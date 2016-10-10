@@ -1,0 +1,23 @@
+# Set the default charset.
+AddDefaultCharset UTF-8
+
+# Don't show directory listings for URLs which map to a directory.
+Options -Indexes
+
+# Enable symlinks
+Options +FollowSymlinks
+
+# Enable mod_rewrite
+RewriteEngine On
+
+# Backend redirect
+RewriteCond %{REQUEST_URI} ^/backend
+RewriteRule ^backend/(.*)$ backend/web/$1 [L]
+
+# Storage redirect
+RewriteCond %{REQUEST_URI} ^/storage
+RewriteRule ^storage/(.*)$ storage/$1 [L]
+
+# Frontend redirect
+RewriteCond %{REQUEST_URI} ^(.*)$
+RewriteRule ^(.*)$ frontend/web/$1
