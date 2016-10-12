@@ -11,8 +11,6 @@ use kartik\icons\Icon;
 
 use trntv\yii\datetime\DateTimeWidget;
 
-use common\models\Wojewodztwa;
-
 
 
 /* @var $this yii\web\View */
@@ -59,20 +57,14 @@ use common\models\Wojewodztwa;
 	
 	
 	<?php
-	
-
-	$dataCategory=ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
-	
-	
+	//parent
 	echo $form->field($model, 'woj')->widget(Select2::classname(), [
-			'data' => $dataCategory,
+			'data' => $woj,
 			'options' => ['id' => 'cat-id'],
 		]
 	);
 	
-	
-	//parent
-	// Parent 
+
 	//echo $form->field($model, 'woj')->dropDownList($dataCategory, ['id'=>'cat-id']);
 	//child # 1
 	echo $form->field($model, 'powiat')->widget(DepDrop::classname(), [
@@ -116,7 +108,7 @@ use common\models\Wojewodztwa;
 	
 	<?= $form->field($model, 'date')->widget(
         DateTimeWidget::className(),
-        [
+        [  
             'clientOptions' => [
 		
 				'allowInputToggle' => true,

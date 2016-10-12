@@ -12,6 +12,7 @@ use common\models\Powiat;
 use common\models\Gmina;
 use common\models\City;
 
+
 use yii\helpers\ArrayHelper;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -48,6 +49,7 @@ class TaskController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+			 
         ];
     }
 
@@ -78,29 +80,7 @@ class TaskController extends Controller
         ]);
     }
 
-    /**
-     * Creates a new Task model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-       $model = new Task();
-	   $woj = ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
-	   $accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
-	   $agent = ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username');
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-				'woj' => $woj,
-				'accident' => $accident,
-				'agent' => $agent,
-            ]);
-        }
-    }
 	
 	
 	public function actionPowiat() {
@@ -149,13 +129,29 @@ class TaskController extends Controller
 		echo Json::encode(['output'=>'', 'selected'=>'']);
 
 	}
-	
-	public function actionTest(){
-		
-		 $data = City::getCitiesList(2,4);
-		echo Json::encode(['output'=>$data['out'], 'selected'=>$data['selected']]);
-	}
+	/**
+     * Creates a new Task model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate()
+    {
+       $model = new Task();
+	   $woj = ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
+	   $accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
+	   $agent = ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username');
 
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('create', [
+                'model' => $model,
+				'woj' => $woj,
+				'accident' => $accident,
+				'agent' => $agent,
+            ]);
+        }
+    }
     /**
      * Updates an existing Task model.
      * If update is successful, the browser will be redirected to the 'view' page.

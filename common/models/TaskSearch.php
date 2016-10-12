@@ -15,11 +15,15 @@ class TaskSearch extends Task
     /**
      * @inheritdoc
      */
+	 public $miasto;
+	 public $agent;
+	 
     public function rules()
     {
         return [
             [['id', 'tele_id', 'agent_id', 'created_at', 'updated_at', 'accident_id', 'woj', 'powiat', 'gmina', 'city', 'meeting', 'date'], 'integer'],
             [['victim_name', 'phone', 'qualified_name', 'details'], 'safe'],
+			[['miasto','agent'],'safe']
         ];
     }
 
@@ -42,7 +46,8 @@ class TaskSearch extends Task
     public function search($params)
     {
         $query = Task::find();
-
+		
+		$query->joinWith(['miasto','agent']);
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -51,6 +56,23 @@ class TaskSearch extends Task
 
         $this->load($params);
 
+		// Important: here is how we set up the sorting
+		// The key is the attribute name on our "TourSearch" instance
+		$dataProvider->sort->attributes['miasto'] = [
+			// The tables are the ones our relation are configured to
+			// in my case they are prefixed with "tbl_"
+			'asc' => ['miasta.name' => SORT_ASC],
+			'desc' => ['miasta.name' => SORT_DESC],
+		];
+		
+		$dataProvider->sort->attributes['agent'] = [
+			// The tables are the ones our relation are configured to
+			// in my case they are prefixed with "tbl_"
+			'asc' => ['user.username' => SORT_ASC],
+			'desc' => ['user.username' => SORT_DESC],
+		];
+		
+		
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
@@ -76,7 +98,9 @@ class TaskSearch extends Task
         $query->andFilterWhere(['like', 'victim_name', $this->victim_name])
             ->andFilterWhere(['like', 'phone', $this->phone])
             ->andFilterWhere(['like', 'qualified_name', $this->qualified_name])
-            ->andFilterWhere(['like', 'details', $this->details]);
+            ->andFilterWhere(['like', 'details', $this->details])
+			->andFilterWhere(['like', 'miasta.name', $this->miasto])
+			->andFilterWhere(['like', 'user.username', $this->agent]);
 
         return $dataProvider;
     }
