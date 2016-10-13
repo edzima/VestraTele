@@ -12,10 +12,10 @@ use common\models\City;
 /* @var $searchModel common\models\TaskSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+
 $this->title = 'Tasks';
 $this->params['breadcrumbs'][] = $this->title;
 
-//$dataCategory=ArrayHelper::map(City::find()->all(), 'id', 'name');
 
 ?>
 <div class="task-index">
