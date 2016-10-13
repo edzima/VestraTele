@@ -6,8 +6,8 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\Task */
 
-$this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Tasks', 'url' => ['index']];
+$this->title = 'Spotkanie nr: '.$model->id;
+$this->params['breadcrumbs'][] = ['label' => 'Spotkania', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="task-view">
@@ -15,11 +15,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::a('Edytuj', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Usuń', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => 'Jesteś pewny, że chcesz usunąć ten wpis?',
                 'method' => 'post',
             ],
         ]) ?>
@@ -30,19 +30,38 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             //'id',
             //'tele_id',
-            'agent_id',
+            [
+				 'attribute' => 'agent_id',
+				 'value' => $model->agent->username,
+			],
+		
             'victim_name',
             'phone',
             'created_at',
             'updated_at',
-            'accident_id',
-            'woj',
-            'powiat',
-            'gmina',
-            'city',
+            [
+				 'attribute' => 'accident_id',
+				 'value' => $model->accident->name,
+			],
+			[
+				 'attribute' => 'woj',
+				 'value' => $model->wojewodztwo->name,
+			],
+            [
+				 'attribute' => 'powiat',
+				 'value' => $model->powiatRel->name,
+			],
+            [
+				 'attribute' => 'gmina',
+				 'value' => $model->gminaRel->name,
+			],
+            [
+				 'attribute' => 'city',
+				 'value' => $model->miasto->name,
+			],
             'qualified_name',
             'details:ntext',
-            'meeting',
+            'meeting:boolean',
             'date',
         ],
     ]) ?>

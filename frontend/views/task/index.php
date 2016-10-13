@@ -12,8 +12,12 @@ use common\models\City;
 /* @var $searchModel common\models\TaskSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+<<<<<<< HEAD
 
 $this->title = 'Tasks';
+=======
+$this->title = 'Umówione spotkania';
+>>>>>>> origin/master
 $this->params['breadcrumbs'][] = $this->title;
 
 
@@ -24,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Task', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Dodaj nowe', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -34,7 +38,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
             //'id',
             //'tele_id',
-            'agent_id',
+            [
+				 'attribute' => 'agent',
+				 'value' => 'agent.username',
+				 'label' => 'Przedstawiciel',
+			],
             'victim_name',
             'phone',
             // 'created_at',
@@ -43,14 +51,17 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'woj',
             // 'powiat',
             // 'gmina',
-            ['label'=>'Miasto', 'attribute'=>'cityName'],
-			['label'=>'Author', 'value'=>function ($model, $index, $widget) { return $model->cityM->name; }],
+			[
+				 'attribute' => 'miasto',
+				 'value' => 'miasto.name',
+				 'label' => 'Miejscowość',
+			],
 
 
              'qualified_name',
             // 'details:ntext',
             // 'meeting',
-            // 'date',
+             'date',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

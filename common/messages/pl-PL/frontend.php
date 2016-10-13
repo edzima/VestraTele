@@ -59,7 +59,7 @@ return [
     'Text' => 'Tekst',
     'Thank you for contacting us. We will respond to you as soon as possible.' => 'Dziękujemy za kontakt',
     'There was an error sending email.' => 'Błąd przy wysyłaniu wiadomości email.',
-    'Update' => 'Aktualizuje',
+    'Update' => 'Edytuj',
     'Username' => 'Login',
     'Users' => 'Użytkownicy',
     'Verification code' => 'Kod weryfikacyjny',

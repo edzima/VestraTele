@@ -41,7 +41,7 @@ class Task extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['tele_id', 'agent_id', 'accident_id', 'woj', 'powiat', 'gmina', 'city'], 'number','min'=>1],
+            [['tele_id', 'agent_id', 'accident_id', 'woj', 'powiat', 'gmina', 'city',], 'number','min'=>1],
             [['details', 'meeting', 'agent_id', 'accident_id', 'city','victim_name','date'], 'required'],
             [['details'], 'string'],
             [['victim_name'], 'string', 'max' => 45, 'min' =>2],
@@ -78,23 +78,33 @@ class Task extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * @inheritdoc
-     * @return TaskQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new TaskQuery(get_called_class());
-    }
+   
 	
 	/**
 	* @return \yii\db\ActiveRelation
 	*/
-	public function getCityM() {
+	public function getMiasto() {
 		return $this->hasOne(City::className(), ['id' => 'city']);
 	}
 	
-	public function getCityName() {
-		return $this->cityM->name;
+	public function getAgent(){
+		return $this->hasOne(User::className(),['id' => 'agent_id']);
 	}
+	
+	public function getAccident(){
+		return $this->hasOne(AccidentTyp::className(),['id'=>'accident_id']);
+	}
+	
+	public function getWojewodztwo(){
+		return $this->hasOne(Wojewodztwa::className(),['id' => 'woj']);
+	}
+	
+	public function getPowiatRel(){
+		return $this->hasOne(Powiat::className(), ['id'=>'powiat', 'wojewodztwo_id'=>'woj']);
+	}
+	
+	public function getGminaRel(){
+		return $this->hasOne(Gmina::className(), ['id'=>'gmina']);
+	}
+
 }

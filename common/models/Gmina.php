@@ -29,7 +29,7 @@ class Gmina extends \yii\db\ActiveRecord
     {
         return [
             [['WOJ', 'POW', 'GMI'], 'integer'],
-            [['NAZWA'], 'string', 'max' => 36],
+            [['name'], 'string', 'max' => 36],
             [['WOJ'], 'exist', 'skipOnError' => true, 'targetClass' => Wojewodztwa::className(), 'targetAttribute' => ['WOJ' => 'id']],
         ];
     }
@@ -43,7 +43,7 @@ class Gmina extends \yii\db\ActiveRecord
             'WOJ' => 'Woj',
             'POW' => 'Pow',
             'GMI' => 'Gmi',
-            'NAZWA' => 'Nazwa',
+            'name' => 'Nazwa',
         ];
     }
 	
