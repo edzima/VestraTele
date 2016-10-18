@@ -126,8 +126,13 @@ class UserForm extends Model
             $model->username = $this->username;
             $model->email = $this->email;
             $model->status = $this->status;
-			$model->typ_work = $this->typ_work;
-            if ($this->password) {
+			//$model->typ_work = $this->typ_work;
+			
+			$typWork = $this->typ_work;
+			if($typWork =='P' || $typWork == 'T') $model->typ_work = $typWork;
+			else $model->typ_work = 'A';
+            
+			if ($this->password) {
                 $model->setPassword($this->password);
             }
             $model->generateAuthKey();

@@ -27,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $form->field($model, 'roles')->checkboxList($roles) ?>
 	
+	
 	<?= $form->field($model, 'typ_work')->dropDownList(['prompt'=> 'Wybierz typ pracownika', 'T'=>'Telemarketer', 'P'=>'Przedstawiciel']) ?>															
 
 	
@@ -41,10 +42,17 @@ $this->params['breadcrumbs'][] = $this->title;
 	$this->registerJs(
 		'$("document").ready(function(){
 			
-			$("#userform-roles").click(function(){
-				console.log($(this).prop("checked"));
+			$(".field-userform-typ_work").toggle();
+			
+				
+			$("#userform-roles").on("change",function(event){
+				console.log(event.target.defaultValue);
+				var role = event.target.defaultValue;
+				
+				if (role =="user")  $(".field-userform-typ_work").toggle();
 			});
-					
+
+			
 		});'		
 	);
 
