@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\Task */
 
-$this->title = 'Spotkanie nr: '.$model->id;
+$this->title = 'Spotkanie dotyczące '.$model->victim_name;
 $this->params['breadcrumbs'][] = ['label' => 'Spotkania', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

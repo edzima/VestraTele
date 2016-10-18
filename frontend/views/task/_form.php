@@ -10,9 +10,6 @@ use kartik\select2\Select2;
 use kartik\icons\Icon;
 
 use trntv\yii\datetime\DateTimeWidget;
-
-
-
 /* @var $this yii\web\View */
 /* @var $model common\models\Task */
 /* @var $woj common\models\Task */
@@ -31,6 +28,8 @@ use trntv\yii\datetime\DateTimeWidget;
 	echo $form->field($model, 'agent_id')->dropDownList($agent);?>
 
     <?= $form->field($model, 'victim_name')->textInput(['maxlength' => true]) ?>
+	
+	<?= $form->field($model, 'qualified_name')->textInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'phone')->widget(\yii\widgets\MaskedInput::className(), [
 			'mask' => '999-999-9999',
@@ -39,34 +38,19 @@ use trntv\yii\datetime\DateTimeWidget;
 
 	<?= $form->field($model, 'accident_id')->dropDownList($accident)?>
 	
-
-		<?php
-/*	
-	// Normal select with ActiveForm & model
-	echo $form->field($model, 'woj')->widget(Select2::classname(), [
-		'data' => $dataCategory,
-		'language' => 'de',
-		'options' => ['placeholder' => 'Wybierz województwo ...'],
-		'pluginOptions' => [
-			'allowClear' => true
-		],
-	]);
-*/
-	?>
-
-	
 	
 	<?php
-	//parent
+	//wojewodztwo
 	echo $form->field($model, 'woj')->widget(Select2::classname(), [
 			'data' => $woj,
-			'options' => ['id' => 'cat-id'],
+			'options' => [
+				'placeholder' => '--Wybierz województwo--',
+				'id' => 'cat-id',
+			],
 		]
 	);
 	
-
-	//echo $form->field($model, 'woj')->dropDownList($dataCategory, ['id'=>'cat-id']);
-	//child # 1
+	//powiat
 	echo $form->field($model, 'powiat')->widget(DepDrop::classname(), [
 		'type'=>DepDrop::TYPE_SELECT2,
 		'options'=>['id'=>'subcat-id'],
@@ -77,8 +61,8 @@ use trntv\yii\datetime\DateTimeWidget;
 			'loading' =>'wyszukiwanie...'
 		]
 	]);
-		
-	// Child # 2
+
+	// gmina
 	echo $form->field($model, 'gmina')->widget(DepDrop::classname(), [
 		'type'=>DepDrop::TYPE_SELECT2,
 		'pluginOptions'=>[
@@ -88,8 +72,7 @@ use trntv\yii\datetime\DateTimeWidget;
 		]
 	]);
 	
-	
-	// Child # 3
+	// miasto
 	echo $form->field($model, 'city')->widget(DepDrop::classname(), [
 		'type'=>DepDrop::TYPE_SELECT2,
 		'pluginOptions'=>[
@@ -108,7 +91,7 @@ use trntv\yii\datetime\DateTimeWidget;
 	
 	<?= $form->field($model, 'date')->widget(
         DateTimeWidget::className(),
-        [  
+        [   'phpDatetimeFormat' => 'dd-MM-yyyy HH:mm',
             'clientOptions' => [
 		
 				'allowInputToggle' => true,
@@ -122,7 +105,7 @@ use trntv\yii\datetime\DateTimeWidget;
     ) ?>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Aktualizuj', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

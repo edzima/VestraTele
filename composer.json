@@ -40,7 +40,8 @@
         "bower-asset/jquery-slimscroll": "*",
         "kartik-v/yii2-widget-depdrop": "@dev",
         "kartik-v/yii2-widget-select2": "@dev",
-        "kartik-v/dependent-dropdown": "@dev"
+        "kartik-v/dependent-dropdown": "@dev",
+        "kartik-v/yii2-grid": "@dev"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "*",

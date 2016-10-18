@@ -44,6 +44,7 @@ class Task extends \yii\db\ActiveRecord
             [['tele_id', 'agent_id', 'accident_id', 'woj', 'powiat', 'gmina', 'city',], 'number','min'=>1],
             [['details', 'meeting', 'agent_id', 'accident_id', 'city','victim_name','date'], 'required'],
             [['details'], 'string'],
+			[['date'], 'safe'],
             [['victim_name'], 'string', 'max' => 45, 'min' =>2],
             [['phone'], 'string', 'max' => 13],
             [['qualified_name'], 'string', 'max' => 200],
@@ -64,8 +65,8 @@ class Task extends \yii\db\ActiveRecord
             'agent_id' => 'Przedstawiciel',
             'victim_name' => 'Poszkodowany',
             'phone' => 'Numer kontaktowy',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'created_at' => 'Utworzono',
+            'updated_at' => 'Aktualizacja',
             'accident_id' => 'Rodzaj zdarzenia',
             'woj' => 'Województwo',
             'powiat' => 'Powiat',
@@ -106,5 +107,6 @@ class Task extends \yii\db\ActiveRecord
 	public function getGminaRel(){
 		return $this->hasOne(Gmina::className(), ['id'=>'gmina']);
 	}
+	
 
 }

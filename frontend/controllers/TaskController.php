@@ -137,12 +137,14 @@ class TaskController extends Controller
     public function actionCreate()
     {
        $model = new Task();
+
 	   $woj = ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
 	   $accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
 	   $agent = ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username');
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+		
+        if ($model->load(Yii::$app->request->post())) {
+			$model->tele_id = Yii::$app->user->id;
+            if ($model->save())return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -161,6 +163,7 @@ class TaskController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+		
 		$woj = ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
 		$accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
 		$agent = ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username');

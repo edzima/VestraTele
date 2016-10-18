@@ -3,23 +3,19 @@
 use yii\helpers\Html;
 
 
-
 /* @var $this yii\web\View */
-/* @var $model common\models\Task */
+/* @var $model common\models\TaskStatus */
 
-$this->title = 'Nowe spotkanie';
-$this->params['breadcrumbs'][] = ['label' => 'Tasks', 'url' => ['index']];
+$this->title = 'Create Task Status';
+$this->params['breadcrumbs'][] = ['label' => 'Task Statuses', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="task-create">
+<div class="task-status-create">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <?= $this->render('_form', [
         'model' => $model,
-		'woj' => $woj,
-		'accident' =>$accident,
-		'agent' => $agent,
     ]) ?>
 
 </div>
