@@ -13,9 +13,9 @@ use common\models\City;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Umówione spotkania';
+
 $this->params['breadcrumbs'][] = $this->title;
 
-//$dataCategory=ArrayHelper::map(City::find()->all(), 'id', 'name');
 
 ?>
 <div class="task-index">

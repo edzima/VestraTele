@@ -1,10 +1,11 @@
 <?php
 
 namespace frontend\modules\account\models\search;
-
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\User;
+
 
 /**
  * UserSearch represents the model behind the search form about `common\models\User`.
@@ -39,7 +40,10 @@ class UserSearch extends User
      */
     public function search($params)
     {
-        $query = User::find()->active();
+		
+		$typWork =  Yii::$app->user->identity->typWork;
+		
+        $query = User::find()->where(['typ_work' => $typWork])->active();
 
         // add conditions that should always apply here
 

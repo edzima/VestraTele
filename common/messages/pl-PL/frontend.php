@@ -18,8 +18,8 @@
  */
 return [
     'Activation for {name}' => 'Активация для {name}',
-    'Articles' => 'Wiadomości',
-    'Articles category &laquo;{title}&raquo;' => 'Статьи категории &laquo;{title}&raquo;',
+    'Articles' => 'Konkursy',
+    'Articles category &laquo;{title}&raquo;' => 'Konkursy &laquo;{title}&raquo;',
     'Articles tagged with &laquo;{name}&raquo;' => 'Статьи с тегом &laquo;{name}&raquo;',
     'Backend' => 'Panel admina',
   
@@ -61,7 +61,7 @@ return [
     'There was an error sending email.' => 'Błąd przy wysyłaniu wiadomości email.',
     'Update' => 'Edytuj',
     'Username' => 'Login',
-    'Users' => 'Użytkownicy',
+    'Users' => 'Ranking',
     'Verification code' => 'Kod weryfikacyjny',
     'Website' => 'Strona',
     'Wrong password reset token.' => 'Неверный маркер сброса пароля.',

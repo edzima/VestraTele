@@ -8,7 +8,9 @@ use yii\helpers\Html;
 /* @var $model common\models\Task */
 
 $this->title = 'Nowe spotkanie';
-$this->params['breadcrumbs'][] = ['label' => 'Tasks', 'url' => ['index']];
+
+$this->params['breadcrumbs'][] = ['label' => 'Spotkania', 'url' => ['index']];
+
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="task-create">

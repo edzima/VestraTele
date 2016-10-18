@@ -2,7 +2,7 @@ require 'yaml'
 require 'fileutils'
 
 domains = {
-  frontend: 'yii2-core.dev',
+  frontend: 'vestra.pl',
   backend: 'backend.yii2-core.dev',
   storage: 'storage.yii2-core.dev'
 }

@@ -17,6 +17,7 @@ class UserForm extends Model
     public $password;
     public $status;
     public $roles;
+	public $typ_work;
 
     private $model;
 
@@ -42,6 +43,7 @@ class UserForm extends Model
             ['email', 'trim'],
             ['email', 'required'],
             ['email', 'email'],
+			['typ_work', 'string'],
             ['email', 'unique',
                 'targetClass' => User::className(),
                 'filter' => function ($query) {
@@ -77,6 +79,7 @@ class UserForm extends Model
             'password' => Yii::t('backend', 'Hasło'),
             'status' => Yii::t('backend', 'Status'),
             'roles' => Yii::t('backend', 'Rola'),
+			'typ_work' => 'Rodzaj pracownika',
         ];
     }
 
@@ -88,6 +91,7 @@ class UserForm extends Model
         $this->username = $model->username;
         $this->email = $model->email;
         $this->status = $model->status;
+		$this->typ_work = $model->typ_work;
         $this->model = $model;
         $this->roles = ArrayHelper::getColumn(
             Yii::$app->authManager->getRolesByUser($model->getId()),
@@ -122,7 +126,13 @@ class UserForm extends Model
             $model->username = $this->username;
             $model->email = $this->email;
             $model->status = $this->status;
-            if ($this->password) {
+			//$model->typ_work = $this->typ_work;
+			
+			$typWork = $this->typ_work;
+			if($typWork =='P' || $typWork == 'T') $model->typ_work = $typWork;
+			else $model->typ_work = 'A';
+            
+			if ($this->password) {
                 $model->setPassword($this->password);
             }
             $model->generateAuthKey();

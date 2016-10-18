@@ -10,6 +10,8 @@ use common\models\User;
 
 $this->title = Yii::t('backend', 'Users');
 $this->params['breadcrumbs'][] = $this->title;
+
+$typWok = ['0' => 'Przedstawiciel', '1' => 'Telemarketer'];
 ?>
 <div class="user-index">
 
@@ -39,8 +41,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'ip',
             // 'created_at',
             // 'updated_at',
-            // 'action_at',
-
+             //'action_at',
+			
+			[
+                'attribute' => 'typ_work',
+                'value' => function ($model) {
+                    return User::typWorks($model->typ_work);
+                },		
+            ],
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{update} {delete}',

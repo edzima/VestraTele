@@ -36,12 +36,6 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 
     <?= $form->field($profile, 'lastname')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($profile, 'birthday')->widget(
-        DateTimeWidget::className(),
-        [
-            'phpDatetimeFormat' => 'yyyy-MM-dd\'T\'HH:mm:ssZZZZZ',
-        ]
-    ) ?>
 
     <?= $form->field($profile, 'avatar_path')->widget(
         Widget::className(),
@@ -55,18 +49,10 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
         ]
     ) ?>
 
-    <?= $form->field($profile, 'gender')->dropDownlist(
-        [
-            UserProfile::GENDER_MALE => Yii::t('backend', 'Male'),
-            UserProfile::GENDER_FEMALE => Yii::t('backend', 'Female'),
-        ],
-        ['prompt' => '']
-    ) ?>
 
-    <?= $form->field($profile, 'website')->textInput(['maxlength' => true]) ?>
+	<?= $form->field($user, 'typ_work')->dropDownList(['prompt'=> 'Wybierz typ pracownika', 'T'=>'Telemarketer', 'P'=>'Przedstawiciel']) ?>															
 
-    <?= $form->field($profile, 'other')->textarea(['rows' => 6, 'maxlength' => true]) ?>
-
+	
     <div class="form-group">
         <?= Html::submitButton(Yii::t('backend', 'Update'), ['class' => 'btn btn-primary']) ?>
     </div>

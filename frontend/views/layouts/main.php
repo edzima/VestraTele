@@ -44,21 +44,12 @@ AppAsset::register($this);
             'visible' => !Yii::$app->user->isGuest,
         ],
 		[
-            'label' => Yii::t('frontend', 'New task'),
-            'url' => ['/account/default/teletask'],
+            'label' => Yii::t('frontend', 'Spotkania'),
+            'url' => ['/task'],
             'visible' => !Yii::$app->user->isGuest,
         ],
-		
-		
-	
-        ['label' => Yii::t('frontend', 'Contact'), 'url' => ['/site/contact']],
     ];
 
-    if (Yii::$app->user->isGuest) {
-		
-		
-        $menuItems[] = ['label' => Yii::t('frontend', 'TypPracy'), 'url' => ['/account/sign-in/login']];
-	}
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => Yii::t('frontend', 'Login'), 'url' => ['/account/sign-in/login']];
     } else {

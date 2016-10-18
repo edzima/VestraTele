@@ -23,14 +23,39 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'status')->checkbox(['label' => Yii::t('backend', 'Activaate')]) ?>
+    <?= $form->field($model, 'status')->checkbox(['label' => Yii::t('backend', 'Activate')]) ?>
 
     <?= $form->field($model, 'roles')->checkboxList($roles) ?>
+	
+	
+	<?= $form->field($model, 'typ_work')->dropDownList(['prompt'=> 'Wybierz typ pracownika', 'T'=>'Telemarketer', 'P'=>'Przedstawiciel']) ?>															
 
+	
     <div class="form-group">
         <?= Html::submitButton(Yii::t('backend', 'Create'), ['class' => 'btn btn-primary']) ?>
     </div>
+	
 
-    <?php ActiveForm::end() ?>
+    <?php ActiveForm::end() ?>	
 
-</div>
+	<?php
+	$this->registerJs(
+		'$("document").ready(function(){
+			
+			$(".field-userform-typ_work").toggle();
+			
+				
+			$("#userform-roles").on("change",function(event){
+				console.log(event.target.defaultValue);
+				var role = event.target.defaultValue;
+				
+				if (role =="user")  $(".field-userform-typ_work").toggle();
+			});
+
+			
+		});'		
+	);
+
+?>
+
+	
