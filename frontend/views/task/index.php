@@ -12,12 +12,8 @@ use common\models\City;
 /* @var $searchModel common\models\TaskSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-<<<<<<< HEAD
-
-$this->title = 'Tasks';
-=======
 $this->title = 'Umówione spotkania';
->>>>>>> origin/master
+
 $this->params['breadcrumbs'][] = $this->title;
 
 

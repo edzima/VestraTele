@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="row">
             <div class="col-md-9">
                 <div class="article-text">
-                    <?= HtmlPurifier::process($model->body) ?>
+                    <?= HtmlPurifier::process($model->preview) ?>
                 </div>
 
                 <?php if ($model->tagValues) : ?>
@@ -37,12 +37,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php endif ?>
 
                 <hr/>
-                <!--noindex-->
-                    <?= Comments::widget([
-                        'shortname' => getenv('SHORT_NAME'),
-                        'identifier' => Html::encode($model->slug),
-                    ]) ?>
-                <!--/noindex-->
             </div>
 
             <div class="col-md-3">

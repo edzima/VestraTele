@@ -14,23 +14,18 @@ use backend\widgets\Menu;
                     'label' => Yii::t('backend', 'Main'),
                     'options' => ['class' => 'header'],
                 ],
-                [
-                    'label' => Yii::t('backend', 'Menu'),
-                    'url' => ['/menu/index'],
-                    'icon' => '<i class="fa fa-sitemap"></i>',
+				[
+                    'label' => Yii::t('backend', 'Users'),
+                    'url' => ['/user/index'],
+                    'icon' => '<i class="fa fa-users"></i>',
+                    'visible' => Yii::$app->user->can('administrator'),
                 ],
                 [
-                    'label' => Yii::t('backend', 'Tags'),
-                    'url' => ['/tag/index'],
-                    'icon' => '<i class="fa fa-tags"></i>',
-                ],
-                [
-                    'label' => Yii::t('backend', 'Content'),
+                    'label' => Yii::t('backend', 'Competition'),
                     'url' => '#',
                     'icon' => '<i class="fa fa-edit"></i>',
                     'options' => ['class' => 'treeview'],
-                    'items' => [
-                        ['label' => Yii::t('backend', 'Static pages'), 'url' => ['/page/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+                    'items' => [                 
                         ['label' => Yii::t('backend', 'Articles'), 'url' => ['/article/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
                         ['label' => Yii::t('backend', 'Article categories'), 'url' => ['/article-category/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
                     ],
@@ -40,29 +35,11 @@ use backend\widgets\Menu;
                     'options' => ['class' => 'header'],
                 ],
                 [
-                    'label' => Yii::t('backend', 'Users'),
-                    'url' => ['/user/index'],
-                    'icon' => '<i class="fa fa-users"></i>',
-                    'visible' => Yii::$app->user->can('administrator'),
-                ],
-                [
-                    'label' => Yii::t('backend', 'Other'),
+                    'label' => Yii::t('backend', 'System'),
                     'url' => '#',
                     'icon' => '<i class="fa fa-terminal"></i>',
                     'options' => ['class' => 'treeview'],
                     'items' => [
-                        [
-                            'label' => 'Gii',
-                            'url' => ['/gii'],
-                            'icon' => '<i class="fa fa-angle-double-right"></i>',
-                            'visible' => YII_ENV_DEV,
-                        ],
-                        [
-                            'label' => 'Web shell',
-                            'url' => ['/webshell'],
-                            'icon' => '<i class="fa fa-angle-double-right"></i>',
-                            'visible' => Yii::$app->user->can('administrator'),
-                        ],
                         ['label' => Yii::t('backend', 'File manager'), 'url' => ['/file-manager/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
                         [
                             'label' => Yii::t('backend', 'DB manager'),
@@ -70,8 +47,11 @@ use backend\widgets\Menu;
                             'icon' => '<i class="fa fa-angle-double-right"></i>',
                             'visible' => Yii::$app->user->can('administrator'),
                         ],
-                        ['label' => Yii::t('backend', 'Key storage'), 'url' => ['/key-storage/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                        ['label' => Yii::t('backend', 'Cache'), 'url' => ['/cache/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+						[
+						'label' => Yii::t('backend', 'Tags'),
+						'url' => ['/tag/index'],
+						'icon' => '<i class="fa fa-tags"></i>',
+						],
                         [
                             'label' => Yii::t('backend', 'Logs'),
                             'url' => ['/log/index'],
