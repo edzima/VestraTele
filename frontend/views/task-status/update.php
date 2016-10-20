@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\TaskStatus */
 
-$this->title = 'Update Task Status: ';
+$this->title = 'Aktualizacja raportu nr: '.$model->task_id;
 $this->params['breadcrumbs'][] = ['label' => 'Task Statuses', 'url' => ['index']];
 //$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->task_id]];
 $this->params['breadcrumbs'][] = 'Update';
@@ -16,6 +16,8 @@ $this->params['breadcrumbs'][] = 'Update';
 
     <?= $this->render('_form', [
         'model' => $model,
+		'task' =>$task,
+		'answers' =>$answers,
     ]) ?>
 
 </div>

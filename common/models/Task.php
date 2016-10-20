@@ -61,7 +61,7 @@ class Task extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'tele_id' => 'Tele ID',
+            'tele_id' => 'Konsultant',
             'agent_id' => 'Przedstawiciel',
             'victim_name' => 'Poszkodowany',
             'phone' => 'Numer kontaktowy',
@@ -72,7 +72,7 @@ class Task extends \yii\db\ActiveRecord
             'powiat' => 'Powiat',
             'gmina' => 'Gmina',
             'city' => 'Miejscowość',
-            'qualified_name' => 'Nazwiska upoważnionych',
+            'qualified_name' => 'Dane uprawnionych (imie, nazwisko)',
             'details' => 'Szczegóły',
             'meeting' => 'Wstępnie umówione',
             'date' => 'Data spotkania',
@@ -92,6 +92,10 @@ class Task extends \yii\db\ActiveRecord
 		return $this->hasOne(User::className(),['id' => 'agent_id']);
 	}
 	
+	public function getTele(){
+		return $this->hasOne(User::className(),['id' => 'tele_id']);
+	}
+	
 	public function getAccident(){
 		return $this->hasOne(AccidentTyp::className(),['id'=>'accident_id']);
 	}
@@ -106,6 +110,14 @@ class Task extends \yii\db\ActiveRecord
 	
 	public function getGminaRel(){
 		return $this->hasOne(Gmina::className(), ['id'=>'gmina']);
+	}
+	
+	public function getTaskstatus(){
+		return $this->hasOne(TaskStatus::className(), ['task_id'=>'id']);
+	}
+	
+	public function getTask_id(){
+		return $this->id;
 	}
 	
 

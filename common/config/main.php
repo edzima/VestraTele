@@ -55,6 +55,7 @@ $config = [
                         'common' => 'common.php',
                         'backend' => 'backend.php',
                         'frontend' => 'frontend.php',
+						'kvgrid' => 'kvgrid.php',
                     ],
                 ],
             ],

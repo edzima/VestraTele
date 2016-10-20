@@ -5,21 +5,28 @@ namespace common\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\TaskStatus;
+use common\models\Task;
 
 /**
- * TaskStatusSearch represents the model behind the search form of `common\models\TaskStatus`.
+ * TaskSearch represents the model behind the search form of `common\models\Task`.
  */
-class TaskStatusSearch extends TaskStatus
+class TaskStatusSearch extends Task
 {
     /**
      * @inheritdoc
      */
+	 public $miasto;
+	 public $tele;
+	 public $taskstatus;
+	 public $finish;
+	 public $answer;
+	 
     public function rules()
     {
         return [
-            [['task_id', 'answer_id', 'count_agreement'], 'integer'],
-            [['status_details', 'name'], 'safe'],
+            [['id', 'tele_id', 'agent_id', 'created_at', 'updated_at', 'accident_id', 'woj', 'powiat', 'gmina', 'city', 'meeting', 'date', 'finish', 'taskstatus'], 'integer'],
+            [['victim_name', 'phone', 'qualified_name', 'details', 'miasto','tele', 'answer'], 'safe'],
+			
         ];
     }
 
@@ -41,8 +48,9 @@ class TaskStatusSearch extends TaskStatus
      */
     public function search($params)
     {
-        $query = TaskStatus::find();
-
+        $query = Task::find();
+		
+		$query->joinWith(['miasto','tele','taskstatus','taskstatus.answer']);
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -50,22 +58,64 @@ class TaskStatusSearch extends TaskStatus
         ]);
 
         $this->load($params);
+		// Important: here is how we set up the sorting
+		// The key is the attribute name on our "TourSearch" instance
+		$dataProvider->sort->attributes['miasto'] = [
+			// The tables are the ones our relation are configured to
+			// in my case they are prefixed with "tbl_"
+			'asc' => ['miasta.name' => SORT_ASC],
+			'desc' => ['miasta.name' => SORT_DESC],
+		];
+		
+		$dataProvider->sort->attributes['tele'] = [
+			// The tables are the ones our relation are configured to
+			// in my case they are prefixed with "tbl_"
+			'asc' => ['user.username' => SORT_ASC],
+			'desc' => ['user.username' => SORT_DESC],
+		];
+		
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
+	
             return $dataProvider;
         }
+		
+					//only raport task-status
+		if(!@$params['TaskStatusSearch']['taskstatus']){
+			$query->where('task_status.created_at is null');
+		}
+	    else $query->where('task_status.created_at is not null');
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'task_id' => $this->task_id,
-            'answer_id' => $this->answer_id,
-            'count_agreement' => $this->count_agreement,
+            'task.id' => $this->id,
+            'tele_id' => $this->tele_id,
+            'agent_id' => $this->agent_id,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'accident_id' => $this->accident_id,
+            'woj' => $this->woj,
+            'powiat' => $this->powiat,
+            'gmina' => $this->gmina,
+            'city' => $this->city,
+            'meeting' => $this->meeting,
+            'date' => $this->date,
+			'task_status.finished'=> $this->finish
+			
         ]);
+		
+		
+        $query->andFilterWhere(['like', 'victim_name', $this->victim_name])
+            ->andFilterWhere(['like', 'phone', $this->phone])
+            ->andFilterWhere(['like', 'qualified_name', $this->qualified_name])
+            ->andFilterWhere(['like', 'details', $this->details])
+			->andFilterWhere(['like', 'miasta.name', $this->miasto])
+			->andFilterWhere(['like', 'answer_typ.name', $this->answer])
+			->andFilterWhere(['like', 'user.username', $this->tele]);
+			
 
-        $query->andFilterWhere(['like', 'status_details', $this->status_details])
-            ->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }

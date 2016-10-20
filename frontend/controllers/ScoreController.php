@@ -3,19 +3,19 @@
 namespace frontend\controllers;
 
 use Yii;
-use common\models\Task;
-use common\models\TaskStatusSearch;
-use common\models\TaskStatus;
-use common\models\TaskExtra;
-use common\models\AnswerTyp;
+use common\models\Score;
+use common\models\Connexion;
+use common\models\ScoreSearch;
+use common\models\User;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
+
 /**
- * TaskStatusController implements the CRUD actions for TaskStatus model.
+ * ScoreController implements the CRUD actions for Score model.
  */
-class TaskStatusController extends Controller
+class ScoreController extends Controller
 {
     /**
      * @inheritdoc
@@ -33,25 +33,22 @@ class TaskStatusController extends Controller
     }
 
     /**
-     * Lists all TaskStatus models.
+     * Lists all Score models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new TaskStatusSearch();
+        $searchModel = new ScoreSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-		
-		$answers = ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name');
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-			'answers' =>$answers,
         ]);
     }
 
     /**
-     * Displays a single TaskStatus model.
+     * Displays a single Score model.
      * @param integer $id
      * @return mixed
      */
@@ -63,32 +60,28 @@ class TaskStatusController extends Controller
     }
 
     /**
-     * Creates a new TaskStatus model.
+     * Creates a new Score model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionRaport($id)
+    public function actionCreate()
     {
-		if (($model = TaskStatus::findOne($id)) == null) $model = new TaskStatus();
-		$model->task_id = $id;
-		$task = $this->findTask($id);
-		
-		$answers = ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name');
-
-        if ($model->load(Yii::$app->request->post()) && $model->save() ) {
-            return $this->redirect(['view', 'id' => $model->task_id]);
+        $model = new Score();
+		$connexion = ArrayHelper::map(Connexion::find()->all(),'id', 'name');
+		$tele = ArrayHelper::map(User::find()->where(['typ_work' => 'T'])->all(), 'id', 'username');
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
-				'task' =>$task,
-				'answers' =>$answers,
-				
+				'connexion' => $connexion,
+				'tele' => $tele,
             ]);
         }
     }
 
     /**
-     * Updates an existing TaskStatus model.
+     * Updates an existing Score model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -96,22 +89,18 @@ class TaskStatusController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-		$task = $this->findTask($id);
-		
-		$answers = ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name');
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->task_id]);
+            return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
                 'model' => $model,
-				'task' => $task,
-				'answers' =>$answers,
             ]);
         }
     }
 
     /**
-     * Deletes an existing TaskStatus model.
+     * Deletes an existing Score model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -124,24 +113,15 @@ class TaskStatusController extends Controller
     }
 
     /**
-     * Finds the TaskStatus model based on its primary key value.
+     * Finds the Score model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return TaskStatus the loaded model
+     * @return Score the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = TaskStatus::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
-    }
-	
-	 protected function findTask($id)
-    {
-        if (($model = Task::findOne($id)) !== null) {
+        if (($model = Score::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

@@ -47,7 +47,7 @@ class TaskSearch extends Task
     {
         $query = Task::find();
 		
-		$query->joinWith(['miasto','agent']);
+		$query->joinWith(['miasto','agent','taskstatus',]);
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -72,6 +72,7 @@ class TaskSearch extends Task
 			'desc' => ['user.username' => SORT_DESC],
 		];
 		
+
 		
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -81,7 +82,7 @@ class TaskSearch extends Task
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
+            'task.id' => $this->id,
             'tele_id' => $this->tele_id,
             'agent_id' => $this->agent_id,
             'created_at' => $this->created_at,

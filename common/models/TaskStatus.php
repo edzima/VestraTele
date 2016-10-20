@@ -12,6 +12,11 @@ use Yii;
  * @property integer $count_agreement
  * @property string $status_details
  * @property string $name
+ * @property string $created_at
+ * @property string $updated_at
+ * @property integer $finished
+ * @property integer $extra_agreement
+ * @property string $extra_name
  */
 class TaskStatus extends \yii\db\ActiveRecord
 {
@@ -29,10 +34,12 @@ class TaskStatus extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['task_id'], 'required'],
-            [['task_id', 'answer_id', 'count_agreement'], 'integer'],
+            [['task_id', 'finished',], 'required'],
+            [['task_id', 'answer_id', 'count_agreement', 'finished', 'extra_agreement'], 'integer'],
             [['status_details'], 'string'],
+            [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 120],
+            [['extra_name'], 'string', 'max' => 250],
             [['answer_id'], 'exist', 'skipOnError' => true, 'targetClass' => AnswerTyp::className(), 'targetAttribute' => ['answer_id' => 'id']],
             [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::className(), 'targetAttribute' => ['task_id' => 'id']],
         ];
@@ -45,14 +52,20 @@ class TaskStatus extends \yii\db\ActiveRecord
     {
         return [
             'task_id' => 'Task ID',
-            'answer_id' => 'Answer ID',
-            'count_agreement' => 'Count Agreement',
-            'status_details' => 'status_details',
-            'name' => 'Name',
+            'answer_id' => 'Efekt spotkania',
+            'count_agreement' => 'Ilość umów',
+            'status_details' => 'Komentarz',
+            'name' => 'Kto poszkodowany',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
+            'finished' => 'Zakończono',
+            'extra_agreement' => 'Extra umowy',
+            'extra_name' => 'Extra Poszkodowani',
         ];
     }
 	
-	public function getTaskRel(){
-		return $this->hasOne(Task::className(), ['id'=>'task_id']);
+	
+	public function getAnswer(){
+			return $this->hasOne(AnswerTyp::className(), ['id'=>'answer_id']);
 	}
 }
