@@ -17,14 +17,9 @@ $config = [
         'noty' => [
             'class' => 'lo\modules\noty\Module',
         ],
-		   'gridview' =>  [
-        'class' => '\kartik\grid\Module',
-        // enter optional module parameters below - only if you need to  
-        // use your own export download action or custom translation 
-        // message source
-        // 'downloadAction' => 'gridview/export/download',
-     
-    ]
+		'gridview' =>  [
+			'class' => '\kartik\grid\Module',
+		]
     ],
     'components' => [
         'request' => [

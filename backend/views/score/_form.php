@@ -19,7 +19,7 @@ use trntv\yii\datetime\DateTimeWidget;
 	
 	<?= $form->field($model, 'name')->textInput() ?>
 
-    <?= $form->field($model, 'date')->widget(
+    	<?= $form->field($model, 'date')->widget(
         DateTimeWidget::className(),
         [   'phpDatetimeFormat' => 'yyyy-MM-dd',
             'clientOptions' => [

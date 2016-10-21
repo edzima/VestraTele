@@ -1,11 +1,11 @@
 <?php
 
-namespace frontend\controllers;
+namespace backend\controllers;
 
 use Yii;
 use common\models\Score;
 use common\models\Connexion;
-use common\models\ScoreSearch;
+use backend\models\search\ScoreSearch;
 use common\models\User;
 use common\models\Task;
 use common\models\TaskStatus;

@@ -74,6 +74,9 @@ $config = [
                 ],
             ],
         ],
+		'gridview' =>  [
+			'class' => '\kartik\grid\Module',
+		],
         'webshell' => [
             'class' => 'samdark\webshell\Module',
             'yiiScript' => '@root/yii', // adjust path to point to your ./yii script

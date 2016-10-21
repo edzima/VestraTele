@@ -18,6 +18,9 @@ class Score extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+	public $suma; 
+	
+	
     public static function tableName()
     {
         return 'score';
@@ -29,8 +32,9 @@ class Score extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['task_id', 'tele_id', 'connexion', 'score', 'date', 'name'], 'required'],
-            [['task_id', 'tele_id', 'connexion', 'score'], 'integer'],
+            [['task_id', 'tele_id', 'connexion', 'score',  'name'], 'required'],
+            [['task_id', 'tele_id', 'connexion'], 'integer'],
+			[['score'], 'number'],
             [['date'], 'safe'],
 			[['name'], 'string', 'max'=>60],
             [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::className(), 'targetAttribute' => ['task_id' => 'id']],
@@ -51,4 +55,9 @@ class Score extends \yii\db\ActiveRecord
 			'name' => 'Upoważniony'
         ];
     }
+	
+	public function getTele(){
+		return $this->hasOne(User::className(),['id' => 'tele_id']);
+	}
+	
 }

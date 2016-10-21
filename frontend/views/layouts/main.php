@@ -39,8 +39,8 @@ AppAsset::register($this);
     $menuItems = [
         ['label' => Yii::t('frontend', 'Articles'), 'url' => ['/article/index']],
         [
-            'label' => Yii::t('frontend', 'Users'),
-            'url' => ['/account/default/users'],
+            'label' => 'Ranking',
+            'url' => ['/score'],
             'visible' => !Yii::$app->user->isGuest,
         ],
 		[

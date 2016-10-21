@@ -47,7 +47,8 @@ class TaskSearch extends Task
     {
         $query = Task::find();
 		
-		$query->joinWith(['miasto','agent','taskstatus',]);
+		//Only the tele tasks
+		$query->joinWith(['miasto','agent','taskstatus',])->where(['tele_id'=>Yii::$app->user->identity->id]);
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([

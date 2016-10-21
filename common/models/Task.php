@@ -42,7 +42,7 @@ class Task extends \yii\db\ActiveRecord
     {
         return [
             [['tele_id', 'agent_id', 'accident_id', 'woj', 'powiat', 'gmina', 'city',], 'number','min'=>1],
-            [['details', 'meeting', 'agent_id', 'accident_id', 'city','victim_name','date'], 'required'],
+            [['details', 'meeting', 'agent_id', 'accident_id', 'city','victim_name','date', 'city_code'], 'required'],
             [['details'], 'string'],
 			[['date'], 'safe'],
             [['victim_name'], 'string', 'max' => 45, 'min' =>2],
@@ -76,6 +76,7 @@ class Task extends \yii\db\ActiveRecord
             'details' => 'Szczegóły',
             'meeting' => 'Wstępnie umówione',
             'date' => 'Data spotkania',
+			'city_code' => 'Kod pocztowy',
         ];
     }
 
@@ -114,6 +115,10 @@ class Task extends \yii\db\ActiveRecord
 	
 	public function getTaskstatus(){
 		return $this->hasOne(TaskStatus::className(), ['task_id'=>'id']);
+	}
+	
+	public function getScore(){
+		return $this->hasOne(Score::className(), ['task_id'=>'id']);
 	}
 	
 	public function getTask_id(){

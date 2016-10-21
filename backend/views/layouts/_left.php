@@ -30,6 +30,16 @@ use backend\widgets\Menu;
                         ['label' => Yii::t('backend', 'Article categories'), 'url' => ['/article-category/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
                     ],
                 ],
+				[
+                    'label' => 'Punkty',
+                    'url' => '#',
+                    'icon' => '<i class="fa fa-dot-circle-o"></i>',
+                    'options' => ['class' => 'treeview'],
+                    'items' => [                 
+                        ['label' => 'Rodziel punty', 'url' => ['/score/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+                
+                    ],
+                ],
                 [
                     'label' => Yii::t('backend', 'System'),
                     'options' => ['class' => 'header'],

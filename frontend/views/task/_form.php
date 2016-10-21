@@ -83,6 +83,11 @@ use trntv\yii\datetime\DateTimeWidget;
 	]);
 
 	?>
+	
+	<?= $form->field($model, 'city_code')->widget(\yii\widgets\MaskedInput::className(), [
+			'mask' => '99-999',
+		]) 
+	?>
 
 
 	<?= $form->field($model, 'details')->textArea(['rows'=>4]) ?>

@@ -59,6 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				 'attribute' => 'city',
 				 'value' => $model->miasto->name,
 			],
+			'city_code',
             'qualified_name',
             'details:ntext',
             'meeting:boolean',
