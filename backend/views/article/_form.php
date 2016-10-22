@@ -4,7 +4,6 @@ use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
-use dosamigos\selectize\SelectizeTextInput;
 use trntv\yii\datetime\DateTimeWidget;
 use vova07\imperavi\Widget;
 
@@ -20,28 +19,6 @@ use vova07\imperavi\Widget;
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'slug')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'keywords')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'preview')->widget(Widget::className(), [
-        'settings' => [
-            'minHeight' => 200,
-            'plugins' => [
-                'filemanager',
-                'fullscreen',
-                'fontcolor',
-                'imagemanager',
-                'table',
-                'video',
-            ],
-            'imageManagerJson' => Url::to(['/site/images-get']),
-            'fileManagerJson' => Url::to(['/site/files-get']),
-            'imageUpload' => Url::to(['/site/image-upload']),
-            'fileUpload' => Url::to(['/site/file-upload']),
-        ],
-    ]) ?>
 
     <?= $form->field($model, 'body')->widget(Widget::className(), [
         'settings' => [
@@ -61,18 +38,6 @@ use vova07\imperavi\Widget;
         ],
     ]) ?>
 
-    <?= $form->field($model, 'tagValues')->widget(SelectizeTextInput::className(), [
-        'loadUrl' => ['tag/list'],
-        'options' => ['class' => 'form-control'],
-        'clientOptions' => [
-            'plugins' => ['remove_button'],
-            'valueField' => 'name',
-            'labelField' => 'name',
-            'searchField' => ['name'],
-            'create' => true,
-        ],
-    ]) ?>
-
     <?= $form->field($model, 'status')->checkbox(['label' => Yii::t('backend', 'Activate')]) ?>
 
     <?= $form->field($model, 'category_id')->dropDownList(ArrayHelper::map(
@@ -88,6 +53,41 @@ use vova07\imperavi\Widget;
             'phpDatetimeFormat' => 'yyyy-MM-dd\'T\'HH:mm:ssZZZZZ',
         ]
     ) ?>
+	
+	
+	<?= $form->field($model, 'start_at')->widget(
+        DateTimeWidget::className(),
+        [
+            'phpDatetimeFormat' => 'yyyy-MM-dd',
+			'clientOptions' => [
+		
+				'allowInputToggle' => true,
+				'sideBySide' => true,
+				'widgetPositioning' => [
+				   'horizontal' => 'auto',
+				   'vertical' => 'auto'
+				],
+			]
+        ]
+    ) ?>
+	
+	
+	<?= $form->field($model, 'finish_at')->widget(
+        DateTimeWidget::className(),
+        [
+            'phpDatetimeFormat' => 'yyyy-MM-dd',
+			'clientOptions' => [
+		
+				'allowInputToggle' => true,
+				'sideBySide' => true,
+				'widgetPositioning' => [
+				   'horizontal' => 'auto',
+				   'vertical' => 'auto'
+				],
+			]
+        ]
+    ) ?>
+	
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('backend', 'Create') : Yii::t('backend', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

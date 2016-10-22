@@ -77,7 +77,7 @@ class Article extends ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'preview', 'body', 'category_id'], 'required'],
+            [['title', 'preview', 'body', 'category_id', 'finish_at', 'start_at'], 'required'],
             [['preview', 'body'], 'string'],
             ['published_at', 'default',
                 'value' => function () {
@@ -115,6 +115,9 @@ class Article extends ActiveRecord
             'created_at' => Yii::t('common', 'Created at'),
             'updated_at' => Yii::t('common', 'Updated at'),
             'tagValues' => Yii::t('common', 'Tags'),
+			'start_at' => 'Zaczyna  się',
+			'finish_at' => 'Kończy się',
+			
         ];
     }
 

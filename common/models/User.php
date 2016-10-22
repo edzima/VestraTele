@@ -245,8 +245,16 @@ class User extends ActiveRecord implements IdentityInterface
 		
         return $statuses[$typ];
     }
+	
+	public function isAgent (){
+		if ($this->typ_work=='P') return true;
+		else return false;
+	}
 
-    /**
+	public function isTele (){
+		if ($this->typ_work=='T') return true;
+		else return false;
+	}    /**
      * Creates user profile and application event.
      *
      * @param array $profileData

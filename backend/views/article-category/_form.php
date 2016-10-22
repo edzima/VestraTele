@@ -16,8 +16,6 @@ use yii\bootstrap\Html;
 
     <?= $form->field($model, 'slug')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'comment')->textarea() ?>
-
     <?= $form->field($model, 'parent_id')->dropDownList($categories, ['prompt' => '']) ?>
 
     <?= $form->field($model, 'status')->checkbox(['label' => Yii::t('backend', 'Activate')]) ?>

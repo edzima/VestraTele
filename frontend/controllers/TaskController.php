@@ -12,6 +12,8 @@ use common\models\Powiat;
 use common\models\Gmina;
 use common\models\City;
 
+use common\models\TaskStatusSearch;
+
 
 use yii\helpers\ArrayHelper;
 use yii\filters\AccessControl;
@@ -29,7 +31,10 @@ class TaskController extends Controller
      */
 	 const WORK_AGENT = 2;
 	 const WORK_TELE = 1;
+	public $allow = false;
 	
+	//if(Yii::$app->user->identity->typ_work=='P') $allow = true;
+		
 	 
     public function behaviors()
     {
@@ -60,11 +65,17 @@ class TaskController extends Controller
     public function actionIndex()
     {
         $searchModel = new TaskSearch();
+		
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		
+		$searchStatus = new TaskStatusSearch();
+		$statusProvider = $searchStatus->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'searchStatus' => $searchStatus,
+            'statusProvider' => $statusProvider,
         ]);
     }
 

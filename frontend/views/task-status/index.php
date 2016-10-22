@@ -97,6 +97,7 @@ $exportConfig=   [
 							return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, $options);
 						}
 				],
+				'visible' => Yii::$app->user->identity->isAgent()
 			],
 			'id',
 		    [

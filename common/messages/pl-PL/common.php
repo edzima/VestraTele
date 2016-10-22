@@ -21,6 +21,7 @@ return [
     'Author' => 'Autor',
     'Avatar' => 'Awatar',
     'Banned' => 'Zbanowany',
+	'Category' => 'Rodzaj',
     'Comment' => 'Komentarz',
     'Created at' => 'W firmie od',
     'Deleted' => 'Usuń',

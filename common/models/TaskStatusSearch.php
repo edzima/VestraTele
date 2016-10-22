@@ -48,15 +48,20 @@ class TaskStatusSearch extends Task
      */
     public function search($params)
     {
+		$typWork= Yii::$app->user->identity->typ_work;
+		if($typWork=='T') $user = 'tele_id';
+		if($typWork=='P') $user = 'agent_id';
         $query = Task::find();
-		
-		$query->joinWith(['miasto','tele','taskstatus','taskstatus.answer']);
-        // add conditions that should always apply here
 
+		var_dump($typWork);
+		$query->joinWith(['miasto','tele','taskstatus','taskstatus.answer'])->where([$user=>Yii::$app->user->identity->id]);
+
+        // add conditions that should always apply here
+		
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
-
+		
         $this->load($params);
 		// Important: here is how we set up the sorting
 		// The key is the attribute name on our "TourSearch" instance
@@ -82,11 +87,12 @@ class TaskStatusSearch extends Task
             return $dataProvider;
         }
 		
-					//only raport task-status
-		if(!@$params['TaskStatusSearch']['taskstatus']){
-			$query->where('task_status.created_at is null');
-		}
-	    else $query->where('task_status.created_at is not null');
+		//is raport task-status
+		
+		if(strlen($this->taskstatus)==1){
+			if($this->taskstatus==0) $query->where('task_status.created_at is null');
+			else $query->where('task_status.created_at is not null');
+		} 
 
         // grid filtering conditions
         $query->andFilterWhere([
@@ -102,7 +108,8 @@ class TaskStatusSearch extends Task
             'city' => $this->city,
             'meeting' => $this->meeting,
             'date' => $this->date,
-			'task_status.finished'=> $this->finish
+			'task_status.finished'=> $this->finish,
+			'answer_typ.id'=> $this->answer
 			
         ]);
 		
@@ -112,7 +119,6 @@ class TaskStatusSearch extends Task
             ->andFilterWhere(['like', 'qualified_name', $this->qualified_name])
             ->andFilterWhere(['like', 'details', $this->details])
 			->andFilterWhere(['like', 'miasta.name', $this->miasto])
-			->andFilterWhere(['like', 'answer_typ.name', $this->answer])
 			->andFilterWhere(['like', 'user.username', $this->tele]);
 			
 

@@ -8,6 +8,7 @@ use common\models\TaskStatusSearch;
 use common\models\TaskStatus;
 use common\models\TaskExtra;
 use common\models\AnswerTyp;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -17,12 +18,22 @@ use yii\helpers\ArrayHelper;
  */
 class TaskStatusController extends Controller
 {
+	
     /**
      * @inheritdoc
      */
     public function behaviors()
     {
         return [
+			'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -68,7 +79,8 @@ class TaskStatusController extends Controller
      * @return mixed
      */
     public function actionRaport($id)
-    {
+	{
+		if(Yii::$app->user->identity->isTele()) throw new NotFoundHttpException('Brak uprawnień ;)');
 		if (($model = TaskStatus::findOne($id)) == null) $model = new TaskStatus();
 		$model->task_id = $id;
 		$task = $this->findTask($id);
@@ -85,42 +97,6 @@ class TaskStatusController extends Controller
 				
             ]);
         }
-    }
-
-    /**
-     * Updates an existing TaskStatus model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-		$task = $this->findTask($id);
-		
-		$answers = ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name');
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->task_id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-				'task' => $task,
-				'answers' =>$answers,
-            ]);
-        }
-    }
-
-    /**
-     * Deletes an existing TaskStatus model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
     }
 
     /**
