@@ -98,7 +98,7 @@ $exportConfig=   [
 						}
 				],
 			],
-			'id',
+			'task_id',
 		    [
 				'class' => '\kartik\grid\BooleanColumn',
 				'trueLabel' => 'Tak', 

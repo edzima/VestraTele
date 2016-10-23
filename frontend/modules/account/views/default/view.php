@@ -35,28 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => $profile->lastname,
                 'visible' => $profile->lastname !== null,
             ],
-            [
-                'attribute' => Yii::t('frontend', 'Birthday'),
-                'format' => 'date',
-                'value' => $profile->birthday,
-                'visible' => $profile->birthday !== null,
-            ],
-            [
-                'attribute' => Yii::t('frontend', 'Gender'),
-                'value' => $profile->gender == UserProfile::GENDER_MALE ? Yii::t('frontend', 'Male') : Yii::t('frontend', 'Female'),
-                'visible' => $profile->gender !== null,
-            ],
-            [
-                'attribute' => Yii::t('frontend', 'Website'),
-                'format' => 'raw',
-                'value' => Html::a($profile->website, $profile->website, ['target'=>'_blank']),
-                'visible' => $profile->website !== null,
-            ],
-            [
-                'attribute' => Yii::t('frontend', 'Other'),
-                'value' => $profile->other,
-                'visible' => $profile->other !== null,
-            ],
+
             'created_at:datetime',
             'action_at:datetime',
         ],

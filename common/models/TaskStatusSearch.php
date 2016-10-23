@@ -49,12 +49,11 @@ class TaskStatusSearch extends Task
     public function search($params)
     {
 		$typWork= Yii::$app->user->identity->typ_work;
-		if($typWork=='T') $user = 'tele_id';
-		if($typWork=='P') $user = 'agent_id';
         $query = Task::find();
 
-		var_dump($typWork);
-		$query->joinWith(['miasto','tele','taskstatus','taskstatus.answer'])->where([$user=>Yii::$app->user->identity->id]);
+		//typ_work => A => admin || manager, all records
+		if($typWork=='A') $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer']);
+		else $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer'])->where(['user.typ_work'=>$typWork]);
 
         // add conditions that should always apply here
 		

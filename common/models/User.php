@@ -246,12 +246,12 @@ class User extends ActiveRecord implements IdentityInterface
         return $statuses[$typ];
     }
 	
-	public function isAgent (){
+	public function isAgent() {
 		if ($this->typ_work=='P') return true;
 		else return false;
 	}
 
-	public function isTele (){
+	public function isTele() {
 		if ($this->typ_work=='T') return true;
 		else return false;
 	}    /**

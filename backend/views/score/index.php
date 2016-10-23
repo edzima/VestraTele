@@ -54,6 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
 						}
 				],
 			],
+			'id',
 			[
 				'class' => '\kartik\grid\BooleanColumn',
 				'trueLabel' => 'Tak', 

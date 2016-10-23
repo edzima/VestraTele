@@ -31,14 +31,14 @@ use backend\widgets\Menu;
                     ],
                 ],
 				[
+                    'label' => 'Spotkania',
+                    'url' => ['/task-status/index'],
+                    'icon' => '<i class="fa fa fa-suitcase"></i>',
+                ],
+				[
                     'label' => 'Punkty',
-                    'url' => '#',
+                    'url' => ['/score/index'],
                     'icon' => '<i class="fa fa-dot-circle-o"></i>',
-                    'options' => ['class' => 'treeview'],
-                    'items' => [                 
-                        ['label' => 'Rodziel punty', 'url' => ['/score/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                
-                    ],
                 ],
                 [
                     'label' => Yii::t('backend', 'System'),

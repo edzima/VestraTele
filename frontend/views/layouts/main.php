@@ -36,19 +36,30 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    $menuItems = [
-        ['label' => Yii::t('frontend', 'Articles'), 'url' => ['/article/index']],
+
+	
+	   if (!Yii::$app->user->isGuest) {
+	    $menuItems = [	
+		['label' => Yii::t('frontend', 'Articles'), 'url' => ['/article/index']],
         [
             'label' => 'Ranking',
             'url' => ['/score'],
-            'visible' => !Yii::$app->user->isGuest,
+            'visible' => Yii::$app->user->identity->isTele(),
         ],
 		[
             'label' => Yii::t('frontend', 'Spotkania'),
             'url' => ['/task'],
-            'visible' => !Yii::$app->user->isGuest,
+            'visible' => Yii::$app->user->identity->isTele(),
         ],
-    ];
+		[
+            'label' => Yii::t('frontend', 'Spotkania'),
+            'url' => ['/task-status'],
+            'visible' => Yii::$app->user->identity->isAgent(),
+        ],
+		];
+	
+	   }
+
 
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => Yii::t('frontend', 'Login'), 'url' => ['/account/sign-in/login']];
@@ -58,6 +69,7 @@ AppAsset::register($this);
             'label' => Yii::$app->user->identity->username,
             'url' => '#',
             'items' => [
+	
                 ['label' => Yii::t('frontend', 'Settings'), 'url' => ['/account/default/settings']],
                 [
                     'label' => Yii::t('frontend', 'Backend'),

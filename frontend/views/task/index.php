@@ -66,7 +66,12 @@ $this->params['breadcrumbs'][] = $this->title;
 		'id' => 'kv-grid-demo',
 		'dataProvider'=>$statusProvider,
 		'columns'=>[
-			'id',
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'id',
+				'width' => '20px'
+			],
 		    [
 				'class' => '\kartik\grid\BooleanColumn',
 				'trueLabel' => 'Tak', 
