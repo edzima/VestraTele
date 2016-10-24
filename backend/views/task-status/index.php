@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\helpers\ArrayHelper;
 use yii\widgets\ListView;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\TaskStatusSearch */
@@ -15,6 +16,9 @@ use yii\data\ActiveDataProvider;
 use  kartik\grid\GridView;
 use common\models\TaskStatus;
 use common\models\AnswerTyp;
+use common\models\User;
+use common\models\AccidentTyp;
+use common\models\Wojewodztwa;
 
 
 
@@ -70,6 +74,23 @@ $exportConfig=   [
         ],
 		'encoding' => 'utf8',
     ],
+	GridView::EXCEL => [
+        'label' => Yii::t('kvgrid', 'Excel'),
+        'icon' =>'file-excel-o',
+        'iconOptions' => ['class' => 'text-success'],
+        'showHeader' => true,
+        'showPageSummary' => true,
+        'showFooter' => true,
+        'showCaption' => true,
+        'filename' => Yii::t('kvgrid', 'grid-export'),
+        'alertMsg' => Yii::t('kvgrid', 'The EXCEL export file will be generated for download.'),
+        'options' => ['title' => Yii::t('kvgrid', 'Microsoft Excel 95+')],
+        'mime' => 'application/vnd.ms-excel',
+        'config' => [
+            'worksheet' => Yii::t('kvgrid', 'ExportWorksheet'),
+            'cssFile' => ''
+        ]
+    ],
 	
 ];
 	
@@ -88,8 +109,8 @@ $exportConfig=   [
 				'buttons' => [
 					  'see' => function ($url, $model, $key) {
 							$options = [
-								'title' => 'Raportuj',
-								'aria-label' => 'Raportuj',
+								'title' => 'Podgląd',
+								'aria-label' => 'Podgląd',
 								'data-pjax' => '0',
 							];
 							$url = \yii\helpers\Url::toRoute(['task-status/raport', 'id' => $key]);
@@ -98,7 +119,7 @@ $exportConfig=   [
 						}
 				],
 			],
-			'task_id',
+			'id',
 		    [
 				'class' => '\kartik\grid\BooleanColumn',
 				'trueLabel' => 'Tak', 
@@ -117,11 +138,18 @@ $exportConfig=   [
 				'showNullAsFalse' => true,
 				'label' => 'Zakończone'
 			],
-			[
-				'class' => 
-				'\kartik\grid\DataColumn',
-				'attribute' => 'taskstatus.count_agreement',
+			
+			[	 'class' => '\kartik\grid\DataColumn',
+				 'attribute' => 'tele',
+				 'value' => 'tele.username',
+				 'label' => 'Telemarketer',
+				 'filter' => ArrayHelper::map(User::find()->where(['typ_work' => 'T'])->all(), 'id', 'username')
 			],
+			[
+				'class' => '\kartik\grid\DataColumn',
+				'attribute' => 'date',
+			],
+
 			[	
 				'class' => 
 				'\kartik\grid\DataColumn',
@@ -132,11 +160,35 @@ $exportConfig=   [
 				'\kartik\grid\DataColumn',
 				'attribute' => 'phone',
 			],
-			'date',
-			[	 'class' => '\kartik\grid\DataColumn',
-				 'attribute' => 'tele',
-				 'value' => 'tele.username',
-				 'label' => 'Telemarketer',
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'accident',
+				'value' => 'accident.name',
+				'label' => 'Zdarzenie',
+				'filter' => ArrayHelper::map(AccidentTyp::find()->all(), 'id', 'name')
+			],
+			'details',
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'wojewodztwo',
+				'value' => 'wojewodztwo.name',
+				'filter' => ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name')
+			],
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'powiatRel',
+				'value' => 'powiatRel.name',
+				'label' => 'Powiat'
+			],
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'gminaRel',
+				'value' => 'gminaRel.name',
+				'label' => 'Gmina'
 			],
 			[
 				'class' => 
@@ -144,15 +196,20 @@ $exportConfig=   [
 				'attribute' => 'miasto',
 				'value' => 'miasto.name',
 			],
+			'city_code',
 			[
 				'class' => 
 				'\kartik\grid\DataColumn',
 				'attribute' => 'answer',
 				'value' => 'taskstatus.answer.name',
 				'label' => 'Efekt',
-		
+				'filter' => ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name')
 			],
-			
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'taskstatus.count_agreement',
+			],
 			[
 				'class' => 
 				'\kartik\grid\CheckboxColumn',
@@ -171,7 +228,6 @@ $exportConfig=   [
 		// set your toolbar
 		'toolbar'=> [
 		['content'=>
-			Html::button('<i class="glyphicon glyphicon-plus"></i>', ['type'=>'button', 'title'=>Yii::t('kvgrid', 'Add Book'), 'class'=>'btn btn-success', 'onclick'=>'alert("This will launch the book creation form.\n\nDisabled for this demo!");']) . ' '.
 			Html::a('<i class="glyphicon glyphicon-repeat"></i>', [''], ['data-pjax'=>0, 'class'=>'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
 		],
 		'{export}',
@@ -182,14 +238,15 @@ $exportConfig=   [
 			'fontAwesome'=>true
 			],
 		'bordered'=>true,
-		'striped'=>false,
+		'striped'=>true,
 		'condensed'=>true,
 		'responsive'=>true,
 		'hover'=>true,
 
 		'panel'=>[
 			'type'=>GridView::TYPE_PRIMARY,
-			'heading'=>'<i class="glyphicon glyphicon-book"></i>  Umówione spotkania'
+			'heading'=>'<i class="glyphicon glyphicon-book"></i>  Umówione spotkania',
+			'footer' => false,
 		],
 		'persistResize'=>false,
 		'exportConfig'=>$exportConfig,

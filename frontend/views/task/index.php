@@ -6,8 +6,10 @@ use yii\data\ActiveDataProvider;
 
 use yii\helpers\ArrayHelper;
 use common\models\AnswerTyp;
-use common\models\City;
 use  kartik\grid\GridView;
+
+use common\models\AccidentTyp;
+
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\TaskSearch */
@@ -21,48 +23,71 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="task-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <p>
-        <?= Html::a('Dodaj nowe', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-            'id',
-            //'tele_id',
-            [
-				 'attribute' => 'agent',
-				 'value' => 'agent.username',
-				 'label' => 'Przedstawiciel',
+<?=GridView::widget([
+		'dataProvider'=> $dataProvider,
+		'filterModel' => $searchModel,
+		'columns' => [
+				['class' => 'kartik\grid\SerialColumn'],
+				[
+					'class' => 
+					'\kartik\grid\DataColumn',
+					'attribute' => 'id',
+					'width' => '20px'
+				],
+				//'tele_id',
+				[
+					 'attribute' => 'agent',
+					 'value' => 'agent.username',
+					 'label' => 'Przedstawiciel',
+				],
+
+				'victim_name',
+				'phone',
+				// 'created_at',
+				// 'updated_at',
+				// 'accident_id',
+				// 'woj',
+				// 'powiat',
+				// 'gmina',
+				[
+					 'attribute' => 'miasto',
+					 'value' => 'miasto.name',
+					 'label' => 'Miejscowość',
+				],
+				 'qualified_name',
+				// 'details:ntext',
+				[
+					'class' => '\kartik\grid\BooleanColumn',
+					'trueLabel' => 'Tak', 
+					'falseLabel' => 'Nie',
+					'attribute' => 'meeting',
+					'showNullAsFalse' => true,
+					'label' => 'Spotkanie'
+				],
+				 'date',
+				['class' => 'kartik\grid\ActionColumn'],
 			],
-            'victim_name',
-            'phone',
-            // 'created_at',
-            // 'updated_at',
-            // 'accident_id',
-            // 'woj',
-            // 'powiat',
-            // 'gmina',
-			[
-				 'attribute' => 'miasto',
-				 'value' => 'miasto.name',
-				 'label' => 'Miejscowość',
+		'responsive'=>true,
+		'pjax'=>true,
+		'hover'=>true,
+		'panel'=>[
+				'type'=>GridView::TYPE_PRIMARY,
+				'heading'=>'<i class="glyphicon glyphicon-road"></i>  Umówione spotkania',
+				'footer'=>false,
+		],
+		'toolbar'=> [
+			['content'=>
+				Html::a('<i class="glyphicon glyphicon-plus"></i>Nowe', ['create'], ['class' => 'btn btn-success']).
+				Html::a('<i class="glyphicon glyphicon-repeat"></i>', [''], ['data-pjax'=>0, 'class'=>'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
 			],
-             'qualified_name',
-            // 'details:ntext',
-             'meeting',
-             'date',
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
-	
-	<h1>W trakcie realizacji</h1>
-<?php     
-	echo GridView::widget([
+			'{toggleData}',
+		],
+	])
+?>
+
+<?= GridView::widget([
 		'id' => 'kv-grid-demo',
 		'dataProvider'=>$statusProvider,
 		'columns'=>[
@@ -117,13 +142,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => ArrayHelper::map(AnswerTyp::find()->all(), 'id', 'name'),
 		
 			],
-			
-			[
-				'class' => 
-				'\kartik\grid\CheckboxColumn',
-				'contentOptions' => ['class' => 'kv-row-select'],
-				'headerOptions' => ['class' => 'kv-all-select'],
-			],
 		],
 		
 		
@@ -136,10 +154,8 @@ $this->params['breadcrumbs'][] = $this->title;
 		// set your toolbar
 		'toolbar'=> [
 		['content'=>
-			Html::button('<i class="glyphicon glyphicon-plus"></i>', ['type'=>'button', 'title'=>Yii::t('kvgrid', 'Add Book'), 'class'=>'btn btn-success', 'onclick'=>'alert("This will launch the book creation form.\n\nDisabled for this demo!");']) . ' '.
 			Html::a('<i class="glyphicon glyphicon-repeat"></i>', [''], ['data-pjax'=>0, 'class'=>'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
 		],
-		'{export}',
 		'{toggleData}',
 		],
 		// set export properties
@@ -154,13 +170,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
 		'panel'=>[
 			'type'=>GridView::TYPE_PRIMARY,
-			'heading'=>'<i class="glyphicon glyphicon-book"></i>  Umówione spotkania'
+			'heading'=>'<i class="glyphicon glyphicon-pencil"></i>  Stan raportów',
+			'footer'=>false,
 		],
 		'persistResize'=>false,
 		//'exportConfig'=>$exportConfig,
-	]);
+	])
 ?>
-
-	
-	
 </div>

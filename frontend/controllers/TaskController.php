@@ -92,54 +92,7 @@ class TaskController extends Controller
     }
 
 
-	
-	
-	public function actionPowiat() {
-		$out = [];
-		if (isset($_POST['depdrop_parents'])) {
-			$parents = $_POST['depdrop_parents'];
-			if ($parents != null) {
-				$cat_id = $parents[0];
-				$out = Powiat::getPowiatListId($cat_id);
-				echo Json::encode(['output'=>$out, 'selected'=>'']);
-				return;
-			}
-		}
-		echo Json::encode(['output'=>'', 'selected'=>'']);
-	}
-	
-	
-	public function actionGmina() {
-		$out = [];
-		if (isset($_POST['depdrop_parents'])) {
-			$ids = $_POST['depdrop_parents'];
-			$cat_id = empty($ids[0]) ? null : $ids[0];
-			$subcat_id = empty($ids[1]) ? null : $ids[1];
-			if ($cat_id != null && is_numeric($subcat_id)) {
-			   $data = Gmina::getGminaList($cat_id,$subcat_id);
-				echo Json::encode(['output'=>$data['out'], 'selected'=>$data['selected']]);
-			   return;
-			}
-		}
-		echo Json::encode(['output'=>'', 'selected'=>'']);
 
-	}
-	
-	public function actionCity() {
-		$out = [];
-		if (isset($_POST['depdrop_parents'])) {
-			$ids = $_POST['depdrop_parents'];
-			$cat_id = empty($ids[0]) ? null : $ids[0];
-			$subcat_id = empty($ids[1]) ? null : $ids[1];
-			if ($cat_id != null && is_numeric($subcat_id)) {
-			   $data = City::getCitiesList($cat_id,$subcat_id);
-				echo Json::encode(['output'=>$data['out'], 'selected'=>$data['selected']]);
-			   return;
-			}
-		}
-		echo Json::encode(['output'=>'', 'selected'=>'']);
-
-	}
 	/**
      * Creates a new Task model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -211,6 +164,53 @@ class TaskController extends Controller
      * @return Task the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
+	 
+	 public function actionPowiat() {
+		$out = [];
+		if (isset($_POST['depdrop_parents'])) {
+			$parents = $_POST['depdrop_parents'];
+			if ($parents != null) {
+				$cat_id = $parents[0];
+				$out = Powiat::getPowiatListId($cat_id);
+				echo Json::encode(['output'=>$out, 'selected'=>'']);
+				return;
+			}
+		}
+		echo Json::encode(['output'=>'', 'selected'=>'']);
+	}
+	
+	
+	public function actionGmina() {
+		$out = [];
+		if (isset($_POST['depdrop_parents'])) {
+			$ids = $_POST['depdrop_parents'];
+			$cat_id = empty($ids[0]) ? null : $ids[0];
+			$subcat_id = empty($ids[1]) ? null : $ids[1];
+			if ($cat_id != null && is_numeric($subcat_id)) {
+			   $data = Gmina::getGminaList($cat_id,$subcat_id);
+				echo Json::encode(['output'=>$data['out'], 'selected'=>$data['selected']]);
+			   return;
+			}
+		}
+		echo Json::encode(['output'=>'', 'selected'=>'']);
+
+	}
+	
+	public function actionCity() {
+		$out = [];
+		if (isset($_POST['depdrop_parents'])) {
+			$ids = $_POST['depdrop_parents'];
+			$cat_id = empty($ids[0]) ? null : $ids[0];
+			$subcat_id = empty($ids[1]) ? null : $ids[1];
+			if ($cat_id != null && is_numeric($subcat_id)) {
+			   $data = City::getCitiesList($cat_id,$subcat_id);
+				echo Json::encode(['output'=>$data['out'], 'selected'=>$data['selected']]);
+			   return;
+			}
+		}
+		echo Json::encode(['output'=>'', 'selected'=>'']);
+
+	}
     protected function findModel($id)
     {
         if (($model = Task::findOne($id)) !== null) {

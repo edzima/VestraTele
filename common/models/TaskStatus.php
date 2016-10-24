@@ -34,7 +34,7 @@ class TaskStatus extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['task_id', 'finished',], 'required'],
+            [['task_id', 'finished','status_details','count_agreement'], 'required'],
             [['task_id', 'answer_id', 'count_agreement', 'finished', 'extra_agreement'], 'integer'],
             [['status_details'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
@@ -51,7 +51,7 @@ class TaskStatus extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'task_id' => 'Task ID',
+            'task_id' => 'Nr',
             'answer_id' => 'Efekt spotkania',
             'count_agreement' => 'Ilość umów',
             'status_details' => 'Komentarz',

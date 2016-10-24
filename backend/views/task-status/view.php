@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\TaskStatus */
 
-$this->title = 'tytul do zmiany';
+$this->title = 'Raport sprawy nr: '.$model->task_id;
 $this->params['breadcrumbs'][] = ['label' => 'Task Statuses', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -29,7 +29,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'task_id',
-            'answer_id',
+            [
+				 'attribute' => 'answer',
+				 'value' => $model->answer->name,
+				 'label' => 'Efekt spotkania',
+			],
             'count_agreement',
             'status_details:ntext',
             'name',

@@ -6,7 +6,7 @@ return [
     'showScriptName' => false,
     'rules' => [
         // Index page
-        '' => 'account/sign-in/login',
+        '' => '',
         // Pages
         'page/<slug>' => 'page/view',
         // Articles

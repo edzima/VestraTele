@@ -60,7 +60,7 @@ class Task extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
+            'id' => 'Nr',
             'tele_id' => 'Konsultant',
             'agent_id' => 'Przedstawiciel',
             'victim_name' => 'Poszkodowany',

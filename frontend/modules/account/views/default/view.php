@@ -35,8 +35,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => $profile->lastname,
                 'visible' => $profile->lastname !== null,
             ],
-
-            'created_at:datetime',
             'action_at:datetime',
         ],
     ]) ?>

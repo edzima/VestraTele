@@ -24,12 +24,17 @@ Highlight::register($this);
     </div>
 
     <div class="article-text">
-        <?= HtmlPurifier::process($model->preview) ?>
+        <?= HtmlPurifier::process($model->body) ?>
     </div>
-
-    <?php if ($model->tagValues) : ?>
-        <div class="article-meta">
-            <span class="glyphicon glyphicon-tags"></span> <?= $model->tagLinks ?>
-        </div>
-    <?php endif ?>
+	<div class="article-span">
+			<button type="button" class="btn btn-primary btn-lg">
+				<?=$model->start_at?><span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+			</button>
+			<button id="threshold" type="button" class="btn btn-danger btn-lg" value="<?=$model->point?>">
+				<span class="glyphicon glyphicon-scale" aria-hidden="true"></span>Próg punktowy : <?=$model->point?>
+			</button>
+				<button type="button" class="btn btn-primary btn-lg">
+				<span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span><?=$model->finish_at?>
+			</button>	
+	</div>
 </div>

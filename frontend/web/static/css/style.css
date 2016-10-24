@@ -8,6 +8,7 @@ body {
     height: auto;
     margin: 0 auto -60px;
     padding: 0 0 60px;
+	
 }
 
 .wrap > .container {
@@ -29,6 +30,7 @@ body {
 .jumbotron .btn {
     font-size: 21px;
     padding: 14px 24px;
+	margin: 1%;
 }
 
 .not-set {
@@ -118,6 +120,14 @@ div.required label:after {
 /* Article style */
 .article-item {
     margin-bottom: 15px;
+}
+
+.article-span{
+	text-align:center;
+}
+
+.qualified{
+	background-color:#5cb85c !important;
 }
 
 .article-item .article-title,

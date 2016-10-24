@@ -6,8 +6,8 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\TaskStatus */
 
-$this->title = 'tytul do zmiany';
-$this->params['breadcrumbs'][] = ['label' => 'Task Statuses', 'url' => ['index']];
+$this->title = 'Raport sprawy nr: '.$model->task_id;
+$this->params['breadcrumbs'][] = ['label' => 'Twoje spotkania', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="task-status-view">
@@ -15,11 +15,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->task_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->task_id], [
+        <?= Html::a('Edytuj', ['update', 'id' => $model->task_id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Usuń', ['delete', 'id' => $model->task_id], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => 'Jesteś pewny, że chcesz usunąć ten raport?',
                 'method' => 'post',
             ],
         ]) ?>
@@ -29,10 +29,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'task_id',
-            'answer_id',
+            [
+				 'attribute' => 'answer',
+				 'value' => $model->answer->name,
+				 'label' => 'Efekt spotkania',
+			],
             'count_agreement',
             'status_details:ntext',
             'name',
+			'finished:boolean',
         ],
     ]) ?>
 

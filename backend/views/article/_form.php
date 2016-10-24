@@ -40,17 +40,28 @@ use vova07\imperavi\Widget;
 
     <?= $form->field($model, 'status')->checkbox(['label' => Yii::t('backend', 'Activate')]) ?>
 
-    <?= $form->field($model, 'category_id')->dropDownList(ArrayHelper::map(
+    <?= $form->field($model, 'category_id',['options'=>['class'=>'col-md-8']])->dropDownList(ArrayHelper::map(
             $categories,
             'id',
             'title'
         ), ['prompt' => '']
     ) ?>
+	
+	<?= $form->field($model,'point',['options'=>['class'=>'col-md-4']])->textInput(['type' => 'number', 'min'=>0]) ?>
 
     <?= $form->field($model, 'published_at')->widget(
         DateTimeWidget::className(),
         [
             'phpDatetimeFormat' => 'yyyy-MM-dd\'T\'HH:mm:ssZZZZZ',
+			'clientOptions' => [
+		
+				'allowInputToggle' => true,
+				'sideBySide' => true,
+				'widgetPositioning' => [
+				   'horizontal' => 'auto',
+				   'vertical' => 'auto'
+				],
+			]
         ]
     ) ?>
 	

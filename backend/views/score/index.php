@@ -1,15 +1,17 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
 //use yii\grid\GridView;
 use yii\widgets\Pjax;
+use common\models\AnswerTyp;
 
 use  kartik\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\ScoreSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Scores';
+$this->title = 'Punktacja';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="score-index">
@@ -89,13 +91,13 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'victim_name',
 			],
 			'date',
-		
 			[
 				'class' => 
 				'\kartik\grid\DataColumn',
 				'attribute' => 'answer',
 				'value' => 'taskstatus.answer.name',
 				'label' => 'Efekt',
+				'filter' => ArrayHelper::map(AnswerTyp::find()->all(), 'id', 'name')
 		
 			],
 			[

@@ -17,9 +17,6 @@ use creocoder\taggable\TaggableBehavior;
  * @property integer $id
  * @property string $title
  * @property string $slug
- * @property string $description
- * @property string $keywords
- * @property string $preview
  * @property string $body
  * @property integer $status
  * @property integer $category_id
@@ -28,6 +25,9 @@ use creocoder\taggable\TaggableBehavior;
  * @property integer $published_at
  * @property integer $created_at
  * @property integer $updated_at
+ * @property date $start_at
+ * @property date $finish_at
+ * @property decimal $point
  *
  * @property string $tagValues
  *
@@ -77,8 +77,9 @@ class Article extends ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'preview', 'body', 'category_id', 'finish_at', 'start_at'], 'required'],
-            [['preview', 'body'], 'string'],
+            [['title', 'body', 'category_id', 'finish_at', 'start_at'], 'required'],
+            [['body'], 'string'],
+			[['point'], 'number'],
             ['published_at', 'default',
                 'value' => function () {
                     return date(DATE_ISO8601);
@@ -86,12 +87,12 @@ class Article extends ActiveRecord
             ],
             ['published_at', 'filter', 'filter' => 'strtotime'],
             [['status', 'category_id', 'author_id', 'updater_id', 'created_at', 'updated_at'], 'integer'],
-            [['title', 'slug', 'description', 'keywords'], 'string', 'max' => 255],
+            [['title', 'slug'], 'string', 'max' => 255],
             ['status', 'default', 'value' => self::STATUS_DRAFT],
             ['author_id', 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['author_id' => 'id']],
             ['category_id', 'exist', 'skipOnError' => true, 'targetClass' => ArticleCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
             ['updater_id', 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['updater_id' => 'id']],
-            ['tagValues', 'safe'],
+    
         ];
     }
 
@@ -103,9 +104,6 @@ class Article extends ActiveRecord
         return [
             'title' => Yii::t('common', 'Title'),
             'slug' => Yii::t('common', 'Slug'),
-            'description' => Yii::t('common', 'Description'),
-            'keywords' => Yii::t('common', 'Keywords'),
-            'preview' => Yii::t('common', 'Preview'),
             'body' => Yii::t('common', 'Text'),
             'status' => Yii::t('common', 'Status'),
             'category_id' => Yii::t('common', 'Category'),
@@ -117,7 +115,7 @@ class Article extends ActiveRecord
             'tagValues' => Yii::t('common', 'Tags'),
 			'start_at' => 'Zaczyna  się',
 			'finish_at' => 'Kończy się',
-			
+			'point' => 'Próg punktowy'
         ];
     }
 

@@ -26,6 +26,10 @@ $config = [
             'linkAssets' => getenv('LINK_ASSETS'),
             'appendTimestamp' => YII_ENV_DEV,
         ],
+		'formatter' => [
+			'class' => 'yii\i18n\Formatter',
+			'nullDisplay' => '',
+		],
         'log' => [
             'traceLevel' => YII_ENV_DEV ? 3 : 0,
             'targets' => [
