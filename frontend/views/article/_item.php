@@ -27,13 +27,13 @@ Highlight::register($this);
         <?= HtmlPurifier::process($model->body) ?>
     </div>
 	<div class="article-span">
-			<button type="button" class="btn btn-primary btn-lg">
+			<button type="button" class="btn btn-primary">
 				<?=$model->start_at?><span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
 			</button>
-			<button id="threshold" type="button" class="btn btn-danger btn-lg" value="<?=$model->point?>">
-				<span class="glyphicon glyphicon-scale" aria-hidden="true"></span>Próg punktowy : <?=$model->point?>
+			<button id="threshold" type="button" class="btn btn-success" value="<?=$model->point?>">
+				<span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span>  Próg punktowy : <?=$model->point?>
 			</button>
-				<button type="button" class="btn btn-primary btn-lg">
+				<button type="button" class="btn btn-primary">
 				<span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span><?=$model->finish_at?>
 			</button>	
 	</div>

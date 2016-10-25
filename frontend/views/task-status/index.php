@@ -4,6 +4,16 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ListView;
+
+use yii\data\ActiveDataProvider;
+use  kartik\grid\GridView;
+use kartik\export\ExportMenu;
+
+use common\models\TaskStatus;
+use common\models\AnswerTyp;
+use common\models\User;
+use common\models\AccidentTyp;
+use common\models\Wojewodztwa;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\TaskStatusSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -11,91 +21,107 @@ use yii\widgets\ListView;
 $this->title = 'Twoje spotkania';
 $this->params['breadcrumbs'][] = $this->title;
 
-use yii\data\SqlDataProvider;
-use yii\data\ActiveDataProvider;
-use  kartik\grid\GridView;
-use common\models\TaskStatus;
-use common\models\AnswerTyp;
-use common\models\User;
-use common\models\AccidentTyp;
-use common\models\Wojewodztwa;
-
-
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\TaskStatusSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$exportConfig=   [ 
-	GridView::PDF => [
-        'label' => Yii::t('kvgrid', 'PDF'),
-        'icon' => 'file-pdf-o',
-        'iconOptions' => ['class' => 'text-danger'],
-        'showHeader' => true,
-        'showPageSummary' => true,
-        'showFooter' => true,
-		'mode' => '+aCJK',
-        'showCaption' => true,
-        'filename' => Yii::t('kvgrid', 'grid-export'),
-        'alertMsg' => Yii::t('kvgrid', 'The PDF export file will be generated for download.'),
-        'options' => ['title' => Yii::t('kvgrid', 'Portable Document Format')],
-        'mime' => 'application/pdf',
-        'config' => [
-            'mode' => 'c',
-            'format' => 'A4-L',
-            'destination' => 'D',
-            'marginTop' => 20,
-            'marginBottom' => 20,
-            'cssInline' => '.kv-wrap{padding:20px;}' .
-                '.kv-align-center{text-align:center;}' .
-                '.kv-align-left{text-align:left;}' .
-                '.kv-align-right{text-align:right;}' .
-                '.kv-align-top{vertical-align:top!important;}' .
-                '.kv-align-bottom{vertical-align:bottom!important;}' .
-                '.kv-align-middle{vertical-align:middle!important;}' .
-                '.kv-page-summary{border-top:4px double #ddd;font-weight: bold;}' .
-                '.kv-table-footer{border-top:4px double #ddd;font-weight: bold;}' .
-                '.kv-table-caption{font-size:1.5em;padding:8px;border:1px solid #ddd;border-bottom:none;}',
-            'methods' => [
-                'SetHeader' => [
-                    ['odd' => 'pdfHeader', 'even' => 'evenHader']
+$columns = [
+			'id',
+			[	 'class' => '\kartik\grid\DataColumn',
+				 'attribute' => 'tele',
+				 'value' => 'tele.username',
+				 'label' => 'Telemarketer',
+				 'filter' => ArrayHelper::map(User::find()->where(['typ_work' => 'T'])->all(), 'id', 'username')
+			],
+			[
+				'class' => '\kartik\grid\DataColumn',
+				'attribute' => 'date',
+			],
+			[	
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'victim_name',
+			],
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'phone',
+			],
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'accident',
+				'value' => 'accident.name',
+				'label' => 'Zdarzenie',
+				'filter' => ArrayHelper::map(AccidentTyp::find()->all(), 'id', 'name')
+			],
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'details',
+			],
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'wojewodztwo',
+				'value' => 'wojewodztwo.name',
+				'filter' => ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name')
+			],
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'powiatRel',
+				'value' => 'powiatRel.name',
+				'label' => 'Powiat'
+			],
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'gminaRel',
+				'value' => 'gminaRel.name',
+				'label' => 'Gmina'
+			],
+			[
+				'class' => 
+				'\kartik\grid\DataColumn',
+				'attribute' => 'miasto',
+				'value' => 'miasto.name',
+			],
+			'city_code',
+		];
+		
+		
+$exportMenu =  ExportMenu::widget([
+    'dataProvider'=>$dataProvider,
+    'columns'=>$columns,
+	'pjaxContainerId' => 'kv-pjax-container',
+	'target' => ExportMenu::TARGET_SELF,
+	'showConfirmAlert' => false,
+    'fontAwesome' => true,
+	 'exportConfig' => [
+        ExportMenu::FORMAT_HTML => false,
+        ExportMenu::FORMAT_TEXT => false,
+		ExportMenu::FORMAT_PDF => [
+                    'filename' => 'Yoklama',
+                    'config' => [
+                        'methods' => [ 
+                            'SetHTMLHeader'=>'naglowek', 
+                            'SetFooter'=>['Akın Dil Eğitim Kurumu'],
+                        ],
+                        'cssInline' => '.table-bordered{border:10px;}'
+                    ]                           
                 ],
-                'SetFooter' => [
-                    ['odd' => 'pdfFooter', 'even' => 'evenFooter']
-                ],
-            ],
-            'options' => [
-                'title' => 'title heh',
-                'subject' => Yii::t('kvgrid', 'PDF export generated by kartik-v/yii2-grid extension'),
-                'keywords' => Yii::t('kvgrid', 'krajee, grid, export, yii2-grid, pdf')
-            ],
-            'contentBefore'=>'',
-            'contentAfter'=>''
-        ],
-		'encoding' => 'utf8',
-    ],
-	GridView::EXCEL => [
-        'label' => Yii::t('kvgrid', 'Excel'),
-        'icon' =>'file-excel-o',
-        'iconOptions' => ['class' => 'text-success'],
-        'showHeader' => true,
-        'showPageSummary' => true,
-        'showFooter' => true,
-        'showCaption' => true,
-        'filename' => Yii::t('kvgrid', 'grid-export'),
-        'alertMsg' => Yii::t('kvgrid', 'The EXCEL export file will be generated for download.'),
-        'options' => ['title' => Yii::t('kvgrid', 'Microsoft Excel 95+')],
-        'mime' => 'application/vnd.ms-excel',
-        'config' => [
-            'worksheet' => Yii::t('kvgrid', 'ExportWorksheet'),
-            'cssFile' => ''
-        ]
-    ],
-	
-];
-	
-?>
 
+    ],
+
+]);
+
+?>
+<?=Html::button('Filtry', [ 'class' => 'btn btn-primary mg-15', 'onclick' => "$('#filter').toggle('drop');" ]) ?>
+<div id="filter">
+    <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
+</div>
 <div class="task-status-index">
 <?php     
 	echo GridView::widget([
@@ -121,25 +147,6 @@ $exportConfig=   [
 				'visible' => Yii::$app->user->identity->isAgent()
 			],
 			'id',
-		    [
-				'class' => '\kartik\grid\BooleanColumn',
-				'trueLabel' => 'Tak', 
-				'falseLabel' => 'Nie',
-				'attribute' => 'taskstatus',
-				'value' => 'taskstatus.task_id',
-				'showNullAsFalse' => true,
-				'label' => 'Raport'
-			],
-			[
-				'class' => '\kartik\grid\BooleanColumn',
-				'trueLabel' => 'Tak', 
-				'falseLabel' => 'Nie',
-				'attribute' => 'finish',
-				'value' => 'taskstatus.finished',
-				'showNullAsFalse' => true,
-				'label' => 'Zakończone'
-			],
-			
 			[	 'class' => '\kartik\grid\DataColumn',
 				 'attribute' => 'tele',
 				 'value' => 'tele.username',
@@ -174,7 +181,6 @@ $exportConfig=   [
 				'\kartik\grid\DataColumn',
 				'attribute' => 'details',
 			],
-			'details',
 			[
 				'class' => 
 				'\kartik\grid\DataColumn',
@@ -231,13 +237,14 @@ $exportConfig=   [
 		'headerRowOptions'=>['class'=>'kartik-sheet-style'],
 		'filterRowOptions'=>['class'=>'kartik-sheet-style'],
 		'pjax'=>true, // pjax is set to always true for this demo
+		'pjaxSettings' => ['options' => ['id' => 'kv-pjax-container']],
 		// set your toolbar
 		'toolbar'=> [
 		['content'=>
 			Html::a('<i class="glyphicon glyphicon-repeat"></i>', [''], ['data-pjax'=>0, 'class'=>'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
 		],
-		'{export}',
 		'{toggleData}',
+		$exportMenu,
 		],
 		// set export properties
 		'export'=>[
@@ -254,9 +261,10 @@ $exportConfig=   [
 			'heading'=>'<i class="glyphicon glyphicon-book"></i>  Umówione spotkania',
 			'footer' => false,
 		],
-		'persistResize'=>false,
-		'exportConfig'=>$exportConfig,
+		//'exportConfig'=>$exportConfig,
 	]);
 ?>
+
+
 
 </div>

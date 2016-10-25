@@ -20,10 +20,15 @@ class ScoreSearch extends Score
      */
 	 
 	public $suma; 
+	public $start_at;
+	public $finish_at;
 
     public function rules()
     {
-      return [];
+      return [
+	    [['start_at', 'finish_at'], 'safe'],
+	    [['start_at', 'finish_at'], 'date','format' => 'yyyy-M-d'],
+	  ];
     }
 
     /**
@@ -52,17 +57,19 @@ class ScoreSearch extends Score
             'query' => $query,
         ]);
 		
-
-
         $this->load($params);
-
+	
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
         }
-
-  
+	
+		
+			if(strlen($this->start_at)&&strlen($this->finish_at))$query->where("date BETWEEN '$this->start_at' AND '$this->finish_at'");
+			else if(strlen($this->start_at))$query->where("date > '$this->start_at'");
+			else if(strlen($this->finish_at))$query->where("date < '$this->finish_at'");
+		
 		
         return $dataProvider;
     }

@@ -146,3 +146,16 @@ div.required label:after {
 .article-item .article-text {
     margin-top: 7px;
 }
+
+/* task */
+
+.input-group-addon{
+	background-color:#337ab7;
+	color: #FFF;
+	
+}
+
+
+.mg-15{
+	margin-bottom:15px;
+}

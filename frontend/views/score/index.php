@@ -9,10 +9,12 @@ use kartik\grid\GridView;
 $this->title = 'Ranking';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="score-index">
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-	
+<?=Html::button('Filtry', [ 'class' => 'btn btn-primary mg-15', 'onclick' => "$('#filter').toggle('drop');" ]) ?>
+<div id="filter">
+    <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
+</div>
+<div class="score-index">
 	<?=GridView::widget([
 		'dataProvider'=> $dataProvider,
 		'columns' => [
@@ -44,3 +46,5 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 	
 </div>
+
+

@@ -8,7 +8,7 @@ use yii\widgets\ListView;
 /* @var $searchModel common\models\TaskStatusSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Umówione spotkania';
+$this->title = 'Wszystkie spotkania';
 $this->params['breadcrumbs'][] = $this->title;
 
 use yii\data\SqlDataProvider;
@@ -21,6 +21,8 @@ use common\models\AccidentTyp;
 use common\models\Wojewodztwa;
 
 
+
+//po przedstawicielach
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\TaskStatusSearch */
@@ -95,6 +97,11 @@ $exportConfig=   [
 ];
 	
 ?>
+
+<?=Html::button('Filtry', [ 'class' => 'btn btn-primary mg-15', 'onclick' => "$('#filter').toggle('drop');" ]) ?>
+<div id="filter">
+    <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
+</div>
 <div class="task-status-index">
 
 <?php     
@@ -119,35 +126,25 @@ $exportConfig=   [
 						}
 				],
 			],
-			'id',
-		    [
-				'class' => '\kartik\grid\BooleanColumn',
-				'trueLabel' => 'Tak', 
-				'falseLabel' => 'Nie',
-				'attribute' => 'taskstatus',
-				'value' => 'taskstatus.task_id',
-				'showNullAsFalse' => true,
-				'label' => 'Raport'
+			[	 'class' => '\kartik\grid\DataColumn',
+				 'attribute' => 'id',
+				 'width' => '15px',
 			],
-			[
-				'class' => '\kartik\grid\BooleanColumn',
-				'trueLabel' => 'Tak', 
-				'falseLabel' => 'Nie',
-				'attribute' => 'finish',
-				'value' => 'taskstatus.finished',
-				'showNullAsFalse' => true,
-				'label' => 'Zakończone'
-			],
-			
 			[	 'class' => '\kartik\grid\DataColumn',
 				 'attribute' => 'tele',
 				 'value' => 'tele.username',
-				 'label' => 'Telemarketer',
+				 'label' => 'Konsultant',
 				 'filter' => ArrayHelper::map(User::find()->where(['typ_work' => 'T'])->all(), 'id', 'username')
+			],
+			[	 'class' => '\kartik\grid\DataColumn',
+				 'attribute' => 'agent',
+				 'value' => 'agent.username',
+				 'label' => 'Przedstawiciel',
+				 'filter' => ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username')
 			],
 			[
 				'class' => '\kartik\grid\DataColumn',
-				'attribute' => 'date',
+				'attribute' => 'created_at',
 			],
 
 			[	
@@ -158,17 +155,11 @@ $exportConfig=   [
 			[
 				'class' => 
 				'\kartik\grid\DataColumn',
-				'attribute' => 'phone',
-			],
-			[
-				'class' => 
-				'\kartik\grid\DataColumn',
 				'attribute' => 'accident',
 				'value' => 'accident.name',
 				'label' => 'Zdarzenie',
 				'filter' => ArrayHelper::map(AccidentTyp::find()->all(), 'id', 'name')
 			],
-			'details',
 			[
 				'class' => 
 				'\kartik\grid\DataColumn',
@@ -196,7 +187,6 @@ $exportConfig=   [
 				'attribute' => 'miasto',
 				'value' => 'miasto.name',
 			],
-			'city_code',
 			[
 				'class' => 
 				'\kartik\grid\DataColumn',
@@ -209,12 +199,6 @@ $exportConfig=   [
 				'class' => 
 				'\kartik\grid\DataColumn',
 				'attribute' => 'taskstatus.count_agreement',
-			],
-			[
-				'class' => 
-				'\kartik\grid\CheckboxColumn',
-				'contentOptions' => ['class' => 'kv-row-select'],
-				'headerOptions' => ['class' => 'kv-all-select'],
 			],
 		],
 		

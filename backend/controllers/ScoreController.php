@@ -75,6 +75,7 @@ class ScoreController extends Controller
 		$scores = Score::find()->where(['task_id' => $id, 'tele_id' => $teleID])->all();
 		$connexion = ArrayHelper::map(Connexion::find()->all(),'id', 'name');
 		$tele = ArrayHelper::map(User::find()->where(['typ_work' => 'T'])->all(), 'id', 'username');
+		$task = Task::findOne($id);
 		//new agreement after update
 		
 		if(count($scores)<$count){
@@ -112,6 +113,7 @@ class ScoreController extends Controller
 			'scores' => $scores,
 			'connexion' => $connexion,
 			'tele' => $tele,
+			'task' => $task,
 			]);
     }
 

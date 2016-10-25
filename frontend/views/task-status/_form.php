@@ -5,6 +5,7 @@ use yii\widgets\ActiveForm;
 use yii\widgets\DetailView;
 use yii\jui\Spinner;
 
+use trntv\yii\datetime\DateTimeWidget;
 /* @var $this yii\web\View */
 /* @var $model common\models\TaskStatus */
 /* @var $form yii\widgets\ActiveForm */
@@ -25,9 +26,8 @@ use yii\jui\Spinner;
 	
 	<div id="extra_agreement">
 		<h4> Extra raport </h2>
-		<?= $form->field($model, 'finished',['options'=>['class'=>'col-md-6']])->checkbox() ?>
 		
-		<?=$form->field($model, 'extra_agreement',['options'=>['class'=>'col-md-6']])->textInput(['type' => 'number', 'min'=>0])?>
+		<?=$form->field($model, 'extra_agreement')->textInput(['type' => 'number', 'min'=>0])?>
 		
 		<?= $form->field($model, 'extra_name')->textarea(['rows' => 2, 'value'=>null])->label('Kto do dopisania') ?>
 	</div>
@@ -38,23 +38,54 @@ use yii\jui\Spinner;
     <?php ActiveForm::end(); ?>
 
 </div>
+
+
+
 <h2>Szczegóły spotkania</h2>
+	<div class="task-form">
+    <?php $form = ActiveForm::begin(); ?>
+	
+		<?= $form->field($task, 'date',
+		[	
+			'options'=>['class'=>'col-md-4 form-group'],
+			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Data spotkania</span>{input}</div>'
+		])
+		->widget(DateTimeWidget::className(),
+			[   'phpDatetimeFormat' => 'dd-MM-yyyy HH:mm',
+				'clientOptions' => [
+			
+					'allowInputToggle' => true,
+					'sideBySide' => true,
+					'widgetPositioning' => [
+					   'horizontal' => 'auto',
+					   'vertical' => 'auto'
+					],
+				]
+			]) 
+	?>
+	
+
+
+        <?= Html::submitButton('Zmień', ['class' => 'btn btn-primary']) ?>
+  
+
+    <?php ActiveForm::end(); ?>
+	</div>		
 	 <?= DetailView::widget([
 			'model' => $task,
 			'attributes' => [
 				//'id',
 				//'tele_id',
-				[
-					 'attribute' => 'tele_id',
-					 'value' => $task->tele->username,
-				],
-			
-				'victim_name',
-				'phone',
+				'date',
 				[
 					 'attribute' => 'accident_id',
 					 'value' => $task->accident->name,
 				],
+				'qualified_name',
+				'details:ntext',
+				'victim_name',
+				'phone',
+			
 				[
 					 'attribute' => 'woj',
 					 'value' => $task->wojewodztwo->name,
@@ -71,13 +102,17 @@ use yii\jui\Spinner;
 					 'attribute' => 'city',
 					 'value' => $task->miasto->name,
 				],
-				'qualified_name',
-				'details:ntext',
+				'city_code',
 				'meeting:boolean',
-				'date',
+				'automat:boolean',
+			
+				[
+					 'attribute' => 'tele_id',
+					 'value' => $task->tele->username,
+				],
 			],
 		]) ?>
-		
+
 
 		<?php
 	$this->registerJs(
@@ -87,8 +122,8 @@ use yii\jui\Spinner;
 			var answer = $("#taskstatus-answer_id");
 			
 			function showExtra(){
-				if(answer.prop("value")==10) extra.show();
-				else extra.hide();
+				if(answer.prop("value")==10) extra.show("bind");
+				else extra.hide("drop");
 			}
 			
 			showExtra();

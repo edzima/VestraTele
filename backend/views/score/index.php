@@ -56,7 +56,11 @@ $this->params['breadcrumbs'][] = $this->title;
 						}
 				],
 			],
-			'id',
+			[	 'class' => '\kartik\grid\DataColumn',
+				 'attribute' => 'id',
+				 'width' => '20px'
+				
+			],
 			[
 				'class' => '\kartik\grid\BooleanColumn',
 				'trueLabel' => 'Tak', 
@@ -97,8 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'answer',
 				'value' => 'taskstatus.answer.name',
 				'label' => 'Efekt',
-				'filter' => ArrayHelper::map(AnswerTyp::find()->all(), 'id', 'name')
-		
+				'filter' => ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name')
 			],
 			[
 				'class' => 
@@ -128,14 +131,14 @@ $this->params['breadcrumbs'][] = $this->title;
 		'bordered'=>true,
 		'striped'=>false,
 		'condensed'=>true,
-		'responsive'=>true,
+		'responsive'=>false,
 		'hover'=>true,
 
 		'panel'=>[
 			'type'=>GridView::TYPE_PRIMARY,
 			'heading'=>'<i class="glyphicon glyphicon-book"></i>Punktacja'
 		],
-		'persistResize'=>false,
+
 
 	]);
 ?>

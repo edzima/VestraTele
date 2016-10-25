@@ -10,3 +10,7 @@ div.required label:after {
     content: " *";
     color: #ff0000;
 }
+
+.mg-15{
+	margin-bottom:15px;
+}

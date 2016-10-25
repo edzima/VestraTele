@@ -42,7 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
 					 'value' => 'agent.username',
 					 'label' => 'Przedstawiciel',
 				],
-
 				'victim_name',
 				'phone',
 				// 'created_at',
@@ -91,6 +90,24 @@ $this->params['breadcrumbs'][] = $this->title;
 		'id' => 'kv-grid-demo',
 		'dataProvider'=>$statusProvider,
 		'columns'=>[
+			[	
+				
+			   'class' => 'yii\grid\ActionColumn',
+			    'template' => '{see}',
+				'buttons' => [
+					  'see' => function ($url, $model, $key) {
+							$options = [
+								'title' => 'Podgląd',
+								'aria-label' => 'Podgląd',
+								'data-pjax' => '0',
+							];
+							$url = \yii\helpers\Url::toRoute(['task-status/teleview', 'id' => $key]);
+
+							return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, $options);
+						}
+				],
+				
+			],
 			[
 				'class' => 
 				'\kartik\grid\DataColumn',
@@ -115,6 +132,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'showNullAsFalse' => true,
 				'label' => 'Zakończone'
 			],
+			'taskstatus.status_details',
 			[
 				'class' => 
 				'\kartik\grid\DataColumn',

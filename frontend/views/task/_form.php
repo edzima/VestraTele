@@ -21,27 +21,59 @@ use trntv\yii\datetime\DateTimeWidget;
 
     <?php $form = ActiveForm::begin(); ?>
 		
-	<i class="fa fa-user-secret" aria-hidden="true"></i>
-
-	<?php 
+    <?= $form->field($model, 'victim_name',['template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-blind fa-lg"></i> Poszkodowany</span>{input}</div>'])->textInput(['maxlength' => true]) ?>
 	
-	echo $form->field($model, 'agent_id')->dropDownList($agent);?>
+	<?= $form->field($model, 'qualified_name')->textArea(['maxlength' => true,'rows'=>3]) ?>
 
-    <?= $form->field($model, 'victim_name')->textInput(['maxlength' => true]) ?>
+	<?= $form->field($model, 'phone',
+		[
+			'options'=>['class'=>'col-md-6 form-group'],
+			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-phone"></i> Numer</span>{input}</div>'
+		])
+			->widget(\yii\widgets\MaskedInput::className(), [
+				'mask' => '999-999-9999',
+			]) 
+	?>
 	
-	<?= $form->field($model, 'qualified_name')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'phone')->widget(\yii\widgets\MaskedInput::className(), [
-			'mask' => '999-999-9999',
-		]) 
+	<?= $form->field($model, 'date',
+		[	
+			'options'=>['class'=>'col-md-6 form-group'],
+			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Kiedy</span>{input}</div>'
+		])
+		->widget(DateTimeWidget::className(),
+			[   'phpDatetimeFormat' => 'dd-MM-yyyy HH:mm',
+				'clientOptions' => [
+			
+					'allowInputToggle' => true,
+					'sideBySide' => true,
+					'widgetPositioning' => [
+					   'horizontal' => 'auto',
+					   'vertical' => 'auto'
+					],
+				]
+			]) 
 	?>
 
-	<?= $form->field($model, 'accident_id')->dropDownList($accident)?>
+	<?= $form->field($model, 'details',
+		[
+			'template' => '<div class="input-group">{input}<span class="input-group-addon"><i class="fa fa-pencil-square-o "></i> Szczegóły</span></div>'
+		])->textArea(['rows'=>4]) ?>
+
 	
+	<?= $form->field($model, 'accident_id',['options'=>['class'=>'col-md-6 form-group']])->dropDownList($accident)?>
+	
+	<?=  $form->field($model, 'meeting',['options'=>['class'=>'col-md-3 form-group']])->dropDownList([0=>'Nie', 1=>'Tak'])?>
+	
+	<?=  $form->field($model, 'automat',['options'=>['class'=>'col-md-3 form-group']])->dropDownList([0=>'Nie', 1=>'Tak'])?>
+
+	<?= $form->field($model, 'agent_id',['template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-user-secret"></i> Przedstawiciel</span>{input}</div>'])->dropDownList($agent)?>
+
+	<h3>Adres</h3>
 	
 	<?php
 	//wojewodztwo
-	echo $form->field($model, 'woj')->widget(Select2::classname(), [
+	echo $form->field($model, 'woj',['options'=>['class'=>'col-md-4']])->widget(Select2::classname(), [
 			'data' => $woj,
 			'options' => [
 				'placeholder' => '--Wybierz województwo--',
@@ -51,7 +83,7 @@ use trntv\yii\datetime\DateTimeWidget;
 	);
 	
 	//powiat
-	echo $form->field($model, 'powiat')->widget(DepDrop::classname(), [
+	echo $form->field($model, 'powiat',['options'=>['class'=>'col-md-4']])->widget(DepDrop::classname(), [
 		'type'=>DepDrop::TYPE_SELECT2,
 		'options'=>['id'=>'subcat-id'],
 		'pluginOptions'=>[
@@ -63,7 +95,7 @@ use trntv\yii\datetime\DateTimeWidget;
 	]);
 
 	// gmina
-	echo $form->field($model, 'gmina')->widget(DepDrop::classname(), [
+	echo $form->field($model, 'gmina',['options'=>['class'=>'col-md-4']])->widget(DepDrop::classname(), [
 		'type'=>DepDrop::TYPE_SELECT2,
 		'pluginOptions'=>[
 			'depends'=>['cat-id', 'subcat-id'],
@@ -73,7 +105,7 @@ use trntv\yii\datetime\DateTimeWidget;
 	]);
 	
 	// miasto
-	echo $form->field($model, 'city')->widget(DepDrop::classname(), [
+	echo $form->field($model, 'city',['options'=>['class'=>'col-md-8']])->widget(DepDrop::classname(), [
 		'type'=>DepDrop::TYPE_SELECT2,
 		'pluginOptions'=>[
 			'depends'=>['cat-id', 'subcat-id'],
@@ -84,33 +116,14 @@ use trntv\yii\datetime\DateTimeWidget;
 
 	?>
 	
-	<?= $form->field($model, 'city_code')->widget(\yii\widgets\MaskedInput::className(), [
+	<?= $form->field($model, 'city_code',['options'=>['class'=>'col-md-4']])->widget(\yii\widgets\MaskedInput::className(), [
 			'mask' => '99-999',
 		]) 
 	?>
-
-
-	<?= $form->field($model, 'details')->textArea(['rows'=>4]) ?>
 	
-	<?=  $form->field($model, 'meeting')->checkBox()?>
-	
-	<?= $form->field($model, 'date')->widget(
-        DateTimeWidget::className(),
-        [   'phpDatetimeFormat' => 'dd-MM-yyyy HH:mm',
-            'clientOptions' => [
-		
-				'allowInputToggle' => true,
-				'sideBySide' => true,
-				'widgetPositioning' => [
-				   'horizontal' => 'auto',
-				   'vertical' => 'auto'
-				],
-			]
-        ]
-    ) ?>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Aktualizuj', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Dodaj' : 'Aktualizuj', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

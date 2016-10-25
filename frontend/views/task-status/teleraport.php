@@ -5,31 +5,43 @@ use yii\widgets\ActiveForm;
 use yii\widgets\DetailView;
 use yii\jui\Spinner;
 
+use yii\helpers\ArrayHelper;
+
+use common\models\AnswerTyp;
+
+
+
 /* @var $this yii\web\View */
-/* @var $model common\models\TaskStatus */
-/* @var $form yii\widgets\ActiveForm */
+/* @var $model common\models\Task */
+
+$this->title = 'Raport sprawy nr: '.$model->task_id;
+
+$this->params['breadcrumbs'][] = ['label' => 'Spotkania', 'url' => ['/spotkania']];
+
+$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="task-status-form">
+<div class="task-create">
+
+    <h1><?= Html::encode($this->title) ?></h1>
+	<div class="task-status-form">
 
     <?php $form = ActiveForm::begin(); ?>
 	
-	<?= $form->field($model, 'answer_id',['options'=>['class'=>'col-md-6']])->dropDownList($answers)?>
+	<?= $form->field($model, 'answer_id',['options'=>['class'=>'col-md-6']])->dropDownList(ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name'),['disabled' =>true])?>
 	
-	<?=$form->field($model, 'count_agreement',['options'=>['class'=>'col-md-6']])->textInput(['type' => 'number', 'min'=>0])->label('Ilość podpisanych umów')?>
-	
-
+	<?=$form->field($model, 'count_agreement',['options'=>['class'=>'col-md-6']])->textInput(['type' => 'number', 'min'=>0, 'disabled'=>true])->label('Ilość podpisanych umów')?>
 
     <?= $form->field($model, 'status_details')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'name')->textArea(['maxlength' => true, 'rows'=>2]) ?>
+    <?= $form->field($model, 'name')->textArea(['maxlength' => true, 'rows'=>2, 'disabled'=>true]) ?>
 	
 	<div id="extra_agreement">
 		<h4> Extra raport </h2>
-		<?= $form->field($model, 'finished',['options'=>['class'=>'col-md-6']])->checkbox() ?>
+		<?= $form->field($model, 'finished',['options'=>['class'=>'col-md-6']])->checkbox(['disabled'=>true]) ?>
 		
-		<?=$form->field($model, 'extra_agreement',['options'=>['class'=>'col-md-6']])->textInput(['type' => 'number', 'min'=>0])?>
+		<?=$form->field($model, 'extra_agreement',['options'=>['class'=>'col-md-6']])->textInput(['type' => 'number', 'min'=>0, 'disabled'=>true])?>
 		
-		<?= $form->field($model, 'extra_name')->textarea(['rows' => 2, 'value'=>null])->label('Kto do dopisania') ?>
+		<?= $form->field($model, 'extra_name')->textarea(['rows' => 2, 'value'=>null, 'disabled'=>true])->label('Kto do dopisania') ?>
 	</div>
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Zapisz' : 'Zapisz', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
@@ -47,10 +59,6 @@ use yii\jui\Spinner;
 				[
 					 'attribute' => 'tele_id',
 					 'value' => $task->tele->username,
-				],
-				[
-					 'attribute' => 'agent_id',
-					 'value' => $task->agent->username,
 				],
 			
 				'victim_name',
@@ -79,13 +87,12 @@ use yii\jui\Spinner;
 				'details:ntext',
 				'meeting:boolean',
 				'automat:boolean',
-				'meeting:boolean',
 				'date',
 			],
 		]) ?>
 		
 
-		<?php
+<?php
 	$this->registerJs(
 		'$("document").ready(function(){
 			
@@ -106,3 +113,5 @@ use yii\jui\Spinner;
 	);
 
 ?>
+
+</div>

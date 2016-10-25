@@ -52,7 +52,7 @@ class ScoreController extends Controller
     {
         $searchModel = new ScoreSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+		
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,

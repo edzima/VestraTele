@@ -19,11 +19,11 @@ class ScoreSearch extends Score
 	public $finished;
 	public $status;
 	public $tele;
-	 
+	public $answer;
     public function rules()
     {
         return [
-            [['id', 'task_id', 'connexion', 'finished','status'], 'integer'],
+            [['id', 'task_id', 'connexion', 'finished','status','answer'], 'integer'],
             [['score'], 'number'],
             [['date', 'name','tele'], 'safe'],
         ];
@@ -82,6 +82,7 @@ class ScoreSearch extends Score
             'date' => $this->date,
 			'task_status.finished' =>$this->finished,
 			'task_status.point' =>$this->status,
+			'task_status.answer_id' =>$this->answer,
         ]);
 
 		

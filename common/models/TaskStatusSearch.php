@@ -24,11 +24,12 @@ class TaskStatusSearch extends Task
 	 public $wojewodztwo;
 	 public $powiatRel;
 	 public $gminaRel;
+	 public $agent;
 	 
     public function rules()
     {
         return [
-            [['id', 'created_at', 'updated_at', 'meeting', 'finish', 'taskstatus'], 'integer'],
+            [['id', 'created_at', 'updated_at', 'meeting', 'finish', 'taskstatus','automat','agent',], 'integer'],
             [['victim_name', 'phone', 'qualified_name', 'details', 'miasto','tele', 'answer', 'accident','date','wojewodztwo', 'powiatRel', 'gminaRel'], 'safe'],
 			
         ];
@@ -57,7 +58,7 @@ class TaskStatusSearch extends Task
 		
 		
 		//typ_work => A => admin || manager, all records
-		if($typWork=='A') $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident']);
+		if($typWork=='A') $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel']);
 		else {
 			if(Yii::$app->user->identity->isAgent())$query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel'])->where(['agent_id'=>Yii::$app->user->identity->id]);
 			else $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel'])->where(['tele_id'=>Yii::$app->user->identity->id]);
@@ -108,24 +109,21 @@ class TaskStatusSearch extends Task
 			if($this->taskstatus) $query->andFilterWhere(['>', 'task_status.answer_id',0]);
 			else $query->andWhere(['task_id' => null]);
 		}
-		
-		//is finish task-status
-		if(strlen($this->finish)==1){
-			if($this->finish) $query->andFilterWhere(['finished' =>1]);
-			else $query->andWhere(['finished' => null]);
-		}
-			
+
         // grid filtering conditions
         $query->andFilterWhere([
             'task.id' => $this->id,
-            'tele_id' => $this->tele_id,
+			'finished' => $this->finish,
+            'tele_id' => $this->tele,
+			'agent_id' => $this->agent,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'accident_id' => $this->accident_id,
             'wojewodztwa.id' => $this->wojewodztwo,
             'meeting' => $this->meeting,
 			'answer_typ.id'=> $this->answer,
-			'accident_typ.id'=> $this->accident
+			'accident_typ.id'=> $this->accident,
+			'automat'=>$this->automat
 			
         ]);
 		
@@ -135,7 +133,6 @@ class TaskStatusSearch extends Task
             ->andFilterWhere(['like', 'qualified_name', $this->qualified_name])
             ->andFilterWhere(['like', 'details', $this->details])
 			->andFilterWhere(['like', 'miasta.name', $this->miasto])
-			->andFilterWhere(['like', 'user.username', $this->tele])
 			->andFilterWhere(['like', 'powiaty.name', $this->powiatRel])
 			->andFilterWhere(['like', 'terc.name', $this->gminaRel])
 			->andFilterWhere(['like', 'date', $this->date]);

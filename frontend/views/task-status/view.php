@@ -14,16 +14,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a('Edytuj', ['update', 'id' => $model->task_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Usuń', ['delete', 'id' => $model->task_id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Jesteś pewny, że chcesz usunąć ten raport?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
 
     <?= DetailView::widget([
         'model' => $model,
@@ -38,6 +28,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'status_details:ntext',
             'name',
 			'finished:boolean',
+			'extra_agreement',
+			'extra_name'
         ],
     ]) ?>
 

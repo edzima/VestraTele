@@ -42,7 +42,7 @@ class Task extends \yii\db\ActiveRecord
     {
         return [
             [['tele_id', 'agent_id', 'accident_id', 'woj', 'powiat', 'gmina', 'city',], 'number','min'=>1],
-            [['details', 'meeting', 'agent_id', 'accident_id', 'city','victim_name','date', 'city_code'], 'required'],
+            [['details', 'meeting', 'agent_id', 'accident_id', 'city','victim_name','date', 'automat', 'city_code'], 'required'],
             [['details'], 'string'],
 			[['date'], 'safe'],
             [['victim_name'], 'string', 'max' => 45, 'min' =>2],
@@ -74,9 +74,10 @@ class Task extends \yii\db\ActiveRecord
             'city' => 'Miejscowość',
             'qualified_name' => 'Dane uprawnionych (imie, nazwisko)',
             'details' => 'Szczegóły',
-            'meeting' => 'Wstępnie umówione',
+            'meeting' => 'Umówione',
             'date' => 'Data spotkania',
 			'city_code' => 'Kod pocztowy',
+			'automat' => 'Automat'
         ];
     }
 
@@ -123,6 +124,10 @@ class Task extends \yii\db\ActiveRecord
 	
 	public function getTask_id(){
 		return $this->id;
+	}
+	
+	public function getAnswer(){
+		return $this->taskstatus->answer;
 	}
 	
 

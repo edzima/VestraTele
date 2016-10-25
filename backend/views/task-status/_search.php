@@ -13,21 +13,19 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
         'method' => 'get',
+	     'options' => [
+            'data-pjax' => 1
+        ],
     ]); ?>
 
-    <?= $form->field($model, 'task_id') ?>
-
-    <?= $form->field($model, 'answer_id') ?>
-
-    <?= $form->field($model, 'count_agreement') ?>
-
-    <?= $form->field($model, 'status_details') ?>
-
-    <?= $form->field($model, 'name') ?>
-
-    <div class="form-group">
-        <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton('Reset', ['class' => 'btn btn-default']) ?>
+	<?=  $form->field($model, 'taskstatus')->dropDownList([''=>'',0=>'Nie', 1=>'Tak'])->label('Zaraportowane')?>
+	<?=  $form->field($model, 'finish')->dropDownList([''=>'',0=>'Nie', 1=>'Tak'])->label('Zakończone')?>
+	<?=  $form->field($model, 'meeting')->dropDownList([''=>'',0=>'Nie', 1=>'Tak'])->label('Umówione')?>
+	<?=  $form->field($model, 'automat')->dropDownList([''=>'',0=>'Nie', 1=>'Tak'])->label('Automat')?>
+	
+	<div class="form-group">
+        <?= Html::submitButton('Szukaj', ['class' => 'btn btn-primary']) ?>
+		<?= Html::a('Reset', ['index'], ['class' => 'btn btn-default'])?>
     </div>
 
     <?php ActiveForm::end(); ?>

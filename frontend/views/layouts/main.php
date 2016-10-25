@@ -40,7 +40,10 @@ AppAsset::register($this);
 	
 	   if (!Yii::$app->user->isGuest) {
 	    $menuItems = [	
-		['label' => Yii::t('frontend', 'Articles'), 'url' => ['/article/index']],
+		[	'label' => Yii::t('frontend', 'Articles'), 
+			'url' => ['/article/index'],
+			'visible' => Yii::$app->user->identity->isTele(),
+		],
         [
             'label' => 'Ranking',
             'url' => ['/score'],

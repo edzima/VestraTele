@@ -76,7 +76,12 @@ class TaskStatusController extends Controller
 		$answers = ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name');
 
         if ($model->load(Yii::$app->request->post()) && $model->save() ) {
-            return $this->redirect(['view', 'id' => $model->task_id]);
+			//point flag to 0 so added point
+			$taskStatus = TaskStatus::findOne($id);
+			$taskStatus->point=0;
+			$taskStatus->save();
+			
+            return $this->redirect(['index']);
         } else {
             return $this->render('create', [
                 'model' => $model,
