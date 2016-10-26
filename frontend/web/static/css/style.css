@@ -155,7 +155,10 @@ div.required label:after {
 	
 }
 
-
 .mg-15{
 	margin-bottom:15px;
+}
+
+.add-terc{
+	cursor:pointer;
 }

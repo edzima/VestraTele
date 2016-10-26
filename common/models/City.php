@@ -30,6 +30,7 @@ class City extends \yii\db\ActiveRecord
         return [
             [['id', 'wojewodztwo_id', 'powiat_id'], 'integer'],
             [['name'], 'string', 'max' => 31],
+			[['name'], 'required'],
             [['wojewodztwo_id'], 'exist', 'skipOnError' => true, 'targetClass' => Wojewodztwa::className(), 'targetAttribute' => ['wojewodztwo_id' => 'id']],
         ];
     }
@@ -41,12 +42,13 @@ class City extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
-            'wojewodztwo_id' => 'Wojewodztwo ID',
-            'powiat_id' => 'Powiat ID',
+            'name' => 'Miejscowość',
+            'wojewodztwo_id' => 'Wojewodztwo',
+            'powiat_id' => 'Powiat',
         ];
     }
 	
+	//to DropDown selectList
 	public static function getCitiesList($wojID, $powID){
 		
 		$cities = Self::find()->where("wojewodztwo_id=$wojID AND powiat_id=$powID")->all();
@@ -57,5 +59,14 @@ class City extends \yii\db\ActiveRecord
 			'out' => $out,
 			'selected' => $cities[0]['id']
 			];
+	}
+	
+	
+	public function getWojewodztwo(){
+		return $this->hasOne(Wojewodztwa::className(),['id' => 'wojewodztwo_id']);
+	}
+	
+	public function getPowiatRel(){
+		return $this->hasOne(Powiat::className(), ['id'=>'powiat_id', 'wojewodztwo_id'=>'wojewodztwo_id']);
 	}
 }

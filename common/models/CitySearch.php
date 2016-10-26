@@ -5,22 +5,24 @@ namespace common\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Powiat;
+use common\models\City;
 
 /**
- * PowiatSearch represents the model behind the search form of `common\models\Powiat`.
+ * CitySearch represents the model behind the search form of `common\models\City`.
  */
-class PowiatSearch extends Powiat
+class CitySearch extends City
 {
     /**
      * @inheritdoc
      */
+	 public $powiat;
 	 public $wojewodztwo;
+
     public function rules()
     {
         return [
-            [['id', 'wojewodztwo_id'], 'integer'],
-            [['name','wojewodztwo'], 'safe'],
+            [['id', 'wojewodztwo_id', 'powiat_id'], 'integer'],
+            [['name','powiat', 'wojewodztwo'], 'safe'],
         ];
     }
 
@@ -42,7 +44,7 @@ class PowiatSearch extends Powiat
      */
     public function search($params)
     {
-        $query = Powiat::find()->joinWith(['wojewodztwo']);
+        $query = City::find()->joinWith(['powiatRel','wojewodztwo']);
 
         // add conditions that should always apply here
 
@@ -62,10 +64,12 @@ class PowiatSearch extends Powiat
         $query->andFilterWhere([
             'id' => $this->id,
             'wojewodztwo_id' => $this->wojewodztwo_id,
+            'powiat_id' => $this->powiat_id,
         ]);
 
-        $query->andFilterWhere(['like', 'powiaty.name', $this->name])
-			->andFilterWhere(['like', 'wojewodztwa.name', $this->wojewodztwo]);
+        $query->andFilterWhere(['like', 'miasta.name', $this->name])
+			->andFilterWhere(['like', 'wojewodztwa.name', $this->wojewodztwo])
+			->andFilterWhere(['like', 'powiaty.name', $this->powiat]);
 
         return $dataProvider;
     }

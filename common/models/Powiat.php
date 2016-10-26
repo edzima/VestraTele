@@ -27,7 +27,7 @@ class Powiat extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'wojewodztwo_id'], 'required'],
+            [['id', 'wojewodztwo_id','name'], 'required'],
             [['id', 'wojewodztwo_id'], 'integer'],
             [['name'], 'string', 'max' => 25],
             [['wojewodztwo_id'], 'exist', 'skipOnError' => true, 'targetClass' => Wojewodztwa::className(), 'targetAttribute' => ['wojewodztwo_id' => 'id']],
@@ -41,8 +41,8 @@ class Powiat extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'wojewodztwo_id' => 'Wojewodztwo ID',
-            'name' => 'Name',
+            'wojewodztwo_id' => 'Wojewodztwo',
+            'name' => 'Nazwa',
         ];
     }
 	
@@ -50,6 +50,11 @@ class Powiat extends \yii\db\ActiveRecord
 	public static function getPowiatListId($cat_id){	
 		return self::find()->where(['wojewodztwo_id' => $cat_id])->asArray()->all();
         
+	}
+	
+		
+	public function getWojewodztwo(){
+		return $this->hasOne(Wojewodztwa::className(),['id' => 'wojewodztwo_id']);
 	}
 	
 }

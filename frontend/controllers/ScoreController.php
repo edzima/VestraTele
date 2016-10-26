@@ -85,8 +85,8 @@ class ScoreController extends Controller
 		$scores = Score::find()->where(['task_id' => $id, 'tele_id' => $teleID])->all();
 		$connexion = ArrayHelper::map(Connexion::find()->all(),'id', 'name');
 		$tele = ArrayHelper::map(User::find()->where(['typ_work' => 'T'])->all(), 'id', 'username');
-		//new agreement after update
 		
+		//new agreement after update (extra_agreement)
 		if(count($scores)<$count){
 			$odds = $count - count($scores);
 			//Create an array of the score submitted

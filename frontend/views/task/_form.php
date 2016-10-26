@@ -7,8 +7,9 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use kartik\depdrop\DepDrop;
 use kartik\select2\Select2;
-use kartik\icons\Icon;
 
+
+use yii\bootstrap\Modal;
 use trntv\yii\datetime\DateTimeWidget;
 /* @var $this yii\web\View */
 /* @var $model common\models\Task */
@@ -80,16 +81,20 @@ use trntv\yii\datetime\DateTimeWidget;
 				'id' => 'cat-id',
 			],
 		]
-	);
+	)->label(false);
 	
 	//powiat
-	echo $form->field($model, 'powiat',['options'=>['class'=>'col-md-4']])->widget(DepDrop::classname(), [
+	echo $form->field($model, 'powiat',
+		[
+			'options'=>['class'=>'col-md-4 form-group'],
+			'template' => '<div class="input-group">{input} <span id="add-powiat" class="input-group-addon add-terc"><i class="fa fa-plus"></i></span></div>'
+		])->widget(DepDrop::classname(), [
 		'type'=>DepDrop::TYPE_SELECT2,
 		'options'=>['id'=>'subcat-id'],
 		'pluginOptions'=>[
 			'depends'=>['cat-id'],
 			'placeholder'=>'Powiat...',
-			'url'=>Url::to(['/task/powiat']),
+			'url'=>Url::to(['/city/powiat']),
 			'loading' =>'wyszukiwanie...'
 		]
 	]);
@@ -100,23 +105,33 @@ use trntv\yii\datetime\DateTimeWidget;
 		'pluginOptions'=>[
 			'depends'=>['cat-id', 'subcat-id'],
 			'placeholder'=>'Gmina...',
-			'url'=>Url::to(['/task/gmina']),
+			'url'=>Url::to(['/city/gmina']),
 		]
-	]);
+	])->label(false);
 	
 	// miasto
-	echo $form->field($model, 'city',['options'=>['class'=>'col-md-8']])->widget(DepDrop::classname(), [
+	echo $form->field($model, 'city',
+		[
+			'options'=>['class'=>'col-md-8 form-group'],
+			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-home"></i></span>{input} <span id="add-city" class="input-group-addon add-terc"><i class="fa fa-plus"></i></span></div>'
+		])
+		->widget(DepDrop::classname(), [
 		'type'=>DepDrop::TYPE_SELECT2,
 		'pluginOptions'=>[
 			'depends'=>['cat-id', 'subcat-id'],
 			'placeholder'=>'Miejscowość...',
-			'url'=>Url::to(['/task/city']),
+			'url'=>Url::to(['/city/city']),
 		]
 	]);
-
 	?>
+
 	
-	<?= $form->field($model, 'city_code',['options'=>['class'=>'col-md-4']])->widget(\yii\widgets\MaskedInput::className(), [
+	<?= $form->field($model, 'city_code',
+		[
+			'options'=>['class'=>'col-md-4 form-group'],
+			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-barcode"></i> Kod</span>{input}</div>'
+		])
+		->widget(\yii\widgets\MaskedInput::className(), [
 			'mask' => '99-999',
 		]) 
 	?>
@@ -129,3 +144,19 @@ use trntv\yii\datetime\DateTimeWidget;
     <?php ActiveForm::end(); ?>
 
 </div>
+
+<?php
+	$this->registerJs(
+		'$("document").ready(function(){
+			
+			$("#add-city").click(function(){
+				 window.open("/city/create");
+			});
+			$("#add-powiat").click(function(){
+				 window.open("/powiat/create");
+			});
+			
+		});'		
+	);
+?>
+

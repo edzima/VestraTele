@@ -29,6 +29,16 @@ use backend\widgets\Menu;
                         ['label' => Yii::t('backend', 'Articles'), 'url' => ['/article/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
                         ['label' => Yii::t('backend', 'Article categories'), 'url' => ['/article-category/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
                     ],
+                ],        
+				[
+                    'label' => 'Terytorium',
+                    'url' => '#',
+                    'icon' => '<i class="fa fa-home"></i>',
+                    'options' => ['class' => 'treeview'],
+                    'items' => [                 
+                        ['label' => 'Powiaty', 'url' => ['/powiat/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+                        ['label' =>'Miejscowości', 'url' => ['/city/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+                    ],
                 ],
 				[
                     'label' => 'Spotkania',
