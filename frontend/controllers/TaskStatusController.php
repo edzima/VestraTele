@@ -45,10 +45,12 @@ class TaskStatusController extends Controller
 
     /**
      * Lists all TaskStatus models.
+     * param $key - selected item 
      * @return mixed
      */
     public function actionIndex()
     {
+		
         $searchModel = new TaskStatusSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		
@@ -138,7 +140,7 @@ class TaskStatusController extends Controller
         if (($model = TaskStatus::findOne($id)) !== null) {
             return $model;
         } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException('Spotkania jeszcze nie zaraportowano.');
         }
     }
 	
@@ -147,7 +149,7 @@ class TaskStatusController extends Controller
         if (($model = Task::findOne($id)) !== null) {
             return $model;
         } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException('Nie ma takiego spotkania.');
         }
     }
 }

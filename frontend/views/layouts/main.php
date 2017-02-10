@@ -78,7 +78,7 @@ AppAsset::register($this);
                     'label' => Yii::t('frontend', 'Backend'),
                     'url' => getenv('BACKEND_URL'),
                     'linkOptions' => ['target' => '_blank'],
-                    'visible' => Yii::$app->user->can('administrator'),
+                    'visible' => Yii::$app->user->can('manager','admnistrator'),
                 ],
                 [
                     'label' => Yii::t('frontend', 'Logout'),

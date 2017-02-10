@@ -20,6 +20,7 @@ use Yii;
  * @property integer $powiat
  * @property integer $gmina
  * @property integer $city
+ * @property string $street
  * @property string $qualified_name
  * @property string $details
  * @property integer $meeting
@@ -42,10 +43,10 @@ class Task extends \yii\db\ActiveRecord
     {
         return [
             [['tele_id', 'agent_id', 'accident_id', 'woj', 'powiat', 'gmina', 'city',], 'number','min'=>1],
-            [['details', 'meeting', 'agent_id', 'accident_id', 'city','victim_name','date', 'automat', 'city_code'], 'required'],
-            [['details'], 'string'],
+            [['details', 'meeting', 'agent_id', 'accident_id', 'city','victim_name', 'automat', 'city_code'], 'required'],
+            [['details','street'], 'string'],
 			[['date'], 'safe'],
-            [['victim_name'], 'string', 'max' => 45, 'min' =>2],
+            [['victim_name',], 'string', 'max' => 45, 'min' =>2],
             [['phone'], 'string', 'max' => 13],
             [['qualified_name'], 'string', 'max' => 200],
             [['accident_id'], 'exist', 'skipOnError' => true, 'targetClass' => AccidentTyp::className(), 'targetAttribute' => ['accident_id' => 'id']],
@@ -72,6 +73,7 @@ class Task extends \yii\db\ActiveRecord
             'powiat' => 'Powiat',
             'gmina' => 'Gmina',
             'city' => 'Miejscowość',
+			'street' => 'Ulica',
             'qualified_name' => 'Dane uprawnionych (imie, nazwisko)',
             'details' => 'Szczegóły',
             'meeting' => 'Umówione',

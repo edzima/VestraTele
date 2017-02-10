@@ -9,7 +9,7 @@ use yii\web\NotFoundHttpException;
 use common\models\Article;
 use common\models\ArticleCategory;
 use common\models\Tag;
-use common\models\score;
+use common\models\Score;
 use yii\filters\AccessControl;
 /**
  * Class ArticleController.
@@ -69,12 +69,13 @@ class ArticleController extends Controller
         if (!$model) {
             throw new NotFoundHttpException(Yii::t('frontend', 'Page not found.'));
         }
-
+		
 		$query = Score::find()->groupBy('tele_id')
 			->select('name, tele_id, sum(score) as suma')
 			->where("date BETWEEN '$model->start_at' AND '$model->finish_at'")
 			->with('tele')
 			->orderBy('suma DESC');
+		
 		$dataProvider = new ActiveDataProvider([
 			'query'=> $query,
 			]);

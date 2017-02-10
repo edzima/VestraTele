@@ -4,57 +4,75 @@ namespace backend\controllers;
 
 use Yii;
 use common\models\Task;
-use backend\models\search\TaskStatusSearch;
-use common\models\TaskStatus;
-use common\models\TaskExtra;
-use common\models\AnswerTyp;
+use backend\models\search\TaskSearch;
+use common\models\Wojewodztwa;
+use common\models\AccidentTyp;
+use common\models\User;
+use common\models\TaskStatusSearch;
+
+
+use yii\helpers\ArrayHelper;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
 /**
- * TaskStatusController implements the CRUD actions for TaskStatus model.
+ * TaskController implements the CRUD actions for Task model.
  */
-class TaskStatusController extends Controller
+class TaskController extends Controller
 {
     /**
      * @inheritdoc
      */
+	 const WORK_AGENT = 2;
+	 const WORK_TELE = 1;
+
+		
     public function behaviors()
     {
         return [
+			'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
                 ],
             ],
+			 
         ];
     }
 
     /**
-     * Lists all TaskStatus models.
-	 * @param array integer $key selected rows
+     * Lists all Task models.
      * @return mixed
      */
     public function actionIndex()
     {
-
+        $searchModel = new TaskSearch();
 		
-        $searchModel = new TaskStatusSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		
-		$answers = ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name');
+		$searchStatus = new TaskStatusSearch();
+		$statusProvider = $searchStatus->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-			'answers' =>$answers,
+            'searchStatus' => $searchStatus,
+            'statusProvider' => $statusProvider,
         ]);
     }
 
     /**
-     * Displays a single TaskStatus model.
+     * Displays a single Task model.
      * @param integer $id
      * @return mixed
      */
@@ -65,38 +83,32 @@ class TaskStatusController extends Controller
         ]);
     }
 
-    /**
-     * Creates a new TaskStatus model.
+
+
+	/**
+     * Creates a new Task model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionRaport($id)
+    public function actionCreate()
     {
-		if (($model = TaskStatus::findOne($id)) == null) $model = new TaskStatus();
-		$model->task_id = $id;
-		$task = $this->findTask($id);
-		
-		$answers = ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name');
+       $model = new Task();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save() ) {
-			//point flag to 0 so added point
-			$taskStatus = TaskStatus::findOne($id);
-			$taskStatus->point=0;
-			$taskStatus->save();
-			
-            return $this->redirect(['index']);
+	   $woj = ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
+	   $accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
+		
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->save())return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
-				'task' =>$task,
-				'answers' =>$answers,
-				
+				'woj' => $woj,
+				'accident' => $accident,
             ]);
         }
     }
-
     /**
-     * Updates an existing TaskStatus model.
+     * Updates an existing Task model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -104,22 +116,24 @@ class TaskStatusController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-		$task = $this->findTask($id);
 		
-		$answers = ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name');
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->task_id]);
+		$woj = ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
+		$accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
+
+        
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
                 'model' => $model,
-				'task' => $task,
-				'answers' =>$answers,
+				'woj' => $woj,
+				'accident' => $accident,
             ]);
         }
     }
 
     /**
-     * Deletes an existing TaskStatus model.
+     * Deletes an existing Task model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -132,22 +146,14 @@ class TaskStatusController extends Controller
     }
 
     /**
-     * Finds the TaskStatus model based on its primary key value.
+     * Finds the Task model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return TaskStatus the loaded model
+     * @return Task the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
+	 
     protected function findModel($id)
-    {
-        if (($model = TaskStatus::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
-    }
-	
-	 protected function findTask($id)
     {
         if (($model = Task::findOne($id)) !== null) {
             return $model;

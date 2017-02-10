@@ -24,8 +24,6 @@ $typWok = ['0' => 'Przedstawiciel', '1' => 'Telemarketer'];
         'filterModel' => $searchModel,
         'columns' => [
             //['class' => 'yii\grid\SerialColumn'],
-
-            'id',
             'username',
             // 'auth_key',
             // 'access_token',
@@ -41,7 +39,7 @@ $typWok = ['0' => 'Przedstawiciel', '1' => 'Telemarketer'];
             'ip',
             // 'created_at',
             // 'updated_at',
-             //'action_at',
+            'action_at:Datetime',
 			
 			[
                 'attribute' => 'typ_work',

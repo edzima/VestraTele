@@ -34,11 +34,14 @@ $this->params['breadcrumbs'][] = $this->title;
 				 'attribute' => 'agent_id',
 				 'value' => $model->agent->username,
 			],
+			[
+				 'attribute' => 'tele_id',
+				 'value' => $model->tele->username,
+			],
 		
             'victim_name',
             'phone',
-            'created_at',
-            'updated_at',
+
             [
 				 'attribute' => 'accident_id',
 				 'value' => $model->accident->name,
@@ -59,12 +62,14 @@ $this->params['breadcrumbs'][] = $this->title;
 				 'attribute' => 'city',
 				 'value' => $model->miasto->name,
 			],
-			'street',
 			'city_code',
             'qualified_name',
             'details:ntext',
             'meeting:boolean',
+			'automat:boolean',
             'date',
+			'created_at',
+            'updated_at',
         ],
     ]) ?>
 

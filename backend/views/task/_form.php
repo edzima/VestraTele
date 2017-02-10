@@ -4,15 +4,15 @@ use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
+use common\models\User;
+
 use yii\widgets\ActiveForm;
 use kartik\depdrop\DepDrop;
 use kartik\select2\Select2;
 
-
-use yii\bootstrap\Modal;
 use trntv\yii\datetime\DateTimeWidget;
 
-use kartik\datetime\DateTimePicker;
+
 /* @var $this yii\web\View */
 /* @var $model common\models\Task */
 /* @var $woj common\models\Task */
@@ -42,16 +42,14 @@ use kartik\datetime\DateTimePicker;
 	<?= $form->field($model, 'date',
 		[	
 			'options'=>['class'=>'col-md-6 form-group'],
-			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Kiedy</span>{input}</div>',
-	
+			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Kiedy</span>{input}</div>'
 		])
 		->widget(DateTimeWidget::className(),
-			[   'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
+			[   'phpDatetimeFormat' => 'dd-MM-yyyy HH:mm',
 				'clientOptions' => [
-				
+			
 					'allowInputToggle' => true,
 					'sideBySide' => true,
-		
 					'widgetPositioning' => [
 					   'horizontal' => 'auto',
 					   'vertical' => 'auto'
@@ -72,7 +70,9 @@ use kartik\datetime\DateTimePicker;
 	
 	<?=  $form->field($model, 'automat',['options'=>['class'=>'col-md-3 form-group']])->dropDownList([0=>'Nie', 1=>'Tak'])?>
 
-	<?= $form->field($model, 'agent_id',['template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-user-secret"></i> Przedstawiciel</span>{input}</div>'])->dropDownList($agent)?>
+	<?= $form->field($model, 'agent_id',['template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-user-secret"></i> Przedstawiciel</span>{input}</div>'])->dropDownList(ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username'))?>
+
+	<?= $form->field($model, 'tele_id',['template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-user-secret"></i> Konsultant</span>{input}</div>'])->dropDownList(ArrayHelper::map(User::find()->where(['typ_work' => 'T'])->all(), 'id', 'username'))?>
 
 	<h3>Adres</h3>
 	
@@ -94,7 +94,6 @@ use kartik\datetime\DateTimePicker;
 			'template' => '<div class="input-group">{input} <span id="add-powiat" class="input-group-addon add-terc"><i class="fa fa-plus"></i></span></div>'
 		])->widget(DepDrop::classname(), [
 		'type'=>DepDrop::TYPE_SELECT2,
-		'data'=>$powiat,
 		'options'=>['id'=>'subcat-id'],
 		'pluginOptions'=>[
 			'depends'=>['cat-id'],
@@ -107,7 +106,6 @@ use kartik\datetime\DateTimePicker;
 	// gmina
 	echo $form->field($model, 'gmina',['options'=>['class'=>'col-md-4']])->widget(DepDrop::classname(), [
 		'type'=>DepDrop::TYPE_SELECT2,
-		'data'=>$gmina,
 		'pluginOptions'=>[
 			'depends'=>['cat-id', 'subcat-id'],
 			'placeholder'=>'Gmina...',
@@ -118,30 +116,23 @@ use kartik\datetime\DateTimePicker;
 	// miasto
 	echo $form->field($model, 'city',
 		[
-			'options'=>['class'=>'col-md-6 form-group'],
+			'options'=>['class'=>'col-md-8 form-group'],
 			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-home"></i></span>{input} <span id="add-city" class="input-group-addon add-terc"><i class="fa fa-plus"></i></span></div>'
 		])
 		->widget(DepDrop::classname(), [
 		'type'=>DepDrop::TYPE_SELECT2,
-		'data'=>$city,
 		'pluginOptions'=>[
 			'depends'=>['cat-id', 'subcat-id'],
 			'placeholder'=>'Miejscowość...',
 			'url'=>Url::to(['/city/city']),
 		]
 	]);
-	
-		echo  $form->field($model, 'street',
-		[
-			'options'=>['class'=>'col-md-4 form-group'],
-			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-address-book"></i> Ulica</span>{input}</div>'
-		]);
 	?>
 
 	
 	<?= $form->field($model, 'city_code',
 		[
-			'options'=>['class'=>'col-md-2 form-group'],
+			'options'=>['class'=>'col-md-4 form-group'],
 			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-barcode"></i> Kod</span>{input}</div>'
 		])
 		->widget(\yii\widgets\MaskedInput::className(), [
@@ -168,18 +159,8 @@ use kartik\datetime\DateTimePicker;
 			$("#add-powiat").click(function(){
 				 window.open("/powiat/create");
 			});
-
-		
+			
 		});'		
 	);
-	
-	$this->registerJs(
-	"	var dateC = '$model->date'.substr(0,16);
-		$('document').ready(function(){
-			$('#task-date').val(dateC);
-		});
-	"
-	);
-
 ?>
 

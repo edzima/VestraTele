@@ -29,13 +29,8 @@ $this->params['breadcrumbs'][] = $this->title;
 		'dataProvider'=> $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-				['class' => 'kartik\grid\SerialColumn'],
-				[
-					'class' => 
-					'\kartik\grid\DataColumn',
-					'attribute' => 'id',
-					'width' => '20px'
-				],
+		
+	
 				//'tele_id',
 				[
 					 'attribute' => 'agent',
@@ -43,7 +38,6 @@ $this->params['breadcrumbs'][] = $this->title;
 					 'label' => 'Przedstawiciel',
 				],
 				'victim_name',
-				'phone',
 				// 'created_at',
 				// 'updated_at',
 				// 'accident_id',
@@ -55,8 +49,8 @@ $this->params['breadcrumbs'][] = $this->title;
 					 'value' => 'miasto.name',
 					 'label' => 'Miejscowość',
 				],
-				 'qualified_name',
-				// 'details:ntext',
+				 //'qualified_name',
+	
 				[
 					'class' => '\kartik\grid\BooleanColumn',
 					'trueLabel' => 'Tak', 
@@ -65,6 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					'showNullAsFalse' => true,
 					'label' => 'Spotkanie'
 				],
+		
 				 'date',
 				['class' => 'kartik\grid\ActionColumn'],
 			],
@@ -74,7 +69,6 @@ $this->params['breadcrumbs'][] = $this->title;
 		'panel'=>[
 				'type'=>GridView::TYPE_PRIMARY,
 				'heading'=>'<i class="glyphicon glyphicon-road"></i>  Umówione spotkania',
-				'footer'=>false,
 		],
 		'toolbar'=> [
 			['content'=>
@@ -93,7 +87,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			[	
 				
 			   'class' => 'yii\grid\ActionColumn',
-			    'template' => '{see}',
+			    'template' => '{see}{points}',
 				'buttons' => [
 					  'see' => function ($url, $model, $key) {
 							$options = [
@@ -103,16 +97,24 @@ $this->params['breadcrumbs'][] = $this->title;
 							];
 							$url = \yii\helpers\Url::toRoute(['task-status/teleview', 'id' => $key]);
 
-							return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, $options);
+							return Html::a('<button type="button" class="btn btn-default">
+												<span class="glyphicon glyphicon-eye-open"></span>
+											</button>', $url, $options);
+						},
+						'points' => function ($url, $model, $key) {
+							$options = [
+								'title' => 'Punkty',
+								'aria-label' => 'Punkty',
+								'data-pjax' => '0',
+							];
+							$url = \yii\helpers\Url::toRoute(['score/deal', ['id' => $key, 'tele' => $model->tele_id]]);
+
+							return Html::a('<button type="button" class="btn btn-default">
+												<span class="glyphicon glyphicon-tower" aria-hidden="true"></span>
+											</button>', $url, $options);
 						}
 				],
 				
-			],
-			[
-				'class' => 
-				'\kartik\grid\DataColumn',
-				'attribute' => 'id',
-				'width' => '20px'
 			],
 		    [
 				'class' => '\kartik\grid\BooleanColumn',
@@ -123,16 +125,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'showNullAsFalse' => true,
 				'label' => 'Raport'
 			],
-			[
-				'class' => '\kartik\grid\BooleanColumn',
-				'trueLabel' => 'Tak', 
-				'falseLabel' => 'Nie',
-				'attribute' => 'finish',
-				'value' => 'taskstatus.finished',
-				'showNullAsFalse' => true,
-				'label' => 'Zakończone'
-			],
-			'taskstatus.status_details',
 			[
 				'class' => 
 				'\kartik\grid\DataColumn',
@@ -189,7 +181,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		'panel'=>[
 			'type'=>GridView::TYPE_PRIMARY,
 			'heading'=>'<i class="glyphicon glyphicon-pencil"></i>  Stan raportów',
-			'footer'=>false,
+		
 		],
 		'persistResize'=>false,
 		//'exportConfig'=>$exportConfig,

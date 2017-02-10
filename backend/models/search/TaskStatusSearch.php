@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models;
+namespace backend\models\search;
 
 use Yii;
 use yii\base\Model;
@@ -51,30 +51,27 @@ class TaskStatusSearch extends Task
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $key)
     {
 		$typWork= Yii::$app->user->identity->typ_work;
         $query = Task::find();
 		
-			
-	
+		//selected rows
+		if($key)$query->where('task.id IN('.$key.')');
+		
 		//typ_work => A => admin || manager, all records
-		if($typWork=='A') $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel']);
-		else {
-			if(Yii::$app->user->identity->isAgent())$query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel'])->where(['agent_id'=>Yii::$app->user->identity->id]);
-			else $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel'])->where(['tele_id'=>Yii::$app->user->identity->id]);
-		}
-		
-		
-			//selected rows
-		if($keys = @Yii::$app->request->queryParams['key'])$query->where('task.id IN('.$keys.')');
-		
+	    $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel']);
+
+
 		//$query->joinWith(['miasto','tele','taskstatus','taskstatus.answer']);
 		//$query->where(['task.agent_id' => Yii::$app->user->identity->id]);
         // add conditions that should always apply here
 		
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+			 'pagination' => [
+				'pageSize' => 40,
+			],
         ]);
 		
         $this->load($params);

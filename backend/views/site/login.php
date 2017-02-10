@@ -27,7 +27,7 @@ $this->params['body-class'] = 'login-page';
         </div>
 
         <div class="footer">
-            <?= Html::submitButton('Sign me in', ['class' => 'btn btn-primary btn-flat btn-block']) ?>
+            <?= Html::submitButton('Zaloguj', ['class' => 'btn btn-primary btn-flat btn-block']) ?>
         </div>
 
         <?php ActiveForm::end() ?>

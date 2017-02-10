@@ -43,17 +43,19 @@ use trntv\yii\datetime\DateTimeWidget;
 
 <h2>Szczegóły spotkania</h2>
 	<div class="task-form">
-    <?php $form = ActiveForm::begin(); ?>
 	
+    <?php $form = ActiveForm::begin(); ?>
+	     <?= Html::submitButton('Zmień', ['class' => 'btn btn-primary']) ?>
 		<?= $form->field($task, 'date',
 		[	
 			'options'=>['class'=>'col-md-4 form-group'],
-			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Data spotkania</span>{input}</div>'
+			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Data spotkania</span>{input}</div>',
+			
 		])
 		->widget(DateTimeWidget::className(),
-			[   'phpDatetimeFormat' => 'dd-MM-yyyy HH:mm',
+			[   'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
 				'clientOptions' => [
-			
+					
 					'allowInputToggle' => true,
 					'sideBySide' => true,
 					'widgetPositioning' => [
@@ -66,10 +68,11 @@ use trntv\yii\datetime\DateTimeWidget;
 	
 
 
-        <?= Html::submitButton('Zmień', ['class' => 'btn btn-primary']) ?>
+   
   
 
     <?php ActiveForm::end(); ?>
+	
 	</div>		
 	 <?= DetailView::widget([
 			'model' => $task,
@@ -102,6 +105,7 @@ use trntv\yii\datetime\DateTimeWidget;
 					 'attribute' => 'city',
 					 'value' => $task->miasto->name,
 				],
+				'street',
 				'city_code',
 				'meeting:boolean',
 				'automat:boolean',

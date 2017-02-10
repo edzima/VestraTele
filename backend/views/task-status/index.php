@@ -211,12 +211,13 @@ $exportConfig=   [
 		'pjax'=>true, // pjax is set to always true for this demo
 		// set your toolbar
 		'toolbar'=> [
-		['content'=>
-			Html::a('<i class="glyphicon glyphicon-repeat"></i>', [''], ['data-pjax'=>0, 'class'=>'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
-		],
-		'{export}',
-		'{toggleData}',
-		],
+			['content'=>
+				Html::a('<i class="glyphicon glyphicon-repeat"></i>', [''], ['data-pjax'=>0, 'class'=>'btn btn-default', 'title'=>Yii::t('kvgrid', 'Reset Grid')])
+			],
+			'{export}',
+			'{toggleData}',
+
+			],
 		// set export properties
 		'export'=>[
 			'fontAwesome'=>true
@@ -226,11 +227,11 @@ $exportConfig=   [
 		'condensed'=>true,
 		'responsive'=>true,
 		'hover'=>true,
+		
 
 		'panel'=>[
 			'type'=>GridView::TYPE_PRIMARY,
 			'heading'=>'<i class="glyphicon glyphicon-book"></i>  Umówione spotkania',
-			'footer' => false,
 		],
 		'persistResize'=>false,
 		'exportConfig'=>$exportConfig,

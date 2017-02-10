@@ -29,5 +29,7 @@ return [
 		'spotkanie' => 'task/index',
 		'spotkanie/nowe' => 'task/create',
 		'spotkanie/edycja' => 'task/update',
+		
+		'admin' => '/backend/web',
     ],
 ];

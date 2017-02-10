@@ -80,7 +80,7 @@ return [
     'Save' => 'Zapisz',
     'Select cache' => 'Wybierz cache',
     'Settings was successfully saved.' => 'Ustawienia zostały zapisane.',
-    'Sign in' => 'Zarejestruj',
+    'Sign in' => 'Zaloguj się',
     'Static pages' => 'Strony statyczne',
     'Status' => '',
     'System' => '',

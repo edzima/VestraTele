@@ -59,4 +59,6 @@ class Gmina extends \yii\db\ActiveRecord
 			'selected' => $gminy[0]['id']
 			];
 	}
+	
+
 }

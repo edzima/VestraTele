@@ -88,6 +88,7 @@ $columns = [
 				'attribute' => 'miasto',
 				'value' => 'miasto.name',
 			],
+			'street',
 			'city_code',
 		];
 		
@@ -145,6 +146,12 @@ $exportMenu =  ExportMenu::widget([
 						}
 				],
 				'visible' => Yii::$app->user->identity->isAgent()
+			],
+			[
+				'class' => 
+				'\kartik\grid\CheckboxColumn',
+				'contentOptions' => ['class' => 'kv-row-select'],
+				'headerOptions' => ['class' => 'kv-all-select'],
 			],
 			'id',
 			[	 'class' => '\kartik\grid\DataColumn',
@@ -208,6 +215,7 @@ $exportMenu =  ExportMenu::widget([
 				'attribute' => 'miasto',
 				'value' => 'miasto.name',
 			],
+			'street',
 			'city_code',
 			[
 				'class' => 
@@ -222,12 +230,7 @@ $exportMenu =  ExportMenu::widget([
 				'\kartik\grid\DataColumn',
 				'attribute' => 'taskstatus.count_agreement',
 			],
-			[
-				'class' => 
-				'\kartik\grid\CheckboxColumn',
-				'contentOptions' => ['class' => 'kv-row-select'],
-				'headerOptions' => ['class' => 'kv-all-select'],
-			],
+
 		],
 		
 		
@@ -245,7 +248,16 @@ $exportMenu =  ExportMenu::widget([
 		],
 		'{toggleData}',
 		$exportMenu,
+			Html::button('<i class="glyphicon glyphicon-download-alt"></i> Tylko zaznaczone',
+                    ['class'=>'btn btn-default',
+                        'onclick'=>'var key = $("#kv-grid-demo").yiiGridView("getSelectedRows");window.location.href = "?key="+key;',
+                        'data-toggle'=>'tooltip',
+                        'title'=>Yii::t('app', 'Create New Record'),
+                    ]
+
+				),
 		],
+		
 		// set export properties
 		'export'=>[
 			'fontAwesome'=>true
@@ -254,12 +266,12 @@ $exportMenu =  ExportMenu::widget([
 		'striped'=>false,
 		'condensed'=>true,
 		'responsive'=>true,
-		'hover'=>true,
-		'resizableColumns'=>true,
+		'hover'=>false,
+
 		'panel'=>[
 			'type'=>GridView::TYPE_PRIMARY,
 			'heading'=>'<i class="glyphicon glyphicon-book"></i>  Umówione spotkania',
-			'footer' => false,
+
 		],
 		//'exportConfig'=>$exportConfig,
 	]);

@@ -14,3 +14,10 @@ div.required label:after {
 .mg-15{
 	margin-bottom:15px;
 }
+.mt-25{
+	margin-top:25px;
+}
+.task-status-search{
+	min-height:70px;
+}
+

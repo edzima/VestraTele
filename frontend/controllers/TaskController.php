@@ -8,6 +8,11 @@ use common\models\TaskSearch;
 use common\models\Wojewodztwa;
 use common\models\AccidentTyp;
 use common\models\User;
+use common\models\Powiat;
+use common\models\Gmina;
+use common\models\City;
+use yii\helpers\Json;
+
 use common\models\TaskStatusSearch;
 
 
@@ -93,22 +98,22 @@ class TaskController extends Controller
     public function actionCreate()
     {
        $model = new Task();
-
+	   $model->tele_id = Yii::$app->user->id;
 	   $woj = ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
 	   $accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
+	   
 	   $agent = ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username');
 		
-        if ($model->load(Yii::$app->request->post())) {
-			$model->tele_id = Yii::$app->user->id;
-            if ($model->save())return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
+	   if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->id]);
+		} else {
+			return $this->render('create', [
+				'model' => $model,
 				'woj' => $woj,
 				'accident' => $accident,
 				'agent' => $agent,
-            ]);
-        }
+			]);
+		}
     }
     /**
      * Updates an existing Task model.
@@ -124,6 +129,12 @@ class TaskController extends Controller
 		$accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
 		$agent = ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username');
         
+		//to dropdown list
+		$powiat = ArrayHelper::map(Powiat::find()->where("wojewodztwo_id=$model->woj")->all(), 'id', 'name');
+		$gmina = ArrayHelper::map(Gmina::find()->where(['WOJ' => $model->woj, 'POW' => $model->powiat])->all(), 'id', 'name');
+		$city = ArrayHelper::map(City::find()->where(['wojewodztwo_id' => $model->woj, 'powiat_id' => $model->powiat])->all(), 'id', 'name');
+
+				
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
@@ -132,6 +143,9 @@ class TaskController extends Controller
 				'woj' => $woj,
 				'accident' => $accident,
 				'agent' => $agent,
+				'powiat' => $powiat,
+				'gmina' => $gmina,
+				'city' => $city
             ]);
         }
     }

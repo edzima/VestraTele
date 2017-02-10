@@ -44,7 +44,12 @@ use backend\widgets\Menu;
                     'label' => 'Spotkania',
                     'url' => ['/task-status/index'],
                     'icon' => '<i class="fa fa fa-suitcase"></i>',
-                ],
+					'options' => ['class' => 'treeview'],
+                    'items' => [
+                        ['label' => 'Spotkania', 'url' => ['/task/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+                        ['label' => 'Raporty', 'url' => ['/task-status/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+					],
+				],
 				[
                     'label' => 'Punkty',
                     'url' => ['/score/index'],
@@ -66,17 +71,6 @@ use backend\widgets\Menu;
                             'url' => ['/db-manager/default/index'],
                             'icon' => '<i class="fa fa-angle-double-right"></i>',
                             'visible' => Yii::$app->user->can('administrator'),
-                        ],
-						[
-						'label' => Yii::t('backend', 'Tags'),
-						'url' => ['/tag/index'],
-						'icon' => '<i class="fa fa-tags"></i>',
-						],
-                        [
-                            'label' => Yii::t('backend', 'Logs'),
-                            'url' => ['/log/index'],
-                            'icon' => '<i class="fa fa-angle-double-right"></i>',
-                            'badge' => Log::find()->count(), 'badgeBgClass' => 'label-danger',
                         ],
                     ],
                 ],

@@ -162,3 +162,14 @@ div.required label:after {
 .add-terc{
 	cursor:pointer;
 }
+
+
+/* task-status */
+
+.task-status-search{
+	min-height:70px;
+}
+
+.mt-25{
+	margin-top:25px;
+}
