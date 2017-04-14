@@ -14,6 +14,8 @@ use common\models\AnswerTyp;
 use common\models\User;
 use common\models\AccidentTyp;
 use common\models\Wojewodztwa;
+
+
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\TaskStatusSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -38,18 +40,18 @@ $columns = [
 				'class' => '\kartik\grid\DataColumn',
 				'attribute' => 'date',
 			],
-			[	
-				'class' => 
+			[
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'victim_name',
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'phone',
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'accident',
 				'value' => 'accident.name',
@@ -57,33 +59,33 @@ $columns = [
 				'filter' => ArrayHelper::map(AccidentTyp::find()->all(), 'id', 'name')
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'details',
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'wojewodztwo',
 				'value' => 'wojewodztwo.name',
 				'filter' => ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name')
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'powiatRel',
 				'value' => 'powiatRel.name',
 				'label' => 'Powiat'
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'gminaRel',
 				'value' => 'gminaRel.name',
 				'label' => 'Gmina'
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'miasto',
 				'value' => 'miasto.name',
@@ -91,8 +93,8 @@ $columns = [
 			'street',
 			'city_code',
 		];
-		
-		
+
+
 $exportMenu =  ExportMenu::widget([
     'dataProvider'=>$dataProvider,
     'columns'=>$columns,
@@ -106,12 +108,12 @@ $exportMenu =  ExportMenu::widget([
 		ExportMenu::FORMAT_PDF => [
                     'filename' => 'Yoklama',
                     'config' => [
-                        'methods' => [ 
-                            'SetHTMLHeader'=>'naglowek', 
+                        'methods' => [
+                            'SetHTMLHeader'=>'naglowek',
                             'SetFooter'=>['Akın Dil Eğitim Kurumu'],
                         ],
                         'cssInline' => '.table-bordered{border:10px;}'
-                    ]                           
+                    ]
                 ],
 
     ],
@@ -119,21 +121,25 @@ $exportMenu =  ExportMenu::widget([
 ]);
 
 ?>
+
+
+
 <?=Html::button('Filtry', [ 'class' => 'btn btn-primary mg-15', 'onclick' => "$('#filter').toggle('drop');" ]) ?>
 <div id="filter">
     <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
 </div>
 <div class="task-status-index">
-<?php     
+
+<?php
 	echo GridView::widget([
 		'id' => 'kv-grid-demo',
 		'dataProvider'=>$dataProvider,
 		'columns'=>[
-			[	
-				
-			   'class' => 'yii\grid\ActionColumn',
+			[
+
+			    'class' => 'yii\grid\ActionColumn',
 			    'template' => '{see}',
-				'buttons' => [
+				  'buttons' => [
 					  'see' => function ($url, $model, $key) {
 							$options = [
 								'title' => 'Raportuj',
@@ -148,7 +154,7 @@ $exportMenu =  ExportMenu::widget([
 				'visible' => Yii::$app->user->identity->isAgent()
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\CheckboxColumn',
 				'contentOptions' => ['class' => 'kv-row-select'],
 				'headerOptions' => ['class' => 'kv-all-select'],
@@ -165,18 +171,18 @@ $exportMenu =  ExportMenu::widget([
 				'attribute' => 'date',
 			],
 
-			[	
-				'class' => 
+			[
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'victim_name',
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'phone',
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'accident',
 				'value' => 'accident.name',
@@ -184,33 +190,33 @@ $exportMenu =  ExportMenu::widget([
 				'filter' => ArrayHelper::map(AccidentTyp::find()->all(), 'id', 'name')
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'details',
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'wojewodztwo',
 				'value' => 'wojewodztwo.name',
 				'filter' => ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name')
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'powiatRel',
 				'value' => 'powiatRel.name',
 				'label' => 'Powiat'
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'gminaRel',
 				'value' => 'gminaRel.name',
 				'label' => 'Gmina'
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'miasto',
 				'value' => 'miasto.name',
@@ -218,7 +224,7 @@ $exportMenu =  ExportMenu::widget([
 			'street',
 			'city_code',
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'answer',
 				'value' => 'taskstatus.answer.name',
@@ -226,14 +232,14 @@ $exportMenu =  ExportMenu::widget([
 				'filter' => ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name')
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'taskstatus.count_agreement',
 			],
 
 		],
-		
-		
+
+
 		'filterModel'=>$searchModel,
 		//'columns'=>$gridColumns,
 		'containerOptions'=>['style'=>'overflow: auto'], // only set when $responsive = false
@@ -257,7 +263,7 @@ $exportMenu =  ExportMenu::widget([
 
 				),
 		],
-		
+
 		// set export properties
 		'export'=>[
 			'fontAwesome'=>true
@@ -266,12 +272,12 @@ $exportMenu =  ExportMenu::widget([
 		'striped'=>false,
 		'condensed'=>true,
 		'responsive'=>true,
+
 		'hover'=>false,
 
 		'panel'=>[
 			'type'=>GridView::TYPE_PRIMARY,
-			'heading'=>'<i class="glyphicon glyphicon-book"></i>  Umówione spotkania',
-
+			'heading'=>'<i class="glyphicon glyphicon-book"></i>Umówione spotkania',
 		],
 		//'exportConfig'=>$exportConfig,
 	]);

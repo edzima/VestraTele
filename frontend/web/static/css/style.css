@@ -1,14 +1,17 @@
 html,
 body {
     height: 100%;
+    overflow-x: hidden;
+overflow-y: auto;
 }
+
 
 .wrap {
     min-height: 100%;
     height: auto;
     margin: 0 auto -60px;
     padding: 0 0 60px;
-	
+
 }
 
 .wrap > .container {
@@ -152,7 +155,7 @@ div.required label:after {
 .input-group-addon{
 	background-color:#337ab7;
 	color: #FFF;
-	
+
 }
 
 .mg-15{
@@ -172,4 +175,7 @@ div.required label:after {
 
 .mt-25{
 	margin-top:25px;
+}
+.modal-dialog{
+    min-width:80%;
 }

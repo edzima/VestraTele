@@ -25,17 +25,17 @@ use backend\widgets\Menu;
                     'url' => '#',
                     'icon' => '<i class="fa fa-edit"></i>',
                     'options' => ['class' => 'treeview'],
-                    'items' => [                 
+                    'items' => [
                         ['label' => Yii::t('backend', 'Articles'), 'url' => ['/article/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
                         ['label' => Yii::t('backend', 'Article categories'), 'url' => ['/article-category/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
                     ],
-                ],        
+                ],
 				[
                     'label' => 'Terytorium',
                     'url' => '#',
                     'icon' => '<i class="fa fa-home"></i>',
                     'options' => ['class' => 'treeview'],
-                    'items' => [                 
+                    'items' => [
                         ['label' => 'Powiaty', 'url' => ['/powiat/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
                         ['label' =>'Miejscowości', 'url' => ['/city/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
                     ],
@@ -53,6 +53,11 @@ use backend\widgets\Menu;
 				[
                     'label' => 'Punkty',
                     'url' => ['/score/index'],
+                    'icon' => '<i class="fa fa-dot-circle-o"></i>',
+                ],
+                [
+                    'label' => 'Kalendarz',
+                    'url' => ['/calendar/view?id=21'],
                     'icon' => '<i class="fa fa-dot-circle-o"></i>',
                 ],
                 [

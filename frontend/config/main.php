@@ -23,9 +23,10 @@ $config = [
     ],
     'components' => [
         'request' => [
-            'cookieValidationKey' => getenv('BACKEND_COOKIE_VALIDATION_KEY'),
+            'cookieValidationKey' => getenv('FRONTEND_COOKIE_VALIDATION_KEY'),
             'csrfParam' => '_csrf-frontend',
 			'baseUrl' => '',
+
         ],
         'user' => [
             'identityClass' => 'common\models\User',
@@ -49,21 +50,21 @@ $config = [
     'params' => $params,
 ];
 
-if (YII_ENV_DEV) {
+if (YII_DEBUG) { //YII_ENV_DEV
     // configuration adjustments for 'dev' environment
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
-        'allowedIPs' => ['127.0.0.1', '::1', '192.168.*.*','83.11.234.3'],
+        'allowedIPs' => ['*'],
     ];
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
-        'allowedIPs' => ['127.0.0.1', '::1', '192.168.*.*','83.11.234.3'],
+         'allowedIPs' => ['*']
     ];
 }
 
-if (YII_ENV_PROD) {
+if (YII_ENV) { //YII_ENV_PROD
     // maintenance mode
     $config['bootstrap'] = ['maintenance'];
     $config['components']['maintenance'] = [

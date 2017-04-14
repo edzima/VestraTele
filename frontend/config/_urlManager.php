@@ -15,7 +15,7 @@ return [
         'article/<slug>' => 'article/view',
         'article/category/<slug>' => 'article/category',
         'article/tag/<slug>' => 'article/tag',
-		
+
 		//user
 		'konto/ustawienia' => 'account/default/settings',
 		'ranking' => 'account/default/users',
@@ -23,13 +23,20 @@ return [
 		'logowanie' => 'account/sign-in/login',
 		'przywroc-haslo' =>'account/sign-in/request-password-reset',
 		'haslo-zmien' =>'account/default/password',
-		
+
 		//task
 		'spotkania' => 'task',
 		'spotkanie' => 'task/index',
 		'spotkanie/nowe' => 'task/create',
 		'spotkanie/edycja' => 'task/update',
-		
+
 		'admin' => '/backend/web',
+
+        //REST
+
+         ['class' => 'yii\rest\UrlRule', 'controller' => 'apicalendar'],
+
+
+
     ],
 ];

@@ -11,16 +11,17 @@ use common\models\User;
 use common\models\Powiat;
 use common\models\Gmina;
 use common\models\City;
-use yii\helpers\Json;
-
 use common\models\TaskStatusSearch;
 
+use yii\helpers\Json;
 
 use yii\helpers\ArrayHelper;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+
+use common\assets\SweetAlert;
 /**
  * TaskController implements the CRUD actions for Task model.
  */
@@ -32,7 +33,7 @@ class TaskController extends Controller
 	 const WORK_AGENT = 2;
 	 const WORK_TELE = 1;
 
-		
+
     public function behaviors()
     {
         return [
@@ -51,7 +52,7 @@ class TaskController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
-			 
+
         ];
     }
 
@@ -62,9 +63,9 @@ class TaskController extends Controller
     public function actionIndex()
     {
         $searchModel = new TaskSearch();
-		
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-		
+
 		$searchStatus = new TaskStatusSearch();
 		$statusProvider = $searchStatus->search(Yii::$app->request->queryParams);
 
@@ -101,9 +102,9 @@ class TaskController extends Controller
 	   $model->tele_id = Yii::$app->user->id;
 	   $woj = ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
 	   $accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
-	   
+
 	   $agent = ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username');
-		
+
 	   if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
 		} else {
@@ -123,32 +124,43 @@ class TaskController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-		
-		$woj = ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
-		$accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
-		$agent = ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username');
-        
-		//to dropdown list
-		$powiat = ArrayHelper::map(Powiat::find()->where("wojewodztwo_id=$model->woj")->all(), 'id', 'name');
-		$gmina = ArrayHelper::map(Gmina::find()->where(['WOJ' => $model->woj, 'POW' => $model->powiat])->all(), 'id', 'name');
-		$city = ArrayHelper::map(City::find()->where(['wojewodztwo_id' => $model->woj, 'powiat_id' => $model->powiat])->all(), 'id', 'name');
+      $model = $this->findModel($id);
 
-				
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+  		$woj = ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
+  		$accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
+  		$agent = ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username');
+
+  		//to dropdown list
+  		$powiat = ArrayHelper::map(Powiat::find()->where("wojewodztwo_id=$model->woj")->all(), 'id', 'name');
+  		$gmina = ArrayHelper::map(Gmina::find()->where(['WOJ' => $model->woj, 'POW' => $model->powiat])->all(), 'id', 'name');
+  		$city = ArrayHelper::map(City::find()->where(['wojewodztwo_id' => $model->woj, 'powiat_id' => $model->powiat])->all(), 'id', 'name');
+
+
+  		if ($model->load(Yii::$app->request->post()) && $model->save())
+        {
             return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-				'woj' => $woj,
-				'accident' => $accident,
-				'agent' => $agent,
-				'powiat' => $powiat,
-				'gmina' => $gmina,
-				'city' => $city
-            ]);
         }
+      else
+        {
+              return $this->render('update', [
+                  'model' => $model,
+          				'woj' => $woj,
+          				'accident' => $accident,
+          				'agent' => $agent,
+          				'powiat' => $powiat,
+          				'gmina' => $gmina,
+          				'city' => $city
+              ]);
+          }
     }
+
+
+    public function actionCalendar($id){
+
+      $agent = ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username');
+      return $this->render('calendar', ['agent' => $agent,'id' => $id]);
+    }
+
 
     /**
      * Deletes an existing Task model.
@@ -170,7 +182,7 @@ class TaskController extends Controller
      * @return Task the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-	 
+
     protected function findModel($id)
     {
         if (($model = Task::findOne($id)) !== null) {

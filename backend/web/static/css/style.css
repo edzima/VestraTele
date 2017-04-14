@@ -3,7 +3,7 @@ body .table {
 }
 
 label {
-    display: block;   
+    display: block;
 }
 
 div.required label:after {
@@ -20,4 +20,3 @@ div.required label:after {
 .task-status-search{
 	min-height:70px;
 }
-

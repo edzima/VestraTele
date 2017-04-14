@@ -19,5 +19,6 @@ class AppAsset extends AssetBundle
         'yii\bootstrap\BootstrapAsset',
         'common\assets\OpenSans',
         'common\assets\FontAwesome',
+        'common\assets\SweetAlert',
     ];
 }
