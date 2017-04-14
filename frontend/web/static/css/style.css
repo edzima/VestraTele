@@ -1,10 +1,7 @@
 html,
 body {
     height: 100%;
-    overflow-x: hidden;
-overflow-y: auto;
 }
-
 
 .wrap {
     min-height: 100%;
@@ -177,5 +174,5 @@ div.required label:after {
 	margin-top:25px;
 }
 .modal-dialog{
-    min-width:80%;
+    min-width: 90%;
 }
