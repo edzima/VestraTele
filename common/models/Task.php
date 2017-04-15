@@ -43,7 +43,7 @@ class Task extends \yii\db\ActiveRecord
     {
         return [
             [['tele_id', 'agent_id', 'accident_id', 'woj', 'powiat', 'gmina', 'city',], 'number','min'=>1],
-            [['details', 'meeting', 'agent_id', 'accident_id', 'city','victim_name', 'automat', 'city_code'], 'required'],
+            [['details', 'meeting', 'agent_id', 'accident_id', 'city','woj','powiat', 'victim_name', 'automat', 'city_code'], 'required' ,'message' => 'Wymagane'],
             [['details','street'], 'string'],
 			[['date'], 'safe'],
             [['victim_name',], 'string', 'max' => 45, 'min' =>2],
@@ -51,7 +51,7 @@ class Task extends \yii\db\ActiveRecord
             [['qualified_name'], 'string', 'max' => 200],
             [['accident_id'], 'exist', 'skipOnError' => true, 'targetClass' => AccidentTyp::className(), 'targetAttribute' => ['accident_id' => 'id']],
 			[['city'], 'exist', 'skipOnError' => true, 'targetClass' => City::className(), 'targetAttribute' => ['city' => 'id']],
-       
+
         ];
     }
 
@@ -83,54 +83,54 @@ class Task extends \yii\db\ActiveRecord
         ];
     }
 
-   
-	
+
+
 	/**
 	* @return \yii\db\ActiveRelation
 	*/
 	public function getMiasto() {
 		return $this->hasOne(City::className(), ['id' => 'city']);
 	}
-	
+
 	public function getAgent(){
 		return $this->hasOne(User::className(),['id' => 'agent_id']);
 	}
-	
+
 	public function getTele(){
 		return $this->hasOne(User::className(),['id' => 'tele_id']);
 	}
-	
+
 	public function getAccident(){
 		return $this->hasOne(AccidentTyp::className(),['id'=>'accident_id']);
 	}
-	
+
 	public function getWojewodztwo(){
 		return $this->hasOne(Wojewodztwa::className(),['id' => 'woj']);
 	}
-	
+
 	public function getPowiatRel(){
 		return $this->hasOne(Powiat::className(), ['id'=>'powiat', 'wojewodztwo_id'=>'woj']);
 	}
-	
+
 	public function getGminaRel(){
 		return $this->hasOne(Gmina::className(), ['id'=>'gmina']);
 	}
-	
+
 	public function getTaskstatus(){
 		return $this->hasOne(TaskStatus::className(), ['task_id'=>'id']);
 	}
-	
+
 	public function getScore(){
 		return $this->hasOne(Score::className(), ['task_id'=>'id']);
 	}
-	
+
 	public function getTask_id(){
 		return $this->id;
 	}
-	
+
 	public function getAnswer(){
 		return $this->taskstatus->answer;
 	}
-	
+
 
 }

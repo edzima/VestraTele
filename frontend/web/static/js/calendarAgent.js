@@ -23,11 +23,14 @@ $('#submitButton').on('click', function(e){
 });
 
 function doSubmit(){
-    var url = "/backend/web/calendar/addnews";
+    var url = "addnews";
+    var data  = $('#addNews').serialize();
+
     $.ajax({
         type: "POST",
         url: url,
-        data: $("#addNews").serialize(), // serializes the form's elements.
+        data: data, // serializes the form's elements.
+
         success: function(data)
         {
             $("#calendar").fullCalendar('renderEvent',
@@ -39,15 +42,14 @@ function doSubmit(){
                     allDay: "true"
                 },
                 true);
+                $('#calendarModal #newsText').val('');
+                
         }
       });
+
+
    }
 
-$( "#agent" ).change(function() {
-  agentID = $(this).val();
-  url = "/backend/web/calendar/view?id="+agentID;
-  document.location.href = url;
-});
 
 $('#calendar').fullCalendar({
   header: {
@@ -56,58 +58,75 @@ $('#calendar').fullCalendar({
     right: 'month,agendaWeek,agendaDay'
   },
   defaultView: 'agendaWeek',
+  views: {
+      month: {
+          aspectRatio: 1.3,
+      },
+      agendaWeek: {
+          height: 'auto',
+      }
+  },
   minTime: '6:00:00',
   maxTime: '23:00:00',
   defaultTimedEventDuration: '0:30:00',
   allDayText: 'Zalecenia',
+//  defaultDate: '2017-02-15',
   selectable: true,
   locale: "pl",
   lang: "pl",
-  selectHelper: true,
+  //selectHelper: true,
   editable: true,
-  aspectRatio: 2,
   eventLimit: true,
+
   eventSources: [
     {
-      url: '/backend/web/calendar/agenttask?id='+agentID,
-      color: 'yellow',
-      textColor: 'black'
+      url: 'oneagent?id='+agentID,
+
     },
+
     {
-     url: '/backend/web/calendar/agentnews?id='+agentID,
+     url: 'agentnews?id='+agentID,
     }
-],
-  select: function(start, end, allDay) {
-      var allDay = !start.hasTime() && !end.hasTime();
-     // console.log(end);
-      if(allDay){
-          //sql format
-          var startTime = start.format();
-          var endTime = end.format();
-          var mywhen = startTime + ' - ' + endTime;
 
-          $('#calendarModal #when').text(mywhen);
-          $('#calendarModal #startTime').val(startTime);
-          $('#calendarModal #agentID').val(agentID);
-          $('#calendarModal #endTime').val(endTime);
-          $('#calendarModal').modal();
-      }
-     $('#calendar').fullCalendar('unselect');
-  },
-  eventDrop: function(event, delta, revertFunc) {
-        $.get('/backend/web/calendar/update', {"id": event.id, "start": event.start.format(), "end": event.end.format()},
-            function(data){
-              });
+    ],
+
+ select: function(start, end, allDay) {
+        var allDay = !start.hasTime() && !end.hasTime();
+       // console.log(end);
+        if(allDay){
+            //sql format
+            var startTime = start.format();
+            var endTime = end.format();
+            var mywhen = startTime + ' - ' + endTime;
+
+            $('#calendarModal #when').text(mywhen);
+            $('#calendarModal #startTime').val(startTime);
+            $('#calendarModal #agentID').val(agentID);
+            $('#calendarModal #endTime').val(endTime);
+            $('#calendarModal').modal();
+        }
+       $('#calendar').fullCalendar('unselect');
     },
-
+  eventClick: function(event){
+      if (event.url) {
+       window.open(event.url);
+       return false;
+   }
+  },
+  eventDrop: function(event) {
+      if(!event.allDay){
+          $.get('update', {"id": event.id, "start": event.start.format()},
+              function(data){
+                });
+            }
+    },
   eventRender: function(event, element) {
-    element.bind('dblclick', function() {
-    if(event._allDay){
 
-    }
+    element.bind('dblclick', function() {
+
     if(confirm("Czy napewno chcesz usunąc?")){
         var event_id = event.id;
-        $.post('/backend/web/calendar/remove', {"event_id": event_id},
+        $.post('remove', {"event_id": event_id},
            function(data){
                console.log(data);
                $('#calendar').fullCalendar("removeEvents",  (data));
@@ -118,8 +137,11 @@ $('#calendar').fullCalendar({
     element.popover({
         title: event.title,
         placement: 'bottom',
-        // content: event.description,
+         trigger: 'hover',
+         content: event.description,
+        // container: '#calendar',
     });
+
         //element.find('div.fc-title').html(element.find('div.fc-title').text())	;
   },
 

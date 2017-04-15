@@ -23,9 +23,9 @@ use kartik\datetime\DateTimePicker;
 <div class="task-form">
 
     <?php $form = ActiveForm::begin(); ?>
-		
+
     <?= $form->field($model, 'victim_name',['template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-blind fa-lg"></i> Poszkodowany</span>{input}</div>'])->textInput(['maxlength' => true]) ?>
-	
+
 	<?= $form->field($model, 'qualified_name')->textArea(['maxlength' => true,'rows'=>3]) ?>
 
 	<?= $form->field($model, 'phone',
@@ -35,29 +35,29 @@ use kartik\datetime\DateTimePicker;
 		])
 			->widget(\yii\widgets\MaskedInput::className(), [
 				'mask' => '999-999-9999',
-			]) 
+			])
 	?>
-	
+
 
 	<?= $form->field($model, 'date',
-		[	
+		[
 			'options'=>['class'=>'col-md-6 form-group'],
 			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Kiedy</span>{input}</div>',
-	
+
 		])
 		->widget(DateTimeWidget::className(),
 			[   'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
 				'clientOptions' => [
-				
+
 					'allowInputToggle' => true,
 					'sideBySide' => true,
-		
+
 					'widgetPositioning' => [
 					   'horizontal' => 'auto',
 					   'vertical' => 'auto'
 					],
 				]
-			]) 
+			])
 	?>
 
 	<?= $form->field($model, 'details',
@@ -65,17 +65,19 @@ use kartik\datetime\DateTimePicker;
 			'template' => '<div class="input-group">{input}<span class="input-group-addon"><i class="fa fa-pencil-square-o "></i> Szczegóły</span></div>'
 		])->textArea(['rows'=>4]) ?>
 
-	
+
 	<?= $form->field($model, 'accident_id',['options'=>['class'=>'col-md-6 form-group']])->dropDownList($accident)?>
-	
+
 	<?=  $form->field($model, 'meeting',['options'=>['class'=>'col-md-3 form-group']])->dropDownList([0=>'Nie', 1=>'Tak'])?>
-	
+
 	<?=  $form->field($model, 'automat',['options'=>['class'=>'col-md-3 form-group']])->dropDownList([0=>'Nie', 1=>'Tak'])?>
 
 	<?= $form->field($model, 'agent_id',['template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-user-secret"></i> Przedstawiciel</span>{input}</div>'])->dropDownList($agent)?>
 
-	<h3>Adres</h3>
-	
+    <div class="clearfix"></div>
+
+    <h3>Adres</h3>
+
 	<?php
 	//wojewodztwo
 	echo $form->field($model, 'woj',['options'=>['class'=>'col-md-4']])->widget(Select2::classname(), [
@@ -86,7 +88,7 @@ use kartik\datetime\DateTimePicker;
 			],
 		]
 	)->label(false);
-	
+
 	//powiat
 	echo $form->field($model, 'powiat',
 		[
@@ -114,7 +116,10 @@ use kartik\datetime\DateTimePicker;
 			'url'=>Url::to(['/city/gmina']),
 		]
 	])->label(false);
-	
+    ?>
+    <div class="clearfix"></div>
+    <?php
+
 	// miasto
 	echo $form->field($model, 'city',
 		[
@@ -130,7 +135,7 @@ use kartik\datetime\DateTimePicker;
 			'url'=>Url::to(['/city/city']),
 		]
 	]);
-	
+
 		echo  $form->field($model, 'street',
 		[
 			'options'=>['class'=>'col-md-4 form-group'],
@@ -138,7 +143,7 @@ use kartik\datetime\DateTimePicker;
 		]);
 	?>
 
-	
+
 	<?= $form->field($model, 'city_code',
 		[
 			'options'=>['class'=>'col-md-2 form-group'],
@@ -146,9 +151,9 @@ use kartik\datetime\DateTimePicker;
 		])
 		->widget(\yii\widgets\MaskedInput::className(), [
 			'mask' => '99-999',
-		]) 
+		])
 	?>
-	
+
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Dodaj' : 'Aktualizuj', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
@@ -161,7 +166,7 @@ use kartik\datetime\DateTimePicker;
 <?php
 	$this->registerJs(
 		'$("document").ready(function(){
-			
+
 			$("#add-city").click(function(){
 				 window.open("/city/create");
 			});
@@ -169,10 +174,10 @@ use kartik\datetime\DateTimePicker;
 				 window.open("/powiat/create");
 			});
 
-		
-		});'		
+
+		});'
 	);
-	
+
 	$this->registerJs(
 	"	var dateC = '$model->date'.substr(0,16);
 		$('document').ready(function(){
@@ -182,4 +187,3 @@ use kartik\datetime\DateTimePicker;
 	);
 
 ?>
-

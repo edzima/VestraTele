@@ -13,7 +13,8 @@ use common\models\AccidentTyp;
 use common\models\Powiat;
 use common\models\Gmina;
 use common\models\City;
-
+use common\models\TaskStatus;
+use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
@@ -39,6 +40,16 @@ class CalendarController extends Controller{
             ],
         ];
     }
+    public function actionAgent($id=$Yii::$app->user->identity->id){
+
+
+    	if(Yii::$app->user->identity->id!=$id) throw new NotFoundHttpException('Brak uprawnień ;)');
+        return $this->render('agent', [
+            'id' => $id,
+        ]);
+    }
+
+
 
     public function actionView($id){
 
@@ -78,13 +89,43 @@ class CalendarController extends Controller{
      }
       $events = array();
       foreach ($task as $key ) {
+
         $event = [
           'id' => $key['id'],
           'title' => $key['victim_name'],
           'start' => $key['date'],
-         // 'description' =>$key['details'],
+          'description' =>$key['details'],
           'color' => ($key['meeting'] ? 'green' : 'red'),
           'url' => '/spotkanie/edycja?id='.$key['id']
+        ];
+        $events[] = $event;
+
+      }
+      //echo Json::encode($events);
+      return $events;
+    }
+
+    public function actionOneagent($id){
+      //->where(['agent_id' => $id])
+     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+
+     if($id){
+         $task = Task::find()->where(['agent_id' => $id])->all();
+     }
+     else{
+          $task = Task::find()->all();
+     }
+      $events = array();
+      foreach ($task as $key ) {
+
+        $event = [
+          'id' => $key['id'],
+          'title' => $key['victim_name'],
+          'start' => $key['date'],
+          'description' =>$key['details'],
+          'color' => ($key['meeting'] ? 'green' : 'red'),
+          'url' => '/task-status/raport?id='.$key['id']
         ];
         $events[] = $event;
 
@@ -121,6 +162,25 @@ class CalendarController extends Controller{
       //echo Json::encode($events);
       return $events;
     }
+
+
+        // $id -> agent_id news
+    public function actionAddnews(){
+            $agent=Yii::$app->request->post()['agent'];
+            $start = Yii::$app->request->post()['start'];
+            $end =  Yii::$app->request->post()['end'];
+            $newsText = Yii::$app->request->post()['newsText'];
+
+             $model = new Calendarnews();
+             $model->agent_id = $agent;
+             $model->news = $newsText;
+             $model->start = $start;
+             $model->end = $end;
+             $model->save();
+             echo $model->getPrimaryKey();
+
+    }
+
 
   public function actionRemove()
   {   $id=Yii::$app->request->post()['event_id'];

@@ -24,50 +24,70 @@ use kartik\datetime\DateTimePicker;
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span> <span class="sr-only">close</span></button>
-                <h4 id="modalTitle" class="modal-title"></h4>
+                <h4 id="modalTitle" class="modal-title">Dodaj nowe spotkanie</h4>
             </div>
             <div id="modalBody" class="modal-body">
 
                 <?php $form = ActiveForm::begin(); ?>
 
-                <?= $form->field($model, 'victim_name',['template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-blind fa-lg"></i> Poszkodowany</span>{input}</div>'])->textInput(['maxlength' => true]) ?>
+                <?= $form->field($model, 'victim_name',
+                    [
+                        'options'=>['class' => 'col-md-6'],
+                        'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-blind fa-lg"></i> Poszkodowany</span>{input}</div>'
 
-            	<?= $form->field($model, 'qualified_name')->textArea(['maxlength' => true,'rows'=>3]) ?>
+                    ])->textInput(['maxlength' => true]) ?>
 
-            	<?= $form->field($model, 'phone',
-            		[
-            			'options'=>['class'=>'col-md-6 form-group'],
-            			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-phone"></i> Numer</span>{input}</div>'
-            		])
-            			->widget(\yii\widgets\MaskedInput::className(), [
-            				'mask' => '999-999-9999',
-            			])
-            	?>
+                <?= $form->field($model, 'phone',
+                    [
+                        'options'=>['class'=>'col-md-6 form-group'],
+                        'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-phone"></i> Numer</span>{input}</div>'
+                    ])
+                        ->widget(\yii\widgets\MaskedInput::className(), [
+                            'mask' => '999-999-9999',
+                        ])
+                ?>
+
+                <?= $form->field($model, 'qualified_name',
+                    [
+                        'options'=>['class' => 'col-md-12'],
+                    ])
+                    ->textArea(['maxlength' => true,'rows'=>3]) ?>
 
 
-            	<?= $form->field($model, 'date',
-            		[
-            			'options'=>['class'=>'col-md-6 form-group'],
-            			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Kiedy</span>{input}</div>',
 
-            		])
-            		->widget(DateTimeWidget::className(),
-            			[   'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
-            				'clientOptions' => [
 
-            					'allowInputToggle' => true,
-            					'sideBySide' => true,
+                <?= $form->field($model, 'agent_id',
+                    [
+                        'options'=>['class'=>'col-md-6 form-group'],
+                        'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-user-secret"></i> Przedstawiciel</span>{input}</div>'
+                    ])
+                    ->dropDownList($agent)?>
 
-            					'widgetPositioning' => [
-            					   'horizontal' => 'auto',
-            					   'vertical' => 'auto'
-            					],
-            				]
-            			])
-            	?>
+                <?= $form->field($model, 'date',
+                    [
+                        'options'=>['class'=>'col-md-6 form-group '],
+                        'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Kiedy</span>{input}</div>',
+
+                    ])
+                    ->widget(DateTimeWidget::className(),
+                        [   'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
+                            'clientOptions' => [
+
+                                'allowInputToggle' => true,
+                                'sideBySide' => true,
+                                'widgetPositioning' => [
+                                   'horizontal' => 'auto',
+                                   'vertical' => 'auto'
+                                ],
+                            ]
+                        ])
+                ?>
+
+
 
             	<?= $form->field($model, 'details',
             		[
+                        'options'=>['class'=>'col-md-12 form-group'],
             			'template' => '<div class="input-group">{input}<span class="input-group-addon"><i class="fa fa-pencil-square-o "></i> Szczegóły</span></div>'
             		])->textArea(['rows'=>4]) ?>
 
@@ -77,8 +97,8 @@ use kartik\datetime\DateTimePicker;
             	<?=  $form->field($model, 'meeting',['options'=>['class'=>'col-md-3 form-group']])->dropDownList([0=>'Nie', 1=>'Tak'])?>
 
             	<?=  $form->field($model, 'automat',['options'=>['class'=>'col-md-3 form-group']])->dropDownList([0=>'Nie', 1=>'Tak'])?>
-                <div class="form-group">
-            	<h3 class="form-group">Adres</h3>
+                <div class="clearfix"></div>
+            	<h3>Adres</h3>
 
             	<?php
             	//wojewodztwo
@@ -118,7 +138,11 @@ use kartik\datetime\DateTimePicker;
             			'url'=>Url::to(['/city/gmina']),
             		]
             	])->label(false);
+                ?>
 
+                <div class="clearfix"></div>
+
+                <?php
             	// miasto
             	echo $form->field($model, 'city',
             		[
@@ -152,20 +176,18 @@ use kartik\datetime\DateTimePicker;
             			'mask' => '99-999',
             		])
             	?>
-            </div>
-                <div class="form-group">
-                    <?= Html::submitButton($model->isNewRecord ? 'Dodaj' : 'Aktualizuj', ['class' => $model->isNewRecord ? 'btn btn-success pull-right' : 'btn btn-primary']) ?>
+
+                </div>
+                <div class="clearfix"></div>
+                <div class="form-group clearfix text-center">
+                    <?= Html::submitButton($model->isNewRecord ? 'Dodaj' : 'Aktualizuj', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
                 </div>
                  <?php ActiveForm::end(); ?>
-        </div>
-       <div class="modal-footer">
 
-           <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Zamknij</button>
-       </div>
 
-   </div>
-</div>
-</div>
+             </div>
+         </div>
+     </div>
 
 <?php
 	$this->registerJs(

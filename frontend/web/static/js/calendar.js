@@ -5,50 +5,15 @@ var queryDict = {}
 location.search.substr(1).split("&").forEach(function(item) {queryDict[item.split("=")[0]] = item.split("=")[1]})
 var agentID = queryDict.id;
 
-$('#newsText').keypress(function() {
-    var dInput = this.value;
-    if(dInput) $( ".field-news" ).removeClass( "has-error" );
-});
-/*
-$('#submitButton').on('click', function(e){
-
-  // We don't want this to act as a link so cancel the link action
-  e.preventDefault();
-  if($('#addNews #newsText').val()){
-      $("#calendarModal").modal('hide');
-      doSubmit();
-  }
-  else{
-      $( ".field-news" ).addClass( "has-error" );
-  }
-});
-*/
-function doSubmit(){
-    var url = "/backend/web/calendar/addnews";
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: $("#addNews").serialize(), // serializes the form's elements.
-        success: function(data)
-        {
-            $("#calendar").fullCalendar('renderEvent',
-                {
-                    id: data,
-                    title: $('#newsText').val(),
-                    start: new Date($('#startTime').val()),
-                    end: new Date($('#endTime').val()),
-                    allDay: "true"
-                },
-                true);
-        }
-      });
-   }
 
 $( "#agent" ).change(function() {
   agentID = $(this).val();
   url = "view?id="+agentID;
   document.location.href = url;
 });
+
+var now = new Date();
+var nextWeek = now.setDate(now.getDate()+7);
 
 $('#calendar').fullCalendar({
   header: {
@@ -68,25 +33,30 @@ $('#calendar').fullCalendar({
   minTime: '6:00:00',
   maxTime: '23:00:00',
   defaultTimedEventDuration: '0:30:00',
-  allDayText: 'Zalecenia',
-  defaultDate: '2017-02-10',
+//  allDayText: 'Zalecenia',
+  defaultDate: '2017-02-15',
   selectable: true,
   locale: "pl",
   lang: "pl",
   //selectHelper: true,
   editable: true,
   eventLimit: true,
+
   eventSources: [
     {
       url: 'agenttask?id='+agentID,
 
     },
+
     {
      url: 'agentnews?id='+agentID,
      color: 'red',
-     textColor: 'white'
+     textColor: 'white',
+     editable: 'false'
     }
-],
+
+    ],
+
   select: function(start, end, allDay) {
       var allDay = !start.hasTime() && !end.hasTime();
      // console.log(end);
@@ -130,9 +100,10 @@ $('#calendar').fullCalendar({
         title: event.title,
         placement: 'bottom',
          trigger: 'hover',
-        // content: event.description,
+         content: event.description,
+         container: 'body',
     });
-        //element.find('div.fc-title').html(element.find('div.fc-title').text())	;
+        element.find('div.fc-title').html(element.find('div.fc-title').text())	;
   },
 
 });

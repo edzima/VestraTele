@@ -11,6 +11,7 @@ use common\models\Task;
 
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 
 class CalendarController extends Controller{
 
