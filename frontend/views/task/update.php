@@ -13,6 +13,15 @@ $this->params['breadcrumbs'][] = 'Update';
 <div class="task-update">
 
     <h1><?= Html::encode($this->title) ?></h1>
+    <p>
+        <?= Html::a('Usuń', ['delete', 'id' => $model->id], [
+            'class' => 'btn btn-danger',
+            'data' => [
+                'confirm' => 'Jesteś pewny, że chcesz usunąć ten wpis?',
+                'method' => 'post',
+            ],
+        ]) ?>
+    </p>
 
       <?= $this->render('_form', [
         'model' => $model,

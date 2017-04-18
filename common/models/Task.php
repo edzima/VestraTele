@@ -132,5 +132,13 @@ class Task extends \yii\db\ActiveRecord
 		return $this->taskstatus->answer;
 	}
 
+    public function getEventColor(){
+        $color = "green";
+        if($this->meeting) $color = "blue";
+        if($this->automat) $color = "red";
+        if($this->taskstatus->answer_id) $color = "grey";
+        return $color;
+    }
+
 
 }

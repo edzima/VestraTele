@@ -35,11 +35,11 @@ $('#calendar').fullCalendar({
   defaultTimedEventDuration: '0:30:00',
 //  allDayText: 'Zalecenia',
   defaultDate: '2017-02-15',
-  selectable: true,
+  selectable: false,
   locale: "pl",
   lang: "pl",
   //selectHelper: true,
-  editable: true,
+  editable: false,
   eventLimit: true,
 
   eventSources: [
@@ -81,6 +81,7 @@ $('#calendar').fullCalendar({
             }
     },
   eventRender: function(event, element) {
+      /*
 
     element.bind('dblclick', function() {
     if(event._allDay){
@@ -96,12 +97,14 @@ $('#calendar').fullCalendar({
              });
         }
     });
+    */
     element.popover({
         title: event.title,
         placement: 'bottom',
          trigger: 'hover',
+         html: true,
          content: event.description,
-         container: 'body',
+         //container: 'body',
     });
         element.find('div.fc-title').html(element.find('div.fc-title').text())	;
   },

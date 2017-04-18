@@ -43,10 +43,9 @@ function doSubmit(){
                 },
                 true);
                 $('#calendarModal #newsText').val('');
-                
+
         }
       });
-
 
    }
 
@@ -119,6 +118,9 @@ $('#calendar').fullCalendar({
               function(data){
                 });
             }
+      else{
+          console.log(end.format());
+      }
     },
   eventRender: function(event, element) {
 

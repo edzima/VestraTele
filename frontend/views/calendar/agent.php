@@ -29,12 +29,5 @@ common\assets\SweetAlert::register($this);
 
 ?>
 
-<div class="common-button">
-    <p>
-        <?= Html::a('Send Message', ['message/create'] ,['class' => 'btn btn-danger','id' => 'buttonMessage','data-pjax' => '0']) ?>
-    </p>
-</div>
-
-
 <div id="calendar"> </div>
 <?= $this->render('_newsForm');

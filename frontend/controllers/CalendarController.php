@@ -40,7 +40,7 @@ class CalendarController extends Controller{
             ],
         ];
     }
-    public function actionAgent($id=$Yii::$app->user->identity->id){
+    public function actionAgent($id){
 
 
     	if(Yii::$app->user->identity->id!=$id) throw new NotFoundHttpException('Brak uprawnień ;)');
@@ -77,26 +77,46 @@ class CalendarController extends Controller{
     }
 
     public function actionAgenttask($id){
-      //->where(['agent_id' => $id])
      \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
 
      if($id){
-         $task = Task::find()->where(['agent_id' => $id])->all();
+         $tasks = Task::find()->where(['agent_id' => $id])->all();
      }
      else{
-          $task = Task::find()->all();
+          $tasks = Task::find()->all();
      }
       $events = array();
-      foreach ($task as $key ) {
+      $title = '';
+      $description= '';
+      foreach ($tasks as $task ) {
 
+          $city = $task->miasto->name;
+          $powiat = $task->powiatRel->name;
+          $woj = $task->wojewodztwo->name;
+          $gmina = $task->gminaRel->name;
+
+          ($gmina ? $title = $gmina.', '.$city : $title = $city );
+          $description = $powiat."<br/>".$woj;
+
+
+
+          //only  owner and manager see url
+        if(Yii::$app->user->can('manager') || $task['tele_id']==Yii::$app->user->identity->id ) {
+            $url =  '/spotkanie/edycja?id='.$task['id'];
+            $borderColor = "#00ffff";
+        } else {
+            $url = '';
+            $borderColor = '';
+        }
         $event = [
-          'id' => $key['id'],
-          'title' => $key['victim_name'],
-          'start' => $key['date'],
-          'description' =>$key['details'],
-          'color' => ($key['meeting'] ? 'green' : 'red'),
-          'url' => '/spotkanie/edycja?id='.$key['id']
+          'id' => $task['id'],
+          'title' => $title,
+          'start' => $task['date'],
+          'description' =>$description,
+          'borderColor' => $borderColor,
+          'color' => $task->eventColor,
+          'url' => $url
         ];
         $events[] = $event;
 

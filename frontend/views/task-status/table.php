@@ -1,149 +1,4 @@
 <?php
-
-use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\helpers\ArrayHelper;
-use yii\widgets\ListView;
-
-use yii\data\ActiveDataProvider;
-use  kartik\grid\GridView;
-use kartik\export\ExportMenu;
-
-use common\models\TaskStatus;
-use common\models\AnswerTyp;
-use common\models\User;
-use common\models\AccidentTyp;
-use common\models\Wojewodztwa;
-/* @var $this yii\web\View */
-/* @var $searchModel common\models\TaskStatusSearch */
-/* @var $dataProvider yii\data\ActiveDataProvider */
-
-$this->title = 'Twoje spotkania';
-$this->params['breadcrumbs'][] = $this->title;
-
-
-/* @var $this yii\web\View */
-/* @var $searchModel common\models\TaskStatusSearch */
-/* @var $dataProvider yii\data\ActiveDataProvider */
-
-$columns = [
-			'id',
-            /*
-			[	 'class' => '\kartik\grid\DataColumn',
-				 'attribute' => 'tele',
-				 'value' => 'tele.username',
-				 'label' => 'Telemarketer',
-				 'filter' => ArrayHelper::map(User::find()->where(['typ_work' => 'T'])->all(), 'id', 'username')
-			],
-            */
-			[
-				'class' => '\kartik\grid\DataColumn',
-				'attribute' => 'date',
-			],
-			[
-				'class' =>
-				'\kartik\grid\DataColumn',
-				'attribute' => 'victim_name',
-			],
-			[
-				'class' =>
-				'\kartik\grid\DataColumn',
-				'attribute' => 'phone',
-			],
-			[
-				'class' =>
-				'\kartik\grid\DataColumn',
-				'attribute' => 'accident',
-				'value' => 'accident.name',
-				'label' => 'Zdarzenie',
-				'filter' => ArrayHelper::map(AccidentTyp::find()->all(), 'id', 'name')
-			],
-			[
-				'class' =>
-				'\kartik\grid\DataColumn',
-				'attribute' => 'details',
-                'contentOptions' => ['style' => 'width:30px; white-space: normal;'],
-
-			],
-			[
-				'class' =>
-				'\kartik\grid\DataColumn',
-				'attribute' => 'wojewodztwo',
-				'value' => 'wojewodztwo.name',
-				'filter' => ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name')
-			],
-			[
-				'class' =>
-				'\kartik\grid\DataColumn',
-				'attribute' => 'powiatRel',
-				'value' => 'powiatRel.name',
-				'label' => 'Powiat'
-			],
-			[
-				'class' =>
-				'\kartik\grid\DataColumn',
-				'attribute' => 'gminaRel',
-				'value' => 'gminaRel.name',
-				'label' => 'Gmina'
-			],
-			[
-				'class' =>
-				'\kartik\grid\DataColumn',
-				'attribute' => 'miasto',
-				'value' => 'miasto.name',
-			],
-			'street',
-			'city_code',
-		];
-
-
-$exportMenu =  ExportMenu::widget([
-    'dataProvider'=>$dataProvider,
-    'columns'=>$columns,
-	'pjaxContainerId' => 'kv-pjax-container',
-	'target' => ExportMenu::TARGET_SELF,
-	'showConfirmAlert' => false,
-    'onInitSheet' => function (PHPExcel_Worksheet $sheet, $grid) {
-
-        $sheet->getDefaultStyle()->applyFromArray(['borders' => [ 'allborders' => ['style' => PHPExcel_Style_Border::BORDER_THIN ]]]);
-        $sheet->getDefaultStyle()->getFont()
-            ->setName('Arial')
-            ->setSize(10);
-        $sheet->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
-        $highestRow = $sheet->getHighestRow();
-
-    },
-
-
-    'fontAwesome' => true,
-    'styleOptions' => [
-        'font' => [
-            'bold' => true,
-            'color' => [
-                'argb' => 'FFA0A0A0',
-            ],
-        ],
-        'fill' => [
-            'type' => PHPExcel_Style_Fill::FILL_GRADIENT_LINEAR,
-            'startcolor' => [
-                'argb' => 'FFA0A0A0',
-            ],
-            'endcolor' => [
-                'argb' => 'FFFFFFFF',
-            ],
-        ],
-    ],
-
-
-]);
-
-?>
-<?=Html::button('Filtry', [ 'class' => 'btn btn-primary mg-15', 'onclick' => "$('#filter').toggle('drop');" ]) ?>
-<div id="filter">
-    <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
-</div>
-<div class="task-status-index">
-<?php
 	echo GridView::widget([
 		'id' => 'kv-grid-demo',
 		'dataProvider'=>$dataProvider,
@@ -188,7 +43,6 @@ $exportMenu =  ExportMenu::widget([
 				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'victim_name',
-                'contentOptions' => ['style' => 'width:100px; white-space: normal;'],
 			],
 			[
 				'class' =>
@@ -207,7 +61,6 @@ $exportMenu =  ExportMenu::widget([
 				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'details',
-                'contentOptions' => ['style' => 'width:200px; white-space: normal;'],
 			],
 			[
 				'class' =>
@@ -257,7 +110,7 @@ $exportMenu =  ExportMenu::widget([
 
 		'filterModel'=>$searchModel,
 		//'columns'=>$gridColumns,
-
+		'containerOptions'=>['style'=>'overflow: auto'], // only set when $responsive = false
 		'headerRowOptions'=>['class'=>'kartik-sheet-style'],
 		'filterRowOptions'=>['class'=>'kartik-sheet-style'],
 		'pjax'=>true, // pjax is set to always true for this demo
@@ -297,7 +150,3 @@ $exportMenu =  ExportMenu::widget([
 		//'exportConfig'=>$exportConfig,
 	]);
 ?>
-
-
-
-</div>

@@ -124,7 +124,7 @@ class TaskController extends Controller
      */
     public function actionUpdate($id)
     {
-      $model = $this->findModel($id);
+        $model = $this->findModel($id);
 
   		$woj = ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
   		$accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
@@ -185,10 +185,23 @@ class TaskController extends Controller
 
     protected function findModel($id)
     {
-        if (($model = Task::findOne($id)) !== null) {
+        if (Yii::$app->user->can('manager')) {
+            $model = Task::findOne($id);
+        }
+
+        else {
+            $model = Task::find()
+                ->where([
+                    'id' => $id,
+                    'tele_id' => Yii::$app->user->identity->id
+                ])
+                ->one();
+        }
+        if ($model  !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
 }

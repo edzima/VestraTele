@@ -8,11 +8,13 @@ body {
     height: auto;
     margin: 0 auto -60px;
     padding: 0 0 60px;
+    overflow-x: hidden;
 
 }
 
 .wrap > .container {
     padding: 70px 15px 20px;
+    width: 90%;
 }
 
 .footer {

@@ -95,9 +95,18 @@ $('#calendar').fullCalendar({
      $('#calendar').fullCalendar('unselect');
   },
   eventDrop: function(event, delta, revertFunc) {
-        $.get('/backend/web/calendar/update', {"id": event.id, "start": event.start.format(), "end": event.end.format()},
-            function(data){
-              });
+       if(event.allDay){
+            $.get('/backend/web/calendar/update', {"id": event.id, "start": event.start.format(), "end": event.end.format()},
+                function(data){
+                  });
+
+        }
+        else{
+            $.get('/calendar/update', {"id": event.id, "start": event.start.format()},
+                function(data){
+                  });
+              }
+    
     },
 
   eventRender: function(event, element) {
