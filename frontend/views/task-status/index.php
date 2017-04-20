@@ -158,6 +158,7 @@ $exportMenu =  ExportMenu::widget([
 								'title' => 'Raportuj',
 								'aria-label' => 'Raportuj',
 								'data-pjax' => '0',
+                                'target' => '_blank'
 							];
 							$url = \yii\helpers\Url::toRoute(['task-status/raport', 'id' => $key]);
 

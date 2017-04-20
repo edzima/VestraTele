@@ -18,6 +18,8 @@ use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
+use common\models\CalendarEvents;
+
 class CalendarController extends Controller{
 
     public function behaviors()
@@ -42,11 +44,27 @@ class CalendarController extends Controller{
     }
     public function actionAgent($id){
 
-
     	if(Yii::$app->user->identity->id!=$id) throw new NotFoundHttpException('Brak uprawnień ;)');
-        return $this->render('agent', [
-            'id' => $id,
-        ]);
+
+        $model = new Task();
+        $model->agent_id= $id;
+        $model->tele_id = $id;
+        $woj = ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name');
+        $accident = ArrayHelper::map(AccidentTyp::find()->all(),'id', 'name');
+
+        $agent = ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username');
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+             return $this->redirect(['/task/view', 'id' => $model->id]);
+         } else {
+             return $this->render('agent', [
+                 'model' => $model,
+                 'woj' => $woj,
+                 'accident' => $accident,
+                 'agent' => $agent,
+
+             ]);
+         }
     }
 
 
@@ -76,113 +94,49 @@ class CalendarController extends Controller{
     //  return $this->render('view', ['agent' => $agent,'id' => $id]);
     }
 
-    public function actionAgenttask($id){
-     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-
-     if($id){
-         $tasks = Task::find()->where(['agent_id' => $id])->all();
-     }
-     else{
-          $tasks = Task::find()->all();
-     }
-      $events = array();
-      $title = '';
-      $description= '';
-      foreach ($tasks as $task ) {
-
-          $city = $task->miasto->name;
-          $powiat = $task->powiatRel->name;
-          $woj = $task->wojewodztwo->name;
-          $gmina = $task->gminaRel->name;
-
-          ($gmina ? $title = $gmina.', '.$city : $title = $city );
-          $description = $powiat."<br/>".$woj;
-
-
-
-          //only  owner and manager see url
-        if(Yii::$app->user->can('manager') || $task['tele_id']==Yii::$app->user->identity->id ) {
-            $url =  '/spotkanie/edycja?id='.$task['id'];
-            $borderColor = "#00ffff";
-        } else {
-            $url = '';
-            $borderColor = '';
+    public function actionAgenttask($id, $start, $end){
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $model = Task::agentTask($id,$start,$end);
+        $events =[];
+        foreach ($model as $task) {
+            $event = CalendarEvents::withTask($task);
+            $event->urlUpdate;
+            $events[] = $event->toArray;
         }
-        $event = [
-          'id' => $task['id'],
-          'title' => $title,
-          'start' => $task['date'],
-          'description' =>$description,
-          'borderColor' => $borderColor,
-          'color' => $task->eventColor,
-          'url' => $url
-        ];
-        $events[] = $event;
-
-      }
-      //echo Json::encode($events);
-      return $events;
+        return $events;
     }
 
-    public function actionOneagent($id){
-      //->where(['agent_id' => $id])
-     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+    public function actionOneagent($id, $start, $end){
 
-
-     if($id){
-         $task = Task::find()->where(['agent_id' => $id])->all();
-     }
-     else{
-          $task = Task::find()->all();
-     }
-      $events = array();
-      foreach ($task as $key ) {
-
-        $event = [
-          'id' => $key['id'],
-          'title' => $key['victim_name'],
-          'start' => $key['date'],
-          'description' =>$key['details'],
-          'color' => ($key['meeting'] ? 'green' : 'red'),
-          'url' => '/task-status/raport?id='.$key['id']
-        ];
-        $events[] = $event;
-
+      Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+      $model = Task::agentTask($id,$start,$end);
+      $events =[];
+      foreach ($model as $task) {
+          $event =  CalendarEvents::withTask($task);
+          $event->urlRaport;
+          $events[] = $event->toArray;
       }
-      //echo Json::encode($events);
       return $events;
+
     }
 
-    public function actionAgentnews($id){
-      //->where(['agent_id' => $id])
-     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+    public function actionAgentnews($id,$start,$end){
 
 
-     if($id){
-         $task = CalendarNews::find()->where(['agent_id' => $id])->all();
+     Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+     $model = CalendarNews::find()
+        ->where(['agent_id' => $id])
+        ->andWhere("start BETWEEN '$start' AND '$end'")
+        ->all();
+     $events =[];
+     foreach ($model as $calendarNews) {
+         $event =  CalendarEvents::withCalendarNews($calendarNews);
+         $events[] = $event->toArray;
      }
-     else {
-        $task = CalendarNews::find()->all();
-     }
-      $events = array();
-      foreach ($task as $key ) {
-        $event = [
-          'id' => $key['id'],
-          'title' => $key['news'],
-          'start' => $key['start'],
-          'end' => $key['end'],
-          'allDay' => 'true',
-          'editable' => 'false',
-          //'url' => '/spotkanie/edycja?id='.$key['id']
-        ];
-        $events[] = $event;
+     return $events;
 
-      }
-      //echo Json::encode($events);
-      return $events;
     }
-
 
         // $id -> agent_id news
     public function actionAddnews(){
@@ -213,6 +167,16 @@ class CalendarController extends Controller{
         $model = $this->findTask($id);
         $model->date = $start;
         //$model->end = $end;
+        if($model->save()) return true;
+        else return false;
+
+  }
+
+  public function actionUpdatenews($id,$start,$end)
+  {
+        $model = $this->findModel($id);
+        $model->start = $start;
+        $model->end = $end;
         if($model->save()) return true;
         else return false;
 

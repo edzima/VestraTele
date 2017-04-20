@@ -19,7 +19,7 @@ use kartik\datetime\DateTimePicker;
 /* @var $accident common\models\Task */
 /* @var $form yii\widgets\ActiveForm */
 ?>
-<div id="calendarModal" class="modal fade">
+<div id="taskModal" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">

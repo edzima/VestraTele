@@ -104,6 +104,10 @@ $('#calendar').fullCalendar({
             $('#calendarModal #endTime').val(endTime);
             $('#calendarModal').modal();
         }
+        else{
+            $('#task-date').val(start.format());
+            $('#taskModal').modal();
+        }
        $('#calendar').fullCalendar('unselect');
     },
   eventClick: function(event){
@@ -112,14 +116,21 @@ $('#calendar').fullCalendar({
        return false;
    }
   },
-  eventDrop: function(event) {
-      if(!event.allDay){
-          $.get('update', {"id": event.id, "start": event.start.format()},
+  eventDrop: function(event, revertFunc) {
+            console.log(event.allDay);
+      if(event.isNews && event.allDay){
+          $.get('updatenews', {"id": event.id, "start": event.start.format(),"end":event.start.format()},
               function(data){
                 });
             }
-      else{
-          console.log(end.format());
+      else if (!event.isNews && !event.allDay){
+          $.get('update', {"id": event.id, "start": event.start.format()},
+              function(data){
+                });
+      }
+      else {
+          revertFunc();
+          $('#calendar').fullCalendar('undrop');
       }
     },
   eventRender: function(event, element) {

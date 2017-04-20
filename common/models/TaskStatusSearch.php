@@ -25,13 +25,13 @@ class TaskStatusSearch extends Task
 	 public $powiatRel;
 	 public $gminaRel;
 	 public $agent;
-	 
+
     public function rules()
     {
         return [
             [['id', 'created_at', 'updated_at', 'meeting', 'finish', 'taskstatus','automat','agent',], 'integer'],
             [['victim_name', 'phone', 'qualified_name', 'details', 'miasto','tele', 'answer', 'accident','date','wojewodztwo', 'powiatRel', 'gminaRel'], 'safe'],
-			
+
         ];
     }
 
@@ -55,28 +55,27 @@ class TaskStatusSearch extends Task
     {
 		$typWork= Yii::$app->user->identity->typ_work;
         $query = Task::find();
-		
-			
-	
+
+
 		//typ_work => A => admin || manager, all records
 		if($typWork=='A') $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel']);
 		else {
 			if(Yii::$app->user->identity->isAgent())$query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel'])->where(['agent_id'=>Yii::$app->user->identity->id]);
 			else $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel'])->where(['tele_id'=>Yii::$app->user->identity->id]);
 		}
-		
-		
+
+
 			//selected rows
 		if($keys = @Yii::$app->request->queryParams['key'])$query->where('task.id IN('.$keys.')');
-		
+
 		//$query->joinWith(['miasto','tele','taskstatus','taskstatus.answer']);
 		//$query->where(['task.agent_id' => Yii::$app->user->identity->id]);
         // add conditions that should always apply here
-		
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
-		
+
         $this->load($params);
 		// Important: here is how we set up the sorting
 		// The key is the attribute name on our "TourSearch" instance
@@ -86,29 +85,29 @@ class TaskStatusSearch extends Task
 			'asc' => ['miasta.name' => SORT_ASC],
 			'desc' => ['miasta.name' => SORT_DESC],
 		];
-		
+
 		$dataProvider->sort->attributes['tele'] = [
 			// The tables are the ones our relation are configured to
 			// in my case they are prefixed with "tbl_"
 			'asc' => ['user.username' => SORT_ASC],
 			'desc' => ['user.username' => SORT_DESC],
 		];
-		
+
 		$dataProvider->sort->attributes['accident'] = [
 			// The tables are the ones our relation are configured to
 			// in my case they are prefixed with "tbl_"
 			'asc' => ['accident_typ.name' => SORT_ASC],
 			'desc' => ['accident_typ.name' => SORT_DESC],
 		];
-		
+
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
-	
+
             return $dataProvider;
         }
-		
+
 		//is raport task-status
 		if(strlen($this->taskstatus)==1){
 			if($this->taskstatus) $query->andFilterWhere(['>', 'task_status.answer_id',0]);
@@ -129,10 +128,10 @@ class TaskStatusSearch extends Task
 			'answer_typ.id'=> $this->answer,
 			'accident_typ.id'=> $this->accident,
 			'automat'=>$this->automat
-			
+
         ]);
-		
-		
+
+
         $query->andFilterWhere(['like', 'victim_name', $this->victim_name])
             ->andFilterWhere(['like', 'phone', $this->phone])
             ->andFilterWhere(['like', 'qualified_name', $this->qualified_name])
@@ -141,7 +140,7 @@ class TaskStatusSearch extends Task
 			->andFilterWhere(['like', 'powiaty.name', $this->powiatRel])
 			->andFilterWhere(['like', 'terc.name', $this->gminaRel])
 			->andFilterWhere(['like', 'date', $this->date]);
-			
+
 
 
         return $dataProvider;

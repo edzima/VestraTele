@@ -133,12 +133,37 @@ class Task extends \yii\db\ActiveRecord
 	}
 
     public function getEventColor(){
+        $textColor = "white";
         $color = "green";
+        $borderColor = '';
         if($this->meeting) $color = "blue";
         if($this->automat) $color = "red";
-        if($this->taskstatus->answer_id) $color = "grey";
-        return $color;
+        $answer = $this->taskstatus->answer;
+        if($answer) {
+            $textColor = $color;
+            $color = "#f5f5f5";
+            if($answer->name=="umowa + EKSTRA") $color = "yellow";
+        }
+        if($this->tele_id==Yii::$app->user->identity->id) $borderColor = "#00ffff";
+        $colors = [
+            "color" => $color,
+            "textColor" => $textColor,
+            "borderColor" => $borderColor,
+        ];
+        return $colors;
     }
+
+    public static function agentTask($agentID, $start, $end){
+        $tasks = Self::find()
+           ->where(['agent_id' => $agentID])
+           ->andWhere("date BETWEEN '$start' AND '$end'")
+           ->all();
+
+        return $tasks;
+    }
+
+
+
 
 
 }

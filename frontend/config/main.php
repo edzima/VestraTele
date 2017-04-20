@@ -50,7 +50,7 @@ $config = [
     'params' => $params,
 ];
 
-if (YII_DEBUG) { //YII_ENV_DEV
+//if (YII_DEBUG) { //YII_ENV_DEV
     // configuration adjustments for 'dev' environment
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
@@ -62,7 +62,7 @@ if (YII_DEBUG) { //YII_ENV_DEV
         'class' => 'yii\gii\Module',
          'allowedIPs' => ['*']
     ];
-}
+//}
 
 if (YII_ENV) { //YII_ENV_PROD
     // maintenance mode

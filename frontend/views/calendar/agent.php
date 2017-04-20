@@ -30,4 +30,10 @@ common\assets\SweetAlert::register($this);
 ?>
 
 <div id="calendar"> </div>
-<?= $this->render('_newsForm');
+<?= $this->render('_newsForm');?>
+<?= $this->render('_taskForm', [
+    'model' => $model,
+    'woj' => $woj,
+    'accident' =>$accident,
+    'agent' => $agent,
+]) ?>

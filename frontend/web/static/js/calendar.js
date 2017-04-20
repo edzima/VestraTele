@@ -35,7 +35,7 @@ $('#calendar').fullCalendar({
   defaultTimedEventDuration: '0:30:00',
 //  allDayText: 'Zalecenia',
   defaultDate: '2017-02-15',
-  selectable: false,
+  selectable: true,
   locale: "pl",
   lang: "pl",
   //selectHelper: true,
@@ -45,13 +45,10 @@ $('#calendar').fullCalendar({
   eventSources: [
     {
       url: 'agenttask?id='+agentID,
-
     },
 
     {
      url: 'agentnews?id='+agentID,
-     color: 'red',
-     textColor: 'white',
      editable: 'false'
     }
 
@@ -61,9 +58,8 @@ $('#calendar').fullCalendar({
       var allDay = !start.hasTime() && !end.hasTime();
      // console.log(end);
       if(!allDay){
-
           $('#task-date').val(start.format());
-          $('#calendarModal').modal();
+          $('#taskModal').modal();
       }
      $('#calendar').fullCalendar('unselect');
   },
@@ -104,7 +100,7 @@ $('#calendar').fullCalendar({
          trigger: 'hover',
          html: true,
          content: event.description,
-         //container: 'body',
+         container: 'body',
     });
         element.find('div.fc-title').html(element.find('div.fc-title').text())	;
   },
