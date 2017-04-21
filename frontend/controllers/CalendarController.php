@@ -70,7 +70,8 @@ class CalendarController extends Controller{
 
 
     public function actionView($id){
-
+        //block for agent who isnt manager
+        if(Yii::$app->user->identity->isAgent() && !Yii::$app->user->can('manager')) throw new NotFoundHttpException('Brak uprawnień ;)');
         $model = new Task();
         $model->agent_id= $id;
         $model->tele_id = Yii::$app->user->id;

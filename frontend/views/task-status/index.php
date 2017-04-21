@@ -183,13 +183,14 @@ $exportMenu =  ExportMenu::widget([
 			[
 				'class' => '\kartik\grid\DataColumn',
 				'attribute' => 'date',
+                'contentOptions' => ['style' => 'white-space: pre-wrap;'],
 			],
 
 			[
 				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'victim_name',
-                'contentOptions' => ['style' => 'width:100px; white-space: normal;'],
+                'contentOptions' => ['style' => 'white-space: normal;'],
 			],
 			[
 				'class' =>
@@ -202,7 +203,8 @@ $exportMenu =  ExportMenu::widget([
 				'attribute' => 'accident',
 				'value' => 'accident.name',
 				'label' => 'Zdarzenie',
-				'filter' => ArrayHelper::map(AccidentTyp::find()->all(), 'id', 'name')
+				'filter' => ArrayHelper::map(AccidentTyp::find()->all(), 'id', 'name'),
+                'contentOptions' => ['style' => 'white-space: normal;'],
 			],
 			[
 				'class' =>

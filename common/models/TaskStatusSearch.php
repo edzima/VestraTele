@@ -100,6 +100,27 @@ class TaskStatusSearch extends Task
 			'desc' => ['accident_typ.name' => SORT_DESC],
 		];
 
+        $dataProvider->sort->attributes['powiatRel'] = [
+            // The tables are the ones our relation are configured to
+            // in my case they are prefixed with "tbl_"
+            'asc' => ['powiaty.name' => SORT_ASC],
+            'desc' => ['powiaty.name' => SORT_DESC],
+        ];
+
+        $dataProvider->sort->attributes['wojewodztwo'] = [
+            // The tables are the ones our relation are configured to
+            // in my case they are prefixed with "tbl_"
+            'asc' => ['wojewodztwa.name' => SORT_ASC],
+            'desc' => ['wojewodztwa.name' => SORT_DESC],
+        ];
+
+        $dataProvider->sort->attributes['gminaRel'] = [
+            // The tables are the ones our relation are configured to
+            // in my case they are prefixed with "tbl_"
+            'asc' => ['terc.name' => SORT_ASC],
+            'desc' => ['terc.name' => SORT_DESC],
+        ];
+
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails

@@ -58,7 +58,7 @@ use backend\widgets\Menu;
                 [
                     'label' => 'Kalendarz',
                     'url' => ['/calendar/view?id=21'],
-                    'icon' => '<i class="fa fa-dot-circle-o"></i>',
+                    'icon' => '<i class="fa fa-calendar"></i>',
                 ],
                 [
                     'label' => Yii::t('backend', 'System'),

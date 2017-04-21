@@ -69,12 +69,12 @@ $('#calendar').fullCalendar({
   eventLimit: true,
   eventSources: [
     {
-      url: '/backend/web/calendar/agenttask?id='+agentID,
+      url: '/calendar/agenttask?id='+agentID,
       color: 'yellow',
       textColor: 'black'
     },
     {
-     url: '/backend/web/calendar/agentnews?id='+agentID,
+     url: '/calendar/agentnews?id='+agentID,
     }
 ],
   select: function(start, end, allDay) {
@@ -94,36 +94,49 @@ $('#calendar').fullCalendar({
       }
      $('#calendar').fullCalendar('unselect');
   },
-  eventDrop: function(event, delta, revertFunc) {
-       if(event.allDay){
-            $.get('/backend/web/calendar/update', {"id": event.id, "start": event.start.format(), "end": event.end.format()},
-                function(data){
-                  });
+  eventDrop: function(event,delta, revertFunc) {
 
-        }
-        else{
-            $.get('/calendar/update', {"id": event.id, "start": event.start.format()},
-                function(data){
-                  });
-              }
-    
+      if(event.isNews && event.allDay){
+
+          $.get('/calendar/updatenews', {"id": event.id, "start": event.start.format(),"end":event.start.format()},
+              function(data){
+                });
+            }
+      else if (!event.isNews && !event.allDay){
+          $.get('/calendar/update', {"id": event.id, "start": event.start.format()},
+              function(data){
+                });
+      }
+      else {
+          revertFunc();
+          $('#calendar').fullCalendar('undrop');
+      }
     },
 
   eventRender: function(event, element) {
-    element.bind('dblclick', function() {
-    if(event._allDay){
+      element.bind('dblclick', function() {
+          swal({
+            title: "Jesteś pewien, że chcesz to usunąć?",
+            text: "Informacja: "+event.title,
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Tak",
+            cancelButtonText: "Nie",
+            closeOnConfirm: false
+          },
+          function(){
+              var event_id = event.id;
+              swal("Usunięto!", "Twoja notatka została usunięta", "success");
+              $.post('remove', {"event_id": event_id},
+                 function(data){
+                     console.log(data);
+                     $('#calendar').fullCalendar("removeEvents",  (data));
+                     $('#calendar').fullCalendar("rerenderEvents");
 
-    }
-    if(confirm("Czy napewno chcesz usunąc?")){
-        var event_id = event.id;
-        $.post('/backend/web/calendar/remove', {"event_id": event_id},
-           function(data){
-               console.log(data);
-               $('#calendar').fullCalendar("removeEvents",  (data));
-               $('#calendar').fullCalendar("rerenderEvents");
-             });
-        }
-    });
+                   });
+          });
+      });
     element.popover({
         title: event.title,
         placement: 'bottom',
@@ -131,5 +144,13 @@ $('#calendar').fullCalendar({
     });
         //element.find('div.fc-title').html(element.find('div.fc-title').text())	;
   },
+  eventResize: function(event, delta, revertFunc) {
+
+    if(event.isNews && event.allDay){
+        $.get('/calendar/updatenews', {"id": event.id, "start": event.start.format(),"end":event.end.format()},
+            function(data){
+              });
+          }
+  }
 
 });

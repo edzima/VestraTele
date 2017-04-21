@@ -29,8 +29,8 @@ $this->params['breadcrumbs'][] = $this->title;
 		'dataProvider'=> $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-		
-	
+
+
 				//'tele_id',
 				[
 					 'attribute' => 'agent',
@@ -50,16 +50,16 @@ $this->params['breadcrumbs'][] = $this->title;
 					 'label' => 'Miejscowość',
 				],
 				 //'qualified_name',
-	
+
 				[
 					'class' => '\kartik\grid\BooleanColumn',
-					'trueLabel' => 'Tak', 
+					'trueLabel' => 'Tak',
 					'falseLabel' => 'Nie',
 					'attribute' => 'meeting',
 					'showNullAsFalse' => true,
 					'label' => 'Spotkanie'
 				],
-		
+
 				 'date',
 				['class' => 'kartik\grid\ActionColumn'],
 			],
@@ -84,10 +84,10 @@ $this->params['breadcrumbs'][] = $this->title;
 		'id' => 'kv-grid-demo',
 		'dataProvider'=>$statusProvider,
 		'columns'=>[
-			[	
-				
+			[
 			   'class' => 'yii\grid\ActionColumn',
 			    'template' => '{see}{points}',
+                
 				'buttons' => [
 					  'see' => function ($url, $model, $key) {
 							$options = [
@@ -114,11 +114,11 @@ $this->params['breadcrumbs'][] = $this->title;
 											</button>', $url, $options);
 						}
 				],
-				
+
 			],
 		    [
 				'class' => '\kartik\grid\BooleanColumn',
-				'trueLabel' => 'Tak', 
+				'trueLabel' => 'Tak',
 				'falseLabel' => 'Nie',
 				'attribute' => 'taskstatus',
 				'value' => 'taskstatus.task_id',
@@ -126,35 +126,35 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => 'Raport'
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'taskstatus.count_agreement',
 			],
-			[	
-				'class' => 
+			[
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'victim_name',
 			],
-			[	
-				'class' => 
+			[
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'updated',
 				'value' => 'taskstatus.updated_at',
 				'label' => 'Zaraportowano'
 			],
-			
+
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'answer',
 				'value' => 'taskstatus.answer.name',
 				'label' => 'Efekt',
 				'filter' => ArrayHelper::map(AnswerTyp::find()->all(), 'id', 'name'),
-		
+
 			],
 		],
-		
-		
+
+
 		'filterModel'=>$searchStatus,
 		//'columns'=>$gridColumns,
 		'containerOptions'=>['style'=>'overflow: auto'], // only set when $responsive = false
@@ -181,7 +181,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		'panel'=>[
 			'type'=>GridView::TYPE_PRIMARY,
 			'heading'=>'<i class="glyphicon glyphicon-pencil"></i>  Stan raportów',
-		
+
 		],
 		'persistResize'=>false,
 		//'exportConfig'=>$exportConfig,

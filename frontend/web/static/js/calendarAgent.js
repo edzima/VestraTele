@@ -43,6 +43,8 @@ function doSubmit(){
                 },
                 true);
                 $('#calendarModal #newsText').val('');
+                $('#calendarModal #url').val('');
+
 
         }
       });
@@ -59,7 +61,7 @@ $('#calendar').fullCalendar({
   defaultView: 'agendaWeek',
   views: {
       month: {
-          aspectRatio: 1.3,
+          aspectRatio: 0.5,
       },
       agendaWeek: {
           height: 'auto',
@@ -111,13 +113,14 @@ $('#calendar').fullCalendar({
        $('#calendar').fullCalendar('unselect');
     },
   eventClick: function(event){
+
       if (event.url) {
        window.open(event.url);
        return false;
    }
   },
-  eventDrop: function(event, revertFunc) {
-            console.log(event.allDay);
+  eventDrop: function( event, delta, revertFunc) {
+      console.log(event.allDay);
       if(event.isNews && event.allDay){
           $.get('updatenews', {"id": event.id, "start": event.start.format(),"end":event.start.format()},
               function(data){
@@ -129,6 +132,11 @@ $('#calendar').fullCalendar({
                 });
       }
       else {
+          swal(
+              'Niedozwolone!',
+              'Nie można mieszać różnego rodzaju zdarzeń',
+              'error'
+            );
           revertFunc();
           $('#calendar').fullCalendar('undrop');
       }
@@ -136,16 +144,27 @@ $('#calendar').fullCalendar({
   eventRender: function(event, element) {
 
     element.bind('dblclick', function() {
+        swal({
+          title: "Jesteś pewien, że chcesz to usunąć?",
+          text: "Informacja: "+event.title,
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#DD6B55",
+          confirmButtonText: "Tak",
+          cancelButtonText: "Nie",
+          closeOnConfirm: false
+        },
+        function(){
+            var event_id = event.id;
+            swal("Usunięto!", "Twoja notatka została usunięta", "success");
+            $.post('remove', {"event_id": event_id},
+               function(data){
+                   console.log(data);
+                   $('#calendar').fullCalendar("removeEvents",  (data));
+                   $('#calendar').fullCalendar("rerenderEvents");
 
-    if(confirm("Czy napewno chcesz usunąc?")){
-        var event_id = event.id;
-        $.post('remove', {"event_id": event_id},
-           function(data){
-               console.log(data);
-               $('#calendar').fullCalendar("removeEvents",  (data));
-               $('#calendar').fullCalendar("rerenderEvents");
-             });
-        }
+                 });
+        });
     });
     element.popover({
         title: event.title,
@@ -155,7 +174,15 @@ $('#calendar').fullCalendar({
         // container: '#calendar',
     });
 
-        //element.find('div.fc-title').html(element.find('div.fc-title').text())	;
+    //element.find('div.fc-title').html(element.find('div.fc-title').text())	;
   },
+  eventResize: function(event, delta, revertFunc) {
+
+    if(event.isNews && event.allDay){
+        $.get('updatenews', {"id": event.id, "start": event.start.format(),"end":event.end.format()},
+            function(data){
+              });
+          }
+  }
 
 });

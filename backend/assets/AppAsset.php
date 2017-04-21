@@ -21,5 +21,6 @@ class AppAsset extends AssetBundle
         'yii\bootstrap\BootstrapAsset',
         'common\assets\AdminLte',
         'common\assets\Html5shiv',
+        'common\assets\SweetAlert',
     ];
 }

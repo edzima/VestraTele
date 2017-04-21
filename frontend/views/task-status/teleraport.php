@@ -9,7 +9,7 @@ use yii\helpers\ArrayHelper;
 
 use common\models\AnswerTyp;
 
-
+$isTele = Yii::$app->user->identity->isTele();
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Task */
@@ -26,22 +26,22 @@ $this->params['breadcrumbs'][] = $this->title;
 	<div class="task-status-form">
 
     <?php $form = ActiveForm::begin(); ?>
-	
-	<?= $form->field($model, 'answer_id',['options'=>['class'=>'col-md-6']])->dropDownList(ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name'),['disabled' =>true])?>
-	
-	<?=$form->field($model, 'count_agreement',['options'=>['class'=>'col-md-6']])->textInput(['type' => 'number', 'min'=>0, 'disabled'=>true])->label('Ilość podpisanych umów')?>
+
+	<?= $form->field($model, 'answer_id',['options'=>['class'=>'col-md-6']])->dropDownList(ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name'),['disabled' =>$isTele])?>
+
+	<?=$form->field($model, 'count_agreement',['options'=>['class'=>'col-md-6']])->textInput(['type' => 'number', 'min'=>0, 'disabled'=>$isTele])->label('Ilość podpisanych umów')?>
 
     <?= $form->field($model, 'status_details')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'name')->textArea(['maxlength' => true, 'rows'=>2, 'disabled'=>true]) ?>
-	
+    <?= $form->field($model, 'name')->textArea(['maxlength' => true, 'rows'=>2, 'disabled'=>$isTele]) ?>
+
 	<div id="extra_agreement">
 		<h4> Extra raport </h2>
-		<?= $form->field($model, 'finished',['options'=>['class'=>'col-md-6']])->checkbox(['disabled'=>true]) ?>
-		
-		<?=$form->field($model, 'extra_agreement',['options'=>['class'=>'col-md-6']])->textInput(['type' => 'number', 'min'=>0, 'disabled'=>true])?>
-		
-		<?= $form->field($model, 'extra_name')->textarea(['rows' => 2, 'value'=>null, 'disabled'=>true])->label('Kto do dopisania') ?>
+		<?= $form->field($model, 'finished',['options'=>['class'=>'col-md-6']])->checkbox(['disabled'=>$isTele]) ?>
+
+		<?=$form->field($model, 'extra_agreement',['options'=>['class'=>'col-md-6']])->textInput(['type' => 'number', 'min'=>0, 'disabled'=>$isTele])?>
+
+		<?= $form->field($model, 'extra_name')->textarea(['rows' => 2, 'value'=>null, 'disabled'=>$isTele])->label('Kto do dopisania') ?>
 	</div>
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Zapisz' : 'Zapisz', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
@@ -60,7 +60,11 @@ $this->params['breadcrumbs'][] = $this->title;
 					 'attribute' => 'tele_id',
 					 'value' => $task->tele->username,
 				],
-			
+                [
+					 'attribute' => 'agent_id',
+					 'value' => $task->agent->username,
+				],
+
 				'victim_name',
 				'phone',
 				[
@@ -90,26 +94,26 @@ $this->params['breadcrumbs'][] = $this->title;
 				'date',
 			],
 		]) ?>
-		
+
 
 <?php
 	$this->registerJs(
 		'$("document").ready(function(){
-			
+
 			var extra = $("#extra_agreement");
 			var answer = $("#taskstatus-answer_id");
-			
+
 			function showExtra(){
 				if(answer.prop("value")==10) extra.show();
 				else extra.hide();
 			}
-			
+
 			showExtra();
 			answer.on("change",function(event){
 				showExtra();
 			});
-			
-		});'		
+
+		});'
 	);
 
 ?>

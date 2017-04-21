@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 	<?php
     foreach ($scores as $index => $score) {
-		echo $form->field($score, "[$index]connexion", 
+		echo $form->field($score, "[$index]connexion",
 		[
 			'options'=>['class'=>'col-md-2'],
 			'template' => '<div class="input-group form-group"><span class="input-group-addon"><i class="fa fa-users"></i></span>{input}</div>'
@@ -42,8 +42,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			'template' => '<div class="input-group form-group"><span class="input-group-addon"><i class="fa fa-user"></i>Upoważniony/a</span>{input}</div>'
 		])->textInput(['disabled' =>true]);
 		echo $form->field($score,"[$index]date",
-		[	
-			'options'=>['class'=>'col-md-3'],
+		[
+			'options'=>[
+                'class'=>'col-md-3',
+            ],
 			'template' => '<div class="input-group form-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Kiedy</span>{input}</div>']
 		)->widget(
 			DateTimeWidget::className(),
@@ -57,7 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					],
 				]
 			]
-		, ['disabled' =>true]);
+            );
 	}
 	?>
 

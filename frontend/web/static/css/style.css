@@ -178,3 +178,7 @@ div.required label:after {
 .modal-dialog{
     min-width: 90%;
 }
+
+.kv-grid-table td{
+    white-space: normal !important;
+}

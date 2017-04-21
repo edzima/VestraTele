@@ -24,17 +24,19 @@ $('#calendar').fullCalendar({
   defaultView: 'agendaWeek',
   views: {
       month: {
-          aspectRatio: 1.3,
+          aspectRatio: 0.5,
       },
       agendaWeek: {
           height: 'auto',
       }
   },
+ // height:'auto',
+
   minTime: '6:00:00',
   maxTime: '23:00:00',
   defaultTimedEventDuration: '0:30:00',
-//  allDayText: 'Zalecenia',
-  defaultDate: '2017-02-15',
+  allDayText: 'Informacje',
+  defaultDate: nextWeek,
   selectable: true,
   locale: "pl",
   lang: "pl",
@@ -64,6 +66,7 @@ $('#calendar').fullCalendar({
      $('#calendar').fullCalendar('unselect');
   },
   eventClick: function(event){
+      console.log(event);
       if (event.url) {
        window.open(event.url);
        return false;

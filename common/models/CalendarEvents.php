@@ -18,6 +18,7 @@ class CalendarEvents extends \yii\base\Object{
     private $borderColor;
     private $allDay = false;
     private $isNews = false;
+    private $task;
 
 
     public function getTitle(){
@@ -42,7 +43,7 @@ class CalendarEvents extends \yii\base\Object{
 
     public function getUrlUpdate(){
 
-        if(Yii::$app->user->can('manager') || $this->id==Yii::$app->user->identity->id ) {
+        if(Yii::$app->user->can('manager') || $this->task->tele_id==Yii::$app->user->identity->id ) {
             $this->url =  '/spotkanie/edycja?id='.$this->id;
         }
         return $this->url;
@@ -58,6 +59,7 @@ class CalendarEvents extends \yii\base\Object{
           'id' => $this->id,
           'title' => $this->title,
           'start' => $this->start,
+          'end' => $this->end,
           'description' => $this->description,
           'borderColor' => $this->borderColor,
           'color' => $this->color,
@@ -116,6 +118,7 @@ class CalendarEvents extends \yii\base\Object{
         ($gmina ? $instance->title = $gmina.', '.$city : $instance->title = $city );
         $instance->description = $powiat."<br/>".$woj;
         $instance->id = $task->id;
+        $instance->task = $task;
         $instance->start = $task->date;
         $instance->EventColor($task);
 

@@ -37,10 +37,10 @@ AppAsset::register($this);
         ],
     ]);
 
-	
+
 	   if (!Yii::$app->user->isGuest) {
-	    $menuItems = [	
-		[	'label' => Yii::t('frontend', 'Articles'), 
+	    $menuItems = [
+		[	'label' => Yii::t('frontend', 'Articles'),
 			'url' => ['/article/index'],
 			'visible' => Yii::$app->user->identity->isTele(),
 		],
@@ -50,17 +50,26 @@ AppAsset::register($this);
             'visible' => Yii::$app->user->identity->isTele(),
         ],
 		[
-            'label' => Yii::t('frontend', 'Spotkania'),
+            'label' => Yii::t('frontend', 'Twoje Spotkania'),
             'url' => ['/task'],
-            'visible' => Yii::$app->user->identity->isTele(),
         ],
 		[
             'label' => Yii::t('frontend', 'Spotkania'),
             'url' => ['/task-status'],
             'visible' => Yii::$app->user->identity->isAgent(),
         ],
+        [
+            'label' => Yii::t('frontend', 'Kalendarz'),
+            'url' => ['/calendar/view?id=26'],
+            'visible' => Yii::$app->user->identity->isTele(),
+        ],
+        [
+            'label' => Yii::t('frontend', 'Osobisty kalendarz'),
+            'url' => ['/calendar/agent?id='.Yii::$app->user->identity->id],
+            'visible' => Yii::$app->user->identity->isAgent(),
+        ],
 		];
-	
+
 	   }
 
 
@@ -68,11 +77,11 @@ AppAsset::register($this);
         $menuItems[] = ['label' => Yii::t('frontend', 'Login'), 'url' => ['/account/sign-in/login']];
     } else {
         $menuItems[] = [
-		
+
             'label' => Yii::$app->user->identity->username,
             'url' => '#',
             'items' => [
-	
+
                 ['label' => Yii::t('frontend', 'Settings'), 'url' => ['/account/default/settings']],
                 [
                     'label' => Yii::t('frontend', 'Backend'),
