@@ -20,9 +20,9 @@ use yii\widgets\ActiveForm;
 
 	<?=  $form->field($model, 'taskstatus',['options'=>['class'=>'col-md-2 form-group']])->dropDownList([''=>'',0=>'Nie', 1=>'Tak'])->label('Zaraportowane')?>
 	<?=  $form->field($model, 'finish',['options'=>['class'=>'col-md-2 form-group']])->dropDownList([''=>'',0=>'Nie', 1=>'Tak'])->label('Zakończone')?>
-	<?=  $form->field($model, 'meeting',['options'=>['class'=>'col-md-2 form-group']])->dropDownList([''=>'',0=>'Nie', 1=>'Tak'])->label('Umówione')?>
+	<?=  $form->field($model, 'meeting',['options'=>['class'=>'col-md-2 form-group']])->dropDownList([''=>'',0=>'Objazdówka', 1=>'Umówione'])->label('Umówione')?>
 	<?=  $form->field($model, 'automat',['options'=>['class'=>'col-md-2 form-group']])->dropDownList([''=>'',0=>'Nie', 1=>'Tak'])->label('Automat')?>
-	
+
 	<div class="form-group pull-right mt-25">
         <?= Html::submitButton('Szukaj', ['class' => 'btn btn-primary']) ?>
 		<?= Html::a('Reset', ['index'], ['class' => 'btn btn-default'])?>

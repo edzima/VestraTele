@@ -74,9 +74,13 @@ class TaskStatusSearch extends Task
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+
         ]);
 
+
         $this->load($params);
+
+         
 		// Important: here is how we set up the sorting
 		// The key is the attribute name on our "TourSearch" instance
 		$dataProvider->sort->attributes['miasto'] = [

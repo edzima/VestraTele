@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 				['class' => 'kartik\grid\SerialColumn'],
 				[
-					'class' => 
+					'class' =>
 					'\kartik\grid\DataColumn',
 					'attribute' => 'id',
 					'width' => '20px'
@@ -49,7 +49,6 @@ $this->params['breadcrumbs'][] = $this->title;
 					 'filter' => ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username')
 				],
 				'victim_name',
-				'phone',
 				// 'created_at',
 				// 'updated_at',
 				// 'accident_id',
@@ -65,21 +64,24 @@ $this->params['breadcrumbs'][] = $this->title;
 				// 'details:ntext',
 				[
 					'class' => '\kartik\grid\BooleanColumn',
-					'trueLabel' => 'Tak', 
+					'trueLabel' => 'Tak',
 					'falseLabel' => 'Nie',
 					'attribute' => 'meeting',
 					'showNullAsFalse' => true,
-					'label' => 'Spotkanie'
+					'label' => 'Umówione?'
 				],
 				[
 					'class' => '\kartik\grid\BooleanColumn',
-					'trueLabel' => 'Tak', 
+					'trueLabel' => 'Tak',
 					'falseLabel' => 'Nie',
 					'attribute' => 'automat',
 					'showNullAsFalse' => true,
 					'label' => 'Automat'
 				],
-				 'date',
+                [
+                      'attribute' => 'date',
+                      'format' => ['date']
+                  ],
 				['class' => 'kartik\grid\ActionColumn'],
 			],
 		'responsive'=>true,

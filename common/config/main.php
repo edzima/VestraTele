@@ -29,6 +29,10 @@ $config = [
 		'formatter' => [
 			'class' => 'yii\i18n\Formatter',
 			'nullDisplay' => '',
+            'dateFormat' => 'dd.MM.yyyy hh:mm',
+            'decimalSeparator' => ',',
+            'thousandSeparator' => ' ',
+            'currencyCode' => 'EUR',
 		],
         'log' => [
             'traceLevel' => YII_ENV_DEV ? 3 : 0,

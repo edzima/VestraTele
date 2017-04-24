@@ -8,7 +8,7 @@ common\assets\SweetAlert::register($this);
 
 
 
-  $this->title = 'Calendar';
+  $this->title = 'Kalendarz';
   $this->params['breadcrumbs'][] = $this->title;
 
   $this->registerJsFile(

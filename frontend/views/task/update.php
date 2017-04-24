@@ -6,9 +6,9 @@ use yii\helpers\Html;
 /* @var $model common\models\Task */
 
 $this->title = 'Edycja spotkania: ' . $model->victim_name;
-$this->params['breadcrumbs'][] = ['label' => 'Tasks', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Spotkania', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->params['breadcrumbs'][] = 'Edycja';
 ?>
 <div class="task-update">
 

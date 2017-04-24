@@ -29,7 +29,7 @@ use common\models\Wojewodztwa;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $isFa = false;
-$exportConfig=   [ 
+$exportConfig=   [
 	GridView::PDF => [
         'label' => Yii::t('kvgrid', 'PDF'),
         'icon' => $isFa ? 'file-pdf-o' : 'floppy-disk',
@@ -93,9 +93,9 @@ $exportConfig=   [
             'cssFile' => ''
         ]
     ],
-	
+
 ];
-	
+
 ?>
 
 <?=Html::button('Filtry', [ 'class' => 'btn btn-primary mg-15', 'onclick' => "$('#filter').toggle('drop');" ]) ?>
@@ -104,13 +104,13 @@ $exportConfig=   [
 </div>
 <div class="task-status-index">
 
-<?php     
+<?php
 	echo GridView::widget([
 		'id' => 'kv-grid-demo',
 		'dataProvider'=>$dataProvider,
 		'columns'=>[
-			[	
-				
+			[
+
 			   'class' => 'yii\grid\ActionColumn',
 			    'template' => '{see}',
 				'buttons' => [
@@ -144,16 +144,17 @@ $exportConfig=   [
 			],
 			[
 				'class' => '\kartik\grid\DataColumn',
-				'attribute' => 'created_at',
+				'attribute' => 'date',
+                'format' => 'date',
 			],
 
-			[	
-				'class' => 
+			[
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'victim_name',
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'accident',
 				'value' => 'accident.name',
@@ -161,34 +162,34 @@ $exportConfig=   [
 				'filter' => ArrayHelper::map(AccidentTyp::find()->all(), 'id', 'name')
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'wojewodztwo',
 				'value' => 'wojewodztwo.name',
 				'filter' => ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name')
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'powiatRel',
 				'value' => 'powiatRel.name',
 				'label' => 'Powiat'
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'gminaRel',
 				'value' => 'gminaRel.name',
 				'label' => 'Gmina'
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'miasto',
 				'value' => 'miasto.name',
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'answer',
 				'value' => 'taskstatus.answer.name',
@@ -196,13 +197,13 @@ $exportConfig=   [
 				'filter' => ArrayHelper::map(AnswerTyp::find()->all(),'id', 'name')
 			],
 			[
-				'class' => 
+				'class' =>
 				'\kartik\grid\DataColumn',
 				'attribute' => 'taskstatus.count_agreement',
 			],
 		],
-		
-		
+
+
 		'filterModel'=>$searchModel,
 		//'columns'=>$gridColumns,
 		'containerOptions'=>['style'=>'overflow: auto'], // only set when $responsive = false
@@ -227,7 +228,7 @@ $exportConfig=   [
 		'condensed'=>true,
 		'responsive'=>true,
 		'hover'=>true,
-		
+
 
 		'panel'=>[
 			'type'=>GridView::TYPE_PRIMARY,
@@ -237,5 +238,5 @@ $exportConfig=   [
 		'exportConfig'=>$exportConfig,
 	]);
 ?>
-	
+
 </div>

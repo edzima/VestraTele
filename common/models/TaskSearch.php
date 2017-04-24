@@ -17,7 +17,7 @@ class TaskSearch extends Task
      */
 	 public $miasto;
 	 public $agent;
-	 
+
     public function rules()
     {
         return [
@@ -46,7 +46,7 @@ class TaskSearch extends Task
     public function search($params)
     {
         $query = Task::find();
-		
+
 		//Only the tele tasks
 		$query->joinWith(['miasto','agent','taskstatus',])->where(['tele_id'=>Yii::$app->user->identity->id]);
         // add conditions that should always apply here
@@ -54,6 +54,8 @@ class TaskSearch extends Task
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+
+
 
         $this->load($params);
 
@@ -65,16 +67,17 @@ class TaskSearch extends Task
 			'asc' => ['miasta.name' => SORT_ASC],
 			'desc' => ['miasta.name' => SORT_DESC],
 		];
-		
+
 		$dataProvider->sort->attributes['agent'] = [
 			// The tables are the ones our relation are configured to
 			// in my case they are prefixed with "tbl_"
 			'asc' => ['user.username' => SORT_ASC],
 			'desc' => ['user.username' => SORT_DESC],
 		];
-		
 
-		
+
+
+
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
