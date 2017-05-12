@@ -40,13 +40,7 @@ $typWok = ['0' => 'Przedstawiciel', '1' => 'Telemarketer'];
             // 'created_at',
             // 'updated_at',
             'action_at:Datetime',
-			
-			[
-                'attribute' => 'typ_work',
-                'value' => function ($model) {
-                    return User::typWorks($model->typ_work);
-                },		
-            ],
+
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{update} {delete}',

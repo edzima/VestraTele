@@ -59,11 +59,14 @@ class PowiatController extends Controller
     public function actionCreate()
     {
         $model = new Powiat();
-		
-		//new Powiat ->38
-		$model->id= 38;
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id, 'wojewodztwo_id' => $model->wojewodztwo_id]);
+
+        if ($model->load(Yii::$app->request->post()) ) {
+            $model->id =    $model->newID;
+
+            if($model->save()){
+                return $this->redirect(['view', 'id' => $model->id, 'wojewodztwo_id' => $model->wojewodztwo_id]);
+            }
+
         } else {
             return $this->render('create', [
                 'model' => $model,

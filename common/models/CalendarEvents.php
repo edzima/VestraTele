@@ -54,6 +54,25 @@ class CalendarEvents extends \yii\base\Object{
         return $this->url;
     }
 
+    public function getUrlCause(){
+        $this->url = '/cause/update?id='.$this->id;
+        return $this->url;
+
+    }
+
+    public function setPeriod($period){
+
+        $start = new \DateTime($this->start);
+        $withPeriod = new \DateTime($this->start.' +'.$period.'day');
+        $now = new \DateTime();
+        $now->sub($start);
+
+
+
+        $this->start =   Yii::$app->formatter->asDate($withPeriod, 'yyyy-MM-dd HH:mm');
+        $this->end = $now;
+    }
+
     public function getToArray(){
         $event = [
           'id' => $this->id,
@@ -107,6 +126,30 @@ class CalendarEvents extends \yii\base\Object{
         return $instance;
     }
 
+    /**
+     * @param Cause $cause
+     * @return CalendarEvents
+     */
+    public static function withCause(Cause $cause){
+        $instance = new Self();
+        $instance->id = $cause->id;
+        $instance->title = $cause->victim_name;
+        $instance->start =    Yii::$app->formatter->asDate($cause->date, 'yyyy-MM-dd HH:mm');
+
+        //$period = $cause->category->period;
+
+
+        //$instance->end = $cause->end;
+        //$instance->allDay = true;
+        //$instance->isNews = true;
+
+        return $instance;
+    }
+
+    /**
+     * @param $task
+     * @return CalendarEvents
+     */
     public static function withTask($task){
 
         $instance = new Self();

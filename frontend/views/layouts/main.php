@@ -109,6 +109,7 @@ AppAsset::register($this);
         ]) ?>
         <?= Wrapper::widget() ?>
         <?= $content ?>
+
     </div>
 </div>
 
@@ -118,7 +119,24 @@ AppAsset::register($this);
     </div>
 </footer>
 
+<?php
+yii\bootstrap\Modal::begin([
+    'headerOptions' => ['id' => 'modalHeader'],
+    'id' => 'modal',
+    'size' => 'modal-lg',
+    //keeps from closing modal with esc key or by clicking out of the modal.
+    // user must click cancel or X to close
+
+]);
+
+echo "<div id='modalContent'></div>";
+yii\bootstrap\Modal::end();
+?>
+
+
 <?php $this->endBody() ?>
 </body>
 </html>
 <?php $this->endPage() ?>
+
+

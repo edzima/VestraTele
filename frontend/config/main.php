@@ -19,7 +19,13 @@ $config = [
         ],
 		'gridview' =>  [
 			'class' => '\kartik\grid\Module',
-		]
+		],
+        'comment' => [
+            'class' => 'yii2mod\comments\Module',
+            // when admin can edit comments on frontend
+            'enableInlineEdit' => true,
+        ],
+
     ],
     'components' => [
         'request' => [
@@ -50,19 +56,7 @@ $config = [
     'params' => $params,
 ];
 
-if (YII_DEBUG) { //YII_ENV_DEV
-    // configuration adjustments for 'dev' environment
-    $config['bootstrap'][] = 'debug';
-    $config['modules']['debug'] = [
-        'class' => 'yii\debug\Module',
-        //'allowedIPs' => ['*'],
-    ];
-    $config['bootstrap'][] = 'gii';
-    $config['modules']['gii'] = [
-        'class' => 'yii\gii\Module',
-        // 'allowedIPs' => ['*']
-    ];
-}
+
 
 if (YII_ENV) { //YII_ENV_PROD
     // maintenance mode
@@ -77,10 +71,29 @@ if (YII_ENV) { //YII_ENV_PROD
         // year-month-day hour:minute:second
         'time' => '0000-00-00 00:00:00', // время окончания работ
     ];
+
     // Compressed assets
     /*$config['components']['assetManager'] = [
        'bundles' => require(__DIR__ . '/assets/_bundles.php'),
     ];*/
+}
+
+
+
+if (YII_DEBUG) { //YII_ENV_DEV
+    // configuration adjustments for 'dev' environment
+    $config['bootstrap'][] = 'debug';
+    $config['modules']['debug'] = [
+        'class' => 'yii\debug\Module',
+        //'traceLine' => '<a href="phpstorm://open?url={file}&line={line}">{file}:{line}</a>'
+    ];
+    $config['modules']['debug']['allowedIPs'] = ['*'];
+
+    $config['bootstrap'][] = 'gii';
+    $config['modules']['gii'] = [
+        'class' => 'yii\gii\Module',
+        // 'allowedIPs' => ['*']
+    ];
 }
 
 return $config;

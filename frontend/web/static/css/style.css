@@ -182,3 +182,7 @@ div.required label:after {
 .kv-grid-table td{
     white-space: normal !important;
 }
+
+.comments{
+    margin:0;
+}

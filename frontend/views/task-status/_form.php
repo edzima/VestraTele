@@ -7,14 +7,14 @@ use yii\jui\Spinner;
 
 use trntv\yii\datetime\DateTimeWidget;
 /* @var $this yii\web\View */
-/* @var $model common\models\TaskStatus */
+///* @var $model common\models\TaskStatus */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 <div class="task-status-form">
 
     <?php $form = ActiveForm::begin(); ?>
 	
-	<?= $form->field($model, 'answer_id',['options'=>['class'=>'col-md-6']])->dropDownList($answers)?>
+	<?= $form->field( $model, 'answer_id',['options'=>['class'=>'col-md-6']])->dropDownList($answers)?>
 	
 	<?=$form->field($model, 'count_agreement',['options'=>['class'=>'col-md-6']])->textInput(['type' => 'number', 'min'=>0])->label('Ilość podpisanych umów')?>
 	
@@ -25,7 +25,7 @@ use trntv\yii\datetime\DateTimeWidget;
     <?= $form->field($model, 'name')->textArea(['maxlength' => true, 'rows'=>2]) ?>
 	
 	<div id="extra_agreement">
-		<h4> Extra raport </h2>
+		<h2> Extra raport </h2>
 		
 		<?=$form->field($model, 'extra_agreement')->textInput(['type' => 'number', 'min'=>0])?>
 		

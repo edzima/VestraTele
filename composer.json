@@ -13,8 +13,8 @@
     "license": "BSD-3-Clause",
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.4.0",
         "ext-intl": "*",
+        "php": ">=5.4.0",
         "ext-mbstring": "*",
         "ext-mcrypt": "*",
         "yiisoft/yii2": ">=2.0.6",
@@ -45,10 +45,13 @@
         "kartik-v/yii2-mpdf": "dev-master",
         "kartik-v/yii2-export": "@dev",
         "philippfrenzel/yii2fullcalendar": "*",
-        "yii2mod/yii2-sweet-alert": "*"
+        "yii2mod/yii2-sweet-alert": "*",
+        "yiisoft/yii2-debug": "^2.0",
+        "codeception/codeception": "^2.2",
+        "demogorgorn/yii2-ajax-submit-button": "*",
+        "yii2mod/yii2-comments": "*"
     },
     "require-dev": {
-        "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
         "samdark/yii2-webshell": "*"
     },

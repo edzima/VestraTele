@@ -147,10 +147,11 @@ class TaskStatusController extends Controller
 
 	 protected function findTask($id)
     {
+
         $model = Task::find()
             ->where([
                 'id' => $id,
-                'agent_id' => Yii::$app->user->identity->id
+               // 'agent_id' => Yii::$app->user->identity->id
             ])
             ->one();
         if ($model !== null) {

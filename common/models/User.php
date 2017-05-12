@@ -32,14 +32,13 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_BANNED = 2;
     const STATUS_DELETED = 3;
 	
-	const TYP_WORK_TELEMARKETER = 'T';
-	const TYP_WORK_PRZEDSTAWICIEL ='P';
-	const TYP_WORK_ADMIN ='A';
-	
 
     const ROLE_USER = 'user';
     const ROLE_MANAGER = 'manager';
     const ROLE_ADMINISTRATOR = 'administrator';
+    const ROLE_LAYER = 'layer';
+    const ROLE_AGENT = 'agent';
+    const ROLE_TELEMARKETER = 'telemarketer';
 
     const EVENT_AFTER_SIGNUP = 'afterSignup';
 
@@ -72,7 +71,7 @@ class User extends ActiveRecord implements IdentityInterface
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => array_keys(self::statuses())],
             ['ip', 'ip'],
-			['typ_work', 'default', 'value' => null]
+			//['typ_work', 'default', 'value' => null]
         ];
     }
 
@@ -88,7 +87,7 @@ class User extends ActiveRecord implements IdentityInterface
             'created_at' => Yii::t('common', 'Created at'),
             'updated_at' => Yii::t('common', 'Updated at'),
             'action_at' => Yii::t('common', 'Last action at'),
-			'typ_work' => 'rodzaj pracownika'
+			//'typ_work' => 'rodzaj pracownika'
         ];
     }
 
@@ -143,14 +142,24 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->auth_key;
     }
 
+    /*
+    public function getAvatar()
+    {
+        $profile = $this->userProfile;
+        if($profile->avatar_path) $src = Yii::getAlias('@storageUrl/avatars/' . $profile->avatar_path) ;
+        else $src = Yii::$app->homeUrl . '/static/img/default.png' ;
+        return $src;
+
+    }
+    */
+
 	/**
      * @inheritdoc
      */
     public function getTypWork()
     {
-		$typ = $this->typ_work;
+
 		return $this->typ_work;
-        //return $this->typ;
     }
 
     /**
@@ -227,23 +236,21 @@ class User extends ActiveRecord implements IdentityInterface
 
         return $statuses[$status];
     }
-	
-	 /**
-     * Returns user typ work list
-     *
-     * @param mixed $typ_work
-     * @return array|mixed
-     */
-    public static function typWorks($typ = null)
-    {
-        $statuses = [
-            self::TYP_WORK_PRZEDSTAWICIEL => 'Przedstawiciel',
-            self::TYP_WORK_TELEMARKETER => 'Telemarketer',
-			self::TYP_WORK_ADMIN => 'Brak',
-        ];
 
-		
-        return $statuses[$typ];
+
+    /**
+     * @return array
+     */
+    public static function roleI18n(){
+        $roles = Yii::$app->authManager->getRoles();
+        $rolesI18n = [];
+
+        foreach ($roles as $role){
+            $name = $role->name;
+            $rolesI18n[$name] = Yii::t('common', $name) ;
+        }
+        return $rolesI18n;
+
     }
 	
 	public function isAgent() {

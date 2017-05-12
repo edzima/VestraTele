@@ -9,6 +9,7 @@ use yii\bootstrap\Html;
 /* @var $roles yii\rbac\Role[] */
 /* @var $permissions yii\rbac\Permission[] */
 
+
 $this->title = Yii::t('backend', 'Nowy użytkownik');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Users'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;

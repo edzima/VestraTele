@@ -34,6 +34,10 @@ $config = [
             'thousandSeparator' => ' ',
             'currencyCode' => 'EUR',
 		],
+        'validator' => [
+            'class' => 'yii\validators\IpValidator',
+            'ipv6' => false,
+        ],
         'log' => [
             'traceLevel' => YII_ENV_DEV ? 3 : 0,
             'targets' => [
@@ -63,7 +67,7 @@ $config = [
                         'common' => 'common.php',
                         'backend' => 'backend.php',
                         'frontend' => 'frontend.php',
-						            'kvgrid' => 'kvgrid.php',
+                        'kvgrid' => 'kvgrid.php',
                     ],
                 ],
             ],

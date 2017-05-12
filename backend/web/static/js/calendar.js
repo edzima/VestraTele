@@ -36,7 +36,9 @@ function doSubmit(){
                     title: $('#newsText').val(),
                     start: new Date($('#startTime').val()),
                     end: new Date($('#endTime').val()),
-                    allDay: "true"
+                    allDay: true,
+                    isNews: true,
+
                 },
                 true);
         }
@@ -94,24 +96,32 @@ $('#calendar').fullCalendar({
       }
      $('#calendar').fullCalendar('unselect');
   },
-  eventDrop: function(event,delta, revertFunc) {
-
-      if(event.isNews && event.allDay){
-
-          $.get('/calendar/updatenews', {"id": event.id, "start": event.start.format(),"end":event.start.format()},
-              function(data){
-                });
-            }
-      else if (!event.isNews && !event.allDay){
-          $.get('/calendar/update', {"id": event.id, "start": event.start.format()},
-              function(data){
-                });
-      }
-      else {
+  eventDrop: function(event, delta, revertFunc) {
+      console.log(event.allDay);
+      console.log(event);
+      if (event.isNews && event.allDay) {
+          $.get('/calendar/updatenews', {
+                  "id": event.id,
+                  "start": event.start.format(),
+                  "end": event.start.format()
+              },
+              function(data) {});
+      } else if (!event.isNews && !event.allDay) {
+          $.get('/calendar/update', {
+                  "id": event.id,
+                  "start": event.start.format()
+              },
+              function(data) {});
+      } else {
+          swal(
+              'Niedozwolone!',
+              'Nie można mieszać różnego rodzaju zdarzeń',
+              'error'
+          );
           revertFunc();
           $('#calendar').fullCalendar('undrop');
       }
-    },
+  },
 
   eventRender: function(event, element) {
       element.bind('dblclick', function() {
@@ -137,11 +147,15 @@ $('#calendar').fullCalendar({
                    });
           });
       });
-    element.popover({
-        title: event.title,
-        placement: 'bottom',
-        // content: event.description,
-    });
+      element.popover({
+          title: event.title,
+          placement: 'bottom',
+          trigger: 'hover',
+          content: event.description,
+          html:true
+          // container: '#calendar',
+      });
+
         //element.find('div.fc-title').html(element.find('div.fc-title').text())	;
   },
   eventResize: function(event, delta, revertFunc) {

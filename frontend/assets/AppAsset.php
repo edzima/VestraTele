@@ -14,6 +14,9 @@ class AppAsset extends AssetBundle
     public $css = [
         'static/css/style.css',
     ];
+    public $js = [
+        'static/js/ajax-modal-popup.js',
+    ];
     public $depends = [
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapAsset',

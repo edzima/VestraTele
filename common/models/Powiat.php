@@ -9,6 +9,7 @@ use Yii;
  *
  * @property integer $id
  * @property integer $wojewodztwo_id
+ * @property integer $newID
  * @property string $name
  */
 class Powiat extends \yii\db\ActiveRecord
@@ -56,5 +57,15 @@ class Powiat extends \yii\db\ActiveRecord
 	public function getWojewodztwo(){
 		return $this->hasOne(Wojewodztwa::className(),['id' => 'wojewodztwo_id']);
 	}
+
+    /**
+     * @return newID
+     */
+    public function getNewID(){
+        $newID = self::find()->where(['wojewodztwo_id' => $this->wojewodztwo_id])->max('id');
+        $newID++;
+        return $newID;
+
+    }
 	
 }
