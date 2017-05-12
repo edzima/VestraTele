@@ -49,7 +49,8 @@
         "yiisoft/yii2-debug": "^2.0",
         "codeception/codeception": "^2.2",
         "demogorgorn/yii2-ajax-submit-button": "*",
-        "yii2mod/yii2-comments": "*"
+        "yii2mod/yii2-comments": "*",
+        "kartik-v/yii2-widget-colorinput": "*"
     },
     "require-dev": {
         "yiisoft/yii2-gii": "*",

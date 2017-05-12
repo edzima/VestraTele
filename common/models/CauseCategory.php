@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property int $period
+ * @property int $color
  *
  * @property Cause[] $causes
  */
@@ -32,6 +33,7 @@ class CauseCategory extends \yii\db\ActiveRecord
             [['name', 'period'], 'required'],
             [['period'], 'integer'],
             [['name'], 'string', 'max' => 50],
+            [['color'], 'string', 'max' => 7],
         ];
     }
 
@@ -42,8 +44,9 @@ class CauseCategory extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
-            'period' => 'Period',
+            'name' => 'Nazwa',
+            'period' => 'Czas',
+            'color' => 'Kolor',
         ];
     }
 

@@ -20,7 +20,8 @@ class m170505_172535_create_comment_table extends Migration
         $this->createTable('cause_category', [
             'id' => $this->smallInteger()->primaryKey(),
             'name' => $this->string(50)->notNull(),
-            'period' =>$this->smallInteger()->notNull()
+            'period' =>$this->smallInteger()->notNull(),
+            'color' =>$this->string(7)
         ], $tableOptions);
 
 
@@ -82,7 +83,7 @@ class m170505_172535_create_comment_table extends Migration
      */
     public function down()
     {
-        
+
         // drops foreign key for table `category`
         $this->dropForeignKey(
             'fk-cause-category_id',

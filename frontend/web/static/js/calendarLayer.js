@@ -1,11 +1,21 @@
-// get agent ID paramert from URL
-var queryDict = {}
-location.search.substr(1).split("&").forEach(function(item) {
-    queryDict[item.split("=")[0]] = item.split("=")[1]
-})
-var agentID = queryDict.id;
+
+function refreshCalendar() {
+    console.log('refresh');
+    $('#calendar').fullCalendar('refetchEvents');
+}
 
 
+var steps = [
+    {
+        title: 'Question 1',
+        text: 'Chaining swal2 modals is easy'
+    },
+    'Question 2',
+    'Question 3'
+];
+//swal.queue(steps);
+
+//setInterval(refreshCalendar, 3000);
 
 
 $('#calendar').fullCalendar({
@@ -36,12 +46,42 @@ $('#calendar').fullCalendar({
     eventLimit: true,
 
     eventSources: [{
-        url: 'layer-events'
+        //url: 'layer-events',
+        url: 'layer-events',
+        /*
+        success: function(data) {
+            var alerts = [];
+            var eventId = [];
+            var title =[];
+            var step = [];
 
+            for (var k in data) {
+
+                if(data[k].isExpired){
+                    alert(data[k].title);
+                    console.log(data[k].id);
+                    eventId.push(data[k].id);
+                    title.push(data[k].title);
+                    step.push(data[k].description);
+                    //alerts.push(data[k]);
+                }
+            }
+            alerts.push(eventId,title,step);
+            console.log(alerts);
+
+        },
+        */
     },
 
-
     ],
+
+
+    eventAfterAllRender: function(){
+        console.log($('#calendar').fullCalendar('getEventSources'));
+
+            console.log('allrender');
+
+    },
 
     select: function(start, end, allDay) {
 
@@ -123,7 +163,7 @@ $('#calendar').fullCalendar({
             title: event.title,
             placement: 'bottom',
             trigger: 'hover',
-          //  content: event.description,
+            content: event.description,
             // container: '#calendar',
         });
 

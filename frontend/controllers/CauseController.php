@@ -7,6 +7,7 @@ use Yii;
 use common\models\Cause;
 use common\models\CauseSearch;
 use common\models\CalendarEvents;
+use common\models\LayerEvent;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -43,9 +44,30 @@ class CauseController extends Controller
         $dt = new \DateTime();
 
 
-        $alert = $dt < $start;
-        var_dump($alert);
+        $alert = $dt > $start;
+
         //echo $dt->format('Y-m-d H:i:s');
+    }
+
+
+    public function actionLayer(){
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $model = Cause::find()
+            ->where(['author_id' => Yii::$app->user->identity->id])
+            //->andWhere("start BETWEEN '$start' AND '$end'")
+            ->all();
+
+
+        $events = [];
+        foreach ($model as $cause) {
+            $event = new LayerEvent($cause);
+            $events[] = $event->toArray();
+            $event->generateNextStep();
+            $events[] = $event->toArray();
+
+        }
+        return $events;
+
     }
     /**
      * Lists all Cause models.
@@ -194,32 +216,28 @@ class CauseController extends Controller
 
 
 
-    public function actionLayerEvents( $start=null, $end=null)
+    public function actionLayerEvents( $start, $end)
     {
 
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
+        $start = strtotime($start);
+        $end = strtotime($end);
         $model = Cause::find()
             ->where(['author_id' => Yii::$app->user->identity->id])
-            //->andWhere("start BETWEEN '$start' AND '$end'")
+            //->andWhere("date BETWEEN '$start' AND '$end'")
             ->all();
-
 
         $events = [];
         foreach ($model as $cause) {
-            $event = CalendarEvents::withCause($cause);
-            //set url to update cause
-            $event->getUrlCause();
-            $events[] = $event->toArray;
-
-            // finish stage
-            $event->setPeriod($cause->category->period);
-            $events[] = $event->toArray;
-
+            $event = new LayerEvent($cause);
+            $events[] = $event->toArray();
+            $event->generateNextStep();
+            $events[] = $event->toArray();
 
         }
 
         return $events;
+
 
     }
 

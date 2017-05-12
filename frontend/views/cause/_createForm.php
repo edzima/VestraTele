@@ -40,7 +40,7 @@ use demogorgorn\ajax\AjaxSubmitButton;
 
                 if (data.status == true)
                 {
-                    console.log('success');
+                   /* console.log('success');
                     $('#calendar').fullCalendar('renderEvent', {
                         id: data.id,
                         title: $('#cause-victim_name').val(),
@@ -49,6 +49,8 @@ use demogorgorn\ajax\AjaxSubmitButton;
        
                         },
                     true);
+                    */
+                    $('#calendar').fullCalendar('refetchEvents');
                     $('#modal').modal('toggle');
                 
                 }
