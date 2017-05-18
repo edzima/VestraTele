@@ -96,5 +96,6 @@ class m170505_172535_create_comment_table extends Migration
             'cause'
         );
         $this->dropTable('cause');
+        $this->dropTable('cause-category');
     }
 }

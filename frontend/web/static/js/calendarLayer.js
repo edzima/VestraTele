@@ -5,17 +5,9 @@ function refreshCalendar() {
 }
 
 
-var steps = [
-    {
-        title: 'Question 1',
-        text: 'Chaining swal2 modals is easy'
-    },
-    'Question 2',
-    'Question 3'
-];
-//swal.queue(steps);
+setInterval(refreshCalendar, 1000*60);
 
-//setInterval(refreshCalendar, 3000);
+var alerts =[];
 
 
 $('#calendar').fullCalendar({
@@ -42,15 +34,33 @@ $('#calendar').fullCalendar({
     locale: "pl",
     lang: "pl",
     //selectHelper: true,
-    editable: true,
+    editable: false,
     eventLimit: true,
 
     eventSources: [{
         //url: 'layer-events',
         url: 'layer-events',
-        /*
+
         success: function(data) {
-            var alerts = [];
+
+            swal.setDefaults({
+                //input: 'text',
+                confirmButtonText: 'Otwórz',
+                type: 'warning',
+                showCancelButton: true,
+                animation: false,
+                preConfirm: function (html) {
+                    return new Promise(function (resolve, reject) {
+                        setTimeout(function() {
+                            console.log(alerts[swal.getQueueStep()]);
+                            window.open(alerts[swal.getQueueStep()].url,'_blank');
+                            resolve()
+                        }, 20)
+                    })
+                },
+
+                //progressSteps: ['1', '2', '3']
+            })
             var eventId = [];
             var title =[];
             var step = [];
@@ -58,30 +68,28 @@ $('#calendar').fullCalendar({
             for (var k in data) {
 
                 if(data[k].isExpired){
-                    alert(data[k].title);
-                    console.log(data[k].id);
+                    alerts.push(data[k]);
+                    step.push({
+                        'title':data[k].title,
+                        'text' :data[k].description,
+
+                    });
                     eventId.push(data[k].id);
                     title.push(data[k].title);
-                    step.push(data[k].description);
+                    //step.push(data[k].description);
                     //alerts.push(data[k]);
                 }
             }
-            alerts.push(eventId,title,step);
-            console.log(alerts);
+
+            //alerts.push(eventId,title,step);
+            console.log(step);
+            swal.queue(step)
 
         },
-        */
+
     },
 
     ],
-
-
-    eventAfterAllRender: function(){
-        console.log($('#calendar').fullCalendar('getEventSources'));
-
-            console.log('allrender');
-
-    },
 
     select: function(start, end, allDay) {
 
@@ -107,58 +115,7 @@ $('#calendar').fullCalendar({
             return false;
         }
     },
-    eventDrop: function(event, delta, revertFunc) {
-        console.log(event.allDay);
-        if (event.isNews && event.allDay) {
-            $.get('updatenews', {
-                    "id": event.id,
-                    "start": event.start.format(),
-                    "end": event.start.format()
-                },
-                function(data) {});
-        } else if (!event.isNews && !event.allDay) {
-            $.get('update', {
-                    "id": event.id,
-                    "start": event.start.format()
-                },
-                function(data) {});
-        } else {
-            swal(
-                'Niedozwolone!',
-                'Nie można mieszać różnego rodzaju zdarzeń',
-                'error'
-            );
-            revertFunc();
-            $('#calendar').fullCalendar('undrop');
-        }
-    },
     eventRender: function(event, element) {
-
-        element.bind('dblclick', function() {
-            swal({
-                    title: "Jesteś pewien, że chcesz to usunąć?",
-                    text: "Informacja: " + event.title,
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Tak",
-                    cancelButtonText: "Nie",
-                    closeOnConfirm: false
-                },
-                function() {
-                    var event_id = event.id;
-                    swal("Usunięto!", "Twoja notatka została usunięta", "success");
-                    $.post('remove', {
-                            "event_id": event_id
-                        },
-                        function(data) {
-                            console.log(data);
-                            $('#calendar').fullCalendar("removeEvents", (data));
-                            $('#calendar').fullCalendar("rerenderEvents");
-
-                        });
-                });
-        });
         element.popover({
             title: event.title,
             placement: 'bottom',
@@ -172,3 +129,5 @@ $('#calendar').fullCalendar({
 
 
 });
+
+

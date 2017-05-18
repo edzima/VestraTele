@@ -7,7 +7,6 @@ use common\models\Task;
 use backend\models\search\TaskSearch;
 use common\models\Wojewodztwa;
 use common\models\AccidentTyp;
-use common\models\User;
 use common\models\TaskStatusSearch;
 
 

@@ -223,7 +223,10 @@ class CauseController extends Controller
         $start = strtotime($start);
         $end = strtotime($end);
         $model = Cause::find()
-            ->where(['author_id' => Yii::$app->user->identity->id])
+            ->where([
+                'author_id' => Yii::$app->user->identity->id,
+                'is_finished' => 0,
+            ])
             //->andWhere("date BETWEEN '$start' AND '$end'")
             ->all();
 

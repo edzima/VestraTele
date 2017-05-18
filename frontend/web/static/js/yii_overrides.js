@@ -12,6 +12,7 @@ yii.confirm = function (message, okCallback, cancelCallback) {
        type: 'warning',
        showCancelButton: true,
        closeOnConfirm: true,
-       allowOutsideClick: true
+       allowOutsideClick: true,
+       cancelButtonText: "Anuluj",
    }, okCallback);
 };

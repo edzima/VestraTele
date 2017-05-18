@@ -3,11 +3,22 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use trntv\yii\datetime\DateTimeWidget;
-
 /* @var $this yii\web\View */
 /* @var $model common\models\Cause */
 /* @var $form yii\widgets\ActiveForm */
+
 ?>
+
+<p class="pull-right">
+    <?= Html::a(Yii::t('frontend', 'Delete'), ['delete', 'id' => $model->id], [
+        'class' => 'btn btn-danger',
+        'data' => [
+            'confirm' => Yii::t('frontend', 'Are you sure you want to delete this item?'),
+            'method' => 'post',
+        ],
+    ]) ?>
+</p>
+
 
 
 <div class="cause-form">

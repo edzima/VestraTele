@@ -3,11 +3,11 @@ namespace common\assets;
 use yii\web\AssetBundle;
 class SweetAlert extends AssetBundle
 {
-    public $sourcePath = '@bower/sweetalert/dist';
+    public $sourcePath = '@bower/sweetalert2/dist';
     public $css = [
-        'sweetalert.css',
+        'sweetalert2.css',
     ];
     public $js = [
-        'sweetalert.min.js'
+        'sweetalert2.min.js'
     ];
 }

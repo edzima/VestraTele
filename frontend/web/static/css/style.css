@@ -187,3 +187,16 @@ div.required label:after {
     margin:0;
 }
 
+#causecategory-color-cont{
+    background-color: white;
+}
+#causecategory-color{
+    display:none;
+}
+.sp-krajee.sp-replacer{
+    width:200px;
+}
+.sp-preview{
+    width:180px;
+}
+

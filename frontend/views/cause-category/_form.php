@@ -13,18 +13,29 @@ use  kartik\color\ColorInput;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'name',[
+            'options'=>[
+                'class'=>'col-md-6'
+            ]
+    ])->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'period')->textInput() ?>
+    <?= $form->field($model,'period',[
+        'options'=>[
+            'class'=>'col-md-3'
+        ]
+    ])->textInput(['type' => 'number', 'min'=>0]) ?>
+    <div class="col-md-3 form-group">
+        <?php
+        echo '<label class="control-label">Kolor tła</label>';
+        echo ColorInput::widget([
+            'model'=>$model,
 
-    <?php
-    echo '<label class="control-label">Kolor tła</label>';
-    echo ColorInput::widget([
-        'model'=>$model,
-        'attribute' =>'color',
-        'options' => ['readonly' => true]
-    ]);
-    ?>
+            'attribute' =>'color',
+            'options' => [ 'class' =>'col-md-2','readonly' => true]
+        ]);
+        ?>
+    </div>
+
     <div class="form-group">
         <?= Html::submitButton(Yii::t('frontend', 'Save'), ['class' => 'btn btn-success']) ?>
     </div>

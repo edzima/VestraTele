@@ -12,14 +12,16 @@ use common\models\Cause;
  */
 class CauseSearch extends Cause
 {
+
+    public $category;
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['id', 'author_id', 'created_at', 'updated_at', 'category_id', 'is_finished'], 'integer'],
-            [['victim_name'], 'safe'],
+            [['id', 'author_id', 'created_at', 'updated_at', 'category_id', 'is_finished', 'date'], 'integer'],
+            [['victim_name','category'], 'safe'],
         ];
     }
 
@@ -63,7 +65,7 @@ class CauseSearch extends Cause
             'author_id' => $this->author_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'category_id' => $this->category_id,
+            'category_id' => $this->category,
             'is_finished' => $this->is_finished,
         ]);
 
