@@ -27,7 +27,6 @@
         "vova07/yii2-fileapi-widget": "*",
         "creocoder/yii2-taggable": "*",
         "2amigos/yii2-selectize-widget": "*",
-        "2amigos/yii2-disqus-widget": "*",
         "mihaildev/yii2-elfinder": "*",
         "trntv/yii2-datetime-widget": "*",
         "loveorigami/yii2-notification-wrapper": "*",
@@ -45,13 +44,13 @@
         "kartik-v/yii2-mpdf": "dev-master",
         "kartik-v/yii2-export": "@dev",
         "philippfrenzel/yii2fullcalendar": "*",
-        "yii2mod/yii2-sweet-alert": "*",
         "yiisoft/yii2-debug": "^2.0",
         "codeception/codeception": "^2.2",
         "demogorgorn/yii2-ajax-submit-button": "*",
         "yii2mod/yii2-comments": "*",
         "kartik-v/yii2-widget-colorinput": "*",
-        "intradarma/yii2-sweetalert2": "^1.0@dev"
+        "intradarma/yii2-sweetalert2": "^1.0@dev",
+        "loveorigami/yii2-bootstrap-toggle": "*"
     },
     "require-dev": {
         "yiisoft/yii2-gii": "*",

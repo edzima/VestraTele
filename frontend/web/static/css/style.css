@@ -200,3 +200,7 @@ div.required label:after {
     width:180px;
 }
 
+.swal2-progresssteps .swal2-progresscircle{
+    width:6em;
+}
+

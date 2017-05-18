@@ -87,19 +87,9 @@ class CauseController extends Controller
 
     public function actionCalendar(){
 
-        $model = new Cause();
-        $model->author_id = Yii::$app->user->id;
-        $category = ArrayHelper::map(CauseCategory::find()->all(), 'id', 'name');
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('calendar', [
-                'model' => $model,
-                'category' => $category
-            ]);
-        }
 
+        return $this->render('calendar');
 
     }
 

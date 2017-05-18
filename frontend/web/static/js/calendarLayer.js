@@ -1,13 +1,57 @@
 
+moment.locale('pl');
+
 function refreshCalendar() {
-    console.log('refresh');
     $('#calendar').fullCalendar('refetchEvents');
 }
 
+//refresh event at 20 min
+//setInterval(refreshCalendar, 1000);
 
-setInterval(refreshCalendar, 1000*60);
+//in cookie store showAlerts
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
 
-var alerts =[];
+
+//set event Change checkAlerts to save in Cookie
+var showAlerts;
+
+
+
+console.log(document.cookie);
+//get coookie data and set in checkBox
+showAlerts= Boolean(parseInt(getCookie('showAlerts')));
+
+
+
+$toggle = $('#toggle');
+$toggle.change(function(){
+    showAlerts= $(this).prop("checked");
+    if(showAlerts) document.cookie= "showAlerts=1";
+    else document.cookie= "showAlerts=0";
+
+    console.log(showAlerts);
+    refreshCalendar();
+});
+
+
+if(!showAlerts) $toggle.bootstrapToggle('off');
+
+
+console.log(showAlerts);
 
 
 $('#calendar').fullCalendar({
@@ -42,48 +86,50 @@ $('#calendar').fullCalendar({
         url: 'layer-events',
 
         success: function(data) {
+            //only user check showAlerts
+            if(showAlerts){
+                var alerts =[];
+                swal.setDefaults({
+                    //input: 'text',
+                    confirmButtonText: 'Otwórz w nowej karcie',
+                    type: 'info',
+                    showCancelButton: false,
+                    animation: false,
+                    preConfirm: function () {
+                        return new Promise(function (resolve) {
+                            setTimeout(function() {
+                                console.log(alerts[swal.getQueueStep()]);
+                                window.open(alerts[swal.getQueueStep()].url,'_blank');
+                                resolve()
+                            }, 20)
+                        })
+                    },
 
-            swal.setDefaults({
-                //input: 'text',
-                confirmButtonText: 'Otwórz',
-                type: 'warning',
-                showCancelButton: true,
-                animation: false,
-                preConfirm: function (html) {
-                    return new Promise(function (resolve, reject) {
-                        setTimeout(function() {
-                            console.log(alerts[swal.getQueueStep()]);
-                            window.open(alerts[swal.getQueueStep()].url,'_blank');
-                            resolve()
-                        }, 20)
-                    })
-                },
+                    //progressSteps: ['1', '2', '3']
+                });
 
-                //progressSteps: ['1', '2', '3']
-            })
-            var eventId = [];
-            var title =[];
-            var step = [];
-
-            for (var k in data) {
-
-                if(data[k].isExpired){
-                    alerts.push(data[k]);
-                    step.push({
-                        'title':data[k].title,
-                        'text' :data[k].description,
-
-                    });
-                    eventId.push(data[k].id);
-                    title.push(data[k].title);
-                    //step.push(data[k].description);
-                    //alerts.push(data[k]);
+                var step = [];
+                var progressSteps = [];
+                for (var k in data) {
+                    if(data[k].isExpired){
+                        alerts.push(data[k]);
+                        var start = moment(data[k].start).format("MMM Do");
+                        progressSteps.push(start);
+                        step.push({
+                            'title':data[k].title,
+                            'text' :data[k].description,
+                        });
+                    }
                 }
+                swal.setDefaults({
+                    progressSteps: progressSteps
+                });
+
+                swal.queue(step).then('',function(){
+                    console.log('close');
+                })
             }
 
-            //alerts.push(eventId,title,step);
-            console.log(step);
-            swal.queue(step)
 
         },
 

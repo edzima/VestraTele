@@ -6,6 +6,9 @@
  * @param string ok callback triggered when confirmation is true
  * @param string cancelCallback callback triggered when cancelled
  */
+
+//moment.locale('pl');\
+
 yii.confirm = function (message, okCallback, cancelCallback) {
    swal({
        title: message,
@@ -14,5 +17,8 @@ yii.confirm = function (message, okCallback, cancelCallback) {
        closeOnConfirm: true,
        allowOutsideClick: true,
        cancelButtonText: "Anuluj",
-   }, okCallback);
+   }).then(okCallback);
 };
+
+
+
