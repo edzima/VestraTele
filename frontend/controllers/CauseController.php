@@ -6,8 +6,9 @@ use common\models\CauseCategory;
 use Yii;
 use common\models\Cause;
 use common\models\CauseSearch;
-use common\models\CalendarEvents;
+use common\models\CalendarNews;
 use common\models\LayerEvent;
+use common\models\NewsEvent;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -37,38 +38,6 @@ class CauseController extends Controller
     }
 
 
-    public function actionPeriod(){
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $start = new \DateTime("2017-05-08 06:30");
-        //$start->format('Y-m-d H:i:s');
-        $dt = new \DateTime();
-
-
-        $alert = $dt > $start;
-
-        //echo $dt->format('Y-m-d H:i:s');
-    }
-
-
-    public function actionLayer(){
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $model = Cause::find()
-            ->where(['author_id' => Yii::$app->user->identity->id])
-            //->andWhere("start BETWEEN '$start' AND '$end'")
-            ->all();
-
-
-        $events = [];
-        foreach ($model as $cause) {
-            $event = new LayerEvent($cause);
-            $events[] = $event->toArray();
-            $event->generateNextStep();
-            $events[] = $event->toArray();
-
-        }
-        return $events;
-
-    }
     /**
      * Lists all Cause models.
      * @return mixed
@@ -86,8 +55,6 @@ class CauseController extends Controller
 
 
     public function actionCalendar(){
-
-
 
         return $this->render('calendar');
 
@@ -114,7 +81,7 @@ class CauseController extends Controller
     {
         $model = new Cause();
         $model->author_id = Yii::$app->user->id;
-        $category = ArrayHelper::map(CauseCategory::find()->all(), 'id', 'name');
+        $category = ArrayHelper::map(CauseCategory::find()->all(), 'id', 'nameWithPeriod');
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -129,7 +96,7 @@ class CauseController extends Controller
     public function actionCreateAjax() {
         //
         $model = new Cause();
-        $category = ArrayHelper::map(CauseCategory::find()->all(), 'id', 'name');
+        $category = ArrayHelper::map(CauseCategory::find()->all(), 'id', 'nameWithPeriod');
         $model->author_id = Yii::$app->user->identity->getId();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -166,7 +133,7 @@ class CauseController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $category = ArrayHelper::map(CauseCategory::find()->all(), 'id', 'name');
+        $category = ArrayHelper::map(CauseCategory::find()->all(), 'id', 'nameWithPeriod');
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
@@ -185,7 +152,7 @@ class CauseController extends Controller
     public function actionUpdateAjax($id) {
 
         $model = $this->findModel($id);
-        $category = ArrayHelper::map(CauseCategory::find()->all(), 'id', 'name');
+        $category = ArrayHelper::map(CauseCategory::find()->all(), 'id', 'nameWithPeriod');
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             $data['status']= true;
@@ -204,6 +171,11 @@ class CauseController extends Controller
         }
     }
 
+    public function actionTest()
+    {
+        $category = ArrayHelper::map(CauseCategory::find()->all(), 'id', 'nameWithPeriod');
+        print_r($category);
+    }
 
 
     public function actionLayerEvents( $start, $end)
@@ -230,7 +202,22 @@ class CauseController extends Controller
         }
 
         return $events;
+    }
 
+    public function actionLayerNews( $start, $end)
+    {
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $model = CalendarNews::find()
+            ->where(['agent_id' => Yii::$app->user->identity->id])
+            ->andWhere("start BETWEEN '$start' AND '$end'")
+            ->all();
+        $events = [];
+        foreach ($model as $calendarNews) {
+            $event = new NewsEvent($calendarNews);
+            $events[] = $event->toArray();
+        }
+        return $events;
 
     }
 

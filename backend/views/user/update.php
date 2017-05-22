@@ -49,9 +49,6 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
         ]
     ) ?>
 
-
-	<?= $form->field($user, 'typ_work')->dropDownList(['prompt'=> 'Wybierz typ pracownika', 'T'=>'Telemarketer', 'P'=>'Przedstawiciel']) ?>															
-
 	
     <div class="form-group">
         <?= Html::submitButton(Yii::t('backend', 'Update'), ['class' => 'btn btn-primary']) ?>

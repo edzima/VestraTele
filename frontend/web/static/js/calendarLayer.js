@@ -6,7 +6,7 @@ function refreshCalendar() {
 }
 
 //refresh event at 20 min
-//setInterval(refreshCalendar, 1000);
+setInterval(refreshCalendar, 1000*60*20);
 
 //in cookie store showAlerts
 function getCookie(cname) {
@@ -28,10 +28,6 @@ function getCookie(cname) {
 
 //set event Change checkAlerts to save in Cookie
 var showAlerts;
-
-
-
-console.log(document.cookie);
 //get coookie data and set in checkBox
 showAlerts= Boolean(parseInt(getCookie('showAlerts')));
 
@@ -84,7 +80,6 @@ $('#calendar').fullCalendar({
     eventSources: [{
         //url: 'layer-events',
         url: 'layer-events',
-
         success: function(data) {
             //only user check showAlerts
             if(showAlerts){
@@ -130,38 +125,58 @@ $('#calendar').fullCalendar({
                 })
             }
 
+            },
+
 
         },
-
-    },
+        {
+            url: 'layer-news'
+        }
 
     ],
 
     select: function(start, end, allDay) {
+        var allDay = !start.hasTime() && !end.hasTime();
+        // console.log(end);
+        if (!allDay) {
 
-        var causeDate = moment(start).format('YYYY-MM-DD HH:mm');
+            var causeDate = moment(start).format('YYYY-MM-DD HH:mm');
 
-        $('#cause-date').val(start.format());
+            $('#cause-date').val(start.format());
 
-        $('#modal').modal({keyboard: false, backdrop : 'static'})
-            .find('#modalContent')
-            .load('create-ajax', function(  status, start ) {
-               // console.log(causeDate);
-                $('#cause-date').val(causeDate);
+            $('#modal').modal({keyboard: false, backdrop: 'static'})
+                .find('#modalContent')
+                .load('create-ajax', function (status, start) {
+                    // console.log(causeDate);
+                    $('#cause-date').val(causeDate);
 
-        });
-        //dynamiclly set the header for the modal
-        document.getElementById('modalHeader').innerHTML = '<h4> Dodanie sprawy</h4>';
+                });
+            //dynamiclly set the header for the modal
+            document.getElementById('modalHeader').innerHTML = '<h4> Dodanie sprawy</h4>';
+        }
 
     },
     eventClick: function(event) {
-
         if (event.url) {
             window.open(event.url);
             return false;
         }
     },
     eventRender: function(event, element) {
+
+        element.bind('dblclick', function() {
+            if(confirm("blaba")){
+                $.post('/calendar/remove', {
+                        "event_id": event.id
+                    },
+                    function(data) {
+                        console.log(data);
+                        $('#calendar').fullCalendar("removeEvents", (data));
+                        $('#calendar').fullCalendar("rerenderEvents");
+
+                    });
+            }
+        });
         element.popover({
             title: event.title,
             placement: 'bottom',

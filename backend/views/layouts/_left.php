@@ -56,9 +56,14 @@ use backend\widgets\Menu;
                     'icon' => '<i class="fa fa-dot-circle-o"></i>',
                 ],
                 [
-                    'label' => 'Kalendarz',
-                    'url' => ['/calendar/view?id=21'],
-                    'icon' => '<i class="fa fa-calendar"></i>',
+                    'label' => Yii::t('frontend', 'Calendar'),
+                    'url' => ['/calendar/index'],
+                    'icon' => '<i class="fa fa fa-calendar"></i>',
+                    'options' => ['class' => 'treeview'],
+                    'items' => [
+                        ['label' => 'Przedstawiciele', 'url' => ['/calendar/agent'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+                        ['label' => 'Prawnicy', 'url' => ['/calendar/layer'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+                    ],
                 ],
                 [
                     'label' => Yii::t('backend', 'System'),

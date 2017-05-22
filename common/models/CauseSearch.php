@@ -45,6 +45,10 @@ class CauseSearch extends Cause
     {
         $query = Cause::find();
 
+        //only owner
+        if(!Yii::$app->user->can('manager')) $query->where(['author_id'=>Yii::$app->user->identity->id]);
+
+
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([

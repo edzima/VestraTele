@@ -108,5 +108,6 @@ class RbacController extends Controller
             }
         }
         $auth->assign($auth->getRole(User::ROLE_ADMINISTRATOR), 1);
+
     }
 }

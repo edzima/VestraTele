@@ -8,15 +8,26 @@ use yii\jui\Spinner;
 /* @var $this yii\web\View */
 /* @var $model common\models\TaskStatus */
 /* @var $form yii\widgets\ActiveForm */
+
 ?>
 <div class="task-status-form">
+    <?php
+        if(!$model->isNewRecord){
+            echo Html::a(Yii::t("Common", "Deleted"), ['delete', 'id' => $model->task_id], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => Yii::t('common', "confirm delete this"),
+                    'method' => 'post',
+                ],
+            ]);
+        }
+    ?>
 
     <?php $form = ActiveForm::begin(); ?>
-	
-	<?= $form->field($model, 'answer_id',['options'=>['class'=>'col-md-6']])->dropDownList($answers)?>
+
+	<?= $form->field($model, 'answer_id',['options'=>['class'=>'col-md-6']])->dropDownList($answers,['prompt'=>''])?>
 	
 	<?=$form->field($model, 'count_agreement',['options'=>['class'=>'col-md-6']])->textInput(['type' => 'number', 'min'=>0])->label('Ilość podpisanych umów')?>
-	
 
 
     <?= $form->field($model, 'status_details')->textarea(['rows' => 6]) ?>
@@ -24,7 +35,7 @@ use yii\jui\Spinner;
     <?= $form->field($model, 'name')->textArea(['maxlength' => true, 'rows'=>2]) ?>
 	
 	<div id="extra_agreement">
-		<h4> Extra raport </h2>
+		<h4> Extra raport </h4>
 		<?= $form->field($model, 'finished',['options'=>['class'=>'col-md-6']])->checkbox() ?>
 		
 		<?=$form->field($model, 'extra_agreement',['options'=>['class'=>'col-md-6']])->textInput(['type' => 'number', 'min'=>0])?>
@@ -69,7 +80,7 @@ use yii\jui\Spinner;
 				],
 				[
 					 'attribute' => 'gmina',
-					 'value' => $task->gminaRel->name,
+					 'value' => @$task->gminaRel->name,
 				],
 				[
 					 'attribute' => 'city',

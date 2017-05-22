@@ -14,7 +14,9 @@ use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
-use common\models\CalendarEvents;
+
+use common\models\TaskEvent;
+use common\models\NewsEvent;
 
 class CalendarController extends Controller
 {
@@ -101,9 +103,9 @@ class CalendarController extends Controller
         $model = Task::agentTask($id, $start, $end);
         $events = [];
         foreach ($model as $task) {
-            $event = CalendarEvents::withTask($task);
-            $event->urlUpdate;
-            $events[] = $event->toArray;
+            $event = new TaskEvent($task);
+            $event->updateURL();
+            $events[] = $event->toArray();
         }
         return $events;
     }
@@ -121,10 +123,10 @@ class CalendarController extends Controller
         $model = Task::agentTask($id, $start, $end);
         $events = [];
         foreach ($model as $task) {
-            $event = CalendarEvents::withTask($task);
+            $event = new TaskEvent($task);
             //set url as Raport Task
-            $event->urlRaport;
-            $events[] = $event->toArray;
+            $event->raportURL();
+            $events[] = $event->toArray();
         }
         return $events;
 
@@ -140,8 +142,8 @@ class CalendarController extends Controller
             ->all();
         $events = [];
         foreach ($model as $calendarNews) {
-            $event = CalendarEvents::withCalendarNews($calendarNews);
-            $events[] = $event->toArray;
+            $event = new NewsEvent($calendarNews);
+            $events[] = $event->toArray();
         }
         return $events;
 

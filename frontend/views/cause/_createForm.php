@@ -18,14 +18,26 @@ use demogorgorn\ajax\AjaxSubmitButton;
         ]
     ]); ?>
 
-    <?= $form->field($model, 'victim_name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'victim_name',
+        [
+            'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-blind fa-lg"></i> Poszkodowany</span>{input}</div>'
+        ])
+        ->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'category_id',
+        [
+            'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-line-chart"></i> Etap</span>{input}</div>',
+
+        ])
+        ->dropDownList($category) ?>
 
 
 
-    <?= $form->field($model, 'category_id')->dropDownList($category) ?>
+    <?= $form->field($model, 'date',
+        [
+            'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Rozpoczęcie etapu</span>{input}</div>',
 
-
-    <?= $form->field($model, 'date')->textInput(['readonly' => false]) ?>
+        ])->textInput(['readonly' => false]) ?>
 
 
     <div class="form-group">

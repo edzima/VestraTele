@@ -27,4 +27,4 @@ common\assets\SweetAlert::register($this);
 
   <div id="calendar"></div>
 
-  <?= $this->render('_form');
+  <?= $this->render('_form', ['id'=>$id]);

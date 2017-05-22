@@ -51,13 +51,12 @@ class TaskStatusSearch extends Task
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $key)
+    public function search($params)
     {
-		$typWork= Yii::$app->user->identity->typ_work;
         $query = Task::find();
 
 		//selected rows
-		if($key)$query->where('task.id IN('.$key.')');
+		//if($key)$query->where('task.id IN('.$key.')');
 
 		//typ_work => A => admin || manager, all records
 	    $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel']);

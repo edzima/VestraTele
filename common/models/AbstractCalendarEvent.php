@@ -14,6 +14,7 @@ abstract class AbstractCalendarEvent {
     protected $start;
     protected $end;
     protected $textColor;
+    protected $color;
     protected $borderColor;
 
     abstract public function toArray();
@@ -21,6 +22,7 @@ abstract class AbstractCalendarEvent {
     protected function setUrl(){
         $this->url = $this->url.$this->id;
     }
+
 
     public function getTitle(){
         return $this->title;

@@ -57,4 +57,8 @@ class CauseCategory extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Cause::className(), ['category_id' => 'id']);
     }
+
+    public function getNameWithPeriod(){
+        return $this->name.' ('.$this->period.')';
+    }
 }

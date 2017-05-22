@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+
 use Yii;
 use yii\web\Controller;
 use yii\helpers\ArrayHelper;
@@ -9,6 +10,9 @@ use common\models\User;
 use common\models\CalendarNews;
 use common\models\Task;
 
+use common\models\TaskEvent;
+
+use common\models\NewsEvent;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
@@ -36,10 +40,39 @@ class CalendarController extends Controller{
         ];
     }
 
-    public function actionView($id){
+    public function actionLayer($id =null){
+        $layers = Yii::$app->authManager->getUserIdsByRole(User::ROLE_LAYER);
+        if($layers){
+            if(in_array($id,$layers)){
+                $layer= ArrayHelper::map(User::find()->where(['id'=>$layers])->all(),'id','username');
+            }
+            else {
+                $id = $layers[0];
+                //$layer= ArrayHelper::map(User::find()->where(['id'=>$id])->all(),'id','username');
+                return $this->redirect(['layer', 'id' => $id]);
+            }
 
-      $agent = ArrayHelper::map(User::find()->where(['typ_work' => 'P'])->all(), 'id', 'username');
-      return $this->render('view', ['agent' => $agent,'id' => $id]);
+            return $this->render('layer', ['layer' => $layer, 'id' => $id]);
+        }
+        throw new NotFoundHttpException('Layer does not exist.');
+
+    }
+
+    public function actionAgent($id = null){
+
+        $agents = Yii::$app->authManager->getUserIdsByRole(User::ROLE_AGENT);
+        if($agents) {
+            if (in_array($id, $agents)) {
+                $agent = ArrayHelper::map(User::find()->where(['id' => $agents])->all(), 'id', 'username');
+            } else {
+                $id = $agents[0];
+                $agent = ArrayHelper::map(User::find()->where(['id' => $id])->all(), 'id', 'username');
+                return $this->redirect(['agent', 'id' => $id]);
+            }
+            return $this->render('view', ['agent' => $agent,'id' => $id]);
+        }
+        throw new NotFoundHttpException('Agent does not exist.');
+
     }
 
     // $id -> agent_id news
@@ -59,77 +92,61 @@ class CalendarController extends Controller{
 
     }
 
-
-    public function actionAgenttask($id){
-      //->where(['agent_id' => $id])
-     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-
-     if($id){
-         $task = Task::find()->where(['agent_id' => $id])->all();
-     }
-     else{
-          $task = Task::find()->all();
-     }
-      $events = array();
-      foreach ($task as $key ) {
-        $event = [
-          'id' => $key['id'],
-          'title' => $key['victim_name'],
-          'start' => $key['date'],
-         // 'content' => $key['phone'],
-          //'url' => '/spotkanie/edycja?id='.$key['id']
-        ];
-        $events[] = $event;
-
-      }
-      //echo Json::encode($events);
-      return $events;
+    public function actionAgenttask($id, $start, $end)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $model = Task::agentTask($id, $start, $end);
+        $events = [];
+        foreach ($model as $task) {
+            $event = new TaskEvent($task);
+            $event->backendRaportURL();
+            $events[] = $event->toArray();
+        }
+        return $events;
     }
 
-    public function actionAgentnews($id){
-      //->where(['agent_id' => $id])
-     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+    public function actionAgentnews($id, $start, $end)
+    {
 
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $model = CalendarNews::find()
+            ->where(['agent_id' => $id])
+            ->andWhere("start BETWEEN '$start' AND '$end'")
+            ->all();
+        $events = [];
+        foreach ($model as $calendarNews) {
+            $event = new NewsEvent($calendarNews);
+            $events[] = $event->toArray();
+        }
+        return $events;
 
-     if($id){
-         $task = CalendarNews::find()->where(['agent_id' => $id])->all();
-     }
-     else {
-        $task = CalendarNews::find()->all();
-     }
-      $events = array();
-      foreach ($task as $key ) {
-        $event = [
-          'id' => $key['id'],
-          'title' => $key['news'],
-          'start' => $key['start'],
-          'end' => $key['end'],
-          'allDay' => 'true',
-          //'url' => '/spotkanie/edycja?id='.$key['id']
-        ];
-        $events[] = $event;
-
-      }
-      //echo Json::encode($events);
-      return $events;
     }
 
-  public function actionRemove()
-  {   $id=Yii::$app->request->post()['event_id'];
-      $this->delete($id);
-      echo $id;
-  }
+      public function actionRemove()
+      {   $id=Yii::$app->request->post()['event_id'];
+          $this->delete($id);
+          echo $id;
+      }
 
-  public function actionUpdate($id,$start, $end)
-  {
+    public function actionUpdate($id, $start)
+    {
+        $model = $this->findTask($id);
+        $model->date = $start;
+        //$model->end = $end;
+        if ($model->save()) return true;
+        else return false;
+
+    }
+
+    public function actionUpdatenews($id, $start, $end)
+    {
         $model = $this->findModel($id);
         $model->start = $start;
         $model->end = $end;
-        if($model->save()) return true;
+        if ($model->save()) return true;
         else return false;
 
-  }
+    }
 
   protected function delete($id)
   {

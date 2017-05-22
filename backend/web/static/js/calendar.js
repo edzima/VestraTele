@@ -47,7 +47,7 @@ function doSubmit(){
 
 $( "#agent" ).change(function() {
   agentID = $(this).val();
-  url = "/backend/web/calendar/view?id="+agentID;
+  url = "/backend/web/calendar/agent?id="+agentID;
   document.location.href = url;
 });
 
@@ -71,14 +71,21 @@ $('#calendar').fullCalendar({
   eventLimit: true,
   eventSources: [
     {
-      url: '/calendar/agenttask?id='+agentID,
+      url: '/backend/web/calendar/agenttask?id='+agentID,
       color: 'yellow',
       textColor: 'black'
     },
     {
-     url: '/calendar/agentnews?id='+agentID,
+     url: '/backend/web/calendar/agentnews?id='+agentID,
     }
 ],
+    eventClick: function(event) {
+
+        if (event.url) {
+            window.open(event.url);
+            return false;
+        }
+    },
   select: function(start, end, allDay) {
       var allDay = !start.hasTime() && !end.hasTime();
      // console.log(end);
@@ -100,14 +107,14 @@ $('#calendar').fullCalendar({
       console.log(event.allDay);
       console.log(event);
       if (event.isNews && event.allDay) {
-          $.get('/calendar/updatenews', {
+          $.get('/backend/web/calendar/updatenews', {
                   "id": event.id,
                   "start": event.start.format(),
                   "end": event.start.format()
               },
               function(data) {});
       } else if (!event.isNews && !event.allDay) {
-          $.get('/calendar/update', {
+          $.get('/backend/web/calendar/update', {
                   "id": event.id,
                   "start": event.start.format()
               },
@@ -134,10 +141,11 @@ $('#calendar').fullCalendar({
             confirmButtonText: "Tak",
             cancelButtonText: "Nie",
             closeOnConfirm: false
-          },
+          }).then(
           function(){
               var event_id = event.id;
               swal("Usunięto!", "Twoja notatka została usunięta", "success");
+              console.log('blabla');
               $.post('remove', {"event_id": event_id},
                  function(data){
                      console.log(data);
@@ -161,7 +169,7 @@ $('#calendar').fullCalendar({
   eventResize: function(event, delta, revertFunc) {
 
     if(event.isNews && event.allDay){
-        $.get('/calendar/updatenews', {"id": event.id, "start": event.start.format(),"end":event.end.format()},
+        $.get('/backend/web/calendar/updatenews', {"id": event.id, "start": event.start.format(),"end":event.end.format()},
             function(data){
               });
           }

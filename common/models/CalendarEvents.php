@@ -3,7 +3,7 @@ namespace common\models;
 use common\models\Task;
 use common\models\CalendarNews;
 use yii;
-//use \path\to\some\other\model\to\use\OtherModels;
+
 
 class CalendarEvents extends \yii\base\Object{
 
@@ -96,7 +96,7 @@ class CalendarEvents extends \yii\base\Object{
         $borderColor = '';
         if($task->meeting) $color = "blue";
         if($task->automat) $color = "red";
-        $answer = $task->taskstatus->answer;
+        $answer = @$task->taskstatus->answer;
         if($answer) {
             $textColor = $color;
             $color = "#f5f5f5";
@@ -153,17 +153,24 @@ class CalendarEvents extends \yii\base\Object{
     public static function withTask($task){
 
         $instance = new Self();
+
         $city = $task->miasto->name;
+
         $powiat = $task->powiatRel->name;
         $woj = $task->wojewodztwo->name;
-        $gmina = $task->gminaRel->name;
 
-        ($gmina ? $instance->title = $gmina.', '.$city : $instance->title = $city );
         $instance->description = $powiat."<br/>".$woj;
+        $gmina = @$task->gminaRel->name;
+        if($gmina)  $instance->title = $gmina.', '.$city;
+        else $instance->title = $city;
+
+
         $instance->id = $task->id;
         $instance->task = $task;
         $instance->start = $task->date;
+
         $instance->EventColor($task);
+
 
         return $instance;
 

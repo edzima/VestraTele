@@ -31,7 +31,21 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'name',
             'period',
+            'color'
         ],
     ]) ?>
 
 </div>
+
+<?php
+$this->registerJs(
+'$("document").ready(function(){
+
+var trColor = $( "tr" ).last();
+var color = trColor.find("td").html();
+trColor.find("td").css( "background-color", color );
+
+
+});'
+);
+?>

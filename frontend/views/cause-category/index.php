@@ -25,9 +25,18 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
+            //'id',
             'name',
             'period',
+            [
+                    //'attribute' => 'color',
+                    // 'value' => '',
+                    'label' => 'Kolor',
+                     'contentOptions' => function($model) {
+                        return ['style'=> 'background-color:'.$model->color];
+                        },
+
+            ],
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

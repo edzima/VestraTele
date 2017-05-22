@@ -27,9 +27,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'status')->checkbox(['label' => Yii::t('backend', 'Activate')]) ?>
 
     <?= $form->field($model, 'roles')->checkboxList($roles) ?>
-	
-	
-	<?= $form->field($model, 'typ_work')->dropDownList(['prompt'=> 'Wybierz typ pracownika', 'T'=>'Telemarketer', 'P'=>'Przedstawiciel']) ?>															
 
 	
     <div class="form-group">
@@ -39,24 +36,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php ActiveForm::end() ?>	
 
-	<?php
-	$this->registerJs(
-		'$("document").ready(function(){
-			
-			$(".field-userform-typ_work").toggle();
-			
-				
-			$("#userform-roles").on("change",function(event){
-				console.log(event.target.defaultValue);
-				var role = event.target.defaultValue;
-				
-				if (role =="user")  $(".field-userform-typ_work").toggle();
-			});
 
-			
-		});'		
-	);
-
-?>
 
 	

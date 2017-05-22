@@ -204,3 +204,8 @@ div.required label:after {
     width:6em;
 }
 
+.fc-event-container a:focus{
+    color:white;
+}
+
+

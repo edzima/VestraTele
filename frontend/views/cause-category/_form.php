@@ -29,13 +29,12 @@ use  kartik\color\ColorInput;
         echo '<label class="control-label">Kolor tła</label>';
         echo ColorInput::widget([
             'model'=>$model,
-
             'attribute' =>'color',
             'options' => [ 'class' =>'col-md-2','readonly' => true]
         ]);
         ?>
     </div>
-
+    <div class="clearfix"></div>
     <div class="form-group">
         <?= Html::submitButton(Yii::t('frontend', 'Save'), ['class' => 'btn btn-success']) ?>
     </div>

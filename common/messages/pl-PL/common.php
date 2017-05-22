@@ -25,6 +25,7 @@ return [
     'Banned' => 'Zbanowany',
 	'Category' => 'Rodzaj',
     'Comment' => 'Komentarz',
+    'confirm delete this' => 'Czy napewno chcesz to usunąć?',
     'Created at' => 'W firmie od',
     'Deleted' => 'Usuń',
     'Description' => 'Opis',
