@@ -24,7 +24,7 @@ Highlight::register($this);
     </div>
 
     <div class="article-text">
-        <?= HtmlPurifier::process($model->body) ?>
+        <?= HtmlPurifier::process(Yii::t('frontend'.$model->title, 'description')) ?>
     </div>
 	<div class="article-span">
 			<button type="button" class="btn btn-primary">

@@ -39,40 +39,46 @@ AppAsset::register($this);
 
 
 	   if (!Yii::$app->user->isGuest) {
-	    $menuItems = [
-		[	'label' => Yii::t('frontend', 'Articles'),
-			'url' => ['/article/index'],
-			'visible' => Yii::$app->user->identity->isTele(),
-		],
-        [
-            'label' => 'Ranking',
-            'url' => ['/score'],
-            'visible' => Yii::$app->user->identity->isTele(),
-        ],
-		[
-            'label' => Yii::t('frontend', 'Your tasks'),
-            'url' => ['/task'],
-        ],
-		[
-            'label' => Yii::t('frontend', 'Task'),
-            'url' => ['/task-status'],
-            'visible' => Yii::$app->user->identity->isAgent(),
-        ],
-        [
-            'label' => Yii::t('frontend', 'Calendar'),
-            'url' => ['/calendar/view?id=26'],
-            'visible' => Yii::$app->user->identity->isTele(),
-        ],
-        [
-            'label' => Yii::t('frontend', 'Your calendar'),
-            'url' => ['/calendar/agent?id='.Yii::$app->user->identity->id],
-            'visible' => Yii::$app->user->identity->isAgent(),
-        ],
-		];
+
+        $menuItems = [
+            [
+                'label' => Yii::t('frontend', 'Your tasks'),
+                'url' => ['/task'],
+            ],
+        ];
+
+	    if(Yii::$app->user->can('telemarketer')){
+            $menuItems = [
+                [	'label' => Yii::t('frontend', 'Articles'),
+                    'url' => ['/article/index'],
+                ],
+                [
+                    'label' => 'Ranking',
+                    'url' => ['/score'],
+                ],
+
+                [
+                    'label' => Yii::t('frontend', 'Calendar'),
+                    'url' => ['/calendar/view?id=26'],
+                ],
+            ];
+        }
+
+        if(Yii::$app->user->can('agent')){
+            $menuItems = [
+                [
+                    'label' => Yii::t('frontend', 'Task'),
+                    'url' => ['/task-status'],
+                ],
+                [
+                    'label' => Yii::t('frontend', 'Your calendar'),
+                    'url' => ['/calendar/agent?id='.Yii::$app->user->identity->id],
+                ],
+            ];
+        }
 
 	    if (Yii::$app->user->can('layer')){
             $menuItems = [
-
                 [
                     'label' => Yii::t('frontend', 'Causes'),
                     'url' => ['/cause/index'],

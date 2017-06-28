@@ -79,4 +79,5 @@ return [
     'Your account has been successfully created. Check your email for further instructions.' => 'Pomyślnie utworzono konto. Sprawdź maila po dalsze instrukcje.',
     'Your message has been sent successfully.' => 'Twoja wiadość pomyślnie została wysłana.',
     'Your password has been successfully changed.' => 'Twoje hasło zostało pomyślnie zmienione.',
+    'description' => '<ul><li>afsfsa</li></ul><p><br></p><table><tbody><tr><td>213</td><td>123</td><td>123</td></tr><tr><td>123</td><td>123</td><td>123</td></tr></tbody></table>',
 ];
