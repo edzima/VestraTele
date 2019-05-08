@@ -8,106 +8,100 @@ use yii\helpers\Console;
 use common\models\User;
 use common\rbac\OwnModelRule;
 
-class RbacController extends Controller
-{
-    public function actionInit()
-    {
-        $auth = Yii::$app->authManager;
-        $auth->removeAll();
+class RbacController extends Controller {
 
-        $user = $auth->createRole(User::ROLE_USER);
-        $auth->add($user);
+	public function actionInit() {
+		$auth = Yii::$app->authManager;
+		$auth->removeAll();
 
-        // own model rule
-        $ownModelRule = new OwnModelRule();
-        $auth->add($ownModelRule);
+		$user = $auth->createRole(User::ROLE_USER);
+		$auth->add($user);
 
+		// own model rule
+		$ownModelRule = new OwnModelRule();
+		$auth->add($ownModelRule);
 
+		$manager = $auth->createRole(User::ROLE_MANAGER);
+		$auth->add($manager);
+		$auth->addChild($manager, $user);
 
-        $manager = $auth->createRole(User::ROLE_MANAGER);
-        $auth->add($manager);
-        $auth->addChild($manager, $user);
+		$loginToBackend = $auth->createPermission('loginToBackend');
+		$auth->add($loginToBackend);
+		$auth->addChild($manager, $loginToBackend);
 
-        $loginToBackend = $auth->createPermission('loginToBackend');
-        $auth->add($loginToBackend);
-        $auth->addChild($manager, $loginToBackend);
+		$admin = $auth->createRole(User::ROLE_ADMINISTRATOR);
+		$auth->add($admin);
+		$auth->addChild($admin, $manager);
 
+		$auth->assign($admin, 1);
 
-        $admin = $auth->createRole(User::ROLE_ADMINISTRATOR);
-        $auth->add($admin);
-        $auth->addChild($admin, $manager);
+		Console::output('Success! RBAC roles has been added.');
+	}
 
-        $auth->assign($admin, 1);
+	public function actionAddLayer() {
+		$auth = Yii::$app->authManager;
+		$manageCause = $auth->createPermission('manageCause');
+		$auth->add($manageCause);
 
-        Console::output('Success! RBAC roles has been added.');
-    }
+		$manager = $auth->getRole('manager');
 
-    public function actionAddLayer(){
-        $auth = Yii::$app->authManager;
-        // add "createPost" permission
-        $manageCause = $auth->createPermission('manageCause');
-        $auth->add($manageCause);
+		$layer = $auth->createRole(User::ROLE_LAYER);
+		$auth->add($layer);
+		$auth->addChild($layer, $manageCause);
+		$auth->addChild($manager, $layer);
 
-        $manager = $auth->getRole('manager');
+		Console::output('Success! RBAC roles layer has been added.');
+	}
 
-        $layer = $auth->createRole(User::ROLE_LAYER);
-        $auth->add($layer);
-        $auth->addChild($layer, $manageCause);
-        $auth->addChild($manager,$layer);
+	public function actionAddAgentAndTele() {
 
-        Console::output('Success! RBAC roles layer has been added.');
-    }
+		$auth = Yii::$app->authManager;
+		$manager = $auth->getRole('manager');
 
-    public function actionAddAgentAndTele(){
+		//add agent role
+		$agent = $auth->createRole(User::ROLE_AGENT);
+		$auth->add($agent);
+		$auth->addChild($manager, $agent);
 
-        $auth = Yii::$app->authManager;
-        $manager = $auth->getRole('manager');
+		//add telemarketer role
+		$tele = $auth->createRole(User::ROLE_TELEMARKETER);
+		$auth->add($tele);
+		$auth->addChild($manager, $tele);
 
-        //add agent role
-        $agent = $auth->createRole(User::ROLE_AGENT);
-        $auth->add($agent);
-        $auth->addChild($manager,$agent);
+		Console::output('Success! RBAC roles (tele, agent)  has been added.');
+	}
 
-        //add telemarketer role
-        $tele = $auth->createRole(User::ROLE_TELEMARKETER);
-        $auth->add($tele);
-        $auth->addChild($manager,$tele);
+	public function actionChangeTypWorkWithRole() {
+		$users = User::find()->all();
 
-        Console::output('Success! RBAC roles (tele, agent)  has been added.');
+		$auth = Yii::$app->authManager;
 
-    }
+		$tele = $auth->getRole(User::ROLE_TELEMARKETER);
+		$agent = $auth->getRole(User::ROLE_AGENT);
 
+		foreach ($users as $user) {
+			$auth->revokeAll($user->id);
+			// Console::output($user->typ_work.$user->username);
+			switch ($user->typ_work) {
+				case "T":
+					Console::output("User is T with id: " . $user->id);
+					$auth->assign($tele, $user->id);
+					break;
+				case "P":
+					Console::output("User is P with id: " . $user->id);
+					$auth->assign($agent, $user->id);
+					break;
+				case "A":
+					Console::output("Admin");
+					$auth->assign($auth->getRole(User::ROLE_MANAGER), $user->id);
+					break;
+			}
+		}
+		$auth->assign($auth->getRole(User::ROLE_ADMINISTRATOR), 1);
+	}
 
-    public function actionChangeTypWorkWithRole(){
-        $users = User::find()->all();
-
-        $auth = Yii::$app->authManager;
-
-        $tele  = $auth->getRole(User::ROLE_TELEMARKETER);
-        $agent = $auth->getRole(User::ROLE_AGENT);
-
-
-        foreach($users as $user){
-            $auth->revokeAll($user->id);
-           // Console::output($user->typ_work.$user->username);
-            switch ($user->typ_work){
-                case "T":
-                    Console::output( "User is T with id: ".$user->id);
-                    $auth->assign($tele, $user->id);
-                    break;
-                case "P":
-                    Console::output( "User is P with id: ".$user->id);
-                    $auth->assign($agent, $user->id);
-                    break;
-                case "A":
-                    Console::output( "Admin");
-                    $auth->assign($auth->getRole(User::ROLE_MANAGER), $user->id);
-                    break;
-
-
-            }
-        }
-        $auth->assign($auth->getRole(User::ROLE_ADMINISTRATOR), 1);
-
-    }
+	public function actionAddBookKeeper() {
+		$auth = Yii::$app->authManager;
+		$auth->add($auth->createRole(User::ROLE_BOOKKEEPER));
+	}
 }

@@ -1,10 +1,12 @@
 <?php
 
+use backend\models\UserForm;
+use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\UserForm */
+/* @var $model UserForm */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $roles yii\rbac\Role[] */
 /* @var $permissions yii\rbac\Permission[] */
@@ -25,6 +27,18 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'status')->checkbox(['label' => Yii::t('backend', 'Activate')]) ?>
+
+	<?= $form->field($model, 'parent_id')
+		->widget(Select2::classname(), [
+				'data' => $model->getParents(),
+				'options' => [
+					'placeholder' => 'Przełożony',
+				],
+				'pluginOptions' => [
+					'allowClear' => true,
+				],
+			]
+		) ?>
 
     <?= $form->field($model, 'roles')->checkboxList($roles) ?>
 

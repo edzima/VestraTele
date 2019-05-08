@@ -85,14 +85,14 @@ if (YII_DEBUG) { //YII_ENV_DEV
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
+		'allowedIPs' => ['*']
         //'traceLine' => '<a href="phpstorm://open?url={file}&line={line}">{file}:{line}</a>'
     ];
-    $config['modules']['debug']['allowedIPs'] = ['*'];
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
-        // 'allowedIPs' => ['*']
+       //  'allowedIPs' => ['*']
     ];
 }
 

@@ -2,10 +2,8 @@
 
 namespace common\models;
 
-use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\City;
 
 /**
  * CitySearch represents the model behind the search form of `common\models\City`.
@@ -62,7 +60,7 @@ class CitySearch extends City
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
+            'miasta.id' => $this->id,
             'wojewodztwo_id' => $this->wojewodztwo_id,
             'powiat_id' => $this->powiat_id,
         ]);

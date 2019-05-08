@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use Yii;
 
 /**
  * This is the model class for table "miasta".
@@ -11,62 +10,90 @@ use Yii;
  * @property string $name
  * @property integer $wojewodztwo_id
  * @property integer $powiat_id
+ *
+ *
+ * @property Powiat $powiatRel
  */
-class City extends \yii\db\ActiveRecord
-{
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return 'miasta';
-    }
+class City extends \yii\db\ActiveRecord {
 
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            [['id', 'wojewodztwo_id', 'powiat_id'], 'integer'],
-            [['name'], 'string', 'max' => 31],
+	public const NOT_EXIST_NAME = 'Nieznany';
+
+	private static $notExist;
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function tableName() {
+		return 'miasta';
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function rules() {
+		return [
+			[['id', 'wojewodztwo_id', 'powiat_id'], 'integer'],
+			[['name'], 'string', 'max' => 31],
 			[['name'], 'required'],
-            [['wojewodztwo_id'], 'exist', 'skipOnError' => true, 'targetClass' => Wojewodztwa::className(), 'targetAttribute' => ['wojewodztwo_id' => 'id']],
-        ];
-    }
+			[['wojewodztwo_id'], 'exist', 'skipOnError' => true, 'targetClass' => Wojewodztwa::className(), 'targetAttribute' => ['wojewodztwo_id' => 'id']],
+		];
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'name' => 'Miejscowość',
-            'wojewodztwo_id' => 'Wojewodztwo',
-            'powiat_id' => 'Powiat',
-        ];
-    }
-	
+	/**
+	 * @inheritdoc
+	 */
+	public function attributeLabels() {
+		return [
+			'id' => 'ID',
+			'name' => 'Miejscowość',
+			'wojewodztwo_id' => 'Wojewodztwo',
+			'powiat_id' => 'Powiat',
+		];
+	}
+
 	//to DropDown selectList
-	public static function getCitiesList($wojID, $powID){
-		
-		$cities = Self::find()->where("wojewodztwo_id=$wojID AND powiat_id=$powID")->all();
+	public static function getCitiesList($wojID, $powID) {
+		$cities = static::find()->where("wojewodztwo_id=$wojID AND powiat_id=$powID")->all();
+		$out = [];
 		foreach ($cities as $city) {
 			$out[] = ['id' => $city['id'], 'name' => $city['name']];
 		}
 		return [
 			'out' => $out,
-			'selected' => $cities[0]['id']
-			];
+			'selected' => $cities[0]['id'] ?? '',
+		];
 	}
-	
-	
-	public function getWojewodztwo(){
-		return $this->hasOne(Wojewodztwa::className(),['id' => 'wojewodztwo_id']);
+
+	public function getWojewodztwo() {
+		return $this->hasOne(Wojewodztwa::className(), ['id' => 'wojewodztwo_id']);
 	}
-	
-	public function getPowiatRel(){
-		return $this->hasOne(Powiat::className(), ['id'=>'powiat_id', 'wojewodztwo_id'=>'wojewodztwo_id']);
+
+	public function getPowiatRel() {
+		return $this->hasOne(Powiat::className(), ['id' => 'powiat_id', 'wojewodztwo_id' => 'wojewodztwo_id']);
+	}
+
+	public function __toString(): string {
+		return $this->name;
+	}
+
+	public static function getNotExistCity(): self {
+		if (empty(static::$notExist)) {
+			$city = static::findOne(['name' => static::NOT_EXIST_NAME]);
+			if ($city === null) {
+				$city = static::createNotExistCity();
+			}
+			static::$notExist = $city;
+		}
+		return static::$notExist;
+	}
+
+	private static function createNotExistCity(): self {
+		$city = new static([
+			'name' => static::NOT_EXIST_NAME,
+			'powiat_id' => Powiat::find()->one()->id,
+			'wojewodztwo_id' => Wojewodztwa::find()->one()->id,
+		]);
+		$city->save();
+		return $city;
 	}
 }
