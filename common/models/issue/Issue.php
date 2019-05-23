@@ -8,8 +8,8 @@ use common\models\Gmina;
 use common\models\Powiat;
 use common\models\User;
 use common\models\Wojewodztwa;
-use cornernote\linkall\LinkAllBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -61,10 +61,12 @@ use yii\db\Expression;
  * @property IssueType $type
  * @property IssueNote[] $issueNotes
  * @property Provision $provision
+ * @property Gmina $clientSubprovince
+ * @property Gmina $victimSubprovince
  * @property string $longId
  * @property bool $payed
  */
-class Issue extends \yii\db\ActiveRecord {
+class Issue extends ActiveRecord {
 
 	private const DEFAULT_PROVISION = Provision::TYPE_PERCENTAGE;
 	private $provision;
@@ -93,7 +95,6 @@ class Issue extends \yii\db\ActiveRecord {
 
 	public function behaviors() {
 		return [
-			LinkAllBehavior::class,
 			DateIDBehavior::class,
 			[
 				'class' => TimestampBehavior::class,
@@ -159,7 +160,7 @@ class Issue extends \yii\db\ActiveRecord {
 			'id' => 'ID',
 			'longId' => 'ID',
 			'created_at' => 'Dodano',
-			'updated_at' => 'Aktualizacja',
+			'updated_at' => 'Edycja',
 			'date' => 'Data podpisania',
 			'agent_id' => 'Agent',
 			'client_first_name' => 'Imie',
@@ -216,7 +217,7 @@ class Issue extends \yii\db\ActiveRecord {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getClientCity() {
-		return $this->hasOne(City::class, ['id' => 'client_city_id']);
+		return $this->hasOne(City::class, ['id' => 'client_city_id'])->cache();
 	}
 
 	public function getClientProvinceId(): ?int {
@@ -326,7 +327,7 @@ class Issue extends \yii\db\ActiveRecord {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getIssueNotes() {
-		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])->orderBy('created_at DESC');
+		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])->with('user')->orderBy('created_at DESC');
 	}
 
 	/**
@@ -364,7 +365,7 @@ class Issue extends \yii\db\ActiveRecord {
 	}
 
 	public function hasTele(): bool {
-		return $this->tele !== null;
+		return $this->tele_id !== null && $this->tele !== null;
 	}
 
 	public function hasLawyer(): bool {
@@ -403,6 +404,14 @@ class Issue extends \yii\db\ActiveRecord {
 
 	public function getVictimFullName(): string {
 		return $this->victim_surname . ' ' . $this->victim_first_name;
+	}
+
+	public function hasClientSubprovince(): bool {
+		return $this->client_subprovince_id !== null && $this->clientSubprovince !== null;
+	}
+
+	public function hasVictimSubprovince(): bool {
+		return $this->victim_subprovince_id !== null && $this->victimSubprovince !== null;
 	}
 
 	/**

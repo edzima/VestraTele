@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use Closure;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -60,7 +61,6 @@ class User extends ActiveRecord implements IdentityInterface {
 	/** @deprecated */
 	const TYPE_TELE = 'T';
 	/** @deprecated */
-	const TYPE_GENERATE = 'G';
 
 	const EVENT_AFTER_SIGNUP = 'afterSignup';
 
@@ -273,22 +273,6 @@ class User extends ActiveRecord implements IdentityInterface {
 		return $rolesI18n;
 	}
 
-	/** @deprecated */
-	public function isAgent(): bool {
-		if ($this->typ_work === static::TYPE_AGENT) {
-			return true;
-		}
-		return false;
-	}
-
-	/** @deprecated */
-	public function isTele(): bool {
-		if ($this->typ_work === static::TYPE_TELE) {
-			return true;
-		}
-		return false;
-	}
-
 	public function hasParent(): bool {
 		return $this->boss !== null;
 	}
@@ -321,7 +305,7 @@ class User extends ActiveRecord implements IdentityInterface {
 		return new UserQuery(get_called_class());
 	}
 
-	public static function getSelectList(array $roles = []): array {
+	public static function getSelectList(array $roles = [], ?Closure $beforeAll = null): array {
 		$query = static::find()
 			->joinWith('userProfile')
 			->with('userProfile')
@@ -329,6 +313,10 @@ class User extends ActiveRecord implements IdentityInterface {
 		if (!empty($roles)) {
 			$query->onlyByRole($roles);
 		}
+		if ($beforeAll instanceof Closure) {
+			$beforeAll($query);
+		}
+		$query->cache(60);
 
 		return ArrayHelper::map(
 			$query->all(), 'id', 'fullName');

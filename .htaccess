@@ -10,6 +10,10 @@ Options +FollowSymlinks
 # Enable mod_rewrite
 RewriteEngine On
 
+
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
 # Backend redirect
 RewriteCond %{REQUEST_URI} ^/backend
 RewriteRule ^backend/(.*)$ backend/web/$1 [L]

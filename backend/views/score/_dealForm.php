@@ -1,9 +1,9 @@
 <?php
 
+use common\widgets\DateTimeWidget;
 use yii\helpers\Html;
 
 use yii\widgets\ActiveForm;
-use trntv\yii\datetime\DateTimeWidget;
 /* @var $this yii\web\View */
 /* @var $model common\models\Score */
 
@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'options'=>['class'=>'col-md-4'],
 			'template' => '<div class="input-group form-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Kiedy</span>{input}</div>']
 		)->widget(
-			DateTimeWidget::className(),
+			DateTimeWidget::class,
 			[   'phpDatetimeFormat' => 'yyyy-MM-dd',
 				'clientOptions' => [
 					'allowInputToggle' => true,

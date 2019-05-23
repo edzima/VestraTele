@@ -2,7 +2,7 @@
 
 use backend\modules\issue\models\PayForm;
 use common\models\issue\IssuePay;
-use trntv\yii\datetime\DateTimeWidget;
+use common\widgets\DateTimeWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 	<?php $form = ActiveForm::begin(); ?>
 
 	<?= $form->field($model, 'date')
-		->widget(DateTimeWidget::className(),
+		->widget(DateTimeWidget::class,
 			[
 				'phpDatetimeFormat' => 'yyyy-MM-dd',
 				'clientOptions' => [

@@ -15,7 +15,7 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'description')->textarea(['rows' => 4, 'maxlength' => true]) ?>
+	<?= $form->field($model, 'description')->textarea(['rows' => 4]) ?>
 
 	<div class="form-group">
 		<?= Html::submitButton('Zapisz', ['class' => 'btn btn-success']) ?>

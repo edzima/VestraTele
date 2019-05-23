@@ -4,6 +4,7 @@ namespace common\models\issue;
 
 use common\models\User;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -20,7 +21,7 @@ use yii\db\Expression;
  * @property Issue $issue
  * @property User $user
  */
-class IssueNote extends \yii\db\ActiveRecord {
+class IssueNote extends ActiveRecord {
 
 	/**
 	 * @inheritdoc
@@ -32,7 +33,7 @@ class IssueNote extends \yii\db\ActiveRecord {
 	public function behaviors() {
 		return [
 			[
-				'class' => TimestampBehavior::className(),
+				'class' => TimestampBehavior::class,
 				'value' => new Expression('CURRENT_TIMESTAMP'),
 			],
 		];
@@ -56,9 +57,9 @@ class IssueNote extends \yii\db\ActiveRecord {
 			[['issue_id', 'user_id', 'title', 'description'], 'required'],
 			[['issue_id', 'user_id'], 'integer'],
 			[['created_at', 'updated_at'], 'safe'],
-			[['title', 'description'], 'string', 'max' => 255],
-			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::className(), 'targetAttribute' => ['issue_id' => 'id']],
-			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+			[['title'], 'string', 'max' => 255],
+			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
+			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 		];
 	}
 
@@ -81,14 +82,14 @@ class IssueNote extends \yii\db\ActiveRecord {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getIssue() {
-		return $this->hasOne(Issue::className(), ['id' => 'issue_id']);
+		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
 	}
 
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getUser() {
-		return $this->hasOne(User::className(), ['id' => 'user_id']);
+		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
 
 	/**

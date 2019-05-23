@@ -3,9 +3,9 @@
 use backend\modules\address\widgets\AddressWidget;
 use common\models\issue\Issue;
 use common\models\issue\Provision;
+use common\widgets\DateTimeWidget;
 use kartik\depdrop\DepDrop;
 use kartik\select2\Select2;
-use trntv\yii\datetime\DateTimeWidget;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\View;

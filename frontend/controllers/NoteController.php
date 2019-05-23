@@ -25,13 +25,13 @@ class NoteController extends Controller {
 	public function behaviors() {
 		return [
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
 				],
 			],
 			'access' => [
-				'class' => AccessControl::className(),
+				'class' => AccessControl::class,
 				'rules' => [
 					[
 						'allow' => true,
@@ -61,10 +61,6 @@ class NoteController extends Controller {
 		return $this->render('create', [
 			'model' => $model,
 		]);
-	}
-
-	private function redirectIssue(int $issueId) {
-		return $this->redirect(['issue/view', 'id' => $issueId, '#' => 'notes-list']);
 	}
 
 	/**
@@ -97,6 +93,10 @@ class NoteController extends Controller {
 		$issueId = $model->issue_id;
 		$model->delete();
 		$this->redirectIssue($issueId);
+	}
+
+	private function redirectIssue(int $issueId) {
+		return $this->redirect(['issue/view', 'id' => $issueId, '#' => 'notes-list']);
 	}
 
 	/**

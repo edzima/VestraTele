@@ -13,9 +13,13 @@ use yii\base\Widget;
 class IssueNoteWidget extends Widget {
 
 	public $model;
+	public $removeBtn = true;
 
 	public function run() {
-		return $this->render('issue-note', ['model' => $this->model]);
+		return $this->render('issue-note', [
+			'model' => $this->model,
+			'removeBtn' => $this->removeBtn,
+		]);
 	}
 
 }

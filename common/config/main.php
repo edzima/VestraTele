@@ -1,5 +1,10 @@
 <?php
 
+use common\components\DbManager;
+use common\formatters\Formatter;
+use yii\caching\DummyCache;
+use yii\caching\FileCache;
+
 $config = [
 	'name' => 'Vestra System',
 	'vendorPath' => dirname(__DIR__, 2) . '/vendor',
@@ -8,6 +13,10 @@ $config = [
 	'sourceLanguage' => 'en-US',
 	'language' => getenv('LANGUAGE'),
 	'bootstrap' => ['log'],
+	'aliases' => [
+		'@bower' => '@vendor/bower-asset',
+		'@npm' => '@vendor/npm-asset',
+	],
 	'components' => [
 		'db' => [
 			'class' => 'yii\db\Connection',
@@ -19,20 +28,26 @@ $config = [
 			'enableSchemaCache' => YII_ENV_PROD,
 		],
 		'authManager' => [
-			'class' => 'yii\rbac\DbManager',
+			'class' => DbManager::class,
 		],
 		'assetManager' => [
 			'class' => 'yii\web\AssetManager',
 			'linkAssets' => getenv('LINK_ASSETS'),
 			'appendTimestamp' => YII_ENV_DEV,
+			'converter' => [
+				'class' => 'yii\web\AssetConverter',
+				'commands' => [
+					'less' => ['css', 'lessc {from} {to} --no-color'],
+				],
+			],
 		],
 		'formatter' => [
-			'class' => \common\formatters\Formatter::class,
+			'class' => Formatter::class,
 			'nullDisplay' => '',
 			'dateFormat' => 'dd.MM.yyyy',
 			'decimalSeparator' => ',',
 			'thousandSeparator' => ' ',
-			'currencyCode' => 'EUR',
+			'currencyCode' => 'PLN',
 		],
 		'validator' => [
 			'class' => 'yii\validators\IpValidator',
@@ -44,7 +59,7 @@ $config = [
 				[
 					'class' => 'yii\log\DbTarget',
 					'levels' => ['error', 'warning'],
-					'except' => ['yii\web\HttpException:*','yii\i18n\*'],
+					'except' => ['yii\web\HttpException:*', 'yii\i18n\*'],
 					'prefix' => function () {
 						$url = !Yii::$app->request->isConsoleRequest ? Yii::$app->request->getUrl() : null;
 
@@ -87,7 +102,7 @@ $config = [
 			'useFileTransport' => YII_ENV_DEV,
 		],
 		'cache' => [
-			'class' => YII_ENV_DEV ? 'yii\caching\DummyCache' : 'yii\caching\FileCache',
+			'class' => YII_ENV_DEV ? DummyCache::class : FileCache::class,
 		],
 	],
 ];

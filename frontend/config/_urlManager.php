@@ -6,7 +6,10 @@ return [
 	'showScriptName' => false,
 	'rules' => [
 		// Index page
+
 		'' => '',
+		'crm' => '',
+
 		// Pages
 		'page/<slug>' => 'page/view',
 		// Articles

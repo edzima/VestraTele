@@ -2,9 +2,8 @@
 
 namespace backend\modules\issue\controllers;
 
-use common\models\issue\IssueStageType;
+use backend\modules\issue\models\IssueStage;
 use Yii;
-use common\models\issue\IssueStage;
 use common\models\issue\IssueStageSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -67,11 +66,10 @@ class StageController extends Controller {
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
-		} else {
-			return $this->render('create', [
-				'model' => $model,
-			]);
 		}
+		return $this->render('create', [
+			'model' => $model,
+		]);
 	}
 
 	/**
@@ -86,11 +84,10 @@ class StageController extends Controller {
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
-		} else {
-			return $this->render('update', [
-				'model' => $model,
-			]);
 		}
+		return $this->render('update', [
+			'model' => $model,
+		]);
 	}
 
 	/**

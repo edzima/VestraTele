@@ -42,7 +42,7 @@ class IssueNoteForm extends Model {
 	public function rules() {
 		return [
 			[['title', 'description'], 'required'],
-			[['title', 'description'], 'string', 'max' => 255],
+			[['title'], 'string', 'max' => 255],
 		];
 	}
 

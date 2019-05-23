@@ -1,6 +1,7 @@
 <?php
 
 use backend\modules\address\widgets\AddressWidget;
+use common\widgets\DateTimeWidget;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 
@@ -8,7 +9,7 @@ use common\models\User;
 
 use yii\widgets\ActiveForm;
 
-use trntv\yii\datetime\DateTimeWidget;
+use yii\widgets\MaskedInput;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Task */
@@ -30,7 +31,7 @@ use trntv\yii\datetime\DateTimeWidget;
 			'options' => ['class' => 'col-md-6 form-group'],
 			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-phone"></i> Numer</span>{input}</div>',
 		])
-		->widget(\yii\widgets\MaskedInput::className(), [
+		->widget(MaskedInput::class, [
 			'mask' => '999-999-9999',
 		])
 	?>
@@ -41,9 +42,8 @@ use trntv\yii\datetime\DateTimeWidget;
 			'options' => ['class' => 'col-md-6 form-group'],
 			'template' => '<div class="input-group"><span class="input-group-addon"><i class="fa fa-calendar"></i> Kiedy</span>{input}</div>',
 		])
-		->widget(DateTimeWidget::className(),
+		->widget(DateTimeWidget::class,
 			[
-				'phpDatetimeFormat' => 'dd-MM-yyyy HH:mm',
 				'clientOptions' => [
 
 					'allowInputToggle' => true,

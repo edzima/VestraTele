@@ -21,7 +21,7 @@ class IssueController extends Controller {
 	public function behaviors() {
 		return [
 			'access' => [
-				'class' => AccessControl::className(),
+				'class' => AccessControl::class,
 				'rules' => [
 					[
 						'allow' => true,
@@ -40,17 +40,17 @@ class IssueController extends Controller {
 	public function actionIndex() {
 		$searchModel = new IssueSearch();
 		$user = Yii::$app->user;
-
+		$searchModel->user_id = $user->getId();
 		if ($user->can(User::ROLE_LAYER)) {
-			$searchModel->lawyer_id = $user->id;
+			$searchModel->isLawyer = true;
 		}
 		if ($user->can(User::ROLE_AGENT)) {
 			$searchModel->agents = $user->getIdentity()->getAllChildsIds();
 			$searchModel->agents[] = $user->id;
-			$searchModel->agent_id = $user->id;
+			$searchModel->isAgent = true;
 		}
 		if ($user->can(User::ROLE_TELEMARKETER)) {
-			$searchModel->tele_id = $user->id;
+			$searchModel->isTele = true;
 		}
 
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -82,26 +82,31 @@ class IssueController extends Controller {
 	 */
 	public static function findModel($id): Issue {
 		$model = Issue::find()
-			->where(['id' => $id]);
-		$user = Yii::$app->user;
+			->andWhere(['id' => $id])
+			->one();
 
-		if ($user->can(User::ROLE_AGENT)) {
-			$agents = $user->getIdentity()->getAllChildsIds();
-			$agents[] = $user->id;
-			$model->onlyForAgents($agents);
-		}
-		if ($user->can(User::ROLE_LAYER)) {
-			$model->onlyForLawyer($user->id);
-		}
-		if ($user->can(User::ROLE_TELEMARKETER)) {
-			$model->onlyForTele($user->id);
-		}
-
-		$model = $model->one();
-		if ($model !== null) {
+		if ($model !== null && static::shouldFind($model)) {
 			return $model;
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');
+	}
+
+	private static function shouldFind(Issue $model): bool {
+		$user = Yii::$app->user;
+		if ($user->can(User::ROLE_TELEMARKETER) && $model->tele_id === $user->id) {
+			return true;
+		}
+		if ($user->can(User::ROLE_LAYER) && $model->lawyer_id === $user->id) {
+			return true;
+		}
+		if ($user->can(User::ROLE_AGENT)) {
+			$agents = $user->getIdentity()->getAllChildsIds();
+			$agents[] = $user->id;
+			if (in_array($model->agent_id, $agents)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

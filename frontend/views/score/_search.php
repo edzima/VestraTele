@@ -1,8 +1,8 @@
 <?php
 
+use common\widgets\DateTimeWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use trntv\yii\datetime\DateTimeWidget;
 /* @var $this yii\web\View */
 /* @var $model common\models\ScoreSearch */
 /* @var $form yii\widgets\ActiveForm */
@@ -19,7 +19,7 @@ use trntv\yii\datetime\DateTimeWidget;
     ]); ?>
 
 	<?= $form->field($model, 'start_at',['options'=>['class'=>'form-group col-md-6']])->widget(
-        DateTimeWidget::className(),
+        DateTimeWidget::class,
         [
             'phpDatetimeFormat' => 'yyyy-MM-dd',
 			'clientOptions' => [
@@ -36,7 +36,7 @@ use trntv\yii\datetime\DateTimeWidget;
 	
 	
 	<?= $form->field($model, 'finish_at',['options'=>['class'=>'form-group col-md-6']])->widget(
-        DateTimeWidget::className(),
+		DateTimeWidget::class,
         [
             'phpDatetimeFormat' => 'yyyy-MM-dd',
 			'clientOptions' => [

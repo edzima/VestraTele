@@ -2,6 +2,8 @@
 
 namespace backend\assets;
 
+use common\assets\OpenSans;
+use dmstr\web\AdminLteAsset;
 use yii\web\AssetBundle;
 
 /**
@@ -15,14 +17,13 @@ class AppAsset extends AssetBundle {
 		'static/css/style.css',
 	];
 	public $js = [
-		'static/js/yii_overrides.js',
 		'static/js/toggle.js',
 	];
 	public $depends = [
 		'yii\web\YiiAsset',
 		'yii\bootstrap\BootstrapAsset',
-		'common\assets\AdminLte',
+		AdminLteAsset::class,
 		'common\assets\Html5shiv',
-		'common\assets\SweetAlert',
+		OpenSans::class,
 	];
 }

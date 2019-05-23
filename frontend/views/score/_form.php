@@ -1,7 +1,8 @@
 <?php
+
+use common\widgets\DateTimeWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use trntv\yii\datetime\DateTimeWidget;
 /* @var $this yii\web\View */
 /* @var $model common\models\Score */
 /* @var $form yii\widgets\ActiveForm */
@@ -20,7 +21,7 @@ use trntv\yii\datetime\DateTimeWidget;
 	<?= $form->field($model, 'name')->textInput() ?>
 
     <?= $form->field($model, 'date')->widget(
-        DateTimeWidget::className(),
+		DateTimeWidget::class,
         [   'phpDatetimeFormat' => 'yyyy-MM-dd',
             'clientOptions' => [
 		

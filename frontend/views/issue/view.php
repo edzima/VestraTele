@@ -21,6 +21,9 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= IssueNotesWidget::widget([
 		'model' => $model,
 		'addBtn' => Yii::$app->user->can(User::ROLE_TELEMARKETER) || Yii::$app->user->can(User::ROLE_LAYER),
+		'noteOptions' => [
+			'removeBtn' => false,
+		],
 	]) ?>
 
 

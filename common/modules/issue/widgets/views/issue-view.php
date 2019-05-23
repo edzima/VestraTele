@@ -125,10 +125,12 @@ use yii\widgets\DetailView;
 						[
 							'attribute' => 'clientSubprovince',
 							'label' => 'Gmina',
+							'visible' => $model->hasClientSubprovince(),
 						],
 						[
 							'attribute' => 'clientCity',
 							'label' => 'Miasto',
+							'visible' => $model->victim_city_id !== null,
 							'value' => Yii::$app->formatter->asCityCode($model->clientCity, $model->client_city_code),
 						],
 						'client_street',
@@ -162,11 +164,14 @@ use yii\widgets\DetailView;
 						[
 							'attribute' => 'victimSubprovince',
 							'label' => 'Gmina',
+							'visible' => $model->hasVictimSubprovince(),
+
 						],
 						[
 							'attribute' => 'victimCity',
 							'label' => 'Miasto',
-							'value' => Yii::$app->formatter->asCityCode($model->clientCity, $model->client_city_code),
+							'value' => Yii::$app->formatter->asCityCode($model->victimCity, $model->victim_city_code),
+							'visible' => $model->victim_city_id !== null,
 						],
 						'victim_street',
 					],

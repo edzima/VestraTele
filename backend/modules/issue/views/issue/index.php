@@ -2,15 +2,12 @@
 
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch;
-use common\models\issue\IssueStage;
-use common\models\issue\IssueType;
 use common\models\User;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
 use kartik\grid\SerialColumn;
 use yii\data\ActiveDataProvider;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\Pjax;
@@ -23,20 +20,38 @@ $this->title = 'Sprawy';
 $this->params['breadcrumbs'][] = $this->title;
 
 $js = <<<JS
-	$(document).on('keyup .dynamic-search', function() {
-	  	setTimeout(function(){
-			$("#issues-list").yiiGridView("applyFilter");
-	
-	},500);
+	var timeout;
+	var filteredId = '';
+	$(document).on('keyup', function(evt) {
+		if(evt.target.classList.contains('dynamic-search')){
+			clearTimeout(timeout);
+			timeout = setTimeout(function(){
+				filteredId = evt.target.getAttribute('id');
+				evt.target.classList.add('filtered');
+				$("#issues-list").yiiGridView("applyFilter");
+			},500);
+		}
+
 	});
+
+	$(document).on('pjax:success', function() {
+		if(filteredId.length){
+			var input = document.getElementById(filteredId);
+			input.focus();
+			var val = input.value;
+			input.value = ''; 
+			input.value = val; 
+			filteredId = '';
+		}
+	}); 
 JS;
 $this->registerJs($js);
 
 ?>
 <div class="issue-index">
-
-	<h1><?= Html::encode($this->title) ?></h1>
 	<?php Pjax::begin(); ?>
+	<h1><?= Html::encode($this->title) ?></h1>
+
 	<?= $this->render('_search', ['model' => $searchModel]); ?>
 
 	<p>
@@ -47,11 +62,10 @@ $this->registerJs($js);
 		'id' => 'issues-list',
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'responsive' => false,
+		'resizableColumns' => false,
 		'tableOptions' => [
 			'class' => 'table-fixed-layout',
 		],
-		//'pjax' => true,
 		'columns' => [
 			[
 				'class' => SerialColumn::class,
@@ -75,13 +89,21 @@ $this->registerJs($js);
 					},
 				],
 				'noWrap' => true,
+				'options' => [
+					'style' => 'width:110px',
+				],
 
 			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'id',
 				'value' => 'longId',
-				'noWrap' => true,
+				'filterInputOptions' => [
+					'class' => 'dynamic-search',
+				],
+				'options' => [
+					'style' => 'width:100px',
+				],
 			],
 			[
 				'class' => DataColumn::class,
@@ -97,27 +119,33 @@ $this->registerJs($js);
 						'placeholder' => 'Agent',
 					],
 				],
-
+				'contentOptions' => [
+					'class' => 'ellipsis',
+				],
 			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'type_id',
-				'filter' => ArrayHelper::map(IssueType::find()->all(), 'id', 'nameWithShort'),
+				'filter' => IssueSearch::getTypesNames(),
 				'value' => 'type.short_name',
-				'width' => '50px',
 				'contentOptions' => [
 					'class' => 'bold-text text-center',
+				],
+				'options' => [
+					'style' => 'width:80px',
 				],
 
 			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'stage_id',
-				'filter' => ArrayHelper::map(IssueStage::find()->all(), 'id', 'nameWithShort'),
+				'filter' => IssueSearch::getStagesNames(),
 				'value' => 'stage.short_name',
-				'width' => '50px',
 				'contentOptions' => [
 					'class' => 'bold-text text-center',
+				],
+				'options' => [
+					'style' => 'width:60px',
 				],
 			],
 			[
@@ -128,6 +156,9 @@ $this->registerJs($js);
 				'filterInputOptions' => [
 					'class' => 'dynamic-search',
 				],
+				'contentOptions' => [
+					'class' => 'ellipsis',
+				],
 			],
 			[
 				'class' => DataColumn::class,
@@ -137,6 +168,9 @@ $this->registerJs($js);
 				'filterInputOptions' => [
 					'class' => 'dynamic-search',
 				],
+				'contentOptions' => [
+					'class' => 'ellipsis',
+				],
 			],
 			[
 				'class' => DataColumn::class,
@@ -145,7 +179,9 @@ $this->registerJs($js);
 				'contentOptions' => [
 					'class' => 'bold-text',
 				],
-				'noWrap' => true,
+				'options' => [
+					'style' => 'width:90px',
+				],
 			],
 			[
 				'class' => DataColumn::class,
@@ -154,7 +190,9 @@ $this->registerJs($js);
 				'contentOptions' => [
 					'class' => 'bold-text',
 				],
-				'noWrap' => true,
+				'options' => [
+					'style' => 'width:90px',
+				],
 			],
 
 			[

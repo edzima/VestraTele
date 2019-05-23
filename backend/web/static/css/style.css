@@ -1,3 +1,8 @@
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
 body .table {
 	word-break: break-all;
 }
@@ -37,16 +42,29 @@ div.required label:after {
 	overflow: hidden;
 }
 
-.table-fixed-layout {
-	table-layout: fixed;
+@media (min-width: 776px) {
+	.table-fixed-layout {
+		table-layout: fixed;
+	}
 }
 
-.table-fixed-layout th:not(.kv-nowrap), .table-fixed-layout td:not(.kv-nowrap) {
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	overflow: hidden;
+
+.table-fixed-layout td input {
+	width: 100%;
 }
 
 .bold-text {
 	font-weight: bold;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+	margin-top: 0;
+}
+
+.select2-container--krajee .select2-selection__clear {
+	top: 0.2rem;
+}
+
+.kv-grid-loading {
+	width: 100%;
 }

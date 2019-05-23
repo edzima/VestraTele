@@ -6,11 +6,10 @@ use Dotenv\Dotenv;
  * Require shortcuts
  */
 require_once(__DIR__ . '/shortcuts.php');
-
 /**
  * Load application environment from .env file
  */
-$dotenv = new Dotenv(dirname(__DIR__));
+$dotenv = Dotenv::create(dirname(__DIR__) . '/');
 $dotenv->load();
 
 /**
@@ -19,5 +18,5 @@ $dotenv->load();
 defined('YII_DEBUG') or define('YII_DEBUG', getenv('YII_DEBUG') === 'true');
 defined('YII_ENV') or define('YII_ENV', getenv('YII_ENV') ?: 'prod');
 
-defined('YII_DEBUG') or define('YII_DEBUG', true); 
+defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_ENV') or define('YII_ENV', 'dev');

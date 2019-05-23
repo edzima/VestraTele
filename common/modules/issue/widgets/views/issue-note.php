@@ -6,11 +6,14 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model IssueNote */
+/* @var $removeBtn bool */
 ?>
 
 <div class="panel panel-primary panel-note">
 	<div class="panel-heading">
-		<h3 class="panel-title"><?= $model->title ?></h3>
+		<h3 class="panel-title"><?= $model->title ?>
+			<span class="pull-right"><?= $model->user ?></span>
+		</h3>
 	</div>
 	<div class="panel-body">
 		<?= $model->description ?>
@@ -19,16 +22,15 @@ use yii\helpers\Html;
 		<span class="date pull-left"><?= $model->updated_at ?></span>
 		<?php if ($model->user_id === Yii::$app->user->id || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)): ?>
 			<span class="action pull-right">
-
 				<?= Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['note/update', 'id' => $model->id]) ?>
-				<?= Html::a('<i class="glyphicon glyphicon-trash"></i>', ['note/delete', 'id' => $model->id], [
+				<?= $removeBtn ? Html::a('<i class="glyphicon glyphicon-trash"></i>', ['note/delete', 'id' => $model->id], [
 					'data' => [
 						'confirm' => 'Czy napewno chcesz usunąć?',
 						'method' => 'post',
+						'params' => ['id' => $model->id],
 					],
-				]) ?>
+				]) : '' ?>
 					</span>
-
 		<?php endif; ?>
 		<div class="clearfix"></div>
 	</div>

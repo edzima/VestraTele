@@ -1,11 +1,9 @@
 <?php
-
 use yii\helpers\ArrayHelper;
 use yii\web\Application;
 
 // Composer
 require(__DIR__ . '/../../vendor/autoload.php');
-
 // Environment
 require(__DIR__ . '/../../common/env.php');
 
@@ -22,11 +20,14 @@ $config = ArrayHelper::merge(
 );
 
 if (YII_ENV_DEV) {
+
     // показываем ошибки
     error_reporting(1);
 } else {
     // не показываем ошибки
-    error_reporting(1);
+    error_reporting(0);
 }
+
+
 
 (new Application($config))->run();

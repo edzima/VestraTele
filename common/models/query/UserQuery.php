@@ -19,6 +19,7 @@ class UserQuery extends ActiveQuery {
 			$ids = array_merge($ids, Yii::$app->authManager->getUserIdsByRole($role));
 		}
 		$this->andWhere(['id' => $ids]);
+		$this->cache(60);
 		return $this;
 	}
 

@@ -2,11 +2,11 @@
 
 use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
-use common\models\User;
 use frontend\models\IssueSearch;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
 use yii\grid\ActionColumn;
+use yii\grid\SerialColumn;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'class' => 'ellipsis',
 		],
 		'columns' => [
-			['class' => 'yii\grid\SerialColumn'],
+			['class' => SerialColumn::class],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'longId',
@@ -60,7 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filterType' => GridView::FILTER_SELECT2,
 				'attribute' => 'agent_id',
 				'value' => 'agent',
-				'filter' => ArrayHelper::map(User::find()->with('userProfile')->where(['id' => $searchModel->agents])->all(), 'id', 'fullName'),
+				'filter' => $searchModel->getAgentsList(),
 				'filterWidgetOptions' => [
 					'pluginOptions' => [
 						'allowClear' => true,

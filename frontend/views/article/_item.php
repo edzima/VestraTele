@@ -2,14 +2,12 @@
 
 use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
-use common\assets\Highlight;
 
 /**
  * @var yii\web\View
  * @var common\models\Article
- */
+ */ 
 
-Highlight::register($this);
 ?>
 
 <hr/>

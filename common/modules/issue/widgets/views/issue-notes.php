@@ -7,7 +7,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model Issue */
 /* @var $addBtn bool */
-/* @var $notesOptions array */
+/* @var $noteOptions array */
 ?>
 
 
@@ -20,15 +20,14 @@ use yii\helpers\Html;
 				'class' => 'btn btn-xs btn-success',
 			]) ?>
 		<?php endif; ?>
-		<btn class="btn toggle pull-right" data-toggle="#notes-list">
-			<i class="glyphicon glyphicon-chevron-down"></i></btn>
+		<button class="btn toggle pull-right" data-toggle="#notes-list">
+			<i class="glyphicon glyphicon-chevron-down"></i></button>
 	</legend>
 	<div id="notes-list">
 		<?php foreach ($model->issueNotes as $note): ?>
 			<?php
-			$notesOptions['model'] = $note;
-			?>
-			<?= IssueNoteWidget::widget($notesOptions) ?>
+			$noteOptions['model'] = $note; ?>
+			<?= IssueNoteWidget::widget($noteOptions) ?>
 		<?php endforeach; ?>
 	</div>
 </fieldset>

@@ -11,7 +11,7 @@ class IssueNotesWidget extends IssueWidget {
 		return $this->render('issue-notes', [
 			'model' => $this->model,
 			'addBtn' => $this->addBtn,
-			'noteOptions' => $this->noteOptions
+			'noteOptions' => $this->noteOptions,
 		]);
 	}
 

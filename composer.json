@@ -16,13 +16,11 @@
 	],
 	"type": "project",
 	"license": "BSD-3-Clause",
-	"minimum-stability": "dev",
 	"require": {
 		"ext-intl": "*",
-		"php": ">=7.1",
+		"php": "^7.1.0",
 		"ext-mbstring": "*",
-		"ext-mcrypt": "*",
-		"yiisoft/yii2": "~2.0.11",
+		"yiisoft/yii2": "~2.0.17",
 		"yiisoft/yii2-bootstrap": "*",
 		"yiisoft/yii2-swiftmailer": "*",
 		"vlucas/phpdotenv": "*",
@@ -30,18 +28,12 @@
 		"samdark/sitemap": "*",
 		"vova07/yii2-imperavi-widget": "*",
 		"vova07/yii2-fileapi-widget": "*",
-		"creocoder/yii2-taggable": "*",
 		"2amigos/yii2-selectize-widget": "*",
 		"mihaildev/yii2-elfinder": "*",
 		"trntv/yii2-datetime-widget": "*",
 		"loveorigami/yii2-notification-wrapper": "*",
-		"bower-asset/admin-lte": "*",
 		"bower-asset/html5shiv": "*",
 		"bower-asset/timecircles": "*",
-		"bower-asset/font-awesome": "*",
-		"bower-asset/open-sans-fontface": "*",
-		"bower-asset/highlightjs": "*",
-		"bower-asset/jquery-slimscroll": "*",
 		"kartik-v/yii2-widget-depdrop": "@dev",
 		"kartik-v/yii2-widget-select2": "@dev",
 		"kartik-v/dependent-dropdown": "@dev",
@@ -52,7 +44,8 @@
 		"demogorgorn/yii2-ajax-submit-button": "*",
 		"yii2mod/yii2-comments": "*",
 		"kartik-v/yii2-widget-colorinput": "*",
-		"loveorigami/yii2-bootstrap-toggle": "*"
+		"loveorigami/yii2-bootstrap-toggle": "*",
+		"dmstr/yii2-adminlte-asset": "^2.1"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-master",
@@ -61,6 +54,12 @@
 		"yiisoft/yii2-debug": "^2.0",
 		"codeception/codeception": "^2.2"
 	},
+	"repositories": [
+		{
+			"type": "composer",
+			"url": "https://asset-packagist.org"
+		}
+	],
 	"scripts": {
 		"post-root-package-install": [
 			"php -r \"file_exists('.env') || copy('.env.dist', '.env');\""

@@ -2,7 +2,7 @@
 
 namespace common\models\issue;
 
-use yii\helpers\ArrayHelper;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "issue_stage".
@@ -15,27 +15,9 @@ use yii\helpers\ArrayHelper;
  * @property Issue[] $issues
  * @property issueType[] $types
  */
-class IssueStage extends \yii\db\ActiveRecord {
+class IssueStage extends ActiveRecord {
 
 	public const ARCHIVES_ID = 6;
-
-	public $typesIds = [];
-
-	public function afterFind() {
-		parent::afterFind();
-		$this->typesIds = ArrayHelper::map($this->types, 'id', 'id');
-	}
-
-	public function beforeSave($insert) {
-		if (!$insert) {
-			$this->unlinkAll('types', true);
-			foreach ($this->typesIds as $typeId) {
-				$this->link('types', IssueType::get($typeId));
-			}
-		}
-
-		return parent::beforeSave($insert);
-	}
 
 	/**
 	 * @inheritdoc
@@ -86,16 +68,16 @@ class IssueStage extends \yii\db\ActiveRecord {
 			->viaTable('{{%issue_stage_type}}', ['stage_id' => 'id']);
 	}
 
-	public function getTypesName(): string {
-		return implode(', ', $this->types);
-	}
-
 	public function getNameWithShort(): string {
 		return $this->name . ' (' . $this->short_name . ')';
 	}
 
 	public function __toString(): string {
 		return $this->name;
+	}
+
+	public function getTypesName(): string {
+		return implode(', ', $this->types);
 	}
 
 	/**

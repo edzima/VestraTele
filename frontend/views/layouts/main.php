@@ -68,10 +68,12 @@ AppAsset::register($this);
 					'label' => Yii::t('frontend', 'Task'),
 					'url' => ['/task-status'],
 				],
+				/*
 				[
 					'label' => Yii::t('frontend', 'Your calendar'),
 					'url' => ['/calendar/agent?id=' . Yii::$app->user->identity->id],
 				],
+				*/
 			];
 		}
 	}

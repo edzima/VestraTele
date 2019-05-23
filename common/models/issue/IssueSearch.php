@@ -5,6 +5,7 @@ namespace common\models\issue;
 use common\models\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 
 /**
  * IssueSearch represents the model behind the search form of `common\models\issue\Issue`.
@@ -18,19 +19,29 @@ class IssueSearch extends Issue {
 	public $createdAtFrom;
 	public $createdAtTo;
 	public $childsId;
-	public $archived = false;
 
 	/**
 	 * @inheritdoc
 	 */
 	public function rules() {
 		return [
-			[['id', 'agent_id', 'tele_id', 'lawyer_id', 'childsId', 'client_city_id', 'client_street', 'victim_city_id', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id'], 'integer'],
 			[
-				['payed', 'archived'], 'boolean',
+				[
+					'id', 'agent_id', 'tele_id', 'lawyer_id', 'childsId', 'client_city_id', 'client_street',
+					'victim_city_id', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id',
+				], 'integer',
+			],
+			[
+				['payed'], 'boolean',
 			],
 			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
-			[['created_at', 'updated_at', 'client_first_name', 'client_surname', 'client_phone_1', 'client_phone_2', 'client_city_code', 'victim_first_name', 'victim_surname', 'victim_city_code', 'victim_street', 'victim_phone', 'details'], 'safe'],
+			[
+				[
+					'created_at', 'updated_at', 'client_first_name', 'client_surname', 'client_phone_1',
+					'client_phone_2', 'client_city_code', 'victim_first_name', 'victim_surname', 'victim_city_code',
+					'victim_street', 'victim_phone', 'details',
+				], 'safe',
+			],
 			[['clientCity', 'clientState'], 'safe'],
 			[['clientCity', 'clientState'], 'default', 'value' => null],
 			['payStatus', 'integer'],
@@ -43,7 +54,6 @@ class IssueSearch extends Issue {
 			'createdAtFrom' => 'Dodano od',
 			'createdAtTo' => 'Dodano do',
 			'childsId' => 'Struktury',
-			'archived' => 'Z archiwum',
 		], parent::attributeLabels());
 	}
 
@@ -65,7 +75,7 @@ class IssueSearch extends Issue {
 	public function search($params) {
 		$query = Issue::find();
 
-		$query->with(['pays', 'agent.userProfile', 'type', 'stage']);
+		$query->with(['pays', 'agent.userProfile', 'type', 'stage.types']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -102,11 +112,10 @@ class IssueSearch extends Issue {
 				$query->andFilterWhere(['agent_id' => $ids]);
 			}
 		}
-		if ((int) $this->stage_id !== IssueStage::ARCHIVES_ID && !$this->archived) {
-			$query->andWhere(['!=', 'stage_id', IssueStage::ARCHIVES_ID]);
-		}
 
 		$this->payedFilter($query);
+		$this->teleFilter($query);
+		$this->lawyerFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -123,8 +132,6 @@ class IssueSearch extends Issue {
 			'type_id' => $this->type_id,
 			'entity_responsible_id' => $this->entity_responsible_id,
 			'payed' => $this->payed,
-			'tele_id' => $this->tele_id,
-			'lawyer_id' => $this->lawyer_id,
 		]);
 
 		$query->andFilterWhere(['like', 'client_first_name', $this->client_first_name])
@@ -144,6 +151,14 @@ class IssueSearch extends Issue {
 		return $dataProvider;
 	}
 
+	protected function teleFilter(IssueQuery $query): void {
+		$query->andFilterWhere(['tele_id' => $this->tele_id]);
+	}
+
+	protected function lawyerFilter(IssueQuery $query): void {
+		$query->andFilterWhere(['lawyer_id' => $this->lawyer_id]);
+	}
+
 	private function payedFilter(IssueQuery $query): void {
 
 		if ($this->payStatus !== null) {
@@ -159,5 +174,18 @@ class IssueSearch extends Issue {
 					break;
 			}
 		}
+	}
+
+	public static function getTypesNames(): array {
+		return ArrayHelper::map(IssueType::find()->all(), 'id', 'nameWithShort');
+	}
+
+	private static $stages;
+
+	public static function getStagesNames(): array {
+		if (static::$stages === null) {
+			static::$stages = ArrayHelper::map(IssueStage::find()->all(), 'id', 'nameWithShort');
+		}
+		return static::$stages;
 	}
 }

@@ -7,7 +7,7 @@ use backend\widgets\Menu;
 <aside class="main-sidebar">
 	<section class="sidebar">
 		<?= Menu::widget([
-			'options' => ['class' => 'sidebar-menu'],
+			'options' => ['class' => 'sidebar-menu', 'data-widget' => 'tree'],
 			'items' => [
 				[
 					'label' => Yii::t('backend', 'Main'),
@@ -93,6 +93,7 @@ use backend\widgets\Menu;
 					'url' => ['/score/index'],
 					'icon' => '<i class="fa fa-dot-circle-o"></i>',
 				],
+				/*
 				[
 					'label' => Yii::t('frontend', 'Calendar'),
 					'url' => ['/calendar/index'],
@@ -103,6 +104,7 @@ use backend\widgets\Menu;
 						['label' => 'Prawnicy', 'url' => ['/calendar/layer'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 					],
 				],
+				*/
 				[
 					'label' => Yii::t('backend', 'System'),
 					'options' => ['class' => 'header'],
@@ -114,6 +116,8 @@ use backend\widgets\Menu;
 					'options' => ['class' => 'treeview'],
 					'items' => [
 						['label' => Yii::t('backend', 'File manager'), 'url' => ['/file-manager/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+						['label' => Yii::t('backend', 'Cache manager'), 'url' => ['/cache/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+
 						[
 							'label' => Yii::t('backend', 'DB manager'),
 							'url' => ['/db-manager/default/index'],

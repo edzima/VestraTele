@@ -1,11 +1,15 @@
 <?php
 
+use common\models\AnswerTyp;
+use common\models\Task;
+use common\models\TaskStatus;
 use yii\helpers\Html;
 
 
 /* @var $this yii\web\View */
-/* @var $model common\models\TaskStatus */
-
+/* @var $model TaskStatus */
+/* @var $task Task */
+/* @var $answers AnswerTyp[] */
 $this->title = 'Raport sprawy '.$task->id;
 $this->params['breadcrumbs'][] = ['label' => 'Spotkania', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;

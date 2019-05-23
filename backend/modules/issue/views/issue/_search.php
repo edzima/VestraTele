@@ -2,8 +2,8 @@
 
 use common\models\issue\IssueSearch;
 use common\models\User;
+use common\widgets\DateTimeWidget;
 use kartik\select2\Select2;
-use trntv\yii\datetime\DateTimeWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -87,8 +87,6 @@ use yii\widgets\ActiveForm;
 				]
 			) ?>
 	</div>
-
-	<?= $form->field($model, 'archived')->checkbox() ?>
 
 
 	<div class="form-group">

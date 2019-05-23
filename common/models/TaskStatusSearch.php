@@ -5,82 +5,79 @@ namespace common\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Task;
 
 /**
  * TaskSearch represents the model behind the search form of `common\models\Task`.
  */
-class TaskStatusSearch extends Task
-{
-    /**
-     * @inheritdoc
-     */
-	 public $miasto;
-	 public $tele;
-	 public $taskstatus;
-	 public $finish;
-	 public $answer;
-	 public $accident;
-	 public $wojewodztwo;
-	 public $powiatRel;
-	 public $gminaRel;
-	 public $agent;
+class TaskStatusSearch extends Task {
 
-    public function rules()
-    {
-        return [
-            [['id', 'created_at', 'updated_at', 'meeting', 'finish', 'taskstatus','automat','agent',], 'integer'],
-            [['victim_name', 'phone', 'qualified_name', 'details', 'miasto','tele', 'answer', 'accident','date','wojewodztwo', 'powiatRel', 'gminaRel'], 'safe'],
+	/**
+	 * @inheritdoc
+	 */
+	public $miasto;
+	public $tele;
+	public $taskstatus;
+	public $finish;
+	public $answer;
+	public $accident;
+	public $wojewodztwo;
+	public $powiatRel;
+	public $gminaRel;
+	public $agent;
 
-        ];
-    }
+	public function rules() {
+		return [
+			[['id', 'created_at', 'updated_at', 'meeting', 'finish', 'taskstatus', 'automat', 'agent',], 'integer'],
+			[['victim_name', 'phone', 'qualified_name', 'details', 'miasto', 'tele', 'answer', 'accident', 'date', 'wojewodztwo', 'powiatRel', 'gminaRel'], 'safe'],
 
-    /**
-     * @inheritdoc
-     */
-    public function scenarios()
-    {
-        // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
-    }
+		];
+	}
 
-    /**
-     * Creates data provider instance with search query applied
-     *
-     * @param array $params
-     *
-     * @return ActiveDataProvider
-     */
-    public function search($params)
-    {
-		$typWork= Yii::$app->user->identity->typ_work;
-        $query = Task::find();
+	/**
+	 * @inheritdoc
+	 */
+	public function scenarios() {
+		// bypass scenarios() implementation in the parent class
+		return Model::scenarios();
+	}
 
+	/**
+	 * Creates data provider instance with search query applied
+	 *
+	 * @param array $params
+	 *
+	 * @return ActiveDataProvider
+	 */
+	public function search($params) {
+		$query = Task::find();
 
 		//typ_work => A => admin || manager, all records
-		if($typWork=='A') $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel']);
-		else {
-			if(Yii::$app->user->identity->isAgent())$query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel'])->where(['agent_id'=>Yii::$app->user->identity->id]);
-			else $query->joinWith(['miasto','tele','taskstatus','taskstatus.answer','accident','wojewodztwo','powiatRel', 'gminaRel'])->where(['tele_id'=>Yii::$app->user->identity->id]);
+		if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
+			$query->joinWith(['miasto', 'tele', 'taskstatus', 'taskstatus.answer', 'accident', 'wojewodztwo', 'powiatRel', 'gminaRel']);
+		} else {
+			if (Yii::$app->user->can(User::ROLE_AGENT)) {
+				$query->joinWith(['miasto', 'tele', 'taskstatus', 'taskstatus.answer', 'accident', 'wojewodztwo', 'powiatRel', 'gminaRel'])->where(['agent_id' => Yii::$app->user->id]);
+			} else {
+				$query->joinWith(['miasto', 'tele', 'taskstatus', 'taskstatus.answer', 'accident', 'wojewodztwo', 'powiatRel', 'gminaRel'])->where(['tele_id' => Yii::$app->user->id]);
+			}
 		}
 
-
-			//selected rows
-		if($keys = @Yii::$app->request->queryParams['key'])$query->where('task.id IN('.$keys.')');
+		//selected rows
+		if ($keys = @Yii::$app->request->queryParams['key']) {
+			$query->where('task.id IN(' . $keys . ')');
+		}
 
 		//$query->joinWith(['miasto','tele','taskstatus','taskstatus.answer']);
 		//$query->where(['task.agent_id' => Yii::$app->user->identity->id]);
-        // add conditions that should always apply here
+		// add conditions that should always apply here
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+		$dataProvider = new ActiveDataProvider([
+			'query' => $query,
 
-        ]);
+		]);
 
+		$this->load($params);
 
-        $this->load($params);
-
-         
 		// Important: here is how we set up the sorting
 		// The key is the attribute name on our "TourSearch" instance
 		$dataProvider->sort->attributes['miasto'] = [
@@ -104,70 +101,69 @@ class TaskStatusSearch extends Task
 			'desc' => ['accident_typ.name' => SORT_DESC],
 		];
 
-        $dataProvider->sort->attributes['powiatRel'] = [
-            // The tables are the ones our relation are configured to
-            // in my case they are prefixed with "tbl_"
-            'asc' => ['powiaty.name' => SORT_ASC],
-            'desc' => ['powiaty.name' => SORT_DESC],
-        ];
+		$dataProvider->sort->attributes['powiatRel'] = [
+			// The tables are the ones our relation are configured to
+			// in my case they are prefixed with "tbl_"
+			'asc' => ['powiaty.name' => SORT_ASC],
+			'desc' => ['powiaty.name' => SORT_DESC],
+		];
 
-        $dataProvider->sort->attributes['wojewodztwo'] = [
-            // The tables are the ones our relation are configured to
-            // in my case they are prefixed with "tbl_"
-            'asc' => ['wojewodztwa.name' => SORT_ASC],
-            'desc' => ['wojewodztwa.name' => SORT_DESC],
-        ];
+		$dataProvider->sort->attributes['wojewodztwo'] = [
+			// The tables are the ones our relation are configured to
+			// in my case they are prefixed with "tbl_"
+			'asc' => ['wojewodztwa.name' => SORT_ASC],
+			'desc' => ['wojewodztwa.name' => SORT_DESC],
+		];
 
-        $dataProvider->sort->attributes['gminaRel'] = [
-            // The tables are the ones our relation are configured to
-            // in my case they are prefixed with "tbl_"
-            'asc' => ['terc.name' => SORT_ASC],
-            'desc' => ['terc.name' => SORT_DESC],
-        ];
+		$dataProvider->sort->attributes['gminaRel'] = [
+			// The tables are the ones our relation are configured to
+			// in my case they are prefixed with "tbl_"
+			'asc' => ['terc.name' => SORT_ASC],
+			'desc' => ['terc.name' => SORT_DESC],
+		];
 
+		if (!$this->validate()) {
+			// uncomment the following line if you do not want to return any records when validation fails
+			// $query->where('0=1');
 
-        if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-
-            return $dataProvider;
-        }
-
-		//is raport task-status
-		if(strlen($this->taskstatus)==1){
-			if($this->taskstatus) $query->andFilterWhere(['>', 'task_status.answer_id',0]);
-			else $query->andWhere(['task_id' => null]);
+			return $dataProvider;
 		}
 
-        // grid filtering conditions
-        $query->andFilterWhere([
-            'task.id' => $this->id,
+		//is raport task-status
+		if (strlen($this->taskstatus) == 1) {
+			if ($this->taskstatus) {
+				$query->andFilterWhere(['>', 'task_status.answer_id', 0]);
+			} else {
+				$query->andWhere(['task_id' => null]);
+			}
+		}
+
+		// grid filtering conditions
+		$query->andFilterWhere([
+			'task.id' => $this->id,
 			'finished' => $this->finish,
-            'tele_id' => $this->tele,
+			'tele_id' => $this->tele,
 			'agent_id' => $this->agent,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'accident_id' => $this->accident_id,
-            'wojewodztwa.id' => $this->wojewodztwo,
-            'meeting' => $this->meeting,
-			'answer_typ.id'=> $this->answer,
-			'accident_typ.id'=> $this->accident,
-			'automat'=>$this->automat
+			'created_at' => $this->created_at,
+			'updated_at' => $this->updated_at,
+			'accident_id' => $this->accident_id,
+			'wojewodztwa.id' => $this->wojewodztwo,
+			'meeting' => $this->meeting,
+			'answer_typ.id' => $this->answer,
+			'accident_typ.id' => $this->accident,
+			'automat' => $this->automat,
 
-        ]);
+		]);
 
-
-        $query->andFilterWhere(['like', 'victim_name', $this->victim_name])
-            ->andFilterWhere(['like', 'phone', $this->phone])
-            ->andFilterWhere(['like', 'qualified_name', $this->qualified_name])
-            ->andFilterWhere(['like', 'details', $this->details])
+		$query->andFilterWhere(['like', 'victim_name', $this->victim_name])
+			->andFilterWhere(['like', 'phone', $this->phone])
+			->andFilterWhere(['like', 'qualified_name', $this->qualified_name])
+			->andFilterWhere(['like', 'details', $this->details])
 			->andFilterWhere(['like', 'miasta.name', $this->miasto])
 			->andFilterWhere(['like', 'powiaty.name', $this->powiatRel])
 			->andFilterWhere(['like', 'terc.name', $this->gminaRel])
 			->andFilterWhere(['like', 'date', $this->date]);
 
-
-
-        return $dataProvider;
-    }
+		return $dataProvider;
+	}
 }
