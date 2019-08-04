@@ -24,6 +24,8 @@ class AddressWidget extends Widget {
 	public $province;
 	public $provinceAdd = '/address/powiat/create';
 	public $subProvince;
+	public $subProvinceAdd = '/address/sub-province/create';
+
 	public $city;
 	public $cityAdd = '/address/city/create';
 	public $street;
@@ -57,6 +59,7 @@ class AddressWidget extends Widget {
 			'province' => $this->province,
 			'provinceAdd' => $this->provinceAdd,
 			'subProvince' => $this->subProvince,
+			'subProvinceAdd' => $this->subProvinceAdd,
 			'city' => $this->city,
 			'cityAdd' => $this->cityAdd,
 			'street' => $this->street,

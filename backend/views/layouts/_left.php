@@ -37,6 +37,7 @@ use backend\widgets\Menu;
 					'items' => [
 						['label' => 'Regiony', 'url' => ['/address/state/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 						['label' => 'Powiaty', 'url' => ['/address/powiat/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+						['label' => 'Gminy', 'url' => ['/address/sub-province/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 						['label' => 'Miejscowości', 'url' => ['/address/city/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 					],
 				],

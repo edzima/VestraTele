@@ -20,30 +20,50 @@ $this->title = 'Sprawy';
 $this->params['breadcrumbs'][] = $this->title;
 
 $js = <<<JS
+//@todo move to external class and use in frontend.
+function moveCursorToEnd(el) {
+	if (typeof el.selectionStart == "number") {
+		el.selectionStart = el.selectionEnd = el.value.length;
+	} else if (typeof el.createTextRange != "undefined") {
+		el.focus();
+		var range = el.createTextRange();
+		range.collapse(false);
+		range.select();
+	}
+}
 	var timeout;
 	var filteredId = '';
-	$(document).on('keyup', function(evt) {
-		if(evt.target.classList.contains('dynamic-search')){
-			clearTimeout(timeout);
+	var submit_form = true;
+	var filter_selector = '.dynamic-search';
+
+	
+	$("body").on('beforeFilter', "#issues-list" , function(event) {
+    return submit_form;
+});
+
+$("body").on('afterFilter', "#issues-list" , function(event) {
+    submit_form = false;
+});
+	
+	$(document)
+.off('keydown.yiiGridView change.yiiGridView', filter_selector)
+.on('keyup', filter_selector, function(evt) {
+   clearTimeout(timeout);
 			timeout = setTimeout(function(){
+				submit_form = true;
 				filteredId = evt.target.getAttribute('id');
-				evt.target.classList.add('filtered');
 				$("#issues-list").yiiGridView("applyFilter");
 			},500);
-		}
+})
+.on('pjax:success', function() {
+	submit_form = true;
+	var i = document.getElementById(filteredId);
+	if(i){
+		i.focus();
+		moveCursorToEnd(i);
+	}
+});
 
-	});
-
-	$(document).on('pjax:success', function() {
-		if(filteredId.length){
-			var input = document.getElementById(filteredId);
-			input.focus();
-			var val = input.value;
-			input.value = ''; 
-			input.value = val; 
-			filteredId = '';
-		}
-	}); 
 JS;
 $this->registerJs($js);
 

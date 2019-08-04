@@ -10,7 +10,7 @@ $config = [
 	'homeUrl' => Yii::getAlias('@backendUrl'),
 	'basePath' => dirname(__DIR__),
 	'controllerNamespace' => 'backend\controllers',
-	'defaultRoute' => 'site/settings',
+	'defaultRoute' => 'issue/issue/index',
 	'controllerMap' => [
 		'file-manager-elfinder' => [
 			'class' => 'mihaildev\elfinder\Controller',
@@ -54,8 +54,8 @@ $config = [
 		'errorHandler' => [
 			'errorAction' => 'site/error',
 		],
-		'urlManager' => require(__DIR__ . '/_urlManager.php'),
-		'frontendCache' => require(Yii::getAlias('@frontend/config/_cache.php')),
+		'urlManager' => require __DIR__ . '/_urlManager.php',
+		'frontendCache' => require Yii::getAlias('@frontend/config/_cache.php'),
 	],
 	'modules' => [
 		'db-manager' => [
@@ -99,6 +99,9 @@ $config = [
 		],
 		'address' => [
 			'class' => 'backend\modules\address\Module',
+		],
+		'provision' => [
+			'class' => 'backend\modules\provision\Module',
 		],
 	],
 	'as globalAccess' => [
@@ -161,7 +164,7 @@ if (YII_ENV_DEV) {
 	$config['bootstrap'][] = 'gii';
 	$config['modules']['gii'] = [
 		'class' => 'yii\gii\Module',
-	//	'allowedIPs' => ['127.0.0.1', '::1', '192.168.*.*'],
+		'allowedIPs' => ['127.0.0.1', '::1', '192.168.*.*', '*'],
 		'as access' => [
 			'class' => 'common\behaviors\GlobalAccessBehavior',
 			'rules' => [

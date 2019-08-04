@@ -1,19 +1,15 @@
 <?php
 
-namespace backend\modules\issue\controllers;
+namespace backend\modules\address\controllers;
 
-use common\models\User;
+use common\models\Gmina;
+use common\models\SubstateSearch;
 use Yii;
-use common\models\issue\Issue;
-use common\models\issue\IssueSearch;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
-/**
- * IssueController implements the CRUD actions for Issue model.
- */
-class IssueController extends Controller {
+class SubProvinceController extends Controller {
 
 	/**
 	 * @inheritdoc
@@ -30,16 +26,14 @@ class IssueController extends Controller {
 	}
 
 	/**
-	 * Lists all Issue models.
+	 * Lists all SubProvince models.
 	 *
 	 * @return mixed
 	 */
 	public function actionIndex() {
-		$searchModel = new IssueSearch();
+		$searchModel = new SubstateSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-		if(Yii::$app->user->can(User::ROLE_BOOKKEEPER)){
-			$dataProvider->query->with('pays');
-		}
+
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
@@ -47,28 +41,15 @@ class IssueController extends Controller {
 	}
 
 	/**
-	 * Displays a single Issue model.
-	 *
-	 * @param integer $id
-	 * @return mixed
-	 */
-	public function actionView($id) {
-		return $this->render('view', [
-			'model' => $this->findModel($id),
-		]);
-	}
-
-	/**
-	 * Creates a new Issue model.
+	 * Creates a new SubProvince model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 *
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new Issue();
-		$data = Yii::$app->request->post();
+		$model = new Gmina();
 
-		if ($model->load($data) && $model->save()) {
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
 		}
 		return $this->render('create', [
@@ -77,7 +58,7 @@ class IssueController extends Controller {
 	}
 
 	/**
-	 * Updates an existing Issue model.
+	 * Updates an existing SubProvince model.
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 *
 	 * @param integer $id
@@ -85,9 +66,9 @@ class IssueController extends Controller {
 	 */
 	public function actionUpdate($id) {
 		$model = $this->findModel($id);
-		$data = Yii::$app->request->post();
-		if ($model->load($data) && $model->save()) {
-			return $this->redirect(['index']);
+
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->id]);
 		}
 		return $this->render('update', [
 			'model' => $model,
@@ -95,7 +76,7 @@ class IssueController extends Controller {
 	}
 
 	/**
-	 * Deletes an existing Issue model.
+	 * Deletes an existing SubProvince model.
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
 	 *
 	 * @param integer $id
@@ -108,17 +89,23 @@ class IssueController extends Controller {
 	}
 
 	/**
-	 * Finds the Issue model based on its primary key value.
-	 * If the model is not found, a 404 HTTP exception will be thrown.
+	 * Displays a single SubProvince model.
 	 *
 	 * @param integer $id
-	 * @return Issue the loaded model
-	 * @throws NotFoundHttpException if the model cannot be found
+	 * @return mixed
 	 */
-	protected function findModel($id): Issue {
-		if (($model = Issue::findOne($id)) !== null) {
+	public function actionView($id) {
+		return $this->render('view', [
+			'model' => $this->findModel($id),
+		]);
+	}
+
+	private function findModel(int $id): Gmina {
+		$model = Gmina::findOne($id);
+		if ($model !== null) {
 			return $model;
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}
+
 }

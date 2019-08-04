@@ -2,6 +2,8 @@
 
 namespace common\models;
 
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "terc".
@@ -11,8 +13,11 @@ namespace common\models;
  * @property integer $POW
  * @property integer $GMI
  * @property string $name
+ *
+ * @property Wojewodztwa $region
+ * @property Powiat $state
  */
-class Gmina extends \yii\db\ActiveRecord {
+class Gmina extends ActiveRecord {
 
 	/**
 	 * @inheritdoc
@@ -30,9 +35,21 @@ class Gmina extends \yii\db\ActiveRecord {
 	 */
 	public function rules() {
 		return [
+			[['name', 'WOJ', 'POW'], 'required'],
 			[['WOJ', 'POW', 'GMI'], 'integer'],
 			[['name'], 'string', 'max' => 36],
-			[['WOJ'], 'exist', 'skipOnError' => true, 'targetClass' => Wojewodztwa::className(), 'targetAttribute' => ['WOJ' => 'id']],
+			[['WOJ'], 'exist', 'skipOnError' => true, 'targetClass' => Wojewodztwa::class, 'targetAttribute' => ['WOJ' => 'id']],
+			[['POW'], 'exist', 'skipOnError' => true, 'targetClass' => Powiat::class, 'targetAttribute' => ['WOJ' => 'wojewodztwo_id', 'POW' => 'id']],
+			[
+				'name', 'unique',
+				'filter' => function (ActiveQuery $query) {
+					if (!$this->isNewRecord) {
+						$query->andWhere(['not', ['id' => $this->id]]);
+					}
+				},
+				'targetAttribute' => ['WOJ', 'POW', 'name'],
+				'message' => 'Gmina: {value} już istnieje'
+			],
 		];
 	}
 
@@ -46,6 +63,14 @@ class Gmina extends \yii\db\ActiveRecord {
 			'GMI' => 'Gmi',
 			'name' => 'Nazwa',
 		];
+	}
+
+	public function getRegion() {
+		return $this->hasOne(Wojewodztwa::class, ['id' => 'WOJ']);
+	}
+
+	public function getState() {
+		return $this->hasOne(Powiat::class, ['id' => 'POW', 'wojewodztwo_id' => 'WOJ']);
 	}
 
 	public static function getGminaList(int $wojID, int $powID, int $selected = null): array {

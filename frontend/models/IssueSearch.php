@@ -11,6 +11,7 @@ namespace frontend\models;
 use common\models\issue\Issue;
 use common\models\User;
 use yii\data\ActiveDataProvider;
+use yii\db\Query;
 
 class IssueSearch extends Issue {
 
@@ -73,15 +74,16 @@ class IssueSearch extends Issue {
 			if ($this->isTele) {
 				$query->andFilterWhere(['tele_id' => $this->user_id]);
 			}
+
 			if ($this->isLawyer) {
 				$query->andFilterWhere(['lawyer_id' => $this->user_id]);
 			}
 		} else {
-			if ($this->isTele) {
-				$query->andWhere(['or', ['tele_id' => $this->user_id], ['agent_id' => $this->agents]]);
-			}
 			if ($this->isLawyer) {
 				$query->andWhere(['or', ['lawyer_id' => $this->user_id], ['agent_id' => $this->agents]]);
+			}
+			if (!$this->isTele && !$this->isLawyer) {
+				$query->andWhere(['agent_id' => $this->agents]);
 			}
 		}
 
@@ -102,7 +104,7 @@ class IssueSearch extends Issue {
 		if ($this->isTele || $this->isLawyer) {
 			return User::getSelectList([User::ROLE_AGENT]);
 		}
-		return User::getSelectList([User::ROLE_AGENT], function (User $query) {
+		return User::getSelectList([User::ROLE_AGENT], function (Query $query) {
 			$query->andWhere(['id' => $this->agents]);
 		});
 	}

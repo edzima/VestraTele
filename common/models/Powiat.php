@@ -2,6 +2,8 @@
 
 namespace common\models;
 
+use yii\db\ActiveRecord;
+
 /**
  * This is the model class for table "powiaty".
  *
@@ -9,13 +11,20 @@ namespace common\models;
  * @property integer $wojewodztwo_id
  * @property string $name
  */
-class Powiat extends \yii\db\ActiveRecord {
+class Powiat extends ActiveRecord {
 
 	/**
 	 * @inheritdoc
 	 */
 	public static function tableName() {
 		return 'powiaty';
+	}
+
+	public function beforeSave($insert) {
+		if ($insert) {
+			$this->id = $this->getNewID();
+		}
+		return parent::beforeSave($insert);
 	}
 
 	/**
@@ -49,7 +58,7 @@ class Powiat extends \yii\db\ActiveRecord {
 		return $this->hasOne(Wojewodztwa::class, ['id' => 'wojewodztwo_id']);
 	}
 
-	public function getNewID(): int {
+	private function getNewID(): int {
 		$newID = (int) self::find()->where(['wojewodztwo_id' => $this->wojewodztwo_id])->max('id');
 		$newID++;
 		return $newID;

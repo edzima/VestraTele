@@ -16,6 +16,7 @@ use yii\widgets\MaskedInput;
 /* @var $province string */
 /* @var $provinceAdd string */
 /* @var $subProvince string */
+/* @var $subProvinceAdd string */
 /* @var $city string */
 /* @var $cityAdd string */
 /* @var $street string */
@@ -87,7 +88,7 @@ $template = function (string $attribute, ?string $url) {
 				$model,
 				$subProvince, [
 				'options' => ['class' => 'col-md-4'],
-				'template' => $template('subProvince', null),
+				'template' => $template('subProvince', $subProvinceAdd),
 			])
 				->widget(DepDrop::class, [
 					'type' => DepDrop::TYPE_SELECT2,

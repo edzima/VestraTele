@@ -21,7 +21,7 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'posi')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'typesIds')->widget(Select2::classname(), [
+	<?= $form->field($model, 'typesIds')->widget(Select2::class, [
 		'data' => ArrayHelper::map(IssueType::find()
 			->select('id,name')
 			->all(), 'id', 'name'),

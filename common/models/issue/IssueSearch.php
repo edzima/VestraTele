@@ -19,6 +19,7 @@ class IssueSearch extends Issue {
 	public $createdAtFrom;
 	public $createdAtTo;
 	public $childsId;
+	public $disabledStages = [];
 
 	/**
 	 * @inheritdoc
@@ -34,12 +35,12 @@ class IssueSearch extends Issue {
 			[
 				['payed'], 'boolean',
 			],
-			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
+			[['createdAtTo', 'createdAtFrom', 'accident_at'], 'date', 'format' => DATE_ATOM],
 			[
 				[
 					'created_at', 'updated_at', 'client_first_name', 'client_surname', 'client_phone_1',
 					'client_phone_2', 'client_city_code', 'victim_first_name', 'victim_surname', 'victim_city_code',
-					'victim_street', 'victim_phone', 'details',
+					'victim_street', 'victim_phone', 'details', 'disabledStages',
 				], 'safe',
 			],
 			[['clientCity', 'clientState'], 'safe'],
@@ -54,6 +55,7 @@ class IssueSearch extends Issue {
 			'createdAtFrom' => 'Dodano od',
 			'createdAtTo' => 'Dodano do',
 			'childsId' => 'Struktury',
+			'disabledStages' => 'Wykluczone etapy',
 		], parent::attributeLabels());
 	}
 
@@ -75,7 +77,7 @@ class IssueSearch extends Issue {
 	public function search($params) {
 		$query = Issue::find();
 
-		$query->with(['pays', 'agent.userProfile', 'type', 'stage.types']);
+		$query->with(['agent.userProfile', 'type', 'stage.types']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -132,6 +134,7 @@ class IssueSearch extends Issue {
 			'type_id' => $this->type_id,
 			'entity_responsible_id' => $this->entity_responsible_id,
 			'payed' => $this->payed,
+			'accident_at' => $this->accident_at,
 		]);
 
 		$query->andFilterWhere(['like', 'client_first_name', $this->client_first_name])
@@ -146,6 +149,7 @@ class IssueSearch extends Issue {
 			->andFilterWhere(['like', 'victim_phone', $this->victim_phone])
 			->andFilterWhere(['>=', 'created_at', $this->createdAtFrom])
 			->andFilterWhere(['<=', 'created_at', $this->createdAtTo])
+			->andFilterWhere(['NOT IN', 'stage_id', $this->disabledStages])
 			->andFilterWhere(['like', 'details', $this->details]);
 
 		return $dataProvider;

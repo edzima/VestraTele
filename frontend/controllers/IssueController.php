@@ -93,7 +93,7 @@ class IssueController extends Controller {
 
 	private static function shouldFind(Issue $model): bool {
 		$user = Yii::$app->user;
-		if ($user->can(User::ROLE_TELEMARKETER) && $model->tele_id === $user->id) {
+		if ($user->can(User::ROLE_TELEMARKETER)) {
 			return true;
 		}
 		if ($user->can(User::ROLE_LAYER) && $model->lawyer_id === $user->id) {

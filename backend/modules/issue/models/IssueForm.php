@@ -19,6 +19,7 @@ use yii\helpers\ArrayHelper;
 class IssueForm extends Model {
 
 	public const STAGE_ARCHIVED_ID = IssueStage::ARCHIVES_ID;
+	public const ACCIDENT_ID = IssueType::ACCIDENT_ID;
 
 	/** @var Issue */
 	private $issue;

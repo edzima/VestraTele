@@ -18,6 +18,7 @@ use yii\base\InvalidParamException;
  */
 class IssueType extends \yii\db\ActiveRecord {
 
+	public const ACCIDENT_ID = 1;
 	private $provision;
 
 	private static $TYPES = [];

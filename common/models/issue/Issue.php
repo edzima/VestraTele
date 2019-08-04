@@ -47,6 +47,7 @@ use yii\db\Expression;
  * @property string $archives_nr
  * @property int $lawyer_id
  * @property int $tele_id
+ * @property string $accident_at
  *
  * @property int $clientStateId
  * @property int $clientProvinceId
@@ -148,7 +149,7 @@ class Issue extends ActiveRecord {
 			[['client_email', 'victim_email'], 'email'],
 			['payed', 'boolean'],
 			['payed', 'default', 'value' => false],
-			['date', 'date', 'format' => DATE_ATOM],
+			[['date', 'accident_at'], 'date', 'format' => DATE_ATOM],
 		];
 	}
 
@@ -191,6 +192,7 @@ class Issue extends ActiveRecord {
 			'payed' => 'Opłacono',
 			'lawyer_id' => 'Prawnik',
 			'tele_id' => 'Telemarketer',
+			'accident_at' => 'Data wypadku',
 		];
 	}
 
@@ -338,7 +340,11 @@ class Issue extends ActiveRecord {
 	}
 
 	public function isArchived(): bool {
-		return $this->stage_id == IssueStage::ARCHIVES_ID;
+		return $this->stage_id === IssueStage::ARCHIVES_ID;
+	}
+
+	public function isAccident(): bool {
+		return $this->type_id === IssueType::ACCIDENT_ID;
 	}
 
 	public function getProvision(): Provision {

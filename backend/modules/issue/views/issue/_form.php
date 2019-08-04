@@ -73,21 +73,43 @@ use backend\modules\issue\models\IssueForm;
 
 		</div>
 
+		<div class="row">
 
-		<?= $form->field($model, 'date')
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
+			<?= $form->field($model, 'date', ['options' => ['class' => 'col-md-6']])
+				->widget(DateTimeWidget::class,
+					[
+						'phpDatetimeFormat' => 'yyyy-MM-dd',
+						'clientOptions' => [
 
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
+							'allowInputToggle' => true,
+							'sideBySide' => true,
+							'widgetPositioning' => [
+								'horizontal' => 'auto',
+								'vertical' => 'auto',
+							],
 						],
-					],
-				]) ?>
+					]) ?>
+
+			<?= $form->field($model, 'accident_at', [
+				'options' => [
+					'id' => 'accident_at_field',
+					'class' => 'col-md-6' . (!$model->isAccident() ? ' hidden' : ''),
+				],
+			])
+				->widget(DateTimeWidget::class,
+					[
+						'phpDatetimeFormat' => 'yyyy-MM-dd',
+						'clientOptions' => [
+
+							'allowInputToggle' => true,
+							'sideBySide' => true,
+							'widgetPositioning' => [
+								'horizontal' => 'auto',
+								'vertical' => 'auto',
+							],
+						],
+					]) ?>
+		</div>
 
 		<?= $form->field($model, 'details')->textarea(['rows' => 10, 'maxlength' => true]) ?>
 
@@ -279,13 +301,20 @@ use backend\modules\issue\models\IssueForm;
 <?php
 $archivesStageId = IssueForm::STAGE_ARCHIVED_ID;
 $stageInputId = Html::getInputId($model, 'stage_id');
+
+$typeAccidentId = IssueForm::ACCIDENT_ID;
 $js = <<<JS
 
 let stageInput = document.getElementById('$stageInputId');
+let typeInput = document.getElementById(('issueTypeId'));
 let archivesInput = document.getElementById('archives-field');
-
+let accidentAtInput = document.getElementById('accident_at_field');
 function isArchived(){
 	return parseInt(stageInput.value) === $archivesStageId;
+}
+
+function isAccident(){
+	return parseInt(typeInput.value) === $typeAccidentId;
 }
 
 stageInput.onchange = function(){
@@ -294,7 +323,15 @@ stageInput.onchange = function(){
 	}else{
 		archivesInput.classList.add('hidden');
 	}
-}
+};
+
+typeInput.onchange= function(){
+	if(parseInt(this.value) === $typeAccidentId){
+		accidentAtInput.classList.remove('hidden');
+	}else{
+		accidentAtInput.classList.add('hidden');
+	}
+};
 
 document.querySelector('.client-fieldset .copy-btn').addEventListener('click', function(evt) {
 	let attributeName = evt.currentTarget.getAttribute('data-copy');

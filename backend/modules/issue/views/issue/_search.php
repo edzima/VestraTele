@@ -20,7 +20,7 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= $form->field($model, 'createdAtFrom', ['options' => ['class' => 'col-md-6']])
+		<?= $form->field($model, 'createdAtFrom', ['options' => ['class' => 'col-md-4']])
 			->widget(DateTimeWidget::class,
 				[
 					'phpDatetimeFormat' => 'yyyy-MM-dd',
@@ -35,7 +35,22 @@ use yii\widgets\ActiveForm;
 					],
 				]) ?>
 
-		<?= $form->field($model, 'createdAtTo', ['options' => ['class' => 'col-md-6']])
+		<?= $form->field($model, 'createdAtTo', ['options' => ['class' => 'col-md-4']])
+			->widget(DateTimeWidget::class,
+				[
+					'phpDatetimeFormat' => 'yyyy-MM-dd',
+					'clientOptions' => [
+
+						'allowInputToggle' => true,
+						'sideBySide' => true,
+						'widgetPositioning' => [
+							'horizontal' => 'auto',
+							'vertical' => 'auto',
+						],
+					],
+				]) ?>
+
+		<?= $form->field($model, 'accident_at', ['options' => ['class' => 'col-md-4']])
 			->widget(DateTimeWidget::class,
 				[
 					'phpDatetimeFormat' => 'yyyy-MM-dd',
@@ -86,6 +101,21 @@ use yii\widgets\ActiveForm;
 					],
 				]
 			) ?>
+	</div>
+
+	<div class="row">
+		<?= $form->field($model, 'disabledStages', ['options' => ['class' => 'col-md-12']])->widget(Select2::class, [
+			'data' => IssueSearch::getStagesNames(),
+			'options' => [
+				'multiple' => true,
+				'placeholder' => 'Wykluczone etapy',
+
+			],
+			'pluginOptions' => [
+				'allowClear' => true,
+			],
+			'showToggleAll' => false,
+		]) ?>
 	</div>
 
 

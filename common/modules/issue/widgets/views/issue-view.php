@@ -75,6 +75,11 @@ use yii\widgets\DetailView;
 					'updated_at:date',
 					'date:date',
 					[
+						'attribute' => 'accident_at',
+						'format' => 'date',
+						'visible' => $model->isAccident(),
+					],
+					[
 						'attribute' => 'type',
 						'label' => $model->getAttributeLabel('type_id'),
 					],
@@ -130,7 +135,7 @@ use yii\widgets\DetailView;
 						[
 							'attribute' => 'clientCity',
 							'label' => 'Miasto',
-							'visible' => $model->victim_city_id !== null,
+							'visible' => $model->client_city_id !== null,
 							'value' => Yii::$app->formatter->asCityCode($model->clientCity, $model->client_city_code),
 						],
 						'client_street',

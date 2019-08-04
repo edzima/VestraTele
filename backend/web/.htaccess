@@ -20,9 +20,13 @@ RewriteRule ^ - [E=protossl]
 RewriteCond %{HTTPS} on
 RewriteRule ^ - [E=protossl:s]
 
+RewriteCond %{HTTPS} off
 # To redirect all users to access the site WITHOUT the 'www.' prefix,
 RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
 RewriteRule ^ http%{ENV:protossl}://%1%{REQUEST_URI} [L,R=301]
+
+
+
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
