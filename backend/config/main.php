@@ -1,5 +1,7 @@
 <?php
 
+use backend\modules\benefit\Module as BenefitModule;
+
 $params = array_merge(
 	require(__DIR__ . '/../../common/config/params.php'),
 	require(__DIR__ . '/params.php')
@@ -58,6 +60,9 @@ $config = [
 		'frontendCache' => require Yii::getAlias('@frontend/config/_cache.php'),
 	],
 	'modules' => [
+		'benefit' => [
+			'class' => BenefitModule::class,
+		],
 		'db-manager' => [
 			'class' => 'bs\dbManager\Module',
 			// path to directory for the dumps

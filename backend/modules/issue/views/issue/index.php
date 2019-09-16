@@ -53,7 +53,7 @@ $("body").on('afterFilter', "#issues-list" , function(event) {
 				submit_form = true;
 				filteredId = evt.target.getAttribute('id');
 				$("#issues-list").yiiGridView("applyFilter");
-			},500);
+			},1000);
 })
 .on('pjax:success', function() {
 	submit_form = true;

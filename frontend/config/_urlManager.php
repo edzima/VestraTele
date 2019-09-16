@@ -35,6 +35,7 @@ return [
 		'spotkanie/edycja' => 'task/update',
 
 		'admin' => '/backend/web',
+		'kalkulator-wyrownania-zasilku' => 'benefit-amount/index',
 
 		//REST
 

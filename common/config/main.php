@@ -75,6 +75,10 @@ $config = [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',
 				],
+				'noty' =>[
+					'class' => 'yii\i18n\PhpMessageSource',
+					'basePath' => '@common/messages',
+				],
 				'*' => [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',

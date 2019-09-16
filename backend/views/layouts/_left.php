@@ -94,6 +94,11 @@ use backend\widgets\Menu;
 					'url' => ['/score/index'],
 					'icon' => '<i class="fa fa-dot-circle-o"></i>',
 				],
+				[
+					'label' => 'Zasiłki',
+					'url' => ['/benefit/amount/index'],
+					'icon' => '<i class="fa fa-book"></i>',
+				],
 				/*
 				[
 					'label' => Yii::t('frontend', 'Calendar'),

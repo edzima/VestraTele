@@ -42,6 +42,7 @@ AppAsset::register($this);
 				'label' => Yii::t('frontend', 'Your tasks'),
 				'url' => ['/task'],
 			],
+
 		];
 
 		if (Yii::$app->user->can('telemarketer')) {
@@ -84,6 +85,10 @@ AppAsset::register($this);
 		$menuItems[] = [
 			'label' => 'Sprawy',
 			'url' => ['/issue/index'],
+		];
+		$menuItems[] = [
+			'label' => 'Kalkulator zasiłku',
+			'url' => ['/benefit-amount/index'],
 		];
 		$menuItems[] = [
 
