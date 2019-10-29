@@ -1,10 +1,11 @@
 <?php
 
+use common\models\entityResponsible\EntityResponsible;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\IssueEntityResponsible */
+/* @var $model EntityResponsible */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 

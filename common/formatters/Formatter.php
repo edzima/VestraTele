@@ -22,4 +22,8 @@ class Formatter extends BaseFormatter {
 		return Html::encode("$city - ($code)");
 	}
 
+	public function asMonthDay($date): string {
+		return $this->asDate($date, "d'-go'");
+	}
+
 }

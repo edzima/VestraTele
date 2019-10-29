@@ -21,9 +21,11 @@ use yii\base\Model;
  */
 class PayForm extends Model {
 
-	public $date;
+	public $deadline_at;
+	public $pay_at;
 	public $value;
 	public $type;
+	public $transferType;
 	public $last = true;
 
 	/** @var IssuePay */
@@ -34,8 +36,8 @@ class PayForm extends Model {
 			throw  new InvalidConfigException('Issue must exist');
 		}
 		$this->setPay($pay);
-		if ($this->date === null) {
-			$this->date = date('Y-m-d');
+		if ($this->pay_at === null) {
+			$this->pay_at = date('Y-m-d');
 		}
 
 		parent::__construct($config);
@@ -47,7 +49,8 @@ class PayForm extends Model {
 			['last', 'boolean'],
 			['value', 'number', 'min' => 1, 'numberPattern' => '/^\s*[-+]?[0-9]*[.,]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
 			[['type'], 'in', 'range' => array_keys(IssuePay::getTypesNames())],
-			['date', 'date', 'format' => DATE_ATOM],
+			[['transferType'], 'in', 'range' => array_keys(IssuePay::getTransferTypesNames())],
+			[['pay_at', 'deadline_at'], 'date', 'format' => DATE_ATOM],
 			['date', 'default', 'value' => date(DATE_ATOM)],
 		];
 	}
@@ -57,9 +60,10 @@ class PayForm extends Model {
 			$this->pay->attributeLabels());
 	}
 
-	private function setPay(IssuePay $pay) {
+	private function setPay(IssuePay $pay): void {
 		$this->pay = $pay;
-		$this->date = $pay->date;
+		$this->pay_at = $pay->pay_at;
+		$this->deadline_at = $pay->deadline_at;
 		$this->value = $pay->value;
 	}
 
@@ -70,7 +74,9 @@ class PayForm extends Model {
 	public function save(): bool {
 		if ($this->validate()) {
 			$model = $this->getPay();
-			$model->date = $this->date;
+			$model->pay_at = $this->pay_at;
+			$model->transfer_type = $this->transferType;
+			$model->deadline_at = $this->deadline_at;
 			$model->value = str_replace(',', '.', $this->value);
 			$model->type = $this->type;
 			$savePay = $model->save();

@@ -1,6 +1,7 @@
 <?php
 
 use backend\widgets\Menu;
+use common\models\User;
 
 /* @var $this \yii\web\View */
 ?>
@@ -51,6 +52,7 @@ use backend\widgets\Menu;
 						['label' => 'Raporty', 'url' => ['/task-status/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 					],
 				],
+
 				[
 					'label' => Yii::t('backend', 'Sprawy'),
 					'url' => '#',
@@ -63,20 +65,16 @@ use backend\widgets\Menu;
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
-							'label' => Yii::t('issue', 'Wpłaty'),
-							'url' => ['/issue/pay/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
-						],
-						[
 							'label' => Yii::t('issue', 'Notatki'),
 							'url' => ['/issue/note/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
-							'label' => Yii::t('issue', 'Podmioty odpowiedzialne'),
-							'url' => ['/issue/entity-responsible/index'],
+							'label' => 'Podmioty',
+							'url' => ['/entity-responsible/default/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
+
 						[
 							'label' => Yii::t('issue', 'Rodzaje'),
 							'url' => ['/issue/type/index'],
@@ -87,6 +85,34 @@ use backend\widgets\Menu;
 							'url' => ['/issue/stage/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
+					],
+				],
+				[
+					'label' => Yii::t('backend', 'Płatności'),
+					'url' => '#',
+					'icon' => '<i class="fa fa-money"></i>',
+					'options' => ['class' => 'treeview'],
+					'items' => [
+						[
+							'label' => Yii::t('issue', 'Rozliczenia'),
+							'url' => ['/issue/pay-calculation/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'visible' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
+
+						],
+						[
+							'label' => Yii::t('issue', 'Wpłaty'),
+							'url' => ['/issue/pay/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'visible' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
+
+						],
+						[
+							'label' => Yii::t('issue', 'Terminy'),
+							'url' => ['/issue/pay-city/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+
 					],
 				],
 				[

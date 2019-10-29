@@ -1,6 +1,8 @@
 <?php
 
 use backend\modules\benefit\Module as BenefitModule;
+use backend\modules\entityResponsible\Module as EntityResponsibleModule;
+use backend\modules\issue\Module as IssueModule;
 
 $params = array_merge(
 	require(__DIR__ . '/../../common/config/params.php'),
@@ -60,6 +62,9 @@ $config = [
 		'frontendCache' => require Yii::getAlias('@frontend/config/_cache.php'),
 	],
 	'modules' => [
+		'address' => [
+			'class' => 'backend\modules\address\Module',
+		],
 		'benefit' => [
 			'class' => BenefitModule::class,
 		],
@@ -79,11 +84,17 @@ $config = [
 				],
 			],
 		],
-		'noty' => [
-			'class' => 'lo\modules\noty\Module',
+		'entity-responsible' => [
+			'class' => EntityResponsibleModule::class,
 		],
 		'gridview' => [
 			'class' => '\kartik\grid\Module',
+		],
+		'issue' => [
+			'class' => IssueModule::class,
+		],
+		'noty' => [
+			'class' => 'lo\modules\noty\Module',
 		],
 		'webshell' => [
 			'class' => 'samdark\webshell\Module',
@@ -98,15 +109,6 @@ $config = [
 					],
 				],
 			],
-		],
-		'issue' => [
-			'class' => 'backend\modules\issue\Module',
-		],
-		'address' => [
-			'class' => 'backend\modules\address\Module',
-		],
-		'provision' => [
-			'class' => 'backend\modules\provision\Module',
 		],
 	],
 	'as globalAccess' => [

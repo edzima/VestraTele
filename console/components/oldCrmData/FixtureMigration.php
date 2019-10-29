@@ -2,7 +2,7 @@
 
 namespace console\components\oldCrmData;
 
-use common\models\issue\IssueEntityResponsible;
+use common\models\entityResponsible\EntityResponsible;
 use Yii;
 use yii\db\Migration;
 use yii\db\Query;
@@ -67,7 +67,7 @@ class FixtureMigration extends Migration {
 		$this->fixColumn(static::TABLE_ISSUE_NAME, static::COLUMN_ENTITY, static::ENTITY_FIXTURE);
 		Yii::$app->db->createCommand()
 			->batchInsert(
-				IssueEntityResponsible::tableName(),
+				EntityResponsible::tableName(),
 				['name'],
 				$this->getEntityNames())
 			->execute();

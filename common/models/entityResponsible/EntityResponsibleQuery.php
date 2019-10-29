@@ -1,13 +1,15 @@
 <?php
 
-namespace common\models\issue;
+namespace common\models\entityResponsible;
+
+use yii\db\ActiveQuery;
 
 /**
  * This is the ActiveQuery class for [[IssueEntityResponsible]].
  *
- * @see IssueEntityResponsible
+ * @see EntityResponsible
  */
-class IssueEntityResponsibleQuery extends \yii\db\ActiveQuery
+class EntityResponsibleQuery extends ActiveQuery
 {
     /*public function active()
     {
@@ -16,7 +18,7 @@ class IssueEntityResponsibleQuery extends \yii\db\ActiveQuery
 
     /**
      * @inheritdoc
-     * @return IssueEntityResponsible[]|array
+     * @return EntityResponsible[]|array
      */
     public function all($db = null)
     {
@@ -25,7 +27,7 @@ class IssueEntityResponsibleQuery extends \yii\db\ActiveQuery
 
     /**
      * @inheritdoc
-     * @return IssueEntityResponsible|array|null
+     * @return EntityResponsible|array|null
      */
     public function one($db = null)
     {

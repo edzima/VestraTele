@@ -1,10 +1,10 @@
 <?php
 
-namespace backend\modules\issue\controllers;
+namespace backend\modules\entityResponsible\controllers;
 
 use Yii;
-use common\models\issue\IssueEntityResponsible;
-use common\models\issue\IssueEntityResponsibleSearch;
+use common\models\entityResponsible\EntityResponsible;
+use common\models\entityResponsible\EntityResponsibleSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -12,7 +12,7 @@ use yii\filters\VerbFilter;
 /**
  * EntityResponsibleController implements the CRUD actions for IssueEntityResponsible model.
  */
-class EntityResponsibleController extends Controller {
+class DefaultController extends Controller {
 
 	/**
 	 * @inheritdoc
@@ -34,7 +34,7 @@ class EntityResponsibleController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex() {
-		$searchModel = new IssueEntityResponsibleSearch();
+		$searchModel = new EntityResponsibleSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -62,7 +62,7 @@ class EntityResponsibleController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new IssueEntityResponsible();
+		$model = new EntityResponsible();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
@@ -108,11 +108,11 @@ class EntityResponsibleController extends Controller {
 	 * If the model is not found, a 404 HTTP exception will be thrown.
 	 *
 	 * @param integer $id
-	 * @return IssueEntityResponsible the loaded model
+	 * @return EntityResponsible the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): IssueEntityResponsible {
-		if (($model = IssueEntityResponsible::findOne($id)) !== null) {
+	protected function findModel($id): EntityResponsible {
+		if (($model = EntityResponsible::findOne($id)) !== null) {
 			return $model;
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');

@@ -2,11 +2,11 @@
 
 namespace backend\modules\issue\controllers;
 
-use backend\modules\issue\models\PayForm;
 use common\models\issue\Issue;
+use common\models\User;
 use Yii;
 use common\models\issue\IssuePay;
-use common\models\issue\IssuePaySearch;
+use backend\modules\issue\models\searches\IssuePaySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -22,23 +22,33 @@ class PayController extends Controller {
 	public function behaviors() {
 		return [
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'pay' => ['POST'],
 				],
 			],
+
 		];
+	}
+
+	public function beforeAction($action) {
+		if (!Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
+			throw new NotFoundHttpException('The requested page does not exist.');
+		}
+		return parent::beforeAction($action);
 	}
 
 	/**
 	 * Lists all IssuePay models.
 	 *
+	 * @param int $status
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(int $status = IssuePaySearch::STATUS_ACTIVE) {
 		$searchModel = new IssuePaySearch();
+		$searchModel->setStatus($status);
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
@@ -57,60 +67,10 @@ class PayController extends Controller {
 		]);
 	}
 
-	/**
-	 * Creates a new IssuePay model.
-	 * If creation is successful, the browser will be redirected to the 'view' page.
-	 *
-	 * @return mixed
-	 */
-	public function actionCreate(int $issueId) {
-		$pay = new IssuePay();
-		$pay->issue_id = $this->findIssueModel($issueId)->id;
-
-		$model = new PayForm($pay);
-
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirectIssue($issueId);
-		}
-		return $this->render('create', [
-			'model' => $model,
-		]);
-	}
-
-	/**
-	 * Updates an existing IssuePay model.
-	 * If update is successful, the browser will be redirected to the 'view' page.
-	 *
-	 * @param integer $id
-	 * @return mixed
-	 */
-	public function actionUpdate($id) {
-		$model = new PayForm($this->findModel($id));
-
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirectIssue($model->pay->issue_id);
-		}
-		return $this->render('update', [
-			'model' => $model,
-		]);
-	}
-
-	/**
-	 * Deletes an existing IssuePay model.
-	 * If deletion is successful, the browser will be redirected to the 'index' page.
-	 *
-	 * @param integer $id
-	 * @return mixed
-	 */
-	public function actionDelete($id) {
+	public function actionPay(int $id) {
 		$model = $this->findModel($id);
-		$issueId = $model->issue_id;
-		$model->delete();
-		$this->redirectIssue($issueId);
-	}
-
-	private function redirectIssue(int $issueId) {
-		return $this->redirect(['issue/view', 'id' => $issueId]);
+		$model->markAsPay();
+		$this->redirect('index');
 	}
 
 	/**

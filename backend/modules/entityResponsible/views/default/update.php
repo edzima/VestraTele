@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\IssueEntityResponsible */
+/* @var $model \common\models\entityResponsible\EntityResponsible */
 
 $this->title = 'Edytuj: ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Podmioty odpowiedzialne', 'url' => ['index']];

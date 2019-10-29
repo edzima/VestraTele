@@ -1,7 +1,10 @@
 <?php
 
-namespace common\models\issue;
+namespace common\models\entityResponsible;
 
+use common\models\City;
+use common\models\issue\Issue;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "issue_entity_responsible".
@@ -10,8 +13,13 @@ namespace common\models\issue;
  * @property string $name
  *
  * @property Issue[] $issues
+ * @property City[] $cities
  */
-class IssueEntityResponsible extends \yii\db\ActiveRecord {
+class EntityResponsible extends ActiveRecord {
+
+	public function __toString(): string {
+		return $this->name;
+	}
 
 	/**
 	 * @inheritdoc
@@ -34,7 +42,7 @@ class IssueEntityResponsible extends \yii\db\ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
 			'name' => 'Nazwa',
@@ -45,10 +53,14 @@ class IssueEntityResponsible extends \yii\db\ActiveRecord {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getIssues() {
-		return $this->hasMany(Issue::className(), ['entity_responsible_id' => 'id']);
+		return $this->hasMany(Issue::class, ['entity_responsible_id' => 'id']);
 	}
 
-	public function __toString(): string {
-		return $this->name;
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getCities() {
+		return $this->hasMany(City::class, ['id' => 'city_id'])->viaTable('issue_entity_responsible_details', ['entity_id' => 'id']);
 	}
+
 }

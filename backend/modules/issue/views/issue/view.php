@@ -16,7 +16,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="issue-view">
 	<p>
 		<?= Html::a('Edytuj', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-		<?= Html::a('Wpłata', ['pay/create', 'issueId' => $model->id], ['class' => 'btn btn-info']) ?>
+		<?php if ($model->isPositiveDecision() || $model->payCalculation !== null): ?>
+			<?= Html::a('Rozliczenie', ['pay-calculation/view', 'id' => $model->id], ['class' => 'btn btn-info']) ?>
+		<?php endif ?>
 
 		<?= Html::a('Notatka', ['note/create', 'issueId' => $model->id], [
 			'class' => 'btn btn-success',

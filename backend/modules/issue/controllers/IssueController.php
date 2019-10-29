@@ -2,6 +2,7 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\modules\issue\models\IssueForm;
 use common\models\User;
 use Yii;
 use common\models\issue\Issue;
@@ -37,9 +38,6 @@ class IssueController extends Controller {
 	public function actionIndex() {
 		$searchModel = new IssueSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-		if(Yii::$app->user->can(User::ROLE_BOOKKEEPER)){
-			$dataProvider->query->with('pays');
-		}
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
@@ -52,9 +50,13 @@ class IssueController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionView($id) {
+	public function actionView(int $id): string {
+		$model = $this->findModel($id);
+		if ($model->isPositiveDecision() && $model->pay_city_id === null) {
+			Yii::$app->session->addFlash('warning', 'Nie ustalono miejscowści wypłat');
+		}
 		return $this->render('view', [
-			'model' => $this->findModel($id),
+			'model' => $model,
 		]);
 	}
 
@@ -65,14 +67,12 @@ class IssueController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new Issue();
-		$data = Yii::$app->request->post();
-
-		if ($model->load($data) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+		$form = new IssueForm();
+		if ($form->load(Yii::$app->request->post()) && $form->save()) {
+			return $this->redirect(['view', 'id' => $form->getModel()->id]);
 		}
 		return $this->render('create', [
-			'model' => $model,
+			'model' => $form,
 		]);
 	}
 
@@ -84,13 +84,12 @@ class IssueController extends Controller {
 	 * @return mixed
 	 */
 	public function actionUpdate($id) {
-		$model = $this->findModel($id);
-		$data = Yii::$app->request->post();
-		if ($model->load($data) && $model->save()) {
+		$form = new IssueForm(['model' => $this->findModel($id)]);
+		if ($form->load(Yii::$app->request->post()) && $form->save()) {
 			return $this->redirect(['index']);
 		}
 		return $this->render('update', [
-			'model' => $model,
+			'model' => $form,
 		]);
 	}
 

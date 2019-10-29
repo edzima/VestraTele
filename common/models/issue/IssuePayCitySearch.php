@@ -6,22 +6,25 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * IssueEntityResponsibleSearch represents the model behind the search form of `common\models\issue\IssueEntityResponsible`.
+ * IssuePayCitySearch represents the model behind the search form of `common\models\issue\IssuePayCity`.
  */
-class IssueEntityResponsibleSearch extends IssueEntityResponsible {
+class IssuePayCitySearch extends IssuePayCity {
+
+	public $city;
 
 	/**
-	 * @inheritdoc
+	 * {@inheritdoc}
 	 */
 	public function rules() {
 		return [
-			[['id'], 'integer'],
-			[['name'], 'safe'],
+			['city', 'string'],
+			[['city_id'], 'integer'],
+			[['phone', 'bank_transfer_at', 'direct_at'], 'safe'],
 		];
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritdoc}
 	 */
 	public function scenarios() {
 		// bypass scenarios() implementation in the parent class
@@ -36,8 +39,8 @@ class IssueEntityResponsibleSearch extends IssueEntityResponsible {
 	 * @return ActiveDataProvider
 	 */
 	public function search($params) {
-		$query = IssueEntityResponsible::find();
-
+		$query = IssuePayCity::find();
+		$query->joinWith('city');
 		// add conditions that should always apply here
 
 		$dataProvider = new ActiveDataProvider([
@@ -54,10 +57,12 @@ class IssueEntityResponsibleSearch extends IssueEntityResponsible {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
+			'bank_transfer_at' => $this->bank_transfer_at,
+			'direct_at' => $this->direct_at,
 		]);
 
-		$query->andFilterWhere(['like', 'name', $this->name]);
+		$query->andFilterWhere(['like', 'phone', $this->phone])
+			->andFilterWhere(['like', 'miasta.name', $this->city]);
 
 		return $dataProvider;
 	}

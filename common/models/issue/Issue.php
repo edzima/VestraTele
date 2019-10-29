@@ -4,6 +4,7 @@ namespace common\models\issue;
 
 use common\behaviors\DateIDBehavior;
 use common\models\City;
+use common\models\entityResponsible\EntityResponsible;
 use common\models\Gmina;
 use common\models\Powiat;
 use common\models\User;
@@ -48,7 +49,10 @@ use yii\db\Expression;
  * @property int $lawyer_id
  * @property int $tele_id
  * @property string $accident_at
+ * @property bool $payed
+ * @property int $pay_city_id
  *
+ * @property string $longId
  * @property int $clientStateId
  * @property int $clientProvinceId
  * @property City $clientCity
@@ -57,15 +61,15 @@ use yii\db\Expression;
  * @property User $lawyer
  * @property User $tele
  * @property IssuePay[] $pays
- * @property IssueEntityResponsible $entityResponsible
+ * @property EntityResponsible $entityResponsible
  * @property IssueStage $stage
  * @property IssueType $type
  * @property IssueNote[] $issueNotes
  * @property Provision $provision
  * @property Gmina $clientSubprovince
  * @property Gmina $victimSubprovince
- * @property string $longId
- * @property bool $payed
+ * @property IssuePayCity $payCity
+ * @property IssuePayCalculation $payCalculation
  */
 class Issue extends ActiveRecord {
 
@@ -115,8 +119,7 @@ class Issue extends ActiveRecord {
 		return [
 			[['created_at', 'updated_at'], 'safe'],
 			[['agent_id', 'client_first_name', 'client_surname', 'client_phone_1', 'client_city_id', 'client_city_code', 'client_street', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id', 'date', 'lawyer_id'], 'required'],
-			[['agent_id', 'tele_id', 'lawyer_id', 'client_subprovince_id', 'client_city_id', 'victim_subprovince_id', 'victim_city_id', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id', 'id'], 'integer'],
-			[['provision_value', 'provision_base'], 'number'],
+			[['agent_id', 'tele_id', 'lawyer_id', 'client_subprovince_id', 'client_city_id', 'victim_subprovince_id', 'victim_city_id', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id', 'id', 'pay_city_id'], 'integer'],
 			[['client_first_name', 'client_surname', 'client_email', 'client_street', 'victim_first_name', 'victim_surname', 'victim_email', 'victim_street'], 'string', 'max' => 255],
 			[['client_phone_1', 'client_phone_2', 'victim_phone'], 'string', 'max' => 15],
 			[['client_email', 'victim_email'], 'email'],
@@ -128,7 +131,8 @@ class Issue extends ActiveRecord {
 			[['lawyer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['lawyer_id' => 'id']],
 			[['tele_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['tele_id' => 'id']],
 			[['client_city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['client_city_id' => 'id']],
-			[['entity_responsible_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueEntityResponsible::class, 'targetAttribute' => ['entity_responsible_id' => 'id']],
+			[['pay_city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['pay_city_id' => 'id']],
+			[['entity_responsible_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_responsible_id' => 'id']],
 			[['stage_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueStage::class, 'targetAttribute' => ['stage_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueType::class, 'targetAttribute' => ['type_id' => 'id']],
 			[['victim_city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['victim_city_id' => 'id']],
@@ -138,12 +142,21 @@ class Issue extends ActiveRecord {
 			[
 				'archives_nr',
 				'required',
-				'when' => function (Issue $model) {
+				'when' => static function (Issue $model) {
 					return $model->isArchived();
 				},
 				'whenClient' => 'function(attribute, value){
 					return isArchived();
-	
+				}',
+			],
+			[
+				'pay_city_id',
+				'required',
+				'when' => static function (Issue $model) {
+					return $model->isPositiveDecision();
+				},
+				'whenClient' => 'function(attribute, value){
+					return isPositiveDecision();
 				}',
 			],
 			[['client_email', 'victim_email'], 'email'],
@@ -193,6 +206,10 @@ class Issue extends ActiveRecord {
 			'lawyer_id' => 'Prawnik',
 			'tele_id' => 'Telemarketer',
 			'accident_at' => 'Data wypadku',
+			'entityResponsibleDetails' => 'Podmiot odpowiedzialny',
+			'pay_city_id' => 'Miasto wypłacające',
+			'payCity' => 'Miasto wypłacające',
+
 		];
 	}
 
@@ -308,7 +325,7 @@ class Issue extends ActiveRecord {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getEntityResponsible() {
-		return $this->hasOne(IssueEntityResponsible::class, ['id' => 'entity_responsible_id']);
+		return $this->hasOne(EntityResponsible::class, ['id' => 'entity_responsible_id']);
 	}
 
 	/**
@@ -328,23 +345,41 @@ class Issue extends ActiveRecord {
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getIssueNotes() {
+	public function getIssueNotes():IssueNoteQuery {
 		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])->with('user')->orderBy('created_at DESC');
 	}
 
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
+	public function getPayCity() {
+		return $this->hasOne(IssuePayCity::class, ['city_id' => 'pay_city_id']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getPayCalculation() {
+		return $this->hasOne(IssuePayCalculation::class, ['issue_id' => 'id']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
 	public function getPays() {
-		return $this->hasMany(IssuePay::class, ['issue_id' => 'id'])->orderBy(IssuePay::tableName() . '.date DESC');
+		return $this->hasMany(IssuePay::class, ['issue_id' => 'id'])->orderBy(IssuePay::tableName() . '.pay_at DESC');
 	}
 
 	public function isArchived(): bool {
-		return $this->stage_id === IssueStage::ARCHIVES_ID;
+		return (int) $this->stage_id === IssueStage::ARCHIVES_ID;
+	}
+
+	public function isPositiveDecision(): bool {
+		return (int) $this->stage_id === IssueStage::POSITIVE_DECISION_ID;
 	}
 
 	public function isAccident(): bool {
-		return $this->type_id === IssueType::ACCIDENT_ID;
+		return (int) $this->type_id === IssueType::ACCIDENT_ID;
 	}
 
 	public function getProvision(): Provision {
@@ -420,11 +455,20 @@ class Issue extends ActiveRecord {
 		return $this->victim_subprovince_id !== null && $this->victimSubprovince !== null;
 	}
 
+	public function markAsUpdate(): void {
+		$this->touch('updated_at');
+	}
+
+	public function hasPayCalculation(): bool {
+		return $this->payCalculation !== null;
+	}
+
 	/**
 	 * @inheritdoc
 	 * @return IssueQuery the active query used by this AR class.
 	 */
-	public static function find() {
+	public static function find(): IssueQuery {
 		return new IssueQuery(get_called_class());
 	}
+
 }

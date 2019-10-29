@@ -3,7 +3,7 @@
 namespace console\controllers;
 
 use common\models\issue\Issue;
-use common\models\issue\IssueEntityResponsible;
+use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\IssueNote;
 use common\models\User;
 use console\components\oldCrmData\IssueNoteDataTransfer;
@@ -47,7 +47,7 @@ class OldCrmController extends Controller {
 	}
 
 	public function actionFixEntity(): void {
-		IssueEntityResponsible::deleteAll();
+		EntityResponsible::deleteAll();
 		$migration = new FixtureMigration();
 		$migration->fixEntity();
 		$issue = new IssueDataTransfer();

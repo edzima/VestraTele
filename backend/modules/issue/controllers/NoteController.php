@@ -7,6 +7,7 @@ use common\models\issue\Issue;
 use Yii;
 use common\models\issue\IssueNote;
 use common\models\issue\IssueNoteSearch;
+use yii\base\InvalidConfigException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -61,25 +62,32 @@ class NoteController extends Controller {
 	 * Creates a new IssueNote model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 *
+	 * @param int $issueId
+	 * @param int|null $type
 	 * @return mixed
+	 * @throws NotFoundHttpException
+	 * @throws InvalidConfigException
 	 */
-	public function actionCreate(int $issueId) {
+	public function actionCreate(int $issueId, int $type = null) {
+		if ($type !== null && !isset(IssueNote::getTypesNames()[$type])) {
+			throw new NotFoundHttpException('The requested page does not exist.');
+		}
 		$note = new IssueNote();
 		$note->issue_id = $this->findIssueModel($issueId)->id;
 		$note->user_id = Yii::$app->user->id;
+		$note->type = $type;
 
 		$model = new IssueNoteForm($note);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$this->redirectIssue($issueId);
+			if ($type === IssueNote::TYPE_PAY) {
+				return $this->redirectPayCalculation($issueId);
+			}
+			return $this->redirectIssue($issueId);
 		}
 		return $this->render('create', [
 			'model' => $model,
 		]);
-	}
-
-	private function redirectIssue(int $issueId) {
-		return $this->redirect(['issue/view', 'id' => $issueId]);
 	}
 
 	/**
@@ -93,7 +101,10 @@ class NoteController extends Controller {
 		$model = new IssueNoteForm($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$this->redirectIssue($model->getNote()->issue_id);
+			if ($model->note->type === IssueNote::TYPE_PAY) {
+				return $this->redirectPayCalculation($model->getNote()->issue_id);
+			}
+			return $this->redirectIssue($model->getNote()->issue_id);
 		}
 		return $this->render('update', [
 			'model' => $model,
@@ -112,6 +123,14 @@ class NoteController extends Controller {
 		$issueId = $model->issue_id;
 		$model->delete();
 		$this->redirectIssue($issueId);
+	}
+
+	private function redirectPayCalculation(int $issueId) {
+		return $this->redirect(['pay-calculation/view', 'id' => $issueId]);
+	}
+
+	private function redirectIssue(int $issueId) {
+		return $this->redirect(['issue/view', 'id' => $issueId]);
 	}
 
 	/**
@@ -135,4 +154,5 @@ class NoteController extends Controller {
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}
+
 }

@@ -18,6 +18,11 @@ use yii\db\ActiveRecord;
 class IssueStage extends ActiveRecord {
 
 	public const ARCHIVES_ID = 6;
+	public const POSITIVE_DECISION_ID = 18;
+
+	public function __toString(): string {
+		return $this->name;
+	}
 
 	/**
 	 * @inheritdoc
@@ -57,23 +62,19 @@ class IssueStage extends ActiveRecord {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getIssues() {
-		return $this->hasMany(Issue::className(), ['stage_id' => 'id']);
+		return $this->hasMany(Issue::class, ['stage_id' => 'id']);
 	}
 
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getTypes() {
-		return $this->hasMany(IssueType::className(), ['id' => 'type_id'])
+		return $this->hasMany(IssueType::class, ['id' => 'type_id'])
 			->viaTable('{{%issue_stage_type}}', ['stage_id' => 'id']);
 	}
 
 	public function getNameWithShort(): string {
 		return $this->name . ' (' . $this->short_name . ')';
-	}
-
-	public function __toString(): string {
-		return $this->name;
 	}
 
 	public function getTypesName(): string {

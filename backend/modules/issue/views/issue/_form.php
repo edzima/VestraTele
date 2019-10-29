@@ -11,9 +11,11 @@ use yii\helpers\Url;
 use yii\web\View;
 use yii\widgets\ActiveForm;
 use backend\modules\issue\models\IssueForm;
+use common\models\address\Address;
 
 /* @var $this View */
 /* @var $model Issue */
+/* @var $payAddress Address */
 /* @var $form yii\widgets\ActiveForm */
 
 ?>
@@ -50,6 +52,17 @@ use backend\modules\issue\models\IssueForm;
 
 			<?= $form->field($model, 'archives_nr', ['options' => ['id' => 'archives-field', 'class' => 'col-md-2 required' . (!$model->isArchived() ? ' hidden' : '')]])->textInput(); ?>
 
+		</div>
+
+		<div id="payCityWrapper" class="<?= !$model->isPositiveDecision() ? 'hidden' : '' ?>">
+			<?= AddressWidget::widget([
+				'form' => $form,
+				'model' => $payAddress,
+				'subProvince' => false,
+				'street' => false,
+				'legend' => 'Miasto wypłacające',
+			]);
+			?>
 		</div>
 
 		<div class="row">
@@ -300,6 +313,7 @@ use backend\modules\issue\models\IssueForm;
 
 <?php
 $archivesStageId = IssueForm::STAGE_ARCHIVED_ID;
+$positiveDecisionStageId = IssueForm::STAGE_POSITIVE_DECISION_ID;
 $stageInputId = Html::getInputId($model, 'stage_id');
 
 $typeAccidentId = IssueForm::ACCIDENT_ID;
@@ -309,19 +323,35 @@ let stageInput = document.getElementById('$stageInputId');
 let typeInput = document.getElementById(('issueTypeId'));
 let archivesInput = document.getElementById('archives-field');
 let accidentAtInput = document.getElementById('accident_at_field');
+let payCityWrapper = document.getElementById('payCityWrapper');
+
+
 function isArchived(){
 	return parseInt(stageInput.value) === $archivesStageId;
+}
+
+function isPositiveDecision(){
+	console.log(parseInt(stageInput.value) === $positiveDecisionStageId);
+	return parseInt(stageInput.value) === $positiveDecisionStageId;
 }
 
 function isAccident(){
 	return parseInt(typeInput.value) === $typeAccidentId;
 }
 
+
 stageInput.onchange = function(){
-	if(parseInt(this.value) === $archivesStageId){
+	let value = parseInt(this.value);
+	if(value === $archivesStageId){
 		archivesInput.classList.remove('hidden');
 	}else{
 		archivesInput.classList.add('hidden');
+	}
+	
+	if(value === $positiveDecisionStageId){
+		payCityWrapper.classList.remove('hidden');
+	}else{
+		payCityWrapper.classList.add('hidden');
 	}
 };
 

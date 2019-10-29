@@ -93,21 +93,6 @@ $this->registerJs($js);
 			],
 			[
 				'class' => ActionColumn::class,
-				'template' => '{view} {update} {pay} {delete}',
-				'buttons' => [
-					'pay' => function ($url, Issue $model, $key) {
-						if ($model->isPayed() || !Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
-							return '';
-						}
-						return Html::a(
-							'<span class="glyphicon glyphicon-usd" aria-hidden="true"></span>',
-							Url::toRoute(['pay/create', 'issueId' => $model->id]),
-							[
-								'title' => 'Wpłata',
-								'aria-label' => 'Wpłata',
-							]);
-					},
-				],
 				'noWrap' => true,
 				'options' => [
 					'style' => 'width:110px',
@@ -213,13 +198,6 @@ $this->registerJs($js);
 				'options' => [
 					'style' => 'width:90px',
 				],
-			],
-
-			[
-				'label' => 'Płatność',
-				'attribute' => 'payStatus',
-				'filter' => IssueSearch::payStatuses(),
-				'visible' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
 			],
 
 		],

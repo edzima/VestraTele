@@ -1,23 +1,22 @@
 <?php
 
-namespace common\models\issue;
+namespace common\models\entityResponsible;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * IssuePaySearch represents the model behind the search form of `common\models\issue\IssuePay`.
+ * IssueEntityResponsibleSearch represents the model behind the search form of `common\models\issue\IssueEntityResponsible`.
  */
-class IssuePaySearch extends IssuePay {
+class EntityResponsibleSearch extends EntityResponsible {
 
 	/**
 	 * @inheritdoc
 	 */
 	public function rules() {
 		return [
-			[['id', 'issue_id'], 'integer'],
-			[['date'], 'safe'],
-			[['value'], 'number'],
+			[['id'], 'integer'],
+			[['name'], 'safe'],
 		];
 	}
 
@@ -37,18 +36,16 @@ class IssuePaySearch extends IssuePay {
 	 * @return ActiveDataProvider
 	 */
 	public function search($params) {
-		$query = IssuePay::find();
+		$query = EntityResponsible::find();
 
 		// add conditions that should always apply here
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
-			'sort' => [
-				'defaultOrder' => ['date'  =>SORT_DESC]
-			]
 		]);
 
 		$this->load($params);
+
 		if (!$this->validate()) {
 			// uncomment the following line if you do not want to return any records when validation fails
 			// $query->where('0=1');
@@ -58,10 +55,9 @@ class IssuePaySearch extends IssuePay {
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
-			'issue_id' => $this->issue_id,
-			'date' => $this->date,
-			'value' => $this->value,
 		]);
+
+		$query->andFilterWhere(['like', 'name', $this->name]);
 
 		return $dataProvider;
 	}

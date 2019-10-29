@@ -2,12 +2,19 @@
 
 namespace common\models\issue;
 
+use yii\db\ActiveQuery;
+
 /**
  * This is the ActiveQuery class for [[Issue]].
  *
  * @see Issue
  */
-class IssueQuery extends \yii\db\ActiveQuery {
+class IssueQuery extends ActiveQuery {
+
+	public function onlyPositiveDecision(): self {
+		$this->andWhere(['stage_id' => IssueStage::POSITIVE_DECISION_ID]);
+		return $this;
+	}
 
 	public function onlyPayed() {
 		$this->andWhere(['payed' => true]);

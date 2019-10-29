@@ -39,7 +39,7 @@ class IssueNoteForm extends Model {
 		parent::__construct($config);
 	}
 
-	public function rules() {
+	public function rules(): array {
 		return [
 			[['title', 'description'], 'required'],
 			[['title'], 'string', 'max' => 255],
@@ -50,7 +50,7 @@ class IssueNoteForm extends Model {
 		return $this->note->attributeLabels();
 	}
 
-	private function setNote(IssueNote $note) {
+	private function setNote(IssueNote $note): void {
 		$this->note = $note;
 		$this->title = $note->title;
 		$this->description = $note->description;

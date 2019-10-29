@@ -103,6 +103,7 @@ class RbacController extends Controller {
 	public function actionAddBookKeeper() {
 		$auth = Yii::$app->authManager;
 		$auth->add($auth->createRole(User::ROLE_BOOKKEEPER));
+		$auth->addChild($auth->getRole(User::ROLE_ADMINISTRATOR), 	$auth->getRole(User::ROLE_BOOKKEEPER));
 	}
 
 }

@@ -17,11 +17,14 @@ use yii\db\Expression;
  * @property string $description
  * @property int $created_at
  * @property int $updated_at
+ * @property int $type
  *
  * @property Issue $issue
  * @property User $user
  */
 class IssueNote extends ActiveRecord {
+
+	public const TYPE_PAY = 10;
 
 	/**
 	 * @inheritdoc
@@ -40,12 +43,12 @@ class IssueNote extends ActiveRecord {
 	}
 
 	public function afterSave($insert, $changedAttributes) {
-		$this->issue->touch('updated_at');
+		$this->issue->markAsUpdate();
 		parent::afterSave($insert, $changedAttributes);
 	}
 
 	public function afterDelete() {
-		$this->issue->touch('updated_at');
+		$this->issue->markAsUpdate();
 		parent::afterDelete();
 	}
 
@@ -55,11 +58,12 @@ class IssueNote extends ActiveRecord {
 	public function rules() {
 		return [
 			[['issue_id', 'user_id', 'title', 'description'], 'required'],
-			[['issue_id', 'user_id'], 'integer'],
+			[['issue_id', 'user_id', 'type'], 'integer'],
 			[['created_at', 'updated_at'], 'safe'],
 			[['title'], 'string', 'max' => 255],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 		];
 	}
 
@@ -90,6 +94,23 @@ class IssueNote extends ActiveRecord {
 	 */
 	public function getUser() {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
+	}
+
+	public function getTypeName(): string {
+		if (empty($this->type)) {
+			return 'ogólna';
+		}
+		return static::getTypesNames()[$this->type];
+	}
+
+	public static function getTypesNames(): array {
+		return [
+			static::TYPE_PAY => 'płatności',
+		];
+	}
+
+	public function isPayType(): bool {
+		return (int) $this->type === static::TYPE_PAY;
 	}
 
 	/**

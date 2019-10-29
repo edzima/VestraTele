@@ -22,10 +22,16 @@ use yii\widgets\DetailView;
 					'class' => 'table table-striped table-bordered detail-view th-nowrap',
 				],
 				'attributes' => [
-					'date:date',
+					'pay_at:date',
+					'deadline_at:date',
 					[
 						'attribute' => 'typeName',
 						'label' => 'Typ',
+						'format' => 'raw',
+					],
+					[
+						'attribute' => 'transferTypeName',
+						'label' => 'Płatność',
 						'format' => 'raw',
 					],
 					'value:decimal',

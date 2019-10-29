@@ -14,6 +14,9 @@ use yii\base\Widget;
 
 abstract class IssueWidget extends Widget {
 
+	/**
+	 * @var Issue
+	 */
 	public $model;
 
 	public function init() {

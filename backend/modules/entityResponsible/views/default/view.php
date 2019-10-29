@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\IssueEntityResponsible */
+/* @var $model \common\models\entityResponsible\EntityResponsible */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Issue Entity Responsibles', 'url' => ['index']];

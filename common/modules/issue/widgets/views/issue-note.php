@@ -9,7 +9,7 @@ use yii\helpers\Html;
 /* @var $removeBtn bool */
 ?>
 
-<div class="panel panel-primary panel-note">
+<div class="panel <?= $model->isPayType() ? 'panel-success' : 'panel-primary' ?> panel-note">
 	<div class="panel-heading">
 		<h3 class="panel-title"><?= $model->title ?>
 			<span class="pull-right"><?= $model->user ?></span>
@@ -20,7 +20,7 @@ use yii\helpers\Html;
 	</div>
 	<div class="panel-footer">
 		<span class="date pull-left"><?= $model->updated_at ?></span>
-		<?php if ($model->user_id === Yii::$app->user->id || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)): ?>
+		<?php if ($model->user_id === Yii::$app->user->id || Yii::$app->user->can(User::ROLE_MANAGER)): ?>
 			<span class="action pull-right">
 				<?= Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['note/update', 'id' => $model->id]) ?>
 				<?= $removeBtn ? Html::a('<i class="glyphicon glyphicon-trash"></i>', ['note/delete', 'id' => $model->id], [

@@ -9,6 +9,7 @@ use yii\widgets\MaskedInput;
 
 /* @var $this yii\web\View */
 /* @var $id string */
+/* @var $legend string */
 /* @var $model \yii\base\Model */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $state string */
@@ -32,18 +33,18 @@ $mergeOptions = function (string $attribute, array $options) use ($copyOptions) 
 };
 
 $template = function (string $attribute, ?string $url) {
-	$content = '{input}';
+	$content = "{input}";
 	if ($url !== null) {
 		$content .= Html::a('<i class="fa fa-plus"></i>', Url::toRoute($url), ['class' => 'input-group-addon', 'target' => '_blank']);
 	}
-	return Html::tag('div', $content, ['class' => 'input-group']);
+	return Html::tag('div', $content, ['class' => 'input-group']) . "\n{error}";
 }
 
 ?>
 <fieldset>
-	<legend>Adres</legend>
+	<legend><?= Html::encode($legend) ?></legend>
 	<div class="row">
-		<?php if ($state !== null): ?>
+		<?php if (!empty($state)): ?>
 			<?= $form->field
 			($model,
 				$state, [
@@ -52,7 +53,7 @@ $template = function (string $attribute, ?string $url) {
 				])
 				->widget(Select2::class, [
 						'data' => AddressWidget::getStates(),
-						'initValueText' => $model->getAttribute($state),
+						'initValueText' => $model->{$state} ?? null,
 						'options' => $mergeOptions('state', [
 							'placeholder' => '--Wybierz województwo--',
 							'id' => $id . 'state-id',
@@ -61,7 +62,7 @@ $template = function (string $attribute, ?string $url) {
 				)->label(false); ?>
 		<?php endif; ?>
 
-		<?php if ($province !== null): ?>
+		<?php if (!empty($province)): ?>
 			<?= $form->field(
 				$model,
 				$province,
@@ -72,7 +73,7 @@ $template = function (string $attribute, ?string $url) {
 				'type' => DepDrop::TYPE_SELECT2,
 				'options' =>
 					['id' => $id . 'province-id'],
-				'data' => $model->{$state} !== null ? AddressWidget::getProvinces($model->{$state}) : [],
+				'data' => $model->{$state} > 0 ? AddressWidget::getProvinces($model->{$state}) : [],
 				'pluginOptions' => $mergeOptions('province', [
 					'depends' => [$id . 'state-id'],
 					'placeholder' => 'Powiat...',
@@ -83,7 +84,7 @@ $template = function (string $attribute, ?string $url) {
 			]); ?>
 		<?php endif; ?>
 
-		<?php if ($subProvince !== null): ?>
+		<?php if (!empty($subProvince)): ?>
 			<?= $form->field(
 				$model,
 				$subProvince, [
@@ -92,19 +93,19 @@ $template = function (string $attribute, ?string $url) {
 			])
 				->widget(DepDrop::class, [
 					'type' => DepDrop::TYPE_SELECT2,
-					'data' => $model->{$state} !== null && $model->{$province} !== null ? AddressWidget::getSubprovinces($model->{$state}, $model->{$province}) : [],
+					'data' => $model->{$state} > 0 && $model->{$province} > 0 ? AddressWidget::getSubprovinces($model->{$state}, $model->{$province}) : [],
 					'pluginOptions' => [
 						'depends' => [$id . 'state-id', $id . 'province-id'],
 						'placeholder' => 'Gmina...',
 						'url' => Url::to(['/address/city/gmina']),
 					],
-				])->label(false);
+				])->label(false)
 			?>
 		<?php endif; ?>
 
 	</div>
 	<div class="row">
-		<?php if ($city !== null): ?>
+		<?php if (!empty($city)): ?>
 
 			<?= $form->field($model, $city,
 				[
@@ -113,7 +114,7 @@ $template = function (string $attribute, ?string $url) {
 				])
 				->widget(DepDrop::class, [
 					'type' => DepDrop::TYPE_SELECT2,
-					'data' => $model->{$state} !== null && $model->{$province} !== null ? AddressWidget::getCities($model->{$state}, $model->{$province}) : [],
+					'data' => $model->{$state} > 0 && $model->{$province} > 0 ? AddressWidget::getCities($model->{$state}, $model->{$province}) : [],
 					'pluginOptions' => [
 						'depends' => [$id . 'state-id', $id . 'province-id'],
 						'placeholder' => 'Miejscowość...',
@@ -124,7 +125,7 @@ $template = function (string $attribute, ?string $url) {
 		<?php endif; ?>
 
 
-		<?php if ($cityCode !== null): ?>
+		<?php if (!empty($cityCode)): ?>
 			<?= $form->field($model, $cityCode,
 				[
 					'options' => ['class' => 'col-md-4 form-group'],
@@ -138,7 +139,7 @@ $template = function (string $attribute, ?string $url) {
 		<?php endif; ?>
 	</div>
 
-	<?php if ($street !== null): ?>
+	<?php if (!empty($street)): ?>
 		<?= $form->field($model, $street)->textInput($mergeOptions('street', ['maxlength' => true])) ?>
 	<?php endif; ?>
 

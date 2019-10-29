@@ -10,7 +10,7 @@ namespace console\components\oldCrmData;
 
 use common\models\City;
 use common\models\issue\Issue;
-use common\models\issue\IssueEntityResponsible;
+use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\IssueStage;
 use common\models\issue\Provision;
 use common\models\Wojewodztwa;
@@ -225,7 +225,7 @@ class IssueDataTransfer extends DataTransfer {
 
 	private function getEntitiesResponsible(): array {
 		if (empty($this->entityResponsible)) {
-			$this->entityResponsible = ArrayHelper::map(IssueEntityResponsible::find()
+			$this->entityResponsible = ArrayHelper::map(EntityResponsible::find()
 				->select('id,LOWER(name) as name')
 				->asArray()
 				->all(),
