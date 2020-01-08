@@ -31,6 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'name',
 			'short_name',
 			'provision',
+			'vat',
 		],
 	]) ?>
 

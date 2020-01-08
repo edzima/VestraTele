@@ -19,6 +19,8 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'provision_type')->dropDownList(Provision::getTypesNames()) ?>
 
+	<?= $form->field($model, 'vat')->textInput() ?>
+
 	<div class="form-group">
 		<?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
 	</div>

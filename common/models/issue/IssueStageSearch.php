@@ -15,7 +15,7 @@ class IssueStageSearch extends IssueStage {
 	 */
 	public function rules() {
 		return [
-			[['id'], 'integer'],
+			[['id', 'days_reminder'], 'integer'],
 			[['name', 'short_name'], 'safe'],
 		];
 	}
@@ -55,6 +55,7 @@ class IssueStageSearch extends IssueStage {
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
+			'days_reminder' => $this->days_reminder,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])

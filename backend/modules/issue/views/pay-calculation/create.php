@@ -1,11 +1,13 @@
 <?php
 
 use backend\helpers\Url;
+use backend\modules\issue\models\IssueProvisionUsersForm;
 use backend\modules\issue\models\PayCalculationForm;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model PayCalculationForm */
+/* @var $provisionModel IssueProvisionUsersForm */
 
 $this->params['breadcrumbs'][] = ['label' => 'Sprawy', 'url' => ['issue/index']];
 $this->params['breadcrumbs'][] = ['label' => $model->getIssue(), 'url' => Url::issueView($model->getIssue()->id)];
@@ -28,6 +30,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= $this->render('_form', [
 		'model' => $model,
+		'provisionModel' => $provisionModel,
 	]) ?>
+
 
 </div>

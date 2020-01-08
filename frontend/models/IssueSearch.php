@@ -26,7 +26,7 @@ class IssueSearch extends Issue {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			[
 				[

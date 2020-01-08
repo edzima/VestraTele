@@ -23,13 +23,13 @@ $this->params['breadcrumbs'][] = $this->title;
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-			'posi',
 			'name',
 			'short_name',
 			[
 				'attribute' => 'typesName',
 				'label' => 'Rodzaje',
 			],
+			'days_reminder',
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>

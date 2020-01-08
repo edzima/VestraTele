@@ -104,7 +104,7 @@ use yii\widgets\ActiveForm;
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'disabledStages', ['options' => ['class' => 'col-md-12']])->widget(Select2::class, [
+		<?= $form->field($model, 'disabledStages', ['options' => ['class' => 'col-md-8']])->widget(Select2::class, [
 			'data' => IssueSearch::getStagesNames(),
 			'options' => [
 				'multiple' => true,
@@ -116,6 +116,9 @@ use yii\widgets\ActiveForm;
 			],
 			'showToggleAll' => false,
 		]) ?>
+
+
+		<?= $form->field($model, 'onlyDelayed', ['options' => ['class' => 'col-md-4']])->checkbox() ?>
 	</div>
 
 

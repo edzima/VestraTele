@@ -88,6 +88,35 @@ use common\models\User;
 					],
 				],
 				[
+					'label' => Yii::t('backend', 'Prowizje'),
+					'url' => '#',
+					'icon' => '<i class="fa fa-terminal"></i>',
+					'options' => ['class' => 'treeview'],
+					'visible' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
+					'items' => [
+						[
+							'label' => Yii::t('issue', 'Raporty'),
+							'url' => ['/provision/report/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => Yii::t('issue', 'Przyznane'),
+							'url' => ['/provision/provision/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => 'Ustalone',
+							'url' => ['/provision/user/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => Yii::t('issue', 'Typy'),
+							'url' => ['/provision/type/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+					],
+				],
+				[
 					'label' => Yii::t('backend', 'Płatności'),
 					'url' => '#',
 					'icon' => '<i class="fa fa-money"></i>',

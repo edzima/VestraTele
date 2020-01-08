@@ -9,6 +9,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model common\models\issue\IssueStage */
 /* @var $form yii\widgets\ActiveForm */
+
 ?>
 
 <div class="issue-stage-form">
@@ -29,6 +30,8 @@ use yii\widgets\ActiveForm;
 			'multiple' => true,
 		],
 	]) ?>
+
+	<?= $form->field($model, 'days_reminder')->textInput(['maxlength' => true]) ?>
 
 	<div class="form-group">
 		<?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

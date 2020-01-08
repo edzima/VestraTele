@@ -5,6 +5,7 @@ namespace common\models\issue;
 use common\models\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -15,16 +16,16 @@ class IssueSearch extends Issue {
 	public $clientCity;
 	public $clientState;
 
-	public $payStatus;
 	public $createdAtFrom;
 	public $createdAtTo;
 	public $childsId;
 	public $disabledStages = [];
+	public $onlyDelayed = false;
 
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			[
 				[
@@ -33,7 +34,7 @@ class IssueSearch extends Issue {
 				], 'integer',
 			],
 			[
-				['payed'], 'boolean',
+				['payed', 'onlyDelayed'], 'boolean',
 			],
 			[['createdAtTo', 'createdAtFrom', 'accident_at'], 'date', 'format' => DATE_ATOM],
 			[
@@ -45,17 +46,17 @@ class IssueSearch extends Issue {
 			],
 			[['clientCity', 'clientState'], 'safe'],
 			[['clientCity', 'clientState'], 'default', 'value' => null],
-			['payStatus', 'integer'],
-			['payStatus', 'in', 'range' => array_keys(static::payStatuses())],
 		];
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return array_merge([
 			'createdAtFrom' => 'Dodano od',
 			'createdAtTo' => 'Dodano do',
 			'childsId' => 'Struktury',
 			'disabledStages' => 'Wykluczone etapy',
+			'stage_change_at' => 'Zmiana etapu',
+			'onlyDelayed' => 'Opóźnione',
 		], parent::attributeLabels());
 	}
 
@@ -109,15 +110,15 @@ class IssueSearch extends Issue {
 		if ($this->childsId > 0) {
 			$user = User::findOne($this->childsId);
 			if ($user !== null) {
-				$ids = $user->getAllChildsIds();
+				$ids = $user->getAllChildesIds();
 				$ids[] = $user->id;
 				$query->andFilterWhere(['agent_id' => $ids]);
 			}
 		}
 
-		$this->payedFilter($query);
 		$this->teleFilter($query);
 		$this->lawyerFilter($query);
+		$this->delayedFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -163,20 +164,26 @@ class IssueSearch extends Issue {
 		$query->andFilterWhere(['lawyer_id' => $this->lawyer_id]);
 	}
 
-	private function payedFilter(IssueQuery $query): void {
+	private function delayedFilter(IssueQuery $query): void {
+		if (!empty($this->onlyDelayed)) {
+			$query->joinWith('stage');
+			$daysGroups = ArrayHelper::map(static::getStages(), 'id', 'days_reminder', 'days_reminder');
 
-		if ($this->payStatus !== null) {
-			switch ($this->payStatus) {
-				case static::PAYED_ALL:
-					$query->onlyPayed();
-					break;
-				case static::PAYED_PART:
-					$query->onlyPartPay();
-					break;
-				case static::PAYED_NOT:
-					$query->onlyWithoutPay();
-					break;
+			foreach ($daysGroups as $day => $ids) {
+				if (!empty($day)) {
+					$query->orFilterWhere([
+						'and',
+						[
+							'stage_id' => array_keys($ids),
+						],
+						[
+							'<=', new Expression("DATE_ADD(stage_change_at, INTERVAL $day DAY)"), new Expression('NOW()'),
+						],
+					]);
+				}
 			}
+			$query->andWhere('stage_change_at IS NOT NULL');
+			$query->andWhere('issue_stage.days_reminder is NOT NULL');
 		}
 	}
 
@@ -187,8 +194,12 @@ class IssueSearch extends Issue {
 	private static $stages;
 
 	public static function getStagesNames(): array {
+		return ArrayHelper::map(static::getStages(), 'id', 'nameWithShort');
+	}
+
+	private static function getStages(): array {
 		if (static::$stages === null) {
-			static::$stages = ArrayHelper::map(IssueStage::find()->all(), 'id', 'nameWithShort');
+			static::$stages = IssueStage::find()->all();
 		}
 		return static::$stages;
 	}

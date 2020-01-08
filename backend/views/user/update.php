@@ -55,7 +55,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 	) ?>
 
 	<?= $form->field($user, 'parent_id')
-		->widget(Select2::classname(), [
+		->widget(Select2::class, [
 				'data' => $user->getParents(),
 				'options' => [
 					'placeholder' => 'Przełożony',
@@ -80,9 +80,9 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 		]);
 	}
 
-	if (!empty($user->getModel()->getAllChildsIds())) {
+	if (!empty($user->getModel()->getAllChildesIds())) {
 		$dataProvider = new ActiveDataProvider([
-			'query' => $user->getModel()->getAllChildsQuery()->with(['userProfile']),
+			'query' => $user->getModel()->getAllChildesQuery()->with(['userProfile']),
 			'pagination' => false,
 		]);
 		echo $this->render('_users', [

@@ -1,0 +1,60 @@
+<?php
+
+use backend\helpers\Url;
+use common\models\provision\Provision;
+use common\models\provision\ProvisionSearch;
+use yii\data\ActiveDataProvider;
+use yii\grid\ActionColumn;
+use yii\helpers\Html;
+use yii\grid\GridView;
+
+/* @var $this yii\web\View */
+/* @var $searchModel ProvisionSearch */
+/* @var $dataProvider ActiveDataProvider */
+
+$this->title = 'Prowizje';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<div class="provision-index">
+
+	<h1><?= Html::encode($this->title) ?></h1>
+
+
+	<?= $this->render('_search', ['model' => $searchModel]) ?>
+
+	<?= GridView::widget([
+		'dataProvider' => $dataProvider,
+		'filterModel' => $searchModel,
+		'columns' => [
+			[
+				'attribute' => 'issue_id',
+				'format' => 'raw',
+				'label' => 'Sprawa',
+				'value' => static function (Provision $data): string {
+					return Html::a($data->pay->issue, Url::to(['/issue/pay-calculation/view', 'id' => $data->pay->issue_id], ['target' => '_blank']));
+				},
+			],
+			[
+				'attribute' => 'clientSurname',
+				'value' => 'pay.issue.clientFullName',
+				'label' => 'Klient',
+			],
+			[
+				'label' => 'Płatność',
+				'value' => 'pay.partInfo',
+			],
+			'toUser',
+			'fromUserString',
+			'provision:percent',
+			'pay.value:currency',
+			'value:currency',
+			'pay.pay_at:date',
+			[
+				'class' => ActionColumn::class,
+				'template' => '{update} {delete}',
+			],
+		],
+	]); ?>
+
+
+</div>

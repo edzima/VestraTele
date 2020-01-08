@@ -7,6 +7,7 @@ use common\models\User;
 use Yii;
 use common\models\issue\IssuePay;
 use backend\modules\issue\models\searches\IssuePaySearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -19,24 +20,25 @@ class PayController extends Controller {
 	/**
 	 * @inheritdoc
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
-					'pay' => ['POST'],
+				],
+			],
+			'access' => [
+				'class' => AccessControl::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'roles' => [User::ROLE_BOOKKEEPER],
+					],
 				],
 			],
 
 		];
-	}
-
-	public function beforeAction($action) {
-		if (!Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
-			throw new NotFoundHttpException('The requested page does not exist.');
-		}
-		return parent::beforeAction($action);
 	}
 
 	/**
@@ -55,22 +57,20 @@ class PayController extends Controller {
 		]);
 	}
 
-	/**
-	 * Displays a single IssuePay model.
-	 *
-	 * @param integer $id
-	 * @return mixed
-	 */
-	public function actionView($id) {
-		return $this->render('view', [
-			'model' => $this->findModel($id),
-		]);
-	}
-
 	public function actionPay(int $id) {
 		$model = $this->findModel($id);
-		$model->markAsPay();
-		$this->redirect('index');
+		$isPayed = $model->isPayed();
+		if (!$model->isPayed()) {
+			$model->pay_at = date(DATE_ATOM);
+		}
+
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$this->redirect('index');
+		}
+		return $this->render('pay', [
+			'model' => $model,
+			'isPayed' => $isPayed,
+		]);
 	}
 
 	/**

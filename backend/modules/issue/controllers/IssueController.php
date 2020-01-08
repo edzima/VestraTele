@@ -3,7 +3,6 @@
 namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueForm;
-use common\models\User;
 use Yii;
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch;
@@ -19,10 +18,10 @@ class IssueController extends Controller {
 	/**
 	 * @inheritdoc
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
 				],
@@ -35,7 +34,7 @@ class IssueController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new IssueSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		return $this->render('index', [

@@ -82,7 +82,7 @@ class IssuePayCalculation extends ActiveRecord {
 			'updated_at' => 'Edycja',
 			'status' => 'Status',
 			'statusName' => 'Status',
-			'value' => 'Kwota',
+			'value' => 'Kwota (Brutto)',
 			'pay_type' => 'Preferowany typ płatności',
 			'payName' => 'Preferowany typ płatności',
 			'details' => 'Szczegóły',
@@ -149,6 +149,10 @@ class IssuePayCalculation extends ActiveRecord {
 
 	public static function find(): IssuePayCalculationQuery {
 		return new IssuePayCalculationQuery(static::class);
+	}
+
+	public function markAsPayed(): void {
+		$this->updateAttributes(['status' => static::STATUS_PAYED]);
 	}
 
 }

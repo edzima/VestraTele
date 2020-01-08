@@ -2,12 +2,16 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\helpers\Url;
+use backend\modules\issue\models\IssueProvisionUsersForm;
 use backend\modules\issue\models\PayCalculationForm;
 use common\models\issue\Issue;
 use common\models\User;
 use Yii;
 use common\models\issue\IssuePayCalculation;
 use backend\modules\issue\models\searches\IssuePayCalculationSearch;
+use yii\filters\AccessControl;
+use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -28,14 +32,16 @@ class PayCalculationController extends Controller {
 					'delete' => ['POST'],
 				],
 			],
+			'access' => [
+				'class' => AccessControl::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'roles' => [User::ROLE_BOOKKEEPER],
+					],
+				],
+			],
 		];
-	}
-
-	public function beforeAction($action) {
-		if (!Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
-			throw new NotFoundHttpException('The requested page does not exist.');
-		}
-		return parent::beforeAction($action);
 	}
 
 	/**
@@ -84,15 +90,45 @@ class PayCalculationController extends Controller {
 		if (IssuePayCalculation::findOne($id) !== null) {
 			return $this->redirect(['update', 'id' => $id]);
 		}
-
-		$model = new PayCalculationForm($this->findIssueModel($id, true));
-		if ($model->load(Yii::$app->request->post()) && (!$model->isGenerate()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->getPayCalculation()->issue_id]);
+		$issue = $this->findIssueModel($id, true);
+		$model = new PayCalculationForm($issue);
+		$provisionModel = new IssueProvisionUsersForm(['issue' => $issue]);
+		if ($this->checkProvisions($issue)
+			&& $model->load(Yii::$app->request->post())
+			&& (!$model->isGenerate())
+			&& $model->save()) {
+			if ($provisionModel->load(Yii::$app->request->post()) && $provisionModel->save()) {
+				return $this->redirect(['view', 'id' => $model->getPayCalculation()->issue_id]);
+			}
 		}
 
 		return $this->render('create', [
 			'model' => $model,
+			'provisionModel' => $provisionModel,
 		]);
+	}
+
+	private function checkProvisions(Issue $model): bool {
+		$provisions = Yii::$app->provisions;
+		$hasAll = true;
+		if (!$provisions->hasAllProvisions($model->lawyer)) {
+			$hasAll = false;
+			$this->addUserProvisionFlash($model->lawyer);
+		}
+		if (!$provisions->hasAllProvisions($model->agent)) {
+			$hasAll = false;
+			$this->addUserProvisionFlash($model->agent);
+		}
+		if ($model->hasTele() && !$provisions->hasAllProvisions($model->tele)) {
+			$hasAll = false;
+			$this->addUserProvisionFlash($model->tele);
+		}
+		return $hasAll;
+	}
+
+	private function addUserProvisionFlash(User $user): void {
+		$link = Html::a($user, Url::userProvisions($user->id), ['target' => '_blank']);
+		Yii::$app->session->addFlash('error', 'Brakuje prowizji dla: ' . $link);
 	}
 
 	/**
@@ -104,14 +140,23 @@ class PayCalculationController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$model = new PayCalculationForm($this->findIssueModel($id, false));
-
-		if ($model->load(Yii::$app->request->post()) && (!$model->isGenerate()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->getPayCalculation()->issue_id]);
+		$issue = $this->findIssueModel($id, false);
+		$model = new PayCalculationForm($issue);
+		$provisionModel = new IssueProvisionUsersForm(['issue' => $issue]);
+		$post = Yii::$app->request->post();
+		if ($this->checkProvisions($issue)
+			&& $model->load(Yii::$app->request->post())
+			&& (!$model->isGenerate())
+			&& $model->save()) {
+			if ($provisionModel->load($post) && $provisionModel->save()) {
+				return $this->redirect(['view', 'id' => $model->getPayCalculation()->issue_id]);
+			}
 		}
 
 		return $this->render('update', [
 			'model' => $model,
+			'provisionModel' => $provisionModel,
+
 		]);
 	}
 
@@ -123,7 +168,7 @@ class PayCalculationController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionDelete($id) {
+	public function actionDelete(int $id) {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);

@@ -1,5 +1,7 @@
 <?php
 
+use common\components\Provisions;
+use common\components\TaxComponent;
 use common\formatters\Formatter;
 use yii\BaseYii;
 
@@ -22,6 +24,8 @@ class Yii extends BaseYii {
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  * @mixin yii\web\Application|yii\web\Application
  * @property Formatter $formatter
+ * @property Provisions $provisions
+ * @property TaxComponent $tax
  */
 abstract class Application extends \yii\web\Application {
 

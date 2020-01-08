@@ -55,19 +55,14 @@ class User extends ActiveRecord implements IdentityInterface {
 	private $selfTree;
 	private static $BOSS_MAP = [];
 	private static $TREE = [];
-
-	/** @deprecated */
-	const TYPE_AGENT = 'P';
-	/** @deprecated */
-	const TYPE_TELE = 'T';
-	/** @deprecated */
+	private static $USER_NAMES = [];
 
 	const EVENT_AFTER_SIGNUP = 'afterSignup';
 
 	/**
 	 * @inheritdoc
 	 */
-	public static function tableName() {
+	public static function tableName(): string {
 		return '{{%user}}';
 	}
 
@@ -76,7 +71,7 @@ class User extends ActiveRecord implements IdentityInterface {
 	 */
 	public function behaviors() {
 		return [
-			TimestampBehavior::className(),
+			TimestampBehavior::class,
 		];
 	}
 
@@ -309,6 +304,7 @@ class User extends ActiveRecord implements IdentityInterface {
 		$query = static::find()
 			->joinWith('userProfile')
 			->with('userProfile')
+			->active()
 			->orderBy('user_profile.lastname');
 		if (!empty($roles)) {
 			$query->onlyByRole($roles);
@@ -352,15 +348,15 @@ class User extends ActiveRecord implements IdentityInterface {
 	/**
 	 * @return static[]
 	 */
-	public function getChilds(): array {
-		return $this->getChildsQuery()->all();
+	public function getChildes(): array {
+		return $this->getChildesQuery()->all();
 	}
 
-	public function getChildsQuery(): ActiveQuery {
-		return static::find()->where(['id' => $this->getChildsIds()]);
+	public function getChildesQuery(): ActiveQuery {
+		return static::find()->where(['id' => $this->getChildesIds()]);
 	}
 
-	public function getChildsIds(): array {
+	public function getChildesIds(): array {
 		$ids = [];
 		foreach (static::getBossesIdsMap() as $id => $boss) {
 			if ($boss === $this->id) {
@@ -370,18 +366,18 @@ class User extends ActiveRecord implements IdentityInterface {
 		return $ids;
 	}
 
-	public function getAllChilds(): array {
-		return $this->getAllChildsQuery()->all();
+	public function getAllChildes(): array {
+		return $this->getAllChildesQuery()->all();
 	}
 
-	public function getAllChildsQuery(): ActiveQuery {
-		return static::find()->where(['id' => $this->getAllChildsIds()]);
+	public function getAllChildesQuery(): ActiveQuery {
+		return static::find()->where(['id' => $this->getAllChildesIds()]);
 	}
 
-	public function getAllChildsIds(): array {
+	public function getAllChildesIds(): array {
 		$selfTree = $this->getSelfTree();
 		$ids = [];
-		array_walk_recursive($selfTree, function ($item, $key) use (&$ids) {
+		array_walk_recursive($selfTree, static function ($item, $key) use (&$ids) {
 			if ($key === 'id') {
 				$ids[] = $item;
 			}
@@ -394,6 +390,8 @@ class User extends ActiveRecord implements IdentityInterface {
 			static::$BOSS_MAP = ArrayHelper::map(static::find()
 				->select('id,boss')
 				->onlyWithBoss()
+				->active()
+				->asArray()
 				->all(), 'id', 'boss');
 		}
 		return static::$BOSS_MAP;
@@ -410,8 +408,9 @@ class User extends ActiveRecord implements IdentityInterface {
 		if (empty(static::$TREE)) {
 			$boss = static::find()
 				->select('id,boss')
-				->asArray()
 				->onlyWithBoss()
+				->active()
+				->asArray()
 				->all();
 			static::$TREE = static::buildTree($boss, 'boss', 'id');
 		}
@@ -430,6 +429,22 @@ class User extends ActiveRecord implements IdentityInterface {
 			}
 		}
 		return $childs;
+	}
+
+	public static function getUserName(int $id): string {
+		return static::getUserNames()[$id];
+	}
+
+	private static function getUserNames(): array {
+		if (empty(static::$USER_NAMES)) {
+			static::$USER_NAMES = static::find()
+				->select('username')
+				->active()
+				->asArray()
+				->indexBy('id')
+				->column();
+		}
+		return static::$USER_NAMES;
 	}
 
 }

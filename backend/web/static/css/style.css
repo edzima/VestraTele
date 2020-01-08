@@ -68,3 +68,27 @@ div.required label:after {
 .kv-grid-loading {
 	width: 100%;
 }
+
+.pay-wrapper {
+	padding: 16px;
+	margin-bottom: 16px;
+}
+
+.border {
+	border: solid 2px;
+}
+
+.border-green {
+	border-color: green;
+}
+
+.border-red {
+	border-color: red;
+}
+
+
+@media print {
+	.no-print, .no-print > * {
+		display: none !important;
+	}
+}

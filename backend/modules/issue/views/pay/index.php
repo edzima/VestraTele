@@ -71,22 +71,15 @@ $this->params['breadcrumbs'][] = $this->title;
 				'template' => '{pay}',
 				'buttons' => [
 					'pay' => static function ($url, IssuePay $model): string {
-						if (!$model->isPayed()) {
-							return Html::a(
-								'<span class="glyphicon glyphicon-check" aria-hidden="true"></span>',
-								Url::toRoute(['pay', 'id' => $model->id]),
-								[
-									'title' => 'Oplac',
-									'aria-label' => 'Oplac',
-									'data' => [
-										'method' => 'POST',
-										'pjax' => true,
-										'confirm' => $model->issue->getClientFullName()
-											. ' ' . Yii::$app->formatter->asDecimal($model->value) . 'zł wpłacił (' . strtolower($model->getTransferTypeName()) . ').',
-									],
-								]);
-						}
-						return '';
+
+						return Html::a(
+							'<span class="glyphicon glyphicon-check" aria-hidden="true"></span>',
+							Url::toRoute(['pay', 'id' => $model->id]),
+							[
+								'title' => 'Oplac',
+								'aria-label' => 'Oplac',
+								'target' => '_blank',
+							]);
 					},
 				],
 			],
@@ -122,15 +115,22 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'value',
-				'format' => 'decimal',
+				'format' => 'currency',
 				'pageSummary' => true,
 			],
+			[
+				'class' => DataColumn::class,
+				'attribute' => 'valueNetto',
+				'format' => 'currency',
+				'pageSummary' => true,
+			],
+			'vatPercent:percent',
 			[
 				'attribute' => 'partInfo',
 			],
 			[
 				'attribute' => 'deadline_at',
-				'value' => function (IssuePay $model) {
+				'value' => static function (IssuePay $model) {
 					if ($model->deadline_at > 0) {
 						return $model->deadline_at;
 					}

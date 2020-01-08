@@ -19,10 +19,10 @@ class TreeController extends Controller {
 	/**
 	 * @inheritdoc
 	 */
-	public function behaviors() {
+	public function behaviors():array {
 		return [
 			'access' => [
-				'class' => AccessControl::className(),
+				'class' => AccessControl::class,
 				'rules' => [
 					[
 						'allow' => true,
@@ -33,11 +33,11 @@ class TreeController extends Controller {
 		];
 	}
 
-	public function actionIndex() {
+	public function actionIndex(): string {
 		/** @var User $user $user */
 		$user = Yii::$app->user->identity;
 		$dataProvider = new ActiveDataProvider([
-			'query' => $user->getAllChildsQuery()->with(['userProfile']),
+			'query' => $user->getAllChildesQuery()->with(['userProfile']),
 		]);
 		return $this->render('index', [
 			'dataProvider' => $dataProvider,

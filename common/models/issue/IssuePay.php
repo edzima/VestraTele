@@ -2,7 +2,10 @@
 
 namespace common\models\issue;
 
+use common\models\provision\ProvisionQuery;
+use Yii;
 use yii\db\ActiveRecord;
+use common\models\provision\Provision;
 
 /**
  * This is the model class for table "issue_pay".
@@ -14,9 +17,13 @@ use yii\db\ActiveRecord;
  * @property string $value
  * @property int $type
  * @property int $transfer_type
+ * @property string $vat
  *
- * @property Issue $issue
+ * @property-read float $valueNetto
+ *
+ * @property-read Issue $issue
  * @property-read IssuePay[] $pays
+ * @property-read Provision[] $provisions
  */
 class IssuePay extends ActiveRecord {
 
@@ -25,8 +32,6 @@ class IssuePay extends ActiveRecord {
 
 	public const TRANSFER_TYPE_DIRECT = 1;
 	public const TRANSFER_TYPE_BANK = 2;
-
-	private static $PAYS = [];
 
 	/**
 	 * @inheritdoc
@@ -40,10 +45,11 @@ class IssuePay extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['issue_id', 'type', 'value', 'deadline_at', 'transfer_type'], 'required','enableClientValidation' => false],
+			[['issue_id', 'type', 'value', 'deadline_at', 'transfer_type', 'vat'], 'required', 'enableClientValidation' => false],
 			[['issue_id', 'type', 'transfer_type'], 'integer'],
 			[['pay_at', 'deadline_at'], 'safe'],
-			[['value'], 'number'],
+			[['value', 'vat'], 'number'],
+			['vat', 'number', 'min' => 0, 'max' => 100],
 			[['type'], 'in', 'range' => array_keys(static::getTypesNames())],
 			[['transfer_type'], 'in', 'range' => array_keys(static::getTransferTypesNames())],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
@@ -52,6 +58,9 @@ class IssuePay extends ActiveRecord {
 
 	public function afterSave($insert, $changedAttributes): void {
 		$this->issue->markAsUpdate();
+		if ($this->isPayed() && (int) $this->issue->getPays()->onlyNotPayed()->count() === 0) {
+			$this->issue->payCalculation->markAsPayed();
+		}
 		parent::afterSave($insert, $changedAttributes);
 	}
 
@@ -69,18 +78,32 @@ class IssuePay extends ActiveRecord {
 			'issue_id' => 'Sprawa',
 			'pay_at' => 'Data płatności',
 			'deadline_at' => 'Termin płatności',
-			'value' => 'Kwota',
+			'value' => 'Honorarium (Brutto)',
+			'valueNetto' => 'Honorarium (Netto)',
 			'type' => 'Rodzaj',
 			'transfer_type' => 'Przelew/konto',
 			'partInfo' => 'Część',
+			'vat' => 'VAT (%)',
+			'vatPercent' => 'VAT (%)',
 		];
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getIssue() {
+	public function getValueNetto(): float {
+		return Yii::$app->tax->netto($this->value, $this->vat);
+	}
+
+	public function getVatPercent(): float {
+		return $this->vat / 100;
+	}
+
+	public function getIssue(): IssueQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
+	}
+
+	public function getProvisions(): ProvisionQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
+		return $this->hasMany(Provision::class, ['pay_id' => 'id']);
 	}
 
 	public function getCityDate(): ?string {
@@ -96,6 +119,26 @@ class IssuePay extends ActiveRecord {
 			default:
 				return null;
 		}
+	}
+
+	public function isPayed(): bool {
+		return $this->pay_at > 0;
+	}
+
+	public function getPartInfo(): string {
+		$pays = $this->issue->pays;
+		$count = count($pays);
+		if ($count === 1) {
+			return '1/1';
+		}
+		$i = 0;
+		foreach ($pays as $pay) {
+			$i++;
+			if ($pay->id === $this->id) {
+				return $i . '/' . $count;
+			}
+		}
+		return '';
 	}
 
 	public function getTypeName(): string {
@@ -118,40 +161,6 @@ class IssuePay extends ActiveRecord {
 			static::TRANSFER_TYPE_BANK => 'Przelew',
 			static::TRANSFER_TYPE_DIRECT => 'Gotówka',
 		];
-	}
-
-	public function isPayed(): bool {
-		return $this->pay_at > 0;
-	}
-
-	public function markAsPay(): bool {
-		if (!$this->isPayed()) {
-			$this->updateAttributes(['pay_at' => date(DATE_ATOM)]);
-			return true;
-		}
-		return false;
-	}
-
-	public function getPays(): array {
-		if (!isset(static::$PAYS[$this->issue_id])) {
-			static::$PAYS[$this->issue_id] = static::findAll(['issue_id' => $this->issue_id]);
-		}
-		return static::$PAYS[$this->issue_id];
-	}
-
-	public function getPartInfo(): string {
-		$count = count($this->pays);
-		if ($count === 1) {
-			return '1/1';
-		}
-		$i = 0;
-		foreach ($this->pays as $pay) {
-			$i++;
-			if ($pay->deadline_at === $this->deadline_at && $pay->value === $this->value) {
-				return $i . '/' . $count;
-			}
-		}
-		return '';
 	}
 
 	public static function find(): IssuePayQuery {

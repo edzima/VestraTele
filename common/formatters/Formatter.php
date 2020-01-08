@@ -8,6 +8,8 @@ use yii\i18n\Formatter as BaseFormatter;
 
 class Formatter extends BaseFormatter {
 
+	public $currencyCode = 'PLN';
+
 	public $numberFormatterOptions = [
 		NumberFormatter::MIN_FRACTION_DIGITS => 2,
 	];

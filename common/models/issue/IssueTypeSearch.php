@@ -13,7 +13,7 @@ class IssueTypeSearch extends IssueType {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			[['provision_type'], 'integer'],
 			[['name', 'short_name'], 'safe'],

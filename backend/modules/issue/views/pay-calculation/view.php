@@ -48,7 +48,7 @@ YiiAsset::register($this);
 		'model' => $model,
 		'attributes' => [
 			'statusName',
-			'value',
+			'value:currency',
 			'payName',
 			[
 				'attribute' => 'payCityDetails',

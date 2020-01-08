@@ -2,7 +2,8 @@
 
 namespace common\models\issue;
 
-use yii\base\InvalidParamException;
+use yii\base\InvalidArgumentException;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "issue_type".
@@ -11,12 +12,13 @@ use yii\base\InvalidParamException;
  * @property string $name
  * @property string $short_name
  * @property int $provision_type
+ * @property string $vat
  *
  * @property Issue[] $issues
  * @property IssueStage[] $stages
  * @property Provision $provision
  */
-class IssueType extends \yii\db\ActiveRecord {
+class IssueType extends ActiveRecord {
 
 	public const ACCIDENT_ID = 1;
 	private $provision;
@@ -26,7 +28,7 @@ class IssueType extends \yii\db\ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public static function tableName() {
+	public static function tableName(): string {
 		return 'issue_type';
 	}
 
@@ -34,7 +36,7 @@ class IssueType extends \yii\db\ActiveRecord {
 		if (!isset(static::$TYPES[$typeId])) {
 			$model = static::findOne($typeId);
 			if ($model === null) {
-				throw new InvalidParamException('Invalid type id: ' . $typeId);
+				throw new InvalidArgumentException('Invalid type id: ' . $typeId);
 			}
 			static::$TYPES[$typeId] = $model;
 		}
@@ -44,12 +46,13 @@ class IssueType extends \yii\db\ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
-			[['name', 'short_name'], 'required'],
+			[['name', 'short_name', 'vat'], 'required'],
 			[['provision_type'], 'integer'],
 			[['name', 'short_name'], 'string', 'max' => 255],
 			[['name'], 'unique'],
+			['vat', 'number', 'min' => 0, 'max' => 100],
 			[['short_name'], 'unique'],
 		];
 	}
@@ -57,12 +60,13 @@ class IssueType extends \yii\db\ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
 			'name' => 'Nazwa',
 			'short_name' => 'Skrót',
 			'provision_type' => 'Prowizja',
+			'vat' => 'VAT (%)',
 		];
 	}
 
@@ -70,11 +74,11 @@ class IssueType extends \yii\db\ActiveRecord {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getIssues() {
-		return $this->hasMany(Issue::className(), ['type_id' => 'id']);
+		return $this->hasMany(Issue::class, ['type_id' => 'id']);
 	}
 
 	public function getStages() {
-		return $this->hasMany(IssueStage::className(), ['id' => 'stage_id'])
+		return $this->hasMany(IssueStage::class, ['id' => 'stage_id'])
 			->viaTable('{{%issue_stage_type}}', ['type_id' => 'id']);
 	}
 

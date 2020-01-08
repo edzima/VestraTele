@@ -26,7 +26,7 @@ use common\models\address\Address;
 
 		<div class="row">
 
-			<?= $form->field($model, 'type_id', ['options' => ['class' => 'col-md-4']])
+			<?= $form->field($model, 'type_id', ['options' => ['class' => 'col-md-3']])
 				->widget(Select2::class, [
 						'data' => IssueForm::getTypes(),
 						'options' => [
@@ -36,7 +36,7 @@ use common\models\address\Address;
 					]
 				) ?>
 
-			<?= $form->field($model, 'stage_id', ['options' => ['class' => 'col-md-4'],])
+			<?= $form->field($model, 'stage_id', ['options' => ['class' => 'col-md-3'],])
 				->widget(DepDrop::class, [
 					'type' => DepDrop::TYPE_SELECT2,
 					'data' => $model->type_id !== null ? IssueForm::getStages($model->type_id) : [],
@@ -46,11 +46,29 @@ use common\models\address\Address;
 						'url' => Url::to(['//issue/type/stages-list']),
 						'loading' => 'Wyszukiwanie...',
 					],
-				]);
+				])
 			?>
 
+			<?= $form->field($model, 'stage_change_at', [
+				'options' => [
+					'class' => 'col-md-3',
+				],
+			])
+				->widget(DateTimeWidget::class,
+					[
+						'phpDatetimeFormat' => 'yyyy-MM-dd',
+						'clientOptions' => [
+							'allowInputToggle' => true,
+							'sideBySide' => true,
+							'widgetPositioning' => [
+								'horizontal' => 'auto',
+								'vertical' => 'auto',
+							],
+						],
+					]) ?>
 
-			<?= $form->field($model, 'archives_nr', ['options' => ['id' => 'archives-field', 'class' => 'col-md-2 required' . (!$model->isArchived() ? ' hidden' : '')]])->textInput(); ?>
+
+			<?= $form->field($model, 'archives_nr', ['options' => ['id' => 'archives-field', 'class' => 'col-md-3 required' . (!$model->isArchived() ? ' hidden' : '')]])->textInput(); ?>
 
 		</div>
 
@@ -312,6 +330,7 @@ use common\models\address\Address;
 	</div>
 
 <?php
+
 $archivesStageId = IssueForm::STAGE_ARCHIVED_ID;
 $positiveDecisionStageId = IssueForm::STAGE_POSITIVE_DECISION_ID;
 $stageInputId = Html::getInputId($model, 'stage_id');
@@ -324,7 +343,7 @@ let typeInput = document.getElementById(('issueTypeId'));
 let archivesInput = document.getElementById('archives-field');
 let accidentAtInput = document.getElementById('accident_at_field');
 let payCityWrapper = document.getElementById('payCityWrapper');
-
+let stateChangeAtInput = document.getElementById('issue-stage_change_at');
 
 function isArchived(){
 	return parseInt(stageInput.value) === $archivesStageId;
@@ -340,7 +359,7 @@ function isAccident(){
 }
 
 
-stageInput.onchange = function(){
+	stageInput.onchange = function(){
 	let value = parseInt(this.value);
 	if(value === $archivesStageId){
 		archivesInput.classList.remove('hidden');
@@ -353,6 +372,7 @@ stageInput.onchange = function(){
 	}else{
 		payCityWrapper.classList.add('hidden');
 	}
+	stateChangeAtInput.value = '';
 };
 
 typeInput.onchange= function(){
@@ -376,6 +396,9 @@ document.querySelector('.client-fieldset .copy-btn').addEventListener('click', f
         }
     }
 });
+
+
+
 JS;
 
 $this->registerJs($js);

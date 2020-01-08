@@ -31,6 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'id',
 			'name',
 			'short_name',
+			'days_reminder',
 		],
 	]) ?>
 

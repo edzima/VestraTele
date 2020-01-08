@@ -3,6 +3,7 @@
 use backend\modules\benefit\Module as BenefitModule;
 use backend\modules\entityResponsible\Module as EntityResponsibleModule;
 use backend\modules\issue\Module as IssueModule;
+use backend\modules\provision\Module as ProvisionModule;
 
 $params = array_merge(
 	require(__DIR__ . '/../../common/config/params.php'),
@@ -92,6 +93,9 @@ $config = [
 		],
 		'issue' => [
 			'class' => IssueModule::class,
+		],
+		'provision' => [
+			'class' => ProvisionModule::class,
 		],
 		'noty' => [
 			'class' => 'lo\modules\noty\Module',

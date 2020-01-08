@@ -1,11 +1,13 @@
 <?php
 
 use backend\helpers\Url;
+use backend\modules\issue\models\IssueProvisionUsersForm;
 use backend\modules\issue\models\PayCalculationForm;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model PayCalculationForm */
+/* @var $provisionModel IssueProvisionUsersForm */
 
 $this->title = 'Edytuj rozliczenie: ' . $model->getIssue();
 
@@ -29,6 +31,7 @@ $this->params['breadcrumbs'][] = 'Edycja';
 
 	<?= $this->render('_form', [
 		'model' => $model,
+		'provisionModel' => $provisionModel,
 	]) ?>
 
 </div>

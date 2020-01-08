@@ -11,6 +11,7 @@ use yii\db\ActiveRecord;
  * @property string $name
  * @property string $short_name
  * @property int $posi
+ * @property int $days_reminder
  *
  * @property Issue[] $issues
  * @property issueType[] $types
@@ -37,8 +38,9 @@ class IssueStage extends ActiveRecord {
 	public function rules() {
 		return [
 			[['name', 'short_name', 'typesIds'], 'required'],
-			[['posi'], 'integer'],
+			[['posi', 'days_reminder'], 'integer'],
 			['posi', 'default', 'value' => 0],
+			['days_reminder', 'integer', 'min' => 1],
 			[['name', 'short_name'], 'string', 'max' => 255],
 			[['name', 'short_name'], 'unique'],
 			[['short_name'], 'unique'],
@@ -55,6 +57,7 @@ class IssueStage extends ActiveRecord {
 			'short_name' => 'Skrót',
 			'posi' => 'Pozycja',
 			'typesIds' => 'Typy',
+			'days_reminder' => 'Przypomnij(dni)',
 		];
 	}
 
@@ -88,4 +91,5 @@ class IssueStage extends ActiveRecord {
 	public static function find() {
 		return new IssueStageQuery(get_called_class());
 	}
+
 }

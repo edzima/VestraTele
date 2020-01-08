@@ -40,17 +40,22 @@ class IssueController extends Controller {
 	public function actionIndex() {
 		$searchModel = new IssueSearch();
 		$user = Yii::$app->user;
-		$searchModel->user_id = $user->getId();
-		if ($user->can(User::ROLE_LAYER)) {
-			$searchModel->isLawyer = true;
-		}
-		if ($user->can(User::ROLE_AGENT)) {
-			$searchModel->agents = $user->getIdentity()->getAllChildsIds();
-			$searchModel->agents[] = $user->id;
-			$searchModel->isAgent = true;
-		}
-		if ($user->can(User::ROLE_TELEMARKETER)) {
-			$searchModel->isTele = true;
+
+		if (!$user->can(User::ROLE_ADMINISTRATOR)) {
+			$searchModel->user_id = $user->getId();
+			if ($user->can(User::ROLE_LAYER)) {
+				$searchModel->isLawyer = true;
+			}
+			if ($user->can(User::ROLE_AGENT)) {
+				/** @var User $userModel */
+				$userModel = $user->getIdentity();
+				$searchModel->agents = $userModel->getAllChildesIds();
+				$searchModel->agents[] = $user->id;
+				$searchModel->isAgent = true;
+			}
+			if ($user->can(User::ROLE_TELEMARKETER)) {
+				$searchModel->isTele = true;
+			}
 		}
 
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -83,6 +88,7 @@ class IssueController extends Controller {
 	public static function findModel($id): Issue {
 		$model = Issue::find()
 			->andWhere(['id' => $id])
+			->with('issueNotes.user.userProfile')
 			->one();
 
 		if ($model !== null && static::shouldFind($model)) {
@@ -93,14 +99,17 @@ class IssueController extends Controller {
 
 	private static function shouldFind(Issue $model): bool {
 		$user = Yii::$app->user;
-		if ($user->can(User::ROLE_TELEMARKETER)) {
+		/** @var User $userModel */
+		$userModel = $user->getIdentity();
+		if (
+			$user->can(User::ROLE_ADMINISTRATOR)
+			|| $user->can(User::ROLE_TELEMARKETER)
+			|| ($user->can(User::ROLE_LAYER) && $model->lawyer_id === $user->id)) {
 			return true;
 		}
-		if ($user->can(User::ROLE_LAYER) && $model->lawyer_id === $user->id) {
-			return true;
-		}
+
 		if ($user->can(User::ROLE_AGENT)) {
-			$agents = $user->getIdentity()->getAllChildsIds();
+			$agents = $userModel->getAllChildesIds();
 			$agents[] = $user->id;
 			if (in_array($model->agent_id, $agents)) {
 				return true;

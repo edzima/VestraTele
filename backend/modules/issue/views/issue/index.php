@@ -1,6 +1,5 @@
 <?php
 
-use common\models\issue\Issue;
 use common\models\issue\IssueSearch;
 use common\models\User;
 use kartik\grid\ActionColumn;
@@ -9,7 +8,6 @@ use kartik\grid\GridView;
 use kartik\grid\SerialColumn;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
-use yii\helpers\Url;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
@@ -155,6 +153,19 @@ $this->registerJs($js);
 			],
 			[
 				'class' => DataColumn::class,
+				'attribute' => 'stage_change_at',
+				'format' => 'date',
+				'contentOptions' => [
+					'class' => 'bold-text',
+				],
+				'options' => [
+					'style' => 'width:90px',
+				],
+				'visible' => $searchModel->onlyDelayed,
+			],
+
+			[
+				'class' => DataColumn::class,
 				'attribute' => 'client_surname',
 				'value' => 'clientFullName',
 				'label' => 'Klient',
@@ -177,6 +188,7 @@ $this->registerJs($js);
 					'class' => 'ellipsis',
 				],
 			],
+
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'created_at',

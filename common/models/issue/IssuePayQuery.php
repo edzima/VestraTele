@@ -29,18 +29,20 @@ class IssuePayQuery extends ActiveQuery {
 
 	public function onlyNotPayed() {
 		list(, $alias) = $this->getTableNameAndAlias();
-		$this->andWhere($alias . '.pay_at IS NULL or pay_at = 0');
+		$this->andWhere("$alias.pay_at IS NULL or $alias.pay_at = 0");
 		return $this;
 	}
 
 	public function onlyDelayed(string $delayRange = 'now') {
+		list(, $alias) = $this->getTableNameAndAlias();
 		$this->onlyNotPayed();
-		$this->andWhere(['<=', 'deadline_at', date(DATE_ATOM, strtotime($delayRange))]);
+		$this->andWhere(['<=', $alias . '.deadline_at', date(DATE_ATOM, strtotime($delayRange))]);
 		return $this;
 	}
 
 	public function onlyNotDelayed(string $delayRange = 'now') {
-		$this->andWhere(['>=', 'deadline_at', date(DATE_ATOM, strtotime($delayRange))]);
+		list(, $alias) = $this->getTableNameAndAlias();
+		$this->andWhere(['>=', $alias . '.deadline_at', date(DATE_ATOM, strtotime($delayRange))]);
 		return $this;
 	}
 
@@ -51,7 +53,9 @@ class IssuePayQuery extends ActiveQuery {
 	}
 
 	public function getValueSum(): float {
-		return $this->sum('value') ?? 0;
+		list(, $alias) = $this->getTableNameAndAlias();
+
+		return $this->sum($alias . '.value') ?? 0;
 	}
 
 	public function getPayedSum(): float {
@@ -60,7 +64,8 @@ class IssuePayQuery extends ActiveQuery {
 	}
 
 	public function onlyWithoutDeadline() {
-		$this->andWhere('deadline_at IS NOT NULL');
+		list(, $alias) = $this->getTableNameAndAlias();
+		$this->andWhere($alias . '.deadline_at IS NOT NULL');
 		return $this;
 	}
 }

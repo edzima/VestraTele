@@ -17,6 +17,7 @@ class PayCalculationForm extends Model {
 	public $value = 4815;
 	public $payParts = 1;
 	public $firstBillDate;
+	public $payAt;
 
 	public $dateInterval = '+ 3 days';
 	public $dateFormat = DATE_ATOM;
@@ -27,11 +28,24 @@ class PayCalculationForm extends Model {
 	private $calculation;
 	/** @var IssuePay[] */
 	private $pays = [];
-	/**
-	 * @var IssuePayCity
-	 */
+	/** @var IssuePayCity */
 	private $payCity;
 	private $_isGenerate = false;
+
+	public function __construct(Issue $issue, $config = []) {
+		$this->issue = $issue;
+		$this->calculation = $this->getIssue()->payCalculation ?? $this->createPayCalculationModel();
+		parent::__construct($config);
+	}
+
+	public function attributeLabels(): array {
+		return [
+			'payParts' => 'Ilość rat',
+			'firstBillDate' => 'Termin płatności',
+			'payAt' => 'Data płatności',
+			'value' => 'Wartość',
+		];
+	}
 
 	public function rules(): array {
 		return [
@@ -43,11 +57,11 @@ class PayCalculationForm extends Model {
 			],
 			['payParts', 'integer', 'min' => 0, 'max' => 10],
 			['firstBillDate', 'date', 'format' => DATE_ATOM],
+			['payAt', 'date', 'format' => DATE_ATOM],
 		];
 	}
 
 	public function validateValue($attribute, $params, $validator): void {
-
 		$value = (float) $this->$attribute;
 		$sum = $this->getPaysSumValue();
 		if ($value !== $sum) {
@@ -56,22 +70,23 @@ class PayCalculationForm extends Model {
 		}
 	}
 
-	public function attributeLabels(): array {
-		return [
-			'payParts' => 'Ilość rat',
-			'firstBillDate' => 'Termin płatności',
-			'value' => 'Wartość',
-		];
+	public function isGenerate(): bool {
+		return $this->_isGenerate;
 	}
 
-	public function __construct(Issue $issue, $config = []) {
-		$this->issue = $issue;
-		$this->calculation = $this->getIssue()->payCalculation ?? $this->createPayCalculationModel();
-
-		parent::__construct($config);
+	public function getIssue(): Issue {
+		return $this->issue;
 	}
 
-	public function init() {
+	private function createPayCalculationModel(): IssuePayCalculation {
+		$model = new IssuePayCalculation();
+		$model->issue_id = $this->getIssue()->id;
+		$model->status = IssuePayCalculation::STATUS_ACTIVE;
+		$model->value = $this->getIssue()->provision_base;
+		return $model;
+	}
+
+	public function init(): void {
 		if ($this->calculation->value > 0) {
 			$this->value = $this->calculation->value;
 		}
@@ -87,22 +102,6 @@ class PayCalculationForm extends Model {
 		parent::init();
 	}
 
-	public function isCreateForm(): bool {
-		return $this->getPayCalculation()->isNewRecord;
-	}
-
-	public function getPayCalculation(): IssuePayCalculation {
-		return $this->calculation;
-	}
-
-	private function createPayCalculationModel(): IssuePayCalculation {
-		$model = new IssuePayCalculation();
-		$model->issue_id = $this->getIssue()->id;
-		$model->status = IssuePayCalculation::STATUS_ACTIVE;
-		$model->value = $this->getIssue()->provision_base;
-		return $model;
-	}
-
 	private function getDefaultFirstBillDate(): string {
 		$time = null;
 		$details = $this->getPayCityDetails();
@@ -115,6 +114,14 @@ class PayCalculationForm extends Model {
 			return date($this->dateFormat, strtotime($this->dateInterval, $time));
 		}
 		return (new DateTime())->modify('last day of')->format($this->dateFormat);
+	}
+
+	public function isCreateForm(): bool {
+		return $this->getPayCalculation()->isNewRecord;
+	}
+
+	public function getPayCalculation(): IssuePayCalculation {
+		return $this->calculation;
 	}
 
 	private function getDefaultPayType(): int {
@@ -145,14 +152,6 @@ class PayCalculationForm extends Model {
 			$sum += (float) $pay->value;
 		}
 		return $sum;
-	}
-
-	public static function getPaysTypesNames(): array {
-		return IssuePayCalculation::getPayTypesNames();
-	}
-
-	public static function getStatusNames(): array {
-		return IssuePayCalculation::getStatusNames();
 	}
 
 	/**
@@ -186,19 +185,12 @@ class PayCalculationForm extends Model {
 				'value' => (int) $this->payParts === 1 ? $this->value : 0,
 				'deadline_at' => $date,
 				'transfer_type' => $this->getPayCalculation()->pay_type,
+				'vat' => $this->issue->type->vat,
 				'type' => IssuePay::TYPE_HONORARIUM,
 			]);
 			$date = date($this->dateFormat, strtotime('+ 1 month', strtotime($date)));
 		}
 		return $pays;
-	}
-
-	public function isGenerate(): bool {
-		return $this->_isGenerate;
-	}
-
-	public function getIssue(): Issue {
-		return $this->issue;
 	}
 
 	public function save(): bool {
@@ -216,8 +208,11 @@ class PayCalculationForm extends Model {
 					$pay->delete();
 					continue;
 				}
-				if ($status === IssuePayCalculation::STATUS_PAYED && empty($pay->pay_at)) {
-					$pay->pay_at = date(DATE_ATOM);
+				$pay->vat = $this->issue->type->vat;
+				if ($status === IssuePayCalculation::STATUS_PAYED) {
+					if (empty($pay->pay_at)) {
+						$pay->pay_at = empty($this->payAt) ? date(DATE_ATOM) : $this->payAt;
+					}
 				}
 				if (!$pay->isPayed()) {
 					$pay->transfer_type = $payCalculation->pay_type;
@@ -245,6 +240,14 @@ class PayCalculationForm extends Model {
 
 	public function isDisallowChangePays(): bool {
 		return !$this->isCreateForm() && !$this->getPayCalculation()->isDraft();
+	}
+
+	public static function getPaysTypesNames(): array {
+		return IssuePayCalculation::getPayTypesNames();
+	}
+
+	public static function getStatusNames(): array {
+		return IssuePayCalculation::getStatusNames();
 	}
 
 }

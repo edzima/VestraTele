@@ -1,6 +1,8 @@
 <?php
 
 use common\components\DbManager;
+use common\components\Provisions;
+use common\components\TaxComponent;
 use common\formatters\Formatter;
 use yii\caching\DummyCache;
 use yii\caching\FileCache;
@@ -75,7 +77,7 @@ $config = [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',
 				],
-				'noty' =>[
+				'noty' => [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',
 				],
@@ -107,6 +109,12 @@ $config = [
 		],
 		'cache' => [
 			'class' => YII_ENV_DEV ? DummyCache::class : FileCache::class,
+		],
+		'provisions' => [
+			'class' => Provisions::class,
+		],
+		'tax' => [
+			'class' => TaxComponent::class,
 		],
 	],
 ];

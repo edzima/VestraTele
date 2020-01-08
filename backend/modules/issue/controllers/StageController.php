@@ -17,10 +17,10 @@ class StageController extends Controller {
 	/**
 	 * @inheritdoc
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
 				],

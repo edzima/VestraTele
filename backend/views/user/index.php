@@ -1,6 +1,8 @@
 <?php
 
+use backend\helpers\Url;
 use yii\bootstrap\Html;
+use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use common\models\User;
 
@@ -44,8 +46,21 @@ $typWok = ['0' => 'Przedstawiciel', '1' => 'Telemarketer'];
 			'action_at:Datetime',
 
 			[
-				'class' => 'yii\grid\ActionColumn',
-				'template' => '{update} {delete}',
+				'class' => ActionColumn::class,
+				'template' => '{update} {provision} {delete}',
+				'buttons' => [
+					'provision' => static function (string $url, User $model) {
+						return Html::a('<span class="glyphicon glyphicon-usd"></span>',
+							Url::userProvisions($model->id),
+							[
+								'title' => 'Podgląd',
+								'aria-label' => 'Podgląd',
+								'data-pjax' => '0',
+							]);
+					},
+
+				],
+
 			],
 		],
 	]) ?>
