@@ -11,6 +11,11 @@ use yii\db\ActiveQuery;
  */
 class ProvisionQuery extends ActiveQuery {
 
+	public function hidden(): self {
+		$this->andWhere(['hide_on_report' => true]);
+		return $this;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 * @return Provision[]|array

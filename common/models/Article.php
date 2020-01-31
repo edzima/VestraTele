@@ -23,9 +23,6 @@ use common\models\query\ArticleQuery;
  * @property integer $published_at
  * @property integer $created_at
  * @property integer $updated_at
- * @property string $start_at
- * @property string $finish_at
- * @property float $point
  *
  *
  * @property User $author
@@ -34,8 +31,8 @@ use common\models\query\ArticleQuery;
  */
 class Article extends ActiveRecord {
 
-	const STATUS_DRAFT = 0;
-	const STATUS_ACTIVE = 1;
+	public const STATUS_DRAFT = 0;
+	public const STATUS_ACTIVE = 1;
 
 	/**
 	 * @inheritdoc
@@ -69,9 +66,8 @@ class Article extends ActiveRecord {
 	 */
 	public function rules() {
 		return [
-			[['title', 'body', 'category_id', 'finish_at', 'start_at'], 'required'],
+			[['title', 'body', 'category_id'], 'required'],
 			[['body'], 'string'],
-			[['point'], 'number'],
 			[
 				'published_at', 'default',
 				'value' => function () {
@@ -105,9 +101,6 @@ class Article extends ActiveRecord {
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
 			'tagValues' => Yii::t('common', 'Tags'),
-			'start_at' => 'Zaczyna  się',
-			'finish_at' => 'Kończy się',
-			'point' => 'Próg punktowy',
 		];
 	}
 

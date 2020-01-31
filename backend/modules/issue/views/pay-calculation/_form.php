@@ -32,10 +32,7 @@ $pay = $model->getPayCalculation();
 							'horizontal' => 'auto',
 							'vertical' => 'auto',
 						],
-					],
-					'options' => [
-						'readonly' => $model->isDisallowChangePays(),
-					],
+					]
 				]) ?>
 
 	</div>

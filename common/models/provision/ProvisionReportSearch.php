@@ -47,4 +47,13 @@ class ProvisionReportSearch extends ProvisionSearch {
 		return Yii::$app->formatter->asCurrency($query->sum('provision.value'));
 	}
 
+	public function hasHiddenProvisions(): bool {
+		$query = Provision::find()
+			->hidden();
+
+		$this->dateFilter($query);
+		$query->andFilterWhere(['to_user_id' => $this->to_user_id]);
+		return $query->exists();
+	}
+
 }

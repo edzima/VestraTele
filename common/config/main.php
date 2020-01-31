@@ -6,6 +6,7 @@ use common\components\TaxComponent;
 use common\formatters\Formatter;
 use yii\caching\DummyCache;
 use yii\caching\FileCache;
+use common\modules\address\Module as AddressModule;
 
 $config = [
 	'name' => 'Vestra System',
@@ -18,6 +19,11 @@ $config = [
 	'aliases' => [
 		'@bower' => '@vendor/bower-asset',
 		'@npm' => '@vendor/npm-asset',
+	],
+	'modules' => [
+		'address' => [
+			'class' => AddressModule::class,
+		],
 	],
 	'components' => [
 		'db' => [

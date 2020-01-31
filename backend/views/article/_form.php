@@ -10,6 +10,7 @@ use vova07\imperavi\Widget;
 /* @var $this yii\web\View */
 /* @var $model common\models\Article */
 /* @var $form yii\bootstrap\ActiveForm */
+/* @var $categories string[] */
 ?>
 
 <div class="article-form">
@@ -20,7 +21,7 @@ use vova07\imperavi\Widget;
 
 	<?= $form->field($model, 'slug')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'body')->widget(Widget::className(), [
+	<?= $form->field($model, 'body')->widget(Widget::class, [
 		'settings' => [
 			'minHeight' => 200,
 			'plugins' => [
@@ -47,45 +48,10 @@ use vova07\imperavi\Widget;
 	), ['prompt' => '']
 	) ?>
 
-	<?= $form->field($model, 'point', ['options' => ['class' => 'col-md-4']])->textInput(['type' => 'number', 'min' => 0]) ?>
 
 	<?= $form->field($model, 'published_at')->widget(
 		DateTimeWidget::class,
 		[
-			'clientOptions' => [
-
-				'allowInputToggle' => true,
-				'sideBySide' => true,
-				'widgetPositioning' => [
-					'horizontal' => 'auto',
-					'vertical' => 'auto',
-				],
-			],
-		]
-	) ?>
-
-
-	<?= $form->field($model, 'start_at')->widget(
-		DateTimeWidget::class,
-		[
-			'phpDatetimeFormat' => 'yyyy-MM-dd',
-			'clientOptions' => [
-
-				'allowInputToggle' => true,
-				'sideBySide' => true,
-				'widgetPositioning' => [
-					'horizontal' => 'auto',
-					'vertical' => 'auto',
-				],
-			],
-		]
-	) ?>
-
-
-	<?= $form->field($model, 'finish_at')->widget(
-		DateTimeWidget::className(),
-		[
-			'phpDatetimeFormat' => 'yyyy-MM-dd',
 			'clientOptions' => [
 
 				'allowInputToggle' => true,

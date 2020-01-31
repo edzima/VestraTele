@@ -29,10 +29,7 @@ return [
 		'haslo-zmien' => 'account/default/password',
 
 		//task
-		'spotkania' => 'task',
-		'spotkanie' => 'task/index',
-		'spotkanie/nowe' => 'task/create',
-		'spotkanie/edycja' => 'task/update',
+		'spotkania' => 'meet',
 
 		'admin' => '/backend/web',
 		'kalkulator-wyrownania-zasilku' => 'benefit-amount/index',

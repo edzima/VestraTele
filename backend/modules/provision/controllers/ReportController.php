@@ -5,10 +5,12 @@ namespace backend\modules\provision\controllers;
 use backend\helpers\Url;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionReportSearch;
+use common\models\provision\ProvisionSearch;
 use common\models\provision\ProvisionUsersSearch;
 use common\models\User;
 use Yii;
 use yii\filters\VerbFilter;
+use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -64,6 +66,17 @@ class ReportController extends Controller {
 		$searchModel->dateTo = $dateTo;
 		$searchModel->dateFrom = $dateFrom;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		if ($searchModel->hasHiddenProvisions()) {
+			$link = Html::a('ukryto prowizje', [
+					'/provision/provision/index',
+					Html::getInputName(ProvisionSearch::instance(), 'dateFrom') => $dateFrom,
+					Html::getInputName(ProvisionSearch::instance(), 'dateTo') => $dateTo,
+					Html::getInputName(ProvisionSearch::instance(), 'to_user_id') => $user->id,
+					Html::getInputName(ProvisionSearch::instance(), 'hide_on_report') => true,
+				]
+			);
+			Yii::$app->session->addFlash('warning', 'W raporcie ' . $link);
+		}
 
 		return $this->render('view', [
 			'searchModel' => $searchModel,

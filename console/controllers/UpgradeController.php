@@ -31,4 +31,21 @@ class UpgradeController extends Controller {
 		Yii::$app->db->createCommand()->update(IssuePayCalculation::tableName(), ['status' => IssuePayCalculation::STATUS_PAYED], ['issue_id' => $ids])
 			->execute();
 	}
+
+	public function actionIssuePayDelayed(): void {
+		$models = IssuePayCalculation::find()
+			->where(['status' => IssuePayCalculation::STATUS_PAYED])
+			->with('issue.pays')
+			->all();
+		$ids = [];
+
+		foreach ($models as $model) {
+			if (count($model->issue->pays) === 0) {
+				$ids[] = $model->issue_id;
+			}
+		}
+		Yii::$app->db->createCommand()->update(IssuePayCalculation::tableName(), ['status' => IssuePayCalculation::STATUS_DRAFT], ['issue_id' => $ids])
+			->execute();
+
+	}
 }

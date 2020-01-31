@@ -37,16 +37,13 @@ AppAsset::register($this);
 
 	if (!Yii::$app->user->isGuest) {
 
-		$menuItems = [
-			[
-				'label' => Yii::t('frontend', 'Your tasks'),
-				'url' => ['/task'],
-			],
-
-		];
 
 		if (Yii::$app->user->can('telemarketer')) {
 			$menuItems = [
+				[
+					'label' => 'Spotkania',
+					'url' => ['/meet/tele'],
+				],
 				[
 					'label' => Yii::t('frontend', 'Articles'),
 					'url' => ['/article/index'],
@@ -66,8 +63,8 @@ AppAsset::register($this);
 		if (Yii::$app->user->can('agent')) {
 			$menuItems = [
 				[
-					'label' => Yii::t('frontend', 'Task'),
-					'url' => ['/task-status'],
+					'label' => 'Spotkania',
+					'url' => ['/meet/agent'],
 				],
 				/*
 				[

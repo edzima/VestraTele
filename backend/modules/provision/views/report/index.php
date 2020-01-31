@@ -3,9 +3,10 @@
 use backend\helpers\Url;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionUsersSearch;
+use kartik\grid\DataColumn;
+use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
-use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel ProvisionUsersSearch */
@@ -26,6 +27,7 @@ $dateTo = $searchModel->dateTo;
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'showPageSummary' => true,
 		'columns' => [
 			[
 				'attribute' => 'toUser',
@@ -34,9 +36,18 @@ $dateTo = $searchModel->dateTo;
 				},
 				'format' => 'raw',
 			],
-			'value:currency',
+			[
+				'class' => DataColumn::class,
+				'attribute' => 'value',
+				'format' => 'currency',
+				'pageSummary' => true,
+			],
 		],
 	]) ?>
+
+	<?php if ($dataProvider->pagination->pageCount > 1): ?>
+		<p>Suma: <?= $searchModel->getSum($dataProvider->query) ?></p>
+	<?php endif; ?>
 
 
 </div>

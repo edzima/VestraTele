@@ -41,6 +41,11 @@ YiiAsset::register($this);
 			'label' => 'Typ',
 			'value' => 'type.name',
 		],
+		[
+			'label' => 'Wpłata (netto)',
+			'value' => 'pay.valueNetto',
+			'format' => 'currency',
+		],
 		'provision:percent',
 		[
 			'class' => DataColumn::class,

@@ -63,9 +63,6 @@ $config = [
 		'frontendCache' => require Yii::getAlias('@frontend/config/_cache.php'),
 	],
 	'modules' => [
-		'address' => [
-			'class' => 'backend\modules\address\Module',
-		],
 		'benefit' => [
 			'class' => BenefitModule::class,
 		],
@@ -156,8 +153,7 @@ $config = [
 	],
 	'params' => $params,
 ];
-
-if (YII_ENV_DEV) {
+if (YII_DEBUG) {
 	// configuration adjustments for 'dev' environment
 	$config['bootstrap'][] = 'debug';
 	$config['modules']['debug'] = [

@@ -132,7 +132,7 @@ class Provisions extends Component {
 	private function issueProvisions(Issue $issue): array {
 		$models = ProvisionUser::find()
 			->with('type')
-			->joinWith('type')
+			->joinWith('type T')
 			->andWhere([
 				'from_user_id' => [
 					$issue->agent_id,
@@ -140,6 +140,7 @@ class Provisions extends Component {
 					$issue->lawyer_id,
 				],
 			])
+			->orderBy('T.only_with_tele DESC')
 			->all();
 		$models = $this->typeFilter($models, $issue);
 		$models = $this->teleFilter($models, $issue);
@@ -154,16 +155,16 @@ class Provisions extends Component {
 
 	private function teleFilter(array $provisions, Issue $issue): array {
 		return array_filter($provisions, static function (ProvisionUser $provisionUser) use ($issue) {
-			if ($issue->hasTele()) {
-				return $provisionUser->type->only_with_tele;
+			if ($provisionUser->type->only_with_tele) {
+				return $issue->hasTele();
 			}
-			return !$provisionUser->type->only_with_tele;
+			return true;
 		});
 	}
 
 	private function userFilter(array $provisions, int $userId): array {
 		return array_filter($provisions, static function (ProvisionUser $provision) use ($userId) {
-			return $provision->to_user_id === $userId;
+			return $provision->to_user_id === $userId && $provision->from_user_id === $userId;
 		});
 	}
 

@@ -21,7 +21,7 @@ use common\models\User;
 					'visible' => Yii::$app->user->can('administrator'),
 				],
 				[
-					'label' => Yii::t('backend', 'Competition'),
+					'label' => Yii::t('backend', 'Articles'),
 					'url' => '#',
 					'icon' => '<i class="fa fa-edit"></i>',
 					'options' => ['class' => 'treeview'],
@@ -43,14 +43,14 @@ use common\models\User;
 					],
 				],
 				[
-					'label' => 'Spotkania',
-					'url' => ['/task-status/index'],
+					'label' => 'Kampanie',
+					'url' => ['/campaign/index'],
 					'icon' => '<i class="fa fa fa-suitcase"></i>',
-					'options' => ['class' => 'treeview'],
-					'items' => [
-						['label' => 'Spotkania', 'url' => ['/task/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-						['label' => 'Raporty', 'url' => ['/task-status/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-					],
+				],
+				[
+					'label' => 'Spotkania',
+					'url' => ['/issue/meet/index'],
+					'icon' => '<i class="fa fa fa-suitcase"></i>',
 				],
 
 				[

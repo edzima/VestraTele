@@ -121,8 +121,8 @@ class ProvisionSearch extends Provision {
 		$this->dateFilter($query);
 		return ArrayHelper::map($query->all(), 'to_user_id', 'toUser.fullName');
 	}
-
-	private function dateFilter(ActiveQuery $query): void {
+ 
+	protected function dateFilter(ActiveQuery $query): void {
 		if (!empty($this->dateFrom) || !empty($this->dateTo)) {
 			$query
 				->joinWith('pay')

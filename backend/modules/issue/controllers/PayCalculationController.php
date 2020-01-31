@@ -110,6 +110,10 @@ class PayCalculationController extends Controller {
 
 	private function checkProvisions(Issue $model): bool {
 		$provisions = Yii::$app->provisions;
+		if (empty($provisions->getTypes())) {
+			Yii::$app->session->addFlash('error', 'Brakuje ustawionych typów prowizji');
+			return false;
+		}
 		$hasAll = true;
 		if (!$provisions->hasAllProvisions($model->lawyer)) {
 			$hasAll = false;
