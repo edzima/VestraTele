@@ -6,6 +6,7 @@ use common\models\User;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class ProvisionReportSearch
@@ -23,7 +24,7 @@ class ProvisionReportSearch extends ProvisionSearch {
 
 	public function rules(): array {
 		return [
-			[['dateFrom', 'dateTo'], 'safe'],
+			[['dateFrom', 'dateTo', 'from_user_id'], 'safe'],
 		];
 	}
 
@@ -54,6 +55,17 @@ class ProvisionReportSearch extends ProvisionSearch {
 		$this->dateFilter($query);
 		$query->andFilterWhere(['to_user_id' => $this->to_user_id]);
 		return $query->exists();
+	}
+
+	public function getFromUserList(): array {
+		$query = Provision::find()
+			->select('from_user_id')
+			->groupBy('from_user_id')
+			->andWhere(['to_user_id' => $this->to_user_id])
+			->andWhere(['<>', 'from_user_id', $this->to_user_id])
+			->joinWith('fromUser.userProfile');
+		$this->dateFilter($query);
+		return ArrayHelper::map($query->all(), 'from_user_id', 'fromUser.fullName');
 	}
 
 }

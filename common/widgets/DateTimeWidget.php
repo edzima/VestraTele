@@ -8,6 +8,14 @@ class DateTimeWidget extends BaseDateTimeWidget {
 
 	public $phpDatetimeFormat = 'yyyy-MM-dd HH:mm';
 
+	public $clientOptions = [
+		'allowInputToggle' => true,
+		'sideBySide' => true,
+		'widgetPositioning' => [
+			'horizontal' => 'auto',
+			'vertical' => 'auto',
+		],
+	];
 
 	/**
 	 * @var array

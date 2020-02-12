@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\models\issue\Issue;
+use common\models\issue\IssueMeet;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use Yii;
@@ -46,6 +47,27 @@ class UpgradeController extends Controller {
 		}
 		Yii::$app->db->createCommand()->update(IssuePayCalculation::tableName(), ['status' => IssuePayCalculation::STATUS_DRAFT], ['issue_id' => $ids])
 			->execute();
+	}
 
+	public function actionUpdateMeetStatus(): void {
+		$statuses = [
+			IssueMeet::STATUS_SIGNED_CONTRACT => [
+				IssueMeet::STATUS_SENT_DOCUMENTS,
+			],
+			IssueMeet::STATUS_CONTACT_AGAIN => [
+				IssueMeet::STATUS_WAITING_FOR_THE_RULE,
+				IssueMeet::STATUS_WONDER,
+			],
+			IssueMeet::STATUS_NOT_ELIGIBLE => [
+				IssueMeet::STATUS_EMERYT,
+				IssueMeet::STATUS_RENTA,
+				IssueMeet::STATUS_GUARDIAN_WORKS,
+			],
+		];
+		$count = 0;
+		foreach ($statuses as $status => $olds) {
+			$count += IssueMeet::updateAll(['status' => $status], ['status' => $olds]);
+		}
+		$this->stdout("Update $count meets");
 	}
 }

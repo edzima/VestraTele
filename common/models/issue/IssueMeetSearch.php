@@ -11,14 +11,25 @@ use yii\data\ActiveDataProvider;
 class IssueMeetSearch extends IssueMeet {
 
 	public $cityName;
+	public $stateId;
+
+	public $created_at_from;
+	public $created_at_to;
+	public $date_at_from;
+	public $date_at_to;
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type_id', 'tele_id', 'agent_id', 'status', 'campaign_id'], 'integer'],
-			[['phone', 'client_name', 'client_surname', 'created_at', 'updated_at', 'date_at', 'details', 'cityName'], 'safe'],
+			[['id', 'type_id', 'stateId', 'tele_id', 'agent_id', 'status', 'campaign_id'], 'integer'],
+			[
+				[
+					'phone', 'client_name', 'client_surname', 'created_at', 'updated_at',
+					'date_at', 'date_at_from', 'date_at_to', 'details', 'cityName', 'created_at_from', 'created_at_to',
+				], 'safe',
+			],
 		];
 	}
 
@@ -30,6 +41,15 @@ class IssueMeetSearch extends IssueMeet {
 		return Model::scenarios();
 	}
 
+	public function attributeLabels(): array {
+		return array_merge(parent::attributeLabels(), [
+			'created_at_from' => 'Data leada (od)',
+			'created_at_to' => 'Data leada (do)',
+			'date_at_from' => 'Data spotkania (od)',
+			'date_at_to' => 'Data spotkania (do)',
+		]);
+	}
+
 	/**
 	 * Creates data provider instance with search query applied
 	 *
@@ -39,10 +59,11 @@ class IssueMeetSearch extends IssueMeet {
 	 */
 	public function search($params) {
 		$query = IssueMeet::find();
-		$query->with('city');
-		$query->with('type');
-		$query->with('campaign');
-		$query->with(['agent.userProfile'])
+		$query->with('city')
+			->with('state')
+			->with('type')
+			->with('campaign')
+			->with(['agent.userProfile'])
 			->with('tele.userProfile');
 
 		$dataProvider = new ActiveDataProvider([
@@ -72,13 +93,22 @@ class IssueMeetSearch extends IssueMeet {
 
 		if (!empty($this->cityName)) {
 			$query->joinWith('city C');
-			$query->andFilterWhere(['like', 'c.name' => $this->cityName]);
+			$query->andFilterWhere(['like', 'C.name', $this->cityName]);
+		}
+
+		if (!empty($this->stateId)) {
+			$query->joinWith('state S');
+			$query->andWhere(['S.id' => $this->stateId]);
 		}
 
 		$query->andFilterWhere(['like', 'phone', $this->phone])
 			->andFilterWhere(['like', 'client_name', $this->client_name])
 			->andFilterWhere(['like', 'client_surname', $this->client_surname])
-			->andFilterWhere(['like', 'details', $this->details]);
+			->andFilterWhere(['like', 'details', $this->details])
+			->andFilterWhere(['>=', 'created_at', $this->created_at_from])
+			->andFilterWhere(['<=', 'created_at', $this->created_at_to])
+			->andFilterWhere(['>=', 'date_at', $this->date_at_from])
+			->andFilterWhere(['<=', 'date_at', $this->date_at_to]);
 
 		return $dataProvider;
 	}

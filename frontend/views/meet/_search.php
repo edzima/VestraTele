@@ -1,7 +1,7 @@
 <?php
 
-use common\models\issue\IssueMeetSearch;
 use common\widgets\DateTimeWidget;
+use frontend\models\IssueMeetSearch;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -66,6 +66,3 @@ use yii\widgets\ActiveForm;
 	<?php ActiveForm::end(); ?>
 
 </div>
-
-
-

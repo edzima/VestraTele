@@ -80,6 +80,10 @@ AppAsset::register($this);
 		$menuItems[] = ['label' => Yii::t('frontend', 'Login'), 'url' => ['/account/sign-in/login']];
 	} else {
 		$menuItems[] = [
+			'label' => 'Raporty',
+			'url' => ['/report/index'],
+		];
+		$menuItems[] = [
 			'label' => 'Sprawy',
 			'url' => ['/issue/index'],
 		];

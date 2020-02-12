@@ -45,7 +45,8 @@
 		"yii2mod/yii2-comments": "*",
 		"kartik-v/yii2-widget-colorinput": "*",
 		"loveorigami/yii2-bootstrap-toggle": "*",
-		"dmstr/yii2-adminlte-asset": "^2.1"
+		"dmstr/yii2-adminlte-asset": "^2.1",
+		"yii2tech/csv-grid": "^1.0"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-master",

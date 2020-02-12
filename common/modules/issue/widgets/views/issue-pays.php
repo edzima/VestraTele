@@ -10,6 +10,7 @@ use yii\widgets\DetailView;
 /* @var $models IssuePay[] */
 /* @var $notesOptions array */
 /* @var $widget IssuePaysWidget */
+/* @var $withProvisions bool */
 
 ?>
 
@@ -56,17 +57,19 @@ use yii\widgets\DetailView;
 						],
 
 					]) ?>
-					<fieldset>
-						<legend>Prowizje</legend>
-						<?= GridView::widget([
-							'dataProvider' => $widget->getProvisionsProvider($pay),
-							'columns' => [
-								'toUser',
-								'fromUserString',
-								'value:currency',
-							],
-						]) ?>
-					</fieldset>
+					<?php if ($withProvisions): ?>
+						<fieldset>
+							<legend>Prowizje</legend>
+							<?= GridView::widget([
+								'dataProvider' => $widget->getProvisionsProvider($pay),
+								'columns' => [
+									'toUser',
+									'fromUserString',
+									'value:currency',
+								],
+							]) ?>
+						</fieldset>
+					<? endif; ?>
 				</div>
 			</fieldset>
 		<?php endforeach; ?>

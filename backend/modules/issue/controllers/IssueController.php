@@ -3,12 +3,14 @@
 namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueForm;
+use backend\widgets\CsvForm;
 use Yii;
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii2tech\csvgrid\CsvGrid;
 
 /**
  * IssueController implements the CRUD actions for Issue model.
@@ -34,9 +36,42 @@ class IssueController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionIndex() {
 		$searchModel = new IssueSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		if (isset($_POST[CsvForm::BUTTON_NAME])) {
+			$exporter = new CsvGrid([
+				'query' => $dataProvider->query,
+				'columns' => [
+					[
+						'attribute' => 'clientFullName',
+						'label' => 'Nazwa',
+					],
+					[
+						'attribute' => 'client_street',
+						'label' => 'Ulica',
+					],
+					[
+						'attribute' => 'client_phone_1',
+						'label' => 'Telefon',
+					],
+					[
+						'attribute' => 'clientCity.name',
+						'label' => 'Miasto',
+					],
+					[
+						'attribute' => 'clientProvince.name',
+						'label' => 'Powiat',
+					],
+					[
+						'attribute' => 'clientState.name',
+						'label' => 'Województwo',
+					],
+				],
+			]);
+			return $exporter->export()->send('export.csv');
+		}
+
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,

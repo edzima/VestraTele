@@ -18,7 +18,7 @@ YiiAsset::register($this);
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Html::a('Edytuj', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+		<?= $model->isForUser(Yii::$app->user->getId()) ? Html::a('Edytuj', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) : '' ?>
 	</p>
 
 	<?= DetailView::widget([
@@ -29,7 +29,6 @@ YiiAsset::register($this);
 				'attribute' => 'campaign',
 				'visible' => Yii::$app->user->can(User::ROLE_TELEMARKETER),
 			],
-			'statusName',
 			'client_name',
 			'client_surname',
 			'phone',
@@ -40,10 +39,11 @@ YiiAsset::register($this);
 			'subProvince',
 			'city',
 			'street',
-			'created_at:date',
-			'updated_at:date',
+			'created_at:datetime',
+			'updated_at:datetime',
 			'date_at:datetime',
 			'details:ntext',
+			'statusName',
 		],
 	]) ?>
 

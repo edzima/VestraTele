@@ -2,126 +2,166 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\widgets\CsvForm;
+use common\models\User;
 use Yii;
 use common\models\issue\IssueMeet;
 use common\models\issue\IssueMeetSearch;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii2tech\csvgrid\CsvGrid;
 
 /**
  * MeetController implements the CRUD actions for IssueMeet model.
  */
-class MeetController extends Controller
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
+class MeetController extends Controller {
 
-    /**
-     * Lists all IssueMeet models.
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        $searchModel = new IssueMeetSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+	/**
+	 * {@inheritdoc}
+	 */
+	public function behaviors(): array {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'delete' => ['POST'],
+				],
+			],
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
+		];
+	}
 
-    /**
-     * Displays a single IssueMeet model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
+	public function beforeAction($action) {
+		$before = parent::beforeAction($action);
+		if ($before && Yii::$app->user->can(User::ROLE_MEET)) {
+			return true;
+		}
+		throw new ForbiddenHttpException();
+	}
 
-    /**
-     * Creates a new IssueMeet model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new IssueMeet();
+	/**
+	 * Lists all IssueMeet models.
+	 *
+	 * @return mixed
+	 */
+	public function actionIndex() {
+		$searchModel = new IssueMeetSearch();
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		if (isset($_POST[CsvForm::BUTTON_NAME])) {
+			$exporter = new CsvGrid([
+				'query' => $dataProvider->query,
+				'columns' => [
+					[
+						'attribute' => 'clientFullName',
+						'label' => 'Nazwa',
+					],
+					[
+						'attribute' => 'street',
+					],
+					['attribute' => 'phone'],
+					[
+						'attribute' => 'city.name',
+						'label' => 'Miasto',
+					],
+					[
+						'attribute' => 'province.name',
+						'label' => 'Powiat',
+					],
+					[
+						'attribute' => 'state.name',
+						'label' => 'Województwo',
+					],
+				],
+			]);
+			return $exporter->export()->send('export.csv');
+		}
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+		return $this->render('index', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
+	/**
+	 * Displays a single IssueMeet model.
+	 *
+	 * @param integer $id
+	 * @return mixed
+	 * @throws NotFoundHttpException if the model cannot be found
+	 */
+	public function actionView($id) {
+		return $this->render('view', [
+			'model' => $this->findModel($id),
+		]);
+	}
 
-    /**
-     * Updates an existing IssueMeet model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
+	/**
+	 * Creates a new IssueMeet model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 *
+	 * @return mixed
+	 */
+	public function actionCreate() {
+		$model = new IssueMeet();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->id]);
+		}
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
+		return $this->render('create', [
+			'model' => $model,
+		]);
+	}
 
-    /**
-     * Deletes an existing IssueMeet model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
+	/**
+	 * Updates an existing IssueMeet model.
+	 * If update is successful, the browser will be redirected to the 'view' page.
+	 *
+	 * @param integer $id
+	 * @return mixed
+	 * @throws NotFoundHttpException if the model cannot be found
+	 */
+	public function actionUpdate($id) {
+		$model = $this->findModel($id);
 
-        return $this->redirect(['index']);
-    }
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->id]);
+		}
 
-    /**
-     * Finds the IssueMeet model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return IssueMeet the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = IssueMeet::findOne($id)) !== null) {
-            return $model;
-        }
+		return $this->render('update', [
+			'model' => $model,
+		]);
+	}
 
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
+	/**
+	 * Deletes an existing IssueMeet model.
+	 * If deletion is successful, the browser will be redirected to the 'index' page.
+	 *
+	 * @param integer $id
+	 * @return mixed
+	 * @throws NotFoundHttpException if the model cannot be found
+	 */
+	public function actionDelete($id) {
+		$this->findModel($id)->delete();
+
+		return $this->redirect(['index']);
+	}
+
+	/**
+	 * Finds the IssueMeet model based on its primary key value.
+	 * If the model is not found, a 404 HTTP exception will be thrown.
+	 *
+	 * @param integer $id
+	 * @return IssueMeet the loaded model
+	 * @throws NotFoundHttpException if the model cannot be found
+	 */
+	protected function findModel($id) {
+		if (($model = IssueMeet::findOne($id)) !== null) {
+			return $model;
+		}
+
+		throw new NotFoundHttpException('The requested page does not exist.');
+	}
 }

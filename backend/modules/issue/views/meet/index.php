@@ -1,27 +1,32 @@
 <?php
 
+use backend\widgets\CsvForm;
 use common\models\issue\IssueMeet;
+use common\models\issue\IssueMeetSearch;
 use common\models\User;
+use common\models\Wojewodztwa;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $searchModel common\models\issue\IssueMeetSearch */
+/* @var $searchModel IssueMeetSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Spotkania';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="issue-meet-index">
+<div class="issue-meet-index relative">
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
 		<?= Html::a('Dodaj', ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
+	<?= CsvForm::widget() ?>
 
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+	<?= $this->render('_search', ['model' => $searchModel]); ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
@@ -36,32 +41,22 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'attribute' => 'type_id',
 				'filter' => IssueMeet::getTypesNames(),
-				'value' => 'type',
+				'value' => 'type.short_name',
 			],
-			[
-				'attribute' => 'status',
-				'filter' => IssueMeet::getStatusNames(),
-				'value' => 'statusName',
-			],
+			'created_at:date',
 			'client_name',
 			'client_surname',
+			'phone',
 			[
-				'class' => DataColumn::class,
-				'filterType' => GridView::FILTER_SELECT2,
-				'attribute' => 'agent_id',
-				'value' => 'agent',
-				'filter' => User::getSelectList([User::ROLE_AGENT]),
-				'filterWidgetOptions' => [
-					'pluginOptions' => [
-						'allowClear' => true,
-					],
-					'options' => [
-						'placeholder' => 'Agent',
-					],
-				],
-				'contentOptions' => [
-					'class' => 'ellipsis',
-				],
+				'attribute' => 'cityName',
+				'value' => 'city',
+				'label' => 'Miasto',
+			],
+			[
+				'attribute' => 'stateId',
+				'value' => 'state.name',
+				'label' => 'Województwo',
+				'filter' => Wojewodztwa::getSelectList(),
 			],
 			[
 				'class' => DataColumn::class,
@@ -82,6 +77,25 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 			],
 			[
+				'class' => DataColumn::class,
+				'filterType' => GridView::FILTER_SELECT2,
+				'attribute' => 'agent_id',
+				'value' => 'agent',
+				'filter' => User::getSelectList([User::ROLE_AGENT]),
+				'filterWidgetOptions' => [
+					'pluginOptions' => [
+						'allowClear' => true,
+					],
+					'options' => [
+						'placeholder' => 'Agent',
+					],
+				],
+				'contentOptions' => [
+					'class' => 'ellipsis',
+				],
+			],
+
+			[
 				'attribute' => 'details',
 				'format' => 'ntext',
 				'value' => static function (IssueMeet $model): string {
@@ -90,16 +104,13 @@ $this->params['breadcrumbs'][] = $this->title;
 						: '';
 				},
 			],
-			[
-				'attribute' => 'cityName',
-				'value' => 'city',
-				'label' => 'Miasto',
-			],
-
-			'date_at:datetime',
-
-			'created_at:date',
+			'date_at:date',
 			'updated_at:date',
+			[
+				'attribute' => 'status',
+				'filter' => IssueMeet::getStatusNames(),
+				'value' => 'statusName',
+			],
 
 			['class' => 'yii\grid\ActionColumn'],
 		],

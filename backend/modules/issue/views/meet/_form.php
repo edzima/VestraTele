@@ -3,6 +3,7 @@
 use backend\modules\address\widgets\AddressWidget;
 use common\models\issue\IssueMeet;
 use common\models\User;
+use common\widgets\DateTimeWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -15,6 +16,12 @@ use yii\widgets\ActiveForm;
 <div class="issue-meet-form">
 
 	<?php $form = ActiveForm::begin(); ?>
+
+	<?= $form->field($model, 'created_at')
+		->widget(DateTimeWidget::class, [
+			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
+		]) ?>
+
 
 	<?= $form->field($model, 'campaign_id')->dropDownList(IssueMeet::getCampaignNames()) ?>
 

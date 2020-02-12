@@ -51,6 +51,8 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const ROLE_MANAGER = 'manager';
 	public const ROLE_ADMINISTRATOR = 'administrator';
 	public const ROLE_BOOKKEEPER = 'book_keeper';
+	public const ROLE_MEET = 'meet';
+	public const MACIEJ_ID = 538;
 
 	private $selfTree;
 	private static $BOSS_MAP = [];

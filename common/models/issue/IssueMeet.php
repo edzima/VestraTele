@@ -54,57 +54,23 @@ class IssueMeet extends ActiveRecord {
 	public const STATUS_SIGNED_CONTRACT = 20;
 	public const STATUS_NOT_ELIGIBLE = 30;
 	public const STATUS_NOT_SIGNED = 40;
-	public const STATUS_NOT_MEETING = 50;
-	public const STATUS_EMERYT = 60;
-	public const STATUS_RENTA = 70;
-	public const STATUS_GUARDIAN_WORKS = 80;
-	public const STATUS_WAITING_FOR_THE_RULE = 90;
-	public const STATUS_WONDER = 100;
-	public const STATUS_SENT_DOCUMENTS = 110;
-
-	public static function getStatusNames(): array {
-		return [
-			static::STATUS_NEW => 'Nowe',
-			static::STATUS_RENEW_CONTACT => 'Ponowić kontakt',
-			static::STATUS_ESTABLISHED => 'Umówione',
-			static::STATUS_SIGNED_CONTRACT => 'Podpisana umowa',
-			static::STATUS_NOT_ELIGIBLE => 'Nie kwalifikuje się',
-			static::STATUS_NOT_SIGNED => 'Nie podpisano',
-			static::STATUS_NOT_MEETING => 'Nie odbyło się',
-			static::STATUS_EMERYT => 'Emeryt',
-			static::STATUS_RENTA => 'Renta',
-			static::STATUS_GUARDIAN_WORKS => 'Opiekun pracuje',
-			static::STATUS_WAITING_FOR_THE_RULE => 'Czekają na orzeczenie',
-			static::STATUS_WONDER => 'Zastanawia się',
-			static::STATUS_SENT_DOCUMENTS => 'Wysłane dokumenty',
-		];
-	}
+	public const STATUS_CONTACT_AGAIN = 50;
+	public const  STATUS_ARCHIVE = 200;
 
 	public function behaviors(): array {
 		return [
 			[
 				'class' => TimestampBehavior::class,
 				'value' => new Expression('CURRENT_TIMESTAMP'),
+				'createdAtAttribute' => false,
 			],
 		];
-	}
-
-	public static function getTypesNames(): array {
-		return ArrayHelper::map(IssueType::find()->all(), 'id', 'name');
-	}
-
-	public static function getCampaignNames(): array {
-		return ArrayHelper::map(Campaign::find()->all(), 'id', 'name');
-	}
-
-	public function getStatusName(): string {
-		return static::getStatusNames()[$this->status];
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function tableName() {
+	public static function tableName(): string {
 		return 'issue_meet';
 	}
 
@@ -143,7 +109,7 @@ class IssueMeet extends ActiveRecord {
 			'client_surname' => 'Nazwisko',
 			'tele_id' => 'Tele',
 			'agent_id' => 'Agent',
-			'created_at' => 'Dodano',
+			'created_at' => 'Data leada',
 			'updated_at' => 'Edytowano',
 			'date_at' => 'Data spotkania',
 			'details' => 'Szczegóły',
@@ -155,11 +121,12 @@ class IssueMeet extends ActiveRecord {
 			'subProvince' => 'Gmina',
 			'campaign_id' => 'Kampania',
 			'campaign' => 'Kampania',
+			'statusName' => 'Status',
 		];
 	}
 
 	public function getClientFullName(): string {
-		return $this->client_name . ' ' . $this->client_surname;
+		return trim($this->client_surname . ' ' . $this->client_name);
 	}
 
 	public function getAgent(): UserQuery {
@@ -215,5 +182,36 @@ class IssueMeet extends ActiveRecord {
 
 	public function isNew(): bool {
 		return (int) $this->status === static::STATUS_NEW;
+	}
+
+	public function getStatusName(): string {
+		return static::getStatusNames()[$this->status];
+	}
+
+	public static function getStatusNames(): array {
+		return [
+			static::STATUS_NEW => 'Nowe',
+			static::STATUS_RENEW_CONTACT => 'Nieodbiera',
+			static::STATUS_ESTABLISHED => 'Umówione',
+			static::STATUS_SIGNED_CONTRACT => 'Umowa',
+			static::STATUS_NOT_ELIGIBLE => 'Niekwalifikuje się',
+			static::STATUS_NOT_SIGNED => 'Niepodpisane',
+			static::STATUS_CONTACT_AGAIN => 'Ponowić',
+			static::STATUS_ARCHIVE => 'Archiwum',
+		];
+	}
+
+	public static function getTypesNames(): array {
+		return ArrayHelper::map(IssueType::find()
+			->andWhere(['meet' => true])
+			->all(), 'id', 'short_name');
+	}
+
+	public static function getCampaignNames(): array {
+		return ArrayHelper::map(Campaign::find()->all(), 'id', 'name');
+	}
+
+	public function isForUser(int $userId): bool {
+		return $this->tele_id === $userId || $this->agent_id === $userId;
 	}
 }

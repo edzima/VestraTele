@@ -127,6 +127,7 @@ class IssueSearch extends Issue {
 			'updated_at' => $this->updated_at,
 			'agent_id' => $this->agent_id,
 			'client_street' => $this->client_street,
+			'client_city_id' => $this->client_city_id,
 			'victim_city_id' => $this->victim_city_id,
 			'provision_type' => $this->provision_type,
 			'provision_value' => $this->provision_value,
@@ -152,7 +153,6 @@ class IssueSearch extends Issue {
 			->andFilterWhere(['<=', 'created_at', $this->createdAtTo])
 			->andFilterWhere(['NOT IN', 'stage_id', $this->disabledStages])
 			->andFilterWhere(['like', 'details', $this->details]);
-
 		return $dataProvider;
 	}
 

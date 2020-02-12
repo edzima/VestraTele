@@ -92,3 +92,14 @@ div.required label:after {
 		display: none !important;
 	}
 }
+
+.relative {
+	position: relative;
+}
+
+.relative .csv-form {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+

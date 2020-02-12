@@ -2,6 +2,7 @@
 
 use common\models\issue\IssueMeet;
 use common\models\User;
+use common\models\Wojewodztwa;
 use frontend\models\AgentMeetSearch;
 use frontend\models\TeleMeetSearch;
 use kartik\grid\ActionColumn;
@@ -16,6 +17,7 @@ use yii\helpers\Html;
 
 $this->title = 'Spotkania';
 $this->params['breadcrumbs'][] = $this->title;
+$userId = Yii::$app->user->getId();
 ?>
 <div class="issue-meet-index">
 
@@ -26,9 +28,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
 			<?= Html::a('Tele', ['tele'], ['class' => 'btn' . ($searchModel instanceof TeleMeetSearch ? ' btn-primary' : '')]) ?>
 			<?= Html::a('Agent', ['agent'], ['class' => 'btn' . ($searchModel instanceof AgentMeetSearch ? ' btn-primary' : '')]) ?>
+			<?= Yii::$app->user->can(User::ROLE_MEET) ?
+				Html::a('Wszystkie', ['all'], ['class' => 'btn' . (Yii::$app->controller->action->id === 'all' ? ' btn-primary' : '')])
+				: '' ?>
+
 
 		</p>
 	<?php endif; ?>
+
+
+	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
 	<?= Yii::$app->user->can(User::ROLE_TELEMARKETER)
 		? ('<p>'
@@ -42,26 +51,34 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
 			[
-				'attribute' => 'type_id',
-				'filter' => $searchModel::getTypesNames(),
-				'value' => 'type',
-			],
-			[
 				'attribute' => 'campaign_id',
 				'filter' => $searchModel::getCampaignNames(),
 				'value' => 'campaign',
-				'visible' => $searchModel instanceof TeleMeetSearch,
+				'visible' => $searchModel instanceof TeleMeetSearch || Yii::$app->user->can(User::ROLE_MEET),
 			],
 			[
-				'attribute' => 'status',
-				'filter' => $searchModel::getStatusNames(),
-				'value' => 'statusName',
+				'attribute' => 'type_id',
+				'filter' => $searchModel::getTypesNames(),
+				'value' => 'type.short_name',
 			],
+			'created_at:date',
 			'client_name',
 			'client_surname',
+			'phone',
+			[
+				'attribute' => 'cityName',
+				'value' => 'city',
+				'label' => 'Miasto',
+			],
+			[
+				'attribute' => 'stateId',
+				'value' => 'state.name',
+				'label' => 'Województwo',
+				'filter' => Wojewodztwa::getSelectList(),
+			],
 			[
 				'class' => DataColumn::class,
-				'visible' => $searchModel instanceof TeleMeetSearch,
+		//		'visible' => $searchModel instanceof TeleMeetSearch,
 				'filterType' => GridView::FILTER_SELECT2,
 				'attribute' => 'agent_id',
 				'value' => 'agent',
@@ -100,27 +117,28 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'attribute' => 'details',
 				'format' => 'ntext',
-				'value' => function (IssueMeet $model): string {
+				'value' => static function (IssueMeet $model): string {
 					return $model->status <= IssueMeet::STATUS_RENEW_CONTACT
 						? $model->details
 						: '';
 				},
 				'visible' => $searchModel instanceof TeleMeetSearch,
 			],
-			[
-				'attribute' => 'cityName',
-				'value' => 'city',
-				'label' => 'Miasto',
-			],
-
-			'date_at:datetime',
-
-			'created_at:date',
+			'date_at:date',
 			'updated_at:date',
-
+			[
+				'attribute' => 'status',
+				'filter' => $searchModel::getStatusNames(),
+				'value' => 'statusName',
+			],
 			[
 				'class' => ActionColumn::class,
 				'template' => '{view}{update}',
+				'visibleButtons' => [
+					'update' => static function (IssueMeet $model) use ($userId) {
+						return $model->isForUser($userId);
+					},
+				],
 			],
 		],
 	]); ?>

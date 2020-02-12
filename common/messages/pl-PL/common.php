@@ -66,4 +66,5 @@ return [
 	'director' => 'Dyrektor',
 	'general_director' => 'Dyrektor generalny',
 	'book_keeper' => 'Księgowy',
+	'meet' => 'Spotkania',
 ];

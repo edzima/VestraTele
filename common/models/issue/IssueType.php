@@ -13,6 +13,7 @@ use yii\db\ActiveRecord;
  * @property string $short_name
  * @property int $provision_type
  * @property string $vat
+ * @property boolean $meet
  *
  * @property Issue[] $issues
  * @property IssueStage[] $stages
@@ -50,6 +51,7 @@ class IssueType extends ActiveRecord {
 		return [
 			[['name', 'short_name', 'vat'], 'required'],
 			[['provision_type'], 'integer'],
+			['meet', 'boolean'],
 			[['name', 'short_name'], 'string', 'max' => 255],
 			[['name'], 'unique'],
 			['vat', 'number', 'min' => 0, 'max' => 100],
@@ -67,6 +69,7 @@ class IssueType extends ActiveRecord {
 			'short_name' => 'Skrót',
 			'provision_type' => 'Prowizja',
 			'vat' => 'VAT (%)',
+			'meet' => 'Spotkania',
 		];
 	}
 

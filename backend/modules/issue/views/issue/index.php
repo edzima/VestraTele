@@ -1,5 +1,6 @@
 <?php
 
+use backend\widgets\CsvForm;
 use common\models\issue\IssueSearch;
 use common\models\User;
 use kartik\grid\ActionColumn;
@@ -66,12 +67,12 @@ JS;
 $this->registerJs($js);
 
 ?>
-<div class="issue-index">
+<div class="issue-index relative">
 	<?php Pjax::begin(); ?>
 	<h1><?= Html::encode($this->title) ?></h1>
 
-	<?= $this->render('_search', ['model' => $searchModel]); ?>
-
+	<?= $this->render('_search', ['model' => $searchModel]) ?>
+	<?= CsvForm::widget() ?>
 	<p>
 		<?= Html::a('Dodaj', ['create'], ['class' => 'btn btn-success']) ?>
 	</p>

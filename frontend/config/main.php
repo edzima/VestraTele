@@ -65,7 +65,7 @@ if (YII_ENV) { //YII_ENV_PROD
 			return $app->keyStorage->get('frontend.maintenance');
 		},
 		'route' => 'maintenance/index',
-		'message' => 'Извините, на сайте ведутся технические работы.',
+		'message' => 'Przerwa techniczna',
 		// year-month-day hour:minute:second
 		'time' => '0000-00-00 00:00:00', // время окончания работ
 	];

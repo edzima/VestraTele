@@ -8,7 +8,7 @@ use yii\widgets\DetailView;
 /* @var $model common\models\issue\IssueMeet */
 
 $this->title = $model->getClientFullName();
-$this->params['breadcrumbs'][] = ['label' => 'Spotkanie', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Spotkania', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 ?>
@@ -31,7 +31,6 @@ YiiAsset::register($this);
 		'model' => $model,
 		'attributes' => [
 			'type',
-			'statusName',
 			'client_name',
 			'client_surname',
 			'phone',
@@ -42,10 +41,11 @@ YiiAsset::register($this);
 			'subProvince',
 			'city',
 			'street',
-			'created_at:date',
-			'updated_at:date',
+			'created_at:datetime',
+			'updated_at:datetime',
 			'date_at:datetime',
 			'details:ntext',
+			'statusName',
 		],
 	]) ?>
 

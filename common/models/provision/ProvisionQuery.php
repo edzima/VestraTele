@@ -16,6 +16,15 @@ class ProvisionQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function notHidden(): self {
+		$this->andWhere([
+			'or',
+			['provision.hide_on_report' => false],
+			['provision.hide_on_report' => null],
+		]);
+		return $this;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 * @return Provision[]|array

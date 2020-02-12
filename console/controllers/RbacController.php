@@ -106,4 +106,10 @@ class RbacController extends Controller {
 		$auth->addChild($auth->getRole(User::ROLE_ADMINISTRATOR), 	$auth->getRole(User::ROLE_BOOKKEEPER));
 	}
 
+	public function actionAddMeet() {
+		$auth = Yii::$app->authManager;
+		$auth->add($auth->createRole(User::ROLE_MEET));
+		$auth->addChild($auth->getRole(User::ROLE_ADMINISTRATOR), 	$auth->getRole(User::ROLE_MEET));
+	}
+
 }

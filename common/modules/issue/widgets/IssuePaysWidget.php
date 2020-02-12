@@ -10,6 +10,7 @@ namespace common\modules\issue\widgets;
 
 use common\models\issue\IssuePay;
 use common\models\User;
+use Yii;
 use yii\base\Widget;
 use yii\data\ActiveDataProvider;
 
@@ -30,6 +31,7 @@ class IssuePaysWidget extends Widget {
 			return $this->render('issue-pays', [
 				'models' => $this->models,
 				'widget' => $this,
+				'withProvisions' => Yii::$app->user->can(User::ROLE_BOOKKEEPER) || !empty($this->user),
 			]);
 		}
 	}
