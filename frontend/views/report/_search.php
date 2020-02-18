@@ -19,38 +19,21 @@ use yii\widgets\ActiveForm;
 	]); ?>
 
 	<div class="form-group row">
+		<?= $form->field($model, 'payStatus', ['options' => ['class' => 'col-md-2']])->dropDownList(ProvisionReportSearch::getPayStatusNames()) ?>
 
 
-		<?= $form->field($model, 'dateFrom', ['options' => ['class' => 'col-md-4']])
+		<?= $form->field($model, 'dateFrom', ['options' => ['class' => 'col-md-2']])
 			->widget(DateTimeWidget::class,
 				[
 					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
-
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
 				]) ?>
 
-		<?= $form->field($model, 'dateTo', ['options' => ['class' => 'col-md-4']])
+		<?= $form->field($model, 'dateTo', ['options' => ['class' => 'col-md-2']])
 			->widget(DateTimeWidget::class,
 				[
 					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
-
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
 				]) ?>
-		<?= $form->field($model, 'from_user_id', ['options' => ['class' => 'col-md-4']])
+		<?= $form->field($model, 'from_user_id', ['options' => ['class' => 'col-md-6']])
 			->widget(Select2::class, [
 					'data' => $model->getFromUserList(),
 					'options' => [
@@ -63,7 +46,6 @@ use yii\widgets\ActiveForm;
 			) ?>
 
 	</div>
-
 
 	<div class="form-group">
 		<?= Html::submitButton('Szukaj', ['class' => 'btn btn-primary']) ?>

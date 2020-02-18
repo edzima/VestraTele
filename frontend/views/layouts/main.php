@@ -44,14 +44,6 @@ AppAsset::register($this);
 					'label' => 'Spotkania',
 					'url' => ['/meet/tele'],
 				],
-				[
-					'label' => Yii::t('frontend', 'Articles'),
-					'url' => ['/article/index'],
-				],
-				[
-					'label' => 'Ranking',
-					'url' => ['/score'],
-				],
 
 				[
 					'label' => Yii::t('frontend', 'Calendar'),
@@ -79,6 +71,10 @@ AppAsset::register($this);
 	if (Yii::$app->user->isGuest) {
 		$menuItems[] = ['label' => Yii::t('frontend', 'Login'), 'url' => ['/account/sign-in/login']];
 	} else {
+		$menuItems[] = [
+			'label' => 'Newsy',
+			'url' => ['/article/index'],
+		];
 		$menuItems[] = [
 			'label' => 'Raporty',
 			'url' => ['/report/index'],

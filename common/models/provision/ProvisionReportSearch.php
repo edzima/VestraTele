@@ -24,6 +24,8 @@ class ProvisionReportSearch extends ProvisionSearch {
 
 	public function rules(): array {
 		return [
+			['payStatus', 'in', 'range' => array_keys(static::getPayStatusNames())],
+			['payStatus', 'default', 'value' => static::DEFAULT_PAY_STATUS],
 			[['dateFrom', 'dateTo', 'from_user_id'], 'safe'],
 		];
 	}

@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'provision:percent',
 			'pay.value:currency',
 			'value:currency',
-			'pay.pay_at:date',
+			$searchModel->isNotPayed() ? 'pay.deadline_at:date' : 'pay.pay_at:date',
 			[
 				'class' => ActionColumn::class,
 				'template' => '{update} {delete}',

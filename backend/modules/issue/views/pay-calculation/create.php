@@ -24,9 +24,9 @@ $this->params['breadcrumbs'][] = $this->title;
 			['target' => '_blank']) ?>
 	</h1>
 
-	<?= $this->render('_pay_city_details', [
+	<?= $model->getIssue()->isSpa() ? $this->render('_pay_city_details', [
 		'model' => $model->getPayCityDetails(),
-	]) ?>
+	]) : '' ?>
 
 	<?= $this->render('_form', [
 		'model' => $model,

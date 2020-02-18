@@ -14,7 +14,7 @@ return [
 		'page/<slug>' => 'page/view',
 		// Articles
 		'article/page/<page>' => 'article/index',
-		'konkursy' => 'article/index',
+		'articles' => 'article/index',
 		'article/<slug>' => 'article/view',
 		'article/category/<slug>' => 'article/category',
 		'article/tag/<slug>' => 'article/tag',

@@ -79,7 +79,7 @@ class PayCalculationController extends Controller {
 	}
 
 	/**
-	 * Updates an existing IssuePayCalculation model.
+	 * Create or Updates an existing IssuePayCalculation model.
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 *
 	 * @param integer $id
@@ -90,7 +90,7 @@ class PayCalculationController extends Controller {
 		if (IssuePayCalculation::findOne($id) !== null) {
 			return $this->redirect(['update', 'id' => $id]);
 		}
-		$issue = $this->findIssueModel($id, true);
+		$issue = $this->findIssueModel($id);
 		$model = new PayCalculationForm($issue);
 		$provisionModel = new IssueProvisionUsersForm(['issue' => $issue]);
 		if ($this->checkProvisions($issue)
@@ -130,7 +130,7 @@ class PayCalculationController extends Controller {
 		return $hasAll;
 	}
 
-	private function addUserProvisionFlash(User $user): void {
+	public static function addUserProvisionFlash(User $user): void {
 		$link = Html::a($user, Url::userProvisions($user->id), ['target' => '_blank']);
 		Yii::$app->session->addFlash('error', 'Brakuje prowizji dla: ' . $link);
 	}
@@ -144,7 +144,7 @@ class PayCalculationController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$issue = $this->findIssueModel($id, false);
+		$issue = $this->findIssueModel($id);
 		$model = new PayCalculationForm($issue);
 		$provisionModel = new IssueProvisionUsersForm(['issue' => $issue]);
 		$post = Yii::$app->request->post();
@@ -196,18 +196,11 @@ class PayCalculationController extends Controller {
 
 	/**
 	 * @param int $id
-	 * @param bool $onlyPositiveDecision
 	 * @return Issue
 	 * @throws NotFoundHttpException
 	 */
-	protected function findIssueModel(int $id, bool $onlyPositiveDecision): Issue {
-		$query = Issue::find()
-			->where(['id' => $id]);
-		if ($onlyPositiveDecision) {
-			$query->onlyPositiveDecision();
-		}
-		if (($model = $query
-				->one()) !== null) {
+	protected function findIssueModel(int $id): Issue {
+		if (($model = Issue::findOne($id)) !== null) {
 			return $model;
 		}
 

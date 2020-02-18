@@ -19,8 +19,6 @@ use yii\widgets\ActiveForm;
 		'method' => 'get',
 	]); ?>
 	<div class="row">
-		<?= $form->field($model, 'onlyPayed', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
-
 		<?= $form->field($model, 'hide_on_report', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 	</div>
 
@@ -120,6 +118,10 @@ use yii\widgets\ActiveForm;
 				]
 			) ?>
 
+	</div>
+
+	<div class="form-group">
+		<?= $form->field($model, 'payStatus')->dropDownList(ProvisionSearch::getPayStatusNames()) ?>
 	</div>
 
 

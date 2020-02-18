@@ -116,9 +116,24 @@ class Issue extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['created_at', 'updated_at'], 'safe'],
-			[['agent_id', 'client_first_name', 'client_surname', 'client_phone_1', 'client_city_id', 'client_city_code', 'client_street', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id', 'date', 'lawyer_id'], 'required'],
-			[['agent_id', 'tele_id', 'lawyer_id', 'client_subprovince_id', 'client_city_id', 'victim_subprovince_id', 'victim_city_id', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id', 'id', 'pay_city_id'], 'integer'],
-			[['client_first_name', 'client_surname', 'client_email', 'client_street', 'victim_first_name', 'victim_surname', 'victim_email', 'victim_street'], 'string', 'max' => 255],
+			[
+				[
+					'agent_id', 'client_first_name', 'client_surname', 'client_phone_1', 'client_city_id', 'client_city_code',
+					'client_street', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id', 'date', 'lawyer_id',
+				], 'required',
+			],
+			[
+				[
+					'agent_id', 'tele_id', 'lawyer_id', 'client_subprovince_id', 'client_city_id', 'victim_subprovince_id',
+					'victim_city_id', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id', 'id', 'pay_city_id',
+				], 'integer',
+			],
+			[
+				[
+					'client_first_name', 'client_surname', 'client_email', 'client_street', 'victim_first_name',
+					'victim_surname', 'victim_email', 'victim_street',
+				], 'string', 'max' => 255,
+			],
 			[['client_phone_1', 'client_phone_2', 'victim_phone'], 'string', 'max' => 15],
 			[['client_email', 'victim_email'], 'email'],
 			[['client_city_code', 'victim_city_code'], 'string', 'max' => 6],
@@ -379,6 +394,10 @@ class Issue extends ActiveRecord {
 
 	public function isAccident(): bool {
 		return (int) $this->type_id === IssueType::ACCIDENT_ID;
+	}
+
+	public function isSpa(): bool {
+		return (int) $this->type_id === IssueType::SPA_ID;
 	}
 
 	public function getProvision(): Provision {

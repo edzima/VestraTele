@@ -12,19 +12,38 @@ use yii\helpers\ArrayHelper;
  */
 class ProvisionSearch extends Provision {
 
+	public const PAY_STATUS_PAYED = 'payed';
+	public const PAY_STATUS_NOT_PAYED = 'not-payed';
+
+	protected const DEFAULT_PAY_STATUS = self::PAY_STATUS_PAYED;
+
 	public $issue_id;
-	public $onlyPayed = true;
 	public $dateFrom;
 	public $dateTo;
 	public $clientSurname;
+
+	public $payStatus;
+
+	public static function getPayStatusNames(): array {
+		return [
+			static::PAY_STATUS_PAYED => 'Opłacone',
+			static::PAY_STATUS_NOT_PAYED => 'Nie opłacone',
+		];
+	}
+
+	public function isNotPayed(): bool {
+		return $this->payStatus === static::PAY_STATUS_NOT_PAYED;
+	}
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['onlyPayed', 'hide_on_report'], 'boolean'],
+			[['hide_on_report'], 'boolean'],
 			[['pay_id', 'from_user_id', 'to_user_id', 'issue_id'], 'integer'],
+			['payStatus', 'in', 'range' => array_keys(static::getPayStatusNames())],
+			['payStatus', 'default', 'value' => static::DEFAULT_PAY_STATUS],
 			[['dateFrom', 'dateTo', 'clientSurname'], 'safe'],
 		];
 	}
@@ -34,6 +53,7 @@ class ProvisionSearch extends Provision {
 			'onlyPayed' => 'Tylko opłacone',
 			'dateFrom' => 'Data od',
 			'dateTo' => 'Data do',
+			'payStatus' => 'Status płatności',
 		], parent::attributeLabels());
 	}
 
@@ -85,10 +105,17 @@ class ProvisionSearch extends Provision {
 			$query->andFilterWhere(['like', 'issue.client_surname', $this->clientSurname]);
 		}
 
-		if ($this->onlyPayed) {
+		if (!empty($this->payStatus)) {
 			$query->joinWith('pay');
-			$query->andWhere('issue_pay.pay_at IS NOT NULL');
+			switch ($this->payStatus) {
+				case static::PAY_STATUS_NOT_PAYED:
+					$query->andWhere('issue_pay.pay_at IS NULL');
+					break;
+				case static::PAY_STATUS_PAYED:
+					$query->andWhere('issue_pay.pay_at IS NOT NULL');
+			}
 		}
+
 		if ($this->hide_on_report) {
 			$query->andWhere(['provision.hide_on_report' => true]);
 		}
@@ -124,10 +151,11 @@ class ProvisionSearch extends Provision {
 
 	protected function dateFilter(ActiveQuery $query): void {
 		if (!empty($this->dateFrom) || !empty($this->dateTo)) {
+			$column = $this->isNotPayed() ? 'issue_pay.deadline_at' : 'issue_pay.pay_at';
 			$query
 				->joinWith('pay')
-				->andFilterWhere(['>=', 'issue_pay.pay_at', $this->dateFrom])
-				->andFilterWhere(['<=', 'issue_pay.pay_at', $this->dateTo]);
+				->andFilterWhere(['>=', $column, $this->dateFrom])
+				->andFilterWhere(['<=', $column, $this->dateTo]);
 		}
 	}
 }

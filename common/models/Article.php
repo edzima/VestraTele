@@ -64,13 +64,13 @@ class Article extends ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
+	public function rules():array {
 		return [
 			[['title', 'body', 'category_id'], 'required'],
 			[['body'], 'string'],
 			[
 				'published_at', 'default',
-				'value' => function () {
+				'value' => static function () {
 					return date(DATE_ATOM);
 				},
 			],
@@ -78,9 +78,9 @@ class Article extends ActiveRecord {
 			[['status', 'category_id', 'author_id', 'updater_id', 'created_at', 'updated_at'], 'integer'],
 			[['title', 'slug'], 'string', 'max' => 255],
 			['status', 'default', 'value' => self::STATUS_DRAFT],
-			['author_id', 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['author_id' => 'id']],
-			['category_id', 'exist', 'skipOnError' => true, 'targetClass' => ArticleCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
-			['updater_id', 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['updater_id' => 'id']],
+			['author_id', 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['author_id' => 'id']],
+			['category_id', 'exist', 'skipOnError' => true, 'targetClass' => ArticleCategory::class, 'targetAttribute' => ['category_id' => 'id']],
+			['updater_id', 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updater_id' => 'id']],
 
 		];
 	}
@@ -88,7 +88,7 @@ class Article extends ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'title' => Yii::t('common', 'Title'),
 			'slug' => Yii::t('common', 'Slug'),

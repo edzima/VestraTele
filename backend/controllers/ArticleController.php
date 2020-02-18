@@ -13,109 +13,100 @@ use common\models\ArticleCategory;
 /**
  * Class ArticleController.
  */
-class ArticleController extends Controller
-{
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
+class ArticleController extends Controller {
 
-    /**
-     * Lists all Article models.
-     *
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        $searchModel = new ArticleSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+	public function behaviors(): array {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'delete' => ['POST'],
+				],
+			],
+		];
+	}
 
-        $dataProvider->sort = [
-            'defaultOrder' => ['published_at' => SORT_DESC],
-        ];
+	/**
+	 * Lists all Article models.
+	 *
+	 * @return mixed
+	 */
+	public function actionIndex(): string {
+		$searchModel = new ArticleSearch();
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
+		$dataProvider->sort = [
+			'defaultOrder' => ['published_at' => SORT_DESC],
+		];
 
-    /**
-     * Creates a new Article model.
-     * If creation is successful, the browser will be redirected to the 'index' page.
-     *
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new Article();
+		return $this->render('index', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-                'categories' => ArticleCategory::find()->active()->all(),
-            ]);
-        }
-    }
+	/**
+	 * Creates a new Article model.
+	 * If creation is successful, the browser will be redirected to the 'index' page.
+	 *
+	 * @return mixed
+	 */
+	public function actionCreate() {
+		$model = new Article();
 
-    /**
-     * Updates an existing Article model.
-     * If update is successful, the browser will be redirected to the 'index' page.
-     *
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['index']);
+		}
+		return $this->render('create', [
+			'model' => $model,
+			'categories' => ArticleCategory::find()->active()->all(),
+		]);
+	}
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-                'categories' => ArticleCategory::find()->active()->all(),
-            ]);
-        }
-    }
+	/**
+	 * Updates an existing Article model.
+	 * If update is successful, the browser will be redirected to the 'index' page.
+	 *
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function actionUpdate(int $id) {
+		$model = $this->findModel($id);
 
-    /**
-     * Deletes an existing Article model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     *
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['index']);
+		}
+		return $this->render('update', [
+			'model' => $model,
+			'categories' => ArticleCategory::find()->active()->all(),
+		]);
+	}
 
-        return $this->redirect(['index']);
-    }
+	/**
+	 * Deletes an existing Article model.
+	 * If deletion is successful, the browser will be redirected to the 'index' page.
+	 *
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function actionDelete(int $id) {
+		$this->findModel($id)->delete();
 
-    /**
-     * Finds the Article model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     *
-     * @param integer $id
-     * @return Article the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Article::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
-    }
+		return $this->redirect(['index']);
+	}
+
+	/**
+	 * Finds the Article model based on its primary key value.
+	 * If the model is not found, a 404 HTTP exception will be thrown.
+	 *
+	 * @param integer $id
+	 * @return Article the loaded model
+	 * @throws NotFoundHttpException if the model cannot be found
+	 */
+	protected function findModel(int $id): Article {
+		if (($model = Article::findOne($id)) !== null) {
+			return $model;
+		}
+		throw new NotFoundHttpException('The requested page does not exist.');
+	}
 }

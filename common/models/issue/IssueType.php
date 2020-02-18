@@ -22,6 +22,7 @@ use yii\db\ActiveRecord;
 class IssueType extends ActiveRecord {
 
 	public const ACCIDENT_ID = 1;
+	public const SPA_ID = 2;
 	private $provision;
 
 	private static $TYPES = [];

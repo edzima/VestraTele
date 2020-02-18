@@ -2,11 +2,14 @@
 
 namespace backend\controllers;
 
+use vova07\imperavi\actions\UploadFileAction;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use common\components\keyStorage\FormModel;
 use common\models\LoginForm;
+use vova07\fileapi\actions\UploadAction as FileAPIUpload;
+use yii\web\ErrorAction;
 
 /**
  * Class SiteController.
@@ -16,10 +19,10 @@ class SiteController extends Controller {
 	/**
 	 * @inheritdoc
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'logout' => ['post'],
 				],
@@ -33,42 +36,28 @@ class SiteController extends Controller {
 	public function actions() {
 		return [
 			'error' => [
-				'class' => 'yii\web\ErrorAction',
+				'class' => ErrorAction::class,
 			],
-			//@todo update actions after update composer on project
-			/*
-            'fileapi-upload' => [
-                'class' => FileAPIUpload::className(),
-                'path' => '@storage/tmp',
-            ],
-            'images-get' => [
-                'class' => GetAction::className(),
-                'url' => Yii::getAlias('@storageUrl/images'),
-                'path' => '@storage/images',
-                'type' => GetAction::TYPE_IMAGES,
-            ],
-            'files-get' => [
-                'class' => GetAction::className(),
-                'url' => Yii::getAlias('@storageUrl/files'),
-                'path' => '@storage/files',
-                'type' => GetAction::TYPE_FILES,
-            ],
-            'image-upload' => [
-                'class' => UploadAction::className(),
-                'url' => Yii::getAlias('@storageUrl/images/' . date('m.y')),
-                'path' => '@storage/images/' . date('m.y'),
-            ],
-            'file-upload' => [
-                'class' => UploadAction::className(),
-                'url' => Yii::getAlias('@storageUrl/files/' . date('m.y')),
-                'path' => '@storage/files/' . date('m.y'),
-                'uploadOnlyImage' => false,
-            ],
-			*/
+			'fileapi-upload' => [
+				'class' => FileAPIUpload::class,
+				'path' => '@storage/tmp',
+			],
+			'image-upload' => [
+				'class' => UploadFileAction::class,
+				'url' => Yii::getAlias('@storageUrl/images/' . date('m.y')),
+				'path' => '@storage/images/' . date('m.y'),
+			],
+			'file-upload' => [
+				'class' => UploadFileAction::class,
+				'url' => Yii::getAlias('@storageUrl/files/' . date('m.y')),
+				'path' => '@storage/files/' . date('m.y'),
+				'uploadOnlyImage' => false,
+			],
+
 		];
 	}
 
-	public function beforeAction($action) {
+	public function beforeAction($action): bool {
 		$this->layout = Yii::$app->user->isGuest || !Yii::$app->user->can('loginToBackend') ? 'main-login' : 'main';
 
 		return parent::beforeAction($action);
@@ -82,11 +71,10 @@ class SiteController extends Controller {
 		$model = new LoginForm();
 		if ($model->load(Yii::$app->request->post()) && $model->login()) {
 			return $this->goBack();
-		} else {
-			return $this->render('login', [
-				'model' => $model,
-			]);
 		}
+		return $this->render('login', [
+			'model' => $model,
+		]);
 	}
 
 	public function actionLogout() {

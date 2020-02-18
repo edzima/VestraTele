@@ -123,11 +123,16 @@ use common\models\User;
 					'options' => ['class' => 'treeview'],
 					'items' => [
 						[
-							'label' => Yii::t('issue', 'Rozliczenia'),
+							'label' => Yii::t('issue', 'Rozliczenia (nowe)'),
+							'url' => ['/issue/pay-calculation/index', 'onlyNew' => true],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'visible' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
+						],
+						[
+							'label' => Yii::t('issue', 'Rozliczenia (w trakcie)'),
 							'url' => ['/issue/pay-calculation/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 							'visible' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
-
 						],
 						[
 							'label' => Yii::t('issue', 'Wpłaty'),

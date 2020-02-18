@@ -32,8 +32,6 @@ use vova07\imperavi\Widget;
 				'table',
 				'video',
 			],
-			'imageManagerJson' => Url::to(['/site/images-get']),
-			'fileManagerJson' => Url::to(['/site/files-get']),
 			'imageUpload' => Url::to(['/site/image-upload']),
 			'fileUpload' => Url::to(['/site/file-upload']),
 		],
@@ -63,6 +61,7 @@ use vova07\imperavi\Widget;
 			],
 		]
 	) ?>
+
 
 
 	<div class="form-group">

@@ -1,6 +1,7 @@
 <?php
 
 use common\models\issue\Issue;
+use common\models\User;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssuePaysWidget;
 use common\modules\issue\widgets\IssueViewWidget;
@@ -16,10 +17,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="issue-view">
 	<p>
 		<?= Html::a('Edytuj', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-		<?php if ($model->isPositiveDecision() || $model->payCalculation !== null): ?>
-			<?= Html::a('Rozliczenie', ['pay-calculation/view', 'id' => $model->id], ['class' => 'btn btn-info']) ?>
-		<?php endif ?>
-
+		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
+			? Html::a(
+				'Rozliczenie',
+				[($model->payCalculation ? 'pay-calculation/view' : 'pay-calculation/create'), 'id' => $model->id],
+				['class' => 'btn btn-info'])
+			: '' ?>
 		<?= Html::a('Notatka', ['note/create', 'issueId' => $model->id], [
 			'class' => 'btn btn-success',
 		]) ?>
