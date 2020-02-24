@@ -12,6 +12,8 @@
       :businessHours="calendar.businessHours"
       :minTime="calendar.minTime"
       :maxTime="calendar.maxTime"
+      :eventDurationEditable="calendar.eventDurationEditable"
+      :columnHeaderFormat="calendar.columnHeaderFormat"
       @eventDrop="handleChangeDates"
     />
   </div>
@@ -76,9 +78,11 @@ export default {
         defaultView: "timeGridWeek",
         locale: plLang,
         editable: true,
-        droppable: true,
+        droppable: false, //external calendars events
         minTime: "8:00:00",
         maxTime: "24:00:00",
+        eventDurationEditable: false, //allow to extend time
+        columnHeaderFormat: { weekday: "long", day: "numeric" },
         // businessHours: { start: "8:00", end: "20:00" },
         events: []
       }
@@ -87,10 +91,6 @@ export default {
   methods: {
     async fetchEvents() {
       const res = await axios.get(this.getCalendarURL, {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json"
-        },
         params: {
           agentId: this.agentId
         }
