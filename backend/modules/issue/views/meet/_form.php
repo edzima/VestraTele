@@ -20,7 +20,14 @@ use yii\widgets\ActiveForm;
 	<?= $form->field($model, 'created_at')
 		->widget(DateTimeWidget::class, [
 			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
-		]) ?>
+		])
+	?>
+
+	<?= $form->field($model, 'date_at')
+		->widget(DateTimeWidget::class, [
+			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
+		])
+	?>
 
 
 	<?= $form->field($model, 'campaign_id')->dropDownList(IssueMeet::getCampaignNames()) ?>
