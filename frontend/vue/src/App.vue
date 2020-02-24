@@ -1,28 +1,65 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="app">
+    <FullCalendar
+      ref="fullCalendar"
+      defaultView="timeGridWeek"
+      :header="{center: 'today prev,next', right: 'dayGridMonth,timeGridWeek,dayGridDay' }"
+      :plugins="calendarPlugins"
+    />
   </div>
 </template>
 
+
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import FullCalendar from "@fullcalendar/vue";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import listWeekPlugin from "@fullcalendar/list";
+import timeGridPlugin from "@fullcalendar/timegrid";
 
 export default {
-  name: 'App',
   components: {
-    HelloWorld
+    FullCalendar
+  },
+  props: {
+    agentId: {
+      type: Number
+      // required: true
+    },
+    cardBaseUrl: {
+      type: String
+      // required: true
+    },
+    updateURL: {
+      type: String
+      // required: true
+    },
+    getCalendarURL: {
+      type: String
+      // required: true
+    },
+    allowUpdate: {
+      type: Boolean
+    }
+  },
+  data() {
+    return {
+      calendarPlugins: [dayGridPlugin, listWeekPlugin, timeGridPlugin]
+    };
+  },
+  methods: {
+    changeView(viewType = "listWeek") {
+      // "dayGridMonth" - month view
+      // "listWeek" - week view
+      this.$refs.fullCalendar.getApi().changeView(viewType);
+    }
   }
-}
+};
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
+
+<style scoped lang='less'>
+@import "~@fullcalendar/core/main.css";
+@import "~@fullcalendar/daygrid/main.css";
+@import "~@fullcalendar/timegrid/main.css";
 </style>
