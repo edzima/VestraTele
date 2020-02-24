@@ -2,9 +2,11 @@
   <div class="app">
     <FullCalendar
       ref="fullCalendar"
-      defaultView="timeGridWeek"
-      :header="{center: 'today prev,next', right: 'dayGridMonth,timeGridWeek,dayGridDay' }"
-      :plugins="calendarPlugins"
+      :defaultView="calendar.defaultView"
+      :header="calendar.header"
+      :plugins="calendar.plugins"
+      :events="calendar.events"
+      :locale="calendar.locale"
     />
   </div>
 </template>
@@ -15,6 +17,8 @@ import FullCalendar from "@fullcalendar/vue";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import listWeekPlugin from "@fullcalendar/list";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import plLang from "@fullcalendar/core/locales/pl";
+import axios from "axios";
 
 export default {
   components: {
@@ -22,19 +26,23 @@ export default {
   },
   props: {
     agentId: {
-      type: Number
+      type: Number,
       // required: true
+      default: () => 21
     },
     cardBaseUrl: {
       type: String
       // required: true
     },
     updateURL: {
+      // meet-calendar/url/?id=&date
       type: String
       // required: true
     },
     getCalendarURL: {
-      type: String
+      type: String,
+      // https://test.vestra.hekko24.pl/meet-calendar/list?agentId=21
+      default: () => "/list"
       // required: true
     },
     allowUpdate: {
@@ -43,15 +51,42 @@ export default {
   },
   data() {
     return {
-      calendarPlugins: [dayGridPlugin, listWeekPlugin, timeGridPlugin]
+      calendar: {
+        plugins: [dayGridPlugin, listWeekPlugin, timeGridPlugin],
+        header: {
+          left: "title",
+          center: "today prev,next",
+          right: "dayGridMonth,timeGridWeek,dayGridDay"
+        },
+        defaultView: "timeGridWeek",
+        locale: plLang,
+        events: []
+      }
     };
   },
   methods: {
-    changeView(viewType = "listWeek") {
-      // "dayGridMonth" - month view
-      // "listWeek" - week view
-      this.$refs.fullCalendar.getApi().changeView(viewType);
+    async fetchEvents() {
+      const res = await axios.get(this.getCalendarURL, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json"
+        },
+        params: {
+          agentId: this.agentId
+        }
+      });
+      const events = res.data.data;
+      console.log(events);
+      const fullCalendarEvents = events.map(event => ({
+        id: event.id,
+        title: event.client,
+        start: event.date_at
+      }));
+      this.calendar.events = fullCalendarEvents;
     }
+  },
+  created() {
+    this.fetchEvents();
   }
 };
 </script>
