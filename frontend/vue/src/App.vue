@@ -1,11 +1,24 @@
 <template>
-  <div class="app">
+  <div class="calendar">
+    <div class="additionalControls">
+      <div class="leftControls">
+        <button
+        :style="buttonStyles[type.id-1]"
+        :class="isFilterActive(type.id) ? '' : 'disabled'"
+        @click="toggleFilter(type.id)"
+        v-for="type in eventTypes"
+        :key="type.id">{{type.name}}</button>
+      </div>
+      <div class="rightControls">
+
+      </div>
+    </div>
     <FullCalendar
       ref="fullCalendar"
       :defaultView="calendar.defaultView"
       :header="calendar.header"
       :plugins="calendar.plugins"
-      :events="calendar.events"
+      :events="calendar.visibleEvents"
       :locale="calendar.locale"
       :editable="calendar.editable"
       :droppable="calendar.droppable"
@@ -83,8 +96,34 @@ export default class App extends Vue {
     maxTime: '24:00:00',
     eventDurationEditable: this.allowUpdate, // allow to extend time
     columnHeaderFormat: { weekday: 'long', day: 'numeric' },
-    events: []
+    fetchedEvents: [],
+    visibleEvents: []
   };
+
+  private activeFilters: Array<any> = [1, 2, 3, 4]
+  private eventTypes: Array<any> = [{ id: 1, name: 'umówiony' }, { id: 2, name: 'umowa' }, { id: 3, name: 'niepodpisany' }, { id: 4, name: 'wysłane dokumenty' }]
+  // umówiony, umowa, niepodpisany, wysłany
+  // private buttonStyles: Array<any> = ['blue', 'green', 'red', 'yellow']
+  private buttonStyles: Array<any> = [
+    { backgroundColor: 'blue', color: 'white' },
+    { backgroundColor: 'green', color: 'white' },
+    { backgroundColor: 'red', color: 'white' },
+    { backgroundColor: 'yellow', color: 'black' }
+  ]
+
+  private toggleFilter (filterId: number): void {
+    if (this.activeFilters.includes(filterId)) {
+      const filtered = this.activeFilters.filter(id => id !== filterId)
+      this.activeFilters = filtered
+    } else {
+      this.activeFilters.push(filterId)
+    }
+    this.calendar.visibleEvents = this.calendar.fetchedEvents.filter(event => this.activeFilters.includes(event.typeId))
+  }
+
+  private isFilterActive (filterId: number): boolean {
+    return this.activeFilters.includes(filterId)
+  }
 
   private async handleChangeDates (e: any): Promise<void> {
     if (!this.allowUpdate) return // cancel if no permissions
@@ -109,14 +148,7 @@ export default class App extends Vue {
     params.append('id', eventId)
     params.append('date_at', dateFrom)
     params.append('date_end_at', dateTo)
-
-    const newEventProperties = {
-      id: eventId,
-      date_at: dateFrom,
-      date_end_at: dateTo
-    }
-
-    axios.post(this.URLUpdate, newEventProperties)
+    axios.post(this.URLUpdate, params)
   }
 
   private async fetchEvents (): Promise<void> {
@@ -129,11 +161,14 @@ export default class App extends Vue {
     const fullCalendarEvents = events.map(eventCard => ({
       id: eventCard.id,
       title: eventCard.client,
-      start: eventCard.date_at
+      start: eventCard.date_at,
+      typeId: 1
     }))
+
     console.log(fullCalendarEvents)
 
-    this.calendar.events = fullCalendarEvents
+    this.calendar.fetchedEvents = fullCalendarEvents
+    this.calendar.visibleEvents = fullCalendarEvents
   }
 
   created () {
@@ -146,4 +181,30 @@ export default class App extends Vue {
 @import "~@fullcalendar/core/main.css";
 @import "~@fullcalendar/daygrid/main.css";
 @import "~@fullcalendar/timegrid/main.css";
+.calendar{
+  .additionalControls{
+    .leftControls{
+      width: 45vw;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      button{
+        height: 5vh;
+        width: 10vw;
+        border-radius: 10px;
+        font-size: 15px;
+        color: white;
+        border: none;
+        margin: 0 auto;
+        box-shadow: 0 4px 5px rgba(0,0,0,0.1);
+        &.disabled{
+          // background-color: #fff !important;
+          // color: black !important;
+          opacity: 0.4;
+        }
+      }
+    }
+  }
+}
 </style>
