@@ -28,6 +28,7 @@ use yii\helpers\ArrayHelper;
  * @property string $created_at
  * @property string $updated_at
  * @property string $date_at
+ * @property string $date_end_at
  * @property string $details
  * @property int $status
  * @property int $city_id
@@ -81,7 +82,7 @@ class IssueMeet extends ActiveRecord {
 		return [
 			[['type_id', 'phone', 'client_name', 'status', 'campaign_id'], 'required'],
 			[['type_id', 'tele_id', 'agent_id', 'status', 'city_id', 'sub_province_id', 'campaign_id'], 'integer'],
-			[['created_at', 'updated_at', 'date_at'], 'safe'],
+			[['created_at', 'updated_at', 'date_at', 'date_end_at'], 'safe'],
 			[['details', 'street'], 'string'],
 			[['phone'], 'string', 'max' => 15],
 			[['client_name'], 'string', 'max' => 20],
@@ -112,6 +113,7 @@ class IssueMeet extends ActiveRecord {
 			'created_at' => 'Data leada',
 			'updated_at' => 'Edytowano',
 			'date_at' => 'Data spotkania',
+			'date_end_at' => 'Data końca spotkania',
 			'details' => 'Szczegóły',
 			'status' => 'Status',
 			'street' => 'Ulica',
