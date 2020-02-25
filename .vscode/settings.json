@@ -1,0 +1,6 @@
+{
+    "files.autoSaveDelay": 1000,
+    "eslint.workingDirectories": [
+        "frontend/vue/"
+    ]
+}

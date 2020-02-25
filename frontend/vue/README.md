@@ -1,4 +1,4 @@
-# calendar
+# vue
 
 ## Project setup
 ```
