@@ -20,7 +20,7 @@
 </template>
 
 
-<script>
+<script lang="ts">
 import FullCalendar from "@fullcalendar/vue";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import listWeekPlugin from "@fullcalendar/list";
@@ -105,7 +105,7 @@ export default {
     },
     handleChangeDates(e) {
       const { event } = e;
-      console.log(event.start.toISOString());
+      console.log(event);
       axios.post(this.updateURL, {
         id: event.id,
         date: event.start.toISOString()
