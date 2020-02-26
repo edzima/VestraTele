@@ -27,8 +27,8 @@ import plLang from '@fullcalendar/core/locales/pl'
 import interactionPlugin from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import axios from 'axios'
+import { ISOtoW3C } from '@/helpers/calendarHelper.ts'
 const FullCalendar = require('@fullcalendar/vue').default
-const CalendarCore = require('@fullcalendar/core')
 
 @Component({
   components: {
@@ -65,10 +65,10 @@ export default class Calendar extends Vue {
   private URLGetEvents!: string;
 
   @Prop({ required: true })
-  private fetchedEvents: Array<any>
+  private fetchedEvents!: Array<any>;
 
   @Prop({ required: true })
-  private activeFilters: Array<number>
+  private activeFilters!: Array<number>;
 
   private calendar: any = {
     plugins: [dayGridPlugin, listWeekPlugin, timeGridPlugin, interactionPlugin],
@@ -88,38 +88,29 @@ export default class Calendar extends Vue {
   };
 
   get events (): Array<any> {
-    return this.fetchedEvents.filter(event => this.activeFilters.includes(event.typeId))
+    return this.fetchedEvents.filter(event =>
+      this.activeFilters.includes(event.typeId)
+    )
   }
 
   private async handleChangeDates (e: any): Promise<void> {
     if (!this.allowUpdate) return // cancel if no permissions
     const eventCard: any = e.event
     console.log(eventCard)
-    const parseSettings = {
-      month: 'numeric',
-      year: 'numeric',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      second: 'numeric',
-      hour12: false,
-      meridiem: false,
-      separator: '-'
-    }
-    const dateFrom: string = CalendarCore.formatDate(
-      eventCard.start.toISOString(),
-      parseSettings
-    )
+    const dateFrom: string = eventCard.start.toISOString()
     const dateTo: string = eventCard.end
-      ? CalendarCore.formatDate(eventCard.end.toISOString(), parseSettings)
+      ? eventCard.end.toISOString()
       : ''
     const eventId: number = eventCard.id
-
+    console.log(dateFrom)
+    const dateFromW3C = ISOtoW3C(dateFrom)
+    const dateToW3C = ISOtoW3C(dateTo)
+    console.log(dateFromW3C)
     const params: any = new URLSearchParams()
     params.append('id', eventId)
-    params.append('date_at', dateFrom)
-    params.append('date_end_at', dateTo)
-    axios.post(this.URLUpdate, params)
+    params.append('date_at', dateFromW3C)
+    params.append('date_end_at', dateToW3C)
+    // axios.post(this.URLUpdate, params)
   }
 }
 </script>

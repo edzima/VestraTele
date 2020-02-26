@@ -91,7 +91,6 @@ export default class App extends Vue {
     console.log(fullCalendarEvents)
 
     this.fetchedEvents = fullCalendarEvents
-    this.visibleEvents = fullCalendarEvents
   }
 
   created () {
