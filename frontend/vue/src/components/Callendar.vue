@@ -14,7 +14,9 @@
       :maxTime="calendar.maxTime"
       :eventDurationEditable="calendar.eventDurationEditable"
       :columnHeaderFormat="calendar.columnHeaderFormat"
+      :visibleRange="getVisibleRange"
       @eventDrop="handleChangeDates"
+      :datesRender="getVisibleRange"
     />
   </div>
 </template>
@@ -98,9 +100,7 @@ export default class Calendar extends Vue {
     const eventCard: any = e.event
     console.log(eventCard)
     const dateFrom: string = eventCard.start.toISOString()
-    const dateTo: string = eventCard.end
-      ? eventCard.end.toISOString()
-      : ''
+    const dateTo: string = eventCard.end ? eventCard.end.toISOString() : ''
     const eventId: number = eventCard.id
     console.log(dateFrom)
     const dateFromW3C = ISOtoW3C(dateFrom)
@@ -111,6 +111,19 @@ export default class Calendar extends Vue {
     params.append('date_at', dateFromW3C)
     params.append('date_end_at', dateToW3C)
     // axios.post(this.URLUpdate, params)
+  }
+
+  private getVisibleRange (): void {
+    const fullcalendar: any = this.$refs.fullCalendar
+    const calApi: any = fullcalendar.getApi()
+    const startDate: any = calApi.view.activeStart
+    const endDate: any = calApi.view.activeEnd
+    console.log(startDate)
+    console.log(endDate)
+  }
+
+  mounted () {
+    this.getVisibleRange()
   }
 }
 </script>
