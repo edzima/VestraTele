@@ -1,4 +1,5 @@
 const CalendarCore = require('@fullcalendar/core')
+const moment = require('moment')
 
 export const dateToW3C = (date: Date): string => {
   if (!date) return ''
@@ -24,4 +25,16 @@ export const dateToW3C = (date: Date): string => {
   // "2020-02-28 12:27:00"
   const dateFormatted = `${year}-${month}-${day} ${time}`
   return dateFormatted
+}
+
+export const getLastOfMonth = (date: Date): Date => {
+  const endDate = moment(date).endOf('month')
+  return dateToW3C(endDate)
+}
+export const getFirstOfMonth = (date: Date): Date => {
+  const startDate = moment(date).startOf('month')
+  return dateToW3C(startDate)
+}
+export const isSameMonth = (firstDate: Date, secondDate: Date): boolean => {
+  return moment(firstDate).month() === moment(secondDate).month()
 }

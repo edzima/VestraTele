@@ -8,12 +8,13 @@
     <Calendar
     :eventTypes="eventTypes"
     :activeFilters="activeFilters"
-    :fetchedEvents="fetchedEvents"
+    :allEvents="allEvents"
     :allowUpdate="allowUpdate"
     :agentId="agentId"
     :URLUpdate="URLUpdate"
     :URLGetEvents="URLGetEvents"
     :URLInspectEvent="URLInspectEvent"
+    @loadMonth="fetchAndCacheMonth"
     />
   </div>
 </template>
@@ -22,6 +23,9 @@
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import Calendar from '@/components/Callendar.vue'
 import Filters from '@/components/Filters.vue'
+import { CalendarEvent } from '@/types/calendarEventType'
+import { getFirstOfMonth, getLastOfMonth } from '@/helpers/dateHelper.ts'
+
 import axios from 'axios'
 @Component({
   components: {
@@ -73,8 +77,9 @@ export default class App extends Vue {
   private URLInspectEvent!: string;
 
   private activeFilters: Array<any> = [1, 2, 3, 4];
-  private eventTypes: Array<any> = [{ id: 1, name: 'umówiony' }, { id: 2, name: 'umowa' }, { id: 3, name: 'niepodpisany' }, { id: 4, name: 'wysłane dokumenty' }]
-  private fetchedEvents: Array<any> = []
+  private eventTypes: Array<any> = [{ id: 1, name: 'umówiony', className: 'blue' }, { id: 2, name: 'umowa', className: 'green' }, { id: 3, name: 'niepodpisany', className: 'red' }, { id: 4, name: 'wysłane dokumenty', className: 'yellow' }]
+  private allEvents: Array<CalendarEvent> = []
+  private fetchedMonths: Array<{monthName: string; events: Array<CalendarEvent>; year: string}> = [];
 
   private toggleFilter (filterId: number): void {
     if (this.activeFilters.includes(filterId)) {
@@ -85,27 +90,56 @@ export default class App extends Vue {
     }
   }
 
-  private async fetchEvents (): Promise<void> {
+  private async fetchAndCacheMonth (monthDate: Date): Promise<void> {
+    console.log(monthDate)
+    const monthEvents = this.fetchedMonths.find(ftchMonth => ftchMonth.monthName === monthDate.getMonth() && ftchMonth.year === monthDate.getFullYear())
+    if (monthEvents) {
+      this.addEvent(monthEvents.events)
+    } else {
+      const fetchedMonth = await this.fetchMonth(monthDate)
+      this.fetchedMonths.push({
+        monthName: monthDate.getMonth(),
+        events: fetchedMonth,
+        year: monthDate.getFullYear()
+      })
+      this.addEvent(fetchedMonth)
+    }
+    console.log(this.allEvents)
+
+    console.log(this.fetchedMonths.map(e => e.monthName))
+  }
+
+  private addEvent (events: Array<CalendarEvent>): void {
+    events.forEach(event => {
+      if (!this.allEvents.find(e => e.id === event.id)) {
+        this.allEvents.push(event)
+      }
+    })
+  }
+
+  private async fetchMonth (monthDate: Date): Promise<Array<CalendarEvent>> {
+    const startDate: Date = getFirstOfMonth(monthDate)
+    console.log(startDate)
+    const endDate: Date = getLastOfMonth(monthDate)
+    console.log(endDate)
     const res = await axios.get(this.URLGetEvents, {
       params: {
-        agentId: this.agentId
+        agentId: this.agentId,
+        dateFrom: startDate,
+        dateTo: endDate
       }
     })
     const events = res.data.data
-    const fullCalendarEvents = events.map(eventCard => ({
+    return events.map(eventCard => ({
       id: eventCard.id,
       title: eventCard.client,
       start: eventCard.date_at,
       typeId: 1
     }))
-
-    console.log(fullCalendarEvents)
-
-    this.fetchedEvents = fullCalendarEvents
   }
 
   created () {
-    this.fetchEvents()
+    // this.fetchAndCacheMonth()
   }
 }
 </script>

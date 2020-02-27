@@ -14,8 +14,8 @@
       :maxTime="calendar.maxTime"
       :eventDurationEditable="calendar.eventDurationEditable"
       :columnHeaderFormat="calendar.columnHeaderFormat"
-      :visibleRange="getVisibleRange"
-      :datesRender="getVisibleRange"
+      :datesRender="loadEvents"
+      :showNonCurrentDates="false"
       @eventDrop="handleChangeDates"
       @eventClick="inspectEvent"
     />
@@ -29,7 +29,7 @@ import listWeekPlugin from '@fullcalendar/list'
 import plLang from '@fullcalendar/core/locales/pl'
 import interactionPlugin from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
-import { dateToW3C } from '@/helpers/dateHelper.ts'
+import { dateToW3C, isSameMonth } from '@/helpers/dateHelper.ts'
 import axios from 'axios'
 const FullCalendar = require('@fullcalendar/vue').default
 
@@ -73,7 +73,7 @@ export default class Calendar extends Vue {
   private URLInspectEvent!: string;
 
   @Prop({ required: true })
-  private fetchedEvents!: Array<any>;
+  private allEvents!: Array<any>;
 
   @Prop({ required: true })
   private activeFilters!: Array<number>;
@@ -101,7 +101,7 @@ export default class Calendar extends Vue {
   }
 
   get events (): Array<any> {
-    const filtered = this.fetchedEvents.filter(event =>
+    const filtered = this.allEvents.filter(event =>
       this.activeFilters.includes(event.typeId)
     )
     console.log(filtered)
@@ -125,13 +125,18 @@ export default class Calendar extends Vue {
     axios.post(this.URLUpdate, params)
   }
 
-  private getVisibleRange (): void {
+  private loadEvents (): void {
     const fullcalendar: any = this.$refs.fullCalendar
     const calApi: any = fullcalendar.getApi()
-    const startDate: any = calApi.view.activeStart
-    const endDate: any = calApi.view.activeEnd
-    // console.log(startDate)
-    // console.log(endDate)
+    console.log(calApi)
+
+    const startDate: Date = calApi.view.activeStart // counting from 0 -> january
+    const endDate: Date = calApi.view.activeEnd
+
+    this.$emit('loadMonth', startDate)
+    if (!isSameMonth(startDate, endDate)) {
+      this.$emit('loadMonth', endDate)
+    }
   }
 
   private inspectEvent (event: any): void{
@@ -151,10 +156,6 @@ export default class Calendar extends Vue {
       const linkToInspect = `${this.URLInspectEvent}?id=${event.event.id}`
       window.open(linkToInspect)
     }
-  }
-
-  mounted () {
-    this.getVisibleRange()
   }
 }
 </script>
