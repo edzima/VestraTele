@@ -9,12 +9,14 @@
     :eventTypes="eventTypes"
     :activeFilters="activeFilters"
     :allEvents="allEvents"
+    :allNotes="allNotes"
     :allowUpdate="allowUpdate"
     :agentId="agentId"
     :URLUpdate="URLUpdate"
     :URLGetEvents="URLGetEvents"
     :URLInspectEvent="URLInspectEvent"
     @loadMonth="fetchAndCacheMonth"
+    @deleteNote="deleteNote"
     />
   </div>
 </template>
@@ -76,10 +78,16 @@ export default class App extends Vue {
   })
   private URLInspectEvent!: string;
 
-  private activeFilters: Array<any> = [1, 2, 3, 4];
+  private activeFilters: Array<number> = [1, 2, 3, 4];
   private eventTypes: Array<any> = [{ id: 1, name: 'umówiony', className: 'blue' }, { id: 2, name: 'umowa', className: 'green' }, { id: 3, name: 'niepodpisany', className: 'red' }, { id: 4, name: 'wysłane dokumenty', className: 'yellow' }]
   private allEvents: Array<CalendarEvent> = []
+  private allNotes: Array<any> = [{ id: 1, date: '2020-02-29 00:00:00', text: 'lorem ipsum' }, { id: 2, date: '2020-02-28 00:00:00', text: 'lorem ipsum' }, { id: 3, date: '2020-02-29 00:00:00', text: 'lorem ipsum' }, { id: 4, date: '2020-02-29 00:00:00', text: 'lorem ipsum' }]
   private fetchedMonths: Array<{monthID: number; year: number}> = [];
+
+  private deleteNote (noteID: number) {
+    // AXIOS
+    this.allNotes = this.allNotes.filter(note => note.id !== noteID)
+  }
 
   private toggleFilter (filterId: number): void {
     if (this.activeFilters.includes(filterId)) {

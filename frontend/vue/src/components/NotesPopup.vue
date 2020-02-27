@@ -1,13 +1,16 @@
 <template>
-  <div v-if="isVisible" class="popup">
+  <div v-if="date" class="popup">
     <div class="modal">
+      <button class="close"
+      @click="handleClose"
+      >X</button>
       <div class="activeNotes">
         <h1>{{dateFormated}}</h1>
         <h3>aktywne notatki:</h3>
         <div class="notes">
-          <div class="note">
-            <button>usuń</button>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum accusantium esse libero nihil fuga impedit ex, blanditiis, pariatur vero placeat omnis tenetur, nobis incidunt aliquid magni suscipit iste. Esse, consequuntur!</p>
+          <div v-for="note in dayNotes" :key="note.id" class="note" >
+            <button @click="deleteNote(note.id)">usuń</button>
+            <p>{{note.text}}</p>
           </div>
         </div>
       </div>
@@ -22,13 +25,34 @@
 
 <script lang="ts">
 import { Vue, Prop, Component } from 'vue-property-decorator'
-
+import { prettyDate, isSameDate } from '@/helpers/dateHelper'
 @Component({})
 export default class NewNotePopup extends Vue {
   @Prop({
-    required: true
+    required: false
   })
   private date!: Date;
+
+  @Prop({
+    required: false
+  })
+  private allNotes!: Array<any>;
+
+  private handleClose () {
+    this.$emit('close')
+  }
+
+  private deleteNote (noteID: number) {
+    this.$emit('deleteNote', noteID)
+  }
+
+  get dayNotes () {
+    return this.allNotes.filter(note => isSameDate(note.date, this.date))
+  }
+
+  get dateFormated () {
+    return prettyDate(this.date)
+  }
 }
 </script>
 
@@ -43,15 +67,29 @@ export default class NewNotePopup extends Vue {
   justify-content: center;
   align-items: center;
   .modal{
+    position: relative;
     width: 50vw;
     min-height: 40vh;
     background-color: white;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
     border-radius: 10px;
     padding: 20px;
-    border: 4px solid #0058a0;
+    border: 4px solid #ffffff59;
+    button.close{
+      position: absolute;
+      top:0;
+      right: 0;
+      border-radius: 0 10px 0 0 ;
+      border: none;
+      font-size: 23px;
+      color: red;
+      cursor: pointer;
+    }
     h1{
       text-align: center;
+      text-shadow: 4px 2px 10px  rgba(0, 0, 0, 0.2);
+      color: #03A9F4;
+      font-size: 38px;
     }
     h3{
       text-align: left;
@@ -59,10 +97,11 @@ export default class NewNotePopup extends Vue {
     .activeNotes{
       .notes{
         .note{
-          padding: 5px;
-          border: solid 2px green;
+          margin: 1vh 0;
+          padding: 10px;
+          border: solid 1px rgba(165, 165, 165, 0.336);
           border-radius: 5px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          box-shadow: 0 2px 10px rgba(0,0,0,0.2);
           cursor: pointer;
           position: relative;
           button{
@@ -92,7 +131,7 @@ export default class NewNotePopup extends Vue {
       }
       textarea{
         width: 97%;
-        border: solid 2px rgb(0, 102, 255);
+        border: solid 2px #03A9F4;
         border-radius: 10px;
         height: 10vh;
         font-size: 17px;
@@ -104,7 +143,7 @@ export default class NewNotePopup extends Vue {
         border-radius: 10px;
         color: white;
         border: none;
-        background-color: rgb(0, 107, 207);
+        background-color: #03A9F4;
         font-size: 15px;
         padding: 10px 20px;
       }

@@ -38,3 +38,18 @@ export const getFirstOfMonth = (date: Date): string => {
 export const isSameMonth = (firstDate: Date, secondDate: Date): boolean => {
   return moment(firstDate).month() === moment(secondDate).month()
 }
+export const prettyDate = (date: Date): string => {
+  moment.locale('pl')
+  return moment(date).format('Do MMMM YYYY')
+}
+export const isSameDate = (firstDate: Date, secondDate: Date): boolean => {
+  const first = moment(firstDate).format('LL')
+  console.log(first)
+
+  const second = moment(secondDate).format('LL')
+  console.log(second)
+  const isSame = first === second
+  console.log(isSame)
+
+  return isSame
+}

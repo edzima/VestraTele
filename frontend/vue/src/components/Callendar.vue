@@ -1,6 +1,12 @@
 <template>
   <div class="calendar">
-    <NotesPopup :date="addNoteDate"/>
+    <NotesPopup
+    :date="addNoteDate"
+    :allNotes="allNotes"
+    @close="closePopup"
+    @deleteNote="deleteNote"
+
+    />
     <FullCalendar
       ref="fullCalendar"
       :defaultView="calendar.defaultView"
@@ -83,6 +89,9 @@ export default class Calendar extends Vue {
   @Prop({ required: true })
   private activeFilters!: Array<number>;
 
+  @Prop({})
+  private allNotes!: Array<any>
+
   private calendar: any = {
     plugins: [dayGridPlugin, listWeekPlugin, timeGridPlugin, interactionPlugin],
     header: {
@@ -100,12 +109,21 @@ export default class Calendar extends Vue {
     columnHeaderFormat: { weekday: 'long', day: 'numeric' }
   };
 
+  private deleteNote (noteID: number) {
+    // handle delete
+    this.$emit('deleteNote', noteID)
+  }
+
   private eventClick: any = {
     eventClicked: null,
     timeoutId: null
   }
 
-  private addNoteDate!: Date;
+  private addNoteDate: any = null;
+
+  private closePopup () {
+    this.addNoteDate = null
+  }
 
   get events (): Array<any> {
     const filtered = this.allEvents.filter(event =>
@@ -118,7 +136,7 @@ export default class Calendar extends Vue {
     if (e.allDay) {
       // clicked on all day
       console.log('add note')
-      console.log(e)
+      this.addNoteDate = e.date
     } else {
       // clicked on blank date
     }
