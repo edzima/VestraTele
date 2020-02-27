@@ -104,19 +104,14 @@ export default class Calendar extends Vue {
     const filtered = this.allEvents.filter(event =>
       this.activeFilters.includes(event.typeId)
     )
-    console.log(filtered)
     return filtered
   }
 
   private async handleChangeDates (e: any): Promise<void> {
     if (!this.allowUpdate) return // cancel if no permissions
     const eventCard: any = e.event
-    console.log(eventCard)
-
     const dateFrom = dateToW3C(e.event.start)
     const dateTo = dateToW3C(e.event.end)
-    console.log(dateFrom)
-
     const eventId: number = eventCard.id
     const params: any = new URLSearchParams()
     params.append('id', eventId)
@@ -128,7 +123,6 @@ export default class Calendar extends Vue {
   private loadEvents (): void {
     const fullcalendar: any = this.$refs.fullCalendar
     const calApi: any = fullcalendar.getApi()
-    console.log(calApi)
 
     const startDate: Date = calApi.view.activeStart // counting from 0 -> january
     const endDate: Date = calApi.view.activeEnd
@@ -152,7 +146,6 @@ export default class Calendar extends Vue {
       clearTimeout(this.eventClick.timeoutId)
       this.eventClick.timeoutId = null
       this.eventClick.eventClicked = event.el
-      console.log(event.el)
       const linkToInspect = `${this.URLInspectEvent}?id=${event.event.id}`
       window.open(linkToInspect)
     }
