@@ -110,6 +110,7 @@ export default class Calendar extends Vue {
   private async handleChangeDates (e: any): Promise<void> {
     if (!this.allowUpdate) return // cancel if no permissions
     const eventCard: any = e.event
+    if (eventCard.allDay) return e.revert()
     const dateFrom = dateToW3C(e.event.start)
     const dateTo = dateToW3C(e.event.end)
     const eventId: number = eventCard.id
