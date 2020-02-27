@@ -15,8 +15,9 @@
       :eventDurationEditable="calendar.eventDurationEditable"
       :columnHeaderFormat="calendar.columnHeaderFormat"
       :visibleRange="getVisibleRange"
-      @eventDrop="handleChangeDates"
       :datesRender="getVisibleRange"
+      @eventDrop="handleChangeDates"
+      @eventClick="inspectEvent"
     />
   </div>
 </template>
@@ -28,8 +29,8 @@ import listWeekPlugin from '@fullcalendar/list'
 import plLang from '@fullcalendar/core/locales/pl'
 import interactionPlugin from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
+import { dateToW3C } from '@/helpers/dateHelper.ts'
 import axios from 'axios'
-import { ISOtoW3C } from '@/helpers/calendarHelper.ts'
 const FullCalendar = require('@fullcalendar/vue').default
 
 @Component({
@@ -89,6 +90,11 @@ export default class Calendar extends Vue {
     columnHeaderFormat: { weekday: 'long', day: 'numeric' }
   };
 
+  private eventClick: any = {
+    eventClicked: null,
+    timeoutId: null
+  }
+
   get events (): Array<any> {
     return this.fetchedEvents.filter(event =>
       this.activeFilters.includes(event.typeId)
@@ -99,18 +105,17 @@ export default class Calendar extends Vue {
     if (!this.allowUpdate) return // cancel if no permissions
     const eventCard: any = e.event
     console.log(eventCard)
-    const dateFrom: string = eventCard.start.toISOString()
-    const dateTo: string = eventCard.end ? eventCard.end.toISOString() : ''
-    const eventId: number = eventCard.id
+
+    const dateFrom = dateToW3C(e.event.start)
+    const dateTo = dateToW3C(e.event.end)
     console.log(dateFrom)
-    const dateFromW3C = ISOtoW3C(dateFrom)
-    const dateToW3C = ISOtoW3C(dateTo)
-    console.log(dateFromW3C)
+
+    const eventId: number = eventCard.id
     const params: any = new URLSearchParams()
     params.append('id', eventId)
-    params.append('date_at', dateFromW3C)
-    params.append('date_end_at', dateToW3C)
-    // axios.post(this.URLUpdate, params)
+    params.append('date_at', dateFrom)
+    params.append('date_end_at', dateTo)
+    axios.post(this.URLUpdate, params)
   }
 
   private getVisibleRange (): void {
@@ -120,6 +125,25 @@ export default class Calendar extends Vue {
     const endDate: any = calApi.view.activeEnd
     console.log(startDate)
     console.log(endDate)
+  }
+
+  private inspectEvent (event: any): void{
+    if (!this.eventClick.timeoutId) {
+      this.eventClick.timeoutId = setTimeout(() => {
+      // simple click
+        clearTimeout(this.eventClick.timeoutId)
+        this.eventClick.timeoutId = null
+        this.eventClick.eventClicked = event.el
+        console.log('singleClick')
+      }, 250)// tolerance in ms
+    } else {
+      // double click
+      console.log(event.event.id)
+      clearTimeout(this.eventClick.timeoutId)
+      this.eventClick.timeoutId = null
+      this.eventClick.eventClicked = event.el
+      console.log('doubleClicked')
+    }
   }
 
   mounted () {

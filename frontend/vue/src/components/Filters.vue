@@ -9,7 +9,6 @@
         :key="type.id"
       >{{type.name}}</button>
     </div>
-    <div class="rightControls"></div>
   </div>
 </template>
 
