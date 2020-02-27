@@ -27,11 +27,11 @@ export const dateToW3C = (date: Date): string => {
   return dateFormatted
 }
 
-export const getLastOfMonth = (date: Date): Date => {
+export const getLastOfMonth = (date: Date): string => {
   const endDate = moment(date).endOf('month')
   return dateToW3C(endDate)
 }
-export const getFirstOfMonth = (date: Date): Date => {
+export const getFirstOfMonth = (date: Date): string => {
   const startDate = moment(date).startOf('month')
   return dateToW3C(startDate)
 }

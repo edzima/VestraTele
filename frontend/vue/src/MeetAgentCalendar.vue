@@ -79,7 +79,7 @@ export default class App extends Vue {
   private activeFilters: Array<any> = [1, 2, 3, 4];
   private eventTypes: Array<any> = [{ id: 1, name: 'umówiony', className: 'blue' }, { id: 2, name: 'umowa', className: 'green' }, { id: 3, name: 'niepodpisany', className: 'red' }, { id: 4, name: 'wysłane dokumenty', className: 'yellow' }]
   private allEvents: Array<CalendarEvent> = []
-  private fetchedMonths: Array<{monthName: string; year: string}> = [];
+  private fetchedMonths: Array<{monthID: number; year: number}> = [];
 
   private toggleFilter (filterId: number): void {
     if (this.activeFilters.includes(filterId)) {
@@ -91,11 +91,11 @@ export default class App extends Vue {
   }
 
   private async fetchAndCacheMonth (monthDate: Date): Promise<void> {
-    const monthExsist = this.fetchedMonths.find(ftchMonth => ftchMonth.monthName === monthDate.getMonth() && ftchMonth.year === monthDate.getFullYear())
+    const monthExsist = this.fetchedMonths.find(ftchMonth => ftchMonth.monthID === monthDate.getMonth() && ftchMonth.year === monthDate.getFullYear())
     if (monthExsist) return
     const fetchedMonth = await this.fetchMonth(monthDate)
     this.fetchedMonths.push({
-      monthName: monthDate.getMonth(),
+      monthID: monthDate.getMonth(),
       year: monthDate.getFullYear()
     })
 
@@ -103,8 +103,8 @@ export default class App extends Vue {
   }
 
   private async fetchMonth (monthDate: Date): Promise<Array<CalendarEvent>> {
-    const startDate: Date = getFirstOfMonth(monthDate)
-    const endDate: Date = getLastOfMonth(monthDate)
+    const startDate: string = getFirstOfMonth(monthDate)
+    const endDate: string = getLastOfMonth(monthDate)
     const res = await axios.get(this.URLGetEvents, {
       params: {
         agentId: this.agentId,
@@ -117,6 +117,7 @@ export default class App extends Vue {
       id: eventCard.id,
       title: eventCard.client,
       start: eventCard.date_at,
+      end: eventCard.date_end_at,
       typeId: 1
     }))
   }

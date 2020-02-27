@@ -1,5 +1,6 @@
 <template>
   <div class="calendar">
+    <NotesPopup :date="addNoteDate"/>
     <FullCalendar
       ref="fullCalendar"
       :defaultView="calendar.defaultView"
@@ -17,6 +18,7 @@
       :datesRender="loadEvents"
       :showNonCurrentDates="false"
       @eventDrop="handleChangeDates"
+      @eventResize="handleChangeDates"
       @eventClick="inspectEvent"
       @dateClick="handleAddNote"
     />
@@ -31,12 +33,14 @@ import plLang from '@fullcalendar/core/locales/pl'
 import interactionPlugin from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import { dateToW3C, isSameMonth } from '@/helpers/dateHelper.ts'
+import NotesPopup from './NotesPopup.vue'
 import axios from 'axios'
 const FullCalendar = require('@fullcalendar/vue').default
 
 @Component({
   components: {
-    FullCalendar
+    FullCalendar,
+    NotesPopup
   }
 })
 export default class Calendar extends Vue {
@@ -101,6 +105,8 @@ export default class Calendar extends Vue {
     timeoutId: null
   }
 
+  private addNoteDate!: Date;
+
   get events (): Array<any> {
     const filtered = this.allEvents.filter(event =>
       this.activeFilters.includes(event.typeId)
@@ -112,6 +118,7 @@ export default class Calendar extends Vue {
     if (e.allDay) {
       // clicked on all day
       console.log('add note')
+      console.log(e)
     } else {
       // clicked on blank date
     }
@@ -127,6 +134,8 @@ export default class Calendar extends Vue {
     const dateTo = dateToW3C(e.event.end)
     const eventId: number = eventCard.id
     const params: any = new URLSearchParams()
+    console.log(dateTo)
+
     params.append('id', eventId)
     params.append('date_at', dateFrom)
     params.append('date_end_at', dateTo)
