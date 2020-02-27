@@ -18,6 +18,7 @@
       :showNonCurrentDates="false"
       @eventDrop="handleChangeDates"
       @eventClick="inspectEvent"
+      @dateClick="handleAddNote"
     />
   </div>
 </template>
@@ -107,10 +108,21 @@ export default class Calendar extends Vue {
     return filtered
   }
 
+  private handleAddNote (e: any): void{
+    if (e.allDay) {
+      // clicked on all day
+      console.log('add note')
+    } else {
+      // clicked on blank date
+    }
+  }
+
   private async handleChangeDates (e: any): Promise<void> {
     if (!this.allowUpdate) return // cancel if no permissions
+
     const eventCard: any = e.event
     if (eventCard.allDay) return e.revert()
+
     const dateFrom = dateToW3C(e.event.start)
     const dateTo = dateToW3C(e.event.end)
     const eventId: number = eventCard.id
