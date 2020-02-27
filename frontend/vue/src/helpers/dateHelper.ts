@@ -16,11 +16,6 @@ export const dateToW3C = (date: Date): string => {
   const dateISO: string = CalendarCore.formatDate(
     date.toISOString(), parseSettings
   )
-  //   const dateCharsFixed = dateISO.split('').map(char => {
-  //     if (char === '/') return '-'
-  //     if (char === ',') return ''
-  //     return char
-  //   }).join('')
   const splitted = dateISO.split('/')
   const month = splitted[0]
   const day = splitted[1]

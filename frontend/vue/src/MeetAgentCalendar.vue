@@ -13,6 +13,7 @@
     :agentId="agentId"
     :URLUpdate="URLUpdate"
     :URLGetEvents="URLGetEvents"
+    :URLInspectEvent="URLInspectEvent"
     />
   </div>
 </template>
@@ -60,6 +61,16 @@ export default class App extends Vue {
     required: false
   })
   private URLGetEvents!: string;
+
+  @Prop({
+    default: () => 'http://google.com',
+    // -----PARAMS-----
+    // dateFrom
+    // dateTo
+    // agentId
+    required: false
+  })
+  private URLInspectEvent!: string;
 
   private activeFilters: Array<any> = [1, 2, 3, 4];
   private eventTypes: Array<any> = [{ id: 1, name: 'umówiony' }, { id: 2, name: 'umowa' }, { id: 3, name: 'niepodpisany' }, { id: 4, name: 'wysłane dokumenty' }]

@@ -67,6 +67,11 @@ export default class Calendar extends Vue {
   })
   private URLGetEvents!: string;
 
+  @Prop({
+    required: true
+  })
+  private URLInspectEvent!: string;
+
   @Prop({ required: true })
   private fetchedEvents!: Array<any>;
 
@@ -84,7 +89,7 @@ export default class Calendar extends Vue {
     locale: plLang,
     editable: this.allowUpdate, // FLAG FROM PROPS
     droppable: false, // external calendars events
-    minTime: '8:00:00',
+    minTime: '0:00:00',
     maxTime: '24:00:00',
     eventDurationEditable: this.allowUpdate, // allow to extend time
     columnHeaderFormat: { weekday: 'long', day: 'numeric' }
@@ -96,9 +101,11 @@ export default class Calendar extends Vue {
   }
 
   get events (): Array<any> {
-    return this.fetchedEvents.filter(event =>
+    const filtered = this.fetchedEvents.filter(event =>
       this.activeFilters.includes(event.typeId)
     )
+    console.log(filtered)
+    return filtered
   }
 
   private async handleChangeDates (e: any): Promise<void> {
@@ -123,8 +130,8 @@ export default class Calendar extends Vue {
     const calApi: any = fullcalendar.getApi()
     const startDate: any = calApi.view.activeStart
     const endDate: any = calApi.view.activeEnd
-    console.log(startDate)
-    console.log(endDate)
+    // console.log(startDate)
+    // console.log(endDate)
   }
 
   private inspectEvent (event: any): void{
@@ -134,15 +141,15 @@ export default class Calendar extends Vue {
         clearTimeout(this.eventClick.timeoutId)
         this.eventClick.timeoutId = null
         this.eventClick.eventClicked = event.el
-        console.log('singleClick')
       }, 250)// tolerance in ms
     } else {
       // double click
-      console.log(event.event.id)
       clearTimeout(this.eventClick.timeoutId)
       this.eventClick.timeoutId = null
       this.eventClick.eventClicked = event.el
-      console.log('doubleClicked')
+      console.log(event.el)
+      const linkToInspect = `${this.URLInspectEvent}?id=${event.event.id}`
+      window.open(linkToInspect)
     }
   }
 
