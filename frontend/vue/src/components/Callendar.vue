@@ -10,6 +10,7 @@
       :calendarEvent="toolTip.calendarEvent"
       :element="toolTip.element"
       :isVisible="toolTip.isVisible"
+      :activeView="toolTip.activeView"
     />
     <FullCalendar
       ref="fullCalendar"
@@ -29,13 +30,13 @@
       :showNonCurrentDates="false"
       :eventTimeFormat="calendar.eventTimeFormat"
       :nowIndicator="calendar.nowIndicator"
+      :eventRender="editEventHtml"
       @eventDrop="handleChangeDates"
       @eventResize="handleChangeDates"
       @eventClick="inspectEvent"
-      @dateClick="handleAddNote"
+      @dateClick="openNotes"
       @eventMouseEnter="openTooltip"
       @eventMouseLeave="closeTooltip"
-      @eventRender="editEventHtml"
     />
   </div>
 </template>
@@ -111,8 +112,8 @@ export default class Calendar extends Vue {
   private calendar: any = {
     plugins: [dayGridPlugin, listWeekPlugin, timeGridPlugin, interactionPlugin],
     header: {
-      left: 'title',
-      center: 'today prev,next',
+      left: 'today prev,next',
+      center: 'title',
       right: 'dayGridMonth,timeGridWeek,dayGridDay'
     },
     defaultView: 'timeGridWeek',
@@ -152,7 +153,8 @@ export default class Calendar extends Vue {
   private toolTip: any = {
     isVisible: false,
     element: null,
-    calendarEvent: null
+    calendarEvent: null,
+    activeView: null
   };
 
   private closePopup () {
@@ -174,16 +176,19 @@ export default class Calendar extends Vue {
 
   private openTooltip (info: any) {
     if (info.event.allDay) return // dont show for notes
-    this.toolTip.isVisible = true
-    this.toolTip.calendarEvent = info.event
-    this.toolTip.element = info.el
+    this.toolTip = {
+      isVisible: true,
+      calendarEvent: info.event,
+      element: info.el,
+      activeView: info.view.type
+    }
   }
 
   private closeTooltip () {
     this.toolTip.isVisible = false
   }
 
-  private handleAddNote (e: any): void {
+  private openNotes (e: any): void {
     if (e.allDay) {
       // clicked on all day
       console.log('add note')
@@ -211,7 +216,7 @@ export default class Calendar extends Vue {
     // prevent draging notes to normal events and vice-versa
       if (eventCard.allDay !== e.oldEvent.allDay) return e.revert()
     }
-
+    if (eventCard.allDay) return // disable sync notes for now
     const dateFrom = dateToW3C(e.event.start)
     const dateTo = dateToW3C(e.event.end)
     const eventId: number = eventCard.id
@@ -241,6 +246,9 @@ export default class Calendar extends Vue {
     if (!this.eventClick.timeoutId) {
       this.eventClick.timeoutId = setTimeout(() => {
         // simple click
+        if (event.event.allDay) {
+          this.openNotes(event.event)
+        }
         clearTimeout(this.eventClick.timeoutId)
         this.eventClick.timeoutId = null
         this.eventClick.eventClicked = event.el
@@ -253,6 +261,15 @@ export default class Calendar extends Vue {
       const linkToInspect = `${this.URLInspectEvent}?id=${event.event.id}`
       window.open(linkToInspect)
     }
+  }
+
+  private disableToolTipOnScroll () {
+    const calendar = document.getElementsByClassName('fc-time-grid-container')[0]
+    calendar.addEventListener('scroll', this.closeTooltip)
+  }
+
+  mounted () {
+    this.disableToolTipOnScroll()
   }
 }
 </script>
@@ -294,7 +311,7 @@ export default class Calendar extends Vue {
 }
 .fc-content-skeleton {
   td {
-    cursor: copy;
+    // cursor: copy;
   }
 }
 </style>
