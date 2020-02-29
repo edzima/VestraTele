@@ -1,12 +1,16 @@
 <template>
   <div class="calendar">
     <NotesPopup
-    :date="addNoteDate"
-    :allNotes="allNotes"
-    @close="closePopup"
-    @deleteNote="deleteNote"
+      :date="addNoteDate"
+      :allNotes="allNotes"
+      @close="closePopup"
+      @deleteNote="deleteNote"
     />
-    <ToolTip :event="toolTip.calendarEvent" :element="toolTip.element" :isVisible="toolTip.isVisible"/>
+    <ToolTip
+      :event="toolTip.calendarEvent"
+      :element="toolTip.element"
+      :isVisible="toolTip.isVisible"
+    />
     <FullCalendar
       ref="fullCalendar"
       :defaultView="calendar.defaultView"
@@ -23,13 +27,15 @@
       :columnHeaderFormat="calendar.columnHeaderFormat"
       :datesRender="loadEvents"
       :showNonCurrentDates="false"
+      :eventTimeFormat="calendar.eventTimeFormat"
+      :nowIndicator="calendar.nowIndicator"
       @eventDrop="handleChangeDates"
       @eventResize="handleChangeDates"
       @eventClick="inspectEvent"
       @dateClick="handleAddNote"
       @eventMouseEnter="openTooltip"
       @eventMouseLeave="closeTooltip"
-      @scroll="alert(1)"
+      @eventRender="editEventHtml"
     />
   </div>
 </template>
@@ -66,6 +72,11 @@ export default class Calendar extends Vue {
   private agentId!: number;
 
   @Prop({
+    required: false
+  })
+  private eventTypes!: Array<any>;
+
+  @Prop({
     required: true
     // -----PARAMS-----
     // id - eventId
@@ -95,7 +106,7 @@ export default class Calendar extends Vue {
   private activeFilters!: Array<number>;
 
   @Prop({})
-  private allNotes!: Array<any>
+  private allNotes!: Array<any>;
 
   private calendar: any = {
     plugins: [dayGridPlugin, listWeekPlugin, timeGridPlugin, interactionPlugin],
@@ -111,7 +122,14 @@ export default class Calendar extends Vue {
     minTime: '0:00:00',
     maxTime: '24:00:00',
     eventDurationEditable: this.allowUpdate, // allow to extend time
-    columnHeaderFormat: { weekday: 'long', day: 'numeric' }
+    columnHeaderFormat: { weekday: 'long', day: 'numeric' },
+    nowIndicator: true, // red line with current time
+    eventTimeFormat: {
+      // like '14:30:00'
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }
   };
 
   private deleteNote (noteID: number) {
@@ -122,7 +140,7 @@ export default class Calendar extends Vue {
   private eventClick: any = {
     eventClicked: null,
     timeoutId: null
-  }
+  };
 
   private addNoteDate: any = null;
 
@@ -130,7 +148,7 @@ export default class Calendar extends Vue {
     isVisible: false,
     element: null,
     calendarEvent: null
-  }
+  };
 
   private closePopup () {
     this.addNoteDate = null
@@ -153,7 +171,7 @@ export default class Calendar extends Vue {
     this.toolTip.isVisible = false
   }
 
-  private handleAddNote (e: any): void{
+  private handleAddNote (e: any): void {
     if (e.allDay) {
       // clicked on all day
       console.log('add note')
@@ -161,6 +179,13 @@ export default class Calendar extends Vue {
     } else {
       // clicked on blank date
     }
+  }
+
+  editEventHtml (info: any) {
+    const id = info.event.extendedProps.typeId
+    const className = this.eventTypes.find(elem => elem.id === id).className
+    info.el.classList.add('calendarEvent')
+    info.el.classList.add(className)
   }
 
   private async handleChangeDates (e: any): Promise<void> {
@@ -194,14 +219,14 @@ export default class Calendar extends Vue {
     }
   }
 
-  private inspectEvent (event: any): void{
+  private inspectEvent (event: any): void {
     if (!this.eventClick.timeoutId) {
       this.eventClick.timeoutId = setTimeout(() => {
-      // simple click
+        // simple click
         clearTimeout(this.eventClick.timeoutId)
         this.eventClick.timeoutId = null
         this.eventClick.eventClicked = event.el
-      }, 250)// tolerance in ms
+      }, 250) // tolerance in ms
     } else {
       // double click
       clearTimeout(this.eventClick.timeoutId)
@@ -214,8 +239,37 @@ export default class Calendar extends Vue {
 }
 </script>
 
-<style scoped lang='less'>
+<style lang='less'>
 @import "~@fullcalendar/core/main.css";
 @import "~@fullcalendar/daygrid/main.css";
 @import "~@fullcalendar/timegrid/main.css";
+  .calendarEvent {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    &.blue {
+      background-color: blue;
+    }
+    &.green {
+      background-color: green;
+    }
+    &.red {
+      background-color: red;
+    }
+    &.yellow {
+      background-color: yellow;
+      color: black;
+    }
+    // override calendar themes
+    .fc-time{
+      // margin-top: 10px;
+      // font-size: 15px;
+    }
+    .fc-title{
+      // margin-top: 10px;
+      // text-shadow: 2px 2px #5e5e5e;
+      // font-size: 22px;
+    }
+  }
 </style>

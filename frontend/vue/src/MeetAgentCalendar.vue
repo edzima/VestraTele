@@ -129,7 +129,7 @@ export default class App extends Vue {
       phone: '123 123 123 ',
       address: 'Wolska 19',
       city: 'Warszawa',
-      typeId: 1
+      typeId: 2
     }))
   }
 
@@ -140,4 +140,5 @@ export default class App extends Vue {
 </script>
 
 <style scoped lang='less'>
+
 </style>

@@ -45,7 +45,6 @@ export default class ToolTip extends Vue {
 
 <style lang='less'>
 #tooltip {
-  display: block;
   position: fixed;
   // background-color: #3788D8;
   background-color: white;
@@ -57,12 +56,14 @@ export default class ToolTip extends Vue {
   width: 20vw;
   padding: 20px;
   p{
-    width: 100%;
-
+    width: 18vw;
     span{
       margin-left: auto;
-      font-size: 18px;
+      font-size: 22px;
       color: #3788D8;
+      font-weight: bold;
+      margin-left: 2em;
+      width: 80%;;
     }
   }
 }
