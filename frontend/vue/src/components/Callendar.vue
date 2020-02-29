@@ -160,6 +160,7 @@ export default class Calendar extends Vue {
   }
 
   get events (): Array<any> {
+    // filter events and add notes to render on calendar
     const filtered = this.allEvents.filter(event =>
       this.activeFilters.includes(event.typeId)
     )
@@ -195,6 +196,7 @@ export default class Calendar extends Vue {
   editEventHtml (info: any) {
     const id = info.event.extendedProps.typeId
     if (info.event.allDay) return // its a note
+    if (!id) return // its a note beeing dragged
     const className = this.eventTypes.find(elem => elem.id === id).className
     info.el.classList.add('calendarEvent')
     info.el.classList.add(className)
@@ -202,9 +204,13 @@ export default class Calendar extends Vue {
 
   private async handleChangeDates (e: any): Promise<void> {
     if (!this.allowUpdate) return // cancel if no permissions
-
     const eventCard: any = e.event
-    if (eventCard.allDay) return e.revert()
+
+    // if there is no oldEvent its just a time change
+    if (e.oldEvent) {
+    // prevent draging notes to normal events and vice-versa
+      if (eventCard.allDay !== e.oldEvent.allDay) return e.revert()
+    }
 
     const dateFrom = dateToW3C(e.event.start)
     const dateTo = dateToW3C(e.event.end)
