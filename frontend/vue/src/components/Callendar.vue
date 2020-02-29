@@ -5,8 +5,8 @@
     :allNotes="allNotes"
     @close="closePopup"
     @deleteNote="deleteNote"
-
     />
+    <ToolTip :event="toolTip.calendarEvent" :element="toolTip.element" :isVisible="toolTip.isVisible"/>
     <FullCalendar
       ref="fullCalendar"
       :defaultView="calendar.defaultView"
@@ -27,6 +27,9 @@
       @eventResize="handleChangeDates"
       @eventClick="inspectEvent"
       @dateClick="handleAddNote"
+      @eventMouseEnter="openTooltip"
+      @eventMouseLeave="closeTooltip"
+      @scroll="alert(1)"
     />
   </div>
 </template>
@@ -40,13 +43,15 @@ import interactionPlugin from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import { dateToW3C, isSameMonth } from '@/helpers/dateHelper.ts'
 import NotesPopup from './NotesPopup.vue'
+import ToolTip from './ToolTip.vue'
 import axios from 'axios'
 const FullCalendar = require('@fullcalendar/vue').default
 
 @Component({
   components: {
     FullCalendar,
-    NotesPopup
+    NotesPopup,
+    ToolTip
   }
 })
 export default class Calendar extends Vue {
@@ -121,6 +126,12 @@ export default class Calendar extends Vue {
 
   private addNoteDate: any = null;
 
+  private toolTip: any = {
+    isVisible: false,
+    element: null,
+    calendarEvent: null
+  }
+
   private closePopup () {
     this.addNoteDate = null
   }
@@ -130,6 +141,16 @@ export default class Calendar extends Vue {
       this.activeFilters.includes(event.typeId)
     )
     return filtered
+  }
+
+  private openTooltip (info: any) {
+    this.toolTip.isVisible = true
+    this.toolTip.calendarEvent = info.event
+    this.toolTip.element = info.el
+  }
+
+  private closeTooltip () {
+    this.toolTip.isVisible = false
   }
 
   private handleAddNote (e: any): void{

@@ -19,7 +19,8 @@
     "moment": "^2.24.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.2",
-    "vue-property-decorator": "^8.4.0"
+    "vue-property-decorator": "^8.4.0",
+    "vue-tippy": "^4.4.0"
   },
   "devDependencies": {
     "@types/fullcalendar": "^3.8.0",

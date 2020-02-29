@@ -126,6 +126,9 @@ export default class App extends Vue {
       title: eventCard.client,
       start: eventCard.date_at,
       end: eventCard.date_end_at,
+      phone: '123 123 123 ',
+      address: 'Wolska 19',
+      city: 'Warszawa',
       typeId: 1
     }))
   }
