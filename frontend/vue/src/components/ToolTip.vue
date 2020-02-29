@@ -1,8 +1,8 @@
 <template>
     <div :style="{top: coords.y+'px',left: coords.x+'px'}" id="tooltip" v-if="isVisible">
-      <p> tel: <span> {{event.extendedProps.phone || 'brak'}} </span></p>
-      <p> miasto: <span>{{event.extendedProps.city || 'brak' }} </span></p>
-      <p> adres:  <span>{{event.extendedProps.address || 'brak'}} </span></p>
+      <p> tel: <span> {{calendarEvent.extendedProps.phone || 'brak'}} </span></p>
+      <p> miasto: <span>{{calendarEvent.extendedProps.city || 'brak' }} </span></p>
+      <p> adres:  <span>{{calendarEvent.extendedProps.address || 'brak'}} </span></p>
     </div>
 </template>
 
@@ -15,7 +15,7 @@ export default class ToolTip extends Vue {
   private isVisible!: boolean
 
   @Prop({})
-  private event!: any
+  private calendarEvent!: any
 
   @Prop({})
   private element!: any
@@ -29,11 +29,19 @@ export default class ToolTip extends Vue {
 
   @Watch('isVisible')
   onPropertyChanged (value: boolean, oldValue: boolean) {
+    // cancel if mouseOut
     if (!value) return
+
     // get the position of the hover element
     const boundBox = this.element.getBoundingClientRect()
     const coordX = boundBox.left
     const coordY = boundBox.top
+
+    // detemine the half of screed
+    const isLeftSide = coordX > screen.width / 2
+    if (isLeftSide) {
+      console.log('ee')
+    }
 
     this.coords = {
       x: coordX + this.offset.x + this.element.offsetWidth,

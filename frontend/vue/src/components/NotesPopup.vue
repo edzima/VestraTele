@@ -10,7 +10,7 @@
         <div class="notes">
           <div v-for="note in dayNotes" :key="note.id" class="note" >
             <button @click="deleteNote(note.id)">usuń</button>
-            <p>{{note.text}}</p>
+            <p>{{note.title}}</p>
           </div>
         </div>
       </div>

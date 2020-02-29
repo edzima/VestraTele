@@ -81,7 +81,7 @@ export default class App extends Vue {
   private activeFilters: Array<number> = [1, 2, 3, 4];
   private eventTypes: Array<any> = [{ id: 1, name: 'umówiony', className: 'blue' }, { id: 2, name: 'umowa', className: 'green' }, { id: 3, name: 'niepodpisany', className: 'red' }, { id: 4, name: 'wysłane dokumenty', className: 'yellow' }]
   private allEvents: Array<CalendarEvent> = []
-  private allNotes: Array<any> = [{ id: 1, date: '2020-02-29 00:00:00', text: 'lorem ipsum' }, { id: 2, date: '2020-02-28 00:00:00', text: 'lorem ipsum' }, { id: 3, date: '2020-02-29 00:00:00', text: 'lorem ipsum' }, { id: 4, date: '2020-02-29 00:00:00', text: 'lorem ipsum' }]
+  private allNotes: Array<any> = [{ id: 1, date: '2020-02-29 00:00:00', title: 'lorem ipsum dolor sir amet und dad ewe ' }, { id: 2, date: '2020-02-28 00:00:00', title: 'lorem ipsum' }, { id: 3, date: '2020-02-29 00:00:00', title: 'lorem ipsum' }, { id: 4, date: '2020-02-29 00:00:00', title: 'lorem ipsum' }]
   private fetchedMonths: Array<{monthID: number; year: number}> = [];
 
   private deleteNote (noteID: number) {

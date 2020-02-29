@@ -7,7 +7,7 @@
       @deleteNote="deleteNote"
     />
     <ToolTip
-      :event="toolTip.calendarEvent"
+      :calendarEvent="toolTip.calendarEvent"
       :element="toolTip.element"
       :isVisible="toolTip.isVisible"
     />
@@ -122,13 +122,18 @@ export default class Calendar extends Vue {
     minTime: '0:00:00',
     maxTime: '24:00:00',
     eventDurationEditable: this.allowUpdate, // allow to extend time
-    columnHeaderFormat: { weekday: 'long', day: 'numeric' },
     nowIndicator: true, // red line with current time
     eventTimeFormat: {
       // like '14:30:00'
       hour: '2-digit',
       minute: '2-digit',
       hour12: false
+    },
+    columnHeaderFormat: {
+      weekday: 'short',
+      month: 'numeric',
+      day: 'numeric',
+      omitCommas: true
     }
   };
 
@@ -158,10 +163,16 @@ export default class Calendar extends Vue {
     const filtered = this.allEvents.filter(event =>
       this.activeFilters.includes(event.typeId)
     )
-    return filtered
+    const allNotes = this.allNotes.map(note => ({
+      ...note,
+      allDay: true
+    }))
+    const eventsWithNotes = [...filtered, ...allNotes]
+    return eventsWithNotes
   }
 
   private openTooltip (info: any) {
+    if (info.event.allDay) return // dont show for notes
     this.toolTip.isVisible = true
     this.toolTip.calendarEvent = info.event
     this.toolTip.element = info.el
@@ -183,6 +194,7 @@ export default class Calendar extends Vue {
 
   editEventHtml (info: any) {
     const id = info.event.extendedProps.typeId
+    if (info.event.allDay) return // its a note
     const className = this.eventTypes.find(elem => elem.id === id).className
     info.el.classList.add('calendarEvent')
     info.el.classList.add(className)
@@ -243,33 +255,40 @@ export default class Calendar extends Vue {
 @import "~@fullcalendar/core/main.css";
 @import "~@fullcalendar/daygrid/main.css";
 @import "~@fullcalendar/timegrid/main.css";
-  .calendarEvent {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    &.blue {
-      background-color: blue;
-    }
-    &.green {
-      background-color: green;
-    }
-    &.red {
-      background-color: red;
-    }
-    &.yellow {
-      background-color: yellow;
-      color: black;
-    }
-    // override calendar themes
-    .fc-time{
-      // margin-top: 10px;
-      // font-size: 15px;
-    }
-    .fc-title{
-      // margin-top: 10px;
-      // text-shadow: 2px 2px #5e5e5e;
-      // font-size: 22px;
-    }
+.calendarEvent {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  cursor: pointer;
+  &.blue {
+    background-color: blue;
   }
+  &.green {
+    background-color: green;
+  }
+  &.red {
+    background-color: red;
+  }
+  &.yellow {
+    background-color: yellow;
+    color: black;
+  }
+  // override calendar themes
+
+  .fc-time {
+    // margin-top: 10px;
+    // font-size: 15px;
+  }
+  .fc-title {
+    // margin-top: 10px;
+    // text-shadow: 2px 2px #5e5e5e;
+    // font-size: 22px;
+  }
+}
+.fc-content-skeleton {
+  td {
+    cursor: copy;
+  }
+}
 </style>
