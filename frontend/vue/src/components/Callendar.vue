@@ -5,6 +5,7 @@
       :allNotes="allNotes"
       @close="closePopup"
       @deleteNote="deleteNote"
+      @addNote="addNote"
     />
     <ToolTip
       :calendarEvent="toolTip.calendarEvent"
@@ -37,6 +38,7 @@
       @dateClick="openNotes"
       @eventMouseEnter="openTooltip"
       @eventMouseLeave="closeTooltip"
+      @eventDragStart="closeTooltip"
     />
   </div>
 </template>
@@ -198,12 +200,22 @@ export default class Calendar extends Vue {
     }
   }
 
+  private addNote (noteText: string, day: Date) {
+    this.$emit('addNote', noteText, day)
+    this.addNoteDate = null
+  }
+
   editEventHtml (info: any) {
     const id = info.event.extendedProps.typeId
-    if (info.event.allDay) return // its a note
+    info.el.classList.add('calendarEvent')
+
+    if (info.event.allDay) {
+      info.el.classList.add('note')
+      return
+    } // its a note
+
     if (!id) return // its a note beeing dragged
     const className = this.eventTypes.find(elem => elem.id === id).className
-    info.el.classList.add('calendarEvent')
     info.el.classList.add(className)
   }
 
@@ -296,6 +308,10 @@ export default class Calendar extends Vue {
   &.yellow {
     background-color: yellow;
     color: black;
+  }
+  &.note{
+    display: block;
+    background-color: rgb(97, 0, 136);
   }
   // override calendar themes
 

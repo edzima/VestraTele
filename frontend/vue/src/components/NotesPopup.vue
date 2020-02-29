@@ -16,8 +16,8 @@
       </div>
       <div class="addNote">
       <h3>dodaj notatkę</h3>
-      <textarea/>
-      <button>Dodaj</button>
+      <textarea v-model="noteText"/>
+      <button @click="addNote">Dodaj</button>
       </div>
     </div>
   </div>
@@ -38,12 +38,20 @@ export default class NewNotePopup extends Vue {
   })
   private allNotes!: Array<any>;
 
+  private noteText = '';
+
   private handleClose () {
     this.$emit('close')
   }
 
   private deleteNote (noteID: number) {
     this.$emit('deleteNote', noteID)
+  }
+
+  private addNote () {
+    const noteWithoutSpaces = this.noteText.split('').filter(char => char !== ' ')
+    if (!noteWithoutSpaces.length) return
+    this.$emit('addNote', this.noteText.trim(), this.date)
   }
 
   get dayNotes () {

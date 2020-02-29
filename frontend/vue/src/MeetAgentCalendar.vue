@@ -17,6 +17,7 @@
     :URLInspectEvent="URLInspectEvent"
     @loadMonth="fetchAndCacheMonth"
     @deleteNote="deleteNote"
+    @addNote="addNote"
     />
   </div>
 </template>
@@ -131,6 +132,16 @@ export default class App extends Vue {
       city: 'Warszawa',
       typeId: 2
     }))
+  }
+
+  private addNote (noteText: string, day: Date) {
+    // send data
+    // get id from axios
+    // const id = axios.res.id
+    this.allNotes.push({
+      title:
+      noteText
+    })
   }
 
   created () {
