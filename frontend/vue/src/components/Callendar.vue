@@ -33,10 +33,11 @@
       :eventTimeFormat="calendar.eventTimeFormat"
       :nowIndicator="calendar.nowIndicator"
       :eventRender="editEventHtml"
+      :height="calendar.height"
       @eventDrop="handleChangeDates"
       @eventResize="handleChangeDates"
       @eventClick="inspectEvent"
-      @dateClick="openNotes"
+      @dateClick="handleDateClick"
       @eventMouseEnter="openTooltip"
       @eventMouseLeave="closeTooltip"
       @eventDragStart="closeTooltip"
@@ -110,7 +111,8 @@ export default class Calendar extends Vue {
       month: 'numeric',
       day: 'numeric',
       omitCommas: true
-    }
+    },
+    height: 'auto'
   };
 
   private deleteNote (noteID: number) {
@@ -124,6 +126,11 @@ export default class Calendar extends Vue {
 
   private eventClick: any = {
     eventClicked: null,
+    timeoutId: null
+  };
+
+  private dateClick: any = {
+    date: null,
     timeoutId: null
   };
 
@@ -168,14 +175,29 @@ export default class Calendar extends Vue {
   }
 
   private openNotes (e: any): void {
-    console.log(e)
+    this.noteOpenedDate = e.date ? e.date : e.start
+  }
 
-    if (e.allDay) {
-      // clicked on all day
-      console.log('add note')
-      this.noteOpenedDate = e.date ? e.date : e.start
+  private handleDateClick (e) {
+    // if its a month view allow only to add events, not notes
+    if (e.view && e.view.type !== 'dayGridMonth') {
+      if (e.allDay) {
+        return this.openNotes(e)
+      }
+    }
+    if (!this.dateClick.timeoutId) {
+      this.dateClick.timeoutId = setTimeout(() => {
+        // simple click
+        clearTimeout(this.dateClick.timeoutId)
+        this.dateClick.timeoutId = null
+        this.dateClick.date = e.date
+      }, 200) // tolerance in ms
     } else {
-      // clicked on blank date
+      // double click
+      clearTimeout(this.dateClick.timeoutId)
+      this.dateClick.timeoutId = null
+      this.dateClick.date = e.date
+      this.$emit('dateClick', this.dateClick.date)
     }
   }
 
@@ -273,9 +295,11 @@ export default class Calendar extends Vue {
   &.note{
     display: block;
     background-color: rgb(97, 0, 136);
+    .fc-title {
+    white-space: nowrap;
+    }
   }
   // override calendar themes
-
   .fc-time {
     // margin-top: 10px;
     // font-size: 15px;
@@ -284,6 +308,7 @@ export default class Calendar extends Vue {
     // margin-top: 10px;
     // text-shadow: 2px 2px #5e5e5e;
     // font-size: 22px;
+    white-space: normal;
   }
 }
 .fc-content-skeleton {

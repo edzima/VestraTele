@@ -18,6 +18,7 @@
     @eventEdit="handleChangeDates"
     @eventDoubleClick="openEventInspect"
     @editNoteText="editNoteText"
+    @dateClick="addEvent"
     />
   </div>
 </template>
@@ -98,6 +99,16 @@ export default class App extends Vue {
     required: false
   })
   private URLGetNotes!: string;
+
+  @Prop({
+    default: () => 'http://google.com',
+    // -----PARAMS-----
+    // dateFrom
+    // dateTo
+    // agentId
+    required: false
+  })
+  private URLAddEvent!: string;
 
   @Prop({
     default: () => 'http://google.com',
@@ -198,6 +209,11 @@ export default class App extends Vue {
       id: 1,
       date: day
     })
+  }
+
+  private addEvent (date: date): void{
+    const linkToInspect = `${this.URLAddEvent}?date=${dateToW3C(date)}`
+    window.open(linkToInspect)
   }
 
   private editNoteText (noteID: number, text: string): void{
