@@ -1,11 +1,12 @@
 <template>
   <div class="calendar">
     <NotesPopup
-      :date="addNoteDate"
+      :date="noteOpenedDate"
       :allNotes="allNotes"
       @close="closePopup"
       @deleteNote="deleteNote"
       @addNote="addNote"
+      @editNoteText="editNoteText"
     />
     <ToolTip
       :calendarEvent="toolTip.calendarEvent"
@@ -50,7 +51,7 @@ import listWeekPlugin from '@fullcalendar/list'
 import plLang from '@fullcalendar/core/locales/pl'
 import interactionPlugin from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
-import { dateToW3C, isSameMonth } from '@/helpers/dateHelper.ts'
+import { isSameMonth } from '@/helpers/dateHelper.ts'
 import NotesPopup from './NotesPopup.vue'
 import ToolTip from './ToolTip.vue'
 import axios from 'axios'
@@ -70,37 +71,9 @@ export default class Calendar extends Vue {
   private allowUpdate!: boolean; // allow user to edit events
 
   @Prop({
-    required: true
-  })
-  private agentId!: number;
-
-  @Prop({
     required: false
   })
   private eventTypes!: Array<any>;
-
-  @Prop({
-    required: true
-    // -----PARAMS-----
-    // id - eventId
-    // date_at - date from
-    // date_end_at - date to
-  })
-  private URLUpdate!: string;
-
-  @Prop({
-    // -----PARAMS-----
-    // dateFrom
-    // dateTo
-    // agentId
-    required: true
-  })
-  private URLGetEvents!: string;
-
-  @Prop({
-    required: true
-  })
-  private URLInspectEvent!: string;
 
   @Prop({ required: true })
   private allEvents!: Array<any>;
@@ -145,12 +118,16 @@ export default class Calendar extends Vue {
     this.$emit('deleteNote', noteID)
   }
 
+  private editNoteText (noteID: number, text: string) {
+    this.$emit('editNoteText', noteID, text)
+  }
+
   private eventClick: any = {
     eventClicked: null,
     timeoutId: null
   };
 
-  private addNoteDate: any = null;
+  private noteOpenedDate: any = null;
 
   private toolTip: any = {
     isVisible: false,
@@ -160,7 +137,7 @@ export default class Calendar extends Vue {
   };
 
   private closePopup () {
-    this.addNoteDate = null
+    this.noteOpenedDate = null
   }
 
   get events (): Array<any> {
@@ -191,10 +168,12 @@ export default class Calendar extends Vue {
   }
 
   private openNotes (e: any): void {
+    console.log(e)
+
     if (e.allDay) {
       // clicked on all day
       console.log('add note')
-      this.addNoteDate = e.date
+      this.noteOpenedDate = e.date ? e.date : e.start
     } else {
       // clicked on blank date
     }
@@ -202,7 +181,6 @@ export default class Calendar extends Vue {
 
   private addNote (noteText: string, day: Date) {
     this.$emit('addNote', noteText, day)
-    this.addNoteDate = null
   }
 
   editEventHtml (info: any) {
@@ -219,26 +197,9 @@ export default class Calendar extends Vue {
     info.el.classList.add(className)
   }
 
-  private async handleChangeDates (e: any): Promise<void> {
+  private handleChangeDates (e: any): void {
     if (!this.allowUpdate) return // cancel if no permissions
-    const eventCard: any = e.event
-
-    // if there is no oldEvent its just a time change
-    if (e.oldEvent) {
-    // prevent draging notes to normal events and vice-versa
-      if (eventCard.allDay !== e.oldEvent.allDay) return e.revert()
-    }
-    if (eventCard.allDay) return // disable sync notes for now
-    const dateFrom = dateToW3C(e.event.start)
-    const dateTo = dateToW3C(e.event.end)
-    const eventId: number = eventCard.id
-    const params: any = new URLSearchParams()
-    console.log(dateTo)
-
-    params.append('id', eventId)
-    params.append('date_at', dateFrom)
-    params.append('date_end_at', dateTo)
-    axios.post(this.URLUpdate, params)
+    this.$emit('eventEdit', e)
   }
 
   private loadEvents (): void {
@@ -255,33 +216,33 @@ export default class Calendar extends Vue {
   }
 
   private inspectEvent (event: any): void {
+    if (event.event.allDay) {
+      this.openNotes(event.event)
+    }
     if (!this.eventClick.timeoutId) {
       this.eventClick.timeoutId = setTimeout(() => {
         // simple click
-        if (event.event.allDay) {
-          this.openNotes(event.event)
-        }
         clearTimeout(this.eventClick.timeoutId)
         this.eventClick.timeoutId = null
         this.eventClick.eventClicked = event.el
-      }, 250) // tolerance in ms
+      }, 200) // tolerance in ms
     } else {
       // double click
+
       clearTimeout(this.eventClick.timeoutId)
       this.eventClick.timeoutId = null
       this.eventClick.eventClicked = event.el
-      const linkToInspect = `${this.URLInspectEvent}?id=${event.event.id}`
-      window.open(linkToInspect)
+      this.$emit('eventDoubleClick', event.event.id)
     }
   }
 
-  private disableToolTipOnScroll () {
-    const calendar = document.getElementsByClassName('fc-time-grid-container')[0]
-    calendar.addEventListener('scroll', this.closeTooltip)
-  }
+  // private disableToolTipOnScroll () {
+  //   const calendar = document.getElementsByClassName('fc-time-grid-container')[0]
+  //   calendar.addEventListener('scroll', this.closeTooltip)
+  // }
 
   mounted () {
-    this.disableToolTipOnScroll()
+    // this.disableToolTipOnScroll()
   }
 }
 </script>

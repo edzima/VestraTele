@@ -12,12 +12,12 @@
     :allNotes="allNotes"
     :allowUpdate="allowUpdate"
     :agentId="agentId"
-    :URLUpdate="URLUpdate"
-    :URLGetEvents="URLGetEvents"
-    :URLInspectEvent="URLInspectEvent"
     @loadMonth="fetchAndCacheMonth"
     @deleteNote="deleteNote"
     @addNote="addNote"
+    @eventEdit="handleChangeDates"
+    @eventDoubleClick="openEventInspect"
+    @editNoteText="editNoteText"
     />
   </div>
 </template>
@@ -27,7 +27,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 import Calendar from '@/components/Callendar.vue'
 import Filters from '@/components/Filters.vue'
 import { CalendarEvent } from '@/types/calendarEventType'
-import { getFirstOfMonth, getLastOfMonth } from '@/helpers/dateHelper.ts'
+import { getFirstOfMonth, getLastOfMonth, dateToW3C } from '@/helpers/dateHelper.ts'
 
 import axios from 'axios'
 @Component({
@@ -57,7 +57,27 @@ export default class App extends Vue {
     // date_at - date from
     // date_end_at - date to
   })
-  private URLUpdate!: string;
+  private URLUpdateEvent!: string;
+
+  @Prop({
+    default: () => '/updateNote',
+    required: false
+    // -----PARAMS-----
+    // id - eventId
+    // date_at - date from
+    // date_end_at - date to
+  })
+  private URLUpdateNote!: string;
+
+  @Prop({
+    default: () => '/update',
+    required: false
+    // -----PARAMS-----
+    // id - eventId
+    // date_at - date from
+    // date_end_at - date to
+  })
+  private URLNewNote!: string;
 
   @Prop({
     default: () => '/list',
@@ -68,6 +88,16 @@ export default class App extends Vue {
     required: false
   })
   private URLGetEvents!: string;
+
+  @Prop({
+    default: () => '/list',
+    // -----PARAMS-----
+    // dateFrom
+    // dateTo
+    // agentId
+    required: false
+  })
+  private URLGetNotes!: string;
 
   @Prop({
     default: () => 'http://google.com',
@@ -84,6 +114,11 @@ export default class App extends Vue {
   private allEvents: Array<CalendarEvent> = []
   private allNotes: Array<any> = [{ id: 1, date: '2020-02-29 00:00:00', title: 'lorem ipsum dolor sir amet und dad ewe ' }, { id: 2, date: '2020-02-28 00:00:00', title: 'lorem ipsum' }, { id: 3, date: '2020-02-29 00:00:00', title: 'lorem ipsum' }, { id: 4, date: '2020-02-29 00:00:00', title: 'lorem ipsum' }]
   private fetchedMonths: Array<{monthID: number; year: number}> = [];
+
+  private openEventInspect (id: number) {
+    const linkToInspect = `${this.URLInspectEvent}?id=${id}`
+    window.open(linkToInspect)
+  }
 
   private deleteNote (noteID: number) {
     // AXIOS
@@ -102,16 +137,17 @@ export default class App extends Vue {
   private async fetchAndCacheMonth (monthDate: Date): Promise<void> {
     const monthExsist = this.fetchedMonths.find(ftchMonth => ftchMonth.monthID === monthDate.getMonth() && ftchMonth.year === monthDate.getFullYear())
     if (monthExsist) return
-    const fetchedMonth = await this.fetchMonth(monthDate)
+    const fetchedMonthEvents = await this.fetchMonthEvents(monthDate)
+    const fetchedMonthNotes = await this.fetchMonthNotes(monthDate)
     this.fetchedMonths.push({
       monthID: monthDate.getMonth(),
       year: monthDate.getFullYear()
     })
-
-    this.allEvents.push(...fetchedMonth)
+    // this.allNotes.push(...fetchedMonthNotes)
+    this.allEvents.push(...fetchedMonthEvents)
   }
 
-  private async fetchMonth (monthDate: Date): Promise<Array<CalendarEvent>> {
+  private async fetchMonthEvents (monthDate: Date): Promise<Array<CalendarEvent>> {
     const startDate: string = getFirstOfMonth(monthDate)
     const endDate: string = getLastOfMonth(monthDate)
     const res = await axios.get(this.URLGetEvents, {
@@ -134,18 +170,72 @@ export default class App extends Vue {
     }))
   }
 
-  private addNote (noteText: string, day: Date) {
+  private async fetchMonthNotes (monthDate: Date): Promise<Array<CalendarEvent>> {
+    const startDate: string = getFirstOfMonth(monthDate)
+    const endDate: string = getLastOfMonth(monthDate)
+    const res = await axios.get(this.URLGetNotes, {
+      params: {
+        agentId: this.agentId,
+        dateFrom: startDate,
+        dateTo: endDate
+      }
+    })
+    const events = res.data.data
+    return events.map(eventCard => ({
+      id: eventCard.id,
+      title: eventCard.client,
+      start: eventCard.date_at
+    }))
+  }
+
+  private addNote (noteText: string, day: Date): void {
     // send data
     // get id from axios
     // const id = axios.res.id
+    //  URLNewNote
     this.allNotes.push({
-      title:
-      noteText
+      title: noteText,
+      id: 1,
+      date: day
     })
   }
 
-  created () {
-    // this.fetchAndCacheMonth()
+  private editNoteText (noteID: number, text: string): void{
+    this.allNotes = this.allNotes.map(note => {
+      if (note.id === noteID) {
+        return {
+          ...note,
+          title: text
+        }
+      }
+      return note
+    })
+  }
+
+  private async handleChangeDates (e: any): Promise<void> {
+    const eventCard: any = e.event
+
+    // if there is no oldEvent its just a time change
+    if (e.oldEvent) {
+    // prevent draging notes to normal events and vice-versa
+      if (eventCard.allDay !== e.oldEvent.allDay) return e.revert()
+    }
+    const dateFrom = dateToW3C(e.event.start)
+    const dateTo = dateToW3C(e.event.end)
+    const eventId: number = eventCard.id
+    const params: any = new URLSearchParams()
+    console.log(dateTo)
+
+    params.append('id', eventId)
+    params.append('date_at', dateFrom)
+    params.append('date_end_at', dateTo)
+    if (eventCard.allDay) {
+      // handle edit dates and time of note
+      axios.post(this.URLUpdateNote, params)
+    } else {
+      // event
+      axios.post(this.URLUpdateEvent, params)
+    }
   }
 }
 </script>
