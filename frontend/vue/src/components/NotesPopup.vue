@@ -50,7 +50,7 @@ export default class NewNotePopup extends Vue {
   private newNoteText = '';
   private editNoteText = '';
   private oldNoteText = '';
-  private noteAllowEditId = null;
+  private noteAllowEditId = 0;
 
   private handleClose () {
     this.$emit('close')
@@ -83,7 +83,7 @@ export default class NewNotePopup extends Vue {
 
   private discardNoteChanges () {
     this.editNoteText = this.oldNoteText
-    this.noteAllowEditId = null
+    this.noteAllowEditId = 0
   }
 
   private saveEditNoteText (noteID: number): void {
@@ -92,7 +92,7 @@ export default class NewNotePopup extends Vue {
     if (text === oldText) {
       return this.discardNoteChanges()
     }
-    this.noteAllowEditId = null
+    this.noteAllowEditId = 0
     this.$emit('editNoteText', noteID, text)
   }
 

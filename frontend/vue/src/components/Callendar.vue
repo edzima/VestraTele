@@ -55,7 +55,6 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import { isSameMonth } from '@/helpers/dateHelper.ts'
 import NotesPopup from './NotesPopup.vue'
 import ToolTip from './ToolTip.vue'
-import axios from 'axios'
 const FullCalendar = require('@fullcalendar/vue').default
 
 @Component({
@@ -213,10 +212,16 @@ export default class Calendar extends Vue {
       info.el.classList.add('note')
       return
     } // its a note
-
     if (!id) return // its a note beeing dragged
+
     const className = this.eventTypes.find(elem => elem.id === id).className
     info.el.classList.add(className)
+
+    // add row for client name
+    const newElem = document.createElement('p')
+    newElem.innerHTML = info.event.extendedProps.client
+    newElem.className = 'fc-client'
+    info.el.children[0].children[1].appendChild(newElem)
   }
 
   private handleChangeDates (e: any): void {
@@ -292,28 +297,39 @@ export default class Calendar extends Vue {
     background-color: yellow;
     color: black;
   }
-  &.note{
+  &.note {
     display: block;
     background-color: rgb(97, 0, 136);
     .fc-title {
-    white-space: nowrap;
+      white-space: nowrap;
     }
   }
-  // override calendar themes
-  .fc-time {
-    // margin-top: 10px;
-    // font-size: 15px;
-  }
-  .fc-title {
-    // margin-top: 10px;
-    // text-shadow: 2px 2px #5e5e5e;
-    // font-size: 22px;
-    white-space: normal;
-  }
 }
-.fc-content-skeleton {
-  td {
-    // cursor: copy;
+
+.calendarEvent:not(.note) {
+  .fc-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    .fc-time {
+      // margin-right: auto;
+      background-color: rgba(0, 0, 0, 0.281);
+      width: 100%;
+      font-weight: bold;
+      span{
+        margin-left: 2%;
+      }
+    }
+    .fc-title {
+      height: auto;
+      text-align: center;
+    }
+    .fc-client{
+      margin: 0;
+      font-style: italic;
+    }
   }
 }
 </style>

@@ -177,6 +177,7 @@ export default class App extends Vue {
       phone: '123 123 123 ',
       address: 'Wolska 19',
       city: 'Warszawa',
+      client: 'Jan Kowal',
       typeId: 2
     }))
   }
@@ -211,7 +212,7 @@ export default class App extends Vue {
     })
   }
 
-  private addEvent (date: date): void{
+  private addEvent (date: Date): void{
     const linkToInspect = `${this.URLAddEvent}?date=${dateToW3C(date)}`
     window.open(linkToInspect)
   }
@@ -240,7 +241,6 @@ export default class App extends Vue {
     const dateTo = dateToW3C(e.event.end)
     const eventId: number = eventCard.id
     const params: any = new URLSearchParams()
-    console.log(dateTo)
 
     params.append('id', eventId)
     params.append('date_at', dateFrom)

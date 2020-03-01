@@ -52,7 +52,7 @@ export default class ToolTip extends Vue {
   }
 
   @Watch('isVisible')
-  onPropertyChanged (value: boolean, oldValue: boolean) {
+  onPropertyChanged (value: boolean) {
     // cancel if mouseOut
     if (!value) return
 
@@ -60,15 +60,12 @@ export default class ToolTip extends Vue {
     const boundBox = this.element.getBoundingClientRect()
     const coordX = boundBox.left
     const coordY = boundBox.top
-    console.log(this.activeView)
 
     if (this.activeView === 'dayGridDay') {
       this.coords = {
         x: coordX + screen.width / 2.2,
         y: coordY + this.offset.y - 80
       }
-      console.log('eee')
-
       return
     }
 
