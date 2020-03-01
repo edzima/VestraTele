@@ -6,11 +6,7 @@
         <h1>{{dateFormated}}</h1>
         <h3>aktywne notatki:</h3>
         <div class="notes">
-          <div
-            v-for="note in dayNotes"
-            :key="note.id"
-            class="note"
-          >
+          <div v-for="note in dayNotes" :key="note.id" class="note">
             <div v-if="isEditable(note.id)" class="controls">
               <img src="../assets/discard.png" @click="discardNoteChanges(note.id)" />
               <img src="../assets/save.png" @click="saveEditNoteText(note.id)" />
@@ -19,7 +15,11 @@
               <img src="../assets/edit.png" @click="allowEdit(note.id)" />
               <img src="../assets/delete.png" @click="deleteNote(note.id)" />
             </div>
-            <textarea @change="editText" :value="note.title" :disabled="noteAllowEditId !== note.id" />
+            <textarea
+              @change="editText"
+              :value="note.title"
+              :disabled="noteAllowEditId !== note.id"
+            />
           </div>
         </div>
       </div>
@@ -212,6 +212,12 @@ export default class NewNotePopup extends Vue {
         padding: 10px 20px;
       }
     }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .modal {
+    width: 90vw !important;
   }
 }
 </style>

@@ -47,7 +47,7 @@ export default class Filters extends Vue {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 45vw;
+    width: 100vw;
     h1{
       margin: 0;
       margin-bottom: 1vh;
@@ -57,18 +57,21 @@ export default class Filters extends Vue {
     .buttons {
       display: flex;
       flex-direction: row;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
       width: 100%;
       margin-bottom: 3vh;
+      flex-wrap: wrap;
+
       button {
-        height: 5vh;
+        min-height: 5vh;
         width: 10vw;
+        min-width: 100px;
         border-radius: 10px;
         font-size: 15px;
         color: white;
         border: none;
-        margin: 0 auto;
+        margin: 0.5vw 1vw;
         box-shadow: 0 4px 5px rgba(0, 0, 0, 0.1);
         cursor: pointer;
         &.blue {

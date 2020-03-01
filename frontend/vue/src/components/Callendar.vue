@@ -332,4 +332,12 @@ export default class Calendar extends Vue {
     }
   }
 }
+@media screen and (max-width: 600px) {
+  .fc-toolbar.fc-header-toolbar{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}
 </style>
