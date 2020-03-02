@@ -4,11 +4,25 @@ namespace frontend\controllers;
 
 use common\models\CalendarNews;
 use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
 class CalendarNoteController extends Controller {
+
+	public function behaviors() {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'add' => ['POST'],
+					'update' => ['POST'],
+					'delete' => ['POST'],
+				],
+			],
+		];
+	}
 
 	public function runAction($id, $params = []) {
 		$params = array_merge($_POST, $params);
