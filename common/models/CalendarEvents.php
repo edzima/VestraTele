@@ -1,181 +1,161 @@
 <?php
+
 namespace common\models;
-use common\models\Task;
-use common\models\CalendarNews;
+
 use yii;
 
+class CalendarEvents extends yii\base\BaseObject {
 
-class CalendarEvents extends \yii\base\Object{
+	private $id;
+	private $url = '';
+	private $title = '';
+	private $description = '';
+	private $start;
+	private $end;
+	private $color;
+	private $textColor;
+	private $borderColor;
+	private $allDay = false;
+	private $isNews = false;
+	private $task;
 
-    private $id;
-    private $url = '';
-    private $title = '';
-    private $description ='';
-    private $start;
-    private $end;
-    private $color = "";
-    private $textColor ='';
-    private $borderColor;
-    private $allDay = false;
-    private $isNews = false;
-    private $task;
+	public function getTitle(): String {
+		return $this->title;
+	}
 
+	public function getDescription(): String {
+		return $this->description;
+	}
 
-    public function getTitle(){
-        return $this->title;
-    }
+	public function getColor() {
+		return $this->color;
+	}
 
-    public function getDescription(){
-        return $this->description;
-    }
+	public function getTextColor() {
+		return $this->textColor;
+	}
 
-    public function getColor(){
-        return $this->color;
-    }
+	public function getBorderColor() {
+		return $this->borderColor;
+	}
 
-    public function getTextColor(){
-        return $this->textColor;
-    }
+	public function setPeriod($period) {
 
-    public function getBorderColor(){
-        return $this->borderColor;
-    }
+		$start = new \DateTime($this->start);
+		$withPeriod = new \DateTime($this->start . ' +' . $period . 'day');
+		$now = new \DateTime();
+		$now->sub($start);
 
-    public function getUrlUpdate(){
+		$this->start = Yii::$app->formatter->asDate($withPeriod, 'yyyy-MM-dd HH:mm');
+		$this->end = $now;
+	}
 
-        if(Yii::$app->user->can('manager') || $this->task->tele_id==Yii::$app->user->identity->id ) {
-            $this->url =  '/spotkanie/edycja?id='.$this->id;
-        }
-        return $this->url;
-    }
+	public function toArray(): array {
+		return [
+			'id' => $this->id,
+			'title' => $this->title,
+			'start' => $this->start,
+			'end' => $this->end,
+			'description' => $this->description,
+			'borderColor' => $this->borderColor,
+			'color' => $this->color,
+			'url' => $this->url,
+			'textColor' => $this->textColor,
+			'allDay' => $this->allDay,
+			'isNews' => $this->isNews,
+		];
+	}
 
-    public function getUrlRaport(){
-        $this->url = '/task-status/raport?id='.$this->id;
-        return $this->url;
-    }
+	private function EventColor($task) {
+		$textColor = "white";
+		$color = "green";
+		$borderColor = '';
+		if ($task->meeting) {
+			$color = "blue";
+		}
+		if ($task->automat) {
+			$color = "red";
+		}
+		$answer = @$task->taskstatus->answer;
+		if ($answer) {
+			$textColor = $color;
+			$color = "#f5f5f5";
+			if ($answer->name == "umowa + EKSTRA") {
+				$color = "yellow";
+			}
+		}
+		if ($task->tele_id == Yii::$app->user->identity->id) {
+			$borderColor = "#00ffff";
+		}
+		$colors = [
+			"color" => $color,
+			"textColor" => $textColor,
+			"borderColor" => $borderColor,
+		];
+		$this->color = $color;
+		$this->textColor = $textColor;
+		$this->borderColor = $borderColor;
+	}
 
-    public function getUrlCause(){
-        $this->url = '/cause/update?id='.$this->id;
-        return $this->url;
+	public static function withCalendarNews($calendarNews) {
+		$instance = new Self();
+		$instance->id = $calendarNews->id;
+		$instance->title = $calendarNews->news;
+		$instance->start = $calendarNews->start;
+		$instance->end = $calendarNews->end;
+		$instance->allDay = true;
+		$instance->isNews = true;
 
-    }
+		return $instance;
+	}
 
-    public function setPeriod($period){
+	/**
+	 * @param Cause $cause
+	 * @return CalendarEvents
+	 */
+	public static function withCause(Cause $cause) {
+		$instance = new Self();
+		$instance->id = $cause->id;
+		$instance->title = $cause->victim_name;
+		$instance->start = Yii::$app->formatter->asDate($cause->date, 'yyyy-MM-dd HH:mm');
 
-        $start = new \DateTime($this->start);
-        $withPeriod = new \DateTime($this->start.' +'.$period.'day');
-        $now = new \DateTime();
-        $now->sub($start);
+		//$period = $cause->category->period;
 
+		//$instance->end = $cause->end;
+		//$instance->allDay = true;
+		//$instance->isNews = true;
 
+		return $instance;
+	}
 
-        $this->start =   Yii::$app->formatter->asDate($withPeriod, 'yyyy-MM-dd HH:mm');
-        $this->end = $now;
-    }
+	/**
+	 * @param $task
+	 * @return CalendarEvents
+	 */
+	public static function withTask($task) {
 
-    public function getToArray(){
-        $event = [
-          'id' => $this->id,
-          'title' => $this->title,
-          'start' => $this->start,
-          'end' => $this->end,
-          'description' => $this->description,
-          'borderColor' => $this->borderColor,
-          'color' => $this->color,
-          'url' => $this->url,
-          'textColor' => $this->textColor,
-          'allDay' => $this->allDay,
-          'isNews' => $this->isNews
-        ];
-        return $event;
-    }
+		$instance = new Self();
 
-    private function EventColor($task){
-        $textColor = "white";
-        $color = "green";
-        $borderColor = '';
-        if($task->meeting) $color = "blue";
-        if($task->automat) $color = "red";
-        $answer = @$task->taskstatus->answer;
-        if($answer) {
-            $textColor = $color;
-            $color = "#f5f5f5";
-            if($answer->name=="umowa + EKSTRA") $color = "yellow";
-        }
-        if($task->tele_id==Yii::$app->user->identity->id) $borderColor = "#00ffff";
-        $colors = [
-            "color" => $color,
-            "textColor" => $textColor,
-            "borderColor" => $borderColor,
-        ];
-        $this->color = $color;
-        $this->textColor = $textColor;
-        $this->borderColor = $borderColor;
+		$city = $task->miasto->name;
 
-    }
+		$powiat = $task->powiatRel->name;
+		$woj = $task->wojewodztwo->name;
 
-    public static function withCalendarNews($calendarNews){
-        $instance = new Self();
-        $instance->id = $calendarNews->id;
-        $instance->title = $calendarNews->news;
-        $instance->start = $calendarNews->start;
-        $instance->end = $calendarNews->end;
-        $instance->allDay = true;
-        $instance->isNews = true;
+		$instance->description = $powiat . "<br/>" . $woj;
+		$gmina = @$task->gminaRel->name;
+		if ($gmina) {
+			$instance->title = $gmina . ', ' . $city;
+		} else {
+			$instance->title = $city;
+		}
 
-        return $instance;
-    }
+		$instance->id = $task->id;
+		$instance->task = $task;
+		$instance->start = $task->date;
 
-    /**
-     * @param Cause $cause
-     * @return CalendarEvents
-     */
-    public static function withCause(Cause $cause){
-        $instance = new Self();
-        $instance->id = $cause->id;
-        $instance->title = $cause->victim_name;
-        $instance->start =    Yii::$app->formatter->asDate($cause->date, 'yyyy-MM-dd HH:mm');
+		$instance->EventColor($task);
 
-        //$period = $cause->category->period;
-
-
-        //$instance->end = $cause->end;
-        //$instance->allDay = true;
-        //$instance->isNews = true;
-
-        return $instance;
-    }
-
-    /**
-     * @param $task
-     * @return CalendarEvents
-     */
-    public static function withTask($task){
-
-        $instance = new Self();
-
-        $city = $task->miasto->name;
-
-        $powiat = $task->powiatRel->name;
-        $woj = $task->wojewodztwo->name;
-
-        $instance->description = $powiat."<br/>".$woj;
-        $gmina = @$task->gminaRel->name;
-        if($gmina)  $instance->title = $gmina.', '.$city;
-        else $instance->title = $city;
-
-
-        $instance->id = $task->id;
-        $instance->task = $task;
-        $instance->start = $task->date;
-
-        $instance->EventColor($task);
-
-
-        return $instance;
-
-    }
-
-
+		return $instance;
+	}
 
 }

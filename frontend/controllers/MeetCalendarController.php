@@ -24,6 +24,11 @@ class MeetCalendarController extends Controller {
 		];
 	}
 
+	public function runAction($id, $params = []) {
+		$params = array_merge($_POST, $params);
+		parent::runAction($id, $params);
+	}
+
 	public function actionCalendar() {
 		/** @var User $user */
 		$user = Yii::$app->user->getIdentity();
@@ -45,7 +50,7 @@ class MeetCalendarController extends Controller {
 			$dateFrom = date('Y-m-01');
 		}
 		if ($dateTo === null) {
-			$dateTo = date('Y-m-t');
+			$dateTo = date('Y-m-t 23:59:59');
 		}
 		$models = IssueMeet::find()
 			->andWhere(['agent_id' => $agentId])
@@ -59,22 +64,29 @@ class MeetCalendarController extends Controller {
 		foreach ($models as $model) {
 			$data[] = [
 				'id' => $model->id,
-				'city' => $model->city->name,
+				'typeId' => $model->type_id,
 				'client' => $model->getClientFullName(),
+				'city' => $model->city->name,
+				'street' => $model->street,
+				'state' => $model->state->name,
+				'province' => $model->province->name,
+				'subProvince' => $model->subProvince->name,
+				'phone' => $model->phone,
 				'date_at' => $model->date_at,
 				'date_end_at' => $model->date_end_at,
 				'details' => $model->details,
 			];
 		}
 
-		return $this->asJson(['data' => $data]);
+		return $this->asJson([
+			'data' => $data,
+		]);
 	}
 
 	public function actionUpdate(int $id, string $date_at, string $date_end_at): Response {
 		$model = $this->findModel($id);
 		$model->date_at = $date_at;
 		$model->date_end_at = $date_end_at;
-		$model->save();
 		return $this->asJson(['success' => $model->save()]);
 	}
 

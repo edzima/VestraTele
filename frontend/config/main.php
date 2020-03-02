@@ -32,7 +32,8 @@ $config = [
 			'cookieValidationKey' => getenv('FRONTEND_COOKIE_VALIDATION_KEY'),
 			'csrfParam' => '_csrf-frontend',
 			'baseUrl' => '',
-
+			//@todo created csrf validation in Vue
+			'enableCsrfValidation' => false,
 		],
 		'user' => [
 			'identityClass' => 'common\models\User',
