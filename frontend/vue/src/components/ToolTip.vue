@@ -1,27 +1,27 @@
 <template>
-    <div :style="{top: coords.y+'px',left: coords.x+'px'}" id="tooltip" v-if="isVisible">
-      <div class="row">
+    <div v-if="isVisible" :style="{top: coords.y+'px',left: coords.x+'px'}" class="tooltip">
+      <div v-if='calendarEvent.extendedProps.phone' class="row">
         <h5>
           tel:
         </h5>
         <p>
-          {{calendarEvent.extendedProps.phone || 'brak' }}
+          {{calendarEvent.extendedProps.phone}}
         </p>
       </div>
-      <div class="row">
+      <div v-if='calendarEvent.extendedProps.city' class="row">
         <h5>
           miasto:
         </h5>
         <p>
-          {{calendarEvent.extendedProps.city || 'brak' }}
+          {{calendarEvent.extendedProps.city}}
         </p>
       </div>
-      <div class="row">
+      <div v-if='calendarEvent.extendedProps.city' class="row">
         <h5>
           adres:
         </h5>
         <p>
-          {{calendarEvent.extendedProps.address || 'brak' }}
+          {{calendarEvent.extendedProps.address}}
         </p>
       </div>
     </div>
@@ -87,7 +87,7 @@ export default class ToolTip extends Vue {
 </script>
 
 <style lang='less'>
-#tooltip {
+.tooltip {
   position: fixed;
   height: 20vh;
   background-color: white;

@@ -1,4 +1,3 @@
-const CalendarCore = require('@fullcalendar/core')
 const moment = require('moment')
 
 export const dateToW3C = (date: Date): string => {

@@ -19,7 +19,7 @@
       :defaultView="calendar.defaultView"
       :header="calendar.header"
       :plugins="calendar.plugins"
-      :events="events"
+      :events="visibleEvents"
       :locale="calendar.locale"
       :editable="calendar.editable"
       :droppable="calendar.droppable"
@@ -55,7 +55,26 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import { isSameMonth } from '@/helpers/dateHelper.ts'
 import NotesPopup from './NotesPopup.vue'
 import ToolTip from './ToolTip.vue'
+import { MeetingType } from '@/types/MeetingType.ts'
+import { CalendarEvent } from '@/types/CalendarEvent.ts'
+import { CalendarNote } from '@/types/CalendarNote.ts'
+import { EventApiType } from '@/types/EventApiType.ts'
 const FullCalendar = require('@fullcalendar/vue').default
+
+type toolTipType ={
+  isVisible: boolean;
+  calendarEvent: any; // wybacz szefie dodam tutaj typy z fullcalendara obiecuje
+  element: any;
+  activeView: any;
+}
+type eventClickType ={
+  eventClicked: any;
+  timeoutId: number;
+}
+type dateClickType ={
+  date: Date;
+  timeoutId: number;
+}
 
 @Component({
   components: {
@@ -73,16 +92,16 @@ export default class Calendar extends Vue {
   @Prop({
     required: false
   })
-  private eventTypes!: Array<any>;
+  private eventTypes!: MeetingType[];
 
   @Prop({ required: true })
-  private allEvents!: Array<any>;
+  private allEvents!: CalendarEvent[];
 
   @Prop({ required: true })
-  private activeFilters!: Array<number>;
+  private activeTypes!: number[];
 
   @Prop({})
-  private allNotes!: Array<any>;
+  private allNotes!: CalendarNote[];
 
   private calendar: any = {
     plugins: [dayGridPlugin, listWeekPlugin, timeGridPlugin, interactionPlugin],
@@ -114,52 +133,49 @@ export default class Calendar extends Vue {
     height: 'auto'
   };
 
-  private deleteNote (noteID: number) {
+  private deleteNote (noteID: number): void {
     // handle delete
     this.$emit('deleteNote', noteID)
   }
 
-  private editNoteText (noteID: number, text: string) {
+  private editNoteText (noteID: number, text: string): void {
     this.$emit('editNoteText', noteID, text)
   }
 
-  private eventClick: any = {
+  private eventClick: eventClickType = {
     eventClicked: null,
-    timeoutId: null
+    timeoutId: 0
   };
 
-  private dateClick: any = {
-    date: null,
-    timeoutId: null
+  private dateClick: dateClickType = {
+    date: new Date(),
+    timeoutId: 0
   };
 
   private noteOpenedDate: any = null;
 
-  private toolTip: any = {
+  private toolTip: toolTipType = {
     isVisible: false,
     element: null,
     calendarEvent: null,
     activeView: null
   };
 
-  private closePopup () {
+  private closePopup (): void {
     this.noteOpenedDate = null
   }
 
-  get events (): Array<any> {
-    // filter events and add notes to render on calendar
-    const filtered = this.allEvents.filter(event =>
-      this.activeFilters.includes(event.typeId)
+  private filterEvents (): CalendarEvent[] {
+    return this.allEvents.filter(event =>
+      this.activeTypes.includes(event.typeId)
     )
-    const allNotes = this.allNotes.map(note => ({
-      ...note,
-      allDay: true
-    }))
-    const eventsWithNotes = [...filtered, ...allNotes]
-    return eventsWithNotes
   }
 
-  private openTooltip (info: any) {
+  get visibleEvents (): Array<any> {
+    return [...this.filterEvents(), ...this.allNotes]
+  }
+
+  private openTooltip (info: any): void {
     if (info.event.allDay) return // dont show for notes
     this.toolTip = {
       isVisible: true,
@@ -169,7 +185,7 @@ export default class Calendar extends Vue {
     }
   }
 
-  private closeTooltip () {
+  private closeTooltip (): void {
     this.toolTip.isVisible = false
   }
 
@@ -177,7 +193,7 @@ export default class Calendar extends Vue {
     this.noteOpenedDate = e.date ? e.date : e.start
   }
 
-  private handleDateClick (e) {
+  private handleDateClick (e): void {
     // if its a month view allow only to add events, not notes
     if (e.view && e.view.type !== 'dayGridMonth') {
       if (e.allDay) {
@@ -188,23 +204,23 @@ export default class Calendar extends Vue {
       this.dateClick.timeoutId = setTimeout(() => {
         // simple click
         clearTimeout(this.dateClick.timeoutId)
-        this.dateClick.timeoutId = null
+        this.dateClick.timeoutId = 0
         this.dateClick.date = e.date
       }, 200) // tolerance in ms
     } else {
       // double click
       clearTimeout(this.dateClick.timeoutId)
-      this.dateClick.timeoutId = null
+      this.dateClick.timeoutId = 0
       this.dateClick.date = e.date
       this.$emit('dateClick', this.dateClick.date)
     }
   }
 
-  private addNote (noteText: string, day: Date) {
+  private addNote (noteText: string, day: Date): void {
     this.$emit('addNote', noteText, day)
   }
 
-  editEventHtml (info: any) {
+  private editEventHtml (info: any): void {
     const id = info.event.extendedProps.typeId
     info.el.classList.add('calendarEvent')
 
@@ -213,15 +229,27 @@ export default class Calendar extends Vue {
       return
     } // its a note
     if (!id) return // its a note beeing dragged
+    console.log('ee')
+    const meetType = this.getType(id)
+    console.log(meetType)
 
-    const className = this.eventTypes.find(elem => elem.id === id).className
-    info.el.classList.add(className)
+    if (meetType) {
+      info.el.classList.add(meetType.className)
+    }
 
     // add row for client name
     const newElem = document.createElement('p')
     newElem.innerHTML = info.event.extendedProps.client
     newElem.className = 'fc-client'
     info.el.children[0].children[1].appendChild(newElem)
+  }
+
+  private getType (id: number): MeetingType {
+    const model = this.eventTypes.find(elem => elem.id === id)
+    if (!model) {
+      throw Error('type error')
+    }
+    return model
   }
 
   private handleChangeDates (e: any): void {
@@ -250,14 +278,14 @@ export default class Calendar extends Vue {
       this.eventClick.timeoutId = setTimeout(() => {
         // simple click
         clearTimeout(this.eventClick.timeoutId)
-        this.eventClick.timeoutId = null
+        this.eventClick.timeoutId = 0
         this.eventClick.eventClicked = event.el
       }, 200) // tolerance in ms
     } else {
       // double click
 
       clearTimeout(this.eventClick.timeoutId)
-      this.eventClick.timeoutId = null
+      this.eventClick.timeoutId = 0
       this.eventClick.eventClicked = event.el
       this.$emit('eventDoubleClick', event.event.id)
     }

@@ -1,7 +1,6 @@
 <template>
-  <div class="additionalControls">
-    <div class="leftControls">
-        <h1>Filtry statusów:</h1>
+  <div class="controlls">
+      <h1>Filtry statusów:</h1>
       <div class="buttons">
         <button
           :class="[type.className, isFilterActive(type.id) ? '' : 'disabled']"
@@ -10,7 +9,6 @@
           :key="type.id"
         >{{type.name}}</button>
       </div>
-    </div>
   </div>
 </template>
 
@@ -20,18 +18,17 @@ import { Vue, Prop, Component } from 'vue-property-decorator'
 @Component({})
 export default class Filters extends Vue {
   @Prop({
-    required: false
+    required: true
   })
-  private activeFilters!: Array<number>;
+  private activeTypes!: Array<number>;
 
   @Prop({
-    default: () => [],
-    required: true
+    default: () => []
   })
   private eventTypes!: Array<any>;
 
   private isFilterActive (filterId: number): boolean {
-    return this.activeFilters.includes(filterId)
+    return this.activeTypes.includes(filterId)
   }
 
   private toggleFilter (filterId: number): void {
@@ -41,16 +38,14 @@ export default class Filters extends Vue {
 </script>
 
 <style scoped lang='less'>
-.additionalControls {
-  .leftControls {
+.controlls {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100vw;
     h1{
-      margin: 0;
-      margin-bottom: 1vh;
+      margin: 0 1vh 0 0;
       align-self: flex-start;
       font-size: 20px;
     }
@@ -93,7 +88,6 @@ export default class Filters extends Vue {
           opacity: 0.4;
         }
       }
-    }
   }
 }
 </style>

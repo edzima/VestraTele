@@ -2,12 +2,12 @@
   <div class="calendar">
     <Filters
     :eventTypes="eventTypes"
-    :activeFilters="activeFilters"
+    :activeTypes="activeTypes"
     @toggleFilter="toggleFilter"
     />
     <Calendar
     :eventTypes="eventTypes"
-    :activeFilters="activeFilters"
+    :activeTypes="activeTypes"
     :allEvents="allEvents"
     :allNotes="allNotes"
     :allowUpdate="allowUpdate"
@@ -28,30 +28,15 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 import Calendar from '@/components/Callendar.vue'
 import Filters from '@/components/Filters.vue'
 import { getFirstOfMonth, getLastOfMonth, dateToW3C } from '@/helpers/dateHelper.ts'
+import { MeetingType } from '@/types/MeetingType.ts'
+import { CalendarNote } from '@/types/CalendarNote.ts'
+import { CalendarEvent } from '@/types/CalendarEvent.ts'
+
 import axios from 'axios'
-
-type MeetingType = {
-  id: number;
-  name: string;
-  className: string;
-}
-
-type CallendarNote ={
-  id: number;
-  date: string;
-  title: string;
-}
 
 type MonthCacheInfo ={
   monthID: number;
   year: number;
-}
-
-type CalendarEvent = {
-  id: number;
-  title: string;
-  start: string;
-  typeId: number;
 }
 
 @Component({
@@ -143,10 +128,19 @@ export default class App extends Vue {
   })
   private URLInspectEvent!: string;
 
-  private activeFilters: number[] = [1, 2, 3, 4];
+  private activeTypes: number[] = [1, 2, 3, 4];
   private eventTypes: MeetingType[] = [{ id: 1, name: 'umówiony', className: 'blue' }, { id: 2, name: 'umowa', className: 'green' }, { id: 3, name: 'niepodpisany', className: 'red' }, { id: 4, name: 'wysłane dokumenty', className: 'yellow' }]
   private allEvents: CalendarEvent[] = []
-  private allNotes: CallendarNote[] = [{ id: 1, date: '2020-02-29 00:00:00', title: 'lorem ipsum dolor sir amet und dad ewe ' }, { id: 2, date: '2020-02-28 00:00:00', title: 'lorem ipsum' }, { id: 3, date: '2020-02-29 00:00:00', title: 'lorem ipsum' }, { id: 4, date: '2020-02-29 00:00:00', title: 'lorem ipsum' }]
+  private allNotes: CalendarNote[] = [
+    {
+      id: 1,
+      title: 'eee',
+      start: '2020-02-29 00:00:00',
+      end: '2020-03-01 00:00:00',
+      allDay: true
+    }
+  ]
+
   private fetchedMonths: MonthCacheInfo[] = [];
 
   private openEventInspect (id: number): void {
@@ -159,10 +153,10 @@ export default class App extends Vue {
   }
 
   private toggleFilter (filterId: number): void {
-    if (this.activeFilters.includes(filterId)) {
-      this.activeFilters = this.activeFilters.filter(id => id !== filterId)
+    if (this.activeTypes.includes(filterId)) {
+      this.activeTypes = this.activeTypes.filter(id => id !== filterId)
     } else {
-      this.activeFilters.push(filterId)
+      this.activeTypes.push(filterId)
     }
   }
 
@@ -191,16 +185,17 @@ export default class App extends Vue {
         dateTo: endDateFormatted
       }
     })
-    return res.data.data.map(eventCard => ({
+    return res.data.data.map((eventCard) => ({
+      // @TODO add here type from EventApiType iplementation
       id: eventCard.id,
       title: eventCard.client,
       start: eventCard.date_at,
       end: eventCard.date_end_at,
-      phone: '123 123 123 ',
-      address: 'Wolska 19',
-      city: 'Warszawa',
-      client: 'Jan Kowal',
-      typeId: 2
+      phone: eventCard.phone,
+      address: eventCard.street,
+      city: eventCard.city,
+      client: eventCard.client,
+      typeId: eventCard.typeId
     }))
   }
 
@@ -214,11 +209,13 @@ export default class App extends Vue {
         dateTo: endDate
       }
     })
+    console.log(res)
     return res.data.data.map(eventCard => ({
       id: eventCard.id,
       title: eventCard.client,
       start: eventCard.date_at,
-      end: eventCard.date_to
+      end: eventCard.date_to,
+      allDay: true
     }))
   }
 
@@ -231,7 +228,8 @@ export default class App extends Vue {
     this.allNotes.push({
       title: noteText,
       id: 1,
-      date: dateToW3C(day)
+      start: dateToW3C(day),
+      allDay: true
     })
   }
 
