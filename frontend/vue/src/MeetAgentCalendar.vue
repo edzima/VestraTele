@@ -35,12 +35,14 @@ import { CalendarEvent } from '@/types/CalendarEvent.ts'
 import { EventApiType } from '@/types/EventApiType.ts'
 import { NoteApiType } from '@/types/NoteApiType.ts'
 
-import axios from 'axios'
-
 type MonthCacheInfo = {
   monthID: number;
   year: number;
 };
+
+interface METAElement extends SVGElement {
+content: string;
+}
 
 @Component({
   components: {
@@ -105,6 +107,7 @@ export default class App extends Vue {
   })
   private EventTitleMinRes!: number;
 
+  private CSRFToken = ''
   private activeTypes: number[] = [1, 2, 3, 4];
   private eventTypes: MeetingType[] = [
     { id: 1, name: 'umówiony', className: 'blue' },
@@ -127,7 +130,7 @@ export default class App extends Vue {
     const params: URLSearchParams = new URLSearchParams()
     params.append('id', String(noteID))
     params.append('agent_id', String(this.agentId))
-    axios.post(this.URLDeleteNote, params)
+    this.axios.post(this.URLDeleteNote, params)
     this.allNotes = this.allNotes.filter(note => note.id !== noteID)
   }
 
@@ -163,7 +166,7 @@ export default class App extends Vue {
     const endDate: Date = getLastOfMonth(monthDate)
     const startDateFormatted: string = dateToW3C(startDate)
     const endDateFormatted: string = dateToW3C(endDate)
-    const res = await axios.get(this.URLGetEvents, {
+    const res = await this.axios.get(this.URLGetEvents, {
       params: {
         agentId: this.agentId,
         dateFrom: startDateFormatted,
@@ -187,7 +190,7 @@ export default class App extends Vue {
   private async fetchMonthNotes (monthDate: Date): Promise<CalendarNote[]> {
     const startDate: Date = getFirstOfMonth(monthDate)
     const endDate: Date = getLastOfMonth(monthDate)
-    const res = await axios.get(this.URLGetNotes, {
+    const res = await this.axios.get(this.URLGetNotes, {
       params: {
         agentId: this.agentId,
         dateFrom: startDate,
@@ -212,7 +215,7 @@ export default class App extends Vue {
     params.append('date', formatted)
     params.append('agent_id', String(this.agentId))
     params.append('news', noteText)
-    const res = await axios.post(this.URLNewNote, params)
+    const res = await this.axios.post(this.URLNewNote, params)
     // TODO: add error handler
     this.allNotes.push({
       title: noteText,
@@ -232,7 +235,7 @@ export default class App extends Vue {
     params.append('agent_id', String(this.agentId))
     params.append('id', String(noteID))
 
-    const res = await axios.post(this.URLUpdateNote, params)
+    const res = await this.axios.post(this.URLUpdateNote, params)
     // TODO: add error handler
     this.allNotes = this.allNotes.map(note => {
       if (note.id === noteID) {
@@ -253,7 +256,7 @@ export default class App extends Vue {
     params.append('id', String(e.event.id))
     params.append('date_at', String(dateFrom))
     params.append('date_end_at', String(dateTo))
-    await axios.post(this.URLUpdateEvent, params)
+    await this.axios.post(this.URLUpdateEvent, params)
   }
 
   private async updateNoteDates (e: any): Promise<void> {
@@ -265,7 +268,7 @@ export default class App extends Vue {
     params.append('start', String(dateFrom))
     params.append('end', String(dateTo))
 
-    await axios.post(this.URLUpdateNote, params)
+    await this.axios.post(this.URLUpdateNote, params)
 
     this.allNotes = this.allNotes.map(note => {
       if (note.id === e.event.id) {
@@ -288,15 +291,34 @@ export default class App extends Vue {
     }
   }
 
-  private configSmallDevice () {
+  private configSmallDevice (): void {
     if (window.innerWidth < this.EventTitleMinRes) {
       this.isSmallDevice = true
     }
-    console.log(window.innerWidth)
+  }
+
+  private getCSRFToken (): string {
+    const token: METAElement | null = document.querySelector('meta[name=csrf-token]')
+    if (token) {
+      return token.content
+    }
+    throw Error('NO CSRF TOKEN SUPPLIED')
+  }
+
+  private setAxiosSCRFToken (): void {
+    this.axios.defaults.headers.common['X-CSRF-TOKEN'] = this.getCSRFToken()
+    console.log(this.axios.defaults)
+  }
+
+  private setAxiosCSRFTokenIfProduction (): void {
+    if (process.env.NODE_ENV === 'production') {
+      this.setAxiosSCRFToken()
+    }
   }
 
   created () {
     this.configSmallDevice()
+    this.setAxiosCSRFTokenIfProduction()
   }
 }
 </script>
