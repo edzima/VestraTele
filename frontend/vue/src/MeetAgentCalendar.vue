@@ -1,24 +1,20 @@
 <template>
   <div class="calendar">
-    <Filters
-    :eventTypes="eventTypes"
-    :activeTypes="activeTypes"
-    @toggleFilter="toggleFilter"
-    />
+    <Filters :eventTypes="eventTypes" :activeTypes="activeTypes" @toggleFilter="toggleFilter" />
     <Calendar
-    :eventTypes="eventTypes"
-    :activeTypes="activeTypes"
-    :allEvents="allEvents"
-    :allNotes="allNotes"
-    :allowUpdate="allowUpdate"
-    :agentId="agentId"
-    @loadMonth="fetchAndCacheMonth"
-    @deleteNote="deleteNote"
-    @addNote="addNote"
-    @eventEdit="handleChangeDates"
-    @eventDoubleClick="openEventInspect"
-    @editNoteText="editNoteText"
-    @dateClick="addEvent"
+      :eventTypes="eventTypes"
+      :activeTypes="activeTypes"
+      :allEvents="allEvents"
+      :allNotes="allNotes"
+      :allowUpdate="allowUpdate"
+      :agentId="agentId"
+      @loadMonth="fetchAndCacheMonth"
+      @deleteNote="deleteNote"
+      @addNote="addNote"
+      @eventEdit="handleChangeDates"
+      @eventDoubleClick="openEventInspect"
+      @editNoteText="editNoteText"
+      @dateClick="addEvent"
     />
   </div>
 </template>
@@ -27,7 +23,11 @@
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import Calendar from '@/components/Callendar.vue'
 import Filters from '@/components/Filters.vue'
-import { getFirstOfMonth, getLastOfMonth, dateToW3C } from '@/helpers/dateHelper.ts'
+import {
+  getFirstOfMonth,
+  getLastOfMonth,
+  dateToW3C
+} from '@/helpers/dateHelper.ts'
 import { MeetingType } from '@/types/MeetingType.ts'
 import { CalendarNote } from '@/types/CalendarNote.ts'
 import { CalendarEvent } from '@/types/CalendarEvent.ts'
@@ -36,10 +36,10 @@ import { NoteApiType } from '@/types/NoteApiType.ts'
 
 import axios from 'axios'
 
-type MonthCacheInfo ={
+type MonthCacheInfo = {
   monthID: number;
   year: number;
-}
+};
 
 @Component({
   components: {
@@ -140,17 +140,15 @@ export default class App extends Vue {
   private URLInspectEvent!: string;
 
   private activeTypes: number[] = [1, 2, 3, 4];
-  private eventTypes: MeetingType[] = [{ id: 1, name: 'umówiony', className: 'blue' }, { id: 2, name: 'umowa', className: 'green' }, { id: 3, name: 'niepodpisany', className: 'red' }, { id: 4, name: 'wysłane dokumenty', className: 'yellow' }]
-  private allEvents: CalendarEvent[] = []
-  private allNotes: CalendarNote[] = [
-    {
-      id: 1,
-      title: 'eee',
-      start: '2020-02-29 00:00:00',
-      end: '2020-03-01 00:00:00',
-      allDay: true
-    }
-  ]
+  private eventTypes: MeetingType[] = [
+    { id: 1, name: 'umówiony', className: 'blue' },
+    { id: 2, name: 'umowa', className: 'green' },
+    { id: 3, name: 'niepodpisany', className: 'red' },
+    { id: 4, name: 'wysłane dokumenty', className: 'yellow' }
+  ];
+
+  private allEvents: CalendarEvent[] = [];
+  private allNotes: CalendarNote[] = [];
 
   private fetchedMonths: MonthCacheInfo[] = [];
 
@@ -176,7 +174,11 @@ export default class App extends Vue {
   }
 
   private async fetchAndCacheMonth (monthDate: Date): Promise<void> {
-    const monthExsist: boolean = this.fetchedMonths.some(ftchMonth => ftchMonth.monthID === monthDate.getMonth() && ftchMonth.year === monthDate.getFullYear())
+    const monthExsist: boolean = this.fetchedMonths.some(
+      ftchMonth =>
+        ftchMonth.monthID === monthDate.getMonth() &&
+        ftchMonth.year === monthDate.getFullYear()
+    )
     if (monthExsist) return
     const fetchedMonthEvents = await this.fetchMonthEvents(monthDate)
     const fetchedMonthNotes = await this.fetchMonthNotes(monthDate)
@@ -188,7 +190,9 @@ export default class App extends Vue {
     this.allEvents.push(...fetchedMonthEvents)
   }
 
-  private async fetchMonthEvents (monthDate: Date): Promise<Array<CalendarEvent>> {
+  private async fetchMonthEvents (
+    monthDate: Date
+  ): Promise<Array<CalendarEvent>> {
     const startDate: Date = getFirstOfMonth(monthDate)
     const endDate: Date = getLastOfMonth(monthDate)
     const startDateFormatted: string = dateToW3C(startDate)
@@ -201,7 +205,7 @@ export default class App extends Vue {
       }
     })
     const eventsFromApi: EventApiType[] = res.data.data
-    return eventsFromApi.map((eventCard) => ({
+    return eventsFromApi.map(eventCard => ({
       id: eventCard.id,
       title: eventCard.client,
       start: eventCard.date_at,
@@ -252,7 +256,7 @@ export default class App extends Vue {
     })
   }
 
-  private addEvent (date: Date): void{
+  private addEvent (date: Date): void {
     window.open(`${this.URLAddEvent}?date=${dateToW3C(date)}`)
   }
 
@@ -275,47 +279,70 @@ export default class App extends Vue {
     })
   }
 
-  private async updateEventDates (dateFrom: string, dateTo: string, eventId: number): Promise<void> {
+  private async updateEventDates (e: any): Promise<void> {
+    const dateFrom: string = dateToW3C(e.event.start)
+    const dateTo: string = dateToW3C(e.event.end)
+
     const params: URLSearchParams = new URLSearchParams()
-    params.append('id', String(eventId))
+    params.append('id', String(e.event.id))
     params.append('date_at', String(dateFrom))
     params.append('date_end_at', String(dateTo))
     await axios.post(this.URLUpdateEvent, params)
   }
 
-  private async updateNoteDates (dateFrom: string, dateTo: string, eventId: number): Promise<void> {
-    const params: URLSearchParams = new URLSearchParams()
-    params.append('id', String(eventId))
-    params.append('start', String(dateFrom))
-    params.append('end', String(dateTo))
-    // params.append('agent_id', String(this.agentId))
-    const x = await axios.post(this.URLUpdateNote, params)
-    console.log(x)
-  }
-
-  private async handleChangeDates (e: any): Promise<void> {
-    const eventCard: any = e.event
-    // if there is no oldEvent its just a time change
-    if (e.oldEvent) {
-    // prevent draging notes to normal events and vice-versa
-      if (eventCard.allDay !== e.oldEvent.allDay) return e.revert()
-    }
+  private async updateNoteDates (e: any): Promise<void> {
     const dateFrom: string = dateToW3C(e.event.start)
     const dateTo: string = dateToW3C(e.event.end)
-    const eventId: number = eventCard.id
 
-    // TODO: add error handler
+    const params: URLSearchParams = new URLSearchParams()
+    params.append('id', String(e.event.id))
+    params.append('start', String(dateFrom))
+    params.append('end', String(dateTo))
+
+    await axios.post(this.URLUpdateNote, params)
+
+    this.allNotes = this.allNotes.map(note => {
+      if (note.id === e.event.id) {
+        return {
+          ...note,
+          start: e.event.start,
+          end: e.event.end
+        }
+      }
+      return note
+    })
+  }
+
+  private handleChangeDates (e: any): void {
+    const eventCard: any = e.event
     if (eventCard.allDay) {
-      // handle edit dates and time of note
-      await this.updateNoteDates(dateFrom, dateTo, eventId)
+      this.updateNoteDates(e)
     } else {
-      // event
-      await this.updateEventDates(dateFrom, dateTo, eventId)
+      this.updateEventDates(e)
     }
   }
+  // private async handleChangeDates (e: any): Promise<void> {
+  //   const eventCard: any = e.event
+  //   // if there is no oldEvent its just a time change
+  //   if (e.oldEvent) {
+  //     // prevent draging notes to normal events and vice-versa
+  //     if (eventCard.allDay !== e.oldEvent.allDay) return e.revert()
+  //   }
+  //   const dateFrom: string = dateToW3C(e.event.start)
+  //   const dateTo: string = dateToW3C(e.event.end)
+  //   const eventId: number = eventCard.id
+
+  //   // TODO: add error handler
+  //   if (eventCard.allDay) {
+  //     // handle edit dates and time of note
+  //     await this.updateNoteDates(dateFrom, dateTo, eventId)
+  //   } else {
+  //     // event
+  //     await this.updateEventDates(dateFrom, dateTo, eventId)
+  //   }
+  // }
 }
 </script>
 
 <style scoped lang='less'>
-
 </style>

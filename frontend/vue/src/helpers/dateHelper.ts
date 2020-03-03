@@ -14,7 +14,7 @@ export const getFirstOfMonth = (date: Date): Date => {
 export const isSameMonth = (firstDate: Date, secondDate: Date): boolean => {
   return moment(firstDate).month() === moment(secondDate).month()
 }
-export const prettyDate = (date: Date): string => {
+export const prettify = (date: string): string => {
   moment.locale('pl')
   return moment(date).format('Do MMMM YYYY')
 }

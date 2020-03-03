@@ -3,7 +3,7 @@
     <div class="modal">
       <button class="close" @click="handleClose">X</button>
       <div class="activeNotes">
-        <h1>{{dateFormated}}</h1>
+        <h1>{{date | prettify}}</h1>
         <h3>aktywne notatki:</h3>
         <div class="notes">
           <div v-for="note in dayNotes" :key="note.id" class="note">
@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import { Vue, Prop, Component } from 'vue-property-decorator'
-import { prettyDate, isSameDate } from '@/helpers/dateHelper'
+import { isSameDate } from '@/helpers/dateHelper'
 import { CalendarNote } from '@/types/CalendarNote.ts'
 
 @Component({})
@@ -100,10 +100,6 @@ export default class NewNotePopup extends Vue {
 
   get dayNotes () {
     return this.allNotes.filter(note => isSameDate(new Date(note.start), this.date))
-  }
-
-  get dateFormated () {
-    return prettyDate(this.date)
   }
 }
 </script>
