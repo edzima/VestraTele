@@ -35,6 +35,8 @@
 <script lang="ts">
 import { Vue, Prop, Component } from 'vue-property-decorator'
 import { prettyDate, isSameDate } from '@/helpers/dateHelper'
+import { CalendarNote } from '@/types/CalendarNote.ts'
+
 @Component({})
 export default class NewNotePopup extends Vue {
   @Prop({
@@ -45,7 +47,7 @@ export default class NewNotePopup extends Vue {
   @Prop({
     required: false
   })
-  private allNotes!: Array<any>;
+  private allNotes!: CalendarNote[];
 
   private newNoteText = '';
   private editNoteText = '';
@@ -97,7 +99,7 @@ export default class NewNotePopup extends Vue {
   }
 
   get dayNotes () {
-    return this.allNotes.filter(note => isSameDate(note.date, this.date))
+    return this.allNotes.filter(note => isSameDate(new Date(note.start), this.date))
   }
 
   get dateFormated () {

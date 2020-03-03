@@ -58,7 +58,6 @@ import ToolTip from './ToolTip.vue'
 import { MeetingType } from '@/types/MeetingType.ts'
 import { CalendarEvent } from '@/types/CalendarEvent.ts'
 import { CalendarNote } from '@/types/CalendarNote.ts'
-import { EventApiType } from '@/types/EventApiType.ts'
 const FullCalendar = require('@fullcalendar/vue').default
 
 type toolTipType ={
@@ -229,9 +228,7 @@ export default class Calendar extends Vue {
       return
     } // its a note
     if (!id) return // its a note beeing dragged
-    console.log('ee')
     const meetType = this.getType(id)
-    console.log(meetType)
 
     if (meetType) {
       info.el.classList.add(meetType.className)

@@ -31,6 +31,8 @@ import { getFirstOfMonth, getLastOfMonth, dateToW3C } from '@/helpers/dateHelper
 import { MeetingType } from '@/types/MeetingType.ts'
 import { CalendarNote } from '@/types/CalendarNote.ts'
 import { CalendarEvent } from '@/types/CalendarEvent.ts'
+import { EventApiType } from '@/types/EventApiType.ts'
+import { NoteApiType } from '@/types/NoteApiType.ts'
 
 import axios from 'axios'
 
@@ -59,7 +61,7 @@ export default class App extends Vue {
   private agentId!: number;
 
   @Prop({
-    default: () => '/update',
+    default: () => 'meet-calendar/update',
     required: false
     // -----PARAMS-----
     // id - eventId
@@ -69,7 +71,7 @@ export default class App extends Vue {
   private URLUpdateEvent!: string;
 
   @Prop({
-    default: () => '/updateNote',
+    default: () => 'calendar-note/update',
     required: false
     // -----PARAMS-----
     // id - eventId
@@ -79,7 +81,7 @@ export default class App extends Vue {
   private URLUpdateNote!: string;
 
   @Prop({
-    default: () => '/update',
+    default: () => 'calendar-note/add',
     required: false
     // -----PARAMS-----
     // id - eventId
@@ -89,7 +91,16 @@ export default class App extends Vue {
   private URLNewNote!: string;
 
   @Prop({
-    default: () => '/list',
+    default: () => 'calendar-note/delete'
+    // -----PARAMS-----
+    // id - eventId
+    // date_at - date from
+    // date_end_at - date to
+  })
+  private URLDeleteNote!: string;
+
+  @Prop({
+    default: () => 'meet-calendar/list',
     // -----PARAMS-----
     // dateFrom
     // dateTo
@@ -99,7 +110,7 @@ export default class App extends Vue {
   private URLGetEvents!: string;
 
   @Prop({
-    default: () => '/list',
+    default: () => 'calendar-note/list',
     // -----PARAMS-----
     // dateFrom
     // dateTo
@@ -149,6 +160,10 @@ export default class App extends Vue {
 
   private deleteNote (noteID: number): void {
     // AXIOS
+    const params: URLSearchParams = new URLSearchParams()
+    params.append('id', String(noteID))
+    params.append('agent_id', String(this.agentId))
+    axios.post(this.URLDeleteNote, params)
     this.allNotes = this.allNotes.filter(note => note.id !== noteID)
   }
 
@@ -169,7 +184,7 @@ export default class App extends Vue {
       monthID: monthDate.getMonth(),
       year: monthDate.getFullYear()
     })
-    // this.allNotes.push(...fetchedMonthNotes)
+    this.allNotes.push(...fetchedMonthNotes)
     this.allEvents.push(...fetchedMonthEvents)
   }
 
@@ -185,8 +200,8 @@ export default class App extends Vue {
         dateTo: endDateFormatted
       }
     })
-    return res.data.data.map((eventCard) => ({
-      // @TODO add here type from EventApiType iplementation
+    const eventsFromApi: EventApiType[] = res.data.data
+    return eventsFromApi.map((eventCard) => ({
       id: eventCard.id,
       title: eventCard.client,
       start: eventCard.date_at,
@@ -199,7 +214,7 @@ export default class App extends Vue {
     }))
   }
 
-  private async fetchMonthNotes (monthDate: Date): Promise<CalendarEvent[]> {
+  private async fetchMonthNotes (monthDate: Date): Promise<CalendarNote[]> {
     const startDate: Date = getFirstOfMonth(monthDate)
     const endDate: Date = getLastOfMonth(monthDate)
     const res = await axios.get(this.URLGetNotes, {
@@ -209,25 +224,29 @@ export default class App extends Vue {
         dateTo: endDate
       }
     })
-    console.log(res)
-    return res.data.data.map(eventCard => ({
+    const notesFromApi: NoteApiType[] = res.data.data
+
+    return notesFromApi.map(eventCard => ({
       id: eventCard.id,
-      title: eventCard.client,
-      start: eventCard.date_at,
-      end: eventCard.date_to,
+      title: eventCard.content,
+      start: eventCard.start_at,
+      end: eventCard.end_at,
       allDay: true
     }))
   }
 
-  private addNote (noteText: string, day: Date): void {
-    // send data
-    // get id from axios
-    // const id = axios.res.id
-    // agentId: this.agentId,
-    //  URLNewNote
+  private async addNote (noteText: string, day: Date): Promise<void> {
+    const formatted = dateToW3C(day)
+
+    const params: URLSearchParams = new URLSearchParams()
+    params.append('date', formatted)
+    params.append('agent_id', String(this.agentId))
+    params.append('news', noteText)
+    const res = await axios.post(this.URLNewNote, params)
+    // TODO: add error handler
     this.allNotes.push({
       title: noteText,
-      id: 1,
+      id: res.data.id,
       start: dateToW3C(day),
       allDay: true
     })
@@ -237,7 +256,14 @@ export default class App extends Vue {
     window.open(`${this.URLAddEvent}?date=${dateToW3C(date)}`)
   }
 
-  private editNoteText (noteID: number, text: string): void{
+  private async editNoteText (noteID: number, text: string): Promise<void> {
+    const params: URLSearchParams = new URLSearchParams()
+    params.append('news', text)
+    params.append('agent_id', String(this.agentId))
+    params.append('id', String(noteID))
+
+    const res = await axios.post(this.URLUpdateNote, params)
+    // TODO: add error handler
     this.allNotes = this.allNotes.map(note => {
       if (note.id === noteID) {
         return {
@@ -247,6 +273,24 @@ export default class App extends Vue {
       }
       return note
     })
+  }
+
+  private async updateEventDates (dateFrom: string, dateTo: string, eventId: number): Promise<void> {
+    const params: URLSearchParams = new URLSearchParams()
+    params.append('id', String(eventId))
+    params.append('date_at', String(dateFrom))
+    params.append('date_end_at', String(dateTo))
+    await axios.post(this.URLUpdateEvent, params)
+  }
+
+  private async updateNoteDates (dateFrom: string, dateTo: string, eventId: number): Promise<void> {
+    const params: URLSearchParams = new URLSearchParams()
+    params.append('id', String(eventId))
+    params.append('start', String(dateFrom))
+    params.append('end', String(dateTo))
+    // params.append('agent_id', String(this.agentId))
+    const x = await axios.post(this.URLUpdateNote, params)
+    console.log(x)
   }
 
   private async handleChangeDates (e: any): Promise<void> {
@@ -259,17 +303,14 @@ export default class App extends Vue {
     const dateFrom: string = dateToW3C(e.event.start)
     const dateTo: string = dateToW3C(e.event.end)
     const eventId: number = eventCard.id
-    const params: URLSearchParams = new URLSearchParams()
 
-    params.append('id', String(eventId))
-    params.append('date_at', String(dateFrom))
-    params.append('date_end_at', String(dateTo))
+    // TODO: add error handler
     if (eventCard.allDay) {
       // handle edit dates and time of note
-      axios.post(this.URLUpdateNote, params)
+      await this.updateNoteDates(dateFrom, dateTo, eventId)
     } else {
       // event
-      axios.post(this.URLUpdateEvent, params)
+      await this.updateEventDates(dateFrom, dateTo, eventId)
     }
   }
 }
