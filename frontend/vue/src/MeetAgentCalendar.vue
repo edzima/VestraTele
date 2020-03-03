@@ -8,6 +8,7 @@
       :allNotes="allNotes"
       :allowUpdate="allowUpdate"
       :agentId="agentId"
+      :isTitlesHidden="isSmallDevice"
       @loadMonth="fetchAndCacheMonth"
       @deleteNote="deleteNote"
       @addNote="addNote"
@@ -21,7 +22,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import Calendar from '@/components/Callendar.vue'
+import Calendar from '@/components/Calendar.vue'
 import Filters from '@/components/Filters.vue'
 import {
   getFirstOfMonth,
@@ -49,95 +50,60 @@ type MonthCacheInfo = {
 })
 export default class App extends Vue {
   @Prop({
-    default: () => true,
-    required: false
+    default: () => true // to change
   })
   private allowUpdate!: boolean; // allow user to edit events
 
   @Prop({
-    default: () => 21,
-    required: false
+    default: () => 21, // to del
+    required: false // to change
   })
   private agentId!: number;
 
   @Prop({
-    default: () => 'meet-calendar/update',
-    required: false
-    // -----PARAMS-----
-    // id - eventId
-    // date_at - date from
-    // date_end_at - date to
+    default: () => 'meet-calendar/update'
   })
   private URLUpdateEvent!: string;
 
   @Prop({
-    default: () => 'calendar-note/update',
-    required: false
-    // -----PARAMS-----
-    // id - eventId
-    // date_at - date from
-    // date_end_at - date to
+    default: () => 'calendar-note/update'
   })
   private URLUpdateNote!: string;
 
   @Prop({
-    default: () => 'calendar-note/add',
-    required: false
-    // -----PARAMS-----
-    // id - eventId
-    // date_at - date from
-    // date_end_at - date to
+    default: () => 'calendar-note/add'
   })
   private URLNewNote!: string;
 
   @Prop({
     default: () => 'calendar-note/delete'
-    // -----PARAMS-----
-    // id - eventId
-    // date_at - date from
-    // date_end_at - date to
   })
   private URLDeleteNote!: string;
 
   @Prop({
-    default: () => 'meet-calendar/list',
-    // -----PARAMS-----
-    // dateFrom
-    // dateTo
-    // agentId
-    required: false
+    default: () => 'meet-calendar/list'
   })
   private URLGetEvents!: string;
 
   @Prop({
-    default: () => 'calendar-note/list',
-    // -----PARAMS-----
-    // dateFrom
-    // dateTo
-    // agentId
-    required: false
+    default: () => 'calendar-note/list'
   })
   private URLGetNotes!: string;
 
   @Prop({
-    default: () => 'http://google.com',
-    // -----PARAMS-----
-    // dateFrom
-    // dateTo
-    // agentId
-    required: false
+    default: () => 'http://google.com'
   })
   private URLAddEvent!: string;
 
   @Prop({
-    default: () => 'http://google.com',
-    // -----PARAMS-----
-    // dateFrom
-    // dateTo
-    // agentId
-    required: false
+    default: () => 'http://google.com'
   })
   private URLInspectEvent!: string;
+
+  @Prop({
+    default: () => 600 // in px
+  })
+  private EventTitleMinRes!: number;
 
   private activeTypes: number[] = [1, 2, 3, 4];
   private eventTypes: MeetingType[] = [
@@ -149,8 +115,8 @@ export default class App extends Vue {
 
   private allEvents: CalendarEvent[] = [];
   private allNotes: CalendarNote[] = [];
-
   private fetchedMonths: MonthCacheInfo[] = [];
+  private isSmallDevice = false;
 
   private openEventInspect (id: number): void {
     window.open(`${this.URLInspectEvent}?id=${id}`)
@@ -321,26 +287,17 @@ export default class App extends Vue {
       this.updateEventDates(e)
     }
   }
-  // private async handleChangeDates (e: any): Promise<void> {
-  //   const eventCard: any = e.event
-  //   // if there is no oldEvent its just a time change
-  //   if (e.oldEvent) {
-  //     // prevent draging notes to normal events and vice-versa
-  //     if (eventCard.allDay !== e.oldEvent.allDay) return e.revert()
-  //   }
-  //   const dateFrom: string = dateToW3C(e.event.start)
-  //   const dateTo: string = dateToW3C(e.event.end)
-  //   const eventId: number = eventCard.id
 
-  //   // TODO: add error handler
-  //   if (eventCard.allDay) {
-  //     // handle edit dates and time of note
-  //     await this.updateNoteDates(dateFrom, dateTo, eventId)
-  //   } else {
-  //     // event
-  //     await this.updateEventDates(dateFrom, dateTo, eventId)
-  //   }
-  // }
+  private configSmallDevice () {
+    if (window.innerWidth < this.EventTitleMinRes) {
+      this.isSmallDevice = true
+    }
+    console.log(window.innerWidth)
+  }
+
+  created () {
+    this.configSmallDevice()
+  }
 }
 </script>
 

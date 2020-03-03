@@ -18,6 +18,9 @@ export const prettify = (date: string): string => {
   moment.locale('pl')
   return moment(date).format('Do MMMM YYYY')
 }
+export const prettifyHourRange = (dateStart: string, dateEnd: string): string => {
+  return `${moment(dateStart).format('HH:mm')} - ${moment(dateEnd).format('HH:mm')}`
+}
 export const isSameDate = (firstDate: Date, secondDate: Date): boolean => {
   const first = moment(firstDate).format('LL')
   const second = moment(secondDate).format('LL')

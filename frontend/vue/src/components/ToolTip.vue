@@ -1,5 +1,21 @@
 <template>
     <div v-if="isVisible" :style="{top: coords.y+'px',left: coords.x+'px'}" class="tooltip">
+      <div v-if='isAllContentVisible' class="row">
+        <h5>
+          tytuł:
+        </h5>
+        <p>
+          {{calendarEvent.title}}
+        </p>
+      </div>
+      <div v-if='isAllContentVisible' class="row">
+        <h5>
+          klient:
+        </h5>
+        <p>
+          {{calendarEvent.extendedProps.client}}
+        </p>
+      </div>
       <div v-if='calendarEvent.extendedProps.phone' class="row">
         <h5>
           tel:
@@ -24,25 +40,39 @@
           {{calendarEvent.extendedProps.address}}
         </p>
       </div>
+      <div class="time">
+        {{eventDateRange}}
+      </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Vue, Prop, Component, Watch } from 'vue-property-decorator'
-
+import { prettifyHourRange } from '@/helpers/dateHelper.ts'
 @Component({})
 export default class ToolTip extends Vue {
-  @Prop({})
+  @Prop({
+    required: true
+  })
   private isVisible!: boolean
 
-  @Prop({})
+  @Prop({
+    required: true
+  })
   private calendarEvent!: any
 
-  @Prop({})
+  @Prop({
+    required: true
+  })
   private activeView!: string
 
-  @Prop({})
+  @Prop({
+    required: true
+  })
   private element!: any
+
+  @Prop({})
+  private isAllContentVisible!: boolean
 
   private coords: any = { x: 0, y: 0 }
 
@@ -55,6 +85,13 @@ export default class ToolTip extends Vue {
   onPropertyChanged (value: boolean) {
     // cancel if mouseOut
     if (!value) return
+    if (this.isAllContentVisible) {
+      this.coords = {
+        x: 0,
+        y: screen.height / 4
+      }
+      return
+    }
 
     // get the position of the hover element
     const boundBox = this.element.getBoundingClientRect()
@@ -82,6 +119,10 @@ export default class ToolTip extends Vue {
         y: coordY + this.offset.y
       }
     }
+  }
+
+  get eventDateRange () {
+    return prettifyHourRange(this.calendarEvent.start, this.calendarEvent.end)
   }
 }
 </script>
@@ -116,6 +157,19 @@ export default class ToolTip extends Vue {
       font-weight: bold;
       width: 100%;;
     }
+  }
+  .time{
+    text-align: center;
+    font-size: 25px;
+  }
+}
+@media screen and (max-width: 600px) {
+  .tooltip{
+      position: fixed;
+      height: 50vh;
+      padding: 10px;
+      width: 95vw;
+      font-size: 20px;
   }
 }
 </style>

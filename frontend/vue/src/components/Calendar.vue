@@ -13,6 +13,7 @@
       :element="toolTip.element"
       :isVisible="toolTip.isVisible"
       :activeView="toolTip.activeView"
+      :isAllContentVisible="isTitlesHidden"
     />
     <FullCalendar
       ref="fullCalendar"
@@ -89,7 +90,12 @@ export default class Calendar extends Vue {
   private allowUpdate!: boolean; // allow user to edit events
 
   @Prop({
-    required: false
+    default: () => false
+  })
+  private isTitlesHidden!: boolean
+
+  @Prop({
+    required: true
   })
   private eventTypes!: MeetingType[];
 
@@ -222,6 +228,9 @@ export default class Calendar extends Vue {
   private editEventHtml (info: any): void {
     const id = info.event.extendedProps.typeId
     info.el.classList.add('calendarEvent')
+    if (this.isTitlesHidden) {
+      info.el.classList.add('hideTitle')
+    }
 
     if (info.event.allDay) {
       info.el.classList.add('note')
@@ -238,7 +247,7 @@ export default class Calendar extends Vue {
     const newElem = document.createElement('p')
     newElem.innerHTML = info.event.extendedProps.client
     newElem.className = 'fc-client'
-    info.el.children[0].children[1].appendChild(newElem)
+    info.el.children[0].appendChild(newElem)
   }
 
   private getType (id: number): MeetingType {
@@ -327,6 +336,20 @@ export default class Calendar extends Vue {
     background-color: rgb(97, 0, 136);
     .fc-title {
       white-space: nowrap;
+    }
+  }
+  &.hideTitle{
+    .fc-title{
+      // display: none;
+      opacity: 0;
+    }
+    .fc-client{
+      // display: none;
+      opacity: 0;
+    }
+    .fc-time{
+      // display: none;
+      opacity: 0;
     }
   }
 }

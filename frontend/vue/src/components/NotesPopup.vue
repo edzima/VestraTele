@@ -45,7 +45,7 @@ export default class NewNotePopup extends Vue {
   private date!: Date;
 
   @Prop({
-    required: false
+    required: true
   })
   private allNotes!: CalendarNote[];
 
