@@ -125,12 +125,13 @@ export default class App extends Vue {
     window.open(`${this.URLInspectEvent}?id=${id}`)
   }
 
-  private deleteNote (noteID: number): void {
+  private async deleteNote (noteID: number): Promise<void> {
     // AXIOS
     const params: URLSearchParams = new URLSearchParams()
     params.append('id', String(noteID))
     params.append('agent_id', String(this.agentId))
-    this.axios.post(this.URLDeleteNote, params)
+    const res = await this.axios.post(this.URLDeleteNote, params)
+    if (res.status !== 200) return
     this.allNotes = this.allNotes.filter(note => note.id !== noteID)
   }
 
@@ -217,6 +218,8 @@ export default class App extends Vue {
     params.append('news', noteText)
     const res = await this.axios.post(this.URLNewNote, params)
     // TODO: add error handler
+    if (res.status !== 200) return
+    if (res.data.id) return
     this.allNotes.push({
       title: noteText,
       id: res.data.id,
