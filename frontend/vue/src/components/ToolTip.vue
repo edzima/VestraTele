@@ -40,7 +40,7 @@
           {{calendarEvent.extendedProps.address}}
         </p>
       </div>
-      <div class="time">
+      <div v-if="isAllContentVisible" class="time">
         {{eventDateRange}}
       </div>
     </div>
@@ -130,7 +130,7 @@ export default class ToolTip extends Vue {
 <style lang='less'>
 .tooltip {
   position: fixed;
-  height: 20vh;
+  height:auto;
   background-color: white;
   border: #3788D8 solid 2px;
   z-index: 99;
