@@ -236,7 +236,8 @@ export default class App extends Vue {
     params.append('id', String(noteID))
 
     const res = await this.axios.post(this.URLUpdateNote, params)
-    // TODO: add error handler
+    if (res.status !== 200) return
+    if (res.data.success === false) return
     this.allNotes = this.allNotes.map(note => {
       if (note.id === noteID) {
         return {
@@ -256,7 +257,9 @@ export default class App extends Vue {
     params.append('id', String(e.event.id))
     params.append('date_at', String(dateFrom))
     params.append('date_end_at', String(dateTo))
-    await this.axios.post(this.URLUpdateEvent, params)
+    const res = await this.axios.post(this.URLUpdateEvent, params)
+    if (res.status !== 200) return e.revert()
+    if (res.data.success === false) return e.revert()
   }
 
   private async updateNoteDates (e: any): Promise<void> {
@@ -268,8 +271,9 @@ export default class App extends Vue {
     params.append('start', String(dateFrom))
     params.append('end', String(dateTo))
 
-    await this.axios.post(this.URLUpdateNote, params)
-
+    const res = await this.axios.post(this.URLUpdateNote, params)
+    if (res.status !== 200) return e.revert()
+    if (res.data.success === false) return e.revert()
     this.allNotes = this.allNotes.map(note => {
       if (note.id === e.event.id) {
         return {
@@ -298,6 +302,7 @@ export default class App extends Vue {
   }
 
   private getCSRFToken (): string {
+    // TODO: check if this functions can be stored externally
     const token: METAElement | null = document.querySelector('meta[name=csrf-token]')
     if (token) {
       return token.content
@@ -316,9 +321,29 @@ export default class App extends Vue {
     }
   }
 
+  private handleAxiosError (): void {
+    this.$swal({
+      icon: 'error',
+      title: 'Ups...',
+      text: 'coś poszło nie tak!'
+    })
+  }
+
+  private setAxiosErrorHandler (): void {
+    this.axios.interceptors.response.use(res => {
+      // is ok
+      return res
+    }, () => {
+      // error
+      this.handleAxiosError()
+      return {}
+    })
+  }
+
   created () {
     this.configSmallDevice()
     this.setAxiosCSRFTokenIfProduction()
+    this.setAxiosErrorHandler()
   }
 }
 </script>

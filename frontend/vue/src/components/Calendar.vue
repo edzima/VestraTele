@@ -259,7 +259,9 @@ export default class Calendar extends Vue {
   }
 
   private handleChangeDates (e: any): void {
-    if (!this.allowUpdate) return // cancel if no permissions
+    if (!this.allowUpdate) return e.revert() // cancel if no permissions
+    if (e.event.allDay !== e.oldEvent.allDay) return e.revert() // cancel if note is dragged to event and vice-versa
+    console.log(e)
     this.$emit('eventEdit', e)
   }
 

@@ -22,6 +22,7 @@
     "vue-axios": "^2.1.5",
     "vue-class-component": "^7.2.2",
     "vue-property-decorator": "^8.4.0",
+    "vue-sweetalert2": "^3.0.3",
     "vue-tippy": "^4.4.0"
   },
   "devDependencies": {
