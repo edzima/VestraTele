@@ -33,74 +33,74 @@
 </template>
 
 <script lang="ts">
-import { Vue, Prop, Component } from 'vue-property-decorator'
-import { isSameDate } from '@/helpers/dateHelper'
-import { CalendarNote } from '@/types/CalendarNote.ts'
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import { isSameDate } from '@/helpers/dateHelper';
+import { CalendarNote } from '@/types/CalendarNote.ts';
 
-@Component({})
+  @Component({})
 export default class NewNotePopup extends Vue {
-  @Prop({
-    required: false
-  })
-  private date!: Date;
+    @Prop({
+      required: false
+    })
+    private date!: Date;
 
-  @Prop({
-    required: true
-  })
-  private allNotes!: CalendarNote[];
+    @Prop({
+      required: true
+    })
+    private allNotes!: CalendarNote[];
 
-  private newNoteText = '';
-  private editNoteText = '';
-  private oldNoteText = '';
-  private noteAllowEditId = 0;
+    private newNoteText = '';
+    private editNoteText = '';
+    private oldNoteText = '';
+    private noteAllowEditId = 0;
 
-  private handleClose () {
-    this.$emit('close')
-  }
-
-  private deleteNote (noteID: number) {
-    this.$emit('deleteNote', noteID)
-  }
-
-  private addNote () {
-    const noteWithoutSpaces = this.newNoteText
-      .split('')
-      .filter(char => char !== ' ')
-    if (!noteWithoutSpaces.length) return
-    this.$emit('addNote', this.newNoteText.trim(), this.date)
-    this.newNoteText = ''
-  }
-
-  private editText (e) {
-    this.editNoteText = e.target.value
-  }
-
-  private allowEdit (noteId: number): void {
-    this.noteAllowEditId = noteId
-  }
-
-  private isEditable (noteId: number): boolean {
-    return this.noteAllowEditId === noteId
-  }
-
-  private discardNoteChanges () {
-    this.editNoteText = this.oldNoteText
-    this.noteAllowEditId = 0
-  }
-
-  private saveEditNoteText (noteID: number): void {
-    const text = this.editNoteText.trim()
-    const oldText = this.oldNoteText
-    if (text === oldText) {
-      return this.discardNoteChanges()
+    get dayNotes () {
+      return this.allNotes.filter(note => isSameDate(new Date(note.start), this.date));
     }
-    this.noteAllowEditId = 0
-    this.$emit('editNoteText', noteID, text)
-  }
 
-  get dayNotes () {
-    return this.allNotes.filter(note => isSameDate(new Date(note.start), this.date))
-  }
+    private handleClose () {
+      this.$emit('close');
+    }
+
+    private deleteNote (noteID: number) {
+      this.$emit('deleteNote', noteID);
+    }
+
+    private addNote () {
+      const noteWithoutSpaces = this.newNoteText
+        .split('')
+        .filter(char => char !== ' ');
+      if (!noteWithoutSpaces.length) return;
+      this.$emit('addNote', this.newNoteText.trim(), this.date);
+      this.newNoteText = '';
+    }
+
+    private editText (e) {
+      this.editNoteText = e.target.value;
+    }
+
+    private allowEdit (noteId: number): void {
+      this.noteAllowEditId = noteId;
+    }
+
+    private isEditable (noteId: number): boolean {
+      return this.noteAllowEditId === noteId;
+    }
+
+    private discardNoteChanges () {
+      this.editNoteText = this.oldNoteText;
+      this.noteAllowEditId = 0;
+    }
+
+    private saveEditNoteText (noteID: number): void {
+      const text = this.editNoteText.trim();
+      const oldText = this.oldNoteText;
+      if (text === oldText) {
+        return this.discardNoteChanges();
+      }
+      this.noteAllowEditId = 0;
+      this.$emit('editNoteText', noteID, text);
+    }
 }
 </script>
 

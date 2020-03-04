@@ -47,83 +47,84 @@
 </template>
 
 <script lang="ts">
-import { Vue, Prop, Component, Watch } from 'vue-property-decorator'
-import { prettifyHourRange } from '@/helpers/dateHelper.ts'
-@Component({})
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { prettifyHourRange } from '@/helpers/dateHelper.ts';
+
+  @Component({})
 export default class ToolTip extends Vue {
-  @Prop({
-    required: true
-  })
-  private isVisible!: boolean
+    @Prop({
+      required: true
+    })
+    private isVisible!: boolean;
 
-  @Prop({
-    required: true
-  })
-  private calendarEvent!: any
+    @Prop({
+      required: true
+    })
+    private calendarEvent!: any;
 
-  @Prop({
-    required: true
-  })
-  private activeView!: string
+    @Prop({
+      required: true
+    })
+    private activeView!: string;
 
-  @Prop({
-    required: true
-  })
-  private element!: any
+    @Prop({
+      required: true
+    })
+    private element!: any;
 
-  @Prop({})
-  private isAllContentVisible!: boolean
+    @Prop({})
+    private isAllContentVisible!: boolean;
 
-  private coords: any = { x: 0, y: 0 }
+    private coords: any = { x: 0, y: 0 };
 
-  private offset = {
-    y: 0,
-    x: 10 // offset in pixels
-  }
+    private offset = {
+      y: 0,
+      x: 10 // offset in pixels
+    };
 
-  @Watch('isVisible')
-  onPropertyChanged (value: boolean) {
-    // cancel if mouseOut
-    if (!value) return
-    if (this.isAllContentVisible) {
-      this.coords = {
-        x: 0,
-        y: screen.height / 4
-      }
-      return
+    get eventDateRange () {
+      return prettifyHourRange(this.calendarEvent.start, this.calendarEvent.end);
     }
 
-    // get the position of the hover element
-    const boundBox = this.element.getBoundingClientRect()
-    const coordX = boundBox.left
-    const coordY = boundBox.top
-
-    if (this.activeView === 'dayGridDay') {
-      this.coords = {
-        x: coordX + screen.width / 2.2,
-        y: coordY + this.offset.y - 80
+    @Watch('isVisible')
+    onPropertyChanged (value: boolean) {
+      // cancel if mouseOut
+      if (!value) return;
+      if (this.isAllContentVisible) {
+        this.coords = {
+          x: 0,
+          y: screen.height / 4
+        };
+        return;
       }
-      return
+
+      // get the position of the hover element
+      const boundBox = this.element.getBoundingClientRect();
+      const coordX = boundBox.left;
+      const coordY = boundBox.top;
+
+      if (this.activeView === 'dayGridDay') {
+        this.coords = {
+          x: coordX + screen.width / 2.2,
+          y: coordY + this.offset.y - 80
+        };
+        return;
+      }
+
+      // detemine the half of screed
+      const isLeftSide = coordX > screen.width / 2;
+      if (isLeftSide) {
+        this.coords = {
+          x: coordX - this.offset.x - 225,
+          y: coordY + this.offset.y
+        };
+      } else {
+        this.coords = {
+          x: coordX + this.offset.x + this.element.offsetWidth,
+          y: coordY + this.offset.y
+        };
+      }
     }
-
-    // detemine the half of screed
-    const isLeftSide = coordX > screen.width / 2
-    if (isLeftSide) {
-      this.coords = {
-        x: coordX - this.offset.x - 225,
-        y: coordY + this.offset.y
-      }
-    } else {
-      this.coords = {
-        x: coordX + this.offset.x + this.element.offsetWidth,
-        y: coordY + this.offset.y
-      }
-    }
-  }
-
-  get eventDateRange () {
-    return prettifyHourRange(this.calendarEvent.start, this.calendarEvent.end)
-  }
 }
 </script>
 

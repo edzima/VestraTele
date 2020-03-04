@@ -47,57 +47,58 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import listWeekPlugin from '@fullcalendar/list'
-import plLang from '@fullcalendar/core/locales/pl'
-import interactionPlugin from '@fullcalendar/interaction'
-import timeGridPlugin from '@fullcalendar/timegrid'
-import { isSameMonth } from '@/helpers/dateHelper.ts'
-import NotesPopup from './NotesPopup.vue'
-import ToolTip from './ToolTip.vue'
-import { MeetingType } from '@/types/MeetingType.ts'
-import { CalendarEvent } from '@/types/CalendarEvent.ts'
-import { CalendarNote } from '@/types/CalendarNote.ts'
-const FullCalendar = require('@fullcalendar/vue').default
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import listWeekPlugin from '@fullcalendar/list';
+import plLang from '@fullcalendar/core/locales/pl';
+import interactionPlugin from '@fullcalendar/interaction';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import { isSameMonth } from '@/helpers/dateHelper.ts';
+import NotesPopup from './NotesPopup.vue';
+import ToolTip from './ToolTip.vue';
+import { MeetingType } from '@/types/MeetingType.ts';
+import { CalendarEvent } from '@/types/CalendarEvent.ts';
+import { CalendarNote } from '@/types/CalendarNote.ts';
 
-type toolTipType ={
-  isVisible: boolean;
-  calendarEvent: any; // wybacz szefie dodam tutaj typy z fullcalendara obiecuje
-  element: any;
-  activeView: any;
-}
-type eventClickType ={
-  eventClicked: any;
-  timeoutId: number;
-}
-type dateClickType ={
-  date: Date;
-  timeoutId: number;
-}
+const FullCalendar = require('@fullcalendar/vue').default;
 
-@Component({
-  components: {
-    FullCalendar,
-    NotesPopup,
-    ToolTip
+  type toolTipType = {
+    isVisible: boolean;
+    calendarEvent: any; // wybacz szefie dodam tutaj typy z fullcalendara obiecuje
+    element: any;
+    activeView: any;
   }
-})
+  type eventClickType = {
+    eventClicked: any;
+    timeoutId: number;
+  }
+  type dateClickType = {
+    date: Date;
+    timeoutId: number;
+  }
+
+  @Component({
+    components: {
+      FullCalendar,
+      NotesPopup,
+      ToolTip
+    }
+  })
 export default class Calendar extends Vue {
-  @Prop({
-    required: true
-  })
-  private allowUpdate!: boolean; // allow user to edit events
+    @Prop({
+      required: true
+    })
+    private allowUpdate!: boolean; // allow user to edit events
 
-  @Prop({
-    default: () => false
-  })
-  private isTitlesHidden!: boolean
+    @Prop({
+      default: () => false
+    })
+    private isTitlesHidden!: boolean;
 
-  @Prop({
-    required: true
-  })
-  private eventTypes!: MeetingType[];
+    @Prop({
+      required: true
+    })
+    private eventTypes!: MeetingType[];
 
   @Prop({ required: true })
   private allEvents!: CalendarEvent[];
@@ -138,176 +139,176 @@ export default class Calendar extends Vue {
     height: 'auto'
   };
 
+  get visibleEvents (): Array<any> {
+    return [...this.filterEvents(), ...this.allNotes];
+  }
+
   private deleteNote (noteID: number): void {
     // handle delete
-    this.$emit('deleteNote', noteID)
+    this.$emit('deleteNote', noteID);
   }
 
-  private editNoteText (noteID: number, text: string): void {
-    this.$emit('editNoteText', noteID, text)
-  }
-
-  private eventClick: eventClickType = {
-    eventClicked: null,
-    timeoutId: 0
-  };
+    private eventClick: eventClickType = {
+      eventClicked: null,
+      timeoutId: 0
+    };
 
   private dateClick: dateClickType = {
     date: new Date(),
     timeoutId: 0
   };
 
-  private noteOpenedDate: any = null;
+    private noteOpenedDate: any = null;
 
-  private toolTip: toolTipType = {
-    isVisible: false,
-    element: null,
-    calendarEvent: null,
-    activeView: null
-  };
+    private toolTip: toolTipType = {
+      isVisible: false,
+      element: null,
+      calendarEvent: null,
+      activeView: null
+    };
 
-  private closePopup (): void {
-    this.noteOpenedDate = null
-  }
-
-  private filterEvents (): CalendarEvent[] {
-    return this.allEvents.filter(event =>
-      this.activeTypes.includes(event.typeId)
-    )
-  }
-
-  get visibleEvents (): Array<any> {
-    return [...this.filterEvents(), ...this.allNotes]
-  }
-
-  private openTooltip (info: any): void {
-    if (info.event.allDay) return // dont show for notes
-    this.toolTip = {
-      isVisible: true,
-      calendarEvent: info.event,
-      element: info.el,
-      activeView: info.view.type
+    private editNoteText (noteID: number, text: string): void {
+      this.$emit('editNoteText', noteID, text);
     }
-  }
 
-  private closeTooltip (): void {
-    this.toolTip.isVisible = false
-  }
+    private closePopup (): void {
+      this.noteOpenedDate = null;
+    }
 
-  private openNotes (e: any): void {
-    this.noteOpenedDate = e.date ? e.date : e.start
-  }
+    private filterEvents (): CalendarEvent[] {
+      return this.allEvents.filter(event =>
+        this.activeTypes.includes(event.typeId)
+      );
+    }
 
-  private handleDateClick (e): void {
+    private openTooltip (info: any): void {
+      if (info.event.allDay) return; // dont show for notes
+      this.toolTip = {
+        isVisible: true,
+        calendarEvent: info.event,
+        element: info.el,
+        activeView: info.view.type
+      };
+    }
+
+    private closeTooltip (): void {
+      this.toolTip.isVisible = false;
+    }
+
+    private openNotes (e: any): void {
+      this.noteOpenedDate = e.date ? e.date : e.start;
+    }
+
+    private handleDateClick (e): void {
     // if its a month view allow only to add events, not notes
-    if (e.view && e.view.type !== 'dayGridMonth') {
-      if (e.allDay) {
-        return this.openNotes(e)
+      if (e.view && e.view.type !== 'dayGridMonth') {
+        if (e.allDay) {
+          return this.openNotes(e);
+        }
+      }
+      if (!this.dateClick.timeoutId) {
+        this.dateClick.timeoutId = setTimeout(() => {
+        // simple click
+          clearTimeout(this.dateClick.timeoutId);
+          this.dateClick.timeoutId = 0;
+          this.dateClick.date = e.date;
+        }, 200); // tolerance in ms
+      } else {
+      // double click
+        clearTimeout(this.dateClick.timeoutId);
+        this.dateClick.timeoutId = 0;
+        this.dateClick.date = e.date;
+        this.$emit('dateClick', this.dateClick.date);
       }
     }
-    if (!this.dateClick.timeoutId) {
-      this.dateClick.timeoutId = setTimeout(() => {
+
+    private addNote (noteText: string, day: Date): void {
+      this.$emit('addNote', noteText, day);
+    }
+
+    private editEventHtml (info: any): void {
+      const id = info.event.extendedProps.typeId;
+      info.el.classList.add('calendarEvent');
+      if (this.isTitlesHidden) {
+        info.el.classList.add('hideTitle');
+      }
+
+      if (info.event.allDay) {
+        info.el.classList.add('note');
+        return;
+      } // its a note
+      if (!id) return; // its a note beeing dragged
+      const meetType = this.getType(id);
+
+      if (meetType) {
+        info.el.classList.add(meetType.className);
+      }
+
+      // add row for client name
+      const newElem = document.createElement('p');
+      newElem.innerHTML = info.event.extendedProps.client;
+      newElem.className = 'fc-client';
+      info.el.children[0].appendChild(newElem);
+    }
+
+    private getType (id: number): MeetingType {
+      const model = this.eventTypes.find(elem => elem.id === id);
+      if (!model) {
+        throw Error('type error');
+      }
+      return model;
+    }
+
+    private handleChangeDates (e: any): void {
+      if (!this.allowUpdate) return e.revert(); // cancel if no permissions
+      if (e.oldEvent) { // cancel if note is dragged to event and vice-versa
+        if (e.event.allDay !== e.oldEvent.allDay) return e.revert();
+      }
+      this.$emit('eventEdit', e);
+    }
+
+    private loadEvents (): void {
+      const fullcalendar: any = this.$refs.fullCalendar;
+      const calApi: any = fullcalendar.getApi();
+
+      const startDate: Date = calApi.view.activeStart; // counting from 0 -> january
+      const endDate: Date = calApi.view.activeEnd;
+
+      this.$emit('loadMonth', startDate);
+      if (!isSameMonth(startDate, endDate)) {
+        this.$emit('loadMonth', endDate);
+      }
+    }
+
+    private inspectEvent (event: any): void {
+      if (event.event.allDay) {
+        this.openNotes(event.event);
+      }
+      if (!this.eventClick.timeoutId) {
+        this.eventClick.timeoutId = setTimeout(() => {
         // simple click
-        clearTimeout(this.dateClick.timeoutId)
-        this.dateClick.timeoutId = 0
-        this.dateClick.date = e.date
-      }, 200) // tolerance in ms
-    } else {
-      // double click
-      clearTimeout(this.dateClick.timeoutId)
-      this.dateClick.timeoutId = 0
-      this.dateClick.date = e.date
-      this.$emit('dateClick', this.dateClick.date)
-    }
-  }
-
-  private addNote (noteText: string, day: Date): void {
-    this.$emit('addNote', noteText, day)
-  }
-
-  private editEventHtml (info: any): void {
-    const id = info.event.extendedProps.typeId
-    info.el.classList.add('calendarEvent')
-    if (this.isTitlesHidden) {
-      info.el.classList.add('hideTitle')
-    }
-
-    if (info.event.allDay) {
-      info.el.classList.add('note')
-      return
-    } // its a note
-    if (!id) return // its a note beeing dragged
-    const meetType = this.getType(id)
-
-    if (meetType) {
-      info.el.classList.add(meetType.className)
-    }
-
-    // add row for client name
-    const newElem = document.createElement('p')
-    newElem.innerHTML = info.event.extendedProps.client
-    newElem.className = 'fc-client'
-    info.el.children[0].appendChild(newElem)
-  }
-
-  private getType (id: number): MeetingType {
-    const model = this.eventTypes.find(elem => elem.id === id)
-    if (!model) {
-      throw Error('type error')
-    }
-    return model
-  }
-
-  private handleChangeDates (e: any): void {
-    if (!this.allowUpdate) return e.revert() // cancel if no permissions
-    if (e.oldEvent) { // cancel if note is dragged to event and vice-versa
-      if (e.event.allDay !== e.oldEvent.allDay) return e.revert()
-    }
-    this.$emit('eventEdit', e)
-  }
-
-  private loadEvents (): void {
-    const fullcalendar: any = this.$refs.fullCalendar
-    const calApi: any = fullcalendar.getApi()
-
-    const startDate: Date = calApi.view.activeStart // counting from 0 -> january
-    const endDate: Date = calApi.view.activeEnd
-
-    this.$emit('loadMonth', startDate)
-    if (!isSameMonth(startDate, endDate)) {
-      this.$emit('loadMonth', endDate)
-    }
-  }
-
-  private inspectEvent (event: any): void {
-    if (event.event.allDay) {
-      this.openNotes(event.event)
-    }
-    if (!this.eventClick.timeoutId) {
-      this.eventClick.timeoutId = setTimeout(() => {
-        // simple click
-        clearTimeout(this.eventClick.timeoutId)
-        this.eventClick.timeoutId = 0
-        this.eventClick.eventClicked = event.el
-      }, 200) // tolerance in ms
-    } else {
+          clearTimeout(this.eventClick.timeoutId);
+          this.eventClick.timeoutId = 0;
+          this.eventClick.eventClicked = event.el;
+        }, 200); // tolerance in ms
+      } else {
       // double click
 
-      clearTimeout(this.eventClick.timeoutId)
-      this.eventClick.timeoutId = 0
-      this.eventClick.eventClicked = event.el
-      this.$emit('eventDoubleClick', event.event.id)
+        clearTimeout(this.eventClick.timeoutId);
+        this.eventClick.timeoutId = 0;
+        this.eventClick.eventClicked = event.el;
+        this.$emit('eventDoubleClick', event.event.id);
+      }
     }
-  }
 
-  // private disableToolTipOnScroll () {
-  //   const calendar = document.getElementsByClassName('fc-time-grid-container')[0]
-  //   calendar.addEventListener('scroll', this.closeTooltip)
-  // }
+    // private disableToolTipOnScroll () {
+    //   const calendar = document.getElementsByClassName('fc-time-grid-container')[0]
+    //   calendar.addEventListener('scroll', this.closeTooltip)
+    // }
 
-  mounted () {
+    mounted () {
     // this.disableToolTipOnScroll()
-  }
+    }
 }
 </script>
 
