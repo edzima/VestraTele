@@ -115,7 +115,6 @@ export default class App extends Vue {
 
     created () {
       this.configSmallDevice();
-      this.setAxiosCSRFTokenIfProduction();
       this.setAxiosErrorHandler();
     }
 

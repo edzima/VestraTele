@@ -1,4 +1,4 @@
-interface METAElement extends SVGElement {
+interface METAElement extends HTMLElement {
   content: string;
 }
 
