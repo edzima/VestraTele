@@ -36,10 +36,6 @@ import { NoteApiType } from '@/types/NoteApiType.ts';
     year: number;
   };
 
-  interface METAElement extends SVGElement {
-    content: string;
-  }
-
   @Component({
     components: {
       Calendar,
@@ -302,26 +298,6 @@ export default class App extends Vue {
     private configSmallDevice (): void {
       if (window.innerWidth < this.EventTitleMinRes) {
         this.isSmallDevice = true;
-      }
-    }
-
-    private getCSRFToken (): string {
-      // TODO: check if this functions can be stored externally
-      const token: METAElement | null = document.querySelector('meta[name=csrf-token]');
-      if (token) {
-        return token.content;
-      }
-      throw Error('NO CSRF TOKEN SUPPLIED');
-    }
-
-    private setAxiosSCRFToken (): void {
-      this.axios.defaults.headers.common['X-CSRF-TOKEN'] = this.getCSRFToken();
-      console.log(this.axios.defaults);
-    }
-
-    private setAxiosCSRFTokenIfProduction (): void {
-      if (process.env.NODE_ENV === 'production') {
-        this.setAxiosSCRFToken();
       }
     }
 

@@ -1,15 +1,17 @@
-import Vue from 'vue'
-import App from './MeetAgentCalendar.vue'
-import { prettify } from '@/helpers/dateHelper'
-import axios, { AxiosInstance } from 'axios'
-import VueAxios from 'vue-axios'
-import VueSweetalert2 from 'vue-sweetalert2'
-import 'sweetalert2/dist/sweetalert2.min.css'
+import Vue from 'vue';
+import App from './MeetAgentCalendar.vue';
+import { prettify } from '@/helpers/dateHelper';
+import axios, { AxiosInstance } from 'axios';
+import VueAxios from 'vue-axios';
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+import { getCSRFToken } from '@/helpers/CSRFtoken';
 
-Vue.use(VueSweetalert2)
-Vue.filter('prettify', prettify)
-Vue.use(VueAxios, axios)
-Vue.config.productionTip = false
+Vue.use(VueSweetalert2);
+Vue.filter('prettify', prettify);
+Vue.use(VueAxios, axios);
+Vue.axios.defaults.headers.common['X-CSRF-TOKEN'] = getCSRFToken();
+Vue.config.productionTip = false;
 declare module 'vue/types/vue' {
   interface Vue {
     $axios: AxiosInstance;
@@ -18,4 +20,4 @@ declare module 'vue/types/vue' {
 
 new Vue({
   render: h => h(App)
-}).$mount('#app')
+}).$mount('#app');
