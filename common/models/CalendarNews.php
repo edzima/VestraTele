@@ -2,7 +2,7 @@
 
 namespace common\models;
 
-use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "calendar_news".
@@ -13,40 +13,37 @@ use Yii;
  * @property string $start
  * @property string $end
  */
-class CalendarNews extends \yii\db\ActiveRecord
-{
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return 'calendar_news';
-    }
+class CalendarNews extends ActiveRecord {
 
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            [['news', 'agent_id'], 'required'],
-            [['news'], 'string'],
-            [['agent_id'], 'integer'],
-            [['start', 'end'], 'safe'],
-        ];
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public static function tableName() {
+		return 'calendar_news';
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'news' => 'News',
-            'agent_id' => 'Agent ID',
-            'start' => 'Start',
-            'end' => 'End'
-        ];
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function rules() {
+		return [
+			[['news', 'agent_id'], 'required'],
+			[['news'], 'string'],
+			[['agent_id'], 'integer'],
+			[['start', 'end'], 'safe'],
+		];
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function attributeLabels() {
+		return [
+			'id' => 'ID',
+			'news' => 'News',
+			'agent_id' => 'Agent ID',
+			'start' => 'Start',
+			'end' => 'End',
+		];
+	}
 }

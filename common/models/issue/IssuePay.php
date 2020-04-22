@@ -18,6 +18,7 @@ use common\models\provision\Provision;
  * @property int $type
  * @property int $transfer_type
  * @property string $vat
+ * @property int $status
  *
  * @property-read float $valueNetto
  *
@@ -32,6 +33,11 @@ class IssuePay extends ActiveRecord {
 
 	public const TRANSFER_TYPE_DIRECT = 1;
 	public const TRANSFER_TYPE_BANK = 2;
+
+	public const STATUS_NO_PROBLEM = 0;
+	public const STATUS_PROBLEM = 10;
+	public const STATUS_PRE_JUDGMENT = 20;
+	public const STATUS_JUDGMENT = 30;
 
 	/**
 	 * @inheritdoc
@@ -48,9 +54,10 @@ class IssuePay extends ActiveRecord {
 			[['issue_id', 'type', 'value', 'deadline_at', 'transfer_type', 'vat'], 'required', 'enableClientValidation' => false],
 			[['issue_id', 'type', 'transfer_type'], 'integer'],
 			[['pay_at', 'deadline_at'], 'safe'],
-			[['value', 'vat'], 'number'],
+			[['value', 'vat'], 'number', 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
 			['vat', 'number', 'min' => 0, 'max' => 100],
 			[['type'], 'in', 'range' => array_keys(static::getTypesNames())],
+			[['status'], 'in', 'range' => array_keys(static::getStatusNames())],
 			[['transfer_type'], 'in', 'range' => array_keys(static::getTransferTypesNames())],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 		];
@@ -145,6 +152,10 @@ class IssuePay extends ActiveRecord {
 		return static::getTypesNames()[$this->type];
 	}
 
+	public function getStatusName(): string {
+		return static::getStatusNames()[$this->status];
+	}
+
 	public function getTransferTypeName(): string {
 		return static::getTransferTypesNames()[$this->transfer_type];
 	}
@@ -160,6 +171,15 @@ class IssuePay extends ActiveRecord {
 		return [
 			static::TRANSFER_TYPE_BANK => 'Przelew',
 			static::TRANSFER_TYPE_DIRECT => 'Gotówka',
+		];
+	}
+
+	public static function getStatusNames(): array {
+		return [
+			static::STATUS_NO_PROBLEM => 'Brak',
+			static::STATUS_PROBLEM => 'Problem',
+			static::STATUS_PRE_JUDGMENT => 'Przygotowanie do sądu',
+			static::STATUS_JUDGMENT => 'Sąd',
 		];
 	}
 

@@ -55,10 +55,15 @@ class PayCalculationForm extends Model {
 				return $this->payParts > 0;
 			},
 			],
+			['value', 'number', 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/', 'enableClientValidation' => false],
 			['payParts', 'integer', 'min' => 0, 'max' => 10],
 			['firstBillDate', 'date', 'format' => DATE_ATOM],
 			['payAt', 'date', 'format' => DATE_ATOM],
 		];
+	}
+
+	public function setValue($value): void {
+		$this->value = str_replace(',', '.', $value);
 	}
 
 	public function validateValue($attribute, $params, $validator): void {

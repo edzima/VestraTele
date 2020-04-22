@@ -17,10 +17,4 @@ class AgentMeetSearch extends IssueMeetSearch {
 		];
 	}
 
-	public function search($params) {
-		$dataProvider = parent::search($params);
-		$query = $dataProvider->query;
-		$query->andFilterWhere(['not in', 'status', static::STATUS_NEW, static::STATUS_RENEW_CONTACT]);
-		return $dataProvider;
-	}
 }

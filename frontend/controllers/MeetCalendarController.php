@@ -25,21 +25,29 @@ class MeetCalendarController extends Controller {
 	}
 
 	public function runAction($id, $params = []) {
-		$params = array_merge($_POST, $params);
-		parent::runAction($id, $params);
+		if ($id !== 'index') {
+			$params = array_merge($_POST, $params);
+		}
+		return parent::runAction($id, $params);
 	}
 
-	public function actionCalendar() {
-		/** @var User $user */
-		$user = Yii::$app->user->getIdentity();
-		$ids = array_merge([$user->id], $user->getAllChildesIds());
+	public function actionIndex(int $agentId = null) {
+		if ($agentId === null) {
+			$agentId = Yii::$app->user->getId();
+		}
 
-		$agents = ArrayHelper::map(User::find()
-			->andWhere(['id' => $ids])
+		$agents = User::find()
 			->with('userProfile')
-			->all(), 'id', 'fullName');
+			->leftJoin('issue_meet', 'user.id = issue_meet.agent_id')
+			->where('issue_meet.agent_id IS NOT NULL')
+			->all();
 
-		return $this->render('calendar', ['agents' => $agents]);
+		$agents = ArrayHelper::map($agents, 'id', 'fullName');
+
+		return $this->render('index', [
+			'agents' => $agents,
+			'agentId' => $agentId,
+		]);
 	}
 
 	public function actionList(string $dateFrom = null, string $dateTo = null, int $agentId = null): Response {
@@ -47,15 +55,15 @@ class MeetCalendarController extends Controller {
 			$agentId = Yii::$app->user->getId();
 		}
 		if ($dateFrom === null) {
-			$dateFrom = date('Y-m-01');
+			$dateFrom = date('Y - m - 01');
 		}
 		if ($dateTo === null) {
-			$dateTo = date('Y-m-t 23:59:59');
+			$dateTo = date('Y - m - t 23:59:59');
 		}
 		$models = IssueMeet::find()
 			->andWhere(['agent_id' => $agentId])
-			->andWhere(['>=', 'date_at', $dateFrom])
-			->andWhere(['<=', 'date_at', $dateTo])
+			->andWhere([' >= ', 'date_at', $dateFrom])
+			->andWhere([' <= ', 'date_at', $dateTo])
 			->with('city')
 			->all();
 

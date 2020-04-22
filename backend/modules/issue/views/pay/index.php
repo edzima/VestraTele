@@ -2,6 +2,7 @@
 
 use backend\helpers\Url;
 use backend\modules\issue\models\searches\IssuePaySearch;
+use backend\widgets\CsvForm;
 use common\models\issue\IssuePay;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
@@ -26,11 +27,11 @@ $this->params['breadcrumbs'][] = $this->title;
 	<p>
 		<?php
 		$statusItems = [];
-		foreach (IssuePaySearch::getStatusNames() as $status => $name) {
+		foreach (IssuePaySearch::getPayStatusNames() as $status => $name) {
 			$statusItems[] = [
 				'label' => $name,
 				'url' => ['index', 'status' => $status],
-				'active' => $searchModel->getStatus() === $status,
+				'active' => $searchModel->getPayStatus() === $status,
 			];
 		}
 		?>
@@ -43,15 +44,17 @@ $this->params['breadcrumbs'][] = $this->title;
 	</p>
 
 
-	<?= $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]) ?>
+	<?= CsvForm::widget() ?>
+
 
 	<?php if ($dataProvider->totalCount > 0): ?>
 		<div class="pay-summary-wrap">
 			<h4>Podsumowanie płatności</h4>
 			<ul>
-				<li>Należna: <?= $searchModel->getValueSum($dataProvider->query) ?></li>
-				<li>Zapłacono: <?= $searchModel->getPayedSum($dataProvider->query) ?></li>
-				<li>Niezaplacono: <?= $searchModel->getNotPaySum($dataProvider->query) ?></li>
+				<li>Należna: <?= Yii::$app->formatter->asCurrency($searchModel->getValueSum($dataProvider->query)) ?></li>
+				<li>Zapłacono: <?= Yii::$app->formatter->asCurrency($searchModel->getPayedSum($dataProvider->query)) ?></li>
+				<li>Niezaplacono: <?= Yii::$app->formatter->asCurrency($searchModel->getNotPaySum($dataProvider->query)) ?></li>
 			</ul>
 		</div>
 	<?php endif; ?>
@@ -68,7 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			['class' => SerialColumn::class],
 			[
 				'class' => ActionColumn::class,
-				'template' => '{pay}',
+				'template' => '{pay}{status}',
 				'buttons' => [
 					'pay' => static function ($url, IssuePay $model): string {
 
@@ -81,11 +84,20 @@ $this->params['breadcrumbs'][] = $this->title;
 								'target' => '_blank',
 							]);
 					},
+					'status' => static function ($url, IssuePay $model): string {
+						return Html::a(
+							'<span class="glyphicon glyphicon-flag" aria-hidden="true"></span>',
+							Url::toRoute(['status', 'id' => $model->id]),
+							[
+								'title' => 'Status',
+								'aria-label' => 'Status',
+								'target' => '_blank',
+							]);
+					},
 				],
 			],
 			[
 				'class' => DataColumn::class,
-
 				'attribute' => 'issue_id',
 				'format' => 'raw',
 				'value' => function (IssuePay $model) {
@@ -98,6 +110,15 @@ $this->params['breadcrumbs'][] = $this->title;
 					'class' => 'dynamic-search',
 				],
 				'width' => '50px',
+
+			],
+			[
+				'class' => DataColumn::class,
+				'attribute' => 'status',
+				'value' => 'statusName',
+				'filter' => IssuePay::getStatusNames(),
+				'visible' => !$searchModel->isActive(),
+				'width' => '100px',
 
 			],
 			[

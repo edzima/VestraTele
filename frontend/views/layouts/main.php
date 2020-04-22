@@ -58,12 +58,12 @@ AppAsset::register($this);
 					'label' => 'Spotkania',
 					'url' => ['/meet/agent'],
 				],
-				/*
+
 				[
 					'label' => Yii::t('frontend', 'Your calendar'),
-					'url' => ['/calendar/agent?id=' . Yii::$app->user->identity->id],
+					'url' => ['/meet-calendar/index'],
 				],
-				*/
+
 			];
 		}
 	}

@@ -17,9 +17,15 @@ use yii\filters\VerbFilter;
 use common\models\TaskEvent;
 use common\models\NewsEvent;
 
+/**
+ * Class CalendarController
+ *
+ * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
+ * @todo to remove after move to new meet calendar.
+ */
 class CalendarController extends Controller {
 
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'access' => [
 				'class' => AccessControl::className(),
@@ -41,7 +47,8 @@ class CalendarController extends Controller {
 
 	public function actionAgent(int $id) {
 
-		if (Yii::$app->user->getId() !== $id && !Yii::$app->user->can(User::ROLE_AGENT)) {
+		if (Yii::$app->user->getId() !== $id
+			&& !Yii::$app->user->can(User::ROLE_AGENT)) {
 			throw new NotFoundHttpException('Brak uprawnień ;)');
 		}
 

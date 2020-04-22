@@ -158,7 +158,7 @@ if (YII_DEBUG) {
 	$config['bootstrap'][] = 'debug';
 	$config['modules']['debug'] = [
 		'class' => 'yii\debug\Module',
-		'allowedIPs' => ['*'],
+		'allowedIPs' => ['188.147.96.251'],
 		'as access' => [
 			'class' => 'common\behaviors\GlobalAccessBehavior',
 			'rules' => [
@@ -171,7 +171,7 @@ if (YII_DEBUG) {
 	$config['bootstrap'][] = 'gii';
 	$config['modules']['gii'] = [
 		'class' => 'yii\gii\Module',
-		'allowedIPs' => ['127.0.0.1', '::1', '192.168.*.*', '*'],
+		'allowedIPs' => ['127.0.0.1', '::1', '192.168.*.*', '188.147.96.251'],
 		'as access' => [
 			'class' => 'common\behaviors\GlobalAccessBehavior',
 			'rules' => [

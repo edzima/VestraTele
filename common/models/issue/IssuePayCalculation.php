@@ -63,7 +63,7 @@ class IssuePayCalculation extends ActiveRecord {
 			[['created_at', 'updated_at'], 'safe'],
 			[['issue_id', 'status', 'value', 'pay_type'], 'required'],
 			[['issue_id', 'status', 'pay_type'], 'integer'],
-			[['value'], 'number', 'min' => 1],
+			['value', 'number', 'min' => 1, 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
 			[['details'], 'string'],
 			[['issue_id'], 'unique'],
 			[['pay_type'], 'in', 'range' => array_keys(static::getPayTypesNames())],

@@ -33,7 +33,7 @@ $config = [
 			'csrfParam' => '_csrf-frontend',
 			'baseUrl' => '',
 			//@todo created csrf validation in Vue
-			'enableCsrfValidation' => false,
+			//'enableCsrfValidation' => false,
 		],
 		'user' => [
 			'identityClass' => 'common\models\User',

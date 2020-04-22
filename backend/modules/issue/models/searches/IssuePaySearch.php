@@ -21,12 +21,12 @@ class IssuePaySearch extends IssuePay {
 
 	protected const TABLE_ALIAS = 'basePay';
 
-	public const STATUS_ALL = 0;
-	public const STATUS_ACTIVE = 10;
-	public const STATUS_DELAYED = 20;
-	public const STATUS_PAYED = 30;
+	public const PAY_STATUS_ALL = 0;
+	public const PAY_STATUS_ACTIVE = 10;
+	public const PAY_STATUS_DELAYED = 20;
+	public const PAY_STATUS_PAYED = 30;
 
-	private $status;
+	private $payStatus;
 
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
@@ -42,38 +42,38 @@ class IssuePaySearch extends IssuePay {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'issue_id', 'payCityState'], 'integer'],
+			[['id', 'issue_id', 'payCityState', 'status'], 'integer'],
 			[['deadlineAtFrom', 'deadlineAtTo', 'clientSurname'], 'safe'],
 			[['value'], 'number'],
 		];
 	}
 
-	public function setStatus(int $status): void {
-		$this->status = $status;
+	public function setPayStatus(int $payStatus): void {
+		$this->payStatus = $payStatus;
 	}
 
-	public function getStatus(): int {
-		return $this->status;
+	public function getPayStatus(): int {
+		return $this->payStatus;
 	}
 
 	public function isActive(): bool {
-		return $this->status === static::STATUS_ACTIVE;
+		return $this->payStatus === static::PAY_STATUS_ACTIVE;
 	}
 
 	public function isDelayed(): bool {
-		return $this->status === static::STATUS_DELAYED;
+		return $this->payStatus === static::PAY_STATUS_DELAYED;
 	}
 
 	public function isPayed(): bool {
-		return $this->status === static::STATUS_PAYED;
+		return $this->payStatus === static::PAY_STATUS_PAYED;
 	}
 
-	public static function getStatusNames(): array {
+	public static function getPayStatusNames(): array {
 		return [
-			static::STATUS_ACTIVE => 'Bieżące',
-			static::STATUS_DELAYED => 'Przeterminowane',
-			static::STATUS_PAYED => 'Opłacone',
-			static::STATUS_ALL => 'Wszystkie',
+			static::PAY_STATUS_ACTIVE => 'Bieżące',
+			static::PAY_STATUS_DELAYED => 'Przeterminowane',
+			static::PAY_STATUS_PAYED => 'Opłacone',
+			static::PAY_STATUS_ALL => 'Wszystkie',
 		];
 	}
 
@@ -98,7 +98,7 @@ class IssuePaySearch extends IssuePay {
 		$query->joinWith(['issue']);
 
 		// add conditions that should always apply here
-		$this->applyStatusFilter($query);
+		$this->applyPayStatusFilter($query);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -127,6 +127,7 @@ class IssuePaySearch extends IssuePay {
 			'basePay.transfer_type' => $this->transfer_type,
 			'basePay.type' => $this->type,
 			'basePay.value' => $this->value,
+			'status' => $this->status,
 
 		]);
 
@@ -149,19 +150,19 @@ class IssuePaySearch extends IssuePay {
 		return $query->getValueSum();
 	}
 
-	private function applyStatusFilter(IssuePayQuery $query): void {
-		switch ($this->status) {
-			case static::STATUS_ALL:
+	private function applyPayStatusFilter(IssuePayQuery $query): void {
+		switch ($this->payStatus) {
+			case static::PAY_STATUS_ALL:
 				break;
-			case static::STATUS_ACTIVE:
+			case static::PAY_STATUS_ACTIVE:
 				$query->onlyNotPayed();
 				$query->onlyNotDelayed($this->delayRange);
 				break;
-			case static::STATUS_DELAYED:
+			case static::PAY_STATUS_DELAYED:
 				$query->onlyDelayed($this->delayRange);
 				$query->onlyWithoutDeadline();
 				break;
-			case static::STATUS_PAYED:
+			case static::PAY_STATUS_PAYED:
 				$query->onlyPayed();
 				break;
 		}
