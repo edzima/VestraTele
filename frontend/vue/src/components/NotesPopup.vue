@@ -1,16 +1,16 @@
 <template>
-  <div v-if="date" class="popup">
-    <div class="modal">
-      <button class="close" @click="handleClose">X</button>
-      <div class="activeNotes">
-        <h1>{{date | prettify}}</h1>
-        <h3>aktywne notatki:</h3>
-        <div class="notes">
-          <div v-for="note in dayNotes" :key="note.id" class="note">
-            <div v-if="isEditable(note.id)" class="controls">
-              <img src="../assets/discard.png" @click="discardNoteChanges(note.id)" />
-              <img src="../assets/save.png" @click="saveEditNoteText(note.id)" />
-            </div>
+	<div class="note-popup" v-if="date">
+		<div class="note-modal">
+			<button class="close" @click="handleClose">X</button>
+			<div class="activeNotes">
+				<h1>{{date | prettify}}</h1>
+				<h3>aktywne notatki:</h3>
+				<div class="notes">
+					<div v-for="note in dayNotes" :key="note.id" class="note">
+						<div v-if="isEditable(note.id)" class="controls">
+							<img src="../assets/discard.png" @click="discardNoteChanges(note.id)"/>
+							<img src="../assets/save.png" @click="saveEditNoteText(note.id)"/>
+						</div>
             <div v-else class="controls">
               <img src="../assets/edit.png" @click="allowEdit(note.id)" />
               <img src="../assets/delete.png" @click="deleteNote(note.id)" />
@@ -33,19 +33,19 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { isSameDate } from '@/helpers/dateHelper';
-import { CalendarNote } from '@/types/CalendarNote.ts';
+    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {isSameDate} from '@/helpers/dateHelper';
+    import {CalendarNote} from '@/types/CalendarNote.ts';
 
-  @Component({})
-export default class NewNotePopup extends Vue {
-    @Prop({
-      required: false
-    })
-    private date!: Date;
+    @Component({})
+    export default class NewNotePopup extends Vue {
+        @Prop({
+            required: false
+        })
+        private date!: Date;
 
-    @Prop({
-      required: true
+        @Prop({
+            required: true
     })
     private allNotes!: CalendarNote[];
 
@@ -105,26 +105,28 @@ export default class NewNotePopup extends Vue {
 </script>
 
 <style scoped lang='less'>
-.popup {
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  .modal {
-    position: relative;
-    width: 50vw;
-    min-height: 40vh;
-    background-color: white;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-    border-radius: 10px;
-    padding: 20px;
-    border: 4px solid #ffffff59;
-    button.close {
-      position: absolute;
+	.note-popup {
+		position: absolute;
+		width: 100vw;
+		height: 100vh;
+		z-index: 100;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		.note-modal {
+			position: relative;
+			width: 50vw;
+			min-height: 40vh;
+			background-color: white;
+			box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+			border-radius: 10px;
+			padding: 20px;
+			border: 4px solid #ffffff59;
+
+			button.close {
+				position: absolute;
       top: 0;
       right: 0;
       border-radius: 0 10px 0 0;
@@ -214,8 +216,8 @@ export default class NewNotePopup extends Vue {
 }
 
 @media screen and (max-width: 600px) {
-  .modal {
-    width: 90vw !important;
-  }
+	.note-modal {
+		width: 90vw !important;
+	}
 }
 </style>

@@ -47,28 +47,29 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import listWeekPlugin from '@fullcalendar/list';
-import plLang from '@fullcalendar/core/locales/pl';
-import interactionPlugin from '@fullcalendar/interaction';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import { isSameMonth } from '@/helpers/dateHelper.ts';
-import NotesPopup from './NotesPopup.vue';
-import ToolTip from './ToolTip.vue';
-import { MeetingType } from '@/types/MeetingType.ts';
-import { CalendarEvent } from '@/types/CalendarEvent.ts';
-import { CalendarNote } from '@/types/CalendarNote.ts';
+    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import dayGridPlugin from '@fullcalendar/daygrid';
+    import listWeekPlugin from '@fullcalendar/list';
+    import plLang from '@fullcalendar/core/locales/pl';
+    import interactionPlugin from '@fullcalendar/interaction';
+    import timeGridPlugin from '@fullcalendar/timegrid';
+    import {isSameMonth} from '@/helpers/dateHelper.ts';
+    import NotesPopup from './NotesPopup.vue';
+    import ToolTip from './ToolTip.vue';
+    import {MeetingType} from '@/types/MeetingType.ts';
+    import {CalendarEvent} from '@/types/CalendarEvent.ts';
+    import {CalendarNote} from '@/types/CalendarNote.ts';
+    import {arrayRemoveObjectsDuplicates} from "@/helpers/arrayHelper";
 
-const FullCalendar = require('@fullcalendar/vue').default;
+    const FullCalendar = require('@fullcalendar/vue').default;
 
-  type toolTipType = {
-    isVisible: boolean;
-    calendarEvent: any; // wybacz szefie dodam tutaj typy z fullcalendara obiecuje
-    element: any;
-    activeView: any;
-  }
-  type eventClickType = {
+    type toolTipType = {
+        isVisible: boolean;
+        calendarEvent: any; // wybacz szefie dodam tutaj typy z fullcalendara obiecuje
+        element: any;
+        activeView: any;
+    }
+    type eventClickType = {
     eventClicked: any;
     timeoutId: number;
   }
@@ -176,9 +177,10 @@ export default class Calendar extends Vue {
     }
 
     private filterEvents (): CalendarEvent[] {
-      return this.allEvents.filter(event =>
-        this.activeTypes.includes(event.typeId)
-      );
+        const filtered = this.allEvents.filter(event =>
+            this.activeTypes.includes(event.typeId)
+        );
+        return arrayRemoveObjectsDuplicates(filtered, 'id');
     }
 
     private openTooltip (info: any): void {
@@ -244,10 +246,10 @@ export default class Calendar extends Vue {
         info.el.classList.add(meetType.className);
       }
 
-      // add row for client name
+        // add row for adress
       const newElem = document.createElement('p');
-      newElem.innerHTML = info.event.extendedProps.client;
-      newElem.className = 'fc-client';
+        newElem.innerHTML = info.event.extendedProps.city;
+        newElem.className = 'fc-client';
       info.el.children[0].appendChild(newElem);
     }
 

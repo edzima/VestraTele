@@ -14,7 +14,7 @@
 				@deleteNote="deleteNote"
 				@editNoteText="editNoteText"
 				@eventDoubleClick="openEventInspect"
-				@eventEdit="handleChangeDates"
+				@eventEdit="updateDates"
 				@loadMonth="fetchAndCacheMonth"
 		/>
 	</div>
@@ -28,8 +28,6 @@
     import {MeetingType} from '@/types/MeetingType.ts';
     import {CalendarNote} from '@/types/CalendarNote.ts';
     import {CalendarEvent} from '@/types/CalendarEvent.ts';
-    import {EventApiType} from '@/types/EventApiType.ts';
-    import {NoteApiType} from '@/types/NoteApiType.ts';
 
     type MonthCacheInfo = {
         monthID: number;
@@ -112,7 +110,6 @@
             {id: 3, name: 'niepodpisany', className: 'red'},
             {id: 4, name: 'wysłane dokumenty', className: 'yellow'}
         ];
-
         private allEvents: CalendarEvent[] = [];
         private allNotes: CalendarNote[] = [];
         private fetchedMonths: MonthCacheInfo[] = [];
@@ -128,7 +125,6 @@
         }
 
         private async deleteNote(noteID: number): Promise<void> {
-            // AXIOS
             const params: URLSearchParams = new URLSearchParams();
             params.append('id', String(noteID));
             params.append('agent_id', String(this.agentId));
@@ -145,26 +141,35 @@
             }
         }
 
+        private cachingMonth: number | null = null;
+
         private async fetchAndCacheMonth(monthDate: Date): Promise<void> {
-            const monthExsist: boolean = this.fetchedMonths.some(
+            if (this.cachingMonth === monthDate.getMonth() || this.isMonthInCache(monthDate)) return;
+            this.cachingMonth = monthDate.getMonth();
+            await this.fetchMonthEvents(monthDate);
+            await this.fetchMonthNotes(monthDate);
+            this.setMonthCached(monthDate);
+            this.cachingMonth = null;
+        }
+
+        private isMonthInCache(monthDate: Date): boolean {
+            return this.fetchedMonths.some(
                 ftchMonth =>
                     ftchMonth.monthID === monthDate.getMonth() &&
                     ftchMonth.year === monthDate.getFullYear()
             );
-            if (monthExsist) return;
-            const fetchedMonthEvents = await this.fetchMonthEvents(monthDate);
-            const fetchedMonthNotes = await this.fetchMonthNotes(monthDate);
+        }
+
+        private setMonthCached(monthDate: Date) {
             this.fetchedMonths.push({
                 monthID: monthDate.getMonth(),
                 year: monthDate.getFullYear()
             });
-            this.allNotes.push(...fetchedMonthNotes);
-            this.allEvents.push(...fetchedMonthEvents);
         }
 
         private async fetchMonthEvents(
             monthDate: Date
-        ): Promise<Array<CalendarEvent>> {
+        ): Promise<void> {
             const startDate: Date = getFirstOfMonth(monthDate);
             const endDate: Date = getLastOfMonth(monthDate);
             const startDateFormatted: string = dateToW3C(startDate);
@@ -176,8 +181,7 @@
                     dateTo: endDateFormatted
                 }
             });
-            const eventsFromApi: EventApiType[] = res.data.data;
-            return eventsFromApi.map(eventCard => ({
+            const mapped: CalendarEvent[] = res.data.data.map(eventCard => ({
                 id: eventCard.id,
                 title: eventCard.client,
                 start: eventCard.date_at,
@@ -188,9 +192,10 @@
                 client: eventCard.client,
                 typeId: eventCard.typeId
             }));
+            this.allEvents.push(...mapped);
         }
 
-        private async fetchMonthNotes(monthDate: Date): Promise<CalendarNote[]> {
+        private async fetchMonthNotes(monthDate: Date): Promise<void> {
             const startDate: Date = getFirstOfMonth(monthDate);
             const endDate: Date = getLastOfMonth(monthDate);
             const res = await this.axios.get(this.URLGetNotes, {
@@ -200,15 +205,14 @@
                     dateTo: endDate
                 }
             });
-            const notesFromApi: NoteApiType[] = res.data.data;
-
-            return notesFromApi.map(eventCard => ({
+            const notes = res.data.data.map(eventCard => ({
                 id: eventCard.id,
                 title: eventCard.content,
                 start: eventCard.start_at,
                 end: eventCard.end_at,
                 allDay: true
             }));
+            this.allNotes.push(...notes);
         }
 
         private async addNote(noteText: string, day: Date): Promise<void> {
@@ -220,7 +224,6 @@
             params.append('news', noteText);
             const res = await this.axios.post(this.URLNewNote, params);
             if (res.status !== 200) return;
-            if (res.data.id) return;
             this.allNotes.push({
                 title: noteText,
                 id: res.data.id,
@@ -253,31 +256,24 @@
             });
         }
 
-        private async updateEventDates(e: any): Promise<void> {
+        private async updateDates(e: any): Promise<void> {
+            const isNote: boolean = Boolean(e.event.allDay);
             const dateFrom: string = dateToW3C(e.event.start);
             const dateTo: string = dateToW3C(e.event.end);
 
             const params: URLSearchParams = new URLSearchParams();
             params.append('id', String(e.event.id));
-            params.append('date_at', String(dateFrom));
-            params.append('date_end_at', String(dateTo));
-            const res = await this.axios.post(this.URLUpdateEvent, params);
+            params.append(isNote ? 'start' : 'date_at', String(dateFrom));
+            params.append(isNote ? 'end' : 'date_end_at', String(dateTo));
+            const res = await this.axios.post(isNote ? this.URLUpdateNote : this.URLUpdateEvent, params);
             if (res.status !== 200) return e.revert();
             if (res.data.success === false) return e.revert();
+            if (isNote) {
+                this.updateCachedNotes(e);
+            }
         }
 
-        private async updateNoteDates(e: any): Promise<void> {
-            const dateFrom: string = dateToW3C(e.event.start);
-            const dateTo: string = dateToW3C(e.event.end);
-
-            const params: URLSearchParams = new URLSearchParams();
-            params.append('id', String(e.event.id));
-            params.append('start', String(dateFrom));
-            params.append('end', String(dateTo));
-
-            const res = await this.axios.post(this.URLUpdateNote, params);
-            if (res.status !== 200) return e.revert();
-            if (res.data.success === false) return e.revert();
+        private async updateCachedNotes(e: any): Promise<void> {
             this.allNotes = this.allNotes.map(note => {
                 if (note.id === e.event.id) {
                     return {
@@ -288,15 +284,6 @@
                 }
                 return note;
             });
-        }
-
-        private handleChangeDates(e: any): void {
-            const eventCard: any = e.event;
-            if (eventCard.allDay) {
-                this.updateNoteDates(e);
-            } else {
-                this.updateEventDates(e);
-            }
         }
 
         private configSmallDevice(): void {
