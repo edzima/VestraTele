@@ -1,15 +1,15 @@
 <template>
-    <div v-if="isVisible" :style="{top: coords.y+'px',left: coords.x+'px'}" class="tooltip">
-      <div v-if='isAllContentVisible' class="row">
-        <h5>
-          tytuł:
-        </h5>
-        <p>
-          {{calendarEvent.title}}
-        </p>
-      </div>
-      <div v-if='isAllContentVisible' class="row">
-        <h5>
+    <div :style="{top: coords.y+'px',left: coords.x+'px'}" class="calendar-tooltip" v-if="isVisible">
+	    <div v-if='isAllContentVisible' class="row">
+		    <h5>
+			    tytuł:
+		    </h5>
+		    <p>
+			    {{calendarEvent.title}}
+		    </p>
+	    </div>
+	    <div v-if='isAllContentVisible' class="row">
+		    <h5>
           klient:
         </h5>
         <p>
@@ -47,18 +47,18 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { prettifyHourRange } from '@/helpers/dateHelper.ts';
+    import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+    import {prettifyHourRange} from '@/helpers/dateHelper.ts';
 
-  @Component({})
-export default class ToolTip extends Vue {
-    @Prop({
-      required: true
-    })
-    private isVisible!: boolean;
+    @Component({})
+    export default class ToolTip extends Vue {
+        @Prop({
+            required: true
+        })
+        private isVisible!: boolean;
 
-    @Prop({
-      required: true
+        @Prop({
+            required: true
     })
     private calendarEvent!: any;
 
@@ -129,17 +129,17 @@ export default class ToolTip extends Vue {
 </script>
 
 <style lang='less'>
-.tooltip {
-  position: fixed;
-  height:auto;
-  background-color: white;
-  border: #3788D8 solid 2px;
-  z-index: 99;
-  pointer-events: none;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-  border-radius: 10px;
-  width: 180px;
-  padding: 20px;
+	.calendar-tooltip {
+		position: fixed;
+		height: auto;
+		background-color: white;
+		border: #3788D8 solid 2px;
+		z-index: 99;
+		pointer-events: none;
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+		border-radius: 10px;
+		width: 180px;
+		padding: 20px;
   .row{
     margin: 0;
     width: 100%;
