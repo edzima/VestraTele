@@ -109,7 +109,7 @@
             const isRightSide = coordX > window.innerWidth / 2;
             if (isRightSide) {
                 this.coords = {
-                    x: coordX - this.offset.x - 285,
+                    x: coordX - this.offset.x - 300,
                     y: coordY + this.offset.y
                 };
             } else {
@@ -124,6 +124,7 @@
 
 <style lang='less'>
 	.calendar-tooltip {
+		box-sizing: border-box;
 		position: fixed;
 		height: auto;
 		background-color: white;
@@ -132,7 +133,7 @@
 		pointer-events: none;
 		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 		border-radius: 10px;
-		width: 240px;
+		width: 300px;
 		padding: 20px;
 
 		.row {
