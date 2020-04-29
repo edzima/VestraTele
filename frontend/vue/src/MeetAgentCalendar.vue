@@ -1,38 +1,69 @@
 <template>
-	<div class="calendar">
-		<Filters :activeTypes="activeTypes" :eventTypes="eventTypes" @toggleFilter="toggleFilter"/>
+	<div class="filter-calendar">
+		<Filters
+				ref="filters"
+				:filters="filtersItems"
+				@toggleFilter="toggleFilter"
+		/>
 		<Calendar
-				:activeTypes="activeTypes"
-				:agentId="agentId"
-				:allEvents="allEvents"
-				:allNotes="allNotes"
+				ref="calendar"
+				:eventSources="eventSources"
+				:eventRender="eventRender"
 				:allowUpdate="allowUpdate"
-				:eventTypes="eventTypes"
-				:isTitlesHidden="isSmallDevice"
-				@addNote="addNote"
-				@dateClick="addEvent"
-				@deleteNote="deleteNote"
-				@editNoteText="editNoteText"
-				@eventDoubleClick="openEventInspect"
-				@eventEdit="updateDates"
-				@loadMonth="fetchAndCacheMonth"
 		/>
 	</div>
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Prop, Ref, Vue} from 'vue-property-decorator';
+    import {EventObject, EventSourceObject, Info} from "@/types/FullCalendar";
+
     import Calendar from '@/components/Calendar.vue';
     import Filters from '@/components/Filters.vue';
-    import {dateToW3C, getFirstOfMonth, getLastOfMonth} from '@/helpers/dateHelper.ts';
-    import {MeetingType} from '@/types/MeetingType.ts';
-    import {CalendarNote} from '@/types/CalendarNote.ts';
-    import {CalendarEvent} from '@/types/CalendarEvent.ts';
+    import {dateToW3C} from '@/helpers/dateHelper.ts';
+    import {telLink} from "@/helpers/HTMLHelper";
+    import {Filter, FiltersCollection} from "@/types/Filter";
 
-    type MonthCacheInfo = {
-        monthID: number;
-        year: number;
-    };
+
+    interface MeetEvent extends EventObject {
+        statusId: number;
+    }
+
+    const defaultFilters: Filter[] = [
+        {
+            id: 10,
+            isActive: true,
+            label: 'Umowiony',
+            itemOptions: {
+                color: 'blue'
+            }
+        },
+        {
+            id: 20,
+            isActive: true,
+            label: 'Podpisana',
+            itemOptions: {
+                color: 'green'
+            }
+        },
+        {
+            id: 40,
+            isActive: true,
+            label: 'Niepodpisany',
+            itemOptions: {
+                color: 'purple'
+            }
+        },
+        {
+            id: 50,
+            isActive: true,
+            label: 'Ponowic',
+            itemOptions: {
+                color: 'red'
+            }
+        }
+    ];
+
 
     @Component({
         components: {
@@ -41,88 +72,81 @@
         }
     })
     export default class App extends Vue {
-        @Prop({
-            default: () => true // to change
-        })
-        private allowUpdate!: boolean; // allow user to edit events
 
         @Prop({
-            required: true
-        })
-        private agentId!: number;
+            default: () => defaultFilters
+        }) filtersItems!: Filter[];
 
-        @Prop({
-            default: () => 'meet-calendar/list'
-        })
-        private URLGetEvents!: string;
+        @Ref() calendar!: Calendar;
+        @Ref() filters!: FiltersCollection;
 
+        private visibleStatusIds: number[] = [];
 
-        @Prop({
-            default: () => 'meet-calendar/update'
-        })
-        private URLUpdateEvent!: string;
-
-
-        @Prop({
-            default: () => 'meet/create'
-        })
-        private URLAddEvent!: string;
-
-
-        @Prop({
-            default: () => 'meet/view'
-        })
-        private URLInspectEvent!: string;
-
-
-        @Prop({
-            default: () => 'calendar-note/list'
-        })
-        private URLGetNotes!: string;
-
-
-        @Prop({
-            default: () => 'calendar-note/add'
-        })
-        private URLNewNote!: string;
-
-
-        @Prop({
-            default: () => 'calendar-note/update'
-        })
-        private URLUpdateNote!: string;
-
-        @Prop({
-            default: () => 'calendar-note/delete'
-        })
-        private URLDeleteNote!: string;
-
-
-        @Prop({
-            default: () => 600 // in px
-        })
-        private EventTitleMinRes!: number;
-
-        private activeTypes: number[] = [1, 2, 3, 4];
-        private eventTypes: MeetingType[] = [
-            {id: 1, name: 'umówiony', className: 'blue'},
-            {id: 2, name: 'umowa', className: 'green'},
-            {id: 3, name: 'niepodpisany', className: 'red'},
-            {id: 4, name: 'wysłane dokumenty', className: 'yellow'}
-        ];
-        private allEvents: CalendarEvent[] = [];
-        private allNotes: CalendarNote[] = [];
-        private fetchedMonths: MonthCacheInfo[] = [];
-        private isSmallDevice = false;
-
-        created() {
-            this.configSmallDevice();
-            this.setAxiosErrorHandler();
+        mounted(): void {
+            this.visibleStatusIds = this.filters.getActiveFiltersIds();
         }
 
-        private openEventInspect(id: number): void {
-            window.open(`${this.URLInspectEvent}?id=${id}`);
+        get eventSources(): EventSourceObject[] {
+            return [
+                {
+                    url: this.URLGetEvents,
+                    allDayDefault: false,
+                    extraParams: {
+                        agentId: this.agentId
+                    },
+                    success: (data: MeetEvent[]) => {
+                        return data.map((event) => {
+                            const filter = this.filters.getFilter(event.statusId);
+                            if (filter && filter.itemOptions) {
+                                event = Object.assign(event, filter.itemOptions);
+                            }
+                            return event;
+                        })
+                    }
+                }, {
+                    url: this.URLGetNotes,
+                    extraParams: {
+                        agentId: this.agentId
+                    },
+                    allDayDefault: true,
+                }
+            ];
         }
+
+        //@todo move to filter calendar?
+        private toggleFilter(filter: Filter, ids: number[]): void {
+            this.visibleStatusIds = ids;
+            this.calendar.rerenderEvents();
+        }
+
+
+        eventRender(info: Info): void {
+            this.parseVisible(info);
+            this.parsePhone(info);
+        }
+
+        //@todo move to filter calendar?
+        private parseVisible(info: Info): void {
+            const status = info.event.extendedProps.statusId;
+            if (status) {
+                if (this.visibleStatusIds.includes(status)) {
+                    info.el.classList.remove('hide');
+                } else {
+                    info.el.classList.add('hide')
+                }
+            }
+        }
+
+        private parsePhone(info: Info): void {
+            const phone = info.event.extendedProps.phone;
+            if (phone) {
+                const title = info.el.querySelector('.fc-title');
+                if (title) {
+                    title.innerHTML = telLink(phone, info.event.title).outerHTML;
+                }
+            }
+        }
+
 
         private async deleteNote(noteID: number): Promise<void> {
             const params: URLSearchParams = new URLSearchParams();
@@ -130,107 +154,10 @@
             params.append('agent_id', String(this.agentId));
             const res = await this.axios.post(this.URLDeleteNote, params);
             if (res.status !== 200) return;
-            this.allNotes = this.allNotes.filter(note => note.id !== noteID);
+            // @todo add remove event from calendar
+            //     this.allNotes = this.allNotes.filter(note => note.id !== noteID);
         }
 
-        private toggleFilter(filterId: number): void {
-            if (this.activeTypes.includes(filterId)) {
-                this.activeTypes = this.activeTypes.filter(id => id !== filterId);
-            } else {
-                this.activeTypes.push(filterId);
-            }
-        }
-
-        private cachingMonth: number | null = null;
-
-        private async fetchAndCacheMonth(monthDate: Date): Promise<void> {
-            if (this.cachingMonth === monthDate.getMonth() || this.isMonthInCache(monthDate)) return;
-            this.cachingMonth = monthDate.getMonth();
-            await this.fetchMonthEvents(monthDate);
-            await this.fetchMonthNotes(monthDate);
-            this.setMonthCached(monthDate);
-            this.cachingMonth = null;
-        }
-
-        private isMonthInCache(monthDate: Date): boolean {
-            return this.fetchedMonths.some(
-                ftchMonth =>
-                    ftchMonth.monthID === monthDate.getMonth() &&
-                    ftchMonth.year === monthDate.getFullYear()
-            );
-        }
-
-        private setMonthCached(monthDate: Date) {
-            this.fetchedMonths.push({
-                monthID: monthDate.getMonth(),
-                year: monthDate.getFullYear()
-            });
-        }
-
-        private async fetchMonthEvents(
-            monthDate: Date
-        ): Promise<void> {
-            const startDate: Date = getFirstOfMonth(monthDate);
-            const endDate: Date = getLastOfMonth(monthDate);
-            const startDateFormatted: string = dateToW3C(startDate);
-            const endDateFormatted: string = dateToW3C(endDate);
-            const res = await this.axios.get(this.URLGetEvents, {
-                params: {
-                    agentId: this.agentId,
-                    dateFrom: startDateFormatted,
-                    dateTo: endDateFormatted
-                }
-            });
-            const mapped: CalendarEvent[] = res.data.data.map(eventCard => ({
-                id: eventCard.id,
-                title: eventCard.client,
-                start: eventCard.date_at,
-                end: eventCard.date_end_at,
-                phone: eventCard.phone,
-                address: eventCard.street,
-                city: eventCard.city,
-                client: eventCard.client,
-                typeId: eventCard.typeId
-            }));
-            this.allEvents.push(...mapped);
-        }
-
-        private async fetchMonthNotes(monthDate: Date): Promise<void> {
-            const startDate: Date = getFirstOfMonth(monthDate);
-            const endDate: Date = getLastOfMonth(monthDate);
-            const res = await this.axios.get(this.URLGetNotes, {
-                params: {
-                    agentId: this.agentId,
-                    dateFrom: startDate,
-                    dateTo: endDate
-                }
-            });
-            const notes = res.data.data.map(eventCard => ({
-                id: eventCard.id,
-                title: eventCard.content,
-                start: eventCard.start_at,
-                end: eventCard.end_at,
-                allDay: true
-            }));
-            this.allNotes.push(...notes);
-        }
-
-        private async addNote(noteText: string, day: Date): Promise<void> {
-            const formatted = dateToW3C(day);
-
-            const params: URLSearchParams = new URLSearchParams();
-            params.append('date', formatted);
-            params.append('agent_id', String(this.agentId));
-            params.append('news', noteText);
-            const res = await this.axios.post(this.URLNewNote, params);
-            if (res.status !== 200) return;
-            this.allNotes.push({
-                title: noteText,
-                id: res.data.id,
-                start: dateToW3C(day),
-                allDay: true
-            });
-        }
 
         private addEvent(date: Date): void {
             window.open(`${this.URLAddEvent}?date=${dateToW3C(date)}`);
@@ -245,15 +172,19 @@
             const res = await this.axios.post(this.URLUpdateNote, params);
             if (res.status !== 200) return;
             if (res.data.success === false) return;
-            this.allNotes = this.allNotes.map(note => {
-                if (note.id === noteID) {
-                    return {
-                        ...note,
-                        title: text
-                    };
-                }
-                return note;
-            });
+            //@todo update event from calendar
+            /*
+			this.allNotes = this.allNotes.map(note => {
+				if (note.id === noteID) {
+					return {
+						...note,
+						title: text
+					};
+				}
+				return note;
+			});
+
+			 */
         }
 
         private async updateDates(e: any): Promise<void> {
@@ -266,31 +197,13 @@
             params.append(isNote ? 'start' : 'date_at', String(dateFrom));
             params.append(isNote ? 'end' : 'date_end_at', String(dateTo));
             const res = await this.axios.post(isNote ? this.URLUpdateNote : this.URLUpdateEvent, params);
-            if (res.status !== 200) return e.revert();
-            if (res.data.success === false) return e.revert();
+            if (res.status !== 200 || !res.data.success) return e.revert();
             if (isNote) {
-                this.updateCachedNotes(e);
+                //@todo update note sources
             }
+
         }
 
-        private async updateCachedNotes(e: any): Promise<void> {
-            this.allNotes = this.allNotes.map(note => {
-                if (note.id === e.event.id) {
-                    return {
-                        ...note,
-                        start: e.event.start,
-                        end: e.event.end
-                    };
-                }
-                return note;
-            });
-        }
-
-        private configSmallDevice(): void {
-            if (window.innerWidth < this.EventTitleMinRes) {
-                this.isSmallDevice = true;
-            }
-        }
 
         private handleAxiosError(): void {
             this.$swal({
@@ -310,8 +223,63 @@
                 return {};
             });
         }
+
+
+        @Prop({
+            default: () => true // to change
+        })
+        private allowUpdate!: boolean; // allow user to edit events
+
+        @Prop({
+            required: true
+        })
+        private agentId!: number;
+
+        @Prop({
+            default: () => '/meet-calendar/list'
+        })
+        private URLGetEvents!: string;
+
+
+        @Prop({
+            default: () => '/meet-calendar/update'
+        })
+        private URLUpdateEvent!: string;
+
+
+        @Prop({
+            default: () => '/meet/create'
+        })
+        private URLAddEvent!: string;
+
+
+        @Prop({
+            default: () => '/calendar-note/list'
+        })
+        private URLGetNotes!: string;
+
+
+        @Prop({
+            default: () => '/calendar-note/add'
+        })
+        private URLNewNote!: string;
+
+
+        @Prop({
+            default: () => '/calendar-note/update'
+        })
+        private URLUpdateNote!: string;
+
+        @Prop({
+            default: () => '/calendar-note/delete'
+        })
+        private URLDeleteNote!: string;
     }
 </script>
-
-<style lang='less' scoped>
+<style lang="less">
+	.tel-link {
+		display: inline-flex;
+		color: white;
+		padding-bottom: 10px;
+	}
 </style>

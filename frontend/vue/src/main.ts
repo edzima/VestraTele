@@ -13,6 +13,8 @@ Vue.use(VueAxios, axios);
 Vue.axios.defaults.headers.common['X-CSRF-TOKEN'] = getCSRFToken();
 Vue.config.productionTip = false;
 
+
+
 const rootElement = document.getElementById('app');
 if (rootElement) {
     const rootComponent = Vue.extend(App);

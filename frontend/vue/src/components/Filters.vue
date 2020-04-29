@@ -1,101 +1,90 @@
 <template>
-  <div class="controlls">
-    <h1>Filtry statusów:</h1>
-    <div class="buttons">
-      <button
-        :class="[type.className, isFilterActive(type.id) ? '' : 'disabled']"
-        @click="toggleFilter(type.id)"
-        v-for="type in eventTypes"
-        :key="type.id"
-      >{{type.name}}
-      </button>
-    </div>
-  </div>
+	<ul class="filters-nav nav nav-pills">
+		<li v-for="filter in renderFilters"
+				:class="{active:filter.isActive}"
+				class="filter-item nav-item"
+		>
+			<a @click="onClick(filter)" href="#" class="btn nav-link filter-btn" :style="itemStyle(filter)">{{filter.label}}</a>
+		</li>
+	</ul>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Filter, FiltersCollection} from "@/types/Filter";
 
-  @Component({})
-export default class Filters extends Vue {
-    @Prop({
-      required: true
-    })
-    private activeTypes!: Array<number>;
+    @Component({})
+    export default class Filters extends Vue implements FiltersCollection {
+        @Prop() filters!: Filter[];
 
-    @Prop({
-      default: () => []
-    })
-    private eventTypes!: Array<any>;
 
-    private isFilterActive (filterId: number): boolean {
-      return this.activeTypes.includes(filterId);
+        get renderFilters(): Filter[] {
+            return this.filters;
+        }
+
+        itemStyle(filter: Filter): any {
+            if (!filter.itemOptions) {
+                return;
+            }
+            let style: any = {};
+            style.backgroundColor = filter.itemOptions.color;
+            return style;
+        }
+
+
+        private onClick(filter: Filter): void {
+            this.toggleFilter(filter);
+            this.$emit('toggleFilter', filter, this.getActiveFiltersIds());
+        }
+
+        private toggleFilter(filter: Filter): void {
+            this.filters.map((el) => {
+                if (el.id === filter.id) {
+                    el.isActive = !el.isActive;
+                }
+            });
+        }
+
+        getFilters(): Filter[] {
+            return this.filters;
+        }
+
+        getFilter(id: number): Filter | undefined {
+            return this.filters.find((filter) => filter.id === id);
+        }
+
+        getActiveFiltersIds(): number[] {
+            return this.getActiveFilters().map((filter) => filter.id);
+        }
+
+        getActiveFilters(): Filter[] {
+            return this.filters.filter((filter) => filter.isActive);
+        }
+
     }
-
-    private toggleFilter (filterId: number): void {
-      this.$emit('toggleFilter', filterId);
-    }
-}
 </script>
 
-<style scoped lang='less'>
-  .controlls {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100vw;
+<style scoped lang="less">
+	.filters-nav {
+		.filter-item {
+			opacity: 0.8;
 
-    h1 {
-      margin: 0 1vh 0 0;
-      align-self: flex-start;
-      font-size: 20px;
-    }
+			&:hover {
+				opacity: 1;
+			}
 
-    .buttons {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-      align-items: center;
-      width: 100%;
-      margin-bottom: 3vh;
-      flex-wrap: wrap;
+			.filter-btn {
+				color: white;
 
-      button {
-        min-height: 5vh;
-        width: 10vw;
-        min-width: 100px;
-        border-radius: 10px;
-        font-size: 15px;
-        color: white;
-        border: none;
-        margin: 0.5vw 1vw;
-        box-shadow: 0 4px 5px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
+				&:hover {
+					color: white;
+				}
 
-        &.blue {
-          background-color: blue;
-        }
+			}
 
-        &.green {
-          background-color: green;
-        }
-
-        &.red {
-          background-color: red;
-        }
-
-        &.yellow {
-          background-color: yellow;
-          color: black;
-        }
-
-        &.disabled {
-          // background-color: #fff !important;
-          // color: black !important;
-          opacity: 0.4;
-        }
-      }
-    }
-  }
+			&:not(.active) {
+				opacity: 0.5;
+			}
+		}
+	}
 </style>
