@@ -1,5 +1,6 @@
 <template>
 	<div class="filter-calendar">
+		<CalendarNotesPopup ref="notesPopup"/>
 		<Filters
 				ref="filters"
 				:filters="filtersItems"
@@ -10,19 +11,23 @@
 				:eventSources="eventSources"
 				:eventRender="eventRender"
 				:allowUpdate="allowUpdate"
+				@dateClick="dateClick"
+				@dateDoubleClick="dateDoubleClick"
+				@eventEdit="updateDates"
 		/>
 	</div>
 </template>
 
 <script lang="ts">
     import {Component, Prop, Ref, Vue} from 'vue-property-decorator';
-    import {EventObject, EventSourceObject, Info} from "@/types/FullCalendar";
+    import {DateClickInfo, EventObject, EventSourceObject, Info} from "@/types/FullCalendar";
 
     import Calendar from '@/components/Calendar.vue';
     import Filters from '@/components/Filters.vue';
     import {dateToW3C} from '@/helpers/dateHelper.ts';
     import {telLink} from "@/helpers/HTMLHelper";
     import {Filter, FiltersCollection} from "@/types/Filter";
+    import CalendarNotesPopup, {NotesPopupInterface} from "@/components/CalendarNotesPopup.vue";
 
 
     interface MeetEvent extends EventObject {
@@ -67,6 +72,7 @@
 
     @Component({
         components: {
+            CalendarNotesPopup,
             Calendar,
             Filters
         }
@@ -84,6 +90,10 @@
 
         mounted(): void {
             this.visibleStatusIds = this.filters.getActiveFiltersIds();
+        }
+
+        get notesPopup(): NotesPopupInterface {
+            return this.$refs.notesPopup;
         }
 
         get eventSources(): EventSourceObject[] {
@@ -147,6 +157,16 @@
             }
         }
 
+        private dateClick(dateInfo: DateClickInfo): void {
+            if (!dateInfo.allDay) return; //it's not a note
+            if (dateInfo.view.type === 'dayGridMonth') return;
+            this.notesPopup.show();
+        }
+
+        private dateDoubleClick(dateInfo: DateClickInfo): void {
+            if (dateInfo.allDay) return; //its a note
+            this.addEvent(dateInfo.date);
+        }
 
         private async deleteNote(noteID: number): Promise<void> {
             const params: URLSearchParams = new URLSearchParams();
@@ -203,27 +223,6 @@
             }
 
         }
-
-
-        private handleAxiosError(): void {
-            this.$swal({
-                icon: 'error',
-                title: 'Ups...',
-                text: 'coś poszło nie tak!'
-            });
-        }
-
-        private setAxiosErrorHandler(): void {
-            this.axios.interceptors.response.use(res => {
-                // is ok
-                return res;
-            }, () => {
-                // error
-                this.handleAxiosError();
-                return {};
-            });
-        }
-
 
         @Prop({
             default: () => true // to change

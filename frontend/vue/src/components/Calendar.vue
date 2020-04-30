@@ -15,7 +15,6 @@
 				@eventDrop="handleChangeDates"
 				@eventResize="handleChangeDates"
 				@dateClick="handleDateClick"
-				@eventMouseEnter="onEventMouseEnter"
 		/>
 	</div>
 </template>
@@ -29,7 +28,7 @@
     import timeGridPlugin from '@fullcalendar/timegrid';
     import NotesPopup from './NotesPopup.vue';
 
-    import {EventSourceObject, Info} from "@/types/FullCalendar";
+    import {DateClickInfo, EventSourceObject, Info} from "@/types/FullCalendar";
 
     import 'tippy.js/dist/tippy.css';
     import tippy, {Props as TooltipOptions} from "tippy.js";
@@ -66,11 +65,6 @@
         height: 'auto',
 
     };
-
-    type dateClickType = {
-        date: Date;
-        timeoutId: number;
-    }
 
     @Component({
         components: {
@@ -136,12 +130,6 @@
             this.$emit('deleteNote', noteID);
         }
 
-
-        private dateClick: dateClickType = {
-            date: new Date(),
-            timeoutId: 0
-        };
-
         private noteOpenedDate: any = null;
 
         private editNoteText(noteID: number, text: string): void {
@@ -156,26 +144,28 @@
             this.noteOpenedDate = e.date ? e.date : e.start;
         }
 
-        private handleDateClick(e): void {
+        private clickCheckerId: number | undefined = undefined;
+
+        private handleDateClick(dateClick: DateClickInfo): void {
             // if its a month view allow only to add events, not notes
-            if (e.view && e.view.type !== 'dayGridMonth') {
-                if (e.allDay) {
-                    return this.openNotes(e);
-                }
-            }
-            if (!this.dateClick.timeoutId) {
-                this.dateClick.timeoutId = setTimeout(() => {
-                    // simple click
-                    clearTimeout(this.dateClick.timeoutId);
-                    this.dateClick.timeoutId = 0;
-                    this.dateClick.date = e.date;
-                }, 200); // tolerance in ms
+            // console.log('dateClick');
+            // if (e.view && e.view.type !== 'dayGridMonth') {
+            //     if (e.allDay) {
+            //         return this.openNotes(e);
+            //     }
+            // }
+            if (!this.clickCheckerId) {
+                this.clickCheckerId = setTimeout(() => {
+                    // single click
+                    clearTimeout(this.clickCheckerId);
+                    this.clickCheckerId = undefined;
+                    this.$emit('dateClick', dateClick);
+                }, 200);
             } else {
                 // double click
-                clearTimeout(this.dateClick.timeoutId);
-                this.dateClick.timeoutId = 0;
-                this.dateClick.date = e.date;
-                this.$emit('dateClick', this.dateClick.date);
+                clearTimeout(this.clickCheckerId);
+                this.clickCheckerId = undefined;
+                this.$emit('dateDoubleClick', dateClick);
             }
         }
 

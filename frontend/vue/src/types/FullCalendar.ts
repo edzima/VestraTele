@@ -40,3 +40,12 @@ export interface ViewObject {
     currentStart: Date,
     currentEnd: Date
 }
+
+export interface DateClickInfo {
+    date: Date;
+    dateStr: string;
+    allDay: boolean;
+    dayEl: HTMLElement;
+    jsEvent: MouseEvent;
+    view: ViewObject;
+}
