@@ -28,10 +28,11 @@
     import timeGridPlugin from '@fullcalendar/timegrid';
     import NotesPopup from './NotesPopup.vue';
 
-    import {DateClickInfo, EventSourceObject, Info} from "@/types/FullCalendar";
+    import {DateClickInfo, DateClickWithDayEvents, EventObject, EventSourceObject, Info} from "@/types/FullCalendar";
 
     import 'tippy.js/dist/tippy.css';
     import tippy, {Props as TooltipOptions} from "tippy.js";
+    import {isSameDate} from "@/helpers/dateHelper";
 
     const FullCalendar = require('@fullcalendar/vue').default;
 
@@ -147,26 +148,38 @@
         private clickCheckerId: number | undefined = undefined;
 
         private handleDateClick(dateClick: DateClickInfo): void {
-            // if its a month view allow only to add events, not notes
-            // console.log('dateClick');
-            // if (e.view && e.view.type !== 'dayGridMonth') {
-            //     if (e.allDay) {
-            //         return this.openNotes(e);
-            //     }
-            // }
             if (!this.clickCheckerId) {
                 this.clickCheckerId = setTimeout(() => {
-                    // single click
-                    clearTimeout(this.clickCheckerId);
-                    this.clickCheckerId = undefined;
-                    this.$emit('dateClick', dateClick);
+                    this.removeClickTimeout();
+                    this.emitExtendedDateClick(dateClick, 'single')
                 }, 200);
             } else {
-                // double click
-                clearTimeout(this.clickCheckerId);
-                this.clickCheckerId = undefined;
-                this.$emit('dateDoubleClick', dateClick);
+                this.removeClickTimeout();
+                this.emitExtendedDateClick(dateClick, 'double')
             }
+        }
+
+        private emitExtendedDateClick(dateClick: DateClickInfo, type: 'single' | 'double'): void {
+            const dateClickWithDayEvents = this.AddEventsToDateClick(dateClick);
+            this.$emit(type === 'single' ? 'dateClick' : 'dateDoubleClick', dateClickWithDayEvents);
+        }
+
+        private removeClickTimeout(): void {
+            clearTimeout(this.clickCheckerId);
+            this.clickCheckerId = undefined;
+        }
+
+        private AddEventsToDateClick(dateClick: DateClickInfo): DateClickWithDayEvents {
+            return {
+                ...dateClick,
+                dayEvents: this.getDayEvents(dateClick.date)
+            };
+        }
+
+        private getDayEvents(date: Date): EventObject[] {
+            const fcApi = this.fullCalendar.getApi();
+            const activeViewEcents: EventObject[] = fcApi.getEvents();
+            return activeViewEcents.filter((event: EventObject) => isSameDate(event.start, date));
         }
 
         private addNote(noteText: string, day: Date): void {
@@ -175,7 +188,7 @@
 
 
         private handleChangeDates(e: any): void {
-            if (!this.editable) return e.revert(); // cancel if no permissions
+            // if (!this.editable) return e.revert(); // cancel if no permissions
             if (e.oldEvent) { // cancel if note is dragged to event and vice-versa
                 if (e.event.allDay !== e.oldEvent.allDay) return e.revert();
             }

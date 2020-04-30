@@ -20,7 +20,7 @@
 
 <script lang="ts">
     import {Component, Prop, Ref, Vue} from 'vue-property-decorator';
-    import {DateClickInfo, EventObject, EventSourceObject, Info} from "@/types/FullCalendar";
+    import {DateClickWithDayEvents, EventObject, EventSourceObject, Info} from "@/types/FullCalendar";
 
     import Calendar from '@/components/Calendar.vue';
     import Filters from '@/components/Filters.vue';
@@ -157,13 +157,13 @@
             }
         }
 
-        private dateClick(dateInfo: DateClickInfo): void {
+        private dateClick(dateInfo: DateClickWithDayEvents): void {
             if (!dateInfo.allDay) return; //it's not a note
             if (dateInfo.view.type === 'dayGridMonth') return;
-            this.notesPopup.show();
+            this.notesPopup.openCalendarDayNotes(dateInfo);
         }
 
-        private dateDoubleClick(dateInfo: DateClickInfo): void {
+        private dateDoubleClick(dateInfo: DateClickWithDayEvents): void {
             if (dateInfo.allDay) return; //its a note
             this.addEvent(dateInfo.date);
         }

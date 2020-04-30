@@ -3,14 +3,14 @@
 		<div aria-labelledby="myModalLabel" class="modal show" id="myModal" role="dialog" tabindex="-1">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
-					<div class="modal-header" v-if="hasSlot('header')">
-						<slot name="header"></slot>
+					<div class="modal-header" v-if="checkSlot('header')">
+						<slot name="header"/>
 					</div>
-					<div class="modal-body" v-if="hasSlot('body')">
-						<slot name="body"></slot>
+					<div class="modal-body" v-if="checkSlot('body')">
+						<slot name="body"/>
 					</div>
-					<div class="modal-footer" v-if="hasSlot('footer')">
-						<slot name="footer"></slot>
+					<div class="modal-footer" v-if="checkSlot('footer')">
+						<slot name="footer"/>
 					</div>
 				</div>
 			</div>
@@ -20,6 +20,7 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
+    import {componentHasSlot} from '@/helpers/componentHelper';
 
     export interface PopupInterface {
         readonly show: Function;
@@ -32,6 +33,10 @@
 
         public visible: boolean = false;
 
+        private checkSlot(name: string): boolean {
+            return componentHasSlot(this, name);
+        }
+
         public show(): void {
             this.visible = true;
         }
@@ -40,9 +45,7 @@
             this.visible = false;
         }
 
-        private hasSlot(slotName: string): boolean {
-            return !!this.$slots[slotName];
-        }
+
     }
 </script>
 <style lang="less" scoped>

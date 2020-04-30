@@ -2,7 +2,7 @@ export interface EventObject {
     id: number,
     groupId: string,
     allDay: boolean,
-    start?: string,
+    start: Date,
     end?: string,
     title: string,
     url?: string
@@ -49,3 +49,8 @@ export interface DateClickInfo {
     jsEvent: MouseEvent;
     view: ViewObject;
 }
+
+export interface DateClickWithDayEvents extends DateClickInfo {
+    dayEvents: EventObject[];
+}
+
