@@ -9,6 +9,8 @@ export interface EventObject {
     color?: string,
     extendedProps: EventProps | any;
     source?: EventSourceObject
+    setProp: Function;
+    remove: Function;
 }
 
 export interface EventProps {

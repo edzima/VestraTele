@@ -22,7 +22,7 @@
     import {Component, Vue} from 'vue-property-decorator';
     import {componentHasSlot} from '@/helpers/componentHelper';
 
-    export interface PopupInterface {
+    export interface PopupInterface extends Element {
         readonly show: Function;
         readonly hide: Function;
         readonly visible: boolean;

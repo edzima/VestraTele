@@ -1,12 +1,5 @@
 <template>
 	<div class="calendar">
-		<NotesPopup
-				:date="noteOpenedDate"
-				@close="closePopup"
-				@deleteNote="deleteNote"
-				@addNote="addNote"
-				@editNoteText="editNoteText"
-		/>
 		<FullCalendar
 				ref="fullCalendar"
 				v-bind="fullCalendarProps"
@@ -26,7 +19,6 @@
     import plLang from '@fullcalendar/core/locales/pl';
     import interactionPlugin from '@fullcalendar/interaction';
     import timeGridPlugin from '@fullcalendar/timegrid';
-    import NotesPopup from './NotesPopup.vue';
 
     import {DateClickInfo, DateClickWithDayEvents, EventObject, EventSourceObject, Info} from "@/types/FullCalendar";
 
@@ -69,8 +61,7 @@
 
     @Component({
         components: {
-            FullCalendar,
-            NotesPopup,
+            FullCalendar
         }
     })
     export default class Calendar extends Vue {
@@ -125,25 +116,20 @@
             this.fullCalendar.getApi().rerenderEvents();
         }
 
-
-        private deleteNote(noteID: number): void {
-            // handle delete
-            this.$emit('deleteNote', noteID);
+        public updateCalendarEventProp(eventToUpdate: EventObject, propName: string, value: string | number | Function): void {
+            eventToUpdate.setProp(propName, value);
         }
 
-        private noteOpenedDate: any = null;
-
-        private editNoteText(noteID: number, text: string): void {
-            this.$emit('editNoteText', noteID, text);
+        public findCalendarEvent(eventId: number): EventObject {
+            // const activeViewEcents: EventObject[] = fcApi.getEvents();
+            // return activeViewEcents.find((event: EventObject) => event.id === eventId)!;
+            return this.fullCalendar.getApi().getEventById(eventId);
         }
 
-        private closePopup(): void {
-            this.noteOpenedDate = null;
+        public deleteEvent(eventToDel: EventObject): void {
+            eventToDel.remove();
         }
 
-        private openNotes(e: any): void {
-            this.noteOpenedDate = e.date ? e.date : e.start;
-        }
 
         private clickCheckerId: number | undefined = undefined;
 
@@ -182,11 +168,6 @@
             return activeViewEcents.filter((event: EventObject) => isSameDate(event.start, date));
         }
 
-        private addNote(noteText: string, day: Date): void {
-            this.$emit('addNote', noteText, day);
-        }
-
-
         private handleChangeDates(e: any): void {
             // if (!this.editable) return e.revert(); // cancel if no permissions
             if (e.oldEvent) { // cancel if note is dragged to event and vice-versa
@@ -197,9 +178,6 @@
 
         //@todo inspect from event.url
         private inspectEvent(event: any): void {
-            if (event.event.allDay) {
-                this.openNotes(event.event);
-            }
             return;
             /*
             if (!this.eventClick.timeoutId) {

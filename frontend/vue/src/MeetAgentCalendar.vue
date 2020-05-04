@@ -1,6 +1,6 @@
 <template>
 	<div class="filter-calendar">
-		<CalendarNotesPopup ref="notesPopup"/>
+		<CalendarNotesPopup :onNoteDelete="deleteNote" :onNoteUpdate="editNoteText" ref="notesPopup"/>
 		<Filters
 				ref="filters"
 				:filters="filtersItems"
@@ -28,6 +28,7 @@
     import {telLink} from "@/helpers/HTMLHelper";
     import {Filter, FiltersCollection} from "@/types/Filter";
     import CalendarNotesPopup, {NotesPopupInterface} from "@/components/CalendarNotesPopup.vue";
+    import {NoteInterface} from "@/components/Note.vue";
 
 
     interface MeetEvent extends EventObject {
@@ -85,15 +86,12 @@
 
         @Ref() calendar!: Calendar;
         @Ref() filters!: FiltersCollection;
+        @Ref() notesPopup!: NotesPopupInterface;
 
         private visibleStatusIds: number[] = [];
 
         mounted(): void {
             this.visibleStatusIds = this.filters.getActiveFiltersIds();
-        }
-
-        get notesPopup(): NotesPopupInterface {
-            return this.$refs.notesPopup;
         }
 
         get eventSources(): EventSourceObject[] {
@@ -168,14 +166,15 @@
             this.addEvent(dateInfo.date);
         }
 
-        private async deleteNote(noteID: number): Promise<void> {
+        private async deleteNote(noteToDel: NoteInterface): Promise<boolean> {
             const params: URLSearchParams = new URLSearchParams();
-            params.append('id', String(noteID));
+            params.append('id', noteToDel.id);
             params.append('agent_id', String(this.agentId));
             const res = await this.axios.post(this.URLDeleteNote, params);
-            if (res.status !== 200) return;
-            // @todo add remove event from calendar
-            //     this.allNotes = this.allNotes.filter(note => note.id !== noteID);
+            if (res.status !== 200) return false;
+            const eventToDel = this.calendar.findCalendarEvent(noteToDel.id);
+            this.calendar.removeEvent(eventToDel);
+            return true;
         }
 
 
@@ -183,29 +182,22 @@
             window.open(`${this.URLAddEvent}?date=${dateToW3C(date)}`);
         }
 
-        private async editNoteText(noteID: number, text: string): Promise<void> {
+        private async editNoteText(newNote: NoteInterface): Promise<boolean> {
             const params: URLSearchParams = new URLSearchParams();
-            params.append('news', text);
+            params.append('news', newNote.content);
             params.append('agent_id', String(this.agentId));
-            params.append('id', String(noteID));
+            params.append('id', String(newNote.id));
 
             const res = await this.axios.post(this.URLUpdateNote, params);
-            if (res.status !== 200) return;
-            if (res.data.success === false) return;
-            //@todo update event from calendar
-            /*
-			this.allNotes = this.allNotes.map(note => {
-				if (note.id === noteID) {
-					return {
-						...note,
-						title: text
-					};
-				}
-				return note;
-			});
+            if (res.status !== 200) return false;
+            if (res.data.success === false) return false;
 
-			 */
+            let calendarEvent = this.calendar.findCalendarEvent(newNote.id);
+            this.calendar.updateCalendarEventProp(calendarEvent, 'title', newNote.content);
+            this.calendar.rerenderEvents();
+            return true;
         }
+
 
         private async updateDates(e: any): Promise<void> {
             const isNote: boolean = Boolean(e.event.allDay);

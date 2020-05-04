@@ -1,7 +1,7 @@
 <template>
 	<ul class="list-group">
 		<Note :key="note.id" :noteInfo="note" class="list-group-item" v-for="note in notes">
-			<template scope="props">
+			<template slot-scope="props">
 				<slot :note="props.note"/>
 			</template>
 		</Note>
