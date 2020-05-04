@@ -1,6 +1,8 @@
 <template>
 	<div class="filter-calendar">
-		<CalendarNotesPopup :onNoteDelete="deleteNote" :onNoteUpdate="editNoteText" ref="notesPopup"/>
+		<BootstrapPopup :title="this.notePopupTitle" outerDissmisable ref="notesPopup">
+			<CalendarNotes :notes="dayNotes" :onNoteDelete="deleteNote" :onNoteUpdate="editNoteText" editable/>
+		</BootstrapPopup>
 		<Filters
 				ref="filters"
 				:filters="filtersItems"
@@ -24,11 +26,12 @@
 
     import Calendar from '@/components/Calendar.vue';
     import Filters from '@/components/Filters.vue';
-    import {dateToW3C} from '@/helpers/dateHelper.ts';
+    import {dateToW3C, prettify} from '@/helpers/dateHelper.ts';
     import {telLink} from "@/helpers/HTMLHelper";
     import {Filter, FiltersCollection} from "@/types/Filter";
-    import CalendarNotesPopup, {NotesPopupInterface} from "@/components/CalendarNotesPopup.vue";
+    import CalendarNotes from "@/components/CalendarNotes.vue";
     import {NoteInterface} from "@/components/Note.vue";
+    import BootstrapPopup, {PopupInterface} from "@/components/BootstrapPopup.vue";
 
 
     interface MeetEvent extends EventObject {
@@ -73,7 +76,8 @@
 
     @Component({
         components: {
-            CalendarNotesPopup,
+            BootstrapPopup,
+            CalendarNotes,
             Calendar,
             Filters
         }
@@ -86,9 +90,12 @@
 
         @Ref() calendar!: Calendar;
         @Ref() filters!: FiltersCollection;
-        @Ref() notesPopup!: NotesPopupInterface;
+        @Ref() notesPopup!: PopupInterface;
 
         private visibleStatusIds: number[] = [];
+
+        private dayNotes: NoteInterface[] = [];
+        private notePopupTitle: string = '';
 
         mounted(): void {
             this.visibleStatusIds = this.filters.getActiveFiltersIds();
@@ -158,7 +165,16 @@
         private dateClick(dateInfo: DateClickWithDayEvents): void {
             if (!dateInfo.allDay) return; //it's not a note
             if (dateInfo.view.type === 'dayGridMonth') return;
-            this.notesPopup.openCalendarDayNotes(dateInfo);
+            this.dayNotes = this.getNotesFromDayInfo(dateInfo);
+            this.notePopupTitle = 'Notatki ' + prettify(dateInfo.dateStr);
+            this.notesPopup.show();
+        }
+
+        private getNotesFromDayInfo(dateInfo: DateClickWithDayEvents): NoteInterface[] {
+            return dateInfo.dayEvents.map((event: EventObject) => ({
+                content: event.title,
+                id: event.id
+            }))
         }
 
         private dateDoubleClick(dateInfo: DateClickWithDayEvents): void {
@@ -172,8 +188,7 @@
             params.append('agent_id', String(this.agentId));
             const res = await this.axios.post(this.URLDeleteNote, params);
             if (res.status !== 200) return false;
-            const eventToDel = this.calendar.findCalendarEvent(noteToDel.id);
-            this.calendar.deleteEvent(eventToDel);
+            this.calendar.deleteEventById(noteToDel.id);
             return true;
         }
 

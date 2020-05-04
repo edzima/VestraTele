@@ -130,6 +130,10 @@
             eventToDel.remove();
         }
 
+        public deleteEventById(eventId: number) {
+            const toDel = this.findCalendarEvent(eventId);
+            this.deleteEvent(toDel);
+        }
 
         private clickCheckerId: number | undefined = undefined;
 

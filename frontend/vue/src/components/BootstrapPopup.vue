@@ -1,16 +1,16 @@
 <template>
-	<div class="modal-wrapper" v-if="visible">
-		<div aria-labelledby="myModalLabel" class="modal show" id="myModal" role="dialog" tabindex="-1">
+	<div @click="outerClick" class="modal-wrapper" v-if="visible">
+		<div @click.stop aria-labelledby="myModalLabel" class="modal show" id="myModal" role="dialog" tabindex="-1">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
-					<div class="modal-header" v-if="checkSlot('header')">
-						<slot name="header"/>
+					<div class="modal-header">
+						<button @click.prevent="hide" aria-label="Close" class="close" type="button">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" v-if="title">{{title}}</h4>
 					</div>
-					<div class="modal-body" v-if="checkSlot('body')">
-						<slot name="body"/>
-					</div>
-					<div class="modal-footer" v-if="checkSlot('footer')">
-						<slot name="footer"/>
+					<div class="modal-body">
+						<slot/>
 					</div>
 				</div>
 			</div>
@@ -19,8 +19,7 @@
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from 'vue-property-decorator';
-    import {componentHasSlot} from '@/helpers/componentHelper';
+    import {Component, Prop, Vue} from 'vue-property-decorator';
 
     export interface PopupInterface extends Element {
         readonly show: Function;
@@ -31,11 +30,10 @@
     @Component({})
     export default class BootstrapPopup extends Vue {
 
-        public visible: boolean = false;
+        @Prop() public title!: string;
+        @Prop({type: Boolean, default: () => false}) public outerDissmisable!: boolean;
 
-        private checkSlot(name: string): boolean {
-            return componentHasSlot(this, name);
-        }
+        public visible: boolean = false;
 
         public show(): void {
             this.visible = true;
@@ -45,6 +43,11 @@
             this.visible = false;
         }
 
+        private outerClick(): void {
+            if (this.outerDissmisable) {
+                this.hide()
+            }
+        }
 
     }
 </script>

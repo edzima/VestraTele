@@ -21,7 +21,7 @@
     export default class NoteEditor extends Vue {
         @Prop({required: true}) note!: NoteInterface;
         @Prop({type: Boolean, default: () => false}) autoFocus!: boolean;
-        @Prop({type: Boolean, default: () => false}) confirmEditSave!: boolean;
+        @Prop({type: Boolean, default: () => false}) confirmEdit!: boolean;
 
         private newNote: NoteInterface = {
             id: 0,
@@ -44,7 +44,7 @@
         }
 
         private async saveEditNote(): Promise<void> {
-            if (this.confirmEditSave) {
+            if (this.confirmEdit) {
                 const confirmed = await this.$swal(noteEditConfirmSwal);
                 if (!confirmed.value) return;
             }
