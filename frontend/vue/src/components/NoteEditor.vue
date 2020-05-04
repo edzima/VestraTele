@@ -43,7 +43,7 @@
             this.newNote = {...this.note};
         }
 
-        private async saveEditNote(): void {
+        private async saveEditNote(): Promise<void> {
             if (this.confirmEditSave) {
                 const confirmed = await this.$swal(noteEditConfirmSwal);
                 if (!confirmed.value) return;

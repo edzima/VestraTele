@@ -168,12 +168,12 @@
 
         private async deleteNote(noteToDel: NoteInterface): Promise<boolean> {
             const params: URLSearchParams = new URLSearchParams();
-            params.append('id', noteToDel.id);
+            params.append('id', String(noteToDel.id));
             params.append('agent_id', String(this.agentId));
             const res = await this.axios.post(this.URLDeleteNote, params);
             if (res.status !== 200) return false;
             const eventToDel = this.calendar.findCalendarEvent(noteToDel.id);
-            this.calendar.removeEvent(eventToDel);
+            this.calendar.deleteEvent(eventToDel);
             return true;
         }
 

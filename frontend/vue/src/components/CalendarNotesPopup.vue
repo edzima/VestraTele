@@ -76,7 +76,7 @@
         }
 
         private async saveEditedNote(newNote: NoteInterface): Promise<void> {
-            this.noteToEdit = {};
+            this.noteToEdit = {id: 0, content: ''};
             this.operation = "view";
             const success = this.hasProp('onNoteUpdate') ? await this.onNoteUpdate!(newNote) : true;
             if (!success) return;
@@ -105,7 +105,7 @@
         }
 
         private discardEditChanges(): void {
-            this.noteToEdit = {};
+            this.noteToEdit = {id: 0, content: ''};
             this.operation = "view";
         }
     }
