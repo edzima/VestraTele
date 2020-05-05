@@ -194,7 +194,7 @@
             params.append('agent_id', String(this.agentId));
             const res = await this.axios.post(this.URLDeleteNote, params);
             if (res.status !== 200) return false;
-            this.calendar.deleteEventById(noteToDel.id);
+            this.calendar.deleteEventById(noteToDel.id!);
             return true;
         }
 
@@ -225,7 +225,7 @@
             if (res.status !== 200) return false;
             if (res.data.success === false) return false;
 
-            let calendarEvent = this.calendar.findCalendarEvent(newNote.id);
+            let calendarEvent = this.calendar.findCalendarEvent(newNote.id!);
             this.calendar.updateCalendarEventProp(calendarEvent, 'title', newNote.content);
             this.calendar.rerenderEvents();
             return true;

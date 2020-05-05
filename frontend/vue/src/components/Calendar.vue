@@ -157,10 +157,6 @@
             }
         }
 
-        public preventDuplicateEvents(events: EventObject[]): boolean {
-            return events.filter((event: EventObject) => !this.findCalendarEvent(event.id));
-        }
-
         private emitExtendedDateClick(dateClick: DateClickInfo, type: 'single' | 'double'): void {
             const dateClickWithDayEvents = this.AddEventsToDateClick(dateClick);
             this.$emit(type === 'single' ? 'dateClick' : 'dateDoubleClick', dateClickWithDayEvents);

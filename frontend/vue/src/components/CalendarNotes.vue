@@ -30,7 +30,7 @@
 
         private noteToEdit: NoteInterface | null = null;
         private operation: 'view' | 'edit' = 'view';
-        private localNotes!: NoteInterface = [];
+        private localNotes: NoteInterface[] = [];
 
         mounted(): void {
             this.localNotes = [...this.notes];
