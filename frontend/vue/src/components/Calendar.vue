@@ -97,7 +97,7 @@
         }
 
         public update(): void {
-            console.log(this.fullCalendar.getApi().getEventSourceById(1).refetch())
+            this.fullCalendar.getApi().getEventSourceById(1).refetch();
         }
 
         private parseTooltip(info: Info) {

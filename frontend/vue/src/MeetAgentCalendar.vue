@@ -169,7 +169,6 @@
             if (!dateInfo.allDay) return; //it's not a note
             if (dateInfo.view.type === 'dayGridMonth') return;
             this.dayNotes = this.getNotesFromDayInfo(dateInfo);
-            console.log(this.dayNotes);
             this.notePopupTitle = 'Notatki ' + prettify(dateInfo.dateStr);
             this.notePopupDate = dateInfo.date;
             this.notesPopup.show();
@@ -206,7 +205,6 @@
             params.append('date', dateToW3C(this.notePopupDate));
 
             const res = await this.axios.post(this.URLNewNote, params);
-            console.log(res);
             if (res.status !== 200) return false;
             if (!res.data.id) return false;
             this.calendar.update();
