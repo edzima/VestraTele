@@ -18,6 +18,7 @@ export interface EventProps {
 }
 
 export interface EventSourceObject {
+    id?: number,
     url?: string,
     allDayDefault?: boolean
     extraParams?: any,

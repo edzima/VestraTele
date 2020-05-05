@@ -49,13 +49,13 @@ class CalendarNoteController extends Controller {
 		foreach ($models as $model) {
 			$data[] = [
 				'id' => $model->id,
-				'content' => $model->news,
-				'start_at' => $model->start,
-				'end_at' => $model->end,
+				'title' => $model->news,
+				'start' => $model->start,
+				'end' => $model->end,
 			];
 		}
 
-		return $this->asJson(['data' => $data]);
+		return $this->asJson($data);
 	}
 
 	public function actionAdd(int $agent_id, string $news, string $date): Response {

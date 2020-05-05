@@ -15,7 +15,7 @@
 
     export interface NoteInterface {
         content: string;
-        id: number;
+        id: number | null;
     }
 
     @Component

@@ -1,7 +1,7 @@
 <template>
 	<div class="filter-calendar">
 		<BootstrapPopup :title="this.notePopupTitle" outerDissmisable ref="notesPopup">
-			<CalendarNotes :notes="dayNotes" :onNoteDelete="deleteNote" :onNoteUpdate="editNoteText" editable/>
+			<CalendarNotes :notes="dayNotes" :onNoteAdd="addNote" :onNoteDelete="deleteNote" :onNoteUpdate="editNoteText" editable/>
 		</BootstrapPopup>
 		<Filters
 				ref="filters"
@@ -96,6 +96,7 @@
 
         private dayNotes: NoteInterface[] = [];
         private notePopupTitle: string = '';
+        private notePopupDate!: Date;
 
         mounted(): void {
             this.visibleStatusIds = this.filters.getActiveFiltersIds();
@@ -104,6 +105,7 @@
         get eventSources(): EventSourceObject[] {
             return [
                 {
+                    id: 0,
                     url: this.URLGetEvents,
                     allDayDefault: false,
                     extraParams: {
@@ -119,6 +121,7 @@
                         })
                     }
                 }, {
+                    id: 1,
                     url: this.URLGetNotes,
                     extraParams: {
                         agentId: this.agentId
@@ -166,15 +169,19 @@
             if (!dateInfo.allDay) return; //it's not a note
             if (dateInfo.view.type === 'dayGridMonth') return;
             this.dayNotes = this.getNotesFromDayInfo(dateInfo);
+            console.log(this.dayNotes);
             this.notePopupTitle = 'Notatki ' + prettify(dateInfo.dateStr);
+            this.notePopupDate = dateInfo.date;
             this.notesPopup.show();
         }
 
         private getNotesFromDayInfo(dateInfo: DateClickWithDayEvents): NoteInterface[] {
-            return dateInfo.dayEvents.map((event: EventObject) => ({
-                content: event.title,
-                id: event.id
-            }))
+            return dateInfo.dayEvents
+                .filter((event) => event.allDay)
+                .map((event: EventObject) => ({
+                    content: event.title,
+                    id: event.id
+                }));
         }
 
         private dateDoubleClick(dateInfo: DateClickWithDayEvents): void {
@@ -192,6 +199,19 @@
             return true;
         }
 
+        private async addNote(newNote: NoteInterface): Promise<number | false> {
+            const params: URLSearchParams = new URLSearchParams();
+            params.append('news', newNote.content);
+            params.append('agent_id', String(this.agentId));
+            params.append('date', dateToW3C(this.notePopupDate));
+
+            const res = await this.axios.post(this.URLNewNote, params);
+            console.log(res);
+            if (res.status !== 200) return false;
+            if (!res.data.id) return false;
+            this.calendar.update();
+            return res.data.id;
+        }
 
         private addEvent(date: Date): void {
             window.open(`${this.URLAddEvent}?date=${dateToW3C(date)}`);

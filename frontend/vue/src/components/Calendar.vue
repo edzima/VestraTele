@@ -96,6 +96,10 @@
             this.parseTooltip(info);
         }
 
+        public update(): void {
+            console.log(this.fullCalendar.getApi().getEventSourceById(1).refetch())
+        }
+
         private parseTooltip(info: Info) {
             if (info.event.extendedProps.tooltipContent) {
                 const options = Object.assign({content: info.event.extendedProps.tooltipContent}, this.tooltipOptions);
@@ -135,6 +139,10 @@
             this.deleteEvent(toDel);
         }
 
+        public createEvent(event: EventObject) {
+            this.fullCalendar.getApi().addEvent(event);
+        }
+
         private clickCheckerId: number | undefined = undefined;
 
         private handleDateClick(dateClick: DateClickInfo): void {
@@ -147,6 +155,10 @@
                 this.removeClickTimeout();
                 this.emitExtendedDateClick(dateClick, 'double')
             }
+        }
+
+        public preventDuplicateEvents(events: EventObject[]): boolean {
+            return events.filter((event: EventObject) => !this.findCalendarEvent(event.id));
         }
 
         private emitExtendedDateClick(dateClick: DateClickInfo, type: 'single' | 'double'): void {
