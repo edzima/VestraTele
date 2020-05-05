@@ -2,7 +2,8 @@
 	<div class="calendar-notes">
 		<template v-if="isOperation('view')">
 			<NotesList :notes="localNotes" @deleteClick="deleteNote" @editClick="editNote" confirmDelete editable v-if="operation==='view'"/>
-			<Button @click="addNote">Dodaj Notatkę</Button>
+			<p class="note-placeholder text-primary" v-if="!localNotes.length"> Brak notatek </p>
+			<Button @click="addNote" class="btn btn-primary">Dodaj Notatkę</Button>
 		</template>
 		<template v-if="isOperation('edit')">
 			<NoteEditor :confirmEdit="noteToEdit.id" :note="noteToEdit" @discardChanges="discardEditChanges" @saveEditedNote="noteChangesHandler" auto-focus/>
@@ -107,7 +108,21 @@
 </script>
 
 <style lang="less">
-	.title-date {
-		font-weight: bold;
+	.calendar-notes {
+		display: flex;
+		flex-direction: column;
+		min-height: 30vh;
+
+		.note-placeholder {
+			font-weight: bold;
+			font-size: 25px;
+			text-align: center;
+		}
+
+		.btn {
+			margin: auto 0 0 auto;
+			align-self: flex-end;
+			justify-self: flex-end;
+		}
 	}
 </style>
