@@ -16,7 +16,7 @@ use common\models\UserProfile;
  */
 class UserController extends Controller {
 
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
 				'class' => VerbFilter::class,

@@ -1,6 +1,6 @@
 <?php
 
-use backend\modules\address\widgets\AddressWidget;
+use backend\modules\address\widgets\AddressFormWidget;
 use kartik\depdrop\DepDrop;
 use kartik\select2\Select2;
 use yii\helpers\Html;
@@ -24,7 +24,12 @@ use yii\widgets\MaskedInput;
 /* @var $cityCode string */
 /* @var $copyOptions array */
 
+?>
+
+<?php
+
 $mergeOptions = function (string $attribute, array $options) use ($copyOptions) {
+
 	if (empty($copyOptions) || !isset($copyOptions['inputs'][$attribute])) {
 		return $options;
 	}
@@ -52,7 +57,7 @@ $template = function (string $attribute, ?string $url) {
 					'template' => $template('state', $stateAdd),
 				])
 				->widget(Select2::class, [
-						'data' => AddressWidget::getStates(),
+						'data' => AddressFormWidget::getStates(),
 						'initValueText' => $model->{$state} ?? null,
 						'options' => $mergeOptions('state', [
 							'placeholder' => '--Wybierz województwo--',
@@ -71,16 +76,25 @@ $template = function (string $attribute, ?string $url) {
 					'template' => $template('province', $provinceAdd),
 				])->widget(DepDrop::class, [
 				'type' => DepDrop::TYPE_SELECT2,
-				'options' =>
-					['id' => $id . 'province-id'],
-				'data' => $model->{$state} > 0 ? AddressWidget::getProvinces($model->{$state}) : [],
-				'pluginOptions' => $mergeOptions('province', [
+				'options' => $mergeOptions('province', [
+					'id' => $id . 'province-id',
+				]),
+				'data' => $model->{$state} > 0 ? AddressFormWidget::getProvinces($model->{$state}) : [],
+				'pluginOptions' => [
 					'depends' => [$id . 'state-id'],
 					'placeholder' => 'Powiat...',
 					'url' => Url::to(['/address/city/powiat']),
 					'loading' => 'wyszukiwanie...',
 					'params' => [$id . 'province-id'],
-				]),
+				],
+				'select2Options' => [
+
+					'options' => [
+						'prompt' => 'Powiat..',
+						'placeholder' => 'Powiat...',
+					],
+
+				],
 			]); ?>
 		<?php endif; ?>
 
@@ -93,7 +107,8 @@ $template = function (string $attribute, ?string $url) {
 			])
 				->widget(DepDrop::class, [
 					'type' => DepDrop::TYPE_SELECT2,
-					'data' => $model->{$state} > 0 && $model->{$province} > 0 ? AddressWidget::getSubprovinces($model->{$state}, $model->{$province}) : [],
+					'data' => $model->{$state} > 0 && $model->{$province} > 0 ? AddressFormWidget::getSubprovinces($model->{$state}, $model->{$province}) : [],
+					'options' => $mergeOptions('subProvince', []),
 					'pluginOptions' => [
 						'depends' => [$id . 'state-id', $id . 'province-id'],
 						'placeholder' => 'Gmina...',
@@ -114,12 +129,13 @@ $template = function (string $attribute, ?string $url) {
 				])
 				->widget(DepDrop::class, [
 					'type' => DepDrop::TYPE_SELECT2,
-					'data' => $model->{$state} > 0 && $model->{$province} > 0 ? AddressWidget::getCities($model->{$state}, $model->{$province}) : [],
+					'data' => $model->{$state} > 0 && $model->{$province} > 0 ? AddressFormWidget::getCities($model->{$state}, $model->{$province}) : [],
 					'pluginOptions' => [
 						'depends' => [$id . 'state-id', $id . 'province-id'],
 						'placeholder' => 'Miejscowość...',
 						'url' => Url::to(['/address/city/city']),
 					],
+					'options' => $mergeOptions('city', []),
 				]);
 			?>
 		<?php endif; ?>

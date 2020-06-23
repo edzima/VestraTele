@@ -4,6 +4,7 @@ namespace backend\models;
 
 use Yii;
 use yii\base\Model;
+use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
 use common\models\User;
 
@@ -23,7 +24,7 @@ class UserForm extends Model {
 	private $model;
 
 	public function getParents(): array {
-		$list = User::getSelectList([User::ROLE_AGENT, User::ROLE_GENERAL_DIRECTOR, User::ROLE_DIRECTOR, User::ROLE_ASSOCIATE_DIRECTOR, User::ROLE_MANAGER, User::ROLE_USER]);
+		$list = User::getSelectList([User::ROLE_AGENT]);
 		if (!$this->getModel()->isNewRecord) {
 			if (isset($list[$this->getModel()->id])) {
 				unset($list[$this->getModel()->id]);
@@ -42,8 +43,8 @@ class UserForm extends Model {
 			['username', 'match', 'pattern' => '#^[\w_\-\.]+$$#i'],
 			[
 				'username', 'unique',
-				'targetClass' => User::className(),
-				'filter' => function ($query) {
+				'targetClass' => User::class,
+				'filter' => function (QueryInterface $query) {
 					if (!$this->getModel()->isNewRecord) {
 						$query->andWhere(['not', ['id' => $this->getModel()->id]]);
 					}
@@ -54,10 +55,9 @@ class UserForm extends Model {
 			['email', 'trim'],
 			['email', 'required'],
 			['email', 'email'],
-			['typ_work', 'string'],
 			[
 				'email', 'unique',
-				'targetClass' => User::className(),
+				'targetClass' => User::class,
 				'filter' => function ($query) {
 					if (!$this->getModel()->isNewRecord) {
 						$query->andWhere(['not', ['id' => $this->getModel()->id]]);
@@ -69,7 +69,7 @@ class UserForm extends Model {
 
 			['password', 'required', 'on' => 'create'],
 			['password', 'string', 'min' => 6, 'max' => 32],
-			[['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['parent_id' => 'id']],
+			[['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['parent_id' => 'id']],
 			['parent_id', 'in', 'range' => array_keys($this->getParents())],
 			['status', 'integer'],
 			['status', 'in', 'range' => array_keys(User::statuses())],
@@ -95,7 +95,6 @@ class UserForm extends Model {
 			'password' => Yii::t('backend', 'Hasło'),
 			'status' => Yii::t('backend', 'Status'),
 			'roles' => Yii::t('backend', 'Rola'),
-			'typ_work' => 'Rodzaj pracownika',
 			'parent_id' => 'Przełożony',
 		];
 	}

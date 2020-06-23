@@ -1,11 +1,11 @@
 <?php
 
-use common\models\WojewodztwaSearch;
+use common\models\address\search\SubProvinceSearch;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel WojewodztwaSearch */
+/* @var $searchModel SubProvinceSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Gminy';
@@ -22,9 +22,10 @@ $this->params['breadcrumbs'][] = $this->title;
 		'filterModel' => $searchModel,
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
+			'id',
 			'name',
-			'region',
 			'state',
+			'province',
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Closure;
+use developeruz\db_rbac\interfaces\UserRbacInterface;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -33,26 +34,30 @@ use common\models\query\UserQuery;
  * @property UserProfile $userProfile
  * @property User $parent
  */
-class User extends ActiveRecord implements IdentityInterface {
+class User extends ActiveRecord implements IdentityInterface, UserRbacInterface {
 
 	public const STATUS_INACTIVE = 0;
 	public const STATUS_ACTIVE = 1;
 	public const STATUS_BANNED = 2;
 	public const STATUS_DELETED = 3;
 
-	public const ROLE_USER = 'user';
-	public const ROLE_TELEMARKETER = 'telemarketer';
-
-	public const ROLE_LAYER = 'layer';
-	public const ROLE_AGENT = 'agent';
-	public const ROLE_ASSOCIATE_DIRECTOR = 'associate_director';
-	public const ROLE_DIRECTOR = 'director';
-	public const ROLE_GENERAL_DIRECTOR = 'general_director';
-	public const ROLE_MANAGER = 'manager';
 	public const ROLE_ADMINISTRATOR = 'administrator';
-	public const ROLE_BOOKKEEPER = 'book_keeper';
+	public const ROLE_MANAGER = 'manager';
+	public const ROLE_USER = 'user';
+
+	public const ROLE_ARCHIVE = 'archive';
+	public const ROLE_ISSUE = 'issue';
+	public const ROLE_LOGS = 'logs';
 	public const ROLE_MEET = 'meet';
-	public const MACIEJ_ID = 538;
+	public const ROLE_NEWS = 'news';
+	public const ROLE_NOTE = 'note';
+
+	public const ROLE_AGENT = 'agent';
+	public const ROLE_BOOKKEEPER = 'book_keeper';
+	public const ROLE_BOOKKEEPER_DELAYED = 'book_keeper_delayed';
+	public const ROLE_CUSTOMER_SERVICE = 'customer_service';
+	public const ROLE_TELEMARKETER = 'telemarketer';
+	public const ROLE_LAWYER = 'lawyer';
 
 	private $selfTree;
 	private static $BOSS_MAP = [];
@@ -302,14 +307,14 @@ class User extends ActiveRecord implements IdentityInterface {
 		return new UserQuery(get_called_class());
 	}
 
-	public static function getSelectList(array $roles = [], ?Closure $beforeAll = null): array {
+	public static function getSelectList(array $roles = [], bool $commonRoles = true, ?Closure $beforeAll = null): array {
 		$query = static::find()
 			->joinWith('userProfile')
 			->with('userProfile')
 			->active()
 			->orderBy('user_profile.lastname');
 		if (!empty($roles)) {
-			$query->onlyByRole($roles);
+			$query->onlyByRole($roles, $commonRoles);
 		}
 		if ($beforeAll instanceof Closure) {
 			$beforeAll($query);
@@ -433,11 +438,11 @@ class User extends ActiveRecord implements IdentityInterface {
 		return $childs;
 	}
 
-	public static function getUserName(int $id): string {
-		return static::getUserNames()[$id];
+	public static function userName(int $id): string {
+		return static::userNames()[$id];
 	}
 
-	private static function getUserNames(): array {
+	private static function userNames(): array {
 		if (empty(static::$USER_NAMES)) {
 			static::$USER_NAMES = static::find()
 				->select('username')
@@ -449,4 +454,7 @@ class User extends ActiveRecord implements IdentityInterface {
 		return static::$USER_NAMES;
 	}
 
+	public function getUserName() {
+		return $this->getFullName();
+	}
 }

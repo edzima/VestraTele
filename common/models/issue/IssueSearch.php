@@ -13,14 +13,14 @@ use yii\helpers\ArrayHelper;
  */
 class IssueSearch extends Issue {
 
-	public $clientCity;
-	public $clientState;
-
 	public $createdAtFrom;
 	public $createdAtTo;
 	public $childsId;
 	public $disabledStages = [];
 	public $onlyDelayed = false;
+	public $withArchive = false;
+
+	private $stages = [];
 
 	/**
 	 * @inheritdoc
@@ -29,23 +29,20 @@ class IssueSearch extends Issue {
 		return [
 			[
 				[
-					'id', 'agent_id', 'tele_id', 'lawyer_id', 'childsId', 'client_city_id', 'client_street',
-					'victim_city_id', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id',
+					'id', 'agent_id', 'tele_id', 'lawyer_id', 'childsId', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id',
 				], 'integer',
 			],
 			[
 				['payed', 'onlyDelayed'], 'boolean',
 			],
 			[['createdAtTo', 'createdAtFrom', 'accident_at'], 'date', 'format' => DATE_ATOM],
+			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			[
 				[
-					'created_at', 'updated_at', 'client_first_name', 'client_surname', 'client_phone_1',
-					'client_phone_2', 'client_city_code', 'victim_first_name', 'victim_surname', 'victim_city_code',
-					'victim_street', 'victim_phone', 'details', 'disabledStages',
+					'created_at', 'updated_at', 'client_first_name', 'client_surname', 'victim_first_name', 'victim_surname', 'victim_city_code',
+					'victim_street', 'details', 'disabledStages',
 				], 'safe',
 			],
-			[['clientCity', 'clientState'], 'safe'],
-			[['clientCity', 'clientState'], 'default', 'value' => null],
 		];
 	}
 
@@ -97,16 +94,6 @@ class IssueSearch extends Issue {
 			return $dataProvider;
 		}
 
-		if ($this->clientState !== null) {
-			$query->joinWith('clientState');
-			$query->andFilterWhere(['wojewodztwa.id' => $this->clientState]);
-		}
-
-		if ($this->clientCity !== null) {
-			$query->joinWith('clientCity');
-			$query->andFilterWhere(['like', 'miasta.name', $this->clientCity]);
-		}
-
 		if ($this->childsId > 0) {
 			$user = User::findOne($this->childsId);
 			if ($user !== null) {
@@ -119,6 +106,7 @@ class IssueSearch extends Issue {
 		$this->teleFilter($query);
 		$this->lawyerFilter($query);
 		$this->delayedFilter($query);
+		$this->archiveFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -156,6 +144,12 @@ class IssueSearch extends Issue {
 		return $dataProvider;
 	}
 
+	protected function archiveFilter(IssueQuery $query): void {
+		if (!$this->withArchive) {
+			$query->withoutArchives();
+		}
+	}
+
 	protected function teleFilter(IssueQuery $query): void {
 		$query->andFilterWhere(['tele_id' => $this->tele_id]);
 	}
@@ -167,7 +161,7 @@ class IssueSearch extends Issue {
 	private function delayedFilter(IssueQuery $query): void {
 		if (!empty($this->onlyDelayed)) {
 			$query->joinWith('stage');
-			$daysGroups = ArrayHelper::map(static::getStages(), 'id', 'days_reminder', 'days_reminder');
+			$daysGroups = ArrayHelper::map($this->getStagesNames(), 'id', 'days_reminder', 'days_reminder');
 
 			foreach ($daysGroups as $day => $ids) {
 				if (!empty($day)) {
@@ -191,16 +185,13 @@ class IssueSearch extends Issue {
 		return ArrayHelper::map(IssueType::find()->all(), 'id', 'nameWithShort');
 	}
 
-	private static $stages;
-
-	public static function getStagesNames(): array {
-		return ArrayHelper::map(static::getStages(), 'id', 'nameWithShort');
-	}
-
-	private static function getStages(): array {
-		if (static::$stages === null) {
-			static::$stages = IssueStage::find()->all();
+	public function getStagesNames(): array {
+		if (empty($this->stages)) {
+			$this->stages = ArrayHelper::map(IssueStage::find()->all(), 'id', 'nameWithShort');
 		}
-		return static::$stages;
+		if (!$this->withArchive && isset($this->stages[IssueStage::ARCHIVES_ID])) {
+			unset($this->stages[IssueStage::ARCHIVES_ID]);
+		}
+		return $this->stages;
 	}
 }

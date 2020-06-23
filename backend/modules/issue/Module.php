@@ -8,9 +8,25 @@
 
 namespace backend\modules\issue;
 
+use common\models\User;
 use yii\base\Module as BaseModule;
+use yii\filters\AccessControl;
 
 class Module extends BaseModule {
 
 	public $controllerNamespace = 'backend\modules\issue\controllers';
+
+	public function behaviors(): array {
+		return [
+			'access' => [
+				'class' => AccessControl::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'roles' => [User::ROLE_ISSUE],
+					],
+				],
+			],
+		];
+	}
 }

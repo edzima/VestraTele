@@ -1,6 +1,7 @@
 <?php
 
 use backend\widgets\CsvForm;
+use common\models\issue\Issue;
 use common\models\issue\IssueSearch;
 use common\models\User;
 use kartik\grid\ActionColumn;
@@ -96,7 +97,11 @@ $this->registerJs($js);
 				'options' => [
 					'style' => 'width:110px',
 				],
-
+				'visibleButtons' => [
+					'view' => static function (Issue $model) use ($searchModel): bool {
+						return !$model->isArchived() || $searchModel->withArchive;
+					},
+				],
 			],
 			[
 				'class' => DataColumn::class,
@@ -143,7 +148,7 @@ $this->registerJs($js);
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'stage_id',
-				'filter' => IssueSearch::getStagesNames(),
+				'filter' => $searchModel->getStagesNames(),
 				'value' => 'stage.short_name',
 				'contentOptions' => [
 					'class' => 'bold-text text-center',

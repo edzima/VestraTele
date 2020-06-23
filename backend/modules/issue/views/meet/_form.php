@@ -1,15 +1,14 @@
 <?php
 
-use backend\modules\address\widgets\AddressWidget;
-use common\models\issue\IssueMeet;
-use common\models\User;
+use backend\modules\address\widgets\AddressFormWidget;
+use backend\modules\issue\models\MeetForm;
 use common\widgets\DateTimeWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\IssueMeet */
+/* @var $model MeetForm */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -17,74 +16,62 @@ use yii\widgets\ActiveForm;
 
 	<?php $form = ActiveForm::begin(); ?>
 
-	<?= $form->field($model, 'created_at')
-		->widget(DateTimeWidget::class, [
-			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
-		])
+	<?= $form->field($model, 'createdAt')
+		->widget(DateTimeWidget::class)
 	?>
 
-	<?= $form->field($model, 'date_at')
-		->widget(DateTimeWidget::class, [
-			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
-		])
+	<?= $form->field($model, 'dateStart')
+		->widget(DateTimeWidget::class)
 	?>
 
 
-	<?= $form->field($model, 'campaign_id')->dropDownList(IssueMeet::getCampaignNames()) ?>
+	<?= $form->field($model, 'campaignId')->dropDownList(MeetForm::getCampaignNames()) ?>
 
-	<?= $form->field($model, 'type_id')->dropDownList(IssueMeet::getTypesNames()) ?>
+	<?= $form->field($model, 'typeId')->dropDownList(MeetForm::getTypesNames()) ?>
 
-	<?= $form->field($model, 'status')->dropDownList(IssueMeet::getStatusNames()) ?>
+	<?= $form->field($model, 'status')->dropDownList(MeetForm::getStatusNames()) ?>
 
 	<fieldset>
 		<legend>Klient</legend>
 		<div class="row">
-			<?= $form->field($model, 'client_name', [
+			<?= $form->field($model, 'clientName', [
 				'options' => [
-					'class' => 'col-md-4',
+					'class' => 'col-md-3',
 				],
-			])->textInput(['maxlength' => true]) ?>
+			])->textInput([
+			]) ?>
 
-			<?= $form->field($model, 'client_surname', [
+			<?= $form->field($model, 'clientSurname', [
 				'options' => [
-					'class' => 'col-md-4',
+					'class' => 'col-md-3',
 				],
-			])->textInput(['maxlength' => true]) ?>
+			])->textInput([
+			]) ?>
 
 			<?= $form->field($model, 'phone', [
 				'options' => [
-					'class' => 'col-md-4',
+					'class' => 'col-md-3',
 				],
 			])->textInput(['maxlength' => true]) ?>
+
+			<?= $form->field($model, 'email', [
+				'options' => [
+					'class' => 'col-md-3',
+				],
+			])->textInput(['maxlength' => true]) ?>
+
 		</div>
-		<?= AddressWidget::widget([
+		<?= AddressFormWidget::widget([
 			'form' => $form,
-			'model' => $model,
-			'state' => 'stateId',
-			'province' => 'provinceId',
-			'subProvince' => 'sub_province_id',
-			'city' => 'city_id',
-			'street' => 'street',
+			'model' => $model->getAddress(),
 		]) ?>
 	</fieldset>
 
 
 	<div class="row">
-		<?= $form->field($model, 'tele_id', ['options' => ['class' => 'col-md-6']])
+		<?= $form->field($model, 'agentId', ['options' => ['class' => 'col-md-6']])
 			->widget(Select2::class, [
-					'data' => User::getSelectList([User::ROLE_TELEMARKETER]),
-					'options' => [
-						'placeholder' => 'Tele',
-					],
-					'pluginOptions' => [
-						'allowClear' => true,
-					],
-				]
-			) ?>
-
-		<?= $form->field($model, 'agent_id', ['options' => ['class' => 'col-md-6']])
-			->widget(Select2::class, [
-					'data' => User::getSelectList([User::ROLE_AGENT]),
+					'data' => MeetForm::getAgentsNames(),
 					'options' => [
 						'placeholder' => 'Agent',
 					],

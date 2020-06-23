@@ -1,6 +1,7 @@
 <?php
 
 use common\models\issue\Issue;
+use common\widgets\address\AddressDetailView;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -120,28 +121,12 @@ use yii\widgets\DetailView;
 						'client_phone_1',
 						'client_phone_2',
 						'client_email:email',
-						[
-							'attribute' => 'clientState',
-							'label' => 'Region',
-						],
-						[
-							'attribute' => 'clientProvince',
-							'label' => 'Powiat',
-						],
-						[
-							'attribute' => 'clientSubprovince',
-							'label' => 'Gmina',
-							'visible' => $model->hasClientSubprovince(),
-						],
-						[
-							'attribute' => 'clientCity',
-							'label' => 'Miasto',
-							'visible' => $model->client_city_id !== null,
-							'value' => Yii::$app->formatter->asCityCode($model->clientCity, $model->client_city_code),
-						],
-						'client_street',
 					],
 				]) ?>
+				<?= AddressDetailView::widget([
+					'model' => $model->getClientAddress(),
+				]) ?>
+
 			</fieldset>
 
 			<fieldset class="col-md-6">
@@ -158,28 +143,11 @@ use yii\widgets\DetailView;
 						'victim_surname',
 						'victim_phone',
 						'victim_email:email',
-
-						[
-							'attribute' => 'victimState',
-							'label' => 'Region',
-						],
-						[
-							'attribute' => 'victimProvince',
-							'label' => 'Powiat',
-						],
-						[
-							'attribute' => 'victimSubprovince',
-							'label' => 'Gmina',
-							'visible' => $model->hasVictimSubprovince(),
-						],
-						[
-							'attribute' => 'victimCity',
-							'label' => 'Miasto',
-							'value' => Yii::$app->formatter->asCityCode($model->victimCity, $model->victim_city_code),
-							'visible' => $model->victim_city_id !== null,
-						],
-						'victim_street',
 					],
+				]) ?>
+
+				<?= AddressDetailView::widget([
+					'model' => $model->getVictimAddress(),
 				]) ?>
 			</fieldset>
 		</div>

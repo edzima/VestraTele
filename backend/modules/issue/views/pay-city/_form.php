@@ -1,6 +1,6 @@
 <?php
 
-use backend\modules\address\widgets\AddressWidget;
+use backend\modules\address\widgets\AddressFormWidget;
 use common\widgets\DateTimeWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 
 	<?php $form = ActiveForm::begin(); ?>
 
-	<?= AddressWidget::widget([
+	<?= AddressFormWidget::widget([
 		'form' => $form,
 		'model' => $model->getAddress(),
 		'subProvince' => false,

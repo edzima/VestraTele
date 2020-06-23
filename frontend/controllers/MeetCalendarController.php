@@ -4,10 +4,16 @@ namespace frontend\controllers;
 
 use common\models\issue\IssueMeet;
 use common\models\User;
+use frontend\models\AgentMeetCalendarSearch;
+use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\web\Controller;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -15,6 +21,15 @@ class MeetCalendarController extends Controller {
 
 	public function behaviors(): array {
 		return [
+			'access' => [
+				'class' => AccessControl::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'roles' => [User::ROLE_MEET, User::ROLE_AGENT],
+					],
+				],
+			],
 			'verbs' => [
 				'class' => VerbFilter::class,
 				'actions' => [
@@ -31,18 +46,21 @@ class MeetCalendarController extends Controller {
 		return parent::runAction($id, $params);
 	}
 
-	public function actionIndex(int $agentId = null) {
+	public function actionIndex(int $agentId = null): string {
 		if ($agentId === null) {
 			$agentId = Yii::$app->user->getId();
 		}
 
-		$agents = User::find()
-			->with('userProfile')
-			->leftJoin('issue_meet', 'user.id = issue_meet.agent_id')
-			->where('issue_meet.agent_id IS NOT NULL')
-			->all();
+		$agents = [];
+		if (Yii::$app->user->can(User::ROLE_MANAGER)) {
+			$agents = User::find()
+				->with('userProfile')
+				->leftJoin('issue_meet', 'user.id = issue_meet.agent_id')
+				->where('issue_meet.agent_id IS NOT NULL')
+				->all();
 
-		$agents = ArrayHelper::map($agents, 'id', 'fullName');
+			$agents = ArrayHelper::map($agents, 'id', 'fullName');
+		}
 
 		return $this->render('index', [
 			'agents' => $agents,
@@ -50,52 +68,71 @@ class MeetCalendarController extends Controller {
 		]);
 	}
 
-	public function actionList(string $dateFrom = null, string $dateTo = null, int $agentId = null): Response {
+	public function actionList(string $start = null, string $end = null, int $agentId = null): Response {
 		if ($agentId === null) {
 			$agentId = Yii::$app->user->getId();
 		}
-		if ($dateFrom === null) {
-			$dateFrom = date('Y - m - 01');
-		}
-		if ($dateTo === null) {
-			$dateTo = date('Y - m - t 23:59:59');
-		}
-		$models = IssueMeet::find()
-			->andWhere(['agent_id' => $agentId])
-			->andWhere([' >= ', 'date_at', $dateFrom])
-			->andWhere([' <= ', 'date_at', $dateTo])
-			->with('city')
-			->all();
 
+		if ($agentId !== Yii::$app->user->getId() && !Yii::$app->user->can(User::ROLE_MANAGER)) {
+			throw new MethodNotAllowedHttpException();
+		}
+		if ($start === null) {
+			$start = date('Y - m - 01');
+		}
+		if ($end === null) {
+			$end = date('Y - m - t 23:59:59');
+		}
+		$model = new AgentMeetCalendarSearch();
+		$model->agent_id = $agentId;
+		$model->start = $start;
+		$model->end = $end;
 		$data = [];
 
-		foreach ($models as $model) {
+		foreach ($model->search()->getModels() as $model) {
 			$data[] = [
 				'id' => $model->id,
-				'typeId' => $model->type_id,
-				'client' => $model->getClientFullName(),
-				'city' => $model->city->name,
-				'street' => $model->street,
-				'state' => $model->state->name,
-				'province' => $model->province->name,
-				'subProvince' => $model->subProvince->name,
-				'phone' => $model->phone,
-				'date_at' => $model->date_at,
-				'date_end_at' => $model->date_end_at,
-				'details' => $model->details,
+				'url' => Url::to(['meet/view', 'id' => $model->id]),
+				'title' => $model->getClientFullName(),
+				'start' => $model->date_at,
+				'end' => $model->date_end_at,
+				'phone' => Html::encode($this->getPhone($model)),
+				'statusId' => $model->status,
+				'tooltipContent' => $this->getTooltipContent($model),
 			];
 		}
 
-		return $this->asJson([
-			'data' => $data,
-		]);
+		return $this->asJson($data);
+	}
+
+	private function getPhone(IssueMeet $model): string {
+		$validator = new PhoneValidator();
+		$validator->country = 'PL';
+		if ($validator->validateAttribute($model, 'phone')) {
+			return $model->phone;
+		}
+		return '';
+	}
+
+	private function getTooltipContent(IssueMeet $model): string {
+		$tooltip = $model->details;
+		$phone = $this->getPhone($model);
+		if (!empty($phone)) {
+			$tooltip .= ' Tel: ' . $phone;
+		}
+		return $tooltip;
 	}
 
 	public function actionUpdate(int $id, string $date_at, string $date_end_at): Response {
 		$model = $this->findModel($id);
 		$model->date_at = $date_at;
 		$model->date_end_at = $date_end_at;
-		return $this->asJson(['success' => $model->save()]);
+		if ($model->save()) {
+			return $this->asJson(['success' => true]);
+		}
+		return $this->asJson([
+			'success' => false,
+			'errors' => $model->getErrors(),
+		]);
 	}
 
 	/**

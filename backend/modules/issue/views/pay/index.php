@@ -4,6 +4,7 @@ use backend\helpers\Url;
 use backend\modules\issue\models\searches\IssuePaySearch;
 use backend\widgets\CsvForm;
 use common\models\issue\IssuePay;
+use common\models\User;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
@@ -14,6 +15,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $searchModel IssuePaySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $withMenu bool */
 
 $this->title = 'Wpłaty';
 $this->params['breadcrumbs'][] = ['label' => 'Rozliczenia', 'url' => ['pay-calculation/index']];
@@ -25,21 +27,22 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?php
-		$statusItems = [];
-		foreach (IssuePaySearch::getPayStatusNames() as $status => $name) {
-			$statusItems[] = [
-				'label' => $name,
-				'url' => ['index', 'status' => $status],
-				'active' => $searchModel->getPayStatus() === $status,
-			];
-		}
-		?>
-		<?= Nav::widget([
-			'items' => $statusItems,
-			'options' => ['class' => 'nav-pills'],
-		]) ?>
-
+		<?php if ($withMenu): ?>
+			<?php
+			$statusItems = [];
+			foreach (IssuePaySearch::getPayStatusNames() as $status => $name) {
+				$statusItems[] = [
+					'label' => $name,
+					'url' => ['index', 'status' => $status],
+					'active' => $searchModel->getPayStatus() === $status,
+				];
+			}
+			?>
+			<?= Nav::widget([
+				'items' => $statusItems,
+				'options' => ['class' => 'nav-pills'],
+			]) ?>
+		<?php endif; ?>
 
 	</p>
 
@@ -74,15 +77,17 @@ $this->params['breadcrumbs'][] = $this->title;
 				'template' => '{pay}{status}',
 				'buttons' => [
 					'pay' => static function ($url, IssuePay $model): string {
-
-						return Html::a(
-							'<span class="glyphicon glyphicon-check" aria-hidden="true"></span>',
-							Url::toRoute(['pay', 'id' => $model->id]),
-							[
-								'title' => 'Oplac',
-								'aria-label' => 'Oplac',
-								'target' => '_blank',
-							]);
+						if (Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
+							return Html::a(
+								'<span class="glyphicon glyphicon-check" aria-hidden="true"></span>',
+								Url::toRoute(['pay', 'id' => $model->id]),
+								[
+									'title' => 'Oplac',
+									'aria-label' => 'Oplac',
+									'target' => '_blank',
+								]);
+						}
+						return '';
 					},
 					'status' => static function ($url, IssuePay $model): string {
 						return Html::a(

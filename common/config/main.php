@@ -87,6 +87,10 @@ $config = [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',
 				],
+				'db_rbac' =>[
+					'class' => 'yii\i18n\PhpMessageSource',
+					'basePath' => '@common/messages',
+				],
 				'*' => [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',

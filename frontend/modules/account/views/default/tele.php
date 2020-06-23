@@ -14,47 +14,46 @@ $this->title = Yii::t('frontend', 'Nowe spotkanie');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="account-default-settings">
-    <h1><?= Html::encode($this->title) ?></h1>
-<?php print_r(Yii::$app->user->identity->typ_work); ?>
+	<h1><?= Html::encode($this->title) ?></h1>
 
 
-    <?php $form = ActiveForm::begin(); ?>
+	<?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'firstname')->textInput(['maxlength' => true]) ?>
+	<?= $form->field($model, 'firstname')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'lastname')->textInput(['maxlength' => true]) ?>
+	<?= $form->field($model, 'lastname')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'birthday')->widget(
-        DateTimeWidget::className(),
-        [
-            'phpDatetimeFormat' => 'yyyy-MM-dd\'T\'HH:mm:ssZZZZZ',
-        ]
-    ) ?>
+	<?= $form->field($model, 'birthday')->widget(
+		DateTimeWidget::className(),
+		[
+			'phpDatetimeFormat' => 'yyyy-MM-dd\'T\'HH:mm:ssZZZZZ',
+		]
+	) ?>
 
-    <?= $form->field($model, 'avatar_path')->widget(
-        Widget::className(),
-        [
-            'settings' => [
-                'url' => ['/site/fileapi-upload'],
-            ],
-            'crop' => true,
-            'cropResizeWidth' => 100,
-            'cropResizeHeight' => 100,
-        ]
-    ) ?>
+	<?= $form->field($model, 'avatar_path')->widget(
+		Widget::className(),
+		[
+			'settings' => [
+				'url' => ['/site/fileapi-upload'],
+			],
+			'crop' => true,
+			'cropResizeWidth' => 100,
+			'cropResizeHeight' => 100,
+		]
+	) ?>
 
-    <?= $form->field($model, 'gender')->dropDownlist([
-        UserProfile::GENDER_MALE => Yii::t('frontend', 'Male'),
-        UserProfile::GENDER_FEMALE => Yii::t('frontend', 'Female'),
-    ], ['prompt' => '']) ?>
+	<?= $form->field($model, 'gender')->dropDownlist([
+		UserProfile::GENDER_MALE => Yii::t('frontend', 'Male'),
+		UserProfile::GENDER_FEMALE => Yii::t('frontend', 'Female'),
+	], ['prompt' => '']) ?>
 
-    <?= $form->field($model, 'website')->textInput(['maxlength' => true]) ?>
+	<?= $form->field($model, 'website')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'other')->textarea(['rows' => 6]) ?>
+	<?= $form->field($model, 'other')->textarea(['rows' => 6]) ?>
 
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('frontend', 'Update'), ['class' => 'btn btn-primary']) ?>
-    </div>
+	<div class="form-group">
+		<?= Html::submitButton(Yii::t('frontend', 'Update'), ['class' => 'btn btn-primary']) ?>
+	</div>
 
-    <?php ActiveForm::end() ?>
+	<?php ActiveForm::end() ?>
 </div>

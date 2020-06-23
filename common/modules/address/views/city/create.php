@@ -1,9 +1,10 @@
 <?php
 
+use common\models\address\City;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $city common\models\City */
+/* @var $model City */
 
 $this->title = 'Dodaj Miejscowość';
 $this->params['breadcrumbs'][] = ['label' => 'Miejscowości', 'url' => ['index']];
@@ -14,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<?= $this->render('_form', [
-		'city' => $city,
+		'model' => $model,
 	]) ?>
 
 </div>

@@ -1,9 +1,10 @@
 <?php
 
+use backend\modules\issue\models\MeetForm;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\IssueMeet */
+/* @var $model MeetForm */
 
 $this->title = 'Dodaj spotkanie';
 $this->params['breadcrumbs'][] = ['label' => 'Spotkania', 'url' => ['index']];

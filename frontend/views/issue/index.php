@@ -1,13 +1,11 @@
 <?php
 
-use common\models\issue\IssueStage;
-use common\models\issue\IssueType;
+use common\models\issue\Issue;
 use frontend\models\IssueSearch;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
 use yii\grid\ActionColumn;
 use yii\grid\SerialColumn;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
 
@@ -23,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<h1><?= Html::encode($this->title) ?></h1>
 	<?php Pjax::begin(); ?>
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]); ?>
 
 
 	<?= GridView::widget([
@@ -38,22 +36,34 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => DataColumn::class,
 				'attribute' => 'longId',
 				'options' => [
-					'style' => 'min-width:100px',
+					'style' => 'width:100px',
 				],
 
 			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'type_id',
-				'filter' => ArrayHelper::map(IssueType::find()->all(), 'id', 'name'),
-				'value' => 'type',
+				'filter' => IssueSearch::getTypesNames(),
+				'value' => 'type.short_name',
+				'contentOptions' => [
+					'class' => 'bold-text text-center',
+				],
+				'options' => [
+					'style' => 'width:80px',
+				],
 
 			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'stage_id',
-				'filter' => ArrayHelper::map(IssueStage::find()->all(), 'id', 'name'),
-				'value' => 'stage',
+				'filter' => $searchModel->getStagesNames(),
+				'value' => 'stage.short_name',
+				'contentOptions' => [
+					'class' => 'bold-text text-center',
+				],
+				'options' => [
+					'style' => 'width:60px',
+				],
 			],
 			[
 				'class' => DataColumn::class,
@@ -103,8 +113,13 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'class' => ActionColumn::class,
 				'template' => '{view}',
+				'visibleButtons' => [
+					'view' => static function (Issue $model) use ($searchModel) {
+						return !$model->isArchived() || $searchModel->withArchive;
+					},
+				],
 			],
 		],
-	]); ?>
+	]) ?>
 	<?php Pjax::end(); ?>
 </div>

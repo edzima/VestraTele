@@ -32,12 +32,17 @@ class PayCalculationController extends Controller {
 					'delete' => ['POST'],
 				],
 			],
-			'access' => [
+			'local-access' => [
 				'class' => AccessControl::class,
 				'rules' => [
 					[
 						'allow' => true,
 						'roles' => [User::ROLE_BOOKKEEPER],
+					],
+					[
+						'allow' => true,
+						'actions' => ['view'],
+						'roles' => [User::ROLE_BOOKKEEPER_DELAYED],
 					],
 				],
 			],
@@ -69,6 +74,8 @@ class PayCalculationController extends Controller {
 	 */
 	public function actionView(int $id) {
 		$model = IssuePayCalculation::findOne($id);
+
+
 		if ($model === null) {
 			return $this->redirect(['create', 'id' => $id]);
 		}
@@ -117,15 +124,15 @@ class PayCalculationController extends Controller {
 		$hasAll = true;
 		if (!$provisions->hasAllProvisions($model->lawyer)) {
 			$hasAll = false;
-			$this->addUserProvisionFlash($model->lawyer);
+			static::addUserProvisionFlash($model->lawyer);
 		}
 		if (!$provisions->hasAllProvisions($model->agent)) {
 			$hasAll = false;
-			$this->addUserProvisionFlash($model->agent);
+			static::addUserProvisionFlash($model->agent);
 		}
 		if ($model->hasTele() && !$provisions->hasAllProvisions($model->tele)) {
 			$hasAll = false;
-			$this->addUserProvisionFlash($model->tele);
+			static::addUserProvisionFlash($model->tele);
 		}
 		return $hasAll;
 	}

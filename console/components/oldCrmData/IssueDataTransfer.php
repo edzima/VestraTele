@@ -8,12 +8,12 @@
 
 namespace console\components\oldCrmData;
 
-use common\models\City;
+use common\models\address\City;
 use common\models\issue\Issue;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\IssueStage;
 use common\models\issue\Provision;
-use common\models\Wojewodztwa;
+use common\models\address\State;
 use console\components\oldCrmData\exceptions\CityNotFoundExcepion;
 use Yii;
 use yii\db\ActiveRecord;
@@ -201,7 +201,7 @@ class IssueDataTransfer extends DataTransfer {
 
 	private function getStates(): array {
 		if (empty($this->states)) {
-			$this->states = ArrayHelper::map(Wojewodztwa::find()
+			$this->states = ArrayHelper::map(State::find()
 				->select('id,name')
 				->asArray()
 				->all(), 'name', 'id');
@@ -209,8 +209,8 @@ class IssueDataTransfer extends DataTransfer {
 		return $this->states;
 	}
 
-	private function addState(string $name): Wojewodztwa {
-		$model = new Wojewodztwa();
+	private function addState(string $name): State {
+		$model = new State();
 		$model->name = $name;
 		$this->message("Add new state: $name");
 		$model->save();

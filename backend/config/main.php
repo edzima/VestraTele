@@ -50,11 +50,11 @@ $config = [
 		'user' => [
 			'identityClass' => 'common\models\User',
 			'enableAutoLogin' => true,
-			'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
+			'identityCookie' => ['name' => '_identity-back', 'httpOnly' => true],
 		],
 		'session' => [
 			// this is the name of the session cookie used for login on the backend
-			'name' => 'app-backend',
+			'name' => 'app-back',
 		],
 		'errorHandler' => [
 			'errorAction' => 'site/error',
@@ -101,6 +101,18 @@ $config = [
 			'class' => 'samdark\webshell\Module',
 			'yiiScript' => '@root/yii', // adjust path to point to your ./yii script
 			'allowedIPs' => ['*'],
+			'as access' => [
+				'class' => 'common\behaviors\GlobalAccessBehavior',
+				'rules' => [
+					[
+						'allow' => true,
+						'roles' => ['administrator'],
+					],
+				],
+			],
+		],
+		'rbac' => [
+			'class' => 'developeruz\db_rbac\Yii2DbRbac',
 			'as access' => [
 				'class' => 'common\behaviors\GlobalAccessBehavior',
 				'rules' => [
@@ -158,7 +170,7 @@ if (YII_DEBUG) {
 	$config['bootstrap'][] = 'debug';
 	$config['modules']['debug'] = [
 		'class' => 'yii\debug\Module',
-		'allowedIPs' => ['188.147.96.251'],
+		'allowedIPs' => ['205.201.55.51', '188.146.54.79'],
 		'as access' => [
 			'class' => 'common\behaviors\GlobalAccessBehavior',
 			'rules' => [
@@ -171,7 +183,7 @@ if (YII_DEBUG) {
 	$config['bootstrap'][] = 'gii';
 	$config['modules']['gii'] = [
 		'class' => 'yii\gii\Module',
-		'allowedIPs' => ['127.0.0.1', '::1', '192.168.*.*', '188.147.96.251'],
+		'allowedIPs' => ['127.0.0.1', '::1', '192.168.*.*', '188.147.96.44'],
 		'as access' => [
 			'class' => 'common\behaviors\GlobalAccessBehavior',
 			'rules' => [

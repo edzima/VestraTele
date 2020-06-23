@@ -1,11 +1,11 @@
 <?php
 
-use common\models\Gmina;
+use common\models\address\SubProvince;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model Gmina */
+/* @var $model SubProvince */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Gminy', 'url' => ['index']];

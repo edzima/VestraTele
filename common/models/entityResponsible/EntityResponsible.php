@@ -2,7 +2,7 @@
 
 namespace common\models\entityResponsible;
 
-use common\models\City;
+use common\models\address\City;
 use common\models\issue\Issue;
 use yii\db\ActiveRecord;
 

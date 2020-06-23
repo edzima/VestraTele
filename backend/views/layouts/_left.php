@@ -4,6 +4,8 @@ use backend\widgets\Menu;
 use common\models\User;
 
 /* @var $this \yii\web\View */
+
+$user = Yii::$app->user;
 ?>
 <aside class="main-sidebar">
 	<section class="sidebar">
@@ -18,7 +20,7 @@ use common\models\User;
 					'label' => Yii::t('backend', 'Users'),
 					'url' => ['/user/index'],
 					'icon' => '<i class="fa fa-users"></i>',
-					'visible' => Yii::$app->user->can('administrator'),
+					'visible' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
 				],
 				[
 					'label' => Yii::t('backend', 'Articles'),
@@ -29,36 +31,45 @@ use common\models\User;
 						['label' => Yii::t('backend', 'Articles'), 'url' => ['/article/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 						['label' => Yii::t('backend', 'Article categories'), 'url' => ['/article-category/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 					],
-				],
-				[
-					'label' => 'Terytorium',
-					'url' => '#',
-					'icon' => '<i class="fa fa-home"></i>',
-					'options' => ['class' => 'treeview'],
-					'items' => [
-						['label' => 'Regiony', 'url' => ['/address/state/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-						['label' => 'Powiaty', 'url' => ['/address/powiat/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-						['label' => 'Gminy', 'url' => ['/address/sub-province/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-						['label' => 'Miejscowości', 'url' => ['/address/city/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-					],
-				],
-				[
-					'label' => 'Kampanie',
-					'url' => ['/campaign/index'],
-					'icon' => '<i class="fa fa fa-suitcase"></i>',
+					'visible' => $user->can(User::ROLE_NEWS),
 				],
 				[
 					'label' => 'Spotkania',
-					'url' => ['/issue/meet/index'],
-					'icon' => '<i class="fa fa fa-suitcase"></i>',
+					'url' => '#',
+					'icon' => '<i class="fa fa fa-calendar"></i>',
+					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(User::ROLE_MEET),
+					'items' => [
+						[
+							'label' => Yii::t('issue', 'Dodaj'),
+							'url' => ['/issue/meet/create'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => Yii::t('issue', 'Przeglądaj'),
+							'url' => ['/issue/meet/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => 'Kampanie',
+							'url' => ['/campaign/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+					],
 				],
 
 				[
-					'label' => Yii::t('backend', 'Sprawy'),
-					'url' => '#',
-					'icon' => '<i class="fa fa-terminal"></i>',
+					'label' => 'Sprawy',
+					'url' => ['/issue/issue/index'],
+					'icon' => '<i class="fa fa-suitcase"></i>',
 					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(User::ROLE_ISSUE),
 					'items' => [
+						[
+							'label' => Yii::t('issue', 'Dodaj'),
+							'url' => ['/issue/issue/create'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
 						[
 							'label' => Yii::t('issue', 'Przeglądaj'),
 							'url' => ['/issue/issue/index'],
@@ -90,9 +101,9 @@ use common\models\User;
 				[
 					'label' => Yii::t('backend', 'Prowizje'),
 					'url' => '#',
-					'icon' => '<i class="fa fa-terminal"></i>',
+					'icon' => '<i class="fa fa-percent"></i>',
 					'options' => ['class' => 'treeview'],
-					'visible' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
+					'visible' => $user->can(User::ROLE_BOOKKEEPER),
 					'items' => [
 						[
 							'label' => Yii::t('issue', 'Raporty'),
@@ -121,56 +132,55 @@ use common\models\User;
 					'url' => '#',
 					'icon' => '<i class="fa fa-money"></i>',
 					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(User::ROLE_BOOKKEEPER) || $user->can(User::ROLE_ISSUE) || $user->can(User::ROLE_BOOKKEEPER_DELAYED),
 					'items' => [
 						[
 							'label' => Yii::t('issue', 'Rozliczenia (nowe)'),
 							'url' => ['/issue/pay-calculation/index', 'onlyNew' => true],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
+							'visible' => $user->can(User::ROLE_BOOKKEEPER),
 						],
 						[
 							'label' => Yii::t('issue', 'Rozliczenia (w trakcie)'),
 							'url' => ['/issue/pay-calculation/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
+							'visible' => $user->can(User::ROLE_BOOKKEEPER),
 						],
 						[
 							'label' => Yii::t('issue', 'Wpłaty'),
 							'url' => ['/issue/pay/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
+							'visible' => $user->can(User::ROLE_BOOKKEEPER),
+
+						],
+						[
+							'label' => Yii::t('issue', 'Wpłaty (przeterminowane)'),
+							'url' => ['/issue/pay/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'visible' => $user->can(User::ROLE_BOOKKEEPER_DELAYED),
 
 						],
 						[
 							'label' => Yii::t('issue', 'Terminy'),
 							'url' => ['/issue/pay-city/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'visible' => $user->can(User::ROLE_ISSUE),
 						],
 
 					],
 				],
 				[
-					'label' => 'Punkty',
-					'url' => ['/score/index'],
-					'icon' => '<i class="fa fa-dot-circle-o"></i>',
-				],
-				[
-					'label' => 'Zasiłki',
-					'url' => ['/benefit/amount/index'],
-					'icon' => '<i class="fa fa-book"></i>',
-				],
-				/*
-				[
-					'label' => Yii::t('frontend', 'Calendar'),
-					'url' => ['/calendar/index'],
-					'icon' => '<i class="fa fa fa-calendar"></i>',
+					'label' => 'Terytorium',
+					'url' => '#',
+					'icon' => '<i class="fa fa-home"></i>',
 					'options' => ['class' => 'treeview'],
 					'items' => [
-						['label' => 'Przedstawiciele', 'url' => ['/calendar/agent'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-						['label' => 'Prawnicy', 'url' => ['/calendar/layer'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+						['label' => Yii::t('address', 'States'), 'url' => ['/address/state/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+						['label' => Yii::t('address', 'Provinces'), 'url' => ['/address/province/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+						['label' => Yii::t('address', 'SubProvinces'), 'url' => ['/address/sub-province/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+						['label' => Yii::t('address', 'Cities'), 'url' => ['/address/city/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 					],
 				],
-				*/
 				[
 					'label' => Yii::t('backend', 'System'),
 					'options' => ['class' => 'header'],
@@ -183,12 +193,17 @@ use common\models\User;
 					'items' => [
 						['label' => Yii::t('backend', 'File manager'), 'url' => ['/file-manager/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 						['label' => Yii::t('backend', 'Cache manager'), 'url' => ['/cache/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-
+						[
+							'label' => Yii::t('backend', 'Log manager'),
+							'url' => ['/log/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'visible' => $user->can(User::ROLE_LOGS),
+						],
 						[
 							'label' => Yii::t('backend', 'DB manager'),
 							'url' => ['/db-manager/default/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => Yii::$app->user->can('administrator'),
+							'visible' => $user->can(User::ROLE_ADMINISTRATOR),
 						],
 					],
 				],

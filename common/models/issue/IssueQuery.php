@@ -63,4 +63,9 @@ class IssueQuery extends ActiveQuery {
 	public function one($db = null) {
 		return parent::one($db);
 	}
+
+	public function withoutArchives() {
+		$this->andWhere(['not in', 'stage_id', IssueStage::ARCHIVES_ID]);
+		return $this;
+	}
 }

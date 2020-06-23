@@ -52,6 +52,7 @@ class IssueForm extends Model {
 			} else {
 				$this->payAddress = new Address();
 			}
+			$this->payAddress->formName = 'payAddress';
 		}
 		return $this->payAddress;
 	}
@@ -61,11 +62,14 @@ class IssueForm extends Model {
 		if ($load && $this->getModel()->isPositiveDecision()) {
 			$load = $load && $this->getPayAddress()->load($data);
 		}
-		return $load;
+		return $load
+			&& $this->getModel()->getClientAddress()->load($data)
+			&& $this->getModel()->getVictimAddress()->load($data);
 	}
 
 	public function validate($attributeNames = null, $clearErrors = true): bool {
-		$validate = $this->getModel()->validate($attributeNames, $clearErrors);
+		$validate = $this->getModel()->getClientAddress()->validate()
+			&& $this->getModel()->getVictimAddress()->validate() && $this->getModel()->validate($attributeNames, $clearErrors);
 		if ($validate && $this->getModel()->isPositiveDecision()) {
 			$validate = $validate && $this->getPayAddress()->validate($attributeNames, $clearErrors);
 		}
@@ -88,15 +92,15 @@ class IssueForm extends Model {
 	}
 
 	public static function getAgents(): array {
-		return User::getSelectList([User::ROLE_AGENT]);
+		return User::getSelectList([User::ROLE_AGENT, User::ROLE_ISSUE]);
 	}
 
 	public static function getLawyers(): array {
-		return User::getSelectList([User::ROLE_LAYER]);
+		return User::getSelectList([User::ROLE_LAWYER, User::ROLE_ISSUE]);
 	}
 
 	public static function getTele(): array {
-		return User::getSelectList([User::ROLE_TELEMARKETER]);
+		return User::getSelectList([User::ROLE_ISSUE, User::ROLE_TELEMARKETER]);
 	}
 
 	public static function getTypes(): array {

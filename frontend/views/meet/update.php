@@ -1,14 +1,14 @@
 <?php
 
-use common\models\User;
+use frontend\models\meet\MeetForm;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\IssueMeet */
+/* @var $model MeetForm */
 
-$this->title = 'Edytyj spotkanie: ' . $model->getClientFullName();
-$this->params['breadcrumbs'][] = ['label' => 'Spotkania', 'url' => [Yii::$app->user->can(User::ROLE_TELEMARKETER) ? 'tele' : 'agent']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
+$this->title = 'Edytyj lead: ' . $model->getName();
+$this->params['breadcrumbs'][] = ['label' => 'Lead', 'url' => 'index'];
+$this->params['breadcrumbs'][] = ['label' => $model->getName(), 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Edytuj';
 ?>
 <div class="issue-meet-update">

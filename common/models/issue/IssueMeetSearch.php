@@ -2,13 +2,19 @@
 
 namespace common\models\issue;
 
+use common\models\address\State;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 
 /**
  * IssueMeetSearch represents the model behind the search form of `common\models\issue\IssueMeet`.
  */
 class IssueMeetSearch extends IssueMeet {
+
+	protected const EMPTY_CAMPAIGN_ID = -1;
+
+	public $withArchive = false;
 
 	public $cityName;
 	public $stateId;
@@ -23,7 +29,8 @@ class IssueMeetSearch extends IssueMeet {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type_id', 'stateId', 'tele_id', 'agent_id', 'status', 'campaign_id'], 'integer'],
+			[['id', 'type_id', 'stateId', 'agent_id', 'status', 'campaign_id'], 'integer'],
+			['status', 'in', 'range' => array_keys(static::getStatusNames($this->withArchive))],
 			[
 				[
 					'phone', 'client_name', 'client_surname', 'created_at', 'updated_at',
@@ -45,8 +52,8 @@ class IssueMeetSearch extends IssueMeet {
 		return array_merge(parent::attributeLabels(), [
 			'created_at_from' => 'Data leada (od)',
 			'created_at_to' => 'Data leada (do)',
-			'date_at_from' => 'Data spotkania (od)',
-			'date_at_to' => 'Data spotkania (do)',
+			'date_at_from' => 'Data Wysyłki/Spotkania/Akcji ',
+			'date_at_to' => 'Koniec Wysyłki/Spotkania/Akcji',
 		]);
 	}
 
@@ -57,17 +64,20 @@ class IssueMeetSearch extends IssueMeet {
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function search($params) {
+	public function search(array $params) {
 		$query = IssueMeet::find();
 		$query->with('city')
 			->with('state')
+			->with('province')
 			->with('type')
 			->with('campaign')
-			->with(['agent.userProfile'])
-			->with('tele.userProfile');
+			->with(['agent.userProfile']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
+			'sort' => [
+				'defaultOrder' => ['updated_at' => SORT_DESC],
+			],
 		]);
 
 		$this->load($params);
@@ -82,14 +92,14 @@ class IssueMeetSearch extends IssueMeet {
 		$query->andFilterWhere([
 			'id' => $this->id,
 			'type_id' => $this->type_id,
-			'tele_id' => $this->tele_id,
 			'agent_id' => $this->agent_id,
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,
 			'date_at' => $this->date_at,
 			'status' => $this->status,
-			'campaign_id' => $this->campaign_id,
 		]);
+
+		$this->filterCampaign($query);
 
 		if (!empty($this->cityName)) {
 			$query->joinWith('city C');
@@ -111,5 +121,33 @@ class IssueMeetSearch extends IssueMeet {
 			->andFilterWhere(['<=', 'date_at', $this->date_at_to]);
 
 		return $dataProvider;
+	}
+
+	private function filterCampaign(ActiveQuery $query): void {
+		if (!empty($this->campaign_id)) {
+			if ((int) $this->campaign_id === static::EMPTY_CAMPAIGN_ID) {
+				$query->andWhere('campaign_id IS NULL');
+			} else {
+				$query->andWhere(['campaign_id' => $this->campaign_id]);
+			}
+		}
+	}
+
+	public static function getCampaignNames(): array {
+		$names = parent::getCampaignNames();
+		$names[static::EMPTY_CAMPAIGN_ID] = 'Własna';
+		return $names;
+	}
+
+	public static function getStateNames(): array {
+		return State::getSelectList();
+	}
+
+	public static function getStatusNames(bool $withArchive = false): array {
+		$names = parent::getStatusNames();
+		if (!$withArchive) {
+			unset($names[static::STATUS_ARCHIVE]);
+		}
+		return $names;
 	}
 }

@@ -3,6 +3,7 @@
 use backend\helpers\Url;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
+use common\models\User;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssuePaysWidget;
 use yii\helpers\Html;
@@ -19,6 +20,7 @@ $this->params['breadcrumbs'][] = ['label' => $model->issue, 'url' => Url::issueV
 $this->params['breadcrumbs'][] = ['label' => 'Rozliczenia', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
+$isMainBookeeper = Yii::$app->user->can(User::ROLE_BOOKKEEPER);
 ?>
 <div class="issue-pay-calculation-view">
 
@@ -29,19 +31,19 @@ YiiAsset::register($this);
 	</h1>
 
 	<p>
-		<?= Html::a('Edycja', ['update', 'id' => $model->issue_id], ['class' => 'btn btn-primary']) ?>
+		<?= $isMainBookeeper ? Html::a('Edycja', ['update', 'id' => $model->issue_id], ['class' => 'btn btn-primary']) : '' ?>
 
 		<?= Html::a('Notatka', ['note/create', 'issueId' => $model->issue_id, 'type' => IssueNote::TYPE_PAY], [
 			'class' => 'btn btn-success',
 		]) ?>
 
-		<?= Html::a('Usuń', ['delete', 'id' => $model->issue_id], [
+		<?= $isMainBookeeper ? Html::a('Usuń', ['delete', 'id' => $model->issue_id], [
 			'class' => 'btn btn-danger pull-right',
 			'data' => [
 				'confirm' => 'Are you sure you want to delete this item?',
 				'method' => 'post',
 			],
-		]) ?>
+		]) : '' ?>
 	</p>
 
 	<?= DetailView::widget([

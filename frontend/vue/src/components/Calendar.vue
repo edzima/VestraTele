@@ -23,7 +23,8 @@
     import {DateClickInfo, DateClickWithDayEvents, EventObject, EventSourceObject, Info} from "@/types/FullCalendar";
 
     import 'tippy.js/dist/tippy.css';
-    import tippy, {Props as TooltipOptions} from "tippy.js";
+    import tippy, {Props as TooltipOptions, Instance} from "tippy.js";
+
     import {isSameDate} from "@/helpers/dateHelper";
 
     const FullCalendar = require('@fullcalendar/vue').default;
@@ -84,10 +85,21 @@
 
         @Prop({
             default: () => {
+                return {
+                    onShow: (instance: Instance) => {
+                        const classList = instance.reference.classList;
+                        console.log(instance.reference);
+                        return !classList.contains('fc-dragging') && classList.contains('fc-allow-mouse-resize') && classList.contains('fc-start');
+                    }
+                }
+
+
             }
         }) private readonly tooltipOptions!: TooltipOptions;
 
         @Ref() fullCalendar!: any;
+
+        private currentShowTippy?: Instance;
 
         renderItem(info: Info): void {
             if (this.eventRender) {
@@ -181,35 +193,14 @@
         }
 
         private handleChangeDates(e: any): void {
-            // if (!this.editable) return e.revert(); // cancel if no permissions
+            if (!this.editable) return e.revert(); // cancel if no permissions
             if (e.oldEvent) { // cancel if note is dragged to event and vice-versa
                 if (e.event.allDay !== e.oldEvent.allDay) return e.revert();
             }
             this.$emit('eventEdit', e);
         }
 
-        //@todo inspect from event.url
-        private inspectEvent(event: any): void {
-            return;
-            /*
-            if (!this.eventClick.timeoutId) {
-                this.eventClick.timeoutId = setTimeout(() => {
-                    // simple click
-                    clearTimeout(this.eventClick.timeoutId);
-                    this.eventClick.timeoutId = 0;
-                    this.eventClick.eventClicked = event.el;
-                }, 200); // tolerance in ms
-            } else {
-                // double click
 
-                clearTimeout(this.eventClick.timeoutId);
-                this.eventClick.timeoutId = 0;
-                this.eventClick.eventClicked = event.el;
-                this.$emit('eventDoubleClick', event.event.id);
-            }
-
-             */
-        }
     }
 </script>
 

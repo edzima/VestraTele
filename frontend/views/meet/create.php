@@ -1,17 +1,18 @@
 <?php
 
-use yii\helpers\Html;
+use frontend\models\meet\MeetForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\IssueMeet */
+/* @var $model MeetForm */
 
-$this->title = 'Dodaj spotkanie';
-$this->params['breadcrumbs'][] = ['label' => 'Spotkania', 'url' => ['index']];
+$this->title = 'Dodaj Lead';
+$this->params['breadcrumbs'][] = ['label' => 'Lead', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="issue-meet-create">
 
-	<h1><?= Html::encode($this->title) ?></h1>
+	<h1>Dodaj lead</h1>
 
 	<?= $this->render('_form', [
 		'model' => $model,

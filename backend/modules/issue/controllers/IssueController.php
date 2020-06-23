@@ -4,10 +4,13 @@ namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueForm;
 use backend\widgets\CsvForm;
+use common\models\User;
 use Yii;
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch;
+use yii\db\ActiveQuery;
 use yii\web\Controller;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii2tech\csvgrid\CsvGrid;
@@ -37,11 +40,20 @@ class IssueController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex() {
+
 		$searchModel = new IssueSearch();
+		if (Yii::$app->user->can(User::ROLE_ARCHIVE)) {
+			$searchModel->withArchive = true;
+		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {
+			/** @var ActiveQuery $query */
+			$query = clone($dataProvider->query);
+			$query->with('clientCity');
+			$query->with('clientProvince');
+			$query->with('clientState');
 			$exporter = new CsvGrid([
-				'query' => $dataProvider->query,
+				'query' => $query,
 				'columns' => [
 					[
 						'attribute' => 'clientFullName',
@@ -71,7 +83,6 @@ class IssueController extends Controller {
 			]);
 			return $exporter->export()->send('export.csv');
 		}
-
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
@@ -150,6 +161,12 @@ class IssueController extends Controller {
 	 */
 	protected function findModel($id): Issue {
 		if (($model = Issue::findOne($id)) !== null) {
+
+			if ($model->isArchived() && !Yii::$app->user->can(User::ROLE_ARCHIVE)) {
+				Yii::warning('User: ' . Yii::$app->user->id . ' try view archived issue: ' . $model->id, 'issue');
+
+				throw new MethodNotAllowedHttpException('Sprawa jest w archiwum.');
+			}
 			return $model;
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');

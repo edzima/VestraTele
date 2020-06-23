@@ -1,7 +1,7 @@
 <?php
 
-use common\models\issue\IssueMeet;
 use frontend\assets\CalendarAsset;
+use frontend\models\AgentMeetCalendarSearch;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -10,22 +10,20 @@ use yii\helpers\Url;
 /* @var $agents string[] */
 /* @var $agentId int */
 
-$this->title = 'Kalendarz spotkań';
+$this->title = 'Kalendarz';
+$this->params['breadcrumbs'][] = ['label' => 'Leady', 'url' => ['/meet/index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 CalendarAsset::register($this);
 
-
 $props = [
 	'agentId' => $agentId,
-	'eventTypes' => IssueMeet::getStatusNames(),
-
+	'filtersItems' => AgentMeetCalendarSearch::getFiltersOptions(),
 
 	'URLGetEvents' => Url::to('/meet-calendar/list'),
 	'URLUpdateEvent' => Url::to('/meet-calendar/update'),
 
 	'URLAddEvent' => Url::to('/meet/create'),
-	'URLInspectEvent' => Url::to('/meet/view'),
 
 	'URLGetNotes' => Url::to('/calendar-note/list'),
 	'URLNewNote' => Url::to('/calendar-note/add'),
@@ -38,9 +36,11 @@ $props = [
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
-	<?= Html::dropDownList('agentId', $agentId, $agents, [
-		'onChange' => 'window.location.replace("' . Url::to('/meet-calendar/index?agentId=') . '" + this.value);',
-	]) ?>
+	<?= empty($agents)
+		? ''
+		: Html::dropDownList('agentId', $agentId, $agents, [
+			'onChange' => 'window.location.replace("' . Url::to('/meet-calendar/index?agentId=') . '" + this.value);',
+		]) ?>
 
 	<?= Html::tag('div', '', ['id' => 'app', 'data-props' => Json::encode($props)]) ?>
 

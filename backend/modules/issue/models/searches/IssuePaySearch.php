@@ -4,6 +4,7 @@ namespace backend\modules\issue\models\searches;
 
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayQuery;
+use common\models\address\State;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -75,6 +76,10 @@ class IssuePaySearch extends IssuePay {
 			static::PAY_STATUS_PAYED => 'Opłacone',
 			static::PAY_STATUS_ALL => 'Wszystkie',
 		];
+	}
+
+	public static function getStateNames(): array {
+		return State::getSelectList();
 	}
 
 	/**

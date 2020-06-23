@@ -3,8 +3,8 @@
 namespace common\modules\address\controllers;
 
 use Yii;
-use common\models\Wojewodztwa;
-use common\models\WojewodztwaSearch;
+use common\models\address\State;
+use common\models\address\search\StateSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -34,7 +34,7 @@ class StateController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex() {
-		$searchModel = new WojewodztwaSearch();
+		$searchModel = new StateSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -62,7 +62,7 @@ class StateController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new Wojewodztwa();
+		$model = new State();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
@@ -108,11 +108,11 @@ class StateController extends Controller {
 	 * If the model is not found, a 404 HTTP exception will be thrown.
 	 *
 	 * @param integer $id
-	 * @return Wojewodztwa the loaded model
+	 * @return State the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): Wojewodztwa {
-		if (($model = Wojewodztwa::findOne($id)) !== null) {
+	protected function findModel($id): State {
+		if (($model = State::findOne($id)) !== null) {
 			return $model;
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');

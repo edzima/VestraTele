@@ -69,7 +69,7 @@ use yii\widgets\ActiveForm;
 	<div class="row">
 		<?= $form->field($model, 'tele_id', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
-					'data' => User::getSelectList([User::ROLE_TELEMARKETER]),
+					'data' => User::getSelectList([User::ROLE_TELEMARKETER, User::ROLE_ISSUE]),
 					'options' => [
 						'placeholder' => 'Telemarketer',
 					],
@@ -80,7 +80,7 @@ use yii\widgets\ActiveForm;
 			) ?>
 		<?= $form->field($model, 'lawyer_id', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
-					'data' => User::getSelectList([User::ROLE_LAYER]),
+					'data' => User::getSelectList([User::ROLE_LAWYER, User::ROLE_ISSUE]),
 					'options' => [
 						'placeholder' => 'Prawnik',
 					],
@@ -105,7 +105,7 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 		<?= $form->field($model, 'disabledStages', ['options' => ['class' => 'col-md-8']])->widget(Select2::class, [
-			'data' => IssueSearch::getStagesNames(),
+			'data' => $model->getStagesNames(),
 			'options' => [
 				'multiple' => true,
 				'placeholder' => 'Wykluczone etapy',

@@ -55,7 +55,7 @@ class Provisions extends Component {
 		$provisions = $this->issueProvisions($issue);
 		return [
 			'agent' => $this->userFilter($this->roleFilter($provisions, User::ROLE_AGENT), $issue->agent_id),
-			'lawyer' => $this->userFilter($this->roleFilter($provisions, User::ROLE_LAYER), $issue->lawyer_id),
+			'lawyer' => $this->userFilter($this->roleFilter($provisions, User::ROLE_LAWYER), $issue->lawyer_id),
 			'tele' => ($issue->hasTele() ? $this->userFilter($this->roleFilter($provisions, User::ROLE_TELEMARKETER), $issue->tele_id) : []),
 		];
 	}

@@ -2,8 +2,8 @@
 
 namespace common\modules\address\controllers;
 
-use common\models\Gmina;
-use common\models\SubstateSearch;
+use common\models\address\SubProvince;
+use common\models\address\search\SubProvinceSearch;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -17,7 +17,7 @@ class SubProvinceController extends Controller {
 	public function behaviors() {
 		return [
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
 				],
@@ -31,7 +31,7 @@ class SubProvinceController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex() {
-		$searchModel = new SubstateSearch();
+		$searchModel = new SubProvinceSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -47,7 +47,7 @@ class SubProvinceController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new Gmina();
+		$model = new SubProvince();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
@@ -100,8 +100,8 @@ class SubProvinceController extends Controller {
 		]);
 	}
 
-	private function findModel(int $id): Gmina {
-		$model = Gmina::findOne($id);
+	private function findModel(int $id): SubProvince {
+		$model = SubProvince::findOne($id);
 		if ($model !== null) {
 			return $model;
 		}

@@ -1,21 +1,22 @@
 <?php
 
+use common\models\address\City;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $city common\models\City */
+/* @var $model City */
 
-$this->title = 'Edycja Mijescowości: ' . $city->name;
+$this->title = 'Edycja Miejscowość: ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Cities', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $city->name, 'url' => ['view', 'id' => $city->id]];
+$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Edycja';
 ?>
 <div class="city-update">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+	<h1><?= Html::encode($this->title) ?></h1>
 
-    <?= $this->render('_form', [
-        'city' => $city,
-    ]) ?>
+	<?= $this->render('_form', [
+		'model' => $model,
+	]) ?>
 
 </div>

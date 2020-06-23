@@ -62,7 +62,7 @@
 		z-index: 999;
 
 		/deep/ .modal {
-			position: initial;
+			top: 10%;
 		}
 	}
 </style>

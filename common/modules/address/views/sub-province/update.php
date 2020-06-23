@@ -1,10 +1,10 @@
 <?php
 
-use common\models\Gmina;
+use common\models\address\SubProvince;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model Gmina */
+/* @var $model SubProvince */
 
 $this->title = 'Edytuj Gmine: ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Gminy', 'url' => ['index']];

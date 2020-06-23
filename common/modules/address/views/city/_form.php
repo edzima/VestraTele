@@ -1,17 +1,12 @@
 <?php
 
+use backend\modules\address\widgets\AddressFormWidget;
+use common\models\address\City;
 use yii\helpers\Html;
-use yii\helpers\ArrayHelper;
-
-use common\models\Wojewodztwa;
 use yii\widgets\ActiveForm;
 
-use kartik\depdrop\DepDrop;
-use kartik\select2\Select2;
-use yii\helpers\Url;
-
 /* @var $this yii\web\View */
-/* @var $city common\models\City */
+/* @var $model City */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -19,38 +14,21 @@ use yii\helpers\Url;
 
 	<?php $form = ActiveForm::begin(); ?>
 
+	<?= AddressFormWidget::widget([
+		'form' => $form,
+		'model' => $model,
+		'state' => 'wojewodztwo_id',
+		'province' => 'powiat_id',
+		'subProvince' => false,
+		'street' => false,
+		'cityAdd' => null,
+		'city' => false,
+	]) ?>
 
-	<?php
-	//wojewodztwo
-	echo $form->field($city, 'wojewodztwo_id', ['options' => ['class' => 'col-md-4 form-group']])->widget(Select2::class, [
-			'data' => ArrayHelper::map(Wojewodztwa::find()->all(), 'id', 'name'),
-			'options' => [
-				'placeholder' => '--Wybierz województwo--',
-				'id' => 'cat-id',
-			],
-			'pluginOptions' => [
-				'allowClear' => true,
-			],
-		]
-	);
-
-	//powiat
-	echo $form->field($city, 'powiat_id', ['options' => ['class' => 'col-md-4 form-group']])->widget(DepDrop::class, [
-		'type' => DepDrop::TYPE_SELECT2,
-		'options' => ['id' => 'subcat-id'],
-		'pluginOptions' => [
-			'depends' => ['cat-id'],
-			'placeholder' => 'Powiat...',
-			'url' => Url::to(['/address/city/powiat']),
-			'loading' => 'wyszukiwanie...',
-		],
-	]);
-	?>
-
-	<?= $form->field($city, 'name', ['options' => ['class' => 'col-md-4 form-group']])->textInput(['maxlength' => true]) ?>
+	<?= $form->field($model, 'name') ?>
 
 	<div class="form-group">
-		<?= Html::submitButton($city->isNewRecord ? 'Dodaj' : 'Zapisz', ['class' => $city->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+		<?= Html::submitButton($model->isNewRecord ? 'Dodaj' : 'Zapisz', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

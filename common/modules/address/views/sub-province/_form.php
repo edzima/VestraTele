@@ -1,12 +1,12 @@
 <?php
 
-use backend\modules\address\widgets\AddressWidget;
-use common\models\Gmina;
+use backend\modules\address\widgets\AddressFormWidget;
+use common\models\address\SubProvince;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model Gmina */
+/* @var $model SubProvince */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -15,7 +15,7 @@ use yii\widgets\ActiveForm;
 	<?php $form = ActiveForm::begin(); ?>
 
 
-	<?= AddressWidget::widget([
+	<?= AddressFormWidget::widget([
 		'form' => $form,
 		'model' => $model,
 		'state' => 'WOJ',

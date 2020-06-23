@@ -11,6 +11,7 @@ namespace frontend\controllers;
 use backend\modules\issue\models\IssueNoteForm;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
+use common\models\User;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -22,7 +23,7 @@ class NoteController extends Controller {
 	/**
 	 * @inheritdoc
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
 				'class' => VerbFilter::class,
@@ -35,7 +36,7 @@ class NoteController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => ['@'],
+						'roles' => [User::ROLE_NOTE],
 					],
 				],
 			],
@@ -72,27 +73,12 @@ class NoteController extends Controller {
 	 */
 	public function actionUpdate(int $id) {
 		$model = new IssueNoteForm($this->findModel($id));
-
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$this->redirectIssue($model->getNote()->issue_id);
 		}
 		return $this->render('update', [
 			'model' => $model,
 		]);
-	}
-
-	/**
-	 * Deletes an existing IssueNote model.
-	 * If deletion is successful, the browser will be redirected to the 'index' page.
-	 *
-	 * @param integer $id
-	 * @return mixed
-	 */
-	public function actionDelete($id) {
-		$model = $this->findModel($id);
-		$issueId = $model->issue_id;
-		$model->delete();
-		$this->redirectIssue($issueId);
 	}
 
 	private function redirectIssue(int $issueId) {
@@ -107,8 +93,8 @@ class NoteController extends Controller {
 	 * @return IssueNote the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id) {
-		if (($model = IssueNote::findOne($id)) !== null) {
+	protected function findModel($id): IssueNote {
+		if (($model = IssueNote::find()->andWhere(['id' => $id, 'user_id' => Yii::$app->user->id])->one()) !== null) {
 			return $model;
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');

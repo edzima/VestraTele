@@ -1,5 +1,6 @@
 <?php
 
+use common\models\User;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
@@ -35,60 +36,51 @@ AppAsset::register($this);
 		],
 	]);
 
-	if (!Yii::$app->user->isGuest) {
-
-
-		if (Yii::$app->user->can('telemarketer')) {
-			$menuItems = [
-				[
-					'label' => 'Spotkania',
-					'url' => ['/meet/tele'],
-				],
-
-				[
-					'label' => Yii::t('frontend', 'Calendar'),
-					'url' => ['/calendar/view?id=26'],
-				],
-			];
-		}
-
-		if (Yii::$app->user->can('agent')) {
-			$menuItems = [
-				[
-					'label' => 'Spotkania',
-					'url' => ['/meet/agent'],
-				],
-
-				[
-					'label' => Yii::t('frontend', 'Your calendar'),
-					'url' => ['/meet-calendar/index'],
-				],
-
-			];
-		}
-	}
-
 	if (Yii::$app->user->isGuest) {
 		$menuItems[] = ['label' => Yii::t('frontend', 'Login'), 'url' => ['/account/sign-in/login']];
 	} else {
+		$menuItems[] = [
+			'label' => 'Lead',
+			'url' => '#',
+			'visible' => Yii::$app->user->can(User::ROLE_MEET),
+
+			'items' => [
+				[
+					'label' => 'Przeglądaj',
+					'url' => ['/meet/index'],
+				],
+				[
+					'label' => 'Nowy',
+					'url' => ['/meet/create'],
+				],
+				[
+					'label' => 'Kalendarz',
+					'url' => ['/meet-calendar/index'],
+				],
+			],
+		];
+
+		$menuItems[] = [
+			'label' => 'Sprawy',
+			'url' => ['/issue/index'],
+			'visible' => Yii::$app->user->can(User::ROLE_ISSUE),
+		];
+		$menuItems[] = [
+			'label' => 'Znajdź sprawę',
+			'url' => ['/issue/search'],
+			'visible' => Yii::$app->user->can(User::ROLE_CUSTOMER_SERVICE),
+		];
 		$menuItems[] = [
 			'label' => 'Newsy',
 			'url' => ['/article/index'],
 		];
 		$menuItems[] = [
-			'label' => 'Raporty',
-			'url' => ['/report/index'],
-		];
-		$menuItems[] = [
-			'label' => 'Sprawy',
-			'url' => ['/issue/index'],
-		];
-		$menuItems[] = [
-			'label' => 'Kalkulator zasiłku',
-			'url' => ['/benefit-amount/index'],
-		];
-		$menuItems[] = [
 
+			'label' => 'Prowizje',
+			'url' => ['/report/index'],
+
+		];
+		$menuItems[] = [
 			'label' => Yii::$app->user->identity->username,
 			'url' => '#',
 			'items' => [

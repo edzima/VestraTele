@@ -8,14 +8,19 @@
 
 namespace frontend\models;
 
+use common\models\issue\IssueSearch as BaseIssueSearch;
 use common\models\issue\Issue;
 use common\models\User;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
 
-class IssueSearch extends Issue {
+class IssueSearch extends BaseIssueSearch {
 
 	public $agents;
+
+	public $onlyAsAgent = false;
+	public $onlyAsTele = false;
+	public $onlyAsLawyer = false;
 
 	public $isAgent = false;
 	public $isTele = false;
@@ -30,15 +35,26 @@ class IssueSearch extends Issue {
 		return [
 			[
 				[
-					'id', 'agent_id', 'stage_id', 'type_id', 'entity_responsible_id',
+					'id', 'agent_id', 'stage_id', 'type_id',
 				], 'integer',
 			],
+			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
+			[['onlyAsAgent', 'onlyAsTele'], 'boolean'],
+			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			[
 				[
 					'created_at', 'updated_at', 'client_surname', 'victim_surname',
 				], 'safe',
 			],
 		];
+	}
+
+	public function attributeLabels(): array {
+		return parent::attributeLabels() + [
+				'onlyAsTele' => 'Jako tele',
+				'onlyAsAgent' => 'Jako agent',
+				'onlyAsLawyer' => 'Jako prawnik',
+			];
 	}
 
 	/**
@@ -49,9 +65,14 @@ class IssueSearch extends Issue {
 	 * @return ActiveDataProvider
 	 */
 	public function search($params) {
+
 		$query = Issue::find();
 
-		$query->with(['agent.userProfile', 'type', 'stage.types']);
+		$query->with([
+			'agent.userProfile',
+			'type',
+			'stage.types',
+		]);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -66,25 +87,14 @@ class IssueSearch extends Issue {
 
 		if (!$this->validate()) {
 			// uncomment the following line if you do not want to return any records when validation fails
-			// $query->where('0=1');
+			$query->where('0=1');
 			return $dataProvider;
 		}
+		$this->archiveFilter($query);
+		$query->andWhere(['or', ['lawyer_id' => $this->user_id], ['agent_id' => $this->agents], ['tele_id' => $this->user_id]]);
 
-		if (!$this->isAgent) {
-			if ($this->isTele) {
-				$query->andFilterWhere(['tele_id' => $this->user_id]);
-			}
-
-			if ($this->isLawyer) {
-				$query->andFilterWhere(['lawyer_id' => $this->user_id]);
-			}
-		} else {
-			if ($this->isLawyer) {
-				$query->andWhere(['or', ['lawyer_id' => $this->user_id], ['agent_id' => $this->agents]]);
-			}
-			if (!$this->isTele && !$this->isLawyer) {
-				$query->andWhere(['agent_id' => $this->agents]);
-			}
+		if ($this->isAgent) {
+			$query->andWhere(['or', ['lawyer_id' => $this->user_id], ['agent_id' => $this->agents], ['tele_id' => $this->user_id]]);
 		}
 
 		$query->andFilterWhere([
@@ -94,7 +104,19 @@ class IssueSearch extends Issue {
 			'agent_id' => $this->agent_id,
 		]);
 
+		if ($this->onlyAsTele) {
+			$query->andWhere(['tele_id' => $this->user_id]);
+		}
+		if ($this->onlyAsAgent) {
+			$query->andWhere(['agent_id' => $this->user_id]);
+		}
+		if ($this->onlyAsLawyer) {
+			$query->andWhere(['lawyer_id' => $this->user_id]);
+		}
+
 		$query->andFilterWhere(['like', 'client_surname', $this->client_surname])
+			->andFilterWhere(['>=', 'created_at', $this->createdAtFrom])
+			->andFilterWhere(['<=', 'created_at', $this->createdAtTo])
 			->andFilterWhere(['like', 'victim_surname', $this->victim_surname]);
 
 		return $dataProvider;
@@ -102,10 +124,11 @@ class IssueSearch extends Issue {
 
 	public function getAgentsList(): array {
 		if ($this->isTele || $this->isLawyer) {
-			return User::getSelectList([User::ROLE_AGENT]);
+			return User::getSelectList([User::ROLE_AGENT, User::ROLE_ISSUE]);
 		}
-		return User::getSelectList([User::ROLE_AGENT], function (Query $query) {
+		return User::getSelectList([], true, function (Query $query) {
 			$query->andWhere(['id' => $this->agents]);
 		});
 	}
+
 }

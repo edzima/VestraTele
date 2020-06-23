@@ -19,6 +19,8 @@ $typWok = ['0' => 'Przedstawiciel', '1' => 'Telemarketer'];
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create user'), ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('db_rbac', 'Role'), ['/rbac/access/role'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('db_rbac', 'Permissions'), ['/rbac/access/permission'], ['class' => 'btn btn-success']) ?>
 	</p>
 
 	<?= GridView::widget([

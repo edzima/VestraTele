@@ -33,17 +33,17 @@ $config = [
 			'csrfParam' => '_csrf-frontend',
 			'baseUrl' => '',
 			//@todo created csrf validation in Vue
-			//'enableCsrfValidation' => false,
+			'enableCsrfValidation' => false,
 		],
 		'user' => [
 			'identityClass' => 'common\models\User',
 			'loginUrl' => ['/account/sign-in/login'],
 			'enableAutoLogin' => true,
-			'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
+			'identityCookie' => ['name' => '_identity-front', 'httpOnly' => true],
 		],
 		'session' => [
 			// this is the name of the session cookie used for login on the frontend
-			'name' => 'app-frontend',
+			'name' => 'app-front',
 		],
 		'errorHandler' => [
 			'errorAction' => 'site/error',

@@ -13,10 +13,18 @@ use common\models\User;
  */
 class UserQuery extends ActiveQuery {
 
-	public function onlyByRole(array $roles) {
+	public function onlyByRole(array $roles, bool $common) {
+		$auth = Yii::$app->authManager;
 		$ids = [];
+		$i = 0;
 		foreach ($roles as $role) {
-			$ids = array_merge($ids, Yii::$app->authManager->getUserIdsByRole($role));
+			$userIds = $auth->getUserIdsByRole($role);
+			if ($common && $i > 0) {
+				$ids = array_intersect($ids, $userIds);
+			} else {
+				$ids = array_merge($ids, $userIds);
+			}
+			$i++;
 		}
 		$this->andWhere(['id' => $ids]);
 		$this->cache(60);

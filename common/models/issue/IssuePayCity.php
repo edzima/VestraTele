@@ -3,7 +3,7 @@
 namespace common\models\issue;
 
 use common\models\address\Address;
-use common\models\City;
+use common\models\address\City;
 use yii\db\ActiveRecord;
 
 /**

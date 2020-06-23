@@ -1,10 +1,11 @@
 <?php
 
+use common\models\address\search\CitySearch;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel common\models\CitySearch */
+/* @var $searchModel CitySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Miejscowości';

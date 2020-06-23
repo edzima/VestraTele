@@ -128,7 +128,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					'format' => 'raw',
 					'label' => 'Miejscowość',
 					'value' => static function (Issue $model) {
-						if ($model->pay_city_id !== null) {
+						if ($model->payCity !== null) {
 							return Html::a(
 								Html::encode($model->payCity->city),
 								Url::payCityDetails($model->pay_city_id),

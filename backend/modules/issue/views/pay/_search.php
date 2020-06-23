@@ -1,7 +1,6 @@
 <?php
 
 use backend\modules\issue\models\searches\IssuePaySearch;
-use common\models\Wojewodztwa;
 use common\widgets\DateTimeWidget;
 use yii\bootstrap\Nav;
 use yii\helpers\Html;
@@ -11,18 +10,18 @@ use yii\widgets\ActiveForm;
 /* @var $model IssuePaySearch */
 /* @var $form yii\widgets\ActiveForm */
 
+$action = Yii::$app->controller->action->id;
 ?>
 
 <div class="issue-pay-search">
 
 	<?php $form = ActiveForm::begin([
-		'action' => ['index', 'status' => $model->getPayStatus()],
+		'action' => [$action, 'status' => $model->getPayStatus()],
 		'method' => 'get',
 	]); ?>
 
 	<div style="display:flex; align-items: center;">
-		<?= $form->field($model, 'payCityState')->dropDownList(Wojewodztwa::getSelectList(), ['prompt' => '- Region -']) ?>
-
+		<?= $form->field($model, 'payCityState')->dropDownList(IssuePaySearch::getStateNames(), ['prompt' => '- Region -']) ?>
 
 		<div class="date-range-fields-wrapper" style="margin-left:auto;display: flex;align-items: center;">
 
@@ -61,7 +60,7 @@ use yii\widgets\ActiveForm;
 					[
 						'label' => 'Poprzedni (' . date('Y-m', strtotime('last month')) . ')',
 						'url' => [
-							'index',
+							$action,
 							'status' => $model->getPayStatus(),
 							Html::getInputName($model, 'deadlineAtFrom') => date('Y-m-d', strtotime('first day of last month')),
 							Html::getInputName($model, 'deadlineAtTo') => date('Y-m-d', strtotime('last day of last month')),
@@ -73,7 +72,7 @@ use yii\widgets\ActiveForm;
 					[
 						'label' => 'Obecny (' . date('Y-m') . ')',
 						'url' => [
-							'index',
+							$action,
 							'status' => $model->getPayStatus(),
 							Html::getInputName($model, 'deadlineAtFrom') => date('Y-m-d', strtotime('first day of this month')),
 							Html::getInputName($model, 'deadlineAtTo') => date('Y-m-d', strtotime('last day of this month')),
@@ -85,7 +84,7 @@ use yii\widgets\ActiveForm;
 					[
 						'label' => 'Następny (' . date('Y-m', strtotime('next month')) . ')',
 						'url' => [
-							'index',
+							$action,
 							'status' => $model->getPayStatus(),
 							Html::getInputName($model, 'deadlineAtFrom') => date('Y-m-d', strtotime('first day of next month')),
 							Html::getInputName($model, 'deadlineAtTo') => date('Y-m-d', strtotime('last day of next month')),
@@ -106,7 +105,7 @@ use yii\widgets\ActiveForm;
 	</div>
 	<div class="form-group">
 		<?= Html::submitButton('Szukaj', ['class' => 'btn btn-primary']) ?>
-		<?= Html::a('Reset', ['index', 'status' => $model->getPayStatus()], ['class' => 'btn btn-default']) ?>
+		<?= Html::a('Reset', [$action, 'status' => $model->getPayStatus()], ['class' => 'btn btn-default']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

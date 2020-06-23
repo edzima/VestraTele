@@ -3,16 +3,16 @@
 namespace common\modules\address\controllers;
 
 use Yii;
-use common\models\City;
-use common\models\CitySearch;
+use common\models\address\City;
+use common\models\address\Province;
+use common\models\address\SubProvince;
+use common\models\address\search\CitySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
 
 use yii\filters\AccessControl;
-use common\models\Powiat;
-use common\models\Gmina;
 
 /**
  * CityController implements the CRUD actions for City model.
@@ -25,7 +25,7 @@ class CityController extends Controller {
 	public function behaviors() {
 		return [
 			'access' => [
-				'class' => AccessControl::className(),
+				'class' => AccessControl::class,
 				'rules' => [
 					[
 						'allow' => true,
@@ -34,7 +34,7 @@ class CityController extends Controller {
 				],
 			],
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
 				],
@@ -76,13 +76,13 @@ class CityController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$city = new City();
+		$model = new City();
 
-		if ($city->load(Yii::$app->request->post()) && $city->save()) {
-			return $this->redirect(['view', 'id' => $city->id]);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->id]);
 		}
 		return $this->render('create', [
-			'city' => $city,
+			'model' => $model,
 		]);
 	}
 
@@ -100,7 +100,7 @@ class CityController extends Controller {
 			return $this->redirect(['view', 'id' => $model->id]);
 		}
 		return $this->render('update', [
-			'city' => $model,
+			'model' => $model,
 		]);
 	}
 
@@ -122,7 +122,7 @@ class CityController extends Controller {
 			$parents = $_POST['depdrop_parents'];
 			if ($parents != null) {
 				$cat_id = $parents[0];
-				$out = Powiat::getPowiatListId($cat_id);
+				$out = Province::getPowiatListId($cat_id);
 				return Json::encode(['output' => $out, 'selected' => '']);
 			}
 		}
@@ -135,7 +135,7 @@ class CityController extends Controller {
 			$cat_id = empty($ids[0]) ? null : $ids[0];
 			$subcat_id = empty($ids[1]) ? null : $ids[1];
 			if ($cat_id != null && is_numeric($subcat_id)) {
-				$data = Gmina::getGminaList($cat_id, $subcat_id);
+				$data = SubProvince::getGminaList($cat_id, $subcat_id);
 				return Json::encode(['output' => $data['out'], 'selected' => $data['selected']]);
 			}
 		}

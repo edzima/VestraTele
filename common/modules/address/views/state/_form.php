@@ -2,10 +2,10 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use common\models\Wojewodztwa;
+use common\models\address\State;
 
 /* @var $this yii\web\View */
-/* @var $model Wojewodztwa */
+/* @var $model State */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 

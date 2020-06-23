@@ -20,7 +20,6 @@ class m200113_160741_meet_media extends Migration {
 
 		$this->insert('{{%campaign}}', ['id' => 1, 'name' => 'Facebook Maciej']);
 		$this->addColumn('{{%issue_meet}}', 'campaign_id', $this->integer()->notNull());
-		$this->update('{{%issue_meet}}', ['campaign_id' => 1]);
 
 		$this->addForeignKey('{{%fk_issue_meet_campaign}}', '{{%issue_meet}}', 'campaign_id', '{{%campaign}}', 'id', 'CASCADE', 'CASCADE');
 	}

@@ -1,11 +1,11 @@
 <?php
 
-use common\models\WojewodztwaSearch;
+use common\models\address\search\StateSearch;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel WojewodztwaSearch */
+/* @var $searchModel StateSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Regiony';

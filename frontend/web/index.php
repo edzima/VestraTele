@@ -20,11 +20,8 @@ $config = ArrayHelper::merge(
 );
 
 if (YII_ENV_DEV) {
-
-    // показываем ошибки
-    error_reporting(1);
+	error_reporting(1);
 } else {
-    // не показываем ошибки
     error_reporting(0);
 }
 

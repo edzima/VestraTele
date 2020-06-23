@@ -89,7 +89,7 @@ class ProvisionTypeForm extends Model {
 		return [
 			User::ROLE_AGENT => 'Agent',
 			User::ROLE_TELEMARKETER => 'Tele',
-			User::ROLE_LAYER => 'Prawnik',
+			User::ROLE_LAWYER => 'Prawnik',
 		];
 	}
 

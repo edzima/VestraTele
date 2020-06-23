@@ -2,6 +2,7 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\modules\issue\models\MeetForm;
 use backend\widgets\CsvForm;
 use common\models\User;
 use Yii;
@@ -9,6 +10,7 @@ use common\models\issue\IssueMeet;
 use common\models\issue\IssueMeetSearch;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii2tech\csvgrid\CsvGrid;
@@ -48,6 +50,9 @@ class MeetController extends Controller {
 	 */
 	public function actionIndex() {
 		$searchModel = new IssueMeetSearch();
+		if (Yii::$app->user->can(User::ROLE_ARCHIVE)) {
+			$searchModel->withArchive = true;
+		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {
 			$exporter = new CsvGrid([
@@ -104,7 +109,7 @@ class MeetController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new IssueMeet();
+		$model = new MeetForm();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
@@ -124,7 +129,9 @@ class MeetController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate($id) {
-		$model = $this->findModel($id);
+
+		$model = new MeetForm();
+		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
@@ -157,8 +164,13 @@ class MeetController extends Controller {
 	 * @return IssueMeet the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id) {
+	protected function findModel($id):IssueMeet {
 		if (($model = IssueMeet::findOne($id)) !== null) {
+			if ($model->isArchived() && !Yii::$app->user->can(User::ROLE_ARCHIVE)) {
+				Yii::warning('User: ' . Yii::$app->user->id . ' try view archived meet: ' . $model->id, 'meet');
+
+				throw new MethodNotAllowedHttpException('Spotkanie jest w archiwum.');
+			}
 			return $model;
 		}
 

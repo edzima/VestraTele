@@ -1,6 +1,6 @@
 <?php
 
-use backend\modules\address\widgets\AddressWidget;
+use common\modules\address\widgets\AddressFormWidget;
 use common\models\issue\Issue;
 use common\models\issue\Provision;
 use common\widgets\DateTimeWidget;
@@ -73,7 +73,7 @@ use common\models\address\Address;
 		</div>
 
 		<div id="payCityWrapper" class="<?= !$model->isPositiveDecision() ? 'hidden' : '' ?>">
-			<?= AddressWidget::widget([
+			<?= AddressFormWidget::widget([
 				'form' => $form,
 				'model' => $payAddress,
 				'subProvince' => false,
@@ -110,15 +110,6 @@ use common\models\address\Address;
 				->widget(DateTimeWidget::class,
 					[
 						'phpDatetimeFormat' => 'yyyy-MM-dd',
-						'clientOptions' => [
-
-							'allowInputToggle' => true,
-							'sideBySide' => true,
-							'widgetPositioning' => [
-								'horizontal' => 'auto',
-								'vertical' => 'auto',
-							],
-						],
 					]) ?>
 
 			<?= $form->field($model, 'accident_at', [
@@ -130,15 +121,6 @@ use common\models\address\Address;
 				->widget(DateTimeWidget::class,
 					[
 						'phpDatetimeFormat' => 'yyyy-MM-dd',
-						'clientOptions' => [
-
-							'allowInputToggle' => true,
-							'sideBySide' => true,
-							'widgetPositioning' => [
-								'horizontal' => 'auto',
-								'vertical' => 'auto',
-							],
-						],
 					]) ?>
 		</div>
 
@@ -215,27 +197,21 @@ use common\models\address\Address;
 						'data-victim-input' => Html::getInputName($model, 'victim_email'),
 					]) ?>
 				</div>
-				<?= AddressWidget::widget([
+				<?= AddressFormWidget::widget([
 					'form' => $form,
-					'model' => $model,
-					'state' => 'clientStateId',
-					'province' => 'clientProvinceId',
-					'subProvince' => 'client_subprovince_id',
-					'city' => 'client_city_id',
-					'cityCode' => 'client_city_code',
-					'street' => 'client_street',
+					'model' => $model->getClientAddress(),
 					'copyOptions' => [
 						'data-selector' => 'data-victim-input',
 						'inputs' => [
-							'state' => Html::getInputName($model, 'victim_state_id'),
-							'province' => Html::getInputName($model, 'victim_province_id'),
-							'subProvince' => Html::getInputName($model, 'victim_subprovince_id'),
-							'city' => Html::getInputName($model, 'victim_city_id'),
-							'cityCode' => Html::getInputName($model, 'victim_city_code'),
-							'street' => Html::getInputName($model, 'victim_street'),
+							'state' => Html::getInputName($model->getVictimAddress(), 'stateId'),
+							'province' => Html::getInputName($model->getVictimAddress(), 'provinceId'),
+							'subProvince' => Html::getInputName($model->getVictimAddress(), 'subProvinceId'),
+							'city' => Html::getInputName($model->getVictimAddress(), 'cityId'),
+							'cityCode' => Html::getInputName($model->getVictimAddress(), 'cityCode'),
+							'street' => Html::getInputName($model->getVictimAddress(), 'street'),
 						],
 					],
-				]);
+				])
 				?>
 
 			</fieldset>
@@ -256,16 +232,10 @@ use common\models\address\Address;
 				</div>
 
 
-				<?= AddressWidget::widget([
+				<?= AddressFormWidget::widget([
 					'form' => $form,
-					'model' => $model,
-					'state' => 'victim_state_id',
-					'province' => 'victim_province_id',
-					'subProvince' => 'victim_subprovince_id',
-					'city' => 'victim_city_id',
-					'cityCode' => 'victim_city_code',
-					'street' => 'victim_street',
-				]);
+					'model' => $model->getVictimAddress(),
+				])
 				?>
 			</fieldset>
 		</div>
@@ -388,12 +358,16 @@ document.querySelector('.client-fieldset .copy-btn').addEventListener('click', f
     let parentFields = document.querySelectorAll('['+attributeName +']');
     for(let i =0, field; !!(field = parentFields[i]); i++){
     	let toCopyField = document.querySelector("[name='"+field.getAttribute(attributeName) +"']");
-    	toCopyField.value = field.value;
-    	var toCopy = $(toCopyField);
-        toCopy.trigger('change');
-        if(toCopyField instanceof HTMLSelectElement){
-        	toCopy.trigger('select2:select');
-        }
+		if(toCopyField.value !== field.value){
+			toCopyField.value = field.value;
+			let toCopy = $(toCopyField);
+			toCopy.trigger('change');
+            if(toCopyField instanceof HTMLSelectElement){
+       	        toCopy.trigger('select2:select');
+            }
+		}
+    
+     
     }
 });
 

@@ -1,11 +1,11 @@
 <?php
 
-use common\models\WojewodztwaSearch;
+use common\models\address\search\StateSearch;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model WojewodztwaSearch */
+/* @var $model StateSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 

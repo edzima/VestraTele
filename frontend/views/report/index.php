@@ -4,6 +4,7 @@ use common\models\provision\ProvisionReportSearch;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
+use yii\helpers\Html;
 use yii\web\View;
 use yii\web\YiiAsset;
 
@@ -14,6 +15,8 @@ $this->title = 'Raport: ' . $searchModel->toUser . ' (' . Yii::$app->formatter->
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 ?>
+
+<h1><?= Html::encode($this->title) ?></h1>
 
 <?= $this->render('_search', ['model' => $searchModel]) ?>
 

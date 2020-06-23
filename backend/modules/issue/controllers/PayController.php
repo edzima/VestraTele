@@ -2,6 +2,7 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\modules\issue\models\searches\DelayedIssuePaySearch;
 use backend\widgets\CsvForm;
 use common\models\issue\Issue;
 use common\models\issue\IssuePayQuery;
@@ -31,12 +32,17 @@ class PayController extends Controller {
 					'delete' => ['POST'],
 				],
 			],
-			'access' => [
+			'local-access' => [
 				'class' => AccessControl::class,
 				'rules' => [
 					[
 						'allow' => true,
 						'roles' => [User::ROLE_BOOKKEEPER],
+					],
+					[
+						'allow' => true,
+						'actions' => ['delayed', 'status'],
+						'roles' => [User::ROLE_BOOKKEEPER_DELAYED],
 					],
 				],
 			],
@@ -101,6 +107,17 @@ class PayController extends Controller {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+			'withMenu' => true,
+		]);
+	}
+
+	public function actionDelayed(): string {
+		$searchModel = new DelayedIssuePaySearch();
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		return $this->render('index', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+			'withMenu' => false,
 		]);
 	}
 
@@ -123,7 +140,7 @@ class PayController extends Controller {
 	public function actionStatus(int $id) {
 		$model = $this->findModel($id);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$this->redirect('index');
+			$this->redirect(Yii::$app->user->can(User::ROLE_BOOKKEEPER) ? 'index' : 'delayed');
 		}
 		return $this->render('status', [
 			'model' => $model,

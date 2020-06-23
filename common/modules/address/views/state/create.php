@@ -1,11 +1,11 @@
 <?php
 
-use common\models\Wojewodztwa;
+use common\models\address\State;
 use yii\helpers\Html;
 
 
 /* @var $this yii\web\View */
-/* @var $model Wojewodztwa */
+/* @var $model State */
 
 $this->title = 'Dodaj region';
 $this->params['breadcrumbs'][] = ['label' => 'Regiony', 'url' => ['index']];
