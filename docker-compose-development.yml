@@ -54,21 +54,33 @@ services:
         aliases:
           - db_mysql
 
-  reverse_proxy:
-    image: nginx:1.9
-    container_name: "vestratele_reverse_proxy"
+#  reverse_proxy:
+#    image: nginx:1.17.10
+#    container_name: "vestratele_reverse_proxy"
+#    volumes:
+#      - ./docker/development/ngnx/ngnx.conf:/etc/ngnx/ngnx.conf
+#    ports:
+#      - 80:80
+#    networks:
+#      main:
+#        aliases:
+#          - db_mysql
+
+  reverse-proxy:
+    image: nginx:1.17.10
+    container_name: "vestratele_reverse_proxy_demo"
     volumes:
-      - ./docker/development/ngnx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./docker/development/ngnx/backend-not-found.html:/var/www/html/backend-not-found.html:ro
-      - ./docker/development/ngnx/includes/:/etc/nginx/includes/
-      - ./docker/development/ngnx/ssl/:/etc/ssl/certs/nginx/
+      - ./docker/development/ngnx/ngnx.conf:/etc/nginx/nginx.conf
     ports:
       - 80:80
-      - 443:443
     networks:
       main:
         aliases:
           - db_mysql
+
+
+
+
 
 networks:
   main:
