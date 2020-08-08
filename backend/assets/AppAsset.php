@@ -14,10 +14,10 @@ class AppAsset extends AssetBundle {
 	public $basePath = '@webroot';
 	public $baseUrl = '@web';
 	public $css = [
-		'static/css/style.css',
+		'backend/static/css/style.css',
 	];
 	public $js = [
-		'static/js/toggle.js',
+		'backend/static/js/toggle.js',
 	];
 	public $depends = [
 		'yii\web\YiiAsset',
