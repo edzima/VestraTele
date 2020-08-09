@@ -11,17 +11,27 @@ Options +FollowSymlinks
 RewriteEngine On
 
 
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+#RewriteCond %{HTTPS} off
+#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Backend redirect
-RewriteCond %{REQUEST_URI} ^/backend
-RewriteRule ^backend/(.*)$ backend/web/$1 [L]
+## Backend redirect
+#RewriteCond %{REQUEST_URI} ^/backend
+#RewriteRule ^backend/(.*)$ backend/web/$1 [L]
+#
+## Storage redirect
+#RewriteCond %{REQUEST_URI} ^/storage
+#RewriteRule ^storage/(.*)$ storage/$1 [L]
+#
+## Frontend redirect
+#RewriteCond %{REQUEST_URI} ^(.*)$
+#RewriteRule ^(.*)$ frontend/web/$1
 
-# Storage redirect
-RewriteCond %{REQUEST_URI} ^/storage
-RewriteRule ^storage/(.*)$ storage/$1 [L]
 
-# Frontend redirect
-RewriteCond %{REQUEST_URI} ^(.*)$
-RewriteRule ^(.*)$ frontend/web/$1
+RewriteEngine on
+# prevent httpd from serving dotfiles (.htaccess, .svn, .git, etc.)
+RedirectMatch 403 /\..*$
+# if a directory or a file exists, use it directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# otherwise forward it to index.php
+RewriteRule . index.php

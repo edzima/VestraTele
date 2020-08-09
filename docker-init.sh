@@ -1,20 +1,27 @@
 #!/bin/bash
 echo "******************************************"
-echo "What docker deployment version would you like to install ? "
-options=("Development ====> YII SERVE(frontend) + YII SERVE(backend) + NGNX(reverse proxy) + MYSQL" "Production ====> NGNX(frontend)+ NGNX(backend) + NGNX(reverse proxy) + MYSQL" "Quit")
+echo "What docker deployment version would you like to start ? "
+options=("Development ====> YII SERVE(frontend) + YII SERVE(backend) + NGNX(reverse proxy) + MYSQL" "Production ====> APACHE(frontend)+ APACHE(backend) + NGNX(reverse proxy) + MYSQL" "Stop Development" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
         "Development ====> YII SERVE(frontend) + YII SERVE(backend) + NGNX(reverse proxy) + MYSQL")
-            echo "INSTALLING development environment ..."
+            echo "STARTING development environment ..."
             docker-compose -f docker-compose-development.yml up
             exit;
             ;;
-        "Production ====> NGNX(frontend) + NGNX(backend) + NGNX(reverse proxy) + MYSQL")
-            echo "INSTALLING production environment ..."
+        "Production ====> APACHE(frontend)+ APACHE(backend) + NGNX(reverse proxy) + MYSQL")
+            echo "STARTING production environment ..."
             docker-compose -f docker-compose-production.yml up
             exit;
             ;;
+        "Stop Development")
+            echo "Removing development containers"
+            docker-compose -f docker-compose-development.yml down
+            docker-compose -f docker-compose-production.yml down
+            exit;
+            ;;
+
         "Quit")
             break
             ;;
