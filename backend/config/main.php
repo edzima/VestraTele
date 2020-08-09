@@ -44,7 +44,6 @@ $config = [
 	],
 	'components' => [
 		'request' => [
-		    'baseUrl' => '/backend/web',
 			'cookieValidationKey' => getenv('BACKEND_COOKIE_VALIDATION_KEY'),
 			'csrfParam' => '_csrf-backend',
 		],
