@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Closure;
+use common\models\address\Address;
 use developeruz\db_rbac\interfaces\UserRbacInterface;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -186,6 +187,13 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	 */
 	public function getAuthKey() {
 		return $this->auth_key;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getUserAddress() {
+		return $this->hasMany(Address::className(), ['user_id' => 'id']);
 	}
 
 	/**
