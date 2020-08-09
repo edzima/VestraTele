@@ -87,4 +87,8 @@ class UpgradeController extends Controller {
 			->execute();
 	}
 
+	public function actionAddClientAndVictim(){
+		RbacController::actionAddClientAndVictim();
+	}
+
 }

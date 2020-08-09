@@ -59,6 +59,9 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	public const ROLE_TELEMARKETER = 'telemarketer';
 	public const ROLE_LAWYER = 'lawyer';
 
+	public const ROLE_CLIENT = 'client';
+	public const ROLE_VICTIM = 'victim';
+
 	private $selfTree;
 	private static $BOSS_MAP = [];
 	private static $TREE = [];
