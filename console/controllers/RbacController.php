@@ -23,7 +23,8 @@ class RbacController extends Controller {
 		User::ROLE_CUSTOMER_SERVICE,
 		User::ROLE_LAWYER,
 		User::ROLE_TELEMARKETER,
-
+		User::ROLE_CLIENT,
+		User::ROLE_VICTIM,
 	];
 
 	public function actionInit() {
@@ -66,6 +67,20 @@ class RbacController extends Controller {
 		$auth->add($role);
 		$bookKeeper = $auth->getRole(User::ROLE_BOOKKEEPER);
 		$auth->addChild($bookKeeper, $role);
+	}
+
+	public static function actionAddClientAndVictim(): void{
+		$auth = Yii::$app->authManager;
+
+		$clientRole = $auth->createRole(User::ROLE_CLIENT);
+		$auth->add($clientRole);
+		$roleManager = $auth->getRole(User::ROLE_MANAGER);
+		$auth->addChild($roleManager, $clientRole);
+
+		$victimRole = $auth->createRole(User::ROLE_VICTIM);
+		$auth->add($victimRole);
+		$roleManager = $auth->getRole(User::ROLE_MANAGER);
+		$auth->addChild($roleManager, $victimRole);
 	}
 
 }
