@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use app\models\UserAddress;
 use Closure;
 use common\models\address\Address;
 use developeruz\db_rbac\interfaces\UserRbacInterface;
@@ -193,7 +194,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	 * @inheritdoc
 	 */
 	public function getUserAddress() {
-		return $this->hasMany(Address::className(), ['user_id' => 'id']);
+		return $this->hasMany(UserAddress::className(), ['user_id' => 'id']);
 	}
 
 	/**
