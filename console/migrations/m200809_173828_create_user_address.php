@@ -19,6 +19,7 @@ class m200809_173828_create_user_address extends Migration
 
 
 		$this->createTable('{{%user_address}}', [
+			'user_id'=> $this->primaryKey(),
 			'city_id' => $this->integer()->notNull(),
 			'type' => $this->string()->notNull(),
 			'subservience_id' => $this->integer()->notNull(),
@@ -26,10 +27,7 @@ class m200809_173828_create_user_address extends Migration
 			'city_code' => $this->integer()->notNull()
 		], $tableOptions);
 
-
 		$this->addForeignKey('fk_useradress_user', '{{%user_address}}', 'user_id', '{{%user}}', 'id', 'CASCADE', 'CASCADE');
-
-
 
 	}
 
