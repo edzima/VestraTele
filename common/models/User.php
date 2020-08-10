@@ -1,7 +1,6 @@
 <?php
 
 namespace common\models;
-
 use app\models\UserAddress;
 use Closure;
 use common\models\address\Address;
@@ -149,7 +148,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getUserProfile() {
-		return $this->hasOne(UserProfile::className(), ['user_id' => 'id']);
+		return $this->hasOne(UserProfile::class, ['user_id' => 'id']);
 	}
 
 	/**
@@ -194,7 +193,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	 * @inheritdoc
 	 */
 	public function getUserAddress() {
-		return $this->hasMany(UserAddress::className(), ['user_id' => 'id']);
+		return $this->hasMany(UserAddress::class, ['user_id' => 'id']);
 	}
 
 	/**

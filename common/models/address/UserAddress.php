@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use common\models\address\Address;
 use common\models\User;
 use phpDocumentor\Reflection\Types\Array_;
 use Yii;
@@ -14,14 +15,16 @@ use yii\db\ActiveQuery;
  * @property int $user_id
  * @property int $city_id
  * @property string $type
- * @property int $subservience_id
+ * @property int $subprovince_id
  * @property string $street
- * @property int $city_code
+ * @property string $city_code
+ * @property Address $address
  *
  * @property User $user
  */
 class UserAddress extends \yii\db\ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */
@@ -37,9 +40,9 @@ class UserAddress extends \yii\db\ActiveRecord
     {
         return [
             [['city_id', 'type', 'subservience_id', 'street', 'city_code'], 'required'],
-            [['city_id', 'subservience_id', 'city_code'], 'integer'],
-            [['type', 'street'], 'string', 'max' => 255],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['city_id', 'subprovince_id'], 'integer'],
+            [['type', 'street', 'city_code'], 'string', 'max' => 255],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -65,6 +68,10 @@ class UserAddress extends \yii\db\ActiveRecord
      */
     public function getUser(): ActiveQuery
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
+
+    public function getAddress():Address {
+    	return Address::createFromCityId($this->city_id);
+	}
 }
