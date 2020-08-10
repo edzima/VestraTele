@@ -2,7 +2,11 @@
 
 namespace app\models;
 
+use common\models\User;
+use phpDocumentor\Reflection\Types\Array_;
 use Yii;
+use yii\base\Arrayable;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "{{%user_address}}".
@@ -21,7 +25,7 @@ class UserAddress extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%user_address}}';
     }
@@ -59,7 +63,7 @@ class UserAddress extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getUser()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
