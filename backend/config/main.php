@@ -12,7 +12,7 @@ $params = array_merge(
 
 $config = [
 	'id' => 'app-backend',
-	'homeUrl' => Yii::getAlias('@backendUrl'),
+	'homeUrl' => '/',
 	'basePath' => dirname(__DIR__),
 	'controllerNamespace' => 'backend\controllers',
 	'defaultRoute' => 'issue/issue/index',
@@ -23,7 +23,7 @@ $config = [
 			'disabledCommands' => ['netmount'],
 			'roots' => [
 				[
-					'baseUrl' => '/backend',
+					'baseUrl' => '/',
 					'basePath' => '@storage',
 					'path' => '/',
 					'access' => ['read' => 'manager', 'write' => 'manager'],

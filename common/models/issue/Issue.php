@@ -420,7 +420,7 @@ class Issue extends ActiveRecord {
 		return $this->hasOne(IssuePayCalculation::class, ['issue_id' => 'id']);
 	}
 
-	public function s(getPay): IssuePayQuery {
+	public function getPays(): IssuePayQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(IssuePay::class, ['issue_id' => 'id'])
 			->orderBy(IssuePay::tableName() . '.deadline_at ASC, ' . IssuePay::tableName() . '.pay_at DESC');
