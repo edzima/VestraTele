@@ -46,15 +46,19 @@
 		"loveorigami/yii2-bootstrap-toggle": "*",
 		"dmstr/yii2-adminlte-asset": "^2.1",
 		"yii2tech/csv-grid": "^1.0",
-		"udokmeci/yii2-phone-validator" : "~1.0.3",
+		"udokmeci/yii2-phone-validator": "~1.0.3",
 		"developeruz/yii2-db-rbac": "*"
 	},
 	"require-dev": {
-		"roave/security-advisories": "dev-master",
 		"yiisoft/yii2-gii": "*",
 		"samdark/yii2-webshell": "*",
 		"yiisoft/yii2-debug": "^2.0",
-		"codeception/codeception": "^2.2"
+		"codeception/module-filesystem": "^1.0",
+		"codeception/verify": "~0.5.0 || ~1.1.0",
+		"codeception/codeception": "^4.0",
+		"roave/security-advisories": "dev-master",
+		"codeception/module-asserts": "^1.0",
+		"codeception/module-yii2": "^1.0"
 	},
 	"repositories": [
 		{
