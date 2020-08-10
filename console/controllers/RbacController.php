@@ -69,7 +69,7 @@ class RbacController extends Controller {
 		$auth->addChild($bookKeeper, $role);
 	}
 
-	public static function actionAddClientAndVictim(): void{
+	public function actionAddClientAndVictim(): void{
 		$auth = Yii::$app->authManager;
 
 		$clientRole = $auth->createRole(User::ROLE_CLIENT);
