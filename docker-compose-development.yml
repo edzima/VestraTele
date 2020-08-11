@@ -11,6 +11,7 @@ services:
     ports:
       - "${FRONTEND_PORT}:8080"
     volumes:
+      - ./vendor:/var/html/vestra/vendor
       - ./:/var/html/vestra
     working_dir: /var/html/vestra
     networks:
@@ -28,6 +29,7 @@ services:
     ports:
       - "${BACKEND_PORT}:8080"
     volumes:
+      - ./vendor:/var/html/vestra/vendor
       - ./:/var/html/vestra
     working_dir: /var/html/vestra
     networks:
