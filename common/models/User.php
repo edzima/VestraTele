@@ -33,6 +33,7 @@ use common\models\query\UserQuery;
  * @property integer $boss
  * @property UserProfile $userProfile
  * @property User $parent
+ * @property-read Address[] A
  */
 class User extends ActiveRecord implements IdentityInterface, UserRbacInterface {
 
@@ -186,7 +187,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	}
 
 	/**
-	 * @inheritdoc
+	 * @return ActiveQuery
 	 */
 	public function getTypWork() {
 
