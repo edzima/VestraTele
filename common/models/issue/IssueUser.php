@@ -5,6 +5,7 @@ namespace app\models;
 use common\models\issue\Issue;
 use common\models\User;
 use Yii;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "issue_user".
@@ -39,18 +40,10 @@ class IssueUser extends \yii\db\ActiveRecord {
 			[['user_id', 'issue_id', 'type'], 'required'],
 			[['user_id', 'issue_id'], 'integer'],
 			[['type'], 'string', 'max' => 255],
+			['type', 'in', 'range' => array_keys(self::getTypesNames())],
 			[['user_id', 'issue_id'], 'unique', 'targetAttribute' => ['user_id', 'issue_id']],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-		];
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function rules(): array {
-		return [
-			['type', 'in', 'range' => array_keys($this->getTypesNames())],
 		];
 	}
 
@@ -85,7 +78,7 @@ class IssueUser extends \yii\db\ActiveRecord {
 	 *
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getIssue() {
+	public function getIssue(): \yii\db\ActiveQuery {
 		return $this->hasOne(Issue::className(), ['id' => 'issue_id']);
 	}
 
@@ -94,7 +87,12 @@ class IssueUser extends \yii\db\ActiveRecord {
 	 *
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getUser() {
+	public function getUser(): \yii\db\ActiveQuery {
 		return $this->hasOne(User::className(), ['id' => 'user_id']);
+	}
+
+
+	public static function getIssueUsersByTypes($types): ActiveQuery{
+		return self::find()->where(["type" => $types]);
 	}
 }
