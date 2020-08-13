@@ -42,7 +42,7 @@ services:
     restart: always
     environment:
       DB_USERNAME: "${DB_USERNAME}"
-      MYSQL_ROOT_PASSWORD: "0
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       DB_PASSWORD: "${DB_PASSWORD}"
       DB_DBNAME: "${DB_DBNAME}"
     volumes:
