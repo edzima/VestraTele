@@ -1,0 +1,1 @@
+[ "$(ls -A /var/html/vestra/vendor)" ] && echo "composer already installed" || (cd /var/html/vestra && touch ./vendor/.installing && php /usr/local/bin/composer install && rm ./vendor/.installing)

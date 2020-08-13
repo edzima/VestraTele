@@ -105,6 +105,4 @@ RUN ls
 
 COPY ./composer.json ./
 
-RUN php /usr/local/bin/composer install
-
-CMD php ./yii serve 0.0.0.0 --docroot="@backend/web" --port=8080
+CMD sleep 5 && docker/development/composerInstall.sh && php ./yii serve 0.0.0.0 --docroot="@backend/web" --port=8080
