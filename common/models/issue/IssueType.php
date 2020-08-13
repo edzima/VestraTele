@@ -2,8 +2,8 @@
 
 namespace common\models\issue;
 
-use yii\base\InvalidArgumentException;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "issue_type".
@@ -25,24 +25,13 @@ class IssueType extends ActiveRecord {
 	public const SPA_ID = 2;
 	private $provision;
 
-	private static $TYPES = [];
+	private static $TYPES;
 
 	/**
 	 * @inheritdoc
 	 */
 	public static function tableName(): string {
 		return 'issue_type';
-	}
-
-	public static function get(int $typeId) {
-		if (!isset(static::$TYPES[$typeId])) {
-			$model = static::findOne($typeId);
-			if ($model === null) {
-				throw new InvalidArgumentException('Invalid type id: ' . $typeId);
-			}
-			static::$TYPES[$typeId] = $model;
-		}
-		return static::$TYPES[$typeId];
 	}
 
 	/**
@@ -99,5 +88,20 @@ class IssueType extends ActiveRecord {
 
 	public function __toString(): string {
 		return $this->name;
+	}
+
+	public static function get(int $typeId): ?self {
+		return static::getTypes()[$typeId] ?? null;
+	}
+
+	public static function getTypes(): array {
+		if (static::$TYPES === null) {
+			static::$TYPES = static::find()->all();
+		}
+		return static::$TYPES;
+	}
+
+	public static function getTypesNames(): array {
+		return ArrayHelper::map(static::getTypes(), 'id', 'name');
 	}
 }

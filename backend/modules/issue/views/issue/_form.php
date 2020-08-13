@@ -11,11 +11,9 @@ use yii\helpers\Url;
 use yii\web\View;
 use yii\widgets\ActiveForm;
 use backend\modules\issue\models\IssueForm;
-use common\models\address\Address;
 
 /* @var $this View */
 /* @var $model Issue */
-/* @var $payAddress Address */
 /* @var $form yii\widgets\ActiveForm */
 
 ?>
@@ -72,16 +70,6 @@ use common\models\address\Address;
 
 		</div>
 
-		<div id="payCityWrapper" class="<?= !$model->isPositiveDecision() ? 'hidden' : '' ?>">
-			<?= AddressFormWidget::widget([
-				'form' => $form,
-				'model' => $payAddress,
-				'subProvince' => false,
-				'street' => false,
-				'legend' => 'Miasto wypłacające',
-			]);
-			?>
-		</div>
 
 		<div class="row">
 			<?= $form->field($model, 'agent_id', ['options' => ['class' => 'col-md-6']])
@@ -312,7 +300,6 @@ let stageInput = document.getElementById('$stageInputId');
 let typeInput = document.getElementById(('issueTypeId'));
 let archivesInput = document.getElementById('archives-field');
 let accidentAtInput = document.getElementById('accident_at_field');
-let payCityWrapper = document.getElementById('payCityWrapper');
 let stateChangeAtInput = document.getElementById('issue-stage_change_at');
 
 function isArchived(){
@@ -337,11 +324,6 @@ function isAccident(){
 		archivesInput.classList.add('hidden');
 	}
 	
-	if(value === $positiveDecisionStageId){
-		payCityWrapper.classList.remove('hidden');
-	}else{
-		payCityWrapper.classList.add('hidden');
-	}
 	stateChangeAtInput.value = '';
 };
 

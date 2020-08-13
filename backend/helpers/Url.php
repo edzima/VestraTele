@@ -10,10 +10,6 @@ class Url extends BaseUrl {
 		return static::to(['/issue/issue/view', 'id' => $id]);
 	}
 
-	public static function payCityDetails(int $cityId = null): string {
-		return static::to(['/issue/pay-city/create', 'city_id' => $cityId]);
-	}
-
 	public static function userProvisions(int $userId): string {
 		return static::to(['/provision/user/user', 'id' => $userId]);
 	}

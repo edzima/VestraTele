@@ -3,36 +3,50 @@
 namespace common\models\issue;
 
 use common\models\issue\query\IssuePayCalculationQuery;
+use common\models\provision\ProvisionQuery;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use common\models\provision\Provision;
 
 /**
  * This is the model class for table "issue_pay_calculation".
  *
+ * @property int $id
  * @property int $issue_id
- * @property int $status
+ * @property int $type
  * @property string $value
- * @property int $pay_type
  * @property string $details
  * @property string $created_at
  * @property string $updated_at
+ * @property string $payment_at
+ * @property int $provider_type
  *
- * @property-read string $statusName
- * @property Issue $issue
+ * @property-read Issue $issue
+ * @property-read IssuePay[] $pays
  */
 class IssuePayCalculation extends ActiveRecord {
 
-	public const STATUS_DRAFT = 5;
-	public const STATUS_ACTIVE = 10;
-	public const STATUS_BEFORE_LAWSUIT = 20;
-	public const STATUS_LAWSUIT = 30;
-	public const STATUS_BAILIFF = 40;
+	public const TYPE_NOT_SET = 0;
+	public const TYPE_ADMINISTRATIVE = 10;
+	public const TYPE_PROVISION = 20;
+	public const TYPE_PROVISION_REFUND = 25;
+	public const TYPE_HONORARIUM = 30;
+	public const TYPE_LAWYER = 40;
+	public const TYPE_SUBSCRIPTION = 50;
 
-	public const STATUS_PAYED = 100;
+	public const PROVIDER_CLIENT = 1;
+	public const PROVIDER_RESPONSIBLE_ENTITY = 10;
 
-	public const PAY_TYPE_DIRECT = IssuePay::TRANSFER_TYPE_DIRECT;
-	public const PAY_TYPE_BANK_TRANSFER = IssuePay::TRANSFER_TYPE_BANK;
+	public function afterSave($insert, $changedAttributes) {
+		parent::afterSave($insert, $changedAttributes);
+		$this->issue->markAsUpdate();
+	}
+
+	public function afterDelete() {
+		parent::afterDelete();
+		$this->issue->markAsUpdate();
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -50,24 +64,17 @@ class IssuePayCalculation extends ActiveRecord {
 		];
 	}
 
-	public function afterDelete() {
-		IssuePay::deleteAll(['issue_id' => $this->issue_id]);
-		parent::afterDelete();
-	}
-
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['created_at', 'updated_at'], 'safe'],
-			[['issue_id', 'status', 'value', 'pay_type'], 'required'],
-			[['issue_id', 'status', 'pay_type'], 'integer'],
+			[['created_at', 'updated_at', 'payment_at'], 'safe'],
+			[['issue_id', 'value'], 'required'],
+			[['issue_id'], 'integer'],
 			['value', 'number', 'min' => 1, 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
 			[['details'], 'string'],
 			[['issue_id'], 'unique'],
-			[['pay_type'], 'in', 'range' => array_keys(static::getPayTypesNames())],
-			[['status'], 'in', 'range' => array_keys(static::getStatusNames())],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 		];
 	}
@@ -80,79 +87,67 @@ class IssuePayCalculation extends ActiveRecord {
 			'issue_id' => 'Sprawa',
 			'created_at' => 'Dodano',
 			'updated_at' => 'Edycja',
-			'status' => 'Status',
-			'statusName' => 'Status',
+			'payment_at' => 'Opłacono',
 			'value' => 'Kwota (Brutto)',
-			'pay_type' => 'Preferowany typ płatności',
-			'payName' => 'Preferowany typ płatności',
+			'type' => 'Rodzaj',
+			'typeName' => 'Typ',
 			'details' => 'Szczegóły',
-			'payCityDetails' => 'Miasto wypłacające',
+			'providerName' => 'Wpłacający',
 		];
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getIssue() {
+	public function getIssue(): IssueQuery {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
 	}
 
-	public function getStatusName(): string {
-		return static::getStatusNames()[$this->status];
+	public function getPays(): IssuePayQuery {
+		return $this->hasMany(IssuePay::class, ['calculation_id' => 'id']);
 	}
 
-	public function getPayName(): string {
-		return static::getPayTypesNames()[$this->pay_type];
+	public function getProvisions(): ProvisionQuery {
+		return $this->hasMany(Provision::class, ['pay_id' => 'id'])->via('pays');
 	}
 
-	public function isActive(): bool {
-		return (int) $this->status === static::STATUS_ACTIVE;
+	public function getTypeName(): string {
+		return static::getTypesNames()[$this->type] ?? '';
 	}
 
 	public function isPayed(): bool {
-		return (int) $this->status === static::STATUS_PAYED;
+		return !empty($this->payment_at);
 	}
 
-	public function isBeforeLawsuit(): bool {
-		return (int) $this->status === static::STATUS_BEFORE_LAWSUIT;
+	public function getPaysCount(): int {
+		return $this->getPays()->count();
+		return count($this->pays);
 	}
 
-	public function isLawsuit(): bool {
-		return (int) $this->status === static::STATUS_LAWSUIT;
-	}
-
-	public function isBailiff(): bool {
-		return (int) $this->status === static::STATUS_BAILIFF;
-	}
-
-	public function isDraft(): bool {
-		return (int) $this->status === static::STATUS_DRAFT;
-	}
-
-	public static function getStatusNames(): array {
+	public static function getTypesNames(): array {
 		return [
-			static::STATUS_DRAFT => 'Pozytywne (Bez terminu)',
-			static::STATUS_ACTIVE => 'W trakcie',
-			static::STATUS_PAYED => 'Opłacony',
-			static::STATUS_BEFORE_LAWSUIT => 'Przygotowanie do sądu',
-			static::STATUS_LAWSUIT => 'Sąd',
-			static::STATUS_BAILIFF => 'Komornik',
+			//static::TYPE_NOT_SET => 'Nieustalono',
+			static::TYPE_ADMINISTRATIVE => 'Administracyjne',
+			static::TYPE_PROVISION => 'Prowizja',
+			static::TYPE_PROVISION_REFUND => 'Zwrot prowizji',
+			static::TYPE_HONORARIUM => 'Honorarium',
+			static::TYPE_LAWYER => 'Koszty adwokackie',
+			static::TYPE_SUBSCRIPTION => 'Abonament',
 		];
 	}
 
-	public static function getPayTypesNames(): array {
+	/** @noinspection PhpUnused */
+	public function getProviderName(): ?string {
+		return $this->getProvidersNames()[$this->provider_type] ?? null;
+	}
+
+	public function getProvidersNames(): array {
+		//@todo change to Client User Model after refactor client.
 		return [
-			static::PAY_TYPE_BANK_TRANSFER => 'Przelew',
-			static::PAY_TYPE_DIRECT => 'Gotówka',
+			static::PROVIDER_CLIENT => $this->issue->getClientFullName(),
+			static::PROVIDER_RESPONSIBLE_ENTITY => $this->issue->entityResponsible,
 		];
 	}
 
 	public static function find(): IssuePayCalculationQuery {
 		return new IssuePayCalculationQuery(static::class);
-	}
-
-	public function markAsPayed(): void {
-		$this->updateAttributes(['status' => static::STATUS_PAYED]);
 	}
 
 }

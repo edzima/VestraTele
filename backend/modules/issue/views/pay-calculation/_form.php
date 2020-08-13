@@ -1,16 +1,15 @@
 <?php
 
-use backend\modules\issue\models\IssueProvisionUsersForm;
 use backend\modules\issue\models\PayCalculationForm;
 use common\widgets\DateTimeWidget;
+use kartik\number\NumberControl;
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\ActiveForm;
 
-/* @var $this yii\web\View */
+/* @var $this View */
 /* @var $model PayCalculationForm */
-/* @var $provisionModel IssueProvisionUsersForm */
-/* @var $form yii\widgets\ActiveForm */
-$pay = $model->getPayCalculation();
+/* @var $form ActiveForm */
 ?>
 
 <div class="issue-pay-calculation-form">
@@ -18,10 +17,26 @@ $pay = $model->getPayCalculation();
 	<?php $form = ActiveForm::begin(); ?>
 	<div class="row">
 
+		<?= $form->field($model, 'providerType', ['options' => ['class' => 'col-md-3 col-lg-3']])->dropDownList($model->getProvidersNames()) ?>
 
-		<?= $form->field($pay, 'status', ['options' => ['class' => 'col-md-6']])->dropDownList(PayCalculationForm::getStatusNames()) ?>
+		<?= $form->field($model, 'type', ['options' => ['class' => 'col-md-2 col-lg-2']])->dropDownList(PayCalculationForm::getTypesNames()) ?>
 
-		<?= $form->field($model, 'payAt', ['options' => ['class' => 'col-md-6 hidden']])
+	</div>
+	<div class="row">
+		<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-2']])->widget(NumberControl::class) ?>
+
+		<?= $form->field($model, 'vat', ['options' => ['class' => 'col-md-1']])->widget(NumberControl::class) ?>
+
+		<?= $form->field($model, 'payTransferType', ['options' => ['class' => 'col-md-3 col-lg-2']])->dropDownList(PayCalculationForm::getPaysTransferTypesNames()) ?>
+
+
+	</div>
+
+
+	<div class="row">
+
+
+		<?= $form->field($model, 'paymentAt', ['options' => ['class' => 'col-md-3 col-lg-2']])
 			->widget(DateTimeWidget::class,
 				[
 					'phpDatetimeFormat' => 'yyyy-MM-dd',
@@ -32,71 +47,71 @@ $pay = $model->getPayCalculation();
 							'horizontal' => 'auto',
 							'vertical' => 'auto',
 						],
-					]
+					],
 				]) ?>
 
-	</div>
-	<div class="row">
-		<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-6']])->textInput(['maxlength' => true]) ?>
 
-		<?= $form->field($pay, 'pay_type', ['options' => ['class' => 'col-md-6']])->dropDownList(PayCalculationForm::getPaysTypesNames()) ?>
-	</div>
+		<?= $form->field($model, 'deadlineAt', ['options' => ['class' => 'col-md-3 col-lg-2']])
+			->widget(DateTimeWidget::class,
+				[
+					'phpDatetimeFormat' => 'yyyy-MM-dd',
+					'clientOptions' => [
+						'allowInputToggle' => true,
+						'sideBySide' => true,
+						'widgetPositioning' => [
+							'horizontal' => 'auto',
+							'vertical' => 'auto',
+						],
+					],
+				]) ?>
 
-	<?= $form->field($pay, 'details')->textarea(['rows' => 2]) ?>
-
-	<div class="row">
-		<?= $form->field($model, 'payParts', ['options' => ['class' => 'col-md-6']])
+		<?= $form->field($model, 'paysCount', ['options' => ['class' => 'col-md-2 col-lg-1']])
 			->textInput([
 				'maxlength' => true,
-				'readonly' => $model->isDisallowChangePays(),
+				'disabled' => $model->isPayed(),
 			]) ?>
 
-		<?= $form->field($model, 'firstBillDate', ['options' => ['class' => 'col-md-6']])
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
-					'options' => [
-						'readonly' => $model->isDisallowChangePays(),
-					],
-				]) ?>
+
 	</div>
 
+
+	<div class="pays-wrapper">
+
+
+		<div class="form-group">
+			<?= Html::submitButton('Generuj', [
+				'id' => 'generate-btn',
+				'class' => 'btn btn-primary',
+				'name' => PayCalculationForm::GENERATE_NAME,
+			]) ?>
+		</div>
+
+
+		<?php if ($model->hasManyPays()): ?>
+
+			<h3>Płatności</h3>
+
+
+			<?php
+			$i = 0;
+			foreach ($model->getPays() as $index => $pay) {
+				echo $this->render('_form_pay', [
+					'form' => $form,
+					'model' => $pay,
+					'id' => $pay->id ?? $index,
+					'index' => $i++,
+					'withBorder' => !$model->isCreateForm(),
+				]);
+			}
+			?>
+
+		<?php endif; ?>
+
+	</div>
 	<div class="form-group">
-		<?= Html::submitButton('Generuj', [
-			'id' => 'generate-btn',
-			'class' => 'btn btn-primary' . ($model->payParts < 2 ? ' hide' : ''),
-			'name' => PayCalculationForm::GENERATE_NAME,
-		]) ?>
 		<?= Html::submitButton('Zapisz', ['id' => 'save-btn', 'class' => 'btn btn-success']) ?>
 	</div>
 
-	<h3 class="<?= $model->payParts < 2 ? 'hide' : '' ?>">Proponowane płatności</h3>
-	<?php
-	$i = 0;
-	foreach ($model->getPays() as $pay) {
-		echo $this->render('_form_pay', [
-			'form' => $form,
-			'index' => $i++,
-			'model' => $pay,
-			'hide' => $model->payParts < 2,
-			'showTransferType' => !$model->isCreateForm(),
-		]);
-	}
-	?>
-
-
-	<?= $this->render('_provision_form', [
-		'model' => $provisionModel,
-		'form' => $form,
-	]) ?>
 
 	<?php ActiveForm::end(); ?>
 
@@ -104,32 +119,25 @@ $pay = $model->getPayCalculation();
 
 <script>
 	document.addEventListener('DOMContentLoaded', function () {
-		let payPartsInput = document.getElementById('paycalculationform-payparts');
+		let paysCountInput = document.getElementById('paycalculationform-payscount');
 		let generatBtn = document.getElementById('generate-btn');
-		let statusInput = document.getElementById('issuepaycalculation-status');
-		let payAtField = document.getElementsByClassName('field-paycalculationform-payat')[0];
+		let paysWrapper = document.getElementsByClassName('pays-wrapper')[0];
 
-		function parseStatusInput() {
-			if (parseInt(statusInput.value) === 100) {
-				payAtField.classList.remove('hidden');
+		function parsePaysCountInput() {
+			const count = parseInt(paysCountInput.value);
+			if (count > 1) {
+				generatBtn.classList.remove('hide');
+				paysWrapper.classList.remove('hide');
 			} else {
-				payAtField.classList.add('hidden');
+				generatBtn.classList.add('hide');
+				paysWrapper.classList.add('hide');
 			}
 		}
 
 
-		parseStatusInput();
+		parsePaysCountInput();
 
-		statusInput.addEventListener('change', parseStatusInput);
-
-
-		payPartsInput.addEventListener('change', function () {
-			if (payPartsInput.value > 1) {
-				generatBtn.classList.remove('hide');
-			} else {
-				generatBtn.classList.add('hide');
-			}
-		});
+		paysCountInput.addEventListener('change', parsePaysCountInput);
 
 
 	})

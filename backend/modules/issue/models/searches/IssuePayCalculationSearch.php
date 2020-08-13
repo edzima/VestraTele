@@ -3,7 +3,6 @@
 namespace backend\modules\issue\models\searches;
 
 use yii\base\Model;
-use common\models\issue\Issue;
 use yii\data\ActiveDataProvider;
 use common\models\issue\IssuePayCalculation;
 
@@ -12,29 +11,16 @@ use common\models\issue\IssuePayCalculation;
  */
 class IssuePayCalculationSearch extends IssuePayCalculation {
 
-	public $id;
-
-	public $clientSurname;
-	public $cityName;
-
-	private $onlyNew = false;
-
-	public function isOnlyNew(): bool {
-		return $this->onlyNew;
-	}
-
-	protected function setIsOnlyNew(bool $value): void {
-		$this->onlyNew = $value;
-	}
+	public $client_surname;
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['issue_id', 'pay_type', 'id'], 'integer'],
+			[['issue_id', 'type'], 'integer'],
 			[['value'], 'number'],
-			[['details', 'cityName', 'clientSurname'], 'safe'],
+			[['client_surname'], 'safe'],
 		];
 	}
 
@@ -53,64 +39,32 @@ class IssuePayCalculationSearch extends IssuePayCalculation {
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function search($params) {
-		$query = Issue::find();
-		$query->joinWith('payCalculation as calculation');
-
-		if ($this->isOnlyNew()) {
-			$this->status = null;
-			$query->onlyPositiveDecision();
-			$query->andWhere('calculation.issue_id IS NULL');
-		} else {
-			$query->andFilterWhere(['calculation.status' => $this->status]);
-		}
+	public function search($params): ActiveDataProvider {
+		$query = IssuePayCalculation::find();
+		$query->joinWith('issue');
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
 			'sort' => [
-				'attributes' => [
-					'value' => [
-						'asc' => ['calculation.value' => SORT_ASC],
-						'desc' => ['calculation.value' => SORT_DESC],
-					],
-					'created_at' => [
-						'asc' => ['calculation.created_at' => SORT_ASC],
-						'desc' => ['calculation.created_at' => SORT_DESC],
-					],
-					'updated_at' => [
-						'asc' => ['calculation.updated_at' => SORT_ASC],
-						'desc' => ['calculation.updated_at' => SORT_DESC],
-					],
-				],
-				'defaultOrder' => 'calculation.updated_at DESC',
+				'defaultOrder' => 'updated_at DESC',
 			],
 		]);
 
 		$this->load($params);
 
 		if (!$this->validate()) {
-			// uncomment the following line if you do not want to return any records when validation fails
-			// $query->where('0=1');
 			return $dataProvider;
-		}
-
-		if (!empty($this->cityName)) {
-			$query->joinWith('clientCity');
-			$query->andFilterWhere(['like', 'miasta.name', $this->cityName]);
 		}
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'calculation.value' => $this->value,
-			'calculation.status' => $this->status,
-			'calculation.pay_type' => $this->pay_type,
+			'value' => $this->value,
+			'type' => $this->type,
 		]);
 
-		$query->andFilterWhere([
-			'like', 'calculation.details', $this->details,
-		])
-			->andFilterWhere(['like', 'client_surname', $this->clientSurname])
-			->andFilterWhere(['like', 'id', $this->id]);
+		$query
+			->andFilterWhere(['like', 'issue.client_surname', $this->client_surname])
+			->andFilterWhere(['like', 'issue.id', $this->issue_id]);
 
 		return $dataProvider;
 	}

@@ -17,7 +17,6 @@ $this->params['breadcrumbs'][] = 'Edycja';
 
 	<?= $this->render('_form', [
 		'model' => $issue,
-		'payAddress' => $model->getPayAddress(),
 	]) ?>
 
 </div>

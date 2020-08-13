@@ -60,6 +60,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	public const ROLE_LAWYER = 'lawyer';
 
 	private $selfTree;
+	private static $ROLES_NAMES;
 	private static $BOSS_MAP = [];
 	private static $TREE = [];
 	private static $USER_NAMES = [];
@@ -90,6 +91,10 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	}
 
 	public function __toString(): string {
+		return $this->getFullName();
+	}
+
+	public function getUserName() {
 		return $this->getFullName();
 	}
 
@@ -188,14 +193,6 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	/**
 	 * @inheritdoc
 	 */
-	public function getTypWork() {
-
-		return $this->typ_work;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
 	public function validateAuthKey($authKey) {
 		return $this->getAuthKey() === $authKey;
 	}
@@ -261,18 +258,18 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 		return $statuses[$status];
 	}
 
-	/**
-	 * @return array
-	 */
-	public static function roleI18n() {
-		$roles = Yii::$app->authManager->getRoles();
-		$rolesI18n = [];
+	public static function roleI18n(): array {
+		if (empty(static::$ROLES_NAMES)) {
+			$roles = Yii::$app->authManager->getRoles();
+			$rolesI18n = [];
 
-		foreach ($roles as $role) {
-			$name = $role->name;
-			$rolesI18n[$name] = Yii::t('common', $name);
+			foreach ($roles as $role) {
+				$name = $role->name;
+				$rolesI18n[$name] = Yii::t('common', $name);
+			}
+			static::$ROLES_NAMES = $rolesI18n;
 		}
-		return $rolesI18n;
+		return static::$ROLES_NAMES;
 	}
 
 	public function hasParent(): bool {
@@ -299,31 +296,6 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 		$auth->assign($auth->getRole(self::ROLE_USER), $this->getId());
 	}
 
-	/**
-	 * @inheritdoc
-	 * @return \common\models\query\UserQuery the active query used by this AR class.
-	 */
-	public static function find() {
-		return new UserQuery(get_called_class());
-	}
-
-	public static function getSelectList(array $roles = [], bool $commonRoles = true, ?Closure $beforeAll = null): array {
-		$query = static::find()
-			->joinWith('userProfile')
-			->with('userProfile')
-			->active()
-			->orderBy('user_profile.lastname');
-		if (!empty($roles)) {
-			$query->onlyByRole($roles, $commonRoles);
-		}
-		if ($beforeAll instanceof Closure) {
-			$beforeAll($query);
-		}
-		$query->cache(60);
-
-		return ArrayHelper::map(
-			$query->all(), 'id', 'fullName');
-	}
 
 	public function getParents(): array {
 		return $this->getParentsQuery()->all();
@@ -442,6 +414,32 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 		return static::userNames()[$id];
 	}
 
+	/**
+	 * @inheritdoc
+	 * @return \common\models\query\UserQuery the active query used by this AR class.
+	 */
+	public static function find() {
+		return new UserQuery(get_called_class());
+	}
+
+	public static function getSelectList(array $roles = [], bool $commonRoles = true, ?Closure $beforeAll = null): array {
+		$query = static::find()
+			->joinWith('userProfile')
+			->with('userProfile')
+			->active()
+			->orderBy('user_profile.lastname');
+		if (!empty($roles)) {
+			$query->onlyByRole($roles, $commonRoles);
+		}
+		if ($beforeAll instanceof Closure) {
+			$beforeAll($query);
+		}
+		$query->cache(60);
+
+		return ArrayHelper::map(
+			$query->all(), 'id', 'fullName');
+	}
+
 	private static function userNames(): array {
 		if (empty(static::$USER_NAMES)) {
 			static::$USER_NAMES = static::find()
@@ -454,7 +452,4 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 		return static::$USER_NAMES;
 	}
 
-	public function getUserName() {
-		return $this->getFullName();
-	}
 }

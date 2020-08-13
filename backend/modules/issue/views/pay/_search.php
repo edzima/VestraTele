@@ -21,7 +21,6 @@ $action = Yii::$app->controller->action->id;
 	]); ?>
 
 	<div style="display:flex; align-items: center;">
-		<?= $form->field($model, 'payCityState')->dropDownList(IssuePaySearch::getStateNames(), ['prompt' => '- Region -']) ?>
 
 		<div class="date-range-fields-wrapper" style="margin-left:auto;display: flex;align-items: center;">
 

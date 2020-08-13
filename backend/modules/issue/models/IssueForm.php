@@ -2,10 +2,8 @@
 
 namespace backend\modules\issue\models;
 
-use common\models\address\Address;
 use common\models\issue\Issue;
 use common\models\entityResponsible\EntityResponsible;
-use common\models\issue\IssuePayCity;
 use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
 use common\models\User;
@@ -15,7 +13,6 @@ use yii\helpers\ArrayHelper;
 /**
  * Class IssueForm
  *
- * @property $issue Issue
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  */
 class IssueForm extends Model {
@@ -26,11 +23,6 @@ class IssueForm extends Model {
 
 	/** @var Issue */
 	private $model;
-
-	/**
-	 * @var Address
-	 */
-	private $payAddress;
 
 	public function setModel(Issue $model): void {
 		$this->model = $model;
@@ -43,50 +35,21 @@ class IssueForm extends Model {
 		return $this->model;
 	}
 
-	public function getPayAddress(): Address {
-		if ($this->payAddress === null) {
-			if ($this->model->pay_city_id !== null) {
-				$this->payAddress = Address::createFromCityId($this->model->pay_city_id);
-			} elseif ($this->model->client_city_id !== null) {
-				$this->payAddress = Address::createFromCity($this->model->clientCity);
-			} else {
-				$this->payAddress = new Address();
-			}
-			$this->payAddress->formName = 'payAddress';
-		}
-		return $this->payAddress;
-	}
-
 	public function load($data, $formName = null): bool {
-		$load = $this->getModel()->load($data, $formName);
-		if ($load && $this->getModel()->isPositiveDecision()) {
-			$load = $load && $this->getPayAddress()->load($data);
-		}
-		return $load
+		return $this->getModel()->load($data, $formName)
 			&& $this->getModel()->getClientAddress()->load($data)
 			&& $this->getModel()->getVictimAddress()->load($data);
 	}
 
 	public function validate($attributeNames = null, $clearErrors = true): bool {
-		$validate = $this->getModel()->getClientAddress()->validate()
-			&& $this->getModel()->getVictimAddress()->validate() && $this->getModel()->validate($attributeNames, $clearErrors);
-		if ($validate && $this->getModel()->isPositiveDecision()) {
-			$validate = $validate && $this->getPayAddress()->validate($attributeNames, $clearErrors);
-		}
-		return $validate;
+		return $this->getModel()->getClientAddress()->validate()
+			&& $this->getModel()->getVictimAddress()->validate()
+			&& $this->getModel()->validate($attributeNames, $clearErrors);
 	}
 
 	public function save(): bool {
-		if ($this->model->isPositiveDecision()) {
-			$this->model->pay_city_id = $this->getPayAddress()->cityId;
-		}
 		if ($this->validate()) {
-			$save = $this->getModel()->save();
-
-			if ($this->getModel()->isPositiveDecision() && !$this->issuePayCityExist($this->model->pay_city_id)) {
-				$save = $save && (new IssuePayCity(['city_id' => $this->model->pay_city_id]))->save(false);
-			}
-			return $save;
+			return $this->getModel()->save();
 		}
 		return false;
 	}
@@ -108,16 +71,15 @@ class IssueForm extends Model {
 	}
 
 	public static function getStages(int $typeID): array {
-		$stages = IssueType::findOne($typeID)->stages;
-		return ArrayHelper::map($stages, 'id', 'name');
+		$type = IssueType::get($typeID);
+		if ($type === null) {
+			return [];
+		}
+		return ArrayHelper::map($type->stages, 'id', 'name');
 	}
 
 	public static function getEntityResponsibles(): array {
 		return ArrayHelper::map(EntityResponsible::find()->asArray()->all(), 'id', 'name');
-	}
-
-	private function issuePayCityExist(int $cityId): bool {
-		return IssuePayCity::find()->andWhere(['city_id' => $cityId])->exists();
 	}
 
 }

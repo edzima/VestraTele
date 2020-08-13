@@ -13,8 +13,10 @@ use yii\data\ActiveDataProvider;
  */
 class IssuePaySearch extends IssuePay {
 
+	public $issue_id;
+
 	public $clientSurname;
-	public $payCityState;
+	public $calculationType;
 	public $deadlineAtFrom;
 	public $deadlineAtTo;
 
@@ -33,8 +35,6 @@ class IssuePaySearch extends IssuePay {
 		return array_merge(parent::attributeLabels(), [
 			'deadlineAtFrom' => 'Termin od',
 			'deadlineAtTo' => 'Termin do',
-			'payCityState' => 'Region',
-
 		]);
 	}
 
@@ -43,7 +43,7 @@ class IssuePaySearch extends IssuePay {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'issue_id', 'payCityState', 'status'], 'integer'],
+			[['id', 'issue_id', 'status', 'calculationType'], 'integer'],
 			[['deadlineAtFrom', 'deadlineAtTo', 'clientSurname'], 'safe'],
 			[['value'], 'number'],
 		];
@@ -100,6 +100,7 @@ class IssuePaySearch extends IssuePay {
 	public function search($params) {
 		$query = IssuePay::find();
 		$query->alias(static::TABLE_ALIAS);
+		$query->joinWith('calculation as calculation');
 		$query->joinWith(['issue']);
 
 		// add conditions that should always apply here
@@ -119,20 +120,16 @@ class IssuePaySearch extends IssuePay {
 			return $dataProvider;
 		}
 
-		if (!empty($this->payCityState)) {
-			$query->joinWith(['issue.payCity.city']);
-			$query->andWhere(['miasta.wojewodztwo_id' => $this->payCityState]);
-		}
-
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
-			'issue_id' => $this->issue_id,
+			'basePay.issue.id' => $this->issue_id,
 			'basePay.deadline_at' => $this->deadline_at,
 			'basePay.transfer_type' => $this->transfer_type,
 			'basePay.type' => $this->type,
 			'basePay.value' => $this->value,
 			'status' => $this->status,
+			'calculation.type' => $this->calculationType,
 
 		]);
 

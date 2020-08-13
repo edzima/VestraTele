@@ -2,16 +2,14 @@
 
 namespace backend\modules\issue\controllers;
 
-use backend\helpers\Url;
-use backend\modules\issue\models\IssueProvisionUsersForm;
 use backend\modules\issue\models\PayCalculationForm;
+use backend\modules\issue\models\searches\NewPayCalculationSearch;
 use common\models\issue\Issue;
 use common\models\User;
 use Yii;
 use common\models\issue\IssuePayCalculation;
 use backend\modules\issue\models\searches\IssuePayCalculationSearch;
 use yii\filters\AccessControl;
-use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -49,15 +47,24 @@ class PayCalculationController extends Controller {
 		];
 	}
 
+	public function actionNew(): string {
+		$searchModel = new NewPayCalculationSearch();
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		return $this->render('new', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
 	/**
 	 * Lists all IssuePayCalculation models.
 	 *
-	 * @param bool $onlyNew
-	 * @param int $status
+	 * @param int|null $issueId
 	 * @return mixed
 	 */
-	public function actionIndex(int $status = IssuePayCalculationSearch::STATUS_ACTIVE, bool $onlyNew = false) {
-		$searchModel = new IssuePayCalculationSearch(['isOnlyNew' => $onlyNew, 'status' => $status]);
+	public function actionIndex(int $issueId = null) {
+		$searchModel = new IssuePayCalculationSearch();
+		$searchModel->issue_id = $issueId;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -73,11 +80,11 @@ class PayCalculationController extends Controller {
 	 * @return mixed
 	 */
 	public function actionView(int $id) {
-		$model = IssuePayCalculation::findOne($id);
-
-
-		if ($model === null) {
-			return $this->redirect(['create', 'id' => $id]);
+		$model = $this->findModel($id);
+		foreach ($model->pays as $pay) {
+			if (empty($pay->provisions)) {
+				Yii::$app->session->addFlash('warning', 'Brak ustawionych prowizji dla wpłaty: ' . Yii::$app->formatter->asDecimal($pay->value));
+			}
 		}
 
 		return $this->render('view', [
@@ -89,57 +96,23 @@ class PayCalculationController extends Controller {
 	 * Create or Updates an existing IssuePayCalculation model.
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 *
-	 * @param integer $id
+	 * @param integer $id Issue ID
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionCreate(int $id) {
-		if (IssuePayCalculation::findOne($id) !== null) {
-			return $this->redirect(['update', 'id' => $id]);
-		}
-		$issue = $this->findIssueModel($id);
-		$model = new PayCalculationForm($issue);
-		$provisionModel = new IssueProvisionUsersForm(['issue' => $issue]);
-		if ($this->checkProvisions($issue)
-			&& $model->load(Yii::$app->request->post())
+
+		$model = new PayCalculationForm();
+		$model->setIssue($this->findIssueModel($id));
+		if ($model->load(Yii::$app->request->post())
 			&& (!$model->isGenerate())
 			&& $model->save()) {
-			if ($provisionModel->load(Yii::$app->request->post()) && $provisionModel->save()) {
-				return $this->redirect(['view', 'id' => $model->getPayCalculation()->issue_id]);
-			}
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
 		return $this->render('create', [
 			'model' => $model,
-			'provisionModel' => $provisionModel,
 		]);
-	}
-
-	private function checkProvisions(Issue $model): bool {
-		$provisions = Yii::$app->provisions;
-		if (empty($provisions->getTypes())) {
-			Yii::$app->session->addFlash('error', 'Brakuje ustawionych typów prowizji');
-			return false;
-		}
-		$hasAll = true;
-		if (!$provisions->hasAllProvisions($model->lawyer)) {
-			$hasAll = false;
-			static::addUserProvisionFlash($model->lawyer);
-		}
-		if (!$provisions->hasAllProvisions($model->agent)) {
-			$hasAll = false;
-			static::addUserProvisionFlash($model->agent);
-		}
-		if ($model->hasTele() && !$provisions->hasAllProvisions($model->tele)) {
-			$hasAll = false;
-			static::addUserProvisionFlash($model->tele);
-		}
-		return $hasAll;
-	}
-
-	public static function addUserProvisionFlash(User $user): void {
-		$link = Html::a($user, Url::userProvisions($user->id), ['target' => '_blank']);
-		Yii::$app->session->addFlash('error', 'Brakuje prowizji dla: ' . $link);
 	}
 
 	/**
@@ -151,23 +124,16 @@ class PayCalculationController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$issue = $this->findIssueModel($id);
-		$model = new PayCalculationForm($issue);
-		$provisionModel = new IssueProvisionUsersForm(['issue' => $issue]);
-		$post = Yii::$app->request->post();
-		if ($this->checkProvisions($issue)
-			&& $model->load(Yii::$app->request->post())
+		$model = new PayCalculationForm();
+		$model->setModel($this->findModel($id));
+		if ($model->load(Yii::$app->request->post())
 			&& (!$model->isGenerate())
 			&& $model->save()) {
-			if ($provisionModel->load($post) && $provisionModel->save()) {
-				return $this->redirect(['view', 'id' => $model->getPayCalculation()->issue_id]);
-			}
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
 		return $this->render('update', [
 			'model' => $model,
-			'provisionModel' => $provisionModel,
-
 		]);
 	}
 

@@ -4,6 +4,7 @@ namespace common\models\issue;
 
 use common\models\provision\ProvisionQuery;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use common\models\provision\Provision;
 
@@ -11,11 +12,10 @@ use common\models\provision\Provision;
  * This is the model class for table "issue_pay".
  *
  * @property int $id
- * @property int $issue_id
+ * @property int $calculation_id
  * @property string $pay_at
  * @property string $deadline_at
  * @property string $value
- * @property int $type
  * @property int $transfer_type
  * @property string $vat
  * @property int $status
@@ -25,11 +25,9 @@ use common\models\provision\Provision;
  * @property-read Issue $issue
  * @property-read IssuePay[] $pays
  * @property-read Provision[] $provisions
+ * @property-read IssuePayCalculation $calculation
  */
 class IssuePay extends ActiveRecord {
-
-	public const TYPE_HONORARIUM = 1;
-	public const TYPE_COMPENSTAION = 2;
 
 	public const TRANSFER_TYPE_DIRECT = 1;
 	public const TRANSFER_TYPE_BANK = 2;
@@ -51,29 +49,28 @@ class IssuePay extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['issue_id', 'type', 'value', 'deadline_at', 'transfer_type', 'vat'], 'required', 'enableClientValidation' => false],
-			[['issue_id', 'type', 'transfer_type'], 'integer'],
+			[['value', 'deadline_at', 'transfer_type', 'vat'], 'required', 'enableClientValidation' => false],
+			[['transfer_type'], 'integer'],
 			[['pay_at', 'deadline_at'], 'safe'],
-			[['value', 'vat'], 'number', 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
+			[['value', 'vat'], 'number', 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/', 'enableClientValidation' => false],
 			['vat', 'number', 'min' => 0, 'max' => 100],
-			[['type'], 'in', 'range' => array_keys(static::getTypesNames())],
 			[['status'], 'in', 'range' => array_keys(static::getStatusNames())],
 			[['transfer_type'], 'in', 'range' => array_keys(static::getTransferTypesNames())],
-			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
+			[['calculation_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssuePayCalculation::class, 'targetAttribute' => ['calculation_id' => 'id']],
 		];
 	}
 
+	//@todo move to PayController
 	public function afterSave($insert, $changedAttributes): void {
-		$this->issue->markAsUpdate();
-		if ($this->isPayed() && (int) $this->issue->getPays()->onlyNotPayed()->count() === 0) {
-			$this->issue->payCalculation->markAsPayed();
+		if ($this->isPayed() && (int) $this->calculation->getPays()->onlyNotPayed()->count() === 0) {
+			//	$this->calculation->markAsPayed();
 		}
 		parent::afterSave($insert, $changedAttributes);
 	}
 
 	public function afterDelete(): void {
-		$this->issue->markAsUpdate();
 		parent::afterDelete();
+		//$this->calculation->update();
 	}
 
 	/**
@@ -82,17 +79,19 @@ class IssuePay extends ActiveRecord {
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'issue_id' => 'Sprawa',
 			'pay_at' => 'Data płatności',
 			'deadline_at' => 'Termin płatności',
 			'value' => 'Honorarium (Brutto)',
 			'valueNetto' => 'Honorarium (Netto)',
-			'type' => 'Rodzaj',
 			'transfer_type' => 'Przelew/konto',
 			'partInfo' => 'Część',
 			'vat' => 'VAT (%)',
 			'vatPercent' => 'VAT (%)',
 		];
+	}
+
+	public function getCalculation(): ActiveQuery {
+		return $this->hasOne(IssuePayCalculation::class, ['id' => 'calculation_id']);
 	}
 
 	public function getValueNetto(): float {
@@ -105,7 +104,7 @@ class IssuePay extends ActiveRecord {
 
 	public function getIssue(): IssueQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
+		return $this->hasOne(Issue::class, ['id' => 'issue_id'])->via('calculation');
 	}
 
 	public function getProvisions(): ProvisionQuery {
@@ -113,27 +112,12 @@ class IssuePay extends ActiveRecord {
 		return $this->hasMany(Provision::class, ['pay_id' => 'id']);
 	}
 
-	public function getCityDate(): ?string {
-		$details = $this->issue->payCity;
-		if ($details === null) {
-			return null;
-		}
-		switch ($this->transfer_type) {
-			case static::TRANSFER_TYPE_DIRECT:
-				return $details->direct_at;
-			case static::TRANSFER_TYPE_BANK:
-				return $details->bank_transfer_at;
-			default:
-				return null;
-		}
-	}
-
 	public function isPayed(): bool {
 		return $this->pay_at > 0;
 	}
 
 	public function getPartInfo(): string {
-		$pays = $this->issue->pays;
+		$pays = $this->calculation->pays;
 		$count = count($pays);
 		if ($count === 1) {
 			return '1/1';
@@ -148,23 +132,12 @@ class IssuePay extends ActiveRecord {
 		return '';
 	}
 
-	public function getTypeName(): string {
-		return static::getTypesNames()[$this->type];
-	}
-
 	public function getStatusName(): string {
 		return static::getStatusNames()[$this->status];
 	}
 
 	public function getTransferTypeName(): string {
 		return static::getTransferTypesNames()[$this->transfer_type];
-	}
-
-	public static function getTypesNames(): array {
-		return [
-			static::TYPE_HONORARIUM => 'Honorarium',
-			static::TYPE_COMPENSTAION => 'Odszkodowanie',
-		];
 	}
 
 	public static function getTransferTypesNames(): array {
@@ -185,6 +158,16 @@ class IssuePay extends ActiveRecord {
 
 	public static function find(): IssuePayQuery {
 		return new IssuePayQuery(static::class);
+	}
+
+	/**
+	 * @param static[] $pays
+	 * @return static[]
+	 */
+	public static function payedFilter(array $pays): array {
+		return array_filter($pays, static function (IssuePay $pay) {
+			return $pay->isPayed();
+		});
 	}
 
 }

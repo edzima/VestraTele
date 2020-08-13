@@ -94,7 +94,6 @@ use yii\widgets\DetailView;
 					],
 					'details:text',
 					'provision_base',
-					'payCity',
 					[
 						'attribute' => 'provision',
 						'label' => 'Rodzaj/krotność',

@@ -13,8 +13,10 @@ use yii\db\ActiveQuery;
  */
 class IssuePayCalculationQuery extends ActiveQuery {
 
-	public function notDraft(): self {
-		$this->andWhere(['>', 'status' => IssuePayCalculation::STATUS_DRAFT]);
+	public function withoutProvisions(): self {
+		$this->joinWith('pays.provisions');
+		$this->andWhere(['provision.pay_id' => null]);
+		$this->groupBy('id');
 		return $this;
 	}
 

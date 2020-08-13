@@ -1,6 +1,5 @@
 <?php
 
-use console\components\oldCrmData\UserDataTransfer;
 use yii\db\Connection;
 
 $params = array_merge(
@@ -26,9 +25,6 @@ return [
 			'tablePrefix' => getenv('OLD_DB_TABLE_PREFIX'),
 			'charset' => 'utf8',
 			'enableSchemaCache' => YII_ENV_PROD,
-		],
-		'userData' => [
-			'class' => UserDataTransfer::class,
 		],
 	],
 ];

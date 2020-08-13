@@ -10,7 +10,6 @@ use console\components\oldCrmData\IssueNoteDataTransfer;
 use yii\console\Controller;
 use console\components\oldCrmData\FixtureMigration;
 use console\components\oldCrmData\IssueDataTransfer;
-use console\components\oldCrmData\UserDataTransfer;
 use yii\db\Query;
 use yii\helpers\Console;
 

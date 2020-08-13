@@ -132,11 +132,11 @@ $user = Yii::$app->user;
 					'url' => '#',
 					'icon' => '<i class="fa fa-money"></i>',
 					'options' => ['class' => 'treeview'],
-					'visible' => $user->can(User::ROLE_BOOKKEEPER) || $user->can(User::ROLE_ISSUE) || $user->can(User::ROLE_BOOKKEEPER_DELAYED),
+					'visible' => $user->can(User::ROLE_BOOKKEEPER) || $user->can(User::ROLE_BOOKKEEPER_DELAYED),
 					'items' => [
 						[
 							'label' => Yii::t('issue', 'Rozliczenia (nowe)'),
-							'url' => ['/issue/pay-calculation/index', 'onlyNew' => true],
+							'url' => ['/issue/pay-calculation/new'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 							'visible' => $user->can(User::ROLE_BOOKKEEPER),
 						],
@@ -160,13 +160,6 @@ $user = Yii::$app->user;
 							'visible' => $user->can(User::ROLE_BOOKKEEPER_DELAYED),
 
 						],
-						[
-							'label' => Yii::t('issue', 'Terminy'),
-							'url' => ['/issue/pay-city/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => $user->can(User::ROLE_ISSUE),
-						],
-
 					],
 				],
 				[

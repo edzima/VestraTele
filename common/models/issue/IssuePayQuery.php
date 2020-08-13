@@ -11,6 +11,8 @@ use yii\db\ActiveQuery;
  */
 class IssuePayQuery extends ActiveQuery {
 
+	private $ids;
+
 	/**
 	 * @inheritdoc
 	 * @return IssuePay[]|array
@@ -28,32 +30,32 @@ class IssuePayQuery extends ActiveQuery {
 	}
 
 	public function onlyNotPayed() {
-		list(, $alias) = $this->getTableNameAndAlias();
+		[, $alias] = $this->getTableNameAndAlias();
 		$this->andWhere("$alias.pay_at IS NULL or $alias.pay_at = 0");
 		return $this;
 	}
 
 	public function onlyDelayed(string $delayRange = 'now') {
-		list(, $alias) = $this->getTableNameAndAlias();
+		[, $alias] = $this->getTableNameAndAlias();
 		$this->onlyNotPayed();
 		$this->andWhere(['<=', $alias . '.deadline_at', date(DATE_ATOM, strtotime($delayRange))]);
 		return $this;
 	}
 
 	public function onlyNotDelayed(string $delayRange = 'now') {
-		list(, $alias) = $this->getTableNameAndAlias();
+		[, $alias] = $this->getTableNameAndAlias();
 		$this->andWhere(['>=', $alias . '.deadline_at', date(DATE_ATOM, strtotime($delayRange))]);
 		return $this;
 	}
 
 	public function onlyPayed() {
-		list(, $alias) = $this->getTableNameAndAlias();
+		[, $alias] = $this->getTableNameAndAlias();
 		$this->andWhere($alias . '.pay_at > 0');
 		return $this;
 	}
 
 	public function getValueSum(): float {
-		list(, $alias) = $this->getTableNameAndAlias();
+		[, $alias] = $this->getTableNameAndAlias();
 
 		return $this->sum($alias . '.value') ?? 0;
 	}
@@ -64,8 +66,17 @@ class IssuePayQuery extends ActiveQuery {
 	}
 
 	public function onlyWithoutDeadline() {
-		list(, $alias) = $this->getTableNameAndAlias();
+		[, $alias] = $this->getTableNameAndAlias();
 		$this->andWhere($alias . '.deadline_at IS NOT NULL');
 		return $this;
+	}
+
+	public function getIds(bool $refresh = false): array {
+		if ($refresh || $this->ids === null) {
+			$model = clone($this);
+			$model->select('id');
+			$this->ids = $model->column();
+		}
+		return $this->ids;
 	}
 }

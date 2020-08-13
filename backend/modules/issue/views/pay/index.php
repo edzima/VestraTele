@@ -4,17 +4,19 @@ use backend\helpers\Url;
 use backend\modules\issue\models\searches\IssuePaySearch;
 use backend\widgets\CsvForm;
 use common\models\issue\IssuePay;
+use common\models\issue\IssuePayCalculation;
 use common\models\User;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
 use kartik\grid\SerialColumn;
 use yii\bootstrap\Nav;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel IssuePaySearch */
-/* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $dataProvider ActiveDataProvider */
 /* @var $withMenu bool */
 
 $this->title = 'Wpłaty';
@@ -108,14 +110,22 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => function (IssuePay $model) {
 					return Html::a(
 						$model->issue,
-						Url::toRoute(['pay-calculation/view', 'id' => $model->issue_id]),
+						Url::toRoute(['pay-calculation/view', 'id' => $model->calculation_id]),
 						['target' => '_blank']);
 				},
 				'filterInputOptions' => [
 					'class' => 'dynamic-search',
 				],
 				'width' => '50px',
-
+			],
+			[
+				'class' => DataColumn::class,
+				'attribute' => 'calculationType',
+				'value' => 'calculation.typeName',
+				'filter' => IssuePayCalculation::getTypesNames(),
+				'label' => 'Rozliczenie',
+				'visible' => !$searchModel->isActive(),
+				'width' => '100px',
 			],
 			[
 				'class' => DataColumn::class,
@@ -124,7 +134,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => IssuePay::getStatusNames(),
 				'visible' => !$searchModel->isActive(),
 				'width' => '100px',
-
 			],
 			[
 				'class' => DataColumn::class,

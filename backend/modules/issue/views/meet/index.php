@@ -85,7 +85,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'updated_at:date',
 			[
 				'attribute' => 'status',
-				'filter' => IssueMeet::getStatusNames($searchModel->withArchive),
+				'filter' => IssueMeetSearch::getStatusNames($searchModel->withArchive),
 				'value' => 'statusName',
 			],
 

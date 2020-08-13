@@ -25,7 +25,7 @@ use yii\widgets\DetailView;
 				<div class="pay-wrapper border <?= $pay->isPayed() ? 'border-green' : 'border-red' ?>">
 
 
-					<legend>Wpłata <?= $key + 1 ?>.</legend>
+					<legend>Wpłata <?= count($models) > 1 ? $key + 1 : '' ?></legend>
 					<p>
 						<?= $widget->editPayBtn ? Html::a($pay->isPayed() ? 'Edytuj' : 'Opłać',
 							['/issue/pay/pay', 'id' => $pay->id], [
@@ -40,11 +40,6 @@ use yii\widgets\DetailView;
 						'attributes' => [
 							'pay_at:date',
 							'deadline_at:date',
-							[
-								'attribute' => 'typeName',
-								'label' => 'Typ',
-								'format' => 'raw',
-							],
 							[
 								'attribute' => 'transferTypeName',
 								'label' => 'Płatność',

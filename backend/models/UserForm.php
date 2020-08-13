@@ -58,7 +58,7 @@ class UserForm extends Model {
 			[
 				'email', 'unique',
 				'targetClass' => User::class,
-				'filter' => function ($query) {
+				'filter' => function (QueryInterface $query) {
 					if (!$this->getModel()->isNewRecord) {
 						$query->andWhere(['not', ['id' => $this->getModel()->id]]);
 					}

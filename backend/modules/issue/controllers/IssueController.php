@@ -97,9 +97,6 @@ class IssueController extends Controller {
 	 */
 	public function actionView(int $id): string {
 		$model = $this->findModel($id);
-		if ($model->isPositiveDecision() && $model->pay_city_id === null) {
-			Yii::$app->session->addFlash('warning', 'Nie ustalono miejscowści wypłat');
-		}
 		return $this->render('view', [
 			'model' => $model,
 		]);

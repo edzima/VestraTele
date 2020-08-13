@@ -1,12 +1,14 @@
 <?php
 
+use common\models\issue\IssueType;
 use common\models\issue\Provision;
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\ActiveForm;
 
-/* @var $this yii\web\View */
-/* @var $model common\models\issue\IssueType */
-/* @var $form yii\widgets\ActiveForm */
+/* @var $this View */
+/* @var $model IssueType */
+/* @var $form ActiveForm */
 ?>
 
 <div class="issue-type-form">

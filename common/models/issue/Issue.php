@@ -53,7 +53,6 @@ use yii\db\Expression;
  * @property int $tele_id
  * @property string $accident_at
  * @property bool $payed
- * @property int $pay_city_id
  * @property string $stage_change_at
  *
  * @property string $longId
@@ -72,24 +71,23 @@ use yii\db\Expression;
  * @property Provision $provision
  * @property SubProvince $clientSubprovince
  * @property SubProvince $victimSubprovince
- * @property IssuePayCity $payCity
- * @property IssuePayCalculation $payCalculation
+ * @property IssuePayCalculation[] $payCalculations
  */
 class Issue extends ActiveRecord {
 
 	private const DEFAULT_PROVISION = Provision::TYPE_PERCENTAGE;
+
+	/* @var Address */
+	private $clientAddress;
+	/* @var Address */
+	private $victimAddress;
+
+	/* @var Provision */
 	private $provision;
 
-	public $victim_state_id;
-	public $victim_province_id;
-
-	/**
-	 * @var Address
-	 */
-	private $clientAddress;
-
-	/** @var Address */
-	private $victimAddress;
+	public function __toString(): string {
+		return $this->longId;
+	}
 
 	/**
 	 * @inheritdoc
@@ -134,10 +132,6 @@ class Issue extends ActiveRecord {
 		return parent::beforeSave($insert);
 	}
 
-	public function __toString(): string {
-		return $this->longId;
-	}
-
 	/**
 	 * @inheritdoc
 	 */
@@ -153,7 +147,7 @@ class Issue extends ActiveRecord {
 			[
 				[
 					'agent_id', 'tele_id', 'lawyer_id', 'client_subprovince_id', 'client_city_id', 'victim_subprovince_id',
-					'victim_city_id', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id', 'id', 'pay_city_id',
+					'victim_city_id', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id', 'id',
 				], 'integer',
 			],
 			[
@@ -174,7 +168,6 @@ class Issue extends ActiveRecord {
 			[['lawyer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['lawyer_id' => 'id']],
 			[['tele_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['tele_id' => 'id']],
 			[['client_city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['client_city_id' => 'id']],
-			[['pay_city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['pay_city_id' => 'id']],
 			[['entity_responsible_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_responsible_id' => 'id']],
 			[['stage_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueStage::class, 'targetAttribute' => ['stage_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueType::class, 'targetAttribute' => ['type_id' => 'id']],
@@ -191,30 +184,12 @@ class Issue extends ActiveRecord {
 					return isArchived();
 				}',
 			],
-			[
-				'pay_city_id',
-				'required',
-				'when' => static function (Issue $model) {
-					return $model->isPositiveDecision();
-				},
-				'whenClient' => 'function(attribute, value){
-					return isPositiveDecision();
-				}',
-			],
 			[['client_email', 'victim_email'], 'email'],
 			['payed', 'boolean'],
 			['payed', 'default', 'value' => false],
 			['stage_id', 'filter', 'filter' => 'intval'],
 			[['date', 'accident_at', 'stage_change_at'], 'date', 'format' => DATE_ATOM],
 		];
-	}
-
-	public function getClientStateId(): ?int {
-		return $this->getClientAddress()->stateId;
-	}
-
-	public function getClientProvinceId(): ?int {
-		return $this->getClientAddress()->provinceId;
 	}
 
 	/**
@@ -258,11 +233,17 @@ class Issue extends ActiveRecord {
 			'tele_id' => 'Telemarketer',
 			'accident_at' => 'Data wypadku',
 			'entityResponsibleDetails' => 'Podmiot odpowiedzialny',
-			'pay_city_id' => 'Miasto wypłacające',
-			'payCity' => 'Miasto wypłacające',
 			'stage_change_at' => 'Data etapu',
 
 		];
+	}
+
+	public function getClientStateId(): ?int {
+		return $this->getClientAddress()->stateId;
+	}
+
+	public function getClientProvinceId(): ?int {
+		return $this->getClientAddress()->provinceId;
 	}
 
 	public function getClientState() {
@@ -272,7 +253,6 @@ class Issue extends ActiveRecord {
 	public function getClientProvince() {
 		return $this->hasOne(Province::class, ['id' => 'powiat_id', 'wojewodztwo_id' => 'wojewodztwo_id'])->via('clientCity');
 	}
-
 
 	public function getClientAddress(): Address {
 		if ($this->clientAddress === null) {
@@ -409,15 +389,8 @@ class Issue extends ActiveRecord {
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getPayCity() {
-		return $this->hasOne(IssuePayCity::class, ['city_id' => 'pay_city_id']);
-	}
-
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getPayCalculation() {
-		return $this->hasOne(IssuePayCalculation::class, ['issue_id' => 'id']);
+	public function getPayCalculations() {
+		return $this->hasMany(IssuePayCalculation::class, ['issue_id' => 'id']);
 	}
 
 	public function getPays(): IssuePayQuery {
@@ -495,10 +468,6 @@ class Issue extends ActiveRecord {
 
 	public function markAsUpdate(): void {
 		$this->touch('updated_at');
-	}
-
-	public function hasPayCalculation(): bool {
-		return $this->payCalculation !== null;
 	}
 
 	/**
