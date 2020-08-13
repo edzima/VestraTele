@@ -1,0 +1,79 @@
+version: "3.2"
+services:
+  frontend:
+    container_name: "vestratele_frontend"
+    restart: "always"
+    build:
+      context: ""
+      dockerfile: docker/development/Dockerfile-frontend
+    env_file:
+      - .env
+    ports:
+      - "${FRONTEND_PORT}:8080"
+    volumes:
+      - ./vendor:/var/html/vestra/vendor
+      - ./:/var/html/vestra
+    working_dir: /var/html/vestra
+    networks:
+      main:
+        aliases:
+          - frontend
+  backend:
+    container_name: "vestratele_backend"
+    restart: "always"
+    build:
+      context: ""
+      dockerfile: docker/development/Dockerfile-backend
+    env_file:
+      - .env
+    ports:
+      - "${BACKEND_PORT}:8080"
+    volumes:
+      - ./vendor:/var/html/vestra/vendor
+      - ./:/var/html/vestra
+    working_dir: /var/html/vestra
+    networks:
+      main:
+        aliases:
+          - backend
+  db_mysql:
+    container_name: "vestratele_db_mysql"
+    image: mysql:8.0.16
+    restart: always
+    environment:
+      DB_USERNAME: "${DB_USERNAME}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_DBNAME: "${DB_DBNAME}"
+    volumes:
+      - ./docker/development/sql/:/docker-entrypoint-initdb.d/
+    ports:
+      - "${DB_PORT}:3306"
+    expose:
+      - "${DB_PORT}"
+    networks:
+      main:
+        aliases:
+          - db_mysql
+
+  reverse_proxy:
+    image: nginx:latest
+    container_name: "vestratele_reverse_proxy"
+    environment:
+      BACKEND_URL: "${BACKEND_URL}"
+      FRONTEND_URL: "${FRONTEND_URL}"
+    volumes:
+      - ./docker/development/ngnx:/etc/nginx/templates
+    ports:
+      - "${REVERSE_PROXY_PORT}:80"
+    networks:
+      main:
+        aliases:
+          - reverse_proxy
+
+
+
+
+
+networks:
+  main:
