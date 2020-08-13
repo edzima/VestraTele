@@ -27,19 +27,19 @@ do
             echo "STARTING development environment ..."
             toMerge=("environments/base.env" "environments/development.env");
             mergeEnvs "${toMerge[@]}"
-#            docker-compose -f docker-compose-development.yml up
+            docker-compose -f docker-compose-development.yml up
             exit;
             ;;
         "Production ====> APACHE(frontend)+ APACHE(backend) + NGNX(reverse proxy) + MYSQL")
             echo "STARTING production environment ..."
             toMerge=("environments/base.env" "environments/production.env");
             mergeEnvs "${toMerge[@]}"
-#            docker-compose -f docker-compose-production.yml up
+            docker-compose -f docker-compose-production.yml up
             exit;
             ;;
 
         "Tests =====> PHP(YII) + MYSQL")
-#            docker-compose -f docker-compose-tests.yml up
+            docker-compose -f docker-compose-tests.yml up
             exit;
         ;;
         "stop all docker containers")
