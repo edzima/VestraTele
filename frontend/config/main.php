@@ -1,5 +1,7 @@
 <?php
 
+use common\models\User;
+
 $params = array_merge(
 	require(__DIR__ . '/../../common/config/params.php'),
 	require(__DIR__ . '/params.php')
@@ -7,7 +9,6 @@ $params = array_merge(
 
 $config = [
 	'id' => 'app-frontend',
-	'homeUrl' => Yii::getAlias('@frontendUrl'),
 	'basePath' => dirname(__DIR__),
 	'controllerNamespace' => 'frontend\controllers',
 	'modules' => [
@@ -31,12 +32,9 @@ $config = [
 		'request' => [
 			'cookieValidationKey' => getenv('FRONTEND_COOKIE_VALIDATION_KEY'),
 			'csrfParam' => '_csrf-frontend',
-			'baseUrl' => '',
-			//@todo created csrf validation in Vue
-			'enableCsrfValidation' => false,
 		],
 		'user' => [
-			'identityClass' => 'common\models\User',
+			'identityClass' => User::class,
 			'loginUrl' => ['/account/sign-in/login'],
 			'enableAutoLogin' => true,
 			'identityCookie' => ['name' => '_identity-front', 'httpOnly' => true],

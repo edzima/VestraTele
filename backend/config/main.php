@@ -12,7 +12,6 @@ $params = array_merge(
 
 $config = [
 	'id' => 'app-backend',
-	'homeUrl' => '/',
 	'basePath' => dirname(__DIR__),
 	'controllerNamespace' => 'backend\controllers',
 	'defaultRoute' => 'issue/issue/index',
@@ -22,8 +21,8 @@ $config = [
 			'access' => ['@'],
 			'disabledCommands' => ['netmount'],
 			'roots' => [
+				//@todo check this work after add access to /storage
 				[
-					'baseUrl' => '/',
 					'basePath' => '@storage',
 					'path' => '/',
 					'access' => ['read' => 'manager', 'write' => 'manager'],
@@ -170,7 +169,7 @@ if (YII_DEBUG) {
 	$config['bootstrap'][] = 'debug';
 	$config['modules']['debug'] = [
 		'class' => 'yii\debug\Module',
-		'allowedIPs' => ['205.201.55.51', '188.146.54.79'],
+		'allowedIPs' => ['*'],
 		'as access' => [
 			'class' => 'common\behaviors\GlobalAccessBehavior',
 			'rules' => [
@@ -183,7 +182,7 @@ if (YII_DEBUG) {
 	$config['bootstrap'][] = 'gii';
 	$config['modules']['gii'] = [
 		'class' => 'yii\gii\Module',
-		'allowedIPs' => ['127.0.0.1', '::1', '192.168.*.*', '188.147.96.44'],
+		'allowedIPs' => ['*'],
 		'as access' => [
 			'class' => 'common\behaviors\GlobalAccessBehavior',
 			'rules' => [
