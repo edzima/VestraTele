@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace common\models\issue;
 
 use common\models\issue\Issue;
 use common\models\User;
