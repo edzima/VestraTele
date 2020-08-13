@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use app\models\IssueUser;
 use common\behaviors\DateIDBehavior;
 use common\models\address\Address;
 use common\models\address\City;
@@ -458,11 +459,11 @@ class Issue extends ActiveRecord {
 	}
 
 	public function getLawyer() {
-		return $this->hasOne(User::class, ['id' => 'lawyer_id']);
+		return IssueUser::getIssueUsersByTypes([User::ROLE_LAWYER])->one();
 	}
 
 	public function getTele() {
-		return $this->hasOne(User::class, ['id' => 'tele_id']);
+		return IssueUser::getIssueUsersByTypes([User::ROLE_TELEMARKETER])->one();
 	}
 
 	public function hasTele(): bool {
