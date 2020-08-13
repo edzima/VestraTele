@@ -1,8 +1,9 @@
 <?php
 
 namespace common\models;
-
+use app\models\UserAddress;
 use Closure;
+use common\models\address\Address;
 use developeruz\db_rbac\interfaces\UserRbacInterface;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -60,6 +61,11 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	public const ROLE_TELEMARKETER = 'telemarketer';
 	public const ROLE_LAWYER = 'lawyer';
 
+	public const ROLE_CLIENT = 'client';
+	public const ROLE_VICTIM = 'victim';
+
+	public const WORKERS_ROLES = [self::ROLE_AGENT, self::ROLE_TELEMARKETER, self::ROLE_BOOKKEEPER, self::ROLE_BOOKKEEPER_DELAYED, self::ROLE_CUSTOMER_SERVICE, self::ROLE_LAWYER, self::ROLE_ADMINISTRATOR];
+	
 	private $selfTree;
 	private static $BOSS_MAP = [];
 	private static $TREE = [];
@@ -145,7 +151,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getUserProfile() {
-		return $this->hasOne(UserProfile::className(), ['user_id' => 'id']);
+		return $this->hasOne(UserProfile::class, ['user_id' => 'id']);
 	}
 
 	/**
@@ -188,6 +194,13 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 
 	/**
 	 * @return ActiveQuery
+	 */
+	public function getUserAddress() {
+		return $this->hasMany(UserAddress::class, ['user_id' => 'id']);
+	}
+
+	/**
+	 * @inheritdoc
 	 */
 	public function getTypWork() {
 
