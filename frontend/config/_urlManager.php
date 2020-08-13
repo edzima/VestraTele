@@ -31,7 +31,6 @@ return [
 		//task
 		'spotkania' => 'meet',
 
-		'admin' => '/backend/web',
 		'kalkulator-wyrownania-zasilku' => 'benefit-amount/index',
 
 		//REST

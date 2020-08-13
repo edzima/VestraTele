@@ -89,7 +89,7 @@ AppAsset::register($this);
 				['label' => 'Hierarchia', 'url' => ['/account/tree/index']],
 				[
 					'label' => Yii::t('frontend', 'Backend'),
-					'url' => getenv('BACKEND_URL'),
+					'url' => '@backendUrl',
 					'linkOptions' => ['target' => '_blank'],
 					'visible' => Yii::$app->user->can('manager', 'admnistrator'),
 				],

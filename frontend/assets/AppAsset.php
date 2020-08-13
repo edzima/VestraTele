@@ -17,13 +17,12 @@ class AppAsset extends AssetBundle {
 	public $js = [
 		'static/js/ajax-modal-popup.js',
 		'static/js/yii_overrides.js',
-		'backend/web/static/js/toggle.js',
+		'static/js/toggle.js',
 	];
 	public $depends = [
 		'yii\web\YiiAsset',
 		'yii\bootstrap\BootstrapAsset',
 		'common\assets\OpenSans',
 		'rmrevin\yii\fontawesome\AssetBundle',
-	//	'common\assets\SweetAlert',
 	];
 }
