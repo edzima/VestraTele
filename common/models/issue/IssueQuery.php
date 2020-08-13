@@ -2,6 +2,8 @@
 
 namespace common\models\issue;
 
+use app\models\IssueUser;
+use common\models\User;
 use yii\db\ActiveQuery;
 
 /**
@@ -46,6 +48,10 @@ class IssueQuery extends ActiveQuery {
 	public function onlyForAgents(array $ids) {
 		$this->andWhere(['agent_id' => $ids]);
 		return $this;
+	}
+
+	public function onlyForCustomers(){
+		return IssueUser::getIssueUsersByTypes([User::ROLE_VICTIM, User::ROLE_CLIENT]);
 	}
 
 	/**
