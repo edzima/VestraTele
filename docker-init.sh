@@ -19,7 +19,7 @@ function mergeEnvs() {
 
 echo "******************************************"
 echo "What docker deployment version would you like to start ? "
-options=("Development ====> YII SERVE(frontend) + YII SERVE(backend) + NGNX(reverse proxy) + MYSQL" "Production ====> APACHE(frontend)+ APACHE(backend) + NGNX(reverse proxy) + MYSQL" "Remove containers" "Quit")
+options=("Development ====> YII SERVE(frontend) + YII SERVE(backend) + NGNX(reverse proxy) + MYSQL" "Production ====> APACHE(frontend)+ APACHE(backend) + NGNX(reverse proxy) + MYSQL" "Tests =====> PHP(YII) + MYSQL" "stop all docker containers"  "Remove containers" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -39,10 +39,14 @@ do
             ;;
 
         "Tests =====> PHP(YII) + MYSQL")
+            echo "STARTING tests environment and performing tests..."
+            toMerge=("environments/base.env" "environments/production.env");
+            mergeEnvs "${toMerge[@]}"
             docker-compose -f docker-compose-tests.yml up
             exit;
         ;;
         "stop all docker containers")
+            docker stop $(docker ps -aq)
             exit;
         ;;
         "Remove containers")

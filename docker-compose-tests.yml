@@ -1,11 +1,11 @@
 version: "3.2"
 services:
-  frontend:
-    container_name: "vestratele_frontend"
+  yii:
+    container_name: "vestratele_TEST"
     restart: "always"
     build:
       context: ""
-      dockerfile: docker/development/Dockerfile-frontend
+      dockerfile: docker/tests/Dockerfile-tests
     env_file:
       - .env
     ports:
@@ -17,27 +17,9 @@ services:
     networks:
       main:
         aliases:
-          - frontend
-  backend:
-    container_name: "vestratele_backend"
-    restart: "always"
-    build:
-      context: ""
-      dockerfile: docker/development/Dockerfile-backend
-    env_file:
-      - .env
-    ports:
-      - "${BACKEND_PORT}:8080"
-    volumes:
-      - ./vendor:/var/html/vestra/vendor
-      - ./:/var/html/vestra
-    working_dir: /var/html/vestra
-    networks:
-      main:
-        aliases:
-          - backend
+          - yii
   db_mysql:
-    container_name: "vestratele_db_mysql"
+    container_name: "vestratele_TEST_DB"
     image: mysql:8.0.16
     restart: always
     environment:
@@ -55,25 +37,6 @@ services:
       main:
         aliases:
           - db_mysql
-
-  reverse_proxy:
-    image: nginx:latest
-    container_name: "vestratele_reverse_proxy"
-    environment:
-      BACKEND_URL: "${BACKEND_URL}"
-      FRONTEND_URL: "${FRONTEND_URL}"
-    volumes:
-      - ./docker/development/ngnx:/etc/nginx/templates
-    ports:
-      - "${REVERSE_PROXY_PORT}:80"
-    networks:
-      main:
-        aliases:
-          - reverse_proxy
-
-
-
-
 
 networks:
   main:
