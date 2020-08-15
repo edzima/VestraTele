@@ -53,6 +53,7 @@ do
             echo "Removing containers"
             docker-compose -f docker-compose-development.yml down
             docker-compose -f docker-compose-production.yml down
+            docker-compose -f docker-compose-tests.yml down
             exit;
             ;;
 
