@@ -9,7 +9,9 @@ function mergeEnvs() {
    arr=("$@")
    for i in "${arr[@]}";
       do
+          echo "##### MERGED FROM $i #####" >> $OUTPUT_FILE;
           cat "$i" >> $OUTPUT_FILE;
+          echo "" >> $OUTPUT_FILE;
       done
 
     # shellcheck disable=SC2145

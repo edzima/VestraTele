@@ -36,6 +36,18 @@ services:
       main:
         aliases:
           - backend
+  storage:
+    container_name: "vestratele_storage"
+    image: 'bitnami/apache:latest'
+    ports:
+      - "${STORAGE_PORT}:8080"
+    volumes:
+      - ./storage:/app
+    networks:
+      main:
+        aliases:
+          - storage
+
   db_mysql:
     container_name: "vestratele_db_mysql"
     image: mysql:8.0.16
@@ -62,6 +74,7 @@ services:
     environment:
       BACKEND_URL: "${BACKEND_URL}"
       FRONTEND_URL: "${FRONTEND_URL}"
+      STORAGE_URL: "${STORAGE_URL}"
     volumes:
       - ./docker/development/ngnx:/etc/nginx/templates
     ports:
