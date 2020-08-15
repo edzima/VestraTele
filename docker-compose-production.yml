@@ -6,6 +6,9 @@ services:
     build:
       context: ""
       dockerfile: docker/production/Dockerfile-frontend
+    volumes:
+#      TODO: TEST WRITE TO THAT FOLDER
+    - ./storage:/var/www/html/storage
     env_file:
       - .env
     ports:
@@ -20,6 +23,9 @@ services:
     build:
       context: ""
       dockerfile: docker/production/Dockerfile-backend
+    volumes:
+#      TODO: TEST WRITE TO THAT FOLDER
+      - ./storage:/var/www/html/storage
     env_file:
       - .env
     ports:
@@ -28,6 +34,17 @@ services:
       main:
         aliases:
           - backend
+  storage:
+    container_name: "vestratele_production_storage"
+    image: 'bitnami/apache:latest'
+    ports:
+      - "${STORAGE_PORT}:8080"
+    volumes:
+      - ./storage:/app
+    networks:
+      main:
+        aliases:
+          - storage
   db_mysql:
     container_name: "vestratele_production_db_mysql"
     image: mysql:8.0.16
