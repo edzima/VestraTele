@@ -10,6 +10,7 @@ $params = array_merge(
 $config = [
 	'id' => 'app-frontend',
 	'basePath' => dirname(__DIR__),
+	'homeUrl' => 'http://' . getenv('FRONTEND_URL'). ':'. getenv('REVERSE_PROXY_PORT'),
 	'controllerNamespace' => 'frontend\controllers',
 	'modules' => [
 		'account' => [
