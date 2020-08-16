@@ -71,6 +71,7 @@ services:
     environment:
       BACKEND_URL: "${BACKEND_URL}"
       FRONTEND_URL: "${FRONTEND_URL}"
+      STORAGE_URL: "${STORAGE_URL}"
     volumes:
       - ./docker/production/ngnx:/etc/nginx/templates
     ports:
