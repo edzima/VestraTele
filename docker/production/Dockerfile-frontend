@@ -110,5 +110,3 @@ ADD . /var/www/html/
 WORKDIR /var/www/html/
 
 RUN php /usr/local/bin/composer install
-
-RUN php yii app/setup

@@ -48,7 +48,8 @@
 		"yii2tech/csv-grid": "^1.0",
 		"udokmeci/yii2-phone-validator": "~1.0.3",
 		"developeruz/yii2-db-rbac": "*",
-		"kartik-v/yii2-number": "^1.0"
+		"kartik-v/yii2-number": "^1.0",
+		"paulzi/yii2-adjacency-list" : "^2.2"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-master",
