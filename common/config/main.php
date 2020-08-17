@@ -26,6 +26,9 @@ $config = [
 		],
 	],
 	'components' => [
+		'cache' => [
+			'class' => YII_ENV_DEV ? DummyCache::class : FileCache::class,
+		],
 		'db' => [
 			'class' => 'yii\db\Connection',
 			'dsn' => getenv('DB_DSN'),
@@ -117,9 +120,7 @@ $config = [
 			// for the mailer to send real emails.
 			'useFileTransport' => YII_ENV_DEV,
 		],
-		'cache' => [
-			'class' => YII_ENV_DEV ? DummyCache::class : FileCache::class,
-		],
+
 		'provisions' => [
 			'class' => Provisions::class,
 		],
