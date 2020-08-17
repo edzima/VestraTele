@@ -27,14 +27,14 @@ do
     case $opt in
         "Development ====> YII SERVE(frontend) + YII SERVE(backend) + NGNX(reverse proxy) + MYSQL")
             echo "STARTING development environment ..."
-            toMerge=("environments/base.env" "environments/development.env");
+            toMerge=("environments/.env.docker" "environments/.env.development");
             mergeEnvs "${toMerge[@]}"
             docker-compose -f docker-compose-development.yml up
             exit;
             ;;
         "Production ====> APACHE(frontend)+ APACHE(backend) + NGNX(reverse proxy) + MYSQL")
             echo "STARTING production environment ..."
-            toMerge=("environments/base.env" "environments/production.env");
+            toMerge=("environments/.env.docker" "environments/.env.production");
             mergeEnvs "${toMerge[@]}"
             docker-compose -f docker-compose-production.yml up
             exit;
@@ -42,7 +42,7 @@ do
 
         "Tests =====> PHP(YII) + MYSQL")
             echo "STARTING tests environment and performing tests..."
-            toMerge=("environments/base.env" "environments/production.env");
+            toMerge=("environments/.env.docker" "environments/.env.test");
             mergeEnvs "${toMerge[@]}"
             docker-compose -f docker-compose-tests.yml up
             exit;
