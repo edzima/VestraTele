@@ -359,7 +359,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 		return $this->getChildesQuery()->all();
 	}
 
-	public function getChildesQuery(): ActiveQuery {
+	public function getChildesQuery(): UserQuery {
 		return static::find()->where(['id' => $this->getChildesIds()]);
 	}
 
@@ -377,7 +377,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 		return $this->getAllChildesQuery()->all();
 	}
 
-	public function getAllChildesQuery(): ActiveQuery {
+	public function getAllChildesQuery(): UserQuery {
 		return static::find()->where(['id' => $this->getAllChildesIds()]);
 	}
 
@@ -406,7 +406,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 
 	public function getSelfTree(): array {
 		if (empty($this->selfTree)) {
-			$this->selfTree = ArrayHelper::filter(static::getTree(), [$this->id]);
+			$this->selfTree = ArrayHelper::filter(static::getTree(), [(string) $this->id]);
 		}
 		return $this->selfTree;
 	}
@@ -424,7 +424,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 		return static::$TREE;
 	}
 
-	private static function buildTree($items, string $parentId, string $id) {
+	private static function buildTree(array $items, string $parentId, string $id) {
 		$childs = [];
 		foreach ($items as &$item) {
 			$childs[$item[$parentId]][] = &$item;

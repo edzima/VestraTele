@@ -15,6 +15,7 @@ $config = [
 	'basePath' => dirname(__DIR__),
 	'controllerNamespace' => 'backend\controllers',
 	'defaultRoute' => 'issue/issue/index',
+	'homeUrl' => '@backendUrl',
 	'controllerMap' => [
 		'file-manager-elfinder' => [
 			'class' => 'mihaildev\elfinder\Controller',

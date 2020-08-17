@@ -13,7 +13,17 @@ Yii::setAlias('storage', realpath(__DIR__ . '/../../storage'));
 /**
  * Setting url aliases
  */
-$schema = getenv('SCHEMA_URL');
-Yii::setAlias('frontendUrl', $schema . getenv('FRONTEND_URL'));
-Yii::setAlias('backendUrl', $schema . getenv('BACKEND_URL'));
-Yii::setAlias('storageUrl', $schema . getenv('STORAGE_URL'));
+
+function buildUrl(string $url) {
+	$schema = getenv('SCHEMA_URL');
+	$reversePort = getenv('REVERSE_PROXY_PORT');
+	$url = $schema . $url;
+	if ($reversePort != 80) {
+		$url .= ":$reversePort";
+	}
+	return $url;
+}
+
+Yii::setAlias('frontendUrl', buildUrl(getenv('FRONTEND_URL')));
+Yii::setAlias('backendUrl', buildUrl(getenv('BACKEND_URL')));
+Yii::setAlias('storageUrl', buildUrl(getenv('STORAGE_URL')));
