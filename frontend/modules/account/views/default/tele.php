@@ -42,10 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		]
 	) ?>
 
-	<?= $form->field($model, 'gender')->dropDownlist([
-		UserProfile::GENDER_MALE => Yii::t('frontend', 'Male'),
-		UserProfile::GENDER_FEMALE => Yii::t('frontend', 'Female'),
-	], ['prompt' => '']) ?>
+	<?= $form->field($model, 'gender')->dropDownlist(UserProfile::getGendersNames(), ['prompt' => '']) ?>
 
 	<?= $form->field($model, 'website')->textInput(['maxlength' => true]) ?>
 

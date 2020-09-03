@@ -12,17 +12,25 @@ use vova07\fileapi\behaviors\UploadBehavior;
  * @property integer $user_id
  * @property string $firstname
  * @property string $lastname
- * @property string $phone
  * @property integer $birthday
  * @property string $avatar_path
  * @property integer $gender
  * @property string $website
  * @property string $other
+ * @property string $phone
+ * @property string $phone_2
  */
 class UserProfile extends ActiveRecord {
 
-	const GENDER_MALE = 1;
-	const GENDER_FEMALE = 2;
+	private const GENDER_MALE = 1;
+	private const GENDER_FEMALE = 2;
+
+	public static function getGendersNames(): array {
+		return [
+			static::GENDER_MALE => Yii::t('common', 'Male'),
+			static::GENDER_FEMALE => Yii::t('common', 'Female'),
+		];
+	}
 
 	/**
 	 * @inheritdoc
@@ -61,7 +69,7 @@ class UserProfile extends ActiveRecord {
 			['other', 'string', 'max' => 1024],
 			['phone', 'string', 'max' => 15],
 			[['firstname', 'lastname', 'avatar_path', 'website'], 'string', 'max' => 255],
-			[['firstname','lastname'], 'match', 'pattern' => '/[AaĄąBbCcĆćDdEeĘęFfGgHhIiJjKkLlŁłMmNnŃńOoÓóPpRrSsŚśTtUuWwYyZzŹźŻż]/iu'],
+			[['firstname', 'lastname'], 'match', 'pattern' => '/[AaĄąBbCcĆćDdEeĘęFfGgHhIiJjKkLlŁłMmNnŃńOoÓóPpRrSsŚśTtUuWwYyZzŹźŻż]/iu'],
 			['user_id', 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
 			[['firstname', 'lastname', 'birthday', 'gender', 'website', 'other'], 'default', 'value' => null],
 		];

@@ -27,4 +27,14 @@ return [
 			'enableSchemaCache' => YII_ENV_PROD,
 		],
 	],
+	'controllerMap' => [
+		'migrate' => [
+			'class' => 'yii\console\controllers\MigrateController',
+			'migrationPath' => [
+				'@app/migrations',
+				'@yii/log/migrations',
+				'@yii/rbac/migrations/',
+			],
+		],
+	],
 ];

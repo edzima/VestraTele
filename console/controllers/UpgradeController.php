@@ -41,21 +41,4 @@ class UpgradeController extends Controller {
 		}
 	}
 
-	public function actionRemoveUnusedTables(): void {
-		$tables = [
-			'{{%benefit_amount}}',
-			'{{%cause}}',
-			'{{%cause_category}}',
-			'{{%score}}',
-			'{{%task_status}}',
-			'{{%task_uncertain}}',
-			'{{%task}}',
-
-		];
-		$db = Yii::$app->db;
-		foreach ($tables as $table) {
-			$db->createCommand()->dropTable($table)->execute();
-		}
-	}
-
 }

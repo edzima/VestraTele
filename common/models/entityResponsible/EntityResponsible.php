@@ -2,7 +2,6 @@
 
 namespace common\models\entityResponsible;
 
-use common\models\address\City;
 use common\models\issue\Issue;
 use yii\db\ActiveRecord;
 
@@ -13,7 +12,6 @@ use yii\db\ActiveRecord;
  * @property string $name
  *
  * @property Issue[] $issues
- * @property City[] $cities
  */
 class EntityResponsible extends ActiveRecord {
 
@@ -54,13 +52,6 @@ class EntityResponsible extends ActiveRecord {
 	 */
 	public function getIssues() {
 		return $this->hasMany(Issue::class, ['entity_responsible_id' => 'id']);
-	}
-
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getCities() {
-		return $this->hasMany(City::class, ['id' => 'city_id'])->viaTable('issue_entity_responsible_details', ['entity_id' => 'id']);
 	}
 
 }

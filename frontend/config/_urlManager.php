@@ -5,10 +5,6 @@ return [
 	'enablePrettyUrl' => true,
 	'showScriptName' => false,
 	'rules' => [
-		// Index page
-
-		'' => '',
-		'crm' => '',
 
 		// Pages
 		'page/<slug>' => 'page/view',
@@ -32,11 +28,6 @@ return [
 		'spotkania' => 'meet',
 
 		'admin' => '/backend/web',
-		'kalkulator-wyrownania-zasilku' => 'benefit-amount/index',
-
-		//REST
-
-		['class' => 'yii\rest\UrlRule', 'controller' => 'apicalendar'],
 
 	],
 ];

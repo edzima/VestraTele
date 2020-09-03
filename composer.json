@@ -20,12 +20,11 @@
 		"ext-intl": "*",
 		"php": ">7.4.0",
 		"ext-mbstring": "*",
-		"yiisoft/yii2": "~2.0.17",
+		"yiisoft/yii2": "2.0.37",
 		"yiisoft/yii2-bootstrap": "*",
 		"yiisoft/yii2-swiftmailer": "*",
 		"vlucas/phpdotenv": "*",
 		"beaten-sect0r/yii2-db-manager": "*",
-		"samdark/sitemap": "*",
 		"vova07/yii2-imperavi-widget": "*",
 		"vova07/yii2-fileapi-widget": "*",
 		"2amigos/yii2-selectize-widget": "*",
@@ -40,6 +39,7 @@
 		"kartik-v/yii2-grid": "@dev",
 		"kartik-v/yii2-mpdf": "dev-master",
 		"kartik-v/yii2-export": "@dev",
+		"kartik-v/yii2-number": "^1.0",
 		"demogorgorn/yii2-ajax-submit-button": "*",
 		"yii2mod/yii2-comments": "*",
 		"kartik-v/yii2-widget-colorinput": "*",
@@ -47,8 +47,7 @@
 		"dmstr/yii2-adminlte-asset": "^2.1",
 		"yii2tech/csv-grid": "^1.0",
 		"udokmeci/yii2-phone-validator": "~1.0.3",
-		"developeruz/yii2-db-rbac": "*",
-		"kartik-v/yii2-number": "^1.0"
+		"developeruz/yii2-db-rbac": "*"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-master",

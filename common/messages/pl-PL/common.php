@@ -75,4 +75,6 @@ return [
 	'book_keeper' => 'Księgowy',
 	'book_keeper_delayed' => 'Księgowy - przeterminowane',
 	'meet' => 'Spotkania',
+	'Female' => 'Kobieta',
+	'Male' => 'Mężczyzna',
 ];

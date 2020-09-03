@@ -42,12 +42,6 @@ $config = [
 			'class' => 'yii\web\AssetManager',
 			'linkAssets' => getenv('LINK_ASSETS'),
 			'appendTimestamp' => YII_ENV_DEV,
-			'converter' => [
-				'class' => 'yii\web\AssetConverter',
-				'commands' => [
-					'less' => ['css', 'lessc {from} {to} --no-color'],
-				],
-			],
 		],
 		'formatter' => [
 			'class' => Formatter::class,
@@ -87,7 +81,7 @@ $config = [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',
 				],
-				'db_rbac' =>[
+				'db_rbac' => [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',
 				],
