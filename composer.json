@@ -9,7 +9,7 @@
 	],
 	"authors": [
 		{
-			"name": "Łukasz Wojda",
+			"name": "Lukas Wojda",
 			"email": "lukasz.wojda@protonmail.com",
 			"role": "Developer"
 		}
@@ -18,7 +18,7 @@
 	"license": "BSD-3-Clause",
 	"require": {
 		"ext-intl": "*",
-		"php": "^7.1.0",
+		"php": ">7.4.0",
 		"ext-mbstring": "*",
 		"yiisoft/yii2": "~2.0.17",
 		"yiisoft/yii2-bootstrap": "*",
@@ -46,8 +46,9 @@
 		"loveorigami/yii2-bootstrap-toggle": "*",
 		"dmstr/yii2-adminlte-asset": "^2.1",
 		"yii2tech/csv-grid": "^1.0",
-		"udokmeci/yii2-phone-validator" : "~1.0.3",
-		"developeruz/yii2-db-rbac": "*"
+		"udokmeci/yii2-phone-validator": "~1.0.3",
+		"developeruz/yii2-db-rbac": "*",
+		"kartik-v/yii2-number": "^1.0"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-master",
