@@ -4,6 +4,9 @@
 # phpstorm project files
 .idea
 
+# VScode project files
+.vscode
+
 # netbeans project files
 nbproject
 
@@ -33,5 +36,3 @@ phpunit.phar
 # vagrant runtime
 /.vagrant
 
-# vue node_modules
-frontend/vue/node_modules
