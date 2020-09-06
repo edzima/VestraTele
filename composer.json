@@ -51,10 +51,15 @@
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-master",
-		"yiisoft/yii2-gii": "*",
-		"samdark/yii2-webshell": "*",
-		"yiisoft/yii2-debug": "^2.0",
-		"codeception/codeception": "^2.2"
+		"yiisoft/yii2-debug": "~2.1.0",
+		"yiisoft/yii2-gii": "~2.1.0",
+		"yiisoft/yii2-faker": "~2.0.0",
+		"codeception/codeception": "^4.0",
+		"codeception/module-asserts": "^1.0",
+		"codeception/module-yii2": "^1.0",
+		"codeception/module-filesystem": "^1.0",
+		"codeception/verify": "~0.5.0 || ~1.1.0",
+		"symfony/browser-kit": ">=2.7 <=4.2.4"
 	},
 	"repositories": [
 		{
@@ -69,13 +74,8 @@
 	},
 	"config": {
 		"process-timeout": 1800,
-		"optimize-autoloader": true,
-		"preferred-install": "dist",
 		"fxp-asset": {
-			"installer-paths": {
-				"npm-asset-library": "vendor/npm",
-				"bower-asset-library": "vendor/bower"
-			}
+			"enabled": false
 		}
 	}
 }

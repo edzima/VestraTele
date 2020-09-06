@@ -1,32 +1,24 @@
 <?php
 
-use yii\db\Connection;
 
 $params = array_merge(
-	require(__DIR__ . '/../../common/config/params.php'),
-	require(__DIR__ . '/params.php')
+	require __DIR__ . '/../../common/config/params.php',
+	require __DIR__ . '/../../common/config/params-local.php',
+	require __DIR__ . '/params.php',
+	require __DIR__ . '/params-local.php'
 );
 
 return [
 	'id' => 'app-console',
 	'basePath' => dirname(__DIR__),
+	'bootstrap' => ['log'],
+
 	'controllerNamespace' => 'console\controllers',
-	'bootstrap' => ['gii'],
-	'modules' => [
-		'gii' => 'yii\gii\Module',
+	'aliases' => [
+		'@bower' => '@vendor/bower-asset',
+		'@npm' => '@vendor/npm-asset',
 	],
-	'params' => $params,
-	'components' => [
-		'oldDb' => [
-			'class' => Connection::class,
-			'dsn' => getenv('OLD_DB_DSN'),
-			'username' => getenv('OLD_DB_USERNAME'),
-			'password' => getenv('OLD_DB_PASSWORD'),
-			'tablePrefix' => getenv('OLD_DB_TABLE_PREFIX'),
-			'charset' => 'utf8',
-			'enableSchemaCache' => YII_ENV_PROD,
-		],
-	],
+
 	'controllerMap' => [
 		'migrate' => [
 			'class' => 'yii\console\controllers\MigrateController',
@@ -36,5 +28,21 @@ return [
 				'@yii/rbac/migrations/',
 			],
 		],
+		'fixture' => [
+			'class' => 'yii\console\controllers\FixtureController',
+			'namespace' => 'common\fixtures',
+		],
 	],
+	'components' => [
+		'log' => [
+			'targets' => [
+				[
+					'class' => 'yii\log\FileTarget',
+					'levels' => ['error', 'warning'],
+				],
+			],
+		],
+	],
+	'params' => $params,
+
 ];

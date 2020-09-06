@@ -1,14 +1,10 @@
 <?php
-
-/**
- * Setting path aliases
- */
-Yii::setAlias('root', realpath(__DIR__ . '/../../'));
-Yii::setAlias('common', realpath(__DIR__ . '/../../common'));
-Yii::setAlias('frontend', realpath(__DIR__ . '/../../frontend'));
-Yii::setAlias('backend', realpath(__DIR__ . '/../../backend'));
-Yii::setAlias('console', realpath(__DIR__ . '/../../console'));
-Yii::setAlias('storage', realpath(__DIR__ . '/../../storage'));
+Yii::setAlias('@root', dirname(__DIR__, 2));
+Yii::setAlias('@common', dirname(__DIR__));
+Yii::setAlias('@frontend', dirname(__DIR__, 2) . '/frontend');
+Yii::setAlias('@backend', dirname(__DIR__, 2) . '/backend');
+Yii::setAlias('@console', dirname(__DIR__, 2) . '/console');
+Yii::setAlias('@storage', dirname(__DIR__, 2) . '/storage');
 
 /**
  * Setting url aliases
