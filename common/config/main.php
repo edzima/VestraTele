@@ -8,9 +8,10 @@ use yii\caching\DummyCache;
 use yii\caching\FileCache;
 use common\modules\address\Module as AddressModule;
 
-$config = [
+return [
 	'name' => 'Vestra System',
-	'vendorPath' => dirname(__DIR__, 2) . '/vendor',
+	'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
+
 	'extensions' => require(__DIR__ . '/../../vendor/yiisoft/extensions.php'),
 	'timeZone' => getenv('TIMEZONE'),
 	'sourceLanguage' => 'en-US',
@@ -122,5 +123,3 @@ $config = [
 		],
 	],
 ];
-
-return $config;

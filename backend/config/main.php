@@ -6,8 +6,10 @@ use backend\modules\issue\Module as IssueModule;
 use backend\modules\provision\Module as ProvisionModule;
 
 $params = array_merge(
-	require(__DIR__ . '/../../common/config/params.php'),
-	require(__DIR__ . '/params.php')
+	require __DIR__ . '/../../common/config/params.php',
+	require __DIR__ . '/../../common/config/params-local.php',
+	require __DIR__ . '/params.php',
+	require __DIR__ . '/params-local.php'
 );
 
 $config = [
@@ -165,6 +167,7 @@ $config = [
 	],
 	'params' => $params,
 ];
+
 if (YII_DEBUG) {
 	// configuration adjustments for 'dev' environment
 	$config['bootstrap'][] = 'debug';

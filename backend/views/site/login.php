@@ -13,24 +13,24 @@ $this->params['body-class'] = 'login-page';
 ?>
 <div class="login-box">
 
-    <div class="login-logo">
-        <?= Html::encode($this->title) ?>
-    </div>
+	<div class="login-logo">
+		<?= Html::encode($this->title) ?>
+	</div>
 
-    <div class="login-box-body">
-        <?php $form = ActiveForm::begin(['id' => 'login-form']) ?>
+	<div class="login-box-body">
+		<?php $form = ActiveForm::begin(['id' => 'login-form']) ?>
 
-        <div class="body">
-            <?= $form->field($model, 'identity') ?>
-            <?= $form->field($model, 'password')->passwordInput() ?>
-            <?= $form->field($model, 'rememberMe')->checkbox(['class' => 'simple']) ?>
-        </div>
+		<div class="body">
+			<?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+			<?= $form->field($model, 'password')->passwordInput() ?>
+			<?= $form->field($model, 'rememberMe')->checkbox(['class' => 'simple']) ?>
+		</div>
 
-        <div class="footer">
-            <?= Html::submitButton('Zaloguj', ['class' => 'btn btn-primary btn-flat btn-block']) ?>
-        </div>
+		<div class="footer">
+			<?= Html::submitButton('Zaloguj', ['class' => 'btn btn-primary btn-flat btn-block']) ?>
+		</div>
 
-        <?php ActiveForm::end() ?>
-    </div>
+		<?php ActiveForm::end() ?>
+	</div>
 
 </div>

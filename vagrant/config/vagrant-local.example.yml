@@ -10,10 +10,10 @@ timezone: UTC
 box_check_update: false
 
 # Virtual machine name
-machine_name: yii2-core
+machine_name: y2aa
 
 # Virtual machine IP
-ip: 192.168.13.37
+ip: 192.168.83.137
 
 # Virtual machine CPU cores number
 cpus: 1
