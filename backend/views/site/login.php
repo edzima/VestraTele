@@ -27,7 +27,7 @@ $this->params['body-class'] = 'login-page';
 		</div>
 
 		<div class="footer">
-			<?= Html::submitButton('Zaloguj', ['class' => 'btn btn-primary btn-flat btn-block']) ?>
+			<?= Html::submitButton(Yii::t('common', 'Login'), ['class' => 'btn btn-primary btn-flat btn-block']) ?>
 		</div>
 
 		<?php ActiveForm::end() ?>

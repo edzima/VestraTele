@@ -1,4 +1,2 @@
 User-agent: *
-Disallow: /index.php*
-Disallow: /article/category/*
-Disallow: /article/tag/*
+Disallow: /

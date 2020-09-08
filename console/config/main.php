@@ -1,6 +1,5 @@
 <?php
 
-
 $params = array_merge(
 	require __DIR__ . '/../../common/config/params.php',
 	require __DIR__ . '/../../common/config/params-local.php',
@@ -26,6 +25,7 @@ return [
 				'@app/migrations',
 				'@yii/log/migrations',
 				'@yii/rbac/migrations/',
+				'@vendor/edzima/yii2-teryt/src/migrations',
 			],
 		],
 		'fixture' => [

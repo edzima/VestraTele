@@ -4,6 +4,8 @@ use backend\modules\benefit\Module as BenefitModule;
 use backend\modules\entityResponsible\Module as EntityResponsibleModule;
 use backend\modules\issue\Module as IssueModule;
 use backend\modules\provision\Module as ProvisionModule;
+use yii\web\User;
+use yii\web\UserEvent;
 
 $params = array_merge(
 	require __DIR__ . '/../../common/config/params.php',
@@ -12,7 +14,7 @@ $params = array_merge(
 	require __DIR__ . '/params-local.php'
 );
 
-$config = [
+return [
 	'id' => 'app-backend',
 	'homeUrl' => Yii::getAlias('@backendUrl'),
 	'basePath' => dirname(__DIR__),
@@ -46,13 +48,21 @@ $config = [
 	],
 	'components' => [
 		'request' => [
-			'cookieValidationKey' => getenv('BACKEND_COOKIE_VALIDATION_KEY'),
 			'csrfParam' => '_csrf-backend',
 		],
 		'user' => [
 			'identityClass' => 'common\models\User',
 			'enableAutoLogin' => true,
 			'identityCookie' => ['name' => '_identity-back', 'httpOnly' => true],
+			'on beforeLogin' => function (UserEvent $event): void {
+				/** @var User $user */
+				$user = $event->sender;
+				$event->isValid = Yii::$app->authManager->checkAccess($event->identity->getId(), 'loginToBackend');
+				if (!$event->isValid) {
+					$id = $event->identity->getId();
+					Yii::info("User '$id'  without permission try logged to backend.", 'User.beforeLogin');
+				}
+			},
 		],
 		'session' => [
 			// this is the name of the session cookie used for login on the backend
@@ -95,9 +105,6 @@ $config = [
 		],
 		'provision' => [
 			'class' => ProvisionModule::class,
-		],
-		'noty' => [
-			'class' => 'lo\modules\noty\Module',
 		],
 		'webshell' => [
 			'class' => 'samdark\webshell\Module',
@@ -167,35 +174,3 @@ $config = [
 	],
 	'params' => $params,
 ];
-
-if (YII_DEBUG) {
-	// configuration adjustments for 'dev' environment
-	$config['bootstrap'][] = 'debug';
-	$config['modules']['debug'] = [
-		'class' => 'yii\debug\Module',
-		'allowedIPs' => ['127.0.0.1', '::1', '192.168.*.*'],
-		'as access' => [
-			'class' => 'common\behaviors\GlobalAccessBehavior',
-			'rules' => [
-				[
-					'allow' => true,
-				],
-			],
-		],
-	];
-	$config['bootstrap'][] = 'gii';
-	$config['modules']['gii'] = [
-		'class' => 'yii\gii\Module',
-		'allowedIPs' => ['127.0.0.1', '::1', '192.168.*.*'],
-		'as access' => [
-			'class' => 'common\behaviors\GlobalAccessBehavior',
-			'rules' => [
-				[
-					'allow' => true,
-				],
-			],
-		],
-	];
-}
-
-return $config;

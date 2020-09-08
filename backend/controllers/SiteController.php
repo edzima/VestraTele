@@ -71,10 +71,6 @@ class SiteController extends Controller {
 
 		$model = new LoginForm();
 		if ($model->load(Yii::$app->request->post()) && $model->login()) {
-			if (!Yii::$app->user->can('loginToBackend')) {
-				Yii::warning('User ' . $model->identity . ' try login to backend.', 'user');
-				return $this->actionLogout();
-			}
 			return $this->goBack();
 		}
 		return $this->render('login', [

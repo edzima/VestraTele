@@ -30,7 +30,6 @@
 		"2amigos/yii2-selectize-widget": "*",
 		"mihaildev/yii2-elfinder": "*",
 		"trntv/yii2-datetime-widget": "*",
-		"loveorigami/yii2-notification-wrapper": "*",
 		"bower-asset/html5shiv": "*",
 		"bower-asset/timecircles": "*",
 		"kartik-v/yii2-widget-depdrop": "@dev",
@@ -47,7 +46,8 @@
 		"dmstr/yii2-adminlte-asset": "^2.1",
 		"yii2tech/csv-grid": "^1.0",
 		"udokmeci/yii2-phone-validator": "~1.0.3",
-		"developeruz/yii2-db-rbac": "*"
+		"developeruz/yii2-db-rbac": "*",
+		"edzima/yii2-teryt": "^1.0.0"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-master",

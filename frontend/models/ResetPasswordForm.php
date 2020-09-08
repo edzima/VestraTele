@@ -40,7 +40,7 @@ class ResetPasswordForm extends Model {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			['password', 'required'],
 			['password', 'string', 'min' => Yii::$app->params['user.passwordMinLength']],
@@ -52,7 +52,10 @@ class ResetPasswordForm extends Model {
 	 *
 	 * @return bool if password was reset.
 	 */
-	public function resetPassword() {
+	public function resetPassword(): bool {
+		if (!$this->validate()) {
+			return false;
+		}
 		$user = $this->_user;
 		$user->setPassword($this->password);
 		$user->removePasswordResetToken();

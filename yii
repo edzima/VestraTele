@@ -1,26 +1,24 @@
 #!/usr/bin/env php
 <?php
+/**
+ * Yii console bootstrap file.
+ */
 
-use yii\console\Application;
-use yii\helpers\ArrayHelper;
+defined('YII_DEBUG') or define('YII_DEBUG', true);
+defined('YII_ENV') or define('YII_ENV', 'dev');
 
-// Composer
-require(__DIR__ . '/vendor/autoload.php');
+require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/vendor/yiisoft/yii2/Yii.php';
+require __DIR__ . '/common/config/bootstrap.php';
+require __DIR__ . '/console/config/bootstrap.php';
 
-// Environment
-require(__DIR__ . '/common/env.php');
-
-// Yii2
-require(__DIR__ . '/vendor/yiisoft/yii2/Yii.php');
-
-// Bootstrap application
-require(__DIR__ . '/common/config/bootstrap.php');
-require(__DIR__ . '/console/config/bootstrap.php');
-
-$config = ArrayHelper::merge(
-    require(__DIR__ . '/common/config/main.php'),
-    require(__DIR__ . '/console/config/main.php')
+$config = yii\helpers\ArrayHelper::merge(
+	require __DIR__ . '/common/config/main.php',
+	require __DIR__ . '/common/config/main-local.php',
+	require __DIR__ . '/console/config/main.php',
+	require __DIR__ . '/console/config/main-local.php'
 );
 
-$exitCode = (new Application($config))->run();
+$application = new yii\console\Application($config);
+$exitCode = $application->run();
 exit($exitCode);

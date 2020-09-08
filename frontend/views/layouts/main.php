@@ -1,13 +1,13 @@
 <?php
 
 use common\models\User;
+use common\widgets\Alert;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
 use yii\widgets\Breadcrumbs;
 use frontend\assets\AppAsset;
 use frontend\models\NavItem;
-use lo\modules\noty\Wrapper;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -37,7 +37,7 @@ AppAsset::register($this);
 	]);
 
 	if (Yii::$app->user->isGuest) {
-		$menuItems[] = ['label' => Yii::t('frontend', 'Login'), 'url' => ['/account/sign-in/login']];
+		$menuItems[] = ['label' => Yii::t('frontend', 'Login'), 'url' => ['/site/login']];
 	} else {
 		$menuItems[] = [
 			'label' => 'Lead',
@@ -111,7 +111,7 @@ AppAsset::register($this);
 		<?= Breadcrumbs::widget([
 			'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
 		]) ?>
-		<?= Wrapper::widget() ?>
+		<?= Alert::widget() ?>
 		<?= $content ?>
 
 	</div>

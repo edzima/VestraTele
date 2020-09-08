@@ -18,9 +18,6 @@ $config = [
 		'account' => [
 			'class' => 'frontend\modules\account\Module',
 		],
-		'noty' => [
-			'class' => 'lo\modules\noty\Module',
-		],
 		'gridview' => [
 			'class' => '\kartik\grid\Module',
 		],
@@ -42,15 +39,11 @@ $config = [
 			],
 		],
 		'request' => [
-			'cookieValidationKey' => getenv('FRONTEND_COOKIE_VALIDATION_KEY'),
 			'csrfParam' => '_csrf-frontend',
-			'baseUrl' => '',
-			//@todo created csrf validation in Vue
-			'enableCsrfValidation' => false,
 		],
 		'user' => [
 			'identityClass' => 'common\models\User',
-			'loginUrl' => ['/account/sign-in/login'],
+			//			'loginUrl' => ['/account/sign-in/login'],
 			'enableAutoLogin' => true,
 			'identityCookie' => ['name' => '_identity-front', 'httpOnly' => true],
 		],

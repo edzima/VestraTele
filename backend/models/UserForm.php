@@ -18,7 +18,6 @@ class UserForm extends Model {
 	public $password;
 	public $status;
 	public $roles;
-	public $typ_work;
 	public $parent_id;
 
 	private $model;
@@ -106,7 +105,6 @@ class UserForm extends Model {
 		$this->username = $model->username;
 		$this->email = $model->email;
 		$this->status = $model->status;
-		$this->typ_work = $model->typ_work;
 		$this->model = $model;
 		$this->parent_id = $model->boss;
 		$this->roles = ArrayHelper::getColumn(

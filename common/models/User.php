@@ -174,7 +174,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	 * @param string $username
 	 * @return static|null
 	 */
-	public static function findByUsername($username) {
+	public static function findByUsername(string $username): ?self {
 		return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
 	}
 
@@ -184,7 +184,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	 * @param string $token password reset token
 	 * @return static|null
 	 */
-	public static function findByPasswordResetToken($token) {
+	public static function findByPasswordResetToken(string $token) {
 		if (!static::isPasswordResetTokenValid($token)) {
 			return null;
 		}
@@ -251,7 +251,7 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	 * @param string $password password to validate
 	 * @return bool if password provided is valid for current user
 	 */
-	public function validatePassword($password) {
+	public function validatePassword(string $password) {
 		return Yii::$app->security->validatePassword($password, $this->password_hash);
 	}
 
@@ -260,49 +260,49 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 	 *
 	 * @param string $password
 	 */
-	public function setPassword($password) {
+	public function setPassword(string $password): void {
 		$this->password_hash = Yii::$app->security->generatePasswordHash($password);
 	}
 
 	/**
 	 * Generates "remember me" authentication key.
 	 */
-	public function generateAuthKey() {
+	public function generateAuthKey(): void {
 		$this->auth_key = Yii::$app->security->generateRandomString();
 	}
 
 	/**
 	 * Generates new access token.
 	 */
-	public function generateAccessToken() {
+	public function generateAccessToken(): void {
 		$this->access_token = Yii::$app->security->generateRandomString();
 	}
 
 	/**
 	 * Removes access token.
 	 */
-	public function removeAccessToken() {
+	public function removeAccessToken(): void {
 		$this->access_token = null;
 	}
 
 	/**
 	 * Generates new password reset token
 	 */
-	public function generatePasswordResetToken() {
+	public function generatePasswordResetToken(): void {
 		$this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
 	}
 
 	/**
 	 * Generates new token for email verification
 	 */
-	public function generateEmailVerificationToken() {
+	public function generateEmailVerificationToken(): void {
 		$this->verification_token = Yii::$app->security->generateRandomString() . '_' . time();
 	}
 
 	/**
 	 * Removes password reset token
 	 */
-	public function removePasswordResetToken() {
+	public function removePasswordResetToken(): void {
 		$this->password_reset_token = null;
 	}
 
@@ -364,7 +364,6 @@ class User extends ActiveRecord implements IdentityInterface, UserRbacInterface 
 		$auth = Yii::$app->authManager;
 		$auth->assign($auth->getRole(self::ROLE_USER), $this->getId());
 	}
-
 
 	public function getParents(): array {
 		return $this->getParentsQuery()->all();

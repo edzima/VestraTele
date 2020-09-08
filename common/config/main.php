@@ -7,16 +7,19 @@ use common\formatters\Formatter;
 use yii\caching\DummyCache;
 use yii\caching\FileCache;
 use common\modules\address\Module as AddressModule;
+use edzima\teryt\Module as TerytModule;
 
 return [
 	'name' => 'Vestra System',
 	'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
 
 	'extensions' => require(__DIR__ . '/../../vendor/yiisoft/extensions.php'),
-	'timeZone' => getenv('TIMEZONE'),
+	'timeZone' => 'Europe/Warsaw',
 	'sourceLanguage' => 'en-US',
-	'language' => getenv('LANGUAGE'),
-	'bootstrap' => ['log'],
+	'language' => 'pl-PL',
+	'bootstrap' => [
+		'log',
+	],
 	'aliases' => [
 		'@bower' => '@vendor/bower-asset',
 		'@npm' => '@vendor/npm-asset',
@@ -24,6 +27,9 @@ return [
 	'modules' => [
 		'address' => [
 			'class' => AddressModule::class,
+		],
+		'teryt' => [
+			'class' => TerytModule::class,
 		],
 	],
 	'components' => [
@@ -42,7 +48,6 @@ return [
 		'assetManager' => [
 			'class' => 'yii\web\AssetManager',
 			'linkAssets' => getenv('LINK_ASSETS'),
-			'appendTimestamp' => YII_ENV_DEV,
 		],
 		'formatter' => [
 			'class' => Formatter::class,
@@ -104,13 +109,6 @@ return [
 		'urlManager' => [
 			'enablePrettyUrl' => true,
 			'showScriptName' => false,
-		],
-		'mailer' => [
-			'class' => 'yii\swiftmailer\Mailer',
-			// send all mails to a file by default. You have to set
-			// 'useFileTransport' to false and configure a transport
-			// for the mailer to send real emails.
-			'useFileTransport' => YII_ENV_DEV,
 		],
 		'cache' => [
 			'class' => YII_ENV_DEV ? DummyCache::class : FileCache::class,

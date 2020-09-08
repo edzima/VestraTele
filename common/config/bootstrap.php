@@ -9,6 +9,7 @@ Yii::setAlias('@storage', dirname(__DIR__, 2) . '/storage');
 /**
  * Setting url aliases
  */
+require __DIR__ . '/../env.php';
 Yii::setAlias('frontendUrl', getenv('FRONTEND_URL'));
 Yii::setAlias('backendUrl', getenv('BACKEND_URL'));
 Yii::setAlias('storageUrl', getenv('STORAGE_URL'));

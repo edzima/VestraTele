@@ -2,9 +2,9 @@
 
 namespace common\models;
 
+use vova07\fileapi\behaviors\UploadBehavior;
 use Yii;
 use yii\db\ActiveRecord;
-use vova07\fileapi\behaviors\UploadBehavior;
 
 /**
  * This is the model class for table "{{%user_profile}}".
@@ -35,17 +35,17 @@ class UserProfile extends ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public static function tableName() {
+	public static function tableName(): string {
 		return '{{%user_profile}}';
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'uploadBehavior' => [
-				'class' => UploadBehavior::className(),
+				'class' => UploadBehavior::class,
 				'attributes' => [
 					'avatar_path' => [
 						'path' => '@storage/avatars',
@@ -60,7 +60,7 @@ class UserProfile extends ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			['birthday', 'filter', 'filter' => 'strtotime', 'skipOnEmpty' => true],
 			['gender', 'in', 'range' => [null, self::GENDER_MALE, self::GENDER_FEMALE]],
@@ -78,7 +78,7 @@ class UserProfile extends ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'firstname' => Yii::t('common', 'Firstname'),
 			'lastname' => Yii::t('common', 'Lastname'),
@@ -88,6 +88,7 @@ class UserProfile extends ActiveRecord {
 			'website' => Yii::t('common', 'Website'),
 			'other' => Yii::t('common', 'Other'),
 			'phone' => Yii::t('common', 'Phone number'),
+			'phone_2' => Yii::t('common', 'Phone number 2'),
 		];
 	}
 }

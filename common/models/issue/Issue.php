@@ -107,9 +107,9 @@ class Issue extends ActiveRecord {
 	}
 
 	public function beforeValidate() {
-		$this->client_city_id = $this->getClientAddress()->cityId;
-		$this->client_street = $this->getClientAddress()->street;
-		$this->client_city_code = $this->getClientAddress()->cityCode;
+//		$this->client_city_id = $this->getClientAddress()->cityId;
+//		$this->client_street = $this->getClientAddress()->street;
+//		$this->client_city_code = $this->getClientAddress()->cityCode;
 		return parent::beforeValidate();
 	}
 

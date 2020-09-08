@@ -4,6 +4,7 @@ namespace backend\tests\functional;
 
 use backend\tests\FunctionalTester;
 use common\fixtures\UserFixture;
+use Yii;
 
 /**
  * Class LoginCest
@@ -27,17 +28,27 @@ class LoginCest {
 		];
 	}
 
-	/**
-	 * @param FunctionalTester $I
-	 */
-	public function loginUser(FunctionalTester $I) {
+	public function loginUserWithoutPermision(FunctionalTester $I) {
+		$user = $I->grabFixture('user', 0);
+		Yii::$app->authManager->revokeAll($user->id);
 		$I->amOnPage('/site/login');
 		$I->fillField('Username', 'erau');
 		$I->fillField('Password', 'password_0');
-		$I->click('login-button');
+		$I->click('#login-form button[type=submit]');
+		$I->see('Login');
+	}
 
-		$I->see('Logout (erau)', 'form button[type=submit]');
+	public function loginUser(FunctionalTester $I) {
+		$user = $I->grabFixture('user', 0);
+		Yii::$app->authManager->assign(Yii::$app->authManager->getPermission('loginToBackend'), $user->id);
+		$I->amOnPage('/site/login');
+		$I->fillField('Username', 'erau');
+		$I->fillField('Password', 'password_0');
+		$I->click('#login-form button[type=submit]');
+
+		$I->see('Logout', 'a[data-method="post"]');
 		$I->dontSeeLink('Login');
 		$I->dontSeeLink('Signup');
 	}
+
 }
