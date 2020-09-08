@@ -10,8 +10,7 @@ $params = array_merge(
 return [
 	'id' => 'app-console',
 	'basePath' => dirname(__DIR__),
-	'bootstrap' => ['log'],
-
+	'bootstrap' => ['log', 'teryt'],
 	'controllerNamespace' => 'console\controllers',
 	'aliases' => [
 		'@bower' => '@vendor/bower-asset',
@@ -25,7 +24,7 @@ return [
 				'@app/migrations',
 				'@yii/log/migrations',
 				'@yii/rbac/migrations/',
-				'@vendor/edzima/yii2-teryt/src/migrations',
+				'@edzima/terytmigrations',
 			],
 		],
 		'fixture' => [
