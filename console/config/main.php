@@ -24,7 +24,7 @@ return [
 				'@app/migrations',
 				'@yii/log/migrations',
 				'@yii/rbac/migrations/',
-				'@edzima/terytmigrations',
+				'@edzima/teryt/migrations',
 			],
 		],
 		'fixture' => [
