@@ -2,7 +2,9 @@
 
 use common\models\issue\Issue;
 use common\models\issue\Summon;
+use common\models\User;
 use common\widgets\DateTimeWidget;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -40,13 +42,13 @@ use yii\widgets\ActiveForm;
 		]) ?>
 
 	</div>
-	<?= $form->field($model, 'issue_id')->dropDownList(Issue::find()->all()) ?>
 
-    <?= $form->field($model, 'owner_id')->textInput() ?>
+	<?= $form->field($model, 'issue_id')->dropDownList( ArrayHelper::map(Issue::find()->all(), 'id', 'client_first_name'),['prompt'=>'']) ?>
 
-    <?= $form->field($model, 'contractor_id')->textInput() ?>
+	<?= $form->field($model, 'contractor_id')->dropDownList( ArrayHelper::map(User::find()->all(), 'id', 'username'),['prompt'=>'']) ?>
 
-    <div class="form-group">
+
+	<div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>
 
