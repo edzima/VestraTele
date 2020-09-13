@@ -65,7 +65,7 @@ class Summon extends \yii\db\ActiveRecord
 					return date(DATE_ATOM);
 				},
 			],
-			['published_at', 'filter', 'filter' => 'strtotime'],
+			['created_at', 'filter', 'filter' => 'strtotime'],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::className(), 'targetAttribute' => ['issue_id' => 'id']],
 			[['contractor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['contractor_id' => 'id']],
 			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['owner_id' => 'id']],
@@ -84,9 +84,9 @@ class Summon extends \yii\db\ActiveRecord
 			'created_at' => 'Data stworzenia',
 			'updated_at' => 'Data aktualizacji',
 			'realized_at' => 'Data realizacji',
-			'issue_id' => 'ID Sprawy',
-			'owner_id' => 'ID Właściciela',
-			'contractor_id' => 'ID Wykonawcy',
+			'issue_id' => 'Sprawa',
+			'owner_id' => 'Właściciel',
+			'contractor_id' => 'Wykonawca',
 		];
 	}
 
@@ -108,6 +108,16 @@ class Summon extends \yii\db\ActiveRecord
 			static::TERM_THREE_WEEKS => '3 tygodnie ',
 			static::TERM_ONE_MONTH => 'Miesiąc',
 		];
+	}
+
+	public static function getUserOwners(){
+		return User::find()->all();
+		//TODO: add where clause
+	}
+
+	public static function getUserContractors(){
+		return User::find()->all();
+		//TODO: add where clause
 	}
 
 	/**
