@@ -2,11 +2,10 @@
 
 namespace common\models\issue;
 
-use common\models\User;
-use Yii;
+use common\models\user\User;
 use yii\behaviors\BlameableBehavior;
-use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "summon".
@@ -21,12 +20,12 @@ use yii\behaviors\TimestampBehavior;
  * @property int $owner_id
  * @property int $contractor_id
  *
- * @property Issue $issue
- * @property User $contractor
- * @property User $owner
+ * @property-read Issue $issue
+ * @property-read User $contractor
+ * @property-read User $owner
+ * @property-read string $statusName
  */
-class Summon extends \yii\db\ActiveRecord
-{
+class Summon extends ActiveRecord {
 
 	public const STATUS_NEW = 1;
 	public const STATUS_IN_PROGRESS = 2;
@@ -40,21 +39,30 @@ class Summon extends \yii\db\ActiveRecord
 	public const TERM_THREE_WEEKS = 21;
 	public const TERM_ONE_MONTH = 30;
 
-
-
 	/**
-	 * {@inheritdoc}
+	 * @inheritdoc
 	 */
-	public static function tableName()
-	{
-		return 'summon';
+	public function behaviors() {
+		return [
+			TimestampBehavior::class,
+			[
+				'class' => BlameableBehavior::class,
+				'createdByAttribute' => 'owner_id',
+			],
+		];
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function rules()
-	{
+	public static function tableName(): string {
+		return '{{%summon}}';
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function rules(): array {
 		return [
 			[['status', 'title', 'issue_id', 'owner_id', 'contractor_id'], 'required'],
 			[['status', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
@@ -66,17 +74,17 @@ class Summon extends \yii\db\ActiveRecord
 				},
 			],
 			['created_at', 'filter', 'filter' => 'strtotime'],
-			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::className(), 'targetAttribute' => ['issue_id' => 'id']],
-			[['contractor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['contractor_id' => 'id']],
-			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['owner_id' => 'id']],
+			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
+			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
+			[['contractor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['contractor_id' => 'id']],
+			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
 		];
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function attributeLabels()
-	{
+	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
 			'status' => 'Status',
@@ -90,7 +98,11 @@ class Summon extends \yii\db\ActiveRecord
 		];
 	}
 
-	public static function getStatusNames(): array {
+	public function getStatusName(): string {
+		return static::getStatusesNames()[$this->status];
+	}
+
+	public static function getStatusesNames(): array {
 		return [
 			static::TERM_ONE_WEEK => 'Nowe',
 			static::STATUS_IN_PROGRESS => 'W trakcie realizacji',
@@ -110,37 +122,13 @@ class Summon extends \yii\db\ActiveRecord
 		];
 	}
 
-	public static function getUserOwners(){
-		return User::find()->all();
-		//TODO: add where clause
-	}
-
-	public static function getUserContractors(){
-		return User::find()->all();
-		//TODO: add where clause
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function behaviors() {
-		return [
-			TimestampBehavior::class,
-			[
-				'class' => BlameableBehavior::class,
-				'createdByAttribute' => 'owner_id'
-			]
-		];
-	}
-
 	/**
 	 * Gets query for [[Issue]].
 	 *
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getIssue()
-	{
-		return $this->hasOne(Issue::className(), ['id' => 'issue_id']);
+	public function getIssue() {
+		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
 	}
 
 	/**
@@ -148,9 +136,8 @@ class Summon extends \yii\db\ActiveRecord
 	 *
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getContractor()
-	{
-		return $this->hasOne(User::className(), ['id' => 'contractor_id']);
+	public function getContractor() {
+		return $this->hasOne(User::class, ['id' => 'contractor_id']);
 	}
 
 	/**
@@ -158,8 +145,7 @@ class Summon extends \yii\db\ActiveRecord
 	 *
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getOwner()
-	{
-		return $this->hasOne(User::className(), ['id' => 'owner_id']);
+	public function getOwner() {
+		return $this->hasOne(User::class, ['id' => 'owner_id']);
 	}
 }

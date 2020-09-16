@@ -1,6 +1,6 @@
 <?php
 
-use yii\db\Migration;
+use console\base\Migration;
 
 /**
  * Class m200913_114017_summon
