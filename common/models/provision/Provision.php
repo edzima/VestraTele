@@ -3,7 +3,7 @@
 namespace common\models\provision;
 
 use common\models\issue\IssuePay;
-use common\models\User;
+use common\models\user\Worker;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -21,10 +21,10 @@ use yii\db\ActiveRecord;
  *
  * @property-read string $provision
  * @property-read IssuePay $pay
- * @property-read User $user
+ * @property-read Worker $user
  * @property-read ProvisionType $type
- * @property-read User $toUser
- * @property-read User $fromUser
+ * @property-read Worker $toUser
+ * @property-read Worker $fromUser
  */
 class Provision extends ActiveRecord {
 
@@ -45,8 +45,8 @@ class Provision extends ActiveRecord {
 			[['value'], 'number'],
 			['hide_on_report', 'boolean'],
 			[['pay_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssuePay::class, 'targetAttribute' => ['pay_id' => 'id']],
-			[['from_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['from_user_id' => 'id']],
-			[['to_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['to_user_id' => 'id']],
+			[['from_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['from_user_id' => 'id']],
+			[['to_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['to_user_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ProvisionType::class, 'targetAttribute' => ['type_id' => 'id']],
 
 		];
@@ -74,11 +74,11 @@ class Provision extends ActiveRecord {
 	}
 
 	public function getFromUser(): ActiveQuery {
-		return $this->hasOne(User::class, ['id' => 'from_user_id']);
+		return $this->hasOne(Worker::class, ['id' => 'from_user_id']);
 	}
 
 	public function getToUser(): ActiveQuery {
-		return $this->hasOne(User::class, ['id' => 'to_user_id']);
+		return $this->hasOne(Worker::class, ['id' => 'to_user_id']);
 	}
 
 	public function getType(): ActiveQuery {
@@ -86,7 +86,7 @@ class Provision extends ActiveRecord {
 	}
 
 	public function getFromUserString(): string {
-		return $this->from_user_id && $this->to_user_id !== $this->from_user_id ? $this->fromUser : '';
+		return $this->from_user_id && $this->to_user_id !== $this->from_user_id && $this->fromUser ? $this->fromUser : '';
 	}
 
 	public function getProvision(): string {

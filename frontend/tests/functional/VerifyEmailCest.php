@@ -3,6 +3,7 @@
 namespace frontend\tests\functional;
 
 use common\fixtures\UserFixture;
+use common\models\user\User;
 use frontend\tests\FunctionalTester;
 
 class VerifyEmailCest {
@@ -54,10 +55,10 @@ class VerifyEmailCest {
 		$I->canSee('Vestra', 'h1');
 		$I->see('Logout', 'a[data-method="post"]');
 
-		$I->seeRecord('common\models\User', [
+		$I->seeRecord('common\models\user\User', [
 			'username' => 'test.test',
 			'email' => 'test@mail.com',
-			'status' => \common\models\User::STATUS_ACTIVE,
+			'status' => User::STATUS_ACTIVE,
 		]);
 	}
 }

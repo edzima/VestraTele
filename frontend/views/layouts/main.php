@@ -1,6 +1,6 @@
 <?php
 
-use common\models\User;
+use common\models\user\User;
 use common\widgets\Alert;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;

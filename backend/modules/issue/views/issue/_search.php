@@ -1,7 +1,7 @@
 <?php
 
 use common\models\issue\IssueSearch;
-use common\models\User;
+use common\models\user\Worker;
 use common\widgets\DateTimeWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
@@ -69,7 +69,7 @@ use yii\widgets\ActiveForm;
 	<div class="row">
 		<?= $form->field($model, 'tele_id', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
-					'data' => User::getSelectList([User::ROLE_TELEMARKETER, User::ROLE_ISSUE]),
+					'data' => Worker::getSelectList([Worker::ROLE_TELEMARKETER, Worker::ROLE_ISSUE]),
 					'options' => [
 						'placeholder' => 'Telemarketer',
 					],
@@ -80,7 +80,7 @@ use yii\widgets\ActiveForm;
 			) ?>
 		<?= $form->field($model, 'lawyer_id', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
-					'data' => User::getSelectList([User::ROLE_LAWYER, User::ROLE_ISSUE]),
+					'data' => Worker::getSelectList([Worker::ROLE_LAWYER, Worker::ROLE_ISSUE]),
 					'options' => [
 						'placeholder' => 'Prawnik',
 					],
@@ -92,7 +92,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'childsId', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
-					'data' => User::getSelectList(),
+					'data' => Worker::getSelectList(),
 					'options' => [
 						'placeholder' => 'Struktury',
 					],

@@ -2,7 +2,7 @@
 
 use backend\modules\provision\models\ProvisionUserForm;
 use common\models\provision\ProvisionUser;
-use common\models\User;
+use common\models\user\Worker;
 use yii\helpers\Html;
 use yii\web\View;
 use yii\widgets\ActiveForm;
@@ -26,13 +26,13 @@ if (!empty($models)): ?>
 						<?php if ($provisionUser->from_user_id === $formModel->getUser()->id && $provisionUser->to_user_id === $formModel->getUser()->id): ?>
 						<?php elseif ($provisionUser->from_user_id === $formModel->getUser()->id): ?>
 							Dla <?= Html::a(
-								User::userName($provisionUser->to_user_id),
+								Worker::userName($provisionUser->to_user_id),
 								['user/user', 'id' => $provisionUser->to_user_id], [
 								'target' => '_blank',
 							]) ?>
 						<?php else: ?>
 							Od <?= Html::a(
-								User::userName($provisionUser->from_user_id),
+								Worker::userName($provisionUser->from_user_id),
 								['user/user', 'id' => $provisionUser->from_user_id], [
 								'target' => '_blank',
 							]) ?>

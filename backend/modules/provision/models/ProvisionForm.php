@@ -4,14 +4,14 @@ namespace backend\modules\provision\models;
 
 use common\models\issue\Issue;
 use common\models\provision\Provision;
-use common\models\User;
+use common\models\user\Worker;
 use yii\base\Model;
 
 /**
  * Class ProvisionForm
  *
  * @property-read int $id
- * @property-read User $toUser
+ * @property-read Worker $toUser
  * @property-read Issue $issue
  *
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
@@ -51,7 +51,7 @@ class ProvisionForm extends Model {
 		$this->hide_on_report = $model->hide_on_report;
 	}
 
-	public function getToUser(): User {
+	public function getToUser(): Worker {
 		return $this->model->toUser;
 	}
 

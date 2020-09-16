@@ -1,6 +1,6 @@
 <?php
 
-use backend\modules\address\widgets\AddressFormWidget;
+use common\modules\address\widgets\AddressFormWidget;
 use kartik\depdrop\DepDrop;
 use kartik\select2\Select2;
 use yii\helpers\Html;

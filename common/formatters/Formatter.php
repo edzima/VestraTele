@@ -15,8 +15,11 @@ class Formatter extends BaseFormatter {
 	];
 
 	public function asCityCode(?string $city, ?string $code) {
-		if ($city === null) {
+		if ($city === null && $code === null) {
 			return $this->nullDisplay;
+		}
+		if ($city === null) {
+			return Html::encode($code);
 		}
 		if ($code === null) {
 			return Html::encode($city);

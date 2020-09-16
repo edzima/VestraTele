@@ -4,7 +4,7 @@ use backend\modules\benefit\Module as BenefitModule;
 use backend\modules\entityResponsible\Module as EntityResponsibleModule;
 use backend\modules\issue\Module as IssueModule;
 use backend\modules\provision\Module as ProvisionModule;
-use yii\web\User;
+use backend\modules\user\Module as UserModule;
 use yii\web\UserEvent;
 
 $params = array_merge(
@@ -51,12 +51,10 @@ return [
 			'csrfParam' => '_csrf-backend',
 		],
 		'user' => [
-			'identityClass' => 'common\models\User',
+			'identityClass' => 'common\models\user\User',
 			'enableAutoLogin' => true,
 			'identityCookie' => ['name' => '_identity-back', 'httpOnly' => true],
 			'on beforeLogin' => function (UserEvent $event): void {
-				/** @var User $user */
-				$user = $event->sender;
 				$event->isValid = Yii::$app->authManager->checkAccess($event->identity->getId(), 'loginToBackend');
 				if (!$event->isValid) {
 					$id = $event->identity->getId();
@@ -106,22 +104,13 @@ return [
 		'provision' => [
 			'class' => ProvisionModule::class,
 		],
+		'user' => [
+			'class' => UserModule::class,
+		],
 		'webshell' => [
 			'class' => 'samdark\webshell\Module',
 			'yiiScript' => '@root/yii', // adjust path to point to your ./yii script
 			'allowedIPs' => ['*'],
-			'as access' => [
-				'class' => 'common\behaviors\GlobalAccessBehavior',
-				'rules' => [
-					[
-						'allow' => true,
-						'roles' => ['administrator'],
-					],
-				],
-			],
-		],
-		'rbac' => [
-			'class' => 'developeruz\db_rbac\Yii2DbRbac',
 			'as access' => [
 				'class' => 'common\behaviors\GlobalAccessBehavior',
 				'rules' => [

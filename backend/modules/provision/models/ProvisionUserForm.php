@@ -4,7 +4,7 @@ namespace backend\modules\provision\models;
 
 use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionUser;
-use common\models\User;
+use common\models\user\Worker;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
@@ -18,7 +18,7 @@ class ProvisionUserForm extends Model {
 	private $types;
 
 	/**
-	 * @var User
+	 * @var Worker
 	 */
 	private $user;
 
@@ -27,12 +27,12 @@ class ProvisionUserForm extends Model {
 	 */
 	private $models;
 
-	public function __construct(User $user, $config = []) {
+	public function __construct(Worker $user, $config = []) {
 		$this->user = $user;
 		parent::__construct($config);
 	}
 
-	public function getUser(): User {
+	public function getUser(): Worker {
 		return $this->user;
 	}
 

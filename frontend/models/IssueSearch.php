@@ -1,16 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: edzima
- * Date: 2019-04-13
- * Time: 14:34
- */
 
 namespace frontend\models;
 
-use common\models\issue\IssueSearch as BaseIssueSearch;
 use common\models\issue\Issue;
-use common\models\User;
+use common\models\issue\IssueSearch as BaseIssueSearch;
+use common\models\user\Worker;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
 
@@ -124,9 +118,9 @@ class IssueSearch extends BaseIssueSearch {
 
 	public function getAgentsList(): array {
 		if ($this->isTele || $this->isLawyer) {
-			return User::getSelectList([User::ROLE_AGENT, User::ROLE_ISSUE]);
+			return Worker::getSelectList([Worker::ROLE_AGENT, Worker::ROLE_ISSUE]);
 		}
-		return User::getSelectList([], true, function (Query $query) {
+		return Worker::getSelectList([], true, function (Query $query) {
 			$query->andWhere(['id' => $this->agents]);
 		});
 	}

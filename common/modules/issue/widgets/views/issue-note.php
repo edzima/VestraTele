@@ -1,7 +1,7 @@
 <?php
 
 use common\models\issue\IssueNote;
-use common\models\User;
+use common\models\user\Worker;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
@@ -20,7 +20,7 @@ use yii\helpers\Html;
 	</div>
 	<div class="panel-footer">
 		<span class="date pull-left"><?= $model->updated_at ?></span>
-		<?php if ($model->user_id === Yii::$app->user->id || Yii::$app->user->can(User::ROLE_MANAGER)): ?>
+		<?php if ($model->user_id === Yii::$app->user->id || Yii::$app->user->can(Worker::ROLE_MANAGER)): ?>
 			<span class="action pull-right">
 				<?= Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['note/update', 'id' => $model->id]) ?>
 				<?= $removeBtn ? Html::a('<i class="glyphicon glyphicon-trash"></i>', ['note/delete', 'id' => $model->id], [

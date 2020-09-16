@@ -1,7 +1,7 @@
 <?php
 
-use backend\modules\address\widgets\AddressFormWidget;
 use backend\modules\issue\models\MeetForm;
+use common\widgets\address\AddressFormWidget;
 use common\widgets\DateTimeWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;

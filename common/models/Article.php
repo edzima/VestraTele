@@ -8,6 +8,7 @@ use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use common\models\query\ArticleQuery;
+use common\models\user\User;
 
 /**
  * This is the model class for table "{{%article}}".

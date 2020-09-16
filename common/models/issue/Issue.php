@@ -3,14 +3,13 @@
 namespace common\models\issue;
 
 use common\behaviors\DateIDBehavior;
-use common\models\address\Address;
+use common\models\address\Address as LegacyAddress;
 use common\models\address\City;
 use common\models\address\Province;
 use common\models\address\State;
 use common\models\address\SubProvince;
 use common\models\entityResponsible\EntityResponsible;
-
-use common\models\User;
+use common\models\user\Worker;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -60,9 +59,9 @@ use yii\db\Expression;
  * @property int $clientProvinceId
  * @property City $clientCity
  * @property City $victimCity
- * @property User $agent
- * @property User $lawyer
- * @property User|null $tele
+ * @property Worker $agent
+ * @property Worker $lawyer
+ * @property Worker|null $tele
  * @property IssuePay[] $pays
  * @property EntityResponsible $entityResponsible
  * @property IssueStage $stage
@@ -77,9 +76,9 @@ class Issue extends ActiveRecord {
 
 	private const DEFAULT_PROVISION = Provision::TYPE_PERCENTAGE;
 
-	/* @var Address */
+	/* @var LegacyAddress */
 	private $clientAddress;
-	/* @var Address */
+	/* @var LegacyAddress */
 	private $victimAddress;
 
 	/* @var Provision */
@@ -106,29 +105,13 @@ class Issue extends ActiveRecord {
 		];
 	}
 
-	public function beforeValidate() {
-//		$this->client_city_id = $this->getClientAddress()->cityId;
-//		$this->client_street = $this->getClientAddress()->street;
-//		$this->client_city_code = $this->getClientAddress()->cityCode;
-		return parent::beforeValidate();
-	}
-
 	public function beforeSave($insert) {
 		if (isset($this->dirtyAttributes['stage_id'])) {
+			//@todo add test, why only on empty
 			if (empty($this->stage_change_at)) {
 				$this->stage_change_at = date(DATE_ATOM);
 			}
 		}
-		$this->client_city_id = $this->getClientAddress()->cityId;
-		$this->client_city_code = $this->getClientAddress()->cityCode;
-		$this->client_subprovince_id = $this->getClientAddress()->subProvinceId;
-		$this->client_street = $this->getClientAddress()->street;
-
-		$this->victim_city_id = $this->getVictimAddress()->cityId !== $this->client_city_id ? $this->getVictimAddress()->cityId : null;
-		$this->victim_city_code = $this->getVictimAddress()->cityCode !== $this->client_city_code ? $this->getVictimAddress()->cityCode : null;
-		$this->victim_subprovince_id = $this->getVictimAddress()->subProvinceId !== $this->client_subprovince_id ? $this->getVictimAddress()->subProvinceId : null;
-		$this->victim_street = $this->getVictimAddress()->street !== $this->client_street ? $this->getVictimAddress()->street : null;
-
 		return parent::beforeSave($insert);
 	}
 
@@ -164,9 +147,9 @@ class Issue extends ActiveRecord {
 			[['victim_first_name', 'victim_surname', 'victim_phone', 'victim_email', 'victim_city_id', 'victim_street'], 'default', 'value' => null],
 			[['archives_nr'], 'string', 'max' => 10],
 			[['details'], 'string'],
-			[['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['agent_id' => 'id']],
-			[['lawyer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['lawyer_id' => 'id']],
-			[['tele_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['tele_id' => 'id']],
+			[['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['agent_id' => 'id']],
+			[['lawyer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['lawyer_id' => 'id']],
+			[['tele_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['tele_id' => 'id']],
 			[['client_city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['client_city_id' => 'id']],
 			[['entity_responsible_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_responsible_id' => 'id']],
 			[['stage_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueStage::class, 'targetAttribute' => ['stage_id' => 'id']],
@@ -195,7 +178,7 @@ class Issue extends ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
 			'longId' => 'ID',
@@ -254,9 +237,9 @@ class Issue extends ActiveRecord {
 		return $this->hasOne(Province::class, ['id' => 'powiat_id', 'wojewodztwo_id' => 'wojewodztwo_id'])->via('clientCity');
 	}
 
-	public function getClientAddress(): Address {
+	public function getClientAddress(): LegacyAddress {
 		if ($this->clientAddress === null) {
-			$address = new Address();
+			$address = new LegacyAddress();
 			$address->formName = 'clientAddress';
 			if ($this->clientCity) {
 				$address->setCity($this->clientCity);
@@ -274,9 +257,9 @@ class Issue extends ActiveRecord {
 		return $this->clientAddress;
 	}
 
-	public function getVictimAddress(): Address {
+	public function getVictimAddress(): LegacyAddress {
 		if ($this->victimAddress === null) {
-			$address = new Address();
+			$address = new LegacyAddress();
 			if ($this->victimCity) {
 				$address->setCity($this->victimCity);
 			} elseif ($this->clientCity) {
@@ -355,7 +338,7 @@ class Issue extends ActiveRecord {
 	}
 
 	public function getAgent() {
-		return $this->hasOne(User::class, ['id' => 'agent_id']);
+		return $this->hasOne(Worker::class, ['id' => 'agent_id']);
 	}
 
 	/**
@@ -431,11 +414,11 @@ class Issue extends ActiveRecord {
 	}
 
 	public function getLawyer() {
-		return $this->hasOne(User::class, ['id' => 'lawyer_id']);
+		return $this->hasOne(Worker::class, ['id' => 'lawyer_id']);
 	}
 
 	public function getTele() {
-		return $this->hasOne(User::class, ['id' => 'tele_id']);
+		return $this->hasOne(Worker::class, ['id' => 'tele_id']);
 	}
 
 	public function hasTele(): bool {

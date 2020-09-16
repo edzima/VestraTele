@@ -1,7 +1,7 @@
 <?php
 
 use backend\widgets\Menu;
-use common\models\User;
+use common\models\user\User;
 
 /* @var $this \yii\web\View */
 
@@ -18,10 +18,22 @@ $user = Yii::$app->user;
 				],
 				[
 					'label' => Yii::t('backend', 'Users'),
-					'url' => ['/user/index'],
+					'url' => ['/user/user/index'],
 					'icon' => '<i class="fa fa-users"></i>',
 					'visible' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
 				],
+				[
+					'label' => Yii::t('backend', 'Workers'),
+					'url' => ['/user/worker/index'],
+					'icon' => '<i class="fa fa-users"></i>',
+					'visible' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+				],
+				[
+					'label' => Yii::t('backend', 'Customers'),
+					'url' => ['/user/customer/index'],
+					'icon' => '<i class="fa fa-users"></i>',
+				],
+
 				[
 					'label' => Yii::t('backend', 'Articles'),
 					'url' => '#',
@@ -160,18 +172,6 @@ $user = Yii::$app->user;
 							'visible' => $user->can(User::ROLE_BOOKKEEPER_DELAYED),
 
 						],
-					],
-				],
-				[
-					'label' => 'Terytorium',
-					'url' => '#',
-					'icon' => '<i class="fa fa-home"></i>',
-					'options' => ['class' => 'treeview'],
-					'items' => [
-						['label' => Yii::t('address', 'States'), 'url' => ['/address/state/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-						['label' => Yii::t('address', 'Provinces'), 'url' => ['/address/province/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-						['label' => Yii::t('address', 'SubProvinces'), 'url' => ['/address/sub-province/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-						['label' => Yii::t('address', 'Cities'), 'url' => ['/address/city/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 					],
 				],
 				[

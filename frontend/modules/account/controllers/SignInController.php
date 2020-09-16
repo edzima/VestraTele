@@ -3,13 +3,13 @@
 namespace frontend\modules\account\controllers;
 
 use Yii;
-use yii\base\InvalidParamException;
+use yii\base\InvalidArgumentException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
-use common\models\LoginForm;
-use common\models\User;
+use common\models\user\LoginForm;
+use common\models\user\User;
 use frontend\modules\account\models\PasswordResetRequestForm;
 use frontend\modules\account\models\ResetPasswordForm;
 use frontend\modules\account\models\SignupForm;
@@ -26,7 +26,7 @@ class SignInController extends Controller
     {
         return [
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'actions' => ['login', 'signup', 'confirm-email', 'request-password-reset', 'reset-password'],
@@ -48,7 +48,7 @@ class SignInController extends Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'logout' => ['post'],
                 ],
@@ -183,7 +183,7 @@ class SignInController extends Controller
     {
         try {
             $model = new ResetPasswordForm($token);
-        } catch (InvalidParamException $e) {
+        } catch (InvalidArgumentException $e) {
             throw new BadRequestHttpException($e->getMessage());
         }
 

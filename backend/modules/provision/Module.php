@@ -8,7 +8,7 @@
 
 namespace backend\modules\provision;
 
-use common\models\User;
+use common\models\user\Worker;
 use yii\base\Module as BaseModule;
 use yii\filters\AccessControl;
 
@@ -23,7 +23,7 @@ class Module extends BaseModule {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [User::ROLE_BOOKKEEPER],
+						'roles' => [Worker::ROLE_BOOKKEEPER],
 					],
 				],
 			],

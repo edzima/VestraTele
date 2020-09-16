@@ -3,7 +3,7 @@
 namespace frontend\controllers;
 
 use common\models\CalendarNews;
-use common\models\User;
+use common\models\user\User;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -33,9 +33,9 @@ class CalendarNoteController extends Controller {
 
 	public function actionList(string $start = null, string $end = null, int $agentId = null): Response {
 		if ($agentId === null) {
-			$agentId = Yii::$app->user->getId();
+			$agentId = (int) Yii::$app->user->getId();
 		}
-		if ($agentId !== Yii::$app->user->getId() && !Yii::$app->user->can(User::ROLE_MANAGER)) {
+		if ($agentId !== (int) Yii::$app->user->getId() && !Yii::$app->user->can(User::ROLE_MANAGER)) {
 			throw new MethodNotAllowedHttpException();
 		}
 		if ($start === null) {
@@ -44,19 +44,19 @@ class CalendarNoteController extends Controller {
 		if ($end === null) {
 			$end = date('Y-m-t 23:59:59');
 		}
-
+		/** @var CalendarNews[] $models */
 		$models = CalendarNews::find()
 			->andWhere(['agent_id' => $agentId])
-			->andWhere(['>=', 'start', $start])
-			->andWhere(['<=', 'end', $end])
+			->andWhere(['>=', 'start_at', $start])
+			->andWhere(['<=', 'end_at', $end])
 			->all();
 		$data = [];
 		foreach ($models as $model) {
 			$data[] = [
 				'id' => $model->id,
-				'title' => $model->news,
-				'start' => $model->start,
-				'end' => $model->end,
+				'title' => $model->text,
+				'start' => $model->start_at,
+				'end' => $model->end_at,
 			];
 		}
 
@@ -65,9 +65,9 @@ class CalendarNoteController extends Controller {
 
 	public function actionAdd(int $agent_id, string $news, string $date): Response {
 		$model = new CalendarNews();
-		$model->agent_id = $agent_id;
-		$model->news = $news;
-		$model->start = $date;
+		$model->user_id = $agent_id;
+		$model->text = $news;
+		$model->start_at = $date;
 		if ($model->save()) {
 			return $this->asJson([
 				'id' => $model->id,

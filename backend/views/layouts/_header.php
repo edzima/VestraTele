@@ -15,8 +15,9 @@ use yii\bootstrap\Html;
 
 				<li class="dropdown user user-menu">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						<?php if (Yii::$app->user->identity->userProfile->avatar_path) : ?>
-							<img src="<?= Yii::getAlias('@storageUrl/avatars/' . Yii::$app->user->identity->userProfile->avatar_path) ?>" class="user-image" alt>
+						<?php if (Yii::$app->user->identity->profile->avatar_path) : ?>
+							<img src="<?= Yii::getAlias('@storageUrl/avatars/' . Yii::$app->user->identity->profile->avatar_path) ?>"
+							     class="user-image" alt>
 						<?php else: ?>
 							<img src="<?= Yii::$app->homeUrl . '/static/img/default.png' ?>" class="user-image" alt>
 						<?php endif ?>
@@ -24,8 +25,9 @@ use yii\bootstrap\Html;
 					</a>
 					<ul class="dropdown-menu">
 						<li class="user-header">
-							<?php if (Yii::$app->user->identity->userProfile->avatar_path) : ?>
-								<img src="<?= Yii::getAlias('@storageUrl/avatars/' . Yii::$app->user->identity->userProfile->avatar_path) ?>" class="img-circle" alt>
+							<?php if (Yii::$app->user->identity->profile->avatar_path) : ?>
+								<img src="<?= Yii::getAlias('@storageUrl/avatars/' . Yii::$app->user->identity->profile->avatar_path) ?>"
+								     class="img-circle" alt>
 							<?php else: ?>
 								<img src="<?= Yii::$app->homeUrl . '/static/img/default.png' ?>" class="img-circle" alt>
 							<?php endif ?>

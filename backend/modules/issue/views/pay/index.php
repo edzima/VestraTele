@@ -5,7 +5,7 @@ use backend\modules\issue\models\searches\IssuePaySearch;
 use backend\widgets\CsvForm;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
-use common\models\User;
+use common\models\user\Worker;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
@@ -79,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'template' => '{pay}{status}',
 				'buttons' => [
 					'pay' => static function ($url, IssuePay $model): string {
-						if (Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
+						if (Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)) {
 							return Html::a(
 								'<span class="glyphicon glyphicon-check" aria-hidden="true"></span>',
 								Url::toRoute(['pay', 'id' => $model->id]),

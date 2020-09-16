@@ -7,7 +7,7 @@ use common\models\issue\IssuePay;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionUser;
-use common\models\User;
+use common\models\user\Worker;
 use Yii;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
@@ -34,7 +34,7 @@ class Provisions extends Component {
 		Provision::deleteAll(['pay_id' => ArrayHelper::getColumn($issue->pays, 'id')]);
 	}
 
-	public function hasAllProvisions(User $user): bool {
+	public function hasAllProvisions(Worker $user): bool {
 		$typesIds = $this->getTypesIdsForUser($user->id);
 		$toUserIds = $user->getParentsIds();
 		$toUserIds[] = $user->id;
@@ -54,19 +54,19 @@ class Provisions extends Component {
 	public function getIssueUsersProvisions(Issue $issue): array {
 		$provisions = $this->issueProvisions($issue);
 		return [
-			'agent' => $this->userFilter($this->roleFilter($provisions, User::ROLE_AGENT), $issue->agent_id),
-			'lawyer' => $this->userFilter($this->roleFilter($provisions, User::ROLE_LAWYER), $issue->lawyer_id),
-			'tele' => ($issue->hasTele() ? $this->userFilter($this->roleFilter($provisions, User::ROLE_TELEMARKETER), $issue->tele_id) : []),
+			'agent' => $this->userFilter($this->roleFilter($provisions, Worker::ROLE_AGENT), $issue->agent_id),
+			'lawyer' => $this->userFilter($this->roleFilter($provisions, Worker::ROLE_LAWYER), $issue->lawyer_id),
+			'tele' => ($issue->hasTele() ? $this->userFilter($this->roleFilter($provisions, Worker::ROLE_TELEMARKETER), $issue->tele_id) : []),
 		];
 	}
 
 	/**
-	 * @param User $user
+	 * @param Worker $user
 	 * @param int $typeId
 	 * @param IssuePay[] $pays
 	 * @return int
 	 */
-	public function add(User $user, int $typeId, array $pays): int {
+	public function add(Worker $user, int $typeId, array $pays): int {
 		$usersProvision = ProvisionUser::find()
 			->andWhere(['from_user_id' => $user->id])
 			->andWhere(['type_id' => $typeId])

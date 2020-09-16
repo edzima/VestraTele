@@ -3,11 +3,8 @@
 namespace frontend\tests\unit\models;
 
 use Codeception\Test\Unit;
-use Codeception\Util\Debug;
 use common\fixtures\UserFixture;
 use frontend\models\ResendVerificationEmailForm;
-use yii\helpers\Html;
-use yii\mail\MessageInterface;
 
 class ResendVerificationEmailFormTest extends Unit {
 
@@ -19,7 +16,7 @@ class ResendVerificationEmailFormTest extends Unit {
 	public function _before() {
 		$this->tester->haveFixtures([
 			'user' => [
-				'class' => UserFixture::className(),
+				'class' => UserFixture::class,
 				'dataFile' => codecept_data_dir() . 'user.php',
 			],
 		]);

@@ -3,7 +3,7 @@
 namespace frontend\controllers;
 
 use common\models\issue\IssueMeet;
-use common\models\User;
+use common\models\user\Worker;
 use frontend\models\AgentMeetCalendarSearch;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
@@ -26,7 +26,7 @@ class MeetCalendarController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [User::ROLE_MEET, User::ROLE_AGENT],
+						'roles' => [Worker::ROLE_MEET, Worker::ROLE_AGENT],
 					],
 				],
 			],
@@ -48,12 +48,12 @@ class MeetCalendarController extends Controller {
 
 	public function actionIndex(int $agentId = null): string {
 		if ($agentId === null) {
-			$agentId = Yii::$app->user->getId();
+			$agentId = (int) Yii::$app->user->getId();
 		}
 
 		$agents = [];
-		if (Yii::$app->user->can(User::ROLE_MANAGER)) {
-			$agents = User::find()
+		if (Yii::$app->user->can(Worker::ROLE_MANAGER)) {
+			$agents = Worker::find()
 				->with('userProfile')
 				->leftJoin('issue_meet', 'user.id = issue_meet.agent_id')
 				->where('issue_meet.agent_id IS NOT NULL')
@@ -73,7 +73,7 @@ class MeetCalendarController extends Controller {
 			$agentId = Yii::$app->user->getId();
 		}
 
-		if ($agentId !== Yii::$app->user->getId() && !Yii::$app->user->can(User::ROLE_MANAGER)) {
+		if ($agentId !== Yii::$app->user->getId() && !Yii::$app->user->can(Worker::ROLE_MANAGER)) {
 			throw new MethodNotAllowedHttpException();
 		}
 		if ($start === null) {

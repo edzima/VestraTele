@@ -2,7 +2,7 @@
 
 namespace common\models\provision;
 
-use common\models\User;
+use common\models\user\Worker;
 use yii\db\ActiveRecord;
 
 /**
@@ -13,8 +13,8 @@ use yii\db\ActiveRecord;
  * @property int $type_id
  * @property string $value
  *
- * @property User $fromUser
- * @property User $toUser
+ * @property Worker $fromUser
+ * @property Worker $toUser
  * @property ProvisionType $type
  *
  * @property-read string $typeWithValue
@@ -37,8 +37,8 @@ class ProvisionUser extends ActiveRecord {
 			[['from_user_id', 'to_user_id', 'type_id'], 'integer'],
 			[['value'], 'number', 'min' => 0],
 			[['from_user_id', 'to_user_id', 'type_id'], 'unique', 'targetAttribute' => ['from_user_id', 'to_user_id', 'type_id']],
-			[['from_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['from_user_id' => 'id']],
-			[['to_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['to_user_id' => 'id']],
+			[['from_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['from_user_id' => 'id']],
+			[['to_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['to_user_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ProvisionType::class, 'targetAttribute' => ['type_id' => 'id']],
 		];
 	}
@@ -60,14 +60,14 @@ class ProvisionUser extends ActiveRecord {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getFromUser() {
-		return $this->hasOne(User::class, ['id' => 'from_user_id']);
+		return $this->hasOne(Worker::class, ['id' => 'from_user_id']);
 	}
 
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getToUser() {
-		return $this->hasOne(User::class, ['id' => 'to_user_id']);
+		return $this->hasOne(Worker::class, ['id' => 'to_user_id']);
 	}
 
 	/**
@@ -93,7 +93,6 @@ class ProvisionUser extends ActiveRecord {
 	public function getFormattedValue(): string {
 		return $this->type->getFormattedValue($this->value);
 	}
-
 
 	public static function find(): ProvisionUserQuery {
 		return new ProvisionUserQuery(static::class);

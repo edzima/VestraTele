@@ -4,7 +4,7 @@ namespace backend\modules\provision\models;
 
 use common\models\issue\IssueType;
 use common\models\provision\ProvisionType;
-use common\models\User;
+use common\models\user\Worker;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
@@ -87,9 +87,9 @@ class ProvisionTypeForm extends Model {
 
 	public static function getRolesNames(): array {
 		return [
-			User::ROLE_AGENT => 'Agent',
-			User::ROLE_TELEMARKETER => 'Tele',
-			User::ROLE_LAWYER => 'Prawnik',
+			Worker::ROLE_AGENT => 'Agent',
+			Worker::ROLE_TELEMARKETER => 'Tele',
+			Worker::ROLE_LAWYER => 'Prawnik',
 		];
 	}
 

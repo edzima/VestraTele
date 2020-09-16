@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $user common\models\User */
+/* @var $user common\models\user\User */
 
 $activationLink = Yii::$app->urlManager->createAbsoluteUrl(['account/sign-in/confirm-email', 'id' => $user->id, 'token' => $user->access_token]);
 ?>

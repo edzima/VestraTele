@@ -2,48 +2,56 @@
 
 namespace common\models;
 
+use common\models\user\query\UserQuery;
+use common\models\user\User;
 use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "calendar_news".
  *
  * @property int $id
- * @property string $news
- * @property int $agent_id
- * @property string $start
- * @property string $end
+ * @property string $text
+ * @property int $user_id
+ * @property string $start_at
+ * @property string $end_at
+ *
+ * @property-read User $user
  */
 class CalendarNews extends ActiveRecord {
 
 	/**
 	 * @inheritdoc
 	 */
-	public static function tableName() {
-		return 'calendar_news';
+	public static function tableName(): string {
+		return '{{%calendar_news}}';
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
-			[['news', 'agent_id'], 'required'],
-			[['news'], 'string'],
-			[['agent_id'], 'integer'],
-			[['start', 'end'], 'safe'],
+			[['text', 'user_id'], 'required'],
+			[['text'], 'string'],
+			[['user_id'], 'integer'],
+			[['start_at', 'end_at'], 'safe'],
 		];
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'news' => 'News',
-			'agent_id' => 'Agent ID',
-			'start' => 'Start',
-			'end' => 'End',
+			'text' => 'Text',
+			'user_id' => 'User',
+			'start_at' => 'Start',
+			'end_at' => 'End',
 		];
+	}
+
+	public function getUser(): UserQuery {
+		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
 }

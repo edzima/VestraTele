@@ -1,15 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: edzima
- * Date: 2019-04-14
- * Time: 22:51
- */
 
 namespace common\modules\issue\widgets;
 
 use common\models\issue\IssuePay;
-use common\models\User;
+use common\models\user\Worker;
 use Yii;
 use yii\base\Widget;
 use yii\data\ActiveDataProvider;
@@ -20,7 +14,7 @@ class IssuePaysWidget extends Widget {
 	public $models;
 
 	/**
-	 * @var User
+	 * @var Worker
 	 */
 	public $user;
 
@@ -31,7 +25,7 @@ class IssuePaysWidget extends Widget {
 			return $this->render('issue-pays', [
 				'models' => $this->models,
 				'widget' => $this,
-				'withProvisions' => Yii::$app->user->can(User::ROLE_BOOKKEEPER) || !empty($this->user),
+				'withProvisions' => Yii::$app->user->can(Worker::ROLE_BOOKKEEPER) || !empty($this->user),
 			]);
 		}
 	}
@@ -41,7 +35,7 @@ class IssuePaysWidget extends Widget {
 			->with('toUser.userProfile')
 			->with('fromUser.userProfile')
 			->with('pay');
-		if ($this->user instanceof User) {
+		if ($this->user instanceof Worker) {
 			$userIds = $this->user->getAllChildesIds();
 			$userIds[] = $this->user->id;
 			$query->andWhere(['from_user_id' => $userIds]);

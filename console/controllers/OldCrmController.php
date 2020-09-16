@@ -5,7 +5,7 @@ namespace console\controllers;
 use common\models\issue\Issue;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\IssueNote;
-use common\models\User;
+use common\models\user\User;
 use console\components\oldCrmData\IssueNoteDataTransfer;
 use yii\console\Controller;
 use console\components\oldCrmData\FixtureMigration;
