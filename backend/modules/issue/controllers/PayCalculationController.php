@@ -5,7 +5,7 @@ namespace backend\modules\issue\controllers;
 use backend\modules\issue\models\PayCalculationForm;
 use backend\modules\issue\models\searches\NewPayCalculationSearch;
 use common\models\issue\Issue;
-use common\models\User;
+use common\models\user\Worker;
 use Yii;
 use common\models\issue\IssuePayCalculation;
 use backend\modules\issue\models\searches\IssuePayCalculationSearch;
@@ -35,12 +35,12 @@ class PayCalculationController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [User::ROLE_BOOKKEEPER],
+						'roles' => [Worker::ROLE_BOOKKEEPER],
 					],
 					[
 						'allow' => true,
 						'actions' => ['view'],
-						'roles' => [User::ROLE_BOOKKEEPER_DELAYED],
+						'roles' => [Worker::ROLE_BOOKKEEPER_DELAYED],
 					],
 				],
 			],

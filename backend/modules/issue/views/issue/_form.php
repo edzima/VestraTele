@@ -1,6 +1,5 @@
 <?php
 
-use common\modules\address\widgets\AddressFormWidget;
 use common\models\issue\Issue;
 use common\models\issue\Provision;
 use common\widgets\DateTimeWidget;
@@ -17,7 +16,6 @@ use backend\modules\issue\models\IssueForm;
 /* @var $form yii\widgets\ActiveForm */
 
 ?>
-
 	<div class="issue-form">
 
 		<?php $form = ActiveForm::begin(); ?>
@@ -113,121 +111,6 @@ use backend\modules\issue\models\IssueForm;
 		</div>
 
 		<?= $form->field($model, 'details')->textarea(['rows' => 10, 'maxlength' => true]) ?>
-
-		<div class="row">
-			<fieldset class="col-md-6 client-fieldset">
-				<style>
-					.client-fieldset {
-						position: relative;
-					}
-
-					.client-fieldset .copy-btn {
-						position: absolute;
-						right: 15px;
-						top: -48px;
-					}
-				</style>
-				<legend>Dane klienta</legend>
-				<?= Html::button('Copy', ['class' => 'copy-btn', 'data-copy' => 'data-victim-input']); ?>
-				<div class="row">
-					<?= $form->field(
-						$model,
-						'client_first_name', [
-						'options' => [
-							'class' => 'col-md-6',
-						],
-					])->textInput(
-						[
-							'maxlength' => true,
-							'data-victim-input' => Html::getInputName($model, 'victim_first_name'),
-						]) ?>
-
-					<?= $form->field(
-						$model,
-						'client_surname', [
-						'options' => [
-							'class' => 'col-md-6',
-						],
-					])->textInput([
-						'maxlength' => true,
-						'data-victim-input' => Html::getInputName($model, 'victim_surname'),
-					]) ?>
-				</div>
-				<div class="row">
-					<?= $form->field(
-						$model,
-						'client_phone_1', [
-						'options' => [
-							'class' => 'col-md-6',
-						],
-					])->textInput([
-						'maxlength' => true,
-						'data-victim-input' => Html::getInputName($model, 'victim_phone'),
-					]) ?>
-
-					<?= $form->field(
-						$model,
-						'client_phone_2', [
-						'options' => [
-							'class' => 'col-md-6',
-						],
-					])->textInput(['maxlength' => true]) ?>
-				</div>
-				<div class="row">
-					<?= $form->field(
-						$model,
-						'client_email', [
-						'options' => [
-							'class' => 'col-md-12',
-						],
-					])->textInput([
-						'maxlength' => true,
-						'data-victim-input' => Html::getInputName($model, 'victim_email'),
-					]) ?>
-				</div>
-				<?= AddressFormWidget::widget([
-					'form' => $form,
-					'model' => $model->getClientAddress(),
-					'copyOptions' => [
-						'data-selector' => 'data-victim-input',
-						'inputs' => [
-							'state' => Html::getInputName($model->getVictimAddress(), 'stateId'),
-							'province' => Html::getInputName($model->getVictimAddress(), 'provinceId'),
-							'subProvince' => Html::getInputName($model->getVictimAddress(), 'subProvinceId'),
-							'city' => Html::getInputName($model->getVictimAddress(), 'cityId'),
-							'cityCode' => Html::getInputName($model->getVictimAddress(), 'cityCode'),
-							'street' => Html::getInputName($model->getVictimAddress(), 'street'),
-						],
-					],
-				])
-				?>
-
-			</fieldset>
-
-			<fieldset class="col-md-6">
-				<legend>Dane poszkodowanego</legend>
-
-				<div class="row">
-					<?= $form->field($model, 'victim_first_name', ['options' => ['class' => 'col-md-6']])->textInput(['maxlength' => true]) ?>
-
-					<?= $form->field($model, 'victim_surname', ['options' => ['class' => 'col-md-6']])->textInput(['maxlength' => true]) ?>
-				</div>
-				<div class="row">
-					<?= $form->field($model, 'victim_phone', ['options' => ['class' => 'col-md-12']])->textInput(['maxlength' => true]) ?>
-				</div>
-				<div class="row">
-					<?= $form->field($model, 'victim_email', ['options' => ['class' => 'col-md-12']])->textInput(['maxlength' => true]) ?>
-				</div>
-
-
-				<?= AddressFormWidget::widget([
-					'form' => $form,
-					'model' => $model->getVictimAddress(),
-				])
-				?>
-			</fieldset>
-		</div>
-
 
 		<fieldset>
 			<legend>Prowizja</legend>
@@ -334,24 +217,6 @@ typeInput.onchange= function(){
 		accidentAtInput.classList.add('hidden');
 	}
 };
-
-document.querySelector('.client-fieldset .copy-btn').addEventListener('click', function(evt) {
-	let attributeName = evt.currentTarget.getAttribute('data-copy');
-    let parentFields = document.querySelectorAll('['+attributeName +']');
-    for(let i =0, field; !!(field = parentFields[i]); i++){
-    	let toCopyField = document.querySelector("[name='"+field.getAttribute(attributeName) +"']");
-		if(toCopyField.value !== field.value){
-			toCopyField.value = field.value;
-			let toCopy = $(toCopyField);
-			toCopy.trigger('change');
-            if(toCopyField instanceof HTMLSelectElement){
-       	        toCopy.trigger('select2:select');
-            }
-		}
-    
-     
-    }
-});
 
 
 

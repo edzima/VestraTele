@@ -3,7 +3,7 @@
 use backend\widgets\CsvForm;
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch;
-use common\models\User;
+use common\models\user\Worker;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
@@ -119,7 +119,7 @@ $this->registerJs($js);
 				'filterType' => GridView::FILTER_SELECT2,
 				'attribute' => 'agent_id',
 				'value' => 'agent',
-				'filter' => User::getSelectList([User::ROLE_AGENT]),
+				'filter' => Worker::getSelectList([Worker::ROLE_AGENT]),
 				'filterWidgetOptions' => [
 					'pluginOptions' => [
 						'allowClear' => true,

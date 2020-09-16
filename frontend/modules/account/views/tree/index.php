@@ -1,6 +1,6 @@
 <?php
 
-use common\models\User;
+use common\models\user\Worker;
 use kartik\grid\GridView;
 use yii\helpers\Html;
 
@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'format' => 'raw',
 				'attribute' => 'fullName',
-				'value' => function (User $data) {
+				'value' => static function (Worker $data) {
 					return Html::a($data->getFullName(), ['update', 'id' => $data->id], ['target' => '_blank']);
 				},
 			],

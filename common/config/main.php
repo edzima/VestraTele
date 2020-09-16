@@ -4,21 +4,22 @@ use common\components\DbManager;
 use common\components\Provisions;
 use common\components\TaxComponent;
 use common\formatters\Formatter;
-use yii\caching\DummyCache;
-use yii\caching\FileCache;
 use common\modules\address\Module as AddressModule;
 use edzima\teryt\Module as TerytModule;
+use yii\caching\DummyCache;
+use yii\caching\FileCache;
 
 return [
-	'name' => 'Vestra System',
+	'name' => 'Vestra CRM',
 	'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
 
 	'extensions' => require(__DIR__ . '/../../vendor/yiisoft/extensions.php'),
 	'timeZone' => 'Europe/Warsaw',
 	'sourceLanguage' => 'en-US',
-	'language' => 'pl-PL',
+	'language' => 'pl',
 	'bootstrap' => [
 		'log',
+		'teryt',
 	],
 	'aliases' => [
 		'@bower' => '@vendor/bower-asset',
@@ -68,7 +69,7 @@ return [
 					'class' => 'yii\log\DbTarget',
 					'levels' => ['error', 'warning'],
 					'except' => ['yii\web\HttpException:*', 'yii\i18n\*'],
-					'prefix' => function () {
+					'prefix' => static function (): string {
 						$url = !Yii::$app->request->isConsoleRequest ? Yii::$app->request->getUrl() : null;
 
 						return sprintf('[%s][%s]', Yii::$app->id, $url);

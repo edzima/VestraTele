@@ -1,13 +1,12 @@
 <?php
 
+use common\models\user\UserProfile;
+use common\widgets\DateTimeWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use common\models\UserProfile;
-use trntv\yii\datetime\DateTimeWidget;
-use vova07\fileapi\Widget;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\UserProfile */
+/* @var $model UserProfile */
 /* @var $form yii\widgets\ActiveForm */
 
 $this->title = Yii::t('frontend', 'Nowe spotkanie');
@@ -23,28 +22,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= $form->field($model, 'lastname')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'birthday')->widget(
-		DateTimeWidget::className(),
-		[
-			'phpDatetimeFormat' => 'yyyy-MM-dd\'T\'HH:mm:ssZZZZZ',
-		]
-	) ?>
-
-	<?= $form->field($model, 'avatar_path')->widget(
-		Widget::className(),
-		[
-			'settings' => [
-				'url' => ['/site/fileapi-upload'],
-			],
-			'crop' => true,
-			'cropResizeWidth' => 100,
-			'cropResizeHeight' => 100,
-		]
-	) ?>
+	<?= $form->field($model, 'birthday')->widget(DateTimeWidget::class) ?>
 
 	<?= $form->field($model, 'gender')->dropDownlist(UserProfile::getGendersNames(), ['prompt' => '']) ?>
-
-	<?= $form->field($model, 'website')->textInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'other')->textarea(['rows' => 6]) ?>
 

@@ -1,25 +1,20 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: edzima
- * Date: 2019-04-16
- * Time: 09:24
- */
 
 namespace frontend\modules\account\controllers;
 
-use common\models\User;
+use common\models\user\Worker;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 class TreeController extends Controller {
 
 	/**
 	 * @inheritdoc
 	 */
-	public function behaviors():array {
+	public function behaviors(): array {
 		return [
 			'access' => [
 				'class' => AccessControl::class,
@@ -34,10 +29,12 @@ class TreeController extends Controller {
 	}
 
 	public function actionIndex(): string {
-		/** @var User $user $user */
-		$user = Yii::$app->user->identity;
+		$worker = Worker::findOne(Yii::$app->user->id);
+		if (!$worker) {
+			throw new NotFoundHttpException('Only for worker.');
+		}
 		$dataProvider = new ActiveDataProvider([
-			'query' => $user->getAllChildesQuery()->with(['userProfile']),
+			'query' => $worker->getAllChildesQuery()->with(['userProfile']),
 		]);
 		return $this->render('index', [
 			'dataProvider' => $dataProvider,

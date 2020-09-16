@@ -2,15 +2,15 @@
 
 namespace common\models\issue;
 
-use common\models\address\Address;
+use common\models\Address;
+use common\models\address\Address as LegacyAddress;
 use common\models\address\City;
-use common\models\address\SubProvince;
 use common\models\address\Province;
-use common\models\Campaign;
-
-use common\models\query\UserQuery;
-use common\models\User;
 use common\models\address\State;
+use common\models\address\SubProvince;
+use common\models\Campaign;
+use common\models\user\query\UserQuery;
+use common\models\user\Worker;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -38,7 +38,7 @@ use yii\helpers\ArrayHelper;
  * @property int $campaign_id
  * @property string $email
  *
- * @property User $agent
+ * @property Worker $agent
  * @property IssueType $type
  * @property-read int $stateId
  * @property-read City $city
@@ -46,6 +46,8 @@ use yii\helpers\ArrayHelper;
  * @property-read Province $province
  * @property-read SubProvince $subProvince
  * @property-read Campaign $campaign
+ * @property-read MeetAddress[] $addresses
+ * @property-read Address|null $customerAddress
  */
 class IssueMeet extends ActiveRecord {
 
@@ -62,7 +64,7 @@ class IssueMeet extends ActiveRecord {
 	protected static $TYPES = [];
 
 	/**
-	 * @var Address
+	 * @var LegacyAddress
 	 */
 	private $address;
 
@@ -93,12 +95,12 @@ class IssueMeet extends ActiveRecord {
 			[['created_at', 'updated_at', 'date_at', 'date_end_at'], 'safe'],
 			[['details', 'street', 'email'], 'string'],
 			['email', 'email'],
-			[['phone'], 'string', 'max' =>20],
+			[['phone'], 'string', 'max' => 20],
 			[['client_name'], 'string', 'max' => 20],
 			[['client_surname'], 'string', 'max' => 30],
 			['status', 'in', 'range' => array_keys(static::getStatusNames())],
 			[['campaign_id'], 'exist', 'skipOnError' => true, 'targetClass' => Campaign::class, 'targetAttribute' => ['campaign_id' => 'id']],
-			[['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['agent_id' => 'id']],
+			[['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['agent_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueType::class, 'targetAttribute' => ['type_id' => 'id']],
 			[['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
 			[['sub_province_id'], 'exist', 'skipOnError' => true, 'targetClass' => SubProvince::class, 'targetAttribute' => ['sub_province_id' => 'id']],
@@ -137,9 +139,9 @@ class IssueMeet extends ActiveRecord {
 		];
 	}
 
-	public function getAddress(): Address {
+	public function getAddress(): LegacyAddress {
 		if ($this->address === null || $this->address->cityId !== $this->city_id) {
-			$address = new Address();
+			$address = new LegacyAddress();
 			if ($this->city) {
 				$address->setCity($this->city);
 			}
@@ -150,13 +152,6 @@ class IssueMeet extends ActiveRecord {
 			$this->address = $address;
 		}
 		return $this->address;
-	}
-
-	public function setAddress(Address $address): void {
-		$this->address = $address;
-		$this->city_id = $address->cityId;
-		$this->sub_province_id = $address->subProvinceId;
-		$this->street = $address->street;
 	}
 
 	public function getClientFullName(): string {
@@ -170,9 +165,17 @@ class IssueMeet extends ActiveRecord {
 		return 'Własna';
 	}
 
+	protected function getAddresses(): ActiveQuery {
+		return $this->hasMany(MeetAddress::class, ['meet_id' => 'id'])->indexBy('type');
+	}
+
+	public function getCustomerAddress(): ?Address {
+		return $this->addresses[MeetAddress::TYPE_CUSTOMER]->address ?? null;
+	}
+
 	public function getAgent(): UserQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		return $this->hasOne(User::class, ['id' => 'agent_id']);
+		return $this->hasOne(Worker::class, ['id' => 'agent_id']);
 	}
 
 	public function getType(): ActiveQuery {

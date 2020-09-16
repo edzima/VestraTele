@@ -3,17 +3,17 @@
 namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\searches\DelayedIssuePaySearch;
+use backend\modules\issue\models\searches\IssuePaySearch;
 use backend\widgets\CsvForm;
 use common\models\issue\Issue;
-use common\models\issue\IssuePayQuery;
-use common\models\User;
-use Yii;
 use common\models\issue\IssuePay;
-use backend\modules\issue\models\searches\IssuePaySearch;
+use common\models\issue\IssuePayQuery;
+use common\models\user\Worker;
+use Yii;
 use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 use yii2tech\csvgrid\CsvGrid;
 
 /**
@@ -37,12 +37,12 @@ class PayController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [User::ROLE_BOOKKEEPER],
+						'roles' => [Worker::ROLE_BOOKKEEPER],
 					],
 					[
 						'allow' => true,
 						'actions' => ['delayed', 'status'],
-						'roles' => [User::ROLE_BOOKKEEPER_DELAYED],
+						'roles' => [Worker::ROLE_BOOKKEEPER_DELAYED],
 					],
 				],
 			],
@@ -140,7 +140,7 @@ class PayController extends Controller {
 	public function actionStatus(int $id) {
 		$model = $this->findModel($id);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$this->redirect(Yii::$app->user->can(User::ROLE_BOOKKEEPER) ? 'index' : 'delayed');
+			$this->redirect(Yii::$app->user->can(Worker::ROLE_BOOKKEEPER) ? 'index' : 'delayed');
 		}
 		return $this->render('status', [
 			'model' => $model,

@@ -3,6 +3,7 @@
 namespace frontend\tests\functional;
 
 use common\fixtures\UserFixture;
+use common\models\user\User;
 use frontend\tests\FunctionalTester;
 
 class ResendVerificationEmailCest {
@@ -64,10 +65,10 @@ class ResendVerificationEmailCest {
 	public function checkSendSuccessfully(FunctionalTester $I) {
 		$I->submitForm($this->formId, $this->formParams('test@mail.com'));
 		$I->canSeeEmailIsSent();
-		$I->seeRecord('common\models\User', [
+		$I->seeRecord('common\models\user\User', [
 			'email' => 'test@mail.com',
 			'username' => 'test.test',
-			'status' => \common\models\User::STATUS_INACTIVE,
+			'status' => User::STATUS_INACTIVE,
 		]);
 		$I->see('Check your email for further instructions.');
 	}

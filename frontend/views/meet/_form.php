@@ -1,6 +1,6 @@
 <?php
 
-use common\modules\address\widgets\AddressFormWidget;
+use common\widgets\address\AddressFormWidget;
 use common\widgets\DateTimeWidget;
 use frontend\models\meet\MeetForm;
 use yii\helpers\Html;

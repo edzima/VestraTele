@@ -2,11 +2,11 @@
 
 namespace backend\modules\issue\models;
 
-use common\models\issue\Issue;
 use common\models\entityResponsible\EntityResponsible;
+use common\models\issue\Issue;
 use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
-use common\models\User;
+use common\models\user\Worker;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
@@ -35,18 +35,6 @@ class IssueForm extends Model {
 		return $this->model;
 	}
 
-	public function load($data, $formName = null): bool {
-		return $this->getModel()->load($data, $formName)
-			&& $this->getModel()->getClientAddress()->load($data)
-			&& $this->getModel()->getVictimAddress()->load($data);
-	}
-
-	public function validate($attributeNames = null, $clearErrors = true): bool {
-		return $this->getModel()->getClientAddress()->validate()
-			&& $this->getModel()->getVictimAddress()->validate()
-			&& $this->getModel()->validate($attributeNames, $clearErrors);
-	}
-
 	public function save(): bool {
 		if ($this->validate()) {
 			return $this->getModel()->save();
@@ -55,15 +43,15 @@ class IssueForm extends Model {
 	}
 
 	public static function getAgents(): array {
-		return User::getSelectList([User::ROLE_AGENT, User::ROLE_ISSUE]);
+		return Worker::getSelectList([Worker::ROLE_AGENT, Worker::ROLE_ISSUE]);
 	}
 
 	public static function getLawyers(): array {
-		return User::getSelectList([User::ROLE_LAWYER, User::ROLE_ISSUE]);
+		return Worker::getSelectList([Worker::ROLE_LAWYER, Worker::ROLE_ISSUE]);
 	}
 
 	public static function getTele(): array {
-		return User::getSelectList([User::ROLE_ISSUE, User::ROLE_TELEMARKETER]);
+		return Worker::getSelectList([Worker::ROLE_ISSUE, Worker::ROLE_TELEMARKETER]);
 	}
 
 	public static function getTypes(): array {

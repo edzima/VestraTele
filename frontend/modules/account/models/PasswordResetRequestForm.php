@@ -4,7 +4,7 @@ namespace frontend\modules\account\models;
 
 use Yii;
 use yii\base\Model;
-use common\models\User;
+use common\models\user\User;
 
 /**
  * Password reset request form.
@@ -23,7 +23,7 @@ class PasswordResetRequestForm extends Model
             ['email', 'trim'],
             ['email', 'required'],
             ['email', 'email'],
-            ['email', 'exist', 'targetClass' => User::className(), 'filter' => ['status' => User::STATUS_ACTIVE]],
+            ['email', 'exist', 'targetClass' => User::class, 'filter' => ['status' => User::STATUS_ACTIVE]],
 
             // verifyCode needs to be entered correctly
             ['verifyCode', 'captcha'],

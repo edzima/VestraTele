@@ -13,7 +13,7 @@ class m160101_000001_user extends Migration {
 			'access_token' => $this->string(255),
 			'password_hash' => $this->string(255)->notNull(),
 			'password_reset_token' => $this->string()->unique(),
-			'email' => $this->string()->notNull()->unique(),
+			'email' => $this->string()->unique(),
 			'status' => $this->smallInteger()->notNull()->defaultValue(1),
 			'ip' => $this->string(128),
 			'created_at' => $this->integer()->notNull(),

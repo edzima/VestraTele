@@ -4,15 +4,15 @@ namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueForm;
 use backend\widgets\CsvForm;
-use common\models\User;
-use Yii;
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch;
+use common\models\user\Worker;
+use Yii;
 use yii\db\ActiveQuery;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 use yii2tech\csvgrid\CsvGrid;
 
 /**
@@ -42,7 +42,7 @@ class IssueController extends Controller {
 	public function actionIndex() {
 
 		$searchModel = new IssueSearch();
-		if (Yii::$app->user->can(User::ROLE_ARCHIVE)) {
+		if (Yii::$app->user->can(Worker::ROLE_ARCHIVE)) {
 			$searchModel->withArchive = true;
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -159,7 +159,7 @@ class IssueController extends Controller {
 	protected function findModel($id): Issue {
 		if (($model = Issue::findOne($id)) !== null) {
 
-			if ($model->isArchived() && !Yii::$app->user->can(User::ROLE_ARCHIVE)) {
+			if ($model->isArchived() && !Yii::$app->user->can(Worker::ROLE_ARCHIVE)) {
 				Yii::warning('User: ' . Yii::$app->user->id . ' try view archived issue: ' . $model->id, 'issue');
 
 				throw new MethodNotAllowedHttpException('Sprawa jest w archiwum.');

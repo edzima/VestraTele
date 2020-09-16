@@ -2,20 +2,19 @@
 
 namespace frontend\controllers;
 
-use common\models\LoginForm;
+use common\models\user\LoginForm;
+use frontend\models\ContactForm;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\ResetPasswordForm;
-use frontend\models\SignupForm;
 use frontend\models\VerifyEmailForm;
+use vova07\fileapi\actions\UploadAction as FileAPIUpload;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
-use frontend\models\ContactForm;
-use vova07\fileapi\actions\UploadAction as FileAPIUpload;
 
 /**
  * Class SiteController.
@@ -35,7 +34,7 @@ class SiteController extends Controller {
 				'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
 			],
 			'fileapi-upload' => [
-				'class' => FileAPIUpload::className(),
+				'class' => FileAPIUpload::class,
 				'path' => '@storage/tmp',
 			],
 
@@ -45,17 +44,12 @@ class SiteController extends Controller {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'access' => [
-				'class' => AccessControl::className(),
-				'only' => ['logout', 'signup'],
+				'class' => AccessControl::class,
+				'only' => ['logout'],
 				'rules' => [
-					[
-						'actions' => ['signup'],
-						'allow' => true,
-						'roles' => ['?'],
-					],
 					[
 						'actions' => ['logout'],
 						'allow' => true,
@@ -64,7 +58,7 @@ class SiteController extends Controller {
 				],
 			],
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'logout' => ['post'],
 				],
@@ -134,23 +128,6 @@ class SiteController extends Controller {
 		Yii::$app->user->logout();
 
 		return $this->goHome();
-	}
-
-	/**
-	 * Signs user up.
-	 *
-	 * @return mixed
-	 */
-	public function actionSignup() {
-		$model = new SignupForm();
-		if ($model->load(Yii::$app->request->post()) && $model->signup()) {
-			Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');
-			return $this->goHome();
-		}
-
-		return $this->render('signup', [
-			'model' => $model,
-		]);
 	}
 
 	/**

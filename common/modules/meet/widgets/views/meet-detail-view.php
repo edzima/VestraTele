@@ -42,7 +42,7 @@ use yii\widgets\DetailView;
 <h3>Adres</h3>
 
 <?= AddressDetailView::widget([
-	'model' => $model->getAddress(),
+	'model' => $model->customerAddress,
 ]) ?>
 
 

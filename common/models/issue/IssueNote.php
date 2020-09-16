@@ -2,7 +2,7 @@
 
 namespace common\models\issue;
 
-use common\models\User;
+use common\models\user\User;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;

@@ -16,6 +16,9 @@ class m190916_123401_pays extends Migration {
 			'id' => $this->primaryKey(),
 			'issue_id' => $this->integer()->notNull(),
 			'type' => $this->smallInteger()->notNull(),
+			//@todo remove status & pay_type columns after full migrate from prod DB
+			'status' => $this->smallInteger()->notNull(),
+			'pay_type' => $this->smallInteger()->notNull(),
 			'value' => $this->decimal(10, 2)->notNull(),
 			'details' => $this->text(),
 			'created_at' => $this->timestamp(),

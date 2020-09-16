@@ -3,7 +3,7 @@
 use backend\widgets\CsvForm;
 use common\models\issue\IssueMeet;
 use common\models\issue\IssueMeetSearch;
-use common\models\User;
+use common\models\user\Worker;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
@@ -53,17 +53,17 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => 'Miasto',
 			],
 			[
-				'attribute' => 'stateId',
-				'value' => 'state.name',
+				'attribute' => 'regionId',
+				'value' => 'city.region.name',
 				'label' => 'Województwo',
-				'filter' => IssueMeetSearch::getStateNames(),
+				'filter' => IssueMeetSearch::getRegionsNames(),
 			],
 			[
 				'class' => DataColumn::class,
 				'filterType' => GridView::FILTER_SELECT2,
 				'attribute' => 'agent_id',
 				'value' => 'agent',
-				'filter' => User::getSelectList([User::ROLE_AGENT, User::ROLE_MEET]),
+				'filter' => Worker::getSelectList([Worker::ROLE_AGENT, Worker::ROLE_MEET]),
 				'filterWidgetOptions' => [
 					'pluginOptions' => [
 						'allowClear' => true,

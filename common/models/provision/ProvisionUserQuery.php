@@ -2,7 +2,7 @@
 
 namespace common\models\provision;
 
-use common\models\User;
+use common\models\user\Worker;
 use yii\db\ActiveQuery;
 
 /**
@@ -12,7 +12,7 @@ use yii\db\ActiveQuery;
  */
 class ProvisionUserQuery extends ActiveQuery {
 
-	public function user(User $user): self {
+	public function user(Worker $user): self {
 		return $this->andWhere([
 			'or', [
 				'from_user_id' => $user->id,

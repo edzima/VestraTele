@@ -2,9 +2,9 @@
 
 namespace frontend\modules\account\models\search;
 
+use common\models\user\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\User;
 
 /**
  * UserSearch represents the model behind the search form about `common\models\User`.
@@ -14,7 +14,7 @@ class UserSearch extends User {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			[['id', 'status', 'created_at', 'updated_at', 'action_at'], 'integer'],
 			['username', 'safe'],

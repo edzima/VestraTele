@@ -1,17 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: edzima
- * Date: 2019-04-13
- * Time: 14:31
- */
 
 namespace frontend\controllers;
 
 use backend\modules\issue\models\IssueNoteForm;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
-use common\models\User;
+use common\models\user\Worker;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -36,7 +30,7 @@ class NoteController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [User::ROLE_NOTE],
+						'roles' => [Worker::ROLE_NOTE],
 					],
 				],
 			],

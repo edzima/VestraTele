@@ -4,13 +4,13 @@ namespace backend\modules\provision\controllers;
 
 use backend\modules\provision\models\ProvisionUserForm;
 use common\models\provision\ProvisionType;
-use common\models\User;
-use Yii;
 use common\models\provision\ProvisionUser;
 use common\models\provision\ProvisionUserSearch;
+use common\models\user\Worker;
+use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * UserController implements the CRUD actions for ProvisionUser model.
@@ -61,8 +61,8 @@ class UserController extends Controller {
 		]);
 	}
 
-	private function findUser(int $id): User {
-		$user = User::findOne($id);
+	private function findUser(int $id): Worker {
+		$user = Worker::findOne($id);
 		if ($user === null) {
 			throw new NotFoundHttpException();
 		}

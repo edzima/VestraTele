@@ -2,9 +2,10 @@
 
 namespace common\models\meet;
 
-use common\models\address\Address;
+use common\models\Address;
 use common\models\issue\IssueMeet;
-use common\models\User;
+use common\models\issue\MeetAddress;
+use common\models\user\Worker;
 use frontend\models\IssueMeetSearch;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use yii\base\Model;
@@ -84,18 +85,16 @@ class MeetForm extends Model {
 		if ($this->address === null) {
 			$this->address = new Address();
 		}
-		$this->address->requiredCity = false;
 		return $this->address;
 	}
 
 	public function load($data, $formName = null) {
-		return $this->getAddress()->load($data, null)
-			&& parent::load($data, $formName);
+		return parent::load($data, $formName)
+			&& $this->getAddress()->load($data, $formName);
 	}
 
 	public function validate($attributeNames = null, $clearErrors = true) {
-		return $this->getAddress()->validate($attributeNames, $clearErrors)
-			&& parent::validate($attributeNames, $clearErrors);
+		return parent::validate($attributeNames, $clearErrors) && $this->getAddress()->validate($attributeNames, $clearErrors);
 	}
 
 	public function getName(): string {
@@ -111,7 +110,7 @@ class MeetForm extends Model {
 
 	public function setModel(IssueMeet $model): void {
 		$this->model = $model;
-		$this->address = $model->getAddress();
+		$this->address = $model->customerAddress;
 		$this->agentId = $model->agent_id;
 		$this->clientName = $model->client_name;
 		$this->clientSurname = $model->client_surname;
@@ -139,11 +138,16 @@ class MeetForm extends Model {
 		$model = $this->getModel();
 		$this->setModelValues($model);
 
-		return $model->save(false);
+		if ($model->save() && $this->getAddress()->save()) {
+			$customerAddress = $model->addresses[MeetAddress::TYPE_CUSTOMER] ?? new MeetAddress(['type' => MeetAddress::TYPE_CUSTOMER]);
+			$customerAddress->meet_id = $model->id;
+			$customerAddress->address_id = $this->getAddress()->id;
+			return $customerAddress->save();
+		}
+		return false;
 	}
 
 	protected function setModelValues(IssueMeet $model): void {
-		$model->setAddress($this->getAddress());
 		$model->agent_id = $this->agentId;
 		$model->client_name = $this->clientName;
 		$model->client_surname = $this->clientSurname;
@@ -170,6 +174,6 @@ class MeetForm extends Model {
 	}
 
 	public static function getAgentsNames(): array {
-		return User::getSelectList([User::ROLE_MEET, User::ROLE_AGENT]);
+		return Worker::getSelectList([Worker::ROLE_MEET, Worker::ROLE_AGENT]);
 	}
 }

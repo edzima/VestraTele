@@ -2,7 +2,7 @@
 
 namespace common\models\issue;
 
-use common\models\address\State;
+use edzima\teryt\models\Region;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -17,7 +17,7 @@ class IssueMeetSearch extends IssueMeet {
 	public $withArchive = false;
 
 	public $cityName;
-	public $stateId;
+	public $regionId;
 
 	public $created_at_from;
 	public $created_at_to;
@@ -29,7 +29,7 @@ class IssueMeetSearch extends IssueMeet {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type_id', 'stateId', 'agent_id', 'status', 'campaign_id'], 'integer'],
+			[['id', 'type_id', 'regionId', 'agent_id', 'status', 'campaign_id'], 'integer'],
 			['status', 'in', 'range' => array_keys(static::getStatusNames($this->withArchive))],
 			[
 				[
@@ -66,9 +66,11 @@ class IssueMeetSearch extends IssueMeet {
 	 */
 	public function search(array $params) {
 		$query = IssueMeet::find();
-		$query->with('city')
-			->with('state')
-			->with('province')
+		//@todo add with Address
+		$query
+			//->with('city')
+			//->with('state')
+			//->with('province')
 			->with('type')
 			->with('campaign')
 			->with(['agent.userProfile']);
@@ -101,6 +103,8 @@ class IssueMeetSearch extends IssueMeet {
 
 		$this->filterCampaign($query);
 
+		//@todo add with Address
+		/*
 		if (!empty($this->cityName)) {
 			$query->joinWith('city C');
 			$query->andFilterWhere(['like', 'C.name', $this->cityName]);
@@ -110,6 +114,7 @@ class IssueMeetSearch extends IssueMeet {
 			$query->joinWith('state S');
 			$query->andWhere(['S.id' => $this->stateId]);
 		}
+		*/
 
 		$query->andFilterWhere(['like', 'phone', $this->phone])
 			->andFilterWhere(['like', 'client_name', $this->client_name])
@@ -139,8 +144,8 @@ class IssueMeetSearch extends IssueMeet {
 		return $names;
 	}
 
-	public static function getStateNames(): array {
-		return State::getSelectList();
+	public static function getRegionsNames(): array {
+		return Region::getNames();
 	}
 
 	public static function getStatusNames(bool $withArchive = false): array {

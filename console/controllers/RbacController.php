@@ -2,27 +2,30 @@
 
 namespace console\controllers;
 
+use common\models\user\User;
+use common\rbac\OwnModelRule;
 use Yii;
 use yii\console\Controller;
 use yii\helpers\Console;
-use common\models\User;
-use common\rbac\OwnModelRule;
 
 class RbacController extends Controller {
 
-	public $roles = [
+	public array $roles = [
 		User::ROLE_ARCHIVE,
 		User::ROLE_ISSUE,
 		User::ROLE_LOGS,
 		User::ROLE_MEET,
 		User::ROLE_NEWS,
 		User::ROLE_NOTE,
+		User::ROLE_CUSTOMER_SERVICE,
 
 		User::ROLE_AGENT,
 		User::ROLE_BOOKKEEPER,
-		User::ROLE_CUSTOMER_SERVICE,
 		User::ROLE_LAWYER,
 		User::ROLE_TELEMARKETER,
+
+		User::ROLE_CLIENT,
+		User::ROLE_VICTIM,
 
 	];
 
@@ -57,15 +60,17 @@ class RbacController extends Controller {
 
 		$auth->assign($admin, 1);
 
+		$this->addDelayedPays();
+
 		Console::output('Success! RBAC roles has been added.');
 	}
 
-	public function actionAddDelayedPays(): void {
+	private function addDelayedPays(): void {
 		$auth = Yii::$app->authManager;
 		$role = $auth->createRole(User::ROLE_BOOKKEEPER_DELAYED);
 		$auth->add($role);
 		$bookKeeper = $auth->getRole(User::ROLE_BOOKKEEPER);
 		$auth->addChild($bookKeeper, $role);
 	}
-
+	
 }

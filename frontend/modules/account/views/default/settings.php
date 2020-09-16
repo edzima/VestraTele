@@ -1,11 +1,12 @@
 <?php
 
+use common\models\user\UserProfile;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use vova07\fileapi\Widget;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\UserProfile */
+/* @var $model UserProfile */
 /* @var $form yii\widgets\ActiveForm */
 
 $this->title = Yii::t('frontend', 'Settings');

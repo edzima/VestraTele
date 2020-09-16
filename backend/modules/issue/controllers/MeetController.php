@@ -4,7 +4,7 @@ namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\MeetForm;
 use backend\widgets\CsvForm;
-use common\models\User;
+use common\models\user\Worker;
 use Yii;
 use common\models\issue\IssueMeet;
 use common\models\issue\IssueMeetSearch;
@@ -37,7 +37,7 @@ class MeetController extends Controller {
 
 	public function beforeAction($action) {
 		$before = parent::beforeAction($action);
-		if ($before && Yii::$app->user->can(User::ROLE_MEET)) {
+		if ($before && Yii::$app->user->can(Worker::ROLE_MEET)) {
 			return true;
 		}
 		throw new ForbiddenHttpException();
@@ -50,7 +50,7 @@ class MeetController extends Controller {
 	 */
 	public function actionIndex() {
 		$searchModel = new IssueMeetSearch();
-		if (Yii::$app->user->can(User::ROLE_ARCHIVE)) {
+		if (Yii::$app->user->can(Worker::ROLE_ARCHIVE)) {
 			$searchModel->withArchive = true;
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -166,7 +166,7 @@ class MeetController extends Controller {
 	 */
 	protected function findModel($id):IssueMeet {
 		if (($model = IssueMeet::findOne($id)) !== null) {
-			if ($model->isArchived() && !Yii::$app->user->can(User::ROLE_ARCHIVE)) {
+			if ($model->isArchived() && !Yii::$app->user->can(Worker::ROLE_ARCHIVE)) {
 				Yii::warning('User: ' . Yii::$app->user->id . ' try view archived meet: ' . $model->id, 'meet');
 
 				throw new MethodNotAllowedHttpException('Spotkanie jest w archiwum.');

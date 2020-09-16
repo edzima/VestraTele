@@ -9,7 +9,7 @@
 namespace frontend\controllers;
 
 use common\models\issue\Issue;
-use common\models\User;
+use common\models\user\Worker;
 use frontend\models\ClientIssueSearch;
 use frontend\models\IssueSearch;
 use Yii;
@@ -26,7 +26,7 @@ class IssueController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [User::ROLE_ISSUE],
+						'roles' => [Worker::ROLE_ISSUE],
 					],
 				],
 			],
@@ -36,12 +36,12 @@ class IssueController extends Controller {
 	public function actionSearch(): string {
 		$user = Yii::$app->user;
 
-		if (!$user->can(User::ROLE_CUSTOMER_SERVICE)) {
+		if (!$user->can(Worker::ROLE_CUSTOMER_SERVICE)) {
 			throw new NotFoundHttpException();
 		}
 
 		$searchModel = new ClientIssueSearch();
-		if ($user->can(User::ROLE_ARCHIVE)) {
+		if ($user->can(Worker::ROLE_ARCHIVE)) {
 			$searchModel->withArchive = true;
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -60,23 +60,23 @@ class IssueController extends Controller {
 	public function actionIndex() {
 		$user = Yii::$app->user;
 		$searchModel = new IssueSearch();
-		if ($user->can(User::ROLE_ARCHIVE)) {
+		if ($user->can(Worker::ROLE_ARCHIVE)) {
 			$searchModel->withArchive = true;
 		}
 		$searchModel->user_id = $user->getId();
 
-		if ($user->can(User::ROLE_LAWYER)) {
+		if ($user->can(Worker::ROLE_LAWYER)) {
 			$searchModel->isLawyer = true;
 		}
-		if ($user->can(User::ROLE_AGENT)) {
-			/** @var User $userModel */
-			$userModel = $user->getIdentity();
-			// @todo all roles with childes
-			$searchModel->agents = $userModel->getAllChildesIds();
-			$searchModel->agents[] = $user->id;
-			$searchModel->isAgent = true;
+		if ($user->can(Worker::ROLE_AGENT)) {
+			$worker = Worker::findOne($user->id);
+			if ($worker) {
+				$searchModel->agents = $worker->getAllChildesIds();
+				$searchModel->agents[] = $worker->id;
+				$searchModel->isAgent = true;
+			}
 		}
-		if ($user->can(User::ROLE_TELEMARKETER)) {
+		if ($user->can(Worker::ROLE_TELEMARKETER)) {
 			$searchModel->isTele = true;
 		}
 
@@ -121,27 +121,28 @@ class IssueController extends Controller {
 
 	private static function shouldFind(Issue $model): bool {
 		$user = Yii::$app->user;
-		/** @var User $userModel */
-		$userModel = $user->getIdentity();
-		if ($user->can(User::ROLE_ADMINISTRATOR)) {
+		if ($user->can(Worker::ROLE_ADMINISTRATOR)) {
 			return true;
 		}
-		if ($model->isArchived() && !$user->can(User::ROLE_ARCHIVE)) {
+		if ($model->isArchived() && !$user->can(Worker::ROLE_ARCHIVE)) {
 			Yii::warning('User: ' . $user->id . ' try view archived issue: ' . $model->id, 'issue');
 			return false;
 		}
 		if (
-			$user->can(User::ROLE_CUSTOMER_SERVICE)
-			|| ($user->can(User::ROLE_TELEMARKETER) && $model->tele_id === $user->id)
-			|| ($user->can(User::ROLE_LAWYER) && $model->lawyer_id === $user->id)) {
+			$user->can(Worker::ROLE_CUSTOMER_SERVICE)
+			|| ($user->can(Worker::ROLE_TELEMARKETER) && $model->tele_id === $user->id)
+			|| ($user->can(Worker::ROLE_LAWYER) && $model->lawyer_id === $user->id)) {
 			return true;
 		}
 
-		if ($user->can(User::ROLE_AGENT)) {
-			$agents = $userModel->getAllChildesIds();
-			$agents[] = $user->id;
-			if (in_array($model->agent_id, $agents)) {
-				return true;
+		if ($user->can(Worker::ROLE_AGENT)) {
+			$worker = Worker::findOne($user->id);
+			if ($worker) {
+				$agents = $worker->getAllChildesIds();
+				$agents[] = $worker->id;
+				if (in_array($model->agent_id, $agents)) {
+					return true;
+				}
 			}
 		}
 		return false;

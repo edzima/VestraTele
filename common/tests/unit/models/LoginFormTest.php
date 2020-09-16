@@ -2,19 +2,15 @@
 
 namespace common\tests\unit\models;
 
-use Yii;
-use common\models\LoginForm;
 use common\fixtures\UserFixture;
+use common\models\user\LoginForm;
+use common\tests\unit\Unit;
+use Yii;
 
 /**
  * Login form test
  */
-class LoginFormTest extends \Codeception\Test\Unit {
-
-	/**
-	 * @var \common\tests\UnitTester
-	 */
-	protected $tester;
+class LoginFormTest extends Unit {
 
 	/**
 	 * @return array

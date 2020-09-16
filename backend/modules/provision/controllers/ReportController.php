@@ -7,7 +7,7 @@ use common\models\provision\Provision;
 use common\models\provision\ProvisionReportSearch;
 use common\models\provision\ProvisionSearch;
 use common\models\provision\ProvisionUsersSearch;
-use common\models\User;
+use common\models\user\Worker;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
@@ -55,7 +55,7 @@ class ReportController extends Controller {
 	}
 
 	public function actionView(int $id, string $dateTo, string $dateFrom): string {
-		$user = User::findOne($id);
+		$user = Worker::findOne($id);
 		if ($user === null) {
 			throw new NotFoundHttpException();
 		}

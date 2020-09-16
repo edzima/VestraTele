@@ -42,7 +42,7 @@ $config = [
 			'csrfParam' => '_csrf-frontend',
 		],
 		'user' => [
-			'identityClass' => 'common\models\User',
+			'identityClass' => 'common\models\user\User',
 			//			'loginUrl' => ['/account/sign-in/login'],
 			'enableAutoLogin' => true,
 			'identityCookie' => ['name' => '_identity-front', 'httpOnly' => true],

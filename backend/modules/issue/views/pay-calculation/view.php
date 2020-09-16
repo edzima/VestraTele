@@ -3,7 +3,7 @@
 use backend\helpers\Url;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
-use common\models\User;
+use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssuePaysWidget;
 use yii\helpers\Html;

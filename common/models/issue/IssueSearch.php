@@ -2,7 +2,7 @@
 
 namespace common\models\issue;
 
-use common\models\User;
+use common\models\user\Worker;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
@@ -95,7 +95,7 @@ class IssueSearch extends Issue {
 		}
 
 		if ($this->childsId > 0) {
-			$user = User::findOne($this->childsId);
+			$user = Worker::findOne($this->childsId);
 			if ($user !== null) {
 				$ids = $user->getAllChildesIds();
 				$ids[] = $user->id;

@@ -1,6 +1,6 @@
 <?php
 
-use backend\modules\address\widgets\AddressFormWidget;
+use common\modules\address\widgets\AddressFormWidget;
 use common\models\address\SubProvince;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;

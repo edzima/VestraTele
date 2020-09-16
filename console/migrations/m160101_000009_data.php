@@ -1,6 +1,6 @@
 <?php
 
-use common\models\User;
+use common\models\user\User;
 use console\base\Migration;
 
 class m160101_000009_data extends Migration {

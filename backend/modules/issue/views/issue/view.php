@@ -1,7 +1,7 @@
 <?php
 
 use common\models\issue\Issue;
-use common\models\User;
+use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssuePaysWidget;
 use common\modules\issue\widgets\IssueViewWidget;

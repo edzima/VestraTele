@@ -4,7 +4,7 @@ namespace frontend\controllers;
 
 use backend\widgets\CsvForm;
 use common\models\issue\IssueMeet;
-use common\models\User;
+use common\models\user\Worker;
 use frontend\models\AgentMeetSearch;
 use frontend\models\meet\MeetForm;
 use Yii;
@@ -24,7 +24,7 @@ class MeetController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [User::ROLE_MEET],
+						'roles' => [Worker::ROLE_MEET],
 					],
 				],
 			],
@@ -40,7 +40,7 @@ class MeetController extends Controller {
 	public function actionIndex() {
 		$user = Yii::$app->user;
 		$searchModel = new AgentMeetSearch();
-		if ($user->can(User::ROLE_ARCHIVE)) {
+		if ($user->can(Worker::ROLE_ARCHIVE)) {
 			$searchModel->withArchive = true;
 		}
 		$searchModel->agent_id = $user->id;
@@ -122,7 +122,7 @@ class MeetController extends Controller {
 
 		$query = IssueMeet::find()
 			->andWhere(['id' => $id]);
-		if (!$user->can(User::ROLE_MANAGER)) {
+		if (!$user->can(Worker::ROLE_MANAGER)) {
 			$query->andWhere(['agent_id' => $user->id]);
 		}
 		$model = $query->one();
@@ -131,7 +131,7 @@ class MeetController extends Controller {
 			throw new NotFoundHttpException('The requested page does not exist.');
 		}
 
-		if ($model->isArchived() && !$user->can(User::ROLE_ARCHIVE)) {
+		if ($model->isArchived() && !$user->can(Worker::ROLE_ARCHIVE)) {
 			Yii::warning('User: ' . $user->id . ' try view archived meet: ' . $model->id, 'meet');
 			throw new MethodNotAllowedHttpException('The requested page does not exist.');
 		}

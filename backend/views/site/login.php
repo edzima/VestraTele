@@ -5,7 +5,7 @@ use yii\bootstrap\Html;
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
-/* @var $model common\models\LoginForm */
+/* @var $model common\models\user\LoginForm */
 
 $this->title = Yii::t('backend', 'Sign in');
 $this->params['breadcrumbs'][] = $this->title;
