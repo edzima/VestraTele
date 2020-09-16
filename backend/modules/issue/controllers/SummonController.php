@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\controllers;
+namespace backend\modules\issue\controllers;
 
 use common\models\issue\Summon;
 use common\models\issue\SummonSearch;
@@ -57,6 +57,24 @@ class SummonController extends Controller {
 	}
 
 	/**
+	 * Creates a new Summon model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 *
+	 * @return mixed
+	 */
+	public function actionCreate() {
+		$model = new Summon();
+
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->id]);
+		}
+
+		return $this->render('create', [
+			'model' => $model,
+		]);
+	}
+
+	/**
 	 * Updates an existing Summon model.
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 *
@@ -74,6 +92,20 @@ class SummonController extends Controller {
 		return $this->render('update', [
 			'model' => $model,
 		]);
+	}
+
+	/**
+	 * Deletes an existing Summon model.
+	 * If deletion is successful, the browser will be redirected to the 'index' page.
+	 *
+	 * @param integer $id
+	 * @return mixed
+	 * @throws NotFoundHttpException if the model cannot be found
+	 */
+	public function actionDelete(int $id) {
+		$this->findModel($id)->delete();
+
+		return $this->redirect(['index']);
 	}
 
 	/**

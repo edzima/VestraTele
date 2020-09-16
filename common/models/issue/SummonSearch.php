@@ -4,7 +4,6 @@ namespace common\models\issue;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\issue\Summon;
 
 /**
  * SummonSearch represents the model behind the search form of `common\models\issue\Summon`.
@@ -14,7 +13,7 @@ class SummonSearch extends Summon
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules():array
     {
         return [
             [['id', 'status', 'created_at', 'updated_at', 'realized_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],

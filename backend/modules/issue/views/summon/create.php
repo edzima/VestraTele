@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $model common\models\issue\Summon */
 
 $this->title = 'Create Summon';
-$this->params['breadcrumbs'][] = ['label' => 'Summons', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Summons'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="summon-create">
