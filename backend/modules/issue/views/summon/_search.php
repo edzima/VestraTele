@@ -1,10 +1,11 @@
 <?php
 
+use backend\modules\issue\models\search\SummonSearch;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\SummonSearch */
+/* @var $model SummonSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 

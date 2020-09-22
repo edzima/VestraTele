@@ -44,6 +44,8 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const STATUS_BANNED = 2;
 	public const STATUS_DELETED = 3;
 
+	public const PERMISSION_SUMMON = 'summon';
+
 	public const ROLE_DEFAULT = self::ROLE_USER;
 
 	public const ROLE_ADMINISTRATOR = 'administrator';

@@ -3,10 +3,12 @@
 namespace frontend\controllers;
 
 use common\models\issue\Summon;
-use common\models\issue\SummonSearch;
+use frontend\models\search\SummonSearch;
+use frontend\models\SummonForm;
 use Yii;
-use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -19,10 +21,13 @@ class SummonController extends Controller {
 	 */
 	public function behaviors(): array {
 		return [
-			'verbs' => [
-				'class' => VerbFilter::class,
-				'actions' => [
-					'delete' => ['POST'],
+			'access' => [
+				'class' => AccessControl::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'roles' => ['@'],
+					],
 				],
 			],
 		];
@@ -34,7 +39,7 @@ class SummonController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex(): string {
-		$searchModel = new SummonSearch();
+		$searchModel = new SummonSearch(['contractor_id' => Yii::$app->user->id]);
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -62,13 +67,17 @@ class SummonController extends Controller {
 	 *
 	 * @param integer $id
 	 * @return mixed
-	 * @throws NotFoundHttpException if the model cannot be found
+	 * @throws NotFoundHttpException|MethodNotAllowedHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$model = $this->findModel($id);
+		$summon = $this->findModel($id);
+		if (!$summon->isForUser(Yii::$app->user->id)) {
+			throw new MethodNotAllowedHttpException();
+		}
+		$model = new SummonForm($summon);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
 		return $this->render('update', [
@@ -84,7 +93,7 @@ class SummonController extends Controller {
 	 * @return Summon the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): Summon {
+	protected function findModel(int $id): Summon {
 		if (($model = Summon::findOne($id)) !== null) {
 			return $model;
 		}

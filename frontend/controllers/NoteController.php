@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use backend\modules\issue\models\IssueNoteForm;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
+use common\models\issue\Summon;
 use common\models\user\Worker;
 use Yii;
 use yii\filters\AccessControl;
@@ -12,6 +13,11 @@ use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
+/**
+ * CRUD for Summon model.
+ *
+ * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
+ */
 class NoteController extends Controller {
 
 	/**
@@ -52,6 +58,25 @@ class NoteController extends Controller {
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$this->redirectIssue($issueId);
+		}
+		return $this->render('create', [
+			'model' => $model,
+		]);
+	}
+
+	public function actionCreateSummon(int $id) {
+		$summon = Summon::findOne($id);
+		if ($summon === null) {
+			throw new NotFoundHttpException('The requested page does not exist.');
+		}
+		$note = new IssueNote();
+		$note->issue_id = $summon->issue_id;
+		$note->user_id = Yii::$app->user->id;
+		$note->type = IssueNote::generateType(IssueNote::TYPE_SUMMON, $summon->id);
+		$note->typeName = Yii::t('common', 'Summon: {title}', ['title' => $summon->title]);
+		$model = new IssueNoteForm($note);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirectIssue($summon->issue_id);
 		}
 		return $this->render('create', [
 			'model' => $model,

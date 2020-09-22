@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model IssueNoteForm */
 
-$this->title = 'Nowa notatka (' . $model->note->getTypeName() . ') dla: ' . $model->note->issue;
+$this->title = 'Nowa notatka ' . ($model->note->typeName ? '(' . $model->note->typeName . ')':'').' dla: ' . $model->note->issue;
 $this->params['breadcrumbs'][] = ['label' => 'Notatki', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->note->issue, 'url' => ['issue/view', 'id' => $model->note->issue->id]];
 $this->params['breadcrumbs'][] = $this->title;

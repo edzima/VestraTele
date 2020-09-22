@@ -4,6 +4,7 @@ use common\models\issue\Issue;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssuePaysWidget;
+use common\modules\issue\widgets\IssueSummonsWidget;
 use common\modules\issue\widgets\IssueViewWidget;
 use yii\helpers\Html;
 
@@ -39,6 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	</p>
 
 	<?= IssueViewWidget::widget(['model' => $model]) ?>
+	<?= IssueSummonsWidget::widget(['model' => $model]) ?>
 	<?= IssuePaysWidget::widget(['models' => $model->pays]) ?>
 	<?= IssueNotesWidget::widget(['model' => $model]) ?>
 

@@ -2,12 +2,12 @@
 
 use common\models\user\User;
 use common\widgets\Alert;
+use frontend\assets\AppAsset;
+use frontend\models\NavItem;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
 use yii\widgets\Breadcrumbs;
-use frontend\assets\AppAsset;
-use frontend\models\NavItem;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -69,6 +69,11 @@ AppAsset::register($this);
 			'label' => 'Znajdź sprawę',
 			'url' => ['/issue/search'],
 			'visible' => Yii::$app->user->can(User::ROLE_CUSTOMER_SERVICE),
+		];
+		$menuItems[] = [
+			'label' => Yii::t('common', 'Summons'),
+			'url' => ['/summon/index'],
+			'visible' => Yii::$app->user->can(User::PERMISSION_SUMMON),
 		];
 		$menuItems[] = [
 			'label' => 'Newsy',

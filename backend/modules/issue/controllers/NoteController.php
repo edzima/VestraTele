@@ -4,13 +4,14 @@ namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueNoteForm;
 use common\models\issue\Issue;
-use Yii;
 use common\models\issue\IssueNote;
 use common\models\issue\IssueNoteSearch;
+use common\models\issue\Summon;
+use Yii;
 use yii\base\InvalidConfigException;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * NoteController implements the CRUD actions for IssueNote model.
@@ -23,7 +24,7 @@ class NoteController extends Controller {
 	public function behaviors() {
 		return [
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
 				],
@@ -63,12 +64,13 @@ class NoteController extends Controller {
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 *
 	 * @param int $issueId
-	 * @param int|null $type
+	 * @param string|null $type
 	 * @return mixed
 	 * @throws NotFoundHttpException
 	 * @throws InvalidConfigException
+	 * @todo add test for them
 	 */
-	public function actionCreate(int $issueId, int $type = null) {
+	public function actionCreate(int $issueId, string $type = null) {
 		if ($type !== null && !isset(IssueNote::getTypesNames()[$type])) {
 			throw new NotFoundHttpException('The requested page does not exist.');
 		}
@@ -84,6 +86,25 @@ class NoteController extends Controller {
 				return $this->redirectPayCalculation($issueId);
 			}
 			return $this->redirectIssue($issueId);
+		}
+		return $this->render('create', [
+			'model' => $model,
+		]);
+	}
+
+	public function actionCreateSummon(int $id) {
+		$summon = Summon::findOne($id);
+		if ($summon === null) {
+			throw new NotFoundHttpException('The requested page does not exist.');
+		}
+		$note = new IssueNote();
+		$note->issue_id = $summon->issue_id;
+		$note->user_id = Yii::$app->user->id;
+		$note->type = IssueNote::generateType(IssueNote::TYPE_SUMMON, $summon->id);
+		$note->typeName = Yii::t('common', 'Summon: {title}', ['title' => $summon->title]);
+		$model = new IssueNoteForm($note);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirectIssue($summon->issue_id);
 		}
 		return $this->render('create', [
 			'model' => $model,
@@ -118,7 +139,7 @@ class NoteController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionDelete($id) {
+	public function actionDelete(int $id) {
 		$model = $this->findModel($id);
 		$issueId = $model->issue_id;
 		$model->delete();

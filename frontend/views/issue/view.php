@@ -4,6 +4,7 @@ use common\models\issue\Issue;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssuePaysWidget;
+use common\modules\issue\widgets\IssueSummonsWidget;
 use common\modules\issue\widgets\IssueViewWidget;
 
 /* @var $this yii\web\View */
@@ -21,6 +22,13 @@ $this->params['breadcrumbs'][] = $this->title;
 		'editPayBtn' => false,
 		'user' => !Yii::$app->user->can(User::ROLE_BOOKKEEPER) ? Yii::$app->user->getIdentity() : null,
 	]) ?>
+	<?= IssueSummonsWidget::widget([
+		'model' => $model,
+		'addBtn' => false,
+		'baseUrl' => '/summon/',
+		'actionColumnTemplate' => '{view} {update}',
+	]) ?>
+
 	<?= IssueNotesWidget::widget([
 		'model' => $model,
 		'addBtn' => Yii::$app->user->can(User::PERMISSION_NOTE),

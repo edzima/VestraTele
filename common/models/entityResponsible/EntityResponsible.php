@@ -10,6 +10,7 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property string $name
+ * @property-read boolean $is_for_summon
  *
  * @property Issue[] $issues
  */
@@ -34,6 +35,7 @@ class EntityResponsible extends ActiveRecord {
 			[['name'], 'required'],
 			[['name'], 'string', 'max' => 255],
 			[['name'], 'unique'],
+			[['is_for_summon'], 'boolean'],
 		];
 	}
 
@@ -44,6 +46,7 @@ class EntityResponsible extends ActiveRecord {
 		return [
 			'id' => 'ID',
 			'name' => 'Nazwa',
+			'is_for_summon' => 'Dla wezwań',
 		];
 	}
 
@@ -52,6 +55,10 @@ class EntityResponsible extends ActiveRecord {
 	 */
 	public function getIssues() {
 		return $this->hasMany(Issue::class, ['entity_responsible_id' => 'id']);
+	}
+
+	public static function find(): EntityResponsibleQuery {
+		return new EntityResponsibleQuery(static::class);
 	}
 
 }

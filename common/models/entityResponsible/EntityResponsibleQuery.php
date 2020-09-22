@@ -11,6 +11,11 @@ use yii\db\ActiveQuery;
  */
 class EntityResponsibleQuery extends ActiveQuery {
 
+	public function summons(): self {
+		$this->andWhere(['is_for_summon' => true]);
+		return $this;
+	}
+
 	/**
 	 * @inheritdoc
 	 * @return EntityResponsible[]|array

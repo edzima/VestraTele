@@ -2,8 +2,9 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\modules\issue\models\search\SummonSearch;
+use backend\modules\issue\models\SummonForm;
 use common\models\issue\Summon;
-use common\models\issue\SummonSearch;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -50,7 +51,7 @@ class SummonController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView(int $id) {
+	public function actionView(int $id): string {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
@@ -60,13 +61,17 @@ class SummonController extends Controller {
 	 * Creates a new Summon model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 *
+	 * @param int|null $issueId
 	 * @return mixed
 	 */
-	public function actionCreate() {
-		$model = new Summon();
+	public function actionCreate(int $issueId = null) {
+		$model = new SummonForm();
+		$model->owner_id = Yii::$app->user->id;
+		$model->issue_id = $issueId;
+		$model->start_at = time();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
 		return $this->render('create', [
@@ -83,10 +88,11 @@ class SummonController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$model = $this->findModel($id);
+		$model = new SummonForm();
+		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
 		return $this->render('update', [

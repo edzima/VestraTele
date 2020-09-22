@@ -23,6 +23,7 @@ class IssueNoteForm extends Model {
 
 	public $title;
 	public $description;
+	public $publish_at;
 
 	/** @var IssueNote */
 	private $note;
@@ -43,17 +44,22 @@ class IssueNoteForm extends Model {
 		return [
 			[['title', 'description'], 'required'],
 			[['title'], 'string', 'max' => 255],
+			['publish_at', 'date', 'format' => 'yyyy-MM-dd HH:mm'],
+			['publish_at', 'filter', 'filter' => 'strtotime'],
 		];
 	}
 
 	public function attributeLabels(): array {
-		return $this->note->attributeLabels();
+		return $this->note->attributeLabels() + [
+				'publish_at' => 'Data publikacji',
+			];
 	}
 
 	private function setNote(IssueNote $note): void {
 		$this->note = $note;
 		$this->title = $note->title;
 		$this->description = $note->description;
+//		$this->publish_at = $note->created_at;
 	}
 
 	public function getNote(): IssueNote {
@@ -65,6 +71,7 @@ class IssueNoteForm extends Model {
 			$model = $this->getNote();
 			$model->description = $this->description;
 			$model->title = $this->title;
+		//	$model->created_at = $this->publish_at;
 			return $model->save();
 		}
 		return false;

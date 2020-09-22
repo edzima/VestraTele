@@ -8,9 +8,9 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model Issue */
 /* @var $notes IssueNote[] */
+/* @var $addUrl string */
 /* @var $addBtn bool */
 /* @var $noteOptions array */
-/* @var $type int */
 ?>
 
 
@@ -19,7 +19,7 @@ use yii\helpers\Html;
 		<?php if ($addBtn): ?>
 			<?= Html::a(
 				'<i class="fa fa-plus"></i>',
-				['note/create', 'issueId' => $model->id, 'type' => $type], [
+				$addUrl, [
 				'class' => 'btn btn-xs btn-success',
 			]) ?>
 		<?php endif; ?>
