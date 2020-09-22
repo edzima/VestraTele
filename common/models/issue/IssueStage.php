@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\models\issue\query\IssueStageQuery;
 use yii\db\ActiveRecord;
 
 /**

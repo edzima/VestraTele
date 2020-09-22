@@ -1,13 +1,16 @@
 <?php
 
-namespace common\models\issue;
+namespace common\models\issue\query;
+
+use common\models\issue\IssueStage;
+use yii\db\ActiveQuery;
 
 /**
  * This is the ActiveQuery class for [[Issue]].
  *
  * @see Issue
  */
-class IssueStageQuery extends \yii\db\ActiveQuery {
+class IssueStageQuery extends ActiveQuery {
 
 	public function init() {
 		parent::init();
@@ -16,7 +19,7 @@ class IssueStageQuery extends \yii\db\ActiveQuery {
 
 	/**
 	 * @inheritdoc
-	 * @return Issue[]|array
+	 * @return IssueStage[]|array
 	 */
 	public function all($db = null) {
 		return parent::all($db);
@@ -24,7 +27,7 @@ class IssueStageQuery extends \yii\db\ActiveQuery {
 
 	/**
 	 * @inheritdoc
-	 * @return Issue|array|null
+	 * @return IssueStage|array|null
 	 */
 	public function one($db = null) {
 		return parent::one($db);

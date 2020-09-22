@@ -2,12 +2,12 @@
 
 namespace backend\modules\issue\controllers;
 
-use backend\modules\issue\models\searches\DelayedIssuePaySearch;
-use backend\modules\issue\models\searches\IssuePaySearch;
+use backend\modules\issue\models\search\DelayedIssuePaySearch;
+use backend\modules\issue\models\search\IssuePaySearch;
 use backend\widgets\CsvForm;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
-use common\models\issue\IssuePayQuery;
+use common\models\issue\query\IssuePayQuery;
 use common\models\user\Worker;
 use Yii;
 use yii\filters\AccessControl;

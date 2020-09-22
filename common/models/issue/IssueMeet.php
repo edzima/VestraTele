@@ -255,7 +255,8 @@ class IssueMeet extends ActiveRecord {
 	}
 
 	public static function getCampaignNames(): array {
-		return ArrayHelper::map(Campaign::find()->all(), 'id', 'name');
+		return ArrayHelper::map(Campaign::find()
+			->orderBy(['default' => SORT_DESC])->all(), 'id', 'name');
 	}
 
 	public function hasCampaign(): bool {

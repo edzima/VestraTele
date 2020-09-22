@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\modules\issue\models\searches;
+namespace backend\modules\issue\models\search;
 
 class DelayedIssuePaySearch extends IssuePaySearch {
 

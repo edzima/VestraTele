@@ -12,8 +12,8 @@ use yii\data\ActiveDataProvider;
 /* @var $model WorkerUserForm */
 /* @var $form ActiveForm */
 
-$this->title = Yii::t('backend', 'Update user: {username}', ['username' => $model->username]);
-$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Users'), 'url' => ['index']];
+$this->title = Yii::t('backend', 'Update customer: {username}', ['username' => $model->username]);
+$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Customers'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 ?>
 <div class="user-update">
@@ -84,7 +84,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 
 
 	<div class="form-group">
-		<?= Html::submitButton(Yii::t('backend', 'Update'), ['class' => 'btn btn-primary']) ?>
+		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-primary']) ?>
 	</div>
 
 	<?php ActiveForm::end() ?>

@@ -3,11 +3,13 @@
 namespace common\models\issue;
 
 use common\models\issue\query\IssuePayCalculationQuery;
+use common\models\issue\query\IssuePayQuery;
+use common\models\issue\query\IssueQuery;
+use common\models\provision\Provision;
 use common\models\provision\ProvisionQuery;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
-use common\models\provision\Provision;
 
 /**
  * This is the model class for table "issue_pay_calculation".
@@ -96,14 +98,17 @@ class IssuePayCalculation extends ActiveRecord {
 		];
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getIssue(): IssueQuery {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getPays(): IssuePayQuery {
 		return $this->hasMany(IssuePay::class, ['calculation_id' => 'id']);
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getProvisions(): ProvisionQuery {
 		return $this->hasMany(Provision::class, ['pay_id' => 'id'])->via('pays');
 	}
@@ -118,7 +123,6 @@ class IssuePayCalculation extends ActiveRecord {
 
 	public function getPaysCount(): int {
 		return $this->getPays()->count();
-		return count($this->pays);
 	}
 
 	public static function getTypesNames(): array {

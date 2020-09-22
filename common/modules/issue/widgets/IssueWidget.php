@@ -9,20 +9,10 @@
 namespace common\modules\issue\widgets;
 
 use common\models\issue\Issue;
-use yii\base\InvalidConfigException;
 use yii\base\Widget;
 
 abstract class IssueWidget extends Widget {
 
-	/**
-	 * @var Issue
-	 */
-	public $model;
+	public Issue $model;
 
-	public function init() {
-		if (!$this->model instanceof Issue) {
-			throw new InvalidConfigException('$model must be instance of: ' . Issue::class);
-		}
-		parent::init();
-	}
 }

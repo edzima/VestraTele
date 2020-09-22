@@ -3,12 +3,12 @@
 namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\PayCalculationForm;
-use backend\modules\issue\models\searches\NewPayCalculationSearch;
+use backend\modules\issue\models\search\NewPayCalculationSearch;
 use common\models\issue\Issue;
 use common\models\user\Worker;
 use Yii;
 use common\models\issue\IssuePayCalculation;
-use backend\modules\issue\models\searches\IssuePayCalculationSearch;
+use backend\modules\issue\models\search\IssuePayCalculationSearch;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;

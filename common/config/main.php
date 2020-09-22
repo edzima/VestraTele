@@ -1,6 +1,7 @@
 <?php
 
 use common\components\DbManager;
+use common\components\keyStorage\KeyStorage;
 use common\components\Provisions;
 use common\components\TaxComponent;
 use common\formatters\Formatter;
@@ -11,8 +12,7 @@ use yii\caching\FileCache;
 
 return [
 	'name' => 'Vestra CRM',
-	'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
-
+	'vendorPath' => dirname(__DIR__, 2) . '/vendor',
 	'extensions' => require(__DIR__ . '/../../vendor/yiisoft/extensions.php'),
 	'timeZone' => 'Europe/Warsaw',
 	'sourceLanguage' => 'en-US',
@@ -45,6 +45,7 @@ return [
 		],
 		'authManager' => [
 			'class' => DbManager::class,
+			'cache' => 'cache',
 		],
 		'assetManager' => [
 			'class' => 'yii\web\AssetManager',
@@ -53,7 +54,6 @@ return [
 		'formatter' => [
 			'class' => Formatter::class,
 			'nullDisplay' => '',
-			'dateFormat' => 'dd.MM.yyyy',
 			'decimalSeparator' => ',',
 			'thousandSeparator' => ' ',
 			'currencyCode' => 'PLN',
@@ -105,7 +105,7 @@ return [
 			],
 		],
 		'keyStorage' => [
-			'class' => 'common\components\keyStorage\KeyStorage',
+			'class' => KeyStorage::class,
 		],
 		'urlManager' => [
 			'enablePrettyUrl' => true,

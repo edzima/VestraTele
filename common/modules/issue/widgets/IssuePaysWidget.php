@@ -13,14 +13,11 @@ class IssuePaysWidget extends Widget {
 	/** @var IssuePay[] */
 	public $models;
 
-	/**
-	 * @var Worker
-	 */
-	public $user;
+	public ?Worker $user = null;
 
 	public $editPayBtn = false;
 
-	public function run() {
+	public function run(): string {
 		if (!empty($this->models)) {
 			return $this->render('issue-pays', [
 				'models' => $this->models,
@@ -28,6 +25,7 @@ class IssuePaysWidget extends Widget {
 				'withProvisions' => Yii::$app->user->can(Worker::ROLE_BOOKKEEPER) || !empty($this->user),
 			]);
 		}
+		return '';
 	}
 
 	public function getProvisionsProvider(IssuePay $pay): ActiveDataProvider {

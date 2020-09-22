@@ -1,7 +1,9 @@
 <?php
 
-namespace common\models\issue;
+namespace common\models\issue\query;
 
+use common\models\issue\Issue;
+use common\models\issue\IssueStage;
 use yii\db\ActiveQuery;
 
 /**
@@ -16,34 +18,34 @@ class IssueQuery extends ActiveQuery {
 		return $this;
 	}
 
-	public function onlyPayed() {
+	public function onlyPayed(): self {
 		$this->andWhere(['payed' => true]);
 		return $this;
 	}
 
-	public function onlyWithoutPay() {
+	public function onlyWithoutPay(): self {
 		$this->joinWith('pays');
 		$this->andWhere('issue_pay.id IS NULL');
 		return $this;
 	}
 
-	public function onlyPartPay() {
+	public function onlyPartPay(): self {
 		$this->joinWith('pays');
 		$this->andWhere('issue_pay.id IS NOT NULL');
 		return $this;
 	}
 
-	public function onlyForLawyer(int $id) {
+	public function onlyForLawyer(int $id): self {
 		$this->andWhere(['lawyer_id' => $id]);
 		return $this;
 	}
 
-	public function onlyForTele(int $id) {
+	public function onlyForTele(int $id): self {
 		$this->andWhere(['tele_id' => $id]);
 		return $this;
 	}
 
-	public function onlyForAgents(array $ids) {
+	public function onlyForAgents(array $ids): self {
 		$this->andWhere(['agent_id' => $ids]);
 		return $this;
 	}
@@ -64,7 +66,7 @@ class IssueQuery extends ActiveQuery {
 		return parent::one($db);
 	}
 
-	public function withoutArchives() {
+	public function withoutArchives(): self {
 		$this->andWhere(['not in', 'stage_id', IssueStage::ARCHIVES_ID]);
 		return $this;
 	}

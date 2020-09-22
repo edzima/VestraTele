@@ -32,6 +32,7 @@ YiiAsset::register($this);
 		'attributes' => [
 			'id',
 			'name',
+			'default:boolean',
 		],
 	]) ?>
 

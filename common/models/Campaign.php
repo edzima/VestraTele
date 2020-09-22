@@ -11,6 +11,7 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property string $name
+ * @property boolean $default
  *
  * @property IssueMeet[] $issueMeets
  */
@@ -35,6 +36,7 @@ class Campaign extends ActiveRecord {
 			[['name'], 'required'],
 			[['name'], 'string', 'max' => 50],
 			[['name'], 'unique'],
+			['default', 'boolean'],
 		];
 	}
 
@@ -45,6 +47,7 @@ class Campaign extends ActiveRecord {
 		return [
 			'id' => 'ID',
 			'name' => 'Nazwa',
+			'default' => 'Domyślna',
 		];
 	}
 

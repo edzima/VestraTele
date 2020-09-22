@@ -4,9 +4,9 @@ namespace common\models\meet;
 
 use common\models\Address;
 use common\models\issue\IssueMeet;
+use common\models\issue\IssueMeetSearch;
 use common\models\issue\MeetAddress;
 use common\models\user\Worker;
-use frontend\models\IssueMeetSearch;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use yii\base\Model;
 

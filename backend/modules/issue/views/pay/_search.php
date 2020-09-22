@@ -1,6 +1,6 @@
 <?php
 
-use backend\modules\issue\models\searches\IssuePaySearch;
+use backend\modules\issue\models\search\IssuePaySearch;
 use common\widgets\DateTimeWidget;
 use yii\bootstrap\Nav;
 use yii\helpers\Html;

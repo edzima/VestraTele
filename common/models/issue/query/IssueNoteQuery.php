@@ -1,7 +1,8 @@
 <?php
 
-namespace common\models\issue;
+namespace common\models\issue\query;
 
+use common\models\issue\IssueNote;
 use yii\db\ActiveQuery;
 
 /**
@@ -15,8 +16,17 @@ class IssueNoteQuery extends ActiveQuery {
 		return $this->onlyType(IssueNote::TYPE_PAY);
 	}
 
-	public function onlyType(int $type): self {
-		$this->andWhere(['type' => $type]);
+	public function onlySummon(int $summonId): self {
+		$this->onlyType(IssueNote::TYPE_SUMMON, $summonId);
+		return $this;
+	}
+
+	public function onlyType(string $type, int $id = null): self {
+		if ($id !== null) {
+			$this->andWhere(['type' => IssueNote::generateType($type, $id)]);
+		} else {
+			$this->andWhere(['like', 'type', $type]);
+		}
 		return $this;
 	}
 

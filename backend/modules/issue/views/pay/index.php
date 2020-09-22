@@ -1,7 +1,7 @@
 <?php
 
 use backend\helpers\Url;
-use backend\modules\issue\models\searches\IssuePaySearch;
+use backend\modules\issue\models\search\IssuePaySearch;
 use backend\widgets\CsvForm;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;

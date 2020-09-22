@@ -1,9 +1,9 @@
 <?php
 
-namespace backend\modules\issue\models\searches;
+namespace backend\modules\issue\models\search;
 
 use common\models\issue\IssuePay;
-use common\models\issue\IssuePayQuery;
+use common\models\issue\query\IssuePayQuery;
 use common\models\address\State;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;

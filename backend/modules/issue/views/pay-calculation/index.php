@@ -1,7 +1,7 @@
 <?php
 
 use backend\helpers\Url;
-use backend\modules\issue\models\searches\IssuePayCalculationSearch;
+use backend\modules\issue\models\search\IssuePayCalculationSearch;
 use common\models\issue\IssuePayCalculation;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;

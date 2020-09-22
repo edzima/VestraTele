@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\models\issue\query\IssueQuery;
 use common\models\user\Worker;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;

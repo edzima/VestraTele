@@ -2,10 +2,13 @@
 
 namespace common\models\issue;
 
+use common\models\issue\query\IssueNoteQuery;
 use common\models\user\User;
+use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\helpers\StringHelper;
 
 /**
  * This is the model class for table "issue_note".
@@ -24,16 +27,23 @@ use yii\db\Expression;
  */
 class IssueNote extends ActiveRecord {
 
-	public const TYPE_PAY = 10;
+	public const TYPE_PAY = 'pay';
+	public const TYPE_SUMMON = 'summon';
+
+	public ?string $typeName = null;
+
+	public static function generateType(string $type, int $id): string {
+		return "$type:$id";
+	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public static function tableName() {
-		return 'issue_note';
+	public static function tableName(): string {
+		return '{{%issue_note}}';
 	}
 
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			[
 				'class' => TimestampBehavior::class,
@@ -58,12 +68,11 @@ class IssueNote extends ActiveRecord {
 	public function rules() {
 		return [
 			[['issue_id', 'user_id', 'title', 'description'], 'required'],
-			[['issue_id', 'user_id', 'type'], 'integer'],
+			[['issue_id', 'user_id'], 'integer'],
 			[['created_at', 'updated_at'], 'safe'],
-			[['title'], 'string', 'max' => 255],
+			[['title', 'type'], 'string', 'max' => 255],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 		];
 	}
 
@@ -96,16 +105,14 @@ class IssueNote extends ActiveRecord {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
 
-	public function getTypeName(): string {
-		if (empty($this->type)) {
-			return 'ogólna';
-		}
-		return static::getTypesNames()[$this->type];
+	public function isType(string $type): bool {
+		return StringHelper::startsWith($this->type, $type);
 	}
 
 	public static function getTypesNames(): array {
 		return [
-			static::TYPE_PAY => 'płatności',
+			static::TYPE_PAY => Yii::t('common', 'Pay'),
+			static::TYPE_SUMMON => Yii::t('common', 'Summon'),
 		];
 	}
 
@@ -117,7 +124,7 @@ class IssueNote extends ActiveRecord {
 	 * @inheritdoc
 	 * @return IssueNoteQuery the active query used by this AR class.
 	 */
-	public static function find() {
-		return new IssueNoteQuery(get_called_class());
+	public static function find(): IssueNoteQuery {
+		return new IssueNoteQuery(static::class);
 	}
 }

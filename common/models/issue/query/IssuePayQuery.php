@@ -1,7 +1,8 @@
 <?php
 
-namespace common\models\issue;
+namespace common\models\issue\query;
 
+use common\models\issue\IssuePay;
 use yii\db\ActiveQuery;
 
 /**
