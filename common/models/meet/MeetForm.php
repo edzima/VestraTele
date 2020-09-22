@@ -174,6 +174,6 @@ class MeetForm extends Model {
 	}
 
 	public static function getAgentsNames(): array {
-		return Worker::getSelectList([Worker::ROLE_MEET, Worker::ROLE_AGENT]);
+		return Worker::getSelectList([Worker::PERMISSION_MEET, Worker::ROLE_AGENT]);
 	}
 }

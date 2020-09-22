@@ -9,6 +9,7 @@ use common\models\user\UserProfile;
 use Yii;
 use yii\base\Model;
 use yii\db\QueryInterface;
+use yii\helpers\ArrayHelper;
 
 /**
  * Create user form.
@@ -23,6 +24,7 @@ class UserForm extends Model {
 	public string $password = '';
 
 	public $roles = [];
+	public $permissions = [];
 
 	public bool $isEmailRequired = true;
 
@@ -64,11 +66,17 @@ class UserForm extends Model {
 			],
 			['email', 'string', 'max' => 255],
 			['status', 'integer'],
-			['status', 'in', 'range' => array_keys(User::getStatusesNames())],
+			['status', 'in', 'range' => array_keys(static::getStatusNames())],
 			[
 				'roles', 'each',
 				'rule' => [
 					'in', 'range' => array_keys(static::getRolesNames()),
+				],
+			],
+			[
+				'permissions', 'each',
+				'rule' => [
+					'in', 'range' => array_keys(static::getPermissionsNames()),
 				],
 			],
 		], $this->emailRules());
@@ -94,6 +102,7 @@ class UserForm extends Model {
 			'password' => Yii::t('backend', 'Password'),
 			'status' => Yii::t('backend', 'Status'),
 			'roles' => Yii::t('backend', 'Roles'),
+			'permissions' => Yii::t('backend', 'Permissions'),
 		];
 	}
 
@@ -103,6 +112,10 @@ class UserForm extends Model {
 		$this->email = $model->email;
 		$this->status = $model->status;
 		$this->roles = $model->getRoles();
+		$this->permissions = ArrayHelper::getColumn(
+			Yii::$app->authManager->getPermissionsByUser($model->id),
+			'name'
+		);
 	}
 
 	public function getModel(): User {
@@ -156,11 +169,12 @@ class UserForm extends Model {
 			return false;
 		}
 
-		$model->setRoles($this->roles);
+		Yii::$app->authManager->revokeAll($model->id);
+		$this->setUserRoles($model->id);
+		$this->setUserPermission($model->id);
 
 		$profile = $this->getProfile();
 		$profile->user_id = $model->id;
-		$profile->isNewRecord = $model->profile->isNewRecord;
 		if (!$profile->save()) {
 			return false;
 		}
@@ -179,6 +193,26 @@ class UserForm extends Model {
 			return $this->sendEmail($model);
 		}
 		return true;
+	}
+
+	private function setUserRoles(int $userId): void {
+		$auth = Yii::$app->authManager;
+		foreach ($this->roles as $roleName) {
+			$role = $auth->getRole($roleName);
+			if ($role) {
+				$auth->assign($role, $userId);
+			}
+		}
+	}
+
+	private function setUserPermission(int $userId): void {
+		$auth = Yii::$app->authManager;
+		foreach ($this->permissions as $permissionName) {
+			$permission = $auth->getPermission($permissionName);
+			if ($permission) {
+				$auth->assign($permission, $userId);
+			}
+		}
 	}
 
 	protected function beforeSaveModel(User $model): void {
@@ -218,6 +252,12 @@ class UserForm extends Model {
 
 	public static function getRolesNames(): array {
 		return User::getRolesNames();
+	}
+
+	public static function getPermissionsNames(): array {
+		return [
+		//	User::PERMISSION_SUMMON => Yii::t('common', 'Summons'),
+		];
 	}
 
 	public static function getStatusNames(): array {

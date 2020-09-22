@@ -26,7 +26,7 @@ class MeetCalendarController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::ROLE_MEET, Worker::ROLE_AGENT],
+						'roles' => [Worker::PERMISSION_MEET, Worker::ROLE_AGENT],
 					],
 				],
 			],

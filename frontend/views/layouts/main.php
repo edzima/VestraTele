@@ -42,7 +42,7 @@ AppAsset::register($this);
 		$menuItems[] = [
 			'label' => 'Lead',
 			'url' => '#',
-			'visible' => Yii::$app->user->can(User::ROLE_MEET),
+			'visible' => Yii::$app->user->can(User::PERMISSION_MEET),
 
 			'items' => [
 				[
@@ -63,7 +63,7 @@ AppAsset::register($this);
 		$menuItems[] = [
 			'label' => 'Sprawy',
 			'url' => ['/issue/index'],
-			'visible' => Yii::$app->user->can(User::ROLE_ISSUE),
+			'visible' => Yii::$app->user->can(User::PERMISSION_ISSUE),
 		];
 		$menuItems[] = [
 			'label' => 'Znajdź sprawę',

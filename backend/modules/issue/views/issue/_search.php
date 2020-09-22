@@ -69,7 +69,7 @@ use yii\widgets\ActiveForm;
 	<div class="row">
 		<?= $form->field($model, 'tele_id', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
-					'data' => Worker::getSelectList([Worker::ROLE_TELEMARKETER, Worker::ROLE_ISSUE]),
+					'data' => Worker::getSelectList([Worker::ROLE_TELEMARKETER, Worker::PERMISSION_ISSUE]),
 					'options' => [
 						'placeholder' => 'Telemarketer',
 					],
@@ -80,7 +80,7 @@ use yii\widgets\ActiveForm;
 			) ?>
 		<?= $form->field($model, 'lawyer_id', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
-					'data' => Worker::getSelectList([Worker::ROLE_LAWYER, Worker::ROLE_ISSUE]),
+					'data' => Worker::getSelectList([Worker::ROLE_LAWYER, Worker::PERMISSION_ISSUE]),
 					'options' => [
 						'placeholder' => 'Prawnik',
 					],

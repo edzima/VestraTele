@@ -118,7 +118,7 @@ class IssueSearch extends BaseIssueSearch {
 
 	public function getAgentsList(): array {
 		if ($this->isTele || $this->isLawyer) {
-			return Worker::getSelectList([Worker::ROLE_AGENT, Worker::ROLE_ISSUE]);
+			return Worker::getSelectList([Worker::ROLE_AGENT, Worker::PERMISSION_ISSUE]);
 		}
 		return Worker::getSelectList([], true, function (Query $query) {
 			$query->andWhere(['id' => $this->agents]);

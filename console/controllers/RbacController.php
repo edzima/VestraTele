@@ -7,26 +7,30 @@ use common\rbac\OwnModelRule;
 use Yii;
 use yii\console\Controller;
 use yii\helpers\Console;
+use yii\rbac\Item;
 
 class RbacController extends Controller {
 
 	public array $roles = [
-		User::ROLE_ARCHIVE,
-		User::ROLE_ISSUE,
-		User::ROLE_LOGS,
-		User::ROLE_MEET,
-		User::ROLE_NEWS,
-		User::ROLE_NOTE,
-		User::ROLE_CUSTOMER_SERVICE,
-
 		User::ROLE_AGENT,
 		User::ROLE_BOOKKEEPER,
+		User::ROLE_CUSTOMER_SERVICE,
 		User::ROLE_LAWYER,
 		User::ROLE_TELEMARKETER,
-
 		User::ROLE_CLIENT,
 		User::ROLE_VICTIM,
+	];
 
+	public array $permissions = [
+		User::PERMISSION_ARCHIVE,
+		User::PERMISSION_ISSUE,
+		User::PERMISSION_LOGS,
+		User::PERMISSION_MEET,
+		User::PERMISSION_NEWS,
+		User::PERMISSION_NOTE,
+		User::PERMISSION_PAYS_DELAYED => [
+			User::ROLE_BOOKKEEPER,
+		],
 	];
 
 	public function actionInit() {
@@ -52,25 +56,61 @@ class RbacController extends Controller {
 		$auth->add($admin);
 		$auth->addChild($admin, $manager);
 
-		foreach ($this->roles as $roleName) {
-			$role = $auth->createRole($roleName);
-			$auth->add($role);
-			$auth->addChild($admin, $role);
+		$roles = $this->createRoles($this->roles);
+		foreach ($roles as $item) {
+			$this->assignAdmin($item);
+		}
+		$permissions = $this->createPermissions($this->permissions);
+		foreach ($permissions as $item) {
+			$this->assignAdmin($item);
 		}
 
 		$auth->assign($admin, 1);
 
-		$this->addDelayedPays();
-
 		Console::output('Success! RBAC roles has been added.');
 	}
 
-	private function addDelayedPays(): void {
+	private function createRoles(array $roles): array {
+		if (empty($roles)) {
+			return [];
+		}
 		$auth = Yii::$app->authManager;
-		$role = $auth->createRole(User::ROLE_BOOKKEEPER_DELAYED);
-		$auth->add($role);
-		$bookKeeper = $auth->getRole(User::ROLE_BOOKKEEPER);
-		$auth->addChild($bookKeeper, $role);
+		$items = [];
+		foreach ($roles as $roleName) {
+			$role = $auth->createRole($roleName);
+			$auth->add($role);
+			$items[] = $role;
+		}
+		return $items;
 	}
-	
+
+	private function createPermissions(array $permissions): array {
+		if (empty($permissions)) {
+			return [];
+		}
+		$auth = Yii::$app->authManager;
+		$items = [];
+		foreach ($permissions as $permissionName => $roles) {
+			if (!is_string($permissionName) && is_string($roles)) {
+				$permissionName = $roles;
+			}
+			$permission = $auth->createPermission($permissionName);
+			$auth->add($permission);
+			$items[] = $permission;
+			if (is_array($roles)) {
+				foreach ($roles as $roleName) {
+					$role = $auth->getRole($roleName);
+					$auth->addChild($role, $permission);
+				}
+			}
+		}
+		return $items;
+	}
+
+	private function assignAdmin(Item $item): bool {
+		$auth = Yii::$app->authManager;
+		$admin = $auth->getRole(User::ROLE_ADMINISTRATOR);
+		return $auth->addChild($admin, $item);
+	}
+
 }

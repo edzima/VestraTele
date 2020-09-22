@@ -40,7 +40,7 @@ class PayCalculationController extends Controller {
 					[
 						'allow' => true,
 						'actions' => ['view'],
-						'roles' => [Worker::ROLE_BOOKKEEPER_DELAYED],
+						'roles' => [Worker::PERMISSION_PAYS_DELAYED],
 					],
 				],
 			],

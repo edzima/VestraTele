@@ -43,14 +43,14 @@ $user = Yii::$app->user;
 						['label' => Yii::t('backend', 'Articles'), 'url' => ['/article/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 						['label' => Yii::t('backend', 'Article categories'), 'url' => ['/article-category/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 					],
-					'visible' => $user->can(User::ROLE_NEWS),
+					'visible' => $user->can(User::PERMISSION_NEWS),
 				],
 				[
 					'label' => 'Spotkania',
 					'url' => '#',
 					'icon' => '<i class="fa fa fa-calendar"></i>',
 					'options' => ['class' => 'treeview'],
-					'visible' => $user->can(User::ROLE_MEET),
+					'visible' => $user->can(User::PERMISSION_MEET),
 					'items' => [
 						[
 							'label' => Yii::t('issue', 'Dodaj'),
@@ -75,7 +75,7 @@ $user = Yii::$app->user;
 					'url' => ['/issue/issue/index'],
 					'icon' => '<i class="fa fa-suitcase"></i>',
 					'options' => ['class' => 'treeview'],
-					'visible' => $user->can(User::ROLE_ISSUE),
+					'visible' => $user->can(User::PERMISSION_ISSUE),
 					'items' => [
 						[
 							'label' => Yii::t('issue', 'Dodaj'),
@@ -144,7 +144,7 @@ $user = Yii::$app->user;
 					'url' => '#',
 					'icon' => '<i class="fa fa-money"></i>',
 					'options' => ['class' => 'treeview'],
-					'visible' => $user->can(User::ROLE_BOOKKEEPER) || $user->can(User::ROLE_BOOKKEEPER_DELAYED),
+					'visible' => $user->can(User::ROLE_BOOKKEEPER) || $user->can(User::PERMISSION_PAYS_DELAYED),
 					'items' => [
 						[
 							'label' => Yii::t('issue', 'Rozliczenia (nowe)'),
@@ -169,7 +169,7 @@ $user = Yii::$app->user;
 							'label' => Yii::t('issue', 'Wpłaty (przeterminowane)'),
 							'url' => ['/issue/pay/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => $user->can(User::ROLE_BOOKKEEPER_DELAYED),
+							'visible' => $user->can(User::PERMISSION_PAYS_DELAYED),
 
 						],
 					],
@@ -190,7 +190,7 @@ $user = Yii::$app->user;
 							'label' => Yii::t('backend', 'Log manager'),
 							'url' => ['/log/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => $user->can(User::ROLE_LOGS),
+							'visible' => $user->can(User::PERMISSION_LOGS),
 						],
 						[
 							'label' => Yii::t('backend', 'DB manager'),

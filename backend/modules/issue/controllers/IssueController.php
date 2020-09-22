@@ -42,7 +42,7 @@ class IssueController extends Controller {
 	public function actionIndex() {
 
 		$searchModel = new IssueSearch();
-		if (Yii::$app->user->can(Worker::ROLE_ARCHIVE)) {
+		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -159,7 +159,7 @@ class IssueController extends Controller {
 	protected function findModel($id): Issue {
 		if (($model = Issue::findOne($id)) !== null) {
 
-			if ($model->isArchived() && !Yii::$app->user->can(Worker::ROLE_ARCHIVE)) {
+			if ($model->isArchived() && !Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
 				Yii::warning('User: ' . Yii::$app->user->id . ' try view archived issue: ' . $model->id, 'issue');
 
 				throw new MethodNotAllowedHttpException('Sprawa jest w archiwum.');

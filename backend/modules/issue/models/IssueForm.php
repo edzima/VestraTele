@@ -43,15 +43,15 @@ class IssueForm extends Model {
 	}
 
 	public static function getAgents(): array {
-		return Worker::getSelectList([Worker::ROLE_AGENT, Worker::ROLE_ISSUE]);
+		return Worker::getSelectList([Worker::ROLE_AGENT, Worker::PERMISSION_ISSUE]);
 	}
 
 	public static function getLawyers(): array {
-		return Worker::getSelectList([Worker::ROLE_LAWYER, Worker::ROLE_ISSUE]);
+		return Worker::getSelectList([Worker::ROLE_LAWYER, Worker::PERMISSION_ISSUE]);
 	}
 
 	public static function getTele(): array {
-		return Worker::getSelectList([Worker::ROLE_ISSUE, Worker::ROLE_TELEMARKETER]);
+		return Worker::getSelectList([Worker::PERMISSION_ISSUE, Worker::ROLE_TELEMARKETER]);
 	}
 
 	public static function getTypes(): array {

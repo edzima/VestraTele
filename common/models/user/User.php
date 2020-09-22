@@ -50,19 +50,19 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const ROLE_MANAGER = 'manager';
 	public const ROLE_USER = 'user';
 
-	public const ROLE_ARCHIVE = 'archive';
-	public const ROLE_ISSUE = 'issue';
-	public const ROLE_LOGS = 'logs';
-	public const ROLE_MEET = 'meet';
-	public const ROLE_NEWS = 'news';
-	public const ROLE_NOTE = 'note';
-
 	public const ROLE_AGENT = 'agent';
 	public const ROLE_BOOKKEEPER = 'book_keeper';
-	public const ROLE_BOOKKEEPER_DELAYED = 'book_keeper_delayed';
 	public const ROLE_CUSTOMER_SERVICE = 'customer_service';
 	public const ROLE_TELEMARKETER = 'telemarketer';
 	public const ROLE_LAWYER = 'lawyer';
+
+	public const PERMISSION_ARCHIVE = 'archive';
+	public const PERMISSION_ISSUE = 'issue';
+	public const PERMISSION_LOGS = 'logs';
+	public const PERMISSION_MEET = 'meet';
+	public const PERMISSION_NEWS = 'news';
+	public const PERMISSION_NOTE = 'note';
+	public const PERMISSION_PAYS_DELAYED = 'pays.delayed';
 
 	//customers
 	public const ROLE_CLIENT = 'client';
@@ -72,7 +72,6 @@ class User extends ActiveRecord implements IdentityInterface {
 		self::ROLE_AGENT,
 		self::ROLE_TELEMARKETER,
 		self::ROLE_BOOKKEEPER,
-		self::ROLE_BOOKKEEPER_DELAYED,
 		self::ROLE_CUSTOMER_SERVICE,
 		self::ROLE_LAWYER,
 	];

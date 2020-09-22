@@ -42,7 +42,7 @@ class PayController extends Controller {
 					[
 						'allow' => true,
 						'actions' => ['delayed', 'status'],
-						'roles' => [Worker::ROLE_BOOKKEEPER_DELAYED],
+						'roles' => [Worker::PERMISSION_PAYS_DELAYED],
 					],
 				],
 			],

@@ -30,7 +30,7 @@ class NoteController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::ROLE_NOTE],
+						'roles' => [Worker::PERMISSION_NOTE],
 					],
 				],
 			],

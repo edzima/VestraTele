@@ -26,7 +26,7 @@ class IssueController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::ROLE_ISSUE],
+						'roles' => [Worker::PERMISSION_ISSUE],
 					],
 				],
 			],
@@ -41,7 +41,7 @@ class IssueController extends Controller {
 		}
 
 		$searchModel = new ClientIssueSearch();
-		if ($user->can(Worker::ROLE_ARCHIVE)) {
+		if ($user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -60,7 +60,7 @@ class IssueController extends Controller {
 	public function actionIndex() {
 		$user = Yii::$app->user;
 		$searchModel = new IssueSearch();
-		if ($user->can(Worker::ROLE_ARCHIVE)) {
+		if ($user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
 		}
 		$searchModel->user_id = $user->getId();
@@ -124,7 +124,7 @@ class IssueController extends Controller {
 		if ($user->can(Worker::ROLE_ADMINISTRATOR)) {
 			return true;
 		}
-		if ($model->isArchived() && !$user->can(Worker::ROLE_ARCHIVE)) {
+		if ($model->isArchived() && !$user->can(Worker::PERMISSION_ARCHIVE)) {
 			Yii::warning('User: ' . $user->id . ' try view archived issue: ' . $model->id, 'issue');
 			return false;
 		}

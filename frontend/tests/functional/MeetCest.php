@@ -14,7 +14,7 @@ use Yii;
  */
 class MeetCest {
 
-	private const ROLE_NAME = User::ROLE_MEET;
+	private const ROLE_NAME = User::PERMISSION_MEET;
 
 	public function _fixtures(): array {
 		return [

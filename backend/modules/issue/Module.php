@@ -23,7 +23,7 @@ class Module extends BaseModule {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::ROLE_ISSUE],
+						'roles' => [Worker::PERMISSION_ISSUE],
 					],
 				],
 			],

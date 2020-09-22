@@ -24,7 +24,7 @@ class MeetController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::ROLE_MEET],
+						'roles' => [Worker::PERMISSION_MEET],
 					],
 				],
 			],
@@ -40,7 +40,7 @@ class MeetController extends Controller {
 	public function actionIndex() {
 		$user = Yii::$app->user;
 		$searchModel = new AgentMeetSearch();
-		if ($user->can(Worker::ROLE_ARCHIVE)) {
+		if ($user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
 		}
 		$searchModel->agent_id = $user->id;
@@ -131,7 +131,7 @@ class MeetController extends Controller {
 			throw new NotFoundHttpException('The requested page does not exist.');
 		}
 
-		if ($model->isArchived() && !$user->can(Worker::ROLE_ARCHIVE)) {
+		if ($model->isArchived() && !$user->can(Worker::PERMISSION_ARCHIVE)) {
 			Yii::warning('User: ' . $user->id . ' try view archived meet: ' . $model->id, 'meet');
 			throw new MethodNotAllowedHttpException('The requested page does not exist.');
 		}
