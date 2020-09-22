@@ -1,10 +1,11 @@
 <?php
 
-use yii\helpers\Html;
+use common\models\entityResponsible\EntityResponsibleSearch;
 use yii\grid\GridView;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $searchModel \common\models\entityResponsible\EntityResponsibleSearch */
+/* @var $searchModel EntityResponsibleSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Podmioty odpowiedzialne';
@@ -25,6 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
 			'name',
+			'is_for_summon:boolean',
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>

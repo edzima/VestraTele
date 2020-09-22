@@ -15,7 +15,7 @@ class EntityResponsibleSearch extends EntityResponsible {
 	 */
 	public function rules() {
 		return [
-			[['id'], 'integer'],
+			[['id', 'is_for_summon'], 'integer'],
 			[['name'], 'safe'],
 		];
 	}
@@ -55,6 +55,7 @@ class EntityResponsibleSearch extends EntityResponsible {
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
+			'is_for_summon' => $this->is_for_summon,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name]);
