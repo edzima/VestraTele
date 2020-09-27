@@ -29,8 +29,7 @@ class LoginCest {
 	}
 
 	public function loginUserWithoutPermision(FunctionalTester $I) {
-		$user = $I->grabFixture('user', 0);
-		Yii::$app->authManager->revokeAll($user->id);
+		Yii::$app->authManager->revokeAll(1);
 		$I->amOnPage('/site/login');
 		$I->fillField('Username', 'erau');
 		$I->fillField('Password', 'password_0');

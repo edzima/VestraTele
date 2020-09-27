@@ -7,6 +7,8 @@ use common\models\user\Worker;
 
 class WorkerUserForm extends UserForm {
 
+	public int $status = User::STATUS_ACTIVE;
+
 	public $parent_id;
 
 	public function rules(): array {

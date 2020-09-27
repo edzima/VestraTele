@@ -11,4 +11,10 @@ class CustomerUserSearch extends UserSearch {
 		return Customer::find();
 	}
 
+	public static function getStatusesNames(): array {
+		$names = parent::getStatusesNames();
+		unset($names[static::STATUS_BANNED], $names[static::STATUS_DELETED]);
+		return $names;
+	}
+
 }

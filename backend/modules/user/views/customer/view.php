@@ -1,6 +1,7 @@
 <?php
 
 use common\models\user\Customer;
+use common\widgets\address\AddressDetailView;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -31,6 +32,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			'statusName',
 		],
 	]) ?>
+
+	<?= $model->homeAddress ? AddressDetailView::widget(['model' => $model->homeAddress]) : '' ?>
+
+
 
 </div>
 

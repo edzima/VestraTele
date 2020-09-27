@@ -37,11 +37,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'profile.lastname',
 				'label' => UserProfile::instance()->getAttributeLabel('lastname'),
 			],
-			[
-				'attribute' => 'parentId',
-				'value' => 'parent.fullName',
-				'filter' => WorkerUserSearch::getParentsList(),
-			],
 			'email:email',
 			[
 				'attribute' => 'phone',

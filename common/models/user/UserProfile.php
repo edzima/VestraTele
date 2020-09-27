@@ -2,6 +2,7 @@
 
 namespace common\models\user;
 
+use udokmeci\yii2PhoneValidator\PhoneValidator;
 use vova07\fileapi\behaviors\UploadBehavior;
 use Yii;
 use yii\db\ActiveRecord;
@@ -64,7 +65,8 @@ class UserProfile extends ActiveRecord {
 			['website', 'trim'],
 			['website', 'url', 'defaultScheme' => 'http', 'validSchemes' => ['http', 'https']],
 			['other', 'string', 'max' => 1024],
-			['phone', 'string', 'max' => 15],
+			[['phone', 'phone_2'], 'string', 'max' => 20],
+			[['phone', 'phone_2'], PhoneValidator::class, 'country' => 'PL'],
 			[['firstname', 'lastname', 'avatar_path', 'website'], 'string', 'max' => 255],
 			[['firstname', 'lastname'], 'match', 'pattern' => '/[AaĄąBbCcĆćDdEeĘęFfGgHhIiJjKkLlŁłMmNnŃńOoÓóPpRrSsŚśTtUuWwYyZzŹźŻż]/iu'],
 			['user_id', 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
@@ -89,8 +91,8 @@ class UserProfile extends ActiveRecord {
 		];
 	}
 
-	public function getGenderName(): string {
-		return static::getGendersNames()[$this->gender] ?? '';
+	public function getGenderName(): ?string {
+		return static::getGendersNames()[$this->gender] ?? null;
 	}
 
 	public static function getGendersNames(): array {

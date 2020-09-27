@@ -9,7 +9,6 @@ use common\models\user\UserProfile;
 use Yii;
 use yii\base\Model;
 use yii\db\QueryInterface;
-use yii\helpers\ArrayHelper;
 
 /**
  * Create user form.
@@ -18,7 +17,7 @@ class UserForm extends Model {
 
 	public const SCENARIO_CREATE = 'create';
 
-	public int $status = User::STATUS_ACTIVE;
+	public int $status = User::STATUS_INACTIVE;
 	public string $username = '';
 	public ?string $email = null;
 	public string $password = '';
@@ -65,6 +64,7 @@ class UserForm extends Model {
 
 			],
 			['email', 'string', 'max' => 255],
+			['email', 'default', 'value' => null],
 			['status', 'integer'],
 			['status', 'in', 'range' => array_keys(static::getStatusNames())],
 			[
@@ -112,10 +112,7 @@ class UserForm extends Model {
 		$this->email = $model->email;
 		$this->status = $model->status;
 		$this->roles = $model->getRoles();
-		$this->permissions = ArrayHelper::getColumn(
-			Yii::$app->authManager->getPermissionsByUser($model->id),
-			'name'
-		);
+		$this->permissions = $model->getPermissions();
 	}
 
 	public function getModel(): User {
@@ -132,14 +129,14 @@ class UserForm extends Model {
 
 	public function getProfile(): UserProfile {
 		if (!$this->profile) {
-			$this->profile = $this->getModel()->profile ?? new UserProfile();
+			$this->profile = $this->getModel()->profile;
 		}
 		return $this->profile;
 	}
 
 	public function getAddress(): Address {
 		if (!$this->address) {
-			$this->address = $this->getModel()->homeAddress ?? new Address();
+			$this->address = $this->getModel()->homeAddress ?: new Address();
 		}
 		return $this->address;
 	}
@@ -173,19 +170,10 @@ class UserForm extends Model {
 		$this->setUserRoles($model->id);
 		$this->setUserPermission($model->id);
 
-		$profile = $this->getProfile();
-		$profile->user_id = $model->id;
-		if (!$profile->save()) {
+		if (!$this->updateProfile($model) || !$this->updateHomeAddress($model)) {
 			return false;
 		}
 
-		$address = $this->getAddress();
-		if ($address->save()) {
-			$homeAddress = $model->addresses[UserAddress::TYPE_HOME] ?? new UserAddress(['type' => UserAddress::TYPE_HOME]);
-			$homeAddress->user_id = $model->id;
-			$homeAddress->address_id = $address->id;
-			$homeAddress->save();
-		}
 		if ($this->status === User::STATUS_INACTIVE
 			&& $isNewRecord
 			&& $this->email !== null
@@ -193,6 +181,28 @@ class UserForm extends Model {
 			return $this->sendEmail($model);
 		}
 		return true;
+	}
+
+	private function updateProfile(User $model): bool {
+		$profile = $model->profile;
+		$profile->lastname = $this->getProfile()->lastname;
+		$profile->firstname = $this->getProfile()->firstname;
+		$profile->phone = $this->getProfile()->phone;
+		$profile->phone_2 = $this->getProfile()->phone_2;
+		return $profile->save();
+	}
+
+	private function updateHomeAddress(User $model): bool {
+		$address = $this->getAddress();
+		if (!$address->save()) {
+			return false;
+		}
+
+		$homeAddress = $model->addresses[UserAddress::TYPE_HOME] ?? new UserAddress(['type' => UserAddress::TYPE_HOME]);
+
+		$homeAddress->user_id = $model->id;
+		$homeAddress->address_id = $address->id;
+		return $homeAddress->save();
 	}
 
 	private function setUserRoles(int $userId): void {
@@ -255,9 +265,7 @@ class UserForm extends Model {
 	}
 
 	public static function getPermissionsNames(): array {
-		return [
-		//	User::PERMISSION_SUMMON => Yii::t('common', 'Summons'),
-		];
+		return User::getPermissionsNames();
 	}
 
 	public static function getStatusNames(): array {

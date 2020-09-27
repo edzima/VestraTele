@@ -18,7 +18,6 @@ class RbacController extends Controller {
 		User::ROLE_LAWYER,
 		User::ROLE_TELEMARKETER,
 		User::ROLE_CLIENT,
-		User::ROLE_VICTIM,
 	];
 
 	public array $permissions = [
@@ -30,6 +29,9 @@ class RbacController extends Controller {
 		User::PERMISSION_NOTE,
 		User::PERMISSION_PAYS_DELAYED => [
 			User::ROLE_BOOKKEEPER,
+		],
+		User::PERMISSION_SUMMON => [
+			User::ROLE_AGENT,
 		],
 	];
 

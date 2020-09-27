@@ -6,8 +6,6 @@ use common\models\user\Customer;
 
 class CustomerUserForm extends UserForm {
 
-	public int $status = Customer::STATUS_INACTIVE;
-
 	public bool $isEmailRequired = false;
 
 	public $roles = [
@@ -30,23 +28,19 @@ class CustomerUserForm extends UserForm {
 		return parent::beforeValidate();
 	}
 
-	private function hasValidFirstAndLastName(): bool {
-		return $this->getProfile()->validate(['firstname', 'lastname']);
-	}
-
 	public function generateUsername(): string {
-		if ($this->hasValidFirstAndLastName()) {
-			$profile = $this->getProfile();
-			return $profile->firstname . $profile->lastname . time();
+		$profile = $this->getProfile();
+		if ($profile->validate(['firstname', 'lastname'], false) && !$profile->hasErrors(['firstname', 'lastname'])) {
+			return $profile->firstname[0] . $profile->lastname[0] . time();
 		}
-
 		return '';
 	}
 
 	public function generatePassword(): string {
-		if ($this->hasValidFirstAndLastName()) {
+		$profile = $this->getProfile();
+		if ($profile->validate('lastname', false) && !$profile->hasErrors('lastname')) {
 			$profile = $this->getProfile();
-			return $profile->firstname . $profile->lastname . time();
+			return $profile->lastname . time();
 		}
 
 		return '';

@@ -2,7 +2,9 @@
 return [
 	'components' => [
 		'db' => [
-			'dsn' => getenv('DB_DSN'),
+			'dsn' => getenv('TEST_DB_DSN'),
+			'username' => getenv('TEST_DB_USERNAME'),
+			'password' => getenv('TEST_DB_PASSWORD'),
 		],
 	],
 ];

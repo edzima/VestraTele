@@ -58,10 +58,6 @@ return [
 			'thousandSeparator' => ' ',
 			'currencyCode' => 'PLN',
 		],
-		'validator' => [
-			'class' => 'yii\validators\IpValidator',
-			'ipv6' => false,
-		],
 		'log' => [
 			'traceLevel' => YII_ENV_DEV ? 3 : 0,
 			'targets' => [

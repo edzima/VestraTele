@@ -15,9 +15,9 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Customers'), 'ur
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<div class="user-create">
+<div class="customer-create">
 
-	<?php $form = ActiveForm::begin() ?>
+	<?php $form = ActiveForm::begin(['id' => 'customer-form']) ?>
 
 	<?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 

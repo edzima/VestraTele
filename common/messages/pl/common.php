@@ -118,4 +118,7 @@ return [
 	'Summon: {text}' => 'Summon: {text}',
 	'Issues' => 'Sprawy',
 	'Entity responsible' => 'Podmiot odpowiedzialny',
+	'loginToBackend' => 'Logowanie do backendu',
+	'summon' => 'Wezwanie',
+	'pays.delayed' => 'Wpłaty przeterminowane',
 ];

@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		'model' => $model,
 	]) ?>
 
-	<?= AddressDetailView::widget(['model' => $model->homeAddress]) ?>
+	<?= $model->homeAddress ? AddressDetailView::widget(['model' => $model->homeAddress]) : '' ?>
 
 </div>
 

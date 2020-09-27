@@ -114,7 +114,7 @@ $user = Yii::$app->user;
 					'label' => Yii::t('backend', 'Summons'),
 					'url' => ['/issue/summon/index'],
 					'icon' => '<i class="fa fa-angle-double-right"></i>',
-					'visible' => $user->can(User::ROLE_SUMMON),
+					'visible' => $user->can(User::PERMISSION_SUMMON),
 				],
 				[
 					'label' => Yii::t('backend', 'Prowizje'),

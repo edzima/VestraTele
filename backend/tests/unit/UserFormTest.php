@@ -3,13 +3,14 @@
 namespace backend\tests\unit;
 
 use backend\modules\user\models\UserForm;
+use backend\tests\UnitTester;
 use common\fixtures\UserFixture;
 use common\models\user\User;
 
 class UserFormTest extends \Codeception\Test\Unit {
 
 	/**
-	 * @var \frontend\tests\UnitTester
+	 * @var UnitTester
 	 */
 	protected $tester;
 
@@ -25,26 +26,19 @@ class UserFormTest extends \Codeception\Test\Unit {
 	public function testCorrectCreate() {
 		$model = new UserForm();
 
-		$loaded = $model->load([
-			'UserForm' => [
-				'username' => 'some_username',
-				'email' => 'some_email@example.com',
-				'password' => 'some_password',
-			],
-			'UserProfile' => [
-				'firstname' => 'some_firstname',
-				'lastname' => 'some_lastname',
-			],
-		]);
+		$model->username = 'some_username';
+		$model->email = 'test@email.com';
+		$model->password = 'some_password';
+		$profile = $model->getProfile();
+		$profile->firstname = 'some_firstname';
+		$profile->lastname = 'some_lastname';
 
-		expect($loaded)->true();
-		$user = $model->save();
-		expect($user)->true();
+		$this->tester->assertTrue($model->save());
 
 		/** @var User $user */
-		$user = $this->tester->grabRecord('common\models\user\User', [
+		$user = $this->tester->grabRecord(User::class, [
 			'username' => 'some_username',
-			'email' => 'some_email@example.com',
+			'email' => 'test@email.com',
 			'status' => User::STATUS_INACTIVE,
 		]);
 		expect($user)->isInstanceOf(User::class);
@@ -56,21 +50,27 @@ class UserFormTest extends \Codeception\Test\Unit {
 		$mail = $this->tester->grabLastSentEmail();
 
 		expect($mail)->isInstanceOf('yii\mail\MessageInterface');
-		expect($mail->getTo())->hasKey('some_email@example.com');
+		expect($mail->getTo())->hasKey('test@email.com');
 		expect($mail->getFrom())->hasKey(\Yii::$app->params['supportEmail']);
 		expect($mail->getSubject())->equals('Account registration at ' . \Yii::$app->name);
 		//l	expect($mail->toString())->stringContainsString($user->verification_token);
+
 	}
 
 	public function testUpdate(): void {
 		$model = new UserForm();
 		$user = $this->tester->grabFixture('user', 0);
 		$model->setModel($user);
-		expect($model->load([
-			'UserForm' => [
-				'username' => 'updated_username',
-			],
-		]))->true();
+		$model->username = 'new_username';
+		$model->getProfile()->lastname = 'lastname';
+		$model->getProfile()->firstname = 'firstname';
+		expect($model->save())->true();
+		/** @var User $user */
+		$user = $this->tester->grabRecord(User::class, ['username' => 'new_username']);
+		expect($user)->isInstanceOf(User::class);
+		$this->tester->assertSame('firstname',$user->profile->firstname);
+		$this->tester->assertSame('lastname',$user->profile->lastname);
+
 	}
 
 }

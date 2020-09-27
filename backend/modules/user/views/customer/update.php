@@ -2,6 +2,7 @@
 
 use backend\modules\user\models\CustomerUserForm;
 use backend\modules\user\widgets\UserProfileFormWidget;
+use common\widgets\address\AddressFormWidget;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 
@@ -12,14 +13,13 @@ use yii\bootstrap\Html;
 $this->title = Yii::t('backend', 'Update customer: {username}', ['username' => $model->username]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Customers'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
+
 ?>
 <div class="user-update">
 
-	<?php $form = ActiveForm::begin() ?>
+	<?php $form = ActiveForm::begin(['id' => 'customer-form']) ?>
 
 	<?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
-
-	<?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
@@ -28,7 +28,12 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 		'form' => $form,
 	]) ?>
 
-	
+	<?= AddressFormWidget::widget([
+		'form' => $form,
+		'model' => $model->getAddress(),
+	]) ?>
+
+
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-primary']) ?>
 	</div>

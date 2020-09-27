@@ -2,7 +2,7 @@
 
 use backend\modules\user\models\search\CustomerUserSearch;
 use backend\widgets\GridView;
-use common\models\user\UserProfile;
+use edzima\teryt\models\Region;
 use kartik\grid\ActionColumn;
 use yii\bootstrap\Html;
 
@@ -24,8 +24,6 @@ $this->params['breadcrumbs'][] = $this->title;
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-			//['class' => 'yii\grid\SerialColumn'],
-			'id',
 			[
 				'attribute' => 'firstname',
 				'value' => 'profile.firstname',
@@ -34,24 +32,25 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'lastname',
 				'value' => 'profile.lastname',
 			],
+			[
+				'attribute' => 'region_id',
+				'value' => 'homeAddress.city.region',
+				'label' => Yii::t('address', 'Region'),
+				'filter' => Region::getNames(),
+			],
+			[
+				'attribute' => 'city_id',
+				'value' => 'homeAddress.city.name',
+				'label' => Yii::t('address', 'City'),
+			],
 			'email:email',
 			'profile.phone',
-			[
-				'attribute' => 'gender',
-				'value' => 'profile.genderName',
-				'filter' => UserProfile::getGendersNames(),
-			],
-			[
-				'attribute' => 'status',
-				'value' => 'statusName',
-				'filter' => CustomerUserSearch::getStatusesNames(),
-			],
-			'created_at:datetime',
-			'action_at:datetime',
-			'issueCount',
+			'updated_at:datetime',
+
+			'issuesCount',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{update}{view}',
+				'template' => '{view} {update}',
 			],
 		],
 	]) ?>

@@ -27,8 +27,6 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $action_at
- * @property string $typ_work
- * @property string $typWork
  * @property string $authKey
  * @property integer|null $boss
  * @property-read UserProfile $profile
@@ -44,20 +42,21 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const STATUS_BANNED = 2;
 	public const STATUS_DELETED = 3;
 
-	public const PERMISSION_SUMMON = 'summon';
-
 	public const ROLE_DEFAULT = self::ROLE_USER;
 
 	public const ROLE_ADMINISTRATOR = 'administrator';
 	public const ROLE_MANAGER = 'manager';
 	public const ROLE_USER = 'user';
 
-
+	//workers
 	public const ROLE_AGENT = 'agent';
 	public const ROLE_BOOKKEEPER = 'book_keeper';
 	public const ROLE_CUSTOMER_SERVICE = 'customer_service';
 	public const ROLE_TELEMARKETER = 'telemarketer';
 	public const ROLE_LAWYER = 'lawyer';
+
+	//customers
+	public const ROLE_CLIENT = 'client';
 
 	public const PERMISSION_ARCHIVE = 'archive';
 	public const PERMISSION_ISSUE = 'issue';
@@ -66,10 +65,7 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const PERMISSION_NEWS = 'news';
 	public const PERMISSION_NOTE = 'note';
 	public const PERMISSION_PAYS_DELAYED = 'pays.delayed';
-
-	//customers
-	public const ROLE_CLIENT = 'client';
-	public const ROLE_VICTIM = 'victim';
+	public const PERMISSION_SUMMON = 'summon';
 
 	public const WORKERS_ROLES = [
 		self::ROLE_AGENT,
@@ -81,13 +77,10 @@ class User extends ActiveRecord implements IdentityInterface {
 
 	public const CUSTOMERS_ROLES = [
 		self::ROLE_CLIENT,
-		self::ROLE_VICTIM,
 	];
 
-	const EVENT_AFTER_SIGNUP = 'afterSignup';
-
 	private static $ROLES_NAMES;
-	private ?array $roles = null;
+	private static $PERMISSIONS_NAMES;
 
 	/**
 	 * @inheritdoc
@@ -353,14 +346,18 @@ class User extends ActiveRecord implements IdentityInterface {
 		}
 	}
 
-	public function getRoles(bool $refresh = false): array {
-		if ($this->roles === null || $refresh) {
-			$this->roles = ArrayHelper::getColumn(
-				Yii::$app->authManager->getRolesByUser($this->id),
-				'name'
-			);
-		}
-		return $this->roles;
+	public function getRoles(): array {
+		return ArrayHelper::getColumn(
+			Yii::$app->authManager->getRolesByUser($this->id),
+			'name'
+		);
+	}
+
+	public function getPermissions(): array {
+		return ArrayHelper::getColumn(
+			Yii::$app->authManager->getPermissionsByUser($this->id),
+			'name'
+		);
 	}
 
 	/**
@@ -388,6 +385,19 @@ class User extends ActiveRecord implements IdentityInterface {
 			static::$ROLES_NAMES = $rolesI18n;
 		}
 		return static::$ROLES_NAMES;
+	}
+
+	public static function getPermissionsNames(): array {
+		if (empty(static::$PERMISSIONS_NAMES)) {
+			$roles = Yii::$app->authManager->getPermissions();
+			$rolesI18n = [];
+			foreach ($roles as $role) {
+				$name = $role->name;
+				$rolesI18n[$name] = Yii::t('common', $name);
+			}
+			static::$PERMISSIONS_NAMES = $rolesI18n;
+		}
+		return static::$PERMISSIONS_NAMES;
 	}
 
 	/**

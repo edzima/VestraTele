@@ -42,6 +42,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 
 	<?= $form->field($model, 'roles')->checkboxList($model::getRolesNames()) ?>
 
+	<?= $form->field($model, 'permissions')->checkboxList($model::getPermissionsNames()) ?>
 
 	<?= $form->field($model, 'parent_id')
 		->widget(Select2::class, [

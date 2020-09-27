@@ -23,4 +23,14 @@ class FunctionalTester extends \Codeception\Actor {
 	/**
 	 * Define custom actions here
 	 */
+
+
+	public function seeValidationError($message): void {
+		$this->see($message, '.help-block');
+	}
+
+	public function dontSeeValidationError($message): void {
+		$this->dontSee($message, '.help-block');
+	}
+
 }
