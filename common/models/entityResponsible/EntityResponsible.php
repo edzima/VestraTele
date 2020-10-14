@@ -3,6 +3,7 @@
 namespace common\models\entityResponsible;
 
 use common\models\issue\Issue;
+use Yii;
 use yii\db\ActiveRecord;
 
 /**
@@ -45,8 +46,8 @@ class EntityResponsible extends ActiveRecord {
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'name' => 'Nazwa',
-			'is_for_summon' => 'Dla wezwań',
+			'name' => Yii::t('common', 'Name'),
+			'is_for_summon' => Yii::t('common', 'Show in summon'),
 		];
 	}
 

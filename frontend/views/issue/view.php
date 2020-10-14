@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= IssuePaysWidget::widget([
 		'models' => $model->pays,
 		'editPayBtn' => false,
-		'user' => !Yii::$app->user->can(User::ROLE_BOOKKEEPER) ? Yii::$app->user->getIdentity() : null,
+		'user' => Yii::$app->user->getIdentity(),
 	]) ?>
 	<?= IssueSummonsWidget::widget([
 		'model' => $model,

@@ -63,7 +63,7 @@ class m190218_135218_issue extends Migration {
 			'stage_id' => $this->integer()->notNull(),
 			'type_id' => $this->integer()->notNull(),
 			'entity_responsible_id' => $this->integer()->notNull(),
-			'archives_nr' => $this->string(10),
+			'archives_nr' => $this->string(10)->unique(),
 			'payed' => $this->boolean()->notNull()->defaultValue(false),
 			'lawyer_id' => $this->integer()->notNull(),
 			'agent_id' => $this->integer()->notNull(),

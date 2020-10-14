@@ -19,7 +19,7 @@ class IssueSearch extends Issue {
 	public $childsId;
 	public $disabledStages = [];
 	public $onlyDelayed = false;
-	public $withArchive = false;
+	public bool $withArchive = false;
 
 	private $stages = [];
 
@@ -76,7 +76,7 @@ class IssueSearch extends Issue {
 	public function search($params) {
 		$query = Issue::find();
 
-		$query->with(['agent.userProfile', 'type', 'stage.types']);
+		$query->with(['agent.userProfile', 'customer.userProfile', 'victim.userProfile', 'type', 'stage.types']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -114,7 +114,7 @@ class IssueSearch extends Issue {
 			'id' => $this->id,
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,
-			'agent_id' => $this->agent_id,
+			'agent.id' => $this->agent_id,
 			'client_street' => $this->client_street,
 			'client_city_id' => $this->client_city_id,
 			'victim_city_id' => $this->victim_city_id,
@@ -152,11 +152,11 @@ class IssueSearch extends Issue {
 	}
 
 	protected function teleFilter(IssueQuery $query): void {
-		$query->andFilterWhere(['tele_id' => $this->tele_id]);
+		//$query->andFilterWhere(['tele_id' => $this->tele_id]);
 	}
 
 	protected function lawyerFilter(IssueQuery $query): void {
-		$query->andFilterWhere(['lawyer_id' => $this->lawyer_id]);
+//		$query->andFilterWhere(['lawyer_id' => $this->lawyer_id]);
 	}
 
 	private function delayedFilter(IssueQuery $query): void {

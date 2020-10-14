@@ -4,6 +4,7 @@ use common\models\issue\IssuePay;
 use common\modules\issue\widgets\IssuePaysWidget;
 use kartik\grid\GridView;
 use yii\bootstrap\Html;
+use yii\data\ActiveDataProvider;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
@@ -55,14 +56,19 @@ use yii\widgets\DetailView;
 					<?php if ($withProvisions): ?>
 						<fieldset>
 							<legend>Prowizje</legend>
-							<?= GridView::widget([
-								'dataProvider' => $widget->getProvisionsProvider($pay),
-								'columns' => [
-									'toUser',
-									'fromUserString',
-									'value:currency',
-								],
-							]) ?>
+
+							<?
+							if (($dataProvider = $widget->getProvisionsProvider($pay)) instanceof ActiveDataProvider) {
+								echo GridView::widget([
+									'dataProvider' => $dataProvider,
+									'columns' => [
+										'toUser',
+										'fromUserString',
+										'value:currency',
+									],
+								]);
+							}
+							?>
 						</fieldset>
 					<? endif; ?>
 				</div>

@@ -21,6 +21,7 @@ class AddressDetailView extends DetailView {
 		if (empty($this->attributes)) {
 			if ($this->model instanceof LegacyAddress) {
 				$this->attributes = [
+					'cityId',
 					'state',
 					'province',
 					'subProvince',
@@ -52,7 +53,7 @@ class AddressDetailView extends DetailView {
 					[
 						'attribute' => 'city',
 						'label' => 'Miasto',
-						'value' => Yii::$app->formatter->asCityCode($this->model->city->name, $this->model->postal_code),
+						'value' => $this->model->city ? Yii::$app->formatter->asCityCode($this->model->city->name, $this->model->postal_code) : $this->model->postal_code,
 						'visible' => !empty($this->model->postal_code) || !empty($this->model->city),
 					],
 					[

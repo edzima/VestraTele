@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $model common\models\issue\IssueType */
 
 $this->title = 'Edytuj rodzaj: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Rodzaje', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issue Types'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>

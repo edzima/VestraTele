@@ -3,6 +3,7 @@
 namespace common\models\user;
 
 use common\models\Address;
+use common\models\issue\IssueUser;
 use common\models\user\query\UserQuery;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -33,6 +34,7 @@ use yii\web\IdentityInterface;
  * @property-read UserAddress[] $addresses
  * @property-read Address|null $homeAddress
  * @property string $password write-only password
+ * @property-read IssueUser[] $issueUsers
  *
  */
 class User extends ActiveRecord implements IdentityInterface {
@@ -55,8 +57,7 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const ROLE_TELEMARKETER = 'telemarketer';
 	public const ROLE_LAWYER = 'lawyer';
 
-	//customers
-	public const ROLE_CLIENT = 'client';
+
 
 	public const PERMISSION_ARCHIVE = 'archive';
 	public const PERMISSION_ISSUE = 'issue';
@@ -66,18 +67,6 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const PERMISSION_NOTE = 'note';
 	public const PERMISSION_PAYS_DELAYED = 'pays.delayed';
 	public const PERMISSION_SUMMON = 'summon';
-
-	public const WORKERS_ROLES = [
-		self::ROLE_AGENT,
-		self::ROLE_TELEMARKETER,
-		self::ROLE_BOOKKEEPER,
-		self::ROLE_CUSTOMER_SERVICE,
-		self::ROLE_LAWYER,
-	];
-
-	public const CUSTOMERS_ROLES = [
-		self::ROLE_CLIENT,
-	];
 
 	private static $ROLES_NAMES;
 	private static $PERMISSIONS_NAMES;
@@ -149,11 +138,11 @@ class User extends ActiveRecord implements IdentityInterface {
 			'email' => Yii::t('common', 'Email'),
 			'status' => Yii::t('common', 'Status'),
 			'statusName' => Yii::t('common', 'Status'),
+			'fullName' => Yii::t('common', 'Full name'),
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
 			'action_at' => Yii::t('common', 'Last action at'),
 			'boss' => Yii::t('common', 'Boss'),
-
 		];
 	}
 
@@ -246,6 +235,10 @@ class User extends ActiveRecord implements IdentityInterface {
 		return $timestamp + $expire >= time();
 	}
 
+	public function getIssueUsers(): ActiveQuery {
+		return $this->hasMany(IssueUser::class, ['user_id' => 'id']);
+	}
+
 	/**
 	 * @inheritdoc
 	 */
@@ -330,20 +323,6 @@ class User extends ActiveRecord implements IdentityInterface {
 
 	public function getStatusName(): string {
 		return static::getStatusesNames()[$this->status];
-	}
-
-	public function setRoles(array $roles): void {
-		$auth = Yii::$app->authManager;
-		$auth->revokeAll($this->id);
-		if (empty($roles)) {
-			$roles = [static::ROLE_DEFAULT];
-		}
-		foreach ($roles as $roleName) {
-			$role = $auth->getRole($roleName);
-			if ($role) {
-				$auth->assign($role, $this->id);
-			}
-		}
 	}
 
 	public function getRoles(): array {

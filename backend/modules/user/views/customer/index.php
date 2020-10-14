@@ -1,7 +1,10 @@
 <?php
 
+use backend\helpers\Url;
 use backend\modules\user\models\search\CustomerUserSearch;
 use backend\widgets\GridView;
+use common\models\user\Customer;
+use common\models\user\UserProfile;
 use edzima\teryt\models\Region;
 use kartik\grid\ActionColumn;
 use yii\bootstrap\Html;
@@ -27,10 +30,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'attribute' => 'firstname',
 				'value' => 'profile.firstname',
+				'label' => UserProfile::instance()->getAttributeLabel('firstname'),
 			],
 			[
 				'attribute' => 'lastname',
 				'value' => 'profile.lastname',
+				'label' => UserProfile::instance()->getAttributeLabel('lastname'),
 			],
 			[
 				'attribute' => 'region_id',
@@ -39,18 +44,31 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => Region::getNames(),
 			],
 			[
-				'attribute' => 'city_id',
+				'attribute' => 'city',
 				'value' => 'homeAddress.city.name',
 				'label' => Yii::t('address', 'City'),
 			],
 			'email:email',
-			'profile.phone',
+			[
+				'attribute' => 'phone',
+				'value' => 'profile.phone',
+				'label' => Yii::t('common', 'Phone number'),
+			],
 			'updated_at:datetime',
-
-			'issuesCount',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{view} {update}',
+				'template' => '{create-issue} {view} {update}',
+				'buttons' => [
+					'create-issue' => static function (string $url, Customer $model): string {
+						return Html::a(
+							'<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>',
+							Url::toRoute(['/issue/issue/create', 'customerId' => $model->id]),
+							[
+								'title' => Yii::t('backend', 'Create issue'),
+								'aria-label' => Yii::t('backend', 'Create issue'),
+							]);
+					},
+				],
 			],
 		],
 	]) ?>

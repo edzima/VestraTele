@@ -10,7 +10,8 @@ class IssueFixture extends ActiveFixture {
 	public $modelClass = Issue::class;
 
 	public $depends = [
-		TypeFixture::class,
+		StageTypesFixtures::class,
+		EntityResponsibleFixture::class,
 	];
-	
+
 }

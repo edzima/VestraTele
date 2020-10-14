@@ -2,6 +2,7 @@
 
 namespace console\controllers;
 
+use common\models\user\Customer;
 use common\models\user\User;
 use common\rbac\OwnModelRule;
 use Yii;
@@ -17,7 +18,11 @@ class RbacController extends Controller {
 		User::ROLE_CUSTOMER_SERVICE,
 		User::ROLE_LAWYER,
 		User::ROLE_TELEMARKETER,
-		User::ROLE_CLIENT,
+		Customer::ROLE_CUSTOMER,
+		Customer::ROLE_VICTIM,
+		Customer::ROLE_MINOR,
+		Customer::ROLE_DIED,
+		Customer::ROLE_SHAREHOLDER,
 	];
 
 	public array $permissions = [
@@ -66,8 +71,9 @@ class RbacController extends Controller {
 		foreach ($permissions as $item) {
 			$this->assignAdmin($item);
 		}
-
-		$auth->assign($admin, 1);
+		if (!YII_ENV_TEST) {
+			$auth->assign($admin, 1);
+		}
 
 		Console::output('Success! RBAC roles has been added.');
 	}

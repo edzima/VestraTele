@@ -2,7 +2,10 @@
 
 namespace common\models\user\query;
 
+use common\components\DbManager;
+use common\models\user\Customer;
 use common\models\user\User;
+use common\models\user\Worker;
 use Yii;
 use yii\db\ActiveQuery;
 
@@ -13,28 +16,47 @@ use yii\db\ActiveQuery;
  */
 class UserQuery extends ActiveQuery {
 
+	private bool $isAssignmentJoin = false;
+
 	public function workers(): self {
-		return $this->onlyByRoles(User::WORKERS_ROLES, false);
+		return $this->onlyByRoles(Worker::ROLES, false);
 	}
 
 	public function customers(): self {
-		return $this->onlyByRoles(User::CUSTOMERS_ROLES, false);
+		return $this->onlyByRoles(Customer::ROLES, false);
 	}
 
 	public function onlyByRoles(array $roles, bool $common): self {
 		$auth = Yii::$app->authManager;
 		$ids = [];
 		$i = 0;
-		foreach ($roles as $role) {
-			$userIds = $auth->getUserIdsByRole($role);
-			if ($common && $i > 0) {
-				$ids = array_intersect($ids, $userIds);
-			} else {
-				$ids = array_merge($ids, $userIds);
+		//@todo add test for them.
+		if (!$auth instanceof DbManager) {
+			if (!$this->isAssignmentJoin) {
+				$this->isAssignmentJoin = true;
+				$this->leftJoin('auth_assignment', 'user.id = auth_assignment.user_id');
 			}
-			$i++;
+			$columnName = $auth->assignmentTable . '.item_name';
+			if ($common) {
+				foreach ($roles as $role) {
+					$this->andWhere([$columnName => $role]);
+				}
+			} else {
+				$this->andWhere([$columnName => $roles]);
+			}
+		} else {
+			foreach ($roles as $role) {
+				$userIds = $auth->getUserIdsByRole($role);
+				if ($common && $i > 0) {
+					$ids = array_intersect($ids, $userIds);
+				} else {
+					$ids = array_merge($ids, $userIds);
+				}
+				$i++;
+			}
+			$this->andWhere([User::tableName() . '.id' => $ids]);
 		}
-		$this->andWhere([User::tableName() . '.id' => $ids]);
+
 		return $this;
 	}
 

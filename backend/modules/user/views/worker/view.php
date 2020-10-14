@@ -1,5 +1,6 @@
 <?php
 
+use common\models\user\User;
 use common\models\user\Worker;
 use common\widgets\address\AddressDetailView;
 use yii\helpers\Html;
@@ -17,22 +18,36 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Html::a('Edytuj', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-		<?= Html::a('Usuń', ['delete', 'id' => $model->id], [
-			'class' => 'btn btn-danger',
-			'data' => [
-				'confirm' => 'Are you sure you want to delete this item?',
-				'method' => 'post',
-			],
-		]) ?>
+		<?php if (Yii::$app->user->can(\common\models\user\User::ROLE_ADMINISTRATOR)): ?>
+			<?= Html::a('Edytuj', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+			<?= Html::a('Usuń', ['delete', 'id' => $model->id], [
+				'class' => 'btn btn-danger',
+				'data' => [
+					'confirm' => 'Are you sure you want to delete this item?',
+					'method' => 'post',
+				],
+			]) ?>
+		<?php endif; ?>
 	</p>
 
 
 	<?= DetailView::widget([
 		'model' => $model,
+		'attributes' => [
+			[
+				'attribute' => 'username',
+				'visible' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+			],
+			'profile.firstname',
+			'profile.lastname',
+			'email',
+			'profile.phone',
+			'profile.phone_2',
+			'statusName',
+		],
 	]) ?>
 
-	<?= AddressDetailView::widget(['model' => $model->homeAddress]) ?>
+	<?= $model->homeAddress ? AddressDetailView::widget(['model' => $model->homeAddress]) : '' ?>
 
 </div>
 

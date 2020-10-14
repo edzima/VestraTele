@@ -6,6 +6,7 @@ use backend\modules\issue\models\IssueForm;
 use backend\widgets\CsvForm;
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch;
+use common\models\user\Customer;
 use common\models\user\Worker;
 use Yii;
 use yii\db\ActiveQuery;
@@ -108,13 +109,18 @@ class IssueController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionCreate() {
-		$form = new IssueForm();
-		if ($form->load(Yii::$app->request->post()) && $form->save()) {
-			return $this->redirect(['view', 'id' => $form->getModel()->id]);
+	public function actionCreate(int $customerId) {
+		$customer = Customer::findOne($customerId);
+		if ($customer === null) {
+			throw new NotFoundHttpException('Client not exist');
+		}
+
+		$model = new IssueForm(['customer' => $customer]);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('create', [
-			'model' => $form,
+			'model' => $model,
 		]);
 	}
 

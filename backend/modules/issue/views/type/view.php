@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model common\models\issue\IssueType */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Issue Types', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issue Types'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-type-view">

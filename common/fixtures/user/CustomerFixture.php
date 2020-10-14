@@ -3,10 +3,10 @@
 namespace common\fixtures\user;
 
 use common\models\user\Customer;
-use yii\test\ActiveFixture;
 
-class CustomerFixture extends ActiveFixture {
+class CustomerFixture extends RbacUserFixture {
 
 	public $modelClass = Customer::class;
+	public array $roles = [Customer::ROLE_DEFAULT];
 
 }

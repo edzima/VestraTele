@@ -3,6 +3,8 @@
 namespace backend\tests\functional;
 
 use backend\tests\FunctionalTester;
+use backend\tests\Step\Functional\Admin;
+use backend\tests\Step\Functional\Manager;
 use common\fixtures\UserFixture;
 use Yii;
 
@@ -37,7 +39,7 @@ class LoginCest {
 		$I->see('Login');
 	}
 
-	public function loginUser(FunctionalTester $I) {
+	public function loginUserWithPermission(FunctionalTester $I) {
 		$user = $I->grabFixture('user', 0);
 		Yii::$app->authManager->assign(Yii::$app->authManager->getPermission('loginToBackend'), $user->id);
 		$I->amOnPage('/site/login');
@@ -48,6 +50,18 @@ class LoginCest {
 		$I->see('Logout', 'a[data-method="post"]');
 		$I->dontSeeLink('Login');
 		$I->dontSeeLink('Signup');
+	}
+
+	public function loginAsAdmin(Admin $I): void {
+		$I->amLoggedIn();
+		$I->see('Logout', 'a[data-method="post"]');
+		$I->dontSeeLink('Login');
+	}
+
+	public function loginAsManager(Manager $I): void {
+		$I->amLoggedIn();
+		$I->see('Logout', 'a[data-method="post"]');
+		$I->dontSeeLink('Login');
 	}
 
 }

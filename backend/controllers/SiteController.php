@@ -2,13 +2,13 @@
 
 namespace backend\controllers;
 
+use common\components\keyStorage\FormModel;
+use common\models\user\LoginForm;
+use vova07\fileapi\actions\UploadAction as FileAPIUpload;
 use vova07\imperavi\actions\UploadFileAction;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
-use common\components\keyStorage\FormModel;
-use common\models\user\LoginForm;
-use vova07\fileapi\actions\UploadAction as FileAPIUpload;
 use yii\web\ErrorAction;
 
 /**
@@ -33,7 +33,7 @@ class SiteController extends Controller {
 	/**
 	 * @inheritdoc
 	 */
-	public function actions() {
+	public function actions(): array {
 		return [
 			'error' => [
 				'class' => ErrorAction::class,
@@ -58,9 +58,7 @@ class SiteController extends Controller {
 	}
 
 	public function beforeAction($action): bool {
-
 		$this->layout = Yii::$app->user->isGuest || !Yii::$app->user->can('loginToBackend') ? 'main-login' : 'main';
-
 		return parent::beforeAction($action);
 	}
 

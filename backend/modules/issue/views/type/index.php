@@ -1,13 +1,13 @@
 <?php
 
-use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\issue\IssueTypeSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Rodzaje';
+$this->title = Yii::t('backend', 'Issue Types');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-type-index">
@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
 	<p>
-		<?= Html::a('Dodaj', ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('backend', 'Create issue type'), ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
 
 	<?= GridView::widget([
@@ -26,6 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'name',
 			'short_name',
 			'vat',
+			'provision',
 			'meet:boolean',
 			['class' => 'yii\grid\ActionColumn'],
 		],

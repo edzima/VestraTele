@@ -17,6 +17,14 @@ use yii\helpers\ArrayHelper;
  */
 class Worker extends User {
 
+	public const ROLES = [
+		self::ROLE_AGENT,
+		self::ROLE_TELEMARKETER,
+		self::ROLE_BOOKKEEPER,
+		self::ROLE_CUSTOMER_SERVICE,
+		self::ROLE_LAWYER,
+	];
+
 	private static $USER_NAMES = [];
 
 	private $selfTree;

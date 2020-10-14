@@ -12,7 +12,6 @@ use yii\web\NotFoundHttpException;
 
 class UserController extends Controller {
 
-	public $accessRole = User::ROLE_ADMINISTRATOR;
 	public $searchModel = UserSearch::class;
 	public $formModel = UserForm::class;
 	public $model = User::class;

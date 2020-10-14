@@ -3,7 +3,8 @@
 namespace backend\tests\functional;
 
 use backend\tests\FunctionalTester;
-use common\fixtures\UserFixture;
+use backend\tests\Step\Functional\Manager;
+use common\fixtures\user\CustomerFixture;
 
 /**
  * Class LoginCest
@@ -20,16 +21,20 @@ class CustomerListCest {
 	 */
 	public function _fixtures() {
 		return [
-			'user' => [
-				'class' => UserFixture::class,
-				'dataFile' => codecept_data_dir() . 'login_data.php',
+			'customer' => [
+				'class' => CustomerFixture::class,
+				'dataFile' => codecept_data_dir() . 'customer.php',
 			],
 		];
 	}
 
-	public function _before(FunctionalTester $I) {
-		$I->amLoggedInAs(1);
+	public function _before(Manager $I): void {
+		$I->amLoggedIn();
 		$I->amOnRoute('/user/customer/index');
+	}
+
+	public function checkCount(FunctionalTester $I): void {
+		$I->see('Showing 1-4 of 4 items');
 	}
 
 	public function checkTable(FunctionalTester $I): void {
@@ -40,7 +45,6 @@ class CustomerListCest {
 		$I->see('City', 'table');
 		$I->see('Email', 'table');
 		$I->see('Phone', 'table');
-		$I->see('Issues count', 'table');
 	}
 
 	public function checkCreateCustomerLink(FunctionalTester $I): void {

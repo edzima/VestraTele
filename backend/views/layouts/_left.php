@@ -33,20 +33,8 @@ $user = Yii::$app->user;
 					'url' => ['/user/customer/index'],
 					'icon' => '<i class="fa fa-users"></i>',
 				],
-
 				[
-					'label' => Yii::t('backend', 'Articles'),
-					'url' => '#',
-					'icon' => '<i class="fa fa-edit"></i>',
-					'options' => ['class' => 'treeview'],
-					'items' => [
-						['label' => Yii::t('backend', 'Articles'), 'url' => ['/article/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-						['label' => Yii::t('backend', 'Article categories'), 'url' => ['/article-category/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-					],
-					'visible' => $user->can(User::PERMISSION_NEWS),
-				],
-				[
-					'label' => 'Spotkania',
+					'label' => Yii::t('backend', 'Meets'),
 					'url' => '#',
 					'icon' => '<i class="fa fa fa-calendar"></i>',
 					'options' => ['class' => 'treeview'],
@@ -71,17 +59,12 @@ $user = Yii::$app->user;
 				],
 
 				[
-					'label' => 'Sprawy',
+					'label' => Yii::t('backend', 'Issues'),
 					'url' => ['/issue/issue/index'],
 					'icon' => '<i class="fa fa-suitcase"></i>',
 					'options' => ['class' => 'treeview'],
 					'visible' => $user->can(User::PERMISSION_ISSUE),
 					'items' => [
-						[
-							'label' => Yii::t('issue', 'Dodaj'),
-							'url' => ['/issue/issue/create'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
-						],
 						[
 							'label' => Yii::t('issue', 'Przeglądaj'),
 							'url' => ['/issue/issue/index'],
@@ -179,6 +162,17 @@ $user = Yii::$app->user;
 
 						],
 					],
+				],
+				[
+					'label' => Yii::t('backend', 'Articles'),
+					'url' => '#',
+					'icon' => '<i class="fa fa-edit"></i>',
+					'options' => ['class' => 'treeview'],
+					'items' => [
+						['label' => Yii::t('backend', 'Articles'), 'url' => ['/article/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+						['label' => Yii::t('backend', 'Article categories'), 'url' => ['/article-category/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+					],
+					'visible' => $user->can(User::PERMISSION_NEWS),
 				],
 				[
 					'label' => Yii::t('backend', 'System'),

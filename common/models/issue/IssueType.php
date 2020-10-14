@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -22,10 +23,13 @@ use yii\helpers\ArrayHelper;
 class IssueType extends ActiveRecord {
 
 	public const ACCIDENT_ID = 1;
-	public const SPA_ID = 2;
 	private $provision;
 
-	private static $TYPES;
+	private static ?array $TYPES = null;
+
+	public function __toString(): string {
+		return $this->name;
+	}
 
 	/**
 	 * @inheritdoc
@@ -39,13 +43,14 @@ class IssueType extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['name', 'short_name', 'vat'], 'required'],
+			[['name', 'short_name', 'vat', 'provision_type'], 'required'],
 			[['provision_type'], 'integer'],
 			['meet', 'boolean'],
 			[['name', 'short_name'], 'string', 'max' => 255],
 			[['name'], 'unique'],
 			['vat', 'number', 'min' => 0, 'max' => 100],
 			[['short_name'], 'unique'],
+			['provision_type', 'in', 'range' => array_keys(Provision::getTypesNames())],
 		];
 	}
 
@@ -55,11 +60,11 @@ class IssueType extends ActiveRecord {
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'name' => 'Nazwa',
-			'short_name' => 'Skrót',
-			'provision_type' => 'Prowizja',
+			'name' => Yii::t('common', 'Name'),
+			'short_name' => Yii::t('common', 'Shortname'),
+			'provision_type' => Yii::t('common', 'Provision type'),
 			'vat' => 'VAT (%)',
-			'meet' => 'Spotkania',
+			'meet' => Yii::t('common', 'meet'),
 		];
 	}
 
@@ -86,17 +91,13 @@ class IssueType extends ActiveRecord {
 		return $this->name . ' (' . $this->short_name . ')';
 	}
 
-	public function __toString(): string {
-		return $this->name;
-	}
-
 	public static function get(int $typeId): ?self {
 		return static::getTypes()[$typeId] ?? null;
 	}
 
 	public static function getTypes(): array {
 		if (static::$TYPES === null) {
-			static::$TYPES = static::find()->all();
+			static::$TYPES = static::find()->indexBy('id')->all();
 		}
 		return static::$TYPES;
 	}

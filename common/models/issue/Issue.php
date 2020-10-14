@@ -12,8 +12,13 @@ use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueNoteQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
+use common\models\issue\query\IssueUserQuery;
+use common\models\user\Customer;
+use common\models\user\query\UserQuery;
+use common\models\user\User;
 use common\models\user\Worker;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
+use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -64,6 +69,7 @@ use yii\db\Expression;
  * @property City $victimCity
  * @property Worker $agent
  * @property Worker $lawyer
+ * @property-read Customer $customer
  * @property Worker|null $tele
  * @property IssuePay[] $pays
  * @property EntityResponsible $entityResponsible
@@ -74,6 +80,7 @@ use yii\db\Expression;
  * @property SubProvince $clientSubprovince
  * @property SubProvince $victimSubprovince
  * @property IssuePayCalculation[] $payCalculations
+ * @property-read Summon[] $summons
  */
 class Issue extends ActiveRecord {
 
@@ -124,57 +131,16 @@ class Issue extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['created_at', 'updated_at'], 'safe'],
-			[
-				[
-					'agent_id', 'client_first_name', 'client_surname', 'client_city_id', 'client_city_code',
-					'client_street', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id', 'date', 'lawyer_id',
-				], 'required',
-			],
-			[
-				[
-					'agent_id', 'tele_id', 'lawyer_id', 'client_subprovince_id', 'client_city_id', 'victim_subprovince_id',
-					'victim_city_id', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id', 'id',
-				], 'integer',
-			],
-			[
-				[
-					'client_first_name', 'client_surname', 'client_email', 'client_street', 'victim_first_name',
-					'victim_surname', 'victim_email', 'victim_street',
-				], 'string', 'max' => 255,
-			],
-			[['client_phone_1', 'client_phone_2', 'victim_phone'], 'string', 'max' => 20],
-			[['client_phone_1', 'client_phone_2', 'victim_phone'], PhoneValidator::class, 'country' => 'PL'],
-
-			[['client_email', 'victim_email'], 'email'],
-			[['client_city_code', 'victim_city_code'], 'string', 'max' => 6],
-			[['victim_first_name', 'victim_surname', 'victim_phone', 'victim_email', 'victim_city_id', 'victim_street'], 'default', 'value' => null],
-			[['archives_nr'], 'string', 'max' => 10],
+			[['stage_id', 'type_id', 'entity_responsible_id', 'date',], 'required',],
+			[['stage_id', 'type_id', 'entity_responsible_id'], 'integer'],
 			[['details'], 'string'],
-			[['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['agent_id' => 'id']],
-			[['lawyer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['lawyer_id' => 'id']],
-			[['tele_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['tele_id' => 'id']],
-			[['client_city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['client_city_id' => 'id']],
+			['archives_nr', 'unique'],
 			[['entity_responsible_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_responsible_id' => 'id']],
 			[['stage_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueStage::class, 'targetAttribute' => ['stage_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueType::class, 'targetAttribute' => ['type_id' => 'id']],
-			[['provision_base', 'provision_value'], 'number', 'min' => 1],
-			[['provision_value'], 'number', 'max' => 1000],
-			['provision_type', 'in', 'range' => array_keys(Provision::getTypesNames())],
-			[
-				'archives_nr',
-				'required',
-				'when' => static function (Issue $model) {
-					return $model->isArchived();
-				},
-				'whenClient' => 'function(attribute, value){
-					return isArchived();
-				}',
-			],
+			//@todo remove this rules after create customers from production Issues.
 			[['client_email', 'victim_email'], 'email'],
-			['payed', 'boolean'],
-			['payed', 'default', 'value' => false],
-			['stage_id', 'filter', 'filter' => 'intval'],
-			[['date', 'accident_at', 'stage_change_at'], 'date', 'format' => DATE_ATOM],
+			[['client_phone_1', 'client_phone_2', 'victim_phone'], PhoneValidator::class, 'country' => 'PL'],
 		];
 	}
 
@@ -185,43 +151,55 @@ class Issue extends ActiveRecord {
 		return [
 			'id' => 'ID',
 			'longId' => 'ID',
-			'created_at' => 'Dodano',
-			'updated_at' => 'Edycja',
-			'date' => 'Data podpisania',
-			'agent_id' => 'Agent',
-			'client_first_name' => 'Imie',
-			'client_surname' => 'Nazwisko',
-			'client_phone_1' => 'Tel. klienta',
-			'client_phone_2' => 'Tel. 2 klienta',
-			'client_email' => 'Email',
-			'client_city_id' => 'Miasto',
-			'client_city_code' => 'Kod pocztowy',
-			'client_street' => 'Ulica klienta',
-			'victim_first_name' => 'Imie',
-			'victim_surname' => 'Nazwisko',
-			'victim_phone' => 'Tel.',
-			'victim_email' => 'Email',
-			'victim_city_id' => 'Miasto',
-			'victim_city_code' => 'Kod pocztowy',
-			'victim_street' => 'Ulica',
-			'details' => 'Szczegoły',
-			'provision_base' => 'Wartość roszczenia',
-			'provision_type' => 'Rodzaj',
-			'provision_value' => 'Procent \ Krotność',
-			'stage_id' => 'Etap',
-			'type_id' => 'Typ',
-			'entity_responsible_id' => 'Podmiot odpowiedzialny',
-			'archives_nr' => 'Archiwum',
-			'clientState' => 'Region klienta',
-			'clientCity' => 'Miasto klienta',
-			'payed' => 'Opłacono',
-			'lawyer_id' => 'Prawnik',
-			'tele_id' => 'Telemarketer',
-			'accident_at' => 'Data wypadku',
-			'entityResponsibleDetails' => 'Podmiot odpowiedzialny',
-			'stage_change_at' => 'Data etapu',
+			'created_at' => Yii::t('common', 'Created at'),
+			'updated_at' => Yii::t('common', 'Updated at'),
+			'details' => Yii::t('common', 'Details'),
+			'stage_id' => Yii::t('common', 'Stage'),
+			'type_id' => Yii::t('common', 'Type'),
+			'stage' => Yii::t('common', 'Stage'),
+			'type' => Yii::t('common', 'Type'),
+			'entity_responsible_id' => Yii::t('common', 'Entity responsible'),
+			'date' => Yii::t('common', 'Date at'),
+			'archives_nr' => Yii::t('common', 'Archives'),
+			'accident_at' => Yii::t('common', 'Accident date'),
+			'stage_change_at' => Yii::t('common', 'Stage date'),
 
 		];
+	}
+
+	public function getCustomer(): UserQuery {
+		return $this->getUserType(IssueUser::TYPE_CUSTOMER, Customer::class);
+	}
+
+	public function getVictim(): UserQuery {
+		return $this->getUserType(IssueUser::TYPE_VICTIM, Customer::class);
+	}
+
+	public function getAgent(): UserQuery {
+		return $this->getUserType(IssueUser::TYPE_AGENT, Worker::class);
+	}
+
+	public function getLawyer(): UserQuery {
+		return $this->getUserType(IssueUser::TYPE_LAWYER, Worker::class);
+	}
+
+	public function getTele(): UserQuery {
+		return $this->getUserType(IssueUser::TYPE_TELEMARKETER, Worker::class);
+	}
+
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	protected function getUserType(string $type, string $userClass = User::class, callable $callable = null): UserQuery {
+		return $this->hasOne($userClass, ['id' => 'user_id'])->via('users', function (IssueUserQuery $query) use ($type, $callable) {
+			$query->withType($type);
+			if ($callable !== null) {
+				$callable($query, $type);
+			}
+		});
+	}
+
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getUsers(): IssueUserQuery {
+		return $this->hasMany(IssueUser::class, ['issue_id' => 'id']);
 	}
 
 	public function getClientStateId(): ?int {
@@ -340,10 +318,6 @@ class Issue extends ActiveRecord {
 		return $this->victim_street;
 	}
 
-	public function getAgent() {
-		return $this->hasOne(Worker::class, ['id' => 'agent_id']);
-	}
-
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
@@ -372,6 +346,10 @@ class Issue extends ActiveRecord {
 		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])->with('user')->orderBy('created_at DESC');
 	}
 
+	public function getSummons() {
+		return $this->hasMany(Summon::class, ['issue_id' => 'id']);
+	}
+
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
@@ -397,10 +375,6 @@ class Issue extends ActiveRecord {
 		return (int) $this->type_id === IssueType::ACCIDENT_ID;
 	}
 
-	public function isSpa(): bool {
-		return (int) $this->type_id === IssueType::SPA_ID;
-	}
-
 	public function getProvision(): Provision {
 		if ($this->provision === null) {
 			if ($this->isNewRecord) {
@@ -414,14 +388,6 @@ class Issue extends ActiveRecord {
 			]);
 		}
 		return $this->provision;
-	}
-
-	public function getLawyer() {
-		return $this->hasOne(Worker::class, ['id' => 'lawyer_id']);
-	}
-
-	public function getTele() {
-		return $this->hasOne(Worker::class, ['id' => 'tele_id']);
 	}
 
 	public function hasTele(): bool {
@@ -454,6 +420,27 @@ class Issue extends ActiveRecord {
 
 	public function markAsUpdate(): void {
 		$this->touch('updated_at');
+	}
+
+	public function linkUser(int $userId, string $type): void {
+		$user = $this->getUsers()->withType($type)->one();
+		if ($user !== null) {
+			$user->user_id = $userId;
+			$user->save();
+		} else {
+			$this->link('users', new IssueUser(['user_id' => $userId, 'type' => $type]));
+		}
+	}
+
+	/**
+	 * @param string $type
+	 * @param bool $delete
+	 */
+	public function unlinkUser(string $type, bool $delete = false) {
+		$user = $this->getUsers()->withType($type)->one();
+		if ($user !== null) {
+			$this->unlink('users', $user, $delete);
+		}
 	}
 
 	/**

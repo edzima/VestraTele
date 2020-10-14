@@ -4,6 +4,7 @@ namespace common\models\issue\query;
 
 use common\models\issue\Issue;
 use common\models\issue\IssueStage;
+use common\models\issue\IssueUser;
 use yii\db\ActiveQuery;
 
 /**
@@ -12,6 +13,16 @@ use yii\db\ActiveQuery;
  * @see Issue
  */
 class IssueQuery extends ActiveQuery {
+
+	public function withoutCustomer(): self {
+		$this->andWhere([
+			'NOT IN', 'id', IssueUser::find()
+				->withType(IssueUser::TYPE_CUSTOMER)
+				->select('issue_id')
+				->column(),
+		]);
+		return $this;
+	}
 
 	public function onlyPositiveDecision(): self {
 		$this->andWhere(['stage_id' => IssueStage::POSITIVE_DECISION_ID]);
@@ -67,7 +78,7 @@ class IssueQuery extends ActiveQuery {
 	}
 
 	public function withoutArchives(): self {
-		$this->andWhere(['not in', 'stage_id', IssueStage::ARCHIVES_ID]);
+		$this->andWhere(['not', 'stage_id' => IssueStage::ARCHIVES_ID]);
 		return $this;
 	}
 }

@@ -1,12 +1,13 @@
 <?php
 
 use backend\widgets\CsvForm;
+use backend\widgets\GridView;
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch;
+use common\models\user\User;
 use common\models\user\Worker;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
-use kartik\grid\GridView;
 use kartik\grid\SerialColumn;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
@@ -16,7 +17,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel IssueSearch */
 /* @var $dataProvider ActiveDataProvider */
 
-$this->title = 'Sprawy';
+$this->title = Yii::t('backend', 'Issues');
 $this->params['breadcrumbs'][] = $this->title;
 
 $js = <<<JS
@@ -65,7 +66,7 @@ $("body").on('afterFilter', "#issues-list" , function(event) {
 });
 
 JS;
-$this->registerJs($js);
+//$this->registerJs($js);
 
 ?>
 <div class="issue-index relative">
@@ -74,9 +75,7 @@ $this->registerJs($js);
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 	<?= CsvForm::widget() ?>
-	<p>
-		<?= Html::a('Dodaj', ['create'], ['class' => 'btn btn-success']) ?>
-	</p>
+
 
 	<?= GridView::widget([
 		'id' => 'issues-list',
@@ -101,6 +100,7 @@ $this->registerJs($js);
 					'view' => static function (Issue $model) use ($searchModel): bool {
 						return !$model->isArchived() || $searchModel->withArchive;
 					},
+					'delete' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
 				],
 			],
 			[
@@ -169,7 +169,12 @@ $this->registerJs($js);
 				],
 				'visible' => $searchModel->onlyDelayed,
 			],
+			[
+				'class' => DataColumn::class,
+				'attribute' => 'customer',
+				'value' => 'customer.fullName',
 
+			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'client_surname',

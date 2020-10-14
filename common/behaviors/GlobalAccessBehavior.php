@@ -9,50 +9,48 @@ use yii\base\Controller;
 /**
  * Class GlobalAccessBehavior.
  */
-class GlobalAccessBehavior extends Behavior
-{
-    /**
-     * @var array
-     * @see \yii\filters\AccessControl::rules
-     */
-    public $rules = [];
+class GlobalAccessBehavior extends Behavior {
 
-    /**
-     * @var string
-     */
-    public $accessControlFilter = 'yii\filters\AccessControl';
+	/**
+	 * @var array
+	 * @see \yii\filters\AccessControl::rules
+	 */
+	public $rules = [];
 
-    /**
-     * @var callable a callback that will be called if the access should be denied
-     * to the current user. If not set, [[denyAccess()]] will be called.
-     *
-     * The signature of the callback should be as follows:
-     *
-     * ~~~
-     * function ($rule, $action)
-     * ~~~
-     *
-     * where `$rule` is the rule that denies the user, and `$action` is the current [[Action|action]] object.
-     * `$rule` can be `null` if access is denied because none of the rules matched.
-     */
-    public $denyCallback;
+	/**
+	 * @var string
+	 */
+	public $accessControlFilter = 'yii\filters\AccessControl';
 
-    /**
-     * @return array
-     */
-    public function events()
-    {
-        return [
-            Controller::EVENT_BEFORE_ACTION => 'beforeAction',
-        ];
-    }
+	/**
+	 * @var callable a callback that will be called if the access should be denied
+	 * to the current user. If not set, [[denyAccess()]] will be called.
+	 *
+	 * The signature of the callback should be as follows:
+	 *
+	 * ~~~
+	 * function ($rule, $action)
+	 * ~~~
+	 *
+	 * where `$rule` is the rule that denies the user, and `$action` is the current [[Action|action]] object.
+	 * `$rule` can be `null` if access is denied because none of the rules matched.
+	 */
+	public $denyCallback;
 
-    public function beforeAction()
-    {
-        Yii::$app->controller->attachBehavior('access', [
-            'class' => $this->accessControlFilter,
-            'denyCallback' => $this->denyCallback,
-            'rules' => $this->rules,
-        ]);
-    }
+	/**
+	 * @return array
+	 */
+	public function events(): array {
+		return [
+			Controller::EVENT_BEFORE_ACTION => 'beforeAction',
+		];
+	}
+
+	public function beforeAction(): void {
+		Yii::$app->controller->attachBehavior('access', [
+			'class' => $this->accessControlFilter,
+			'denyCallback' => $this->denyCallback,
+			'rules' => $this->rules,
+		]);
+	}
 }

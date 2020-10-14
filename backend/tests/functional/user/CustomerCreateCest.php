@@ -3,6 +3,7 @@
 namespace backend\tests\functional;
 
 use backend\tests\FunctionalTester;
+use backend\tests\Step\Functional\Manager;
 use common\fixtures\UserFixture;
 use common\models\user\User;
 use common\models\user\UserProfile;
@@ -29,8 +30,8 @@ class CustomerCreateCest {
 		];
 	}
 
-	public function _before(FunctionalTester $I) {
-		$I->amLoggedInAs(1);
+	public function _before(Manager $I) {
+		$I->amLoggedIn();
 		$I->amOnRoute('/user/customer/create');
 	}
 
@@ -38,9 +39,11 @@ class CustomerCreateCest {
 		$I->fillField('Email', '');
 		$I->fillField('Firstname', '');
 		$I->fillField('Lastname', '');
+
 		$this->sendForm($I);
 		$I->seeValidationError('Firstname cannot be blank.');
 		$I->seeValidationError('Lastname cannot be blank.');
+
 	}
 
 	public function checkOnlyFirstname(FunctionalTester $I): void {
@@ -63,6 +66,7 @@ class CustomerCreateCest {
 		$this->sendForm($I);
 		$I->dontSeeValidationError('Firstname cannot be blank.');
 		$I->dontSeeValidationError('Lastname cannot be blank.');
+		$I->dontSeeEmailIsSent();
 
 		$I->seeRecord(User::class, [
 			'and',
@@ -80,6 +84,7 @@ class CustomerCreateCest {
 		$I->fillField('Email', 'fred@test.com');
 		$I->fillField('Firstname', 'Fred');
 		$I->fillField('Lastname', 'Johansson');
+
 		$this->sendForm($I);
 		$I->dontSeeValidationError('Firstname cannot be blank.');
 		$I->dontSeeValidationError('Lastname cannot be blank.');
@@ -104,6 +109,7 @@ class CustomerCreateCest {
 	public function checkInvalidEmail(FunctionalTester $I): void {
 		$I->fillField('Email', 'not-address-email');
 		$this->sendForm($I);
+		$I->dontSeeEmailIsSent();
 		$I->seeValidationError('Email is not a valid email address.');
 	}
 

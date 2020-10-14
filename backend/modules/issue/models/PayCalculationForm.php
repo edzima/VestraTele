@@ -81,7 +81,7 @@ class PayCalculationForm extends Model {
 		return 1;
 	}
 
-	public function paysSumValidate($attribute, $params, $validator): void {
+	public function paysSumValidate($attribute): void {
 		$value = (float) $this->$attribute;
 		$sum = $this->getPaysSumValue();
 		if ($value !== $sum) {
@@ -135,7 +135,8 @@ class PayCalculationForm extends Model {
 
 	public function setIssue(Issue $model): void {
 		$this->issue = $model;
-		$this->value = $model->getProvision()->getSum();
+		//@todo get from draft?
+		//$this->value = $model->getProvision()->getSum();
 		$this->vat = $model->type->vat;
 	}
 

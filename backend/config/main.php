@@ -5,6 +5,8 @@ use backend\modules\entityResponsible\Module as EntityResponsibleModule;
 use backend\modules\issue\Module as IssueModule;
 use backend\modules\provision\Module as ProvisionModule;
 use backend\modules\user\Module as UserModule;
+use common\behaviors\GlobalAccessBehavior;
+use common\behaviors\LastActionBehavior;
 use yii\web\UserEvent;
 
 $params = array_merge(
@@ -83,7 +85,7 @@ return [
 			// list of registerd db-components
 			'dbList' => ['db'],
 			'as access' => [
-				'class' => 'common\behaviors\GlobalAccessBehavior',
+				'class' => GlobalAccessBehavior::class,
 				'rules' => [
 					[
 						'allow' => true,
@@ -106,13 +108,34 @@ return [
 		],
 		'user' => [
 			'class' => UserModule::class,
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'controllers' => ['user/user', 'user/customer', 'user/worker'],
+						'actions' => ['view'],
+						'allow' => true,
+						'roles' => ['manager'],
+					],
+					[
+						'controllers' => ['user/customer'],
+						'actions' => ['index', 'create', 'update'],
+						'allow' => true,
+						'roles' => ['manager'],
+					],
+					[
+						'allow' => true,
+						'roles' => ['administrator'],
+					],
+				],
+			],
 		],
 		'webshell' => [
 			'class' => 'samdark\webshell\Module',
 			'yiiScript' => '@root/yii', // adjust path to point to your ./yii script
 			'allowedIPs' => ['*'],
 			'as access' => [
-				'class' => 'common\behaviors\GlobalAccessBehavior',
+				'class' => GlobalAccessBehavior::class,
 				'rules' => [
 					[
 						'allow' => true,
@@ -123,7 +146,7 @@ return [
 		],
 	],
 	'as globalAccess' => [
-		'class' => 'common\behaviors\GlobalAccessBehavior',
+		'class' => GlobalAccessBehavior::class,
 		'rules' => [
 			[
 				'controllers' => ['site'],
@@ -144,22 +167,13 @@ return [
 				'roles' => ['?', '@'],
 			],
 			[
-				'controllers' => ['user'],
-				'allow' => true,
-				'roles' => ['administrator'],
-			],
-			[
-				'controllers' => ['user'],
-				'allow' => false,
-			],
-			[
 				'allow' => true,
 				'roles' => ['manager'],
 			],
 		],
 	],
 	'as beforeAction' => [
-		'class' => 'common\behaviors\LastActionBehavior',
+		'class' => LastActionBehavior::class,
 	],
 	'params' => $params,
 ];

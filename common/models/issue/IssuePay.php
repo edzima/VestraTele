@@ -3,6 +3,7 @@
 namespace common\models\issue;
 
 use common\models\issue\query\IssuePayQuery;
+use common\models\issue\query\IssueQuery;
 use common\models\provision\ProvisionQuery;
 use Yii;
 use yii\db\ActiveQuery;

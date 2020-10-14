@@ -6,33 +6,31 @@ use Yii;
 use yii\base\Behavior;
 use yii\base\Controller;
 
-class LastActionBehavior extends Behavior
-{
-    /**
-     * @var string
-     */
-    public $attribute = 'action_at';
+class LastActionBehavior extends Behavior {
 
-    /**
-     * @inheritdoc
-     */
-    public function events()
-    {
-        return [
-            Controller::EVENT_BEFORE_ACTION => 'beforeAction',
-        ];
-    }
+	/**
+	 * @var string
+	 */
+	public $attribute = 'action_at';
 
-    /**
-     * @inheritdoc
-     */
-    public function beforeAction()
-    {
-        if (!Yii::$app->user->isGuest) {
-            $model = Yii::$app->user->identity;
-            $model->touch($this->attribute);
-        }
+	/**
+	 * @inheritdoc
+	 */
+	public function events(): array {
+		return [
+			Controller::EVENT_BEFORE_ACTION => 'beforeAction',
+		];
+	}
 
-        return true;
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function beforeAction(): bool {
+		if (!Yii::$app->user->isGuest) {
+			$model = Yii::$app->user->identity;
+			$model->touch($this->attribute);
+		}
+
+		return true;
+	}
 }

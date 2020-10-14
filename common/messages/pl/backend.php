@@ -154,5 +154,13 @@ return [
 	'Add qualification' => 'Add qualification',
 	'Prowizje' => 'Prowizje',
 	'Add review' => 'Add review',
-	'Cities' => 'Cities'
+	'Cities' => 'Miejscowości',
+	'Meets' => 'Spotkania',
+	'Create issue' => 'Create issue',
+	'Create issue for: {customer}' => 'Dodaj sprawe dla: {customer}',
+	'Issues' => 'Sprawy',
+	'Add issue' => 'Dodaj sprawe',
+	'Types' => 'Typy',
+	'Issue Types' => 'Typy spraw',
+	'Create issue type' => 'Dodaj typ'
 ];

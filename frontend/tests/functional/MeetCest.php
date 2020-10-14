@@ -14,7 +14,7 @@ use Yii;
  */
 class MeetCest {
 
-	private const ROLE_NAME = User::PERMISSION_MEET;
+	private const PERMISSION_NAME = User::PERMISSION_MEET;
 
 	public function _fixtures(): array {
 		return [
@@ -33,8 +33,8 @@ class MeetCest {
 	public function checkAccessWithoutPermission(FunctionalTester $I) {
 		$user = $I->grabFixture('user', 0);
 		$I->amLoggedInAs($user);
-		if (Yii::$app->authManager->checkAccess($user->id, static::ROLE_NAME)) {
-			Yii::$app->authManager->revoke(Yii::$app->authManager->getRole(static::ROLE_NAME), $user->id);
+		if (Yii::$app->authManager->checkAccess($user->id, static::PERMISSION_NAME)) {
+			Yii::$app->authManager->revoke(Yii::$app->authManager->getPermission(static::PERMISSION_NAME), $user->id);
 		}
 		$I->amOnRoute('/meet/index');
 		$I->seeResponseCodeIs(403);
@@ -43,8 +43,8 @@ class MeetCest {
 	public function checkAccessWithPermission(FunctionalTester $I): void {
 		$user = $I->grabFixture('user', 0);
 		$I->amLoggedInAs($user);
-		if (!Yii::$app->authManager->checkAccess($user->id, static::ROLE_NAME)) {
-			Yii::$app->authManager->assign(Yii::$app->authManager->getRole(static::ROLE_NAME), $user->id);
+		if (!Yii::$app->authManager->checkAccess($user->id, static::PERMISSION_NAME)) {
+			Yii::$app->authManager->assign(Yii::$app->authManager->getPermission(static::PERMISSION_NAME), $user->id);
 		}
 		$I->amOnRoute('/meet/index');
 		$I->seeResponseCodeIs(200);

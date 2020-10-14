@@ -1,7 +1,6 @@
 <?php
 
-use common\models\issue\Issue;
-use common\models\issue\Provision;
+use backend\modules\issue\models\IssueForm;
 use common\widgets\DateTimeWidget;
 use kartik\depdrop\DepDrop;
 use kartik\select2\Select2;
@@ -9,10 +8,9 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\View;
 use yii\widgets\ActiveForm;
-use backend\modules\issue\models\IssueForm;
 
 /* @var $this View */
-/* @var $model Issue */
+/* @var $model IssueForm */
 /* @var $form yii\widgets\ActiveForm */
 
 ?>
@@ -22,64 +20,59 @@ use backend\modules\issue\models\IssueForm;
 
 		<div class="row">
 
-			<?= $form->field($model, 'type_id', ['options' => ['class' => 'col-md-3']])
+			<?= $form->field($model, 'type_id', [
+				'options' => [
+					'class' => 'col-md-3',
+				],
+			])
 				->widget(Select2::class, [
-						'data' => IssueForm::getTypes(),
+						'data' => IssueForm::getTypesNames(),
 						'options' => [
-							'placeholder' => 'Typ',
-							'id' => 'issueTypeId',
+							'placeholder' => $model->getAttributeLabel('type_id'),
 						],
 					]
 				) ?>
 
-			<?= $form->field($model, 'stage_id', ['options' => ['class' => 'col-md-3'],])
+			<?= $form->field($model, 'archives_nr', [
+				'options' => [
+					'id' => 'archives-field',
+					'class' => 'col-md-3 col-lg-1 required' . (!$model->getModel()->isArchived() ? ' hidden' : ''),
+				],
+			])->textInput(); ?>
+
+
+			<?= $form->field($model, 'stage_id', [
+				'options' => [
+					'class' => 'col-md-3 col-lg-2',
+				],
+			])
 				->widget(DepDrop::class, [
 					'type' => DepDrop::TYPE_SELECT2,
-					'data' => $model->type_id !== null ? IssueForm::getStages($model->type_id) : [],
+					'data' => $model->getStagesData(),
 					'pluginOptions' => [
-						'depends' => ['issueTypeId'],
-						'placeholder' => 'Etap',
+						'depends' => [Html::getInputId($model, 'type_id')],
+						'placeholder' => $model->getAttributeLabel('stage_id'),
 						'url' => Url::to(['//issue/type/stages-list']),
-						'loading' => 'Wyszukiwanie...',
+						'loading' => Yii::t('common', 'Loading...'),
 					],
 				])
 			?>
 
 			<?= $form->field($model, 'stage_change_at', [
 				'options' => [
-					'class' => 'col-md-3',
+					'class' => 'col-md-3 col-lg-2',
 				],
 			])
-				->widget(DateTimeWidget::class,
-					[
-						'phpDatetimeFormat' => 'yyyy-MM-dd',
-						'clientOptions' => [
-							'allowInputToggle' => true,
-							'sideBySide' => true,
-							'widgetPositioning' => [
-								'horizontal' => 'auto',
-								'vertical' => 'auto',
-							],
-						],
-					]) ?>
+				->widget(DateTimeWidget::class, ['phpDatetimeFormat' => 'yyyy-MM-dd',]) ?>
 
-
-			<?= $form->field($model, 'archives_nr', ['options' => ['id' => 'archives-field', 'class' => 'col-md-3 required' . (!$model->isArchived() ? ' hidden' : '')]])->textInput(); ?>
 
 		</div>
 
 
 		<div class="row">
-			<?= $form->field($model, 'agent_id', ['options' => ['class' => 'col-md-6']])
-				->widget(Select2::class, [
-						'data' => IssueForm::getAgents(),
-						'options' => [
-							'placeholder' => 'Agent',
-						],
-					]
-				) ?>
 
-			<?= $form->field($model, 'entity_responsible_id', ['options' => ['class' => 'col-md-6']])
+
+			<?= $form->field($model, 'entity_responsible_id', ['options' => ['class' => 'col-md-3']])
 				->widget(Select2::class, [
 						'data' => IssueForm::getEntityResponsibles(),
 						'options' => [
@@ -88,11 +81,7 @@ use backend\modules\issue\models\IssueForm;
 					]
 				) ?>
 
-		</div>
-
-		<div class="row">
-
-			<?= $form->field($model, 'date', ['options' => ['class' => 'col-md-6']])
+			<?= $form->field($model, 'date', ['options' => ['class' => 'col-md-2']])
 				->widget(DateTimeWidget::class,
 					[
 						'phpDatetimeFormat' => 'yyyy-MM-dd',
@@ -101,58 +90,51 @@ use backend\modules\issue\models\IssueForm;
 			<?= $form->field($model, 'accident_at', [
 				'options' => [
 					'id' => 'accident_at_field',
-					'class' => 'col-md-6' . (!$model->isAccident() ? ' hidden' : ''),
+					'class' => 'col-md-2' . (!$model->getModel()->isAccident() ? ' hidden' : ''),
 				],
 			])
 				->widget(DateTimeWidget::class,
 					[
 						'phpDatetimeFormat' => 'yyyy-MM-dd',
 					]) ?>
+
 		</div>
 
-		<?= $form->field($model, 'details')->textarea(['rows' => 10, 'maxlength' => true]) ?>
+		<div class="row">
+			<?= $form->field($model, 'details', ['options' => ['class' => 'col-md-5']])
+				->textarea(['rows' => 5, 'maxlength' => true]) ?>
 
-		<fieldset>
-			<legend>Prowizja</legend>
-			<div class="row">
-
-				<?= $form->field($model, 'provision_base', [
-					'options' => ['class' => 'col-md-5 form-group'],
-				])->textInput(['maxlength' => true]) ?>
-
-				<?= $form->field($model, 'provision_value', [
-					'options' => ['class' => 'col-md-5 form-group'],
-				])->textInput(['maxlength' => true]) ?>
-
-
-				<?= $form->field($model, 'provision_type', [
-					'options' => ['class' => 'col-md-2 form-group'],
-				])->dropDownList(Provision::getTypesNames()) ?>
-
-			</div>
-		</fieldset>
+		</div>
 
 		<fieldset>
 			<legend>Role</legend>
 			<div class="row">
-				<?= $form->field($model, 'lawyer_id', ['options' => ['class' => 'col-md-6']])
+
+				<?= $form->field($model, 'agent_id', ['options' => ['class' => 'col-md-3']])
 					->widget(Select2::class, [
-							'data' => IssueForm::getLawyers(),
+							'data' => IssueForm::getAgents(),
 							'options' => [
-								'placeholder' => 'Prawnik',
-							],
-							'pluginOptions' => [
-								'allowClear' => true,
+								'placeholder' => $model->getAttributeLabel('agent_id'),
 							],
 						]
 					) ?>
 
-				<?= $form->field($model, 'tele_id', ['options' => ['class' => 'col-md-6']])
+
+				<?= $form->field($model, 'lawyer_id', ['options' => ['class' => 'col-md-3']])
+					->widget(Select2::class, [
+							'data' => IssueForm::getLawyers(),
+							'options' => [
+								'placeholder' => $model->getAttributeLabel('lawyer_id'),
+							],
+						]
+					) ?>
+
+				<?= $form->field($model, 'tele_id', ['options' => ['class' => 'col-md-3']])
 					->widget(Select2::class, [
 							'data' => IssueForm::getTele(),
 							'options' => [
-								'placeholder' => 'Telemarketer',
-							],
+								'placeholder' => $model->getAttributeLabel('tele_id'),
+								],
 							'pluginOptions' => [
 								'allowClear' => true,
 							],
@@ -175,22 +157,23 @@ use backend\modules\issue\models\IssueForm;
 $archivesStageId = IssueForm::STAGE_ARCHIVED_ID;
 $positiveDecisionStageId = IssueForm::STAGE_POSITIVE_DECISION_ID;
 $stageInputId = Html::getInputId($model, 'stage_id');
+$typeInputId = Html::getInputId($model, 'type_id');
+$stageChangeInputId = Html::getInputId($model, 'stage_change_at');
 
-$typeAccidentId = IssueForm::ACCIDENT_ID;
+$typeAccidentId = IssueForm::TYPE_ACCIDENT_ID;
 $js = <<<JS
 
 let stageInput = document.getElementById('$stageInputId');
-let typeInput = document.getElementById(('issueTypeId'));
-let archivesInput = document.getElementById('archives-field');
-let accidentAtInput = document.getElementById('accident_at_field');
-let stateChangeAtInput = document.getElementById('issue-stage_change_at');
+let typeInput = document.getElementById('$typeInputId');
+let archivesField = document.getElementById('archives-field');
+let accidentAtField = document.getElementById('accident_at_field');
+let stateChangeAtInput = document.getElementById('$stageChangeInputId');
 
 function isArchived(){
 	return parseInt(stageInput.value) === $archivesStageId;
 }
 
 function isPositiveDecision(){
-	console.log(parseInt(stageInput.value) === $positiveDecisionStageId);
 	return parseInt(stageInput.value) === $positiveDecisionStageId;
 }
 
@@ -202,9 +185,9 @@ function isAccident(){
 	stageInput.onchange = function(){
 	let value = parseInt(this.value);
 	if(value === $archivesStageId){
-		archivesInput.classList.remove('hidden');
+		archivesField.classList.remove('hidden');
 	}else{
-		archivesInput.classList.add('hidden');
+		archivesField.classList.add('hidden');
 	}
 	
 	stateChangeAtInput.value = '';
@@ -212,9 +195,9 @@ function isAccident(){
 
 typeInput.onchange= function(){
 	if(parseInt(this.value) === $typeAccidentId){
-		accidentAtInput.classList.remove('hidden');
+		accidentAtField.classList.remove('hidden');
 	}else{
-		accidentAtInput.classList.add('hidden');
+		accidentAtField.classList.add('hidden');
 	}
 };
 

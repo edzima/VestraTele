@@ -3,6 +3,7 @@
 namespace common\models\issue;
 
 use common\models\issue\query\IssueStageQuery;
+use Yii;
 use yii\db\ActiveRecord;
 
 /**
@@ -29,36 +30,21 @@ class IssueStage extends ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public static function tableName() {
+	public static function tableName(): string {
 		return 'issue_stage';
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
-		return [
-			[['name', 'short_name', 'typesIds'], 'required'],
-			[['posi', 'days_reminder'], 'integer'],
-			['posi', 'default', 'value' => 0],
-			['days_reminder', 'integer', 'min' => 1],
-			[['name', 'short_name'], 'string', 'max' => 255],
-			[['name', 'short_name'], 'unique'],
-			[['short_name'], 'unique'],
-		];
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'name' => 'Nazwa',
-			'short_name' => 'Skrót',
-			'posi' => 'Pozycja',
-			'typesIds' => 'Typy',
-			'days_reminder' => 'Przypomnij(dni)',
+			'name' => Yii::t('common', 'Name'),
+			'short_name' => Yii::t('common', 'Shortname'),
+			'posi' => Yii::t('common', 'Position'),
+			'typesIds' => Yii::t('common', 'Types'),
+			'days_reminder' => Yii::t('common', 'Reminder (days)'),
 		];
 	}
 

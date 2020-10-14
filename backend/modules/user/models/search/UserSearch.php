@@ -17,7 +17,7 @@ class UserSearch extends User {
 	public $phone;
 	public $gender;
 	public $region_id;
-	public $city_id;
+	public $city;
 
 	protected function createQuery(): UserQuery {
 		return User::find();
@@ -28,8 +28,8 @@ class UserSearch extends User {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'status', 'created_at', 'updated_at', 'action_at', 'gender', 'region_id', 'city_id'], 'integer'],
-			[['username', 'email', 'ip', 'firstname', 'lastname', 'phone'], 'safe'],
+			[['id', 'status', 'created_at', 'updated_at', 'action_at', 'gender', 'region_id'], 'integer'],
+			[['username', 'email', 'ip', 'firstname', 'lastname', 'phone', 'city'], 'safe'],
 		];
 	}
 
@@ -49,9 +49,10 @@ class UserSearch extends User {
 	 */
 	public function search(array $params): ActiveDataProvider {
 		$query = $this->createQuery();
-		$query->with('userProfile');
+		$query->joinWith('userProfile');
 		$query->joinWith('addresses.address.city');
 		$query->with('addresses.address.city');
+
 
 		// add conditions that should always apply here
 
@@ -81,11 +82,12 @@ class UserSearch extends User {
 		]);
 
 		$query->andFilterWhere(['like', 'username', $this->username])
-			->andFilterWhere(['like', 'profile.firstname', $this->firstname])
-			->andFilterWhere(['like', 'profile.lastname', $this->lastname])
-			->andFilterWhere(['like', 'profile.phone', $this->phone])
+			->andFilterWhere(['like', 'user_profile.firstname', $this->firstname])
+			->andFilterWhere(['like', 'user_profile.lastname', $this->lastname])
+			->andFilterWhere(['like', 'user_profile.phone', $this->phone])
 			->andFilterWhere(['like', 'email', $this->email])
 			->andFilterWhere(['like', 'teryt_simc.region_id', $this->region_id])
+			->andFilterWhere(['like', 'teryt_simc.name', $this->city])
 			->andFilterWhere(['like', 'ip', $this->ip]);
 
 		return $dataProvider;

@@ -33,6 +33,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 		'model' => $model->getAddress(),
 	]) ?>
 
+	<?= $form->field($model, 'roles')->checkboxList($model::getRolesNames()) ?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-primary']) ?>

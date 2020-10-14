@@ -25,6 +25,7 @@ class UserFormTest extends \Codeception\Test\Unit {
 
 	public function testCorrectCreate() {
 		$model = new UserForm();
+		$model->sendEmail = true;
 
 		$model->username = 'some_username';
 		$model->email = 'test@email.com';
@@ -68,9 +69,8 @@ class UserFormTest extends \Codeception\Test\Unit {
 		/** @var User $user */
 		$user = $this->tester->grabRecord(User::class, ['username' => 'new_username']);
 		expect($user)->isInstanceOf(User::class);
-		$this->tester->assertSame('firstname',$user->profile->firstname);
-		$this->tester->assertSame('lastname',$user->profile->lastname);
-
+		$this->tester->assertSame('firstname', $user->profile->firstname);
+		$this->tester->assertSame('lastname', $user->profile->lastname);
 	}
 
 }

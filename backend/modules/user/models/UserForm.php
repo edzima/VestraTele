@@ -25,6 +25,7 @@ class UserForm extends Model {
 	public $roles = [];
 	public $permissions = [];
 
+	public bool $sendEmail = false;
 	public bool $isEmailRequired = true;
 
 	private $model;
@@ -166,21 +167,26 @@ class UserForm extends Model {
 			return false;
 		}
 
-		Yii::$app->authManager->revokeAll($model->id);
-		$this->setUserRoles($model->id);
-		$this->setUserPermission($model->id);
+		$this->applyAuth($model->id);
 
 		if (!$this->updateProfile($model) || !$this->updateHomeAddress($model)) {
 			return false;
 		}
 
-		if ($this->status === User::STATUS_INACTIVE
+		if ($this->sendEmail &&
+			$this->status === User::STATUS_INACTIVE
 			&& $isNewRecord
 			&& $this->email !== null
 			&& !$this->hasErrors('email')) {
 			return $this->sendEmail($model);
 		}
 		return true;
+	}
+
+	protected function applyAuth(int $id): void {
+		Yii::$app->authManager->revokeAll($id);
+		$this->assignRoles($id);
+		$this->assignPermissions($id);
 	}
 
 	private function updateProfile(User $model): bool {
@@ -205,9 +211,9 @@ class UserForm extends Model {
 		return $homeAddress->save();
 	}
 
-	private function setUserRoles(int $userId): void {
+	private function assignRoles(int $userId): void {
 		$auth = Yii::$app->authManager;
-		foreach ($this->roles as $roleName) {
+		foreach ((array) $this->roles as $roleName) {
 			$role = $auth->getRole($roleName);
 			if ($role) {
 				$auth->assign($role, $userId);
@@ -215,9 +221,9 @@ class UserForm extends Model {
 		}
 	}
 
-	private function setUserPermission(int $userId): void {
+	private function assignPermissions(int $userId): void {
 		$auth = Yii::$app->authManager;
-		foreach ($this->permissions as $permissionName) {
+		foreach ((array) $this->permissions as $permissionName) {
 			$permission = $auth->getPermission($permissionName);
 			if ($permission) {
 				$auth->assign($permission, $userId);

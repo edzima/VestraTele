@@ -2,12 +2,12 @@
 
 namespace backend\modules\issue\controllers;
 
-use Yii;
 use common\models\issue\IssueType;
 use common\models\issue\IssueTypeSearch;
+use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 use yii\web\Response;
 
 /**
@@ -105,11 +105,12 @@ class TypeController extends Controller {
 	}
 
 	public function actionStagesList(): array {
-		if (!isset($_POST['depdrop_all_params'])) {
+		$params = Yii::$app->request->post('depdrop_all_params');
+		if (empty($params)) {
 			throw new NotFoundHttpException('The requested page does not exist.');
 		}
 		Yii::$app->response->format = Response::FORMAT_JSON;
-		$id = (int) $_POST['depdrop_all_params']['issueTypeId'];
+		$id = (int) $params['issueform-type_id'];
 		$stages = $this->findModel($id)->stages;
 
 		return [

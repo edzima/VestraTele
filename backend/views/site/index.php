@@ -2,11 +2,13 @@
 
 /* @var $this yii\web\View */
 
+use yii\bootstrap\Html;
+
 $this->title = Yii::$app->name;
 ?>
 <div class="site-index">
 	<div class="jumbotron">
-		<h1>Congratulations!</h1>
+		<h1><?= Html::encode($this->title) ?>!</h1>
 
 		<p class="lead">You have successfully created your Yii-powered application.</p>
 
