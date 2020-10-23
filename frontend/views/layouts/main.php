@@ -46,7 +46,7 @@ AppAsset::register($this);
 
 			'items' => [
 				[
-					'label' => 'Przeglądaj',
+					'label' => Yii::t('common', 'Browse'),
 					'url' => ['/meet/index'],
 				],
 				[

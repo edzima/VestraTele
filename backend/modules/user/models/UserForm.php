@@ -28,9 +28,10 @@ class UserForm extends Model {
 	public bool $sendEmail = false;
 	public bool $isEmailRequired = true;
 
-	private $model;
-	private $profile;
-	private $address;
+	private ?User $model = null;
+	private ?UserProfile $profile = null;
+	private ?Address $homeAddress = null;
+	private ?Address $postalAddress = null;
 
 	/**
 	 * @inheritdoc
@@ -135,23 +136,36 @@ class UserForm extends Model {
 		return $this->profile;
 	}
 
-	public function getAddress(): Address {
-		if (!$this->address) {
-			$this->address = $this->getModel()->homeAddress ?: new Address();
+	public function getHomeAddress(): Address {
+		if (!$this->homeAddress) {
+			$this->homeAddress = $this->getModel()->homeAddress ?: new Address();
 		}
-		return $this->address;
+		return $this->homeAddress;
 	}
 
+	public function getPostalAddress(): Address {
+		if (!$this->postalAddress) {
+			$this->postalAddress = $this->getModel()->postalAddress ?: new Address();
+		}
+		return $this->postalAddress;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function load($data, $formName = null): bool {
 		return parent::load($data)
 			&& $this->getProfile()->load($data)
-			&& $this->getAddress()->load($data);
+			&& $this->getHomeAddress()->load($data);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function validate($attributeNames = null, $clearErrors = true) {
 		return parent::validate($attributeNames, $clearErrors)
 			&& $this->getProfile()->validate($attributeNames, $clearErrors)
-			&& $this->getAddress()->validate($attributeNames, $clearErrors);
+			&& $this->getHomeAddress()->validate($attributeNames, $clearErrors);
 	}
 
 	public function save(): bool {
@@ -163,11 +177,12 @@ class UserForm extends Model {
 		$this->beforeSaveModel($model);
 
 		$isNewRecord = $model->isNewRecord;
+		codecept_debug('Is new record: ' . $isNewRecord);
 		if (!$model->save()) {
 			return false;
 		}
 
-		$this->applyAuth($model->id);
+		$this->applyAuth($model->id, $isNewRecord);
 
 		if (!$this->updateProfile($model) || !$this->updateHomeAddress($model)) {
 			return false;
@@ -183,8 +198,10 @@ class UserForm extends Model {
 		return true;
 	}
 
-	protected function applyAuth(int $id): void {
-		Yii::$app->authManager->revokeAll($id);
+	protected function applyAuth(int $id, bool $isNewRecord): void {
+		if (!$isNewRecord) {
+			Yii::$app->authManager->revokeAll($id);
+		}
 		$this->assignRoles($id);
 		$this->assignPermissions($id);
 	}
@@ -198,17 +215,20 @@ class UserForm extends Model {
 		return $profile->save();
 	}
 
-	private function updateHomeAddress(User $model): bool {
-		$address = $this->getAddress();
+	private function updateAddress(Address $address, User $model, string $type = UserAddress::TYPE_HOME): bool {
 		if (!$address->save()) {
 			return false;
 		}
 
-		$homeAddress = $model->addresses[UserAddress::TYPE_HOME] ?? new UserAddress(['type' => UserAddress::TYPE_HOME]);
+		$userAddress = $model->addresses[$type] ?? new UserAddress(['type' => $type]);
 
-		$homeAddress->user_id = $model->id;
-		$homeAddress->address_id = $address->id;
-		return $homeAddress->save();
+		$userAddress->user_id = $model->id;
+		$userAddress->address_id = $address->id;
+		return $userAddress->save();
+	}
+
+	private function updateHomeAddress(User $model): bool {
+		return $this->updateAddress($this->getHomeAddress(), $model, UserAddress::TYPE_HOME);
 	}
 
 	private function assignRoles(int $userId): void {

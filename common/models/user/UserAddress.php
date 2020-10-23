@@ -39,6 +39,7 @@ class UserAddress extends ActiveRecord {
 			[['user_id', 'address_id', 'type'], 'integer'],
 			[['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Address::class, 'targetAttribute' => ['address_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 		];
 	}
 

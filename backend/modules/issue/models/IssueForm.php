@@ -33,6 +33,7 @@ class IssueForm extends Model {
 	public ?string $stage_change_at = null;
 	public ?string $archives_nr = null;
 	public ?string $details = null;
+	public ?string $signature_act = null;
 
 	public const TYPE_ACCIDENT_ID = IssueType::ACCIDENT_ID;
 
@@ -63,7 +64,10 @@ class IssueForm extends Model {
 				return array_keys($this->getStagesData());
 			}, 'enableClientValidation' => false,
 			],
+			[['details', 'signature_act'], 'string'],
+			['signature_act', 'string', 'max' => 30],
 			[['date', 'accident_at', 'stage_change_at'], 'date', 'format' => DATE_ATOM],
+			[['date', 'stage_change_at'], 'default', 'value' => date(DATE_ATOM)],
 			[
 				'archives_nr',
 				'required',
@@ -77,6 +81,14 @@ class IssueForm extends Model {
 			[['archives_nr'], 'string', 'max' => 10],
 			[
 				'archives_nr', 'unique', 'targetClass' => Issue::class,
+				'filter' => function (ActiveQuery $query): void {
+					if (!$this->getModel()->isNewRecord) {
+						$query->andWhere(['not', 'id' => $this->getModel()->id]);
+					}
+				},
+			],
+			[
+				'signature_act', 'unique', 'targetClass' => Issue::class,
 				'filter' => function (ActiveQuery $query): void {
 					if (!$this->getModel()->isNewRecord) {
 						$query->andWhere(['not', 'id' => $this->getModel()->id]);
@@ -111,6 +123,7 @@ class IssueForm extends Model {
 		$this->type_id = $model->type_id;
 		$this->stage_id = $model->stage_id;
 		$this->archives_nr = $model->archives_nr;
+		$this->signature_act = $model->signature_act;
 		$this->agent_id = $model->agent->id;
 		$this->lawyer_id = $model->lawyer->id;
 		$this->tele_id = $model->tele->id ?? null;
@@ -135,14 +148,16 @@ class IssueForm extends Model {
 			$model->type_id = $this->type_id;
 			$model->stage_id = $this->stage_id;
 			$model->archives_nr = $this->archives_nr;
+			$model->signature_act = $this->signature_act;
 			$model->details = $this->details;
 			$model->stage_change_at = $this->stage_change_at;
 			$model->entity_responsible_id = $this->entity_responsible_id;
 			$model->date = $this->date;
 			$model->accident_at = $this->accident_at;
-			$model->stage_change_at = $this->stage_change_at;
-			if (empty($this->stage_change_at) && isset($model->dirtyAttributes['stage_id'])) {
+			if (isset($model->dirtyAttributes['stage_id']) && $model->stage_change_at !== $this->stage_change_at) {
 				$model->stage_change_at = date(DATE_ATOM);
+			} else {
+				$model->stage_change_at = $this->stage_change_at;
 			}
 			if (!$model->save(false)) {
 				return false;
@@ -170,7 +185,7 @@ class IssueForm extends Model {
 	}
 
 	public static function getTele(): array {
-		return Worker::getSelectList([Worker::PERMISSION_ISSUE, Worker::ROLE_TELEMARKETER]);
+		return Worker::getSelectList([Worker::ROLE_TELEMARKETER, Worker::PERMISSION_ISSUE]);
 	}
 
 	public static function getTypesNames(): array {

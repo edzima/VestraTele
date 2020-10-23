@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= AddressFormWidget::widget([
 		'form' => $form,
-		'model' => $model->getAddress(),
+		'model' => $model->getHomeAddress(),
 	]) ?>
 
 	<?= $form->field($model, 'status')->radioList($model::getStatusNames()) ?>

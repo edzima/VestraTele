@@ -16,7 +16,9 @@ use yii\widgets\ActiveForm;
 ?>
 	<div class="issue-form">
 
-		<?php $form = ActiveForm::begin(); ?>
+		<?php $form = ActiveForm::begin(
+			['id' => 'issue-form']
+		); ?>
 
 		<div class="row">
 
@@ -58,12 +60,14 @@ use yii\widgets\ActiveForm;
 				])
 			?>
 
-			<?= $form->field($model, 'stage_change_at', [
-				'options' => [
-					'class' => 'col-md-3 col-lg-2',
-				],
-			])
-				->widget(DateTimeWidget::class, ['phpDatetimeFormat' => 'yyyy-MM-dd',]) ?>
+			<?= !empty($model->stage_change_at)
+				? $form->field($model, 'stage_change_at', [
+					'options' => [
+						'class' => 'col-md-3 col-lg-2',
+					],
+				])
+					->widget(DateTimeWidget::class, ['phpDatetimeFormat' => 'yyyy-MM-dd'])
+				: '' ?>
 
 
 		</div>
@@ -80,6 +84,9 @@ use yii\widgets\ActiveForm;
 						],
 					]
 				) ?>
+
+			<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-2']])
+				->textInput() ?>
 
 			<?= $form->field($model, 'date', ['options' => ['class' => 'col-md-2']])
 				->widget(DateTimeWidget::class,
@@ -134,7 +141,7 @@ use yii\widgets\ActiveForm;
 							'data' => IssueForm::getTele(),
 							'options' => [
 								'placeholder' => $model->getAttributeLabel('tele_id'),
-								],
+							],
 							'pluginOptions' => [
 								'allowClear' => true,
 							],
@@ -189,8 +196,10 @@ function isAccident(){
 	}else{
 		archivesField.classList.add('hidden');
 	}
+	if(stateChangeAtInput){
+			stateChangeAtInput.value = '';
+	}
 	
-	stateChangeAtInput.value = '';
 };
 
 typeInput.onchange= function(){

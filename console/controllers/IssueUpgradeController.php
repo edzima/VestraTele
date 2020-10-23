@@ -13,21 +13,11 @@ use edzima\teryt\models\Simc;
 use Yii;
 use yii\console\Controller;
 use yii\helpers\Console;
+use yii\helpers\StringHelper;
 
 class IssueUpgradeController extends Controller {
 
 	private $foundedCities = [];
-
-	public function actionFind(): void {
-		$issue = new Issue();
-		$issue->client_phone_1 = '+48 511 858 183';
-		$client = $this->findClient($issue);
-		if ($client === null) {
-			Console::output('Not found');
-		} else {
-			Console::output($client);
-		}
-	}
 
 	public function actionWorkers(): void {
 		IssueUser::deleteAll(['type' => [IssueUser::TYPE_AGENT, IssueUser::TYPE_TELEMARKETER, IssueUser::TYPE_LAWYER]]);
@@ -71,12 +61,35 @@ class IssueUpgradeController extends Controller {
 		Console::output('Successful imported ' . $count . ' users.');
 	}
 
-	public function actionCustomer(): void {
-
-		//	Customer::deleteAll();
+	public function actionProvision(): void {
 
 		foreach (Issue::find()
-			//	->withoutArchives()
+			->batch() as $rows) {
+			foreach ($rows as $issue) {
+				/** @var $issue Issue */
+				if (!StringHelper::startsWith($issue->details, 'Prowizja: ')) {
+					$provision = $issue->getProvision();
+					if ($provision) {
+						$details = [];
+						$details[] = 'Prowizja: ';
+						$details[] = 'Typ: ' . $provision->getTypeName();
+						$details[] = 'Podstawa: ' . $provision->getBase();
+						$details[] = 'Procent\krotność: ' . $provision->getValue();
+						$details[] = $issue->details;
+						$issue->details = implode("\n", $details);
+						$issue->update(false, ['details']);
+					}
+				}
+			}
+		}
+	}
+
+	public function actionCustomer(): void {
+
+		Customer::deleteAll();
+
+		foreach (Issue::find()
+			//->withoutArchives()
 			->withoutCustomer()
 			->batch() as $rows) {
 			foreach ($rows as $issue) {
@@ -107,11 +120,8 @@ class IssueUpgradeController extends Controller {
 			if (!$customer->validate()) {
 				$this->fixModel($customer);
 			}
-			if (!$this->clientIsVictim($issue)) {
-				$customer->roles = [Customer::ROLE_CUSTOMER];
-			} else {
-				$customer->roles = [Customer::ROLE_CUSTOMER, Customer::ROLE_VICTIM];
-			}
+			$customer->roles = [Customer::ROLE_CUSTOMER];
+
 			if ($customer->save()) {
 				Console::output('Success create Customer:' . $customer->getModel()->getFullName());
 				$issue->linkUser($customer->getModel()->id, IssueUser::TYPE_CUSTOMER);
@@ -133,7 +143,7 @@ class IssueUpgradeController extends Controller {
 
 			if ($victim !== null) {
 				Console::output('Victim already exist: ' . $victim->getFullName());
-				$issue->linkUser($victim->id, IssueUser::TYPE_VICTIM);
+				$issue->linkUser($victim->id, IssueUser::TYPE_UNKNOWN);
 			} else {
 
 				$victim = new CustomerUserForm();
@@ -148,7 +158,7 @@ class IssueUpgradeController extends Controller {
 				}
 				if ($victim->save()) {
 					Console::output('Success create Victim:' . $victim->getModel()->getFullName());
-					$issue->linkUser($victim->getModel()->id, IssueUser::TYPE_VICTIM);
+					$issue->linkUser($victim->getModel()->id, IssueUser::TYPE_UNKNOWN);
 				} else {
 					Console::output('Victim dont save.');
 					Console::output(var_export($victim->getErrors()));
@@ -247,6 +257,7 @@ class IssueUpgradeController extends Controller {
 	private function findByMail(Issue $model, string $emailAttribute): ?User {
 		if (!empty($model->{$emailAttribute}) && $model->validate([$emailAttribute])) {
 			Console::output('Try Find by email: ' . $model->{$emailAttribute});
+			/** @noinspection PhpIncompatibleReturnTypeInspection */
 			return User::find()
 				->andWhere(['email' => $model->{$emailAttribute}])
 				->one();
@@ -258,6 +269,7 @@ class IssueUpgradeController extends Controller {
 		if (!empty($model->{$phoneAttribute}) && $model->validate([$phoneAttribute])) {
 			Console::output('Try Find by phone: ' . $model->{$phoneAttribute});
 
+			/** @noinspection PhpIncompatibleReturnTypeInspection */
 			return User::find()
 				->joinWith('userProfile')
 				->andWhere([
@@ -321,9 +333,9 @@ class IssueUpgradeController extends Controller {
 	}
 
 	private function setAddress(CustomerUserForm $model, LegacyAddress $address): void {
-		$model->getAddress()->postal_code = $address->cityCode;
-		$model->getAddress()->info = $address->street;
-		$model->getAddress()->city_id = $this->getCityID($address);
+		$model->getHomeAddress()->postal_code = $address->cityCode;
+		$model->getHomeAddress()->info = $address->street;
+		$model->getHomeAddress()->city_id = $this->getCityID($address);
 	}
 
 	private function getCityID(LegacyAddress $address): ?int {

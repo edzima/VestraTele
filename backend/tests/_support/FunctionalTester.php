@@ -2,6 +2,8 @@
 
 namespace backend\tests;
 
+use common\tests\_support\UserRbacActor;
+
 /**
  * Inherited Methods
  * @method void wantToTest($text)
@@ -20,10 +22,11 @@ namespace backend\tests;
 class FunctionalTester extends \Codeception\Actor {
 
 	use _generated\FunctionalTesterActions;
+	use UserRbacActor;
+
 	/**
 	 * Define custom actions here
 	 */
-
 
 	public function seeValidationError($message): void {
 		$this->see($message, '.help-block');

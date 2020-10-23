@@ -23,5 +23,4 @@ return [
 		'user_id' => 400,
 		'issue_id' => 1,
 	],
-
 ];

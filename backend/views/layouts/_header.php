@@ -48,7 +48,11 @@ use yii\bootstrap\Html;
 								<?= Html::a(
 									Yii::t('backend', 'Logout'),
 									['/site/logout'],
-									['data-method' => 'post', 'class' => 'btn btn-default btn-flat']
+									[
+										'id' => 'logout-link',
+										'data-method' => 'post',
+										'class' => 'btn btn-default btn-flat',
+									]
 								) ?>
 							</div>
 						</li>

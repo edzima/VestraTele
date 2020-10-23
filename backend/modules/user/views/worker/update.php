@@ -14,6 +14,7 @@ use yii\data\ActiveDataProvider;
 
 $this->title = Yii::t('backend', 'Update worker: {username}', ['username' => $model->username]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Workers'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->getModel()->getFullName(), 'url' => ['view', 'id' => $model->getModel()->id]];
 $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 ?>
 <div class="user-update">
@@ -34,7 +35,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 
 	<?= AddressFormWidget::widget([
 		'form' => $form,
-		'model' => $model->getAddress(),
+		'model' => $model->getHomeAddress(),
 	]) ?>
 
 

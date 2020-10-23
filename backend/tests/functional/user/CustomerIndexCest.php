@@ -7,9 +7,9 @@ use backend\tests\Step\Functional\Manager;
 use common\fixtures\user\CustomerFixture;
 
 /**
- * Class LoginCest
+ * Class CustomerIndexCest
  */
-class CustomerListCest {
+class CustomerIndexCest {
 
 	/**
 	 * Load fixtures before db transaction begin
@@ -33,15 +33,10 @@ class CustomerListCest {
 		$I->amOnRoute('/user/customer/index');
 	}
 
-	public function checkCount(FunctionalTester $I): void {
-		$I->see('Showing 1-4 of 4 items');
-	}
-
 	public function checkTable(FunctionalTester $I): void {
 		$I->see('Customers');
 		$I->see('Firstname', 'table');
 		$I->see('Lastname', 'table');
-		$I->see('Region', 'table');
 		$I->see('City', 'table');
 		$I->see('Email', 'table');
 		$I->see('Phone', 'table');

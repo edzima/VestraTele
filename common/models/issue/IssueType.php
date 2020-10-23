@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\models\issue\query\IssueStageQuery;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -23,7 +24,7 @@ use yii\helpers\ArrayHelper;
 class IssueType extends ActiveRecord {
 
 	public const ACCIDENT_ID = 1;
-	private $provision;
+	private ?Provision $provision = null;
 
 	private static ?array $TYPES = null;
 
@@ -75,7 +76,7 @@ class IssueType extends ActiveRecord {
 		return $this->hasMany(Issue::class, ['type_id' => 'id']);
 	}
 
-	public function getStages() {
+	public function getStages(): IssueStageQuery {
 		return $this->hasMany(IssueStage::class, ['id' => 'stage_id'])
 			->viaTable('{{%issue_stage_type}}', ['type_id' => 'id']);
 	}

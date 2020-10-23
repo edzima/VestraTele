@@ -30,10 +30,11 @@ use yii\web\IdentityInterface;
  * @property integer $action_at
  * @property string $authKey
  * @property integer|null $boss
+ * @property-write string $password
  * @property-read UserProfile $profile
  * @property-read UserAddress[] $addresses
  * @property-read Address|null $homeAddress
- * @property string $password write-only password
+ * @property-read Address|null $postalAddress
  * @property-read IssueUser[] $issueUsers
  *
  */
@@ -56,8 +57,6 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const ROLE_CUSTOMER_SERVICE = 'customer_service';
 	public const ROLE_TELEMARKETER = 'telemarketer';
 	public const ROLE_LAWYER = 'lawyer';
-
-
 
 	public const PERMISSION_ARCHIVE = 'archive';
 	public const PERMISSION_ISSUE = 'issue';
@@ -85,14 +84,6 @@ class User extends ActiveRecord implements IdentityInterface {
 		return [
 			TimestampBehavior::class,
 		];
-	}
-
-	public function beforeSave($insert) {
-		// @todo add test for this
-		if ($this->boss === $this->id) {
-			$this->boss = null;
-		}
-		return parent::beforeSave($insert);
 	}
 
 	public function __toString(): string {
@@ -157,12 +148,16 @@ class User extends ActiveRecord implements IdentityInterface {
 		return $this->userProfile ?: new UserProfile(['user_id' => $this->id]);
 	}
 
-	protected function getAddresses(): ActiveQuery {
-		return $this->hasMany(UserAddress::class, ['user_id' => 'id'])->indexBy('type');
-	}
-
 	public function getHomeAddress(): ?Address {
 		return $this->addresses[UserAddress::TYPE_HOME]->address ?? null;
+	}
+
+	public function getPostalAddress(): ?Address {
+		return $this->addresses[UserAddress::TYPE_POSTAL]->address ?? null;
+	}
+
+	protected function getAddresses(): ActiveQuery {
+		return $this->hasMany(UserAddress::class, ['user_id' => 'id'])->indexBy('type');
 	}
 
 	/**

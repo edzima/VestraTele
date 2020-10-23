@@ -20,6 +20,7 @@ use common\models\user\Worker;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
@@ -61,6 +62,7 @@ use yii\db\Expression;
  * @property string $accident_at
  * @property bool $payed
  * @property string $stage_change_at
+ * @property string|null $signature_act
  *
  * @property string $longId
  * @property int $clientStateId
@@ -115,16 +117,6 @@ class Issue extends ActiveRecord {
 		];
 	}
 
-	public function beforeSave($insert) {
-		if (isset($this->dirtyAttributes['stage_id'])) {
-			//@todo add test, why only on empty
-			if (empty($this->stage_change_at)) {
-				$this->stage_change_at = date(DATE_ATOM);
-			}
-		}
-		return parent::beforeSave($insert);
-	}
-
 	/**
 	 * @inheritdoc
 	 */
@@ -133,7 +125,7 @@ class Issue extends ActiveRecord {
 			[['created_at', 'updated_at'], 'safe'],
 			[['stage_id', 'type_id', 'entity_responsible_id', 'date',], 'required',],
 			[['stage_id', 'type_id', 'entity_responsible_id'], 'integer'],
-			[['details'], 'string'],
+			[['details', 'signature_act'], 'string'],
 			['archives_nr', 'unique'],
 			[['entity_responsible_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_responsible_id' => 'id']],
 			[['stage_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueStage::class, 'targetAttribute' => ['stage_id' => 'id']],
@@ -159,11 +151,11 @@ class Issue extends ActiveRecord {
 			'stage' => Yii::t('common', 'Stage'),
 			'type' => Yii::t('common', 'Type'),
 			'entity_responsible_id' => Yii::t('common', 'Entity responsible'),
-			'date' => Yii::t('common', 'Date at'),
+			'date' => Yii::t('common', 'Registration at'),
 			'archives_nr' => Yii::t('common', 'Archives'),
 			'accident_at' => Yii::t('common', 'Accident date'),
 			'stage_change_at' => Yii::t('common', 'Stage date'),
-
+			'signature_act' => Yii::t('common', 'Signature act'),
 		];
 	}
 
@@ -210,11 +202,13 @@ class Issue extends ActiveRecord {
 		return $this->getClientAddress()->provinceId;
 	}
 
-	public function getClientState() {
+	/** @deprecated */
+	public function getClientState(): ActiveQuery {
 		return $this->hasOne(State::class, ['id' => 'wojewodztwo_id'])->via('clientCity');
 	}
 
-	public function getClientProvince() {
+	/** @deprecated */
+	public function getClientProvince(): ActiveQuery {
 		return $this->hasOne(Province::class, ['id' => 'powiat_id', 'wojewodztwo_id' => 'wojewodztwo_id'])->via('clientCity');
 	}
 
@@ -258,7 +252,8 @@ class Issue extends ActiveRecord {
 		return $this->victimAddress;
 	}
 
-	public function getClientSubprovince() {
+	/** @deprecated */
+	public function getClientSubprovince(): ActiveQuery {
 		return $this->hasOne(SubProvince::class, ['id' => 'client_subprovince_id']);
 	}
 
@@ -269,6 +264,10 @@ class Issue extends ActiveRecord {
 		return $this->hasOne(City::class, ['id' => 'client_city_id'])->cache();
 	}
 
+	/**
+	 * @return ActiveQuery
+	 * @deprecated
+	 */
 	public function getVictimSubprovince() {
 		return $this->hasOne(SubProvince::class, ['id' => 'victim_subprovince_id']);
 	}
@@ -346,7 +345,7 @@ class Issue extends ActiveRecord {
 		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])->with('user')->orderBy('created_at DESC');
 	}
 
-	public function getSummons() {
+	public function getSummons(): ActiveQuery {
 		return $this->hasMany(Summon::class, ['issue_id' => 'id']);
 	}
 
@@ -375,17 +374,19 @@ class Issue extends ActiveRecord {
 		return (int) $this->type_id === IssueType::ACCIDENT_ID;
 	}
 
-	public function getProvision(): Provision {
+	public function getProvision(): ?Provision {
 		if ($this->provision === null) {
 			if ($this->isNewRecord) {
 				$type = static::DEFAULT_PROVISION;
 			} else {
 				$type = $this->provision_type;
 			}
-			$this->provision = new Provision($type, [
-				'base' => (float) $this->provision_base,
-				'value' => (float) $this->provision_value,
-			]);
+			if ($type > 0) {
+				$this->provision = new Provision($type, [
+					'base' => (float) $this->provision_base,
+					'value' => (float) $this->provision_value,
+				]);
+			}
 		}
 		return $this->provision;
 	}

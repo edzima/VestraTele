@@ -1,44 +1,21 @@
 <?php
 
 use backend\modules\user\models\CustomerUserForm;
-use backend\modules\user\widgets\UserProfileFormWidget;
-use common\widgets\address\AddressFormWidget;
-use yii\bootstrap\ActiveForm;
-use yii\bootstrap\Html;
 
 /* @var $this yii\web\View */
 /* @var $model CustomerUserForm */
-/* @var $form ActiveForm */
 
 $this->title = Yii::t('backend', 'Update customer: {username}', ['username' => $model->username]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Customers'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->getModel()->getFullName(), 'url' => ['view', 'id' => $model->getModel()->id]];
 $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 
 ?>
-<div class="user-update">
+<div class="customer-update">
 
-	<?php $form = ActiveForm::begin(['id' => 'customer-form']) ?>
-
-	<?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
-
-	<?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-
-	<?= UserProfileFormWidget::widget([
-		'model' => $model->getProfile(),
-		'form' => $form,
-	]) ?>
-
-	<?= AddressFormWidget::widget([
-		'form' => $form,
-		'model' => $model->getAddress(),
-	]) ?>
-
-	<?= $form->field($model, 'roles')->checkboxList($model::getRolesNames()) ?>
-
-	<div class="form-group">
-		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-primary']) ?>
-	</div>
-
-	<?php ActiveForm::end() ?>
+	<?= $this->render('_form', [
+			'model' => $model,
+		]
+	) ?>
 
 </div>

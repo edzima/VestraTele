@@ -9,7 +9,7 @@ use common\models\user\User;
 use common\models\user\UserProfile;
 
 /**
- * Class LoginCest
+ * Class CustomerCreateCest
  */
 class CustomerCreateCest {
 
@@ -73,7 +73,6 @@ class CustomerCreateCest {
 			['like', 'username', 'FJ%', false],
 			['status' => User::STATUS_INACTIVE],
 		]);
-
 		$I->seeRecord(UserProfile::class, [
 			'firstname' => 'Fred',
 			'lastname' => 'Johansson',

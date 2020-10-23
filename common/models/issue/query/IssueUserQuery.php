@@ -17,6 +17,11 @@ class IssueUserQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function withTypes(array $types): self {
+		$this->andWhere(['type' => $types]);
+		return $this;
+	}
+
 	/**
 	 * @inheritdoc
 	 * @return IssueUser[]|array

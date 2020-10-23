@@ -4,6 +4,7 @@ namespace common\models\issue;
 
 use common\models\issue\query\IssueQuery;
 use common\models\user\Worker;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
@@ -20,6 +21,10 @@ class IssueSearch extends Issue {
 	public $disabledStages = [];
 	public $onlyDelayed = false;
 	public bool $withArchive = false;
+
+	public $agent_id;
+	public $lawyer_id;
+	public $tele_id;
 
 	private $stages = [];
 
@@ -49,12 +54,14 @@ class IssueSearch extends Issue {
 
 	public function attributeLabels(): array {
 		return array_merge([
-			'createdAtFrom' => 'Dodano od',
-			'createdAtTo' => 'Dodano do',
-			'childsId' => 'Struktury',
-			'disabledStages' => 'Wykluczone etapy',
-			'stage_change_at' => 'Zmiana etapu',
-			'onlyDelayed' => 'Opóźnione',
+			'createdAtFrom' => Yii::t('common', 'Created at from'),
+			'createdAtTo' => Yii::t('common', 'Created at to'),
+			'childsId' => Yii::t('backend', 'Structures'),
+			'disabledStages' => Yii::t('backend', 'Excluded stages'), 'Wykluczone etapy',
+			'onlyDelayed' => Yii::t('backend', 'Only delayed'), 'Opóźnione',
+			'agent_id' => Worker::getRolesNames()[Worker::ROLE_AGENT],
+			'lawyer_id' => Worker::getRolesNames()[Worker::ROLE_LAWYER],
+			'tele_id' => Worker::getRolesNames()[Worker::ROLE_TELEMARKETER],
 		], parent::attributeLabels());
 	}
 

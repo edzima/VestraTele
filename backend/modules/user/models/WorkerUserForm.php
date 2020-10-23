@@ -41,6 +41,9 @@ class WorkerUserForm extends UserForm {
 
 	protected function beforeSaveModel(User $model): void {
 		parent::beforeSaveModel($model);
+		if ($this->parent_id === $model->id) {
+			$this->parent_id = null;
+		}
 		$model->boss = $this->parent_id;
 	}
 

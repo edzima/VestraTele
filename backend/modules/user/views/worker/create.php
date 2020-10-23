@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= AddressFormWidget::widget([
 		'form' => $form,
-		'model' => $model->getAddress(),
+		'model' => $model->getHomeAddress(),
 	]) ?>
 
 	<?= $form->field($model, 'roles')->checkboxList($model::getRolesNames()) ?>

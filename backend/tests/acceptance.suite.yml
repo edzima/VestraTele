@@ -1,0 +1,13 @@
+suite_namespace: backend\tests\acceptance
+actor: AcceptanceTester
+modules:
+  enabled:
+    - WebDriver:
+        url: http://nginx:8081
+        host: browser
+        browser: chrome
+    - Yii2:
+        part: [init, orm, fixtures ]
+        cleanup: true
+        entryScript: index-test.php
+        transaction: false

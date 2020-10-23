@@ -41,12 +41,12 @@ $user = Yii::$app->user;
 					'visible' => $user->can(User::PERMISSION_MEET),
 					'items' => [
 						[
-							'label' => Yii::t('issue', 'Dodaj'),
+							'label' => Yii::t('backend', 'Create'),
 							'url' => ['/issue/meet/create'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
-							'label' => Yii::t('issue', 'Przeglądaj'),
+							'label' => Yii::t('common', 'Browse'),
 							'url' => ['/issue/meet/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
@@ -59,19 +59,19 @@ $user = Yii::$app->user;
 				],
 
 				[
-					'label' => Yii::t('backend', 'Issues'),
+					'label' => Yii::t('common', 'Issues'),
 					'url' => ['/issue/issue/index'],
 					'icon' => '<i class="fa fa-suitcase"></i>',
 					'options' => ['class' => 'treeview'],
 					'visible' => $user->can(User::PERMISSION_ISSUE),
 					'items' => [
 						[
-							'label' => Yii::t('issue', 'Przeglądaj'),
+							'label' => Yii::t('common', 'Browse'),
 							'url' => ['/issue/issue/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
-							'label' => Yii::t('issue', 'Notatki'),
+							'label' => Yii::t('common', 'Notes'),
 							'url' => ['/issue/note/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
@@ -82,15 +82,20 @@ $user = Yii::$app->user;
 						],
 
 						[
-							'label' => Yii::t('issue', 'Rodzaje'),
+							'label' => Yii::t('common', 'Types'),
 							'url' => ['/issue/type/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
-							'label' => Yii::t('issue', 'Etapy'),
+							'label' => Yii::t('common', 'Etapy'),
 							'url' => ['/issue/stage/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
+						[
+								'label' => Yii::t('common','Issue Users'),
+								'url' => ['/issue/user/index'],
+								'icon' => '<i class="fa fa-angle-double-right"></i>',
+						]
 					],
 				],
 				[

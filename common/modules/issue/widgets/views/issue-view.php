@@ -2,9 +2,10 @@
 
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
+use common\models\user\User;
+use common\modules\issue\widgets\IssueUsersWidget;
 use common\widgets\FieldsetDetailView;
-use common\widgets\WorkerDetailViewWidget;
-use yii\helpers\Html;
+use yii\bootstrap\Html;
 
 /* @var $this yii\web\View */
 /* @var $model Issue */
@@ -20,27 +21,45 @@ use yii\helpers\Html;
 	</legend>
 	<div id="issue-details">
 
+		<?= IssueUsersWidget::widget([
+			'model' => $model,
+			'type' => IssueUsersWidget::TYPE_CUSTOMERS,
+			'legendEncode' => false,
+			'legend' => static function (IssueUser $issueUser): string {
+				$legend = Html::a($issueUser->getTypeName()
+					. ' - '
+					. Html::encode($issueUser->user->getFullName()),
+					['/user/customer/view', 'id' => $issueUser->user_id], [
+						'target' => '_blank',
+					]);
+				if ($issueUser->type === IssueUser::TYPE_CUSTOMER) {
+					return $legend;
+				}
+				$legend .= Html::beginTag('span', ['class' => 'pull-right']);
+				$legend .= Html::a(Html::icon('pencil'),
+					[
+						'/issue/user/update-type',
+						'issueId' => $issueUser->issue_id,
+						'userId' => $issueUser->user_id,
+						'type' => $issueUser->type,
+					]);
+				if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
+					$legend .= Html::a(Html::icon('trash'),
+						[
+							'/issue/user/delete',
+							'issueId' => $issueUser->issue_id,
+							'userId' => $issueUser->user_id,
+							'type' => $issueUser->type,
+						], [
+							'data-method' => 'POST',
+							'data-confirm' => Yii::t('backend', 'Are you sure you want to delete this item?'),
+						]);
+				}
+				$legend .= Html::endTag('span');
 
-		<div class="row">
-
-			<?= FieldsetDetailView::widget([
-				'legend' => IssueUser::getTypesNames()[IssueUser::TYPE_CUSTOMER],
-				'toggle' => false,
-				'htmlOptions' => [
-					'class' => 'col-md-4',
-				],
-				'detailConfig' => [
-					'model' => $model->customer,
-					'attributes' => [
-						'fullName',
-						'email:email',
-						'profile.phone',
-						'profile.phone_2',
-					],
-				],
-			]) ?>
-
-		</div>
+				return $legend;
+			},
+		]) ?>
 
 		<?= FieldsetDetailView::widget([
 			'legend' => Yii::t('common', 'Issue details'),
@@ -52,6 +71,7 @@ use yii\helpers\Html;
 				],
 				'attributes' => [
 					'longId',
+					'signature_act',
 					[
 						'attribute' => 'archives_nr',
 						'visible' => $model->isArchived(),
@@ -59,11 +79,6 @@ use yii\helpers\Html;
 					'created_at:date',
 					'updated_at:date',
 					'date:date',
-					'client_email:email',
-					'client_phone_1',
-					'client_phone_2',
-					'victim_email:email',
-					'victim_phone',
 					[
 						'attribute' => 'accident_at',
 						'format' => 'date',
@@ -87,47 +102,19 @@ use yii\helpers\Html;
 			],
 		]) ?>
 
-		<div class="row">
-
-			<?= FieldsetDetailView::widget([
-				'legend' => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
-				'toggle' => false,
-				'htmlOptions' => [
-					'class' => 'col-md-4',
-				],
-				'detailConfig' => [
-					'class' => WorkerDetailViewWidget::class,
-					'model' => $model->agent,
-				],
-			]) ?>
-
-			<?= FieldsetDetailView::widget([
-				'legend' => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
-				'toggle' => false,
-				'htmlOptions' => [
-					'class' => 'col-md-4',
-				],
-				'detailConfig' => [
-					'class' => WorkerDetailViewWidget::class,
-					'model' => $model->lawyer,
-
-				],
-			]) ?>
-
-			<?= FieldsetDetailView::widget([
-				'legend' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
-				'toggle' => false,
-				'htmlOptions' => [
-					'class' => 'col-md-4',
-				],
-				'detailConfig' => [
-					'class' => WorkerDetailViewWidget::class,
-					'model' => $model->tele,
-				],
-			]) ?>
-
-		</div>
-
+		<?= IssueUsersWidget::widget([
+			'model' => $model,
+			'type' => IssueUsersWidget::TYPE_WORKERS,
+			'legendEncode' => false,
+			'legend' => static function (IssueUser $issueUser): string {
+				return Html::a($issueUser->getTypeName()
+					. ' - '
+					. Html::encode($issueUser->user->getFullName()),
+					['/user/worker/view', 'id' => $issueUser->user_id], [
+						'target' => '_blank',
+					]);
+			},
+		]) ?>
 
 	</div>
 

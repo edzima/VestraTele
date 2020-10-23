@@ -19,20 +19,20 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-view">
 	<p>
-		<?= Html::a('Edytuj', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
 			? Html::a(
 				'Rozliczenia',
 				['pay-calculation/index', 'issueId' => $model->id],
 				['class' => 'btn btn-info'])
 			: '' ?>
-		<?= Html::a('Notatka', ['note/create', 'issueId' => $model->id], [
+		<?= Yii::$app->user->can(User::PERMISSION_NOTE) ? Html::a('Notatka', ['note/create', 'issueId' => $model->id], [
 			'class' => 'btn btn-success',
-		]) ?>
+		]) : '' ?>
 
-		<?= Html::a('Relacje', ['user/issue', 'id' => $model->id], [
+		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('Relacje', ['user/issue', 'id' => $model->id], [
 			'class' => 'btn btn-success',
-		]) ?>
+		]) : '' ?>
 
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger pull-right',

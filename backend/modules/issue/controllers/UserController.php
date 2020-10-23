@@ -2,12 +2,12 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\helpers\Url;
 use backend\modules\issue\models\IssueUserForm;
 use backend\modules\issue\models\search\UserSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use Yii;
-use yii\base\InvalidArgumentException;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
@@ -65,37 +65,46 @@ class UserController extends Controller {
 		]);
 	}
 
-	public function actionCreate(int $issueId) {
-		$model = new IssueUserForm();
-		$model->issue_id = $issueId;
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['issue', 'id' => $issueId]);
-		}
-	}
-
 	/**
-	 * Creates a new IssueUser model.
+	 * Link a User to Issue.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 *
 	 * @return string
-	 * @throws BadRequestHttpException
+	 * @throws NotFoundHttpException
 	 */
 	public function actionLink(int $userId) {
-		try {
-			$model = new IssueUserForm($userId);
-		} catch (InvalidArgumentException $exception) {
-			throw new BadRequestHttpException($exception->getMessage());
+		$model = new IssueUserForm();
+		$model->user_id = $userId;
+		if ($model->getUser() === null) {
+			throw new NotFoundHttpException();
 		}
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['issue', 'id' => $model->issue_id]);
+			return $this->redirect(Url::issueView($model->issue_id));
 		}
 		return $this->render('link', [
 			'model' => $model,
 		]);
 	}
 
+	public function actionUpdateType(int $issueId, int $userId, string $type) {
+		$model = new IssueUserForm();
+		$issue = $this->findIssue($issueId);
+		$model->setIssue($issue);
+		$model->user_id = $userId;
+		$model->type = $type;
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			if ($model->type !== $type) {
+				$issue->unlinkUser($type, true);
+			}
+			return $this->redirect(['/issue/issue/view', 'id' => $issueId]);
+		}
+		return $this->render('update', [
+			'model' => $model,
+		]);
+	}
+
 	/**
-	 * Displays a single IssueStage model.
+	 * Displays a single IssueUser model.
 	 *
 	 * @param int $issueId
 	 * @param int $userId
@@ -110,29 +119,6 @@ class UserController extends Controller {
 	}
 
 	/**
-	 * Updates an existing IssueStage model.
-	 * If update is successful, the browser will be redirected to the 'view' page.
-	 *
-	 * @param int $issueId
-	 * @param string $type
-	 * @return mixed
-	 * @throws NotFoundHttpException
-	 */
-	public function actionUpdate(int $issueId, string $type) {
-		$issue = $this->findIssue($issueId);
-		$model = new IssueUserForm();
-		$model->type = $type;
-		$model->setIssue($issue);
-
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
-		}
-		return $this->render('update', [
-			'model' => $model,
-		]);
-	}
-
-	/**
 	 * Deletes an existing IssueStage model.
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
 	 *
@@ -141,13 +127,19 @@ class UserController extends Controller {
 	 * @param string $type
 	 * @return mixed
 	 * @throws NotFoundHttpException
-	 * @throws \Throwable
-	 * @throws \yii\db\StaleObjectException
 	 */
 	public function actionDelete(int $issueId, int $userId, string $type) {
-		$this->findModel($issueId, $userId, $type)->delete();
+		$required = [
+			IssueUser::TYPE_CUSTOMER,
+			IssueUser::TYPE_LAWYER,
+			IssueUser::TYPE_AGENT,
+		];
+		if (in_array($type, $required, true)) {
+			throw new BadRequestHttpException('Invalid Type');
+		}
 
-		return $this->redirect(['index']);
+		$this->findModel($issueId, $userId, $type)->delete();
+		return $this->redirect(Url::issueView($issueId));
 	}
 
 	/**

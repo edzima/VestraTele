@@ -4,24 +4,16 @@ namespace backend\tests\issue;
 
 use backend\modules\issue\models\IssueForm;
 use backend\modules\issue\models\IssueStage;
+use backend\tests\fixtures\IssueFixtureHelper;
 use backend\tests\UnitTester;
-use common\fixtures\issue\EntityResponsibleFixture;
-use common\fixtures\issue\IssueFixture;
-use common\fixtures\issue\IssueUserFixture;
-use common\fixtures\issue\StageFixture;
-use common\fixtures\issue\StageTypesFixtures;
-use common\fixtures\issue\TypeFixture;
-use common\fixtures\user\AgentFixture;
-use common\fixtures\user\CustomerFixture;
-use common\fixtures\user\LawyerFixture;
-use common\fixtures\user\TelemarketerFixture;
+use Codeception\Test\Unit;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\user\User;
 use Yii;
 use yii\base\InvalidConfigException;
 
-class IssueFormTest extends \Codeception\Test\Unit {
+class IssueFormTest extends Unit {
 
 	/**
 	 * @var UnitTester
@@ -29,56 +21,10 @@ class IssueFormTest extends \Codeception\Test\Unit {
 	protected $tester;
 
 	protected function _before() {
-		$this->tester->haveFixtures([
-			'issue' => [
-				'class' => IssueFixture::class,
-				'dataFile' => codecept_data_dir() . 'issue/issue.php',
-			],
-			'user' => [
-				'class' => IssueUserFixture::class,
-				'dataFile' => codecept_data_dir() . 'issue/users.php',
-
-			],
-			'customer' => [
-				'class' => CustomerFixture::class,
-				'dataFile' => codecept_data_dir() . 'customer.php',
-			],
-			'agent' => [
-				'class' => AgentFixture::class,
-				'dataFile' => codecept_data_dir() . 'agent.php',
-				'permissions' => [User::PERMISSION_ISSUE],
-			],
-			'lawyer' => [
-				'class' => LawyerFixture::class,
-				'dataFile' => codecept_data_dir() . 'lawyer.php',
-				'permissions' => [User::PERMISSION_ISSUE],
-			],
-			'telemarketer' => [
-				'class' => TelemarketerFixture::class,
-				'dataFile' => codecept_data_dir() . 'telemarketer.php',
-				'permissions' => [User::PERMISSION_ISSUE],
-			],
-			'stage' => [
-				'class' => StageFixture::class,
-				'dataFile' => codecept_data_dir() . 'issue/stage.php',
-			],
-			'type' => [
-				'class' => TypeFixture::class,
-				'dataFile' => codecept_data_dir() . 'issue/type.php',
-			],
-			'stage-types' => [
-				'class' => StageTypesFixtures::class,
-				'dataFile' => codecept_data_dir() . 'issue/stage_types.php',
-			],
-			'entity' => [
-				'class' => EntityResponsibleFixture::class,
-				'dataFile' => codecept_data_dir() . 'issue/entity_responsible.php',
-			],
-		]);
+		$this->tester->haveFixtures(IssueFixtureHelper::fixtures());
 	}
 
 	public function testWorkersList() {
-		return;
 		$this->tester->assertCount(2, IssueForm::getAgents());
 		$agent = $this->tester->grabFixture('agent', 0);
 		Yii::$app->authManager->revoke(Yii::$app->authManager->getPermission(User::PERMISSION_ISSUE), $agent->id);
@@ -103,18 +49,20 @@ class IssueFormTest extends \Codeception\Test\Unit {
 
 	public function testCorrectCreate(): void {
 		$model = $this->createModel([
-			'type_id' => 1,
-			'stage_id' => 1,
-			'entity_responsible_id' => 1,
+			'details' => 'Test details',
+			'signature_act' => 'I OC 20/20',
 		]);
 		$this->tester->assertTrue($model->save());
+		$this->tester->seeRecord(Issue::class, [
+			'details' => 'Test details',
+			'signature_act' => 'I OC 20/20',
+		]);
 	}
 
 	public function testInvalidStageType(): void {
 		$model = $this->createModel([
 			'type_id' => 3,
 			'stage_id' => 1,
-			'entity_responsible_id' => 1,
 		]);
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('Stage is invalid.', $model->getFirstError('stage_id'));
@@ -122,9 +70,7 @@ class IssueFormTest extends \Codeception\Test\Unit {
 
 	public function testArchiveEmpty(): void {
 		$model = $this->createModel([
-			'type_id' => 1,
 			'stage_id' => IssueStage::ARCHIVES_ID,
-			'entity_responsible_id' => 1,
 		]);
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('Archives cannot be blank.', $model->getFirstError('archives_nr'));
@@ -132,9 +78,7 @@ class IssueFormTest extends \Codeception\Test\Unit {
 
 	public function testValidArchive(): void {
 		$model = $this->createModel([
-			'type_id' => 1,
 			'stage_id' => IssueStage::ARCHIVES_ID,
-			'entity_responsible_id' => 1,
 			'archives_nr' => 'A1222',
 		]);
 		$this->tester->assertTrue($model->save());
@@ -143,12 +87,13 @@ class IssueFormTest extends \Codeception\Test\Unit {
 		]);
 	}
 
-	public function testChangeStateWithoutDate(): void {
+	public function testCheckStateAtWithoutChangeStage(): void {
 		/** @var Issue $issue */
 		$issue = $this->tester->grabFixture('issue', 0);
 		$this->tester->assertNull($issue->stage_change_at);
 		$model = new IssueForm(['model' => $issue]);
-		$model->stage_id = 1;
+		codecept_debug($model->stage_change_at);
+		codecept_debug($model->getModel()->stage_change_at);
 		$this->tester->assertTrue($model->save());
 		$this->tester->assertSame(date('Y-m-d'), date('Y-m-d', strtotime($model->getModel()->stage_change_at)));
 	}
@@ -180,20 +125,28 @@ class IssueFormTest extends \Codeception\Test\Unit {
 
 	public function testNotUniqueArchive(): void {
 		$model = $this->createModel([
-			'type_id' => 1,
 			'stage_id' => IssueStage::ARCHIVES_ID,
-			'entity_responsible_id' => 1,
 			'archives_nr' => 'A1222',
 		]);
 		$this->tester->assertTrue($model->save());
 		$model = $this->createModel([
-			'type_id' => 1,
 			'stage_id' => IssueStage::ARCHIVES_ID,
-			'entity_responsible_id' => 1,
 			'archives_nr' => 'A1222',
 		]);
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('Archives "A1222" has already been taken.', $model->getFirstError('archives_nr'));
+	}
+
+	public function testNotUniqueSignatureAct(): void {
+		$model = $this->createModel([
+			'signature_act' => 'I OC 22',
+		]);
+		$this->tester->assertTrue($model->save());
+		$model = $this->createModel([
+			'signature_act' => 'I OC 22',
+		]);
+		$this->tester->assertFalse($model->save());
+		$this->tester->assertSame('Signature act "I OC 22" has already been taken.', $model->getFirstError('signature_act'));
 	}
 
 	private function createModel(array $attributes = []): IssueForm {
@@ -205,6 +158,17 @@ class IssueFormTest extends \Codeception\Test\Unit {
 		}
 		if (!isset($attributes['agent_id'])) {
 			$attributes['agent_id'] = 300;
+		}
+
+		if (!isset($attributes['type_id'])) {
+			$attributes['type_id'] = 1;
+		}
+		if (!isset($attributes['stage_id'])) {
+			$attributes['stage_id'] = 1;
+		}
+
+		if (!isset($attributes['entity_responsible_id'])) {
+			$attributes['entity_responsible_id'] = 1;
 		}
 
 		return new IssueForm($attributes);

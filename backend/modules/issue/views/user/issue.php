@@ -21,11 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="issue-user-issue">
 
 	<h1><?= Html::encode($this->title) ?></h1>
-
-	<p>
-		<?= Html::a(Yii::t('backend', 'Link customer to issue'), ['link', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
-
-	</p>
+	
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,

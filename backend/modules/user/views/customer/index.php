@@ -5,7 +5,6 @@ use backend\modules\user\models\search\CustomerUserSearch;
 use backend\widgets\GridView;
 use common\models\user\Customer;
 use common\models\user\UserProfile;
-use edzima\teryt\models\Region;
 use kartik\grid\ActionColumn;
 use yii\bootstrap\Html;
 
@@ -38,15 +37,14 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => UserProfile::instance()->getAttributeLabel('lastname'),
 			],
 			[
-				'attribute' => 'region_id',
-				'value' => 'homeAddress.city.region',
-				'label' => Yii::t('address', 'Region'),
-				'filter' => Region::getNames(),
-			],
-			[
 				'attribute' => 'city',
 				'value' => 'homeAddress.city.name',
-				'label' => Yii::t('address', 'City'),
+				'label' => Yii::t('common', 'City'),
+			],
+			[
+				'attribute' => 'street',
+				'value' => 'homeAddress.info',
+				'label' => Yii::t('common', 'Street'),
 			],
 			'email:email',
 			[

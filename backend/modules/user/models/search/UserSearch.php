@@ -53,7 +53,6 @@ class UserSearch extends User {
 		$query->joinWith('addresses.address.city');
 		$query->with('addresses.address.city');
 
-
 		// add conditions that should always apply here
 
 		$dataProvider = new ActiveDataProvider([
@@ -73,7 +72,7 @@ class UserSearch extends User {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
+			'user.id' => $this->id,
 			'status' => $this->status,
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,

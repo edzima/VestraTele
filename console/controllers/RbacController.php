@@ -4,6 +4,7 @@ namespace console\controllers;
 
 use common\models\user\Customer;
 use common\models\user\User;
+use common\models\user\Worker;
 use common\rbac\OwnModelRule;
 use Yii;
 use yii\console\Controller;
@@ -13,11 +14,11 @@ use yii\rbac\Item;
 class RbacController extends Controller {
 
 	public array $roles = [
-		User::ROLE_AGENT,
-		User::ROLE_BOOKKEEPER,
-		User::ROLE_CUSTOMER_SERVICE,
-		User::ROLE_LAWYER,
-		User::ROLE_TELEMARKETER,
+		Worker::ROLE_AGENT,
+		Worker::ROLE_BOOKKEEPER,
+		Worker::ROLE_CUSTOMER_SERVICE,
+		Worker::ROLE_LAWYER,
+		Worker::ROLE_TELEMARKETER,
 		Customer::ROLE_CUSTOMER,
 		Customer::ROLE_VICTIM,
 		Customer::ROLE_MINOR,

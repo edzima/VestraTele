@@ -143,7 +143,8 @@ class NoteController extends Controller {
 		$model = $this->findModel($id);
 		$issueId = $model->issue_id;
 		$model->delete();
-		$this->redirectIssue($issueId);
+		Yii::warning('User: ' . Yii::$app->user->id . ' delete note. Title: ' . $model->title . "\n description: " . $model->description, 'note.delete');
+		return $this->redirectIssue($issueId);
 	}
 
 	private function redirectPayCalculation(int $issueId) {

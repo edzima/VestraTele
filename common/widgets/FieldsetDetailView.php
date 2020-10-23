@@ -40,15 +40,23 @@ class FieldsetDetailView extends Widget {
 	}
 
 	public function renderLegend(): string {
-		return Html::tag('legend', $this->renderLegendContent(), $this->legendOptions);
+		$options = $this->legendOptions;
+		$encode = ArrayHelper::remove($options, 'encode', true);
+		$legend = $this->legend;
+		if ($encode) {
+			$legend = Html::encode($legend);
+		}
+		if($this->toggle){
+			$legend .= $this->renderToggleBtn();
+		}
+		return Html::tag('legend', $legend, $options);
 	}
 
 	public function renderLegendContent(): string {
-		$legend = Html::encode($this->legend);
 		if (!$this->toggle) {
-			return $legend;
+			return $this->legend;
 		}
-		return $legend . $this->renderToggleBtn();
+		return $this->legend . $this->renderToggleBtn();
 	}
 
 	public function renderToggleBtn(): string {

@@ -1,18 +1,22 @@
 <?php
 
-namespace backend\tests\Step\Functional;
+namespace common\tests\_support;
 
-use backend\tests\FunctionalTester;
 use Codeception\Scenario;
 use common\models\user\User;
 use Yii;
 
-abstract class UserRbac extends FunctionalTester {
+trait UserRbacActor {
 
 	private User $user;
 
-	protected const USERNAME = 'user_rbac';
-	protected const PASSWORD = 'user_rbac_password';
+	protected function getUsername(): string {
+		return 'user_rbac';
+	}
+
+	protected function getPassword(): string {
+		return 'user_rbac_password';
+	}
 
 	public function __construct(Scenario $scenario) {
 		$this->user = $this->createUser();
@@ -21,9 +25,8 @@ abstract class UserRbac extends FunctionalTester {
 		parent::__construct($scenario);
 	}
 
-
-
-	public function _after(FunctionalTester $I): void {
+	public function _after(): void {
+		codecept_debug('revoke all');
 		Yii::$app->authManager->revokeAll($this->user->id);
 	}
 
@@ -42,10 +45,14 @@ abstract class UserRbac extends FunctionalTester {
 	final public function amLoggedIn(): void {
 		$I = $this;
 		$I->amOnPage('/site/login');
-		$I->fillField('Username', static::USERNAME);
-		$I->fillField('Password', static::PASSWORD);
+		$I->fillField('Username', $this->getUsername());
+		$I->fillField('Password', $this->getPassword());
 		$I->click('#login-form button[type=submit]');
-		$I->see(static::USERNAME);
+		$this->checkIsLogged();
+	}
+
+	protected function checkIsLogged(): void {
+		$this->see($this->getUsername());
 	}
 
 	private function assignRoles(): void {
@@ -54,6 +61,7 @@ abstract class UserRbac extends FunctionalTester {
 			try {
 				$auth->assign($auth->getRole($roleName), $this->user->id);
 			} catch (\Exception $exception) {
+				codecept_debug($exception->getMessage());
 			}
 		}
 	}
@@ -64,19 +72,18 @@ abstract class UserRbac extends FunctionalTester {
 			try {
 				$auth->assign($auth->getPermission($permission), $this->user->id);
 			} catch (\Exception $exception) {
+				codecept_debug($exception->getMessage());
 			}
 		}
 	}
 
 	private function createUser(): User {
 		$user = new User();
-		$user->password = static::PASSWORD;
-		$user->username = static::USERNAME;
+		$user->username = $this->getUsername();
+		$user->setPassword($this->getPassword());
 		$user->status = User::STATUS_ACTIVE;
-		$user->setPassword(static::PASSWORD);
 		$user->generateAuthKey();
 		$user->save();
 		return $user;
 	}
-
 }

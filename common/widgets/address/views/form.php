@@ -15,6 +15,11 @@ use yii\widgets\ActiveForm;
 
 <div class="row">
 
+	<?= $form->field($model, 'postal_code',
+		[
+			'options' => ['class' => 'form-group col-sm-2 col-lg-2'],
+		])->textInput(['maxlength' => true]) ?>
+
 	<?= $form->field($model, 'city_id', [
 		'options' => ['class' => 'form-group col-sm-10 col-lg-5'],
 	])->widget(Select2::class, [
@@ -39,11 +44,6 @@ use yii\widgets\ActiveForm;
 		],
 	]) ?>
 
-
-	<?= $form->field($model, 'postal_code',
-		[
-			'options' => ['class' => 'form-group col-sm-2 col-lg-2'],
-		])->textInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'info',
 		[

@@ -2,12 +2,14 @@
 
 namespace backend\tests\Step\Functional;
 
+use backend\tests\FunctionalTester;
 use common\models\user\User;
 
-class Admin extends UserRbac {
+class Admin extends FunctionalTester {
 
-	protected const USERNAME = 'admin';
-	protected const PASSWORD = 'password';
+	protected function getUsername(): string {
+		return 'administrator';
+	}
 
 	protected function getRoles(): array {
 		return [
