@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\tests\functional;
+namespace backend\tests\functional\user;
 
 use backend\tests\FunctionalTester;
 use backend\tests\Step\Functional\Manager;
@@ -19,7 +19,7 @@ class CustomerIndexCest {
 	 * @see \Codeception\Module\Yii2::loadFixtures()
 	 * @see \Codeception\Module\Yii2::_before()
 	 */
-	public function _fixtures() {
+	public function _fixtures(): array {
 		return [
 			'customer' => [
 				'class' => CustomerFixture::class,

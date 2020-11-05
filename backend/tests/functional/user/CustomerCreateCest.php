@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\tests\functional;
+namespace backend\tests\functional\user;
 
 use backend\tests\FunctionalTester;
 use backend\tests\Step\Functional\Manager;
@@ -21,7 +21,7 @@ class CustomerCreateCest {
 	 * @see \Codeception\Module\Yii2::loadFixtures()
 	 * @see \Codeception\Module\Yii2::_before()
 	 */
-	public function _fixtures() {
+	public function _fixtures(): array {
 		return [
 			'user' => [
 				'class' => UserFixture::class,
@@ -43,7 +43,6 @@ class CustomerCreateCest {
 		$this->sendForm($I);
 		$I->seeValidationError('Firstname cannot be blank.');
 		$I->seeValidationError('Lastname cannot be blank.');
-
 	}
 
 	public function checkOnlyFirstname(FunctionalTester $I): void {

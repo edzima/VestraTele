@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\tests\functional;
+namespace backend\tests\functional\issue;
 
 use backend\tests\fixtures\IssueFixtureHelper;
 use backend\tests\Step\Functional\IssueManager;

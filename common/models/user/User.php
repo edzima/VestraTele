@@ -66,6 +66,7 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const PERMISSION_NOTE = 'note';
 	public const PERMISSION_PAYS_DELAYED = 'pays.delayed';
 	public const PERMISSION_SUMMON = 'summon';
+	public const PERMISSION_COST = 'cost';
 
 	private static $ROLES_NAMES;
 	private static $PERMISSIONS_NAMES;

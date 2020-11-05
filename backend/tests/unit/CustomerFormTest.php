@@ -3,25 +3,27 @@
 namespace backend\tests\unit;
 
 use backend\modules\user\models\CustomerUserForm;
-use backend\tests\UnitTester;
 use common\fixtures\user\CustomerFixture;
 use common\models\user\Customer;
 use common\models\user\User;
+use Yii;
 
-class CustomerFormTest extends \Codeception\Test\Unit {
-
-	/**
-	 * @var UnitTester
-	 */
-	protected $tester;
+class CustomerFormTest extends Unit {
 
 	public function _before() {
+		parent::_before();
+		Yii::$app->authManager->removeAllAssignments();
 		$this->tester->haveFixtures([
 			'customer' => [
 				'class' => CustomerFixture::class,
 				'dataFile' => codecept_data_dir() . 'customer.php',
 			],
 		]);
+	}
+
+	protected function _after() {
+		parent::_after();
+		Yii::$app->authManager->removeAllAssignments();
 	}
 
 	public function testPolishCharsInNames(): void {
@@ -56,8 +58,8 @@ class CustomerFormTest extends \Codeception\Test\Unit {
 
 		expect($mail)->isInstanceOf('yii\mail\MessageInterface');
 		expect($mail->getTo())->hasKey('test@email.com');
-		expect($mail->getFrom())->hasKey(\Yii::$app->params['supportEmail']);
-		expect($mail->getSubject())->equals('Account registration at ' . \Yii::$app->name);
+		expect($mail->getFrom())->hasKey(Yii::$app->params['supportEmail']);
+		expect($mail->getSubject())->equals('Account registration at ' . Yii::$app->name);
 	}
 
 	public function testUpdate(): void {

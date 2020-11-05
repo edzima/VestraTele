@@ -32,8 +32,7 @@ class AcceptanceTester extends \Codeception\Actor {
 
 	public function fillOutSelect2OptionField(string $selector, $value) {
 		$I = $this;
-		$element = '#select2-' . $selector . '-container';
-		$I->click($element);
+		$I->click($selector);
 		$searchField = '.select2-search__field';
 		$I->waitForElementVisible($searchField);
 		$I->fillField($searchField, $value);

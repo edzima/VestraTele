@@ -4,11 +4,12 @@ namespace common\models\issue;
 
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
+use common\models\provision\Provision;
 use common\models\provision\ProvisionQuery;
+use Decimal\Decimal;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use common\models\provision\Provision;
 
 /**
  * This is the model class for table "issue_pay".
@@ -96,8 +97,8 @@ class IssuePay extends ActiveRecord {
 		return $this->hasOne(IssuePayCalculation::class, ['id' => 'calculation_id']);
 	}
 
-	public function getValueNetto(): float {
-		return Yii::$app->tax->netto($this->value, $this->vat);
+	public function getValueNetto(): string {
+		return Yii::$app->tax->netto(new Decimal($this->value), new Decimal($this->vat))->toFloat();
 	}
 
 	public function getVatPercent(): float {

@@ -11,6 +11,11 @@ use yii\console\Controller;
 use yii\helpers\Console;
 use yii\rbac\Item;
 
+/**
+ * Class RbacController
+ *
+ * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
+ */
 class RbacController extends Controller {
 
 	public array $roles = [
@@ -28,6 +33,7 @@ class RbacController extends Controller {
 
 	public array $permissions = [
 		User::PERMISSION_ARCHIVE,
+		User::PERMISSION_COST,
 		User::PERMISSION_ISSUE,
 		User::PERMISSION_LOGS,
 		User::PERMISSION_MEET,

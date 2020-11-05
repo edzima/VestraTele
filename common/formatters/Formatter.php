@@ -2,16 +2,17 @@
 
 namespace common\formatters;
 
+use Decimal\Decimal;
 use NumberFormatter;
 use yii\helpers\Html;
 use yii\i18n\Formatter as BaseFormatter;
 
 class Formatter extends BaseFormatter {
 
-	public $currencyCode = 'PLN';
+	public const FRACTION_DIGITS = 2;
 
 	public $numberFormatterOptions = [
-		NumberFormatter::MIN_FRACTION_DIGITS => 2,
+		NumberFormatter::MIN_FRACTION_DIGITS => self::FRACTION_DIGITS,
 	];
 
 	public function asCityCode(?string $city, ?string $code) {
@@ -29,6 +30,13 @@ class Formatter extends BaseFormatter {
 
 	public function asMonthDay($date): string {
 		return $this->asDate($date, "d'-go'");
+	}
+
+	public function asCurrency($value, $currency = null, $options = [], $textOptions = []) {
+		if ($value instanceof Decimal) {
+			$value = $value->toFixed(self::FRACTION_DIGITS);
+		}
+		return parent::asCurrency($value, $currency, $options, $textOptions);
 	}
 
 }

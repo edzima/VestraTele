@@ -57,9 +57,12 @@ $this->params['breadcrumbs'][] = $this->title;
 		<div class="pay-summary-wrap">
 			<h4>Podsumowanie płatności</h4>
 			<ul>
-				<li>Należna: <?= Yii::$app->formatter->asCurrency($searchModel->getValueSum($dataProvider->query)) ?></li>
-				<li>Zapłacono: <?= Yii::$app->formatter->asCurrency($searchModel->getPayedSum($dataProvider->query)) ?></li>
-				<li>Niezaplacono: <?= Yii::$app->formatter->asCurrency($searchModel->getNotPaySum($dataProvider->query)) ?></li>
+				<li>
+					Należna: <?= Yii::$app->formatter->asCurrency($searchModel->getValueSum($dataProvider->query)) ?></li>
+				<li>
+					Zapłacono: <?= Yii::$app->formatter->asCurrency($searchModel->getPayedSum($dataProvider->query)) ?></li>
+				<li>
+					Niezaplacono: <?= Yii::$app->formatter->asCurrency($searchModel->getNotPaySum($dataProvider->query)) ?></li>
 			</ul>
 		</div>
 	<?php endif; ?>
@@ -107,7 +110,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => DataColumn::class,
 				'attribute' => 'issue_id',
 				'format' => 'raw',
-				'value' => function (IssuePay $model) {
+				'value' => static function (IssuePay $model) {
 					return Html::a(
 						$model->issue,
 						Url::toRoute(['pay-calculation/view', 'id' => $model->calculation_id]),
@@ -124,7 +127,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'calculation.typeName',
 				'filter' => IssuePayCalculation::getTypesNames(),
 				'label' => 'Rozliczenie',
-				'visible' => !$searchModel->isActive(),
 				'width' => '100px',
 			],
 			[
@@ -138,7 +140,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'clientSurname',
-				'value' => 'issue.clientFullName',
+				'value' => 'issue.client',
 				'label' => 'Klient',
 				'filterInputOptions' => [
 					'class' => 'dynamic-search',
@@ -165,10 +167,11 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'attribute' => 'deadline_at',
-				'value' => static function (IssuePay $model) {
+				'value' => static function (IssuePay $model): ?string {
 					if ($model->deadline_at > 0) {
 						return $model->deadline_at;
 					}
+					return null;
 				},
 				'format' => 'date',
 			],

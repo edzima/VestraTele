@@ -1,11 +1,10 @@
 <?php
 
-namespace backend\tests\issue;
+namespace backend\tests\unit\issue;
 
 use backend\modules\issue\models\IssueUserForm;
 use backend\tests\fixtures\IssueFixtureHelper;
-use backend\tests\UnitTester;
-use Codeception\Test\Unit;
+use backend\tests\unit\Unit;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\user\Customer;
@@ -13,12 +12,8 @@ use Yii;
 
 class IssueUserFormTest extends Unit {
 
-	/**
-	 * @var UnitTester
-	 */
-	protected $tester;
-
 	protected function _before() {
+		parent::_before();
 		$this->tester->haveFixtures(IssueFixtureHelper::fixtures());
 	}
 

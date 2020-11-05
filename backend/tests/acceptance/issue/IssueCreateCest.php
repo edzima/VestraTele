@@ -33,13 +33,13 @@ class IssueCreateCest {
 		$customer = $I->grabFixture('customer', 0);
 		$I->amOnPage(Url::to(['/issue/issue/create', 'customerId' => 100]));
 		$I->seeInTitle('Create issue for: ' . $customer->getFullName());
-		$I->fillOutSelect2OptionField('issueform-type_id', 'Accident');
+		$I->fillOutSelect2OptionField('.field-issueform-type_id', 'Accident');
 		$I->wait(2);
-		$I->fillOutSelect2OptionField('issueform-stage_id', 'Completing documents');
-		$I->fillOutSelect2OptionField('issueform-entity_responsible_id', 'Alianz');
+		$I->fillOutSelect2OptionField('.field-issueform-stage_id', 'Completing documents');
+		$I->fillOutSelect2OptionField('.field-issueform-entity_responsible_id', 'Alianz');
 
-		$I->fillOutSelect2OptionField('issueform-lawyer_id', 'lawyer1');
-		$I->fillOutSelect2OptionField('issueform-agent_id', 'agent1');
+		$I->fillOutSelect2OptionField('.field-issueform-lawyer_id', 'lawyer1');
+		$I->fillOutSelect2OptionField('.field-issueform-agent_id', 'agent1');
 		$I->click('#issue-form button[type=submit]');
 		$I->wait(2);
 		$I->seeLink('Update');

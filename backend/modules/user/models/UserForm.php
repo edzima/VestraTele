@@ -177,7 +177,6 @@ class UserForm extends Model {
 		$this->beforeSaveModel($model);
 
 		$isNewRecord = $model->isNewRecord;
-		codecept_debug('Is new record: ' . $isNewRecord);
 		if (!$model->save()) {
 			return false;
 		}

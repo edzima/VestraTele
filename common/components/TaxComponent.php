@@ -2,39 +2,32 @@
 
 namespace common\components;
 
+use Decimal\Decimal;
 use yii\base\Component;
 use yii\base\InvalidArgumentException;
 
 class TaxComponent extends Component {
 
-	public $default = 23;
-
-	public function netto(float $brutto, float $tax = null): float {
-		if ($tax === null) {
-			$tax = $this->default;
-		}
+	public function netto(Decimal $brutto, Decimal $tax): Decimal {
 		$this->checkTax($tax);
-		return $brutto / $this->ratio($tax);
+		return $brutto->div($this->ratio($tax));
 	}
 
-	public function brutto(float $netto, float $tax = null): float {
-		if ($tax === null) {
-			$tax = $this->default;
-		}
+	public function brutto(Decimal $netto, Decimal $tax): Decimal {
 		$this->checkTax($tax);
-		return $netto * $this->ratio($tax);
+		return $netto->mul($this->ratio($tax));
 	}
 
-	private function ratio(float $tax): float {
-		return (100 + $tax) / 100;
+	private function ratio(Decimal $tax): Decimal {
+		return $tax->add(100)->div(100);
 	}
 
 	/**
-	 * @param float $tax
+	 * @param Decimal $tax
 	 * @throws InvalidArgumentException
 	 */
-	private function checkTax(float $tax): void {
-		if ($tax < 0) {
+	private function checkTax(Decimal $tax): void {
+		if (!$tax->isPositive()) {
 			throw new InvalidArgumentException('$tax must best greater than 0');
 		}
 	}

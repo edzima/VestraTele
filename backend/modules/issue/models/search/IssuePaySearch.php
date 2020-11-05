@@ -126,7 +126,6 @@ class IssuePaySearch extends IssuePay {
 			'basePay.issue.id' => $this->issue_id,
 			'basePay.deadline_at' => $this->deadline_at,
 			'basePay.transfer_type' => $this->transfer_type,
-			'basePay.type' => $this->type,
 			'basePay.value' => $this->value,
 			'status' => $this->status,
 			'calculation.type' => $this->calculationType,

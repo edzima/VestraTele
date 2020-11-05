@@ -18,7 +18,7 @@ class IssueCreateCest {
 	 * @see \Codeception\Module\Yii2::loadFixtures()
 	 * @see \Codeception\Module\Yii2::_before()
 	 */
-	public function _fixtures() {
+	public function _fixtures(): array {
 		return IssueFixtureHelper::fixtures();
 	}
 
@@ -30,5 +30,5 @@ class IssueCreateCest {
 		$I->amOnRoute('/issue/issue/create', ['customerId' => $customer->id]);
 		$I->see('Create issue for: ' . $customer, 'title');
 	}
-	
+
 }

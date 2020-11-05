@@ -1,10 +1,15 @@
 <?php
 
-namespace backend\tests\functional;
+namespace backend\tests\functional\user;
 
 use backend\tests\Step\Functional\Admin;
 use backend\tests\Step\Functional\Manager;
 
+/**
+ * Class WorkerCest
+ *
+ * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
+ */
 class WorkerCest {
 
 	protected const ROUTE_INDEX = '/user/worker/index';

@@ -2,13 +2,13 @@
 
 namespace common\tests\_support;
 
-use Codeception\Scenario;
 use common\models\user\User;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 trait UserRbacActor {
 
-	private User $user;
+	private ?User $user = null;
 
 	protected function getUsername(): string {
 		return 'user_rbac';
@@ -18,20 +18,19 @@ trait UserRbacActor {
 		return 'user_rbac_password';
 	}
 
-	public function __construct(Scenario $scenario) {
-		$this->user = $this->createUser();
-		$this->assignRoles();
-		$this->assignPermissions();
-		parent::__construct($scenario);
-	}
-
-	public function _after(): void {
-		codecept_debug('revoke all');
-		Yii::$app->authManager->revokeAll($this->user->id);
-	}
-
 	public function getUser(): User {
+		if ($this->user === null) {
+			$this->user = $this->createUser();
+			codecept_debug('Create user: ' . $this->user->username);
+			$this->revokeAll();
+			$this->assignRoles();
+			$this->assignPermissions();
+		}
 		return $this->user;
+	}
+
+	private function revokeAll(): void {
+		Yii::$app->authManager->revokeAll($this->getUser()->id);
 	}
 
 	protected function getRoles(): array {
@@ -45,7 +44,7 @@ trait UserRbacActor {
 	final public function amLoggedIn(): void {
 		$I = $this;
 		$I->amOnPage('/site/login');
-		$I->fillField('Username', $this->getUsername());
+		$I->fillField('Username', $this->getUser()->username);
 		$I->fillField('Password', $this->getPassword());
 		$I->click('#login-form button[type=submit]');
 		$this->checkIsLogged();
@@ -59,22 +58,26 @@ trait UserRbacActor {
 		$auth = Yii::$app->authManager;
 		foreach ($this->getRoles() as $roleName) {
 			try {
-				$auth->assign($auth->getRole($roleName), $this->user->id);
+				$auth->assign($auth->getRole($roleName), $this->getUser()->id);
 			} catch (\Exception $exception) {
 				codecept_debug($exception->getMessage());
 			}
 		}
+		codecept_debug('Assigned roles:');
+		codecept_debug(ArrayHelper::getColumn($auth->getRolesByUser($this->getUser()->id), 'name'));
 	}
 
 	private function assignPermissions(): void {
 		$auth = Yii::$app->authManager;
 		foreach ($this->getPermissions() as $permission) {
 			try {
-				$auth->assign($auth->getPermission($permission), $this->user->id);
+				$auth->assign($auth->getPermission($permission), $this->getUser()->id);
 			} catch (\Exception $exception) {
 				codecept_debug($exception->getMessage());
 			}
 		}
+		codecept_debug('Assigned permissions:');
+		codecept_debug(ArrayHelper::getColumn($auth->getPermissionsByUser($this->getUser()->id), 'name'));
 	}
 
 	private function createUser(): User {

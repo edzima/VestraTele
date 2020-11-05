@@ -66,6 +66,7 @@ class IssueForm extends Model {
 			],
 			[['details', 'signature_act'], 'string'],
 			['signature_act', 'string', 'max' => 30],
+			['signature_act', 'default', 'value' => null],
 			[['date', 'accident_at', 'stage_change_at'], 'date', 'format' => DATE_ATOM],
 			[['date', 'stage_change_at'], 'default', 'value' => date(DATE_ATOM)],
 			[

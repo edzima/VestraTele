@@ -23,10 +23,26 @@ class Module extends BaseModule {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::PERMISSION_ISSUE],
+						'controllers' => ['issue/cost'],
+						'permissions' => [Worker::PERMISSION_COST],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['issue/meet'],
+						'permissions' => [Worker::PERMISSION_ISSUE, Worker::PERMISSION_MEET],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['issue/issue', 'issue/type', 'issue/stage', 'issue/user'],
+						'permissions' => [Worker::PERMISSION_ISSUE],
+					],
+					[
+						'allow' => true,
+						'roles' => ['administrator'],
 					],
 				],
 			],
+
 		];
 	}
 }

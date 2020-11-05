@@ -1,17 +1,16 @@
-<?php namespace backend\tests\issue;
+<?php
 
+namespace backend\tests\unit\issue;
+
+use backend\tests\unit\Unit;
 use common\fixtures\issue\TypeFixture;
 use common\models\issue\IssueType;
 use common\models\issue\Provision;
 
-class TypeTest extends \Codeception\Test\Unit {
+class TypeTest extends Unit {
 
-	/**
-	 * @var \backend\tests\UnitTester
-	 */
-	protected $tester;
-
-	protected function _before() {
+	protected function _before(): void {
+		parent::_before();
 		$this->tester->haveFixtures([
 			'type' => [
 				'class' => TypeFixture::class,
@@ -20,19 +19,19 @@ class TypeTest extends \Codeception\Test\Unit {
 		]);
 	}
 
-	public function testDuplicateName() {
+	public function testDuplicateName():void {
 		$model = new IssueType(['name' => 'Accident']);
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('Name "Accident" has already been taken.', $model->getFirstError('name'));
 	}
 
-	public function testDuplicateShortName() {
+	public function testDuplicateShortName():void {
 		$model = new IssueType(['name' => 'Accident2', 'short_name' => 'ACC']);
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('Shortname "ACC" has already been taken.', $model->getFirstError('short_name'));
 	}
 
-	public function testInvalidProvisionType() {
+	public function testInvalidProvisionType():void {
 		$model = new IssueType([
 			'name' => 'Benefits',
 			'short_name' => 'B',
@@ -43,7 +42,7 @@ class TypeTest extends \Codeception\Test\Unit {
 		$this->tester->assertSame('Provision type is invalid.', $model->getFirstError('provision_type'));
 	}
 
-	public function testEmpty() {
+	public function testEmpty():void {
 		$model = new IssueType([
 			'name' => '',
 			'short_name' => '',

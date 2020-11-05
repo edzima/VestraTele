@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\tests\functional;
+namespace backend\tests\functional\user;
 
 use backend\tests\fixtures\IssueFixtureHelper;
 use backend\tests\FunctionalTester;
@@ -23,7 +23,7 @@ class CustomerViewCest {
 	 * @see \Codeception\Module\Yii2::loadFixtures()
 	 * @see \Codeception\Module\Yii2::_before()
 	 */
-	public function _fixtures() {
+	public function _fixtures(): array {
 		return IssueFixtureHelper::fixtures();
 	}
 

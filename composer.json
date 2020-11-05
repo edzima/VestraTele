@@ -17,9 +17,10 @@
 	"type": "project",
 	"license": "BSD-3-Clause",
 	"require": {
-		"ext-intl": "*",
 		"php": ">7.4.0",
+		"ext-intl": "*",
 		"ext-mbstring": "*",
+		"php-decimal/php-decimal": "^1.1",
 		"yiisoft/yii2": "2.0.38",
 		"yiisoft/yii2-bootstrap": "^2.0.10",
 		"yiisoft/yii2-swiftmailer": "^2.1.2",
@@ -67,6 +68,14 @@
 		"process-timeout": 1800,
 		"fxp-asset": {
 			"enabled": false
+		}
+	},
+	"autoload": {
+		"psr-4": {
+			"backend\\": "backend/",
+			"common\\": "common/",
+			"frontend\\": "frontend/",
+			"console\\": "console/"
 		}
 	}
 }

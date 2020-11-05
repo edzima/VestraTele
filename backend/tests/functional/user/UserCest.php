@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\tests\functional;
+namespace backend\tests\functional\user;
 
 use backend\tests\Step\Functional\Admin;
 use backend\tests\Step\Functional\Manager;

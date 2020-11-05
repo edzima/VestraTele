@@ -13,7 +13,7 @@ use yii\helpers\Html;
 /* @var $searchModel IssueMeetSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Spotkania';
+$this->title = Yii::t('backend', 'Meets');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-meet-index relative">

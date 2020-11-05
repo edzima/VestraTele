@@ -1,12 +1,11 @@
 <?php
 
-namespace backend\tests\issue;
+namespace backend\tests\unit\issue;
 
 use backend\modules\issue\models\IssueForm;
 use backend\modules\issue\models\IssueStage;
 use backend\tests\fixtures\IssueFixtureHelper;
-use backend\tests\UnitTester;
-use Codeception\Test\Unit;
+use backend\tests\unit\Unit;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\user\User;
@@ -15,12 +14,8 @@ use yii\base\InvalidConfigException;
 
 class IssueFormTest extends Unit {
 
-	/**
-	 * @var UnitTester
-	 */
-	protected $tester;
-
 	protected function _before() {
+		parent::_before();
 		$this->tester->haveFixtures(IssueFixtureHelper::fixtures());
 	}
 
@@ -92,8 +87,6 @@ class IssueFormTest extends Unit {
 		$issue = $this->tester->grabFixture('issue', 0);
 		$this->tester->assertNull($issue->stage_change_at);
 		$model = new IssueForm(['model' => $issue]);
-		codecept_debug($model->stage_change_at);
-		codecept_debug($model->getModel()->stage_change_at);
 		$this->tester->assertTrue($model->save());
 		$this->tester->assertSame(date('Y-m-d'), date('Y-m-d', strtotime($model->getModel()->stage_change_at)));
 	}

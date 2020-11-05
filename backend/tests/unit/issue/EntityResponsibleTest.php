@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\tests\issue;
+namespace backend\tests\unit\issue;
 
 use common\fixtures\issue\EntityResponsibleFixture;
 use common\models\entityResponsible\EntityResponsible;

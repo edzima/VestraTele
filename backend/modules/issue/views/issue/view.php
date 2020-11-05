@@ -20,12 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="issue-view">
 	<p>
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
-			? Html::a(
-				'Rozliczenia',
-				['pay-calculation/index', 'issueId' => $model->id],
-				['class' => 'btn btn-info'])
-			: '' ?>
+
 		<?= Yii::$app->user->can(User::PERMISSION_NOTE) ? Html::a('Notatka', ['note/create', 'issueId' => $model->id], [
 			'class' => 'btn btn-success',
 		]) : '' ?>
@@ -42,7 +37,21 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 		]) : '' ?>
 
+	</p>
+	<p>
+		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
+			? Html::a(
+				'Rozliczenia',
+				['pay-calculation/index', 'issueId' => $model->id],
+				['class' => 'btn btn-info'])
+			: '' ?>
 
+		<?= Yii::$app->user->can(User::PERMISSION_COST)
+			? Html::a(
+				Yii::t('backend', 'Costs'),
+				['cost/issue', 'id' => $model->id],
+				['class' => 'btn btn-info'])
+			: '' ?>
 	</p>
 
 	<?= IssueViewWidget::widget(['model' => $model]) ?>

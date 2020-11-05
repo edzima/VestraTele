@@ -3,18 +3,13 @@
 namespace backend\tests\unit;
 
 use backend\modules\user\models\UserForm;
-use backend\tests\UnitTester;
 use common\fixtures\UserFixture;
 use common\models\user\User;
 
-class UserFormTest extends \Codeception\Test\Unit {
+class UserFormTest extends Unit {
 
-	/**
-	 * @var UnitTester
-	 */
-	protected $tester;
-
-	public function _before() {
+	public function _before(): void {
+		parent::_before();
 		$this->tester->haveFixtures([
 			'user' => [
 				'class' => UserFixture::class,
@@ -23,7 +18,7 @@ class UserFormTest extends \Codeception\Test\Unit {
 		]);
 	}
 
-	public function testCorrectCreate() {
+	public function testCorrectCreate(): void {
 		$model = new UserForm();
 		$model->sendEmail = true;
 

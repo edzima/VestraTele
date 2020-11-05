@@ -36,4 +36,20 @@ class FunctionalTester extends \Codeception\Actor {
 		$this->dontSee($message, '.help-block');
 	}
 
+	public function seeMenuLink($text): void {
+		$this->see($text, '.main-sidebar li a');
+	}
+
+	public function dontSeeMenuLink($text): void {
+		$this->dontSee($text, '.main-sidebar li a');
+	}
+
+	public function seeInGridHeader($text, string $selector = null): void {
+		if ($selector === null) {
+			$selector = '.grid-view';
+		}
+		$selector .= ' th';
+		$this->see($text, $selector);
+	}
+
 }

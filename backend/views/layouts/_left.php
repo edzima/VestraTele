@@ -92,10 +92,16 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
-								'label' => Yii::t('common','Issue Users'),
-								'url' => ['/issue/user/index'],
-								'icon' => '<i class="fa fa-angle-double-right"></i>',
-						]
+							'label' => Yii::t('common', 'Issue Users'),
+							'url' => ['/issue/user/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => Yii::t('backend', 'Costs'),
+							'url' => ['/issue/cost/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'visible' => $user->can(User::PERMISSION_COST),
+						],
 					],
 				],
 				[
@@ -105,11 +111,11 @@ $user = Yii::$app->user;
 					'visible' => $user->can(User::PERMISSION_SUMMON),
 				],
 				[
-					'label' => Yii::t('backend', 'Prowizje'),
+					'label' => Yii::t('backend', 'Provisions'),
 					'url' => '#',
 					'icon' => '<i class="fa fa-percent"></i>',
 					'options' => ['class' => 'treeview'],
-					'visible' => $user->can(User::ROLE_BOOKKEEPER),
+					'visible' => $user->can(User::ROLE_ADMINISTRATOR),
 					'items' => [
 						[
 							'label' => Yii::t('issue', 'Raporty'),
@@ -133,6 +139,7 @@ $user = Yii::$app->user;
 						],
 					],
 				],
+
 				[
 					'label' => Yii::t('backend', 'Płatności'),
 					'url' => '#',
