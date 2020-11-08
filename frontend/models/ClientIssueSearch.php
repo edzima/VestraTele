@@ -25,7 +25,10 @@ class ClientIssueSearch extends IssueSearch {
 		];
 	}
 
-	public function search($params) {
+	/**
+	 * @inheritdoc
+	 */
+	public function search(array $params): ActiveDataProvider {
 		$query = Issue::find();
 
 		$query->with([

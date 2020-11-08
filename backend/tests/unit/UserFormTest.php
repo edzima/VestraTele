@@ -3,6 +3,8 @@
 namespace backend\tests\unit;
 
 use backend\modules\user\models\UserForm;
+use common\fixtures\AddressFixture;
+use common\fixtures\user\UserAddressFixture;
 use common\fixtures\UserFixture;
 use common\models\user\User;
 
@@ -14,6 +16,15 @@ class UserFormTest extends Unit {
 			'user' => [
 				'class' => UserFixture::class,
 				'dataFile' => codecept_data_dir() . 'user.php',
+			],
+			'user-address' => [
+				'class' => UserAddressFixture::class,
+				'dataFile' => codecept_data_dir() . 'user_address.php',
+
+			],
+			'address' => [
+				'class' => AddressFixture::class,
+				'dataFile' => codecept_data_dir() . 'address.php',
 			],
 		]);
 	}
@@ -28,7 +39,8 @@ class UserFormTest extends Unit {
 		$profile = $model->getProfile();
 		$profile->firstname = 'some_firstname';
 		$profile->lastname = 'some_lastname';
-
+		$address = $model->getHomeAddress();
+		$address->postal_code = '34-100';
 		$this->tester->assertTrue($model->save());
 
 		/** @var User $user */

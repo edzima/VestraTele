@@ -72,7 +72,7 @@ class IssueCostCest {
 		$I->amLoggedIn();
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		/* @var Issue $issue */
-		$issue = $I->grabFixture('issue', 1);
+		$issue = $I->grabFixture('issue', 'archived');
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
 		$I->seeResponseCodeIs(404);
 	}

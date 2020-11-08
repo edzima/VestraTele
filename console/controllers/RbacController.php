@@ -26,8 +26,6 @@ class RbacController extends Controller {
 		Worker::ROLE_TELEMARKETER,
 		Customer::ROLE_CUSTOMER,
 		Customer::ROLE_VICTIM,
-		Customer::ROLE_MINOR,
-		Customer::ROLE_DIED,
 		Customer::ROLE_SHAREHOLDER,
 	];
 
@@ -47,7 +45,7 @@ class RbacController extends Controller {
 		],
 	];
 
-	public function actionInit() {
+	public function actionInit(): void {
 		$auth = Yii::$app->authManager;
 		$auth->removeAll();
 

@@ -116,20 +116,6 @@ class IssueFormTest extends Unit {
 		$this->tester->dontSeeRecord(IssueUser::class, ['issue_id' => $issue->id, 'user_id' => $teleId, 'type' => IssueUser::TYPE_TELEMARKETER]);
 	}
 
-	public function testNotUniqueArchive(): void {
-		$model = $this->createModel([
-			'stage_id' => IssueStage::ARCHIVES_ID,
-			'archives_nr' => 'A1222',
-		]);
-		$this->tester->assertTrue($model->save());
-		$model = $this->createModel([
-			'stage_id' => IssueStage::ARCHIVES_ID,
-			'archives_nr' => 'A1222',
-		]);
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Archives "A1222" has already been taken.', $model->getFirstError('archives_nr'));
-	}
-
 	public function testNotUniqueSignatureAct(): void {
 		$model = $this->createModel([
 			'signature_act' => 'I OC 22',

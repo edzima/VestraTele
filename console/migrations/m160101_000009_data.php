@@ -6,21 +6,23 @@ use console\base\Migration;
 class m160101_000009_data extends Migration {
 
 	public function safeUp() {
-		$this->insert('{{%user}}', [
-			'id' => 1,
-			'username' => 'Administrator',
-			'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
-			'access_token' => Yii::$app->getSecurity()->generateRandomString(),
-			'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('passwd'),
-			'email' => 'webmaster@example.com',
-			'status' => User::STATUS_ACTIVE,
-			'created_at' => time(),
-			'updated_at' => time(),
-		]);
+		if (!YII_ENV_TEST) {
+			$this->insert('{{%user}}', [
+				'id' => 1,
+				'username' => 'Administrator',
+				'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
+				'access_token' => Yii::$app->getSecurity()->generateRandomString(),
+				'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('passwd'),
+				'email' => 'webmaster@example.com',
+				'status' => User::STATUS_ACTIVE,
+				'created_at' => time(),
+				'updated_at' => time(),
+			]);
 
-		$this->insert('{{%user_profile}}', [
-			'user_id' => 1,
-		]);
+			$this->insert('{{%user_profile}}', [
+				'user_id' => 1,
+			]);
+		}
 
 		$this->insert('{{%key_storage_item}}', [
 			'key' => 'frontend.registration',
@@ -75,12 +77,14 @@ class m160101_000009_data extends Migration {
 			],
 		]);
 
-		$this->delete('{{%user_profile}}', [
-			'user_id' => 1,
-		]);
+		if (!YII_ENV_TEST) {
+			$this->delete('{{%user_profile}}', [
+				'user_id' => 1,
+			]);
 
-		$this->delete('{{%user}}', [
-			'id' => 1,
-		]);
+			$this->delete('{{%user}}', [
+				'id' => 1,
+			]);
+		}
 	}
 }

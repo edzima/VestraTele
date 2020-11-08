@@ -47,10 +47,6 @@ class AddressDetailView extends DetailView {
 						'visible' => !empty($this->model->city),
 					],
 					[
-						'attribute' => 'city.terc.communeTypeName',
-						'visible' => !empty($this->model->city),
-					],
-					[
 						'attribute' => 'city',
 						'label' => 'Miasto',
 						'value' => $this->model->city ? Yii::$app->formatter->asCityCode($this->model->city->name, $this->model->postal_code) : $this->model->postal_code,

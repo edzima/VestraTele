@@ -83,6 +83,7 @@ use yii\db\Expression;
  * @property SubProvince $victimSubprovince
  * @property IssuePayCalculation[] $payCalculations
  * @property-read Summon[] $summons
+ * @property-read IssueUser[] $users
  */
 class Issue extends ActiveRecord {
 
@@ -160,11 +161,8 @@ class Issue extends ActiveRecord {
 	}
 
 	public function getCustomer(): UserQuery {
-		return $this->getUserType(IssueUser::TYPE_CUSTOMER, Customer::class);
-	}
-
-	public function getVictim(): UserQuery {
-		return $this->getUserType(IssueUser::TYPE_VICTIM, Customer::class);
+		/** @todo change to customer after UserQuery join with assignment table */
+		return $this->getUserType(IssueUser::TYPE_CUSTOMER, User::class);
 	}
 
 	public function getAgent(): UserQuery {
@@ -404,7 +402,7 @@ class Issue extends ActiveRecord {
 	}
 
 	public function getClientFullName(): string {
-		return $this->client_surname . ' ' . $this->client_first_name;
+		return trim($this->client_surname) . ' ' . trim($this->client_first_name);
 	}
 
 	public function getVictimFullName(): string {
@@ -437,11 +435,12 @@ class Issue extends ActiveRecord {
 	 * @param string $type
 	 * @param bool $delete
 	 */
-	public function unlinkUser(string $type, bool $delete = false) {
+	public function unlinkUser(string $type) {
 		$user = $this->getUsers()->withType($type)->one();
 		if ($user !== null) {
-			$this->unlink('users', $user, $delete);
+			return $this->unlink('users', $user, true);
 		}
+		return false;
 	}
 
 	/**

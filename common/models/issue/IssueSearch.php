@@ -7,7 +7,6 @@ use common\models\user\Worker;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -15,18 +14,17 @@ use yii\helpers\ArrayHelper;
  */
 class IssueSearch extends Issue {
 
-	public $createdAtFrom;
-	public $createdAtTo;
-	public $childsId;
-	public $disabledStages = [];
-	public $onlyDelayed = false;
+	public string $createdAtFrom = '';
+	public string $createdAtTo = '';
+	public string $customerLastname = '';
+
 	public bool $withArchive = false;
 
 	public $agent_id;
 	public $lawyer_id;
 	public $tele_id;
 
-	private $stages = [];
+	private ?array $stages = null;
 
 	/**
 	 * @inheritdoc
@@ -35,30 +33,26 @@ class IssueSearch extends Issue {
 		return [
 			[
 				[
-					'id', 'agent_id', 'tele_id', 'lawyer_id', 'childsId', 'provision_type', 'stage_id', 'type_id', 'entity_responsible_id',
+					'id', 'agent_id', 'tele_id', 'lawyer_id', 'stage_id', 'type_id', 'entity_responsible_id',
 				], 'integer',
-			],
-			[
-				['payed', 'onlyDelayed'], 'boolean',
 			],
 			[['createdAtTo', 'createdAtFrom', 'accident_at'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			[
 				[
-					'created_at', 'updated_at', 'client_first_name', 'client_surname', 'victim_first_name', 'victim_surname', 'victim_city_code',
-					'victim_street', 'details', 'disabledStages',
+					'created_at', 'updated_at', 'customerLastname',
 				], 'safe',
 			],
 		];
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function attributeLabels(): array {
 		return array_merge([
 			'createdAtFrom' => Yii::t('common', 'Created at from'),
 			'createdAtTo' => Yii::t('common', 'Created at to'),
-			'childsId' => Yii::t('backend', 'Structures'),
-			'disabledStages' => Yii::t('backend', 'Excluded stages'), 'Wykluczone etapy',
-			'onlyDelayed' => Yii::t('backend', 'Only delayed'), 'Opóźnione',
 			'agent_id' => Worker::getRolesNames()[Worker::ROLE_AGENT],
 			'lawyer_id' => Worker::getRolesNames()[Worker::ROLE_LAWYER],
 			'tele_id' => Worker::getRolesNames()[Worker::ROLE_TELEMARKETER],
@@ -80,10 +74,15 @@ class IssueSearch extends Issue {
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function search($params) {
+	public function search(array $params): ActiveDataProvider {
 		$query = Issue::find();
 
-		$query->with(['agent.userProfile', 'customer.userProfile', 'victim.userProfile', 'type', 'stage.types']);
+		$query->with([
+			'agent.userProfile',
+			'customer.userProfile',
+			'type',
+			'stage.types',
+		]);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -97,58 +96,29 @@ class IssueSearch extends Issue {
 		$this->load($params);
 
 		if (!$this->validate()) {
-			// uncomment the following line if you do not want to return any records when validation fails
-			// $query->where('0=1');
 			return $dataProvider;
 		}
 
-		if ($this->childsId > 0) {
-			$user = Worker::findOne($this->childsId);
-			if ($user !== null) {
-				$ids = $user->getAllChildesIds();
-				$ids[] = $user->id;
-				$query->andFilterWhere(['agent_id' => $ids]);
-			}
-		}
-
+		$this->agentFilter($query);
 		$this->teleFilter($query);
 		$this->lawyerFilter($query);
-		$this->delayedFilter($query);
 		$this->archiveFilter($query);
+		$this->customerFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
-			'created_at' => $this->created_at,
-			'updated_at' => $this->updated_at,
-			'agent.id' => $this->agent_id,
-			'client_street' => $this->client_street,
-			'client_city_id' => $this->client_city_id,
-			'victim_city_id' => $this->victim_city_id,
-			'provision_type' => $this->provision_type,
-			'provision_value' => $this->provision_value,
-			'provision_base' => $this->provision_base,
 			'stage_id' => $this->stage_id,
 			'type_id' => $this->type_id,
 			'entity_responsible_id' => $this->entity_responsible_id,
-			'payed' => $this->payed,
+			'created_at' => $this->created_at,
+			'updated_at' => $this->updated_at,
 			'accident_at' => $this->accident_at,
 		]);
 
-		$query->andFilterWhere(['like', 'client_first_name', $this->client_first_name])
-			->andFilterWhere(['like', 'client_surname', $this->client_surname])
-			->andFilterWhere(['like', 'client_phone_1', $this->client_phone_1])
-			->andFilterWhere(['like', 'client_phone_2', $this->client_phone_2])
-			->andFilterWhere(['like', 'client_city_code', $this->client_city_code])
-			->andFilterWhere(['like', 'victim_first_name', $this->victim_first_name])
-			->andFilterWhere(['like', 'victim_surname', $this->victim_surname])
-			->andFilterWhere(['like', 'victim_city_code', $this->victim_city_code])
-			->andFilterWhere(['like', 'victim_street', $this->victim_street])
-			->andFilterWhere(['like', 'victim_phone', $this->victim_phone])
-			->andFilterWhere(['>=', 'created_at', $this->createdAtFrom])
-			->andFilterWhere(['<=', 'created_at', $this->createdAtTo])
-			->andFilterWhere(['NOT IN', 'stage_id', $this->disabledStages])
-			->andFilterWhere(['like', 'details', $this->details]);
+		$query->andFilterWhere(['>=', 'created_at', $this->createdAtFrom])
+			->andFilterWhere(['<=', 'created_at', $this->createdAtTo]);
+
 		return $dataProvider;
 	}
 
@@ -158,47 +128,41 @@ class IssueSearch extends Issue {
 		}
 	}
 
-	protected function teleFilter(IssueQuery $query): void {
-		//$query->andFilterWhere(['tele_id' => $this->tele_id]);
+	protected function agentFilter(IssueQuery $query): void {
+		if (!empty($this->agent_id)) {
+			$query->agents([$this->agent_id]);
+		}
+	}
+
+	protected function customerFilter(IssueQuery $query): void {
+		if (!empty($this->customerLastname)) {
+			$query->joinWith('users.user.userProfile');
+			$query->andWhere(['like', 'user_profile.lastname', $this->customerLastname]);
+		}
 	}
 
 	protected function lawyerFilter(IssueQuery $query): void {
-//		$query->andFilterWhere(['lawyer_id' => $this->lawyer_id]);
+		if (!empty($this->lawyer_id)) {
+			$query->lawyers([$this->lawyer_id]);
+		}
 	}
 
-	private function delayedFilter(IssueQuery $query): void {
-		if (!empty($this->onlyDelayed)) {
-			$query->joinWith('stage');
-			$daysGroups = ArrayHelper::map($this->getStagesNames(), 'id', 'days_reminder', 'days_reminder');
-
-			foreach ($daysGroups as $day => $ids) {
-				if (!empty($day)) {
-					$query->orFilterWhere([
-						'and',
-						[
-							'stage_id' => array_keys($ids),
-						],
-						[
-							'<=', new Expression("DATE_ADD(stage_change_at, INTERVAL $day DAY)"), new Expression('NOW()'),
-						],
-					]);
-				}
-			}
-			$query->andWhere('stage_change_at IS NOT NULL');
-			$query->andWhere('issue_stage.days_reminder is NOT NULL');
+	protected function teleFilter(IssueQuery $query): void {
+		if (!empty($this->tele_id)) {
+			$query->tele([$this->tele_id]);
 		}
 	}
 
 	public static function getTypesNames(): array {
-		return ArrayHelper::map(IssueType::find()->all(), 'id', 'nameWithShort');
+		return IssueType::getTypesNames();
 	}
 
 	public function getStagesNames(): array {
-		if (empty($this->stages)) {
+		if ($this->stages === null) {
 			$this->stages = ArrayHelper::map(IssueStage::find()->all(), 'id', 'nameWithShort');
-		}
-		if (!$this->withArchive && isset($this->stages[IssueStage::ARCHIVES_ID])) {
-			unset($this->stages[IssueStage::ARCHIVES_ID]);
+			if (!$this->withArchive) {
+				unset($this->stages[IssueStage::ARCHIVES_ID]);
+			}
 		}
 		return $this->stages;
 	}

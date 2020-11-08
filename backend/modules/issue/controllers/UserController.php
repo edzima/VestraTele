@@ -94,7 +94,7 @@ class UserController extends Controller {
 		$model->type = $type;
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			if ($model->type !== $type) {
-				$issue->unlinkUser($type, true);
+				$issue->unlinkUser($type);
 			}
 			return $this->redirect(['/issue/issue/view', 'id' => $issueId]);
 		}

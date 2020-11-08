@@ -165,13 +165,15 @@ class IssueMeet extends ActiveRecord {
 		return 'Własna';
 	}
 
-	protected function getAddresses(): ActiveQuery {
-		return $this->hasMany(MeetAddress::class, ['meet_id' => 'id'])->indexBy('type');
-	}
 
 	public function getCustomerAddress(): ?Address {
 		return $this->addresses[MeetAddress::TYPE_CUSTOMER]->address ?? null;
 	}
+	protected function getAddresses(): ActiveQuery {
+		return $this->hasMany(MeetAddress::class, ['meet_id' => 'id'])->indexBy('type');
+	}
+
+
 
 	public function getAgent(): UserQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */

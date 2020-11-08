@@ -13,12 +13,12 @@ use yii\db\ActiveQuery;
 class IssueUserQuery extends ActiveQuery {
 
 	public function withType(string $type): self {
-		$this->andWhere(['type' => $type]);
+		$this->andWhere([IssueUser::tableName() . '.type' => $type]);
 		return $this;
 	}
 
 	public function withTypes(array $types): self {
-		$this->andWhere(['type' => $types]);
+		$this->andWhere([IssueUser::tableName() . '.type' => $types]);
 		return $this;
 	}
 

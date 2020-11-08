@@ -16,7 +16,7 @@ class IssueUserForm extends Model {
 	public const SCENARIO_DEFAULT = self::SCENARIO_USER_LINK;
 
 	protected const UNAVAILABLE_TYPES = [
-		IssueUser::TYPE_CUSTOMER, IssueUser::TYPE_UNKNOWN, IssueUser::TYPE_LAWYER,
+		IssueUser::TYPE_CUSTOMER, IssueUser::TYPE_LAWYER,
 	];
 
 	public $user_id;

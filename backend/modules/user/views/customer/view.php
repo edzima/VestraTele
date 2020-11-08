@@ -40,6 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'profile.phone_2',
 			'statusName',
 			'username',
+			'profile.other',
 		],
 	]) ?>
 

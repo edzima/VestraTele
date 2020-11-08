@@ -35,6 +35,22 @@ class Address extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
+			[['postal_code', 'info'], 'trim'],
+			[
+				'city_id', 'required', 'enableClientValidation' => false, 'when' => function (): bool {
+				return empty($this->postal_code) && empty($this->info);
+			},
+			],
+			[
+				'postal_code', 'required', 'enableClientValidation' => false, 'when' => function (): bool {
+				return empty($this->city_id) && empty($this->info);
+			},
+			],
+			[
+				'info', 'required', 'enableClientValidation' => false, 'when' => function (): bool {
+				return empty($this->city_id) && empty($this->postal_code);
+			},
+			],
 			[['city_id'], 'integer'],
 			[['postal_code'], 'string', 'max' => 6],
 			[['info'], 'string', 'max' => 100],

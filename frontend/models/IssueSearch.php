@@ -52,13 +52,9 @@ class IssueSearch extends BaseIssueSearch {
 	}
 
 	/**
-	 * Creates data provider instance with search query applied
-	 *
-	 * @param array $params
-	 *
-	 * @return ActiveDataProvider
+	 * @inheritdoc
 	 */
-	public function search($params) {
+	public function search(array $params): ActiveDataProvider {
 
 		$query = Issue::find();
 

@@ -8,7 +8,6 @@ use common\models\user\Customer;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
-use Yii;
 use yii\db\ActiveRecord;
 
 /**
@@ -29,9 +28,6 @@ class IssueUser extends ActiveRecord {
 	public const TYPE_CUSTOMER = Customer::ROLE_CUSTOMER;
 	public const TYPE_VICTIM = Customer::ROLE_VICTIM;
 	public const TYPE_SHAREHOLDER = Customer::ROLE_SHAREHOLDER;
-	public const TYPE_MINOR = Customer::ROLE_MINOR;
-	public const TYPE_DIED = Customer::ROLE_DIED;
-	public const TYPE_UNKNOWN = 'unknown';
 
 	public const TYPES_WORKERS = [
 		self::TYPE_LAWYER,
@@ -43,9 +39,6 @@ class IssueUser extends ActiveRecord {
 		self::TYPE_CUSTOMER,
 		self::TYPE_VICTIM,
 		self::TYPE_SHAREHOLDER,
-		self::TYPE_MINOR,
-		self::TYPE_DIED,
-		self::TYPE_UNKNOWN,
 	];
 
 	/**
@@ -111,10 +104,7 @@ class IssueUser extends ActiveRecord {
 			static::TYPE_LAWYER => User::getRolesNames()[static::TYPE_LAWYER],
 			static::TYPE_TELEMARKETER => User::getRolesNames()[static::TYPE_TELEMARKETER],
 			static::TYPE_VICTIM => User::getRolesNames()[static::TYPE_VICTIM],
-			static::TYPE_MINOR => User::getRolesNames()[static::TYPE_MINOR],
 			static::TYPE_SHAREHOLDER => User::getRolesNames()[static::TYPE_SHAREHOLDER],
-			static::TYPE_DIED => User::getRolesNames()[static::TYPE_DIED],
-			static::TYPE_UNKNOWN => Yii::t('common', 'Unknown issue type'),
 		];
 	}
 

@@ -44,6 +44,9 @@ class IssueForm extends Model {
 
 	private ?Issue $model = null;
 
+	/**
+	 * @inheritdoc
+	 */
 	public function __construct($config = []) {
 		if (!isset($config['customer']) && !isset($config['model'])) {
 			throw new InvalidConfigException('$customer or $model must be set.');
@@ -80,14 +83,6 @@ class IssueForm extends Model {
 				}',
 			],
 			[['archives_nr'], 'string', 'max' => 10],
-			[
-				'archives_nr', 'unique', 'targetClass' => Issue::class,
-				'filter' => function (ActiveQuery $query): void {
-					if (!$this->getModel()->isNewRecord) {
-						$query->andWhere(['not', 'id' => $this->getModel()->id]);
-					}
-				},
-			],
 			[
 				'signature_act', 'unique', 'targetClass' => Issue::class,
 				'filter' => function (ActiveQuery $query): void {
@@ -128,7 +123,7 @@ class IssueForm extends Model {
 		$this->agent_id = $model->agent->id;
 		$this->lawyer_id = $model->lawyer->id;
 		$this->tele_id = $model->tele->id ?? null;
-		$this->customer = $model->customer;
+		$this->customer = Customer::fromUser($model->customer);
 		$this->entity_responsible_id = $model->entity_responsible_id;
 		$this->details = $model->details;
 		$this->date = $model->date;
@@ -169,7 +164,7 @@ class IssueForm extends Model {
 			if (!empty($this->tele_id)) {
 				$model->linkUser($this->tele_id, IssueUser::TYPE_TELEMARKETER);
 			} else {
-				$model->unlinkUser(IssueUser::TYPE_TELEMARKETER, true);
+				$model->unlinkUser(IssueUser::TYPE_TELEMARKETER);
 			}
 
 			return true;

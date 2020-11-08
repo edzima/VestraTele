@@ -187,14 +187,19 @@ class UserForm extends Model {
 			return false;
 		}
 
-		if ($this->sendEmail &&
-			$this->status === User::STATUS_INACTIVE
-			&& $isNewRecord
-			&& $this->email !== null
-			&& !$this->hasErrors('email')) {
+		if ($isNewRecord && $this->shouldSendEmail()) {
+			codecept_debug('should send email for new record');
 			return $this->sendEmail($model);
 		}
+
 		return true;
+	}
+
+	protected function shouldSendEmail(): bool {
+		return $this->sendEmail
+			&& $this->status === User::STATUS_INACTIVE
+			&& $this->email !== null
+			&& !$this->hasErrors('email');
 	}
 
 	protected function applyAuth(int $id, bool $isNewRecord): void {

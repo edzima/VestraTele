@@ -5,6 +5,7 @@ use backend\modules\issue\models\search\IssuePaySearch;
 use backend\widgets\CsvForm;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
+use common\models\user\Customer;
 use common\models\user\Worker;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
@@ -140,8 +141,8 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'clientSurname',
-				'value' => 'issue.client',
-				'label' => 'Klient',
+				'value' => 'issue.customer',
+				'label' => Customer::getRolesNames()[Customer::ROLE_CUSTOMER],
 				'filterInputOptions' => [
 					'class' => 'dynamic-search',
 				],

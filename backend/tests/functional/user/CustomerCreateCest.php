@@ -4,7 +4,9 @@ namespace backend\tests\functional\user;
 
 use backend\tests\FunctionalTester;
 use backend\tests\Step\Functional\Manager;
-use common\fixtures\UserFixture;
+use common\fixtures\AddressFixture;
+use common\fixtures\user\CustomerFixture;
+use common\fixtures\user\UserAddressFixture;
 use common\models\user\User;
 use common\models\user\UserProfile;
 
@@ -23,9 +25,18 @@ class CustomerCreateCest {
 	 */
 	public function _fixtures(): array {
 		return [
-			'user' => [
-				'class' => UserFixture::class,
-				'dataFile' => codecept_data_dir() . 'login_data.php',
+			'customer' => [
+				'class' => CustomerFixture::class,
+				'dataFile' => codecept_data_dir() . 'customer.php',
+			],
+			'user-address' => [
+				'class' => UserAddressFixture::class,
+				'dataFile' => codecept_data_dir() . 'customer_address.php',
+
+			],
+			'address' => [
+				'class' => AddressFixture::class,
+				'dataFile' => codecept_data_dir() . 'address.php',
 			],
 		];
 	}
@@ -62,6 +73,7 @@ class CustomerCreateCest {
 	public function checkCorrectWithoutEmail(FunctionalTester $I): void {
 		$I->fillField('Firstname', 'Fred');
 		$I->fillField('Lastname', 'Johansson');
+		$I->fillField('Postal Code', '34-200');
 		$this->sendForm($I);
 		$I->dontSeeValidationError('Firstname cannot be blank.');
 		$I->dontSeeValidationError('Lastname cannot be blank.');
@@ -82,6 +94,7 @@ class CustomerCreateCest {
 		$I->fillField('Email', 'fred@test.com');
 		$I->fillField('Firstname', 'Fred');
 		$I->fillField('Lastname', 'Johansson');
+		$I->fillField('Postal Code', '34-200');
 
 		$this->sendForm($I);
 		$I->dontSeeValidationError('Firstname cannot be blank.');

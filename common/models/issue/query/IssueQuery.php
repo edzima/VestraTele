@@ -46,18 +46,31 @@ class IssueQuery extends ActiveQuery {
 		return $this;
 	}
 
-	public function onlyForLawyer(int $id): self {
-		$this->andWhere(['lawyer_id' => $id]);
+	public function withoutArchives(): self {
+		$this->andWhere(['not', ['stage_id' => IssueStage::ARCHIVES_ID]]);
 		return $this;
 	}
 
-	public function onlyForTele(int $id): self {
-		$this->andWhere(['tele_id' => $id]);
-		return $this;
+	public function agents(array $ids): self {
+		return $this->users(IssueUser::TYPE_AGENT, $ids);
 	}
 
-	public function onlyForAgents(array $ids): self {
-		$this->andWhere(['agent_id' => $ids]);
+	public function lawyers(array $ids): self {
+		return $this->users(IssueUser::TYPE_LAWYER, $ids);
+	}
+
+	public function tele(array $ids): self {
+		return $this->users(IssueUser::TYPE_TELEMARKETER, $ids);
+	}
+
+	protected function users(string $type, array $ids): self {
+		if (!empty($ids)) {
+			$this->joinWith('users');
+			$this->andWhere([
+				'issue_user.type' => $type,
+				'issue_user.user_id' => $ids,
+			]);
+		}
 		return $this;
 	}
 
@@ -77,8 +90,4 @@ class IssueQuery extends ActiveQuery {
 		return parent::one($db);
 	}
 
-	public function withoutArchives(): self {
-		$this->andWhere(['not', ['stage_id' => IssueStage::ARCHIVES_ID]]);
-		return $this;
-	}
 }

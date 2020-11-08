@@ -1,6 +1,7 @@
 <?php
 
-use common\models\issue\IssueSearch;
+use backend\modules\issue\models\search\IssueSearch;
+use common\models\user\User;
 use common\models\user\Worker;
 use common\widgets\DateTimeWidget;
 use kartik\select2\Select2;
@@ -71,7 +72,7 @@ use yii\widgets\ActiveForm;
 			->widget(Select2::class, [
 					'data' => Worker::getSelectList([Worker::ROLE_TELEMARKETER, Worker::PERMISSION_ISSUE]),
 					'options' => [
-						'placeholder' => 'Telemarketer',
+						'placeholder' => $model->getAttributeLabel('tele_id'),
 					],
 					'pluginOptions' => [
 						'allowClear' => true,
@@ -82,7 +83,7 @@ use yii\widgets\ActiveForm;
 			->widget(Select2::class, [
 					'data' => Worker::getSelectList([Worker::ROLE_LAWYER, Worker::PERMISSION_ISSUE]),
 					'options' => [
-						'placeholder' => 'Prawnik',
+						'placeholder' => $model->getAttributeLabel('lawyer_id'),
 					],
 					'pluginOptions' => [
 						'allowClear' => true,
@@ -90,26 +91,27 @@ use yii\widgets\ActiveForm;
 				]
 			) ?>
 
-		<?= $form->field($model, 'childsId', ['options' => ['class' => 'col-md-4']])
-			->widget(Select2::class, [
-					'data' => Worker::getSelectList(),
-					'options' => [
-						'placeholder' => 'Struktury',
-					],
-					'pluginOptions' => [
-						'allowClear' => true,
-					],
-				]
-			) ?>
+		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ?
+			$form->field($model, 'parentId', ['options' => ['class' => 'col-md-4']])
+				->widget(Select2::class, [
+						'data' => Worker::getSelectList(),
+						'options' => [
+							'placeholder' => $model->getAttributeLabel('parentId'),
+							'multiple' => true,
+						],
+						'pluginOptions' => [
+							'allowClear' => true,
+						],
+					]
+				) : '' ?>
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'disabledStages', ['options' => ['class' => 'col-md-8']])->widget(Select2::class, [
+		<?= $form->field($model, 'excludedStages', ['options' => ['class' => 'col-md-8']])->widget(Select2::class, [
 			'data' => $model->getStagesNames(),
 			'options' => [
 				'multiple' => true,
-				'placeholder' => 'Wykluczone etapy',
-
+				'placeholder' => Yii::t('backend', 'Excluded stages'),
 			],
 			'pluginOptions' => [
 				'allowClear' => true,
@@ -123,8 +125,8 @@ use yii\widgets\ActiveForm;
 
 
 	<div class="form-group">
-		<?= Html::submitButton('Szukaj', ['class' => 'btn btn-primary']) ?>
-		<?= Html::a('Reset', 'index', ['class' => 'btn btn-default']) ?>
+		<?= Html::submitButton(Yii::t('backend', 'Search'), ['class' => 'btn btn-primary']) ?>
+		<?= Html::a(Yii::t('backend', 'Reset'), 'index', ['class' => 'btn btn-default']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

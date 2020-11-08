@@ -55,7 +55,7 @@ class LinkUserCest {
 	public function checkLinkToArchiveIssue(IssueManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnPage(['issue/user/link', 'userId' => 101]);
-		$I->submitForm(static::FORM_SELECTOR, $this->formParams(2, 'victim'));
+		$I->submitForm(static::FORM_SELECTOR, $this->formParams(5, 'victim'));
 		$I->seeValidationError('Issue cannot be archived.');
 	}
 

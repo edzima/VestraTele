@@ -1,9 +1,10 @@
 <?php
 
+use backend\modules\issue\models\search\IssueSearch;
 use backend\widgets\CsvForm;
 use backend\widgets\GridView;
 use common\models\issue\Issue;
-use common\models\issue\IssueSearch;
+use common\models\user\Customer;
 use common\models\user\User;
 use common\models\user\Worker;
 use kartik\grid\ActionColumn;
@@ -119,6 +120,7 @@ JS;
 				'filterType' => GridView::FILTER_SELECT2,
 				'attribute' => 'agent_id',
 				'value' => 'agent',
+				'label' => Worker::getRolesNames()[Worker::ROLE_AGENT],
 				'filter' => Worker::getSelectList([Worker::ROLE_AGENT]),
 				'filterWidgetOptions' => [
 					'pluginOptions' => [
@@ -130,6 +132,9 @@ JS;
 				],
 				'contentOptions' => [
 					'class' => 'ellipsis',
+				],
+				'options' => [
+					'style' => 'width:200px',
 				],
 			],
 			[
@@ -143,7 +148,6 @@ JS;
 				'options' => [
 					'style' => 'width:80px',
 				],
-
 			],
 			[
 				'class' => DataColumn::class,
@@ -155,6 +159,15 @@ JS;
 				],
 				'options' => [
 					'style' => 'width:60px',
+				],
+			],
+			[
+				'class' => DataColumn::class,
+				'attribute' => 'entity_responsible_id',
+				'filter' => IssueSearch::getEntityNames(),
+				'value' => 'entityResponsible.name',
+				'options' => [
+					'style' => 'width:200px',
 				],
 			],
 			[
@@ -171,35 +184,10 @@ JS;
 			],
 			[
 				'class' => DataColumn::class,
-				'attribute' => 'customer',
+				'attribute' => 'customerLastname',
 				'value' => 'customer.fullName',
-
+				'label' => Customer::getRolesNames()[Customer::ROLE_CUSTOMER],
 			],
-			[
-				'class' => DataColumn::class,
-				'attribute' => 'client_surname',
-				'value' => 'clientFullName',
-				'label' => 'Klient',
-				'filterInputOptions' => [
-					'class' => 'dynamic-search',
-				],
-				'contentOptions' => [
-					'class' => 'ellipsis',
-				],
-			],
-			[
-				'class' => DataColumn::class,
-				'attribute' => 'victim_surname',
-				'value' => 'victimFullName',
-				'label' => 'Poszkodowany',
-				'filterInputOptions' => [
-					'class' => 'dynamic-search',
-				],
-				'contentOptions' => [
-					'class' => 'ellipsis',
-				],
-			],
-
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'created_at',

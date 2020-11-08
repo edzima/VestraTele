@@ -41,10 +41,13 @@ use yii\widgets\DetailView;
 
 <h3>Adres</h3>
 
-<?= AddressDetailView::widget([
-	'model' => $model->customerAddress ? $model->customerAddress : $model->getAddress(),
-]) ?>
+<?= $model->customerAddress ? AddressDetailView::widget([
+	'model' => $model->customerAddress,
+]) : '' ?>
 
+<?= AddressDetailView::widget([
+	'model' => $model->getAddress(),
+]) ?>
 
 <style>
 	.table > tbody > tr > th {

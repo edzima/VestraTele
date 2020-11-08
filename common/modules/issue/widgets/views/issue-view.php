@@ -10,6 +10,16 @@ use yii\bootstrap\Html;
 /* @var $this yii\web\View */
 /* @var $model Issue */
 
+$provision = $model->getProvision();
+if ($provision) {
+	$details = [];
+	$details[] = 'PROWIZJA - rodzaj: ' . $provision->getTypeName();
+	$details[] = 'Podstawa: ' . $provision->getBase();
+	$details[] = 'Procent\krotność: ' . $provision->getValue();
+	$details[] = $model->details;
+	$model->details = implode("\n", $details);
+}
+
 ?>
 
 <fieldset>
@@ -61,6 +71,27 @@ use yii\bootstrap\Html;
 			},
 		]) ?>
 
+
+		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
+			? FieldsetDetailView::widget([
+				'legend' => 'Poprzednie dane osobowe',
+				'detailConfig' => [
+					'id' => 'base-details',
+					'model' => $model,
+					'options' => [
+						'class' => 'table table-striped table-bordered detail-view th-nowrap',
+					],
+					'attributes' => [
+						'clientFullname',
+						'client_phone_1',
+						'victimFullname',
+						'victim_phone',
+					],
+				],
+			])
+			: ''
+		?>
+
 		<?= FieldsetDetailView::widget([
 			'legend' => Yii::t('common', 'Issue details'),
 			'detailConfig' => [
@@ -96,7 +127,7 @@ use yii\bootstrap\Html;
 						'attribute' => 'entityResponsible',
 						'label' => $model->getAttributeLabel('entity_responsible_id'),
 					],
-					'details:text',
+					'details:ntext',
 				],
 
 			],

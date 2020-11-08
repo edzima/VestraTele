@@ -2,9 +2,9 @@
 
 namespace backend\modules\issue\models\search;
 
+use common\models\address\State;
 use common\models\issue\IssuePay;
 use common\models\issue\query\IssuePayQuery;
-use common\models\address\State;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -102,6 +102,7 @@ class IssuePaySearch extends IssuePay {
 		$query->alias(static::TABLE_ALIAS);
 		$query->joinWith('calculation as calculation');
 		$query->joinWith(['issue']);
+		$query->joinWith(['issue.customer.userProfile']);
 
 		// add conditions that should always apply here
 		$this->applyPayStatusFilter($query);
@@ -127,7 +128,7 @@ class IssuePaySearch extends IssuePay {
 			'basePay.deadline_at' => $this->deadline_at,
 			'basePay.transfer_type' => $this->transfer_type,
 			'basePay.value' => $this->value,
-			'status' => $this->status,
+			'basePay.status' => $this->status,
 			'calculation.type' => $this->calculationType,
 
 		]);

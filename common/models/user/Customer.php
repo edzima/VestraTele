@@ -13,15 +13,11 @@ class Customer extends User {
 	public const ROLE_CUSTOMER = 'client';
 	public const ROLE_VICTIM = 'victim';
 	public const ROLE_SHAREHOLDER = 'shareholder';
-	public const ROLE_MINOR = 'minor';
-	public const ROLE_DIED = 'died';
 
 	public const ROLES = [
 		self::ROLE_CUSTOMER,
 		self::ROLE_VICTIM,
 		self::ROLE_SHAREHOLDER,
-		self::ROLE_MINOR,
-		self::ROLE_DIED,
 	];
 
 	/**
@@ -45,5 +41,9 @@ class Customer extends User {
 			}
 		}
 		return $count;
+	}
+
+	public static function fromUser(User $user): self {
+		return new self($user->attributes);
 	}
 }

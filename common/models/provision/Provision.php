@@ -4,6 +4,7 @@ namespace common\models\provision;
 
 use common\models\issue\IssuePay;
 use common\models\user\Worker;
+use Decimal\Decimal;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -86,11 +87,17 @@ class Provision extends ActiveRecord {
 	}
 
 	public function getFromUserString(): string {
-		return $this->from_user_id && $this->to_user_id !== $this->from_user_id && $this->fromUser ? $this->fromUser : '';
+		return $this->from_user_id
+		&& $this->to_user_id !== $this->from_user_id
+		&& $this->fromUser ? $this->fromUser : '';
 	}
 
 	public function getProvision(): string {
-		return Yii::$app->tax->brutto($this->value, $this->pay->vat) / $this->pay->value;
+		return Yii::$app->tax->brutto(
+			new Decimal($this->value),
+			new Decimal($this->pay->vat))
+			->div(new Decimal($this->pay->value))
+			->toFixed(2);
 	}
 
 	public static function find(): ProvisionQuery {

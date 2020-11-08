@@ -57,4 +57,8 @@ class MeetAddress extends ActiveRecord {
 	public function getMeet() {
 		return $this->hasOne(IssueMeet::class, ['id' => 'meet_id']);
 	}
+
+	public function getAddress() {
+		return $this->hasOne(Address::class, ['id' => 'address_id']);
+	}
 }

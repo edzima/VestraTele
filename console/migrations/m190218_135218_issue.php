@@ -63,16 +63,16 @@ class m190218_135218_issue extends Migration {
 			'stage_id' => $this->integer()->notNull(),
 			'type_id' => $this->integer()->notNull(),
 			'entity_responsible_id' => $this->integer()->notNull(),
-			'archives_nr' => $this->string(10)->unique(),
+			'archives_nr' => $this->string(10),
 			'payed' => $this->boolean()->notNull()->defaultValue(false),
 			'lawyer_id' => $this->integer()->notNull(),
 			'agent_id' => $this->integer()->notNull(),
 			'tele_id' => $this->integer(),
-			'created_at' => $this->timestamp(),
-			'updated_at' => $this->timestamp(),
-			'accident_at' => $this->timestamp(),
-			'stage_change_at' => $this->timestamp(),
-			'date' => $this->timestamp(),
+			'created_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
+			'updated_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
+			'date' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
+			'accident_at' => $this->timestamp()->defaultValue(null),
+			'stage_change_at' => $this->timestamp()->defaultValue(null),
 		]);
 
 		$this->addForeignKey('fk_issue_entity_responsible', '{{%issue}}', 'entity_responsible_id', '{{%issue_entity_responsible}}', 'id', 'CASCADE', 'CASCADE');
@@ -84,13 +84,13 @@ class m190218_135218_issue extends Migration {
 	}
 
 	public function safeDown() {
+
 		$this->dropForeignKey('issue_stage_type_type', '{{%issue_stage_type}}');
 		$this->dropForeignKey('issue_stage_type_stage', '{{%issue_stage_type}}');
 
 		$this->dropForeignKey('fk_issue_entity_responsible', '{{%issue}}');
 		$this->dropForeignKey('fk_issue_stage', '{{%issue}}');
-		$this->dropForeignKey('fk_issue_client_city', '{{%issue}}');
-		$this->dropForeignKey('fk_issue_victim_city', '{{%issue}}');
+
 		$this->dropForeignKey('fk_issue_type', '{{%issue}}');
 		$this->dropForeignKey('fk_issue_client_agent', '{{%issue}}');
 		$this->dropForeignKey('fk_issue_lawyer', '{{%issue}}');

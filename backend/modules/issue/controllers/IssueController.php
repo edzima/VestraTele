@@ -3,9 +3,9 @@
 namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueForm;
+use backend\modules\issue\models\search\IssueSearch;
 use backend\widgets\CsvForm;
 use common\models\issue\Issue;
-use common\models\issue\IssueSearch;
 use common\models\user\Customer;
 use common\models\user\Worker;
 use Yii;
@@ -107,7 +107,9 @@ class IssueController extends Controller {
 	 * Creates a new Issue model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 *
+	 * @param int $customerId
 	 * @return mixed
+	 * @throws NotFoundHttpException
 	 */
 	public function actionCreate(int $customerId) {
 		$customer = Customer::findOne($customerId);
