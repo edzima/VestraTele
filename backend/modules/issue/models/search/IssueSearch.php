@@ -2,7 +2,6 @@
 
 namespace backend\modules\issue\models\search;
 
-use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\IssueSearch as BaseIssueSearch;
 use common\models\issue\query\IssueQuery;
 use common\models\user\Worker;
@@ -21,10 +20,6 @@ class IssueSearch extends BaseIssueSearch {
 	public $parentId;
 	public $excludedStages = [];
 	public bool $onlyDelayed = false;
-
-	public static function getEntityNames(): array {
-		return ArrayHelper::map(EntityResponsible::find()->asArray()->all(), 'id', 'name');
-	}
 
 	public function rules(): array {
 		return array_merge(parent::rules(), [

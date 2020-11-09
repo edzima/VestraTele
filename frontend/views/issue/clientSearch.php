@@ -34,13 +34,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 		<h2>Klient</h2>
 
-		<?= $form->field($searchModel, 'client_surname')->textInput() ?>
-
-
-		<h2>Poszkodowany</h2>
-
-		<?= $form->field($searchModel, 'victim_surname')->textInput() ?>
-
+		<?= $form->field($searchModel, 'customerLastname')->textInput() ?>
+		
 
 		<div class="form-group">
 			<?= Html::submitButton('Szukaj', ['class' => 'btn btn-primary']) ?>

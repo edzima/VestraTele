@@ -9,19 +9,7 @@ class ClientIssueSearch extends IssueSearch {
 
 	public function rules(): array {
 		return [
-			[['client_surname', 'victim_surname'], 'string'],
-			[
-				'client_surname', 'required', 'when' => function () {
-				return empty($this->victim_surname);
-			}, 'enableClientValidation' => false,
-
-			],
-			[
-				'victim_surname', 'required', 'when' => function () {
-				return empty($this->client_surname);
-			}, 'enableClientValidation' => false,
-
-			],
+			[['customerLastname'], 'string'],
 		];
 	}
 
@@ -54,10 +42,7 @@ class ClientIssueSearch extends IssueSearch {
 			return $dataProvider;
 		}
 		$this->archiveFilter($query);
-
-		$query
-			->andFilterWhere(['like', 'client_surname', $this->client_surname])
-			->andFilterWhere(['like', 'victim_surname', $this->victim_surname]);
+		$this->customerFilter($query);
 		return $dataProvider;
 	}
 }

@@ -29,7 +29,7 @@ class IssueSearch extends BaseIssueSearch {
 		return [
 			[
 				[
-					'id', 'agent_id', 'stage_id', 'type_id',
+					'id', 'agent_id', 'stage_id', 'type_id', 'entity_responsible_id',
 				], 'integer',
 			],
 			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
@@ -44,11 +44,12 @@ class IssueSearch extends BaseIssueSearch {
 	}
 
 	public function attributeLabels(): array {
-		return parent::attributeLabels() + [
-				'onlyAsTele' => 'Jako tele',
-				'onlyAsAgent' => 'Jako agent',
-				'onlyAsLawyer' => 'Jako prawnik',
-			];
+		return array_merge(parent::attributeLabels(), [
+			'onlyAsTele' => 'Jako tele',
+			'onlyAsAgent' => 'Jako agent',
+			'onlyAsLawyer' => 'Jako prawnik',
+			'customerLastname' => 'Nazwisko klienta',
+		]);
 	}
 
 	/**

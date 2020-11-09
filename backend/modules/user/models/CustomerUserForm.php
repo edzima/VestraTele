@@ -10,7 +10,7 @@ use Yii;
 class CustomerUserForm extends UserForm {
 
 	public bool $isEmailRequired = false;
-	public bool $sendEmail = true;
+	public bool $sendEmail = false;
 
 	public $roles = [
 		Customer::ROLE_CUSTOMER,

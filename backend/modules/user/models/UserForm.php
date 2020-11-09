@@ -188,7 +188,6 @@ class UserForm extends Model {
 		}
 
 		if ($isNewRecord && $this->shouldSendEmail()) {
-			codecept_debug('should send email for new record');
 			return $this->sendEmail($model);
 		}
 

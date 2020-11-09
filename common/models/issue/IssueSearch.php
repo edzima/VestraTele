@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
 use common\models\user\Worker;
 use Yii;
@@ -165,5 +166,9 @@ class IssueSearch extends Issue {
 			}
 		}
 		return $this->stages;
+	}
+
+	public static function getEntityNames(): array {
+		return ArrayHelper::map(EntityResponsible::find()->asArray()->all(), 'id', 'name');
 	}
 }

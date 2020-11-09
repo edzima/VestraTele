@@ -67,8 +67,18 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => DataColumn::class,
+				'attribute' => 'entity_responsible_id',
+				'filter' => IssueSearch::getEntityNames(),
+				'value' => 'entityResponsible.name',
+				'options' => [
+					'style' => 'width:200px',
+				],
+			],
+			[
+				'class' => DataColumn::class,
 				'filterType' => GridView::FILTER_SELECT2,
 				'attribute' => 'agent_id',
+				'label' => $searchModel->getAttributeLabel('agent_id'),
 				'value' => 'agent',
 				'filter' => $searchModel->getAgentsList(),
 				'filterWidgetOptions' => [
@@ -76,7 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
 						'allowClear' => true,
 					],
 					'options' => [
-						'placeholder' => 'Agent',
+						'placeholder' => $searchModel->getAttributeLabel('agent_id'),
 					],
 				],
 			],

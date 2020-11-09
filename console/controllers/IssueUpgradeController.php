@@ -91,6 +91,7 @@ class IssueUpgradeController extends Controller {
 	public function actionCheckCustomer(): void {
 		foreach (Issue::find()
 			->withoutArchives()
+			->andWhere(['=','id',7963])
 			->with('customer')
 			->batch() as $rows) {
 			foreach ($rows as $issue) {
@@ -100,10 +101,23 @@ class IssueUpgradeController extends Controller {
 					if ($issue->customer->getFullName() !== $issue->getClientFullName()) {
 						Console::output('Customer: ' . $issue->customer->getFullName());
 						Console::output('Old client: ' . $issue->getClientFullName());
-						Console::confirm('Not same names: ' . $issue->id);
+						if(Console::confirm('Move to archive: ' . $issue->id)){
+							$issue->stage_id = 45;
+							Console::output($issue->save(false,['stage_id']));
+						}
+						if(Console::confirm('Unlink customer?')){
+							$issue->unlinkUser(IssueUser::TYPE_CUSTOMER);
+							$issue->linkUser(Console::prompt('Insert new customer ID: '),IssueUser::TYPE_CUSTOMER);
+						}
+
 					}
 				} else {
-					Console::confirm('Not customer for isssue: ' . $issue->id);
+					Console::output('Not customer for isssue: ' . $issue->id);
+					$issue->linkUser(Console::prompt('Insert new customer ID: '),IssueUser::TYPE_CUSTOMER);
+				}
+				if(Console::confirm('Unlink customer?')){
+					$issue->unlinkUser(IssueUser::TYPE_CUSTOMER);
+					$issue->linkUser(Console::prompt('Insert new customer ID: '),IssueUser::TYPE_CUSTOMER);
 				}
 			}
 		}
