@@ -18,7 +18,7 @@ class IssueNotesWidget extends IssueWidget {
 	public bool $addBtn = true;
 	public ?string $addUrl = null;
 
-	public ?array $notes = [];
+	public array $notes = [];
 	public ?string $type = null;
 	/**
 	 * @var IssueNote[]
@@ -30,7 +30,7 @@ class IssueNotesWidget extends IssueWidget {
 	 */
 	public function init(): void {
 		parent::init();
-		if ($this->notes === null) {
+		if (empty($this->notes)) {
 			$this->notes = $this->model->issueNotes;
 		}
 		if ($this->addBtn && $this->addUrl === null) {
