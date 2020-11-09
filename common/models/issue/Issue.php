@@ -340,7 +340,8 @@ class Issue extends ActiveRecord {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getIssueNotes(): IssueNoteQuery {
-		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])->with('user')->orderBy('created_at DESC');
+		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])
+			->with('user')->orderBy('created_at DESC');
 	}
 
 	public function getSummons(): ActiveQuery {

@@ -13,11 +13,13 @@ class Customer extends User {
 	public const ROLE_CUSTOMER = 'client';
 	public const ROLE_VICTIM = 'victim';
 	public const ROLE_SHAREHOLDER = 'shareholder';
+	public const ROLE_HANDICAPPED = 'handicapped';
 
 	public const ROLES = [
 		self::ROLE_CUSTOMER,
 		self::ROLE_VICTIM,
 		self::ROLE_SHAREHOLDER,
+		self::ROLE_HANDICAPPED,
 	];
 
 	/**

@@ -33,6 +33,16 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
+						'controllers' => ['issue/note'],
+						'permissions' => [Worker::PERMISSION_NOTE],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['issue/summon'],
+						'permissions' => [Worker::PERMISSION_SUMMON],
+					],
+					[
+						'allow' => true,
 						'controllers' => ['issue/issue', 'issue/type', 'issue/stage', 'issue/user'],
 						'permissions' => [Worker::PERMISSION_ISSUE],
 					],

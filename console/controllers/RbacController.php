@@ -27,6 +27,7 @@ class RbacController extends Controller {
 		Customer::ROLE_CUSTOMER,
 		Customer::ROLE_VICTIM,
 		Customer::ROLE_SHAREHOLDER,
+		Customer::ROLE_HANDICAPPED,
 	];
 
 	public array $permissions = [
@@ -124,6 +125,12 @@ class RbacController extends Controller {
 		$auth = Yii::$app->authManager;
 		$admin = $auth->getRole(User::ROLE_ADMINISTRATOR);
 		return $auth->addChild($admin, $item);
+	}
+
+	public function actionAddRole(string $role): void {
+		$auth = Yii::$app->authManager;
+		$auth->add($auth->createRole($role));
+		Console::output('Success add role: ' . $role);
 	}
 
 }

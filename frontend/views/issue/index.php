@@ -1,6 +1,7 @@
 <?php
 
 use common\models\issue\Issue;
+use common\models\user\Customer;
 use frontend\models\IssueSearch;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
@@ -92,21 +93,9 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => DataColumn::class,
-				'attribute' => 'client_surname',
-				'value' => 'clientFullName',
-				'label' => 'Klient',
-				'filterInputOptions' => [
-					'class' => 'dynamic-search',
-				],
-			],
-			[
-				'class' => DataColumn::class,
-				'attribute' => 'victim_surname',
-				'value' => 'victimFullName',
-				'label' => 'Poszkodowany',
-				'filterInputOptions' => [
-					'class' => 'dynamic-search',
-				],
+				'attribute' => 'customerLastname',
+				'value' => 'customer.fullName',
+				'label' => Customer::getRolesNames()[Customer::ROLE_CUSTOMER],
 			],
 			[
 				'class' => DataColumn::class,

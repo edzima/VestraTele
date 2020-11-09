@@ -181,5 +181,6 @@ return [
 	'value' => 'value',
 	'Writ' => 'Pozew',
 	'Date At' => 'Date At',
-	'Updated At' => 'Updated At'
+	'Updated At' => 'Updated At',
+	'handicapped' => 'Niepełnosrawny',
 ];
