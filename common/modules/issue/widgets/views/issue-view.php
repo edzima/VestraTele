@@ -69,6 +69,9 @@ if ($provision) {
 
 				return $legend;
 			},
+			'withAddress' => static function (IssueUser $issueUser): bool {
+				return $issueUser->type === IssueUser::TYPE_CUSTOMER;
+			},
 		]) ?>
 
 
@@ -102,19 +105,15 @@ if ($provision) {
 				],
 				'attributes' => [
 					'longId',
-					'signature_act',
+					[
+						'attribute' => 'signature_act',
+						'visible' => !empty($model->signature_act),
+					],
 					[
 						'attribute' => 'archives_nr',
 						'visible' => $model->isArchived(),
 					],
-					'created_at:date',
-					'updated_at:date',
-					'date:date',
-					[
-						'attribute' => 'accident_at',
-						'format' => 'date',
-						'visible' => $model->isAccident(),
-					],
+					'victimFullname:text:Poszkodowany',
 					[
 						'attribute' => 'type',
 						'label' => $model->getAttributeLabel('type_id'),
@@ -126,6 +125,14 @@ if ($provision) {
 					[
 						'attribute' => 'entityResponsible',
 						'label' => $model->getAttributeLabel('entity_responsible_id'),
+					],
+					'created_at:date',
+					'updated_at:date',
+					'date:date',
+					[
+						'attribute' => 'accident_at',
+						'format' => 'date',
+						'visible' => $model->isAccident(),
 					],
 					'details:ntext',
 				],

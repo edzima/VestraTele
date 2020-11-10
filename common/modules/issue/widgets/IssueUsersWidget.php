@@ -5,6 +5,7 @@ namespace common\modules\issue\widgets;
 use Closure;
 use common\models\issue\IssueUser;
 use common\widgets\FieldsetDetailView;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 
@@ -33,6 +34,7 @@ class IssueUsersWidget extends IssueWidget {
 	];
 
 	public ?Closure $legend = null;
+	public ?Closure $withAddress = null;
 	public bool $legendEncode = true;
 
 	public function run(): string {
@@ -60,6 +62,27 @@ class IssueUsersWidget extends IssueWidget {
 	public function renderUser(IssueUser $issueUser): string {
 		$options = $this->fieldsetOptions;
 		$class = ArrayHelper::remove($options, 'class', FieldsetDetailView::class);
+		if ($this->withAddress !== null) {
+			if (call_user_func($this->withAddress, $issueUser) && $issueUser->user->homeAddress) {
+				$address = $issueUser->user->homeAddress;
+				$name = $address->city->nameWithRegionAndDistrict;
+				if ($address->postal_code) {
+					$name = $address->postal_code . ' ' . $name;
+				}
+				$options['detailConfig']['attributes'] = array_merge($options['detailConfig']['attributes'], [
+					[
+						'attribute' => 'homeAddress.city.nameWithRegionAndDistrict',
+						'label' => Yii::t('common', 'City'),
+						'value' => $name,
+					],
+					[
+						'attribute' => 'homeAddress.info',
+						'label' => 'Ulica i nr',
+						'visible' => !empty($address->info),
+					],
+				]);
+			}
+		}
 		$options['legend'] = $this->generateLegend($issueUser);
 		$options['legendOptions']['encode'] = $this->legendEncode;
 		$options['detailConfig']['model'] = $issueUser->user;
