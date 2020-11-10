@@ -23,14 +23,14 @@ class MeetAddress extends ActiveRecord {
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function tableName() {
+	public static function tableName(): string {
 		return 'meet_address';
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			[['meet_id', 'address_id', 'type'], 'required'],
 			[['meet_id', 'address_id', 'type'], 'integer'],
@@ -41,7 +41,7 @@ class MeetAddress extends ActiveRecord {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'meet_id' => Yii::t('address', 'Meet ID'),
 			'address_id' => Yii::t('address', 'Address ID'),

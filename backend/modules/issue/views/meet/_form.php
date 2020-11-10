@@ -16,20 +16,58 @@ use yii\widgets\ActiveForm;
 
 	<?php $form = ActiveForm::begin(); ?>
 
-	<?= $form->field($model, 'createdAt')
-		->widget(DateTimeWidget::class)
-	?>
 
-	<?= $form->field($model, 'dateStart')
-		->widget(DateTimeWidget::class)
-	?>
+	<div class="row">
+		<?= $form->field($model, 'agentId', ['options' => ['class' => 'col-md-3']])
+			->widget(Select2::class, [
+					'data' => MeetForm::getAgentsNames(),
+					'options' => [
+						'placeholder' => 'Agent',
+					],
+					'pluginOptions' => [
+						'allowClear' => true,
+					],
+				]
+			) ?>
+	</div>
 
+	<div class="row">
+		<?= $form->field($model, 'createdAt', [
+			'options' => [
+				'class' => 'col-md-3',
+			],
+		])
+			->widget(DateTimeWidget::class)
+		?>
 
-	<?= $form->field($model, 'campaignId')->dropDownList(MeetForm::getCampaignNames()) ?>
+		<?= $form->field($model, 'dateStart', [
+			'options' => [
+				'class' => 'col-md-3',
+			],
+		])
+			->widget(DateTimeWidget::class)
+		?>
+	</div>
+	<div class="row">
+		<?= $form->field($model, 'campaignId', [
+			'options' => [
+				'class' => 'col-md-3',
+			],
+		])->dropDownList(MeetForm::getCampaignNames()) ?>
 
-	<?= $form->field($model, 'typeId')->dropDownList(MeetForm::getTypesNames()) ?>
+		<?= $form->field($model, 'typeId', [
+			'options' => [
+				'class' => 'col-md-3',
+			],
+		])->dropDownList(MeetForm::getTypesNames()) ?>
 
-	<?= $form->field($model, 'status')->dropDownList(MeetForm::getStatusNames()) ?>
+		<?= $form->field($model, 'status', [
+			'options' => [
+				'class' => 'col-md-3',
+			],
+		])->dropDownList(MeetForm::getStatusNames()) ?>
+	</div>
+
 
 	<fieldset>
 		<legend>Klient</legend>
@@ -61,34 +99,44 @@ use yii\widgets\ActiveForm;
 			])->textInput(['maxlength' => true]) ?>
 
 		</div>
-		<?= AddressFormWidget::widget([
-			'form' => $form,
-			'model' => $model->getAddress(),
-		]) ?>
+		<?= $form->field($model, 'withAddress')->checkbox() ?>
+		<div id="address-wrapper" class="address-wrapper<?= !$model->withAddress ? ' hidden' : '' ?>">
+			<?= AddressFormWidget::widget([
+				'form' => $form,
+				'model' => $model->getAddress(),
+			]) ?>
+		</div>
+
 	</fieldset>
 
-
-	<div class="row">
-		<?= $form->field($model, 'agentId', ['options' => ['class' => 'col-md-6']])
-			->widget(Select2::class, [
-					'data' => MeetForm::getAgentsNames(),
-					'options' => [
-						'placeholder' => 'Agent',
-					],
-					'pluginOptions' => [
-						'allowClear' => true,
-					],
-				]
-			) ?>
-	</div>
 
 	<?= $form->field($model, 'details')->textarea(['rows' => 6]) ?>
 
 
 	<div class="form-group">
-		<?= Html::submitButton('Zapisz', ['class' => 'btn btn-success']) ?>
+		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>
 
 </div>
+
+<?php
+
+$withAddressID = Html::getInputId($model, 'withAddress');
+
+$js = <<<JS
+	const withAddress = document.getElementById('$withAddressID');
+	const addressWrapper = document.getElementById('address-wrapper');
+			withAddress.addEventListener('change',function (){
+		if(withAddress.checked){
+			addressWrapper.classList.remove('hidden');
+		}else{
+			addressWrapper.classList.add('hidden');
+		}
+	});
+JS;
+
+$this->registerJs($js);
+
+?>

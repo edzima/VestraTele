@@ -12,6 +12,8 @@ use yii\data\ActiveDataProvider;
  */
 class UserSearch extends IssueUser {
 
+	public $userSurname;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -19,7 +21,7 @@ class UserSearch extends IssueUser {
 	public function rules(): array {
 		return [
 			[['issue_id', 'user_id'], 'integer'],
-			[['type'], 'string'],
+			[['type', 'userSurname'], 'string'],
 		];
 	}
 
@@ -56,12 +58,19 @@ class UserSearch extends IssueUser {
 			return $dataProvider;
 		}
 
+		if (!empty($this->userSurname)) {
+			$query->with('user.userProfile');
+			$query->andWhere(['like','user_profile.lastname', $this->userSurname]);
+		}
+
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'issue_id' => $this->issue_id,
 			'user_id' => $this->user_id,
 			'type' => $this->type,
 		]);
+
+
 
 		return $dataProvider;
 	}

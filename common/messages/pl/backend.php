@@ -205,5 +205,8 @@ return [
 	'Counties' => 'Counties',
 	'Search' => 'Szukaj',
 	'Issues count' => 'Issues count',
-	'Reset' => 'Reset'
+	'Reset' => 'Reset',
+	'Care Age' => 'Care Age',
+	'Disabled stages' => 'Disabled stages',
+	'Create meet' => 'Dodaj spotkanie',
 ];

@@ -4,6 +4,7 @@ namespace frontend\models;
 
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch as BaseIssueSearch;
+use common\models\issue\query\IssueQuery;
 use common\models\user\Worker;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
@@ -37,7 +38,7 @@ class IssueSearch extends BaseIssueSearch {
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			[
 				[
-					'created_at', 'updated_at', 'client_surname', 'victim_surname',
+					'created_at', 'updated_at', 'customerLastname',
 				], 'safe',
 			],
 		];
@@ -82,10 +83,12 @@ class IssueSearch extends BaseIssueSearch {
 			return $dataProvider;
 		}
 		$this->archiveFilter($query);
-		$query->andWhere(['or', ['lawyer_id' => $this->user_id], ['agent_id' => $this->agents], ['tele_id' => $this->user_id]]);
+		/** @var IssueQuery $query */
+		$query->agents($this->agents);
+		//	$query->andWhere(['or', ['lawyer_id' => $this->user_id], ['agent_id' => $this->agents], ['tele_id' => $this->user_id]]);
 
 		if ($this->isAgent) {
-			$query->andWhere(['or', ['lawyer_id' => $this->user_id], ['agent_id' => $this->agents], ['tele_id' => $this->user_id]]);
+			//		$query->andWhere(['or', ['lawyer_id' => $this->user_id], ['agent_id' => $this->agents], ['tele_id' => $this->user_id]]);
 		}
 
 		$query->andFilterWhere([
@@ -96,13 +99,18 @@ class IssueSearch extends BaseIssueSearch {
 		]);
 
 		if ($this->onlyAsTele) {
-			$query->andWhere(['tele_id' => $this->user_id]);
+			$query->tele([$this->user_id]);
 		}
 		if ($this->onlyAsAgent) {
-			$query->andWhere(['agent_id' => $this->user_id]);
+			$query->agents([$this->user_id]);
+		} else {
+			if(!$this->onlyAsTele){
+				$query->agents($this->agents);
+			}
 		}
+
 		if ($this->onlyAsLawyer) {
-			$query->andWhere(['lawyer_id' => $this->user_id]);
+			$query->lawyers([$this->user_id]);
 		}
 
 		$query->andFilterWhere(['like', 'client_surname', $this->client_surname])

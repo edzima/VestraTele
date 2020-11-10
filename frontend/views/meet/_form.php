@@ -54,6 +54,8 @@ use yii\widgets\ActiveForm;
 			])->textInput(['maxlength' => true]) ?>
 
 		</div>
+		<?= $form->field($model, 'withAddress')->checkbox() ?>
+
 		<?= AddressFormWidget::widget([
 			'form' => $form,
 			'model' => $model->getAddress(),
@@ -94,3 +96,22 @@ use yii\widgets\ActiveForm;
 	<?php ActiveForm::end(); ?>
 
 </div>
+<?php
+
+$withAddressID = Html::getInputId($model, 'withAddress');
+
+$js = <<<JS
+	const withAddress = document.getElementById('$withAddressID');
+	const addressWrapper = document.getElementById('address-wrapper');
+			withAddress.addEventListener('change',function (){
+		if(withAddress.checked){
+			addressWrapper.classList.remove('hidden');
+		}else{
+			addressWrapper.classList.add('hidden');
+		}
+	});
+JS;
+
+$this->registerJs($js);
+
+?>

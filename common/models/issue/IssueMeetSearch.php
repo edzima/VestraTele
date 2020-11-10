@@ -3,6 +3,7 @@
 namespace common\models\issue;
 
 use edzima\teryt\models\Region;
+use edzima\teryt\models\Simc;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -68,9 +69,7 @@ class IssueMeetSearch extends IssueMeet {
 		$query = IssueMeet::find();
 		//@todo add with Address
 		$query
-			//->with('city')
-			//->with('state')
-			//->with('province')
+			->with('addresses.address.city')
 			->with('type')
 			->with('campaign')
 			->with(['agent.userProfile']);
@@ -102,19 +101,7 @@ class IssueMeetSearch extends IssueMeet {
 		]);
 
 		$this->filterCampaign($query);
-
-		//@todo add with Address
-		/*
-		if (!empty($this->cityName)) {
-			$query->joinWith('city C');
-			$query->andFilterWhere(['like', 'C.name', $this->cityName]);
-		}
-
-		if (!empty($this->stateId)) {
-			$query->joinWith('state S');
-			$query->andWhere(['S.id' => $this->stateId]);
-		}
-		*/
+		$this->filterAddress($query);
 
 		$query->andFilterWhere(['like', 'phone', $this->phone])
 			->andFilterWhere(['like', 'client_name', $this->client_name])
@@ -126,6 +113,14 @@ class IssueMeetSearch extends IssueMeet {
 			->andFilterWhere(['<=', 'date_at', $this->date_at_to]);
 
 		return $dataProvider;
+	}
+
+	private function filterAddress(ActiveQuery $query): void {
+		if (!empty($this->regionId) || !empty($this->cityName)) {
+			$query->joinWith('addresses.address.city');
+			$query->andFilterWhere([Simc::tableName() . '.region_id' => $this->regionId]);
+			$query->andFilterWhere(['like', Simc::tableName() . '.name', $this->cityName]);
+		}
 	}
 
 	private function filterCampaign(ActiveQuery $query): void {

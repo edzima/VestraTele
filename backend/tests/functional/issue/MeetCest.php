@@ -30,4 +30,5 @@ class MeetCest {
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->see('Meets');
 	}
+
 }

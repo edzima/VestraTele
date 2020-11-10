@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model MeetForm */
 
-$this->title = 'Dodaj spotkanie';
-$this->params['breadcrumbs'][] = ['label' => 'Spotkania', 'url' => ['index']];
+$this->title = Yii::t('backend', 'Create meet');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Meets'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-meet-create">

@@ -57,7 +57,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => 'Województwo',
 				'filter' => AgentMeetSearch::getRegionsNames(),
 			],
-
 			[
 				'attribute' => 'details',
 				'format' => 'ntext',

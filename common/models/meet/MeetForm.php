@@ -30,6 +30,8 @@ class MeetForm extends Model {
 	public $status;
 	public $typeId;
 
+	public bool $withAddress = false;
+
 	/** @var Address */
 	public $address;
 
@@ -63,7 +65,7 @@ class MeetForm extends Model {
 			['dateEnd', 'compare', 'compareAttribute' => 'dateStart', 'operator' => '>', 'enableClientValidation' => false],
 			['typeId', 'in', 'range' => array_keys(static::getTypesNames())],
 			['status', 'in', 'range' => array_keys(static::getStatusNames())],
-
+			['withAddress', 'boolean'],
 		];
 	}
 
@@ -78,6 +80,7 @@ class MeetForm extends Model {
 			'dateEnd' => 'Koniec Wysyłki/Spotkania/Akcji',
 			'details' => 'Szczegóły',
 			'agentId' => 'Agent',
+			'withAddress' => 'Adres',
 		];
 	}
 
@@ -94,7 +97,11 @@ class MeetForm extends Model {
 	}
 
 	public function validate($attributeNames = null, $clearErrors = true) {
-		return parent::validate($attributeNames, $clearErrors) && $this->getAddress()->validate($attributeNames, $clearErrors);
+		$validate = parent::validate($attributeNames, $clearErrors);
+		if ($this->withAddress) {
+			$validate = $validate && $this->getAddress()->validate($attributeNames, $clearErrors);
+		}
+		return $validate;
 	}
 
 	public function getName(): string {
@@ -111,6 +118,9 @@ class MeetForm extends Model {
 	public function setModel(IssueMeet $model): void {
 		$this->model = $model;
 		$this->address = $model->customerAddress;
+		if ($model->customerAddress) {
+			$this->withAddress = true;
+		}
 		$this->agentId = $model->agent_id;
 		$this->clientName = $model->client_name;
 		$this->clientSurname = $model->client_surname;
@@ -138,11 +148,14 @@ class MeetForm extends Model {
 		$model = $this->getModel();
 		$this->setModelValues($model);
 
-		if ($model->save() && $this->getAddress()->save()) {
-			$customerAddress = $model->addresses[MeetAddress::TYPE_CUSTOMER] ?? new MeetAddress(['type' => MeetAddress::TYPE_CUSTOMER]);
-			$customerAddress->meet_id = $model->id;
-			$customerAddress->address_id = $this->getAddress()->id;
-			return $customerAddress->save();
+		if ($model->save()) {
+			if ($this->withAddress && $this->getAddress()->save()) {
+				$customerAddress = $model->addresses[MeetAddress::TYPE_CUSTOMER] ?? new MeetAddress(['type' => MeetAddress::TYPE_CUSTOMER]);
+				$customerAddress->meet_id = $model->id;
+				$customerAddress->address_id = $this->getAddress()->id;
+				return $customerAddress->save();
+			}
+			return true;
 		}
 		return false;
 	}

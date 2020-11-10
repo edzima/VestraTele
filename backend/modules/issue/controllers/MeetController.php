@@ -4,15 +4,15 @@ namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\MeetForm;
 use backend\widgets\CsvForm;
-use common\models\user\Worker;
-use Yii;
 use common\models\issue\IssueMeet;
 use common\models\issue\IssueMeetSearch;
+use common\models\user\Worker;
+use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 use yii2tech\csvgrid\CsvGrid;
 
 /**
@@ -164,7 +164,7 @@ class MeetController extends Controller {
 	 * @return IssueMeet the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id):IssueMeet {
+	protected function findModel($id): IssueMeet {
 		if (($model = IssueMeet::findOne($id)) !== null) {
 			if ($model->isArchived() && !Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
 				Yii::warning('User: ' . Yii::$app->user->id . ' try view archived meet: ' . $model->id, 'meet');

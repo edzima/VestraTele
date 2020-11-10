@@ -49,12 +49,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			'phone',
 			[
 				'attribute' => 'cityName',
-				'value' => 'city',
+				'value' => 'customerAddress.city.name',
 				'label' => 'Miasto',
 			],
 			[
 				'attribute' => 'regionId',
-				'value' => 'city.region.name',
+				'value' => 'customerAddress.city.region.name',
 				'label' => 'Województwo',
 				'filter' => IssueMeetSearch::getRegionsNames(),
 			],

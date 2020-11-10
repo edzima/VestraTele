@@ -24,7 +24,10 @@ $this->params['breadcrumbs'][] = $this->title;
 		'filterModel' => $searchModel,
 		'columns' => [
 			['class' => IssueColumn::class],
-			'user',
+			[
+				'attribute' => 'userSurname',
+				'value' => 'user',
+			],
 			[
 				'attribute' => 'type',
 				'value' => 'typeName',
