@@ -46,7 +46,7 @@ class CalendarNoteController extends Controller {
 		}
 		/** @var CalendarNews[] $models */
 		$models = CalendarNews::find()
-			->andWhere(['agent_id' => $agentId])
+			->andWhere(['user_id' => $agentId])
 			->andWhere(['>=', 'start_at', $start])
 			->andWhere(['<=', 'end_at', $end])
 			->all();
