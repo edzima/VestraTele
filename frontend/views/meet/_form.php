@@ -55,11 +55,12 @@ use yii\widgets\ActiveForm;
 
 		</div>
 		<?= $form->field($model, 'withAddress')->checkbox() ?>
-
-		<?= AddressFormWidget::widget([
-			'form' => $form,
-			'model' => $model->getAddress(),
-		]) ?>
+		<div id="address-wrapper" class="address-wrapper<?= !$model->withAddress ? ' hidden' : '' ?>">
+			<?= AddressFormWidget::widget([
+				'form' => $form,
+				'model' => $model->getAddress(),
+			]) ?>
+		</div>
 	</fieldset>
 
 	<div class="row">
