@@ -13,7 +13,7 @@ use yii\base\Model;
  */
 class SummonForm extends Model {
 
-	public int $status;
+	public $status;
 	public ?string $realize_at;
 	public ?string $realized_at;
 
