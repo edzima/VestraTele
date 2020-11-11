@@ -407,7 +407,7 @@ class Issue extends ActiveRecord {
 	}
 
 	public function getVictimFullName(): string {
-		return $this->victim_surname . ' ' . $this->victim_first_name;
+		return trim($this->victim_surname) . ' ' . trim($this->victim_first_name);
 	}
 
 	public function hasClientSubprovince(): bool {

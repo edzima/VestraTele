@@ -37,6 +37,10 @@ class IssueUsersWidget extends IssueWidget {
 	public ?Closure $withAddress = null;
 	public bool $legendEncode = true;
 
+	/**
+	 * @return string
+	 * @throws InvalidConfigException
+	 */
 	public function run(): string {
 		$users = $this->getUsers();
 		if (empty($users)) {
@@ -48,15 +52,39 @@ class IssueUsersWidget extends IssueWidget {
 		]);
 	}
 
+	/**
+	 * @return array
+	 * @throws InvalidConfigException when type is not correct.
+	 */
 	public function getUsers(): array {
 		switch ($this->type) {
 			case static::TYPE_CUSTOMERS:
-				return $this->model->getUsers()->withTypes(IssueUser::TYPES_CUSTOMERS)->all();
+				return $this->sort($this->model
+					->getUsers()
+					->with('user.userProfile')
+					->withTypes(IssueUser::TYPES_CUSTOMERS)
+					->indexBy('type')
+					->all(), IssueUser::TYPES_CUSTOMERS);
 			case static::TYPE_WORKERS:
-				return $this->model->getUsers()->withTypes(IssueUser::TYPES_WORKERS)->all();
+				return $this->sort($this->model
+					->getUsers()
+					->with('user.userProfile')
+					->withTypes(IssueUser::TYPES_WORKERS)
+					->indexBy('type')
+					->all(), IssueUser::TYPES_WORKERS);
 			default:
 				throw new InvalidConfigException('Invalid $type.');
 		}
+	}
+
+	protected function sort(array $users, array $types): array {
+		$sorted = [];
+		foreach ($types as $type) {
+			if (isset($users[$type])) {
+				$sorted[$type] = $users[$type];
+			}
+		}
+		return $sorted;
 	}
 
 	public function renderUser(IssueUser $issueUser): string {

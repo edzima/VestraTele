@@ -4,6 +4,7 @@ namespace common\models\issue;
 
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
+use common\models\issue\query\IssueUserQuery;
 use common\models\user\Worker;
 use Yii;
 use yii\base\Model;
@@ -137,8 +138,13 @@ class IssueSearch extends Issue {
 
 	protected function customerFilter(IssueQuery $query): void {
 		if (!empty($this->customerLastname)) {
-			$query->joinWith('users.user.userProfile');
-			$query->andWhere(['like', 'user_profile.lastname', $this->customerLastname]);
+			$query->joinWith([
+				'users c' => function (IssueUserQuery $query): void {
+					$query->andWhere(['c.type' => IssueUser::TYPE_CUSTOMER]);
+					$query->joinWith('user.userProfile customerProfile');
+				},
+			]);
+			$query->andWhere(['like', 'customerProfile.lastname', $this->customerLastname . '%', false]);
 		}
 	}
 

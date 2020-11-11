@@ -51,24 +51,27 @@ class IssueQuery extends ActiveQuery {
 		return $this;
 	}
 
-	public function agents(array $ids): self {
-		return $this->users(IssueUser::TYPE_AGENT, $ids);
+	public function agents(array $ids, string $alias = null): self {
+		return $this->users(IssueUser::TYPE_AGENT, $ids, $alias);
 	}
 
-	public function lawyers(array $ids): self {
-		return $this->users(IssueUser::TYPE_LAWYER, $ids);
+	public function lawyers(array $ids, string $alias = null): self {
+		return $this->users(IssueUser::TYPE_LAWYER, $ids, $alias);
 	}
 
-	public function tele(array $ids): self {
-		return $this->users(IssueUser::TYPE_TELEMARKETER, $ids);
+	public function tele(array $ids, string $alias = null): self {
+		return $this->users(IssueUser::TYPE_TELEMARKETER, $ids, $alias);
 	}
 
-	protected function users(string $type, array $ids): self {
+	public function users(string $type, array $ids, string $alias = null): self {
 		if (!empty($ids)) {
-			$this->joinWith('users');
+			if ($alias === null) {
+				$alias = $type;
+			}
+			$this->joinWith('users ' . $alias);
 			$this->andWhere([
-				'issue_user.type' => $type,
-				'issue_user.user_id' => $ids,
+				$alias . '.type' => $type,
+				$alias . '.user_id' => $ids,
 			]);
 		}
 		return $this;

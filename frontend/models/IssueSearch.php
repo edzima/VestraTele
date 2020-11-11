@@ -4,7 +4,6 @@ namespace frontend\models;
 
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch as BaseIssueSearch;
-use common\models\issue\query\IssueQuery;
 use common\models\user\Worker;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
@@ -83,13 +82,7 @@ class IssueSearch extends BaseIssueSearch {
 			return $dataProvider;
 		}
 		$this->archiveFilter($query);
-		/** @var IssueQuery $query */
-		$query->agents($this->agents);
-		//	$query->andWhere(['or', ['lawyer_id' => $this->user_id], ['agent_id' => $this->agents], ['tele_id' => $this->user_id]]);
-
-		if ($this->isAgent) {
-			//		$query->andWhere(['or', ['lawyer_id' => $this->user_id], ['agent_id' => $this->agents], ['tele_id' => $this->user_id]]);
-		}
+		$this->customerFilter($query);
 
 		$query->andFilterWhere([
 			'id' => $this->id,
@@ -104,7 +97,7 @@ class IssueSearch extends BaseIssueSearch {
 		if ($this->onlyAsAgent) {
 			$query->agents([$this->user_id]);
 		} else {
-			if(!$this->onlyAsTele){
+			if (!$this->onlyAsTele) {
 				$query->agents($this->agents);
 			}
 		}
@@ -113,10 +106,9 @@ class IssueSearch extends BaseIssueSearch {
 			$query->lawyers([$this->user_id]);
 		}
 
-		$query->andFilterWhere(['like', 'client_surname', $this->client_surname])
+		$query
 			->andFilterWhere(['>=', 'created_at', $this->createdAtFrom])
-			->andFilterWhere(['<=', 'created_at', $this->createdAtTo])
-			->andFilterWhere(['like', 'victim_surname', $this->victim_surname]);
+			->andFilterWhere(['<=', 'created_at', $this->createdAtTo]);
 
 		return $dataProvider;
 	}
