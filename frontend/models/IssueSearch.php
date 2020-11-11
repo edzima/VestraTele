@@ -61,6 +61,8 @@ class IssueSearch extends BaseIssueSearch {
 
 		$query->with([
 			'agent.userProfile',
+			'customer.userProfile',
+			'entityResponsible',
 			'type',
 			'stage.types',
 		]);
@@ -88,7 +90,7 @@ class IssueSearch extends BaseIssueSearch {
 			'id' => $this->id,
 			'stage_id' => $this->stage_id,
 			'type_id' => $this->type_id,
-			'agent_id' => $this->agent_id,
+			'entity_responsible_id' => $this->entity_responsible_id,
 		]);
 
 		if ($this->onlyAsTele) {

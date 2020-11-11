@@ -82,6 +82,7 @@ class IssueSearch extends Issue {
 		$query->with([
 			'agent.userProfile',
 			'customer.userProfile',
+			'entityResponsible',
 			'type',
 			'stage.types',
 		]);
