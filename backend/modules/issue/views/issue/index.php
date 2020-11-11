@@ -165,6 +165,15 @@ JS;
 				'class' => DataColumn::class,
 				'attribute' => 'entity_responsible_id',
 				'filter' => IssueSearch::getEntityNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'pluginOptions' => [
+						'allowClear' => true,
+					],
+					'options' => [
+						'placeholder' => $searchModel->getAttributeLabel('entity_responsible_id'),
+					],
+				],
 				'value' => 'entityResponsible.name',
 				'options' => [
 					'style' => 'width:200px',
