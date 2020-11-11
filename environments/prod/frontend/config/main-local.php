@@ -1,7 +1,5 @@
 <?php
 
-use common\components\maintenance\Maintenance;
-
 $config = [
 	'components' => [
 		'request' => [
@@ -11,17 +9,16 @@ $config = [
 	],
 ];
 
-// maintenance mode
-$config['bootstrap'] = ['maintenance'];
-$config['components']['maintenance'] = [
-	'class' => Maintenance::class,
-	'enabled' => static function ($app) {
-		return $app->keyStorage->get('frontend.maintenance');
-	},
-	'route' => 'maintenance/index',
-	'message' => 'Przerwa techniczna',
-	// year-month-day hour:minute:second
-	'time' => '0000-00-00 00:00:00', // время окончания работ
-];
+$maintenance = getenv("FRONTEND_MAINTENANCE");
+if (strtotime($maintenance)) {
+	$config['bootstrap'] = ['maintenance'];
+	$config['components']['maintenance'] = [
+		'class' => 'common\components\maintenance\Maintenance',
+		'enabled' => true,
+		'time' => $maintenance,
+		'route' => 'maintenance/index',
+		'message' => Yii::t('common', 'Technical break'),
+	];
+}
 
 return $config;
