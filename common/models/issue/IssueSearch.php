@@ -9,6 +9,7 @@ use common\models\user\Worker;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -107,6 +108,7 @@ class IssueSearch extends Issue {
 		$this->lawyerFilter($query);
 		$this->archiveFilter($query);
 		$this->customerFilter($query);
+		$this->createdAtFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -114,15 +116,17 @@ class IssueSearch extends Issue {
 			'stage_id' => $this->stage_id,
 			'type_id' => $this->type_id,
 			'entity_responsible_id' => $this->entity_responsible_id,
-			'created_at' => $this->created_at,
-			'updated_at' => $this->updated_at,
-			'accident_at' => $this->accident_at,
+			'issue.created_at' => $this->created_at,
+			'issue.updated_at' => $this->updated_at,
+			'accident_at' => 'issue.' . $this->accident_at,
 		]);
 
-		$query->andFilterWhere(['>=', 'created_at', $this->createdAtFrom])
-			->andFilterWhere(['<=', 'created_at', $this->createdAtTo]);
-
 		return $dataProvider;
+	}
+
+	protected function createdAtFilter(QueryInterface $query): void {
+		$query->andFilterWhere(['>=', 'issue.' . 'created_at', $this->createdAtFrom])
+			->andFilterWhere(['<=', 'issue.' . 'created_at', $this->createdAtTo]);
 	}
 
 	protected function archiveFilter(IssueQuery $query): void {

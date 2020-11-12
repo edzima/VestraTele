@@ -108,9 +108,7 @@ class IssueSearch extends BaseIssueSearch {
 			$query->lawyers([$this->user_id]);
 		}
 
-		$query
-			->andFilterWhere(['>=', 'created_at', $this->createdAtFrom])
-			->andFilterWhere(['<=', 'created_at', $this->createdAtTo]);
+		$this->createdAtFilter($query);
 
 		return $dataProvider;
 	}
