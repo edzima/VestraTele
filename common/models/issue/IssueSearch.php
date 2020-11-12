@@ -118,7 +118,7 @@ class IssueSearch extends Issue {
 			'entity_responsible_id' => $this->entity_responsible_id,
 			'issue.created_at' => $this->created_at,
 			'issue.updated_at' => $this->updated_at,
-			'accident_at' => 'issue.' . $this->accident_at,
+			'accident_at' => $this->accident_at,
 		]);
 
 		return $dataProvider;
