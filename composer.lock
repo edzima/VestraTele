@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "12b5c52ab274bf8d57f36ae1ece85e19",
+    "content-hash": "3c7f339f44007b511b2181d178d1f6de",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -108,7 +108,7 @@
             "version": "v3.4.1",
             "source": {
                 "type": "git",
-                "url": "git@github.com:twbs/bootstrap.git",
+                "url": "https://github.com/twbs/bootstrap.git",
                 "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e"
             },
             "dist": {
@@ -187,7 +187,7 @@
             "version": "3.5.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jquery/jquery-dist.git",
+                "url": "git@github.com:jquery/jquery-dist.git",
                 "reference": "4c0e4becb8263bb5b3e6dadc448d8e7305ef8215"
             },
             "dist": {
@@ -571,16 +571,16 @@
         },
         {
             "name": "edzima/yii2-teryt",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/edzima/yii2-teryt.git",
-                "reference": "e029d150c6926d16bb534d982ec3c714f3a5e378"
+                "reference": "de57dd0962421d43cf4b8a03a09df1075848eabb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/edzima/yii2-teryt/zipball/e029d150c6926d16bb534d982ec3c714f3a5e378",
-                "reference": "e029d150c6926d16bb534d982ec3c714f3a5e378",
+                "url": "https://api.github.com/repos/edzima/yii2-teryt/zipball/de57dd0962421d43cf4b8a03a09df1075848eabb",
+                "reference": "de57dd0962421d43cf4b8a03a09df1075848eabb",
                 "shasum": ""
             },
             "require": {
@@ -620,7 +620,7 @@
                 "teryt",
                 "yii2"
             ],
-            "time": "2020-09-15T18:59:26+00:00"
+            "time": "2020-11-12T19:01:48+00:00"
         },
         {
             "name": "egulias/email-validator",
