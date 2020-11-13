@@ -7,6 +7,7 @@ use backend\modules\issue\models\IssueUserForm;
 use backend\modules\issue\models\search\UserSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
+use common\models\user\User;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
@@ -37,8 +38,12 @@ class UserController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new UserSearch();
+		if (Yii::$app->user->can(User::PERMISSION_ARCHIVE)) {
+			$searchModel->withArchive = true;
+		}
+
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -55,6 +60,9 @@ class UserController extends Controller {
 	public function actionIssue(int $id) {
 		$model = $this->findIssue($id);
 		$searchModel = new UserSearch();
+		if (Yii::$app->user->can(User::PERMISSION_ARCHIVE)) {
+			$searchModel->withArchive = true;
+		}
 		$searchModel->issue_id = $id;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 

@@ -9,9 +9,10 @@
 namespace frontend\controllers;
 
 use common\models\issue\Issue;
+use common\models\user\User;
 use common\models\user\Worker;
-use frontend\models\ClientIssueSearch;
-use frontend\models\IssueSearch;
+use frontend\models\search\IssueSearch;
+use frontend\models\search\IssueUserSearch;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -33,55 +34,47 @@ class IssueController extends Controller {
 		];
 	}
 
-	public function actionSearch(): string {
-		$user = Yii::$app->user;
-
-		if (!$user->can(Worker::ROLE_CUSTOMER_SERVICE)) {
-			throw new NotFoundHttpException();
-		}
-
-		$searchModel = new ClientIssueSearch();
-		if ($user->can(Worker::PERMISSION_ARCHIVE)) {
-			$searchModel->withArchive = true;
-		}
-		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-		return $this->render('clientSearch', [
-			'searchModel' => $searchModel,
-			'dataProvider' => $dataProvider,
-		]);
-	}
-
 	/**
-	 * Lists all Issue models.
+	 * Lists all Issue models available for current User.
 	 *
-	 * @return mixed
+	 * @return string
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$user = Yii::$app->user;
 		$searchModel = new IssueSearch();
 		if ($user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
 		}
-		$searchModel->user_id = $user->getId();
+		$searchModel->user_id = (int) $user->getId();
 
-		if ($user->can(Worker::ROLE_LAWYER)) {
-			$searchModel->isLawyer = true;
-		}
 		if ($user->can(Worker::ROLE_AGENT)) {
 			$worker = Worker::findOne($user->id);
 			if ($worker) {
-				$searchModel->agents = $worker->getAllChildesIds();
-				$searchModel->agents[] = $worker->id;
-				$searchModel->isAgent = true;
+				$searchModel->agentsIds = $worker->getAllChildesIds();
 			}
 		}
-		if ($user->can(Worker::ROLE_TELEMARKETER)) {
-			$searchModel->isTele = true;
-		}
-
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		return $this->render('index', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	public function actionUser(): string {
+		$user = Yii::$app->user;
+
+		$searchModel = new IssueUserSearch();
+
+		if ($user->can(User::ROLE_CUSTOMER_SERVICE)) {
+			$searchModel->withArchive = true;
+		} else {
+			$searchModel->user_id = $user->id;
+		}
+		if ($user->can(Worker::PERMISSION_ARCHIVE)) {
+			$searchModel->withArchive = true;
+		}
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		return $this->render('user', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
 		]);
@@ -91,9 +84,10 @@ class IssueController extends Controller {
 	 * Displays a single Issue model.
 	 *
 	 * @param integer $id
-	 * @return mixed
+	 * @return string
+	 * @throws NotFoundHttpException
 	 */
-	public function actionView(int $id) {
+	public function actionView(int $id): string {
 		return $this->render('view', [
 			'model' => static::findModel($id),
 		]);
@@ -107,10 +101,9 @@ class IssueController extends Controller {
 	 * @return Issue the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public static function findModel($id): Issue {
+	public static function findModel(int $id): Issue {
 		$model = Issue::find()
 			->andWhere(['id' => $id])
-			->with('issueNotes.user.userProfile')
 			->one();
 
 		if ($model !== null && static::shouldFind($model)) {
@@ -128,20 +121,16 @@ class IssueController extends Controller {
 			Yii::warning('User: ' . $user->id . ' try view archived issue: ' . $model->id, 'issue');
 			return false;
 		}
-		if (
-			$user->can(Worker::ROLE_CUSTOMER_SERVICE)
-			|| ($user->can(Worker::ROLE_TELEMARKETER) && $model->tele_id === $user->id)
-			|| ($user->can(Worker::ROLE_LAWYER) && $model->lawyer_id === $user->id)) {
+		if ($user->can(Worker::ROLE_CUSTOMER_SERVICE) || $model->isForUser($user->id)) {
 			return true;
 		}
 
 		if ($user->can(Worker::ROLE_AGENT)) {
-			$worker = Worker::findOne($user->id);
-			if ($worker) {
-				$agents = $worker->getAllChildesIds();
-				$agents[] = $worker->id;
-				if (in_array($model->agent_id, $agents)) {
-					return true;
+			$agent = Worker::findOne($user->id);
+			if ($agent) {
+				$childesIds = $agent->getAllChildesIds();
+				if (!empty($childesIds)) {
+					return $model->isForAgents($childesIds);
 				}
 			}
 		}

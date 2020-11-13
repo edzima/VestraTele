@@ -452,4 +452,15 @@ class Issue extends ActiveRecord {
 		return new IssueQuery(get_called_class());
 	}
 
+	public function isForUser(int $id): bool {
+		return $this->getUsers()->andWhere(['user_id' => $id])->exists();
+	}
+
+	public function isForAgents(array $ids):bool{
+		return $this->getUsers()
+			->withType(IssueUser::TYPE_AGENT)
+			->andWhere(['user_id' => $ids])
+			->exists();
+	}
+
 }

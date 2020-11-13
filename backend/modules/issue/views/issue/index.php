@@ -106,7 +106,7 @@ JS;
 			],
 			[
 				'class' => DataColumn::class,
-				'attribute' => 'id',
+				'attribute' => 'issue_id',
 				'value' => 'longId',
 				'filterInputOptions' => [
 					'class' => 'dynamic-search',

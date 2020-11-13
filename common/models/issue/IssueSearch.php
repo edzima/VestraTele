@@ -5,6 +5,7 @@ namespace common\models\issue;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueUserQuery;
+use common\models\issue\search\ArchivedIssueSearch;
 use common\models\user\Worker;
 use Yii;
 use yii\base\Model;
@@ -15,8 +16,16 @@ use yii\helpers\ArrayHelper;
 /**
  * IssueSearch represents the model behind the search form of `common\models\issue\Issue`.
  */
-class IssueSearch extends Issue {
+abstract class IssueSearch extends Model
+	implements ArchivedIssueSearch {
 
+	public $issue_id;
+	public $stage_id;
+	public $type_id;
+	public $entity_responsible_id;
+
+	public string $created_at = '';
+	public string $updated_at = '';
 	public string $createdAtFrom = '';
 	public string $createdAtTo = '';
 	public string $customerLastname = '';
@@ -27,8 +36,6 @@ class IssueSearch extends Issue {
 	public $lawyer_id;
 	public $tele_id;
 
-	private ?array $stages = null;
-
 	/**
 	 * @inheritdoc
 	 */
@@ -36,10 +43,10 @@ class IssueSearch extends Issue {
 		return [
 			[
 				[
-					'id', 'agent_id', 'tele_id', 'lawyer_id', 'stage_id', 'type_id', 'entity_responsible_id',
+					'issue_id', 'agent_id', 'stage_id', 'type_id', 'entity_responsible_id',
 				], 'integer',
 			],
-			[['createdAtTo', 'createdAtFrom', 'accident_at'], 'date', 'format' => DATE_ATOM],
+			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			[
 				[
@@ -54,19 +61,19 @@ class IssueSearch extends Issue {
 	 */
 	public function attributeLabels(): array {
 		return array_merge([
+			'issue_id' => Yii::t('common', 'Issue'),
 			'createdAtFrom' => Yii::t('common', 'Created at from'),
 			'createdAtTo' => Yii::t('common', 'Created at to'),
 			'agent_id' => Worker::getRolesNames()[Worker::ROLE_AGENT],
 			'lawyer_id' => Worker::getRolesNames()[Worker::ROLE_LAWYER],
 			'tele_id' => Worker::getRolesNames()[Worker::ROLE_TELEMARKETER],
-		], parent::attributeLabels());
+		], Issue::instance()->attributeLabels());
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function scenarios() {
-		// bypass scenarios() implementation in the parent class
+	public function scenarios(): array {
 		return Model::scenarios();
 	}
 
@@ -77,51 +84,29 @@ class IssueSearch extends Issue {
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function search(array $params): ActiveDataProvider {
-		$query = Issue::find();
+	abstract public function search(array $params): ActiveDataProvider;
 
-		$query->with([
-			'agent.userProfile',
-			'customer.userProfile',
-			'entityResponsible',
-			'type',
-			'stage.types',
-		]);
-
-		$dataProvider = new ActiveDataProvider([
-			'query' => $query,
-			'sort' => [
-				'defaultOrder' => [
-					'updated_at' => SORT_DESC,
-				],
-			],
-		]);
-
-		$this->load($params);
-
-		if (!$this->validate()) {
-			return $dataProvider;
-		}
-
-		$this->agentFilter($query);
-		$this->teleFilter($query);
-		$this->lawyerFilter($query);
+	protected function issueQueryFilter(IssueQuery $query): void {
 		$this->archiveFilter($query);
+		$this->agentFilter($query);
 		$this->customerFilter($query);
 		$this->createdAtFilter($query);
-
-		// grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
+			'id' => $this->issue_id,
 			'stage_id' => $this->stage_id,
 			'type_id' => $this->type_id,
 			'entity_responsible_id' => $this->entity_responsible_id,
-			'issue.created_at' => $this->created_at,
-			'issue.updated_at' => $this->updated_at,
-			'accident_at' => $this->accident_at,
 		]);
+	}
 
-		return $dataProvider;
+	protected function issueWith(): array {
+		return [
+			'agent.userProfile',
+			'customer.userProfile',
+			'entityResponsible',
+			'stage.types',
+			'type',
+		];
 	}
 
 	protected function createdAtFilter(QueryInterface $query): void {
@@ -130,7 +115,7 @@ class IssueSearch extends Issue {
 	}
 
 	protected function archiveFilter(IssueQuery $query): void {
-		if (!$this->withArchive) {
+		if (!$this->getWithArchive()) {
 			$query->withoutArchives();
 		}
 	}
@@ -153,33 +138,20 @@ class IssueSearch extends Issue {
 		}
 	}
 
-	protected function lawyerFilter(IssueQuery $query): void {
-		if (!empty($this->lawyer_id)) {
-			$query->lawyers([$this->lawyer_id]);
-		}
-	}
-
-	protected function teleFilter(IssueQuery $query): void {
-		if (!empty($this->tele_id)) {
-			$query->tele([$this->tele_id]);
-		}
+	public function getWithArchive(): bool {
+		return $this->withArchive;
 	}
 
 	public static function getTypesNames(): array {
 		return IssueType::getTypesNames();
 	}
 
-	public function getStagesNames(): array {
-		if ($this->stages === null) {
-			$this->stages = ArrayHelper::map(IssueStage::find()->all(), 'id', 'nameWithShort');
-			if (!$this->withArchive) {
-				unset($this->stages[IssueStage::ARCHIVES_ID]);
-			}
-		}
-		return $this->stages;
-	}
-
 	public static function getEntityNames(): array {
 		return ArrayHelper::map(EntityResponsible::find()->asArray()->all(), 'id', 'name');
 	}
+
+	public function getStagesNames(): array {
+		return IssueStage::getStagesNames($this->getWithArchive());
+	}
+
 }

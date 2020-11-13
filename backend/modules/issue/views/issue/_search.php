@@ -97,7 +97,6 @@ use yii\widgets\ActiveForm;
 						'data' => Worker::getSelectList(),
 						'options' => [
 							'placeholder' => $model->getAttributeLabel('parentId'),
-							'multiple' => true,
 						],
 						'pluginOptions' => [
 							'allowClear' => true,

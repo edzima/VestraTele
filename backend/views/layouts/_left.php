@@ -71,6 +71,11 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
+							'label' => Yii::t('common', 'Issues users'),
+							'url' => ['/issue/user/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
 							'label' => Yii::t('common', 'Notes'),
 							'url' => ['/issue/note/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
@@ -91,11 +96,7 @@ $user = Yii::$app->user;
 							'url' => ['/issue/stage/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
-						[
-							'label' => Yii::t('common', 'Issue Users'),
-							'url' => ['/issue/user/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
-						],
+
 						[
 							'label' => Yii::t('backend', 'Costs'),
 							'url' => ['/issue/cost/index'],

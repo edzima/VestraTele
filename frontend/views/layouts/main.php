@@ -61,14 +61,9 @@ AppAsset::register($this);
 		];
 
 		$menuItems[] = [
-			'label' => 'Sprawy',
+			'label' => Yii::t('common', 'Issues'),
 			'url' => ['/issue/index'],
 			'visible' => Yii::$app->user->can(User::PERMISSION_ISSUE),
-		];
-		$menuItems[] = [
-			'label' => 'Znajdź sprawę',
-			'url' => ['/issue/search'],
-			'visible' => Yii::$app->user->can(User::ROLE_CUSTOMER_SERVICE),
 		];
 		$menuItems[] = [
 			'label' => Yii::t('common', 'Summons'),
@@ -80,7 +75,6 @@ AppAsset::register($this);
 			'url' => ['/article/index'],
 		];
 		$menuItems[] = [
-
 			'label' => 'Prowizje',
 			'url' => ['/report/index'],
 
@@ -107,6 +101,7 @@ AppAsset::register($this);
 		];
 	}
 	echo Nav::widget([
+		'id' => 'main-nav',
 		'options' => ['class' => 'navbar-nav navbar-right'],
 		'items' => array_merge(NavItem::getMenuItems(), $menuItems),
 	]);

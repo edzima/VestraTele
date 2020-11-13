@@ -183,4 +183,14 @@ return [
 	'Date At' => 'Date At',
 	'Updated At' => 'Updated At',
 	'handicapped' => 'Niepełnosrawny',
+	'Technical break' => 'Przerwa techniczna',
+	'Issue users' => 'Issue users',
+	'One field is required.' => 'One field is required.',
+	'Value with VAT' => 'Value with VAT',
+	'City is required when empty postal code and info.' => 'City is required when empty postal code and info.',
+	'Jlustification of the judgment' => 'Jlustification of the judgment',
+	'justification of the judgment' => 'justification of the judgment',
+	'Przerwa techniczna' => 'Przerwa techniczna',
+	'Issues users' => 'Uczestnicy',
+	'Surname' => 'Nazwisko'
 ];

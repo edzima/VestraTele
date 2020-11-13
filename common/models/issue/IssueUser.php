@@ -8,6 +8,7 @@ use common\models\user\Customer;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
+use Yii;
 use yii\db\ActiveRecord;
 
 /**
@@ -75,8 +76,8 @@ class IssueUser extends ActiveRecord {
 	public function attributeLabels(): array {
 		return [
 			'user_id' => 'User ID',
-			'issue_id' => 'Issue ID',
-			'type' => 'Type',
+			'issue_id' => Yii::t('common', 'Issue'),
+			'type' => Yii::t('common', 'Type'),
 		];
 	}
 

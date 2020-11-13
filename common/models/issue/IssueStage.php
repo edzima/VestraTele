@@ -5,6 +5,7 @@ namespace common\models\issue;
 use common\models\issue\query\IssueStageQuery;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "issue_stage".
@@ -22,6 +23,8 @@ class IssueStage extends ActiveRecord {
 
 	public const ARCHIVES_ID = 6;
 	public const POSITIVE_DECISION_ID = 18;
+
+	public static array $STAGES = [];
 
 	public function __toString(): string {
 		return $this->name;
@@ -71,12 +74,27 @@ class IssueStage extends ActiveRecord {
 		return implode(', ', $this->types);
 	}
 
+	public static function getStagesNames(bool $withArchive = false): array {
+		$names = ArrayHelper::map(static::getStages(), 'id', 'nameWithShort');
+		if (!$withArchive) {
+			unset($names[static::ARCHIVES_ID]);
+		}
+		return $names;
+	}
+
+	public static function getStages(): array {
+		if (empty(static::$STAGES)) {
+			static::$STAGES = static::find()->indexBy('id')->all();
+		}
+		return static::$STAGES;
+	}
+
 	/**
 	 * @inheritdoc
 	 * @return IssueStageQuery the active query used by this AR class.
 	 */
-	public static function find() {
-		return new IssueStageQuery(get_called_class());
+	public static function find(): IssueStageQuery {
+		return new IssueStageQuery(static::class);
 	}
 
 }

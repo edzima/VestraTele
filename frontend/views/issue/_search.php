@@ -1,8 +1,7 @@
 <?php
 
-use common\models\user\Worker;
 use common\widgets\DateTimeWidget;
-use frontend\models\IssueSearch;
+use frontend\models\search\IssueSearch;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -52,9 +51,7 @@ use yii\widgets\ActiveForm;
 	</div>
 
 	<div class="row">
-		<?= Yii::$app->user->can(Worker::ROLE_AGENT) ? $form->field($model, 'onlyAsAgent', ['options' => ['class' => 'col-md-1']])->checkbox() : '' ?>
-		<?= Yii::$app->user->can(Worker::ROLE_TELEMARKETER) ? $form->field($model, 'onlyAsTele', ['options' => ['class' => 'col-md-1']])->checkbox() : '' ?>
-		<?= Yii::$app->user->can(Worker::ROLE_LAWYER) ? $form->field($model, 'onlyAsLawyer', ['options' => ['class' => 'col-md-1']])->checkbox() : '' ?>
+		<?php // $form->field($model, 'type')->checkboxList($model->getUserTypeNames()) ?>
 	</div>
 
 	<div class="form-group">

@@ -2,6 +2,7 @@
 
 namespace backend\modules\issue\models\search;
 
+use common\models\issue\Issue;
 use common\models\issue\IssueSearch as BaseIssueSearch;
 use common\models\issue\query\IssueQuery;
 use common\models\user\Worker;
@@ -18,13 +19,15 @@ use yii\helpers\ArrayHelper;
 class IssueSearch extends BaseIssueSearch {
 
 	public $parentId;
+	public $accident_at;
 	public $excludedStages = [];
 	public bool $onlyDelayed = false;
 
 	public function rules(): array {
 		return array_merge(parent::rules(), [
-			['parentId', 'integer'],
+			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
 			['onlyDelayed', 'boolean'],
+			['accident_at', 'safe'],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 		]);
 	}
@@ -38,13 +41,37 @@ class IssueSearch extends BaseIssueSearch {
 	}
 
 	public function search(array $params): ActiveDataProvider {
-		$provider = parent::search($params);
-		/** @var IssueQuery $query */
-		$query = $provider->query;
-		$query->with('entityResponsible');
+		$query = Issue::find();
+
+		$query->with($this->issueWith());
+
+		$dataProvider = new ActiveDataProvider([
+			'query' => $query,
+			'sort' => [
+				'defaultOrder' => [
+					'updated_at' => SORT_DESC,
+				],
+			],
+		]);
+
+		$this->load($params);
+
+		if (!$this->validate()) {
+			$this->archiveFilter($query);
+			return $dataProvider;
+		}
+		$this->issueQueryFilter($query);
+
+		return $dataProvider;
+	}
+
+	protected function issueQueryFilter(IssueQuery $query): void {
+		parent::issueQueryFilter($query);
 		$this->delayedFilter($query);
 		$this->excludedStagesFilter($query);
-		return $provider;
+		$this->teleFilter($query);
+		$this->lawyerFilter($query);
+		$query->andFilterWhere(['accident_at' => $this->accident_at]);
 	}
 
 	protected function agentFilter(IssueQuery $query): void {
@@ -87,6 +114,18 @@ class IssueSearch extends BaseIssueSearch {
 
 	protected function excludedStagesFilter(IssueQuery $query): void {
 		$query->andFilterWhere(['NOT IN', 'stage_id', $this->excludedStages]);
+	}
+
+	protected function lawyerFilter(IssueQuery $query): void {
+		if (!empty($this->lawyer_id)) {
+			$query->lawyers([$this->lawyer_id]);
+		}
+	}
+
+	protected function teleFilter(IssueQuery $query): void {
+		if (!empty($this->tele_id)) {
+			$query->tele([$this->tele_id]);
+		}
 	}
 
 }

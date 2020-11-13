@@ -25,6 +25,37 @@ class IssueUpgradeController extends Controller {
 
 	private $foundedCities = [];
 
+	public function actionCheckLead(): void {
+		$ids = [];
+		foreach (IssueUser::find()
+			->withType(IssueUser::TYPE_CUSTOMER)
+			->with('user.userProfile')
+			->batch() as $rows) {
+			foreach ($rows as $issueUser) {
+				/** @var $issueUser IssueUser */
+				$userProfile = $issueUser->user->profile;
+				$phones = [];
+				if (!empty($userProfile->phone)) {
+					$phones[] = $userProfile->phone;
+				}
+				if (!empty($userProfile->phone_2)) {
+					$phones[] = $userProfile->phone_2;
+				}
+				$meetIds = IssueMeet::find()->
+				select('id')
+					->andWhere(['phone' => $phones])
+					->column();
+
+				foreach ($meetIds as $id){
+					$ids[$id] = $id;
+				}
+			}
+
+		}
+		Console::output(print_r($ids));
+		Console::output('Count: '. count($ids));
+	}
+
 	public function actionWorkers(): void {
 		IssueUser::deleteAll(['type' => [IssueUser::TYPE_AGENT, IssueUser::TYPE_TELEMARKETER, IssueUser::TYPE_LAWYER]]);
 		$count = 0;
@@ -91,33 +122,60 @@ class IssueUpgradeController extends Controller {
 	public function actionCheckCustomer(): void {
 		foreach (Issue::find()
 			->withoutArchives()
-			->andWhere(['=','id',7963])
-			->with('customer')
+			->with('customer.userProfile')
 			->batch() as $rows) {
 			foreach ($rows as $issue) {
 				/** @var $issue Issue */
-				Console::output('Parse issue: ' . $issue->longId);
+				Console::output($issue->id);
 				if ($issue->customer) {
 					if ($issue->customer->getFullName() !== $issue->getClientFullName()) {
 						Console::output('Customer: ' . $issue->customer->getFullName());
 						Console::output('Old client: ' . $issue->getClientFullName());
-						if(Console::confirm('Move to archive: ' . $issue->id)){
-							$issue->stage_id = 45;
-							Console::output($issue->save(false,['stage_id']));
+						Console::output('Customer phone: ' . $issue->customer->profile->phone);
+						Console::output('Old client phone: ' . $issue->client_phone_1);
+						if (!Console::confirm('Is same client? ', false)) {
+							if (Console::confirm('Overwrite old client phones from new?', true)) {
+								$issue->client_phone_1 = $issue->customer->profile->phone;
+								$issue->client_phone_2 = $issue->customer->profile->phone_2;
+							}
+							$customer = null;
+							if (Console::confirm('Try find or create client without phone?', true)) {
+								$customer = $this->parseClient($issue, false);
+							}
+							if ($customer === null) {
+								if (Console::confirm('Unlink customer?')) {
+									$issue->unlinkUser(IssueUser::TYPE_CUSTOMER);
+									$issue->linkUser(Console::prompt('Insert new customer ID: '), IssueUser::TYPE_CUSTOMER);
+								}
+							}
 						}
-						if(Console::confirm('Unlink customer?')){
-							$issue->unlinkUser(IssueUser::TYPE_CUSTOMER);
-							$issue->linkUser(Console::prompt('Insert new customer ID: '),IssueUser::TYPE_CUSTOMER);
-						}
-
 					}
 				} else {
 					Console::output('Not customer for isssue: ' . $issue->id);
-					$issue->linkUser(Console::prompt('Insert new customer ID: '),IssueUser::TYPE_CUSTOMER);
+					$issue->linkUser(Console::prompt('Insert new customer ID: '), IssueUser::TYPE_CUSTOMER);
 				}
-				if(Console::confirm('Unlink customer?')){
-					$issue->unlinkUser(IssueUser::TYPE_CUSTOMER);
-					$issue->linkUser(Console::prompt('Insert new customer ID: '),IssueUser::TYPE_CUSTOMER);
+			}
+		}
+	}
+
+	public function actionCheckVictim(): void {
+		foreach (IssueUser::find()
+			->with('issue')
+			->with('user.userProfile')
+			->andWhere(['<', 'issue_id', '8782'])
+			->withTypes([IssueUser::TYPE_VICTIM, IssueUser::TYPE_HANDICAPPED])
+			->batch() as $rows) {
+			foreach ($rows as $issueUser) {
+				/** @var $issueUser IssueUser */
+				Console::output($issueUser->issue_id);
+				$user = $issueUser->user;
+				$issue = $issueUser->issue;
+				if ($issueUser->issue->getVictimFullName() !== $user->getFullName()) {
+					Console::output('User: ' . $user->getFullName());
+					Console::output('Old victim: ' . $issue->getClientFullName());
+					Console::output('User phone: ' . $user->profile->phone);
+					Console::output('Old client phone: ' . $issue->victim_phone);
+					return;
 				}
 			}
 		}
@@ -148,16 +206,17 @@ class IssueUpgradeController extends Controller {
 		}
 	}
 
-	public function actionVictim(): void {
+	public function actionVictimHandicapped(): void {
 		foreach (Issue::find()
-			->andWhere(['type_id' => 1])
+			->andWhere(['id' => [5353, 5354, 5381]])
+			->andWhere(['type_id' => [2, 6, 9, 10, 13]])
 			->withoutArchives()
 			->batch() as $rows) {
 			foreach ($rows as $issue) {
 				/** @var Issue $issue */
 				Console::output('------------------------------');
 				Console::output('Parse issue: ' . $issue);
-				$this->parseVictim($issue);
+				$this->parseVictim($issue, IssueUser::TYPE_HANDICAPPED);
 			}
 		}
 	}
@@ -188,8 +247,8 @@ class IssueUpgradeController extends Controller {
 		}
 	}
 
-	private function parseClient(Issue $issue): User {
-		$customer = $this->findClient($issue);
+	private function parseClient(Issue $issue, bool $withPhone = false): User {
+		$customer = $this->findClient($issue, $withPhone);
 		if ($customer !== null) {
 			Console::output('Customer already exist: ' . $customer->getFullName());
 			$issue->linkUser($customer->id, IssueUser::TYPE_CUSTOMER);
@@ -221,18 +280,18 @@ class IssueUpgradeController extends Controller {
 		return $customer->getModel();
 	}
 
-	private function parseVictim(Issue $issue): void {
-		if (!$this->clientIsVictim($issue) || !$issue->getUsers()->withType(IssueUser::TYPE_VICTIM)->exists()) {
+	private function parseVictim(Issue $issue, string $type): void {
+		if (!$this->clientIsVictim($issue) || !$issue->getUsers()->withType($type)->exists()) {
 			Console::output('Client is not victim');
 			if (empty($issue->victim_first_name) || empty($issue->victim_surname)) {
 				return;
 			}
 			$victim = $this->findVictim($issue);
 
-			if ($victim !== null) {
+			if ($victim !== null && $victim->getFullName() === $issue->getVictimFullName()) {
 				Console::output('Victim already exist: ' . $victim->getFullName());
 				if ($victim->id !== $issue->customer->id) {
-					$issue->linkUser($victim->id, IssueUser::TYPE_VICTIM);
+					$issue->linkUser($victim->id, $type);
 				}
 			} else {
 
@@ -248,26 +307,32 @@ class IssueUpgradeController extends Controller {
 				}
 				if ($victim->save()) {
 					Console::output('Success create Victim:' . $victim->getModel()->getFullName());
-					$issue->linkUser($victim->getModel()->id, IssueUser::TYPE_VICTIM);
+					$issue->linkUser($victim->getModel()->id, $type);
 				} else {
-					Console::output('Victim dont save.');
 					Console::output(var_export($victim->getErrors()));
+					Console::output(var_export($victim->getProfile()->getErrors()));
+					Console::output(var_export($victim->getHomeAddress()->getErrors()));
+
+					Console::confirm('Victim dont save.');
 				}
 			}
 		}
 	}
 
-	private function findClient(Issue $model): ?User {
+	private function findClient(Issue $model, bool $withPhone = true): ?User {
 		$user = $this->findByMail($model, 'client_email');
 		if ($user) {
 			Console::output('Find by email: ' . $user->email);
 			return $user;
 		}
-		$user = $this->findByPhone($model, 'client_phone_1');
-		if ($user) {
-			Console::output('Find by phone: ' . $user->profile->phone);
-			return $user;
+		if ($withPhone) {
+			$user = $this->findByPhone($model, 'client_phone_1');
+			if ($user) {
+				Console::output('Find by phone: ' . $user->profile->phone);
+				return $user;
+			}
 		}
+
 		$users = $this->findByNames($model->client_first_name, $model->client_surname);
 		if (empty($users)) {
 			return null;
@@ -299,11 +364,14 @@ class IssueUpgradeController extends Controller {
 			Console::output('Find by email: ' . $user->email);
 			return $user;
 		}
-		$user = $this->findByPhone($model, 'victim_phone');
-		if ($user) {
-			Console::output('Find by phone: ' . $user->profile->phone);
-			return $user;
+		if (trim($model->client_phone_1) !== trim($model->victim_phone)) {
+			$user = $this->findByPhone($model, 'victim_phone');
+			if ($user) {
+				Console::output('Find by phone: ' . $user->profile->phone);
+				return $user;
+			}
 		}
+
 		if (empty($model->victim_first_name) || empty($model->victim_surname)) {
 			return null;
 		}
@@ -335,7 +403,7 @@ class IssueUpgradeController extends Controller {
 	private function filterByAddress(array $users, LegacyAddress $legacyAddress): array {
 		return array_filter($users, function (User $user) use ($legacyAddress): bool {
 			if (!$user->homeAddress) {
-				Console::output('User has not home address: ' . $user->getFullName());
+				Console::confirm('User has not home address: ' . $user->getFullName());
 				return false;
 			}
 			return $user->homeAddress->info === $legacyAddress->street && $user->homeAddress->postal_code === $legacyAddress->cityCode;
@@ -420,6 +488,9 @@ class IssueUpgradeController extends Controller {
 		}
 		if ($model->hasErrors('username')) {
 			$this->fixUsername($model);
+		}
+		if ($model->hasErrors('email')) {
+			$model->email = null;
 		}
 	}
 
