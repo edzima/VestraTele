@@ -1,10 +1,11 @@
 <?php
 
+use backend\modules\issue\models\search\IssueTypeSearch;
 use yii\grid\GridView;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $searchModel common\models\issue\IssueTypeSearch */
+/* @var $searchModel IssueTypeSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('backend', 'Issue Types');

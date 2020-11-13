@@ -3,8 +3,8 @@
 namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueStage;
+use backend\modules\issue\models\search\IssueStageSearch;
 use Yii;
-use common\models\issue\IssueStageSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;

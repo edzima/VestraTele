@@ -1,10 +1,11 @@
 <?php
 
+use backend\modules\issue\models\search\IssueStageSearch;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel common\models\issue\IssueStageSearch */
+/* @var $searchModel IssueStageSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Etapy';

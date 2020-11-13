@@ -1,7 +1,8 @@
 <?php
 
-namespace common\models\issue;
+namespace backend\modules\issue\models\search;
 
+use common\models\issue\IssueType;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -23,7 +24,7 @@ class IssueTypeSearch extends IssueType {
 	/**
 	 * @inheritdoc
 	 */
-	public function scenarios() {
+	public function scenarios(): array {
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
 	}
@@ -35,7 +36,7 @@ class IssueTypeSearch extends IssueType {
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function search($params) {
+	public function search(array $params): ActiveDataProvider {
 		$query = IssueType::find();
 
 		// add conditions that should always apply here

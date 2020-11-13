@@ -3,9 +3,9 @@
 namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueNoteForm;
+use backend\modules\issue\models\search\IssueNoteSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
-use common\models\issue\IssueNoteSearch;
 use common\models\issue\Summon;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -21,7 +21,7 @@ class NoteController extends Controller {
 	/**
 	 * @inheritdoc
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
 				'class' => VerbFilter::class,

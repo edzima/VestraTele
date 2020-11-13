@@ -76,6 +76,12 @@ $requirements = [
 		'by' => 'All DB-related classes',
 	],
 	[
+		'name' => 'Decimal extension',
+		'mandatory' => true,
+		'condition' => extension_loaded('decimal'),
+		'by' => 'Required by decimals operations.'
+	],
+	[
 		'name' => 'PDO SQLite extension',
 		'mandatory' => false,
 		'condition' => extension_loaded('pdo_sqlite'),

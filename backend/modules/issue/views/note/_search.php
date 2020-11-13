@@ -1,10 +1,11 @@
 <?php
 
+use backend\modules\issue\models\search\IssueNoteSearch;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\IssueNoteSearch */
+/* @var $model IssueNoteSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 

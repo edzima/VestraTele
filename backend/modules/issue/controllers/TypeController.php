@@ -2,8 +2,8 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\modules\issue\models\search\IssueTypeSearch;
 use common\models\issue\IssueType;
-use common\models\issue\IssueTypeSearch;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;

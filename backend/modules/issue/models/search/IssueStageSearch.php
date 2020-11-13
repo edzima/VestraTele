@@ -1,7 +1,8 @@
 <?php
 
-namespace common\models\issue;
+namespace backend\modules\issue\models\search;
 
+use backend\modules\issue\models\IssueStage;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -13,7 +14,7 @@ class IssueStageSearch extends IssueStage {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			[['id', 'days_reminder'], 'integer'],
 			[['name', 'short_name'], 'safe'],
@@ -23,7 +24,7 @@ class IssueStageSearch extends IssueStage {
 	/**
 	 * @inheritdoc
 	 */
-	public function scenarios() {
+	public function scenarios(): array {
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
 	}
@@ -35,7 +36,7 @@ class IssueStageSearch extends IssueStage {
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function search($params) {
+	public function search(array $params): ActiveDataProvider {
 		$query = IssueStage::find();
 
 		// add conditions that should always apply here

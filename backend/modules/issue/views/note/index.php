@@ -1,10 +1,11 @@
 <?php
 
+use backend\modules\issue\models\search\IssueNoteSearch;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel common\models\issue\IssueNoteSearch */
+/* @var $searchModel IssueNoteSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Notatki';
