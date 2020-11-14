@@ -45,7 +45,12 @@ class IssueSearch extends BaseIssueSearch {
 			'query' => $query,
 			'key' => 'issue_id',
 			'sort' => [
-				'defaultOrder' => 'issue.updated_at DESC',
+				'attributes' => [
+					'issue_id',
+					'issue.created_at',
+					'issue.updated_at',
+				],
+				'defaultOrder' => ['issue.updated_at' => SORT_DESC],
 			],
 		]);
 
