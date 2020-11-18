@@ -2,8 +2,8 @@
 
 namespace backend\tests\functional\issue;
 
-use backend\tests\fixtures\IssueFixtureHelper;
 use backend\tests\Step\Functional\CostIssueManager;
+use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueCost;
 
@@ -41,6 +41,12 @@ class IssueCostCreateCest {
 		$I->fillField('VAT (%)', 23);
 		$I->click('Save');
 		$I->seeLink('Update');
+		$I->seeRecord(IssueCost::class, [
+			'type' => IssueCost::TYPE_PURCHASE_OF_RECEIVABLES,
+			'value' => 100,
+			'vat' => 23,
+		]);
+
 		$I->seeLink('Delete');
 	}
 

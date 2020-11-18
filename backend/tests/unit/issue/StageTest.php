@@ -4,6 +4,7 @@ namespace backend\tests\unit\issue;
 
 use backend\modules\issue\models\IssueStage;
 use backend\tests\unit\Unit;
+use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\issue\StageFixture;
 use common\fixtures\issue\StageTypesFixtures;
 use common\fixtures\issue\TypeFixture;
@@ -15,33 +16,33 @@ class StageTest extends Unit {
 		$this->tester->haveFixtures([
 			'stage-types' => [
 				'class' => StageTypesFixtures::class,
-				'dataFile' => codecept_data_dir() . 'issue/stage_types.php',
+				'dataFile' => IssueFixtureHelper::dataDir() . 'issue/stage_types.php',
 
 			],
 			'stage' => [
 				'class' => StageFixture::class,
-				'dataFile' => codecept_data_dir() . 'issue/stage.php',
+				'dataFile' => IssueFixtureHelper::dataDir() . 'issue/stage.php',
 			],
 			'type' => [
 				'class' => TypeFixture::class,
-				'dataFile' => codecept_data_dir() . 'issue/type.php',
+				'dataFile' => IssueFixtureHelper::dataDir() . 'issue/type.php',
 			],
 		]);
 	}
 
-	public function testDuplicateName():void {
+	public function testDuplicateName(): void {
 		$model = new IssueStage(['name' => 'Completing documents']);
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('Name "Completing documents" has already been taken.', $model->getFirstError('name'));
 	}
 
-	public function testDuplicateShortName():void {
+	public function testDuplicateShortName(): void {
 		$model = new IssueStage(['name' => 'Completing', 'short_name' => 'CD']);
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('Shortname "CD" has already been taken.', $model->getFirstError('short_name'));
 	}
 
-	public function testEmpty():void {
+	public function testEmpty(): void {
 		$model = new IssueStage();
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('Name cannot be blank.', $model->getFirstError('name'));
@@ -49,7 +50,7 @@ class StageTest extends Unit {
 		$this->tester->assertSame('Types cannot be blank.', $model->getFirstError('typesIds'));
 	}
 
-	public function testEmptyTypes():void {
+	public function testEmptyTypes(): void {
 		$model = new IssueStage([
 			'name' => 'Some name',
 			'short_name' => 'SN',
@@ -60,7 +61,7 @@ class StageTest extends Unit {
 		$this->tester->assertSame('Types cannot be blank.', $model->getFirstError('typesIds'));
 	}
 
-	public function testInvalidTypes():void {
+	public function testInvalidTypes(): void {
 		$model = new IssueStage([
 			'name' => 'Some name',
 			'short_name' => 'SN',
@@ -72,7 +73,7 @@ class StageTest extends Unit {
 		$this->tester->assertSame('Types is invalid.', $model->getFirstError('typesIds'));
 	}
 
-	public function testCorrectCreate():void {
+	public function testCorrectCreate(): void {
 		$model = new IssueStage([
 			'name' => 'Some name',
 			'short_name' => 'SN',

@@ -41,6 +41,7 @@ class LoginCest {
 
 	public function loginUserWithPermission(FunctionalTester $I) {
 		$user = $I->grabFixture('user', 0);
+		Yii::$app->authManager->revokeAll($user->id);
 		Yii::$app->authManager->assign(Yii::$app->authManager->getPermission('loginToBackend'), $user->id);
 		$I->amOnPage('/site/login');
 		$I->fillField('Username', 'erau');

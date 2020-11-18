@@ -3,8 +3,8 @@
 namespace backend\tests\unit\issue\search;
 
 use backend\modules\issue\models\search\IssueSearch;
-use backend\tests\fixtures\IssueFixtureHelper;
 use backend\tests\unit\Unit;
+use common\fixtures\helpers\IssueFixtureHelper;
 use yii\data\ActiveDataProvider;
 
 class IssueSearchTest extends Unit {
@@ -42,8 +42,8 @@ class IssueSearchTest extends Unit {
 	}
 
 	public function testForId(): void {
-		$this->assertTotalCount(0, ['id' => 200]);
-		$this->assertTotalCount(1, ['id' => 1]);
+		$this->assertTotalCount(0, ['issue_id' => 200]);
+		$this->assertTotalCount(1, ['issue_id' => 1]);
 	}
 
 	public function testForType(): void {
@@ -77,12 +77,15 @@ class IssueSearchTest extends Unit {
 		$this->assertTotalCount(1, ['tele_id' => 400]);
 	}
 
-	/** @todo fix few users types query */
-	/*
+	public function testCustomerWithAgent(): void {
+		$this->assertTotalCount(1, ['agent_id' => 300, 'customerLastname' => 'Lar']);
+	}
+
+
 	public function testForAgentAndLawyer(): void {
 		$this->assertTotalCount(1, ['agent_id' => 300, 'lawyer_id' => 200]);
 	}
-	*/
+
 
 	protected function assertTotalCount(int $count, array $params = []): void {
 		$this->tester->assertSame($count, $this->search($params)->getTotalCount());

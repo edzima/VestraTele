@@ -3,6 +3,7 @@
 namespace backend\tests\unit\issue;
 
 use backend\tests\unit\Unit;
+use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\issue\TypeFixture;
 use common\models\issue\IssueType;
 use common\models\issue\Provision;
@@ -14,7 +15,7 @@ class TypeTest extends Unit {
 		$this->tester->haveFixtures([
 			'type' => [
 				'class' => TypeFixture::class,
-				'dataFile' => codecept_data_dir() . 'issue/type.php',
+				'dataFile' => IssueFixtureHelper::dataDir(). 'issue/type.php',
 			],
 		]);
 	}

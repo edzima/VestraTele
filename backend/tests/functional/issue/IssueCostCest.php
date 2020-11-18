@@ -2,10 +2,10 @@
 
 namespace backend\tests\functional\issue;
 
-use backend\tests\fixtures\IssueFixtureHelper;
 use backend\tests\Step\Functional\CostIssueManager;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
+use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\issue\CostFixture;
 use common\models\issue\Issue;
 
@@ -82,7 +82,7 @@ class IssueCostCest {
 		$I->haveFixtures(array_merge(IssueFixtureHelper::fixtures(), [
 			'cost' => [
 				'class' => CostFixture::class,
-				'dataFile' => codecept_data_dir() . 'issue/cost.php',
+				'dataFile' => IssueFixtureHelper::dataDir(). 'issue/cost.php',
 			],
 		]));
 		$I->amOnPage([static::ROUTE_VIEW, 'id' => 1]);

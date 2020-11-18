@@ -3,8 +3,8 @@
 namespace backend\tests\unit\issue;
 
 use backend\modules\issue\models\IssueCostForm;
-use backend\tests\fixtures\IssueFixtureHelper;
 use backend\tests\unit\Unit;
+use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\issue\CostFixture;
 use common\models\issue\Issue;
 use common\models\issue\IssueCost;
@@ -18,7 +18,7 @@ class IssueCostFormTest extends Unit {
 				[
 					'cost' => [
 						'class' => CostFixture::class,
-						'dataFile' => codecept_data_dir() . 'issue/cost.php',
+						'dataFile' => IssueFixtureHelper::dataDir() . 'issue/cost.php',
 					],
 				]));
 	}

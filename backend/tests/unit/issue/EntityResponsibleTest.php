@@ -2,26 +2,24 @@
 
 namespace backend\tests\unit\issue;
 
+use backend\tests\unit\Unit;
+use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\issue\EntityResponsibleFixture;
 use common\models\entityResponsible\EntityResponsible;
 
-class EntityResponsibleTest extends \Codeception\Test\Unit {
+class EntityResponsibleTest extends Unit {
 
-	/**
-	 * @var \backend\tests\UnitTester
-	 */
-	protected $tester;
-
-	protected function _before() {
+	protected function _before(): void {
+		parent::_before();
 		$this->tester->haveFixtures([
 			'entity' => [
 				'class' => EntityResponsibleFixture::class,
-				'dataFile' => codecept_data_dir() . 'issue/entity_responsible.php',
+				'dataFile' => IssueFixtureHelper::dataDir() . 'issue/entity_responsible.php',
 			],
 		]);
 	}
 
-	public function testDuplicateName() {
+	public function testDuplicateName(): void {
 		$model = new EntityResponsible(['name' => 'Alianz']);
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('Name "Alianz" has already been taken.', $model->getFirstError('name'));

@@ -12,4 +12,8 @@ class IssueManager extends Manager {
 		];
 	}
 
+	public function assignArchivePermission(): void {
+		$this->assignPermission(User::PERMISSION_ARCHIVE);
+	}
+
 }

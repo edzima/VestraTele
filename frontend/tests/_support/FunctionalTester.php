@@ -2,6 +2,8 @@
 
 namespace frontend\tests;
 
+use common\tests\_support\UserRbacActor;
+
 /**
  * Inherited Methods
  * @method void wantToTest($text)
@@ -20,6 +22,7 @@ namespace frontend\tests;
 class FunctionalTester extends \Codeception\Actor {
 
 	use _generated\FunctionalTesterActions;
+	use UserRbacActor;
 
 	public function seeValidationError($message): void {
 		$this->see($message, '.help-block');
@@ -27,6 +30,14 @@ class FunctionalTester extends \Codeception\Actor {
 
 	public function dontSeeValidationError($message): void {
 		$this->dontSee($message, '.help-block');
+	}
+
+	public function seeMenuLink($link): void {
+		$this->see($link, '#main-nav li a');
+	}
+
+	public function dontSeeMenuLink($link): void {
+		$this->dontSee($link, '#main-nav li a');
 	}
 
 	public function seeInLoginUrl(): void {

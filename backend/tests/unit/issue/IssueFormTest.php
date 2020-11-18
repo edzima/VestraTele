@@ -4,8 +4,8 @@ namespace backend\tests\unit\issue;
 
 use backend\modules\issue\models\IssueForm;
 use backend\modules\issue\models\IssueStage;
-use backend\tests\fixtures\IssueFixtureHelper;
 use backend\tests\unit\Unit;
+use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\user\User;
@@ -87,6 +87,9 @@ class IssueFormTest extends Unit {
 		$issue = $this->tester->grabFixture('issue', 0);
 		$this->tester->assertNull($issue->stage_change_at);
 		$model = new IssueForm(['model' => $issue]);
+		codecept_debug($model->date);
+		$model->save();
+		codecept_debug($model->getErrors());
 		$this->tester->assertTrue($model->save());
 		$this->tester->assertSame(date('Y-m-d'), date('Y-m-d', strtotime($model->getModel()->stage_change_at)));
 	}
@@ -148,6 +151,10 @@ class IssueFormTest extends Unit {
 
 		if (!isset($attributes['entity_responsible_id'])) {
 			$attributes['entity_responsible_id'] = 1;
+		}
+
+		if (!isset($attributes['date'])) {
+			$attributes['date'] = date('Y-m-d');
 		}
 
 		return new IssueForm($attributes);

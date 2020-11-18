@@ -2,9 +2,9 @@
 
 namespace backend\tests\functional\user;
 
-use backend\tests\fixtures\IssueFixtureHelper;
 use backend\tests\FunctionalTester;
 use backend\tests\Step\Functional\Manager;
+use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\user\User;
 
 /**

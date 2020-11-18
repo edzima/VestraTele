@@ -3,8 +3,8 @@
 namespace backend\tests\unit\issue;
 
 use backend\modules\issue\models\IssueUserForm;
-use backend\tests\fixtures\IssueFixtureHelper;
 use backend\tests\unit\Unit;
+use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\user\Customer;

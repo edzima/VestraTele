@@ -56,7 +56,7 @@ class IssueForm extends Model {
 
 	public function rules(): array {
 		return [
-			[['agent_id', 'lawyer_id', 'type_id', 'stage_id', 'entity_responsible_id'], 'required'],
+			[['agent_id', 'lawyer_id', 'type_id', 'stage_id', 'entity_responsible_id', 'date'], 'required'],
 			[['agent_id', 'lawyer_id', 'tele_id', 'type_id', 'stage_id', 'entity_responsible_id'], 'integer'],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
 			[['stage_id'], 'filter', 'filter' => 'intval'],
@@ -70,8 +70,8 @@ class IssueForm extends Model {
 			[['details', 'signature_act'], 'string'],
 			['signature_act', 'string', 'max' => 30],
 			['signature_act', 'default', 'value' => null],
-			[['date', 'accident_at', 'stage_change_at'], 'date', 'format' => DATE_ATOM],
-			[['date', 'stage_change_at'], 'default', 'value' => date(DATE_ATOM)],
+			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
+			[['date', 'accident_at', 'stage_change_at'], 'date', 'format' => 'Y-m-d'],
 			[
 				'archives_nr',
 				'required',
@@ -151,7 +151,7 @@ class IssueForm extends Model {
 			$model->date = $this->date;
 			$model->accident_at = $this->accident_at;
 			if (isset($model->dirtyAttributes['stage_id']) && $model->stage_change_at !== $this->stage_change_at) {
-				$model->stage_change_at = date(DATE_ATOM);
+				$model->stage_change_at = date('Y-m-d');
 			} else {
 				$model->stage_change_at = $this->stage_change_at;
 			}
@@ -169,6 +169,9 @@ class IssueForm extends Model {
 
 			return true;
 		}
+		codecept_debug($this->getErrors());
+		codecept_debug($this->date);
+		codecept_debug($this->stage_change_at);
 		return false;
 	}
 

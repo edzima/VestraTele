@@ -4,8 +4,8 @@ namespace backend\tests\acceptance\issue;
 
 use backend\helpers\Url;
 use backend\tests\AcceptanceTester;
-use backend\tests\fixtures\IssueFixtureHelper;
 use backend\tests\Step\acceptance\IssueManager;
+use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\user\Customer;
 
 class IssueCreateCest {
