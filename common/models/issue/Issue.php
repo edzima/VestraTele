@@ -152,7 +152,7 @@ class Issue extends ActiveRecord {
 			'stage' => Yii::t('common', 'Stage'),
 			'type' => Yii::t('common', 'Type'),
 			'entity_responsible_id' => Yii::t('common', 'Entity responsible'),
-			'date' => Yii::t('common', 'Registration at'),
+			'date' => Yii::t('common', 'Signing at'),
 			'archives_nr' => Yii::t('common', 'Archives'),
 			'accident_at' => Yii::t('common', 'Accident date'),
 			'stage_change_at' => Yii::t('common', 'Stage date'),

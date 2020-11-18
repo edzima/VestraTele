@@ -192,5 +192,6 @@ return [
 	'justification of the judgment' => 'justification of the judgment',
 	'Przerwa techniczna' => 'Przerwa techniczna',
 	'Issues users' => 'Uczestnicy',
-	'Surname' => 'Nazwisko'
+	'Surname' => 'Nazwisko',
+	'Signing at' => 'Data podpisania umowy'
 ];

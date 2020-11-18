@@ -92,10 +92,10 @@ abstract class IssueSearch extends Model
 		$this->customerFilter($query);
 		$this->createdAtFilter($query);
 		$query->andFilterWhere([
-			'id' => $this->issue_id,
-			'stage_id' => $this->stage_id,
-			'type_id' => $this->type_id,
-			'entity_responsible_id' => $this->entity_responsible_id,
+			Issue::tableName() . '.id' => $this->issue_id,
+			Issue::tableName() . '.stage_id' => $this->stage_id,
+			Issue::tableName() . '.type_id' => $this->type_id,
+			Issue::tableName() . '.entity_responsible_id' => $this->entity_responsible_id,
 		]);
 	}
 
