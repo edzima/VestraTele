@@ -24,6 +24,7 @@ class TypeController extends Controller {
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'stages-list' => ['POST'],
 				],
 			],
 		];
@@ -105,12 +106,12 @@ class TypeController extends Controller {
 	}
 
 	public function actionStagesList(): array {
-		$params = Yii::$app->request->post('depdrop_all_params');
+		$params = Yii::$app->request->post('depdrop_parents');
 		if (empty($params)) {
 			throw new NotFoundHttpException('The requested page does not exist.');
 		}
 		Yii::$app->response->format = Response::FORMAT_JSON;
-		$id = (int) $params['issueform-type_id'];
+		$id = (int) reset($params);
 		$stages = $this->findModel($id)->stages;
 
 		return [
@@ -127,7 +128,7 @@ class TypeController extends Controller {
 	 * @return IssueType the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): IssueType {
+	protected function findModel(int $id): IssueType {
 		if (($model = IssueType::findOne($id)) !== null) {
 			return $model;
 		}

@@ -209,4 +209,17 @@ return [
 	'Care Age' => 'Care Age',
 	'Disabled stages' => 'Disabled stages',
 	'Create meet' => 'Dodaj spotkanie',
+	'Min count' => 'Minimalną ilość',
+	'Set min count' => 'Ustaw minimalną ilość',
+	'Min calculation count' => 'Minimalna ilość rozliczeń',
+	'Issues users' => 'Uczestnicy spraw',
+	'Set min calculation count' => 'Ustaw minimalną ilość',
+	'Settlement' => 'Rozliczenie',
+	'Create note' => 'Dodaj notatkę',
+	'Calculations min counts' => 'Minimalna ilość rozliczeń',
+	'Calculation to create' => 'Do założenia',
+	'Calculations' => '',
+	'Stage' => 'Etap',
+	'Settlements' => 'Rozliczenia',
+	'Create note {typeName} for: {issue}' => 'Dodaj notatkę {typeName} dla: {issue}'
 ];

@@ -336,6 +336,10 @@ class Issue extends ActiveRecord {
 		return $this->hasOne(IssueType::class, ['id' => 'type_id']);
 	}
 
+	public function getStageType() {
+		return $this->hasOne(StageType::class, ['type_id' => 'type_id', 'stage_id' => 'stage_id']);
+	}
+
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
@@ -456,7 +460,7 @@ class Issue extends ActiveRecord {
 		return $this->getUsers()->andWhere(['user_id' => $id])->exists();
 	}
 
-	public function isForAgents(array $ids):bool{
+	public function isForAgents(array $ids): bool {
 		return $this->getUsers()
 			->withType(IssueUser::TYPE_AGENT)
 			->andWhere(['user_id' => $ids])

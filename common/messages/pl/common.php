@@ -184,7 +184,7 @@ return [
 	'Updated At' => 'Updated At',
 	'handicapped' => 'Niepełnosrawny',
 	'Technical break' => 'Przerwa techniczna',
-	'Issue users' => 'Issue users',
+	'Issue users' => 'Uczestnicy',
 	'One field is required.' => 'One field is required.',
 	'Value with VAT' => 'Value with VAT',
 	'City is required when empty postal code and info.' => 'City is required when empty postal code and info.',
@@ -193,5 +193,5 @@ return [
 	'Przerwa techniczna' => 'Przerwa techniczna',
 	'Issues users' => 'Uczestnicy',
 	'Surname' => 'Nazwisko',
-	'Signing at' => 'Data podpisania umowy'
+	'Signing at' => 'Data podpisania umowy',
 ];

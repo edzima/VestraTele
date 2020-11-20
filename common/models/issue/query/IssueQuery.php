@@ -47,7 +47,7 @@ class IssueQuery extends ActiveQuery {
 	}
 
 	public function withoutArchives(): self {
-		$this->andWhere(['not', ['stage_id' => IssueStage::ARCHIVES_ID]]);
+		$this->andWhere(['not', ['issue.stage_id' => IssueStage::ARCHIVES_ID]]);
 		return $this;
 	}
 
