@@ -1,6 +1,6 @@
 <?php
 
-namespace common\modules\issue\widgets;
+namespace common\widgets\grid;
 
 use kartik\grid\DataColumn;
 use Yii;

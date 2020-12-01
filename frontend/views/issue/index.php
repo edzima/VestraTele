@@ -1,7 +1,7 @@
 <?php
 
 use common\models\issue\IssueUser;
-use common\models\user\Customer;
+use common\widgets\grid\CustomerDataColumn;
 use frontend\models\search\IssueSearch;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
@@ -108,10 +108,8 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 			],
 			[
-				'class' => DataColumn::class,
-				'attribute' => 'customerLastname',
+				'class' => CustomerDataColumn::class,
 				'value' => 'issue.customer.fullName',
-				'label' => Customer::getRolesNames()[Customer::ROLE_CUSTOMER],
 			],
 			[
 				'class' => DataColumn::class,

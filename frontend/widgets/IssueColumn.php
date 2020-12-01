@@ -2,7 +2,7 @@
 
 namespace frontend\widgets;
 
-use common\modules\issue\widgets\IssueColumn as BaseIssueColumn;
+use common\widgets\grid\IssueColumn as BaseIssueColumn;
 
 class IssueColumn extends BaseIssueColumn {
 
