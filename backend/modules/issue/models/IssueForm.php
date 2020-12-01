@@ -28,7 +28,7 @@ class IssueForm extends Model {
 	public ?int $type_id = null;
 	public ?int $stage_id = null;
 	public ?int $entity_responsible_id = null;
-	public ?string $date = null;
+	public ?string $signing_at = null;
 	public ?string $accident_at = null;
 	public ?string $stage_change_at = null;
 	public ?string $archives_nr = null;
@@ -56,7 +56,7 @@ class IssueForm extends Model {
 
 	public function rules(): array {
 		return [
-			[['agent_id', 'lawyer_id', 'type_id', 'stage_id', 'entity_responsible_id', 'date'], 'required'],
+			[['agent_id', 'lawyer_id', 'type_id', 'stage_id', 'entity_responsible_id', 'signing_at'], 'required'],
 			[['agent_id', 'lawyer_id', 'tele_id', 'type_id', 'stage_id', 'entity_responsible_id'], 'integer'],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
 			[['stage_id'], 'filter', 'filter' => 'intval'],
@@ -71,7 +71,7 @@ class IssueForm extends Model {
 			['signature_act', 'string', 'max' => 30],
 			['signature_act', 'default', 'value' => null],
 			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
-			[['date', 'accident_at', 'stage_change_at'], 'date', 'format' => 'Y-m-d'],
+			[['signing_at', 'accident_at', 'stage_change_at'], 'date', 'format' => 'Y-m-d'],
 			[
 				'archives_nr',
 				'required',
@@ -126,7 +126,7 @@ class IssueForm extends Model {
 		$this->customer = Customer::fromUser($model->customer);
 		$this->entity_responsible_id = $model->entity_responsible_id;
 		$this->details = $model->details;
-		$this->date = $model->date;
+		$this->signing_at = $model->signing_at;
 		$this->accident_at = $model->accident_at;
 		$this->stage_change_at = $model->stage_change_at;
 	}
@@ -148,7 +148,7 @@ class IssueForm extends Model {
 			$model->details = $this->details;
 			$model->stage_change_at = $this->stage_change_at;
 			$model->entity_responsible_id = $this->entity_responsible_id;
-			$model->date = $this->date;
+			$model->signing_at = $this->signing_at;
 			$model->accident_at = $this->accident_at;
 			if (isset($model->dirtyAttributes['stage_id']) && $model->stage_change_at !== $this->stage_change_at) {
 				$model->stage_change_at = date('Y-m-d');
@@ -170,8 +170,6 @@ class IssueForm extends Model {
 			return true;
 		}
 		codecept_debug($this->getErrors());
-		codecept_debug($this->date);
-		codecept_debug($this->stage_change_at);
 		return false;
 	}
 

@@ -128,7 +128,7 @@ if ($provision) {
 					],
 					'created_at:date',
 					'updated_at:date',
-					'date:date',
+					'signing_at:date',
 					[
 						'attribute' => 'accident_at',
 						'format' => 'date',

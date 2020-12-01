@@ -30,7 +30,6 @@ use yii\db\Expression;
  * @property int $id
  * @property string $created_at
  * @property string $updated_at
- * @property string $date
  * @property int $agent_id
  * @property string $client_first_name
  * @property string $client_surname
@@ -59,8 +58,9 @@ use yii\db\Expression;
  * @property string $archives_nr
  * @property int $lawyer_id
  * @property int $tele_id
- * @property string $accident_at
  * @property bool $payed
+ * @property string|null $signing_at
+ * @property string|null $accident_at
  * @property string $stage_change_at
  * @property string|null $signature_act
  *
@@ -124,7 +124,7 @@ class Issue extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['created_at', 'updated_at'], 'safe'],
-			[['stage_id', 'type_id', 'entity_responsible_id', 'date',], 'required',],
+			[['stage_id', 'type_id', 'entity_responsible_id',], 'required',],
 			[['stage_id', 'type_id', 'entity_responsible_id'], 'integer'],
 			[['details', 'signature_act'], 'string'],
 			['archives_nr', 'unique'],
@@ -152,7 +152,7 @@ class Issue extends ActiveRecord {
 			'stage' => Yii::t('common', 'Stage'),
 			'type' => Yii::t('common', 'Type'),
 			'entity_responsible_id' => Yii::t('common', 'Entity responsible'),
-			'date' => Yii::t('common', 'Signing at'),
+			'signing_at' => Yii::t('common', 'Signing at'),
 			'archives_nr' => Yii::t('common', 'Archives'),
 			'accident_at' => Yii::t('common', 'Accident date'),
 			'stage_change_at' => Yii::t('common', 'Stage date'),

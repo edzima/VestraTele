@@ -88,7 +88,7 @@ use yii\widgets\ActiveForm;
 			<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-2']])
 				->textInput() ?>
 
-			<?= $form->field($model, 'date', ['options' => ['class' => 'col-md-2']])
+			<?= $form->field($model, 'signing_at', ['options' => ['class' => 'col-md-2']])
 				->widget(DateTimeWidget::class,
 					[
 						'phpDatetimeFormat' => 'yyyy-MM-dd',
