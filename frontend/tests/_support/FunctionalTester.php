@@ -40,6 +40,15 @@ class FunctionalTester extends \Codeception\Actor {
 		$this->dontSee($link, '#main-nav li a');
 	}
 
+
+	public function seeInGridHeader($text, string $selector = null): void {
+		if ($selector === null) {
+			$selector = '.grid-view';
+		}
+		$selector .= ' th';
+		$this->see($text, $selector);
+	}
+
 	public function seeInLoginUrl(): void {
 		$this->seeInCurrentUrl('site/login');
 	}

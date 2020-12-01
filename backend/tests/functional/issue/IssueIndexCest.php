@@ -2,6 +2,7 @@
 
 namespace backend\tests\functional\issue;
 
+use backend\tests\_support\Step\Functional\ExportIssueManager;
 use backend\tests\Step\Functional\Admin;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
@@ -26,6 +27,13 @@ class IssueIndexCest {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE);
 		$I->see('Issues', 'h1');
+		$I->dontSeeLink('Export');
+	}
+
+	public function checkIndexAsExportIssueManager(ExportIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE);
+		$I->seeLink('Export');
 	}
 
 	public function checkSearchFields(IssueManager $I): void {

@@ -52,13 +52,13 @@ class IssueSearchTest extends Unit {
 	}
 
 	public function testForStage(): void {
-		$this->assertTotalCount(2, ['stage_id' => 1]);
+		$this->assertTotalCount(1, ['stage_id' => 1]);
 		$this->assertTotalCount(2, ['stage_id' => 2]);
 	}
 
 	public function testExcludedStages(): void {
 		$this->assertTotalCount(2, ['excludedStages' => [2]]);
-		$this->assertTotalCount(2, ['excludedStages' => [1]]);
+		$this->assertTotalCount(3, ['excludedStages' => [1]]);
 	}
 
 	public function testCustomerLastname(): void {

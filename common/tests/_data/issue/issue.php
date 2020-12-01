@@ -23,11 +23,11 @@ return [
 	],
 	[
 		'type_id' => 2,
-		'stage_id' => 1,
+		'stage_id' => IssueStage::POSITIVE_DECISION_ID,
 		'entity_responsible_id' => 2,
 		'signing_at' => '2020-01-02',
 	],
-	'archived' =>[
+	'archived' => [
 		'type_id' => 1,
 		'stage_id' => IssueStage::ARCHIVES_ID,
 		'entity_responsible_id' => 1,

@@ -87,6 +87,26 @@ class IssueUserFormTest extends Unit {
 		$this->tester->assertSame('Issue cannot be blank.', $model->getFirstError('issue_id'));
 	}
 
+	public function testLinkToMoreIssueAsSameType(): void {
+		$model = new IssueUserForm();
+		$model->setIssue($this->grabIssue(0));
+		$model->user_id = 101;
+		$model->type =IssueUser::TYPE_HANDICAPPED;
+		$this->tester->assertTrue($model->save());
+		$this->tester->seeRecord(IssueUser::class, [
+			'user_id' => 101,
+			'issue_id' => $model->getIssue()->id,
+			'type' => IssueUser::TYPE_HANDICAPPED,
+		]);
+		$model->setIssue($this->grabIssue(1));
+		$this->tester->assertTrue($model->save());
+		$this->tester->seeRecord(IssueUser::class, [
+			'user_id' => 101,
+			'issue_id' => $model->getIssue()->id,
+			'type' => IssueUser::TYPE_HANDICAPPED,
+		]);
+	}
+
 	protected function grabIssue(int $fixtureId): ?Issue {
 		return $this->tester->grabFixture('issue', $fixtureId);
 	}

@@ -8,6 +8,8 @@ use common\fixtures\issue\IssueUserFixture;
 use common\fixtures\issue\StageFixture;
 use common\fixtures\issue\StageTypesFixtures;
 use common\fixtures\issue\TypeFixture;
+use common\fixtures\settlement\CalculationFixture;
+use common\fixtures\settlement\PayFixture;
 use common\fixtures\user\AgentFixture;
 use common\fixtures\user\CustomerFixture;
 use common\fixtures\user\LawyerFixture;
@@ -18,13 +20,17 @@ use Yii;
 
 class IssueFixtureHelper {
 
+	public const CALCULATION = 'calculation';
+	public const PAY = 'pay';
+	public const ISSUE = 'issue';
+
 	public static function dataDir(): string {
 		return Yii::getAlias('@common/tests/_data/');
 	}
 
 	public static function fixtures(): array {
-		return [
-			'issue' => [
+		return array_merge([
+			static::ISSUE => [
 				'class' => IssueFixture::class,
 				'dataFile' => static::dataDir() . 'issue/issue.php',
 			],
@@ -56,23 +62,11 @@ class IssueFixtureHelper {
 				'dataFile' => static::dataDir() . 'user/telemarketer.php',
 				'permissions' => [User::PERMISSION_ISSUE],
 			],
-			'stage' => [
-				'class' => StageFixture::class,
-				'dataFile' => static::dataDir() . 'issue/stage.php',
-			],
-			'type' => [
-				'class' => TypeFixture::class,
-				'dataFile' => static::dataDir() . 'issue/type.php',
-			],
-			'stage-types' => [
-				'class' => StageTypesFixtures::class,
-				'dataFile' => static::dataDir() . 'issue/stage_types.php',
-			],
 			'entity' => [
 				'class' => EntityResponsibleFixture::class,
 				'dataFile' => static::dataDir() . 'issue/entity_responsible.php',
 			],
-		];
+		], static::stageAndTypesFixtures());
 	}
 
 	public static function stageAndTypesFixtures(): array {
@@ -91,4 +85,18 @@ class IssueFixtureHelper {
 			],
 		];
 	}
+
+	public static function settlements(): array {
+		return [
+			static::CALCULATION => [
+				'class' => CalculationFixture::class,
+				'dataFile' => static::dataDir() . 'settlement/calculation.php',
+			],
+			static::PAY => [
+				'class' => PayFixture::class,
+				'dataFile' => static::dataDir() . 'settlement/pay.php',
+			],
+		];
+	}
+
 }

@@ -12,6 +12,10 @@ class IssueManager extends Manager {
 		];
 	}
 
+	public function assignNotePermission(): void {
+		$this->assignPermission(User::PERMISSION_NOTE);
+	}
+
 	public function assignArchivePermission(): void {
 		$this->assignPermission(User::PERMISSION_ARCHIVE);
 	}

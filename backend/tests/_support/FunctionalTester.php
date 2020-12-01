@@ -36,6 +36,10 @@ class FunctionalTester extends \Codeception\Actor {
 		$this->dontSee($message, '.help-block');
 	}
 
+	public function clickMenuLink($text): void {
+		$this->click($text, '.main-sidebar li a');
+	}
+
 	public function seeMenuLink($text): void {
 		$this->see($text, '.main-sidebar li a');
 	}
@@ -52,4 +56,11 @@ class FunctionalTester extends \Codeception\Actor {
 		$this->see($text, $selector);
 	}
 
+	public function seeFlash(string $text, string $type): void {
+		$this->see($text, '.alert.alert-' . $type);
+	}
+
+	public function dontSeeFlash(string $text, string $type): void {
+		$this->dontSee($text, '.alert.alert-' . $type);
+	}
 }
