@@ -8,12 +8,12 @@ use common\models\issue\query\IssueQuery;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionQuery;
 use common\models\settlement\PayInterface;
-use common\models\user\query\UserQuery;
 use common\models\user\User;
 use DateTime;
 use Decimal\Decimal;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
@@ -116,7 +116,9 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface {
 			'typeName' => Yii::t('common', 'Type'),
 			'details' => Yii::t('common', 'Details'),
 			'providerName' => Yii::t('settlement', 'Provider name'),
+			'problemStatusName' => Yii::t('settlement', 'Problem'),
 			'owner_id' => Yii::t('common', 'Owner'),
+			'owner' => Yii::t('common', 'Owner'),
 		];
 	}
 
@@ -136,8 +138,8 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface {
 		return new DateTime($this->payment_at);
 	}
 
-	public function getOwner(): UserQuery {
-		return $this->hasOne(UserQuery::class, ['id' => 'owner_id']);
+	public function getOwner(): ActiveQuery {
+		return $this->hasOne(User::class, ['id' => 'owner_id']);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
@@ -185,6 +187,14 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface {
 			static::PROVIDER_CLIENT => $this->issue->customer->getFullName(),
 			static::PROVIDER_RESPONSIBLE_ENTITY => $this->issue->entityResponsible,
 		];
+	}
+
+	public function hasProblemStatus(): bool {
+		return !empty($this->problem_status);
+	}
+
+	public function hasPays(): bool {
+		return $this->getPaysCount() > 0;
 	}
 
 	public function getProblemStatusName(): ?string {

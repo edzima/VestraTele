@@ -101,6 +101,10 @@ class SettlementProvisionsForm extends Model {
 		return $this->getIssue()->lawyer;
 	}
 
+	public function getModel(): IssuePayCalculation {
+		return $this->model;
+	}
+
 	public function getIssue(): Issue {
 		return $this->model->issue;
 	}

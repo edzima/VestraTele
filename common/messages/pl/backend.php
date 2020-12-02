@@ -247,5 +247,6 @@ return [
 	'Set problem status for calculation: {id}' => 'Ustal problem: {id}',
 	'Issue' => 'Sprawa',
 	'Without provisions' => 'Bez prowizji',
-	'Set provisions for settlement' => 'Ustal prowizje dla rozliczenia'
+	'Set provisions for settlement' => 'Ustal prowizje dla rozliczenia',
+	'Set provisions for settlement: {type}' => 'Ustal prowizje dla rozliczenia: {type}'
 ];

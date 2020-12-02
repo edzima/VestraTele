@@ -27,17 +27,27 @@ YiiAsset::register($this);
 
 	<p>
 		<?= Yii::$app->user->can(User::PERMISSION_CALCULATION)
-			? Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) : '' ?>
+			? Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
+			: '' ?>
 
-		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
-			? Html::a(Yii::t('backend', 'Provisions'), ['/provision/settlement/set', 'id' => $model->id], ['class' => 'btn btn-warning']) : '' ?>
+		<?= !$model->isPayed() && Yii::$app->user->can(User::PERMISSION_CALCULATION)
+			? Html::a(Yii::t('backend', 'Set problem status'), ['problem-status', 'id' => $model->id], ['class' => 'btn btn-warning'])
+			: '' ?>
 
 		<?= !$model->isPayed() && Yii::$app->user->can(User::PERMISSION_PAY)
 			? Html::a(Yii::t('backend', 'Generate pays'), ['pays', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: '' ?>
+
+
+		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) && $model->hasPays()
+			? Html::a(Yii::t('backend', 'Provisions'), ['/provision/settlement/set', 'id' => $model->id], ['class' => 'btn btn-warning'])
+			: '' ?>
+
+
 		<?= Html::a('Notatka', ['note/create', 'issueId' => $model->issue_id, 'type' => IssueNote::TYPE_PAY], [
 			'class' => 'btn btn-success',
 		]) ?>
+
 
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger pull-right',
@@ -58,6 +68,11 @@ YiiAsset::register($this);
 				'label' => 'Sprawa',
 			],
 			'providerName',
+			'owner',
+			[
+				'attribute' => 'problemStatusName',
+				'visible' => $model->hasProblemStatus(),
+			],
 			'value:currency',
 			[
 				'attribute' => 'valueToPay',
