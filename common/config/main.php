@@ -2,6 +2,7 @@
 
 use common\components\DbManager;
 use common\components\keyStorage\KeyStorage;
+use common\components\PayComponent;
 use common\components\Provisions;
 use common\components\TaxComponent;
 use common\formatters\Formatter;
@@ -109,6 +110,9 @@ return [
 		],
 		'cache' => [
 			'class' => YII_ENV_DEV ? DummyCache::class : FileCache::class,
+		],
+		'pay' => [
+			'class' => PayComponent::class,
 		],
 		'provisions' => [
 			'class' => Provisions::class,

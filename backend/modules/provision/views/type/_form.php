@@ -12,7 +12,10 @@ use yii\widgets\ActiveForm;
 
 <div class="provision-type-form">
 
-	<?php $form = ActiveForm::begin(); ?>
+	<?php $form = ActiveForm::begin([
+			'id' => 'provision-type-form',
+		]
+	); ?>
 
 	<div class="row">
 
@@ -36,15 +39,23 @@ use yii\widgets\ActiveForm;
 	</div>
 	<div class="row">
 
-		<?= $form->field($model, 'rolesIds', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+		<?= $form->field($model, 'roles', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
 			'data' => ProvisionTypeForm::getRolesNames(),
 			'options' => [
 				'multiple' => true,
 			],
 		]) ?>
 
-		<?= $form->field($model, 'typesIds', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
-			'data' => ProvisionTypeForm::getTypesNames(),
+		<?= $form->field($model, 'issueTypesIds', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+			'data' => ProvisionTypeForm::getIssueTypesNames(),
+			'options' => [
+				'multiple' => true,
+			],
+		]) ?>
+
+
+		<?= $form->field($model, 'calculationTypes', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+			'data' => ProvisionTypeForm::getCalculationTypesNames(),
 			'options' => [
 				'multiple' => true,
 			],
@@ -60,12 +71,12 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'is_default', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 	</div>
+
+
+	<div class="form-group">
+		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>
+	</div>
+
+	<?php ActiveForm::end(); ?>
+
 </div>
-
-
-<div class="form-group">
-	<?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
-</div>
-
-<?php ActiveForm::end(); ?>
-

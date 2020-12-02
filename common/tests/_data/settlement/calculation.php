@@ -1,0 +1,30 @@
+<?php
+
+use common\models\issue\IssuePayCalculation;
+
+return [
+	'not-payed' => [
+		'issue_id' => 1,
+		'value' => 1230,
+		'type' => IssuePayCalculation::TYPE_ADMINISTRATIVE,
+		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
+		'provider_id' => 200,
+		'owner_id' => 300,
+	],
+	'payed' => [
+		'issue_id' => 2,
+		'value' => 1230,
+		'type' => IssuePayCalculation::TYPE_ADMINISTRATIVE,
+		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
+		'provider_id' => 200,
+		'owner_id' => 300,
+	],
+	'many-pays' => [
+		'issue_id' => 1,
+		'value' => 1230,
+		'type' => IssuePayCalculation::TYPE_PROVISION,
+		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
+		'provider_id' => 200,
+		'owner_id' => 300,
+	],
+];

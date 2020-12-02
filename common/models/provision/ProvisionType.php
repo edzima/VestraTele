@@ -26,6 +26,7 @@ class ProvisionType extends ActiveRecord {
 
 	private const KEY_DATA_ROLES = 'roles';
 	private const KEY_DATA_TYPES = 'types';
+	private const KEY_DATA_CALCULATION_TYPES = 'calculation.types';
 
 	public function __toString() {
 		return $this->name . ' ' . $this->getFormattedValue();
@@ -49,19 +50,17 @@ class ProvisionType extends ActiveRecord {
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'name' => 'Nazwa',
-			'date_from' => 'Od',
-			'date_to' => 'Do',
-			'only_with_tele' => 'Tylko z tele',
-			'is_default' => 'Domyślna',
-			'value' => 'Prowizja',
-			'is_percentage' => 'Procentowa',
-			'rolesNames' => 'Użytkownicy',
-			'typesNames' => 'Typy spraw',
+			'name' => Yii::t('common', 'Name'),
+			'date_from' => Yii::t('common', 'Date from'),
+			'date_to' => Yii::t('common', 'Date to'),
+			'only_with_tele' => Yii::t('common', 'Only with telemarketer'),
+			'is_default' => Yii::t('common', 'Is default'),
+			'value' => Yii::t('common', 'Provision value'),
+			'is_percentage' => Yii::t('common', 'Is percentage'),
+			'rolesNames' => Yii::t('common', 'Roles'),
+			'typesNames' => Yii::t('common', 'Issue types'),
 		];
 	}
-
-
 
 	/**
 	 * @return \yii\db\ActiveQuery
@@ -78,12 +77,20 @@ class ProvisionType extends ActiveRecord {
 		return $this->getDataArray()[static::KEY_DATA_ROLES] ?? [];
 	}
 
-	public function getTypesIds(): array {
+	public function getIssueTypesIds(): array {
 		return $this->getDataArray()[static::KEY_DATA_TYPES] ?? [];
 	}
 
-	public function setTypesIds(array $ids): void {
+	public function setIssueTypesIds(array $ids): void {
 		$this->setDataValues(static::KEY_DATA_TYPES, $ids);
+	}
+
+	public function getCalculationTypes(): array {
+		return $this->getDataArray()[static::KEY_DATA_CALCULATION_TYPES] ?? [];
+	}
+
+	public function setCalculationTypes(array $types): void {
+		$this->setDataValues(static::KEY_DATA_CALCULATION_TYPES, $types);
 	}
 
 	private function setDataValues(string $key, $values): void {
@@ -122,30 +129,44 @@ class ProvisionType extends ActiveRecord {
 		return Yii::$app->formatter->asCurrency($value);
 	}
 
-	public function getTypesNames(): string {
-		$types = $this->getTypesIds();
-		if (empty($types)) {
-			return 'Wszystkie';
+
+	public function getCalculationTypesNames(): string {
+		$calculationTypes= $this->getCalculationTypes();
+		if (empty($calculationTypes)) {
+			return Yii::t('common', 'All');
 		}
-		$typesNames = ProvisionTypeForm::getTypesNames();
+		$allNames = ProvisionTypeForm::getCalculationTypesNames();
+		$names = [];
+		foreach ($allNames as $name) {
+			$names[] = $allNames[$name];
+		}
+		return implode(', ', $names);
+	}
+
+	public function getIssueTypesNames(): string {
+		$types = $this->getIssueTypesIds();
+		if (empty($types)) {
+			return Yii::t('common', 'All');
+		}
+		$typesNames = ProvisionTypeForm::getIssueTypesNames();
 		$names = [];
 		foreach ($types as $id) {
 			$names[] = $typesNames[$id];
 		}
-		return implode(' ,', $names);
+		return implode(', ', $names);
 	}
 
 	public function getRolesNames(): string {
 		$roles = $this->getRoles();
 		if (empty($roles)) {
-			return 'Wszyscy';
+			return Yii::t('common', 'All');
 		}
 		$rolesNames = ProvisionTypeForm::getRolesNames();
 		$names = [];
 		foreach ($roles as $role) {
 			$names[] = $rolesNames[$role];
 		}
-		return implode(' ,', $names);
+		return implode(', ', $names);
 	}
 
 	/**

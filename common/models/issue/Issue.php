@@ -157,6 +157,7 @@ class Issue extends ActiveRecord {
 			'accident_at' => Yii::t('common', 'Accident date'),
 			'stage_change_at' => Yii::t('common', 'Stage date'),
 			'signature_act' => Yii::t('common', 'Signature act'),
+			'customer' => IssueUser::getTypesNames()[IssueUser::TYPE_CUSTOMER],
 		];
 	}
 
@@ -361,8 +362,11 @@ class Issue extends ActiveRecord {
 
 	public function getPays(): IssuePayQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		return $this->hasMany(IssuePay::class, ['issue_id' => 'id'])
-			->orderBy(IssuePay::tableName() . '.deadline_at ASC, ' . IssuePay::tableName() . '.pay_at DESC');
+		//@todo check when directly get pays.
+		// ->orderBy(IssuePay::tableName() . '.deadline_at ASC, ' . IssuePay::tableName() . '.pay_at DESC');
+
+		return $this->hasMany(IssuePay::class, ['calculation_id' => 'id'])
+			->via('payCalculations');
 	}
 
 	public function isArchived(): bool {

@@ -1,6 +1,6 @@
 <?php
 
-use common\models\issue\IssuePay;
+use common\models\settlement\PayInterface;
 use common\modules\issue\widgets\IssuePaysWidget;
 use kartik\grid\GridView;
 use yii\bootstrap\Html;
@@ -8,7 +8,7 @@ use yii\data\ActiveDataProvider;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $models IssuePay[] */
+/* @var $models PayInterface[] */
 /* @var $notesOptions array */
 /* @var $widget IssuePaysWidget */
 /* @var $withProvisions bool */
@@ -21,6 +21,8 @@ use yii\widgets\DetailView;
 			<i class="glyphicon glyphicon-chevron-down"></i></button>
 	</legend>
 	<div id="pays-details">
+
+
 		<?php foreach ($models as $key => $pay): ?>
 			<fieldset>
 				<div class="pay-wrapper border <?= $pay->isPayed() ? 'border-green' : 'border-red' ?>">
@@ -29,7 +31,7 @@ use yii\widgets\DetailView;
 					<legend>Wpłata <?= count($models) > 1 ? $key + 1 : '' ?></legend>
 					<p>
 						<?= $widget->editPayBtn ? Html::a($pay->isPayed() ? 'Edytuj' : 'Opłać',
-							['/issue/pay/pay', 'id' => $pay->id], [
+							['/settlement/pay/pay', 'id' => $pay->id], [
 								'class' => 'btn btn-primary',
 							]) : '' ?>
 					</p>
@@ -39,17 +41,24 @@ use yii\widgets\DetailView;
 							'class' => 'table table-striped table-bordered detail-view th-nowrap',
 						],
 						'attributes' => [
-							'pay_at:date',
-							'deadline_at:date',
+							[
+								'attribute' => 'payment_at',
+								'format' => 'date',
+								'visible' => $pay->isPayed(),
+							],
+							[
+								'attribute' => 'deadline_at',
+								'format' => 'date',
+								'visible' => !$pay->isPayed(),
+							],
 							[
 								'attribute' => 'transferTypeName',
 								'label' => 'Płatność',
 								'format' => 'raw',
 							],
-							'value:currency',
+							'valueWithVAT:currency:Honorarium (Brutto)',
+							'valueVAT:currency:VAT(%)',
 							'valueNetto:currency',
-							'vatPercent:percent',
-
 						],
 
 					]) ?>
@@ -74,5 +83,6 @@ use yii\widgets\DetailView;
 				</div>
 			</fieldset>
 		<?php endforeach; ?>
+
 	</div>
 </fieldset>

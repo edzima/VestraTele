@@ -3,6 +3,7 @@
 namespace common\models\provision;
 
 use common\models\user\Worker;
+use Decimal\Decimal;
 use yii\db\ActiveRecord;
 
 /**
@@ -92,6 +93,10 @@ class ProvisionUser extends ActiveRecord {
 
 	public function getFormattedValue(): string {
 		return $this->type->getFormattedValue($this->value);
+	}
+
+	public function getValue(): Decimal {
+		return new Decimal($this->value);
 	}
 
 	public static function find(): ProvisionUserQuery {

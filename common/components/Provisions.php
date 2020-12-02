@@ -8,6 +8,7 @@ use common\models\provision\Provision;
 use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionUser;
 use common\models\user\Worker;
+use Decimal\Decimal;
 use Yii;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
@@ -32,6 +33,12 @@ class Provisions extends Component {
 
 	public function removeForIssue(Issue $issue): void {
 		Provision::deleteAll(['pay_id' => ArrayHelper::getColumn($issue->pays, 'id')]);
+	}
+
+	public function removeForPays(array $ids): void {
+		if (!empty($ids)) {
+			Provision::deleteAll(['pay_id' => $ids]);
+		}
 	}
 
 	public function hasAllProvisions(Worker $user): bool {
@@ -75,14 +82,13 @@ class Provisions extends Component {
 		$provisions = [];
 		foreach ($pays as $pay) {
 			foreach ($usersProvision as $provisionUser) {
-				$brutto = $this->calculateProvision($provisionUser, $pay->value);
-				$value = Yii::$app->tax->netto($brutto, $pay->vat);
+				$value = $this->calculateProvision($provisionUser, $pay->getValueWithoutVAT());
 				if ($value > 0) {
 					$provisions[] = [
 						'pay_id' => $pay->id,
 						'to_user_id' => $provisionUser->to_user_id,
 						'from_user_id' => $provisionUser->from_user_id,
-						'value' => $value,
+						'value' => $value->toFixed(2),
 						'type_id' => $typeId,
 					];
 				}
@@ -99,16 +105,16 @@ class Provisions extends Component {
 			->execute();
 	}
 
-	private function calculateProvision(ProvisionUser $provisionUser, float $value): float {
+	private function calculateProvision(ProvisionUser $provisionUser, Decimal $value): Decimal {
 		if ($provisionUser->type->is_percentage) {
-			return $value * $provisionUser->value / 100;
+			return $value->mul($provisionUser->getValue())->div(100);
 		}
-		return $provisionUser->value;
+		return $provisionUser->getValue();
 	}
 
 	public function isValidForIssue(Issue $issue, ProvisionUser $provisionUser): bool {
-		return empty($provisionUser->type->getTypesIds())
-			|| in_array($issue->type_id, $provisionUser->type->getTypesIds());
+		return empty($provisionUser->type->getIssueTypesIds())
+			|| in_array($issue->type_id, $provisionUser->type->getIssueTypesIds());
 	}
 
 	public function isTypeForUser(ProvisionType $type, int $userId): bool {

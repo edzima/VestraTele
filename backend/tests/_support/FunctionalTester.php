@@ -56,6 +56,14 @@ class FunctionalTester extends \Codeception\Actor {
 		$this->see($text, $selector);
 	}
 
+	public function dontSeeInGridHeader($text, string $selector = null): void {
+		if ($selector === null) {
+			$selector = '.grid-view';
+		}
+		$selector .= ' th';
+		$this->dontSee($text, $selector);
+	}
+
 	public function seeFlash(string $text, string $type): void {
 		$this->see($text, '.alert.alert-' . $type);
 	}

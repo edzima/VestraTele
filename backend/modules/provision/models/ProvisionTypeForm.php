@@ -2,57 +2,66 @@
 
 namespace backend\modules\provision\models;
 
+use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueType;
+use common\models\issue\IssueUser;
 use common\models\provision\ProvisionType;
-use common\models\user\Worker;
+use Yii;
 use yii\base\Model;
-use yii\helpers\ArrayHelper;
 
 class ProvisionTypeForm extends Model {
 
-	public $name;
-	public $only_with_tele;
-	public $is_default;
-	public $rolesIds;
-	public $typesIds;
-	public $date_from;
-	public $date_to;
-	public $value;
-	public $is_percentage = true;
+	public string $name = '';
+	public bool $is_percentage = true;
+	public string $value = '';
 
-	private $model;
+	public bool $only_with_tele = false;
+	public bool $is_default = false;
+	public $roles = [];
+	public $issueTypesIds = [];
+	public $calculationTypes = [];
 
+	private ?ProvisionType $model = null;
+	
 	public function rules(): array {
 		return [
-			[['name', 'value'], 'required'],
+			[['name', 'value', 'is_percentage'], 'required'],
 			['name', 'string', 'max' => 255],
-			['value', 'number', 'min' => 0, 'max' => 100],
+			[
+				'value', 'number', 'min' => 0, 'max' => 100, 'when' => function (): bool {
+				return $this->is_percentage;
+			},
+			],
+			[
+				'value', 'number', 'min' => 0, 'max' => 10000, 'when' => function (): bool {
+				return !$this->is_percentage;
+			},
+			],
 			[['only_with_tele', 'is_default', 'is_percentage'], 'boolean'],
-			['typesIds', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
-			['rolesIds', 'in', 'range' => array_keys(static::getRolesNames()), 'allowArray' => true],
-			[['date_to', 'date_from'], 'safe'],
+			['calculationTypes', 'in', 'range' => array_keys(static::getCalculationTypesNames()), 'allowArray' => true],
+			['issueTypesIds', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
+			['roles', 'in', 'range' => array_keys(static::getRolesNames()), 'allowArray' => true],
 		];
 	}
 
 	public function attributeLabels(): array {
 		return array_merge($this->getModel()->attributeLabels(), [
-			'rolesIds' => 'Typ pracownik',
-			'typesIds' => 'Typy spraw',
-			'value' => 'Prowizja',
+			'roles' => Yii::t('common', 'Roles'),
+			'issueTypesIds' => Yii::t('common', 'Issue Types'),
+			'calculationTypes' => Yii::t('common', 'Calculation Types'),
 		]);
 	}
 
 	public function setModel(ProvisionType $model): void {
 		$this->model = $model;
 		$this->name = $model->name;
-		$this->only_with_tele = $model->only_with_tele;
-		$this->is_default = $model->is_default;
-		$this->date_from = $model->date_from;
-		$this->date_to = $model->date_to;
-		$this->rolesIds = $model->getRoles();
-		$this->typesIds = $model->getTypesIds();
 		$this->is_percentage = $model->is_percentage;
 		$this->value = $model->value;
+		$this->only_with_tele = $model->only_with_tele;
+		$this->is_default = $model->is_default;
+		$this->roles = $model->getRoles();
+		$this->issueTypesIds = $model->getIssueTypesIds();
+		$this->calculationTypes = $model->getCalculationTypes();
 	}
 
 	public function getModel(): ProvisionType {
@@ -68,29 +77,26 @@ class ProvisionTypeForm extends Model {
 		}
 		$model = $this->getModel();
 		$model->name = $this->name;
+		$model->is_percentage = $this->is_percentage;
 		$model->value = $this->value;
 		$model->only_with_tele = $this->only_with_tele;
 		$model->is_default = $this->is_default;
-		$model->date_from = $this->date_from;
-		$model->date_to = $this->date_to;
-		$model->setTypesIds(is_array($this->typesIds) ? $this->typesIds : []);
-		$model->setRoles(is_array($this->rolesIds) ? $this->rolesIds : []);
-		$model->is_percentage = $this->is_percentage;
+		$model->setRoles(is_array($this->roles) ? $this->roles : []);
+		$model->setIssueTypesIds(is_array($this->issueTypesIds) ? $this->issueTypesIds : []);
+		$model->setCalculationTypes(is_array($this->calculationTypes) ? $this->calculationTypes : []);
 		return $model->save();
 	}
 
-	public static function getTypesNames(): array {
-		return ArrayHelper::map(IssueType::find()
-			->select('id,name')
-			->all(), 'id', 'name');
+	public static function getRolesNames(): array {
+		return IssueUser::getTypesNames();
 	}
 
-	public static function getRolesNames(): array {
-		return [
-			Worker::ROLE_AGENT => 'Agent',
-			Worker::ROLE_TELEMARKETER => 'Tele',
-			Worker::ROLE_LAWYER => 'Prawnik',
-		];
+	public static function getIssueTypesNames(): array {
+		return IssueType::getTypesNames();
+	}
+
+	public static function getCalculationTypesNames(): array {
+		return IssuePayCalculation::getTypesNames();
 	}
 
 }

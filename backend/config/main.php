@@ -4,6 +4,7 @@ use backend\modules\benefit\Module as BenefitModule;
 use backend\modules\entityResponsible\Module as EntityResponsibleModule;
 use backend\modules\issue\Module as IssueModule;
 use backend\modules\provision\Module as ProvisionModule;
+use backend\modules\settlement\Module as SettlementModule;
 use backend\modules\user\Module as UserModule;
 use common\behaviors\GlobalAccessBehavior;
 use common\behaviors\LastActionBehavior;
@@ -102,6 +103,9 @@ return [
 		],
 		'issue' => [
 			'class' => IssueModule::class,
+		],
+		'settlement' => [
+			'class' => SettlementModule::class,
 		],
 		'provision' => [
 			'class' => ProvisionModule::class,

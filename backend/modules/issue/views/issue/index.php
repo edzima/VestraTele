@@ -4,9 +4,9 @@ use backend\modules\issue\models\search\IssueSearch;
 use backend\widgets\CsvForm;
 use backend\widgets\GridView;
 use common\models\issue\Issue;
-use common\models\user\Customer;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\widgets\grid\CustomerDataColumn;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
 use kartik\grid\SerialColumn;
@@ -75,8 +75,7 @@ JS;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
-	<?= CsvForm::widget() ?>
-
+	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() :'' ?>
 
 	<?= GridView::widget([
 		'id' => 'issues-list',
@@ -192,10 +191,8 @@ JS;
 				'visible' => $searchModel->onlyDelayed,
 			],
 			[
-				'class' => DataColumn::class,
-				'attribute' => 'customerLastname',
-				'value' => 'customer.fullName',
-				'label' => Customer::getRolesNames()[Customer::ROLE_CUSTOMER],
+				'class' => CustomerDataColumn::class,
+				'value' => 'customer.fullName'
 			],
 			[
 				'class' => DataColumn::class,

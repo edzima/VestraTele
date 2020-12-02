@@ -6,6 +6,7 @@ use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueUserQuery;
 use common\models\issue\search\ArchivedIssueSearch;
+use common\models\user\CustomerSearchInterface;
 use common\models\user\Worker;
 use Yii;
 use yii\base\Model;
@@ -17,7 +18,8 @@ use yii\helpers\ArrayHelper;
  * IssueSearch represents the model behind the search form of `common\models\issue\Issue`.
  */
 abstract class IssueSearch extends Model
-	implements ArchivedIssueSearch {
+	implements ArchivedIssueSearch,
+			   CustomerSearchInterface {
 
 	public $issue_id;
 	public $stage_id;
@@ -89,7 +91,7 @@ abstract class IssueSearch extends Model
 	protected function issueQueryFilter(IssueQuery $query): void {
 		$this->archiveFilter($query);
 		$this->agentFilter($query);
-		$this->customerFilter($query);
+		$this->applyCustomerSurnameFilter($query);
 		$this->createdAtFilter($query);
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
@@ -126,8 +128,9 @@ abstract class IssueSearch extends Model
 		}
 	}
 
-	protected function customerFilter(IssueQuery $query): void {
+	public function applyCustomerSurnameFilter(QueryInterface $query): void {
 		if (!empty($this->customerLastname)) {
+			/** @var IssueQuery $query */
 			$query->joinWith([
 				'users c' => function (IssueUserQuery $query): void {
 					$query->andWhere(['c.type' => IssueUser::TYPE_CUSTOMER]);

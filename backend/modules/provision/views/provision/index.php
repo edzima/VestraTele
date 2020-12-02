@@ -5,8 +5,8 @@ use common\models\provision\Provision;
 use common\models\provision\ProvisionSearch;
 use yii\data\ActiveDataProvider;
 use yii\grid\ActionColumn;
-use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel ProvisionSearch */
@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'format' => 'raw',
 				'label' => 'Sprawa',
 				'value' => static function (Provision $data): string {
-					return Html::a($data->pay->issue, Url::to(['/issue/pay-calculation/view', 'id' => $data->pay->issue_id], ['target' => '_blank']));
+					return Html::a($data->pay->issue, Url::to(['/issue/pay-calculation/view', 'id' => $data->pay->calculation->issue_id], ['target' => '_blank']));
 				},
 			],
 			[

@@ -96,13 +96,6 @@ $user = Yii::$app->user;
 							'url' => ['/issue/stage/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
-
-						[
-							'label' => Yii::t('backend', 'Costs'),
-							'url' => ['/issue/cost/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => $user->can(User::PERMISSION_COST),
-						],
 					],
 				],
 				[
@@ -110,6 +103,55 @@ $user = Yii::$app->user;
 					'url' => ['/issue/summon/index'],
 					'icon' => '<i class="fa fa-angle-double-right"></i>',
 					'visible' => $user->can(User::PERMISSION_SUMMON),
+				],
+
+				[
+					'label' => Yii::t('backend', 'Settlements'),
+					'url' => '#',
+					'icon' => '<i class="fa fa-money"></i>',
+					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(User::PERMISSION_COST)
+						|| $user->can(User::PERMISSION_CALCULATION)
+						|| $user->can(User::PERMISSION_PAY)
+					,
+					'items' => [
+						[
+							'label' => Yii::t('settlement', 'Costs'),
+							'url' => ['/settlement/cost/index'],
+							'icon' => '<i class="fa fa-minus"></i>',
+							'visible' => $user->can(User::PERMISSION_COST),
+						],
+						[
+							'label' => Yii::t('settlement', 'Pays'),
+							'url' => ['/settlement/pay/index'],
+							'icon' => '<i class="fa fa-plus"></i>',
+							'visible' => $user->can(User::PERMISSION_PAY),
+						],
+						[
+							'label' => Yii::t('settlement', 'Settlements'),
+							'url' => ['/settlement/calculation/index'],
+							'options' => ['class' => 'treeview'],
+							'visible' => $user->can(User::PERMISSION_CALCULATION),
+							'items' => [
+								[
+									'label' => Yii::t('backend', 'Browse'),
+									'url' => ['/settlement/calculation/index'],
+									'icon' => '<i class="fa fa-angle-double-right"></i>',
+								],
+								[
+									'label' => Yii::t('backend', 'Calculation to create'),
+									'url' => ['/settlement/calculation/to-create'],
+									'icon' => '<i class="fa fa-angle-double-right"></i>',
+								],
+								[
+									'label' => Yii::t('backend', 'Min calculation count'),
+									'url' => ['/settlement/calculation-min-count/index'],
+									'icon' => '<i class="fa fa-angle-double-right"></i>',
+								],
+							],
+						],
+
+					],
 				],
 				[
 					'label' => Yii::t('backend', 'Provisions'),
@@ -137,42 +179,6 @@ $user = Yii::$app->user;
 							'label' => Yii::t('issue', 'Typy'),
 							'url' => ['/provision/type/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
-						],
-					],
-				],
-
-				[
-					'label' => Yii::t('backend', 'Płatności'),
-					'url' => '#',
-					'icon' => '<i class="fa fa-money"></i>',
-					'options' => ['class' => 'treeview'],
-					'visible' => $user->can(User::ROLE_BOOKKEEPER) || $user->can(User::PERMISSION_PAYS_DELAYED),
-					'items' => [
-						[
-							'label' => Yii::t('issue', 'Rozliczenia (nowe)'),
-							'url' => ['/issue/pay-calculation/new'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => $user->can(User::ROLE_BOOKKEEPER),
-						],
-						[
-							'label' => Yii::t('issue', 'Rozliczenia (w trakcie)'),
-							'url' => ['/issue/pay-calculation/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => $user->can(User::ROLE_BOOKKEEPER),
-						],
-						[
-							'label' => Yii::t('issue', 'Wpłaty'),
-							'url' => ['/issue/pay/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => $user->can(User::ROLE_BOOKKEEPER),
-
-						],
-						[
-							'label' => Yii::t('issue', 'Wpłaty (przeterminowane)'),
-							'url' => ['/issue/pay/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => $user->can(User::PERMISSION_PAYS_DELAYED),
-
 						],
 					],
 				],

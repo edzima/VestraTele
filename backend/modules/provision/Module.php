@@ -23,7 +23,7 @@ class Module extends BaseModule {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::ROLE_BOOKKEEPER],
+						'roles' => [Worker::ROLE_ADMINISTRATOR],
 					],
 				],
 			],

@@ -59,14 +59,18 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const ROLE_LAWYER = 'lawyer';
 
 	public const PERMISSION_ARCHIVE = 'archive';
+	public const PERMISSION_EXPORT = 'export';
 	public const PERMISSION_ISSUE = 'issue';
 	public const PERMISSION_LOGS = 'logs';
 	public const PERMISSION_MEET = 'meet';
 	public const PERMISSION_NEWS = 'news';
 	public const PERMISSION_NOTE = 'note';
-	public const PERMISSION_PAYS_DELAYED = 'pays.delayed';
 	public const PERMISSION_SUMMON = 'summon';
 	public const PERMISSION_COST = 'cost';
+	public const PERMISSION_CALCULATION = 'calculation';
+	public const PERMISSION_PAY = 'pay';
+	public const PERMISSION_PAYS_DELAYED = 'pays.delayed';
+	public const PERMISSION_PROVISION = 'provision';
 
 	private static $ROLES_NAMES;
 	private static $PERMISSIONS_NAMES;

@@ -7,6 +7,12 @@ use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionQuery;
+use common\models\settlement\PayInterface;
+use common\models\user\query\UserQuery;
+use common\models\user\User;
+use DateTime;
+use Decimal\Decimal;
+use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -23,11 +29,16 @@ use yii\db\Expression;
  * @property string $updated_at
  * @property string $payment_at
  * @property int $provider_type
+ * @property int $stage_id
+ * @property int $owner_id
+ * @property int $provider_id
+ * @property int $problem_status
  *
+ * @property-read User $owner
  * @property-read Issue $issue
  * @property-read IssuePay[] $pays
  */
-class IssuePayCalculation extends ActiveRecord {
+class IssuePayCalculation extends ActiveRecord implements PayInterface {
 
 	public const TYPE_NOT_SET = 0;
 	public const TYPE_ADMINISTRATIVE = 10;
@@ -36,6 +47,14 @@ class IssuePayCalculation extends ActiveRecord {
 	public const TYPE_HONORARIUM = 30;
 	public const TYPE_LAWYER = 40;
 	public const TYPE_SUBSCRIPTION = 50;
+
+	public const PROBLEM_STATUS_PREPEND_DEMAND = 10;
+	public const PROBLEM_STATUS_DEMAND = 15;
+
+	public const PROBLEM_STATUS_PREPEND_JUDGEMENT = 20;
+	public const PROBLEM_STATUS_JUDGEMENT = 25;
+
+	public const PROBLEM_STATUS_BAILLIF = 40;
 
 	public const PROVIDER_CLIENT = 1;
 	public const PROVIDER_RESPONSIBLE_ENTITY = 10;
@@ -76,8 +95,8 @@ class IssuePayCalculation extends ActiveRecord {
 			[['issue_id'], 'integer'],
 			['value', 'number', 'min' => 1, 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
 			[['details'], 'string'],
-			[['issue_id'], 'unique'],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
+			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
 		];
 	}
 
@@ -86,16 +105,39 @@ class IssuePayCalculation extends ActiveRecord {
 	 */
 	public function attributeLabels(): array {
 		return [
-			'issue_id' => 'Sprawa',
-			'created_at' => 'Dodano',
-			'updated_at' => 'Edycja',
-			'payment_at' => 'Opłacono',
-			'value' => 'Kwota (Brutto)',
-			'type' => 'Rodzaj',
-			'typeName' => 'Typ',
-			'details' => 'Szczegóły',
-			'providerName' => 'Wpłacający',
+			'issue_id' => Yii::t('common', 'Issue'),
+			'created_at' => Yii::t('common', 'Created at'),
+			'updated_at' => Yii::t('common', 'Updated at'),
+			'payment_at' => Yii::t('common', 'Payment at'),
+			'value' => Yii::t('common', 'Value with VAT'),
+			'valueToPay' => Yii::t('common', 'Value to pay'),
+			'type' => Yii::t('common', 'Type'),
+			'stage_id' => Yii::t('common', 'Stage'),
+			'typeName' => Yii::t('common', 'Type'),
+			'details' => Yii::t('common', 'Details'),
+			'providerName' => Yii::t('settlement', 'Provider name'),
+			'owner_id' => Yii::t('common', 'Owner'),
 		];
+	}
+
+	public function getNotPayedPays(): IssuePayQuery {
+		return $this->getPays()->onlyNotPayed();
+	}
+
+	public function getValueToPay(): Decimal {
+		return $this->getValue()->sub(Yii::$app->pay->payedSum($this->pays));
+	}
+
+	public function getValue(): Decimal {
+		return new Decimal($this->value);
+	}
+
+	public function getPaymentAt(): ?DateTime {
+		return new DateTime($this->payment_at);
+	}
+
+	public function getOwner(): UserQuery {
+		return $this->hasOne(UserQuery::class, ['id' => 'owner_id']);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
@@ -118,23 +160,19 @@ class IssuePayCalculation extends ActiveRecord {
 	}
 
 	public function isPayed(): bool {
-		return !empty($this->payment_at);
+		if ($this->isNewRecord) {
+			return false;
+		}
+
+		return $this->getValueToPay()->isZero();
+	}
+
+	public function getDecimalValue(): Decimal {
+		return new Decimal($this->value);
 	}
 
 	public function getPaysCount(): int {
 		return $this->getPays()->count();
-	}
-
-	public static function getTypesNames(): array {
-		return [
-			//static::TYPE_NOT_SET => 'Nieustalono',
-			static::TYPE_ADMINISTRATIVE => 'Administracyjne',
-			static::TYPE_PROVISION => 'Prowizja',
-			static::TYPE_PROVISION_REFUND => 'Zwrot prowizji',
-			static::TYPE_HONORARIUM => 'Honorarium',
-			static::TYPE_LAWYER => 'Koszty adwokackie',
-			static::TYPE_SUBSCRIPTION => 'Abonament',
-		];
 	}
 
 	/** @noinspection PhpUnused */
@@ -143,10 +181,45 @@ class IssuePayCalculation extends ActiveRecord {
 	}
 
 	public function getProvidersNames(): array {
-		//@todo change to Client User Model after refactor client.
 		return [
-			static::PROVIDER_CLIENT => $this->issue->getClientFullName(),
+			static::PROVIDER_CLIENT => $this->issue->customer->getFullName(),
 			static::PROVIDER_RESPONSIBLE_ENTITY => $this->issue->entityResponsible,
+		];
+	}
+
+	public function getProblemStatusName(): ?string {
+		if (empty($this->problem_status)) {
+			return null;
+		}
+		return static::getProblemStatusesNames()[$this->problem_status];
+	}
+
+	public static function getProvidersTypesNames(): array {
+		return [
+			static::PROVIDER_CLIENT => Yii::t('settlement', 'Customer'),
+			static::PROVIDER_RESPONSIBLE_ENTITY => Yii::t('settlement', 'Entity responsible'),
+		];
+	}
+
+	public static function getTypesNames(): array {
+		return [
+			static::TYPE_ADMINISTRATIVE => Yii::t('settlement', 'Administrative'),
+			static::TYPE_PROVISION => Yii::t('settlement', 'Provision'),
+			static::TYPE_PROVISION_REFUND => Yii::t('settlement', 'Provision refund'),
+			static::TYPE_HONORARIUM => Yii::t('settlement', 'Honorarium'),
+			static::TYPE_LAWYER => Yii::t('settlement', 'Lawyer'),
+			static::TYPE_SUBSCRIPTION => Yii::t('settlement', 'Subscription'),
+		];
+	}
+
+	public static function getProblemStatusesNames(): array {
+		return [
+			static::PROBLEM_STATUS_PREPEND_DEMAND => Yii::t('settlement', 'Prepariation for demand'),
+			static::PROBLEM_STATUS_DEMAND => Yii::t('settlement', 'Demand'),
+			static::PROBLEM_STATUS_PREPEND_JUDGEMENT => Yii::t('settlement', 'Prepariation for judgement'),
+			static::PROBLEM_STATUS_JUDGEMENT => Yii::t('settlement', 'Judgement'),
+			static::PROBLEM_STATUS_BAILLIF => Yii::t('settlement', 'Baillif'),
+
 		];
 	}
 
@@ -154,4 +227,15 @@ class IssuePayCalculation extends ActiveRecord {
 		return new IssuePayCalculationQuery(static::class);
 	}
 
+	public function getDeadlineAt(): ?DateTime {
+		// TODO: Implement getDeadlineAt() method.
+	}
+
+	public function getVAT(): ?Decimal {
+		// TODO: Implement getVAT() method.
+	}
+
+	public function getTransferType(): int {
+		// TODO: Implement getTransferType() method.
+	}
 }

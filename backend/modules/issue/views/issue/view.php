@@ -21,13 +21,13 @@ $this->params['breadcrumbs'][] = $this->title;
 	<p>
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_NOTE) ? Html::a('Notatka', ['note/create', 'issueId' => $model->id], [
+		<?= Yii::$app->user->can(User::PERMISSION_NOTE) ? Html::a(Yii::t('backend', 'Create note'), ['note/create', 'issueId' => $model->id], [
 			'class' => 'btn btn-success',
 		]) : '' ?>
 
-		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('Relacje', ['user/issue', 'id' => $model->id], [
+		<?= Html::a(Yii::t('common', 'Issue users'), ['user/issue', 'id' => $model->id], [
 			'class' => 'btn btn-success',
-		]) : '' ?>
+		]) ?>
 
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger pull-right',
@@ -39,17 +39,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	</p>
 	<p>
-		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
+		<?= Yii::$app->user->can(User::PERMISSION_CALCULATION)
 			? Html::a(
-				'Rozliczenia',
-				['pay-calculation/index', 'issueId' => $model->id],
+				Yii::t('backend', 'Calculations'),
+				['/settlement/calculation/issue', 'id' => $model->id],
 				['class' => 'btn btn-info'])
 			: '' ?>
 
 		<?= Yii::$app->user->can(User::PERMISSION_COST)
 			? Html::a(
 				Yii::t('backend', 'Costs'),
-				['cost/issue', 'id' => $model->id],
+				['/settlement/cost/issue', 'id' => $model->id],
 				['class' => 'btn btn-info'])
 			: '' ?>
 	</p>

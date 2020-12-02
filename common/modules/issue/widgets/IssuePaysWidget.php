@@ -30,7 +30,8 @@ class IssuePaysWidget extends Widget {
 			return $this->render('issue-pays', [
 				'models' => $this->models,
 				'widget' => $this,
-				'withProvisions' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR) || !empty($this->user),
+				'withProvisions' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)
+					|| !empty($this->user),
 			]);
 		}
 		return '';

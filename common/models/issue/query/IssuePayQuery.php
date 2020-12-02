@@ -3,6 +3,7 @@
 namespace common\models\issue\query;
 
 use common\models\issue\IssuePay;
+use Decimal\Decimal;
 use yii\db\ActiveQuery;
 
 /**
@@ -55,13 +56,16 @@ class IssuePayQuery extends ActiveQuery {
 		return $this;
 	}
 
-	public function getValueSum(): float {
+	public function getValueSum(): Decimal {
 		[, $alias] = $this->getTableNameAndAlias();
-
-		return $this->sum($alias . '.value') ?? 0;
+		$sum = $this->sum($alias . '.value');
+		if ($sum === null) {
+			$sum = 0;
+		}
+		return new Decimal($sum);
 	}
 
-	public function getPayedSum(): float {
+	public function getPayedSum(): Decimal {
 		$query = clone $this;
 		return $query->onlyPayed()->getValueSum();
 	}

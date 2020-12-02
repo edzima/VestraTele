@@ -3,8 +3,8 @@
 namespace common\models\issue;
 
 use common\models\issue\query\IssueQuery;
-use common\models\VATInfo;
-use common\models\VATInfoTrait;
+use common\models\settlement\VATInfo;
+use common\models\settlement\VATInfoTrait;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
