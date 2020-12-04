@@ -3,10 +3,10 @@
 use backend\helpers\Url;
 use backend\modules\settlement\models\search\IssueToCreateCalculationSearch;
 use backend\widgets\GridView;
+use backend\widgets\IssueColumn;
 use common\models\issue\Issue;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
-use common\widgets\grid\DataColumn;
 use yii\bootstrap\Html;
 use yii\data\ActiveDataProvider;
 use yii\web\View;
@@ -40,20 +40,18 @@ use yii\web\View;
 			],
 		],
 		[
-			'class' => DataColumn::class,
-			'attribute' => 'issue_id',
-			'value' => 'longId',
-			'options' => [
-				'style' => 'width:100px',
-			],
+			'class' => IssueColumn::class,
+			'issueAttribute' => null,
 			'visible' => $withIssue,
 		],
 		[
-			'attribute' => 'type.name',
+			'attribute' => 'type',
+			'value' => 'type.name',
 			'filter' => IssueToCreateCalculationSearch::getTypesNames(),
 		],
 		[
-			'attribute' => 'stage.name',
+			'attribute' => 'stage',
+			'value' => 'stage.name',
 			'filter' => $searchModel->getStagesNames(),
 		],
 		[

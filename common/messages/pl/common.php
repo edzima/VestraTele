@@ -196,7 +196,7 @@ return [
 	'Payement at' => 'Opłacono w',
 	'Provider name' => 'Wpłacający',
 	'Payment at' => 'Data płatności',
-	'Owner' => 'Właściciel',
+	'Owner' => 'Utworzył',
 	'Value to pay' => 'Do zapłaty',
 	'Surname22' => 'Surname22',
 	'Jlustification of the judgment' => 'Jlustification of the judgment',

@@ -23,21 +23,22 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="settlement-calculation-issue">
 
 	<p>
-		<?= Html::a(Yii::t('backend', 'Create calculation'), ['create', 'id' => $searchModel->issue_id], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('settlement', 'Create settlement'), ['create', 'id' => $searchModel->issue_id], ['class' => 'btn btn-success']) ?>
 	</p>
 
-	<fieldset>
-		<legend><?= Yii::t('backend', 'To create') ?></legend>
+	<?php if ($toCreateProvider->getTotalCount() > 0): ?>
+		<fieldset>
+			<legend><?= Yii::t('backend', 'To create') ?></legend>
 
-		<?= $this->render('_to-create_grid', [
-			'searchModel' => $toCreateSearchModel,
-			'dataProvider' => $toCreateProvider,
-			'withIssue' => false,
-			'withCustomer' => false,
-		]) ?>
+			<?= $this->render('_to-create_grid', [
+				'searchModel' => $toCreateSearchModel,
+				'dataProvider' => $toCreateProvider,
+				'withIssue' => false,
+				'withCustomer' => false,
+			]) ?>
 
-	</fieldset>
-
+		</fieldset>
+	<?php endif; ?>
 
 	<fieldset>
 		<legend><?= Yii::t('backend', 'Issue calculations') ?></legend>
@@ -47,6 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'dataProvider' => $dataProvider,
 			'withIssue' => false,
 			'withCustomer' => false,
+			'withProblemStatus' => true,
 		]) ?>
 	</fieldset>
 

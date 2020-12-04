@@ -28,5 +28,6 @@ $this->params['breadcrumbs'][] = $this->title;
 		'dataProvider' => $dataProvider,
 		'withIssue' => true,
 		'withCustomer' => true,
+		'withProblemStatus' => true,
 	]) ?>
 </div>

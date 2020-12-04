@@ -2,6 +2,7 @@
 
 namespace backend\modules\provision\controllers;
 
+use backend\helpers\Url;
 use backend\modules\provision\models\SettlementProvisionsForm;
 use common\models\issue\IssuePayCalculation;
 use Yii;
@@ -16,7 +17,7 @@ class SettlementController extends Controller {
 		$model = new SettlementProvisionsForm($settlement);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['/settlement/calculation/view', 'id' => $id]);
+			return $this->redirect(Url::previous());
 		}
 		return $this->render('set', [
 			'model' => $model,

@@ -14,7 +14,7 @@ use common\models\issue\Issue;
  */
 class CalculationCest {
 
-	public const ROUTE_INDEX = '/settlement/calculation/index';
+	public const ROUTE_INDEX = 'settlement/calculation/index';
 	public const ROUTE_ISSUE = 'settlement/calculation/issue';
 	public const ROUTE_TO_CREATE = 'settlement/calculation/to-create';
 
@@ -27,15 +27,15 @@ class CalculationCest {
 
 	public function checkAsCalculationIssueManager(CalculationIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->seeMenuLink('Calculations');
+		$I->seeMenuLink('Settlements');
 		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->see('Calculations');
+		$I->see('Settlements');
 	}
 
 	public function checkMenuLink(CalculationIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->seeMenuLink('Calculations');
-		$I->clickMenuLink('Calculations');
+		$I->seeMenuLink('Settlements');
+		$I->clickMenuLink('Settlements');
 		$I->seeInCurrentUrl(static::ROUTE_INDEX);
 	}
 

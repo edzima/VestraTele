@@ -1,8 +1,8 @@
 <?php
 
-use backend\helpers\Url;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\GridView;
+use backend\widgets\IssueColumn;
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
 use common\widgets\grid\ActionColumn;
@@ -32,7 +32,7 @@ use yii\web\View;
 					if ($model->isPayed()) {
 						return '';
 					}
-					return Html::a(Html::icon('problem'), $url);
+					return Html::a(Html::icon('warning'), $url);
 				},
 
 				'provision' => static function (string $url, IssuePayCalculation $model) {
@@ -49,14 +49,7 @@ use yii\web\View;
 			],
 		],
 		[
-			'attribute' => 'issue_id',
-			'format' => 'raw',
-			'value' => static function (IssuePayCalculation $model) {
-				return Html::a(
-					$model->issue,
-					Url::issueView($model->issue_id),
-					['target' => '_blank']);
-			},
+			'class' => IssueColumn::class,
 			'visible' => $withIssue,
 		],
 		[

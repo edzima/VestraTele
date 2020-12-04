@@ -2,6 +2,7 @@
 
 namespace backend\modules\settlement\controllers;
 
+use backend\helpers\Url;
 use backend\modules\settlement\models\CalculationForm;
 use backend\modules\settlement\models\CalculationProblemStatusForm;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
@@ -56,6 +57,7 @@ class CalculationController extends Controller {
 		if (!Yii::$app->user->can(User::PERMISSION_PROVISION)) {
 			throw new ForbiddenHttpException();
 		}
+		Url::remember();
 		$searchModel = new IssuePayCalculationSearch();
 		$searchModel->withoutProvisions = true;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -136,6 +138,7 @@ class CalculationController extends Controller {
 				}
 			}
 		}
+		Url::remember();
 
 		return $this->render('view', [
 			'model' => $model,

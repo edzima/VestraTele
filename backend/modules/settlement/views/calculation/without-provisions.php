@@ -20,5 +20,6 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Without provisions');
 		'dataProvider' => $dataProvider,
 		'withIssue' => true,
 		'withCustomer' => true,
+		'withProblemStatus' => false,
 	]) ?>
 </div>
