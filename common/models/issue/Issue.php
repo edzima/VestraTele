@@ -85,7 +85,7 @@ use yii\db\Expression;
  * @property-read Summon[] $summons
  * @property-read IssueUser[] $users
  */
-class Issue extends ActiveRecord {
+class Issue extends ActiveRecord implements IssueInterface {
 
 	private const DEFAULT_PROVISION = Provision::TYPE_PERCENTAGE;
 
@@ -471,4 +471,23 @@ class Issue extends ActiveRecord {
 			->exists();
 	}
 
+	public function getIssueId(): int {
+		return $this->id;
+	}
+
+	public function getIssueName(): string {
+		return $this->longId;
+	}
+
+	public function getIssueModel(): Issue {
+		return $this;
+	}
+
+	public function getIssueType(): IssueType {
+		return $this->type;
+	}
+
+	public function getIssueStage(): IssueStage {
+		return $this->stage;
+	}
 }
