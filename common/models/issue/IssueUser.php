@@ -21,7 +21,9 @@ use yii\db\ActiveRecord;
  * @property Issue $issue
  * @property User $user
  */
-class IssueUser extends ActiveRecord {
+class IssueUser extends ActiveRecord implements IssueInterface {
+
+	use IssueTrait;
 
 	public const TYPE_LAWYER = Worker::ROLE_LAWYER;
 	public const TYPE_AGENT = Worker::ROLE_AGENT;

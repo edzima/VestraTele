@@ -5,40 +5,75 @@ namespace backend\tests\unit\settlement\search;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
-use yii\data\ActiveDataProvider;
+use common\models\issue\IssuePayCalculation;
+use common\models\SearchModel;
+use common\tests\_support\UnitSearchModelTrait;
 
+
+/**
+ * Class IssuePayCalculationSearchTest
+ *
+ * @property-read IssuePayCalculationSearch $model
+ * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
+ */
 class IssuePayCalculationSearchTest extends Unit {
 
-	private IssuePayCalculationSearch $model;
+	use UnitSearchModelTrait;
 
 	public function _before(): void {
+		$this->model = $this->createModel();
 		$this->tester->haveFixtures(
 			array_merge(
 				IssueFixtureHelper::fixtures(),
 				IssueFixtureHelper::settlements(),
 			));
-		$this->model = new IssuePayCalculationSearch();
 		parent::_before();
 	}
 
 	public function testEmpty(): void {
-		$provider = $this->search([]);
-		$this->assertSame(3, $provider->getTotalCount());
+		$this->assertTotalCount(5);
+	}
+
+	public function testType(): void {
+		$this->assertTotalCount(3, ['type' => IssuePayCalculation::TYPE_ADMINISTRATIVE]);
+		$this->assertTotalCount(3, ['type' => IssuePayCalculation::TYPE_PROVISION]);
 	}
 
 	public function testIssue(): void {
-		$provider = $this->search(['issue_id' => 1]);
-		$this->assertSame(2, $provider->getTotalCount());
+		$this->assertTotalCount(3, ['issue_id' => 1]);
 	}
 
 	public function testWithoutProvisions(): void {
 		$this->model->withoutProvisions = true;
-		$provider = $this->search([]);
-		$this->assertSame(3, $provider->getTotalCount());
+		$this->assertTotalCount(4);
 	}
 
-	protected function search(array $params): ActiveDataProvider {
-		$params[$this->model->formName()] = $params;
-		return $this->model->search($params);
+	public function testProblemStatus(): void {
+		$this->model->problem_status = IssuePayCalculation::PROBLEM_STATUS_PREPEND_DEMAND;
+		$this->assertTotalCount(1);
+	}
+
+	public function testOnlyWithProblems(): void {
+		$this->model->onlyWithProblems = true;
+		$this->assertTotalCount(2);
+	}
+
+	public function testOnlyWithoutProblems(): void {
+		$this->model->onlyWithProblems = false;
+		$this->assertTotalCount(3);
+	}
+
+	public function testValue(): void {
+		$this->model->value = '1230';
+		$this->assertTotalCount(1);
+	}
+
+	public function testCustomer(): void {
+		$this->model->customerLastname = 'Lar';
+		$this->assertTotalCount(2);
+	}
+
+	protected function createModel(): SearchModel {
+		return new IssuePayCalculationSearch();
 	}
 }

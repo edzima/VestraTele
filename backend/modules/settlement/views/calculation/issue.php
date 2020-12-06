@@ -3,6 +3,7 @@
 use backend\helpers\Breadcrumbs;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\modules\settlement\models\search\IssueToCreateCalculationSearch;
+use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 
@@ -43,13 +44,12 @@ $this->params['breadcrumbs'][] = $this->title;
 	<fieldset>
 		<legend><?= Yii::t('backend', 'Issue calculations') ?></legend>
 
-		<?= $this->render('_grid', [
-			'searchModel' => $searchModel,
+
+		<?= IssuePayCalculationGrid::widget([
+			'filterModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'withIssue' => false,
-			'withCustomer' => false,
-			'withProblemStatus' => true,
 		]) ?>
+
 	</fieldset>
 
 </div>

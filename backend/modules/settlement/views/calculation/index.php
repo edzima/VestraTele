@@ -1,6 +1,7 @@
 <?php
 
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
+use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\user\User;
 use yii\bootstrap\Html;
 use yii\data\ActiveDataProvider;
@@ -23,11 +24,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	</p>
 
-	<?= $this->render('_grid', [
-		'searchModel' => $searchModel,
+	<?= IssuePayCalculationGrid::widget([
+		'filterModel' => $searchModel,
 		'dataProvider' => $dataProvider,
-		'withIssue' => true,
-		'withCustomer' => true,
-		'withProblemStatus' => true,
 	]) ?>
+	
 </div>

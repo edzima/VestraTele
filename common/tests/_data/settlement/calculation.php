@@ -27,4 +27,22 @@ return [
 		'provider_id' => 200,
 		'owner_id' => 300,
 	],
+	'with-problem-status' => [
+		'issue_id' => 3,
+		'value' => 1230,
+		'type' => IssuePayCalculation::TYPE_PROVISION,
+		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
+		'problem_status' => IssuePayCalculation::PROBLEM_STATUS_PREPEND_DEMAND,
+		'provider_id' => 200,
+		'owner_id' => 300,
+	],
+	'with-problem-status_and_pay' => [
+		'issue_id' => 1,
+		'value' => 1230,
+		'type' => IssuePayCalculation::TYPE_PROVISION,
+		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
+		'problem_status' => IssuePayCalculation::PROBLEM_STATUS_DEMAND,
+		'provider_id' => 200,
+		'owner_id' => 300,
+	],
 ];

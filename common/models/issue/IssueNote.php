@@ -25,7 +25,9 @@ use yii\helpers\StringHelper;
  * @property Issue $issue
  * @property User $user
  */
-class IssueNote extends ActiveRecord {
+class IssueNote extends ActiveRecord implements IssueInterface {
+
+	use IssueTrait;
 
 	public const TYPE_PAY = 'pay';
 	public const TYPE_SUMMON = 'summon';
@@ -127,4 +129,5 @@ class IssueNote extends ActiveRecord {
 	public static function find(): IssueNoteQuery {
 		return new IssueNoteQuery(static::class);
 	}
+	
 }

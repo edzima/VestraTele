@@ -2,16 +2,12 @@
 
 namespace common\widgets\grid;
 
-use common\models\issue\Issue;
+use common\models\issue\IssueInterface;
 use kartik\grid\DataColumn;
 use Yii;
-use yii\base\Model;
 use yii\helpers\Html;
 
 class IssueColumn extends DataColumn {
-
-	public $attribute = 'issue_id';
-	public $value = 'issue.longId';
 
 	public ?string $issueAttribute = 'issue';
 
@@ -27,10 +23,10 @@ class IssueColumn extends DataColumn {
 		}
 		if (!empty($this->linkOptions)) {
 			$this->format = 'raw';
-			$this->value = function ($model): string {
+			$this->value = function (IssueInterface $model): string {
 				return Html::a(
-					$this->getLinkText($model),
-					[$this->viewBaseUrl, 'id' => $this->getId($model)],
+					$model->getIssueName(),
+					[$this->viewBaseUrl, 'id' => $model->getIssueId()],
 					$this->linkOptions);
 			};
 		}
@@ -38,19 +34,11 @@ class IssueColumn extends DataColumn {
 		parent::init();
 	}
 
-	public function getLinkText(Model $model): string {
-		if ($this->issueAttribute === null) {
-			/** @var $model Issue */
-			return $model->longId;
-		}
-		return $model->{$this->issueAttribute}->longId;
+	public function getLinkText(IssueInterface $model): string {
+		return $model->getIssueName();
 	}
 
-	public function getId(Model $model): int {
-		if ($this->issueAttribute === null) {
-			/** @var $model Issue */
-			return $model->id;
-		}
-		return $model->{$this->attribute};
+	public function getId(IssueInterface $model): int {
+		return $model->getIssueId();
 	}
 }

@@ -34,7 +34,6 @@ use yii\web\View;
 					}
 					return Html::a(Html::icon('warning'), $url);
 				},
-
 				'provision' => static function (string $url, IssuePayCalculation $model) {
 					return Yii::$app->user->can(User::PERMISSION_PROVISION) ? Html::a('<span class="glyphicon glyphicon-usd"></span>',
 						['/provision/settlement/set', 'id' => $model->id],

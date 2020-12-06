@@ -96,6 +96,7 @@ class CalculationController extends Controller {
 		if ((int) $searchModel->issue->getPayCalculations()->count() === 0) {
 			return $this->redirect(['create', 'id' => $id]);
 		}
+		$searchModel->withCustomer = false;
 		$toCreateSearchModel = new IssueToCreateCalculationSearch();
 		$toCreateSearchModel->issue_id = $id;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);

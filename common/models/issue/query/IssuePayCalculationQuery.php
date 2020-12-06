@@ -20,6 +20,20 @@ class IssuePayCalculationQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function onlyWithoutProblems(): self {
+		$this->andWhere('problem_status is NULL');
+		return $this;
+	}
+
+	public function onlyProblems(array $problems = []): self {
+		if (empty($problems)) {
+			$this->andWhere('problem_status IS NOT NULL');
+		} else {
+			$this->andWhere(['problem_status' => $problems]);
+		}
+		return $this;
+	}
+
 	/**
 	 * @inheritdoc
 	 * @return IssuePayCalculation[]|array

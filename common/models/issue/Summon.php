@@ -39,7 +39,9 @@ use yii\db\ActiveRecord;
  * @property-read Simc $city
  * @property-read EntityResponsible $entityResponsible
  */
-class Summon extends ActiveRecord {
+class Summon extends ActiveRecord implements IssueInterface {
+
+	use IssueTrait;
 
 	public const STATUS_NEW = 1;
 	public const STATUS_IN_PROGRESS = 2;

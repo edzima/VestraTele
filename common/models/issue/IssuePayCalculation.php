@@ -32,13 +32,15 @@ use yii\db\Expression;
  * @property int $stage_id
  * @property int $owner_id
  * @property int $provider_id
- * @property int $problem_status
+ * @property int|null $problem_status
  *
  * @property-read User $owner
  * @property-read Issue $issue
  * @property-read IssuePay[] $pays
  */
-class IssuePayCalculation extends ActiveRecord implements PayInterface {
+class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInterface {
+
+	use IssueTrait;
 
 	public const TYPE_NOT_SET = 0;
 	public const TYPE_ADMINISTRATIVE = 10;
@@ -248,4 +250,5 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface {
 	public function getTransferType(): int {
 		// TODO: Implement getTransferType() method.
 	}
+
 }

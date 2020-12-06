@@ -15,17 +15,19 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property int $issue_id
  * @property string $type
- * @property string|null $value
+ * @property string $value
  * @property string|null $vat
  * @property int $created_at
  * @property int $updated_at
  * @property string $date_at
  *
- * @property-read  Issue $issue
+ * @property-read Issue $issue
  * @property-read string $typeName
  */
-class IssueCost extends ActiveRecord implements VATInfo {
+class IssueCost extends ActiveRecord implements
+	IssueInterface, VATInfo {
 
+	use IssueTrait;
 	use VATInfoTrait;
 
 	public const TYPE_PURCHASE_OF_RECEIVABLES = 'purchase_of_receivables';

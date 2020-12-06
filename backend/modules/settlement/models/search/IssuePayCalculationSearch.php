@@ -3,9 +3,11 @@
 namespace backend\modules\settlement\models\search;
 
 use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueType;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
+use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -15,10 +17,17 @@ use yii\db\QueryInterface;
  * IssuePayCalculationSearch represents the model behind the search form of `common\models\issue\IssuePayCalculation`.
  */
 class IssuePayCalculationSearch extends IssuePayCalculation implements
-	CustomerSearchInterface {
+	CustomerSearchInterface,
+	SearchModel {
 
+	public $issue_type_id;
 	public string $customerLastname = '';
+	public ?bool $withCustomer = true;
 	public ?bool $withoutProvisions = null;
+	/**
+	 * @var bool|mixed|null
+	 */
+	public ?bool $onlyWithProblems = null;
 
 	/**
 	 * {@inheritdoc}
@@ -26,6 +35,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public function rules(): array {
 		return [
 			[['issue_id', 'type', 'problem_status'], 'integer'],
+			['issue_type_id', 'in', 'range' => IssueType::getTypesIds()],
 			[['value'], 'number'],
 			[['customerLastname'], 'safe'],
 		];
@@ -49,7 +59,8 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public function search(array $params): ActiveDataProvider {
 		$query = IssuePayCalculation::find();
 		$query->joinWith('issue');
-		$query->joinWith('issue.customer.userProfile CP');
+		$query->joinWith('issue.type IT');
+
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -65,18 +76,29 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		}
 		$this->applyCustomerSurnameFilter($query);
 		$this->applyWithoutProvisionsFilter($query);
+		$this->applyProblemStatusFilter($query);
+		$this->applyIssueTypeFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
 			IssuePayCalculation::tableName() . '.value' => $this->value,
 			IssuePayCalculation::tableName() . '.type' => $this->type,
-			IssuePayCalculation::tableName() . 'problem_status' => $this->problem_status,
 		]);
 
-		$query
-			->andFilterWhere(['like', 'issue.id', $this->issue_id]);
+		$query->andFilterWhere(['like', 'issue.id', $this->issue_id]);
 
 		return $dataProvider;
+	}
+
+	protected function applyProblemStatusFilter(IssuePayCalculationQuery $query): void {
+		if ($this->onlyWithProblems === false) {
+			$query->onlyWithoutProblems();
+		} elseif ($this->onlyWithProblems === true) {
+			$query->onlyProblems();
+		}
+		if (!empty($this->problem_status)) {
+			$query->onlyProblems((array) $this->problem_status);
+		}
 	}
 
 	protected function applyWithoutProvisionsFilter(IssuePayCalculationQuery $query): void {
@@ -96,8 +118,17 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	}
 
 	public function applyCustomerSurnameFilter(QueryInterface $query): void {
+		if ($this->withCustomer || !empty($this->customerLastname)) {
+			$query->joinWith('issue.customer.userProfile CP');
+		}
 		if (!empty($this->customerLastname)) {
 			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
+		}
+	}
+
+	protected function applyIssueTypeFilter(IssuePayCalculationQuery $query) {
+		if (!empty($this->issue_type_id)) {
+			$query->andWhere(['IT.id' => $this->issue_type_id]);
 		}
 	}
 
