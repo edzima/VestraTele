@@ -3,6 +3,7 @@
 use backend\modules\issue\models\search\IssueSearch;
 use backend\widgets\CsvForm;
 use backend\widgets\GridView;
+use backend\widgets\IssueColumn;
 use common\models\issue\Issue;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -75,7 +76,7 @@ JS;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
-	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() :'' ?>
+	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() : '' ?>
 
 	<?= GridView::widget([
 		'id' => 'issues-list',
@@ -104,15 +105,8 @@ JS;
 				],
 			],
 			[
-				'class' => DataColumn::class,
-				'attribute' => 'issue_id',
-				'value' => 'longId',
-				'filterInputOptions' => [
-					'class' => 'dynamic-search',
-				],
-				'options' => [
-					'style' => 'width:100px',
-				],
+				'class' => IssueColumn::class,
+				'issueAttribute' => null,
 			],
 			[
 				'class' => DataColumn::class,
@@ -126,7 +120,7 @@ JS;
 						'allowClear' => true,
 					],
 					'options' => [
-						'placeholder' => 'Agent',
+						'placeholder' => $searchModel->getAttributeLabel('agent_id'),
 					],
 				],
 				'contentOptions' => [
@@ -192,7 +186,7 @@ JS;
 			],
 			[
 				'class' => CustomerDataColumn::class,
-				'value' => 'customer.fullName'
+				'value' => 'customer.fullName',
 			],
 			[
 				'class' => DataColumn::class,
