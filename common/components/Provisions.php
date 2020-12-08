@@ -58,13 +58,17 @@ class Provisions extends Component {
 	 * @param Issue $issue
 	 * @return ProvisionUser[][]
 	 */
-	public function getIssueUsersProvisions(Issue $issue): array {
-		$provisions = $this->issueProvisions($issue);
-		return [
-			'agent' => $this->userFilter($this->roleFilter($provisions, Worker::ROLE_AGENT), $issue->agent_id),
-			'lawyer' => $this->userFilter($this->roleFilter($provisions, Worker::ROLE_LAWYER), $issue->lawyer_id),
-			'tele' => ($issue->hasTele() ? $this->userFilter($this->roleFilter($provisions, Worker::ROLE_TELEMARKETER), $issue->tele_id) : []),
-		];
+	public function getIssueWorkersProvisions(Issue $issue): array {
+		$workers = $issue->getUsers()->onlyWorkers()
+			->indexBy('type')
+			->all();
+		$ids = ArrayHelper::getColumn($workers, 'user_id');
+		$provisions = $this->issueProvisions($issue, $ids);
+		$workersProvisions = [];
+		foreach ($workers as $worker) {
+			$workersProvisions[$worker->type] = $this->userFilter($this->roleFilter($provisions, $worker->type), $worker->user_id);
+		}
+		return $workersProvisions;
 	}
 
 	/**
@@ -135,16 +139,12 @@ class Provisions extends Component {
 		return $ids;
 	}
 
-	private function issueProvisions(Issue $issue): array {
+	private function issueProvisions(Issue $issue, array $usersIds): array {
 		$models = ProvisionUser::find()
 			->with('type')
 			->joinWith('type T')
 			->andWhere([
-				'from_user_id' => [
-					$issue->agent_id,
-					$issue->tele_id,
-					$issue->lawyer_id,
-				],
+				'from_user_id' => $usersIds,
 			])
 			->orderBy('T.only_with_tele DESC')
 			->all();

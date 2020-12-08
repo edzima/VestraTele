@@ -4,6 +4,7 @@ namespace backend\modules\provision\models;
 
 use common\models\issue\Issue;
 use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueUser;
 use common\models\provision\ProvisionUser;
 use common\models\user\Worker;
 use Yii;
@@ -40,10 +41,10 @@ class SettlementProvisionsForm extends Model {
 	}
 
 	public function init(): void {
-		$provisions = Yii::$app->provisions->getIssueUsersProvisions($this->model->issue);
-		$this->lawyerProvisions = $provisions['lawyer'];
-		$this->agentProvisions = $provisions['agent'];
-		$this->teleProvisions = $provisions['tele'];
+		$provisions = Yii::$app->provisions->getIssueWorkersProvisions($this->model->issue);
+		$this->lawyerProvisions = ArrayHelper::getValue($provisions, IssueUser::TYPE_LAWYER, []);
+		$this->agentProvisions = ArrayHelper::getValue($provisions, IssueUser::TYPE_AGENT, []);
+		$this->teleProvisions = ArrayHelper::getValue($provisions, IssueUser::TYPE_TELEMARKETER, []);
 		parent::init();
 	}
 
