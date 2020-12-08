@@ -2,21 +2,22 @@
 
 namespace backend\modules\settlement\models\search;
 
-use common\models\address\State;
 use common\models\issue\IssuePay;
 use common\models\issue\query\IssuePayQuery;
+use common\models\user\CustomerSearchInterface;
 use Decimal\Decimal;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\QueryInterface;
 
 /**
  * IssuePaySearch represents the model behind the search form of `common\models\issue\IssuePay`.
  */
-class IssuePaySearch extends IssuePay {
+class IssuePaySearch extends IssuePay implements CustomerSearchInterface {
 
 	public $issue_id;
 
-	public $clientSurname;
+	public $customerLastname;
 	public $calculationType;
 	public $deadlineAtFrom;
 	public $deadlineAtTo;
@@ -25,12 +26,12 @@ class IssuePaySearch extends IssuePay {
 
 	protected const TABLE_ALIAS = 'basePay';
 
-	public const PAY_STATUS_ALL = 0;
-	public const PAY_STATUS_ACTIVE = 10;
-	public const PAY_STATUS_DELAYED = 20;
-	public const PAY_STATUS_PAYED = 30;
+	public const PAY_STATUS_ALL = 'all';
+	public const PAY_STATUS_ACTIVE = 'active';
+	public const PAY_STATUS_DELAYED = 'delayed';
+	public const PAY_STATUS_PAYED = 'payed';
 
-	private $payStatus;
+	private string $payStatus;
 
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
@@ -45,16 +46,17 @@ class IssuePaySearch extends IssuePay {
 	public function rules(): array {
 		return [
 			[['id', 'issue_id', 'status', 'calculationType'], 'integer'],
-			[['deadlineAtFrom', 'deadlineAtTo', 'clientSurname'], 'safe'],
+			[['deadlineAtFrom', 'deadlineAtTo'], 'safe'],
+			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[['value'], 'number'],
 		];
 	}
 
-	public function setPayStatus(int $payStatus): void {
+	public function setPayStatus(string $payStatus): void {
 		$this->payStatus = $payStatus;
 	}
 
-	public function getPayStatus(): int {
+	public function getPayStatus(): string {
 		return $this->payStatus;
 	}
 
@@ -79,14 +81,10 @@ class IssuePaySearch extends IssuePay {
 		];
 	}
 
-	public static function getStateNames(): array {
-		return State::getSelectList();
-	}
-
 	/**
 	 * @inheritdoc
 	 */
-	public function scenarios() {
+	public function scenarios(): array {
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
 	}
@@ -98,12 +96,11 @@ class IssuePaySearch extends IssuePay {
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function search($params) {
+	public function search(array $params): ActiveDataProvider {
 		$query = IssuePay::find();
 		$query->alias(static::TABLE_ALIAS);
-		$query->joinWith('calculation as calculation');
-		$query->joinWith(['issue']);
-		$query->joinWith(['issue.customer.userProfile']);
+		$query->joinWith('calculation');
+		$query->joinWith('calculation.issue.customer.userProfile CP');
 
 		// add conditions that should always apply here
 		$this->applyPayStatusFilter($query);
@@ -122,6 +119,9 @@ class IssuePaySearch extends IssuePay {
 			return $dataProvider;
 		}
 
+		$this->applyCustomerSurnameFilter($query);
+		$this->applyStatusFilter($query);
+
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
@@ -129,16 +129,23 @@ class IssuePaySearch extends IssuePay {
 			'basePay.deadline_at' => $this->deadline_at,
 			'basePay.transfer_type' => $this->transfer_type,
 			'basePay.value' => $this->value,
-			'basePay.status' => $this->status,
 			'calculation.type' => $this->calculationType,
 
 		]);
 
-		$query->andFilterWhere(['like', 'issue.client_surname', $this->clientSurname])
+		$query
 			->andFilterWhere(['>=', 'deadline_at', $this->deadlineAtFrom])
 			->andFilterWhere(['<=', 'deadline_at', $this->deadlineAtTo]);
 
 		return $dataProvider;
+	}
+
+	protected function applyStatusFilter(QueryInterface $query): void {
+		if (empty($this->status)) {
+			$query->andWhere(['basePay.status' => null]);
+		} else {
+			$query->andWhere(['basePay.status' => $this->status]);
+		}
 	}
 
 	public function getPayedSum(IssuePayQuery $query): Decimal {
@@ -170,4 +177,11 @@ class IssuePaySearch extends IssuePay {
 				break;
 		}
 	}
+
+	public function applyCustomerSurnameFilter(QueryInterface $query): void {
+		if (!empty($this->customerLastname)) {
+			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
+		}
+	}
+
 }

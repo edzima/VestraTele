@@ -48,6 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		<?= IssuePayCalculationGrid::widget([
 			'filterModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+			'withIssue' => false,
 		]) ?>
 
 	</fieldset>

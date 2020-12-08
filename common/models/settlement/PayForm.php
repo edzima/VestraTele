@@ -51,9 +51,11 @@ class PayForm extends Model implements PayInterface {
 
 	public function attributeLabels(): array {
 		return [
+			'deadline_at' => Yii::t('settlement', 'Deadline at'),
 			'deadlineAt' => Yii::t('settlement', 'Deadline at'),
 			'transferType' => Yii::t('settlement', 'Pay transfer type'),
 			'value' => Yii::t('settlement', 'Value with VAT'),
+			'payment_at' => Yii::t('settlement', 'Payment at'),
 			'paymentAt' => Yii::t('settlement', 'Payment at'),
 		];
 	}

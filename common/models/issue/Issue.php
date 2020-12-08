@@ -87,6 +87,8 @@ use yii\db\Expression;
  */
 class Issue extends ActiveRecord implements IssueInterface {
 
+	use IssueTrait;
+
 	private const DEFAULT_PROVISION = Provision::TYPE_PERCENTAGE;
 
 	/* @var LegacyAddress */
@@ -471,23 +473,12 @@ class Issue extends ActiveRecord implements IssueInterface {
 			->exists();
 	}
 
-	public function getIssueId(): int {
-		return $this->id;
-	}
-
-	public function getIssueName(): string {
-		return $this->longId;
-	}
-
 	public function getIssueModel(): Issue {
 		return $this;
 	}
 
-	public function getIssueType(): IssueType {
-		return $this->type;
+	public static function getIssueIdAttribute(): string {
+		return 'id';
 	}
 
-	public function getIssueStage(): IssueStage {
-		return $this->stage;
-	}
 }

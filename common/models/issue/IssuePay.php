@@ -44,9 +44,8 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 	public const TRANSFER_TYPE_DIRECT = 1;
 	public const TRANSFER_TYPE_BANK = 2;
 
-	public const STATUS_PROBLEM = 10;
-	public const STATUS_PRE_JUDGMENT = 20;
-	public const STATUS_JUDGMENT = 30;
+	public const STATUS_NO_CONTACT = 10;
+	public const STATUS_ANALYSE = 20;
 
 	/**
 	 * @inheritdoc
@@ -182,9 +181,8 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 
 	public static function getStatusNames(): array {
 		return [
-			static::STATUS_PROBLEM => 'Problem',
-			static::STATUS_PRE_JUDGMENT => 'Przygotowanie do sądu',
-			static::STATUS_JUDGMENT => 'Sąd',
+			static::STATUS_NO_CONTACT => Yii::t('settlement', 'No contact'),
+			static::STATUS_ANALYSE => Yii::t('settlement', 'Analyse'),
 		];
 	}
 

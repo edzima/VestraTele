@@ -8,16 +8,19 @@ use yii\data\ActiveDataProvider;
 /* @var $searchModel IssuePayCalculationSearch */
 /* @var $dataProvider ActiveDataProvider */
 
-$this->title = Yii::t('settlement', 'Settlements without provisions');
-
+$this->title = Yii::t('settlement', 'Settlements with problems');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = Yii::t('backend', 'Without provisions');
-?>
-<div class="settlement-without-provisions">
+$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Settlements'), 'url' => ['/settlement/calculation/index']];
 
+$this->params['breadcrumbs'][] = Yii::t('backend', 'With problems');
+?>
+<div class="settlement-calculation-problems">
+
+	<?= $this->render('_search', ['model' => $searchModel]) ?>
+	
 	<?= IssuePayCalculationGrid::widget([
 		'filterModel' => $searchModel,
 		'dataProvider' => $dataProvider,
 	]) ?>
+
 </div>

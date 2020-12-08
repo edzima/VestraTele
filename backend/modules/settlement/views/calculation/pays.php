@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = ['label' => $calculation->issue->longId, 'url' 
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<div class="settlement-calculation-create">
+<div class="settlement-calculation-pays">
 
 
 	<h2> <?= Html::a(

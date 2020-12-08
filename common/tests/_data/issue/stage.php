@@ -14,6 +14,10 @@ return [
 		'days_reminder' => 56,
 	],
 	[
+		'name' => 'Stage with min 2 calculation',
+		'short_name' => 'ST2',
+	],
+	[
 		'id' => IssueStage::POSITIVE_DECISION_ID,
 		'name' => 'Positive Decision',
 		'short_name' => 'PD',
@@ -24,4 +28,5 @@ return [
 		'name' => 'Archives',
 		'short_name' => 'A',
 	],
+
 ];

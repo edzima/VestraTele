@@ -22,7 +22,7 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
-						'controllers' => ['settlement/calculation', 'settlement/calculation-min-count'],
+						'controllers' => ['settlement/calculation', 'settlement/calculation-min-count', 'settlement/calculation-problem'],
 						'permissions' => [Worker::PERMISSION_CALCULATION],
 					],
 					[

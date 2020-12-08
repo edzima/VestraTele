@@ -134,13 +134,18 @@ $user = Yii::$app->user;
 							'visible' => $user->can(User::PERMISSION_CALCULATION),
 							'items' => [
 								[
+									'label' => Yii::t('backend', 'Calculation to create'),
+									'url' => ['/settlement/calculation/to-create'],
+									'icon' => '<i class="fa fa-angle-double-right"></i>',
+								],
+								[
 									'label' => Yii::t('backend', 'Browse'),
 									'url' => ['/settlement/calculation/index'],
 									'icon' => '<i class="fa fa-angle-double-right"></i>',
 								],
 								[
-									'label' => Yii::t('backend', 'Calculation to create'),
-									'url' => ['/settlement/calculation/to-create'],
+									'label' => Yii::t('backend', 'With problems'),
+									'url' => ['/settlement/calculation-problem/index'],
 									'icon' => '<i class="fa fa-angle-double-right"></i>',
 								],
 								[
@@ -152,6 +157,12 @@ $user = Yii::$app->user;
 						],
 
 					],
+				],
+				[
+					'label' => Yii::t('settlement', 'Settlements without provisions'),
+					'url' => ['/settlement/calculation/without-provisions'],
+					'icon' => '<i class="fa fa-calculator"></i>',
+					'visible' => $user->can(User::PERMISSION_PROVISION),
 				],
 				[
 					'label' => Yii::t('backend', 'Provisions'),

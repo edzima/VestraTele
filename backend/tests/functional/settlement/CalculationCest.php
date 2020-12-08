@@ -2,10 +2,12 @@
 
 namespace backend\tests\functional\settlement;
 
+use backend\modules\settlement\controllers\CalculationController;
 use backend\tests\Step\Functional\CalculationIssueManager;
 use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
+use common\models\user\User;
 
 /**
  * Class CalculationIndexCest
@@ -14,9 +16,14 @@ use common\models\issue\Issue;
  */
 class CalculationCest {
 
+	/** @see CalculationController::actionIndex() */
 	public const ROUTE_INDEX = 'settlement/calculation/index';
-	public const ROUTE_ISSUE = 'settlement/calculation/issue';
+
+	/** @see CalculationController::actionToCreate() */
 	public const ROUTE_TO_CREATE = 'settlement/calculation/to-create';
+
+	/** @see CalculationController::actionIssue() */
+	public const ROUTE_ISSUE = 'settlement/calculation/issue';
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -42,11 +49,36 @@ class CalculationCest {
 	public function checkIndex(CalculationIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeLink('To create');
+		$I->seeLink('With problems');
+		$I->dontSeeLink('Without provisions');
 		$I->seeInGridHeader('Issue');
+		$I->dontSeeInGridHeader('Problem status');
+		$I->seeInGridHeader('Issue type');
 		$I->seeInGridHeader('Type');
-		//@todo change customer from client
-		//	$I->seeInGridHeader('Customer');
-		//	$I->seeInGridHeader('Value with VAT');
+		$I->seeInGridHeader('Issue stage on create');
+		$I->seeInGridHeader('Customer');
+		$I->seeInGridHeader('Value with VAT');
+		$I->seeInGridHeader('Value to pay');
+		$I->seeInGridHeader('Provider name');
+		$I->seeInGridHeader('Created at');
+		$I->seeInGridHeader('Updated at');
+	}
+
+	public function checkIndexWithProvisionPerrmision(CalculationIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(User::PERMISSION_PROVISION);
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeLink('Without provisions');
+		$I->click('Without provisions');
+		$I->seeResponseCodeIsSuccessful();
+	}
+
+	public function checkWithProblemsFromIndexLink(CalculationIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->click('With problems');
+		$I->seeInCurrentUrl(CalculationProblemStatusCest::ROUTE_INDEX);
 	}
 
 	public function checkToCreateWithoutMinCountSettings(CalculationIssueManager $I): void {
@@ -71,7 +103,7 @@ class CalculationCest {
 		$I->amLoggedIn();
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		/** @var Issue $issue */
-		$issue = $I->grabFixture('issue', 0);
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
 		$I->dontSee('Calculations for: ' . $issue->longId);
 		$I->see('Create calculation for: ' . $issue->longId);
@@ -84,25 +116,28 @@ class CalculationCest {
 			IssueFixtureHelper::settlements()
 		));
 		/** @var Issue $issue */
-		$issue = $I->grabFixture('issue', 0);
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
 		$I->see('Calculations for: ' . $issue->longId);
-		$I->seeLink('Create calculation');
+		$I->seeLink('Create settlement');
+
 		$I->see('To create');
 		$I->dontSeeInGridHeader('Issue', '#to-create-grid');
 		$I->seeInGridHeader('Type', '#to-create-grid');
 		$I->seeInGridHeader('Stage', '#to-create-grid');
 		$I->dontSeeInGridHeader('Customer', '#to-create-grid');
 
+
 		$I->see('Issue calculations');
 		$I->dontSeeInGridHeader('Issue', '#calculations-grid');
 		$I->seeInGridHeader('Type', '#calculations-grid');
+		$I->seeInGridHeader('Issue stage on create');
 		$I->seeInGridHeader('Problem status', '#calculations-grid');
 		$I->dontSeeInGridHeader('Customer', '#calculations-grid');
 		$I->seeInGridHeader('Value with VAT');
 	}
 
-	public function checkIssueWithCalculationStageWithoutCalculationOnIssuePage(CalculationIssueManager $I) {
+	public function checkIssueWithCalculationStageWithoutCalculationOnIssuePage(CalculationIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		/** @var Issue $issue */
@@ -119,9 +154,9 @@ class CalculationCest {
 			IssueFixtureHelper::settlements()
 		));
 		/** @var Issue $issue */
-		$issue = $I->grabFixture('issue', 0);
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
-		$I->click('Create calculation');
+		$I->click('Create settlement');
 		$I->seeResponseCodeIsSuccessful();
 		$I->seeInCurrentUrl(CalculationCreateCest::ROUTE);
 	}

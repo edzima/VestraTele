@@ -2,6 +2,7 @@
 
 namespace backend\modules\settlement\models\search;
 
+use backend\modules\issue\models\IssueStage;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueType;
 use common\models\issue\query\IssuePayCalculationQuery;
@@ -12,6 +13,7 @@ use common\models\user\CustomerSearchInterface;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\QueryInterface;
+use yii\helpers\ArrayHelper;
 
 /**
  * IssuePayCalculationSearch represents the model behind the search form of `common\models\issue\IssuePayCalculation`.
@@ -24,20 +26,21 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public string $customerLastname = '';
 	public ?bool $withCustomer = true;
 	public ?bool $withoutProvisions = null;
-	/**
-	 * @var bool|mixed|null
-	 */
+
 	public ?bool $onlyWithProblems = null;
+	public ?bool $onlyWithPayedPays = null;
+
+	private static ?array $STAGES_NAMES = null;
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['issue_id', 'type', 'problem_status'], 'integer'],
-			['issue_type_id', 'in', 'range' => IssueType::getTypesIds()],
+			[['issue_id', 'stage_id', 'type', 'problem_status'], 'integer'],
+			['issue_type_id', 'in', 'range' => IssueType::getTypesIds(), 'allowArray' => true],
 			[['value'], 'number'],
-			[['customerLastname'], 'safe'],
+			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];
 	}
 
@@ -61,11 +64,12 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		$query->joinWith('issue');
 		$query->joinWith('issue.type IT');
 
-
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
 			'sort' => [
-				'defaultOrder' => 'updated_at DESC',
+				'defaultOrder' => [
+					'updated_at' => SORT_DESC,
+				],
 			],
 		]);
 
@@ -75,19 +79,31 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 			return $dataProvider;
 		}
 		$this->applyCustomerSurnameFilter($query);
-		$this->applyWithoutProvisionsFilter($query);
 		$this->applyProblemStatusFilter($query);
 		$this->applyIssueTypeFilter($query);
+		$this->applyWithPayedPays($query);
+		$this->applyWithoutProvisionsFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
 			IssuePayCalculation::tableName() . '.value' => $this->value,
 			IssuePayCalculation::tableName() . '.type' => $this->type,
+			IssuePayCalculation::tableName() . '.stage_id' => $this->stage_id,
 		]);
 
 		$query->andFilterWhere(['like', 'issue.id', $this->issue_id]);
 
 		return $dataProvider;
+	}
+
+	protected function applyWithPayedPays(IssuePayCalculationQuery $query): void {
+		if ($this->onlyWithPayedPays) {
+			$query->joinWith([
+				'pays P' => function (IssuePayQuery $payQuery) {
+					$payQuery->onlyPayed();
+				},
+			]);
+		}
 	}
 
 	protected function applyProblemStatusFilter(IssuePayCalculationQuery $query): void {
@@ -130,6 +146,21 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		if (!empty($this->issue_type_id)) {
 			$query->andWhere(['IT.id' => $this->issue_type_id]);
 		}
+	}
+
+	public static function getStagesNames(): array {
+		if (static::$STAGES_NAMES === null) {
+			$ids = IssuePayCalculation::find()
+				->groupBy('stage_id')
+				->select('stage_id')
+				->column();
+			$models = IssueStage::find()
+				->andWhere(['id' => $ids])
+				->asArray()
+				->all();
+			static::$STAGES_NAMES = ArrayHelper::map($models, 'id', 'name');
+		}
+		return static::$STAGES_NAMES;
 	}
 
 }

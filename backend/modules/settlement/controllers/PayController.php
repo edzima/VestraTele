@@ -40,7 +40,7 @@ class PayController extends Controller {
 	 * @param int $status
 	 * @return mixed
 	 */
-	public function actionIndex(int $status = IssuePaySearch::PAY_STATUS_ACTIVE) {
+	public function actionIndex(string $status = IssuePaySearch::PAY_STATUS_ACTIVE) {
 
 		$searchModel = new IssuePaySearch();
 		$searchModel->setPayStatus($status);
@@ -141,7 +141,7 @@ class PayController extends Controller {
 	 * @return IssuePay the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): IssuePay {
+	protected function findModel(int $id): IssuePay {
 		if (($model = IssuePay::findOne($id)) !== null) {
 			return $model;
 		}

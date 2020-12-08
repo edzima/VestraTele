@@ -12,10 +12,11 @@ class PayFormTest extends Unit {
 
 	public function testEmpty(): void {
 		$model = $this->createForm();
+		$this->assertFalse($model->validate());
 		$this->assertNull($model->generatePay());
 		$this->tester->assertSame('Value with VAT cannot be blank.', $model->getFirstError('value'));
-		$this->tester->assertSame('Payment at is required when Deadline at is empty.', $model->getFirstError('paymentAt'));
-		$this->tester->assertSame('Deadline at is required when Payment at is empty.', $model->getFirstError('deadlineAt'));
+		$this->tester->assertSame('Payment at is required when Deadline at is empty.', $model->getFirstError('payment_at'));
+		$this->tester->assertSame('Deadline at is required when Payment at is empty.', $model->getFirstError('deadline_at'));
 	}
 
 	public function testValueAsString(): void {

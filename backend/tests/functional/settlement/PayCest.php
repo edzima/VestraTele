@@ -2,6 +2,7 @@
 
 namespace backend\tests\functional\settlement;
 
+use backend\modules\settlement\controllers\PayController;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\PayIssueManager;
 
@@ -12,6 +13,9 @@ use backend\tests\Step\Functional\PayIssueManager;
  */
 class PayCest {
 
+	/**
+	 * @see PayController::actionIndex()
+	 */
 	public const ROUTE_INDEX = '/settlement/pay/index';
 
 	public function checkAsManager(Manager $I): void {
@@ -38,7 +42,6 @@ class PayCest {
 	public function checkIndex(PayIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->seeInGridHeader('Issue');
 		$I->seeInGridHeader('Settlement type');
 	}
 

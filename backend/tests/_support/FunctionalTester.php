@@ -37,7 +37,7 @@ class FunctionalTester extends \Codeception\Actor {
 	}
 
 	public function clickMenuLink($text): void {
-		$this->click($text, '.main-sidebar li:last-child a');
+		$this->click($text, '.main-sidebar li a');
 	}
 
 	public function seeMenuLink($text): void {

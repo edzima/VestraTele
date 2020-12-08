@@ -20,6 +20,9 @@ use Yii;
 
 class IssueFixtureHelper {
 
+	public const ISSUE_COUNT = 6;
+	public const ARCHIVED_ISSUE_COUNT = 1;
+
 	public const CALCULATION = 'calculation';
 	public const PAY = 'pay';
 	public const ISSUE = 'issue';

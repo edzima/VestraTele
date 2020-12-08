@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		</div>
 	</div>
 
-	<?= $this->render('_problem-status_form', [
+	<?= $this->render('_form', [
 		'model' => $model,
 	]) ?>
 

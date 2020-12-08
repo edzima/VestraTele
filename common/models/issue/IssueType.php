@@ -96,6 +96,10 @@ class IssueType extends ActiveRecord {
 		return array_keys(static::getTypes());
 	}
 
+	public static function getShortTypesNames(): array {
+		return ArrayHelper::map(static::getTypes(), 'id', 'short_name');
+	}
+
 	public static function getTypesNames(): array {
 		return ArrayHelper::map(static::getTypes(), 'id', 'name');
 	}

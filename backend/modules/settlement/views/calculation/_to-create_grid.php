@@ -4,6 +4,7 @@ use backend\helpers\Url;
 use backend\modules\settlement\models\search\IssueToCreateCalculationSearch;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
+use backend\widgets\IssueTypeColumn;
 use common\models\issue\Issue;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
@@ -16,6 +17,7 @@ use yii\web\View;
 /* @var $dataProvider ActiveDataProvider */
 /* @var $withIssue bool */
 /* @var $withCustomer bool */
+
 ?>
 
 
@@ -30,7 +32,7 @@ use yii\web\View;
 			'buttons' => [
 				'create' => static function ($url, Issue $model): string {
 					return Html::a(
-						'<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>',
+						Html::icon('plus'),
 						Url::toRoute(['create', 'id' => $model->id]),
 						[
 							'title' => 'Dodaj',
@@ -45,17 +47,17 @@ use yii\web\View;
 			'visible' => $withIssue,
 		],
 		[
-			'attribute' => 'type',
-			'value' => 'type.name',
-			'filter' => IssueToCreateCalculationSearch::getTypesNames(),
+			'attribute' => 'type_id',
+			'class' => IssueTypeColumn::class,
 		],
 		[
-			'attribute' => 'stage',
+			'attribute' => 'stage_id',
 			'value' => 'stage.name',
 			'filter' => $searchModel->getStagesNames(),
 		],
 		[
 			'class' => CustomerDataColumn::class,
+			'value' => 'customer.fullName',
 			'visible' => $withCustomer,
 		],
 	],

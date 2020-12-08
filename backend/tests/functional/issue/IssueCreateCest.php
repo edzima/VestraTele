@@ -38,7 +38,7 @@ class IssueCreateCest {
 				'type_id' => 1,
 				'stage_id' => 1,
 				'lawyer_id' => 200,
-				'date' => date('Y-m-d'),
+				'signing_at' => date('Y-m-d'),
 			],
 		]);
 
@@ -47,7 +47,7 @@ class IssueCreateCest {
 			'entity_responsible_id' => 1,
 			'type_id' => 1,
 			'stage_id' => 1,
-			'date' => date('Y-m-d'),
+			'signing_at' => date('Y-m-d'),
 		]);
 
 		$I->seeRecord(IssueUser::class, [

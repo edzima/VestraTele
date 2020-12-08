@@ -32,6 +32,7 @@ class CalculationFormTest extends PayFormTest {
 		$this->tester->assertSame('Issue Id cannot be blank.', $model->getFirstError('issue_id'));
 		$this->tester->assertSame('Type cannot be blank.', $model->getFirstError('type'));
 		$this->tester->assertSame('Provider cannot be blank.', $model->getFirstError('providerType'));
+		$this->tester->assertSame('Owner is invalid.', $model->getFirstError('owner'));
 	}
 
 	public function testInvalidType(): void {
@@ -62,7 +63,7 @@ class CalculationFormTest extends PayFormTest {
 		$model->issue_id = 1;
 		$model->value = 12300;
 		$model->vat = 23;
-		$model->type = IssuePayCalculation::TYPE_PROVISION;
+		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
 		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
 		$model->payment_at = '2020-02-02';
 		$this->tester->assertTrue($model->save());
@@ -70,7 +71,7 @@ class CalculationFormTest extends PayFormTest {
 			'owner_id' => static::AGENT_ID,
 			'issue_id' => 1,
 			'value' => 12300,
-			'type' => IssuePayCalculation::TYPE_PROVISION,
+			'type' => IssuePayCalculation::TYPE_HONORARIUM,
 			'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 			'payment_at' => '2020-02-02',
 			'provider_id' => $model->getModel()->issue->customer->id,
@@ -92,7 +93,7 @@ class CalculationFormTest extends PayFormTest {
 		$model->issue_id = 1;
 		$model->value = 123;
 		$model->vat = 23;
-		$model->type = IssuePayCalculation::TYPE_PROVISION;
+		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
 		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
 		$model->payment_at = '2020-01-01';
 		$pay = $model->generatePay();

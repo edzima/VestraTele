@@ -38,6 +38,7 @@ class CalculationViewCest {
 		$I->see('Value to pay');
 		$I->dontSeeLink('Generate pays');
 	}
+
 	public function checkNotPayedWithPayPermission(CalculationIssueManager $I): void {
 		$I->assignPermission(User::PERMISSION_PAY);
 		/** @var IssuePayCalculation $model */
@@ -45,6 +46,5 @@ class CalculationViewCest {
 		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
 		$I->seeLink('Generate pays');
 	}
-
 
 }

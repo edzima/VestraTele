@@ -1,7 +1,7 @@
 <?php
 
 use backend\modules\settlement\models\search\IssuePaySearch;
-use common\widgets\DateTimeWidget;
+use common\widgets\DateWidget;
 use yii\bootstrap\Nav;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -20,40 +20,17 @@ $action = Yii::$app->controller->action->id;
 		'method' => 'get',
 	]); ?>
 
-	<div style="display:flex; align-items: center;">
+	<div class="fields-wrapper">
 
 		<div class="date-range-fields-wrapper" style="margin-left:auto;display: flex;align-items: center;">
 
 
 			<?= $form->field($model, 'deadlineAtFrom')
-				->widget(DateTimeWidget::class,
-					[
-						'phpDatetimeFormat' => 'yyyy-MM-dd',
-						'clientOptions' => [
-
-							'allowInputToggle' => true,
-							'sideBySide' => true,
-							'widgetPositioning' => [
-								'horizontal' => 'auto',
-								'vertical' => 'auto',
-							],
-						],
-					]) ?>
+				->widget(DateWidget::class) ?>
 
 			<?= $form->field($model, 'deadlineAtTo')
-				->widget(DateTimeWidget::class,
-					[
-						'phpDatetimeFormat' => 'yyyy-MM-dd',
-						'clientOptions' => [
+				->widget(DateWidget::class) ?>
 
-							'allowInputToggle' => true,
-							'sideBySide' => true,
-							'widgetPositioning' => [
-								'horizontal' => 'auto',
-								'vertical' => 'auto',
-							],
-						],
-					]) ?>
 			<?= Nav::widget([
 				'items' => [
 					[

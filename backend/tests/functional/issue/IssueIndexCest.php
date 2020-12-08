@@ -2,6 +2,7 @@
 
 namespace backend\tests\functional\issue;
 
+use backend\modules\issue\controllers\IssueController;
 use backend\tests\_support\Step\Functional\ExportIssueManager;
 use backend\tests\Step\Functional\Admin;
 use backend\tests\Step\Functional\IssueManager;
@@ -9,6 +10,9 @@ use backend\tests\Step\Functional\Manager;
 
 class IssueIndexCest {
 
+	/**
+	 * @see IssueController::actionIndex()
+	 */
 	protected const ROUTE = '/issue/issue/index';
 
 	public function checkWithoutPermission(Manager $I): void {
@@ -27,13 +31,13 @@ class IssueIndexCest {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE);
 		$I->see('Issues', 'h1');
-		$I->dontSeeLink('Export');
+		$I->dontSeeLink('CSV export');
 	}
 
 	public function checkIndexAsExportIssueManager(ExportIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE);
-		$I->seeLink('Export');
+		$I->seeLink('CSV export');
 	}
 
 	public function checkSearchFields(IssueManager $I): void {

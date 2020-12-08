@@ -5,12 +5,11 @@ namespace backend\tests\unit\issue\search;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
-use yii\data\ActiveDataProvider;
+use common\tests\_support\UnitSearchModelTrait;
 
 class IssueSearchTest extends Unit {
 
-	/** @var IssueSearch */
-	protected IssueSearch $model;
+	use UnitSearchModelTrait;
 
 	public static bool $hasFixture = false;
 
@@ -29,16 +28,16 @@ class IssueSearchTest extends Unit {
 	}
 
 	public function testWithoutSearchParams(): void {
-		$this->assertTotalCount(4);
+		$this->assertTotalCount(IssueFixtureHelper::ISSUE_COUNT - IssueFixtureHelper::ARCHIVED_ISSUE_COUNT);
 	}
 
 	public function testWithArchiveAsParams(): void {
-		$this->assertTotalCount(4);
+		$this->assertTotalCount(IssueFixtureHelper::ISSUE_COUNT - IssueFixtureHelper::ARCHIVED_ISSUE_COUNT, ['withArchive' => true]);
 	}
 
 	public function testWithArchive(): void {
 		$this->model->withArchive = true;
-		$this->assertTotalCount(5);
+		$this->assertTotalCount(IssueFixtureHelper::ISSUE_COUNT);
 	}
 
 	public function testForId(): void {
@@ -48,17 +47,17 @@ class IssueSearchTest extends Unit {
 
 	public function testForType(): void {
 		$this->assertTotalCount(2, ['type_id' => 1]);
-		$this->assertTotalCount(2, ['type_id' => 2]);
+		$this->assertTotalCount(3, ['type_id' => 2]);
 	}
 
 	public function testForStage(): void {
 		$this->assertTotalCount(1, ['stage_id' => 1]);
-		$this->assertTotalCount(2, ['stage_id' => 2]);
+		$this->assertTotalCount(3, ['stage_id' => 2]);
 	}
 
 	public function testExcludedStages(): void {
 		$this->assertTotalCount(2, ['excludedStages' => [2]]);
-		$this->assertTotalCount(3, ['excludedStages' => [1]]);
+		$this->assertTotalCount(4, ['excludedStages' => [1]]);
 	}
 
 	public function testCustomerLastname(): void {
@@ -81,18 +80,8 @@ class IssueSearchTest extends Unit {
 		$this->assertTotalCount(1, ['agent_id' => 300, 'customerLastname' => 'Lar']);
 	}
 
-
 	public function testForAgentAndLawyer(): void {
 		$this->assertTotalCount(1, ['agent_id' => 300, 'lawyer_id' => 200]);
-	}
-
-
-	protected function assertTotalCount(int $count, array $params = []): void {
-		$this->tester->assertSame($count, $this->search($params)->getTotalCount());
-	}
-
-	protected function search(array $params = []): ActiveDataProvider {
-		return $this->model->search(['IssueSearch' => $params]);
 	}
 
 }

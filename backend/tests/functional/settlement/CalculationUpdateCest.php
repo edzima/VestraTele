@@ -64,7 +64,7 @@ class CalculationUpdateCest {
 		/** @var IssuePayCalculation $calculation */
 		$I->amOnPage([static::ROUTE, 'id' => $calculation->id]);
 		$I->seeOptionIsSelected('#calculationform-type', IssuePayCalculation::getTypesNames()[IssuePayCalculation::TYPE_ADMINISTRATIVE]);
-		$I->selectOption('#calculationform-type', IssuePayCalculation::TYPE_PROVISION);
+		$I->selectOption('#calculationform-type', IssuePayCalculation::TYPE_HONORARIUM);
 		$I->click('Save');
 		$I->dontSeeRecord(IssuePayCalculation::class, [
 			'id' => $calculation->id,
@@ -72,7 +72,7 @@ class CalculationUpdateCest {
 		]);
 		$I->seeRecord(IssuePayCalculation::class, [
 			'id' => $calculation->id,
-			'type' => IssuePayCalculation::TYPE_PROVISION,
+			'type' => IssuePayCalculation::TYPE_HONORARIUM,
 		]);
 	}
 

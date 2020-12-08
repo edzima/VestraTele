@@ -42,10 +42,7 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 
 	use IssueTrait;
 
-	public const TYPE_NOT_SET = 0;
 	public const TYPE_ADMINISTRATIVE = 10;
-	public const TYPE_PROVISION = 20;
-	public const TYPE_PROVISION_REFUND = 25;
 	public const TYPE_HONORARIUM = 30;
 	public const TYPE_LAWYER = 40;
 	public const TYPE_SUBSCRIPTION = 50;
@@ -144,6 +141,10 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 		return $this->hasOne(User::class, ['id' => 'owner_id']);
 	}
 
+	public function getStage():ActiveQuery{
+		return $this->hasOne(IssueStage::class, ['id' => 'stage_id']);
+	}
+
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getIssue(): IssueQuery {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
@@ -216,8 +217,6 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 	public static function getTypesNames(): array {
 		return [
 			static::TYPE_ADMINISTRATIVE => Yii::t('settlement', 'Administrative'),
-			static::TYPE_PROVISION => Yii::t('settlement', 'Provision'),
-			static::TYPE_PROVISION_REFUND => Yii::t('settlement', 'Provision refund'),
 			static::TYPE_HONORARIUM => Yii::t('settlement', 'Honorarium'),
 			static::TYPE_LAWYER => Yii::t('settlement', 'Lawyer'),
 			static::TYPE_SUBSCRIPTION => Yii::t('settlement', 'Subscription'),

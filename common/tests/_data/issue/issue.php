@@ -27,6 +27,12 @@ return [
 		'entity_responsible_id' => 2,
 		'signing_at' => '2020-01-02',
 	],
+	[
+		'type_id' => 2,
+		'stage_id' => 2,
+		'entity_responsible_id' => 2,
+		'signing_at' => '2020-01-02',
+	],
 	'archived' => [
 		'type_id' => 1,
 		'stage_id' => IssueStage::ARCHIVES_ID,

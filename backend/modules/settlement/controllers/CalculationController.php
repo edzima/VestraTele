@@ -4,7 +4,6 @@ namespace backend\modules\settlement\controllers;
 
 use backend\helpers\Url;
 use backend\modules\settlement\models\CalculationForm;
-use backend\modules\settlement\models\CalculationProblemStatusForm;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\modules\settlement\models\search\IssueToCreateCalculationSearch;
 use common\models\issue\Issue;
@@ -13,7 +12,6 @@ use common\models\issue\IssuePayCalculation;
 use common\models\settlement\PaysForm;
 use common\models\user\User;
 use Yii;
-use yii\base\InvalidConfigException;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -45,6 +43,7 @@ class CalculationController extends Controller {
 	 */
 	public function actionIndex(): string {
 		$searchModel = new IssuePayCalculationSearch();
+		$searchModel->onlyWithProblems = false;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -109,21 +108,6 @@ class CalculationController extends Controller {
 		]);
 	}
 
-	public function actionProblemStatus(int $id) {
-		try {
-			$model = new CalculationProblemStatusForm($this->findModel($id));
-			if ($model->load(Yii::$app->request->post()) && $model->save()) {
-				return $this->redirect(['view', 'id' => $id]);
-			}
-			return $this->render('problem-status', [
-				'model' => $model,
-			]);
-		} catch (InvalidConfigException $exception) {
-			Yii::$app->session->addFlash('warning', Yii::t('backend', 'Only not payed calculation can be set problem status.'));
-		}
-		return $this->redirect(['view', 'id' => $id]);
-	}
-
 	/**
 	 * Displays a single IssuePayCalculation model.
 	 *
@@ -149,6 +133,9 @@ class CalculationController extends Controller {
 	public function actionCreate(int $id) {
 		$issue = $this->findIssueModel($id);
 		$model = new CalculationForm();
+		if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
+			Yii::$app->session->addFlash('warning', Yii::t('settlement','You try create calculation as Admin.'));
+		}
 		$model->setOwner(Yii::$app->user->getId());
 		$model->issue_id = $issue->id;
 		$model->vat = $issue->type->vat;
@@ -239,7 +226,7 @@ class CalculationController extends Controller {
 	 * @return IssuePayCalculation the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): IssuePayCalculation {
+	protected function findModel(int $id): IssuePayCalculation {
 		if (($model = IssuePayCalculation::findOne($id)) !== null) {
 			return $model;
 		}

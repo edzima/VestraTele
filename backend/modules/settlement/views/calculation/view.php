@@ -2,10 +2,8 @@
 
 use backend\helpers\Breadcrumbs;
 use backend\helpers\Url;
-use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
-use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssuePaysWidget;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
@@ -44,9 +42,8 @@ YiiAsset::register($this);
 			: '' ?>
 
 
-		<?= Html::a('Notatka', ['note/create', 'issueId' => $model->issue_id, 'type' => IssueNote::TYPE_PAY], [
-			'class' => 'btn btn-success',
-		]) ?>
+		<?php //@todo enable this after refactoring note
+		//  Html::a('Notatka', ['note/create', 'issueId' => $model->issue_id, 'type' => IssueNote::TYPE_PAY], ['class' => 'btn btn-success',]) ?>
 
 
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
@@ -98,11 +95,16 @@ YiiAsset::register($this);
 		'editPayBtn' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
 	]) ?>
 
-	<?= IssueNotesWidget::widget([
+	<?php
+	//@todo enable this after refactoring note
+	/*IssueNotesWidget::widget([
 		'model' => $model->issue,
 		'notes' => $model->issue->getIssueNotes()->onlyPays()->all(),
 		'type' => IssueNotesWidget::TYPE_PAY,
-	]) ?>
+
+	])
+	*/
+	?>
 
 
 </div>

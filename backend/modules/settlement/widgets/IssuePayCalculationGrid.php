@@ -27,6 +27,9 @@ class IssuePayCalculationGrid extends GridView {
 	public $filterModel;
 
 	public function init(): void {
+		if (!empty($this->id) && !isset($this->options['id'])) {
+			$this->options['id'] = $this->id;
+		}
 		if ($this->filterModel !== null && !$this->filterModel instanceof IssuePayCalculationSearch) {
 			throw new InvalidConfigException('$filter model must be instance of: ' . IssuePayCalculationSearch::class . '.');
 		}
@@ -46,16 +49,20 @@ class IssuePayCalculationGrid extends GridView {
 						if ($model->isPayed()) {
 							return '';
 						}
-						return Html::a(Html::icon('warning'), $url);
+						return Html::a(Html::icon('warning-sign'),
+							['/settlement/calculation-problem/set', 'id' => $model->id],
+							[
+								'title' => Yii::t('backend', 'Set problem status'),
+								'aria-label' => Yii::t('backend', 'Set problem status'),
+							]);
 					},
 					'provision' => static function (string $url, IssuePayCalculation $model) {
 						return Yii::$app->user->can(User::PERMISSION_PROVISION)
-							? Html::a('<span class="glyphicon glyphicon-usd"></span>',
+							? Html::a(Html::icon('usd'),
 								['/provision/settlement/set', 'id' => $model->id],
 								[
-									'title' => 'Prowizje',
-									'aria-label' => 'Prowizje',
-									'data-pjax' => '0',
+									'title' => Yii::t('backend', 'Set provisions'),
+									'aria-label' => Yii::t('backend', 'Set provisions'),
 								])
 							: '';
 					},
@@ -66,8 +73,21 @@ class IssuePayCalculationGrid extends GridView {
 				'visible' => $this->withIssue,
 			],
 			[
+				'attribute' => 'problem_status',
+				'value' => 'problemStatusName',
+				'filter' => $this->filterModel::getProblemStatusesNames(),
+				'visible' => $this->filterModel->problem_status !== null || $this->filterModel->onlyWithProblems,
+			],
+			[
 				'class' => IssueTypeColumn::class,
+				'label' => Yii::t('backend', 'Issue type'),
 				'attribute' => 'issue_type_id',
+			],
+			[
+				'attribute' => 'stage_id',
+				'label' => Yii::t('backend', 'Issue stage on create'),
+				'value' => 'stage.name',
+				'filter' => $this->filterModel::getStagesNames(),
 			],
 			[
 				'attribute' => 'type',
@@ -75,19 +95,10 @@ class IssuePayCalculationGrid extends GridView {
 				'filter' => $this->filterModel::getTypesNames(),
 			],
 			[
-				'attribute' => 'problem_status',
-				'value' => 'problemStatusName',
-				'filter' => $this->filterModel::getProblemStatusesNames(),
-				'visible' => $this->filterModel->problem_status !== null,
-			],
-			[
 				'class' => CustomerDataColumn::class,
 				'visible' => $this->withCustomer,
 			],
-			[
-				'attribute' => 'providerName',
-				'filter' => $this->filterModel::getProvidersTypesNames(),
-			],
+
 			[
 				'attribute' => 'value',
 				'format' => 'currency',
@@ -96,7 +107,17 @@ class IssuePayCalculationGrid extends GridView {
 				'attribute' => 'valueToPay',
 				'format' => 'currency',
 				'visible' => function (IssuePayCalculation $model): bool {
-					return $model->isPayed();
+					return !$model->isPayed();
+				},
+			],
+			[
+				'attribute' => 'providerName',
+				'filter' => $this->filterModel::getProvidersTypesNames(),
+				'value' => function (IssuePayCalculation $model): string {
+					if ($model->provider_type === IssuePayCalculation::PROVIDER_RESPONSIBLE_ENTITY) {
+						return $model->getProviderName();
+					}
+					return $this->filterModel::getProvidersTypesNames()[IssuePayCalculation::PROVIDER_CLIENT];
 				},
 			],
 			[
@@ -105,10 +126,6 @@ class IssuePayCalculationGrid extends GridView {
 			],
 			[
 				'attribute' => 'updated_at',
-				'format' => 'date',
-			],
-			[
-				'attribute' => 'payment_at',
 				'format' => 'date',
 			],
 		];

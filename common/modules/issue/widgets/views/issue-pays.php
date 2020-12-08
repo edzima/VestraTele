@@ -42,7 +42,7 @@ use yii\widgets\DetailView;
 						],
 						'attributes' => [
 							[
-								'attribute' => 'payment_at',
+								'attribute' => 'pay_at',
 								'format' => 'date',
 								'visible' => $pay->isPayed(),
 							],

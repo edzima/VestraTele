@@ -4,6 +4,7 @@ namespace backend\tests\functional\issue;
 
 use backend\tests\Step\Functional\IssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\models\issue\Issue;
 
 class LinkUserCest {
 
@@ -56,7 +57,9 @@ class LinkUserCest {
 	public function checkLinkToArchiveIssue(IssueManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnPage($this->linkPage(101));
-		$I->submitForm(static::FORM_SELECTOR, $this->formParams(5, 'victim'));
+		/** @var Issue $issue */
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 'archive');
+		$I->submitForm(static::FORM_SELECTOR, $this->formParams($issue->id, 'victim'));
 		$I->seeValidationError('Issue cannot be archived.');
 	}
 

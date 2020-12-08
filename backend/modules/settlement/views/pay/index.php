@@ -109,27 +109,17 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => DataColumn::class,
-				'attribute' => 'issue_id',
-				'label' => Yii::t('common', 'Issue'),
+				'attribute' => 'calculationType',
 				'format' => 'raw',
 				'value' => static function (IssuePay $model) {
 					return Html::a(
-						$model->issue,
+						$model->calculation->getTypeName(),
 						Url::toRoute(['calculation/view', 'id' => $model->calculation_id]),
 						['target' => '_blank']);
 				},
-				'filterInputOptions' => [
-					'class' => 'dynamic-search',
-				],
-				'width' => '50px',
-			],
-			[
-				'class' => DataColumn::class,
-				'attribute' => 'calculationType',
-				'value' => 'calculation.typeName',
 				'filter' => IssuePayCalculation::getTypesNames(),
 				'label' => Yii::t('settlement', 'Settlement type'),
-				'width' => '100px',
+				'width' => '120px',
 			],
 			[
 				'class' => DataColumn::class,
@@ -141,8 +131,8 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => DataColumn::class,
-				'attribute' => 'clientSurname',
-				'value' => 'issue.customer',
+				'attribute' => 'customerLastname',
+				'value' => 'calculation.issue.customer',
 				'label' => Customer::getRolesNames()[Customer::ROLE_CUSTOMER],
 				'filterInputOptions' => [
 					'class' => 'dynamic-search',

@@ -29,4 +29,9 @@ return [
 		'stage_id' => IssueStage::POSITIVE_DECISION_ID,
 		'min_calculation_count' => 1,
 	],
+	[
+		'type_id' => 2,
+		'stage_id' => 2,
+		'min_calculation_count' => 2,
+	],
 ];

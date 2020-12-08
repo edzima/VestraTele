@@ -3,6 +3,7 @@
 namespace backend\modules\user\models\search;
 
 use common\models\user\query\UserQuery;
+use common\models\user\SurnameSearchInterface;
 use common\models\user\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -30,6 +31,7 @@ class UserSearch extends User {
 		return [
 			[['id', 'status', 'created_at', 'updated_at', 'action_at', 'gender', 'region_id'], 'integer'],
 			[['username', 'email', 'ip', 'firstname', 'lastname', 'phone', 'city'], 'safe'],
+			['lastname', 'string', 'min' => SurnameSearchInterface::MIN_LENGTH],
 		];
 	}
 

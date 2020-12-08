@@ -10,6 +10,7 @@ use yii\helpers\Html;
 class IssueColumn extends DataColumn {
 
 	public ?string $issueAttribute = 'issue';
+	public $attribute = 'issue_id';
 
 	public array $linkOptions = [
 		'target' => '_blank',
