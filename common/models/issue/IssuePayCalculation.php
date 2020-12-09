@@ -257,8 +257,8 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 
 	public static function getTypesNames(): array {
 		return [
-			static::TYPE_ADMINISTRATIVE => Yii::t('settlement', 'Administrative'),
 			static::TYPE_HONORARIUM => Yii::t('settlement', 'Honorarium'),
+			static::TYPE_ADMINISTRATIVE => Yii::t('settlement', 'Administrative'),
 			static::TYPE_LAWYER => Yii::t('settlement', 'Lawyer'),
 			static::TYPE_SUBSCRIPTION => Yii::t('settlement', 'Subscription'),
 		];
