@@ -2,8 +2,8 @@
 
 namespace common\modules\issue\widgets;
 
-use backend\helpers\Url;
 use common\models\issue\IssueNote;
+use yii\helpers\Url;
 
 /**
  * Widget for render Issue Notes.

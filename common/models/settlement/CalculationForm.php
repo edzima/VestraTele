@@ -45,9 +45,18 @@ class CalculationForm extends PayForm {
 		], parent::rules());
 	}
 
+	public function isRequiredPaymentAt(): bool {
+		return $this->getModel()->getPaysCount() < 2 && parent::isRequiredPaymentAt();
+	}
+
+	public function isRequiredDeadlineAt(): bool {
+		return $this->getModel()->getPaysCount() < 2 && parent::isRequiredDeadlineAt();
+	}
+
 	public function attributeLabels(): array {
 		return array_merge([
 			'providerType' => Yii::t('settlement', 'Provider'),
+			'type' => Yii::t('settlement', 'Type'),
 		], parent::attributeLabels());
 	}
 

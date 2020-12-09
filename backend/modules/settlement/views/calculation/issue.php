@@ -49,6 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'filterModel' => $searchModel,
 			'dataProvider' => $dataProvider,
 			'withIssue' => false,
+			'withCustomer' => false,
 		]) ?>
 
 	</fieldset>

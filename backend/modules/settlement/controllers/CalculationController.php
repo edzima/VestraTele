@@ -119,11 +119,24 @@ class CalculationController extends Controller {
 		if (Yii::$app->user->can(User::PERMISSION_PROVISION)) {
 			foreach ($model->pays as $pay) {
 				if (empty($pay->provisions)) {
-					Yii::$app->session->addFlash('warning', 'Brak ustawionych prowizji dla wpłaty: ' . Yii::$app->formatter->asCurrency($pay->getValue()));
+					Yii::$app->session->addFlash('warning',
+						Yii::t('backend', 'Pay: {value} dont has provisions.', [
+							'value' => Yii::$app->formatter->asCurrency($pay->getValue()),
+						])
+					);
 				}
 			}
 		}
 		Url::remember();
+		$diff = $model->getValue()->sub($model->getPays()->getValueSum());
+		if (!$diff->isZero()) {
+			Yii::$app->session->addFlash('error',
+				Yii::t('backend', 'Settlement value is not same as sum value from pays. Diff: {diffValue}.', [
+					'diffValue' => Yii::$app->formatter->asCurrency($diff),
+				])
+			);
+			Yii::warning(Yii::t('backend', 'Settlement: {id} has not valid total value.', ['id' => $id]), 'settlement.diffValue');
+		}
 
 		return $this->render('view', [
 			'model' => $model,
@@ -134,11 +147,12 @@ class CalculationController extends Controller {
 		$issue = $this->findIssueModel($id);
 		$model = new CalculationForm();
 		if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
-			Yii::$app->session->addFlash('warning', Yii::t('settlement','You try create calculation as Admin.'));
+			Yii::$app->session->addFlash('warning', Yii::t('settlement', 'You try create calculation as Admin.'));
 		}
 		$model->setOwner(Yii::$app->user->getId());
 		$model->issue_id = $issue->id;
 		$model->vat = $issue->type->vat;
+		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}

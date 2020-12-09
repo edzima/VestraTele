@@ -2,7 +2,6 @@
 
 namespace backend\modules\settlement\models\search;
 
-use backend\modules\issue\models\IssueStage;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueType;
 use common\models\issue\query\IssuePayCalculationQuery;
@@ -13,7 +12,6 @@ use common\models\user\CustomerSearchInterface;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\QueryInterface;
-use yii\helpers\ArrayHelper;
 
 /**
  * IssuePayCalculationSearch represents the model behind the search form of `common\models\issue\IssuePayCalculation`.
@@ -24,13 +22,11 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 	public $issue_type_id;
 	public string $customerLastname = '';
-	public ?bool $withCustomer = true;
+	public bool $withCustomer = true;
 	public ?bool $withoutProvisions = null;
 
 	public ?bool $onlyWithProblems = null;
 	public ?bool $onlyWithPayedPays = null;
-
-	private static ?array $STAGES_NAMES = null;
 
 	/**
 	 * {@inheritdoc}
@@ -76,6 +72,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		$this->load($params);
 
 		if (!$this->validate()) {
+			$query->andWhere('0=1');
 			return $dataProvider;
 		}
 		$this->applyCustomerSurnameFilter($query);
@@ -142,25 +139,10 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		}
 	}
 
-	protected function applyIssueTypeFilter(IssuePayCalculationQuery $query) {
+	protected function applyIssueTypeFilter(IssuePayCalculationQuery $query): void {
 		if (!empty($this->issue_type_id)) {
 			$query->andWhere(['IT.id' => $this->issue_type_id]);
 		}
-	}
-
-	public static function getStagesNames(): array {
-		if (static::$STAGES_NAMES === null) {
-			$ids = IssuePayCalculation::find()
-				->groupBy('stage_id')
-				->select('stage_id')
-				->column();
-			$models = IssueStage::find()
-				->andWhere(['id' => $ids])
-				->asArray()
-				->all();
-			static::$STAGES_NAMES = ArrayHelper::map($models, 'id', 'name');
-		}
-		return static::$STAGES_NAMES;
 	}
 
 }

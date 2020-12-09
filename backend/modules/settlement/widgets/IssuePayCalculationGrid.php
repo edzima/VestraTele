@@ -11,6 +11,7 @@ use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
+use Decimal\Decimal;
 use Yii;
 use yii\base\InvalidConfigException;
 
@@ -18,8 +19,14 @@ class IssuePayCalculationGrid extends GridView {
 
 	public $id = 'calculation-grid';
 
+	public $showPageSummary = true;
+
 	public bool $withIssue = true;
 	public bool $withCustomer = true;
+	public bool $withIssueType = true;
+	public bool $withDates = true;
+
+	public ?int $userProvisionsId = null;
 
 	/**
 	 * @var IssuePayCalculationSearch
@@ -43,7 +50,8 @@ class IssuePayCalculationGrid extends GridView {
 		return [
 			[
 				'class' => ActionColumn::class,
-				'template' => '{problem-status} {provision} {view} {update} {delete}',
+				'template' => '{provision} {problem-status} {view} {update} {delete}',
+				'controller' => '/settlement/calculation',
 				'buttons' => [
 					'problem-status' => static function (string $url, IssuePayCalculation $model): string {
 						if ($model->isPayed()) {
@@ -67,66 +75,118 @@ class IssuePayCalculationGrid extends GridView {
 							: '';
 					},
 				],
+
+				'contentOptions' => [
+					'class' => 'd-inline-flex width-100 justify-center',
+				],
 			],
 			[
 				'class' => IssueColumn::class,
 				'visible' => $this->withIssue,
 			],
 			[
+				'class' => CustomerDataColumn::class,
+				'visible' => $this->withCustomer,
+			],
+			[
+				'attribute' => 'type',
+				'value' => 'typeName',
+				'filter' => IssuePayCalculation::getTypesNames(),
+			],
+
+			[
 				'attribute' => 'problem_status',
 				'value' => 'problemStatusName',
-				'filter' => $this->filterModel::getProblemStatusesNames(),
-				'visible' => $this->filterModel->problem_status !== null || $this->filterModel->onlyWithProblems,
+				'filter' => IssuePayCalculation::getProblemStatusesNames(),
+				'visible' => $this->filterModel && ($this->filterModel->problem_status !== null || $this->filterModel->onlyWithProblems),
 			],
 			[
 				'class' => IssueTypeColumn::class,
 				'label' => Yii::t('backend', 'Issue type'),
 				'attribute' => 'issue_type_id',
+				'visible' => $this->withIssueType,
+
 			],
 			[
 				'attribute' => 'stage_id',
 				'label' => Yii::t('backend', 'Issue stage on create'),
-				'value' => 'stage.name',
-				'filter' => $this->filterModel::getStagesNames(),
+				'value' => 'stageName',
+				'filter' => IssuePayCalculation::getStagesNames(),
 			],
-			[
-				'attribute' => 'type',
-				'value' => 'typeName',
-				'filter' => $this->filterModel::getTypesNames(),
-			],
-			[
-				'class' => CustomerDataColumn::class,
-				'visible' => $this->withCustomer,
-			],
-
 			[
 				'attribute' => 'value',
 				'format' => 'currency',
+				'pageSummary' => true,
 			],
 			[
 				'attribute' => 'valueToPay',
 				'format' => 'currency',
-				'visible' => function (IssuePayCalculation $model): bool {
-					return !$model->isPayed();
+				'pageSummary' => true,
+				'pageSummaryFunc' => function (array $decimals): Decimal {
+					$sum = new Decimal(0);
+					foreach ($decimals as $decimal) {
+						$sum = $sum->add($decimal);
+					}
+					return $sum;
 				},
 			],
 			[
 				'attribute' => 'providerName',
-				'filter' => $this->filterModel::getProvidersTypesNames(),
+				'filter' => IssuePayCalculation::getProvidersTypesNames(),
 				'value' => function (IssuePayCalculation $model): string {
 					if ($model->provider_type === IssuePayCalculation::PROVIDER_RESPONSIBLE_ENTITY) {
 						return $model->getProviderName();
 					}
-					return $this->filterModel::getProvidersTypesNames()[IssuePayCalculation::PROVIDER_CLIENT];
+					return IssuePayCalculation::getProvidersTypesNames()[IssuePayCalculation::PROVIDER_CLIENT];
+				},
+			],
+			[
+				'attribute' => 'userProvisionsSum',
+				'format' => 'currency',
+				'visible' => $this->userProvisionsId !== null,
+				'pageSummary' => true,
+				'value' => function (IssuePayCalculation $model): Decimal {
+					if ($this->userProvisionsId === null) {
+						return new Decimal(0);
+					}
+					return $model->getUserProvisionsSum($this->userProvisionsId);
+				},
+				'pageSummaryFunc' => function ($decimals): Decimal {
+					$sum = new Decimal(0);
+					foreach ($decimals as $decimal) {
+						$sum = $sum->add($decimal);
+					}
+					return $sum;
+				},
+			],
+			[
+				'attribute' => 'userProvisionsSumNotPay',
+				'format' => 'currency',
+				'visible' => $this->userProvisionsId !== null,
+				'pageSummary' => true,
+				'value' => function (IssuePayCalculation $model): Decimal {
+					if ($this->userProvisionsId === null) {
+						return new Decimal(0);
+					}
+					return $model->getUserProvisionsSumNotPay($this->userProvisionsId);
+				},
+				'pageSummaryFunc' => function ($decimals): Decimal {
+					$sum = new Decimal(0);
+					foreach ($decimals as $decimal) {
+						$sum = $sum->add($decimal);
+					}
+					return $sum;
 				},
 			],
 			[
 				'attribute' => 'created_at',
 				'format' => 'date',
+				'visible' => $this->withDates,
 			],
 			[
 				'attribute' => 'updated_at',
 				'format' => 'date',
+				'visible' => $this->withDates,
 			],
 		];
 	}

@@ -4,9 +4,11 @@ namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueForm;
 use backend\modules\issue\models\search\IssueSearch;
+use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\CsvForm;
 use common\models\issue\Issue;
 use common\models\user\Customer;
+use common\models\user\User;
 use common\models\user\Worker;
 use Yii;
 use yii\db\ActiveQuery;
@@ -98,8 +100,15 @@ class IssueController extends Controller {
 	 */
 	public function actionView(int $id): string {
 		$model = $this->findModel($id);
+		$calculationsDataProvider = null;
+		if (Yii::$app->user->can(User::PERMISSION_CALCULATION) || $model->isForUser(Yii::$app->user->getId())) {
+			$search = new IssuePayCalculationSearch();
+			$search->issue_id = $id;
+			$calculationsDataProvider = $search->search(Yii::$app->request->post());
+		}
 		return $this->render('view', [
 			'model' => $model,
+			'calculationsDataProvider' => $calculationsDataProvider,
 		]);
 	}
 
@@ -164,7 +173,7 @@ class IssueController extends Controller {
 	 * @return Issue the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): Issue {
+	protected function findModel(int $id): Issue {
 		if (($model = Issue::findOne($id)) !== null) {
 
 			if ($model->isArchived() && !Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {

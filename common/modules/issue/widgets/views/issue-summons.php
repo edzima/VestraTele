@@ -1,6 +1,6 @@
 <?php
 
-use backend\widgets\GridView;
+use common\widgets\GridView;
 use common\models\issue\Issue;
 use common\models\issue\Summon;
 use kartik\grid\ActionColumn;

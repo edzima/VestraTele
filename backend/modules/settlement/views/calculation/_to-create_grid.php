@@ -47,6 +47,11 @@ use yii\web\View;
 			'visible' => $withIssue,
 		],
 		[
+			'class' => CustomerDataColumn::class,
+			'value' => 'customer.fullName',
+			'visible' => $withCustomer,
+		],
+		[
 			'attribute' => 'type_id',
 			'class' => IssueTypeColumn::class,
 		],
@@ -55,10 +60,6 @@ use yii\web\View;
 			'value' => 'stage.name',
 			'filter' => $searchModel->getStagesNames(),
 		],
-		[
-			'class' => CustomerDataColumn::class,
-			'value' => 'customer.fullName',
-			'visible' => $withCustomer,
-		],
+
 	],
 ]) : '' ?>

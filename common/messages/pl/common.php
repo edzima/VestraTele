@@ -200,6 +200,10 @@ return [
 	'Value to pay' => 'Do zapłaty',
 	'Surname22' => 'Surname22',
 	'Jlustification of the judgment' => 'Jlustification of the judgment',
-	'Settlements' => 'Rozliczenia'
+	'Settlements' => 'Rozliczenia',
+	'User provision (not pay)' => 'Prowizja (nieopłacone)',
+	'User provision (to pay)' => 'Prowizja (opłacona)',
+	'User provision (total)' => 'Prowizja (całkowita)',
+	'value' => 'value'
 
 ];

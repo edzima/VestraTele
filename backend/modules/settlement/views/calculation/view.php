@@ -28,17 +28,20 @@ YiiAsset::register($this);
 			? Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: '' ?>
 
-		<?= !$model->isPayed() && Yii::$app->user->can(User::PERMISSION_CALCULATION)
-			? Html::a(Yii::t('backend', 'Set problem status'), ['problem-status', 'id' => $model->id], ['class' => 'btn btn-warning'])
-			: '' ?>
 
 		<?= !$model->isPayed() && Yii::$app->user->can(User::PERMISSION_PAY)
 			? Html::a(Yii::t('backend', 'Generate pays'), ['pays', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: '' ?>
 
 
+		<?= !$model->isPayed() && Yii::$app->user->can(User::PERMISSION_CALCULATION)
+			? Html::a(Yii::t('backend', 'Set problem status'), ['problem-status', 'id' => $model->id], ['class' => 'btn btn-warning'])
+			: '' ?>
+
+
+
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) && $model->hasPays()
-			? Html::a(Yii::t('backend', 'Provisions'), ['/provision/settlement/set', 'id' => $model->id], ['class' => 'btn btn-warning'])
+			? Html::a(Yii::t('backend', 'Provisions'), ['/provision/settlement/set', 'id' => $model->id], ['class' => 'btn btn-success'])
 			: '' ?>
 
 

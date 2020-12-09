@@ -124,3 +124,16 @@ div.required label:after {
 		max-width: 140px;
 	}
 }
+
+
+.d-inline-flex {
+	display: inline-flex;
+}
+
+.justify-center{
+	justify-content: center;
+}
+
+.width-100 {
+	width: 100% !important;
+}

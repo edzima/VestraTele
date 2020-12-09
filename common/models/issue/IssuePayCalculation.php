@@ -16,6 +16,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "issue_pay_calculation".
@@ -32,11 +33,12 @@ use yii\db\Expression;
  * @property int $stage_id
  * @property int $owner_id
  * @property int $provider_id
- * @property int|null $problem_status
+ * @property int $problem_status
  *
  * @property-read User $owner
  * @property-read Issue $issue
  * @property-read IssuePay[] $pays
+ * @property-read IssueStage $stage
  */
 class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInterface {
 
@@ -49,16 +51,16 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 
 	public const PROBLEM_STATUS_PREPEND_DEMAND = 10;
 	public const PROBLEM_STATUS_DEMAND = 15;
-
 	public const PROBLEM_STATUS_PREPEND_JUDGEMENT = 20;
 	public const PROBLEM_STATUS_JUDGEMENT = 25;
-
 	public const PROBLEM_STATUS_BAILLIF = 40;
 
 	public const PROVIDER_CLIENT = 1;
 	public const PROVIDER_RESPONSIBLE_ENTITY = 10;
 
-	public function afterSave($insert, $changedAttributes) {
+	private static ?array $STAGES_NAMES = null;
+
+	public function afterSave($insert, $changedAttributes): void {
 		parent::afterSave($insert, $changedAttributes);
 		$this->issue->markAsUpdate();
 	}
@@ -118,6 +120,9 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 			'problemStatusName' => Yii::t('settlement', 'Problem'),
 			'owner_id' => Yii::t('common', 'Owner'),
 			'owner' => Yii::t('common', 'Owner'),
+			'userProvisionsSum' => Yii::t('common', 'User provision (total)'),
+			'userProvisionsSumNotPay' => Yii::t('common', 'User provision (not pay)'),
+
 		];
 	}
 
@@ -137,11 +142,39 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 		return new DateTime($this->payment_at);
 	}
 
+	public function getUserProvisionsSum(int $id): Decimal {
+		$sum = (string) $this->getPays()
+			->joinWith([
+				'provisions PR' => function (ProvisionQuery $query) use ($id): void {
+					$query->user($id);
+				},
+			])
+			->sum('PR.value');
+		if (empty($sum)) {
+			$sum = 0;
+		}
+		return new Decimal($sum);
+	}
+
+	public function getUserProvisionsSumNotPay(int $id): Decimal {
+		$sum = (string) $this->getNotPayedPays()
+			->joinWith([
+				'provisions PR' => function (ProvisionQuery $query) use ($id): void {
+					$query->user($id);
+				},
+			])
+			->sum('PR.value');
+		if (empty($sum)) {
+			$sum = 0;
+		}
+		return new Decimal($sum);
+	}
+
 	public function getOwner(): ActiveQuery {
 		return $this->hasOne(User::class, ['id' => 'owner_id']);
 	}
 
-	public function getStage():ActiveQuery{
+	public function getStage(): ActiveQuery {
 		return $this->hasOne(IssueStage::class, ['id' => 'stage_id']);
 	}
 
@@ -180,6 +213,10 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 		return $this->getPays()->count();
 	}
 
+	public function getNotPayedPaysCount(): int {
+		return $this->getNotPayedPays()->count();
+	}
+
 	/** @noinspection PhpUnused */
 	public function getProviderName(): ?string {
 		return $this->getProvidersNames()[$this->provider_type] ?? null;
@@ -187,8 +224,12 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 
 	public function getProvidersNames(): array {
 		return [
-			static::PROVIDER_CLIENT => $this->issue->customer->getFullName(),
-			static::PROVIDER_RESPONSIBLE_ENTITY => $this->issue->entityResponsible,
+			static::PROVIDER_CLIENT => Yii::t('settlement', 'Customer - {fullName}', [
+				'fullName' => $this->issue->customer->getFullName(),
+			]),
+			static::PROVIDER_RESPONSIBLE_ENTITY => Yii::t('settlement', 'Entity rensponsible - {name}', [
+				'name' => $this->issue->entityResponsible,
+			]),
 		];
 	}
 
@@ -232,6 +273,25 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 			static::PROBLEM_STATUS_BAILLIF => Yii::t('settlement', 'Baillif'),
 
 		];
+	}
+
+	public function getStageName(): string {
+		return static::getStagesNames()[$this->stage_id];
+	}
+
+	public static function getStagesNames(): array {
+		if (static::$STAGES_NAMES === null) {
+			$ids = self::find()
+				->groupBy('stage_id')
+				->select('stage_id')
+				->column();
+			$models = IssueStage::find()
+				->andWhere(['id' => $ids])
+				->asArray()
+				->all();
+			static::$STAGES_NAMES = ArrayHelper::map($models, 'id', 'name');
+		}
+		return static::$STAGES_NAMES;
 	}
 
 	public static function find(): IssuePayCalculationQuery {

@@ -1,16 +1,20 @@
 <?php
 
+use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\issue\Issue;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
-use common\modules\issue\widgets\IssuePaysWidget;
 use common\modules\issue\widgets\IssueSummonsWidget;
 use common\modules\issue\widgets\IssueViewWidget;
+use yii\data\DataProviderInterface;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model Issue */
+/* @var $calculationsDataProvider DataProviderInterface|null */
+
 $this->title = $model->longId;
+
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Customers'), 'url' => ['/user/customer/index']];
 $this->params['breadcrumbs'][] = ['label' => $model->customer, 'url' => ['/user/customer/view', 'id' => $model->customer->id]];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' => ['index']];
@@ -36,7 +40,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'method' => 'post',
 			],
 		]) : '' ?>
-
 	</p>
 	<p>
 		<?= Yii::$app->user->can(User::PERMISSION_CALCULATION)
@@ -54,9 +57,22 @@ $this->params['breadcrumbs'][] = $this->title;
 			: '' ?>
 	</p>
 
+
 	<?= IssueViewWidget::widget(['model' => $model]) ?>
+
+	<?= $calculationsDataProvider !== null
+		? IssuePayCalculationGrid::widget([
+			'dataProvider' => $calculationsDataProvider,
+			'withIssue' => false,
+			'withIssueType' => false,
+			'withCustomer' => false,
+			'withDates' => false,
+			'userProvisionsId' => 21,
+		])
+		: ''
+	?>
+	
 	<?= IssueSummonsWidget::widget(['model' => $model]) ?>
-	<?= IssuePaysWidget::widget(['models' => $model->pays, 'user' => Yii::$app->user->getIdentity()]) ?>
 	<?= IssueNotesWidget::widget(['model' => $model]) ?>
 
 </div>

@@ -10,6 +10,7 @@ use yii\widgets\ActiveForm;
 /* @var $this View */
 /* @var $model CalculationForm */
 /* @var $form ActiveForm */
+
 ?>
 
 <div class="settlement-form">
@@ -18,15 +19,17 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= $form->field($model, 'providerType', ['options' => ['class' => 'col-md-3 col-lg-3']])->dropDownList($model->getProvidersNames()) ?>
+		<?= $form->field($model, 'providerType', ['options' => ['class' => 'col-md-3 col-lg-2']])->dropDownList($model->getProvidersNames()) ?>
 
 		<?= $form->field($model, 'type', ['options' => ['class' => 'col-md-2 col-lg-2']])->dropDownList(CalculationForm::getTypesNames()) ?>
 
 	</div>
 	<div class="row">
-		<?= $form->field($model, 'value', ['options' => ['class' => 'col-xs-9 col-md-2']])->widget(NumberControl::class) ?>
+		<?= $form->field($model, 'value', ['options' => ['class' => 'col-xs-9 col-md-2 col-lg-1']])->widget(NumberControl::class) ?>
 
-		<?= $form->field($model, 'vat', ['options' => ['class' => 'col-xs-3 col-md-1']])->widget(NumberControl::class) ?>
+		<?= $model->getModel()->isNewRecord
+			? $form->field($model, 'vat', ['options' => ['class' => 'col-xs-3 col-md-1']])->widget(NumberControl::class)
+			: '' ?>
 
 		<?= $form->field($model, 'transferType', ['options' => ['class' => 'col-md-3 col-lg-2']])->dropDownList(CalculationForm::getTransferTypesNames()) ?>
 
@@ -34,19 +37,14 @@ use yii\widgets\ActiveForm;
 
 
 	<div class="row">
-		
+
 		<?= $model->getModel()->isNewRecord || $model->getModel()->getPaysCount() < 2
 			? $form->field($model, 'payment_at', ['options' => ['class' => 'col-md-3 col-lg-2']])
 				->widget(DateWidget::class)
+			. $form->field($model, 'deadline_at', ['options' => ['class' => 'col-md-3 col-lg-2']])
+				->widget(DateWidget::class)
 			: ''
 		?>
-
-		<?php if ($model->getModel()->isNewRecord): ?>
-			<?= $form->field($model, 'deadlineInterval', ['options' => ['class' => 'col-md-3 col-lg-2']])->dropDownList(CalculationForm::getDeadlineIntervals()) ?>
-		<?php elseif ($model->getModel()->getPaysCount() < 2): ?>
-			<?= $form->field($model, 'deadline_at', ['options' => ['class' => 'col-md-3 col-lg-2']])
-				->widget(DateWidget::class) ?>
-		<?php endif; ?>
 
 
 	</div>

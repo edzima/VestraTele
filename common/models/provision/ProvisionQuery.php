@@ -16,6 +16,11 @@ class ProvisionQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function user(int $id):self{
+		$this->andWhere(['to_user_id' => $id]);
+		return $this;
+	}
+
 	public function notHidden(): self {
 		$this->andWhere([
 			'or',

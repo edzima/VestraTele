@@ -102,10 +102,7 @@ class IssueController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public static function findModel(int $id): Issue {
-		$model = Issue::find()
-			->andWhere(['id' => $id])
-			->one();
-
+		$model = Issue::findOne($id);
 		if ($model !== null && static::shouldFind($model)) {
 			return $model;
 		}

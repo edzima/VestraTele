@@ -2,6 +2,7 @@
 
 namespace backend\modules\settlement\controllers;
 
+use backend\helpers\Url;
 use backend\modules\settlement\models\search\DelayedIssuePaySearch;
 use backend\modules\settlement\models\search\IssuePaySearch;
 use backend\widgets\CsvForm;
@@ -114,7 +115,7 @@ class PayController extends Controller {
 		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$this->redirect('index');
+			return $this->redirect(Url::previous());
 		}
 
 		return $this->render('pay', [

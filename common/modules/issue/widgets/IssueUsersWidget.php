@@ -23,7 +23,7 @@ class IssueUsersWidget extends IssueWidget {
 	public array $fieldsetOptions = [
 		'toggle' => false,
 		'htmlOptions' => [
-			'class' => 'col-md-4',
+			'class' => 'col-md-6',
 		],
 		'detailConfig' => [
 			'attributes' => [

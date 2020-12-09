@@ -35,18 +35,26 @@ class PayForm extends Model implements PayInterface {
 			['value', 'number', 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/', 'enableClientValidation' => false],
 			[['deadline_at', 'payment_at'], 'date', 'format' => $this->dateFormat],
 			[
-				'payment_at', 'required', 'enableClientValidation' => false, 'when' => function () {
-				return empty($this->deadlineInterval) && empty($this->deadline_at);
+				'payment_at', 'required', 'enableClientValidation' => false, 'when' => function (): bool {
+				return $this->isRequiredPaymentAt();
 			}, 'message' => Yii::t('settlement', '{attribute} is required when {secondLabel} is empty.', ['secondLabel' => $this->getAttributeLabel('deadlineAt')]),
 			],
 			[
-				'deadline_at', 'required', 'enableClientValidation' => false, 'when' => function () {
-				return empty($this->deadlineInterval) && empty($this->payment_at);
+				'deadline_at', 'required', 'enableClientValidation' => false, 'when' => function (): bool {
+				return $this->isRequiredDeadlineAt();
 			}, 'message' => Yii::t('settlement', '{attribute} is required when {secondLabel} is empty.', ['secondLabel' => $this->getAttributeLabel('paymentAt')]),
 			],
 			['transferType', 'in', 'range' => array_keys(static::getTransferTypesNames())],
 			['deadlineInterval', 'in', 'range' => array_keys(static::getDeadlineIntervals())],
 		];
+	}
+
+	public function isRequiredPaymentAt(): bool {
+		return empty($this->deadlineInterval) && empty($this->deadline_at);
+	}
+
+	public function isRequiredDeadlineAt(): bool {
+		return empty($this->deadlineInterval) && empty($this->payment_at);
 	}
 
 	public function attributeLabels(): array {
@@ -55,6 +63,7 @@ class PayForm extends Model implements PayInterface {
 			'deadlineAt' => Yii::t('settlement', 'Deadline at'),
 			'transferType' => Yii::t('settlement', 'Pay transfer type'),
 			'value' => Yii::t('settlement', 'Value with VAT'),
+			'vat' => Yii::t('settlement', 'VAT'),
 			'payment_at' => Yii::t('settlement', 'Payment at'),
 			'paymentAt' => Yii::t('settlement', 'Payment at'),
 		];

@@ -182,7 +182,7 @@ return [
 	'Only delayed' => 'Tylko opóźnione',
 	'Structures' => 'Struktury',
 	'Excluded stages' => 'Wykluczone etapy',
-	'Update relation in {issue} for: {user}' => 'Update relation in {issue} for: {user}',
+	'Update relation in {issue} for: {user}' => '{user} w sprawie: {issue}',
 	'Update cost: {issue}' => 'Edytuj koszt: {issue}',
 	'Costs' => 'Koszty',
 	'Leads' => 'Leads',
@@ -257,5 +257,13 @@ return [
 	'Create settlement' => 'Dodaj rozliczenie',
 	'Setting problem status remove all not payed pays.' => 'Ustalenie problemu usunie wszystkie nieopłacone płatności.',
 	'Create meeet' => 'Create meeet',
-	'Issue stage on create' => 'Etap w trakcie założenia'
+	'Issue stage on create' => 'Etap w trakcie założenia',
+	'Settlement: {id} has not valid total value.' => 'Settlement: {id} has not valid total value.',
+	'Provision' => 'Prowizja',
+	'Provision (Not pay)' => 'Prowizja (Nieopłacone)',
+	'Pay: {value} dont has provisions.' => 'Płatność: {value} nie ma ustalonych prowizji.',
+	'Settlements without provisions' => 'Rozliczenia bez prowizji',
+	'Settlement value is not same as sum value from pays. Diff: {diffValue}.' => 'Kwota rozliczenia nie jest równoznaczna sumie płatności. Różnica: {diffValue}.',
+	'Provision (Total)' => 'Provision (Total)',
+	'Settlement: {id} hasnt valid total value.' => 'Settlement: {id} hasnt valid total value.'
 ];
