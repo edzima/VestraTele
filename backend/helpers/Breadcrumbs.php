@@ -21,7 +21,9 @@ class Breadcrumbs {
 	public static function customer(User $model): array {
 		return [
 			['label' => Yii::t('backend', 'Customers'), 'url' => ['/user/customer/index']],
-			['label' => $model->getFullName(), 'url' => '/user/customer/view'],
+			[
+				'label' => $model->getFullName(), 'url' => ['/user/customer/view', 'id' => $model->id],
+			],
 		];
 	}
 }
