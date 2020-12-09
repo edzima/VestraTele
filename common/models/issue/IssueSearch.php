@@ -6,6 +6,7 @@ use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueUserQuery;
 use common\models\issue\search\ArchivedIssueSearch;
+use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\Worker;
 use Yii;
@@ -19,7 +20,8 @@ use yii\helpers\ArrayHelper;
  */
 abstract class IssueSearch extends Model
 	implements ArchivedIssueSearch,
-			   CustomerSearchInterface {
+			   CustomerSearchInterface,
+			   SearchModel {
 
 	public $issue_id;
 	public $stage_id;
@@ -50,9 +52,10 @@ abstract class IssueSearch extends Model
 			],
 			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
+			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[
 				[
-					'created_at', 'updated_at', 'customerLastname',
+					'created_at', 'updated_at',
 				], 'safe',
 			],
 		];

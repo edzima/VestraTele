@@ -9,10 +9,23 @@ use common\models\SearchModel;
 use common\tests\_support\UnitSearchModelTrait;
 use yii\helpers\ArrayHelper;
 
+/**
+ * Class CalculationToCreateSearchTest
+ *
+ * @property IssueToCreateCalculationSearch $model
+ *
+ * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
+ */
 class CalculationToCreateSearchTest extends Unit {
 
-	public function _before() {
-		$this->tester->haveFixtures(IssueFixtureHelper::fixtures());
+	use UnitSearchModelTrait;
+
+	public function _before(): void {
+		$this->tester->haveFixtures(array_merge(
+			IssueFixtureHelper::fixtures()),
+			IssueFixtureHelper::settlements()
+		);
+		$this->model = $this->createModel();
 		parent::_before();
 	}
 
