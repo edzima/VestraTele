@@ -16,7 +16,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 <div class="issue-view">
-	<?= IssueViewWidget::widget(['model' => $model]) ?>
+	<?= IssueViewWidget::widget([
+		'model' => $model,
+		'usersLinks' => false,
+	]) ?>
 	<?= IssuePaysWidget::widget([
 		'models' => $model->pays,
 		'editPayBtn' => false,

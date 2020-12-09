@@ -28,7 +28,7 @@ class IssueUsersWidget extends IssueWidget {
 		'detailConfig' => [
 			'attributes' => [
 				'email:email',
-				'profile.phone',
+				'profile.phone:text:Telefon',
 			],
 		],
 	];

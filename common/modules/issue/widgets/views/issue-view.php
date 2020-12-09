@@ -9,6 +9,7 @@ use yii\bootstrap\Html;
 
 /* @var $this yii\web\View */
 /* @var $model Issue */
+/* @var $usersLinks bool */
 
 $provision = $model->getProvision();
 if ($provision) {
@@ -31,18 +32,20 @@ if ($provision) {
 	</legend>
 	<div id="issue-details">
 		<div class="row">
-			<div class="col-md-6">
+			<div class="col-md-8 col-lg-7">
 				<?= IssueUsersWidget::widget([
 					'model' => $model,
 					'type' => IssueUsersWidget::TYPE_CUSTOMERS,
 					'legendEncode' => false,
-					'legend' => static function (IssueUser $issueUser): string {
-						$legend = Html::a($issueUser->getTypeName()
+					'legend' => static function (IssueUser $issueUser) use ($usersLinks): string {
+						$legend = $issueUser->getTypeName()
 							. ' - '
-							. Html::encode($issueUser->user->getFullName()),
-							['/user/customer/view', 'id' => $issueUser->user_id], [
+							. Html::encode($issueUser->user->getFullName());
+						if ($usersLinks) {
+							$legend = Html::a($legend, ['/user/customer/view', 'id' => $issueUser->user_id], [
 								'target' => '_blank',
 							]);
+						}
 						if ($issueUser->type === IssueUser::TYPE_CUSTOMER) {
 							return $legend;
 						}
@@ -78,17 +81,23 @@ if ($provision) {
 					'model' => $model,
 					'type' => IssueUsersWidget::TYPE_WORKERS,
 					'legendEncode' => false,
-					'legend' => static function (IssueUser $issueUser): string {
-						return Html::a($issueUser->getTypeName()
+					'legend' => static function (IssueUser $issueUser) use ($usersLinks): string {
+						$legend = $issueUser->getTypeName()
 							. ' - '
-							. Html::encode($issueUser->user->getFullName()),
-							['/user/worker/view', 'id' => $issueUser->user_id], [
-								'target' => '_blank',
-							]);
+							. Html::encode($issueUser->user->getFullName());
+
+						if ($usersLinks) {
+							$legend = Html::a($legend,
+								['/user/worker/view', 'id' => $issueUser->user_id], [
+									'target' => '_blank',
+								]);
+						}
+
+						return $legend;
 					},
 				]) ?>
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-4 col-lg-5">
 				<?= FieldsetDetailView::widget([
 					'legend' => Yii::t('common', 'Issue details'),
 					'toggle' => false,

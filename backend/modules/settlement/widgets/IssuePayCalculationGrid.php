@@ -43,7 +43,28 @@ class IssuePayCalculationGrid extends GridView {
 		if (empty($this->columns)) {
 			$this->columns = $this->defaultColumns();
 		}
+		if (empty($this->rowOptions)) {
+			$this->rowOptions = function (IssuePayCalculation $model): array {
+				return $this->defaultRowOptions($model);
+			};
+		}
 		parent::init();
+	}
+
+	protected function defaultRowOptions(IssuePayCalculation $model): array {
+		return [];
+		$options = [];
+		if ($model->isPayed()) {
+			Html::addCssClass($options, 'payed-row');
+		} else {
+			if ($model->isDelayed()) {
+				Html::addCssClass($options, 'delayed-row');
+			}
+			if ($model->hasProblemStatus()) {
+				Html::addCssClass($options, 'problem-row');
+			}
+		}
+		return $options;
 	}
 
 	public function defaultColumns(): array {
