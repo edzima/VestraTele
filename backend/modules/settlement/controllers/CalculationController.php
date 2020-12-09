@@ -42,6 +42,9 @@ class CalculationController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex(): string {
+		if (!Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
+			throw new ForbiddenHttpException();
+		}
 		$searchModel = new IssuePayCalculationSearch();
 		$searchModel->onlyWithProblems = false;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
