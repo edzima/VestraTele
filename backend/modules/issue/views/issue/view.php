@@ -67,11 +67,11 @@ $this->params['breadcrumbs'][] = $this->title;
 			'withIssueType' => false,
 			'withCustomer' => false,
 			'withDates' => false,
-			'userProvisionsId' => 21,
+			'userProvisionsId' => Yii::$app->user->getId(),
 		])
 		: ''
 	?>
-	
+
 	<?= IssueSummonsWidget::widget(['model' => $model]) ?>
 	<?= IssueNotesWidget::widget(['model' => $model]) ?>
 
