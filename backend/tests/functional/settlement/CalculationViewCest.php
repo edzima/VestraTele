@@ -2,7 +2,7 @@
 
 namespace backend\tests\functional\settlement;
 
-use backend\tests\Step\Functional\CalculationIssueManager;
+use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
@@ -11,7 +11,7 @@ class CalculationViewCest {
 
 	public const ROUTE = '/settlement/calculation/view';
 
-	public function _before(CalculationIssueManager $I): void {
+	public function _before(CreateCalculationIssueManager $I): void {
 		$I->haveFixtures(array_merge(
 			IssueFixtureHelper::fixtures(),
 			IssueFixtureHelper::settlements(),
@@ -19,7 +19,7 @@ class CalculationViewCest {
 		$I->amLoggedIn();
 	}
 
-	public function checkPayed(CalculationIssueManager $I): void {
+	public function checkPayed(CreateCalculationIssueManager $I): void {
 		/** @var IssuePayCalculation $model */
 		$model = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'payed');
 
@@ -30,7 +30,7 @@ class CalculationViewCest {
 		$I->seeLink($model->issue->longId);
 	}
 
-	public function checkNotPayed(CalculationIssueManager $I): void {
+	public function checkNotPayed(CreateCalculationIssueManager $I): void {
 		/** @var IssuePayCalculation $model */
 		$model = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
 		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
@@ -39,8 +39,8 @@ class CalculationViewCest {
 		$I->dontSeeLink('Generate pays');
 	}
 
-	public function checkNotPayedWithPayPermission(CalculationIssueManager $I): void {
-		$I->assignPermission(User::PERMISSION_PAY);
+	public function checkNotPayedWithPayPermission(CreateCalculationIssueManager $I): void {
+		$I->assignPermission(User::PERMISSION_CALCULATION_PAYS);
 		/** @var IssuePayCalculation $model */
 		$model = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
 		$I->amOnPage([static::ROUTE, 'id' => $model->id]);

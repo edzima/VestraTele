@@ -3,8 +3,10 @@
 namespace backend\tests\functional\settlement;
 
 use backend\modules\settlement\controllers\CalculationController;
-use backend\tests\Step\Functional\CalculationIssueManager;
+use backend\tests\Step\Functional\Bookkeeper;
+use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use backend\tests\Step\Functional\Manager;
+use backend\tests\Step\Functional\ProblemCalculationIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
 use common\models\user\User;
@@ -27,30 +29,39 @@ class CalculationCest {
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
-		$I->dontSeeMenuLink('Calculations');
+		$I->dontSeeMenuLink('Settlements');
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkAsCalculationIssueManager(CalculationIssueManager $I): void {
+	public function checkAsCreateCalculationIssueManager(CreateCalculationIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->seeMenuLink('Settlements');
+		$I->seeMenuLink('Calculation to create');
 		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->see('Settlements');
+		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkMenuLink(CalculationIssueManager $I): void {
+	public function checkAsProblemsCalculationIssueManager(ProblemCalculationIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->dontSeeMenuLink('Calculation to create');
+		$I->seeMenuLink('Uncollectible');
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeResponseCodeIs(403);
+	}
+
+	public function checkAsBookkeeper(Bookkeeper $I): void {
 		$I->amLoggedIn();
 		$I->seeMenuLink('Settlements');
-		$I->clickMenuLink('Settlements');
-		$I->seeInCurrentUrl(static::ROUTE_INDEX);
+		$I->seeMenuLink('Calculation to create');
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->see('Settlements', 'h1');
 	}
 
-	public function checkIndex(CalculationIssueManager $I): void {
+	public function checkIndex(Bookkeeper $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeLink('To create');
-		$I->seeLink('With problems');
+		$I->seeLink('Uncollectible');
 		$I->dontSeeLink('Without provisions');
 		$I->seeInGridHeader('Issue');
 		$I->dontSeeInGridHeader('Problem status');
@@ -65,29 +76,29 @@ class CalculationCest {
 		$I->seeInGridHeader('Updated at');
 	}
 
-	public function checkIndexWithProvisionPerrmision(CalculationIssueManager $I): void {
-		$I->amLoggedIn();
+	public function checkWithProvisionPermission(Bookkeeper $I): void {
 		$I->assignPermission(User::PERMISSION_PROVISION);
+		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeLink('Without provisions');
 		$I->click('Without provisions');
 		$I->seeResponseCodeIsSuccessful();
 	}
 
-	public function checkWithProblemsFromIndexLink(CalculationIssueManager $I): void {
+	public function checkWithProblemsFromIndexLink(ProblemCalculationIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->click('With problems');
+		$I->click('Uncollectible');
 		$I->seeInCurrentUrl(CalculationProblemStatusCest::ROUTE_INDEX);
 	}
 
-	public function checkToCreateWithoutMinCountSettings(CalculationIssueManager $I): void {
+	public function checkToCreateWithoutMinCountSettings(CreateCalculationIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_TO_CREATE);
 		$I->seeFlash('Min calculation count must be set.', 'warning');
 	}
 
-	public function checkToCreateWithMinCountSettings(CalculationIssueManager $I): void {
+	public function checkToCreateWithMinCountSettings(CreateCalculationIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		$I->amOnPage(static::ROUTE_TO_CREATE);
@@ -99,17 +110,16 @@ class CalculationCest {
 		$I->seeInGridHeader('Customer');
 	}
 
-	public function checkIssueWithoutCalculation(CalculationIssueManager $I): void {
+	public function checkIssueWithoutCalculation(Bookkeeper $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		/** @var Issue $issue */
 		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
-		$I->dontSee('Calculations for: ' . $issue->longId);
-		$I->see('Create calculation for: ' . $issue->longId);
+		$I->see('Calculations for: ' . $issue->longId);
 	}
 
-	public function checkIssueWithCalculation(CalculationIssueManager $I): void {
+	public function checkIssueWithCalculationAndNotMinLimit(Bookkeeper $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(array_merge(
 			IssueFixtureHelper::fixtures(),
@@ -121,33 +131,16 @@ class CalculationCest {
 		$I->see('Calculations for: ' . $issue->longId);
 		$I->seeLink('Create settlement');
 
-		$I->see('To create');
-		$I->dontSeeInGridHeader('Issue', '#to-create-grid');
-		$I->seeInGridHeader('Type', '#to-create-grid');
-		$I->seeInGridHeader('Stage', '#to-create-grid');
-		$I->dontSeeInGridHeader('Customer', '#to-create-grid');
-
-
 		$I->see('Issue calculations');
-		$I->dontSeeInGridHeader('Issue', '#calculations-grid');
-		$I->seeInGridHeader('Type', '#calculations-grid');
+		$I->seeInGridHeader('Type', '#calculation-grid');
 		$I->seeInGridHeader('Issue stage on create');
-		$I->seeInGridHeader('Problem status', '#calculations-grid');
-		$I->dontSeeInGridHeader('Customer', '#calculations-grid');
+		$I->seeInGridHeader('Problem status', '#calculation-grid');
+		$I->dontSeeInGridHeader('Customer', '#calculation-grid');
 		$I->seeInGridHeader('Value with VAT');
 	}
 
-	public function checkIssueWithCalculationStageWithoutCalculationOnIssuePage(CalculationIssueManager $I): void {
-		$I->amLoggedIn();
-		$I->haveFixtures(IssueFixtureHelper::fixtures());
-		/** @var Issue $issue */
-		$issue = $I->grabFixture('issue', 0);
-		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
-		$I->see('Create');
-		$I->seeInCurrentUrl(CalculationCreateCest::ROUTE);
-	}
 
-	public function checkIssueCreateLink(CalculationIssueManager $I): void {
+	public function checkIssueCreateLink(Bookkeeper $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(array_merge(
 			IssueFixtureHelper::fixtures(),
@@ -161,11 +154,11 @@ class CalculationCest {
 		$I->seeInCurrentUrl(CalculationCreateCest::ROUTE);
 	}
 
-	public function checkNotExistIssue(CalculationIssueManager $I): void {
+	public function checkNotExistIssue(CreateCalculationIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => 1000]);
-		$I->seeResponseCodeIs(404);
+		$I->seeResponseCodeIs(403);
 	}
 
 }

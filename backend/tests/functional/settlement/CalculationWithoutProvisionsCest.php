@@ -2,13 +2,17 @@
 
 namespace backend\tests\functional\settlement;
 
-use backend\tests\Step\Functional\CalculationIssueManager;
+use backend\modules\settlement\controllers\CalculationController;
+use backend\tests\Step\Functional\Bookkeeper;
+use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use backend\tests\Step\Functional\Manager;
 use common\models\user\User;
 
 class CalculationWithoutProvisionsCest {
 
+	/** @see CalculationController::actionWithoutProvisions() */
 	public const ROUTE = '/settlement/calculation/without-provisions';
+	private const MENU_LINK_TEXT = 'Without provisions';
 
 	public function checkPageAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -16,22 +20,22 @@ class CalculationWithoutProvisionsCest {
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkPageAsCalculationManager(CalculationIssueManager $I): void {
+	public function checkPageAsCalculationManager(CreateCalculationIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->dontSeeMenuLink('Settlements without provisions');
+		$I->dontSeeMenuLink(static::MENU_LINK_TEXT);
 		$I->amOnRoute(static::ROUTE);
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkMenuLinkWithProvisionPermission(CalculationIssueManager $I):void{
+	public function checkMenuLinkWithProvisionPermission(CreateCalculationIssueManager $I):void{
 		$I->assignPermission(User::PERMISSION_PROVISION);
 		$I->amLoggedIn();
-		$I->seeMenuLink('Settlements without provisions');
-		$I->clickMenuLink('Settlements without provisions');
+		$I->seeMenuLink(static::MENU_LINK_TEXT);
+		$I->clickMenuLink(static::MENU_LINK_TEXT);
 		$I->seeInCurrentUrl(static::ROUTE);
 	}
 
-	public function checkPageAsCalculationManagerWithProvisionPermission(CalculationIssueManager $I): void {
+	public function checkPageAsCalculationManagerWithProvisionPermission(Bookkeeper $I): void {
 		$I->assignPermission(User::PERMISSION_PROVISION);
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE);
@@ -42,14 +46,14 @@ class CalculationWithoutProvisionsCest {
 		$I->seeInGridHeader('Type');
 	}
 
-	public function checkIndexPageLinkAsCalculationManager(CalculationIssueManager $I): void {
+	public function checkIndexPageLinkAsCalculationManager(CreateCalculationIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->dontSeeMenuLink('Settlements without provisions');
+		$I->dontSeeMenuLink(static::MENU_LINK_TEXT);
 		$I->amOnRoute(CalculationCest::ROUTE_INDEX);
 		$I->dontSeeLink('Without provisions');
 	}
 
-	public function checkIndexPageLinkAsCalculationManagerWithProvisionPermission(CalculationIssueManager $I): void {
+	public function checkIndexPageLinkAsCalculationManagerWithProvisionPermission(CreateCalculationIssueManager $I): void {
 		$I->assignPermission(User::PERMISSION_PROVISION);
 		$I->amLoggedIn();
 		$I->amOnRoute(CalculationCest::ROUTE_INDEX);

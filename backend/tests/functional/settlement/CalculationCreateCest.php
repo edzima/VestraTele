@@ -2,7 +2,7 @@
 
 namespace backend\tests\functional\settlement;
 
-use backend\tests\Step\Functional\CalculationIssueManager;
+use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
@@ -12,7 +12,7 @@ class CalculationCreateCest {
 
 	public const ROUTE = '/settlement/calculation/create';
 
-	public function _before(CalculationIssueManager $I): void {
+	public function _before(CreateCalculationIssueManager $I): void {
 		$I->haveFixtures(array_merge(
 			IssueFixtureHelper::fixtures(),
 			IssueFixtureHelper::settlements(),
@@ -20,7 +20,7 @@ class CalculationCreateCest {
 		$I->amLoggedIn();
 	}
 
-	public function checkCreatePage(CalculationIssueManager $I): void {
+	public function checkCreatePage(CreateCalculationIssueManager $I): void {
 
 		/** @var Issue $issue */
 		$issue = $I->grabFixture('issue', 0);
@@ -31,13 +31,13 @@ class CalculationCreateCest {
 		$I->see($issue->stage->name);
 	}
 
-	public function checkSubmitEmpty(CalculationIssueManager $I): void {
+	public function checkSubmitEmpty(CreateCalculationIssueManager $I): void {
 		$I->amOnPage([static::ROUTE, 'id' => 1]);
 		$I->click('Save');
 		$I->seeValidationError('Value with VAT cannot be blank.');
 	}
 
-	public function checkValid(CalculationIssueManager $I): void {
+	public function checkValid(CreateCalculationIssueManager $I): void {
 		$I->amOnPage([static::ROUTE, 'id' => 1]);
 		$I->dontSee('Problem status');
 		$I->fillField('Value with VAT', 123);

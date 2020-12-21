@@ -2,15 +2,21 @@
 
 namespace backend\tests\functional\settlement;
 
-use backend\tests\Step\Functional\CalculationIssueManager;
+use backend\modules\settlement\controllers\CalculationMinCountController;
+use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\StageType;
 
 class CalculationMinCountCest {
 
+	/** @see CalculationMinCountController::actionIndex() */
 	public const ROUTE_INDEX = '/settlement/calculation-min-count/index';
+
+	/** @see CalculationMinCountController::actionSet() */
 	public const ROUTE_SET = '/settlement/calculation-min-count/set';
+
+	/** @see CalculationMinCountController::actionUpdate() */
 	public const ROUTE_UPDATE = '/settlement/calculation-min-count/update';
 
 	public function checkAsManager(Manager $I): void {
@@ -20,14 +26,14 @@ class CalculationMinCountCest {
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkMenuLink(CalculationIssueManager $I): void {
+	public function checkMenuLink(CreateCalculationIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->seeMenuLink('Min calculation count');
 		$I->clickMenuLink('Min calculation count');
 		$I->seeInCurrentUrl(static::ROUTE_INDEX);
 	}
 
-	public function checkIndex(CalculationIssueManager $I): void {
+	public function checkIndex(CreateCalculationIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->see('Calculations min counts');
@@ -36,7 +42,7 @@ class CalculationMinCountCest {
 		$I->seeInGridHeader('Min calculation count');
 	}
 
-	public function checkValidCreate(CalculationIssueManager $I): void {
+	public function checkValidCreate(CreateCalculationIssueManager $I): void {
 		$I->haveFixtures(IssueFixtureHelper::stageAndTypesFixtures());
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_SET);

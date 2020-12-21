@@ -2,29 +2,24 @@
 
 namespace backend\tests\functional\settlement;
 
-use backend\modules\settlement\controllers\CalculationController;
 use backend\modules\settlement\controllers\CalculationProblemController;
-use backend\tests\Step\Functional\CalculationIssueManager;
+use backend\tests\Step\Functional\CreateCalculationIssueManager;
+use backend\tests\Step\Functional\ProblemCalculationIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 
 /**
  * Class CalculationProblemStatusCest
  *
- * @see CalculationController::actionProblemStatus()
  */
 class CalculationProblemStatusCest {
 
-	/**
-	 * @see CalculationProblemController::actionIndex()
-	 */
+	/* @see CalculationProblemController::actionIndex() */
 	public const ROUTE_INDEX = '/settlement/calculation-problem/index';
 
-	/**
-	 * @see CalculationProblemController::actionSet()
-	 */
+	/* @see CalculationProblemController::actionSet() */
 	public const ROUTE_SET = '/settlement/calculation-problem/set';
 
-	public function _before(CalculationIssueManager $I): void {
+	public function _before(ProblemCalculationIssueManager $I): void {
 		$I->haveFixtures(array_merge(
 			IssueFixtureHelper::fixtures(),
 			IssueFixtureHelper::settlements(),
@@ -32,10 +27,15 @@ class CalculationProblemStatusCest {
 		$I->amLoggedIn();
 	}
 
-	public function checkWithProblemsPage(CalculationIssueManager $I): void {
-		$I->amLoggedIn();
+	public function checkMenuLink(ProblemCalculationIssueManager $I): void {
+		$I->seeMenuLink('Uncollectible');
+		$I->clickMenuLink('Uncollectible');
+		$I->seeInCurrentUrl(static::ROUTE_INDEX);
+	}
+
+	public function checkWithProblemsPage(ProblemCalculationIssueManager $I): void {
 		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->see('Settlements with problems');
+		$I->see('Uncollectible settlements');
 		$I->seeInGridHeader('Issue');
 		$I->seeInGridHeader('Problem status');
 		$I->seeInGridHeader('Issue type');
@@ -48,14 +48,14 @@ class CalculationProblemStatusCest {
 		$I->seeInGridHeader('Updated at');
 	}
 
-	public function checkSetStatusForNotPayed(CalculationIssueManager $I): void {
+	public function checkSetStatusForNotPayed(ProblemCalculationIssueManager $I): void {
 		$model = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
 		$I->amOnPage([static::ROUTE_SET, 'id' => $model->id]);
-		$I->see('Set problem status for calculation: ' . $model->id);
+		$I->see('Set uncollectible status');
 		$I->seeFlash('Setting problem status remove all not payed pays.', 'warning');
 	}
 
-	public function checkSetStatusForPayed(CalculationIssueManager $I): void {
+	public function checkSetStatusForPayed(ProblemCalculationIssueManager $I): void {
 		$model = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'payed');
 		$I->amOnPage([static::ROUTE_SET, 'id' => $model->id]);
 		$I->seeFlash('Only not payed calculation can be set problem status.', 'warning');

@@ -19,5 +19,6 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Without provisions');
 	<?= IssuePayCalculationGrid::widget([
 		'filterModel' => $searchModel,
 		'dataProvider' => $dataProvider,
+		'withProblems' => false,
 	]) ?>
 </div>

@@ -21,6 +21,7 @@ class IssuePayCalculationGrid extends GridView {
 	public bool $withIssue = true;
 	public bool $withCustomer = true;
 	public bool $withIssueType = true;
+	public bool $withProblems = true;
 	public bool $withDates = true;
 
 	public $userProvisionsId = null;
@@ -86,7 +87,7 @@ class IssuePayCalculationGrid extends GridView {
 				'attribute' => 'problem_status',
 				'value' => 'problemStatusName',
 				'filter' => IssuePayCalculationSearch::getProblemStatusesNames(),
-				'visible' => $this->filterModel && ($this->filterModel->problem_status !== null || $this->filterModel->onlyWithProblems),
+				'visible' => $this->withProblems,
 			],
 			[
 				'attribute' => 'owner_id',
@@ -106,12 +107,12 @@ class IssuePayCalculationGrid extends GridView {
 				'filter' => IssuePayCalculationSearch::getStagesNames(),
 			],
 			[
-				'class'=> CurrencyColumn::class,
+				'class' => CurrencyColumn::class,
 				'pageSummary' => true,
 				'attribute' => 'value',
 			],
 			[
-				'class'=> CurrencyColumn::class,
+				'class' => CurrencyColumn::class,
 				'attribute' => 'valueToPay',
 				'pageSummary' => true,
 				'pageSummaryFunc' => function (array $decimals): Decimal {
@@ -133,7 +134,7 @@ class IssuePayCalculationGrid extends GridView {
 				},
 			],
 			[
-				'class'=> CurrencyColumn::class,
+				'class' => CurrencyColumn::class,
 
 				'attribute' => 'userProvisionsSum',
 				'format' => 'currency',

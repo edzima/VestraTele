@@ -22,7 +22,12 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
-						'actions' => ['to-create','create', 'view', 'update'],
+						'controllers' => ['settlement/calculation-min-count'],
+						'permissions' => [Worker::PERMISSION_CALCULATION_TO_CREATE],
+					],
+					[
+						'allow' => true,
+						'actions' => ['to-create', 'create', 'view', 'update'],
 						'controllers' => ['settlement/calculation'],
 						'permissions' => [Worker::PERMISSION_CALCULATION_TO_CREATE],
 					],
