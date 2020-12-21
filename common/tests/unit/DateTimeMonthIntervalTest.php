@@ -20,5 +20,12 @@ class DateTimeMonthIntervalTest extends Unit {
 			DateTimeHelper::addMonth(new DateTime('2020-01-31'))
 				->format(static::FORMAT)
 		);
+		$this->tester->assertSame(
+			'2020-03-31',
+			DateTimeHelper::lastDayOfMonth(
+				DateTimeHelper::addMonth(new DateTime('2020-02-29'))
+			)
+				->format(static::FORMAT)
+		);
 	}
 }

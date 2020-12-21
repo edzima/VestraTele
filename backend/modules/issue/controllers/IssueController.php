@@ -7,11 +7,10 @@ use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\CsvForm;
 use common\models\issue\Issue;
+use common\models\issue\query\IssueQuery;
 use common\models\user\Customer;
-use common\models\user\User;
 use common\models\user\Worker;
 use Yii;
-use yii\db\ActiveQuery;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\MethodNotAllowedHttpException;
@@ -50,37 +49,19 @@ class IssueController extends Controller {
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {
-			/** @var ActiveQuery $query */
+			/** @var IssueQuery $query */
 			$query = clone($dataProvider->query);
-			$query->with('clientCity');
-			$query->with('clientProvince');
-			$query->with('clientState');
+			$query->with('customer.userProfile');
 			$exporter = new CsvGrid([
 				'query' => $query,
 				'columns' => [
 					[
-						'attribute' => 'clientFullName',
-						'label' => 'Nazwa',
+						'attribute' => 'customer.fullName',
+						'label' => 'Imie nazwisko',
 					],
 					[
-						'attribute' => 'client_street',
-						'label' => 'Ulica',
-					],
-					[
-						'attribute' => 'client_phone_1',
+						'attribute' => 'customer.userProfile.phone',
 						'label' => 'Telefon',
-					],
-					[
-						'attribute' => 'clientCity.name',
-						'label' => 'Miasto',
-					],
-					[
-						'attribute' => 'clientProvince.name',
-						'label' => 'Powiat',
-					],
-					[
-						'attribute' => 'clientState.name',
-						'label' => 'Województwo',
 					],
 				],
 			]);
@@ -100,12 +81,9 @@ class IssueController extends Controller {
 	 */
 	public function actionView(int $id): string {
 		$model = $this->findModel($id);
-		$calculationsDataProvider = null;
-		if (Yii::$app->user->can(User::PERMISSION_CALCULATION) || $model->isForUser(Yii::$app->user->getId())) {
-			$search = new IssuePayCalculationSearch();
-			$search->issue_id = $id;
-			$calculationsDataProvider = $search->search(Yii::$app->request->post());
-		}
+		$search = new IssuePayCalculationSearch();
+		$search->issue_id = $id;
+		$calculationsDataProvider = $search->search([]);
 		return $this->render('view', [
 			'model' => $model,
 			'calculationsDataProvider' => $calculationsDataProvider,

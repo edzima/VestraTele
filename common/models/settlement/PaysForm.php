@@ -24,10 +24,10 @@ class PaysForm extends PayForm {
 
 	public function rules(): array {
 		return array_merge([
-			[['count', 'deadline_at'], 'required'],
+			[['count'], 'required'],
 			[
 				'deadlineRange', 'required', 'when' => function (): bool {
-				return $this->count > 1;
+				return $this->count > 1 && empty($this->deadline_at);
 			},
 			],
 			['count', 'integer', 'min' => $this->minCount],
@@ -124,7 +124,9 @@ class PaysForm extends PayForm {
 			$pay = $this->generatePay(false, $value->div($this->count), $deadline);
 			$pays[] = $pay;
 			if ($deadline !== null && $this->deadlineRange === static::DEADLINE_LAST_DAY_OF_MONTH) {
-				$deadline = DateTimeHelper::addMonth($deadline);
+				$deadline = DateTimeHelper::lastDayOfMonth(
+					DateTimeHelper::addMonth($deadline)
+				);
 			}
 		}
 		return $pays;
@@ -136,6 +138,9 @@ class PaysForm extends PayForm {
 		}
 		if ($value === null) {
 			$value = $this->getValue();
+		}
+		if ($deadline === null) {
+			$deadline = $this->getDeadlineAt();
 		}
 		return new PayForm([
 			'value' => $value->toFixed(2),

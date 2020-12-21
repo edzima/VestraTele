@@ -13,4 +13,8 @@ class DateTimeHelper {
 		$dt->modify('+' . (min($day, $dt->format('t')) - 1) . ' days');
 		return $dt;
 	}
+
+	public static function lastDayOfMonth(DateTime $dateTime): DateTime {
+		return $dateTime->modify('last day of this month');
+	}
 }

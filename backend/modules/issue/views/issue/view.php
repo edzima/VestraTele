@@ -11,7 +11,7 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model Issue */
-/* @var $calculationsDataProvider DataProviderInterface|null */
+/* @var $calculationsDataProvider DataProviderInterface */
 
 $this->title = $model->longId;
 
@@ -42,10 +42,10 @@ $this->params['breadcrumbs'][] = $this->title;
 		]) : '' ?>
 	</p>
 	<p>
-		<?= Yii::$app->user->can(User::PERMISSION_CALCULATION)
+		<?= Yii::$app->user->can(User::PERMISSION_CALCULATION_TO_CREATE)
 			? Html::a(
-				Yii::t('backend', 'Calculations'),
-				['/settlement/calculation/issue', 'id' => $model->id],
+				Yii::t('backend', 'Create settlement'),
+				['/settlement/calculation/create', 'id' => $model->id],
 				['class' => 'btn btn-info'])
 			: '' ?>
 
@@ -60,16 +60,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= IssueViewWidget::widget(['model' => $model]) ?>
 
-	<?= $calculationsDataProvider !== null
-		? IssuePayCalculationGrid::widget([
+	<?= IssuePayCalculationGrid::widget([
 			'dataProvider' => $calculationsDataProvider,
 			'withIssue' => false,
 			'withIssueType' => false,
 			'withCustomer' => false,
 			'withDates' => false,
-			'userProvisionsId' => Yii::$app->user->getId(),
 		])
-		: ''
 	?>
 
 	<?= IssueSummonsWidget::widget(['model' => $model]) ?>

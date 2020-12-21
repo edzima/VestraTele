@@ -73,7 +73,12 @@ JS;
 ?>
 <div class="issue-index relative">
 	<?php Pjax::begin(); ?>
-	<h1><?= Html::encode($this->title) ?></h1>
+	<p>
+		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
+			? Html::a(Yii::t('backend', 'Settlements'), ['/settlement/calculation/index'], ['class' => 'btn btn-success'])
+			: ''
+		?>
+	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() : '' ?>
