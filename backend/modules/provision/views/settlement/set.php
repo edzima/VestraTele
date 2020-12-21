@@ -2,8 +2,8 @@
 
 use backend\helpers\Breadcrumbs;
 use backend\modules\provision\models\SettlementProvisionsForm;
+use common\widgets\settlement\SettlementDetailView;
 use yii\web\View;
-use yii\widgets\DetailView;
 
 /* @var $this View */
 /* @var $model SettlementProvisionsForm */
@@ -18,27 +18,8 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions for settlemen
 ?>
 <div class="provision-settlement-set">
 
-	<?= DetailView::widget([
+	<?= SettlementDetailView::widget([
 		'model' => $model->getModel(),
-		'attributes' => [
-			'providerName',
-			'value:currency',
-			[
-				'attribute' => 'valueToPay',
-				'format' => 'currency',
-				'visible' => !$model->getModel()->isPayed(),
-			],
-			[
-				'attribute' => 'payment_at',
-				'format' => 'date',
-				'visible' => $model->getModel()->isPayed(),
-			],
-			[
-				'attribute' => 'details',
-				'format' => 'ntext',
-				'visible' => !empty($model->getModel()->details),
-			],
-		],
 	]) ?>
 
 	<?= $this->render('_form', [

@@ -34,6 +34,7 @@ use yii\helpers\ArrayHelper;
  * @property int $owner_id
  * @property int $provider_id
  * @property int $problem_status
+ * @property bool $is_provider_notified
  *
  * @property-read User $owner
  * @property-read Issue $issue
@@ -59,6 +60,9 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 	public const PROVIDER_RESPONSIBLE_ENTITY = 10;
 
 	private static ?array $STAGES_NAMES = null;
+	private static ?array $OWNER_NAMES = null;
+
+	private static array $USER_PROVISIONS_SUM = [];
 
 	public function afterSave($insert, $changedAttributes): void {
 		parent::afterSave($insert, $changedAttributes);
@@ -114,6 +118,7 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 			'valueToPay' => Yii::t('common', 'Value to pay'),
 			'type' => Yii::t('common', 'Type'),
 			'stage_id' => Yii::t('common', 'Stage'),
+			'stageName' => Yii::t('common', 'Stage'),
 			'typeName' => Yii::t('common', 'Type'),
 			'details' => Yii::t('common', 'Details'),
 			'providerName' => Yii::t('settlement', 'Provider name'),
@@ -122,8 +127,12 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 			'owner' => Yii::t('common', 'Owner'),
 			'userProvisionsSum' => Yii::t('common', 'User provision (total)'),
 			'userProvisionsSumNotPay' => Yii::t('common', 'User provision (not pay)'),
-
+			'is_provider_notified' => Yii::t('common', 'Is provider notified'),
 		];
+	}
+
+	public function getName(): string {
+		return Yii::t('settlement', 'Settlement {type}', ['type' => $this->getTypeName()]);
 	}
 
 	public function getNotPayedPays(): IssuePayQuery {
@@ -143,20 +152,31 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 	}
 
 	public function getUserProvisionsSum(int $id): Decimal {
-		$sum = (string) $this->getPays()
-			->joinWith([
-				'provisions PR' => function (ProvisionQuery $query) use ($id): void {
-					$query->user($id);
-				},
-			])
-			->sum('PR.value');
-		if (empty($sum)) {
-			$sum = 0;
+		if (!isset(static::$USER_PROVISIONS_SUM[$id])) {
+			$sum = (string) $this->getPays()
+				->joinWith([
+					'provisions PR' => function (ProvisionQuery $query) use ($id): void {
+						$query->user($id);
+					},
+				])
+				->sum('PR.value');
+			if (empty($sum)) {
+				$sum = 0;
+			}
+			static::$USER_PROVISIONS_SUM[$id] = new Decimal($sum);
 		}
-		return new Decimal($sum);
+		return static::$USER_PROVISIONS_SUM[$id];
+	}
+
+	public function isForUser(int $id): bool {
+		return $this->owner_id === $id ||
+			$this->issue->isForUser($id);
 	}
 
 	public function getUserProvisionsSumNotPay(int $id): Decimal {
+		if (!$this->getUserProvisionsSum($id)->isPositive()) {
+			return new Decimal(0);
+		}
 		$sum = (string) $this->getNotPayedPays()
 			->joinWith([
 				'provisions PR' => function (ProvisionQuery $query) use ($id): void {
@@ -294,6 +314,21 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 		return static::$STAGES_NAMES;
 	}
 
+	public static function getOwnerNames(): array {
+		if (static::$OWNER_NAMES === null) {
+			$ids = self::find()
+				->groupBy('owner_id')
+				->select('owner_id')
+				->column();
+			$models = User::find()
+				->andWhere(['id' => $ids])
+				->with('userProfile')
+				->all();
+			static::$OWNER_NAMES = ArrayHelper::map($models, 'id', 'fullName');
+		}
+		return static::$OWNER_NAMES;
+	}
+
 	public static function find(): IssuePayCalculationQuery {
 		return new IssuePayCalculationQuery(static::class);
 	}
@@ -311,7 +346,13 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 	}
 
 	public function isDelayed(string $delayRange = '-3 days'): bool {
-		return $this->getNotPayedPays()->onlyDelayed($delayRange)->exists();
+		$delay = new DateTime($delayRange);
+		foreach ($this->pays as $pay) {
+			if (!$pay->isPayed() && $delay > $pay->getDeadlineAt()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

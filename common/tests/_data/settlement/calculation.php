@@ -37,7 +37,7 @@ return [
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 		'problem_status' => IssuePayCalculation::PROBLEM_STATUS_PREPEND_DEMAND,
 		'provider_id' => 200,
-		'owner_id' => 300,
+		'owner_id' => 301,
 		'stage_id' => 1,
 	],
 	'with-problem-status_and_pay' => [
@@ -47,7 +47,7 @@ return [
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 		'problem_status' => IssuePayCalculation::PROBLEM_STATUS_DEMAND,
 		'provider_id' => 200,
-		'owner_id' => 300,
+		'owner_id' => 303,
 		'stage_id' => 2
 	],
 ];

@@ -58,7 +58,7 @@ class LinkUserCest {
 		$I->amLoggedIn();
 		$I->amOnPage($this->linkPage(101));
 		/** @var Issue $issue */
-		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 'archive');
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 'archived');
 		$I->submitForm(static::FORM_SELECTOR, $this->formParams($issue->id, 'victim'));
 		$I->seeValidationError('Issue cannot be archived.');
 	}

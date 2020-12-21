@@ -14,7 +14,7 @@ class CsvForm extends Widget {
 	public $formOptions = [];
 	public $buttonText = 'CSV export';
 	public $buttonOptions = [
-		'class' => 'btn btn-info',
+		'class' => 'btn btn-secondary',
 	];
 
 	public function run(): string {

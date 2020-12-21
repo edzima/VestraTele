@@ -13,8 +13,8 @@ class PaysFormTest extends PayFormTest {
 		$this->tester->assertFalse($model->validate());
 		$this->tester->assertEmpty($model->generatePays());
 		$this->tester->assertSame('Value with VAT cannot be blank.', $model->getFirstError('value'));
-		$this->tester->assertSame('Payment at is required when First deadline at is empty.', $model->getFirstError('paymentAt'));
-		$this->tester->assertSame('First deadline at cannot be blank.', $model->getFirstError('deadlineAt'));
+		$this->tester->assertSame('Payment at is required when Deadline at is empty.', $model->getFirstError('payment_at'));
+		$this->tester->assertSame('First deadline at is required when Payment at is empty.', $model->getFirstError('deadline_at'));
 	}
 
 	public function testGenerateOne(): void {
@@ -40,7 +40,7 @@ class PaysFormTest extends PayFormTest {
 		$model->vat = 23;
 		$model->deadline_at = '2020-01-31';
 		$model->deadlineRange = PaysForm::DEADLINE_LAST_DAY_OF_MONTH;
-		$pays = $model->generatePays();
+		$pays = $model->generatePays(false);
 		$this->tester->assertCount(2, $pays);
 		$pay1 = $pays[0];
 		$this->tester->assertTrue($pay1->getValue()->equals(new Decimal(123)));

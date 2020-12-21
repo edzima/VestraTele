@@ -79,15 +79,23 @@ class IssuePayCalculationSearchTest extends Unit {
 		$names = IssuePayCalculationSearch::getStagesNames();
 		$countAllStages = (int) IssueStage::find()->count();
 		$this->assertNotSame(count($names), $countAllStages);
-		$this->assertCount(2,$names);
-		$this->assertArrayHasKey(1,$names);
-		$this->assertArrayHasKey(2,$names);
-
+		$this->assertCount(2, $names);
+		$this->assertArrayHasKey(1, $names);
+		$this->assertArrayHasKey(2, $names);
 	}
 
 	public function testCustomer(): void {
 		$this->model->customerLastname = 'Lar';
 		$this->assertTotalCount(2);
+	}
+
+	public function testOwner(): void {
+		$this->model->owner_id = 300;
+		$this->assertTotalCount(3);
+		$this->model->owner_id = 301;
+		$this->assertTotalCount(1);
+		$this->model->owner_id = 100000000;
+		$this->assertTotalCount(0);
 	}
 
 	protected function createModel(): SearchModel {

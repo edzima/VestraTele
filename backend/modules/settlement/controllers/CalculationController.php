@@ -42,7 +42,7 @@ class CalculationController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex(): string {
-		if (!Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
+		if (!Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
 			throw new ForbiddenHttpException();
 		}
 		$searchModel = new IssuePayCalculationSearch();
@@ -89,14 +89,11 @@ class CalculationController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIssue(int $id) {
+	public function actionIssue(int $id): string {
 		$searchModel = new IssuePayCalculationSearch();
 		$searchModel->issue_id = $id;
 		if ($searchModel->issue === null) {
 			throw new NotFoundHttpException('Issue dont exist.');
-		}
-		if ((int) $searchModel->issue->getPayCalculations()->count() === 0) {
-			return $this->redirect(['create', 'id' => $id]);
 		}
 		$searchModel->withCustomer = false;
 		$toCreateSearchModel = new IssueToCreateCalculationSearch();
@@ -174,6 +171,11 @@ class CalculationController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
+		$calculation = $this->findModel($id);
+		if (!Yii::$app->user->can(User::ROLE_BOOKKEEPER)
+			|| $calculation->owner_id !== Yii::$app->user->getId()) {
+			throw new ForbiddenHttpException(Yii::t('backend', 'Only bookkeeper or owner can update settlement.'));
+		}
 		$model = new CalculationForm();
 		$model->setCalculation($this->findModel($id));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {

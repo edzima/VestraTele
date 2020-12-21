@@ -67,8 +67,11 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const PERMISSION_NOTE = 'note';
 	public const PERMISSION_SUMMON = 'summon';
 	public const PERMISSION_COST = 'cost';
-	public const PERMISSION_CALCULATION = 'calculation';
+	public const PERMISSION_CALCULATION_TO_CREATE = 'calculation.to-create';
+	public const PERMISSION_CALCULATION_PROBLEMS = 'calculation.problems';
+	public const PERMISSION_CALCULATION_PAYS = 'calculation.pays';
 	public const PERMISSION_PAY = 'pay';
+	public const PERMISSION_PAY_RECEIVED = 'pay.received';
 	public const PERMISSION_PAYS_DELAYED = 'pays.delayed';
 	public const PERMISSION_PROVISION = 'provision';
 
@@ -145,7 +148,7 @@ class User extends ActiveRecord implements IdentityInterface {
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
-	protected function getUserProfile() {
+	public function getUserProfile() {
 		return $this->hasOne(UserProfile::class, ['user_id' => 'id']);
 	}
 

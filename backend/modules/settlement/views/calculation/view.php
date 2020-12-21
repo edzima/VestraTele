@@ -1,13 +1,12 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
-use backend\helpers\Url;
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
 use common\modules\issue\widgets\IssuePaysWidget;
+use common\widgets\settlement\SettlementDetailView;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
-use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model IssuePayCalculation */
@@ -15,8 +14,10 @@ use yii\widgets\DetailView;
 $this->title = Yii::t('settlement', 'Settlement {type}', ['type' => $model->getTypeName()]);
 
 $this->params['breadcrumbs'] = Breadcrumbs::issue($model->issue);
-$this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->issue, 'url' => ['issue', 'id' => $model->issue_id]];
+if (Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
+	$this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['index']];
+	$this->params['breadcrumbs'][] = ['label' => $model->issue, 'url' => ['issue', 'id' => $model->issue_id]];
+}
 $this->params['breadcrumbs'][] = $this->title;
 
 YiiAsset::register($this);
@@ -24,18 +25,19 @@ YiiAsset::register($this);
 <div class="issue-pay-calculation-view">
 
 	<p>
-		<?= Yii::$app->user->can(User::PERMISSION_CALCULATION)
+		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
+		|| $model->owner_id === Yii::$app->user->getId()
 			? Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: '' ?>
 
 
-		<?= !$model->isPayed() && Yii::$app->user->can(User::PERMISSION_PAY)
+		<?= !$model->isPayed() && Yii::$app->user->can(User::PERMISSION_CALCULATION_PAYS)
 			? Html::a(Yii::t('backend', 'Generate pays'), ['pays', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: '' ?>
 
 
-		<?= !$model->isPayed() && Yii::$app->user->can(User::PERMISSION_CALCULATION)
-			? Html::a(Yii::t('backend', 'Set problem status'), ['problem-status', 'id' => $model->id], ['class' => 'btn btn-warning'])
+		<?= !$model->isPayed() && Yii::$app->user->can(User::PERMISSION_CALCULATION_PROBLEMS)
+			? Html::a(Yii::t('backend', 'Set uncollectible status'), ['/settlement/calculation-problem/set', 'id' => $model->id], ['class' => 'btn btn-warning'])
 			: '' ?>
 
 
@@ -49,7 +51,7 @@ YiiAsset::register($this);
 		//  Html::a('Notatka', ['note/create', 'issueId' => $model->issue_id, 'type' => IssueNote::TYPE_PAY], ['class' => 'btn btn-success',]) ?>
 
 
-		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
+		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger pull-right',
 			'data' => [
 				'confirm' => 'Are you sure you want to delete this item?',
@@ -58,44 +60,14 @@ YiiAsset::register($this);
 		]) : '' ?>
 	</p>
 
-	<?= DetailView::widget([
+	<?= SettlementDetailView::widget([
 		'model' => $model,
-		'attributes' => [
-			[
-				'attribute' => 'issue',
-				'format' => 'raw',
-				'value' => Html::a($model->issue, Url::issueView($model->issue_id), ['target' => '_blank']),
-				'label' => 'Sprawa',
-			],
-			'providerName',
-			'owner',
-			[
-				'attribute' => 'problemStatusName',
-				'visible' => $model->hasProblemStatus(),
-			],
-			'value:currency',
-			[
-				'attribute' => 'valueToPay',
-				'format' => 'currency',
-				'visible' => !$model->isPayed(),
-			],
-			[
-				'attribute' => 'payment_at',
-				'format' => 'date',
-				'visible' => $model->isPayed(),
-			],
-
-			[
-				'attribute' => 'details',
-				'format' => 'ntext',
-				'visible' => !empty($model->details),
-			],
-		],
 	]) ?>
+
 
 	<?= IssuePaysWidget::widget([
 		'models' => $model->pays,
-		'editPayBtn' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
+		'editPayBtn' => Yii::$app->user->getId() === $model->owner_id,
 	]) ?>
 
 	<?php

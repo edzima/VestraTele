@@ -101,7 +101,7 @@ $user = Yii::$app->user;
 				[
 					'label' => Yii::t('backend', 'Summons'),
 					'url' => ['/issue/summon/index'],
-					'icon' => '<i class="fa fa-angle-double-right"></i>',
+					'icon' => '<i class="fa fa-bolt"></i>',
 					'visible' => $user->can(User::PERMISSION_SUMMON),
 				],
 
@@ -111,15 +111,34 @@ $user = Yii::$app->user;
 					'icon' => '<i class="fa fa-money"></i>',
 					'options' => ['class' => 'treeview'],
 					'visible' => $user->can(User::PERMISSION_COST)
-						|| $user->can(User::PERMISSION_CALCULATION)
+						|| $user->can(User::PERMISSION_CALCULATION_TO_CREATE)
+						|| $user->can(User::PERMISSION_CALCULATION_PROBLEMS)
 						|| $user->can(User::PERMISSION_PAY)
 					,
 					'items' => [
 						[
-							'label' => Yii::t('settlement', 'Costs'),
-							'url' => ['/settlement/cost/index'],
-							'icon' => '<i class="fa fa-minus"></i>',
-							'visible' => $user->can(User::PERMISSION_COST),
+							'label' => Yii::t('backend', 'Browse'),
+							'url' => ['/settlement/calculation/index'],
+							'icon' => '<i class="fa fa-money"></i>',
+							'visible' => $user->can(User::ROLE_BOOKKEEPER),
+						],
+						[
+							'label' => Yii::t('settlement', 'Without provisions'),
+							'url' => ['/settlement/calculation/without-provisions'],
+							'icon' => '<i class="fa fa-calculator"></i>',
+							'visible' => $user->can(User::PERMISSION_PROVISION),
+						],
+						[
+							'label' => Yii::t('backend', 'Calculation to create'),
+							'url' => ['/settlement/calculation/to-create'],
+							'icon' => '<i class="fa fa-pencil"></i>',
+							'visible' => $user->can(User::PERMISSION_CALCULATION_TO_CREATE),
+						],
+						[
+							'label' => Yii::t('settlement', 'Uncollectible'),
+							'url' => ['/settlement/calculation-problem/index'],
+							'icon' => '<i class="fa fa-bolt"></i>',
+							'visible' => $user->can(User::PERMISSION_CALCULATION_PROBLEMS),
 						],
 						[
 							'label' => Yii::t('settlement', 'Pays'),
@@ -128,48 +147,25 @@ $user = Yii::$app->user;
 							'visible' => $user->can(User::PERMISSION_PAY),
 						],
 						[
-							'label' => Yii::t('settlement', 'Settlements'),
-							'url' => ['/settlement/calculation/index'],
-							'options' => ['class' => 'treeview'],
-							'visible' => $user->can(User::PERMISSION_CALCULATION),
-							'items' => [
-								[
-									'label' => Yii::t('backend', 'Calculation to create'),
-									'url' => ['/settlement/calculation/to-create'],
-									'icon' => '<i class="fa fa-angle-double-right"></i>',
-								],
-								[
-									'label' => Yii::t('backend', 'Browse'),
-									'url' => ['/settlement/calculation/index'],
-									'icon' => '<i class="fa fa-angle-double-right"></i>',
-								],
-								[
-									'label' => Yii::t('backend', 'With problems'),
-									'url' => ['/settlement/calculation-problem/index'],
-									'icon' => '<i class="fa fa-angle-double-right"></i>',
-								],
-								[
-									'label' => Yii::t('backend', 'Min calculation count'),
-									'url' => ['/settlement/calculation-min-count/index'],
-									'icon' => '<i class="fa fa-angle-double-right"></i>',
-								],
-							],
+							'label' => Yii::t('settlement', 'Received pays'),
+							'url' => ['/settlement/pay-received/index'],
+							'icon' => '<i class="fa fa-car"></i>',
+							'visible' => $user->can(User::PERMISSION_PAY_RECEIVED),
 						],
-
+						[
+							'label' => Yii::t('settlement', 'Costs'),
+							'url' => ['/settlement/cost/index'],
+							'icon' => '<i class="fa fa-minus"></i>',
+							'visible' => $user->can(User::PERMISSION_COST),
+						],
 					],
-				],
-				[
-					'label' => Yii::t('settlement', 'Settlements without provisions'),
-					'url' => ['/settlement/calculation/without-provisions'],
-					'icon' => '<i class="fa fa-calculator"></i>',
-					'visible' => $user->can(User::PERMISSION_PROVISION),
 				],
 				[
 					'label' => Yii::t('backend', 'Provisions'),
 					'url' => '#',
 					'icon' => '<i class="fa fa-percent"></i>',
 					'options' => ['class' => 'treeview'],
-					'visible' => $user->can(User::ROLE_ADMINISTRATOR),
+					'visible' => $user->can(User::PERMISSION_PROVISION),
 					'items' => [
 						[
 							'label' => Yii::t('issue', 'Raporty'),
@@ -227,6 +223,12 @@ $user = Yii::$app->user;
 							'url' => ['/db-manager/default/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 							'visible' => $user->can(User::ROLE_ADMINISTRATOR),
+						],
+						[
+							'label' => Yii::t('backend', 'Min calculation count'),
+							'url' => ['/settlement/calculation-min-count/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'visible' => $user->can(User::PERMISSION_CALCULATION_TO_CREATE),
 						],
 					],
 				],

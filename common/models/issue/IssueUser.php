@@ -68,6 +68,10 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		];
 	}
 
+	public function getTypeWithUser(): string {
+		return $this->getTypeName() . ' - ' . $this->user->getFullName();
+	}
+
 	public function getTypeName(): string {
 		return static::getTypesNames()[$this->type];
 	}

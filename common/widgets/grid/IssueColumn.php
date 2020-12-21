@@ -3,11 +3,12 @@
 namespace common\widgets\grid;
 
 use common\models\issue\IssueInterface;
-use kartik\grid\DataColumn;
 use Yii;
 use yii\helpers\Html;
 
 class IssueColumn extends DataColumn {
+
+	public $noWrap = true;
 
 	public ?string $issueAttribute = 'issue';
 	public $attribute = 'issue_id';

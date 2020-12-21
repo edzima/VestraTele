@@ -9,9 +9,12 @@ use common\models\address\Province;
 use common\models\address\State;
 use common\models\address\SubProvince;
 use common\models\entityResponsible\EntityResponsible;
+use common\models\entityResponsible\EntityResponsibleQuery;
 use common\models\issue\query\IssueNoteQuery;
+use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
+use common\models\issue\query\IssueStageQuery;
 use common\models\issue\query\IssueUserQuery;
 use common\models\user\Customer;
 use common\models\user\query\UserQuery;
@@ -318,35 +321,26 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return $this->victim_street;
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getEntityResponsible() {
+	public function getEntityResponsible(): EntityResponsibleQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasOne(EntityResponsible::class, ['id' => 'entity_responsible_id']);
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getStage() {
+	public function getStage(): IssueStageQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasOne(IssueStage::class, ['id' => 'stage_id']);
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getType() {
+	public function getType(): ActiveQuery {
 		return $this->hasOne(IssueType::class, ['id' => 'type_id']);
 	}
 
-	public function getStageType() {
+	public function getStageType(): ActiveQuery {
 		return $this->hasOne(StageType::class, ['type_id' => 'type_id', 'stage_id' => 'stage_id']);
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
 	public function getIssueNotes(): IssueNoteQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])
 			->with('user')->orderBy('created_at DESC');
 	}
@@ -355,10 +349,8 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return $this->hasMany(Summon::class, ['issue_id' => 'id']);
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getPayCalculations() {
+	public function getPayCalculations(): IssuePayCalculationQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(IssuePayCalculation::class, ['issue_id' => 'id']);
 	}
 
@@ -463,7 +455,9 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function isForUser(int $id): bool {
-		return $this->getUsers()->andWhere(['user_id' => $id])->exists();
+		return $this->getUsers()
+			->andWhere(['user_id' => $id])
+			->exists();
 	}
 
 	public function isForAgents(array $ids): bool {

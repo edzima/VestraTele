@@ -44,7 +44,6 @@ $this->params['breadcrumbs'][] = $this->title;
 	<fieldset>
 		<legend><?= Yii::t('backend', 'Issue calculations') ?></legend>
 
-
 		<?= IssuePayCalculationGrid::widget([
 			'filterModel' => $searchModel,
 			'dataProvider' => $dataProvider,

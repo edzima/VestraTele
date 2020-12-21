@@ -35,7 +35,13 @@ class RbacController extends Controller {
 		User::PERMISSION_COST => [
 			User::ROLE_BOOKKEEPER,
 		],
-		User::PERMISSION_CALCULATION => [
+		User::PERMISSION_CALCULATION_TO_CREATE => [
+			User::ROLE_BOOKKEEPER,
+		],
+		User::PERMISSION_CALCULATION_PAYS => [
+			User::ROLE_BOOKKEEPER,
+		],
+		User::PERMISSION_CALCULATION_PROBLEMS => [
 			User::ROLE_BOOKKEEPER,
 		],
 		User::PERMISSION_EXPORT,

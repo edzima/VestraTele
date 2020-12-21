@@ -20,10 +20,12 @@ class IssueFormTest extends Unit {
 	}
 
 	public function testWorkersList() {
-		$this->tester->assertCount(2, IssueForm::getAgents());
-		$agent = $this->tester->grabFixture('agent', 0);
+		$activeAgentsCount = 3;
+
+		$this->tester->assertCount($activeAgentsCount, IssueForm::getAgents());
+		$agent = $this->tester->grabFixture('agent', 'some-agent');
 		Yii::$app->authManager->revoke(Yii::$app->authManager->getPermission(User::PERMISSION_ISSUE), $agent->id);
-		$this->tester->assertCount(1, IssueForm::getAgents());
+		$this->tester->assertCount($activeAgentsCount - 1, IssueForm::getAgents());
 
 		$this->tester->assertCount(2, IssueForm::getLawyers());
 		$lawyer = $this->tester->grabFixture('lawyer', 0);

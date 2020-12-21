@@ -25,14 +25,12 @@ use yii\widgets\ActiveForm;
 
 	</div>
 	<div class="row">
-		<?= $form->field($model, 'value', ['options' => ['class' => 'col-xs-9 col-md-2 col-lg-1']])->widget(NumberControl::class) ?>
+		<?= $form->field($model, 'value', ['options' => ['class' => 'col-xs-9 col-md-2 col-lg-2']])->widget(NumberControl::class) ?>
 
 		<?= $model->getModel()->isNewRecord
 			? $form->field($model, 'vat', ['options' => ['class' => 'col-xs-3 col-md-1']])->widget(NumberControl::class)
 			: '' ?>
-
-		<?= $form->field($model, 'transferType', ['options' => ['class' => 'col-md-3 col-lg-2']])->dropDownList(CalculationForm::getTransferTypesNames()) ?>
-
+		
 	</div>
 
 

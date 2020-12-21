@@ -1,7 +1,9 @@
 <?php
 
+use common\models\user\User;
+
 return [
-	[
+	'with-childs' => [
 		'id' => 300,
 		'username' => 'agent1',
 		'auth_key' => 'iwTNae9t34mnK6l4vT4IeaTk-YWI2Rv',
@@ -10,8 +12,9 @@ return [
 		'created_at' => '1391885313',
 		'updated_at' => '1391885313',
 		'email' => 'agent@vestra.info',
+		'boss' => null,
 	],
-	[
+	'with-parent-and-child' => [
 		'id' => 301,
 		'username' => 'agent2',
 		'auth_key' => 'EdKfXrx88weFMV0IxuTMKgfK2tS3Lp',
@@ -21,9 +24,9 @@ return [
 		'updated_at' => '1391885313',
 		'email' => 'agent2@vestra.info',
 		'status' => '3',
-
+		'boss' => 300,
 	],
-	[
+	'with-parents-without-childs' => [
 		'id' => 302,
 		'username' => 'agent3',
 		'auth_key' => 'O87Gk3_UfmMHYkyezZ7QLmkKNsllzT',
@@ -34,8 +37,9 @@ return [
 		'created_at' => '1548675330',
 		'updated_at' => '1548675330',
 		'verification_token' => '4ch0qbfhvWwkcuWqjN8SWRq72SOw1KYT_1548675330',
+		'boss' => 301,
 	],
-	[
+	'without-parent-and-childs' => [
 		'id' => 303,
 		'username' => 'agent4',
 		'auth_key' => '4XXdVqi3rDpa_a6JH6zqreFxUPcUPvJ',
@@ -46,5 +50,18 @@ return [
 		'created_at' => '1548675330',
 		'updated_at' => '1548675330',
 		'verification_token' => 'already_used_token_1548675330',
+		'boss' => null,
 	],
+	'some-agent' => [
+		'username' => 'agent5',
+		'auth_key' => '4XXdVqi3rDpa_a6JH62zqreFxUPcUPvJ',
+		//Test1234
+		'password_hash' => '$2y$13$d172w/wKC4LFwtzBcm6up4jErQuandJqhzKGKczfWuiEhLBtQBK',
+		'email' => 'agent5@vestra.info',
+		'status' => User::STATUS_ACTIVE,
+		'created_at' => '1548675330',
+		'updated_at' => '1548675330',
+		'verification_token' => 'already_used_token_1548675330',
+		'boss' => null,
+	]
 ];

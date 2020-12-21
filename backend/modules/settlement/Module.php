@@ -22,8 +22,14 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
-						'controllers' => ['settlement/calculation', 'settlement/calculation-min-count', 'settlement/calculation-problem'],
-						'permissions' => [Worker::PERMISSION_CALCULATION],
+						'actions' => ['to-create','create', 'view', 'update'],
+						'controllers' => ['settlement/calculation'],
+						'permissions' => [Worker::PERMISSION_CALCULATION_TO_CREATE],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['settlement/calculation-problem'],
+						'permissions' => [Worker::PERMISSION_CALCULATION_PROBLEMS],
 					],
 					[
 						'allow' => true,
@@ -32,7 +38,7 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
-						'roles' => ['administrator'],
+						'roles' => [Worker::ROLE_BOOKKEEPER],
 					],
 				],
 			],

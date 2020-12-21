@@ -181,7 +181,7 @@ return [
 	'Writ' => 'Pozew',
 	'Date At' => 'Date At',
 	'Updated At' => 'Updated At',
-	'handicapped' => 'Niepełnosrawny',
+	'handicapped' => 'Niepełnosprawny',
 	'Technical break' => 'Przerwa techniczna',
 	'Issue users' => 'Uczestnicy',
 	'One field is required.' => 'One field is required.',
@@ -204,6 +204,9 @@ return [
 	'User provision (not pay)' => 'Prowizja (nieopłacone)',
 	'User provision (to pay)' => 'Prowizja (opłacona)',
 	'User provision (total)' => 'Prowizja (całkowita)',
-	'value' => 'value'
+	'value' => 'value',
+	'Issue type' => 'Typ sprawy',
+	'Issue stage' => 'Etap sprawy',
+	'Is provider notified' => 'Wpłacający powiadomiony'
 
 ];

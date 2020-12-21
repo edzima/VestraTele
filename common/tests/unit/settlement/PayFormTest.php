@@ -64,6 +64,7 @@ class PayFormTest extends Unit {
 		$model->deadlineInterval = PayForm::DEADLINE_INTERVAL_3_DAYS;
 		$pay = $model->generatePay();
 		$this->tester->assertNotNull($pay);
+		$this->tester->assertNotNull($pay->getDeadlineAt());
 		$this->tester->assertSame((new DateTime())->modify('3 days')->format($model->dateFormat), $pay->getDeadlineAt()->format($model->dateFormat));
 	}
 

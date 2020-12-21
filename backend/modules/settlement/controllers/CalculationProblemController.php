@@ -5,20 +5,15 @@ namespace backend\modules\settlement\controllers;
 use backend\modules\settlement\models\CalculationProblemStatusForm;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use common\models\issue\IssuePayCalculation;
-use common\models\user\User;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\web\Controller;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class CalculationProblemController extends Controller {
 
 	public function actionIndex(): string {
-		if (!Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
-			throw new ForbiddenHttpException();
-		}
 		$searchModel = new IssuePayCalculationSearch();
 		$searchModel->onlyWithProblems = true;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);

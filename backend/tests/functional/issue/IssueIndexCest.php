@@ -37,7 +37,7 @@ class IssueIndexCest {
 	public function checkIndexAsExportIssueManager(ExportIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE);
-		$I->seeLink('CSV export');
+		$I->see('CSV export');
 	}
 
 	public function checkSearchFields(IssueManager $I): void {

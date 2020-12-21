@@ -36,17 +36,15 @@ if ($provision) {
 				<?= IssueUsersWidget::widget([
 					'model' => $model,
 					'type' => IssueUsersWidget::TYPE_CUSTOMERS,
-					'legendEncode' => false,
+					'legendEncode' => !$usersLinks,
 					'legend' => static function (IssueUser $issueUser) use ($usersLinks): string {
-						$legend = $issueUser->getTypeName()
-							. ' - '
-							. Html::encode($issueUser->user->getFullName());
+						$legend = $issueUser->getTypeWithUser();
 						if ($usersLinks) {
 							$legend = Html::a($legend, ['/user/customer/view', 'id' => $issueUser->user_id], [
 								'target' => '_blank',
 							]);
 						}
-						if ($issueUser->type === IssueUser::TYPE_CUSTOMER) {
+						if ($issueUser->type === IssueUser::TYPE_CUSTOMER || !$usersLinks) {
 							return $legend;
 						}
 						$legend .= Html::beginTag('span', ['class' => 'pull-right']);
@@ -80,12 +78,9 @@ if ($provision) {
 				<?= IssueUsersWidget::widget([
 					'model' => $model,
 					'type' => IssueUsersWidget::TYPE_WORKERS,
-					'legendEncode' => false,
+					'legendEncode' => !$usersLinks,
 					'legend' => static function (IssueUser $issueUser) use ($usersLinks): string {
-						$legend = $issueUser->getTypeName()
-							. ' - '
-							. Html::encode($issueUser->user->getFullName());
-
+						$legend = $issueUser->getTypeWithUser();
 						if ($usersLinks) {
 							$legend = Html::a($legend,
 								['/user/worker/view', 'id' => $issueUser->user_id], [
@@ -116,7 +111,6 @@ if ($provision) {
 								'attribute' => 'archives_nr',
 								'visible' => $model->isArchived(),
 							],
-							'victimFullname:text:Poszkodowany',
 							[
 								'attribute' => 'type',
 								'label' => $model->getAttributeLabel('type_id'),

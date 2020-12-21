@@ -22,7 +22,7 @@ class PayForm extends Model implements PayInterface {
 	public ?string $vat = null;
 	public ?string $payment_at = null;
 	public ?string $deadline_at = null;
-	public int $transferType = IssuePay::TRANSFER_TYPE_BANK;
+	public ?int $transferType = IssuePay::TRANSFER_TYPE_BANK;
 
 	public string $dateFormat = 'Y-m-d';
 

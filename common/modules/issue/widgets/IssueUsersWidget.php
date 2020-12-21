@@ -2,21 +2,26 @@
 
 namespace common\modules\issue\widgets;
 
+use backend\helpers\Html;
 use Closure;
+use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\widgets\FieldsetDetailView;
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 
 /**
  *
  * @property-read array $users
  */
-class IssueUsersWidget extends IssueWidget {
+class IssueUsersWidget extends Widget {
 
 	public const TYPE_WORKERS = 'workers';
 	public const TYPE_CUSTOMERS = 'customers';
+
+	public Issue $model;
 
 	public string $type;
 
@@ -33,6 +38,10 @@ class IssueUsersWidget extends IssueWidget {
 		],
 	];
 
+	public array $containerOptions = [
+		'class' => 'issue-users row',
+	];
+
 	public ?Closure $legend = null;
 	public ?Closure $withAddress = null;
 	public bool $legendEncode = true;
@@ -46,10 +55,13 @@ class IssueUsersWidget extends IssueWidget {
 		if (empty($users)) {
 			return '';
 		}
-		return $this->render('issue-users', [
-			'users' => $users,
-			'widget' => $this,
-		]);
+		$content = [];
+		$content[] = Html::beginTag('div', $this->containerOptions);
+		foreach ($users as $user) {
+			$content[] = $this->renderUser($user);
+		}
+		$content[] = Html::endTag('div');
+		return implode("\n", $content);
 	}
 
 	/**

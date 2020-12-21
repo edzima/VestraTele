@@ -7,6 +7,7 @@ use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\settlement\CalculationForm;
 use common\models\settlement\PayInterface;
+use DateTime;
 use Decimal\Decimal;
 use yii\base\InvalidConfigException;
 
@@ -34,6 +35,35 @@ class CalculationFormTest extends PayFormTest {
 		$this->tester->assertSame('Provider cannot be blank.', $model->getFirstError('providerType'));
 		$this->tester->assertSame('Owner is invalid.', $model->getFirstError('owner'));
 	}
+
+	public function testCreateWithDeadline(): void {
+		$this->haveFixtures();
+		$model = $this->createForm();
+		$model->issue_id = 1;
+		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
+		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
+		$model->value = 123;
+		$model->vat = 23;
+		$model->deadline_at = '2020-01-01';
+		$pay = $model->generatePay();
+		$this->tester->assertNotNull($pay);
+		$this->tester->assertNotNull($pay->getDeadlineAt());
+		$this->tester->assertSame('2020-01-01', $pay->getDeadlineAt()->format($model->dateFormat));
+	}
+
+	public function testCreateWithDeadlineRange(): void {
+		$this->haveFixtures();
+		$model = $this->createForm();
+		$model->issue_id = 1;
+		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
+		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
+		$model->value = 123;
+		$model->deadlineInterval = CalculationForm::DEADLINE_INTERVAL_3_DAYS;
+		$pay = $model->generatePay();
+		$this->tester->assertNotNull($pay);
+		$this->tester->assertSame((new DateTime())->modify('3 days')->format($model->dateFormat), $pay->getDeadlineAt()->format($model->dateFormat));
+	}
+
 
 	public function testInvalidType(): void {
 		$model = $this->createForm();

@@ -10,7 +10,6 @@ use yii\web\View;
 
 $this->title = Yii::t('backend', 'Issues to create calculations');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Calculations'), 'url' => ['index']];
 
 $this->params['breadcrumbs'][] = $this->title;
 
