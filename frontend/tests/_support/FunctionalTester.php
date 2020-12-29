@@ -2,6 +2,8 @@
 
 namespace frontend\tests;
 
+use common\fixtures\helpers\IssueFixtureHelper;
+use common\models\user\Worker;
 use common\tests\_support\UserRbacActor;
 
 /**
@@ -40,7 +42,6 @@ class FunctionalTester extends \Codeception\Actor {
 		$this->dontSee($link, '#main-nav li a');
 	}
 
-
 	public function seeInGridHeader($text, string $selector = null): void {
 		if ($selector === null) {
 			$selector = '.grid-view';
@@ -51,5 +52,9 @@ class FunctionalTester extends \Codeception\Actor {
 
 	public function seeInLoginUrl(): void {
 		$this->seeInCurrentUrl('site/login');
+	}
+
+	public function grabAgent($index): Worker {
+		return $this->grabFixture(IssueFixtureHelper::AGENT, $index);
 	}
 }

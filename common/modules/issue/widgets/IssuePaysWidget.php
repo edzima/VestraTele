@@ -2,6 +2,7 @@
 
 namespace common\modules\issue\widgets;
 
+use Closure;
 use common\models\issue\IssuePay;
 use common\models\user\Worker;
 use Yii;
@@ -15,13 +16,15 @@ class IssuePaysWidget extends Widget {
 
 	public $user;
 
+	public ?Closure $updateLink = null;
+	public ?string $receivedRoute = null;
+	public ?string $editRoute = null;
+	public ?string $payRoute = null;
+	public ?string $deleteRoute = null;
+
 	public $editPayBtn = false;
 
-	public function init() {
-		if (!empty($this->user)) {
-			//@todo after add Customer, remove them
-			$this->user = Worker::findOne($this->user->id);
-		}
+	public function init(): void {
 		parent::init();
 	}
 

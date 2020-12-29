@@ -5,7 +5,6 @@ namespace backend\modules\issue\models\search;
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch as BaseIssueSearch;
 use common\models\issue\query\IssueQuery;
-use common\models\user\Worker;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
@@ -80,11 +79,8 @@ class IssueSearch extends BaseIssueSearch {
 			$ids[] = $this->agent_id;
 		}
 		if ($this->parentId > 0) {
-			$user = Worker::findOne($this->parentId);
-			if ($user !== null) {
-				$ids = $user->getAllChildesIds();
-				$ids[] = $user->id;
-			}
+			$ids = Yii::$app->userHierarchy->getAllChildesIds($this->parentId);
+			$ids[] = $this->parentId;
 		}
 		$query->agents($ids);
 	}

@@ -345,14 +345,20 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 		// TODO: Implement getTransferType() method.
 	}
 
-	public function isDelayed(string $delayRange = '-3 days'): bool {
-		$delay = new DateTime($delayRange);
+	public function isDelayed(string $range = 'now'): bool {
 		foreach ($this->pays as $pay) {
-			if (!$pay->isPayed() && $delay > $pay->getDeadlineAt()) {
+			if($pay->isDelayed($range)){
 				return true;
 			}
 		}
 		return false;
 	}
 
+	public function markAsPayment(DateTime $dateTime): void {
+		foreach ($this->pays as $pay){
+			if(!$pay->isPayed()){
+				$pay->markAsPayment($dateTime);
+			}
+		}
+	}
 }

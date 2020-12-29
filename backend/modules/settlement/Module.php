@@ -27,7 +27,7 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
-						'actions' => ['to-create', 'create', 'view', 'update'],
+						'actions' => ['to-create', 'create', 'view', 'update', 'pays'],
 						'controllers' => ['settlement/calculation'],
 						'permissions' => [Worker::PERMISSION_CALCULATION_TO_CREATE],
 					],
@@ -35,6 +35,18 @@ class Module extends BaseModule {
 						'allow' => true,
 						'controllers' => ['settlement/calculation-problem'],
 						'permissions' => [Worker::PERMISSION_CALCULATION_PROBLEMS],
+					],
+					[
+						'allow' => true,
+						'actions' => ['pay-provisions'],
+						'controllers' => ['settlement/pay'],
+						'permissions' => [Worker::PERMISSION_ISSUE],
+					],
+					[
+						'allow' => true,
+						'actions' => ['delayed'],
+						'controllers' => ['settlement/pay'],
+						'permissions' => [Worker::PERMISSION_PAYS_DELAYED],
 					],
 					[
 						'allow' => true,

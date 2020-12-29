@@ -1,11 +1,10 @@
 <?php
 
-use common\models\issue\Summon;
 use common\widgets\GridView;
 use frontend\models\search\SummonSearch;
+use frontend\widgets\IssueColumn;
 use kartik\grid\ActionColumn;
 use yii\helpers\Html;
-use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel SummonSearch */
@@ -27,16 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
 			[
-				'attribute' => 'issue_id',
-				'format' => 'raw',
-				'value' => function (Summon $model): string {
-					return Html::a($model->issue,
-						Url::to(['issue/view', 'id' => $model->issue_id]),
-						[
-							'target' => '_blank',
-						]);
-				},
-				'label' => 'Sprawa', // as link
+				'class' => IssueColumn::class,
 			],
 			[
 				'attribute' => 'type',

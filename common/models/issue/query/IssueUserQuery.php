@@ -17,12 +17,16 @@ class IssueUserQuery extends ActiveQuery {
 	}
 
 	public function withType(string $type): self {
-		$this->andWhere([IssueUser::tableName() . '.type' => $type]);
+		[, $alias] = $this->getTableNameAndAlias();
+
+		$this->andWhere([$alias . '.type' => $type]);
 		return $this;
 	}
 
 	public function withTypes(array $types): self {
-		$this->andWhere([IssueUser::tableName() . '.type' => $types]);
+		[, $alias] = $this->getTableNameAndAlias();
+
+		$this->andWhere([$alias . '.type' => $types]);
 		return $this;
 	}
 

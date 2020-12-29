@@ -3,7 +3,6 @@
 namespace backend\tests\functional\settlement;
 
 use backend\modules\settlement\controllers\CalculationProblemController;
-use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use backend\tests\Step\Functional\ProblemCalculationIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 
@@ -43,7 +42,6 @@ class CalculationProblemStatusCest {
 		$I->seeInGridHeader('Customer');
 		$I->seeInGridHeader('Value with VAT');
 		$I->seeInGridHeader('Value to pay');
-		$I->seeInGridHeader('Provider name');
 		$I->seeInGridHeader('Created at');
 		$I->seeInGridHeader('Updated at');
 	}

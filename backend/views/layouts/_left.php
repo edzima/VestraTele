@@ -147,6 +147,12 @@ $user = Yii::$app->user;
 							'visible' => $user->can(User::PERMISSION_PAY),
 						],
 						[
+							'label' => Yii::t('settlement', 'Delayed pays'),
+							'url' => ['/settlement/pay/delayed'],
+							'icon' => '<i class="fa fa-plus"></i>',
+							'visible' => $user->can(User::PERMISSION_PAYS_DELAYED),
+						],
+						[
 							'label' => Yii::t('settlement', 'Received pays'),
 							'url' => ['/settlement/pay-received/index'],
 							'icon' => '<i class="fa fa-car"></i>',

@@ -207,6 +207,11 @@ return [
 	'value' => 'value',
 	'Issue type' => 'Typ sprawy',
 	'Issue stage' => 'Etap sprawy',
-	'Is provider notified' => 'Wpłacający powiadomiony'
+	'Is provider notified' => 'Wpłacający powiadomiony',
+	'Status...' => 'Status...',
+	'Agent' => 'Agent',
+	'created_at' => 'created_at',
+	'Delete this pay' => 'Delete this pay',
+	'Provisions' => 'Prowizje'
 
 ];

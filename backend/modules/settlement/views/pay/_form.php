@@ -1,7 +1,8 @@
 <?php
 
 use common\models\issue\IssuePay;
-use common\widgets\DateTimeWidget;
+use common\widgets\DateWidget;
+use kartik\number\NumberControl;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -15,41 +16,37 @@ use yii\widgets\ActiveForm;
 	<?php $form = ActiveForm::begin(); ?>
 
 	<div class="row">
-		<?= $form->field($model, 'deadline_at', ['options' => ['class' => 'col-md-6']])
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
-				]) ?>
-		<?= $form->field($model, 'pay_at', ['options' => ['class' => 'col-md-6']])
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
-				]) ?>
+
+		<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-2']])
+			->widget(NumberControl::class)
+		?>
+
+		<?= $form->field($model, 'vat', ['options' => ['class' => 'col-md-1']])
+			->widget(NumberControl::class)
+		?>
+
+		<?= $form->field($model, 'deadline_at', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+		<?= $form->field($model, 'pay_at', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+	</div>
+	<div class="row">
+		<?= $form->field($model, 'transfer_type', ['options' => ['class' => 'col-md-2']])
+			->dropDownList(IssuePay::getTransferTypesNames())
+		?>
+		<?= $form->field($model, 'status', ['options' => ['class' => 'col-md-2']])
+			->dropDownList(IssuePay::getStatusNames(), [
+				'prompt' => Yii::t('common', 'Status...'),
+			])
+		?>
 	</div>
 
-	<?= $form->field($model, 'vat')->textInput() ?>
-
-
-	<?= $form->field($model, 'value')->textInput(['readonly' => true]) ?>
 
 	<div class="form-group">
-		<?= Html::submitButton('Zapisz', ['class' => 'btn btn-success']) ?>
+		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

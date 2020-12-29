@@ -5,6 +5,7 @@ namespace common\models\issue\query;
 use common\models\issue\IssuePay;
 use Decimal\Decimal;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 
 /**
  * This is the ActiveQuery class for [[IssueNote]].
@@ -31,28 +32,41 @@ class IssuePayQuery extends ActiveQuery {
 		return parent::one($db);
 	}
 
-	public function onlyNotPayed() {
+	public function onlyNotPayed(): self {
 		[, $alias] = $this->getTableNameAndAlias();
-		$this->andWhere("$alias.pay_at IS NULL or $alias.pay_at = 0");
+		$this->andWhere("$alias.pay_at IS NULL");
 		return $this;
 	}
 
-	public function onlyDelayed(string $delayRange = 'now') {
+	public function onlyDelayed(): self {
 		[, $alias] = $this->getTableNameAndAlias();
 		$this->onlyNotPayed();
-		$this->andWhere(['<=', $alias . '.deadline_at', date(DATE_ATOM, strtotime($delayRange))]);
+		$this->andWhere(['<=', $alias . '.deadline_at', date('Y-m-d')]);
 		return $this;
 	}
 
-	public function onlyNotDelayed(string $delayRange = 'now') {
+	public function onlyMaxDelayed(int $days): self {
 		[, $alias] = $this->getTableNameAndAlias();
-		$this->andWhere(['>=', $alias . '.deadline_at', date(DATE_ATOM, strtotime($delayRange))]);
+		$this->andWhere(['<=', new Expression("DATEDIFF(CURDATE(), $alias.deadline_at)"), $days]);
+
 		return $this;
 	}
 
-	public function onlyPayed() {
+	public function onlyMinDelayed(int $days): self {
 		[, $alias] = $this->getTableNameAndAlias();
-		$this->andWhere($alias . '.pay_at > 0');
+		$this->andWhere(['>=', new Expression("DATEDIFF(CURDATE(), $alias.deadline_at)"), $days]);
+		return $this;
+	}
+
+	public function onlyNotDelayed(): self {
+		[, $alias] = $this->getTableNameAndAlias();
+		$this->andWhere(['>=', $alias . '.deadline_at', date('Y-m-d')]);
+		return $this;
+	}
+
+	public function onlyPayed(): self {
+		[, $alias] = $this->getTableNameAndAlias();
+		$this->andWhere($alias . '.pay_at IS NOT NULL');
 		return $this;
 	}
 
@@ -70,7 +84,7 @@ class IssuePayQuery extends ActiveQuery {
 		return $query->onlyPayed()->getValueSum();
 	}
 
-	public function onlyWithoutDeadline() {
+	public function onlyWithoutDeadline(): self {
 		[, $alias] = $this->getTableNameAndAlias();
 		$this->andWhere($alias . '.deadline_at IS NOT NULL');
 		return $this;
@@ -84,4 +98,5 @@ class IssuePayQuery extends ActiveQuery {
 		}
 		return $this->ids;
 	}
+
 }

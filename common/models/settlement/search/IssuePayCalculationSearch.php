@@ -2,15 +2,19 @@
 
 namespace common\models\settlement\search;
 
+use common\models\AgentSearchInterface;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueType;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
+use common\models\issue\query\IssueUserQuery;
 use common\models\issue\search\ArchivedIssueSearch;
 use common\models\issue\search\IssueTypeSearch;
 use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
+use common\models\user\query\UserQuery;
+use common\models\user\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\QueryInterface;
@@ -22,11 +26,19 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	CustomerSearchInterface,
 	IssueTypeSearch,
 	ArchivedIssueSearch,
+	AgentSearchInterface,
 	SearchModel {
 
-	public $issue_type_id;
+	public $agent_id;
 	public string $customerLastname = '';
+	public $issue_type_id;
+
+	/**
+	 * @var int[]|null
+	 */
+	public array $issueUsersIds = [];
 	public bool $withCustomer = true;
+	public bool $withAgents = true;
 	public ?bool $withoutProvisions = null;
 
 	public ?bool $onlyWithProblems = null;
@@ -39,9 +51,20 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		return [
 			[['issue_id', 'stage_id', 'type', 'problem_status', 'owner_id'], 'integer'],
 			['issue_type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
+			['agent_id', 'in', 'range' => array_keys($this->getAgentsNames()), 'allowArray' => true],
 			[['value'], 'number'],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];
+	}
+
+	public function getAgentsNames(): array {
+		$ids = IssuePayCalculation::find()
+			->select('user_id')
+			->joinWith([
+				'issue.agent',
+			])
+			->column();
+		return User::getSelectList($ids);
 	}
 
 	/**
@@ -68,9 +91,10 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 			},
 		]);
 		$query->joinWith('issue.type IT');
-		$query->joinWith('pays', true, 'LEFT JOIN');
+		$query->joinWith('owner O');
+		$query->joinWith('pays');
+
 		$query->distinct();
-		//	$query->groupBy('id');
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -87,8 +111,9 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 			$query->andWhere('0=1');
 			return $dataProvider;
 		}
-
+		$this->applyAgentsFilters($query);
 		$this->applyCustomerSurnameFilter($query);
+		$this->applyIssueUsersFilter($query);
 		$this->applyProblemStatusFilter($query);
 		$this->applyIssueTypeFilter($query);
 		$this->applyWithPayedPays($query);
@@ -141,9 +166,31 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		}
 	}
 
+	public function applyAgentsFilters(QueryInterface $query): void {
+		/** @var IssuePayCalculationQuery $query */
+		if ($this->withAgents || !empty($this->agent_id)) {
+			$query->joinWith([
+				'issue.agent' => function (UserQuery $query) {
+					$query->joinWith('userProfile AP');
+				},
+			]);
+		}
+		if (!empty($this->agent_id)) {
+			$query->joinWith([
+				'issue' => function (IssueQuery $query): void {
+					$query->agents((array) $this->agent_id);
+				},
+			]);
+		}
+	}
+
 	public function applyCustomerSurnameFilter(QueryInterface $query): void {
 		if ($this->withCustomer || !empty($this->customerLastname)) {
-			$query->joinWith('issue.customer.userProfile CP');
+			$query->joinWith([
+				'issue.customer C' => function (UserQuery $query) {
+					$query->joinWith('userProfile CP');
+				},
+			]);
 		}
 		if (!empty($this->customerLastname)) {
 			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
@@ -160,7 +207,19 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		return IssueType::getTypesNames();
 	}
 
+	//@todo add archive filter when withArchive is true.
 	public function getWithArchive(): bool {
 		return $this->withAchive;
 	}
+
+	private function applyIssueUsersFilter(IssuePayCalculationQuery $query): void {
+		if (!empty($this->issueUsersIds)) {
+			$query->joinWith([
+				'issue.users IU' => function (IssueUserQuery $query): void {
+					$query->andWhere(['IU.user_id' => $this->issueUsersIds]);
+				},
+			]);
+		}
+	}
+
 }

@@ -138,4 +138,11 @@ class PayForm extends Model implements PayInterface {
 
 		];
 	}
+
+	public function isDelayed(string $range = 'now'): bool {
+		if ($this->isPayed() || $this->getDeadlineAt() === null) {
+			return false;
+		}
+		return new DateTime($range) > $this->getDeadlineAt();
+	}
 }

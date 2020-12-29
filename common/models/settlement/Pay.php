@@ -36,6 +36,13 @@ class Pay extends BaseObject implements
 		return $this->getPaymentAt() !== null;
 	}
 
+	public function isDelayed(string $range = 'now'): bool {
+		if ($this->isPayed() || $this->getDeadlineAt() === null) {
+			return false;
+		}
+		return new DateTime($range) > $this->getDeadlineAt();
+	}
+
 	public function getPaymentAt(): ?DateTime {
 		return $this->paymentAt;
 	}
@@ -59,4 +66,5 @@ class Pay extends BaseObject implements
 	public function getTransferType(): int {
 		return $this->transferType;
 	}
+
 }

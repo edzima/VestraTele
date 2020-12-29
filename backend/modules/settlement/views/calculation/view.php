@@ -1,10 +1,11 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
+use backend\modules\settlement\widgets\IssuePayGrid;
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
-use common\modules\issue\widgets\IssuePaysWidget;
 use common\widgets\settlement\SettlementDetailView;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 
@@ -25,8 +26,8 @@ YiiAsset::register($this);
 <div class="issue-pay-calculation-view">
 
 	<p>
-		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
-		|| $model->owner_id === Yii::$app->user->getId()
+		<?= $model->owner_id === Yii::$app->user->getId()
+		|| Yii::$app->user->can(User::ROLE_BOOKKEEPER)
 			? Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: '' ?>
 
@@ -64,11 +65,20 @@ YiiAsset::register($this);
 		'model' => $model,
 	]) ?>
 
+	<?= IssuePayGrid::widget([
+		'dataProvider' => new ActiveDataProvider([
+			'query' => $model->getPays(),
+		]),
+		'visibleAgent' => false,
+		'visibleCustomer' => false,
+		'caption' => Yii::t('settlement', 'Pays'),
+		'summary' => '',
+		'visibleProvisionsDetails' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR) || $model->issue->isForUser(Yii::$app->user->getId()),
+		'visibleSettlementType' => false,
+	])
+	?>
 
-	<?= IssuePaysWidget::widget([
-		'models' => $model->pays,
-		'editPayBtn' => Yii::$app->user->getId() === $model->owner_id,
-	]) ?>
+
 
 	<?php
 	//@todo enable this after refactoring note

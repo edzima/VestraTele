@@ -1,5 +1,6 @@
 <?php
 
+use common\components\HierarchyComponent;
 use common\components\PayComponent;
 use common\components\Provisions;
 use common\components\TaxComponent;
@@ -25,6 +26,7 @@ class Yii extends BaseYii {
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  * @mixin yii\web\Application|yii\web\Application
  * @property Formatter $formatter
+ * @property HierarchyComponent $userHierarchy
  * @property PayComponent $pay
  * @property Provisions $provisions
  * @property TaxComponent $tax

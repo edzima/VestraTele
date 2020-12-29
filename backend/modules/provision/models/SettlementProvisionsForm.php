@@ -6,7 +6,7 @@ use common\models\issue\Issue;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
 use common\models\provision\ProvisionUser;
-use common\models\user\Worker;
+use common\models\user\User;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -90,15 +90,15 @@ class SettlementProvisionsForm extends Model {
 		return ArrayHelper::map($provisions, 'type_id', 'typeWithValue');
 	}
 
-	public function getTele(): ?Worker {
+	public function getTele(): ?User {
 		return $this->getIssue()->tele;
 	}
 
-	public function getAgent(): Worker {
+	public function getAgent(): User {
 		return $this->getIssue()->agent;
 	}
 
-	public function getLawyer(): Worker {
+	public function getLawyer(): User {
 		return $this->getIssue()->lawyer;
 	}
 
@@ -124,7 +124,7 @@ class SettlementProvisionsForm extends Model {
 		return true;
 	}
 
-	private function addProvision(Worker $user, int $type) {
+	private function addProvision(User $user, int $type) {
 		Yii::$app->provisions->add($user, $type, $this->model->pays);
 	}
 }

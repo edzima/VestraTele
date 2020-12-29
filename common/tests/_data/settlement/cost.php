@@ -6,7 +6,7 @@ return [
 	[
 		'issue_id' => 1,
 		'type' => IssueCost::TYPE_PURCHASE_OF_RECEIVABLES,
-		'value' => (new \Decimal\Decimal(600))->toFixed(2),
+		'value' => 600,
 		'vat' => 23,
 		'date_at' => '2020-02-10',
 		'created_at' => '1391885313',

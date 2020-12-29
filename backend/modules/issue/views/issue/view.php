@@ -29,9 +29,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			'class' => 'btn btn-success',
 		]) : '' ?>
 
-		<?= Html::a(Yii::t('common', 'Issue users'), ['user/issue', 'id' => $model->id], [
-			'class' => 'btn btn-success',
-		]) ?>
+		<?= Yii::$app->user->can(User::PERMISSION_SUMMON) ? Html::a(Yii::t('backend', 'Create summon'), ['summon/create', 'issueId' => $model->id], [
+			'class' => 'btn btn-warning',
+		]) : '' ?>
+
 
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger pull-right',
@@ -60,13 +61,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= IssueViewWidget::widget(['model' => $model]) ?>
 
-	<?= IssuePayCalculationGrid::widget([
+	<?= $calculationsDataProvider->getTotalCount() > 0
+		? IssuePayCalculationGrid::widget([
 			'dataProvider' => $calculationsDataProvider,
+			'caption' => Yii::t('settlement', 'Settlements'),
 			'withIssue' => false,
 			'withIssueType' => false,
 			'withCustomer' => false,
 			'withDates' => false,
 		])
+		: ''
 	?>
 
 	<?= IssueSummonsWidget::widget(['model' => $model]) ?>

@@ -19,4 +19,5 @@ interface PayInterface {
 
 	public function getDeadlineAt(): ?DateTime;
 
+	public function isDelayed(string $range = 'now'): bool;
 }

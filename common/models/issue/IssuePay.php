@@ -44,8 +44,11 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 	public const TRANSFER_TYPE_DIRECT = 1;
 	public const TRANSFER_TYPE_BANK = 2;
 
+	public const STATUS_INFORMED = 1;
 	public const STATUS_NO_CONTACT = 10;
-	public const STATUS_ANALYSE = 20;
+	public const STATUS_REQUEST_PAY = 30;
+	public const STATUS_REQUEST_REDUCTION = 40;
+	public const STATUS_ANALYSE = 50;
 
 	/**
 	 * @inheritdoc
@@ -115,7 +118,7 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 			'deadline_at' => 'Termin płatności',
 			'value' => 'Honorarium (Brutto)',
 			'valueNetto' => 'Honorarium (Netto)',
-			'transfer_type' => 'Przelew/konto',
+			'transfer_type' => 'Typ płatności',
 			'partInfo' => 'Część',
 			'vat' => 'VAT (%)',
 			'vatPercent' => 'VAT (%)',
@@ -181,7 +184,10 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 
 	public static function getStatusNames(): array {
 		return [
+			static::STATUS_INFORMED => Yii::t('settlement','Informed'),
 			static::STATUS_NO_CONTACT => Yii::t('settlement', 'No contact'),
+			static::STATUS_REQUEST_PAY => Yii::t('settlement','Pay request'),
+			static::STATUS_REQUEST_REDUCTION => Yii::t('settlement','Reduction request'),
 			static::STATUS_ANALYSE => Yii::t('settlement', 'Analyse'),
 		];
 	}
@@ -190,4 +196,16 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 		return new IssuePayQuery(static::class);
 	}
 
+	public function isDelayed(string $range = 'now'): bool {
+		if ($this->isPayed() || $this->getDeadlineAt() === null) {
+			return false;
+		}
+		return new DateTime($range) > $this->getDeadlineAt();
+	}
+
+	public function markAsPayment(DateTime $dateTime): void {
+		$this->pay_at = $dateTime->format('Y-m-d');
+		$this->status = null;
+		$this->save(false);
+	}
 }

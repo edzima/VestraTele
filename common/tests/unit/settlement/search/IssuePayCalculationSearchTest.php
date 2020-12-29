@@ -1,14 +1,14 @@
 <?php
 
-namespace backend\tests\unit\settlement\search;
+namespace common\tests\unit\settlement\search;
 
-use backend\modules\issue\models\IssueStage;
-use backend\modules\settlement\models\search\IssuePayCalculationSearch;
-use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueStage;
 use common\models\SearchModel;
+use common\models\settlement\search\IssuePayCalculationSearch;
 use common\tests\_support\UnitSearchModelTrait;
+use common\tests\unit\Unit;
 
 /**
  * Class IssuePayCalculationSearchTest
@@ -86,7 +86,12 @@ class IssuePayCalculationSearchTest extends Unit {
 
 	public function testCustomer(): void {
 		$this->model->customerLastname = 'Lar';
+		$models = $this->search([])->getModels();
+		foreach ($models as $model){
+			codecept_debug($model->issue->customer->fullName);
+		}
 		$this->assertTotalCount(2);
+
 	}
 
 	public function testOwner(): void {
@@ -95,6 +100,35 @@ class IssuePayCalculationSearchTest extends Unit {
 		$this->model->owner_id = 301;
 		$this->assertTotalCount(1);
 		$this->model->owner_id = 100000000;
+		$this->assertTotalCount(0);
+	}
+
+	public function testEmptyIssueUsers(): void {
+
+	}
+
+	public function testNotExistedIssueUser(): void {
+		$this->model->issueUsersIds = [12312312312];
+		$this->assertTotalCount(0);
+	}
+
+	public function testAgents(): void {
+		$this->model->issueUsersIds = [300, 301];
+		$this->assertTotalCount(5);
+		$this->model->issueUsersIds = [300];
+		$this->assertTotalCount(4);
+		$this->model->issueUsersIds = [302];
+		$this->assertTotalCount(0);
+	}
+
+	public function testLawyers(): void {
+		$this->model->issueUsersIds = [200, 201];
+		$this->assertTotalCount(5);
+		$this->model->issueUsersIds = [200];
+		$this->assertTotalCount(3);
+		$this->model->issueUsersIds = [201];
+		$this->assertTotalCount(2);
+		$this->model->issueUsersIds = [203];
 		$this->assertTotalCount(0);
 	}
 

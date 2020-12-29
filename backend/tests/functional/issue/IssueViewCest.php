@@ -2,9 +2,10 @@
 
 namespace backend\tests\functional\issue;
 
-use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use backend\tests\Step\Functional\CostIssueManager;
+use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use backend\tests\Step\Functional\IssueManager;
+use backend\tests\Step\Functional\SummonIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
 
@@ -36,9 +37,9 @@ class IssueViewCest {
 		$I->amLoggedIn();
 		$this->goToIssuePage($I);
 		$I->seeLink('Update');
-		$I->seeLink('Issue users');
 		$I->dontSeeLink('Costs');
 		$I->dontSeeLink('Create settlement');
+		$I->dontSeeLink('Create summon');
 	}
 
 	public function checkNoteLink(IssueManager $I): void {
@@ -63,6 +64,14 @@ class IssueViewCest {
 		$this->goToIssuePage($I);
 		$I->seeLink('Create settlement');
 		$I->click('Create settlement');
+		$I->seeResponseCodeIsSuccessful();
+	}
+
+	public function checkCreateSummonLink(SummonIssueManager $I):void{
+		$I->amLoggedIn();
+		$this->goToIssuePage($I);
+		$I->seeLink('Create summon');
+		$I->click('Create summon');
 		$I->seeResponseCodeIsSuccessful();
 	}
 

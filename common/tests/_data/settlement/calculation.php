@@ -50,4 +50,14 @@ return [
 		'owner_id' => 303,
 		'stage_id' => 2
 	],
+	'archived-issue' => [
+		'issue_id' => 6,
+		'value' => 1230,
+		'type' => IssuePayCalculation::TYPE_HONORARIUM,
+		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
+		'problem_status' => IssuePayCalculation::PROBLEM_STATUS_DEMAND,
+		'provider_id' => 200,
+		'owner_id' => 303,
+		'stage_id' => 2
+	],
 ];

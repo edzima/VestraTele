@@ -3,14 +3,15 @@
 namespace backend\modules\settlement\controllers;
 
 use backend\helpers\Url;
-use backend\modules\settlement\models\search\DelayedIssuePaySearch;
 use backend\modules\settlement\models\search\IssuePaySearch;
 use backend\widgets\CsvForm;
-use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\query\IssuePayQuery;
-use common\models\user\Worker;
+use common\models\settlement\PayPayedForm;
+use common\models\settlement\search\DelayedIssuePaySearch;
+use common\models\user\User;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -30,9 +31,44 @@ class PayController extends Controller {
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'pay-provisions' => ['POST'],
 				],
 			],
 		];
+	}
+
+	public function actionPayProvisions(): string {
+		if (isset($_POST['expandRowKey'])) {
+			$model = $this->findModel($_POST['expandRowKey']);
+			$userId = Yii::$app->user->getId();
+			if (!Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
+				&& !$model->calculation->issue->isForUser($userId)) {
+				throw new NotFoundHttpException();
+			}
+			$query = $model->getProvisions()
+				->joinWith('toUser.userProfile')
+				->joinWith('fromUser.userProfile');
+			if (!Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
+				$query->user($userId);
+			}
+			$dataProvider = new ActiveDataProvider([
+				'query' => $query,
+			]);
+			return $this->renderPartial('_pay_provisions', [
+				'dataProvider' => $dataProvider,
+			]);
+		}
+		return '<div class="alert alert-danger">No data found</div>';
+	}
+
+	public function actionDelayed(): string {
+		$searchModel = new DelayedIssuePaySearch();
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		return $this->render('index', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+			'withNav' => false
+		]);
 	}
 
 	/**
@@ -41,10 +77,12 @@ class PayController extends Controller {
 	 * @param int $status
 	 * @return mixed
 	 */
-	public function actionIndex(string $status = IssuePaySearch::PAY_STATUS_ACTIVE) {
-
+	public function actionIndex(string $status = IssuePaySearch::PAY_STATUS_NOT_PAYED) {
 		$searchModel = new IssuePaySearch();
-		$searchModel->setPayStatus($status);
+		if (!Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
+			$searchModel->calculationOwnerId = Yii::$app->user->getId();
+		}
+		$searchModel->payStatus = $status;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {
@@ -90,48 +128,49 @@ class PayController extends Controller {
 			]);
 			return $exporter->export()->send('export.csv');
 		}
-		return $this->render('index', [
-			'searchModel' => $searchModel,
-			'dataProvider' => $dataProvider,
-			'withMenu' => true,
-		]);
-	}
 
-	public function actionDelayed(): string {
-		$searchModel = new DelayedIssuePaySearch();
-		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'withMenu' => false,
+			'withNav' => true,
 		]);
 	}
 
 	public function actionPay(int $id) {
-		$model = $this->findModel($id);
-		$isPayed = $model->isPayed();
-		if (!$model->isPayed()) {
-			$model->pay_at = date('Y-m-d');
+		$model = new PayPayedForm($this->findModel($id));
+		$model->date = date('Y-m-d');
+		if ($model->load(Yii::$app->request->post()) && $model->pay()) {
+			return $this->redirect(Url::previous());
 		}
+		return $this->render('pay', [
+			'model' => $model,
+		]);
+	}
 
+	public function actionUpdate(int $id) {
+		$model = $this->findModel($id);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(Url::previous());
 		}
-
-		return $this->render('pay', [
+		return $this->render('update', [
 			'model' => $model,
-			'isPayed' => $isPayed,
 		]);
 	}
 
 	public function actionStatus(int $id) {
 		$model = $this->findModel($id);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$this->redirect(Yii::$app->user->can(Worker::ROLE_BOOKKEEPER) ? 'index' : 'delayed');
+			return $this->redirect(Url::previous());
 		}
 		return $this->render('status', [
 			'model' => $model,
 		]);
+	}
+
+	public function actionDelete(int $id) {
+		$model = $this->findModel($id);
+		$model->delete();
+		return $this->redirect(Url::previous());
 	}
 
 	/**
@@ -149,10 +188,4 @@ class PayController extends Controller {
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}
 
-	protected function findIssueModel(int $id): Issue {
-		if (($model = Issue::findOne($id)) !== null) {
-			return $model;
-		}
-		throw new NotFoundHttpException('The requested page does not exist.');
-	}
 }

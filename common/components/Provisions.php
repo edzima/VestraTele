@@ -7,6 +7,7 @@ use common\models\issue\IssuePay;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionUser;
+use common\models\user\User;
 use common\models\user\Worker;
 use Decimal\Decimal;
 use Yii;
@@ -77,7 +78,7 @@ class Provisions extends Component {
 	 * @param IssuePay[] $pays
 	 * @return int
 	 */
-	public function add(Worker $user, int $typeId, array $pays): int {
+	public function add(User $user, int $typeId, array $pays): int {
 		$usersProvision = ProvisionUser::find()
 			->andWhere(['from_user_id' => $user->id])
 			->andWhere(['type_id' => $typeId])

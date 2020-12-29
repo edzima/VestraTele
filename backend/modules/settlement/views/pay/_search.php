@@ -24,6 +24,10 @@ $action = Yii::$app->controller->action->id;
 
 		<div class="date-range-fields-wrapper" style="margin-left:auto;display: flex;align-items: center;">
 
+			<?= $model->isNotPayed()
+				? $form->field($model, 'delay')->dropDownList(IssuePaySearch::getDelaysRangesNames())
+				: ''
+			?>
 
 			<?= $form->field($model, 'deadlineAtFrom')
 				->widget(DateWidget::class) ?>

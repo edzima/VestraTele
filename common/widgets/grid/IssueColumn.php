@@ -17,13 +17,13 @@ class IssueColumn extends DataColumn {
 		'target' => '_blank',
 	];
 
-	public string $viewBaseUrl;
+	public ?string $viewBaseUrl = null;
 
 	public function init(): void {
 		if (empty($this->label)) {
 			$this->label = Yii::t('common', 'Issue');
 		}
-		if (!empty($this->linkOptions)) {
+		if (!empty($this->viewBaseUrl) && !empty($this->linkOptions)) {
 			$this->format = 'raw';
 			$this->value = function (IssueInterface $model): string {
 				return Html::a(

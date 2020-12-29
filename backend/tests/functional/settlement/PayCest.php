@@ -43,6 +43,9 @@ class PayCest {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeInGridHeader('Settlement type');
+		$I->seeInGridHeader('Agent');
+		$I->seeInGridHeader('Customer');
+
 	}
 
 }

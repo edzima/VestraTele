@@ -2,34 +2,39 @@
 
 namespace common\widgets\grid;
 
+use common\helpers\Html;
 use common\models\issue\IssuePayCalculation;
 use common\models\settlement\search\IssuePayCalculationSearch;
 use common\widgets\GridView;
 use Decimal\Decimal;
 use Yii;
 use yii\base\InvalidConfigException;
-use yii\bootstrap\Html;
 
 class IssuePayCalculationGrid extends GridView {
 
-	protected const ISSUE_COLUMN = IssueColumn::class;
+	/* @var IssuePayCalculationSearch */
+	public $filterModel;
 
 	public $id = 'calculation-grid';
 
 	public $showPageSummary = true;
 
+	public string $issueColumn = IssueColumn::class;
 	public bool $withIssue = true;
+	public bool $withOwner = true;
 	public bool $withCustomer = true;
 	public bool $withIssueType = true;
 	public bool $withProblems = true;
 	public bool $withDates = true;
+	public bool $withStageOnCreate = true;
+	public bool $withValueSummary = false;
+	public bool $rowColors = true;
 
 	public $userProvisionsId = null;
 
-	/**
-	 * @var IssuePayCalculationSearch
-	 */
-	public $filterModel;
+	public string $valueTypeIssueType = IssueTypeColumn::VALUE_SHORT;
+
+	public bool $withAgent = true;
 
 	public function init(): void {
 		if (!empty($this->id) && !isset($this->options['id'])) {
@@ -41,24 +46,12 @@ class IssuePayCalculationGrid extends GridView {
 		if (empty($this->columns)) {
 			$this->columns = $this->defaultColumns();
 		}
-		if (empty($this->rowOptions)) {
-			$this->rowOptions = function (IssuePayCalculation $model): array {
-				return $this->defaultRowOptions($model);
+		if (empty($this->rowOptions) && $this->rowColors) {
+			$this->rowOptions = static function (IssuePayCalculation $model): array {
+				return Html::payStatusRowOptions($model);
 			};
 		}
 		parent::init();
-	}
-
-	protected function defaultRowOptions(IssuePayCalculation $model): array {
-		$options = [];
-		if ($model->isPayed()) {
-			Html::addCssClass($options, 'payed-row success');
-		} else {
-			if ($model->isDelayed()) {
-				Html::addCssClass($options, 'delayed-row warning');
-			}
-		}
-		return $options;
 	}
 
 	protected function actionColumn(): array {
@@ -71,12 +64,17 @@ class IssuePayCalculationGrid extends GridView {
 		return [
 			$this->actionColumn(),
 			[
-				'class' => static::ISSUE_COLUMN,
+				'class' => $this->issueColumn,
 				'visible' => $this->withIssue,
 			],
 			[
 				'class' => CustomerDataColumn::class,
 				'visible' => $this->withCustomer,
+			],
+			[
+				'class' => AgentDataColumn::class,
+				'visible' => $this->withAgent,
+				'value' => 'issue.agent.fullName',
 			],
 			[
 				'attribute' => 'type',
@@ -93,28 +91,33 @@ class IssuePayCalculationGrid extends GridView {
 				'attribute' => 'owner_id',
 				'value' => 'owner',
 				'filter' => IssuePayCalculationSearch::getOwnerNames(),
+				'visible' => $this->withOwner,
 			],
 			[
 				'class' => IssueTypeColumn::class,
 				'label' => Yii::t('backend', 'Issue type'),
 				'attribute' => 'issue_type_id',
 				'visible' => $this->withIssueType,
+				'valueType' => $this->valueTypeIssueType,
 			],
+			/*
 			[
 				'attribute' => 'stage_id',
 				'label' => Yii::t('backend', 'Issue stage on create'),
 				'value' => 'stageName',
 				'filter' => IssuePayCalculationSearch::getStagesNames(),
+				'visible' => $this->withStageOnCreate,
 			],
+			*/
 			[
 				'class' => CurrencyColumn::class,
-				'pageSummary' => true,
+				'pageSummary' => $this->withValueSummary,
 				'attribute' => 'value',
 			],
 			[
 				'class' => CurrencyColumn::class,
 				'attribute' => 'valueToPay',
-				'pageSummary' => true,
+				'pageSummary' => $this->withValueSummary,
 				'pageSummaryFunc' => function (array $decimals): Decimal {
 					$sum = new Decimal(0);
 					foreach ($decimals as $decimal) {
@@ -123,6 +126,7 @@ class IssuePayCalculationGrid extends GridView {
 					return $sum;
 				},
 			],
+			/*
 			[
 				'attribute' => 'providerName',
 				'filter' => IssuePayCalculation::getProvidersTypesNames(),
@@ -133,6 +137,7 @@ class IssuePayCalculationGrid extends GridView {
 					return IssuePayCalculation::getProvidersTypesNames()[IssuePayCalculation::PROVIDER_CLIENT];
 				},
 			],
+			*/
 			[
 				'class' => CurrencyColumn::class,
 
@@ -158,7 +163,7 @@ class IssuePayCalculationGrid extends GridView {
 				'format' => 'currency',
 				'visible' => $this->userProvisionsId !== null,
 				'pageSummary' => true,
-				'value' => function (IssuePayCalculation $model): Decimal {
+				'value' => function (IssuePayCalculation $model): ?Decimal {
 					if ($this->userProvisionsId === null) {
 						return new Decimal(0);
 					}
@@ -171,12 +176,6 @@ class IssuePayCalculationGrid extends GridView {
 					}
 					return $sum;
 				},
-			],
-			[
-				'attribute' => 'created_at',
-				'format' => 'date',
-				'noWrap' => true,
-				'visible' => $this->withDates,
 			],
 			[
 				'attribute' => 'updated_at',

@@ -67,12 +67,9 @@ class CalculationCest {
 		$I->dontSeeInGridHeader('Problem status');
 		$I->seeInGridHeader('Issue type');
 		$I->seeInGridHeader('Type');
-		$I->seeInGridHeader('Issue stage on create');
 		$I->seeInGridHeader('Customer');
 		$I->seeInGridHeader('Value with VAT');
 		$I->seeInGridHeader('Value to pay');
-		$I->seeInGridHeader('Provider name');
-		$I->seeInGridHeader('Created at');
 		$I->seeInGridHeader('Updated at');
 	}
 
@@ -133,7 +130,6 @@ class CalculationCest {
 
 		$I->see('Issue calculations');
 		$I->seeInGridHeader('Type', '#calculation-grid');
-		$I->seeInGridHeader('Issue stage on create');
 		$I->seeInGridHeader('Problem status', '#calculation-grid');
 		$I->dontSeeInGridHeader('Customer', '#calculation-grid');
 		$I->seeInGridHeader('Value with VAT');

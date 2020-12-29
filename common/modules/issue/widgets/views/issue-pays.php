@@ -1,14 +1,13 @@
 <?php
 
-use common\models\settlement\PayInterface;
+use common\models\issue\IssuePay;
 use common\modules\issue\widgets\IssuePaysWidget;
 use kartik\grid\GridView;
 use yii\bootstrap\Html;
-use yii\data\ActiveDataProvider;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $models PayInterface[] */
+/* @var $models IssuePay[] */
 /* @var $notesOptions array */
 /* @var $widget IssuePaysWidget */
 /* @var $withProvisions bool */
@@ -27,13 +26,36 @@ use yii\widgets\DetailView;
 			<fieldset>
 				<div class="pay-wrapper border <?= $pay->isPayed() ? 'border-green' : 'border-red' ?>">
 
-
-					<legend>Wpłata <?= count($models) > 1 ? $key + 1 : '' ?></legend>
+					<?= count($models) > 1
+						? Html::tag('legend', ($key + 1) . '.')
+						: ''
+					?>
 					<p>
-						<?= $widget->editPayBtn ? Html::a($pay->isPayed() ? 'Edytuj' : 'Opłać',
-							['/settlement/pay/pay', 'id' => $pay->id], [
-								'class' => 'btn btn-primary',
-							]) : '' ?>
+						<?= $widget->updateLink !== null
+							? call_user_func($widget->updateLink, $pay)
+							: ''
+						?>
+						<?= $widget->updateLink !== null
+							? call_user_func($widget->updateLink, $pay)
+							: ''
+						?>
+
+						<?= $widget->editPayBtn
+							? Html::a($pay->isPayed() ? 'Edytuj' : 'Opłać',
+								['/settlement/pay/pay', 'id' => $pay->id], [
+									'class' => 'btn btn-primary',
+								])
+							: ''
+						?>
+
+
+						<?= $widget->editPayBtn
+							? Html::a($pay->isPayed() ? 'Edytuj' : 'Opłać',
+								['/settlement/pay/pay', 'id' => $pay->id], [
+									'class' => 'btn btn-primary',
+								])
+							: ''
+						?>
 					</p>
 					<?= DetailView::widget([
 						'model' => $pay,
@@ -62,24 +84,20 @@ use yii\widgets\DetailView;
 						],
 
 					]) ?>
-					<?php if ($withProvisions): ?>
-						<fieldset>
-							<legend>Prowizje</legend>
-
-							<?
-							if (($dataProvider = $widget->getProvisionsProvider($pay)) instanceof ActiveDataProvider) {
-								echo GridView::widget([
-									'dataProvider' => $dataProvider,
-									'columns' => [
-										'toUser',
-										'fromUserString',
-										'value:currency',
-									],
-								]);
-							}
-							?>
-						</fieldset>
-					<? endif; ?>
+					<?php if ($withProvisions) {
+						$dataProvider = $widget->getProvisionsProvider($pay);
+						if ($dataProvider !== null && $dataProvider->getTotalCount() > 0) {
+							echo Html::tag('legend', 'Prowizje');
+							echo GridView::widget([
+								'dataProvider' => $dataProvider,
+								'columns' => [
+									'toUser',
+									'fromUserString',
+									'value:currency',
+								],
+							]);
+						}
+					} ?>
 				</div>
 			</fieldset>
 		<?php endforeach; ?>

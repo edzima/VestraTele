@@ -172,20 +172,21 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function getAgent(): UserQuery {
-		return $this->getUserType(IssueUser::TYPE_AGENT, Worker::class);
+		return $this->getUserType(IssueUser::TYPE_AGENT, User::class);
 	}
 
 	public function getLawyer(): UserQuery {
-		return $this->getUserType(IssueUser::TYPE_LAWYER, Worker::class);
+		return $this->getUserType(IssueUser::TYPE_LAWYER, User::class);
 	}
 
 	public function getTele(): UserQuery {
-		return $this->getUserType(IssueUser::TYPE_TELEMARKETER, Worker::class);
+		return $this->getUserType(IssueUser::TYPE_TELEMARKETER, User::class);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	protected function getUserType(string $type, string $userClass = User::class, callable $callable = null): UserQuery {
 		return $this->hasOne($userClass, ['id' => 'user_id'])->via('users', function (IssueUserQuery $query) use ($type, $callable) {
+			$query->alias($type);
 			$query->withType($type);
 			if ($callable !== null) {
 				$callable($query, $type);

@@ -14,7 +14,7 @@ class IssueTypeColumn extends DataColumn {
 	public const VALUE_NAME = 'name';
 	public const VALUE_NAME_WITH_SHORT = 'name-with-short';
 
-	public $valueType = self::VALUE_SHORT;
+	public string $valueType = self::VALUE_SHORT;
 	public bool $contentBold = true;
 
 	public function init(): void {

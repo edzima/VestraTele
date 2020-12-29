@@ -266,5 +266,13 @@ return [
 	'Settlement value is not same as sum value from pays. Diff: {diffValue}.' => 'Kwota rozliczenia nie jest równoznaczna sumie płatności. Różnica: {diffValue}.',
 	'Provision (Total)' => 'Provision (Total)',
 	'Settlement: {id} hasnt valid total value.' => 'Settlement: {id} hasnt valid total value.',
-	'Set uncollectible status' => 'Nieściągalny'
+	'Set uncollectible status' => 'Nieściągalny',
+	'Create summon' => 'Dodaj wezwanie',
+	'Set uncollectible status: {id}' => 'Set uncollectible status: {id}',
+	'Set uncollectible settlements' => 'Set uncollectible settlements',
+	'uncollectible' => 'uncollectible',
+	'Uncollectible' => 'Nieściągalne',
+	'Not payed' => 'Nieopłacone',
+	'Only bookkeeper or owner can update settlement.' => 'Tylko księgowy lub właściciel rozliczenia może je edytować.',
+	'Payed pay: {value}' => 'Opłać wpłatę: {value}',
 ];
