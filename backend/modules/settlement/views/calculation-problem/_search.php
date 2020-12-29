@@ -18,8 +18,6 @@ $action = Yii::$app->controller->action->id;
 		'method' => 'get',
 	]); ?>
 
-	<?= $form->field($model, 'onlyWithPayedPays')->checkbox() ?>
-	
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Search'), ['class' => 'btn btn-primary']) ?>
 		<?= Html::resetButton(Yii::t('backend', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>

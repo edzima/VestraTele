@@ -93,4 +93,5 @@ return [
 	'Pays - {statusType}' => 'Pays - {statusType}',
 	'Status pay: {value}' => 'Status pay: {value}',
 	'Pay request' => 'Prośba o raty',
+	'Without problems' => 'Brak',
 ];

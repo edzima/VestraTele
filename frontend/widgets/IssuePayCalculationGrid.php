@@ -5,6 +5,7 @@ namespace frontend\widgets;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\IssuePayCalculationGrid as BaseIssuePayCalculationGrid;
 use common\widgets\grid\IssueTypeColumn;
+use frontend\models\search\IssuePayCalculationSearch;
 
 class IssuePayCalculationGrid extends BaseIssuePayCalculationGrid {
 
@@ -19,5 +20,9 @@ class IssuePayCalculationGrid extends BaseIssuePayCalculationGrid {
 			'template' => '{view}',
 			'controller' => 'settlement',
 		];
+	}
+
+	protected function problemStatusFilter(): array {
+		return IssuePayCalculationSearch::getProblemStatusesNames();
 	}
 }

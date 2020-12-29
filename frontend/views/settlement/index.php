@@ -1,5 +1,6 @@
 <?php
 
+use common\models\user\Worker;
 use frontend\models\search\IssuePayCalculationSearch;
 use frontend\widgets\IssuePayCalculationGrid;
 use yii\data\ActiveDataProvider;
@@ -18,6 +19,15 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="issue-index">
 
 	<h1><?= Html::encode($this->title) ?></h1>
+
+	<p>
+		<?= Html::a(Yii::t('settlement', 'Pays'), '/pay/index', ['class' => 'btn btn-success']) ?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_PAY_RECEIVED)
+			? Html::a(Yii::t('settlement', 'Received pays'), '/pay-received/index', ['class' => 'btn btn-primary'])
+			: ''
+		?>
+	</p>
 
 	<?= IssuePayCalculationGrid::widget([
 		'filterModel' => $searchModel,

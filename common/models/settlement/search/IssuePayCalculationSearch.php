@@ -42,7 +42,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public ?bool $withoutProvisions = null;
 
 	public ?bool $onlyWithProblems = null;
-	public ?bool $onlyWithPayedPays = null;
+	public bool $onlyToPayed = false;
 
 	/**
 	 * {@inheritdoc}
@@ -52,6 +52,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 			[['issue_id', 'stage_id', 'type', 'problem_status', 'owner_id'], 'integer'],
 			['issue_type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
 			['agent_id', 'in', 'range' => array_keys($this->getAgentsNames()), 'allowArray' => true],
+			['problem_status', 'in', 'range' => array_keys(static::getProblemStatusesNames())],
 			[['value'], 'number'],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];
@@ -92,7 +93,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		]);
 		$query->joinWith('issue.type IT');
 		$query->joinWith('owner O');
-		$query->joinWith('pays');
+		$query->joinWith('pays P');
 
 		$query->distinct();
 
@@ -116,7 +117,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		$this->applyIssueUsersFilter($query);
 		$this->applyProblemStatusFilter($query);
 		$this->applyIssueTypeFilter($query);
-		$this->applyWithPayedPays($query);
+		$this->applyToPayedPaysFilter($query);
 		$this->applyWithoutProvisionsFilter($query);
 
 		// grid filtering conditions
@@ -132,11 +133,11 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		return $dataProvider;
 	}
 
-	protected function applyWithPayedPays(IssuePayCalculationQuery $query): void {
-		if ($this->onlyWithPayedPays) {
+	protected function applyToPayedPaysFilter(IssuePayCalculationQuery $query): void {
+		if ($this->onlyToPayed === true) {
 			$query->joinWith([
 				'pays P' => function (IssuePayQuery $payQuery) {
-					$payQuery->onlyPayed();
+					$payQuery->onlyNotPayed();
 				},
 			]);
 		}
@@ -148,7 +149,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		} elseif ($this->onlyWithProblems === true) {
 			$query->onlyProblems();
 		}
-		if (!empty($this->problem_status)) {
+		if ($this->problem_status > 0) {
 			$query->onlyProblems((array) $this->problem_status);
 		}
 	}
@@ -220,6 +221,10 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 				},
 			]);
 		}
+	}
+
+	public static function getProblemStatusesNames(): array {
+		return IssuePayCalculation::getProblemStatusesNames();
 	}
 
 }

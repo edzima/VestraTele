@@ -48,7 +48,11 @@ class IssuePayCalculationGrid extends GridView {
 		}
 		if (empty($this->rowOptions) && $this->rowColors) {
 			$this->rowOptions = static function (IssuePayCalculation $model): array {
-				return Html::payStatusRowOptions($model);
+				$options = Html::payStatusRowOptions($model);
+				if ($model->hasProblemStatus()) {
+					Html::addCssClass($options, 'problem-status-row danger');
+				}
+				return $options;
 			};
 		}
 		parent::init();
@@ -84,7 +88,7 @@ class IssuePayCalculationGrid extends GridView {
 			[
 				'attribute' => 'problem_status',
 				'value' => 'problemStatusName',
-				'filter' => IssuePayCalculationSearch::getProblemStatusesNames(),
+				'filter' => $this->problemStatusFilter(),
 				'visible' => $this->withProblems,
 			],
 			[
@@ -184,6 +188,10 @@ class IssuePayCalculationGrid extends GridView {
 				'visible' => $this->withDates,
 			],
 		];
+	}
+
+	protected function problemStatusFilter(): array {
+		return IssuePayCalculationSearch::getProblemStatusesNames();
 	}
 
 }
