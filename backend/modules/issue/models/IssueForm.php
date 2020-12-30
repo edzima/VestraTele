@@ -9,6 +9,7 @@ use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use common\models\user\Customer;
 use common\models\user\Worker;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\db\ActiveQuery;
@@ -169,7 +170,7 @@ class IssueForm extends Model {
 
 			return true;
 		}
-		codecept_debug($this->getErrors());
+		Yii::error($this->getModel()->getErrors(), 'issueForm');
 		return false;
 	}
 

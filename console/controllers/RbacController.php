@@ -57,6 +57,9 @@ class RbacController extends Controller {
 		User::PERMISSION_PAYS_DELAYED => [
 			User::ROLE_BOOKKEEPER,
 		],
+		User::PERMISSION_PAY_RECEIVED => [
+			User::ROLE_BOOKKEEPER,
+		],
 		User::PERMISSION_SUMMON => [
 			User::ROLE_AGENT,
 		],

@@ -114,6 +114,8 @@ $user = Yii::$app->user;
 						|| $user->can(User::PERMISSION_CALCULATION_TO_CREATE)
 						|| $user->can(User::PERMISSION_CALCULATION_PROBLEMS)
 						|| $user->can(User::PERMISSION_PAY)
+						|| $user->can(User::PERMISSION_PAY_RECEIVED)
+						|| $user->can(User::PERMISSION_PAYS_DELAYED)
 					,
 					'items' => [
 						[

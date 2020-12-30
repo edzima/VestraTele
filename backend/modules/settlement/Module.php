@@ -55,6 +55,11 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
+						'controllers' => ['settlement/pay-received'],
+						'permissions' => [Worker::PERMISSION_PAY_RECEIVED],
+					],
+					[
+						'allow' => true,
 						'roles' => [Worker::ROLE_BOOKKEEPER],
 					],
 				],
