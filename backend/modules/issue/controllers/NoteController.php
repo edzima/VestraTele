@@ -82,7 +82,7 @@ class NoteController extends Controller {
 		$model = new IssueNoteForm($note);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			if ($type === IssueNote::TYPE_PAY) {
+			if ($type === IssueNote::TYPE_SETTLEMENT) {
 				return $this->redirectPayCalculation($issueId);
 			}
 			return $this->redirectIssue($issueId);
@@ -101,7 +101,6 @@ class NoteController extends Controller {
 		$note->issue_id = $summon->issue_id;
 		$note->user_id = Yii::$app->user->id;
 		$note->type = IssueNote::generateType(IssueNote::TYPE_SUMMON, $summon->id);
-		$note->typeName = Yii::t('common', 'Summon: {title}', ['title' => $summon->title]);
 		$model = new IssueNoteForm($note);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirectIssue($summon->issue_id);
@@ -122,7 +121,7 @@ class NoteController extends Controller {
 		$model = new IssueNoteForm($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			if ($model->note->type === IssueNote::TYPE_PAY) {
+			if ($model->note->type === IssueNote::TYPE_SETTLEMENT) {
 				return $this->redirectPayCalculation($model->getNote()->issue_id);
 			}
 			return $this->redirectIssue($model->getNote()->issue_id);

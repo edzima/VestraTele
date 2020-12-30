@@ -12,8 +12,8 @@ use yii\db\ActiveQuery;
  */
 class IssueNoteQuery extends ActiveQuery {
 
-	public function onlyPays(): self {
-		return $this->onlyType(IssueNote::TYPE_PAY);
+	public function onlySettlement(int $id): self {
+		return $this->onlyType(IssueNote::TYPE_SETTLEMENT, $id);
 	}
 
 	public function onlySummon(int $summonId): self {
@@ -44,5 +44,10 @@ class IssueNoteQuery extends ActiveQuery {
 	 */
 	public function one($db = null) {
 		return parent::one($db);
+	}
+
+	public function withoutType(): self {
+		$this->andWhere(['type' => null]);
+		return $this;
 	}
 }

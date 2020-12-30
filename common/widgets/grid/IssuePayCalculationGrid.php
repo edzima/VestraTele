@@ -17,12 +17,15 @@ class IssuePayCalculationGrid extends GridView {
 
 	public $id = 'calculation-grid';
 
+	public ?string $noteRoute = '/note/settlement';
+
 	public $showPageSummary = true;
 
 	public string $issueColumn = IssueColumn::class;
 	public bool $withIssue = true;
 	public bool $withOwner = true;
 	public bool $withCustomer = true;
+	public bool $withCaption = false;
 	public bool $withIssueType = true;
 	public bool $withProblems = true;
 	public bool $withDates = true;
@@ -45,6 +48,9 @@ class IssuePayCalculationGrid extends GridView {
 		}
 		if (empty($this->columns)) {
 			$this->columns = $this->defaultColumns();
+		}
+		if ($this->withCaption && empty($this->caption)) {
+			$this->caption = Yii::t('settlement', 'Settlements');
 		}
 		if (empty($this->rowOptions) && $this->rowColors) {
 			$this->rowOptions = static function (IssuePayCalculation $model): array {

@@ -14,7 +14,7 @@ class IssueNoteSearch extends IssueNote {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			[['id', 'issue_id', 'user_id', 'created_at', 'updated_at'], 'integer'],
 			[['title', 'description'], 'safe'],

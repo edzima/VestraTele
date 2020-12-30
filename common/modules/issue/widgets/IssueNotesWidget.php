@@ -12,7 +12,7 @@ use yii\helpers\Url;
  */
 class IssueNotesWidget extends IssueWidget {
 
-	public const TYPE_PAY = IssueNote::TYPE_PAY;
+	public const TYPE_SETTLEMENT = IssueNote::TYPE_SETTLEMENT;
 	public const TYPE_SUMMON = IssueNote::TYPE_SUMMON;
 
 	public bool $addBtn = true;
@@ -31,7 +31,11 @@ class IssueNotesWidget extends IssueWidget {
 	public function init(): void {
 		parent::init();
 		if ($this->notes === null) {
-			$this->notes = $this->model->issueNotes;
+			$this->notes = $this->model
+				->getIssueNotes()
+				->withoutType()
+				->joinWith('user.userProfile')
+				->all();
 		}
 		if ($this->addBtn && $this->addUrl === null) {
 			$this->addUrl = Url::to(['note/create', 'issueId' => $this->model->id]);
@@ -42,6 +46,9 @@ class IssueNotesWidget extends IssueWidget {
 	 * {@inheritdoc}
 	 */
 	public function run(): string {
+		if (empty($this->notes)) {
+			return '';
+		}
 		return $this->render('issue-notes', [
 			'model' => $this->model,
 			'addUrl' => $this->addUrl,

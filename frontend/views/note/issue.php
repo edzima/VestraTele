@@ -6,8 +6,9 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model IssueNoteForm */
 
-$this->title = 'Nowa notatka dla: ' . $model->note->issue;
-$this->params['breadcrumbs'][] = ['label' => 'Sprawy', 'url' => ['/issue/index']];
+$this->title = Yii::t('common', 'Create note for issue: {id}', ['id' => $model->note->issue->longId]);
+
+$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/index']];
 $this->params['breadcrumbs'][] = ['label' => $model->note->issue, 'url' => ['/issue/view', 'id' => $model->note->issue->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

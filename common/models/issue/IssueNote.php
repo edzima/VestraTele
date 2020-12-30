@@ -3,6 +3,8 @@
 namespace common\models\issue;
 
 use common\models\issue\query\IssueNoteQuery;
+use common\models\issue\query\IssueQuery;
+use common\models\user\query\UserQuery;
 use common\models\user\User;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -29,14 +31,10 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 
 	use IssueTrait;
 
-	public const TYPE_PAY = 'pay';
+	public const TYPE_SETTLEMENT = 'settlement';
 	public const TYPE_SUMMON = 'summon';
 
 	public ?string $typeName = null;
-
-	public static function generateType(string $type, int $id): string {
-		return "$type:$id";
-	}
 
 	/**
 	 * @inheritdoc
@@ -67,7 +65,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			[['issue_id', 'user_id', 'title', 'description'], 'required'],
 			[['issue_id', 'user_id'], 'integer'],
@@ -81,45 +79,47 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	/**
 	 * @inheritdoc
 	 */
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
 			'issue_id' => 'Issue ID',
 			'user_id' => 'User ID',
-			'title' => 'Tytuł',
-			'description' => 'Szczegóły',
-			'created_at' => 'Dodano',
-			'updated_at' => 'Zaktualizowano',
+			'title' => Yii::t('common', 'Title'),
+			'description' => Yii::t('common', 'Description'),
+			'created_at' => Yii::t('common', 'Created at'),
+			'updated_at' => Yii::t('common', 'Updated at'),
 		];
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getIssue() {
+	public function getIssue(): IssueQuery {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getUser() {
+	public function getUser(): UserQuery {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
+	}
+
+	public function isForSettlement(): bool {
+		return $this->isType(static::TYPE_SETTLEMENT);
+	}
+
+	public function isForSummon(): bool {
+		return $this->isType(static::TYPE_SUMMON);
 	}
 
 	public function isType(string $type): bool {
 		return StringHelper::startsWith($this->type, $type);
 	}
 
-	public static function getTypesNames(): array {
-		return [
-			static::TYPE_PAY => Yii::t('common', 'Pay'),
-			static::TYPE_SUMMON => Yii::t('common', 'Summon'),
-		];
+	public static function generateType(string $type, int $id): string {
+		return "$type:$id";
 	}
 
-	public function isPayType(): bool {
-		return (int) $this->type === static::TYPE_PAY;
+	public static function getTypesNames(): array {
+		return [
+			static::TYPE_SETTLEMENT => Yii::t('settlement', 'Settlement'),
+			static::TYPE_SUMMON => Yii::t('common', 'Summon'),
+		];
 	}
 
 	/**
@@ -129,5 +129,5 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	public static function find(): IssueNoteQuery {
 		return new IssueNoteQuery(static::class);
 	}
-	
+
 }

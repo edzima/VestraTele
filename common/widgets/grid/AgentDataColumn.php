@@ -13,6 +13,7 @@ class AgentDataColumn extends DataColumn {
 
 	public $attribute = 'agent_id';
 	public $value = 'agent.fullName';
+	public $width = '250px';
 
 	public function init(): void {
 		if (empty($this->label)) {

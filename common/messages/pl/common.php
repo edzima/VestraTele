@@ -212,6 +212,26 @@ return [
 	'Agent' => 'Agent',
 	'created_at' => 'created_at',
 	'Delete this pay' => 'Delete this pay',
-	'Provisions' => 'Prowizje'
-
+	'Provisions' => 'Prowizje',
+	'Create note for issue: {id}' => 'Dodaj notatkę do sprawy: {id}',
+	'Settlement' => 'Rozliczenie',
+	'Signi at' => 'Signi at',
+	'Select...' => 'Select...',
+	'Create note for: {name}' => 'Dodaj notatkę dla: {name}',
+	'Summon {type}' => 'Summon {type}',
+	'Create note for settlement: {id}' => 'Create note for settlement: {id}',
+	'Phonable' => 'Telefoniczne',
+	'Incomplete documentation' => 'Dokumentacja niekompletna',
+	'Documents' => 'Dokumenty',
+	'Create note for settlement: {name}' => 'Create note for settlement: {name}',
+	'Antyvindication' => 'Antywindykacja',
+	'export' => 'Eksport',
+	'cost' => 'Koszty',
+	'provision' => 'Prowizje',
+	'calculation.to-create' =>'Zakładanie rozliczeń',
+	'calculation.problems' => 'Rozliczenia nieściągalne',
+	'calculation.pays' => 'Rozliczenia raty',
+	'pay' => 'Wpłaty',
+	'pay.received' => 'Odbieranie wpłat',
+	'pays.delayed' => 'Przeterminowane wpłaty'
 ];

@@ -9,7 +9,7 @@ use yii\helpers\Html;
 /* @var $removeBtn bool */
 ?>
 
-<div class="panel <?= $model->isPayType() ? 'panel-success' : 'panel-primary' ?> panel-note">
+<div class="panel <?= $model->isForSettlement() ? 'panel-success' : 'panel-primary' ?> panel-note">
 	<div class="panel-heading">
 		<h3 class="panel-title"><?= $model->title ?>
 			<span class="pull-right"><?= $model->user ?></span>

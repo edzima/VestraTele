@@ -7,6 +7,7 @@ use common\fixtures\issue\IssueFixture;
 use common\fixtures\issue\IssueUserFixture;
 use common\fixtures\issue\StageFixture;
 use common\fixtures\issue\StageTypesFixtures;
+use common\fixtures\issue\SummonFixture;
 use common\fixtures\issue\TypeFixture;
 use common\fixtures\settlement\CalculationFixture;
 use common\fixtures\settlement\PayFixture;
@@ -27,6 +28,7 @@ class IssueFixtureHelper {
 	public const CALCULATION = 'calculation';
 	public const PAY = 'pay';
 	public const ISSUE = 'issue';
+	public const SUMMON = 'summon';
 
 	public static function dataDir(): string {
 		return Yii::getAlias('@common/tests/_data/');
@@ -99,6 +101,15 @@ class IssueFixtureHelper {
 			static::PAY => [
 				'class' => PayFixture::class,
 				'dataFile' => static::dataDir() . 'settlement/pay.php',
+			],
+		];
+	}
+
+	public static function summon(): array {
+		return [
+			static::SUMMON => [
+				'class' => SummonFixture::class,
+				'dataFile' => static::dataDir() . 'issue/summon.php',
 			],
 		];
 	}

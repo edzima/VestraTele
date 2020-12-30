@@ -23,10 +23,10 @@ class SettlementCest {
 		);
 	}
 
-	public function checkIndexAsIssueUser(IssueUserTester $I): void {
-		$I->amLoggedIn();
-		$I->amOnPage(static::ROUTE_INDEX);
-		$I->see('Only for workers.');
+	public function checkAsGuest(FunctionalTester $I): void {
+		$id = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-pay');
+		$I->amOnPage([static::ROUTE_VIEW, 'id' => $id]);
+		$I->seeInLoginUrl();
 	}
 
 	public function checkIndexAsAgent(IssueUserTester $I): void {
@@ -40,15 +40,8 @@ class SettlementCest {
 		$I->seeInGridHeader('Issue type');
 		$I->seeInGridHeader('Value with VAT');
 		$I->seeInGridHeader('Value to pay');
-		$I->seeInGridHeader('Provider');
 		$I->seeInGridHeader('User provision (total)');
 		$I->seeInGridHeader('User provision (not pay)');
-	}
-
-	public function checkAsGuest(FunctionalTester $I): void {
-		$id = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-pay');
-		$I->amOnPage([static::ROUTE_VIEW, 'id' => $id]);
-		$I->seeInLoginUrl();
 	}
 
 	public function checkViewAsAgent(FunctionalTester $I): void {

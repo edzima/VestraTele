@@ -3,8 +3,10 @@
 use common\models\issue\IssueUser;
 use common\models\user\Worker;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\AgentDataColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
+use common\widgets\grid\IssueTypeColumn;
 use frontend\models\search\IssueSearch;
 use frontend\widgets\IssueColumn;
 use kartik\grid\GridView;
@@ -50,18 +52,9 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => IssueColumn::class,
 			],
 			[
-				'class' => DataColumn::class,
+				'class' => IssueTypeColumn::class,
+				'valueType' => IssueTypeColumn::VALUE_NAME,
 				'attribute' => 'type_id',
-				'label' => $searchModel->getAttributeLabel('type_id'),
-				'filter' => IssueSearch::getTypesNames(),
-				'value' => 'issue.type.short_name',
-				'contentOptions' => [
-					'class' => 'bold-text text-center',
-				],
-				'options' => [
-					'style' => 'width:80px',
-				],
-
 			],
 			[
 				'class' => DataColumn::class,

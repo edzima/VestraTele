@@ -8,6 +8,8 @@ use backend\modules\settlement\Module as SettlementModule;
 use backend\modules\user\Module as UserModule;
 use common\behaviors\GlobalAccessBehavior;
 use common\behaviors\LastActionBehavior;
+use common\components\User as WebUser;
+use common\models\user\User;
 use yii\web\UserEvent;
 
 $params = array_merge(
@@ -54,7 +56,8 @@ return [
 			'csrfParam' => '_csrf-backend',
 		],
 		'user' => [
-			'identityClass' => 'common\models\user\User',
+			'class' => WebUser::class,
+			'identityClass' => User::class,
 			'enableAutoLogin' => true,
 			'identityCookie' => ['name' => '_identity-back', 'httpOnly' => true],
 			'on beforeLogin' => function (UserEvent $event): void {

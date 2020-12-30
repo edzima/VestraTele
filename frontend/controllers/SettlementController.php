@@ -20,7 +20,7 @@ class SettlementController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::PERMISSION_ISSUE],
+						'permissions' => [Worker::PERMISSION_ISSUE],
 					],
 				],
 			],
@@ -32,6 +32,7 @@ class SettlementController extends Controller {
 		$ids = Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId());
 		$ids[] = Yii::$app->user->getId();
 		$searchModel->issueUsersIds = $ids;
+
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -59,8 +60,11 @@ class SettlementController extends Controller {
 	 */
 	private function findModel(int $id): IssuePayCalculation {
 		$model = IssuePayCalculation::findOne($id);
-
-		if ($model === null || !IssueController::shouldFind($model->issue)) {
+		if ($model === null
+			|| !$model->issue->isForUser(Yii::$app->user->id)
+		) {
+		}
+		if ($model === null || !Yii::$app->user->canSeeIssue($model->issue)) {
 			throw new NotFoundHttpException();
 		}
 		return $model;

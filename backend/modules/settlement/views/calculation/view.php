@@ -4,6 +4,7 @@ use backend\helpers\Breadcrumbs;
 use backend\modules\settlement\widgets\IssuePayGrid;
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
+use common\modules\issue\widgets\IssueNotesWidget;
 use common\widgets\settlement\SettlementDetailView;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
@@ -78,18 +79,12 @@ YiiAsset::register($this);
 	])
 	?>
 
-
-
-	<?php
-	//@todo enable this after refactoring note
-	/*IssueNotesWidget::widget([
+	<?= IssueNotesWidget::widget([
 		'model' => $model->issue,
-		'notes' => $model->issue->getIssueNotes()->onlyPays()->all(),
-		'type' => IssueNotesWidget::TYPE_PAY,
+		'notes' => $model->issue->getIssueNotes()->onlySettlement($model->id)->all(),
+		'type' => IssueNotesWidget::TYPE_SUMMON,
 
 	])
-	*/
 	?>
-
 
 </div>

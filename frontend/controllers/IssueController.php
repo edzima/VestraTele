@@ -87,7 +87,7 @@ class IssueController extends Controller {
 	 * @throws NotFoundHttpException
 	 */
 	public function actionView(int $id): string {
-		$model = static::findModel($id);
+		$model = $this->findModel($id);
 
 		$calculationsDataProvider = null;
 		if (Yii::$app->user->can(User::ROLE_CUSTOMER_SERVICE)
@@ -115,34 +115,12 @@ class IssueController extends Controller {
 	 * @return Issue the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public static function findModel(int $id): Issue {
+	private function findModel(int $id): Issue {
 		$model = Issue::findOne($id);
-		if ($model !== null && static::shouldFind($model)) {
-			return $model;
+		if ($model === null || !Yii::$app->user->canSeeIssue($model)) {
+			throw new NotFoundHttpException('The requested page does not exist.');
 		}
-		throw new NotFoundHttpException('The requested page does not exist.');
-	}
-
-	public static function shouldFind(Issue $model): bool {
-		$user = Yii::$app->user;
-		if ($user->can(Worker::ROLE_ADMINISTRATOR)) {
-			return true;
-		}
-		if ($model->isArchived() && !$user->can(Worker::PERMISSION_ARCHIVE)) {
-			Yii::warning('User: ' . $user->id . ' try view archived issue: ' . $model->id, 'issue');
-			return false;
-		}
-		if ($user->can(Worker::ROLE_CUSTOMER_SERVICE) || $model->isForUser($user->id)) {
-			return true;
-		}
-
-		if ($user->can(Worker::ROLE_AGENT)) {
-			$childesIds = Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId());
-			if (!empty($childesIds)) {
-				return $model->isForAgents($childesIds);
-			}
-		}
-		return false;
+		return $model;
 	}
 
 }

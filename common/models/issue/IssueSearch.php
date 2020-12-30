@@ -6,6 +6,7 @@ use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueUserQuery;
 use common\models\issue\search\ArchivedIssueSearch;
+use common\models\issue\search\IssueTypeSearch;
 use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\Worker;
@@ -21,6 +22,7 @@ use yii\helpers\ArrayHelper;
 abstract class IssueSearch extends Model
 	implements ArchivedIssueSearch,
 			   CustomerSearchInterface,
+			   IssueTypeSearch,
 			   SearchModel {
 
 	public $issue_id;
@@ -47,11 +49,12 @@ abstract class IssueSearch extends Model
 		return [
 			[
 				[
-					'issue_id', 'agent_id', 'stage_id', 'type_id', 'entity_responsible_id',
+					'issue_id', 'agent_id', 'stage_id', 'entity_responsible_id',
 				], 'integer',
 			],
 			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
+			['type_id', 'in', 'range' => array_keys($this->getStagesNames()),'allowArray' => true],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[
 				[
@@ -160,4 +163,11 @@ abstract class IssueSearch extends Model
 		return IssueStage::getStagesNames($this->getWithArchive());
 	}
 
+	public static function getIssueTypesNames(): array {
+		return IssueType::getTypesNames();
+	}
+	public function applyIssueTypeFilter(QueryInterface $query): void {
+		$query->andFilterWhere([Issue::tableName() . '.type_id' => $this->type_id]);
+
+	}
 }

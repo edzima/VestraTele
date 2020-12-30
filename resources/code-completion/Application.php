@@ -4,6 +4,7 @@ use common\components\HierarchyComponent;
 use common\components\PayComponent;
 use common\components\Provisions;
 use common\components\TaxComponent;
+use common\components\User;
 use common\formatters\Formatter;
 use yii\BaseYii;
 
@@ -30,6 +31,7 @@ class Yii extends BaseYii {
  * @property PayComponent $pay
  * @property Provisions $provisions
  * @property TaxComponent $tax
+ * @property User $user
  */
 abstract class Application extends \yii\web\Application {
 

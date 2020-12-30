@@ -2,6 +2,7 @@
 
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
+use common\modules\issue\widgets\IssueNotesWidget;
 use common\widgets\settlement\SettlementDetailView;
 use frontend\helpers\Html;
 use frontend\widgets\IssuePayGrid;
@@ -25,8 +26,13 @@ YiiAsset::register($this);
 			? Html::a(Yii::t('settlement', 'Generate pays'), ['generate-pays'])
 			: ''
 		?>
-		<?php //@todo enable this after refactoring note
-		//  Html::a('Notatka', ['note/create', 'issueId' => $model->issue_id, 'type' => IssueNote::TYPE_PAY], ['class' => 'btn btn-success',]) ?>
+		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
+			? Html::a(
+				Yii::t('common', 'Create note'),
+				['note/settlement', 'id' => $model->id],
+				['class' => 'btn btn-info',])
+			: ''
+		?>
 	</p>
 
 	<?= SettlementDetailView::widget([
@@ -50,16 +56,11 @@ YiiAsset::register($this);
 	?>
 
 
-	<?php
-	//@todo enable this after refactoring note
-	/*IssueNotesWidget::widget([
+	<?= IssueNotesWidget::widget([
 		'model' => $model->issue,
-		'notes' => $model->issue->getIssueNotes()->onlyPays()->all(),
-		'type' => IssueNotesWidget::TYPE_PAY,
-
+		'notes' => $model->issue->getIssueNotes()->joinWith('user.userProfile')->onlySettlement($model->id)->all(),
+		'type' => IssueNotesWidget::TYPE_SETTLEMENT,
 	])
-	*/
 	?>
-
 
 </div>

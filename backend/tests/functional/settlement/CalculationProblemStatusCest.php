@@ -42,7 +42,6 @@ class CalculationProblemStatusCest {
 		$I->seeInGridHeader('Customer');
 		$I->seeInGridHeader('Value with VAT');
 		$I->seeInGridHeader('Value to pay');
-		$I->seeInGridHeader('Created at');
 		$I->seeInGridHeader('Updated at');
 	}
 

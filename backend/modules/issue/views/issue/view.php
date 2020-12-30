@@ -23,15 +23,16 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-view">
 	<p>
-		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
 		<?= Yii::$app->user->can(User::PERMISSION_NOTE) ? Html::a(Yii::t('backend', 'Create note'), ['note/create', 'issueId' => $model->id], [
-			'class' => 'btn btn-success',
+			'class' => 'btn btn-info',
 		]) : '' ?>
 
 		<?= Yii::$app->user->can(User::PERMISSION_SUMMON) ? Html::a(Yii::t('backend', 'Create summon'), ['summon/create', 'issueId' => $model->id], [
 			'class' => 'btn btn-warning',
 		]) : '' ?>
+
+		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
 
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
@@ -41,20 +42,22 @@ $this->params['breadcrumbs'][] = $this->title;
 				'method' => 'post',
 			],
 		]) : '' ?>
+
+
 	</p>
 	<p>
 		<?= Yii::$app->user->can(User::PERMISSION_CALCULATION_TO_CREATE)
 			? Html::a(
 				Yii::t('backend', 'Create settlement'),
 				['/settlement/calculation/create', 'id' => $model->id],
-				['class' => 'btn btn-info'])
+				['class' => 'btn btn-success'])
 			: '' ?>
 
 		<?= Yii::$app->user->can(User::PERMISSION_COST)
 			? Html::a(
 				Yii::t('backend', 'Costs'),
 				['/settlement/cost/issue', 'id' => $model->id],
-				['class' => 'btn btn-info'])
+				['class' => 'btn btn-warning'])
 			: '' ?>
 	</p>
 
@@ -66,6 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'dataProvider' => $calculationsDataProvider,
 			'caption' => Yii::t('settlement', 'Settlements'),
 			'withIssue' => false,
+			'summary' => '',
 			'withIssueType' => false,
 			'withCustomer' => false,
 			'withDates' => false,
