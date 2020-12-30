@@ -20,8 +20,6 @@ $this->params['breadcrumbs'][] = Yii::t('settlement', 'Uncollectible');
 ?>
 <div class="settlement-calculation-problems">
 
-	<?= $this->render('_search', ['model' => $searchModel]) ?>
-
 	<?= IssuePayCalculationGrid::widget([
 		'filterModel' => $searchModel,
 		'dataProvider' => $dataProvider,

@@ -23,6 +23,7 @@ class IssuePayGrid extends GridView {
 	public ?string $statusRoute = '/settlement/pay/status';
 	public ?string $deleteRoute = '/settlement/pay/delete';
 	public ?string $payProvisionsRoute = '/settlement/pay/pay-provisions';
+	public ?string $receivedRoute = '/settlement/pay-received/received';
 
 	public bool $visibleStatus = true;
 
@@ -135,7 +136,7 @@ class IssuePayGrid extends GridView {
 	protected function actionColumn(): array {
 		return [
 			'class' => ActionColumn::class,
-			'template' => '{pay} {status} {update} {delete}',
+			'template' => '{pay} {status} {received} {update} {delete}',
 			'visibleButtons' => [
 				'pay' => function (PayInterface $pay): bool {
 					return !$pay->isPayed() && $this->payRoute !== null;
@@ -143,6 +144,9 @@ class IssuePayGrid extends GridView {
 				'update' => $this->updateRoute !== null,
 				'status' => function (PayInterface $pay): bool {
 					return !$pay->isPayed() && $this->statusRoute !== null;
+				},
+				'received' => function (PayInterface $pay): bool {
+					return !$pay->isPayed() && $this->receivedRoute !== null;
 				},
 				'delete' => $this->deleteRoute !== null,
 			],
@@ -160,6 +164,15 @@ class IssuePayGrid extends GridView {
 					return Html::a(
 						'<span class="glyphicon glyphicon-flag" aria-hidden="true"></span>',
 						Url::toRoute([$this->statusRoute, 'id' => $model->id]),
+						[
+							'title' => Yii::t('common', 'Status'),
+							'aria-label' => Yii::t('common', 'Status'),
+						]);
+				},
+				'received' => function ($url, IssuePay $model): string {
+					return Html::a(
+						'<span class="fa fa-car" aria-hidden="true"></span>',
+						Url::toRoute([$this->receivedRoute, 'id' => $model->id]),
 						[
 							'title' => Yii::t('common', 'Status'),
 							'aria-label' => Yii::t('common', 'Status'),

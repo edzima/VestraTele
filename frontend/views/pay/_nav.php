@@ -32,4 +32,12 @@ use yii\helpers\Html;
 		])
 
 	?>
+	<?= Yii::$app->user->can(\common\models\user\User::PERMISSION_PAY_RECEIVED)
+		? Html::a(Yii::t('settlement', 'Received pays'),
+			['/pay-received/index'],
+			[
+				'class' => 'btn btn-info',
+			])
+		: ''
+	?>
 </div>

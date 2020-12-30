@@ -114,9 +114,9 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'pay_at' => 'Data płatności',
-			'deadline_at' => 'Termin płatności',
-			'value' => 'Honorarium (Brutto)',
+			'pay_at' =>  Yii::t('settlement','Pay at'),
+			'deadline_at' => Yii::t('settlement','Deadline at'),
+			'value' => Yii::t('settlement','Value with VAT'),
 			'valueNetto' => 'Honorarium (Netto)',
 			'transfer_type' => 'Typ płatności',
 			'partInfo' => 'Część',

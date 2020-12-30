@@ -94,4 +94,7 @@ return [
 	'Status pay: {value}' => 'Status pay: {value}',
 	'Pay request' => 'Prośba o raty',
 	'Without problems' => 'Brak',
+	'Date At' => 'Data',
+	'Received pay: {value}' => 'Received pay: {value}',
+	'Pay at' => 'Data płatności'
 ];

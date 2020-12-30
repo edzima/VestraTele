@@ -7,6 +7,8 @@ use kartik\grid\GridView as BaseGridView;
 
 class GridView extends BaseGridView {
 
+	public $pageSummaryPosition = self::POS_TOP;
+	
 	public $dataColumnClass = DataColumn::class;
 
 }
