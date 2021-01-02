@@ -194,4 +194,6 @@ return [
 	'Issues users' => 'Uczestnicy',
 	'Surname' => 'Nazwisko',
 	'Signing at' => 'Data podpisania umowy',
+	'belief' => 'Komornik',
+	'liabilities' => 'Zadłużenie'
 ];

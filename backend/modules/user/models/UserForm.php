@@ -115,6 +115,7 @@ class UserForm extends Model {
 		$this->status = $model->status;
 		$this->roles = $model->getRoles();
 		$this->permissions = $model->getPermissions();
+		$this->traits = ArrayHelper::index($model->traits, 'trait_id', 'name');
 	}
 
 	public function getModel(): User {

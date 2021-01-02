@@ -5,7 +5,6 @@ namespace backend\tests\acceptance;
 use backend\tests\AcceptanceTester;
 use backend\tests\Step\acceptance\Admin;
 use backend\tests\Step\acceptance\Manager;
-use common\fixtures\UserFixture;
 use Yii;
 
 /**

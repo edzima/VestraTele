@@ -221,5 +221,6 @@ return [
 	'Calculations' => '',
 	'Stage' => 'Etap',
 	'Settlements' => 'Rozliczenia',
-	'Create note {typeName} for: {issue}' => 'Dodaj notatkę {typeName} dla: {issue}'
+	'Create note {typeName} for: {issue}' => 'Dodaj notatkę {typeName} dla: {issue}',
+	'Traits' => 'Cechy'
 ];

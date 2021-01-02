@@ -157,6 +157,16 @@ class User extends ActiveRecord implements IdentityInterface {
 		return $this->addresses[UserAddress::TYPE_POSTAL]->address ?? null;
 	}
 
+	public function getTraits(): ActiveQuery {
+		return $this->hasMany(UserTrait::class, ['user_id' => 'id'])->indexBy('type');
+	}
+
+//	@todo add this method and use in user view.
+//	public function getTraitsNames():string{
+//		return implode(", ", ArrayHelper::index($this->traits, ''));
+//	}
+
+
 	protected function getAddresses(): ActiveQuery {
 		return $this->hasMany(UserAddress::class, ['user_id' => 'id'])->indexBy('type');
 	}
