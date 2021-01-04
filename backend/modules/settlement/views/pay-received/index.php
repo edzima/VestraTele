@@ -2,6 +2,10 @@
 
 use backend\modules\settlement\models\search\PayReceivedSearch;
 use backend\widgets\GridView;
+use common\widgets\grid\ActionColumn;
+use common\widgets\grid\AgentDataColumn;
+use common\widgets\grid\CurrencyColumn;
+use common\widgets\grid\CustomerDataColumn;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 
@@ -17,11 +21,12 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'showPageSummary' => true,
 		'columns' => [
 			[
 				'attribute' => 'calculationType',
@@ -31,12 +36,29 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'attribute' => 'user_id',
 				'value' => 'user',
-				'label' => 'Odbiorca',
 				'filter' => PayReceivedSearch::getUserNames(),
+			],
+			[
+				'attribute' => 'issueAgent',
+
+				'class' => AgentDataColumn::class,
+				'value' => 'pay.calculation.issue.agent',
+
+			],
+			[
+				'class' => CustomerDataColumn::class,
+				'value' => 'pay.calculation.issue.customer',
+			],
+			[
+				'class' => CurrencyColumn::class,
+				'attribute' => 'pay.value',
+				'pageSummary' => true,
 			],
 			'date_at:date',
 			'transfer_at:date',
-			['class' => 'yii\grid\ActionColumn'],
+			[
+				'class' => ActionColumn::class,
+			],
 		],
 	]); ?>
 

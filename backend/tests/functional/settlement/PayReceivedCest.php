@@ -19,5 +19,12 @@ class PayReceivedCest {
 		$I->seeMenuLink('Received pays');
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->seeInTitle('Received pays');
+		$I->seeInGridHeader('Calculation Type');
+		$I->seeInGridHeader('Receiver');
+		$I->seeInGridHeader('Agent');
+		$I->seeInGridHeader('Customer');
+		$I->seeInGridHeader('Date At');
+		$I->seeInGridHeader('Transfer At');
+		$I->seeInGridHeader('Value with VAT');
 	}
 }

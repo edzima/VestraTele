@@ -35,6 +35,7 @@ class PayReceivedController extends Controller {
 	 */
 	public function actionIndex(): string {
 		$searchModel = new PayReceivedSearch();
+		$searchModel->transferStatus = PayReceivedSearch::TRANFER_STATUS_NO;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [

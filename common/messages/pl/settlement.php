@@ -96,5 +96,8 @@ return [
 	'Without problems' => 'Brak',
 	'Date At' => 'Data',
 	'Received pay: {value}' => 'Received pay: {value}',
-	'Pay at' => 'Data płatności'
+	'Pay at' => 'Data płatności',
+	'Receiver' => 'Odbiorca',
+	'Transfer status' => 'Odebrane',
+	'Set transfer status' => 'Wszystkie',
 ];

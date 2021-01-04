@@ -9,6 +9,7 @@ use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
 use common\models\user\User;
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "pay_received".
@@ -21,7 +22,7 @@ use Yii;
  * @property IssuePay $pay
  * @property User $user
  */
-class PayReceived extends \yii\db\ActiveRecord implements IssueInterface {
+class PayReceived extends ActiveRecord implements IssueInterface {
 
 	/**
 	 * {@inheritdoc}
@@ -49,7 +50,7 @@ class PayReceived extends \yii\db\ActiveRecord implements IssueInterface {
 	public function attributeLabels(): array {
 		return [
 			'pay_id' => Yii::t('settlement', 'Pay ID'),
-			'user_id' => Yii::t('settlement', 'User ID'),
+			'user_id' => Yii::t('settlement', 'Receiver'),
 			'date_at' => Yii::t('settlement', 'Date At'),
 			'transfer_at' => Yii::t('settlement', 'Transfer At'),
 		];

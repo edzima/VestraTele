@@ -228,10 +228,12 @@ return [
 	'export' => 'Eksport',
 	'cost' => 'Koszty',
 	'provision' => 'Prowizje',
-	'calculation.to-create' =>'Zakładanie rozliczeń',
+	'calculation.to-create' => 'Zakładanie rozliczeń',
 	'calculation.problems' => 'Rozliczenia nieściągalne',
 	'calculation.pays' => 'Rozliczenia raty',
 	'pay' => 'Wpłaty',
 	'pay.received' => 'Odbieranie wpłat',
-	'pays.delayed' => 'Przeterminowane wpłaty'
+	'pays.delayed' => 'Przeterminowane wpłaty',
+	'Yes' => 'Tak',
+	'No' => 'Nie',
 ];
