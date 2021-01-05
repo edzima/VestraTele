@@ -24,7 +24,7 @@ class PayReceivedCest {
 		$I->seeInGridHeader('Issue');
 		$I->seeInGridHeader('Customer');
 		$I->seeInGridHeader('Value with VAT');
-		$I->seeInGridHeader('Date at');
+		$I->seeInGridHeader('Receive At');
 	}
 
 }
