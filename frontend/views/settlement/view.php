@@ -22,10 +22,11 @@ YiiAsset::register($this);
 <div class="settlement-view">
 
 	<p>
-		<?= Yii::$app->user->can(User::PERMISSION_CALCULATION_PAYS)
-			? Html::a(Yii::t('settlement', 'Generate pays'), ['generate-pays'])
+		<?= !$model->isPayed() && Yii::$app->user->can(User::PERMISSION_CALCULATION_PAYS)
+			? Html::a(Yii::t('settlement', 'Generate pays'), ['pays', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: ''
 		?>
+
 		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
 			? Html::a(
 				Yii::t('common', 'Create note'),

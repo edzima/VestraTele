@@ -42,7 +42,7 @@ class PaysForm extends PayForm {
 		$sum = Yii::$app->pay->sum($this->getPays());
 		if (!$value->equals($sum)) {
 			$formatter = Yii::$app->formatter;
-			$diff = $sum - $value;
+			$diff = $sum->sub($value);
 			$this->addError($attribute,
 				'Suma rat musi być: ' . $formatter->asCurrency($value) . '. 
 				Różnica: ' . $formatter->asCurrency($diff) . '.');
@@ -52,6 +52,7 @@ class PaysForm extends PayForm {
 	public function attributeLabels(): array {
 		$labels = parent::attributeLabels();
 		$labels['deadline_at'] = Yii::t('settlement', 'First deadline at');
+		$labels['count'] = Yii::t('settlement', 'Count');
 		return $labels;
 	}
 

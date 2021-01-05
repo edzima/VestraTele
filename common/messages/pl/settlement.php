@@ -104,4 +104,5 @@ return [
 	'Receive' => 'Odbierz',
 	'Receive pays' => 'Odbierz wpłaty',
 	'Receive At' => 'Odebrano',
+	'Count' => 'Ilość',
 ];

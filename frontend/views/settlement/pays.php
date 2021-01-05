@@ -1,35 +1,31 @@
 <?php
 
-use backend\helpers\Breadcrumbs;
-use backend\helpers\Url;
 use common\models\issue\IssuePayCalculation;
 use common\models\settlement\PaysForm;
 use common\widgets\DateWidget;
 use common\widgets\settlement\SettlementDetailView;
+use frontend\helpers\Html;
 use yii\bootstrap\ActiveForm;
-use yii\helpers\Html;
 use yii\web\View;
 
 /* @var $this View */
 /* @var $calculation IssuePayCalculation */
 /* @var $model PaysForm */
 
-$this->title = Yii::t('backend', 'Generate pays for: {id}', ['id' => $calculation->id]);
+$this->title = Yii::t('backend', 'Generate pays for: {id}', ['id' => $calculation->getTypeName()]);
 
-$this->params['breadcrumbs'] = Breadcrumbs::issue($calculation->issue);
+$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/index']];
+$this->params['breadcrumbs'][] = ['label' => $calculation->getIssueName(), 'url' => ['/issue/view', 'id' => $calculation->getIssueId()]];
+
 $this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $calculation->issue->longId, 'url' => ['issue', 'id' => $calculation->issue_id]];
+$this->params['breadcrumbs'][] = ['label' => $calculation->getTypeName(), 'url' => ['view', 'id' => $calculation->id]];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 <div class="settlement-calculation-pays">
 
 
-	<h2> <?= Html::a(
-			$calculation->issue->longId,
-			Url::issueView($calculation->issue_id),
-			['target' => '_blank']) ?>
-	</h2>
+	<h1> <?= Html::encode($this->title) ?> </h1>
 	<div class="row">
 		<div class="col-md-5">
 			<?= SettlementDetailView::widget([
@@ -46,8 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 			<?= $form->field($model, 'count', ['options' => ['class' => 'col-md-1 col-lg-1']])
 				->textInput() ?>
-
-			<?= $form->field($model, 'transferType', ['options' => ['class' => 'col-md-3 col-lg-2']])->dropDownList(PaysForm::getTransferTypesNames()) ?>
 
 			<?= $form->field($model, 'deadline_at', ['options' => ['class' => 'col-md-3 col-lg-2']])
 				->widget(DateWidget::class)
@@ -96,4 +90,3 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 </div>
-
