@@ -28,4 +28,9 @@ return [
 		'date_at' => '2019-01-01',
 		'pay_id' => 5,
 	],
+	'not-transfer-302-2' => [
+		'user_id' => 302,
+		'date_at' => '2019-01-01',
+		'pay_id' => 6,
+	],
 ];

@@ -90,6 +90,9 @@ class PayReceivedSearch extends PayReceived
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
+			'pagination' => [
+				'pageSize' => 100,
+			],
 		]);
 
 		$this->load($params);
@@ -104,9 +107,9 @@ class PayReceivedSearch extends PayReceived
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'user_id' => $this->user_id,
-			'date_at' => $this->date_at,
-			'transfer_at' => $this->transfer_at,
+			PayReceived::tableName() . '.user_id' => $this->user_id,
+			PayReceived::tableName() . '.date_at' => $this->date_at,
+			PayReceived::tableName() . '.transfer_at' => $this->transfer_at,
 			'C.type' => $this->calculationType,
 			'P.value' => $this->value,
 		]);

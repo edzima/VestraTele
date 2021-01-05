@@ -30,14 +30,14 @@ class PayReceivedSearchTest extends Unit {
 	}
 
 	public function testEmpty(): void {
-		$this->assertTotalCount(5);
+		$this->assertTotalCount(6);
 	}
 
 	public function testAgent(): void {
 		$this->model->issueAgent = 300;
 		$this->assertTotalCount(4);
 		$this->model->issueAgent = 301;
-		$this->assertTotalCount(1);
+		$this->assertTotalCount(2);
 		$this->model->issueAgent = 302;
 		$this->assertTotalCount(0);
 	}
@@ -48,19 +48,19 @@ class PayReceivedSearchTest extends Unit {
 		$this->model->user_id = 301;
 		$this->assertTotalCount(2);
 		$this->model->user_id = 302;
-		$this->assertTotalCount(1);
+		$this->assertTotalCount(2);
 	}
 
 	public function testCustomerLastname(): void {
 		$this->model->customerLastname = 'Lar';
 		$this->assertTotalCount(1);
 		$this->model->customerLastname = 'Way';
-		$this->assertTotalCount(4);
+		$this->assertTotalCount(5);
 	}
 
 	public function testTransferStatus(): void {
 		$this->model->transferStatus = PayReceivedSearch::TRANFER_STATUS_NO;
-		$this->assertTotalCount(3);
+		$this->assertTotalCount(4);
 		$this->model->transferStatus = PayReceivedSearch::TRANFER_STATUS_YES;
 		$this->assertTotalCount(2);
 	}

@@ -14,12 +14,16 @@ use yii\helpers\Html;
 /* @var $dataProvider ActiveDataProvider */
 
 $this->title = Yii::t('settlement', 'Received pays');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['/settlement/calculation/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Pays'), 'url' => ['/settlement/pay/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="pay-received-index">
 
-	<h1><?= Html::encode($this->title) ?></h1>
-
+	<p>
+		<?= Html::a(Yii::t('settlement', 'Receive'), ['receive'], ['class' => 'btn btn-success']) ?>
+	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
@@ -31,6 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'attribute' => 'calculationType',
 				'value' => 'pay.calculation.typeName',
+				'label' => Yii::t('settlement', 'Settlement type'),
 				'filter' => PayReceivedSearch::getCalculationTypesNames(),
 			],
 			[
@@ -58,6 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'transfer_at:date',
 			[
 				'class' => ActionColumn::class,
+				'template' => '{update} {delete}',
 			],
 		],
 	]); ?>

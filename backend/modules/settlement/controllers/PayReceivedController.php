@@ -2,12 +2,15 @@
 
 namespace backend\modules\settlement\controllers;
 
+use backend\modules\settlement\models\ReceivePaysForm;
 use backend\modules\settlement\models\search\PayReceivedSearch;
+use common\models\issue\IssuePay;
 use common\models\settlement\PayReceived;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * PayReceivedController implements the CRUD actions for PayReceived model.
@@ -23,6 +26,7 @@ class PayReceivedController extends Controller {
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'user-not-transfer-pays' => ['POST'],
 				],
 			],
 		];
@@ -44,33 +48,44 @@ class PayReceivedController extends Controller {
 		]);
 	}
 
-	/**
-	 * Displays a single PayReceived model.
-	 *
-	 * @param integer $id
-	 * @return mixed
-	 * @throws NotFoundHttpException if the model cannot be found
-	 */
-	public function actionView(int $id): string {
-		return $this->render('view', [
-			'model' => $this->findModel($id),
-		]);
+	public function actionReceive() {
+		$model = new ReceivePaysForm();
+		$model->date = date('Y-m-d');
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			Yii::$app->session->addFlash('success',
+				Yii::t('backend', 'Received {count} pays. Sum value: {sumValue}', [
+					'count' => count($model->pays_ids),
+					'sumValue' => Yii::$app->formatter->asCurrency(
+						IssuePay::find()->andWhere(['id' => $model->pays_ids])->sum('value')
+					),
+				]));
+
+			return $this->redirect(['index']);
+		}
+		return $this->render('receive', ['model' => $model]);
 	}
 
-	public function actionReceived(int $id) {
-		$model = PayReceived::find()
-			->andWhere(['pay_id' => $id])
-			->one();
-		if ($model === null) {
-			throw new NotFoundHttpException();
+	public function actionUserNotTransferPays() {
+		$params = Yii::$app->request->post('depdrop_parents');
+		if (empty($params)) {
+			throw new NotFoundHttpException('The requested page does not exist.');
 		}
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->goBack();
+		Yii::$app->response->format = Response::FORMAT_JSON;
+		$user_id = (int) reset($params);
+		$pays = (new ReceivePaysForm(['user_id' => $user_id]))->getNotTransferPays();
+		$data = [];
+		foreach ($pays as $pay) {
+			$data[$pay->pay_id] =
+				[
+					'id' => $pay->pay_id,
+					'name' => ReceivePaysForm::getName($pay),
+				];
 		}
 
-		return $this->render('received', [
-			'model' => $model,
-		]);
+		return [
+			'output' => $data,
+			'selected' => '',
+		];
 	}
 
 	/**
@@ -81,7 +96,7 @@ class PayReceivedController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionUpdate($id) {
+	public function actionUpdate(int $id) {
 		$model = $this->findModel($id);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -101,7 +116,7 @@ class PayReceivedController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionDelete($id) {
+	public function actionDelete(int $id) {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);
@@ -115,7 +130,7 @@ class PayReceivedController extends Controller {
 	 * @return PayReceived the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id) {
+	protected function findModel(int $id) {
 		if (($model = PayReceived::findOne($id)) !== null) {
 			return $model;
 		}

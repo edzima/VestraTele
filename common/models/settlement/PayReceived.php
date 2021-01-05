@@ -51,7 +51,7 @@ class PayReceived extends ActiveRecord implements IssueInterface {
 		return [
 			'pay_id' => Yii::t('settlement', 'Pay ID'),
 			'user_id' => Yii::t('settlement', 'Receiver'),
-			'date_at' => Yii::t('settlement', 'Date At'),
+			'date_at' => Yii::t('settlement', 'Receive At'),
 			'transfer_at' => Yii::t('settlement', 'Transfer At'),
 		];
 	}
