@@ -10,6 +10,6 @@ abstract class Unit extends BaseUnit {
 	/**
 	 * @var UnitTester
 	 */
-	protected $tester;
+	protected UnitTester $tester;
 
 }

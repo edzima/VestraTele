@@ -60,6 +60,23 @@ class IssueController extends Controller {
 		]);
 	}
 
+	public function actionTest(): string {
+		$sender = getenv('EMAIL_ROBOT');
+		Yii::info('senderrrr');
+		Yii::info($sender);
+
+		$send = Yii::$app->mailer->compose()
+			->setFrom(getenv('EMAIL_ROBOT'))
+			->setTo('atipezda@gmail.com')
+			->setSubject('Message subject')
+			->setTextBody('Plain text content')
+			->setHtmlBody('<b>HTML content</b>')
+			->send();
+
+
+		return $send;
+	}
+
 	public function actionUser(): string {
 		$user = Yii::$app->user;
 

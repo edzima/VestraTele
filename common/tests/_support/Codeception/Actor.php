@@ -1,5 +1,4 @@
 <?php
-
 namespace common\tests;
 
 /**
@@ -13,16 +12,15 @@ namespace common\tests;
  * @method void am($role)
  * @method void lookForwardTo($achieveValue)
  * @method void comment($description)
- * @method \Codeception\Lib\Friend haveFriend($name, $actorClass = null)
- * @method grabFixture(string $string, int $int)
- * @method seeRecord(string $class, array $array)
+ * @method void pause()
  *
  * @SuppressWarnings(PHPMD)
- */
-class UnitTester extends \Codeception\Actor {
+*/
+class \Codeception\Actor extends \Codeception\Actor
+{
+    use _generated\\Codeception\ActorActions;
 
-	use _generated\UnitTesterActions;
-	/**
-	 * Define custom actions here
-	 */
+    /**
+     * Define custom actions here
+     */
 }

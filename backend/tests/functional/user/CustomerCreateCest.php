@@ -91,7 +91,7 @@ class CustomerCreateCest {
 	}
 
 	public function checkCorrectWithSendEmail(FunctionalTester $I): void {
-		$I->fillField('Email', 'fred@test.com');
+		$I->fillField('Email', 'atipezda@gmail.com');
 		$I->fillField('Firstname', 'Fred');
 		$I->fillField('Lastname', 'Johansson');
 		$I->fillField('Postal Code', '34-200');
@@ -114,7 +114,7 @@ class CustomerCreateCest {
 		$I->seeEmailIsSent();
 		$mail = $I->grabLastSentEmail();
 		expect($mail)->isInstanceOf('yii\mail\MessageInterface');
-		expect($mail->getTo())->hasKey('fred@test.com');
+		expect($mail->getTo())->hasKey('atipezda@gmail.com');
 	}
 
 	public function checkInvalidEmail(FunctionalTester $I): void {

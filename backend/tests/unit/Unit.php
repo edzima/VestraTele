@@ -13,5 +13,5 @@ use common\tests\unit\Unit as BaseUnit;
 class Unit extends BaseUnit {
 
 	/** @var UnitTester */
-	protected $tester;
+	protected \common\tests\UnitTester $tester;
 }
