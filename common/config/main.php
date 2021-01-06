@@ -100,6 +100,20 @@ return [
 				],
 			],
 		],
+		//@todo: move to environments folder maybe
+		'mailer' => [
+			'class' => 'yii\swiftmailer\Mailer',
+			'viewPath' => '@common/mail',
+			'useFileTransport' => YII_ENV_DEV,
+			'transport' => [
+				'class' => 'Swift_SmtpTransport',
+				'encryption' => getenv('EMAIL_ENCRYPTION'),
+				'host' => getenv('EMAIL_SMTP_HOST'),
+				'port' => getenv('EMAIL_SMTP_PORT'),
+				'username' => getenv('EMAIL_USERNAME'),
+				'password' => getenv('EMAIL_PASSWORD'),
+			],
+		],
 		'keyStorage' => [
 			'class' => KeyStorage::class,
 		],

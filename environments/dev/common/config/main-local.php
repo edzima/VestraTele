@@ -7,11 +7,6 @@ return [
 			'username' => getenv('DB_USERNAME'),
 			'password' => getenv('DB_PASSWORD'),
 			'charset' => 'utf8',
-		],
-		'mailer' => [
-			'class' => 'yii\swiftmailer\Mailer',
-			'viewPath' => '@common/mail',
-//			@todo: set mailer dev here
-		],
+		]
 	],
 ];
