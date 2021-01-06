@@ -68,7 +68,7 @@ class MailTest extends Unit {
 		$transport = $this->realMailer->getTransport();
 		$ping = $transport->ping();
 
-		$this->tester->assertSame(true,$ping);
+		$this->tester->assertTrue($ping);
 	}
 
 	public function testSendOnlineMailThroughRealMailer(): void {
@@ -82,7 +82,7 @@ class MailTest extends Unit {
 			->setTextBody('test body');
 		$isEmailSend = $message->send();
 
-		$this->assertSame(true, $isEmailSend);
+		$this->assertTrue($isEmailSend);
 	}
 
 }
