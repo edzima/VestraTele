@@ -39,19 +39,20 @@ class UserTraitTest extends Unit {
 	}
 
 	public function testAssignUserSingleTrait(): void {
-		$user = $this->tester->grabFixture('user', 0);
+		$user = $this->getUserWithoutTraits();
 		$traitsToAssign = [UserTrait::TRAIT_LIABILITIES];
 		UserTrait::assignUser($user->id, $traitsToAssign);
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
+		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_DISABILITY_RESULT_OF_CASE, 'user_id' => $this->getUserWithTrait()->id]);
 	}
 
 	public function testAssignUserMultipleTraits(): void {
-		$user = $this->tester->grabFixture('user', 0);
+		$user = $this->getUserWithoutTraits();
 		$traitsToAssign = [UserTrait::TRAIT_LIABILITIES, UserTrait::TRAIT_BAILIFF];
 		UserTrait::assignUser($user->id, $traitsToAssign);
-
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
+		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_DISABILITY_RESULT_OF_CASE, 'user_id' => $user->id]);
 	}
 
 	public function testAssignUserTraitSameTrait(): void {

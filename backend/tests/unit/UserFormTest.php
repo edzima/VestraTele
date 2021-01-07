@@ -106,6 +106,39 @@ class UserFormTest extends Unit {
 		$model->traits = [UserTrait::TRAIT_BAILIFF];
 		$this->tester->assertTrue($model->save());
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
+		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
+	}
+
+	public function testAssignTraitsToUser(): void {
+		$model = new UserForm();
+		$user = $this->tester->grabFixture('user', 0);
+		$model->setModel($user);
+		$model->traits = [UserTrait::TRAIT_LIABILITIES, UserTrait::TRAIT_BAILIFF];
+		$this->tester->assertTrue($model->validate());
+		$this->tester->assertTrue($model->save());
+		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
+	}
+
+	public function testAssignTraitAsEmptyArray(): void {
+		$model = new UserForm();
+		$user = $this->tester->grabFixture('user', 0);
+		$this->tester->seeRecord(UserTrait::class, ['user_id' => $user->id]);
+		$model->setModel($user);
+		$model->traits = [];
+		$this->tester->assertTrue($model->save());
+		$this->tester->dontSeeRecord(UserTrait::class, ['user_id' => $user->id]);
+		$this->tester->seeRecord(UserTrait::class, ['user_id' => 2]);
+	}
+
+	public function testAssignTraitAsEmptyString(): void {
+		$model = new UserForm();
+		$user = $this->tester->grabFixture('user', 0);
+		$this->tester->seeRecord(UserTrait::class, ['user_id' => $user->id]);
+		$model->setModel($user);
+		$model->traits = '';
+		$this->tester->assertTrue($model->save());
+		$this->tester->dontSeeRecord(UserTrait::class, ['user_id' => $user->id]);
+		$this->tester->seeRecord(UserTrait::class, ['user_id' => 2]);
 	}
 }

@@ -142,7 +142,6 @@ class CustomerCreateCest {
 			'lastname' => 'Johansson',
 		]);
 
-//		@todo: Add userID
 		$I->seeRecord(UserTrait::class, [
 			'trait_id' => UserTrait::TRAIT_LIABILITIES,
 			'user_id' => $user->id,
