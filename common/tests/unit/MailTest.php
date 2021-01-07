@@ -11,7 +11,7 @@ class MailTest extends Unit {
 	private Mailer $realMailer;
 	private array $realTransportSettings;
 
-	public function _before() {
+	public function _before():void {
 		parent::_before();
 		$this->realTransportSettings = [
 			'class' => 'Swift_SmtpTransport',
