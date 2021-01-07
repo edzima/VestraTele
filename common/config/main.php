@@ -10,8 +10,6 @@ use common\formatters\Formatter;
 use common\models\user\User;
 use common\modules\address\Module as AddressModule;
 use edzima\teryt\Module as TerytModule;
-use yii\caching\DummyCache;
-use yii\caching\FileCache;
 
 return [
 	'name' => 'Vestra CRM',
@@ -110,9 +108,6 @@ return [
 			'enablePrettyUrl' => true,
 			'showScriptName' => false,
 		],
-		'cache' => [
-			'class' => YII_ENV_DEV ? DummyCache::class : FileCache::class,
-		],
 		'pay' => [
 			'class' => PayComponent::class,
 		],
@@ -123,7 +118,7 @@ return [
 			'class' => TaxComponent::class,
 		],
 		'userHierarchy' => [
-			'class' =>HierarchyComponent::class,
+			'class' => HierarchyComponent::class,
 			'modelClass' => User::class,
 			'parentColumn' => 'boss',
 		],

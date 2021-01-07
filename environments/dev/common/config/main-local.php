@@ -1,12 +1,14 @@
 <?php
+
+use yii\caching\DummyCache;
+
 return [
 	'components' => [
+		'cache' => [
+			'class' => DummyCache::class,
+		],
 		'db' => [
-			'class' => 'yii\db\Connection',
-			'dsn' => getenv('DB_DSN'),
-			'username' => getenv('DB_USERNAME'),
-			'password' => getenv('DB_PASSWORD'),
-			'charset' => 'utf8',
+			'enableSchemaCache' => false,
 		],
 		'mailer' => [
 			'class' => 'yii\swiftmailer\Mailer',
@@ -15,6 +17,9 @@ return [
 			// 'useFileTransport' to false and configure a transport
 			// for the mailer to send real emails.
 			'useFileTransport' => true,
+		],
+		'log' => [
+			'traceLevel' => 3,
 		],
 	],
 ];

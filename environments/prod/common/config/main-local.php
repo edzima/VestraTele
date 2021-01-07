@@ -1,16 +1,21 @@
 <?php
+
+use yii\caching\FileCache;
+
 return [
 	'components' => [
+		'cache' => [
+			'class' => FileCache::class,
+		],
 		'db' => [
-			'class' => 'yii\db\Connection',
-			'dsn' => getenv('DB_DSN'),
-			'username' => getenv('DB_USERNAME'),
-			'password' => getenv('DB_PASSWORD'),
-			'charset' => 'utf8',
+			'enableSchemaCache' => true,
 		],
 		'mailer' => [
 			'class' => 'yii\swiftmailer\Mailer',
 			'viewPath' => '@common/mail',
+		],
+		'log' => [
+			'traceLevel' => 0,
 		],
 	],
 ];
