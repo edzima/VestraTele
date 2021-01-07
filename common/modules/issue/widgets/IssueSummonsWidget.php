@@ -17,14 +17,18 @@ class IssueSummonsWidget extends IssueWidget {
 	public string $actionColumnTemplate = '{view} {update} {delete}';
 
 	public function run(): string {
-		return $this->render('issue-summons', [
-			'model' => $this->model,
-			'baseUrl' => $this->baseUrl,
-			'dataProvider' => $this->getDataProvider(),
-			'editBtn' => $this->editBtn,
-			'addBtn' => $this->addBtn,
-			'actionColumnTemplate' => $this->actionColumnTemplate,
-		]);
+		$dataProvider = $this->getDataProvider();
+		if ($dataProvider->getTotalCount() > 0) {
+			return $this->render('issue-summons', [
+				'model' => $this->model,
+				'baseUrl' => $this->baseUrl,
+				'dataProvider' => $dataProvider,
+				'editBtn' => $this->editBtn,
+				'addBtn' => $this->addBtn,
+				'actionColumnTemplate' => $this->actionColumnTemplate,
+			]);
+		}
+		return '';
 	}
 
 	public function getDataProvider(): ActiveDataProvider {

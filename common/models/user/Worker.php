@@ -28,7 +28,7 @@ class Worker extends User {
 	private static $USER_NAMES = [];
 
 	private $selfTree;
-	private static $BOSS_MAP = [];
+	private static $PARENTS_MAP = [];
 	private static $TREE = [];
 
 	public function hasParent(): bool {
@@ -63,7 +63,7 @@ class Worker extends User {
 	}
 
 	private static function getBossId(int $userId): ?int {
-		return static::getBossesIdsMap()[$userId] ?? null;
+		return static::getParentsIdsMap()[$userId] ?? null;
 	}
 
 	/**
@@ -79,8 +79,9 @@ class Worker extends User {
 
 	public function getChildesIds(): array {
 		$ids = [];
-		foreach (static::getBossesIdsMap() as $id => $boss) {
-			if ($boss === $this->id) {
+		$parentsIdsMap = static::getParentsIdsMap();
+		foreach ($parentsIdsMap as $id => $parent) {
+			if ($parent === $this->id) {
 				$ids[] = $id;
 			}
 		}
@@ -97,6 +98,9 @@ class Worker extends User {
 
 	public function getAllChildesIds(): array {
 		$selfTree = $this->getSelfTree();
+		if (empty($selfTree)) {
+			return [];
+		}
 		$ids = [];
 		array_walk_recursive($selfTree, static function ($item, $key) use (&$ids) {
 			if ($key === 'id') {
@@ -106,23 +110,21 @@ class Worker extends User {
 		return $ids;
 	}
 
-	private static function getBossesIdsMap(): array {
-		if (empty(static::$BOSS_MAP)) {
-			static::$BOSS_MAP = ArrayHelper::map(static::find()
-				->select('id,boss')
-				->onlyWithBoss()
-				->active()
-				->asArray()
-				->all(), 'id', 'boss');
+	private static function getParentsIdsMap(): array {
+		if (empty(static::$PARENTS_MAP)) {
+			static::$PARENTS_MAP = array_map('intval',
+				ArrayHelper::map(static::find()
+					->select('id,boss')
+					->onlyWithBoss()
+					->asArray()
+					->all(), 'id', 'boss'),
+			);
 		}
-		return static::$BOSS_MAP;
+		return static::$PARENTS_MAP;
 	}
 
 	public function getSelfTree(): array {
-		if (empty($this->selfTree)) {
-			$this->selfTree = ArrayHelper::filter(static::getTree(), [$this->id]);
-		}
-		return $this->selfTree;
+		return static::getTree()[$this->id] ?? [];
 	}
 
 	public static function getTree(): array {
@@ -130,7 +132,6 @@ class Worker extends User {
 			$boss = static::find()
 				->select('id,boss')
 				->onlyWithBoss()
-				->active()
 				->asArray()
 				->all();
 			static::$TREE = static::buildTree($boss, 'boss', 'id');
@@ -138,15 +139,15 @@ class Worker extends User {
 		return static::$TREE;
 	}
 
-	private static function buildTree(array $items, string $parentId, string $id) {
+	private static function buildTree(array $items, string $parentKey, string $idKey): array {
 		$childs = [];
 		foreach ($items as &$item) {
-			$childs[$item[$parentId]][] = &$item;
+			$childs[$item[$parentKey]][] = &$item;
 		}
 		unset($item);
 		foreach ($items as &$item) {
-			if (isset($childs[$item[$id]])) {
-				$item['childs'] = $childs[$item[$id]];
+			if (isset($childs[$item[$idKey]])) {
+				$item['childs'] = $childs[$item[$idKey]];
 			}
 		}
 		return $childs;

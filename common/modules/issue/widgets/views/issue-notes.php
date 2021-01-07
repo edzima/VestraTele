@@ -3,7 +3,6 @@
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\modules\issue\widgets\IssueNoteWidget;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model Issue */
@@ -16,13 +15,6 @@ use yii\helpers\Html;
 
 <fieldset>
 	<legend>Notatki
-		<?php if ($addBtn): ?>
-			<?= Html::a(
-				'<i class="fa fa-plus"></i>',
-				$addUrl, [
-				'class' => 'btn btn-xs btn-success',
-			]) ?>
-		<?php endif; ?>
 		<button class="btn toggle pull-right" data-toggle="#notes-list">
 			<i class="glyphicon glyphicon-chevron-down"></i></button>
 	</legend>

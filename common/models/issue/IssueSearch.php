@@ -6,6 +6,9 @@ use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueUserQuery;
 use common\models\issue\search\ArchivedIssueSearch;
+use common\models\issue\search\IssueTypeSearch;
+use common\models\SearchModel;
+use common\models\user\CustomerSearchInterface;
 use common\models\user\Worker;
 use Yii;
 use yii\base\Model;
@@ -17,7 +20,10 @@ use yii\helpers\ArrayHelper;
  * IssueSearch represents the model behind the search form of `common\models\issue\Issue`.
  */
 abstract class IssueSearch extends Model
-	implements ArchivedIssueSearch {
+	implements ArchivedIssueSearch,
+			   CustomerSearchInterface,
+			   IssueTypeSearch,
+			   SearchModel {
 
 	public $issue_id;
 	public $stage_id;
@@ -43,14 +49,16 @@ abstract class IssueSearch extends Model
 		return [
 			[
 				[
-					'issue_id', 'agent_id', 'stage_id', 'type_id', 'entity_responsible_id',
+					'issue_id', 'agent_id', 'stage_id', 'entity_responsible_id',
 				], 'integer',
 			],
 			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
+			['type_id', 'in', 'range' => array_keys($this->getStagesNames()),'allowArray' => true],
+			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[
 				[
-					'created_at', 'updated_at', 'customerLastname',
+					'created_at', 'updated_at',
 				], 'safe',
 			],
 		];
@@ -89,7 +97,7 @@ abstract class IssueSearch extends Model
 	protected function issueQueryFilter(IssueQuery $query): void {
 		$this->archiveFilter($query);
 		$this->agentFilter($query);
-		$this->customerFilter($query);
+		$this->applyCustomerSurnameFilter($query);
 		$this->createdAtFilter($query);
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
@@ -126,8 +134,9 @@ abstract class IssueSearch extends Model
 		}
 	}
 
-	protected function customerFilter(IssueQuery $query): void {
+	public function applyCustomerSurnameFilter(QueryInterface $query): void {
 		if (!empty($this->customerLastname)) {
+			/** @var IssueQuery $query */
 			$query->joinWith([
 				'users c' => function (IssueUserQuery $query): void {
 					$query->andWhere(['c.type' => IssueUser::TYPE_CUSTOMER]);
@@ -154,4 +163,11 @@ abstract class IssueSearch extends Model
 		return IssueStage::getStagesNames($this->getWithArchive());
 	}
 
+	public static function getIssueTypesNames(): array {
+		return IssueType::getTypesNames();
+	}
+	public function applyIssueTypeFilter(QueryInterface $query): void {
+		$query->andFilterWhere([Issue::tableName() . '.type_id' => $this->type_id]);
+
+	}
 }

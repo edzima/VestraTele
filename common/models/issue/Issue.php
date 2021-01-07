@@ -9,9 +9,12 @@ use common\models\address\Province;
 use common\models\address\State;
 use common\models\address\SubProvince;
 use common\models\entityResponsible\EntityResponsible;
+use common\models\entityResponsible\EntityResponsibleQuery;
 use common\models\issue\query\IssueNoteQuery;
+use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
+use common\models\issue\query\IssueStageQuery;
 use common\models\issue\query\IssueUserQuery;
 use common\models\user\Customer;
 use common\models\user\query\UserQuery;
@@ -85,7 +88,9 @@ use yii\db\Expression;
  * @property-read Summon[] $summons
  * @property-read IssueUser[] $users
  */
-class Issue extends ActiveRecord {
+class Issue extends ActiveRecord implements IssueInterface {
+
+	use IssueTrait;
 
 	private const DEFAULT_PROVISION = Provision::TYPE_PERCENTAGE;
 
@@ -157,6 +162,7 @@ class Issue extends ActiveRecord {
 			'accident_at' => Yii::t('common', 'Accident date'),
 			'stage_change_at' => Yii::t('common', 'Stage date'),
 			'signature_act' => Yii::t('common', 'Signature act'),
+			'customer' => IssueUser::getTypesNames()[IssueUser::TYPE_CUSTOMER],
 		];
 	}
 
@@ -166,20 +172,21 @@ class Issue extends ActiveRecord {
 	}
 
 	public function getAgent(): UserQuery {
-		return $this->getUserType(IssueUser::TYPE_AGENT, Worker::class);
+		return $this->getUserType(IssueUser::TYPE_AGENT, User::class);
 	}
 
 	public function getLawyer(): UserQuery {
-		return $this->getUserType(IssueUser::TYPE_LAWYER, Worker::class);
+		return $this->getUserType(IssueUser::TYPE_LAWYER, User::class);
 	}
 
 	public function getTele(): UserQuery {
-		return $this->getUserType(IssueUser::TYPE_TELEMARKETER, Worker::class);
+		return $this->getUserType(IssueUser::TYPE_TELEMARKETER, User::class);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	protected function getUserType(string $type, string $userClass = User::class, callable $callable = null): UserQuery {
 		return $this->hasOne($userClass, ['id' => 'user_id'])->via('users', function (IssueUserQuery $query) use ($type, $callable) {
+			$query->alias($type);
 			$query->withType($type);
 			if ($callable !== null) {
 				$callable($query, $type);
@@ -315,35 +322,26 @@ class Issue extends ActiveRecord {
 		return $this->victim_street;
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getEntityResponsible() {
+	public function getEntityResponsible(): EntityResponsibleQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasOne(EntityResponsible::class, ['id' => 'entity_responsible_id']);
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getStage() {
+	public function getStage(): IssueStageQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasOne(IssueStage::class, ['id' => 'stage_id']);
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getType() {
+	public function getType(): ActiveQuery {
 		return $this->hasOne(IssueType::class, ['id' => 'type_id']);
 	}
 
-	public function getStageType() {
+	public function getStageType(): ActiveQuery {
 		return $this->hasOne(StageType::class, ['type_id' => 'type_id', 'stage_id' => 'stage_id']);
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
 	public function getIssueNotes(): IssueNoteQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])
 			->with('user')->orderBy('created_at DESC');
 	}
@@ -352,17 +350,18 @@ class Issue extends ActiveRecord {
 		return $this->hasMany(Summon::class, ['issue_id' => 'id']);
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getPayCalculations() {
+	public function getPayCalculations(): IssuePayCalculationQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(IssuePayCalculation::class, ['issue_id' => 'id']);
 	}
 
 	public function getPays(): IssuePayQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		return $this->hasMany(IssuePay::class, ['issue_id' => 'id'])
-			->orderBy(IssuePay::tableName() . '.deadline_at ASC, ' . IssuePay::tableName() . '.pay_at DESC');
+		//@todo check when directly get pays.
+		// ->orderBy(IssuePay::tableName() . '.deadline_at ASC, ' . IssuePay::tableName() . '.pay_at DESC');
+
+		return $this->hasMany(IssuePay::class, ['calculation_id' => 'id'])
+			->via('payCalculations');
 	}
 
 	public function isArchived(): bool {
@@ -457,7 +456,9 @@ class Issue extends ActiveRecord {
 	}
 
 	public function isForUser(int $id): bool {
-		return $this->getUsers()->andWhere(['user_id' => $id])->exists();
+		return $this->getUsers()
+			->andWhere(['user_id' => $id])
+			->exists();
 	}
 
 	public function isForAgents(array $ids): bool {
@@ -465,6 +466,14 @@ class Issue extends ActiveRecord {
 			->withType(IssueUser::TYPE_AGENT)
 			->andWhere(['user_id' => $ids])
 			->exists();
+	}
+
+	public function getIssueModel(): Issue {
+		return $this;
+	}
+
+	public static function getIssueIdAttribute(): string {
+		return 'id';
 	}
 
 }

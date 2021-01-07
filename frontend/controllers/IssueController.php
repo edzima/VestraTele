@@ -11,6 +11,8 @@ namespace frontend\controllers;
 use common\models\issue\Issue;
 use common\models\user\User;
 use common\models\user\Worker;
+use frontend\helpers\Url;
+use frontend\models\search\IssuePayCalculationSearch;
 use frontend\models\search\IssueSearch;
 use frontend\models\search\IssueUserSearch;
 use Yii;
@@ -48,10 +50,7 @@ class IssueController extends Controller {
 		$searchModel->user_id = (int) $user->getId();
 
 		if ($user->can(Worker::ROLE_AGENT)) {
-			$worker = Worker::findOne($user->id);
-			if ($worker) {
-				$searchModel->agentsIds = $worker->getAllChildesIds();
-			}
+			$searchModel->agentsIds = Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId());
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		return $this->render('index', [
@@ -88,8 +87,23 @@ class IssueController extends Controller {
 	 * @throws NotFoundHttpException
 	 */
 	public function actionView(int $id): string {
+		$model = $this->findModel($id);
+
+		$calculationsDataProvider = null;
+		if (Yii::$app->user->can(User::ROLE_CUSTOMER_SERVICE)
+			|| $model->isForUser(Yii::$app->user->getId())
+			|| $model->isForAgents(Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId()))
+		) {
+			$search = new IssuePayCalculationSearch();
+			$search->issue_id = $id;
+			$search->withAgents = false;
+			$calculationsDataProvider = $search->search([]);
+		}
+		Url::remember();
+
 		return $this->render('view', [
-			'model' => static::findModel($id),
+			'model' => $model,
+			'calculationsDataProvider' => $calculationsDataProvider,
 		]);
 	}
 
@@ -101,40 +115,12 @@ class IssueController extends Controller {
 	 * @return Issue the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public static function findModel(int $id): Issue {
-		$model = Issue::find()
-			->andWhere(['id' => $id])
-			->one();
-
-		if ($model !== null && static::shouldFind($model)) {
-			return $model;
+	private function findModel(int $id): Issue {
+		$model = Issue::findOne($id);
+		if ($model === null || !Yii::$app->user->canSeeIssue($model)) {
+			throw new NotFoundHttpException('The requested page does not exist.');
 		}
-		throw new NotFoundHttpException('The requested page does not exist.');
-	}
-
-	private static function shouldFind(Issue $model): bool {
-		$user = Yii::$app->user;
-		if ($user->can(Worker::ROLE_ADMINISTRATOR)) {
-			return true;
-		}
-		if ($model->isArchived() && !$user->can(Worker::PERMISSION_ARCHIVE)) {
-			Yii::warning('User: ' . $user->id . ' try view archived issue: ' . $model->id, 'issue');
-			return false;
-		}
-		if ($user->can(Worker::ROLE_CUSTOMER_SERVICE) || $model->isForUser($user->id)) {
-			return true;
-		}
-
-		if ($user->can(Worker::ROLE_AGENT)) {
-			$agent = Worker::findOne($user->id);
-			if ($agent) {
-				$childesIds = $agent->getAllChildesIds();
-				if (!empty($childesIds)) {
-					return $model->isForAgents($childesIds);
-				}
-			}
-		}
-		return false;
+		return $model;
 	}
 
 }

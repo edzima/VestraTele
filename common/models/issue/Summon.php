@@ -39,7 +39,9 @@ use yii\db\ActiveRecord;
  * @property-read Simc $city
  * @property-read EntityResponsible $entityResponsible
  */
-class Summon extends ActiveRecord {
+class Summon extends ActiveRecord implements IssueInterface {
+
+	use IssueTrait;
 
 	public const STATUS_NEW = 1;
 	public const STATUS_IN_PROGRESS = 2;
@@ -198,10 +200,10 @@ class Summon extends ActiveRecord {
 
 	public static function getTypesNames(): array {
 		return [
-			static::TYPE_DOCUMENTS => 'Dokumenty',
-			static::TYPE_INCOMPLETE_DOCUMENTATION => 'Dokumentacja niekompletna',
-			static::TYPE_PHONE => 'Telefoniczne',
-			static::TYPE_ANTIVINDICATION => 'Antywindykacja',
+			static::TYPE_DOCUMENTS =>Yii::t('common','Documents'),
+			static::TYPE_INCOMPLETE_DOCUMENTATION => Yii::t('common','Incomplete documentation'),
+			static::TYPE_PHONE =>  Yii::t('common','Phonable'),
+			static::TYPE_ANTIVINDICATION =>  Yii::t('common','Antyvindication'),
 		];
 	}
 
@@ -251,5 +253,9 @@ class Summon extends ActiveRecord {
 
 	public function isForUser(int $id): bool {
 		return $this->contractor_id === $id || $this->owner_id === $id;
+	}
+
+	public function getName(): string {
+		return Yii::t('common','Summon {type}',['type' => $this->getTypeName()]);
 	}
 }

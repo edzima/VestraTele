@@ -3,6 +3,7 @@
 use backend\widgets\CsvForm;
 use common\models\issue\IssueMeet;
 use common\models\issue\IssueMeetSearch;
+use common\models\user\User;
 use common\models\user\Worker;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
@@ -23,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<p>
 		<?= Html::a('Dodaj', ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
-	<?= CsvForm::widget() ?>
+	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() :'' ?>
 
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>

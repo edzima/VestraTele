@@ -7,9 +7,16 @@ use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionQuery;
+use common\models\settlement\PayInterface;
+use common\models\user\User;
+use DateTime;
+use Decimal\Decimal;
+use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "issue_pay_calculation".
@@ -23,24 +30,41 @@ use yii\db\Expression;
  * @property string $updated_at
  * @property string $payment_at
  * @property int $provider_type
+ * @property int $stage_id
+ * @property int $owner_id
+ * @property int $provider_id
+ * @property int $problem_status
+ * @property bool $is_provider_notified
  *
+ * @property-read User $owner
  * @property-read Issue $issue
  * @property-read IssuePay[] $pays
+ * @property-read IssueStage $stage
  */
-class IssuePayCalculation extends ActiveRecord {
+class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInterface {
 
-	public const TYPE_NOT_SET = 0;
+	use IssueTrait;
+
 	public const TYPE_ADMINISTRATIVE = 10;
-	public const TYPE_PROVISION = 20;
-	public const TYPE_PROVISION_REFUND = 25;
 	public const TYPE_HONORARIUM = 30;
 	public const TYPE_LAWYER = 40;
 	public const TYPE_SUBSCRIPTION = 50;
 
+	public const PROBLEM_STATUS_PREPEND_DEMAND = 10;
+	public const PROBLEM_STATUS_DEMAND = 15;
+	public const PROBLEM_STATUS_PREPEND_JUDGEMENT = 20;
+	public const PROBLEM_STATUS_JUDGEMENT = 25;
+	public const PROBLEM_STATUS_BAILLIF = 40;
+
 	public const PROVIDER_CLIENT = 1;
 	public const PROVIDER_RESPONSIBLE_ENTITY = 10;
 
-	public function afterSave($insert, $changedAttributes) {
+	private static ?array $STAGES_NAMES = null;
+	private static ?array $OWNER_NAMES = null;
+
+	private static array $USER_PROVISIONS_SUM = [];
+
+	public function afterSave($insert, $changedAttributes): void {
 		parent::afterSave($insert, $changedAttributes);
 		$this->issue->markAsUpdate();
 	}
@@ -76,8 +100,8 @@ class IssuePayCalculation extends ActiveRecord {
 			[['issue_id'], 'integer'],
 			['value', 'number', 'min' => 1, 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
 			[['details'], 'string'],
-			[['issue_id'], 'unique'],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
+			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
 		];
 	}
 
@@ -86,16 +110,92 @@ class IssuePayCalculation extends ActiveRecord {
 	 */
 	public function attributeLabels(): array {
 		return [
-			'issue_id' => 'Sprawa',
-			'created_at' => 'Dodano',
-			'updated_at' => 'Edycja',
-			'payment_at' => 'Opłacono',
-			'value' => 'Kwota (Brutto)',
-			'type' => 'Rodzaj',
-			'typeName' => 'Typ',
-			'details' => 'Szczegóły',
-			'providerName' => 'Wpłacający',
+			'issue_id' => Yii::t('common', 'Issue'),
+			'created_at' => Yii::t('common', 'Created at'),
+			'updated_at' => Yii::t('common', 'Updated at'),
+			'payment_at' => Yii::t('common', 'Payment at'),
+			'value' => Yii::t('common', 'Value with VAT'),
+			'valueToPay' => Yii::t('common', 'Value to pay'),
+			'type' => Yii::t('common', 'Type'),
+			'stage_id' => Yii::t('common', 'Stage'),
+			'stageName' => Yii::t('common', 'Stage'),
+			'typeName' => Yii::t('common', 'Type'),
+			'details' => Yii::t('common', 'Details'),
+			'providerName' => Yii::t('settlement', 'Provider name'),
+			'problemStatusName' => Yii::t('settlement', 'Problem'),
+			'owner_id' => Yii::t('common', 'Owner'),
+			'owner' => Yii::t('common', 'Owner'),
+			'userProvisionsSum' => Yii::t('common', 'User provision (total)'),
+			'userProvisionsSumNotPay' => Yii::t('common', 'User provision (not pay)'),
+			'is_provider_notified' => Yii::t('common', 'Is provider notified'),
 		];
+	}
+
+	public function getName(): string {
+		return Yii::t('settlement', 'Settlement {type}', ['type' => $this->getTypeName()]);
+	}
+
+	public function getNotPayedPays(): IssuePayQuery {
+		return $this->getPays()->onlyNotPayed();
+	}
+
+	public function getValueToPay(): Decimal {
+		return $this->getValue()->sub(Yii::$app->pay->payedSum($this->pays));
+	}
+
+	public function getValue(): Decimal {
+		return new Decimal($this->value);
+	}
+
+	public function getPaymentAt(): ?DateTime {
+		return new DateTime($this->payment_at);
+	}
+
+	public function getUserProvisionsSum(int $id): Decimal {
+		if (!isset(static::$USER_PROVISIONS_SUM[$id])) {
+			$sum = (string) $this->getPays()
+				->joinWith([
+					'provisions PR' => function (ProvisionQuery $query) use ($id): void {
+						$query->user($id);
+					},
+				])
+				->sum('PR.value');
+			if (empty($sum)) {
+				$sum = 0;
+			}
+			static::$USER_PROVISIONS_SUM[$id] = new Decimal($sum);
+		}
+		return static::$USER_PROVISIONS_SUM[$id];
+	}
+
+	public function isForUser(int $id): bool {
+		return $this->owner_id === $id ||
+			$this->issue->isForUser($id);
+	}
+
+	public function getUserProvisionsSumNotPay(int $id): Decimal {
+		if (!$this->getUserProvisionsSum($id)->isPositive()) {
+			return new Decimal(0);
+		}
+		$sum = (string) $this->getNotPayedPays()
+			->joinWith([
+				'provisions PR' => function (ProvisionQuery $query) use ($id): void {
+					$query->user($id);
+				},
+			])
+			->sum('PR.value');
+		if (empty($sum)) {
+			$sum = 0;
+		}
+		return new Decimal($sum);
+	}
+
+	public function getOwner(): ActiveQuery {
+		return $this->hasOne(User::class, ['id' => 'owner_id']);
+	}
+
+	public function getStage(): ActiveQuery {
+		return $this->hasOne(IssueStage::class, ['id' => 'stage_id']);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
@@ -118,23 +218,23 @@ class IssuePayCalculation extends ActiveRecord {
 	}
 
 	public function isPayed(): bool {
-		return !empty($this->payment_at);
+		if ($this->isNewRecord) {
+			return false;
+		}
+
+		return $this->getValueToPay()->isZero();
+	}
+
+	public function getDecimalValue(): Decimal {
+		return new Decimal($this->value);
 	}
 
 	public function getPaysCount(): int {
 		return $this->getPays()->count();
 	}
 
-	public static function getTypesNames(): array {
-		return [
-			//static::TYPE_NOT_SET => 'Nieustalono',
-			static::TYPE_ADMINISTRATIVE => 'Administracyjne',
-			static::TYPE_PROVISION => 'Prowizja',
-			static::TYPE_PROVISION_REFUND => 'Zwrot prowizji',
-			static::TYPE_HONORARIUM => 'Honorarium',
-			static::TYPE_LAWYER => 'Koszty adwokackie',
-			static::TYPE_SUBSCRIPTION => 'Abonament',
-		];
+	public function getNotPayedPaysCount(): int {
+		return $this->getNotPayedPays()->count();
 	}
 
 	/** @noinspection PhpUnused */
@@ -143,15 +243,122 @@ class IssuePayCalculation extends ActiveRecord {
 	}
 
 	public function getProvidersNames(): array {
-		//@todo change to Client User Model after refactor client.
 		return [
-			static::PROVIDER_CLIENT => $this->issue->getClientFullName(),
-			static::PROVIDER_RESPONSIBLE_ENTITY => $this->issue->entityResponsible,
+			static::PROVIDER_CLIENT => Yii::t('settlement', 'Customer - {fullName}', [
+				'fullName' => $this->issue->customer->getFullName(),
+			]),
+			static::PROVIDER_RESPONSIBLE_ENTITY => Yii::t('settlement', 'Entity rensponsible - {name}', [
+				'name' => $this->issue->entityResponsible,
+			]),
 		];
+	}
+
+	public function hasProblemStatus(): bool {
+		return !empty($this->problem_status);
+	}
+
+	public function hasPays(): bool {
+		return $this->getPaysCount() > 0;
+	}
+
+	public function getProblemStatusName(): ?string {
+		if (empty($this->problem_status)) {
+			return null;
+		}
+		return static::getProblemStatusesNames()[$this->problem_status];
+	}
+
+	public static function getProvidersTypesNames(): array {
+		return [
+			static::PROVIDER_CLIENT => Yii::t('settlement', 'Customer'),
+			static::PROVIDER_RESPONSIBLE_ENTITY => Yii::t('settlement', 'Entity responsible'),
+		];
+	}
+
+	public static function getTypesNames(): array {
+		return [
+			static::TYPE_HONORARIUM => Yii::t('settlement', 'Honorarium'),
+			static::TYPE_ADMINISTRATIVE => Yii::t('settlement', 'Administrative'),
+			static::TYPE_LAWYER => Yii::t('settlement', 'Lawyer'),
+			static::TYPE_SUBSCRIPTION => Yii::t('settlement', 'Subscription'),
+		];
+	}
+
+	public static function getProblemStatusesNames(): array {
+		return [
+			static::PROBLEM_STATUS_PREPEND_DEMAND => Yii::t('settlement', 'Prepariation for demand'),
+			static::PROBLEM_STATUS_DEMAND => Yii::t('settlement', 'Demand'),
+			static::PROBLEM_STATUS_PREPEND_JUDGEMENT => Yii::t('settlement', 'Prepariation for judgement'),
+			static::PROBLEM_STATUS_JUDGEMENT => Yii::t('settlement', 'Judgement'),
+			static::PROBLEM_STATUS_BAILLIF => Yii::t('settlement', 'Baillif'),
+
+		];
+	}
+
+	public function getStageName(): string {
+		return static::getStagesNames()[$this->stage_id];
+	}
+
+	public static function getStagesNames(): array {
+		if (static::$STAGES_NAMES === null) {
+			$ids = self::find()
+				->groupBy('stage_id')
+				->select('stage_id')
+				->column();
+			$models = IssueStage::find()
+				->andWhere(['id' => $ids])
+				->asArray()
+				->all();
+			static::$STAGES_NAMES = ArrayHelper::map($models, 'id', 'name');
+		}
+		return static::$STAGES_NAMES;
+	}
+
+	public static function getOwnerNames(): array {
+		if (static::$OWNER_NAMES === null) {
+			$ids = self::find()
+				->groupBy('owner_id')
+				->select('owner_id')
+				->column();
+			$models = User::find()
+				->andWhere(['id' => $ids])
+				->with('userProfile')
+				->all();
+			static::$OWNER_NAMES = ArrayHelper::map($models, 'id', 'fullName');
+		}
+		return static::$OWNER_NAMES;
 	}
 
 	public static function find(): IssuePayCalculationQuery {
 		return new IssuePayCalculationQuery(static::class);
 	}
 
+	public function getDeadlineAt(): ?DateTime {
+		// TODO: Implement getDeadlineAt() method.
+	}
+
+	public function getVAT(): ?Decimal {
+		// TODO: Implement getVAT() method.
+	}
+
+	public function getTransferType(): int {
+		// TODO: Implement getTransferType() method.
+	}
+
+	public function isDelayed(string $range = 'now'): bool {
+		foreach ($this->pays as $pay) {
+			if($pay->isDelayed($range)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function markAsPayment(DateTime $dateTime): void {
+		foreach ($this->pays as $pay){
+			if(!$pay->isPayed()){
+				$pay->markAsPayment($dateTime);
+			}
+		}
+	}
 }

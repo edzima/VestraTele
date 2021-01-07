@@ -85,7 +85,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_LAWYER,
-		'user_id' => 202,
+		'user_id' => 201,
 		'issue_id' => 5,
 	],
 	[
@@ -97,5 +97,25 @@ return [
 		'type' => IssueUser::TYPE_AGENT,
 		'user_id' => 301,
 		'issue_id' => 5,
+	],
+	[
+		'type' => IssueUser::TYPE_CUSTOMER,
+		'user_id' => 100,
+		'issue_id' => 6,
+	],
+	[
+		'type' => IssueUser::TYPE_LAWYER,
+		'user_id' => 202,
+		'issue_id' => 6,
+	],
+	[
+		'type' => IssueUser::TYPE_TELEMARKETER,
+		'user_id' => 300,
+		'issue_id' => 6,
+	],
+	[
+		'type' => IssueUser::TYPE_AGENT,
+		'user_id' => 301,
+		'issue_id' => 6,
 	],
 ];

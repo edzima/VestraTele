@@ -6,7 +6,12 @@ use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionQuery;
+use common\models\settlement\PayInterface;
+use common\models\settlement\VATInfo;
+use common\models\settlement\VATInfoTrait;
+use DateTime;
 use Decimal\Decimal;
+use Exception;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -30,15 +35,20 @@ use yii\db\ActiveRecord;
  * @property-read Provision[] $provisions
  * @property-read IssuePayCalculation $calculation
  */
-class IssuePay extends ActiveRecord {
+class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
+
+	use VATInfoTrait;
+
+	public const DATE_FORMAT = 'Y-m-d';
 
 	public const TRANSFER_TYPE_DIRECT = 1;
 	public const TRANSFER_TYPE_BANK = 2;
 
-	public const STATUS_NO_PROBLEM = 0;
-	public const STATUS_PROBLEM = 10;
-	public const STATUS_PRE_JUDGMENT = 20;
-	public const STATUS_JUDGMENT = 30;
+	public const STATUS_INFORMED = 1;
+	public const STATUS_NO_CONTACT = 10;
+	public const STATUS_REQUEST_PAY = 30;
+	public const STATUS_REQUEST_REDUCTION = 40;
+	public const STATUS_ANALYSE = 50;
 
 	/**
 	 * @inheritdoc
@@ -57,23 +67,45 @@ class IssuePay extends ActiveRecord {
 			[['pay_at', 'deadline_at'], 'safe'],
 			[['value', 'vat'], 'number', 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/', 'enableClientValidation' => false],
 			['vat', 'number', 'min' => 0, 'max' => 100],
-			[['status'], 'in', 'range' => array_keys(static::getStatusNames())],
+			[
+				['status'], 'in', 'range' => array_keys(static::getStatusNames()), 'when' => function (): bool {
+				return !empty($this->status);
+			},
+			],
 			[['transfer_type'], 'in', 'range' => array_keys(static::getTransferTypesNames())],
 			[['calculation_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssuePayCalculation::class, 'targetAttribute' => ['calculation_id' => 'id']],
 		];
 	}
 
-	//@todo move to PayController
-	public function afterSave($insert, $changedAttributes): void {
-		if ($this->isPayed() && (int) $this->calculation->getPays()->onlyNotPayed()->count() === 0) {
-			//	$this->calculation->markAsPayed();
-		}
-		parent::afterSave($insert, $changedAttributes);
+	public function setPay(PayInterface $pay): void {
+		$this->value = $pay->getValue()->toFixed(2);
+		$this->vat = $pay->getVAT() ? $pay->getVAT()->toFixed(2) : null;
+		$this->pay_at = $pay->getPaymentAt() ? $pay->getPaymentAt()->format(static::DATE_FORMAT) : null;
+		$this->deadline_at = $pay->getDeadlineAt() ? $pay->getDeadlineAt()->format(static::DATE_FORMAT) : null;
+		$this->transfer_type = $pay->getTransferType();
 	}
 
-	public function afterDelete(): void {
-		parent::afterDelete();
-		//$this->calculation->update();
+	public function getDeadlineAt(): ?DateTime {
+		try {
+			return $this->deadline_at ? new DateTime($this->deadline_at) : null;
+		} catch (Exception $e) {
+			Yii::warning($e->getMessage(), 'pays.deadline_at');
+
+			return null;
+		}
+	}
+
+	public function getValue(): Decimal {
+		return new Decimal($this->value);
+	}
+
+	public function getPaymentAt(): ?DateTime {
+		try {
+			return $this->pay_at ? new DateTime($this->pay_at) : null;
+		} catch (Exception $e) {
+			Yii::warning($e->getMessage(), 'pays.pay_at');
+			return null;
+		}
 	}
 
 	/**
@@ -82,11 +114,11 @@ class IssuePay extends ActiveRecord {
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'pay_at' => 'Data płatności',
-			'deadline_at' => 'Termin płatności',
-			'value' => 'Honorarium (Brutto)',
+			'pay_at' =>  Yii::t('settlement','Pay at'),
+			'deadline_at' => Yii::t('settlement','Deadline at'),
+			'value' => Yii::t('settlement','Value with VAT'),
 			'valueNetto' => 'Honorarium (Netto)',
-			'transfer_type' => 'Przelew/konto',
+			'transfer_type' => 'Typ płatności',
 			'partInfo' => 'Część',
 			'vat' => 'VAT (%)',
 			'vatPercent' => 'VAT (%)',
@@ -101,10 +133,6 @@ class IssuePay extends ActiveRecord {
 		return Yii::$app->tax->netto(new Decimal($this->value), new Decimal($this->vat))->toFloat();
 	}
 
-	public function getVatPercent(): float {
-		return $this->vat / 100;
-	}
-
 	public function getIssue(): IssueQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasOne(Issue::class, ['id' => 'issue_id'])->via('calculation');
@@ -116,7 +144,11 @@ class IssuePay extends ActiveRecord {
 	}
 
 	public function isPayed(): bool {
-		return $this->pay_at > 0;
+		return $this->getPaymentAt() !== null;
+	}
+
+	public function getTransferType(): int {
+		return $this->transfer_type;
 	}
 
 	public function getPartInfo(): string {
@@ -135,7 +167,7 @@ class IssuePay extends ActiveRecord {
 		return '';
 	}
 
-	public function getStatusName(): string {
+	public function getStatusName(): ?string {
 		return static::getStatusNames()[$this->status];
 	}
 
@@ -152,10 +184,11 @@ class IssuePay extends ActiveRecord {
 
 	public static function getStatusNames(): array {
 		return [
-			static::STATUS_NO_PROBLEM => 'Brak',
-			static::STATUS_PROBLEM => 'Problem',
-			static::STATUS_PRE_JUDGMENT => 'Przygotowanie do sądu',
-			static::STATUS_JUDGMENT => 'Sąd',
+			static::STATUS_INFORMED => Yii::t('settlement','Informed'),
+			static::STATUS_NO_CONTACT => Yii::t('settlement', 'No contact'),
+			static::STATUS_REQUEST_PAY => Yii::t('settlement','Pay request'),
+			static::STATUS_REQUEST_REDUCTION => Yii::t('settlement','Reduction request'),
+			static::STATUS_ANALYSE => Yii::t('settlement', 'Analyse'),
 		];
 	}
 
@@ -163,14 +196,16 @@ class IssuePay extends ActiveRecord {
 		return new IssuePayQuery(static::class);
 	}
 
-	/**
-	 * @param static[] $pays
-	 * @return static[]
-	 */
-	public static function payedFilter(array $pays): array {
-		return array_filter($pays, static function (IssuePay $pay) {
-			return $pay->isPayed();
-		});
+	public function isDelayed(string $range = 'now'): bool {
+		if ($this->isPayed() || $this->getDeadlineAt() === null) {
+			return false;
+		}
+		return new DateTime($range) > $this->getDeadlineAt();
 	}
 
+	public function markAsPayment(DateTime $dateTime): void {
+		$this->pay_at = $dateTime->format('Y-m-d');
+		$this->status = null;
+		$this->save(false);
+	}
 }

@@ -4,15 +4,19 @@ namespace common\models\issue\search;
 
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
+use common\models\user\SurnameSearchInterface;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\QueryInterface;
 
 /**
  * UserSearch represents the model behind the search form of `common\models\issue\IssueUser`.
  *
  */
-class UserSearch extends IssueUser implements ArchivedIssueSearch {
+class UserSearch extends IssueUser implements
+	ArchivedIssueSearch,
+	SurnameSearchInterface {
 
 	public string $surname = '';
 	public bool $withArchive = false;
@@ -24,7 +28,9 @@ class UserSearch extends IssueUser implements ArchivedIssueSearch {
 	public function rules(): array {
 		return [
 			[['issue_id'], 'integer'],
-			[['type', 'surname'], 'string'],
+			[['type'], 'string'],
+			['surname', 'string', 'min' => SurnameSearchInterface::MIN_LENGTH],
+
 		];
 	}
 
@@ -72,10 +78,7 @@ class UserSearch extends IssueUser implements ArchivedIssueSearch {
 			return $dataProvider;
 		}
 
-		if (!empty($this->surname)) {
-			$query->with('user.userProfile');
-			$query->andWhere(['like', 'user_profile.lastname', $this->surname . '%', false]);
-		}
+		$this->applySurnameFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -90,4 +93,10 @@ class UserSearch extends IssueUser implements ArchivedIssueSearch {
 		return $this->withArchive;
 	}
 
+	public function applySurnameFilter(QueryInterface $query): void {
+		if (!empty($this->surname)) {
+			$query->with('user.userProfile');
+			$query->andWhere(['like', 'user_profile.lastname', $this->surname . '%', false]);
+		}
+	}
 }

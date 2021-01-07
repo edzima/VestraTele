@@ -1,11 +1,15 @@
 <?php
 
 use common\models\issue\IssueUser;
+use common\models\user\Worker;
+use common\widgets\grid\ActionColumn;
+use common\widgets\grid\AgentDataColumn;
 use common\widgets\grid\CustomerDataColumn;
+use common\widgets\grid\DataColumn;
+use common\widgets\grid\IssueTypeColumn;
 use frontend\models\search\IssueSearch;
-use kartik\grid\DataColumn;
+use frontend\widgets\IssueColumn;
 use kartik\grid\GridView;
-use yii\grid\ActionColumn;
 use yii\grid\SerialColumn;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
@@ -24,6 +28,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 		<?= Html::a(Yii::t('frontend', 'Search issue user'), 'user', ['class' => 'btn btn-info']) ?>
+		<?= Html::a(Yii::t('frontend', 'Yours settlements'), '/settlement/index', ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('settlement', 'Pays'), '/pay/index', ['class' => 'btn btn-success']) ?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_PAY_RECEIVED)
+			? Html::a(Yii::t('settlement', 'Received pays'), '/pay-received/index', ['class' => 'btn btn-primary'])
+			: ''
+		?>
 	</p>
 	<?php Pjax::begin(); ?>
 	<?= $this->render('_search', ['model' => $searchModel]); ?>
@@ -38,26 +49,12 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 			['class' => SerialColumn::class],
 			[
-				'class' => DataColumn::class,
-				'attribute' => 'issue_id',
-				'options' => [
-					'style' => 'width:100px',
-				],
-
+				'class' => IssueColumn::class,
 			],
 			[
-				'class' => DataColumn::class,
+				'class' => IssueTypeColumn::class,
+				'valueType' => IssueTypeColumn::VALUE_NAME,
 				'attribute' => 'type_id',
-				'label' => $searchModel->getAttributeLabel('type_id'),
-				'filter' => IssueSearch::getTypesNames(),
-				'value' => 'issue.type.short_name',
-				'contentOptions' => [
-					'class' => 'bold-text text-center',
-				],
-				'options' => [
-					'style' => 'width:80px',
-				],
-
 			],
 			[
 				'class' => DataColumn::class,

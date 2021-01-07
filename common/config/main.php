@@ -1,10 +1,13 @@
 <?php
 
 use common\components\DbManager;
+use common\components\HierarchyComponent;
 use common\components\keyStorage\KeyStorage;
+use common\components\PayComponent;
 use common\components\Provisions;
 use common\components\TaxComponent;
 use common\formatters\Formatter;
+use common\models\user\User;
 use common\modules\address\Module as AddressModule;
 use edzima\teryt\Module as TerytModule;
 use yii\caching\DummyCache;
@@ -110,11 +113,19 @@ return [
 		'cache' => [
 			'class' => YII_ENV_DEV ? DummyCache::class : FileCache::class,
 		],
+		'pay' => [
+			'class' => PayComponent::class,
+		],
 		'provisions' => [
 			'class' => Provisions::class,
 		],
 		'tax' => [
 			'class' => TaxComponent::class,
+		],
+		'userHierarchy' => [
+			'class' =>HierarchyComponent::class,
+			'modelClass' => User::class,
+			'parentColumn' => 'boss',
 		],
 	],
 ];

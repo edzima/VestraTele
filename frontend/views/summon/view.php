@@ -1,5 +1,6 @@
 <?php
 
+use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -21,7 +22,12 @@ YiiAsset::register($this);
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
+		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
+			? Html::a(Yii::t('common', 'Create note'), ['/note/summon', 'id' => $model->id], ['class' => 'btn btn-info'])
+			: ''
+		?>
 		<?= Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+
 	</p>
 	<?= DetailView::widget([
 		'model' => $model,
@@ -40,8 +46,8 @@ YiiAsset::register($this);
 				'attribute' => 'deadline',
 				'format' => 'date',
 				'options' => [
-						'class' => 'red-text'
-				]
+					'class' => 'red-text',
+				],
 			],
 
 			'created_at:datetime',
@@ -51,7 +57,7 @@ YiiAsset::register($this);
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model->issue,
-		'notes' => $model->issue->getIssueNotes()->onlySummon($model->id)->all(),
+		'notes' => $model->issue->getIssueNotes()->joinWith('user.userProfile')->onlySummon($model->id)->all(),
 		'addUrl' => Url::to(['/note/create-summon', 'id' => $model->id]),
 		'noteOptions' => [
 			'removeBtn' => false,

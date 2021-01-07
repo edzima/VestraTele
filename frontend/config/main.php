@@ -1,5 +1,8 @@
 <?php
 
+use common\components\User as WebUser;
+use common\models\user\User;
+
 $params = array_merge(
 	require __DIR__ . '/../../common/config/params.php',
 	require __DIR__ . '/../../common/config/params-local.php',
@@ -35,7 +38,8 @@ return [
 			'csrfParam' => '_csrf-frontend',
 		],
 		'user' => [
-			'identityClass' => 'common\models\user\User',
+			'class' => WebUser::class,
+			'identityClass' => User::class,
 			//			'loginUrl' => ['/account/sign-in/login'],
 			'enableAutoLogin' => true,
 			'identityCookie' => ['name' => '_identity-front', 'httpOnly' => true],

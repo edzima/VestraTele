@@ -3,8 +3,8 @@
 namespace frontend\tests\unit\search;
 
 use common\fixtures\helpers\IssueFixtureHelper;
-use common\tests\unit\Unit;
 use frontend\models\search\IssueSearch;
+use frontend\tests\unit\Unit;
 use yii\base\InvalidConfigException;
 
 class IssueSearchTest extends Unit {

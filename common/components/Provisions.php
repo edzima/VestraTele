@@ -7,7 +7,9 @@ use common\models\issue\IssuePay;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionUser;
+use common\models\user\User;
 use common\models\user\Worker;
+use Decimal\Decimal;
 use Yii;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
@@ -34,6 +36,12 @@ class Provisions extends Component {
 		Provision::deleteAll(['pay_id' => ArrayHelper::getColumn($issue->pays, 'id')]);
 	}
 
+	public function removeForPays(array $ids): void {
+		if (!empty($ids)) {
+			Provision::deleteAll(['pay_id' => $ids]);
+		}
+	}
+
 	public function hasAllProvisions(Worker $user): bool {
 		$typesIds = $this->getTypesIdsForUser($user->id);
 		$toUserIds = $user->getParentsIds();
@@ -51,13 +59,17 @@ class Provisions extends Component {
 	 * @param Issue $issue
 	 * @return ProvisionUser[][]
 	 */
-	public function getIssueUsersProvisions(Issue $issue): array {
-		$provisions = $this->issueProvisions($issue);
-		return [
-			'agent' => $this->userFilter($this->roleFilter($provisions, Worker::ROLE_AGENT), $issue->agent_id),
-			'lawyer' => $this->userFilter($this->roleFilter($provisions, Worker::ROLE_LAWYER), $issue->lawyer_id),
-			'tele' => ($issue->hasTele() ? $this->userFilter($this->roleFilter($provisions, Worker::ROLE_TELEMARKETER), $issue->tele_id) : []),
-		];
+	public function getIssueWorkersProvisions(Issue $issue): array {
+		$workers = $issue->getUsers()->onlyWorkers()
+			->indexBy('type')
+			->all();
+		$ids = ArrayHelper::getColumn($workers, 'user_id');
+		$provisions = $this->issueProvisions($issue, $ids);
+		$workersProvisions = [];
+		foreach ($workers as $worker) {
+			$workersProvisions[$worker->type] = $this->userFilter($this->roleFilter($provisions, $worker->type), $worker->user_id);
+		}
+		return $workersProvisions;
 	}
 
 	/**
@@ -66,7 +78,7 @@ class Provisions extends Component {
 	 * @param IssuePay[] $pays
 	 * @return int
 	 */
-	public function add(Worker $user, int $typeId, array $pays): int {
+	public function add(User $user, int $typeId, array $pays): int {
 		$usersProvision = ProvisionUser::find()
 			->andWhere(['from_user_id' => $user->id])
 			->andWhere(['type_id' => $typeId])
@@ -75,14 +87,13 @@ class Provisions extends Component {
 		$provisions = [];
 		foreach ($pays as $pay) {
 			foreach ($usersProvision as $provisionUser) {
-				$brutto = $this->calculateProvision($provisionUser, $pay->value);
-				$value = Yii::$app->tax->netto($brutto, $pay->vat);
+				$value = $this->calculateProvision($provisionUser, $pay->getValueWithoutVAT());
 				if ($value > 0) {
 					$provisions[] = [
 						'pay_id' => $pay->id,
 						'to_user_id' => $provisionUser->to_user_id,
 						'from_user_id' => $provisionUser->from_user_id,
-						'value' => $value,
+						'value' => $value->toFixed(2),
 						'type_id' => $typeId,
 					];
 				}
@@ -99,16 +110,16 @@ class Provisions extends Component {
 			->execute();
 	}
 
-	private function calculateProvision(ProvisionUser $provisionUser, float $value): float {
+	private function calculateProvision(ProvisionUser $provisionUser, Decimal $value): Decimal {
 		if ($provisionUser->type->is_percentage) {
-			return $value * $provisionUser->value / 100;
+			return $value->mul($provisionUser->getValue())->div(100);
 		}
-		return $provisionUser->value;
+		return $provisionUser->getValue();
 	}
 
 	public function isValidForIssue(Issue $issue, ProvisionUser $provisionUser): bool {
-		return empty($provisionUser->type->getTypesIds())
-			|| in_array($issue->type_id, $provisionUser->type->getTypesIds());
+		return empty($provisionUser->type->getIssueTypesIds())
+			|| in_array($issue->type_id, $provisionUser->type->getIssueTypesIds());
 	}
 
 	public function isTypeForUser(ProvisionType $type, int $userId): bool {
@@ -129,16 +140,12 @@ class Provisions extends Component {
 		return $ids;
 	}
 
-	private function issueProvisions(Issue $issue): array {
+	private function issueProvisions(Issue $issue, array $usersIds): array {
 		$models = ProvisionUser::find()
 			->with('type')
 			->joinWith('type T')
 			->andWhere([
-				'from_user_id' => [
-					$issue->agent_id,
-					$issue->tele_id,
-					$issue->lawyer_id,
-				],
+				'from_user_id' => $usersIds,
 			])
 			->orderBy('T.only_with_tele DESC')
 			->all();

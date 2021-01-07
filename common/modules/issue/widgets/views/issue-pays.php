@@ -4,7 +4,6 @@ use common\models\issue\IssuePay;
 use common\modules\issue\widgets\IssuePaysWidget;
 use kartik\grid\GridView;
 use yii\bootstrap\Html;
-use yii\data\ActiveDataProvider;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
@@ -21,17 +20,42 @@ use yii\widgets\DetailView;
 			<i class="glyphicon glyphicon-chevron-down"></i></button>
 	</legend>
 	<div id="pays-details">
+
+
 		<?php foreach ($models as $key => $pay): ?>
 			<fieldset>
 				<div class="pay-wrapper border <?= $pay->isPayed() ? 'border-green' : 'border-red' ?>">
 
-
-					<legend>Wpłata <?= count($models) > 1 ? $key + 1 : '' ?></legend>
+					<?= count($models) > 1
+						? Html::tag('legend', ($key + 1) . '.')
+						: ''
+					?>
 					<p>
-						<?= $widget->editPayBtn ? Html::a($pay->isPayed() ? 'Edytuj' : 'Opłać',
-							['/issue/pay/pay', 'id' => $pay->id], [
-								'class' => 'btn btn-primary',
-							]) : '' ?>
+						<?= $widget->updateLink !== null
+							? call_user_func($widget->updateLink, $pay)
+							: ''
+						?>
+						<?= $widget->updateLink !== null
+							? call_user_func($widget->updateLink, $pay)
+							: ''
+						?>
+
+						<?= $widget->editPayBtn
+							? Html::a($pay->isPayed() ? 'Edytuj' : 'Opłać',
+								['/settlement/pay/pay', 'id' => $pay->id], [
+									'class' => 'btn btn-primary',
+								])
+							: ''
+						?>
+
+
+						<?= $widget->editPayBtn
+							? Html::a($pay->isPayed() ? 'Edytuj' : 'Opłać',
+								['/settlement/pay/pay', 'id' => $pay->id], [
+									'class' => 'btn btn-primary',
+								])
+							: ''
+						?>
 					</p>
 					<?= DetailView::widget([
 						'model' => $pay,
@@ -39,40 +63,44 @@ use yii\widgets\DetailView;
 							'class' => 'table table-striped table-bordered detail-view th-nowrap',
 						],
 						'attributes' => [
-							'pay_at:date',
-							'deadline_at:date',
+							[
+								'attribute' => 'pay_at',
+								'format' => 'date',
+								'visible' => $pay->isPayed(),
+							],
+							[
+								'attribute' => 'deadline_at',
+								'format' => 'date',
+								'visible' => !$pay->isPayed(),
+							],
 							[
 								'attribute' => 'transferTypeName',
 								'label' => 'Płatność',
 								'format' => 'raw',
 							],
-							'value:currency',
+							'valueWithVAT:currency:Honorarium (Brutto)',
+							'valueVAT:currency:VAT(%)',
 							'valueNetto:currency',
-							'vatPercent:percent',
-
 						],
 
 					]) ?>
-					<?php if ($withProvisions): ?>
-						<fieldset>
-							<legend>Prowizje</legend>
-
-							<?
-							if (($dataProvider = $widget->getProvisionsProvider($pay)) instanceof ActiveDataProvider) {
-								echo GridView::widget([
-									'dataProvider' => $dataProvider,
-									'columns' => [
-										'toUser',
-										'fromUserString',
-										'value:currency',
-									],
-								]);
-							}
-							?>
-						</fieldset>
-					<? endif; ?>
+					<?php if ($withProvisions) {
+						$dataProvider = $widget->getProvisionsProvider($pay);
+						if ($dataProvider !== null && $dataProvider->getTotalCount() > 0) {
+							echo Html::tag('legend', 'Prowizje');
+							echo GridView::widget([
+								'dataProvider' => $dataProvider,
+								'columns' => [
+									'toUser',
+									'fromUserString',
+									'value:currency',
+								],
+							]);
+						}
+					} ?>
 				</div>
 			</fieldset>
 		<?php endforeach; ?>
+
 	</div>
 </fieldset>

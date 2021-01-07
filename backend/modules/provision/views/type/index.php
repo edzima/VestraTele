@@ -1,15 +1,15 @@
 <?php
 
 use common\models\provision\ProvisionTypeSearch;
-use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel ProvisionTypeSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Typy';
-$this->params['breadcrumbs'][] = ['label' => 'Prowizje', 'url' => ['/provision/provision']];
+$this->title = Yii::t('backend', 'Provisions types');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Provisions'), 'url' => ['/provision/provision']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="provision-type-index">
@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Html::a('Dodaj typ', ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('backend', 'Create'), ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
 
 
@@ -32,8 +32,9 @@ $this->params['breadcrumbs'][] = $this->title;
 			'is_percentage:boolean',
 			'only_with_tele:boolean',
 			'is_default:boolean',
+			'calculationTypesNames',
 			'rolesNames',
-			'typesNames',
+			'issueTypesNames',
 			//'date_from:date',
 			//'date_to:date',
 

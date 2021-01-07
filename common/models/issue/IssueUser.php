@@ -21,7 +21,9 @@ use yii\db\ActiveRecord;
  * @property Issue $issue
  * @property User $user
  */
-class IssueUser extends ActiveRecord {
+class IssueUser extends ActiveRecord implements IssueInterface {
+
+	use IssueTrait;
 
 	public const TYPE_LAWYER = Worker::ROLE_LAWYER;
 	public const TYPE_AGENT = Worker::ROLE_AGENT;
@@ -64,6 +66,10 @@ class IssueUser extends ActiveRecord {
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 		];
+	}
+
+	public function getTypeWithUser(): string {
+		return $this->getTypeName() . ' - ' . $this->user->getFullName();
 	}
 
 	public function getTypeName(): string {

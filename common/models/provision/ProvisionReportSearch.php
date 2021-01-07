@@ -3,7 +3,6 @@
 namespace common\models\provision;
 
 use common\models\user\User;
-use common\models\user\Worker;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -14,7 +13,6 @@ use yii\helpers\ArrayHelper;
  *
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  *
- * @property-read Worker $user
  */
 class ProvisionReportSearch extends ProvisionSearch {
 

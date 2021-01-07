@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use backend\modules\issue\models\IssueNoteForm;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
+use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
 use common\models\user\Worker;
 use Yii;
@@ -49,37 +50,61 @@ class NoteController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionCreate(int $issueId) {
+	public function actionIssue(int $id) {
+		$issue = Issue::findOne($id);
+		if ($issue === null || !Yii::$app->user->canSeeIssue($issue)) {
+			throw new NotFoundHttpException();
+		}
 		$note = new IssueNote();
-		$note->issue_id = $this->findIssueModel($issueId)->id;
-		$note->user_id = Yii::$app->user->id;
+		$note->issue_id = $issue->id;
+		$note->user_id = Yii::$app->user->getId();
 
 		$model = new IssueNoteForm($note);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$this->redirectIssue($issueId);
+			$this->redirect(['/issue/view', 'id' => $issue->id]);
 		}
-		return $this->render('create', [
+		return $this->render('issue', [
 			'model' => $model,
 		]);
 	}
 
-	public function actionCreateSummon(int $id) {
+	public function actionSettlement(int $id) {
+		$settlement = IssuePayCalculation::findOne($id);
+		if ($settlement === null || !Yii::$app->user->canSeeIssue($settlement->getIssueModel())) {
+			throw new NotFoundHttpException();
+		}
+		$note = new IssueNote();
+		$note->issue_id = $settlement->issue_id;
+		$note->user_id = Yii::$app->user->getId();
+		$note->type = IssueNote::generateType(IssueNote::TYPE_SETTLEMENT, $settlement->id);
+		$model = new IssueNoteForm($note);
+
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$this->redirect(['/settlement/view', 'id' => $settlement->id]);
+		}
+		return $this->render('settlement', [
+			'model' => $model,
+			'settlement' => $settlement,
+		]);
+	}
+
+	public function actionSummon(int $id) {
 		$summon = Summon::findOne($id);
-		if ($summon === null) {
-			throw new NotFoundHttpException('The requested page does not exist.');
+		if ($summon === null || !Yii::$app->user->canSeeIssue($summon->getIssueModel())) {
+			throw new NotFoundHttpException();
 		}
 		$note = new IssueNote();
 		$note->issue_id = $summon->issue_id;
 		$note->user_id = Yii::$app->user->id;
 		$note->type = IssueNote::generateType(IssueNote::TYPE_SUMMON, $summon->id);
-		$note->typeName = Yii::t('common', 'Summon: {title}', ['title' => $summon->title]);
 		$model = new IssueNoteForm($note);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirectIssue($summon->issue_id);
+			$this->redirect(['/summon/view', 'id' => $summon->id]);
 		}
-		return $this->render('create', [
+		return $this->render('summon', [
 			'model' => $model,
+			'summon' => $summon,
 		]);
 	}
 
@@ -112,15 +137,16 @@ class NoteController extends Controller {
 	 * @return IssueNote the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): IssueNote {
-		if (($model = IssueNote::find()->andWhere(['id' => $id, 'user_id' => Yii::$app->user->id])->one()) !== null) {
+	protected function findModel(int $id): IssueNote {
+		if (($model = IssueNote::find()
+				->andWhere([
+					'id' => $id,
+					'user_id' => Yii::$app->user->id,
+				])
+				->one()) !== null) {
 			return $model;
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');
-	}
-
-	protected function findIssueModel(int $id): Issue {
-		return IssueController::findModel($id);
 	}
 
 }

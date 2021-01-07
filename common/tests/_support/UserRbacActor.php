@@ -76,7 +76,7 @@ trait UserRbacActor {
 		}
 	}
 
-	protected function assignPermission(string $name): void {
+	public function assignPermission(string $name): void {
 		$auth = $this->getAuth();
 		try {
 			$auth->assign($auth->getPermission($name), $this->getUser()->id);

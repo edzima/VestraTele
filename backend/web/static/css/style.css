@@ -103,3 +103,37 @@ div.required label:after {
 	right: 0;
 }
 
+.settlement-pay-index {
+	position: relative;
+}
+
+.issue-pay-search .fields-wrapper {
+	display: flex;
+	align-items: center;
+}
+
+
+@media (min-width: 1140px) {
+	.issue-pay-search .fields-wrapper {
+		position: absolute;
+		top: 30px;
+		right: 0;
+	}
+
+	.issue-pay-search .form-group {
+		max-width: 140px;
+	}
+}
+
+
+.d-inline-flex {
+	display: inline-flex;
+}
+
+.justify-center{
+	justify-content: center;
+}
+
+.width-100 {
+	width: 100% !important;
+}

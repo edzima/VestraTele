@@ -135,5 +135,6 @@ return [
 	'Confirm phone number' => 'Confirm phone number',
 	'Ask for availability' => 'Ask for availability',
 	'My profile' => 'My profile',
-	'Code isn\'t the same as send in SMS' => 'Code isn\'t the same as send in SMS'
+	'Code isn\'t the same as send in SMS' => 'Code isn\'t the same as send in SMS',
+	'Yours settlements' => 'Rozliczenia',
 ];

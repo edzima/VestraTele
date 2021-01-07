@@ -32,13 +32,32 @@ class RbacController extends Controller {
 
 	public array $permissions = [
 		User::PERMISSION_ARCHIVE,
-		User::PERMISSION_COST,
+		User::PERMISSION_COST => [
+			User::ROLE_BOOKKEEPER,
+		],
+		User::PERMISSION_CALCULATION_TO_CREATE => [
+			User::ROLE_BOOKKEEPER,
+		],
+		User::PERMISSION_CALCULATION_PAYS => [
+			User::ROLE_BOOKKEEPER,
+		],
+		User::PERMISSION_CALCULATION_PROBLEMS => [
+			User::ROLE_BOOKKEEPER,
+		],
+		User::PERMISSION_EXPORT,
 		User::PERMISSION_ISSUE,
 		User::PERMISSION_LOGS,
 		User::PERMISSION_MEET,
 		User::PERMISSION_NEWS,
 		User::PERMISSION_NOTE,
+		User::PERMISSION_PROVISION,
+		User::PERMISSION_PAY => [
+			User::ROLE_BOOKKEEPER,
+		],
 		User::PERMISSION_PAYS_DELAYED => [
+			User::ROLE_BOOKKEEPER,
+		],
+		User::PERMISSION_PAY_RECEIVED => [
 			User::ROLE_BOOKKEEPER,
 		],
 		User::PERMISSION_SUMMON => [
@@ -127,10 +146,25 @@ class RbacController extends Controller {
 		return $auth->addChild($admin, $item);
 	}
 
-	public function actionAddRole(string $role): void {
+	public function actionAddRole(string $name, bool $admin = true): void {
 		$auth = Yii::$app->authManager;
-		$auth->add($auth->createRole($role));
-		Console::output('Success add role: ' . $role);
+		$role = $auth->createRole($name);
+
+		$auth->add($role);
+		if ($admin) {
+			$this->assignAdmin($role);
+		}
+
+		Console::output('Success add role: ' . $name);
 	}
 
+	public function actionAddPermission(string $name, bool $admin = true): void {
+		$auth = Yii::$app->authManager;
+		$permission = $auth->createPermission($name);
+		$auth->add($permission);
+		if ($admin) {
+			$this->assignAdmin($permission);
+		}
+		Console::output('Success add permission: ' . $name);
+	}
 }

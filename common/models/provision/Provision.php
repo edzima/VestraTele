@@ -3,7 +3,7 @@
 namespace common\models\provision;
 
 use common\models\issue\IssuePay;
-use common\models\user\Worker;
+use common\models\user\User;
 use Decimal\Decimal;
 use Yii;
 use yii\db\ActiveQuery;
@@ -22,10 +22,9 @@ use yii\db\ActiveRecord;
  *
  * @property-read string $provision
  * @property-read IssuePay $pay
- * @property-read Worker $user
  * @property-read ProvisionType $type
- * @property-read Worker $toUser
- * @property-read Worker $fromUser
+ * @property-read User $toUser
+ * @property-read User $fromUser
  */
 class Provision extends ActiveRecord {
 
@@ -75,11 +74,11 @@ class Provision extends ActiveRecord {
 	}
 
 	public function getFromUser(): ActiveQuery {
-		return $this->hasOne(Worker::class, ['id' => 'from_user_id']);
+		return $this->hasOne(User::class, ['id' => 'from_user_id']);
 	}
 
 	public function getToUser(): ActiveQuery {
-		return $this->hasOne(Worker::class, ['id' => 'to_user_id']);
+		return $this->hasOne(User::class, ['id' => 'to_user_id']);
 	}
 
 	public function getType(): ActiveQuery {

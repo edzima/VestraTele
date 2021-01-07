@@ -1,15 +1,24 @@
 <?php
 
-namespace common\tests\functional;
+namespace frontend\tests\functional;
 
+use common\fixtures\helpers\IssueFixtureHelper;
+use common\models\issue\Issue;
+use common\models\user\User;
+use frontend\controllers\IssueController;
+use frontend\tests\_support\CustomerServiceTester;
 use frontend\tests\_support\IssueUserTester;
+use frontend\tests\_support\PayReceivedTester;
 use frontend\tests\FunctionalTester;
 
 class IssueCest {
 
+	/** @see IssueController::actionIndex() */
 	public const ROUTE_INDEX = '/issue/index';
+	/** @see IssueController::actionView() */
+	public const ROUTE_VIEW = '/issue/view';
 
-	public function checkWithoutLogin(FunctionalTester $I): void {
+	public function checkAsGuest(FunctionalTester $I): void {
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->dontSeeMenuLink('Issues');
 	}
@@ -20,11 +29,26 @@ class IssueCest {
 		$I->dontSeeMenuLink('Issues');
 	}
 
+	public function checkAsAgent(FunctionalTester $I): void {
+		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		$I->amLoggedInAs($I->grabAgent('with-childs')->id);
+		$I->amOnPage(static::ROUTE_INDEX);
+		$I->seeMenuLink('Issues');
+	}
+
 	public function checkAsIssueUser(IssueUserTester $I): void {
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->seeMenuLink('Issues');
+		$I->dontSeeLink('Received pays');
+		$I->dontSeeLink('Create note');
 		$I->see('Issues', 'h1');
+	}
+
+	public function checkAsPayReceived(PayReceivedTester $I): void {
+		$I->amLoggedIn();
+		$I->amOnPage(static::ROUTE_INDEX);
+		$I->seeLink('Received pays');
 	}
 
 	public function checkIssueUserLink(IssueUserTester $I): void {
@@ -34,4 +58,52 @@ class IssueCest {
 		$I->click('Search issue user');
 		$I->see('Issues users');
 	}
+
+	public function checkSettlementLink(IssueUserTester $I): void {
+		$I->amLoggedIn();
+		$I->amOnPage(static::ROUTE_INDEX);
+		$I->seeLink('Yours settlements');
+		$I->click('Yours settlements');
+		$I->seeInCurrentUrl(SettlementCest::ROUTE_INDEX);
+		$I->seeResponseCodeIsSuccessful();
+	}
+
+	public function checkView(IssueUserTester $I): void {
+		$I->amLoggedIn();
+		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		/** @var Issue $issue */
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
+		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->id]);
+		$I->seeResponseCodeIsClientError();
+	}
+
+	public function checkViewAsCustomerService(CustomerServiceTester $I): void {
+		$I->amLoggedIn();
+		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		/** @var Issue $issue */
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
+		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->id]);
+		$I->see($issue->longId, 'h1');
+		$I->dontSeeLink('Create note');
+	}
+
+	public function checkNoteLinkWithoutPermission(CustomerServiceTester $I): void {
+		$I->amLoggedIn();
+		$I->amOnPage(static::ROUTE_VIEW);
+		$I->dontSeeLink('Create note');
+	}
+
+	public function checkNoteLinkWithPermission(CustomerServiceTester $I): void {
+		$I->haveFixtures(IssueFixtureHelper::fixtures());
+
+		$I->assignPermission(User::PERMISSION_NOTE);
+		$I->amLoggedIn();
+		/** @var Issue $issue */
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
+		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->id]);
+		$I->seeLink('Create note');
+		$I->click('Create note');
+		$I->seeInCurrentUrl(NoteCest::ROUTE_ISSUE);
+	}
+
 }

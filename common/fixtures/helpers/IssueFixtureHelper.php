@@ -7,9 +7,11 @@ use common\fixtures\issue\IssueFixture;
 use common\fixtures\issue\IssueUserFixture;
 use common\fixtures\issue\StageFixture;
 use common\fixtures\issue\StageTypesFixtures;
+use common\fixtures\issue\SummonFixture;
 use common\fixtures\issue\TypeFixture;
 use common\fixtures\settlement\CalculationFixture;
 use common\fixtures\settlement\PayFixture;
+use common\fixtures\settlement\PayReceivedFixture;
 use common\fixtures\user\AgentFixture;
 use common\fixtures\user\CustomerFixture;
 use common\fixtures\user\LawyerFixture;
@@ -20,9 +22,15 @@ use Yii;
 
 class IssueFixtureHelper {
 
+	public const ISSUE_COUNT = 6;
+	public const ARCHIVED_ISSUE_COUNT = 1;
+
+	public const AGENT = 'agent';
 	public const CALCULATION = 'calculation';
 	public const PAY = 'pay';
 	public const ISSUE = 'issue';
+	public const SUMMON = 'summon';
+	public const PAY_RECEIVED = 'pay-received';
 
 	public static function dataDir(): string {
 		return Yii::getAlias('@common/tests/_data/');
@@ -47,7 +55,7 @@ class IssueFixtureHelper {
 				'class' => UserProfileFixture::class,
 				'dataFile' => static::dataDir() . 'user/customer_profile.php',
 			],
-			'agent' => [
+			static::AGENT => [
 				'class' => AgentFixture::class,
 				'dataFile' => static::dataDir() . 'user/agent.php',
 				'permissions' => [User::PERMISSION_ISSUE],
@@ -95,6 +103,24 @@ class IssueFixtureHelper {
 			static::PAY => [
 				'class' => PayFixture::class,
 				'dataFile' => static::dataDir() . 'settlement/pay.php',
+			],
+		];
+	}
+
+	public static function payReceived(): array {
+		return [
+			static::PAY_RECEIVED => [
+				'class' => PayReceivedFixture::class,
+				'dataFile' => static::dataDir() . 'settlement/pay-received.php',
+			],
+		];
+	}
+
+	public static function summon(): array {
+		return [
+			static::SUMMON => [
+				'class' => SummonFixture::class,
+				'dataFile' => static::dataDir() . 'issue/summon.php',
 			],
 		];
 	}

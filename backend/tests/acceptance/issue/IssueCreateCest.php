@@ -40,6 +40,7 @@ class IssueCreateCest {
 
 		$I->fillOutSelect2OptionField('.field-issueform-lawyer_id', 'lawyer1');
 		$I->fillOutSelect2OptionField('.field-issueform-agent_id', 'agent1');
+		$I->fillField('Signing at','2020-02-02');
 		$I->click('#issue-form button[type=submit]');
 		$I->wait(2);
 		$I->seeLink('Update');
@@ -57,6 +58,7 @@ class IssueCreateCest {
 		$I->click('#issue-form button[type=submit]');
 		$I->wait(1);
 		$I->seeValidationError('Type cannot be blank.');
+		$I->seeValidationError('Signing at cannot be blank.');
 		$I->seeValidationError('Entity responsible cannot be blank.');
 		$I->seeValidationError('lawyer cannot be blank.');
 		$I->seeValidationError('agent cannot be blank.');

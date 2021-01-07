@@ -2,13 +2,14 @@
 
 namespace backend\helpers;
 
-use yii\helpers\BaseUrl;
+use common\helpers\Url as BaseUrl;
 
+/**
+ * Url helper for backend app.
+ *
+ * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
+ */
 class Url extends BaseUrl {
-
-	public static function issueView(int $id): string {
-		return static::to(['/issue/issue/view', 'id' => $id]);
-	}
 
 	public static function userProvisions(int $userId): string {
 		return static::to(['/provision/user/user', 'id' => $userId]);
