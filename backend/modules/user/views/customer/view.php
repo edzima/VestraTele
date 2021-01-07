@@ -35,13 +35,34 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [
-			'email',
-			'profile.phone',
-			'profile.phone_2',
-			'traitsNames',
-			'statusName',
-			'username',
-			'profile.other',
+			[
+				'label' => Yii::t('backend', 'Email'),
+				'value' => $model->email
+			],
+			[
+				'label' => Yii::t('common', 'Phone number'),
+				'value' => $model->profile->phone
+			],
+			[
+				'label' => Yii::t('common', 'Phone number 2'),
+				'value' => $model->profile->phone_2
+			],
+			[
+				'label' => Yii::t('backend', 'Traits'),
+				'value' => $model->getTraitsNames()
+			],
+			[
+				'label' => Yii::t('backend', 'Status'),
+				'value' => $model->getStatusName()
+			],
+			[
+				'label' => Yii::t('backend', 'Username'),
+				'value' => $model->username
+			],
+			[
+				'label' => Yii::t('backend', 'Other'),
+				'value' => $model->profile->other
+			],
 		],
 	]) ?>
 
