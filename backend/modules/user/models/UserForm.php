@@ -114,6 +114,7 @@ class UserForm extends Model {
 			'status' => Yii::t('backend', 'Status'),
 			'roles' => Yii::t('backend', 'Roles'),
 			'permissions' => Yii::t('backend', 'Permissions'),
+			'traits' => Yii::t('common', 'Traits'),
 		];
 	}
 

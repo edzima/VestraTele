@@ -239,4 +239,5 @@ return [
 	'pays.delayed' => 'Przeterminowane wpłaty',
 	'Yes' => 'Tak',
 	'No' => 'Nie',
+	'Traits' => 'Cechy'
 ];
