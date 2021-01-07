@@ -195,5 +195,6 @@ return [
 	'Surname' => 'Nazwisko',
 	'Signing at' => 'Data podpisania umowy',
 	'Bailiff' => 'Komornik',
-	'Liabilities' => 'Zadłużenie'
+	'Liabilities' => 'Zadłużenie',
+	'Disability result of case' => 'Niepełnosprawność w wyniku wypadku'
 ];

@@ -18,6 +18,7 @@ class UserTrait extends ActiveRecord {
 
 	public const TRAIT_BAILIFF = 1;
 	public const TRAIT_LIABILITIES = 2;
+	public const TRAIT_DISABILITY_RESULT_OF_CASE = 3;
 
 	/**
 	 * {@inheritdoc}
@@ -61,6 +62,7 @@ class UserTrait extends ActiveRecord {
 		return [
 			static::TRAIT_BAILIFF => Yii::t('common', 'Bailiff'),
 			static::TRAIT_LIABILITIES => Yii::t('common', 'Liabilities'),
+			static::TRAIT_DISABILITY_RESULT_OF_CASE => Yii::t('common', 'Disability result of case'),
 		];
 	}
 
