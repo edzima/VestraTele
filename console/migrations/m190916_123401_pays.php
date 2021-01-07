@@ -16,7 +16,6 @@ class m190916_123401_pays extends Migration {
 			'id' => $this->primaryKey(),
 			'issue_id' => $this->integer()->notNull(),
 			'type' => $this->smallInteger()->notNull(),
-			//@todo remove status & pay_type columns after full migrate from prod DB
 			'status' => $this->smallInteger()->notNull(),
 			'pay_type' => $this->smallInteger()->notNull(),
 			'value' => $this->decimal(10, 2)->notNull(),
@@ -38,7 +37,7 @@ class m190916_123401_pays extends Migration {
 			'deadline_at' => $this->date()->notNull(),
 			'value' => $this->decimal(10, 2)->notNull(),
 			'status' => $this->integer()->notNull(),
-			'transfer_type' => $this->smallInteger()->notNull(),
+			'transfer_type' => $this->smallInteger(),
 		]);
 
 		$this->addForeignKey('fk_issue_pay_issue', '{{%issue_pay}}', 'issue_id', '{{%issue}}', 'id', 'CASCADE', 'CASCADE');
