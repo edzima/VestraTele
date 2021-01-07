@@ -194,7 +194,7 @@ return [
 	'Signing at' => 'Data podpisania umowy',
 	'Bailiff' => 'Komornik',
 	'Liabilities' => 'Zadłużenie',
-	'Disability result of case' => 'Niepełnosprawność w wyniku wypadku'
+	'Disability result of case' => 'Niepełnosprawność w wyniku wypadku',
 	'Customer' => 'Klient',
 	'Payement at' => 'Opłacono w',
 	'Provider name' => 'Wpłacający',
