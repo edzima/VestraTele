@@ -2,6 +2,7 @@
 
 namespace backend\tests\functional\settlement;
 
+use backend\modules\settlement\controllers\PayReceivedController;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\PayReceivedManager;
 use common\fixtures\helpers\IssueFixtureHelper;
@@ -9,7 +10,10 @@ use Yii;
 
 class PayReceivedCest {
 
+	/** @see PayReceivedController::actionIndex() */
 	public const ROUTE_INDEX = '/settlement/pay-received/index';
+
+	/** @see PayReceivedController::actionReceive() */
 	public const ROUTE_RECEIVE_PAYS = '/settlement/pay-received/receive';
 
 	protected const FORM_SELECTOR = '#receive-pays-form';
@@ -24,7 +28,7 @@ class PayReceivedCest {
 		$I->seeMenuLink('Received pays');
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->seeInTitle('Received pays');
-		$I->seeInGridHeader('Calculation Type');
+		$I->seeInGridHeader('Settlement type');
 		$I->seeInGridHeader('Receiver');
 		$I->seeInGridHeader('Agent');
 		$I->seeInGridHeader('Customer');
