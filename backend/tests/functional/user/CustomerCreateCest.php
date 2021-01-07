@@ -125,15 +125,14 @@ class CustomerCreateCest {
 		$I->seeValidationError('Email is not a valid email address.');
 	}
 
-	public function checkWithTraits(FunctionalTester $I): void{
+	public function checkWithTrait(FunctionalTester $I): void {
 		$I->fillField('Firstname', 'Fred');
 		$I->fillField('Lastname', 'Johansson');
 		$I->fillField('Postal Code', '34-200');
-//		@todo: Fix that selector
-		$I->checkOption('input[type=checkbox]');
+		$I->selectOption('Traits', UserTrait::TRAIT_LIABILITIES);
 		$this->sendForm($I);
 
-		$I->seeRecord(User::class, [
+		$user = $I->grabRecord(User::class, [
 			'and',
 			['like', 'username', 'FJ%', false],
 			['status' => User::STATUS_INACTIVE],
@@ -145,12 +144,11 @@ class CustomerCreateCest {
 
 //		@todo: Add userID
 		$I->seeRecord(UserTrait::class, [
-			'trait_id' => UserTrait::TRAIT_BAILIFF,
+			'trait_id' => UserTrait::TRAIT_LIABILITIES,
+			'user_id' => $user->id,
 
 		]);
-
 	}
-
 
 	private function sendForm(FunctionalTester $I): void {
 		$I->click('#customer-form button[type=submit]');

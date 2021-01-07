@@ -72,12 +72,7 @@ class UserForm extends Model {
 			['email', 'default', 'value' => null],
 			['status', 'integer'],
 			['status', 'in', 'range' => array_keys(static::getStatusNames())],
-			[
-				'traits', 'each',
-				'rule' => [
-					'in', 'range' => array_keys(static::getTraitsNames()),
-				],
-			],
+			['traits', 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
 			[
 				'roles', 'each',
 				'rule' => [
@@ -125,7 +120,7 @@ class UserForm extends Model {
 		$this->status = $model->status;
 		$this->roles = $model->getRoles();
 		$this->permissions = $model->getPermissions();
-		$this->traits = ArrayHelper::map($model->traits, 'trait_id', 'name');
+		$this->traits = ArrayHelper::getColumn($model->traits, 'trait_id');
 	}
 
 	public function getModel(): User {
@@ -193,7 +188,7 @@ class UserForm extends Model {
 		}
 
 		$this->applyAuth($model->id, $isNewRecord);
-		$this->applyTraits($model->id, $isNewRecord);
+		$this->assignTraits($model->id, $isNewRecord);
 
 		if (!$this->updateProfile($model) || !$this->updateHomeAddress($model)) {
 			return false;
@@ -205,7 +200,6 @@ class UserForm extends Model {
 
 		return true;
 	}
-
 
 	protected function shouldSendEmail(): bool {
 		return $this->sendEmail
@@ -220,6 +214,15 @@ class UserForm extends Model {
 		}
 		$this->assignRoles($id);
 		$this->assignPermissions($id);
+	}
+
+	private function assignTraits(int $userId, bool $isNewRecord): void {
+		if (!$isNewRecord || empty($this->traits)) {
+			UserTrait::unassignUser($userId);
+		}
+		if (!empty($this->traits)) {
+			UserTrait::assignUser($userId, $this->traits);
+		}
 	}
 
 	private function updateProfile(User $model): bool {
@@ -314,11 +317,8 @@ class UserForm extends Model {
 		return User::getStatusesNames();
 	}
 
-	public static function getTraitsNames(): array{
+	public static function getTraitsNames(): array {
 		return UserTrait::getNames();
 	}
 
-	private function applyTraits(int $userId, bool $isNewRecord): void {
-		UserTrait::assignUser($userId,$this->traits,!$isNewRecord);
-	}
 }

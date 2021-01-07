@@ -54,6 +54,7 @@ class UserTrait extends ActiveRecord {
 		return static::getNames()[$this->trait_id];
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getUser(): UserQuery {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
@@ -72,11 +73,9 @@ class UserTrait extends ActiveRecord {
 	 * @param bool $withDelete
 	 * @throws \yii\db\Exception
 	 */
-	public static function assignUser(int $userId, array $traitsIds, bool $withDelete = true): void {
-		if ($withDelete) {
-			static::deleteAll(['user_id' => $userId]);
-		}
+	public static function assignUser(int $userId, array $traitsIds): void {
 		if (empty($traitsIds)) {
+			static::unassignUser($userId);
 			return;
 		}
 		$userTraits = [];
@@ -87,5 +86,9 @@ class UserTrait extends ActiveRecord {
 			];
 		}
 		static::getDb()->createCommand()->batchInsert(self::tableName(), ['user_id', 'trait_id'], $userTraits)->execute();
+	}
+
+	public static function unassignUser(int $userId): void {
+		static::deleteAll(['user_id' => $userId]);
 	}
 }

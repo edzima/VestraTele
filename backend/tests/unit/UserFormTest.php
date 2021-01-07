@@ -6,6 +6,8 @@ use backend\modules\user\models\UserForm;
 use common\fixtures\AddressFixture;
 use common\fixtures\user\UserAddressFixture;
 use common\fixtures\UserFixture;
+use common\fixtures\UserProfileFixture;
+use common\fixtures\UserTraitFixture;
 use common\models\user\User;
 use common\models\user\UserTrait;
 
@@ -18,14 +20,21 @@ class UserFormTest extends Unit {
 				'class' => UserFixture::class,
 				'dataFile' => codecept_data_dir() . 'user.php',
 			],
+			'user-profile' => [
+				'class' => UserProfileFixture::class,
+				'dataFile' => codecept_data_dir() . 'user_profile.php',
+			],
 			'user-address' => [
 				'class' => UserAddressFixture::class,
 				'dataFile' => codecept_data_dir() . 'user_address.php',
-
 			],
 			'address' => [
 				'class' => AddressFixture::class,
 				'dataFile' => codecept_data_dir() . 'address.php',
+			],
+			'user-trait' => [
+				'class' => UserTraitFixture::class,
+				'dataFile' => codecept_data_dir() . 'user_trait.php',
 			],
 		]);
 	}
@@ -81,13 +90,20 @@ class UserFormTest extends Unit {
 		$this->tester->assertSame('lastname', $user->profile->lastname);
 	}
 
+	public function testInvalidTrait(): void {
+		$model = new UserForm();
+		$user = $this->tester->grabFixture('user', 0);
+		$model->setModel($user);
+		$model->traits = [121212];
+		$this->tester->assertFalse($model->save());
+		$this->tester->assertSame('Traits is invalid.', $model->getFirstError('traits'));
+	}
 
 	public function testAssignTraitToUser(): void {
 		$model = new UserForm();
 		$user = $this->tester->grabFixture('user', 0);
 		$model->setModel($user);
-		$model->traits = [UserTrait::TRAIT_LIABILITIES, UserTrait::TRAIT_BAILIFF];
-
+		$model->traits = [UserTrait::TRAIT_BAILIFF];
 		$this->tester->assertTrue($model->save());
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);

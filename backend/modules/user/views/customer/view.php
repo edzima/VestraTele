@@ -37,31 +37,35 @@ $this->params['breadcrumbs'][] = $this->title;
 		'attributes' => [
 			[
 				'label' => Yii::t('backend', 'Email'),
-				'value' => $model->email
+				'value' => $model->email,
+				'format' => 'email',
+				'visible' => !empty($model->email),
 			],
 			[
 				'label' => Yii::t('common', 'Phone number'),
-				'value' => $model->profile->phone
+				'value' => $model->profile->phone,
+				'visible' => !empty($model->profile->phone),
 			],
 			[
 				'label' => Yii::t('common', 'Phone number 2'),
-				'value' => $model->profile->phone_2
+				'visible' => !empty($model->profile->phone_2),
 			],
 			[
 				'label' => Yii::t('backend', 'Traits'),
-				'value' => $model->getTraitsNames()
+				'value' => $model->getTraitsNames(),
+				'visible' => !empty($model->traits),
 			],
 			[
 				'label' => Yii::t('backend', 'Status'),
-				'value' => $model->getStatusName()
+				'value' => $model->getStatusName(),
 			],
 			[
 				'label' => Yii::t('backend', 'Username'),
-				'value' => $model->username
+				'value' => $model->username,
 			],
 			[
 				'label' => Yii::t('backend', 'Other'),
-				'value' => $model->profile->other
+				'value' => $model->profile->other,
 			],
 		],
 	]) ?>

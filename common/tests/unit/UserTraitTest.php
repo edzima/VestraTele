@@ -4,31 +4,38 @@ namespace common\tests\unit;
 
 use common\fixtures\UserFixture;
 use common\fixtures\UserTraitFixture;
+use common\models\user\User;
 use common\models\user\UserTrait;
-use common\tests\UnitTester;
-use udokmeci\yii2PhoneValidator\PhoneValidator;
-use Yii;
+use yii\db\IntegrityException;
 
 class UserTraitTest extends Unit {
-
-	/**
-	 * @var UnitTester
-	 */
-	protected $tester;
 
 	public function _before() {
 		parent::_before();
 		$this->tester->haveFixtures([
 			'user' => [
 				'class' => UserFixture::class,
-				'dataFile' => codecept_data_dir() . 'user.php',
+				'dataFile' => codecept_data_dir() . '/user/user.php',
 			],
 			'user-trait' => [
 				'class' => UserTraitFixture::class,
 				'dataFile' => codecept_data_dir() . 'user/user_trait.php',
 			],
-
 		]);
+	}
+
+	private function getUserWithoutTraits(): User {
+		return $this->tester->grabFixture('user', 0);
+	}
+
+	private function getUserWithTrait(): User {
+		// TRAIT_BAILIFF
+		return $this->tester->grabFixture('user', 1);
+	}
+
+	private function getUserWithTraits(): User {
+		// TRAIT_BAILIFF, TRAIT_DISABILITY_RESULT_OF_CASE
+		return $this->tester->grabFixture('user', 2);
 	}
 
 	public function testAssignUserSingleTrait(): void {
@@ -37,6 +44,7 @@ class UserTraitTest extends Unit {
 		UserTrait::assignUser($user->id, $traitsToAssign);
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
 	}
+
 	public function testAssignUserMultipleTraits(): void {
 		$user = $this->tester->grabFixture('user', 0);
 		$traitsToAssign = [UserTrait::TRAIT_LIABILITIES, UserTrait::TRAIT_BAILIFF];
@@ -45,25 +53,22 @@ class UserTraitTest extends Unit {
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
 	}
-	public function testAssignUserTraitWithoutDelete(): void {
-		$user = $this->tester->grabFixture('user', 1);
-		$traitsToAssign = [UserTrait::TRAIT_LIABILITIES];
-		UserTrait::assignUser($user->id, $traitsToAssign, false);
-		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
-		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
-	}
-	public function testAssignUserNoTraits(): void {
-		$user = $this->tester->grabFixture('user', 0);
-		$traitsToAssign = [];
-		UserTrait::assignUser($user->id, $traitsToAssign);
-		$this->tester->dontSeeRecord(UserTrait::class, ['user_id' => $user->id]);
-	}
-	public function testAssignUserNoTraitsWithoutDelete(): void {
-		$user = $this->tester->grabFixture('user', 1);
-		$traitsToAssign = [];
-		UserTrait::assignUser($user->id, $traitsToAssign, false);
-		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
+
+	public function testAssignUserTraitSameTrait(): void {
+		$user = $this->getUserWithTrait();
+		$this->tester->expectThrowable(IntegrityException::class, function () use ($user) {
+			UserTrait::assignUser($user->id, [UserTrait::TRAIT_BAILIFF]);
+		});
+		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
 	}
 
+	public function testAssignUserNoTraits(): void {
+		$user = $this->getUserWithTraits();
+		UserTrait::assignUser($user->id, []);
+		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
+		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
+		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_DISABILITY_RESULT_OF_CASE, 'user_id' => $user->id]);
+		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $this->getUserWithTrait()->id]);
+	}
 
 }
