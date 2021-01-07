@@ -36,6 +36,7 @@ use yii\web\IdentityInterface;
  * @property-read Address|null $homeAddress
  * @property-read Address|null $postalAddress
  * @property-read IssueUser[] $issueUsers
+ * @property-read UserTrait[] $traits
  *
  */
 class User extends ActiveRecord implements IdentityInterface {
@@ -158,13 +159,12 @@ class User extends ActiveRecord implements IdentityInterface {
 	}
 
 	public function getTraits(): ActiveQuery {
-		return $this->hasMany(UserTrait::class, ['user_id' => 'id'])->indexBy('type');
+		return $this->hasMany(UserTrait::class, ['user_id' => 'id'])->indexBy('trait_id');
 	}
 
-//	@todo add this method and use in user view.
-//	public function getTraitsNames():string{
-//		return implode(", ", ArrayHelper::index($this->traits, ''));
-//	}
+	public function getTraitsNames():string{
+		return implode(", ", ArrayHelper::getColumn($this->traits, 'name'));
+	}
 
 
 	protected function getAddresses(): ActiveQuery {

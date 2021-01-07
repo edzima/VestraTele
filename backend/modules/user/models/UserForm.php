@@ -6,9 +6,11 @@ use common\models\Address;
 use common\models\user\User;
 use common\models\user\UserAddress;
 use common\models\user\UserProfile;
+use common\models\user\UserTrait;
 use Yii;
 use yii\base\Model;
 use yii\db\QueryInterface;
+use yii\helpers\ArrayHelper;
 
 /**
  * Create user form.
@@ -24,6 +26,7 @@ class UserForm extends Model {
 
 	public $roles = [];
 	public $permissions = [];
+	public $traits = [];
 
 	public bool $sendEmail = false;
 	public bool $isEmailRequired = true;
@@ -70,6 +73,12 @@ class UserForm extends Model {
 			['status', 'integer'],
 			['status', 'in', 'range' => array_keys(static::getStatusNames())],
 			[
+				'traits', 'each',
+				'rule' => [
+					'in', 'range' => array_keys(static::getTraitsNames()),
+				],
+			],
+			[
 				'roles', 'each',
 				'rule' => [
 					'in', 'range' => array_keys(static::getRolesNames()),
@@ -115,7 +124,7 @@ class UserForm extends Model {
 		$this->status = $model->status;
 		$this->roles = $model->getRoles();
 		$this->permissions = $model->getPermissions();
-		$this->traits = ArrayHelper::index($model->traits, 'trait_id', 'name');
+		$this->traits = ArrayHelper::map($model->traits, 'trait_id', 'name');
 	}
 
 	public function getModel(): User {
@@ -183,6 +192,7 @@ class UserForm extends Model {
 		}
 
 		$this->applyAuth($model->id, $isNewRecord);
+		$this->applyTraits($model->id, $isNewRecord);
 
 		if (!$this->updateProfile($model) || !$this->updateHomeAddress($model)) {
 			return false;
@@ -194,6 +204,7 @@ class UserForm extends Model {
 
 		return true;
 	}
+
 
 	protected function shouldSendEmail(): bool {
 		return $this->sendEmail
@@ -300,5 +311,13 @@ class UserForm extends Model {
 
 	public static function getStatusNames(): array {
 		return User::getStatusesNames();
+	}
+
+	public static function getTraitsNames(): array{
+		return UserTrait::getNames();
+	}
+
+	private function applyTraits(int $userId, bool $isNewRecord): void {
+		UserTrait::assignUser($userId,$this->traits,!$isNewRecord);
 	}
 }

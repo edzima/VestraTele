@@ -38,6 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'email',
 			'profile.phone',
 			'profile.phone_2',
+			'traitsNames',
 			'statusName',
 			'username',
 			'profile.other',

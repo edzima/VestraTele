@@ -9,6 +9,7 @@ use common\fixtures\user\CustomerFixture;
 use common\fixtures\user\UserAddressFixture;
 use common\models\user\User;
 use common\models\user\UserProfile;
+use common\models\user\UserTrait;
 
 /**
  * Class CustomerCreateCest
@@ -123,6 +124,33 @@ class CustomerCreateCest {
 		$I->dontSeeEmailIsSent();
 		$I->seeValidationError('Email is not a valid email address.');
 	}
+
+	public function checkWithTraits(FunctionalTester $I): void{
+		$I->fillField('Firstname', 'Fred');
+		$I->fillField('Lastname', 'Johansson');
+		$I->fillField('Postal Code', '34-200');
+//		@todo: Fix that selector
+		$I->checkOption('input[type=checkbox]');
+		$this->sendForm($I);
+
+		$I->seeRecord(User::class, [
+			'and',
+			['like', 'username', 'FJ%', false],
+			['status' => User::STATUS_INACTIVE],
+		]);
+		$I->seeRecord(UserProfile::class, [
+			'firstname' => 'Fred',
+			'lastname' => 'Johansson',
+		]);
+
+//		@todo: Add userID
+		$I->seeRecord(UserTrait::class, [
+			'trait_id' => UserTrait::TRAIT_BAILIFF,
+
+		]);
+
+	}
+
 
 	private function sendForm(FunctionalTester $I): void {
 		$I->click('#customer-form button[type=submit]');

@@ -4,7 +4,6 @@ namespace common\models\user;
 
 use common\models\user\query\UserQuery;
 use Yii;
-use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -54,33 +53,37 @@ class UserTrait extends ActiveRecord {
 		return static::getNames()[$this->trait_id];
 	}
 
-	public function getUser(): ActiveQuery {
+	public function getUser(): UserQuery {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
 
 	public static function getNames(): array {
 		return [
-			static::TRAIT_BAILIFF => Yii::t('common', 'bailiff'),
-			static::TRAIT_LIABILITIES => Yii::t('common', 'liabilities'),
+			static::TRAIT_BAILIFF => Yii::t('common', 'Bailiff'),
+			static::TRAIT_LIABILITIES => Yii::t('common', 'Liabilities'),
 		];
 	}
 
-	public static function assignUser(int $userId, array $traits, bool $withDelete = true):void{
-		codecept_debug("start");
+	/**
+	 * @param int $userId
+	 * @param int[] $traitsIds
+	 * @param bool $withDelete
+	 * @throws \yii\db\Exception
+	 */
+	public static function assignUser(int $userId, array $traitsIds, bool $withDelete = true): void {
 		if ($withDelete) {
 			static::deleteAll(['user_id' => $userId]);
 		}
-		if (empty($traits)){
+		if (empty($traitsIds)) {
 			return;
 		}
 		$userTraits = [];
-		foreach ($traits as $trait) {
+		foreach ($traitsIds as $id) {
 			$userTraits[] = [
 				'user_id' => $userId,
-				'trait_id' => $trait,
+				'trait_id' => $id,
 			];
 		}
-		$out = static::getDb()->createCommand()->batchInsert(UserTrait::tableName(),['user_id', 'trait_id'], $userTraits)->execute();
-		codecept_debug($userTraits);
+		static::getDb()->createCommand()->batchInsert(self::tableName(), ['user_id', 'trait_id'], $userTraits)->execute();
 	}
 }

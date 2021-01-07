@@ -21,6 +21,7 @@ use yii\bootstrap\Html;
 	'model' => $model->getProfile(),
 	'form' => $form,
 ]) ?>
+<?= $form->field($model, 'traits')->checkboxList(CustomerUserForm::getTraitsNames()) ?>
 
 <?= AddressFormWidget::widget([
 	'form' => $form,

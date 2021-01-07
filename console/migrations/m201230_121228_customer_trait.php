@@ -30,19 +30,4 @@ class m201230_121228_customer_trait extends Migration
 		$this->dropForeignKey('{{%fk_user_user_trait}}', '{{%customer_trait}}');
 		$this->dropTable('{{%customer_trait}}');
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m201230_121228_customer_trait cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }

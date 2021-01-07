@@ -5,7 +5,7 @@ namespace backend\tests\unit;
 use backend\modules\user\models\UserForm;
 use common\fixtures\AddressFixture;
 use common\fixtures\user\UserAddressFixture;
-use common\fixtures\UserTraitFixture;
+use common\fixtures\UserFixture;
 use common\models\user\User;
 use common\models\user\UserTrait;
 
@@ -15,7 +15,7 @@ class UserFormTest extends Unit {
 		parent::_before();
 		$this->tester->haveFixtures([
 			'user' => [
-				'class' => UserTraitFixture::class,
+				'class' => UserFixture::class,
 				'dataFile' => codecept_data_dir() . 'user.php',
 			],
 			'user-address' => [
