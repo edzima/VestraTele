@@ -50,7 +50,7 @@ return [
 	'Delete' => 'Usuń',
 	'Delete a value with the specified key from cache' => 'Usuń wartości o danym cache',
 	'Disabled' => 'Wyłączony',
-	'Email' => '',
+	'Email' => 'Email',
 	'Email confirm' => 'Potwierdź email',
 	'Enabled' => 'Włączony',
 	'Error #{id}' => 'Błąd #{id}',
@@ -278,4 +278,5 @@ return [
 	'Update pay: {value}' => 'Update pay: {value}',
 	'Received {count} pays. Value sum: {valueSum}' => 'Odebrano {count} wpłat. Suma: {valueSum}',
 	'Pay status: {value}' => 'Status wpłaty: {value}',
+	'Traits' => 'Cechy'
 ];

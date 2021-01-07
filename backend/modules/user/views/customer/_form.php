@@ -3,6 +3,7 @@
 use backend\modules\user\models\CustomerUserForm;
 use backend\modules\user\widgets\UserProfileFormWidget;
 use common\widgets\address\AddressFormWidget;
+use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 
@@ -20,6 +21,13 @@ use yii\bootstrap\Html;
 <?= UserProfileFormWidget::widget([
 	'model' => $model->getProfile(),
 	'form' => $form,
+]) ?>
+
+<?= $form->field($model, 'traits')->widget(Select2::class, [
+	'data' => CustomerUserForm::getTraitsNames(),
+	'options' => [
+		'multiple' => true,
+	],
 ]) ?>
 
 <?= AddressFormWidget::widget([

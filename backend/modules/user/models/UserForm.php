@@ -6,9 +6,11 @@ use common\models\Address;
 use common\models\user\User;
 use common\models\user\UserAddress;
 use common\models\user\UserProfile;
+use common\models\user\UserTrait;
 use Yii;
 use yii\base\Model;
 use yii\db\QueryInterface;
+use yii\helpers\ArrayHelper;
 
 /**
  * Create user form.
@@ -24,6 +26,7 @@ class UserForm extends Model {
 
 	public $roles = [];
 	public $permissions = [];
+	public $traits = [];
 
 	public bool $sendEmail = false;
 	public bool $isEmailRequired = true;
@@ -69,6 +72,7 @@ class UserForm extends Model {
 			['email', 'default', 'value' => null],
 			['status', 'integer'],
 			['status', 'in', 'range' => array_keys(static::getStatusNames())],
+			['traits', 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
 			[
 				'roles', 'each',
 				'rule' => [
@@ -105,6 +109,7 @@ class UserForm extends Model {
 			'status' => Yii::t('backend', 'Status'),
 			'roles' => Yii::t('backend', 'Roles'),
 			'permissions' => Yii::t('backend', 'Permissions'),
+			'traits' => Yii::t('common', 'Traits'),
 		];
 	}
 
@@ -115,6 +120,7 @@ class UserForm extends Model {
 		$this->status = $model->status;
 		$this->roles = $model->getRoles();
 		$this->permissions = $model->getPermissions();
+		$this->traits = ArrayHelper::getColumn($model->traits, 'trait_id');
 	}
 
 	public function getModel(): User {
@@ -182,6 +188,7 @@ class UserForm extends Model {
 		}
 
 		$this->applyAuth($model->id, $isNewRecord);
+		$this->assignTraits($model->id, $isNewRecord);
 
 		if (!$this->updateProfile($model) || !$this->updateHomeAddress($model)) {
 			return false;
@@ -207,6 +214,15 @@ class UserForm extends Model {
 		}
 		$this->assignRoles($id);
 		$this->assignPermissions($id);
+	}
+
+	private function assignTraits(int $userId, bool $isNewRecord): void {
+		if (!$isNewRecord || empty($this->traits)) {
+			UserTrait::unassignUser($userId);
+		}
+		if (!empty($this->traits)) {
+			UserTrait::assignUser($userId, $this->traits);
+		}
 	}
 
 	private function updateProfile(User $model): bool {
@@ -300,4 +316,9 @@ class UserForm extends Model {
 	public static function getStatusNames(): array {
 		return User::getStatusesNames();
 	}
+
+	public static function getTraitsNames(): array {
+		return UserTrait::getNames();
+	}
+
 }

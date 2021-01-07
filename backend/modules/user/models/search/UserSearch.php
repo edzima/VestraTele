@@ -53,6 +53,7 @@ class UserSearch extends User {
 		$query = $this->createQuery();
 		$query->joinWith('userProfile');
 		$query->joinWith('addresses.address.city');
+		$query->joinWith('traits');
 		$query->with('addresses.address.city');
 
 		// add conditions that should always apply here

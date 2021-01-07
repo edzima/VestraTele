@@ -192,6 +192,9 @@ return [
 	'Issues users' => 'Uczestnicy',
 	'Surname' => 'Nazwisko',
 	'Signing at' => 'Data podpisania umowy',
+	'Bailiff' => 'Komornik',
+	'Liabilities' => 'Zadłużenie',
+	'Disability result of case' => 'Niepełnosprawność w wyniku wypadku',
 	'Customer' => 'Klient',
 	'Payement at' => 'Opłacono w',
 	'Provider name' => 'Wpłacający',
@@ -236,4 +239,5 @@ return [
 	'pays.delayed' => 'Przeterminowane wpłaty',
 	'Yes' => 'Tak',
 	'No' => 'Nie',
+	'Traits' => 'Cechy'
 ];
