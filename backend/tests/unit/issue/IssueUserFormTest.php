@@ -91,7 +91,7 @@ class IssueUserFormTest extends Unit {
 		$model = new IssueUserForm();
 		$model->setIssue($this->grabIssue(0));
 		$model->user_id = 101;
-		$model->type =IssueUser::TYPE_HANDICAPPED;
+		$model->type = IssueUser::TYPE_HANDICAPPED;
 		$this->tester->assertTrue($model->save());
 		$this->tester->seeRecord(IssueUser::class, [
 			'user_id' => 101,
@@ -108,7 +108,7 @@ class IssueUserFormTest extends Unit {
 	}
 
 	protected function grabIssue(int $fixtureId): ?Issue {
-		return $this->tester->grabFixture('issue', $fixtureId);
+		return $this->tester->grabFixture(IssueFixtureHelper::ISSUE, $fixtureId);
 	}
 
 }

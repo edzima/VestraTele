@@ -12,11 +12,6 @@ use common\fixtures\issue\TypeFixture;
 use common\fixtures\settlement\CalculationFixture;
 use common\fixtures\settlement\PayFixture;
 use common\fixtures\settlement\PayReceivedFixture;
-use common\fixtures\user\AgentFixture;
-use common\fixtures\user\CustomerFixture;
-use common\fixtures\user\LawyerFixture;
-use common\fixtures\user\TelemarketerFixture;
-use common\fixtures\UserProfileFixture;
 use common\models\user\User;
 use Yii;
 
@@ -26,55 +21,42 @@ class IssueFixtureHelper {
 	public const ARCHIVED_ISSUE_COUNT = 1;
 
 	public const AGENT = 'agent';
+	public const CUSTOMER = 'customer';
+	public const LAWYER = 'lawyer';
+	public const TELEMARKETER = 'telemarketer';
+
 	public const CALCULATION = 'calculation';
 	public const PAY = 'pay';
 	public const ISSUE = 'issue';
-	public const SUMMON = 'summon';
 	public const PAY_RECEIVED = 'pay-received';
+
+	public const SUMMON = 'summon';
 
 	public static function dataDir(): string {
 		return Yii::getAlias('@common/tests/_data/');
 	}
 
 	public static function fixtures(): array {
-		return array_merge([
-			static::ISSUE => [
-				'class' => IssueFixture::class,
-				'dataFile' => static::dataDir() . 'issue/issue.php',
+		return array_merge(
+			[
+				static::ISSUE => [
+					'class' => IssueFixture::class,
+					'dataFile' => static::dataDir() . 'issue/issue.php',
+				],
 			],
-			'user' => [
-				'class' => IssueUserFixture::class,
-				'dataFile' => static::dataDir() . 'issue/users.php',
+			static::entityResponsible(),
+			static::stageAndTypesFixtures(),
+			static::users(),
+		);
+	}
 
-			],
-			'customer' => [
-				'class' => CustomerFixture::class,
-				'dataFile' => static::dataDir() . 'user/customer.php',
-			],
-			'customer-profile' => [
-				'class' => UserProfileFixture::class,
-				'dataFile' => static::dataDir() . 'user/customer_profile.php',
-			],
-			static::AGENT => [
-				'class' => AgentFixture::class,
-				'dataFile' => static::dataDir() . 'user/agent.php',
-				'permissions' => [User::PERMISSION_ISSUE],
-			],
-			'lawyer' => [
-				'class' => LawyerFixture::class,
-				'dataFile' => static::dataDir() . 'user/lawyer.php',
-				'permissions' => [User::PERMISSION_ISSUE],
-			],
-			'telemarketer' => [
-				'class' => TelemarketerFixture::class,
-				'dataFile' => static::dataDir() . 'user/telemarketer.php',
-				'permissions' => [User::PERMISSION_ISSUE],
-			],
+	public static function entityResponsible(): array {
+		return [
 			'entity' => [
 				'class' => EntityResponsibleFixture::class,
 				'dataFile' => static::dataDir() . 'issue/entity_responsible.php',
 			],
-		], static::stageAndTypesFixtures());
+		];
 	}
 
 	public static function stageAndTypesFixtures(): array {
@@ -92,6 +74,25 @@ class IssueFixtureHelper {
 				'dataFile' => static::dataDir() . 'issue/stage_types.php',
 			],
 		];
+	}
+
+	public static function users(): array {
+		$users = [
+			static::AGENT => UserFixtureHelper::agent(),
+			static::CUSTOMER => UserFixtureHelper::customer(),
+			static::LAWYER => UserFixtureHelper::lawyer(),
+			static::TELEMARKETER => UserFixtureHelper::telemarketer(),
+		];
+		foreach ($users as &$user) {
+			UserFixtureHelper::addPermission($user, User::PERMISSION_ISSUE);
+		}
+		$users['customer-profile'] = UserFixtureHelper::customerProfile();
+		$users['users'] = [
+			'class' => IssueUserFixture::class,
+			'dataFile' => static::dataDir() . 'issue/users.php',
+		];
+
+		return $users;
 	}
 
 	public static function settlements(): array {

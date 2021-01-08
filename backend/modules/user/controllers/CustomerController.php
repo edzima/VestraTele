@@ -26,7 +26,7 @@ class CustomerController extends UserController {
 		]);
 
 		return $this->render('view', [
-			'model' => $this->findModel($id),
+			'model' => $model,
 			'issuesDataProvider' => $dataProvider,
 		]);
 	}

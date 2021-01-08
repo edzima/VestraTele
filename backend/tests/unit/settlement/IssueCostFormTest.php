@@ -65,6 +65,6 @@ class IssueCostFormTest extends Unit {
 	}
 
 	protected function grabIssue(int $index = 0): Issue {
-		return $this->tester->grabFixture('issue', $index);
+		return $this->tester->grabFixture(IssueFixtureHelper::ISSUE, $index);
 	}
 }

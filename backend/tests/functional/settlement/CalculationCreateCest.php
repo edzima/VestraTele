@@ -23,7 +23,7 @@ class CalculationCreateCest {
 	public function checkCreatePage(CreateCalculationIssueManager $I): void {
 
 		/** @var Issue $issue */
-		$issue = $I->grabFixture('issue', 0);
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE, 'id' => $issue->id]);
 		$I->see('Create calculation for: ' . $issue->longId);
 		$I->see($issue->customer->getFullName());

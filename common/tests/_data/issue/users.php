@@ -1,11 +1,12 @@
 <?php
 
+use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssueUser;
 
 return [
 	[
 		'type' => IssueUser::TYPE_CUSTOMER,
-		'user_id' => 100,
+		'user_id' => UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID,
 		'issue_id' => 1,
 	],
 	[
@@ -25,7 +26,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_CUSTOMER,
-		'user_id' => 101,
+		'user_id' => UserFixtureHelper::CUSTOMER_ERIKA_LARSON_ID,
 		'issue_id' => 2,
 	],
 	[
@@ -45,7 +46,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_CUSTOMER,
-		'user_id' => 101,
+		'user_id' => UserFixtureHelper::CUSTOMER_ERIKA_LARSON_ID,
 		'issue_id' => 3,
 	],
 	[
@@ -60,7 +61,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_CUSTOMER,
-		'user_id' => 100,
+		'user_id' => UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID,
 		'issue_id' => 4,
 	],
 	[
@@ -80,7 +81,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_CUSTOMER,
-		'user_id' => 100,
+		'user_id' => UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID,
 		'issue_id' => 5,
 	],
 	[
@@ -100,7 +101,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_CUSTOMER,
-		'user_id' => 100,
+		'user_id' => UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID,
 		'issue_id' => 6,
 	],
 	[

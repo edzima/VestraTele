@@ -5,6 +5,7 @@ use backend\widgets\IssueColumn;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\user\Customer;
+use common\models\user\User;
 use common\widgets\address\AddressDetailView;
 use common\widgets\FieldsetDetailView;
 use yii\data\ActiveDataProvider;
@@ -25,8 +26,25 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-		<?= Html::a(Yii::t('backend', 'Add issue'), ['/issue/issue/create', 'customerId' => $model->id], ['class' => 'btn btn-success']) ?>
-		<?= Html::a(Yii::t('backend', 'Link to issue'), ['/issue/user/link', 'userId' => $model->id], ['class' => 'btn btn-success']) ?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_ISSUE)
+			? Html::a(
+				Yii::t('backend', 'Add issue'),
+				['/issue/issue/create', 'customerId' => $model->id],
+				['class' => 'btn btn-success']
+			)
+			: ''
+		?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_ISSUE)
+			? Html::a(
+				Yii::t('backend', 'Link to issue'),
+				['/issue/user/link', 'userId' => $model->id],
+				['class' => 'btn btn-success']
+			)
+			: ''
+		?>
+
 		<?php //@todo add this action
 		//  Html::a(Yii::t('backend', 'Generate password'), ['/issue/user/link', 'userId' => $model->id], ['class' => 'btn btn-success']) ?>
 	</p>

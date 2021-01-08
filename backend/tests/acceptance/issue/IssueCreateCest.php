@@ -6,6 +6,7 @@ use backend\helpers\Url;
 use backend\tests\AcceptanceTester;
 use backend\tests\Step\acceptance\IssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\models\user\Customer;
 
 class IssueCreateCest {
@@ -30,8 +31,8 @@ class IssueCreateCest {
 
 	public function checkCreate(AcceptanceTester $I): void {
 		/** @var Customer $customer */
-		$customer = $I->grabFixture('customer', 0);
-		$I->amOnPage(Url::to(['/issue/issue/create', 'customerId' => 100]));
+		$customer = $I->grabFixture(IssueFixtureHelper::CUSTOMER, 0);
+		$I->amOnPage(Url::to(['/issue/issue/create', 'customerId' => $customer->id]));
 		$I->seeInTitle('Create issue for: ' . $customer->getFullName());
 		$I->fillOutSelect2OptionField('.field-issueform-type_id', 'Accident');
 		$I->wait(2);
@@ -40,7 +41,7 @@ class IssueCreateCest {
 
 		$I->fillOutSelect2OptionField('.field-issueform-lawyer_id', 'lawyer1');
 		$I->fillOutSelect2OptionField('.field-issueform-agent_id', 'agent1');
-		$I->fillField('Signing at','2020-02-02');
+		$I->fillField('Signing at', '2020-02-02');
 		$I->click('#issue-form button[type=submit]');
 		$I->wait(2);
 		$I->seeLink('Update');
@@ -54,7 +55,7 @@ class IssueCreateCest {
 	}
 
 	public function checkSendEmpty(AcceptanceTester $I): void {
-		$I->amOnPage(Url::to(['/issue/issue/create', 'customerId' => 100]));
+		$I->amOnPage(Url::to(['/issue/issue/create', 'customerId' => UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID]));
 		$I->click('#issue-form button[type=submit]');
 		$I->wait(1);
 		$I->seeValidationError('Type cannot be blank.');

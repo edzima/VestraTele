@@ -27,7 +27,7 @@ class IssueCreateCest {
 	public function checkCreate(IssueManager $I): void {
 		$I->amLoggedIn();
 		/** @var Customer $customer */
-		$customer = $I->grabFixture('customer', 0);
+		$customer = $I->grabFixture(IssueFixtureHelper::CUSTOMER, 0);
 
 		$I->amOnRoute('/issue/issue/create', ['customerId' => $customer->id]);
 		$I->see('Create issue for: ' . $customer, 'title');

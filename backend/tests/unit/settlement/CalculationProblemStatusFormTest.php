@@ -18,7 +18,7 @@ class CalculationProblemStatusFormTest extends Unit {
 
 	public function testSetStatusForNotPayed(): void {
 		/** @var IssuePayCalculation $calculation */
-		$calculation = $this->tester->grabFixture('calculation', 'not-payed');
+		$calculation = $this->tester->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
 		$this->tester->seeRecord(IssuePay::class, [
 			'calculation_id' => $calculation->id,
 		]);
@@ -37,7 +37,7 @@ class CalculationProblemStatusFormTest extends Unit {
 
 	public function testSetStatusForPayed(): void {
 		$this->tester->expectThrowable(InvalidConfigException::class, function () {
-			new CalculationProblemStatusForm($this->tester->grabFixture('calculation', 'payed'));
+			new CalculationProblemStatusForm($this->tester->grabFixture(IssueFixtureHelper::CALCULATION, 'payed'));
 		});
 	}
 

@@ -59,7 +59,7 @@ class IssueCostCest {
 		$I->amLoggedIn();
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		/* @var Issue $issue */
-		$issue = $I->grabFixture('issue', 0);
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
 		$I->see('Costs: ' . $issue->longId);
 		$I->seeInGridHeader('Type');
@@ -78,7 +78,7 @@ class IssueCostCest {
 		$I->amLoggedIn();
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		/* @var Issue $issue */
-		$issue = $I->grabFixture('issue', 'archived');
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 'archived');
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
 		$I->seeResponseCodeIs(404);
 	}

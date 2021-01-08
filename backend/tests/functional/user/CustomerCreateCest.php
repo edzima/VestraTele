@@ -129,7 +129,7 @@ class CustomerCreateCest {
 		$I->fillField('Firstname', 'Fred');
 		$I->fillField('Lastname', 'Johansson');
 		$I->fillField('Postal Code', '34-200');
-		$I->selectOption('Traits', UserTrait::TRAIT_LIABILITIES);
+		$I->selectOption('Traits', UserTrait::TRAIT_COMMISSION_REFUND);
 		$this->sendForm($I);
 
 		$user = $I->grabRecord(User::class, [
@@ -143,7 +143,7 @@ class CustomerCreateCest {
 		]);
 
 		$I->seeRecord(UserTrait::class, [
-			'trait_id' => UserTrait::TRAIT_LIABILITIES,
+			'trait_id' => UserTrait::TRAIT_COMMISSION_REFUND,
 			'user_id' => $user->id,
 
 		]);

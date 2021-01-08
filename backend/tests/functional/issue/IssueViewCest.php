@@ -67,7 +67,7 @@ class IssueViewCest {
 		$I->seeResponseCodeIsSuccessful();
 	}
 
-	public function checkCreateSummonLink(SummonIssueManager $I):void{
+	public function checkCreateSummonLink(SummonIssueManager $I): void {
 		$I->amLoggedIn();
 		$this->goToIssuePage($I);
 		$I->seeLink('Create summon');
@@ -77,7 +77,7 @@ class IssueViewCest {
 
 	protected function goToIssuePage(IssueManager $I, string $issueIndex = '0'): Issue {
 		/** @var Issue $model */
-		$model = $I->grabFixture('issue', $issueIndex);
+		$model = $I->grabFixture(IssueFixtureHelper::ISSUE, $issueIndex);
 		$I->amOnPage(['/issue/issue/view', 'id' => $model->id]);
 		return $model;
 	}

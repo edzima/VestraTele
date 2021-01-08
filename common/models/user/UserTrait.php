@@ -16,15 +16,16 @@ use yii\db\ActiveRecord;
  */
 class UserTrait extends ActiveRecord {
 
-	public const TRAIT_BAILIFF = 1;
-	public const TRAIT_LIABILITIES = 2;
-	public const TRAIT_DISABILITY_RESULT_OF_CASE = 3;
+	public const TRAIT_ANTYVINDICATION = 100;
+	public const TRAIT_BAILIFF = 150;
+	public const TRAIT_COMMISSION_REFUND = 200;
+	public const TRAIT_DISABILITY_RESULT_OF_CASE = 300;
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public static function tableName(): string {
-		return 'customer_trait';
+		return '{{%customer_trait}}';
 	}
 
 	/**
@@ -61,8 +62,9 @@ class UserTrait extends ActiveRecord {
 
 	public static function getNames(): array {
 		return [
+			static::TRAIT_ANTYVINDICATION => Yii::t('common', 'Antyvindication'),
 			static::TRAIT_BAILIFF => Yii::t('common', 'Bailiff'),
-			static::TRAIT_LIABILITIES => Yii::t('common', 'Liabilities'),
+			static::TRAIT_COMMISSION_REFUND => Yii::t('common', 'Commision refund'),
 			static::TRAIT_DISABILITY_RESULT_OF_CASE => Yii::t('common', 'Disability result of case'),
 		];
 	}

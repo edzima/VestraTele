@@ -193,7 +193,7 @@ return [
 	'Surname' => 'Nazwisko',
 	'Signing at' => 'Data podpisania umowy',
 	'Bailiff' => 'Komornik',
-	'Liabilities' => 'Zadłużenie',
+	'Commision refund' => 'Zwroty prowizji',
 	'Disability result of case' => 'Niepełnosprawność w wyniku wypadku',
 	'Customer' => 'Klient',
 	'Payement at' => 'Opłacono w',

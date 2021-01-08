@@ -60,8 +60,8 @@ class UserFormTest extends Unit {
 			'status' => User::STATUS_INACTIVE,
 		]);
 		expect($user)->isInstanceOf(User::class);
-		$this->assertSame('some_firstname', $user->profile->firstname);
-		$this->assertSame('some_lastname', $user->profile->lastname);
+		$this->tester->assertSame('some_firstname', $user->profile->firstname);
+		$this->tester->assertSame('some_lastname', $user->profile->lastname);
 
 		$this->tester->seeEmailIsSent();
 
@@ -106,18 +106,18 @@ class UserFormTest extends Unit {
 		$model->traits = [UserTrait::TRAIT_BAILIFF];
 		$this->tester->assertTrue($model->save());
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
-		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
+		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_COMMISSION_REFUND, 'user_id' => $user->id]);
 	}
 
 	public function testAssignTraitsToUser(): void {
 		$model = new UserForm();
 		$user = $this->tester->grabFixture('user', 0);
 		$model->setModel($user);
-		$model->traits = [UserTrait::TRAIT_LIABILITIES, UserTrait::TRAIT_BAILIFF];
+		$model->traits = [UserTrait::TRAIT_COMMISSION_REFUND, UserTrait::TRAIT_BAILIFF];
 		$this->tester->assertTrue($model->validate());
 		$this->tester->assertTrue($model->save());
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
-		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
+		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_COMMISSION_REFUND, 'user_id' => $user->id]);
 	}
 
 	public function testAssignTraitAsEmptyArray(): void {

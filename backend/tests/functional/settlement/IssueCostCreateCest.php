@@ -18,7 +18,7 @@ class IssueCostCreateCest {
 	public function _before(CostIssueManager $I): void {
 		$I->amLoggedIn();
 		/* @var Issue $issue */
-		$issue = $I->grabFixture('issue', 0);
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE, 'id' => $issue->id]);
 	}
 

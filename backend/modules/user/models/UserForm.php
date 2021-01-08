@@ -72,7 +72,7 @@ class UserForm extends Model {
 			['email', 'default', 'value' => null],
 			['status', 'integer'],
 			['status', 'in', 'range' => array_keys(static::getStatusNames())],
-			['traits', 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
+			['traits', 'in', 'range' => array_keys(static::getTraitsNames()), 'allowArray' => true],
 			[
 				'roles', 'each',
 				'rule' => [

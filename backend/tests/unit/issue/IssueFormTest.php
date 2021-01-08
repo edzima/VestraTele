@@ -14,31 +14,31 @@ use yii\base\InvalidConfigException;
 
 class IssueFormTest extends Unit {
 
-	protected function _before() {
+	protected function _before(): void {
 		parent::_before();
 		$this->tester->haveFixtures(IssueFixtureHelper::fixtures());
 	}
 
-	public function testWorkersList() {
+	public function testWorkersList(): void {
 		$activeAgentsCount = 3;
 
 		$this->tester->assertCount($activeAgentsCount, IssueForm::getAgents());
-		$agent = $this->tester->grabFixture('agent', 'some-agent');
+		$agent = $this->tester->grabFixture(IssueFixtureHelper::AGENT, 'some-agent');
 		Yii::$app->authManager->revoke(Yii::$app->authManager->getPermission(User::PERMISSION_ISSUE), $agent->id);
 		$this->tester->assertCount($activeAgentsCount - 1, IssueForm::getAgents());
 
 		$this->tester->assertCount(2, IssueForm::getLawyers());
-		$lawyer = $this->tester->grabFixture('lawyer', 0);
+		$lawyer = $this->tester->grabFixture(IssueFixtureHelper::LAWYER, 0);
 		Yii::$app->authManager->revoke(Yii::$app->authManager->getPermission(User::PERMISSION_ISSUE), $lawyer->id);
 		$this->tester->assertCount(1, IssueForm::getLawyers());
 
 		$this->tester->assertCount(2, IssueForm::getTele());
-		$tele = $this->tester->grabFixture('telemarketer', 0);
+		$tele = $this->tester->grabFixture(IssueFixtureHelper::TELEMARKETER, 0);
 		Yii::$app->authManager->revoke(Yii::$app->authManager->getPermission(User::PERMISSION_ISSUE), $tele->id);
 		$this->tester->assertCount(1, IssueForm::getTele());
 	}
 
-	public function testCreateWithoutCustomerOrModel() {
+	public function testCreateWithoutCustomerOrModel(): void {
 		$this->tester->expectThrowable(InvalidConfigException::class, function () {
 			new IssueForm();
 		});
@@ -86,7 +86,7 @@ class IssueFormTest extends Unit {
 
 	public function testCheckStateAtWithoutChangeStage(): void {
 		/** @var Issue $issue */
-		$issue = $this->tester->grabFixture('issue', 0);
+		$issue = $this->tester->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$this->tester->assertNull($issue->stage_change_at);
 		$model = new IssueForm(['model' => $issue]);
 		$model->save();
@@ -96,7 +96,7 @@ class IssueFormTest extends Unit {
 
 	public function testChangeStateWithDate(): void {
 		/** @var Issue $issue */
-		$issue = $this->tester->grabFixture('issue', 0);
+		$issue = $this->tester->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$this->tester->assertNull($issue->stage_change_at);
 		$model = new IssueForm(['model' => $issue]);
 		$model->stage_id = 1;
@@ -107,7 +107,7 @@ class IssueFormTest extends Unit {
 
 	public function testUnlinkTele(): void {
 		/** @var Issue $issue */
-		$issue = $this->tester->grabFixture('issue', 0);
+		$issue = $this->tester->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$this->tester->assertNotNull($issue->tele);
 		$teleId = $issue->tele->id;
 		$model = new IssueForm(['model' => $issue]);
@@ -133,7 +133,7 @@ class IssueFormTest extends Unit {
 
 	private function createModel(array $attributes = []): IssueForm {
 		if (!isset($attributes['customer'])) {
-			$attributes['customer'] = $this->tester->grabFixture('customer', 0);
+			$attributes['customer'] = $this->tester->grabFixture(IssueFixtureHelper::CUSTOMER, 0);
 		}
 		if (!isset($attributes['lawyer_id'])) {
 			$attributes['lawyer_id'] = 200;

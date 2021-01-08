@@ -40,18 +40,18 @@ class UserTraitTest extends Unit {
 
 	public function testAssignUserSingleTrait(): void {
 		$user = $this->getUserWithoutTraits();
-		$traitsToAssign = [UserTrait::TRAIT_LIABILITIES];
+		$traitsToAssign = [UserTrait::TRAIT_COMMISSION_REFUND];
 		UserTrait::assignUser($user->id, $traitsToAssign);
-		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
+		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_COMMISSION_REFUND, 'user_id' => $user->id]);
 		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_DISABILITY_RESULT_OF_CASE, 'user_id' => $this->getUserWithTrait()->id]);
 	}
 
 	public function testAssignUserMultipleTraits(): void {
 		$user = $this->getUserWithoutTraits();
-		$traitsToAssign = [UserTrait::TRAIT_LIABILITIES, UserTrait::TRAIT_BAILIFF];
+		$traitsToAssign = [UserTrait::TRAIT_COMMISSION_REFUND, UserTrait::TRAIT_BAILIFF];
 		UserTrait::assignUser($user->id, $traitsToAssign);
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
-		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
+		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_COMMISSION_REFUND, 'user_id' => $user->id]);
 		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_DISABILITY_RESULT_OF_CASE, 'user_id' => $user->id]);
 	}
 
@@ -60,13 +60,13 @@ class UserTraitTest extends Unit {
 		$this->tester->expectThrowable(IntegrityException::class, function () use ($user) {
 			UserTrait::assignUser($user->id, [UserTrait::TRAIT_BAILIFF]);
 		});
-		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
+		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_COMMISSION_REFUND, 'user_id' => $user->id]);
 	}
 
 	public function testAssignUserNoTraits(): void {
 		$user = $this->getUserWithTraits();
 		UserTrait::assignUser($user->id, []);
-		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_LIABILITIES, 'user_id' => $user->id]);
+		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_COMMISSION_REFUND, 'user_id' => $user->id]);
 		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
 		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_DISABILITY_RESULT_OF_CASE, 'user_id' => $user->id]);
 		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $this->getUserWithTrait()->id]);
