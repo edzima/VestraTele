@@ -40,7 +40,7 @@ class IssuePaySearch extends IssuePay implements
 	public const DELAY_ALL = 'all';
 
 	public string $payStatus = self::PAY_STATUS_ALL;
-	public string $delay = self::DELAY_MIN_3_MAX_7_DAYS;
+	public ?string $delay = self::DELAY_MIN_3_MAX_7_DAYS;
 
 	public ?string $issue_id = null;
 	public ?string $calculationOwnerId = null;
@@ -259,7 +259,7 @@ class IssuePaySearch extends IssuePay implements
 	}
 
 	public function getNotPaySum(IssuePayQuery $query): Decimal {
-		return $this->getValueSum($query) - $query->getPayedSum();
+		return $this->getValueSum($query)->sub($query->getPayedSum());
 	}
 
 	public function getValueSum(IssuePayQuery $query): Decimal {

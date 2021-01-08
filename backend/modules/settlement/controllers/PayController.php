@@ -67,7 +67,7 @@ class PayController extends Controller {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'withNav' => false
+			'withNav' => false,
 		]);
 	}
 
@@ -83,6 +83,7 @@ class PayController extends Controller {
 			$searchModel->calculationOwnerId = Yii::$app->user->getId();
 		}
 		$searchModel->payStatus = $status;
+		$searchModel->delay = null;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {

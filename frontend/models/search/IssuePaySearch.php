@@ -7,7 +7,7 @@ use yii\db\QueryInterface;
 
 class IssuePaySearch extends BaseIssuePaySearch {
 
-	public string $delay = self::DELAY_ALL;
+	public ?string $delay = self::DELAY_ALL;
 	public bool $withArchive = false;
 
 	public function applyAgentsFilters(QueryInterface $query): void {
