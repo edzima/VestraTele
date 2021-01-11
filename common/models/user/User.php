@@ -186,7 +186,11 @@ class User extends ActiveRecord implements IdentityInterface {
 	}
 
 	public function getTraitsNames(): string {
-		return implode(", ", ArrayHelper::getColumn($this->traits, 'name'));
+		$traits = $this->traits;
+		if (empty($traits)) {
+			return '';
+		}
+		return implode(", ", ArrayHelper::getColumn($traits, 'name'));
 	}
 
 	protected function getAddresses(): ActiveQuery {
