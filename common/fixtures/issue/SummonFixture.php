@@ -2,6 +2,7 @@
 
 namespace common\fixtures\issue;
 
+use common\fixtures\teryt\SimcFixture;
 use common\models\issue\Summon;
 use yii\test\ActiveFixture;
 
@@ -11,6 +12,7 @@ class SummonFixture extends ActiveFixture {
 
 	public $depends = [
 		IssueFixture::class,
+		SimcFixture::class,
 	];
 
 }

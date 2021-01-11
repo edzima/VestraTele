@@ -33,7 +33,8 @@ class IssueNotesWidget extends IssueWidget {
 		if ($this->notes === null) {
 			$this->notes = $this->model
 				->getIssueNotes()
-				->withoutType()
+				->withoutTypes([IssueNote::TYPE_SETTLEMENT])
+				->orWhere(['type' => null])
 				->joinWith('user.userProfile')
 				->all();
 		}

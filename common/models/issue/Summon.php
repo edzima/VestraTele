@@ -112,36 +112,35 @@ class Summon extends ActiveRecord implements IssueInterface {
 	}
 
 	/**
-	 * @todo add I18n
 	 * {@inheritdoc}
 	 */
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'type' => 'Typ',
-			'typeName' => 'Typ',
-			'status' => 'Status',
-			'statusName' => 'Status',
-			'term' => 'Termin',
-			'termName' => 'Termin',
-			'title' => 'Tytuł',
-			'created_at' => 'Data utworzenia',
-			'updated_at' => 'Data aktualizacji',
-			'start_at' => 'Data wezwania',
-			'realize_at' => 'Wykonaj dnia',
-			'realized_at' => 'Data realizacji',
-			'issue_id' => 'Sprawa',
-			'owner_id' => 'Zlecający',
+			'type' => Yii::t('common', 'Type'),
+			'typeName' => Yii::t('common', 'Type'),
+			'status' => Yii::t('common', 'Status'),
+			'statusName' => Yii::t('common', 'Status'),
+			'term' => Yii::t('common', 'Term'),
+			'termName' => Yii::t('common', 'Term'),
+			'title' => Yii::t('common', 'Title'),
+			'created_at' => Yii::t('common', 'Created at'),
+			'updated_at' => Yii::t('common', 'Updated at'),
+			'start_at' => Yii::t('common', 'Start at'),
+			'realize_at' => Yii::t('common', 'Realize at'),
+			'realized_at' => Yii::t('common', 'Realized at'),
+			'issue_id' => Yii::t('common', 'Issue'),
+			'owner_id' => Yii::t('common', 'Owner'),
 			'issue' => 'Sprawa',
-			'owner' => 'Zlecający',
-			'contractor_id' => 'Realizujący',
-			'contractor' => 'Realizujący',
+			'owner' => Yii::t('common', 'Owner'),
+			'contractor_id' => Yii::t('common', 'Contractor'),
+			'contractor' => Yii::t('common', 'Contractor'),
 			'city_id' => Yii::t('address', 'City'),
 			'city' => Yii::t('address', 'City'),
 			'entity_id' => Yii::t('common', 'Entity responsible'),
 			'entity' => Yii::t('common', 'Entity responsible'),
 			'entityWithCity' => Yii::t('common', 'Entity responsible'),
-
+			'deadline' => Yii::t('common', 'Deadline at'),
 		];
 	}
 
@@ -200,10 +199,10 @@ class Summon extends ActiveRecord implements IssueInterface {
 
 	public static function getTypesNames(): array {
 		return [
-			static::TYPE_DOCUMENTS =>Yii::t('common','Documents'),
-			static::TYPE_INCOMPLETE_DOCUMENTATION => Yii::t('common','Incomplete documentation'),
-			static::TYPE_PHONE =>  Yii::t('common','Phonable'),
-			static::TYPE_ANTIVINDICATION =>  Yii::t('common','Antyvindication'),
+			static::TYPE_DOCUMENTS => Yii::t('common', 'Documents'),
+			static::TYPE_INCOMPLETE_DOCUMENTATION => Yii::t('common', 'Incomplete documentation'),
+			static::TYPE_PHONE => Yii::t('common', 'Phonable'),
+			static::TYPE_ANTIVINDICATION => Yii::t('common', 'Antyvindication'),
 		];
 	}
 
@@ -252,10 +251,18 @@ class Summon extends ActiveRecord implements IssueInterface {
 	}
 
 	public function isForUser(int $id): bool {
-		return $this->contractor_id === $id || $this->owner_id === $id;
+		return $this->isContractor($id) || $this->isOwner($id);
+	}
+
+	public function isOwner(int $id): bool {
+		return $this->owner_id === $id;
+	}
+
+	public function isContractor(int $id): bool {
+		return $this->contractor_id === $id;
 	}
 
 	public function getName(): string {
-		return Yii::t('common','Summon {type}',['type' => $this->getTypeName()]);
+		return Yii::t('common', 'Summon {type}', ['type' => $this->getTypeName()]);
 	}
 }

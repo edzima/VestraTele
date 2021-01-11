@@ -3,11 +3,13 @@
 namespace frontend\controllers;
 
 use common\models\issue\Summon;
+use common\models\user\Worker;
 use frontend\models\search\SummonSearch;
 use frontend\models\SummonForm;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 
@@ -26,7 +28,7 @@ class SummonController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => ['@'],
+						'roles' => [Worker::PERMISSION_SUMMON],
 					],
 				],
 			],
@@ -72,7 +74,7 @@ class SummonController extends Controller {
 	public function actionUpdate(int $id) {
 		$summon = $this->findModel($id);
 		if (!$summon->isForUser(Yii::$app->user->id)) {
-			throw new MethodNotAllowedHttpException();
+			throw new ForbiddenHttpException();
 		}
 		$model = new SummonForm($summon);
 

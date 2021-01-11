@@ -25,14 +25,14 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'realize_at', [
 			'options' => [
-				'class' => 'col-md-2',
+				'class' => 'col-md-4 col-lg-3',
 			],
 		])
 			->widget(DateTimeWidget::class) ?>
 
 		<?= $model->getModel()->isRealized() ? $form->field($model, 'realized_at', [
 			'options' => [
-				'class' => 'col-md-2',
+				'class' => 'col-md-4 col-lg-3',
 			],
 		])
 			->widget(DateTimeWidget::class) : '' ?>

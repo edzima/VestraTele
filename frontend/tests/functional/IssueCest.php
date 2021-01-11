@@ -87,6 +87,27 @@ class IssueCest {
 		$I->dontSeeLink('Create note');
 	}
 
+	public function checkSummonGrid(CustomerServiceTester $I): void {
+		$I->amLoggedIn();
+		$I->haveFixtures(
+			array_merge(
+				IssueFixtureHelper::fixtures(),
+				IssueFixtureHelper::summon()
+			)
+		);
+		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
+		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->id]);
+		$I->see('Summons');
+		$I->dontSeeInGridHeader('Issue', '#summon-grid');
+		$I->dontSeeInGridHeader('Customer', '#summon-grid');
+		$I->seeInGridHeader('Type', '#summon-grid');
+		$I->seeInGridHeader('Status', '#summon-grid');
+		$I->seeInGridHeader('Term', '#summon-grid');
+		$I->seeInGridHeader('Title', '#summon-grid');
+		$I->dontSeeInGridHeader('Owner', '#summon-grid');
+		$I->seeInGridHeader('Contractor', '#summon-grid');
+	}
+
 	public function checkNoteLinkWithoutPermission(CustomerServiceTester $I): void {
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_VIEW);

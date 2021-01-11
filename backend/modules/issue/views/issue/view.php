@@ -1,10 +1,10 @@
 <?php
 
+use backend\modules\issue\widgets\SummonGrid;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\issue\Issue;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
-use common\modules\issue\widgets\IssueSummonsWidget;
 use common\modules\issue\widgets\IssueViewWidget;
 use yii\data\DataProviderInterface;
 use yii\helpers\Html;
@@ -12,6 +12,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model Issue */
 /* @var $calculationsDataProvider DataProviderInterface */
+/* @var $summonDataProvider DataProviderInterface */
 
 $this->title = $model->longId;
 
@@ -62,8 +63,6 @@ $this->params['breadcrumbs'][] = $this->title;
 	</p>
 
 
-	<?= IssueViewWidget::widget(['model' => $model]) ?>
-
 	<?= $calculationsDataProvider->getTotalCount() > 0
 		? IssuePayCalculationGrid::widget([
 			'dataProvider' => $calculationsDataProvider,
@@ -77,7 +76,22 @@ $this->params['breadcrumbs'][] = $this->title;
 		: ''
 	?>
 
-	<?= IssueSummonsWidget::widget(['model' => $model]) ?>
+	<?= IssueViewWidget::widget(['model' => $model]) ?>
+
+	<?= $summonDataProvider->getTotalCount() > 0
+		? SummonGrid::widget([
+			'dataProvider' => $summonDataProvider,
+			'summary' => '',
+			'withCaption' => true,
+			'withIssue' => false,
+			'withCustomer' => false,
+			'withOwner' => false,
+			'withContractor' => true,
+			'withUpdatedAt' => false,
+		])
+		: ''
+	?>
+
 	<?= IssueNotesWidget::widget(['model' => $model]) ?>
 
 </div>

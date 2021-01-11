@@ -3,15 +3,16 @@
 use common\models\issue\Issue;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
-use common\modules\issue\widgets\IssueSummonsWidget;
 use common\modules\issue\widgets\IssueViewWidget;
 use frontend\helpers\Html;
 use frontend\widgets\IssuePayCalculationGrid;
+use frontend\widgets\SummonGrid;
 use yii\data\DataProviderInterface;
 
 /* @var $this yii\web\View */
 /* @var $model Issue */
 /* @var $calculationsDataProvider DataProviderInterface|null */
+/* @var $summonDataProvider DataProviderInterface|null */
 
 $this->title = $model->longId;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['index']];
@@ -52,14 +53,19 @@ $this->params['breadcrumbs'][] = $this->title;
 		'usersLinks' => false,
 	]) ?>
 
-
-
-	<?= IssueSummonsWidget::widget([
-		'model' => $model,
-		'addBtn' => false,
-		'baseUrl' => '/summon/',
-		'actionColumnTemplate' => '{view} {update}',
-	]) ?>
+	<?= $summonDataProvider->getTotalCount() > 0
+		? SummonGrid::widget([
+			'dataProvider' => $summonDataProvider,
+			'summary' => '',
+			'withCaption' => true,
+			'withIssue' => false,
+			'withCustomer' => false,
+			'withOwner' => false,
+			'withContractor' => true,
+			'withUpdatedAt' => false,
+		])
+		: ''
+	?>
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model,

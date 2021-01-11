@@ -3,6 +3,7 @@
 namespace frontend\models\search;
 
 use common\models\issue\search\SummonSearch as BaseSummonSearch;
+use common\models\user\CustomerSearchInterface;
 use yii\data\ActiveDataProvider;
 
 /**
@@ -17,8 +18,9 @@ class SummonSearch extends BaseSummonSearch {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type', 'status', 'term', 'updated_at', 'realized_at', 'start_at', 'issue_id', 'owner_id'], 'integer'],
+			[['id', 'type', 'status', 'term', 'created_at', 'updated_at', 'realized_at', 'start_at', 'issue_id', 'owner_id'], 'integer'],
 			[['title'], 'safe'],
+			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];
 	}
 
@@ -28,7 +30,9 @@ class SummonSearch extends BaseSummonSearch {
 	public function search(array $params): ActiveDataProvider {
 		$provider = parent::search($params);
 		if (empty($this->status)) {
-			$provider->query->andWhere(['status' => array_keys(static::getActiveStatusesNames())]);
+			$provider->query->andWhere([
+				static::SUMMON_ALIAS . '.status' => array_keys(static::getActiveStatusesNames()),
+			]);
 		}
 		return $provider;
 	}

@@ -15,6 +15,7 @@ use frontend\helpers\Url;
 use frontend\models\search\IssuePayCalculationSearch;
 use frontend\models\search\IssueSearch;
 use frontend\models\search\IssueUserSearch;
+use frontend\models\search\SummonSearch;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -99,11 +100,15 @@ class IssueController extends Controller {
 			$search->withAgents = false;
 			$calculationsDataProvider = $search->search([]);
 		}
+		$summonDataProvider = (new SummonSearch(['issue_id' => $model->id]))->search([]);
+		$summonDataProvider->sort = false;
+		$summonDataProvider->pagination = false;
 		Url::remember();
 
 		return $this->render('view', [
 			'model' => $model,
 			'calculationsDataProvider' => $calculationsDataProvider,
+			'summonDataProvider' => $summonDataProvider,
 		]);
 	}
 

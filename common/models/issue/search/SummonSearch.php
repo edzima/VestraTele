@@ -3,13 +3,40 @@
 namespace common\models\issue\search;
 
 use common\models\issue\Summon;
+use common\models\SearchModel;
+use common\models\user\CustomerSearchInterface;
+use common\models\user\query\UserQuery;
+use common\models\user\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\QueryInterface;
 
 /**
  * SummonSearch represents the model behind the search form of `common\models\issue\Summon`.
  */
-class SummonSearch extends Summon {
+class SummonSearch extends Summon implements
+	CustomerSearchInterface,
+	SearchModel {
+
+	public string $customerLastname = '';
+
+	protected const SUMMON_ALIAS = 'S';
+
+	public static function getOwnersNames(): array {
+		return User::getSelectList(Summon::find()
+			->select('owner_id')
+			->distinct()
+			->column()
+		);
+	}
+
+	public static function getContractorsNames(): array {
+		return User::getSelectList(Summon::find()
+			->select('contractor_id')
+			->distinct()
+			->column()
+		);
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -18,6 +45,7 @@ class SummonSearch extends Summon {
 		return [
 			[['id', 'type', 'status', 'term', 'created_at', 'updated_at', 'realized_at', 'start_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
 			[['title'], 'safe'],
+			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];
 	}
 
@@ -37,7 +65,12 @@ class SummonSearch extends Summon {
 	 */
 	public function search(array $params): ActiveDataProvider {
 		$query = Summon::find();
-		$query->with('issue');
+		$query->alias(static::SUMMON_ALIAS);
+		$query->joinWith([
+			'issue.customer C' => function (UserQuery $query) {
+				$query->joinWith('userProfile CP');
+			},
+		]);
 
 		// add conditions that should always apply here
 
@@ -56,23 +89,30 @@ class SummonSearch extends Summon {
 			return $dataProvider;
 		}
 
+		$this->applyCustomerSurnameFilter($query);
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
-			'type' => $this->type,
-			'status' => $this->status,
-			'term' => $this->term,
-			'created_at' => $this->created_at,
-			'updated_at' => $this->updated_at,
-			'start_at' => $this->start_at,
-			'realized_at' => $this->realized_at,
-			'owner_id' => $this->owner_id,
-			'contractor_id' => $this->contractor_id,
+			static::SUMMON_ALIAS . '.id' => $this->id,
+			static::SUMMON_ALIAS . '.type' => $this->type,
+			static::SUMMON_ALIAS . '.status' => $this->status,
+			static::SUMMON_ALIAS . '.term' => $this->term,
+			static::SUMMON_ALIAS . '.created_at' => $this->created_at,
+			static::SUMMON_ALIAS . '.updated_at' => $this->updated_at,
+			static::SUMMON_ALIAS . '.start_at' => $this->start_at,
+			static::SUMMON_ALIAS . '.realized_at' => $this->realized_at,
+			static::SUMMON_ALIAS . '.owner_id' => $this->owner_id,
+			static::SUMMON_ALIAS . '.contractor_id' => $this->contractor_id,
 		]);
-		$query->andFilterWhere(['like', 'issue_id', $this->issue_id]);
 
-		$query->andFilterWhere(['like', 'title', $this->title]);
+		$query->andFilterWhere(['like', static::SUMMON_ALIAS . '.issue_id', $this->issue_id]);
+		$query->andFilterWhere(['like', static::SUMMON_ALIAS . '.title', $this->title]);
 
 		return $dataProvider;
+	}
+
+	public function applyCustomerSurnameFilter(QueryInterface $query): void {
+		if (!empty($this->customerLastname)) {
+			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
+		}
 	}
 }

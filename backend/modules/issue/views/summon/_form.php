@@ -56,13 +56,13 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'entity_id', [
 			'options' => [
-				'class' => 'col-md-2',
+				'class' => 'col-md-3',
 			],
 		])->dropDownList(SummonForm::getEntityNames()) ?>
 
 		<?= $form->field($model, 'city_id', [
 			'options' => [
-				'class' => 'col-md-3',
+				'class' => 'col-md-4',
 			],
 		])->widget(CitySimcInputWidget::class) ?>
 	</div>
@@ -75,7 +75,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'start_at', [
 			'options' => [
-				'class' => 'col-md-2',
+				'class' => 'col-md-3',
 			],
 		])
 			->widget(DateTimeWidget::class, [
@@ -84,7 +84,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'realize_at', [
 			'options' => [
-				'class' => 'col-md-2',
+				'class' => 'col-md-3',
 			],
 		])
 			->widget(DateTimeWidget::class) ?>
@@ -92,7 +92,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $model->getModel()->isRealized() ? $form->field($model, 'realized_at', [
 			'options' => [
-				'class' => 'col-md-2',
+				'class' => 'col-md-3',
 			],
 		])
 			->widget(DateTimeWidget::class) : '' ?>

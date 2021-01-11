@@ -4,6 +4,7 @@ namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueForm;
 use backend\modules\issue\models\search\IssueSearch;
+use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\CsvForm;
 use common\models\issue\Issue;
@@ -84,9 +85,13 @@ class IssueController extends Controller {
 		$search = new IssuePayCalculationSearch();
 		$search->issue_id = $id;
 		$calculationsDataProvider = $search->search([]);
+		$summonDataProvider = (new SummonSearch(['issue_id' => $model->id]))->search([]);
+		$summonDataProvider->sort = false;
+		$summonDataProvider->pagination = false;
 		return $this->render('view', [
 			'model' => $model,
 			'calculationsDataProvider' => $calculationsDataProvider,
+			'summonDataProvider' => $summonDataProvider,
 		]);
 	}
 

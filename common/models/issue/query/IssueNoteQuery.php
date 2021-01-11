@@ -50,4 +50,9 @@ class IssueNoteQuery extends ActiveQuery {
 		$this->andWhere(['type' => null]);
 		return $this;
 	}
+
+	public function withoutTypes(array $types): self {
+		$this->andWhere(['not in', 'type', $types]);
+		return $this;
+	}
 }

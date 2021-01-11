@@ -73,7 +73,12 @@ JS;
 ?>
 <div class="issue-index relative">
 	<?php Pjax::begin(); ?>
+
 	<p>
+		<?= Yii::$app->user->can(User::PERMISSION_SUMMON)
+			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index'], ['class' => 'btn btn-warning'])
+			: ''
+		?>
 		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
 			? Html::a(Yii::t('backend', 'Settlements'), ['/settlement/calculation/index'], ['class' => 'btn btn-success'])
 			: ''
