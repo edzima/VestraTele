@@ -4,6 +4,7 @@ namespace backend\tests\unit;
 
 use backend\modules\user\models\CustomerUserForm;
 use common\fixtures\AddressFixture;
+use common\fixtures\helpers\TerytFixtureHelper;
 use common\fixtures\user\CustomerFixture;
 use common\fixtures\user\UserAddressFixture;
 use common\models\user\Customer;
@@ -15,21 +16,26 @@ class CustomerFormTest extends Unit {
 	public function _before() {
 		parent::_before();
 		Yii::$app->authManager->removeAllAssignments();
-		$this->tester->haveFixtures([
-			'customer' => [
-				'class' => CustomerFixture::class,
-				'dataFile' => codecept_data_dir() . 'customer.php',
-			],
-			'user-address' => [
-				'class' => UserAddressFixture::class,
-				'dataFile' => codecept_data_dir() . 'customer_address.php',
+		$this->tester->haveFixtures(array_merge
+			(
+				[
+					'customer' => [
+						'class' => CustomerFixture::class,
+						'dataFile' => codecept_data_dir() . 'customer.php',
+					],
+					'user-address' => [
+						'class' => UserAddressFixture::class,
+						'dataFile' => codecept_data_dir() . 'customer_address.php',
 
-			],
-			'address' => [
-				'class' => AddressFixture::class,
-				'dataFile' => codecept_data_dir() . 'address.php',
-			],
-		]);
+					],
+					'address' => [
+						'class' => AddressFixture::class,
+						'dataFile' => codecept_data_dir() . 'address.php',
+					],
+				],
+				TerytFixtureHelper::fixtures()
+			)
+		);
 	}
 
 	protected function _after() {

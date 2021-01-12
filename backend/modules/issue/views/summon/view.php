@@ -21,6 +21,15 @@ YiiAsset::register($this);
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
+		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
+			? Html::a(
+				Yii::t('common', 'Create note'),
+				['/issue/note/create-summon', 'id' => $model->id],
+				[
+					'class' => 'btn btn-info',
+				])
+			: ''
+		?>
 		<?= $model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
 			? Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: ''

@@ -5,6 +5,9 @@ namespace backend\tests\functional\issue;
 use backend\modules\issue\controllers\SummonController;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\SummonIssueManager;
+use common\fixtures\helpers\IssueFixtureHelper;
+use common\models\issue\Summon;
+use common\models\user\Worker;
 
 class SummonCest {
 
@@ -13,6 +16,9 @@ class SummonCest {
 
 	/** @see SummonController::actionCreate() */
 	public const ROUTE_CREATE = '/issue/summon/create';
+
+	/** @see SummonController::actionView() */
+	public const ROUTE_VIEW = '/issue/summon/view';
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -45,5 +51,41 @@ class SummonCest {
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->click('Create summon');
 		$I->seeInCurrentUrl(static::ROUTE_CREATE);
+	}
+
+	public function checkView(SummonIssueManager $I): void {
+		$I->haveFixtures(array_merge(
+			IssueFixtureHelper::fixtures(),
+			IssueFixtureHelper::summon(),
+		));
+		/** @var Summon $summon */
+		$summon = $I->grabFixture(IssueFixtureHelper::SUMMON, 'new');
+		$I->amLoggedIn();
+		$I->amOnPage([static::ROUTE_VIEW, 'id' => $summon->id]);
+		$I->see('Summon #' . $summon->id);
+		$I->dontSeeLink('Create note');
+		$I->see($summon->title);
+		$I->see($summon->issue->longId);
+		$I->see($summon->owner->getFullName());
+		$I->see($summon->contractor->getFullName());
+		$I->see($summon->typeName);
+		$I->see($summon->statusName);
+		$I->see($summon->termName);
+		$I->see($summon->entityWithCity);
+	}
+
+	public function checkViewWithNotePermission(SummonIssueManager $I): void {
+		$I->haveFixtures(array_merge(
+			IssueFixtureHelper::fixtures(),
+			IssueFixtureHelper::summon(),
+		));
+		/** @var Summon $summon */
+		$summon = $I->grabFixture(IssueFixtureHelper::SUMMON, 'new');
+		$I->assignPermission(Worker::PERMISSION_NOTE);
+		$I->amLoggedIn();
+		$I->amOnPage([static::ROUTE_VIEW, 'id' => $summon->id]);
+		$I->seeLink('Create note');
+		$I->click('Create note');
+		$I->seeInCurrentUrl(NoteCest::ROUTE_CREATE_SUMMON);
 	}
 }

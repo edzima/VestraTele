@@ -24,7 +24,7 @@ class Module extends BaseModule {
 					[
 						'allow' => true,
 						'controllers' => ['issue/meet'],
-						'permissions' => [Worker::PERMISSION_ISSUE, Worker::PERMISSION_MEET],
+						'permissions' => [Worker::PERMISSION_MEET],
 					],
 					[
 						'allow' => true,

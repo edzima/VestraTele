@@ -4,6 +4,7 @@ namespace backend\tests\unit;
 
 use backend\modules\user\models\UserForm;
 use common\fixtures\AddressFixture;
+use common\fixtures\helpers\TerytFixtureHelper;
 use common\fixtures\user\UserAddressFixture;
 use common\fixtures\UserFixture;
 use common\fixtures\UserProfileFixture;
@@ -15,28 +16,32 @@ class UserFormTest extends Unit {
 
 	public function _before(): void {
 		parent::_before();
-		$this->tester->haveFixtures([
-			'user' => [
-				'class' => UserFixture::class,
-				'dataFile' => codecept_data_dir() . 'user.php',
-			],
-			'user-profile' => [
-				'class' => UserProfileFixture::class,
-				'dataFile' => codecept_data_dir() . 'user_profile.php',
-			],
-			'user-address' => [
-				'class' => UserAddressFixture::class,
-				'dataFile' => codecept_data_dir() . 'user_address.php',
-			],
-			'address' => [
-				'class' => AddressFixture::class,
-				'dataFile' => codecept_data_dir() . 'address.php',
-			],
-			'user-trait' => [
-				'class' => UserTraitFixture::class,
-				'dataFile' => codecept_data_dir() . 'user_trait.php',
-			],
-		]);
+		$this->tester->haveFixtures(array_merge(
+				[
+					'user' => [
+						'class' => UserFixture::class,
+						'dataFile' => codecept_data_dir() . 'user.php',
+					],
+					'user-profile' => [
+						'class' => UserProfileFixture::class,
+						'dataFile' => codecept_data_dir() . 'user_profile.php',
+					],
+					'user-address' => [
+						'class' => UserAddressFixture::class,
+						'dataFile' => codecept_data_dir() . 'user_address.php',
+					],
+					'address' => [
+						'class' => AddressFixture::class,
+						'dataFile' => codecept_data_dir() . 'address.php',
+					],
+					'user-trait' => [
+						'class' => UserTraitFixture::class,
+						'dataFile' => codecept_data_dir() . 'user_trait.php',
+					],
+				],
+				TerytFixtureHelper::fixtures()
+			)
+		);
 	}
 
 	public function testCorrectCreate(): void {

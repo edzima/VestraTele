@@ -24,7 +24,6 @@ class SummonCest {
 		return array_merge(
 			IssueFixtureHelper::fixtures(),
 			IssueFixtureHelper::summon(),
-			TerytFixtureHelper::fixtures(),
 		);
 	}
 
@@ -108,5 +107,7 @@ class SummonCest {
 		$I->click('Create note');
 		$I->seeInCurrentUrl(NoteCest::ROUTE_SUMMON);
 	}
+
+
 
 }

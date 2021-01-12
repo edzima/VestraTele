@@ -118,12 +118,12 @@ class IssueFixtureHelper {
 	}
 
 	public static function summon(): array {
-		return [
+		return array_merge(TerytFixtureHelper::fixtures(), [
 			static::SUMMON => [
 				'class' => SummonFixture::class,
 				'dataFile' => static::dataDir() . 'issue/summon.php',
 			],
-		];
+		]);
 	}
 
 }
