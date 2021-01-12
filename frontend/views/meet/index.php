@@ -2,6 +2,7 @@
 
 use backend\widgets\CsvForm;
 use common\models\issue\IssueMeet;
+use common\widgets\grid\AddressColumn;
 use frontend\models\AgentMeetSearch;
 use kartik\grid\ActionColumn;
 use kartik\grid\GridView;
@@ -47,15 +48,8 @@ $this->params['breadcrumbs'][] = $this->title;
 			'client_surname',
 			'phone',
 			[
-				'attribute' => 'cityName',
-				'value' => 'customerAddress.city.name',
-				'label' => 'Miasto',
-			],
-			[
-				'attribute' => 'regionId',
-				'value' => 'customerAddress.city.region.name',
-				'label' => 'Województwo',
-				'filter' => AgentMeetSearch::getRegionsNames(),
+				'class' => AddressColumn::class,
+				'attribute' => 'customerAddress',
 			],
 			[
 				'attribute' => 'details',

@@ -1,20 +1,43 @@
 <?php
 
+use common\fixtures\helpers\TerytFixtureHelper;
+
 return [
-	//02;13;03;5;01;1;Duchowo;0877660;0877660;2020-01-01
-	//02;13;03;5;01;1;Postolin;0878116;0878116;2020-01-01
+
 	[
-		'region_id' => 02,
+		'region_id' => 2,
 		'district_id' => 13,
-		'commune_id' => 03,
-		'id' => 877660,
+		'commune_id' => 3,
+		'id' => TerytFixtureHelper::SIMC_ID_DUCHOWO,
 		'name' => 'Duchowo',
 	],
 	[
-		'region_id' => 02,
+		'region_id' => 2,
 		'district_id' => 13,
-		'commune_id' => 03,
-		'id' => 878116,
+		'commune_id' => 3,
+		'id' => TerytFixtureHelper::SIMC_ID_POSTOLIN,
 		'name' => 'Postolin',
 	],
+	[
+		'region_id' => 22,
+		'district_id' => 8,
+		'commune_id' => 1,
+		'id' => TerytFixtureHelper::SIMC_ID_LEBORK,
+		'name' => 'Lębork',
+	],
+	[
+		'region_id' => 22,
+		'district_id' => 15,
+		'commune_id' => 3,
+		'id' => TerytFixtureHelper::SIMC_ID_WEJHEROWO,
+		'name' => 'Wejherowo',
+	],
+	[
+		'region_id' => 24,
+		'district_id' => 61,
+		'commune_id' => 1,
+		'id' => TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA,
+		'name' => 'Bielsko-Biała',
+	],
+
 ];

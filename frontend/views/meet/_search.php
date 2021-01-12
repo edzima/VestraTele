@@ -1,5 +1,6 @@
 <?php
 
+use common\widgets\address\AddressSearchWidget;
 use common\widgets\DateTimeWidget;
 use frontend\models\IssueMeetSearch;
 use yii\helpers\Html;
@@ -55,8 +56,14 @@ use yii\widgets\ActiveForm;
 				'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
 			]) ?>
 
+
 	</div>
 
+
+	<?= AddressSearchWidget::widget([
+		'form' => $form,
+		'model' => $model->getAddressSearch(),
+	]) ?>
 
 	<div class="form-group">
 		<?= Html::submitButton('Szukaj', ['class' => 'btn btn-primary']) ?>

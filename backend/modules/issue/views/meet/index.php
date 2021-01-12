@@ -5,6 +5,7 @@ use common\models\issue\IssueMeet;
 use common\models\issue\IssueMeetSearch;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\widgets\grid\AddressColumn;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
@@ -24,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<p>
 		<?= Html::a('Dodaj', ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
-	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() :'' ?>
+	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() : '' ?>
 
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
@@ -49,15 +50,8 @@ $this->params['breadcrumbs'][] = $this->title;
 			'client_surname',
 			'phone',
 			[
-				'attribute' => 'cityName',
-				'value' => 'customerAddress.city.name',
-				'label' => 'Miasto',
-			],
-			[
-				'attribute' => 'regionId',
-				'value' => 'customerAddress.city.region.name',
-				'label' => 'Województwo',
-				'filter' => IssueMeetSearch::getRegionsNames(),
+				'class' => AddressColumn::class,
+				'attribute' => 'customerAddress',
 			],
 			[
 				'class' => DataColumn::class,
@@ -82,7 +76,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'details',
 				'format' => 'ntext',
 			],
-			'date_at:date',
 			'updated_at:date',
 			[
 				'attribute' => 'status',

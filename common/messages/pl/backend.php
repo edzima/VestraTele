@@ -19,6 +19,7 @@
 return [
 	'Activate' => 'Aktywuj',
 	'Active' => 'Aktywny',
+	'Addresses' => 'Adresy',
 	'Application settings' => 'Ustawienia aplikacji',
 	'Are you sure you want to delete this item?' => 'Czy jesteś pewny, że chcesz to usunąć?',
 	'Are you sure you want to flush this cache?' => 'Вы уверены, что хотите сбросить этот кеш?',
@@ -278,5 +279,5 @@ return [
 	'Update pay: {value}' => 'Update pay: {value}',
 	'Received {count} pays. Value sum: {valueSum}' => 'Odebrano {count} wpłat. Suma: {valueSum}',
 	'Pay status: {value}' => 'Status wpłaty: {value}',
-	'Traits' => 'Cechy'
+	'Traits' => 'Cechy',
 ];

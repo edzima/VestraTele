@@ -10,7 +10,6 @@ use common\models\user\Worker;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
-use yii\web\ForbiddenHttpException;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 use yii2tech\csvgrid\CsvGrid;
@@ -35,14 +34,6 @@ class MeetController extends Controller {
 		];
 	}
 
-	public function beforeAction($action) {
-		$before = parent::beforeAction($action);
-		if ($before && Yii::$app->user->can(Worker::PERMISSION_MEET)) {
-			return true;
-		}
-		throw new ForbiddenHttpException();
-	}
-
 	/**
 	 * Lists all IssueMeet models.
 	 *
@@ -55,30 +46,53 @@ class MeetController extends Controller {
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {
-			$exporter = new CsvGrid([
-				'query' => $dataProvider->query,
-				'columns' => [
-					[
-						'attribute' => 'clientFullName',
-						'label' => 'Nazwa',
-					],
-					[
-						'attribute' => 'street',
-					],
-					['attribute' => 'phone'],
-					[
-						'attribute' => 'city.name',
-						'label' => 'Miasto',
-					],
-					[
-						'attribute' => 'province.name',
-						'label' => 'Powiat',
-					],
-					[
-						'attribute' => 'state.name',
-						'label' => 'Województwo',
-					],
+			$query = clone $dataProvider->query;
+			$columns = [
+				[
+					'attribute' => 'clientFullName',
+					'label' => 'Nazwa',
 				],
+				['attribute' => 'phone'],
+				['attribute' => 'email'],
+			];
+			$addressSearch = $searchModel->getAddressSearch();
+			if (!empty($addressSearch->region_id)
+				|| !empty($addressSearch->city_name)
+				|| !empty($addressSearch->region_id)) {
+				$query->joinWith('addresses.address.city.terc');
+
+				$addressColumns = [
+					[
+						'attribute' => 'customerAddress.city.region.name',
+						'label' => Yii::t('address', 'Region'),
+					],
+					[
+						'attribute' => 'customerAddress.city.terc.district.name',
+						'label' => Yii::t('address', 'District'),
+					],
+					[
+						'attribute' => 'customerAddress.city.terc.commune.name',
+						'label' => Yii::t('address', 'Commune'),
+					],
+					[
+						'attribute' => 'customerAddress.postal_code',
+						'label' => Yii::t('address', 'Code'),
+					],
+					[
+						'attribute' => 'customerAddress.city.name',
+						'label' => Yii::t('address', 'City'),
+					],
+					[
+						'attribute' => 'customerAddress.info',
+						'label' => Yii::t('address', 'Info'),
+					],
+				];
+				$columns = array_merge($columns, $addressColumns);
+			}
+
+			$exporter = new CsvGrid([
+				'query' => $query,
+				'columns' => $columns,
 			]);
 			return $exporter->export()->send('export.csv');
 		}

@@ -20,6 +20,9 @@ use yii\db\ActiveRecord;
  * @property string|null $info
  *
  * @property Simc $city
+ *
+ * @property-read User[] $users
+ * @property-read IssueMeet[] $meets
  */
 class Address extends ActiveRecord {
 
@@ -75,11 +78,12 @@ class Address extends ActiveRecord {
 	}
 
 	public function getUsers(): UserQuery {
-		return $this->hasMany(User::class, ['user_id' => 'id'])->viaTable('{{%user_address}}', ['address_id' => 'id']);
+		return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('{{%user_address}}', ['address_id' => 'id']);
 	}
 
+
 	public function getMeets(): ActiveQuery {
-		return $this->hasMany(IssueMeet::class, ['meet_id' => 'id'])->viaTable('{{%meet_address}}', ['address_id' => 'id']);
+		return $this->hasMany(IssueMeet::class, ['id' => 'meet_id'])->viaTable('{{%meet_address}}', ['address_id' => 'id']);
 	}
 
 	public function getCityFullName(): string {

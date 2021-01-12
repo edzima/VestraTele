@@ -15,6 +15,9 @@ class TerytFixtureHelper {
 
 	public const SIMC_ID_DUCHOWO = 877660;
 	public const SIMC_ID_POSTOLIN = 878116;
+	public const SIMC_ID_LEBORK = 977373;
+	public const SIMC_ID_WEJHEROWO = 934984;
+	public const SIMC_ID_BIELSKO_BIALA = 923584;
 
 	public static function dataDir(): string {
 		return Yii::getAlias('@common/tests/_data/teryt/');

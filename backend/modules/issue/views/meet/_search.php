@@ -1,6 +1,7 @@
 <?php
 
 use common\models\issue\IssueMeetSearch;
+use common\widgets\address\AddressSearchWidget;
 use common\widgets\DateTimeWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -13,7 +14,7 @@ use yii\widgets\ActiveForm;
 <div class="issue-meet-search">
 
 	<?php $form = ActiveForm::begin([
-		'action' => [Yii::$app->controller->action->id],
+		'action' => ['index'],
 		'method' => 'get',
 	]); ?>
 
@@ -22,40 +23,37 @@ use yii\widgets\ActiveForm;
 			'options' => [
 				'class' => 'col-md-3',
 			],
-		])
-			->widget(DateTimeWidget::class, [
-				'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
-			]) ?>
+		])->widget(DateTimeWidget::class)
+		?>
 
 		<?= $form->field($model, 'created_at_to', [
 			'options' => [
 				'class' => 'col-md-3',
 			],
-		])
-			->widget(DateTimeWidget::class, [
-				'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
-			]) ?>
+		])->widget(DateTimeWidget::class)
+		?>
 
 
 		<?= $form->field($model, 'date_at_from', [
 			'options' => [
 				'class' => 'col-md-3',
 			],
-		])
-			->widget(DateTimeWidget::class, [
-				'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
-			]) ?>
+		])->widget(DateTimeWidget::class)
+		?>
 
 		<?= $form->field($model, 'date_at_to', [
 			'options' => [
 				'class' => 'col-md-3',
 			],
-		])
-			->widget(DateTimeWidget::class, [
-				'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm',
-			]) ?>
+		])->widget(DateTimeWidget::class)
+		?>
 
 	</div>
+
+	<?= AddressSearchWidget::widget([
+		'form' => $form,
+		'model' => $model->getAddressSearch(),
+	]) ?>
 
 
 	<div class="form-group">

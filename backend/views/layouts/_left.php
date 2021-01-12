@@ -209,6 +209,11 @@ $user = Yii::$app->user;
 					'visible' => $user->can(User::PERMISSION_NEWS),
 				],
 				[
+					'label' => Yii::t('backend', 'Addresses'),
+					'url' => ['/address/index'],
+					'icon' => '<i class="fa fa-home"></i>',
+				],
+				[
 					'label' => Yii::t('backend', 'System'),
 					'options' => ['class' => 'header'],
 				],
