@@ -1,7 +1,6 @@
 <?php
 
 use backend\modules\settlement\models\IssueCostForm;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model IssueCostForm */
@@ -13,8 +12,6 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Costs'), 'url' =
 $this->params['breadcrumbs'][] = Yii::t('backend', 'Create');
 ?>
 <div class="issue-cost-create">
-
-	<h1><?= Html::encode($this->title) ?></h1>
 
 	<?= $this->render('_form', [
 		'model' => $model,

@@ -17,8 +17,6 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Costs');
 ?>
 <div class="issue-cost-issue">
 
-	<h1><?= Html::encode($this->title) ?></h1>
-
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create'), ['create', 'id' => $issue->id], ['class' => 'btn btn-success']) ?>
 	</p>

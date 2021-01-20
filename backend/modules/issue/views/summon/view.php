@@ -1,5 +1,6 @@
 <?php
 
+use backend\helpers\Breadcrumbs;
 use backend\helpers\Url;
 use common\models\issue\Summon;
 use common\models\user\User;
@@ -12,13 +13,12 @@ use yii\widgets\DetailView;
 /* @var $model Summon */
 
 $this->title = Yii::t('common', 'Summon #{id}', ['id' => $model->id]);
+$this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Summons'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $model->id;
 YiiAsset::register($this);
 ?>
 <div class="summon-view">
-
-	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
 		<?= Yii::$app->user->can(User::PERMISSION_NOTE)

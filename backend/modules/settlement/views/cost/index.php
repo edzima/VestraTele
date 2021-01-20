@@ -4,7 +4,6 @@ use backend\modules\settlement\models\search\IssueCostSearch;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
 use kartik\grid\SerialColumn;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model IssueCostSearch */
@@ -15,8 +14,6 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' 
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-cost-index">
-
-	<h1><?= Html::encode($this->title) ?></h1>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,

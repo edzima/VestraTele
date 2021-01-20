@@ -111,6 +111,13 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 		return StringHelper::startsWith($this->type, $type);
 	}
 
+	public function getEntityId(): string {
+		if (empty($this->type)) {
+			return $this->issue_id;
+		}
+		return StringHelper::explode($this->type, ':')[1];
+	}
+
 	public static function generateType(string $type, int $id): string {
 		return "$type:$id";
 	}

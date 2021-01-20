@@ -6,6 +6,7 @@ use backend\modules\issue\models\IssueNoteForm;
 use backend\modules\issue\models\search\IssueNoteSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
+use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -92,6 +93,26 @@ class NoteController extends Controller {
 		]);
 	}
 
+	public function actionCreateSettlement(int $id) {
+		$settlement = IssuePayCalculation::findOne($id);
+		if ($settlement === null || !Yii::$app->user->canSeeIssue($settlement->getIssueModel())) {
+			throw new NotFoundHttpException();
+		}
+		$note = new IssueNote();
+		$note->issue_id = $settlement->issue_id;
+		$note->user_id = Yii::$app->user->getId();
+		$note->type = IssueNote::generateType(IssueNote::TYPE_SETTLEMENT, $settlement->id);
+		$model = new IssueNoteForm($note);
+
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['/settlement/calculation/view', 'id' => $settlement->id]);
+		}
+		return $this->render('create-settlement', [
+			'model' => $model,
+			'settlement' => $settlement,
+		]);
+	}
+
 	public function actionCreateSummon(int $id) {
 		$summon = Summon::findOne($id);
 		if ($summon === null) {
@@ -121,8 +142,8 @@ class NoteController extends Controller {
 		$model = new IssueNoteForm($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			if ($model->note->type === IssueNote::TYPE_SETTLEMENT) {
-				return $this->redirectPayCalculation($model->getNote()->issue_id);
+			if ($model->note->isForSettlement()) {
+				return $this->redirect(['/settlement/calculation/view', 'id' => $model->note->getEntityId()]);
 			}
 			return $this->redirectIssue($model->getNote()->issue_id);
 		}
@@ -147,7 +168,7 @@ class NoteController extends Controller {
 	}
 
 	private function redirectPayCalculation(int $issueId) {
-		return $this->redirect(['pay-calculation/view', 'id' => $issueId]);
+		return $this->redirect(['/settlement/calculation/pay-calculation/view', 'id' => $issueId]);
 	}
 
 	private function redirectIssue(int $issueId) {

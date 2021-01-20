@@ -9,6 +9,13 @@ use yii\web\User as BaseUser;
 
 class User extends BaseUser {
 
+	public function can($permissionName, $params = [], $allowCaching = true): bool {
+		if (YII_ENV_TEST) {
+			$allowCaching = false;
+		}
+		return parent::can($permissionName, $params, $allowCaching);
+	}
+
 	public function canSeeIssue(Issue $model, bool $withChildes = true): bool {
 
 		if ($this->can(Worker::ROLE_ADMINISTRATOR)) {
