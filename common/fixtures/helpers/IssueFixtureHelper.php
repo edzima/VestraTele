@@ -9,7 +9,9 @@ use common\fixtures\issue\StageFixture;
 use common\fixtures\issue\StageTypesFixtures;
 use common\fixtures\issue\SummonFixture;
 use common\fixtures\issue\TypeFixture;
+use common\fixtures\settlement\CalculationCostFixture;
 use common\fixtures\settlement\CalculationFixture;
+use common\fixtures\settlement\CostFixture;
 use common\fixtures\settlement\PayFixture;
 use common\fixtures\settlement\PayReceivedFixture;
 use common\models\user\User;
@@ -95,8 +97,8 @@ class IssueFixtureHelper {
 		return $users;
 	}
 
-	public static function settlements(): array {
-		return [
+	public static function settlements(bool $withCost = false): array {
+		$fixtures = [
 			static::CALCULATION => [
 				'class' => CalculationFixture::class,
 				'dataFile' => static::dataDir() . 'settlement/calculation.php',
@@ -106,6 +108,17 @@ class IssueFixtureHelper {
 				'dataFile' => static::dataDir() . 'settlement/pay.php',
 			],
 		];
+		if ($withCost) {
+			$fixtures['cost'] = [
+				'class' => CostFixture::class,
+				'dataFile' => static::dataDir() . 'settlement/cost.php',
+			];
+			$fixtures['calculation-cost'] = [
+				'class' => CalculationCostFixture::class,
+				'dataFile' => static::dataDir() . 'settlement/calculation-cost.php',
+			];
+		}
+		return $fixtures;
 	}
 
 	public static function payReceived(): array {

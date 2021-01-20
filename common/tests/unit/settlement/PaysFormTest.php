@@ -56,7 +56,7 @@ class PaysFormTest extends PayFormTest {
 		$this->tester->assertSame('2020-02-29', $pay2->getDeadlineAt()->format($model->dateFormat));
 	}
 
-	protected function createForm(): PaysForm {
-		return new PaysForm();
+	protected function createForm(array $config = []): PaysForm {
+		return new PaysForm($config);
 	}
 }

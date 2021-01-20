@@ -5,28 +5,41 @@ namespace common\models\settlement;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
-use common\models\user\User;
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\helpers\ArrayHelper;
 
 class CalculationForm extends PayForm {
 
-	public ?int $issue_id = null;
-	protected ?int $owner = null;
+	private Issue $issue;
+	private int $owner;
 	public $type;
 
 	public ?int $providerType = null;
+	public $costs_ids = [];
 
 	private ?IssuePayCalculation $model = null;
+
+	public function __construct(int $owner_id, Issue $issue, $config = []) {
+		$this->issue = $issue;
+		$this->owner = $owner_id;
+		parent::__construct($config);
+	}
+
+	public static function createFromModel(IssuePayCalculation $model): self {
+		$self = new static(
+			$model->owner_id,
+			$model->issue
+		);
+		$self->setCalculation($model);
+		return $self;
+	}
 
 	/**
 	 * @return int
 	 * @throws InvalidConfigException
 	 */
 	protected function getOwner(): int {
-		if ($this->owner === null) {
-			throw new InvalidConfigException('Owner must be set as integer.');
-		}
 		return $this->owner;
 	}
 
@@ -36,12 +49,11 @@ class CalculationForm extends PayForm {
 
 	public function rules(): array {
 		return array_merge([
-			[['issue_id', 'type', 'providerType',], 'required'],
-			[['issue_id', 'owner', 'type', 'providerType'], 'integer'],
+			[['type', 'providerType',], 'required'],
+			[['owner', 'type', 'providerType'], 'integer'],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
+			['costs_ids', 'in', 'range' => array_keys($this->getCostsData()), 'allowArray' => true],
 			['providerType', 'in', 'range' => array_keys(IssuePayCalculation::getProvidersTypesNames())],
-			[['owner'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner' => 'id']],
-			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 		], parent::rules());
 	}
 
@@ -57,13 +69,17 @@ class CalculationForm extends PayForm {
 		return array_merge([
 			'providerType' => Yii::t('settlement', 'Provider'),
 			'type' => Yii::t('settlement', 'Type'),
+			'costs_ids' => Yii::t('settlement', 'Costs'),
 		], parent::attributeLabels());
 	}
 
 	public function setCalculation(IssuePayCalculation $model): void {
 		$this->model = $model;
-		$this->issue_id = $model->issue_id;
+		$this->issue = $model->issue;
 		$this->owner = $model->owner_id;
+		$this->costs_ids = ArrayHelper::getColumn($model->costs, 'id');
+		$this->providerType = $model->provider_type;
+		$this->type = $model->type;
 		if ($model->getPaysCount() === 1) {
 			$this->setPay($model->getPays()->one());
 		}
@@ -73,7 +89,7 @@ class CalculationForm extends PayForm {
 	public function getModel(): IssuePayCalculation {
 		if ($this->model === null) {
 			$model = new IssuePayCalculation();
-			$model->issue_id = $this->issue_id;
+			$model->issue_id = $this->getIssue()->id;
 			$model->owner_id = $this->owner;
 			$this->model = $model;
 		}
@@ -81,7 +97,11 @@ class CalculationForm extends PayForm {
 	}
 
 	public function getIssue(): Issue {
-		return $this->getModel()->issue;
+		return $this->issue;
+	}
+
+	public function getCostsData(): array {
+		return ArrayHelper::map($this->getIssue()->costs, 'id', 'typeNameWithValue');
 	}
 
 	public function save(): bool {
@@ -89,12 +109,13 @@ class CalculationForm extends PayForm {
 			return false;
 		}
 		$model = $this->getModel();
+		$model->owner_id = $this->owner;
+		$model->issue_id = $this->getIssue()->id;
 		if ($model->isNewRecord) {
 			$model->stage_id = $this->getIssue()->stage_id;
 		}
-		$model->owner_id = $this->getOwner();
+
 		$model->payment_at = $this->getPaymentAt() ? $this->getPaymentAt()->format($this->dateFormat) : null;
-		$model->issue_id = $this->issue_id;
 		$model->value = $this->getValue()->toFixed(2);
 		$model->type = $this->type;
 		$model->provider_type = $this->providerType;
@@ -102,6 +123,7 @@ class CalculationForm extends PayForm {
 		if (!$model->save(false)) {
 			return false;
 		}
+		$this->saveCosts();
 		$paysCount = $model->getPaysCount();
 		if ($paysCount === 0) {
 			$calculationPay = new IssuePay();
@@ -114,6 +136,17 @@ class CalculationForm extends PayForm {
 			$calculationPay->save(false);
 		}
 		return true;
+	}
+
+	protected function saveCosts(): void {
+		$model = $this->getModel();
+		if ($model->getCosts()->count() > 0) {
+			$model->unlinkCosts();
+		}
+
+		if (!empty($this->costs_ids)) {
+			$model->linkCosts((array) $this->costs_ids);
+		}
 	}
 
 	/**

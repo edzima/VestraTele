@@ -17,6 +17,8 @@ class SettlementDetailView extends DetailView {
 
 	public bool $withType = true;
 
+	public bool $withValueWithoutCosts = false;
+
 	public function init(): void {
 		if (!$this->model instanceof IssuePayCalculation) {
 			throw new InvalidConfigException('$model must be instance of: ' . IssuePayCalculation::class);
@@ -69,6 +71,11 @@ class SettlementDetailView extends DetailView {
 				'attribute' => 'valueToPay',
 				'format' => 'currency',
 				'visible' => !$this->model->isPayed(),
+			],
+			[
+				'attribute' => 'valueWithoutCosts',
+				'format' => 'currency',
+				'visible' => $this->model->hasCosts && $this->withValueWithoutCosts,
 			],
 			[
 				'attribute' => 'userProvisionsSum',

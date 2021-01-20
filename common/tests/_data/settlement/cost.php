@@ -22,7 +22,7 @@ return [
 		'updated_at' => '1391885313',
 	],
 	[
-		'issue_id' => 1,
+		'issue_id' => 2,
 		'type' => IssueCost::TYPE_JUSTIFICATION_OF_THE_JUDGMENT,
 		'value' => 150,
 		'vat' => 0,

@@ -79,8 +79,8 @@ class PayFormTest extends Unit {
 		);
 	}
 
-	protected function createForm(): PayForm {
-		return new PayForm();
+	protected function createForm(array $config = []): PayForm {
+		return new PayForm($config);
 	}
 
 }

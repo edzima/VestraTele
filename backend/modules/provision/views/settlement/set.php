@@ -20,6 +20,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions for settlemen
 
 	<?= SettlementDetailView::widget([
 		'model' => $model->getModel(),
+		'withValueWithoutCosts' => true,
 	]) ?>
 
 	<?= $this->render('_form', [

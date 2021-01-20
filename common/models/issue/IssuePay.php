@@ -114,9 +114,9 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'pay_at' =>  Yii::t('settlement','Pay at'),
-			'deadline_at' => Yii::t('settlement','Deadline at'),
-			'value' => Yii::t('settlement','Value with VAT'),
+			'pay_at' => Yii::t('settlement', 'Pay at'),
+			'deadline_at' => Yii::t('settlement', 'Deadline at'),
+			'value' => Yii::t('settlement', 'Value with VAT'),
 			'valueNetto' => 'Honorarium (Netto)',
 			'transfer_type' => 'Typ płatności',
 			'partInfo' => 'Część',
@@ -184,10 +184,10 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 
 	public static function getStatusNames(): array {
 		return [
-			static::STATUS_INFORMED => Yii::t('settlement','Informed'),
+			static::STATUS_INFORMED => Yii::t('settlement', 'Informed'),
 			static::STATUS_NO_CONTACT => Yii::t('settlement', 'No contact'),
-			static::STATUS_REQUEST_PAY => Yii::t('settlement','Pay request'),
-			static::STATUS_REQUEST_REDUCTION => Yii::t('settlement','Reduction request'),
+			static::STATUS_REQUEST_PAY => Yii::t('settlement', 'Pay request'),
+			static::STATUS_REQUEST_REDUCTION => Yii::t('settlement', 'Reduction request'),
 			static::STATUS_ANALYSE => Yii::t('settlement', 'Analyse'),
 		];
 	}
@@ -207,5 +207,13 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 		$this->pay_at = $dateTime->format('Y-m-d');
 		$this->status = null;
 		$this->save(false);
+	}
+
+	public function getCosts(bool $withVAT = false): Decimal {
+		if ($this->calculation->hasCosts) {
+			return $this->calculation->getCostsSum($withVAT)
+				->div($this->calculation->getPaysCount());
+		}
+		return new Decimal(0);
 	}
 }

@@ -54,6 +54,13 @@ $this->params['breadcrumbs'][] = $this->title;
 				['class' => 'btn btn-success'])
 			: '' ?>
 
+		<?= Yii::$app->user->can(User::PERMISSION_CALCULATION_TO_CREATE)
+			? Html::a(
+				Yii::t('backend', 'Create administrative settlement'),
+				['/settlement/calculation/create-administrative', 'id' => $model->id],
+				['class' => 'btn btn-success'])
+			: '' ?>
+
 		<?= Yii::$app->user->can(User::PERMISSION_COST)
 			? Html::a(
 				Yii::t('backend', 'Costs'),

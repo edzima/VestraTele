@@ -28,6 +28,8 @@ class CalculationViewCest {
 		$I->dontSeeLink('Generate pays');
 		$I->see('Issue');
 		$I->seeLink($model->issue->longId);
+
+		$I->dontSeeLink('Create note');
 	}
 
 	public function checkNotPayed(CreateCalculationIssueManager $I): void {
@@ -45,6 +47,14 @@ class CalculationViewCest {
 		$model = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
 		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
 		$I->seeLink('Generate pays');
+	}
+
+	public function checkWithNotePermission(CreateCalculationIssueManager $I): void {
+		$I->assignPermission(User::PERMISSION_NOTE);
+		$model = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
+		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
+		$I->seeLink('Create note');
+		$I->click('Create note');
 	}
 
 }

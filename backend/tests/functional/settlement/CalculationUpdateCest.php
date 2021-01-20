@@ -67,16 +67,16 @@ class CalculationUpdateCest {
 		$calculation = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
 		/** @var IssuePayCalculation $calculation */
 		$I->amOnPage([static::ROUTE, 'id' => $calculation->id]);
-		$I->seeOptionIsSelected('#calculationform-type', IssuePayCalculation::getTypesNames()[IssuePayCalculation::TYPE_HONORARIUM]);
-		$I->selectOption('#calculationform-type', IssuePayCalculation::TYPE_ADMINISTRATIVE);
+		$I->seeOptionIsSelected('#calculationform-type', IssuePayCalculation::getTypesNames()[IssuePayCalculation::TYPE_ADMINISTRATIVE]);
+		$I->selectOption('#calculationform-type', IssuePayCalculation::TYPE_HONORARIUM);
 		$I->click('Save');
 		$I->dontSeeRecord(IssuePayCalculation::class, [
 			'id' => $calculation->id,
-			'type' => IssuePayCalculation::TYPE_HONORARIUM,
+			'type' => IssuePayCalculation::TYPE_ADMINISTRATIVE,
 		]);
 		$I->seeRecord(IssuePayCalculation::class, [
 			'id' => $calculation->id,
-			'type' => IssuePayCalculation::TYPE_ADMINISTRATIVE,
+			'type' => IssuePayCalculation::TYPE_HONORARIUM,
 		]);
 	}
 

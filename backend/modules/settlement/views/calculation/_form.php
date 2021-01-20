@@ -1,11 +1,12 @@
 <?php
 
 use backend\modules\settlement\models\CalculationForm;
+use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
 use kartik\number\NumberControl;
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\web\View;
-use yii\widgets\ActiveForm;
 
 /* @var $this View */
 /* @var $model CalculationForm */
@@ -30,12 +31,10 @@ use yii\widgets\ActiveForm;
 		<?= $model->getModel()->isNewRecord
 			? $form->field($model, 'vat', ['options' => ['class' => 'col-xs-3 col-md-1']])->widget(NumberControl::class)
 			: '' ?>
-		
+
 	</div>
 
-
 	<div class="row">
-
 		<?= $model->getModel()->isNewRecord || $model->getModel()->getPaysCount() < 2
 			? $form->field($model, 'payment_at', ['options' => ['class' => 'col-md-3 col-lg-2']])
 				->widget(DateWidget::class)
@@ -43,8 +42,20 @@ use yii\widgets\ActiveForm;
 				->widget(DateWidget::class)
 			: ''
 		?>
+	</div>
 
-
+	<div class="row">
+		<?= $model->getModel()->hasCosts
+			? $form->field($model, 'costs_ids', ['options' => ['class' => 'col-md-6 col-lg-4']])
+				->widget(Select2::class, [
+						'data' => $model->getCostsData(),
+						'options' => [
+							'multiple' => true,
+							'placeholder' => $model->getAttributeLabel('costs_ids'),
+						],
+					]
+				)
+			: '' ?>
 	</div>
 
 	<div class="form-group">

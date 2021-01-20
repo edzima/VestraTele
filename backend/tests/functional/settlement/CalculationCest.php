@@ -63,6 +63,7 @@ class CalculationCest {
 		$I->seeLink('To create');
 		$I->seeLink('Uncollectible');
 		$I->dontSeeLink('Without provisions');
+		$I->seeLink('Costs');
 		$I->seeInGridHeader('Issue');
 		$I->dontSeeInGridHeader('Problem status');
 		$I->seeInGridHeader('Issue type');
@@ -71,6 +72,13 @@ class CalculationCest {
 		$I->seeInGridHeader('Value with VAT');
 		$I->seeInGridHeader('Value to pay');
 		$I->seeInGridHeader('Updated at');
+	}
+
+	public function checkCostsLink(Bookkeeper $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->click('Costs', '.btn');
+		$I->seeInCurrentUrl(IssueCostCest::ROUTE_INDEX);
 	}
 
 	public function checkWithProvisionPermission(Bookkeeper $I): void {
@@ -134,7 +142,6 @@ class CalculationCest {
 		$I->dontSeeInGridHeader('Customer', '#calculation-grid');
 		$I->seeInGridHeader('Value with VAT');
 	}
-
 
 	public function checkIssueCreateLink(Bookkeeper $I): void {
 		$I->amLoggedIn();

@@ -87,8 +87,9 @@ class Provisions extends Component {
 		$provisions = [];
 		foreach ($pays as $pay) {
 			foreach ($usersProvision as $provisionUser) {
-				$value = $this->calculateProvision($provisionUser, $pay->getValueWithoutVAT());
-				if ($value > 0) {
+				$payValue = $pay->getValueWithoutVAT()->sub($pay->getCosts(false));
+				$value = $this->calculateProvision($provisionUser, $payValue);
+				if ($value->isPositive()) {
 					$provisions[] = [
 						'pay_id' => $pay->id,
 						'to_user_id' => $provisionUser->to_user_id,
@@ -96,6 +97,15 @@ class Provisions extends Component {
 						'value' => $value->toFixed(2),
 						'type_id' => $typeId,
 					];
+				} else {
+					Yii::warning([
+						'message' => 'Provision value is not positive',
+						'pay_id' => $pay->id,
+						'to_user_id' => $provisionUser->to_user_id,
+						'from_user_id' => $provisionUser->from_user_id,
+						'value' => $value->toFixed(2),
+						'type_id' => $typeId,
+					], 'provisions');
 				}
 			}
 		}

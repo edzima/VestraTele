@@ -5,7 +5,10 @@ use backend\modules\settlement\widgets\IssuePayGrid;
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
+use common\widgets\grid\CurrencyColumn;
+use common\widgets\GridView;
 use common\widgets\settlement\SettlementDetailView;
+use Decimal\Decimal;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
@@ -23,34 +26,36 @@ if (Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
 $this->params['breadcrumbs'][] = $this->title;
 
 YiiAsset::register($this);
+
 ?>
 <div class="issue-pay-calculation-view">
 
 	<p>
+		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
+			? Html::a(Yii::t('backend', 'Create note'), ['/issue/note/create-settlement', 'id' => $model->id], ['class' => 'btn btn-info'])
+			: ''
+		?>
+
 		<?= $model->owner_id === Yii::$app->user->getId()
 		|| Yii::$app->user->can(User::ROLE_BOOKKEEPER)
 			? Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
-			: '' ?>
-
+			: ''
+		?>
 
 		<?= !$model->isPayed() && Yii::$app->user->can(User::PERMISSION_CALCULATION_PAYS)
 			? Html::a(Yii::t('backend', 'Generate pays'), ['pays', 'id' => $model->id], ['class' => 'btn btn-primary'])
-			: '' ?>
-
+			: ''
+		?>
 
 		<?= !$model->isPayed() && Yii::$app->user->can(User::PERMISSION_CALCULATION_PROBLEMS)
 			? Html::a(Yii::t('backend', 'Set uncollectible status'), ['/settlement/calculation-problem/set', 'id' => $model->id], ['class' => 'btn btn-warning'])
-			: '' ?>
-
-
+			: ''
+		?>
 
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) && $model->hasPays()
 			? Html::a(Yii::t('backend', 'Provisions'), ['/provision/settlement/set', 'id' => $model->id], ['class' => 'btn btn-success'])
-			: '' ?>
-
-
-		<?php //@todo enable this after refactoring note
-		//  Html::a('Notatka', ['note/create', 'issueId' => $model->issue_id, 'type' => IssueNote::TYPE_PAY], ['class' => 'btn btn-success',]) ?>
+			: ''
+		?>
 
 
 		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
@@ -79,11 +84,47 @@ YiiAsset::register($this);
 	])
 	?>
 
+	<?= GridView::widget([
+		'dataProvider' => new ActiveDataProvider([
+			'query' => $model->getCosts(),
+		]),
+		'summary' => '',
+		'showPageSummary' => true,
+		'caption' => Yii::t('settlement', 'Costs'),
+		'columns' => [
+			'typeName',
+			'vatPercent',
+			[
+				'class' => CurrencyColumn::class,
+				'attribute' => 'valueWithoutVAT',
+				'pageSummary' => true,
+				'pageSummaryFunc' => function (array $decimals): Decimal {
+					$sum = new Decimal(0);
+					foreach ($decimals as $decimal) {
+						$sum = $sum->add($decimal);
+					}
+					return $sum;
+				},
+			],
+			[
+				'class' => CurrencyColumn::class,
+				'attribute' => 'valueWithVAT',
+				'pageSummary' => true,
+				'pageSummaryFunc' => function (array $decimals): Decimal {
+					$sum = new Decimal(0);
+					foreach ($decimals as $decimal) {
+						$sum = $sum->add($decimal);
+					}
+					return $sum;
+				},
+			],
+		],
+	]) ?>
+
 	<?= IssueNotesWidget::widget([
 		'model' => $model->issue,
 		'notes' => $model->issue->getIssueNotes()->onlySettlement($model->id)->all(),
-		'type' => IssueNotesWidget::TYPE_SUMMON,
-
+		'type' => IssueNotesWidget::TYPE_SETTLEMENT,
 	])
 	?>
 

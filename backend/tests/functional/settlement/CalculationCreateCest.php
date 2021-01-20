@@ -7,6 +7,7 @@ use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
+use common\models\user\User;
 
 class CalculationCreateCest {
 
@@ -18,6 +19,12 @@ class CalculationCreateCest {
 			IssueFixtureHelper::settlements(),
 		));
 		$I->amLoggedIn();
+	}
+
+	public function checkCreatePageWithCostPermission(CreateCalculationIssueManager $I): void {
+		$I->assignPermission(User::PERMISSION_COST);
+		$I->amOnPage([static::ROUTE, 'id' => 1]);
+		$I->seeLink('Create cost');
 	}
 
 	public function checkCreatePage(CreateCalculationIssueManager $I): void {

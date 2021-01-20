@@ -11,6 +11,7 @@ class CalculationFixture extends ActiveFixture {
 	public $modelClass = IssuePayCalculation::class;
 
 	public $depends = [
+		CostFixture::class,
 		IssueFixture::class,
 	];
 }

@@ -24,6 +24,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			? Html::a(Yii::t('backend', 'Without provisions'), ['without-provisions'], ['class' => 'btn btn-info'])
 			: '' ?>
 
+
+		<?= Yii::$app->user->can(User::PERMISSION_COST)
+			? Html::a(Yii::t('backend', 'Costs'), ['/settlement/cost/index'], ['class' => 'btn btn-warning'])
+			: '' ?>
+
+
 	</p>
 
 	<?= IssuePayCalculationGrid::widget([

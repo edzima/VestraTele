@@ -87,6 +87,7 @@ use yii\db\Expression;
  * @property IssuePayCalculation[] $payCalculations
  * @property-read Summon[] $summons
  * @property-read IssueUser[] $users
+ * @property-read IssueCost[] $costs
  */
 class Issue extends ActiveRecord implements IssueInterface {
 
@@ -192,6 +193,10 @@ class Issue extends ActiveRecord implements IssueInterface {
 				$callable($query, $type);
 			}
 		});
+	}
+
+	public function getCosts(): ActiveQuery {
+		return $this->hasMany(IssueCost::class, ['issue_id' => 'id']);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */

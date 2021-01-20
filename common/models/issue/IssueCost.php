@@ -2,9 +2,11 @@
 
 namespace common\models\issue;
 
+use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\settlement\VATInfo;
 use common\models\settlement\VATInfoTrait;
+use Decimal\Decimal;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -21,8 +23,11 @@ use yii\db\ActiveRecord;
  * @property int $updated_at
  * @property string $date_at
  *
- * @property-read Issue $issue
  * @property-read string $typeName
+ * @property-read string $typeNameWithValue
+ *
+ * @property-read Issue $issue
+ * @property-read IssuePayCalculation[] $settlements
  */
 class IssueCost extends ActiveRecord implements
 	IssueInterface, VATInfo {
@@ -32,6 +37,7 @@ class IssueCost extends ActiveRecord implements
 
 	public const TYPE_PURCHASE_OF_RECEIVABLES = 'purchase_of_receivables';
 	public const TYPE_WRIT = 'writ';
+	public const TYPE_OFFICE = 'office';
 	public const TYPE_JUSTIFICATION_OF_THE_JUDGMENT = 'justification_of_the_judgment';
 
 	public static function tableName(): string {
@@ -42,6 +48,12 @@ class IssueCost extends ActiveRecord implements
 		return [
 			TimestampBehavior::class,
 		];
+	}
+
+	public function getTypeNameWithValue(): string {
+		return $this->getTypeName()
+			. ' - '
+			. Yii::$app->formatter->asCurrency($this->getValueWithVAT());
 	}
 
 	public function getTypeName(): string {
@@ -56,6 +68,7 @@ class IssueCost extends ActiveRecord implements
 			'id' => 'ID',
 			'issue_id' => Yii::t('common', 'Issue'),
 			'type' => Yii::t('common', 'Type'),
+			'typeName' => Yii::t('common', 'Type'),
 			'value' => Yii::t('common', 'Value with VAT'),
 			'vat' => 'VAT (%)',
 			'VATPercent' => 'VAT (%)',
@@ -65,16 +78,37 @@ class IssueCost extends ActiveRecord implements
 		];
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getIssue(): IssueQuery {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getSettlements(): IssuePayCalculationQuery {
+		return $this->hasMany(IssuePayCalculation::class, ['id' => 'settlement_id'])
+			->viaTable(IssuePayCalculation::viaCostTableName(), ['cost_id' => 'id']);
+	}
+
 	public static function getTypesNames(): array {
 		return [
+			static::TYPE_OFFICE => Yii::t('common', 'Office'),
 			static::TYPE_PURCHASE_OF_RECEIVABLES => Yii::t('common', 'Purchase of receivables'),
 			static::TYPE_WRIT => Yii::t('common', 'Writ'),
 			static::TYPE_JUSTIFICATION_OF_THE_JUDGMENT => Yii::t('common', 'Justification of the judgment'),
 		];
+	}
+
+	/**
+	 * @param static[] $costs
+	 * @return Decimal
+	 */
+	public static function sum(array $costs, bool $withVAT = false): Decimal {
+		$sum = new Decimal(0);
+		foreach ($costs as $cost) {
+			$value = $withVAT ? $cost->getValueWithVAT() : $cost->getValueWithoutVAT();
+			$sum = $sum->add($value);
+		}
+		return $sum;
 	}
 
 }

@@ -12,6 +12,7 @@ use common\models\user\User;
 use DateTime;
 use Decimal\Decimal;
 use Yii;
+use yii\base\InvalidCallException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -36,8 +37,11 @@ use yii\helpers\ArrayHelper;
  * @property int $problem_status
  * @property bool $is_provider_notified
  *
+ * @property-read bool $hasCosts
+ *
  * @property-read User $owner
  * @property-read Issue $issue
+ * @property-read IssueCost[] $costs
  * @property-read IssuePay[] $pays
  * @property-read IssueStage $stage
  */
@@ -78,7 +82,11 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 	 * {@inheritdoc}
 	 */
 	public static function tableName(): string {
-		return 'issue_pay_calculation';
+		return '{{%issue_pay_calculation}}';
+	}
+
+	public static function viaCostTableName(): string {
+		return '{{%issue_calculation_cost}}';
 	}
 
 	public function behaviors(): array {
@@ -128,11 +136,32 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 			'userProvisionsSum' => Yii::t('common', 'User provision (total)'),
 			'userProvisionsSumNotPay' => Yii::t('common', 'User provision (not pay)'),
 			'is_provider_notified' => Yii::t('common', 'Is provider notified'),
+			'costsSum' => Yii::t('settlement', 'Costs sum'),
+			'valueWithoutCosts' => Yii::t('settlement', 'Value without costs'),
 		];
 	}
 
 	public function getName(): string {
 		return Yii::t('settlement', 'Settlement {type}', ['type' => $this->getTypeName()]);
+	}
+
+	public function getHasCosts(): bool {
+		return !empty($this->costs);
+	}
+
+	public function getValueWithoutCosts(): Decimal {
+		$costs = $this->getCostsSum();
+		if ($costs === null) {
+			return $this->getValue();
+		}
+		return $this->getValue()->sub($costs);
+	}
+
+	public function getCostsSum(bool $withVAT = false): Decimal {
+		if ($this->getHasCosts()) {
+			return IssueCost::sum($this->costs, $withVAT);
+		}
+		return new Decimal(0);
 	}
 
 	public function getNotPayedPays(): IssuePayQuery {
@@ -190,17 +219,18 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 		return new Decimal($sum);
 	}
 
-	public function getOwner(): ActiveQuery {
-		return $this->hasOne(User::class, ['id' => 'owner_id']);
-	}
-
-	public function getStage(): ActiveQuery {
-		return $this->hasOne(IssueStage::class, ['id' => 'stage_id']);
+	public function getCosts(): ActiveQuery {
+		return $this->hasMany(IssueCost::class, ['id' => 'cost_id'])
+			->viaTable(static::viaCostTableName(), ['settlement_id' => 'id']);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getIssue(): IssueQuery {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
+	}
+
+	public function getOwner(): ActiveQuery {
+		return $this->hasOne(User::class, ['id' => 'owner_id']);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
@@ -211,6 +241,10 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getProvisions(): ProvisionQuery {
 		return $this->hasMany(Provision::class, ['pay_id' => 'id'])->via('pays');
+	}
+
+	public function getStage(): ActiveQuery {
+		return $this->hasOne(IssueStage::class, ['id' => 'stage_id']);
 	}
 
 	public function getTypeName(): string {
@@ -347,7 +381,7 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 
 	public function isDelayed(string $range = 'now'): bool {
 		foreach ($this->pays as $pay) {
-			if($pay->isDelayed($range)){
+			if ($pay->isDelayed($range)) {
 				return true;
 			}
 		}
@@ -355,10 +389,29 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 	}
 
 	public function markAsPayment(DateTime $dateTime): void {
-		foreach ($this->pays as $pay){
-			if(!$pay->isPayed()){
+		foreach ($this->pays as $pay) {
+			if (!$pay->isPayed()) {
 				$pay->markAsPayment($dateTime);
 			}
 		}
+	}
+
+	public function unlinkCosts(): void {
+		$this->unlinkAll('costs', true);
+	}
+
+	public function linkCosts(array $costs_ids): int {
+		if ($this->isNewRecord) {
+			throw new InvalidCallException('Unable to link costs: the model being linked cannot be newly created.');
+		}
+		$rows = [];
+		foreach ($costs_ids as $id) {
+			$rows[] = [
+				'settlement_id' => $this->id,
+				'cost_id' => $id,
+			];
+		}
+		return static::getDb()->createCommand()
+			->batchInsert(static::viaCostTableName(), ['settlement_id', 'cost_id'], $rows)->execute();
 	}
 }

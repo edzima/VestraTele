@@ -3,6 +3,7 @@
 namespace backend\modules\settlement\controllers;
 
 use backend\helpers\Url;
+use backend\modules\settlement\models\AdministrativeCalculationForm;
 use backend\modules\settlement\models\CalculationForm;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\modules\settlement\models\search\IssueToCreateCalculationSearch;
@@ -143,14 +144,24 @@ class CalculationController extends Controller {
 		]);
 	}
 
+	public function actionCreateAdministrative(int $id) {
+		$issue = $this->findIssueModel($id);
+		$model = new AdministrativeCalculationForm(Yii::$app->user->getId(), $issue);
+		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
+		}
+		return $this->render('administrative', [
+			'model' => $model,
+		]);
+	}
+
 	public function actionCreate(int $id) {
 		$issue = $this->findIssueModel($id);
-		$model = new CalculationForm();
+		$model = new CalculationForm(Yii::$app->user->getId(), $issue);
 		if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
 			Yii::$app->session->addFlash('warning', Yii::t('settlement', 'You try create calculation as Admin.'));
 		}
-		$model->setOwner(Yii::$app->user->getId());
-		$model->issue_id = $issue->id;
 		$model->vat = $issue->type->vat;
 		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -176,8 +187,7 @@ class CalculationController extends Controller {
 			&& $calculation->owner_id !== Yii::$app->user->getId()) {
 			throw new ForbiddenHttpException(Yii::t('backend', 'Only bookkeeper or owner can update settlement.'));
 		}
-		$model = new CalculationForm();
-		$model->setCalculation($this->findModel($id));
+		$model = CalculationForm::createFromModel($calculation);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
