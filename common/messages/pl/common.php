@@ -253,4 +253,9 @@ return [
 	'Start at' => 'Data wezwania',
 	'Term' => 'Termin',
 	'Deadline at' => 'Deadline',
+	'Update Summon: #{id}' => 'Edycja wezwania: #{id}',
+	'Office' => 'Biuro',
+	'Create note for settlement: {typeName}' => 'Dodaj notatkę do rozliczenia: {typeName}',
+	'bailiff' => 'komornik',
+	'Commision Refund' => 'Zwroty prowizji',
 ];

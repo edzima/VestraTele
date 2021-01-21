@@ -150,7 +150,7 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 	}
 
 	public function getValueWithoutCosts(): Decimal {
-		$costs = $this->getCostsSum();
+		$costs = $this->getCostsSum(true);
 		if ($costs === null) {
 			return $this->getValue();
 		}

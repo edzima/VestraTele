@@ -15,8 +15,8 @@ class AdministrativeCalculationForm extends CalculationForm implements HiddenFie
 	public ?int $providerType = IssuePayCalculation::PROVIDER_CLIENT;
 
 	public $officeCost = [
-		'value' => 130,
-		'vat' => 23,
+		'value' => 30,
+		'vat' => 0,
 		'type' => IssueCost::TYPE_OFFICE,
 	];
 
@@ -25,6 +25,7 @@ class AdministrativeCalculationForm extends CalculationForm implements HiddenFie
 		'providerType',
 		'payment_at',
 		'costs_ids',
+		'vat',
 	];
 
 	protected function saveCosts(): void {
