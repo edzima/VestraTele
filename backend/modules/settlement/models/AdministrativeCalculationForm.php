@@ -46,7 +46,7 @@ class AdministrativeCalculationForm extends CalculationForm implements HiddenFie
 			if (!isset($options['class'])) {
 				$options['class'] = IssueCost::class;
 			}
-			$options['issue_id'] = $this->issue_id;
+			$options['issue_id'] = $this->getIssue()->id;
 			return Yii::createObject($options);
 		}
 		return null;
