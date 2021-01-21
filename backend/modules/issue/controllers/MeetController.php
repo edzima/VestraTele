@@ -58,7 +58,7 @@ class MeetController extends Controller {
 			$addressSearch = $searchModel->getAddressSearch();
 			if (!empty($addressSearch->region_id)
 				|| !empty($addressSearch->city_name)
-				|| !empty($addressSearch->region_id)) {
+				|| !empty($addressSearch->postal_code)) {
 				$query->joinWith('addresses.address.city.terc');
 
 				$addressColumns = [
