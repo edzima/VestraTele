@@ -27,69 +27,72 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<h1> <?= Html::encode($this->title) ?> </h1>
 	<div class="row">
+		<?php $form = ActiveForm::begin(); ?>
+
 		<div class="col-md-5">
 			<?= SettlementDetailView::widget([
 				'model' => $calculation,
 			]) ?>
+
+			<div class="form-group">
+				<?= Html::submitButton(Yii::t('backend', 'Generate'), [
+					'id' => 'generate-btn',
+					'class' => 'btn btn-primary',
+					'name' => 'action',
+					'value' => 'generate',
+				]) ?>
+			</div>
+
+			<div class="row">
+
+				<?= $form->field($model, 'count', ['options' => ['class' => 'col-md-3 col-lg-2']])
+					->textInput() ?>
+
+				<?= $form->field($model, 'deadline_at', ['options' => ['class' => 'col-md-5']])
+					->widget(DateWidget::class)
+				?>
+
+				<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-5']])->widget(NumberControl::class, [
+					'disabled' => true,
+				]) ?>
+
+			</div>
+
+
 		</div>
-	</div>
 
-	<div class="settlement-pays-form">
+		<div class="settlement-pays-form col-md-7">
 
-		<?php $form = ActiveForm::begin(); ?>
 
-		<div class="row">
-
-			<?= $form->field($model, 'count', ['options' => ['class' => 'col-md-1 col-lg-1']])
-				->textInput() ?>
-
-			<?= $form->field($model, 'deadline_at', ['options' => ['class' => 'col-md-3 col-lg-2']])
-				->widget(DateWidget::class)
+			<?php
+			$i = 0;
+			foreach ($model->getPays() as $index => $pay) {
+				echo $this->render('_form_pay', [
+					'form' => $form,
+					'model' => $pay,
+					'id' => $index,
+					'index' => $i++,
+				]);
+			}
 			?>
 
-			<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(NumberControl::class, [
-				'disabled' => true,
-			]) ?>
+
+
+			<?php ActiveForm::end(); ?>
 
 		</div>
 
 
-		<div class="form-group">
-			<?= Html::submitButton(Yii::t('backend', 'Generate'), [
-				'id' => 'generate-btn',
-				'class' => 'btn btn-primary',
-				'name' => 'action',
-				'value' => 'generate',
-			]) ?>
-		</div>
 
 
-		<h3><?= Yii::t('backend', 'Pays') ?></h3>
+	</div>
 
-
-		<?php
-		$i = 0;
-		foreach ($model->getPays() as $index => $pay) {
-			echo $this->render('_form_pay', [
-				'form' => $form,
-				'model' => $pay,
-				'id' => $index,
-				'index' => $i++,
-			]);
-		}
-		?>
-
-
-		<div class="form-group">
-			<?= Html::submitButton(Yii::t('backend', 'Save'), [
-				'id' => 'save-btn', 'class' => 'btn btn-success',
-				'name' => 'action',
-				'value' => 'save',
-			]) ?>
-		</div>
-
-		<?php ActiveForm::end(); ?>
-
+	<div class="form-group">
+		<?= Html::submitButton(Yii::t('backend', 'Save'), [
+			'id' => 'save-btn', 'class' => 'btn btn-success',
+			'name' => 'action',
+			'value' => 'save',
+		]) ?>
 	</div>
 
 

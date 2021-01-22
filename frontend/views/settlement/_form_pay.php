@@ -25,13 +25,14 @@ $options = [
 
 	<div class="pay-form">
 		<div class="row">
-			<?= $form->field($model, "[$id]value", ['options' => ['class' => 'col-md-4 col-lg-2']])
+
+			<?= $form->field($model, "[$id]value", ['options' => ['class' => 'col-md-4']])
 				->widget(NumberControl::class)
 			?>
-			<?= $form->field($model, "[$id]payment_at", ['options' => ['class' => 'col-md-4 col-lg-2']])
+			<?= $form->field($model, "[$id]payment_at", ['options' => ['class' => 'col-md-4']])
 				->widget(DateWidget::class)
 			?>
-			<?= $form->field($model, "[$id]deadline_at", ['options' => ['class' => 'col-md-4 col-lg-2']])
+			<?= $form->field($model, "[$id]deadline_at", ['options' => ['class' => 'col-md-4']])
 				->widget(DateWidget::class)
 			?>
 		</div>
