@@ -5,6 +5,7 @@ use common\models\settlement\PaysForm;
 use common\widgets\DateWidget;
 use common\widgets\settlement\SettlementDetailView;
 use frontend\helpers\Html;
+use kartik\number\NumberControl;
 use yii\bootstrap\ActiveForm;
 use yii\web\View;
 
@@ -20,7 +21,6 @@ $this->params['breadcrumbs'][] = ['label' => $calculation->getIssueName(), 'url'
 $this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $calculation->getTypeName(), 'url' => ['view', 'id' => $calculation->id]];
 $this->params['breadcrumbs'][] = $this->title;
-
 ?>
 <div class="settlement-calculation-pays">
 
@@ -46,6 +46,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			<?= $form->field($model, 'deadline_at', ['options' => ['class' => 'col-md-3 col-lg-2']])
 				->widget(DateWidget::class)
 			?>
+
+			<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(NumberControl::class, [
+				'disabled' => true,
+			]) ?>
 
 		</div>
 
