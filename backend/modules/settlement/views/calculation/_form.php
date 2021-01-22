@@ -45,8 +45,7 @@ use yii\web\View;
 	</div>
 
 	<div class="row">
-		<?= $model->getModel()->hasCosts
-			? $form->field($model, 'costs_ids', ['options' => ['class' => 'col-md-6 col-lg-4']])
+		<?=  $form->field($model, 'costs_ids', ['options' => ['class' => 'col-md-6 col-lg-4']])
 				->widget(Select2::class, [
 						'data' => $model->getCostsData(),
 						'options' => [
@@ -55,7 +54,7 @@ use yii\web\View;
 						],
 					]
 				)
-			: '' ?>
+			 ?>
 	</div>
 
 	<div class="form-group">
