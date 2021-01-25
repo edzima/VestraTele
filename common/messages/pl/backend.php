@@ -290,4 +290,5 @@ return [
 	'The requested page does not exist.' => 'The requested page does not exist.',
 	'Create cost' => 'Dodaj koszt',
 	'User Traits' => 'User Traits',
+	'Set parent for: {user}' => 'Ustal przełożonego dla: {user}',
 ];

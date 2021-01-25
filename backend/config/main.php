@@ -115,27 +115,6 @@ return [
 		],
 		'user' => [
 			'class' => UserModule::class,
-			'as access' => [
-				'class' => GlobalAccessBehavior::class,
-				'rules' => [
-					[
-						'controllers' => ['user/user', 'user/customer', 'user/worker'],
-						'actions' => ['view'],
-						'allow' => true,
-						'roles' => ['manager'],
-					],
-					[
-						'controllers' => ['user/customer'],
-						'actions' => ['index', 'create', 'update'],
-						'allow' => true,
-						'roles' => ['manager'],
-					],
-					[
-						'allow' => true,
-						'roles' => ['administrator'],
-					],
-				],
-			],
 		],
 		'webshell' => [
 			'class' => 'samdark\webshell\Module',

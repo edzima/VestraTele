@@ -26,7 +26,6 @@ $user = Yii::$app->user;
 					'label' => Yii::t('backend', 'Workers'),
 					'url' => ['/user/worker/index'],
 					'icon' => '<i class="fa fa-users"></i>',
-					'visible' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
 				],
 				[
 					'label' => Yii::t('backend', 'Customers'),

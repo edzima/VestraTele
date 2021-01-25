@@ -29,6 +29,9 @@ class HierarchyTest extends Unit {
 		$parentsIds = $worker->getParentsIds();
 		$this->tester->assertCount(1, $parentsIds);
 		$this->tester->assertTrue(in_array(300, $parentsIds));
+		$parentsIds = \Yii::$app->userHierarchy->getParentsIds($worker->id);
+		$this->tester->assertCount(1, $parentsIds);
+		$this->tester->assertTrue(in_array(300, $parentsIds));
 	}
 
 	public function testParentsAsChildFromChild(): void {
@@ -49,7 +52,6 @@ class HierarchyTest extends Unit {
 		$this->tester->assertTrue(in_array(301, $allChildesIds));
 		$this->tester->assertTrue(in_array(302, $allChildesIds));
 	}
-
 
 	private function grabWorker($index): Worker {
 		return $this->tester->grabFixture('worker', $index);

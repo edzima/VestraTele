@@ -18,7 +18,7 @@
  */
 return [
 	'Activation for {name}' => 'Активация для {name}',
-	'Articles' => 'Newsy',
+	'Articles' => 'Vademecum',
 	'Articles category &laquo;{title}&raquo;' => 'News &laquo;{title}&raquo;',
 	'Are you sure you want to delete this item?' => 'Czy napewno chcesz to usunąć?',
 	'Backend' => 'Panel admina',

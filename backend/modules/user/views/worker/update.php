@@ -3,10 +3,8 @@
 use backend\modules\user\models\WorkerUserForm;
 use backend\modules\user\widgets\UserProfileFormWidget;
 use common\widgets\address\AddressFormWidget;
-use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
-use yii\data\ActiveDataProvider;
 
 /* @var $this yii\web\View */
 /* @var $model WorkerUserForm */
@@ -44,45 +42,6 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 	<?= $form->field($model, 'roles')->checkboxList($model::getRolesNames()) ?>
 
 	<?= $form->field($model, 'permissions')->checkboxList($model::getPermissionsNames()) ?>
-
-	<?= $form->field($model, 'parent_id')
-		->widget(Select2::class, [
-				'data' => $model->getParents(),
-				'options' => [
-					'placeholder' => 'Przełożony',
-				],
-				'pluginOptions' => [
-					'allowClear' => true,
-				],
-			]
-		) ?>
-
-	<?php
-
-	if (!empty($model->getModel()->getParentsIds())) {
-		$dataProvider = new ActiveDataProvider([
-			'query' => $model->getModel()->getParentsQuery()->with(['userProfile']),
-			'pagination' => false,
-		]);
-
-		echo $this->render('_users', [
-			'legend' => 'Przełożeni',
-			'dataProvider' => $dataProvider,
-		]);
-	}
-
-	if (!empty($model->getModel()->getAllChildesIds())) {
-		$dataProvider = new ActiveDataProvider([
-			'query' => $model->getModel()->getAllChildesQuery()->with(['userProfile']),
-			'pagination' => false,
-		]);
-		echo $this->render('_users', [
-			'legend' => 'Podopieczni',
-			'dataProvider' => $dataProvider,
-		]);
-	}
-
-	?>
 
 
 	<div class="form-group">

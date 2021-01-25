@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\models\AgentSearchInterface;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueUserQuery;
@@ -9,7 +10,7 @@ use common\models\issue\search\ArchivedIssueSearch;
 use common\models\issue\search\IssueTypeSearch;
 use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
-use common\models\user\Worker;
+use common\models\user\User;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -20,7 +21,8 @@ use yii\helpers\ArrayHelper;
  * IssueSearch represents the model behind the search form of `common\models\issue\Issue`.
  */
 abstract class IssueSearch extends Model
-	implements ArchivedIssueSearch,
+	implements AgentSearchInterface,
+			   ArchivedIssueSearch,
 			   CustomerSearchInterface,
 			   IssueTypeSearch,
 			   SearchModel {
@@ -54,7 +56,7 @@ abstract class IssueSearch extends Model
 			],
 			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
-			['type_id', 'in', 'range' => array_keys($this->getStagesNames()),'allowArray' => true],
+			['type_id', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[
 				[
@@ -72,9 +74,9 @@ abstract class IssueSearch extends Model
 			'issue_id' => Yii::t('common', 'Issue'),
 			'createdAtFrom' => Yii::t('common', 'Created at from'),
 			'createdAtTo' => Yii::t('common', 'Created at to'),
-			'agent_id' => Worker::getRolesNames()[Worker::ROLE_AGENT],
-			'lawyer_id' => Worker::getRolesNames()[Worker::ROLE_LAWYER],
-			'tele_id' => Worker::getRolesNames()[Worker::ROLE_TELEMARKETER],
+			'agent_id' => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
+			'lawyer_id' => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
+			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 		], Issue::instance()->attributeLabels());
 	}
 
@@ -96,7 +98,7 @@ abstract class IssueSearch extends Model
 
 	protected function issueQueryFilter(IssueQuery $query): void {
 		$this->archiveFilter($query);
-		$this->agentFilter($query);
+		$this->applyAgentsFilters($query);
 		$this->applyCustomerSurnameFilter($query);
 		$this->createdAtFilter($query);
 		$query->andFilterWhere([
@@ -128,7 +130,7 @@ abstract class IssueSearch extends Model
 		}
 	}
 
-	protected function agentFilter(IssueQuery $query): void {
+	public function applyAgentsFilters(QueryInterface $query): void {
 		if (!empty($this->agent_id)) {
 			$query->agents([$this->agent_id]);
 		}
@@ -151,6 +153,24 @@ abstract class IssueSearch extends Model
 		return $this->withArchive;
 	}
 
+	public function getAgentsNames(): array {
+		return User::getSelectList(
+			IssueUser::userIds(IssueUser::TYPE_AGENT)
+		);
+	}
+
+	public static function getLawyersNames(): array {
+		return User::getSelectList(
+			IssueUser::userIds(IssueUser::TYPE_LAWYER)
+		);
+	}
+
+	public static function getTelemarketersNames(): array {
+		return User::getSelectList(
+			IssueUser::userIds(IssueUser::TYPE_LAWYER)
+		);
+	}
+
 	public static function getTypesNames(): array {
 		return IssueType::getTypesNames();
 	}
@@ -166,8 +186,8 @@ abstract class IssueSearch extends Model
 	public static function getIssueTypesNames(): array {
 		return IssueType::getTypesNames();
 	}
+
 	public function applyIssueTypeFilter(QueryInterface $query): void {
 		$query->andFilterWhere([Issue::tableName() . '.type_id' => $this->type_id]);
-
 	}
 }

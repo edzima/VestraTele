@@ -5,9 +5,11 @@ namespace backend\modules\issue\models\search;
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch as BaseIssueSearch;
 use common\models\issue\query\IssueQuery;
+use common\models\user\User;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
+use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -73,15 +75,15 @@ class IssueSearch extends BaseIssueSearch {
 		$query->andFilterWhere(['accident_at' => $this->accident_at]);
 	}
 
-	protected function agentFilter(IssueQuery $query): void {
+	public function applyAgentsFilters(QueryInterface $query): void {
 		$ids = [];
 		if (!empty($this->agent_id)) {
 			$ids[] = $this->agent_id;
-		}
-		if ($this->parentId > 0) {
+		} elseif (!empty($this->parentId)) {
 			$ids = Yii::$app->userHierarchy->getAllChildesIds($this->parentId);
 			$ids[] = $this->parentId;
 		}
+		/** @var IssueQuery $query */
 		$query->agents($ids);
 	}
 
@@ -122,6 +124,15 @@ class IssueSearch extends BaseIssueSearch {
 		if (!empty($this->tele_id)) {
 			$query->tele([$this->tele_id]);
 		}
+	}
+
+	public function getAgentsNames(): array {
+		if (empty($this->parentId) || $this->parentId < 0) {
+			return parent::getAgentsNames();
+		}
+		$ids = Yii::$app->userHierarchy->getAllChildesIds($this->parentId);
+		$ids[] = $this->parentId;
+		return User::getSelectList($ids, false);
 	}
 
 }

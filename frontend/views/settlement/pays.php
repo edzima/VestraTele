@@ -26,8 +26,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 	<h1> <?= Html::encode($this->title) ?> </h1>
+	<?php $form = ActiveForm::begin(); ?>
+
 	<div class="row">
-		<?php $form = ActiveForm::begin(); ?>
 
 		<div class="col-md-5">
 			<?= SettlementDetailView::widget([
@@ -77,23 +78,19 @@ $this->params['breadcrumbs'][] = $this->title;
 			?>
 
 
-
-			<?php ActiveForm::end(); ?>
-
 		</div>
-
-
 
 
 	</div>
 
 	<div class="form-group">
-		<?= Html::submitButton(Yii::t('backend', 'Save'), [
+		<?= Html::submitButton(Yii::t('common', 'Save'), [
 			'id' => 'save-btn', 'class' => 'btn btn-success',
 			'name' => 'action',
 			'value' => 'save',
 		]) ?>
 	</div>
 
+	<?php ActiveForm::end(); ?>
 
 </div>

@@ -46,7 +46,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'contractor_id', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
-					'data' => SummonForm::getContractors(),
+					'data' => $model->getContractors(),
 				]
 			) ?>
 

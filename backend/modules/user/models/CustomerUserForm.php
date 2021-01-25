@@ -36,14 +36,6 @@ class CustomerUserForm extends UserForm {
 		}
 	}
 
-	public static function getRolesNames(): array {
-		$rolesNames = parent::getRolesNames();
-		foreach (static::EXCLUDED_ROLES as $role) {
-			unset($rolesNames[$role]);
-		}
-		return $rolesNames;
-	}
-
 	public function beforeValidate(): bool {
 		if ($this->scenario === static::SCENARIO_CREATE) {
 			if (empty($this->username)) {

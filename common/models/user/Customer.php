@@ -3,7 +3,6 @@
 namespace common\models\user;
 
 use common\models\user\query\UserQuery;
-use Yii;
 
 class Customer extends User {
 
@@ -27,22 +26,6 @@ class Customer extends User {
 	 */
 	public static function find(): UserQuery {
 		return parent::find()->customers();
-	}
-
-	public static function deleteAll($condition = null, $params = []) {
-		//@todo add test, with condition.
-		$count = 0;
-		foreach (static::ROLES as $role) {
-			$ids = Yii::$app->authManager->getUserIdsByRole($role);
-			if ($condition === null) {
-				$count += parent::deleteAll(['id' => $ids]);
-			} else {
-				$extendedCondition = [$condition];
-				$extendedCondition[] = ['id' => $ids];
-				$count += parent::deleteAll($extendedCondition, $params);
-			}
-		}
-		return $count;
 	}
 
 	public static function fromUser(User $user): self {

@@ -88,7 +88,7 @@ class IssueFixtureHelper {
 		foreach ($users as &$user) {
 			UserFixtureHelper::addPermission($user, User::PERMISSION_ISSUE);
 		}
-		$users['customer-profile'] = UserFixtureHelper::customerProfile();
+		$users['customer-profile'] = UserFixtureHelper::profile(UserFixtureHelper::CUSTOMER);
 		$users['users'] = [
 			'class' => IssueUserFixture::class,
 			'dataFile' => static::dataDir() . 'issue/users.php',

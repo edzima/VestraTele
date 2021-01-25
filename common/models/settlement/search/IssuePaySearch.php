@@ -293,7 +293,7 @@ class IssuePaySearch extends IssuePay implements
 				->andFilterWhere(['user_id' => $this->agents_ids])
 				->distinct()
 				->column()
-		);
+			, false);
 	}
 
 	public function getWithArchive(): bool {

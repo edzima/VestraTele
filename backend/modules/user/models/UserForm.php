@@ -36,6 +36,9 @@ class UserForm extends Model {
 	private ?Address $homeAddress = null;
 	private ?Address $postalAddress = null;
 
+	protected const EXCLUDED_ROLES = [];
+	protected const EXCLUDED_PERMISSIONS = [];
+
 	/**
 	 * @inheritdoc
 	 */
@@ -306,11 +309,21 @@ class UserForm extends Model {
 	}
 
 	public static function getRolesNames(): array {
-		return User::getRolesNames();
+		$roles = User::getRolesNames();
+		foreach (static::EXCLUDED_ROLES as $role) {
+			unset($roles[$role]);
+		}
+		asort($roles);
+		return $roles;
 	}
 
 	public static function getPermissionsNames(): array {
-		return User::getPermissionsNames();
+		$permissions = User::getPermissionsNames();
+		foreach (static::EXCLUDED_PERMISSIONS as $permission) {
+			unset($permissions[$permission]);
+		}
+		asort($permissions);
+		return $permissions;
 	}
 
 	public static function getStatusNames(): array {

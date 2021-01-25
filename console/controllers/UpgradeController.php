@@ -3,15 +3,30 @@
 namespace console\controllers;
 
 use backend\modules\settlement\models\CalculationProblemStatusForm;
+use common\components\DbManager;
 use common\models\issue\IssueMeet;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueStage;
+use common\models\user\Customer;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
+use Yii;
 use yii\console\Controller;
 use yii\helpers\Console;
 
 class UpgradeController extends Controller {
+
+	public function actionCustomerSummon(): void {
+		/** @var DbManager $auth */
+		$auth = Yii::$app->authManager;
+		$auth->db->createCommand()
+			->delete($auth->assignmentTable, [
+				'user_id' => Customer::getAssignmentIds([Customer::PERMISSION_SUMMON], false),
+				'item_name' => Customer::PERMISSION_SUMMON,
+			])
+			->execute();
+		Console::output(Customer::find()->onlyAssignments([Customer::PERMISSION_SUMMON], false)->count());
+	}
 
 	public function actionCalculationOwner(): void {
 		IssuePayCalculation::updateAll(['owner_id' => 21]);

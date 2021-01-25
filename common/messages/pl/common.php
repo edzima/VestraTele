@@ -51,7 +51,7 @@ return [
 	'manager' => 'Manager',
 	'Name' => 'Nazwa',
 	'Other' => 'Inne',
-	'Parent' => 'Rodzic',
+	'Parent' => 'Przełożony(a)',
 	'Password' => 'Hasło',
 	'Preview' => 'Podgląd',
 	'Published at' => 'Publikowany',
@@ -273,4 +273,5 @@ return [
 	'Code' => 'Code',
 	'Court entry' => 'Wpis sądowy',
 	'Text T' => 'Text T',
+	'Hierarchy' => 'Hierarchia',
 ];

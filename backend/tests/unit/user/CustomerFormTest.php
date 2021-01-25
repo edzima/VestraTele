@@ -1,8 +1,9 @@
 <?php
 
-namespace backend\tests\unit;
+namespace backend\tests\unit\user;
 
 use backend\modules\user\models\CustomerUserForm;
+use backend\tests\unit\Unit;
 use common\fixtures\AddressFixture;
 use common\fixtures\helpers\TerytFixtureHelper;
 use common\fixtures\user\CustomerFixture;

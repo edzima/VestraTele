@@ -68,8 +68,10 @@ class ReceivePaysForm extends Model {
 	public static function getUsersNames(): array {
 		return User::getSelectList(PayReceived::find()
 			->select('user_id')
+			->distinct()
 			->andWhere(['transfer_at' => null])
-			->column());
+			->column()
+		);
 	}
 
 	public function save(): bool {

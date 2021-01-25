@@ -34,6 +34,7 @@ class IssueUsersWidget extends Widget {
 			'attributes' => [
 				'email:email',
 				'profile.phone:text:Telefon',
+				'profile.phone_2:text:Telefon[2]',
 			],
 		],
 	];

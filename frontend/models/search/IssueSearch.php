@@ -6,15 +6,15 @@ use common\models\issue\IssueSearch as BaseIssueSearch;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
 use common\models\user\User;
-use common\models\user\Worker;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
-use yii\db\QueryInterface;
 
 class IssueSearch extends BaseIssueSearch {
 
 	public int $user_id;
 	public ?array $agentsIds = null;
+
+	private ?array $availableAgentsIds = null;
 
 	public function rules(): array {
 		return array_merge(parent::rules(), [
@@ -72,24 +72,38 @@ class IssueSearch extends BaseIssueSearch {
 	}
 
 	protected function getAvailableAgentsIds(): array {
-		if (!empty($this->agentsIds)) {
-			$ids = $this->agentsIds;
-			if (!in_array($this->user_id, $ids)) {
-				$ids[] = $this->user_id;
+		if ($this->availableAgentsIds === null) {
+			if (empty($this->agentsIds)) {
+				$ids = IssueUser::find()
+					->from([
+						IssueUser::tableName() . ' IU_1',
+						IssueUser::tableName() . ' IU_2',
+					])
+					->andWhere(['IU_1.user_id' => $this->user_id])
+					->andWhere('IU_1.issue_id = IU_2.issue_id')
+					->andWhere(['IU_2.type' => IssueUser::TYPE_AGENT])
+					->select('IU_2.user_id')
+					->distinct()
+					->column();
+			} else {
+				$ids = $this->agentsIds;
+				if (!in_array($this->user_id, $ids)) {
+					$ids[] = $this->user_id;
+				}
 			}
-			return $ids;
+			$this->availableAgentsIds = $ids;
 		}
-		return IssueUser::find()
-			->select('user_id')
-			->andWhere(['user_id' => $this->user_id])
-			->withType(IssueUser::TYPE_AGENT)
-			->column();
+		return $this->availableAgentsIds;
 	}
 
 	public function getAgentsList(): array {
-		return Worker::getSelectList([User::ROLE_AGENT, User::PERMISSION_ISSUE], true, function (QueryInterface $query) {
-			$query->andWhere(['id' => $this->getAvailableAgentsIds()]);
-		});
+		return User::getSelectList(
+			IssueUser::find()
+				->select('user_id')
+				->withType(IssueUser::TYPE_AGENT)
+				->andWhere(['user_id' => $this->getAvailableAgentsIds()])
+				->column()
+		);
 	}
 
 }

@@ -32,37 +32,38 @@ class RbacController extends Controller {
 
 	public array $permissions = [
 		User::PERMISSION_ARCHIVE,
-		User::PERMISSION_COST => [
-			User::ROLE_BOOKKEEPER,
+		Worker::PERMISSION_COST => [
+			Worker::ROLE_BOOKKEEPER,
 		],
-		User::PERMISSION_CALCULATION_TO_CREATE => [
-			User::ROLE_BOOKKEEPER,
+		Worker::PERMISSION_CALCULATION_TO_CREATE => [
+			Worker::ROLE_BOOKKEEPER,
 		],
-		User::PERMISSION_CALCULATION_PAYS => [
-			User::ROLE_BOOKKEEPER,
+		Worker::PERMISSION_CALCULATION_PAYS => [
+			Worker::ROLE_BOOKKEEPER,
 		],
-		User::PERMISSION_CALCULATION_PROBLEMS => [
-			User::ROLE_BOOKKEEPER,
+		Worker::PERMISSION_CALCULATION_PROBLEMS => [
+			Worker::ROLE_BOOKKEEPER,
 		],
 		User::PERMISSION_EXPORT,
 		User::PERMISSION_ISSUE,
 		User::PERMISSION_LOGS,
-		User::PERMISSION_MEET,
+		Worker::PERMISSION_MEET,
 		User::PERMISSION_NEWS,
 		User::PERMISSION_NOTE,
 		User::PERMISSION_PROVISION,
-		User::PERMISSION_PAY => [
-			User::ROLE_BOOKKEEPER,
+		Worker::PERMISSION_PAY => [
+			Worker::ROLE_BOOKKEEPER,
 		],
-		User::PERMISSION_PAYS_DELAYED => [
-			User::ROLE_BOOKKEEPER,
+		Worker::PERMISSION_PAYS_DELAYED => [
+			Worker::ROLE_BOOKKEEPER,
 		],
-		User::PERMISSION_PAY_RECEIVED => [
-			User::ROLE_BOOKKEEPER,
+		Worker::PERMISSION_PAY_RECEIVED => [
+			Worker::ROLE_BOOKKEEPER,
 		],
-		User::PERMISSION_SUMMON => [
-			User::ROLE_AGENT,
+		Worker::PERMISSION_SUMMON => [
+			Worker::ROLE_AGENT,
 		],
+		Worker::PERMISSION_WORKERS,
 	];
 
 	public function actionInit(): void {

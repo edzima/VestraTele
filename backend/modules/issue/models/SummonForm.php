@@ -4,6 +4,7 @@ namespace backend\modules\issue\models;
 
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\Issue;
+use common\models\issue\IssueUser;
 use common\models\issue\Summon;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -35,6 +36,8 @@ class SummonForm extends Model {
 
 	private ?Summon $model = null;
 
+	private ?array $_contractorIds = null;
+
 	public function rules(): array {
 		return [
 			[['type', 'status', 'title', 'issue_id', 'owner_id', 'contractor_id', 'start_at', 'entity_id', 'city_id'], 'required'],
@@ -47,7 +50,7 @@ class SummonForm extends Model {
 			['term', 'in', 'range' => array_keys(static::getTermsNames())],
 			[['title'], 'string', 'max' => 255],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
-			[['contractor_id'], 'in', 'range' => array_keys(static::getContractors()),],
+			[['contractor_id'], 'in', 'range' => array_keys($this->getContractors()),],
 			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
 		];
 	}
@@ -127,11 +130,19 @@ class SummonForm extends Model {
 		);
 	}
 
-	public static function getContractors(): array {
-		return Worker::getSelectList([
-			Worker::PERMISSION_SUMMON,
-			Worker::ROLE_AGENT,
-		], false
-		);
+	public function getContractors(): array {
+		if ($this->_contractorIds === null) {
+			$ids = Worker::getAssignmentIds([Worker::PERMISSION_SUMMON]);
+			if ($this->issue_id) {
+				$issueUsersIds = IssueUser::find()
+					->select('user_id')
+					->andWhere(['issue_id' => $this->issue_id])
+					->column();
+				$ids = array_merge($ids, $issueUsersIds);
+			}
+			$this->_contractorIds = User::getSelectList($ids);
+		}
+		return $this->_contractorIds;
 	}
+
 }

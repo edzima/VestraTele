@@ -9,7 +9,6 @@
 namespace frontend\controllers;
 
 use common\models\issue\Issue;
-use common\models\user\User;
 use common\models\user\Worker;
 use frontend\helpers\Url;
 use frontend\models\search\IssuePayCalculationSearch;
@@ -65,7 +64,7 @@ class IssueController extends Controller {
 
 		$searchModel = new IssueUserSearch();
 
-		if ($user->can(User::ROLE_CUSTOMER_SERVICE)) {
+		if ($user->can(Worker::ROLE_CUSTOMER_SERVICE)) {
 			$searchModel->withArchive = true;
 		} else {
 			$searchModel->user_id = $user->id;
@@ -91,7 +90,7 @@ class IssueController extends Controller {
 		$model = $this->findModel($id);
 
 		$calculationsDataProvider = null;
-		if (Yii::$app->user->can(User::ROLE_CUSTOMER_SERVICE)
+		if (Yii::$app->user->can(Worker::ROLE_CUSTOMER_SERVICE)
 			|| $model->isForUser(Yii::$app->user->getId())
 			|| $model->isForAgents(Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId()))
 		) {

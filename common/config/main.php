@@ -7,7 +7,7 @@ use common\components\PayComponent;
 use common\components\Provisions;
 use common\components\TaxComponent;
 use common\formatters\Formatter;
-use common\models\user\User;
+use common\models\user\Worker;
 use edzima\teryt\Module as TerytModule;
 use yii\caching\DummyCache;
 use yii\caching\FileCache;
@@ -120,7 +120,7 @@ return [
 		],
 		'userHierarchy' => [
 			'class' => HierarchyComponent::class,
-			'modelClass' => User::class,
+			'modelClass' => Worker::class,
 			'parentColumn' => 'boss',
 		],
 	],

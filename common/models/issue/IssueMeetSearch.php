@@ -3,6 +3,7 @@
 namespace common\models\issue;
 
 use common\models\AddressSearch;
+use common\models\user\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -138,6 +139,15 @@ class IssueMeetSearch extends IssueMeet {
 				$query->andWhere(['campaign_id' => $this->campaign_id]);
 			}
 		}
+	}
+
+	public static function getAgentsNames(): array {
+		return User::getSelectList(
+			IssueMeet::find()
+				->select('agent_id')
+				->distinct()
+				->column()
+		);
 	}
 
 	public static function getCampaignNames(): array {

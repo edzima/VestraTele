@@ -27,7 +27,7 @@ class CustomerViewCest {
 	public function _fixtures(): array {
 		return [
 			'customer' => UserFixtureHelper::customer(),
-			'customer-profile' => UserFixtureHelper::customerProfile(),
+			'customer-profile' => UserFixtureHelper::profile(UserFixtureHelper::CUSTOMER),
 			'customer-traits' => UserFixtureHelper::customerTraits(),
 		];
 	}

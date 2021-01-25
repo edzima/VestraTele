@@ -2,9 +2,12 @@
 
 namespace common\components;
 
+use common\models\hierarchy\HierarchyModel;
 use common\models\user\User;
 use yii\base\Component;
+use yii\base\InvalidArgumentException;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 class HierarchyComponent extends Component {
 
@@ -12,9 +15,41 @@ class HierarchyComponent extends Component {
 
 	public $primaryKeyColumn = 'id';
 	public $parentColumn = 'parent_id';
+	/** @var string|ActiveRecord */
 	public $modelClass = User::class;
 
 	private array $tree = [];
+
+	public function getModel(int $id): ?HierarchyModel {
+		return $this->modelClass::findOne($id);
+	}
+
+	public function assign(int $id, int $parent_id = null): bool {
+		if ($id === $parent_id) {
+			throw new InvalidArgumentException('$id must be other than $parentId.');
+		}
+		$attributes = [
+			$this->parentColumn => $parent_id,
+		];
+		$condition = [
+			$this->primaryKeyColumn => $id,
+		];
+		/** @var ActiveRecord $model */
+		$model = $this->modelClass;
+		$model::updateAll($attributes, $condition);
+		return true;
+	}
+
+	public function getChildesIds(int $id): array {
+		$ids = [];
+		$parentsIdsMap = $this->getParentsMap();
+		foreach ($parentsIdsMap as $baseId => $parent) {
+			if ($parent === $id) {
+				$ids[] = $baseId;
+			}
+		}
+		return $ids;
+	}
 
 	public function getAllChildesIds(int $id): array {
 		$selfTree = $this->getSelfTree($id);
@@ -39,6 +74,39 @@ class HierarchyComponent extends Component {
 			$this->tree = $this->buildTree($this->getParentsData());
 		}
 		return $this->tree;
+	}
+
+	public function getAllParentsIds(): array {
+		return array_keys($this->getTree());
+	}
+
+	public function getParent(int $id): ?int {
+		$model = $this->getModel($id);
+		if ($model) {
+			return $model->getParentId();
+		}
+		return null;
+	}
+
+	public function getParentsIds(int $id): array {
+		if ($this->getParent($id) === null) {
+			return [];
+		}
+		$map = $this->getParentsMap();
+		$ids = [];
+		while (($id = $map[$id] ?? null) !== null) {
+			$ids[] = $id;
+		}
+		return $ids;
+	}
+
+	protected function getParentsMap(): array {
+		return array_map('intval',
+			ArrayHelper::map(
+				$this->getParentsData(),
+				$this->primaryKeyColumn,
+				$this->parentColumn)
+		);
 	}
 
 	private function getParentsData(): array {

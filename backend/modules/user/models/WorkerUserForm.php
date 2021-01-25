@@ -2,57 +2,46 @@
 
 namespace backend\modules\user\models;
 
+use common\models\user\Customer;
 use common\models\user\User;
 use common\models\user\Worker;
 
 class WorkerUserForm extends UserForm {
 
+	protected const EXCLUDED_ROLES = [
+		User::ROLE_ADMINISTRATOR,
+		User::ROLE_BOOKKEEPER,
+		User::ROLE_USER,
+		Customer::ROLE_CUSTOMER,
+		Customer::ROLE_HANDICAPPED,
+		Customer::ROLE_SHAREHOLDER,
+		Customer::ROLE_VICTIM,
+	];
+
+	protected const EXCLUDED_PERMISSIONS = [
+		User::PERMISSION_ARCHIVE,
+		User::PERMISSION_CALCULATION_PAYS,
+		User::PERMISSION_CALCULATION_PROBLEMS,
+		User::PERMISSION_CALCULATION_TO_CREATE,
+		User::PERMISSION_COST,
+		User::PERMISSION_LOGS,
+		User::PERMISSION_PAY,
+		User::PERMISSION_PAYS_DELAYED,
+		User::PERMISSION_PAY_RECEIVED,
+		User::PERMISSION_PROVISION,
+		User::PERMISSION_WORKERS,
+	];
+
 	public int $status = User::STATUS_ACTIVE;
-
-	public $parent_id;
-
-	public function rules(): array {
-		return array_merge(parent::rules(), [
-
-			[['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['parent_id' => 'id']],
-			['parent_id', 'in', 'range' => array_keys($this->getParents())],
-		]);
-	}
-
-	public function attributeLabels(): array {
-		return parent::attributeLabels()
-			+ [
-				'parent_id' => \Yii::t('backend', 'Parent'),
-			];
-	}
-
-	public function getModel(): Worker {
-		return parent::getModel();
-	}
 
 	protected function createModel(): Worker {
 		return new Worker();
 	}
 
-	public function setModel(User $model): void {
-		parent::setModel($model);
-		$this->parent_id = $model->boss;
-	}
-
-	protected function beforeSaveModel(User $model): void {
-		parent::beforeSaveModel($model);
-		if ($this->parent_id === $model->id) {
-			$this->parent_id = null;
+	protected function applyAuth(int $id, bool $isNewRecord): void {
+		if ($isNewRecord) {
+			parent::applyAuth($id, $isNewRecord);
 		}
-		$model->boss = $this->parent_id;
-	}
-
-	public function getParents(): array {
-		$list = Worker::getSelectList([Worker::ROLE_AGENT]);
-		if (isset($list[$this->getModel()->id])) {
-			unset($list[$this->getModel()->id]);
-		}
-		return $list;
 	}
 
 }

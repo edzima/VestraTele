@@ -2,7 +2,6 @@
 
 use backend\modules\issue\models\search\IssueSearch;
 use common\models\user\User;
-use common\models\user\Worker;
 use common\widgets\DateTimeWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
@@ -11,6 +10,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model IssueSearch */
 /* @var $form yii\widgets\ActiveForm */
+
 ?>
 <div id="issue-search" class="issue-search">
 
@@ -70,7 +70,7 @@ use yii\widgets\ActiveForm;
 	<div class="row">
 		<?= $form->field($model, 'tele_id', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
-					'data' => Worker::getSelectList([Worker::ROLE_TELEMARKETER, Worker::PERMISSION_ISSUE]),
+					'data' => IssueSearch::getTelemarketersNames(),
 					'options' => [
 						'placeholder' => $model->getAttributeLabel('tele_id'),
 					],
@@ -81,7 +81,7 @@ use yii\widgets\ActiveForm;
 			) ?>
 		<?= $form->field($model, 'lawyer_id', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
-					'data' => Worker::getSelectList([Worker::ROLE_LAWYER, Worker::PERMISSION_ISSUE]),
+					'data' => IssueSearch::getLawyersNames(),
 					'options' => [
 						'placeholder' => $model->getAttributeLabel('lawyer_id'),
 					],
@@ -94,7 +94,7 @@ use yii\widgets\ActiveForm;
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ?
 			$form->field($model, 'parentId', ['options' => ['class' => 'col-md-4']])
 				->widget(Select2::class, [
-						'data' => Worker::getSelectList(),
+						'data' => User::getSelectList(Yii::$app->userHierarchy->getAllParentsIds()),
 						'options' => [
 							'placeholder' => $model->getAttributeLabel('parentId'),
 						],

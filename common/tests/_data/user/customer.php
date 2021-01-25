@@ -1,8 +1,10 @@
 <?php
 
+use common\fixtures\helpers\UserFixtureHelper;
+
 return [
 	[
-		'id' => 100,
+		'id' => UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID,
 		'username' => 'customer.wayne',
 		'auth_key' => 'iwTNae9t34OmnK6l4vT4IeaTk-YWI2Rv',
 		'password_hash' => '$2y$13$CXT0Rkle1EMJ/c1l5bylL.EylfmQ39O5JlHJVFpNn618OUS1HwaIi',
@@ -12,7 +14,7 @@ return [
 		'email' => 'john@wayne.com',
 	],
 	[
-		'id' => 101,
+		'id' => UserFixtureHelper::CUSTOMER_ERIKA_LARSON_ID,
 		'username' => 'customer.troj',
 		'auth_key' => 'EdKfXrx88weFMV0vIxuTMWKgfK2tS3Lp',
 		'password_hash' => '$2y$13$g5nv41Px7VBqhS3hVsVN2.MKfgT3jFdkXEsMC4rQJLfaMa7VaJqL2',
@@ -23,7 +25,7 @@ return [
 		'status' => '3',
 	],
 	[
-		'id' => 102,
+		'id' => UserFixtureHelper::CUSTOMER_TOMMY_JOHNS,
 		'username' => 'customer3.test',
 		'auth_key' => 'O87GkY3_UfmMHYkyezZ7QLfmkKNsllzT',
 		//Test1234

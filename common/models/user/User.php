@@ -79,6 +79,8 @@ class User extends ActiveRecord implements IdentityInterface {
 
 	public const PERMISSION_PROVISION = 'provision';
 
+	public const PERMISSION_WORKERS = 'workers';
+
 	private static $ROLES_NAMES;
 	private static $PERMISSIONS_NAMES;
 
@@ -87,19 +89,6 @@ class User extends ActiveRecord implements IdentityInterface {
 	 */
 	public static function tableName(): string {
 		return '{{%user}}';
-	}
-
-	public static function getSelectList(array $ids): array {
-		$query = static::find()
-			->joinWith('userProfile')
-			->with('userProfile')
-			->andWhere(['id' => $ids])
-			->orderBy('user_profile.lastname');
-
-		$query->cache(60);
-
-		return ArrayHelper::map(
-			$query->all(), 'id', 'fullName');
 	}
 
 	/**
@@ -411,11 +400,33 @@ class User extends ActiveRecord implements IdentityInterface {
 		return static::$PERMISSIONS_NAMES;
 	}
 
+	public static function getAssignmentIds(array $names, bool $common = true): array {
+		return static::find()
+			->select('id')
+			->onlyAssignments($names, $common)
+			->column();
+	}
+
+	public static function getSelectList(array $ids, bool $active = true): array {
+		$query = static::find()
+			->joinWith('userProfile UP')
+			->select(['id', 'username', 'firstname', 'lastname'])
+			->andWhere(['id' => $ids])
+			->orderBy('UP.lastname');
+		if ($active) {
+			$query->active();
+		}
+
+		$query->cache(60);
+		return ArrayHelper::map(
+			$query->all(), 'id', 'fullName');
+	}
+
 	/**
 	 * @inheritdoc
 	 */
 	public static function find(): UserQuery {
-		return new UserQuery(get_called_class());
+		return new UserQuery(static::class);
 	}
 
 }

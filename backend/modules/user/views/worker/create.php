@@ -3,7 +3,6 @@
 use backend\modules\user\models\WorkerUserForm;
 use backend\modules\user\widgets\UserProfileFormWidget;
 use common\widgets\address\AddressFormWidget;
-use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 
@@ -14,6 +13,7 @@ use yii\bootstrap\Html;
 $this->title = Yii::t('backend', 'Create worker');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Workers'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="user-create user-worker-create">
 
@@ -24,18 +24,6 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-
-	<?= $form->field($model, 'parent_id')
-		->widget(Select2::class, [
-				'data' => $model->getParents(),
-				'options' => [
-					'placeholder' => $model->getAttributeLabel('parent_id'),
-				],
-				'pluginOptions' => [
-					'allowClear' => true,
-				],
-			]
-		)->hint(Yii::t('backend', 'Only agents')) ?>
 
 	<?= UserProfileFormWidget::widget([
 		'model' => $model->getProfile(),

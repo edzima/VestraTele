@@ -2,10 +2,10 @@
 
 /** @var $title string */
 
-use common\models\user\Worker;
 use yii\data\ActiveDataProvider;
 use yii\grid\GridView;
 use yii\helpers\Html;
+use common\models\user\Worker;
 
 /** @var $legend string */
 /** @var $dataProvider ActiveDataProvider */
@@ -18,12 +18,20 @@ use yii\helpers\Html;
 			[
 				'format' => 'raw',
 				'attribute' => 'fullName',
-				'value' => function (Worker $data) {
-					return Html::a($data->getFullName(), ['update', 'id' => $data->id], ['target' => '_blank']);
+				'value' => static function (Worker $data) {
+					return Html::a($data->getFullName(), ['hierarchy', 'id' => $data->id], ['target' => '_blank']);
 				},
 			],
-			'action_at:datetime',
-			'email:email',
+			[
+				'format' => 'raw',
+				'label' => Yii::t('common', 'Parent'),
+				'value' => static function (Worker $data): string {
+					if ($data->parent) {
+						return Html::a($data->parent->getFullName(), ['hierarchy', 'id' => $data->parent->id], ['target' => '_blank']);
+					}
+					return '';
+				},
+			],
 		],
 
 	]); ?>

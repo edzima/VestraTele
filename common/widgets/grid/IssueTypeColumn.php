@@ -42,18 +42,8 @@ class IssueTypeColumn extends DataColumn {
 		if (empty($this->filterType)) {
 			$this->filterType = GridView::FILTER_SELECT2;
 		}
-		if (empty($this->filterWidgetOptions)) {
-			$this->filterWidgetOptions = [
-				'options' => [
-					'multiple' => true,
-					'placeholder' => $this->label,
-				],
-				'size' => Select2::SIZE_SMALL,
-				'showToggleAll' => false,
-			];
-		}
 
-		switch ($this->valueType){
+		switch ($this->valueType) {
 			case self::VALUE_NAME_WITH_SHORT:
 				$this->width = '200px';
 				break;
@@ -63,6 +53,20 @@ class IssueTypeColumn extends DataColumn {
 			case self::VALUE_NAME:
 				$this->width = '250px';
 				break;
+		}
+
+		if (empty($this->filterWidgetOptions)) {
+			$this->filterWidgetOptions = [
+				'options' => [
+					'multiple' => true,
+					'placeholder' => $this->label,
+				],
+				'pluginOptions' => [
+					'width' => $this->width,
+				],
+				'size' => Select2::SIZE_SMALL,
+				'showToggleAll' => false,
+			];
 		}
 
 		parent::init();

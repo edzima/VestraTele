@@ -117,6 +117,14 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		];
 	}
 
+	public static function userIds(string $type): array {
+		return static::find()
+			->select('user_id')
+			->distinct()
+			->withType($type)
+			->column();
+	}
+
 	/**
 	 * @inheritdoc
 	 * @return IssueUserQuery the active query used by this AR class.

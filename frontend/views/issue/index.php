@@ -3,7 +3,6 @@
 use common\models\issue\IssueUser;
 use common\models\user\Worker;
 use common\widgets\grid\ActionColumn;
-use common\widgets\grid\AgentDataColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
 use common\widgets\grid\IssueTypeColumn;
@@ -98,6 +97,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filterWidgetOptions' => [
 					'pluginOptions' => [
 						'allowClear' => true,
+						'width' => '180px',
 					],
 					'options' => [
 						'placeholder' => $searchModel->getAttributeLabel('agent_id'),

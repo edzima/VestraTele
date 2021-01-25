@@ -1,6 +1,5 @@
 <?php
 
-use common\models\user\User;
 use common\models\user\Worker;
 use common\widgets\address\AddressDetailView;
 use yii\helpers\Html;
@@ -18,9 +17,15 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?php if (Yii::$app->user->can(\common\models\user\User::ROLE_ADMINISTRATOR)): ?>
-			<?= Html::a('Edytuj', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-			<?= Html::a('Usuń', ['delete', 'id' => $model->id], [
+		<?=
+		Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)
+			? Html::a(Yii::t('common', 'Hierarchy'), ['hierarchy', 'id' => $model->id], ['class' => 'btn btn-info'])
+			: ''
+		?>
+
+		<?php if (Yii::$app->user->can(Worker::PERMISSION_WORKERS)): ?>
+			<?= Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+			<?= Html::a(Yii::t('common', 'Delete'), ['delete', 'id' => $model->id], [
 				'class' => 'btn btn-danger',
 				'data' => [
 					'confirm' => 'Are you sure you want to delete this item?',
@@ -28,6 +33,8 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 			]) ?>
 		<?php endif; ?>
+
+
 	</p>
 
 
@@ -36,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		'attributes' => [
 			[
 				'attribute' => 'username',
-				'visible' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+				'visible' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
 			],
 			'profile.firstname',
 			'profile.lastname',

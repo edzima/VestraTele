@@ -5,7 +5,7 @@ use backend\modules\user\models\search\WorkerUserSearch;
 use backend\widgets\GridView;
 use common\models\user\UserProfile;
 use common\models\user\Worker;
-use kartik\grid\ActionColumn;
+use common\widgets\grid\ActionColumn;
 use yii\bootstrap\Html;
 
 /* @var $this yii\web\View */
@@ -14,12 +14,14 @@ use yii\bootstrap\Html;
 
 $this->title = Yii::t('backend', 'Workers');
 $this->params['breadcrumbs'][] = $this->title;
-
 ?>
 <div class="user-customer-index">
 
 	<p>
-		<?= Html::a(Yii::t('backend', 'Create worker'), ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Yii::$app->user->can(Worker::PERMISSION_WORKERS)
+			? Html::a(Yii::t('backend', 'Create worker'), ['create'], ['class' => 'btn btn-success'])
+			: ''
+		?>
 	</p>
 
 
@@ -47,8 +49,13 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'status',
 				'value' => 'statusName',
 				'filter' => WorkerUserSearch::getStatusesNames(),
+				'visible' => Yii::$app->user->can(Worker::PERMISSION_WORKERS),
+
 			],
-			'ip',
+			[
+				'attribute' => 'ip',
+				'visible' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
+			],
 			[
 				'attribute' => 'gender',
 				'value' => 'profile.genderName',
@@ -57,18 +64,33 @@ $this->params['breadcrumbs'][] = $this->title;
 			'action_at:Datetime',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{update} {provision} {delete}',
+				'template' => '{view} {update} {provision} {hierarchy} {delete}',
 				'buttons' => [
+					'hierarchy' => static function (string $url, Worker $model) {
+						return Html::a('<span class="glyphicon glyphicon-king"></span>',
+							['hierarchy', 'id' => $model->id],
+							[
+								'title' => Yii::t('common', 'Hierarchy'),
+								'aria-label' => Yii::t('common', 'Hierarchy'),
+								'data-pjax' => '0',
+							]);
+					},
 					'provision' => static function (string $url, Worker $model) {
 						return Html::a('<span class="glyphicon glyphicon-usd"></span>',
 							Url::userProvisions($model->id),
 							[
-								'title' => 'Podgląd',
-								'aria-label' => 'Podgląd',
+								'title' => Yii::t('backend', 'Provisions'),
+								'aria-label' => Yii::t('backend', 'Provisions'),
 								'data-pjax' => '0',
 							]);
 					},
-
+				],
+				'visibleButtons' => [
+					'view' => true,
+					'update' => Yii::$app->user->can(Worker::PERMISSION_WORKERS),
+					'delete' => Yii::$app->user->can(Worker::PERMISSION_WORKERS),
+					'hierarchy' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
+					'provision' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
 				],
 
 			],

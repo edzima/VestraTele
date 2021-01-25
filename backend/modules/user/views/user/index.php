@@ -3,7 +3,7 @@
 use backend\modules\user\models\search\UserSearch;
 use backend\widgets\GridView;
 use common\models\user\UserProfile;
-use kartik\grid\ActionColumn;
+use common\widgets\grid\ActionColumn;
 use yii\bootstrap\Html;
 
 /* @var $this yii\web\View */
@@ -20,6 +20,10 @@ $this->params['breadcrumbs'][] = $this->title;
 		<?= Html::a(Yii::t('backend', 'Create user'), ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
 
+	<?= $this->render('_search', [
+		'model' => $searchModel,
+	]) ?>
+
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
@@ -27,6 +31,16 @@ $this->params['breadcrumbs'][] = $this->title;
 			//['class' => 'yii\grid\SerialColumn'],
 			'id',
 			'username',
+			[
+				'attribute' => 'firstname',
+				'value' => 'profile.firstname',
+				'label' => UserProfile::instance()->getAttributeLabel('firstname'),
+			],
+			[
+				'attribute' => 'lastname',
+				'value' => 'profile.lastname',
+				'label' => UserProfile::instance()->getAttributeLabel('lastname'),
+			],
 			[
 				'attribute' => 'status',
 				'value' => 'statusName',

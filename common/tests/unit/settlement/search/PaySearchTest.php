@@ -3,6 +3,7 @@
 namespace common\tests\unit\settlement\search;
 
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssuePay;
 use common\models\SearchModel;
 use common\models\settlement\search\IssuePaySearch;
@@ -130,10 +131,10 @@ class PaySearchTest extends Unit {
 
 	public function testAgent(): void {
 
-		$this->model->agent_id = 300;
+		$this->model->agent_id = UserFixtureHelper::AGENT_PETER_NOWAK;
 		$this->model->payStatus = IssuePaySearch::PAY_STATUS_ALL;
 		$this->assertTotalCount(4);
-		$this->model->agent_id = 301;
+		$this->model->agent_id = UserFixtureHelper::AGENT_AGNES_MILLER;
 
 		$this->assertTotalCount(2);
 		$this->model->agent_id = [300, 301];
@@ -149,13 +150,13 @@ class PaySearchTest extends Unit {
 		$this->assertTotalCount(6);
 		$this->model->agent_id = 302;
 		$this->assertTotalCount(0);
-		$this->assertSame('Agent Id is invalid.', $this->model->getFirstError('agent_id'));
+		$this->tester->assertSame('Agent Id is invalid.', $this->model->getFirstError('agent_id'));
 		$this->model->agent_id = 303;
-		$this->assertSame('Agent Id is invalid.', $this->model->getFirstError('agent_id'));
+		$this->tester->assertSame('Agent Id is invalid.', $this->model->getFirstError('agent_id'));
 		$this->assertTotalCount(0);
 		$this->model->agent_id = 111111;
 		$this->assertTotalCount(0);
-		$this->assertSame('Agent Id is invalid.', $this->model->getFirstError('agent_id'));
+		$this->tester->assertSame('Agent Id is invalid.', $this->model->getFirstError('agent_id'));
 
 		$this->model->payStatus = IssuePaySearch::PAY_STATUS_NOT_PAYED;
 		$this->model->delay = IssuePaySearch::DELAY_ALL;

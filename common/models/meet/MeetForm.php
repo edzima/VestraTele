@@ -6,7 +6,7 @@ use common\models\Address;
 use common\models\issue\IssueMeet;
 use common\models\issue\IssueMeetSearch;
 use common\models\issue\MeetAddress;
-use common\models\user\Worker;
+use common\models\user\User;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use yii\base\Model;
 
@@ -187,6 +187,8 @@ class MeetForm extends Model {
 	}
 
 	public static function getAgentsNames(): array {
-		return Worker::getSelectList([Worker::PERMISSION_MEET, Worker::ROLE_AGENT]);
+		return User::getSelectList(
+			User::getAssignmentIds([User::ROLE_AGENT, User::PERMISSION_MEET], true)
+		);
 	}
 }

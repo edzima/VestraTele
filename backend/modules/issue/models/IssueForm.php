@@ -8,7 +8,7 @@ use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use common\models\user\Customer;
-use common\models\user\Worker;
+use common\models\user\User;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
@@ -175,15 +175,21 @@ class IssueForm extends Model {
 	}
 
 	public static function getAgents(): array {
-		return Worker::getSelectList([Worker::ROLE_AGENT, Worker::PERMISSION_ISSUE]);
+		return User::getSelectList(
+			User::getAssignmentIds([User::ROLE_AGENT, User::PERMISSION_ISSUE])
+		);
 	}
 
 	public static function getLawyers(): array {
-		return Worker::getSelectList([Worker::ROLE_LAWYER, Worker::PERMISSION_ISSUE]);
+		return User::getSelectList(
+			User::getAssignmentIds([User::ROLE_LAWYER, User::PERMISSION_ISSUE])
+		);
 	}
 
 	public static function getTele(): array {
-		return Worker::getSelectList([Worker::ROLE_TELEMARKETER, Worker::PERMISSION_ISSUE]);
+		return User::getSelectList(
+			User::getAssignmentIds([User::ROLE_TELEMARKETER, User::PERMISSION_ISSUE])
+		);
 	}
 
 	public static function getTypesNames(): array {

@@ -16,7 +16,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_AGENT,
-		'user_id' => 300,
+		'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
 		'issue_id' => 1,
 	],
 	[
@@ -36,7 +36,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_AGENT,
-		'user_id' => 301,
+		'user_id' => UserFixtureHelper::AGENT_AGNES_MILLER,
 		'issue_id' => 2,
 	],
 	[
@@ -56,7 +56,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_AGENT,
-		'user_id' => 300,
+		'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
 		'issue_id' => 3,
 	],
 	[
@@ -76,7 +76,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_AGENT,
-		'user_id' => 301,
+		'user_id' => UserFixtureHelper::AGENT_AGNES_MILLER,
 		'issue_id' => 4,
 	],
 	[
@@ -96,7 +96,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_AGENT,
-		'user_id' => 301,
+		'user_id' => UserFixtureHelper::AGENT_AGNES_MILLER,
 		'issue_id' => 5,
 	],
 	[
@@ -116,7 +116,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_AGENT,
-		'user_id' => 301,
+		'user_id' => UserFixtureHelper::AGENT_AGNES_MILLER,
 		'issue_id' => 6,
 	],
 ];

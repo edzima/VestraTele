@@ -6,7 +6,6 @@ use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
 use common\models\issue\Issue;
 use common\models\user\User;
-use common\models\user\Worker;
 use common\widgets\grid\CustomerDataColumn;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
@@ -123,8 +122,8 @@ JS;
 				'filterType' => GridView::FILTER_SELECT2,
 				'attribute' => 'agent_id',
 				'value' => 'agent',
-				'label' => Worker::getRolesNames()[Worker::ROLE_AGENT],
-				'filter' => Worker::getSelectList([Worker::ROLE_AGENT]),
+				'label' => $searchModel->getAttributeLabel('agent_id'),
+				'filter' => $searchModel->getAgentsNames(),
 				'filterWidgetOptions' => [
 					'pluginOptions' => [
 						'allowClear' => true,

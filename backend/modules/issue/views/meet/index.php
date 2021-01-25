@@ -4,7 +4,6 @@ use backend\widgets\CsvForm;
 use common\models\issue\IssueMeet;
 use common\models\issue\IssueMeetSearch;
 use common\models\user\User;
-use common\models\user\Worker;
 use common\widgets\grid\AddressColumn;
 use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
@@ -17,6 +16,7 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('backend', 'Meets');
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="issue-meet-index relative">
 
@@ -58,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filterType' => GridView::FILTER_SELECT2,
 				'attribute' => 'agent_id',
 				'value' => 'agent',
-				'filter' => Worker::getSelectList([Worker::ROLE_AGENT, Worker::PERMISSION_MEET]),
+				'filter' => IssueMeetSearch::getAgentsNames(),
 				'filterWidgetOptions' => [
 					'pluginOptions' => [
 						'allowClear' => true,
