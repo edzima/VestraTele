@@ -35,6 +35,8 @@ class IssueCost extends ActiveRecord implements
 	use IssueTrait;
 	use VATInfoTrait;
 
+	public const TYPE_COURT_ENTRY = 'court_entry';
+	public const TYPE_POWER_OF_ATTORNEY = 'power_of_attorney';
 	public const TYPE_PURCHASE_OF_RECEIVABLES = 'purchase_of_receivables';
 	public const TYPE_WRIT = 'writ';
 	public const TYPE_OFFICE = 'office';
@@ -91,8 +93,10 @@ class IssueCost extends ActiveRecord implements
 
 	public static function getTypesNames(): array {
 		return [
-			static::TYPE_OFFICE => Yii::t('common', 'Office'),
 			static::TYPE_PURCHASE_OF_RECEIVABLES => Yii::t('common', 'Purchase of receivables'),
+			static::TYPE_COURT_ENTRY => Yii::t('common', 'Court entry'),
+			static::TYPE_POWER_OF_ATTORNEY => Yii::t('common', 'Power of attorney'),
+			static::TYPE_OFFICE => Yii::t('common', 'Office'),
 			static::TYPE_WRIT => Yii::t('common', 'Writ'),
 			static::TYPE_JUSTIFICATION_OF_THE_JUDGMENT => Yii::t('common', 'Justification of the judgment'),
 		];

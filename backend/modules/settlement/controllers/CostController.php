@@ -105,7 +105,6 @@ class CostController extends Controller {
 	 * @throws NotFoundHttpException
 	 */
 	public function actionCreate(int $id) {
-
 		$issue = $this->findIssue($id);
 		$model = new IssueCostForm($issue);
 		$model->date_at = date(DATE_ATOM);
