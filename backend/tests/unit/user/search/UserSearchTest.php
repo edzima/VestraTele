@@ -15,7 +15,12 @@ class UserSearchTest extends Unit {
 
 	public function _before(): void {
 		parent::_before();
-		$this->tester->haveFixtures(UserFixtureHelper::workers());
+		$this->tester->haveFixtures(array_merge(
+				UserFixtureHelper::workers(),
+				['user-profile' => UserFixtureHelper::profile('user')],
+			)
+		);
+
 		$this->model = $this->createModel();
 	}
 
@@ -38,6 +43,14 @@ class UserSearchTest extends Unit {
 		Yii::$app->authManager->assign(Yii::$app->authManager->getPermission(User::PERMISSION_NOTE), $lawyer->id);
 		$this->assertTotalCount(1, ['permission' => [User::PERMISSION_NOTE]]);
 		$this->assertTotalCount(1, ['role' => [User::ROLE_LAWYER], 'permission' => [User::PERMISSION_NOTE]]);
+	}
+
+	public function testPhone(): void {
+		$this->assertTotalCount(1, ['phone' => '+48 673 222 110']);
+		$this->assertTotalCount(1, ['phone' => '+48-673-222-110']);
+		$this->assertTotalCount(1, ['phone' => '     +48 673 222 110    ']);
+		$this->assertTotalCount(1, ['phone' => '+48 - - -673 ----222-110']);
+		$this->assertTotalCount(0, ['phone' => '+48+673+222-110']);
 	}
 
 	public function testStatus(): void {

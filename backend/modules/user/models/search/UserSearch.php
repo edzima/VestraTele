@@ -10,6 +10,7 @@ use common\models\user\UserTrait;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\Expression;
 
 /**
  * UserSearch represents the model behind the search form about `common\models\User`.
@@ -100,6 +101,7 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 		$this->applySurnameFilter($query);
 		$this->applyAssigmentFilter($query);
 		$this->applyTraitFilter($query);
+		$this->applyPhoneFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -113,7 +115,6 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 
 		$query->andFilterWhere(['like', 'username', $this->username])
 			->andFilterWhere(['like', 'user_profile.firstname', $this->firstname])
-			->andFilterWhere(['like', 'user_profile.phone', $this->phone])
 			->andFilterWhere(['like', 'email', $this->email])
 			->andFilterWhere(['like', 'teryt_simc.region_id', $this->region_id])
 			->andFilterWhere(['like', 'teryt_simc.name', $this->city])
@@ -146,6 +147,22 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 		);
 		if (!empty($names)) {
 			$query->onlyAssignments($names, true);
+		}
+	}
+
+	public function applyPhoneFilter(UserQuery $query): void {
+		if (!empty($this->phone)) {
+			//@todo implement search in phone2 column
+
+			$dbPhoneSpacesReplaced = new Expression(
+				'REPLACE(user_profile.phone, " ", "")'
+			);
+			$dbPhoneDashesReplaced = new Expression(
+				'REPLACE('.$dbPhoneSpacesReplaced.', " ", "")'
+			);
+			$inputReplaced = str_replace([' ', '-'], [''],$this->phone);
+
+			$query->andFilterWhere(['like', $dbPhoneDashesReplaced, $inputReplaced . '%', false]);
 		}
 	}
 
