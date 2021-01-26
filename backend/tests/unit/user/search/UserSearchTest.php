@@ -52,6 +52,11 @@ class UserSearchTest extends Unit {
 		$this->assertTotalCount(1, ['phone' => '+48 - - -673 ----222-110']);
 		$this->assertTotalCount(0, ['phone' => '+48+673+222-110']);
 	}
+	public function testPhone2(): void {
+		$this->assertTotalCount(1, ['phone' => '541-211-980']);
+		$this->assertTotalCount(1, ['phone' => '541 - 211 - 980']);
+		$this->assertTotalCount(1, ['phone' => '541211980']);
+	}
 
 	public function testStatus(): void {
 		$this->assertTotalCount(3, ['status' => User::STATUS_INACTIVE]);
