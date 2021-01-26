@@ -22,7 +22,7 @@ class SummonForm extends Model {
 	public int $owner_id;
 
 	public int $status = Summon::STATUS_NEW;
-	public int $type = Summon::TYPE_DOCUMENTS;
+	public int $type = Summon::TYPE_APPEAL;
 	public $term = Summon::TERM_ONE_WEEK;
 	public string $title = '';
 	public ?int $issue_id = null;

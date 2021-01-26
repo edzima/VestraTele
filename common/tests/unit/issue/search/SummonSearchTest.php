@@ -37,7 +37,7 @@ class SummonSearchTest extends Unit {
 	}
 
 	public function testType(): void {
-		$this->assertTotalCount(3, ['type' => Summon::TYPE_DOCUMENTS]);
+		$this->assertTotalCount(3, ['type' => Summon::TYPE_APPEAL]);
 		$this->assertTotalCount(1, ['type' => Summon::TYPE_ANTIVINDICATION]);
 		$this->assertTotalCount(0, ['type' => Summon::TYPE_INCOMPLETE_DOCUMENTATION]);
 	}

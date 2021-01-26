@@ -64,7 +64,7 @@ class SummonCest {
 			'contractor_id' => $I->getUser()->id,
 			'title' => 'New summon',
 			'status' => Summon::STATUS_NEW,
-			'type' => Summon::TYPE_DOCUMENTS,
+			'type' => Summon::TYPE_APPEAL,
 		]);
 		$I->amOnPage([static::ROUTE_UPDATE, 'id' => $summonId]);
 		$I->see('Update summon: New summon');

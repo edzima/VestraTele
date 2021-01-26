@@ -50,10 +50,12 @@ class Summon extends ActiveRecord implements IssueInterface {
 	public const STATUS_REALIZED = 5;
 	public const STATUS_UNREALIZED = 6;
 
-	public const TYPE_DOCUMENTS = 10;
+	public const TYPE_APPEAL = 10;
 	public const TYPE_INCOMPLETE_DOCUMENTATION = 15;
 	public const TYPE_PHONE = 20;
 	public const TYPE_ANTIVINDICATION = 30;
+	public const TYPE_URGENCY = 40;
+	public const TYPE_RESIGNATION = 50;
 
 	public const TERM_EMPTY = null;
 	public const TERM_ONE_DAY = 1;
@@ -199,10 +201,12 @@ class Summon extends ActiveRecord implements IssueInterface {
 
 	public static function getTypesNames(): array {
 		return [
-			static::TYPE_DOCUMENTS => Yii::t('common', 'Documents'),
+			static::TYPE_APPEAL => Yii::t('common', 'Appeal'),
 			static::TYPE_INCOMPLETE_DOCUMENTATION => Yii::t('common', 'Incomplete documentation'),
-			static::TYPE_PHONE => Yii::t('common', 'Phonable'),
+			static::TYPE_PHONE => Yii::t('common', 'Phonable summon'),
 			static::TYPE_ANTIVINDICATION => Yii::t('common', 'Antyvindication'),
+			static::TYPE_RESIGNATION => Yii::t('common', 'Resignation'),
+			static::TYPE_URGENCY => Yii::t('common', 'Urgency'),
 		];
 	}
 

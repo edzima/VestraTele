@@ -7,7 +7,7 @@ use common\models\issue\Summon;
 return [
 	'new' => [
 		'status' => Summon::STATUS_NEW,
-		'type' => Summon::TYPE_DOCUMENTS,
+		'type' => Summon::TYPE_APPEAL,
 		'title' => 'Document summon',
 		'issue_id' => 1,
 		'owner_id' => 300,
@@ -17,7 +17,7 @@ return [
 	],
 	'in-progress' => [
 		'status' => Summon::STATUS_IN_PROGRESS,
-		'type' => Summon::TYPE_DOCUMENTS,
+		'type' => Summon::TYPE_APPEAL,
 		'title' => 'In progress summon',
 		'issue_id' => 1,
 		'owner_id' => 300,
@@ -27,7 +27,7 @@ return [
 	],
 	'in-progress-301' => [
 		'status' => Summon::STATUS_IN_PROGRESS,
-		'type' => Summon::TYPE_DOCUMENTS,
+		'type' => Summon::TYPE_APPEAL,
 		'title' => 'In progress summon',
 		'issue_id' => 2,
 		'owner_id' => 301,
