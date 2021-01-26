@@ -150,19 +150,30 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 		}
 	}
 
-	public function applyPhoneFilter(UserQuery $query): void {
+	protected function applyPhoneFilter(UserQuery $query): void {
+		$this->filterPhoneColumn($query, 'user_profile.phone');
+		//OR
+		$this->filterPhoneColumn($query, 'user_profile.phone_2', true);
+	}
+
+	protected function filterPhoneColumn(UserQuery $query, string $column, bool $useOr = false): void {
 		if (!empty($this->phone)) {
-			//@todo implement search in phone2 column
 
-			$dbPhoneSpacesReplaced = new Expression(
-				'REPLACE(user_profile.phone, " ", "")'
+			$applySpaceReplace = new Expression(
+				'REPLACE(' . $column . ', " ", "")'
 			);
-			$dbPhoneDashesReplaced = new Expression(
-				'REPLACE('.$dbPhoneSpacesReplaced.', " ", "")'
+			$applyDashReplace = new Expression(
+				'REPLACE(' . $applySpaceReplace . ', "-", "")'
 			);
-			$inputReplaced = str_replace([' ', '-'], [''],$this->phone);
+			$inputReplaced = str_replace([' ', '-'], [''], $this->phone);
 
-			$query->andFilterWhere(['like', $dbPhoneDashesReplaced, $inputReplaced . '%', false]);
+			$params = ['like', $applyDashReplace, $inputReplaced . '%', false];
+
+			if ($useOr) {
+				$query->orFilterWhere($params);
+			} else {
+				$query->andFilterWhere($params);
+			}
 		}
 	}
 
