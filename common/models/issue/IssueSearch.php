@@ -167,7 +167,7 @@ abstract class IssueSearch extends Model
 
 	public static function getTelemarketersNames(): array {
 		return User::getSelectList(
-			IssueUser::userIds(IssueUser::TYPE_LAWYER)
+			IssueUser::userIds(IssueUser::TYPE_TELEMARKETER)
 		);
 	}
 
