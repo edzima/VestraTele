@@ -46,16 +46,39 @@ class UserSearchTest extends Unit {
 	}
 
 	public function testPhone(): void {
-		$this->assertTotalCount(1, ['phone' => '+48 673 222 110']);
-		$this->assertTotalCount(1, ['phone' => '+48-673-222-110']);
-		$this->assertTotalCount(1, ['phone' => '     +48 673 222 110    ']);
-		$this->assertTotalCount(1, ['phone' => '+48 - - -673 ----222-110']);
-		$this->assertTotalCount(0, ['phone' => '+48+673+222-110']);
+		$this->assertTotalCount(1, ['phone' => '+48 673 223 110']);
+		$this->assertTotalCount(1, ['phone' => '+48-673-223-110']);
+		$this->assertTotalCount(1, ['phone' => '     +48 673 223 110    ']);
+		$this->assertTotalCount(1, ['phone' => '+48 - - -673 ----223-110']);
+		$this->assertTotalCount(2, ['phone' => '23']);
+		$this->assertTotalCount(13, ['phone' => '']);
+		$this->assertTotalCount(0, ['phone' => '+48+673+223-110']);
 	}
+
 	public function testPhone2(): void {
 		$this->assertTotalCount(1, ['phone' => '541-211-980']);
 		$this->assertTotalCount(1, ['phone' => '541 - 211 - 980']);
 		$this->assertTotalCount(1, ['phone' => '541211980']);
+		$this->assertTotalCount(0, ['phone' => '999']);
+	}
+
+	public function testPhoneWithOtherCondition(): void{
+		$this->assertTotalCount(1, [
+			'phone' => '673223110',
+			'lastname' => 'Wayne'
+		]);
+		$this->assertTotalCount(1, [
+			'phone' => '541',
+			'lastname' => 'Wayne'
+		]);
+		$this->assertTotalCount(2, [
+			'phone' => '',
+			'lastname' => 'Wayne'
+		]);
+		$this->assertTotalCount(0, [
+			'phone' => '999',
+			'lastname' => 'Wayne'
+		]);
 	}
 
 	public function testStatus(): void {

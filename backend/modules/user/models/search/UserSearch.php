@@ -101,7 +101,11 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 		$this->applySurnameFilter($query);
 		$this->applyAssigmentFilter($query);
 		$this->applyTraitFilter($query);
-		$this->applyPhoneFilter($query);
+
+		if (!empty($this->phone)){
+			$query->withPhoneNumber($this->phone);
+		}
+
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -147,33 +151,6 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 		);
 		if (!empty($names)) {
 			$query->onlyAssignments($names, true);
-		}
-	}
-
-	protected function applyPhoneFilter(UserQuery $query): void {
-		$this->filterPhoneColumn($query, 'user_profile.phone');
-		//OR
-		$this->filterPhoneColumn($query, 'user_profile.phone_2', true);
-	}
-
-	protected function filterPhoneColumn(UserQuery $query, string $column, bool $useOr = false): void {
-		if (!empty($this->phone)) {
-
-			$applySpaceReplace = new Expression(
-				'REPLACE(' . $column . ', " ", "")'
-			);
-			$applyDashReplace = new Expression(
-				'REPLACE(' . $applySpaceReplace . ', "-", "")'
-			);
-			$inputReplaced = str_replace([' ', '-'], [''], $this->phone);
-
-			$params = ['like', $applyDashReplace, $inputReplaced . '%', false];
-
-			if ($useOr) {
-				$query->orFilterWhere($params);
-			} else {
-				$query->andFilterWhere($params);
-			}
 		}
 	}
 
