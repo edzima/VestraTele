@@ -9,6 +9,8 @@ use common\models\user\Worker;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
+use yii\db\conditions\LikeCondition;
+use yii\db\Expression;
 
 /**
  * This is the ActiveQuery class for [[\common\models\User]].
@@ -123,4 +125,24 @@ class UserQuery extends ActiveQuery {
 		$this->andWhere(['status' => User::STATUS_ACTIVE]);
 		return $this;
 	}
+
+	public function withPhoneNumber(string $phone): self {
+		$likePhone = $this->preparePhoneLikeCondition('user_profile.phone', $phone);
+		$likePhone2 = $this->preparePhoneLikeCondition('user_profile.phone_2', $phone);
+		$this->andWhere($likePhone)->orWhere($likePhone2);
+		return $this;
+	}
+
+	private function preparePhoneLikeCondition(string $column, $phone): LikeCondition {
+		$phoneReplaced = str_replace([' ', '-'], [''], $phone);
+
+		$applySpaceReplace = new Expression(
+			'REPLACE(' . $column . ', " ", "")'
+		);
+		$applyDashReplace = new Expression(
+			'REPLACE(' . $applySpaceReplace . ', "-", "")'
+		);
+		return new LikeCondition($applyDashReplace, 'LIKE', $phoneReplaced);
+	}
+
 }
