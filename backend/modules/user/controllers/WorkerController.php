@@ -7,7 +7,6 @@ use backend\modules\user\models\WorkerUserForm;
 use common\models\forms\HierarchyForm;
 use common\models\user\Worker;
 use Yii;
-use yii\data\ActiveDataProvider;
 
 class WorkerController extends UserController {
 
