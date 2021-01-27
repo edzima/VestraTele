@@ -7,6 +7,7 @@ use backend\modules\user\models\WorkerUserForm;
 use common\models\forms\HierarchyForm;
 use common\models\user\Worker;
 use Yii;
+use yii\data\ActiveDataProvider;
 
 class WorkerController extends UserController {
 
@@ -32,6 +33,23 @@ class WorkerController extends UserController {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+		]);
+	}
+	public function actionView(int $id): string {
+		$model = $this->findModel($id);
+		$query = $model->getIssueUsers();
+		$query->with([
+			'issue',
+			'issue.type',
+			'issue.stage',
+		]);
+		$dataProvider = new ActiveDataProvider([
+			'query' => $query,
+		]);
+
+		return $this->render('view', [
+			'model' => $model,
+			'issuesDataProvider' => $dataProvider,
 		]);
 	}
 
