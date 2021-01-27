@@ -35,23 +35,6 @@ class WorkerController extends UserController {
 			'dataProvider' => $dataProvider,
 		]);
 	}
-	public function actionView(int $id): string {
-		$model = $this->findModel($id);
-		$query = $model->getIssueUsers();
-		$query->with([
-			'issue',
-			'issue.type',
-			'issue.stage',
-		]);
-		$dataProvider = new ActiveDataProvider([
-			'query' => $query,
-		]);
-
-		return $this->render('view', [
-			'model' => $model,
-			'issuesDataProvider' => $dataProvider,
-		]);
-	}
 
 	public function actionHierarchy(int $id) {
 		/** @var Worker $user */

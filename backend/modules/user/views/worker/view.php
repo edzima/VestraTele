@@ -113,53 +113,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	</div>
 
-	<fieldset>
-		<legend><?= Yii::t('common', 'Issues') ?></legend>
-
-		<?= GridView::widget([
-			'dataProvider' => $issuesDataProvider,
-			'columns' => [
-				['class' => IssueColumn::class],
-				[
-					'attribute' => 'issue.signature_act',
-					'label' => Issue::instance()->getAttributeLabel('signature_act'),
-				],
-				[
-					'attribute' => 'typeName',
-					'label' => Yii::t('common', 'As role'),
-				],
-				[
-					'attribute' => 'issue.type',
-					'label' => Issue::instance()->getAttributeLabel('type'),
-				],
-				[
-					'attribute' => 'issue.stage',
-					'label' => Issue::instance()->getAttributeLabel('stage'),
-				],
-				[
-					'attribute' => 'issue.agent.username',
-					'value' => function (IssueUser $model): ?string {
-						// @todo remove this condition after full upgrade.
-						if ($model->issue->agent) {
-							return $model->issue->agent->username;
-						}
-						return null;
-//						/return $model->issue->agent->username;
-					},
-
-					'label' => Issue::instance()->getAttributeLabel('agent'),
-				],
-				[
-					'attribute' => 'issue.updated_at',
-					'format' => 'date',
-					'label' => Issue::instance()->getAttributeLabel('updated_at'),
-				],
-
-			],
-		]) ?>
-
-	</fieldset>
-
 	<?= $model->homeAddress ? AddressDetailView::widget(['model' => $model->homeAddress]) : '' ?>
 
 </div>
