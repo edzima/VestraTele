@@ -29,6 +29,12 @@ class SiteController extends Controller {
 			],
 		];
 	}
+	//@TODO: remove this method and resolve issue
+	// https://wojdev.jetbrains.space/p/vestra/issues/41
+	private function getStorageUrl(): string{
+		//HTTP:// is important here in test environment !
+		return YII_ENV_TEST ? 'http://backend.dev/storage': Yii::getAlias('@storageUrl');
+	}
 
 	/**
 	 * @inheritdoc
@@ -44,12 +50,12 @@ class SiteController extends Controller {
 			],
 			'image-upload' => [
 				'class' => UploadFileAction::class,
-				'url' => Yii::getAlias('@storageUrl/images/' . date('m.y')),
+				'url' => $this->getStorageUrl().'/images/' . date('m.y'),
 				'path' => '@storage/images/' . date('m.y'),
 			],
 			'file-upload' => [
 				'class' => UploadFileAction::class,
-				'url' => Yii::getAlias('@storageUrl/files/' . date('m.y')),
+				'url' => $this->getStorageUrl().'/files/' . date('m.y'),
 				'path' => '@storage/files/' . date('m.y'),
 				'uploadOnlyImage' => false,
 			],
