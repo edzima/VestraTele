@@ -71,8 +71,9 @@ AppAsset::register($this);
 			'visible' => Yii::$app->user->can(User::PERMISSION_SUMMON),
 		];
 		$menuItems[] = [
-			'label' => 'Newsy',
+			'label' => Yii::t('frontend', 'Articles'),
 			'url' => ['/article/index'],
+			'items' => NavItem::getNewsCategoryItems(),
 		];
 		$menuItems[] = [
 			'label' => 'Prowizje',
@@ -100,10 +101,11 @@ AppAsset::register($this);
 			],
 		];
 	}
+
 	echo Nav::widget([
 		'id' => 'main-nav',
 		'options' => ['class' => 'navbar-nav navbar-right'],
-		'items' => array_merge(NavItem::getMenuItems(), $menuItems),
+		'items' => $menuItems,
 	]);
 	NavBar::end() ?>
 

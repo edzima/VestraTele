@@ -22,98 +22,90 @@ use common\models\query\ArticleCategoryQuery;
  *
  * @property Article[] $articles
  * @property ArticleCategory $parent
- * @property ArticleCategory[] $articleCategories
+ * @property ArticleCategory[] $childs
  */
-class ArticleCategory extends ActiveRecord
-{
-    const STATUS_DRAFT = 0;
-    const STATUS_ACTIVE = 1;
+class ArticleCategory extends ActiveRecord {
 
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return '{{%article_category}}';
-    }
+	const STATUS_DRAFT = 0;
+	const STATUS_ACTIVE = 1;
 
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [
-            TimestampBehavior::className(),
-            [
-                'class' => SluggableBehavior::className(),
-                'attribute' => 'title',
-                'ensureUnique' => true,
-                'immutable' => true,
-            ],
-        ];
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public static function tableName() {
+		return '{{%article_category}}';
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            ['title', 'required'],
-            ['comment', 'string'],
-            [['parent_id', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['title', 'slug'], 'string', 'max' => 255],
-            ['parent_id', 'exist', 'skipOnError' => true, 'targetClass' => self::className(), 'targetAttribute' => ['parent_id' => 'id']],
-            ['status', 'default', 'value' => self::STATUS_DRAFT],
-        ];
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function behaviors() {
+		return [
+			TimestampBehavior::class,
+			[
+				'class' => SluggableBehavior::class,
+				'attribute' => 'title',
+				'ensureUnique' => true,
+				'immutable' => true,
+			],
+		];
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'title' => Yii::t('common', 'Title'),
-            'slug' => Yii::t('common', 'Slug'),
-            'comment' => Yii::t('common', 'Comment'),
-            'parent_id' => Yii::t('common', 'Parent'),
-            'status' => Yii::t('common', 'Status'),
-            'created_at' => Yii::t('common', 'Created at'),
-            'updated_at' => Yii::t('common', 'Updated at'),
-        ];
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function rules(): array {
+		return [
+			['title', 'required'],
+			['comment', 'string'],
+			[['parent_id', 'status', 'created_at', 'updated_at'], 'integer'],
+			[['title', 'slug'], 'string', 'max' => 255],
+			['parent_id', 'exist', 'skipOnError' => true, 'targetClass' => static::class, 'targetAttribute' => ['parent_id' => 'id']],
+			['status', 'default', 'value' => self::STATUS_DRAFT],
+		];
+	}
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getArticles()
-    {
-        return $this->hasMany(Article::className(), ['category_id' => 'id']);
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function attributeLabels(): array {
+		return [
+			'title' => Yii::t('common', 'Title'),
+			'slug' => Yii::t('common', 'Slug'),
+			'comment' => Yii::t('common', 'Comment'),
+			'parent_id' => Yii::t('common', 'Parent'),
+			'status' => Yii::t('common', 'Status'),
+			'created_at' => Yii::t('common', 'Created at'),
+			'updated_at' => Yii::t('common', 'Updated at'),
+		];
+	}
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getParent()
-    {
-        return $this->hasOne(self::className(), ['id' => 'parent_id']);
-    }
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getArticles() {
+		return $this->hasMany(Article::class, ['category_id' => 'id']);
+	}
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getChilds()
-    {
-        return $this->hasMany(self::className(), ['parent_id' => 'id']);
-    }
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getParent() {
+		return $this->hasOne(static::class, ['id' => 'parent_id']);
+	}
 
-    /**
-     * @inheritdoc
-     * @return \common\models\query\ArticleCategoryQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new ArticleCategoryQuery(get_called_class());
-    }
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getChilds() {
+		return $this->hasMany(static::class, ['parent_id' => 'id']);
+	}
+
+	/**
+	 * @inheritdoc
+	 * @return \common\models\query\ArticleCategoryQuery the active query used by this AR class.
+	 */
+	public static function find() {
+		return new ArticleCategoryQuery(static::class);
+	}
 }
