@@ -1,6 +1,7 @@
 <?php
 
 use common\models\provision\ProvisionReportSearch;
+use common\widgets\grid\CustomerDataColumn;
 use kartik\grid\DataColumn;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
@@ -33,8 +34,8 @@ YiiAsset::register($this);
 			'label' => 'Nr sprawy',
 		],
 		[
-			'attribute' => 'pay.issue.clientFullName',
-			'label' => 'Klient',
+			'class' => CustomerDataColumn::class,
+			'value' => 'pay.issue.customer.fullName',
 		],
 		'fromUserString',
 		[

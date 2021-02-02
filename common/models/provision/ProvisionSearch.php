@@ -2,15 +2,18 @@
 
 namespace common\models\provision;
 
+use common\models\user\CustomerSearchInterface;
+use common\models\user\query\UserQuery;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
+use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
 
 /**
  * ProvisionSearch represents the model behind the search form of `common\models\provision\Provision`.
  */
-class ProvisionSearch extends Provision {
+class ProvisionSearch extends Provision implements CustomerSearchInterface {
 
 	public const PAY_STATUS_PAYED = 'payed';
 	public const PAY_STATUS_NOT_PAYED = 'not-payed';
@@ -20,7 +23,7 @@ class ProvisionSearch extends Provision {
 	public $issue_id;
 	public $dateFrom;
 	public $dateTo;
-	public $clientSurname;
+	public $customerLastname;
 
 	public $payStatus;
 
@@ -44,7 +47,8 @@ class ProvisionSearch extends Provision {
 			[['pay_id', 'from_user_id', 'to_user_id', 'issue_id'], 'integer'],
 			['payStatus', 'in', 'range' => array_keys(static::getPayStatusNames())],
 			['payStatus', 'default', 'value' => static::DEFAULT_PAY_STATUS],
-			[['dateFrom', 'dateTo', 'clientSurname'], 'safe'],
+			[['dateFrom', 'dateTo'], 'safe'],
+			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];
 	}
 
@@ -83,6 +87,12 @@ class ProvisionSearch extends Provision {
 			->with('fromUser.userProfile')
 			->with('toUser.userProfile');
 
+		$query->joinWith([
+			'pay.issue.customer C' => function (UserQuery $query) {
+				$query->joinWith('userProfile CP');
+			},
+		]);
+
 		// add conditions that should always apply here
 
 		$dataProvider = new ActiveDataProvider([
@@ -95,14 +105,11 @@ class ProvisionSearch extends Provision {
 			return $dataProvider;
 		}
 
+		$this->applyCustomerSurnameFilter($query);
+
 		if (!empty($this->issue_id)) {
 			$query->joinWith('pay.issue');
 			$query->andWhere(['issue.id' => $this->issue_id]);
-		}
-
-		if (!empty($this->clientSurname)) {
-			$query->joinWith('pay.issue');
-			$query->andFilterWhere(['like', 'issue.client_surname', $this->clientSurname]);
 		}
 
 		if (!empty($this->payStatus)) {
@@ -156,6 +163,12 @@ class ProvisionSearch extends Provision {
 				->joinWith('pay')
 				->andFilterWhere(['>=', $column, $this->dateFrom])
 				->andFilterWhere(['<=', $column, $this->dateTo]);
+		}
+	}
+
+	public function applyCustomerSurnameFilter(QueryInterface $query): void {
+		if (!empty($this->customerLastname)) {
+			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
 		}
 	}
 }

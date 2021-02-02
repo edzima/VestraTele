@@ -1,11 +1,12 @@
 <?php
 
 use backend\helpers\Url;
+use backend\widgets\GridView;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionSearch;
+use common\widgets\grid\CustomerDataColumn;
 use yii\data\ActiveDataProvider;
 use yii\grid\ActionColumn;
-use yii\grid\GridView;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
@@ -35,9 +36,8 @@ $this->params['breadcrumbs'][] = $this->title;
 				},
 			],
 			[
-				'attribute' => 'clientSurname',
-				'value' => 'pay.issue.clientFullName',
-				'label' => 'Klient',
+				'class' => CustomerDataColumn::class,
+				'value' => 'pay.issue.customer.fullName',
 			],
 			[
 				'label' => 'Płatność',
