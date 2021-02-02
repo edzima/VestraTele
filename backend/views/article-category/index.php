@@ -30,6 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'comment',
             [
                 'attribute' => 'parent_id',
+                'label' => Yii::t('backend','Parent category'),
                 'value' => function ($model) {
                     return $model->parent ? $model->parent->title : null;
                 },

@@ -18,7 +18,7 @@ use common\models\query\MenuQuery;
  * @property integer $sort_index
  *
  * @property Menu $parent
- * @property Menu $childs
+ * @property Menu[] $childs
  */
 class Menu extends ActiveRecord
 {
