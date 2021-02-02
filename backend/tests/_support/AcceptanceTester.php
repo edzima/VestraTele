@@ -47,4 +47,10 @@ class AcceptanceTester extends \Codeception\Actor {
 		$this->dontSee($message, '.help-block');
 	}
 
+	public function seeImageLoaded(string $element): void {
+		$this->waitForElement($element,5);
+		$naturalHeight = $this->grabAttributeFrom($element, 'naturalHeight');
+		$this->assertGreaterThan(0,$naturalHeight);
+	}
+
 }

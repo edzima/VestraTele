@@ -15,7 +15,7 @@ use vova07\imperavi\Widget;
 
 <div class="article-form">
 
-	<?php $form = ActiveForm::begin() ?>
+	<?php $form = ActiveForm::begin(['id' => 'article-form']) ?>
 
 	<?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 

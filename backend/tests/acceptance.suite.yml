@@ -11,3 +11,4 @@ modules:
         cleanup: true
         entryScript: index-test.php
         transaction: false
+    - Asserts

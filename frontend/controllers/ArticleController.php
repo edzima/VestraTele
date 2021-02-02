@@ -15,7 +15,7 @@ use yii\filters\AccessControl;
  */
 class ArticleController extends Controller {
 
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'access' => [
 				'class' => AccessControl::class,
@@ -34,7 +34,7 @@ class ArticleController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$query = Article::find()->published()->with('category');
 
 		$dataProvider = new ActiveDataProvider([
@@ -60,7 +60,7 @@ class ArticleController extends Controller {
 	 * @param $slug
 	 * @return mixed
 	 */
-	public function actionView($slug) {
+	public function actionView($slug): string {
 		$model = Article::find()->andWhere(['slug' => $slug])->published()->one();
 		if (!$model) {
 			throw new NotFoundHttpException(Yii::t('frontend', 'Page not found.'));
@@ -78,7 +78,7 @@ class ArticleController extends Controller {
 	 * @param $slug
 	 * @return mixed
 	 */
-	public function actionCategory($slug) {
+	public function actionCategory(string $slug): string {
 		$model = ArticleCategory::find()->andWhere(['slug' => $slug])->active()->one();
 		if (!$model) {
 			throw new NotFoundHttpException(Yii::t('frontend', 'Page not found.'));
@@ -107,10 +107,10 @@ class ArticleController extends Controller {
 	/**
 	 * Generate menu items for yii\widgets\Menu
 	 *
-	 * @param null|array $models
+	 * @param null|ArticleCategory[] $models
 	 * @return array
 	 */
-	public static function getMenuItems(array $models = null) {
+	public static function getMenuItems(array $models = null): array {
 		$items = [];
 		if ($models === null) {
 			$models = ArticleCategory::find()->where(['parent_id' => null])->with('childs')->orderBy(['id' => SORT_ASC])->active()->all();
