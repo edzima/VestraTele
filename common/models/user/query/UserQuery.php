@@ -133,22 +133,25 @@ class UserQuery extends ActiveQuery {
 	}
 
 	public function withPhoneNumber(string $phone): self {
-		$likePhone = $this->preparePhoneLikeCondition('user_profile.phone', $phone);
-		$likePhone2 = $this->preparePhoneLikeCondition('user_profile.phone_2', $phone);
-		$this->andWhere($likePhone)->orWhere($likePhone2);
+		$phonePrepared = self::preparePhoneString($phone);
+		$phoneExpression = self::preparePhoneExpression("user_profile.phone");
+		$phoneExpression2 = self::preparePhoneExpression("user_profile.phone_2");
+
+		$this->andWhere(['like', $phoneExpression, $phonePrepared])
+			->orWhere(['like', $phoneExpression2, $phonePrepared]);
 		return $this;
 	}
+	public static function preparePhoneString(string $phone): String {
+		return str_replace([' ', '-'], [''], $phone);
+	}
 
-	private function preparePhoneLikeCondition(string $column, $phone): LikeCondition {
-		$phoneReplaced = str_replace([' ', '-'], [''], $phone);
-
+	public static function preparePhoneExpression(string $phoneColumn): Expression {
 		$applySpaceReplace = new Expression(
-			'REPLACE(' . $column . ', " ", "")'
+			'REPLACE(' . $phoneColumn . ', " ", "")'
 		);
-		$applyDashReplace = new Expression(
+		return new Expression(
 			'REPLACE(' . $applySpaceReplace . ', "-", "")'
 		);
-		return new LikeCondition($applyDashReplace, 'LIKE', $phoneReplaced);
 	}
 
 }
