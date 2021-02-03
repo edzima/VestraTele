@@ -7,9 +7,7 @@ use common\tests\UnitTester;
 
 abstract class Unit extends BaseUnit {
 
-	/**
-	 * @var UnitTester
-	 */
-	protected UnitTester $tester;
+	/* @var UnitTester */
+	protected $tester;
 
 }
