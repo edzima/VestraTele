@@ -1,19 +1,13 @@
 <?php
 
-use backend\widgets\GridView;
-use backend\widgets\IssueColumn;
-use common\models\issue\Issue;
-use common\models\issue\IssueUser;
 use common\models\user\Worker;
 use common\widgets\address\AddressDetailView;
 use common\widgets\FieldsetDetailView;
-use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model Worker */
-/* @var $issuesDataProvider ActiveDataProvider */
 
 $this->title = $model->username;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Workers'), 'url' => ['index']];
