@@ -99,6 +99,7 @@ return [
 				],
 			],
 		],
+
 		'keyStorage' => [
 			'class' => KeyStorage::class,
 		],

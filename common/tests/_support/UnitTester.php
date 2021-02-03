@@ -14,6 +14,8 @@ namespace common\tests;
  * @method void lookForwardTo($achieveValue)
  * @method void comment($description)
  * @method \Codeception\Lib\Friend haveFriend($name, $actorClass = null)
+ * @method grabFixture(string $string, int $int)
+ * @method seeRecord(string $class, array $array)
  *
  * @SuppressWarnings(PHPMD)
  */

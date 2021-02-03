@@ -35,7 +35,7 @@ class PasswordResetRequestForm extends Model {
 	 *
 	 * @return bool whether the email was send
 	 */
-	public function sendEmail() {
+	public function sendEmail(): bool {
 		/* @var $user User */
 		$user = User::findOne([
 			'status' => User::STATUS_ACTIVE,
