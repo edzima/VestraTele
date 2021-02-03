@@ -1,4 +1,7 @@
 <?php
+
+use yii\swiftmailer\Mailer;
+
 return [
 	'components' => [
 		'db' => [
@@ -9,10 +12,16 @@ return [
 			'charset' => 'utf8',
 		],
 		'mailer' => [
-			'class' => 'yii\swiftmailer\Mailer',
+			'class' => Mailer::class,
 			'viewPath' => '@common/mail',
-			//@todo: mailer here prod
-
+			'transport' => [
+				'class' => 'Swift_SmtpTransport',
+				'encryption' => getenv('EMAIL_ENCRYPTION'),
+				'host' => getenv('EMAIL_SMTP_HOST'),
+				'port' => getenv('EMAIL_SMTP_PORT'),
+				'username' => getenv('EMAIL_USERNAME'),
+				'password' => getenv('EMAIL_PASSWORD'),
+			],
 		],
 	],
 ];

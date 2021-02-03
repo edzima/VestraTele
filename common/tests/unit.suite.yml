@@ -4,6 +4,6 @@ bootstrap: false
 modules:
   enabled:
     - Yii2:
-        part: [ orm, fixtures ]
+        part: [ orm, fixtures, email ]
         cleanup: true
     - Asserts
