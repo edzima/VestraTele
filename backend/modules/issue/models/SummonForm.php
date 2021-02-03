@@ -9,6 +9,7 @@ use common\models\issue\Summon;
 use common\models\user\User;
 use common\models\user\Worker;
 use edzima\teryt\models\Simc;
+use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
@@ -19,11 +20,21 @@ use yii\helpers\ArrayHelper;
  */
 class SummonForm extends Model {
 
+	public const TERM_EMPTY = null;
+	public const TERM_ONE_DAY = 1;
+	public const TERM_TREE_DAYS = 3;
+	public const TERM_FIVE_DAYS = 5;
+	public const TERM_ONE_WEEK = 7;
+	public const TERM_TWO_WEEKS = 14;
+	public const TERM_THREE_WEEKS = 21;
+	public const TERM_ONE_MONTH = 30;
+	public const TERM_CUSTOM = 'custom';
+
 	public int $owner_id;
 
 	public int $status = Summon::STATUS_NEW;
 	public int $type = Summon::TYPE_APPEAL;
-	public $term = Summon::TERM_ONE_WEEK;
+	public $term = self::TERM_ONE_WEEK;
 	public string $title = '';
 	public ?int $issue_id = null;
 	public ?int $contractor_id = null;
@@ -31,6 +42,7 @@ class SummonForm extends Model {
 	public ?int $city_id = null;
 
 	public $start_at;
+	public $deadline_at;
 	public $realize_at;
 	public $realized_at;
 
@@ -43,7 +55,7 @@ class SummonForm extends Model {
 			[['type', 'status', 'title', 'issue_id', 'owner_id', 'contractor_id', 'start_at', 'entity_id', 'city_id'], 'required'],
 			[['type', 'issue_id', 'owner_id', 'contractor_id', 'status'], 'integer'],
 			[['start_at', 'realize_at', 'realized_at'], 'safe'],
-			['start_at', 'date', 'format' => 'yyyy-MM-dd'],
+			[['start_at', 'deadline_at'], 'date', 'format' => 'yyyy-MM-dd'],
 			[['realize_at', 'realized_at'], 'date', 'format' => 'yyyy-MM-dd HH:mm'],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
@@ -60,7 +72,10 @@ class SummonForm extends Model {
 	}
 
 	public function attributeLabels(): array {
-		return $this->getModel()->attributeLabels();
+		return array_merge(
+			$this->getModel()->attributeLabels(), [
+			'term' => Yii::t('common', 'Term'),
+		]);
 	}
 
 	public function getModel(): Summon {
@@ -74,7 +89,6 @@ class SummonForm extends Model {
 		$this->model = $model;
 		$this->status = $model->status;
 		$this->type = $model->type;
-		$this->term = $model->term;
 		$this->issue_id = $model->issue_id;
 		$this->title = $model->title;
 		$this->contractor_id = $model->contractor_id;
@@ -82,6 +96,7 @@ class SummonForm extends Model {
 		$this->entity_id = $model->entity_id;
 		$this->city_id = $model->city_id;
 		$this->start_at = $model->start_at;
+		$this->deadline_at = $model->deadline_at;
 		$this->realize_at = $model->realize_at;
 		$this->realized_at = $model->realized_at;
 	}
@@ -93,7 +108,6 @@ class SummonForm extends Model {
 		$model = $this->getModel();
 		$model->status = $this->status;
 		$model->type = $this->type;
-		$model->term = $this->term;
 		$model->issue_id = $this->issue_id;
 		$model->title = $this->title;
 		$model->contractor_id = $this->contractor_id;
@@ -103,6 +117,15 @@ class SummonForm extends Model {
 		$model->entity_id = $this->entity_id;
 		$model->realize_at = $this->realize_at;
 		$model->realized_at = $this->realized_at;
+		if ($model->isNewRecord && $this->term !== static::TERM_CUSTOM) {
+			if ($this->term === static::TERM_EMPTY) {
+				$this->deadline_at = null;
+			} else {
+				$this->deadline_at = date('Y-m-d', strtotime($this->start_at . " + {$this->term} days"));
+			}
+		}
+
+		$model->deadline_at = $this->deadline_at;
 		if ($model->save()) {
 			return true;
 		}
@@ -116,10 +139,6 @@ class SummonForm extends Model {
 
 	public static function getTypesNames(): array {
 		return Summon::getTypesNames();
-	}
-
-	public static function getTermsNames(): array {
-		return Summon::getTermsNames();
 	}
 
 	public static function getEntityNames(): array {
@@ -143,6 +162,21 @@ class SummonForm extends Model {
 			$this->_contractorIds = User::getSelectList($ids);
 		}
 		return $this->_contractorIds;
+	}
+
+	//@todo add I18n
+	public static function getTermsNames(): array {
+		return [
+			static::TERM_ONE_DAY => '1 dzień',
+			static::TERM_TREE_DAYS => '3 dni',
+			static::TERM_FIVE_DAYS => '5 dni',
+			static::TERM_ONE_WEEK => 'Tydzień',
+			static::TERM_TWO_WEEKS => '2 tygodnie',
+			static::TERM_THREE_WEEKS => '3 tygodnie ',
+			static::TERM_ONE_MONTH => 'Miesiąc',
+			static::TERM_EMPTY => 'Bez terminu',
+			static::TERM_CUSTOM => 'Custom',
+		];
 	}
 
 }

@@ -102,7 +102,6 @@ class IssueCest {
 		$I->dontSeeInGridHeader('Customer', '#summon-grid');
 		$I->seeInGridHeader('Type', '#summon-grid');
 		$I->seeInGridHeader('Status', '#summon-grid');
-		$I->seeInGridHeader('Term', '#summon-grid');
 		$I->seeInGridHeader('Title', '#summon-grid');
 		$I->dontSeeInGridHeader('Owner', '#summon-grid');
 		$I->seeInGridHeader('Contractor', '#summon-grid');

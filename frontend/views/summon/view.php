@@ -1,5 +1,6 @@
 <?php
 
+use common\models\issue\Summon;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
 use yii\helpers\Html;
@@ -8,7 +9,7 @@ use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\Summon */
+/* @var $model Summon */
 
 $this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/index']];
@@ -37,13 +38,12 @@ YiiAsset::register($this);
 			'contractor',
 			'typeName',
 			'statusName',
-			'termName',
 			'entityWithCity',
 			'start_at:date',
 			'realize_at:datetime',
 			'realized_at:datetime',
 			[
-				'attribute' => 'deadline',
+				'attribute' => 'deadline_at',
 				'format' => 'date',
 				'options' => [
 					'class' => 'red-text',

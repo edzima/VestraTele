@@ -41,7 +41,6 @@ class SummonCest {
 		$I->see('Customer');
 		$I->see('Type');
 		$I->see('Status');
-		$I->see('Term');
 		$I->dontSee('Contractor');
 	}
 

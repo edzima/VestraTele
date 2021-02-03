@@ -15,13 +15,13 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property int $status
  * @property int $type
- * @property int|null $term
  * @property string $title
  * @property int $created_at
  * @property int $updated_at
  * @property string $start_at
  * @property string|null $realize_at
  * @property string|null $realized_at
+ * @property string|null $deadline_at
  * @property int $issue_id
  * @property int $owner_id
  * @property int $contractor_id
@@ -30,7 +30,6 @@ use yii\db\ActiveRecord;
  *
  * @property-read string $statusName
  * @property-read string $typeName
- * @property-read string $termName
  * @property-read string $entityWithCity
  *
  * @property-read Issue $issue
@@ -57,14 +56,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 	public const TYPE_URGENCY = 40;
 	public const TYPE_RESIGNATION = 50;
 
-	public const TERM_EMPTY = null;
-	public const TERM_ONE_DAY = 1;
-	public const TERM_TREE_DAYS = 3;
-	public const TERM_FIVE_DAYS = 5;
-	public const TERM_ONE_WEEK = 7;
-	public const TERM_TWO_WEEKS = 14;
-	public const TERM_THREE_WEEKS = 21;
-	public const TERM_ONE_MONTH = 30;
+
 
 	/**
 	 * @inheritdoc
@@ -104,7 +96,6 @@ class Summon extends ActiveRecord implements IssueInterface {
 			[['created_at', 'updated_at', 'realized_at', 'start_at'], 'safe'],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
-			['term', 'in', 'range' => array_keys(static::getTermsNames())],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			[['entity_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_id' => 'id']],
 			[['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Simc::class, 'targetAttribute' => ['city_id' => 'id']],
@@ -123,8 +114,6 @@ class Summon extends ActiveRecord implements IssueInterface {
 			'typeName' => Yii::t('common', 'Type'),
 			'status' => Yii::t('common', 'Status'),
 			'statusName' => Yii::t('common', 'Status'),
-			'term' => Yii::t('common', 'Term'),
-			'termName' => Yii::t('common', 'Term'),
 			'title' => Yii::t('common', 'Title'),
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
@@ -142,7 +131,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 			'entity_id' => Yii::t('common', 'Entity responsible'),
 			'entity' => Yii::t('common', 'Entity responsible'),
 			'entityWithCity' => Yii::t('common', 'Entity responsible'),
-			'deadline' => Yii::t('common', 'Deadline at'),
+			'deadline_at' => Yii::t('common', 'Deadline at'),
 		];
 	}
 
@@ -158,20 +147,10 @@ class Summon extends ActiveRecord implements IssueInterface {
 		return static::getStatusesNames()[$this->status];
 	}
 
-	public function getTermName(): string {
-		return static::getTermsNames()[$this->term];
-	}
 
-	public function getDeadline(): ?string {
-		if ($this->hasTerm()) {
-			return date('Y-m-d', strtotime($this->start_at . " + {$this->term} days"));
-		}
-		return null;
-	}
 
-	public function hasTerm(): bool {
-		return $this->term !== null;
-	}
+
+
 
 	//@todo add I18n
 	public static function getStatusesNames(): array {
@@ -182,20 +161,6 @@ class Summon extends ActiveRecord implements IssueInterface {
 			static::STATUS_TO_CONFIRM => 'Do potwierdzenia',
 			static::STATUS_REALIZED => 'Zrealizowane',
 			static::STATUS_UNREALIZED => 'Niezrealizowane',
-		];
-	}
-
-	//@todo add I18n
-	public static function getTermsNames(): array {
-		return [
-			static::TERM_ONE_DAY => '1 dzień',
-			static::TERM_TREE_DAYS => '3 dni',
-			static::TERM_FIVE_DAYS => '5 dni',
-			static::TERM_ONE_WEEK => 'Tydzień',
-			static::TERM_TWO_WEEKS => '2 tygodnie',
-			static::TERM_THREE_WEEKS => '3 tygodnie ',
-			static::TERM_ONE_MONTH => 'Miesiąc',
-			static::TERM_EMPTY => 'Bez terminu',
 		];
 	}
 

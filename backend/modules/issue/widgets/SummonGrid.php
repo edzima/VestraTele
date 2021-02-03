@@ -15,7 +15,7 @@ class SummonGrid extends BaseSummonGrid {
 		$this->actionColumn['controller'] = '/issue/summon';
 		$this->actionColumn['visibleButtons'] = [
 			'update' => function (Summon $model): bool {
-				return $model->isOwner(Yii::$app->user->getId());
+				return $model->isForUser(Yii::$app->user->getId());
 			},
 			'delete' => function (Summon $model): bool {
 				return $model->isOwner(Yii::$app->user->getId());

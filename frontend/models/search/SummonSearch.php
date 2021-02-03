@@ -18,7 +18,7 @@ class SummonSearch extends BaseSummonSearch {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type', 'status', 'term', 'created_at', 'updated_at', 'realized_at', 'start_at', 'issue_id', 'owner_id'], 'integer'],
+			[['id', 'type', 'status', 'created_at', 'updated_at', 'realized_at', 'deadline_at', 'start_at', 'issue_id', 'owner_id'], 'integer'],
 			[['title'], 'safe'],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];

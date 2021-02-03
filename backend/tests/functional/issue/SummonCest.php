@@ -36,10 +36,7 @@ class SummonCest {
 		$I->seeInGridHeader('Customer');
 		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('Status');
-		$I->seeInGridHeader('Term');
 		$I->seeInGridHeader('Title');
-		$I->seeInGridHeader('Start at');
-		$I->seeInGridHeader('Realized at');
 		$I->seeInGridHeader('Deadline at');
 		$I->seeInGridHeader('Updated at');
 		$I->seeInGridHeader('Owner');
@@ -70,7 +67,6 @@ class SummonCest {
 		$I->see($summon->contractor->getFullName());
 		$I->see($summon->typeName);
 		$I->see($summon->statusName);
-		$I->see($summon->termName);
 		$I->see($summon->entityWithCity);
 	}
 

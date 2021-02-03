@@ -55,12 +55,11 @@ YiiAsset::register($this);
 			'contractor',
 			'typeName',
 			'statusName',
-			'termName',
 			'entityWithCity',
 			'start_at:date',
 			'realize_at:datetime',
 			'realized_at:datetime',
-			'deadline:date',
+			'deadline_at:date',
 
 			'created_at:datetime',
 			'updated_at:datetime',

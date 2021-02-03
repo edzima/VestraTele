@@ -43,7 +43,7 @@ class SummonSearch extends Summon implements
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type', 'status', 'term', 'created_at', 'updated_at', 'realized_at', 'start_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
+			[['id', 'type', 'status', 'created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
 			[['title'], 'safe'],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];
@@ -95,7 +95,6 @@ class SummonSearch extends Summon implements
 			static::SUMMON_ALIAS . '.id' => $this->id,
 			static::SUMMON_ALIAS . '.type' => $this->type,
 			static::SUMMON_ALIAS . '.status' => $this->status,
-			static::SUMMON_ALIAS . '.term' => $this->term,
 			static::SUMMON_ALIAS . '.created_at' => $this->created_at,
 			static::SUMMON_ALIAS . '.updated_at' => $this->updated_at,
 			static::SUMMON_ALIAS . '.start_at' => $this->start_at,

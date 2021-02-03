@@ -50,41 +50,27 @@ class SummonGrid extends GridView {
 			[
 				'attribute' => 'type',
 				'value' => 'typeName',
-				'width' => '150px',
 				'filter' => SummonSearch::getTypesNames(),
 			],
 			[
 				'attribute' => 'status',
 				'value' => 'statusName',
-				'noWrap' => true,
 				'filter' => SummonSearch::getStatusesNames(),
-			],
-			[
-				'attribute' => 'term',
-				'value' => 'termName',
-				'width' => '150px',
-				'filter' => SummonSearch::getTermsNames(),
 			],
 			[
 				'attribute' => 'title',
 				'contentOptions' => ['style' => 'width: 35%;'],
 			],
 			[
-				'attribute' => 'start_at',
+				'attribute' => 'deadline_at',
 				'format' => 'date',
-			],
-			[
-				'attribute' => 'realized_at',
-				'format' => 'date',
-			],
-			[
-				'attribute' => 'deadline',
-				'format' => 'date',
+				'noWrap' => true,
 			],
 			[
 				'attribute' => 'updated_at',
 				'format' => 'date',
 				'visible' => $this->withUpdatedAt,
+				'noWrap' => true,
 			],
 			[
 				'attribute' => 'owner_id',
