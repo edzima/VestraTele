@@ -1,6 +1,6 @@
 <template>
 	<div class="filter-calendar">
-		<BootstrapPopup :title="this.notePopupTitle" outerDissmisable ref="notesPopup">
+		<BootstrapPopup :title="this.notePopupTitle" outerDissmisable ref="notesPopup" v-if="notesEnabled">
 			<CalendarNotes :notes="dayNotes" :onNoteAdd="addNote" :onNoteDelete="deleteNote" :onNoteUpdate="editNoteText" editable/>
 		</BootstrapPopup>
 		<Filters
@@ -120,15 +120,20 @@
                             return event;
                         })
                     }
-                }, {
-                    id: 1,
-                    url: this.URLGetNotes,
-                    extraParams: {
-                        agentId: this.agentId
-                    },
-                    allDayDefault: true,
-                }
+                }, this.getNotesSettings()
             ];
+        }
+
+        private getNotesSettings(): EventSourceObject{
+            if(!this.notesEnabled) return {};
+            return {
+                id: 1,
+                url: this.URLGetNotes,
+                extraParams: {
+                  agentId: this.agentId
+                },
+                allDayDefault: true,
+            }
         }
 
         //@todo move to filter calendar?
@@ -166,6 +171,7 @@
         }
 
         private dateClick(dateInfo: DateClickWithDayEvents): void {
+            if (!this.notesEnabled) return;
             if (!dateInfo.allDay) return; //it's not a note
             if (dateInfo.view.type === 'dayGridMonth') return;
             this.dayNotes = this.getNotesFromDayInfo(dateInfo);
@@ -276,6 +282,10 @@
         })
         private URLAddEvent!: string;
 
+        @Prop({
+          default: () => true
+        })
+        private notesEnabled!: boolean;
 
         @Prop({
             default: () => '/calendar-note/list'
