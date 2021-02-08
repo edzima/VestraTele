@@ -6,6 +6,7 @@ use backend\modules\issue\Module as IssueModule;
 use backend\modules\provision\Module as ProvisionModule;
 use backend\modules\settlement\Module as SettlementModule;
 use backend\modules\user\Module as UserModule;
+use common\modules\lead\Module as LeadModule;
 use common\behaviors\GlobalAccessBehavior;
 use common\behaviors\LastActionBehavior;
 use common\components\User as WebUser;
@@ -106,6 +107,9 @@ return [
 		],
 		'issue' => [
 			'class' => IssueModule::class,
+		],
+		'lead' => [
+			'class' => LeadModule::class,
 		],
 		'settlement' => [
 			'class' => SettlementModule::class,
