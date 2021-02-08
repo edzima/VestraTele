@@ -37,6 +37,7 @@ use yii\db\ActiveRecord;
  * @property-read User $owner
  * @property-read Simc $city
  * @property-read EntityResponsible $entityResponsible
+ * @property int $term [smallint]
  */
 class Summon extends ActiveRecord implements IssueInterface {
 
