@@ -30,7 +30,7 @@ YiiAsset::register($this);
 				])
 			: ''
 		?>
-		<?= $model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
+		<?= $model->isForUser(Yii::$app->user->getId()) || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
 			? Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: ''
 		?>
