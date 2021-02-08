@@ -88,7 +88,6 @@
                 return {
                     onShow: (instance: Instance) => {
                         const classList = instance.reference.classList;
-                        console.log(instance.reference);
                         return !classList.contains('fc-dragging') && classList.contains('fc-allow-mouse-resize') && classList.contains('fc-start');
                     }
                 }
