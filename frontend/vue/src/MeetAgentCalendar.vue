@@ -239,6 +239,8 @@
 
 
         private async updateDates(e: any): Promise<void> {
+            ignoreAllSelections();
+            hideAllTippy();
             const isNote: boolean = Boolean(e.event.allDay);
             const dateFrom: string = dateToW3C(e.event.start);
             const dateTo: string = dateToW3C(e.event.end);
