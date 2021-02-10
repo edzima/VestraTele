@@ -129,10 +129,12 @@ class MeetCalendarController extends Controller {
 		if ($model->save()) {
 			return $this->asJson(['success' => true]);
 		}
-		return $this->asJson([
+		$response = $this->asJson([
 			'success' => false,
 			'errors' => $model->getErrors(),
 		]);
+		$response->statusCode = 400;
+		return $response;
 	}
 
 	/**
