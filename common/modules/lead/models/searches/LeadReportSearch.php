@@ -1,30 +1,30 @@
 <?php
 
-namespace common\modules\lead\models;
+namespace common\modules\lead\models\searches;
 
-use common\models\SearchModel;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use common\modules\lead\models\LeadReport;
 
 /**
- * LeadSearch represents the model behind the search form of `common\modules\lead\models\Lead`.
+ * LeadReportSearch represents the model behind the search form of `common\modules\lead\models\LeadReport`.
  */
-class LeadSearch extends Lead implements SearchModel {
+class LeadReportSearch extends LeadReport {
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['id'], 'integer'],
-			[['date_at', 'source', 'data', 'phone', 'email', 'postal_code'], 'safe'],
+			[['id', 'lead_id', 'owner_id', 'status_id', 'old_status_id', 'schema_id'], 'integer'],
+			[['details', 'created_at', 'updated_at'], 'safe'],
 		];
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function scenarios(): array {
+	public function scenarios() {
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
 	}
@@ -36,8 +36,8 @@ class LeadSearch extends Lead implements SearchModel {
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function search(array $params): ActiveDataProvider {
-		$query = Lead::find();
+	public function search($params) {
+		$query = LeadReport::find();
 
 		// add conditions that should always apply here
 
@@ -56,14 +56,16 @@ class LeadSearch extends Lead implements SearchModel {
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
-			'date_at' => $this->date_at,
+			'lead_id' => $this->lead_id,
+			'owner_id' => $this->owner_id,
+			'status_id' => $this->status_id,
+			'old_status_id' => $this->old_status_id,
+			'schema_id' => $this->schema_id,
+			'created_at' => $this->created_at,
+			'updated_at' => $this->updated_at,
 		]);
 
-		$query->andFilterWhere(['like', 'source', $this->source])
-			->andFilterWhere(['like', 'data', $this->data])
-			->andFilterWhere(['like', 'phone', $this->phone])
-			->andFilterWhere(['like', 'email', $this->email])
-			->andFilterWhere(['like', 'postal_code', $this->postal_code]);
+		$query->andFilterWhere(['like', 'details', $this->details]);
 
 		return $dataProvider;
 	}

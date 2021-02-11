@@ -1,0 +1,50 @@
+<?php
+
+use common\helpers\Html;
+use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadType;
+use common\modules\lead\models\searches\LeadReportSchemaSearch;
+use common\widgets\GridView;
+
+/* @var $this yii\web\View */
+/* @var $searchModel LeadReportSchemaSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = Yii::t('lead', 'Lead Report Schemas');
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<div class="lead-report-schema-index">
+
+	<h1><?= Html::encode($this->title) ?></h1>
+
+	<p>
+		<?= Html::a(Yii::t('lead', 'Create Lead Report Schema'), ['create'], ['class' => 'btn btn-success']) ?>
+	</p>
+
+	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+	<?= GridView::widget([
+		'dataProvider' => $dataProvider,
+		'filterModel' => $searchModel,
+		'columns' => [
+			['class' => 'yii\grid\SerialColumn'],
+			'name',
+			'placeholder',
+			[
+				'attribute' => 'status_ids',
+				'value' => 'statusNames',
+				'filter' => LeadStatus::getNames()
+			],
+			[
+				'attribute' => 'types_ids',
+				'value' => 'typesNames',
+				'filter' => LeadType::getNames()
+
+			],
+
+			['class' => 'yii\grid\ActionColumn'],
+		],
+	]); ?>
+
+
+</div>

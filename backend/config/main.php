@@ -110,6 +110,16 @@ return [
 		],
 		'lead' => [
 			'class' => LeadModule::class,
+			'userClass' => User::class,
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'permissions' => [User::PERMISSION_LEAD],
+					],
+				],
+			],
 		],
 		'settlement' => [
 			'class' => SettlementModule::class,

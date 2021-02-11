@@ -2,7 +2,7 @@
 
 namespace common\tests\unit\lead;
 
-use common\modules\lead\components\LeadComponent;
+use common\modules\lead\components\LeadManager;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadEntity;
 use common\modules\lead\models\LeadInterface;
@@ -11,7 +11,7 @@ use yii\helpers\Json;
 
 class LeadComponentTest extends Unit {
 
-	private LeadComponent $leadManager;
+	private LeadManager $leadManager;
 	private LeadInterface $lead;
 	private ?array $leadData;
 
@@ -27,7 +27,7 @@ class LeadComponentTest extends Unit {
 	}
 
 	private function givenLeadComponent(): void {
-		$this->leadManager = new LeadComponent(['model' => Lead::class]);
+		$this->leadManager = new LeadManager(['model' => Lead::class]);
 	}
 
 	public function testPush(): void {

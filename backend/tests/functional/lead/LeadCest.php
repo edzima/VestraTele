@@ -23,4 +23,22 @@ class LeadCest {
 		$I->seeInCurrentUrl(static::ROUTE_INDEX);
 		$I->see('Leads', 'h1');
 	}
+
+	public function checkCreateLink(LeadManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeLink('Create Lead');
+		$I->click('Create Lead');
+		$I->see('Create Lead', 'h1');
+	}
+
+	public function checkIndex(LeadManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeInGridHeader('Type');
+		$I->seeInGridHeader('Status');
+		$I->seeInGridHeader('Phone');
+		$I->seeInGridHeader('Email');
+		$I->seeInGridHeader('Owner');
+	}
 }

@@ -9,6 +9,6 @@ use yii\rest\Controller;
 class LeadController extends Controller {
 
 	public function actionLanding() {
-		Yii::$app->lead->pushLead(new LeadEntity(\Yii::$app->request->post()));
+		Yii::$app->leadManager->pushLead(new LeadEntity(Yii::$app->request->post()));
 	}
 }

@@ -1,10 +1,11 @@
 <?php
 
+use common\modules\lead\models\searches\LeadSearch;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\modules\lead\models\LeadSearch */
+/* @var $model LeadSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 

@@ -1,10 +1,13 @@
 <?php
 
-use yii\helpers\Html;
-use yii\grid\GridView;
+use common\helpers\Html;
+use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\searches\LeadSearch;
+use common\widgets\grid\ActionColumn;
+use common\widgets\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel common\modules\lead\models\LeadSearch */
+/* @var $searchModel LeadSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('lead', 'Leads');
@@ -25,15 +28,35 @@ $this->params['breadcrumbs'][] = $this->title;
 		'filterModel' => $searchModel,
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
-
-			'id',
+			[
+				'attribute' => 'type_id',
+				'value' => 'type',
+				'filter' => $searchModel::getTypesNames(),
+				'label' => Yii::t('lead', 'Type'),
+			],
+			[
+				'attribute' => 'status_id',
+				'value' => 'status',
+				'filter' => $searchModel::getStatusNames(),
+				'label' => Yii::t('lead', 'Status'),
+			],
 			'date_at',
 			'source',
 			'phone',
 			'email:email',
 			'postal_code',
 
-			['class' => 'yii\grid\ActionColumn'],
+			'owner',
+
+			[
+				'class' => ActionColumn::class,
+				'template' => '{view} {update} {report} {delete}',
+				'buttons' => [
+					'report' => static function (string $url, ActiveLead $lead): string {
+						return Html::a(Html::icon('comment'), ['report/create', 'id' => $lead->getId()]);
+					},
+				],
+			],
 		],
 	]); ?>
 

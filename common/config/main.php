@@ -8,7 +8,7 @@ use common\components\Provisions;
 use common\components\TaxComponent;
 use common\formatters\Formatter;
 use common\models\user\Worker;
-use common\modules\lead\components\LeadComponent;
+use common\modules\lead\components\LeadManager;
 use edzima\teryt\Module as TerytModule;
 use yii\caching\DummyCache;
 use yii\caching\FileCache;
@@ -58,8 +58,8 @@ return [
 			'thousandSeparator' => ' ',
 			'currencyCode' => 'PLN',
 		],
-		'lead' => [
-			'class' => LeadComponent::class,
+		'leadManager' => [
+			'class' => LeadManager::class,
 		],
 		'log' => [
 			'traceLevel' => YII_ENV_DEV ? 3 : 0,

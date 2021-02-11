@@ -3,9 +3,10 @@
 namespace common\modules\lead\controllers;
 
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\LeadForm;
 use Yii;
 use common\modules\lead\models\Lead;
-use common\modules\lead\models\LeadSearch;
+use common\modules\lead\models\searches\LeadSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -18,7 +19,7 @@ class LeadController extends Controller {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
 				'class' => VerbFilter::class,
@@ -34,7 +35,7 @@ class LeadController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new LeadSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -51,7 +52,7 @@ class LeadController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView($id) {
+	public function actionView(int $id): string {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
@@ -64,10 +65,10 @@ class LeadController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new Lead();
-
+		$model = new LeadForm();
+		$model->date_at = time();
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
 		return $this->render('create', [

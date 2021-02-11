@@ -3,6 +3,7 @@
 namespace common\modules\lead\models;
 
 use DateTime;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\Json;
 
@@ -13,9 +14,15 @@ use yii\helpers\Json;
  * @property string $date_at
  * @property string $source
  * @property string $data
+ * @property int $type_id
+ * @property int $status_id
  * @property string|null $phone
  * @property string|null $postal_code
  * @property string|null $email
+ * @property int|null $owner_id
+ *
+ * @property-read LeadType $type
+ * @property-read LeadStatus $status
  */
 class Lead extends ActiveRecord implements ActiveLead {
 
@@ -23,6 +30,18 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public static function tableName(): string {
 		return '{{%lead}}';
+	}
+
+	public function getId(): int {
+		return $this->id;
+	}
+
+	public function getType(): ActiveQuery {
+		return $this->hasOne(LeadType::class, ['id' => 'type_id']);
+	}
+
+	public function getStatus(): ActiveQuery {
+		return $this->hasOne(LeadStatus::class, ['id' => 'status_id']);
 	}
 
 	public function getDateTime(): DateTime {
@@ -49,6 +68,22 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->postal_code;
 	}
 
+	public function getTypeId(): int {
+		return $this->type_id;
+	}
+
+	public function getStatusId(): int {
+		return $this->status_id;
+	}
+
+	public function updateStatus(int $status_id): bool {
+		return $this->updateAttributes(['status_id' => $status_id]) > 0;
+	}
+
+	public static function findById(int $id): ?self {
+		return static::find()->andWhere(['id' => $id])->one();
+	}
+
 	public static function findByLead(LeadInterface $lead): ?self {
 		return static::find()
 			->andWhere(['source' => $lead->getSource()])
@@ -64,6 +99,8 @@ class Lead extends ActiveRecord implements ActiveLead {
 		$model->postal_code = $lead->getPostalCode();
 		$model->date_at = $lead->getDateTime()->format($model->dateFormat);
 		$model->data = Json::encode($lead->getData());
+		$model->type_id = $lead->getTypeId();
+		$model->status_id = $lead->getStatusId();
 		return $model;
 	}
 

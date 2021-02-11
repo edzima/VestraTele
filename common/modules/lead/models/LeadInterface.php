@@ -17,4 +17,9 @@ interface LeadInterface {
 	public function getEmail(): ?string;
 
 	public function getPostalCode(): ?string;
+
+	public function getStatusId(): int;
+
+	public function getTypeId(): int;
+
 }

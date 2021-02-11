@@ -8,7 +8,7 @@ use common\modules\lead\models\LeadInterface;
 use Yii;
 use yii\base\Component;
 
-class LeadComponent extends Component {
+class LeadManager extends Component {
 
 	public string $logCategory = 'lead';
 
@@ -16,6 +16,10 @@ class LeadComponent extends Component {
 	 * @var string|ActiveLead
 	 */
 	public string $model = Lead::class;
+
+	public function findModel(int $id): ?ActiveLead {
+		return $this->model::findById($id);
+	}
 
 	public function pushLead(LeadInterface $lead): bool {
 		if (empty($lead->getPhone()) && empty($lead->getEmail())) {

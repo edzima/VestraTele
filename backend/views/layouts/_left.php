@@ -61,8 +61,35 @@ $user = Yii::$app->user;
 					'url' => ['/lead/lead/index'],
 					'visible' => $user->can(User::PERMISSION_LEAD),
 					'icon' => '<i class="fa fa-vcard"></i>',
-				],
+					'items' => [
+						[
+							'label' => Yii::t('common', 'Browse'),
+							'url' => ['/lead/lead/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('common', 'Reports'),
+							'url' => ['/lead/report/index'],
+							'icon' => '<i class="fa fa-table"></i>',
+						],
+						[
+							'label' => Yii::t('common', 'Reports schemas'),
+							'url' => ['/lead/report-schema/index'],
+							'icon' => '<i class="fa fa-table"></i>',
+						],
+						[
+							'label' => Yii::t('common', 'Statuses'),
+							'url' => ['/lead/status/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('common', 'Types'),
+							'url' => ['/lead/type/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
 
+					],
+				],
 				[
 					'label' => Yii::t('common', 'Issues'),
 					'url' => ['/issue/issue/index'],
