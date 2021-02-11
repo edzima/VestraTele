@@ -3,6 +3,7 @@
 namespace backend\modules\provision\models;
 
 use common\models\issue\Issue;
+use common\models\issue\IssueInterface;
 use common\models\provision\Provision;
 use common\models\user\User;
 use Decimal\Decimal;
@@ -66,7 +67,7 @@ class ProvisionForm extends Model {
 		return $this->model->toUser;
 	}
 
-	public function getIssue(): Issue {
+	public function getIssue(): IssueInterface {
 		return $this->model->pay->issue;
 	}
 
