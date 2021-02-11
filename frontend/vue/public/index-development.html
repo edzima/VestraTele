@@ -14,8 +14,13 @@
 
 <script>
 	props = {
-		agentId: 100
-
+		notesEnabled: false,
+		extraParams: [
+			{
+				name: "agentId",
+				value: 17302
+			}
+		]
 	}
 	document.getElementsByTagName("div")[0].setAttribute('data-props', JSON.stringify(props));
 </script>

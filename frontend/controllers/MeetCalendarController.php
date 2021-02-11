@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\models\issue\IssueMeet;
+use common\models\user\User;
 use common\models\user\Worker;
 use frontend\models\AgentMeetCalendarSearch;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
@@ -53,18 +54,31 @@ class MeetCalendarController extends Controller {
 
 		$agents = [];
 		if (Yii::$app->user->can(Worker::ROLE_MANAGER)) {
+			$myId = Yii::$app->user->getId();
+			$me = User::findOne(["id" => $myId]);
+			$myOption = [
+				"id" => $myId,
+				'fullName' => $me->getFullName()
+			];
+
 			$agents = Worker::find()
 				->with('userProfile')
 				->leftJoin('issue_meet', 'user.id = issue_meet.agent_id')
 				->where('issue_meet.agent_id IS NOT NULL')
 				->all();
 
+			array_unshift($agents, $myOption);
 			$agents = ArrayHelper::map($agents, 'id', 'fullName');
 		}
 
 		return $this->render('index', [
 			'agents' => $agents,
-			'agentId' => $agentId,
+			'extraParams' => [
+				[
+					'name' => 'agentId',
+					'value' => $agentId,
+				],
+			],
 		]);
 	}
 

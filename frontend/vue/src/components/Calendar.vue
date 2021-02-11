@@ -89,7 +89,8 @@
                     onShow: (instance: Instance) => {
                         const classList = instance.reference.classList;
                         return !classList.contains('fc-dragging') && classList.contains('fc-allow-mouse-resize') && classList.contains('fc-start');
-                    }
+                    },
+                    delay: [400,0]
                 }
 
 

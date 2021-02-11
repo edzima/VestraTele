@@ -32,6 +32,9 @@
     import CalendarNotes from "@/components/CalendarNotes.vue";
     import {NoteInterface} from "@/components/Note.vue";
     import BootstrapPopup, {PopupInterface} from "@/components/BootstrapPopup.vue";
+    import {ExtraParam} from "@/types/ExtraParam";
+    import {mapExtraParamsToObj} from "@/helpers/extraParamsHelper";
+    import {hideAllTippy, ignoreAllSelections} from "@/helpers/domHelper";
 
 
     interface MeetEvent extends EventObject {
@@ -44,7 +47,7 @@
             isActive: true,
             label: 'Umowiony',
             itemOptions: {
-                color: 'blue'
+                color: 'orange'
             }
         },
         {
@@ -108,9 +111,7 @@
                     id: 0,
                     url: this.URLGetEvents,
                     allDayDefault: false,
-                    extraParams: {
-                        agentId: this.agentId
-                    },
+                    extraParams: mapExtraParamsToObj(this.extraParams),
                     success: (data: MeetEvent[]) => {
                         return data.map((event) => {
                             const filter = this.filters.getFilter(event.statusId);
@@ -129,9 +130,7 @@
             return {
                 id: 1,
                 url: this.URLGetNotes,
-                extraParams: {
-                  agentId: this.agentId
-                },
+                extraParams: mapExtraParamsToObj(this.extraParams),
                 allDayDefault: true,
             }
         }
@@ -197,7 +196,9 @@
         private async deleteNote(noteToDel: NoteInterface): Promise<boolean> {
             const params: URLSearchParams = new URLSearchParams();
             params.append('id', String(noteToDel.id));
-            params.append('agent_id', String(this.agentId));
+            this.extraParams.forEach((param: ExtraParam) => {
+                params.append(param.name, String(param.value));
+            })
             const res = await this.axios.post(this.URLDeleteNote, params);
             if (res.status !== 200) return false;
             this.calendar.deleteEventById(noteToDel.id!);
@@ -207,8 +208,10 @@
         private async addNote(newNote: NoteInterface): Promise<number | false> {
             const params: URLSearchParams = new URLSearchParams();
             params.append('news', newNote.content);
-            params.append('agent_id', String(this.agentId));
             params.append('date', dateToW3C(this.notePopupDate));
+            this.extraParams.forEach((param: ExtraParam) => {
+                params.append(param.name, String(param.value));
+            })
 
             const res = await this.axios.post(this.URLNewNote, params);
             if (res.status !== 200) return false;
@@ -224,7 +227,9 @@
         private async editNoteText(newNote: NoteInterface): Promise<boolean> {
             const params: URLSearchParams = new URLSearchParams();
             params.append('news', newNote.content);
-            params.append('agent_id', String(this.agentId));
+            this.extraParams.forEach((param: ExtraParam) => {
+                params.append(param.name, String(param.value));
+            })
             params.append('id', String(newNote.id));
 
             const res = await this.axios.post(this.URLUpdateNote, params);
@@ -249,8 +254,18 @@
             params.append('id', String(e.event.id));
             params.append(isNote ? 'start' : 'date_at', String(dateFrom));
             params.append(isNote ? 'end' : 'date_end_at', String(dateTo));
-            const res = await this.axios.post(isNote ? this.URLUpdateNote : this.URLUpdateEvent, params);
-            if (res.status !== 200 || !res.data.success) return e.revert();
+            this.extraParams.forEach((param: ExtraParam) => {
+                params.append(param.name, String(param.value));
+            })
+            let res;
+            try{
+                res = await this.axios.post(isNote ? this.URLUpdateNote : this.URLUpdateEvent, params);
+            }catch{
+                e.revert();
+            }
+            if (res.status !== 200 || !res.data.success){
+                e.revert();
+            }
             if (isNote) {
                 //@todo update note sources
             }
@@ -263,9 +278,10 @@
         private allowUpdate!: boolean; // allow user to edit events
 
         @Prop({
-            required: true
+            required: false,
+            default: ()=> []
         })
-        private agentId!: number;
+        private extraParams!: ExtraParam[];
 
         @Prop({
             default: () => '/meet-calendar/list'

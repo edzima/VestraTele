@@ -8,16 +8,17 @@ use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $agents string[] */
-/* @var $agentId int */
+/* @var $extraParams string[] */
 
 $this->title = 'Kalendarz';
 $this->params['breadcrumbs'][] = ['label' => 'Leady', 'url' => ['/meet/index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 CalendarAsset::register($this);
+$agentId = $extraParams[0]['value'];
 
 $props = [
-	'agentId' => $agentId,
+	'extraParams' => $extraParams,
 	'filtersItems' => AgentMeetCalendarSearch::getFiltersOptions(),
 
 	'URLGetEvents' => Url::to('/meet-calendar/list'),
