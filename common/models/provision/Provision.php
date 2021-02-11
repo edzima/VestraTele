@@ -4,9 +4,7 @@ namespace common\models\provision;
 
 use common\models\issue\IssuePay;
 use common\models\user\User;
-use common\models\user\Worker;
 use Decimal\Decimal;
-use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -46,8 +44,8 @@ class Provision extends ActiveRecord {
 			[['value'], 'number'],
 			['hide_on_report', 'boolean'],
 			[['pay_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssuePay::class, 'targetAttribute' => ['pay_id' => 'id']],
-			[['from_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['from_user_id' => 'id']],
-			[['to_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['to_user_id' => 'id']],
+			[['from_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['from_user_id' => 'id']],
+			[['to_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['to_user_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ProvisionType::class, 'targetAttribute' => ['type_id' => 'id']],
 
 		];
@@ -97,11 +95,12 @@ class Provision extends ActiveRecord {
 	}
 
 	public function getProvision(): string {
-		return Yii::$app->tax->brutto(
-			$this->getValue(),
-			$this->pay->getVAT())
-			->div($this->pay->getValue())
-			->toFixed(2);
+		return $this->getProvisionDecimal()->toFixed(2);
+	}
+
+	public function getProvisionDecimal(): Decimal {
+		return $this->getValue()
+			->div($this->pay->getValueWithoutVAT());
 	}
 
 	public static function find(): ProvisionQuery {

@@ -5,6 +5,8 @@ namespace backend\modules\provision\models;
 use common\models\issue\Issue;
 use common\models\provision\Provision;
 use common\models\user\User;
+use Decimal\Decimal;
+use Yii;
 use yii\base\Model;
 
 /**
@@ -24,20 +26,31 @@ class ProvisionForm extends Model {
 	/**
 	 * @var Provision
 	 */
-	private $model;
+	private Provision $model;
+
+	public function __construct(Provision $model, $config = []) {
+		$this->setModel($model);
+		parent::__construct($config);
+	}
+
+	private function setModel(Provision $model): void {
+		$this->model = $model;
+		$this->percent = $model->getProvisionDecimal()->mul(100)->toFixed(2);
+		$this->hide_on_report = $model->hide_on_report;
+	}
 
 	public function rules(): array {
 		return [
-			['hide_on_report', 'boolean'],
 			['percent', 'required'],
+			['hide_on_report', 'boolean'],
 			['percent', 'number', 'min' => 0, 'max' => 100],
 		];
 	}
 
 	public function attributeLabels(): array {
 		return [
-			'percent' => 'Prowizja (%)',
-			'hide_on_report' => 'Ukryty w raporcie',
+			'percent' => Yii::t('provision', 'Provision (%)'),
+			'hide_on_report' => Yii::t('provision', 'Hide on report'),
 		];
 	}
 
@@ -45,10 +58,8 @@ class ProvisionForm extends Model {
 		return $this->model->id;
 	}
 
-	public function setModel(Provision $model): void {
-		$this->model = $model;
-		$this->percent = $model->provision * 100;
-		$this->hide_on_report = $model->hide_on_report;
+	public function getModel(): Provision {
+		return $this->model;
 	}
 
 	public function getToUser(): User {
@@ -67,9 +78,12 @@ class ProvisionForm extends Model {
 			return $this->model->delete();
 		}
 		$model = $this->model;
-		$model->value = $model->pay->value * $this->percent / 100;
+		$percent = new Decimal($this->percent);
+		$model->value = Yii::$app->provisions->issuePayValue($this->model->pay)
+			->mul($percent)
+			->div(100)
+			->toFixed(2);
 		$model->hide_on_report = $this->hide_on_report;
-		$model->validate();
 		return $model->save();
 	}
 }

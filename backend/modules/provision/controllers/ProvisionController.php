@@ -2,6 +2,7 @@
 
 namespace backend\modules\provision\controllers;
 
+use backend\helpers\Url;
 use backend\modules\provision\models\ProvisionForm;
 use Yii;
 use common\models\provision\Provision;
@@ -37,7 +38,7 @@ class ProvisionController extends Controller {
 	public function actionIndex() {
 		$searchModel = new ProvisionSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+		Url::remember();
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
@@ -53,11 +54,10 @@ class ProvisionController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$model = new ProvisionForm();
-		$model->setModel($this->findModel($id));
+		$model = new ProvisionForm($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect('index');
+			return $this->goBack();
 		}
 
 		return $this->render('update', [
