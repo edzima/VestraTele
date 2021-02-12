@@ -47,7 +47,6 @@ export default class FilterCalendar extends Vue {
     }
 
     private toggleFilter(ids: number[]): void {
-        console.log('passed',ids);
         this.visibleStatusIds = ids;
         this.calendar.rerenderEvents();
     }
@@ -60,7 +59,6 @@ export default class FilterCalendar extends Vue {
     private parseVisible(info: EventInfo): void {
         const status = info.event.extendedProps.statusId;
         if (status) {
-            console.log(this.visibleStatusIds)
             if (this.visibleStatusIds.includes(status)) {
                 info.el.classList.remove('hide');
             } else {
@@ -92,13 +90,11 @@ export default class FilterCalendar extends Vue {
     }
 
     public filterEvents(events: EventInfo[]): EventInfo[]{
-        console.log(events);
         return events.map((event) => {
             const filter = this.filterManager.getFilter(event.statusId);
             if (filter && filter.itemOptions) {
                 event = Object.assign(event, filter.itemOptions);
             }
-            console.log(event)
             return event;
         })
     }
