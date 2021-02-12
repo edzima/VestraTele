@@ -1,10 +1,13 @@
 <template>
     <div>
-        <FilterManager
-            ref="filterManager"
-            :filters="filters"
-            @toggleFilter="toggleFilter"
-        />
+        <div class="filter-bar">
+            <FilterManager
+                v-for="filterGroup in usableFilterGroups"
+                :key="filterGroup.filteredPropertyName"
+                :filterGroup="filterGroup"
+                @groupUpdate="refreshFilterGroups"
+            />
+        </div>
         <Calendar
             ref="calendar"
             :eventSources="eventSources"
@@ -19,17 +22,17 @@
 
 <script lang="ts">
 import {Component, Prop, Ref, Vue} from 'vue-property-decorator';
-import FilterManager from "@/components/Filters.vue";
+import FilterManager from "@/components/FilterManager.vue";
 import Calendar from "@/components/Calendar.vue";
-import {Filter} from "@/types/Filter";
-import {DateClickWithDayEvents, EventInfo, EventSourceObject} from "@/types/FullCalendar";
-import {telLink} from "@/helpers/HTMLHelper";
+import {Filter, FilterGroup} from "@/types/Filter";
+import {DateClickWithDayEvents, EventInfo, EventObject, EventSourceObject} from "@/types/FullCalendar";
+import {createBadge, telLink} from "@/helpers/HTMLHelper";
 
 @Component({
     components: {Calendar, FilterManager}
 })
 export default class FilterCalendar extends Vue {
-    @Prop() filters!: Filter[];
+    @Prop() filterGroups!: FilterGroup[];
     @Prop() private readonly eventSources!: EventSourceObject[];
     @Prop({
         default: () => true,
@@ -40,30 +43,65 @@ export default class FilterCalendar extends Vue {
     @Ref() calendar!: Calendar;
     @Ref() filterManager!: FilterManager;
 
-    private visibleStatusIds: any[] = [];
+    usableFilterGroups: FilterGroup[] = [];
 
     mounted(): void {
-        this.visibleStatusIds = this.filterManager.getActiveFiltersIds();
+        this.usableFilterGroups = this.filterGroups;
     }
 
-    private toggleFilter(ids: number[]): void {
-        this.visibleStatusIds = ids;
-        this.calendar.rerenderEvents();
+    checkGroupFilters(event: EventObject): boolean {
+        let allGroupVisible = true;
+
+        this.usableFilterGroups.forEach((filterGroup: FilterGroup) => {
+            allGroupVisible = allGroupVisible && this.checkIsEventVisibleInGroup(event, filterGroup);
+        })
+
+        return allGroupVisible
+    }
+
+    checkIsEventVisibleInGroup(event: EventObject, filterGroup: FilterGroup): boolean {
+        let isElementVisibleInGroup = false;
+        const activeInGroup = this.activeValuesInFilterGroup(filterGroup);
+        activeInGroup.forEach(value => {
+            if (value === event.extendedProps[filterGroup.filteredPropertyName]) {
+                isElementVisibleInGroup = true
+            }
+        })
+        return isElementVisibleInGroup;
+    }
+
+    activeValuesInFilterGroup(filterGroup: FilterGroup): Filter["value"][] {
+        const actives = filterGroup.filters.filter((filter: Filter) => filter.isActive);
+        return actives.map((filter: Filter) => filter.value);
     }
 
     private eventRender(info: EventInfo): void {
         this.parseVisible(info);
         this.parsePhone(info);
+        this.parseEventStyles(info);
     }
 
-    private parseVisible(info: EventInfo): void {
-        const status = info.event.extendedProps.statusId;
-        if (status) {
-            if (this.visibleStatusIds.includes(status)) {
-                info.el.classList.remove('hide');
-            } else {
-                info.el.classList.add('hide')
+    refreshFilterGroups(updatedGroup: FilterGroup):void{
+        this.usableFilterGroups = this.usableFilterGroups.map((oldGroup: FilterGroup)=>{
+            if(oldGroup.id === updatedGroup.id){
+                return updatedGroup
             }
+            return oldGroup
+        })
+        this.calendar.rerenderEvents();
+
+    }
+
+    private parseVisible(eventInfo: EventInfo): void {
+        try {
+            const isVisible = this.checkGroupFilters(eventInfo.event);
+            if (isVisible) {
+                eventInfo.el.classList.remove('hide');
+            } else {
+                eventInfo.el.classList.add('hide')
+            }
+        } catch (err) {
+            console.error(err);
         }
     }
 
@@ -89,15 +127,40 @@ export default class FilterCalendar extends Vue {
         this.$emit('eventEdit', e);
     }
 
-    public filterEvents(events: EventInfo[]): EventInfo[]{
-        return events.map((event) => {
-            const filter = this.filterManager.getFilter(event.statusId);
-            if (filter && filter.itemOptions) {
-                event = Object.assign(event, filter.itemOptions);
-            }
-            return event;
+    parseEventStyles(eventInfo:EventInfo):void{
+        this.usableFilterGroups.forEach((filterGroup: FilterGroup)=>{
+            filterGroup.filters.forEach((filter: Filter)=>{
+                if(!filter.eventColors) return;
+                const key = filterGroup.filteredPropertyName;
+                if(eventInfo.event.extendedProps[key] === filter.value){
+                    const backgroundColor = filter.eventColors.background
+
+                    if(backgroundColor){
+                        eventInfo.el.style.backgroundColor = backgroundColor;
+                    }
+
+                    const badgeColor = filter.eventColors.badge
+                    if(badgeColor){
+                        this.parseBadge(eventInfo.el, badgeColor);
+                    }
+                }
+            })
         })
     }
 
+    parseBadge(event: EventInfo["el"], badgeColor): void{
+        console.log(event);
+        const badgeElem = createBadge(badgeColor);
+        const body = event.querySelector('.fc-content');
+        body.appendChild(badgeElem);
+    }
 }
 </script>
+<style>
+.filter-bar {
+    display: flex;
+    flex-direction: row;
+    height: auto;
+    width: 100%;
+}
+</style>

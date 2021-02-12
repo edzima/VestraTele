@@ -9,3 +9,10 @@ export function telLink(number: string, text?: string): HTMLElement {
     element.classList.add('tel-link');
     return element;
 }
+
+export function createBadge(color: string): HTMLElement {
+    const element = document.createElement('div');
+    element.classList.add('event-badge');
+    element.style.backgroundColor = color;
+    return element;
+}

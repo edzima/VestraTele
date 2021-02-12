@@ -215,12 +215,37 @@
 	@import "~@fullcalendar/daygrid/main.css";
 	@import "~@fullcalendar/timegrid/main.css";
 
-	.fc-event {
-		&a {
-			&:hover {
-				opacity: 0.5;
-			}
-		}
-	}
+.tel-link {
+  display: inline-flex;
+  color: white;
+  padding-bottom: 10px;
+}
+.event-badge{
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  z-index: 10;
+  top:-5px;
+  right: -5px;
+  border-radius: 50%;
+  box-shadow: 0 0 4px 1px rgba(0,0,0,0.8);
+}
+
+.fc-event {
+  overflow: visible;
+  border: none;
+  padding: 2px;
+
+  .fc-content {
+    height: 100%;
+    overflow: visible;
+
+    &a {
+      &:hover {
+        opacity: 0.5;
+      }
+    }
+  }
+}
 
 </style>

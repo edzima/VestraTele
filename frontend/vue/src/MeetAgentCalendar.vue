@@ -5,7 +5,7 @@
 		</BootstrapPopup>
 
         <FilterCalendar
-            :filters="filters"
+            :filterGroups="filterGroups"
             :eventSources="eventSources"
             :editable="allowUpdate"
             @dateClick="dateClick"
@@ -21,10 +21,9 @@
     import {DateClickWithDayEvents, EventObject, EventSourceObject, EventInfo} from "@/types/FullCalendar";
 
     import Calendar from '@/components/Calendar.vue';
-    import FilterManager from '@/components/Filters.vue';
+    import FilterManager from '@/components/FilterManager.vue';
     import {dateToW3C, prettify} from '@/helpers/dateHelper.ts';
-    import {telLink} from "@/helpers/HTMLHelper";
-    import {Filter} from "@/types/Filter";
+    import {FilterGroup} from "@/types/Filter";
     import CalendarNotes from "@/components/CalendarNotes.vue";
     import {NoteInterface} from "@/components/Note.vue";
     import BootstrapPopup, {PopupInterface} from "@/components/BootstrapPopup.vue";
@@ -47,7 +46,7 @@
 
         @Prop({
             default: () => []
-        }) filters!: Filter[];
+        }) filterGroups!: FilterGroup[];
 
         @Ref() calendar!: Calendar;
         @Ref() calendarFilter!: FilterCalendar;
@@ -64,7 +63,6 @@
                     url: this.URLGetEvents,
                     allDayDefault: false,
                     extraParams: mapExtraParamsToObj(this.extraHTTPParams),
-                    success: (data) => this.calendarFilter.filterEvents(data)
                 }, this.getNotesSettings()
             ];
         }
@@ -238,10 +236,3 @@
         private URLDeleteNote!: string;
     }
 </script>
-<style lang="less">
-	.tel-link {
-		display: inline-flex;
-		color: white;
-		padding-bottom: 10px;
-	}
-</style>

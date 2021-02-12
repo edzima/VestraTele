@@ -21,31 +21,40 @@
 				value: 17302
 			}
 		],
-		filters:[
+		filterGroups: [
 			{
 				id: 1,
-				isActive: true,
-				label: 'Umowiony',
-				itemOptions: {
-					color: 'orange'
-				}
+				title: 'Statusy',
+				filteredPropertyName: 'statusId',
+				filters: [
+					{
+						isActive: true,
+						label: 'Umowiony',
+						value: 1,
+						color: 'red',
+						eventColors: {
+							background: 'red',
+						}
+					}
+				]
 			},
 			{
-				id: 5,
-				isActive: true,
-				label: 'Stary',
-				itemOptions: {
-					color: 'red'
-				}
-			},
-			{
-				id: 8,
-				isActive: true,
-				label: 'jakis inny',
-				itemOptions: {
-					color: 'green'
-				}
+				id: 2,
+				title: 'Typy',
+				filteredPropertyName: 'tooltipContent',
+				filters: [
+					{
+						isActive: true,
+						label: 'aktywny',
+						value: "d",
+						color: "green",
+						eventColors: {
+							badge: 'green',
+						}
+					}
+				]
 			}
+
 		]
 	}
 	document.getElementsByTagName("div")[0].setAttribute('data-props', JSON.stringify(props));
