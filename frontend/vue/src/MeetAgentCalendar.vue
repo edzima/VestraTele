@@ -3,107 +3,59 @@
 		<BootstrapPopup :title="this.notePopupTitle" outerDissmisable ref="notesPopup" v-if="notesEnabled">
 			<CalendarNotes :notes="dayNotes" :onNoteAdd="addNote" :onNoteDelete="deleteNote" :onNoteUpdate="editNoteText" editable/>
 		</BootstrapPopup>
-		<Filters
-				ref="filters"
-				:filters="filtersItems"
-				@toggleFilter="toggleFilter"
-		/>
-		<Calendar
-				ref="calendar"
-				:eventSources="eventSources"
-				:eventRender="eventRender"
-				:allowUpdate="allowUpdate"
-				@dateClick="dateClick"
-				@dateDoubleClick="dateDoubleClick"
-				@eventEdit="updateDates"
-		/>
+
+        <FilterCalendar
+            :filters="filters"
+            :eventSources="eventSources"
+            :editable="allowUpdate"
+            @dateClick="dateClick"
+            @dateDoubleClick="dateDoubleClick"
+            @eventEdit="updateDates"
+            ref="calendarFilter"
+        />
 	</div>
 </template>
 
 <script lang="ts">
     import {Component, Prop, Ref, Vue} from 'vue-property-decorator';
-    import {DateClickWithDayEvents, EventObject, EventSourceObject, Info} from "@/types/FullCalendar";
+    import {DateClickWithDayEvents, EventObject, EventSourceObject, EventInfo} from "@/types/FullCalendar";
 
     import Calendar from '@/components/Calendar.vue';
-    import Filters from '@/components/Filters.vue';
+    import FilterManager from '@/components/Filters.vue';
     import {dateToW3C, prettify} from '@/helpers/dateHelper.ts';
     import {telLink} from "@/helpers/HTMLHelper";
-    import {Filter, FiltersCollection} from "@/types/Filter";
+    import {Filter} from "@/types/Filter";
     import CalendarNotes from "@/components/CalendarNotes.vue";
     import {NoteInterface} from "@/components/Note.vue";
     import BootstrapPopup, {PopupInterface} from "@/components/BootstrapPopup.vue";
     import {ExtraParam} from "@/types/ExtraParam";
     import {mapExtraParamsToObj} from "@/helpers/extraParamsHelper";
     import {hideAllTippy, ignoreAllSelections} from "@/helpers/domHelper";
-
-
-    interface MeetEvent extends EventObject {
-        statusId: number;
-    }
-
-    const defaultFilters: Filter[] = [
-        {
-            id: 10,
-            isActive: true,
-            label: 'Umowiony',
-            itemOptions: {
-                color: 'orange'
-            }
-        },
-        {
-            id: 20,
-            isActive: true,
-            label: 'Podpisana',
-            itemOptions: {
-                color: 'green'
-            }
-        },
-        {
-            id: 40,
-            isActive: true,
-            label: 'Niepodpisany',
-            itemOptions: {
-                color: 'purple'
-            }
-        },
-        {
-            id: 50,
-            isActive: true,
-            label: 'Ponowic',
-            itemOptions: {
-                color: 'red'
-            }
-        }
-    ];
+    import FilterCalendar from "@/components/FilterCalendar.vue";
 
 
     @Component({
         components: {
+            FilterCalendar,
             BootstrapPopup,
             CalendarNotes,
             Calendar,
-            Filters
+            FilterManager
         }
     })
     export default class App extends Vue {
 
         @Prop({
-            default: () => defaultFilters
-        }) filtersItems!: Filter[];
+            default: () => []
+        }) filters!: Filter[];
 
         @Ref() calendar!: Calendar;
-        @Ref() filters!: FiltersCollection;
+        @Ref() calendarFilter!: FilterCalendar;
         @Ref() notesPopup!: PopupInterface;
-
-        private visibleStatusIds: number[] = [];
 
         private dayNotes: NoteInterface[] = [];
         private notePopupTitle: string = '';
         private notePopupDate!: Date;
-
-        mounted(): void {
-            this.visibleStatusIds = this.filters.getActiveFiltersIds();
-        }
 
         get eventSources(): EventSourceObject[] {
             return [
@@ -111,16 +63,8 @@
                     id: 0,
                     url: this.URLGetEvents,
                     allDayDefault: false,
-                    extraParams: mapExtraParamsToObj(this.extraParams),
-                    success: (data: MeetEvent[]) => {
-                        return data.map((event) => {
-                            const filter = this.filters.getFilter(event.statusId);
-                            if (filter && filter.itemOptions) {
-                                event = Object.assign(event, filter.itemOptions);
-                            }
-                            return event;
-                        })
-                    }
+                    extraParams: mapExtraParamsToObj(this.extraHTTPParams),
+                    success: (data) => this.calendarFilter.filterEvents(data)
                 }, this.getNotesSettings()
             ];
         }
@@ -130,42 +74,8 @@
             return {
                 id: 1,
                 url: this.URLGetNotes,
-                extraParams: mapExtraParamsToObj(this.extraParams),
+                extraParams: mapExtraParamsToObj(this.extraHTTPParams),
                 allDayDefault: true,
-            }
-        }
-
-        //@todo move to filter calendar?
-        private toggleFilter(filter: Filter, ids: number[]): void {
-            this.visibleStatusIds = ids;
-            this.calendar.rerenderEvents();
-        }
-
-
-        eventRender(info: Info): void {
-            this.parseVisible(info);
-            this.parsePhone(info);
-        }
-
-        //@todo move to filter calendar?
-        private parseVisible(info: Info): void {
-            const status = info.event.extendedProps.statusId;
-            if (status) {
-                if (this.visibleStatusIds.includes(status)) {
-                    info.el.classList.remove('hide');
-                } else {
-                    info.el.classList.add('hide')
-                }
-            }
-        }
-
-        private parsePhone(info: Info): void {
-            const phone = info.event.extendedProps.phone;
-            if (phone) {
-                const title = info.el.querySelector('.fc-title');
-                if (title) {
-                    title.innerHTML = telLink(phone, info.event.title).outerHTML;
-                }
             }
         }
 
@@ -196,7 +106,7 @@
         private async deleteNote(noteToDel: NoteInterface): Promise<boolean> {
             const params: URLSearchParams = new URLSearchParams();
             params.append('id', String(noteToDel.id));
-            this.extraParams.forEach((param: ExtraParam) => {
+            this.extraHTTPParams.forEach((param: ExtraParam) => {
                 params.append(param.name, String(param.value));
             })
             const res = await this.axios.post(this.URLDeleteNote, params);
@@ -209,7 +119,7 @@
             const params: URLSearchParams = new URLSearchParams();
             params.append('news', newNote.content);
             params.append('date', dateToW3C(this.notePopupDate));
-            this.extraParams.forEach((param: ExtraParam) => {
+            this.extraHTTPParams.forEach((param: ExtraParam) => {
                 params.append(param.name, String(param.value));
             })
 
@@ -227,7 +137,7 @@
         private async editNoteText(newNote: NoteInterface): Promise<boolean> {
             const params: URLSearchParams = new URLSearchParams();
             params.append('news', newNote.content);
-            this.extraParams.forEach((param: ExtraParam) => {
+            this.extraHTTPParams.forEach((param: ExtraParam) => {
                 params.append(param.name, String(param.value));
             })
             params.append('id', String(newNote.id));
@@ -254,7 +164,7 @@
             params.append('id', String(e.event.id));
             params.append(isNote ? 'start' : 'date_at', String(dateFrom));
             params.append(isNote ? 'end' : 'date_end_at', String(dateTo));
-            this.extraParams.forEach((param: ExtraParam) => {
+            this.extraHTTPParams.forEach((param: ExtraParam) => {
                 params.append(param.name, String(param.value));
             })
             let res;
@@ -281,7 +191,7 @@
             required: false,
             default: ()=> []
         })
-        private extraParams!: ExtraParam[];
+        private extraHTTPParams!: ExtraParam[];
 
         @Prop({
             default: () => '/meet-calendar/list'

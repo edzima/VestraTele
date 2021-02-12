@@ -15,10 +15,36 @@
 <script>
 	props = {
 		notesEnabled: false,
-		extraParams: [
+		extraHTTPParams: [
 			{
 				name: "agentId",
 				value: 17302
+			}
+		],
+		filters:[
+			{
+				id: 1,
+				isActive: true,
+				label: 'Umowiony',
+				itemOptions: {
+					color: 'orange'
+				}
+			},
+			{
+				id: 5,
+				isActive: true,
+				label: 'Stary',
+				itemOptions: {
+					color: 'red'
+				}
+			},
+			{
+				id: 8,
+				isActive: true,
+				label: 'jakis inny',
+				itemOptions: {
+					color: 'green'
+				}
 			}
 		]
 	}

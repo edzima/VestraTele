@@ -26,7 +26,7 @@ export interface EventSourceObject {
 }
 
 
-export interface Info {
+export interface EventInfo {
     event: EventObject,
     el: HTMLElement,
     isMirror: boolean,

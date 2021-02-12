@@ -11,10 +11,10 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {Filter, FiltersCollection} from "@/types/Filter";
+    import {Filter} from "@/types/Filter";
 
     @Component({})
-    export default class Filters extends Vue implements FiltersCollection {
+    export default class Filters extends Vue {
         @Prop() filters!: Filter[];
 
 
@@ -34,7 +34,7 @@
 
         private onClick(filter: Filter): void {
             this.toggleFilter(filter);
-            this.$emit('toggleFilter', filter, this.getActiveFiltersIds());
+            this.$emit('toggleFilter',this.getActiveFiltersIds());
         }
 
         private toggleFilter(filter: Filter): void {

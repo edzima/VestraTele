@@ -20,7 +20,13 @@
     import interactionPlugin from '@fullcalendar/interaction';
     import timeGridPlugin from '@fullcalendar/timegrid';
 
-    import {DateClickInfo, DateClickWithDayEvents, EventObject, EventSourceObject, Info} from "@/types/FullCalendar";
+    import {
+        DateClickInfo,
+        DateClickWithDayEvents,
+        EventInfo,
+        EventObject,
+        EventSourceObject
+    } from "@/types/FullCalendar";
 
     import 'tippy.js/dist/tippy.css';
     import tippy, {Props as TooltipOptions, Instance} from "tippy.js";
@@ -101,7 +107,7 @@
 
         private currentShowTippy?: Instance;
 
-        renderItem(info: Info): void {
+        renderItem(info: EventInfo): void {
             if (this.eventRender) {
                 this.eventRender(info);
             }
@@ -112,7 +118,7 @@
             this.fullCalendar.getApi().getEventSourceById(1).refetch();
         }
 
-        private parseTooltip(info: Info) {
+        private parseTooltip(info: EventInfo) {
             if (info.event.extendedProps.tooltipContent) {
                 const options = Object.assign({content: info.event.extendedProps.tooltipContent}, this.tooltipOptions);
                 tippy(info.el, options);
