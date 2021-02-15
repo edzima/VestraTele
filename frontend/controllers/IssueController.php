@@ -97,6 +97,7 @@ class IssueController extends Controller {
 			$search = new IssuePayCalculationSearch();
 			$search->issue_id = $id;
 			$search->withAgents = false;
+			$search->withArchive = true;
 			$calculationsDataProvider = $search->search([]);
 		}
 		$summonDataProvider = (new SummonSearch(['issue_id' => $model->id]))->search([]);

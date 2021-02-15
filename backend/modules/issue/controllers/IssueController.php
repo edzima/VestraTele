@@ -127,6 +127,7 @@ class IssueController extends Controller {
 	public function actionView(int $id): string {
 		$model = $this->findModel($id);
 		$search = new IssuePayCalculationSearch();
+		$search->withArchive = true;
 		$search->issue_id = $id;
 		$calculationsDataProvider = $search->search([]);
 		$summonDataProvider = (new SummonSearch(['issue_id' => $model->id]))->search([]);

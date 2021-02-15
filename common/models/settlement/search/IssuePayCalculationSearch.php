@@ -33,6 +33,8 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public string $customerLastname = '';
 	public $issue_type_id;
 
+	public bool $withArchive = false;
+
 	/**
 	 * @var int[]|null
 	 */
@@ -88,7 +90,9 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 		$query->joinWith([
 			'issue' => function (IssueQuery $query): void {
-				$query->withoutArchives();
+				if (!$this->getWithArchive()) {
+					$query->withoutArchives();
+				}
 			},
 		]);
 		$query->joinWith('issue.type IT');
@@ -210,7 +214,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 	//@todo add archive filter when withArchive is true.
 	public function getWithArchive(): bool {
-		return $this->withAchive;
+		return $this->withArchive;
 	}
 
 	private function applyIssueUsersFilter(IssuePayCalculationQuery $query): void {
