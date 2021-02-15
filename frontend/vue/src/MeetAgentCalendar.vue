@@ -6,34 +6,42 @@
 
         <FilterCalendar
             :filterGroups="filterGroups"
+            :notesEnabled="notesEnabled"
             :eventSources="eventSources"
             :editable="allowUpdate"
             @dateClick="dateClick"
             @dateDoubleClick="dateDoubleClick"
             @eventEdit="updateDates"
+            @eventClick="eventClick"
             ref="calendarFilter"
         />
 	</div>
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Ref, Vue} from 'vue-property-decorator';
-    import {DateClickWithDayEvents, EventObject, EventSourceObject, EventInfo} from "@/types/FullCalendar";
+import {Component, Prop, Ref, Vue} from 'vue-property-decorator';
+import {
+    DateClickWithDayEvents,
+    EventInfo,
+    EventObject,
+    EventSourceConfig,
+    EventSourceObject
+} from "@/types/FullCalendar";
 
-    import Calendar from '@/components/Calendar.vue';
-    import FilterManager from '@/components/FilterManager.vue';
-    import {dateToW3C, prettify} from '@/helpers/dateHelper.ts';
-    import {FilterGroup} from "@/types/Filter";
-    import CalendarNotes from "@/components/CalendarNotes.vue";
-    import {NoteInterface} from "@/components/Note.vue";
-    import BootstrapPopup, {PopupInterface} from "@/components/BootstrapPopup.vue";
-    import {ExtraParam} from "@/types/ExtraParam";
-    import {mapExtraParamsToObj} from "@/helpers/extraParamsHelper";
-    import {hideAllTippy, ignoreAllSelections} from "@/helpers/domHelper";
-    import FilterCalendar from "@/components/FilterCalendar.vue";
+import Calendar from '@/components/Calendar.vue';
+import FilterManager from '@/components/FilterManager.vue';
+import {dateToW3C, prettify} from '@/helpers/dateHelper.ts';
+import {FilterGroup} from "@/types/Filter";
+import CalendarNotes from "@/components/CalendarNotes.vue";
+import {NoteInterface} from "@/components/Note.vue";
+import BootstrapPopup, {PopupInterface} from "@/components/BootstrapPopup.vue";
+import {ExtraParam} from "@/types/ExtraParam";
+import {mapExtraParamsToObj} from "@/helpers/extraParamsHelper";
+import {hideAllTippy, ignoreAllSelections} from "@/helpers/domHelper";
+import FilterCalendar from "@/components/FilterCalendar.vue";
 
 
-    @Component({
+@Component({
         components: {
             FilterCalendar,
             BootstrapPopup,
@@ -57,14 +65,22 @@
         private notePopupDate!: Date;
 
         get eventSources(): EventSourceObject[] {
-            return [
-                {
-                    id: 0,
-                    url: this.URLGetEvents,
-                    allDayDefault: false,
-                    extraParams: mapExtraParamsToObj(this.extraHTTPParams),
-                }, this.getNotesSettings()
-            ];
+            return [...this.mapEventSources(this.eventSourcesConfig), this.getNotesSettings()]
+        }
+
+        private mapEventSources(events: EventSourceConfig[]): EventSourceObject[]{
+            return events.map((eventSource:EventSourceConfig)=>{
+                eventSource.extraParams = mapExtraParamsToObj(this.extraHTTPParams)
+                eventSource.success = this.setUpdateUrlMapper(eventSource.urlUpdate)
+                return eventSource
+            })
+        }
+
+        private setUpdateUrlMapper(url: string): Function{
+            return (events: any[]) => events.map((event: any) => {
+                event.urlUpdate = url
+                return event
+            })
         }
 
         private getNotesSettings(): EventSourceObject{
@@ -77,23 +93,28 @@
             }
         }
 
-        private dateClick(dateInfo: DateClickWithDayEvents): void {
-            if (!this.notesEnabled) return;
-            if (!dateInfo.allDay) return; //it's not a note
-            if (dateInfo.view.type === 'dayGridMonth') return;
+        private dateClick(dateInfo: any): void {
+            // if (dateInfo.view.type === 'dayGridMonth') return;
             this.dayNotes = this.getNotesFromDayInfo(dateInfo);
             this.notePopupTitle = 'Notatki ' + prettify(dateInfo.dateStr);
             this.notePopupDate = dateInfo.date;
             this.notesPopup.show();
         }
 
-        private getNotesFromDayInfo(dateInfo: DateClickWithDayEvents): NoteInterface[] {
-            return dateInfo.dayEvents
+        private getNotesFromDayInfo(event: any): NoteInterface[] {
+            return event.dayEvents
                 .filter((event) => event.allDay)
                 .map((event: EventObject) => ({
                     content: event.title,
                     id: event.id
                 }));
+        }
+
+        private eventClick(event: EventInfo){
+            if(this.notesEnabled && event.event.extendedProps.isNote){
+                this.dateClick(event)
+            }
+
         }
 
         private dateDoubleClick(dateInfo: DateClickWithDayEvents): void {
@@ -109,7 +130,7 @@
             })
             const res = await this.axios.post(this.URLDeleteNote, params);
             if (res.status !== 200) return false;
-            this.calendar.deleteEventById(noteToDel.id!);
+            this.calendarFilter.deleteEventById(noteToDel.id!);
             return true;
         }
 
@@ -124,7 +145,7 @@
             const res = await this.axios.post(this.URLNewNote, params);
             if (res.status !== 200) return false;
             if (!res.data.id) return false;
-            this.calendar.update();
+            this.calendarFilter.update();
             return res.data.id;
         }
 
@@ -144,40 +165,41 @@
             if (res.status !== 200) return false;
             if (res.data.success === false) return false;
 
-            let calendarEvent = this.calendar.findCalendarEvent(newNote.id!);
-            this.calendar.updateCalendarEventProp(calendarEvent, 'title', newNote.content);
-            this.calendar.rerenderEvents();
+            let calendarEvent = this.calendarFilter.findCalendarEvent(newNote.id!);
+            this.calendarFilter.updateCalendarEventProp(calendarEvent, 'title', newNote.content);
+            this.calendarFilter.rerenderCalendar();
             return true;
         }
-
 
         private async updateDates(e: any): Promise<void> {
             ignoreAllSelections();
             hideAllTippy();
-            const isNote: boolean = Boolean(e.event.allDay);
-            const dateFrom: string = dateToW3C(e.event.start);
-            const dateTo: string = dateToW3C(e.event.end);
+            const event: EventObject = e.event;
+            const isNote: boolean = event.extendedProps.isNote;
+            const dateFrom: string = dateToW3C(event.start);
+            const dateTo: string = dateToW3C(event.end);
 
             const params: URLSearchParams = new URLSearchParams();
-            params.append('id', String(e.event.id));
-            params.append(isNote ? 'start' : 'date_at', String(dateFrom));
-            params.append(isNote ? 'end' : 'date_end_at', String(dateTo));
+            params.append('id', String(event.id));
+            if (isNote) {
+                params.append('start', String(dateFrom));
+                params.append('end', String(dateFrom));
+            } else {
+                params.append('date_at', String(dateFrom));
+                params.append('date_end_at', String(dateTo));
+            }
             this.extraHTTPParams.forEach((param: ExtraParam) => {
                 params.append(param.name, String(param.value));
             })
             let res;
-            try{
-                res = await this.axios.post(isNote ? this.URLUpdateNote : this.URLUpdateEvent, params);
-            }catch{
+            try {
+                res = await this.axios.post(isNote ? this.URLUpdateNote : event.extendedProps.urlUpdate, params);
+            } catch {
                 e.revert();
             }
-            if (res.status !== 200 || !res.data.success){
+            if (res.status !== 200) {
                 e.revert();
             }
-            if (isNote) {
-                //@todo update note sources
-            }
-
         }
 
         @Prop({
@@ -190,18 +212,6 @@
             default: ()=> []
         })
         private extraHTTPParams!: ExtraParam[];
-
-        @Prop({
-            default: () => '/meet-calendar/list'
-        })
-        private URLGetEvents!: string;
-
-
-        @Prop({
-            default: () => '/meet-calendar/update'
-        })
-        private URLUpdateEvent!: string;
-
 
         @Prop({
             default: () => '/meet/create'
@@ -218,12 +228,10 @@
         })
         private URLGetNotes!: string;
 
-
         @Prop({
             default: () => '/calendar-note/add'
         })
         private URLNewNote!: string;
-
 
         @Prop({
             default: () => '/calendar-note/update'
@@ -234,5 +242,10 @@
             default: () => '/calendar-note/delete'
         })
         private URLDeleteNote!: string;
+
+        @Prop({
+            required: true
+        })
+        private eventSourcesConfig!: EventSourceConfig[]
     }
 </script>

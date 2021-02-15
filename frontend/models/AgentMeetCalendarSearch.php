@@ -51,17 +51,20 @@ class AgentMeetCalendarSearch extends IssueMeetSearch {
 	];
 
 	public static function getFiltersOptions(): array {
-		$names = static::getStatusNames();
-		$options = [];
-		foreach (static::STATUS_FILTERS as $status => $itemOptions) {
-			$options[] = [
-				'id' => $status,
-				'isActive' => true,
-				'label' => $names[$status],
-				'itemOptions' => $itemOptions,
-			];
+			$names = static::getStatusNames();
+			$options = [];
+			foreach (static::STATUS_FILTERS as $status => $filter) {
+				$options[] = [
+					'value' => $status,
+					'isActive' => true,
+					'label' => $names[$status],
+					'color' => $filter['color'],
+					'eventColors' => [
+						'background' => $filter['color'],
+					],
+				];
+			}
+			return $options;
 		}
-		return $options;
-	}
 
 }

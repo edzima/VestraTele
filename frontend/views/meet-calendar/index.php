@@ -1,5 +1,6 @@
 <?php
 
+use common\models\CalendarNews;
 use frontend\assets\CalendarAsset;
 use frontend\models\AgentMeetCalendarSearch;
 use yii\helpers\Html;
@@ -18,11 +19,29 @@ CalendarAsset::register($this);
 $agentId = $extraParams[0]['value'];
 
 $props = [
-	'extraParams' => $extraParams,
-	'filtersItems' => AgentMeetCalendarSearch::getFiltersOptions(),
-
-	'URLGetEvents' => Url::to('/meet-calendar/list'),
-	'URLUpdateEvent' => Url::to('/meet-calendar/update'),
+	'extraHTTPParams' => $extraParams,
+	'filterGroups' => [
+		[
+			'id' => 0,
+			'title' => 'Statusy',
+			'filteredPropertyName' => 'statusId',
+			'filters' => AgentMeetCalendarSearch::getFiltersOptions(),
+		],
+		[
+			'id' => 1,
+			'title' => 'Notatki',
+			'filteredPropertyName' => 'isNote',
+			'filters' => CalendarNews::getFilters(),
+		],
+	],
+	'eventSourcesConfig' => [
+		[
+			'id' => 0,
+			'url' => '/meet-calendar/list',
+			'allDayDefault' => false,
+			'urlUpdate' => '/meet-calendar/update'
+		],
+	],
 
 	'URLAddEvent' => Url::to('/meet/create'),
 

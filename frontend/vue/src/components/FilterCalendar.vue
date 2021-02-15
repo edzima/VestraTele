@@ -16,6 +16,7 @@
             @dateClick="emitDateClick"
             @dateDoubleClick="emitDateDoubleClick"
             @eventEdit="emitEventEdit"
+            @eventClick="eventClick"
         />
     </div>
 </template>
@@ -34,6 +35,7 @@ import {createBadge, telLink} from "@/helpers/HTMLHelper";
 export default class FilterCalendar extends Vue {
     @Prop() filterGroups!: FilterGroup[];
     @Prop() private readonly eventSources!: EventSourceObject[];
+    @Prop({default: ()=>true}) private readonly notesEnabled!: boolean
     @Prop({
         default: () => true,
         type: Boolean,
@@ -62,6 +64,12 @@ export default class FilterCalendar extends Vue {
     checkIsEventVisibleInGroup(event: EventObject, filterGroup: FilterGroup): boolean {
         let isElementVisibleInGroup = false;
         const activeInGroup = this.activeValuesInFilterGroup(filterGroup);
+        const key = filterGroup.filteredPropertyName;
+        const hasKey = key in event.extendedProps
+        if(!hasKey) {
+            return true
+        }
+
         activeInGroup.forEach(value => {
             if (value === event.extendedProps[filterGroup.filteredPropertyName]) {
                 isElementVisibleInGroup = true
@@ -88,8 +96,10 @@ export default class FilterCalendar extends Vue {
             }
             return oldGroup
         })
-        this.calendar.rerenderEvents();
-
+        this.rerenderCalendar()
+    }
+    private eventClick(event: EventObject){
+        this.$emit('eventClick', event)
     }
 
     private parseVisible(eventInfo: EventInfo): void {
@@ -152,7 +162,25 @@ export default class FilterCalendar extends Vue {
         console.log(event);
         const badgeElem = createBadge(badgeColor);
         const body = event.querySelector('.fc-content');
-        body.appendChild(badgeElem);
+        body?.appendChild(badgeElem);
+    }
+
+    public rerenderCalendar():void{
+        this.calendar.rerenderEvents();
+    }
+    public updateCalendarEventProp(event: EventObject, propName: string, newContent: string | number){
+        this.calendar.updateCalendarEventProp(event,propName,newContent)
+    }
+    public update():void{
+        this.calendar.update();
+    }
+
+    public deleteEventById(id: number):void{
+        return this.calendar.deleteEventById(id);
+    }
+
+    public findCalendarEvent(id: number): EventObject{
+        return this.calendar.findCalendarEvent(id)
     }
 }
 </script>
@@ -162,5 +190,6 @@ export default class FilterCalendar extends Vue {
     flex-direction: row;
     height: auto;
     width: 100%;
+    margin-bottom: 5%;
 }
 </style>

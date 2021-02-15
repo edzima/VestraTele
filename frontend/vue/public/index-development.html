@@ -14,7 +14,7 @@
 
 <script>
 	props = {
-		notesEnabled: false,
+		notesEnabled: true,
 		extraHTTPParams: [
 			{
 				name: "agentId",
@@ -29,13 +29,31 @@
 				filters: [
 					{
 						isActive: true,
-						label: 'Umowiony',
+						label: 'nie ',
 						value: 1,
+						color: 'brown',
+						eventColors: {
+							background: 'brown',
+						}
+					},
+					{
+						isActive: true,
+						label: 'Umowiony',
+						value: 2,
+						color: 'green',
+						eventColors: {
+							background: 'green',
+						}
+					},
+					{
+						isActive: true,
+						label: 'inny',
+						value: 3,
 						color: 'red',
 						eventColors: {
 							background: 'red',
 						}
-					}
+					},
 				]
 			},
 			{
@@ -55,6 +73,14 @@
 				]
 			}
 
+		],
+		eventSourcesConfig: [
+			{
+				id: 0,
+				url: '/meet-calendar/list',
+				allDayDefault: false,
+				urlUpdate: '/meet-calendar/update'
+			},
 		]
 	}
 	document.getElementsByTagName("div")[0].setAttribute('data-props', JSON.stringify(props));

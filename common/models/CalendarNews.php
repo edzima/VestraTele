@@ -51,6 +51,20 @@ class CalendarNews extends ActiveRecord {
 		];
 	}
 
+	public static function getFilters(): array {
+		return [
+			[
+				'value' => true,
+				'isActive' => true,
+				'label' => 'notatka',
+				'color' => '#009688',
+				'eventColors' => [
+					'background' => '#009688',
+				],
+			]
+		];
+	}
+
 	public function getUser(): UserQuery {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}

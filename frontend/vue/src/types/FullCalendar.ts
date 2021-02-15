@@ -3,7 +3,7 @@ export interface EventObject {
     groupId: string,
     allDay: boolean,
     start: Date,
-    end?: string,
+    end:  Date,
     title: string,
     url?: string
     color?: string,
@@ -22,7 +22,11 @@ export interface EventSourceObject {
     url?: string,
     allDayDefault?: boolean
     extraParams?: any,
+    editable?: boolean
     success?: Function,
+}
+export interface EventSourceConfig extends EventSourceObject{
+    urlUpdate: string,
 }
 
 

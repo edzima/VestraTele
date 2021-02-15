@@ -22,7 +22,7 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import {Filter, FilterGroup} from "@/types/Filter";
 
 @Component({})
-export default class Filters extends Vue {
+export default class FilterManager extends Vue {
     @Prop() filterGroup!: FilterGroup;
 
     itemStyle(filter: Filter): any {

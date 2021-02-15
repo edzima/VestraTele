@@ -13,6 +13,17 @@ use yii\web\Response;
 
 class CalendarNoteController extends Controller {
 
+
+	/**
+	 * @inheritdoc
+	 */
+	public function beforeAction($action)
+	{
+		$this->enableCsrfValidation = false;
+		return parent::beforeAction($action);
+	}
+
+
 	public function behaviors(): array {
 		return [
 			'verbs' => [
@@ -57,17 +68,19 @@ class CalendarNoteController extends Controller {
 				'title' => $model->text,
 				'start' => $model->start_at,
 				'end' => $model->end_at,
+				'isNote' => true
 			];
 		}
 
 		return $this->asJson($data);
 	}
 
-	public function actionAdd(int $agent_id, string $news, string $date): Response {
+	public function actionAdd(int $agentId, string $news, string $date): Response {
 		$model = new CalendarNews();
-		$model->user_id = $agent_id;
+		$model->user_id = $agentId;
 		$model->text = $news;
 		$model->start_at = $date;
+		$model->end_at = $date;
 		if ($model->save()) {
 			return $this->asJson([
 				'id' => $model->id,
@@ -76,9 +89,13 @@ class CalendarNoteController extends Controller {
 		return $this->asJson(['errors' => $model->getErrors()]);
 	}
 
-	public function actionUpdate(int $id): Response {
+	public function actionUpdate(int $id, string $start='', string $end='', string $news='' ): Response {
 		$model = $this->findModel($id);
-		if ($model->load(Yii::$app->request->post(), '') && $model->save()) {
+		$model->start_at = $start !== '' ? $start : $model->start_at ;
+		$model->end_at = $end !== '' ? $end: $model->end_at;
+		$model->text = $news !== '' ? $news: $model->text;
+
+		if ($model->save()) {
 			return $this->asJson(['success' => true]);
 		}
 		return $this->asJson([
