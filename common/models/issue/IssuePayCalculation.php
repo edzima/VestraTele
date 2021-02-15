@@ -59,6 +59,7 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 	public const PROBLEM_STATUS_PREPEND_JUDGEMENT = 20;
 	public const PROBLEM_STATUS_JUDGEMENT = 25;
 	public const PROBLEM_STATUS_BAILLIF = 40;
+	public const PROBLEM_STATUS_EXTERNAL_DEBT_COLLECTION = 50;
 
 	public const PROVIDER_CLIENT = 1;
 	public const PROVIDER_RESPONSIBLE_ENTITY = 10;
@@ -325,7 +326,7 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 			static::PROBLEM_STATUS_PREPEND_JUDGEMENT => Yii::t('settlement', 'Prepariation for judgement'),
 			static::PROBLEM_STATUS_JUDGEMENT => Yii::t('settlement', 'Judgement'),
 			static::PROBLEM_STATUS_BAILLIF => Yii::t('settlement', 'Baillif'),
-
+			static::PROBLEM_STATUS_EXTERNAL_DEBT_COLLECTION => Yii::t('settlement', 'External debt collection'),
 		];
 	}
 
