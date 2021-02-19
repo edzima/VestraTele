@@ -1,6 +1,6 @@
 <?php
 
-namespace common\components;
+namespace common\formatters;
 
 use common\helpers\Html;
 use Decimal\Decimal;
@@ -32,11 +32,29 @@ class Formatter extends BaseFormatter {
 		return $this->asDate($date, "d'-go'");
 	}
 
+	public function asPercent($value, $decimals = null, $options = [], $textOptions = []) {
+		if ($value instanceof Decimal) {
+			$value = $value->toFixed(self::FRACTION_DIGITS);
+		}
+		return parent::asPercent($value, $decimals, $options, $textOptions);
+	}
+
 	public function asCurrency($value, $currency = null, $options = [], $textOptions = []) {
 		if ($value instanceof Decimal) {
 			$value = $value->toFixed(self::FRACTION_DIGITS);
 		}
 		return parent::asCurrency($value, $currency, $options, $textOptions);
+	}
+
+	public function getCurrencySymbol($currencyCode = null): string {
+		if ($currencyCode === null) {
+			$currencyCode = $this->currencyCode;
+		}
+		if (empty($currencyCode)) {
+			return '';
+		}
+		$formatter = new NumberFormatter($this->locale . '@currency=' . $currencyCode, NumberFormatter::CURRENCY);
+		return $formatter->getSymbol(NumberFormatter::CURRENCY_SYMBOL);
 	}
 
 	public function asTel($value, $options = []) {
