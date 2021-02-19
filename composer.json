@@ -20,6 +20,7 @@
 		"php": ">7.4.0",
 		"ext-intl": "*",
 		"ext-mbstring": "*",
+		"ext-decimal": "*",
 		"php-decimal/php-decimal": "^1.1",
 		"yiisoft/yii2": "2.0.38",
 		"yiisoft/yii2-bootstrap": "^2.0.10",
