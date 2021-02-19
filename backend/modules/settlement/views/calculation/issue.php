@@ -17,8 +17,7 @@ $this->title = Yii::t('backend', 'Calculations for: {issue}', ['issue' => $searc
 
 $this->params['breadcrumbs'] = Breadcrumbs::issue($searchModel->issue);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $searchModel->issue, 'url' => ['issue', 'id' => $searchModel->issue_id]];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = $searchModel->issue->longId;
 
 ?>
 <div class="settlement-calculation-issue">

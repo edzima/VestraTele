@@ -3,6 +3,7 @@
 namespace common\models\user;
 
 use common\models\Address;
+use common\models\hierarchy\Hierarchy;
 use common\models\issue\IssueUser;
 use common\models\user\query\UserQuery;
 use Yii;
@@ -39,7 +40,7 @@ use yii\web\IdentityInterface;
  * @property-read UserTrait[] $traits
  *
  */
-class User extends ActiveRecord implements IdentityInterface {
+class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 
 	public const STATUS_INACTIVE = 0;
 	public const STATUS_ACTIVE = 1;
@@ -149,6 +150,41 @@ class User extends ActiveRecord implements IdentityInterface {
 			'action_at' => Yii::t('common', 'Last action at'),
 			'boss' => Yii::t('common', 'Boss'),
 		];
+	}
+
+	public function hasParent(): bool {
+		return $this->getParentId() !== null;
+	}
+
+	public function getParentId(): ?int {
+		return $this->boss;
+	}
+
+	public function getParentsIds(): array {
+		if (!$this->hasParent()) {
+			return [];
+		}
+		return Yii::$app->userHierarchy->getParentsIds($this->id);
+	}
+
+	public function getChildesIds(): array {
+		return Yii::$app->userHierarchy->getChildesIds($this->id);
+	}
+
+	public function getAllChildesQuery(): UserQuery {
+		return static::find()->where(['id' => $this->getAllChildesIds()]);
+	}
+
+	public function getAllParentsQuery(): ?UserQuery {
+		if ($this->hasParent()) {
+			return static::find()->where(['id' => $this->getParentsIds()]);
+		}
+		return null;
+	}
+
+	public function getAllChildesIds(): array {
+		return Yii::$app
+			->userHierarchy->getAllChildesIds($this->id);
 	}
 
 	/**
