@@ -152,6 +152,9 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 	}
 
 	public function getPartInfo(): string {
+		if ($this->getValue()->equals($this->calculation->getValue())) {
+			return '1/1';
+		}
 		$pays = $this->calculation->pays;
 		$count = count($pays);
 		if ($count === 1) {
