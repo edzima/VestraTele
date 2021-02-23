@@ -18,9 +18,6 @@ use yii\widgets\ActiveForm;
 		'action' => ['index'],
 		'method' => 'get',
 	]); ?>
-	<div class="row">
-		<?= $form->field($model, 'hide_on_report', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
-	</div>
 
 
 	<?= Nav::widget([
@@ -117,6 +114,10 @@ use yii\widgets\ActiveForm;
 					],
 				]
 			) ?>
+
+
+		<?= $form->field($model, 'hide_on_report', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
+
 
 	</div>
 

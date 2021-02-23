@@ -2,9 +2,13 @@
 
 namespace common\models\provision;
 
+use common\models\issue\Issue;
+use common\models\issue\IssueInterface;
 use common\models\issue\IssuePay;
+use common\models\issue\IssueTrait;
 use common\models\user\User;
 use Decimal\Decimal;
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -25,7 +29,17 @@ use yii\db\ActiveRecord;
  * @property-read User $toUser
  * @property-read User $fromUser
  */
-class Provision extends ActiveRecord {
+class Provision extends ActiveRecord implements IssueInterface {
+
+	use IssueTrait;
+
+	public function getIssueId(): int {
+		return $this->getIssueModel()->id;
+	}
+
+	public function getIssueModel(): Issue {
+		return $this->pay->issue;
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -59,12 +73,12 @@ class Provision extends ActiveRecord {
 			'pay_id' => 'Pay ID',
 			'to_user_id' => 'Dla',
 			'from_user_id' => 'Nadprowizja',
-			'value' => 'Honorarium (netto)',
+			'value' => Yii::t('provision', 'Provision ({currencySymbol})', ['currencySymbol' => Yii::$app->formatter->getCurrencySymbol()]),
 			'toUser' => 'Dla',
 			'fromUser' => 'Nadprowizja',
 			'fromUserString' => 'Nadprowizja',
-			'provision' => 'Prowizja (%)',
-			'hide_on_report' => 'Ukryty w raporcie',
+			'hide_on_report' => Yii::t('provision', 'Hide on report'),
+			'provisionPercent' => Yii::t('provision', 'Provision (%)'),
 		];
 	}
 
@@ -95,10 +109,20 @@ class Provision extends ActiveRecord {
 	}
 
 	public function getProvision(): string {
-		return $this->getProvisionDecimal()->toFixed(2);
+		return $this->getPercent()->toFixed(2);
 	}
 
-	public function getProvisionDecimal(): Decimal {
+	public function getProvisionPercent(): string {
+		return Yii::$app->formatter->asPercent($this->getDivision()->toFixed(2), 1);
+	}
+
+	/** @todo maybe store division in DB for check pay value update */
+	public function getDivision(): Decimal {
+		return $this->getValue()
+			->div(Yii::$app->provisions->issuePayValue($this->pay));
+	}
+
+	public function getPercent(): Decimal {
 		return $this->getValue()
 			->div($this->pay->getValueWithoutVAT());
 	}

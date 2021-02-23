@@ -2,9 +2,9 @@
 
 namespace acceptance\provision;
 
-use backend\tests\fixtures\ProvisionFixtureHelper;
 use backend\tests\Page\provision\ProvisionTypePage;
 use backend\tests\Step\acceptance\Admin;
+use common\fixtures\helpers\ProvisionFixtureHelper;
 
 class ProvisionTypeCreateCest {
 
@@ -19,7 +19,7 @@ class ProvisionTypeCreateCest {
 	 * @see \Codeception\Module\Yii2::_before()
 	 */
 	public function _fixtures(): array {
-		return ProvisionFixtureHelper::typesFixtures();
+		return ProvisionFixtureHelper::type();
 	}
 
 	public function _before(Admin $I): void {

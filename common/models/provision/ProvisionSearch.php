@@ -2,8 +2,11 @@
 
 namespace common\models\provision;
 
+use common\models\issue\IssuePayCalculation;
+use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\query\UserQuery;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -25,6 +28,7 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface {
 	public $dateTo;
 	public $customerLastname;
 
+	public $calculationTypes = [];
 	public $payStatus;
 
 	public static function getPayStatusNames(): array {
@@ -45,6 +49,8 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface {
 		return [
 			[['hide_on_report'], 'boolean'],
 			[['pay_id', 'from_user_id', 'to_user_id', 'issue_id'], 'integer'],
+			['type_id', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
+			['calculationTypes', 'in', 'range' => array_keys(static::getCalculationTypesNames()), 'allowArray' => true],
 			['payStatus', 'in', 'range' => array_keys(static::getPayStatusNames())],
 			['payStatus', 'default', 'value' => static::DEFAULT_PAY_STATUS],
 			[['dateFrom', 'dateTo'], 'safe'],
@@ -58,6 +64,7 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface {
 			'dateFrom' => 'Data od',
 			'dateTo' => 'Data do',
 			'payStatus' => 'Status płatności',
+			'calculationTypes' => Yii::t('settlement', 'Settlement type'),
 		], parent::attributeLabels());
 	}
 
@@ -83,6 +90,8 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface {
 		$query = Provision::find();
 		$query
 			->with('pay.issue')
+			->with('pay.calculation')
+			->with('pay.calculation.costs')
 			->with('type')
 			->with('fromUser.userProfile')
 			->with('toUser.userProfile');
@@ -106,6 +115,7 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface {
 		}
 
 		$this->applyCustomerSurnameFilter($query);
+		$this->applyCalculationTypeFilter($query);
 
 		if (!empty($this->issue_id)) {
 			$query->joinWith('pay.issue');
@@ -129,9 +139,10 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'pay_id' => $this->pay_id,
-			'to_user_id' => $this->to_user_id,
-			'from_user_id' => $this->from_user_id,
+			Provision::tableName() . '.pay_id' => $this->pay_id,
+			Provision::tableName() . '.to_user_id' => $this->to_user_id,
+			Provision::tableName() . '.from_user_id' => $this->from_user_id,
+			Provision::tableName() . '.type_id' => $this->type_id,
 		]);
 		$this->dateFilter($query);
 
@@ -166,9 +177,27 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface {
 		}
 	}
 
+	private function applyCalculationTypeFilter(ActiveQuery $query): void {
+		if (!empty($this->calculationTypes)) {
+			$query->joinWith([
+				'pay.calculation PC' => function (IssuePayCalculationQuery $query) {
+					$query->onlyTypes($this->calculationTypes);
+				},
+			]);
+		}
+	}
+
 	public function applyCustomerSurnameFilter(QueryInterface $query): void {
 		if (!empty($this->customerLastname)) {
 			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
 		}
+	}
+
+	public static function getCalculationTypesNames(): array {
+		return IssuePayCalculation::getTypesNames();
+	}
+
+	public static function getTypesNames(): array {
+		return ProvisionType::getTypesNames();
 	}
 }

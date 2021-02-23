@@ -13,7 +13,6 @@ trait UnitSearchModelTrait {
 
 	private SearchModel $model;
 
-
 	abstract protected function createModel(): SearchModel;
 
 	protected function search(array $params, string $formName = null): DataProviderInterface {

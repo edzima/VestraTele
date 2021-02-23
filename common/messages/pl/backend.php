@@ -25,6 +25,7 @@ return [
 	'Are you sure you want to flush this cache?' => 'Вы уверены, что хотите сбросить этот кеш?',
 	'Article categories' => 'Kategorie postów',
 	'Articles' => 'Posty',
+	'Assign supervisor' => 'Przełożony',
 	'Backend sidebar collapsed' => 'Ukryte menu admina',
 	'Backend sidebar mini' => 'Małe menu admina',
 	'Backend theme' => 'Motyw admina',

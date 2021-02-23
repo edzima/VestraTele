@@ -61,6 +61,7 @@ class IssueFixtureHelper {
 		];
 	}
 
+
 	public static function stageAndTypesFixtures(): array {
 		return [
 			'stage' => [
@@ -74,6 +75,15 @@ class IssueFixtureHelper {
 			'stage-types' => [
 				'class' => StageTypesFixtures::class,
 				'dataFile' => static::dataDir() . 'issue/stage_types.php',
+			],
+		];
+	}
+
+	public static function types(): array {
+		return [
+			'type' => [
+				'class' => TypeFixture::class,
+				'dataFile' => static::dataDir() . 'issue/type.php',
 			],
 		];
 	}

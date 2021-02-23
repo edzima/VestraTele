@@ -35,7 +35,7 @@ class ProvisionController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new ProvisionSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		Url::remember();

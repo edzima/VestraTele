@@ -54,7 +54,7 @@ use yii\widgets\ActiveForm;
 			->widget(Select2::class, [
 					'data' => $model->getToUsersList(),
 					'options' => [
-						'placeholder' => 'Agent',
+						'placeholder' => Yii::t('provision', 'User'),
 					],
 					'pluginOptions' => [
 						'allowClear' => true,

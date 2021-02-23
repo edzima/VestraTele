@@ -7,7 +7,6 @@ use common\models\issue\IssuePay;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionUser;
-use common\models\user\User;
 use common\models\user\Worker;
 use Decimal\Decimal;
 use Yii;
@@ -16,24 +15,20 @@ use yii\helpers\ArrayHelper;
 
 class Provisions extends Component {
 
-	/** @var ProvisionType[] */
-	private $types;
+	/** @var ProvisionType[]|null */
+	private ?array $types = null;
 
 	/**
 	 * @param bool $refresh
 	 * @return ProvisionType[]
 	 */
 	public function getTypes(bool $refresh = false): array {
-		if (empty($this->types) || $refresh) {
+		if ($this->types === null || $refresh) {
 			$this->types = ProvisionType::find()
 				->indexBy('id')
 				->all();
 		}
 		return $this->types;
-	}
-
-	public function removeForIssue(Issue $issue): void {
-		Provision::deleteAll(['pay_id' => ArrayHelper::getColumn($issue->pays, 'id')]);
 	}
 
 	public function removeForPays(array $ids): void {
@@ -42,8 +37,8 @@ class Provisions extends Component {
 		}
 	}
 
-	public function hasAllProvisions(Worker $user): bool {
-		$typesIds = $this->getTypesIdsForUser($user->id);
+	public function hasAllProvisions(Worker $user, string $userType): bool {
+		$typesIds = array_keys($this->getIssueUserTypes($userType));
 		$toUserIds = $user->getParentsIds();
 		$toUserIds[] = $user->id;
 		$provisionsCount = ProvisionUser::find()
@@ -77,14 +72,14 @@ class Provisions extends Component {
 	}
 
 	/**
-	 * @param Worker $user
+	 * @param int $userId
 	 * @param int $typeId
 	 * @param IssuePay[] $pays
 	 * @return int
 	 */
-	public function add(User $user, int $typeId, array $pays): int {
+	public function add(int $userId, int $typeId, array $pays): int {
 		$usersProvision = ProvisionUser::find()
-			->andWhere(['from_user_id' => $user->id])
+			->andWhere(['from_user_id' => $userId])
 			->andWhere(['type_id' => $typeId])
 			->with('type')
 			->all();
@@ -135,19 +130,15 @@ class Provisions extends Component {
 			|| in_array($issue->type_id, $provisionUser->type->getIssueTypesIds());
 	}
 
-	public function isTypeForUser(ProvisionType $type, int $userId): bool {
-		return in_array($type->id, $this->getTypesIdsForUser($userId));
-	}
-
 	public function isTypeForRole(ProvisionType $type, string $role): bool {
 		return empty($type->getRoles()) || in_array($role, $type->getRoles());
 	}
 
-	private function getTypesIdsForUser(int $userId): array {
+	public function getIssueUserTypes(string $userType): array {
 		$ids = [];
 		foreach ($this->getTypes() as $type) {
-			if ($type->isValidForUser($userId)) {
-				$ids[] = $type->id;
+			if ($type->isForIssueUser($userType)) {
+				$ids[$type->id] = $type;
 			}
 		}
 		return $ids;

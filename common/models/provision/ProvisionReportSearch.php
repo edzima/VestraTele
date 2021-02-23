@@ -35,11 +35,10 @@ class ProvisionReportSearch extends ProvisionSearch {
 		$provider->pagination->defaultPageSize = 100;
 		$provider->pagination->pageSizeLimit = [1, 100];
 
-		$provider->query->andWhere([
-			'or',
-			['provision.hide_on_report' => false],
-			['provision.hide_on_report' => null],
-		]);
+		/* @var $query ProvisionQuery */
+		$query = $provider->query;
+		$query->with('type');
+		$query->notHidden();
 
 		return $provider;
 	}

@@ -160,7 +160,7 @@ return [
 	'Created at from' => 'Dodano (od)',
 	'Created at to' => 'Dodano (do)',
 	'Customers' => 'Customers',
-	'Issue user type' => 'Issue user type',
+	'Issue user type' => 'Kto',
 	'Etapy' => 'Etapy',
 	'Date at from' => 'Date at from',
 	'Users roles' => 'Users roles',
@@ -174,7 +174,7 @@ return [
 	'Only with telemarketer' => 'Tylko z konsultantem',
 	'Issue types' => 'Issue types',
 	'Provision value' => 'Prowizja',
-	'All' => 'All',
+	'All' => 'Wszystkie',
 	'All issue types' => 'All issue types',
 	'Justification of the judgment' => 'Uzasadnienie wyroku',
 	'Calculation Types' => 'Calculation Types',
@@ -277,4 +277,5 @@ return [
 	'Phonable summon' => 'Wezwanie telefoniczne',
 	'Resignation' => 'Rezygnacja',
 	'Urgency' => 'Ponaglenie',
+	'Is active' => 'Aktywna',
 ];

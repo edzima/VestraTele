@@ -16,13 +16,17 @@ use yii\widgets\ActiveForm;
 		'method' => 'get',
 	]); ?>
 
-	<?= $form->field($model, 'onlySelf')->checkbox() ?>
-	<?= $form->field($model, 'onlyNotDefault')->checkbox() ?>
+	<div class="row">
+		<?= $form->field($model, 'onlySelf', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])->checkbox() ?>
+	</div>
 
 
 	<div class="form-group">
-		<?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-		<?= Html::resetButton('Reset', ['class' => 'btn btn-outline-secondary']) ?>
+		<?= Html::submitButton(Yii::t('common', 'Search'), ['class' => 'btn btn-primary']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

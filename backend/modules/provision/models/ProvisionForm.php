@@ -36,7 +36,7 @@ class ProvisionForm extends Model {
 
 	private function setModel(Provision $model): void {
 		$this->model = $model;
-		$this->percent = $model->getProvisionDecimal()->mul(100)->toFixed(2);
+		$this->percent = $model->getDivision()->mul(100)->toFixed(2);
 		$this->hide_on_report = $model->hide_on_report;
 	}
 
