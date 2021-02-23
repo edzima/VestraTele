@@ -8,13 +8,33 @@ use common\models\issue\IssueMeet;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueStage;
+use common\models\issue\IssueUser;
+use common\models\provision\ProvisionType;
 use common\models\user\Customer;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\console\Controller;
 use yii\helpers\Console;
+use yii\helpers\Json;
 
 class UpgradeController extends Controller {
+
+	public function actionProvisionTypeUsers(): void {
+		/** @var ProvisionType[] $types */
+		$types = ProvisionType::find()->all();
+		foreach ($types as $type) {
+			$data = Json::decode($type->data) ?? [];
+			$roles = $data['roles'] ?? [];
+			$role = reset($roles);
+			unset($data['roles']);
+			$type->data = Json::encode($data);
+			if (!$role) {
+				$role = IssueUser::TYPE_AGENT;
+			}
+			$type->setIssueUserTypes($role);
+			$type->save();
+		}
+	}
 
 	public function actionCustomerSummon(): void {
 		/** @var DbManager $auth */

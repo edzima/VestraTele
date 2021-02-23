@@ -1,10 +1,10 @@
 <?php
 
 use backend\helpers\Url;
+use backend\widgets\GridView;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionUsersSearch;
-use kartik\grid\DataColumn;
-use kartik\grid\GridView;
+use common\widgets\grid\CurrencyColumn;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 
@@ -12,15 +12,13 @@ use yii\helpers\Html;
 /* @var $searchModel ProvisionUsersSearch */
 /* @var $dataProvider ActiveDataProvider */
 
-$this->title = 'Raporty';
+$this->title = Yii::t('provision', 'Reports');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('provision', 'Provisions'), 'url' => ['provision/index']];
 $this->params['breadcrumbs'][] = $this->title;
 $dateFrom = $searchModel->dateFrom;
 $dateTo = $searchModel->dateTo;
 ?>
 <div class="provision-index">
-
-	<h1><?= Html::encode($this->title) ?></h1>
-
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
@@ -30,6 +28,7 @@ $dateTo = $searchModel->dateTo;
 		'showPageSummary' => true,
 		'columns' => [
 			[
+				'label' => Yii::t('provision', 'User'),
 				'attribute' => 'toUser',
 				'value' => static function (Provision $provision) use ($dateTo, $dateFrom): string {
 					return Html::a($provision->toUser, Url::to(['view', 'id' => $provision->to_user_id, 'dateFrom' => $dateFrom, 'dateTo' => $dateTo]));
@@ -37,7 +36,7 @@ $dateTo = $searchModel->dateTo;
 				'format' => 'raw',
 			],
 			[
-				'class' => DataColumn::class,
+				'class' => CurrencyColumn::class,
 				'attribute' => 'value',
 				'format' => 'currency',
 				'pageSummary' => true,

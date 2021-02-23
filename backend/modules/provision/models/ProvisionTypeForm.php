@@ -8,47 +8,62 @@ use common\models\issue\IssueUser;
 use common\models\provision\ProvisionType;
 use Yii;
 use yii\base\Model;
+use yii\db\QueryInterface;
 
 class ProvisionTypeForm extends Model {
 
 	public string $name = '';
+	public bool $is_active = true;
 	public bool $is_percentage = true;
 	public string $value = '';
 
 	public bool $only_with_tele = false;
 	public bool $is_default = false;
-	public $roles = [];
+	public bool $with_hierarchy = true;
+	public $issueUserType;
 	public $issueTypesIds = [];
 	public $calculationTypes = [];
 
+	public ?string $from_at = null;
+	public ?string $to_at = null;
+
 	private ?ProvisionType $model = null;
-	
+
+	public bool $rolesAsArray = false;
+
 	public function rules(): array {
 		return [
-			[['name', 'value', 'is_percentage'], 'required'],
-			['name', 'string', 'max' => 255],
+			[['name', 'value', 'is_percentage', 'issueUserType', 'is_active', 'with_hierarchy'], 'required'],
+			['name', 'string', 'max' => 50],
 			[
-				'value', 'number', 'min' => 0, 'max' => 100, 'when' => function (): bool {
-				return $this->is_percentage;
-			},
+				'name', 'unique', 'targetClass' => ProvisionType::class,
+				'filter' => function (QueryInterface $query): void {
+					if (!$this->getModel()->isNewRecord) {
+						$query->andWhere(['not', 'id' => $this->getModel()->id]);
+					}
+				},
 			],
+			[['from_at', 'to_at'], 'date', 'format' => 'Y-m-d'],
+			['value', 'number', 'min' => 0],
 			[
-				'value', 'number', 'min' => 0, 'max' => 10000, 'when' => function (): bool {
-				return !$this->is_percentage;
-			},
+				'value', 'number', 'max' => 100,
+				'when' => function (): bool {
+					return $this->is_percentage;
+				},
 			],
-			[['only_with_tele', 'is_default', 'is_percentage'], 'boolean'],
+			[['only_with_tele', 'is_default', 'is_percentage', 'is_active', 'with_hierarchy'], 'boolean'],
 			['calculationTypes', 'in', 'range' => array_keys(static::getCalculationTypesNames()), 'allowArray' => true],
 			['issueTypesIds', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
-			['roles', 'in', 'range' => array_keys(static::getRolesNames()), 'allowArray' => true],
+			['issueUserType', 'in', 'range' => array_keys(static::getIssueUserTypesNames())],
+			['calculationTypes', 'each', 'rule' => ['integer']],
 		];
 	}
 
 	public function attributeLabels(): array {
 		return array_merge($this->getModel()->attributeLabels(), [
-			'roles' => Yii::t('common', 'Roles'),
+			'issueUserType' => Yii::t('common', 'Issue user type'),
 			'issueTypesIds' => Yii::t('common', 'Issue Types'),
-			'calculationTypes' => Yii::t('common', 'Calculation Types'),
+			'calculationTypes' => Yii::t('settlement', 'Settlement type'),
 		]);
 	}
 
@@ -59,9 +74,12 @@ class ProvisionTypeForm extends Model {
 		$this->value = $model->value;
 		$this->only_with_tele = $model->only_with_tele;
 		$this->is_default = $model->is_default;
-		$this->roles = $model->getRoles();
+		$this->is_active = $model->is_active;
+		$this->from_at = $model->from_at;
+		$this->issueUserType = $model->getIssueUserType();
 		$this->issueTypesIds = $model->getIssueTypesIds();
 		$this->calculationTypes = $model->getCalculationTypes();
+		$this->with_hierarchy = $model->getWithHierarchy();
 	}
 
 	public function getModel(): ProvisionType {
@@ -78,16 +96,20 @@ class ProvisionTypeForm extends Model {
 		$model = $this->getModel();
 		$model->name = $this->name;
 		$model->is_percentage = $this->is_percentage;
+		$model->is_active = $this->is_active;
 		$model->value = $this->value;
 		$model->only_with_tele = $this->only_with_tele;
 		$model->is_default = $this->is_default;
-		$model->setRoles(is_array($this->roles) ? $this->roles : []);
+		$model->from_at = $this->from_at;
+		$model->to_at = $this->to_at;
+		$model->setWithHierarchy($this->with_hierarchy);
+		$model->setIssueUserTypes($this->issueUserType);
 		$model->setIssueTypesIds(is_array($this->issueTypesIds) ? $this->issueTypesIds : []);
 		$model->setCalculationTypes(is_array($this->calculationTypes) ? $this->calculationTypes : []);
 		return $model->save();
 	}
 
-	public static function getRolesNames(): array {
+	public static function getIssueUserTypesNames(): array {
 		return IssueUser::getTypesNames();
 	}
 

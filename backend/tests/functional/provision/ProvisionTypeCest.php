@@ -2,13 +2,21 @@
 
 namespace backend\tests\functional\provision;
 
-use backend\tests\Step\Functional\Admin;
+use backend\modules\provision\controllers\TypeController;
 use backend\tests\Step\Functional\Manager;
+use backend\tests\Step\Functional\ProvisionManager;
+use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\ProvisionFixtureHelper;
+use common\models\provision\ProvisionType;
 
 class ProvisionTypeCest {
 
+	/** @see TypeController::actionIndex() */
 	public const ROUTE_INDEX = '/provision/type/index';
+	/** @see TypeController::actionCreate() */
 	public const ROUTE_CREATE = '/provision/type/create';
+	/** @see TypeController::actionView() */
+	public const ROUTE_VIEW = '/provision/type/view';
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -17,37 +25,77 @@ class ProvisionTypeCest {
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkAsAdmin(Admin $I): void {
+	public function checkAsProvisionManager(ProvisionManager $I): void {
 		$I->amLoggedIn();
 		$I->seeMenuLink('Provisions');
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->see('Provisions types', 'h1');
 	}
 
-	public function checkCreateLink(Admin $I): void {
+	public function checkCreateLink(ProvisionManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->seeLink('Create');
 		$I->click('Create');
 	}
 
-	public function checkGridContent(Admin $I): void {
+	public function checkGridContent(ProvisionManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->seeInGridHeader('Name');
+		$I->seeInGridHeader('Issue user type');
 		$I->seeInGridHeader('Value');
 		$I->seeInGridHeader('Is percentage');
 		$I->seeInGridHeader('Only with telemarketer');
-		$I->seeInGridHeader('Roles');
 		$I->seeInGridHeader('Issue types');
+		$I->seeInGridHeader('Is active');
+		$I->seeInGridHeader('From at');
+		$I->seeInGridHeader('To at');
+		$I->seeInGridHeader('User self schema count');
 	}
 
-	public function checkCreate(Admin $I): void {
+	public function checkCreate(ProvisionManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_CREATE);
 		$I->fillField('Name', 'name');
 		$I->fillField('Provision value', 25);
 		$I->click('Save');
 		$I->see('name', 'h1');
+	}
+
+	public function checkView(ProvisionManager $I): void {
+		$I->haveFixtures(array_merge(
+			IssueFixtureHelper::types(),
+			IssueFixtureHelper::users(),
+			ProvisionFixtureHelper::type(),
+			ProvisionFixtureHelper::user()
+		));
+		$I->amLoggedIn();
+		/** @var ProvisionType $type */
+		$type = $I->grabFixture(ProvisionFixtureHelper::TYPE, 'agent-administrative');
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $type->id]);
+		$I->seeInTitle($type->name);
+		$I->seeLink('Update');
+		$I->seeLink('Delete');
+		$I->seeLink('Create provision schema');
+		$I->see('Users with type');
+		$I->see('Users without type');
+	}
+
+	public function checkCreateProvisionLink(ProvisionManager $I): void {
+		$I->haveFixtures(array_merge(
+			IssueFixtureHelper::types(),
+			IssueFixtureHelper::users(),
+			ProvisionFixtureHelper::type(),
+			ProvisionFixtureHelper::user()
+		));
+		$I->amLoggedIn();
+		/** @var ProvisionType $type */
+		$type = $I->grabFixture(ProvisionFixtureHelper::TYPE, 'agent-administrative');
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $type->id]);
+		$I->click('Create provision schema');
+		$I->seeInCurrentUrl(ProvisionUserCest::ROUTE_CREATE);
+		$I->seeInField('Value', $type->value);
+		$I->seeInField('Type', $type->name);
 	}
 }

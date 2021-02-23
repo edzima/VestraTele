@@ -7,18 +7,23 @@ use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
 use common\models\provision\Provision;
+use common\tests\_support\UnitModelTrait;
 use Decimal\Decimal;
+use yii\base\Model;
 
 class ProvisionFormTest extends Unit {
 
 	private ProvisionForm $form;
+
+	use UnitModelTrait;
 
 	public function _before() {
 		$this->tester->haveFixtures(
 			array_merge(
 				IssueFixtureHelper::fixtures(),
 				IssueFixtureHelper::settlements(),
-				ProvisionFixtureHelper::provision()
+				ProvisionFixtureHelper::all()
+
 			)
 
 		);
@@ -28,11 +33,11 @@ class ProvisionFormTest extends Unit {
 	public function testEmptyPercent(): void {
 		$this->givenForm($this->grabProvision('nowak-self-payed'));
 
-		$this->tester->assertSame($this->form->percent, 50.0);
+		$this->tester->assertSame($this->form->percent, '50.00');
 		$this->form->percent = null;
 		$this->thenUnsuccessSave();
 
-		$this->thenSeeValidationError('Provision (%) cannot be blank.', 'percent');
+		$this->thenSeeError('Provision (%) cannot be blank.', 'percent');
 	}
 
 	public function testNotChangePercent(): void {
@@ -50,24 +55,11 @@ class ProvisionFormTest extends Unit {
 	}
 
 	private function thenSeeProvision(Decimal $value = null): void {
-		codecept_debug(Provision::find()->asArray()->all());
 		$attributes = $this->form->getModel()->getAttributes();
 		if ($value !== null) {
 			$attributes['value'] = $value->toFixed(2);
 		}
 		$this->tester->seeRecord(Provision::class, $attributes);
-	}
-
-	private function thenUnsuccessSave(): void {
-		$this->tester->assertFalse($this->form->save());
-	}
-
-	private function thenSuccessSave(): void {
-		$this->tester->assertTrue($this->form->save());
-	}
-
-	private function thenSeeValidationError(string $message, string $attribute): void {
-		$this->tester->assertSame($message, $this->form->getFirstError($attribute));
 	}
 
 	private function grabProvision(string $index): Provision {
@@ -76,5 +68,9 @@ class ProvisionFormTest extends Unit {
 
 	private function givenForm(Provision $provision): void {
 		$this->form = new ProvisionForm($provision);
+	}
+
+	public function getModel(): Model {
+		return $this->form;
 	}
 }

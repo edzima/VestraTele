@@ -1,10 +1,8 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
-use backend\helpers\Url;
 use backend\modules\provision\models\ProvisionForm;
-use common\widgets\settlement\SettlementDetailView;
-use yii\helpers\Html;
+use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model ProvisionForm */
@@ -19,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="provision-update">
 
 
-	<?= \yii\widgets\DetailView::widget([
+	<?= DetailView::widget([
 		'model' => $model->getModel(),
 		'attributes' => [
 			'toUser',
@@ -29,7 +27,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'format' => 'currency',
 			],
 			[
-				'attribute' => 'pay.value',
+				'attribute' => 'pay.valueWithVAT',
+				'format' => 'currency',
+			],
+			[
+				'attribute' => 'pay.valueWithoutVAT',
 				'format' => 'currency',
 			],
 		],
