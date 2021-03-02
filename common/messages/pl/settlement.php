@@ -29,6 +29,8 @@ return [
 	'{attribute} is required when {secondLabel} is empty.' => '{attribute} jest wymagany gdy {secondLabel} jest pusty.',
 	'Customer - {fullName}' => 'Klient - {fullName}',
 	'Customer - {name}' => 'Klient - {name}',
+	'Costs: {issue}' => 'Koszty: {issue}',
+	'Costs without settlements' => 'Koszty nierozliczone',
 	'3 days' => '3 dni',
 	'Settlements' => 'Rozliczenia',
 	'Settlement' => 'Rozliczenie',
@@ -109,4 +111,8 @@ return [
 	'Receve at' => 'Receve at',
 	'Receve At' => 'Receve At',
 	'Costs sum' => 'Koszty',
+	'Settlement costs' => 'Koszty rozliczenia',
+	'Link with settlement' => 'Dodaj do rozliczenia',
+	'Unlink with settlement' => 'Usuń z rozliczenia',
+	'With settlements' => 'Rozliczone',
 ];

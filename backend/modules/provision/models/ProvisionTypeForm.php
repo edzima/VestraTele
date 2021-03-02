@@ -2,9 +2,7 @@
 
 namespace backend\modules\provision\models;
 
-use common\models\issue\IssuePayCalculation;
-use common\models\issue\IssueType;
-use common\models\issue\IssueUser;
+use common\models\provision\IssueProvisionType;
 use common\models\provision\ProvisionType;
 use Yii;
 use yii\base\Model;
@@ -22,14 +20,13 @@ class ProvisionTypeForm extends Model {
 	public bool $with_hierarchy = true;
 	public $issueUserType;
 	public $issueTypesIds = [];
+	public $issueStagesIds = [];
 	public $calculationTypes = [];
 
 	public ?string $from_at = null;
 	public ?string $to_at = null;
 
-	private ?ProvisionType $model = null;
-
-	public bool $rolesAsArray = false;
+	private ?IssueProvisionType $model = null;
 
 	public function rules(): array {
 		return [
@@ -54,6 +51,7 @@ class ProvisionTypeForm extends Model {
 			[['only_with_tele', 'is_default', 'is_percentage', 'is_active', 'with_hierarchy'], 'boolean'],
 			['calculationTypes', 'in', 'range' => array_keys(static::getCalculationTypesNames()), 'allowArray' => true],
 			['issueTypesIds', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
+			['issueStagesIds', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true],
 			['issueUserType', 'in', 'range' => array_keys(static::getIssueUserTypesNames())],
 			['calculationTypes', 'each', 'rule' => ['integer']],
 		];
@@ -61,9 +59,10 @@ class ProvisionTypeForm extends Model {
 
 	public function attributeLabels(): array {
 		return array_merge($this->getModel()->attributeLabels(), [
-			'issueUserType' => Yii::t('common', 'Issue user type'),
-			'issueTypesIds' => Yii::t('common', 'Issue Types'),
 			'calculationTypes' => Yii::t('settlement', 'Settlement type'),
+			'issueStagesIds' => Yii::t('common', 'Issue Stages'),
+			'issueTypesIds' => Yii::t('common', 'Issue Types'),
+			'issueUserType' => Yii::t('common', 'Issue user type'),
 		]);
 	}
 
@@ -82,9 +81,9 @@ class ProvisionTypeForm extends Model {
 		$this->with_hierarchy = $model->getWithHierarchy();
 	}
 
-	public function getModel(): ProvisionType {
+	public function getModel(): IssueProvisionType {
 		if ($this->model === null) {
-			$this->model = new ProvisionType();
+			$this->model = new IssueProvisionType();
 		}
 		return $this->model;
 	}
@@ -104,21 +103,26 @@ class ProvisionTypeForm extends Model {
 		$model->to_at = $this->to_at;
 		$model->setWithHierarchy($this->with_hierarchy);
 		$model->setIssueUserTypes($this->issueUserType);
+		$model->setIssueStagesIds(is_array($this->issueStagesIds) ? $this->issueStagesIds : []);
 		$model->setIssueTypesIds(is_array($this->issueTypesIds) ? $this->issueTypesIds : []);
 		$model->setCalculationTypes(is_array($this->calculationTypes) ? $this->calculationTypes : []);
 		return $model->save();
 	}
 
-	public static function getIssueUserTypesNames(): array {
-		return IssueUser::getTypesNames();
+	public static function getCalculationTypesNames(): array {
+		return IssueProvisionType::calculationTypesNames();
+	}
+
+	public static function getIssueStagesNames(): array {
+		return IssueProvisionType::issueStagesNames();
 	}
 
 	public static function getIssueTypesNames(): array {
-		return IssueType::getTypesNames();
+		return IssueProvisionType::issueTypesNames();
 	}
 
-	public static function getCalculationTypesNames(): array {
-		return IssuePayCalculation::getTypesNames();
+	public static function getIssueUserTypesNames(): array {
+		return IssueProvisionType::issueUserTypesNames();
 	}
 
 }

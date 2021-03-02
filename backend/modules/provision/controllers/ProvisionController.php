@@ -4,12 +4,12 @@ namespace backend\modules\provision\controllers;
 
 use backend\helpers\Url;
 use backend\modules\provision\models\ProvisionForm;
-use Yii;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionSearch;
+use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * ProvisionController implements the CRUD actions for Provision model.
@@ -76,7 +76,7 @@ class ProvisionController extends Controller {
 	public function actionDelete(int $id) {
 		$this->findModel($id)->delete();
 
-		return $this->redirect(['index']);
+		return $this->redirect(Url::previous());
 	}
 
 	/**

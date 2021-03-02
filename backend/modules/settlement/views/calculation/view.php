@@ -53,7 +53,7 @@ YiiAsset::register($this);
 		?>
 
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) && $model->hasPays()
-			? Html::a(Yii::t('backend', 'Provisions'), ['/provision/settlement/set', 'id' => $model->id], ['class' => 'btn btn-success'])
+			? Html::a(Yii::t('backend', 'Provisions'), ['/provision/settlement/view', 'id' => $model->id], ['class' => 'btn btn-success'])
 			: ''
 		?>
 

@@ -76,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
 							]);
 					},
 					'provision' => static function (string $url, Worker $model) {
-						return Html::a('<span class="glyphicon glyphicon-usd"></span>',
+						return Html::a('<i class="fa fa-percent"></i>',
 							Url::userProvisions($model->id),
 							[
 								'title' => Yii::t('backend', 'Provisions'),
@@ -90,7 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					'update' => Yii::$app->user->can(Worker::PERMISSION_WORKERS),
 					'delete' => Yii::$app->user->can(Worker::PERMISSION_WORKERS),
 					'hierarchy' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
-					'provision' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
+					'provision' => Yii::$app->user->can(Worker::PERMISSION_PROVISION),
 				],
 
 			],

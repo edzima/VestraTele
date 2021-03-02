@@ -2,9 +2,7 @@
 
 namespace common\models\provision;
 
-use common\models\issue\IssuePayCalculation;
-use common\models\issue\IssueType;
-use common\models\issue\IssueUser;
+use DateTime;
 use Decimal\Decimal;
 use Yii;
 use yii\db\ActiveRecord;
@@ -29,18 +27,19 @@ use yii\helpers\Json;
  */
 class ProvisionType extends ActiveRecord {
 
-	private const KEY_DATA_ROLES = 'roles';
-	private const KEY_DATA_TYPES = 'types';
-	public const KEY_DATA_CALCULATION_TYPES = 'calculation.types';
-	public const KEY_DATA_ISSUE_USER_TYPE = 'issue.user.type';
 	public const KEY_DATA_WITH_HIERARCHY = 'with-hierarchy';
+
 	/**
 	 * @var static[]|null
 	 */
 	private static ?array $TYPES = null;
+	/**
+	 * @var static[]|null
+	 */
+	private static ?array $ACTIVE_TYPES = null;
 
 	public function __toString() {
-		return $this->name . ' ' . $this->getFormattedValue();
+		return $this->getNameWithValue();
 	}
 
 	public function beforeSave($insert): bool {
@@ -66,16 +65,11 @@ class ProvisionType extends ActiveRecord {
 			'to_at' => Yii::t('provision', 'To at'),
 			'only_with_tele' => Yii::t('provision', 'Only with telemarketer'),
 			'is_default' => Yii::t('provision', 'Is default'),
-			'value' => Yii::t('common', 'Provision value'),
-			'formattedValue' => Yii::t('provision', 'Value'),
-			'calculationTypesNames' => Yii::t('settlement', 'Settlement type'),
-			'issueTypesNames' => Yii::t('common', 'Issue Types'),
+			'value' => Yii::t('provision', 'Value'),
+			'formattedValue' => $this->getFormattedValueLabel(),
 			'is_percentage' => Yii::t('provision', 'Is percentage'),
 			'is_active' => Yii::t('common', 'Is active'),
-			'rolesNames' => Yii::t('common', 'Roles'),
-			'typesNames' => Yii::t('common', 'Issue types'),
 			'with_hierarchy' => Yii::t('provision', 'With hierarchy'),
-			'issueUserTypeName' => Yii::t('common', 'Issue user type'),
 		];
 	}
 
@@ -83,6 +77,11 @@ class ProvisionType extends ActiveRecord {
 		return $this->hasMany(ProvisionUser::class, ['type_id' => 'id']);
 	}
 
+	public function getNameWithValue(): string {
+		return $this->name . ' - ' . $this->getFormattedValue();
+	}
+
+	/**  @todo add Decimal Type. */
 	public function getFormattedValue($value = null): string {
 		if ($value === null) {
 			$value = $this->value;
@@ -97,38 +96,25 @@ class ProvisionType extends ActiveRecord {
 		return new Decimal($this->value);
 	}
 
-	public function setRoles(array $roles): void {
-		$this->setDataValues(static::KEY_DATA_ROLES, $roles);
+	public function getDataArray(): array {
+		return Json::decode($this->data) ?? [];
 	}
 
-	public function getRoles(): array {
-		return $this->getDataArray()[static::KEY_DATA_ROLES] ?? [];
-	}
-
-	public function getCalculationTypes(): array {
-		return $this->getDataArray()[static::KEY_DATA_CALCULATION_TYPES] ?? [];
-	}
-
-	public function setCalculationTypes(array $types): void {
-		$types = array_map('intval', $types);
-		$this->setDataValues(static::KEY_DATA_CALCULATION_TYPES, $types);
-	}
-
-	public function getIssueTypesIds(): array {
-		return $this->getDataArray()[static::KEY_DATA_TYPES] ?? [];
-	}
-
-	public function setIssueTypesIds(array $ids): void {
-		$ids = array_map('intval', $ids);
-		$this->setDataValues(static::KEY_DATA_TYPES, $ids);
-	}
-
-	public function getIssueUserType(): string {
-		return $this->getDataArray()[static::KEY_DATA_ISSUE_USER_TYPE];
-	}
-
-	public function setIssueUserTypes(string $type): void {
-		$this->setDataValues(static::KEY_DATA_ISSUE_USER_TYPE, $type);
+	public function isForDate($date): bool {
+		if (empty($this->from_at) && empty($this->to_at)) {
+			return true;
+		}
+		if (!$date instanceof DateTime) {
+			$date = new DateTime($date);
+		}
+		if (!empty($this->from_at)) {
+			$fromAt = new DateTime($this->from_at);
+			if (empty($this->to_at)) {
+				return $date >= $fromAt;
+			}
+			return $date >= $fromAt && $date <= new DateTime($this->to_at);
+		}
+		return $date <= new DateTime($this->to_at);
 	}
 
 	public function setWithHierarchy(bool $withHierarchy): void {
@@ -139,94 +125,59 @@ class ProvisionType extends ActiveRecord {
 		return $this->getDataArray()[static::KEY_DATA_WITH_HIERARCHY] ?? false;
 	}
 
-	private function setDataValues(string $key, $values): void {
+	protected function setDataValues(string $key, $values): void {
 		$data = $this->getDataArray();
 		$data[$key] = $values;
 		$this->setDataArray($data);
-	}
-
-	private function getDataArray(): array {
-		return Json::decode($this->data) ?? [];
 	}
 
 	private function setDataArray(array $data): void {
 		$this->data = Json::encode($data);
 	}
 
-	public function getCalculationTypesNames(): string {
-		$calculationTypes = $this->getCalculationTypes();
-		if (empty($calculationTypes)) {
-			return Yii::t('common', 'All');
+	protected function getFormattedValueLabel(): string {
+		if ($this->is_percentage) {
+			return Yii::t('provision', 'Provision (%)');
 		}
-		$allNames = IssuePayCalculation::getTypesNames();
-		$names = [];
-		foreach ($calculationTypes as $type) {
-			$names[] = $allNames[$type];
-		}
-		return implode(', ', $names);
+		return Yii::t('provision', 'Provision ({currencySymbol})', ['currencySymbol' => Yii::$app->formatter->getCurrencySymbol()]);
 	}
 
-	public function getIssueTypesNames(): string {
-		$types = $this->getIssueTypesIds();
-		if (empty($types)) {
-			return Yii::t('common', 'All');
-		}
-		$typesNames = IssueType::getTypesNames();
-		$names = [];
-		foreach ($types as $id) {
-			$names[] = $typesNames[$id];
-		}
-		return implode(', ', $names);
-	}
-
-	public function getIssueUserTypeName(): string {
-		return IssueUser::getTypesNames()[$this->getIssueUserType()];
-	}
-
-	public function isForCalculationType(int $type): bool {
-		$types = $this->getCalculationTypes();
-		if (empty($types)) {
-			return true;
-		}
-		return in_array($type, $types, true);
-	}
-
-	public function isForIssueType(int $typeID): bool {
-		$ids = $this->getIssueTypesIds();
-		if (empty($ids)) {
-			return true;
-		}
-		return in_array($typeID, $ids, true);
-	}
-
-	public function isForIssueUser(string $type): bool {
-		return $this->getIssueUserType() === $type;
-	}
-
-	public function getNameWithValue(): string {
-		return $this->name . ' - ' . $this->getFormattedValue();
-	}
-
-	public static function findCalculationTypes(IssuePayCalculation $calculation, string $issueUserType = null): array {
-		return array_filter(static::getTypes(), static function (ProvisionType $provisionType) use ($calculation, $issueUserType) {
-			return $provisionType->isForCalculationType($calculation->type)
-				&& $provisionType->isForIssueType($calculation->issue->type_id)
-				&& (!$issueUserType ? true : $provisionType->isForIssueUser($issueUserType));
-		});
-	}
-
-	public static function getTypesNames(): array {
-		return ArrayHelper::map(static::getTypes(), 'id', 'nameWithValue');
+	public static function getTypesNames(bool $onlyActive = true, bool $refresh = false): array {
+		return ArrayHelper::map(static::getTypes($onlyActive, $refresh), 'id', 'nameWithValue');
 	}
 
 	/**
+	 * @param int $id
+	 * @return static|null
+	 */
+	public static function getType(int $id, bool $onlyActive) {
+		if (!isset(static::getTypes()[$id])) {
+			static::getTypes()[$id] = static::findOne($id);
+		}
+		return static::getTypes()[$id];
+	}
+
+	/**
+	 * @param bool $onlyActive
+	 * @param bool $refresh
 	 * @return static[]
 	 */
-	public static function getTypes(): array {
-		if (static::$TYPES === null) {
+	public static function getTypes(bool $onlyActive = false, bool $refresh = false): array {
+		if (static::$TYPES === null || $refresh) {
 			static::$TYPES = static::find()
 				->indexBy('id')
 				->all();
+		}
+		if ($onlyActive) {
+			if (empty(static::$ACTIVE_TYPES) || $refresh) {
+				static::$ACTIVE_TYPES = [];
+				foreach (static::$TYPES as $type) {
+					if ($type->is_active) {
+						static::$ACTIVE_TYPES[$type->id] = $type;
+					}
+				}
+			}
+			return static::$ACTIVE_TYPES;
 		}
 		return static::$TYPES;
 	}

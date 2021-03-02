@@ -12,6 +12,18 @@ use yii\db\ActiveQuery;
  */
 class ProvisionUserQuery extends ActiveQuery {
 
+	public function forDate(string $date): self {
+		$this->andWhere([
+			'and', [
+				'or', ['<=', 'from_at', $date], ['from_at' => null],
+			],
+			[
+				'or', ['>=', 'to_at', $date], ['to_at' => null],
+			],
+		]);
+		return $this;
+	}
+
 	public function onlyTo(int $user_id): self {
 		$this->andWhere(['to_user_id' => $user_id]);
 		return $this;
@@ -24,6 +36,11 @@ class ProvisionUserQuery extends ActiveQuery {
 
 	public function forType(int $typeId): self {
 		$this->andWhere(['type_id' => $typeId]);
+		return $this;
+	}
+
+	public function forTypes(array $types): self {
+		$this->andWhere(['type_id' => $types]);
 		return $this;
 	}
 

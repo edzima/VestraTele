@@ -21,6 +21,8 @@ $this->params['breadcrumbs'][] = Yii::t('provision', 'Schemas')
 
 	<p>
 		<?= Html::a(Yii::t('provision', 'Create provision schema'), 'create', ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('provision', 'Create provision type'), '/provision/type/create', ['class' => 'btn btn-success']) ?>
+
 	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]); ?>

@@ -4,6 +4,7 @@ namespace backend\modules\settlement\models;
 
 use common\models\issue\Issue;
 use common\models\issue\IssueCost;
+use common\models\user\User;
 use Decimal\Decimal;
 use Yii;
 use yii\base\Model;
@@ -19,6 +20,7 @@ class IssueCostForm extends Model {
 	public string $type = '';
 	public string $value = '';
 	public string $vat = '';
+	public $user_id;
 
 	private ?IssueCost $model = null;
 	private Issue $issue;
@@ -34,6 +36,7 @@ class IssueCostForm extends Model {
 			'type' => Yii::t('backend', 'Type'),
 			'value' => Yii::t('backend', 'Value with VAT'),
 			'vat' => 'VAT (%)',
+			'user_id' => Yii::t('backend', 'User'),
 		];
 	}
 
@@ -41,10 +44,19 @@ class IssueCostForm extends Model {
 		return [
 			[['type', 'value', 'vat', 'date_at'], 'required'],
 			[['date_at'], 'date', 'format' => DATE_ATOM],
+			[
+				'user_id', 'required',
+				'when' => function (): bool {
+					return $this->type === IssueCost::TYPE_INSTALLMENT;
+				},
+				'enableClientValidation' => false,
+			],
+			['user_id', 'integer'],
 			[['value', 'vat'], 'number'],
 			['vat', 'number', 'min' => 0, 'max' => 100],
 			['value', 'number', 'min' => 1, 'max' => 10000],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
+			['user_id', 'in', 'range' => array_keys($this->getUserNames()), 'message' => Yii::t('backend', 'User must be from issue users.')],
 		];
 	}
 
@@ -66,10 +78,15 @@ class IssueCostForm extends Model {
 		$this->date_at = $cost->date_at;
 		$this->value = $cost->getValueWithVAT()->toFixed(2);
 		$this->vat = $cost->getVAT()->toFixed(2);
+		$this->user_id = $cost->user_id;
 	}
 
 	public static function getTypesNames(): array {
 		return IssueCost::getTypesNames();
+	}
+
+	public function getUserNames(): array {
+		return User::getSelectList($this->issue->getUsers()->select('user_id')->column());
 	}
 
 	public function save(): bool {
@@ -82,6 +99,7 @@ class IssueCostForm extends Model {
 		$model->vat = (new Decimal($this->vat))->toFixed(2);
 		$model->type = $this->type;
 		$model->date_at = $this->date_at;
+		$model->user_id = $this->user_id;
 		return $model->save(false);
 	}
 }

@@ -29,6 +29,19 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => IssueCostSearch::getTypesNames(),
 			],
 			[
+				'attribute' => 'user_id',
+				'value' => 'user',
+				'label' => Yii::t('backend', 'User'),
+				'filter' => IssueCostSearch::getUsersNames(),
+			],
+			[
+				'attribute' => 'withSettlements',
+				'value' => 'hasSettlements',
+				'label' => Yii::t('settlement', 'With settlements'),
+				'noWrap' => true,
+				'format' => 'boolean',
+			],
+			[
 				'attribute' => 'value',
 				'value' => 'valueWithVAT',
 				'format' => 'currency',

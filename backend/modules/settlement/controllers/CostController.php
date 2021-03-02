@@ -2,10 +2,12 @@
 
 namespace backend\modules\settlement\controllers;
 
+use backend\helpers\Url;
 use backend\modules\settlement\models\IssueCostForm;
 use backend\modules\settlement\models\search\IssueCostSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueCost;
+use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
 use Yii;
 use yii\filters\VerbFilter;
@@ -66,6 +68,22 @@ class CostController extends Controller {
 		]);
 	}
 
+	public function actionSettlementLink(int $id, int $settlementId) {
+		$model = $this->findModel($id);
+		$settlement = IssuePayCalculation::findOne($settlementId);
+		$model->link('settlements', $settlement);
+		return $this->redirect(Url::previous());
+	}
+
+	public function actionSettlementUnlink(int $id, int $settlementId) {
+		$model = $this->findModel($id);
+		$settlement = IssuePayCalculation::findOne($settlementId);
+		if ($settlement) {
+			$model->unlinkSettlement($settlementId);
+		}
+		return $this->redirect(Url::previous());
+	}
+
 	/**
 	 * @param int $id
 	 * @return Issue
@@ -108,6 +126,22 @@ class CostController extends Controller {
 		$issue = $this->findIssue($id);
 		$model = new IssueCostForm($issue);
 		$model->date_at = date(DATE_ATOM);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
+		}
+
+		return $this->render('create', [
+			'model' => $model,
+		]);
+	}
+
+	public function actionCreateInstallment(int $id, int $user_id = null) {
+		$issue = $this->findIssue($id);
+		$model = new IssueCostForm($issue);
+		$model->user_id = $user_id;
+		$model->type = IssueCost::TYPE_INSTALLMENT;
+		$model->date_at = date(DATE_ATOM);
+		$model->vat = 0;
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}

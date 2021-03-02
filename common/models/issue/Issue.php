@@ -399,7 +399,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function hasTele(): bool {
-		return $this->tele_id !== null && $this->tele !== null;
+		return $this->tele !== null;
 	}
 
 	public function hasLawyer(): bool {

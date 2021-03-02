@@ -11,9 +11,7 @@ use common\models\provision\ProvisionUser;
 use common\models\provision\ProvisionUserSearch;
 use common\models\user\User;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -64,68 +62,32 @@ class UserController extends Controller {
 	public function actionUserView(int $userId, int $typeId = null): string {
 		$model = new ProvisionUserData($this->findUser($userId));
 		if ($typeId !== null) {
-			$model->type = $this->findType($typeId);
+			$model->type = $this->findType($typeId, false);
 		}
 		Url::remember();
 
-		$fromDataProvider = new ActiveDataProvider([
-			'query' => $model->getFromQuery()->with('fromUser.userProfile', 'type'),
-			'pagination' => false,
-		]);
-
-		$toDataProvider = new ActiveDataProvider([
-			'query' => $model->getToQuery()->with('toUser.userProfile', 'type'),
-			'pagination' => false,
-		]);
-
-		$parentsWithoutProvisionsDataProvider = null;
-		$parentsQuery = $model->getAllParentsQueryWithoutProvision();
-
-		if ($parentsQuery) {
-			$parentsWithoutProvisionsDataProvider = new ActiveDataProvider([
-					'query' => $parentsQuery->orderByLastname(),
-					'pagination' => false,
-				]
-			);
-		}
-
-		$allChildesDataProvider = null;
-		$allChildesQuery = $model->getAllChildesQueryWithoutProvision(ArrayHelper::map($toDataProvider->getModels(), 'to_user_id', 'to_user_id'));
-		if ($allChildesQuery) {
-			$allChildesDataProvider = new ActiveDataProvider([
-				'query' => $allChildesQuery->orderByLastname(),
-				'pagination' => false,
-			]);
-		}
-
-		if ($parentsWithoutProvisionsDataProvider !== null && $parentsWithoutProvisionsDataProvider->getTotalCount() > 0) {
+		$allChildesQuery = $model->getAllChildesQueryWithoutProvision();
+		if ($allChildesQuery && ($childesCount = $allChildesQuery->count()) > 0) {
 			Flash::add(Flash::TYPE_WARNING,
 				Yii::t('provision',
-					'There {n,plural, =1{parent} other{# parents}} has not set schema provisions!',
-					['n' => $parentsWithoutProvisionsDataProvider->getTotalCount()]
+					'There {n,plural, =1{subordinate} other{# subordinates}} has not set schema provisions!',
+					['n' => $childesCount]
 				)
 			);
 		}
 
-		if ($allChildesDataProvider !== null && $allChildesDataProvider->getTotalCount() > 0) {
+		$parentsQuery = $model->getAllParentsQueryWithoutProvision();
+		if ($parentsQuery && ($parentsCount = $parentsQuery->count()) > 0) {
 			Flash::add(Flash::TYPE_WARNING,
 				Yii::t('provision',
-					'There {n,plural, =1{subordinate} other{# subordinates}} has not set schema provisions!',
-					['n' => $allChildesDataProvider->getTotalCount()]
+					'There {n,plural, =1{parent} other{# parents}} has not set schema provisions!',
+					['n' => $parentsCount]
 				)
 			);
 		}
 
 		return $this->render('user-view', [
 			'model' => $model,
-			'selfDataProvider' => new ActiveDataProvider([
-				'query' => $model->getSelfQuery()->with('type'),
-				'pagination' => false,
-			]),
-			'fromDataProvider' => $fromDataProvider,
-			'parentsWithoutProvisionsDataProvider' => $parentsWithoutProvisionsDataProvider,
-			'toDataProvider' => $toDataProvider,
-			'allChildesDataProvider' => $allChildesDataProvider,
 		]);
 	}
 
@@ -142,7 +104,7 @@ class UserController extends Controller {
 		$model->to_user_id = $toUserId;
 
 		if ($typeId !== null) {
-			$model->setType($this->findType($typeId));
+			$model->setType($this->findType($typeId, true));
 		}
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(Url::previous());
@@ -158,7 +120,7 @@ class UserController extends Controller {
 		$model = ProvisionUserForm::createUserSelfForm($userId);
 
 		if ($typeId) {
-			$model->setType($this->findType($typeId));
+			$model->setType($this->findType($typeId, true));
 		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -214,8 +176,8 @@ class UserController extends Controller {
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}
 
-	private function findType(int $typeId): ProvisionType {
-		$model = ProvisionType::getTypes()[$typeId] ?? null;
+	private function findType(int $typeId, bool $onlyActive): ProvisionType {
+		$model = ProvisionType::getType($typeId, $onlyActive);
 		if ($model !== null) {
 			return $model;
 		}

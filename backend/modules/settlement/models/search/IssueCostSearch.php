@@ -3,6 +3,8 @@
 namespace backend\modules\settlement\models\search;
 
 use common\models\issue\IssueCost;
+use common\models\issue\query\IssueCostQuery;
+use common\models\user\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -11,13 +13,16 @@ use yii\data\ActiveDataProvider;
  */
 class IssueCostSearch extends IssueCost {
 
+	public $withSettlements;
+
 	/**
 	 * @inheritdoc
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'issue_id'], 'integer'],
+			[['id', 'issue_id', 'user_id'], 'integer'],
 			['type', 'string'],
+			['withSettlements', 'boolean'],
 			[['created_at', 'updated_at', 'date_at'], 'safe'],
 			[['value', 'vat'], 'number'],
 		];
@@ -40,7 +45,7 @@ class IssueCostSearch extends IssueCost {
 	 */
 	public function search(array $params): ActiveDataProvider {
 		$query = IssueCost::find();
-		$query->joinWith(['issue']);
+		$query->joinWith(['issue', 'settlements', 'user']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -56,19 +61,41 @@ class IssueCostSearch extends IssueCost {
 			return $dataProvider;
 		}
 
+		$this->applySettlementsFilter($query);
+
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
-			'issue.id' => $this->issue_id,
-			'value' => $this->value,
-			'vat' => $this->vat,
-			'created_at' => $this->created_at,
-			'date_at' => $this->date_at,
-			'updated_at' => $this->updated_at,
-			'type' => $this->type,
+			IssueCost::tableName() . '.id' => $this->id,
+			IssueCost::tableName() . '.issue_id' => $this->issue_id,
+			IssueCost::tableName() . '.user_id' => $this->user_id,
+			IssueCost::tableName() . '.value' => $this->value,
+			IssueCost::tableName() . '.vat' => $this->vat,
+			IssueCost::tableName() . '.created_at' => $this->created_at,
+			IssueCost::tableName() . '.date_at' => $this->date_at,
+			IssueCost::tableName() . '.updated_at' => $this->updated_at,
+			IssueCost::tableName() . '.type' => $this->type,
 		]);
 
 		return $dataProvider;
+	}
+
+	private function applySettlementsFilter(IssueCostQuery $query): void {
+		if ($this->withSettlements === null || $this->withSettlements === '') {
+			return;
+		}
+		if ($this->withSettlements) {
+			$query->withSettlements();
+			return;
+		}
+		$query->withoutSettlements();
+	}
+
+	public static function getUsersNames(): array {
+		return User::getSelectList(IssueCost::find()
+			->select('user_id')
+			->distinct()
+			->column()
+			, false);
 	}
 
 }

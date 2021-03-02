@@ -2,91 +2,49 @@
 
 namespace common\tests\unit\provision;
 
-use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
-use common\models\issue\IssuePayCalculation;
-use common\models\issue\IssueType;
-use common\models\issue\IssueUser;
 use common\models\provision\ProvisionType;
 use common\tests\unit\Unit;
+use Yii;
 
 class ProvisionTypeTest extends Unit {
 
 	public function _before() {
 		parent::_before();
-		$this->tester->haveFixtures(ProvisionFixtureHelper::type());
+		$this->tester->haveFixtures($this->fixtures());
 	}
 
-	public function testIssueUserType(): void {
-		$type = $this->grabType('agent-percent-25');
-		$this->tester->assertTrue($type->isForIssueUser(IssueUser::TYPE_AGENT));
-		$this->tester->assertFalse($type->isForIssueUser(IssueUser::TYPE_LAWYER));
-		$this->tester->assertFalse($type->isForIssueUser('not-existed-issue-type'));
-		$this->tester->assertSame('agent', $type->getIssueUserTypeName());
-
-		$type = $this->grabType('tele-percent-5');
-		$this->tester->assertTrue($type->isForIssueUser(IssueUser::TYPE_TELEMARKETER));
-		$this->tester->assertFalse($type->isForIssueUser(IssueUser::TYPE_AGENT));
-		$this->tester->assertFalse($type->isForIssueUser('not-existed-issue-type'));
-		$this->tester->assertSame('telemarketer', $type->getIssueUserTypeName());
+	public function fixtures(): array {
+		return ProvisionFixtureHelper::type();
 	}
 
-	public function testIssueType(): void {
-		$this->tester->haveFixtures(IssueFixtureHelper::types());
+	public function testPercentFormattedValue(): void {
 		$type = new ProvisionType();
-
-		$this->tester->wantToTest('Empty type');
-		$type->setIssueTypesIds([]);
-		foreach (IssueType::getTypesIds() as $typeId) {
-			$this->tester->assertTrue($type->isForIssueType($typeId));
-		}
-		$this->tester->assertSame('All', $type->getIssueTypesNames());
-
-		$this->tester->wantToTest('Single type');
-		$type->setIssueTypesIds([1]);
-		$this->tester->assertTrue($type->isForIssueType(1));
-		$this->tester->assertFalse($type->isForIssueType(2));
-		$this->tester->assertFalse($type->isForIssueType(3));
-		$this->tester->assertSame('Accident', $type->getIssueTypesNames());
-
-		$this->tester->wantToTest('Multiply type');
-		$type->setIssueTypesIds([1, 2]);
-		$this->tester->assertTrue($type->isForIssueType(1));
-		$this->tester->assertTrue($type->isForIssueType(2));
-		$this->tester->assertFalse($type->isForIssueType(3));
-		$this->tester->assertSame('Accident, Benefits - administrative proceedings', $type->getIssueTypesNames());
+		$type->is_percentage = true;
+		$type->value = 20;
+		$this->assertSame('20,00%', $type->getFormattedValue());
 	}
 
-	public function testCalculationTypesNames(): void {
+	public function testPercentValueLabel(): void {
 		$type = new ProvisionType();
-
-		$this->tester->wantToTest('Empty type');
-		$type->setCalculationTypes([]);
-		foreach (IssuePayCalculation::getTypesNames() as $key => $name) {
-			$this->tester->assertTrue($type->isForCalculationType($key));
-		}
-		$this->tester->assertSame('All', $type->getCalculationTypesNames());
-
-		$this->tester->wantToTest('One type');
-		$type->setCalculationTypes([IssuePayCalculation::TYPE_ADMINISTRATIVE]);
-		foreach (IssuePayCalculation::getTypesNames() as $key => $name) {
-			if ($key === IssuePayCalculation::TYPE_ADMINISTRATIVE) {
-				$this->tester->assertTrue($type->isForCalculationType($key));
-			} else {
-				$this->tester->assertFalse($type->isForCalculationType($key));
-			}
-		}
-		$this->tester->assertSame('Administrative', $type->getCalculationTypesNames());
-
-		$this->tester->wantToTest('Multiple types');
-		$type->setCalculationTypes([IssuePayCalculation::TYPE_ADMINISTRATIVE, IssuePayCalculation::TYPE_LAWYER]);
-		$this->tester->assertTrue($type->isForCalculationType(IssuePayCalculation::TYPE_ADMINISTRATIVE));
-		$this->tester->assertTrue($type->isForCalculationType(IssuePayCalculation::TYPE_LAWYER));
-		$this->tester->assertFalse($type->isForCalculationType(IssuePayCalculation::TYPE_HONORARIUM));
-		$this->tester->assertSame('Administrative, Lawyer', $type->getCalculationTypesNames());
+		$type->is_percentage = true;
+		$this->tester->assertSame('Provision (%)', $type->getAttributeLabel('value'));
 	}
 
-	private function grabType(string $index): ProvisionType {
+	public function testNotPercentFormattedValue(): void {
+		$type = new ProvisionType();
+		$type->is_percentage = false;
+		$type->value = 20;
+		$this->assertSame(Yii::$app->formatter->asCurrency(20), $type->getFormattedValue());
+	}
+
+	public function testNotPercentValueLabel(): void {
+		$type = new ProvisionType();
+		$type->is_percentage = false;
+		$this->tester->assertSame('Provision (' . Yii::$app->formatter->getCurrencySymbol() . ')', $type->getAttributeLabel('value'));
+	}
+
+	protected function grabType(string $index): ProvisionType {
 		return $this->tester->grabFixture(ProvisionFixtureHelper::TYPE, $index);
 	}
 }

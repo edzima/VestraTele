@@ -1,6 +1,8 @@
 <?php
 
+use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\issue\IssueCost;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -34,6 +36,10 @@ YiiAsset::register($this);
 		'model' => $model,
 		'attributes' => [
 			[
+				'attribute' => 'user',
+				'visible' => $model->user !== null,
+			],
+			[
 				'attribute' => 'valueWithVAT',
 				'format' => 'currency',
 			],
@@ -48,4 +54,12 @@ YiiAsset::register($this);
 		],
 	]) ?>
 
+	<?= $model->getHasSettlements() ?
+		IssuePayCalculationGrid::widget([
+			'withCaption' => true,
+			'dataProvider' => new ActiveDataProvider([
+				'query' => $model->getSettlements(),
+			]),
+		])
+		: '' ?>
 </div>

@@ -50,7 +50,8 @@ class ProvisionUserForm extends Model {
 			[
 				'value', 'number', 'max' => 100, 'enableClientValidation' => false,
 				'when' => function () {
-					return $this->getType()->is_percentage;
+					$type = $this->getType();
+					return $type->is_percentage ?? false;
 				},
 			],
 			['from_user_id', 'compare', 'compareAttribute' => 'to_user_id', 'on' => static::SCENARIO_SELF],
@@ -100,7 +101,10 @@ class ProvisionUserForm extends Model {
 	}
 
 	public function getType(): ?ProvisionType {
-		return ProvisionType::getTypes()[$this->type_id] ?? null;
+		if ($this->type_id) {
+			return ProvisionType::getType($this->type_id, true);
+		}
+		return null;
 	}
 
 	public function setModel(ProvisionUser $model): void {
@@ -151,7 +155,7 @@ class ProvisionUserForm extends Model {
 	}
 
 	public static function getTypesNames(): array {
-		return ProvisionType::getTypesNames();
+		return ProvisionType::getTypesNames(true, true);
 	}
 
 	public static function getUserNames(): array {

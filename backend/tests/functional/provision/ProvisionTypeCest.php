@@ -58,9 +58,9 @@ class ProvisionTypeCest {
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_CREATE);
 		$I->fillField('Name', 'name');
-		$I->fillField('Provision value', 25);
+		$I->fillField('Value', 25);
 		$I->click('Save');
-		$I->see('name', 'h1');
+		$I->see('Name', 'h1');
 	}
 
 	public function checkView(ProvisionManager $I): void {
@@ -78,8 +78,8 @@ class ProvisionTypeCest {
 		$I->seeLink('Update');
 		$I->seeLink('Delete');
 		$I->seeLink('Create provision schema');
-		$I->see('Users with type');
-		$I->see('Users without type');
+		$I->see('With set type');
+		$I->see('Without set type');
 	}
 
 	public function checkCreateProvisionLink(ProvisionManager $I): void {
@@ -96,6 +96,6 @@ class ProvisionTypeCest {
 		$I->click('Create provision schema');
 		$I->seeInCurrentUrl(ProvisionUserCest::ROUTE_CREATE);
 		$I->seeInField('Value', $type->value);
-		$I->seeInField('Type', $type->name);
+		$I->seeInField('Type', $type->getNameWithValue());
 	}
 }

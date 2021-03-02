@@ -11,6 +11,11 @@ use yii\db\ActiveQuery;
  */
 class ProvisionTypeQuery extends ActiveQuery {
 
+	public function active(): self {
+		$this->andWhere(['is_active' => true]);
+		return $this;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 * @return ProvisionType[]|array
