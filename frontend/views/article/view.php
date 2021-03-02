@@ -22,7 +22,10 @@ $this->params['breadcrumbs'][] = $this->title;
 		<div class="row">
 			<div>
 				<div class="article-text">
-					<?= HtmlPurifier::process($model->body) ?>
+					<?= HtmlPurifier::process($model->body, function ($config) {
+						$config->set('HTML.SafeIframe', true);
+						$config->set('URI.SafeIframeRegexp', '%^(https?:)?//(www\.youtube(?:-nocookie)?\.com/embed/|player\.vimeo\.com/video/)%');
+					}) ?>
 				</div>
 				<hr/>
 			</div>

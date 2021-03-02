@@ -23,6 +23,6 @@ use yii\helpers\HtmlPurifier;
 	</div>
 
 	<div class="article-text">
-		<?= HtmlPurifier::process(Yii::t('frontend' . $model->title, 'description')) ?>
+		<?= HtmlPurifier::process($model->preview) ?>
 	</div>
 </div>

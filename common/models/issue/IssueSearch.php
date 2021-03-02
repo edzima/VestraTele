@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\models\AddressSearch;
 use common\models\AgentSearchInterface;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
@@ -14,6 +15,7 @@ use common\models\user\User;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
 
@@ -43,6 +45,8 @@ abstract class IssueSearch extends Model
 	public $agent_id;
 	public $lawyer_id;
 	public $tele_id;
+
+	public ?AddressSearch $addressSearch = null;
 
 	/**
 	 * @inheritdoc
@@ -97,6 +101,7 @@ abstract class IssueSearch extends Model
 	abstract public function search(array $params): ActiveDataProvider;
 
 	protected function issueQueryFilter(IssueQuery $query): void {
+		$this->addressFilter($query);
 		$this->archiveFilter($query);
 		$this->applyAgentsFilters($query);
 		$this->applyCustomerSurnameFilter($query);
@@ -107,6 +112,16 @@ abstract class IssueSearch extends Model
 			Issue::tableName() . '.type_id' => $this->type_id,
 			Issue::tableName() . '.entity_responsible_id' => $this->entity_responsible_id,
 		]);
+	}
+
+	protected function addressFilter(IssueQuery $query): void {
+		if ($this->addressSearch !== null && $this->addressSearch->validate()) {
+			$query->joinWith([
+				'customer.addresses.address' => function (ActiveQuery $addressQuery) {
+					$this->addressSearch->applySearch($addressQuery);
+				},
+			]);
+		}
 	}
 
 	protected function issueWith(): array {

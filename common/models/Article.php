@@ -16,6 +16,7 @@ use common\models\user\User;
  * @property integer $id
  * @property string $title
  * @property string $slug
+ * @property string $preview
  * @property string $body
  * @property integer $status
  * @property integer $category_id
@@ -38,14 +39,14 @@ class Article extends ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public static function tableName() {
+	public static function tableName(): string {
 		return '{{%article}}';
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			TimestampBehavior::class,
 			[
@@ -65,10 +66,10 @@ class Article extends ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules():array {
+	public function rules(): array {
 		return [
 			[['title', 'body', 'category_id'], 'required'],
-			[['body'], 'string'],
+			[['preview', 'body'], 'string'],
 			[
 				'published_at', 'default',
 				'value' => static function () {
@@ -93,6 +94,7 @@ class Article extends ActiveRecord {
 		return [
 			'title' => Yii::t('common', 'Title'),
 			'slug' => Yii::t('common', 'Slug'),
+			'preview' => Yii::t('common', 'Preview'),
 			'body' => Yii::t('common', 'Text'),
 			'status' => Yii::t('common', 'Status'),
 			'category_id' => Yii::t('common', 'Category'),
@@ -118,28 +120,24 @@ class Article extends ActiveRecord {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getAuthor() {
-		return $this->hasOne(User::className(), ['id' => 'author_id']);
+		return $this->hasOne(User::class, ['id' => 'author_id']);
 	}
 
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getCategory() {
-		return $this->hasOne(ArticleCategory::className(), ['id' => 'category_id']);
+		return $this->hasOne(ArticleCategory::class, ['id' => 'category_id']);
 	}
 
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getUpdater() {
-		return $this->hasOne(User::className(), ['id' => 'updater_id']);
+		return $this->hasOne(User::class, ['id' => 'updater_id']);
 	}
 
-	/**
-	 * @inheritdoc
-	 * @return \common\models\query\ArticleQuery the active query used by this AR class.
-	 */
-	public static function find() {
-		return new ArticleQuery(get_called_class());
+	public static function find(): ArticleQuery {
+		return new ArticleQuery(static::class);
 	}
 }

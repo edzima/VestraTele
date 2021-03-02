@@ -53,18 +53,62 @@ class IssueController extends Controller {
 			/** @var IssueQuery $query */
 			$query = clone($dataProvider->query);
 			$query->with('customer.userProfile');
+			$query->with('type');
+			$columns = [
+				[
+					'attribute' => 'longID',
+					'label' => 'Nr',
+				],
+				[
+					'attribute' => 'customer.fullName',
+					'label' => 'Imie nazwisko',
+				],
+				[
+					'attribute' => 'customer.userProfile.phone',
+					'label' => 'Telefon',
+				],
+				[
+					'attribute' => 'issue.type.name',
+					'label' => 'Typ',
+				],
+			];
+			$addressSearch = $searchModel->addressSearch;
+			if (!empty($addressSearch->region_id)
+				|| !empty($addressSearch->city_name)
+				|| !empty($addressSearch->postal_code)) {
+				$query->joinWith('customer.addresses.address.city.terc');
+
+				$addressColumns = [
+					[
+						'attribute' => 'customer.homeAddress.city.region.name',
+						'label' => Yii::t('address', 'Region'),
+					],
+					[
+						'attribute' => 'customer.homeAddress.city.terc.district.name',
+						'label' => Yii::t('address', 'District'),
+					],
+					[
+						'attribute' => 'customer.homeAddress.city.terc.commune.name',
+						'label' => Yii::t('address', 'Commune'),
+					],
+					[
+						'attribute' => 'customer.homeAddress.postal_code',
+						'label' => Yii::t('address', 'Code'),
+					],
+					[
+						'attribute' => 'customer.homeAddress.city.name',
+						'label' => Yii::t('address', 'City'),
+					],
+					[
+						'attribute' => 'customer.homeAddress.info',
+						'label' => Yii::t('address', 'Info'),
+					],
+				];
+				$columns = array_merge($columns, $addressColumns);
+			}
 			$exporter = new CsvGrid([
 				'query' => $query,
-				'columns' => [
-					[
-						'attribute' => 'customer.fullName',
-						'label' => 'Imie nazwisko',
-					],
-					[
-						'attribute' => 'customer.userProfile.phone',
-						'label' => 'Telefon',
-					],
-				],
+				'columns' => $columns,
 			]);
 			return $exporter->export()->send('export.csv');
 		}
@@ -83,6 +127,7 @@ class IssueController extends Controller {
 	public function actionView(int $id): string {
 		$model = $this->findModel($id);
 		$search = new IssuePayCalculationSearch();
+		$search->withArchive = true;
 		$search->issue_id = $id;
 		$calculationsDataProvider = $search->search([]);
 		$summonDataProvider = (new SummonSearch(['issue_id' => $model->id]))->search([]);

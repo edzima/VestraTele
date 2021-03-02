@@ -21,6 +21,22 @@ use vova07\imperavi\Widget;
 
 	<?= $form->field($model, 'slug')->textInput(['maxlength' => true]) ?>
 
+	<?= $form->field($model, 'preview')->widget(Widget::class, [
+		'settings' => [
+			'minHeight' => 200,
+			'plugins' => [
+				'filemanager',
+				'fullscreen',
+				'fontcolor',
+				'imagemanager',
+				'table',
+				'video',
+			],
+			'imageUpload' => Url::to(['/site/image-upload']),
+			'fileUpload' => Url::to(['/site/file-upload']),
+		],
+	]) ?>
+
 	<?= $form->field($model, 'body')->widget(Widget::class, [
 		'settings' => [
 			'minHeight' => 200,
@@ -61,7 +77,6 @@ use vova07\imperavi\Widget;
 			],
 		]
 	) ?>
-
 
 
 	<div class="form-group">

@@ -109,4 +109,7 @@ return [
 	'Receve at' => 'Receve at',
 	'Receve At' => 'Receve At',
 	'Costs sum' => 'Koszty',
+	'Calculation Types' => 'Typy rozliczeń',
+	'Settlement types' => 'Typy rozliczeń',
+	'External debt collection' => 'Firma windykacyjna'
 ];

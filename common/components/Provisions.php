@@ -72,6 +72,10 @@ class Provisions extends Component {
 		return $workersProvisions;
 	}
 
+	public function issuePayValue(IssuePay $pay): Decimal {
+		return $pay->getValueWithoutVAT()->sub($pay->getCosts(false));
+	}
+
 	/**
 	 * @param Worker $user
 	 * @param int $typeId
@@ -87,8 +91,7 @@ class Provisions extends Component {
 		$provisions = [];
 		foreach ($pays as $pay) {
 			foreach ($usersProvision as $provisionUser) {
-				$payValue = $pay->getValueWithoutVAT()->sub($pay->getCosts(false));
-				$value = $this->calculateProvision($provisionUser, $payValue);
+				$value = $this->calculateProvision($provisionUser, $this->issuePayValue($pay));
 				if ($value->isPositive()) {
 					$provisions[] = [
 						'pay_id' => $pay->id,

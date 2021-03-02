@@ -2,6 +2,7 @@
 
 namespace backend\modules\issue\models\search;
 
+use common\models\AddressSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch as BaseIssueSearch;
 use common\models\issue\query\IssueQuery;
@@ -23,6 +24,14 @@ class IssueSearch extends BaseIssueSearch {
 	public $accident_at;
 	public $excludedStages = [];
 	public bool $onlyDelayed = false;
+
+	public function __construct($config = []) {
+		if (!isset($config['addressSearch'])) {
+			$config['addressSearch'] = new AddressSearch();
+		}
+		parent::__construct($config);
+	}
+
 
 	public function rules(): array {
 		return array_merge(parent::rules(), [
@@ -56,6 +65,9 @@ class IssueSearch extends BaseIssueSearch {
 		]);
 
 		$this->load($params);
+		if ($this->addressSearch) {
+			$this->addressSearch->load($params);
+		}
 
 		if (!$this->validate()) {
 			$this->archiveFilter($query);

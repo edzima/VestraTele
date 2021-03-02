@@ -2,6 +2,7 @@
 
 use backend\modules\issue\models\search\IssueSearch;
 use common\models\user\User;
+use common\widgets\address\AddressSearchWidget;
 use common\widgets\DateTimeWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
@@ -121,6 +122,14 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'onlyDelayed', ['options' => ['class' => 'col-md-4']])->checkbox() ?>
 	</div>
+
+	<?= $model->addressSearch !== null
+		? AddressSearchWidget::widget([
+			'form' => $form,
+			'model' => $model->addressSearch,
+		])
+		: ''
+	?>
 
 
 	<div class="form-group">
