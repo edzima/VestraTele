@@ -4,6 +4,7 @@
         <ul class="filters-nav nav nav-pills">
             <li v-for="filter in filterGroup.filters"
                 :class="{active:filter.isActive}"
+                :data-id="filter.value"
                 class="filter-item nav-item"
             >
                 <a @click="filterClick(filter)"

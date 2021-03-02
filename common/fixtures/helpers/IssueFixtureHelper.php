@@ -2,8 +2,10 @@
 
 namespace common\fixtures\helpers;
 
+use common\fixtures\issue\CampaignFixture;
 use common\fixtures\issue\EntityResponsibleFixture;
 use common\fixtures\issue\IssueFixture;
+use common\fixtures\issue\IssueMeetFixture;
 use common\fixtures\issue\IssueUserFixture;
 use common\fixtures\issue\StageFixture;
 use common\fixtures\issue\StageTypesFixtures;
@@ -49,6 +51,7 @@ class IssueFixtureHelper {
 			static::entityResponsible(),
 			static::stageAndTypesFixtures(),
 			static::users(),
+			static::meet()
 		);
 	}
 
@@ -57,6 +60,22 @@ class IssueFixtureHelper {
 			'entity' => [
 				'class' => EntityResponsibleFixture::class,
 				'dataFile' => static::dataDir() . 'issue/entity_responsible.php',
+			],
+		];
+	}
+	public static function meet(): array {
+		return [
+			'issueMeet' => [
+				'class' => IssueMeetFixture::class,
+				'dataFile' => static::dataDir() . 'issue/issue_meet.php',
+			],
+		];
+	}
+	public static function campagin(): array {
+		return [
+			'campaign' => [
+				'class' => CampaignFixture::class,
+				'dataFile' => static::dataDir() . 'issue/campaign.php',
 			],
 		];
 	}
