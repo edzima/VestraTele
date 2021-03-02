@@ -33,6 +33,11 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Costs');
 				'filter' => IssueCostSearch::getTypesNames(),
 			],
 			[
+				'attribute' => 'user_id',
+				'value' => 'user',
+				'filter' => IssueCostSearch::getUsersNames(),
+			],
+			[
 				'attribute' => 'value',
 				'value' => 'valueWithVAT',
 				'format' => 'currency',

@@ -37,7 +37,7 @@ class ProvisionTypeSearch extends ProvisionType {
 	 * @return ActiveDataProvider
 	 */
 	public function search($params) {
-		$query = ProvisionType::find();
+		$query = IssueProvisionType::find();
 
 		// add conditions that should always apply here
 

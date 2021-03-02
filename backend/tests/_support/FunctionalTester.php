@@ -3,6 +3,7 @@
 namespace backend\tests;
 
 use common\tests\_support\UserRbacActor;
+use Yii;
 
 /**
  * Inherited Methods
@@ -82,5 +83,11 @@ class FunctionalTester extends \Codeception\Actor {
 
 	public function dontSeeFlash(string $text, string $type): void {
 		$this->dontSee($text, '.alert.alert-' . $type);
+	}
+
+	public function getCSRF(): array {
+		return [
+			Yii::$app->request->csrfParam => Yii::$app->request->csrfToken,
+		];
 	}
 }

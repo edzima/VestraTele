@@ -17,7 +17,7 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= $model->getIssue() ? '' : $form->field($model, 'issue_id', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput() ?>
+		<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-4 col-lg-3']])->dropDownList($model->getUserNames(), ['prompt' => Yii::t('common', 'Select...')]) ?>
 
 		<?= $form->field($model, 'type', ['options' => ['class' => 'col-md-4 col-lg-3']])->dropDownList(IssueCostForm::getTypesNames()) ?>
 

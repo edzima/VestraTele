@@ -80,6 +80,14 @@ if ($provision) {
 								'target' => '_blank',
 							]);
 					}
+					if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
+						$legend .= Html::a(Html::icon('usd'),
+							[
+								'/settlement/cost/create-installment',
+								'id' => $issueUser->issue_id,
+								'user_id' => $issueUser->user_id,
+							]);
+					}
 
 					return $legend;
 				},

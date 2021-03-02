@@ -12,6 +12,7 @@ use yii\base\BaseObject;
 class ProvisionUserData extends BaseObject {
 
 	public ?ProvisionType $type = null;
+	public ?string $date = null;
 
 	private User $user;
 
@@ -38,7 +39,7 @@ class ProvisionUserData extends BaseObject {
 			->select('type_id')
 			->distinct()
 			->column();
-		$types = ProvisionType::getTypes();
+		$types = ProvisionType::getTypes(true);
 		if (empty($typesIds)) {
 			return $types;
 		}
@@ -49,14 +50,14 @@ class ProvisionUserData extends BaseObject {
 	}
 
 	public function getSelfQuery(): ProvisionUserQuery {
-		return $this->applyTypeFilter(
+		return $this->applyFilter(
 			ProvisionUser::find()
 				->onlySelf($this->user->id)
 		);
 	}
 
 	public function getFromQuery(): ProvisionUserQuery {
-		return $this->applyTypeFilter(
+		return $this->applyFilter(
 			ProvisionUser::find()
 				->notSelf()
 				->onlyTo($this->user->id)
@@ -64,9 +65,8 @@ class ProvisionUserData extends BaseObject {
 	}
 
 	public function getToQuery(): ProvisionUserQuery {
-		return $this->applyTypeFilter(
+		return $this->applyFilter(
 			ProvisionUser::find()
-				->with('toUser.userProfile', 'type')
 				->notSelf()
 				->onlyFrom($this->user->id)
 		);
@@ -114,10 +114,22 @@ class ProvisionUserData extends BaseObject {
 		return $query;
 	}
 
-	private function applyTypeFilter(ProvisionUserQuery $query): ProvisionUserQuery {
+	public function applyFilter(ProvisionUserQuery $query): ProvisionUserQuery {
+		$this->applyDateFilter($query);
+		$this->applyTypeFilter($query);
+		return $query;
+	}
+
+	public function applyDateFilter(ProvisionUserQuery $query): void {
+		if ($this->date) {
+			$query->forDate($this->date);
+		}
+	}
+
+	public function applyTypeFilter(ProvisionUserQuery $query): void {
 		if ($this->type) {
 			$query->forType($this->type->id);
 		}
-		return $query;
 	}
+
 }

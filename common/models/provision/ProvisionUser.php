@@ -3,6 +3,7 @@
 namespace common\models\provision;
 
 use common\models\user\User;
+use DateTime;
 use Decimal\Decimal;
 use Yii;
 use yii\db\ActiveRecord;
@@ -61,8 +62,16 @@ class ProvisionUser extends ActiveRecord {
 			'to_at' => Yii::t('provision', 'To at'),
 			'fromUser' => Yii::t('provision', 'From'),
 			'toUser' => Yii::t('provision', 'To'),
+			'fromUserNameWhenNotSelf' => Yii::t('provision', 'From'),
 			'formattedValue' => Yii::t('provision', 'Provision'),
 		];
+	}
+
+	public function getFromUserNameWhenNotSelf(): ?string {
+		if ($this->isSelf()) {
+			return null;
+		}
+		return $this->fromUser->getFullName();
 	}
 
 	/**
@@ -113,6 +122,23 @@ class ProvisionUser extends ActiveRecord {
 
 	public function isSelf(): bool {
 		return $this->from_user_id === $this->to_user_id;
+	}
+
+	public function isForDate($date): bool {
+		if (empty($this->from_at) && empty($this->to_at)) {
+			return true;
+		}
+		if (!$date instanceof DateTime) {
+			$date = new DateTime($date);
+		}
+		if (!empty($this->from_at)) {
+			$fromAt = new DateTime($this->from_at);
+			if (empty($this->to_at)) {
+				return $date >= $fromAt;
+			}
+			return $date >= $fromAt && $date <= new DateTime($this->to_at);
+		}
+		return $date <= new DateTime($this->to_at);
 	}
 
 }

@@ -198,6 +198,6 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface {
 	}
 
 	public static function getTypesNames(): array {
-		return ProvisionType::getTypesNames();
+		return ProvisionType::getTypesNames(false);
 	}
 }

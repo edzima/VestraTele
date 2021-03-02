@@ -105,6 +105,7 @@ return [
 	'Update worker: {username}' => 'Edycja pracownika: {username}',
 	'User has been deleted.' => 'Użytkownik został usunięty.',
 	'Username' => 'Login',
+	'User' => 'Użytkownik',
 	'Users' => 'Użytkownicy',
 	'Workers' => 'Pracownicy',
 	'View all' => 'Zobacz wszystko',

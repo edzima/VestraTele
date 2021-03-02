@@ -5,6 +5,7 @@ namespace common\fixtures\helpers;
 use common\fixtures\provision\ProvisionFixture;
 use common\fixtures\provision\ProvisionTypeFixture;
 use common\fixtures\provision\ProvisionUserFixture;
+use common\models\provision\IssueProvisionType;
 use Yii;
 
 class ProvisionFixtureHelper {
@@ -38,6 +39,16 @@ class ProvisionFixtureHelper {
 		return [
 			static::TYPE => [
 				'class' => ProvisionTypeFixture::class,
+				'dataFile' => static::dataDir() . 'type.php',
+			],
+		];
+	}
+
+	public static function issueType(): array {
+		return [
+			static::TYPE => [
+				'class' => ProvisionTypeFixture::class,
+				'modelClass' => IssueProvisionType::class,
 				'dataFile' => static::dataDir() . 'type.php',
 			],
 		];

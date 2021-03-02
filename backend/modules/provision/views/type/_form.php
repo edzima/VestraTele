@@ -1,13 +1,14 @@
 <?php
 
 use backend\modules\provision\models\ProvisionTypeForm;
+use common\models\provision\IssueProvisionType;
 use common\widgets\DateWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model ProvisionTypeForm */
+/* @var $model IssueProvisionType */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -40,6 +41,15 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'issueTypesIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
 			'data' => ProvisionTypeForm::getIssueTypesNames(),
+			'options' => [
+				'multiple' => true,
+			],
+		])->hint(Yii::t('provision', 'Empty - all'))
+		?>
+
+
+		<?= $form->field($model, 'issueStagesIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+			'data' => ProvisionTypeForm::getIssueStagesNames(),
 			'options' => [
 				'multiple' => true,
 			],
