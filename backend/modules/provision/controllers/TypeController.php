@@ -6,7 +6,6 @@ use backend\modules\provision\models\ProvisionTypeForm;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
 use common\models\provision\IssueProvisionType;
-use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionTypeSearch;
 use common\models\provision\ProvisionUser;
 use common\models\provision\ProvisionUserSearch;
@@ -55,9 +54,7 @@ class TypeController extends Controller {
 		$model = $this->findCalculation($id);
 		$searchModel = new ProvisionTypeSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-		$dataProvider->setModels(array_filter($dataProvider->getModels(), function (ProvisionType $type) use ($model): bool {
-			return $type->isForCalculation($model);
-		}));
+		$dataProvider->setModels(IssueProvisionType::calculationFilter($dataProvider->getModels(), $model));
 
 		return $this->render('settlement', [
 			'model' => $model,
@@ -70,10 +67,10 @@ class TypeController extends Controller {
 	 * Displays a single ProvisionType model.
 	 *
 	 * @param integer $id
-	 * @return mixed
+	 * @return string
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView(int $id) {
+	public function actionView(int $id): string {
 		$model = $this->findModel($id);
 
 		$userWithTypesSearch = new ProvisionUserSearch();
@@ -183,11 +180,11 @@ class TypeController extends Controller {
 	 * If the model is not found, a 404 HTTP exception will be thrown.
 	 *
 	 * @param integer $id
-	 * @return ProvisionType the loaded model
+	 * @return IssueProvisionType the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	protected function findModel(int $id): IssueProvisionType {
-		if (($model = IssueProvisionType::findOne($id)) !== null) {
+		if (($model = IssueProvisionType::getType($id, false)) !== null) {
 			return $model;
 		}
 

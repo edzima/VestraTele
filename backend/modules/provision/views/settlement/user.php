@@ -13,6 +13,7 @@ use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CurrencyColumn;
 use common\widgets\settlement\SettlementDetailView;
 use Decimal\Decimal;
+use yii\bootstrap\Nav;
 use yii\data\ActiveDataProvider;
 use yii\web\View;
 
@@ -21,6 +22,7 @@ use yii\web\View;
 /* @var $issueCostDataProvider ActiveDataProvider */
 /* @var $userCostWithoutSettlementsDataProvider ActiveDataProvider */
 /* @var $settlementCostDataProvider ActiveDataProvider */
+/* @var $navTypesItems array */
 
 $this->title = Yii::t('provision', 'Generate provisions for: {user}', ['user' => $model->getIssueUser()->getTypeWithUser()]);
 $this->params['breadcrumbs'] = array_merge(
@@ -28,33 +30,36 @@ $this->params['breadcrumbs'] = array_merge(
 	Breadcrumbs::settlement($model->getModel())
 );
 $this->params['breadcrumbs'][] = ['label' => Yii::t('provision', 'Provisions'), 'url' => ['view', 'id' => $model->getModel()->id]];
-
 $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 
 ?>
 <div class="provision-settlement-user">
 
 	<p>
-		<?= Html::a(
-			Yii::t('provision', 'Schemas provisions'),
-			Url::userProvisions($model->getIssueUser()->user_id, $model->typeId),
-			['class' => 'btn btn-info'])
-		?>
+
 		<?= Html::a(
 			Yii::t('provision', 'Create provision type'),
 			['type/create-settlement', 'id' => $model->getModel()->id, 'issueUserType' => $model->getIssueUser()->type],
 			['class' => 'btn btn-success'])
 		?>
+
+		<?= Html::a(
+			Yii::t('provision', 'Schemas provisions'),
+			Url::userProvisions($model->getIssueUser()->user_id, $model->typeId),
+			['class' => 'btn btn-info'])
+		?>
+
 	</p>
 
-	<?= SettlementDetailView::widget([
-		'model' => $model->getModel(),
-		'withValueWithoutCosts' => true,
-	]) ?>
-
 	<div class="row">
+		<div class="col-md-4">
+			<?= SettlementDetailView::widget([
+				'model' => $model->getModel(),
+				'withOwner' => false,
+			]) ?>
+		</div>
 
-		<div class="col-md-6">
+		<div class="col-md-4">
 			<?= GridView::widget([
 					'dataProvider' => $userCostWithoutSettlementsDataProvider,
 					'toolbar' => [
@@ -100,7 +105,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 			) ?>
 		</div>
 
-		<div class="col-md-6">
+		<div class="col-md-4">
 			<?= GridView::widget([
 					'dataProvider' => $settlementCostDataProvider,
 					'panel' => [
@@ -110,10 +115,21 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 						'after' => false,
 						'footer' => false,
 					],
+					'showPageSummary' => true,
 					'columns' => [
 						['class' => IssueColumn::class],
 						'typeName',
-						['class' => CurrencyColumn::class,],
+						[
+							'class' => CurrencyColumn::class,
+							'pageSummary' => true,
+							'pageSummaryFunc' => function (array $decimals): Decimal {
+								$sum = new Decimal(0);
+								foreach ($decimals as $decimal) {
+									$sum = $sum->add($decimal);
+								}
+								return $sum;
+							},
+						],
 						[
 							'class' => ActionColumn::class,
 							'controller' => '/settlement/cost',
@@ -133,12 +149,23 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 				]
 			) ?>
 		</div>
+
 	</div>
 
+	<?= Nav::widget([
+		'items' => $navTypesItems,
+		'options' => ['class' => 'nav-pills'],
+	]) ?>
+
+	<?= !empty($model->getTypesNames())
+		? $this->render('_user_form', ['model' => $model])
+		: ''
+	?>
 
 	<?= UserProvisionsWidget::widget([
 		'userData' => $model->getData(),
 		'withFrom' => false,
+		'withTypeDetail' => false,
 		'extraProvisionsColumns' => [
 			[
 				'class' => CurrencyColumn::class,
@@ -152,14 +179,11 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 				'class' => CurrencyColumn::class,
 				'label' => Yii::t('provision', 'Base Value'),
 				'value' => static function (ProvisionUser $data) use ($model): Decimal {
-					return $model->getPaysSum($data);
+					return $model->getPaysSum();
 				},
 			],
 		],
 	]) ?>
-
-
-	<?= $this->render('_user_form', ['model' => $model,]) ?>
 
 
 </div>

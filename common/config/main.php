@@ -52,7 +52,6 @@ return [
 		],
 		'formatter' => [
 			'class' => Formatter::class,
-			'nullDisplay' => '',
 			'decimalSeparator' => ',',
 			'thousandSeparator' => ' ',
 			'currencyCode' => 'PLN',

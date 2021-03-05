@@ -8,6 +8,7 @@ use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
+use common\models\provision\IssueProvisionType;
 use common\models\provision\ProvisionType;
 use common\tests\_support\UnitModelTrait;
 use yii\base\Model;
@@ -24,7 +25,7 @@ class ProvisionTypeFormTest extends Unit {
 
 	public function _before(): void {
 		parent::_before();
-		$this->tester->haveFixtures(ProvisionFixtureHelper::type());
+		$this->tester->haveFixtures(ProvisionFixtureHelper::issueType());
 		$this->giveModel();
 	}
 
@@ -32,7 +33,7 @@ class ProvisionTypeFormTest extends Unit {
 		$this->model = new ProvisionTypeForm();
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Name cannot be blank.', 'name');
-		$this->thenSeeError('Provision value cannot be blank.', 'value');
+		$this->thenSeeError('Value cannot be blank.', 'value');
 	}
 
 	public function testPercentage(): void {
@@ -48,7 +49,7 @@ class ProvisionTypeFormTest extends Unit {
 	public function testPercentageGreaterThanHundred(): void {
 		$this->giveModel(true, ['value' => 101]);
 		$this->thenUnsuccessValidate();
-		$this->thenSeeError('Provision value must be no greater than 100.', 'value');
+		$this->thenSeeError('Value must be no greater than 100.', 'value');
 	}
 
 	public function testPercentageAsHundred(): void {
@@ -64,7 +65,7 @@ class ProvisionTypeFormTest extends Unit {
 	public function testPercentageAsNegative(): void {
 		$this->giveModel(true, ['value' => -1]);
 		$this->thenUnsuccessSave();
-		$this->thenSeeError('Provision value must be no less than 0.', 'value');
+		$this->thenSeeError('Value must be no less than 0.', 'value');
 	}
 
 	public function testRandomPercentage(): void {
@@ -85,7 +86,7 @@ class ProvisionTypeFormTest extends Unit {
 	public function testNotPercentageAsNegative(): void {
 		$this->giveModel(false, ['value' => -1]);
 		$this->thenUnsuccessSave();
-		$this->thenSeeError('Provision value must be no less than 0.', 'value');
+		$this->thenSeeError('Value must be no less than 0.', 'value');
 	}
 
 	public function testNotPercentageAsGreatherThan100(): void {
@@ -222,14 +223,14 @@ class ProvisionTypeFormTest extends Unit {
 		$this->model = new ProvisionTypeForm($config);
 	}
 
-	protected function grabModel(array $attributes = []): ?ProvisionType {
+	protected function grabModel(array $attributes = []): ?IssueProvisionType {
 		if (!isset($attributes['name'])) {
 			$attributes['name'] = static::DEFAULT_NAME;
 		}
 		if (!isset($attributes['value'])) {
 			$attributes['value'] = static::DEFAULT_VALUE;
 		}
-		return $this->tester->grabRecord(ProvisionType::class, $attributes);
+		return $this->tester->grabRecord(IssueProvisionType::class, $attributes);
 	}
 
 	public function getModel(): Model {

@@ -15,6 +15,7 @@ class UserProvisionsWidget extends Widget {
 	public ProvisionUserData $userData;
 
 	public bool $withFrom = true;
+	public bool $withTypeDetail = true;
 
 	public $dataProviderConfig = [
 		'pagination' => false,

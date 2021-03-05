@@ -1,5 +1,6 @@
 <?php
 
+use backend\helpers\Html;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\widgets\CsvForm;
 use backend\widgets\GridView;
@@ -11,7 +12,6 @@ use kartik\grid\ActionColumn;
 use kartik\grid\DataColumn;
 use kartik\grid\SerialColumn;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Html;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
@@ -106,7 +106,14 @@ JS;
 				'options' => [
 					'style' => 'width:110px',
 				],
+				'template' => '{view} {installment} {update} {delete}',
+				'buttons' => [
+					'installment' => function (string $url, Issue $model): string {
+						return Html::a(Html::icon('usd'), ['/settlement/cost/create-installment', 'id' => $model->id, 'user_id' => $model->agent->id]);
+					},
+				],
 				'visibleButtons' => [
+					'installment' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
 					'view' => static function (Issue $model) use ($searchModel): bool {
 						return !$model->isArchived() || $searchModel->withArchive;
 					},

@@ -2,8 +2,8 @@
 
 use backend\helpers\Breadcrumbs;
 use backend\helpers\Html;
+use backend\modules\provision\models\SettlementUserProvisionsForm;
 use common\models\issue\IssuePayCalculation;
-use common\models\provision\ProvisionType;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use common\widgets\settlement\SettlementDetailView;
@@ -12,8 +12,8 @@ use yii\web\View;
 
 /* @var $this View */
 /* @var $model IssuePayCalculation */
-/* @var $types ProvisionType[] */
 /* @var $dataProvider ActiveDataProvider */
+/* @var $userModels SettlementUserProvisionsForm[] */
 
 $this->title = Yii::t('provision', 'Settlement provisions: {type}', ['type' => $model->getTypeName()]);
 $this->params['breadcrumbs'] = array_merge(
@@ -23,58 +23,47 @@ $this->params['breadcrumbs'] = array_merge(
 $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 
 ?>
-<div class="provision-settlement-user">
-
+<div class="provision-settlement-view">
+	<p>
+		<?= Html::a(
+			Yii::t('provision', 'Provisions types'),
+			['type/settlement', 'id' => $model->id],
+			['class' => 'btn btn-info'])
+		?>
+	</p>
 
 	<div class="row">
-		<div class="col-md-6">
+		<div class="col-md-4 col-lg-3">
 			<?= SettlementDetailView::widget([
 				'model' => $model,
-				'withValueWithoutCosts' => true,
 			]) ?>
 		</div>
 
-		<div class="col-md-6">
-
-			<p>
-				<?= Html::a(
-					Yii::t('provision', 'Provisions types'),
-					['type/settlement', 'id' => $model->id],
-					['class' => 'btn btn-info'])
-				?>
-			</p>
+		<div class="col-md-8 col-lg-9 users-grid-wrapper">
 			<?
+			foreach ($userModels as $userModel) {
 
-			foreach ($model->issue->users as $issueUser) {
-				$userTypes = array_filter($types, function (ProvisionType $type) use ($issueUser): bool {
-					return $type->isForIssueUser($issueUser->type);
-				});
-				echo Html::tag('h4',
-					Html::encode($issueUser->getTypeWithUser())
-					. Html::a(
-						Html::icon('plus'),
-						['type/create-settlement', 'id' => $model->id, 'issueUserType' => $issueUser->type], [
-						'class' => 'btn btn-success',
-						'title' => Yii::t('provision', 'Create provision type'),
-
-					])
-				);
-
-				if (!empty($userTypes)) {
-					echo Html::ul($userTypes, [
-						'item' => function (ProvisionType $type) use ($model): string {
-							return 'Generuj: ' . Html::a(
-									Html::encode($type->name),
-									['user', 'id' => $model->id, 'issueUserType' => $type->getIssueUserType(), 'typeId' => $type->id]
-								);
-						},
-					]);
-				}
+				echo $this->render('_user_types', [
+					'model' => $userModel,
+				]);
 			}
-
 			?>
 		</div>
 	</div>
+
+	<p>
+		<?= Html::a(
+			Yii::t('provision', 'Delete provisions'),
+			['delete', 'id' => $model->id],
+			[
+				'class' => 'btn btn-danger',
+				'disabled' => $dataProvider->getTotalCount() === 0,
+				'data-method' => 'POST',
+				'data-confirm' => Yii::t('backend', 'Are you sure you want to delete all provisions for this settlement?'),
+			]
+		)
+		?>
+	</p>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,

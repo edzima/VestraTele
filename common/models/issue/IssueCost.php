@@ -119,6 +119,12 @@ class IssueCost extends ActiveRecord implements
 		];
 	}
 
+	public static function userFilter(array $costs, int $userId): array {
+		return array_filter($costs, static function (IssueCost $cost) use ($userId): bool {
+			return $cost->user_id === null || $cost->user_id === $userId;
+		});
+	}
+
 	/**
 	 * @param static[] $costs
 	 * @return Decimal

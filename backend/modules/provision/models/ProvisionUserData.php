@@ -49,6 +49,10 @@ class ProvisionUserData extends BaseObject {
 		return $types;
 	}
 
+	public function hasSelfies(): bool {
+		return $this->getSelfQuery()->exists();
+	}
+
 	public function getSelfQuery(): ProvisionUserQuery {
 		return $this->applyFilter(
 			ProvisionUser::find()

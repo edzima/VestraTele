@@ -32,10 +32,11 @@ class Provisions extends Component {
 		return $this->types;
 	}
 
-	public function removeForPays(array $ids): void {
+	public function removeForPays(array $ids): int {
 		if (!empty($ids)) {
-			Provision::deleteAll(['pay_id' => $ids]);
+			return Provision::deleteAll(['pay_id' => $ids]);
 		}
+		return 0;
 	}
 
 	public function hasAllProvisions(Worker $user, string $userType): bool {

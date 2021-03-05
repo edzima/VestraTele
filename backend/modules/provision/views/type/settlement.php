@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="provision-type-index">
 
 	<p>
-		<?= Html::a(Yii::t('backend', 'Create'), ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('backend', 'Create'), ['create-settlement', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
 	</p>
 
 

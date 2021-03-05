@@ -17,6 +17,8 @@ class ProvisionTypeCest {
 	public const ROUTE_CREATE = '/provision/type/create';
 	/** @see TypeController::actionView() */
 	public const ROUTE_VIEW = '/provision/type/view';
+	/** @see TypeController::actionSettlement() */
+	public const ROUTE_SETTLEMENT = '/provision/type/settlement';
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();

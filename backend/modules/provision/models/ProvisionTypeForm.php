@@ -3,7 +3,6 @@
 namespace backend\modules\provision\models;
 
 use common\models\provision\IssueProvisionType;
-use common\models\provision\ProvisionType;
 use Yii;
 use yii\base\Model;
 use yii\db\QueryInterface;
@@ -33,7 +32,7 @@ class ProvisionTypeForm extends Model {
 			[['name', 'value', 'is_percentage', 'issueUserType', 'is_active', 'with_hierarchy'], 'required'],
 			['name', 'string', 'max' => 50],
 			[
-				'name', 'unique', 'targetClass' => ProvisionType::class,
+				'name', 'unique', 'targetClass' => IssueProvisionType::class,
 				'filter' => function (QueryInterface $query): void {
 					if (!$this->getModel()->isNewRecord) {
 						$query->andWhere(['not', 'id' => $this->getModel()->id]);
@@ -47,6 +46,7 @@ class ProvisionTypeForm extends Model {
 				'when' => function (): bool {
 					return $this->is_percentage;
 				},
+				'enableClientValidation' => false,
 			],
 			[['only_with_tele', 'is_default', 'is_percentage', 'is_active', 'with_hierarchy'], 'boolean'],
 			['calculationTypes', 'in', 'range' => array_keys(static::getCalculationTypesNames()), 'allowArray' => true],
@@ -66,7 +66,7 @@ class ProvisionTypeForm extends Model {
 		]);
 	}
 
-	public function setModel(ProvisionType $model): void {
+	public function setModel(IssueProvisionType $model): void {
 		$this->model = $model;
 		$this->name = $model->name;
 		$this->is_percentage = $model->is_percentage;

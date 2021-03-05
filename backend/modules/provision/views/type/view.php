@@ -63,7 +63,7 @@ YiiAsset::register($this);
 				'columns' => [
 					'fromUserNameWhenNotSelf',
 					'toUser',
-					'value',
+					'formattedValue',
 					'from_at:date',
 					'to_at:date',
 					[
