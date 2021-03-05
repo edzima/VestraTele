@@ -6,7 +6,7 @@ use common\components\keyStorage\KeyStorage;
 use common\components\PayComponent;
 use common\components\Provisions;
 use common\components\TaxComponent;
-use common\components\Formatter;
+use common\formatters\Formatter;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\czater\Czater;
@@ -63,7 +63,6 @@ return [
 		],
 		'formatter' => [
 			'class' => Formatter::class,
-			'nullDisplay' => '',
 			'defaultTimeZone' => 'Europe/Warsaw',//@todo load from .env
 			'decimalSeparator' => ',',
 			'thousandSeparator' => ' ',

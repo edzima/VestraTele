@@ -29,7 +29,7 @@ class SettlementCest {
 			IssueFixtureHelper::fixtures(),
 			IssueFixtureHelper::settlements(),
 			ProvisionFixtureHelper::user(),
-			ProvisionFixtureHelper::type(),
+			ProvisionFixtureHelper::issueType(),
 		);
 	}
 
@@ -39,11 +39,20 @@ class SettlementCest {
 		$I->see('Settlement provisions: ' . $settlement->getTypeName());
 	}
 
+	public function checkTypesLinkOnViewPage(ProvisionManager $I): void {
+		$settlement = $this->grabSettlement('not-payed');
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $settlement->id]);
+		$I->seeLink('Provisions types');
+		$I->click('Provisions types');
+		$I->seeInCurrentUrl(ProvisionTypeCest::ROUTE_SETTLEMENT);
+		$I->see('Provisions types for settlement: ' . $settlement->getTypeName());
+	}
+
 	public function checkSettlementWithoutTypes(ProvisionManager $I): void {
 		$this->goToUserPage($this->grabSettlement('lawyer')->id, IssueUser::TYPE_AGENT);
 		$I->seeResponseCodeIsSuccessful();
 		$I->see('Generate provisions for: agent - agent2');
-		$I->seeFlash('Not active types for settlement.', Flash::TYPE_WARNING);
+		$I->seeFlash('Not active types for this settlement.', Flash::TYPE_WARNING);
 		$I->seeLink('Create provision type');
 		$I->click('Create provision type');
 		$I->seeInField('Name', 'Lawyer - Accident');

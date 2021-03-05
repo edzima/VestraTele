@@ -6,8 +6,10 @@ use backend\modules\provision\models\SettlementUserProvisionsForm;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
+use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
+use Decimal\Decimal;
 use yii\base\InvalidConfigException;
 
 class SettlementUserProvisionsFormTest extends Unit {
@@ -18,20 +20,29 @@ class SettlementUserProvisionsFormTest extends Unit {
 		parent::_before();
 		$this->tester->haveFixtures(array_merge(
 			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements(true),
-			ProvisionFixtureHelper::type(),
+			IssueFixtureHelper::settlements(true, codecept_data_dir() . 'provision/'),
+			ProvisionFixtureHelper::issueType(),
 			ProvisionFixtureHelper::user()
 		));
 	}
 
+	public function testNotExistedIssueUserType(): void {
+		$this->tester->expectThrowable(InvalidConfigException::class, function () {
+			$this->giveForm($this->grabCalculation('without-telemarketer'), IssueUser::TYPE_TELEMARKETER);
+		});
+		$this->tester->expectThrowable(InvalidConfigException::class, function () {
+			$this->giveForm($this->grabCalculation('without-telemarketer'), 'not-existed-issue-user-type');
+		});
+	}
+
 	public function testTypesForAgent(): void {
 		$this->tester->wantToTest('Agent administrative type.');
-		$this->giveForm($this->grabCalculation('not-payed'));
+		$this->giveForm($this->grabCalculation('administrative'));
 		$this->tester->assertNotEmpty($this->model->getTypes());
 		$this->tester->assertArrayHasKey(3, $this->model->getTypes());
 
 		$this->tester->wantToTest('Agent honorarium type.');
-		$this->giveForm($this->grabCalculation('many-pays'));
+		$this->giveForm($this->grabCalculation('honorarium'));
 		$this->tester->assertNotEmpty($this->model->getTypes());
 		$this->tester->assertArrayHasKey(1, $this->model->getTypes());
 
@@ -40,14 +51,19 @@ class SettlementUserProvisionsFormTest extends Unit {
 		$this->tester->assertEmpty($this->model->getTypes());
 	}
 
-	public function testSelfSchemaProvision(): void {
-		$this->giveForm($this->grabCalculation('not-payed'));
-	}
-
-	public function testNotExistedIssueUserType(): void {
-		$this->tester->expectThrowable(InvalidConfigException::class, function () {
-			$this->giveForm($this->grabCalculation('with-problem-status'), IssueUser::TYPE_TELEMARKETER);
-		});
+	public function testCostSum(): void {
+		$this->giveForm($this->grabCalculation('administrative'));
+		$this->tester->assertTrue((new Decimal(230))->equals($this->model->getCostSum()));
+		$this->model->getModel()->unlinkCosts();
+		$this->tester->assertTrue((new Decimal(0))->equals($this->model->getCostSum()));
+		$costId = $this->tester->haveRecord(IssueCost::class, [
+			'issue_id' => 3,
+			'value' => 123,
+			'vat' => 23,
+		]);
+		$this->model->getModel()->linkCosts([$costId]);
+		codecept_debug($this->model->getCostSum());
+		$this->tester->assertTrue((new Decimal(100))->equals($this->model->getCostSum()));
 	}
 
 	/**

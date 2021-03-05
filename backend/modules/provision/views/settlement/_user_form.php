@@ -17,10 +17,7 @@ use yii\widgets\ActiveForm;
 		]
 	); ?>
 
-	<?= count($model->getTypesNames()) > 1
-		? $form->field($model, 'typeId')->dropDownList($model->getTypesNames())
-		: ''
-	?>
+	<?= $form->field($model, 'typeId')->dropDownList($model->getTypesNames())->hiddenInput()->label(false) ?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Generate'), ['class' => 'btn btn-success']) ?>

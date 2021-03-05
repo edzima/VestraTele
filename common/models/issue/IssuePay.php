@@ -152,22 +152,27 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 	}
 
 	public function getPartInfo(): string {
-		if ($this->getValue()->equals($this->calculation->getValue())) {
+		$index = $this->getSettlementPartIndex();
+		if ($index === 1) {
 			return '1/1';
+		}
+		return $index . '/' . count($this->calculation->pays);
+	}
+
+	public function getSettlementPartIndex(): int {
+		if ($this->getValue()->equals($this->calculation->getValue())
+			|| count($this->calculation->pays) === 1) {
+			return 1;
 		}
 		$pays = $this->calculation->pays;
-		$count = count($pays);
-		if ($count === 1) {
-			return '1/1';
-		}
 		$i = 0;
 		foreach ($pays as $pay) {
 			$i++;
 			if ($pay->id === $this->id) {
-				return $i . '/' . $count;
+				break;
 			}
 		}
-		return '';
+		return $i;
 	}
 
 	public function getStatusName(): ?string {
@@ -213,6 +218,7 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 	}
 
 	public function getCosts(bool $withVAT = false): Decimal {
+		//@todo without div by pays count, first sub sum costs.
 		if ($this->calculation->hasCosts) {
 			return $this->calculation->getCostsSum($withVAT)
 				->div($this->calculation->getPaysCount());

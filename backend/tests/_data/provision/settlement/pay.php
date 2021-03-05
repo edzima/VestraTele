@@ -3,7 +3,7 @@
 use common\models\issue\IssuePay;
 
 return [
-	'not-payed' =>[
+	'not-payed' => [
 		'calculation_id' => 1,
 		'value' => 1230,
 		'vat' => 23,

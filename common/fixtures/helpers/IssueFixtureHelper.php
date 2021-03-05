@@ -34,8 +34,8 @@ class IssueFixtureHelper {
 
 	public const SUMMON = 'summon';
 
-	public static function dataDir(): string {
-		return Yii::getAlias('@common/tests/_data/');
+	public static function dataDir(string $path = null): string {
+		return $path ? $path : Yii::getAlias('@common/tests/_data/');
 	}
 
 	public static function fixtures(): array {
@@ -60,7 +60,6 @@ class IssueFixtureHelper {
 			],
 		];
 	}
-
 
 	public static function stageAndTypesFixtures(): array {
 		return [
@@ -107,25 +106,26 @@ class IssueFixtureHelper {
 		return $users;
 	}
 
-	public static function settlements(bool $withCost = false): array {
+	public static function settlements(bool $withCost = false, string $dataDir = null): array {
+
 		$fixtures = [
 			static::CALCULATION => [
 				'class' => CalculationFixture::class,
-				'dataFile' => static::dataDir() . 'settlement/calculation.php',
+				'dataFile' => static::dataDir($dataDir) . 'settlement/calculation.php',
 			],
 			static::PAY => [
 				'class' => PayFixture::class,
-				'dataFile' => static::dataDir() . 'settlement/pay.php',
+				'dataFile' => static::dataDir($dataDir) . 'settlement/pay.php',
 			],
 		];
 		if ($withCost) {
 			$fixtures['cost'] = [
 				'class' => CostFixture::class,
-				'dataFile' => static::dataDir() . 'settlement/cost.php',
+				'dataFile' => static::dataDir($dataDir) . 'settlement/cost.php',
 			];
 			$fixtures['calculation-cost'] = [
 				'class' => CalculationCostFixture::class,
-				'dataFile' => static::dataDir() . 'settlement/calculation-cost.php',
+				'dataFile' => static::dataDir($dataDir) . 'settlement/calculation-cost.php',
 			];
 		}
 		return $fixtures;

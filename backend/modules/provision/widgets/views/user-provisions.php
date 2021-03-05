@@ -27,7 +27,7 @@ $context = $this->context;
 <div class="user-provisions">
 
 
-	<?php if ($model->hasType()): ?>
+	<?php if ($model->hasType() && $context->withTypeDetail): ?>
 		<p>
 			<?= Html::a(
 				Yii::t('provision', 'Update provision type'),
@@ -120,7 +120,7 @@ $context = $this->context;
 				[
 					'attribute' => 'type.name',
 					'visible' => !$model->hasType(),
-				],
+				],//@todo only percent type
 				'formattedValue',
 				'from_at:date',
 				'to_at:date',

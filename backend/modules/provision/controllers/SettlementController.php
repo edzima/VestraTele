@@ -3,7 +3,6 @@
 namespace backend\modules\provision\controllers;
 
 use backend\helpers\Url;
-use backend\modules\provision\models\SettlementProvisionsForm;
 use backend\modules\provision\models\SettlementUserProvisionsForm;
 use common\helpers\Flash;
 use common\models\issue\IssueCost;
@@ -13,6 +12,7 @@ use common\models\provision\Provision;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -27,9 +27,12 @@ class SettlementController extends Controller {
 			'pagination' => false,
 			'sort' => false,
 		]);
+		$userModels = [];
+		foreach ($model->issue->users as $issueUser) {
+			$userModels[] = new SettlementUserProvisionsForm($model, $issueUser->type);
+		}
 
-		$types = IssueProvisionType::findCalculationTypes($model);
-		if (empty($types)) {
+		if (empty(IssueProvisionType::findCalculationTypes($model))) {
 			Flash::add(Flash::TYPE_WARNING,
 				Yii::t('provision', 'Not active types for settlement.')
 			);
@@ -40,38 +43,24 @@ class SettlementController extends Controller {
 		return $this->render('view', [
 			'model' => $model,
 			'dataProvider' => $dataProvider,
-			'types' => $types,
-		]);
-	}
-
-	public function actionSet(int $id) {
-		$settlement = $this->findModel($id);
-
-		$model = new SettlementProvisionsForm($settlement);
-
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(Url::previous());
-		}
-		return $this->render('set', [
-			'model' => $model,
+			'userModels' => $userModels,
 		]);
 	}
 
 	public function actionUser(int $id, string $issueUserType, int $typeId = null) {
 		$settlement = $this->findModel($id);
-		$model = new SettlementUserProvisionsForm($settlement, $issueUserType);
 
-		if (empty($model->getTypes())) {
-			Flash::add(Flash::TYPE_WARNING,
-				Yii::t('provision', 'Not active types for settlement.')
-			);
+		try {
+			$model = new SettlementUserProvisionsForm($settlement, $issueUserType);
+		} catch (InvalidConfigException $e) {
+			throw new NotFoundHttpException($e->getMessage());
 		}
 
 		if ($typeId) {
 			try {
 				$model->setType($this->findType($typeId));
 			} catch (InvalidConfigException $e) {
-				throw new NotFoundHttpException($e->getMessage());
+				throw new NotFoundHttpException();
 			}
 		} else {
 			$types = $model->getTypes();
@@ -81,33 +70,64 @@ class SettlementController extends Controller {
 			}
 		}
 
+		if (empty($model->getTypes())) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('provision', 'Not active {userType} types for settlement.', ['userType' => $model->getIssueUser()->getTypeName()])
+			);
+		}
+
+		$navTypesItems = [];
+		foreach ($model->getTypes() as $type) {
+			$navTypesItems[] = [
+				'label' => $type->getNameWithTypeName(),
+				'url' => ['user', 'id' => $id, 'issueUserType' => $issueUserType, 'typeId' => $type->id],
+				'active' => $type->id === $typeId,
+			];
+		}
+
 		Url::remember();
 
 		$userCostWithoutSettlementsDataProvider = new ActiveDataProvider([
 			'query' => IssueCost::find()
-				->andWhere(['user_id' => $model->getIssueUser()->user_id])
-				->withoutSettlements(),
+				->withoutSettlements()
+				->andWhere([
+					'or', [
+						'user_id' => $model->getIssueUser()->user_id,
+					], [
+						IssueCost::tableName() . '.issue_id' => $settlement->getIssueId(),
+						'user_id' => null,
+					],
+				]),
+
 		]);
 
-		$settlementCostDataProvider = new ActiveDataProvider([
-				'query' => $settlement->getCosts()
-					->andWhere([
-						'or', [
-							'user_id' => null,
-							'user_id' => $model->getIssueUser()->user_id,
-						],
-					]),
+		$settlementCostDataProvider = new ArrayDataProvider([
+				'allModels' => $settlement->getCostForUser($model->getIssueUser()->user_id),
+				'modelClass' => IssueCost::class,
 			]
 		);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $id]);
 		}
+
 		return $this->render('user', [
 			'model' => $model,
+			'navTypesItems' => $navTypesItems,
 			'userCostWithoutSettlementsDataProvider' => $userCostWithoutSettlementsDataProvider,
 			'settlementCostDataProvider' => $settlementCostDataProvider,
 		]);
+	}
+
+	public function actionDelete(int $id) {
+		$model = $this->findModel($id);
+		$count = Yii::$app->provisions->removeForPays($model->getPays()->getIds());
+		if ($count) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('provision', 'Remove {count} provisions.', ['count' => $count]));
+		}
+
+		return $this->redirect(['view', 'id' => $id]);
 	}
 
 	private function findModel(int $id): IssuePayCalculation {

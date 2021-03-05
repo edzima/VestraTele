@@ -6,7 +6,7 @@ use backend\helpers\Url;
 use backend\modules\provision\models\ProvisionUserData;
 use backend\modules\provision\models\ProvisionUserForm;
 use common\helpers\Flash;
-use common\models\provision\ProvisionType;
+use common\models\provision\IssueProvisionType;
 use common\models\provision\ProvisionUser;
 use common\models\provision\ProvisionUserSearch;
 use common\models\user\User;
@@ -176,20 +176,31 @@ class UserController extends Controller {
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}
 
-	private function findType(int $typeId, bool $onlyActive): ProvisionType {
-		$model = ProvisionType::getType($typeId, $onlyActive);
+	/**
+	 * @param int $typeId
+	 * @param bool $onlyActive
+	 * @return IssueProvisionType
+	 * @throws NotFoundHttpException
+	 */
+	private function findType(int $typeId, bool $onlyActive): IssueProvisionType {
+		$model = IssueProvisionType::getType($typeId, $onlyActive);
 		if ($model !== null) {
 			return $model;
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}
 
+	/**
+	 * @param int $id
+	 * @return User
+	 * @throws NotFoundHttpException
+	 */
 	private function findUser(int $id): User {
 		$user = User::findOne($id);
-		if ($user === null) {
-			throw new NotFoundHttpException();
+		if ($user !== null) {
+			return $user;
 		}
-		return $user;
+		throw new NotFoundHttpException('The requested page does not exist.');
 	}
 
 }

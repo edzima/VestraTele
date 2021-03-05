@@ -133,16 +133,20 @@ class IssueProvisionType extends ProvisionType {
 		return $this->getIssueUserType() === $type;
 	}
 
-	public function isForCalculation(IssuePayCalculation $calculation, string $issueUserType = null) {
+	public static function findCalculationTypes(IssuePayCalculation $calculation, string $issueUserType = null, bool $onlyActive = true): array {
+		return static::calculationFilter(static::getTypes($onlyActive, true), $calculation, $issueUserType);
+	}
+
+	public static function calculationFilter(array $types, IssuePayCalculation $calculation, string $issueUserType = null): array {
+		return ArrayHelper::index(array_filter($types, static function (IssueProvisionType $provisionType) use ($calculation, $issueUserType) {
+			return $provisionType->isForCalculation($calculation, $issueUserType);
+		}), static::INDEX_KEY);
+	}
+
+	public function isForCalculation(IssuePayCalculation $calculation, string $issueUserType = null): bool {
 		return $this->isForCalculationType($calculation->type)
 			&& $this->isForIssue($calculation->issue)
 			&& (!$issueUserType ? true : $this->isForIssueUser($issueUserType));
-	}
-
-	public static function findCalculationTypes(IssuePayCalculation $calculation, bool $onlyActive = true, string $issueUserType = null): array {
-		return ArrayHelper::index(array_filter(static::getTypes($onlyActive, true), static function (ProvisionType $provisionType) use ($calculation, $issueUserType) {
-			return $provisionType->isForCalculation($calculation, $issueUserType);
-		}), 'id');
 	}
 
 	public static function calculationTypesNames(): array {

@@ -6,7 +6,6 @@ use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
 use common\models\provision\IssueProvisionType;
-use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionUser;
 use Decimal\Decimal;
 use Yii;
@@ -20,19 +19,47 @@ class SettlementUserProvisionsForm extends Model {
 
 	private IssuePayCalculation $model;
 	private IssueUser $user;
-	/* @var ProvisionType[] */
+	/* @var IssueProvisionType[] */
 	private ?array $types = null;
 
 	private ProvisionUserData $provisionData;
 
+	public function rules(): array {
+		return [
+			['typeId', 'required'],
+			['typeId', 'in', 'range' => array_keys($this->getTypes())],
+		];
+	}
+
+	/**
+	 * SettlementUserProvisionsForm constructor.
+	 *
+	 * @param IssuePayCalculation $model
+	 * @param string $type
+	 * @param array $config
+	 * @throws InvalidConfigException
+	 */
 	public function __construct(IssuePayCalculation $model, string $type, $config = []) {
 		$this->model = $model;
-		$user = $model->issue->getUsers()->withType($type)->one();
-		if ($user === null) {
-			throw new InvalidConfigException('Issue User: ' . $type . ' not exist in issue: ' . $model->getIssueName() . '.');
-		}
-		$this->user = $user;
+		$this->user = $this->findUser($type);
 		parent::__construct($config);
+	}
+
+	/**
+	 * @param string $type
+	 * @return IssueUser
+	 * @throws InvalidConfigException
+	 */
+	protected function findUser(string $type): IssueUser {
+		$user = $this->model->issue
+			->getUsers()
+			->withType($type)
+			->with('user')
+			->one();
+		if ($user === null) {
+			throw new InvalidConfigException('Issue User: ' . $type . ' not exist in issue: ' . $this->model->getIssueName() . '.');
+		}
+		return $user;
 	}
 
 	public function init() {
@@ -50,22 +77,6 @@ class SettlementUserProvisionsForm extends Model {
 		}
 		$this->typeId = $type->id;
 		$this->provisionData->type = $type;
-	}
-
-	public function rules(): array {
-		return [
-			['typeId', 'required'],
-			['typeId', 'in', 'range' => array_keys($this->getTypes())],
-		];
-	}
-
-	public function save(): int {
-		if (!$this->validate()) {
-			return false;
-		}
-		$data = $this->provisionData;
-		$data->type = $this->getTypes()[$this->typeId];
-		return Yii::$app->provisions->addFromUserData($this->provisionData, $this->getPaysValues());
 	}
 
 	public function getPaysValues(): array {
@@ -86,14 +97,25 @@ class SettlementUserProvisionsForm extends Model {
 
 	public function getProvisionsSum(ProvisionUser $provisionUser): Decimal {
 		$sum = new Decimal(0);
+		//@todo sub personal costs.
 		foreach ($this->model->pays as $pay) {
 			$sum = $sum->add(Yii::$app->provisions->calculateProvision($provisionUser, $this->getPayValue($pay)));
 		}
 		return $sum;
 	}
 
+	public function getCostSum(): Decimal {
+		$sum = new Decimal(0);
+		$costs = $this->model->getCostForUser($this->user->user_id);
+		foreach ($costs as $cost) {
+			$sum = $sum->add($cost->getValueWithoutVAT());
+		}
+		return $sum;
+	}
+
 	public function getPayValue(IssuePay $pay): Decimal {
-		return $pay->getValueWithoutVAT()->sub($pay->getCosts(false));
+		//@todo sub personal costs.
+		return $pay->getValueWithoutVAT();
 	}
 
 	public function getModel(): IssuePayCalculation {
@@ -113,7 +135,7 @@ class SettlementUserProvisionsForm extends Model {
 	 */
 	public function getTypes(): array {
 		if ($this->types === null) {
-			$this->types = IssueProvisionType::findCalculationTypes($this->model, true, $this->user->type);
+			$this->types = IssueProvisionType::findCalculationTypes($this->model, $this->user->type);
 		}
 		return $this->types;
 	}
@@ -122,4 +144,12 @@ class SettlementUserProvisionsForm extends Model {
 		return ArrayHelper::map($this->getTypes(), 'id', 'name');
 	}
 
+	public function save(): int {
+		if (!$this->validate()) {
+			return false;
+		}
+		$data = $this->provisionData;
+		$data->type = $this->getTypes()[$this->typeId];
+		return Yii::$app->provisions->addFromUserData($this->provisionData, $this->getPaysValues());
+	}
 }

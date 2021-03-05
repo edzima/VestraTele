@@ -27,19 +27,17 @@ use yii\helpers\Json;
  */
 class ProvisionType extends ActiveRecord {
 
+	protected const INDEX_KEY = 'id';
+
 	public const KEY_DATA_WITH_HIERARCHY = 'with-hierarchy';
 
 	/**
 	 * @var static[]|null
 	 */
 	private static ?array $TYPES = null;
-	/**
-	 * @var static[]|null
-	 */
-	private static ?array $ACTIVE_TYPES = null;
 
 	public function __toString() {
-		return $this->getNameWithValue();
+		return $this->getNameWithTypeName();
 	}
 
 	public function beforeSave($insert): bool {
@@ -61,6 +59,7 @@ class ProvisionType extends ActiveRecord {
 		return [
 			'id' => 'ID',
 			'name' => Yii::t('provision', 'Name'),
+			'nameWithTypeName' => Yii::t('provision', 'Name'),
 			'from_at' => Yii::t('provision', 'From at'),
 			'to_at' => Yii::t('provision', 'To at'),
 			'only_with_tele' => Yii::t('provision', 'Only with telemarketer'),
@@ -75,6 +74,17 @@ class ProvisionType extends ActiveRecord {
 
 	public function getProvisionUsers(): ProvisionUserQuery {
 		return $this->hasMany(ProvisionUser::class, ['type_id' => 'id']);
+	}
+
+	public function getNameWithTypeName(): string {
+		return $this->name . ' - ( ' . $this->getTypeName() . ' )';
+	}
+
+	public function getTypeName(): string {
+		if ($this->is_percentage) {
+			return '%';
+		}
+		return Yii::$app->formatter->getCurrencySymbol();
 	}
 
 	public function getNameWithValue(): string {
@@ -148,13 +158,18 @@ class ProvisionType extends ActiveRecord {
 
 	/**
 	 * @param int $id
+	 * @param bool $onlyActive
 	 * @return static|null
 	 */
-	public static function getType(int $id, bool $onlyActive) {
-		if (!isset(static::getTypes()[$id])) {
-			static::getTypes()[$id] = static::findOne($id);
+	public static function getType(int $id, bool $onlyActive): ?self {
+		if (!isset(static::getTypes($onlyActive)[$id])) {
+			static::$TYPES[$id] = static::findOne($id);
 		}
-		return static::getTypes()[$id];
+		$type = static::getTypes()[$id];
+		if ($onlyActive && !$type->is_active) {
+			return null;
+		}
+		return $type;
 	}
 
 	/**
@@ -165,21 +180,23 @@ class ProvisionType extends ActiveRecord {
 	public static function getTypes(bool $onlyActive = false, bool $refresh = false): array {
 		if (static::$TYPES === null || $refresh) {
 			static::$TYPES = static::find()
-				->indexBy('id')
+				->indexBy(static::INDEX_KEY)
 				->all();
 		}
 		if ($onlyActive) {
-			if (empty(static::$ACTIVE_TYPES) || $refresh) {
-				static::$ACTIVE_TYPES = [];
-				foreach (static::$TYPES as $type) {
-					if ($type->is_active) {
-						static::$ACTIVE_TYPES[$type->id] = $type;
-					}
-				}
-			}
-			return static::$ACTIVE_TYPES;
+			return static::activeFilter(static::$TYPES);
 		}
 		return static::$TYPES;
+	}
+
+	/**
+	 * @param static[] $types
+	 * @return static[]
+	 */
+	public static function activeFilter(array $types): array {
+		return ArrayHelper::index(array_filter($types, static function (self $model): bool {
+			return $model->is_active;
+		}), static::INDEX_KEY);
 	}
 
 	/**

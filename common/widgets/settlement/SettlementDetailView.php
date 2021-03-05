@@ -16,6 +16,7 @@ class SettlementDetailView extends DetailView {
 	public ?int $userIdProvisions = null;
 
 	public bool $withType = true;
+	public bool $withOwner = true;
 
 	public bool $withValueWithoutCosts = false;
 
@@ -57,11 +58,8 @@ class SettlementDetailView extends DetailView {
 				'attribute' => 'providerName',
 			],
 			[
-				'attribute' => 'is_provider_notified',
-				'visible' => !$this->model->isPayed(),
-			],
-			[
 				'attribute' => 'owner',
+				'visible' => $this->withOwner,
 			],
 			[
 				'attribute' => 'value',
@@ -71,11 +69,6 @@ class SettlementDetailView extends DetailView {
 				'attribute' => 'valueToPay',
 				'format' => 'currency',
 				'visible' => !$this->model->isPayed(),
-			],
-			[
-				'attribute' => 'valueWithoutCosts',
-				'format' => 'currency',
-				'visible' => $this->model->hasCosts && $this->withValueWithoutCosts,
 			],
 			[
 				'attribute' => 'userProvisionsSum',
