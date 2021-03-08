@@ -6,6 +6,7 @@ export interface Filter {
     eventColors?: {
         background?: string
         badge?: string
+        border?: string
     };
 }
 

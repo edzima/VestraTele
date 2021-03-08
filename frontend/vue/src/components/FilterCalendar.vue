@@ -144,12 +144,15 @@ export default class FilterCalendar extends Vue {
                 const key = filterGroup.filteredPropertyName;
                 if(eventInfo.event.extendedProps[key] === filter.value){
                     const backgroundColor = filter.eventColors.background
+                    const borderColor = filter.eventColors.border
+                    const badgeColor = filter.eventColors.badge
 
                     if(backgroundColor){
                         eventInfo.el.style.backgroundColor = backgroundColor;
                     }
-
-                    const badgeColor = filter.eventColors.badge
+                    if(borderColor){
+                        eventInfo.el.style.border = `dotted 3px ${borderColor}`;
+                    }
                     if(badgeColor){
                         this.parseBadge(eventInfo.el, badgeColor);
                     }

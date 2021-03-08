@@ -1,5 +1,9 @@
 <template>
-  <div class="calendar">
+  <div class="calendar no-select"
+      unselectable="on"
+      onselectstart="return false;"
+      onmousedown="return false;"
+  >
     <FullCalendar
         ref="fullCalendar"
         v-bind="fullCalendarProps"
@@ -251,6 +255,14 @@
       }
     }
   }
+}
+.no-select{
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
 }
 
 </style>
