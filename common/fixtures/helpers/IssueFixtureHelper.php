@@ -119,15 +119,24 @@ class IssueFixtureHelper {
 			],
 		];
 		if ($withCost) {
-			$fixtures['cost'] = [
-				'class' => CostFixture::class,
-				'dataFile' => static::dataDir($dataDir) . 'settlement/cost.php',
-			];
+			$fixtures = array_merge($fixtures, static::cost(true, $dataDir));
+		}
+		return $fixtures;
+	}
+
+	public static function cost(bool $calculationCosts = true, string $dataDir = null): array {
+		$fixtures = [];
+		$fixtures['cost'] = [
+			'class' => CostFixture::class,
+			'dataFile' => static::dataDir($dataDir) . 'settlement/cost.php',
+		];
+		if ($calculationCosts) {
 			$fixtures['calculation-cost'] = [
 				'class' => CalculationCostFixture::class,
 				'dataFile' => static::dataDir($dataDir) . 'settlement/calculation-cost.php',
 			];
 		}
+
 		return $fixtures;
 	}
 

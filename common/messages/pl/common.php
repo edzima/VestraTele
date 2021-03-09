@@ -284,6 +284,7 @@ return [
 	'Is active' => 'Aktywna',
 	'User' => 'Użytkownik',
 	'Users' => 'Użytkownicy',
+	'Settled at' => 'Rozliczono',
 	'Additional Date' => 'Dodatkowa Data',
 	'With additional Date' => 'Z dodatkową Datą',
 	'Additional Date for Type' => 'Dodatkowa Data (dla typu)',

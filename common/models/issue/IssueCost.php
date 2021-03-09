@@ -25,10 +25,13 @@ use yii\db\ActiveRecord;
  * @property int $created_at
  * @property int $updated_at
  * @property string $date_at
+ * @property string|null $settled_at
  * @property int|null $user_id
  *
  * @property-read string $typeName
  * @property-read string $typeNameWithValue
+ * @property-read bool $isSettled
+ * @property-read bool $hasSettlement
  *
  * @property-read Issue $issue
  * @property-read IssuePayCalculation[] $settlements
@@ -83,6 +86,8 @@ class IssueCost extends ActiveRecord implements
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
 			'date_at' => Yii::t('common', 'Date at'),
+			'settled_at' => Yii::t('common', 'Settled at'),
+			'user_id' => Yii::t('common', 'User'),
 			'user' => Yii::t('common', 'User'),
 		];
 	}
@@ -101,6 +106,10 @@ class IssueCost extends ActiveRecord implements
 	public function getSettlements(): IssuePayCalculationQuery {
 		return $this->hasMany(IssuePayCalculation::class, ['id' => 'settlement_id'])
 			->viaTable(IssuePayCalculation::viaCostTableName(), ['cost_id' => 'id']);
+	}
+
+	public function getIsSettled(): bool {
+		return !empty($this->settled_at) || $this->getHasSettlements();
 	}
 
 	public function getHasSettlements(): bool {

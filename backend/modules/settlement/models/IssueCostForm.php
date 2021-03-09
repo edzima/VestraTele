@@ -17,6 +17,7 @@ use yii\base\Model;
 class IssueCostForm extends Model {
 
 	public string $date_at = '';
+	public ?string $settled_at = null;
 	public string $type = '';
 	public string $value = '';
 	public string $vat = '';
@@ -32,18 +33,23 @@ class IssueCostForm extends Model {
 
 	public function attributeLabels(): array {
 		return [
-			'date_at' => Yii::t('backend', 'Date at'),
-			'type' => Yii::t('backend', 'Type'),
-			'value' => Yii::t('backend', 'Value with VAT'),
+			'date_at' => Yii::t('common', 'Date at'),
+			'type' => Yii::t('common', 'Type'),
+			'value' => Yii::t('common', 'Value with VAT'),
 			'vat' => 'VAT (%)',
-			'user_id' => Yii::t('backend', 'User'),
+			'user_id' => Yii::t('common', 'User'),
+			'settled_at' => Yii::t('common', 'Settled at'),
 		];
 	}
 
 	public function rules(): array {
 		return [
 			[['type', 'value', 'vat', 'date_at'], 'required'],
-			[['date_at'], 'date', 'format' => DATE_ATOM],
+			[['date_at', 'settled_at'], 'date', 'format' => 'Y-m-d'],
+			[
+				'settled_at', 'compare', 'compareAttribute' => 'date_at', 'operator' => '>=',
+				'enableClientValidation' => false,
+			],
 			[
 				'user_id', 'required',
 				'when' => function (): bool {
@@ -76,6 +82,7 @@ class IssueCostForm extends Model {
 		$this->issue = $cost->issue;
 		$this->type = $cost->type;
 		$this->date_at = $cost->date_at;
+		$this->settled_at = $cost->settled_at;
 		$this->value = $cost->getValueWithVAT()->toFixed(2);
 		$this->vat = $cost->getVAT()->toFixed(2);
 		$this->user_id = $cost->user_id;
@@ -100,6 +107,7 @@ class IssueCostForm extends Model {
 		$model->type = $this->type;
 		$model->date_at = $this->date_at;
 		$model->user_id = $this->user_id;
+		$model->settled_at = $this->settled_at;
 		return $model->save(false);
 	}
 }

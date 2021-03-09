@@ -46,6 +46,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Costs');
 			'valueWithoutVAT:currency:' . Yii::t('backend', 'Value without VAT'),
 			'VATPercent',
 			'date_at:date',
+			'settled_at:date',
 			'created_at:datetime',
 			'updated_at:datetime',
 

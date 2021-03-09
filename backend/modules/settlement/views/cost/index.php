@@ -3,6 +3,7 @@
 use backend\modules\settlement\models\search\IssueCostSearch;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
+use common\widgets\grid\IssueTypeColumn;
 use kartik\grid\SerialColumn;
 
 /* @var $this yii\web\View */
@@ -24,6 +25,16 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => IssueColumn::class,
 			],
 			[
+				'class' => IssueTypeColumn::class,
+				'attribute' => 'issueType',
+				'label' => Yii::t('common', 'Issue type'),
+			],
+			[
+				'attribute' => 'issueStage',
+				'label' => Yii::t('common', 'Issue stage'),
+				'filter' => IssueCostSearch::getIssueStagesNames(),
+			],
+			[
 				'attribute' => 'type',
 				'value' => 'typeName',
 				'filter' => IssueCostSearch::getTypesNames(),
@@ -35,9 +46,9 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => IssueCostSearch::getUsersNames(),
 			],
 			[
-				'attribute' => 'withSettlements',
-				'value' => 'hasSettlements',
-				'label' => Yii::t('settlement', 'With settlements'),
+				'attribute' => 'settled',
+				'value' => 'isSettled',
+				'label' => Yii::t('settlement', 'Settled'),
 				'noWrap' => true,
 				'format' => 'boolean',
 			],
@@ -50,6 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'valueWithoutVAT:currency:' . Yii::t('backend', 'Value without VAT'),
 			'VATPercent',
 			'date_at:date',
+			'settled_at:date',
 			'created_at:date',
 			'updated_at:date',
 

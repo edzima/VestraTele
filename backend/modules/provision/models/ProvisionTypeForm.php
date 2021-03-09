@@ -40,6 +40,10 @@ class ProvisionTypeForm extends Model {
 				},
 			],
 			[['from_at', 'to_at'], 'date', 'format' => 'Y-m-d'],
+			[
+				'to_at', 'compare', 'compareAttribute' => 'from_at', 'operator' => '>=',
+				'enableClientValidation' => false,
+			],
 			['value', 'number', 'min' => 0],
 			[
 				'value', 'number', 'max' => 100,
