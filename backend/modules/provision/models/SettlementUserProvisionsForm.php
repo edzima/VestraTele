@@ -2,6 +2,7 @@
 
 namespace backend\modules\provision\models;
 
+use common\models\issue\IssueCost;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
@@ -16,6 +17,8 @@ use yii\helpers\ArrayHelper;
 class SettlementUserProvisionsForm extends Model {
 
 	public ?int $typeId = null;
+	public bool $costWithVAT = false;
+	public bool $payWithVAT = false;
 
 	private IssuePayCalculation $model;
 	private IssueUser $user;
@@ -27,6 +30,7 @@ class SettlementUserProvisionsForm extends Model {
 	public function rules(): array {
 		return [
 			['typeId', 'required'],
+			[['costWithVAT', 'costWithVAT'], 'boolean'],
 			['typeId', 'in', 'range' => array_keys($this->getTypes())],
 		];
 	}
@@ -79,14 +83,6 @@ class SettlementUserProvisionsForm extends Model {
 		$this->provisionData->type = $type;
 	}
 
-	public function getPaysValues(): array {
-		$pays = [];
-		foreach ($this->model->pays as $pay) {
-			$pays[$pay->id] = $this->getPayValue($pay);
-		}
-		return $pays;
-	}
-
 	public function getPaysSum(): Decimal {
 		$sum = new Decimal(0);
 		foreach ($this->model->pays as $pay) {
@@ -95,27 +91,38 @@ class SettlementUserProvisionsForm extends Model {
 		return $sum;
 	}
 
+	public function getPaysSumWithoutGeneralCosts(): Decimal {
+		return $this->getPaysSum()->sub($this->getGeneralCostsSum());
+	}
+
 	public function getProvisionsSum(ProvisionUser $provisionUser): Decimal {
+		return $provisionUser->generateProvision($this->getPaysSumWithoutGeneralCosts());
+	}
+
+	public function getGeneralCostsSum(): Decimal {
 		$sum = new Decimal(0);
-		//@todo sub personal costs.
-		foreach ($this->model->pays as $pay) {
-			$sum = $sum->add(Yii::$app->provisions->calculateProvision($provisionUser, $this->getPayValue($pay)));
+		$costs = $this->model->getCostsWithoutUser();
+		foreach ($costs as $cost) {
+			$sum = $sum->add($this->getCostValue($cost));
 		}
 		return $sum;
 	}
 
-	public function getCostSum(): Decimal {
+	public function getPersonalCostsSum(): Decimal {
 		$sum = new Decimal(0);
-		$costs = $this->model->getCostForUser($this->user->user_id);
+		$costs = $this->model->getCostsWithUser($this->user->user_id);
 		foreach ($costs as $cost) {
-			$sum = $sum->add($cost->getValueWithoutVAT());
+			$sum = $sum->add($this->getCostValue($cost));
 		}
 		return $sum;
 	}
 
 	public function getPayValue(IssuePay $pay): Decimal {
-		//@todo sub personal costs.
-		return $pay->getValueWithoutVAT();
+		return $this->payWithVAT ? $pay->getValueWithVAT() : $pay->getValueWithoutVAT();
+	}
+
+	public function getCostValue(IssueCost $cost): Decimal {
+		return $this->costWithVAT ? $cost->getValueWithVAT() : $cost->getValueWithoutVAT();
 	}
 
 	public function getModel(): IssuePayCalculation {
@@ -151,5 +158,13 @@ class SettlementUserProvisionsForm extends Model {
 		$data = $this->provisionData;
 		$data->type = $this->getTypes()[$this->typeId];
 		return Yii::$app->provisions->addFromUserData($this->provisionData, $this->getPaysValues());
+	}
+
+	public function getPaysValues(): array {
+		$pays = [];
+		foreach ($this->model->pays as $pay) {
+			$pays[$pay->id] = $this->getPayValue($pay);
+		}
+		return $pays;
 	}
 }

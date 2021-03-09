@@ -17,6 +17,11 @@ use yii\widgets\ActiveForm;
 		]
 	); ?>
 
+
+	<?= $form->field($model, 'costWithVAT')->checkbox() ?>
+
+	<?= $form->field($model, 'payWithVAT')->checkbox() ?>
+
 	<?= $form->field($model, 'typeId')->dropDownList($model->getTypesNames())->hiddenInput()->label(false) ?>
 
 	<div class="form-group">

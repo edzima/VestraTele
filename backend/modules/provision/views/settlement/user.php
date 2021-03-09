@@ -178,8 +178,11 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 			[
 				'class' => CurrencyColumn::class,
 				'label' => Yii::t('provision', 'Base Value'),
-				'value' => static function (ProvisionUser $data) use ($model): Decimal {
-					return $model->getPaysSum();
+				'value' => static function (ProvisionUser $data) use ($model): ?Decimal {
+					if ($data->type->is_percentage) {
+						return $model->getPaysSumWithoutGeneralCosts();
+					}
+					return null;
 				},
 			],
 		],

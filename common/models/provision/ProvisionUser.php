@@ -6,6 +6,7 @@ use common\models\user\User;
 use DateTime;
 use Decimal\Decimal;
 use Yii;
+use yii\base\InvalidArgumentException;
 use yii\db\ActiveRecord;
 
 /**
@@ -139,6 +140,16 @@ class ProvisionUser extends ActiveRecord {
 			return $date >= $fromAt && $date <= new DateTime($this->to_at);
 		}
 		return $date <= new DateTime($this->to_at);
+	}
+
+	public function generateProvision(Decimal $value = null): Decimal {
+		if (!$this->type->is_percentage) {
+			return $this->getValue();
+		}
+		if ($value === null) {
+			new InvalidArgumentException('$value must be Decimal when type is percentage.');
+		}
+		return $value->mul($this->getValue())->div(100);
 	}
 
 }
