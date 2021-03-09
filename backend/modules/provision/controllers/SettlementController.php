@@ -102,7 +102,9 @@ class SettlementController extends Controller {
 		]);
 
 		$settlementCostDataProvider = new ArrayDataProvider([
-				'allModels' => $settlement->getCostForUser($model->getIssueUser()->user_id),
+				'allModels' => array_merge(
+					$settlement->getCostsWithUser($model->getIssueUser()->user_id),
+					$settlement->getCostsWithoutUser()),
 				'modelClass' => IssueCost::class,
 			]
 		);

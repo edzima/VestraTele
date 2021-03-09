@@ -7,7 +7,6 @@ use common\models\user\User;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use yii\helpers\ArrayHelper;
 
 /**
  * ProvisionUserSearch represents the model behind the search form of `common\models\provision\ProvisionUser`.
@@ -115,6 +114,6 @@ class ProvisionUserSearch extends ProvisionUser implements SearchModel {
 	}
 
 	public static function getTypesNames(): array {
-		return ArrayHelper::map(Yii::$app->provisions->getTypes(), 'id', 'name');
+		return ProvisionType::getTypesNames(false);
 	}
 }

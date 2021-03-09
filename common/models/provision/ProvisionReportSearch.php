@@ -37,7 +37,6 @@ class ProvisionReportSearch extends ProvisionSearch {
 
 		/* @var $query ProvisionQuery */
 		$query = $provider->query;
-		$query->with('type');
 		$query->notHidden();
 
 		return $provider;

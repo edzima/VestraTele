@@ -180,15 +180,6 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 		return new DateTime($this->payment_at);
 	}
 
-	/**
-	 * @param int $userId
-	 * @return IssueCost[]
-	 */
-	public function getCostForUser(int $userId): array {
-		$costs = $this->costs;
-		return IssueCost::userFilter($costs, $userId);
-	}
-
 	public function getUserProvisionsSum(int $id): Decimal {
 		if (!isset(static::$USER_PROVISIONS_SUM[$id])) {
 			$sum = (string) $this->getPays()
@@ -426,5 +417,22 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 			$this->populateRelation('costs', $this->getCosts()->all());
 		}
 		return $count;
+	}
+
+	/**
+	 * @param int $userId
+	 * @return IssueCost[]
+	 */
+	public function getCostsWithUser(int $userId): array {
+		$costs = $this->costs;
+		return IssueCost::userFilter($costs, $userId);
+	}
+
+	/**
+	 * @return IssueCost[]
+	 */
+	public function getCostsWithoutUser(): array {
+		$costs = $this->costs;
+		return IssueCost::withoutUserFilter($costs);
 	}
 }

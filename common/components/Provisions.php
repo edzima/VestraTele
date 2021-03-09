@@ -63,6 +63,7 @@ class Provisions extends Component {
 	}
 
 	public function issuePayValue(IssuePay $pay): Decimal {
+		//@todo remove only general costs, move to issue pay?
 		return $pay->getValueWithoutVAT()->sub($pay->getCosts(false));
 	}
 

@@ -6,6 +6,7 @@ use backend\modules\provision\models\SettlementUserProvisionsForm;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
@@ -49,21 +50,6 @@ class SettlementUserProvisionsFormTest extends Unit {
 		$this->tester->wantToTest('Agent lawyer type.');
 		$this->giveForm($this->grabCalculation('lawyer'));
 		$this->tester->assertEmpty($this->model->getTypes());
-	}
-
-	public function testCostSum(): void {
-		$this->giveForm($this->grabCalculation('administrative'));
-		$this->tester->assertTrue((new Decimal(230))->equals($this->model->getCostSum()));
-		$this->model->getModel()->unlinkCosts();
-		$this->tester->assertTrue((new Decimal(0))->equals($this->model->getCostSum()));
-		$costId = $this->tester->haveRecord(IssueCost::class, [
-			'issue_id' => 3,
-			'value' => 123,
-			'vat' => 23,
-		]);
-		$this->model->getModel()->linkCosts([$costId]);
-		codecept_debug($this->model->getCostSum());
-		$this->tester->assertTrue((new Decimal(100))->equals($this->model->getCostSum()));
 	}
 
 	/**

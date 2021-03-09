@@ -107,6 +107,14 @@ class IssueCost extends ActiveRecord implements
 		return !empty($this->settlements);
 	}
 
+	public function isForUser(int $userId): bool {
+		return (int) $this->user_id === $userId;
+	}
+
+	public function hasUser(): bool {
+		return $this->user !== null;
+	}
+
 	public static function getTypesNames(): array {
 		return [
 			static::TYPE_PURCHASE_OF_RECEIVABLES => Yii::t('common', 'Purchase of receivables'),
@@ -119,9 +127,23 @@ class IssueCost extends ActiveRecord implements
 		];
 	}
 
+	/**
+	 * @param static[] $costs
+	 * @return static[]
+	 */
 	public static function userFilter(array $costs, int $userId): array {
 		return array_filter($costs, static function (IssueCost $cost) use ($userId): bool {
-			return $cost->user_id === null || $cost->user_id === $userId;
+			return $cost->isForUser($userId);
+		});
+	}
+
+	/**
+	 * @param static[] $costs
+	 * @return static[]
+	 */
+	public static function withoutUserFilter(array $costs): array {
+		return array_filter($costs, static function (IssueCost $cost): bool {
+			return !$cost->hasUser();
 		});
 	}
 
