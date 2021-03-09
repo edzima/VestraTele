@@ -48,7 +48,7 @@ class IssueTypeColumn extends DataColumn {
 				$this->width = '200px';
 				break;
 			case self::VALUE_SHORT:
-				$this->width = '50px';
+				$this->width = '75px';
 				break;
 			case self::VALUE_NAME:
 				$this->width = '250px';

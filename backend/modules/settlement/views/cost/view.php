@@ -49,6 +49,7 @@ YiiAsset::register($this);
 			],
 			'VATPercent',
 			'date_at:date',
+			'settled_at:date',
 			'created_at:datetime',
 			'updated_at:datetime',
 		],

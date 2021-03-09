@@ -55,11 +55,13 @@ class IssueCostCest {
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->see('Costs');
 		$I->seeInGridHeader('Issue');
+		$I->seeInGridHeader('Issue Type');
 		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('User');
 		$I->seeInGridHeader('Value with VAT');
 		$I->seeInGridHeader('VAT (%)');
 		$I->seeInGridHeader('Date at');
+		$I->seeInGridHeader('Settled at');
 		$I->seeInGridHeader('Created at');
 		$I->seeInGridHeader('Updated at');
 	}
@@ -76,6 +78,7 @@ class IssueCostCest {
 		$I->seeInGridHeader('Value with VAT');
 		$I->seeInGridHeader('VAT (%)');
 		$I->seeInGridHeader('Date at');
+		$I->seeInGridHeader('Settled at');
 		$I->seeInGridHeader('Created at');
 		$I->seeInGridHeader('Updated at');
 

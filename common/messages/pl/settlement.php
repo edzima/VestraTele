@@ -102,6 +102,7 @@ return [
 	'Receiver' => 'Odbiorca',
 	'Transfer status' => 'Odebrane',
 	'Set transfer status' => 'Wszystkie',
+	'Settled' => 'Rozliczone',
 	'Received' => 'Received',
 	'Receive' => 'Odbierz',
 	'Receive pays' => 'Odbierz wpłaty',

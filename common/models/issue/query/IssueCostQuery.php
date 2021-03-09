@@ -12,6 +12,25 @@ use yii\db\ActiveQuery;
  */
 class IssueCostQuery extends ActiveQuery {
 
+	public function settled(): self {
+		$this->joinWith('settlements');
+		$this->andWhere([
+			'or', 'settlement_id IS NOT NULL', 'settled_at IS NOT NULL',
+		]);
+		return $this;
+	}
+
+	public function notSettled(): self {
+		$this->joinWith('settlements');
+		$this->andWhere([
+			'or', [
+				'settlement_id' => null,
+				'settled_at' => null,
+			],
+		]);
+		return $this;
+	}
+
 	public function withSettlements(): self {
 		$this->joinWith('settlements');
 		$this->andWhere('settlement_id IS NOT NULL');

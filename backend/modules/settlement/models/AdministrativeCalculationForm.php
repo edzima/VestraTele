@@ -31,6 +31,9 @@ class AdministrativeCalculationForm extends CalculationForm implements HiddenFie
 	protected function saveCosts(): void {
 		$cost = $this->createOfficeCost();
 		if ($cost) {
+			if (empty($cost->date_at)) {
+				$cost->date_at = $this->getModel()->created_at;
+			}
 			$cost->save();
 			$this->costs_ids[] = $cost->id;
 		}
@@ -41,6 +44,7 @@ class AdministrativeCalculationForm extends CalculationForm implements HiddenFie
 		return !in_array($attribute, $this->hiddenFields);
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	private function createOfficeCost(): ?IssueCost {
 		if (!empty($this->officeCost)) {
 			$options = $this->officeCost;

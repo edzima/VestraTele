@@ -2,28 +2,35 @@
 
 namespace backend\modules\settlement\models\search;
 
+use backend\modules\issue\models\IssueStage;
 use common\models\issue\IssueCost;
+use common\models\issue\IssueType;
 use common\models\issue\query\IssueCostQuery;
+use common\models\issue\search\IssueTypeSearch;
+use common\models\SearchModel;
 use common\models\user\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\QueryInterface;
 
 /**
  * IssueCostSearch represents the model behind the search form of `common\models\issue\IssueCost`.
  */
-class IssueCostSearch extends IssueCost {
+class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch {
 
-	public $withSettlements;
+	public $settled;
+	public $issueType;
+	public $issueStage;
 
 	/**
 	 * @inheritdoc
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'issue_id', 'user_id'], 'integer'],
+			[['id', 'issue_id', 'user_id', 'issueType', 'issueStage'], 'integer'],
 			['type', 'string'],
-			['withSettlements', 'boolean'],
-			[['created_at', 'updated_at', 'date_at'], 'safe'],
+			['settled', 'boolean'],
+			[['created_at', 'updated_at', 'date_at', 'settled_at'], 'safe'],
 			[['value', 'vat'], 'number'],
 		];
 	}
@@ -46,6 +53,8 @@ class IssueCostSearch extends IssueCost {
 	public function search(array $params): ActiveDataProvider {
 		$query = IssueCost::find();
 		$query->joinWith(['issue', 'settlements', 'user']);
+		$query->with('issue.type');
+		$query->with('issue.stage');
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -61,6 +70,8 @@ class IssueCostSearch extends IssueCost {
 			return $dataProvider;
 		}
 
+		$this->applyIssueStageFilter($query);
+		$this->applyIssueTypeFilter($query);
 		$this->applySettlementsFilter($query);
 
 		// grid filtering conditions
@@ -72,6 +83,7 @@ class IssueCostSearch extends IssueCost {
 			IssueCost::tableName() . '.vat' => $this->vat,
 			IssueCost::tableName() . '.created_at' => $this->created_at,
 			IssueCost::tableName() . '.date_at' => $this->date_at,
+			IssueCost::tableName() . '.settled_at' => $this->date_at,
 			IssueCost::tableName() . '.updated_at' => $this->updated_at,
 			IssueCost::tableName() . '.type' => $this->type,
 		]);
@@ -80,22 +92,41 @@ class IssueCostSearch extends IssueCost {
 	}
 
 	private function applySettlementsFilter(IssueCostQuery $query): void {
-		if ($this->withSettlements === null || $this->withSettlements === '') {
+		if ($this->settled === null || $this->settled === '') {
 			return;
 		}
-		if ($this->withSettlements) {
-			$query->withSettlements();
+		if ($this->settled) {
+			$query->settled();
 			return;
 		}
-		$query->withoutSettlements();
+		$query->notSettled();
+	}
+
+	private function applyIssueStageFilter(IssueCostQuery $query): void {
+		if (!empty($this->issueStage)) {
+			$query->andWhere(['issue.stage_id' => $this->issueStage]);
+		}
+	}
+
+	public function applyIssueTypeFilter(QueryInterface $query): void {
+		if (!empty($this->issueType)) {
+			$query->andWhere(['issue.type_id' => $this->issueType]);
+		}
 	}
 
 	public static function getUsersNames(): array {
 		return User::getSelectList(IssueCost::find()
 			->select('user_id')
 			->distinct()
-			->column()
-			, false);
+			->column(), false);
+	}
+
+	public static function getIssueTypesNames(): array {
+		return IssueType::getShortTypesNames();
+	}
+
+	public static function getIssueStagesNames(): array {
+		return IssueStage::getStagesNames(true);
 	}
 
 }

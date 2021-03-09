@@ -170,7 +170,6 @@ return [
 	'Issue Stages' => 'Etapy spraw',
 	'Issue Types' => 'Typy spraw',
 	'Roles' => 'Role',
-	'Users' => 'Użytkownicy',
 	'Is percentage' => '%',
 	'Only with telemarketer' => 'Tylko z konsultantem',
 	'Issue types' => 'Issue types',
@@ -282,4 +281,5 @@ return [
 	'Is active' => 'Aktywna',
 	'User' => 'Użytkownik',
 	'Users' => 'Użytkownicy',
+	'Settled at' => 'Rozliczono',
 ];

@@ -23,6 +23,8 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'date_at', ['options' => ['class' => 'col-md-4 col-lg-2']])->widget(DateWidget::class) ?>
 
+		<?= $form->field($model, 'settled_at', ['options' => ['class' => 'col-md-4 col-lg-2']])->widget(DateWidget::class) ?>
+
 	</div>
 
 
