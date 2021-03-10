@@ -20,7 +20,7 @@ use yii\web\View;
 /* @var $this View */
 /* @var $model SettlementUserProvisionsForm */
 /* @var $issueCostDataProvider ActiveDataProvider */
-/* @var $userCostWithoutSettlementsDataProvider ActiveDataProvider */
+/* @var $userNotSettledCosts ActiveDataProvider */
 /* @var $settlementCostDataProvider ActiveDataProvider */
 /* @var $navTypesItems array */
 
@@ -61,7 +61,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 
 		<div class="col-md-4">
 			<?= GridView::widget([
-					'dataProvider' => $userCostWithoutSettlementsDataProvider,
+					'dataProvider' => $userNotSettledCosts,
 					'toolbar' => [
 						[
 							'content' =>
@@ -85,6 +85,8 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 						[
 							'class' => CurrencyColumn::class,
 						],
+						'date_at:date',
+						'settled_at:date',
 						[
 							'class' => ActionColumn::class,
 							'controller' => '/settlement/cost',
@@ -122,13 +124,6 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 						[
 							'class' => CurrencyColumn::class,
 							'pageSummary' => true,
-							'pageSummaryFunc' => function (array $decimals): Decimal {
-								$sum = new Decimal(0);
-								foreach ($decimals as $decimal) {
-									$sum = $sum->add($decimal);
-								}
-								return $sum;
-							},
 						],
 						[
 							'class' => ActionColumn::class,
