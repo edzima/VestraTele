@@ -31,12 +31,20 @@ class IssueCostSearchTest extends Unit {
 		$this->assertTotalCount(5);
 	}
 
-	public function testWithSettlement(): void {
-		$this->assertTotalCount(4, ['settled' => true]);
+	public function testSettled(): void {
+		$this->assertTotalCount(1, ['settled' => true]);
 	}
 
-	public function testWithoutSettlement(): void {
-		$this->assertTotalCount(1, ['settled' => false]);
+	public function testNotSettled(): void {
+		$this->assertTotalCount(4, ['settled' => false]);
+	}
+
+	public function testWithSettlements(): void {
+		$this->assertTotalCount(3, ['withSettlements' => true]);
+	}
+
+	public function testWithoutSettlements(): void {
+		$this->assertTotalCount(2, ['withSettlements' => false]);
 	}
 
 	public function testIssueType(): void {

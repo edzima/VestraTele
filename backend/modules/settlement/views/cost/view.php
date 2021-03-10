@@ -11,6 +11,9 @@ use yii\widgets\DetailView;
 /* @var $model IssueCost */
 
 $this->title = $model->typeName;
+if ($model->hasUser()) {
+	$this->title .= ' - ' . $model->user;
+}
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' => ['/issue/issue/index']];
 $this->params['breadcrumbs'][] = ['label' => $model->issue->longId, 'url' => ['/issue/issue/view', 'id' => $model->issue->id]];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Costs'), 'url' => ['issue', 'id' => $model->issue->id]];
@@ -35,10 +38,6 @@ YiiAsset::register($this);
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [
-			[
-				'attribute' => 'user',
-				'visible' => $model->user !== null,
-			],
 			[
 				'attribute' => 'valueWithVAT',
 				'format' => 'currency',
