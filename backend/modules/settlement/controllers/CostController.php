@@ -71,7 +71,9 @@ class CostController extends Controller {
 	public function actionSettlementLink(int $id, int $settlementId) {
 		$model = $this->findModel($id);
 		$settlement = IssuePayCalculation::findOne($settlementId);
-		$model->link('settlements', $settlement);
+		if ($settlement) {
+			$model->link('settlements', $settlement);
+		}
 		return $this->redirect(Url::previous());
 	}
 

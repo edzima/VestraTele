@@ -4,6 +4,7 @@ namespace common\helpers;
 
 use common\models\issue\IssueInterface;
 use common\models\settlement\PayInterface;
+use Yii;
 use yii\bootstrap\BaseHtml;
 
 class Html extends BaseHtml {
@@ -24,6 +25,13 @@ class Html extends BaseHtml {
 			static::addCssClass($options, 'delayed-row warning');
 		}
 		return $options;
+	}
+
+	public static function booleanDropdownList(): array {
+		return [
+			0 => Yii::t('common', 'Yes'),
+			1 => Yii::t('common', 'No'),
+		];
 	}
 
 }

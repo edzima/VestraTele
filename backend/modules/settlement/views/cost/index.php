@@ -3,6 +3,7 @@
 use backend\modules\settlement\models\search\IssueCostSearch;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
+use common\models\issue\IssueCost;
 use common\widgets\grid\IssueTypeColumn;
 use kartik\grid\SerialColumn;
 
@@ -15,6 +16,8 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' 
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-cost-index">
+
+	<?= $this->render('_search', ['model' => $model]) ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
@@ -46,11 +49,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => IssueCostSearch::getUsersNames(),
 			],
 			[
-				'attribute' => 'settled',
-				'value' => 'isSettled',
-				'label' => Yii::t('settlement', 'Settled'),
+				'value' => function (IssueCost $cost): string {
+					return count($cost->settlements);
+				},
+				'label' => Yii::t('settlement', 'Settlements'),
 				'noWrap' => true,
-				'format' => 'boolean',
 			],
 			[
 				'attribute' => 'value',

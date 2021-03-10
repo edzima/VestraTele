@@ -9,6 +9,7 @@ use common\models\issue\query\IssueCostQuery;
 use common\models\issue\search\IssueTypeSearch;
 use common\models\SearchModel;
 use common\models\user\User;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\QueryInterface;
@@ -19,6 +20,7 @@ use yii\db\QueryInterface;
 class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch {
 
 	public $settled;
+	public $withSettlements;
 	public $issueType;
 	public $issueStage;
 
@@ -29,10 +31,20 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 		return [
 			[['id', 'issue_id', 'user_id', 'issueType', 'issueStage'], 'integer'],
 			['type', 'string'],
-			['settled', 'boolean'],
+			[['settled', 'withSettlements'], 'boolean'],
 			[['created_at', 'updated_at', 'date_at', 'settled_at'], 'safe'],
 			[['value', 'vat'], 'number'],
 		];
+	}
+
+	public function attributeLabels(): array {
+		return array_merge(
+			parent::attributeLabels(),
+			[
+				'settled' => Yii::t('settlement', 'Settled'),
+				'withSettlements' => Yii::t('settlement', 'With settlements'),
+			]
+		);
 	}
 
 	/**
@@ -72,7 +84,8 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 
 		$this->applyIssueStageFilter($query);
 		$this->applyIssueTypeFilter($query);
-		$this->applySettlementsFilter($query);
+		$this->applySettledFilter($query);
+		$this->applyWithSettlementsFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -91,7 +104,7 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 		return $dataProvider;
 	}
 
-	private function applySettlementsFilter(IssueCostQuery $query): void {
+	private function applySettledFilter(IssueCostQuery $query): void {
 		if ($this->settled === null || $this->settled === '') {
 			return;
 		}
@@ -100,6 +113,17 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 			return;
 		}
 		$query->notSettled();
+	}
+
+	private function applyWithSettlementsFilter(IssueCostQuery $query): void {
+		if ($this->withSettlements === null || $this->withSettlements === '') {
+			return;
+		}
+		if ($this->withSettlements) {
+			$query->withSettlements();
+			return;
+		}
+		$query->withoutSettlements();
 	}
 
 	private function applyIssueStageFilter(IssueCostQuery $query): void {
