@@ -122,7 +122,6 @@ JS;
 			],
 			[
 				'class' => IssueColumn::class,
-				'issueAttribute' => null,
 			],
 			[
 				'class' => DataColumn::class,
