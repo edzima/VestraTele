@@ -171,7 +171,7 @@ class IssueCost extends ActiveRecord implements
 
 	/**
 	 * @inheritdoc
-	 * @return IssueQuery the active query used by this AR class.
+	 * @return IssueCostQuery the active query used by this AR class.
 	 */
 	public static function find(): IssueCostQuery {
 		return new IssueCostQuery(static::class);
