@@ -27,7 +27,6 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 			[
 				'class' => IssueColumn::class,
-				'issueAttribute' => 'pay.issue',
 			],
 			[
 				'attribute' => 'calculationTypes',
