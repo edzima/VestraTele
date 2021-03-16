@@ -5,20 +5,27 @@ namespace backend\tests\unit\settlement;
 use backend\modules\settlement\models\CalculationProblemStatusForm;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use yii\base\InvalidConfigException;
 
 class CalculationProblemStatusFormTest extends Unit {
 
+	private SettlementFixtureHelper $settlementFixture;
+
 	public function _before() {
 		parent::_before();
-		$this->tester->haveFixtures(array_merge(IssueFixtureHelper::fixtures(), IssueFixtureHelper::settlements()));
+		$this->settlementFixture = new SettlementFixtureHelper($this->tester);
+		$this->tester->haveFixtures(array_merge(
+			IssueFixtureHelper::issue(),
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::pay()
+		));
 	}
 
 	public function testSetStatusForNotPayed(): void {
-		/** @var IssuePayCalculation $calculation */
-		$calculation = $this->tester->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
+		$calculation = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
 		$this->tester->seeRecord(IssuePay::class, [
 			'calculation_id' => $calculation->id,
 		]);
@@ -37,7 +44,9 @@ class CalculationProblemStatusFormTest extends Unit {
 
 	public function testSetStatusForPayed(): void {
 		$this->tester->expectThrowable(InvalidConfigException::class, function () {
-			new CalculationProblemStatusForm($this->tester->grabFixture(IssueFixtureHelper::CALCULATION, 'payed'));
+			new CalculationProblemStatusForm(
+				$this->settlementFixture->grabSettlement('payed-with-single-costs')
+			);
 		});
 	}
 

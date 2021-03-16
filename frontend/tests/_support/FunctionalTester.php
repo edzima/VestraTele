@@ -2,6 +2,7 @@
 
 namespace frontend\tests;
 
+use common\fixtures\helpers\FixtureTester;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\user\Worker;
 use common\tests\_support\UserRbacActor;
@@ -21,7 +22,7 @@ use common\tests\_support\UserRbacActor;
  *
  * @SuppressWarnings(PHPMD)
  */
-class FunctionalTester extends \Codeception\Actor {
+class FunctionalTester extends \Codeception\Actor implements FixtureTester {
 
 	use _generated\FunctionalTesterActions;
 	use UserRbacActor;

@@ -14,12 +14,17 @@ class SummonSearchTest extends Unit {
 	use UnitSearchModelTrait;
 
 	public function _before(): void {
-		$this->tester->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::summon(),
-		));
 		$this->model = $this->createModel();
 		parent::_before();
+	}
+
+	public function _fixtures(): array {
+		return array_merge(
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::customer(true),
+			IssueFixtureHelper::issueUsers(),
+			IssueFixtureHelper::summon()
+		);
 	}
 
 	public function testEmpty(): void {

@@ -2,7 +2,7 @@
 
 namespace common\tests\unit\settlement;
 
-use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssuePay;
 use common\models\settlement\PayPayedForm;
 use common\tests\unit\Unit;
@@ -10,13 +10,19 @@ use yii\base\InvalidConfigException;
 
 class PayPayedFormTest extends Unit {
 
+	private SettlementFixtureHelper $settlementFixture;
+
+	public function _before() {
+		parent::_before();
+		$this->settlementFixture = new SettlementFixtureHelper($this->tester);
+	}
+
 	/**
 	 * @return array
 	 */
 	public function _fixtures(): array {
 		return array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements()
+			SettlementFixtureHelper::pay()
 		);
 	}
 
@@ -57,7 +63,7 @@ class PayPayedFormTest extends Unit {
 		);
 		$model->date = '2021-01-01';
 		$this->tester->assertTrue($model->pay());
-		$this->tester->seeRecord(IssuePay::class, [
+		$this->settlementFixture->seePay([
 			'calculation_id' => 1,
 			'value' => 1230,
 			'vat' => 23,
@@ -70,21 +76,15 @@ class PayPayedFormTest extends Unit {
 		$model = new PayPayedForm(
 			$this->grabPay('status-analyse')
 		);
-		$model->date = date('Y-m-d');
+		$this->tester->assertNotNull($model->getPay()->status);
+		$model->date = '2020-02-02';
 
 		$this->tester->assertTrue($model->pay());
-		$this->tester->seeRecord(IssuePay::class, [
-			'calculation_id' => 3,
-			'value' => 615,
-			'vat' => 23,
-			'deadline_at' => '2020-02-01',
-			'pay_at' => date('Y-m-d'),
-			'status' => null,
-		]);
+		$this->tester->assertNull($model->getPay()->status);
 	}
 
 	protected function grabPay($index): IssuePay {
-		return $this->tester->grabFixture(IssueFixtureHelper::PAY, $index);
+		return $this->settlementFixture->grabPay($index);
 	}
 
 }

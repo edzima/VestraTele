@@ -2,6 +2,8 @@
 
 namespace common\tests;
 
+use common\fixtures\helpers\FixtureTester;
+
 /**
  * Inherited Methods
  * @method void wantToTest($text)
@@ -19,9 +21,10 @@ namespace common\tests;
  *
  * @SuppressWarnings(PHPMD)
  */
-class UnitTester extends \Codeception\Actor {
+class UnitTester extends \Codeception\Actor implements FixtureTester {
 
 	use _generated\UnitTesterActions;
+
 	/**
 	 * Define custom actions here
 	 */

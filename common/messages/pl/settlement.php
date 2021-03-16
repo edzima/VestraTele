@@ -99,6 +99,7 @@ return [
 	'Date At' => 'Data',
 	'Received pay: {value}' => 'Received pay: {value}',
 	'Pay at' => 'Data płatności',
+	'Pay Value without VAT' => 'Wpłata (netto)',
 	'Receiver' => 'Odbiorca',
 	'Transfer status' => 'Odebrane',
 	'Set transfer status' => 'Wszystkie',
@@ -115,5 +116,5 @@ return [
 	'Settlement costs' => 'Koszty rozliczenia',
 	'Link with settlement' => 'Dodaj do rozliczenia',
 	'Unlink with settlement' => 'Usuń z rozliczenia',
-	'With settlements' => 'Rozliczone',
+	'With settlements' => 'W rozliczeniach',
 ];

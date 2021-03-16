@@ -5,6 +5,7 @@ namespace backend\tests\unit\settlement\search;
 use backend\modules\settlement\models\search\PayReceivedSearch;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\SearchModel;
 use common\tests\_support\UnitSearchModelTrait;
 
@@ -21,9 +22,13 @@ class PayReceivedSearchTest extends Unit {
 
 	public function _before(): void {
 		$this->tester->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements(),
-			IssueFixtureHelper::payReceived(),
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::agent(),
+			IssueFixtureHelper::customer(true),
+			IssueFixtureHelper::issueUsers(),
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::pay(),
+			SettlementFixtureHelper::payReceived(),
 		));
 		$this->model = $this->createModel();
 		parent::_before();
@@ -35,9 +40,9 @@ class PayReceivedSearchTest extends Unit {
 
 	public function testAgent(): void {
 		$this->model->issueAgent = 300;
-		$this->assertTotalCount(4);
+		$this->assertTotalCount(5);
 		$this->model->issueAgent = 301;
-		$this->assertTotalCount(2);
+		$this->assertTotalCount(1);
 		$this->model->issueAgent = 302;
 		$this->assertTotalCount(0);
 	}

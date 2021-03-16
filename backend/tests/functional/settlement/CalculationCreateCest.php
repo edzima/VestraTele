@@ -4,6 +4,7 @@ namespace backend\tests\functional\settlement;
 
 use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
@@ -15,8 +16,12 @@ class CalculationCreateCest {
 
 	public function _before(CreateCalculationIssueManager $I): void {
 		$I->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements(),
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::customer(),
+			IssueFixtureHelper::issueUsers(),
+			IssueFixtureHelper::stageAndTypesFixtures(),
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::pay(),
 		));
 		$I->amLoggedIn();
 	}

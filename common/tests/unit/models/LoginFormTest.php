@@ -15,7 +15,7 @@ class LoginFormTest extends Unit {
 	/**
 	 * @return array
 	 */
-	public function _fixtures() {
+	public function _fixtures(): array {
 		return [
 			'user' => [
 				'class' => UserFixture::className(),

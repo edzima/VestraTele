@@ -5,29 +5,11 @@ namespace backend\tests\unit\issue;
 use backend\modules\issue\models\IssueStage;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
-use common\fixtures\issue\StageFixture;
-use common\fixtures\issue\StageTypesFixtures;
-use common\fixtures\issue\TypeFixture;
 
 class StageTest extends Unit {
 
-	protected function _before(): void {
-		parent::_before();
-		$this->tester->haveFixtures([
-			'stage-types' => [
-				'class' => StageTypesFixtures::class,
-				'dataFile' => IssueFixtureHelper::dataDir() . 'issue/stage_types.php',
-
-			],
-			'stage' => [
-				'class' => StageFixture::class,
-				'dataFile' => IssueFixtureHelper::dataDir() . 'issue/stage.php',
-			],
-			'type' => [
-				'class' => TypeFixture::class,
-				'dataFile' => IssueFixtureHelper::dataDir() . 'issue/type.php',
-			],
-		]);
+	public function _fixtures(): array {
+		return IssueFixtureHelper::stageAndTypesFixtures();
 	}
 
 	public function testDuplicateName(): void {
