@@ -16,7 +16,6 @@ use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
 use common\models\issue\query\IssueUserQuery;
-use common\models\user\Customer;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -74,7 +73,7 @@ use yii\db\Expression;
  * @property City $victimCity
  * @property Worker $agent
  * @property Worker $lawyer
- * @property-read Customer $customer
+ * @property-read User $customer
  * @property Worker|null $tele
  * @property IssuePay[] $pays
  * @property EntityResponsible $entityResponsible
@@ -440,16 +439,11 @@ class Issue extends ActiveRecord implements IssueInterface {
 		}
 	}
 
-	/**
-	 * @param string $type
-	 * @param bool $delete
-	 */
-	public function unlinkUser(string $type) {
+	public function unlinkUser(string $type): void {
 		$user = $this->getUsers()->withType($type)->one();
 		if ($user !== null) {
-			return $this->unlink('users', $user, true);
+			$this->unlink('users', $user, true);
 		}
-		return false;
 	}
 
 	/**
@@ -457,7 +451,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	 * @return IssueQuery the active query used by this AR class.
 	 */
 	public static function find(): IssueQuery {
-		return new IssueQuery(get_called_class());
+		return new IssueQuery(static::class);
 	}
 
 	public function isForUser(int $id): bool {
