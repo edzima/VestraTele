@@ -39,6 +39,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public array $issueUsersIds = [];
 	public bool $withCustomer = true;
 	public bool $withAgents = true;
+	public bool $withArchive = false;
 	public ?bool $withoutProvisions = null;
 
 	public ?bool $onlyWithProblems = null;
@@ -88,7 +89,9 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 		$query->joinWith([
 			'issue' => function (IssueQuery $query): void {
-				$query->withoutArchives();
+				if (!$this->withArchive) {
+					$query->withoutArchives();
+				}
 			},
 		]);
 		$query->joinWith('issue.type IT');
@@ -129,7 +132,6 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 		$query->andFilterWhere(['like', 'issue.id', $this->issue_id]);
 		$query->andFilterWhere(['like', 'owner_id', $this->owner_id]);
-
 		return $dataProvider;
 	}
 
@@ -210,7 +212,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 	//@todo add archive filter when withArchive is true.
 	public function getWithArchive(): bool {
-		return $this->withAchive;
+		return $this->withArchive;
 	}
 
 	private function applyIssueUsersFilter(IssuePayCalculationQuery $query): void {

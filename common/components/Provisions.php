@@ -7,7 +7,6 @@ use common\models\issue\IssuePay;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionUser;
-use common\models\settlement\PayInterface;
 use common\models\user\Worker;
 use Decimal\Decimal;
 use Yii;
@@ -82,12 +81,11 @@ class Provisions extends Component {
 		$selfModels = $userData->getSelfQuery()->all();
 		foreach ($selfModels as $model) {
 			foreach ($pays as $payId => $payValue) {
-				$value = $this->calculateProvision($model, $payValue);
 				$provisions[] = [
 					'pay_id' => $payId,
 					'to_user_id' => $model->to_user_id,
 					'from_user_id' => $model->from_user_id,
-					'value' => $value->toFixed(2),
+					'value' => $model->generateProvision($payValue)->toFixed(2),
 					'type_id' => $model->type_id,
 				];
 			}
@@ -96,12 +94,11 @@ class Provisions extends Component {
 			$toModels = $userData->getToQuery()->all();
 			foreach ($toModels as $model) {
 				foreach ($pays as $payId => $payValue) {
-					$value = $this->calculateProvision($model, $payValue);
 					$provisions[] = [
 						'pay_id' => $payId,
 						'to_user_id' => $model->to_user_id,
 						'from_user_id' => $model->from_user_id,
-						'value' => $value->toFixed(2),
+						'value' => $model->generateProvision($payValue)->toFixed(2),
 						'type_id' => $model->type_id,
 					];
 				}
@@ -117,79 +114,6 @@ class Provisions extends Component {
 				'type_id',
 			], $provisions)
 			->execute();
-	}
-
-	public function getValueToProvision(PayInterface $pay): Decimal {
-		return $pay->getValue();
-	}
-
-	public function generateProvision(ProvisionUser $provisionUser, PayInterface $pay): Provision {
-		return new Provision($this->generateProvisionData($provisionUser, $pay));
-	}
-
-	protected function generateProvisionData(ProvisionUser $provisionUser, ProvisionPay $pay): array {
-		$value = $this->calculateProvision($provisionUser, $pay->getProvisionValue());
-		return [
-			'pay_id' => $pay->id,
-			'to_user_id' => $provisionUser->to_user_id,
-			'from_user_id' => $provisionUser->from_user_id,
-			'value' => $value->toFixed(2),
-			'type_id' => $provisionUser->type_id,
-		];
-	}
-
-	/**
-	 * @param int $userId
-	 * @param int $typeId
-	 * @param IssuePay[] $pays
-	 * @return int
-	 */
-	public function add(int $userId, int $typeId, array $pays): int {
-		$usersProvision = ProvisionUser::find()
-			->onlyFrom($userId)
-			->forType($typeId)
-			->with('type')
-			->all();
-		$provisions = [];
-		foreach ($pays as $pay) {
-			foreach ($usersProvision as $provisionUser) {
-				$value = $this->calculateProvision($provisionUser, $this->issuePayValue($pay));
-				if ($value->isPositive()) {
-					$provisions[] = [
-						'pay_id' => $pay->id,
-						'to_user_id' => $provisionUser->to_user_id,
-						'from_user_id' => $provisionUser->from_user_id,
-						'value' => $value->toFixed(2),
-						'type_id' => $typeId,
-					];
-				} else {
-					Yii::warning([
-						'message' => 'Provision value is not positive',
-						'pay_id' => $pay->id,
-						'to_user_id' => $provisionUser->to_user_id,
-						'from_user_id' => $provisionUser->from_user_id,
-						'value' => $value->toFixed(2),
-						'type_id' => $typeId,
-					], 'provisions');
-				}
-			}
-		}
-		return Yii::$app->db->createCommand()
-			->batchInsert(Provision::tableName(), [
-				'pay_id',
-				'to_user_id',
-				'from_user_id',
-				'value',
-				'type_id',
-			], $provisions)
-			->execute();
-	}
-
-	public function calculateProvision(ProvisionUser $provisionUser, Decimal $value): Decimal {
-		if ($provisionUser->type->is_percentage) {
-			return $value->mul($provisionUser->getValue())->div(100);
-		}
-		return $provisionUser->getValue();
 	}
 
 }

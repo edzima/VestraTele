@@ -87,9 +87,9 @@ class SettlementController extends Controller {
 
 		Url::remember();
 
-		$userCostWithoutSettlementsDataProvider = new ActiveDataProvider([
+		$userNotSettledCosts = new ActiveDataProvider([
 			'query' => IssueCost::find()
-				->withoutSettlements()
+				->notSettled()
 				->andWhere([
 					'or', [
 						'user_id' => $model->getIssueUser()->user_id,
@@ -116,7 +116,7 @@ class SettlementController extends Controller {
 		return $this->render('user', [
 			'model' => $model,
 			'navTypesItems' => $navTypesItems,
-			'userCostWithoutSettlementsDataProvider' => $userCostWithoutSettlementsDataProvider,
+			'userNotSettledCosts' => $userNotSettledCosts,
 			'settlementCostDataProvider' => $settlementCostDataProvider,
 		]);
 	}

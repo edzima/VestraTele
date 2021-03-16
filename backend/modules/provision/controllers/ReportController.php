@@ -3,8 +3,10 @@
 namespace backend\modules\provision\controllers;
 
 use backend\helpers\Url;
+use common\helpers\Flash;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionReportSearch;
+use common\models\provision\ProvisionReportSummary;
 use common\models\provision\ProvisionSearch;
 use common\models\provision\ProvisionUsersSearch;
 use common\models\user\Worker;
@@ -65,7 +67,7 @@ class ReportController extends Controller {
 		$searchModel->setToUser($user);
 		$searchModel->dateTo = $dateTo;
 		$searchModel->dateFrom = $dateFrom;
-		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		$provisionsDataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		if ($searchModel->hasHiddenProvisions()) {
 			$link = Html::a('ukryto prowizje', [
 					'/provision/provision/index',
@@ -77,10 +79,29 @@ class ReportController extends Controller {
 			);
 			Yii::$app->session->addFlash('warning', 'W raporcie ' . $link);
 		}
+		if ($provisionsDataProvider->getTotalCount() > $searchModel->limit) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('provision',
+					'Total items count is greater than limit: {limit}. Change smaller dates range.', [
+						'limit' => $searchModel->limit,
+					]));
+		}
+
+		$notSettledCostsDataProvider = $searchModel->getNotSettledCosts();
+		$settledCostsDataProvider = $searchModel->getSettledCosts();
+
+		$summary = new ProvisionReportSummary([
+			'provisions' => $provisionsDataProvider->getModels(),
+			'settledCosts' => $settledCostsDataProvider->getModels(),
+			'notSettledCosts' => $notSettledCostsDataProvider->getModels(),
+		]);
 
 		return $this->render('view', [
 			'searchModel' => $searchModel,
-			'dataProvider' => $dataProvider,
+			'provisionsDataProvider' => $provisionsDataProvider,
+			'notSettledCostsDataProvider' => $notSettledCostsDataProvider,
+			'settledCostsDataProvider' => $settledCostsDataProvider,
+			'summary' => $summary,
 		]);
 	}
 
