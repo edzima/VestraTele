@@ -22,8 +22,11 @@ class CalculationToCreateSearchTest extends Unit {
 
 	public function _before(): void {
 		$this->tester->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures()),
-			IssueFixtureHelper::settlements()
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::stageAndTypesFixtures(),
+				IssueFixtureHelper::customer(true),
+				IssueFixtureHelper::issueUsers()
+			)
 		);
 		$this->model = $this->createModel();
 		parent::_before();

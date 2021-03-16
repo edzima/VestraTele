@@ -5,6 +5,7 @@ namespace backend\tests\unit\settlement\search;
 use backend\modules\settlement\models\search\IssueCostSearch;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\tests\_support\UnitSearchModelTrait;
 
 /**
@@ -21,8 +22,10 @@ class IssueCostSearchTest extends Unit {
 		$this->model = $this->createModel();
 		$this->tester->haveFixtures(
 			array_merge(
-				IssueFixtureHelper::fixtures(),
-				IssueFixtureHelper::settlements(true)
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::stageAndTypesFixtures(),
+				SettlementFixtureHelper::settlement(),
+				SettlementFixtureHelper::cost(true)
 			)
 		);
 	}

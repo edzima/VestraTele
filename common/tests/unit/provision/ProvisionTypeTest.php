@@ -28,7 +28,7 @@ class ProvisionTypeTest extends Unit {
 	public function testPercentValueLabel(): void {
 		$type = new ProvisionType();
 		$type->is_percentage = true;
-		$this->tester->assertSame('Provision (%)', $type->getAttributeLabel('value'));
+		$this->tester->assertSame('Provision (%)', $type->getAttributeLabel('formattedValue'));
 	}
 
 	public function testNotPercentFormattedValue(): void {
@@ -41,7 +41,7 @@ class ProvisionTypeTest extends Unit {
 	public function testNotPercentValueLabel(): void {
 		$type = new ProvisionType();
 		$type->is_percentage = false;
-		$this->tester->assertSame('Provision (' . Yii::$app->formatter->getCurrencySymbol() . ')', $type->getAttributeLabel('value'));
+		$this->tester->assertSame('Provision (' . Yii::$app->formatter->getCurrencySymbol() . ')', $type->getAttributeLabel('formattedValue'));
 	}
 
 	protected function grabType(string $index): ProvisionType {

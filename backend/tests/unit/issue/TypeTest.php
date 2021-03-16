@@ -4,35 +4,28 @@ namespace backend\tests\unit\issue;
 
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
-use common\fixtures\issue\TypeFixture;
 use common\models\issue\IssueType;
 use common\models\issue\Provision;
 
 class TypeTest extends Unit {
 
-	protected function _before(): void {
-		parent::_before();
-		$this->tester->haveFixtures([
-			'type' => [
-				'class' => TypeFixture::class,
-				'dataFile' => IssueFixtureHelper::dataDir(). 'issue/type.php',
-			],
-		]);
+	public function _fixtures(): array {
+		return IssueFixtureHelper::types();
 	}
 
-	public function testDuplicateName():void {
+	public function testDuplicateName(): void {
 		$model = new IssueType(['name' => 'Accident']);
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('Name "Accident" has already been taken.', $model->getFirstError('name'));
 	}
 
-	public function testDuplicateShortName():void {
+	public function testDuplicateShortName(): void {
 		$model = new IssueType(['name' => 'Accident2', 'short_name' => 'ACC']);
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('Shortname "ACC" has already been taken.', $model->getFirstError('short_name'));
 	}
 
-	public function testInvalidProvisionType():void {
+	public function testInvalidProvisionType(): void {
 		$model = new IssueType([
 			'name' => 'Benefits',
 			'short_name' => 'B',
@@ -43,7 +36,7 @@ class TypeTest extends Unit {
 		$this->tester->assertSame('Provision type is invalid.', $model->getFirstError('provision_type'));
 	}
 
-	public function testEmpty():void {
+	public function testEmpty(): void {
 		$model = new IssueType([
 			'name' => '',
 			'short_name' => '',

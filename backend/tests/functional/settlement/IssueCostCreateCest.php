@@ -4,6 +4,7 @@ namespace backend\tests\functional\settlement;
 
 use backend\tests\Step\Functional\CostIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueCost;
 
@@ -12,7 +13,10 @@ class IssueCostCreateCest {
 	public const ROUTE = '/settlement/cost/create';
 
 	public function _fixtures(): array {
-		return IssueFixtureHelper::fixtures();
+		return array_merge(
+			IssueFixtureHelper::issue(),
+			SettlementFixtureHelper::cost(false)
+		);
 	}
 
 	public function _before(CostIssueManager $I): void {

@@ -4,6 +4,7 @@ namespace backend\tests\functional\settlement;
 
 use backend\tests\Step\Functional\Bookkeeper;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 
@@ -11,39 +12,46 @@ class CalculationUpdateCest {
 
 	public const ROUTE = '/settlement/calculation/update';
 
+	private SettlementFixtureHelper $settlementFixture;
+
 	public function _before(Bookkeeper $I): void {
+		$this->settlementFixture = new SettlementFixtureHelper($I);
+
 		$I->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements(),
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::customer(),
+			IssueFixtureHelper::issueUsers(),
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::pay(),
 		));
 		$I->amLoggedIn();
 	}
 
 	public function checkUpdateValue(Bookkeeper $I): void {
-		$calculation = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
-		/** @var IssuePayCalculation $calculation */
-		$I->amOnPage([static::ROUTE, 'id' => $calculation->id]);
-		$I->see('Update settlement: ' . $calculation->getTypeName());
+		$model = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
+
+		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
+		$I->see('Update settlement: ' . $model->getTypeName());
 		$I->seeInField('Value with VAT', '1230');
 		$I->fillField('Value with VAT', 2460);
 		$I->click('Save');
 		$I->seeRecord(IssuePayCalculation::class, [
-			'id' => $calculation->id,
+			'id' => $model->id,
 			'value' => 2460,
 		]);
 		$I->dontSeeRecord(IssuePay::class, [
-			'calculation_id' => $calculation->id,
+			'calculation_id' => $model->id,
 			'value' => 1230,
 		]);
 		$I->seeRecord(IssuePay::class, [
-			'calculation_id' => $calculation->id,
+			'calculation_id' => $model->id,
 			'value' => 2460,
 		]);
 	}
 
 	public function checkUpdateValueForManyPays(Bookkeeper $I): void {
-		$calculation = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'many-pays');
-		/** @var IssuePayCalculation $calculation */
+		$calculation = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
+
 		$I->amOnPage([static::ROUTE, 'id' => $calculation->id]);
 		$I->seeInField('Value with VAT', '1230');
 		$I->fillField('Value with VAT', 2460);
@@ -64,8 +72,7 @@ class CalculationUpdateCest {
 	}
 
 	public function checkChangeType(Bookkeeper $I): void {
-		$calculation = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
-		/** @var IssuePayCalculation $calculation */
+		$calculation = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
 		$I->amOnPage([static::ROUTE, 'id' => $calculation->id]);
 		$I->seeOptionIsSelected('#calculationform-type', IssuePayCalculation::getTypesNames()[IssuePayCalculation::TYPE_ADMINISTRATIVE]);
 		$I->selectOption('#calculationform-type', IssuePayCalculation::TYPE_HONORARIUM);
@@ -81,8 +88,8 @@ class CalculationUpdateCest {
 	}
 
 	public function checkUpdateDeadlineAt(Bookkeeper $I): void {
-		$calculation = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
-		/** @var IssuePayCalculation $calculation */
+		$calculation = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
+
 		$I->amOnPage([static::ROUTE, 'id' => $calculation->id]);
 		$I->see('Update settlement: ' . $calculation->getTypeName());
 		$I->seeInField('Deadline at', '2019-01-01');

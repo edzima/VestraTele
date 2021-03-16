@@ -4,18 +4,14 @@ namespace backend\tests\unit\settlement;
 
 use backend\modules\settlement\models\ReceivePaysForm;
 use backend\tests\unit\Unit;
-use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 
 class ReceivePaysFormTest extends Unit {
 
 	public function _before(): void {
 		parent::_before();
 		$this->tester->haveFixtures(
-			array_merge(
-				IssueFixtureHelper::fixtures(),
-				IssueFixtureHelper::settlements(),
-				IssueFixtureHelper::payReceived()
-			)
+			SettlementFixtureHelper::payReceived()
 		);
 	}
 

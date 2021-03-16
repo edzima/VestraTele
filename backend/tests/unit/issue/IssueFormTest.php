@@ -13,9 +13,16 @@ use yii\base\InvalidConfigException;
 
 class IssueFormTest extends Unit {
 
+	private IssueFixtureHelper $issueFixture;
+
 	protected function _before(): void {
 		parent::_before();
-		$this->tester->haveFixtures(IssueFixtureHelper::fixtures());
+		$this->issueFixture = new IssueFixtureHelper($this->tester);
+		codecept_debug(array_keys($this->tester->grabFixtures()));
+	}
+
+	public function _fixtures(): array {
+		return IssueFixtureHelper::fixtures();
 	}
 
 	public function testWorkersList(): void {

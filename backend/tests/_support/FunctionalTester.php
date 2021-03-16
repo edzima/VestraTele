@@ -2,6 +2,7 @@
 
 namespace backend\tests;
 
+use common\fixtures\helpers\FixtureTester;
 use common\tests\_support\UserRbacActor;
 use Yii;
 
@@ -20,7 +21,7 @@ use Yii;
  *
  * @SuppressWarnings(PHPMD)
  */
-class FunctionalTester extends \Codeception\Actor {
+class FunctionalTester extends \Codeception\Actor implements FixtureTester {
 
 	use _generated\FunctionalTesterActions;
 	use UserRbacActor;

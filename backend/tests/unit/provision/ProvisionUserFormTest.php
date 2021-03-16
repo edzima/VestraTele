@@ -63,8 +63,6 @@ class ProvisionUserFormTest extends Unit {
 			'is_percentage' => 0,
 		])->id;
 
-		codecept_debug($percentageValueType);
-		codecept_debug($notPercentageValueType);
 
 		$this->givenForm([
 			'from_user_id' => UserFixtureHelper::AGENT_TOMMY_SET,

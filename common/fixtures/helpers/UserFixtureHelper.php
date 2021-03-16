@@ -6,6 +6,7 @@ use common\fixtures\user\AgentFixture;
 use common\fixtures\user\CustomerFixture;
 use common\fixtures\user\LawyerFixture;
 use common\fixtures\user\TelemarketerFixture;
+use common\fixtures\UserFixture;
 use common\fixtures\UserProfileFixture;
 use common\fixtures\UserTraitFixture;
 use Yii;
@@ -27,6 +28,9 @@ class UserFixtureHelper {
 	public const WORKER_TELEMARKETER = 'telemarketer';
 
 	public const CUSTOMER = 'customer';
+
+	public const MANAGER_JOHN = 500;
+	public const MANAGER_NICOLE = 501;
 
 	public static function dataDir(): string {
 		return Yii::getAlias('@common/tests/_data/user/');
@@ -79,6 +83,17 @@ class UserFixtureHelper {
 		return [
 			'class' => LawyerFixture::class,
 			'dataFile' => static::dataDir() . 'lawyer.php',
+		];
+	}
+
+	/**
+	 * @return string[]
+	 * @todo maybe user RbacUserFixture with Role User::ROLE_MANAGER
+	 */
+	public static function manager(): array {
+		return [
+			'class' => UserFixture::class,
+			'dataFile' => static::dataDir() . 'manager.php',
 		];
 	}
 

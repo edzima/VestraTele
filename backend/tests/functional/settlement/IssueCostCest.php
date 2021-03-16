@@ -8,6 +8,7 @@ use backend\tests\Step\Functional\CostIssueManager;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\Issue;
 
 class IssueCostCest {
@@ -68,7 +69,7 @@ class IssueCostCest {
 
 	public function checkIssue(CostIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		$I->haveFixtures(IssueFixtureHelper::issue());
 		/* @var Issue $issue */
 		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
@@ -89,7 +90,7 @@ class IssueCostCest {
 
 	public function checkArchivedIssue(CostIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		$I->haveFixtures(IssueFixtureHelper::issue());
 		/* @var Issue $issue */
 		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 'archived');
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
@@ -98,16 +99,21 @@ class IssueCostCest {
 
 	public function checkViewPage(CostIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->haveFixtures(array_merge(IssueFixtureHelper::fixtures(), IssueFixtureHelper::settlements(true)));
+		$I->haveFixtures(array_merge(SettlementFixtureHelper::cost(true), IssueFixtureHelper::issue()));
 		$I->amOnPage([static::ROUTE_VIEW, 'id' => 1]);
 		$I->see('Purchase of receivables');
-		$I->see('600.00');
+		$I->see('615.00');
 		$I->see('23,00%');
 		$I->see('User');
 	}
 
 	public function checkSettlementLink(CostIssueManager $I): void {
 		$I->amLoggedIn();
+		$I->haveFixtures(array_merge(
+				SettlementFixtureHelper::cost(true),
+				IssueFixtureHelper::issue())
+		);
+
 		$I->haveFixtures(array_merge(IssueFixtureHelper::fixtures(), IssueFixtureHelper::settlements(true)));
 		$withoutSettlementsId = 4;
 		$I->amOnPage([static::ROUTE_VIEW, 'id' => $withoutSettlementsId]);
@@ -125,7 +131,12 @@ class IssueCostCest {
 
 	public function checkSettlementUnLink(CostIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->haveFixtures(array_merge(IssueFixtureHelper::fixtures(), IssueFixtureHelper::settlements(true)));
+		$I->haveFixtures(array_merge(
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::types(),
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::cost(true),
+		));
 		$withSettlementsId = 1;
 		$I->amOnPage([static::ROUTE_VIEW, 'id' => $withSettlementsId]);
 		$I->see('Settlements', '#calculation-grid-container');
