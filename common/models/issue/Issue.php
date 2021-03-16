@@ -73,7 +73,7 @@ use yii\db\Expression;
  * @property City $victimCity
  * @property Worker $agent
  * @property Worker $lawyer
- * @property-read Customer $customer
+ * @property-read User $customer
  * @property Worker|null $tele
  * @property IssuePay[] $pays
  * @property EntityResponsible $entityResponsible
@@ -430,10 +430,11 @@ class Issue extends ActiveRecord implements IssueInterface {
 		}
 	}
 
+
 	/**
 	 * @param string $type
 	 */
-	public function unlinkUser(string $type) {
+	public function unlinkUser(string $type): void {
 		$user = $this->getUsers()->withType($type)->one();
 		if ($user !== null) {
 			$this->unlink('users', $user, true);
@@ -445,7 +446,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	 * @return IssueQuery the active query used by this AR class.
 	 */
 	public static function find(): IssueQuery {
-		return new IssueQuery(get_called_class());
+		return new IssueQuery(static::class);
 	}
 
 	public function isForUser(int $id): bool {
