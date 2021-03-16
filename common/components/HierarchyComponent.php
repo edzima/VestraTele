@@ -24,6 +24,19 @@ class HierarchyComponent extends Component {
 		return $this->modelClass::findOne($id);
 	}
 
+	public function unassign(int $id): bool {
+		$attributes = [
+			$this->parentColumn => null,
+		];
+		$condition = [
+			$this->primaryKeyColumn => $id,
+		];
+		/** @var ActiveRecord $model */
+		$model = $this->modelClass;
+		$model::updateAll($attributes, $condition);
+		return true;
+	}
+
 	public function assign(int $id, int $parent_id = null): bool {
 		if ($id === $parent_id) {
 			throw new InvalidArgumentException('$id must be other than $parentId.');

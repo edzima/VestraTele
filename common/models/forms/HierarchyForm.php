@@ -57,6 +57,9 @@ class HierarchyForm extends Model {
 		if (!$this->validate()) {
 			return false;
 		}
+		if (empty($this->parent_id)) {
+			return $this->hierarchy->unassign($this->id);
+		}
 		return $this->hierarchy->assign($this->id, $this->parent_id);
 	}
 
