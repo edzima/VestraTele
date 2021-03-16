@@ -28,6 +28,7 @@ return [
 	'Provisions types' => 'Typy prowizji',
 	'Provisions types for settlement: {type}' => 'Typy prowizji dla rozliczenia: {type}',
 	'Reports' => 'Raporty',
+	'Report: {user} ({fromDate} - {toDate})' => 'Raport: {user} ({fromDate} - {toDate})',
 	'Self provisions' => 'Własne prowizje',
 	'Self - {user}' => 'Własna - {user}',
 	'Schemas' => 'Schematy',

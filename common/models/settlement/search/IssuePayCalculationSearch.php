@@ -33,14 +33,13 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public string $customerLastname = '';
 	public $issue_type_id;
 
-	public bool $withArchive = false;
-
 	/**
 	 * @var int[]|null
 	 */
 	public array $issueUsersIds = [];
 	public bool $withCustomer = true;
 	public bool $withAgents = true;
+	public bool $withArchive = false;
 	public ?bool $withoutProvisions = null;
 
 	public ?bool $onlyWithProblems = null;

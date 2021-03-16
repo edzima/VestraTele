@@ -2,19 +2,21 @@
 
 namespace common\models\provision;
 
+use common\models\issue\IssueCost;
 use common\models\user\User;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
+use yii\data\DataProviderInterface;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
  * Class ProvisionReportSearch
- *
- * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
- *
  */
 class ProvisionReportSearch extends ProvisionSearch {
+
+	public int $limit = 100;
 
 	public function setToUser(User $user): void {
 		$this->toUser = $user;
@@ -32,8 +34,8 @@ class ProvisionReportSearch extends ProvisionSearch {
 	public function search(array $params): ActiveDataProvider {
 		$provider = parent::search($params);
 		$provider->sort = false;
-		$provider->pagination->defaultPageSize = 100;
-		$provider->pagination->pageSizeLimit = [1, 100];
+		$provider->pagination->defaultPageSize = $this->limit;
+		$provider->pagination->pageSizeLimit = false;
 
 		/* @var $query ProvisionQuery */
 		$query = $provider->query;
@@ -47,12 +49,35 @@ class ProvisionReportSearch extends ProvisionSearch {
 		return Yii::$app->formatter->asCurrency($query->sum('provision.value'));
 	}
 
+	public function getNotSettledCosts(): DataProviderInterface {
+		return new ArrayDataProvider([
+			'allModels' => IssueCost::find()
+				->indexBy('id')
+				->with('issue')
+				->user($this->toUser->id)
+				->notSettled()
+				->andWhere(['between', 'date_at', $this->dateFrom, $this->dateTo])
+				->all(),
+		]);
+	}
+
+	public function getSettledCosts(): DataProviderInterface {
+		return new ArrayDataProvider([
+			'allModels' => IssueCost::find()
+				->indexBy('id')
+				->with('issue')
+				->user($this->toUser->id)
+				->settled($this->dateFrom, $this->dateTo)
+				->all(),
+		]);
+	}
+
 	public function hasHiddenProvisions(): bool {
 		$query = Provision::find()
-			->hidden();
+			->hidden()
+			->andFilterWhere(['to_user_id' => $this->to_user_id]);
 
 		$this->dateFilter($query);
-		$query->andFilterWhere(['to_user_id' => $this->to_user_id]);
 		return $query->exists();
 	}
 

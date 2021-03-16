@@ -217,6 +217,7 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 		$this->save(false);
 	}
 
+	//@todo to remove
 	public function getCosts(bool $withVAT = false): Decimal {
 		//@todo without div by pays count, first sub sum costs.
 		if ($this->calculation->hasCosts) {

@@ -4,6 +4,7 @@ namespace common\models\provision;
 
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\query\IssuePayCalculationQuery;
+use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\query\UserQuery;
 use Yii;
@@ -16,7 +17,7 @@ use yii\helpers\ArrayHelper;
 /**
  * ProvisionSearch represents the model behind the search form of `common\models\provision\Provision`.
  */
-class ProvisionSearch extends Provision implements CustomerSearchInterface {
+class ProvisionSearch extends Provision implements CustomerSearchInterface, SearchModel {
 
 	public const PAY_STATUS_PAYED = 'payed';
 	public const PAY_STATUS_NOT_PAYED = 'not-payed';
@@ -92,9 +93,9 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface {
 			->with('pay.issue')
 			->with('pay.calculation')
 			->with('pay.calculation.costs')
-			->with('type')
 			->with('fromUser.userProfile')
-			->with('toUser.userProfile');
+			->with('toUser.userProfile')
+			->with('type');
 
 		$query->joinWith([
 			'pay.issue.customer C' => function (UserQuery $query) {
