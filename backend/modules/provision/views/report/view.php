@@ -31,28 +31,32 @@ $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 ?>
 
-<?= DetailView::widget([
-	'model' => $summary,
-	'attributes' => [
-		[
-			'attribute' => 'provisionsSum',
-			'format' => 'currency',
+<?= $summary
+	?
+	DetailView::widget([
+		'model' => $summary,
+		'attributes' => [
+			[
+				'attribute' => 'provisionsSum',
+				'format' => 'currency',
+			],
+			[
+				'attribute' => 'notSettledCostsSum',
+				'format' => 'currency',
+			],
+			[
+				'attribute' => 'settledCostsSum',
+				'format' => 'currency',
+				'value' => $summary->getSettledCostsSum() * -1,
+			],
+			[
+				'attribute' => 'totalSum',
+				'format' => 'currency',
+			],
 		],
-		[
-			'attribute' => 'notSettledCostsSum',
-			'format' => 'currency',
-		],
-		[
-			'attribute' => 'settledCostsSum',
-			'format' => 'currency',
-			'value' => $summary->getSettledCostsSum() * -1,
-		],
-		[
-			'attribute' => 'totalSum',
-			'format' => 'currency',
-		],
-	],
-]) ?>
+	])
+	: ''
+?>
 
 <div class="row">
 
@@ -60,6 +64,8 @@ YiiAsset::register($this);
 		<?= GridView::widget([
 			'dataProvider' => $notSettledCostsDataProvider,
 			'summary' => false,
+			'showOnEmpty' => false,
+			'emptyText' => '',
 			'showPageSummary' => true,
 			'caption' => Yii::t('provision', 'Not settled costs.'),
 			'columns' => [
@@ -100,6 +106,8 @@ YiiAsset::register($this);
 			'dataProvider' => $settledCostsDataProvider,
 			'summary' => false,
 			'showPageSummary' => true,
+			'showOnEmpty' => false,
+			'emptyText' => '',
 			'caption' => Yii::t('provision', 'Settled costs.'),
 			'columns' => [
 				[

@@ -90,11 +90,17 @@ class ReportController extends Controller {
 		$notSettledCostsDataProvider = $searchModel->getNotSettledCosts();
 		$settledCostsDataProvider = $searchModel->getSettledCosts();
 
-		$summary = new ProvisionReportSummary([
-			'provisions' => $provisionsDataProvider->getModels(),
-			'settledCosts' => $settledCostsDataProvider->getModels(),
-			'notSettledCosts' => $notSettledCostsDataProvider->getModels(),
-		]);
+		$summary = null;
+		if (
+			$notSettledCostsDataProvider->getTotalCount() > 0
+			|| $settledCostsDataProvider->getTotalCount() > 0
+		) {
+			$summary = new ProvisionReportSummary([
+				'provisions' => $provisionsDataProvider->getModels(),
+				'settledCosts' => $settledCostsDataProvider->getModels(),
+				'notSettledCosts' => $notSettledCostsDataProvider->getModels(),
+			]);
+		}
 
 		return $this->render('view', [
 			'searchModel' => $searchModel,
