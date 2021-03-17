@@ -4,25 +4,36 @@ namespace backend\tests\functional\settlement;
 
 use backend\helpers\Url;
 use backend\modules\settlement\controllers\CostController;
+use backend\tests\FunctionalTester;
 use backend\tests\Step\Functional\CostIssueManager;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
-use common\models\issue\Issue;
+use common\fixtures\helpers\UserFixtureHelper;
 
 class IssueCostCest {
+
+	private IssueFixtureHelper $issueFixture;
 
 	/* @see CostController::actionIndex() */
 	public const ROUTE_INDEX = '/settlement/cost/index';
 	/* @see CostController::actionIssue() */
 	public const ROUTE_ISSUE = '/settlement/cost/issue';
+	/* @see CostController::actionCreate() */
+	public const ROUTE_CREATE = '/settlement/cost/create';
+	/* @see CostController::actionCreateInstallment() */
+	public const ROUTE_CREATE_INSTALLMENT = '/settlement/cost/create-installment';
 	/* @see CostController::actionView() */
 	public const ROUTE_VIEW = '/settlement/cost/view';
 	/* @see CostController::actionSettlementLink() */
 	public const ROUTE_SETTLEMENT_LINK = '/settlement/cost/settlement-link';
 	/* @see CostController::actionSettlementUnlink() */
 	public const ROUTE_SETTLEMENT_UNLINK = '/settlement/cost/settlement-unlink';
+
+	public function _before(FunctionalTester $I): void {
+		$this->issueFixture = new IssueFixtureHelper($I);
+	}
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -70,8 +81,7 @@ class IssueCostCest {
 	public function checkIssue(CostIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(IssueFixtureHelper::issue());
-		/* @var Issue $issue */
-		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
+		$issue = $this->issueFixture->grabIssue(0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
 		$I->see('Costs: ' . $issue->longId);
 		$I->seeInGridHeader('Type');
@@ -91,8 +101,7 @@ class IssueCostCest {
 	public function checkArchivedIssue(CostIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(IssueFixtureHelper::issue());
-		/* @var Issue $issue */
-		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 'archived');
+		$issue = $this->issueFixture->grabIssue('archived');
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
 		$I->seeResponseCodeIs(404);
 	}
@@ -107,14 +116,54 @@ class IssueCostCest {
 		$I->see('User');
 	}
 
+	public function checkCreate(CostIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->haveFixtures(
+			array_merge(
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::users(),
+				SettlementFixtureHelper::cost(false),
+			)
+		);
+		$issue = $this->issueFixture->grabIssue(0);
+		$I->amOnPage([static::ROUTE_CREATE, 'id' => $issue->id]);
+		$I->see('Create cost: ' . $issue->longId);
+		$I->fillField('Value with VAT', 1230);
+		$I->fillField('VAT (%)', 23);
+		$I->click('Save');
+		$I->seeInCurrentUrl(static::ROUTE_VIEW);
+	}
+
+	public function checkCreateInstallment(CostIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->haveFixtures(
+			array_merge(
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::users(),
+				SettlementFixtureHelper::cost(false),
+			)
+		);
+		$issue = $this->issueFixture->grabIssue(0);
+		$I->amOnPage([static::ROUTE_CREATE_INSTALLMENT, 'id' => $issue->id]);
+		$I->dontSee('Type', 'label');
+		$I->dontSee('Settled at', 'label');
+		$I->selectOption('User', UserFixtureHelper::AGENT_PETER_NOWAK);
+		$I->fillField('Value with VAT', 123);
+		$I->fillField('VAT (%)', 23);
+		$I->click('Save');
+		$I->seeInCurrentUrl(static::ROUTE_VIEW);
+	}
+
 	public function checkSettlementLink(CostIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(array_merge(
+				SettlementFixtureHelper::settlement(),
 				SettlementFixtureHelper::cost(true),
-				IssueFixtureHelper::issue())
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::types(),
+			)
 		);
 
-		$I->haveFixtures(array_merge(IssueFixtureHelper::fixtures(), IssueFixtureHelper::settlements(true)));
 		$withoutSettlementsId = 4;
 		$I->amOnPage([static::ROUTE_VIEW, 'id' => $withoutSettlementsId]);
 		$I->dontSee('Settlements', '#calculation-grid-container');

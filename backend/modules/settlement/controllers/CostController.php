@@ -140,6 +140,7 @@ class CostController extends Controller {
 	public function actionCreateInstallment(int $id, int $user_id = null) {
 		$issue = $this->findIssue($id);
 		$model = new IssueCostForm($issue);
+		$model->setScenario(IssueCostForm::SCENARIO_CREATE_INSTALLMENT);
 		$model->user_id = $user_id;
 		$model->type = IssueCost::TYPE_INSTALLMENT;
 		$model->date_at = date(DATE_ATOM);
@@ -148,7 +149,7 @@ class CostController extends Controller {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
-		return $this->render('create', [
+		return $this->render('create-installment', [
 			'model' => $model,
 		]);
 	}
