@@ -6,16 +6,26 @@ use common\fixtures\provision\ProvisionFixture;
 use common\fixtures\provision\ProvisionTypeFixture;
 use common\fixtures\provision\ProvisionUserFixture;
 use common\models\provision\IssueProvisionType;
+use common\models\provision\Provision;
 use Yii;
 
-class ProvisionFixtureHelper {
+class ProvisionFixtureHelper extends BaseFixtureHelper {
+
+	public const TYPE_AGENT_PERCENT_25 = 1;
+
+	protected const DEFAULT_TYPE_ID = self::TYPE_AGENT_PERCENT_25;
+	protected const DEFAULT_USER_ID = UserFixtureHelper::AGENT_PETER_NOWAK;
 
 	public const PROVISION = 'provision';
 	public const TYPE = 'provision-type';
 	public const USER = 'provision-user';
 
-	public static function dataDir(): string {
+	public static function getDefaultDataDirPath(): string {
 		return Yii::getAlias('@common/tests/_data/provision/');
+	}
+
+	public function grabProvision(string $index): Provision {
+		return $this->tester->grabFixture(static::PROVISION, $index);
 	}
 
 	public static function all(): array {
@@ -30,7 +40,7 @@ class ProvisionFixtureHelper {
 		return [
 			static::PROVISION => [
 				'class' => ProvisionFixture::class,
-				'dataFile' => static::dataDir() . 'provision.php',
+				'dataFile' => static::getDataDirPath() . 'provision.php',
 			],
 		];
 	}
@@ -39,7 +49,7 @@ class ProvisionFixtureHelper {
 		return [
 			static::TYPE => [
 				'class' => ProvisionTypeFixture::class,
-				'dataFile' => static::dataDir() . 'type.php',
+				'dataFile' => static::getDataDirPath() . 'type.php',
 			],
 		];
 	}
@@ -49,7 +59,7 @@ class ProvisionFixtureHelper {
 			static::TYPE => [
 				'class' => ProvisionTypeFixture::class,
 				'modelClass' => IssueProvisionType::class,
-				'dataFile' => static::dataDir() . 'type.php',
+				'dataFile' => static::getDataDirPath() . 'type.php',
 			],
 		];
 	}
@@ -58,8 +68,32 @@ class ProvisionFixtureHelper {
 		return [
 			static::USER => [
 				'class' => ProvisionUserFixture::class,
-				'dataFile' => static::dataDir() . 'user.php',
+				'dataFile' => static::getDataDirPath() . 'user.php',
 			],
 		];
+	}
+
+	public function haveProvision($value, array $attributes = []): int {
+		$attributes['value'] = $value;
+		return $this->tester->haveRecord(Provision::class, $this->defaultProvisionAttributes($attributes));
+	}
+
+	public function defaultProvisionAttributes(array $attributes): array {
+		if (!isset($attributes['vat'])) {
+			$attributes['vat'] = 0;
+		}
+		if (!isset($attributes['from_user_id'])) {
+			$attributes['from_user_id'] = static::DEFAULT_USER_ID;
+		}
+		if (!isset($attributes['to_user_id'])) {
+			$attributes['to_user_id'] = static::DEFAULT_USER_ID;
+		}
+		if (!isset($attributes['pay_id'])) {
+			$attributes['pay_id'] = 1;
+		}
+		if (!isset($attributes['type_id'])) {
+			$attributes['type_id'] = static::DEFAULT_TYPE_ID;
+		}
+		return $attributes;
 	}
 }

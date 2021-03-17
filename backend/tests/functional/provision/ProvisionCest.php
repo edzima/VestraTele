@@ -3,24 +3,18 @@
 namespace backend\tests\functional\provision;
 
 use backend\modules\provision\controllers\ProvisionController;
+use backend\tests\Page\provision\ProvisionUpdatePage;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\ProvisionManager;
-use common\fixtures\helpers\IssueFixtureHelper;
-use common\fixtures\helpers\ProvisionFixtureHelper;
+use common\models\provision\Provision;
 use Yii;
 
 class ProvisionCest {
 
 	/** @see ProvisionController::actionIndex() */
 	public const ROUTE_INDEX = '/provision/provision/index';
-
-	public function _fixtures(): array {
-		return array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements(),
-			ProvisionFixtureHelper::provision()
-		);
-	}
+	/** @see ProvisionController::actionUpdate() */
+	public const ROUTE_UPDATE = '/provision/provision/update';
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -48,6 +42,26 @@ class ProvisionCest {
 		$I->seeInGridHeader('Provision (%)');
 		$currencyCode = Yii::$app->formatter->getCurrencySymbol();
 		$I->seeInGridHeader("Provision ($currencyCode)");
+	}
+
+	public function checkUpdateValue(ProvisionManager $I, ProvisionUpdatePage $page): void {
+		$I->amLoggedIn();
+		$page->haveFixtures();
+		$id = $page->haveProvision(100);
+		$I->amOnPage([static::ROUTE_UPDATE, 'id' => $id]);
+		$page->fillValueField(300);
+		$I->click('Save');
+		$I->seeRecord(Provision::class, ['id' => $id, 'value' => 300]);
+	}
+
+	public function checkUpdatePercent(ProvisionManager $I, ProvisionUpdatePage $page): void {
+		$I->amLoggedIn();
+		$page->haveFixtures();
+		$id = $page->haveProvision(300, ['pay_id' => 1]);
+		$I->amOnPage([static::ROUTE_UPDATE, 'id' => $id]);
+		$page->fillPercentField(10);
+		$I->click('Save');
+		$I->seeRecord(Provision::class, ['id' => $id, 'value' => 100]);
 	}
 
 }
