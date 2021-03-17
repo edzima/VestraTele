@@ -47,6 +47,7 @@ return [
 	'Create user' => 'Dodaj użytkownika',
 	'Create customer' => 'Dodaj klienta',
 	'Create worker' => 'Dodaj pracownika',
+	'Create installment cost: {issue}' => 'Dodaj zaliczkę: {issue}',
 	'Customers' => 'Klienci',
 	'DB manager' => 'Zarządzanie Bazą Danych',
 	'Delete' => 'Usuń',

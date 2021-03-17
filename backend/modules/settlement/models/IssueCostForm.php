@@ -2,6 +2,7 @@
 
 namespace backend\modules\settlement\models;
 
+use common\models\forms\HiddenFieldsModel;
 use common\models\issue\Issue;
 use common\models\issue\IssueCost;
 use common\models\user\User;
@@ -14,7 +15,9 @@ use yii\base\Model;
  *
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  */
-class IssueCostForm extends Model {
+class IssueCostForm extends Model implements HiddenFieldsModel {
+
+	public const SCENARIO_CREATE_INSTALLMENT = 'create-installment';
 
 	public string $date_at = '';
 	public ?string $settled_at = null;
@@ -56,6 +59,10 @@ class IssueCostForm extends Model {
 					return $this->type === IssueCost::TYPE_INSTALLMENT;
 				},
 				'enableClientValidation' => false,
+			],
+			[
+				'user_id', 'required',
+				'on' => static::SCENARIO_CREATE_INSTALLMENT,
 			],
 			['user_id', 'integer'],
 			[['value', 'vat'], 'number'],
@@ -109,5 +116,17 @@ class IssueCostForm extends Model {
 		$model->user_id = $this->user_id;
 		$model->settled_at = $this->settled_at;
 		return $model->save(false);
+	}
+
+	public function isVisibleField(string $attribute): bool {
+		if ($this->scenario === static::SCENARIO_CREATE_INSTALLMENT) {
+			if ($attribute === 'type') {
+				return false;
+			}
+			if ($attribute === 'settled_at') {
+				return false;
+			}
+		}
+		return true;
 	}
 }

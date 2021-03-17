@@ -49,10 +49,6 @@ class IssuePayCalculationGrid extends BaseIssuePayCalculationGrid {
 						: '';
 				},
 			],
-
-			'contentOptions' => [
-				'class' => 'd-inline-flex width-100 justify-center',
-			],
 		];
 	}
 }
