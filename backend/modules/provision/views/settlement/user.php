@@ -52,14 +52,14 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 	</p>
 
 	<div class="row">
-		<div class="col-md-4">
+		<div class="col-md-12 col-lg-4">
 			<?= SettlementDetailView::widget([
 				'model' => $model->getModel(),
 				'withOwner' => false,
 			]) ?>
 		</div>
 
-		<div class="col-md-4">
+		<div class="col-md-6 col-lg-4">
 			<?= GridView::widget([
 					'dataProvider' => $userNotSettledCosts,
 					'toolbar' => [
@@ -107,7 +107,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 			) ?>
 		</div>
 
-		<div class="col-md-4">
+		<div class="col-md-6 col-lg-4">
 			<?= GridView::widget([
 					'dataProvider' => $settlementCostDataProvider,
 					'panel' => [
