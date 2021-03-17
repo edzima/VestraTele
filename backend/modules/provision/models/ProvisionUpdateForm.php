@@ -8,6 +8,7 @@ use common\models\provision\Provision;
 use common\models\user\User;
 use Decimal\Decimal;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 
 /**
@@ -19,44 +20,44 @@ use yii\base\Model;
  *
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  */
-class ProvisionForm extends Model {
+class ProvisionUpdateForm extends Model {
 
+	public $value;
 	public $percent;
 	public $hide_on_report;
 
-	/**
-	 * @var Provision
-	 */
 	private Provision $model;
 
 	public function __construct(Provision $model, $config = []) {
+		if ($model->isNewRecord) {
+			throw new InvalidConfigException('Provision can not be new record.');
+		}
 		$this->setModel($model);
 		parent::__construct($config);
 	}
 
 	private function setModel(Provision $model): void {
 		$this->model = $model;
+		$this->value = $model->getValue()->toFixed(2);
 		$this->percent = $model->getDivision()->mul(100)->toFixed(2);
 		$this->hide_on_report = $model->hide_on_report;
 	}
 
 	public function rules(): array {
 		return [
-			['percent', 'required'],
+			[['percent', 'value'], 'required'],
 			['hide_on_report', 'boolean'],
 			['percent', 'number', 'min' => 0, 'max' => 100],
+			['value', 'number', 'min' => 0],
 		];
 	}
 
 	public function attributeLabels(): array {
 		return [
+			'value' => Yii::t('provision', 'Provision ({currencySymbol})', ['currencySymbol' => Yii::$app->formatter->getCurrencySymbol()]),
 			'percent' => Yii::t('provision', 'Provision (%)'),
 			'hide_on_report' => Yii::t('provision', 'Hide on report'),
 		];
-	}
-
-	public function getId(): int {
-		return $this->model->id;
 	}
 
 	public function getModel(): Provision {
@@ -75,16 +76,20 @@ class ProvisionForm extends Model {
 		if (!$this->validate()) {
 			return false;
 		}
-		if ($this->percent === 0) {
-			return $this->model->delete();
-		}
 		$model = $this->model;
-		$percent = new Decimal($this->percent);
-		$model->value = Yii::$app->provisions->issuePayValue($this->model->pay)
-			->mul($percent)
-			->div(100)
-			->toFixed(2);
+		$model->value = $this->generateValue()->toFixed(2);
 		$model->hide_on_report = $this->hide_on_report;
-		return $model->save();
+		return $model->save(false);
+	}
+
+	public function generateValue(): Decimal {
+		$value = new Decimal($this->value);
+		if (!$value->equals($this->getModel()->value)) {
+			return $value;
+		}
+		$percent = new Decimal($this->percent);
+		return Yii::$app->provisions->issuePayValue($this->model->pay)
+			->mul($percent)
+			->div(100);
 	}
 }

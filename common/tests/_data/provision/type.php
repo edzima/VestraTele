@@ -1,5 +1,6 @@
 <?php
 
+use common\fixtures\helpers\ProvisionFixtureHelper;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
 use common\models\provision\IssueProvisionType;
@@ -7,6 +8,7 @@ use yii\helpers\Json;
 
 return [
 	'agent-percent-25' => [
+		'id' => ProvisionFixtureHelper::TYPE_AGENT_PERCENT_25,
 		'name' => 'Agent Honorarium',
 		'is_percentage' => 1,
 		'is_active' => 1,

@@ -10,4 +10,11 @@ interface FixtureTester {
 
 	public function seeRecord(string $class, array $array);
 
+	/**
+	 * @param string $className
+	 * @param array $attributes
+	 * @return mixed
+	 */
+	public function haveRecord(string $className, array $attributes);
+
 }
