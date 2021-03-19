@@ -55,7 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'updated_at:datetime',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{create-issue} {view} {update}',
+				'template' => '{create-issue} {link-to-issue} {view} {update}',
 				'buttons' => [
 					'create-issue' => static function (string $url, Customer $model): string {
 						return Html::a(
@@ -64,6 +64,14 @@ $this->params['breadcrumbs'][] = $this->title;
 							[
 								'title' => Yii::t('backend', 'Create issue'),
 								'aria-label' => Yii::t('backend', 'Create issue'),
+							]);
+					},
+					'link-to-issue' => static function (string $url, Customer $model) {
+						return Html::a(Html::icon('link'),
+							['/issue/user/link', 'userId' => $model->id],
+							[
+								'title' => Yii::t('backend', 'Link to issue'),
+								'aria-label' => Yii::t('backend', 'Link to issue'),
 							]);
 					},
 				],

@@ -64,15 +64,14 @@ $this->params['breadcrumbs'][] = $this->title;
 			'action_at:Datetime',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{view} {update} {provision} {hierarchy} {delete}',
+				'template' => '{provision} {hierarchy}  {link-to-issue} {view} {update}  {delete}',
 				'buttons' => [
 					'hierarchy' => static function (string $url, Worker $model) {
-						return Html::a('<span class="glyphicon glyphicon-king"></span>',
+						return Html::a(Html::icon('king'),
 							['hierarchy', 'id' => $model->id],
 							[
 								'title' => Yii::t('common', 'Hierarchy'),
 								'aria-label' => Yii::t('common', 'Hierarchy'),
-								'data-pjax' => '0',
 							]);
 					},
 					'provision' => static function (string $url, Worker $model) {
@@ -81,7 +80,14 @@ $this->params['breadcrumbs'][] = $this->title;
 							[
 								'title' => Yii::t('backend', 'Provisions'),
 								'aria-label' => Yii::t('backend', 'Provisions'),
-								'data-pjax' => '0',
+							]);
+					},
+					'link-to-issue' => static function (string $url, Worker $model) {
+						return Html::a(Html::icon('link'),
+							['/issue/user/link', 'userId' => $model->id],
+							[
+								'title' => Yii::t('backend', 'Link to issue'),
+								'aria-label' => Yii::t('backend', 'Link to issue'),
 							]);
 					},
 				],
@@ -91,6 +97,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					'delete' => Yii::$app->user->can(Worker::PERMISSION_WORKERS),
 					'hierarchy' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
 					'provision' => Yii::$app->user->can(Worker::PERMISSION_PROVISION),
+					'link-to-issue' => Yii::$app->user->can(Worker::PERMISSION_ISSUE),
 				],
 
 			],
