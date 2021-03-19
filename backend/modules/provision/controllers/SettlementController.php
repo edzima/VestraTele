@@ -4,6 +4,7 @@ namespace backend\modules\provision\controllers;
 
 use backend\helpers\Url;
 use backend\modules\provision\models\SettlementUserProvisionsForm;
+use common\components\provision\exception\MissingProvisionUserException;
 use common\helpers\Flash;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
@@ -27,10 +28,8 @@ class SettlementController extends Controller {
 			'pagination' => false,
 			'sort' => false,
 		]);
-		$userModels = [];
-		foreach ($model->issue->users as $issueUser) {
-			$userModels[] = new SettlementUserProvisionsForm($model, $issueUser->type);
-		}
+
+		$userModels = SettlementUserProvisionsForm::createModels($model);
 
 		if (empty(IssueProvisionType::findCalculationTypes($model))) {
 			Flash::add(Flash::TYPE_WARNING,
@@ -47,6 +46,20 @@ class SettlementController extends Controller {
 		]);
 	}
 
+	public function actionGenerate(int $id) {
+		$model = $this->findModel($id);
+		try {
+			$count = Yii::$app->provisions->settlement($model);
+			if ($count > 0) {
+				Flash::add(Flash::TYPE_SUCCESS, Yii::t('provision', 'Success! Generate {count} provisions.', ['count' => $count]));
+			}
+		} catch (MissingProvisionUserException $exception) {
+			Flash::add(Flash::TYPE_ERROR, $exception->getMessage());
+		}
+
+		return $this->redirect(['view', 'id' => $id]);
+	}
+
 	public function actionUser(int $id, string $issueUserType, int $typeId = null) {
 		$settlement = $this->findModel($id);
 
@@ -60,7 +73,7 @@ class SettlementController extends Controller {
 			try {
 				$model->setType($this->findType($typeId));
 			} catch (InvalidConfigException $e) {
-				throw new NotFoundHttpException();
+				throw new NotFoundHttpException($e->getMessage());
 			}
 		} else {
 			$types = $model->getTypes();
@@ -109,7 +122,13 @@ class SettlementController extends Controller {
 			]
 		);
 
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+			$provisions = Yii::$app->provisions->generateProvisionsData($model->getData(), $model->getPaysValues());
+			$count = Yii::$app->provisions->batchInsert($provisions);
+			if ($count > 0) {
+				Flash::add(Flash::TYPE_SUCCESS, Yii::t('provision',
+					'Success generated {count} provisions.', ['count' => $count]));
+			}
 			return $this->redirect(['view', 'id' => $id]);
 		}
 

@@ -1,8 +1,8 @@
 <?php
 
 use backend\helpers\Html;
-use backend\modules\provision\models\ProvisionUserData;
 use backend\modules\provision\widgets\UserProvisionsWidget;
+use common\models\provision\ProvisionUserData;
 
 /* @var $this yii\web\View */
 /* @var $model ProvisionUserData */

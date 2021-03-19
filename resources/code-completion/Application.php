@@ -2,7 +2,7 @@
 
 use common\components\HierarchyComponent;
 use common\components\PayComponent;
-use common\components\Provisions;
+use common\components\provision\Provisions;
 use common\components\TaxComponent;
 use common\components\User;
 use common\formatters\Formatter;

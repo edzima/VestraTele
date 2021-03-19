@@ -4,9 +4,10 @@ namespace common\models\provision;
 
 use common\models\issue\IssueCost;
 use Decimal\Decimal;
-use yii\base\BaseObject;
+use Yii;
+use yii\base\Model;
 
-class ProvisionReportSummary extends BaseObject {
+class ProvisionReportSummary extends Model {
 
 	/**
 	 * @var Provision[]
@@ -22,6 +23,15 @@ class ProvisionReportSummary extends BaseObject {
 	 * @var IssueCost[]
 	 */
 	public array $notSettledCosts = [];
+
+	public function attributeLabels() {
+		return [
+			'settledCostsSum' => Yii::t('provision', 'Settled costs sum'),
+			'notSettledCostsSum' => Yii::t('provision', 'Not settled costs sum'),
+			'provisionsSum' => Yii::t('provision', 'Provisions sum'),
+			'totalSum' => Yii::t('provision', 'Total sum'),
+		];
+	}
 
 	public function getTotalSum(): Decimal {
 		return $this->getProvisionsSum()

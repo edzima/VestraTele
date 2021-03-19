@@ -2,11 +2,13 @@
 
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
+use common\models\issue\IssueCost;
 use common\models\provision\ProvisionReportSearch;
 use common\models\provision\ProvisionReportSummary;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CurrencyColumn;
 use common\widgets\grid\CustomerDataColumn;
+use Decimal\Decimal;
 use yii\data\DataProviderInterface;
 use yii\web\View;
 use yii\web\YiiAsset;
@@ -47,19 +49,19 @@ YiiAsset::register($this);
 			[
 				'attribute' => 'settledCostsSum',
 				'format' => 'currency',
-				'value' => $summary->getSettledCostsSum() * -1,
+				'value' => $summary->getSettledCostsSum()->negate(),
 			],
 			[
 				'attribute' => 'totalSum',
 				'format' => 'currency',
 			],
 		],
-	])
+	]) . '<br>'
 	: ''
 ?>
 
-<div class="row">
 
+<div class="row">
 	<div class="col-md-6">
 		<?= GridView::widget([
 			'dataProvider' => $notSettledCostsDataProvider,
@@ -81,7 +83,6 @@ YiiAsset::register($this);
 					'class' => CurrencyColumn::class,
 					'attribute' => 'valueWithoutVAT',
 					'pageSummary' => true,
-					'label' => Yii::t('settlement', 'Value'),
 				],
 				'date_at:date',
 				[
@@ -121,8 +122,10 @@ YiiAsset::register($this);
 				[
 					'class' => CurrencyColumn::class,
 					'attribute' => 'valueWithoutVAT',
+					'value' => function (IssueCost $data): Decimal {
+						return $data->getValueWithoutVAT()->negate();
+					},
 					'pageSummary' => true,
-					'label' => Yii::t('settlement', 'Value'),
 				],
 				'date_at:date',
 				'settled_at:date',
@@ -145,7 +148,7 @@ YiiAsset::register($this);
 	'id' => 'report-grid',
 	'dataProvider' => $provisionsDataProvider,
 	'summary' => false,
-	'caption' => Yii::t('provision', 'Provisions.'),
+	'caption' => Yii::t('provision', 'Provisions'),
 	'showPageSummary' => true,
 	'columns' => [
 		[

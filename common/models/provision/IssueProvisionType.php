@@ -102,7 +102,10 @@ class IssueProvisionType extends ProvisionType {
 	}
 
 	public function isForIssueTele(Issue $issue): bool {
-		return !($this->only_with_tele && !$issue->hasTele());
+		if ($issue->hasTele()) {
+			return $this->only_with_tele;
+		}
+		return !$this->only_with_tele;
 	}
 
 	public function isForCalculationType(int $type): bool {
@@ -133,8 +136,14 @@ class IssueProvisionType extends ProvisionType {
 		return $this->getIssueUserType() === $type;
 	}
 
+	/**
+	 * @param IssuePayCalculation $calculation
+	 * @param string|null $issueUserType
+	 * @param bool $onlyActive
+	 * @return static[]
+	 */
 	public static function findCalculationTypes(IssuePayCalculation $calculation, string $issueUserType = null, bool $onlyActive = true): array {
-		return static::calculationFilter(static::getTypes($onlyActive, true), $calculation, $issueUserType);
+		return static::calculationFilter(static::getTypes($onlyActive), $calculation, $issueUserType);
 	}
 
 	public static function calculationFilter(array $types, IssuePayCalculation $calculation, string $issueUserType = null): array {

@@ -75,7 +75,7 @@ class IssueCost extends ActiveRecord implements
 	 * {@inheritdoc}
 	 */
 	public function attributeLabels(): array {
-		return [
+		return array_merge($this->vatAttributeLabels(), [
 			'id' => 'ID',
 			'issue_id' => Yii::t('common', 'Issue'),
 			'type' => Yii::t('common', 'Type'),
@@ -89,7 +89,8 @@ class IssueCost extends ActiveRecord implements
 			'settled_at' => Yii::t('common', 'Settled at'),
 			'user_id' => Yii::t('common', 'User'),
 			'user' => Yii::t('common', 'User'),
-		];
+
+		]);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */

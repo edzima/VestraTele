@@ -5,6 +5,7 @@ namespace backend\modules\settlement\controllers;
 use backend\helpers\Url;
 use backend\modules\settlement\models\search\IssuePaySearch;
 use backend\widgets\CsvForm;
+use common\components\provision\exception\MissingProvisionUserException;
 use common\models\issue\IssuePay;
 use common\models\issue\query\IssuePayQuery;
 use common\models\settlement\PayPayedForm;
@@ -151,6 +152,22 @@ class PayController extends Controller {
 	public function actionUpdate(int $id) {
 		$model = $this->findModel($id);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$dirty = $model->getDirtyAttributes();
+			Yii::info([
+				'message' => 'Update pay',
+				'dirty' => $dirty,
+				'user_id' => Yii::$app->user->id,
+			], 'settlement.pay');
+			if (isset($dirty['value'])) {
+				// @todo remove for all pays, or only updated?
+				Yii::$app->provisions->removeForPays($model->calculation->getPays()->getIds());
+				try {
+					Yii::$app->provisions->settlement($model->calculation);
+				} catch (MissingProvisionUserException) {
+
+				}
+			}
+
 			return $this->redirect(Url::previous());
 		}
 		return $this->render('update', [

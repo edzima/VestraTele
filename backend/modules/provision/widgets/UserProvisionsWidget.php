@@ -3,7 +3,7 @@
 namespace backend\modules\provision\widgets;
 
 use backend\helpers\Url;
-use backend\modules\provision\models\ProvisionUserData;
+use common\models\provision\ProvisionUserData;
 use Yii;
 use yii\base\Widget;
 use yii\data\ActiveDataProvider;
@@ -81,6 +81,7 @@ class UserProvisionsWidget extends Widget {
 		return null;
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	private function createActiveDataProvider(QueryInterface $query): ActiveDataProvider {
 		$config = $this->dataProviderConfig;
 		if (!isset($config['class'])) {

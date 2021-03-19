@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\components\provision\exception\MissingProvisionUserException;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\settlement\PaysForm;
@@ -87,6 +88,12 @@ class SettlementController extends Controller {
 				$calculationPay = new IssuePay();
 				$calculationPay->setPay($pay);
 				$calculation->link('pays', $calculationPay);
+			}
+			Yii::$app->provisions->removeForPays($calculation->getPays()->getIds(true));
+			try {
+				Yii::$app->provisions->settlement($calculation);
+			} catch (MissingProvisionUserException) {
+
 			}
 			return $this->redirect(['view', 'id' => $id]);
 		}
