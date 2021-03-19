@@ -4,7 +4,7 @@ use common\components\DbManager;
 use common\components\HierarchyComponent;
 use common\components\keyStorage\KeyStorage;
 use common\components\PayComponent;
-use common\components\Provisions;
+use common\components\provision\Provisions;
 use common\components\TaxComponent;
 use common\formatters\Formatter;
 use common\models\user\User;

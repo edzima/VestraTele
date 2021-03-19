@@ -45,8 +45,9 @@ use yii\web\View;
 			[
 				'label' => Yii::t('provision', 'Value'),
 				'value' => static function (IssueProvisionType $type) use ($model): ?string {
-					$model->setType($type);
-					$selfies = $model->getData()->getSelfQuery()->all();
+					$data = $model->getData();
+					$data->type = $type;
+					$selfies = $data->getSelfQuery()->all();
 					if (empty($selfies)) {
 						return null;
 					}

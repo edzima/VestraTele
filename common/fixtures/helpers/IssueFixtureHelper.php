@@ -119,12 +119,13 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 		];
 	}
 
-	public static function agent(): array {
+	public static function agent(bool $withProfile = false): array {
 		return array_merge(
 			[
 				static::AGENT => UserFixtureHelper::agent(),
 			],
-			static::issueUsers()
+			static::issueUsers(),
+			$withProfile ? [static::AGENT . '.profile' => UserFixtureHelper::profile(UserFixtureHelper::WORKER_AGENT)] : []
 		);
 	}
 

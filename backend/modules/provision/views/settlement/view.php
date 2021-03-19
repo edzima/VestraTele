@@ -26,42 +26,28 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 <div class="provision-settlement-view">
 	<p>
 		<?= Html::a(
+			Yii::t('backend', 'Generate'),
+			['generate', 'id' => $model->id],
+			['class' => 'btn btn-success'])
+		?>
+
+		<?= Html::a(
 			Yii::t('provision', 'Provisions types'),
 			['type/settlement', 'id' => $model->id],
 			['class' => 'btn btn-info'])
 		?>
-	</p>
 
-	<div class="row">
-		<div class="col-md-4 col-lg-3">
-			<?= SettlementDetailView::widget([
-				'model' => $model,
-			]) ?>
-		</div>
-
-		<div class="col-md-8 col-lg-9 users-grid-wrapper">
-			<?
-			foreach ($userModels as $userModel) {
-
-				echo $this->render('_user_types', [
-					'model' => $userModel,
-				]);
-			}
-			?>
-		</div>
-	</div>
-
-	<p>
-		<?= Html::a(
-			Yii::t('provision', 'Delete provisions'),
-			['delete', 'id' => $model->id],
-			[
-				'class' => 'btn btn-danger',
-				'disabled' => $dataProvider->getTotalCount() === 0,
-				'data-method' => 'POST',
-				'data-confirm' => Yii::t('backend', 'Are you sure you want to delete all provisions for this settlement?'),
-			]
-		)
+		<?= $dataProvider->getTotalCount()
+			? Html::a(
+				Yii::t('provision', 'Delete provisions'),
+				['delete', 'id' => $model->id],
+				[
+					'class' => 'btn btn-danger pull-right',
+					'data-method' => 'POST',
+					'data-confirm' => Yii::t('backend', 'Are you sure you want to delete all provisions for this settlement?'),
+				]
+			)
+			: ''
 		?>
 	</p>
 
@@ -85,6 +71,26 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 			],
 		],
 	]) ?>
+
+
+	<div class="row">
+		<div class="col-md-4 col-lg-3">
+			<?= SettlementDetailView::widget([
+				'model' => $model,
+			]) ?>
+		</div>
+
+		<div class="col-md-8 col-lg-9 users-grid-wrapper">
+			<?
+			foreach ($userModels as $userModel) {
+
+				echo $this->render('_user_types', [
+					'model' => $userModel,
+				]);
+			}
+			?>
+		</div>
+	</div>
 
 
 </div>

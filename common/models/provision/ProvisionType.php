@@ -68,10 +68,11 @@ class ProvisionType extends ActiveRecord {
 			'formattedValue' => $this->getFormattedValueLabel(),
 			'is_percentage' => Yii::t('provision', 'Is percentage'),
 			'is_active' => Yii::t('common', 'Is active'),
-			'with_hierarchy' => Yii::t('provision', 'With hierarchy'),
+			'withHierarchy' => Yii::t('provision', 'With hierarchy'),
 		];
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getProvisionUsers(): ProvisionUserQuery {
 		return $this->hasMany(ProvisionUser::class, ['type_id' => 'id']);
 	}

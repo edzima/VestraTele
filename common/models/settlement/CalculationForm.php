@@ -2,6 +2,7 @@
 
 namespace common\models\settlement;
 
+use common\components\provision\exception\MissingProvisionUserException;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
@@ -104,14 +105,15 @@ class CalculationForm extends PayForm {
 		return ArrayHelper::map($this->getIssue()->costs, 'id', 'typeNameWithValue');
 	}
 
-	public function save(): bool {
+	public function save(bool $throwException = false): bool {
 		if (!$this->validate()) {
 			return false;
 		}
 		$model = $this->getModel();
 		$model->owner_id = $this->owner;
 		$model->issue_id = $this->getIssue()->id;
-		if ($model->isNewRecord) {
+		$isNewRecord = $model->isNewRecord;
+		if ($isNewRecord) {
 			$model->stage_id = $this->getIssue()->stage_id;
 		}
 
@@ -134,6 +136,15 @@ class CalculationForm extends PayForm {
 			$calculationPay = $model->getPays()->one();
 			$calculationPay->setPay($this->generatePay(false));
 			$calculationPay->save(false);
+		}
+		//@todo dont remove pays for new model.
+		Yii::$app->provisions->removeForPays($model->getPays()->getIds(true));
+		try {
+			Yii::$app->provisions->settlement($model);
+		} catch (MissingProvisionUserException $exception) {
+			if ($throwException) {
+				throw $exception;
+			}
 		}
 		return true;
 	}

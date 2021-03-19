@@ -1,10 +1,7 @@
 <?php
 
-namespace backend\modules\provision\models;
+namespace common\models\provision;
 
-use common\models\provision\ProvisionType;
-use common\models\provision\ProvisionUser;
-use common\models\provision\ProvisionUserQuery;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use yii\base\BaseObject;

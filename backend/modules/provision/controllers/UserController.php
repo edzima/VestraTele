@@ -3,11 +3,11 @@
 namespace backend\modules\provision\controllers;
 
 use backend\helpers\Url;
-use backend\modules\provision\models\ProvisionUserData;
 use backend\modules\provision\models\ProvisionUserForm;
 use common\helpers\Flash;
 use common\models\provision\IssueProvisionType;
 use common\models\provision\ProvisionUser;
+use common\models\provision\ProvisionUserData;
 use common\models\provision\ProvisionUserSearch;
 use common\models\user\User;
 use Yii;

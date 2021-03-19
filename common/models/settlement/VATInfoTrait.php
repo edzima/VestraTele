@@ -7,6 +7,13 @@ use Yii;
 
 trait VATInfoTrait {
 
+	public function vatAttributeLabels(): array {
+		return [
+			'valueWithVAT' => Yii::t('settlement', 'Value with VAT'),
+			'valueWithoutVAT' => Yii::t('settlement', 'Value without VAT'),
+		];
+	}
+
 	public function getValueWithoutVAT(): Decimal {
 		return Yii::$app->tax->netto($this->getValueWithVAT(), $this->getVAT());
 	}

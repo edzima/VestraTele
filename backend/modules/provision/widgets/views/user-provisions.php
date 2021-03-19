@@ -2,11 +2,11 @@
 
 use backend\helpers\Html;
 use backend\helpers\Url;
-use backend\modules\provision\models\ProvisionUserData;
 use backend\modules\provision\widgets\UserProvisionsWidget;
 use backend\widgets\GridView;
 use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionUser;
+use common\models\provision\ProvisionUserData;
 use common\models\user\User;
 use common\widgets\FieldsetDetailView;
 use common\widgets\grid\ActionColumn;
@@ -41,7 +41,6 @@ $context = $this->context;
 			'detailConfig' => [
 				'model' => $model->type,
 				'attributes' => [
-					'formattedValue',
 					'issueUserTypeName',
 					'issueTypesNames',
 					'calculationTypesNames',
