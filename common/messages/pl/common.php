@@ -199,6 +199,7 @@ return [
 	'Commision refund' => 'Zwroty prowizji',
 	'Disability result of case' => 'Niepełnosprawność w wyniku wypadku',
 	'Customer' => 'Klient',
+	'Campaign manager' => 'Manager kampanii',
 	'Payement at' => 'Opłacono w',
 	'Provider name' => 'Wpłacający',
 	'Payment at' => 'Data płatności',
@@ -282,4 +283,5 @@ return [
 	'User' => 'Użytkownik',
 	'Users' => 'Użytkownicy',
 	'Settled at' => 'Rozliczono',
+	'Recommending' => 'Polecający',
 ];
