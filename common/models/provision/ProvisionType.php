@@ -138,7 +138,13 @@ class ProvisionType extends ActiveRecord {
 
 	protected function setDataValues(string $key, $values): void {
 		$data = $this->getDataArray();
-		$data[$key] = $values;
+		if (empty($values)) {
+			if (isset($data[$key])) {
+				unset($data[$key]);
+			}
+		} else {
+			$data[$key] = $values;
+		}
 		$this->setDataArray($data);
 	}
 
