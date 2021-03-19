@@ -285,6 +285,7 @@ return [
 	'User' => 'Użytkownik',
 	'Users' => 'Użytkownicy',
 	'Settled at' => 'Rozliczono',
+	'Recommending' => 'Polecający',
 	'Additional Date' => 'Dodatkowa Data',
 	'With additional Date' => 'Z dodatkową Datą',
 	'Additional Date for Type' => 'Dodatkowa Data (dla typu)',

@@ -71,6 +71,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 	public const PERMISSION_NOTE = 'note';
 	public const PERMISSION_SUMMON = 'summon';
 	public const PERMISSION_COST = 'cost';
+	public const PERMISSION_CAMPAIGN = 'campaign';
 
 	public const PERMISSION_CALCULATION_TO_CREATE = 'calculation.to-create';
 	public const PERMISSION_CALCULATION_PROBLEMS = 'calculation.problems';
