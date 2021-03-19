@@ -105,7 +105,7 @@ abstract class IssueSearch extends Model
 		$this->archiveFilter($query);
 		$this->applyAgentsFilters($query);
 		$this->applyCustomerSurnameFilter($query);
-		$this->createdAtFilter($query);
+		$this->applyCreatedAtFilter($query);
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
 			Issue::tableName() . '.stage_id' => $this->stage_id,
@@ -134,7 +134,11 @@ abstract class IssueSearch extends Model
 		];
 	}
 
-	protected function createdAtFilter(QueryInterface $query): void {
+	protected function applyCreatedAtFilter(QueryInterface $query): void {
+		if (!empty($this->createdAtTo)) {
+			$this->createdAtTo = date('Y-m-d 23:59:59', strtotime($this->createdAtTo));
+		}
+
 		$query->andFilterWhere(['>=', 'issue.' . 'created_at', $this->createdAtFrom])
 			->andFilterWhere(['<=', 'issue.' . 'created_at', $this->createdAtTo]);
 	}
