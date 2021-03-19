@@ -8,11 +8,72 @@ use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use common\models\provision\IssueProvisionType;
+use yii\base\InvalidCallException;
 
 class IssueProvisionTypeTest extends ProvisionTypeTest {
 
 	public function fixtures(): array {
 		return ProvisionFixtureHelper::issueType();
+	}
+
+	public function testRequiredIssueUserTypesWithoutIssueAndTypes(): void {
+		$type = new IssueProvisionType();
+		$type->setIssueRequiredUserTypes([
+			IssueUser::TYPE_CUSTOMER,
+			IssueUser::TYPE_AGENT,
+			IssueUser::TYPE_LAWYER,
+			IssueUser::TYPE_TELEMARKETER,
+		]);
+		$this->tester->expectThrowable(InvalidCallException::class, function () use ($type) {
+			$type->hasRequiredIssueUserTypes(null, []);
+		});
+	}
+
+	public function testRequiredIssueUserTypesWithoutRequired(): void {
+		$type = new IssueProvisionType();
+		$this->tester->assertTrue($type->hasRequiredIssueUserTypes(null, [
+			IssueUser::TYPE_AGENT,
+		]));
+
+		$type->setIssueRequiredUserTypes([]);
+		$this->tester->assertTrue($type->hasRequiredIssueUserTypes(null, [
+			IssueUser::TYPE_AGENT,
+		]));
+	}
+
+	public function testRequiredIssueUserTypesWithoutIssue(): void {
+		$type = new IssueProvisionType();
+		$type->setIssueRequiredUserTypes([
+			IssueUser::TYPE_CUSTOMER,
+			IssueUser::TYPE_AGENT,
+			IssueUser::TYPE_LAWYER,
+			IssueUser::TYPE_TELEMARKETER,
+		]);
+
+		$this->tester->wantToTest('Has all types that required.');
+		$this->tester->assertTrue($type->hasRequiredIssueUserTypes(null, [
+			IssueUser::TYPE_CUSTOMER,
+			IssueUser::TYPE_AGENT,
+			IssueUser::TYPE_LAWYER,
+			IssueUser::TYPE_TELEMARKETER,
+		]));
+
+		$this->tester->wantToTest('Has all types that required with one more.');
+		$this->tester->assertTrue($type->hasRequiredIssueUserTypes(null, [
+			IssueUser::TYPE_CUSTOMER,
+			IssueUser::TYPE_AGENT,
+			IssueUser::TYPE_LAWYER,
+			IssueUser::TYPE_TELEMARKETER,
+			IssueUser::TYPE_RECOMMENDING,
+		]));
+
+		$this->tester->wantToTest('Has all types that required without one.');
+
+		$this->tester->assertFalse($type->hasRequiredIssueUserTypes(null, [
+			IssueUser::TYPE_AGENT,
+			IssueUser::TYPE_LAWYER,
+			IssueUser::TYPE_TELEMARKETER,
+		]));
 	}
 
 	public function testIssueUserType(): void {

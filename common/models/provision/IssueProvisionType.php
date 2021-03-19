@@ -8,6 +8,7 @@ use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use Yii;
+use yii\base\InvalidCallException;
 use yii\helpers\ArrayHelper;
 
 class IssueProvisionType extends ProvisionType {
@@ -16,12 +17,13 @@ class IssueProvisionType extends ProvisionType {
 
 	private const KEY_DATA_ISSUE_STAGES = 'issue.stages';
 	private const KEY_DATA_ISSUE_TYPES = 'issue.types';
+	private const KEY_DATA_ISSUE_REQUIRED_USER_TYPES = 'issue.user.types.required';
 	public const KEY_DATA_ISSUE_USER_TYPE = 'issue.user.type';
 
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
-			'only_with_tele' => Yii::t('provision', 'Only with telemarketer'),
 			'calculationTypesNames' => Yii::t('settlement', 'Settlement type'),
+			'issueRequiredUserTypes' => Yii::t('common', 'Issue required user types'),
 			'issueTypesNames' => Yii::t('common', 'Issue Types'),
 			'issueStagesNames' => Yii::t('common', 'Issue Stages'),
 			'issueUserTypeName' => Yii::t('common', 'Issue user type'),
@@ -63,6 +65,14 @@ class IssueProvisionType extends ProvisionType {
 		$this->setDataValues(static::KEY_DATA_ISSUE_USER_TYPE, $type);
 	}
 
+	public function getIssueRequiredUserTypes(): array {
+		return $this->getDataArray()[static::KEY_DATA_ISSUE_REQUIRED_USER_TYPES] ?? [];
+	}
+
+	public function setIssueRequiredUserTypes(array $types): void {
+		$this->setDataValues(static::KEY_DATA_ISSUE_REQUIRED_USER_TYPES, $types);
+	}
+
 	public function getCalculationTypesNames(): string {
 		$calculationTypes = $this->getCalculationTypes();
 		if (empty($calculationTypes)) {
@@ -95,17 +105,29 @@ class IssueProvisionType extends ProvisionType {
 
 	public function isForIssue(Issue $issue): bool {
 		return
-			$this->isForIssueTele($issue)
+			$this->hasRequiredIssueUserTypes($issue)
 			&& $this->isForDate($issue->created_at)
 			&& $this->isForIssueStage($issue->stage_id)
 			&& $this->isForIssueType($issue->type_id);
 	}
 
-	public function isForIssueTele(Issue $issue): bool {
-		if ($issue->hasTele()) {
-			return $this->only_with_tele;
+	public function hasRequiredIssueUserTypes(Issue $issue = null, array $types = []): bool {
+		$requiredTypes = $this->getIssueRequiredUserTypes();
+		if (empty($requiredTypes)) {
+			return true;
 		}
-		return !$this->only_with_tele;
+		if (empty($types)) {
+			if ($issue === null) {
+				throw new InvalidCallException('$types cannot be empty when $issue is null.');
+			}
+			$types = ArrayHelper::getColumn($issue->users, 'type');
+		}
+		foreach ($requiredTypes as $requiredType) {
+			if (!in_array($requiredType, $types, true)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public function isForCalculationType(int $type): bool {
