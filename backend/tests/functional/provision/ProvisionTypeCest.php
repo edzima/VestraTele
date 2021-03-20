@@ -7,6 +7,7 @@ use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\ProvisionManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\provision\ProvisionType;
 
 class ProvisionTypeCest {
@@ -41,19 +42,29 @@ class ProvisionTypeCest {
 		$I->click('Create');
 	}
 
-	public function checkGridContent(ProvisionManager $I): void {
+	public function checkIndexGridContent(ProvisionManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->seeInGridHeader('Name');
 		$I->seeInGridHeader('Issue user type');
 		$I->seeInGridHeader('Value');
 		$I->seeInGridHeader('Is percentage');
-		$I->seeInGridHeader('Only with telemarketer');
+		$I->seeInGridHeader('Issue required user types');
 		$I->seeInGridHeader('Issue types');
 		$I->seeInGridHeader('Is active');
 		$I->seeInGridHeader('From at');
 		$I->seeInGridHeader('To at');
 		$I->seeInGridHeader('User self schema count');
+	}
+
+	public function checkSettlementGridContent(ProvisionManager $I): void {
+		$I->haveFixtures(array_merge(
+			SettlementFixtureHelper::settlement(),
+		));
+		$I->amLoggedIn();
+		$I->amOnPage([static::ROUTE_SETTLEMENT, 'id' => 1]);
+		$I->seeInGridHeader('Name');
+		$I->seeInGridHeader('Issue user type');
 	}
 
 	public function checkCreate(ProvisionManager $I): void {

@@ -15,7 +15,7 @@ class ProvisionTypeSearch extends ProvisionType {
 	 */
 	public function rules(): array {
 		return [
-			[['only_with_tele', 'is_default', 'is_percentage', 'is_active'], 'boolean'],
+			[['is_default', 'is_percentage', 'is_active'], 'boolean'],
 			[['id'], 'integer'],
 			[['name', 'value', 'from_at', 'to_at'], 'safe'],
 		];
@@ -59,7 +59,6 @@ class ProvisionTypeSearch extends ProvisionType {
 			'from_at' => $this->from_at,
 			'to_at' => $this->to_at,
 			'value' => $this->value,
-			'only_with_tele' => $this->only_with_tele,
 			'is_default' => $this->is_default,
 			'is_active' => $this->is_active,
 			'is_percentage' => $this->is_percentage,

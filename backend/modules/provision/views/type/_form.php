@@ -1,14 +1,13 @@
 <?php
 
 use backend\modules\provision\models\ProvisionTypeForm;
-use common\models\provision\IssueProvisionType;
 use common\widgets\DateWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model IssueProvisionType */
+/* @var $model ProvisionTypeForm */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -26,6 +25,15 @@ use yii\widgets\ActiveForm;
 				'data' => ProvisionTypeForm::getIssueUserTypesNames(),
 				'options' => [
 					'multiple' => false,
+				],
+			])
+		?>
+
+		<?= $form->field($model, 'issueRequiredUserTypes', ['options' => ['class' => 'col-md-3 col-lg-2']])
+			->widget(Select2::class, [
+				'data' => ProvisionTypeForm::getIssueUserTypesNames(),
+				'options' => [
+					'multiple' => true,
 				],
 			])
 		?>
@@ -83,8 +91,6 @@ use yii\widgets\ActiveForm;
 		<?= $form->field($model, 'is_active', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
 		<?= $form->field($model, 'with_hierarchy', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
-
-		<?= $form->field($model, 'only_with_tele', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
 		<?= $form->field($model, 'is_default', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 	</div>

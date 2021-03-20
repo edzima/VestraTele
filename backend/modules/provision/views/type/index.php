@@ -34,6 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'issueUserTypeName',
 				'noWrap' => true,
 			],
+			'issueRequiredUserTypesNames',
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'value',
@@ -41,7 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'noWrap' => true,
 			],
 			'is_percentage:boolean',
-			'only_with_tele:boolean',
 			'is_default:boolean',
 			'calculationTypesNames',
 			'issueTypesNames',
