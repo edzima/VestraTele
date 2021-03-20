@@ -45,7 +45,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'noWrap' => true,
 			],
 			'is_percentage:boolean',
-			'only_with_tele:boolean',
 			'is_default:boolean',
 			'calculationTypesNames',
 			'issueTypesNames',

@@ -16,7 +16,6 @@ use yii\helpers\Json;
  * @property string $name
  * @property string|null $from_at
  * @property string|null $to_at
- * @property boolean $only_with_tele
  * @property boolean is_default
  * @property string $data
  * @property string $value
@@ -62,7 +61,6 @@ class ProvisionType extends ActiveRecord {
 			'nameWithTypeName' => Yii::t('provision', 'Name'),
 			'from_at' => Yii::t('provision', 'From at'),
 			'to_at' => Yii::t('provision', 'To at'),
-			'only_with_tele' => Yii::t('provision', 'Only with telemarketer'),
 			'is_default' => Yii::t('provision', 'Is default'),
 			'value' => Yii::t('provision', 'Value'),
 			'formattedValue' => $this->getFormattedValueLabel(),
@@ -160,7 +158,7 @@ class ProvisionType extends ActiveRecord {
 	}
 
 	public static function getTypesNames(bool $onlyActive = true, bool $refresh = false): array {
-		return ArrayHelper::map(static::getTypes($onlyActive, $refresh), 'id', 'nameWithValue');
+		return ArrayHelper::map(static::getTypes($onlyActive, $refresh), 'id', 'nameWithTypeName');
 	}
 
 	/**

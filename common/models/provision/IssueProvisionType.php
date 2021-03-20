@@ -23,7 +23,7 @@ class IssueProvisionType extends ProvisionType {
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
 			'calculationTypesNames' => Yii::t('settlement', 'Settlement type'),
-			'issueRequiredUserTypes' => Yii::t('common', 'Issue required user types'),
+			'issueRequiredUserTypesNames' => Yii::t('common', 'Issue required user types'),
 			'issueTypesNames' => Yii::t('common', 'Issue Types'),
 			'issueStagesNames' => Yii::t('common', 'Issue Stages'),
 			'issueUserTypeName' => Yii::t('common', 'Issue user type'),
@@ -101,6 +101,19 @@ class IssueProvisionType extends ProvisionType {
 
 	public function getIssueUserTypeName(): string {
 		return IssueUser::getTypesNames()[$this->getIssueUserType()];
+	}
+
+	public function getIssueRequiredUserTypesNames(): string {
+		$types = $this->getIssueRequiredUserTypes();
+		if (empty($types)) {
+			return Yii::t('yii', '(not set)');
+		}
+		$typesNames = IssueUser::getTypesNames();
+		$names = [];
+		foreach ($types as $type) {
+			$names[] = $typesNames[$type];
+		}
+		return implode(', ', $names);
 	}
 
 	public function isForIssue(Issue $issue): bool {

@@ -45,6 +45,7 @@ YiiAsset::register($this);
 			'is_active:boolean',
 			'formattedValue',
 			'issueUserTypeName',
+			'issueRequiredUserTypesNames',
 			'issueTypesNames',
 			'issueStagesNames',
 			'calculationTypesNames',

@@ -59,5 +59,6 @@ return [
 	'Total sum' => 'Razem',
 	'There {n,plural, =1{parent} other{# parents}} has not set schema provisions!' => '{n,plural, =1{Przełożony} other{# przełożonych}} nie ma ustalonych schematów prowizji!',
 	'There {n,plural, =1{subordinate} other{# subordinates}} has not set schema provisions!' => '{n,plural, =1{Podwładny} other{# podwładnych}} nie ma ustalonych schematów prowizji!',
+	'Type' => 'Typ',
 	'Types not set.' => 'Typy nieustalone.',
 ];

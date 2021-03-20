@@ -14,13 +14,13 @@ class ProvisionTypeForm extends Model {
 	public bool $is_percentage = true;
 	public string $value = '';
 
-	public bool $only_with_tele = false;
 	public bool $is_default = false;
 	public bool $with_hierarchy = true;
 	public $issueUserType;
 	public $issueTypesIds = [];
 	public $issueStagesIds = [];
 	public $calculationTypes = [];
+	public $issueRequiredUserTypes = [];
 
 	public ?string $from_at = null;
 	public ?string $to_at = null;
@@ -52,10 +52,11 @@ class ProvisionTypeForm extends Model {
 				},
 				'enableClientValidation' => false,
 			],
-			[['only_with_tele', 'is_default', 'is_percentage', 'is_active', 'with_hierarchy'], 'boolean'],
+			[['is_default', 'is_percentage', 'is_active', 'with_hierarchy'], 'boolean'],
 			['calculationTypes', 'in', 'range' => array_keys(static::getCalculationTypesNames()), 'allowArray' => true],
 			['issueTypesIds', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
 			['issueStagesIds', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true],
+			['issueRequiredUserTypes', 'in', 'range' => array_keys(static::getIssueUserTypesNames()), 'allowArray' => true],
 			['issueUserType', 'in', 'range' => array_keys(static::getIssueUserTypesNames())],
 			['calculationTypes', 'each', 'rule' => ['integer']],
 		];
@@ -67,6 +68,7 @@ class ProvisionTypeForm extends Model {
 			'issueStagesIds' => Yii::t('common', 'Issue Stages'),
 			'issueTypesIds' => Yii::t('common', 'Issue Types'),
 			'issueUserType' => Yii::t('common', 'Issue user type'),
+			'issueRequiredUserTypes' => Yii::t('common', 'Required issue user types'),
 		]);
 	}
 
@@ -75,12 +77,12 @@ class ProvisionTypeForm extends Model {
 		$this->name = $model->name;
 		$this->is_percentage = $model->is_percentage;
 		$this->value = $model->value;
-		$this->only_with_tele = $model->only_with_tele;
 		$this->is_default = $model->is_default;
 		$this->is_active = $model->is_active;
 		$this->from_at = $model->from_at;
 		$this->issueUserType = $model->getIssueUserType();
 		$this->issueTypesIds = $model->getIssueTypesIds();
+		$this->issueRequiredUserTypes = $model->getIssueRequiredUserTypes();
 		$this->calculationTypes = $model->getCalculationTypes();
 		$this->with_hierarchy = $model->getWithHierarchy();
 	}
@@ -101,7 +103,6 @@ class ProvisionTypeForm extends Model {
 		$model->is_percentage = $this->is_percentage;
 		$model->is_active = $this->is_active;
 		$model->value = $this->value;
-		$model->only_with_tele = $this->only_with_tele;
 		$model->is_default = $this->is_default;
 		$model->from_at = $this->from_at;
 		$model->to_at = $this->to_at;
@@ -109,6 +110,7 @@ class ProvisionTypeForm extends Model {
 		$model->setIssueUserTypes($this->issueUserType);
 		$model->setIssueStagesIds(is_array($this->issueStagesIds) ? $this->issueStagesIds : []);
 		$model->setIssueTypesIds(is_array($this->issueTypesIds) ? $this->issueTypesIds : []);
+		$model->setIssueRequiredUserTypes(is_array($this->issueRequiredUserTypes) ? $this->issueRequiredUserTypes : []);
 		$model->setCalculationTypes(is_array($this->calculationTypes) ? $this->calculationTypes : []);
 		return $model->save();
 	}

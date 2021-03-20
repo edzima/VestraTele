@@ -94,6 +94,51 @@ class ProvisionTypeFormTest extends Unit {
 		$this->thenSuccessSave();
 	}
 
+	public function testIssueRequiredUserTypesAsNull(): void {
+		$model = $this->model;
+		$model->issueRequiredUserTypes = null;
+		$this->thenSuccessSave();
+		$type = $this->grabModel();
+		$this->tester->assertInstanceOf(ProvisionType::class, $type);
+		$this->tester->assertEmpty($type->getIssueRequiredUserTypes());
+	}
+
+	public function testIssueRequiredUserTypesAsEmptyArray(): void {
+		$model = $this->model;
+		$model->issueRequiredUserTypes = [];
+		$this->thenSuccessSave();
+		$type = $this->grabModel();
+		$this->tester->assertInstanceOf(ProvisionType::class, $type);
+		$this->tester->assertEmpty($type->getIssueRequiredUserTypes());
+	}
+
+	public function testNotExistedIssueRequiredUserTypes(): void {
+		$model = $this->model;
+		$model->issueRequiredUserTypes = ['not-existed-type'];
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Required issue user types is invalid.', 'issueRequiredUserTypes');
+	}
+
+	public function testValidIssueRequiredUserType(): void {
+		$model = $this->model;
+		$model->issueRequiredUserTypes = [IssueUser::TYPE_LAWYER];
+		$this->thenSuccessSave();
+		$type = $this->grabModel();
+		$this->tester->assertInstanceOf(ProvisionType::class, $type);
+		codecept_debug($type->getIssueRequiredUserTypes());
+		$this->tester->assertContains(IssueUser::TYPE_LAWYER, $type->getIssueRequiredUserTypes());
+	}
+
+	public function testValidIssueRequiredUserTypes(): void {
+		$model = $this->model;
+		$model->issueRequiredUserTypes = [IssueUser::TYPE_LAWYER, IssueUser::TYPE_AGENT];
+		$this->thenSuccessSave();
+		$type = $this->grabModel();
+		$this->tester->assertInstanceOf(ProvisionType::class, $type);
+		$this->tester->assertContains(IssueUser::TYPE_LAWYER, $type->getIssueRequiredUserTypes());
+		$this->tester->assertContains(IssueUser::TYPE_AGENT, $type->getIssueRequiredUserTypes());
+	}
+
 	public function testIssueUserType(): void {
 		$model = $this->model;
 		$model->issueUserType = IssueUser::TYPE_LAWYER;

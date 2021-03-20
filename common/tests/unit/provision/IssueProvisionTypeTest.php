@@ -76,6 +76,17 @@ class IssueProvisionTypeTest extends ProvisionTypeTest {
 		]));
 	}
 
+	public function testIssueRequiredUserTypesNames(): void {
+		$type = new IssueProvisionType();
+		$this->tester->assertSame('(not set)', $type->getIssueRequiredUserTypesNames());
+		$type->setIssueRequiredUserTypes([]);
+		$this->tester->assertSame('(not set)', $type->getIssueRequiredUserTypesNames());
+		$type->setIssueRequiredUserTypes([IssueUser::TYPE_AGENT]);
+		$this->tester->assertSame('agent', $type->getIssueRequiredUserTypesNames());
+		$type->setIssueRequiredUserTypes([IssueUser::TYPE_AGENT, IssueUser::TYPE_LAWYER]);
+		$this->tester->assertSame('agent, lawyer', $type->getIssueRequiredUserTypesNames());
+	}
+
 	public function testIssueUserType(): void {
 		$type = $this->grabType('agent-percent-25');
 		$this->tester->assertTrue($type->isForIssueUser(IssueUser::TYPE_AGENT));
