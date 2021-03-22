@@ -65,10 +65,18 @@ class IssueController extends Controller {
 				],
 				[
 					'attribute' => 'customer.userProfile.phone',
-					'label' => 'Telefon',
+					'label' => 'Telefon [1]',
 				],
 				[
-					'attribute' => 'issue.type.name',
+					'attribute' => 'customer.userProfile.phone_2',
+					'label' => 'Telefon [2]',
+				],
+				[
+					'attribute' => 'customer.email',
+					'label' => 'Email',
+				],
+				[
+					'attribute' => 'type.name',
 					'label' => 'Typ',
 				],
 			];
@@ -76,7 +84,8 @@ class IssueController extends Controller {
 			if (!empty($addressSearch->region_id)
 				|| !empty($addressSearch->city_name)
 				|| !empty($addressSearch->postal_code)) {
-				$query->joinWith('customer.addresses.address.city.terc');
+				$query->with('customer.addresses.address.city.terc');
+				$query->with('customer.addresses.address.city.terc.districts');
 
 				$addressColumns = [
 					[

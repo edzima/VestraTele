@@ -3,7 +3,7 @@
 use backend\modules\issue\models\search\IssueSearch;
 use common\models\user\User;
 use common\widgets\address\AddressSearchWidget;
-use common\widgets\DateTimeWidget;
+use common\widgets\DateWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -23,49 +23,13 @@ use yii\widgets\ActiveForm;
 	<div class="row">
 
 		<?= $form->field($model, 'createdAtFrom', ['options' => ['class' => 'col-md-4']])
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
-
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
-				]) ?>
-
+			->widget(DateWidget::class)
+		?>
 		<?= $form->field($model, 'createdAtTo', ['options' => ['class' => 'col-md-4']])
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
-
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
-				]) ?>
+			->widget(DateWidget::class) ?>
 
 		<?= $form->field($model, 'accident_at', ['options' => ['class' => 'col-md-4']])
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
-
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
-				]) ?>
+			->widget(DateWidget::class) ?>
 
 	</div>
 	<div class="row">

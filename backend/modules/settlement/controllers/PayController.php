@@ -89,42 +89,33 @@ class PayController extends Controller {
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {
 			/* @var IssuePayQuery $query */
 			$query = $dataProvider->query;
-			$query->groupBy('issue_id');
+			$query->groupBy('P.calculation_id');
 
 			$exporter = new CsvGrid([
 				'query' => $query,
 				'columns' => [
-					/*
+
 					[
-						'attribute' => 'issue.longId',
+						'attribute' => 'calculation.issue.longId',
 						'label' => 'Sprawa',
 					],
 					[
-						'attribute' => 'issue.clientFullName',
+						'attribute' => 'calculation.issue.customer.fullName',
 						'label' => 'Klient',
 					],
-					*/
+
 					[
-						'attribute' => 'issue.client_phone_1',
-						'label' => 'Telefon',
-					],
-					/*
-					[
-						'label' => 'Tele',
-						'content' => function (IssuePay $model): ?string {
-							if ($model->issue->tele_id) {
-								return User::getUserName($model->issue->tele_id);
-							}
-							return null;
-						},
+						'attribute' => 'calculation.issue.customer.profile.phone',
+						'label' => 'Telefon [1]',
 					],
 					[
-						'label' => 'Agent',
-						'content' => function (IssuePay $model): string {
-							return User::getUserName($model->issue->agent_id);
-						},
+						'attribute' => 'calculation.issue.customer.profile.phone_2',
+						'label' => 'Telefon [2]',
 					],
-					*/
+					[
+						'attribute' => 'calculation.issue.customer.email',
+						'label' => 'Email',
+					],
 				],
 			]);
 			return $exporter->export()->send('export.csv');
