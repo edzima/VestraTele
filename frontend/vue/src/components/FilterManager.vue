@@ -53,7 +53,7 @@ export default class FilterManager extends Vue {
 }
 </script>
 
-<style scoped lang="less">
+<style lang="less">
 .filter-group {
     margin: 0 auto;
     text-align: center;
@@ -61,6 +61,7 @@ export default class FilterManager extends Vue {
     .filters-nav {
 
         .filter-item {
+            margin: 1%;
 
             .filter-btn {
                 color: white;
