@@ -42,6 +42,7 @@ $context = $this->context;
 				'model' => $model->type,
 				'attributes' => [
 					'issueUserTypeName',
+					'issueRequiredUserTypesNames',
 					'issueTypesNames',
 					'calculationTypesNames',
 					'withHierarchy:boolean',

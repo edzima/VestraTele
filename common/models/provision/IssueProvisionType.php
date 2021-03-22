@@ -182,9 +182,9 @@ class IssueProvisionType extends ProvisionType {
 	}
 
 	public static function calculationFilter(array $types, IssuePayCalculation $calculation, string $issueUserType = null): array {
-		return ArrayHelper::index(array_filter($types, static function (IssueProvisionType $provisionType) use ($calculation, $issueUserType) {
+		return static::filter($types, static function (IssueProvisionType $provisionType) use ($calculation, $issueUserType) {
 			return $provisionType->isForCalculation($calculation, $issueUserType);
-		}), static::INDEX_KEY);
+		});
 	}
 
 	public function isForCalculation(IssuePayCalculation $calculation, string $issueUserType = null): bool {

@@ -28,7 +28,10 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 		<?= Html::a(
 			Yii::t('backend', 'Generate'),
 			['generate', 'id' => $model->id],
-			['class' => 'btn btn-success'])
+			[
+				'class' => 'btn btn-success',
+				'data-method' => 'POST',
+			])
 		?>
 
 		<?= Html::a(

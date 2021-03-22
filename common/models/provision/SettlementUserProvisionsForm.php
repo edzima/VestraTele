@@ -131,7 +131,13 @@ class SettlementUserProvisionsForm extends Model {
 	 */
 	public function getTypes(): array {
 		if ($this->types === null) {
-			$this->types = IssueProvisionType::findCalculationTypes($this->model, $this->user->type);
+			$types = IssueProvisionType::findCalculationTypes($this->model, $this->user->type);
+			if (count($types) > 1) {
+				$types = IssueProvisionType::filter($types, function (IssueProvisionType $type): bool {
+					return !empty($type->getIssueRequiredUserTypes());
+				});
+			}
+			$this->types = $types;
 		}
 		return $this->types;
 	}
