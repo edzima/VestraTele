@@ -14,10 +14,25 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 class SettlementController extends Controller {
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function behaviors(): array {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'generate' => ['POST'],
+				],
+			],
+		];
+	}
 
 	public function actionView(int $id): string {
 		$model = $this->findModel($id);
@@ -50,6 +65,10 @@ class SettlementController extends Controller {
 		$model = $this->findModel($id);
 		try {
 			$count = Yii::$app->provisions->settlement($model);
+			if ($count === 0) {
+				Flash::add(Flash::TYPE_WARNING,
+					Yii::t('provision', 'Any user has not provision.'));
+			}
 			if ($count > 0) {
 				Flash::add(Flash::TYPE_SUCCESS, Yii::t('provision', 'Success! Generate {count} provisions.', ['count' => $count]));
 			}
@@ -123,13 +142,21 @@ class SettlementController extends Controller {
 		);
 
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-			$provisions = Yii::$app->provisions->generateProvisionsData($model->getData(), $model->getPaysValues());
-			$count = Yii::$app->provisions->batchInsert($provisions);
-			if ($count > 0) {
-				Flash::add(Flash::TYPE_SUCCESS, Yii::t('provision',
-					'Success generated {count} provisions.', ['count' => $count]));
+
+			try {
+				$provisions = Yii::$app->provisions->generateProvisionsData($model->getData(), $model->getPaysValues());
+				$count = Yii::$app->provisions->batchInsert($provisions);
+				if ($count === 0) {
+					Flash::add(Flash::TYPE_WARNING,
+						Yii::t('provision', 'User has not provision.'));
+				}
+				if ($count > 0) {
+					Flash::add(Flash::TYPE_SUCCESS, Yii::t('provision', 'Success! Generate {count} provisions.', ['count' => $count]));
+				}
+				return $this->redirect(['view', 'id' => $id]);
+			} catch (MissingProvisionUserException $exception) {
+				Flash::add(Flash::TYPE_ERROR, $exception->getMessage());
 			}
-			return $this->redirect(['view', 'id' => $id]);
 		}
 
 		return $this->render('user', [

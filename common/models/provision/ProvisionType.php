@@ -2,6 +2,7 @@
 
 namespace common\models\provision;
 
+use Closure;
 use DateTime;
 use Decimal\Decimal;
 use Yii;
@@ -199,9 +200,16 @@ class ProvisionType extends ActiveRecord {
 	 * @return static[]
 	 */
 	public static function activeFilter(array $types): array {
-		return ArrayHelper::index(array_filter($types, static function (self $model): bool {
+		return static::filter($types, static function (self $model): bool {
 			return $model->is_active;
-		}), static::INDEX_KEY);
+		});
+	}
+
+	public static function filter(array $types, Closure $callback): array {
+		return ArrayHelper::index(
+			array_filter($types, $callback),
+			static::INDEX_KEY
+		);
 	}
 
 	/**

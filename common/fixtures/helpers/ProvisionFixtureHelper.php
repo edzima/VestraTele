@@ -7,6 +7,8 @@ use common\fixtures\provision\ProvisionTypeFixture;
 use common\fixtures\provision\ProvisionUserFixture;
 use common\models\provision\IssueProvisionType;
 use common\models\provision\Provision;
+use common\models\provision\ProvisionType;
+use common\models\provision\ProvisionUser;
 use Yii;
 
 class ProvisionFixtureHelper extends BaseFixtureHelper {
@@ -73,15 +75,30 @@ class ProvisionFixtureHelper extends BaseFixtureHelper {
 		];
 	}
 
+	public function haveProvisionUser($value, array $attributes = []): int {
+		$attributes['value'] = $value;
+		return $this->tester->haveRecord(ProvisionUser::class, $this->defaultProvisionUserAttributes($attributes));
+	}
+
+	public function defaultProvisionUserAttributes(array $attributes): array {
+		if (!isset($attributes['from_user_id'])) {
+			$attributes['from_user_id'] = static::DEFAULT_USER_ID;
+		}
+		if (!isset($attributes['to_user_id'])) {
+			$attributes['to_user_id'] = static::DEFAULT_USER_ID;
+		}
+		if (!isset($attributes['type_id'])) {
+			$attributes['type_id'] = static::DEFAULT_TYPE_ID;
+		}
+		return $attributes;
+	}
+
 	public function haveProvision($value, array $attributes = []): int {
 		$attributes['value'] = $value;
 		return $this->tester->haveRecord(Provision::class, $this->defaultProvisionAttributes($attributes));
 	}
 
 	public function defaultProvisionAttributes(array $attributes): array {
-		if (!isset($attributes['vat'])) {
-			$attributes['vat'] = 0;
-		}
 		if (!isset($attributes['from_user_id'])) {
 			$attributes['from_user_id'] = static::DEFAULT_USER_ID;
 		}
@@ -95,5 +112,13 @@ class ProvisionFixtureHelper extends BaseFixtureHelper {
 			$attributes['type_id'] = static::DEFAULT_TYPE_ID;
 		}
 		return $attributes;
+	}
+
+	/**
+	 * @param string $index
+	 * @return ProvisionType|IssueProvisionType
+	 */
+	public function grabType(string $index = 'agent-percent-25'): ProvisionType {
+		return $this->tester->grabFixture(static::TYPE, $index);
 	}
 }

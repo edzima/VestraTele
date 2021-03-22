@@ -91,4 +91,24 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 		];
 	}
 
+	public function haveSettlement(string $value, int $type, array $attributes = []): int {
+		if (!isset($attributes['owner_id'])) {
+			$attributes['owner_id'] = static::OWNER_JOHN;
+		}
+		$attributes['value'] = $value;
+		$attributes['type'] = $type;
+		return $this->tester->haveRecord(IssuePayCalculation::class, $attributes);
+	}
+
+	public function havePay(string $value, array $attributes = []): int {
+		$attributes['value'] = $value;
+		if (!isset($attributes['calculation_id'])) {
+			$attributes['calculation_id'] = 1;
+		}
+		if (!isset($attributes['vat'])) {
+			$attributes['vat'] = 0;
+		}
+		return $this->tester->haveRecord(IssuePay::class, $attributes);
+	}
+
 }
