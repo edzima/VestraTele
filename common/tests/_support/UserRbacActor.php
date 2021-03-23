@@ -47,7 +47,14 @@ trait UserRbacActor {
 		$I->fillField('Username', $this->getUser()->username);
 		$I->fillField('Password', $this->getPassword());
 		$I->click('#login-form button[type=submit]');
+		$I->waitPageLoad();
 		$this->checkIsLogged();
+	}
+	public function waitPageLoad($wait= 0.5,$timeout = 5): void {
+		if($wait){
+			$this->wait($wait);
+		}
+		$this->waitForJs('return document.readyState == "complete"', $timeout);
 	}
 
 	protected function checkIsLogged(): void {
