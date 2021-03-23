@@ -40,28 +40,28 @@ class MeetCalendarCest {
 
 	public function checkCalendarRoute(MeetIssueManager $I) {
 		$I->amLoggedIn();
-		$I->amOnPage(Url::toRoute($this::ROUTE_INDEX));
+		$I->amOnPage(Url::toRoute(self::ROUTE_INDEX));
 		$I->wait(5);
 		$I->see('Kalendarz');
 	}
 
 	public function checkSimpleEventVisible(MeetIssueManager $I) {
 		$I->amLoggedIn();
-		$I->amOnPage(Url::toRoute($this::ROUTE_INDEX));
+		$I->amOnPage(Url::toRoute(self::ROUTE_INDEX));
 		$I->waitForCalendarEventsLoaded();
 		$I->see('Smith Gorge');
 	}
 
 	public function checkCorrectEventDates(MeetIssueManager $I) {
 		$I->amLoggedIn();
-		$I->amOnPage(Url::toRoute($this::ROUTE_INDEX));
+		$I->amOnPage(Url::toRoute(self::ROUTE_INDEX));
 		$I->waitForCalendarEventsLoaded();
 		$I->seeElement(self::GorgeSmithsEventSelector);
 	}
 
 	public function checkEventClickableTel(MeetIssueManager $I) {
 		$I->amLoggedIn();
-		$I->amOnPage(Url::toRoute($this::ROUTE_INDEX));
+		$I->amOnPage(Url::toRoute(self::ROUTE_INDEX));
 		$I->waitForCalendarEventsLoaded();
 		$I->canSeeElement('.tel-link');
 		$I->see('Smith Gorge');
@@ -69,7 +69,7 @@ class MeetCalendarCest {
 
 	public function checkDragAndDropChangeEventDates(MeetIssueManager $I) {
 		$I->amLoggedIn();
-		$I->amOnPage(Url::toRoute($this::ROUTE_INDEX));
+		$I->amOnPage(Url::toRoute(self::ROUTE_INDEX));
 		$I->waitForCalendarEventsLoaded();
 		$I->dragAndDrop(self::GorgeSmithsEventSelector, self::EightAMSelector);
 		$I->waitForElement(self::GorgeSmithsEventSelectorAfterChange, 5);
@@ -79,7 +79,7 @@ class MeetCalendarCest {
 
 	public function checkFilterToggle(MeetIssueManager $I) {
 		$I->amLoggedIn();
-		$I->amOnPage(Url::toRoute($this::ROUTE_INDEX));
+		$I->amOnPage(Url::toRoute(self::ROUTE_INDEX));
 		$I->waitForCalendarEventsLoaded();
 		$I->seeElement(self::BrandonJonsonEventSelector);
 		$I->seeElement(self::GorgeSmithsEventSelector);
