@@ -2,18 +2,14 @@
 
 namespace frontend\controllers;
 
-use common\models\issue\IssueMeet;
-use common\models\User;
-use frontend\models\AgentMeetCalendarSearch;
-use udokmeci\yii2PhoneValidator\PhoneValidator;
+use common\models\issue\Summon;
+use frontend\helpers\Html;
+use frontend\models\ContactorSummonCalendarSearch;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\Controller;
-use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -25,7 +21,7 @@ class SummonCalendarController extends Controller {
 				'class' => AccessControl::class,
 				'rules' => [
 					[
-						'allow' => true
+						'allow' => true,
 					],
 				],
 			],
@@ -45,86 +41,85 @@ class SummonCalendarController extends Controller {
 		return parent::runAction($id, $params);
 	}
 
-	public function actionIndex(int $agentId = null): string {
-		if ($agentId === null) {
-			$agentId = Yii::$app->user->getId();
-		}
-
-		$agents = [];
-		if (Yii::$app->user->can(User::ROLE_MANAGER)) {
-			$agents = User::find()
-				->with('userProfile')
-				->leftJoin('issue_meet', 'user.id = issue_meet.agent_id')
-				->where('issue_meet.agent_id IS NOT NULL')
-				->all();
-
-			$agents = ArrayHelper::map($agents, 'id', 'fullName');
-		}
-
-		return $this->render('index', [
-			'agents' => $agents,
-			'agentId' => $agentId,
-		]);
+	public function actionIndex(): string {
+		return $this->render('index');
 	}
 
-	public function actionList(string $start = null, string $end = null, int $agentId = null): Response {
-		if ($agentId === null) {
-			$agentId = Yii::$app->user->getId();
-		}
-
-		if ($agentId !== Yii::$app->user->getId() && !Yii::$app->user->can(User::ROLE_MANAGER)) {
-			throw new MethodNotAllowedHttpException();
-		}
+	public function actionList(string $start = null, string $end = null): Response {
 		if ($start === null) {
-			$start = date('Y - m - 01');
+			$start = date('Y-m-01');
 		}
 		if ($end === null) {
-			$end = date('Y - m - t 23:59:59');
+			$end = date('Y-m-t 23:59:59');
 		}
-		$model = new AgentMeetCalendarSearch();
-		$model->agent_id = $agentId;
-		$model->start = $start;
-		$model->end = $end;
+		$model = new ContactorSummonCalendarSearch();
+		$model->owner_id = (int) Yii::$app->user->getId();
+		$model->start = (string) $start;
+		$model->end = (string) $end;
 		$data = [];
 
 		foreach ($model->search()->getModels() as $model) {
 			$data[] = [
 				'id' => $model->id,
-				'url' => Url::to(['meet/view', 'id' => $model->id]),
-				'title' => $model->getClientFullName(),
-				'start' => $model->date_at,
-				'end' => $model->date_end_at,
+				'url' => Url::to(['summon/view', 'id' => $model->id]),
+				'is' => 'event',
+				'title' => $this->getClientFullName($model)." - ".$model->title,
+				'start' => $model->start_at,
+				'end' => $model->start_at,
 				'phone' => Html::encode($this->getPhone($model)),
 				'statusId' => $model->status,
-				'tooltipContent' => $this->getTooltipContent($model),
+				'typeId' => $model->type,
+				'tooltipContent' => $this->getClientFullName($model),
 			];
 		}
 
 		return $this->asJson($data);
 	}
 
-	private function getPhone(IssueMeet $model): string {
-		$validator = new PhoneValidator();
-		$validator->country = 'PL';
-		if ($validator->validateAttribute($model, 'phone')) {
-			return $model->phone;
+	public function actionDeadline(string $start = null, string $end = null): Response {
+		if ($start === null) {
+			$start = date('Y-m-01');
+		}
+		if ($end === null) {
+			$end = date('Y-m-t 23:59:59');
+		}
+		$model = new ContactorSummonCalendarSearch();
+
+		$model->owner_id = (int) Yii::$app->user->getId();
+		$model->start = (string) $start;
+		$model->end = (string) $end;
+		$data = [];
+
+		foreach ($model->search()->getModels() as $model) {
+			$data[] = [
+				'id' => $model->id,
+				'url' => Url::to(['summon/view', 'id' => $model->id]),
+				'is' => 'deadline',
+				'title' => $this->getClientFullName($model),
+				'start' => $model->deadline_at,
+				'end' => $model->deadline_at,
+				'tooltipContent' => 'test',
+			];
+		}
+
+		return $this->asJson($data);
+	}
+
+	private function getPhone(Summon $model): string {
+		$phone = $model->contractor->getProfile()->phone;
+		if ($phone) {
+			return $phone;
 		}
 		return '';
 	}
 
-	private function getTooltipContent(IssueMeet $model): string {
-		$tooltip = $model->details;
-		$phone = $this->getPhone($model);
-		if (!empty($phone)) {
-			$tooltip .= ' Tel: ' . $phone;
-		}
-		return $tooltip;
+	private function getClientFullName(Summon $model): string {
+		return $model->contractor->getFullName();
 	}
 
-	public function actionUpdate(int $id, string $date_at, string $date_end_at): Response {
+	public function actionUpdate(int $id, string $date_at): Response {
 		$model = $this->findModel($id);
-		$model->date_at = $date_at;
-		$model->date_end_at = $date_end_at;
+		$model->start_at = $date_at;
 		if ($model->save()) {
 			return $this->asJson(['success' => true]);
 		}
@@ -136,11 +131,11 @@ class SummonCalendarController extends Controller {
 
 	/**
 	 * @param int $id
-	 * @return IssueMeet
+	 * @return Summon
 	 * @throws NotFoundHttpException
 	 */
-	private function findModel(int $id): IssueMeet {
-		if (($model = IssueMeet::findOne($id)) !== null) {
+	private function findModel(int $id): Summon {
+		if (($model = Summon::findOne($id)) !== null) {
 			return $model;
 		}
 		throw new NotFoundHttpException();

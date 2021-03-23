@@ -95,6 +95,7 @@ export default class App extends Vue {
 
     private dateClick(dateInfo: any): void {
         // if (dateInfo.view.type === 'dayGridMonth') return;
+        if(!this.notesEnabled) return;
         this.dayNotes = this.getNotesFromDayInfo(dateInfo);
         this.notePopupTitle = 'Notatki ' + prettify(dateInfo.dateStr);
         this.notePopupDate = dateInfo.date;
