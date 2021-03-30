@@ -2,7 +2,9 @@
 
 use backend\helpers\Url;
 use backend\widgets\GridView;
+use common\models\issue\IssueCost;
 use common\models\provision\Provision;
+use common\models\provision\ProvisionReportSummary;
 use common\models\provision\ProvisionUsersSearch;
 use common\widgets\grid\CurrencyColumn;
 use yii\data\ActiveDataProvider;
@@ -39,6 +41,23 @@ $dateTo = $searchModel->dateTo;
 				'class' => CurrencyColumn::class,
 				'attribute' => 'value',
 				'format' => 'currency',
+				'value' => static function (Provision $provision) use ($dateTo, $dateFrom): string {
+					if ($provision->toUser->issueCosts) {
+						$settled = [];
+						$notSettled = [];
+						foreach ($provision->toUser->issueCosts as $cost) {
+							/** @var IssueCost $cost */
+							if ($cost->isSettled) {
+								$settled[] = $cost;
+							} else {
+
+							}
+						}
+						$summary = new ProvisionReportSummary();
+					}
+					return $provision->value;
+					return Html::a($provision->toUser->getFullName(), Url::to(['view', 'id' => $provision->to_user_id, 'dateFrom' => $dateFrom, 'dateTo' => $dateTo]));
+				},
 				'pageSummary' => true,
 			],
 		],

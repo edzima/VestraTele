@@ -28,7 +28,7 @@ class ReportController extends Controller {
 
 	public function actionIndex(): string {
 		$searchModel = new ProvisionReportSearch();
-		$searchModel->setToUser(Yii::$app->user->getIdentity());
+		$searchModel->to_user_id = Yii::$app->user->getId();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -36,7 +36,5 @@ class ReportController extends Controller {
 			'dataProvider' => $dataProvider,
 		]);
 	}
-
-
 
 }

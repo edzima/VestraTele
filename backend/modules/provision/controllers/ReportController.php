@@ -9,6 +9,7 @@ use common\models\provision\ProvisionReportSearch;
 use common\models\provision\ProvisionReportSummary;
 use common\models\provision\ProvisionSearch;
 use common\models\provision\ProvisionUsersSearch;
+use common\models\provision\search\ReportSearch;
 use common\models\user\Worker;
 use Yii;
 use yii\filters\VerbFilter;
@@ -30,6 +31,27 @@ class ReportController extends Controller {
 				],
 			],
 		];
+	}
+
+	public function actionReport() {
+		$searchModel = new ReportSearch();
+		$searchModel->load(Yii::$app->request->queryParams);
+		if ($searchModel->user_id) {
+			return $this->redirect([
+				'view',
+				'id' => $searchModel->user_id,
+				'dateFrom' => $searchModel->dateFrom,
+				'dateTo' => $searchModel->dateTo,
+			]);
+		}
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+
+		return $this->render('report', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+
 	}
 
 	/**
@@ -64,7 +86,7 @@ class ReportController extends Controller {
 		Url::remember();
 
 		$searchModel = new ProvisionReportSearch();
-		$searchModel->setToUser($user);
+		$searchModel->to_user_id = $id;
 		$searchModel->dateTo = $dateTo;
 		$searchModel->dateFrom = $dateFrom;
 		$provisionsDataProvider = $searchModel->search(Yii::$app->request->queryParams);

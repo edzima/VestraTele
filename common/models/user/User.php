@@ -4,7 +4,11 @@ namespace common\models\user;
 
 use common\models\Address;
 use common\models\hierarchy\Hierarchy;
+use common\models\issue\IssueCost;
 use common\models\issue\IssueUser;
+use common\models\provision\Provision;
+use common\models\issue\query\IssueCostQuery;
+use common\models\provision\ProvisionQuery;
 use common\models\user\query\UserQuery;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -38,6 +42,7 @@ use yii\web\IdentityInterface;
  * @property-read Address|null $postalAddress
  * @property-read IssueUser[] $issueUsers
  * @property-read UserTrait[] $traits
+ * @property-read IssueCost[] $costs
  *
  */
 class User extends ActiveRecord implements IdentityInterface, Hierarchy {
@@ -193,10 +198,17 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 			->userHierarchy->getAllChildesIds($this->id);
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getUserProfile() {
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getIssueCosts(): IssueCostQuery {
+		return $this->hasMany(IssueCost::class, ['user_id' => 'id']);
+	}
+
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getProvisions(): ProvisionQuery {
+		return $this->hasMany(Provision::class, ['to_user_id' => 'id']);
+	}
+
+	public function getUserProfile(): ActiveQuery {
 		return $this->hasOne(UserProfile::class, ['user_id' => 'id']);
 	}
 

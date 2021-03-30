@@ -54,7 +54,7 @@ class ProvisionReportSearch extends ProvisionSearch {
 			'allModels' => IssueCost::find()
 				->indexBy('id')
 				->with('issue')
-				->user($this->toUser->id)
+				->user($this->to_user_id)
 				->notSettled()
 				->andWhere(['between', 'date_at', $this->dateFrom, $this->dateTo])
 				->all(),
@@ -66,7 +66,7 @@ class ProvisionReportSearch extends ProvisionSearch {
 			'allModels' => IssueCost::find()
 				->indexBy('id')
 				->with('issue')
-				->user($this->toUser->id)
+				->user($this->to_user_id)
 				->settled($this->dateFrom, $this->dateTo)
 				->all(),
 		]);

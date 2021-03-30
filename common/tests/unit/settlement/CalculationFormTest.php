@@ -28,8 +28,7 @@ class CalculationFormTest extends PayFormTest {
 		return array_merge(
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::entityResponsible(),
-			IssueFixtureHelper::customer(),
-			IssueFixtureHelper::issueUsers(),
+			IssueFixtureHelper::users(),
 			SettlementFixtureHelper::settlement(),
 			SettlementFixtureHelper::cost(true),
 			SettlementFixtureHelper::pay(),

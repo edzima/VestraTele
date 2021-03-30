@@ -89,15 +89,16 @@ class SettlementController extends Controller {
 		}
 
 		if ($typeId) {
-			try {
-				$model->setType($this->findType($typeId));
-			} catch (InvalidConfigException $e) {
-				throw new NotFoundHttpException($e->getMessage());
+			$type = $model->getType($typeId);
+			if ($type === null) {
+				throw new NotFoundHttpException();
 			}
+			$model->typeId = $typeId;
 		} else {
 			$types = $model->getTypes();
+			/* @var IssueProvisionType|null $type */
 			$type = reset($types);
-			if ($type instanceof IssueProvisionType) {
+			if ($type !== null) {
 				return $this->redirect(['user', 'id' => $id, 'issueUserType' => $issueUserType, 'typeId' => $type->id]);
 			}
 		}
@@ -122,6 +123,7 @@ class SettlementController extends Controller {
 		$userNotSettledCosts = new ActiveDataProvider([
 			'query' => IssueCost::find()
 				->notSettled()
+				->withoutSettlements()
 				->andWhere([
 					'or', [
 						'user_id' => $model->getIssueUser()->user_id,
@@ -180,14 +182,6 @@ class SettlementController extends Controller {
 
 	private function findModel(int $id): IssuePayCalculation {
 		$model = IssuePayCalculation::findOne($id);
-		if ($model === null) {
-			throw new NotFoundHttpException();
-		}
-		return $model;
-	}
-
-	private function findType(int $id): IssueProvisionType {
-		$model = IssueProvisionType::getType($id, true);
 		if ($model === null) {
 			throw new NotFoundHttpException();
 		}

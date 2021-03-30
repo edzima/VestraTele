@@ -16,6 +16,7 @@ use Decimal\Decimal;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\helpers\ArrayHelper;
 
 class Provisions extends Component {
 
@@ -73,20 +74,10 @@ class Provisions extends Component {
 		foreach ($forms as $form) {
 			$typesCount = count($form->getTypes());
 
-			/*
-			if ($typesCount === 0) {
-				Yii::warning([
-					'message' => Yii::t('provision', 'Settlement: {type} has not active provisions type for user type: {userType}',
-						[
-							'type' => $form->getModel()->getTypeName(),
-							'userType' => $form->getIssueUser()->getTypeName(),
-						]),
-					'settlement' => $model->attributes,
-				], 'provision.settlement.generate');
-
-				continue;
+			$costs = $form->getIssueNotSettledUserCosts();
+			if (!empty($costs)) {
+				$form->getModel()->linkCosts(ArrayHelper::getColumn($costs, 'id'));
 			}
-*/
 			if ($typesCount === 1) {
 				$form->typeId = array_key_first($form->getTypes());
 				$provisions[] = $this->generateProvisionsData($form->getData(), $form->getPaysValues());
@@ -112,9 +103,7 @@ class Provisions extends Component {
 	}
 
 	public function issuePayValue(IssuePay $pay): Decimal {
-		//@todo remove only general costs, move to issue pay?
-		return $pay->getValueWithoutVAT()
-			->sub($pay->getCosts(false));
+		return $pay->getValueWithoutVAT();
 	}
 
 	/**

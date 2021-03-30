@@ -127,8 +127,6 @@ class ProvisionComponentTest extends Unit {
 			2 => new Decimal(200),
 		]);
 
-		codecept_debug($data);
-
 		$this->tester->assertCount(2, $data);
 		$this->tester->assertSame(2, $this->batchInsert($data));
 		$this->thenSeeProvision([
@@ -146,10 +144,6 @@ class ProvisionComponentTest extends Unit {
 			'to_user_id' => $user->id,
 			'type_id' => $provisionUserData->type->id,
 		]);
-	}
-
-	private function grabAgent(string $index = 'without-parent-and-childs'): User {
-		return $this->tester->grabFixture('agent', $index);
 	}
 
 	public function testSettlement(): void {
