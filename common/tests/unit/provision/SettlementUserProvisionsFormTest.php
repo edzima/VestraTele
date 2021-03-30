@@ -1,16 +1,13 @@
 <?php
 
-namespace backend\tests\unit\provision;
+namespace common\tests\unit\provision;
 
-use backend\modules\provision\models\SettlementUserProvisionsForm;
-use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
-use common\fixtures\helpers\UserFixtureHelper;
-use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
-use Decimal\Decimal;
+use common\models\provision\SettlementUserProvisionsForm;
+use common\tests\unit\Unit;
 use yii\base\InvalidConfigException;
 
 class SettlementUserProvisionsFormTest extends Unit {

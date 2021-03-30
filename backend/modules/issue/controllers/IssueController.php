@@ -2,6 +2,7 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\helpers\Url;
 use backend\modules\issue\models\IssueForm;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\issue\models\search\SummonSearch;
@@ -88,6 +89,8 @@ class IssueController extends Controller {
 		$summonDataProvider = (new SummonSearch(['issue_id' => $model->id]))->search([]);
 		$summonDataProvider->sort = false;
 		$summonDataProvider->pagination = false;
+
+		Url::remember();
 		return $this->render('view', [
 			'model' => $model,
 			'calculationsDataProvider' => $calculationsDataProvider,

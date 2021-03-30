@@ -27,7 +27,8 @@ class ProvisionReportSearchTest extends Unit {
 			IssueFixtureHelper::agent(),
 			SettlementFixtureHelper::settlement(),
 			SettlementFixtureHelper::pay(),
-			ProvisionFixtureHelper::all()
+			ProvisionFixtureHelper::provision(),
+			ProvisionFixtureHelper::type(),
 		));
 	}
 

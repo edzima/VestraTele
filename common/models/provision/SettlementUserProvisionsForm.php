@@ -69,7 +69,7 @@ class SettlementUserProvisionsForm extends Model {
 		$data = new ProvisionUserData($this->user->user);
 		$data->date = $this->model->issue->created_at;
 		if ($this->typeId) {
-			$data->type = $this->getTypes()[$this->typeId] ?? null;
+			$data->type = $this->getType($this->typeId);
 		}
 		return $data;
 	}
@@ -148,6 +148,15 @@ class SettlementUserProvisionsForm extends Model {
 			$pays[$pay->id] = $this->getPayValue($pay);
 		}
 		return $pays;
+	}
+
+	public function getIssueNotSettledUserCosts(): array {
+		return $this->getModel()
+			->issue->getCosts()
+			->notSettled()
+			->withoutSettlements()
+			->user($this->user->user_id)
+			->all();
 	}
 
 	/**

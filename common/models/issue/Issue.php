@@ -10,6 +10,7 @@ use common\models\address\State;
 use common\models\address\SubProvince;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\entityResponsible\EntityResponsibleQuery;
+use common\models\issue\query\IssueCostQuery;
 use common\models\issue\query\IssueNoteQuery;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssuePayQuery;
@@ -194,7 +195,8 @@ class Issue extends ActiveRecord implements IssueInterface {
 		});
 	}
 
-	public function getCosts(): ActiveQuery {
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getCosts(): IssueCostQuery {
 		return $this->hasMany(IssueCost::class, ['issue_id' => 'id']);
 	}
 

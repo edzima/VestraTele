@@ -163,7 +163,7 @@ class PayController extends Controller {
 				Yii::$app->provisions->removeForPays($model->calculation->getPays()->getIds());
 				try {
 					Yii::$app->provisions->settlement($model->calculation);
-				} catch (MissingProvisionUserException) {
+				} catch (MissingProvisionUserException $exception) {
 
 				}
 			}
