@@ -1,12 +1,11 @@
 <?php
 
-namespace common\fixtures\lead;
+namespace common\modules\lead\fixtures;
 
 use common\modules\lead\models\LeadType;
 use yii\test\ActiveFixture;
 
-class LeadTypeFixture extends ActiveFixture {
+class TypeFixture extends ActiveFixture {
 
 	public $modelClass = LeadType::class;
-
 }

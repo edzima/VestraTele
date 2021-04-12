@@ -3,6 +3,7 @@
 namespace common\modules\lead\models\searches;
 
 use common\models\SearchModel;
+use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
 use yii\base\Model;
@@ -19,8 +20,8 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'status_id', 'type_id'], 'integer'],
-			[['date_at', 'source', 'data', 'phone', 'email', 'postal_code'], 'safe'],
+			[['id', 'status_id', 'type_id', 'source_id'], 'integer'],
+			[['date_at', 'data', 'phone', 'email', 'postal_code'], 'safe'],
 		];
 	}
 
@@ -40,7 +41,8 @@ class LeadSearch extends Lead implements SearchModel {
 	 * @return ActiveDataProvider
 	 */
 	public function search(array $params): ActiveDataProvider {
-		$query = Lead::find();
+		$query = Lead::find()
+			->with('reports');
 
 		// add conditions that should always apply here
 
@@ -61,10 +63,11 @@ class LeadSearch extends Lead implements SearchModel {
 			'id' => $this->id,
 			'date_at' => $this->date_at,
 			'status_id' => $this->status_id,
+			'source_id' => $this->source_id,
 			'type_id' => $this->type_id,
 		]);
 
-		$query->andFilterWhere(['like', 'source', $this->source])
+		$query
 			->andFilterWhere(['like', 'data', $this->data])
 			->andFilterWhere(['like', 'phone', $this->phone])
 			->andFilterWhere(['like', 'email', $this->email])
@@ -79,5 +82,9 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public static function getTypesNames(): array {
 		return LeadType::getNames();
+	}
+
+	public static function getSourcesNames(): array {
+		return LeadSource::getNames();
 	}
 }

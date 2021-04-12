@@ -1,6 +1,6 @@
 <?php
 
-namespace common\fixtures\lead;
+namespace common\modules\lead\fixtures;
 
 use common\modules\lead\models\LeadReportSchemaStatusType;
 use yii\test\ActiveFixture;
@@ -10,7 +10,8 @@ class LeadReportSchemaStatusTypeFixture extends ActiveFixture {
 	public $modelClass = LeadReportSchemaStatusType::class;
 
 	public $depends = [
-		LeadStatusFixture::class,
-		LeadTypeFixture::class,
+		LeadReportSchemaFixture::class,
+		TypeFixture::class,
+		StatusFixture::class
 	];
 }

@@ -63,27 +63,32 @@ $user = Yii::$app->user;
 					'icon' => '<i class="fa fa-vcard"></i>',
 					'items' => [
 						[
-							'label' => Yii::t('common', 'Browse'),
+							'label' => Yii::t('lead', 'Browse'),
 							'url' => ['/lead/lead/index'],
 							'icon' => '<i class="fa fa-eye"></i>',
 						],
 						[
-							'label' => Yii::t('common', 'Reports'),
+							'label' => Yii::t('lead', 'Reports'),
 							'url' => ['/lead/report/index'],
 							'icon' => '<i class="fa fa-table"></i>',
 						],
 						[
-							'label' => Yii::t('common', 'Reports schemas'),
+							'label' => Yii::t('lead', 'Reports schemas'),
 							'url' => ['/lead/report-schema/index'],
 							'icon' => '<i class="fa fa-table"></i>',
 						],
 						[
-							'label' => Yii::t('common', 'Statuses'),
+							'label' => Yii::t('lead', 'Sources'),
+							'url' => ['/lead/source/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Statuses'),
 							'url' => ['/lead/status/index'],
 							'icon' => '<i class="fa fa-eye"></i>',
 						],
 						[
-							'label' => Yii::t('common', 'Types'),
+							'label' => Yii::t('lead', 'Types'),
 							'url' => ['/lead/type/index'],
 							'icon' => '<i class="fa fa-eye"></i>',
 						],

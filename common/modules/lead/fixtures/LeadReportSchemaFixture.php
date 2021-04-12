@@ -1,6 +1,6 @@
 <?php
 
-namespace common\fixtures\lead;
+namespace common\modules\lead\fixtures;
 
 use common\modules\lead\models\LeadReportSchema;
 use yii\test\ActiveFixture;

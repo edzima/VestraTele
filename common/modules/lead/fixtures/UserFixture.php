@@ -1,11 +1,11 @@
 <?php
 
-namespace common\fixtures\lead;
+namespace common\modules\lead\fixtures;
 
 use common\modules\lead\Module;
 use yii\test\ActiveFixture;
 
-class LeadUserFixture extends ActiveFixture {
+class UserFixture extends ActiveFixture {
 
 	public function init() {
 		if (empty($this->modelClass) && empty($this->tableName)) {

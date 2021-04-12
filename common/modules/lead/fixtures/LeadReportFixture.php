@@ -1,6 +1,6 @@
 <?php
 
-namespace common\fixtures\lead;
+namespace common\modules\lead\fixtures;
 
 use common\modules\lead\models\LeadReport;
 use yii\test\ActiveFixture;
@@ -11,6 +11,6 @@ class LeadReportFixture extends ActiveFixture {
 
 	public $depends = [
 		LeadFixture::class,
-		LeadUserFixture::class,
+		UserFixture::class,
 	];
 }

@@ -2,24 +2,26 @@
 
 namespace common\fixtures\helpers;
 
-use common\fixtures\lead\LeadFixture;
-use common\fixtures\lead\LeadReportFixture;
-use common\fixtures\lead\LeadReportSchemaFixture;
-use common\fixtures\lead\LeadReportSchemaStatusTypeFixture;
-use common\fixtures\lead\LeadStatusFixture;
-use common\fixtures\lead\LeadTypeFixture;
-use common\fixtures\lead\LeadUserFixture;
+use common\modules\lead\fixtures\LeadFixture;
+use common\modules\lead\fixtures\LeadReportFixture;
+use common\modules\lead\fixtures\LeadReportSchemaFixture;
+use common\modules\lead\fixtures\LeadReportSchemaStatusTypeFixture;
+use common\modules\lead\fixtures\SourceFixture;
+use common\modules\lead\fixtures\StatusFixture;
+use common\modules\lead\fixtures\TypeFixture;
+use common\modules\lead\fixtures\UserFixture;
 use Yii;
 
 class LeadFixtureHelper {
 
 	public const LEAD = 'lead';
 	public const TYPE = 'type';
-	public const STATUS = 'status';
+	private const STATUS = 'status';
+	private const SOURCE = 'source';
 
-	public const REPORT = 'report';
-	public const REPORT_SCHEMA = 'report-schema';
-	public const USER = 'user';
+	private const REPORT = 'report';
+	private const REPORT_SCHEMA = 'report-schema';
+	private const USER = 'user';
 
 	public static function dataDir(): string {
 		return Yii::getAlias('@common/tests/_data/lead/');
@@ -43,10 +45,23 @@ class LeadFixtureHelper {
 		];
 	}
 
+	public static function source(): array {
+		return [
+			static::USER => [
+				'class' => UserFixture::class,
+				'dataFile' => static::dataDir() . 'user.php',
+			],
+			static::SOURCE => [
+				'class' => SourceFixture::class,
+				'dataFile' => static::dataDir() . 'source.php',
+			],
+		];
+	}
+
 	public static function leads(): array {
 		return [
 			static::USER => [
-				'class' => LeadUserFixture::class,
+				'class' => UserFixture::class,
 				'dataFile' => static::dataDir() . 'user.php',
 			],
 			static::LEAD => [
@@ -54,12 +69,16 @@ class LeadFixtureHelper {
 				'dataFile' => static::dataDir() . 'lead.php',
 			],
 			static::TYPE => [
-				'class' => LeadTypeFixture::class,
+				'class' => TypeFixture::class,
 				'dataFile' => static::dataDir() . 'type.php',
 			],
 			static::STATUS => [
-				'class' => LeadStatusFixture::class,
+				'class' => StatusFixture::class,
 				'dataFile' => static::dataDir() . 'status.php',
+			],
+			static::SOURCE => [
+				'class' => SourceFixture::class,
+				'dataFile' => static::dataDir() . 'source.php',
 			],
 		];
 	}

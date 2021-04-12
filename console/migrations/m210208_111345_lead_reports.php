@@ -50,18 +50,12 @@ class m210208_111345_lead_reports extends Migration {
 		$this->addForeignKey('{{%fk_lead_report_status}}', '{{%lead_report}}', 'status_id', '{{%lead_status}}', 'id', 'CASCADE', 'CASCADE');
 		$this->addForeignKey('{{%fk_lead_report_old_status}}', '{{%lead_report}}', 'old_status_id', '{{%lead_status}}', 'id', 'CASCADE', 'CASCADE');
 		$this->addForeignKey('{{%fk_lead_report_schema}}', '{{%lead_report}}', 'schema_id', '{{%lead_report_schema}}', 'id', 'CASCADE', 'CASCADE');
-
-		$this->addColumn('{{%lead}}', 'owner_id', $this->integer()->null());
-		$this->addForeignKey('{{%lead_owner}}', '{{%lead}}', 'owner_id', $userClass::tableName(), 'id', 'CASCADE', 'CASCADE');
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function safeDown() {
-		$this->dropForeignKey('{{%lead_owner}}', '{{%lead}}');
-		$this->dropColumn('{{%lead}}', 'owner_id');
-
 		$this->dropTable('{{%lead_report}}');
 		$this->dropTable('{{%lead_report_schema_status_type}}');
 		$this->dropTable('{{%lead_report_schema}}');

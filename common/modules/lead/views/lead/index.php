@@ -40,14 +40,27 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => $searchModel::getStatusNames(),
 				'label' => Yii::t('lead', 'Status'),
 			],
+			[
+				'attribute' => 'source_id',
+				'value' => 'source',
+				'filter' => $searchModel::getSourcesNames(),
+				'label' => Yii::t('lead', 'Source'),
+			],
 			'date_at',
-			'source',
 			'phone',
 			'email:email',
 			'postal_code',
 
 			'owner',
 
+			[
+				'attribute' => 'reportsCount',
+				'value' => function (ActiveLead $lead): int {
+					return count($lead->reports);
+				},
+				'filter' => $searchModel::getStatusNames(),
+				'label' => Yii::t('lead', 'Reports'),
+			],
 			[
 				'class' => ActionColumn::class,
 				'template' => '{view} {update} {report} {delete}',
