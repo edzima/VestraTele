@@ -1,6 +1,6 @@
 <?php
 
-use common\modules\lead\forms\LeadReportSchemaForm;
+use common\modules\lead\models\forms\LeadReportSchemaForm;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */

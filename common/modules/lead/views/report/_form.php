@@ -1,6 +1,6 @@
 <?php
 
-use common\modules\lead\forms\LeadReportForm;
+use common\modules\lead\models\forms\LeadReportForm;
 use kartik\depdrop\DepDrop;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;

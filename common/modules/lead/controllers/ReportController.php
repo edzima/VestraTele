@@ -2,7 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
-use common\modules\lead\forms\LeadReportForm;
+use common\modules\lead\models\forms\LeadReportForm;
 use common\modules\lead\models\LeadReportSchemaStatusType;
 use Yii;
 use common\modules\lead\models\LeadReport;
@@ -66,7 +66,7 @@ class ReportController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate(int $id) {
-		$lead = Yii::$app->leadManager->findModel($id);
+		$lead = Yii::$app->leadManager->findById($id);
 		if ($lead === null) {
 			throw new NotFoundHttpException();
 		}

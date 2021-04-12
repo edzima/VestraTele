@@ -2,7 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
-use common\modules\lead\forms\LeadReportSchemaForm;
+use common\modules\lead\models\forms\LeadReportSchemaForm;
 use Yii;
 use common\modules\lead\models\LeadReportSchema;
 use common\modules\lead\models\searches\LeadReportSchemaSearch;

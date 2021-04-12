@@ -3,7 +3,7 @@
 namespace common\tests\unit\lead;
 
 use common\fixtures\helpers\LeadFixtureHelper;
-use common\modules\lead\forms\LeadReportForm;
+use common\modules\lead\models\forms\LeadReportForm;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;

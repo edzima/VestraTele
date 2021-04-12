@@ -1,6 +1,6 @@
 <?php
 
-namespace common\modules\lead\forms;
+namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadInterface;
