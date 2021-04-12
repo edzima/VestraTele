@@ -6,20 +6,20 @@ use DateTime;
 
 interface LeadInterface {
 
+	public function getStatusId(): int;
+
+	public function getSourceId(): int;
+
+	public function getTypeId(): int;
+
 	public function getDateTime(): DateTime;
 
 	public function getData(): array;
-
-	public function getSource(): string;
 
 	public function getPhone(): ?string;
 
 	public function getEmail(): ?string;
 
 	public function getPostalCode(): ?string;
-
-	public function getStatusId(): int;
-
-	public function getTypeId(): int;
 
 }

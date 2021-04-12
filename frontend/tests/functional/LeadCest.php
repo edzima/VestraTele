@@ -3,7 +3,6 @@
 namespace frontend\tests\functional;
 
 use common\fixtures\helpers\LeadFixtureHelper;
-use common\modules\lead\models\LeadEntity;
 use frontend\controllers\LeadController;
 use frontend\tests\FunctionalTester;
 use Yii;
@@ -19,12 +18,13 @@ class LeadCest {
 
 	public function checkLanding(FunctionalTester $I): void {
 		$I->sendAjaxPostRequest(static::ROUTE_LANDING, [
-			LeadEntity::SOURCE_DATA_ATTRIBUTE => 'landing',
-			LeadEntity::EMAIL_DATA_ATTRIBUTE => 'email@example.com',
-			LeadEntity::TYPE_DATA_ATTRIBUTE => 1,
+			'source_id' => 1,
+			'type_id' => 1,
+			'email' => 'email@example.com',
 		]);
 		$I->seeRecord(Yii::$app->lead->model, [
-			'source' => 'landing',
+			'source_id' => 1,
+			'type_id' => 1,
 			'email' => 'email@example.com',
 		]);
 	}

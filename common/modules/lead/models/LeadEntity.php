@@ -42,7 +42,7 @@ class LeadEntity extends BaseObject implements LeadInterface {
 		return $this->getData()[static::STATUS_DATA_ATTRIBUTE];
 	}
 
-	public function getSource(): string {
+	public function getSourceId(): int {
 		if (!isset($this->getData()[static::SOURCE_DATA_ATTRIBUTE])) {
 			throw new MissingDataAttributeException(static::SOURCE_DATA_ATTRIBUTE);
 		}
