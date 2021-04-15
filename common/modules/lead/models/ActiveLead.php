@@ -2,17 +2,25 @@
 
 namespace common\modules\lead\models;
 
-use yii\db\ActiveRecordInterface;
+interface ActiveLead extends LeadInterface {
 
-interface ActiveLead extends LeadInterface, ActiveRecordInterface {
+	public function getId(): string;
 
-	public function getId(): int;
+	public function updateFromLead(LeadInterface $lead): void;
 
 	public function updateStatus(int $status_id): bool;
 
-	public static function findById(int $id): ?self;
+	/**
+	 * @param string $id
+	 * @return ?static
+	 */
+	public static function findById(string $id): ?self;
 
-	public static function createFromLead(LeadInterface $lead): self;
+	public function setLead(LeadInterface $lead): void;
 
-	public static function findByLead(LeadInterface $lead): ?self;
+	/**
+	 * @param LeadInterface $lead
+	 * @return static[]
+	 */
+	public static function findByLead(LeadInterface $lead): array;
 }

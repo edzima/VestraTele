@@ -3,7 +3,7 @@
 namespace common\modules\lead\controllers;
 
 use common\modules\lead\models\ActiveLead;
-use common\modules\lead\models\LeadForm;
+use common\modules\lead\models\forms\LeadForm;
 use Yii;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\searches\LeadSearch;
@@ -65,10 +65,10 @@ class LeadController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new LeadForm();
-		$model->date_at = time();
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->getModel()->id]);
+		$model = new LeadForm(['datetime' => time()]);
+		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+			$lead = Yii::$app->leadManager->pushLead($model);
+			return $this->redirect(['view', 'id' => $lead->getId()]);
 		}
 
 		return $this->render('create', [
@@ -85,13 +85,18 @@ class LeadController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$model = $this->findModel($id);
+		$model = new LeadForm();
+		$lead = $this->findModel($id);
+		$model->setLead($lead);
 
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+			$lead->setLead($model);
+			$lead->update();
+			return $this->redirect(['view', 'id' => $lead->id]);
 		}
 
 		return $this->render('update', [
+			'id' => $id,
 			'model' => $model,
 		]);
 	}
@@ -119,7 +124,8 @@ class LeadController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	protected function findModel(int $id): ActiveLead {
-		if (($model = Lead::findOne($id)) !== null) {
+		$model = Yii::$app->leadManager->findById($id);
+		if ($model !== null) {
 			return $model;
 		}
 

@@ -78,6 +78,11 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-table"></i>',
 						],
 						[
+							'label' => Yii::t('lead', 'Campaigns'),
+							'url' => ['/lead/campaign/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
 							'label' => Yii::t('lead', 'Sources'),
 							'url' => ['/lead/source/index'],
 							'icon' => '<i class="fa fa-eye"></i>',

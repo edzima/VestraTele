@@ -93,7 +93,7 @@ class ReportController extends Controller {
 		$model = LeadReportForm::createFromModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['/lead/view', 'id' => $id]);
+			return $this->redirect(['/lead/view', 'id' => $model->getModel()->lead_id]);
 		}
 
 		return $this->render('update', [

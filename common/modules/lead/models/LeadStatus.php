@@ -67,10 +67,11 @@ class LeadStatus extends ActiveRecord {
 		return ArrayHelper::map(static::getModels(), 'id', 'name');
 	}
 
-	public static function getModels(): array {
-		if (static::$models === null) {
+	public static function getModels(bool $refresh = false): array {
+		if (static::$models === null || $refresh) {
 			static::$models = static::find()
 				->indexBy('id')
+				->orderBy(['sort_index' => SORT_DESC])
 				->all();
 		}
 		return static::$models;

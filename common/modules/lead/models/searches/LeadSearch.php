@@ -15,6 +15,8 @@ use common\modules\lead\models\Lead;
  */
 class LeadSearch extends Lead implements SearchModel {
 
+	public $type_id;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -42,6 +44,7 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function search(array $params): ActiveDataProvider {
 		$query = Lead::find()
+			->joinWith('leadSource S')
 			->with('reports');
 
 		// add conditions that should always apply here
@@ -64,7 +67,7 @@ class LeadSearch extends Lead implements SearchModel {
 			'date_at' => $this->date_at,
 			'status_id' => $this->status_id,
 			'source_id' => $this->source_id,
-			'type_id' => $this->type_id,
+			'S.type_id' => $this->type_id,
 		]);
 
 		$query

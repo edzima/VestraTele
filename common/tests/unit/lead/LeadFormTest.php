@@ -1,0 +1,65 @@
+<?php
+
+namespace common\tests\unit\lead;
+
+use common\fixtures\helpers\LeadFixtureHelper;
+use common\modules\lead\models\forms\LeadForm;
+use common\tests\_support\UnitModelTrait;
+use common\tests\helpers\LeadFactory;
+use common\tests\unit\Unit;
+use yii\base\Model;
+
+class LeadFormTest extends Unit {
+
+	use UnitModelTrait;
+
+	private LeadForm $lead;
+
+	public function _fixtures(): array {
+		return LeadFixtureHelper::leads();
+	}
+
+	public function testEmpty(): void {
+		$this->giveLead([
+		]);
+
+		$this->thenUnsuccessValidate();
+
+		$this->thenSeeError('Source cannot be blank.', 'source_id');
+		$this->thenSeeError('Status cannot be blank.', 'status_id');
+		$this->thenSeeError('Date At cannot be blank.', 'datetime');
+
+		$this->thenSeeError('Phone cannot be blank when email is blank.', 'phone');
+		$this->thenSeeError('Email cannot be blank when phone is blank.', 'email');
+	}
+
+	public function testWithPhone(): void {
+		$this->giveLead([
+			'phone' => '123-123-123',
+			'status_id' => 1,
+			'source_id' => 1,
+			'datetime' => '2020-01-01 12:00:00',
+		]);
+
+		$this->thenSuccessValidate();
+	}
+
+	public function testWithEmail(): void {
+		$this->giveLead([
+			'email' => 'some@mail.com',
+			'status_id' => 1,
+			'source_id' => 1,
+			'datetime' => '2020-01-01 12:00:00',
+		]);
+
+		$this->thenSuccessValidate();
+	}
+
+	protected function giveLead(array $data): void {
+		$this->lead = LeadFactory::createLead($data);
+	}
+
+	public function getModel(): Model {
+		return $this->lead;
+	}
+}

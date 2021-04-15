@@ -2,23 +2,22 @@
 
 namespace common\modules\lead\controllers;
 
-use common\modules\lead\models\forms\LeadSourceForm;
-use common\modules\lead\models\LeadSource;
-use common\modules\lead\models\searches\LeadSourceSearch;
 use Yii;
+use common\modules\lead\models\LeadCampaign;
+use common\modules\lead\models\searches\LeadCampaignSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * SourceController implements the CRUD actions for LeadSource model.
+ * CampaignController implements the CRUD actions for LeadCampaign model.
  */
-class SourceController extends Controller {
+class CampaignController extends Controller {
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
 				'class' => VerbFilter::class,
@@ -30,12 +29,12 @@ class SourceController extends Controller {
 	}
 
 	/**
-	 * Lists all LeadSource models.
+	 * Lists all LeadCampaign models.
 	 *
 	 * @return mixed
 	 */
 	public function actionIndex() {
-		$searchModel = new LeadSourceSearch();
+		$searchModel = new LeadCampaignSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -45,7 +44,7 @@ class SourceController extends Controller {
 	}
 
 	/**
-	 * Displays a single LeadSource model.
+	 * Displays a single LeadCampaign model.
 	 *
 	 * @param integer $id
 	 * @return mixed
@@ -58,16 +57,16 @@ class SourceController extends Controller {
 	}
 
 	/**
-	 * Creates a new LeadSource model.
+	 * Creates a new LeadCampaign model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 *
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new LeadSourceForm();
+		$model = new LeadCampaign();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->getModel()->id]);
+			return $this->redirect(['view', 'id' => $model->id]);
 		}
 
 		return $this->render('create', [
@@ -76,19 +75,18 @@ class SourceController extends Controller {
 	}
 
 	/**
-	 * Updates an existing LeadSource model.
+	 * Updates an existing LeadCampaign model.
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 *
 	 * @param integer $id
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionUpdate(int $id) {
-		$model = new LeadSourceForm();
-		$model->setModel($this->findModel($id));
+	public function actionUpdate($id) {
+		$model = $this->findModel($id);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $id]);
+			return $this->redirect(['view', 'id' => $model->id]);
 		}
 
 		return $this->render('update', [
@@ -97,7 +95,7 @@ class SourceController extends Controller {
 	}
 
 	/**
-	 * Deletes an existing LeadSource model.
+	 * Deletes an existing LeadCampaign model.
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
 	 *
 	 * @param integer $id
@@ -111,15 +109,15 @@ class SourceController extends Controller {
 	}
 
 	/**
-	 * Finds the LeadSource model based on its primary key value.
+	 * Finds the LeadCampaign model based on its primary key value.
 	 * If the model is not found, a 404 HTTP exception will be thrown.
 	 *
 	 * @param integer $id
-	 * @return LeadSource the loaded model
+	 * @return LeadCampaign the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel(int $id): LeadSource {
-		if (($model = LeadSource::findOne($id)) !== null) {
+	protected function findModel($id): LeadCampaign {
+		if (($model = LeadCampaign::findOne($id)) !== null) {
 			return $model;
 		}
 

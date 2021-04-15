@@ -11,5 +11,6 @@ class SourceFixture extends ActiveFixture {
 
 	public $depends = [
 		UserFixture::class,
+		TypeFixture::class,
 	];
 }

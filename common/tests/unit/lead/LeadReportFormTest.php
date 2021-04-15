@@ -56,7 +56,6 @@ class LeadReportFormTest extends Unit {
 		$this->thenSeeLead([
 			'status_id' => $this->lead->getStatusId(),
 			'source_id' => $this->lead->getSourceId(),
-			'type_id' => $this->lead->getTypeId(),
 		]);
 		$this->thenSeeReport([
 			'schema_id' => 1,
@@ -74,7 +73,6 @@ class LeadReportFormTest extends Unit {
 		$this->thenSeeLead([
 			'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
 			'source_id' => $this->lead->getSourceId(),
-			'type_id' => $this->lead->getTypeId(),
 		]);
 		$this->thenSeeReport([
 			'schema_id' => 3,

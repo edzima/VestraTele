@@ -11,6 +11,8 @@ class Module extends BaseModule implements BootstrapInterface {
 	public $controllerNamespace = 'common\modules\lead\controllers';
 
 	public string $userClass;
+	/** @var \Closure|array */
+	public $userNames;
 
 	public bool $onlyOwner = false;
 
@@ -19,11 +21,26 @@ class Module extends BaseModule implements BootstrapInterface {
 	}
 
 	public static function userClass(): string {
+		return static::instance()->userClass;
+	}
+
+	public static function userNames(): array {
+		return static::instance()->getUserNames();
+	}
+
+	public function getUserNames(): array {
+		if (is_array($this->userNames)) {
+			return $this->userNames;
+		}
+		return call_user_func($this->userNames);
+	}
+
+	private static function instance(): self {
 		$instance = static::getInstance();
 		if ($instance === null) {
 			throw new InvalidConfigException('Lead module must be configured.');
 		}
-		return $instance->userClass;
+		return $instance;
 	}
 
 }

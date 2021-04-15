@@ -1,20 +1,20 @@
 <?php
 
-use common\modules\lead\models\LeadSource;
+use common\modules\lead\models\LeadCampaign;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model LeadSource */
+/* @var $model LeadCampaign */
 
 $this->title = $model->name;
 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Sources'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Campaigns'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
-<div class="lead-source-view">
+<div class="lead-campaign-view">
 
 	<h1><?= Html::encode($this->title) ?></h1>
 

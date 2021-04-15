@@ -111,6 +111,9 @@ return [
 		'lead' => [
 			'class' => LeadModule::class,
 			'userClass' => User::class,
+			'userNames' => function () {
+				return User::getSelectList(User::getAssignmentIds([User::PERMISSION_LEAD]));
+			},
 			'as access' => [
 				'class' => GlobalAccessBehavior::class,
 				'rules' => [

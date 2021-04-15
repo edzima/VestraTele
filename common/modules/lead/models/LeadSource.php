@@ -13,13 +13,15 @@ use yii\helpers\ArrayHelper;
  *
  * @property int $id
  * @property string $name
+ * @property int $type_id
  * @property string|null $url
  * @property int|null $sort_index
  * @property int|null $owner_id
  *
  * @property-read  Lead[] $leads
+ * @property-read LeadType $leadType
  */
-class LeadSource extends ActiveRecord {
+class LeadSource extends ActiveRecord implements LeadSourceInterface {
 
 	private static ?array $models = null;
 
@@ -39,9 +41,10 @@ class LeadSource extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['name'], 'required'],
+			[['name', 'type_id'], 'required'],
 			[['sort_index'], 'integer'],
 			[['name', 'url'], 'string', 'max' => 255],
+			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadType::class, 'targetAttribute' => ['type_id' => 'id']],
 			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['owner_id' => 'id']],
 		];
 	}
@@ -55,6 +58,7 @@ class LeadSource extends ActiveRecord {
 			'name' => Yii::t('lead', 'Name'),
 			'url' => Yii::t('lead', 'URL'),
 			'sort_index' => Yii::t('lead', 'Sort Index'),
+			'type_id' => Yii::t('lead', 'Type'),
 		];
 	}
 
@@ -80,8 +84,8 @@ class LeadSource extends ActiveRecord {
 		return ArrayHelper::map(static::getModels(), 'id', 'name');
 	}
 
-	public static function getModels(): array {
-		if (static::$models === null) {
+	public static function getModels(bool $refresh = false): array {
+		if (static::$models === null || $refresh) {
 			static::$models = static::find()
 				->indexBy('id')
 				->orderBy('sort_index')
@@ -89,4 +93,25 @@ class LeadSource extends ActiveRecord {
 		}
 		return static::$models;
 	}
+
+	public function getID(): string {
+		return $this->id;
+	}
+
+	public function getName(): string {
+		return $this->name;
+	}
+
+	public function getURL(): ?string {
+		return $this->url;
+	}
+
+	public function getOwnerId(): ?int {
+		return $this->owner_id;
+	}
+
+	public function getType(): LeadTypeInterface {
+		return LeadType::getModels()[$this->type_id];
+	}
+
 }

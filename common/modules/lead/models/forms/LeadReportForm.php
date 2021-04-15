@@ -5,6 +5,7 @@ namespace common\modules\lead\models\forms;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadReport;
+use common\modules\lead\models\LeadReportSchema;
 use common\modules\lead\models\LeadReportSchemaStatusType;
 use common\modules\lead\models\LeadStatus;
 use yii\base\Model;
@@ -22,6 +23,12 @@ class LeadReportForm extends Model {
 	public function rules(): array {
 		return [
 			[['status_id', 'schema_id'], 'required'],
+			[
+				'details', 'required', 'when' => function () {
+				$schema = LeadReportSchema::findOne($this->schema_id);
+				return $schema && !empty($schema->placeholder);
+			},
+			],
 		];
 	}
 
@@ -43,8 +50,12 @@ class LeadReportForm extends Model {
 		return $model;
 	}
 
+	public function getModel(): LeadReport {
+		return $this->model;
+	}
+
 	public function getSchemaData(): array {
-		$schemas = LeadReportSchemaStatusType::findSchemasByStatusAndType($this->status_id, $this->lead->getTypeId());
+		$schemas = LeadReportSchemaStatusType::findSchemasByStatusAndType($this->status_id, $this->lead->getSource()->getType()->getID());
 		return ArrayHelper::map(
 			$schemas,
 			'id',

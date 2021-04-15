@@ -41,27 +41,32 @@ class SourceCest {
 
 	public function checkCreateWithoutURL(LeadManager $I): void {
 		$I->amLoggedIn();
-		$I->amOnPage(static::ROUTE_CREATE);
 		$I->haveFixtures(LeadFixtureHelper::source());
+
+		$I->amOnPage(static::ROUTE_CREATE);
 		$I->submitForm(static::FORM_SELECTOR, $this->formParams(
 			'Some name',
+			1
 		));
 		$I->seeRecord(LeadSource::class, [
 			'name' => 'Some name',
+			'type_id' => 1,
 		]);
 	}
 
 	public function checkCreateWithoutUser(LeadManager $I): void {
 		$I->amLoggedIn();
-		$I->amOnPage(static::ROUTE_CREATE);
 		$I->haveFixtures(LeadFixtureHelper::source());
+		$I->amOnPage(static::ROUTE_CREATE);
 		$I->submitForm(static::FORM_SELECTOR, $this->formParams(
 			'Some name',
+			 1,
 			'http://google.com',
 			null
 		));
 		$I->seeRecord(LeadSource::class, [
 			'name' => 'Some name',
+			'type_id' => 1,
 			'url' => 'http://google.com',
 			'owner_id' => null,
 		]);
@@ -69,26 +74,29 @@ class SourceCest {
 
 	public function checkWithUser(LeadManager $I): void {
 		$I->amLoggedIn();
-		$I->amOnPage(static::ROUTE_CREATE);
 		$I->haveFixtures(LeadFixtureHelper::source());
+		$I->amOnPage(static::ROUTE_CREATE);
 		$I->submitForm(static::FORM_SELECTOR, $this->formParams(
 			'Some name',
+			1,
 			'http://google.com',
 			1
 		));
 		$I->seeRecord(LeadSource::class, [
 			'name' => 'Some name',
+			'type_id' => 1,
 			'url' => 'http://google.com',
 			'owner_id' => 1,
 		]);
 	}
 
-	protected function formParams($name, $url = null, $owner_id = null, $sort_index = null): array {
+	protected function formParams($name, $type_id = null, $url = null, $owner_id = null, $sort_index = null): array {
 		return [
-			'LeadSource[name]' => $name,
-			'LeadSource[url]' => $url,
-			'LeadSource[owner_id]' => $owner_id,
-			'LeadSource[sort_index]' => $sort_index,
+			'LeadSourceForm[name]' => $name,
+			'LeadSourceForm[type_id' => $type_id,
+			'LeadSourceForm[url]' => $url,
+			'LeadSourceForm[owner_id]' => $owner_id,
+			'LeadSourceForm[sort_index]' => $sort_index,
 		];
 	}
 

@@ -12,7 +12,6 @@ class LeadFixture extends ActiveFixture {
 	public $depends = [
 		SourceFixture::class,
 		StatusFixture::class,
-		TypeFixture::class,
-		UserFixture::class
+		UserFixture::class,
 	];
 }

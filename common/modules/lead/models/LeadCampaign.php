@@ -2,21 +2,25 @@
 
 namespace common\modules\lead\models;
 
+use common\modules\lead\Module;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "lead_type".
+ * This is the model class for table "lead_campaign".
  *
  * @property int $id
  * @property string $name
- * @property string|null $description
+ * @property int|null $owner_id
+ * @property int|null $parent_id
  * @property int|null $sort_index
  *
- * @property Lead[] $leads
+ * @property-read Lead[] $leads
+ * @property-read LeadCampaign $parent
  */
-class LeadType extends ActiveRecord implements LeadTypeInterface {
+class LeadCampaign extends ActiveRecord {
 
 	private static ?array $models = null;
 
@@ -28,7 +32,7 @@ class LeadType extends ActiveRecord implements LeadTypeInterface {
 	 * {@inheritdoc}
 	 */
 	public static function tableName(): string {
-		return '{{%lead_type}}';
+		return '{{%lead_campaign}}';
 	}
 
 	/**
@@ -38,7 +42,9 @@ class LeadType extends ActiveRecord implements LeadTypeInterface {
 		return [
 			[['name'], 'required'],
 			[['sort_index'], 'integer'],
-			[['name', 'description'], 'string', 'max' => 255],
+			[['name'], 'string', 'max' => 255],
+			[['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => static::class, 'targetAttribute' => ['parent_id' => 'id']],
+			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['owner_id' => 'id']],
 		];
 	}
 
@@ -49,7 +55,8 @@ class LeadType extends ActiveRecord implements LeadTypeInterface {
 		return [
 			'id' => Yii::t('lead', 'ID'),
 			'name' => Yii::t('lead', 'Name'),
-			'description' => Yii::t('lead', 'Description'),
+			'parent_id' => Yii::t('lead', 'Parent'),
+			'owner_id' => Yii::t('lead', 'Owner'),
 			'sort_index' => Yii::t('lead', 'Sort Index'),
 		];
 	}
@@ -63,6 +70,10 @@ class LeadType extends ActiveRecord implements LeadTypeInterface {
 		return $this->hasMany(Lead::class, ['type_id' => 'id']);
 	}
 
+	public function getParent(): ActiveQuery {
+		return $this->hasOne(static::class, ['parent_id' => 'id']);
+	}
+
 	public static function getNames(): array {
 		return ArrayHelper::map(static::getModels(), 'id', 'name');
 	}
@@ -72,20 +83,12 @@ class LeadType extends ActiveRecord implements LeadTypeInterface {
 	 * @return static[]
 	 */
 	public static function getModels(bool $refresh = false): array {
-		if (empty(static::$models) || $refresh) {
+		if (static::$models === null || $refresh) {
 			static::$models = static::find()
 				->indexBy('id')
 				->orderBy('sort_index')
 				->all();
 		}
 		return static::$models;
-	}
-
-	public function getID(): int {
-		return $this->id;
-	}
-
-	public function getName(): string {
-		return $this->name;
 	}
 }

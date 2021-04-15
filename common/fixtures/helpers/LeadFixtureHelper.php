@@ -2,6 +2,7 @@
 
 namespace common\fixtures\helpers;
 
+use common\modules\lead\fixtures\CampaignFixture;
 use common\modules\lead\fixtures\LeadFixture;
 use common\modules\lead\fixtures\LeadReportFixture;
 use common\modules\lead\fixtures\LeadReportSchemaFixture;
@@ -25,37 +26,6 @@ class LeadFixtureHelper {
 
 	public static function dataDir(): string {
 		return Yii::getAlias('@common/tests/_data/lead/');
-	}
-
-	public static function reports(): array {
-		return [
-			static::REPORT_SCHEMA => [
-				'class' => LeadReportSchemaFixture::class,
-				'dataFile' => static::dataDir() . 'report-schema.php',
-			],
-			'report-schema-status-type' => [
-				'class' => LeadReportSchemaStatusTypeFixture::class,
-				'dataFile' => static::dataDir() . 'report-schema-status-type.php',
-			],
-			static::REPORT => [
-				'class' => LeadReportFixture::class,
-				'dataFile' => static::dataDir() . 'report.php',
-			],
-
-		];
-	}
-
-	public static function source(): array {
-		return [
-			static::USER => [
-				'class' => UserFixture::class,
-				'dataFile' => static::dataDir() . 'user.php',
-			],
-			static::SOURCE => [
-				'class' => SourceFixture::class,
-				'dataFile' => static::dataDir() . 'source.php',
-			],
-		];
 	}
 
 	public static function leads(): array {
@@ -82,4 +52,53 @@ class LeadFixtureHelper {
 			],
 		];
 	}
+
+	public static function reports(): array {
+		return [
+			static::REPORT_SCHEMA => [
+				'class' => LeadReportSchemaFixture::class,
+				'dataFile' => static::dataDir() . 'report-schema.php',
+			],
+			'report-schema-status-type' => [
+				'class' => LeadReportSchemaStatusTypeFixture::class,
+				'dataFile' => static::dataDir() . 'report-schema-status-type.php',
+			],
+			static::REPORT => [
+				'class' => LeadReportFixture::class,
+				'dataFile' => static::dataDir() . 'report.php',
+			],
+
+		];
+	}
+
+	public static function campaign(): array {
+		return [
+			static::USER => [
+				'class' => UserFixture::class,
+				'dataFile' => static::dataDir() . 'user.php',
+			],
+			static::SOURCE => [
+				'class' => CampaignFixture::class,
+				'dataFile' => static::dataDir() . 'campaign.php',
+			],
+		];
+	}
+
+	public static function source(): array {
+		return [
+			static::USER => [
+				'class' => UserFixture::class,
+				'dataFile' => static::dataDir() . 'user.php',
+			],
+			static::SOURCE => [
+				'class' => SourceFixture::class,
+				'dataFile' => static::dataDir() . 'source.php',
+			],
+			static::TYPE => [
+				'class' => TypeFixture::class,
+				'dataFile' => static::dataDir() . 'type.php',
+			],
+		];
+	}
+
 }

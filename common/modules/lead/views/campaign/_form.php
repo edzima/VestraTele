@@ -1,26 +1,22 @@
 <?php
 
-use common\modules\lead\models\forms\LeadSourceForm;
+use common\modules\lead\models\LeadCampaign;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model LeadSourceForm */
+/* @var $model LeadCampaign */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="lead-source-form">
+<div class="lead-campaign-form">
 
 	<?php $form = ActiveForm::begin(
-		['id' => 'lead-source-form']
+		['id' => 'lead-campaign-form']
 	); ?>
 
 	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-
-	<?= $form->field($model, 'type_id')->dropDownList(LeadSourceForm::getTypesNames()) ?>
-
-	<?= $form->field($model, 'url')->textInput(['maxlength' => true]) ?>
-
+	
 	<?= $form->field($model, 'owner_id')->textInput() ?>
 
 	<?= $form->field($model, 'sort_index')->textInput() ?>

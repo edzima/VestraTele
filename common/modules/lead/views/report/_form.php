@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'status_id')->dropDownList($model::getStatusNames()) ?>
 
-	<?= Html::hiddenInput('lead-type_id', $model->getLead()->getTypeId(), ['id' => 'lead-type_id']) ?>
+	<?= Html::hiddenInput('lead-type_id', $model->getLead()->getSource()->getType()->getID(), ['id' => 'lead-type_id']) ?>
 
 	<?= $form->field($model, 'schema_id')->widget(DepDrop::class, [
 		'type' => DepDrop::TYPE_SELECT2,

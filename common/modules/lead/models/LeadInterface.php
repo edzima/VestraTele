@@ -6,11 +6,13 @@ use DateTime;
 
 interface LeadInterface {
 
+	public function getSource(): LeadSourceInterface;
+
 	public function getStatusId(): int;
 
-	public function getSourceId(): int;
+	//public function getSourceId(): int;
 
-	public function getTypeId(): int;
+	//public function getTypeId(): int;
 
 	public function getDateTime(): DateTime;
 
@@ -21,5 +23,9 @@ interface LeadInterface {
 	public function getEmail(): ?string;
 
 	public function getPostalCode(): ?string;
+
+	public function getOwnerId(): ?int;
+
+	public function getCampaignId(): ?int;
 
 }
