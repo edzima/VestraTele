@@ -65,9 +65,9 @@ class LeadSourceFormTest extends Unit {
 
 	public function testWithURL(): void {
 		$this->giveModel([
-				'name' => 'New source',
-				'type_id' => 1,
-				'url' => 'http://google.com',
+			'name' => 'New source',
+			'type_id' => 1,
+			'url' => 'http://google.com',
 		]);
 
 		$this->thenSuccessValidate();
@@ -81,15 +81,44 @@ class LeadSourceFormTest extends Unit {
 
 	public function testNotUniqueName(): void {
 		$this->giveModel([
-			'name' => 'New source',
+			'name' => 'Test source',
 			'type_id' => 1,
 		]);
 		$this->thenSuccessSave();
 		$this->giveModel([
-			'name' => 'New source',
+			'name' => 'Test source',
 			'type_id' => 2,
 		]);
 		$this->thenUnsuccessValidate();
+	}
+
+	public function testWithOwner(): void {
+		$owner_id = array_key_first(LeadSourceForm::getUsersNames());
+		$this->giveModel([
+			'name' => 'Test source',
+			'type_id' => 1,
+			'owner_id' => $owner_id,
+		]);
+		$this->thenSuccessSave();
+		$this->thenSeeSource([
+			'name' => 'Test source',
+			'type_id' => 1,
+			'owner_id' => $owner_id,
+		]);
+	}
+
+	public function testWithPhone(): void {
+		$this->giveModel([
+			'name' => 'Test source',
+			'type_id' => 1,
+			'phone' => '123-456-789',
+		]);
+		$this->thenSuccessSave();
+		$this->thenSeeSource([
+			'name' => 'Test source',
+			'type_id' => 1,
+			'phone' => '+48 12 345 67 89',
+		]);
 	}
 
 	public function thenSeeSource(array $attributes): void {

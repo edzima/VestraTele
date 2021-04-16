@@ -42,6 +42,7 @@ class m210204_121955_lead extends Migration {
 		$this->createTable('{{%lead_source}}', [
 			'id' => $this->primaryKey(),
 			'name' => $this->string(100)->notNull()->unique(),
+			'phone' => $this->string(30)->null(),
 			'type_id' => $this->integer()->notNull(),
 			'url' => $this->string(255),
 			'owner_id' => $this->integer(),

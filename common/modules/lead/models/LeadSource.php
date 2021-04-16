@@ -14,6 +14,7 @@ use yii\helpers\ArrayHelper;
  * @property int $id
  * @property string $name
  * @property int $type_id
+ * @property string|null $phone
  * @property string|null $url
  * @property int|null $sort_index
  * @property int|null $owner_id
@@ -44,6 +45,7 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 			[['name', 'type_id'], 'required'],
 			[['sort_index'], 'integer'],
 			[['name', 'url'], 'string', 'max' => 255],
+			['phone', 'string', 'max' => 30],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadType::class, 'targetAttribute' => ['type_id' => 'id']],
 			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['owner_id' => 'id']],
 		];
@@ -57,18 +59,18 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 			'id' => Yii::t('lead', 'ID'),
 			'name' => Yii::t('lead', 'Name'),
 			'url' => Yii::t('lead', 'URL'),
+			'phone' => Yii::t('lead', 'Phone'),
 			'sort_index' => Yii::t('lead', 'Sort Index'),
 			'type_id' => Yii::t('lead', 'Type'),
 		];
 	}
 
-	/**
-	 * Gets query for [[Leads]].
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getLeads() {
+	public function getLeads(): ActiveQuery {
 		return $this->hasMany(Lead::class, ['source_id' => 'id']);
+	}
+
+	public function getLeadType(): ActiveQuery {
+		return $this->hasOne(LeadType::class, ['id' => 'type_id']);
 	}
 
 	/**
@@ -77,7 +79,7 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 	 * @return ActiveQuery
 	 */
 	public function getOwner(): ActiveQuery {
-		return $this->hasOne(Module::userClass(), ['owner_id' => 'id']);
+		return $this->hasOne(Module::userClass(), ['id' => 'owner_id']);
 	}
 
 	public static function getNames(): array {
@@ -114,4 +116,7 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 		return LeadType::getModels()[$this->type_id];
 	}
 
+	public function getPhone(): ?string {
+		return $this->phone;
+	}
 }

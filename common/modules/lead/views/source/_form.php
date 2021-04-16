@@ -21,7 +21,9 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'url')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'owner_id')->textInput() ?>
+	<?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
+
+	<?= $form->field($model, 'owner_id')->dropDownList(LeadSourceForm::getUsersNames()) ?>
 
 	<?= $form->field($model, 'sort_index')->textInput() ?>
 

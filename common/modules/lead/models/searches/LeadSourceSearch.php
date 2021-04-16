@@ -3,6 +3,7 @@
 namespace common\modules\lead\models\searches;
 
 use common\modules\lead\models\LeadSource;
+use common\modules\lead\models\LeadType;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -16,8 +17,8 @@ class LeadSourceSearch extends LeadSource {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'sort_index', 'owner_id'], 'integer'],
-			[['name', 'url'], 'safe'],
+			[['id', 'sort_index', 'owner_id', 'type_id'], 'integer'],
+			[['name', 'url', 'phone'], 'safe'],
 		];
 	}
 
@@ -38,6 +39,8 @@ class LeadSourceSearch extends LeadSource {
 	 */
 	public function search(array $params): ActiveDataProvider {
 		$query = LeadSource::find();
+
+		$query->with(['leadType', 'owner']);
 
 		// add conditions that should always apply here
 
@@ -64,5 +67,9 @@ class LeadSourceSearch extends LeadSource {
 			->andFilterWhere(['like', 'url', $this->url]);
 
 		return $dataProvider;
+	}
+
+	public static function getTypesNames(): array {
+		return LeadType::getNames();
 	}
 }

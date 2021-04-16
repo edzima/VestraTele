@@ -17,21 +17,25 @@ use yii\widgets\ActiveForm;
 	<div class="row">
 		<?= $form->field($model, 'source_id', ['options' => ['class' => 'col-md-4']])->dropDownList(LeadForm::getSourcesNames()) ?>
 
-		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-4']])->dropDownList(LeadForm::getCampaignsNames()) ?>
+		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getCampaignsNames()) ?>
 
-		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-4']])->dropDownList(LeadForm::getStatusNames()) ?>
+		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getStatusNames()) ?>
+		
+		<?= $form->field($model, 'datetime', ['options' => ['class' => 'col-md-2']])->widget(DateTimeWidget::class, [
+			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
+		]) ?>
+
 	</div>
 
 
-	<?= $form->field($model, 'datetime')->widget(DateTimeWidget::class, [
-		'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
-	]) ?>
+	<div class="row">
+		<?= $form->field($model, 'phone', ['options' => ['class' => 'col-md-4']])->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-4']])->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'postal_code', ['options' => ['class' => 'col-md-4']])->textInput(['maxlength' => true]) ?>
+	</div>
 
-	<?= $form->field($model, 'postal_code')->textInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'data')->textarea(['rows' => 6]) ?>
 

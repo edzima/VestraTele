@@ -2,6 +2,7 @@
 
 use common\models\user\User;
 use common\modules\lead\Module;
+use yii\helpers\ArrayHelper;
 
 return [
 	'id' => 'app-common-tests',
@@ -21,6 +22,10 @@ return [
 		'lead' => [
 			'class' => Module::class,
 			'userClass' => User::class,
+			'userNames' => static function () {
+				return ArrayHelper::map(User::find()->asArray()->all(), 'id', 'username');
+			},
+
 		],
 	],
 ];

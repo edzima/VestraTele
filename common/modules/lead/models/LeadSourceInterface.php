@@ -10,6 +10,8 @@ interface LeadSourceInterface {
 
 	public function getType(): LeadTypeInterface;
 
+	public function getPhone(): ?string;
+
 	public function getURL(): ?string;
 
 	public function getOwnerId(): ?int;

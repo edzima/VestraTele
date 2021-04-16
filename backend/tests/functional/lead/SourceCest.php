@@ -34,7 +34,9 @@ class SourceCest {
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->seeInGridHeader('ID');
 		$I->seeInGridHeader('Name');
+		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('URL');
+		$I->seeInGridHeader('Phone');
 		$I->seeInGridHeader('Owner');
 		$I->seeInGridHeader('Sort Index');
 	}
@@ -60,7 +62,7 @@ class SourceCest {
 		$I->amOnPage(static::ROUTE_CREATE);
 		$I->submitForm(static::FORM_SELECTOR, $this->formParams(
 			'Some name',
-			 1,
+			1,
 			'http://google.com',
 			null
 		));

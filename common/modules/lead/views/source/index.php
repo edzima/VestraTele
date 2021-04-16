@@ -30,7 +30,14 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Sources');
 
 			'id',
 			'name',
+			[
+				'attribute' => 'type_id',
+				'value' => 'type.name',
+				'filter' => $searchModel::getTypesNames(),
+				'label' => Yii::t('lead', 'Type'),
+			],
 			'url',
+			'phone',
 			'owner',
 			'sort_index',
 
