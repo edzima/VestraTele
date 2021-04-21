@@ -18,13 +18,18 @@ interface LeadInterface {
 
 	public function getData(): array;
 
+	public function getProvider(): ?string;
+
 	public function getPhone(): ?string;
 
 	public function getEmail(): ?string;
 
 	public function getPostalCode(): ?string;
 
-	public function getOwnerId(): ?int;
+	/**
+	 * @return int[] users IDs indexed by type.
+	 */
+	public function getUsers(): array;
 
 	public function getCampaignId(): ?int;
 

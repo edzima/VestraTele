@@ -55,6 +55,24 @@ class LeadFormTest extends Unit {
 		$this->thenSuccessValidate();
 	}
 
+	public function testInvalidProvider(): void {
+		$this->giveLead([
+			'provider' => 'some-not-existed-provider',
+		]);
+
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Provider is invalid.', 'provider');
+	}
+
+	public function testWithOwner(): void {
+		$this->giveLead([
+			'email' => 'some@mail.com',
+			'status_id' => 1,
+			'source_id' => 1,
+			'datetime' => '2020-01-01 12:00:00',
+		]);
+	}
+
 	protected function giveLead(array $data): void {
 		$this->lead = LeadFactory::createLead($data);
 	}

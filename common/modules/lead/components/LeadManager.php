@@ -42,7 +42,6 @@ class LeadManager extends Component {
 				'errors' => $model->getErrors(),
 			], 'lead.push.create.error');
 		}
-		$this->groupLeads($lead);
 		return $model;
 	}
 
@@ -60,6 +59,7 @@ class LeadManager extends Component {
 	 * @return Lead
 	 */
 	protected function create(LeadInterface $lead): ActiveLead {
+		/** @var ActiveLead $model */
 		$model = Yii::createObject($this->model);
 		$model->setLead($lead);
 		return $model;

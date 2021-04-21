@@ -3,11 +3,13 @@
 namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadSourceInterface;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\Module;
 use DateTime;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
@@ -16,12 +18,15 @@ use yii\helpers\Json;
 
 class LeadForm extends Model implements LeadInterface {
 
+	public const USER_OWNER = 'owner';
+	public const USER_AGENT = 'agent';
+
 	public $campaign_id;
 	public $source_id;
 	public $status_id;
 	public $type_id;
 	public $datetime;
-	public $owner_id;
+	public $provider;
 	public $first_name;
 	public $lastname;
 	public ?string $data = null;
@@ -29,7 +34,8 @@ class LeadForm extends Model implements LeadInterface {
 	public ?string $phone = null;
 	public ?string $postal_code = null;
 
-	public array $owners = [];
+	public $owner_id;
+	public $agent_id;
 
 	public function rules(): array {
 		return [
@@ -44,20 +50,17 @@ class LeadForm extends Model implements LeadInterface {
 				return empty($this->phone);
 			}, 'message' => Yii::t('lead', 'Email cannot be blank when phone is blank.'),
 			],
-			[['status_id', 'source_id', 'campaign_id'], 'integer'],
+			[['status_id', 'source_id', 'campaign_id', 'agent_id', 'owner_id'], 'integer'],
 			[['phone', 'postal_code', 'email', 'first_name', 'lastname'], 'string'],
 			['postal_code', 'string', 'max' => 6],
 			['email', 'email'],
 			['datetime', 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],
 			[['phone'], PhoneValidator::class, 'country' => 'PL'],
+			[['owner_id', 'agent_id'], 'in', 'range' => array_keys(static::getUsersNames())],
 			['campaign_id', 'in', 'range' => array_keys(static::getCampaignsNames())],
+			['provider', 'in', 'range' => array_keys(static::getProvidersNames())],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 			['source_id', 'in', 'range' => array_keys(static::getSourcesNames())],
-			[
-				'owner_id', 'in', 'range' => array_keys($this->owners), 'when' => function (): bool {
-				return !empty($this->owners);
-			},
-			],
 		];
 	}
 
@@ -74,16 +77,23 @@ class LeadForm extends Model implements LeadInterface {
 
 	public function setLead(LeadInterface $lead): void {
 		$this->setSource($lead->getSource());
+		$this->setUsers($lead->getUsers());
 		$this->status_id = $lead->getStatusId();
 		$this->datetime = $lead->getDateTime()->format(DATE_ATOM);
 		$this->data = Json::encode($lead->getData());
 		$this->email = $lead->getEmail();
 		$this->phone = $lead->getPhone();
 		$this->postal_code = $lead->getPostalCode();
+		$this->provider = $lead->getProvider();
 	}
 
 	public function setSource(LeadSourceInterface $source): void {
 		$this->source_id = $source->getID();
+	}
+
+	public function setUsers(array $users): void {
+		$this->agent_id = $users[static::USER_AGENT] ?? null;
+		$this->owner_id = $users[static::USER_OWNER] ?? null;
 	}
 
 	public function getStatusId(): int {
@@ -114,16 +124,52 @@ class LeadForm extends Model implements LeadInterface {
 		return $this->postal_code;
 	}
 
-	public function getOwnerId(): ?int {
-		return $this->owner_id;
+	public function getCampaignId(): ?int {
+		return $this->campaign_id;
 	}
 
-	public function getSourceName(): string {
-		return static::getSourcesNames()[$this->source_id];
+	public function getSource(): LeadSourceInterface {
+		return LeadSource::findOne($this->source_id);
 	}
 
-	public function getStatusName(): string {
-		return static::getStatusNames()[$this->status_id];
+	public function getProvider(): ?string {
+		return $this->provider;
+	}
+
+	public function getUsers(): array {
+		$users = [];
+		if (!empty($this->agent_id)) {
+			$users[static::USER_AGENT] = $this->agent_id;
+		}
+		if (!empty($this->owner_id)) {
+			$users[static::USER_OWNER] = $this->owner_id;
+		}
+		return $users;
+		return [
+			static::USER_OWNER => $this->owner_id,
+			static::USER_AGENT => $this->agent_id,
+		];
+	}
+
+	public function push(): ?ActiveLead {
+		if (!$this->validate()) {
+			return null;
+		}
+		$lead = Yii::$app->leadManager->pushLead($this);
+		if ($lead) {
+			$lead->unlinkUsers();
+			$this->linkUsers($lead);
+		}
+		return $lead;
+	}
+
+	public function linkUsers(ActiveLead $lead): void {
+		if (!empty($this->agent_id)) {
+			$lead->linkUser(static::USER_AGENT, $this->agent_id);
+		}
+		if (!empty($this->owner_id)) {
+			$lead->linkUser(static::USER_OWNER, $this->owner_id);
+		}
 	}
 
 	public static function getCampaignsNames(): array {
@@ -138,18 +184,12 @@ class LeadForm extends Model implements LeadInterface {
 		return LeadStatus::getNames();
 	}
 
-	public function getCampaignId(): ?int {
-		return $this->campaign_id;
+	public static function getProvidersNames(): array {
+		return Lead::getProvidersNames();
 	}
 
-	public function getSource(): LeadSourceInterface {
-		return LeadSource::findOne($this->source_id);
-	}
-
-	public function push(): ?ActiveLead {
-		if (!$this->validate()) {
-			return Yii::$app->leadManager->pushLead($this);
-		}
+	public static function getUsersNames(): array {
+		return Module::userNames();
 	}
 
 }

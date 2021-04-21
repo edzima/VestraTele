@@ -5,7 +5,6 @@ namespace common\modules\lead\controllers;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\forms\LeadForm;
 use Yii;
-use common\modules\lead\models\Lead;
 use common\modules\lead\models\searches\LeadSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -120,7 +119,7 @@ class LeadController extends Controller {
 	 * If the model is not found, a 404 HTTP exception will be thrown.
 	 *
 	 * @param integer $id
-	 * @return Lead the loaded model
+	 * @return ActiveLead the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	protected function findModel(int $id): ActiveLead {

@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models\forms;
 
+use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadSourceInterface;
@@ -31,7 +32,6 @@ class CzaterPhoneLead extends Model implements LeadInterface {
 		// TODO: Implement getSourceId() method.
 	}
 
-
 	public function getDateTime(): DateTime {
 		return new DateTime($this->dateStart);
 	}
@@ -52,7 +52,7 @@ class CzaterPhoneLead extends Model implements LeadInterface {
 		return null;
 	}
 
-	public function getOwnerId(): ?int {
+	public function getUsers(): ?int {
 		return $this->getSource()->getOwnerId();
 	}
 
@@ -67,5 +67,9 @@ class CzaterPhoneLead extends Model implements LeadInterface {
 			$model->save();
 		}
 		return $model->id;
+	}
+
+	public function getProvider(): ?string {
+		return Lead::PROVIDER_CZATER;
 	}
 }

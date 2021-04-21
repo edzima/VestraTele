@@ -15,8 +15,7 @@ class m210204_121955_lead extends Migration {
 	 */
 	public function safeUp() {
 
-		/** @var ActiveRecord $userClass */
-		$userClass = Module::userClass();
+
 		$this->createTable('{{%lead}}', [
 			'id' => $this->primaryKey(),
 			'date_at' => $this->dateTime()->notNull(),
@@ -26,11 +25,21 @@ class m210204_121955_lead extends Migration {
 			'phone' => $this->string(30)->null(),
 			'email' => $this->string(40)->null(),
 			'postal_code' => $this->string(6)->null(),
+			'provider' => $this->string(25),
 			'campaign_id' => $this->integer(),
 			'owner_id' => $this->integer(),
 		]);
 
-		$this->addForeignKey('{{%fk_lead_owner}}', '{{%lead}}', 'owner_id', $userClass::tableName(), 'id', 'CASCADE', 'CASCADE');
+		$this->createTable('{{%lead_user}}', [
+			'lead_id' => $this->integer()->notNull(),
+			'user_id' => $this->integer()->notNull(),
+			'type' => $this->string(25)->notNull(),
+		]);
+
+		$this->addPrimaryKey('{{%lead_user_PK}}', '{{%lead_user}}', ['lead_id', 'user_id', 'type']);
+		/** @var ActiveRecord $userClass */
+		$userClass = Module::userClass();
+		$this->addForeignKey('{{%fk_lead_user}}', '{{%lead_user}}', 'user_id', $userClass::tableName(), 'id', 'CASCADE', 'CASCADE');
 
 		$this->createTable('{{%lead_type}}', [
 			'id' => $this->primaryKey(),
@@ -93,7 +102,7 @@ class m210204_121955_lead extends Migration {
 	 */
 	public function safeDown() {
 		$this->dropTable('{{%lead}}');
-
+		$this->dropTable('{{%lead_user}}');
 		$this->dropTable('{{%lead_status}}');
 		$this->dropTable('{{%lead_campaign}}');
 		$this->dropTable('{{%lead_source}}');

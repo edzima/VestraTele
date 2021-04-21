@@ -2,10 +2,11 @@
 
 namespace common\modules\lead\models;
 
-use common\modules\lead\Module;
 use DateTime;
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 /**
@@ -17,18 +18,32 @@ use yii\helpers\Json;
  * @property int $type_id
  * @property int $source_id
  * @property int $status_id
+ * @property string|null $provider
  * @property string|null $phone
  * @property string|null $postal_code
  * @property string|null $email
  * @property int|null $campaign_id
- * @property int|null $owner_id
  *
  * @property-read LeadCampaign|null $campaign
  * @property-read LeadType $type
  * @property-read LeadStatus $status
  * @property-read LeadSource $leadSource
+ * @property-read LeadUser[] $leadUsers
+ * @property-read LeadReport[] $reports
  */
 class Lead extends ActiveRecord implements ActiveLead {
+
+	public const PROVIDER_FORM = 'form';
+	public const PROVIDER_CZATER = 'czater';
+	public const PROVIDER_CENTRAL_PHONE = 'central-phone';
+
+	public static function getProvidersNames(): array {
+		return [
+			static::PROVIDER_FORM => Yii::t('lead', 'Form'),
+			static::PROVIDER_CZATER => Yii::t('lead', 'Czater'),
+			static::PROVIDER_CENTRAL_PHONE => Yii::t('lead', 'Central phone'),
+		];
+	}
 
 	public string $dateFormat = 'Y-m-d H:i:s';
 
@@ -39,19 +54,25 @@ class Lead extends ActiveRecord implements ActiveLead {
 	public function rules(): array {
 		return [
 			[['source_id', 'status_id', 'data'], 'required'],
-			[['status_id', 'owner_id'], 'integer'],
-			[['phone', 'postal_code', 'email'], 'string'],
+			[['status_id'], 'integer'],
+			[['phone', 'postal_code', 'email', 'provider'], 'string'],
 			['email', 'email'],
 			['postal_code', 'string', 'max' => 6],
+			['provider', 'in', 'range' => array_keys(static::getProvidersNames())],
 			[['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadStatus::class, 'targetAttribute' => ['status_id' => 'id']],
 			[['source_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadSource::class, 'targetAttribute' => ['source_id' => 'id']],
 			[['campaign_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadCampaign::class, 'targetAttribute' => ['campaign_id' => 'id']],
-			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['owner_id' => 'id']],
 		];
 	}
 
-	public function getSource(): LeadSourceInterface {
-		return $this->leadSource;
+	public function unlinkUsers(): void {
+		$this->unlinkAll('leadUsers', true);
+	}
+
+	public function linkUser(string $type, int $user_id): void {
+		if (!$this->getIsNewRecord()) {
+			$this->link('leadUsers', new LeadUser(['type' => $type, 'user_id' => $user_id]));
+		}
 	}
 
 	public function getCampaign(): ActiveQuery {
@@ -68,6 +89,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function getReports(): ActiveQuery {
 		return $this->hasMany(LeadReport::class, ['lead_id' => 'id']);
+	}
+
+	public function getLeadUsers(): ActiveQuery {
+		return $this->hasMany(LeadUser::class, ['lead_id' => 'id']);
 	}
 
 	public function getType(): ActiveQuery {
@@ -110,12 +135,20 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->postal_code;
 	}
 
-	public function getOwnerId(): ?int {
-		return $this->owner_id;
+	public function getUsers(): array {
+		return ArrayHelper::map($this->leadUsers, 'type', 'user_id');
 	}
 
 	public function getCampaignId(): ?int {
 		return $this->campaign_id;
+	}
+
+	public function getProvider(): ?string {
+		return $this->provider;
+	}
+
+	public function getSource(): LeadSourceInterface {
+		return $this->leadSource;
 	}
 
 	public function updateFromLead(LeadInterface $lead): void {
@@ -169,6 +202,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		$this->data = Json::encode($lead->getData());
 		$this->status_id = $lead->getStatusId();
 		$this->campaign_id = $lead->getCampaignId();
+		$this->unlinkUsers();
+		foreach ($lead->getUsers() as $type => $userId) {
+			$this->linkUser($type, $userId);
+		}
 	}
 
 }

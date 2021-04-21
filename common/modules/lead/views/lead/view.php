@@ -1,5 +1,7 @@
 <?php
 
+use yii\data\ActiveDataProvider;
+use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -41,4 +43,14 @@ YiiAsset::register($this);
 		],
 	]) ?>
 
+	<?= GridView::widget([
+		'dataProvider' => new ActiveDataProvider(['query' => $model->getLeadUsers()->with('user.userProfile')]),
+		'columns' => [
+			'type',
+			[
+				'label' => Yii::t('lead', 'User'),
+				'value' => 'user.fullName',
+			],
+		],
+	]) ?>
 </div>

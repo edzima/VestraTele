@@ -17,11 +17,13 @@ use yii\widgets\ActiveForm;
 	<div class="row">
 		<?= $form->field($model, 'source_id', ['options' => ['class' => 'col-md-4']])->dropDownList(LeadForm::getSourcesNames()) ?>
 
+		<?= $form->field($model, 'provider', ['options' => ['class' => 'col-md-2']])->dropDownList(LeadForm::getProvidersNames(), ['prompt' => Yii::t('lead', '--- Select ---')]) ?>
+
 		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getCampaignsNames()) ?>
 
 		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getStatusNames()) ?>
-		
-		<?= $form->field($model, 'datetime', ['options' => ['class' => 'col-md-2']])->widget(DateTimeWidget::class, [
+
+		<?= $form->field($model, 'datetime', ['options' => ['class' => 'col-md-3']])->widget(DateTimeWidget::class, [
 			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
 		]) ?>
 
@@ -34,6 +36,12 @@ use yii\widgets\ActiveForm;
 		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-4']])->textInput(['maxlength' => true]) ?>
 
 		<?= $form->field($model, 'postal_code', ['options' => ['class' => 'col-md-4']])->textInput(['maxlength' => true]) ?>
+	</div>
+
+	<div class="row">
+		<?= $form->field($model, 'agent_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getUsersNames()) ?>
+
+		<?= $form->field($model, 'owner_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getUsersNames()) ?>
 	</div>
 
 

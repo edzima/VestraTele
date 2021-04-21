@@ -10,6 +10,10 @@ interface ActiveLead extends LeadInterface {
 
 	public function updateStatus(int $status_id): bool;
 
+	public function unlinkUsers(): void;
+
+	public function linkUser(string $type, int $user_id): void;
+
 	/**
 	 * @param string $id
 	 * @return ?static
