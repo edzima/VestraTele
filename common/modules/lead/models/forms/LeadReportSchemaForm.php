@@ -13,14 +13,16 @@ class LeadReportSchemaForm extends Model {
 	public string $name = '';
 	public ?string $placeholder = null;
 
-	public array $types_ids = [];
-	public array $status_ids = [];
+	public $types_ids = [];
+	public $status_ids = [];
 
 	private ?LeadReportSchema $model = null;
 
 	public function rules(): array {
 		return [
-			[['name', 'status_ids', 'types_ids'], 'required'],
+			[['name'], 'required'],
+			['status_ids', 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
+			['types_ids', 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
 		];
 	}
 
@@ -54,6 +56,9 @@ class LeadReportSchemaForm extends Model {
 		$model = $this->getModel();
 		$model->name = $this->name;
 		$model->placeholder = $this->placeholder;
+		$model->setTypesIds($this->getTypesIds());
+		$model->setStatusIds($this->getStatusIds());
+		return $model->save();
 		$isNewRecord = $model->getIsNewRecord();
 		if (!$model->save()) {
 			return false;
@@ -75,6 +80,23 @@ class LeadReportSchemaForm extends Model {
 			LeadReportSchemaStatusType::tableName(),
 			['schema_id', 'status_id', 'type_id'],
 			$rows)->execute();
+	}
+
+	public function getStatusIds(): ?array {
+		if (is_numeric($this->status_ids)) {
+			return [$this->status_ids];
+		}
+		return is_array($this->status_ids) ? $this->status_ids : [];
+	}
+
+	public function getTypesIds(): array {
+		if (empty($this->types_ids)) {
+			return [];
+		}
+		if (is_numeric($this->types_ids)) {
+			return [$this->types_ids];
+		}
+		return $this->types_ids;
 	}
 
 }

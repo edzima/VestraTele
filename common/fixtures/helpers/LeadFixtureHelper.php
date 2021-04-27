@@ -101,4 +101,21 @@ class LeadFixtureHelper {
 		];
 	}
 
+	public static function schemas(): array {
+		return [
+			static::REPORT_SCHEMA => [
+				'class' => LeadReportSchemaFixture::class,
+				'dataFile' => static::dataDir() . 'report-schema.php',
+			],
+			static::STATUS => [
+				'class' => StatusFixture::class,
+				'dataFile' => static::dataDir() . 'status.php',
+			],
+			static::TYPE => [
+				'class' => TypeFixture::class,
+				'dataFile' => static::dataDir() . 'type.php',
+			],
+		];
+	}
+
 }

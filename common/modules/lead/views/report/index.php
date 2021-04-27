@@ -9,7 +9,8 @@ use yii\grid\GridView;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('lead', 'Lead Reports');
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
+$this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 ?>
 <div class="lead-report-index">
 
@@ -27,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'status',
 			'oldStatus',
 			'schema',
-			'details',
+			'formattedDetails',
 			'created_at',
 			'updated_at',
 

@@ -25,11 +25,28 @@ class LeadReportForm extends Model {
 			[['status_id', 'schema_id'], 'required'],
 			[
 				'details', 'required', 'when' => function () {
-				$schema = LeadReportSchema::findOne($this->schema_id);
-				return $schema && !empty($schema->placeholder);
-			},
+				$schema = $this->getSchema();
+				return $schema->is_required ?? false;
+			}, 'enableClientValidation' => false,
 			],
 		];
+	}
+
+	public function attributeLabels() {
+		return [
+			'details' => $this->getSchema()->name,
+		];
+	}
+
+	public function getSchema(): ?LeadReportSchema {
+		return LeadReportSchema::findOne($this->schema_id);
+	}
+
+	/**
+	 * @return LeadReportSchema[]
+	 */
+	public function getSchemas(): array {
+		return LeadReportSchema::findWithStatusAndType($this->status_id, $this->getLeadTypeID());
 	}
 
 	public function __construct(int $owner_id, ActiveLead $lead, $config = []) {
@@ -54,8 +71,12 @@ class LeadReportForm extends Model {
 		return $this->model;
 	}
 
+	public function getLeadTypeID(): int {
+		return $this->getLead()->getSource()->getType()->getID();
+	}
+
 	public function getSchemaData(): array {
-		$schemas = LeadReportSchemaStatusType::findSchemasByStatusAndType($this->status_id, $this->lead->getSource()->getType()->getID());
+		$schemas = LeadReportSchemaStatusType::findSchemasByStatusAndType($this->status_id, $this->getLeadTypeID());
 		return ArrayHelper::map(
 			$schemas,
 			'id',
@@ -63,8 +84,8 @@ class LeadReportForm extends Model {
 		);
 	}
 
-	public function save(): bool {
-		if (!$this->validate()) {
+	public function save(bool $validate = true): bool {
+		if ($validate && !$this->validate()) {
 			return false;
 		}
 		$lead = $this->lead;

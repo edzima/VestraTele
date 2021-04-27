@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models;
 
+use common\modules\lead\models\query\LeadReportQuery;
 use common\modules\lead\Module;
 use Yii;
 use yii\db\ActiveRecord;
@@ -26,6 +27,13 @@ use yii\db\ActiveRecord;
  * @property LeadStatus $status
  */
 class LeadReport extends ActiveRecord {
+
+	public function getFormattedDetails(): string {
+		if ($this->schema->placeholder) {
+			return $this->details;
+		}
+		return Yii::$app->formatter->asBoolean($this->details);
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -111,5 +119,12 @@ class LeadReport extends ActiveRecord {
 	 */
 	public function getStatus() {
 		return $this->hasOne(LeadStatus::class, ['id' => 'status_id']);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public static function find(): LeadReportQuery {
+		return new LeadReportQuery(static::class);
 	}
 }

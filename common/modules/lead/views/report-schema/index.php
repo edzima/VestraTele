@@ -12,6 +12,7 @@ use common\widgets\GridView;
 
 $this->title = Yii::t('lead', 'Lead Report Schemas');
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="lead-report-schema-index">
 
@@ -33,12 +34,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'attribute' => 'status_ids',
 				'value' => 'statusNames',
-				'filter' => LeadStatus::getNames()
+				'filter' => LeadStatus::getNames(),
 			],
 			[
 				'attribute' => 'types_ids',
 				'value' => 'typesNames',
-				'filter' => LeadType::getNames()
+				'filter' => LeadType::getNames(),
 
 			],
 

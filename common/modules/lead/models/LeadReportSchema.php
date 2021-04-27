@@ -5,6 +5,7 @@ namespace common\modules\lead\models;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "lead_report_schema".
@@ -12,6 +13,10 @@ use yii\helpers\ArrayHelper;
  * @property int $id
  * @property string $name
  * @property string|null $placeholder
+ * @property boolean $is_required
+ * @property string $statuses
+ * @property string $types
+ * @property boolean show_in_grid
  *
  * @property LeadReport[] $reports
  * @property LeadReportSchemaStatusType[] $schemaStatusTypes
@@ -35,6 +40,7 @@ class LeadReportSchema extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['name'], 'required'],
+			['show_in_grid', 'boolean'],
 			[['name', 'placeholder'], 'string', 'max' => 255],
 		];
 	}
@@ -59,7 +65,19 @@ class LeadReportSchema extends ActiveRecord {
 	}
 
 	public function getTypesIds(): array {
-		return ArrayHelper::getColumn($this->schemaStatusTypes, 'type_id');
+		if (empty($this->types)) {
+			return [];
+		}
+		return Json::decode($this->types);
+		//	return ArrayHelper::getColumn($this->schemaStatusTypes, 'type_id');
+	}
+
+	public function setStatusIds(array $ids): void {
+		$this->statuses = Json::encode($ids);
+	}
+
+	public function setTypesIds(array $ids): void {
+		$this->types = Json::encode($ids);
 	}
 
 	public function getStatusNames(): string {
@@ -71,6 +89,10 @@ class LeadReportSchema extends ActiveRecord {
 	}
 
 	public function getStatusIds(): array {
+		if (empty($this->statuses)) {
+			return [];
+		}
+		return Json::decode($this->statuses);
 		return ArrayHelper::getColumn($this->schemaStatusTypes, 'status_id');
 	}
 
@@ -90,6 +112,19 @@ class LeadReportSchema extends ActiveRecord {
 	 */
 	public function getSchemaStatusTypes() {
 		return $this->hasMany(LeadReportSchemaStatusType::class, ['schema_id' => 'id']);
+	}
+
+	/**
+	 * @param int $status_id
+	 * @param int $type_id
+	 * @return static[]
+	 */
+	public static function findWithStatusAndType(int $status_id, int $type_id): array {
+		return static::find()
+			->joinWith('schemaStatusTypes')
+			->andWhere(['or', ['status_id' => null], ['status_id' => $status_id]])
+			->andWhere(['or', ['type_id' => null], ['type_id' => $type_id]])
+			->all();
 	}
 
 }

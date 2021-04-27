@@ -9,7 +9,8 @@ use yii\helpers\Html;
 $this->title = Yii::t('lead', 'Update Lead Report: {name}', [
 	'name' => $model->getModel()->id,
 ]);
-$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Reports'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Reports'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->getModel()->lead_id, 'url' => ['lead/view', 'id' => $model->getModel()->lead_id]];
 $this->params['breadcrumbs'][] = Yii::t('lead', 'Update');
 ?>

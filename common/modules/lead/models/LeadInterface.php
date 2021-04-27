@@ -10,10 +10,6 @@ interface LeadInterface {
 
 	public function getStatusId(): int;
 
-	//public function getSourceId(): int;
-
-	//public function getTypeId(): int;
-
 	public function getDateTime(): DateTime;
 
 	public function getData(): array;
@@ -32,5 +28,8 @@ interface LeadInterface {
 	public function getUsers(): array;
 
 	public function getCampaignId(): ?int;
+
+	public function setLead(LeadInterface $lead): void;
+
 
 }

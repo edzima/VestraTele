@@ -16,6 +16,8 @@ use common\modules\lead\models\Lead;
 class LeadSearch extends Lead implements SearchModel {
 
 	public $type_id;
+	public $firstname;
+	public $lastname;
 
 	/**
 	 * {@inheritdoc}
@@ -23,7 +25,7 @@ class LeadSearch extends Lead implements SearchModel {
 	public function rules(): array {
 		return [
 			[['id', 'status_id', 'type_id', 'source_id'], 'integer'],
-			[['date_at', 'data', 'phone', 'email', 'postal_code'], 'safe'],
+			[['date_at', 'data', 'phone', 'email', 'postal_code', 'firstname', 'lastname'], 'safe'],
 		];
 	}
 

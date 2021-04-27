@@ -1,5 +1,6 @@
 <?php
 
+use common\modules\lead\models\ReportSchemaInterface;
 use common\modules\lead\Module;
 use console\base\Migration;
 use yii\db\ActiveRecord;
@@ -12,17 +13,42 @@ class m210208_111345_lead_reports extends Migration {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function safeUp() {
+	public function safeUp(): void {
+
 		$this->createTable('{{%lead_report_schema}}', [
 			'id' => $this->primaryKey(),
 			'name' => $this->string(255)->notNull(),
 			'placeholder' => $this->string(255)->null(),
+			'is_required' => $this->boolean(),
+			'show_in_grid' => $this->boolean()->defaultValue(false),
+			'types' => $this->json()->null(),
+			'statuses' => $this->json()->null(),
+		]);
+
+		$this->batchInsert('{{%lead_report_schema}}', [
+			'id',
+			'name',
+			'placeholder',
+			'show_in_grid',
+		], [
+			[
+				'id' => ReportSchemaInterface::FIRSTNAME_ID,
+				'name' => 'Firstname',
+				'placeholder' => 'Firstname',
+				'show_in_grid' => true,
+			],
+			[
+				'id' => ReportSchemaInterface::LASTNAME_ID,
+				'name' => 'Lastname',
+				'placeholder' => 'Lastname',
+				'show_in_grid' => true,
+			],
 		]);
 
 		$this->createTable('{{%lead_report_schema_status_type}}', [
 			'schema_id' => $this->integer()->notNull(),
-			'status_id' => $this->integer()->notNull(),
-			'type_id' => $this->integer()->notNull(),
+			'status_id' => $this->integer()->null(),
+			'type_id' => $this->integer()->null(),
 		]);
 
 		$this->addPrimaryKey('{{%PK_lead_report_schema_status_type}}', '{{%lead_report_schema_status_type}}', ['schema_id', 'status_id', 'type_id']);
@@ -55,7 +81,7 @@ class m210208_111345_lead_reports extends Migration {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function safeDown() {
+	public function safeDown(): void {
 		$this->dropTable('{{%lead_report}}');
 		$this->dropTable('{{%lead_report_schema_status_type}}');
 		$this->dropTable('{{%lead_report_schema}}');

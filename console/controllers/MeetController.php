@@ -4,6 +4,7 @@ namespace console\controllers;
 
 use common\models\issue\IssueMeet;
 use common\modules\lead\models\forms\LeadForm;
+use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
@@ -15,10 +16,10 @@ class MeetController extends Controller {
 
 	public string $sourceName = 'meets';
 
-	private ?LeadSource $source = null;
+	private array $sources = [];
 
 	public function actionMigration(): void {
-		IssueMeet::deleteAll();
+		Lead::deleteAll();
 		Yii::$app->leadManager->pushLead($this->createLead(IssueMeet::find()->one()));
 		return;
 		foreach (IssueMeet::find()->batch() as $rows) {
@@ -36,7 +37,6 @@ class MeetController extends Controller {
 		$lead->postal_code = $meet->customerAddress->postal_code ?? null;
 		$lead->datetime = $meet->date_at;
 		$lead->owner_id = $meet->agent_id;
-		$lead->type_id = $this->getType($meet->type->name)->id;
 		$lead->status_id = $this->getStatus($meet->getStatusName())->id;
 		$lead->campaign_id = $this->getCampaign($meet->campaign->name)->id;
 		$lead->source_id = $this->getSource($meet)->id;
@@ -44,15 +44,21 @@ class MeetController extends Controller {
 	}
 
 	private function getSource(IssueMeet $issueMeet): LeadSource {
-		if ($this->source === null) {
-			$model = LeadSource::find()->andWhere(['name' => $this->sourceName])->one();
+		$type_id = $this->getType($issueMeet->type->name)->id;
+		if (!isset($this->sources[$type_id])) {
+			$sourceName = $this->sourceName . ' - ' . $issueMeet->type->name;
+			$model = LeadSource::find()->andWhere(['name' => $sourceName])->one();
 			if ($model === null) {
-				$model = new LeadSource(['name' => $this->sourceName]);
+				$model = new LeadSource([
+					'name' => $sourceName,
+					'type_id' => $type_id,
+				]);
 				$model->save();
 			}
-			$this->source = $model;
+			$this->sources[$type_id] = $model;
 		}
-		return $this->source;
+
+		return $this->sources[$type_id];
 	}
 
 	private function getCampaign(string $name): LeadCampaign {

@@ -88,7 +88,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function getReports(): ActiveQuery {
-		return $this->hasMany(LeadReport::class, ['lead_id' => 'id']);
+		return $this->hasMany(LeadReport::class, ['lead_id' => 'id'])->indexBy('id');
 	}
 
 	public function getLeadUsers(): ActiveQuery {
@@ -147,6 +147,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->provider;
 	}
 
+	public function getProviderName(): ?string {
+		return static::getProvidersNames()[$this->provider] ?? null;
+	}
+
 	public function getSource(): LeadSourceInterface {
 		return $this->leadSource;
 	}
@@ -198,6 +202,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 		$this->email = $lead->getEmail();
 		$this->phone = $lead->getPhone();
 		$this->postal_code = $lead->getPostalCode();
+		$this->provider = $lead->getProvider();
 		$this->date_at = $lead->getDateTime()->format($this->dateFormat);
 		$this->data = Json::encode($lead->getData());
 		$this->status_id = $lead->getStatusId();

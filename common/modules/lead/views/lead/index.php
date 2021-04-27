@@ -2,6 +2,7 @@
 
 use common\helpers\Html;
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\LeadReportSchema;
 use common\modules\lead\models\searches\LeadSearch;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -12,6 +13,20 @@ use common\widgets\GridView;
 
 $this->title = Yii::t('lead', 'Leads');
 $this->params['breadcrumbs'][] = $this->title;
+
+$schemas = LeadReportSchema::find()
+	->andWhere(['show_in_grid' => true])
+	->all();
+
+$schemasColumns = [];
+foreach ($schemas as $schema) {
+	$schemasColumns[] = [
+		'attribute' => $schema->name,
+		'value' => function (ActiveLead $lead) use ($schema): ?string {
+			return $lead->reports[$schema->id]->details;
+		},
+	];
+}
 ?>
 <div class="lead-index">
 
@@ -26,11 +41,11 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'columns' => [
+		'columns' => array_merge([
 			['class' => 'yii\grid\SerialColumn'],
 			[
 				'attribute' => 'type_id',
-				'value' => 'type',
+				'value' => 'source.type',
 				'filter' => $searchModel::getTypesNames(),
 				'label' => Yii::t('lead', 'Type'),
 			],
@@ -50,7 +65,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			'phone',
 			'email:email',
 			'postal_code',
-
+			[
+				'attribute' => 'provider',
+				'value' => 'providerName',
+			],
 			'owner',
 
 			[
@@ -66,11 +84,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'template' => '{view} {update} {report} {delete}',
 				'buttons' => [
 					'report' => static function (string $url, ActiveLead $lead): string {
-						return Html::a(Html::icon('comment'), ['report/create', 'id' => $lead->getId()]);
+						return Html::a(Html::icon('comment'), ['report/report', 'id' => $lead->getId()]);
 					},
 				],
 			],
-		],
+		], $schemasColumns),
 	]); ?>
 
 

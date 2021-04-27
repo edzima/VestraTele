@@ -33,6 +33,7 @@ YiiAsset::register($this);
 		'model' => $model,
 		'attributes' => [
 			'id',
+			'source.type',
 			'source',
 			'status',
 			'date_at',
@@ -40,17 +41,28 @@ YiiAsset::register($this);
 			'phone',
 			'email:email',
 			'postal_code',
+			'providerName',
 		],
 	]) ?>
 
 	<?= GridView::widget([
-		'dataProvider' => new ActiveDataProvider(['query' => $model->getLeadUsers()->with('user.userProfile')]),
-		'columns' => [
-			'type',
-			[
-				'label' => Yii::t('lead', 'User'),
-				'value' => 'user.fullName',
-			],
-		],
+	'dataProvider' => new ActiveDataProvider(['query' => $model->getLeadUsers()->with('user.userProfile')]),
+	'columns' => [
+	'type',
+	[
+	'label' => Yii::t('lead', 'User'),
+	'value' => 'user.fullName',
+	],
+	],
+	]) ?>
+
+
+	<?= GridView::widget([
+	'dataProvider' => new ActiveDataProvider(['query' => $model->getReports()->with('schema')]),
+	'columns' => [
+	'owner',
+	'schema',
+	'details',
+	],
 	]) ?>
 </div>

@@ -3,6 +3,7 @@
 namespace common\modules\lead\controllers;
 
 use common\modules\lead\models\forms\LeadReportForm;
+use common\modules\lead\models\forms\LeadReportsForm;
 use common\modules\lead\models\LeadReportSchemaStatusType;
 use Yii;
 use common\modules\lead\models\LeadReport;
@@ -73,10 +74,28 @@ class ReportController extends Controller {
 		$model = new LeadReportForm(Yii::$app->user->getId(), $lead);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['/lead/view', 'id' => $id]);
+			return $this->redirect(['lead/view', 'id' => $id]);
 		}
 
 		return $this->render('create', [
+			'model' => $model,
+		]);
+	}
+
+	public function actionReport(int $id, int $status_id = null) {
+		$lead = Yii::$app->leadManager->findById($id);
+		if ($lead === null) {
+			throw new NotFoundHttpException();
+		}
+		$model = new LeadReportsForm(Yii::$app->user->getId(), $lead);
+		if ($status_id) {
+			$model->status_id = $status_id;
+		}
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['lead/view', 'id' => $id]);
+		}
+
+		return $this->render('report', [
 			'model' => $model,
 		]);
 	}
@@ -93,7 +112,7 @@ class ReportController extends Controller {
 		$model = LeadReportForm::createFromModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['/lead/view', 'id' => $model->getModel()->lead_id]);
+			return $this->redirect(['lead/view', 'id' => $model->getModel()->lead_id]);
 		}
 
 		return $this->render('update', [
