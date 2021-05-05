@@ -84,4 +84,13 @@ class IssueSearchTest extends Unit {
 		$this->assertTotalCount(1, ['agent_id' => 300, 'lawyer_id' => 200]);
 	}
 
+	public function testOnlyWithPayedPays(): void {
+		$this->tester->haveFixtures(
+			array_merge(
+				IssueFixtureHelper::fixtures(),
+				IssueFixtureHelper::settlements()
+			)
+		);
+		$this->assertTotalCount(2, ['onlyWithPayedPay' => true]);
+	}
 }

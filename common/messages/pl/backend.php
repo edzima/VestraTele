@@ -291,4 +291,5 @@ return [
 	'Create cost' => 'Dodaj koszt',
 	'User Traits' => 'User Traits',
 	'Set parent for: {user}' => 'Ustal przełożonego dla: {user}',
+	'Only with payed pay' => 'Tylko z opłaconą wpłatą',
 ];

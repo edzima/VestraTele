@@ -5,6 +5,7 @@ namespace backend\tests\functional\issue;
 use backend\modules\issue\controllers\IssueController;
 use backend\tests\_support\Step\Functional\ExportIssueManager;
 use backend\tests\Step\Functional\Admin;
+use backend\tests\Step\Functional\Bookkeeper;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\SummonIssueManager;
@@ -62,6 +63,7 @@ class IssueIndexCest {
 		$I->see('Telemarketer');
 		$I->see('Only delayed');
 		$I->dontSee('Structures');
+		$I->dontSee('Only with payed pay');
 	}
 
 	public function checkSearchFieldsAsAdmin(Admin $I): void {
@@ -70,4 +72,9 @@ class IssueIndexCest {
 		$I->see('Structures');
 	}
 
+	public function checkSearchFieldsAsBookkeeper(Bookkeeper $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE);
+		$I->see('Only with payed pay');
+	}
 }

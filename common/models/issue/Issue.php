@@ -361,10 +361,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function getPays(): IssuePayQuery {
-		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		//@todo check when directly get pays.
-		// ->orderBy(IssuePay::tableName() . '.deadline_at ASC, ' . IssuePay::tableName() . '.pay_at DESC');
-
 		return $this->hasMany(IssuePay::class, ['calculation_id' => 'id'])
 			->via('payCalculations');
 	}

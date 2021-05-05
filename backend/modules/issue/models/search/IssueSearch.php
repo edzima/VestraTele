@@ -5,6 +5,7 @@ namespace backend\modules\issue\models\search;
 use common\models\AddressSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueSearch as BaseIssueSearch;
+use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\user\User;
 use Yii;
@@ -24,6 +25,7 @@ class IssueSearch extends BaseIssueSearch {
 	public $accident_at;
 	public $excludedStages = [];
 	public bool $onlyDelayed = false;
+	public bool $onlyWithPayedPay = false;
 
 	public function __construct($config = []) {
 		if (!isset($config['addressSearch'])) {
@@ -32,11 +34,10 @@ class IssueSearch extends BaseIssueSearch {
 		parent::__construct($config);
 	}
 
-
 	public function rules(): array {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
-			['onlyDelayed', 'boolean'],
+			[['onlyDelayed', 'onlyWithPayedPay'], 'boolean'],
 			['accident_at', 'safe'],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 		]);
@@ -47,6 +48,7 @@ class IssueSearch extends BaseIssueSearch {
 			'parentId' => Yii::t('backend', 'Structures'),
 			'excludedStages' => Yii::t('backend', 'Excluded stages'),
 			'onlyDelayed' => Yii::t('backend', 'Only delayed'),
+			'onlyWithPayedPay' => Yii::t('backend', 'Only with payed pay'),
 		]);
 	}
 
@@ -84,6 +86,7 @@ class IssueSearch extends BaseIssueSearch {
 		$this->excludedStagesFilter($query);
 		$this->teleFilter($query);
 		$this->lawyerFilter($query);
+		$this->payedFilter($query);
 		$query->andFilterWhere(['accident_at' => $this->accident_at]);
 	}
 
@@ -145,6 +148,16 @@ class IssueSearch extends BaseIssueSearch {
 		$ids = Yii::$app->userHierarchy->getAllChildesIds($this->parentId);
 		$ids[] = $this->parentId;
 		return User::getSelectList($ids, false);
+	}
+
+	private function payedFilter(IssueQuery $query): void {
+		if ($this->onlyWithPayedPay) {
+			$query->joinWith([
+				'pays' => function (IssuePayQuery $payQuery) {
+					$payQuery->onlyPayed();
+				},
+			]);
+		}
 	}
 
 }
