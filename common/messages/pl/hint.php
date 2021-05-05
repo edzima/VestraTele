@@ -59,4 +59,9 @@ return [
 	'Updated At' => 'Edytowano',
 	'Summons' => 'Summons',
 	'Created At' => 'Dodano',
+	'Uninterested' => 'Niezainteresowany',
+	'Hint' => 'Wskaźnik',
+	'Shipped materials' => 'Wysłane materiały',
+	'Not answer' => 'Nie Odbiera',
+	'Renew' => 'Ponowić'
 ];
