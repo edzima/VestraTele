@@ -12,6 +12,7 @@ use yii\db\ActiveRecord;
  * @property int $hint_id
  * @property string $phone
  * @property string $rating
+ * @property string $status
  * @property string|null $details
  * @property string $created_at
  * @property string $updated_at
@@ -22,9 +23,23 @@ use yii\db\ActiveRecord;
  */
 class HintCitySource extends ActiveRecord {
 
+	public const STATUS_RENEW = 'renew';
+	public const STATUS_UNINTERESTED = 'uninterested';
+	public const STATUS_NOT_ANSWER = 'not-answer';
+	public const STATUS_SHIPPED_MATERIALS = 'shipped-materials';
+
 	public const RATING_POSITIVE = 'positive';
 	public const RATING_NEUTRAL = 'neutral';
 	public const RATING_NEGATIVE = 'negative';
+
+	public static function getStatusesNames(): array {
+		return [
+			static::STATUS_RENEW => Yii::t('hint', 'Renew'),
+			static::STATUS_UNINTERESTED => Yii::t('hint', 'Uninterested'),
+			static::STATUS_SHIPPED_MATERIALS => Yii::t('hint', 'Shipped materials'),
+			static::STATUS_NOT_ANSWER => Yii::t('hint', 'Not answer'),
+		];
+	}
 
 	public static function getRatingsNames(): array {
 		return [
@@ -46,12 +61,13 @@ class HintCitySource extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['source_id', 'hint_id', 'phone', 'rating'], 'required'],
+			[['source_id', 'hint_id', 'phone', 'rating', 'status'], 'required'],
 			[['source_id', 'hint_id'], 'integer'],
-			[['details'], 'string'],
+			[['details', 'status'], 'string'],
 			[['phone', 'rating'], 'string', 'max' => 50],
 			[['source_id', 'hint_id'], 'unique', 'targetAttribute' => ['source_id', 'hint_id']],
 			['rating', 'in', 'range' => array_keys(static::getRatingsNames())],
+			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			[['hint_id'], 'exist', 'skipOnError' => true, 'targetClass' => HintCity::class, 'targetAttribute' => ['hint_id' => 'id']],
 			[['source_id'], 'exist', 'skipOnError' => true, 'targetClass' => HintSource::class, 'targetAttribute' => ['source_id' => 'id']],
 		];
@@ -62,11 +78,13 @@ class HintCitySource extends ActiveRecord {
 	 */
 	public function attributeLabels(): array {
 		return [
-			'source_id' => Yii::t('hint', 'Source ID'),
-			'hint_id' => Yii::t('hint', 'Hint ID'),
+			'source_id' => Yii::t('hint', 'Source'),
+			'hint_id' => Yii::t('hint', 'Hint'),
 			'phone' => Yii::t('hint', 'Phone'),
 			'rating' => Yii::t('hint', 'Rating'),
 			'ratingName' => Yii::t('hint', 'Rating'),
+			'status' => Yii::t('hint', 'Status'),
+			'statusName' => Yii::t('hint', 'Status'),
 			'details' => Yii::t('hint', 'Details'),
 			'created_at' => Yii::t('hint', 'Created At'),
 			'updated_at' => Yii::t('hint', 'Updated At'),
@@ -75,6 +93,10 @@ class HintCitySource extends ActiveRecord {
 
 	public function getRatingName(): string {
 		return static::getRatingsNames()[$this->rating];
+	}
+
+	public function getStatusName(): string {
+		return static::getStatusesNames()[$this->status];
 	}
 
 	/**

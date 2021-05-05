@@ -23,6 +23,8 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'rating')->dropDownList(HintCitySource::getRatingsNames()) ?>
 
+	<?= $form->field($model, 'status')->dropDownList(HintCitySource::getStatusesNames()) ?>
+
 	<?= $form->field($model, 'details')->textarea(['rows' => 6]) ?>
 
 	<div class="form-group">

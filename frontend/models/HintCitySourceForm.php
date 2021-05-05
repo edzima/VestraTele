@@ -14,6 +14,7 @@ class HintCitySourceForm extends Model {
 	public $source_id;
 	public $phone;
 	public $rating;
+	public $status;
 	public $details;
 
 	private HintCity $hintCity;
@@ -21,15 +22,26 @@ class HintCitySourceForm extends Model {
 
 	private array $sources = [];
 
+	public function rules(): array {
+		return [
+			[['source_id', 'rating', 'phone', 'status'], 'required'],
+			[['phone', 'rating', 'details', 'status'], 'string'],
+			['phone', PhoneValidator::class, 'country' => 'PL'],
+			['rating', 'in', 'range' => array_keys(static::getRatingsNames())],
+			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
+			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
+		];
+	}
+
 	public function getSourcesNames(): array {
 		if (empty($this->sources)) {
 			$sources = HintSource::find()
 				->andWhere(['is_active' => true])
 				->indexBy('id')
 				->all();
-			$hintSources = $this->hintCity->sources;
+			$hintSources = $this->hintCity->hintCitySources;
 			foreach ($hintSources as $hintSource) {
-				$sourceId = $hintSource->id;
+				$sourceId = $hintSource->source_id;
 				if ($this->getModel()->source_id !== $sourceId) {
 					unset($sources[$sourceId]);
 				}
@@ -43,17 +55,11 @@ class HintCitySourceForm extends Model {
 		return HintCitySource::getRatingsNames();
 	}
 
-	public function rules(): array {
-		return [
-			[['source_id', 'rating', 'phone'], 'required'],
-			[['phone', 'rating', 'details'], 'string'],
-			['phone', PhoneValidator::class, 'country' => 'PL'],
-			['rating', 'in', 'range' => array_keys(static::getRatingsNames())],
-			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
-		];
+	public static function getStatusesNames(): array {
+		return HintCitySource::getStatusesNames();
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return HintCitySource::instance()->attributeLabels();
 	}
 
@@ -68,6 +74,7 @@ class HintCitySourceForm extends Model {
 	public function setModel(HintCitySource $model): void {
 		$this->model = $model;
 		$this->hintCity = $model->hint;
+		$this->status = $model->status;
 		$this->source_id = $model->source_id;
 		$this->details = $model->details;
 		$this->phone = $model->phone;
@@ -88,6 +95,7 @@ class HintCitySourceForm extends Model {
 		$model = $this->getModel();
 		$model->hint_id = $this->hintCity->id;
 		$model->source_id = $this->source_id;
+		$model->status = $this->status;
 		$model->phone = $this->phone;
 		$model->rating = $this->rating;
 		$model->details = $this->details;

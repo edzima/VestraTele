@@ -30,6 +30,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => $searchModel::getSourcesNames(),
 			],
 			[
+				'attribute' => 'status',
+				'value' => 'statusName',
+				'filter' => HintCitySourceSearch::getStatusesNames(),
+			],
+			[
 				'attribute' => 'rating',
 				'value' => 'ratingName',
 

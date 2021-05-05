@@ -29,6 +29,11 @@ $this->params['breadcrumbs'][] = $this->title;
 			'filter' => HintCitySourceSearch::getSourcesNames(),
 		],
 		[
+			'attribute' => 'status',
+			'value' => 'statusName',
+			'filter' => HintCitySourceSearch::getStatusesNames(),
+		],
+		[
 			'attribute' => 'rating',
 			'value' => 'ratingName',
 

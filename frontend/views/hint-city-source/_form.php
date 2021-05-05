@@ -15,6 +15,8 @@ use frontend\models\HintCitySourceForm;
 
 	<?= $form->field($model, 'source_id')->dropDownList($model->getSourcesNames()) ?>
 
+	<?= $form->field($model, 'status')->dropDownList(HintCitySourceForm::getStatusesNames()) ?>
+
 	<?= $form->field($model, 'rating')->dropDownList(HintCitySourceForm::getRatingsNames()) ?>
 
 	<?= $form->field($model, 'phone')->textInput() ?>

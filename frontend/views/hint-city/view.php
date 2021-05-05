@@ -44,6 +44,7 @@ YiiAsset::register($this);
 		]),
 		'columns' => [
 			'source.name',
+			'statusName',
 			'phone',
 			'ratingName',
 			'details:text',

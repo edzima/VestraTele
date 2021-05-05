@@ -21,7 +21,7 @@ class HintCitySourceSearch extends HintCitySource {
 	public function rules(): array {
 		return [
 			[['source_id', 'user_id'], 'integer'],
-			[['rating', 'phone', 'hintType', 'hintStatus', 'hintCityName', 'details', 'created_at', 'updated_at'], 'string'],
+			[['rating', 'phone', 'hintType', 'hintStatus', 'hintCityName', 'details', 'created_at', 'updated_at', 'status'], 'string'],
 		];
 	}
 
@@ -60,8 +60,9 @@ class HintCitySourceSearch extends HintCitySource {
 		}
 
 		$query->andFilterWhere([
-			'source_id' => $this->source_id,
-			'rating' => $this->rating,
+			HintCitySource::tableName() . '.source_id' => $this->source_id,
+			HintCitySource::tableName() . '.rating' => $this->rating,
+			HintCitySource::tableName() . '.status' => $this->status,
 			'H.user_id' => $this->user_id,
 			'H.type' => $this->hintType,
 			'H.status' => $this->hintStatus,

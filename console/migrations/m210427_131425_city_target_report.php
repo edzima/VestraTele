@@ -41,12 +41,14 @@ class m210427_131425_city_target_report extends Migration {
 			'hint_id' => $this->integer()->notNull(),
 			'phone' => $this->string(50)->notNull(),
 			'rating' => $this->string(50)->notNull(),
+			'status' => $this->string(30)->notNull(),
 			'details' => $this->text(),
 			'created_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
 			'updated_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
 		]);
 
 		$this->createIndex('{{%index_hint_city_source_rating}}', '{{%hint_city_source}}', 'rating');
+		$this->createIndex('{{%index_hint_city_source_status}}', '{{%hint_city_source}}', 'status');
 
 		$this->addPrimaryKey('{{%pk_hint_city_source}}', '{{%hint_city_source}}', ['hint_id', 'source_id']);
 		$this->addForeignKey('{{%fk_hint_city_hint}}', '{{%hint_city_source}}', 'hint_id', '{{%hint_city}}', 'id', 'CASCADE', 'CASCADE');
