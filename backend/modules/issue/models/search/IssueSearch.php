@@ -156,7 +156,8 @@ class IssueSearch extends BaseIssueSearch {
 				'pays' => function (IssuePayQuery $payQuery) {
 					$payQuery->onlyPayed();
 				},
-			]);
+			])
+				->groupBy(Issue::tableName() . '.id');
 		}
 	}
 
