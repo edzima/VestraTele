@@ -1,13 +1,15 @@
 <?php
 
+use common\modules\lead\models\Lead;
+use common\widgets\grid\ActionColumn;
+use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
-use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model common\modules\lead\models\Lead */
+/* @var $model Lead */
 
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['index']];
@@ -19,6 +21,8 @@ YiiAsset::register($this);
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
+		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+
 		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 		<?= Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',
@@ -46,23 +50,27 @@ YiiAsset::register($this);
 	]) ?>
 
 	<?= GridView::widget([
-	'dataProvider' => new ActiveDataProvider(['query' => $model->getLeadUsers()->with('user.userProfile')]),
-	'columns' => [
-	'type',
-	[
-	'label' => Yii::t('lead', 'User'),
-	'value' => 'user.fullName',
-	],
-	],
+		'dataProvider' => new ActiveDataProvider(['query' => $model->getLeadUsers()->with('user.userProfile')]),
+		'columns' => [
+			'type', [
+				'label' => Yii::t('lead', 'User'),
+				'value' => 'user.fullName',
+			],
+		],
 	]) ?>
 
 
 	<?= GridView::widget([
-	'dataProvider' => new ActiveDataProvider(['query' => $model->getReports()->with('schema')]),
-	'columns' => [
-	'owner',
-	'schema',
-	'details',
-	],
+		'dataProvider' => new ActiveDataProvider(['query' => $model->getReports()->with('schema')]),
+		'columns' => [
+			'owner',
+			'schema',
+			'details',
+			[
+				'class' => ActionColumn::class,
+				'controller' => '/lead/report',
+				'template' => '{update}{delete}',
+			],
+		],
 	]) ?>
 </div>

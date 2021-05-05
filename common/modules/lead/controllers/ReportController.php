@@ -4,7 +4,7 @@ namespace common\modules\lead\controllers;
 
 use common\modules\lead\models\forms\LeadReportForm;
 use common\modules\lead\models\forms\LeadReportsForm;
-use common\modules\lead\models\LeadReportSchemaStatusType;
+use common\modules\lead\models\LeadReportSchema;
 use Yii;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\searches\LeadReportSearch;
@@ -142,7 +142,7 @@ class ReportController extends Controller {
 			if (isset($_POST['depdrop_params'])) {
 				$type_id = reset($_POST['depdrop_params']);
 			}
-			$schemas = LeadReportSchemaStatusType::findSchemasByStatusAndType($status_id, $type_id);
+			$schemas = LeadReportSchema::findWithStatusAndType($status_id, $type_id);
 			foreach ($schemas as $schema) {
 				$out[$schema->id] = ['id' => $schema->id, 'name' => $schema->name];
 			}

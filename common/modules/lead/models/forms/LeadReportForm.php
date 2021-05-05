@@ -6,7 +6,6 @@ use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadReportSchema;
-use common\modules\lead\models\LeadReportSchemaStatusType;
 use common\modules\lead\models\LeadStatus;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -76,7 +75,8 @@ class LeadReportForm extends Model {
 	}
 
 	public function getSchemaData(): array {
-		$schemas = LeadReportSchemaStatusType::findSchemasByStatusAndType($this->status_id, $this->getLeadTypeID());
+		$schemas = LeadReportSchema::findWithStatusAndType($this->status_id, $this->getLeadTypeID());
+
 		return ArrayHelper::map(
 			$schemas,
 			'id',
@@ -93,6 +93,12 @@ class LeadReportForm extends Model {
 		$oldStatus = $lead->getStatusId();
 		if ($oldStatus !== $statusId) {
 			$lead->updateStatus($statusId);
+		}
+		if ($this->getSchema()->placeholder && empty($this->details)) {
+			if (!$this->model->isNewRecord) {
+				$this->model->delete();
+			}
+			return true;
 		}
 		$model = $this->model;
 		$model->old_status_id = $oldStatus;

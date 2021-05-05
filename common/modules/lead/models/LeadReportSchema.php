@@ -3,9 +3,8 @@
 namespace common\modules\lead\models;
 
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 
 /**
  * This is the model class for table "lead_report_schema".
@@ -14,12 +13,13 @@ use yii\helpers\Json;
  * @property string $name
  * @property string|null $placeholder
  * @property boolean $is_required
- * @property string $statuses
- * @property string $types
- * @property boolean show_in_grid
+ * @property int|null $status_id
+ * @property int|null $type_id
+ * @property boolean $show_in_grid
  *
- * @property LeadReport[] $reports
- * @property LeadReportSchemaStatusType[] $schemaStatusTypes
+ * @property-read  LeadReport[] $reports
+ * @property-read  LeadStatus|null $status
+ * @property-read  LeadType|null $type
  */
 class LeadReportSchema extends ActiveRecord {
 
@@ -30,19 +30,8 @@ class LeadReportSchema extends ActiveRecord {
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function tableName() {
+	public static function tableName(): string {
 		return '{{%lead_report_schema}}';
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules(): array {
-		return [
-			[['name'], 'required'],
-			['show_in_grid', 'boolean'],
-			[['name', 'placeholder'], 'string', 'max' => 255],
-		];
 	}
 
 	/**
@@ -53,65 +42,23 @@ class LeadReportSchema extends ActiveRecord {
 			'id' => Yii::t('lead', 'ID'),
 			'name' => Yii::t('lead', 'Name'),
 			'placeholder' => Yii::t('lead', 'Placeholder'),
+			'type_id' => Yii::t('lead', 'Type'),
+			'status_id' => Yii::t('lead', 'Status'),
+			'is_required' => Yii::t('lead', 'Is required'),
+			'show_in_grid' => Yii::t('lead', 'Show in grid'),
 		];
 	}
 
-	public function getTypesNames(): string {
-		$names = [];
-		foreach ($this->getTypesIds() as $id) {
-			$names[$id] = LeadType::getModels()[$id]->name;
-		}
-		return implode(', ', $names);
-	}
-
-	public function getTypesIds(): array {
-		if (empty($this->types)) {
-			return [];
-		}
-		return Json::decode($this->types);
-		//	return ArrayHelper::getColumn($this->schemaStatusTypes, 'type_id');
-	}
-
-	public function setStatusIds(array $ids): void {
-		$this->statuses = Json::encode($ids);
-	}
-
-	public function setTypesIds(array $ids): void {
-		$this->types = Json::encode($ids);
-	}
-
-	public function getStatusNames(): string {
-		$names = [];
-		foreach ($this->getStatusIds() as $id) {
-			$names[$id] = LeadStatus::getModels()[$id]->name;
-		}
-		return implode(', ', $names);
-	}
-
-	public function getStatusIds(): array {
-		if (empty($this->statuses)) {
-			return [];
-		}
-		return Json::decode($this->statuses);
-		return ArrayHelper::getColumn($this->schemaStatusTypes, 'status_id');
-	}
-
-	/**
-	 * Gets query for [[LeadReports]].
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getReports() {
+	public function getReports(): ActiveQuery {
 		return $this->hasMany(LeadReport::class, ['schema_id' => 'id']);
 	}
 
-	/**
-	 * Gets query for [[LeadReportSchemaStatusTypes]].
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getSchemaStatusTypes() {
-		return $this->hasMany(LeadReportSchemaStatusType::class, ['schema_id' => 'id']);
+	public function getStatus(): ActiveQuery {
+		return $this->hasOne(LeadStatus::class, ['id' => 'status_id']);
+	}
+
+	public function getType(): ActiveQuery {
+		return $this->hasOne(LeadType::class, ['id' => 'type_id']);
 	}
 
 	/**
@@ -121,7 +68,6 @@ class LeadReportSchema extends ActiveRecord {
 	 */
 	public static function findWithStatusAndType(int $status_id, int $type_id): array {
 		return static::find()
-			->joinWith('schemaStatusTypes')
 			->andWhere(['or', ['status_id' => null], ['status_id' => $status_id]])
 			->andWhere(['or', ['type_id' => null], ['type_id' => $type_id]])
 			->all();

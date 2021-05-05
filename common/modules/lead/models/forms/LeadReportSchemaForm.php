@@ -3,7 +3,6 @@
 namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\LeadReportSchema;
-use common\modules\lead\models\LeadReportSchemaStatusType;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
 use yii\base\Model;
@@ -13,25 +12,35 @@ class LeadReportSchemaForm extends Model {
 	public string $name = '';
 	public ?string $placeholder = null;
 
-	public $types_ids = [];
-	public $status_ids = [];
+	public ?bool $show_in_grid = null;
+	public ?bool $is_required = null;
+
+	public $type_id;
+	public $status_id;
 
 	private ?LeadReportSchema $model = null;
 
 	public function rules(): array {
 		return [
 			[['name'], 'required'],
-			['status_ids', 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
-			['types_ids', 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
+			[['show_in_grid', 'is_required'], 'boolean'],
+			['type_id', 'in', 'range' => array_keys(static::getStatusNames())],
+			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 		];
+	}
+
+	public function attributeLabels(): array {
+		return LeadReportSchema::instance()->attributeLabels();
 	}
 
 	public function setModel(LeadReportSchema $model): void {
 		$this->model = $model;
 		$this->name = $model->name;
 		$this->placeholder = $model->placeholder;
-		$this->types_ids = $model->getTypesIds();
-		$this->status_ids = $model->getStatusIds();
+		$this->show_in_grid = $model->show_in_grid;
+		$this->is_required = $model->is_required;
+		$this->type_id = $model->type_id;
+		$this->status_id = $model->status_id;
 	}
 
 	public function getModel(): LeadReportSchema {
@@ -56,47 +65,10 @@ class LeadReportSchemaForm extends Model {
 		$model = $this->getModel();
 		$model->name = $this->name;
 		$model->placeholder = $this->placeholder;
-		$model->setTypesIds($this->getTypesIds());
-		$model->setStatusIds($this->getStatusIds());
+		$model->show_in_grid = $this->show_in_grid;
+		$model->type_id = $this->type_id;
+		$model->status_id = $this->status_id;
 		return $model->save();
-		$isNewRecord = $model->getIsNewRecord();
-		if (!$model->save()) {
-			return false;
-		}
-		if (!$isNewRecord) {
-			$model->unlinkAll('schemaStatusTypes', true);
-		}
-		$rows = [];
-		foreach ($this->status_ids as $status_id) {
-			foreach ($this->types_ids as $type_id) {
-				$rows[] = [
-					'schema_id' => $model->id,
-					'status_id' => $status_id,
-					'type_id' => $type_id,
-				];
-			}
-		}
-		return LeadReportSchemaStatusType::getDb()->createCommand()->batchInsert(
-			LeadReportSchemaStatusType::tableName(),
-			['schema_id', 'status_id', 'type_id'],
-			$rows)->execute();
-	}
-
-	public function getStatusIds(): ?array {
-		if (is_numeric($this->status_ids)) {
-			return [$this->status_ids];
-		}
-		return is_array($this->status_ids) ? $this->status_ids : [];
-	}
-
-	public function getTypesIds(): array {
-		if (empty($this->types_ids)) {
-			return [];
-		}
-		if (is_numeric($this->types_ids)) {
-			return [$this->types_ids];
-		}
-		return $this->types_ids;
 	}
 
 }

@@ -11,16 +11,13 @@ use common\modules\lead\models\LeadReportSchema;
  */
 class LeadReportSchemaSearch extends LeadReportSchema {
 
-	public $status_ids;
-	public $types_ids;
-
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['id'], 'integer'],
-			[['name', 'placeholder', 'status_ids', 'types_ids'], 'safe'],
+			[['id', 'type_id', 'status_id', 'is_required', 'show_in_grid'], 'integer'],
+			[['name', 'placeholder'], 'safe'],
 		];
 	}
 
@@ -41,7 +38,8 @@ class LeadReportSchemaSearch extends LeadReportSchema {
 	 */
 	public function search($params) {
 		$query = LeadReportSchema::find();
-		$query->joinWith('schemaStatusTypes ST');
+		$query->joinWith('status S');
+		$query->joinWith('type T');
 
 		// add conditions that should always apply here
 
@@ -60,8 +58,10 @@ class LeadReportSchemaSearch extends LeadReportSchema {
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
-			'ST.type_id' => $this->types_ids,
-			'ST.status_id' => $this->status_ids,
+			'status_id' => $this->status_id,
+			'type_id' => $this->type_id,
+			'is_required' => $this->is_required,
+			'show_in_grid' => $this->show_in_grid,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])

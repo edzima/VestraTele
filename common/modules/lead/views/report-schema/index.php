@@ -11,6 +11,8 @@ use common\widgets\GridView;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('lead', 'Lead Report Schemas');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Reports'), 'url' => ['/lead/report/index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
@@ -32,17 +34,18 @@ $this->params['breadcrumbs'][] = $this->title;
 			'name',
 			'placeholder',
 			[
-				'attribute' => 'status_ids',
-				'value' => 'statusNames',
+				'attribute' => 'status_id',
+				'value' => 'status.name',
 				'filter' => LeadStatus::getNames(),
 			],
 			[
-				'attribute' => 'types_ids',
-				'value' => 'typesNames',
+				'attribute' => 'type_id',
+				'value' => 'type.name',
 				'filter' => LeadType::getNames(),
 
 			],
-
+			'is_required:boolean',
+			'show_in_grid:boolean',
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>

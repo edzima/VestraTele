@@ -1,6 +1,7 @@
 <?php
 
 use common\modules\lead\models\forms\LeadReportsForm;
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -29,8 +30,8 @@ $dropdownItems = [];
 			$dropdownItems[$reportForm->schema_id] = $reportForm->getSchema()->name;
 		}
 		?>
-	<? endforeach; ?>
-	<?= $form->field($model, 'reports')->widget(\kartik\select2\Select2::class, [
+	<?php endforeach; ?>
+	<?= $form->field($model, 'reports')->widget(Select2::class, [
 		'data' => $dropdownItems,
 		'options' => [
 			'multiple' => true,

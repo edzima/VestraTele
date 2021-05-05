@@ -10,6 +10,7 @@ class LeadReportSchemaFixture extends ActiveFixture {
 	public $modelClass = LeadReportSchema::class;
 
 	public $depends = [
-		LeadReportSchemaStatusTypeFixture::class,
+		StatusFixture::class,
+		TypeFixture::class,
 	];
 }

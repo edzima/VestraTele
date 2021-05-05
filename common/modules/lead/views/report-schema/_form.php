@@ -2,7 +2,6 @@
 
 use common\modules\lead\models\forms\LeadReportSchemaForm;
 
-use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -13,29 +12,21 @@ use yii\widgets\ActiveForm;
 
 <div class="lead-report-schema-form">
 
-	<?php $form = ActiveForm::begin(); ?>
+	<?php $form = ActiveForm::begin([
+		'id' => 'lead-report-schema-form',
+	]); ?>
 
 	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'placeholder')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'status_ids')->widget(Select2::class, [
-		'data' => $model::getStatusNames(),
-		'options' => [
-			'placeholder' => $model->getAttributeLabel('status_ids'),
-			'multiple' => true,
-		],
-	])->hint(Yii::t('lead', 'Allow empty to not use filter.')) ?>
+	<?= $form->field($model, 'status_id')->dropDownList(LeadReportSchemaForm::getStatusNames(), [
+		'prompt' => Yii::t('common', 'Select...'),
+	]) ?>
 
-
-	<?= $form->field($model, 'types_ids')->widget(Select2::class, [
-		'data' => $model::getTypesNames(),
-		'options' => [
-			'placeholder' => $model->getAttributeLabel('types_ids'),
-			'multiple' => true,
-		],
-	])->hint(Yii::t('lead', 'Allow empty to not use filter.')) ?>
-
+	<?= $form->field($model, 'type_id')->dropDownList(LeadReportSchemaForm::getTypesNames(), [
+		'prompt' => Yii::t('common', 'Select...'),
+	]) ?>
 
 
 	<div class="form-group">

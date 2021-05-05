@@ -1,15 +1,19 @@
 <?php
 
+use common\modules\lead\models\LeadReportSchema;
 use yii\helpers\Html;
+use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model common\modules\lead\models\LeadReportSchema */
+/* @var $model LeadReportSchema */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Report Schemas'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Reports'), 'url' => ['/lead/report/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Schemas'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-\yii\web\YiiAsset::register($this);
+YiiAsset::register($this);
 ?>
 <div class="lead-report-schema-view">
 
@@ -32,8 +36,18 @@ $this->params['breadcrumbs'][] = $this->title;
 			'id',
 			'name',
 			'placeholder',
-			'typesNames:text:' . Yii::t('lead', 'Types'),
-			'statusNames:text:' . Yii::t('lead', 'Statuses'),
+			'is_required:boolean',
+			'show_in_grid:boolean',
+			[
+				'attribute' => 'type',
+				'value' => $model->type->name,
+				'visible' => !empty($model->type),
+			],
+			[
+				'attribute' => 'status',
+				'value' => $model->status->name,
+				'visible' => !empty($model->status),
+			],
 		],
 	]) ?>
 

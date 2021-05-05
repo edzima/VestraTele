@@ -4,9 +4,11 @@ namespace backend\tests\functional\lead;
 
 use backend\tests\Step\Functional\LeadManager;
 use backend\tests\Step\Functional\Manager;
+use common\modules\lead\controllers\ReportController;
 
 class LeadReportCest {
 
+	/* @see ReportController::actionIndex() */
 	public const ROUTE_INDEX = '/lead/report/index';
 
 	public function checkAsManager(Manager $I): void {
@@ -32,5 +34,13 @@ class LeadReportCest {
 		$I->seeInGridHeader('Status');
 		$I->seeInGridHeader('Old Status');
 		$I->seeInGridHeader('Schema');
+	}
+
+	public function checkSchemasLinkInIndexPage(LeadManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeLink('Lead reports schemas');
+		$I->click('Lead reports schemas');
+		$I->seeCurrentUrlEquals(ReportSchemaCest::ROUTE_INDEX);
 	}
 }

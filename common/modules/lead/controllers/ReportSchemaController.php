@@ -2,13 +2,14 @@
 
 namespace common\modules\lead\controllers;
 
-use common\modules\lead\models\forms\LeadReportSchemaForm;
 use Yii;
+use common\modules\lead\models\forms\LeadReportSchemaForm;
 use common\modules\lead\models\LeadReportSchema;
 use common\modules\lead\models\searches\LeadReportSchemaSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * ReportSchemaController implements the CRUD actions for LeadReportSchema model.
@@ -18,10 +19,10 @@ class ReportSchemaController extends Controller {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
 				],
@@ -34,7 +35,7 @@ class ReportSchemaController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new LeadReportSchemaSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -104,7 +105,7 @@ class ReportSchemaController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionDelete($id) {
+	public function actionDelete(int $id): Response {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);
@@ -118,7 +119,7 @@ class ReportSchemaController extends Controller {
 	 * @return LeadReportSchema the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id) {
+	protected function findModel(int $id): LeadReportSchema {
 		if (($model = LeadReportSchema::findOne($id)) !== null) {
 			return $model;
 		}

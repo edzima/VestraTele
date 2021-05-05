@@ -15,47 +15,43 @@ class m210208_111345_lead_reports extends Migration {
 	 */
 	public function safeUp(): void {
 
+
 		$this->createTable('{{%lead_report_schema}}', [
 			'id' => $this->primaryKey(),
 			'name' => $this->string(255)->notNull(),
 			'placeholder' => $this->string(255)->null(),
 			'is_required' => $this->boolean(),
 			'show_in_grid' => $this->boolean()->defaultValue(false),
-			'types' => $this->json()->null(),
-			'statuses' => $this->json()->null(),
+			'type_id' => $this->integer(),
+			'status_id' => $this->integer(),
 		]);
+
+		$this->addForeignKey('{{%lead_report_schema_status}}', '{{%lead_report_schema}}', 'status_id', '{{%lead_status}}', 'id', 'CASCADE', 'CASCADE');
+		$this->addForeignKey('{{%lead_report_schema_type}}', '{{%lead_report_schema}}', 'type_id', '{{%lead_type}}', 'id', 'CASCADE', 'CASCADE');
 
 		$this->batchInsert('{{%lead_report_schema}}', [
 			'id',
 			'name',
 			'placeholder',
 			'show_in_grid',
+			'is_required',
 		], [
 			[
 				'id' => ReportSchemaInterface::FIRSTNAME_ID,
 				'name' => 'Firstname',
 				'placeholder' => 'Firstname',
 				'show_in_grid' => true,
+				'is_required' => false,
 			],
 			[
 				'id' => ReportSchemaInterface::LASTNAME_ID,
 				'name' => 'Lastname',
 				'placeholder' => 'Lastname',
 				'show_in_grid' => true,
+				'is_required' => false,
+
 			],
 		]);
-
-		$this->createTable('{{%lead_report_schema_status_type}}', [
-			'schema_id' => $this->integer()->notNull(),
-			'status_id' => $this->integer()->null(),
-			'type_id' => $this->integer()->null(),
-		]);
-
-		$this->addPrimaryKey('{{%PK_lead_report_schema_status_type}}', '{{%lead_report_schema_status_type}}', ['schema_id', 'status_id', 'type_id']);
-
-		$this->addForeignKey('{{%lead_report_schema_status_type_schema}}', '{{%lead_report_schema_status_type}}', 'schema_id', '{{%lead_report_schema}}', 'id', 'CASCADE', 'CASCADE');
-		$this->addForeignKey('{{%lead_report_schema_status_type_status}}', '{{%lead_report_schema_status_type}}', 'status_id', '{{%lead_status}}', 'id', 'CASCADE', 'CASCADE');
-		$this->addForeignKey('{{%lead_report_schema_status_type_type}}', '{{%lead_report_schema_status_type}}', 'type_id', '{{%lead_type}}', 'id', 'CASCADE', 'CASCADE');
 
 		$this->createTable('{{%lead_report}}', [
 			'id' => $this->primaryKey(),
@@ -83,7 +79,6 @@ class m210208_111345_lead_reports extends Migration {
 	 */
 	public function safeDown(): void {
 		$this->dropTable('{{%lead_report}}');
-		$this->dropTable('{{%lead_report_schema_status_type}}');
 		$this->dropTable('{{%lead_report_schema}}');
 	}
 

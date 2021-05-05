@@ -16,6 +16,12 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
+	<p>
+		<?= Html::a(Yii::t('lead', 'Lead Report Schemas'), ['report-schema/index'], [
+			'class' => 'btn btn-info',
+		]) ?>
+	</p>
+
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
 	<?= GridView::widget([

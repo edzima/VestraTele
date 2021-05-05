@@ -6,7 +6,6 @@ use common\modules\lead\fixtures\CampaignFixture;
 use common\modules\lead\fixtures\LeadFixture;
 use common\modules\lead\fixtures\LeadReportFixture;
 use common\modules\lead\fixtures\LeadReportSchemaFixture;
-use common\modules\lead\fixtures\LeadReportSchemaStatusTypeFixture;
 use common\modules\lead\fixtures\SourceFixture;
 use common\modules\lead\fixtures\StatusFixture;
 use common\modules\lead\fixtures\TypeFixture;
@@ -58,10 +57,6 @@ class LeadFixtureHelper {
 			static::REPORT_SCHEMA => [
 				'class' => LeadReportSchemaFixture::class,
 				'dataFile' => static::dataDir() . 'report-schema.php',
-			],
-			'report-schema-status-type' => [
-				'class' => LeadReportSchemaStatusTypeFixture::class,
-				'dataFile' => static::dataDir() . 'report-schema-status-type.php',
 			],
 			static::REPORT => [
 				'class' => LeadReportFixture::class,
