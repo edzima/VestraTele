@@ -61,6 +61,22 @@ AppAsset::register($this);
 		];
 
 		$menuItems[] = [
+			'label' => Yii::t('hint', 'Hints'),
+			'url' => '#',
+			'visible' => Yii::$app->user->can(User::PERMISSION_HINT),
+			'items' => [
+				[
+					'label' => Yii::t('hint', 'Hint Cities'),
+					'url' => ['/hint-city/index'],
+				],
+				[
+					'label' => Yii::t('hint', 'Hint Sources'),
+					'url' => ['/hint-city-source/index'],
+				],
+			],
+		];
+
+		$menuItems[] = [
 			'label' => Yii::t('common', 'Issues'),
 			'url' => ['/issue/index'],
 			'visible' => Yii::$app->user->can(User::PERMISSION_ISSUE),

@@ -25,6 +25,7 @@ return [
 	'customer_service' => 'Obsługa klienta',
 	'issue' => 'Sprawy',
 	'lawyer' => 'Prawnik',
+	'hint' => 'Wskazówki',
 	'logs' => 'Logi',
 	'news' => 'Newsy',
 	'note' => 'Notatki',

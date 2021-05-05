@@ -58,6 +58,31 @@ $user = Yii::$app->user;
 				],
 
 				[
+					'label' => Yii::t('hint', 'Hints'),
+					'url' => ['/hint/city/index'],
+					'icon' => '<i class="fa fa fa-map-marker"></i>',
+					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(User::PERMISSION_HINT),
+					'items' => [
+						[
+							'label' => Yii::t('hint', 'Hint Cities'),
+							'url' => ['/hint/city/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => Yii::t('hint', 'Hint Cities Sources'),
+							'url' => ['/hint/city-source/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => Yii::t('hint', 'Hint Sources'),
+							'url' => ['/hint/source/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+					],
+				],
+
+				[
 					'label' => Yii::t('common', 'Issues'),
 					'url' => ['/issue/issue/index'],
 					'icon' => '<i class="fa fa-suitcase"></i>',

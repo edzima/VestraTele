@@ -7,7 +7,7 @@ use Yii;
 
 class RbacUserFixture extends UserFixture {
 
-	public array $roles;
+	public array $roles = [];
 	public array $permissions = [];
 
 	public function load() {

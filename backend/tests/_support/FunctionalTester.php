@@ -40,12 +40,24 @@ class FunctionalTester extends \Codeception\Actor {
 		$this->click($text, '.main-sidebar li a');
 	}
 
+	public function clickMenuSubLink($text): void {
+		$this->click($text, '.main-sidebar .treeview-menu li a');
+	}
+
 	public function seeMenuLink($text): void {
 		$this->see($text, '.main-sidebar li a');
 	}
 
+	public function seeMenuSubLink($text): void {
+		$this->see($text, '.main-sidebar .treeview-menu li a');
+	}
+
 	public function dontSeeMenuLink($text): void {
 		$this->dontSee($text, '.main-sidebar li a');
+	}
+
+	public function dontSeeMenuSubLink($text): void {
+		$this->dontSee($text, '.main-sidebar .treeview-menu li a');
 	}
 
 	public function seeInGridHeader($text, string $selector = null): void {

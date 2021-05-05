@@ -62,6 +62,7 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const PERMISSION_ARCHIVE = 'archive';
 	public const PERMISSION_EXPORT = 'export';
 	public const PERMISSION_ISSUE = 'issue';
+	public const PERMISSION_HINT = 'hint';
 	public const PERMISSION_LOGS = 'logs';
 	public const PERMISSION_MEET = 'meet';
 	public const PERMISSION_NEWS = 'news';

@@ -3,6 +3,7 @@
 use backend\modules\benefit\Module as BenefitModule;
 use backend\modules\entityResponsible\Module as EntityResponsibleModule;
 use backend\modules\issue\Module as IssueModule;
+use backend\modules\hint\Module as HintModule;
 use backend\modules\provision\Module as ProvisionModule;
 use backend\modules\settlement\Module as SettlementModule;
 use backend\modules\user\Module as UserModule;
@@ -106,6 +107,9 @@ return [
 		],
 		'issue' => [
 			'class' => IssueModule::class,
+		],
+		'hint' => [
+			'class' => HintModule::class,
 		],
 		'settlement' => [
 			'class' => SettlementModule::class,
