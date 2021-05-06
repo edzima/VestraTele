@@ -5,10 +5,10 @@ namespace backend\tests\functional\issue;
 use backend\modules\issue\controllers\IssueController;
 use backend\tests\_support\Step\Functional\ExportIssueManager;
 use backend\tests\Step\Functional\Admin;
-use backend\tests\Step\Functional\Bookkeeper;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\SummonIssueManager;
+use common\models\user\Worker;
 
 class IssueIndexCest {
 
@@ -72,8 +72,9 @@ class IssueIndexCest {
 		$I->see('Structures');
 	}
 
-	public function checkSearchFieldsAsBookkeeper(Bookkeeper $I): void {
+	public function checkSearchFieldsWithPayPartPayed(IssueManager $I): void {
 		$I->amLoggedIn();
+		$I->assignPermission(Worker::PERMISSION_PAY_PART_PAYED);
 		$I->amOnRoute(static::ROUTE);
 		$I->see('Only with payed pay');
 	}

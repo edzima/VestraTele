@@ -86,7 +86,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'onlyDelayed', ['options' => ['class' => 'col-md-4']])->checkbox() ?>
 
-		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ?
+		<?= Yii::$app->user->can(User::PERMISSION_PAY_PART_PAYED) ?
 			$form->field($model, 'onlyWithPayedPay', ['options' => ['class' => 'col-md-4']])->checkbox()
 			: ''
 		?>

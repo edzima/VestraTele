@@ -77,6 +77,7 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const PERMISSION_PAY = 'pay';
 	public const PERMISSION_PAY_RECEIVED = 'pay.received';
 	public const PERMISSION_PAYS_DELAYED = 'pays.delayed';
+	public const PERMISSION_PAY_PART_PAYED = 'pay.part-payed';
 
 	public const PERMISSION_PROVISION = 'provision';
 
