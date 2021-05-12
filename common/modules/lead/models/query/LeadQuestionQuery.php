@@ -1,0 +1,55 @@
+<?php
+
+namespace common\modules\lead\models\query;
+
+use common\modules\lead\models\LeadQuestion;
+use yii\db\ActiveQuery;
+
+class LeadQuestionQuery extends ActiveQuery {
+
+	public function active(): self {
+		$this->andWhere(['is_active' => true]);
+		return $this;
+	}
+
+	public function required(): self {
+		$this->andWhere(['is_required' => true]);
+		return $this;
+	}
+
+	public function notRequired(): self {
+		$this->andWhere(['is_required' => false]);
+		return $this;
+	}
+
+	public function forStatus(int $status_id): self {
+		$this->andWhere(['or', ['status_id' => null], ['status_id' => $status_id]]);
+		return $this;
+	}
+
+	public function forType(int $type_id): self {
+		$this->andWhere(['or', ['type_id' => null], ['type_id' => $type_id]]);
+		return $this;
+	}
+
+	public function withoutPlaceholder(): self {
+		$this->andWhere(['placeholder' => null]);
+		return $this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @return LeadQuestion|null
+	 */
+	public function one($db = null) {
+		return parent::one($db);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @return LeadQuestion[]
+	 */
+	public function all($db = null) {
+		return parent::all($db);
+	}
+}

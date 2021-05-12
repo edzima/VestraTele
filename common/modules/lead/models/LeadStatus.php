@@ -16,7 +16,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property Lead[] $leads
  */
-class LeadStatus extends ActiveRecord {
+class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 
 	private static ?array $models = null;
 
@@ -75,5 +75,13 @@ class LeadStatus extends ActiveRecord {
 				->all();
 		}
 		return static::$models;
+	}
+
+	public function getId(): int {
+		return $this->id;
+	}
+
+	public function getName(): string {
+		return $this->name;
 	}
 }

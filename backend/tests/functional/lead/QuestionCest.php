@@ -4,29 +4,29 @@ namespace backend\tests\functional\lead;
 
 use backend\tests\Step\Functional\LeadManager;
 use backend\tests\Step\Functional\Manager;
-use common\modules\lead\controllers\ReportSchemaController;
-use common\modules\lead\models\LeadReportSchema;
+use common\modules\lead\controllers\QuestionController;
+use common\modules\lead\models\LeadQuestion;
 
-class ReportSchemaCest {
+class QuestionCest {
 
-	/* @see ReportSchemaController::actionIndex() */
-	public const ROUTE_INDEX = '/lead/report-schema/index';
-	/* @see ReportSchemaController::actionCreate() */
-	private const ROUTE_CREATE = '/lead/report-schema/create';
+	/* @see QuestionController::actionIndex() */
+	public const ROUTE_INDEX = '/lead/question/index';
+	/* @see QuestionController::actionCreate() */
+	private const ROUTE_CREATE = '/lead/question/create';
 
 	private const FORM_SELECTOR = '#lead-report-schema-form';
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
-		$I->dontSeeMenuLink('Reports schemas');
+		$I->dontSeeMenuLink('Questions');
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->seeResponseCodeIs(403);
 	}
 
 	public function checkAsLeadManager(LeadManager $I): void {
 		$I->amLoggedIn();
-		$I->seeMenuLink('Reports schemas');
-		$I->clickMenuLink('Reports schemas');
+		$I->seeMenuLink('Questions');
+		$I->clickMenuLink('Questions');
 		$I->seeInCurrentUrl(static::ROUTE_INDEX);
 		$I->seeResponseCodeIsSuccessful();
 	}
@@ -34,7 +34,7 @@ class ReportSchemaCest {
 	public function checkIndexPage(LeadManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_INDEX);
-		$I->seeInTitle('Lead Report Schemas');
+		$I->seeInTitle('Lead Questions');
 
 		$I->seeInGridHeader('Name');
 		$I->seeInGridHeader('Placeholder');
@@ -47,18 +47,18 @@ class ReportSchemaCest {
 	public function checkCreateOnlyName(LeadManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_CREATE);
-		$I->see('Create Lead Report Schema');
-		$I->submitForm(static::FORM_SELECTOR, $this->formParams('New lead report schema', null, null));
-		$I->seeRecord(LeadReportSchema::class, [
-			'name' => 'New lead report schema',
+		$I->see('Create Lead Question');
+		$I->submitForm(static::FORM_SELECTOR, $this->formParams('New lead question', null, null));
+		$I->seeRecord(LeadQuestion::class, [
+			'name' => 'New lead question',
 		]);
 	}
 
 	private function formParams($name, $placeholder, $is_required) {
 		return [
-			'LeadReportSchemaForm[name]' => $name,
-			'LeadReportSchemaForm[placeholder]' => $placeholder,
-			'LeadReportSchemaForm[is_required]' => $is_required,
+			'LeadQuestionForm[name]' => $name,
+			'LeadQuestionForm[placeholder]' => $placeholder,
+			'LeadQuestionForm[is_required]' => $is_required,
 		];
 	}
 

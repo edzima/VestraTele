@@ -2,7 +2,7 @@
 
 use common\helpers\Html;
 use common\modules\lead\models\ActiveLead;
-use common\modules\lead\models\LeadReportSchema;
+use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\searches\LeadSearch;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -14,7 +14,7 @@ use common\widgets\GridView;
 $this->title = Yii::t('lead', 'Leads');
 $this->params['breadcrumbs'][] = $this->title;
 
-$schemas = LeadReportSchema::find()
+$schemas = LeadQuestion::find()
 	->andWhere(['show_in_grid' => true])
 	->all();
 

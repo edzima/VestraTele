@@ -3,25 +3,25 @@
 use common\helpers\Html;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
-use common\modules\lead\models\searches\LeadReportSchemaSearch;
+use common\modules\lead\models\searches\LeadQuestionSearch;
 use common\widgets\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel LeadReportSchemaSearch */
+/* @var $searchModel LeadQuestionSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('lead', 'Lead Report Schemas');
+$this->title = Yii::t('lead', 'Lead Questions');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Reports'), 'url' => ['/lead/report/index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<div class="lead-report-schema-index">
+<div class="lead-question-index">
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Html::a(Yii::t('lead', 'Create Lead Report Schema'), ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('lead', 'Create Lead Question'), ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
 
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>

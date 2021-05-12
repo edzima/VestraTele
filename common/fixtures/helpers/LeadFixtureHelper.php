@@ -5,7 +5,7 @@ namespace common\fixtures\helpers;
 use common\modules\lead\fixtures\CampaignFixture;
 use common\modules\lead\fixtures\LeadFixture;
 use common\modules\lead\fixtures\LeadReportFixture;
-use common\modules\lead\fixtures\LeadReportSchemaFixture;
+use common\modules\lead\fixtures\LeadQuestionFixture;
 use common\modules\lead\fixtures\SourceFixture;
 use common\modules\lead\fixtures\StatusFixture;
 use common\modules\lead\fixtures\TypeFixture;
@@ -20,7 +20,7 @@ class LeadFixtureHelper {
 	private const SOURCE = 'source';
 
 	private const REPORT = 'report';
-	private const REPORT_SCHEMA = 'report-schema';
+	private const QUESTION = 'question';
 	private const USER = 'user';
 
 	public static function dataDir(): string {
@@ -54,9 +54,9 @@ class LeadFixtureHelper {
 
 	public static function reports(): array {
 		return [
-			static::REPORT_SCHEMA => [
-				'class' => LeadReportSchemaFixture::class,
-				'dataFile' => static::dataDir() . 'report-schema.php',
+			static::QUESTION => [
+				'class' => LeadQuestionFixture::class,
+				'dataFile' => static::dataDir() . 'question.php',
 			],
 			static::REPORT => [
 				'class' => LeadReportFixture::class,
@@ -81,10 +81,6 @@ class LeadFixtureHelper {
 
 	public static function source(): array {
 		return [
-			static::USER => [
-				'class' => UserFixture::class,
-				'dataFile' => static::dataDir() . 'user.php',
-			],
 			static::SOURCE => [
 				'class' => SourceFixture::class,
 				'dataFile' => static::dataDir() . 'source.php',
@@ -93,14 +89,18 @@ class LeadFixtureHelper {
 				'class' => TypeFixture::class,
 				'dataFile' => static::dataDir() . 'type.php',
 			],
+			static::USER => [
+				'class' => UserFixture::class,
+				'dataFile' => static::dataDir() . 'user.php',
+			],
 		];
 	}
 
-	public static function schemas(): array {
+	public static function question(): array {
 		return [
-			static::REPORT_SCHEMA => [
-				'class' => LeadReportSchemaFixture::class,
-				'dataFile' => static::dataDir() . 'report-schema.php',
+			static::QUESTION => [
+				'class' => LeadQuestionFixture::class,
+				'dataFile' => static::dataDir() . 'question.php',
 			],
 			static::STATUS => [
 				'class' => StatusFixture::class,

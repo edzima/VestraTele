@@ -3,20 +3,20 @@
 namespace common\tests\unit\lead;
 
 use common\fixtures\helpers\LeadFixtureHelper;
-use common\modules\lead\models\forms\LeadReportSchemaForm;
-use common\modules\lead\models\LeadReportSchema;
+use common\modules\lead\models\forms\LeadQuestionForm;
+use common\modules\lead\models\LeadQuestion;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
 use yii\base\Model;
 
-class LeadReportSchemaFormTest extends Unit {
+class LeadQuestionFormTest extends Unit {
 
 	use UnitModelTrait;
 
-	private LeadReportSchemaForm $model;
+	private LeadQuestionForm $model;
 
 	public function _fixtures(): array {
-		return LeadFixtureHelper::schemas();
+		return LeadFixtureHelper::question();
 	}
 
 	public function testEmpty(): void {
@@ -57,11 +57,11 @@ class LeadReportSchemaFormTest extends Unit {
 	}
 
 	private function thenSeeRecord(array $attributes): void {
-		$this->tester->seeRecord(LeadReportSchema::class, $attributes);
+		$this->tester->seeRecord(LeadQuestion::class, $attributes);
 	}
 
 	private function giveForm(array $config): void {
-		$this->model = new LeadReportSchemaForm($config);
+		$this->model = new LeadQuestionForm($config);
 	}
 
 	public function getModel(): Model {

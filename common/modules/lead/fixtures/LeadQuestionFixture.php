@@ -2,12 +2,12 @@
 
 namespace common\modules\lead\fixtures;
 
-use common\modules\lead\models\LeadReportSchema;
+use common\modules\lead\models\LeadQuestion;
 use yii\test\ActiveFixture;
 
-class LeadReportSchemaFixture extends ActiveFixture {
+class LeadQuestionFixture extends ActiveFixture {
 
-	public $modelClass = LeadReportSchema::class;
+	public $modelClass = LeadQuestion::class;
 
 	public $depends = [
 		StatusFixture::class,

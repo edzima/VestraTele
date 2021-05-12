@@ -33,14 +33,15 @@ class LeadReportCest {
 		$I->seeInGridHeader('Owner');
 		$I->seeInGridHeader('Status');
 		$I->seeInGridHeader('Old Status');
-		$I->seeInGridHeader('Schema');
+		$I->seeInGridHeader('Answers');
+		$I->seeInGridHeader('Details');
 	}
 
 	public function checkSchemasLinkInIndexPage(LeadManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->seeLink('Lead reports schemas');
-		$I->click('Lead reports schemas');
-		$I->seeCurrentUrlEquals(ReportSchemaCest::ROUTE_INDEX);
+		$I->seeLink('Lead Questions');
+		$I->click('Lead Questions');
+		$I->seeCurrentUrlEquals(QuestionCest::ROUTE_INDEX);
 	}
 }

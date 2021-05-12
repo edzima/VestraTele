@@ -11,12 +11,14 @@ use common\modules\lead\models\LeadReport;
  */
 class LeadReportSearch extends LeadReport {
 
+	public $lead_type_id;
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'lead_id', 'owner_id', 'status_id', 'old_status_id', 'schema_id'], 'integer'],
+			[['id', 'lead_id', 'owner_id', 'status_id', 'old_status_id', 'lead_type_id'], 'integer'],
 			[['details', 'created_at', 'updated_at'], 'safe'],
 		];
 	}
@@ -60,7 +62,6 @@ class LeadReportSearch extends LeadReport {
 			'owner_id' => $this->owner_id,
 			'status_id' => $this->status_id,
 			'old_status_id' => $this->old_status_id,
-			'schema_id' => $this->schema_id,
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,
 		]);

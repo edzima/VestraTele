@@ -4,12 +4,12 @@ namespace common\modules\lead\models\searches;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\modules\lead\models\LeadReportSchema;
+use common\modules\lead\models\LeadQuestion;
 
 /**
  * LeadReportSchemaSearch represents the model behind the search form of `common\modules\lead\models\LeadReportSchema`.
  */
-class LeadReportSchemaSearch extends LeadReportSchema {
+class LeadQuestionSearch extends LeadQuestion {
 
 	/**
 	 * {@inheritdoc}
@@ -37,7 +37,7 @@ class LeadReportSchemaSearch extends LeadReportSchema {
 	 * @return ActiveDataProvider
 	 */
 	public function search($params) {
-		$query = LeadReportSchema::find();
+		$query = LeadQuestion::find();
 		$query->joinWith('status S');
 		$query->joinWith('type T');
 

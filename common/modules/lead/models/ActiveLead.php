@@ -2,6 +2,11 @@
 
 namespace common\modules\lead\models;
 
+/**
+ * Interface ActiveLead
+ *
+ * @property-read LeadReportInterface[] $reports
+ */
 interface ActiveLead extends LeadInterface {
 
 	public function getId(): string;

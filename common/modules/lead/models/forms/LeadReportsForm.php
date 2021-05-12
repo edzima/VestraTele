@@ -4,15 +4,16 @@ namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadReport;
-use common\modules\lead\models\LeadReportSchema;
+use common\modules\lead\models\LeadQuestion;
 use yii\base\Model;
 
 class LeadReportsForm extends Model {
 
 	public $status_id;
-	public $reports;
+	public $selectedSchemas = [];
 	private ActiveLead $lead;
 	private int $owner_id;
+	public $details;
 
 	private ?array $models = null;
 
@@ -33,7 +34,26 @@ class LeadReportsForm extends Model {
 		if (empty($this->status_id)) {
 			$this->status_id = $this->lead->getStatusId();
 		}
+		if (empty($this->selectedSchemas)) {
+
+		}
 		parent::init();
+	}
+
+	public function getTextModels(): array {
+		return array_filter($this->getModels(), static function (LeadReportForm $form): bool {
+			return $form->isTextField();
+		});
+	}
+
+	public function getDropdownItems(): array {
+		$items = [];
+		foreach ($this->getModels() as $model) {
+			if (!$model->isTextField()) {
+				$items[$model->schema_id] = $model->getSchema()->name;
+			}
+		}
+		return $items;
 	}
 
 	/**
@@ -54,7 +74,7 @@ class LeadReportsForm extends Model {
 				if (!isset($models[$schema->id])) {
 					$model = new LeadReportForm($this->owner_id, $this->lead);
 					$model->status_id = $this->status_id;
-					$model->schema_id = $schema->id;
+					$model->setSchema($schema);
 					$models[$schema->id] = $model;
 				}
 			}
@@ -77,7 +97,7 @@ class LeadReportsForm extends Model {
 		if (!$this->validate()) {
 			return false;
 		}
-		foreach ($this->getModels() as $model) {
+		foreach ($this->getTextModels() as $model) {
 			$model->save(false);
 		}
 		return true;
@@ -87,15 +107,15 @@ class LeadReportsForm extends Model {
 		return $this->lead;
 	}
 
-	/**
-	 * @return LeadReportSchema[]
-	 */
-	public function getSchemas(): array {
-		return LeadReportSchema::findWithStatusAndType($this->status_id, $this->getLeadTypeID());
-	}
-
 	public function getLeadTypeID(): int {
 		return $this->lead->getSource()->getType()->getID();
+	}
+
+	/**
+	 * @return LeadQuestion[]
+	 */
+	public function getSchemas(): array {
+		return LeadQuestion::findWithStatusAndType($this->status_id, $this->getLeadTypeID());
 	}
 
 	public static function getStatusNames(): array {

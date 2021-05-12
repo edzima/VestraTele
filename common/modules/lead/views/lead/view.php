@@ -1,7 +1,6 @@
 <?php
 
 use common\modules\lead\models\Lead;
-use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
@@ -36,10 +35,10 @@ YiiAsset::register($this);
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [
-			'id',
+			'status',
 			'source.type',
 			'source',
-			'status',
+			'campaign',
 			'date_at',
 			'data:ntext',
 			'phone',
@@ -51,6 +50,8 @@ YiiAsset::register($this);
 
 	<?= GridView::widget([
 		'dataProvider' => new ActiveDataProvider(['query' => $model->getLeadUsers()->with('user.userProfile')]),
+		'showOnEmpty' => false,
+		'emptyText' => false,
 		'columns' => [
 			'type', [
 				'label' => Yii::t('lead', 'User'),
@@ -60,17 +61,36 @@ YiiAsset::register($this);
 	]) ?>
 
 
-	<?= GridView::widget([
-		'dataProvider' => new ActiveDataProvider(['query' => $model->getReports()->with('schema')]),
-		'columns' => [
-			'owner',
-			'schema',
-			'details',
-			[
-				'class' => ActionColumn::class,
-				'controller' => '/lead/report',
-				'template' => '{update}{delete}',
+
+	<?php foreach ($model->reports as $report): ?>
+		<h4><?= $report->getDateTitle() ?></h4>
+		<?= DetailView::widget([
+			'model' => $report,
+			'attributes' => [
+				'owner',
+				'details',
+				[
+					'attribute' => 'oldStatus',
+					'visible' => $report->old_status_id !== $report->status_id,
+				],
+				[
+					'attribute' => 'status',
+					'visible' => $report->old_status_id !== $report->status_id,
+				],
 			],
-		],
-	]) ?>
+		]) ?>
+
+		<?php foreach ($report->answers as $answer): ?>
+			<?= DetailView::widget([
+				'model' => $answer,
+				'attributes' => [
+					'question',
+					'answer',
+				],
+			]) ?>
+
+		<?php endforeach; ?>
+
+	<?php endforeach; ?>
+
 </div>

@@ -3,8 +3,8 @@
 namespace common\modules\lead\controllers;
 
 use common\modules\lead\models\forms\LeadReportForm;
-use common\modules\lead\models\forms\LeadReportsForm;
-use common\modules\lead\models\LeadReportSchema;
+use common\modules\lead\models\forms\ReportForm;
+use common\modules\lead\models\LeadQuestion;
 use Yii;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\searches\LeadReportSearch;
@@ -87,7 +87,9 @@ class ReportController extends Controller {
 		if ($lead === null) {
 			throw new NotFoundHttpException();
 		}
-		$model = new LeadReportsForm(Yii::$app->user->getId(), $lead);
+		$model = new ReportForm();
+		$model->owner_id = Yii::$app->user->getId();
+		$model->setLead($lead);
 		if ($status_id) {
 			$model->status_id = $status_id;
 		}
@@ -142,7 +144,7 @@ class ReportController extends Controller {
 			if (isset($_POST['depdrop_params'])) {
 				$type_id = reset($_POST['depdrop_params']);
 			}
-			$schemas = LeadReportSchema::findWithStatusAndType($status_id, $type_id);
+			$schemas = LeadQuestion::findWithStatusAndType($status_id, $type_id);
 			foreach ($schemas as $schema) {
 				$out[$schema->id] = ['id' => $schema->id, 'name' => $schema->name];
 			}

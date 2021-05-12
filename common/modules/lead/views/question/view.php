@@ -1,21 +1,20 @@
 <?php
 
-use common\modules\lead\models\LeadReportSchema;
+use common\modules\lead\models\LeadQuestion;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model LeadReportSchema */
+/* @var $model LeadQuestion */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Reports'), 'url' => ['/lead/report/index']];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Schemas'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Questions'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 ?>
-<div class="lead-report-schema-view">
+<div class="lead-question-view">
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
@@ -36,6 +35,7 @@ YiiAsset::register($this);
 			'id',
 			'name',
 			'placeholder',
+			'is_active:boolean',
 			'is_required:boolean',
 			'show_in_grid:boolean',
 			[

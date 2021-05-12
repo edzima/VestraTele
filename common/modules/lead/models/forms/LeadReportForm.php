@@ -5,7 +5,7 @@ namespace common\modules\lead\models\forms;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadReport;
-use common\modules\lead\models\LeadReportSchema;
+use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadStatus;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -18,34 +18,43 @@ class LeadReportForm extends Model {
 
 	private ActiveLead $lead;
 	private LeadReport $model;
+	/**
+	 * @var LeadQuestion|mixed
+	 */
+	private ?LeadQuestion $schema = null;
 
 	public function rules(): array {
 		return [
 			[['status_id', 'schema_id'], 'required'],
 			[
-				'details', 'required', 'when' => function () {
-				$schema = $this->getSchema();
-				return $schema->is_required ?? false;
-			}, 'enableClientValidation' => false,
+				'details', 'required',
+				'when' => function () {
+					$schema = $this->getSchema();
+					return $schema->is_required ?? false;
+				},
+				'enableClientValidation' => false,
 			],
 		];
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'details' => $this->getSchema()->name,
 		];
 	}
 
-	public function getSchema(): ?LeadReportSchema {
-		return LeadReportSchema::findOne($this->schema_id);
+	public function getSchema(): ?LeadQuestion {
+		if ($this->schema === null || $this->schema_id !== $this->schema->id) {
+			$this->schema = LeadQuestion::findOne($this->schema_id);
+		}
+		return $this->schema;
 	}
 
 	/**
-	 * @return LeadReportSchema[]
+	 * @return LeadQuestion[]
 	 */
 	public function getSchemas(): array {
-		return LeadReportSchema::findWithStatusAndType($this->status_id, $this->getLeadTypeID());
+		return LeadQuestion::findWithStatusAndType($this->status_id, $this->getLeadTypeID());
 	}
 
 	public function __construct(int $owner_id, ActiveLead $lead, $config = []) {
@@ -60,10 +69,19 @@ class LeadReportForm extends Model {
 
 	public static function createFromModel(LeadReport $leadReport): self {
 		$model = new static($leadReport->owner_id, $leadReport->lead);
-		$model->schema_id = $leadReport->schema_id;
-		$model->details = $leadReport->details;
-		$model->model = $leadReport;
+		$model->setModel($leadReport);
 		return $model;
+	}
+
+	private function setModel(LeadReport $model): void {
+		$this->model = $model;
+		$this->setSchema($model->schema);
+		$this->details = $model->details;
+	}
+
+	public function setSchema(LeadQuestion $schema): void {
+		$this->schema = $schema;
+		$this->schema_id = $schema->id;
 	}
 
 	public function getModel(): LeadReport {
@@ -75,7 +93,7 @@ class LeadReportForm extends Model {
 	}
 
 	public function getSchemaData(): array {
-		$schemas = LeadReportSchema::findWithStatusAndType($this->status_id, $this->getLeadTypeID());
+		$schemas = LeadQuestion::findWithStatusAndType($this->status_id, $this->getLeadTypeID());
 
 		return ArrayHelper::map(
 			$schemas,
@@ -94,7 +112,7 @@ class LeadReportForm extends Model {
 		if ($oldStatus !== $statusId) {
 			$lead->updateStatus($statusId);
 		}
-		if ($this->getSchema()->placeholder && empty($this->details)) {
+		if ($this->isTextField() && empty($this->details)) {
 			if (!$this->model->isNewRecord) {
 				$this->model->delete();
 			}
@@ -114,6 +132,10 @@ class LeadReportForm extends Model {
 
 	public static function getStatusNames(): array {
 		return LeadStatus::getNames();
+	}
+
+	public function isTextField(): bool {
+		return !empty($this->getSchema()->placeholder);
 	}
 
 }

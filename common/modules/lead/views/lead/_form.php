@@ -19,7 +19,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'provider', ['options' => ['class' => 'col-md-2']])->dropDownList(LeadForm::getProvidersNames(), ['prompt' => Yii::t('lead', '--- Select ---')]) ?>
 
-		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getCampaignsNames()) ?>
+		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getCampaignsNames(), ['prompt' => Yii::t('lead', '--- Select ---')]) ?>
 
 		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getStatusNames()) ?>
 

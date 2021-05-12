@@ -73,8 +73,8 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-table"></i>',
 						],
 						[
-							'label' => Yii::t('lead', 'Reports schemas'),
-							'url' => ['/lead/report-schema/index'],
+							'label' => Yii::t('lead', 'Questions'),
+							'url' => ['/lead/question/index'],
 							'icon' => '<i class="fa fa-table"></i>',
 						],
 						[

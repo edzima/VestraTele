@@ -68,6 +68,7 @@ class LeadForm extends Model implements LeadInterface {
 		return [
 			'status_id' => Yii::t('lead', 'Status'),
 			'source_id' => Yii::t('lead', 'Source'),
+			'campaign_id' => Yii::t('lead', 'Campaign'),
 			'datetime' => Yii::t('lead', 'Date At'),
 			'phone' => Yii::t('lead', 'Phone'),
 			'postal_code' => Yii::t('lead', 'Postal Code'),

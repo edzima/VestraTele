@@ -1,6 +1,7 @@
 <?php
 
 return [
+
 	[
 		'name' => 'Works - will not quit',
 	],
@@ -12,5 +13,9 @@ return [
 	],
 	[
 		'name' => 'No judgment, it will not',
+	],
+	'only-accident' => [
+		'name' => 'Died',
+		'type_id' => 1,
 	],
 ];

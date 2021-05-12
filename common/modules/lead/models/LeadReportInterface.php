@@ -6,8 +6,6 @@ interface LeadReportInterface {
 
 	public function getLead(): LeadInterface;
 
-	public function getSchema(): ReportSchemaInterface;
-
 	public function getStatus(): LeadStatusInterface;
 
 	public function getOldStatus(): ?LeadStatusInterface;
@@ -15,4 +13,6 @@ interface LeadReportInterface {
 	public function getOwnerId(): int;
 
 	public function getDetails(): ?string;
+
+	public function getAnswersNames(): array;
 }

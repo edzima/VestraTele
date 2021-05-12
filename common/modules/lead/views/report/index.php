@@ -1,5 +1,7 @@
 <?php
 
+use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadReportSearch;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -17,9 +19,10 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Html::a(Yii::t('lead', 'Lead Report Schemas'), ['report-schema/index'], [
+		<?= Html::a(Yii::t('lead', 'Lead Questions'), ['question/index'], [
 			'class' => 'btn btn-info',
-		]) ?>
+		])
+		?>
 	</p>
 
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -28,15 +31,26 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-			['class' => 'yii\grid\SerialColumn'],
-			'lead.type',
+			[
+				'attribute' => 'lead_type_id',
+				'value' => 'lead.source.type',
+				'filter' => LeadType::getNames(),
+			],
 			'owner',
-			'status',
-			'oldStatus',
-			'schema',
-			'formattedDetails',
-			'created_at',
-			'updated_at',
+			[
+				'attribute' => 'status_id',
+				'value' => 'status',
+				'filter' => LeadStatus::getNames(),
+			],
+			[
+				'attribute' => 'old_status_id',
+				'value' => 'oldStatus',
+				'filter' => LeadStatus::getNames(),
+			],
+			'questionsAnswers',
+			'details:text',
+			'created_at:date',
+			'updated_at:date',
 
 			['class' => 'yii\grid\ActionColumn'],
 		],

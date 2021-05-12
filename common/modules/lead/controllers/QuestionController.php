@@ -3,18 +3,18 @@
 namespace common\modules\lead\controllers;
 
 use Yii;
-use common\modules\lead\models\forms\LeadReportSchemaForm;
-use common\modules\lead\models\LeadReportSchema;
-use common\modules\lead\models\searches\LeadReportSchemaSearch;
+use common\modules\lead\models\forms\LeadQuestionForm;
+use common\modules\lead\models\LeadQuestion;
+use common\modules\lead\models\searches\LeadQuestionSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
 
 /**
- * ReportSchemaController implements the CRUD actions for LeadReportSchema model.
+ * ReportSchemaController implements the CRUD actions for LeadQuestion model.
  */
-class ReportSchemaController extends Controller {
+class QuestionController extends Controller {
 
 	/**
 	 * {@inheritdoc}
@@ -36,7 +36,7 @@ class ReportSchemaController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex(): string {
-		$searchModel = new LeadReportSchemaSearch();
+		$searchModel = new LeadQuestionSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -65,7 +65,7 @@ class ReportSchemaController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new LeadReportSchemaForm();
+		$model = new LeadQuestionForm();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
@@ -85,7 +85,7 @@ class ReportSchemaController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$model = new LeadReportSchemaForm();
+		$model = new LeadQuestionForm();
 		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -116,11 +116,11 @@ class ReportSchemaController extends Controller {
 	 * If the model is not found, a 404 HTTP exception will be thrown.
 	 *
 	 * @param integer $id
-	 * @return LeadReportSchema the loaded model
+	 * @return LeadQuestion the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel(int $id): LeadReportSchema {
-		if (($model = LeadReportSchema::findOne($id)) !== null) {
+	protected function findModel(int $id): LeadQuestion {
+		if (($model = LeadQuestion::findOne($id)) !== null) {
 			return $model;
 		}
 

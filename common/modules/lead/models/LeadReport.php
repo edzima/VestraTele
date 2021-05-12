@@ -5,6 +5,7 @@ namespace common\modules\lead\models;
 use common\modules\lead\models\query\LeadReportQuery;
 use common\modules\lead\Module;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -15,24 +16,58 @@ use yii\db\ActiveRecord;
  * @property int $owner_id
  * @property int $status_id
  * @property int $old_status_id
- * @property int $schema_id
  * @property string|null $details
  * @property string $created_at
  * @property string $updated_at
  *
- * @property Lead $lead
- * @property LeadStatus $oldStatus
- * @property ActiveRecord $owner
- * @property LeadReportSchema $schema
- * @property LeadStatus $status
+ * @property-read Lead $lead
+ * @property-read LeadStatus $oldStatus
+ * @property-read ActiveRecord $owner
+ * @property-read LeadStatus $status
+ * @property-read LeadAnswer[] $answers
+ *
+ * @property-read string $formattedDetails
  */
 class LeadReport extends ActiveRecord {
 
-	public function getFormattedDetails(): string {
-		if ($this->schema->placeholder) {
-			return $this->details;
+	public function getDateTitle(): string {
+		if ($this->created_at !== $this->updated_at) {
+			return Yii::t('lead', 'Report from: {created_at} ( updated: {updated_at} )', [
+				'created_at' => Yii::$app->formatter->asDate($this->created_at),
+				'updated_at' => Yii::$app->formatter->asDate($this->updated_at),
+			]);
 		}
-		return Yii::$app->formatter->asBoolean($this->details);
+
+		return Yii::t('lead', 'Report from: {created_at}', [
+			'created_at' => Yii::$app->formatter->asDate($this->created_at),
+		]);
+	}
+
+	public function getAnswersQuestions(): string {
+		$answers = $this->answers;
+		$questionAnswers = [];
+		foreach ($answers as $answer) {
+			$questionAnswers[] = $answer->getAnswerQuestion();
+		}
+		return implode(', ', $questionAnswers);
+	}
+
+	/**
+	 * Gets query for [[LeadAnswers]].
+	 *
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getAnswers() {
+		return $this->hasMany(LeadAnswer::class, ['report_id' => 'id'])->indexBy('question_id');
+	}
+
+	/**
+	 * Gets query for [[Questions]].
+	 *
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getQuestions() {
+		return $this->hasMany(LeadQuestion::class, ['id' => 'question_id'])->viaTable(LeadAnswer::tableName(), ['report_id' => 'id']);
 	}
 
 	/**
@@ -47,14 +82,13 @@ class LeadReport extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['lead_id', 'owner_id', 'status_id', 'old_status_id', 'schema_id'], 'required'],
-			[['lead_id', 'owner_id', 'status_id', 'old_status_id', 'schema_id'], 'integer'],
+			[['lead_id', 'owner_id', 'status_id', 'old_status_id'], 'required'],
+			[['lead_id', 'owner_id', 'status_id', 'old_status_id'], 'integer'],
 			[['created_at', 'updated_at'], 'safe'],
 			[['details'], 'string', 'max' => 255],
 			[['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => ['lead_id' => 'id']],
 			[['old_status_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadStatus::class, 'targetAttribute' => ['old_status_id' => 'id']],
 			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['owner_id' => 'id']],
-			[['schema_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadReportSchema::class, 'targetAttribute' => ['schema_id' => 'id']],
 			[['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadStatus::class, 'targetAttribute' => ['status_id' => 'id']],
 		];
 	}
@@ -69,55 +103,33 @@ class LeadReport extends ActiveRecord {
 			'owner_id' => Yii::t('lead', 'Owner ID'),
 			'status_id' => Yii::t('lead', 'Status ID'),
 			'old_status_id' => Yii::t('lead', 'Old Status ID'),
-			'schema_id' => Yii::t('lead', 'Schema ID'),
 			'details' => Yii::t('lead', 'Details'),
 			'created_at' => Yii::t('lead', 'Created At'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
 		];
 	}
 
-	/**
-	 * Gets query for [[Lead]].
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getLead() {
+	public function getOwnerId(): int {
+		return $this->owner_id;
+	}
+
+	public function getDetails(): ?string {
+		return $this->details;
+	}
+
+	public function getLead(): ActiveQuery {
 		return $this->hasOne(Lead::class, ['id' => 'lead_id']);
 	}
 
-	/**
-	 * Gets query for [[OldStatus]].
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
 	public function getOldStatus() {
 		return $this->hasOne(LeadStatus::class, ['id' => 'old_status_id']);
 	}
 
-	/**
-	 * Gets query for [[Owner]].
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
 	public function getOwner() {
 		return $this->hasOne(Module::userClass(), ['id' => 'owner_id']);
 	}
 
-	/**
-	 * Gets query for [[Schema]].
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getSchema() {
-		return $this->hasOne(LeadReportSchema::class, ['id' => 'schema_id']);
-	}
-
-	/**
-	 * Gets query for [[Status]].
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getStatus() {
+	public function getStatus(): ActiveQuery {
 		return $this->hasOne(LeadStatus::class, ['id' => 'status_id']);
 	}
 
@@ -127,4 +139,5 @@ class LeadReport extends ActiveRecord {
 	public static function find(): LeadReportQuery {
 		return new LeadReportQuery(static::class);
 	}
+
 }
