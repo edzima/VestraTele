@@ -2,7 +2,7 @@
 
 namespace common\components;
 
-use common\models\hierarchy\HierarchyModel;
+use common\models\hierarchy\ActiveHierarchy;
 use common\models\user\User;
 use yii\base\Component;
 use yii\base\InvalidArgumentException;
@@ -20,8 +20,21 @@ class HierarchyComponent extends Component {
 
 	private array $tree = [];
 
-	public function getModel(int $id): ?HierarchyModel {
+	public function getModel(int $id): ?ActiveHierarchy {
 		return $this->modelClass::findOne($id);
+	}
+
+	public function unassign(int $id): bool {
+		$attributes = [
+			$this->parentColumn => null,
+		];
+		$condition = [
+			$this->primaryKeyColumn => $id,
+		];
+		/** @var ActiveRecord $model */
+		$model = $this->modelClass;
+		$model::updateAll($attributes, $condition);
+		return true;
 	}
 
 	public function assign(int $id, int $parent_id = null): bool {

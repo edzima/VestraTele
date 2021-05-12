@@ -129,6 +129,10 @@ class SummonForm extends Model {
 		if ($model->save()) {
 			return true;
 		}
+		Yii::warning('summon.errors', [
+			'attributes' => $model->getAttributes(),
+			'errors' => $model->getErrors(),
+		]);
 		$this->addErrors($model->getErrors());
 		return false;
 	}

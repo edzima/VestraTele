@@ -2,7 +2,7 @@
 
 namespace common\models\user;
 
-use common\models\hierarchy\HierarchyModel;
+use common\models\hierarchy\ActiveHierarchy;
 use common\models\user\query\UserQuery;
 use Yii;
 use yii\db\ActiveQuery;
@@ -16,7 +16,7 @@ use yii\db\ActiveQuery;
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  *
  */
-class Worker extends User implements HierarchyModel {
+class Worker extends User implements ActiveHierarchy {
 
 	public const ROLES = [
 		self::ROLE_AGENT,

@@ -2,15 +2,13 @@
 
 namespace common\models\hierarchy;
 
-use yii\db\ActiveQuery;
-
 /**
  * Interface HierarchyModel
  *
- * @property HierarchyModel|null $parent
- * @property HierarchyModel[] $childes
+ * @property Hierarchy|null $parent
+ * @property Hierarchy[] $childes
  */
-interface HierarchyModel {
+interface Hierarchy {
 
 	public function getParentId(): ?int;
 
@@ -19,9 +17,5 @@ interface HierarchyModel {
 	public function getChildesIds(): array;
 
 	public function getAllChildesIds(): array;
-
-	public function getParent(): ActiveQuery;
-
-	public function getParentsQuery(): ActiveQuery;
 
 }

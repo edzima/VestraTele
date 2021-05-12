@@ -3,7 +3,7 @@
 namespace common\models\forms;
 
 use common\components\HierarchyComponent;
-use common\models\hierarchy\HierarchyModel;
+use common\models\hierarchy\Hierarchy;
 use Yii;
 use yii\base\Model;
 
@@ -14,7 +14,7 @@ class HierarchyForm extends Model {
 
 	public array $parentsMap = [];
 
-	public ?HierarchyModel $model = null;
+	public ?Hierarchy $model = null;
 
 	private HierarchyComponent $hierarchy;
 
@@ -23,14 +23,14 @@ class HierarchyForm extends Model {
 		parent::__construct($config);
 	}
 
-	public function getModel(): HierarchyModel {
+	public function getModel(): Hierarchy {
 		if ($this->model === null) {
 			$this->model = $this->hierarchy->getModel($this->id);
 		}
 		return $this->model;
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
 			'parent_id' => Yii::t('common', 'Parent'),
@@ -40,8 +40,8 @@ class HierarchyForm extends Model {
 	public function rules(): array {
 		return [
 			[['id'], 'required'],
-			['id', 'exist', 'skipOnError' => true, 'targetAttribute' => [$this->hierarchy->primaryKeyColumn => 'id']],
-			['parent_id', 'exist', 'skipOnError' => true, 'targetClass' => $this->hierarchy->modelClass, 'targetAttribute' => [$this->hierarchy->parentColumn => 'id']],
+			['id', 'exist', 'skipOnError' => true, 'targetClass' => $this->hierarchy->modelClass, 'targetAttribute' => ['id' => 'id']],
+			['parent_id', 'exist', 'skipOnError' => true, 'targetClass' => $this->hierarchy->modelClass, 'targetAttribute' => ['id' => 'id']],
 		];
 	}
 
@@ -56,6 +56,9 @@ class HierarchyForm extends Model {
 	public function save(): bool {
 		if (!$this->validate()) {
 			return false;
+		}
+		if (empty($this->parent_id)) {
+			return $this->hierarchy->unassign($this->id);
 		}
 		return $this->hierarchy->assign($this->id, $this->parent_id);
 	}
