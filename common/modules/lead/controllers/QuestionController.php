@@ -12,7 +12,7 @@ use yii\filters\VerbFilter;
 use yii\web\Response;
 
 /**
- * ReportSchemaController implements the CRUD actions for LeadQuestion model.
+ * QuestionController implements the CRUD actions for LeadQuestion model.
  */
 class QuestionController extends Controller {
 
@@ -31,7 +31,7 @@ class QuestionController extends Controller {
 	}
 
 	/**
-	 * Lists all LeadReportSchema models.
+	 * Lists all LeadQuestion models.
 	 *
 	 * @return mixed
 	 */
@@ -46,7 +46,7 @@ class QuestionController extends Controller {
 	}
 
 	/**
-	 * Displays a single LeadReportSchema model.
+	 * Displays a single LeadQuestion model.
 	 *
 	 * @param integer $id
 	 * @return mixed
@@ -59,7 +59,7 @@ class QuestionController extends Controller {
 	}
 
 	/**
-	 * Creates a new LeadReportSchema model.
+	 * Creates a new LeadQuestion model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 *
 	 * @return mixed
@@ -77,7 +77,7 @@ class QuestionController extends Controller {
 	}
 
 	/**
-	 * Updates an existing LeadReportSchema model.
+	 * Updates an existing LeadQuestion model.
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 *
 	 * @param integer $id
@@ -98,7 +98,7 @@ class QuestionController extends Controller {
 	}
 
 	/**
-	 * Deletes an existing LeadReportSchema model.
+	 * Deletes an existing LeadQuestion model.
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
 	 *
 	 * @param integer $id
@@ -112,7 +112,7 @@ class QuestionController extends Controller {
 	}
 
 	/**
-	 * Finds the LeadReportSchema model based on its primary key value.
+	 * Finds the LeadQuestion model based on its primary key value.
 	 * If the model is not found, a 404 HTTP exception will be thrown.
 	 *
 	 * @param integer $id
