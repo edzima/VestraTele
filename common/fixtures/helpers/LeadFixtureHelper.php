@@ -3,6 +3,7 @@
 namespace common\fixtures\helpers;
 
 use common\modules\lead\fixtures\CampaignFixture;
+use common\modules\lead\fixtures\LeadAnswerFixture;
 use common\modules\lead\fixtures\LeadFixture;
 use common\modules\lead\fixtures\LeadReportFixture;
 use common\modules\lead\fixtures\LeadQuestionFixture;
@@ -10,7 +11,9 @@ use common\modules\lead\fixtures\SourceFixture;
 use common\modules\lead\fixtures\StatusFixture;
 use common\modules\lead\fixtures\TypeFixture;
 use common\modules\lead\fixtures\UserFixture;
+use common\modules\lead\models\LeadUser;
 use Yii;
+use yii\test\ActiveFixture;
 
 class LeadFixtureHelper {
 
@@ -22,6 +25,8 @@ class LeadFixtureHelper {
 	private const REPORT = 'report';
 	private const QUESTION = 'question';
 	private const USER = 'user';
+	private const LEAD_USER = 'lead-user';
+	private const ANSWER = 'answer';
 
 	public static function dataDir(): string {
 		return Yii::getAlias('@common/tests/_data/lead/');
@@ -54,6 +59,10 @@ class LeadFixtureHelper {
 
 	public static function reports(): array {
 		return [
+			static::ANSWER => [
+				'class' => LeadAnswerFixture::class,
+				'dataFile' => static::dataDir() . 'answer.php',
+			],
 			static::QUESTION => [
 				'class' => LeadQuestionFixture::class,
 				'dataFile' => static::dataDir() . 'question.php',
@@ -109,6 +118,16 @@ class LeadFixtureHelper {
 			static::TYPE => [
 				'class' => TypeFixture::class,
 				'dataFile' => static::dataDir() . 'type.php',
+			],
+		];
+	}
+
+	public static function user() {
+		return [
+			static::LEAD_USER => [
+				'class' => ActiveFixture::class,
+				'modelClass' => LeadUser::class,
+				'dataFile' => static::dataDir() . 'lead-user.php',
 			],
 		];
 	}
