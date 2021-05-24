@@ -35,19 +35,10 @@ class LeadUser extends ActiveRecord {
 			[['user_id', 'lead_id', 'type'], 'required'],
 			[['user_id', 'lead_id'], 'integer'],
 			[['type'], 'string', 'max' => 255],
-			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 			[['user_id', 'lead_id', 'type'], 'unique', 'targetAttribute' => ['user_id', 'lead_id', 'type']],
 			[['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => ['lead_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['user_id' => 'id']],
 		];
-	}
-
-	public function getTypeWithUser(): string {
-		return $this->getTypeName() . ' - ' . $this->user->getFullName();
-	}
-
-	public function getTypeName(): string {
-		return static::getTypesNames()[$this->type];
 	}
 
 	/**
@@ -69,12 +60,14 @@ class LeadUser extends ActiveRecord {
 		return $this->hasOne(Module::userClass(), ['id' => 'user_id']);
 	}
 
-	public static function userIds(string $type): array {
-		return static::find()
+	public static function userIds(string $type = null): array {
+		$query = static::find()
 			->select('user_id')
-			->distinct()
-			->andWhere([static::tableName() . '.type' => $type])
-			->column();
+			->distinct();
+		if ($type) {
+			$query->andWhere([static::tableName() . '.type' => $type]);
+		}
+		return $query->column();
 	}
 
 }
