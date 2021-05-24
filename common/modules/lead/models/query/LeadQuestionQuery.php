@@ -32,6 +32,16 @@ class LeadQuestionQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function showInGrid(): self {
+		$this->andWhere(['show_in_grid' => true]);
+		return $this;
+	}
+
+	public function withPlaceholder(): self {
+		$this->andWhere('placeholder IS NOT NULL');
+		return $this;
+	}
+
 	public function withoutPlaceholder(): self {
 		$this->andWhere(['placeholder' => null]);
 		return $this;

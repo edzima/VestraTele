@@ -6,6 +6,7 @@ namespace common\modules\lead\models;
  * Interface ActiveLead
  *
  * @property-read LeadReportInterface[] $reports
+ * @property-read LeadAnswer[] $answers
  */
 interface ActiveLead extends LeadInterface {
 
@@ -32,4 +33,5 @@ interface ActiveLead extends LeadInterface {
 	 * @return static[]
 	 */
 	public static function findByLead(LeadInterface $lead): array;
+
 }

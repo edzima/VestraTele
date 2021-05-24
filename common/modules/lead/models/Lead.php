@@ -30,6 +30,7 @@ use yii\helpers\Json;
  * @property-read LeadSource $leadSource
  * @property-read LeadUser[] $leadUsers
  * @property-read LeadReport[] $reports
+ * @property-read LeadAnswer[] $answers
  */
 class Lead extends ActiveRecord implements ActiveLead {
 
@@ -65,6 +66,15 @@ class Lead extends ActiveRecord implements ActiveLead {
 		];
 	}
 
+	public function attributeLabels(): array {
+		return [
+			'source_id' => Yii::t('lead', 'Source'),
+			'status_id' => Yii::t('lead', 'Status'),
+			'provider' => Yii::t('lead', 'Provider'),
+			'phone' => Yii::t('lead', 'Phone'),
+		];
+	}
+
 	public function unlinkUsers(): void {
 		$this->unlinkAll('leadUsers', true);
 	}
@@ -85,6 +95,11 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function getStatus(): ActiveQuery {
 		return $this->hasOne(LeadStatus::class, ['id' => 'status_id']);
+	}
+
+	public function getAnswers(): ActiveQuery {
+		return $this->hasMany(LeadAnswer::class, ['report_id' => 'id'])->via('reports')
+			->indexBy('question_id');
 	}
 
 	public function getReports(): ActiveQuery {
@@ -133,6 +148,14 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function getPostalCode(): ?string {
 		return $this->postal_code;
+	}
+
+	public function hasUser(int $user_id): bool {
+		return $this->getLeadUsers()->andWhere(['user_id' => $user_id])->exists();
+	}
+
+	public function hasAnswer(int $question_id): bool {
+		return isset($this->answers[$question_id]);
 	}
 
 	public function getUsers(): array {

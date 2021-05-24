@@ -6,6 +6,8 @@ use DateTime;
 
 interface LeadInterface {
 
+	public function getSourceId(): int;
+
 	public function getSource(): LeadSourceInterface;
 
 	public function getStatusId(): int;
