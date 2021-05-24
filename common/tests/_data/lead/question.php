@@ -1,7 +1,16 @@
 <?php
 
 return [
-
+	[
+		'name' => 'Firstname',
+		'placeholder' => 'Firstname',
+		'show_in_grid' => true,
+	],
+	[
+		'name' => 'Lastname',
+		'placeholder' => 'Lastname',
+		'show_in_grid' => true,
+	],
 	[
 		'name' => 'Works - will not quit',
 	],

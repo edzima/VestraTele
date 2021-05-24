@@ -45,15 +45,19 @@ class LeadCest {
 		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('Status');
 		$I->seeInGridHeader('Phone');
-		$I->seeInGridHeader('Email');
-		$I->seeInGridHeader('Owner');
 		$I->seeInGridHeader('Reports');
+
+		$I->see('Provider', '.lead-search label');
+		$I->see('Email', '.lead-search label');
+		$I->see('User', '.lead-search label');
+		$I->see('Closed Questions', '.lead-search label');
 	}
 
 	public function checkCreate(LeadManager $I): void {
 		$I->haveFixtures(LeadFixtureHelper::leads());
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_CREATE);
+		//@todo add submitForm
 		$I->click('Save');
 	}
 

@@ -2,7 +2,6 @@
 
 use common\helpers\Html;
 use common\modules\lead\models\ActiveLead;
-use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\searches\LeadSearch;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -14,16 +13,18 @@ use common\widgets\GridView;
 $this->title = Yii::t('lead', 'Leads');
 $this->params['breadcrumbs'][] = $this->title;
 
-$schemas = LeadQuestion::find()
-	->andWhere(['show_in_grid' => true])
-	->all();
-
-$schemasColumns = [];
-foreach ($schemas as $schema) {
-	$schemasColumns[] = [
-		'attribute' => $schema->name,
-		'value' => function (ActiveLead $lead) use ($schema): ?string {
-			return $lead->reports[$schema->id]->details;
+$questionColumns = [];
+foreach (LeadSearch::questions() as $question) {
+	//@todo add input placeholders from $question->placeholder
+	$questionColumns[] = [
+		'attribute' => LeadSearch::generateQuestionAttribute($question->id),
+		'label' => $question->name,
+		'format' => $question->hasPlaceholder() ? 'text' : 'boolean',
+		'value' => static function (ActiveLead $lead) use ($question): ?string {
+			if ($question->hasPlaceholder()) {
+				return $lead->answers[$question->id]->answer ?? null;
+			}
+			return isset($lead->answers[$question->id]);
 		},
 	];
 }
@@ -36,13 +37,12 @@ foreach ($schemas as $schema) {
 		<?= Html::a(Yii::t('lead', 'Create Lead'), ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
 
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => array_merge([
-			['class' => 'yii\grid\SerialColumn'],
 			[
 				'attribute' => 'type_id',
 				'value' => 'source.type',
@@ -63,32 +63,27 @@ foreach ($schemas as $schema) {
 			],
 			'date_at',
 			'phone',
-			'email:email',
-			'postal_code',
+		],
+			$questionColumns,
 			[
-				'attribute' => 'provider',
-				'value' => 'providerName',
-			],
-			'owner',
-
-			[
-				'attribute' => 'reportsCount',
-				'value' => function (ActiveLead $lead): int {
-					return count($lead->reports);
-				},
-				'filter' => $searchModel::getStatusNames(),
-				'label' => Yii::t('lead', 'Reports'),
-			],
-			[
-				'class' => ActionColumn::class,
-				'template' => '{view} {update} {report} {delete}',
-				'buttons' => [
-					'report' => static function (string $url, ActiveLead $lead): string {
-						return Html::a(Html::icon('comment'), ['report/report', 'id' => $lead->getId()]);
+				[
+					'attribute' => 'reportsCount',
+					'value' => function (ActiveLead $lead): int {
+						return count($lead->reports);
 					},
+					'filter' => $searchModel::getStatusNames(),
+					'label' => Yii::t('lead', 'Reports'),
 				],
-			],
-		], $schemasColumns),
+				[
+					'class' => ActionColumn::class,
+					'template' => '{view} {update} {report} {delete}',
+					'buttons' => [
+						'report' => static function (string $url, ActiveLead $lead): string {
+							return Html::a(Html::icon('comment'), ['report/report', 'id' => $lead->getId()]);
+						},
+					],
+				],
+			]),
 	]); ?>
 
 

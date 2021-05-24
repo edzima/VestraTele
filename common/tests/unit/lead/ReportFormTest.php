@@ -28,10 +28,6 @@ class ReportFormTest extends Unit {
 		);
 	}
 
-	public function getModel(): Model {
-		return $this->model;
-	}
-
 	public function testInvalidStatus(): void {
 		$lead = $this->haveLead([
 			'source_id' => 1,
@@ -171,13 +167,14 @@ class ReportFormTest extends Unit {
 	}
 
 	private function thenSeeAnswer(int $question_id, string $answer = null, int $report_id = null) {
-		if ($report_id === null) {
-			$report_id = $this->model->getModel()->id;
-		}
 		return $this->tester->seeRecord(LeadAnswer::class, [
-			'report_id' => $report_id,
 			'question_id' => $question_id,
 			'answer' => $answer,
+			'report_id' => $report_id ?? $this->model->getModel()->id,
 		]);
+	}
+
+	public function getModel(): Model {
+		return $this->model;
 	}
 }

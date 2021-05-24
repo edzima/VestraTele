@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models;
 
+use common\modules\lead\models\query\LeadAnswerQuery;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -15,7 +16,7 @@ use yii\db\ActiveRecord;
  *
  * @property LeadQuestion $question
  * @property LeadReport $report
- * @property-read string $questionAnswer
+ * @property-read string $answerQuestion
  */
 class LeadAnswer extends ActiveRecord {
 
@@ -78,5 +79,12 @@ class LeadAnswer extends ActiveRecord {
 	 */
 	public function getReport(): ActiveQuery {
 		return $this->hasOne(LeadReport::class, ['id' => 'report_id']);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public static function find(): LeadAnswerQuery {
+		return new LeadAnswerQuery(static::class);
 	}
 }
