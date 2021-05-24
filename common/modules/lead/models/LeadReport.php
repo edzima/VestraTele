@@ -30,6 +30,10 @@ use yii\db\ActiveRecord;
  */
 class LeadReport extends ActiveRecord {
 
+	public function isChangeStatus(): bool {
+		return $this->old_status_id !== $this->status_id;
+	}
+
 	public function getDateTitle(): string {
 		if ($this->created_at !== $this->updated_at) {
 			return Yii::t('lead', 'Report from: {created_at} ( updated: {updated_at} )', [
@@ -50,6 +54,10 @@ class LeadReport extends ActiveRecord {
 			$questionAnswers[] = $answer->getAnswerQuestion();
 		}
 		return implode(', ', $questionAnswers);
+	}
+
+	public function getAnswer(int $question_id): ?LeadAnswer {
+		return $this->answers[$question_id] ?? null;
 	}
 
 	/**
