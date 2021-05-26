@@ -2,10 +2,17 @@
 
 namespace common\modules\lead\models\query;
 
+use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadQuestion;
 use yii\db\ActiveQuery;
 
 class LeadQuestionQuery extends ActiveQuery {
+
+	public function forLead(LeadInterface $lead): self {
+		$this->forStatus($lead->getStatusId());
+		$this->forType($lead->getSource()->getType()->id);
+		return $this;
+	}
 
 	public function active(): self {
 		$this->andWhere(['is_active' => true]);

@@ -4,7 +4,6 @@ namespace common\modules\lead\models;
 
 use common\modules\lead\models\query\LeadQuestionQuery;
 use Yii;
-use yii\base\InvalidArgumentException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -20,7 +19,7 @@ use yii\db\ActiveRecord;
  * @property int|null $type_id
  * @property boolean $show_in_grid
  *
- * @property-read LeadAnswer $answer$
+ * @property-read LeadAnswer[] $answers
  * @property-read LeadReport[] $reports
  * @property-read LeadStatus|null $status
  * @property-read LeadType|null $type
@@ -95,8 +94,8 @@ class LeadQuestion extends ActiveRecord {
 	 */
 	public static function findWithStatusAndType(int $status_id, int $type_id): array {
 		return static::find()
-			->andWhere(['or', ['status_id' => null], ['status_id' => $status_id]])
-			->andWhere(['or', ['type_id' => null], ['type_id' => $type_id]])
+			->forStatus($status_id)
+			->forType($type_id)
 			->all();
 	}
 
