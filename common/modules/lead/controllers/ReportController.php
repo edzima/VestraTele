@@ -2,7 +2,6 @@
 
 namespace common\modules\lead\controllers;
 
-use common\modules\lead\models\forms\LeadReportForm;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\LeadQuestion;
 use Yii;
@@ -60,35 +59,13 @@ class ReportController extends Controller {
 		]);
 	}
 
-	/**
-	 * Creates a new LeadReport model.
-	 * If creation is successful, the browser will be redirected to the 'view' page.
-	 *
-	 * @return mixed
-	 */
-	public function actionCreate(int $id) {
-		$lead = Yii::$app->leadManager->findById($id);
-		if ($lead === null) {
-			throw new NotFoundHttpException();
-		}
-		$model = new LeadReportForm(Yii::$app->user->getId(), $lead);
-
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['lead/view', 'id' => $id]);
-		}
-
-		return $this->render('create', [
-			'model' => $model,
-		]);
-	}
-
 	public function actionReport(int $id, int $status_id = null) {
 		$lead = Yii::$app->leadManager->findById($id);
 		if ($lead === null) {
 			throw new NotFoundHttpException();
 		}
 		$model = new ReportForm();
-		$model->owner_id = Yii::$app->user->getId();
+		$model->owner_id = (int) Yii::$app->user->getId();
 		$model->setLead($lead);
 		if ($status_id) {
 			$model->status_id = $status_id;
@@ -111,8 +88,8 @@ class ReportController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$model = LeadReportForm::createFromModel($this->findModel($id));
-
+		$model = new ReportForm();
+		$model->setModel($this->findModel($id));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['lead/view', 'id' => $model->getModel()->lead_id]);
 		}
