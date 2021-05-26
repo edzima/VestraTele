@@ -2,6 +2,7 @@
 
 use common\modules\lead\models\Lead;
 use common\modules\lead\widgets\LeadAnswersWidget;
+use common\modules\lead\widgets\LeadReportWidget;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
@@ -80,47 +81,13 @@ YiiAsset::register($this);
 		</div>
 	</div>
 
+	<?php foreach ($model->reports as $report): ?>
 
-	<div class="row">
-
-
-		<?php foreach ($model->reports as $report): ?>
-			<div class="col-md-6">
-
-				<h4><?= $report->getDateTitle() ?></h4>
-
-				<?php if ($report->isChangeStatus()): ?>
-					<p><?= Yii::t('lead', 'Change status from: {oldStatus} to: {status}', [
-							'oldStatus' => $report->oldStatus->name,
-							'status' => $report->status->name,
-						]) ?>
-					</p>
-				<?php endif; ?>
+		<?= LeadReportWidget::widget([
+			'model' => $report,
+		]) ?>
 
 
-				<?= DetailView::widget([
-					'model' => $report,
-					'attributes' => [
-						[
-							'attribute' => 'details',
-							'visible' => !empty($report->details),
-						],
-						//		'owner',
-						[
-							'label' => Yii::t('lead', 'Answer count'),
-							'value' => count($report->answers),
-							'visible' => !empty($report->answers),
-						],
-						[
-							'attribute' => 'answersQuestions',
-							'visible' => !empty($report->answers),
-						],
-					],
-				]) ?>
-
-			</div>
-
-		<?php endforeach; ?>
-	</div>
+	<?php endforeach; ?>
 
 </div>
