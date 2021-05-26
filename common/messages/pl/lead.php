@@ -100,5 +100,6 @@ return [
 	'Details cannot be blank when closed questions is empty.' => 'Szczegóły nie mogą być puste gdy niewybrano żadnego zamknietego pytania.',
 	'Closed questions' => 'Pytania zamknięte',
 	'Provider' => 'Dostawca',
+	'Are you sure you want to delete this report?' => 'Czy chcesz usunąć ten raport?',
 
 ];

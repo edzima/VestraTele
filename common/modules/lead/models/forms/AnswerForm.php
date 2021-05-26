@@ -4,44 +4,45 @@ namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadQuestion;
+use common\modules\lead\models\LeadReport;
 use yii\base\Model;
 
 class AnswerForm extends Model {
 
-	public int $question_id;
-	public string $answer = '';
+	public ?string $answer = null;
 
 	private ?LeadAnswer $model = null;
-	private ?LeadQuestion $question = null;
+	private LeadQuestion $question;
+
+	public function __construct(LeadQuestion $question, $config = []) {
+		$this->question = $question;
+		parent::__construct($config);
+	}
 
 	public function rules(): array {
 		return [
-			['question_id', 'required'],
-			['question_id', 'integer'],
 			['answer', 'string'],
 			[
 				'answer', 'required',
 				'when' => function () {
 					return $this->getQuestion()->is_required;
 				},
-				//	'enableClientValidation' => false,
+				'enableClientValidation' => false,
 			],
 		];
 	}
 
-	public function setQuestion(LeadQuestion $question): void {
-		$this->question = $question;
-		$this->question_id = $question->id;
+	public function attributeLabels(): array {
+		return [
+			'answer' => $this->getQuestion()->name,
+		];
 	}
 
-	public function getQuestion(): ?LeadQuestion {
-		if ($this->question === null || $this->question !== $this->question_id) {
-			$this->question = LeadQuestion::findOne($this->question_id);
-		}
+	public function getQuestion(): LeadQuestion {
 		return $this->question;
 	}
 
-	public function getModel(): LeadAnswer {
+	private function getModel(): LeadAnswer {
 		if ($this->model === null) {
 			$this->model = new LeadAnswer();
 		}
@@ -50,7 +51,25 @@ class AnswerForm extends Model {
 
 	public function setModel(LeadAnswer $model): void {
 		$this->model = $model;
-		$this->question_id = $model->question_id;
+		$this->answer = $model->answer;
+	}
+
+	public function linkReport(LeadReport $report, bool $validate = true): bool {
+		if ($validate && !$this->validate()) {
+			return false;
+		}
+		$questionId = $this->getQuestion()->id;
+		$model = $report->getAnswer($questionId) ?? $this->getModel();
+		if (empty($this->answer) && $this->getQuestion()->hasPlaceholder()) {
+			if (!$model->isNewRecord) {
+				$model->delete();
+			}
+			return false;
+		}
+		$model->answer = $this->answer;
+		$model->question_id = $questionId;
+		$report->link('answers', $model);
+		return true;
 	}
 
 }

@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models;
 
+use common\behaviors\DatesInfoBehavior;
 use common\modules\lead\models\query\LeadReportQuery;
 use common\modules\lead\Module;
 use Yii;
@@ -26,63 +27,22 @@ use yii\db\ActiveRecord;
  * @property-read LeadStatus $status
  * @property-read LeadAnswer[] $answers
  *
- * @property-read string $formattedDetails
+ * @property-read string $answersQuestions
+ * @property-read string $formattedDates
  */
 class LeadReport extends ActiveRecord {
-
-	public function isChangeStatus(): bool {
-		return $this->old_status_id !== $this->status_id;
-	}
-
-	public function getDateTitle(): string {
-		if ($this->created_at !== $this->updated_at) {
-			return Yii::t('lead', 'Report from: {created_at} ( updated: {updated_at} )', [
-				'created_at' => Yii::$app->formatter->asDate($this->created_at),
-				'updated_at' => Yii::$app->formatter->asDate($this->updated_at),
-			]);
-		}
-
-		return Yii::t('lead', 'Report from: {created_at}', [
-			'created_at' => Yii::$app->formatter->asDate($this->created_at),
-		]);
-	}
-
-	public function getAnswersQuestions(): string {
-		$answers = $this->answers;
-		$questionAnswers = [];
-		foreach ($answers as $answer) {
-			$questionAnswers[] = $answer->getAnswerQuestion();
-		}
-		return implode(', ', $questionAnswers);
-	}
-
-	public function getAnswer(int $question_id): ?LeadAnswer {
-		return $this->answers[$question_id] ?? null;
-	}
-
-	/**
-	 * Gets query for [[LeadAnswers]].
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getAnswers() {
-		return $this->hasMany(LeadAnswer::class, ['report_id' => 'id'])->indexBy('question_id');
-	}
-
-	/**
-	 * Gets query for [[Questions]].
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getQuestions() {
-		return $this->hasMany(LeadQuestion::class, ['id' => 'question_id'])->viaTable(LeadAnswer::tableName(), ['report_id' => 'id']);
-	}
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public static function tableName(): string {
 		return '{{%lead_report}}';
+	}
+
+	public function behaviors() {
+		return [
+			'dateInfo' => DatesInfoBehavior::class,
+		];
 	}
 
 	/**
@@ -115,6 +75,41 @@ class LeadReport extends ActiveRecord {
 			'created_at' => Yii::t('lead', 'Created At'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
 		];
+	}
+
+	public function isChangeStatus(): bool {
+		return $this->old_status_id !== $this->status_id;
+	}
+
+	public function getAnswersQuestions(): string {
+		$answers = $this->answers;
+		$questionAnswers = [];
+		foreach ($answers as $answer) {
+			$questionAnswers[] = $answer->getAnswerQuestion();
+		}
+		return implode(', ', $questionAnswers);
+	}
+
+	public function getAnswer(int $question_id): ?LeadAnswer {
+		return $this->answers[$question_id] ?? null;
+	}
+
+	/**
+	 * Gets query for [[LeadAnswers]].
+	 *
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getAnswers() {
+		return $this->hasMany(LeadAnswer::class, ['report_id' => 'id'])->indexBy('question_id');
+	}
+
+	/**
+	 * Gets query for [[Questions]].
+	 *
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getQuestions() {
+		return $this->hasMany(LeadQuestion::class, ['id' => 'question_id'])->viaTable(LeadAnswer::tableName(), ['report_id' => 'id']);
 	}
 
 	public function getOwnerId(): int {

@@ -83,7 +83,7 @@ class ReportFormTest extends Unit {
 			'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
 		]);
 		$this->thenUnsuccessValidate();
-		$this->thenSeeError('Details cannot be blank when closed questions is empty.', 'details');
+		$this->thenSeeError('Details cannot be blank when answers is empty.', 'details');
 		$this->thenSeeError('Closed questions must be set when details is blank.', 'closedQuestions');
 	}
 
@@ -115,7 +115,7 @@ class ReportFormTest extends Unit {
 		]);
 	}
 
-	public function testClosedQuestionAsArrayWithoutDetails(): void {
+	public function testClosedQuestionWithOpenIdsWithoutDetails(): void {
 		$this->giveForm([
 			'owner_id' => 1,
 			'lead' => $this->haveLead([
@@ -126,9 +126,24 @@ class ReportFormTest extends Unit {
 			'closedQuestions' => [1, 2],
 		]);
 
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Closed Questions is invalid.', 'closedQuestions');
+	}
+
+	public function testClosedQuestionWithValidIdsWithoutDetails(): void {
+		$this->giveForm([
+			'owner_id' => 1,
+			'lead' => $this->haveLead([
+				'source_id' => 1,
+				'status_id' => LeadStatusInterface::STATUS_NEW,
+				'data' => 'test-lead',
+			]),
+			'closedQuestions' => [3, 4],
+		]);
+
 		$this->thenSuccessSave();
-		$this->thenSeeAnswer(1);
-		$this->thenSeeAnswer(2);
+		$this->thenSeeAnswer(3);
+		$this->thenSeeAnswer(4);
 	}
 
 	public function testClosedQuestionAsEmptyTableWithoutDetails(): void {
@@ -143,6 +158,31 @@ class ReportFormTest extends Unit {
 		]);
 
 		$this->thenUnsuccessSave();
+	}
+
+	public function testOpenQuestions(): void {
+		$this->giveForm([
+			'owner_id' => 1,
+			'lead' => $this->haveLead([
+				'source_id' => 1,
+				'status_id' => LeadStatusInterface::STATUS_NEW,
+				'data' => 'test-lead',
+			]),
+			'closedQuestions' => [],
+			'openAnswers' => [
+				1 => 'answer-1',
+				2 => 'answer-2',
+			],
+		]);
+		$answered = [];
+		foreach ($this->model->getAnswersModels() as $answerForm) {
+			$answered[$answerForm->getQuestion()->id] = 'test-answer';
+			$answerForm->answer = 'test-answer';
+		}
+		$this->thenSuccessSave();
+		foreach ($answered as $questionId => $answer) {
+			$this->thenSeeAnswer($questionId, $answer);
+		}
 	}
 
 	private function haveLead(array $attributes): ActiveLead {

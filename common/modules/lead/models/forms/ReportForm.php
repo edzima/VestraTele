@@ -3,6 +3,7 @@
 namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadQuestion;
@@ -14,17 +15,27 @@ use yii\helpers\ArrayHelper;
 class ReportForm extends Model {
 
 	public int $status_id;
-	public string $details = '';
+	public ?string $details = null;
 	public int $owner_id;
 
 	public $closedQuestions = [];
 
-	private ActiveLead $lead;
+	private Lead $lead;
 	private ?LeadReport $model = null;
 	/* @var LeadQuestion[] */
 	private ?array $questions = null;
-	/* @var LeadAnswer[] */
+	/* @var AnswerForm[] */
 	private array $answersModels = [];
+
+	public function setOpenAnswers(array $questionsAnswers): void {
+		$models = $this->getAnswersModels();
+		foreach ($questionsAnswers as $question_id => $answer) {
+			$model = $models[$question_id] ?? null;
+			if ($model) {
+				$model->answer = $answer;
+			}
+		}
+	}
 
 	public function attributeLabels(): array {
 		return [
@@ -40,15 +51,15 @@ class ReportForm extends Model {
 			[
 				'details', 'required',
 				'when' => function () {
-					return empty($this->closedQuestions);
+					return empty($this->closedQuestions) && !$this->hasOpenAnswer();
 				},
 				'enableClientValidation' => false,
-				'message' => Yii::t('lead', 'Details cannot be blank when closed questions is empty.'),
+				'message' => Yii::t('lead', 'Details cannot be blank when answers is empty.'),
 			],
 			[
 				'closedQuestions', 'required',
 				'when' => function () {
-					return empty($this->details);
+					return empty($this->details) && !$this->hasOpenAnswer();
 				},
 				'enableClientValidation' => false,
 				'message' => Yii::t('lead', 'Closed questions must be set when details is blank.'),
@@ -56,6 +67,12 @@ class ReportForm extends Model {
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 			['closedQuestions', 'in', 'range' => array_keys($this->getClosedQuestionsData()), 'allowArray' => true],
 		];
+	}
+
+	private function hasOpenAnswer(): bool {
+		return !empty(array_filter($this->getAnswersModels(), static function (AnswerForm $answerForm): bool {
+			return !empty($answerForm->answer);
+		}));
 	}
 
 	public function getClosedQuestionsData(): array {
@@ -86,48 +103,40 @@ class ReportForm extends Model {
 	public function getAnswersModels(): array {
 		if (empty($this->answersModels)) {
 			foreach ($this->getOpenQuestions() as $question) {
-				$this->answersModels[$question->id] = $this->getAnswerForm($question);
+				if ($this->getModel()->isNewRecord
+					|| isset($this->getModel()->answers[$question->id])
+				) {
+					$this->answersModels[$question->id] = $this->getAnswerForm($question);
+				}
 			}
 		}
 		return $this->answersModels;
 	}
 
 	private function getAnswerForm(LeadQuestion $question): AnswerForm {
-		$model = new AnswerForm();
-		$answer = $this->getModel()->answers[$question->id];
+		$model = new AnswerForm($question);
+		$answer = $this->getModel()->getAnswer($question->id);
 		if ($answer) {
 			$model->setModel($answer);
 		}
-		$model->setQuestion($question);
 		return $model;
-	}
-
-	/**
-	 * @param int $questionID
-	 * @return LeadAnswer
-	 * @todo remove after complete use AnswerForm
-	 */
-	private function getAnswer(int $questionID): LeadAnswer {
-		$answer = $this->getModel()->answers[$questionID] ?? null;
-		if ($answer === null) {
-			$answer = new LeadAnswer();
-			$answer->question_id = $questionID;
-		}
-		return $answer;
 	}
 
 	public function getQuestions(): array {
 		if ($this->questions === null) {
-			$answeredQuestionsIds = $this->lead->getReports()
-				->joinWith('answers')
-				->select('question_id')
-				->column();
 
-			$this->questions = LeadQuestion::find()
+			$query = LeadQuestion::find()
 				->forStatus($this->status_id)
-				->forType($this->getLeadTypeID())
-				->andFilterWhere(['not', ['id' => $answeredQuestionsIds]])
-				->all();
+				->forType($this->getLeadTypeID());
+			if ($this->getModel()->isNewRecord) {
+				$answeredQuestionsIds = $this->lead
+					->getAnswers()
+					->select('question_id')
+					->column();
+
+				$query->andFilterWhere(['not', ['id' => $answeredQuestionsIds]]);
+			}
+			$this->questions = $query->all();
 		}
 		return $this->questions;
 	}
@@ -149,16 +158,20 @@ class ReportForm extends Model {
 		if ($this->status_id !== $this->lead->getStatusId()) {
 			$this->lead->updateStatus($this->status_id);
 		}
-		if (!$isNewRecord) {
+		$this->linkAnswers(!$isNewRecord);
+
+		return true;
+	}
+
+	private function linkAnswers(bool $unlink): void {
+		$model = $this->getModel();
+		if ($unlink) {
 			$model->unlinkAll('answers', true);
 		}
 		foreach ($this->getAnswersModels() as $answer) {
-			$answer->report_id = $model->id;
-			$answer->save();
+			$answer->linkReport($model, false);
 		}
 		$this->saveClosedQuestions();
-
-		return true;
 	}
 
 	private function saveClosedQuestions(): void {
@@ -181,16 +194,22 @@ class ReportForm extends Model {
 		}
 	}
 
-	public function load($data, $formName = null) {
+	public function load($data, $formName = null, $answersFormName = null): bool {
 		return parent::load($data, $formName)
-			&& AnswerForm::loadMultiple($this->getAnswersModels(), $data, $formName);
+			&& $this->loadAnswers($data, $answersFormName);
 	}
 
-	public function validate($attributeNames = null, $clearErrors = true) {
-		return parent::validate($attributeNames, $clearErrors);
-		//@todo fix validate answer required report_id
+	private function loadAnswers($data, $formName = null): bool {
+		$models = $this->getAnswersModels();
+		if (empty($models)) {
+			return true;
+		}
+		return AnswerForm::loadMultiple($models, $data, $formName);
+	}
+
+	public function validate($attributeNames = null, $clearErrors = true): bool {
 		return parent::validate($attributeNames, $clearErrors)
-			&& LeadReportForm::validateMultiple($this->getAnswersModels());
+			&& AnswerForm::validateMultiple($this->getAnswersModels());
 	}
 
 	public function setLead(ActiveLead $lead): void {
@@ -209,7 +228,20 @@ class ReportForm extends Model {
 		return $this->model;
 	}
 
-	public function getLeadTypeID(): int {
+	public function setModel(LeadReport $model): void {
+		$this->model = $model;
+		$this->setLead($model->lead);
+		$this->status_id = $model->status_id;
+		$this->owner_id = $model->owner_id;
+		$this->details = $model->details;
+		foreach ($this->getModel()->answers as $answer) {
+			if (isset($this->getClosedQuestionsData()[$answer->question_id])) {
+				$this->closedQuestions[] = $answer->question_id;
+			}
+		}
+	}
+
+	private function getLeadTypeID(): int {
 		return $this->lead->getSource()->getType()->getID();
 	}
 

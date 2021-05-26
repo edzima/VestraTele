@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 				'value' => 'oldStatus',
 				'filter' => LeadStatus::getNames(),
 			],
-			'questionsAnswers',
+			'answersQuestions',
 			'details:text',
 			'created_at:date',
 			'updated_at:date',
