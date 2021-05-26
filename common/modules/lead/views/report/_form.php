@@ -19,10 +19,6 @@ use kartik\select2\Select2;
 
 
 	<?php foreach ($model->getAnswersModels() as $id => $answer): ?>
-		<?= $form->field($answer, "[$id]question_id")
-			->hiddenInput()
-			->label(false)
-		?>
 
 		<?= $form->field($answer, "[$id]answer")
 			->textInput(['placeholder' => $answer->getQuestion()->placeholder])

@@ -1,10 +1,10 @@
 <?php
 
-use common\modules\lead\models\forms\LeadReportForm;
+use common\modules\lead\models\forms\ReportForm;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model LeadReportForm */
+/* @var $model ReportForm */
 
 $this->title = Yii::t('lead', 'Update Lead Report: {name}', [
 	'name' => $model->getModel()->id,
