@@ -26,6 +26,7 @@ class LeadQuestionForm extends Model {
 			[['name'], 'required'],
 			[['show_in_grid', 'is_required', 'is_active'], 'boolean'],
 			[['name', 'placeholder'], 'string'],
+			['placeholder', 'default', 'value' => null],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 		];
