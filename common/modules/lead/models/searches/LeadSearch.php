@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models\searches;
 
+use common\models\AddressSearch;
 use common\models\SearchModel;
 use common\models\user\User;
 use common\modules\lead\models\LeadQuestion;
@@ -35,6 +36,15 @@ class LeadSearch extends Lead implements SearchModel {
 	private array $questionsAttributes = [];
 
 	private static ?array $QUESTIONS = null;
+
+	public AddressSearch $addressSearch;
+
+	public function __construct($config = []) {
+		if (!isset($config['addressSearch'])) {
+			$config['addressSearch'] = new AddressSearch();
+		}
+		parent::__construct($config);
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -114,6 +124,7 @@ class LeadSearch extends Lead implements SearchModel {
 	public function search(array $params = []): ActiveDataProvider {
 		$query = Lead::find()
 			->joinWith('leadSource S')
+			->joinWith('addresses.address')
 			->joinWith('answers');
 
 		// add conditions that should always apply here
@@ -123,6 +134,7 @@ class LeadSearch extends Lead implements SearchModel {
 		]);
 
 		$this->load($params);
+		$this->addressSearch->load($params);
 
 		if (!$this->validate()) {
 			// uncomment the following line if you do not want to return any records when validation fails
@@ -130,6 +142,7 @@ class LeadSearch extends Lead implements SearchModel {
 			return $dataProvider;
 		}
 
+		$this->applyAddressFilter($query);
 		$this->applyAnswerFilter($query);
 		$this->applyUserFilter($query);
 
@@ -154,6 +167,16 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 
 		return $dataProvider;
+	}
+
+	private function applyAddressFilter(ActiveQuery $query): void {
+		if ($this->addressSearch->validate()) {
+			$query->joinWith([
+				'addresses.address' => function (ActiveQuery $addressQuery) {
+					$this->addressSearch->applySearch($addressQuery);
+				},
+			]);
+		}
 	}
 
 	private function applyUserFilter(ActiveQuery $query): void {
@@ -192,6 +215,10 @@ class LeadSearch extends Lead implements SearchModel {
 				},
 			], false);
 		}
+	}
+
+	public function getAddressSearch(): AddressSearch {
+		return $this->addressSearch;
 	}
 
 	public static function getStatusNames(): array {

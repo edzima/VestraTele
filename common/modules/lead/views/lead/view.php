@@ -3,6 +3,7 @@
 use common\modules\lead\models\Lead;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
+use common\widgets\address\AddressDetailView;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
@@ -61,9 +62,15 @@ YiiAsset::register($this);
 		</div>
 		<div class="col-md-6">
 
+
 			<?= LeadAnswersWidget::widget([
 				'answers' => $model->answers,
 			]) ?>
+
+
+			<?= $model->getCustomerAddress() ? AddressDetailView::widget([
+				'model' => $model->getCustomerAddress(),
+			]) : '' ?>
 
 			<?= GridView::widget([
 				'dataProvider' => new ActiveDataProvider(['query' => $model->getLeadUsers()->with('user.userProfile')]),

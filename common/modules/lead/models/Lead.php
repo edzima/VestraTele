@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models;
 
+use common\models\Address;
 use DateTime;
 use Yii;
 use yii\db\ActiveQuery;
@@ -15,7 +16,6 @@ use yii\helpers\Json;
  * @property int $id
  * @property string $date_at
  * @property string $data
- * @property int $type_id
  * @property int $source_id
  * @property int $status_id
  * @property string|null $provider
@@ -31,6 +31,7 @@ use yii\helpers\Json;
  * @property-read LeadUser[] $leadUsers
  * @property-read LeadReport[] $reports
  * @property-read LeadAnswer[] $answers
+ * @property-read LeadAddress[] $addresses
  */
 class Lead extends ActiveRecord implements ActiveLead {
 
@@ -73,6 +74,14 @@ class Lead extends ActiveRecord implements ActiveLead {
 			'provider' => Yii::t('lead', 'Provider'),
 			'phone' => Yii::t('lead', 'Phone'),
 		];
+	}
+
+	public function getCustomerAddress(): ?Address {
+		return $this->addresses[LeadAddress::TYPE_CUSTOMER]->address ?? null;
+	}
+
+	protected function getAddresses(): ActiveQuery {
+		return $this->hasMany(LeadAddress::class, ['lead_id' => 'id'])->indexBy('type');
 	}
 
 	public function unlinkUsers(): void {

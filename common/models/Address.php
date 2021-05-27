@@ -5,6 +5,7 @@ namespace common\models;
 use common\models\issue\IssueMeet;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
+use common\modules\lead\models\Lead;
 use edzima\teryt\models\query\SimcQuery;
 use edzima\teryt\models\Simc;
 use Yii;
@@ -23,6 +24,7 @@ use yii\db\ActiveRecord;
  *
  * @property-read User[] $users
  * @property-read IssueMeet[] $meets
+ * @property-read Lead[] $leads
  */
 class Address extends ActiveRecord {
 
@@ -81,9 +83,12 @@ class Address extends ActiveRecord {
 		return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('{{%user_address}}', ['address_id' => 'id']);
 	}
 
-
 	public function getMeets(): ActiveQuery {
 		return $this->hasMany(IssueMeet::class, ['id' => 'meet_id'])->viaTable('{{%meet_address}}', ['address_id' => 'id']);
+	}
+
+	public function getLeads(): ActiveQuery {
+		return $this->hasMany(Lead::class, ['id' => 'lead_id'])->viaTable('{{%lead_address}}', ['address_id' => 'id']);
 	}
 
 	public function getCityFullName(): string {

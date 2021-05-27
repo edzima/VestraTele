@@ -1,6 +1,7 @@
 <?php
 
 use common\modules\lead\models\searches\LeadSearch;
+use common\widgets\address\AddressSearchWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -55,6 +56,11 @@ use yii\widgets\ActiveForm;
 		])
 		?>
 	</div>
+
+	<?= AddressSearchWidget::widget([
+		'form' => $form,
+		'model' => $model->getAddressSearch(),
+	]) ?>
 
 
 	<div class="form-group">

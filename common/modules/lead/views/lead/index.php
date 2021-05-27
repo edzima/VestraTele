@@ -4,6 +4,7 @@ use common\helpers\Html;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\searches\LeadSearch;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\AddressColumn;
 use common\widgets\GridView;
 
 /* @var $this yii\web\View */
@@ -66,6 +67,10 @@ foreach (LeadSearch::questions() as $question) {
 		],
 			$questionColumns,
 			[
+				[
+					'class' => AddressColumn::class,
+					'attribute' => 'customerAddress',
+				],
 				[
 					'attribute' => 'reportsCount',
 					'value' => function (ActiveLead $lead): int {

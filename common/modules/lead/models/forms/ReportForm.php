@@ -2,8 +2,9 @@
 
 namespace common\modules\lead\models\forms;
 
+use common\models\Address;
 use common\modules\lead\models\ActiveLead;
-use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadQuestion;
@@ -20,7 +21,11 @@ class ReportForm extends Model {
 
 	public $closedQuestions = [];
 
-	private Lead $lead;
+	public int $addressType = LeadAddress::TYPE_CUSTOMER;
+	public bool $withAddress = false;
+	public ?Address $address = null;
+
+	private ActiveLead $lead;
 	private ?LeadReport $model = null;
 	/* @var LeadQuestion[] */
 	private ?array $questions = null;
@@ -48,6 +53,7 @@ class ReportForm extends Model {
 		return [
 			[['!owner_id', 'status_id'], 'required'],
 			['details', 'string'],
+			['withAddress', 'boolean'],
 			[
 				'details', 'required',
 				'when' => function () {
@@ -159,6 +165,7 @@ class ReportForm extends Model {
 			$this->lead->updateStatus($this->status_id);
 		}
 		$this->linkAnswers(!$isNewRecord);
+		$this->saveAddress();
 
 		return true;
 	}
@@ -194,9 +201,10 @@ class ReportForm extends Model {
 		}
 	}
 
-	public function load($data, $formName = null, $answersFormName = null): bool {
+	public function load($data, $formName = null, $answersFormName = null, $addressFormName = null): bool {
 		return parent::load($data, $formName)
-			&& $this->loadAnswers($data, $answersFormName);
+			&& $this->loadAnswers($data, $answersFormName)
+			&& $this->loadAddress($data, $addressFormName);
 	}
 
 	private function loadAnswers($data, $formName = null): bool {
@@ -207,14 +215,23 @@ class ReportForm extends Model {
 		return AnswerForm::loadMultiple($models, $data, $formName);
 	}
 
+	private function loadAddress($data, $formName = null): bool {
+		return $this->getAddress()->load($data, $formName);
+	}
+
 	public function validate($attributeNames = null, $clearErrors = true): bool {
 		return parent::validate($attributeNames, $clearErrors)
-			&& AnswerForm::validateMultiple($this->getAnswersModels());
+		&& AnswerForm::validateMultiple($this->getAnswersModels())
+		&& $this->withAddress ? $this->getAddress()->validate() : true;
 	}
 
 	public function setLead(ActiveLead $lead): void {
 		$this->lead = $lead;
 		$this->status_id = $lead->getStatusId();
+		$this->address = $lead->addresses[$this->addressType]->address ?? null;
+		if ($this->address !== null) {
+			$this->withAddress = true;
+		}
 	}
 
 	public function getLead(): ActiveLead {
@@ -241,11 +258,28 @@ class ReportForm extends Model {
 		}
 	}
 
+	public function getAddress(): Address {
+		if ($this->address === null) {
+			$this->address = new Address();
+		}
+		return $this->address;
+	}
+
 	private function getLeadTypeID(): int {
 		return $this->lead->getSource()->getType()->getID();
 	}
 
 	public static function getStatusNames(): array {
 		return LeadStatus::getNames();
+	}
+
+	private function saveAddress(): bool {
+		if ($this->withAddress && $this->getAddress()->save()) {
+			$address = $model->addresses[$this->addressType] ?? new LeadAddress(['type' => $this->addressType]);
+			$address->lead_id = $this->getLead()->id;
+			$address->address_id = $this->getAddress()->id;
+			return $address->save();
+		}
+		return true;
 	}
 }
