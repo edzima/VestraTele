@@ -23,6 +23,10 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 			'class' => 'btn btn-info',
 		])
 		?>
+		<?= Html::a(Yii::t('lead', 'Lead Answers'), ['answer/index'], [
+			'class' => 'btn btn-info',
+		])
+		?>
 	</p>
 
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>

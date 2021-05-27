@@ -101,5 +101,12 @@ return [
 	'Closed questions' => 'Pytania zamknięte',
 	'Provider' => 'Dostawca',
 	'Are you sure you want to delete this report?' => 'Czy chcesz usunąć ten raport?',
-
+	'Owner: {user}' => 'Właściciel: {user}',
+	'Answers' => 'Opdowiedzi',
+	'User: {user}' => 'Użytkownik: {user}',
+	'Details cannot be blank when answers is empty.' => 'Szczegóły nie mogą być pustę, gdy nie odpowiedziano na pytania.',
+	'Old Status' => 'Poprzedni Status',
+	'New Status' => 'Nowy Status',
+	'Update Lead Answer: {name}' => 'Edytuj opdowiedź: {name}',
+	'Create Lead Answer' => 'Dodaj odpowiedź',
 ];
