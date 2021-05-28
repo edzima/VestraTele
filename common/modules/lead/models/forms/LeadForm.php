@@ -20,6 +20,7 @@ class LeadForm extends Model implements LeadInterface {
 
 	public const USER_OWNER = 'owner';
 	public const USER_AGENT = 'agent';
+	public const USER_TELE = 'tele';
 
 	public $campaign_id;
 	public $source_id;
@@ -27,8 +28,7 @@ class LeadForm extends Model implements LeadInterface {
 	public $type_id;
 	public $datetime;
 	public $provider;
-	public $first_name;
-	public $lastname;
+
 	public ?string $data = null;
 	public ?string $email = null;
 	public ?string $phone = null;
@@ -51,7 +51,7 @@ class LeadForm extends Model implements LeadInterface {
 			}, 'message' => Yii::t('lead', 'Email cannot be blank when phone is blank.'),
 			],
 			[['status_id', 'source_id', 'campaign_id', 'agent_id', 'owner_id'], 'integer'],
-			[['phone', 'postal_code', 'email', 'first_name', 'lastname'], 'string'],
+			[['phone', 'postal_code', 'email'], 'string'],
 			['postal_code', 'string', 'max' => 6],
 			['email', 'email'],
 			['datetime', 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],
@@ -66,6 +66,7 @@ class LeadForm extends Model implements LeadInterface {
 
 	public function attributeLabels(): array {
 		return [
+			'date_at' => Yii::t('lead', 'Date At'),
 			'status_id' => Yii::t('lead', 'Status'),
 			'source_id' => Yii::t('lead', 'Source'),
 			'campaign_id' => Yii::t('lead', 'Campaign'),
@@ -73,6 +74,8 @@ class LeadForm extends Model implements LeadInterface {
 			'phone' => Yii::t('lead', 'Phone'),
 			'postal_code' => Yii::t('lead', 'Postal Code'),
 			'data' => Yii::t('lead', 'Data'),
+			'agent_id' => Yii::t('lead', 'Agent'),
+			'owner_id' => Yii::t('lead', 'Owner'),
 		];
 	}
 
@@ -146,10 +149,6 @@ class LeadForm extends Model implements LeadInterface {
 			$users[static::USER_OWNER] = $this->owner_id;
 		}
 		return $users;
-		return [
-			static::USER_OWNER => $this->owner_id,
-			static::USER_AGENT => $this->agent_id,
-		];
 	}
 
 	public function push(): ?ActiveLead {

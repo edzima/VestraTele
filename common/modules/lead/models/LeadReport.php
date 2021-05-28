@@ -53,7 +53,7 @@ class LeadReport extends ActiveRecord {
 			[['lead_id', 'owner_id', 'status_id', 'old_status_id'], 'required'],
 			[['lead_id', 'owner_id', 'status_id', 'old_status_id'], 'integer'],
 			[['created_at', 'updated_at'], 'safe'],
-			[['details'], 'string', 'max' => 255],
+			[['details'], 'string'],
 			[['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => ['lead_id' => 'id']],
 			[['old_status_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadStatus::class, 'targetAttribute' => ['old_status_id' => 'id']],
 			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['owner_id' => 'id']],

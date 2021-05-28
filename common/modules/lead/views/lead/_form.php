@@ -2,6 +2,7 @@
 
 use common\modules\lead\models\forms\LeadForm;
 use common\widgets\DateTimeWidget;
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -39,9 +40,21 @@ use yii\widgets\ActiveForm;
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'agent_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getUsersNames()) ?>
+		<?= $form->field($model, 'owner_id',['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+			'data' => LeadForm::getUsersNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('owner_id'),
+				'allowClear' => true,
+			],
+		]) ?>
 
-		<?= $form->field($model, 'owner_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getUsersNames()) ?>
+		<?= $form->field($model, 'agent_id',['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+			'data' => LeadForm::getUsersNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('agent_id'),
+				'allowClear' => true,
+			],
+		]) ?>
 	</div>
 
 

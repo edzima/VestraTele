@@ -12,6 +12,7 @@ use common\modules\lead\models\LeadStatus;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Console;
 
 class ReportForm extends Model {
 
@@ -159,7 +160,9 @@ class ReportForm extends Model {
 		$model->owner_id = $this->owner_id;
 		$model->lead_id = $this->lead->getId();
 		$isNewRecord = $model->isNewRecord;
-		$model->save();
+		if (!$model->save()) {
+			return false;
+		}
 
 		if ($this->status_id !== $this->lead->getStatusId()) {
 			$this->lead->updateStatus($this->status_id);
