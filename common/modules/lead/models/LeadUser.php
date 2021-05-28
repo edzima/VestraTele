@@ -20,6 +20,10 @@ use yii\db\ActiveRecord;
  */
 class LeadUser extends ActiveRecord {
 
+	public const TYPE_OWNER = 'owner';
+	public const TYPE_AGENT = Worker::ROLE_AGENT;
+	public const TYPE_TELE = Worker::ROLE_TELEMARKETER;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -35,6 +39,7 @@ class LeadUser extends ActiveRecord {
 			[['user_id', 'lead_id', 'type'], 'required'],
 			[['user_id', 'lead_id'], 'integer'],
 			[['type'], 'string', 'max' => 255],
+			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 			[['user_id', 'lead_id', 'type'], 'unique', 'targetAttribute' => ['user_id', 'lead_id', 'type']],
 			[['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => ['lead_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['user_id' => 'id']],
@@ -47,9 +52,13 @@ class LeadUser extends ActiveRecord {
 	public function attributeLabels(): array {
 		return [
 			'user_id' => Yii::t('lead', 'User'),
-			'lead_id' => Yii::t('common', 'Lead'),
-			'type' => Yii::t('common', 'Type'),
+			'lead_id' => Yii::t('lead', 'Lead'),
+			'type' => Yii::t('lead', 'Type'),
 		];
+	}
+
+	public function getTypeName(): string {
+		return static::getTypesNames()[$this->type];
 	}
 
 	public function getLead(): ActiveQuery {
@@ -68,6 +77,18 @@ class LeadUser extends ActiveRecord {
 			$query->andWhere([static::tableName() . '.type' => $type]);
 		}
 		return $query->column();
+	}
+
+	public static function getTypesNames(): array {
+		return [
+			static::TYPE_AGENT => Yii::t('lead', 'Agent'),
+			static::TYPE_TELE => Yii::t('lead', 'Telemarketer'),
+			static::TYPE_OWNER => Yii::t('lead', 'Owner'),
+		];
+	}
+
+	public function getUserWithTypeName(): string {
+		return $this->user->getFullName() . ' - ' . $this->getTypeName();
 	}
 
 }

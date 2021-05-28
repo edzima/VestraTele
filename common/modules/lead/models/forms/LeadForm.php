@@ -9,6 +9,7 @@ use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadSourceInterface;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadUser;
 use common\modules\lead\Module;
 use DateTime;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
@@ -18,9 +19,9 @@ use yii\helpers\Json;
 
 class LeadForm extends Model implements LeadInterface {
 
-	public const USER_OWNER = 'owner';
-	public const USER_AGENT = 'agent';
-	public const USER_TELE = 'tele';
+	public const USER_OWNER = LeadUser::TYPE_OWNER;
+	public const USER_AGENT = LeadUser::TYPE_AGENT;
+	public const USER_TELE = LeadUser::TYPE_TELE;
 
 	public $campaign_id;
 	public $source_id;

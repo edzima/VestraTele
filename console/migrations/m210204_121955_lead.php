@@ -40,6 +40,7 @@ class m210204_121955_lead extends Migration {
 		/** @var ActiveRecord $userClass */
 		$userClass = Module::userClass();
 		$this->addForeignKey('{{%fk_lead_user}}', '{{%lead_user}}', 'user_id', $userClass::tableName(), 'id', 'CASCADE', 'CASCADE');
+		$this->addForeignKey('{{%fk_lead_lead}}', '{{%lead_user}}', 'lead_id', '{{%lead}}', 'id', 'CASCADE', 'CASCADE');
 
 		$this->createTable('{{%lead_type}}', [
 			'id' => $this->primaryKey(),

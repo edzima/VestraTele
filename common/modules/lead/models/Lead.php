@@ -25,7 +25,6 @@ use yii\helpers\Json;
  * @property int|null $campaign_id
  *
  * @property-read LeadCampaign|null $campaign
- * @property-read LeadType $type
  * @property-read LeadStatus $status
  * @property-read LeadSource $leadSource
  * @property-read LeadUser[] $leadUsers
@@ -119,10 +118,6 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->hasMany(LeadUser::class, ['lead_id' => 'id']);
 	}
 
-	public function getType(): ActiveQuery {
-		return $this->hasOne(LeadType::class, ['id' => 'type_id']);
-	}
-
 	public function getId(): string {
 		return $this->id;
 	}
@@ -137,10 +132,6 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function getSourceId(): int {
 		return $this->source_id;
-	}
-
-	public function getTypeId(): int {
-		return $this->type_id;
 	}
 
 	public function getData(): array {
