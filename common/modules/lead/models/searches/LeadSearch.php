@@ -124,6 +124,7 @@ class LeadSearch extends Lead implements SearchModel {
 	public function search(array $params = []): ActiveDataProvider {
 		$query = Lead::find()
 			->joinWith('leadSource S')
+			->with('status')
 			//		->joinWith('addresses.address')
 			->joinWith('answers')
 			->groupBy(Lead::tableName() . '.id');

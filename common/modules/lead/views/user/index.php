@@ -35,6 +35,14 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Users');
 				'value' => 'user',
 				'filter' => Module::userNames(),
 				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'pluginOptions' => [
+						'allowClear' => true,
+					],
+					'options' => [
+						'placeholder' => $searchModel->getAttributeLabel('user_id'),
+					],
+				],
 			],
 			[
 				'attribute' => 'type',

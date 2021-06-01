@@ -37,6 +37,7 @@ class LeadForm extends Model implements LeadInterface {
 
 	public $owner_id;
 	public $agent_id;
+	public $tele_id;
 
 	public function rules(): array {
 		return [
@@ -51,13 +52,17 @@ class LeadForm extends Model implements LeadInterface {
 				return empty($this->phone);
 			}, 'message' => Yii::t('lead', 'Email cannot be blank when phone is blank.'),
 			],
-			[['status_id', 'source_id', 'campaign_id', 'agent_id', 'owner_id'], 'integer'],
+			[['status_id', 'source_id', 'campaign_id', 'agent_id', 'owner_id', 'tele_id'], 'integer'],
 			[['phone', 'postal_code', 'email'], 'string'],
 			['postal_code', 'string', 'max' => 6],
 			['email', 'email'],
 			['datetime', 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],
 			[['phone'], PhoneValidator::class, 'country' => 'PL'],
-			[['owner_id', 'agent_id'], 'in', 'range' => array_keys(static::getUsersNames())],
+			[
+				['owner_id', 'agent_id', 'tele_id'], 'in', 'range' => function (): array {
+				return array_keys(static::getUsersNames());
+			},
+			],
 			['campaign_id', 'in', 'range' => array_keys(static::getCampaignsNames())],
 			['provider', 'in', 'range' => array_keys(static::getProvidersNames())],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
@@ -77,6 +82,7 @@ class LeadForm extends Model implements LeadInterface {
 			'data' => Yii::t('lead', 'Data'),
 			'agent_id' => Yii::t('lead', 'Agent'),
 			'owner_id' => Yii::t('lead', 'Owner'),
+			'tele_id' => Yii::t('lead', 'Tele'),
 		];
 	}
 
@@ -99,6 +105,7 @@ class LeadForm extends Model implements LeadInterface {
 	public function setUsers(array $users): void {
 		$this->agent_id = $users[static::USER_AGENT] ?? null;
 		$this->owner_id = $users[static::USER_OWNER] ?? null;
+		$this->tele_id = $users[static::USER_TELE] ?? null;
 	}
 
 	public function getStatusId(): int {
@@ -149,11 +156,14 @@ class LeadForm extends Model implements LeadInterface {
 		if (!empty($this->owner_id)) {
 			$users[static::USER_OWNER] = $this->owner_id;
 		}
+		if (!empty($this->tele_id)) {
+			$users[static::USER_TELE] = $this->tele_id;
+		}
 		return $users;
 	}
 
-	public function push(): ?ActiveLead {
-		if (!$this->validate()) {
+	public function push(bool $validate = true): ?ActiveLead {
+		if ($validate && !$this->validate()) {
 			return null;
 		}
 		$lead = Yii::$app->leadManager->pushLead($this);

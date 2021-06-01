@@ -33,28 +33,23 @@ class LeadFixtureHelper {
 	}
 
 	public static function leads(): array {
-		return [
-			static::USER => [
-				'class' => UserFixture::class,
-				'dataFile' => static::dataDir() . 'user.php',
-			],
+		return array_merge([
 			static::LEAD => [
 				'class' => LeadFixture::class,
 				'dataFile' => static::dataDir() . 'lead.php',
-			],
-			static::TYPE => [
-				'class' => TypeFixture::class,
-				'dataFile' => static::dataDir() . 'type.php',
 			],
 			static::STATUS => [
 				'class' => StatusFixture::class,
 				'dataFile' => static::dataDir() . 'status.php',
 			],
-			static::SOURCE => [
-				'class' => SourceFixture::class,
-				'dataFile' => static::dataDir() . 'source.php',
+			static::TYPE => [
+				'class' => TypeFixture::class,
+				'dataFile' => static::dataDir() . 'type.php',
 			],
-		];
+		],
+			static::source(),
+			static::user(),
+		);
 	}
 
 	public static function reports(): array {
