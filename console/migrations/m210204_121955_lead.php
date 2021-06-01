@@ -76,7 +76,7 @@ class m210204_121955_lead extends Migration {
 
 		$this->createTable('{{%lead_campaign}}', [
 			'id' => $this->primaryKey(),
-			'name' => $this->string()->notNull()->unique(),
+			'name' => $this->string()->notNull(),
 			'sort_index' => $this->smallInteger(),
 			'owner_id' => $this->integer(),
 			'parent_id' => $this->integer(),
@@ -85,6 +85,7 @@ class m210204_121955_lead extends Migration {
 		$this->addForeignKey('{{%fk_lead_campaign}}', '{{%lead}}', 'campaign_id', '{{%lead_campaign}}', 'id', 'CASCADE', 'CASCADE');
 		$this->addForeignKey('{{%fk_lead_campaign_owner}}', '{{%lead_campaign}}', 'owner_id', $userClass::tableName(), 'id', 'CASCADE', 'CASCADE');
 		$this->addForeignKey('{{%fk_lead_campaign_parent}}', '{{%lead_campaign}}', 'parent_id', '{{%lead_campaign}}', 'id', 'CASCADE', 'CASCADE');
+		$this->createIndex('{{%lead_campaign_name_owner_unique}}', '{{%lead_campaign}}', ['name', 'owner_id'], true);
 
 		$this->batchInsert('{{%lead_status}}', ['id', 'name'], [
 			[
@@ -102,8 +103,8 @@ class m210204_121955_lead extends Migration {
 	 * {@inheritdoc}
 	 */
 	public function safeDown() {
-		$this->dropTable('{{%lead}}');
 		$this->dropTable('{{%lead_user}}');
+		$this->dropTable('{{%lead}}');
 		$this->dropTable('{{%lead_status}}');
 		$this->dropTable('{{%lead_campaign}}');
 		$this->dropTable('{{%lead_source}}');

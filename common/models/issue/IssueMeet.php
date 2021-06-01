@@ -46,7 +46,7 @@ use yii\helpers\ArrayHelper;
  * @property-read State $state
  * @property-read Province $province
  * @property-read SubProvince $subProvince
- * @property-read Campaign $campaign
+ * @property-read Campaign|null $campaign
  * @property-read MeetAddress[] $addresses
  * @property-read Address|null $customerAddress
  */

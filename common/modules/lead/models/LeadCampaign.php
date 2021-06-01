@@ -43,6 +43,7 @@ class LeadCampaign extends ActiveRecord {
 			[['name'], 'required'],
 			[['sort_index'], 'integer'],
 			[['name'], 'string', 'max' => 255],
+			[['name', 'owner_id'], 'unique', 'targetAttribute' => ['name', 'owner_id']],
 			[['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => static::class, 'targetAttribute' => ['parent_id' => 'id']],
 			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['owner_id' => 'id']],
 		];
