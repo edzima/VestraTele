@@ -18,7 +18,6 @@ return [
 		'short_name' => 'ST2',
 	],
 	[
-		'id' => IssueStage::POSITIVE_DECISION_ID,
 		'name' => 'Positive Decision',
 		'short_name' => 'PD',
 		'days_reminder' => 28,

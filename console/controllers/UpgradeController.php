@@ -52,10 +52,6 @@ class UpgradeController extends Controller {
 		Console::output(count($pays));
 	}
 
-	public function actionCalculationStage(): void {
-		IssuePayCalculation::updateAll(['stage_id' => IssueStage::POSITIVE_DECISION_ID]);
-	}
-
 	public function actionFixPhone(): void {
 		$validator = new PhoneValidator();
 		$validator->country = 'PL';

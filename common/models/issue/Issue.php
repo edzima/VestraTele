@@ -369,10 +369,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return (int) $this->stage_id === IssueStage::ARCHIVES_ID;
 	}
 
-	public function isPositiveDecision(): bool {
-		return (int) $this->stage_id === IssueStage::POSITIVE_DECISION_ID;
-	}
-
 	public function isAccident(): bool {
 		return (int) $this->type_id === IssueType::ACCIDENT_ID;
 	}

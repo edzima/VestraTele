@@ -23,7 +23,7 @@ return [
 	],
 	[
 		'type_id' => 2,
-		'stage_id' => IssueStage::POSITIVE_DECISION_ID,
+		'stage_id' => 3,
 		'entity_responsible_id' => 2,
 		'signing_at' => '2020-01-02',
 	],

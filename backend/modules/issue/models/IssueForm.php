@@ -24,7 +24,7 @@ class IssueForm extends Model {
 
 	public ?int $agent_id = null;
 	public ?int $lawyer_id = null;
-	public $tele_id = null;
+	public ?int $tele_id = null;
 
 	public ?int $type_id = null;
 	public ?int $stage_id = null;
@@ -39,7 +39,6 @@ class IssueForm extends Model {
 	public const TYPE_ACCIDENT_ID = IssueType::ACCIDENT_ID;
 
 	public const STAGE_ARCHIVED_ID = IssueStage::ARCHIVES_ID;
-	public const STAGE_POSITIVE_DECISION_ID = IssueStage::POSITIVE_DECISION_ID;
 
 	private Customer $customer;
 

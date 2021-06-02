@@ -162,7 +162,6 @@ use yii\widgets\ActiveForm;
 <?php
 
 $archivesStageId = IssueForm::STAGE_ARCHIVED_ID;
-$positiveDecisionStageId = IssueForm::STAGE_POSITIVE_DECISION_ID;
 $stageInputId = Html::getInputId($model, 'stage_id');
 $typeInputId = Html::getInputId($model, 'type_id');
 $stageChangeInputId = Html::getInputId($model, 'stage_change_at');
@@ -178,10 +177,6 @@ let stateChangeAtInput = document.getElementById('$stageChangeInputId');
 
 function isArchived(){
 	return parseInt(stageInput.value) === $archivesStageId;
-}
-
-function isPositiveDecision(){
-	return parseInt(stageInput.value) === $positiveDecisionStageId;
 }
 
 function isAccident(){

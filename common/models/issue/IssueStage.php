@@ -22,19 +22,18 @@ use yii\helpers\ArrayHelper;
 class IssueStage extends ActiveRecord {
 
 	public const ARCHIVES_ID = 6;
-	public const POSITIVE_DECISION_ID = 18;
 
 	public static array $STAGES = [];
-
-	public function __toString(): string {
-		return $this->name;
-	}
 
 	/**
 	 * @inheritdoc
 	 */
 	public static function tableName(): string {
-		return 'issue_stage';
+		return '{{%issue_stage}}';
+	}
+
+	public function __toString(): string {
+		return $this->name;
 	}
 
 	/**
@@ -51,6 +50,14 @@ class IssueStage extends ActiveRecord {
 		];
 	}
 
+	public function getNameWithShort(): string {
+		return $this->name . ' (' . $this->short_name . ')';
+	}
+
+	public function getTypesName(): string {
+		return implode(', ', $this->types);
+	}
+
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
@@ -64,14 +71,6 @@ class IssueStage extends ActiveRecord {
 	public function getTypes() {
 		return $this->hasMany(IssueType::class, ['id' => 'type_id'])
 			->viaTable('{{%issue_stage_type}}', ['stage_id' => 'id']);
-	}
-
-	public function getNameWithShort(): string {
-		return $this->name . ' (' . $this->short_name . ')';
-	}
-
-	public function getTypesName(): string {
-		return implode(', ', $this->types);
 	}
 
 	public static function getStagesNames(bool $withArchive = false): array {
