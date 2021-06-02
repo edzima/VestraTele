@@ -5,6 +5,7 @@ namespace common\modules\lead;
 use yii\base\BootstrapInterface;
 use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
+use common\modules\reminder\Module as ReminderModule;
 
 class Module extends BaseModule implements BootstrapInterface {
 
@@ -15,6 +16,13 @@ class Module extends BaseModule implements BootstrapInterface {
 	public $userNames;
 
 	public bool $onlyOwner = false;
+
+	// @todo check Reminder module access from Lead.
+	public $modules = [
+		'reminder' => [
+			'class' => ReminderModule::class,
+		],
+	];
 
 	public function bootstrap($app) {
 

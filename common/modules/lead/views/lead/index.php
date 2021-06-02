@@ -81,10 +81,14 @@ foreach (LeadSearch::questions() as $question) {
 				],
 				[
 					'class' => ActionColumn::class,
-					'template' => '{view} {update} {report} {delete}',
+					'template' => '{view} {update} {report} {reminder} {delete}',
 					'buttons' => [
 						'report' => static function (string $url, ActiveLead $lead): string {
 							return Html::a(Html::icon('comment'), ['report/report', 'id' => $lead->getId()]);
+						},
+						//@todo find icon for reminder.
+						'reminder' => static function (string $url, ActiveLead $lead): string {
+							return Html::a(Html::icon('comment'), ['reminder/create', 'id' => $lead->getId()]);
 						},
 					],
 				],

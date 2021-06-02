@@ -14,9 +14,21 @@ class LeadManager extends Component {
 	 * @var string|Lead
 	 */
 	public string $model = Lead::class;
+	public bool $onlyForUser = false;
 
 	public function findById(string $id): ?ActiveLead {
-		return $this->model::findById($id);
+		$model = $this->model::findById($id);
+		if ($model && $this->isForUser($model)) {
+			return $model;
+		}
+		return null;
+	}
+
+	public function isForUser(ActiveLead $lead): bool {
+		if ($this->onlyForUser) {
+			return !Yii::$app->user->isGuest && $lead->isForUser(Yii::$app->user->getId());
+		}
+		return true;
 	}
 
 	public function pushLead(LeadInterface $lead): ?ActiveLead {

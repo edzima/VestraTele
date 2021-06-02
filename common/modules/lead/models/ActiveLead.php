@@ -35,4 +35,6 @@ interface ActiveLead extends LeadInterface {
 	 */
 	public static function findByLead(LeadInterface $lead): array;
 
+	public function isForUser($id): bool;
+
 }

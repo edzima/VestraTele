@@ -7,6 +7,7 @@ use backend\modules\provision\Module as ProvisionModule;
 use backend\modules\settlement\Module as SettlementModule;
 use backend\modules\user\Module as UserModule;
 use common\modules\lead\Module as LeadModule;
+use common\modules\reminder\Module as ReminderModule;
 use common\behaviors\GlobalAccessBehavior;
 use common\behaviors\LastActionBehavior;
 use common\components\User as WebUser;
@@ -127,6 +128,11 @@ return [
 		'settlement' => [
 			'class' => SettlementModule::class,
 		],
+		//@todo remove after finish config in LeadModule.
+		/*
+		'reminder' => [
+			'class' => ReminderModule::class,
+		],*/
 		'provision' => [
 			'class' => ProvisionModule::class,
 		],

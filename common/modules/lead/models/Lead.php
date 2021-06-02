@@ -3,6 +3,7 @@
 namespace common\modules\lead\models;
 
 use common\models\Address;
+use common\modules\reminder\models\Reminder;
 use DateTime;
 use Yii;
 use yii\db\ActiveQuery;
@@ -110,6 +111,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 			->indexBy('question_id');
 	}
 
+	public function getReminders(): ActiveQuery {
+		return $this->hasMany(Reminder::class, ['id' => 'reminder_id'])->viaTable(LeadReminder::tableName(), ['lead_id' => 'id']);
+	}
+
 	public function getReports(): ActiveQuery {
 		return $this->hasMany(LeadReport::class, ['lead_id' => 'id'])->indexBy('id');
 	}
@@ -151,7 +156,9 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function hasUser(int $user_id): bool {
-		return $this->getLeadUsers()->andWhere(['user_id' => $user_id])->exists();
+		return !empty(array_filter($this->leadUsers, static function (LeadUser $leadUser) use ($user_id): bool {
+			return $leadUser->user_id === $user_id;
+		}));
 	}
 
 	public function hasAnswer(int $question_id): bool {
@@ -236,4 +243,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 		}
 	}
 
+	public function isForUser($id): bool {
+		return $this->hasUser($id);
+	}
 }

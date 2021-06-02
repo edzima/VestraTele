@@ -3,6 +3,7 @@
 use common\modules\lead\models\Lead;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
+use common\modules\reminder\widgets\ReminderGridWidget;
 use common\widgets\address\AddressDetailView;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
@@ -27,7 +28,7 @@ YiiAsset::register($this);
 
 		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
 
-		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['remininder/create', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['/reminder/lead/create', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
 		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
@@ -83,6 +84,10 @@ YiiAsset::register($this);
 						'value' => 'user.fullName',
 					],
 				],
+			]) ?>
+
+			<?= ReminderGridWidget::widget([
+				'dataProvider' => new ActiveDataProvider(['query' => $model->getReminders()]),
 			]) ?>
 
 		</div>
