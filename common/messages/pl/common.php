@@ -278,4 +278,8 @@ return [
 	'Phonable summon' => 'Wezwanie telefoniczne',
 	'Resignation' => 'Rezygnacja',
 	'Urgency' => 'Ponaglenie',
+	'Additional Date' => 'Dodatkowa Data',
+	'With additional Date' => 'Z dodatkową Datą',
+	'Additional Date for Type' => 'Dodatkowa Data (dla typu)',
+	'Date at ({type})' => 'Data ({type})',
 ];

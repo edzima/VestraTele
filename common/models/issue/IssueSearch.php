@@ -24,15 +24,16 @@ use yii\helpers\ArrayHelper;
  */
 abstract class IssueSearch extends Model
 	implements AgentSearchInterface,
-			   ArchivedIssueSearch,
-			   CustomerSearchInterface,
-			   IssueTypeSearch,
-			   SearchModel {
+	ArchivedIssueSearch,
+	CustomerSearchInterface,
+	IssueTypeSearch,
+	SearchModel {
 
 	public $issue_id;
 	public $stage_id;
 	public $type_id;
 	public $entity_responsible_id;
+	public $type_additional_date_at;
 
 	public string $created_at = '';
 	public string $updated_at = '';
@@ -64,7 +65,7 @@ abstract class IssueSearch extends Model
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[
 				[
-					'created_at', 'updated_at',
+					'created_at', 'updated_at', 'type_additional_date_at',
 				], 'safe',
 			],
 		];
@@ -111,6 +112,7 @@ abstract class IssueSearch extends Model
 			Issue::tableName() . '.stage_id' => $this->stage_id,
 			Issue::tableName() . '.type_id' => $this->type_id,
 			Issue::tableName() . '.entity_responsible_id' => $this->entity_responsible_id,
+			Issue::tableName() . '.type_additional_date_at' => $this->type_additional_date_at,
 		]);
 	}
 

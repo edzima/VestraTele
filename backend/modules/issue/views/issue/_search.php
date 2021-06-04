@@ -28,7 +28,7 @@ use yii\widgets\ActiveForm;
 		<?= $form->field($model, 'createdAtTo', ['options' => ['class' => 'col-md-4']])
 			->widget(DateWidget::class) ?>
 
-		<?= $form->field($model, 'accident_at', ['options' => ['class' => 'col-md-4']])
+		<?= $form->field($model, 'type_additional_date_at', ['options' => ['class' => 'col-md-4']])
 			->widget(DateWidget::class) ?>
 
 	</div>

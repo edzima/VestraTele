@@ -11,8 +11,10 @@ use yii\data\DataProviderInterface;
  */
 trait UnitSearchModelTrait {
 
+	/**
+	 * @todo refactor createModel() as getter and remove this property.
+	 */
 	private SearchModel $model;
-
 
 	abstract protected function createModel(): SearchModel;
 

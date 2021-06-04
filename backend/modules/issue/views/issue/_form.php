@@ -2,9 +2,11 @@
 
 use backend\modules\issue\models\IssueForm;
 use common\widgets\DateTimeWidget;
+use common\widgets\DateWidget;
 use kartik\depdrop\DepDrop;
 use kartik\select2\Select2;
 use yii\helpers\Html;
+use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\View;
 use yii\widgets\ActiveForm;
@@ -89,21 +91,17 @@ use yii\widgets\ActiveForm;
 				->textInput() ?>
 
 			<?= $form->field($model, 'signing_at', ['options' => ['class' => 'col-md-2']])
-				->widget(DateTimeWidget::class,
-					[
-						'phpDatetimeFormat' => 'yyyy-MM-dd',
-					]) ?>
+				->widget(DateWidget::class) ?>
 
-			<?= $form->field($model, 'accident_at', [
+			<?= $form->field($model, 'type_additional_date_at', [
 				'options' => [
-					'id' => 'accident_at_field',
-					'class' => 'col-md-2' . (!$model->getModel()->isAccident() ? ' hidden' : ''),
+					'id' => 'field-' . Html::getInputId($model, 'type_additional_date_at'),
+					'class' => 'col-md-2' . (
+						isset($model::getTypesWithAdditionalDateNames()[(int) $model->type_id]) || !empty($model->type_additional_date_at) ?
+							' hidden' : ''),
 				],
 			])
-				->widget(DateTimeWidget::class,
-					[
-						'phpDatetimeFormat' => 'yyyy-MM-dd',
-					]) ?>
+				->widget(DateWidget::class) ?>
 
 		</div>
 
@@ -164,27 +162,28 @@ use yii\widgets\ActiveForm;
 $archivesStageId = IssueForm::STAGE_ARCHIVED_ID;
 $stageInputId = Html::getInputId($model, 'stage_id');
 $typeInputId = Html::getInputId($model, 'type_id');
+$typeAdditionalInputId = 'field-' . Html::getInputId($model, 'type_additional_date_at');
+$typesWithAdditionalDateAtNames = Json::encode($model::getTypesWithAdditionalDateNames());
+
 $stageChangeInputId = Html::getInputId($model, 'stage_change_at');
 
-$typeAccidentId = IssueForm::TYPE_ACCIDENT_ID;
 $js = <<<JS
 
-let stageInput = document.getElementById('$stageInputId');
-let typeInput = document.getElementById('$typeInputId');
-let archivesField = document.getElementById('archives-field');
-let accidentAtField = document.getElementById('accident_at_field');
-let stateChangeAtInput = document.getElementById('$stageChangeInputId');
+const stageInput = document.getElementById('$stageInputId');
+const typeInput = document.getElementById('$typeInputId');
+const typeAdditionalDateAtField = document.getElementById('$typeAdditionalInputId');
+const labelForTypeAdditionalDateAtField = typeAdditionalDateAtField.getElementsByTagName('label')[0];
+const typesAdditionalDateAtNames = $typesWithAdditionalDateAtNames;
+const archivesField = document.getElementById('archives-field');
+const stateChangeAtInput = document.getElementById('$stageChangeInputId');
 
 function isArchived(){
 	return parseInt(stageInput.value) === $archivesStageId;
 }
 
-function isAccident(){
-	return parseInt(typeInput.value) === $typeAccidentId;
-}
 
 
-	stageInput.onchange = function(){
+stageInput.onchange = function(){
 	let value = parseInt(this.value);
 	if(value === $archivesStageId){
 		archivesField.classList.remove('hidden');
@@ -198,10 +197,11 @@ function isAccident(){
 };
 
 typeInput.onchange= function(){
-	if(parseInt(this.value) === $typeAccidentId){
-		accidentAtField.classList.remove('hidden');
+	if(typesAdditionalDateAtNames.hasOwnProperty(parseInt(this.value))){
+		labelForTypeAdditionalDateAtField.textContent = typesAdditionalDateAtNames[parseInt(this.value)];
+		typeAdditionalDateAtField.classList.remove('hidden');
 	}else{
-		accidentAtField.classList.add('hidden');
+		typeAdditionalDateAtField.classList.add('hidden');
 	}
 };
 

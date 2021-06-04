@@ -120,9 +120,9 @@ if ($provision) {
 						'updated_at:date',
 						'signing_at:date',
 						[
-							'attribute' => 'accident_at',
+							'attribute' => 'type_additional_date_at',
 							'format' => 'date',
-							'visible' => $model->isAccident(),
+							'visible' => $model->type->with_additional_date,
 						],
 						'details:ntext',
 					],

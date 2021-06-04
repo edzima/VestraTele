@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'short_name',
 			'vat',
 			'provision',
+			'with_additional_date:boolean',
 			'meet:boolean',
 			['class' => 'yii\grid\ActionColumn'],
 		],

@@ -47,7 +47,8 @@ class IssueSearchTest extends Unit {
 
 	public function testForType(): void {
 		$this->assertTotalCount(2, ['type_id' => 1]);
-		$this->assertTotalCount(3, ['type_id' => 2]);
+		$this->assertTotalCount(2, ['type_id' => 2]);
+		$this->assertTotalCount(1, ['type_id' => 3]);
 	}
 
 	public function testForStage(): void {

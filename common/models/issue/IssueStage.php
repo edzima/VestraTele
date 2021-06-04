@@ -21,7 +21,7 @@ use yii\helpers\ArrayHelper;
  */
 class IssueStage extends ActiveRecord {
 
-	public const ARCHIVES_ID = 6;
+	public const ARCHIVES_ID = -1;
 
 	public static array $STAGES = [];
 

@@ -32,6 +32,8 @@ $this->params['breadcrumbs'][] = $this->title;
 			'short_name',
 			'provision',
 			'vat',
+			'meet:boolean',
+			'with_additional_date:boolean',
 		],
 	]) ?>
 

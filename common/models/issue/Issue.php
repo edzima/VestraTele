@@ -63,7 +63,7 @@ use yii\db\Expression;
  * @property int $tele_id
  * @property bool $payed
  * @property string|null $signing_at
- * @property string|null $accident_at
+ * @property string|null $type_additional_date_at
  * @property string $stage_change_at
  * @property string|null $signature_act
  *
@@ -160,7 +160,9 @@ class Issue extends ActiveRecord implements IssueInterface {
 			'entity_responsible_id' => Yii::t('common', 'Entity responsible'),
 			'signing_at' => Yii::t('common', 'Signing at'),
 			'archives_nr' => Yii::t('common', 'Archives'),
-			'accident_at' => Yii::t('common', 'Accident date'),
+			'type_additional_date_at' => $this->type
+				? Yii::t('common', 'Date at ({type})', ['type' => $this->type->name])
+				: Yii::t('common', 'Additional Date for Type'),
 			'stage_change_at' => Yii::t('common', 'Stage date'),
 			'signature_act' => Yii::t('common', 'Signature act'),
 			'customer' => IssueUser::getTypesNames()[IssueUser::TYPE_CUSTOMER],
@@ -369,10 +371,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return (int) $this->stage_id === IssueStage::ARCHIVES_ID;
 	}
 
-	public function isAccident(): bool {
-		return (int) $this->type_id === IssueType::ACCIDENT_ID;
-	}
-
 	public function getProvision(): ?Provision {
 		if ($this->provision === null) {
 			if ($this->isNewRecord) {
@@ -434,14 +432,12 @@ class Issue extends ActiveRecord implements IssueInterface {
 
 	/**
 	 * @param string $type
-	 * @param bool $delete
 	 */
 	public function unlinkUser(string $type) {
 		$user = $this->getUsers()->withType($type)->one();
 		if ($user !== null) {
-			return $this->unlink('users', $user, true);
+			$this->unlink('users', $user, true);
 		}
-		return false;
 	}
 
 	/**

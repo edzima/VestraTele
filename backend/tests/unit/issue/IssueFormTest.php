@@ -3,7 +3,6 @@
 namespace backend\tests\unit\issue;
 
 use backend\modules\issue\models\IssueForm;
-use backend\modules\issue\models\IssueStage;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
@@ -67,7 +66,7 @@ class IssueFormTest extends Unit {
 
 	public function testArchiveEmpty(): void {
 		$model = $this->createModel([
-			'stage_id' => IssueStage::ARCHIVES_ID,
+			'stage_id' => IssueForm::STAGE_ARCHIVED_ID,
 		]);
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('Archives cannot be blank.', $model->getFirstError('archives_nr'));
@@ -75,7 +74,7 @@ class IssueFormTest extends Unit {
 
 	public function testValidArchive(): void {
 		$model = $this->createModel([
-			'stage_id' => IssueStage::ARCHIVES_ID,
+			'stage_id' => IssueForm::STAGE_ARCHIVED_ID,
 			'archives_nr' => 'A1222',
 		]);
 		$this->tester->assertTrue($model->save());

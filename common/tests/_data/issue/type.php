@@ -1,11 +1,9 @@
 <?php
 
-use common\models\issue\IssueType;
 use common\models\issue\Provision;
 
 return [
 	[
-		'id' => IssueType::ACCIDENT_ID,
 		'name' => 'Accident',
 		'short_name' => 'ACC',
 		'meet' => true,
@@ -24,6 +22,7 @@ return [
 		'short_name' => 'B-CP',
 		'meet' => false,
 		'vat' => 23,
+		'with_additional_date' => true,
 		'provision_type' => Provision::TYPE_MULTIPLICITY,
 
 	],
@@ -32,6 +31,7 @@ return [
 		'short_name' => 'CR',
 		'meet' => true,
 		'vat' => 0,
+		'with_additional_date' => true,
 		'provision_type' => Provision::TYPE_PERCENTAGE,
 	],
 ];

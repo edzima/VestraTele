@@ -15,7 +15,8 @@ use yii\helpers\ArrayHelper;
  * @property string $short_name
  * @property int $provision_type
  * @property string $vat
- * @property boolean $meet
+ * @property bool $meet
+ * @property bool $with_additional_date
  *
  * @property Issue[] $issues
  * @property IssueStage[] $stages
@@ -23,7 +24,6 @@ use yii\helpers\ArrayHelper;
  */
 class IssueType extends ActiveRecord {
 
-	public const ACCIDENT_ID = 1;
 	private ?Provision $provision = null;
 
 	private static ?array $TYPES = null;
@@ -36,7 +36,7 @@ class IssueType extends ActiveRecord {
 	 * @inheritdoc
 	 */
 	public static function tableName(): string {
-		return 'issue_type';
+		return '{{%issue_type}}';
 	}
 
 	/**
@@ -46,7 +46,7 @@ class IssueType extends ActiveRecord {
 		return [
 			[['name', 'short_name', 'vat', 'provision_type'], 'required'],
 			[['provision_type'], 'integer'],
-			['meet', 'boolean'],
+			[['meet', 'with_additional_date'], 'boolean'],
 			[['name', 'short_name'], 'string', 'max' => 255],
 			[['name'], 'unique'],
 			['vat', 'number', 'min' => 0, 'max' => 100],
@@ -65,6 +65,7 @@ class IssueType extends ActiveRecord {
 			'short_name' => Yii::t('common', 'Shortname'),
 			'provision_type' => Yii::t('common', 'Provision type'),
 			'vat' => 'VAT (%)',
+			'with_additional_date' => Yii::t('common', 'With additional Date'),
 			'meet' => Yii::t('common', 'meet'),
 		];
 	}
@@ -108,6 +109,9 @@ class IssueType extends ActiveRecord {
 		return static::getTypes()[$typeId] ?? null;
 	}
 
+	/**
+	 * @return static[]
+	 */
 	public static function getTypes(): array {
 		if (empty(static::$TYPES)) {
 			static::$TYPES = static::find()->indexBy('id')->all();

@@ -22,7 +22,6 @@ use yii\helpers\ArrayHelper;
 class IssueSearch extends BaseIssueSearch {
 
 	public $parentId;
-	public $accident_at;
 	public $excludedStages = [];
 	public bool $onlyDelayed = false;
 	public bool $onlyWithPayedPay = false;
@@ -38,7 +37,7 @@ class IssueSearch extends BaseIssueSearch {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
 			[['onlyDelayed', 'onlyWithPayedPay'], 'boolean'],
-			['accident_at', 'safe'],
+			['type_additional_date_at', 'safe'],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 		]);
 	}
@@ -87,7 +86,6 @@ class IssueSearch extends BaseIssueSearch {
 		$this->teleFilter($query);
 		$this->lawyerFilter($query);
 		$this->payedFilter($query);
-		$query->andFilterWhere(['accident_at' => $this->accident_at]);
 	}
 
 	public function applyAgentsFilters(QueryInterface $query): void {

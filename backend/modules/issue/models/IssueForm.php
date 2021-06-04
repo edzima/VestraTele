@@ -24,19 +24,17 @@ class IssueForm extends Model {
 
 	public ?int $agent_id = null;
 	public ?int $lawyer_id = null;
-	public ?int $tele_id = null;
+	public $tele_id;
 
 	public ?int $type_id = null;
 	public ?int $stage_id = null;
 	public ?int $entity_responsible_id = null;
 	public ?string $signing_at = null;
-	public ?string $accident_at = null;
+	public ?string $type_additional_date_at = null;
 	public ?string $stage_change_at = null;
 	public ?string $archives_nr = null;
 	public ?string $details = null;
 	public ?string $signature_act = null;
-
-	public const TYPE_ACCIDENT_ID = IssueType::ACCIDENT_ID;
 
 	public const STAGE_ARCHIVED_ID = IssueStage::ARCHIVES_ID;
 
@@ -71,7 +69,7 @@ class IssueForm extends Model {
 			['signature_act', 'string', 'max' => 30],
 			['signature_act', 'default', 'value' => null],
 			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
-			[['signing_at', 'accident_at', 'stage_change_at'], 'date', 'format' => 'Y-m-d'],
+			[['signing_at', 'type_additional_date_at', 'stage_change_at'], 'date', 'format' => 'Y-m-d'],
 			[
 				'archives_nr',
 				'required',
@@ -127,7 +125,7 @@ class IssueForm extends Model {
 		$this->entity_responsible_id = $model->entity_responsible_id;
 		$this->details = $model->details;
 		$this->signing_at = $model->signing_at;
-		$this->accident_at = $model->accident_at;
+		$this->type_additional_date_at = $model->type_additional_date_at;
 		$this->stage_change_at = $model->stage_change_at;
 	}
 
@@ -149,7 +147,7 @@ class IssueForm extends Model {
 			$model->stage_change_at = $this->stage_change_at;
 			$model->entity_responsible_id = $this->entity_responsible_id;
 			$model->signing_at = $this->signing_at;
-			$model->accident_at = $this->accident_at;
+			$model->type_additional_date_at = $this->type_additional_date_at;
 			if (isset($model->dirtyAttributes['stage_id']) && $model->stage_change_at !== $this->stage_change_at) {
 				$model->stage_change_at = date('Y-m-d');
 			} else {
@@ -212,6 +210,16 @@ class IssueForm extends Model {
 
 	public static function getEntityResponsibles(): array {
 		return ArrayHelper::map(EntityResponsible::find()->asArray()->all(), 'id', 'name');
+	}
+
+	public static function getTypesWithAdditionalDateNames(): array {
+		$names = [];
+		foreach (IssueType::getTypes() as $type) {
+			if ($type->with_additional_date) {
+				$names[$type->id] = Yii::t('common', 'Date at ({type})', ['type' => $type->name]);
+			}
+		}
+		return $names;
 	}
 
 }
