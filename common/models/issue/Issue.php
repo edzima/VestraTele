@@ -158,6 +158,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 			'stage' => Yii::t('common', 'Stage'),
 			'type' => Yii::t('common', 'Type'),
 			'entity_responsible_id' => Yii::t('common', 'Entity responsible'),
+			'entityResponsible' => Yii::t('common', 'Entity responsible'),
 			'signing_at' => Yii::t('common', 'Signing at'),
 			'archives_nr' => Yii::t('common', 'Archives'),
 			'type_additional_date_at' => $this->type

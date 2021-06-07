@@ -127,7 +127,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				['class' => IssueColumn::class],
 				[
 					'attribute' => 'issue.signature_act',
-					'label' => Issue::instance()->getAttributeLabel('signature_act'),
 				],
 				[
 					'attribute' => 'typeName',
@@ -135,31 +134,21 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 				[
 					'attribute' => 'issue.type',
-					'label' => Issue::instance()->getAttributeLabel('type'),
 				],
 				[
 					'attribute' => 'issue.stage',
-					'label' => Issue::instance()->getAttributeLabel('stage'),
 				],
 				[
-					'attribute' => 'issue.agent.username',
-					'value' => function (IssueUser $model): ?string {
-						// @todo remove this condition after full upgrade.
-						if ($model->issue->agent) {
-							return $model->issue->agent->username;
-						}
-						return null;
-//						/return $model->issue->agent->username;
-					},
-
+					'attribute' => 'issue.entityResponsible',
+				],
+				[
+					'attribute' => 'issue.agent',
 					'label' => Issue::instance()->getAttributeLabel('agent'),
 				],
 				[
 					'attribute' => 'issue.updated_at',
 					'format' => 'date',
-					'label' => Issue::instance()->getAttributeLabel('updated_at'),
 				],
-
 			],
 		]) ?>
 

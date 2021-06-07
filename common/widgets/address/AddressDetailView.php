@@ -36,24 +36,28 @@ class AddressDetailView extends DetailView {
 				$this->attributes = [
 					[
 						'attribute' => 'city.terc.region',
+						'label' => Yii::t('address', 'Region'),
 						'visible' => !empty($this->model->city),
 					],
 					[
 						'attribute' => 'city.terc.district',
+						'label' => Yii::t('address', 'District'),
 						'visible' => !empty($this->model->city),
 					],
 					[
 						'attribute' => 'city.terc.commune',
+						'label' => Yii::t('address', 'Commune'),
 						'visible' => !empty($this->model->city),
 					],
 					[
 						'attribute' => 'city',
-						'label' => 'Miasto',
+						'label' => Yii::t('address', 'City'),
 						'value' => $this->model->city ? Yii::$app->formatter->asCityCode($this->model->city->name, $this->model->postal_code) : $this->model->postal_code,
 						'visible' => !empty($this->model->postal_code) || !empty($this->model->city),
 					],
 					[
 						'attribute' => 'info',
+						'label' => Yii::t('address', 'Info'),
 						'visible' => !empty($this->model->info),
 					],
 				];
