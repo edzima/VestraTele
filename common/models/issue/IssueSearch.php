@@ -61,7 +61,7 @@ abstract class IssueSearch extends Model
 			],
 			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
-			['type_id', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
+			['type_id', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[
 				[
