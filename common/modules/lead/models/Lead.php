@@ -39,15 +39,23 @@ class Lead extends ActiveRecord implements ActiveLead {
 	public const PROVIDER_CZATER = 'czater';
 	public const PROVIDER_CENTRAL_PHONE = 'central-phone';
 
-	public static function getProvidersNames(): array {
-		return [
-			static::PROVIDER_FORM => Yii::t('lead', 'Form'),
-			static::PROVIDER_CZATER => Yii::t('lead', 'Czater'),
-			static::PROVIDER_CENTRAL_PHONE => Yii::t('lead', 'Central phone'),
-		];
-	}
+	private ?array $users_ids = null;
 
 	public string $dateFormat = 'Y-m-d H:i:s';
+
+	public function afterSave($insert, $changedAttributes): void {
+		parent::afterSave($insert, $changedAttributes);
+		$this->linkUsers(!$insert);
+	}
+
+	private function linkUsers(bool $withUnlink): void {
+		if ($withUnlink) {
+			$this->unlinkUsers();
+		}
+		foreach ($this->getUsers() as $type => $id) {
+			$this->linkUser($type, $id);
+		}
+	}
 
 	public static function tableName(): string {
 		return '{{%lead}}';
@@ -155,18 +163,15 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->postal_code;
 	}
 
-	public function hasUser(int $user_id): bool {
-		return !empty(array_filter($this->leadUsers, static function (LeadUser $leadUser) use ($user_id): bool {
-			return $leadUser->user_id === $user_id;
-		}));
-	}
-
 	public function hasAnswer(int $question_id): bool {
 		return isset($this->answers[$question_id]);
 	}
 
 	public function getUsers(): array {
-		return ArrayHelper::map($this->leadUsers, 'type', 'user_id');
+		if (empty($this->users_ids)) {
+			$this->users_ids = ArrayHelper::map($this->leadUsers, 'type', 'user_id');
+		}
+		return $this->users_ids;
 	}
 
 	public function getCampaignId(): ?int {
@@ -227,6 +232,14 @@ class Lead extends ActiveRecord implements ActiveLead {
 			->all();
 	}
 
+	public static function getProvidersNames(): array {
+		return [
+			static::PROVIDER_FORM => Yii::t('lead', 'Form'),
+			static::PROVIDER_CZATER => Yii::t('lead', 'Czater'),
+			static::PROVIDER_CENTRAL_PHONE => Yii::t('lead', 'Central phone'),
+		];
+	}
+
 	public function setLead(LeadInterface $lead): void {
 		$this->source_id = $lead->getSource()->getID();
 		$this->email = $lead->getEmail();
@@ -237,13 +250,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		$this->data = Json::encode($lead->getData());
 		$this->status_id = $lead->getStatusId();
 		$this->campaign_id = $lead->getCampaignId();
-		$this->unlinkUsers();
-		foreach ($lead->getUsers() as $type => $userId) {
-			$this->linkUser($type, $userId);
-		}
+		$this->users_ids = $lead->getUsers();
 	}
 
 	public function isForUser($id): bool {
-		return $this->hasUser($id);
+		return in_array($id, $this->getUsers(), true);
 	}
 }

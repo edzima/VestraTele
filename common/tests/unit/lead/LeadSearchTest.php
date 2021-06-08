@@ -73,12 +73,12 @@ class LeadSearchTest extends Unit {
 		$this->model->user_id = 1;
 		$models = $this->getSearchModels();
 		foreach ($models as $model) {
-			$this->assertTrue($model->hasUser(1));
+			$this->assertTrue($model->isForUser(1));
 		}
 		$this->model->user_id = 2;
 		$models = $this->getSearchModels(true);
 		foreach ($models as $model) {
-			$this->assertTrue($model->hasUser(2));
+			$this->assertTrue($model->IsForUser(2));
 		}
 	}
 
@@ -86,7 +86,7 @@ class LeadSearchTest extends Unit {
 		$this->model->email = 'test@lead.com';
 		$models = $this->getSearchModels();
 		foreach ($models as $model) {
-			$this->assertSame('test@lead.com', $model->getEmail());
+			$this->tester->assertSame('test@lead.com', $model->getEmail());
 		}
 	}
 
@@ -94,14 +94,14 @@ class LeadSearchTest extends Unit {
 		$this->model->phone = '777-222-122';
 		$models = $this->getSearchModels();
 		foreach ($models as $model) {
-			$this->assertSame('777-222-122', $model->getPhone());
+			$this->tester->assertSame('777-222-122', $model->getPhone());
 		}
 	}
 
 	public function testProvider(): void {
 		$this->model->provider = Lead::PROVIDER_FORM;
 		foreach ($this->getSearchModels() as $model) {
-			$this->assertSame(Lead::PROVIDER_FORM, $model->getProvider());
+			$this->tester->assertSame(Lead::PROVIDER_FORM, $model->getProvider());
 		}
 	}
 

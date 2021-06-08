@@ -24,6 +24,8 @@ interface LeadInterface {
 
 	public function getPostalCode(): ?string;
 
+	public function isForUser($id): bool;
+
 	/**
 	 * @return int[] users IDs indexed by type.
 	 */
@@ -32,6 +34,5 @@ interface LeadInterface {
 	public function getCampaignId(): ?int;
 
 	public function setLead(LeadInterface $lead): void;
-
 
 }

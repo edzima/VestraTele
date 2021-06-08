@@ -10,6 +10,7 @@ return [
 		'id' => 2,
 		'name' => 'agent-1-personal-page',
 		'type_id' => 1,
+		'owner_id' => 1,
 	],
 	[
 		'id' => 3,

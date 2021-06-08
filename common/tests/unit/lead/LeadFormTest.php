@@ -70,7 +70,31 @@ class LeadFormTest extends Unit {
 			'status_id' => 1,
 			'source_id' => 1,
 			'datetime' => '2020-01-01 12:00:00',
+			'owner_id' => 1,
 		]);
+
+		$this->thenSuccessValidate();
+
+		$this->thenLeadIsForUser(1);
+		$this->thenLeadIsNotForUser(2);
+		$this->thenLeadIsNotForUser(null);
+	}
+
+	public function testWithOwnerWithSource(): void {
+		$this->giveLead([
+			'email' => 'some@mail.com',
+			'status_id' => 1,
+			'source_id' => 2,
+			'datetime' => '2020-01-01 12:00:00',
+		]);
+	}
+
+	private function thenLeadIsForUser($id): void {
+		$this->tester->assertTrue($this->lead->isForUser($id));
+	}
+
+	private function thenLeadIsNotForUser($id): void {
+		$this->tester->assertFalse($this->lead->isForUser($id));
 	}
 
 	protected function giveLead(array $data): void {

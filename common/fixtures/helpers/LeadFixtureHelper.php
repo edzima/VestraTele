@@ -117,7 +117,7 @@ class LeadFixtureHelper {
 		];
 	}
 
-	public static function user() {
+	public static function user(): array {
 		return [
 			static::LEAD_USER => [
 				'class' => ActiveFixture::class,

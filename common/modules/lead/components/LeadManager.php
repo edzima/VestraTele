@@ -7,28 +7,35 @@ use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadInterface;
 use Yii;
 use yii\base\Component;
+use yii\db\BaseActiveRecord;
 
 class LeadManager extends Component {
 
 	/**
-	 * @var string|Lead
+	 * @var string|array
 	 */
-	public string $model = Lead::class;
+	public $model = Lead::class;
 	public bool $onlyForUser = false;
 
 	public function findById(string $id): ?ActiveLead {
-		$model = $this->model::findById($id);
+		$model = $this->getModel()::findById($id);
 		if ($model && $this->isForUser($model)) {
 			return $model;
 		}
 		return null;
 	}
 
-	public function isForUser(ActiveLead $lead): bool {
-		if ($this->onlyForUser) {
-			return !Yii::$app->user->isGuest && $lead->isForUser(Yii::$app->user->getId());
+	public function isForUser(ActiveLead $lead, $userId = null): bool {
+		if (!$this->onlyForUser) {
+			return true;
 		}
-		return true;
+		if ($userId === null) {
+			$userId = Yii::$app->user->getId();
+		}
+		if (empty($userId)) {
+			return false;
+		}
+		return $lead->isForUser($userId);
 	}
 
 	public function pushLead(LeadInterface $lead): ?ActiveLead {
@@ -40,7 +47,8 @@ class LeadManager extends Component {
 			return null;
 		}
 
-		$model = $this->create($lead);
+		$model = $this->getModel();
+		$model->setLead($lead);
 		if ($model->validate()) {
 			Yii::info([
 				'message' => 'Push new lead.',
@@ -67,14 +75,13 @@ class LeadManager extends Component {
 	}
 
 	/**
-	 * @param LeadInterface $lead
-	 * @return Lead
+	 * @return ActiveLead|BaseActiveRecord
 	 */
-	protected function create(LeadInterface $lead): ActiveLead {
-		/** @var ActiveLead $model */
-		$model = Yii::createObject($this->model);
-		$model->setLead($lead);
-		return $model;
+	protected function getModel(): ActiveLead {
+		if (!$this->model instanceof ActiveLead) {
+			return Yii::createObject($this->model);
+		}
+		return $this->model;
 	}
 
 	/**
@@ -82,7 +89,7 @@ class LeadManager extends Component {
 	 * @return Lead[]
 	 */
 	public function findByLead(LeadInterface $lead): array {
-		return $this->model::findByLead($lead);
+		return $this->getModel()::findByLead($lead);
 	}
 
 }

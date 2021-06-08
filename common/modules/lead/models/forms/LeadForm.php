@@ -100,6 +100,7 @@ class LeadForm extends Model implements LeadInterface {
 
 	public function setSource(LeadSourceInterface $source): void {
 		$this->source_id = $source->getID();
+		$this->owner_id = $source->getOwnerId();
 	}
 
 	public function setUsers(array $users): void {
@@ -150,16 +151,31 @@ class LeadForm extends Model implements LeadInterface {
 
 	public function getUsers(): array {
 		$users = [];
+
+		$ownerId = $this->getOwnerId();
+		if ($ownerId !== null) {
+			$users[static::USER_OWNER] = $ownerId;
+		}
+
 		if (!empty($this->agent_id)) {
 			$users[static::USER_AGENT] = $this->agent_id;
 		}
-		if (!empty($this->owner_id)) {
-			$users[static::USER_OWNER] = $this->owner_id;
-		}
+
 		if (!empty($this->tele_id)) {
 			$users[static::USER_TELE] = $this->tele_id;
 		}
 		return $users;
+	}
+
+	private function getOwnerId(): ?int {
+		if (empty($this->owner_id)) {
+			$this->owner_id = $this->getSource()->getOwnerId();
+		}
+		return $this->owner_id;
+	}
+
+	private function getSourceOwnerId(): ?int {
+		return $this->getSource()->getOwnerId();
 	}
 
 	public function push(bool $validate = true): ?ActiveLead {
@@ -203,4 +219,7 @@ class LeadForm extends Model implements LeadInterface {
 		return Module::userNames();
 	}
 
+	public function isForUser($id): bool {
+		return in_array($id, $this->getUsers(), true);
+	}
 }
