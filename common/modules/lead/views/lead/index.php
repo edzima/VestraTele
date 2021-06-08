@@ -86,9 +86,8 @@ foreach (LeadSearch::questions() as $question) {
 						'report' => static function (string $url, ActiveLead $lead): string {
 							return Html::a(Html::icon('comment'), ['report/report', 'id' => $lead->getId()]);
 						},
-						//@todo find icon for reminder.
 						'reminder' => static function (string $url, ActiveLead $lead): string {
-							return Html::a(Html::icon('comment'), ['reminder/create', 'id' => $lead->getId()]);
+							return Html::a(Html::icon('calendar'), ['reminder/create', 'id' => $lead->getId()]);
 						},
 					],
 				],
