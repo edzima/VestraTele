@@ -14,7 +14,7 @@ class QuestionCest {
 	/* @see QuestionController::actionCreate() */
 	private const ROUTE_CREATE = '/lead/question/create';
 
-	private const FORM_SELECTOR = '#lead-report-schema-form';
+	private const FORM_SELECTOR = '#lead-question-form';
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();

@@ -42,6 +42,6 @@ class LeadReportCest {
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeLink('Lead Questions');
 		$I->click('Lead Questions');
-		$I->seeCurrentUrlEquals(QuestionCest::ROUTE_INDEX);
+		$I->seeInCurrentUrl(QuestionCest::ROUTE_INDEX);
 	}
 }
