@@ -22,7 +22,7 @@ class LeadCest {
 			'type_id' => 1,
 			'email' => 'email@example.com',
 		]);
-		$I->seeRecord(Yii::$app->lead->model, [
+		$I->seeRecord(Yii::$app->leadManager->model, [
 			'source_id' => 1,
 			'type_id' => 1,
 			'email' => 'email@example.com',

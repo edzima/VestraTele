@@ -174,29 +174,11 @@ class LeadForm extends Model implements LeadInterface {
 		return $this->owner_id;
 	}
 
-	private function getSourceOwnerId(): ?int {
-		return $this->getSource()->getOwnerId();
-	}
-
 	public function push(bool $validate = true): ?ActiveLead {
 		if ($validate && !$this->validate()) {
 			return null;
 		}
-		$lead = Yii::$app->leadManager->pushLead($this);
-		if ($lead) {
-			$lead->unlinkUsers();
-			$this->linkUsers($lead);
-		}
-		return $lead;
-	}
-
-	public function linkUsers(ActiveLead $lead): void {
-		if (!empty($this->agent_id)) {
-			$lead->linkUser(static::USER_AGENT, $this->agent_id);
-		}
-		if (!empty($this->owner_id)) {
-			$lead->linkUser(static::USER_OWNER, $this->owner_id);
-		}
+		return Yii::$app->leadManager->pushLead($this);
 	}
 
 	public static function getCampaignsNames(): array {
