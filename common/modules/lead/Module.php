@@ -9,6 +9,8 @@ use common\modules\reminder\Module as ReminderModule;
 
 class Module extends BaseModule implements BootstrapInterface {
 
+	protected const REMINDER_MODULE_ID = 'reminder';
+
 	public $controllerNamespace = 'common\modules\lead\controllers';
 
 	public string $userClass;
@@ -17,12 +19,16 @@ class Module extends BaseModule implements BootstrapInterface {
 
 	public bool $onlyOwner = false;
 
-	// @todo check Reminder module access from Lead.
-	public $modules = [
-		'reminder' => [
-			'class' => ReminderModule::class,
-		],
+	public array $reminderModule = [
+		'class' => ReminderModule::class,
 	];
+
+	public function init(): void {
+		parent::init();
+		if (!empty($this->reminderModule)) {
+			$this->setModule(static::REMINDER_MODULE_ID, $this->reminderModule);
+		}
+	}
 
 	public function bootstrap($app) {
 
