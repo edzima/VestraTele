@@ -40,12 +40,12 @@ YiiAsset::register($this);
 			'show_in_grid:boolean',
 			[
 				'attribute' => 'type',
-				'value' => $model->type->name,
+				'value' => 'type.name',
 				'visible' => !empty($model->type),
 			],
 			[
 				'attribute' => 'status',
-				'value' => $model->status->name,
+				'value' => 'status.name',
 				'visible' => !empty($model->status),
 			],
 		],
