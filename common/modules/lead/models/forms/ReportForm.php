@@ -12,8 +12,15 @@ use common\modules\lead\models\LeadStatus;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Console;
 
+/**
+ * ReportForm Class.
+ *
+ * @property-read int $leadTypeID
+ * @property-read array $closedQuestionsData
+ * @property-write array $openAnswers
+ * @property-read LeadQuestion[] $openQuestions
+ */
 class ReportForm extends Model {
 
 	public int $status_id;
@@ -224,8 +231,8 @@ class ReportForm extends Model {
 
 	public function validate($attributeNames = null, $clearErrors = true): bool {
 		return parent::validate($attributeNames, $clearErrors)
-		&& AnswerForm::validateMultiple($this->getAnswersModels())
-		&& $this->withAddress ? $this->getAddress()->validate() : true;
+			&& AnswerForm::validateMultiple($this->getAnswersModels())
+			&& ($this->withAddress ? $this->getAddress()->validate() : true);
 	}
 
 	public function setLead(ActiveLead $lead): void {
