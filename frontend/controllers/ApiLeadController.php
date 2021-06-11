@@ -7,10 +7,12 @@ use common\modules\lead\models\forms\LandingLeadForm;
 use Yii;
 use yii\rest\Controller;
 
-class LeadController extends Controller {
+class ApiLeadController extends Controller {
 
 	public function actionLanding() {
 		$model = new LandingLeadForm();
+		$model->date_at = date($model->dateFormat);
+
 		if ($model->load(Yii::$app->request->post())) {
 			if ($model->validate()) {
 				$lead = Yii::$app->leadManager->pushLead($model);

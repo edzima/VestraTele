@@ -26,8 +26,7 @@ class LeadForm extends Model implements LeadInterface {
 	public $campaign_id;
 	public $source_id;
 	public $status_id;
-	public $type_id;
-	public $datetime;
+	public $date_at;
 	public $provider;
 
 	public ?string $data = null;
@@ -39,9 +38,11 @@ class LeadForm extends Model implements LeadInterface {
 	public $agent_id;
 	public $tele_id;
 
+	public string $dateFormat = 'Y-m-d H:i:s';
+
 	public function rules(): array {
 		return [
-			[['source_id', 'status_id', 'datetime'], 'required'],
+			[['source_id', 'status_id', 'date_at'], 'required'],
 			[
 				'phone', 'required', 'enableClientValidation' => false, 'when' => function () {
 				return empty($this->email);
@@ -56,7 +57,7 @@ class LeadForm extends Model implements LeadInterface {
 			[['phone', 'postal_code', 'email'], 'string'],
 			['postal_code', 'string', 'max' => 6],
 			['email', 'email'],
-			['datetime', 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],
+			['date_at', 'date', 'format' => 'php:' . $this->dateFormat],
 			[['phone'], PhoneValidator::class, 'country' => 'PL'],
 			[
 				['owner_id', 'agent_id', 'tele_id'], 'in', 'range' => function (): array {
@@ -76,7 +77,6 @@ class LeadForm extends Model implements LeadInterface {
 			'status_id' => Yii::t('lead', 'Status'),
 			'source_id' => Yii::t('lead', 'Source'),
 			'campaign_id' => Yii::t('lead', 'Campaign'),
-			'datetime' => Yii::t('lead', 'Date At'),
 			'phone' => Yii::t('lead', 'Phone'),
 			'postal_code' => Yii::t('lead', 'Postal Code'),
 			'data' => Yii::t('lead', 'Data'),
@@ -90,7 +90,7 @@ class LeadForm extends Model implements LeadInterface {
 		$this->setSource($lead->getSource());
 		$this->setUsers($lead->getUsers());
 		$this->status_id = $lead->getStatusId();
-		$this->datetime = $lead->getDateTime()->format(DATE_ATOM);
+		$this->date_at = $lead->getDateTime()->format($this->dateFormat);
 		$this->data = Json::encode($lead->getData());
 		$this->email = $lead->getEmail();
 		$this->phone = $lead->getPhone();
@@ -118,7 +118,7 @@ class LeadForm extends Model implements LeadInterface {
 	}
 
 	public function getDateTime(): DateTime {
-		return new DateTime($this->datetime);
+		return new DateTime($this->date_at);
 	}
 
 	public function getData(): array {

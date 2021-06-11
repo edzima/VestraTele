@@ -24,7 +24,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getStatusNames()) ?>
 
-		<?= $form->field($model, 'datetime', ['options' => ['class' => 'col-md-3']])->widget(DateTimeWidget::class, [
+		<?= $form->field($model, 'date_at', ['options' => ['class' => 'col-md-3']])->widget(DateTimeWidget::class, [
 			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
 		]) ?>
 
@@ -40,7 +40,7 @@ use yii\widgets\ActiveForm;
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'owner_id',['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+		<?= $form->field($model, 'owner_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
 			'data' => LeadForm::getUsersNames(),
 			'pluginOptions' => [
 				'placeholder' => $model->getAttributeLabel('owner_id'),
@@ -48,7 +48,7 @@ use yii\widgets\ActiveForm;
 			],
 		]) ?>
 
-		<?= $form->field($model, 'agent_id',['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+		<?= $form->field($model, 'agent_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
 			'data' => LeadForm::getUsersNames(),
 			'pluginOptions' => [
 				'placeholder' => $model->getAttributeLabel('agent_id'),

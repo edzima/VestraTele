@@ -27,7 +27,7 @@ class LeadFormTest extends Unit {
 
 		$this->thenSeeError('Source cannot be blank.', 'source_id');
 		$this->thenSeeError('Status cannot be blank.', 'status_id');
-		$this->thenSeeError('Date At cannot be blank.', 'datetime');
+		$this->thenSeeError('Date At cannot be blank.', 'date_at');
 
 		$this->thenSeeError('Phone cannot be blank when email is blank.', 'phone');
 		$this->thenSeeError('Email cannot be blank when phone is blank.', 'email');
@@ -38,7 +38,7 @@ class LeadFormTest extends Unit {
 			'phone' => '123-123-123',
 			'status_id' => 1,
 			'source_id' => 1,
-			'datetime' => '2020-01-01 12:00:00',
+			'date_at' => '2020-01-01 12:00:00',
 		]);
 
 		$this->thenSuccessValidate();
@@ -49,7 +49,7 @@ class LeadFormTest extends Unit {
 			'email' => 'some@mail.com',
 			'status_id' => 1,
 			'source_id' => 1,
-			'datetime' => '2020-01-01 12:00:00',
+			'date_at' => '2020-01-01 12:00:00',
 		]);
 
 		$this->thenSuccessValidate();
@@ -69,7 +69,7 @@ class LeadFormTest extends Unit {
 			'email' => 'some@mail.com',
 			'status_id' => 1,
 			'source_id' => 1,
-			'datetime' => '2020-01-01 12:00:00',
+			'date_at' => '2020-01-01 12:00:00',
 			'owner_id' => 1,
 		]);
 
@@ -85,7 +85,7 @@ class LeadFormTest extends Unit {
 			'email' => 'some@mail.com',
 			'status_id' => 1,
 			'source_id' => 2,
-			'datetime' => '2020-01-01 12:00:00',
+			'date_at' => '2020-01-01 12:00:00',
 		]);
 	}
 

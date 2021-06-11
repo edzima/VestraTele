@@ -26,7 +26,7 @@ class MeetToLeadCreator extends Component {
 		$lead->phone = $meet->phone;
 		$lead->email = $meet->email;
 		$lead->postal_code = $meet->customerAddress->postal_code ?? null;
-		$lead->datetime = $meet->created_at;
+		$lead->date_at = $meet->created_at;
 		$lead->status_id = $this->getStatus($meet->getStatusName())->id;
 		$lead->source_id = $this->getSource($meet)->id;
 		$lead->campaign_id = $this->getCampaign($meet)->id;

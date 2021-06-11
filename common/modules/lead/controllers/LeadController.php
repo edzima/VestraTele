@@ -64,7 +64,8 @@ class LeadController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new LeadForm(['datetime' => time()]);
+		$model = new LeadForm();
+		$model->date_at = date($model->dateFormat);
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 			$lead = Yii::$app->leadManager->pushLead($model);
 			return $this->redirect(['view', 'id' => $lead->getId()]);
