@@ -80,6 +80,9 @@ class LeadSearchTest extends Unit {
 		foreach ($models as $model) {
 			$this->assertTrue($model->IsForUser(2));
 		}
+		$this->model->user_id = 3;
+		$models = $this->getSearchModels(true);
+		$this->tester->assertEmpty($models);
 	}
 
 	public function testEmail(): void {

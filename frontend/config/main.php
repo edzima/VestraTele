@@ -1,7 +1,9 @@
 <?php
 
+use common\behaviors\GlobalAccessBehavior;
 use common\components\User as WebUser;
 use common\models\user\User;
+use common\modules\lead\Module as LeadModule;
 
 $params = array_merge(
 	require __DIR__ . '/../../common/config/params.php',
@@ -22,6 +24,19 @@ return [
 		],
 		'gridview' => [
 			'class' => '\kartik\grid\Module',
+		],
+		'lead' => [
+			'class' => LeadModule::class,
+			'onlyUser' => true,
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'permissions' => [User::PERMISSION_LEAD],
+					],
+				],
+			],
 		],
 	],
 	'components' => [

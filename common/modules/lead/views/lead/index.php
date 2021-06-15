@@ -43,6 +43,7 @@ foreach (LeadSearch::questions() as $question) {
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'id' => 'leads-grid',
 		'columns' => array_merge([
 			[
 				'attribute' => 'type_id',

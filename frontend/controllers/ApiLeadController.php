@@ -2,8 +2,11 @@
 
 namespace frontend\controllers;
 
+use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\forms\CzaterLeadForm;
 use common\modules\lead\models\forms\LandingLeadForm;
+use common\modules\lead\models\LeadInterface;
+use common\modules\lead\Module;
 use Yii;
 use yii\rest\Controller;
 
@@ -15,7 +18,7 @@ class ApiLeadController extends Controller {
 
 		if ($model->load(Yii::$app->request->post())) {
 			if ($model->validate()) {
-				$lead = Yii::$app->leadManager->pushLead($model);
+				$lead = static::pushLead($model);
 			} else {
 				Yii::warning([
 					'message' => 'Landing lead with validate errors.',
@@ -36,7 +39,7 @@ class ApiLeadController extends Controller {
 		$model = new CzaterLeadForm();
 		if ($model->load(Yii::$app->request->post())) {
 			if ($model->validate()) {
-				$lead = Yii::$app->leadManager->pushLead($model);
+				$lead = static::pushLead($model);
 			} else {
 				Yii::warning([
 					'message' => 'Czater lead with validate errors.',
@@ -46,5 +49,9 @@ class ApiLeadController extends Controller {
 			}
 		}
 		return '';
+	}
+
+	public static function pushLead(LeadInterface $lead): ?ActiveLead {
+		return Module::manager()->pushLead($lead);
 	}
 }

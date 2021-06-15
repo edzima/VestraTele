@@ -4,8 +4,8 @@ namespace console\controllers;
 
 use common\models\issue\IssueMeet;
 use common\modules\lead\models\Lead;
+use common\modules\lead\Module;
 use console\components\MeetToLeadCreator;
-use Yii;
 use yii\console\Controller;
 use yii\helpers\Console;
 
@@ -13,12 +13,14 @@ class MeetController extends Controller {
 
 	public function actionMigration(): void {
 		Lead::deleteAll();
+
+		$manager = Module::manager();
 		foreach (IssueMeet::find()->batch() as $rows) {
 			foreach ($rows as $meet) {
 				$creator = new MeetToLeadCreator();
 				$lead = $creator->createLead($meet);
 				if ($lead->validate(['status_id', 'source_id', 'campaign_id', 'phone', 'email'])) {
-					$activeLead = Yii::$app->leadManager->pushLead($lead);
+					$activeLead = $manager->pushLead($lead);
 					if ($activeLead) {
 						Console::output('Success push Lead from Meet: ' . $meet->id);
 						$report = $creator->createReport($activeLead, $meet);

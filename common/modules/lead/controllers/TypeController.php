@@ -5,123 +5,121 @@ namespace common\modules\lead\controllers;
 use Yii;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadTypeSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * TypeController implements the CRUD actions for LeadType model.
  */
-class TypeController extends Controller
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
+class TypeController extends BaseController {
 
-    /**
-     * Lists all LeadType models.
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        $searchModel = new LeadTypeSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+	/**
+	 * {@inheritdoc}
+	 */
+	public function behaviors(): array {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'delete' => ['POST'],
+				],
+			],
+		];
+	}
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
+	/**
+	 * Lists all LeadType models.
+	 *
+	 * @return string
+	 */
+	public function actionIndex(): string {
+		$searchModel = new LeadTypeSearch();
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-    /**
-     * Displays a single LeadType model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
+		return $this->render('index', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
 
-    /**
-     * Creates a new LeadType model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new LeadType();
+	/**
+	 * Displays a single LeadType model.
+	 *
+	 * @param integer $id
+	 * @return string
+	 * @throws NotFoundHttpException if the model cannot be found
+	 */
+	public function actionView(int $id): string {
+		return $this->render('view', [
+			'model' => $this->findModel($id),
+		]);
+	}
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+	/**
+	 * Creates a new LeadType model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 *
+	 * @return mixed
+	 */
+	public function actionCreate() {
+		$model = new LeadType();
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->id]);
+		}
 
-    /**
-     * Updates an existing LeadType model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
+		return $this->render('create', [
+			'model' => $model,
+		]);
+	}
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+	/**
+	 * Updates an existing LeadType model.
+	 * If update is successful, the browser will be redirected to the 'view' page.
+	 *
+	 * @param integer $id
+	 * @return mixed
+	 * @throws NotFoundHttpException if the model cannot be found
+	 */
+	public function actionUpdate(int $id) {
+		$model = $this->findModel($id);
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->id]);
+		}
 
-    /**
-     * Deletes an existing LeadType model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
+		return $this->render('update', [
+			'model' => $model,
+		]);
+	}
 
-        return $this->redirect(['index']);
-    }
+	/**
+	 * Deletes an existing LeadType model.
+	 * If deletion is successful, the browser will be redirected to the 'index' page.
+	 *
+	 * @param integer $id
+	 * @return mixed
+	 * @throws NotFoundHttpException if the model cannot be found
+	 */
+	public function actionDelete(int $id) {
+		$this->findModel($id)->delete();
 
-    /**
-     * Finds the LeadType model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return LeadType the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = LeadType::findOne($id)) !== null) {
-            return $model;
-        }
+		return $this->redirect(['index']);
+	}
 
-        throw new NotFoundHttpException(Yii::t('lead', 'The requested page does not exist.'));
-    }
+	/**
+	 * Finds the LeadType model based on its primary key value.
+	 * If the model is not found, a 404 HTTP exception will be thrown.
+	 *
+	 * @param integer $id
+	 * @return LeadType the loaded model
+	 * @throws NotFoundHttpException if the model cannot be found
+	 */
+	protected function findModel(int $id): LeadType {
+		if (($model = LeadType::findOne($id)) !== null) {
+			return $model;
+		}
+
+		throw new NotFoundHttpException(Yii::t('lead', 'The requested page does not exist.'));
+	}
 }

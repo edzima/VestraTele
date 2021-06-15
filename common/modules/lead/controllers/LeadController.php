@@ -2,18 +2,17 @@
 
 namespace common\modules\lead\controllers;
 
-use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\forms\LeadForm;
-use Yii;
 use common\modules\lead\models\searches\LeadSearch;
-use yii\web\Controller;
+use Yii;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * LeadController implements the CRUD actions for Lead model.
  */
-class LeadController extends Controller {
+class LeadController extends BaseController {
 
 	/**
 	 * {@inheritdoc}
@@ -36,6 +35,13 @@ class LeadController extends Controller {
 	 */
 	public function actionIndex(): string {
 		$searchModel = new LeadSearch();
+		if ($this->module->onlyUser) {
+			if (Yii::$app->user->getIsGuest()) {
+				throw new ForbiddenHttpException();
+			}
+			$searchModel->user_id = Yii::$app->user->getId();
+		}
+
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -53,7 +59,7 @@ class LeadController extends Controller {
 	 */
 	public function actionView(int $id): string {
 		return $this->render('view', [
-			'model' => $this->findModel($id),
+			'model' => $this->findLead($id),
 		]);
 	}
 
@@ -67,7 +73,7 @@ class LeadController extends Controller {
 		$model = new LeadForm();
 		$model->date_at = date($model->dateFormat);
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-			$lead = Yii::$app->leadManager->pushLead($model);
+			$lead = $this->module->manager->pushLead($model);
 			return $this->redirect(['view', 'id' => $lead->getId()]);
 		}
 
@@ -86,13 +92,13 @@ class LeadController extends Controller {
 	 */
 	public function actionUpdate(int $id) {
 		$model = new LeadForm();
-		$lead = $this->findModel($id);
+		$lead = $this->findLead($id);
 		$model->setLead($lead);
 
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 			$lead->setLead($model);
 			$lead->update();
-			return $this->redirect(['view', 'id' => $lead->id]);
+			return $this->redirect(['view', 'id' => $lead->getId()]);
 		}
 
 		return $this->render('update', [
@@ -110,25 +116,9 @@ class LeadController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionDelete(int $id) {
-		$this->findModel($id)->delete();
+		$this->findLead($id)->delete();
 
 		return $this->redirect(['index']);
 	}
 
-	/**
-	 * Finds the Lead model based on its primary key value.
-	 * If the model is not found, a 404 HTTP exception will be thrown.
-	 *
-	 * @param integer $id
-	 * @return ActiveLead the loaded model
-	 * @throws NotFoundHttpException if the model cannot be found
-	 */
-	protected function findModel(int $id): ActiveLead {
-		$model = Yii::$app->leadManager->findById($id);
-		if ($model !== null) {
-			return $model;
-		}
-
-		throw new NotFoundHttpException(Yii::t('lead', 'The requested page does not exist.'));
-	}
 }

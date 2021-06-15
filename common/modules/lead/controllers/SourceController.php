@@ -6,14 +6,13 @@ use common\modules\lead\models\forms\LeadSourceForm;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\searches\LeadSourceSearch;
 use Yii;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * SourceController implements the CRUD actions for LeadSource model.
  */
-class SourceController extends Controller {
+class SourceController extends BaseController {
 
 	/**
 	 * {@inheritdoc}

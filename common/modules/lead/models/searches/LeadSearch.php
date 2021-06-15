@@ -184,7 +184,7 @@ class LeadSearch extends Lead implements SearchModel {
 	private function applyUserFilter(ActiveQuery $query): void {
 		if (!empty($this->user_id)) {
 			$query->joinWith('leadUsers');
-			$query->andWhere(LeadUser::tableName() . '.user_id');
+			$query->andWhere([LeadUser::tableName() . '.user_id' => $this->user_id]);
 		}
 	}
 

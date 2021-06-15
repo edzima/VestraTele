@@ -7,7 +7,6 @@ use common\modules\lead\models\LeadQuestion;
 use Yii;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\searches\LeadReportSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -15,7 +14,7 @@ use yii\web\Response;
 /**
  * ReportController implements the CRUD actions for LeadReport model.
  */
-class ReportController extends Controller {
+class ReportController extends BaseController {
 
 	/**
 	 * {@inheritdoc}
@@ -60,13 +59,9 @@ class ReportController extends Controller {
 	}
 
 	public function actionReport(int $id, int $status_id = null) {
-		$lead = Yii::$app->leadManager->findById($id);
-		if ($lead === null) {
-			throw new NotFoundHttpException();
-		}
 		$model = new ReportForm();
 		$model->owner_id = (int) Yii::$app->user->getId();
-		$model->setLead($lead);
+		$model->setLead($this->findLead($id));
 		if ($status_id) {
 			$model->status_id = $status_id;
 		}

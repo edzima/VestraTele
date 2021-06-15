@@ -6,7 +6,6 @@ use Yii;
 use common\modules\lead\models\forms\LeadQuestionForm;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\searches\LeadQuestionSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -14,7 +13,7 @@ use yii\web\Response;
 /**
  * QuestionController implements the CRUD actions for LeadQuestion model.
  */
-class QuestionController extends Controller {
+class QuestionController extends BaseController {
 
 	/**
 	 * {@inheritdoc}

@@ -233,6 +233,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public static function getProvidersNames(): array {
+		//@todo load from Lead Module
 		return [
 			static::PROVIDER_FORM => Yii::t('lead', 'Form'),
 			static::PROVIDER_CZATER => Yii::t('lead', 'Czater'),

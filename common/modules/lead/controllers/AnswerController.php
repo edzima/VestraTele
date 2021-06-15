@@ -5,14 +5,13 @@ namespace common\modules\lead\controllers;
 use Yii;
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\searches\LeadAnswerSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * AnswerController implements the CRUD actions for LeadAnswer model.
  */
-class AnswerController extends Controller {
+class AnswerController extends BaseController {
 
 	/**
 	 * {@inheritdoc}

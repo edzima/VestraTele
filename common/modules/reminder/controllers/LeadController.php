@@ -4,6 +4,7 @@ namespace common\modules\reminder\controllers;
 
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadReminder;
+use common\modules\lead\Module;
 use common\modules\reminder\models\ReminderForm;
 use Yii;
 use yii\web\Controller;
@@ -31,7 +32,7 @@ class LeadController extends Controller {
 	}
 
 	private function findLead(int $id): ActiveLead {
-		$model = Yii::$app->leadManager->findById($id);
+		$model = Module::manager()->findById($id);
 		if ($model) {
 			return $model;
 		}

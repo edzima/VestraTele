@@ -5,14 +5,13 @@ namespace common\modules\lead\controllers;
 use Yii;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\searches\LeadCampaignSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * CampaignController implements the CRUD actions for LeadCampaign model.
  */
-class CampaignController extends Controller {
+class CampaignController extends BaseController {
 
 	/**
 	 * {@inheritdoc}

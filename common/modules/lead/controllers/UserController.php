@@ -5,22 +5,21 @@ namespace common\modules\lead\controllers;
 use Yii;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadUsersSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * UserController implements the CRUD actions for LeadUser model.
  */
-class UserController extends Controller {
+class UserController extends BaseController {
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
 				],
@@ -31,9 +30,9 @@ class UserController extends Controller {
 	/**
 	 * Lists all LeadUser models.
 	 *
-	 * @return mixed
+	 * @return string
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new LeadUsersSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -52,7 +51,7 @@ class UserController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView($lead_id, $user_id, $type) {
+	public function actionView(int $lead_id, int $user_id, string $type) {
 		return $this->render('view', [
 			'model' => $this->findModel($lead_id, $user_id, $type),
 		]);
@@ -86,7 +85,7 @@ class UserController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionUpdate($lead_id, $user_id, $type) {
+	public function actionUpdate(int $lead_id, int $user_id, string $type) {
 		$model = $this->findModel($lead_id, $user_id, $type);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -108,7 +107,7 @@ class UserController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionDelete($lead_id, $user_id, $type) {
+	public function actionDelete(int $lead_id, int $user_id, string $type) {
 		$this->findModel($lead_id, $user_id, $type)->delete();
 
 		return $this->redirect(['index']);
@@ -124,7 +123,7 @@ class UserController extends Controller {
 	 * @return LeadUser the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($lead_id, $user_id, $type) {
+	protected function findModel(int $lead_id, int $user_id, string $type): LeadUser {
 		if (($model = LeadUser::findOne(['lead_id' => $lead_id, 'user_id' => $user_id, 'type' => $type])) !== null) {
 			return $model;
 		}

@@ -2,7 +2,6 @@
 
 namespace common\modules\lead\models\forms;
 
-use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadInterface;
@@ -172,13 +171,6 @@ class LeadForm extends Model implements LeadInterface {
 			$this->owner_id = $this->getSource()->getOwnerId();
 		}
 		return $this->owner_id;
-	}
-
-	public function push(bool $validate = true): ?ActiveLead {
-		if ($validate && !$this->validate()) {
-			return null;
-		}
-		return Yii::$app->leadManager->pushLead($this);
 	}
 
 	public static function getCampaignsNames(): array {
