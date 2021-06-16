@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\tests\functional;
+namespace frontend\tests\functional\lead;
 
 use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\Module;

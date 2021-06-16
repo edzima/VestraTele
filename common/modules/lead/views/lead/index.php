@@ -10,6 +10,7 @@ use common\widgets\GridView;
 /* @var $this yii\web\View */
 /* @var $searchModel LeadSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $visibleButtons array */
 
 $this->title = Yii::t('lead', 'Leads');
 $this->params['breadcrumbs'][] = $this->title;
@@ -74,7 +75,7 @@ foreach (LeadSearch::questions() as $question) {
 				],
 				[
 					'attribute' => 'reportsCount',
-					'value' => function (ActiveLead $lead): int {
+					'value' => static function (ActiveLead $lead): int {
 						return count($lead->reports);
 					},
 					'filter' => $searchModel::getStatusNames(),
@@ -83,6 +84,7 @@ foreach (LeadSearch::questions() as $question) {
 				[
 					'class' => ActionColumn::class,
 					'template' => '{view} {update} {report} {reminder} {delete}',
+					'visibleButtons' => $visibleButtons,
 					'buttons' => [
 						'report' => static function (string $url, ActiveLead $lead): string {
 							return Html::a(Html::icon('comment'), ['report/report', 'id' => $lead->getId()]);

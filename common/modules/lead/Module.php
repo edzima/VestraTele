@@ -24,6 +24,7 @@ class Module extends BaseModule implements BootstrapInterface {
 	public $userNames;
 
 	public bool $onlyUser = false;
+	public bool $allowDelete = true;
 
 	public array $reminderModule = [
 		'class' => ReminderModule::class,

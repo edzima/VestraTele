@@ -5,6 +5,7 @@ namespace common\modules\lead\controllers;
 use common\modules\lead\models\forms\LeadForm;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
+use yii\base\ActionFilter;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -24,6 +25,10 @@ class LeadController extends BaseController {
 				'actions' => [
 					'delete' => ['POST'],
 				],
+			],
+			'action' => [
+				'class' => ActionFilter::class,
+				'except' => $this->module->allowDelete ? [] : ['delete'],
 			],
 		];
 	}
@@ -47,6 +52,9 @@ class LeadController extends BaseController {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+			'visibleButtons' => [
+				'delete' => $this->module->allowDelete,
+			],
 		]);
 	}
 

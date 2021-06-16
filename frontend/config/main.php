@@ -28,6 +28,7 @@ return [
 		'lead' => [
 			'class' => LeadModule::class,
 			'onlyUser' => true,
+			'allowDelete' => false,
 			'as access' => [
 				'class' => GlobalAccessBehavior::class,
 				'rules' => [
