@@ -34,6 +34,7 @@ return [
 				'rules' => [
 					[
 						'allow' => true,
+						'controllers' => ['lead/lead'],
 						'permissions' => [User::PERMISSION_LEAD],
 					],
 				],
