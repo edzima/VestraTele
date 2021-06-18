@@ -28,12 +28,19 @@ class CampaignController extends BaseController {
 	}
 
 	/**
-	 * Lists all LeadCampaign models.
+	 * Lists all LeadCampaign models or when Module::onlyUser list all users LeadCampaign models.
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new LeadCampaignSearch();
+		if ($this->module->onlyUser) {
+			if (Yii::$app->user->getIsGuest()) {
+				return Yii::$app->user->loginRequired();
+			}
+			$searchModel->owner_id = Yii::$app->user->getId();
+		}
+
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -63,6 +70,10 @@ class CampaignController extends BaseController {
 	 */
 	public function actionCreate() {
 		$model = new LeadCampaign();
+		if ($this->module->onlyUser) {
+			$model->setScenario(LeadCampaign::SCENARIO_OWNER);
+			$model->owner_id = Yii::$app->user->getId();
+		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
@@ -81,7 +92,7 @@ class CampaignController extends BaseController {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionUpdate($id) {
+	public function actionUpdate(int $id) {
 		$model = $this->findModel($id);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -115,9 +126,13 @@ class CampaignController extends BaseController {
 	 * @return LeadCampaign the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): LeadCampaign {
-		if (($model = LeadCampaign::findOne($id)) !== null) {
-			return $model;
+	protected function findModel(int $id): LeadCampaign {
+		$model = LeadCampaign::findOne($id);
+		if ($model !== null) {
+			if (!$this->module->onlyUser
+				|| ($model->owner_id !== null && $model->owner_id === (int) Yii::$app->user->getId())) {
+				return $model;
+			}
 		}
 
 		throw new NotFoundHttpException(Yii::t('lead', 'The requested page does not exist.'));

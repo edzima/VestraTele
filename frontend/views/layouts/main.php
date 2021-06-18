@@ -61,6 +61,26 @@ AppAsset::register($this);
 		];
 
 		$menuItems[] = [
+			'label' => Yii::t('lead', 'Leads'),
+			'url' => '#',
+			'visible' => Yii::$app->user->can(User::PERMISSION_LEAD),
+			'items' => [
+				[
+					'label' => Yii::t('common', 'Browse'),
+					'url' => ['/lead/lead/index'],
+				],
+				[
+					'label' => Yii::t('lead', 'Create Lead'),
+					'url' => ['/lead/lead/create'],
+				],
+				[
+					'label' => Yii::t('lead', 'Campaigns'),
+					'url' => ['/lead/campaign/create'],
+				],
+			],
+		];
+
+		$menuItems[] = [
 			'label' => Yii::t('common', 'Issues'),
 			'url' => ['/issue/index'],
 			'visible' => Yii::$app->user->can(User::PERMISSION_ISSUE),

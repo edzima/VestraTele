@@ -67,7 +67,10 @@ class Module extends BaseModule implements BootstrapInterface {
 		if (is_array($this->userNames)) {
 			return $this->userNames;
 		}
-		return call_user_func($this->userNames);
+		if (is_callable($this->userNames)) {
+			return call_user_func($this->userNames);
+		}
+		throw new InvalidConfigException('$userNames must be array or callable.');
 	}
 
 	private static function instance(): self {

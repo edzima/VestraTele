@@ -1,6 +1,8 @@
 <?php
 
 use common\modules\lead\models\LeadCampaign;
+use common\modules\lead\Module;
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -16,8 +18,16 @@ use yii\widgets\ActiveForm;
 	); ?>
 
 	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-	
-	<?= $form->field($model, 'owner_id')->textInput() ?>
+
+	<?= !Module::getInstance()->onlyUser
+		? $form->field($model, 'owner_id')->widget(Select2::class, [
+			'data' => Module::userNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('owner_id'),
+				'allowClear' => true,
+			],
+		])
+		: '' ?>
 
 	<?= $form->field($model, 'sort_index')->textInput() ?>
 

@@ -1,9 +1,10 @@
 <?php
 
+use common\modules\lead\models\LeadCampaign;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model common\modules\lead\models\LeadType */
+/* @var $model LeadCampaign */
 
 $this->title = Yii::t('lead', 'Create Lead Campaign');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];

@@ -6,7 +6,6 @@ use common\modules\lead\models\forms\LeadForm;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
 use yii\base\ActionFilter;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -42,7 +41,7 @@ class LeadController extends BaseController {
 		$searchModel = new LeadSearch();
 		if ($this->module->onlyUser) {
 			if (Yii::$app->user->getIsGuest()) {
-				throw new ForbiddenHttpException();
+				return Yii::$app->user->loginRequired();
 			}
 			$searchModel->user_id = Yii::$app->user->getId();
 		}

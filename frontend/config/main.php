@@ -29,12 +29,16 @@ return [
 			'class' => LeadModule::class,
 			'onlyUser' => true,
 			'allowDelete' => false,
+			'userClass' => User::class,
+			'userNames' => static function (): array {
+				return User::getSelectList([Yii::$app->user->getId()]);
+			},
 			'as access' => [
 				'class' => GlobalAccessBehavior::class,
 				'rules' => [
 					[
 						'allow' => true,
-						'controllers' => ['lead/lead'],
+						'controllers' => ['lead/lead', 'lead/campaign'],
 						'permissions' => [User::PERMISSION_LEAD],
 					],
 				],

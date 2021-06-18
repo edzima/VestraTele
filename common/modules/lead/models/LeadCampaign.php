@@ -22,6 +22,8 @@ use yii\helpers\ArrayHelper;
  */
 class LeadCampaign extends ActiveRecord {
 
+	public const SCENARIO_OWNER = 'owner';
+
 	private static ?array $models = null;
 
 	public function __toString(): string {
@@ -43,6 +45,7 @@ class LeadCampaign extends ActiveRecord {
 			[['name'], 'required'],
 			[['sort_index'], 'integer'],
 			[['name'], 'string', 'max' => 255],
+			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['name', 'owner_id'], 'unique', 'targetAttribute' => ['name', 'owner_id']],
 			[['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => static::class, 'targetAttribute' => ['parent_id' => 'id']],
 			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['owner_id' => 'id']],
@@ -68,11 +71,15 @@ class LeadCampaign extends ActiveRecord {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getLeads() {
-		return $this->hasMany(Lead::class, ['type_id' => 'id']);
+		return $this->hasMany(Lead::class, ['campaign_id' => 'id']);
 	}
 
 	public function getParent(): ActiveQuery {
 		return $this->hasOne(static::class, ['parent_id' => 'id']);
+	}
+
+	public function getOwner(): ActiveQuery {
+		return $this->hasOne(Module::userClass(), ['id' => 'owner_id']);
 	}
 
 	public static function getNames(): array {
