@@ -17,7 +17,7 @@ class SourceController extends BaseController {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
 				'class' => VerbFilter::class,
@@ -35,11 +35,22 @@ class SourceController extends BaseController {
 	 */
 	public function actionIndex() {
 		$searchModel = new LeadSourceSearch();
+
+		if ($this->module->onlyUser) {
+			if (Yii::$app->user->getIsGuest()) {
+				return Yii::$app->user->loginRequired();
+			}
+			$searchModel->setScenario(LeadSourceSearch::SCENARIO_OWNER);
+			$searchModel->owner_id = Yii::$app->user->getId();
+		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+			'visibleButtons' => [
+				'delete' => $this->module->allowDelete,
+			],
 		]);
 	}
 
@@ -64,6 +75,11 @@ class SourceController extends BaseController {
 	 */
 	public function actionCreate() {
 		$model = new LeadSourceForm();
+
+		if ($this->module->onlyUser) {
+			$model->setScenario(LeadSourceForm::SCENARIO_OWNER);
+			$model->owner_id = Yii::$app->user->getId();
+		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
@@ -118,8 +134,12 @@ class SourceController extends BaseController {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	protected function findModel(int $id): LeadSource {
-		if (($model = LeadSource::findOne($id)) !== null) {
-			return $model;
+		$model = LeadSource::findOne($id);
+		if ($model !== null) {
+			if (!$this->module->onlyUser
+				|| ($model->owner_id !== null && $model->owner_id === (int) Yii::$app->user->getId())) {
+				return $model;
+			}
 		}
 
 		throw new NotFoundHttpException(Yii::t('lead', 'The requested page does not exist.'));

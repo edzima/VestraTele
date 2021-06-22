@@ -1,12 +1,14 @@
 <?php
 
 use common\modules\lead\models\searches\LeadSourceSearch;
+use common\widgets\grid\ActionColumn;
+use common\widgets\GridView;
 use yii\helpers\Html;
-use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadSourceSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $visibleButtons array */
 
 $this->title = Yii::t('lead', 'Lead Sources');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
@@ -23,6 +25,7 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Sources');
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
 	<?= GridView::widget([
+		'id' => 'lead-source-grid',
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
@@ -38,10 +41,18 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Sources');
 			],
 			'url',
 			'phone',
-			'owner',
+			[
+				'attribute' => 'owner_id',
+				'value' => 'owner',
+				'filter' => $searchModel::getTypesNames(),
+				'label' => Yii::t('lead', 'Owner'),
+				'visible' => $searchModel->scenario !== $searchModel::SCENARIO_OWNER,
+			],
 			'sort_index',
-
-			['class' => 'yii\grid\ActionColumn'],
+			[
+				'class' => ActionColumn::class,
+				'visibleButtons' => $visibleButtons,
+			],
 		],
 	]); ?>
 

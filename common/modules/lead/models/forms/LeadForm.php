@@ -14,6 +14,7 @@ use DateTime;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\base\Model;
+use yii\behaviors\AttributeTypecastBehavior;
 use yii\helpers\Json;
 
 class LeadForm extends Model implements LeadInterface {
@@ -39,6 +40,14 @@ class LeadForm extends Model implements LeadInterface {
 
 	public string $dateFormat = 'Y-m-d H:i:s';
 
+	public function behaviors(): array {
+		return [
+			'typecast' => [
+				'class' => AttributeTypecastBehavior::class,
+			],
+		];
+	}
+
 	public function rules(): array {
 		return [
 			[['source_id', 'status_id', 'date_at'], 'required'],
@@ -54,6 +63,7 @@ class LeadForm extends Model implements LeadInterface {
 			],
 			[['status_id', 'source_id', 'campaign_id', 'agent_id', 'owner_id', 'tele_id'], 'integer'],
 			[['phone', 'postal_code', 'email'], 'string'],
+			[['campaign_id'], 'default', 'value' => null],
 			['postal_code', 'string', 'max' => 6],
 			['email', 'email'],
 			['date_at', 'date', 'format' => 'php:' . $this->dateFormat],
@@ -78,6 +88,7 @@ class LeadForm extends Model implements LeadInterface {
 			'campaign_id' => Yii::t('lead', 'Campaign'),
 			'phone' => Yii::t('lead', 'Phone'),
 			'postal_code' => Yii::t('lead', 'Postal Code'),
+			'provider' => Yii::t('lead', 'Provider'),
 			'data' => Yii::t('lead', 'Data'),
 			'agent_id' => Yii::t('lead', 'Agent'),
 			'owner_id' => Yii::t('lead', 'Owner'),

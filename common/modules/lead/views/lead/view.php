@@ -1,6 +1,7 @@
 <?php
 
 use common\modules\lead\models\Lead;
+use common\modules\lead\Module;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
 use common\modules\reminder\widgets\ReminderGridWidget;
@@ -32,13 +33,14 @@ YiiAsset::register($this);
 
 		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
-		<?= Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->id], [
-			'class' => 'btn btn-danger',
-			'data' => [
-				'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
-				'method' => 'post',
-			],
-		]) ?>
+		<?= Module::getInstance()->allowDelete
+			? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->id], [
+				'class' => 'btn btn-danger',
+				'data' => [
+					'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
+					'method' => 'post',
+				],
+			]) : '' ?>
 	</p>
 
 	<div class="row">

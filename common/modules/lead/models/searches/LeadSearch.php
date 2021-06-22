@@ -25,6 +25,8 @@ use yii\helpers\StringHelper;
  */
 class LeadSearch extends Lead implements SearchModel {
 
+	public const SCENARIO_USER = 'user';
+
 	private const QUESTION_ATTRIBUTE_PREFIX = 'question';
 
 	public $user_id;
@@ -52,6 +54,7 @@ class LeadSearch extends Lead implements SearchModel {
 	public function rules(): array {
 		return [
 			[['id', 'status_id', 'type_id', 'source_id', 'user_id'], 'integer'],
+			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions'], 'safe'],
 			[array_keys($this->questionsAttributes), 'safe'],
 		];
@@ -139,8 +142,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->addressSearch->load($params);
 
 		if (!$this->validate()) {
-			// uncomment the following line if you do not want to return any records when validation fails
-			// $query->where('0=1');
+			$query->where('0=1');
 			return $dataProvider;
 		}
 

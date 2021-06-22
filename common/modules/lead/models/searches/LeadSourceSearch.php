@@ -17,6 +17,7 @@ class LeadSourceSearch extends LeadSource {
 	 */
 	public function rules(): array {
 		return [
+			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['id', 'sort_index', 'owner_id', 'type_id'], 'integer'],
 			[['name', 'url', 'phone'], 'safe'],
 		];
@@ -51,8 +52,7 @@ class LeadSourceSearch extends LeadSource {
 		$this->load($params);
 
 		if (!$this->validate()) {
-			// uncomment the following line if you do not want to return any records when validation fails
-			// $query->where('0=1');
+			$query->where('0=1');
 			return $dataProvider;
 		}
 

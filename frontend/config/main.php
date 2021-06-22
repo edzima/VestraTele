@@ -38,7 +38,11 @@ return [
 				'rules' => [
 					[
 						'allow' => true,
-						'controllers' => ['lead/lead', 'lead/campaign'],
+						'controllers' => [
+							'lead/lead',
+							'lead/campaign',
+							'lead/source',
+						],
 						'permissions' => [User::PERMISSION_LEAD],
 					],
 				],

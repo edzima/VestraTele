@@ -17,6 +17,7 @@ class LeadCampaignSearch extends LeadCampaign {
 	public function rules(): array {
 		return [
 			[['id', 'sort_index', 'owner_id'], 'integer'],
+			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['name'], 'safe'],
 		];
 	}
@@ -48,8 +49,7 @@ class LeadCampaignSearch extends LeadCampaign {
 		$this->load($params);
 
 		if (!$this->validate()) {
-			// uncomment the following line if you do not want to return any records when validation fails
-			// $query->where('0=1');
+			$query->where('0=1');
 			return $dataProvider;
 		}
 

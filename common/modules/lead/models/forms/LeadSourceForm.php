@@ -14,6 +14,8 @@ use yii\db\QueryInterface;
 
 class LeadSourceForm extends Model implements LeadSourceInterface {
 
+	public const SCENARIO_OWNER = 'owner';
+
 	public string $name = '';
 	public string $type_id = '';
 	public ?string $url = null;
@@ -34,6 +36,7 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 	public function rules(): array {
 		return [
 			[['name', 'type_id'], 'required'],
+			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['type_id', 'owner_id'], 'integer'],
 			[['name', 'url'], 'string', 'max' => 255],
 			[['phone'], 'string', 'max' => 30],
@@ -56,6 +59,8 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 		return [
 			'name' => Yii::t('lead', 'Name'),
 			'type_id' => Yii::t('lead', 'Type'),
+			'phone' => Yii::t('lead', 'Phone'),
+			'sort_index' => Yii::t('lead', 'Sort Index'),
 		];
 	}
 

@@ -19,10 +19,12 @@ use yii\helpers\ArrayHelper;
  * @property int|null $sort_index
  * @property int|null $owner_id
  *
- * @property-read  Lead[] $leads
+ * @property-read Lead[] $leads
  * @property-read LeadType $leadType
  */
 class LeadSource extends ActiveRecord implements LeadSourceInterface {
+
+	public const SCENARIO_OWNER = 'owner';
 
 	private static ?array $models = null;
 
@@ -43,6 +45,7 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 	public function rules(): array {
 		return [
 			[['name', 'type_id'], 'required'],
+			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['sort_index'], 'integer'],
 			[['name', 'url'], 'string', 'max' => 255],
 			['phone', 'string', 'max' => 30],

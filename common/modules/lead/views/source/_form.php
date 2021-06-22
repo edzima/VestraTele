@@ -24,14 +24,16 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'owner_id')->widget(Select2::class, [
-		'data' => LeadSourceForm::getUsersNames(),
-		'pluginOptions' => [
-			'placeholder' => $model->getAttributeLabel('owner_id'),
-			'allowClear' => true,
-		],
+	<?= $model->scenario !== LeadSourceForm::SCENARIO_OWNER
+		? $form->field($model, 'owner_id')->widget(Select2::class, [
+			'data' => LeadSourceForm::getUsersNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('owner_id'),
+				'allowClear' => true,
+			],
 
-	]) ?>
+		])
+		: '' ?>
 
 	<?= $form->field($model, 'sort_index')->textInput() ?>
 

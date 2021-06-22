@@ -31,13 +31,14 @@ use yii\widgets\ActiveForm;
 			],
 		]) ?>
 
-		<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
-			'data' => LeadSearch::getUsersNames(),
-			'pluginOptions' => [
-				'placeholder' => $model->getAttributeLabel('user_id'),
-				'allowClear' => true,
-			],
-		])
+		<?= $model->scenario !== LeadSearch::SCENARIO_USER
+			? $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+				'data' => LeadSearch::getUsersNames(),
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('user_id'),
+					'allowClear' => true,
+				],
+			]) : ''
 		?>
 
 

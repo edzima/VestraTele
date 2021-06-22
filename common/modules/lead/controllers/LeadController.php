@@ -5,7 +5,6 @@ namespace common\modules\lead\controllers;
 use common\modules\lead\models\forms\LeadForm;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
-use yii\base\ActionFilter;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -25,10 +24,6 @@ class LeadController extends BaseController {
 					'delete' => ['POST'],
 				],
 			],
-			'action' => [
-				'class' => ActionFilter::class,
-				'except' => $this->module->allowDelete ? [] : ['delete'],
-			],
 		];
 	}
 
@@ -43,11 +38,11 @@ class LeadController extends BaseController {
 			if (Yii::$app->user->getIsGuest()) {
 				return Yii::$app->user->loginRequired();
 			}
+			$searchModel->setScenario(LeadSearch::SCENARIO_USER);
 			$searchModel->user_id = Yii::$app->user->getId();
 		}
 
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
@@ -81,7 +76,10 @@ class LeadController extends BaseController {
 		$model->date_at = date($model->dateFormat);
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 			$lead = $this->module->manager->pushLead($model);
-			return $this->redirect(['view', 'id' => $lead->getId()]);
+			if ($lead) {
+				Yii::$app->session->addFlash('success', Yii::t('lead', 'Success create Lead.'));
+				return $this->redirect(['view', 'id' => $lead->getId()]);
+			}
 		}
 
 		return $this->render('create', [

@@ -38,6 +38,7 @@ class CampaignController extends BaseController {
 			if (Yii::$app->user->getIsGuest()) {
 				return Yii::$app->user->loginRequired();
 			}
+			$searchModel->setScenario(LeadCampaignSearch::SCENARIO_OWNER);
 			$searchModel->owner_id = Yii::$app->user->getId();
 		}
 
@@ -46,6 +47,9 @@ class CampaignController extends BaseController {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+			'visibleButtons' => [
+				'delete' => $this->module->allowDelete,
+			],
 		]);
 	}
 

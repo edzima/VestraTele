@@ -19,7 +19,7 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-	<?= !Module::getInstance()->onlyUser
+	<?= $model->getScenario() !== LeadCampaign::SCENARIO_OWNER
 		? $form->field($model, 'owner_id')->widget(Select2::class, [
 			'data' => Module::userNames(),
 			'pluginOptions' => [

@@ -14,6 +14,8 @@ class LeadCest {
 
 	/* @see LeadController::actionIndex() */
 	private const ROUTE_INDEX = '/lead/lead/index';
+	/* @see LeadController::actionCreate() */
+	private const ROUTE_CREATE = '/lead/lead/create';
 	/* @see LeadController::actionView() */
 	private const ROUTE_VIEW = '/lead/lead/view';
 	/* @see LeadController::actionDelete() */
@@ -65,6 +67,34 @@ class LeadCest {
 		$I->see('Showing 1-2 of 2 items.', static::SELECTOR_LEAD_GRID);
 	}
 
+	public function trySearchNotSelfLeads(FunctionalTester $I): void {
+		$I->amLoggedInAs(1);
+		$I->assignPermission(User::PERMISSION_LEAD);
+		$I->amOnRoute(static::ROUTE_INDEX, [
+			'LeadSearch[user_id]' => 2,
+		]);
+		//	$I->see('Showing 1-1 of 1 item.', static::SELECTOR_LEAD_GRID);
+
+	}
+
+	public function checkCreateEmpty(FunctionalTester $I): void {
+		$I->amLoggedInAs(1);
+		$I->assignPermission(User::PERMISSION_LEAD);
+		$I->amOnRoute(static::ROUTE_CREATE);
+		$I->click('Save');
+		$I->seeValidationError('Phone cannot be blank when email is blank.');
+		$I->seeValidationError('Email cannot be blank when phone is blank.');
+	}
+
+	public function checkCreateOnlyPhone(FunctionalTester $I): void {
+		$I->amLoggedInAs(1);
+		$I->assignPermission(User::PERMISSION_LEAD);
+		$I->amOnRoute(static::ROUTE_CREATE);
+		$I->fillField('Phone', '789-789-789');
+		$I->click('Save');
+		$I->seeInCurrentUrl(static::ROUTE_VIEW);
+	}
+
 	public function checkViewPageSelfLead(FunctionalTester $I): void {
 		$I->amLoggedInAs(1);
 		$I->assignPermission(User::PERMISSION_LEAD);
@@ -85,7 +115,7 @@ class LeadCest {
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->dontSeeGridDeleteLink(static::SELECTOR_LEAD_GRID);
 		$I->sendAjaxPostRequest(Url::to([static::ROUTE_DELETE, 'id' => 2]), $I->getCSRF());
-		$I->seeResponseCodeIs(404);
+		$I->seeResponseCodeIs(405);
 	}
 
 }
