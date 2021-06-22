@@ -7,6 +7,7 @@ use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadInterface;
 use Yii;
 use yii\base\Component;
+use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
 
 class LeadManager extends Component {
@@ -38,6 +39,10 @@ class LeadManager extends Component {
 		return $lead->isForUser($userId);
 	}
 
+	/**
+	 * @param LeadInterface $lead
+	 * @return ActiveLead|ActiveRecord|null
+	 */
 	public function pushLead(LeadInterface $lead): ?ActiveLead {
 		if (empty($lead->getPhone()) && empty($lead->getEmail())) {
 			Yii::warning([

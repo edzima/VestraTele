@@ -108,6 +108,19 @@ class LeadSearchTest extends Unit {
 		}
 	}
 
+	public function testEmptyOnUserScenario(): void {
+		$this->model->setScenario(LeadSearch::SCENARIO_USER);
+		$this->tester->assertEmpty($this->getSearchModels());
+		$this->tester->assertSame('User cannot be blank.', $this->model->getFirstError('user_id'));
+	}
+
+	public function testLoadOtherUserOnUserScenario(): void {
+		$this->model->setScenario(LeadSearch::SCENARIO_USER);
+		$this->model->user_id = 1;
+		$this->model->load(['user_id' => 2], '');
+		$this->assertSame(1, $this->model->user_id);
+	}
+
 	public function testAnswerForQuestionWithPlaceholder(): void {
 		$this->model->answers = [
 			1 => 'Joh',

@@ -39,26 +39,7 @@ AppAsset::register($this);
 	if (Yii::$app->user->isGuest) {
 		$menuItems[] = ['label' => Yii::t('frontend', 'Login'), 'url' => ['/site/login']];
 	} else {
-		$menuItems[] = [
-			'label' => 'Lead',
-			'url' => '#',
-			'visible' => Yii::$app->user->can(User::PERMISSION_MEET),
 
-			'items' => [
-				[
-					'label' => Yii::t('common', 'Browse'),
-					'url' => ['/meet/index'],
-				],
-				[
-					'label' => 'Nowy',
-					'url' => ['/meet/create'],
-				],
-				[
-					'label' => 'Kalendarz',
-					'url' => ['/meet-calendar/index'],
-				],
-			],
-		];
 
 		$menuItems[] = [
 			'label' => Yii::t('lead', 'Leads'),
@@ -75,7 +56,11 @@ AppAsset::register($this);
 				],
 				[
 					'label' => Yii::t('lead', 'Campaigns'),
-					'url' => ['/lead/campaign/create'],
+					'url' => ['/lead/campaign/index'],
+				],
+				[
+					'label' => Yii::t('lead', 'Sources'),
+					'url' => ['/lead/source/index'],
 				],
 			],
 		];
