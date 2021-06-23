@@ -30,7 +30,7 @@ class BaseController extends Controller {
 	}
 
 	protected function attachBeforeDeleteAction(): void {
-		if ($this->allowDelete) {
+		if (!$this->allowDelete) {
 			$this->on(static::EVENT_BEFORE_ACTION, function (ActionEvent $actionEvent): void {
 				if ($actionEvent->action->id === $this->deleteAction) {
 					Yii::warning([
