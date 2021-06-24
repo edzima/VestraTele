@@ -5,6 +5,7 @@ namespace common\modules\lead\models\searches;
 use common\models\AddressSearch;
 use common\models\SearchModel;
 use common\models\user\User;
+use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
@@ -53,7 +54,7 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'status_id', 'type_id', 'source_id', 'user_id'], 'integer'],
+			[['id', 'status_id', 'type_id', 'source_id', 'user_id', 'campaign_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions'], 'safe'],
 			[array_keys($this->questionsAttributes), 'safe'],
@@ -128,6 +129,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$query = Lead::find()
 			->joinWith('leadSource S')
 			->with('status')
+			->with('campaign')
 			//		->joinWith('addresses.address')
 			->joinWith('answers')
 			->groupBy(Lead::tableName() . '.id');
@@ -233,7 +235,10 @@ class LeadSearch extends Lead implements SearchModel {
 		return LeadType::getNames();
 	}
 
-	public static function getSourcesNames(): array {
+	public function getSourcesNames(): array {
+		if ($this->scenario === static::SCENARIO_USER) {
+			return LeadSource::getNames($this->user_id, true, false);
+		}
 		return LeadSource::getNames();
 	}
 
@@ -268,6 +273,10 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private static function removeQuestionAttributePrefix(string $attribute): int {
 		return substr($attribute, strlen(static::QUESTION_ATTRIBUTE_PREFIX));
+	}
+
+	public function getCampaignNames(): array {
+		return LeadCampaign::getNames();
 	}
 
 }

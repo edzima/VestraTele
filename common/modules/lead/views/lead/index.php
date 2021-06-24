@@ -61,8 +61,14 @@ foreach (LeadSearch::questions() as $question) {
 			[
 				'attribute' => 'source_id',
 				'value' => 'source',
-				'filter' => $searchModel::getSourcesNames(),
+				'filter' => $searchModel->getSourcesNames(),
 				'label' => Yii::t('lead', 'Source'),
+			],
+			[
+				'attribute' => 'campaign_id',
+				'value' => 'campaign',
+				'filter' => $searchModel->getCampaignNames(),
+				'label' => Yii::t('lead', 'Campaign'),
 			],
 			'date_at',
 			'phone',

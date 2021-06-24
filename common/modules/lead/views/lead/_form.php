@@ -16,11 +16,11 @@ use yii\widgets\ActiveForm;
 	<?php $form = ActiveForm::begin(); ?>
 
 	<div class="row">
-		<?= $form->field($model, 'source_id', ['options' => ['class' => 'col-md-4']])->dropDownList(LeadForm::getSourcesNames()) ?>
+		<?= $form->field($model, 'source_id', ['options' => ['class' => 'col-md-4']])->dropDownList($model->getSourcesNames()) ?>
 
 		<?= $form->field($model, 'provider', ['options' => ['class' => 'col-md-2']])->dropDownList(LeadForm::getProvidersNames(), ['prompt' => Yii::t('lead', '--- Select ---')]) ?>
 
-		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getCampaignsNames(), ['prompt' => Yii::t('lead', '--- Select ---')]) ?>
+		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-3']])->dropDownList($model->getCampaignsNames(), ['prompt' => Yii::t('lead', '--- Select ---')]) ?>
 
 		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getStatusNames()) ?>
 

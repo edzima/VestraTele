@@ -82,7 +82,8 @@ class LeadCampaign extends ActiveRecord {
 		return $this->hasOne(Module::userClass(), ['id' => 'owner_id']);
 	}
 
-	public static function getNames(): array {
+	public static function getNames(int $owner_id = null): array {
+		//@todo add getter for Owner and without owners.
 		return ArrayHelper::map(static::getModels(), 'id', 'name');
 	}
 

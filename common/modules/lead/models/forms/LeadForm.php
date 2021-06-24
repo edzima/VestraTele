@@ -13,6 +13,7 @@ use common\modules\lead\Module;
 use DateTime;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\behaviors\AttributeTypecastBehavior;
 use yii\helpers\Json;
@@ -22,6 +23,8 @@ class LeadForm extends Model implements LeadInterface {
 	public const USER_OWNER = LeadUser::TYPE_OWNER;
 	public const USER_AGENT = LeadUser::TYPE_AGENT;
 	public const USER_TELE = LeadUser::TYPE_TELE;
+
+	public const SCENARIO_OWNER = 'owner';
 
 	public $campaign_id;
 	public $source_id;
@@ -51,6 +54,7 @@ class LeadForm extends Model implements LeadInterface {
 	public function rules(): array {
 		return [
 			[['source_id', 'status_id', 'date_at'], 'required'],
+			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[
 				'phone', 'required', 'enableClientValidation' => false, 'when' => function () {
 				return empty($this->email);
@@ -73,10 +77,10 @@ class LeadForm extends Model implements LeadInterface {
 				return array_keys(static::getUsersNames());
 			},
 			],
-			['campaign_id', 'in', 'range' => array_keys(static::getCampaignsNames())],
+			['campaign_id', 'in', 'range' => array_keys($this->getCampaignsNames())],
 			['provider', 'in', 'range' => array_keys(static::getProvidersNames())],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
-			['source_id', 'in', 'range' => array_keys(static::getSourcesNames())],
+			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 		];
 	}
 
@@ -184,11 +188,26 @@ class LeadForm extends Model implements LeadInterface {
 		return $this->owner_id;
 	}
 
-	public static function getCampaignsNames(): array {
+	public function getCampaignsNames(): array {
+		if ($this->scenario === static::SCENARIO_OWNER) {
+			if (!is_int($this->owner_id)) {
+				throw new InvalidConfigException('Owner must be integer.');
+			}
+			return LeadCampaign::getNames($this->owner_id);
+		}
 		return LeadCampaign::getNames();
 	}
 
-	public static function getSourcesNames(): array {
+	/**
+	 * @throws InvalidConfigException
+	 */
+	public function getSourcesNames(): array {
+		if ($this->scenario === static::SCENARIO_OWNER) {
+			if (!is_int($this->owner_id)) {
+				throw new InvalidConfigException('Owner must be integer.');
+			}
+			return LeadSource::getNames($this->owner_id);
+		}
 		return LeadSource::getNames();
 	}
 

@@ -7,6 +7,7 @@ use common\models\user\User;
 use common\modules\lead\controllers\LeadController;
 use common\modules\lead\Module;
 use common\tests\helpers\LeadFactory;
+use frontend\tests\_support\LeadTester;
 use frontend\tests\FunctionalTester;
 use yii\helpers\Url;
 
@@ -38,11 +39,21 @@ class LeadCest {
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkWithPermission(FunctionalTester $I): void {
-		$I->amLoggedInAs(1);
-		$I->assignPermission(User::PERMISSION_LEAD);
+	public function checkWithPermission(LeadTester $I): void {
+		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeResponseCodeIsSuccessful();
+	}
+
+	public function checkIndexPage(LeadTester $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeInGridHeader('Type');
+		$I->seeInGridHeader('Status');
+		$I->seeInGridHeader('Source');
+		$I->seeInGridHeader('Campaign');
+		$I->seeInGridHeader('Phone');
+		$I->seeInGridHeader('Reports');
 	}
 
 	public function checkAsUserWithoutLeads(FunctionalTester $I): void {
@@ -73,8 +84,6 @@ class LeadCest {
 		$I->amOnRoute(static::ROUTE_INDEX, [
 			'LeadSearch[user_id]' => 2,
 		]);
-		//	$I->see('Showing 1-1 of 1 item.', static::SELECTOR_LEAD_GRID);
-
 	}
 
 	public function checkCreateEmpty(FunctionalTester $I): void {

@@ -74,6 +74,10 @@ class LeadController extends BaseController {
 	public function actionCreate() {
 		$model = new LeadForm();
 		$model->date_at = date($model->dateFormat);
+		if ($this->module->onlyUser) {
+			$model->setScenario(LeadForm::SCENARIO_OWNER);
+			$model->owner_id = Yii::$app->user->getId();
+		}
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 			$lead = $this->module->manager->pushLead($model);
 			if ($lead) {

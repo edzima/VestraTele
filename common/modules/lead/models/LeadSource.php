@@ -32,6 +32,13 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 		return $this->name;
 	}
 
+	public function getNameWithOwner(): string {
+		if ($this->owner_id && $this->owner) {
+			return $this->name . ' - ' . $this->owner;
+		}
+		return $this->name;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -85,14 +92,35 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 		return $this->hasOne(Module::userClass(), ['id' => 'owner_id']);
 	}
 
-	public static function getNames(): array {
-		return ArrayHelper::map(static::getModels(), 'id', 'name');
+	public static function getNames(int $owner_id = null, bool $withWithoutOwners = true): array {
+		if ($owner_id === null) {
+			$models = static::getModels();
+		} else {
+			$models = static::find()
+				->joinWith('owner')
+				->andWhere(['owner_id' => $owner_id])
+				->all();
+
+			if ($withWithoutOwners) {
+				$models = array_merge($models, static::find()
+					->andWhere(['owner_id' => null])
+					->all()
+				);
+			}
+		}
+		return ArrayHelper::map($models, 'id', 'nameWithOwner');
+	}
+
+	public static function find() {
+		return parent::find()
+			->orderBy('sort_index');
 	}
 
 	public static function getModels(bool $refresh = false): array {
 		if (static::$models === null || $refresh) {
 			static::$models = static::find()
 				->indexBy('id')
+				->joinWith('owner')
 				->orderBy('sort_index')
 				->all();
 		}

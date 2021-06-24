@@ -45,7 +45,7 @@ return [
 	'Lead Report Schemas' => 'Schematy raportów',
 	'Updated At' => 'Updated At',
 	'URL' => 'URL',
-	'Source' => 'źródło',
+	'Source' => 'Źródło',
 	'Update Lead Report Schema: {name}' => 'Update Lead Report Schema: {name}',
 	'Email cannot be blank when phone is blank.' => 'Email cannot be blank when phone is blank.',
 	'Phone' => 'Telefon',
