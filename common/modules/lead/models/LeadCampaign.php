@@ -107,6 +107,7 @@ class LeadCampaign extends ActiveRecord {
 		if (static::$models === null || $refresh) {
 			static::$models = static::find()
 				->indexBy('id')
+				->joinWith('owner')
 				->orderBy('sort_index')
 				->all();
 		}
