@@ -49,15 +49,31 @@ YiiAsset::register($this);
 				'model' => $model,
 				'attributes' => [
 					'status',
-					'source.type',
+					[
+						'attribute' => 'source.type',
+						'label' => Yii::t('lead', 'Type'),
+					],
 					'source',
-					'campaign',
-					'date_at',
-					'data:ntext',
+					[
+						'attribute' => 'campaign',
+						'visible' => !empty($model->campaign_id),
+					],
+					'date_at:datetime',
+					[
+						'attribute' => 'data',
+						'visible' => !empty($model->getData()),
+						'format' => 'ntext',
+					],
 					'phone',
 					'email:email',
-					'postal_code',
-					'providerName',
+					[
+						'attribute' => 'postal_code',
+						'visible' => !empty($model->postal_code),
+					],
+					[
+						'attribute' => 'providerName',
+						'visible' => !empty($model->provider),
+					],
 				],
 			]) ?>
 
@@ -75,18 +91,22 @@ YiiAsset::register($this);
 				'model' => $model->getCustomerAddress(),
 			]) : '' ?>
 
-			<?= GridView::widget([
-				'dataProvider' => new ActiveDataProvider(['query' => $model->getLeadUsers()->with('user.userProfile')]),
-				'showOnEmpty' => false,
-				'emptyText' => false,
-				'summary' => false,
-				'columns' => [
-					'type', [
-						'label' => Yii::t('lead', 'User'),
-						'value' => 'user.fullName',
+			<?= !Module::getInstance()->onlyUser || count($model->getUsers()) > 1
+				? GridView::widget([
+					'caption' => Yii::t('lead', 'Users'),
+					'dataProvider' => new ActiveDataProvider(['query' => $model->getLeadUsers()->with('user.userProfile')]),
+					'showOnEmpty' => false,
+					'emptyText' => false,
+					'summary' => false,
+					'columns' => [
+						'typeName',
+						[
+							'label' => Yii::t('lead', 'User'),
+							'value' => 'user.fullName',
+						],
 					],
-				],
-			]) ?>
+				])
+				: '' ?>
 
 			<?= ReminderGridWidget::widget([
 				'dataProvider' => new ActiveDataProvider(['query' => $model->getReminders()]),

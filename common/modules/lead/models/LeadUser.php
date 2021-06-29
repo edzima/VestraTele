@@ -54,6 +54,7 @@ class LeadUser extends ActiveRecord {
 			'user_id' => Yii::t('lead', 'User'),
 			'lead_id' => Yii::t('lead', 'Lead'),
 			'type' => Yii::t('lead', 'Type'),
+			'typeName' => Yii::t('lead', 'Type'),
 		];
 	}
 

@@ -21,7 +21,7 @@ use yii\widgets\ActiveForm;
 		'data' => Module::userNames(),
 	]) ?>
 
-	<?= $form->field($model, 'type')->textInput(['maxlength' => true]) ?>
+	<?= $form->field($model, 'type')->dropDownList(LeadUser::getTypesNames()) ?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>

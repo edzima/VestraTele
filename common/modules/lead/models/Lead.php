@@ -77,10 +77,16 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function attributeLabels(): array {
 		return [
+			'date_at' => Yii::t('lead', 'Date At'),
+			'data' => Yii::t('lead', 'Data'),
 			'source_id' => Yii::t('lead', 'Source'),
+			'source' => Yii::t('lead', 'Source'),
 			'status_id' => Yii::t('lead', 'Status'),
 			'provider' => Yii::t('lead', 'Provider'),
+			'providerName' => Yii::t('lead', 'Provider'),
+			'campaign' => Yii::t('lead', 'Campaign'),
 			'phone' => Yii::t('lead', 'Phone'),
+			'postal_code' => Yii::t('lead', 'Postal Code'),
 		];
 	}
 

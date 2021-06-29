@@ -109,6 +109,21 @@ class LeadCest {
 		$I->assignPermission(User::PERMISSION_LEAD);
 		$I->amOnRoute(static::ROUTE_VIEW, ['id' => 1]);
 		$I->seeResponseCodeIsSuccessful();
+		$I->see('Status');
+		$I->see('Type');
+		$I->see('Source');
+		$I->see('Campaign');
+		$I->see('Phone');
+		$I->see('Email');
+		$I->see('Users');
+	}
+
+	public function checkViewPageOnlySelfLead(FunctionalTester $I): void {
+		$I->amLoggedInAs(2);
+		$I->assignPermission(User::PERMISSION_LEAD);
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => 2]);
+		$I->seeResponseCodeIsSuccessful();
+		$I->dontSee('Users');
 	}
 
 	public function checkViewPageNotSelfLead(FunctionalTester $I): void {
