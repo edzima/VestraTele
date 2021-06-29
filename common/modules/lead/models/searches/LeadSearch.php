@@ -57,6 +57,8 @@ class LeadSearch extends Lead implements SearchModel {
 			[['id', 'status_id', 'type_id', 'source_id', 'user_id', 'campaign_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions'], 'safe'],
+			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
+			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			[array_keys($this->questionsAttributes), 'safe'],
 		];
 	}
@@ -157,6 +159,7 @@ class LeadSearch extends Lead implements SearchModel {
 			'id' => $this->id,
 			'date_at' => $this->date_at,
 			Lead::tableName() . '.status_id' => $this->status_id,
+			'campaign_id' => $this->campaign_id,
 			'source_id' => $this->source_id,
 			'S.type_id' => $this->type_id,
 			'provider' => $this->provider,
@@ -227,19 +230,26 @@ class LeadSearch extends Lead implements SearchModel {
 		return $this->addressSearch;
 	}
 
+	public function getCampaignNames(): array {
+		if ($this->getScenario() === static::SCENARIO_USER) {
+			return LeadCampaign::getNames($this->user_id);
+		}
+		return LeadCampaign::getNames();
+	}
+
+	public function getSourcesNames(): array {
+		if ($this->getScenario() === static::SCENARIO_USER) {
+			return LeadSource::getNames($this->user_id);
+		}
+		return LeadSource::getNames();
+	}
+
 	public static function getStatusNames(): array {
 		return LeadStatus::getNames();
 	}
 
 	public static function getTypesNames(): array {
 		return LeadType::getNames();
-	}
-
-	public function getSourcesNames(): array {
-		if ($this->scenario === static::SCENARIO_USER) {
-			return LeadSource::getNames($this->user_id, true, false);
-		}
-		return LeadSource::getNames();
 	}
 
 	public static function getUsersNames(): array {
@@ -273,10 +283,6 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private static function removeQuestionAttributePrefix(string $attribute): int {
 		return substr($attribute, strlen(static::QUESTION_ATTRIBUTE_PREFIX));
-	}
-
-	public function getCampaignNames(): array {
-		return LeadCampaign::getNames();
 	}
 
 }

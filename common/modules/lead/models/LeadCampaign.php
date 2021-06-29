@@ -30,6 +30,13 @@ class LeadCampaign extends ActiveRecord {
 		return $this->name;
 	}
 
+	public function getNameWithOwner(): string {
+		if ($this->owner_id && $this->owner) {
+			return $this->name . ' - ' . $this->owner ?? Yii::t('common', 'Deleted');
+		}
+		return $this->name;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -83,8 +90,13 @@ class LeadCampaign extends ActiveRecord {
 	}
 
 	public static function getNames(int $owner_id = null): array {
-		//@todo add getter for Owner and without owners.
-		return ArrayHelper::map(static::getModels(), 'id', 'name');
+		$models = static::getModels();
+		if ($owner_id) {
+			$models = array_filter($models, static function (LeadCampaign $model) use ($owner_id): bool {
+				return $model->owner_id === null || $model->owner_id === $owner_id;
+			});
+		}
+		return ArrayHelper::map($models, 'id', $owner_id ? 'name' : 'nameWithOwner');
 	}
 
 	/**
