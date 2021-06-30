@@ -81,7 +81,7 @@ class Reminder extends ActiveRecord {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getLeads() {
-		return $this->hasMany(Lead::class, ['id' => 'lead_id'])->viaTable('lead_reminder', ['reminder_id' => 'id']);
+		return $this->hasMany(Lead::class, ['id' => 'lead_id'])->viaTable(LeadReminder::tableName(), ['reminder_id' => 'id']);
 	}
 
 	public function getPriorityName(): string {

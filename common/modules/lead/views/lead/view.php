@@ -29,7 +29,7 @@ YiiAsset::register($this);
 
 		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
 
-		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['/reminder/lead/create', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/reminder/create', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
 		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 

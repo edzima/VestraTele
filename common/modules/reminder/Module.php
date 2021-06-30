@@ -8,4 +8,6 @@ class Module extends BaseModule {
 
 	public $controllerNamespace = 'common\modules\reminder\controllers';
 
+	public string $relatedModel;
+
 }

@@ -6,6 +6,7 @@ use common\modules\lead\models\searches\LeadSearch;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AddressColumn;
 use common\widgets\GridView;
+use kartik\grid\CheckboxColumn;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadSearch */
@@ -41,11 +42,27 @@ foreach (LeadSearch::questions() as $question) {
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
+	<?= Html::beginForm('user/assign', 'POST', [
+		'id' => 'user-assign-form',
+		'data-pjax' => '',
+	]) ?>
+
+	<?= Html::submitButton(
+		Yii::t('lead', 'Link users'),
+		[
+			'class' => 'btn btn-success btn-flat',
+			'id' => 'assign-action-btn',
+		])
+	?>
+
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'id' => 'leads-grid',
 		'columns' => array_merge([
+			[
+				'class' => CheckboxColumn::class,
+			],
 			[
 				'attribute' => 'type_id',
 				'value' => 'source.type',
@@ -96,12 +113,11 @@ foreach (LeadSearch::questions() as $question) {
 							return Html::a(Html::icon('comment'), ['report/report', 'id' => $lead->getId()]);
 						},
 						'reminder' => static function (string $url, ActiveLead $lead): string {
-							return Html::a(Html::icon('calendar'), ['reminder/create', 'id' => $lead->getId()]);
+							return Html::a(Html::icon('calendar'), ['reminder/reminder/create', 'id' => $lead->getId()]);
 						},
 					],
 				],
 			]),
-	]); ?>
-
+	]) ?>
 
 </div>

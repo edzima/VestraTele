@@ -73,6 +73,11 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-table"></i>',
 						],
 						[
+							'label' => Yii::t('reminder', 'Reminders'),
+							'url' => ['/lead/reminder/reminder/index'],
+							'icon' => '<i class="fa fa-table"></i>',
+						],
+						[
 							'label' => Yii::t('lead', 'Answers'),
 							'url' => ['/lead/answer/index'],
 							'icon' => '<i class="fa fa-table"></i>',
