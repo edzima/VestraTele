@@ -11,6 +11,7 @@ use kartik\grid\CheckboxColumn;
 /* @var $this yii\web\View */
 /* @var $searchModel LeadSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $assignUsers bool */
 /* @var $visibleButtons array */
 
 $this->title = Yii::t('lead', 'Leads');
@@ -42,18 +43,22 @@ foreach (LeadSearch::questions() as $question) {
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
-	<?= Html::beginForm('user/assign', 'POST', [
-		'id' => 'user-assign-form',
-		'data-pjax' => '',
-	]) ?>
+	<?php if ($assignUsers): ?>
 
-	<?= Html::submitButton(
-		Yii::t('lead', 'Link users'),
-		[
-			'class' => 'btn btn-success btn-flat',
-			'id' => 'assign-action-btn',
-		])
-	?>
+		<?= Html::beginForm('', 'POST', [
+			'id' => 'user-assign-form',
+			'data-pjax' => '',
+		]) ?>
+
+		<?= Html::submitButton(
+			Yii::t('lead', 'Link users'),
+			[
+				'class' => 'btn btn-success',
+				'id' => 'assign-action-btn',
+			])
+		?>
+
+	<?php endif; ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
@@ -62,6 +67,7 @@ foreach (LeadSearch::questions() as $question) {
 		'columns' => array_merge([
 			[
 				'class' => CheckboxColumn::class,
+				'visible' => $assignUsers,
 			],
 			[
 				'attribute' => 'type_id',
@@ -119,5 +125,7 @@ foreach (LeadSearch::questions() as $question) {
 				],
 			]),
 	]) ?>
+
+	<?= $assignUsers ? Html::endForm() : '' ?>
 
 </div>

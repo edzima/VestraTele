@@ -32,7 +32,10 @@ class LeadController extends BaseController {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionIndex() {
+		if (Yii::$app->request->post('selection')) {
+			return $this->redirect(['user/assign', 'ids' => Yii::$app->request->post('selection')]);
+		}
 		$searchModel = new LeadSearch();
 		if ($this->module->onlyUser) {
 			if (Yii::$app->user->getIsGuest()) {
@@ -46,6 +49,7 @@ class LeadController extends BaseController {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+			'assignUsers' => !$this->module->onlyUser,
 			'visibleButtons' => [
 				'delete' => $this->module->allowDelete,
 			],

@@ -32,12 +32,17 @@ class LeadFixtureHelper {
 		return Yii::getAlias('@common/tests/_data/lead/');
 	}
 
-	public static function leads(): array {
-		return array_merge([
+	public static function lead(): array {
+		return [
 			static::LEAD => [
 				'class' => LeadFixture::class,
 				'dataFile' => static::dataDir() . 'lead.php',
 			],
+		];
+	}
+
+	public static function leads(): array {
+		return array_merge([
 			static::STATUS => [
 				'class' => StatusFixture::class,
 				'dataFile' => static::dataDir() . 'status.php',
@@ -47,6 +52,7 @@ class LeadFixtureHelper {
 				'dataFile' => static::dataDir() . 'type.php',
 			],
 		],
+			static::lead(),
 			static::source(),
 			static::user(),
 		);
@@ -119,6 +125,10 @@ class LeadFixtureHelper {
 
 	public static function user(): array {
 		return [
+			static::USER => [
+				'class' => UserFixture::class,
+				'dataFile' => static::dataDir() . 'user.php',
+			],
 			static::LEAD_USER => [
 				'class' => ActiveFixture::class,
 				'modelClass' => LeadUser::class,

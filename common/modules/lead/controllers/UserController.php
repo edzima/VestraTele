@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\modules\lead\models\forms\LeadsUserForm;
 use Yii;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadUsersSearch;
@@ -39,6 +40,27 @@ class UserController extends BaseController {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	public function actionAssign(array $ids = []) {
+		$model = new LeadsUserForm();
+		$model->leadsIds = array_combine($ids, $ids);
+		if ($model->load(Yii::$app->request->post())) {
+			$count = $model->save();
+			if ($count) {
+				Yii::$app->session->addFlash('success',
+					Yii::t('lead', 'Success assign {user} as {type} to {count} leads.', [
+						'user' => LeadsUserForm::getUsersNames()[$model->userId],
+						'type' => LeadsUserForm::getTypesNames()[$model->type],
+						'count' => $count,
+					])
+				);
+				return $this->redirect(['lead/index']);
+			}
+		}
+		return $this->render('assign', [
+			'model' => $model,
 		]);
 	}
 
