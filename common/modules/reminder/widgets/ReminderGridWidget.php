@@ -2,6 +2,7 @@
 
 namespace common\modules\reminder\widgets;
 
+use Closure;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use Yii;
@@ -12,6 +13,7 @@ class ReminderGridWidget extends GridView {
 	public $emptyText = false;
 	public $summary = false;
 	public string $actionController = '/reminder/reminder';
+	public ?Closure $urlCreator = null;
 
 	public function init(): void {
 		if (empty($this->columns)) {
@@ -37,6 +39,7 @@ class ReminderGridWidget extends GridView {
 			[
 				'class' => ActionColumn::class,
 				'controller' => $this->actionController,
+				'urlCreator' => $this->urlCreator,
 				'template' => '{update} {delete}',
 			],
 		];

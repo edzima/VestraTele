@@ -126,6 +126,7 @@ return [
 	'Update Lead User: {name}' => 'Update Lead User: {name}',
 	'Success assign {user} as {type} to {count} leads.' => 'Pomyślnie przypisano {user} jako {type} do {count} leadów.',
 	'Assign User to Leads' => 'Przypisz użytkownika do leadów',
+	'Lead Reminders' => 'Przypomnienia',
 	'Reminders' => 'Przypomnienia',
 	'Report from: {created_at} ( updated: {updated_at} )' => 'Report from: {created_at} ( updated: {updated_at} )',
 	'User {id} try access to delete action' => 'User {id} try access to delete action',

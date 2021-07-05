@@ -18,7 +18,7 @@ class LeadCest {
 	/* @see LeadController::actionCreate() */
 	private const ROUTE_CREATE = '/lead/lead/create';
 	/* @see LeadController::actionView() */
-	private const ROUTE_VIEW = '/lead/lead/view';
+	public const ROUTE_VIEW = '/lead/lead/view';
 	/* @see LeadController::actionDelete() */
 	private const ROUTE_DELETE = '/lead/lead/delete';
 

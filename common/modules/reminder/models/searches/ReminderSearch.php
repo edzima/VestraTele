@@ -2,6 +2,8 @@
 
 namespace common\modules\reminder\models\searches;
 
+use common\modules\reminder\models\ReminderQuery;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\modules\reminder\models\Reminder;
@@ -11,6 +13,9 @@ use common\modules\reminder\models\Reminder;
  */
 class ReminderSearch extends Reminder {
 
+	public ?bool $onlyToday = false;
+	public ?bool $onlyDelayed = true;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -18,7 +23,17 @@ class ReminderSearch extends Reminder {
 		return [
 			[['id', 'priority', 'created_at', 'updated_at'], 'integer'],
 			[['date_at', 'details'], 'safe'],
+			[['onlyDelayed', 'onlyToday'], 'boolean'],
 		];
+	}
+
+	public function attributeLabels(): array {
+		return array_merge(
+			parent::attributeLabels(), [
+			'onlyToday' => Yii::t('common', 'Only Today'),
+			'onlyDelayed' => Yii::t('common', 'Only Delayed'),
+
+		]);
 	}
 
 	/**
@@ -54,16 +69,28 @@ class ReminderSearch extends Reminder {
 		}
 
 		// grid filtering conditions
+		$this->applyReminderFilter($query);
+
+		return $dataProvider;
+	}
+
+	protected function applyReminderFilter(ReminderQuery $query): void {
+		$this->applyDateFilter($query);
 		$query->andFilterWhere([
-			'id' => $this->id,
 			'priority' => $this->priority,
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,
-			'date_at' => $this->date_at,
 		]);
 
 		$query->andFilterWhere(['like', 'details', $this->details]);
+	}
 
-		return $dataProvider;
+	protected function applyDateFilter(ReminderQuery $query): void {
+		if ($this->onlyToday) {
+			$query->onlyToday();
+		}
+		if ($this->onlyDelayed) {
+			$query->onlyDelayed();
+		}
 	}
 }

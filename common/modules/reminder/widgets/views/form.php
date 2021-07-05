@@ -7,13 +7,14 @@ use common\widgets\DateTimeWidget;
 
 /* @var $this \yii\web\View */
 /* @var $model ReminderForm */
+/* @var $options array */
 
 ?>
 
 
 <div class="reminder-form">
 
-	<?php $form = ActiveForm::begin(); ?>
+	<?php $form = ActiveForm::begin($options); ?>
 
 	<?= $form->field($model, 'priority')->dropDownList($model::getPriorityNames()) ?>
 

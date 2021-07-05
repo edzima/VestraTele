@@ -55,6 +55,10 @@ AppAsset::register($this);
 					'url' => ['/lead/lead/create'],
 				],
 				[
+					'label' => Yii::t('lead', 'Reminders'),
+					'url' => ['/lead/reminder/index'],
+				],
+				[
 					'label' => Yii::t('lead', 'Campaigns'),
 					'url' => ['/lead/campaign/index'],
 				],

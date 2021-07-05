@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+
 	'Address' => 'Adres',
 	'Active' => 'Aktywny',
 	'administrator' => 'Admin',
@@ -288,4 +289,6 @@ return [
 	'{createdAt} - (updated: {updatedAt})' => '{createdAt} - (edytowano: {updatedAt})',
 	'Created At' => 'Dodano',
 	'Select ...' => 'Select ...',
+	'Only Today' => 'Na dziś',
+	'Only Delayed' => 'Opóźnione',
 ];

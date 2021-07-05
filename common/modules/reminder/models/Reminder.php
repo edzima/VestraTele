@@ -95,4 +95,8 @@ class Reminder extends ActiveRecord {
 			static::PRIORITY_HIGH => Yii::t('common', 'High'),
 		];
 	}
+
+	public static function find(): ReminderQuery {
+		return new ReminderQuery(static::class);
+	}
 }

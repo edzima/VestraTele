@@ -1,5 +1,6 @@
 <?php
 
+use common\helpers\Url;
 use common\modules\lead\models\Lead;
 use common\modules\lead\Module;
 use common\modules\lead\widgets\LeadAnswersWidget;
@@ -29,7 +30,7 @@ YiiAsset::register($this);
 
 		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
 
-		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/reminder/create', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
 		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
@@ -110,6 +111,13 @@ YiiAsset::register($this);
 
 			<?= ReminderGridWidget::widget([
 				'dataProvider' => new ActiveDataProvider(['query' => $model->getReminders()]),
+				'urlCreator' => function ($action, $reminder, $key, $index) use ($model) {
+					return Url::toRoute([
+						'reminder/' . $action,
+						'reminder_id' => $reminder->id,
+						'lead_id' => $model->getId(),
+					]);
+				},
 			]) ?>
 
 		</div>

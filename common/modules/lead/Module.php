@@ -6,7 +6,6 @@ use common\modules\lead\components\LeadManager;
 use yii\base\BootstrapInterface;
 use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
-use common\modules\reminder\Module as ReminderModule;
 
 /**
  * Class Module
@@ -26,10 +25,6 @@ class Module extends BaseModule implements BootstrapInterface {
 	public bool $onlyUser = false;
 	public bool $allowDelete = true;
 
-	public array $reminderModule = [
-		'class' => ReminderModule::class,
-	];
-
 	public $components = [
 		'manager' => [
 			'class' => LeadManager::class,
@@ -38,9 +33,6 @@ class Module extends BaseModule implements BootstrapInterface {
 
 	public function init(): void {
 		parent::init();
-		if (!empty($this->reminderModule)) {
-			$this->setModule(static::REMINDER_MODULE_ID, $this->reminderModule);
-		}
 		$this->setComponents($this->components);
 		if ($this->onlyUser) {
 			$this->manager->onlyForUser = true;

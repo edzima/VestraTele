@@ -42,6 +42,7 @@ return [
 							'lead/lead',
 							'lead/campaign',
 							'lead/source',
+							'lead/reminder',
 						],
 						'permissions' => [User::PERMISSION_LEAD],
 					],

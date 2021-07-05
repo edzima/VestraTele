@@ -2,11 +2,13 @@
 
 namespace common\fixtures\helpers;
 
+use common\fixtures\ReminderFixture;
 use common\modules\lead\fixtures\CampaignFixture;
 use common\modules\lead\fixtures\LeadAnswerFixture;
 use common\modules\lead\fixtures\LeadFixture;
 use common\modules\lead\fixtures\LeadReportFixture;
 use common\modules\lead\fixtures\LeadQuestionFixture;
+use common\modules\lead\fixtures\ReminderFixture as LeadReminderFixture;
 use common\modules\lead\fixtures\SourceFixture;
 use common\modules\lead\fixtures\StatusFixture;
 use common\modules\lead\fixtures\TypeFixture;
@@ -26,6 +28,8 @@ class LeadFixtureHelper {
 	private const QUESTION = 'question';
 	private const USER = 'user';
 	private const LEAD_USER = 'lead-user';
+	private const REMINDER = 'reminder';
+	private const LEAD_REMINDER = 'lead-reminder';
 	private const ANSWER = 'answer';
 
 	public static function dataDir(): string {
@@ -133,6 +137,19 @@ class LeadFixtureHelper {
 				'class' => ActiveFixture::class,
 				'modelClass' => LeadUser::class,
 				'dataFile' => static::dataDir() . 'lead-user.php',
+			],
+		];
+	}
+
+	public static function reminder(): array {
+		return [
+			static::REMINDER => [
+				'class' => ReminderFixture::class,
+				'dataFile' => static::dataDir() . 'reminder.php',
+			],
+			static::LEAD_REMINDER => [
+				'class' => LeadReminderFixture::class,
+				'dataFile' => static::dataDir() . 'lead-reminder.php',
 			],
 		];
 	}
