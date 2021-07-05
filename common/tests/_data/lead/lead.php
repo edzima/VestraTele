@@ -17,6 +17,11 @@ return [
 		'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
 		'date_at' => '2020-02-01',
 	],
+	'new-benefits' => [
+		'source_id' => 2,
+		'status_id' => LeadStatusInterface::STATUS_NEW,
+		'date_at' => '2020-01-01',
+	],
 	'new-without-owner' => [
 		'source_id' => 2,
 		'status_id' => LeadStatusInterface::STATUS_NEW,

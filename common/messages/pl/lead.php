@@ -39,7 +39,7 @@ return [
 	'Create Lead Campaign' => 'Dodaj kampanie',
 	'Placeholder' => 'Placeholder',
 	'Description' => 'Description',
-	'User' => 'User',
+	'User' => 'Użytkownik',
 	'Form' => 'Form',
 	'Parent' => 'Parent',
 	'Lead Report Schemas' => 'Schematy raportów',
@@ -131,4 +131,5 @@ return [
 	'Report from: {created_at} ( updated: {updated_at} )' => 'Report from: {created_at} ( updated: {updated_at} )',
 	'User {id} try access to delete action' => 'User {id} try access to delete action',
 	'Link users' => 'Przypisz użytkownika',
+	'Without User' => 'Bez Użytkownika',
 ];

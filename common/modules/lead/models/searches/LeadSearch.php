@@ -30,6 +30,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private const QUESTION_ATTRIBUTE_PREFIX = 'question';
 
+	public bool $withoutUser = false;
 	public $user_id;
 	public $type_id;
 
@@ -56,6 +57,7 @@ class LeadSearch extends Lead implements SearchModel {
 		return [
 			[['id', 'status_id', 'type_id', 'source_id', 'user_id', 'campaign_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
+			['withoutUser', 'boolean'],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
@@ -67,6 +69,7 @@ class LeadSearch extends Lead implements SearchModel {
 		return array_merge(
 			parent::attributeLabels(),
 			[
+				'withoutUser' => Yii::t('lead', 'Without User'),
 				'user_id' => Yii::t('lead', 'User'),
 				'closedQuestions' => Yii::t('lead', 'Closed questions'),
 			]
@@ -192,6 +195,10 @@ class LeadSearch extends Lead implements SearchModel {
 		if (!empty($this->user_id)) {
 			$query->joinWith('leadUsers');
 			$query->andWhere([LeadUser::tableName() . '.user_id' => $this->user_id]);
+		}
+		if ($this->withoutUser) {
+			$query->joinWith('leadUsers', false, 'LEFT OUTER JOIN');
+			$query->andWhere([LeadUser::tableName() . '.user_id' => null]);
 		}
 	}
 

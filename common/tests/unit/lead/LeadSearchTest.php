@@ -114,6 +114,15 @@ class LeadSearchTest extends Unit {
 		$this->tester->assertSame('User cannot be blank.', $this->model->getFirstError('user_id'));
 	}
 
+	public function testWithoutUser(): void {
+		$this->model->withoutUser = true;
+		$models = $this->getSearchModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertEmpty($model->getUsers());
+		}
+	}
+
 	public function testLoadOtherUserOnUserScenario(): void {
 		$this->model->setScenario(LeadSearch::SCENARIO_USER);
 		$this->model->user_id = 1;
