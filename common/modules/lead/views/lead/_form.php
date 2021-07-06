@@ -13,7 +13,9 @@ use yii\widgets\ActiveForm;
 
 <div class="lead-form">
 
-	<?php $form = ActiveForm::begin(); ?>
+	<?php $form = ActiveForm::begin([
+		'id' => 'lead-form',
+	]); ?>
 
 	<div class="row">
 		<?= $form->field($model, 'source_id', ['options' => ['class' => 'col-md-4']])->dropDownList($model->getSourcesNames()) ?>

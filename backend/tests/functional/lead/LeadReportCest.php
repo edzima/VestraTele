@@ -10,6 +10,8 @@ class LeadReportCest {
 
 	/* @see ReportController::actionIndex() */
 	public const ROUTE_INDEX = '/lead/report/index';
+	/* @see ReportController::actionReport() */
+	public const ROUTE_REPORT = '/lead/report/report';
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -37,11 +39,20 @@ class LeadReportCest {
 		$I->seeInGridHeader('Details');
 	}
 
-	public function checkSchemasLinkInIndexPage(LeadManager $I): void {
+	public function checkQuestionsLink(LeadManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeLink('Lead Questions');
 		$I->click('Lead Questions');
 		$I->seeInCurrentUrl(QuestionCest::ROUTE_INDEX);
 	}
+
+	public function checkAnswersLink(LeadManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeLink('Lead Answers');
+		$I->click('Lead Answers');
+		$I->seeInCurrentUrl(AnswerCest::ROUTE_INDEX);
+	}
+
 }

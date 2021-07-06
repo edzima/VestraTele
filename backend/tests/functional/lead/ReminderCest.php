@@ -3,10 +3,14 @@
 namespace backend\tests\functional\lead;
 
 use backend\tests\Step\Functional\LeadManager;
+use common\modules\lead\controllers\ReminderController;
 
 class ReminderCest {
 
+	/* @see ReminderController::actionIndex() */
 	private const ROUTE_INDEX = '/lead/reminder/index';
+	/* @see ReminderController::actionCreate() */
+	public const ROUTE_REPORT = '/lead/reminder/create';
 
 	public function checkMenuLink(LeadManager $I): void {
 		$I->amLoggedIn();
