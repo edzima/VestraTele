@@ -31,6 +31,7 @@ class LeadSearch extends Lead implements SearchModel {
 	private const QUESTION_ATTRIBUTE_PREFIX = 'question';
 
 	public bool $withoutUser = false;
+	public bool $withoutReport = false;
 	public $user_id;
 	public $type_id;
 
@@ -57,7 +58,7 @@ class LeadSearch extends Lead implements SearchModel {
 		return [
 			[['id', 'status_id', 'type_id', 'source_id', 'user_id', 'campaign_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
-			['withoutUser', 'boolean'],
+			[['withoutUser', 'withoutReport'], 'boolean'],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
@@ -70,6 +71,7 @@ class LeadSearch extends Lead implements SearchModel {
 			parent::attributeLabels(),
 			[
 				'withoutUser' => Yii::t('lead', 'Without User'),
+				'withoutReport' => Yii::t('lead', 'Without Report'),
 				'user_id' => Yii::t('lead', 'User'),
 				'closedQuestions' => Yii::t('lead', 'Closed questions'),
 			]
@@ -156,6 +158,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyAddressFilter($query);
 		$this->applyAnswerFilter($query);
 		$this->applyUserFilter($query);
+		$this->applyReportFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -199,6 +202,13 @@ class LeadSearch extends Lead implements SearchModel {
 		if ($this->withoutUser) {
 			$query->joinWith('leadUsers', false, 'LEFT OUTER JOIN');
 			$query->andWhere([LeadUser::tableName() . '.user_id' => null]);
+		}
+	}
+
+	private function applyReportFilter(ActiveQuery $query) {
+		if ($this->withoutReport) {
+			$query->joinWith('reports R', false, 'LEFT OUTER JOIN');
+			$query->andWhere(['R.id' => null]);
 		}
 	}
 

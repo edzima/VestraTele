@@ -49,6 +49,8 @@ class LeadCest {
 		$I->see('Provider', static::SELECTOR_SEARCH_LABEL);
 		$I->see('User', static::SELECTOR_SEARCH_LABEL);
 		$I->see('Without User', static::SELECTOR_SEARCH_LABEL);
+		$I->see('Without Report', static::SELECTOR_SEARCH_LABEL);
+
 		$I->see('Closed Questions', static::SELECTOR_SEARCH_LABEL);
 		$I->see('Region', 'label');
 		$I->see('Code', 'label');

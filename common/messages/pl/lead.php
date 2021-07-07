@@ -131,6 +131,7 @@ return [
 	'Report from: {created_at} ( updated: {updated_at} )' => 'Report from: {created_at} ( updated: {updated_at} )',
 	'User {id} try access to delete action' => 'User {id} try access to delete action',
 	'Link users' => 'Przypisz użytkownika',
-	'Without User' => 'Bez Użytkownika',
-	'With Address' => 'Adres'
+	'Without User' => 'Brak Użytkownika',
+	'Without Report' => 'Brak Raportu',
+	'With Address' => 'Adres',
 ];

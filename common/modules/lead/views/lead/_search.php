@@ -42,9 +42,11 @@ use yii\widgets\ActiveForm;
 		?>
 
 		<?= $model->scenario !== LeadSearch::SCENARIO_USER
-			? $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-3']])->checkbox()
+			? $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-1']])->checkbox()
 			: ''
 		?>
+
+		<?= $form->field($model, 'withoutReport', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
 
 	</div>

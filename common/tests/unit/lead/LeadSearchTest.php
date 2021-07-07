@@ -123,6 +123,15 @@ class LeadSearchTest extends Unit {
 		}
 	}
 
+	public function testWithoutReport(): void {
+		$this->model->withoutReport = true;
+		$models = $this->getSearchModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertEmpty($model->reports);
+		}
+	}
+
 	public function testLoadOtherUserOnUserScenario(): void {
 		$this->model->setScenario(LeadSearch::SCENARIO_USER);
 		$this->model->user_id = 1;
