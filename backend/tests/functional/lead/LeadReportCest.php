@@ -2,9 +2,14 @@
 
 namespace backend\tests\functional\lead;
 
+use backend\tests\FunctionalTester;
 use backend\tests\Step\Functional\LeadManager;
 use backend\tests\Step\Functional\Manager;
+use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\controllers\ReportController;
+use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadStatus;
 
 class LeadReportCest {
 
@@ -12,6 +17,12 @@ class LeadReportCest {
 	public const ROUTE_INDEX = '/lead/report/index';
 	/* @see ReportController::actionReport() */
 	public const ROUTE_REPORT = '/lead/report/report';
+
+	private FunctionalTester $tester;
+
+	public function _before(FunctionalTester $I): void {
+		$this->tester = $I;
+	}
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -53,6 +64,23 @@ class LeadReportCest {
 		$I->seeLink('Lead Answers');
 		$I->click('Lead Answers');
 		$I->seeInCurrentUrl(AnswerCest::ROUTE_INDEX);
+	}
+
+	public function checkReport(LeadManager $I): void {
+		$I->haveFixtures(array_merge(
+			LeadFixtureHelper::leads(),
+			LeadFixtureHelper::reports()
+		));
+		$I->amLoggedIn();
+
+		$lead = $this->grabLead();
+		$I->amOnRoute(static::ROUTE_REPORT, ['id' => $lead->getId()]);
+		$I->see('Create Report: ' . $lead->getId());
+		$I->seeOptionIsSelected('#reportform-status_id', LeadStatus::getNames()[$lead->getStatusId()]);
+	}
+
+	private function grabLead(string $index = 'new-wordpress-accident'): ActiveLead {
+		return $this->tester->grabFixture(LeadFixtureHelper::LEAD, $index);
 	}
 
 }

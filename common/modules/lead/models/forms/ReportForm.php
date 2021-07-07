@@ -54,6 +54,7 @@ class ReportForm extends Model {
 		return [
 			'status_id' => Yii::t('lead', 'Status'),
 			'details' => Yii::t('lead', 'Details'),
+			'withAddress' => Yii::t('lead', 'With Address'),
 		];
 	}
 

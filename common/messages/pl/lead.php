@@ -132,4 +132,5 @@ return [
 	'User {id} try access to delete action' => 'User {id} try access to delete action',
 	'Link users' => 'Przypisz użytkownika',
 	'Without User' => 'Bez Użytkownika',
+	'With Address' => 'Adres'
 ];
