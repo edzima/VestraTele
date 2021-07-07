@@ -60,7 +60,6 @@ use yii\db\Expression;
  * @property int $entity_responsible_id
  * @property string $archives_nr
  * @property int $lawyer_id
- * @property int $tele_id
  * @property bool $payed
  * @property string|null $signing_at
  * @property string|null $type_additional_date_at
@@ -390,7 +389,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function hasTele(): bool {
-		return $this->tele_id !== null && $this->tele !== null;
+		return $this->tele !== null;
 	}
 
 	public function hasLawyer(): bool {
