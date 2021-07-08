@@ -22,7 +22,6 @@ class LeadForm extends Model implements LeadInterface {
 
 	public const USER_OWNER = LeadUser::TYPE_OWNER;
 	public const USER_AGENT = LeadUser::TYPE_AGENT;
-	public const USER_TELE = LeadUser::TYPE_TELE;
 
 	public const SCENARIO_OWNER = 'owner';
 
@@ -39,7 +38,6 @@ class LeadForm extends Model implements LeadInterface {
 
 	public $owner_id;
 	public $agent_id;
-	public $tele_id;
 
 	public string $dateFormat = 'Y-m-d H:i:s';
 
@@ -65,7 +63,7 @@ class LeadForm extends Model implements LeadInterface {
 				return empty($this->phone);
 			}, 'message' => Yii::t('lead', 'Email cannot be blank when phone is blank.'),
 			],
-			[['status_id', 'source_id', 'campaign_id', 'agent_id', 'owner_id', 'tele_id'], 'integer'],
+			[['status_id', 'source_id', 'campaign_id', 'agent_id', 'owner_id'], 'integer'],
 			[['phone', 'postal_code', 'email'], 'string'],
 			[['campaign_id'], 'default', 'value' => null],
 			['postal_code', 'string', 'max' => 6],
@@ -73,7 +71,7 @@ class LeadForm extends Model implements LeadInterface {
 			['date_at', 'date', 'format' => 'php:' . $this->dateFormat],
 			[['phone'], PhoneValidator::class, 'country' => 'PL'],
 			[
-				['owner_id', 'agent_id', 'tele_id'], 'in', 'range' => function (): array {
+				['owner_id', 'agent_id'], 'in', 'range' => function (): array {
 				return array_keys(static::getUsersNames());
 			},
 			],
@@ -96,7 +94,6 @@ class LeadForm extends Model implements LeadInterface {
 			'data' => Yii::t('lead', 'Data'),
 			'agent_id' => Yii::t('lead', 'Agent'),
 			'owner_id' => Yii::t('lead', 'Owner'),
-			'tele_id' => Yii::t('lead', 'Tele'),
 		];
 	}
 
@@ -120,7 +117,6 @@ class LeadForm extends Model implements LeadInterface {
 	public function setUsers(array $users): void {
 		$this->agent_id = $users[static::USER_AGENT] ?? null;
 		$this->owner_id = $users[static::USER_OWNER] ?? null;
-		$this->tele_id = $users[static::USER_TELE] ?? null;
 	}
 
 	public function getStatusId(): int {
@@ -175,9 +171,6 @@ class LeadForm extends Model implements LeadInterface {
 			$users[static::USER_AGENT] = $this->agent_id;
 		}
 
-		if (!empty($this->tele_id)) {
-			$users[static::USER_TELE] = $this->tele_id;
-		}
 		return $users;
 	}
 
