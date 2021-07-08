@@ -1,6 +1,6 @@
 <?php
 
-namespace common\formatters;
+namespace common\components;
 
 use Decimal\Decimal;
 use NumberFormatter;

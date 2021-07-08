@@ -5,7 +5,7 @@ use common\components\PayComponent;
 use common\components\Provisions;
 use common\components\TaxComponent;
 use common\components\User;
-use common\formatters\Formatter;
+use common\components\Formatter;
 use common\modules\lead\components\LeadManager;
 use yii\BaseYii;
 

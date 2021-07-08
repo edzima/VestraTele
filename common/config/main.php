@@ -6,7 +6,7 @@ use common\components\keyStorage\KeyStorage;
 use common\components\PayComponent;
 use common\components\Provisions;
 use common\components\TaxComponent;
-use common\formatters\Formatter;
+use common\components\Formatter;
 use common\models\user\Worker;
 use edzima\teryt\Module as TerytModule;
 use yii\caching\DummyCache;
