@@ -67,7 +67,7 @@ YiiAsset::register($this);
 							&& Yii::$app->user->can(User::ROLE_MANAGER),
 						'format' => 'ntext',
 					],
-					'phone',
+					'phone:tel',
 					'email:email',
 					[
 						'attribute' => 'postal_code',

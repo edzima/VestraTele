@@ -94,7 +94,7 @@ foreach (LeadSearch::questions() as $question) {
 				'label' => Yii::t('lead', 'Campaign'),
 			],
 			'date_at',
-			'phone',
+			'phone:tel',
 		],
 			$questionColumns,
 			[
