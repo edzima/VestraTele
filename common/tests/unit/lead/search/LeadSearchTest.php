@@ -1,6 +1,6 @@
 <?php
 
-namespace common\tests\unit\lead;
+namespace common\tests\unit\lead\search;
 
 use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\models\ActiveLead;

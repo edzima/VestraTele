@@ -34,7 +34,7 @@ class BaseController extends Controller {
 			$this->on(static::EVENT_BEFORE_ACTION, function (ActionEvent $actionEvent): void {
 				if ($actionEvent->action->id === $this->deleteAction) {
 					Yii::warning([
-						'message' => Yii::t('lead', 'User {id} try access to delete action', ['id' => \Yii::$app->user->getId()]),
+						'message' => Yii::t('lead', 'User {id} try access to delete action', ['id' => Yii::$app->user->getId()]),
 						'controller' => $this->id,
 					], 'lead.delete');
 					throw new MethodNotAllowedHttpException();

@@ -73,7 +73,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'withoutUser' => Yii::t('lead', 'Without User'),
 				'withoutReport' => Yii::t('lead', 'Without Report'),
 				'user_id' => Yii::t('lead', 'User'),
-				'closedQuestions' => Yii::t('lead', 'Closed questions'),
+				'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 			]
 		);
 	}

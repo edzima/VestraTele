@@ -55,6 +55,13 @@ class Module extends BaseModule implements BootstrapInterface {
 		return static::instance()->getUserNames();
 	}
 
+	public function findUsersNames(array $ids): array {
+		if (is_callable($this->findUsersNames)) {
+			return call_user_func($this->userNames);
+		}
+		throw new InvalidConfigException('$userNames must be array or callable.');
+	}
+
 	public function getUserNames(): array {
 		if (is_array($this->userNames)) {
 			return $this->userNames;

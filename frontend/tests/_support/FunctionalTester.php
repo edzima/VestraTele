@@ -65,7 +65,7 @@ class FunctionalTester extends \Codeception\Actor {
 		$this->seeElement($selector, $attributes);
 	}
 
-	public function dontSeeGridDeleteLink(string $gridSelector, string $actionColumnSelector = '.action-column a', array $attributes = ['title' => 'Delete']): void {
+	public function dontSeeGridDeleteLink(string $gridSelector = '.grid-view', string $actionColumnSelector = '.action-column a', array $attributes = ['title' => 'Delete']): void {
 		$selector = $gridSelector . ' ' . $actionColumnSelector;
 		$this->dontSeeElement($selector, $attributes);
 	}

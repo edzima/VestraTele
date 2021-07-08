@@ -39,12 +39,14 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'details')->textarea() ?>
 
-	<?= $form->field($model, 'closedQuestions')->widget(Select2::class, [
-		'data' => $model->getClosedQuestionsData(),
-		'options' => [
-			'multiple' => true,
-		],
-	])
+	<?= !empty($model->getClosedQuestionsData())
+		? $form->field($model, 'closedQuestions')->widget(Select2::class, [
+			'data' => $model->getClosedQuestionsData(),
+			'options' => [
+				'multiple' => true,
+			],
+		])
+		: ''
 	?>
 
 

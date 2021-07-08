@@ -1,6 +1,7 @@
 <?php
 
 use common\helpers\Url;
+use common\models\user\User;
 use common\modules\lead\models\Lead;
 use common\modules\lead\Module;
 use common\modules\lead\widgets\LeadAnswersWidget;
@@ -62,7 +63,8 @@ YiiAsset::register($this);
 					'date_at:datetime',
 					[
 						'attribute' => 'data',
-						'visible' => !empty($model->getData()),
+						'visible' => !empty($model->getData())
+							&& Yii::$app->user->can(User::ROLE_MANAGER),
 						'format' => 'ntext',
 					],
 					'phone',
@@ -122,6 +124,7 @@ YiiAsset::register($this);
 
 		</div>
 	</div>
+	<div class="clearfix"></div>
 
 	<?php foreach ($model->reports as $report): ?>
 

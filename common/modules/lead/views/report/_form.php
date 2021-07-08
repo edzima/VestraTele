@@ -11,7 +11,9 @@ use common\widgets\ActiveForm;
 ?>
 	<div class="lead-report-form">
 
-		<?php $form = ActiveForm::begin(); ?>
+		<?php $form = ActiveForm::begin([
+			'id' => 'lead-report-form',
+		]); ?>
 
 		<?= ReportFormWidget::widget([
 			'form' => $form,

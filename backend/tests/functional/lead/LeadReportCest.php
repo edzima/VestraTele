@@ -8,7 +8,6 @@ use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\controllers\ReportController;
 use common\modules\lead\models\ActiveLead;
-use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadStatus;
 
 class LeadReportCest {
@@ -48,22 +47,6 @@ class LeadReportCest {
 		$I->seeInGridHeader('Old Status');
 		$I->seeInGridHeader('Answers');
 		$I->seeInGridHeader('Details');
-	}
-
-	public function checkQuestionsLink(LeadManager $I): void {
-		$I->amLoggedIn();
-		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->seeLink('Lead Questions');
-		$I->click('Lead Questions');
-		$I->seeInCurrentUrl(QuestionCest::ROUTE_INDEX);
-	}
-
-	public function checkAnswersLink(LeadManager $I): void {
-		$I->amLoggedIn();
-		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->seeLink('Lead Answers');
-		$I->click('Lead Answers');
-		$I->seeInCurrentUrl(AnswerCest::ROUTE_INDEX);
 	}
 
 	public function checkReport(LeadManager $I): void {

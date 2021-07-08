@@ -37,11 +37,22 @@ class ReportController extends BaseController {
 	 */
 	public function actionIndex(): string {
 		$searchModel = new LeadReportSearch();
+		if ($this->module->onlyUser) {
+			$userId = Yii::$app->user->getId();
+			if ($userId === null) {
+				throw new NotFoundHttpException();
+			}
+			$searchModel->scenario = LeadReportSearch::SCENARIO_OWNER;
+			$searchModel->owner_id = $userId;
+		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+			'visibleButtons' => [
+				'delete' => $this->module->allowDelete,
+			],
 		]);
 	}
 
@@ -132,11 +143,18 @@ class ReportController extends BaseController {
 	 * @return LeadReport the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id) {
-		if (($model = LeadReport::findOne($id)) !== null) {
-			return $model;
+	protected function findModel(int $id): LeadReport {
+		$model = LeadReport::findOne($id);
+		if ($model === null || !$this->isForUser($model)) {
+			throw new NotFoundHttpException(Yii::t('lead', 'The requested page does not exist.'));
 		}
+		return $model;
+	}
 
-		throw new NotFoundHttpException(Yii::t('lead', 'The requested page does not exist.'));
+	private function isForUser(LeadReport $model): bool {
+		if (!$this->module->onlyUser) {
+			return true;
+		}
+		return $model->owner_id === Yii::$app->user->getId();
 	}
 }

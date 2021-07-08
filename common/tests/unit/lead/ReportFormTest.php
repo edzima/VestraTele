@@ -8,9 +8,9 @@ use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatusInterface;
+use common\modules\lead\Module;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
-use Yii;
 use yii\base\Model;
 
 class ReportFormTest extends Unit {
@@ -84,7 +84,7 @@ class ReportFormTest extends Unit {
 		]);
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Details cannot be blank when answers is empty.', 'details');
-		$this->thenSeeError('Closed questions must be set when details is blank.', 'closedQuestions');
+		$this->thenSeeError('Closed Questions must be set when details is blank.', 'closedQuestions');
 	}
 
 	public function testWithDetails(): void {
@@ -186,9 +186,9 @@ class ReportFormTest extends Unit {
 	}
 
 	private function haveLead(array $attributes): ActiveLead {
-		return Yii::$app->leadManager->findById(
+		return Module::manager()->findById(
 			$this->tester->haveRecord(
-				Yii::$app->leadManager->model,
+				Module::manager()->model,
 				$attributes
 			)
 		);
@@ -199,7 +199,7 @@ class ReportFormTest extends Unit {
 	}
 
 	private function thenSeeLead(array $attributes): void {
-		$this->tester->seeRecord(Yii::$app->leadManager->model, $attributes);
+		$this->tester->seeRecord(Module::manager()->model, $attributes);
 	}
 
 	private function thenSeeReport(array $attributes): void {

@@ -1,43 +1,56 @@
 <?php
 
+use common\modules\lead\models\searches\LeadReportSearch;
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\modules\lead\models\searches\LeadReportSearch */
+/* @var $model LeadReportSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
 <div class="lead-report-search">
 
-    <?php $form = ActiveForm::begin([
-        'action' => ['index'],
-        'method' => 'get',
-    ]); ?>
+	<?php $form = ActiveForm::begin([
+		'action' => ['index'],
+		'method' => 'get',
+	]); ?>
 
-    <?= $form->field($model, 'id') ?>
+	<div class="row">
+		<?= $form->field($model, 'lead_source_id', [
+			'options' => [
+				'class' => 'col-md-6',
+			],
+		])->widget(Select2::class, [
+			'data' => $model->getSourcesNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('lead_source_id'),
+				'allowClear' => true,
+			],
+		]) ?>
 
-    <?= $form->field($model, 'lead_id') ?>
+		<?= $form->field($model, 'lead_campaign_id', [
+			'options' => [
+				'class' => 'col-md-6',
+			],
+		])->widget(Select2::class, [
+			'data' => $model->getCampaignNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('lead_campaign_id'),
+				'allowClear' => true,
+			],
+		]) ?>
+	</div>
 
-    <?= $form->field($model, 'owner_id') ?>
 
-    <?= $form->field($model, 'status_id') ?>
+	<?= $form->field($model, 'changedStatus')->checkbox() ?>
 
-    <?= $form->field($model, 'old_status_id') ?>
+	<div class="form-group">
+		<?= Html::submitButton(Yii::t('lead', 'Search'), ['class' => 'btn btn-primary']) ?>
+		<?= Html::a(Yii::t('lead', 'Reset'), ['index'], ['class' => 'btn btn-default']) ?>
+	</div>
 
-    <?php // echo $form->field($model, 'schema_id') ?>
-
-    <?php // echo $form->field($model, 'details') ?>
-
-    <?php // echo $form->field($model, 'created_at') ?>
-
-    <?php // echo $form->field($model, 'updated_at') ?>
-
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('lead', 'Search'), ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton(Yii::t('lead', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>
-    </div>
-
-    <?php ActiveForm::end(); ?>
+	<?php ActiveForm::end(); ?>
 
 </div>

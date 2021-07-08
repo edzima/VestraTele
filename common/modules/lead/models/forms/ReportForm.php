@@ -55,6 +55,7 @@ class ReportForm extends Model {
 			'status_id' => Yii::t('lead', 'Status'),
 			'details' => Yii::t('lead', 'Details'),
 			'withAddress' => Yii::t('lead', 'With Address'),
+			'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 		];
 	}
 
@@ -77,7 +78,7 @@ class ReportForm extends Model {
 					return empty($this->details) && !$this->hasOpenAnswer();
 				},
 				'enableClientValidation' => false,
-				'message' => Yii::t('lead', 'Closed questions must be set when details is blank.'),
+				'message' => Yii::t('lead', 'Closed Questions must be set when details is blank.'),
 			],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 			['closedQuestions', 'in', 'range' => array_keys($this->getClosedQuestionsData()), 'allowArray' => true],

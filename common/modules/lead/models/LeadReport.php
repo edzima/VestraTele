@@ -32,6 +32,8 @@ use yii\db\ActiveRecord;
  */
 class LeadReport extends ActiveRecord {
 
+	public const SCENARIO_OWNER = 'owner';
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -68,12 +70,14 @@ class LeadReport extends ActiveRecord {
 		return [
 			'id' => Yii::t('lead', 'ID'),
 			'lead_id' => Yii::t('lead', 'Lead ID'),
-			'owner_id' => Yii::t('lead', 'Owner ID'),
+			'owner_id' => Yii::t('lead', 'Owner'),
+			'owner' => Yii::t('lead', 'Owner'),
 			'status_id' => Yii::t('lead', 'Status ID'),
 			'old_status_id' => Yii::t('lead', 'Old Status ID'),
 			'details' => Yii::t('lead', 'Details'),
 			'created_at' => Yii::t('lead', 'Created At'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
+			'answersQuestions' => Yii::t('lead', 'Answers Questions'),
 		];
 	}
 
@@ -125,15 +129,15 @@ class LeadReport extends ActiveRecord {
 	}
 
 	public function getOldStatus() {
-		return $this->hasOne(LeadStatus::class, ['id' => 'old_status_id']);
+		return LeadStatus::getModels()[$this->old_status_id] ?? null;
 	}
 
 	public function getOwner() {
 		return $this->hasOne(Module::userClass(), ['id' => 'owner_id']);
 	}
 
-	public function getStatus(): ActiveQuery {
-		return $this->hasOne(LeadStatus::class, ['id' => 'status_id']);
+	public function getStatus() {
+		return LeadStatus::getModels()[$this->status_id] ?? null;
 	}
 
 	/**
