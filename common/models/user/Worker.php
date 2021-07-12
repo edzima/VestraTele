@@ -24,6 +24,7 @@ class Worker extends User implements HierarchyModel {
 		self::ROLE_BOOKKEEPER,
 		self::ROLE_CUSTOMER_SERVICE,
 		self::ROLE_LAWYER,
+		self::ROLE_MANAGER,
 	];
 
 	private static $USER_NAMES = [];
