@@ -10,7 +10,7 @@ $params = array_merge(
 return [
 	'id' => 'app-console',
 	'basePath' => dirname(__DIR__),
-	'bootstrap' => ['log', 'teryt'],
+	'bootstrap' => ['log', 'teryt', 'lead'],
 	'controllerNamespace' => 'console\controllers',
 	'aliases' => [
 		'@bower' => '@vendor/bower-asset',

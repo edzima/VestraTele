@@ -15,6 +15,8 @@ class m210204_121955_lead extends Migration {
 	 */
 	public function safeUp() {
 
+		/** @var ActiveRecord $userClass */
+		$userClass = Module::userClass();
 
 		$this->createTable('{{%lead}}', [
 			'id' => $this->primaryKey(),
@@ -37,8 +39,6 @@ class m210204_121955_lead extends Migration {
 		]);
 
 		$this->addPrimaryKey('{{%lead_user_PK}}', '{{%lead_user}}', ['lead_id', 'user_id', 'type']);
-		/** @var ActiveRecord $userClass */
-		$userClass = Module::userClass();
 		$this->addForeignKey('{{%fk_lead_user}}', '{{%lead_user}}', 'user_id', $userClass::tableName(), 'id', 'CASCADE', 'CASCADE');
 		$this->addForeignKey('{{%fk_lead_lead}}', '{{%lead_user}}', 'lead_id', '{{%lead}}', 'id', 'CASCADE', 'CASCADE');
 
