@@ -8,6 +8,7 @@ use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\controllers\LeadController;
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\LeadStatusInterface;
 
 class LeadCest {
 
@@ -60,6 +61,7 @@ class LeadCest {
 	public function checkIndexGrid(LeadManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeInGridHeader('Name');
 		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('Status');
 		$I->seeInGridHeader('Phone');
@@ -80,6 +82,7 @@ class LeadCest {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_CREATE);
 		$I->submitForm(static::SELECTOR_FORM, []);
+		$I->seeValidationError('Name cannot be blank.');
 		$I->seeValidationError('Phone cannot be blank when email is blank.');
 		$I->seeValidationError('Email cannot be blank when phone is blank.');
 	}
@@ -89,11 +92,13 @@ class LeadCest {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_CREATE);
 		$I->submitForm(static::SELECTOR_FORM, [
-			$this->formParam('phone') => '555-222-111',
+			'LeadForm[source_id]' => 1,
+			'LeadForm[status_id]' => LeadStatusInterface::STATUS_NEW,
+			'LeadForm[name]' => 'Jonny',
+			'LeadForm[phone]' => '555-222-111',
 		]);
 		$I->seeFlash(' Success create Lead. ', 'success');
 		$I->seeInCurrentUrl(static::ROUTE_VIEW);
-		$I->see('555-222-111');
 	}
 
 	public function checkViewPage(LeadManager $I): void {
@@ -133,10 +138,6 @@ class LeadCest {
 
 	private function grabLead(string $index = 'new-wordpress-accident'): ActiveLead {
 		return $this->tester->grabFixture(LeadFixtureHelper::LEAD, $index);
-	}
-
-	private function formParam(string $attribute): string {
-		return "LeadForm[$attribute]";
 	}
 
 }

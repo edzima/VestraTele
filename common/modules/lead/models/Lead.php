@@ -19,6 +19,7 @@ use yii\helpers\Json;
  * @property string $data
  * @property int $source_id
  * @property int $status_id
+ * @property string $name
  * @property string|null $provider
  * @property string|null $phone
  * @property string|null $postal_code
@@ -63,9 +64,9 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function rules(): array {
 		return [
-			[['source_id', 'status_id', 'data'], 'required'],
+			[['source_id', 'status_id', 'data', 'name'], 'required'],
 			[['status_id'], 'integer'],
-			[['phone', 'postal_code', 'email', 'provider'], 'string'],
+			[['phone', 'postal_code', 'email', 'provider', 'name'], 'string'],
 			['email', 'email'],
 			['postal_code', 'string', 'max' => 6],
 			['provider', 'in', 'range' => array_keys(static::getProvidersNames())],
@@ -139,6 +140,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function getId(): string {
 		return $this->id;
+	}
+
+	public function getName(): string {
+		return $this->name;
 	}
 
 	public function getDateTime(): DateTime {
@@ -248,6 +253,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function setLead(LeadInterface $lead): void {
+		$this->name = $lead->getName();
 		$this->source_id = $lead->getSource()->getID();
 		$this->email = $lead->getEmail();
 		$this->phone = $lead->getPhone();
@@ -263,4 +269,5 @@ class Lead extends ActiveRecord implements ActiveLead {
 	public function isForUser($id): bool {
 		return in_array($id, $this->getUsers(), true);
 	}
+
 }

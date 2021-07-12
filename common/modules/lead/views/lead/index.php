@@ -69,6 +69,7 @@ foreach (LeadSearch::questions() as $question) {
 				'class' => CheckboxColumn::class,
 				'visible' => $assignUsers,
 			],
+			'name',
 			[
 				'attribute' => 'type_id',
 				'value' => 'source.type',

@@ -17,7 +17,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model Lead */
 
-$this->title = $model->id;
+$this->title = $model->getName();
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);

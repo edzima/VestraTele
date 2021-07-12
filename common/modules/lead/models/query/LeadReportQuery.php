@@ -8,24 +8,6 @@ use yii\db\ActiveQuery;
 
 class LeadReportQuery extends ActiveQuery {
 
-
-	public function likeFirstname(string $firstname): void {
-		$this->orWhere([
-			'and',
-			['like', '%' . $firstname, true],
-			['schema_id' => ReportSchemaInterface::FIRSTNAME_ID],
-		]);
-	}
-
-	public function likeLastname(string $lastname): void {
-		$this->orWhere([
-			'and',
-			['like', '%' . $lastname, true],
-			['schema_id' => ReportSchemaInterface::LASTNAME_ID],
-		]);
-	}
-
-
 	/**
 	 * {@inheritDoc}
 	 * @return LeadReport|null

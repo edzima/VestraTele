@@ -136,4 +136,5 @@ return [
 	'With Address' => 'Adres',
 	'Answers Questions' => 'Odpowiedzi',
 	'Changed Status' => 'Zmieniony Status',
+	'Lead Name' => 'Imię i Nazwisko',
 ];

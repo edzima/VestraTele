@@ -30,6 +30,7 @@ class m210204_121955_lead extends Migration {
 			'provider' => $this->string(25),
 			'campaign_id' => $this->integer(),
 			'owner_id' => $this->integer(),
+			'name' => $this->string()->notNull(),
 		]);
 
 		$this->createTable('{{%lead_user}}', [

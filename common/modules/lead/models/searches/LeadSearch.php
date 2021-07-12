@@ -32,6 +32,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public bool $withoutUser = false;
 	public bool $withoutReport = false;
+	public $name = '';
 	public $user_id;
 	public $type_id;
 
@@ -59,7 +60,7 @@ class LeadSearch extends Lead implements SearchModel {
 			[['id', 'status_id', 'type_id', 'source_id', 'user_id', 'campaign_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			[['withoutUser', 'withoutReport'], 'boolean'],
-			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions'], 'safe'],
+			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'name'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			[array_keys($this->questionsAttributes), 'safe'],
@@ -162,13 +163,16 @@ class LeadSearch extends Lead implements SearchModel {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
-			'date_at' => $this->date_at,
+			Lead::tableName() . '.id' => $this->id,
+			Lead::tableName() . '.date_at' => $this->date_at,
 			Lead::tableName() . '.status_id' => $this->status_id,
-			'campaign_id' => $this->campaign_id,
-			'source_id' => $this->source_id,
+			Lead::tableName() . '.name' => $this->name,
+
+			Lead::tableName() . '.campaign_id' => $this->campaign_id,
+			Lead::tableName() . '.source_id' => $this->source_id,
+			Lead::tableName() . '.provider' => $this->provider,
 			'S.type_id' => $this->type_id,
-			'provider' => $this->provider,
+
 		]);
 
 		$query

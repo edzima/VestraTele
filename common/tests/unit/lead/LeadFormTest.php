@@ -25,6 +25,7 @@ class LeadFormTest extends Unit {
 
 		$this->thenUnsuccessValidate();
 
+		$this->thenSeeError('Name cannot be blank.', 'name');
 		$this->thenSeeError('Source cannot be blank.', 'source_id');
 		$this->thenSeeError('Status cannot be blank.', 'status_id');
 		$this->thenSeeError('Date At cannot be blank.', 'date_at');
@@ -35,6 +36,7 @@ class LeadFormTest extends Unit {
 
 	public function testWithPhone(): void {
 		$this->giveLead([
+			'name' => 'Test lead',
 			'phone' => '123-123-123',
 			'status_id' => 1,
 			'source_id' => 1,
@@ -46,6 +48,7 @@ class LeadFormTest extends Unit {
 
 	public function testWithEmail(): void {
 		$this->giveLead([
+			'name' => 'Test lead',
 			'email' => 'some@mail.com',
 			'status_id' => 1,
 			'source_id' => 1,
@@ -66,6 +69,7 @@ class LeadFormTest extends Unit {
 
 	public function testWithOwner(): void {
 		$this->giveLead([
+			'name' => 'With owner',
 			'email' => 'some@mail.com',
 			'status_id' => 1,
 			'source_id' => 1,
@@ -82,6 +86,7 @@ class LeadFormTest extends Unit {
 
 	public function testWithOwnerWithSource(): void {
 		$this->giveLead([
+			'name' => 'Jonny',
 			'email' => 'some@mail.com',
 			'status_id' => 1,
 			'source_id' => 2,

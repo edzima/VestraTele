@@ -8,6 +8,8 @@ interface LeadInterface {
 
 	public function getSourceId(): int;
 
+	public function getName(): string;
+
 	public function getSource(): LeadSourceInterface;
 
 	public function getStatusId(): int;

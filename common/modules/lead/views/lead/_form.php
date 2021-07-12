@@ -34,11 +34,14 @@ use yii\widgets\ActiveForm;
 
 
 	<div class="row">
-		<?= $form->field($model, 'phone', ['options' => ['class' => 'col-md-4']])->textInput(['maxlength' => true]) ?>
 
-		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-4']])->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'name', ['options' => ['class' => 'col-md-4']])->textInput(['maxlength' => true]) ?>
 
-		<?= $form->field($model, 'postal_code', ['options' => ['class' => 'col-md-4']])->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'phone', ['options' => ['class' => 'col-md-3']])->textInput(['maxlength' => true]) ?>
+
+		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-3']])->textInput(['maxlength' => true]) ?>
+
+		<?= $form->field($model, 'postal_code', ['options' => ['class' => 'col-md-2']])->textInput(['maxlength' => true]) ?>
 	</div>
 
 	<div class="row">

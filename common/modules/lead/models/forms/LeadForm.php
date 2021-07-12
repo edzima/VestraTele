@@ -30,6 +30,7 @@ class LeadForm extends Model implements LeadInterface {
 	public $status_id;
 	public $date_at;
 	public $provider;
+	public $name;
 
 	public ?string $data = null;
 	public ?string $email = null;
@@ -51,7 +52,7 @@ class LeadForm extends Model implements LeadInterface {
 
 	public function rules(): array {
 		return [
-			[['source_id', 'status_id', 'date_at'], 'required'],
+			[['source_id', 'status_id', 'date_at', 'name'], 'required'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[
 				'phone', 'required', 'enableClientValidation' => false, 'when' => function () {
@@ -94,12 +95,14 @@ class LeadForm extends Model implements LeadInterface {
 			'data' => Yii::t('lead', 'Data'),
 			'agent_id' => Yii::t('lead', 'Agent'),
 			'owner_id' => Yii::t('lead', 'Owner'),
+			'name' => Yii::t('lead', 'Lead Name'),
 		];
 	}
 
 	public function setLead(LeadInterface $lead): void {
 		$this->setSource($lead->getSource());
 		$this->setUsers($lead->getUsers());
+		$this->name = $lead->getName();
 		$this->status_id = $lead->getStatusId();
 		$this->date_at = $lead->getDateTime()->format($this->dateFormat);
 		$this->data = Json::encode($lead->getData());
@@ -117,6 +120,10 @@ class LeadForm extends Model implements LeadInterface {
 	public function setUsers(array $users): void {
 		$this->agent_id = $users[static::USER_AGENT] ?? null;
 		$this->owner_id = $users[static::USER_OWNER] ?? null;
+	}
+
+	public function getName(): string {
+		return $this->name;
 	}
 
 	public function getStatusId(): int {
@@ -219,4 +226,5 @@ class LeadForm extends Model implements LeadInterface {
 	public function isForUser($id): bool {
 		return in_array($id, $this->getUsers(), true);
 	}
+
 }

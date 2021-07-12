@@ -29,29 +29,6 @@ class m210208_111345_lead_reports extends Migration {
 		$this->addForeignKey('{{%lead_question_status}}', '{{%lead_question}}', 'status_id', '{{%lead_status}}', 'id', 'CASCADE', 'CASCADE');
 		$this->addForeignKey('{{%lead_question_type}}', '{{%lead_question}}', 'type_id', '{{%lead_type}}', 'id', 'CASCADE', 'CASCADE');
 
-		$this->batchInsert('{{%lead_question}}', [
-			'id',
-			'name',
-			'placeholder',
-			'show_in_grid',
-			'is_required',
-		], [
-			[
-				'id' => ReportSchemaInterface::FIRSTNAME_ID,
-				'name' => 'Firstname',
-				'placeholder' => 'Firstname',
-				'show_in_grid' => true,
-				'is_required' => false,
-			],
-			[
-				'id' => ReportSchemaInterface::LASTNAME_ID,
-				'name' => 'Lastname',
-				'placeholder' => 'Lastname',
-				'show_in_grid' => true,
-				'is_required' => false,
-			],
-		]);
-
 		$this->createTable('{{%lead_report}}', [
 			'id' => $this->primaryKey(),
 			'lead_id' => $this->integer()->notNull(),

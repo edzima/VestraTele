@@ -47,6 +47,7 @@ class LeadManagerTest extends Unit {
 
 	public function testPush(): void {
 		$this->giveLead([
+			'name' => 'Test push',
 			'source_id' => 1,
 			'status_id' => 1,
 			'phone' => '789-185-145',
@@ -59,6 +60,7 @@ class LeadManagerTest extends Unit {
 
 	public function testPushWithUser(): void {
 		$this->giveLead([
+			'name' => 'Test push with user',
 			'source_id' => 1,
 			'status_id' => 1,
 			'phone' => '789-185-145',
@@ -93,6 +95,7 @@ class LeadManagerTest extends Unit {
 			'name' => 'Some owner source',
 		]);
 		$this->giveLead([
+			'name' => 'Source With Owner',
 			'source_id' => $sourceId,
 			'phone' => '789-185-145',
 		]);
@@ -108,6 +111,7 @@ class LeadManagerTest extends Unit {
 			'source_id' => 1,
 			'status_id' => 1,
 			'phone' => '789-185-145',
+			'name' => 'Double Same Push',
 		]);
 
 		$this->whenPush();
