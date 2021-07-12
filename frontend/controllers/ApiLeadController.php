@@ -22,6 +22,7 @@ class ApiLeadController extends Controller {
 	}
 
 	public function actionLanding() {
+
 		$model = new LandingLeadForm();
 		$model->date_at = date($model->dateFormat);
 
