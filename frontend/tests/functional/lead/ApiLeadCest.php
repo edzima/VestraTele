@@ -16,7 +16,7 @@ class ApiLeadCest {
 		return LeadFixtureHelper::leads();
 	}
 
-	public function checkLanding(FunctionalTester $I): void {
+	public function checkLandingForSourceWithoutOwner(FunctionalTester $I): void {
 		$I->sendAjaxPostRequest(static::ROUTE_LANDING, [
 			'source_id' => 1,
 			'email' => 'email@example.com',
@@ -25,5 +25,18 @@ class ApiLeadCest {
 			'source_id' => 1,
 			'email' => 'email@example.com',
 		]);
+	}
+
+	public function checkLandingForSourceWithOwner(FunctionalTester $I): void {
+		$I->sendAjaxPostRequest(static::ROUTE_LANDING, [
+			'source_id' => 2,
+			'email' => 'email@example.com',
+		]);
+
+		$I->seeRecord(Module::manager()->model, [
+			'source_id' => 2,
+			'email' => 'email@example.com',
+		]);
+		$I->seeEmailIsSent();
 	}
 }

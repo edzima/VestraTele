@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\components;
 
+use common\modules\lead\events\LeadEvent;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadInterface;
@@ -11,6 +12,8 @@ use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
 
 class LeadManager extends Component {
+
+	public const EVENT_AFTER_PUSH = 'push.after';
 
 	/**
 	 * @var string|array
@@ -60,6 +63,7 @@ class LeadManager extends Component {
 				'lead' => $lead,
 			], 'lead.push.create.success');
 			$model->save();
+			$this->afterPush($model);
 		} else {
 			Yii::warning([
 				'message' => 'Try push lead with validate errors.',
@@ -68,6 +72,11 @@ class LeadManager extends Component {
 			], 'lead.push.create.error');
 		}
 		return $model;
+	}
+
+	protected function afterPush(ActiveLead $lead): void {
+		$event = new LeadEvent($lead);
+		$this->trigger(self::EVENT_AFTER_PUSH, $event);
 	}
 
 	public function groupLeads(LeadInterface $lead): void {
