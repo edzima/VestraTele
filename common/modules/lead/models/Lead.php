@@ -3,6 +3,7 @@
 namespace common\modules\lead\models;
 
 use common\models\Address;
+use common\modules\lead\Module;
 use common\modules\reminder\models\Reminder;
 use DateTime;
 use Yii;
@@ -88,6 +89,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			'campaign' => Yii::t('lead', 'Campaign'),
 			'phone' => Yii::t('lead', 'Phone'),
 			'postal_code' => Yii::t('lead', 'Postal Code'),
+			'owner' => Yii::t('lead', 'Owner'),
 		];
 	}
 
@@ -132,6 +134,12 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function getReports(): ActiveQuery {
 		return $this->hasMany(LeadReport::class, ['lead_id' => 'id'])->indexBy('id');
+	}
+
+	public function getOwner(): ActiveQuery {
+		return $this->hasOne(Module::userClass(), ['id' => 'user_id'])->via('leadUsers', function (ActiveQuery $query) {
+			$query->andWhere(['type' => LeadUser::TYPE_OWNER]);
+		});
 	}
 
 	public function getLeadUsers(): ActiveQuery {

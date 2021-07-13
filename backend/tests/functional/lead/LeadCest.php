@@ -61,6 +61,7 @@ class LeadCest {
 	public function checkIndexGrid(LeadManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeInGridHeader('Owner');
 		$I->seeInGridHeader('Name');
 		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('Status');

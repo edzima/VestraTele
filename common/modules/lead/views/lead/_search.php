@@ -31,27 +31,40 @@ use yii\widgets\ActiveForm;
 			],
 		]) ?>
 
-		<?= $model->scenario !== LeadSearch::SCENARIO_USER
-			? $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+
+	</div>
+
+	<?php if ($model->scenario !== LeadSearch::SCENARIO_USER): ?>
+
+		<div class="row">
+
+			<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
 				'data' => LeadSearch::getUsersNames(),
 				'pluginOptions' => [
 					'placeholder' => $model->getAttributeLabel('user_id'),
 					'allowClear' => true,
 				],
-			]) : ''
-		?>
+			])
+			?>
 
-		<?= $model->scenario !== LeadSearch::SCENARIO_USER
-			? $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-1']])->checkbox()
-			: ''
-		?>
+			<?= $form->field($model, 'user_type', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+				'data' => LeadSearch::getUserTypesNames(),
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('user_type'),
+					'allowClear' => true,
+				],
+			])
+			?>
 
-		<?= $form->field($model, 'withoutReport', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
+			<?= $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
 
-	</div>
+		</div>
+
+	<?php endif; ?>
 
 	<div class="row">
+
 		<?= $form->field($model, 'closedQuestions', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
 			'data' => LeadSearch::getClosedQuestionsNames(),
 			'options' => [
@@ -63,12 +76,16 @@ use yii\widgets\ActiveForm;
 			],
 		])
 		?>
+
+		<?= $form->field($model, 'withoutReport', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
+
+
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
+		<?php //$form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
-		<?= $form->field($model, 'duplicateEmail', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
+		<?php // $form->field($model, 'duplicateEmail', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 	</div>
 
 	<?= AddressSearchWidget::widget([

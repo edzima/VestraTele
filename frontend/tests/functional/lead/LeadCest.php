@@ -48,6 +48,7 @@ class LeadCest {
 	public function checkIndexPage(LeadTester $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->dontSeeInGridHeader('Owner');
 		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('Status');
 		$I->seeInGridHeader('Source');

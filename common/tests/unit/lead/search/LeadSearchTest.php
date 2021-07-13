@@ -6,6 +6,7 @@ use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadStatusInterface;
+use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadSearch;
 use common\tests\unit\Unit;
 
@@ -69,12 +70,22 @@ class LeadSearchTest extends Unit {
 		$this->assertSame(0, $this->model->search()->getTotalCount());
 	}
 
+	public function testUserWithType(): void {
+		$this->model->user_id = 1;
+		$this->model->user_type = LeadUser::TYPE_OWNER;
+		$models = $this->getSearchModels();
+		foreach ($models as $model) {
+			$this->tester->assertSame($model->getUsers()[LeadUser::TYPE_OWNER], 1);
+		}
+	}
+
 	public function testUser(): void {
 		$this->model->user_id = 1;
 		$models = $this->getSearchModels();
 		foreach ($models as $model) {
 			$this->assertTrue($model->isForUser(1));
 		}
+
 		$this->model->user_id = 2;
 		$models = $this->getSearchModels(true);
 		foreach ($models as $model) {

@@ -36,6 +36,7 @@ class LeadSearch extends Lead implements SearchModel {
 	public bool $duplicatePhone = false;
 	public $name = '';
 	public $user_id;
+	public $user_type;
 	public $type_id;
 
 	public $answers = [];
@@ -62,7 +63,7 @@ class LeadSearch extends Lead implements SearchModel {
 			[['id', 'status_id', 'type_id', 'source_id', 'user_id', 'campaign_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			[['withoutUser', 'withoutReport', 'duplicatePhone', 'duplicateEmail'], 'boolean'],
-			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'name'], 'safe'],
+			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'name', 'user_type'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			[array_keys($this->questionsAttributes), 'safe'],
@@ -142,6 +143,7 @@ class LeadSearch extends Lead implements SearchModel {
 			->joinWith('leadSource S')
 			->with('status')
 			->with('campaign')
+			->with('owner.userProfile')
 			//		->joinWith('addresses.address')
 			->joinWith('answers')
 			->groupBy(Lead::tableName() . '.id');
@@ -206,6 +208,7 @@ class LeadSearch extends Lead implements SearchModel {
 		if (!empty($this->user_id)) {
 			$query->joinWith('leadUsers');
 			$query->andWhere([LeadUser::tableName() . '.user_id' => $this->user_id]);
+			$query->andFilterWhere([LeadUser::tableName() . '.type' => $this->user_type]);
 		}
 		if ($this->withoutUser) {
 			$query->joinWith('leadUsers', false, 'LEFT OUTER JOIN');
@@ -253,7 +256,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private function applyDuplicates(ActiveQuery $query): void {
 		if ($this->duplicateEmail) {
-			$query->addSelect('*, COUNT(' . Lead::tableName() . '.email) as emailCount');
+			$query->addSelect('COUNT(' . Lead::tableName() . '.email) as emailCount');
 			$query->addGroupBy(Lead::tableName() . '.email');
 			$query->having('emailCount > 1');
 		}
@@ -294,6 +297,10 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public static function getTypesNames(): array {
 		return LeadType::getNames();
+	}
+
+	public static function getUserTypesNames(): array {
+		return LeadUser::getTypesNames();
 	}
 
 	public static function getUsersNames(): array {
