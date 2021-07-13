@@ -80,6 +80,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 				'duplicateEmail' => Yii::t('lead', 'Duplicate Email'),
 				'duplicatePhone' => Yii::t('lead', 'Duplicate Phone'),
+				'user_type' => Yii::t('lead', 'Type'),
 			]
 		);
 	}
