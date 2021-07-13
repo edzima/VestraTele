@@ -101,6 +101,18 @@ class LeadSearchTest extends Unit {
 		}
 	}
 
+	public function testEmailDuplicated(): void {
+		$this->model->duplicateEmail = true;
+		$models = $this->getSearchModels();
+		$this->tester->assertCount(2, $models);
+	}
+
+	public function testPhoneDuplicated(): void {
+		$this->model->duplicatePhone = true;
+		$models = $this->getSearchModels();
+		$this->tester->assertCount(2, $models);
+	}
+
 	public function testProvider(): void {
 		$this->model->provider = Lead::PROVIDER_FORM;
 		foreach ($this->getSearchModels() as $model) {

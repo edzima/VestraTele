@@ -65,6 +65,12 @@ use yii\widgets\ActiveForm;
 		?>
 	</div>
 
+	<div class="row">
+		<?= $form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
+
+		<?= $form->field($model, 'duplicateEmail', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
+	</div>
+
 	<?= AddressSearchWidget::widget([
 		'form' => $form,
 		'model' => $model->getAddressSearch(),

@@ -32,6 +32,8 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public bool $withoutUser = false;
 	public bool $withoutReport = false;
+	public bool $duplicateEmail = false;
+	public bool $duplicatePhone = false;
 	public $name = '';
 	public $user_id;
 	public $type_id;
@@ -59,7 +61,7 @@ class LeadSearch extends Lead implements SearchModel {
 		return [
 			[['id', 'status_id', 'type_id', 'source_id', 'user_id', 'campaign_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
-			[['withoutUser', 'withoutReport'], 'boolean'],
+			[['withoutUser', 'withoutReport', 'duplicatePhone', 'duplicateEmail'], 'boolean'],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'name'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
@@ -75,6 +77,8 @@ class LeadSearch extends Lead implements SearchModel {
 				'withoutReport' => Yii::t('lead', 'Without Report'),
 				'user_id' => Yii::t('lead', 'User'),
 				'closedQuestions' => Yii::t('lead', 'Closed Questions'),
+				'duplicateEmail' => Yii::t('lead', 'Duplicate Email'),
+				'duplicatePhone' => Yii::t('lead', 'Duplicate Phone'),
 			]
 		);
 	}
@@ -158,6 +162,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 		$this->applyAddressFilter($query);
 		$this->applyAnswerFilter($query);
+		$this->applyDuplicates($query);
 		$this->applyUserFilter($query);
 		$this->applyReportFilter($query);
 
@@ -303,6 +308,19 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private static function removeQuestionAttributePrefix(string $attribute): int {
 		return substr($attribute, strlen(static::QUESTION_ATTRIBUTE_PREFIX));
+	}
+
+	private function applyDuplicates(ActiveQuery $query): void {
+		if ($this->duplicateEmail) {
+			$query->addSelect('COUNT(' . Lead::tableName() . '.email) as emailCount');
+			$query->addGroupBy(Lead::tableName() . '.email');
+			$query->having('emailCount > 1');
+		}
+		if ($this->duplicatePhone) {
+			$query->addSelect('COUNT(' . Lead::tableName() . '.phone) as phoneCount');
+			$query->addGroupBy(Lead::tableName() . '.phone');
+			$query->having('phoneCount > 1');
+		}
 	}
 
 }
