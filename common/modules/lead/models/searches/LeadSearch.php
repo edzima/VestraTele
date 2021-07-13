@@ -166,8 +166,6 @@ class LeadSearch extends Lead implements SearchModel {
 			Lead::tableName() . '.id' => $this->id,
 			Lead::tableName() . '.date_at' => $this->date_at,
 			Lead::tableName() . '.status_id' => $this->status_id,
-			Lead::tableName() . '.name' => $this->name,
-
 			Lead::tableName() . '.campaign_id' => $this->campaign_id,
 			Lead::tableName() . '.source_id' => $this->source_id,
 			Lead::tableName() . '.provider' => $this->provider,
@@ -176,10 +174,11 @@ class LeadSearch extends Lead implements SearchModel {
 		]);
 
 		$query
-			->andFilterWhere(['like', 'data', $this->data])
+			->andFilterWhere(['like', Lead::tableName() . '.data', $this->data])
+			->andFilterWhere(['like', Lead::tableName() . '.email', $this->email])
+			->andFilterWhere(['like', Lead::tableName() . '.name', $this->name . '%', false])
 			->andFilterWhere(['like', Lead::tableName() . '.phone', $this->phone])
-			->andFilterWhere(['like', 'email', $this->email])
-			->andFilterWhere(['like', 'postal_code', $this->postal_code]);
+			->andFilterWhere(['like', Lead::tableName() . '.postal_code', $this->postal_code]);
 
 		if (YII_ENV_TEST) {
 			codecept_debug($query->createCommand()->getRawSql());

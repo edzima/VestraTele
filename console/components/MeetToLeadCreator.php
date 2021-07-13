@@ -32,7 +32,7 @@ class MeetToLeadCreator extends Component {
 		$lead->campaign_id = $this->getCampaign($meet)->id;
 		$lead->data = Json::encode($meet->getAttributes());
 		$lead->owner_id = $meet->agent_id;
-		$lead->tele_id = $meet->tele_id;
+		$lead->name = $meet->getClientFullName();
 		return $lead;
 	}
 
@@ -47,14 +47,6 @@ class MeetToLeadCreator extends Component {
 		$model->details = $meet->details;
 		$model->getModel()->created_at = $meet->created_at;
 		$model->getModel()->updated_at = $meet->updated_at;
-		$answers = [];
-		if ($meet->client_name) {
-			$answers[1] = $meet->client_name;
-		}
-		if ($meet->client_surname) {
-			$answers[2] = $meet->client_surname;
-		}
-		$model->setOpenAnswers($answers);
 		return $model;
 	}
 
