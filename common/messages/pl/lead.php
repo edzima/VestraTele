@@ -137,4 +137,6 @@ return [
 	'Answers Questions' => 'Odpowiedzi',
 	'Changed Status' => 'Zmieniony Status',
 	'Lead Name' => 'Imię i Nazwisko',
+	'Duplicate Phone' => 'Dubel (Telefon)',
+	'Duplicate Email' => 'Dubel (Email)',
 ];
