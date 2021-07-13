@@ -8,10 +8,11 @@ use common\modules\lead\models\ActiveLead;
 $leadLink = Yii::$app->urlManager->createAbsoluteUrl(['lead/lead/view', 'id' => $lead->getId()]);
 
 ?>
-<?= Yii::t('lead', 'New Lead from: ' . $lead->getSource()->getName()) ?>
-<?= Yii::t('lead', 'Type: ' . $lead->getSource()->getType()->getName()) ?>
+<?= Yii::t('lead', 'Source: {name}', ['name' => $lead->getSource()->getType()->getName()]) ?>
+<?= Yii::t('lead', 'Type: {name}', ['name' => $lead->getSource()->getType()->getName()]) ?>
 
-<?= Yii::t('lead', 'Phone: {phone}', ['phone' => $lead->getPhone()]) ?>
-<?= Yii::t('lead', 'Email: {email}', ['email' => $lead->getEmail()]) ?>
+<?= Yii::t('lead', 'Name: {name}', ['name' => $lead->getName()]) ?>
+<?= $lead->getPhone() ? Yii::t('lead', 'Phone: {phone}', ['phone' => $lead->getPhone()]) : '' ?>
+<?= $lead->getEmail() ? Yii::t('lead', 'Email: {email}', ['email' => $lead->getEmail()]) : '' ?>
 
 <?= $leadLink ?>

@@ -32,9 +32,9 @@ class LeadPushEmail extends Model {
 				['html' => 'leadPush-html', 'text' => 'leadPush-text'],
 				['lead' => $this->lead]
 			)
-			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
+			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' Leads'])
 			->setTo($this->email)
-			->setSubject(Yii::t('lead', 'Push new Lead to ' . Yii::$app->name))
+			->setSubject(Yii::t('lead', 'Push new Lead from {name}', ['name' => $this->lead->getName()]))
 			->send();
 	}
 }
