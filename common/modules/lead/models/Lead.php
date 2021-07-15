@@ -133,7 +133,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function getReports(): ActiveQuery {
-		return $this->hasMany(LeadReport::class, ['lead_id' => 'id'])->indexBy('id');
+		return $this->hasMany(LeadReport::class, ['lead_id' => 'id'])->indexBy('id')->orderBy([LeadReport::tableName() . '.created_at' => SORT_DESC]);
 	}
 
 	public function getOwner(): ActiveQuery {

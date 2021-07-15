@@ -63,7 +63,7 @@ use yii\widgets\ActiveForm;
 	</div>
 
 
-	<?= $form->field($model, 'data')->textarea(['rows' => 6]) ?>
+	<?php //form->field($model, 'data')->textarea(['rows' => 6]) ?>
 
 
 	<div class="form-group">

@@ -6,6 +6,7 @@ use yii\helpers\Html;
 /* @var $model common\modules\lead\models\LeadType */
 
 $this->title = Yii::t('lead', 'Create Lead Type');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Types'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
