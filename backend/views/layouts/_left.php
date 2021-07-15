@@ -116,6 +116,25 @@ $user = Yii::$app->user;
 					],
 				],
 				[
+					'label' => Yii::t('czater', 'Czater'),
+					'url' => '#',
+					'icon' => '<i class="fa fa fa-commenting"></i>',
+					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(User::PERMISSION_CZATER),
+					'items' => [
+						[
+							'label' => Yii::t('czater', 'Consultants'),
+							'url' => ['/czater/consultant/index'],
+							'icon' => '<i class="fa fa-users"></i>',
+						],
+						[
+							'label' => Yii::t('czater', 'Calls'),
+							'url' => ['/czater/call/index'],
+							'icon' => '<i class="fa fa-volume-control-phone "></i>',
+						],
+					],
+				],
+				[
 					'label' => Yii::t('hint', 'Hints'),
 					'url' => ['/hint/city/index'],
 					'icon' => '<i class="fa fa fa-map-marker"></i>',

@@ -9,6 +9,7 @@ use common\components\TaxComponent;
 use common\components\Formatter;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\czater\Czater;
 use edzima\teryt\Module as TerytModule;
 use common\modules\lead\Module as LeadModule;
 use yii\caching\DummyCache;
@@ -39,6 +40,10 @@ return [
 		],
 	],
 	'components' => [
+		'czater' => [
+			'class' => Czater::class,
+			'apiKey' => $_ENV['CZATER_API_KEY'],
+		],
 		'db' => [
 			'class' => 'yii\db\Connection',
 			'dsn' => getenv('DB_DSN'),
