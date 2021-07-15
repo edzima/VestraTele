@@ -12,6 +12,7 @@ use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\Module;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\rest\Controller;
 
 class ApiLeadController extends Controller {
@@ -84,11 +85,16 @@ class ApiLeadController extends Controller {
 	protected function afterPush(LeadEvent $event): void {
 		$lead = $event->getLead();
 		$ownerId = $lead->getUsers()[LeadUser::TYPE_OWNER] ?? null;
+		$model = new LeadPushEmail($lead);
 		if ($ownerId) {
-			$model = new LeadPushEmail($lead);
 			$model->email = User::findOne($ownerId)->email;
-			$model->sendEmail();
+		} else {
+			if (!isset(Yii::$app->params['leads.emailWithoutOwner'])) {
+				throw new InvalidConfigException('Param with key -> leads.emailWithoutOwner must be set');
+			}
+			$model->email = Yii::$app->params['leads.emailWithoutOwner'];
 		}
+		$model->sendEmail();
 	}
 
 	protected function pushLead(LeadInterface $lead): bool {
