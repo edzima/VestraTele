@@ -75,17 +75,17 @@ $user = Yii::$app->user;
 						[
 							'label' => Yii::t('common', 'Reminders'),
 							'url' => ['/lead/reminder/index'],
-							'icon' => '<i class="fa fa-table"></i>',
+							'icon' => '<i class="fa fa-calendar-check-o"></i>',
 						],
 						[
 							'label' => Yii::t('lead', 'Answers'),
 							'url' => ['/lead/answer/index'],
-							'icon' => '<i class="fa fa-table"></i>',
+							'icon' => '<i class="fa fa-quote-left"></i>',
 						],
 						[
 							'label' => Yii::t('lead', 'Questions'),
 							'url' => ['/lead/question/index'],
-							'icon' => '<i class="fa fa-table"></i>',
+							'icon' => '<i class="fa fa-question"></i>',
 						],
 						[
 							'label' => Yii::t('lead', 'Users'),
@@ -95,22 +95,22 @@ $user = Yii::$app->user;
 						[
 							'label' => Yii::t('lead', 'Campaigns'),
 							'url' => ['/lead/campaign/index'],
-							'icon' => '<i class="fa fa-eye"></i>',
+							'icon' => '<i class="fa fa-bullhorn"></i>',
 						],
 						[
 							'label' => Yii::t('lead', 'Sources'),
 							'url' => ['/lead/source/index'],
-							'icon' => '<i class="fa fa-eye"></i>',
+							'icon' => '<i class="fa fa-feed"></i>',
 						],
 						[
 							'label' => Yii::t('lead', 'Statuses'),
 							'url' => ['/lead/status/index'],
-							'icon' => '<i class="fa fa-eye"></i>',
+							'icon' => '<i class="fa fa-flag"></i>',
 						],
 						[
 							'label' => Yii::t('lead', 'Types'),
 							'url' => ['/lead/type/index'],
-							'icon' => '<i class="fa fa-eye"></i>',
+							'icon' => '<i class="fa fa-sitemap"></i>',
 						],
 
 					],
