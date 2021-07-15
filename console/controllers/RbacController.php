@@ -7,9 +7,13 @@ use common\models\user\User;
 use common\models\user\Worker;
 use common\rbac\OwnModelRule;
 use Yii;
+use yii\base\InvalidArgumentException;
 use yii\console\Controller;
 use yii\helpers\Console;
 use yii\rbac\Item;
+use yii\rbac\Permission;
+use yii\rbac\Role;
+use Exception;
 
 /**
  * Class RbacController
@@ -172,5 +176,28 @@ class RbacController extends Controller {
 			$this->assignAdmin($permission);
 		}
 		Console::output('Success add permission: ' . $name);
+	}
+
+	public function actionCopy(int $type, string $from, string $to): void {
+		$types = [Item::TYPE_ROLE, Item::TYPE_PERMISSION];
+		if (!in_array($type, $types, true)) {
+			throw new InvalidArgumentException('Invalid Rbac Item $type.');
+		}
+		$auth = Yii::$app->authManager;
+		$ids = $auth->getUserIdsByRole($from);
+		$item = $type === Item::TYPE_ROLE
+			? new Role()
+			: new Permission();
+		$item->name = $to;
+		$count = 0;
+		foreach ($ids as $id) {
+			try {
+				$auth->assign($item, $id);
+				$count++;
+			} catch (Exception $exception) {
+				Console::output($exception->getMessage());
+			}
+		}
+		Console::output('Copy rbac items: ' . $count);
 	}
 }
