@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\modules\lead\models\forms\LeadPushEmail;
 use common\modules\lead\models\forms\LeadsUserForm;
 use Yii;
 use common\modules\lead\models\LeadUser;
@@ -56,6 +57,12 @@ class UserController extends BaseController {
 						'count' => $count,
 					])
 				);
+				$email = $this->module->userClass::findOne($model->userId)->email ?? null;
+				foreach ($model->leadsIds as $leadsId) {
+					$pushEmailModel = new LeadPushEmail($this->findLead($leadsId));
+					$pushEmailModel->email = $email;
+					$pushEmailModel->sendEmail();
+				}
 				return $this->redirect(['lead/index']);
 			}
 		}

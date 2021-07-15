@@ -54,6 +54,7 @@ class UserCest {
 			'user_id' => 1,
 			'type' => LeadUser::TYPE_TELE,
 		]);
+		$I->seeEmailIsSent(2);
 
 		$I->seeInCurrentUrl(LeadCest::ROUTE_INDEX);
 	}

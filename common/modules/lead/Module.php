@@ -6,6 +6,7 @@ use common\modules\lead\components\LeadManager;
 use yii\base\BootstrapInterface;
 use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
+use yii\db\ActiveRecord;
 
 /**
  * Class Module
@@ -18,6 +19,9 @@ class Module extends BaseModule implements BootstrapInterface {
 
 	public $controllerNamespace = 'common\modules\lead\controllers';
 
+	/**
+	 * @var string|ActiveRecord
+	 */
 	public string $userClass;
 	/** @var \Closure|array */
 	public $userNames;
@@ -53,13 +57,6 @@ class Module extends BaseModule implements BootstrapInterface {
 
 	public static function userNames(): array {
 		return static::instance()->getUserNames();
-	}
-
-	public function findUsersNames(array $ids): array {
-		if (is_callable($this->findUsersNames)) {
-			return call_user_func($this->userNames);
-		}
-		throw new InvalidConfigException('$userNames must be array or callable.');
 	}
 
 	public function getUserNames(): array {
