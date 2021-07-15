@@ -39,23 +39,36 @@ AppAsset::register($this);
 	if (Yii::$app->user->isGuest) {
 		$menuItems[] = ['label' => Yii::t('frontend', 'Login'), 'url' => ['/site/login']];
 	} else {
-		$menuItems[] = [
-			'label' => 'Lead',
-			'url' => '#',
-			'visible' => Yii::$app->user->can(User::PERMISSION_MEET),
 
+
+		$menuItems[] = [
+			'label' => Yii::t('lead', 'Leads'),
+			'url' => '#',
+			'visible' => Yii::$app->user->can(User::PERMISSION_LEAD),
 			'items' => [
 				[
 					'label' => Yii::t('common', 'Browse'),
-					'url' => ['/meet/index'],
+					'url' => ['/lead/lead/index'],
 				],
 				[
-					'label' => 'Nowy',
-					'url' => ['/meet/create'],
+					'label' => Yii::t('lead', 'Create Lead'),
+					'url' => ['/lead/lead/create'],
 				],
 				[
-					'label' => 'Kalendarz',
-					'url' => ['/meet-calendar/index'],
+					'label' => Yii::t('lead', 'Lead Reports'),
+					'url' => ['/lead/report/index'],
+				],
+				[
+					'label' => Yii::t('lead', 'Reminders'),
+					'url' => ['/lead/reminder/index'],
+				],
+				[
+					'label' => Yii::t('lead', 'Campaigns'),
+					'url' => ['/lead/campaign/index'],
+				],
+				[
+					'label' => Yii::t('lead', 'Sources'),
+					'url' => ['/lead/source/index'],
 				],
 			],
 		];

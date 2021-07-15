@@ -7,6 +7,8 @@ use backend\modules\hint\Module as HintModule;
 use backend\modules\provision\Module as ProvisionModule;
 use backend\modules\settlement\Module as SettlementModule;
 use backend\modules\user\Module as UserModule;
+use common\modules\lead\Module as LeadModule;
+use common\modules\reminder\Module as ReminderModule;
 use common\behaviors\GlobalAccessBehavior;
 use common\behaviors\LastActionBehavior;
 use common\components\User as WebUser;
@@ -110,6 +112,22 @@ return [
 		],
 		'hint' => [
 			'class' => HintModule::class,
+		],
+		'lead' => [
+			'class' => LeadModule::class,
+			'userClass' => User::class,
+			'userNames' => static function (): array {
+				return User::getSelectList(User::getAssignmentIds([User::PERMISSION_LEAD]));
+			},
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'permissions' => [User::PERMISSION_LEAD],
+					],
+				],
+			],
 		],
 		'settlement' => [
 			'class' => SettlementModule::class,

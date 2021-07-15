@@ -5,6 +5,7 @@ namespace frontend\tests;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\user\Worker;
 use common\tests\_support\UserRbacActor;
+use Yii;
 
 /**
  * Inherited Methods
@@ -34,6 +35,7 @@ class FunctionalTester extends \Codeception\Actor {
 		$this->dontSee($message, '.help-block');
 	}
 
+
 	public function seeMenuLink($link): void {
 		$this->see($link, '#main-nav li a');
 	}
@@ -58,6 +60,16 @@ class FunctionalTester extends \Codeception\Actor {
 		$this->dontSee($text, $selector);
 	}
 
+	public function seeGridDeleteLink(string $gridSelector, string $actionColumnSelector = '.action-column a', array $attributes = ['title' => 'Delete']): void {
+		$selector = $gridSelector . ' ' . $actionColumnSelector;
+		$this->seeElement($selector, $attributes);
+	}
+
+	public function dontSeeGridDeleteLink(string $gridSelector = '.grid-view', string $actionColumnSelector = '.action-column a', array $attributes = ['title' => 'Delete']): void {
+		$selector = $gridSelector . ' ' . $actionColumnSelector;
+		$this->dontSeeElement($selector, $attributes);
+	}
+
 	public function seeInLoginUrl(): void {
 		$this->seeInCurrentUrl('site/login');
 	}
@@ -65,4 +77,11 @@ class FunctionalTester extends \Codeception\Actor {
 	public function grabAgent($index): Worker {
 		return $this->grabFixture(IssueFixtureHelper::AGENT, $index);
 	}
+
+	public function getCSRF(): array {
+		return [
+			Yii::$app->request->csrfParam => Yii::$app->request->csrfToken,
+		];
+	}
+
 }

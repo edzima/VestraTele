@@ -1,7 +1,10 @@
 <?php
 
+use common\behaviors\GlobalAccessBehavior;
 use common\components\User as WebUser;
 use common\models\user\User;
+use common\modules\lead\Module as LeadModule;
+use frontend\controllers\ApiLeadController;
 
 $params = array_merge(
 	require __DIR__ . '/../../common/config/params.php',
@@ -22,6 +25,40 @@ return [
 		],
 		'gridview' => [
 			'class' => '\kartik\grid\Module',
+		],
+		'lead' => [
+			'class' => LeadModule::class,
+			'controllerMap' => [
+				'api' => ApiLeadController::class,
+			],
+			'onlyUser' => true,
+			'allowDelete' => false,
+			'userClass' => User::class,
+			'userNames' => static function (): array {
+				return User::getSelectList([Yii::$app->user->getId()]);
+			},
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'controllers' => [
+							'lead/lead',
+							'lead/campaign',
+							'lead/source',
+							'lead/reminder',
+							'lead/report',
+						],
+						'permissions' => [User::PERMISSION_LEAD],
+					],
+					[
+						'allow' => true,
+						'controllers' => [
+							'lead/api',
+						],
+					],
+				],
+			],
 		],
 	],
 	'components' => [

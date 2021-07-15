@@ -25,19 +25,7 @@ class IssueUsersWidget extends Widget {
 
 	public string $type;
 
-	public array $fieldsetOptions = [
-		'toggle' => false,
-		'htmlOptions' => [
-			'class' => 'col-md-6',
-		],
-		'detailConfig' => [
-			'attributes' => [
-				'email:email',
-				'profile.phone:text:Telefon',
-				'profile.phone_2:text:Telefon[2]',
-			],
-		],
-	];
+	public array $fieldsetOptions = [];
 
 	public array $containerOptions = [
 		'class' => 'issue-users row',
@@ -46,6 +34,37 @@ class IssueUsersWidget extends Widget {
 	public ?Closure $legend = null;
 	public ?Closure $withAddress = null;
 	public bool $legendEncode = true;
+
+	public function getDefaultFieldsetOptions(IssueUser $issueUser): array {
+		$user = $issueUser->user;
+		return [
+			'toggle' => false,
+			'htmlOptions' => [
+				'class' => 'col-md-6',
+			],
+			'detailConfig' => [
+				'attributes' => [
+					[
+						'attribute' => 'email',
+						'format' => 'email',
+						'visible' => !empty($user->email),
+					],
+					[
+						'attribute' => 'profile.phone',
+						'format' => 'tel',
+						'label' => Yii::t('common', 'Phone number'),
+						'visible' => !empty($user->profile->phone),
+					],
+					[
+						'attribute' => 'profile.phone_2',
+						'label' => Yii::t('common', 'Phone number 2'),
+						'format' => 'tel',
+						'visible' => !empty($user->profile->phone_2),
+					],
+				],
+			],
+		];
+	}
 
 	/**
 	 * @return string
@@ -102,6 +121,9 @@ class IssueUsersWidget extends Widget {
 
 	public function renderUser(IssueUser $issueUser): string {
 		$options = $this->fieldsetOptions;
+		if (empty($options)) {
+			$options = $this->getDefaultFieldsetOptions($issueUser);
+		}
 		$class = ArrayHelper::remove($options, 'class', FieldsetDetailView::class);
 		if ($this->withAddress !== null) {
 			if (call_user_func($this->withAddress, $issueUser) && $issueUser->user->homeAddress) {

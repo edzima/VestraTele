@@ -20,8 +20,14 @@ trait UserRbacActor {
 
 	public function getUser(): User {
 		if ($this->user === null) {
-			$this->user = $this->createUser();
-			codecept_debug('Create user: ' . $this->user->username);
+			$user = Yii::$app->user;
+			if ($user && $user->getIdentity()) {
+				$this->user = Yii::$app->user->getIdentity();
+				codecept_debug('Load user from identity: ' . $this->user->username);
+			} else {
+				$this->user = $this->createUser();
+				codecept_debug('Create user: ' . $this->user->username);
+			}
 			$this->revokeAll();
 			$this->assignRoles();
 			$this->assignPermissions();

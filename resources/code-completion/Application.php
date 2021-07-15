@@ -5,7 +5,8 @@ use common\components\PayComponent;
 use common\components\Provisions;
 use common\components\TaxComponent;
 use common\components\User;
-use common\formatters\Formatter;
+use common\components\Formatter;
+use common\modules\lead\components\LeadManager;
 use yii\BaseYii;
 
 /**
@@ -28,6 +29,7 @@ class Yii extends BaseYii {
  * @mixin yii\web\Application|yii\web\Application
  * @property Formatter $formatter
  * @property HierarchyComponent $userHierarchy
+ * @property LeadManager $leadManager
  * @property PayComponent $pay
  * @property Provisions $provisions
  * @property TaxComponent $tax

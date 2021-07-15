@@ -6,9 +6,11 @@ use common\components\keyStorage\KeyStorage;
 use common\components\PayComponent;
 use common\components\Provisions;
 use common\components\TaxComponent;
-use common\formatters\Formatter;
+use common\components\Formatter;
+use common\models\user\User;
 use common\models\user\Worker;
 use edzima\teryt\Module as TerytModule;
+use common\modules\lead\Module as LeadModule;
 use yii\caching\DummyCache;
 use yii\caching\FileCache;
 
@@ -30,6 +32,10 @@ return [
 	'modules' => [
 		'teryt' => [
 			'class' => TerytModule::class,
+		],
+		'lead' => [
+			'class' => LeadModule::class,
+			'userClass' => User::class,
 		],
 	],
 	'components' => [

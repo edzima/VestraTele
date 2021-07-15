@@ -1,10 +1,10 @@
 <?php
 
-namespace common\formatters;
+namespace common\components;
 
+use common\helpers\Html;
 use Decimal\Decimal;
 use NumberFormatter;
-use yii\helpers\Html;
 use yii\i18n\Formatter as BaseFormatter;
 
 class Formatter extends BaseFormatter {
@@ -37,6 +37,14 @@ class Formatter extends BaseFormatter {
 			$value = $value->toFixed(self::FRACTION_DIGITS);
 		}
 		return parent::asCurrency($value, $currency, $options, $textOptions);
+	}
+
+	public function asTel($value, $options = []) {
+		if ($value === null) {
+			return $this->nullDisplay;
+		}
+
+		return Html::telLink(Html::encode($value), $value, $options);
 	}
 
 }

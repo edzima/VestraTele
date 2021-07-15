@@ -56,7 +56,65 @@ $user = Yii::$app->user;
 						],
 					],
 				],
+				[
+					'label' => Yii::t('common', 'Leads'),
+					'url' => ['/lead/lead/index'],
+					'visible' => $user->can(User::PERMISSION_LEAD),
+					'icon' => '<i class="fa fa-vcard"></i>',
+					'items' => [
+						[
+							'label' => Yii::t('lead', 'Browse'),
+							'url' => ['/lead/lead/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Reports'),
+							'url' => ['/lead/report/index'],
+							'icon' => '<i class="fa fa-table"></i>',
+						],
+						[
+							'label' => Yii::t('common', 'Reminders'),
+							'url' => ['/lead/reminder/index'],
+							'icon' => '<i class="fa fa-table"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Answers'),
+							'url' => ['/lead/answer/index'],
+							'icon' => '<i class="fa fa-table"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Questions'),
+							'url' => ['/lead/question/index'],
+							'icon' => '<i class="fa fa-table"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Users'),
+							'url' => ['/lead/user/index'],
+							'icon' => '<i class="fa fa-users"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Campaigns'),
+							'url' => ['/lead/campaign/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Sources'),
+							'url' => ['/lead/source/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Statuses'),
+							'url' => ['/lead/status/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Types'),
+							'url' => ['/lead/type/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
 
+					],
+				],
 				[
 					'label' => Yii::t('hint', 'Hints'),
 					'url' => ['/hint/city/index'],

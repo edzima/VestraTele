@@ -10,6 +10,11 @@ class Html extends BaseHtml {
 
 	protected const URL_HELPER = Url::class;
 
+	public static function telLink($text, $email = null, $options = []) {
+		$options['href'] = 'tel:' . ($email === null ? $text : $email);
+		return static::tag('a', $text, $options);
+	}
+
 	public static function issueLink(IssueInterface $issue, array $options = []): string {
 		/** @var $url Url */
 		$url = static::URL_HELPER;
