@@ -32,13 +32,6 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 		return $this->name;
 	}
 
-	public function getNameWithOwner(): string {
-		if ($this->owner_id && $this->owner) {
-			return $this->name . ' - ' . $this->owner;
-		}
-		return $this->name;
-	}
-
 	/**
 	 * {@inheritdoc}
 	 */
@@ -92,14 +85,18 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 		return $this->hasOne(Module::userClass(), ['id' => 'owner_id']);
 	}
 
-	public static function getNames(int $owner_id = null): array {
+	public static function getNames(int $owner_id = null, bool $withType = false): array {
 		$models = static::getModels();
 		if ($owner_id) {
 			$models = array_filter($models, static function (LeadSource $model) use ($owner_id): bool {
 				return $model->owner_id === null || $model->owner_id === $owner_id;
 			});
 		}
-		return ArrayHelper::map($models, 'id', $owner_id ? 'name' : 'nameWithOwner');
+		$name = $owner_id ? 'name' : 'nameWithOwner';
+		if ($withType) {
+			$name .= 'withType';
+		}
+		return ArrayHelper::map($models, 'id', $name);
 	}
 
 	public static function find() {
@@ -122,8 +119,23 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 		return $this->id;
 	}
 
+	public function getNameWithType(): string {
+		return $this->getName() . ' [' . $this->getType()->getName() . ']';
+	}
+
 	public function getName(): string {
 		return $this->name;
+	}
+
+	public function getNameWithOwnerWithType(): string {
+		return $this->getNameWithOwner() . ' [' . $this->getType()->getName() . ']';
+	}
+
+	public function getNameWithOwner(): string {
+		if ($this->owner_id && $this->owner) {
+			return $this->getName() . '  (' . $this->owner . ')';
+		}
+		return $this->getName();
 	}
 
 	public function getURL(): ?string {

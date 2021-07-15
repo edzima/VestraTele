@@ -206,9 +206,9 @@ class LeadForm extends Model implements LeadInterface {
 			if (!is_int($this->owner_id)) {
 				throw new InvalidConfigException('Owner must be integer.');
 			}
-			return LeadSource::getNames($this->owner_id);
+			return LeadSource::getNames($this->owner_id, true);
 		}
-		return LeadSource::getNames();
+		return LeadSource::getNames(null, true);
 	}
 
 	public static function getStatusNames(): array {
