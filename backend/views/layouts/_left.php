@@ -58,7 +58,7 @@ $user = Yii::$app->user;
 				],
 				[
 					'label' => Yii::t('common', 'Leads'),
-					'url' => ['/lead/lead/index'],
+					'url' => '#',
 					'visible' => $user->can(User::PERMISSION_LEAD),
 					'icon' => '<i class="fa fa-vcard"></i>',
 					'items' => [
