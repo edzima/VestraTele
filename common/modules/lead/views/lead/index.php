@@ -73,6 +73,7 @@ foreach (LeadSearch::questions() as $question) {
 				'attribute' => 'owner_id',
 				'label' => Yii::t('lead', 'Owner'),
 				'value' => 'owner',
+				'visible' => $searchModel->scenario !== LeadSearch::SCENARIO_USER,
 			],
 			'name',
 			[

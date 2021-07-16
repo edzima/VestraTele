@@ -72,6 +72,7 @@ class LeadCest {
 		Module::manager()->pushLead(LeadFactory::createLead([
 			'owner_id' => 1,
 			'phone' => '505-505-505',
+			'name' => 'Jonny',
 			'source_id' => 1,
 			'status_id' => 1,
 		]));
@@ -92,6 +93,7 @@ class LeadCest {
 		$I->assignPermission(User::PERMISSION_LEAD);
 		$I->amOnRoute(static::ROUTE_CREATE);
 		$I->click('Save');
+		$I->seeValidationError('Name cannot be blank.');
 		$I->seeValidationError('Phone cannot be blank when email is blank.');
 		$I->seeValidationError('Email cannot be blank when phone is blank.');
 	}
@@ -100,6 +102,7 @@ class LeadCest {
 		$I->amLoggedInAs(1);
 		$I->assignPermission(User::PERMISSION_LEAD);
 		$I->amOnRoute(static::ROUTE_CREATE);
+		$I->fillField('Lead Name', 'Jonny');
 		$I->fillField('Phone', '789-789-789');
 		$I->click('Save');
 		$I->seeInCurrentUrl(static::ROUTE_VIEW);

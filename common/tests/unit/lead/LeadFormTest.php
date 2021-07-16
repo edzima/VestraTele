@@ -25,7 +25,7 @@ class LeadFormTest extends Unit {
 
 		$this->thenUnsuccessValidate();
 
-		$this->thenSeeError('Name cannot be blank.', 'name');
+		$this->thenSeeError('Lead Name cannot be blank.', 'name');
 		$this->thenSeeError('Source cannot be blank.', 'source_id');
 		$this->thenSeeError('Status cannot be blank.', 'status_id');
 		$this->thenSeeError('Date At cannot be blank.', 'date_at');
