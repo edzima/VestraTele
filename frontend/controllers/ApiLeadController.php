@@ -44,6 +44,11 @@ class ApiLeadController extends Controller {
 				'errors' => $model->getErrors(),
 			];
 		}
+		Yii::warning([
+			'message' => 'Landing Lead not Loaded Data',
+			'post' => Yii::$app->request->post(),
+			'error' => $model->getErrors(),
+		], 'lead.landing.error');
 		return [
 			'status' => 'warning',
 			'message' => 'Not Send Data',
