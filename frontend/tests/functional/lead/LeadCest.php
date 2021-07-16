@@ -122,6 +122,13 @@ class LeadCest {
 		$I->see('Users');
 	}
 
+	public function checkViewPageShortReportLink(FunctionalTester $I): void {
+		$I->amLoggedInAs(1);
+		$I->assignPermission(User::PERMISSION_LEAD);
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => 1]);
+		$I->seeLink('Not Answered');
+	}
+
 	public function checkViewPageOnlySelfLead(FunctionalTester $I): void {
 		$I->amLoggedInAs(2);
 		$I->assignPermission(User::PERMISSION_LEAD);

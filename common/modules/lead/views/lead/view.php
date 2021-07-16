@@ -6,6 +6,7 @@ use common\modules\lead\models\Lead;
 use common\modules\lead\Module;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
+use common\modules\lead\widgets\ShortReportStatusesWidget;
 use common\modules\reminder\widgets\ReminderGridWidget;
 use common\widgets\address\AddressDetailView;
 use common\widgets\GridView;
@@ -32,6 +33,8 @@ YiiAsset::register($this);
 
 		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
 
+		<?= ShortReportStatusesWidget::widget(['lead_id' => $model->id]) ?>
+
 		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
 		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -43,7 +46,11 @@ YiiAsset::register($this);
 					'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
 					'method' => 'post',
 				],
-			]) : '' ?>
+			])
+			: ''
+		?>
+
+
 	</p>
 
 	<div class="row">

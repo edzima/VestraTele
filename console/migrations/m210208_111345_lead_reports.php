@@ -1,6 +1,5 @@
 <?php
 
-use common\modules\lead\models\ReportSchemaInterface;
 use common\modules\lead\Module;
 use console\base\Migration;
 use yii\db\ActiveRecord;
@@ -35,7 +34,7 @@ class m210208_111345_lead_reports extends Migration {
 			'owner_id' => $this->integer()->notNull(),
 			'status_id' => $this->integer()->notNull(),
 			'old_status_id' => $this->integer()->notNull(),
-			'details' => $this->string(255)->null(),
+			'details' => $this->text(),
 			'created_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
 			'updated_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
 		]);

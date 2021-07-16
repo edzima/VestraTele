@@ -28,6 +28,17 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 		'filterModel' => $searchModel,
 		'columns' => [
 			[
+				'attribute' => 'lead_name',
+				'value' => 'lead.name',
+				'label' => Yii::t('lead', 'Lead Name'),
+			],
+			[
+				'attribute' => 'lead_phone',
+				'value' => 'lead.phone',
+				'format' => 'tel',
+				'label' => Yii::t('lead', 'Phone'),
+			],
+			[
 				'attribute' => 'lead_type_id',
 				'value' => 'lead.source.type',
 				'filter' => LeadType::getNames(),

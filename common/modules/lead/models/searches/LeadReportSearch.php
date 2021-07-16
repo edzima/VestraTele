@@ -11,6 +11,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\modules\lead\models\LeadReport;
+use yii\db\ActiveQuery;
 use yii\db\Query;
 
 /**
@@ -18,6 +19,8 @@ use yii\db\Query;
  */
 class LeadReportSearch extends LeadReport {
 
+	public $lead_name;
+	public $lead_phone;
 	public $lead_campaign_id;
 	public $lead_source_id;
 	public $lead_type_id;
@@ -34,7 +37,8 @@ class LeadReportSearch extends LeadReport {
 			[['changedStatus'], 'boolean'],
 			['lead_source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['lead_campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
-			[['details', 'created_at', 'updated_at', 'answersQuestions'], 'safe'],
+			['lead_name', 'string', 'min' => 3],
+			[['details', 'created_at', 'updated_at', 'answersQuestions', 'lead_phone'], 'safe'],
 		];
 	}
 
@@ -88,6 +92,8 @@ class LeadReportSearch extends LeadReport {
 		}
 
 		$this->applyAnswersFilter($query);
+		$this->applyLeadNameFilter($query);
+		$this->applyLeadPhoneFilter($query);
 		$this->applyStatusesFilter($query);
 
 		// grid filtering conditions
@@ -111,6 +117,18 @@ class LeadReportSearch extends LeadReport {
 		$query->andFilterWhere([
 			'like', LeadAnswer::tableName() . '.answer', $this->answersQuestions,
 		]);
+	}
+
+	private function applyLeadNameFilter(ActiveQuery $query) {
+		if (!empty($this->lead_name)) {
+			$query->andWhere(['like', Lead::tableName() . '.name', $this->lead_name . '%', false]);
+		}
+	}
+
+	private function applyLeadPhoneFilter(ActiveQuery $query) {
+		if (!empty($this->lead_phone)) {
+			$query->andWhere(['like', Lead::tableName() . '.phone', $this->lead_phone]);
+		}
 	}
 
 	private function applyStatusesFilter(Query $query): void {

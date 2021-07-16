@@ -11,4 +11,8 @@ return [
 		'id' => LeadStatusInterface::STATUS_ARCHIVE,
 		'name' => 'Archive',
 	],
+	[
+		'name' => 'Not Answered',
+		'short_report' => true,
+	],
 ];

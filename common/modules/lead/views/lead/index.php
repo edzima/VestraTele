@@ -76,6 +76,7 @@ foreach (LeadSearch::questions() as $question) {
 				'visible' => $searchModel->scenario !== LeadSearch::SCENARIO_USER,
 			],
 			'name',
+			'phone:tel',
 			[
 				'attribute' => 'type_id',
 				'value' => 'source.type',
@@ -99,9 +100,9 @@ foreach (LeadSearch::questions() as $question) {
 				'value' => 'campaign',
 				'filter' => $searchModel->getCampaignNames(),
 				'label' => Yii::t('lead', 'Campaign'),
+				'visible' => $searchModel->scenario !== LeadSearch::SCENARIO_USER,
 			],
 			'date_at',
-			'phone:tel',
 		],
 			$questionColumns,
 			[
