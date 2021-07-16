@@ -10,18 +10,22 @@ use yii\widgets\ActiveForm;
 
 <div class="lead-status-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+	<?php $form = ActiveForm::begin([
+		'id' => 'lead-status-form',
+	]); ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
+	<?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'sort_index')->textInput() ?>
+	<?= $form->field($model, 'short_report')->checkbox() ?>
 
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>
-    </div>
+	<?= $form->field($model, 'sort_index')->textInput() ?>
 
-    <?php ActiveForm::end(); ?>
+	<div class="form-group">
+		<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>
+	</div>
+
+	<?php ActiveForm::end(); ?>
 
 </div>

@@ -13,6 +13,7 @@ use yii\helpers\ArrayHelper;
  * @property string $name
  * @property string|null $description
  * @property int|null $sort_index
+ * @property int|null $short_report
  *
  * @property Lead[] $leads
  */
@@ -38,6 +39,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 		return [
 			[['name'], 'required'],
 			[['sort_index'], 'integer'],
+			['short_report', 'boolean'],
 			[['name', 'description'], 'string', 'max' => 255],
 		];
 	}
@@ -51,6 +53,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			'name' => Yii::t('lead', 'Name'),
 			'description' => Yii::t('lead', 'Description'),
 			'sort_index' => Yii::t('lead', 'Sort Index'),
+			'short_report' => Yii::t('lead', 'Short Report'),
 		];
 	}
 
@@ -83,5 +86,9 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 
 	public function getName(): string {
 		return $this->name;
+	}
+
+	public function isShortReport(): bool {
+		return !empty($this->short_report);
 	}
 }

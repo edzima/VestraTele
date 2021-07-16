@@ -160,4 +160,5 @@ return [
 	'Phone: {phone}' => 'Telefon: {phone}',
 	'campaign' => 'campaign',
 	'Type {name}: ' => 'Typ {name}: ',
+	'Short Report' => 'Skrócony Raport',
 ];

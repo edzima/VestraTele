@@ -11,4 +11,6 @@ interface LeadStatusInterface {
 
 	public function getName(): string;
 
+	public function isShortReport(): bool;
+
 }

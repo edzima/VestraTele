@@ -17,6 +17,7 @@ class LeadStatusSearch extends LeadStatus {
 	public function rules(): array {
 		return [
 			[['id', 'sort_index'], 'integer'],
+			['short_report', 'boolean'],
 			[['name', 'description'], 'safe'],
 		];
 	}
@@ -57,6 +58,7 @@ class LeadStatusSearch extends LeadStatus {
 		$query->andFilterWhere([
 			'id' => $this->id,
 			'sort_index' => $this->sort_index,
+			'short_report' => $this->short_report,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])
