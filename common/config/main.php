@@ -19,7 +19,7 @@ return [
 	'name' => 'Vestra CRM',
 	'vendorPath' => dirname(__DIR__, 2) . '/vendor',
 	'extensions' => require(__DIR__ . '/../../vendor/yiisoft/extensions.php'),
-	'timeZone' => 'Europe/Warsaw',
+	'timeZone' => 'Europe/Warsaw', //@todo load from .env
 	'sourceLanguage' => 'en-US',
 	'language' => 'pl',
 	'bootstrap' => [
@@ -64,6 +64,7 @@ return [
 		'formatter' => [
 			'class' => Formatter::class,
 			'nullDisplay' => '',
+			'defaultTimeZone' => 'Europe/Warsaw',//@todo load from .env
 			'decimalSeparator' => ',',
 			'thousandSeparator' => ' ',
 			'currencyCode' => 'PLN',
