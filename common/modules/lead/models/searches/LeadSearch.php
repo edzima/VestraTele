@@ -155,7 +155,7 @@ class LeadSearch extends Lead implements SearchModel {
 			'query' => $query,
 			'sort' => [
 				'defaultOrder' => [
-					'date' => SORT_DESC,
+					'date_at' => SORT_DESC,
 				],
 			],
 		]);
