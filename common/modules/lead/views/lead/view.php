@@ -131,6 +131,7 @@ YiiAsset::register($this);
 
 		<?= LeadReportWidget::widget([
 			'model' => $report,
+			'withDelete' => $withDelete,
 		]) ?>
 
 
