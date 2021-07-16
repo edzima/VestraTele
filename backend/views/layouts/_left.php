@@ -60,6 +60,7 @@ $user = Yii::$app->user;
 					'label' => Yii::t('common', 'Leads'),
 					'url' => '#',
 					'visible' => $user->can(User::PERMISSION_LEAD),
+					'options' => ['class' => 'treeview'],
 					'icon' => '<i class="fa fa-vcard"></i>',
 					'items' => [
 						[
