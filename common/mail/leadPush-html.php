@@ -7,6 +7,8 @@ use common\modules\lead\models\ActiveLead;
 /* @var $lead ActiveLead $lead */
 
 $leadLink = Yii::$app->urlManager->createAbsoluteUrl(['lead/lead/view', 'id' => $lead->getId()]);
+$reportLink = Yii::$app->urlManager->createAbsoluteUrl(['lead/report/report', 'id' => $lead->getId()]);
+
 ?>
 <div class="lead-push-email">
 	<p><?= Yii::t('lead', 'Source') ?>: <?= Html::encode($lead->getSource()->getName()) ?></p>
@@ -15,5 +17,7 @@ $leadLink = Yii::$app->urlManager->createAbsoluteUrl(['lead/lead/view', 'id' => 
 	<p><?= Yii::t('lead', 'Phone') ?>: <?= Html::telLink($lead->getPhone()) ?></p>
 	<p><?= Yii::t('lead', 'Email') ?>: <?= Html::mailto($lead->getEmail()) ?></p>
 
-	<p><?= Html::a(Yii::t('lead', 'View Details'), $leadLink) ?></p>
+	<p><?= Html::a(Html::encode($leadLink), $leadLink) ?></p>
+	<p><?= Html::a(Yii::t('lead', 'Create Lead Report'), $reportLink) ?></p>
+
 </div>
