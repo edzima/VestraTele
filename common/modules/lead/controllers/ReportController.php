@@ -66,6 +66,7 @@ class ReportController extends BaseController {
 	public function actionView(int $id): string {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
+			'withDelete' => $this->module->allowDelete,
 		]);
 	}
 

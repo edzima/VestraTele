@@ -16,6 +16,7 @@ use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model Lead */
+/* @var $withDelete bool */
 
 $this->title = $model->getName();
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['index']];
@@ -35,7 +36,7 @@ YiiAsset::register($this);
 
 		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
-		<?= Module::getInstance()->allowDelete
+		<?= $withDelete
 			? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->id], [
 				'class' => 'btn btn-danger',
 				'data' => [

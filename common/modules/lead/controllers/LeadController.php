@@ -66,6 +66,7 @@ class LeadController extends BaseController {
 	public function actionView(int $id): string {
 		return $this->render('view', [
 			'model' => $this->findLead($id),
+			'withDelete' => $this->module->allowDelete,
 		]);
 	}
 
