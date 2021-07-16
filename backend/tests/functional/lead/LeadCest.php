@@ -17,7 +17,7 @@ class LeadCest {
 	/** @see LeadController::actionCreate() */
 	private const ROUTE_CREATE = '/lead/lead/create';
 	/** @see LeadController::actionView() */
-	private const ROUTE_VIEW = '/lead/lead/view';
+	public const ROUTE_VIEW = '/lead/lead/view';
 
 	private const SELECTOR_SEARCH_LABEL = '.lead-search label';
 	private const SELECTOR_FORM = '#lead-form';
@@ -118,7 +118,7 @@ class LeadCest {
 		$this->goToViewPage();
 		$I->seeLink('Report');
 		$I->click('Report');
-		$I->seeInCurrentUrl(LeadReportCest::ROUTE_REPORT);
+		$I->seeInCurrentUrl(ReportCest::ROUTE_REPORT);
 	}
 
 	public function checkReminderLink(LeadManager $I): void {

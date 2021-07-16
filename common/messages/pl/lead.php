@@ -75,7 +75,7 @@ return [
 	'Types' => 'Typy',
 	'Campaign' => 'Kampania',
 	'Report' => 'Raport',
-	'Create Report: {id}' => 'Dodaj raport: {id}',
+	'Create Report for Lead: {name}' => 'Dodaj Lead Raport: {name}',
 	'Leave empty for closed question.' => 'Zostaw puste dla pytań zamkniętych.',
 	'Answer' => 'Odpowiedź',
 	'Create Lead Question' => 'Dodaj pytanie',

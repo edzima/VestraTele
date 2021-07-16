@@ -9,23 +9,28 @@ use common\widgets\ActiveForm;
 /* @var $model ReportForm */
 
 ?>
-	<div class="lead-report-form">
+	<div class="row">
+		<div class="col-md-6">
+			<div class="lead-report-form">
 
-		<?php $form = ActiveForm::begin([
-			'id' => 'lead-report-form',
-		]); ?>
+				<?php $form = ActiveForm::begin([
+					'id' => 'lead-report-form',
+				]); ?>
 
-		<?= ReportFormWidget::widget([
-			'form' => $form,
-			'model' => $model,
-		]) ?>
+				<?= ReportFormWidget::widget([
+					'form' => $form,
+					'model' => $model,
+				]) ?>
 
-		<div class="form-group">
-			<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>
+				<div class="form-group">
+					<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>
+				</div>
+
+				<?php ActiveForm::end(); ?>
+
+			</div>
 		</div>
-
-		<?php ActiveForm::end(); ?>
-
 	</div>
+
 
 <?php

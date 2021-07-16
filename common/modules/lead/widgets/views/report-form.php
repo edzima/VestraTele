@@ -15,7 +15,8 @@ use yii\widgets\ActiveForm;
 
 <div class="lead-report-form-fields">
 
-	<?= $form->field($model, 'status_id')->dropDownList(ReportForm::getStatusNames()) ?>
+	<?= $form->field($model, 'status_id')
+		->widget(Select2::class, ['data' => ReportForm::getStatusNames()]) ?>
 
 	<?= $form->field($model, 'withAddress')->checkbox() ?>
 	<div id="address-wrapper" class="address-wrapper<?= !$model->withAddress ? ' hidden' : '' ?>">
@@ -37,7 +38,6 @@ use yii\widgets\ActiveForm;
 
 
 
-	<?= $form->field($model, 'details')->textarea() ?>
 
 	<?= !empty($model->getClosedQuestionsData())
 		? $form->field($model, 'closedQuestions')->widget(Select2::class, [
@@ -48,6 +48,9 @@ use yii\widgets\ActiveForm;
 		])
 		: ''
 	?>
+
+
+	<?= $form->field($model, 'details')->textarea() ?>
 
 
 </div>

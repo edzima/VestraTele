@@ -60,6 +60,19 @@ class ReportCest {
 		$I->seePageNotFound();
 	}
 
+	public function checkReportSelfLeadPage(FunctionalTester $I): void {
+		$I->haveFixtures($this->fixtures());
+		$I->amLoggedInAs(1);
+		$I->assignPermission(User::PERMISSION_LEAD);
+		$I->amOnRoute(static::ROUTE_REPORT, ['id' => 1]);
+		$I->see('Create Report for Lead: John');
+		$I->see('Status');
+		$I->see('Type');
+		$I->see('Phone');
+		$I->see('Email');
+		$I->see('Provider');
+	}
+
 	public function checkReportSelfLead(FunctionalTester $I): void {
 		$I->haveFixtures($this->fixtures());
 		$I->amLoggedInAs(1);

@@ -68,7 +68,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 	}
 
 	public static function getModels(bool $refresh = false): array {
-		if (static::$models === null || $refresh) {
+		if (empty(static::$models) || $refresh) {
 			static::$models = static::find()
 				->indexBy('id')
 				->orderBy(['sort_index' => SORT_DESC])

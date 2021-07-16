@@ -8,9 +8,10 @@ use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\controllers\ReportController;
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatus;
 
-class LeadReportCest {
+class ReportCest {
 
 	/* @see ReportController::actionIndex() */
 	public const ROUTE_INDEX = '/lead/report/index';
@@ -58,8 +59,16 @@ class LeadReportCest {
 
 		$lead = $this->grabLead();
 		$I->amOnRoute(static::ROUTE_REPORT, ['id' => $lead->getId()]);
-		$I->see('Create Report: ' . $lead->getId());
+		$I->see('Create Report for Lead: ' . $lead->getName(), 'h1');
 		$I->seeOptionIsSelected('#reportform-status_id', LeadStatus::getNames()[$lead->getStatusId()]);
+		$I->fillField('Details', 'Some Report Details');
+		$I->click('Save');
+		$I->seeRecord(LeadReport::class, [
+			'lead_id' => $lead->getId(),
+			'details' => 'Some Report Details',
+		]);
+		$I->seeInCurrentUrl(LeadCest::ROUTE_VIEW);
+		$I->see('Some Report Details');
 	}
 
 	private function grabLead(string $index = 'new-wordpress-accident'): ActiveLead {
