@@ -11,6 +11,7 @@ class FieldsetDetailView extends Widget {
 
 	public string $legend;
 	public array $legendOptions = [];
+	public string $afterLegend = '';
 	public array $htmlOptions = [];
 
 	public array $detailConfig = [];
@@ -46,10 +47,10 @@ class FieldsetDetailView extends Widget {
 		if ($encode) {
 			$legend = Html::encode($legend);
 		}
-		if($this->toggle){
+		if ($this->toggle) {
 			$legend .= $this->renderToggleBtn();
 		}
-		return Html::tag('legend', $legend, $options);
+		return Html::tag('legend', $legend, $options) . $this->afterLegend;
 	}
 
 	public function renderLegendContent(): string {

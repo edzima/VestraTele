@@ -32,6 +32,7 @@ class IssueUsersWidget extends Widget {
 	];
 
 	public ?Closure $legend = null;
+	public ?Closure $afterLegend = null;
 	public ?Closure $withAddress = null;
 	public bool $legendEncode = true;
 
@@ -147,6 +148,7 @@ class IssueUsersWidget extends Widget {
 			}
 		}
 		$options['legend'] = $this->generateLegend($issueUser);
+		$options['afterLegend'] = $this->renderAfterLegend($issueUser);
 		$options['legendOptions']['encode'] = $this->legendEncode;
 		$options['detailConfig']['model'] = $issueUser->user;
 		return $class::widget($options);
@@ -158,5 +160,12 @@ class IssueUsersWidget extends Widget {
 			return $legend($issueUser);
 		}
 		return $issueUser->getTypeName();
+	}
+
+	public function renderAfterLegend(IssueUser $issueUser): string {
+		if ($this->afterLegend instanceof Closure) {
+			return call_user_func($this->afterLegend, $issueUser);
+		}
+		return '';
 	}
 }

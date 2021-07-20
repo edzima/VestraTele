@@ -119,4 +119,5 @@ return [
 	'Link with settlement' => 'Dodaj do rozliczenia',
 	'Unlink with settlement' => 'Usuń z rozliczenia',
 	'With settlements' => 'W rozliczeniach',
+	'Create Installment' => 'Dodaj zaliczkę',
 ];
