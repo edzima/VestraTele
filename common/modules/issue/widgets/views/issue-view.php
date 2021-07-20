@@ -52,7 +52,7 @@ if ($provision) {
 							'type' => $issueUser->type,
 						],
 						[
-							'class' => 'btn btn-primary',
+							'class' => 'btn btn-xs btn-primary',
 							'title' => Yii::t('common', 'Update'),
 							'aria-label' => Yii::t('common', 'Update'),
 						]);
@@ -65,7 +65,7 @@ if ($provision) {
 									'type' => $issueUser->type,
 								], [
 
-									'class' => 'btn btn-danger',
+									'class' => 'btn btn-xs btn-danger',
 									'data-method' => 'POST',
 									'title' => Yii::t('common', 'Delete'),
 									'aria-label' => Yii::t('common', 'Delete'),
@@ -104,7 +104,7 @@ if ($provision) {
 							'id' => $issueUser->issue_id,
 							'user_id' => $issueUser->user_id,
 						], [
-							'class' => 'btn btn-success',
+							'class' => 'btn btn-success btn-xs',
 							'title' => Yii::t('settlement', 'Create Installment'),
 							'aria-label' => Yii::t('settlement', 'Create Installment'),
 						]);
