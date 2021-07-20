@@ -14,7 +14,7 @@ return [
 		'provider' => Lead::PROVIDER_FORM,
 	],
 	'equal-accident-phone-from-other-source' => [
-		'name' => 'John',
+		'name' => 'John2',
 		'source_id' => 2,
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',

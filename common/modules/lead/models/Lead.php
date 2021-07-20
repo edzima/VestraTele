@@ -245,10 +245,9 @@ class Lead extends ActiveRecord implements ActiveLead {
 	 */
 	public static function findByLead(LeadInterface $lead): array {
 		return static::find()
-			->andWhere([
-				'source_id' => $lead->getSourceId(),
-			])
-			->andWhere(['or', ['phone' => $lead->getPhone()], ['email' => $lead->getEmail()]])
+			->andFilterWhere(['phone' => $lead->getPhone()])
+			->orFilterWhere(['email' => $lead->getEmail()])
+			->indexBy('id')
 			->all();
 	}
 
@@ -279,4 +278,9 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return in_array($id, $this->getUsers(), true);
 	}
 
+	public function getSameContacts(): array {
+		$models = static::findByLead($this);
+		unset($models[$this->id]);
+		return $models;
+	}
 }

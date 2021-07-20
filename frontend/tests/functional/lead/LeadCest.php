@@ -52,7 +52,6 @@ class LeadCest {
 		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('Status');
 		$I->seeInGridHeader('Source');
-		$I->seeInGridHeader('Campaign');
 		$I->seeInGridHeader('Phone');
 		$I->seeInGridHeader('Reports');
 	}
@@ -151,6 +150,19 @@ class LeadCest {
 		$I->dontSeeGridDeleteLink(static::SELECTOR_LEAD_GRID);
 		$I->sendAjaxPostRequest(Url::to([static::ROUTE_DELETE, 'id' => 2]), $I->getCSRF());
 		$I->seeResponseCodeIs(405);
+	}
+
+	public function checkSameContacts(FunctionalTester $I): void {
+		$I->amLoggedInAs(1);
+		$I->assignPermission(User::PERMISSION_LEAD);
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => 1]);
+		$I->seeFlash('Find Similars Leads: 1.', 'warning');
+		$I->see('Same Contacts Leads', 'h3');
+		$I->dontSeeLink('John2');
+		$I->see('Type', '.same-contact-lead');
+		$I->see('Source', '.same-contact-lead');
+		$I->see('Phone', '.same-contact-lead');
+		$I->see('Owner', '.same-contact-lead');
 	}
 
 }

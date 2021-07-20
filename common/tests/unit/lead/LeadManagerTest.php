@@ -123,6 +123,31 @@ class LeadManagerTest extends Unit {
 		$this->tester->assertNotSame($first->getId(), $second->getId());
 	}
 
+	public function testDoubleSamePhone(): void {
+		$this->giveLead([
+			'source_id' => 1,
+			'status_id' => 1,
+			'phone' => '789-185-145',
+			'name' => 'First Contact from Source 1.',
+		]);
+		$this->whenPush();
+		$this->thenSuccessPush();
+		$this->tester->assertEmpty($this->pushed->getSameContacts());
+
+		$this->giveLead([
+			'source_id' => 2,
+			'status_id' => 1,
+			'phone' => '789-185-145',
+			'name' => 'Second Contact from Source 2.',
+		]);
+		$this->whenPush();
+		$this->thenSuccessPush();
+		$leads = $this->pushed->getSameContacts();
+		$this->tester->assertCount(1, $leads);
+		$lead = reset($leads);
+		$this->tester->assertSame('First Contact from Source 1.', $lead->getName());
+	}
+
 	protected function giveLead(array $data): void {
 		if (!isset($data['status_id'])) {
 			$data['status_id'] = LeadStatusInterface::STATUS_NEW;

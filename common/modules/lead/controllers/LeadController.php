@@ -64,8 +64,18 @@ class LeadController extends BaseController {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionView(int $id): string {
+		$model = $this->findLead($id);
+		$sameContacts = $model->getSameContacts();
+		if (!empty($sameContacts)) {
+			Yii::$app->session->addFlash('warning',
+				Yii::t('lead', 'Find Similars Leads: {count}.', [
+					'count' => count($sameContacts),
+				])
+			);
+		}
 		return $this->render('view', [
-			'model' => $this->findLead($id),
+			'model' => $model,
+			'sameContacts' => $sameContacts,
 			'withDelete' => $this->module->allowDelete,
 		]);
 	}

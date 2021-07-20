@@ -35,7 +35,6 @@ class FunctionalTester extends \Codeception\Actor {
 		$this->dontSee($message, '.help-block');
 	}
 
-
 	public function seeMenuLink($link): void {
 		$this->see($link, '#main-nav li a');
 	}
@@ -76,6 +75,14 @@ class FunctionalTester extends \Codeception\Actor {
 
 	public function grabAgent($index): Worker {
 		return $this->grabFixture(IssueFixtureHelper::AGENT, $index);
+	}
+
+	public function seeFlash(string $text, string $type): void {
+		$this->see($text, '.alert.alert-' . $type);
+	}
+
+	public function dontSeeFlash(string $text, string $type): void {
+		$this->dontSee($text, '.alert.alert-' . $type);
 	}
 
 	public function getCSRF(): array {

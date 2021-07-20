@@ -37,4 +37,9 @@ interface LeadInterface {
 
 	public function setLead(LeadInterface $lead): void;
 
+	/**
+	 * @return static[]
+	 */
+	public function getSameContacts(): array;
+
 }

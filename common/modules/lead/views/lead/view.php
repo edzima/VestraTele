@@ -2,7 +2,8 @@
 
 use common\helpers\Url;
 use common\models\user\User;
-use common\modules\lead\models\Lead;
+use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\LeadInterface;
 use common\modules\lead\Module;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
@@ -16,8 +17,10 @@ use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model Lead */
-/* @var $withDelete bool */
+/* @var $model ActiveLead */
+/* @var $sameContacts LeadInterface[]
+ * /* @var $withDelete bool
+ */
 
 $this->title = $model->getName();
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['index']];
@@ -31,16 +34,16 @@ YiiAsset::register($this);
 
 	<p>
 
-		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->getId()], ['class' => 'btn btn-success']) ?>
 
-		<?= ShortReportStatusesWidget::widget(['lead_id' => $model->id]) ?>
+		<?= ShortReportStatusesWidget::widget(['lead_id' => $model->getId()]) ?>
 
-		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->getId()], ['class' => 'btn btn-warning']) ?>
 
-		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary']) ?>
 
 		<?= $withDelete
-			? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->id], [
+			? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->getId()], [
 				'class' => 'btn btn-danger',
 				'data' => [
 					'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
@@ -54,7 +57,7 @@ YiiAsset::register($this);
 	</p>
 
 	<div class="row">
-		<div class="col-md-6">
+		<div class="col-md-4">
 			<?= DetailView::widget([
 				'model' => $model,
 				'attributes' => [
@@ -75,8 +78,16 @@ YiiAsset::register($this);
 							&& Yii::$app->user->can(User::ROLE_MANAGER),
 						'format' => 'ntext',
 					],
-					'phone:tel',
-					'email:email',
+					[
+						'attribute' => 'phone',
+						'format' => 'tel',
+						'visible' => !empty($model->getPhone()),
+					],
+					[
+						'attribute' => 'email',
+						'format' => 'email',
+						'visible' => !empty($model->getEmail()),
+					],
 					[
 						'attribute' => 'postal_code',
 						'visible' => !empty($model->postal_code),
@@ -90,7 +101,7 @@ YiiAsset::register($this);
 
 
 		</div>
-		<div class="col-md-6">
+		<div class="col-md-8">
 
 
 			<?= LeadAnswersWidget::widget([
@@ -119,6 +130,9 @@ YiiAsset::register($this);
 				])
 				: '' ?>
 
+			<div class="clearfix"></div>
+
+
 			<?= ReminderGridWidget::widget([
 				'dataProvider' => new ActiveDataProvider(['query' => $model->getReminders()]),
 				'urlCreator' => function ($action, $reminder, $key, $index) use ($model) {
@@ -130,18 +144,37 @@ YiiAsset::register($this);
 				},
 			]) ?>
 
+			<?php if (!empty($sameContacts)): ?>
+				<div class="row">
+					<h3><?= Yii::t('lead', 'Same Contacts Leads') ?></h3>
+					<?php foreach ($sameContacts as $sameContact): ?>
+						<div class="col-md-6">
+							<?= $this->render('_sameContact', [
+								'model' => $sameContact,
+							]) ?>
+
+						</div>
+					<?php endforeach; ?>
+
+				</div>
+			<?php endif; ?>
+
+
 		</div>
 	</div>
 	<div class="clearfix"></div>
 
-	<?php foreach ($model->reports as $report): ?>
+	<?php if (!empty($model->reports)): ?>
+		<h4><?= Yii::t('lead', 'Reports') ?></h4>
+		<?php foreach ($model->reports as $report): ?>
 
-		<?= LeadReportWidget::widget([
-			'model' => $report,
-			'withDelete' => $withDelete,
-		]) ?>
+			<?= LeadReportWidget::widget([
+				'model' => $report,
+				'withDelete' => false,
+			]) ?>
 
 
-	<?php endforeach; ?>
+		<?php endforeach; ?>
+	<?php endif; ?>
 
 </div>
