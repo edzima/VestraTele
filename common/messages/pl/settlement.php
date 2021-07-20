@@ -123,4 +123,8 @@ return [
 	'Calculation Types' => 'Typy rozliczeń',
 	'Settlement types' => 'Typy rozliczeń',
 	'External debt collection' => 'Firma windykacyjna'
+	'Settlement costs' => 'Koszty rozliczenia',
+	'Link with settlement' => 'Dodaj do rozliczenia',
+	'Unlink with settlement' => 'Usuń z rozliczenia',
+	'With settlements' => 'W rozliczeniach',
 ];

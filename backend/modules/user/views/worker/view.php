@@ -20,6 +20,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE)
+			? Html::a(
+				Yii::t('backend', 'Link to issue'),
+				['/issue/user/link', 'userId' => $model->id],
+				['class' => 'btn btn-success']
+			)
+			: ''
+		?>
+
+
 		<?=
 		Yii::$app->user->can(Worker::PERMISSION_PROVISION)
 			? Html::a(Yii::t('provision', 'Schemas provisions'), Url::userProvisions($model->id), ['class' => 'btn btn-success'])
@@ -33,14 +43,6 @@ $this->params['breadcrumbs'][] = $this->title;
 			: ''
 		?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE)
-			? Html::a(
-				Yii::t('backend', 'Link to issue'),
-				['/issue/user/link', 'userId' => $model->id],
-				['class' => 'btn btn-success']
-			)
-			: ''
-		?>
 
 		<?php if (Yii::$app->user->can(Worker::PERMISSION_WORKERS)): ?>
 			<?= Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>

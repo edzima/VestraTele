@@ -64,7 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'action_at:Datetime',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{view} {update} {link} {provision} {hierarchy} {delete}',
+				'template' => '{view} {update} {provision} {hierarchy} {delete}',
 				'buttons' => [
 					'hierarchy' => static function (string $url, Worker $model) {
 						return Html::a('<span class="glyphicon glyphicon-king"></span>',

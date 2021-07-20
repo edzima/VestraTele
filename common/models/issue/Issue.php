@@ -17,7 +17,6 @@ use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
 use common\models\issue\query\IssueUserQuery;
-use common\models\user\Customer;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -442,6 +441,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 			$this->unlink('users', $user, true);
 		}
 	}
+
 
 	/**
 	 * @inheritdoc
