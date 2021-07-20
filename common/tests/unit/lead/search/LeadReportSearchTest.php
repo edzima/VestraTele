@@ -96,6 +96,24 @@ class LeadReportSearchTest extends Unit {
 		$this->tester->assertEmpty($models);
 	}
 
+	public function testDate(): void {
+		$this->model->from_at = '2020-01-01';
+		$models = $this->getSearchModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertGreaterThanOrEqual(strtotime($this->model->from_at), strtotime($model->created_at));
+		}
+		$this->model->to_at = '2020-01-01';
+		$models = $this->getSearchModels(true);
+		foreach ($models as $model) {
+			$this->tester->assertGreaterThanOrEqual(strtotime($this->model->from_at), strtotime($model->created_at));
+			$this->tester->assertLessThanOrEqual(strtotime($this->model->to_at), strtotime($model->created_at));
+		}
+		$this->model->from_at = '2020-02-01';
+		$models = $this->getSearchModels(true);
+		$this->tester->assertEmpty($models);
+	}
+
 	/**
 	 * @param bool $refresh
 	 * @return Lead[]

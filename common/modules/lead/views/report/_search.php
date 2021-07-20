@@ -1,6 +1,7 @@
 <?php
 
 use common\modules\lead\models\searches\LeadReportSearch;
+use common\widgets\DateWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -18,9 +19,27 @@ use yii\widgets\ActiveForm;
 	]); ?>
 
 	<div class="row">
+
+		<?= $form->field($model, 'from_at', [
+			'options' => [
+				'class' => [
+					'col-md-3',
+				],
+			],
+		])->widget(DateWidget::class)
+		?>
+
+		<?= $form->field($model, 'to_at', [
+			'options' => [
+				'class' => [
+					'col-md-3',
+				],
+			],
+		])->widget(DateWidget::class)
+		?>
 		<?= $form->field($model, 'lead_source_id', [
 			'options' => [
-				'class' => 'col-md-6',
+				'class' => 'col-md-3',
 			],
 		])->widget(Select2::class, [
 			'data' => $model->getSourcesNames(),
@@ -32,7 +51,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'lead_campaign_id', [
 			'options' => [
-				'class' => 'col-md-6',
+				'class' => 'col-md-3',
 			],
 		])->widget(Select2::class, [
 			'data' => $model->getCampaignNames(),
@@ -41,6 +60,8 @@ use yii\widgets\ActiveForm;
 				'allowClear' => true,
 			],
 		]) ?>
+
+
 	</div>
 
 

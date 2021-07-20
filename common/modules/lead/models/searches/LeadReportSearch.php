@@ -26,6 +26,8 @@ class LeadReportSearch extends LeadReport {
 	public $lead_type_id;
 	public bool $changedStatus = false;
 	public $answersQuestions;
+	public $from_at;
+	public $to_at;
 
 	/**
 	 * {@inheritdoc}
@@ -38,7 +40,7 @@ class LeadReportSearch extends LeadReport {
 			['lead_source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['lead_campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			['lead_name', 'string', 'min' => 3],
-			[['details', 'created_at', 'updated_at', 'answersQuestions', 'lead_phone'], 'safe'],
+			[['details', 'created_at', 'updated_at', 'answersQuestions', 'lead_phone', 'from_at', 'to_at'], 'safe'],
 		];
 	}
 
@@ -47,6 +49,8 @@ class LeadReportSearch extends LeadReport {
 			'changedStatus' => Yii::t('lead', 'Changed Status'),
 			'lead_source_id' => Yii::t('lead', 'Source'),
 			'lead_campaign_id' => Yii::t('lead', 'Campaign'),
+			'from_at' => Yii::t('lead', 'From At'),
+			'to_at' => Yii::t('lead', 'To At'),
 		];
 	}
 
@@ -92,6 +96,7 @@ class LeadReportSearch extends LeadReport {
 		}
 
 		$this->applyAnswersFilter($query);
+		$this->applyDateFilter($query);
 		$this->applyLeadNameFilter($query);
 		$this->applyLeadPhoneFilter($query);
 		$this->applyStatusesFilter($query);
@@ -101,8 +106,6 @@ class LeadReportSearch extends LeadReport {
 			LeadReport::tableName() . '.id' => $this->id,
 			LeadReport::tableName() . '.lead_id' => $this->lead_id,
 			LeadReport::tableName() . '.owner_id' => $this->owner_id,
-			LeadReport::tableName() . '.created_at' => $this->created_at,
-			LeadReport::tableName() . '.updated_at' => $this->updated_at,
 			Lead::tableName() . '.campaign_id' => $this->lead_campaign_id,
 			Lead::tableName() . '.source_id' => $this->lead_source_id,
 
@@ -116,6 +119,19 @@ class LeadReportSearch extends LeadReport {
 	private function applyAnswersFilter(Query $query): void {
 		$query->andFilterWhere([
 			'like', LeadAnswer::tableName() . '.answer', $this->answersQuestions,
+		]);
+	}
+
+	private function applyDateFilter(ActiveQuery $query): void {
+		if (!empty($this->from_at)) {
+			$query->andWhere(['>=', LeadReport::tableName() . '.created_at', date('Y-m-d 00:00:00', strtotime($this->from_at))]);
+		}
+		if (!empty($this->to_at)) {
+			$query->andWhere(['<=', LeadReport::tableName() . '.created_at', date('Y-m-d 23:59:59', strtotime($this->to_at))]);
+		}
+		$query->andFilterWhere([
+			LeadReport::tableName() . '.created_at' => $this->created_at,
+			LeadReport::tableName() . '.updated_at' => $this->updated_at,
 		]);
 	}
 

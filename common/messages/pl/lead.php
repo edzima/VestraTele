@@ -1,6 +1,8 @@
 <?php
 
 return [
+	'From At' => 'Od',
+	'To At' => 'Do',
 	'status' => 'Status',
 	'Delete' => 'Usuń',
 	'Owner' => 'Właściciel',
