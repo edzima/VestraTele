@@ -24,6 +24,7 @@ class RbacController extends Controller {
 
 	public array $roles = [
 		Worker::ROLE_AGENT,
+		Worker::ROLE_CO_AGENT,
 		Worker::ROLE_BOOKKEEPER,
 		Worker::ROLE_CUSTOMER_SERVICE,
 		Worker::ROLE_LAWYER,
