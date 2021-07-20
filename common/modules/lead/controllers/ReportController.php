@@ -94,15 +94,13 @@ class ReportController extends BaseController {
 			throw new NotFoundHttpException();
 		}
 		$lead = $this->findLead($lead_id);
-		if ($lead->getStatusId() !== $status_id) {
-			$model = new LeadReport();
-			$model->lead_id = $lead_id;
-			$model->old_status_id = $lead->getStatusId();
-			$model->status_id = $status_id;
-			$model->owner_id = Yii::$app->user->getId();
-			$model->save();
-		}
-		//	return $this->redirect(['lead/view', 'id' => $lead_id]);
+		$model = new LeadReport();
+		$model->lead_id = $lead_id;
+		$model->old_status_id = $lead->getStatusId();
+		$model->status_id = $status_id;
+		$model->owner_id = Yii::$app->user->getId();
+		$model->save();
+		return $this->redirect(['lead/view', 'id' => $lead_id]);
 	}
 
 	/**
