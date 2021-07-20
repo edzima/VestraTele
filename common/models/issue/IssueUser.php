@@ -27,6 +27,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 
 	public const TYPE_LAWYER = Worker::ROLE_LAWYER;
 	public const TYPE_AGENT = Worker::ROLE_AGENT;
+	public const TYPE_CO_AGENT = Worker::ROLE_CO_AGENT;
 	public const TYPE_TELEMARKETER = Worker::ROLE_TELEMARKETER;
 	public const TYPE_CUSTOMER = Customer::ROLE_CUSTOMER;
 	public const TYPE_VICTIM = Customer::ROLE_VICTIM;
@@ -109,6 +110,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		return [
 			static::TYPE_CUSTOMER => User::getRolesNames()[static::TYPE_CUSTOMER],
 			static::TYPE_AGENT => User::getRolesNames()[static::TYPE_AGENT],
+			static::TYPE_CO_AGENT => User::getRolesNames()[static::TYPE_CO_AGENT],
 			static::TYPE_LAWYER => User::getRolesNames()[static::TYPE_LAWYER],
 			static::TYPE_TELEMARKETER => User::getRolesNames()[static::TYPE_TELEMARKETER],
 			static::TYPE_VICTIM => User::getRolesNames()[static::TYPE_VICTIM],

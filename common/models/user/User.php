@@ -54,6 +54,7 @@ class User extends ActiveRecord implements IdentityInterface {
 
 	//workers
 	public const ROLE_AGENT = 'agent';
+	public const ROLE_CO_AGENT = 'co-agent';
 	public const ROLE_BOOKKEEPER = 'book_keeper';
 	public const ROLE_CUSTOMER_SERVICE = 'customer_service';
 	public const ROLE_TELEMARKETER = 'telemarketer';

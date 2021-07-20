@@ -1,5 +1,6 @@
 <?php
 
+use common\models\user\User;
 use common\models\user\Worker;
 use common\widgets\address\AddressDetailView;
 use yii\helpers\Html;
@@ -20,6 +21,15 @@ $this->params['breadcrumbs'][] = $this->title;
 		<?=
 		Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)
 			? Html::a(Yii::t('common', 'Hierarchy'), ['hierarchy', 'id' => $model->id], ['class' => 'btn btn-info'])
+			: ''
+		?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_ISSUE)
+			? Html::a(
+				Yii::t('backend', 'Link to issue'),
+				['/issue/user/link', 'userId' => $model->id],
+				['class' => 'btn btn-success']
+			)
 			: ''
 		?>
 

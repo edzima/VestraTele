@@ -70,6 +70,10 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 		return ArrayHelper::map(static::getModels(), 'id', 'name');
 	}
 
+	/**
+	 * @param bool $refresh
+	 * @return static[]
+	 */
 	public static function getModels(bool $refresh = false): array {
 		if (empty(static::$models) || $refresh) {
 			static::$models = static::find()

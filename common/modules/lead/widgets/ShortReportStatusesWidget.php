@@ -9,7 +9,7 @@ use yii\base\Widget;
 class ShortReportStatusesWidget extends Widget {
 
 	public int $lead_id;
-	public string $route = '/lead/report/short';
+	public string $route = '/lead/report/status';
 	public array $options = [
 		'class' => 'btn btn-info',
 	];

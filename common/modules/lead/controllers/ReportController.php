@@ -4,9 +4,11 @@ namespace common\modules\lead\controllers;
 
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\LeadQuestion;
+use common\modules\lead\models\LeadStatus;
 use Yii;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\searches\LeadReportSearch;
+use yii\base\BaseObject;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -84,6 +86,23 @@ class ReportController extends BaseController {
 		return $this->render('report', [
 			'model' => $model,
 		]);
+	}
+
+	public function actionStatus(int $lead_id, int $status_id) {
+		$status = LeadStatus::getModels()[$status_id] ?? null;
+		if ($status === null || !$status->short_report) {
+			throw new NotFoundHttpException();
+		}
+		$lead = $this->findLead($lead_id);
+		if ($lead->getStatusId() !== $status_id) {
+			$model = new LeadReport();
+			$model->lead_id = $lead_id;
+			$model->old_status_id = $lead->getStatusId();
+			$model->status_id = $status_id;
+			$model->owner_id = Yii::$app->user->getId();
+			$model->save();
+		}
+		//	return $this->redirect(['lead/view', 'id' => $lead_id]);
 	}
 
 	/**
