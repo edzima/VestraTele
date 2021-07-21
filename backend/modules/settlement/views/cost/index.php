@@ -63,6 +63,11 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			'valueWithoutVAT:currency:' . Yii::t('backend', 'Value without VAT'),
 			'VATPercent',
+			[
+				'attribute' => 'pay_type',
+				'value' => 'payTypeName',
+				'filter' => IssueCostSearch::getPayTypesNames(),
+			],
 			'date_at:date',
 			'settled_at:date',
 			'created_at:date',

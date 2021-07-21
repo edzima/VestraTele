@@ -120,4 +120,7 @@ return [
 	'Unlink with settlement' => 'Usuń z rozliczenia',
 	'With settlements' => 'W rozliczeniach',
 	'Create Installment' => 'Dodaj zaliczkę',
+	'Pay Type' => 'Metoda Płatności',
+	'Cash' => 'Gotówka',
+	'Bank Transfer' => 'Przelew Bankowy',
 ];

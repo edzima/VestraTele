@@ -25,9 +25,11 @@ use yii\db\ActiveRecord;
  * @property int $created_at
  * @property int $updated_at
  * @property string $date_at
+ * @property string|null $pay_type
  * @property string|null $settled_at
  * @property int|null $user_id
  *
+ * @property-read string|null $payTypeName
  * @property-read string $typeName
  * @property-read string $typeNameWithValue
  * @property-read bool $isSettled
@@ -50,6 +52,11 @@ class IssueCost extends ActiveRecord implements
 	public const TYPE_OFFICE = 'office';
 	public const TYPE_JUSTIFICATION_OF_THE_JUDGMENT = 'justification_of_the_judgment';
 	public const TYPE_INSTALLMENT = 'installment';
+	public const TYPE_PCC = 'pcc';
+	public const TYPE_PIT_4 = 'PIT-4';
+
+	public const PAY_TYPE_CASH = 'cash';
+	public const PAY_TYPE_BANK_TRANSFER = 'bank-transfer';
 
 	public static function tableName(): string {
 		return '{{%issue_cost}}';
@@ -71,6 +78,10 @@ class IssueCost extends ActiveRecord implements
 		return static::getTypesNames()[$this->type];
 	}
 
+	public function getPayTypeName(): ?string {
+		return static::getPayTypesNames()[$this->pay_type] ?? null;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -89,7 +100,8 @@ class IssueCost extends ActiveRecord implements
 			'settled_at' => Yii::t('common', 'Settled at'),
 			'user_id' => Yii::t('common', 'User'),
 			'user' => Yii::t('common', 'User'),
-
+			'pay_type' => Yii::t('settlement', 'Pay Type'),
+			'payTypeName' => Yii::t('settlement', 'Pay Type'),
 		]);
 	}
 
@@ -125,6 +137,13 @@ class IssueCost extends ActiveRecord implements
 		return $this->user !== null;
 	}
 
+	public function unlinkSettlement(int $settlementId): void {
+		static::getDb()
+			->createCommand()
+			->delete(IssuePayCalculation::viaCostTableName(), ['cost_id' => $this->id, 'settlement_id' => $settlementId])
+			->execute();
+	}
+
 	public static function getTypesNames(): array {
 		return [
 			static::TYPE_PURCHASE_OF_RECEIVABLES => Yii::t('common', 'Purchase of receivables'),
@@ -134,6 +153,15 @@ class IssueCost extends ActiveRecord implements
 			static::TYPE_WRIT => Yii::t('common', 'Writ'),
 			static::TYPE_JUSTIFICATION_OF_THE_JUDGMENT => Yii::t('common', 'Justification of the judgment'),
 			static::TYPE_INSTALLMENT => Yii::t('common', 'Installment'),
+			static::TYPE_PCC => Yii::t('settlement', 'PCC'),
+			static::TYPE_PIT_4 => Yii::t('settlement', 'PIT-4'),
+		];
+	}
+
+	public static function getPayTypesNames(): array {
+		return [
+			static::PAY_TYPE_CASH => Yii::t('settlement', 'Cash'),
+			static::PAY_TYPE_BANK_TRANSFER => Yii::t('settlement', 'Bank Transfer'),
 		];
 	}
 
@@ -176,13 +204,6 @@ class IssueCost extends ActiveRecord implements
 	 */
 	public static function find(): IssueCostQuery {
 		return new IssueCostQuery(static::class);
-	}
-
-	public function unlinkSettlement(int $settlementId): void {
-		static::getDb()
-			->createCommand()
-			->delete(IssuePayCalculation::viaCostTableName(), ['cost_id' => $this->id, 'settlement_id' => $settlementId])
-			->execute();
 	}
 
 }

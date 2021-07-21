@@ -30,7 +30,7 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 	public function rules(): array {
 		return [
 			[['id', 'issue_id', 'user_id', 'issueType', 'issueStage'], 'integer'],
-			['type', 'string'],
+			[['type', 'pay_type'], 'string'],
 			[['settled', 'withSettlements'], 'boolean'],
 			[['created_at', 'updated_at', 'date_at', 'settled_at'], 'safe'],
 			[['value', 'vat'], 'number'],

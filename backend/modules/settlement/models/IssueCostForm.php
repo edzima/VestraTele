@@ -22,6 +22,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	public string $date_at = '';
 	public ?string $settled_at = null;
 	public string $type = '';
+	public ?string $pay_type = null;
 	public string $value = '';
 	public string $vat = '';
 	public $user_id;
@@ -42,6 +43,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 			'vat' => 'VAT (%)',
 			'user_id' => Yii::t('common', 'User'),
 			'settled_at' => Yii::t('common', 'Settled at'),
+			'pay_type' => Yii::t('settlement', 'Pay Type'),
 		];
 	}
 
@@ -69,6 +71,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 			['vat', 'number', 'min' => 0, 'max' => 100],
 			['value', 'number', 'min' => 1, 'max' => 10000],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
+			['pay_type', 'in', 'range' => array_keys(static::getPayTypesNames())],
 			['user_id', 'in', 'range' => array_keys($this->getUserNames()), 'message' => Yii::t('backend', 'User must be from issue users.')],
 		];
 	}
@@ -93,10 +96,15 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		$this->value = $cost->getValueWithVAT()->toFixed(2);
 		$this->vat = $cost->getVAT()->toFixed(2);
 		$this->user_id = $cost->user_id;
+		$this->pay_type = $cost->pay_type;
 	}
 
 	public static function getTypesNames(): array {
 		return IssueCost::getTypesNames();
+	}
+
+	public static function getPayTypesNames(): array {
+		return IssueCost::getPayTypesNames();
 	}
 
 	public function getUserNames(): array {
@@ -115,6 +123,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		$model->date_at = $this->date_at;
 		$model->user_id = $this->user_id;
 		$model->settled_at = $this->settled_at;
+		$model->pay_type = $this->pay_type;
 		return $model->save(false);
 	}
 

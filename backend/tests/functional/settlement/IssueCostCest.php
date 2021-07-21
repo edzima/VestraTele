@@ -69,6 +69,7 @@ class IssueCostCest {
 		$I->seeInGridHeader('Issue');
 		$I->seeInGridHeader('Issue Type');
 		$I->seeInGridHeader('Type');
+		$I->seeInGridHeader('Pay Type');
 		$I->seeInGridHeader('User');
 		$I->seeInGridHeader('Value with VAT');
 		$I->seeInGridHeader('VAT (%)');
@@ -86,6 +87,7 @@ class IssueCostCest {
 		$I->see('Costs: ' . $issue->longId);
 		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('User');
+		$I->seeInGridHeader('Pay Type');
 		$I->seeInGridHeader('Value with VAT');
 		$I->seeInGridHeader('VAT (%)');
 		$I->seeInGridHeader('Date at');

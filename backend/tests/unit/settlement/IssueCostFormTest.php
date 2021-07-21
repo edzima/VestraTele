@@ -143,13 +143,33 @@ class IssueCostFormTest extends Unit {
 		$model->value = 600;
 		$model->vat = 23;
 		$this->thenUnsuccessSave();
-		$this->tester->assertFalse($model->save());
-		$this->tester->dontSeeRecord(IssueCost::class, [
-			'issue_id' => $model->getIssue()->id,
-			'type' => 'invalid-type',
+		$this->thenSeeError('Type is invalid.', 'type');
+	}
+
+	public function testInvalidPayType(): void {
+		$model = $this->model;
+		$model->pay_type = 'invalid-pat-type';
+		$model->date_at = '2020-01-01';
+		$model->value = 600;
+		$model->vat = 23;
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Pay Type is invalid.', 'pay_type');
+	}
+
+	public function testWithPayType(): void {
+		$model = $this->model;
+		$model->type = IssueCost::TYPE_OFFICE;
+		$model->pay_type = IssueCost::PAY_TYPE_CASH;
+		$model->date_at = '2020-01-01';
+		$model->value = 600;
+		$model->vat = 23;
+		$this->thenSuccessSave();
+		$this->tester->seeRecord(IssueCost::class, [
+			'type' => IssueCost::TYPE_OFFICE,
+			'pay_type' => IssueCost::PAY_TYPE_CASH,
+			'issue_id' => $this->model->getIssue()->getIssueId(),
 			'value' => 600,
 			'vat' => 23,
-			'date_at' => '2020-01-01',
 		]);
 	}
 
