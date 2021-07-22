@@ -4,7 +4,6 @@ namespace common\models\user;
 
 use common\models\hierarchy\ActiveHierarchy;
 use common\models\user\query\UserQuery;
-use Yii;
 use yii\db\ActiveQuery;
 
 /**
@@ -26,6 +25,8 @@ class Worker extends User implements ActiveHierarchy {
 		self::ROLE_LAWYER,
 		self::ROLE_MANAGER,
 	];
+
+	public const PERMISSION_COST_DEBT = 'cost.debt';
 
 	private static $USER_NAMES = [];
 

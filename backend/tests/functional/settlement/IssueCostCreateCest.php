@@ -29,8 +29,7 @@ class IssueCostCreateCest {
 	public function checkDefaultSave(CostIssueManager $I): void {
 		$I->seeInField('Date at', date('Y-m-d'));
 		$I->click('Save');
-		$I->seeValidationError('Value with VAT cannot be blank.');
-		$I->seeValidationError('VAT (%) cannot be blank.');
+		$I->seeValidationError('Value cannot be blank.');
 	}
 
 	public function checkEmptyDate(CostIssueManager $I): void {
@@ -41,7 +40,7 @@ class IssueCostCreateCest {
 
 	public function checkValidCreate(CostIssueManager $I): void {
 		$I->selectOption('Type', IssueCost::TYPE_PURCHASE_OF_RECEIVABLES);
-		$I->fillField('Value with VAT', 100);
+		$I->fillField('Value', 100);
 		$I->fillField('VAT (%)', 23);
 		$I->click('Save');
 		$I->seeLink('Update');

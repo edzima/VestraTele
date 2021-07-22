@@ -93,6 +93,7 @@ trait UserRbacActor {
 	}
 
 	private function createUser(): User {
+		User::deleteAll(['username' => $this->getUsername()]);
 		$user = new User();
 		$user->username = $this->getUsername();
 		$user->setPassword($this->getPassword());

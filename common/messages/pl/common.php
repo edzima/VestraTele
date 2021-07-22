@@ -22,6 +22,7 @@ return [
 	'administrator' => 'Admin',
 	'agent' => 'Przedstawiciel',
 	'co-agent' => 'Przedstawiciel (wspólnik)',
+	'cost.debt' => 'Koszty Wierzytelność',
 	'archive' => 'Archiwum',
 	'customer_service' => 'Obsługa klienta',
 	'issue' => 'Sprawy',

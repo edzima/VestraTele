@@ -27,7 +27,7 @@ class IssueCostActionColumn extends ActionColumn {
 		}
 		if ($this->settle && !isset($this->buttons['settle'])) {
 			$this->buttons['settle'] = function (string $key, IssueCost $cost): string {
-				return $this->checkLink($cost);
+				return $this->settleLink($cost);
 			};
 		}
 		if ($this->settlement) {
@@ -44,7 +44,7 @@ class IssueCostActionColumn extends ActionColumn {
 		}
 	}
 
-	public function checkLink(IssueCost $cost): string {
+	public function settleLink(IssueCost $cost): string {
 		if ($cost->isSettled) {
 			return '';
 		}

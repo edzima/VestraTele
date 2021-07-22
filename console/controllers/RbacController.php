@@ -40,6 +40,9 @@ class RbacController extends Controller {
 		Worker::PERMISSION_COST => [
 			Worker::ROLE_BOOKKEEPER,
 		],
+		Worker::PERMISSION_COST_DEBT => [
+			Worker::ROLE_BOOKKEEPER,
+		],
 		Worker::PERMISSION_CALCULATION_TO_CREATE => [
 			Worker::ROLE_BOOKKEEPER,
 		],
@@ -75,6 +78,7 @@ class RbacController extends Controller {
 		],
 		Worker::PERMISSION_WORKERS,
 		Worker::PERMISSION_LEAD,
+
 	];
 
 	public function actionInit(): void {

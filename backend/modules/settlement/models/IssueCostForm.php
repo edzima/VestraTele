@@ -3,8 +3,8 @@
 namespace backend\modules\settlement\models;
 
 use common\models\forms\HiddenFieldsModel;
-use common\models\issue\Issue;
 use common\models\issue\IssueCost;
+use common\models\issue\IssueInterface;
 use common\models\user\User;
 use Decimal\Decimal;
 use Yii;
@@ -25,13 +25,13 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	public string $type = '';
 	public ?string $pay_type = null;
 	public string $value = '';
-	public string $vat = '';
+	public ?string $vat = null;
 	public $user_id;
 
 	private ?IssueCost $model = null;
-	private Issue $issue;
+	private IssueInterface $issue;
 
-	public function __construct(Issue $issue, $config = []) {
+	public function __construct(IssueInterface $issue, $config = []) {
 		$this->issue = $issue;
 		parent::__construct($config);
 	}
@@ -46,7 +46,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		return [
 			'date_at' => Yii::t('common', 'Date at'),
 			'type' => Yii::t('common', 'Type'),
-			'value' => Yii::t('common', 'Value with VAT'),
+			'value' => $this->vat ? Yii::t('settlement', 'Value with VAT') : Yii::t('settlement', 'Value'),
 			'vat' => 'VAT (%)',
 			'user_id' => Yii::t('common', 'User'),
 			'settled_at' => Yii::t('common', 'Settled at'),
@@ -56,8 +56,9 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 
 	public function rules(): array {
 		return [
-			[['type', 'value', 'vat', 'date_at'], 'required'],
+			[['type', 'value', 'date_at'], 'required'],
 			[['date_at', 'settled_at'], 'date', 'format' => 'Y-m-d'],
+			['vat', 'default', 'value' => null],
 			[
 				'settled_at', 'compare', 'compareAttribute' => 'date_at', 'operator' => '>=',
 				'enableClientValidation' => false,
@@ -84,7 +85,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		];
 	}
 
-	public function getIssue(): Issue {
+	public function getIssue(): IssueInterface {
 		return $this->issue;
 	}
 
@@ -102,7 +103,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		$this->date_at = $cost->date_at;
 		$this->settled_at = $cost->settled_at;
 		$this->value = $cost->getValueWithVAT()->toFixed(2);
-		$this->vat = $cost->getVAT()->toFixed(2);
+		$this->vat = $cost->getVAT() ? $cost->getVAT()->toFixed(2) : null;
 		$this->user_id = $cost->user_id;
 		$this->pay_type = $cost->pay_type;
 	}
@@ -116,17 +117,18 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	}
 
 	public function getUserNames(): array {
-		return User::getSelectList($this->issue->getUsers()->select('user_id')->column());
+		return User::getSelectList($this->getIssue()->getIssueModel()->getUsers()->select('user_id')->column(), false);
 	}
 
 	public function save(): bool {
 		if (!$this->validate()) {
+			codecept_debug($this->getErrors());
 			return false;
 		}
 		$model = $this->getModel();
-		$model->issue_id = $this->getIssue()->id;
+		$model->issue_id = $this->getIssue()->getIssueId();
 		$model->value = (new Decimal($this->value))->toFixed(2);
-		$model->vat = (new Decimal($this->vat))->toFixed(2);
+		$model->vat = $this->vat ? (new Decimal($this->vat))->toFixed(2) : null;
 		$model->type = $this->type;
 		$model->date_at = $this->date_at;
 		$model->user_id = $this->user_id;
@@ -152,5 +154,9 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 			return in_array($attribute, $attributes);
 		}
 		return true;
+	}
+
+	public function getValue(): Decimal {
+		return new Decimal($this->value);
 	}
 }

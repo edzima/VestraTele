@@ -61,7 +61,7 @@ use yii\db\Expression;
  * @property string $archives_nr
  * @property int $lawyer_id
  * @property bool $payed
- * @property string|null $signing_at
+ * @property string $signing_at
  * @property string|null $type_additional_date_at
  * @property string $stage_change_at
  * @property string|null $signature_act
@@ -431,7 +431,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 		}
 	}
 
-
 	/**
 	 * @param string $type
 	 */
@@ -441,7 +440,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 			$this->unlink('users', $user, true);
 		}
 	}
-
 
 	/**
 	 * @inheritdoc

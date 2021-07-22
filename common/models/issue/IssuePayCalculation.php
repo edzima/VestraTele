@@ -53,6 +53,7 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 	public const TYPE_HONORARIUM = 30;
 	public const TYPE_LAWYER = 40;
 	public const TYPE_SUBSCRIPTION = 50;
+	public const TYPE_DEBT = 100;
 
 	public const PROBLEM_STATUS_PREPEND_DEMAND = 10;
 	public const PROBLEM_STATUS_DEMAND = 15;
@@ -316,6 +317,7 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 			static::TYPE_ADMINISTRATIVE => Yii::t('settlement', 'Administrative'),
 			static::TYPE_LAWYER => Yii::t('settlement', 'Lawyer'),
 			static::TYPE_SUBSCRIPTION => Yii::t('settlement', 'Subscription'),
+			static::TYPE_DEBT => Yii::t('settlement', 'Debt'),
 		];
 	}
 

@@ -3,6 +3,7 @@
 namespace backend\modules\settlement\controllers;
 
 use backend\helpers\Url;
+use backend\modules\settlement\models\DebtCostsForm;
 use backend\modules\settlement\models\IssueCostForm;
 use backend\modules\settlement\models\search\IssueCostSearch;
 use common\models\issue\Issue;
@@ -28,6 +29,8 @@ class CostController extends Controller {
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'settlement-link' => ['POST'],
+					'settlement-unlink' => ['POST'],
 				],
 			],
 		];
@@ -65,6 +68,23 @@ class CostController extends Controller {
 			'model' => $model,
 			'issue' => $issue,
 			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	/**
+	 * Create Debt Costs for Issue
+	 *
+	 * @param int $issue_id
+	 * @return string|\yii\web\Response
+	 * @throws NotFoundHttpException
+	 */
+	public function actionCreateDebt(int $issue_id) {
+		$model = new DebtCostsForm($this->findIssue($issue_id));
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['issue', 'id' => $issue_id]);
+		}
+		return $this->render('create-debt', [
+			'model' => $model,
 		]);
 	}
 

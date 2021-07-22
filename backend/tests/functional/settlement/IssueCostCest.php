@@ -133,7 +133,7 @@ class IssueCostCest {
 		$issue = $this->issueFixture->grabIssue(0);
 		$I->amOnPage([static::ROUTE_CREATE, 'id' => $issue->id]);
 		$I->see('Create cost: ' . $issue->longId);
-		$I->fillField('Value with VAT', 1230);
+		$I->fillField('Value', 1230);
 		$I->fillField('VAT (%)', 23);
 		$I->click('Save');
 		$I->seeInCurrentUrl(static::ROUTE_VIEW);
@@ -153,7 +153,7 @@ class IssueCostCest {
 		$I->dontSee('Type', 'label[for="issuecostform-type"]');
 		$I->dontSee('Settled at', 'label');
 		$I->selectOption('User', UserFixtureHelper::AGENT_PETER_NOWAK);
-		$I->fillField('Value with VAT', 123);
+		$I->fillField('Value', 123);
 		$I->fillField('VAT (%)', 23);
 		$I->click('Save');
 		$I->seeInCurrentUrl(static::ROUTE_VIEW);
@@ -238,18 +238,34 @@ class IssueCostCest {
 			'issue_id' => 1,
 			'type' => IssueCost::TYPE_OFFICE,
 			'value' => 300,
-			'vat' => 0,
+			'date_at' => '2020-01-01',
 		]);
 		$I->amOnPage([static::ROUTE_INDEX]);
-		$I->seeElement('a', ['title' => 'Settle', 'href' => Url::toRoute([static::ROUTE_SETTLE, 'id' => $id])]);
+		$I->seeElement('a', [
+			'title' => 'Settle',
+			'href' => Url::toRoute([
+				static::ROUTE_SETTLE,
+				'id' => $id,
+				'redirectUrl' => Url::toRoute(static::ROUTE_INDEX),
+			]),
+		]);
 		$I->amOnPage([static::ROUTE_SETTLE, 'id' => $id]);
 		$I->fillField('Settled at', '2020-01-01');
 		$I->click('Save');
 		$I->seeRecord(IssueCost::class, [
 			'id' => $id,
+			'type' => IssueCost::TYPE_OFFICE,
 			'settled_at' => '2020-01-01',
 		]);
 		$I->seeInCurrentUrl(static::ROUTE_INDEX);
-		$I->dontSeeElement('a', ['title' => 'Settle', 'href' => Url::toRoute([static::ROUTE_SETTLE, 'id' => $id])]);
+
+		$I->dontSeeElement('a', [
+			'title' => 'Settle',
+			'href' => Url::toRoute([
+				static::ROUTE_SETTLE,
+				'id' => $id,
+				'redirectUrl' => Url::toRoute(static::ROUTE_INDEX),
+			]),
+		]);
 	}
 }

@@ -108,6 +108,7 @@ return [
 	'Receive pays' => 'Odbierz wpłaty',
 	'Receive At' => 'Odebrano',
 	'Count' => 'Ilość',
+	'Value' => 'Wartość',
 	'Value with VAT' => 'Wartość (brutto)',
 	'Value without VAT' => 'Wartość (netto)',
 	'Value without costs' => 'Bez kosztów',
@@ -127,4 +128,6 @@ return [
 	'Settle' => 'Rozlicz',
 	'Settle cost: {cost}' => 'Rozlicz Koszt: {cost}',
 	'Update Issue Cost: {issue}' => 'Edytuj koszt w Sprawie: {issue}',
+	'Create Debt Costs' => 'Zakup Wierzytelności',
+	'Create Debt Costs: {issue}' => 'Zakup Wierzytelności w Sprawie: {issue}',
 ];
