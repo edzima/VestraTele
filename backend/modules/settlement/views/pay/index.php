@@ -9,7 +9,6 @@ use yii\data\ActiveDataProvider;
 /* @var $this yii\web\View */
 /* @var $searchModel IssuePaySearch */
 /* @var $dataProvider ActiveDataProvider */
-/* @var $withNav bool */
 
 $this->title = Yii::t('settlement', 'Pays');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];

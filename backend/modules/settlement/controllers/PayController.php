@@ -63,12 +63,12 @@ class PayController extends Controller {
 	}
 
 	public function actionDelayed(): string {
+		Url::remember();
 		$searchModel = new DelayedIssuePaySearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'withNav' => false,
 		]);
 	}
 
@@ -83,6 +83,7 @@ class PayController extends Controller {
 		if (!Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
 			$searchModel->calculationOwnerId = Yii::$app->user->getId();
 		}
+		Url::remember();
 		$searchModel->payStatus = $status;
 		$searchModel->delay = null;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -125,7 +126,6 @@ class PayController extends Controller {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'withNav' => true,
 		]);
 	}
 
