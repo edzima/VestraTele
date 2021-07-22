@@ -123,4 +123,8 @@ return [
 	'Pay Type' => 'Metoda Płatności',
 	'Cash' => 'Gotówka',
 	'Bank Transfer' => 'Przelew Bankowy',
+	'Debt' => 'Wierzytelność',
+	'Settle' => 'Rozlicz',
+	'Settle cost: {cost}' => 'Rozlicz Koszt: {cost}',
+	'Update Issue Cost: {issue}' => 'Edytuj koszt w Sprawie: {issue}',
 ];

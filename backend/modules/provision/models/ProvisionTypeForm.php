@@ -67,8 +67,8 @@ class ProvisionTypeForm extends Model {
 			'calculationTypes' => Yii::t('settlement', 'Settlement type'),
 			'issueStagesIds' => Yii::t('common', 'Issue Stages'),
 			'issueTypesIds' => Yii::t('common', 'Issue Types'),
-			'issueUserType' => Yii::t('common', 'Issue user type'),
-			'issueRequiredUserTypes' => Yii::t('common', 'Required issue user types'),
+			'issueUserType' => Yii::t('provision', 'For whom'),
+			'issueRequiredUserTypes' => Yii::t('provision', 'Required issue user types'),
 		]);
 	}
 
