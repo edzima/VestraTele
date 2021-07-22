@@ -1,6 +1,7 @@
 <?php
 
 use backend\modules\settlement\models\search\IssueCostSearch;
+use backend\modules\settlement\widgets\IssueCostActionColumn;
 use backend\widgets\GridView;
 use common\models\issue\Issue;
 use yii\helpers\Html;
@@ -12,8 +13,9 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('backend', 'Costs: {issue}', ['issue' => $issue->longId]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' => ['/issue/issue/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Costs'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $issue->longId, 'url' => ['/issue/issue/view', 'id' => $issue->id]];
-$this->params['breadcrumbs'][] = Yii::t('backend', 'Costs');
+$this->params['breadcrumbs'][] = Yii::t('settlement', 'Costs');
 ?>
 <div class="issue-cost-issue">
 
@@ -54,8 +56,9 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Costs');
 			'settled_at:date',
 			'created_at:datetime',
 			'updated_at:datetime',
-
-			['class' => 'yii\grid\ActionColumn'],
+			[
+				'class' => IssueCostActionColumn::class,
+			],
 		],
 	]); ?>
 

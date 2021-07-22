@@ -5,11 +5,10 @@ use backend\helpers\Html;
 use backend\helpers\Url;
 use backend\modules\provision\models\SettlementUserProvisionsForm;
 use backend\modules\provision\widgets\UserProvisionsWidget;
+use backend\modules\settlement\widgets\IssueCostActionColumn;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
-use common\models\issue\IssueCost;
 use common\models\provision\ProvisionUser;
-use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CurrencyColumn;
 use common\widgets\settlement\SettlementDetailView;
 use Decimal\Decimal;
@@ -89,19 +88,10 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 						'date_at:date',
 						'settled_at:date',
 						[
-							'class' => ActionColumn::class,
-							'controller' => '/settlement/cost',
-							'template' => '{link} {update} {delete}',
-							'buttons' => [
-								'link' => function (string $url, IssueCost $cost) use ($model): string {
-									return Html::a(Html::icon('plus'),
-										['/settlement/cost/settlement-link', 'id' => $cost->id, 'settlementId' => $model->getModel()->id], [
-											'data-method' => 'POST',
-											'title' => Yii::t('settlement', 'Link with settlement'),
-											'aria-label' => Yii::t('settlement', 'Link with settlement'),
-										]);
-								},
-							],
+							'class' => IssueCostActionColumn::class,
+							'settlement' => $model->getModel(),
+							'settle' => false,
+							'link' => true,
 						],
 					],
 				]
@@ -127,19 +117,9 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Set provisions');
 							'pageSummary' => true,
 						],
 						[
-							'class' => ActionColumn::class,
-							'controller' => '/settlement/cost',
-							'template' => '{unlink} {update} {delete}',
-							'buttons' => [
-								'unlink' => function (string $url, IssueCost $cost) use ($model): string {
-									return Html::a(Html::icon('minus'),
-										['/settlement/cost/settlement-unlink', 'id' => $cost->id, 'settlementId' => $model->getModel()->id], [
-											'data-method' => 'POST',
-											'title' => Yii::t('settlement', 'Unlink with settlement'),
-											'aria-label' => Yii::t('settlement', 'Unlink with settlement'),
-										]);
-								},
-							],
+							'class' => IssueCostActionColumn::class,
+							'settlement' => $model->getModel(),
+							'unlink' => true,
 						],
 					],
 				]

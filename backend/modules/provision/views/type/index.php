@@ -61,6 +61,8 @@ $this->params['breadcrumbs'][] = $this->title;
 					'create-user' => function (string $url, IssueProvisionType $model): string {
 						return Html::a('<i class="fa fa-users"></i>', ['user/create', 'typeId' => $model->id]);
 					},
+					//@todo add title label for create-user link
+
 				],
 			],
 		],

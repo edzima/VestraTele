@@ -1,6 +1,7 @@
 <?php
 
 use backend\modules\settlement\models\search\IssueCostSearch;
+use backend\modules\settlement\widgets\IssueCostActionColumn;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
 use common\models\issue\IssueCost;
@@ -72,8 +73,9 @@ $this->params['breadcrumbs'][] = $this->title;
 			'settled_at:date',
 			'created_at:date',
 			'updated_at:date',
-
-			['class' => 'yii\grid\ActionColumn'],
+			[
+				'class' => IssueCostActionColumn::class,
+			],
 		],
 	]) ?>
 

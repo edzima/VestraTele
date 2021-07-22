@@ -18,6 +18,7 @@ use yii\base\Model;
 class IssueCostForm extends Model implements HiddenFieldsModel {
 
 	public const SCENARIO_CREATE_INSTALLMENT = 'create-installment';
+	public const SCENARIO_SETTLE = 'settle';
 
 	public string $date_at = '';
 	public ?string $settled_at = null;
@@ -33,6 +34,12 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	public function __construct(Issue $issue, $config = []) {
 		$this->issue = $issue;
 		parent::__construct($config);
+	}
+
+	public static function createFromModel(IssueCost $cost): self {
+		$model = new static($cost->getIssueModel());
+		$model->setModel($cost);
+		return $model;
 	}
 
 	public function attributeLabels(): array {
@@ -66,6 +73,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 				'user_id', 'required',
 				'on' => static::SCENARIO_CREATE_INSTALLMENT,
 			],
+			['settled_at', 'required', 'on' => static::SCENARIO_SETTLE],
 			['user_id', 'integer'],
 			[['value', 'vat'], 'number'],
 			['vat', 'number', 'min' => 0, 'max' => 100],
@@ -135,6 +143,13 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 			if ($attribute === 'settled_at') {
 				return false;
 			}
+		}
+		if ($this->scenario === static::SCENARIO_SETTLE) {
+			$attributes = [
+				'pay_type',
+				'settled_at',
+			];
+			return in_array($attribute, $attributes);
 		}
 		return true;
 	}

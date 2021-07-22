@@ -87,23 +87,6 @@ class CostController extends Controller {
 	}
 
 	/**
-	 * @param int $id
-	 * @return Issue
-	 * @throws NotFoundHttpException
-	 */
-	protected function findIssue(int $id): Issue {
-		$model = Issue::find()->andWhere(['id' => $id]);
-		if (!Yii::$app->user->can(User::PERMISSION_ARCHIVE)) {
-			$model->withoutArchives();
-		}
-		$model = $model->one();
-		if ($model === null) {
-			throw new NotFoundHttpException();
-		}
-		return $model;
-	}
-
-	/**
 	 * Displays a single IssueCost model.
 	 *
 	 * @param integer $id
@@ -150,6 +133,23 @@ class CostController extends Controller {
 		}
 
 		return $this->render('create-installment', [
+			'model' => $model,
+		]);
+	}
+
+	public function actionSettle(int $id, string $redirectUrl = null) {
+		$cost = $this->findModel($id);
+		if ($cost->isSettled) {
+			Yii::$app->session->addFlash('warning', Yii::t('settlement', 'Warning! Try settle already settled Cost.'));
+			return $this->redirect('index');
+		}
+		$model = IssueCostForm::createFromModel($cost);
+		$model->setScenario(IssueCostForm::SCENARIO_SETTLE);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect($redirectUrl ?? 'index');
+		}
+
+		return $this->render('settle', [
 			'model' => $model,
 		]);
 	}
@@ -204,5 +204,22 @@ class CostController extends Controller {
 		}
 
 		throw new NotFoundHttpException('The requested page does not exist.');
+	}
+
+	/**
+	 * @param int $id
+	 * @return Issue
+	 * @throws NotFoundHttpException
+	 */
+	protected function findIssue(int $id): Issue {
+		$model = Issue::find()->andWhere(['id' => $id]);
+		if (!Yii::$app->user->can(User::PERMISSION_ARCHIVE)) {
+			$model->withoutArchives();
+		}
+		$model = $model->one();
+		if ($model === null) {
+			throw new NotFoundHttpException();
+		}
+		return $model;
 	}
 }

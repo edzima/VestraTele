@@ -11,6 +11,7 @@ use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
+use common\models\issue\IssueCost;
 
 class IssueCostCest {
 
@@ -26,6 +27,8 @@ class IssueCostCest {
 	public const ROUTE_CREATE_INSTALLMENT = '/settlement/cost/create-installment';
 	/* @see CostController::actionView() */
 	public const ROUTE_VIEW = '/settlement/cost/view';
+	/* @see CostController::actionSettle() */
+	public const ROUTE_SETTLE = '/settlement/cost/settle';
 	/* @see CostController::actionSettlementLink() */
 	public const ROUTE_SETTLEMENT_LINK = '/settlement/cost/settlement-link';
 	/* @see CostController::actionSettlementUnlink() */
@@ -147,7 +150,7 @@ class IssueCostCest {
 		);
 		$issue = $this->issueFixture->grabIssue(0);
 		$I->amOnPage([static::ROUTE_CREATE_INSTALLMENT, 'id' => $issue->id]);
-		$I->dontSee('Type', 'label');
+		$I->dontSee('Type', 'label[for="issuecostform-type"]');
 		$I->dontSee('Settled at', 'label');
 		$I->selectOption('User', UserFixtureHelper::AGENT_PETER_NOWAK);
 		$I->fillField('Value with VAT', 123);
@@ -202,4 +205,51 @@ class IssueCostCest {
 		$I->dontSee('Settlements', '#calculation-grid-container');
 	}
 
+	public function checkSettleAlreadySettledCost(CostIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->haveFixtures(array_merge(
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::stageAndTypesFixtures(),
+			SettlementFixtureHelper::cost(false),
+		));
+		$id = $I->haveRecord(IssueCost::class, [
+			'issue_id' => 1,
+			'settled_at' => '2020-01-01',
+			'type' => IssueCost::TYPE_INSTALLMENT,
+			'value' => 300,
+			'vat' => 0,
+		]);
+		$I->amOnPage([static::ROUTE_INDEX]);
+		$I->dontSeeElement('a', ['title' => 'Settle', 'href' => Url::toRoute([static::ROUTE_SETTLE, 'id' => $id])]);
+
+		$I->amOnPage([static::ROUTE_SETTLE, 'id' => $id]);
+		$I->seeFlash('Warning! Try settle already settled Cost.', 'warning');
+		$I->seeInCurrentUrl(static::ROUTE_INDEX);
+	}
+
+	public function checkSettle(CostIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->haveFixtures(array_merge(
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::stageAndTypesFixtures(),
+			SettlementFixtureHelper::cost(false),
+		));
+		$id = $I->haveRecord(IssueCost::class, [
+			'issue_id' => 1,
+			'type' => IssueCost::TYPE_OFFICE,
+			'value' => 300,
+			'vat' => 0,
+		]);
+		$I->amOnPage([static::ROUTE_INDEX]);
+		$I->seeElement('a', ['title' => 'Settle', 'href' => Url::toRoute([static::ROUTE_SETTLE, 'id' => $id])]);
+		$I->amOnPage([static::ROUTE_SETTLE, 'id' => $id]);
+		$I->fillField('Settled at', '2020-01-01');
+		$I->click('Save');
+		$I->seeRecord(IssueCost::class, [
+			'id' => $id,
+			'settled_at' => '2020-01-01',
+		]);
+		$I->seeInCurrentUrl(static::ROUTE_INDEX);
+		$I->dontSeeElement('a', ['title' => 'Settle', 'href' => Url::toRoute([static::ROUTE_SETTLE, 'id' => $id])]);
+	}
 }

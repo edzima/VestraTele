@@ -23,6 +23,11 @@ YiiAsset::register($this);
 <div class="issue-cost-view">
 
 	<p>
+		<?= !$model->isSettled
+			? Html::a(Yii::t('settlement', 'Settle'), ['settle', 'id' => $model->id], ['class' => 'btn btn-success'])
+			: ''
+		?>
+
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 		<?= Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',

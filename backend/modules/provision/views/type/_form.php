@@ -46,6 +46,14 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
+		<?= $form->field($model, 'calculationTypes', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+			'data' => ProvisionTypeForm::getCalculationTypesNames(),
+			'options' => [
+				'multiple' => true,
+			],
+		])->hint(Yii::t('provision', 'Empty - all'))
+		?>
+
 
 		<?= $form->field($model, 'issueTypesIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
 			'data' => ProvisionTypeForm::getIssueTypesNames(),
@@ -58,15 +66,6 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'issueStagesIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
 			'data' => ProvisionTypeForm::getIssueStagesNames(),
-			'options' => [
-				'multiple' => true,
-			],
-		])->hint(Yii::t('provision', 'Empty - all'))
-		?>
-
-
-		<?= $form->field($model, 'calculationTypes', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
-			'data' => ProvisionTypeForm::getCalculationTypesNames(),
 			'options' => [
 				'multiple' => true,
 			],

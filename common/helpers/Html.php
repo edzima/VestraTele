@@ -34,9 +34,13 @@ class Html extends BaseHtml {
 
 	public static function booleanDropdownList(): array {
 		return [
-			0 => Yii::t('common', 'Yes'),
-			1 => Yii::t('common', 'No'),
+			1 => Yii::t('common', 'Yes'),
+			0 => Yii::t('common', 'No'),
 		];
+	}
+
+	public static function addNoPrintClass(array &$options): void {
+		static::addCssClass($options, 'no-print');
 	}
 
 }

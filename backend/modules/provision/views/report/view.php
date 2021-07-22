@@ -1,10 +1,11 @@
 <?php
 
+use backend\modules\settlement\widgets\IssueCostActionColumn;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
-use common\models\issue\IssueCost;
 use common\models\provision\ProvisionReportSearch;
 use common\models\provision\ProvisionReportSummary;
+use common\models\settlement\VATInfo;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CurrencyColumn;
 use common\widgets\grid\CustomerDataColumn;
@@ -69,7 +70,7 @@ YiiAsset::register($this);
 			'showOnEmpty' => false,
 			'emptyText' => '',
 			'showPageSummary' => true,
-			'caption' => Yii::t('provision', 'Not settled costs.'),
+			'caption' => Yii::t('provision', 'Not settled costs'),
 			'columns' => [
 				[
 					'class' => IssueColumn::class,
@@ -86,18 +87,7 @@ YiiAsset::register($this);
 				],
 				'date_at:date',
 				[
-					'class' => ActionColumn::class,
-					'template' => '{view} {update}',
-					'controller' => '/settlement/cost',
-					'headerOptions' => [
-						'class' => 'no-print',
-					],
-					'contentOptions' => [
-						'class' => 'no-print',
-					],
-					'footerOptions' => [
-						'class' => 'no-print',
-					],
+					'class' => IssueCostActionColumn::class,
 				],
 			],
 		]) ?>
@@ -109,7 +99,7 @@ YiiAsset::register($this);
 			'showPageSummary' => true,
 			'showOnEmpty' => false,
 			'emptyText' => '',
-			'caption' => Yii::t('provision', 'Settled costs.'),
+			'caption' => Yii::t('provision', 'Settled costs'),
 			'columns' => [
 				[
 					'class' => IssueColumn::class,
@@ -122,7 +112,7 @@ YiiAsset::register($this);
 				[
 					'class' => CurrencyColumn::class,
 					'attribute' => 'valueWithoutVAT',
-					'value' => function (IssueCost $data): Decimal {
+					'value' => function (VATInfo $data): Decimal {
 						return $data->getValueWithoutVAT()->negate();
 					},
 					'pageSummary' => true,
@@ -130,12 +120,7 @@ YiiAsset::register($this);
 				'date_at:date',
 				'settled_at:date',
 				[
-					'class' => ActionColumn::class,
-					'template' => '{view} {update}',
-					'controller' => '/settlement/cost',
-					'headerOptions' => ['class' => 'no-print',],
-					'contentOptions' => ['class' => 'no-print',],
-					'footerOptions' => ['class' => 'no-print',],
+					'class' => IssueCostActionColumn::class,
 				],
 			],
 		]) ?>
