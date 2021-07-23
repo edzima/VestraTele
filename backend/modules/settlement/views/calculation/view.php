@@ -93,12 +93,12 @@ YiiAsset::register($this);
 		'caption' => Yii::t('settlement', 'Costs'),
 		'columns' => [
 			'typeName',
-			'vatPercent',
+			'vatPercent:text:' . Yii::t('settlement', 'VAT (%)'),
 			[
 				'class' => CurrencyColumn::class,
 				'attribute' => 'valueWithoutVAT',
 				'pageSummary' => true,
-				'pageSummaryFunc' => function (array $decimals): Decimal {
+				'pageSummaryFunc' => static function (array $decimals): Decimal {
 					$sum = new Decimal(0);
 					foreach ($decimals as $decimal) {
 						$sum = $sum->add($decimal);
@@ -110,7 +110,7 @@ YiiAsset::register($this);
 				'class' => CurrencyColumn::class,
 				'attribute' => 'valueWithVAT',
 				'pageSummary' => true,
-				'pageSummaryFunc' => function (array $decimals): Decimal {
+				'pageSummaryFunc' => static function (array $decimals): Decimal {
 					$sum = new Decimal(0);
 					foreach ($decimals as $decimal) {
 						$sum = $sum->add($decimal);

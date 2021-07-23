@@ -66,6 +66,16 @@ class SettlementDetailView extends DetailView {
 				'format' => 'currency',
 			],
 			[
+				'attribute' => 'costsSum',
+				'format' => 'currency',
+				'visible' => $this->model->hasCosts,
+			],
+			[
+				'attribute' => 'valueWithoutCosts',
+				'format' => 'currency',
+				'visible' => $this->model->hasCosts,
+			],
+			[
 				'attribute' => 'valueToPay',
 				'format' => 'currency',
 				'visible' => !$this->model->isPayed(),

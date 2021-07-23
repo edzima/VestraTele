@@ -54,45 +54,50 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 		?>
 	</p>
 
-	<?= GridView::widget([
-		'dataProvider' => $dataProvider,
-		'columns' => [
-			[
-				'attribute' => 'pay.partInfo',
-				'visible' => $model->getPaysCount() > 1,
-			],
-			'type.name',
-			'toUser',
-			'fromUserString',
-			'value:currency',
-			'provisionPercent',
-			'pay.value:currency',
-			[
-				'class' => ActionColumn::class,
-				'controller' => '/provision/provision',
-				'template' => '{update} {delete}',
-			],
-		],
-	]) ?>
-
-
 	<div class="row">
 		<div class="col-md-4 col-lg-3">
 			<?= SettlementDetailView::widget([
 				'model' => $model,
 			]) ?>
 		</div>
+		<div class="col-md-8 col-lg-9">
+			<?= GridView::widget([
+				'dataProvider' => $dataProvider,
+				'summary' => false,
+				'caption' => Yii::t('provision', 'Provisions'),
+				'columns' => [
+					[
+						'attribute' => 'pay.partInfo',
+						'visible' => $model->getPaysCount() > 1,
+					],
+					'type.name',
+					'toUser',
+					'fromUserString',
+					'value:currency',
+					'provisionPercent',
+					'pay.value:currency',
+					[
+						'class' => ActionColumn::class,
+						'controller' => '/provision/provision',
+						'template' => '{update} {delete}',
+					],
+				],
+			]) ?>
 
-		<div class="col-md-8 col-lg-9 users-grid-wrapper">
-			<?
-			foreach ($userModels as $userModel) {
-
-				echo $this->render('_user_types', [
-					'model' => $userModel,
-				]);
-			}
-			?>
 		</div>
+	</div>
+
+
+	<h3><?= Yii::t('common', 'Users') ?></h3>
+
+	<div class="row users-grid-wrapper">
+		<?php foreach ($userModels as $userModel) {
+
+			echo $this->render('_user_types', [
+				'model' => $userModel,
+			]);
+		}
+		?>
 	</div>
 
 

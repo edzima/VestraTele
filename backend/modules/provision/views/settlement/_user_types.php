@@ -14,7 +14,7 @@ use yii\web\View;
 /* @var $model SettlementUserProvisionsForm */
 ?>
 
-<div class="provision-settlement-user-type-grid col-md-6">
+<div class="provision-settlement-user-type-grid col-md-4 col-lg-4">
 
 	<?= GridView::widget([
 		'dataProvider' => new ArrayDataProvider([
