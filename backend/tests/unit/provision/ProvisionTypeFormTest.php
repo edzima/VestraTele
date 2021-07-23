@@ -206,36 +206,36 @@ class ProvisionTypeFormTest extends Unit {
 
 	public function testEmptyCalculationTypes(): void {
 		$model = $this->model;
-		$model->calculationTypes = [];
+		$model->settlementTypes = [];
 		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertNotNull($type);
-		$this->tester->assertEmpty($type->getCalculationTypes());
+		$this->tester->assertEmpty($type->getSettlementTypes());
 	}
 
 	public function testSingleCalculationType(): void {
 		$model = $this->model;
-		$model->calculationTypes = [IssuePayCalculation::TYPE_ADMINISTRATIVE];
+		$model->settlementTypes = [IssuePayCalculation::TYPE_ADMINISTRATIVE];
 		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertNotNull($type);
-		$this->tester->assertContains(IssuePayCalculation::TYPE_ADMINISTRATIVE, $type->getCalculationTypes());
+		$this->tester->assertContains(IssuePayCalculation::TYPE_ADMINISTRATIVE, $type->getSettlementTypes());
 	}
 
 	public function testFewCalculationTypes(): void {
 		$model = $this->model;
-		$model->calculationTypes = [IssuePayCalculation::TYPE_ADMINISTRATIVE, IssuePayCalculation::TYPE_LAWYER];
+		$model->settlementTypes = [IssuePayCalculation::TYPE_ADMINISTRATIVE, IssuePayCalculation::TYPE_LAWYER];
 		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertNotNull($type);
-		$this->tester->assertContains(IssuePayCalculation::TYPE_ADMINISTRATIVE, $type->getCalculationTypes());
-		$this->tester->assertContains(IssuePayCalculation::TYPE_LAWYER, $type->getCalculationTypes());
+		$this->tester->assertContains(IssuePayCalculation::TYPE_ADMINISTRATIVE, $type->getSettlementTypes());
+		$this->tester->assertContains(IssuePayCalculation::TYPE_LAWYER, $type->getSettlementTypes());
 	}
 
-	public function testNotExistedCalculationType(): void {
-		$this->model->calculationTypes = ['not-existed-calculation-type'];
+	public function testNotExistedSettlementType(): void {
+		$this->model->settlementTypes = ['not-existed-calculation-type'];
 		$this->thenUnsuccessValidate();
-		$this->thenSeeError('Settlement type is invalid.', 'calculationTypes');
+		$this->thenSeeError('Settlement type is invalid.', 'settlementTypes');
 	}
 
 	public function testWithHierarchy(): void {

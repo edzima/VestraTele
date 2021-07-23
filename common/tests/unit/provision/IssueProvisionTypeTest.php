@@ -131,29 +131,29 @@ class IssueProvisionTypeTest extends ProvisionTypeTest {
 		$type = new IssueProvisionType();
 
 		$this->tester->wantToTest('Empty type');
-		$type->setCalculationTypes([]);
+		$type->setSettlementTypes([]);
 		foreach (IssuePayCalculation::getTypesNames() as $key => $name) {
-			$this->tester->assertTrue($type->isForCalculationType($key));
+			$this->tester->assertTrue($type->isForSettlementType($key));
 		}
-		$this->tester->assertSame('All', $type->getCalculationTypesNames());
+		$this->tester->assertSame('All', $type->getSettlementTypesNames());
 
 		$this->tester->wantToTest('One type');
-		$type->setCalculationTypes([IssuePayCalculation::TYPE_ADMINISTRATIVE]);
+		$type->setSettlementTypes([IssuePayCalculation::TYPE_ADMINISTRATIVE]);
 		foreach (IssuePayCalculation::getTypesNames() as $key => $name) {
 			if ($key === IssuePayCalculation::TYPE_ADMINISTRATIVE) {
-				$this->tester->assertTrue($type->isForCalculationType($key));
+				$this->tester->assertTrue($type->isForSettlementType($key));
 			} else {
-				$this->tester->assertFalse($type->isForCalculationType($key));
+				$this->tester->assertFalse($type->isForSettlementType($key));
 			}
 		}
-		$this->tester->assertSame('Administrative', $type->getCalculationTypesNames());
+		$this->tester->assertSame('Administrative', $type->getSettlementTypesNames());
 
 		$this->tester->wantToTest('Multiple types');
-		$type->setCalculationTypes([IssuePayCalculation::TYPE_ADMINISTRATIVE, IssuePayCalculation::TYPE_LAWYER]);
-		$this->tester->assertTrue($type->isForCalculationType(IssuePayCalculation::TYPE_ADMINISTRATIVE));
-		$this->tester->assertTrue($type->isForCalculationType(IssuePayCalculation::TYPE_LAWYER));
-		$this->tester->assertFalse($type->isForCalculationType(IssuePayCalculation::TYPE_HONORARIUM));
-		$this->tester->assertSame('Administrative, Lawyer', $type->getCalculationTypesNames());
+		$type->setSettlementTypes([IssuePayCalculation::TYPE_ADMINISTRATIVE, IssuePayCalculation::TYPE_LAWYER]);
+		$this->tester->assertTrue($type->isForSettlementType(IssuePayCalculation::TYPE_ADMINISTRATIVE));
+		$this->tester->assertTrue($type->isForSettlementType(IssuePayCalculation::TYPE_LAWYER));
+		$this->tester->assertFalse($type->isForSettlementType(IssuePayCalculation::TYPE_HONORARIUM));
+		$this->tester->assertSame('Administrative, Lawyer', $type->getSettlementTypesNames());
 	}
 
 	protected function grabType(string $index): IssueProvisionType {

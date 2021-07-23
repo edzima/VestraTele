@@ -19,7 +19,7 @@ class ProvisionTypeForm extends Model {
 	public $issueUserType;
 	public $issueTypesIds = [];
 	public $issueStagesIds = [];
-	public $calculationTypes = [];
+	public $settlementTypes = [];
 	public $issueRequiredUserTypes = [];
 
 	public ?string $from_at = null;
@@ -53,18 +53,18 @@ class ProvisionTypeForm extends Model {
 				'enableClientValidation' => false,
 			],
 			[['is_default', 'is_percentage', 'is_active', 'with_hierarchy'], 'boolean'],
-			['calculationTypes', 'in', 'range' => array_keys(static::getCalculationTypesNames()), 'allowArray' => true],
+			['settlementTypes', 'in', 'range' => array_keys(static::getSettlementTypesNames()), 'allowArray' => true],
 			['issueTypesIds', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
 			['issueStagesIds', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true],
 			['issueRequiredUserTypes', 'in', 'range' => array_keys(static::getIssueUserTypesNames()), 'allowArray' => true],
 			['issueUserType', 'in', 'range' => array_keys(static::getIssueUserTypesNames())],
-			['calculationTypes', 'each', 'rule' => ['integer']],
+			['settlementTypes', 'each', 'rule' => ['integer']],
 		];
 	}
 
 	public function attributeLabels(): array {
 		return array_merge($this->getModel()->attributeLabels(), [
-			'calculationTypes' => Yii::t('settlement', 'Settlement type'),
+			'settlementTypes' => Yii::t('settlement', 'Settlement type'),
 			'issueStagesIds' => Yii::t('common', 'Issue Stages'),
 			'issueTypesIds' => Yii::t('common', 'Issue Types'),
 			'issueUserType' => Yii::t('provision', 'For whom'),
@@ -83,7 +83,7 @@ class ProvisionTypeForm extends Model {
 		$this->issueUserType = $model->getIssueUserType();
 		$this->issueTypesIds = $model->getIssueTypesIds();
 		$this->issueRequiredUserTypes = $model->getIssueRequiredUserTypes();
-		$this->calculationTypes = $model->getCalculationTypes();
+		$this->settlementTypes = $model->getSettlementTypes();
 		$this->with_hierarchy = $model->getWithHierarchy();
 	}
 
@@ -111,12 +111,12 @@ class ProvisionTypeForm extends Model {
 		$model->setIssueStagesIds(is_array($this->issueStagesIds) ? $this->issueStagesIds : []);
 		$model->setIssueTypesIds(is_array($this->issueTypesIds) ? $this->issueTypesIds : []);
 		$model->setIssueRequiredUserTypes(is_array($this->issueRequiredUserTypes) ? $this->issueRequiredUserTypes : []);
-		$model->setCalculationTypes(is_array($this->calculationTypes) ? $this->calculationTypes : []);
+		$model->setSettlementTypes(is_array($this->settlementTypes) ? $this->settlementTypes : []);
 		return $model->save();
 	}
 
-	public static function getCalculationTypesNames(): array {
-		return IssueProvisionType::calculationTypesNames();
+	public static function getSettlementTypesNames(): array {
+		return IssueProvisionType::settlementTypesNames();
 	}
 
 	public static function getIssueStagesNames(): array {

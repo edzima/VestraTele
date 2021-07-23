@@ -17,7 +17,7 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 	public const OWNER_JOHN = UserFixtureHelper::MANAGER_JOHN;
 	public const OWNER_NICOLE = UserFixtureHelper::MANAGER_NICOLE;
 
-	private const SETTLEMENT = 'settlement.settlement';
+	public const SETTLEMENT = 'settlement.settlement';
 	private const COST = 'settlement.cost';
 	private const PAY = 'settlement.pay';
 	private const OWNER = 'settlement.owner';

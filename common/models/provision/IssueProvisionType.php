@@ -5,6 +5,7 @@ namespace common\models\provision;
 use backend\modules\issue\models\IssueStage;
 use common\models\issue\Issue;
 use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueSettlement;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use Yii;
@@ -20,9 +21,25 @@ class IssueProvisionType extends ProvisionType {
 	private const KEY_DATA_ISSUE_REQUIRED_USER_TYPES = 'issue.user.types.required';
 	public const KEY_DATA_ISSUE_USER_TYPE = 'issue.user.type';
 
+	public static function settlementTypesNames(): array {
+		return IssuePayCalculation::getTypesNames();
+	}
+
+	public static function issueStagesNames(): array {
+		return IssueStage::getStagesNames();
+	}
+
+	public static function issueTypesNames(): array {
+		return IssueType::getTypesNames();
+	}
+
+	public static function issueUserTypesNames(): array {
+		return IssueUser::getTypesNames();
+	}
+
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
-			'calculationTypesNames' => Yii::t('settlement', 'Settlement type'),
+			'settlementTypesNames' => Yii::t('settlement', 'Settlement type'),
 			'issueRequiredUserTypesNames' => Yii::t('common', 'Issue required user types'),
 			'issueTypesNames' => Yii::t('common', 'Issue Types'),
 			'issueStagesNames' => Yii::t('common', 'Issue Stages'),
@@ -30,11 +47,11 @@ class IssueProvisionType extends ProvisionType {
 		]);
 	}
 
-	public function getCalculationTypes(): array {
+	public function getSettlementTypes(): array {
 		return $this->getDataArray()[static::KEY_DATA_CALCULATION_TYPES] ?? [];
 	}
 
-	public function setCalculationTypes(array $types): void {
+	public function setSettlementTypes(array $types): void {
 		$types = array_map('intval', $types);
 		$this->setDataValues(static::KEY_DATA_CALCULATION_TYPES, $types);
 	}
@@ -73,14 +90,14 @@ class IssueProvisionType extends ProvisionType {
 		$this->setDataValues(static::KEY_DATA_ISSUE_REQUIRED_USER_TYPES, $types);
 	}
 
-	public function getCalculationTypesNames(): string {
-		$calculationTypes = $this->getCalculationTypes();
-		if (empty($calculationTypes)) {
+	public function getSettlementTypesNames(): string {
+		$types = $this->getSettlementTypes();
+		if (empty($types)) {
 			return Yii::t('common', 'All');
 		}
-		$allNames = IssuePayCalculation::getTypesNames();
+		$allNames = static::settlementTypesNames();
 		$names = [];
-		foreach ($calculationTypes as $type) {
+		foreach ($types as $type) {
 			$names[] = $allNames[$type];
 		}
 		return implode(', ', $names);
@@ -91,7 +108,7 @@ class IssueProvisionType extends ProvisionType {
 		if (empty($types)) {
 			return Yii::t('common', 'All');
 		}
-		$typesNames = IssueType::getTypesNames();
+		$typesNames = static::issueTypesNames();
 		$names = [];
 		foreach ($types as $id) {
 			$names[] = $typesNames[$id];
@@ -100,7 +117,7 @@ class IssueProvisionType extends ProvisionType {
 	}
 
 	public function getIssueUserTypeName(): string {
-		return IssueUser::getTypesNames()[$this->getIssueUserType()];
+		return static::issueUserTypesNames()[$this->getIssueUserType()];
 	}
 
 	public function getIssueRequiredUserTypesNames(): string {
@@ -143,8 +160,8 @@ class IssueProvisionType extends ProvisionType {
 		return true;
 	}
 
-	public function isForCalculationType(int $type): bool {
-		$types = $this->getCalculationTypes();
+	public function isForSettlementType(int $type): bool {
+		$types = $this->getSettlementTypes();
 		if (empty($types)) {
 			return true;
 		}
@@ -172,41 +189,31 @@ class IssueProvisionType extends ProvisionType {
 	}
 
 	/**
-	 * @param IssuePayCalculation $calculation
+	 * @param IssueSettlement $settlement
 	 * @param string|null $issueUserType
 	 * @param bool $onlyActive
 	 * @return static[]
 	 */
-	public static function findCalculationTypes(IssuePayCalculation $calculation, string $issueUserType = null, bool $onlyActive = true): array {
-		return static::calculationFilter(static::getTypes($onlyActive), $calculation, $issueUserType);
+	public static function findSettlementTypes(IssueSettlement $settlement, string $issueUserType = null, bool $onlyActive = true): array {
+		return static::settlementFilter(static::getTypes($onlyActive), $settlement, $issueUserType);
 	}
 
-	public static function calculationFilter(array $types, IssuePayCalculation $calculation, string $issueUserType = null): array {
-		return static::filter($types, static function (IssueProvisionType $provisionType) use ($calculation, $issueUserType) {
-			return $provisionType->isForCalculation($calculation, $issueUserType);
+	/**
+	 * @param static[] $types
+	 * @param IssueSettlement $settlement
+	 * @param string|null $issueUserType
+	 * @return static[]
+	 */
+	public static function settlementFilter(array $types, IssueSettlement $settlement, string $issueUserType = null): array {
+		return static::filter($types, static function (IssueProvisionType $provisionType) use ($settlement, $issueUserType) {
+			return $provisionType->isForSettlement($settlement, $issueUserType);
 		});
 	}
 
-	public function isForCalculation(IssuePayCalculation $calculation, string $issueUserType = null): bool {
-		return $this->isForCalculationType($calculation->type)
-			&& $this->isForIssue($calculation->issue)
+	public function isForSettlement(IssueSettlement $settlement, string $issueUserType = null): bool {
+		return $this->isForSettlementType($settlement->getType())
+			&& $this->isForIssue($settlement->getIssueModel())
 			&& (!$issueUserType ? true : $this->isForIssueUser($issueUserType));
-	}
-
-	public static function calculationTypesNames(): array {
-		return IssuePayCalculation::getTypesNames();
-	}
-
-	public static function issueStagesNames(): array {
-		return IssueStage::getStagesNames();
-	}
-
-	public static function issueTypesNames(): array {
-		return IssueType::getTypesNames();
-	}
-
-	public static function issueUserTypesNames(): array {
-		return IssueUser::getTypesNames();
 	}
 
 }

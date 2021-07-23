@@ -3,9 +3,9 @@
 namespace common\models\provision;
 
 use common\models\issue\IssueCost;
-use common\models\issue\IssuePay;
-use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueSettlement;
 use common\models\issue\IssueUser;
+use common\models\settlement\VATInfo;
 use Decimal\Decimal;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
@@ -17,7 +17,7 @@ class SettlementUserProvisionsForm extends Model {
 	public bool $costWithVAT = false;
 	public bool $payWithVAT = false;
 
-	private IssuePayCalculation $model;
+	private IssueSettlement $model;
 	private IssueUser $user;
 	/* @var IssueProvisionType[] */
 	private ?array $types = null;
@@ -32,13 +32,14 @@ class SettlementUserProvisionsForm extends Model {
 
 	/**
 	 * SettlementUserProvisionsForm constructor.
+	 * 49]=[\*
 	 *
-	 * @param IssuePayCalculation $model
+	 * @param IssueSettlement $model
 	 * @param string $type
 	 * @param array $config
 	 * @throws InvalidConfigException
 	 */
-	public function __construct(IssuePayCalculation $model, string $type, $config = []) {
+	public function __construct(IssueSettlement $model, string $type, $config = []) {
 		$this->model = $model;
 		$this->user = $this->findUser($type);
 		parent::__construct($config);
@@ -50,7 +51,7 @@ class SettlementUserProvisionsForm extends Model {
 	 * @throws InvalidConfigException
 	 */
 	protected function findUser(string $type): IssueUser {
-		$user = $this->model->issue
+		$user = $this->model->getIssueModel()
 			->getUsers()
 			->withType($type)
 			->with('user')
@@ -61,7 +62,7 @@ class SettlementUserProvisionsForm extends Model {
 		return $user;
 	}
 
-	public function getModel(): IssuePayCalculation {
+	public function getModel(): IssueSettlement {
 		return $this->model;
 	}
 
@@ -79,7 +80,7 @@ class SettlementUserProvisionsForm extends Model {
 	}
 
 	public function setType(IssueProvisionType $type): void {
-		if (!$type->isForCalculation($this->model)) {
+		if (!$type->isForSettlement($this->model)) {
 			throw new InvalidConfigException('Type is not valid for this settlement.');
 		}
 		$this->typeId = $type->id;
@@ -114,7 +115,7 @@ class SettlementUserProvisionsForm extends Model {
 		return $provisionUser->generateProvision($this->getPaysSumWithoutGeneralCosts());
 	}
 
-	public function getPayValue(IssuePay $pay): Decimal {
+	public function getPayValue(VATInfo $pay): Decimal {
 		return $this->payWithVAT ? $pay->getValueWithVAT() : $pay->getValueWithoutVAT();
 	}
 
@@ -131,7 +132,7 @@ class SettlementUserProvisionsForm extends Model {
 	 */
 	public function getTypes(): array {
 		if ($this->types === null) {
-			$types = IssueProvisionType::findCalculationTypes($this->model, $this->user->type);
+			$types = IssueProvisionType::findSettlementTypes($this->model, $this->user->type);
 			if (count($types) > 1) {
 				$types = IssueProvisionType::filter($types, function (IssueProvisionType $type): bool {
 					return !empty($type->getIssueRequiredUserTypes());
@@ -152,7 +153,8 @@ class SettlementUserProvisionsForm extends Model {
 
 	public function getIssueNotSettledUserCosts(): array {
 		return $this->getModel()
-			->issue->getCosts()
+			->getIssueModel()
+			->getCosts()
 			->notSettled()
 			->withoutSettlements()
 			->user($this->user->user_id)
@@ -160,15 +162,15 @@ class SettlementUserProvisionsForm extends Model {
 	}
 
 	/**
-	 * @param IssuePayCalculation $model
+	 * @param IssueSettlement $model
 	 * @param array $userTypes
 	 * @param array $config
 	 * @return static[]
 	 * @throws InvalidConfigException
 	 */
-	public static function createModels(IssuePayCalculation $model, array $userTypes = [], array $config = []): array {
+	public static function createModels(IssueSettlement $model, array $userTypes = [], array $config = []): array {
 		if (empty($userTypes)) {
-			$userTypes = ArrayHelper::getColumn($model->issue->users, 'type');
+			$userTypes = ArrayHelper::getColumn($model->getIssueModel()->users, 'type');
 		}
 		$models = [];
 		foreach ($userTypes as $userType) {

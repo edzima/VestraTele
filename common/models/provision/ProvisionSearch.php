@@ -29,7 +29,7 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 	public $dateTo;
 	public $customerLastname;
 
-	public $calculationTypes = [];
+	public $settlementTypes = [];
 	public $payStatus;
 
 	public static function getPayStatusNames(): array {
@@ -51,7 +51,7 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 			[['hide_on_report'], 'boolean'],
 			[['pay_id', 'from_user_id', 'to_user_id', 'issue_id'], 'integer'],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
-			['calculationTypes', 'in', 'range' => array_keys(static::getCalculationTypesNames()), 'allowArray' => true],
+			['settlementTypes', 'in', 'range' => array_keys(static::getSettlementTypesNames()), 'allowArray' => true],
 			['payStatus', 'in', 'range' => array_keys(static::getPayStatusNames())],
 			['payStatus', 'default', 'value' => static::DEFAULT_PAY_STATUS],
 			[['dateFrom', 'dateTo'], 'safe'],
@@ -65,7 +65,7 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 			'dateFrom' => 'Data od',
 			'dateTo' => 'Data do',
 			'payStatus' => 'Status płatności',
-			'calculationTypes' => Yii::t('settlement', 'Settlement type'),
+			'settlementTypes' => Yii::t('settlement', 'Settlement type'),
 		], parent::attributeLabels());
 	}
 
@@ -116,7 +116,7 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 		}
 
 		$this->applyCustomerSurnameFilter($query);
-		$this->applyCalculationTypeFilter($query);
+		$this->applySettlementFilter($query);
 
 		if (!empty($this->issue_id)) {
 			$query->joinWith('pay.issue');
@@ -178,11 +178,11 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 		}
 	}
 
-	private function applyCalculationTypeFilter(ActiveQuery $query): void {
-		if (!empty($this->calculationTypes)) {
+	private function applySettlementFilter(ActiveQuery $query): void {
+		if (!empty($this->settlementTypes)) {
 			$query->joinWith([
 				'pay.calculation PC' => function (IssuePayCalculationQuery $query) {
-					$query->onlyTypes($this->calculationTypes);
+					$query->onlyTypes($this->settlementTypes);
 				},
 			]);
 		}
@@ -194,7 +194,7 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 		}
 	}
 
-	public static function getCalculationTypesNames(): array {
+	public static function getSettlementTypesNames(): array {
 		return IssuePayCalculation::getTypesNames();
 	}
 

@@ -44,7 +44,7 @@ $context = $this->context;
 					'issueUserTypeName',
 					'issueRequiredUserTypesNames',
 					'issueTypesNames',
-					'calculationTypesNames',
+					'settlementTypesNames',
 					'withHierarchy:boolean',
 				],
 			],

@@ -46,7 +46,7 @@ class SettlementController extends Controller {
 
 		$userModels = SettlementUserProvisionsForm::createModels($model);
 
-		if (empty(IssueProvisionType::findCalculationTypes($model))) {
+		if (empty(IssueProvisionType::findSettlementTypes($model))) {
 			Flash::add(Flash::TYPE_WARNING,
 				Yii::t('provision', 'Not active types for settlement.')
 			);

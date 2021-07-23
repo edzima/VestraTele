@@ -43,14 +43,14 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			'is_percentage:boolean',
 			'is_default:boolean',
-			'calculationTypesNames',
+			'settlementTypesNames',
 			'issueTypesNames',
 			'is_active:boolean',
 			'from_at:date',
 			'to_at:date',
 			[
 				'label' => Yii::t('provision', 'User self schema count'),
-				'value' => function (IssueProvisionType $model): string {
+				'value' => static function (IssueProvisionType $model): string {
 					return $model->getProvisionUsers()->onlySelf()->count();
 				},
 			],
@@ -58,11 +58,14 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => ActionColumn::class,
 				'template' => '{create-user} {view} {update} {delete}',
 				'buttons' => [
-					'create-user' => function (string $url, IssueProvisionType $model): string {
-						return Html::a('<i class="fa fa-users"></i>', ['user/create', 'typeId' => $model->id]);
+					'create-user' => static function (string $url, IssueProvisionType $type): string {
+						return Html::a(
+							'<i class="fa fa-user-plus"></i>',
+							['user/create', 'typeId' => $type->id], [
+								'title' => Yii::t('provision', 'Create provision schema'),
+							]
+						);
 					},
-					//@todo add title label for create-user link
-
 				],
 			],
 		],

@@ -46,8 +46,8 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= $form->field($model, 'calculationTypes', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
-			'data' => ProvisionTypeForm::getCalculationTypesNames(),
+		<?= $form->field($model, 'settlementTypes', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+			'data' => ProvisionTypeForm::getSettlementTypesNames(),
 			'options' => [
 				'multiple' => true,
 			],

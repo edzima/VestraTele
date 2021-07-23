@@ -56,7 +56,7 @@ class Provisions extends Component {
 	 * @throws MissingProvisionUserException
 	 */
 	public function settlement(IssuePayCalculation $model, array $userTypes = [], array $config = []): int {
-		if (empty(IssueProvisionType::findCalculationTypes($model))) {
+		if (empty(IssueProvisionType::findSettlementTypes($model))) {
 			Yii::warning(
 				[
 					'message' => Yii::t('provision', 'Not found active type for settlement: {type}', [

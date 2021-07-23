@@ -29,14 +29,14 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => IssueColumn::class,
 			],
 			[
-				'attribute' => 'calculationTypes',
-				'filter' => $searchModel::getCalculationTypesNames(),
-				'label' => $searchModel->getAttributeLabel('calculationTypes'),
+				'attribute' => 'settlementTypes',
+				'filter' => $searchModel::getSettlementTypesNames(),
+				'label' => $searchModel->getAttributeLabel('settlementTypes'),
 				'filterType' => GridView::FILTER_SELECT2,
 				'filterWidgetOptions' => [
 					'options' => [
 						'multiple' => true,
-						'placeholder' => $searchModel->getAttributeLabel('calculationTypes'),
+						'placeholder' => $searchModel->getAttributeLabel('settlementTypes'),
 					],
 					'pluginOptions' => [
 						'width' => '120px',

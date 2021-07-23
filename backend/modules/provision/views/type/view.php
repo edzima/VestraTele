@@ -48,7 +48,7 @@ YiiAsset::register($this);
 			'issueRequiredUserTypesNames',
 			'issueTypesNames',
 			'issueStagesNames',
-			'calculationTypesNames',
+			'settlementTypesNames',
 			'withHierarchy:boolean',
 			'from_at:date',
 			'to_at:date',

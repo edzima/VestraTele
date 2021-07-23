@@ -4,6 +4,7 @@ namespace backend\modules\provision\controllers;
 
 use backend\modules\provision\models\ProvisionTypeForm;
 use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueSettlement;
 use common\models\issue\IssueUser;
 use common\models\provision\IssueProvisionType;
 use common\models\provision\ProvisionTypeSearch;
@@ -51,10 +52,10 @@ class TypeController extends Controller {
 	}
 
 	public function actionSettlement(int $id): string {
-		$model = $this->findCalculation($id);
+		$model = $this->findSettlement($id);
 		$searchModel = new ProvisionTypeSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-		$dataProvider->setModels(IssueProvisionType::calculationFilter($dataProvider->getModels(), $model));
+		$dataProvider->setModels(IssueProvisionType::settlementFilter($dataProvider->getModels(), $model));
 
 		return $this->render('settlement', [
 			'model' => $model,
@@ -124,11 +125,11 @@ class TypeController extends Controller {
 	}
 
 	public function actionCreateSettlement(int $id, string $issueUserType = null) {
-		$calclulation = $this->findCalculation($id);
+		$calclulation = $this->findSettlement($id);
 		$model = new ProvisionTypeForm();
 		$model->issueUserType = $issueUserType;
 		$model->issueTypesIds = [$calclulation->issue->type_id];
-		$model->calculationTypes = [$calclulation->type];
+		$model->settlementTypes = [$calclulation->type];
 		$model->name = $calclulation->getTypeName() . ' - ' . $calclulation->issue->type->name;
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -191,7 +192,7 @@ class TypeController extends Controller {
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}
 
-	private function findCalculation(int $id): IssuePayCalculation {
+	private function findSettlement(int $id): IssueSettlement {
 		if (($model = IssuePayCalculation::findOne($id)) !== null) {
 			return $model;
 		}

@@ -45,7 +45,7 @@ use yii\helpers\ArrayHelper;
  * @property-read IssuePay[] $pays
  * @property-read IssueStage $stage
  */
-class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInterface {
+class IssuePayCalculation extends ActiveRecord implements IssueSettlement, PayInterface {
 
 	use IssueTrait;
 
@@ -247,6 +247,10 @@ class IssuePayCalculation extends ActiveRecord implements PayInterface, IssueInt
 
 	public function getStage(): ActiveQuery {
 		return $this->hasOne(IssueStage::class, ['id' => 'stage_id']);
+	}
+
+	public function getType(): int {
+		return $this->type;
 	}
 
 	public function getTypeName(): string {
