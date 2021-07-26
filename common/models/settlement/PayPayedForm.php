@@ -3,6 +3,7 @@
 namespace common\models\settlement;
 
 use common\models\issue\IssuePay;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 
@@ -27,6 +28,13 @@ class PayPayedForm extends Model {
 			[['transfer_type', 'date'], 'required'],
 			['date', 'date', 'format' => 'Y-m-d'],
 			['transfer_type', 'in', 'range' => array_keys(IssuePay::getTransferTypesNames())],
+		];
+	}
+
+	public function attributeLabels(): array {
+		return [
+			'transfer_type' => Yii::t('settlement', 'Transfer Type'),
+			'date' => Yii::t('settlement', 'Pay at'),
 		];
 	}
 
