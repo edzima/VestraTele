@@ -5,6 +5,7 @@ return [
 	'Deadline at' => 'Termin płatności',
 	'Pays count' => 'Ilość rat',
 	'Pay transfer type' => 'Rodzaj płatności',
+	'Transfer Type' => 'Rodzaj płatności',
 	'Type' => 'Typ',
 	'Payment at' => 'Data płatności',
 	'Provider' => 'Wpłacający',
@@ -131,4 +132,6 @@ return [
 	'Create Debt Costs' => 'Zakup Wierzytelności',
 	'Create Debt Costs: {issue}' => 'Zakup Wierzytelności w Sprawie: {issue}',
 	'The payment: {value} has already been paid.' => 'Wpłata: {value} została już opłacona.',
+	'Part Info' => 'Część',
+	'Payed pay({partInfo}): {value}' => 'Opłać wpłatę ({partInfo}): {value}',
 ];

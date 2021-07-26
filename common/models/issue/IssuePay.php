@@ -117,11 +117,11 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 			'pay_at' => Yii::t('settlement', 'Pay at'),
 			'deadline_at' => Yii::t('settlement', 'Deadline at'),
 			'value' => Yii::t('settlement', 'Value with VAT'),
-			'valueNetto' => 'Honorarium (Netto)',
-			'transfer_type' => 'Typ płatności',
-			'partInfo' => 'Część',
-			'vat' => 'VAT (%)',
-			'vatPercent' => 'VAT (%)',
+			'valueNetto' => Yii::t('settlement', 'Value without VAT'),
+			'transfer_type' => Yii::t('settlement', 'Transfer Type'),
+			'partInfo' => Yii::t('settlement', 'Part Info'),
+			'vat' => Yii::t('settlement', 'VAT (%)'),
+			'vatPercent' => Yii::t('settlement', 'VAT (%)'),
 		];
 	}
 

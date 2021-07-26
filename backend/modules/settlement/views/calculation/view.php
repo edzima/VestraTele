@@ -86,13 +86,14 @@ YiiAsset::register($this);
 
 	<?= GridView::widget([
 		'dataProvider' => new ActiveDataProvider([
-			'query' => $model->getCosts(),
+			'query' => $model->getCosts()->joinWith('user.userProfile'),
 		]),
 		'summary' => '',
 		'showPageSummary' => true,
 		'caption' => Yii::t('settlement', 'Costs'),
 		'columns' => [
 			'typeName',
+			'user',
 			'vatPercent:text:' . Yii::t('settlement', 'VAT (%)'),
 			[
 				'class' => CurrencyColumn::class,

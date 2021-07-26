@@ -63,4 +63,5 @@ return [
 	'Types not set.' => 'Typy nieustalone.',
 	'For whom' => 'Dla kogo',
 	'Required issue user types' => 'Kto musi być w sprawie',
+	'Any user has not provision.' => 'Żadnemu użytkownikowi nie należy się prowizja.',
 ];
