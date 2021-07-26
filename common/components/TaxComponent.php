@@ -10,11 +10,17 @@ class TaxComponent extends Component {
 
 	public function netto(Decimal $brutto, Decimal $tax): Decimal {
 		$this->checkTax($tax);
+		if ($tax->isZero()) {
+			return $brutto;
+		}
 		return $brutto->div($this->ratio($tax));
 	}
 
 	public function brutto(Decimal $netto, Decimal $tax): Decimal {
 		$this->checkTax($tax);
+		if ($tax->isZero()) {
+			return $netto;
+		}
 		return $netto->mul($this->ratio($tax));
 	}
 
