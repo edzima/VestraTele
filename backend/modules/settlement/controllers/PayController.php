@@ -6,6 +6,7 @@ use backend\helpers\Url;
 use backend\modules\settlement\models\search\IssuePaySearch;
 use backend\widgets\CsvForm;
 use common\components\provision\exception\MissingProvisionUserException;
+use common\helpers\Flash;
 use common\models\issue\IssuePay;
 use common\models\issue\query\IssuePayQuery;
 use common\models\settlement\PayPayedForm;
@@ -130,6 +131,11 @@ class PayController extends Controller {
 	}
 
 	public function actionPay(int $id) {
+		$pay = $this->findModel($id);
+		if ($pay->isPayed()) {
+			Flash::add(Flash::TYPE_WARNING, Yii::t('settlement', 'The payment: {value} has already been paid.', ['value' => Yii::$app->formatter->asCurrency($pay->getValue())]));
+			return $this->redirect(Url::previous());
+		}
 		$model = new PayPayedForm($this->findModel($id));
 		$model->date = date('Y-m-d');
 		if ($model->load(Yii::$app->request->post()) && $model->pay()) {

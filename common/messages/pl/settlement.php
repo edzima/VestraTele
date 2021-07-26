@@ -130,4 +130,5 @@ return [
 	'Update Issue Cost: {issue}' => 'Edytuj koszt w Sprawie: {issue}',
 	'Create Debt Costs' => 'Zakup Wierzytelności',
 	'Create Debt Costs: {issue}' => 'Zakup Wierzytelności w Sprawie: {issue}',
+	'The payment: {value} has already been paid.' => 'Wpłata: {value} została już opłacona.',
 ];
