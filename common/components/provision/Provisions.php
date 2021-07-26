@@ -26,19 +26,8 @@ class Provisions extends Component {
 		'to_user_id',
 		'from_user_id',
 		'type_id',
+		'percent',
 	];
-
-	public function batchInsert(array $provisions, array $columns = []): int {
-		if (empty($provisions)) {
-			return 0;
-		}
-		if (empty($columns)) {
-			$columns = $this->batchColumns;
-		}
-		return Yii::$app->db->createCommand()
-			->batchInsert(Provision::tableName(), $columns, $provisions)
-			->execute();
-	}
 
 	public function removeForPays(array $ids): int {
 		if (!empty($ids)) {
@@ -161,13 +150,26 @@ class Provisions extends Component {
 		return $provisions;
 	}
 
-	public function generateData(int $pay_id, ProvisionUser $provisionUser, Decimal $baseValue = null): array {
+	public function batchInsert(array $provisions, array $columns = []): int {
+		if (empty($provisions)) {
+			return 0;
+		}
+		if (empty($columns)) {
+			$columns = $this->batchColumns;
+		}
+		return Yii::$app->db->createCommand()
+			->batchInsert(Provision::tableName(), $columns, $provisions)
+			->execute();
+	}
+
+	protected function generateData(int $pay_id, ProvisionUser $provisionUser, Decimal $baseValue = null): array {
 		return [
 			'pay_id' => $pay_id,
 			'value' => $provisionUser->generateProvision($baseValue)->toFixed(2),
 			'to_user_id' => $provisionUser->to_user_id,
 			'from_user_id' => $provisionUser->from_user_id,
 			'type_id' => $provisionUser->type_id,
+			'percent' => $provisionUser->type->is_percentage ? $provisionUser->value : null,
 		];
 	}
 

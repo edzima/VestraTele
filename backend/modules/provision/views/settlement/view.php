@@ -74,7 +74,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 					'toUser',
 					'fromUserString',
 					'value:currency',
-					'provisionPercent',
+					'provision',
 					'pay.value:currency',
 					[
 						'class' => ActionColumn::class,

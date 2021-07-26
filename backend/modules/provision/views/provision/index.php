@@ -79,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'fromUserString',
 			'pay.value:currency',
 
-			'provisionPercent',
+			'provision',
 			'value:currency',
 			$searchModel->isNotPayed() ? 'pay.deadline_at:date' : 'pay.pay_at:date',
 			[

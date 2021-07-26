@@ -22,6 +22,7 @@ use yii\db\ActiveRecord;
  * @property int $from_user_id
  * @property int $to_user_id
  * @property bool $hide_on_report
+ * @property string|null $percent
  *
  * @property-read string $provision
  * @property-read IssuePay $pay
@@ -78,7 +79,7 @@ class Provision extends ActiveRecord implements IssueInterface {
 			'fromUser' => 'Nadprowizja',
 			'fromUserString' => 'Nadprowizja',
 			'hide_on_report' => Yii::t('provision', 'Hide on report'),
-			'provisionPercent' => Yii::t('provision', 'Provision (%)'),
+			'provision' => Yii::t('provision', 'Provision'),
 		];
 	}
 
@@ -109,22 +110,10 @@ class Provision extends ActiveRecord implements IssueInterface {
 	}
 
 	public function getProvision(): string {
-		return $this->getPercent()->toFixed(2);
-	}
-
-	public function getProvisionPercent(): string {
-		return Yii::$app->formatter->asPercent($this->getDivision()->toFixed(2), 1);
-	}
-
-	/** @todo maybe store division in DB for check pay value update */
-	public function getDivision(): Decimal {
-		return $this->getValue()
-			->div(Yii::$app->provisions->issuePayValue($this->pay));
-	}
-
-	public function getPercent(): Decimal {
-		return $this->getValue()
-			->div($this->pay->getValueWithoutVAT());
+		if ($this->percent) {
+			return Yii::$app->formatter->asPercent($this->percent / 100);
+		}
+		return Yii::$app->formatter->asCurrency($this->getValue());
 	}
 
 	public static function find(): ProvisionQuery {

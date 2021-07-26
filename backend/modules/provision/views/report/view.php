@@ -158,7 +158,7 @@ YiiAsset::register($this);
 			'label' => Yii::t('settlement', 'Pay Value without VAT'),
 			'format' => 'currency',
 		],
-		'provision:percent',
+		'provision',
 		[
 			'class' => CurrencyColumn::class,
 			'pageSummary' => true,
