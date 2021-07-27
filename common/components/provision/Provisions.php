@@ -16,7 +16,6 @@ use Decimal\Decimal;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-use yii\helpers\ArrayHelper;
 
 class Provisions extends Component {
 
@@ -62,11 +61,7 @@ class Provisions extends Component {
 		$provisions = [];
 		foreach ($forms as $form) {
 			$typesCount = count($form->getTypes());
-
-			$costs = $form->getIssueNotSettledUserCosts();
-			if (!empty($costs)) {
-				$form->getModel()->linkCosts(ArrayHelper::getColumn($costs, 'id'));
-			}
+			$form->linkIssueNotSettledUserCosts();
 			if ($typesCount === 1) {
 				$form->typeId = array_key_first($form->getTypes());
 				$provisions[] = $this->generateProvisionsData($form->getData(), $form->getPaysValues());

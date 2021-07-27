@@ -134,4 +134,5 @@ return [
 	'The payment: {value} has already been paid.' => 'Wpłata: {value} została już opłacona.',
 	'Part Info' => 'Część',
 	'Payed pay({partInfo}): {value}' => 'Opłać wpłatę ({partInfo}): {value}',
+	'Excluded Issue Costs Types' => 'Wykluczone Koszty',
 ];

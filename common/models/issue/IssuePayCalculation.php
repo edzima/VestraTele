@@ -49,12 +49,6 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement, PayIn
 
 	use IssueTrait;
 
-	public const TYPE_ADMINISTRATIVE = 10;
-	public const TYPE_HONORARIUM = 30;
-	public const TYPE_LAWYER = 40;
-	public const TYPE_SUBSCRIPTION = 50;
-	public const TYPE_DEBT = 100;
-
 	public const PROBLEM_STATUS_PREPEND_DEMAND = 10;
 	public const PROBLEM_STATUS_DEMAND = 15;
 	public const PROBLEM_STATUS_PREPEND_JUDGEMENT = 20;
@@ -438,8 +432,12 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement, PayIn
 	/**
 	 * @return IssueCost[]
 	 */
-	public function getCostsWithoutUser(): array {
+	public function getCostsWithoutUser(int $userId): array {
 		$costs = $this->costs;
-		return IssueCost::withoutUserFilter($costs);
+		return IssueCost::withoutUserFilter($costs, $userId);
+	}
+
+	public function getId(): int {
+		return $this->id;
 	}
 }

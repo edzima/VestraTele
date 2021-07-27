@@ -8,6 +8,7 @@ use yii\db\ActiveQuery;
  * Interface SettlementInterface
  *
  * @property-read PayInterface[] $pays
+ * @property-read CostInterface[] $costs
  */
 interface SettlementInterface {
 
@@ -17,8 +18,11 @@ interface SettlementInterface {
 
 	public static function getTypesNames(): array;
 
-	/**
-	 * @return PayInterface[]
-	 */
 	public function getPays(): ActiveQuery;
+
+	public function getCosts(): ActiveQuery;
+
+	public function unlinkCosts(): void;
+
+	public function linkCosts(array $costs_ids): int;
 }

@@ -17,6 +17,7 @@ use yii\widgets\ActiveForm;
 		]
 	); ?>
 
+	<?= $form->field($model, 'excludedIssueCostTypes')->checkboxList(SettlementUserProvisionsForm::getCostTypesNames()) ?>
 
 	<?= $form->field($model, 'costWithVAT')->checkbox() ?>
 

@@ -3,10 +3,12 @@
 namespace common\models\provision;
 
 use common\models\issue\IssueCost;
+use common\models\issue\IssueCostInterface;
 use common\models\issue\IssueSettlement;
 use common\models\issue\IssueUser;
 use common\models\settlement\VATInfo;
 use Decimal\Decimal;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -16,6 +18,10 @@ class SettlementUserProvisionsForm extends Model {
 	public ?int $typeId = null;
 	public bool $costWithVAT = false;
 	public bool $payWithVAT = false;
+
+	public array $excludedIssueCostTypes = [
+		IssueCostInterface::TYPE_INSTALLMENT,
+	];
 
 	private IssueSettlement $model;
 	private IssueUser $user;
@@ -27,6 +33,16 @@ class SettlementUserProvisionsForm extends Model {
 			['typeId', 'required'],
 			[['costWithVAT', 'costWithVAT'], 'boolean'],
 			['typeId', 'in', 'range' => array_keys($this->getTypes())],
+			['excludedIssueCostTypes', 'in', 'range' => array_keys(static::getCostTypesNames()), 'allowArray' => true],
+		];
+	}
+
+	public function attributeLabels(): array {
+		return [
+			'typeId' => Yii::t('provision', 'Type'),
+			'costWithVAT' => Yii::t('settlement', 'Cost With VAT'),
+			'payWithVAT' => Yii::t('settlement', 'Pay With VAT'),
+			'excludedIssueCostTypes' => Yii::t('settlement', 'Excluded Issue Costs Types'),
 		];
 	}
 
@@ -102,11 +118,16 @@ class SettlementUserProvisionsForm extends Model {
 		return $this->getPaysSum()->sub($this->getGeneralCostsSum());
 	}
 
-	public function getGeneralCostsSum(): Decimal {
+	public function getGeneralCostsSum(bool $excludedTypes = false): Decimal {
 		$sum = new Decimal(0);
-		$costs = $this->model->getCostsWithoutUser();
+		$costs = $this->model->getCostsWithoutUser($this->user->user_id);
+		if ($excludedTypes && empty($this->excludedIssueCostTypes)) {
+			$excludedTypes = false;
+		}
 		foreach ($costs as $cost) {
-			$sum = $sum->add($this->getCostValue($cost));
+			if (!$excludedTypes || !in_array($cost->type, $this->excludedIssueCostTypes, true)) {
+				$sum = $sum->add($this->getCostValue($cost));
+			}
 		}
 		return $sum;
 	}
@@ -119,7 +140,7 @@ class SettlementUserProvisionsForm extends Model {
 		return $this->payWithVAT ? $pay->getValueWithVAT() : $pay->getValueWithoutVAT();
 	}
 
-	public function getCostValue(IssueCost $cost): Decimal {
+	public function getCostValue(VATInfo $cost): Decimal {
 		return $this->costWithVAT ? $cost->getValueWithVAT() : $cost->getValueWithoutVAT();
 	}
 
@@ -144,9 +165,27 @@ class SettlementUserProvisionsForm extends Model {
 	}
 
 	public function getPaysValues(): array {
+		if (empty($this->model->pays)) {
+			return [];
+		}
+
 		$pays = [];
+		$costsSum = $this->getGeneralCostsSum(true);
+		$subCosts = new Decimal(0);
 		foreach ($this->model->pays as $pay) {
-			$pays[$pay->id] = $this->getPayValue($pay);
+			$payValue = $this->getPayValue($pay);
+			if ($subCosts < $costsSum) {
+				if ($payValue > $costsSum) {
+					$subCosts = $costsSum;
+					$payValue = $payValue->sub($costsSum);
+				} else {
+					$subCosts = $subCosts->add($payValue);
+					$payValue = new Decimal(0);
+				}
+			}
+			if ($payValue > 0) {
+				$pays[$pay->id] = $payValue;
+			}
 		}
 		return $pays;
 	}
@@ -159,6 +198,15 @@ class SettlementUserProvisionsForm extends Model {
 			->withoutSettlements()
 			->user($this->user->user_id)
 			->all();
+	}
+
+	public function linkIssueNotSettledUserCosts(): int {
+		$costs = $this->getIssueNotSettledUserCosts();
+		if (empty($costs)) {
+			return 0;
+		}
+
+		return $this->getModel()->linkCosts(ArrayHelper::getColumn($costs, 'id'));
 	}
 
 	/**
@@ -177,6 +225,10 @@ class SettlementUserProvisionsForm extends Model {
 			$models[] = new static($model, $userType, $config);
 		}
 		return $models;
+	}
+
+	public static function getCostTypesNames(): array {
+		return IssueCost::getTypesNames();
 	}
 
 }

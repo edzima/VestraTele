@@ -5,7 +5,6 @@ namespace common\models\issue;
 use common\models\issue\query\IssueCostQuery;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssueQuery;
-use common\models\settlement\VATInfo;
 use common\models\settlement\VATInfoTrait;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
@@ -33,27 +32,16 @@ use yii\db\ActiveRecord;
  * @property-read string $typeName
  * @property-read string $typeNameWithValue
  * @property-read bool $isSettled
- * @property-read bool $hasSettlement
+ * @property-read bool $hasSettlements
  *
  * @property-read Issue $issue
  * @property-read IssuePayCalculation[] $settlements
  * @property-read User|null $user
  */
-class IssueCost extends ActiveRecord implements
-	IssueInterface, VATInfo {
+class IssueCost extends ActiveRecord implements IssueCostInterface {
 
 	use IssueTrait;
 	use VATInfoTrait;
-
-	public const TYPE_COURT_ENTRY = 'court_entry';
-	public const TYPE_POWER_OF_ATTORNEY = 'power_of_attorney';
-	public const TYPE_PURCHASE_OF_RECEIVABLES = 'purchase_of_receivables';
-	public const TYPE_WRIT = 'writ';
-	public const TYPE_OFFICE = 'office';
-	public const TYPE_JUSTIFICATION_OF_THE_JUDGMENT = 'justification_of_the_judgment';
-	public const TYPE_INSTALLMENT = 'installment';
-	public const TYPE_PCC = 'pcc';
-	public const TYPE_PIT_4 = 'PIT-4';
 
 	public const PAY_TYPE_CASH = 'cash';
 	public const PAY_TYPE_BANK_TRANSFER = 'bank-transfer';
@@ -121,6 +109,10 @@ class IssueCost extends ActiveRecord implements
 			->viaTable(IssuePayCalculation::viaCostTableName(), ['cost_id' => 'id']);
 	}
 
+	public function getValue(): Decimal {
+		return new Decimal($this->value);
+	}
+
 	public function getIsSettled(): bool {
 		return !empty($this->settled_at) || $this->getHasSettlements();
 	}
@@ -179,9 +171,12 @@ class IssueCost extends ActiveRecord implements
 	 * @param static[] $costs
 	 * @return static[]
 	 */
-	public static function withoutUserFilter(array $costs): array {
-		return array_filter($costs, static function (IssueCost $cost): bool {
-			return !$cost->hasUser();
+	public static function withoutUserFilter(array $costs, int $userId): array {
+		return array_filter($costs, static function (IssueCost $cost) use ($userId): bool {
+			if ($userId) {
+				return $cost->user_id !== $userId;
+			}
+			return $cost->user_id !== null;
 		});
 	}
 
