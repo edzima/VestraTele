@@ -151,7 +151,7 @@ class ProvisionComponentTest extends Unit {
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::users()
 		));
-		$settlement = $this->settlementFixture->grabSettlement('honorarium-single');
+		$settlement = $this->settlementFixture->grabSettlement('accident-honorarium-single-pay-not-payed');
 		$agent = $settlement->issue->agent;
 
 		$this->provisionFixture->haveProvisionUser(30, [
@@ -173,7 +173,7 @@ class ProvisionComponentTest extends Unit {
 			'type_id' => $this->provisionFixture->grabType('tele-percent-5')->id,
 		]);
 
-		$this->provision->settlement($settlement);
+		$this->assertSame(5, $this->provision->settlement($settlement));
 	}
 
 	private function thenSeeProvision(array $data): void {
@@ -195,6 +195,7 @@ class ProvisionComponentTest extends Unit {
 			'to_user_id' => $to_user_id,
 			'from_user_id' => $from_user_id,
 			'type_id' => $type_id,
+			'percent' => null,
 		];
 	}
 

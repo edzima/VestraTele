@@ -39,7 +39,7 @@ class PayPayedFormTest extends Unit {
 			$this->grabPay('not-payed')
 		);
 		$this->tester->assertFalse($model->pay());
-		$this->tester->assertSame('Date cannot be blank.', $model->getFirstError('date'));
+		$this->tester->assertSame('Pay at cannot be blank.', $model->getFirstError('date'));
 	}
 
 	public function testInvalidDate(): void {

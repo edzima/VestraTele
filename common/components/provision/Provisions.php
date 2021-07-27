@@ -42,6 +42,7 @@ class Provisions extends Component {
 	 * @return int
 	 * @throws InvalidConfigException
 	 * @throws MissingProvisionUserException
+	 * @todo maybe add $throwException param.
 	 */
 	public function settlement(IssuePayCalculation $model, array $userTypes = [], array $config = []): int {
 		if (empty(IssueProvisionType::findSettlementTypes($model))) {

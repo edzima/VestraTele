@@ -73,7 +73,7 @@ class SettlementController extends Controller {
 		$model->count = 2;
 		$pay = $calculation->getPays()->one();
 		if ($pay) {
-			$model->vat = $pay->getVAT()->toFixed(2);
+			$model->vat = $pay->getVAT() ? $pay->getVAT()->toFixed(2) : null;
 		} else {
 			$model->vat = $calculation->issue->type->vat;
 		}
@@ -92,8 +92,7 @@ class SettlementController extends Controller {
 			Yii::$app->provisions->removeForPays($calculation->getPays()->getIds(true));
 			try {
 				Yii::$app->provisions->settlement($calculation);
-			} catch (MissingProvisionUserException) {
-
+			} catch (MissingProvisionUserException $exception) {
 			}
 			return $this->redirect(['view', 'id' => $id]);
 		}
