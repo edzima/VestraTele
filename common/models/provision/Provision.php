@@ -114,7 +114,7 @@ class Provision extends ActiveRecord implements IssueInterface {
 			return new Decimal($this->percent);
 		}
 		if ($this->type->is_percentage) {
-			return Yii::$app->provisions->issuePayValue($this->pay)->sub($this->getValue());
+			return $this->getValue()->div(Yii::$app->provisions->issuePayValue($this->pay))->mul(100);
 		}
 		return null;
 	}
