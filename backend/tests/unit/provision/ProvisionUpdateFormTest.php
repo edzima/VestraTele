@@ -24,6 +24,7 @@ class ProvisionUpdateFormTest extends Unit {
 		$this->tester->haveFixtures(
 			array_merge(
 				ProvisionFixtureHelper::provision(),
+				ProvisionFixtureHelper::type(),
 				SettlementFixtureHelper::pay(),
 				SettlementFixtureHelper::settlement(),
 			)

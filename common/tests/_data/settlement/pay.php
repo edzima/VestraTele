@@ -1,6 +1,7 @@
 <?php
 
 use common\models\issue\IssuePay;
+use common\models\settlement\TransferType;
 
 return [
 	'not-payed' =>[
@@ -15,7 +16,7 @@ return [
 		'vat' => 23,
 		'pay_at' => '2020-01-01',
 		'deadline_at' => '2020-01-01',
-		'transfer_type' => IssuePay::TRANSFER_TYPE_BANK,
+		'transfer_type' => TransferType::TRANSFER_TYPE_BANK,
 	],
 	[
 		'calculation_id' => 3,
@@ -23,7 +24,7 @@ return [
 		'vat' => 23,
 		'pay_at' => '2020-01-01',
 		'deadline_at' => '2020-01-01',
-		'transfer_type' => IssuePay::TRANSFER_TYPE_DIRECT,
+		'transfer_type' => TransferType::TRANSFER_TYPE_CASH,
 	],
 	[
 		'calculation_id' => 3,
@@ -31,7 +32,7 @@ return [
 		'vat' => 23,
 		'pay_at' => '2020-02-01',
 		'deadline_at' => '2020-02-01',
-		'transfer_type' => IssuePay::TRANSFER_TYPE_DIRECT,
+		'transfer_type' => TransferType::TRANSFER_TYPE_CASH,
 	],
 	'status-analyse' => [
 		'calculation_id' => 3,

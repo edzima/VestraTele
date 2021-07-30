@@ -7,6 +7,7 @@ use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\ProvisionManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\provision\ProvisionUser;
 
 class ProvisionUserCest {
@@ -23,7 +24,8 @@ class ProvisionUserCest {
 	public function _fixtures(): array {
 		return array_merge(
 			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements(),
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::pay(),
 			ProvisionFixtureHelper::user(),
 			ProvisionFixtureHelper::type(),
 		);

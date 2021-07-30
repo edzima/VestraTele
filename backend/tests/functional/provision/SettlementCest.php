@@ -6,8 +6,9 @@ use backend\modules\provision\controllers\SettlementController;
 use backend\tests\Step\Functional\ProvisionManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\helpers\Flash;
-use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueSettlement;
 use common\models\issue\IssueUser;
 
 class SettlementCest {
@@ -26,21 +27,33 @@ class SettlementCest {
 
 	public function _fixtures(): array {
 		return array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements(),
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::users(),
+			IssueFixtureHelper::stageAndTypesFixtures(),
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::cost(true),
 			ProvisionFixtureHelper::user(),
 			ProvisionFixtureHelper::issueType(),
+			ProvisionFixtureHelper::provision(),
 		);
 	}
 
-	public function checkViewPage(ProvisionManager $I): void {
-		$settlement = $this->grabSettlement('not-payed');
+	public function checkViewPageWithCosts(ProvisionManager $I): void {
+		$settlement = $this->grabSettlement('not-payed-with-double-costs');
 		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $settlement->id]);
 		$I->see('Settlement provisions: ' . $settlement->getTypeName());
+		$I->see('Value without costs');
+	}
+
+	public function checkViewPageWithoutCosts(ProvisionManager $I): void {
+		$settlement = $this->grabSettlement('many-pays-without-costs');
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $settlement->id]);
+		$I->see('Settlement provisions: ' . $settlement->getTypeName());
+		$I->dontSee('Value without costs');
 	}
 
 	public function checkTypesLinkOnViewPage(ProvisionManager $I): void {
-		$settlement = $this->grabSettlement('not-payed');
+		$settlement = $this->grabSettlement('many-pays-without-costs');
 		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $settlement->id]);
 		$I->seeLink('Provisions types');
 		$I->click('Provisions types');
@@ -49,10 +62,14 @@ class SettlementCest {
 	}
 
 	public function checkSettlementWithoutTypes(ProvisionManager $I): void {
-		$this->goToUserPage($this->grabSettlement('lawyer')->id, IssueUser::TYPE_AGENT);
+		$settlement = $this->grabSettlement('lawyer');
+		codecept_debug($settlement->getId());
+
+		codecept_debug($settlement);
+		$this->goToUserPage($settlement->getId(), IssueUser::TYPE_AGENT);
 		$I->seeResponseCodeIsSuccessful();
-		$I->see('Generate provisions for: agent - agent2');
-		$I->seeFlash('Not active types for this settlement.', Flash::TYPE_WARNING);
+		$I->see('Generate provisions for: agent - ' . $settlement->getIssueModel()->agent->getFullName());
+		$I->seeFlash('Not active agent types for settlement: ' . $settlement->getTypeName(), Flash::TYPE_WARNING);
 		$I->seeLink('Create provision type');
 		$I->click('Create provision type');
 		$I->seeInField('Name', 'Lawyer - Accident');
@@ -66,7 +83,7 @@ class SettlementCest {
 		]);
 	}
 
-	private function grabSettlement(string $index): IssuePayCalculation {
-		return $this->tester->grabFixture(IssueFixtureHelper::CALCULATION, $index);
+	private function grabSettlement(string $index): IssueSettlement {
+		return $this->tester->grabFixture(SettlementFixtureHelper::SETTLEMENT, $index);
 	}
 }

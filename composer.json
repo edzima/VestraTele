@@ -42,8 +42,8 @@
 		"edzima/yii2-teryt": "^1.0.3"
 	},
 	"require-dev": {
-		"roave/security-advisories": "dev-master",
-		"yiisoft/yii2-debug": "~2.1.0",
+		"roave/security-advisories": "dev-latest",
+		"yiisoft/yii2-debug": "~2.1.17",
 		"yiisoft/yii2-gii": "~2.1.0",
 		"yiisoft/yii2-faker": "~2.0.0",
 		"codeception/codeception": "^4.0",

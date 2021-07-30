@@ -39,7 +39,7 @@ class ProvisionCest {
 		$I->seeInGridHeader('Settlement type');
 		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('Customer');
-		$I->seeInGridHeader('Provision (%)');
+		$I->seeInGridHeader('Provision');
 		$currencyCode = Yii::$app->formatter->getCurrencySymbol();
 		$I->seeInGridHeader("Provision ($currencyCode)");
 	}

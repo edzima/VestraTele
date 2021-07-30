@@ -2,6 +2,7 @@
 
 namespace backend\tests\functional\settlement;
 
+use backend\modules\settlement\controllers\CalculationController;
 use backend\tests\Step\Functional\Bookkeeper;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
@@ -10,6 +11,9 @@ use common\models\issue\IssuePayCalculation;
 
 class CalculationUpdateCest {
 
+	/**
+	 * @see CalculationController::actionUpdate()
+	 */
 	public const ROUTE = '/settlement/calculation/update';
 
 	private SettlementFixtureHelper $settlementFixture;
@@ -50,7 +54,7 @@ class CalculationUpdateCest {
 	}
 
 	public function checkUpdateValueForManyPays(Bookkeeper $I): void {
-		$calculation = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
+		$calculation = $this->settlementFixture->grabSettlement('many-pays-without-costs');
 
 		$I->amOnPage([static::ROUTE, 'id' => $calculation->id]);
 		$I->seeInField('Value with VAT', '1230');
@@ -60,15 +64,19 @@ class CalculationUpdateCest {
 			'id' => $calculation->id,
 			'value' => 2460,
 		]);
+		$I->wantTo('See payed Pay.');
+
 		$I->seeRecord(IssuePay::class, [
 			'calculation_id' => $calculation->id,
-			'value' => 615,
+			'value' => 400,
 			'pay_at' => '2020-01-01',
 		]);
-		$I->dontSeeRecord(IssuePay::class, [
+		$I->seeRecord(IssuePay::class, [
 			'calculation_id' => $calculation->id,
-			'value' => 1230,
+			'value' => 215,
+			'pay_at' => '2020-02-01',
 		]);
+		$I->seeFlash('Settlement value is not same as sum value from pays. Diff: ' . \Yii::$app->formatter->asCurrency(1230) . '.', 'danger');
 	}
 
 	public function checkChangeType(Bookkeeper $I): void {

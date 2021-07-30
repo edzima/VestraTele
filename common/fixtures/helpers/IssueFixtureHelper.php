@@ -10,11 +10,6 @@ use common\fixtures\issue\StageFixture;
 use common\fixtures\issue\StageTypesFixtures;
 use common\fixtures\issue\SummonFixture;
 use common\fixtures\issue\TypeFixture;
-use common\fixtures\settlement\CalculationCostFixture;
-use common\fixtures\settlement\CalculationFixture;
-use common\fixtures\settlement\CostFixture;
-use common\fixtures\settlement\PayFixture;
-use common\fixtures\settlement\PayReceivedFixture;
 use common\models\issue\Issue;
 use common\models\user\User;
 use Yii;
@@ -162,55 +157,6 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 		$users = array_merge($users, static::issueUsers());
 
 		return $users;
-	}
-
-	/**
-	 * @param bool $withCost
-	 * @param string|null $dataDir
-	 * @return \string[][]
-	 * @see SettlementFixtureHelper
-	 * @deprecated
-	 */
-	public static function settlements(bool $withCost = false, string $dataDir = null): array {
-		$fixtures = [
-			static::CALCULATION => [
-				'class' => CalculationFixture::class,
-				'dataFile' => static::dataDir($dataDir) . 'settlement/calculation.php',
-			],
-			static::PAY => [
-				'class' => PayFixture::class,
-				'dataFile' => static::dataDir($dataDir) . 'settlement/pay.php',
-			],
-		];
-		if ($withCost) {
-			$fixtures = array_merge($fixtures, static::cost(true, $dataDir));
-		}
-		return $fixtures;
-	}
-
-	public static function cost(bool $calculationCosts = true, string $dataDir = null): array {
-		$fixtures = [];
-		$fixtures['cost'] = [
-			'class' => CostFixture::class,
-			'dataFile' => static::dataDir($dataDir) . 'settlement/cost.php',
-		];
-		if ($calculationCosts) {
-			$fixtures['calculation-cost'] = [
-				'class' => CalculationCostFixture::class,
-				'dataFile' => static::dataDir($dataDir) . 'settlement/calculation-cost.php',
-			];
-		}
-
-		return $fixtures;
-	}
-
-	public static function payReceived(): array {
-		return [
-			static::PAY_RECEIVED => [
-				'class' => PayReceivedFixture::class,
-				'dataFile' => static::dataDir() . 'settlement/pay-received.php',
-			],
-		];
 	}
 
 	public static function summon(): array {

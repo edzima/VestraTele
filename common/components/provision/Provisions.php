@@ -37,7 +37,7 @@ class Provisions extends Component {
 	}
 
 	/**
-	 * @param IssueSettlement|Model $model
+	 * @param IssueSettlement $model
 	 * @param array $userTypes
 	 * @param array $config
 	 * @return int
@@ -71,11 +71,15 @@ class Provisions extends Component {
 
 			if ($typesCount > 1) {
 				Yii::warning([
-					'message' => Yii::t('provision', 'Settlement: {type} has more than one active provision type for user type: {userType}', [
+					'message' => Yii::t('provision', 'Settlement: {type} has more than one active provision type for user type: {userType}.', [
 						'type' => $form->getModel()->getTypeName(),
 						'userType' => $form->getIssueUser()->getTypeName(),
 					]),
-					'settlement' => $model->attributes,
+					'settlement' => [
+						'id' => $model->getId(),
+						'issueId' => $model->getIssueId(),
+						'type' => $model->getTypeName(),
+					],
 					'types' => $form->getTypesNames(),
 				], 'provision.settlement');
 			}

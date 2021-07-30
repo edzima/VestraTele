@@ -8,6 +8,7 @@ use common\components\provision\exception\MissingProvisionUserException;
 use common\helpers\Flash;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueSettlement;
 use common\models\provision\IssueProvisionType;
 use common\models\provision\Provision;
 use Yii;
@@ -48,7 +49,7 @@ class SettlementController extends Controller {
 
 		if (empty(IssueProvisionType::findSettlementTypes($model))) {
 			Flash::add(Flash::TYPE_WARNING,
-				Yii::t('provision', 'Not active types for settlement.')
+				Yii::t('provision', 'Not active types for settlement: {settlement}.', ['settlement' => $model->getTypeName()])
 			);
 		}
 
@@ -96,16 +97,22 @@ class SettlementController extends Controller {
 			$model->typeId = $typeId;
 		} else {
 			$types = $model->getTypes();
-			/* @var IssueProvisionType|null $type */
-			$type = reset($types);
-			if ($type !== null) {
-				return $this->redirect(['user', 'id' => $id, 'issueUserType' => $issueUserType, 'typeId' => $type->id]);
+			if (!empty($types)) {
+				/* @var IssueProvisionType|null $type */
+				$type = reset($types);
+				if ($type !== null) {
+					return $this->redirect(['user', 'id' => $settlement->getId(), 'issueUserType' => $issueUserType, 'typeId' => $type->id]);
+				}
 			}
 		}
 
 		if (empty($model->getTypes())) {
 			Flash::add(Flash::TYPE_WARNING,
-				Yii::t('provision', 'Not active {userType} types for settlement.', ['userType' => $model->getIssueUser()->getTypeName()])
+				Yii::t('provision',
+					'Not active {userType} types for settlement: {settlement}.', [
+						'userType' => $model->getIssueUser()->getTypeName(),
+						'settlement' => $settlement->getTypeName(),
+					])
 			);
 		}
 
@@ -113,7 +120,7 @@ class SettlementController extends Controller {
 		foreach ($model->getTypes() as $type) {
 			$navTypesItems[] = [
 				'label' => $type->getNameWithTypeName(),
-				'url' => ['user', 'id' => $id, 'issueUserType' => $issueUserType, 'typeId' => $type->id],
+				'url' => ['user', 'id' => $settlement->getId(), 'issueUserType' => $issueUserType, 'typeId' => $type->id],
 				'active' => $type->id === $typeId,
 			];
 		}
@@ -181,7 +188,7 @@ class SettlementController extends Controller {
 		return $this->redirect(['view', 'id' => $id]);
 	}
 
-	private function findModel(int $id): IssuePayCalculation {
+	private function findModel(int $id): IssueSettlement {
 		$model = IssuePayCalculation::findOne($id);
 		if ($model === null) {
 			throw new NotFoundHttpException();

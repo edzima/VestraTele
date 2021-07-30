@@ -1,6 +1,7 @@
 <?php
 
 use common\fixtures\helpers\SettlementFixtureHelper;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssuePayCalculation;
 
 return [
@@ -58,6 +59,15 @@ return [
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 		'problem_status' => IssuePayCalculation::PROBLEM_STATUS_DEMAND,
 		'provider_id' => 200,
+		'owner_id' => SettlementFixtureHelper::OWNER_NICOLE,
+		'stage_id' => 2,
+	],
+	'lawyer' => [
+		'issue_id' => 1,
+		'value' => 100,
+		'type' => IssuePayCalculation::TYPE_LAWYER,
+		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
+		'provider_id' => UserFixtureHelper::CUSTOMER_ERIKA_LARSON_ID,
 		'owner_id' => SettlementFixtureHelper::OWNER_NICOLE,
 		'stage_id' => 2,
 	],

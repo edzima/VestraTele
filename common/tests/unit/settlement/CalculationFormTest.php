@@ -20,8 +20,8 @@ class CalculationFormTest extends PayFormTest {
 	private const DEFAULT_OWNER_ID = SettlementFixtureHelper::OWNER_JOHN;
 
 	public function _before() {
-		parent::_before();
 		$this->issueFixture = new IssueFixtureHelper($this->tester);
+		parent::_before();
 	}
 
 	public function _fixtures(): array {
@@ -38,14 +38,13 @@ class CalculationFormTest extends PayFormTest {
 
 	public function testEmpty(): void {
 		parent::testEmpty();
-		$model = $this->createForm();
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Type cannot be blank.', $model->getFirstError('type'));
-		$this->tester->assertSame('Provider cannot be blank.', $model->getFirstError('providerType'));
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Type cannot be blank.', 'type');
+		$this->thenSeeError('Provider cannot be blank.', 'providerType');
 	}
 
 	public function testCreateWithDeadline(): void {
-		$model = $this->createForm();
+		$model = $this->getModel();
 		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
 		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
 		$model->value = 123;
@@ -210,6 +209,14 @@ class CalculationFormTest extends PayFormTest {
 		$issue = ArrayHelper::remove($config, 'issue', $this->issueFixture->grabIssue(0));
 		$ownerId = ArrayHelper::remove($config, 'ownerId', static::DEFAULT_OWNER_ID);
 		return new CalculationForm($ownerId, $issue, $config);
+	}
+
+	public function getModel(): CalculationForm {
+		/**
+		 * @var CalculationForm $model
+		 */
+		$model = parent::getModel();
+		return $model;
 	}
 
 }
