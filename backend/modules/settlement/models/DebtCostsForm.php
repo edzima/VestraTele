@@ -18,7 +18,7 @@ class DebtCostsForm extends IssueCostForm {
 
 	public function rules(): array {
 		return array_merge(parent::rules(), [
-			[['!user_id', 'settled_at', 'pay_type'], 'required'],
+			[['!user_id', 'settled_at', 'transfer_type'], 'required'],
 			[['pccPercent', 'pit4Percent'], 'required'],
 			[['pccPercent', 'pit4Percent'], 'number', 'min' => 0],
 			[['pccPercent', 'pit4Percent'], 'number', 'max' => 100],
@@ -77,7 +77,7 @@ class DebtCostsForm extends IssueCostForm {
 
 	public function isVisibleField(string $attribute): bool {
 		$attributes = [
-			'pay_type',
+			'transfer_type',
 			'settled_at',
 			'value',
 		];

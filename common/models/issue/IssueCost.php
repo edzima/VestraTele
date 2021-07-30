@@ -24,11 +24,11 @@ use yii\db\ActiveRecord;
  * @property int $created_at
  * @property int $updated_at
  * @property string $date_at
- * @property string|null $pay_type
+ * @property string|null $transfer_type
  * @property string|null $settled_at
  * @property int|null $user_id
  *
- * @property-read string|null $payTypeName
+ * @property-read string|null $transferTypeName
  * @property-read string $typeName
  * @property-read string $typeNameWithValue
  * @property-read bool $isSettled
@@ -42,9 +42,6 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 
 	use IssueTrait;
 	use VATInfoTrait;
-
-	public const PAY_TYPE_CASH = 'cash';
-	public const PAY_TYPE_BANK_TRANSFER = 'bank-transfer';
 
 	public static function tableName(): string {
 		return '{{%issue_cost}}';
@@ -66,8 +63,8 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 		return static::getTypesNames()[$this->type];
 	}
 
-	public function getPayTypeName(): ?string {
-		return static::getPayTypesNames()[$this->pay_type] ?? null;
+	public function getTransferTypeName(): ?string {
+		return static::getTransfersTypesNames()[$this->transfer_type] ?? null;
 	}
 
 	/**
@@ -88,8 +85,8 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 			'settled_at' => Yii::t('common', 'Settled at'),
 			'user_id' => Yii::t('common', 'User'),
 			'user' => Yii::t('common', 'User'),
-			'pay_type' => Yii::t('settlement', 'Pay Type'),
-			'payTypeName' => Yii::t('settlement', 'Pay Type'),
+			'transfer_type' => Yii::t('settlement', 'Transfer Type'),
+			'transferTypeName' => Yii::t('settlement', 'Transfer Type'),
 		]);
 	}
 
@@ -107,6 +104,10 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 	public function getSettlements(): IssuePayCalculationQuery {
 		return $this->hasMany(IssuePayCalculation::class, ['id' => 'settlement_id'])
 			->viaTable(IssuePayCalculation::viaCostTableName(), ['cost_id' => 'id']);
+	}
+
+	public function getTransferType(): ?string {
+		return $this->transfer_type;
 	}
 
 	public function getValue(): Decimal {
@@ -150,10 +151,10 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 		];
 	}
 
-	public static function getPayTypesNames(): array {
+	public static function getTransfersTypesNames(): array {
 		return [
-			static::PAY_TYPE_CASH => Yii::t('settlement', 'Cash'),
-			static::PAY_TYPE_BANK_TRANSFER => Yii::t('settlement', 'Bank Transfer'),
+			static::TRANSFER_TYPE_CASH => Yii::t('settlement', 'Cash'),
+			static::TRANSFER_TYPE_BANK => Yii::t('settlement', 'Bank Transfer'),
 		];
 	}
 

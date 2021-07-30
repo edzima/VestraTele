@@ -2,6 +2,7 @@
 
 namespace common\models\settlement;
 
+use Decimal\Decimal;
 use yii\db\ActiveQuery;
 
 /**
@@ -10,13 +11,15 @@ use yii\db\ActiveQuery;
  * @property-read PayInterface[] $pays
  * @property-read CostInterface[] $costs
  */
-interface SettlementInterface {
+interface SettlementInterface extends PayedInterface {
 
 	public function getType(): int;
 
 	public function getTypeName(): string;
 
 	public static function getTypesNames(): array;
+
+	public function getValue(): Decimal;
 
 	public function getPays(): ActiveQuery;
 

@@ -22,7 +22,7 @@ use yii\widgets\ActiveForm;
 		?>
 
 		<?= $form->field($model, 'transfer_type', ['options' => ['class' => 'col-md-2']])
-			->dropDownList(IssuePay::getTransferTypesNames())
+			->dropDownList(IssuePay::getTransfersTypesNames())
 		?>
 
 	</div>

@@ -53,9 +53,9 @@ $this->params['breadcrumbs'][] = Yii::t('settlement', 'Costs');
 			'valueWithoutVAT:currency:' . Yii::t('backend', 'Value without VAT'),
 			'VATPercent',
 			[
-				'attribute' => 'pay_type',
-				'value' => 'payTypeName',
-				'filter' => IssueCostSearch::getPayTypesNames(),
+				'attribute' => 'transfer_type',
+				'value' => 'transferTypeName',
+				'filter' => IssueCostSearch::getTransfersTypesNames(),
 			],
 			'date_at:date',
 			'settled_at:date',

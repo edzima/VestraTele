@@ -3,9 +3,10 @@
 namespace common\models\issue;
 
 use common\models\settlement\CostInterface;
+use common\models\settlement\TransferType;
 use common\models\settlement\VATInfo;
 
-interface IssueCostInterface extends CostInterface, VATInfo, IssueInterface {
+interface IssueCostInterface extends CostInterface, VATInfo, IssueInterface, TransferType {
 
 	public const TYPE_COURT_ENTRY = 'court_entry';
 	public const TYPE_POWER_OF_ATTORNEY = 'power_of_attorney';

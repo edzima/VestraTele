@@ -38,7 +38,7 @@ class DebtCostsFormTest extends Unit {
 		$this->thenSeeError('Value cannot be blank.', 'value');
 		$this->thenSeeError('Date at cannot be blank.', 'date_at');
 		$this->thenSeeError('Settled at cannot be blank.', 'settled_at');
-		$this->thenSeeError('Pay Type cannot be blank.', 'pay_type');
+		$this->thenSeeError('Transfer Type cannot be blank.', 'transfer_type');
 		$this->thenSeeError('PCC (%) cannot be blank.', 'pccPercent');
 		$this->thenSeeError('PIT-4 (%) cannot be blank.', 'pit4Percent');
 	}
@@ -48,7 +48,7 @@ class DebtCostsFormTest extends Unit {
 		$this->model->pit4Percent = 17;
 		$this->model->value = 1000;
 		$this->model->settled_at = '2020-01-01';
-		$this->model->pay_type = IssueCost::PAY_TYPE_CASH;
+		$this->model->transfer_type = IssueCost::TRANSFER_TYPE_CASH;
 		$this->thenSuccessSave();
 		$this->thenSeeCost(IssueCost::TYPE_PURCHASE_OF_RECEIVABLES, [
 			'value' => 1000,

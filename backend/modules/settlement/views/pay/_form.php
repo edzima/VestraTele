@@ -35,7 +35,7 @@ use yii\widgets\ActiveForm;
 	</div>
 	<div class="row">
 		<?= $form->field($model, 'transfer_type', ['options' => ['class' => 'col-md-2']])
-			->dropDownList(IssuePay::getTransferTypesNames())
+			->dropDownList(IssuePay::getTransfersTypesNames())
 		?>
 		<?= $form->field($model, 'status', ['options' => ['class' => 'col-md-2']])
 			->dropDownList(IssuePay::getStatusNames(), [

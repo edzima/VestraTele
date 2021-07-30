@@ -21,7 +21,7 @@ use yii\helpers\Html;
 
 		<?= $form->field($model, 'type', ['options' => ['class' => 'col-md-4 col-lg-3']])->dropDownList(IssueCostForm::getTypesNames()) ?>
 
-		<?= $form->field($model, 'pay_type', ['options' => ['class' => 'col-md-4 col-lg-2']])->dropDownList(IssueCostForm::getPayTypesNames(), ['prompt' => Yii::t('common', 'Select...')]) ?>
+		<?= $form->field($model, 'transfer_type', ['options' => ['class' => 'col-md-4 col-lg-2']])->dropDownList(IssueCostForm::getTransfersTypesNames(), ['prompt' => Yii::t('common', 'Select...')]) ?>
 
 		<?= $form->field($model, 'date_at', ['options' => ['class' => 'col-md-4 col-lg-2']])->widget(DateWidget::class) ?>
 

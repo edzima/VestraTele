@@ -30,7 +30,7 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 	public function rules(): array {
 		return [
 			[['id', 'issue_id', 'user_id', 'issueType', 'issueStage'], 'integer'],
-			[['type', 'pay_type'], 'string'],
+			[['type', 'transfer_type'], 'string'],
 			[['settled', 'withSettlements'], 'boolean'],
 			[['created_at', 'updated_at', 'date_at', 'settled_at'], 'safe'],
 			[['value', 'vat'], 'number'],
@@ -99,6 +99,7 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 			IssueCost::tableName() . '.settled_at' => $this->date_at,
 			IssueCost::tableName() . '.updated_at' => $this->updated_at,
 			IssueCost::tableName() . '.type' => $this->type,
+			IssueCost::tableName() . '.transfer_type' => $this->transfer_type,
 		]);
 
 		return $dataProvider;

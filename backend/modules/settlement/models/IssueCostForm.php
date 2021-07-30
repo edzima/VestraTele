@@ -23,7 +23,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	public string $date_at = '';
 	public ?string $settled_at = null;
 	public string $type = '';
-	public ?string $pay_type = null;
+	public ?string $transfer_type = null;
 	public string $value = '';
 	public ?string $vat = null;
 	public $user_id;
@@ -50,7 +50,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 			'vat' => 'VAT (%)',
 			'user_id' => Yii::t('common', 'User'),
 			'settled_at' => Yii::t('common', 'Settled at'),
-			'pay_type' => Yii::t('settlement', 'Pay Type'),
+			'transfer_type' => Yii::t('settlement', 'Transfer Type'),
 		];
 	}
 
@@ -80,7 +80,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 			['vat', 'number', 'min' => 0, 'max' => 100],
 			['value', 'number', 'min' => 1, 'max' => 10000],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
-			['pay_type', 'in', 'range' => array_keys(static::getPayTypesNames())],
+			['transfer_type', 'in', 'range' => array_keys(static::getTransfersTypesNames())],
 			['user_id', 'in', 'range' => array_keys($this->getUserNames()), 'message' => Yii::t('backend', 'User must be from issue users.')],
 		];
 	}
@@ -105,15 +105,15 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		$this->value = $cost->getValueWithVAT()->toFixed(2);
 		$this->vat = $cost->getVAT() ? $cost->getVAT()->toFixed(2) : null;
 		$this->user_id = $cost->user_id;
-		$this->pay_type = $cost->pay_type;
+		$this->transfer_type = $cost->transfer_type;
 	}
 
 	public static function getTypesNames(): array {
 		return IssueCost::getTypesNames();
 	}
 
-	public static function getPayTypesNames(): array {
-		return IssueCost::getPayTypesNames();
+	public static function getTransfersTypesNames(): array {
+		return IssueCost::getTransfersTypesNames();
 	}
 
 	public function getUserNames(): array {
@@ -133,7 +133,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		$model->date_at = $this->date_at;
 		$model->user_id = $this->user_id;
 		$model->settled_at = $this->settled_at;
-		$model->pay_type = $this->pay_type;
+		$model->transfer_type = $this->transfer_type;
 		return $model->save(false);
 	}
 
@@ -148,7 +148,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		}
 		if ($this->scenario === static::SCENARIO_SETTLE) {
 			$attributes = [
-				'pay_type',
+				'transfer_type',
 				'settled_at',
 			];
 			return in_array($attribute, $attributes);

@@ -5,8 +5,8 @@ namespace backend\tests\unit\settlement;
 use backend\modules\settlement\models\IssueCostForm;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
-use common\fixtures\settlement\CostFixture;
 use common\models\issue\Issue;
 use common\models\issue\IssueCost;
 use common\tests\_support\UnitModelTrait;
@@ -21,21 +21,17 @@ class IssueCostFormTest extends Unit {
 	public function _before() {
 		parent::_before();
 		$this->tester->haveFixtures(
-			array_merge(IssueFixtureHelper::fixtures(),
-				[
-					'cost' => [
-						'class' => CostFixture::class,
-						'dataFile' => IssueFixtureHelper::dataDir() . 'issue/cost.php',
-					],
-				]));
+			array_merge(
+				IssueFixtureHelper::fixtures(),
+				SettlementFixtureHelper::cost(false),
+			));
 		$this->model = new IssueCostForm($this->grabIssue());
 	}
 
 	public function testEmpty(): void {
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Type cannot be blank.', 'type');
-		$this->thenSeeError('Value with VAT cannot be blank.', 'value');
-		$this->thenSeeError('VAT (%) cannot be blank.', 'vat');
+		$this->thenSeeError('Value cannot be blank.', 'value');
 		$this->thenSeeError('Date at cannot be blank.', 'date_at');
 	}
 
@@ -102,17 +98,17 @@ class IssueCostFormTest extends Unit {
 	public function testInstallmentWithIssueUser(): void {
 		$model = $this->model;
 		$model->type = IssueCost::TYPE_INSTALLMENT;
-		$model->user_id = UserFixtureHelper::AGENT_PETER_NOWAK;
+		$model->user_id = $model->getIssue()->getIssueModel()->agent->id;
 		$model->date_at = '2020-01-01';
 		$model->value = 150;
-		$model->vat = 0;
+		$model->vat = 23;
 		$this->thenSuccessSave();
 		$this->tester->seeRecord(IssueCost::class, [
-			'issue_id' => $model->getIssue()->id,
+			'issue_id' => $model->getIssue()->getIssueId(),
 			'type' => IssueCost::TYPE_INSTALLMENT,
-			'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
+			'user_id' => $model->getIssue()->getIssueModel()->agent->id,
 			'value' => 150,
-			'vat' => 0,
+			'vat' => 23,
 			'date_at' => '2020-01-01',
 		]);
 	}
@@ -148,25 +144,25 @@ class IssueCostFormTest extends Unit {
 
 	public function testInvalidPayType(): void {
 		$model = $this->model;
-		$model->pay_type = 'invalid-pat-type';
+		$model->transfer_type = 'invalid-pat-type';
 		$model->date_at = '2020-01-01';
 		$model->value = 600;
 		$model->vat = 23;
 		$this->thenUnsuccessSave();
-		$this->thenSeeError('Pay Type is invalid.', 'pay_type');
+		$this->thenSeeError('Transfer Type is invalid.', 'transfer_type');
 	}
 
 	public function testWithPayType(): void {
 		$model = $this->model;
 		$model->type = IssueCost::TYPE_OFFICE;
-		$model->pay_type = IssueCost::PAY_TYPE_CASH;
+		$model->transfer_type = IssueCost::TRANSFER_TYPE_CASH;
 		$model->date_at = '2020-01-01';
 		$model->value = 600;
 		$model->vat = 23;
 		$this->thenSuccessSave();
 		$this->tester->seeRecord(IssueCost::class, [
 			'type' => IssueCost::TYPE_OFFICE,
-			'pay_type' => IssueCost::PAY_TYPE_CASH,
+			'transfer_type' => IssueCost::TRANSFER_TYPE_CASH,
 			'issue_id' => $this->model->getIssue()->getIssueId(),
 			'value' => 600,
 			'vat' => 23,

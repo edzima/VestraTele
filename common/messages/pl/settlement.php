@@ -4,7 +4,6 @@ return [
 	'Details' => 'Szczegóły',
 	'Deadline at' => 'Termin płatności',
 	'Pays count' => 'Ilość rat',
-	'Pay transfer type' => 'Rodzaj płatności',
 	'Transfer Type' => 'Rodzaj płatności',
 	'Type' => 'Typ',
 	'Payment at' => 'Data płatności',

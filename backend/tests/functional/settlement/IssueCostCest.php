@@ -10,7 +10,6 @@ use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
-use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssueCost;
 
 class IssueCostCest {
@@ -72,7 +71,7 @@ class IssueCostCest {
 		$I->seeInGridHeader('Issue');
 		$I->seeInGridHeader('Issue Type');
 		$I->seeInGridHeader('Type');
-		$I->seeInGridHeader('Pay Type');
+		$I->seeInGridHeader('Transfer Type');
 		$I->seeInGridHeader('User');
 		$I->seeInGridHeader('Value with VAT');
 		$I->seeInGridHeader('VAT (%)');
@@ -90,7 +89,7 @@ class IssueCostCest {
 		$I->see('Costs: ' . $issue->longId);
 		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('User');
-		$I->seeInGridHeader('Pay Type');
+		$I->seeInGridHeader('Transfer Type');
 		$I->seeInGridHeader('Value with VAT');
 		$I->seeInGridHeader('VAT (%)');
 		$I->seeInGridHeader('Date at');
@@ -152,7 +151,7 @@ class IssueCostCest {
 		$I->amOnPage([static::ROUTE_CREATE_INSTALLMENT, 'id' => $issue->id]);
 		$I->dontSee('Type', 'label[for="issuecostform-type"]');
 		$I->dontSee('Settled at', 'label');
-		$I->selectOption('User', UserFixtureHelper::AGENT_PETER_NOWAK);
+		$I->selectOption('User', $issue->agent->id);
 		$I->fillField('Value', 123);
 		$I->fillField('VAT (%)', 23);
 		$I->click('Save');

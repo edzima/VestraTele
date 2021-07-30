@@ -64,4 +64,6 @@ return [
 	'For whom' => 'Dla kogo',
 	'Required issue user types' => 'Kto musi być w sprawie',
 	'Any user has not provision.' => 'Żadnemu użytkownikowi nie należy się prowizja.',
+	'Not active types for settlement: {settlement}.' => 'Brak Aktywnych Typów prowizji dla rozliczenia: {settlement}.',
+	'Not active {userType} types for settlement: {settlement}.' => 'Brak Aktywnych Typów prowizji ({userType}) dla rozliczenia: {settlement}.',
 ];

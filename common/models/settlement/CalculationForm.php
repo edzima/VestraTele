@@ -36,18 +36,6 @@ class CalculationForm extends PayForm {
 		return $self;
 	}
 
-	/**
-	 * @return int
-	 * @throws InvalidConfigException
-	 */
-	protected function getOwner(): int {
-		return $this->owner;
-	}
-
-	public function setOwner(int $id): void {
-		$this->owner = $id;
-	}
-
 	public function rules(): array {
 		return array_merge([
 			[['type', 'providerType',], 'required'],
@@ -58,20 +46,20 @@ class CalculationForm extends PayForm {
 		], parent::rules());
 	}
 
-	public function isRequiredPaymentAt(): bool {
-		return $this->getModel()->getPaysCount() < 2 && parent::isRequiredPaymentAt();
-	}
-
-	public function isRequiredDeadlineAt(): bool {
-		return $this->getModel()->getPaysCount() < 2 && parent::isRequiredDeadlineAt();
-	}
-
 	public function attributeLabels(): array {
 		return array_merge([
 			'providerType' => Yii::t('settlement', 'Provider'),
 			'type' => Yii::t('settlement', 'Type'),
 			'costs_ids' => Yii::t('settlement', 'Costs'),
 		], parent::attributeLabels());
+	}
+
+	public function isRequiredPaymentAt(): bool {
+		return $this->getModel()->getPaysCount() < 2 && parent::isRequiredPaymentAt();
+	}
+
+	public function isRequiredDeadlineAt(): bool {
+		return $this->getModel()->getPaysCount() < 2 && parent::isRequiredDeadlineAt();
 	}
 
 	public function setCalculation(IssuePayCalculation $model): void {
@@ -87,6 +75,14 @@ class CalculationForm extends PayForm {
 		$this->value = $model->getValue()->toFixed(2);
 	}
 
+	public function getCostsData(): array {
+		return ArrayHelper::map($this->getIssue()->costs, 'id', 'typeNameWithValue');
+	}
+
+	public function getIssue(): Issue {
+		return $this->issue;
+	}
+
 	public function getModel(): IssuePayCalculation {
 		if ($this->model === null) {
 			$model = new IssuePayCalculation();
@@ -97,12 +93,16 @@ class CalculationForm extends PayForm {
 		return $this->model;
 	}
 
-	public function getIssue(): Issue {
-		return $this->issue;
+	/**
+	 * @return int
+	 * @throws InvalidConfigException
+	 */
+	protected function getOwner(): int {
+		return $this->owner;
 	}
 
-	public function getCostsData(): array {
-		return ArrayHelper::map($this->getIssue()->costs, 'id', 'typeNameWithValue');
+	public function setOwner(int $id): void {
+		$this->owner = $id;
 	}
 
 	public function save(bool $throwException = false): bool {
@@ -137,8 +137,9 @@ class CalculationForm extends PayForm {
 			$calculationPay->setPay($this->generatePay(false));
 			$calculationPay->save(false);
 		}
-		//@todo dont remove pays for new model.
-		Yii::$app->provisions->removeForPays($model->getPays()->getIds(true));
+		if (!$isNewRecord) {
+			Yii::$app->provisions->removeForPays($model->getPays()->getIds(true));
+		}
 		try {
 			Yii::$app->provisions->settlement($model);
 		} catch (MissingProvisionUserException $exception) {

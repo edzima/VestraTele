@@ -87,6 +87,7 @@ use yii\db\Expression;
  * @property-read Summon[] $summons
  * @property-read IssueUser[] $users
  * @property-read IssueCost[] $costs
+ * @property-read StageType $stageType
  */
 class Issue extends ActiveRecord implements IssueInterface {
 
@@ -364,6 +365,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function getPays(): IssuePayQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(IssuePay::class, ['calculation_id' => 'id'])
 			->via('payCalculations');
 	}

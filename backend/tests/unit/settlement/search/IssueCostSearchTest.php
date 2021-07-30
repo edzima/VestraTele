@@ -6,6 +6,7 @@ use backend\modules\settlement\models\search\IssueCostSearch;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
+use common\models\settlement\TransferType;
 use common\tests\_support\UnitSearchModelTrait;
 
 /**
@@ -60,6 +61,35 @@ class IssueCostSearchTest extends Unit {
 		$this->assertTotalCount(2, ['issueStage' => 1]);
 		$this->assertTotalCount(3, ['issueStage' => 2]);
 		$this->assertTotalCount(0, ['issueStage' => 3]);
+	}
+
+	public function testTransferType(): void {
+		$models = $this->search()->getModels();
+		$cash = array_filter($models, static function (TransferType $type): bool {
+			return $type->getTransferType() === TransferType::TRANSFER_TYPE_CASH;
+		});
+		$bank = array_filter($models, static function (TransferType $type): bool {
+			return $type->getTransferType() === TransferType::TRANSFER_TYPE_BANK;
+		});
+		$this->assertNotEmpty($cash);
+		$this->assertNotEmpty($bank);
+		$models = $this->search([
+			'transfer_type' => TransferType::TRANSFER_TYPE_CASH,
+		])->getModels();
+
+		foreach ($models as $model) {
+			/** @var TransferType $model */
+			$this->tester->assertSame(TransferType::TRANSFER_TYPE_CASH, $model->getTransferType());
+		}
+
+		$models = $this->search([
+			'transfer_type' => TransferType::TRANSFER_TYPE_BANK,
+		])->getModels();
+
+		foreach ($models as $model) {
+			/** @var TransferType $model */
+			$this->tester->assertSame(TransferType::TRANSFER_TYPE_BANK, $model->getTransferType());
+		}
 	}
 
 	protected function createModel(): IssueCostSearch {
