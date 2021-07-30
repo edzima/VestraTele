@@ -6,7 +6,7 @@ use common\components\provision\exception\MissingParentProvisionUserException;
 use common\components\provision\exception\MissingProvisionUserException;
 use common\components\provision\exception\MissingSelfProvisionUserException;
 use common\models\issue\IssuePay;
-use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueSettlement;
 use common\models\provision\IssueProvisionType;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionUser;
@@ -16,6 +16,7 @@ use Decimal\Decimal;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\base\Model;
 
 class Provisions extends Component {
 
@@ -36,7 +37,7 @@ class Provisions extends Component {
 	}
 
 	/**
-	 * @param IssuePayCalculation $model
+	 * @param IssueSettlement|Model $model
 	 * @param array $userTypes
 	 * @param array $config
 	 * @return int
@@ -44,7 +45,7 @@ class Provisions extends Component {
 	 * @throws MissingProvisionUserException
 	 * @todo maybe add $throwException param.
 	 */
-	public function settlement(IssuePayCalculation $model, array $userTypes = [], array $config = []): int {
+	public function settlement(IssueSettlement $model, array $userTypes = [], array $config = []): int {
 		if (empty(IssueProvisionType::findSettlementTypes($model))) {
 			Yii::warning(
 				[

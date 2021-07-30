@@ -39,7 +39,7 @@ class ProvisionUpdateForm extends Model {
 	private function setModel(Provision $model): void {
 		$this->model = $model;
 		$this->value = $model->getValue()->toFixed(2);
-		$this->percent = $model->percent;
+		$this->percent = $model->getPercent() ? $model->getPercent()->toFixed(2) : null;
 		$this->hide_on_report = $model->hide_on_report;
 	}
 
