@@ -168,7 +168,6 @@ class PayController extends Controller {
 				'user_id' => Yii::$app->user->id,
 			], 'settlement.pay');
 			if (isset($dirty['value'])) {
-				// @todo remove for all pays, or only updated?
 				Yii::$app->provisions->removeForPays($model->calculation->getPays()->getIds());
 				try {
 					Yii::$app->provisions->settlement($model->calculation);
