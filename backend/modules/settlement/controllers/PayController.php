@@ -133,12 +133,22 @@ class PayController extends Controller {
 	public function actionPay(int $id) {
 		$pay = $this->findModel($id);
 		if ($pay->isPayed()) {
-			Flash::add(Flash::TYPE_WARNING, Yii::t('settlement', 'The payment: {value} has already been paid.', ['value' => Yii::$app->formatter->asCurrency($pay->getValue())]));
+			Flash::add(
+				Flash::TYPE_WARNING,
+				Yii::t('settlement', 'The payment: {value} has already been paid.', [
+					'value' => Yii::$app->formatter->asCurrency($pay->getValue()),
+				]));
+
 			return $this->redirect(Url::previous());
 		}
 		$model = new PayPayedForm($this->findModel($id));
 		$model->date = date('Y-m-d');
 		if ($model->load(Yii::$app->request->post()) && $model->pay()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('settlement', 'The payment: {value} marked as paid.', [
+					'value' => Yii::$app->formatter->asCurrency($pay->getValue()),
+				]));
+
 			$model->sendEmailToCustomer();
 			$model->sendEmailsToWorkers();
 			return $this->redirect(Url::previous());

@@ -72,7 +72,7 @@ class PayPayedForm extends Model {
 			)
 			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' ' . Yii::t('settlement', 'Settlements')])
 			->setTo($this->pay->calculation->getIssueModel()->customer->email)
-			->setSubject(Yii::t('settlement', 'Mark Pay: {value} as Paid.', ['value' => Yii::$app->formatter->asCurrency($this->pay->getValue())]))
+			->setSubject(Yii::t('settlement', 'The payment: {value} marked as paid.', ['value' => Yii::$app->formatter->asCurrency($this->pay->getValue())]))
 			->send();
 	}
 
@@ -103,7 +103,7 @@ class PayPayedForm extends Model {
 			)
 			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' ' . Yii::t('settlement', 'Settlements')])
 			->setTo($emails)
-			->setSubject(Yii::t('settlement', 'Mark Pay: {value} as Paid.', ['value' => Yii::$app->formatter->asCurrency($this->pay->getValue())]))
+			->setSubject(Yii::t('settlement', 'The payment: {value} marked as paid.', ['value' => Yii::$app->formatter->asCurrency($this->pay->getValue())]))
 			->send();
 	}
 }

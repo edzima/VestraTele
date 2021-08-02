@@ -135,6 +135,6 @@ return [
 	'Payed pay({partInfo}): {value}' => 'Opłać wpłatę ({partInfo}): {value}',
 	'Excluded Issue Costs Types' => 'Wykluczone Koszty',
 	'Thank you for Paid Pay: {value}.' => 'Dziękujemy za dokonanie wpłaty: {value}.',
-	'Mark Pay: {value} as Paid.' => 'Płatność {value} została opłacona.',
+	'The payment: {value} marked as paid.' => 'Wpłata: {value} została opłacona.',
 	'Payment Pay: {value} in Settlement - {settlementType}' => 'Opłacono płatność: {value} w Rozliczeniu - {settlementType}',
 ];
