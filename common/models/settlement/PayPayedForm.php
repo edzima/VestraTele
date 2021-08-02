@@ -4,6 +4,7 @@ namespace common\models\settlement;
 
 use common\models\issue\IssuePayInterface;
 use common\models\issue\IssueUser;
+use DateTime;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
@@ -47,26 +48,29 @@ class PayPayedForm extends Model {
 	public function pay(): bool {
 		if ($this->validate()) {
 			$pay = $this->getPay();
-			return $pay->markAsPaid(new \DateTime($this->date), $this->transfer_type);
+			/** @noinspection PhpUnhandledExceptionInspection */
+			return $pay->markAsPaid(new DateTime($this->date), $this->transfer_type);
 		}
 		return false;
 	}
 
 	/**
 	 * @return bool
-	 * @todo
 	 */
 	public function sendEmailToCustomer(): bool {
+		if (!$this->pay->isPayed()) {
+			return false;
+		}
 		return Yii::$app
 			->mailer
 			->compose(
-				['html' => 'payPayed-customer-html', 'text' => 'payPayed-customer-text'],
+				['html' => 'settlements/paidPay-customer-html', 'text' => 'settlements/paidPay-customer-text'],
 				[
 					'pay' => $this->pay,
 					'customer' => $this->pay->calculation->getIssueModel()->customer,
 				]
 			)
-			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' Leads'])
+			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' ' . Yii::t('settlement', 'Settlements')])
 			->setTo($this->pay->calculation->getIssueModel()->customer->email)
 			->setSubject(Yii::t('settlement', 'Mark Pay: {value} as Paid.', ['value' => Yii::$app->formatter->asCurrency($this->pay->getValue())]))
 			->send();
@@ -75,24 +79,24 @@ class PayPayedForm extends Model {
 	/**
 	 * @param array $types
 	 * @return int
-	 * @todo
 	 */
-	public function sendToWorkers(array $types = [IssueUser::TYPE_AGENT, IssueUser::TYPE_TELEMARKETER]): int {
-		if (empty($types)) {
-			return 0;
+	public function sendEmailsToWorkers(array $types = [IssueUser::TYPE_AGENT, IssueUser::TYPE_TELEMARKETER]): bool {
+		if (!empty($types) && !$this->getPay()->isPayed()) {
+			return false;
 		}
 		$emails = $this->getPay()->calculation->getIssueModel()->getUsers()
 			->withTypes($types)
 			->select('user.email')
 			->joinWith('user')
 			->column();
-		if (!empty($emails)) {
-			return 0;
+		if (empty($emails)) {
+			return false;
 		}
+
 		return Yii::$app
 			->mailer
 			->compose(
-				['html' => 'payPayed-worker-html', 'text' => 'payPayed-worker-text'],
+				['html' => 'settlements/paidPay-worker-html', 'text' => 'settlements/paidPay-worker-text'],
 				[
 					'pay' => $this->pay,
 				]

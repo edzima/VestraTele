@@ -28,10 +28,10 @@ use yii\db\ActiveRecord;
  * @property string $vat
  * @property int $status
  *
+ * @todo replace with valueWithoutVAT
  * @property-read float $valueNetto
  *
  * @property-read Issue $issue
- * @property-read IssuePay[] $pays
  * @property-read Provision[] $provisions
  * @property-read IssuePayCalculation $calculation
  */
@@ -212,4 +212,7 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 		return new IssuePayQuery(static::class);
 	}
 
+	public function getSettlementId(): int {
+		return $this->calculation_id;
+	}
 }

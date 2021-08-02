@@ -139,6 +139,8 @@ class PayController extends Controller {
 		$model = new PayPayedForm($this->findModel($id));
 		$model->date = date('Y-m-d');
 		if ($model->load(Yii::$app->request->post()) && $model->pay()) {
+			$model->sendEmailToCustomer();
+			$model->sendEmailsToWorkers();
 			return $this->redirect(Url::previous());
 		}
 		return $this->render('pay', [

@@ -306,9 +306,5 @@ return [
 	'Select ...' => 'Select ...',
 	'Only Today' => 'Na dziś',
 	'Only Delayed' => 'Opóźnione',
-	'Is active' => 'Aktywna',
-	'User' => 'Użytkownik',
-	'Users' => 'Użytkownicy',
-	'Settled at' => 'Rozliczono',
-	'Recommending' => 'Polecający',
+	'Hello {firstname}' => 'Witaj {firstname}',
 ];
