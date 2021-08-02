@@ -165,6 +165,8 @@ class CalculationController extends Controller {
 		$model->vat = $issue->type->vat;
 		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$model->sendEmailToCustomer();
+			$model->sendEmailToWorkers();
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
@@ -209,7 +211,7 @@ class CalculationController extends Controller {
 		$model->count = 2;
 		$pay = $calculation->getPays()->one();
 		if ($pay) {
-			$model->vat = $pay->getVAT()->toFixed(2);
+			$model->vat = $pay->getVAT() ? $pay->getVAT()->toFixed(2) : null;
 		} else {
 			$model->vat = $calculation->issue->type->vat;
 		}

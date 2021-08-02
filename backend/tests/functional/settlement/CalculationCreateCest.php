@@ -2,6 +2,7 @@
 
 namespace backend\tests\functional\settlement;
 
+use backend\modules\settlement\controllers\CalculationController;
 use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
@@ -12,13 +13,13 @@ use common\models\user\User;
 
 class CalculationCreateCest {
 
+	/** @see CalculationController::actionCreate() */
 	public const ROUTE = '/settlement/calculation/create';
 
 	public function _before(CreateCalculationIssueManager $I): void {
 		$I->haveFixtures(array_merge(
 			IssueFixtureHelper::issue(),
-			IssueFixtureHelper::customer(),
-			IssueFixtureHelper::issueUsers(),
+			IssueFixtureHelper::users(),
 			IssueFixtureHelper::stageAndTypesFixtures(),
 			SettlementFixtureHelper::settlement(),
 			SettlementFixtureHelper::pay(),
@@ -64,5 +65,6 @@ class CalculationCreateCest {
 			'calculation_id' => $model->id,
 			'value' => 123,
 		]);
+		$I->seeEmailIsSent(2);
 	}
 }

@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\helpers\Url;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
@@ -185,6 +186,10 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 
 	public function getPaymentAt(): ?DateTime {
 		return new DateTime($this->payment_at);
+	}
+
+	public function getFrontendUrl(): string {
+		return Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['settlement/view', 'id' => $this->getId()]);
 	}
 
 	public function getUserProvisionsSum(int $id): Decimal {
