@@ -276,7 +276,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private function applyNameFilter(ActiveQuery $query) {
 		if (!empty($this->name)) {
-			$query->andFilterWhere(['like', Lead::tableName() . '.name', $this->name . '%', false]);
+			$query->andFilterWhere(['like', Lead::tableName() . '.name', $this->name]);
 		}
 	}
 

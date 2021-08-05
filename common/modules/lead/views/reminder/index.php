@@ -29,6 +29,11 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
 			[
+				'attribute' => 'leadName',
+				'value' => 'lead.name',
+				'label' => Yii::t('lead', 'Lead Name'),
+			],
+			[
 				'attribute' => 'priority',
 				'value' => 'reminder.priorityName',
 				'filter' => Reminder::getPriorityNames(),
@@ -62,7 +67,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'class' => ActionColumn::class,
 				'buttons' => [
-					'view' => function (string $url, LeadReminder $model): string {
+					'view' => static function (string $url, LeadReminder $model): string {
 						$url = Url::toRoute(['lead/view', 'id' => $model->lead_id]);
 						return Html::a(Html::icon('eye-open'), $url);
 					},
