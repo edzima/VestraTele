@@ -6,6 +6,7 @@ use backend\helpers\Url;
 use backend\modules\settlement\models\DebtCostsForm;
 use backend\modules\settlement\models\IssueCostForm;
 use backend\modules\settlement\models\search\IssueCostSearch;
+use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
@@ -159,8 +160,11 @@ class CostController extends Controller {
 
 	public function actionSettle(int $id, string $redirectUrl = null) {
 		$cost = $this->findModel($id);
-		if ($cost->isSettled) {
-			Yii::$app->session->addFlash('warning', Yii::t('settlement', 'Warning! Try settle already settled Cost.'));
+		if ($cost->getIsSettled()) {
+			Flash::add(
+				Flash::TYPE_WARNING,
+				Yii::t('settlement', 'Warning! Try settle already settled Cost.')
+			);
 			return $this->redirect('index');
 		}
 		$model = IssueCostForm::createFromModel($cost);
@@ -184,8 +188,7 @@ class CostController extends Controller {
 	 */
 	public function actionUpdate(int $id) {
 		$cost = $this->findModel($id);
-		$model = new IssueCostForm($cost->issue);
-		$model->setModel($cost);
+		$model = IssueCostForm::createFromModel($cost);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
