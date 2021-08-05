@@ -39,7 +39,8 @@
 		"kartik-v/yii2-number": "^1.0",
 		"yii2tech/csv-grid": "^1.0",
 		"udokmeci/yii2-phone-validator": "~1.0.3",
-		"edzima/yii2-teryt": "^1.0.3"
+		"edzima/yii2-teryt": "^1.0.3",
+		"kartik-v/yii2-date-range": "~1.7.0"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-latest",
