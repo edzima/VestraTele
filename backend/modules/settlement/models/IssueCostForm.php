@@ -74,7 +74,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 				'user_id', 'required',
 				'on' => static::SCENARIO_CREATE_INSTALLMENT,
 			],
-			['settled_at', 'required', 'on' => static::SCENARIO_SETTLE],
+			[['settled_at', 'transfer_type'], 'required', 'on' => static::SCENARIO_SETTLE],
 			[['vat', 'settled_at', 'confirmed_at', 'deadline_at'], 'default', 'value' => null],
 			['user_id', 'integer'],
 			[['value', 'vat'], 'number'],
@@ -130,8 +130,8 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		}
 		$model = $this->getModel();
 		$model->issue_id = $this->getIssue()->getIssueId();
-		$this->base_value = (new Decimal($this->value))->toFixed(2);
-		$model->value = (new Decimal($this->value))->toFixed(2);
+		$model->base_value = $this->getBaseValue() ? $this->getBaseValue()->toFixed(2) : null;
+		$model->value = $this->getValue()->toFixed(2);
 		$model->vat = $this->vat ? (new Decimal($this->vat))->toFixed(2) : null;
 		$model->transfer_type = $this->transfer_type;
 		$model->type = $this->type;
@@ -167,5 +167,9 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 
 	public function getValue(): Decimal {
 		return new Decimal($this->value);
+	}
+
+	public function getBaseValue(): ?Decimal {
+		return $this->base_value ? new Decimal($this->base_value) : null;
 	}
 }

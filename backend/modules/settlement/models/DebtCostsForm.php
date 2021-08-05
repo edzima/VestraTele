@@ -2,11 +2,16 @@
 
 namespace backend\modules\settlement\models;
 
+use common\helpers\DateTimeHelper;
 use common\models\issue\IssueCost;
+use common\models\issue\IssueCostInterface;
+use DateTime;
+use Decimal\Decimal;
 use Yii;
 
 class DebtCostsForm extends IssueCostForm {
 
+	public int $minPccValue = 1000;
 	public string $pccPercent = '1';
 	public string $pit4Percent = '17';
 
@@ -18,8 +23,11 @@ class DebtCostsForm extends IssueCostForm {
 
 	public function rules(): array {
 		return array_merge(parent::rules(), [
-			[['!user_id', 'settled_at', 'transfer_type'], 'required'],
-			[['pccPercent', 'pit4Percent'], 'required'],
+			[['!user_id', 'settled_at', 'transfer_type', 'base_value', 'pccPercent', 'pit4Percent'], 'required'],
+			[
+				'base_value', 'compare', 'compareAttribute' => 'value', 'operator' => '>=',
+				'enableClientValidation' => false,
+			],
 			[['pccPercent', 'pit4Percent'], 'number', 'min' => 0],
 			[['pccPercent', 'pit4Percent'], 'number', 'max' => 100],
 		]);
@@ -29,16 +37,21 @@ class DebtCostsForm extends IssueCostForm {
 		return array_merge(parent::attributeLabels(), [
 			'pccPercent' => Yii::t('settlement', 'PCC (%)'),
 			'pit4Percent' => Yii::t('settlement', 'PIT-4 (%)'),
+			'value' => Yii::t('settlement', 'Value of purchase'),
+			'base_value' => Yii::t('settlement', 'Nominal Value'),
 		]);
 	}
 
 	public function save(): bool {
-		$this->type = IssueCost::TYPE_PURCHASE_OF_RECEIVABLES;
+		$this->type = IssueCostInterface::TYPE_PURCHASE_OF_RECEIVABLES;
 		if (!parent::save()) {
 			return false;
 		}
 		$costs = [];
-		$costs[] = $this->createPCCCost();
+		$pcc = $this->createPCCCost();
+		if ($pcc) {
+			$costs[] = $pcc;
+		}
 		$costs[] = $this->createPIT4Cost();
 		foreach ($costs as $cost) {
 			$cost->save();
@@ -46,23 +59,24 @@ class DebtCostsForm extends IssueCostForm {
 		return true;
 	}
 
-	protected function createPurchaseOfReceivablesCost(): IssueCost {
-		$cost = $this->createCost(IssueCost::TYPE_PURCHASE_OF_RECEIVABLES);
-		$cost->value = $this->value;
-		$cost->settled_at = $this->settled_at;
-		return $cost;
-	}
-
-	protected function createPCCCost(): IssueCost {
-		$cost = $this->createCost(IssueCost::TYPE_PCC);
-		$cost->value = $this->getValue()->mul($this->pccPercent)->div(100)->toFixed(2);
+	protected function createPCCCost(): ?IssueCost {
+		$value = $this->getBaseValue();
+		if ($value < $this->minPccValue) {
+			return null;
+		}
+		$cost = $this->createCost(IssueCostInterface::TYPE_PCC);
+		$cost->base_value = $value->toFixed(2);
+		$cost->value = $value->mul($this->pccPercent)->div(100)->toFixed();
+		$cost->deadline_at = date('Y-m-d', strtotime($cost->date_at . ' + 14 days'));
 		return $cost;
 	}
 
 	protected function createPIT4Cost(): IssueCost {
-		$cost = $this->createCost(IssueCost::TYPE_PIT_4);
-		$cost->value = $this->getValue()->mul($this->pit4Percent)->div(100)->toFixed(2);
+		$cost = $this->createCost(IssueCostInterface::TYPE_PIT_4);
+		$cost->base_value = $this->getValue()->toFixed(2);
+		$cost->value = $this->getValue()->mul($this->pit4Percent)->div(100)->toFixed();
 		$cost->date_at = $this->settled_at;
+		$cost->deadline_at = DateTimeHelper::addMonth(new DateTime($cost->date_at))->format('Y-m-20');
 		return $cost;
 	}
 
@@ -79,9 +93,14 @@ class DebtCostsForm extends IssueCostForm {
 		$attributes = [
 			'transfer_type',
 			'settled_at',
+			'base_value',
 			'value',
 		];
 		return in_array($attribute, $attributes);
+	}
+
+	public function getBaseValue(): Decimal {
+		return new Decimal($this->base_value);
 	}
 
 }

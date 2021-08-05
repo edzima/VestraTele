@@ -141,4 +141,6 @@ return [
 	'Payment Pay: {value} in Settlement - {settlementType}' => 'Opłacono płatność: {value} w Rozliczeniu - {settlementType}',
 	'Is Confirmed' => 'Potwierdzony',
 	'Confirmed at' => 'Potwierdzono',
+	'Value of purchase' => 'Wartość zakupu',
+	'Nominal Value' => 'Wartość nominalna',
 ];
