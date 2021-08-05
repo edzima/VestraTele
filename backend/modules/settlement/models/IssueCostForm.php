@@ -4,6 +4,7 @@ namespace backend\modules\settlement\models;
 
 use common\models\forms\HiddenFieldsModel;
 use common\models\issue\IssueCost;
+use common\models\issue\IssueCostInterface;
 use common\models\issue\IssueInterface;
 use common\models\user\User;
 use Decimal\Decimal;
@@ -20,13 +21,18 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	public const SCENARIO_CREATE_INSTALLMENT = 'create-installment';
 	public const SCENARIO_SETTLE = 'settle';
 
-	public string $date_at = '';
-	public ?string $settled_at = null;
-	public string $type = '';
-	public ?string $transfer_type = null;
+	public ?string $base_value = null;
 	public string $value = '';
 	public ?string $vat = null;
+
+	public string $type = '';
+	public ?string $transfer_type = null;
 	public $user_id;
+
+	public string $date_at = '';
+	public ?string $confirmed_at = null;
+	public ?string $deadline_at = null;
+	public ?string $settled_at = null;
 
 	private ?IssueCost $model = null;
 	private IssueInterface $issue;
@@ -43,22 +49,16 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	}
 
 	public function attributeLabels(): array {
-		return [
-			'date_at' => Yii::t('common', 'Date at'),
-			'type' => Yii::t('common', 'Type'),
+		return array_merge(
+			IssueCost::instance()->attributeLabels(), [
 			'value' => $this->vat ? Yii::t('settlement', 'Value with VAT') : Yii::t('settlement', 'Value'),
-			'vat' => 'VAT (%)',
-			'user_id' => Yii::t('common', 'User'),
-			'settled_at' => Yii::t('common', 'Settled at'),
-			'transfer_type' => Yii::t('settlement', 'Transfer Type'),
-		];
+		]);
 	}
 
 	public function rules(): array {
 		return [
 			[['type', 'value', 'date_at'], 'required'],
-			[['date_at', 'settled_at'], 'date', 'format' => 'Y-m-d'],
-			['vat', 'default', 'value' => null],
+			[['date_at', 'deadline_at', 'confirmed_at', 'settled_at'], 'date', 'format' => 'Y-m-d'],
 			[
 				'settled_at', 'compare', 'compareAttribute' => 'date_at', 'operator' => '>=',
 				'enableClientValidation' => false,
@@ -66,7 +66,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 			[
 				'user_id', 'required',
 				'when' => function (): bool {
-					return $this->type === IssueCost::TYPE_INSTALLMENT;
+					return $this->type === IssueCostInterface::TYPE_INSTALLMENT;
 				},
 				'enableClientValidation' => false,
 			],
@@ -75,10 +75,11 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 				'on' => static::SCENARIO_CREATE_INSTALLMENT,
 			],
 			['settled_at', 'required', 'on' => static::SCENARIO_SETTLE],
+			[['vat', 'settled_at', 'confirmed_at', 'deadline_at'], 'default', 'value' => null],
 			['user_id', 'integer'],
 			[['value', 'vat'], 'number'],
 			['vat', 'number', 'min' => 0, 'max' => 100],
-			['value', 'number', 'min' => 1, 'max' => 10000],
+			[['base_value', 'value'], 'number', 'min' => 1, 'max' => 100000],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 			['transfer_type', 'in', 'range' => array_keys(static::getTransfersTypesNames())],
 			['user_id', 'in', 'range' => array_keys($this->getUserNames()), 'message' => Yii::t('backend', 'User must be from issue users.')],
@@ -98,14 +99,17 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 
 	public function setModel(IssueCost $cost): void {
 		$this->model = $cost;
-		$this->issue = $cost->issue;
+		$this->issue = $cost->getIssueModel();
 		$this->type = $cost->type;
 		$this->date_at = $cost->date_at;
+		$this->confirmed_at = $cost->confirmed_at;
+
 		$this->settled_at = $cost->settled_at;
+		$this->base_value = $cost->getBaseValue() ? $cost->getBaseValue()->toFixed(2) : null;
 		$this->value = $cost->getValueWithVAT()->toFixed(2);
 		$this->vat = $cost->getVAT() ? $cost->getVAT()->toFixed(2) : null;
 		$this->user_id = $cost->user_id;
-		$this->transfer_type = $cost->transfer_type;
+		$this->transfer_type = $cost->getTransferType();
 	}
 
 	public static function getTypesNames(): array {
@@ -122,19 +126,24 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 
 	public function save(): bool {
 		if (!$this->validate()) {
-			codecept_debug($this->getErrors());
 			return false;
 		}
 		$model = $this->getModel();
 		$model->issue_id = $this->getIssue()->getIssueId();
+		$this->base_value = (new Decimal($this->value))->toFixed(2);
 		$model->value = (new Decimal($this->value))->toFixed(2);
 		$model->vat = $this->vat ? (new Decimal($this->vat))->toFixed(2) : null;
+		$model->transfer_type = $this->transfer_type;
 		$model->type = $this->type;
+		$model->confirmed_at = $this->confirmed_at;
 		$model->date_at = $this->date_at;
 		$model->user_id = $this->user_id;
 		$model->settled_at = $this->settled_at;
-		$model->transfer_type = $this->transfer_type;
 		return $model->save(false);
+	}
+
+	public function isAttributeSafe($attribute): bool {
+		return parent::isAttributeSafe($attribute) && $this->isVisibleField($attribute);
 	}
 
 	public function isVisibleField(string $attribute): bool {

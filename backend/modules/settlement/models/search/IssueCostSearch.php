@@ -9,6 +9,7 @@ use common\models\issue\query\IssueCostQuery;
 use common\models\issue\search\IssueTypeSearch;
 use common\models\SearchModel;
 use common\models\user\User;
+use kartik\daterange\DateRangeBehavior;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -21,19 +22,62 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 
 	public $settled;
 	public $withSettlements;
+	public $is_confirmed;
 	public $issueType;
-	public $issueStage;
+
+	public $dateRange;
+	public $dateStart;
+	public $dateEnd;
+
+	public $deadlineRange;
+	public $deadlineStart;
+	public $deadlineEnd;
+
+	public $settledRange;
+	public $settledStart;
+	public $settledEnd;
+
+	public function behaviors(): array {
+		return [
+			'date-range' => [
+				'class' => DateRangeBehavior::class,
+				'attribute' => 'dateRange',
+				'dateStartAttribute' => 'dateStart',
+				'dateEndAttribute' => 'dateEnd',
+				'dateStartFormat' => 'Y-m-d 00:00:00',
+				'dateEndFormat' => 'Y-m-d 23:59:59',
+			],
+			'deadline-range' => [
+				'class' => DateRangeBehavior::class,
+				'attribute' => 'deadlineRange',
+				'dateStartAttribute' => 'deadlineStart',
+				'dateEndAttribute' => 'deadlineEnd',
+				'dateStartFormat' => 'Y-m-d 00:00:00',
+				'dateEndFormat' => 'Y-m-d 23:59:59',
+			],
+			'settled-range' => [
+				'class' => DateRangeBehavior::class,
+				'attribute' => 'settledRange',
+				'dateStartAttribute' => 'settledStart',
+				'dateEndAttribute' => 'settledEnd',
+				'dateStartFormat' => 'Y-m-d 00:00:00',
+				'dateEndFormat' => 'Y-m-d 23:59:59',
+			],
+		];
+	}
 
 	/**
 	 * @inheritdoc
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'issue_id', 'user_id', 'issueType', 'issueStage'], 'integer'],
+			[['id', 'issue_id', 'user_id'], 'integer'],
 			[['type', 'transfer_type'], 'string'],
-			[['settled', 'withSettlements'], 'boolean'],
+			[['settled', 'withSettlements', 'is_confirmed'], 'boolean'],
 			[['created_at', 'updated_at', 'date_at', 'settled_at'], 'safe'],
-			[['value', 'vat'], 'number'],
+			[['dateRange', 'deadlineRange', 'settledRange'], 'match', 'pattern' => '/^.+\s\-\s.+$/'],
+			[['value', 'base_value', 'vat'], 'number'],
+			['issueType', 'in', 'range' => array_keys(static::getIssueTypesNames())],
 		];
 	}
 
@@ -66,7 +110,6 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 		$query = IssueCost::find();
 		$query->joinWith(['issue', 'settlements', 'user']);
 		$query->with('issue.type');
-		$query->with('issue.stage');
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -74,6 +117,10 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 				'defaultOrder' => ['date_at' => SORT_ASC],
 			],
 		]);
+		$sort = $dataProvider->getSort();
+		$sort->attributes['dateRange'] = $sort->attributes['date_at'];
+		$sort->attributes['deadlineRange'] = $sort->attributes['deadline_at'];
+		$sort->attributes['settledRange'] = $sort->attributes['settled_at'];
 
 		$this->load($params);
 		if (!$this->validate()) {
@@ -82,7 +129,9 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 			return $dataProvider;
 		}
 
-		$this->applyIssueStageFilter($query);
+		$this->applyConfirmedFilter($query);
+		$this->applyDatesFilter($query);
+		//	$this->applyIssueStageFilter($query);
 		$this->applyIssueTypeFilter($query);
 		$this->applySettledFilter($query);
 		$this->applyWithSettlementsFilter($query);
@@ -93,16 +142,33 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 			IssueCost::tableName() . '.issue_id' => $this->issue_id,
 			IssueCost::tableName() . '.user_id' => $this->user_id,
 			IssueCost::tableName() . '.value' => $this->value,
+			IssueCost::tableName() . '.base_value' => $this->base_value,
 			IssueCost::tableName() . '.vat' => $this->vat,
-			IssueCost::tableName() . '.created_at' => $this->created_at,
-			IssueCost::tableName() . '.date_at' => $this->date_at,
-			IssueCost::tableName() . '.settled_at' => $this->date_at,
-			IssueCost::tableName() . '.updated_at' => $this->updated_at,
 			IssueCost::tableName() . '.type' => $this->type,
 			IssueCost::tableName() . '.transfer_type' => $this->transfer_type,
 		]);
 
 		return $dataProvider;
+	}
+
+	private function applyConfirmedFilter(IssueCostQuery $query): void {
+		if ($this->is_confirmed === null || $this->is_confirmed === '') {
+			return;
+		}
+		if ($this->is_confirmed) {
+			$query->andWhere(IssueCost::tableName() . '.confirmed_at IS NOT NULL');
+			return;
+		}
+		$query->andWhere(IssueCost::tableName() . '.confirmed_at IS NULL');
+	}
+
+	private function applyDatesFilter(IssueCostQuery $query): void {
+		$query->andFilterWhere(['>=', IssueCost::tableName() . '.date_at', $this->dateStart])
+			->andFilterWhere(['<', IssueCost::tableName() . '.date_at', $this->dateEnd])
+			->andFilterWhere(['>=', IssueCost::tableName() . '.deadline_at', $this->deadlineStart])
+			->andFilterWhere(['<', IssueCost::tableName() . '.deadline_at', $this->deadlineEnd])
+			->andFilterWhere(['>=', IssueCost::tableName() . '.deadline_at', $this->settledStart])
+			->andFilterWhere(['<', IssueCost::tableName() . '.deadline_at', $this->settledEnd]);
 	}
 
 	private function applySettledFilter(IssueCostQuery $query): void {

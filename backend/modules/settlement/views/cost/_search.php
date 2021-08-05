@@ -17,13 +17,19 @@ use yii\widgets\ActiveForm;
 	]); ?>
 
 	<div class="row">
-		<?= $form->field($model, 'settled', ['options' => ['class' => 'col-xs-6']])->dropDownList(
+		<?= $form->field($model, 'settled', ['options' => ['class' => 'col-xs-4']])->dropDownList(
 			Html::booleanDropdownList(), [
 			'prompt' => Yii::t('common', 'All'),
 		])
 		?>
 
-		<?= $form->field($model, 'withSettlements', ['options' => ['class' => 'col-xs-6']])->dropDownList(
+		<?= $form->field($model, 'withSettlements', ['options' => ['class' => 'col-xs-4']])->dropDownList(
+			Html::booleanDropdownList(), [
+			'prompt' => Yii::t('common', 'All'),
+		])
+		?>
+
+		<?= $form->field($model, 'is_confirmed', ['options' => ['class' => 'col-xs-4']])->dropDownList(
 			Html::booleanDropdownList(), [
 			'prompt' => Yii::t('common', 'All'),
 		])
@@ -32,8 +38,8 @@ use yii\widgets\ActiveForm;
 
 
 	<div class="form-group">
-		<?= Html::submitButton(Yii::t('settlement', 'Search'), ['class' => 'btn btn-primary']) ?>
-		<?= Html::resetButton(Yii::t('settlement', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>
+		<?= Html::submitButton(Yii::t('common', 'Search'), ['class' => 'btn btn-primary']) ?>
+		<?= Html::a(Yii::t('common', 'Reset'), 'index', ['class' => 'btn btn-default']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

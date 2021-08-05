@@ -71,14 +71,12 @@ class IssueCostCest {
 		$I->seeInGridHeader('Issue');
 		$I->seeInGridHeader('Issue Type');
 		$I->seeInGridHeader('Type');
-		$I->seeInGridHeader('Transfer Type');
 		$I->seeInGridHeader('User');
 		$I->seeInGridHeader('Value with VAT');
-		$I->seeInGridHeader('VAT (%)');
+		$I->seeInGridHeader('Transfer Type');
 		$I->seeInGridHeader('Date at');
+		$I->seeInGridHeader('Deadline at');
 		$I->seeInGridHeader('Settled at');
-		$I->seeInGridHeader('Created at');
-		$I->seeInGridHeader('Updated at');
 	}
 
 	public function checkIssue(CostIssueManager $I): void {

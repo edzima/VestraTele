@@ -23,7 +23,7 @@ YiiAsset::register($this);
 <div class="issue-cost-view">
 
 	<p>
-		<?= !$model->isSettled
+		<?= !$model->getIsSettled()
 			? Html::a(Yii::t('settlement', 'Settle'), ['settle', 'id' => $model->id], ['class' => 'btn btn-success'])
 			: ''
 		?>
@@ -52,8 +52,11 @@ YiiAsset::register($this);
 				'format' => 'currency',
 			],
 			'VATPercent',
+			'base_value:currency',
 			'date_at:date',
+			'deadline_at:date',
 			'settled_at:date',
+			'confirmed_at:date',
 			'created_at:datetime',
 			'updated_at:datetime',
 		],

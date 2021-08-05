@@ -26,6 +26,11 @@ trait UnitSearchModelTrait {
 		return $this->model->search($params);
 	}
 
+	/**
+	 * @param int $count
+	 * @param array $params
+	 * @deprecated
+	 */
 	protected function assertTotalCount(int $count, array $params = []): void {
 		$this->tester->assertSame($count, $this->search($params)->getTotalCount());
 	}

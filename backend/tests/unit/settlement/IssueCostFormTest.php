@@ -43,7 +43,7 @@ class IssueCostFormTest extends Unit {
 		$model->vat = 23;
 		$this->thenSuccessSave();
 		$this->tester->seeRecord(IssueCost::class, [
-			'issue_id' => $model->getIssue()->id,
+			'issue_id' => $model->getIssue()->getIssueId(),
 			'type' => IssueCost::TYPE_PURCHASE_OF_RECEIVABLES,
 			'value' => 600,
 			'vat' => 23,
@@ -55,13 +55,13 @@ class IssueCostFormTest extends Unit {
 		$model = $this->model;
 		$model->type = IssueCost::TYPE_PURCHASE_OF_RECEIVABLES;
 		$model->date_at = '2020-01-01';
-		$model->settled_at = '2019-02-02';
+		$model->settled_at = '2019-02-02 12:00';
 		$model->value = 600;
 		$model->vat = 23;
 		$this->thenUnsuccessSave();
 		$this->thenSeeError('Settled at must be greater than or equal to "Date at".', 'settled_at');
 		$this->tester->dontSeeRecord(IssueCost::class, [
-			'issue_id' => $model->getIssue()->id,
+			'issue_id' => $model->getIssue()->getIssueId(),
 			'type' => IssueCost::TYPE_PURCHASE_OF_RECEIVABLES,
 			'value' => 600,
 			'vat' => 23,
@@ -79,7 +79,7 @@ class IssueCostFormTest extends Unit {
 		$model->vat = 23;
 		$this->thenSuccessSave();
 		$this->tester->seeRecord(IssueCost::class, [
-			'issue_id' => $model->getIssue()->id,
+			'issue_id' => $model->getIssue()->getIssueId(),
 			'type' => IssueCost::TYPE_PURCHASE_OF_RECEIVABLES,
 			'value' => 600,
 			'vat' => 23,
@@ -167,6 +167,17 @@ class IssueCostFormTest extends Unit {
 			'value' => 600,
 			'vat' => 23,
 		]);
+	}
+
+	public function testUpdate(): void {
+		$this->model = IssueCostForm::createFromModel($this->tester->grabFixture(SettlementFixtureHelper::COST, '0'));
+		$model = $this->model;
+		$this->tester->assertNotSame('10000', $model->value);
+		$model->value = 10000;
+		$this->thenSuccessSave();
+		$attributes = $model->getModel()->getAttributes();
+		$attributes['value'] = 10000;
+		$this->tester->seeRecord(IssueCost::class, $attributes);
 	}
 
 	protected function grabIssue(int $index = 0): Issue {

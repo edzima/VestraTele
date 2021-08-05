@@ -3,10 +3,18 @@
 namespace common\models\issue;
 
 use common\models\settlement\CostInterface;
+use common\models\settlement\PayedInterface;
 use common\models\settlement\TransferType;
 use common\models\settlement\VATInfo;
 
-interface IssueCostInterface extends CostInterface, VATInfo, IssueInterface, TransferType {
+/**
+ * @property-read IssueSettlement[] $settlements
+ */
+interface IssueCostInterface extends
+	CostInterface,
+	IssueInterface,
+	TransferType,
+	VATInfo {
 
 	public const TYPE_COURT_ENTRY = 'court_entry';
 	public const TYPE_POWER_OF_ATTORNEY = 'power_of_attorney';
@@ -17,4 +25,5 @@ interface IssueCostInterface extends CostInterface, VATInfo, IssueInterface, Tra
 	public const TYPE_INSTALLMENT = 'installment';
 	public const TYPE_PCC = 'pcc';
 	public const TYPE_PIT_4 = 'PIT-4';
+
 }

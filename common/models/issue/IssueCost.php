@@ -20,14 +20,18 @@ use yii\db\ActiveRecord;
  * @property int $issue_id
  * @property string $type
  * @property string $value
+ * @property string|null $base_value
  * @property string|null $vat
  * @property int $created_at
  * @property int $updated_at
  * @property string $date_at
+ * @property string $deadline_at
  * @property string|null $transfer_type
  * @property string|null $settled_at
+ * @property string|null $confirmed_at
  * @property int|null $user_id
  *
+ * @property-read bool $is_confirmed
  * @property-read string|null $transferTypeName
  * @property-read string $typeName
  * @property-read string $typeNameWithValue
@@ -59,6 +63,10 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 			. Yii::$app->formatter->asCurrency($this->getValueWithVAT());
 	}
 
+	public function getType(): string {
+		return $this->type;
+	}
+
 	public function getTypeName(): string {
 		return static::getTypesNames()[$this->type];
 	}
@@ -81,12 +89,16 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 			'VATPercent' => 'VAT (%)',
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
-			'date_at' => Yii::t('common', 'Date at'),
+			'confirmed_at' => Yii::t('settlement', 'Confirmed at'),
+			'date_at' => Yii::t('settlement', 'Date at'),
+			'deadline_at' => Yii::t('settlement', 'Deadline at'),
 			'settled_at' => Yii::t('common', 'Settled at'),
 			'user_id' => Yii::t('common', 'User'),
 			'user' => Yii::t('common', 'User'),
 			'transfer_type' => Yii::t('settlement', 'Transfer Type'),
 			'transferTypeName' => Yii::t('settlement', 'Transfer Type'),
+			'base_value' => Yii::t('settlement', 'Base Value'),
+			'is_confirmed' => Yii::t('settlement', 'Is Confirmed'),
 		]);
 	}
 
@@ -114,8 +126,19 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 		return new Decimal($this->value);
 	}
 
+	public function getBaseValue(): ?Decimal {
+		if ($this->base_value !== null) {
+			return new Decimal($this->base_value);
+		}
+		return null;
+	}
+
 	public function getIsSettled(): bool {
 		return !empty($this->settled_at) || $this->getHasSettlements();
+	}
+
+	public function getIsConfirmed(): bool {
+		return $this->confirmed_at !== null;
 	}
 
 	public function getHasSettlements(): bool {

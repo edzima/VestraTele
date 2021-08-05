@@ -4,9 +4,8 @@ use backend\modules\settlement\models\search\IssueCostSearch;
 use backend\modules\settlement\widgets\IssueCostActionColumn;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
-use common\models\issue\IssueCost;
+use common\models\issue\IssueCostInterface;
 use common\widgets\grid\IssueTypeColumn;
-use kartik\grid\SerialColumn;
 
 /* @var $this yii\web\View */
 /* @var $model IssueCostSearch */
@@ -23,8 +22,9 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $model,
+		'showPageSummary' => true,
+
 		'columns' => [
-			['class' => SerialColumn::class],
 			[
 				'class' => IssueColumn::class,
 			],
@@ -32,11 +32,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => IssueTypeColumn::class,
 				'attribute' => 'issueType',
 				'label' => Yii::t('common', 'Issue type'),
-			],
-			[
-				'attribute' => 'issueStage',
-				'label' => Yii::t('common', 'Issue stage'),
-				'filter' => IssueCostSearch::getIssueStagesNames(),
 			],
 			[
 				'attribute' => 'type',
@@ -49,30 +44,69 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('backend', 'User'),
 				'filter' => IssueCostSearch::getUsersNames(),
 			],
-			[
-				'value' => function (IssueCost $cost): string {
-					return count($cost->settlements);
-				},
-				'label' => Yii::t('settlement', 'Settlements'),
-				'noWrap' => true,
-			],
+
 			[
 				'attribute' => 'value',
-				'value' => 'valueWithVAT',
 				'format' => 'currency',
-				'label' => Yii::t('backend', 'Value with VAT'),
+				'pageSummary' => true,
 			],
-			'valueWithoutVAT:currency:' . Yii::t('backend', 'Value without VAT'),
-			'VATPercent',
 			[
 				'attribute' => 'transfer_type',
 				'value' => 'transferTypeName',
 				'filter' => IssueCostSearch::getTransfersTypesNames(),
 			],
-			'date_at:date',
-			'settled_at:date',
-			'created_at:date',
-			'updated_at:date',
+			[
+				'attribute' => 'dateRange',
+				'format' => 'date',
+				'value' => 'date_at',
+				'label' => $model->getAttributeLabel('date_at'),
+				'enableSorting' => true,
+				'filterType' => GridView::FILTER_DATE_RANGE,
+				'filterWidgetOptions' => [
+					'pluginOptions' => [
+						'locale' => [
+							'format' => 'YYYY-MM-DD',
+						],
+					],
+				],
+			],
+			[
+				'attribute' => 'deadlineRange',
+				'format' => 'date',
+				'value' => 'deadline_at',
+				'label' => $model->getAttributeLabel('deadline_at'),
+				'filterType' => GridView::FILTER_DATE_RANGE,
+				'filterWidgetOptions' => [
+					'pluginOptions' => [
+						'locale' => [
+							'format' => 'YYYY-MM-DD',
+						],
+					],
+				],
+			],
+			[
+				'attribute' => 'settledRange',
+				'format' => 'date',
+				'value' => 'settled_at',
+				'label' => $model->getAttributeLabel('settled_at'),
+				'filterType' => GridView::FILTER_DATE_RANGE,
+				'filterWidgetOptions' => [
+					'pluginOptions' => [
+						'locale' => [
+							'format' => 'YYYY-MM-DD',
+						],
+					],
+				],
+			],
+			[
+				'value' => static function (IssueCostInterface $cost): string {
+					return count($cost->settlements);
+				},
+				'label' => Yii::t('settlement', 'Settlements'),
+				'noWrap' => true,
+			],
+			//	'created_at:date',
+			//	'updated_at:date',
 			[
 				'class' => IssueCostActionColumn::class,
 			],

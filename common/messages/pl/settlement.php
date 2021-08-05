@@ -1,6 +1,7 @@
 <?php
 
 return [
+	'Base Value' => 'Kwota Bazowa',
 	'Details' => 'Szczegóły',
 	'Deadline at' => 'Termin płatności',
 	'Pays count' => 'Ilość rat',
@@ -10,6 +11,7 @@ return [
 	'Provider' => 'Wpłacający',
 	'Demand' => 'Wezwanie',
 	'Judgement' => 'Sąd',
+	'Date at' => 'Data',
 	'Prepariation for demand' => 'Przygotowanie do wezwania',
 	'Prepariation for judgement' => 'Przygotowanie do sądu',
 	'Baillif' => 'Komornik',
@@ -137,4 +139,6 @@ return [
 	'Thank you for Paid Pay: {value}.' => 'Dziękujemy za dokonanie wpłaty: {value}.',
 	'The payment: {value} marked as paid.' => 'Wpłata: {value} została opłacona.',
 	'Payment Pay: {value} in Settlement - {settlementType}' => 'Opłacono płatność: {value} w Rozliczeniu - {settlementType}',
+	'Is Confirmed' => 'Potwierdzony',
+	'Confirmed at' => 'Potwierdzono',
 ];

@@ -45,7 +45,7 @@ class IssueCostActionColumn extends ActionColumn {
 	}
 
 	public function settleLink(IssueCost $cost): string {
-		if ($cost->isSettled) {
+		if ($cost->getIsSettled()) {
 			return '';
 		}
 		return Html::a(

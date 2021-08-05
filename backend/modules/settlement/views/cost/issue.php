@@ -32,8 +32,8 @@ $this->params['breadcrumbs'][] = Yii::t('settlement', 'Costs');
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $model,
+		'showPageSummary' => true,
 		'columns' => [
-			['class' => 'yii\grid\SerialColumn'],
 			[
 				'attribute' => 'type',
 				'value' => 'typeName',
@@ -46,10 +46,10 @@ $this->params['breadcrumbs'][] = Yii::t('settlement', 'Costs');
 			],
 			[
 				'attribute' => 'value',
-				'value' => 'valueWithVAT',
 				'format' => 'currency',
-				'label' => Yii::t('backend', 'Value with VAT'),
+				'pageSummary' => true,
 			],
+			'base_value:currency',
 			'valueWithoutVAT:currency:' . Yii::t('backend', 'Value without VAT'),
 			'VATPercent',
 			[
@@ -58,6 +58,7 @@ $this->params['breadcrumbs'][] = Yii::t('settlement', 'Costs');
 				'filter' => IssueCostSearch::getTransfersTypesNames(),
 			],
 			'date_at:date',
+			'deadline_at:date',
 			'settled_at:date',
 			'created_at:datetime',
 			'updated_at:datetime',

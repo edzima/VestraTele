@@ -6,6 +6,7 @@ use backend\modules\settlement\models\search\IssueCostSearch;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
+use common\models\issue\IssueCost;
 use common\models\settlement\TransferType;
 use common\tests\_support\UnitSearchModelTrait;
 
@@ -31,36 +32,73 @@ class IssueCostSearchTest extends Unit {
 		);
 	}
 
-	public function testEmpty(): void {
-		$this->assertTotalCount(5);
-	}
-
 	public function testSettled(): void {
-		$this->assertTotalCount(1, ['settled' => true]);
+		/** @var IssueCost[] $models */
+		$models = $this->search(['settled' => true])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertTrue($model->getIsSettled());
+		}
 	}
 
 	public function testNotSettled(): void {
-		$this->assertTotalCount(4, ['settled' => false]);
+		/** @var IssueCost[] $models */
+		$models = $this->search(['settled' => false])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertFalse($model->getIsSettled());
+		}
 	}
 
 	public function testWithSettlements(): void {
-		$this->assertTotalCount(3, ['withSettlements' => true]);
+		/** @var IssueCost[] $models */
+		$models = $this->search(['withSettlements' => true])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertTrue($model->getHasSettlements());
+		}
 	}
 
 	public function testWithoutSettlements(): void {
-		$this->assertTotalCount(2, ['withSettlements' => false]);
+		/** @var IssueCost[] $models */
+		$models = $this->search(['withSettlements' => false])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertFalse($model->getHasSettlements());
+		}
 	}
 
 	public function testIssueType(): void {
-		$this->assertTotalCount(3, ['issueType' => 1]);
-		$this->assertTotalCount(2, ['issueType' => 2]);
-		$this->assertTotalCount(0, ['issueType' => 3]);
+		/** @var IssueCost[] $models */
+		$models = $this->search(['issueType' => 1])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame(1, $model->getIssueType()->id);
+		}
+		/** @var IssueCost[] $models */
+		$models = $this->search(['issueType' => 2])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame(2, $model->getIssueType()->id);
+		}
 	}
 
-	public function testIssueStage(): void {
-		$this->assertTotalCount(2, ['issueStage' => 1]);
-		$this->assertTotalCount(3, ['issueStage' => 2]);
-		$this->assertTotalCount(0, ['issueStage' => 3]);
+	public function testConfirmed(): void {
+		/** @var IssueCost[] $models */
+		$models = $this->search(['is_confirmed' => true])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertTrue($model->getIsConfirmed());
+		}
+	}
+
+	public function testNotConfirmed(): void {
+		/** @var IssueCost[] $models */
+		$models = $this->search(['is_confirmed' => false])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertFalse($model->getIsConfirmed());
+		}
 	}
 
 	public function testTransferType(): void {
@@ -90,6 +128,34 @@ class IssueCostSearchTest extends Unit {
 			/** @var TransferType $model */
 			$this->tester->assertSame(TransferType::TRANSFER_TYPE_BANK, $model->getTransferType());
 		}
+	}
+
+	public function testDateRange(): void {
+		/** @var IssueCost[] $models */
+		$models = $this->search(['dateRange' => '2020-02-10 - 2020-02-11'])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertGreaterThanOrEqual('2020-02-10', $model->date_at);
+			$this->tester->assertLessThanOrEqual('2020-02-11', $model->date_at);
+		}
+	}
+
+	public function testDeadlineRange(): void {
+		/** @var IssueCost[] $models */
+		$models = $this->search(['deadlineRange' => '2020-03-11 - 2020-03-12'])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertGreaterThanOrEqual('2020-03-11', $model->deadline_at);
+			$this->tester->assertLessThanOrEqual('2020-03-12', $model->deadline_at);
+		}
+	}
+
+	public function testSortRangesAttributes(): void {
+		$dataProvider = $this->search();
+		$sort = $dataProvider->getSort();
+		$this->tester->assertTrue($sort->hasAttribute('dateRange'));
+		$this->tester->assertTrue($sort->hasAttribute('deadlineRange'));
+		$this->tester->assertTrue($sort->hasAttribute('settledRange'));
 	}
 
 	protected function createModel(): IssueCostSearch {

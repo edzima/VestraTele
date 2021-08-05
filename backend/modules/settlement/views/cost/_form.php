@@ -23,17 +23,27 @@ use yii\helpers\Html;
 
 		<?= $form->field($model, 'transfer_type', ['options' => ['class' => 'col-md-4 col-lg-2']])->dropDownList(IssueCostForm::getTransfersTypesNames(), ['prompt' => Yii::t('common', 'Select...')]) ?>
 
+
+	</div>
+
+	<div class="row">
 		<?= $form->field($model, 'date_at', ['options' => ['class' => 'col-md-4 col-lg-2']])->widget(DateWidget::class) ?>
 
 		<?= $form->field($model, 'settled_at', ['options' => ['class' => 'col-md-4 col-lg-2']])->widget(DateWidget::class) ?>
 
+		<?= $form->field($model, 'deadline_at', ['options' => ['class' => 'col-md-4 col-lg-2']])->widget(DateWidget::class) ?>
+
+		<?= $form->field($model, 'confirmed_at', ['options' => ['class' => 'col-md-4 col-lg-2']])->widget(DateWidget::class) ?>
 	</div>
 
 
 	<div class="row">
-		<?= $form->field($model, 'value', ['options' => ['class' => 'col-xs-9 col-md-2 col-lg-3']])->widget(NumberControl::class) ?>
+		<?= $form->field($model, 'value', ['options' => ['class' => 'col-xs-9 col-md-3 col-lg-2']])->widget(NumberControl::class) ?>
 
 		<?= $form->field($model, 'vat', ['options' => ['class' => 'col-xs-3 col-md-2']])->widget(NumberControl::class) ?>
+
+		<?= $form->field($model, 'base_value', ['options' => ['class' => 'col-xs-9 col-md-3 col-lg-2']])->widget(NumberControl::class) ?>
+
 	</div>
 
 
