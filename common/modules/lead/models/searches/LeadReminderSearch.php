@@ -41,15 +41,6 @@ class LeadReminderSearch extends ReminderSearch {
 			$query->andWhere('0=1');
 		}
 
-		/*
-		$query->joinWith([
-			'lead' => function (LeadQuery $query) {
-				$this->applyReminderFilter($query);
-			},
-		]);
-
-		*/
-
 		$query->joinWith([
 			'reminder' => function (ReminderQuery $query) {
 				$this->applyReminderFilter($query);
