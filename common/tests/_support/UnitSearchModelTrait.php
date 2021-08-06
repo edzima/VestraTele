@@ -18,7 +18,7 @@ trait UnitSearchModelTrait {
 
 	abstract protected function createModel(): SearchModel;
 
-	protected function search(array $params, string $formName = null): DataProviderInterface {
+	protected function search(array $params = [], string $formName = null): DataProviderInterface {
 		if ($formName === null) {
 			$formName = $this->model->formName();
 		}

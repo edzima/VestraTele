@@ -6,6 +6,7 @@ return [
 	[
 		'id' => LeadStatusInterface::STATUS_NEW,
 		'name' => 'New',
+		'calendar' => '{"color":"#cc0000"}',
 	],
 	[
 		'id' => LeadStatusInterface::STATUS_ARCHIVE,
@@ -14,5 +15,6 @@ return [
 	[
 		'name' => 'Not Answered',
 		'short_report' => true,
+		'calendar' => '{"color":"#ffe599"}',
 	],
 ];

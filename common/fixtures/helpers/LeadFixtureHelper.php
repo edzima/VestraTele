@@ -19,18 +19,18 @@ use yii\test\ActiveFixture;
 
 class LeadFixtureHelper {
 
-	public const LEAD = 'lead';
-	public const TYPE = 'type';
-	private const STATUS = 'status';
-	private const SOURCE = 'source';
+	public const LEAD = 'lead.lead';
+	public const TYPE = 'lead.type';
+	private const STATUS = 'lead.status';
+	private const SOURCE = 'lead.source';
 
-	private const REPORT = 'report';
-	private const QUESTION = 'question';
-	private const USER = 'user';
-	private const LEAD_USER = 'lead-user';
-	private const REMINDER = 'reminder';
-	private const LEAD_REMINDER = 'lead-reminder';
-	private const ANSWER = 'answer';
+	private const REPORT = 'lead.report';
+	private const QUESTION = 'lead.question';
+	private const USER = 'lead.user';
+	private const LEAD_USER = 'lead.lead-user';
+	private const REMINDER = 'lead.reminder';
+	private const LEAD_REMINDER = 'lead.lead-reminder';
+	private const ANSWER = 'lead.answer';
 
 	public static function dataDir(): string {
 		return Yii::getAlias('@common/tests/_data/lead/');
@@ -46,20 +46,31 @@ class LeadFixtureHelper {
 	}
 
 	public static function leads(): array {
-		return array_merge([
+		return array_merge(
+			static::lead(),
+			static::status(),
+			static::source(),
+			static::type(),
+			static::user(),
+		);
+	}
+
+	public static function status(): array {
+		return [
 			static::STATUS => [
 				'class' => StatusFixture::class,
 				'dataFile' => static::dataDir() . 'status.php',
 			],
+		];
+	}
+
+	public static function type(): array {
+		return [
 			static::TYPE => [
 				'class' => TypeFixture::class,
 				'dataFile' => static::dataDir() . 'type.php',
 			],
-		],
-			static::lead(),
-			static::source(),
-			static::user(),
-		);
+		];
 	}
 
 	public static function reports(): array {
