@@ -99,6 +99,10 @@ return [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',
 				],
+				'calendar' => [
+					'class' => 'yii\i18n\PhpMessageSource',
+					'basePath' => '@common/modules/calendar/messages',
+				],
 				'*' => [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',

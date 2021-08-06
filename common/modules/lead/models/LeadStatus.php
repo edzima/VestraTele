@@ -2,9 +2,11 @@
 
 namespace common\modules\lead\models;
 
+use common\modules\calendar\models\Filter;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "lead_status".
@@ -14,12 +16,15 @@ use yii\helpers\ArrayHelper;
  * @property string|null $description
  * @property int|null $sort_index
  * @property int|null $short_report
+ * @property string $calendar
  *
  * @property Lead[] $leads
  */
 class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 
 	private static ?array $models = null;
+
+	private ?Filter $filter = null;
 
 	public function __toString(): string {
 		return $this->name;
@@ -32,6 +37,17 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 		return '{{%lead_status}}';
 	}
 
+	public function load($data, $formName = null): bool {
+		return parent::load($data, $formName) && $this->getFilter()->load($data, $formName);
+	}
+
+	public function beforeSave($insert): bool {
+		if ($this->getFilter()->validate()) {
+			$this->calendar = $this->getFilter()->toJson();
+		}
+		return parent::beforeSave($insert);
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -41,6 +57,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			[['sort_index'], 'integer'],
 			['short_report', 'boolean'],
 			[['name', 'description'], 'string', 'max' => 255],
+			['calendar', 'string'],
 		];
 	}
 
@@ -94,5 +111,16 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 
 	public function isShortReport(): bool {
 		return !empty($this->short_report);
+	}
+
+	public function getFilter(): Filter {
+		if ($this->filter === null) {
+			$this->filter = new Filter($this->getCalendarData());
+		}
+		return $this->filter;
+	}
+
+	public function getCalendarData(): array {
+		return $this->calendar ? Json::decode($this->calendar) : [];
 	}
 }

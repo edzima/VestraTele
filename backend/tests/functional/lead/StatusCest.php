@@ -50,6 +50,21 @@ class StatusCest {
 		]);
 	}
 
+	public function checkCreateWithFilterColor(LeadManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_CREATE);
+		$I->submitForm(static::FORM_SELECTOR,
+			array_merge(
+				$this->formParams('Status Filter Color'),
+				$this->filterFormParams('#6fa8dc')
+			)
+		);
+		$I->seeRecord(LeadStatus::class, [
+			'name' => 'Status Filter Color',
+		]);
+		$I->see('#6fa8dc');
+	}
+
 	public function checkCreateWithShorReportName(LeadManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_CREATE);
@@ -64,6 +79,12 @@ class StatusCest {
 		return [
 			'LeadStatus[name]' => $name,
 			'LeadStatus[short_report]' => $short_report,
+		];
+	}
+
+	private function filterFormParams($color): array {
+		return [
+			'Filter[color]' => $color,
 		];
 	}
 

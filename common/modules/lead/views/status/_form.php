@@ -1,5 +1,6 @@
 <?php
 
+use common\modules\calendar\widgets\FilterForm;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -21,6 +22,11 @@ use yii\widgets\ActiveForm;
 	<?= $form->field($model, 'short_report')->checkbox() ?>
 
 	<?= $form->field($model, 'sort_index')->textInput() ?>
+
+	<?= FilterForm::widget([
+		'form' => $form,
+		'model' => $model->getFilter(),
+	]) ?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>
