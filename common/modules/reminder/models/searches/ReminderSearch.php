@@ -16,13 +16,16 @@ class ReminderSearch extends Reminder {
 	public ?bool $onlyToday = false;
 	public ?bool $onlyDelayed = true;
 
+	public ?string $dateStart = null;
+	public ?string $dateEnd = null;
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
 			[['id', 'priority', 'created_at', 'updated_at'], 'integer'],
-			[['date_at', 'details'], 'safe'],
+			[['date_at', 'details', 'dateStart', 'dateEnd'], 'safe'],
 			[['onlyDelayed', 'onlyToday'], 'boolean'],
 		];
 	}
@@ -32,7 +35,6 @@ class ReminderSearch extends Reminder {
 			parent::attributeLabels(), [
 			'onlyToday' => Yii::t('common', 'Only Today'),
 			'onlyDelayed' => Yii::t('common', 'Only Delayed'),
-
 		]);
 	}
 
@@ -92,5 +94,7 @@ class ReminderSearch extends Reminder {
 		if ($this->onlyDelayed) {
 			$query->onlyDelayed();
 		}
+		$query->andFilterWhere(['>=', Reminder::tableName() . '.date_at', $this->dateStart]);
+		$query->andFilterWhere(['<=', Reminder::tableName() . '.date_at', $this->dateEnd]);
 	}
 }

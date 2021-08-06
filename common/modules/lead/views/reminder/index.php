@@ -34,6 +34,12 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('lead', 'Lead Name'),
 			],
 			[
+				'attribute' => 'details',
+				'value' => 'reminder.details',
+				'label' => $searchModel->getAttributeLabel('details'),
+				'format' => 'ntext',
+			],
+			[
 				'attribute' => 'priority',
 				'value' => 'reminder.priorityName',
 				'filter' => Reminder::getPriorityNames(),
@@ -58,12 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => $searchModel->getAttributeLabel('date_at'),
 				'format' => 'date',
 			],
-			[
-				'attribute' => 'details',
-				'value' => 'reminder.details',
-				'label' => $searchModel->getAttributeLabel('details'),
-				'format' => 'ntext',
-			],
+
 			[
 				'class' => ActionColumn::class,
 				'buttons' => [
