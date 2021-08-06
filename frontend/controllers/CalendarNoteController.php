@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\CalendarNews;
 use common\models\user\User;
+use common\modules\calendar\Module;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -11,6 +12,10 @@ use yii\web\ForbiddenHttpException;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\Response;
 
+/**
+ * @todo move to Calendar module
+ * @see Module
+ */
 class CalendarNoteController extends Controller {
 
 	public function behaviors(): array {

@@ -3,6 +3,7 @@
 use common\behaviors\GlobalAccessBehavior;
 use common\components\User as WebUser;
 use common\models\user\User;
+use common\modules\calendar\Module as CalendarModule;
 use common\modules\lead\Module as LeadModule;
 use frontend\controllers\ApiLeadController;
 
@@ -25,6 +26,22 @@ return [
 		],
 		'gridview' => [
 			'class' => '\kartik\grid\Module',
+		],
+		'calendar' => [
+			'class' => CalendarModule::class,
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'controllers' => [
+							'calendar/lead',
+						],
+						'permissions' => [User::PERMISSION_LEAD],
+					],
+
+				],
+			],
 		],
 		'lead' => [
 			'class' => LeadModule::class,
