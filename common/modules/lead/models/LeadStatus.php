@@ -3,6 +3,7 @@
 namespace common\modules\lead\models;
 
 use common\modules\calendar\models\Filter;
+use common\modules\calendar\models\FilterOptions;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -24,7 +25,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 
 	private static ?array $models = null;
 
-	private ?Filter $filter = null;
+	private ?FilterOptions $filterOptions = null;
 
 	public function __toString(): string {
 		return $this->name;
@@ -38,12 +39,12 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 	}
 
 	public function load($data, $formName = null): bool {
-		return parent::load($data, $formName) && $this->getFilter()->load($data, $formName);
+		return parent::load($data, $formName) && $this->getFilterOptions()->load($data, $formName);
 	}
 
 	public function beforeSave($insert): bool {
-		if ($this->getFilter()->validate()) {
-			$this->calendar = $this->getFilter()->toJson();
+		if ($this->getFilterOptions()->validate()) {
+			$this->calendar = Json::encode($this->getFilterOptions()->toArray());
 		}
 		return parent::beforeSave($insert);
 	}
@@ -56,6 +57,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			[['name'], 'required'],
 			[['sort_index'], 'integer'],
 			['short_report', 'boolean'],
+			['name', 'unique'],
 			[['name', 'description'], 'string', 'max' => 255],
 			['calendar', 'string'],
 		];
@@ -114,10 +116,18 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 	}
 
 	public function getFilter(): Filter {
-		if ($this->filter === null) {
-			$this->filter = new Filter($this->getCalendarData());
+		return new Filter([
+			'id' => $this->getId(),
+			'label' => $this->getName(),
+			'options' => $this->getFilterOptions(),
+		]);
+	}
+
+	public function getFilterOptions(): FilterOptions {
+		if ($this->filterOptions === null) {
+			$this->filterOptions = new FilterOptions($this->getCalendarData());
 		}
-		return $this->filter;
+		return $this->filterOptions;
 	}
 
 	public function getCalendarData(): array {

@@ -1,5 +1,6 @@
 <?php
 
+use common\modules\lead\models\LeadStatus;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -24,13 +25,22 @@ $this->params['breadcrumbs'][] = $this->title;
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-			['class' => 'yii\grid\SerialColumn'],
-
 			'id',
 			'name',
 			'description',
 			'short_report:boolean',
 			'sort_index',
+			[
+				'attribute' => 'filterOptions.color',
+				'value' => static function (LeadStatus $model): ?string {
+					$color = Html::decode($model->getFilterOptions()->color);
+					if (empty($color)) {
+						return null;
+					}
+					return "<span class='badge' style='background-color: $color'> </span>  <code>" . $color . '</code>';
+				},
+				'format' => 'html',
+			],
 
 			['class' => 'yii\grid\ActionColumn'],
 		],

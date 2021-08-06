@@ -25,7 +25,7 @@ use yii\widgets\ActiveForm;
 
 	<?= FilterForm::widget([
 		'form' => $form,
-		'model' => $model->getFilter(),
+		'model' => $model->getFilterOptions(),
 	]) ?>
 
 	<div class="form-group">

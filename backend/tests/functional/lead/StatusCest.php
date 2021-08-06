@@ -84,7 +84,7 @@ class StatusCest {
 
 	private function filterFormParams($color): array {
 		return [
-			'Filter[color]' => $color,
+			'FilterOptions[color]' => $color,
 		];
 	}
 

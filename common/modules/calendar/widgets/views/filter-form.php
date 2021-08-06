@@ -1,13 +1,13 @@
 <?php
 
-use common\modules\calendar\models\Filter;
+use common\modules\calendar\models\FilterOptions;
 use kartik\color\ColorInput;
 use yii\web\View;
 use yii\widgets\ActiveForm;
 
 /* @var $this View */
 /* @var $form ActiveForm */
-/* @var $model Filter */
+/* @var $model FilterOptions */
 
 ?>
 

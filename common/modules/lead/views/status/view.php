@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'description',
 			'short_report:boolean',
 			'sort_index',
-			'filter.color',
+			'filterOptions.color',
 		],
 	]) ?>
 

@@ -2,14 +2,14 @@
 
 namespace common\modules\calendar\widgets;
 
-use common\modules\calendar\models\Filter;
+use common\modules\calendar\models\FilterOptions;
 use yii\base\Widget;
 use yii\widgets\ActiveForm;
 
 class FilterForm extends Widget {
 
 	public ActiveForm $form;
-	public Filter $model;
+	public FilterOptions $model;
 
 	public function run(): string {
 		return $this->render('filter-form', [

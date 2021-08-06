@@ -2,32 +2,35 @@
 
 namespace common\modules\calendar\models;
 
-use Yii;
-use yii\base\Model;
-use yii\helpers\Json;
+use yii\base\Arrayable;
+use yii\base\ArrayableTrait;
+use yii\base\BaseObject;
 
-class Filter extends Model {
+/**
+ *
+ * @property-read array $itemOptions
+ */
+class Filter extends BaseObject implements Arrayable {
 
-	public string $color = '';
+	use ArrayableTrait;
 
-	public function rules(): array {
-		return [
-			['color', 'required'],
-		];
+	public string $id;
+	public string $label;
+	public FilterOptions $options;
+
+	public bool $isActive = true;
+
+	public function getItemOptions(): array {
+		return $this->options->toArray();
 	}
 
-	public function attributeLabels(): array {
+	public function fields(): array {
 		return [
-			'color' => Yii::t('calendar', 'Color'),
+			'id',
+			'label',
+			'isActive',
+			'itemOptions',
 		];
-	}
-
-	public function toJson(): string {
-		$data = [];
-		if ($this->color) {
-			$data['color'] = $this->color;
-		}
-		return Json::encode($data);
 	}
 
 }
