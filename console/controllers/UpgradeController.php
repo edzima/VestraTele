@@ -10,6 +10,8 @@ use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
 use common\models\provision\IssueProvisionType;
 use common\models\user\Customer;
+use common\models\user\User;
+use common\models\user\UserRelation;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\console\Controller;
@@ -32,6 +34,33 @@ class UpgradeController extends Controller {
 			}
 			$type->setIssueUserTypes($role);
 			$type->save();
+		}
+	}
+
+	public function actionBoss(): void {
+		$users = User::find()->andWhere('boss IS NOT NULL')->all();
+		$rows = [];
+		$time = time();
+		foreach ($users as $user) {
+			if (User::findOne($user->boss)) {
+				$rows[] = [
+					'user_id' => $user->boss,
+					'to_user_id' => $user->id,
+					'type' => UserRelation::TYPE_SUPERVISOR,
+					'created_at' => $time,
+					'updated_at' => $time,
+				];
+			}
+		}
+		if (!empty($rows)) {
+			UserRelation::getDb()->createCommand()->batchInsert(UserRelation::tableName(), [
+				'user_id',
+				'to_user_id',
+				'type',
+				'created_at',
+				'updated_at',
+			], $rows)
+				->execute();
 		}
 	}
 
