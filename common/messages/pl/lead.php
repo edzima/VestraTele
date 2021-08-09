@@ -10,6 +10,7 @@ return [
 	'Lead ID' => 'Lead',
 	'Update' => 'Edytuj',
 	'Czater' => 'Czater',
+	'Calendar -  Leads' => 'Kalendarz - Leads',
 	'Name' => 'Nazwa',
 	'Lead Sources' => 'Źródła',
 	'Create Lead Status' => 'Dodaj status',
