@@ -20,6 +20,7 @@ return [
 	'Address' => 'Adres',
 	'Active' => 'Aktywny',
 	'administrator' => 'Admin',
+	'user.relation' => 'Relacje (użytkownicy)',
 	'agent' => 'Przedstawiciel',
 	'co-agent' => 'Przedstawiciel (wspólnik)',
 	'archive' => 'Archiwum',
@@ -296,4 +297,7 @@ return [
 	'Select ...' => 'Select ...',
 	'Only Today' => 'Na dziś',
 	'Only Delayed' => 'Opóźnione',
+	'Supervisor' => 'Przełożony',
+	'To User' => 'Kogo',
+	'Preview Issues' => 'Podgląd Spraw',
 ];

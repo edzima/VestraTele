@@ -292,4 +292,7 @@ return [
 	'User Traits' => 'User Traits',
 	'Set parent for: {user}' => 'Ustal przełożonego dla: {user}',
 	'Only with payed pay' => 'Tylko z opłaconą wpłatą',
+	'Relations' => 'Relacje',
+	'Users - Relations' => 'Użytkownicy - Relacje',
+	'Create User Relation' => 'Dodaj Relację',
 ];

@@ -73,6 +73,8 @@ class RbacController extends Controller {
 		],
 		Worker::PERMISSION_WORKERS,
 		Worker::PERMISSION_LEAD,
+		Worker::PERMISSION_CZATER,
+		Worker::PERMISSION_USER_RELATION,
 	];
 
 	public function actionInit(): void {

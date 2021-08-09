@@ -2,6 +2,7 @@
 
 use backend\modules\user\models\search\UserSearch;
 use backend\widgets\GridView;
+use common\models\user\User;
 use common\models\user\UserProfile;
 use common\widgets\grid\ActionColumn;
 use yii\bootstrap\Html;
@@ -18,6 +19,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create user'), ['create'], ['class' => 'btn btn-success']) ?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_USER_RELATION)
+			? Html::a(Yii::t('backend', 'Relations'), ['relation/index'], ['class' => 'btn btn-info'])
+			: ''
+		?>
+
 	</p>
 
 	<?= $this->render('_search', [

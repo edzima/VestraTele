@@ -17,8 +17,6 @@ use yii\db\ActiveQuery;
  */
 class UserQuery extends ActiveQuery {
 
-	private bool $isAssignmentJoin = false;
-
 	protected static $assignmentJoinCount = 0;
 
 	public function workers(): self {
@@ -80,47 +78,24 @@ class UserQuery extends ActiveQuery {
 		return $ids;
 	}
 
-	public function onlyByRoles(array $roles, bool $common): self {
-		$auth = Yii::$app->authManager;
-		$ids = [];
-		$i = 0;
-		//@todo add test for them.
-		if (!$auth instanceof DbManager) {
-			if (!$this->isAssignmentJoin) {
-				$this->isAssignmentJoin = true;
-				$this->leftJoin('auth_assignment', 'user.id = auth_assignment.user_id');
-			}
-			$columnName = $auth->assignmentTable . '.item_name';
-			if ($common) {
-				foreach ($roles as $role) {
-					$this->andWhere([$columnName => $role]);
-				}
-			} else {
-				$this->andWhere([$columnName => $roles]);
-			}
-		} else {
-			foreach ($roles as $role) {
-				$userIds = $auth->getUserIdsByRole($role);
-				if ($common && $i > 0) {
-					$ids = array_intersect($ids, $userIds);
-				} else {
-					$ids = array_merge($ids, $userIds);
-				}
-				$i++;
-			}
-			$this->andWhere([User::tableName() . '.id' => $ids]);
-		}
-
-		return $this;
-	}
-
-	public function onlyWithBoss(): self {
-		$this->andWhere('boss IS NOT NULL');
-		return $this;
-	}
-
 	public function active(): self {
 		$this->andWhere(['status' => User::STATUS_ACTIVE]);
 		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 * @return User[]|array
+	 */
+	public function all($db = null) {
+		return parent::all($db);
+	}
+
+	/**
+	 * @inheritdoc
+	 * @return User|array|null
+	 */
+	public function one($db = null) {
+		return parent::one($db);
 	}
 }
