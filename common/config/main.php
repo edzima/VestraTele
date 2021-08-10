@@ -3,6 +3,7 @@
 use common\components\DbManager;
 use common\components\EmailTemplateManager;
 use common\components\HierarchyComponent;
+use common\components\RelationComponent;
 use common\components\keyStorage\KeyStorage;
 use common\components\PayComponent;
 use common\components\provision\Provisions;
@@ -135,7 +136,7 @@ return [
 			'class' => TaxComponent::class,
 		],
 		'userHierarchy' => [
-			'class' => HierarchyComponent::class,
+			'class' => RelationComponent::class,
 			'modelClass' => Worker::class,
 			'parentColumn' => 'boss',
 		],

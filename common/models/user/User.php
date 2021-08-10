@@ -42,7 +42,8 @@ use yii\web\IdentityInterface;
  * @property-read Address|null $postalAddress
  * @property-read IssueUser[] $issueUsers
  * @property-read UserTrait[] $traits
- * @property-read IssueCost[] $costs
+ * @property-read UserRelation[] $fromRelations
+ * @property-read UserRelation[] $toRelations
  *
  */
 class User extends ActiveRecord implements IdentityInterface, Hierarchy {
@@ -164,41 +165,6 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 		];
 	}
 
-	public function hasParent(): bool {
-		return $this->getParentId() !== null;
-	}
-
-	public function getParentId(): ?int {
-		return $this->boss;
-	}
-
-	public function getParentsIds(): array {
-		if (!$this->hasParent()) {
-			return [];
-		}
-		return Yii::$app->userHierarchy->getParentsIds($this->id);
-	}
-
-	public function getChildesIds(): array {
-		return Yii::$app->userHierarchy->getChildesIds($this->id);
-	}
-
-	public function getAllChildesQuery(): UserQuery {
-		return static::find()->where(['id' => $this->getAllChildesIds()]);
-	}
-
-	public function getAllParentsQuery(): ?UserQuery {
-		if ($this->hasParent()) {
-			return static::find()->where(['id' => $this->getParentsIds()]);
-		}
-		return null;
-	}
-
-	public function getAllChildesIds(): array {
-		return Yii::$app
-			->userHierarchy->getAllChildesIds($this->id);
-	}
-
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getIssueCosts(): IssueCostQuery {
 		return $this->hasMany(IssueCost::class, ['user_id' => 'id']);
@@ -239,6 +205,14 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 
 	protected function getAddresses(): ActiveQuery {
 		return $this->hasMany(UserAddress::class, ['user_id' => 'id'])->indexBy('type');
+	}
+
+	public function getToRelations(): ActiveQuery {
+		return $this->hasMany(UserRelation::class, [UserRelation::toAttribute() => 'id']);
+	}
+
+	public function getFromRelations(): ActiveQuery {
+		return $this->hasMany(UserRelation::class, [UserRelation::fromAttribute() => 'id']);
 	}
 
 	/**
