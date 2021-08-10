@@ -2,6 +2,7 @@
 
 namespace common\models\user;
 
+use common\models\hierarchy\RelationModel;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -18,7 +19,7 @@ use yii\db\ActiveRecord;
  * @property-read User $toUser
  * @property-read User $user
  */
-class UserRelation extends ActiveRecord {
+class UserRelation extends ActiveRecord implements RelationModel {
 
 	public const TYPE_SUPERVISOR = 'supervisior';
 	public const TYPE_PREVIEW_ISSUES = 'preview.issues';
@@ -96,5 +97,29 @@ class UserRelation extends ActiveRecord {
 			static::TYPE_SUPERVISOR => Yii::t('common', 'Supervisor'),
 			static::TYPE_PREVIEW_ISSUES => Yii::t('common', 'Preview Issues'),
 		];
+	}
+
+	public function getFromId(): int {
+		return $this->user_id;
+	}
+
+	public function getToId(): int {
+		return $this->to_user_id;
+	}
+
+	public function getType(): string {
+		return $this->type;
+	}
+
+	public static function fromAttribute(): string {
+		return 'user_id';
+	}
+
+	public static function toAttribute(): string {
+		return 'to_user_id';
+	}
+
+	public static function typeAttribute(): string {
+		return 'type';
 	}
 }

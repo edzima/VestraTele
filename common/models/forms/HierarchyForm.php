@@ -2,8 +2,9 @@
 
 namespace common\models\forms;
 
-use common\components\HierarchyComponent;
+use common\components\RelationComponent;
 use common\models\hierarchy\Hierarchy;
+use common\models\user\UserRelation;
 use Yii;
 use yii\base\Model;
 
@@ -16,18 +17,11 @@ class HierarchyForm extends Model {
 
 	public ?Hierarchy $model = null;
 
-	private HierarchyComponent $hierarchy;
+	private RelationComponent $hierarchy;
 
-	public function __construct(HierarchyComponent $hierarchy, $config = []) {
+	public function __construct(RelationComponent $hierarchy, $config = []) {
 		$this->hierarchy = $hierarchy;
 		parent::__construct($config);
-	}
-
-	public function getModel(): Hierarchy {
-		if ($this->model === null) {
-			$this->model = $this->hierarchy->getModel($this->id);
-		}
-		return $this->model;
 	}
 
 	public function attributeLabels(): array {
@@ -57,10 +51,15 @@ class HierarchyForm extends Model {
 		if (!$this->validate()) {
 			return false;
 		}
-		if (empty($this->parent_id)) {
-			return $this->hierarchy->unassign($this->id);
+		$this->hierarchy->unassign(UserRelation::TYPE_SUPERVISOR, null, $this->id);
+		if (!empty($this->parent_id)) {
+			$this->hierarchy->assign(UserRelation::TYPE_SUPERVISOR, $this->parent_id, $this->id);
 		}
-		return $this->hierarchy->assign($this->id, $this->parent_id);
+		return true;
+		if (empty($this->parent_id)) {
+			return $this->hierarchy->unassign(UserRelation::TYPE_SUPERVISOR, $this->id);
+		}
+		return $this->hierarchy->assign(UserRelation::TYPE_SUPERVISOR, $this->id, $this->parent_id);
 	}
 
 }

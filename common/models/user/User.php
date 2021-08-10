@@ -37,6 +37,8 @@ use yii\web\IdentityInterface;
  * @property-read Address|null $postalAddress
  * @property-read IssueUser[] $issueUsers
  * @property-read UserTrait[] $traits
+ * @property-read UserRelation[] $fromRelations
+ * @property-read UserRelation[] $toRelations
  *
  */
 class User extends ActiveRecord implements IdentityInterface {
@@ -190,6 +192,14 @@ class User extends ActiveRecord implements IdentityInterface {
 
 	protected function getAddresses(): ActiveQuery {
 		return $this->hasMany(UserAddress::class, ['user_id' => 'id'])->indexBy('type');
+	}
+
+	public function getToRelations(): ActiveQuery {
+		return $this->hasMany(UserRelation::class, [UserRelation::toAttribute() => 'id']);
+	}
+
+	public function getFromRelations(): ActiveQuery {
+		return $this->hasMany(UserRelation::class, [UserRelation::fromAttribute() => 'id']);
 	}
 
 	/**
