@@ -47,7 +47,7 @@ class RelationComponent extends Component {
 			$this->relationModel::toAttribute() => $to,
 			$this->relationModel::typeAttribute() => $type,
 		]);
-		return $model->validate() && $model->save();
+		return $model->save();
 	}
 
 	public function getChildesIds(int $id): array {
