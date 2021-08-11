@@ -26,13 +26,13 @@ if (!empty($models)): ?>
 						<?php if ($provisionUser->from_user_id === $formModel->getUser()->id && $provisionUser->to_user_id === $formModel->getUser()->id): ?>
 						<?php elseif ($provisionUser->from_user_id === $formModel->getUser()->id): ?>
 							Dla <?= Html::a(
-								Worker::userName($provisionUser->to_user_id),
+								Worker::name($provisionUser->to_user_id),
 								['user/user', 'id' => $provisionUser->to_user_id], [
 								'target' => '_blank',
 							]) ?>
 						<?php else: ?>
 							Od <?= Html::a(
-								Worker::userName($provisionUser->from_user_id),
+								Worker::name($provisionUser->from_user_id),
 								['user/user', 'id' => $provisionUser->from_user_id], [
 								'target' => '_blank',
 							]) ?>

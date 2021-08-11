@@ -75,11 +75,11 @@ class Worker extends User implements ActiveHierarchy {
 		return Yii::$app->userHierarchy->getAllChildesIds($this->id);
 	}
 
-	public static function userName(int $id): string {
-		return static::userNames()[$id] ?? '';
+	public static function name(int $id): string {
+		return static::usernames()[$id] ?? '';
 	}
 
-	private static function userNames(): array {
+	public static function usernames(): array {
 		if (empty(static::$USER_NAMES)) {
 			static::$USER_NAMES = static::find()
 				->select('username')
