@@ -2,7 +2,7 @@
 
 namespace common\models\user;
 
-use common\models\hierarchy\RelationModel;
+use common\models\relation\RelationModel;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -49,8 +49,8 @@ class UserRelation extends ActiveRecord implements RelationModel {
 			[['user_id', 'to_user_id', 'created_at', 'updated_at'], 'integer'],
 			[['type'], 'string', 'max' => 255],
 			[['user_id', 'to_user_id', 'type'], 'unique', 'targetAttribute' => ['user_id', 'to_user_id', 'type']],
-			[['to_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['to_user_id' => 'id']],
-			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+			[['to_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => static::toTargetClass(), 'targetAttribute' => ['to_user_id' => 'id']],
+			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => static::fromTargetClass(), 'targetAttribute' => ['user_id' => 'id']],
 		];
 	}
 
@@ -121,5 +121,13 @@ class UserRelation extends ActiveRecord implements RelationModel {
 
 	public static function typeAttribute(): string {
 		return 'type';
+	}
+
+	public static function fromTargetClass(): string {
+		return User::class;
+	}
+
+	public static function toTargetClass(): string {
+		return User::class;
 	}
 }

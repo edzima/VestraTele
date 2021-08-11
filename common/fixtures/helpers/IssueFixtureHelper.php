@@ -152,6 +152,7 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 		}
 		$users['customer-profile'] = UserFixtureHelper::profile(UserFixtureHelper::CUSTOMER);
 		$users = array_merge($users, static::issueUsers());
+		$users['relation'] = UserFixtureHelper::relation();
 
 		return $users;
 	}

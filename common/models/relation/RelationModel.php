@@ -1,8 +1,6 @@
 <?php
 
-namespace common\models\hierarchy;
-
-use yii\db\ActiveRecord;
+namespace common\models\relation;
 
 interface RelationModel {
 
@@ -11,6 +9,10 @@ interface RelationModel {
 	public function getToId(): int;
 
 	public function getType(): string;
+
+	public static function fromTargetClass(): string;
+
+	public static function toTargetClass(): string;
 
 	public static function typeAttribute(): string;
 

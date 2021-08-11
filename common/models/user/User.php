@@ -34,7 +34,6 @@ use yii\web\IdentityInterface;
  * @property integer $updated_at
  * @property integer $action_at
  * @property string $authKey
- * @property integer|null $boss
  * @property-write string $password
  * @property-read UserProfile $profile
  * @property-read UserAddress[] $addresses
@@ -144,7 +143,6 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 			['status', 'default', 'value' => self::STATUS_INACTIVE],
 			['status', 'in', 'range' => array_keys(self::getStatusesNames())],
 			['ip', 'ip'],
-			['boss', 'number'],
 		];
 	}
 
@@ -161,7 +159,6 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
 			'action_at' => Yii::t('common', 'Last action at'),
-			'boss' => Yii::t('common', 'Boss'),
 		];
 	}
 

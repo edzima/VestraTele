@@ -34,7 +34,7 @@ class TreeController extends Controller {
 			throw new NotFoundHttpException('Only for worker.');
 		}
 		$dataProvider = new ActiveDataProvider([
-			'query' => $worker->getAllChildesQuery()->with(['userProfile']),
+			'query' => $worker->getAllChildes()->with(['userProfile']),
 		]);
 		return $this->render('index', [
 			'dataProvider' => $dataProvider,

@@ -1,6 +1,6 @@
 <?php
 
-use common\models\forms\HierarchyForm;
+use common\models\relation\HierarchyForm;
 use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;

@@ -2,9 +2,7 @@
 
 namespace common\components;
 
-use common\models\hierarchy\ActiveHierarchy;
-use common\models\hierarchy\RelationModel;
-use common\models\user\User;
+use common\models\relation\RelationModel;
 use common\models\user\UserRelation;
 use Yii;
 use yii\base\Component;
@@ -13,15 +11,6 @@ use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 class RelationComponent extends Component {
-
-	public const CHILDS_ARRAY_KEY = 'childs';
-
-	// to
-	public $primaryKeyColumn = 'id';
-	// from
-	public $parentColumn = 'parent_id';
-	/** @var string|ActiveRecord */
-	public $modelClass = User::class;
 
 	public ?array $parentsData = null;
 
@@ -102,16 +91,7 @@ class RelationComponent extends Component {
 	}
 
 	public function getParent(int $id): ?int {
-		$model = $this->relationModel::find()
-			->andWhere([
-				$this->relationModel::toAttribute() => $id,
-				$this->relationModel::typeAttribute() => UserRelation::TYPE_SUPERVISOR,
-			])
-			->one();
-		if ($model instanceof RelationModel) {
-			return $model->getFromId();
-		}
-		return null;
+		return $this->getParentsMap()[$id] ?? null;
 	}
 
 	public function getParentsIds(int $id): array {
@@ -120,7 +100,7 @@ class RelationComponent extends Component {
 		}
 		$map = $this->getParentsMap();
 		$ids = [];
-		while (($id = $map[$id] ?? null) !== null) {
+		while (($id = null ?? $map[$id]) !== null) {
 			$ids[] = $id;
 		}
 		return $ids;
@@ -151,15 +131,13 @@ class RelationComponent extends Component {
 
 	private function buildTree(array $items): array {
 		$childs = [];
-		$this->parentColumn = $this->relationModel::fromAttribute();
-		$this->primaryKeyColumn = $this->relationModel::toAttribute();
 		foreach ($items as &$item) {
-			$childs[$item[$this->parentColumn]][] = &$item;
+			$childs[$item[$this->relationModel::fromAttribute()]][] = &$item;
 		}
 		unset($item);
 		foreach ($items as &$item) {
-			if (isset($childs[$item[$this->primaryKeyColumn]])) {
-				$item[static::CHILDS_ARRAY_KEY] = $childs[$item[$this->primaryKeyColumn]];
+			if (isset($childs[$item[$this->relationModel::toAttribute()]])) {
+				$item['childs'] = $childs[$item[$this->relationModel::toAttribute()]];
 			}
 		}
 		return $childs;

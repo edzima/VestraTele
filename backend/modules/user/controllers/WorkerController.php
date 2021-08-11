@@ -4,7 +4,7 @@ namespace backend\modules\user\controllers;
 
 use backend\modules\user\models\search\WorkerUserSearch;
 use backend\modules\user\models\WorkerUserForm;
-use common\models\forms\HierarchyForm;
+use common\models\relation\HierarchyForm;
 use common\models\user\Worker;
 use Yii;
 

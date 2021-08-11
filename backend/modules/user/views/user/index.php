@@ -25,6 +25,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			: ''
 		?>
 
+
+		<?= Yii::$app->user->can(User::PERMISSION_WORKERS)
+			? Html::a(Yii::t('backend', 'Workers'), ['worker/index'], ['class' => 'btn btn-info'])
+			: ''
+		?>
+
 	</p>
 
 	<?= $this->render('_search', [

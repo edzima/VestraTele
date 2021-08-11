@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models\hierarchy;
+namespace common\models\relation;
 
 /**
  * Interface HierarchyModel
