@@ -8,7 +8,9 @@ use common\fixtures\user\LawyerFixture;
 use common\fixtures\user\TelemarketerFixture;
 use common\fixtures\UserProfileFixture;
 use common\fixtures\UserTraitFixture;
+use common\models\user\UserRelation;
 use Yii;
+use yii\test\ActiveFixture;
 
 class UserFixtureHelper {
 
@@ -44,6 +46,14 @@ class UserFixtureHelper {
 		return [
 			'class' => AgentFixture::class,
 			'dataFile' => static::dataDir() . 'agent.php',
+		];
+	}
+
+	public static function relation(): array {
+		return [
+			'class' => ActiveFixture::class,
+			'modelClass' => UserRelation::class,
+			'dataFile' => static::dataDir() . 'relation.php',
 		];
 	}
 

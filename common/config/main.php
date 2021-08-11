@@ -133,8 +133,6 @@ return [
 		],
 		'userHierarchy' => [
 			'class' => RelationComponent::class,
-			'modelClass' => Worker::class,
-			'parentColumn' => 'boss',
 		],
 	],
 ];

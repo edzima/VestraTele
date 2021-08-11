@@ -1,12 +1,12 @@
 <?php
 
-namespace common\models\forms;
+namespace common\models\relation;
 
 use common\components\RelationComponent;
-use common\models\hierarchy\Hierarchy;
 use common\models\user\UserRelation;
 use Yii;
 use yii\base\Model;
+use yii\validators\CompareValidator;
 
 class HierarchyForm extends Model {
 
@@ -14,8 +14,6 @@ class HierarchyForm extends Model {
 	public $parent_id;
 
 	public array $parentsMap = [];
-
-	public ?Hierarchy $model = null;
 
 	private RelationComponent $hierarchy;
 
@@ -34,8 +32,15 @@ class HierarchyForm extends Model {
 	public function rules(): array {
 		return [
 			[['id'], 'required'],
-			['id', 'exist', 'skipOnError' => true, 'targetClass' => $this->hierarchy->modelClass, 'targetAttribute' => ['id' => 'id']],
-			['parent_id', 'exist', 'skipOnError' => true, 'targetClass' => $this->hierarchy->modelClass, 'targetAttribute' => ['id' => 'id']],
+			['id', 'compare', 'operator' => '!=', 'compareAttribute' => 'parent_id', 'type' => CompareValidator::TYPE_NUMBER],
+			[
+				'parent_id', 'in', 'not' => true, 'range' => function (): array {
+				return $this->hierarchy->getAllChildesIds($this->id);
+			},
+				'message' => Yii::t('common', 'Parent cannot be from childes.'),
+			],
+			['id', 'exist', 'skipOnError' => true, 'targetClass' => $this->hierarchy->relationModel::toTargetClass(), 'targetAttribute' => ['id' => 'id']],
+			['parent_id', 'exist', 'skipOnError' => true, 'targetClass' => $this->hierarchy->relationModel::fromTargetClass(), 'targetAttribute' => ['parent_id' => 'id']],
 		];
 	}
 
@@ -56,10 +61,6 @@ class HierarchyForm extends Model {
 			$this->hierarchy->assign(UserRelation::TYPE_SUPERVISOR, $this->parent_id, $this->id);
 		}
 		return true;
-		if (empty($this->parent_id)) {
-			return $this->hierarchy->unassign(UserRelation::TYPE_SUPERVISOR, $this->id);
-		}
-		return $this->hierarchy->assign(UserRelation::TYPE_SUPERVISOR, $this->id, $this->parent_id);
 	}
 
 }

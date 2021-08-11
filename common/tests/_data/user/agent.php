@@ -13,7 +13,6 @@ return [
 		'created_at' => '1391885313',
 		'updated_at' => '1391885313',
 		'email' => 'agent@vestra.info',
-		'boss' => null,
 	],
 	'with-parent-and-child' => [
 		'id' => UserFixtureHelper::AGENT_AGNES_MILLER,
@@ -25,7 +24,6 @@ return [
 		'updated_at' => '1391885313',
 		'email' => 'agent2@vestra.info',
 		'status' => User::STATUS_DELETED,
-		'boss' => 300,
 	],
 	'with-parents-without-childs' => [
 		'id' => UserFixtureHelper::AGENT_TOMMY_SET,
@@ -38,7 +36,6 @@ return [
 		'created_at' => '1548675330',
 		'updated_at' => '1548675330',
 		'verification_token' => '4ch0qbfhvWwkcuWqjN8SWRq72SOw1KYT_1548675330',
-		'boss' => 301,
 	],
 	'without-parent-and-childs' => [
 		'id' => UserFixtureHelper::AGENT_EMILY_PAT,
@@ -51,7 +48,6 @@ return [
 		'created_at' => '1548675330',
 		'updated_at' => '1548675330',
 		'verification_token' => 'already_used_token_1548675330',
-		'boss' => null,
 	],
 	'some-agent' => [
 		'username' => 'agent5',
@@ -63,6 +59,5 @@ return [
 		'created_at' => '1548675330',
 		'updated_at' => '1548675330',
 		'verification_token' => 'already_used_token_1548675330',
-		'boss' => null,
-	]
+	],
 ];

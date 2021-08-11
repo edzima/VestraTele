@@ -93,6 +93,7 @@ class IssueFixtureHelper {
 			'class' => IssueUserFixture::class,
 			'dataFile' => static::dataDir() . 'issue/users.php',
 		];
+		$users['relation'] = UserFixtureHelper::relation();
 
 		return $users;
 	}

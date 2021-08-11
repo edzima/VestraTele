@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models\hierarchy;
+namespace common\models\relation;
 
 use yii\db\ActiveQuery;
 
@@ -14,6 +14,6 @@ interface ActiveHierarchy extends Hierarchy {
 
 	public function getParent(): ActiveQuery;
 
-	public function getParentsQuery(): ActiveQuery;
+	public function getParents(): ActiveQuery;
 
 }

@@ -40,6 +40,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= DetailView::widget([
 		'model' => $model,
+		'attributes' => [
+			'username',
+			'profile.firstname',
+			'profile.lastname',
+			'email',
+			'profile.phone',
+			'profile.phone_2',
+			'statusName',
+		],
 	]) ?>
 
 	<?= $model->homeAddress ? AddressDetailView::widget(['model' => $model->homeAddress]) : '' ?>
