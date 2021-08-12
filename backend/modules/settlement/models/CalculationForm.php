@@ -8,6 +8,26 @@ use Yii;
 
 class CalculationForm extends BaseCalculationForm {
 
+	public bool $sendEmailToCustomer = true;
+	public bool $sendEmailToWorkers = true;
+
+	public function rules(): array {
+		return array_merge(
+			parent::rules(), [
+			[
+				['sendEmailToWorkers', 'sendEmailToCustomer'], 'boolean',
+			],
+		]);
+	}
+
+	public function attributeLabels(): array {
+		return array_merge(
+			parent::attributeLabels(), [
+			'sendEmailToCustomer' => Yii::t('settlement', 'Send Email to Customer'),
+			'sendEmailToWorkers' => Yii::t('settlement', 'Send Email to Workers'),
+		]);
+	}
+
 	public function sendEmailToCustomer(): bool {
 		return Yii::$app
 			->mailer

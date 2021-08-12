@@ -67,4 +67,33 @@ class CalculationCreateCest {
 		]);
 		$I->seeEmailIsSent(2);
 	}
+
+	public function checkCreateWithoutSendEmailToWorker(CreateCalculationIssueManager $I): void {
+		$I->amOnPage([static::ROUTE, 'id' => 1]);
+		$I->fillField('Value with VAT', 123);
+		$I->uncheckOption('Send Email to Workers');
+		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
+		$I->click('Save');
+		$I->seeEmailIsSent(1);
+	}
+
+	public function checkCreateWithoutSendEmailToCustomer(CreateCalculationIssueManager $I): void {
+		$I->amOnPage([static::ROUTE, 'id' => 1]);
+		$I->fillField('Value with VAT', 123);
+		$I->uncheckOption('Send Email to Customer');
+		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
+		$I->click('Save');
+		$I->seeEmailIsSent(1);
+	}
+
+	public function checkCreateWithoutSendEmails(CreateCalculationIssueManager $I): void {
+		$I->amOnPage([static::ROUTE, 'id' => 1]);
+		$I->fillField('Value with VAT', 123);
+		$I->uncheckOption('Send Email to Customer');
+		$I->uncheckOption('Send Email to Workers');
+		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
+		$I->click('Save');
+		$I->dontSeeEmailIsSent();
+	}
+
 }

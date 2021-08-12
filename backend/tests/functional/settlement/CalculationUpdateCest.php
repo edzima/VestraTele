@@ -31,6 +31,13 @@ class CalculationUpdateCest {
 		$I->amLoggedIn();
 	}
 
+	public function checkEmailsFieldsVisible(Bookkeeper $I): void {
+		$model = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
+		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
+		$I->dontSee('Send Email to Customer');
+		$I->dontSee('Send Email to Workers');
+	}
+
 	public function checkUpdateValue(Bookkeeper $I): void {
 		$model = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
 

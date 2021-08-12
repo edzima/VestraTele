@@ -143,4 +143,7 @@ return [
 	'Confirmed at' => 'Potwierdzono',
 	'Value of purchase' => 'Wartość zakupu',
 	'Nominal Value' => 'Wartość nominalna',
+	'Send Email to Customer' => 'Wyślij E-mail do Klienta',
+	'Send Email to Workers' => 'Wyślij E-mail do Pracowników',
+
 ];

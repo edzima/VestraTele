@@ -165,8 +165,12 @@ class CalculationController extends Controller {
 		$model->vat = $issue->type->vat;
 		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$model->sendEmailToCustomer();
-			$model->sendEmailToWorkers();
+			if ($model->sendEmailToCustomer) {
+				$model->sendEmailToCustomer();
+			}
+			if ($model->sendEmailToWorkers) {
+				$model->sendEmailToWorkers();
+			}
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
