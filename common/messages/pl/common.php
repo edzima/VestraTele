@@ -307,4 +307,5 @@ return [
 	'Only Today' => 'Na dziś',
 	'Only Delayed' => 'Opóźnione',
 	'Hello {firstname}' => 'Witaj {firstname}',
+	'PESEL' => 'PESEL',
 ];

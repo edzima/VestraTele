@@ -3,18 +3,22 @@
 namespace backend\modules\settlement\controllers;
 
 use backend\helpers\Url;
+use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\settlement\models\DebtCostsForm;
 use backend\modules\settlement\models\IssueCostForm;
 use backend\modules\settlement\models\search\IssueCostSearch;
+use backend\widgets\IssueColumn;
 use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
+use common\models\user\Worker;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii2tech\csvgrid\CsvGrid;
 
 /**
  * CostController implements the CRUD actions for IssueCost model.
@@ -35,6 +39,112 @@ class CostController extends Controller {
 				],
 			],
 		];
+	}
+
+	public function actionPccExport() {
+		$searchModel = new IssueCostSearch();
+		$searchModel->type = IssueCost::TYPE_PCC;
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		if ($dataProvider->getTotalCount()) {
+			$exporter = new CsvGrid([
+				'dataProvider' => $dataProvider,
+				'columns' => [
+					[
+						'attribute' => 'issue.longId',
+						'label' => Yii::t('common', 'Issue'),
+					],
+					[
+						'attribute' => 'user',
+						'label' => Yii::t('common', 'Full name'),
+					],
+					[
+						'attribute' => 'value',
+						'label' => Yii::t('settlement', 'Value'),
+						'format' => 'currency',
+					],
+					[
+						'attribute' => 'base_value',
+						'label' => Yii::t('settlement', 'Nominal Value'),
+						'format' => 'currency',
+					],
+					[
+						'attribute' => 'date_at',
+						'format' => 'date',
+					],
+					[
+						'attribute' => 'deadline_at',
+						'format' => 'date',
+					],
+					[
+						'attribute' => 'settled_at',
+						'format' => 'date',
+					],
+				],
+			]);
+			return $exporter->export()->send('export.csv');
+		}
+		Flash::add(Flash::TYPE_WARNING, Yii::t('settlement', 'Not found Costs for this filters.'));
+		return $this->redirect(['index', Yii::$app->request->queryParams]);
+	}
+
+	public function actionPitExport() {
+		$searchModel = new IssueCostSearch();
+		$searchModel->type = IssueCost::TYPE_PIT_4;
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		if ($dataProvider->getTotalCount()) {
+			$exporter = new CsvGrid([
+				'dataProvider' => $dataProvider,
+				'columns' => [
+					//PIT4 - numer sprawy, imię i nazwisko, PESEL, adres zamieszkania, Urząd skarbowy, data kosztu, data płatności, termin, wartość kosztu, wartość bazowa
+
+					[
+						'attribute' => 'issue.longId',
+						'label' => Yii::t('common', 'Issue'),
+					],
+					[
+						'attribute' => 'user',
+						'label' => Yii::t('common', 'Full name'),
+					],
+					[
+						'attribute' => 'user.userProfile.pesel',
+						'label' => Yii::t('common', 'PESEL'),
+					],
+					[
+						'attribute' => 'user.homeAddress',
+						'label' => Yii::t('common', 'Home address'),
+					],
+					[
+						'attribute' => 'user.userProfile.tax_office',
+						'label' => Yii::t('settlement', 'Tax Office'),
+					],
+					[
+						'attribute' => 'value',
+						'label' => Yii::t('settlement', 'Value'),
+						'format' => 'currency',
+					],
+					[
+						'attribute' => 'base_value',
+						'label' => Yii::t('settlement', 'Nominal Value'),
+						'format' => 'currency',
+					],
+					[
+						'attribute' => 'date_at',
+						'format' => 'date',
+					],
+					[
+						'attribute' => 'deadline_at',
+						'format' => 'date',
+					],
+					[
+						'attribute' => 'settled_at',
+						'format' => 'date',
+					],
+				],
+			]);
+			return $exporter->export()->send('export.csv');
+		}
+		Flash::add(Flash::TYPE_WARNING, Yii::t('settlement', 'Not found Costs for this filters.'));
+		return $this->redirect(['index', Yii::$app->request->queryParams]);
 	}
 
 	/**

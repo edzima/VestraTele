@@ -78,6 +78,8 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('backend', 'Status'),
 				'value' => $model->getStatusName(),
 			],
+			'pesel',
+			'tax_office',
 			[
 				'label' => Yii::t('backend', 'Username'),
 				'value' => $model->username,
@@ -86,7 +88,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('backend', 'Other'),
 				'value' => $model->profile->other,
 				'visible' => !empty($model->profile->other),
-
 			],
 		],
 	]) ?>

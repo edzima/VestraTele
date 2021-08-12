@@ -225,4 +225,10 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 		return new IssueCostQuery(static::class);
 	}
 
+	public static function typeExist(string $type): bool {
+		return static::find()
+			->andWhere(['type' => $type])
+			->exists();
+	}
+
 }

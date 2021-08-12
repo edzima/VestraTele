@@ -4,6 +4,8 @@ use backend\modules\settlement\models\search\IssueCostSearch;
 use backend\modules\settlement\widgets\IssueCostActionColumn;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
+use common\helpers\Html;
+use common\models\issue\IssueCost;
 use common\models\issue\IssueCostInterface;
 use common\widgets\grid\IssueTypeColumn;
 
@@ -16,6 +18,19 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' 
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-cost-index">
+
+	<p>
+		<?= IssueCost::typeExist(IssueCost::TYPE_PCC)
+			? Html::a(Yii::t('backend', 'PCC Export'), ['pcc-export', Yii::$app->request->queryParams], ['class' => 'btn btn-success'])
+			: ''
+		?>
+		<?= IssueCost::typeExist(IssueCost::TYPE_PIT_4)
+			? Html::a(Yii::t('backend', 'PIT-4 Export'), ['pit-export', Yii::$app->request->queryParams], ['class' => 'btn btn-success'])
+			: ''
+		?>
+
+	</p>
+
 
 	<?= $this->render('_search', ['model' => $model]) ?>
 
