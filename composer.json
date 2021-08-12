@@ -34,12 +34,12 @@
 		"bower-asset/html5shiv": "^3.7.3",
 		"bower-asset/timecircles": "^1.5.3",
 		"kartik-v/yii2-widget-depdrop": "^1.0.6",
-		"kartik-v/yii2-widget-select2": "@dev",
+		"kartik-v/yii2-widget-select2": "^2.2",
 		"kartik-v/yii2-grid": "^3.3.5",
 		"kartik-v/yii2-number": "^1.0",
 		"yii2tech/csv-grid": "^1.0",
 		"udokmeci/yii2-phone-validator": "~1.0.3",
-		"edzima/yii2-teryt": "^1.0.3",
+		"edzima/yii2-teryt": "^1.1.0",
 		"kartik-v/yii2-date-range": "~1.7.0"
 	},
 	"require-dev": {
