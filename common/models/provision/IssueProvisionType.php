@@ -74,7 +74,7 @@ class IssueProvisionType extends ProvisionType {
 		$this->setDataValues(static::KEY_DATA_ISSUE_TYPES, $ids);
 	}
 
-	public function getIssueUserType(): string {
+	public function getIssueUserType(): ?string {
 		return $this->getDataArray()[static::KEY_DATA_ISSUE_USER_TYPE];
 	}
 
@@ -116,8 +116,8 @@ class IssueProvisionType extends ProvisionType {
 		return implode(', ', $names);
 	}
 
-	public function getIssueUserTypeName(): string {
-		return static::issueUserTypesNames()[$this->getIssueUserType()];
+	public function getIssueUserTypeName(): ?string {
+		return static::issueUserTypesNames()[$this->getIssueUserType()] ?? null;
 	}
 
 	public function getIssueRequiredUserTypesNames(): string {

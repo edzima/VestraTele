@@ -2,6 +2,7 @@
 
 namespace backend\modules\provision\controllers;
 
+use backend\helpers\Url;
 use backend\modules\provision\models\ProvisionTypeForm;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSettlement;
@@ -98,6 +99,8 @@ class TypeController extends Controller {
 				->andWhere(['id' => $userIds]),
 			'pagination' => false,
 		]);
+
+		Url::remember();
 
 		return $this->render('view', [
 			'model' => $model,

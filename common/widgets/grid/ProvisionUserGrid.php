@@ -17,8 +17,10 @@ class ProvisionUserGrid extends GridView {
 
 	public function defaultColumns(): array {
 		return [
-			'toUser',
-			'fromUserString',
+			'type.name',
+			'toUser',//@todo add link to provision user schema for User::PERMISSION_PROVISION
+			'fromUserString',//@todo add link to provision user schema for User::PERMISSION_PROVISION
+			'provision',
 			'value:currency',
 		];
 	}

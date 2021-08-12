@@ -21,6 +21,7 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('provision', 'Provisions'), 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('provision', 'Provisions types'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
+//@todo add FIlter for Users
 ?>
 <div class="provision-type-view">
 

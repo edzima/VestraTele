@@ -69,6 +69,7 @@ class ProvisionTypeForm extends Model {
 			'issueTypesIds' => Yii::t('common', 'Issue Types'),
 			'issueUserType' => Yii::t('provision', 'For whom'),
 			'issueRequiredUserTypes' => Yii::t('provision', 'Required issue user types'),
+			'with_hierarchy' => Yii::t('provision', 'With hierarchy'),
 		]);
 	}
 
