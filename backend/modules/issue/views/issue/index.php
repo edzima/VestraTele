@@ -118,6 +118,13 @@ JS;
 				'issueAttribute' => null,
 			],
 			[
+				'attribute' => 'signature_act',
+				'visible' => !empty($searchModel->signature_act),
+				'options' => [
+					'style' => 'width:180px',
+				],
+			],
+			[
 				'class' => DataColumn::class,
 				'filterType' => GridView::FILTER_SELECT2,
 				'attribute' => 'agent_id',

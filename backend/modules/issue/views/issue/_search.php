@@ -71,7 +71,7 @@ use yii\widgets\ActiveForm;
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'excludedStages', ['options' => ['class' => 'col-md-8']])->widget(Select2::class, [
+		<?= $form->field($model, 'excludedStages', ['options' => ['class' => 'col-md-7']])->widget(Select2::class, [
 			'data' => $model->getStagesNames(),
 			'options' => [
 				'multiple' => true,
@@ -83,6 +83,7 @@ use yii\widgets\ActiveForm;
 			'showToggleAll' => false,
 		]) ?>
 
+		<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-1']])->textInput() ?>
 
 		<?= $form->field($model, 'onlyDelayed', ['options' => ['class' => 'col-md-4']])->checkbox() ?>
 
