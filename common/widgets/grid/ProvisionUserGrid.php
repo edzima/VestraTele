@@ -10,7 +10,8 @@ use Yii;
 
 class ProvisionUserGrid extends GridView {
 
-	public $summary  = '';
+	public $summary = '';
+	public ?bool $withLink = null;
 
 	public function init(): void {
 		if ($this->withLink === null) {
