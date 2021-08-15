@@ -1,4 +1,7 @@
 <?php
+
+use motion\i18n\ConfigLanguageProvider;
+
 return [
 	'id' => 'app-backend-tests',
 	'homeUrl' => null,
@@ -11,6 +14,23 @@ return [
 		],
 		'request' => [
 			'cookieValidationKey' => 'test',
+		],
+	],
+	'modules' => [
+		'email-templates' => [
+			'languageProvider' => [
+				'class' => ConfigLanguageProvider::class,
+				'languages' => [
+					[
+						'locale' => 'en-US',
+						'label' => 'English',
+					],
+				],
+				'defaultLanguage' => [
+					'locale' => 'en-US',
+					'label' => 'English',
+				],
+			],
 		],
 	],
 ];

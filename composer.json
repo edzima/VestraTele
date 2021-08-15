@@ -40,7 +40,8 @@
 		"yii2tech/csv-grid": "^1.0",
 		"udokmeci/yii2-phone-validator": "~1.0.3",
 		"edzima/yii2-teryt": "^1.1.0",
-		"kartik-v/yii2-date-range": "~1.7.0"
+		"kartik-v/yii2-date-range": "~1.7.0",
+		"yiimaker/yii2-email-templates": "~4.1"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-latest",

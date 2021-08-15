@@ -334,6 +334,12 @@ $user = Yii::$app->user;
 							'visible' => $user->can(User::PERMISSION_LOGS),
 						],
 						[
+							'label' => Yii::t('backend', 'Email Templates'),
+							'url' => ['/email-templates/default/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'visible' => $user->can(User::PERMISSION_EMAIL_TEMPLATE),
+						],
+						[
 							'label' => Yii::t('backend', 'DB manager'),
 							'url' => ['/db-manager/default/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
