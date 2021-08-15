@@ -27,7 +27,7 @@ use yii\web\IdentityInterface;
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $verification_token
- * @property string $email
+ * @property string|null $email
  * @property integer $status
  * @property string $ip
  * @property integer $created_at
@@ -67,6 +67,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 	public const ROLE_LAWYER = 'lawyer';
 
 	public const PERMISSION_ARCHIVE = 'archive';
+	public const PERMISSION_EMAIL_TEMPLATE = 'email.template';
 	public const PERMISSION_EXPORT = 'export';
 	public const PERMISSION_ISSUE = 'issue';
 	public const PERMISSION_HINT = 'hint';
