@@ -4,6 +4,7 @@ namespace backend\tests\functional\settlement;
 
 use backend\modules\settlement\controllers\CalculationController;
 use backend\tests\Step\Functional\CreateCalculationIssueManager;
+use common\fixtures\helpers\EmailTemplateFixtureHelper;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\Issue;
@@ -23,6 +24,7 @@ class CalculationCreateCest {
 			IssueFixtureHelper::stageAndTypesFixtures(),
 			SettlementFixtureHelper::settlement(),
 			SettlementFixtureHelper::pay(),
+			EmailTemplateFixtureHelper::fixture(),
 		));
 		$I->amLoggedIn();
 	}
@@ -51,14 +53,14 @@ class CalculationCreateCest {
 	}
 
 	public function checkValid(CreateCalculationIssueManager $I): void {
-		$I->amOnPage([static::ROUTE, 'id' => 1]);
+		$I->amOnPage([static::ROUTE, 'id' => 3]);
 		$I->dontSee('Problem status');
 		$I->fillField('Value with VAT', 123);
 		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
 		$I->click('Save');
 		$I->seeLink('Update');
 		$model = $I->grabRecord(IssuePayCalculation::class, [
-			'issue_id' => 1,
+			'issue_id' => 3,
 			'value' => 123,
 		]);
 		$I->seeRecord(IssuePay::class, [
@@ -69,7 +71,7 @@ class CalculationCreateCest {
 	}
 
 	public function checkCreateWithoutSendEmailToWorker(CreateCalculationIssueManager $I): void {
-		$I->amOnPage([static::ROUTE, 'id' => 1]);
+		$I->amOnPage([static::ROUTE, 'id' => 3]);
 		$I->fillField('Value with VAT', 123);
 		$I->uncheckOption('Send Email to Workers');
 		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
@@ -78,7 +80,7 @@ class CalculationCreateCest {
 	}
 
 	public function checkCreateWithoutSendEmailToCustomer(CreateCalculationIssueManager $I): void {
-		$I->amOnPage([static::ROUTE, 'id' => 1]);
+		$I->amOnPage([static::ROUTE, 'id' => 3]);
 		$I->fillField('Value with VAT', 123);
 		$I->uncheckOption('Send Email to Customer');
 		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);

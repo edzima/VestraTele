@@ -166,10 +166,10 @@ class CalculationController extends Controller {
 		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			if ($model->sendEmailToCustomer) {
-				$model->sendEmailToCustomer();
+				$model->sendCreateEmailToCustomer();
 			}
 			if ($model->sendEmailToWorkers) {
-				$model->sendEmailToWorkers();
+				$model->sendCreateEmailToWorkers();
 			}
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}

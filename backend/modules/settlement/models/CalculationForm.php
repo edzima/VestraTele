@@ -2,6 +2,8 @@
 
 namespace backend\modules\settlement\models;
 
+use backend\helpers\EmailTemplateKeyHelper;
+use backend\helpers\Html;
 use common\models\issue\IssueUser;
 use common\models\settlement\CalculationForm as BaseCalculationForm;
 use Yii;
@@ -28,26 +30,40 @@ class CalculationForm extends BaseCalculationForm {
 		]);
 	}
 
-	public function sendEmailToCustomer(): bool {
+	public function init() {
+		parent::init();
+		$this->sendEmailToCustomer = !empty($this->getIssue()->customer->email);
+	}
+
+	public function sendCreateEmailToCustomer(): bool {
+		$model = $this->getModel();
+		if (empty($model->getIssueModel()->customer->email)) {
+			return false;
+		}
+		$template = Yii::$app->emailTemplate->getIssueTypeTemplatesLikeKey(
+			$this->getCreateEmailKeyToCustomer(),
+			$model->getIssueType()->id
+		);
+		if (!$template) {
+			return false;
+		}
+		$issue = $model->getIssueModel();
+		$template->parseBody([
+			'agentFullName' => $issue->agent->getFullName(),
+			'agentPhone' => $issue->agent->profile->phone,
+			'agentEmail' => $issue->agent->email,
+		]);
 		return Yii::$app
 			->mailer
-			->compose(
-				['html' => 'settlements/createSettlement-customer-html', 'text' => 'settlements/createSettlement-customer-text'],
-				[
-					'customer' => $this->getModel()->getIssueModel()->customer,
-					'settlement' => $this->getModel(),
-				]
-			)
+			->compose()
 			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' ' . Yii::t('settlement', 'Settlements')])
 			->setTo($this->getModel()->getIssueModel()->customer->email)
-			->setSubject(Yii::t('settlement', 'Create Settlement: {type} in Issue: {issue}.', [
-				'type' => $this->getModel()->getTypeName(),
-				'issue' => $this->getModel()->getIssueName(),
-			]))
+			->setSubject($template->getSubject())
+			->setHtmlBody($template->getBody())
 			->send();
 	}
 
-	public function sendEmailToWorkers(array $types = [IssueUser::TYPE_AGENT, IssueUser::TYPE_TELEMARKETER]): bool {
+	public function sendCreateEmailToWorkers(array $types = [IssueUser::TYPE_AGENT, IssueUser::TYPE_TELEMARKETER]): bool {
 		$emails = $this->getModel()
 			->getIssueModel()
 			->getUsers()
@@ -58,20 +74,48 @@ class CalculationForm extends BaseCalculationForm {
 		if (empty($emails)) {
 			return false;
 		}
+		$model = $this->getModel();
+		$template = Yii::$app->emailTemplate->getIssueTypeTemplatesLikeKey(
+			$this->getCreateEmailKeyToWorker(),
+			$model->getIssueType()->id
+		);
+		if (!$template) {
+			return false;
+		}
+		$issue = $model->getIssueModel();
+		$template->parseBody([
+			'customerFullName' => $issue->agent->getFullName(),
+			'settlementLink' => Html::a($model->getName(), $model->getFrontendUrl()),
+		]);
+
 		return Yii::$app
 			->mailer
-			->compose(
-				['html' => 'settlements/createSettlement-worker-html', 'text' => 'settlements/createSettlement-worker-text'],
-				[
-					'settlement' => $this->getModel(),
-				]
-			)
+			->compose()
 			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' ' . Yii::t('settlement', 'Settlements')])
 			->setTo($emails)
-			->setSubject(Yii::t('settlement', 'Create Settlement: {type} in Issue: {issue}.', [
-				'type' => $this->getModel()->getTypeName(),
-				'issue' => $this->getModel()->getIssueName(),
-			]))
+			->setSubject($template->getSubject())
+			->setHtmlBody($template->getBody())
 			->send();
 	}
+
+	public function getCreateEmailKeyToCustomer(): string {
+		return EmailTemplateKeyHelper::generateKey(
+			[
+				EmailTemplateKeyHelper::SETTLEMENT_CREATE,
+				strtolower($this->getModel()->getTypeName()),
+				EmailTemplateKeyHelper::CUSTOMER,
+			]
+		);
+	}
+
+	public function getCreateEmailKeyToWorker(): string {
+		return EmailTemplateKeyHelper::generateKey(
+			[
+				EmailTemplateKeyHelper::SETTLEMENT_CREATE,
+				strtolower($this->getModel()->getTypeName()),
+				EmailTemplateKeyHelper::WORKER,
+			]
+		);
+	}
+
 }
