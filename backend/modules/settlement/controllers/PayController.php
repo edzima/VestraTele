@@ -148,9 +148,17 @@ class PayController extends Controller {
 				Yii::t('settlement', 'The payment: {value} marked as paid.', [
 					'value' => Yii::$app->formatter->asCurrency($pay->getValue()),
 				]));
+			if ($model->sendEmailToCustomer && $model->sendEmailToCustomer()) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'Send E-mail to Customer.')
+				);
+			}
+			if ($model->sendEmailToWorkers && $model->sendEmailsToWorkers()) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'Send E-mail to Workers.')
+				);
+			}
 
-			$model->sendEmailToCustomer();
-			$model->sendEmailsToWorkers();
 			return $this->redirect(Url::previous());
 		}
 		return $this->render('pay', [

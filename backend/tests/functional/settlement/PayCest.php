@@ -5,6 +5,7 @@ namespace backend\tests\functional\settlement;
 use backend\modules\settlement\controllers\PayController;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\PayIssueManager;
+use common\fixtures\helpers\EmailTemplateFixtureHelper;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\helpers\Flash;
@@ -60,6 +61,7 @@ class PayCest {
 			IssueFixtureHelper::users(),
 			SettlementFixtureHelper::settlement(),
 			SettlementFixtureHelper::pay(),
+			EmailTemplateFixtureHelper::fixture(),
 		));
 		$I->amLoggedIn();
 		$pay = $this->settlementFixture->grabPay('not-payed');

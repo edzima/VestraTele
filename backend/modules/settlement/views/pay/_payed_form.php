@@ -27,6 +27,12 @@ use yii\widgets\ActiveForm;
 
 	</div>
 
+	<div class="row">
+		<?= $form->field($model, 'sendEmailToCustomer', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
+
+		<?= $form->field($model, 'sendEmailToWorkers', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
+	</div>
+
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>

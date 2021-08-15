@@ -2,6 +2,7 @@
 
 namespace common\tests\unit\settlement;
 
+use common\fixtures\helpers\EmailTemplateFixtureHelper;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssuePayInterface;
@@ -35,6 +36,7 @@ class PayPayedFormTest extends Unit {
 			IssueFixtureHelper::users(),
 			SettlementFixtureHelper::pay(),
 			SettlementFixtureHelper::settlement(),
+			EmailTemplateFixtureHelper::fixture(),
 		);
 	}
 
@@ -84,6 +86,8 @@ class PayPayedFormTest extends Unit {
 		$this->tester->seeEmailIsSent();
 		$email = $this->tester->grabLastSentEmail();
 		$this->tester->assertTrue(array_key_exists($model->getPay()->calculation->getIssueModel()->customer->email, $email->getTo()));
+		$this->tester->assertSame('Paid Pay for Customer.', $email->getSubject());
+
 		$this->tester->assertStringNotContainsString(
 			$this->getSettlementLink(),
 			$email->toString(),
@@ -102,7 +106,7 @@ class PayPayedFormTest extends Unit {
 		 */
 		$this->tester->assertTrue(array_key_exists($model->getPay()->calculation->getIssueModel()->agent->email, $email->getTo()));
 		$this->tester->assertTrue(array_key_exists($model->getPay()->calculation->getIssueModel()->tele->email, $email->getTo()));
-
+		$this->tester->assertSame('Paid Pay for Worker.', $email->getSubject());
 		$this->assertStringContainsString(
 			$this->getSettlementLink(),
 			$email->toString()
