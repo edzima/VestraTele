@@ -2,7 +2,6 @@
 
 namespace common\models\issue;
 
-use common\helpers\Url;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;

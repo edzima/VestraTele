@@ -24,12 +24,9 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 	public const LAWYER = 'lawyer';
 	public const TELEMARKETER = 'telemarketer';
 
-	public const CALCULATION = 'calculation';
-	public const PAY = 'pay';
 	public const ISSUE = 'issue';
-	public const PAY_RECEIVED = 'pay-received';
 
-	public const SUMMON = 'summon';
+	public const SUMMON = 'issue.summon';
 
 	private const TYPE = 'issue.type';
 	private const STAGE = 'issue.stage';

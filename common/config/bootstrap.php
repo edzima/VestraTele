@@ -1,4 +1,8 @@
 <?php
+
+use ymaker\email\templates\repositories\EmailTemplatesRepository;
+use ymaker\email\templates\repositories\EmailTemplatesRepositoryInterface;
+
 Yii::setAlias('@root', dirname(__DIR__, 2));
 Yii::setAlias('@common', dirname(__DIR__));
 Yii::setAlias('@frontend', dirname(__DIR__, 2) . '/frontend');
@@ -19,9 +23,6 @@ if (!YII_ENV_TEST) {
 	Yii::setAlias('backendUrl', 'http://backend.dev');
 	Yii::setAlias('storageUrl', 'http://storage.dev');
 }
-
-use ymaker\email\templates\repositories\EmailTemplatesRepository;
-use ymaker\email\templates\repositories\EmailTemplatesRepositoryInterface;
 
 Yii::$container->set(
 	EmailTemplatesRepositoryInterface::class,

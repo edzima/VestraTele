@@ -151,14 +151,14 @@ class ProvisionTypeFormTest extends Unit {
 		$model = $this->model;
 		$model->issueUserType = null;
 		$this->thenUnsuccessSave();
-		$this->thenSeeError('For whom type cannot be blank.', 'issueUserType');
+		$this->thenSeeError('For whom cannot be blank.', 'issueUserType');
 	}
 
 	public function testNotExistedIssueUserType(): void {
 		$model = $this->model;
 		$model->issueUserType = 'not-existed-type';
 		$this->thenUnsuccessSave();
-		$this->thenSeeError('For whom type is invalid.', 'issueUserType');
+		$this->thenSeeError('For whom is invalid.', 'issueUserType');
 	}
 
 	public function testEmptyIssueTypes(): void {

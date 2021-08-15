@@ -6,7 +6,6 @@ use common\fixtures\user\AgentFixture;
 use common\fixtures\user\CustomerFixture;
 use common\fixtures\user\LawyerFixture;
 use common\fixtures\user\TelemarketerFixture;
-use common\fixtures\UserFixture;
 use common\models\issue\IssueUser;
 use yii\test\ActiveFixture;
 

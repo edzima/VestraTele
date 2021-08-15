@@ -28,8 +28,11 @@ class NoteCest {
 
 	public function checkIssueAsCustomerService(CustomerServiceTester $I): void {
 		$I->haveFixtures(
-			IssueFixtureHelper::issue(),
-			IssueFixtureHelper::note(),
+			array_merge(
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::types(),
+				IssueFixtureHelper::note(),
+			)
 		);
 		$I->assignPermission(User::PERMISSION_NOTE);
 		$I->amLoggedIn();
