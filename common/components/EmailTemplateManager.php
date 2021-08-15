@@ -2,7 +2,7 @@
 
 namespace common\components;
 
-use backend\helpers\EmailTemplateKeyHelper;
+use common\helpers\EmailTemplateKeyHelper;
 use Yii;
 use yii\data\ActiveDataProvider;
 use ymaker\email\templates\components\TemplateManager;
@@ -16,7 +16,7 @@ class EmailTemplateManager extends TemplateManager {
 	 * @param string|null $language
 	 * @return EmailTemplate[]|null indexed by Key
 	 */
-	public function getTemplatesLikeKey(string $key, string $language = null): ?array {
+	public function getTemplatesLikeKey(string $key, string &$language = null): ?array {
 		$language = $language ?: Yii::$app->language;
 		/** @var ActiveDataProvider $dataProvider */
 		$dataProvider = $this->repository->getDataProvider();

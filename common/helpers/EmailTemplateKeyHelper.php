@@ -1,10 +1,12 @@
 <?php
 
-namespace backend\helpers;
+namespace common\helpers;
 
 use yii\helpers\StringHelper;
 
 class EmailTemplateKeyHelper {
+
+	public const SETTLEMENT_PAY_PAID = 'settlement' . self::PART_SEPARATOR . 'pay' . self::PART_SEPARATOR . 'paid';
 
 	public const SETTLEMENT_CREATE = 'settlement' . self::PART_SEPARATOR . 'create';
 

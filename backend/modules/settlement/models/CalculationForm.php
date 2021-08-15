@@ -2,8 +2,8 @@
 
 namespace backend\modules\settlement\models;
 
-use backend\helpers\EmailTemplateKeyHelper;
 use backend\helpers\Html;
+use common\helpers\EmailTemplateKeyHelper;
 use common\models\issue\IssueUser;
 use common\models\settlement\CalculationForm as BaseCalculationForm;
 use Yii;

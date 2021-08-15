@@ -2,7 +2,7 @@
 
 namespace common\tests\unit;
 
-use backend\helpers\EmailTemplateKeyHelper;
+use common\helpers\EmailTemplateKeyHelper;
 use common\components\EmailTemplateManager;
 use common\fixtures\helpers\EmailTemplateFixtureHelper;
 use Yii;

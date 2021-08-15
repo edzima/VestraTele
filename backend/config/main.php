@@ -1,7 +1,6 @@
 <?php
 
 use backend\modules\benefit\Module as BenefitModule;
-use common\components\EmailTemplateManager;
 use common\models\user\User;
 use motion\i18n\ConfigLanguageProvider;
 use ymaker\email\templates\Module as EmailTemplateModule;
@@ -77,9 +76,6 @@ return [
 		'session' => [
 			// this is the name of the session cookie used for login on the backend
 			'name' => 'app-back',
-		],
-		'emailTemplate' => [
-			'class' => EmailTemplateManager::class,
 		],
 		'errorHandler' => [
 			'errorAction' => 'site/error',

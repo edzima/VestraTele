@@ -1,6 +1,7 @@
 <?php
 
 use common\components\DbManager;
+use common\components\EmailTemplateManager;
 use common\components\HierarchyComponent;
 use common\components\keyStorage\KeyStorage;
 use common\components\PayComponent;
@@ -52,6 +53,9 @@ return [
 			'tablePrefix' => getenv('DB_TABLE_PREFIX'),
 			'charset' => 'utf8',
 			'enableSchemaCache' => YII_ENV_PROD,
+		],
+		'emailTemplate' => [
+			'class' => EmailTemplateManager::class,
 		],
 		'authManager' => [
 			'class' => DbManager::class,
