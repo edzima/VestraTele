@@ -29,7 +29,6 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	public const TYPE_AGENT = Worker::ROLE_AGENT;
 	public const TYPE_CO_AGENT = Worker::ROLE_CO_AGENT;
 	public const TYPE_TELEMARKETER = Worker::ROLE_TELEMARKETER;
-	public const TYPE_CAMPAIGN_MANAGER = Worker::PERMISSION_CAMPAIGN;
 	public const TYPE_CUSTOMER = Customer::ROLE_CUSTOMER;
 	public const TYPE_VICTIM = Customer::ROLE_VICTIM;
 	public const TYPE_SHAREHOLDER = Customer::ROLE_SHAREHOLDER;
@@ -40,7 +39,6 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		self::TYPE_LAWYER,
 		self::TYPE_AGENT,
 		self::TYPE_TELEMARKETER,
-		self::TYPE_CAMPAIGN_MANAGER,
 	];
 
 	public const TYPES_CUSTOMERS = [
@@ -121,7 +119,6 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 			static::TYPE_SHAREHOLDER => User::getRolesNames()[static::TYPE_SHAREHOLDER],
 			static::TYPE_HANDICAPPED => User::getRolesNames()[static::TYPE_HANDICAPPED],
 			static::TYPE_RECOMMENDING => Yii::t('common', 'Recommending'),
-			static::TYPE_CAMPAIGN_MANAGER => Yii::t('common', 'Campaign manager'),
 		];
 	}
 
