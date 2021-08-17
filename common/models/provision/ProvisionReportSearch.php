@@ -5,6 +5,7 @@ namespace common\models\provision;
 use common\models\issue\IssueCost;
 use common\models\user\User;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\data\DataProviderInterface;
@@ -77,8 +78,19 @@ class ProvisionReportSearch extends ProvisionSearch {
 			->hidden()
 			->andFilterWhere(['to_user_id' => $this->to_user_id]);
 
-		$this->dateFilter($query);
+		$this->applyDateFilter($query);
 		return $query->exists();
+	}
+
+	public function summary(): ProvisionReportSummary {
+		if ($this->toUser === null) {
+			throw new InvalidConfigException('Not Found User with ID: ' . $this->to_user_id);
+		}
+		$summary = new ProvisionReportSummary($this->toUser);
+		$summary->provisionsDataProvider = $this->search([]);
+		$summary->settledCostsDataProvider = $this->getSettledCosts();
+		$summary->notSettledCostsDataProvider = $this->getNotSettledCosts();
+		return $summary;
 	}
 
 	public function getFromUserList(): array {
@@ -88,7 +100,7 @@ class ProvisionReportSearch extends ProvisionSearch {
 			->andWhere(['to_user_id' => $this->to_user_id])
 			->andWhere(['<>', 'from_user_id', $this->to_user_id])
 			->joinWith('fromUser.userProfile');
-		$this->dateFilter($query);
+		$this->applyDateFilter($query);
 		return ArrayHelper::map($query->all(), 'from_user_id', 'fromUser.fullName');
 	}
 

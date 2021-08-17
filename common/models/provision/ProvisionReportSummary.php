@@ -2,27 +2,20 @@
 
 namespace common\models\provision;
 
-use common\models\issue\IssueCost;
+use common\models\settlement\VATInfo;
+use common\models\user\User;
 use Decimal\Decimal;
 use Yii;
 use yii\base\Model;
+use yii\data\DataProviderInterface;
 
 class ProvisionReportSummary extends Model {
 
-	/**
-	 * @var Provision[]
-	 */
-	public array $provisions = [];
+	public DataProviderInterface $provisionsDataProvider;
+	public DataProviderInterface $settledCostsDataProvider;
+	public DataProviderInterface $notSettledCostsDataProvider;
 
-	/**
-	 * @var IssueCost[]
-	 */
-	public array $settledCosts = [];
-
-	/**
-	 * @var IssueCost[]
-	 */
-	public array $notSettledCosts = [];
+	public function __construct(User $user, $config = []) { parent::__construct($config); }
 
 	public function attributeLabels() {
 		return [
@@ -41,15 +34,36 @@ class ProvisionReportSummary extends Model {
 
 	public function getProvisionsSum(): Decimal {
 		$sum = new Decimal(0);
-		foreach ($this->provisions as $provision) {
+		foreach ($this->getProvisions() as $provision) {
 			$sum = $sum->add($provision->getValue());
 		}
 		return $sum;
 	}
 
+	/**
+	 * @return Provision[]
+	 */
+	public function getProvisions(): array {
+		return $this->provisionsDataProvider->getModels();
+	}
+
+	/**
+	 * @return VATInfo[]
+	 */
+	public function getNotSettledCosts(): array {
+		return $this->notSettledCostsDataProvider->getModels();
+	}
+
+	/**
+	 * @return VATInfo[]
+	 */
+	public function getSettledCosts(): array {
+		return $this->settledCostsDataProvider->getModels();
+	}
+
 	public function getSettledCostsSum(): Decimal {
 		$sum = new Decimal(0);
-		foreach ($this->settledCosts as $cost) {
+		foreach ($this->getSettledCosts() as $cost) {
 			$sum = $sum->add($cost->getValueWithoutVAT());
 		}
 		return $sum;
@@ -57,7 +71,7 @@ class ProvisionReportSummary extends Model {
 
 	public function getNotSettledCostsSum(): Decimal {
 		$sum = new Decimal(0);
-		foreach ($this->notSettledCosts as $cost) {
+		foreach ($this->getNotSettledCosts() as $cost) {
 			$sum = $sum->add($cost->getValueWithoutVAT());
 		}
 		return $sum;

@@ -6,10 +6,8 @@ use backend\helpers\Url;
 use common\helpers\Flash;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionReportSearch;
-use common\models\provision\ProvisionReportSummary;
 use common\models\provision\ProvisionSearch;
 use common\models\provision\ToUserGroupProvisionSearch;
-use common\models\user\Worker;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
@@ -57,23 +55,18 @@ class ReportController extends Controller {
 	}
 
 	public function actionView(int $id, string $dateTo, string $dateFrom): string {
-		$user = Worker::findOne($id);
-		if ($user === null) {
-			throw new NotFoundHttpException();
-		}
 		Url::remember();
 
 		$searchModel = new ProvisionReportSearch();
 		$searchModel->to_user_id = $id;
 		$searchModel->dateTo = $dateTo;
 		$searchModel->dateFrom = $dateFrom;
-		$provisionsDataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		if ($searchModel->hasHiddenProvisions()) {
 			$link = Html::a(Yii::t('provision', 'hidden provisions'), [
 					'/provision/provision/index',
 					Html::getInputName(ProvisionSearch::instance(), 'dateFrom') => $dateFrom,
 					Html::getInputName(ProvisionSearch::instance(), 'dateTo') => $dateTo,
-					Html::getInputName(ProvisionSearch::instance(), 'to_user_id') => $user->id,
+					Html::getInputName(ProvisionSearch::instance(), 'to_user_id') => $id,
 					Html::getInputName(ProvisionSearch::instance(), 'hide_on_report') => true,
 				]
 			);
@@ -81,35 +74,9 @@ class ReportController extends Controller {
 				Yii::t('provision', 'In report' . ' ' . $link)
 			);
 		}
-		if ($provisionsDataProvider->getTotalCount() > $searchModel->limit) {
-			Flash::add(Flash::TYPE_WARNING,
-				Yii::t('provision',
-					'Total items count is greater than limit: {limit}. Change smaller dates range.', [
-						'limit' => $searchModel->limit,
-					]));
-		}
-
-		$notSettledCostsDataProvider = $searchModel->getNotSettledCosts();
-		$settledCostsDataProvider = $searchModel->getSettledCosts();
-
-		$summary = null;
-		if (
-			$notSettledCostsDataProvider->getTotalCount() > 0
-			|| $settledCostsDataProvider->getTotalCount() > 0
-		) {
-			$summary = new ProvisionReportSummary([
-				'provisions' => $provisionsDataProvider->getModels(),
-				'settledCosts' => $settledCostsDataProvider->getModels(),
-				'notSettledCosts' => $notSettledCostsDataProvider->getModels(),
-			]);
-		}
 
 		return $this->render('view', [
 			'searchModel' => $searchModel,
-			'provisionsDataProvider' => $provisionsDataProvider,
-			'notSettledCostsDataProvider' => $notSettledCostsDataProvider,
-			'settledCostsDataProvider' => $settledCostsDataProvider,
-			'summary' => $summary,
 		]);
 	}
 
