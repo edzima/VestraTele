@@ -172,7 +172,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	}
 
 	public function getNotPayedPays(): IssuePayQuery {
-		return $this->getPays()->onlyNotPayed();
+		return $this->getPays()->onlyUnpaid();
 	}
 
 	public function getValueToPay(): Decimal {

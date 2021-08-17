@@ -308,4 +308,7 @@ return [
 	'Only Delayed' => 'Opóźnione',
 	'Hello {firstname}' => 'Witaj {firstname}',
 	'PESEL' => 'PESEL',
+	'Last Month {month}' => 'Poprzedni ({month})',
+	'Current Month {month}' => 'Obecny ({month})',
+	'Next Month {month}' => 'Następny ({month})',
 ];

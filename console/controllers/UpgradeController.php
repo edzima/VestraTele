@@ -58,7 +58,7 @@ class UpgradeController extends Controller {
 	public function actionProblemsPays(): void {
 		IssuePay::updateAll(['status' => null], ['or', 'status=0', 'pay_at IS NOT NULL']);
 		$pays = IssuePay::find()
-			->onlyNotPayed()
+			->onlyUnpaid()
 			->andWhere('status IS NOT NULL')
 			->indexBy('calculation_id')
 			->with('calculation')

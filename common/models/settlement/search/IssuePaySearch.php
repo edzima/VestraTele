@@ -238,10 +238,10 @@ class IssuePaySearch extends IssuePay implements
 			case static::PAY_STATUS_ALL:
 				break;
 			case static::PAY_STATUS_NOT_PAYED:
-				$query->onlyNotPayed();
+				$query->onlyUnpaid();
 				break;
 			case static::PAY_STATUS_PAYED:
-				$query->onlyPayed();
+				$query->onlyPaid();
 				break;
 		}
 	}

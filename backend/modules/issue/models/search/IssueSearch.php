@@ -152,7 +152,7 @@ class IssueSearch extends BaseIssueSearch {
 		if ($this->onlyWithPayedPay) {
 			$query->joinWith([
 				'pays' => function (IssuePayQuery $payQuery) {
-					$payQuery->onlyPayed();
+					$payQuery->onlyPaid();
 				},
 			])
 				->groupBy(Issue::tableName() . '.id');

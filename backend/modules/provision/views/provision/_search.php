@@ -1,9 +1,9 @@
 <?php
 
 use common\models\provision\ProvisionSearch;
-use common\widgets\DateTimeWidget;
+use common\widgets\LastCurrentNextMonthNav;
+use common\widgets\DateWidget;
 use kartik\select2\Select2;
-use yii\bootstrap\Nav;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -19,78 +19,36 @@ use yii\widgets\ActiveForm;
 		'method' => 'get',
 	]); ?>
 
+	<div class="row">
+		<div class="col-md-5">
+			<?= LastCurrentNextMonthNav::widget([
+				'model' => $model,
+				'dateFromAttribute' => 'dateFrom',
+				'dateToAttribute' => 'dateTo',
+			]) ?>
+		</div>
 
-	<?= Nav::widget([
-		'items' => [
-			[
-				'label' => 'Poprzedni (' . date('Y-m', strtotime('last month')) . ')',
-				'url' => [
-					'index',
-					Html::getInputName($model, 'dateFrom') => date('Y-m-d', strtotime('first day of last month')),
-					Html::getInputName($model, 'dateTo') => date('Y-m-d', strtotime('last day of last month')),
+		<?= $form->field($model, 'dateFrom', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+			->hint($model->isUnpaid()
+				? Yii::t('settlement', 'Deadline at')
+				: Yii::t('settlement', 'Pay at')
+			)
+		?>
 
-				],
-				'active' => $model->dateFrom === date('Y-m-d', strtotime('first day of last month'))
-					&& $model->dateTo === date('Y-m-d', strtotime('last day of last month')),
-			],
-			[
-				'label' => 'Obecny (' . date('Y-m') . ')',
-				'url' => [
-					'index',
-					Html::getInputName($model, 'dateFrom') => date('Y-m-d', strtotime('first day of this month')),
-					Html::getInputName($model, 'dateTo') => date('Y-m-d', strtotime('last day of this month')),
+		<?= $form->field($model, 'dateTo', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+			->hint($model->isUnpaid()
+				? Yii::t('settlement', 'Deadline at')
+				: Yii::t('settlement', 'Pay at')
+			)
+		?>
 
-				],
-				'active' => $model->dateFrom === date('Y-m-d', strtotime('first day of this month'))
-					&& $model->dateTo === date('Y-m-d', strtotime('last day of this month')),
-			],
-			[
-				'label' => 'Następny (' . date('Y-m', strtotime('next month')) . ')',
-				'url' => [
-					'index',
-					Html::getInputName($model, 'dateFrom') => date('Y-m-d', strtotime('first day of next month')),
-					Html::getInputName($model, 'dateTo') => date('Y-m-d', strtotime('last day of next month')),
-				],
-				'active' => $model->dateFrom === date('Y-m-d', strtotime('first day of next month'))
-					&& $model->dateTo === date('Y-m-d', strtotime('last day of next month')),
-			],
-		],
-		'options' => ['class' => 'nav-pills'],
-
-	]) ?>
+	</div>
 
 	<div class="form-group row">
 
 
-		<?= $form->field($model, 'dateFrom', ['options' => ['class' => 'col-md-3']])
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
-
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
-				]) ?>
-
-		<?= $form->field($model, 'dateTo', ['options' => ['class' => 'col-md-3']])
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
-
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
-				]) ?>
 		<?= $form->field($model, 'to_user_id', ['options' => ['class' => 'col-md-3']])
 			->widget(Select2::class, [
 					'data' => $model->getToUsersList(),

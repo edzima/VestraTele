@@ -140,7 +140,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		if ($this->onlyToPayed === true) {
 			$query->joinWith([
 				'pays P' => function (IssuePayQuery $payQuery) {
-					$payQuery->onlyNotPayed();
+					$payQuery->onlyUnpaid();
 				},
 			]);
 		}

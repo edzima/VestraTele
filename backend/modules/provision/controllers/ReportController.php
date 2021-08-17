@@ -8,8 +8,7 @@ use common\models\provision\Provision;
 use common\models\provision\ProvisionReportSearch;
 use common\models\provision\ProvisionReportSummary;
 use common\models\provision\ProvisionSearch;
-use common\models\provision\ProvisionUsersSearch;
-use common\models\provision\search\ReportSearch;
+use common\models\provision\ToUserGroupProvisionSearch;
 use common\models\user\Worker;
 use Yii;
 use yii\filters\VerbFilter;
@@ -33,34 +32,13 @@ class ReportController extends Controller {
 		];
 	}
 
-	public function actionReport() {
-		$searchModel = new ReportSearch();
-		$searchModel->load(Yii::$app->request->queryParams);
-		if ($searchModel->user_id) {
-			return $this->redirect([
-				'view',
-				'id' => $searchModel->user_id,
-				'dateFrom' => $searchModel->dateFrom,
-				'dateTo' => $searchModel->dateTo,
-			]);
-		}
-		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-
-		return $this->render('report', [
-			'searchModel' => $searchModel,
-			'dataProvider' => $dataProvider,
-		]);
-
-	}
-
 	/**
 	 * Lists all reports models.
 	 *
 	 * @return mixed
 	 */
 	public function actionIndex() {
-		$searchModel = new ProvisionUsersSearch();
+		$searchModel = new ToUserGroupProvisionSearch();
 		$searchModel->load(Yii::$app->request->queryParams);
 		if ($searchModel->to_user_id) {
 			return $this->redirect([
@@ -91,7 +69,7 @@ class ReportController extends Controller {
 		$searchModel->dateFrom = $dateFrom;
 		$provisionsDataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		if ($searchModel->hasHiddenProvisions()) {
-			$link = Html::a('ukryto prowizje', [
+			$link = Html::a(Yii::t('provision', 'hidden provisions'), [
 					'/provision/provision/index',
 					Html::getInputName(ProvisionSearch::instance(), 'dateFrom') => $dateFrom,
 					Html::getInputName(ProvisionSearch::instance(), 'dateTo') => $dateTo,
@@ -99,7 +77,9 @@ class ReportController extends Controller {
 					Html::getInputName(ProvisionSearch::instance(), 'hide_on_report') => true,
 				]
 			);
-			Yii::$app->session->addFlash('warning', 'W raporcie ' . $link);
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('provision', 'In report' . ' ' . $link)
+			);
 		}
 		if ($provisionsDataProvider->getTotalCount() > $searchModel->limit) {
 			Flash::add(Flash::TYPE_WARNING,

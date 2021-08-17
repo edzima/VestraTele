@@ -4,6 +4,7 @@ namespace common\models\provision;
 
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\query\IssuePayCalculationQuery;
+use common\models\issue\query\IssuePayQuery;
 use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\query\UserQuery;
@@ -19,12 +20,13 @@ use yii\helpers\ArrayHelper;
  */
 class ProvisionSearch extends Provision implements CustomerSearchInterface, SearchModel {
 
-	public const PAY_STATUS_PAYED = 'payed';
-	public const PAY_STATUS_NOT_PAYED = 'not-payed';
-
-	protected const DEFAULT_PAY_STATUS = self::PAY_STATUS_PAYED;
+	public const PAY_STATUS_PAID = 'paid';
+	public const PAY_STATUS_UNPAID = 'unpaid';
+	protected const DEFAULT_PAY_STATUS = self::PAY_STATUS_PAID;
 
 	public $issue_id;
+
+	public bool $defaultCurrentMonth = true;
 	public $dateFrom;
 	public $dateTo;
 	public $customerLastname;
@@ -32,15 +34,8 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 	public $settlementTypes = [];
 	public $payStatus;
 
-	public static function getPayStatusNames(): array {
-		return [
-			static::PAY_STATUS_PAYED => 'Opłacone',
-			static::PAY_STATUS_NOT_PAYED => 'Nie opłacone',
-		];
-	}
-
-	public function isNotPayed(): bool {
-		return $this->payStatus === static::PAY_STATUS_NOT_PAYED;
+	public function isUnpaid(): bool {
+		return $this->payStatus === static::PAY_STATUS_UNPAID;
 	}
 
 	/**
@@ -70,13 +65,15 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 	}
 
 	public function init() {
-		if (empty($this->dateFrom)) {
-			$this->dateFrom = date('Y-m-d', strtotime('first day of this month'));
-		}
-		if (empty($this->dateTo)) {
-			$this->dateTo = date('Y-m-d', strtotime('last day of this month'));
-		}
 		parent::init();
+		if ($this->defaultCurrentMonth) {
+			if (empty($this->dateFrom)) {
+				$this->dateFrom = date('Y-m-d', strtotime('first day of this month'));
+			}
+			if (empty($this->dateTo)) {
+				$this->dateTo = date('Y-m-d', strtotime('last day of this month'));
+			}
+		}
 	}
 
 	/**
@@ -103,8 +100,6 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 			},
 		]);
 
-		// add conditions that should always apply here
-
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
 		]);
@@ -112,10 +107,13 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 		$this->load($params);
 
 		if (!$this->validate()) {
+			$query->andWhere('0=1');
 			return $dataProvider;
 		}
 
 		$this->applyCustomerSurnameFilter($query);
+		$this->applyDateFilter($query);
+		$this->applyPayStatusFilter($query);
 		$this->applySettlementFilter($query);
 
 		if (!empty($this->issue_id)) {
@@ -123,19 +121,8 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 			$query->andWhere(['issue.id' => $this->issue_id]);
 		}
 
-		if (!empty($this->payStatus)) {
-			$query->joinWith('pay');
-			switch ($this->payStatus) {
-				case static::PAY_STATUS_NOT_PAYED:
-					$query->andWhere('issue_pay.pay_at IS NULL');
-					break;
-				case static::PAY_STATUS_PAYED:
-					$query->andWhere('issue_pay.pay_at IS NOT NULL');
-			}
-		}
-
 		if ($this->hide_on_report) {
-			$query->andWhere(['provision.hide_on_report' => true]);
+			$query->hidden();
 		}
 
 		// grid filtering conditions
@@ -145,9 +132,28 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 			Provision::tableName() . '.from_user_id' => $this->from_user_id,
 			Provision::tableName() . '.type_id' => $this->type_id,
 		]);
-		$this->dateFilter($query);
 
+		if (YII_ENV_TEST) {
+			codecept_debug($query->createCommand()->getRawSql());
+		}
 		return $dataProvider;
+	}
+
+	protected function applyPayStatusFilter(ProvisionQuery $query): void {
+		if (!empty($this->payStatus)) {
+			$query->joinWith([
+				'pay' => function (IssuePayQuery $query): void {
+					switch ($this->payStatus) {
+						case static::PAY_STATUS_UNPAID:
+							$query->onlyUnpaid();
+							break;
+						case static::PAY_STATUS_PAID:
+							$query->onlyPaid();
+							break;
+					}
+				},
+			]);
+		}
 	}
 
 	public function getFromUserList(): array {
@@ -155,7 +161,7 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 			->select('from_user_id')
 			->groupBy('from_user_id')
 			->joinWith('fromUser.userProfile');
-		$this->dateFilter($query);
+		$this->applyDateFilter($query);
 		return ArrayHelper::map($query->all(), 'from_user_id', 'fromUser.fullName');
 	}
 
@@ -164,13 +170,13 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 			->select('to_user_id')
 			->groupBy('to_user_id')
 			->joinWith('toUser.userProfile');
-		$this->dateFilter($query);
+		$this->applyDateFilter($query);
 		return ArrayHelper::map($query->all(), 'to_user_id', 'toUser.fullName');
 	}
 
-	protected function dateFilter(ActiveQuery $query): void {
+	protected function applyDateFilter(ActiveQuery $query): void {
 		if (!empty($this->dateFrom) || !empty($this->dateTo)) {
-			$column = $this->isNotPayed() ? 'issue_pay.deadline_at' : 'issue_pay.pay_at';
+			$column = $this->isUnpaid() ? 'issue_pay.deadline_at' : 'issue_pay.pay_at';
 			$query
 				->joinWith('pay')
 				->andFilterWhere(['>=', $column, $this->dateFrom])
@@ -192,6 +198,13 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 		if (!empty($this->customerLastname)) {
 			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
 		}
+	}
+
+	public static function getPayStatusNames(): array {
+		return [
+			static::PAY_STATUS_PAID => Yii::t('settlement', 'Paid'),
+			static::PAY_STATUS_UNPAID => Yii::t('settlement', 'Unpaid'),
+		];
 	}
 
 	public static function getSettlementTypesNames(): array {

@@ -1,13 +1,13 @@
 <?php
 
-use common\models\provision\ProvisionSearch;
-use common\widgets\DateTimeWidget;
+use common\models\provision\ToUserGroupProvisionSearch;
+use common\widgets\DateWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model ProvisionSearch */
+/* @var $model ToUserGroupProvisionSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -22,34 +22,11 @@ use yii\widgets\ActiveForm;
 
 
 		<?= $form->field($model, 'dateFrom', ['options' => ['class' => 'col-md-4']])
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
-
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
-				]) ?>
+			->widget(DateWidget::class) ?>
 
 		<?= $form->field($model, 'dateTo', ['options' => ['class' => 'col-md-4']])
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
+			->widget(DateWidget::class) ?>
 
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
-				]) ?>
 		<?= $form->field($model, 'to_user_id', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
 					'data' => $model->getToUsersList(),

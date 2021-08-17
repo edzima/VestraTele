@@ -12,7 +12,20 @@ use yii\web\YiiAsset;
 /* @var $this View */
 /* @var $searchModel ProvisionReportSearch */
 /* @var $dataProvider ActiveDataProvider */
-$this->title = 'Raport: ' . $searchModel->toUser . ' (' . Yii::$app->formatter->asDate($searchModel->dateFrom) . ' - ' . Yii::$app->formatter->asDate($searchModel->dateTo) . ')';
+
+if ($searchModel->to_user_id === Yii::$app->user->getId()) {
+	$this->title = Yii::t('provision', 'Provisions Report ({from} - {to})', [
+		'from' => Yii::$app->formatter->asDate($searchModel->dateFrom),
+		'to' => Yii::$app->formatter->asDate($searchModel->dateTo),
+	]);
+} else {
+	$this->title = Yii::t('provision',
+		'Provisions Report: {user} ({from} - {to})', [
+			'user' => $searchModel->toUser->getFullName(),
+			'from' => Yii::$app->formatter->asDate($searchModel->dateFrom),
+			'to' => Yii::$app->formatter->asDate($searchModel->dateTo),
+		]);
+}
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 ?>

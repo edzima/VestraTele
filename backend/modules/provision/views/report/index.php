@@ -5,13 +5,13 @@ use backend\widgets\GridView;
 use common\models\issue\IssueCost;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionReportSummary;
-use common\models\provision\ProvisionUsersSearch;
+use common\models\provision\ToUserGroupProvisionSearch;
 use common\widgets\grid\CurrencyColumn;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $searchModel ProvisionUsersSearch */
+/* @var $searchModel ToUserGroupProvisionSearch */
 /* @var $dataProvider ActiveDataProvider */
 
 $this->title = Yii::t('provision', 'Reports');

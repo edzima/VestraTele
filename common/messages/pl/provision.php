@@ -31,6 +31,8 @@ return [
 	'Provisions types' => 'Typy prowizji',
 	'Provisions types for settlement: {type}' => 'Typy prowizji dla rozliczenia: {type}',
 	'Reports' => 'Raporty',
+	'Provisions Report ({from} - {to})' => 'Raport Prowizji ({from} - {to})',
+	'Provisions Report: {user} ({from} - {to})' => 'Raport Prowizji: {user} ({from} - {to})',
 	'Report: {user} ({fromDate} - {toDate})' => 'Raport: {user} ({fromDate} - {toDate})',
 	'Self provisions' => 'Własne prowizje',
 	'Self - {user}' => 'Własna - {user}',
@@ -66,4 +68,6 @@ return [
 	'Any user has not provision.' => 'Żadnemu użytkownikowi nie należy się prowizja.',
 	'Not active types for settlement: {settlement}.' => 'Brak Aktywnych Typów prowizji dla rozliczenia: {settlement}.',
 	'Not active {userType} types for settlement: {settlement}.' => 'Brak Aktywnych Typów prowizji ({userType}) dla rozliczenia: {settlement}.',
+	'hidden provisions' => 'ukryto prowizje',
+	'In report' => 'W Raporcie',
 ];

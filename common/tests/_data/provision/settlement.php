@@ -23,4 +23,9 @@ return [
 		'value' => 100,
 		'type' => IssueSettlement::TYPE_LAWYER,
 	],
+	'honorarium-larson-customer' => [
+		'issue_id' => 1,
+		'value' => 1230,
+		'type' => IssueSettlement::TYPE_HONORARIUM,
+	],
 ];

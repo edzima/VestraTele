@@ -21,7 +21,7 @@ use yii\db\ActiveRecord;
  * @property int $type_id
  * @property int $from_user_id
  * @property int $to_user_id
- * @property bool $hide_on_report
+ * @property int $hide_on_report
  * @property string|null $percent
  *
  * @property-read string $provision

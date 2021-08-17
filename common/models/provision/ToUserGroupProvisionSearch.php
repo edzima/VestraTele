@@ -7,9 +7,7 @@ use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 
-class ProvisionUsersSearch extends ProvisionSearch {
-
-	public $sumValue;
+class ToUserGroupProvisionSearch extends ProvisionSearch {
 
 	public function rules(): array {
 		return [

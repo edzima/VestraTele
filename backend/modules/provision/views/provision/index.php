@@ -38,9 +38,6 @@ $this->params['breadcrumbs'][] = $this->title;
 						'multiple' => true,
 						'placeholder' => $searchModel->getAttributeLabel('settlementTypes'),
 					],
-					'pluginOptions' => [
-						'width' => '120px',
-					],
 					'size' => Select2::SIZE_SMALL,
 					'showToggleAll' => false,
 				],
@@ -61,9 +58,6 @@ $this->params['breadcrumbs'][] = $this->title;
 					],
 					'size' => Select2::SIZE_SMALL,
 					'showToggleAll' => false,
-					'pluginOptions' => [
-						'width' => '140px',
-					],
 				],
 				'value' => 'type.name',
 			],
@@ -81,7 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 			'provision',
 			'value:currency',
-			$searchModel->isNotPayed() ? 'pay.deadline_at:date' : 'pay.pay_at:date',
+			$searchModel->isUnpaid() ? 'pay.deadline_at:date' : 'pay.pay_at:date',
 			[
 				'class' => ActionColumn::class,
 				'template' => '{update} {delete}',
