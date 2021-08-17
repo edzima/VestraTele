@@ -2,7 +2,7 @@
 
 use backend\modules\settlement\models\search\IssuePaySearch;
 use common\widgets\DateWidget;
-use yii\bootstrap\Nav;
+use common\widgets\LastCurrentNextMonthNav;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -35,46 +35,10 @@ $action = Yii::$app->controller->action->id;
 			<?= $form->field($model, 'deadlineAtTo')
 				->widget(DateWidget::class) ?>
 
-			<?= Nav::widget([
-				'items' => [
-					[
-						'label' => 'Poprzedni (' . date('Y-m', strtotime('last month')) . ')',
-						'url' => [
-							$action,
-							'status' => $model->getPayStatus(),
-							Html::getInputName($model, 'deadlineAtFrom') => date('Y-m-d', strtotime('first day of last month')),
-							Html::getInputName($model, 'deadlineAtTo') => date('Y-m-d', strtotime('last day of last month')),
-
-						],
-						'active' => $model->deadlineAtFrom === date('Y-m-d', strtotime('first day of last month'))
-							&& $model->deadlineAtTo === date('Y-m-d', strtotime('last day of last month')),
-					],
-					[
-						'label' => 'Obecny (' . date('Y-m') . ')',
-						'url' => [
-							$action,
-							'status' => $model->getPayStatus(),
-							Html::getInputName($model, 'deadlineAtFrom') => date('Y-m-d', strtotime('first day of this month')),
-							Html::getInputName($model, 'deadlineAtTo') => date('Y-m-d', strtotime('last day of this month')),
-
-						],
-						'active' => $model->deadlineAtFrom === date('Y-m-d', strtotime('first day of this month'))
-							&& $model->deadlineAtTo === date('Y-m-d', strtotime('last day of this month')),
-					],
-					[
-						'label' => 'Następny (' . date('Y-m', strtotime('next month')) . ')',
-						'url' => [
-							$action,
-							'status' => $model->getPayStatus(),
-							Html::getInputName($model, 'deadlineAtFrom') => date('Y-m-d', strtotime('first day of next month')),
-							Html::getInputName($model, 'deadlineAtTo') => date('Y-m-d', strtotime('last day of next month')),
-						],
-						'active' => $model->deadlineAtFrom === date('Y-m-d', strtotime('first day of next month'))
-							&& $model->deadlineAtTo === date('Y-m-d', strtotime('last day of next month')),
-					],
-				],
-				'options' => ['class' => 'nav-pills'],
-
+			<?= LastCurrentNextMonthNav::widget([
+				'model' => $model,
+				'dateFromAttribute' => 'deadlineAtFrom',
+				'dateToAttribute' => 'deadlineAtTo',
 			]) ?>
 		</div>
 
