@@ -133,9 +133,6 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 			Provision::tableName() . '.type_id' => $this->type_id,
 		]);
 
-		if (YII_ENV_TEST) {
-			codecept_debug($query->createCommand()->getRawSql());
-		}
 		return $dataProvider;
 	}
 

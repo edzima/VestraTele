@@ -20,13 +20,10 @@ use yii\widgets\ActiveForm;
 	]); ?>
 
 	<div class="row">
-		<div class="col-md-5">
-			<?= LastCurrentNextMonthNav::widget([
-				'model' => $model,
-				'dateFromAttribute' => 'dateFrom',
-				'dateToAttribute' => 'dateTo',
-			]) ?>
-		</div>
+
+
+		<?= $form->field($model, 'payStatus', ['options' => ['class' => 'col-md-2']])->dropDownList(ProvisionSearch::getPayStatusNames()) ?>
+
 
 		<?= $form->field($model, 'dateFrom', ['options' => ['class' => 'col-md-2']])
 			->widget(DateWidget::class)
@@ -43,6 +40,16 @@ use yii\widgets\ActiveForm;
 				: Yii::t('settlement', 'Pay at')
 			)
 		?>
+
+		<div class="col-md-6">
+			<div class="pull-right">
+				<?= LastCurrentNextMonthNav::widget([
+					'model' => $model,
+					'dateFromAttribute' => 'dateFrom',
+					'dateToAttribute' => 'dateTo',
+				]) ?>
+			</div>
+		</div>
 
 	</div>
 
@@ -77,10 +84,6 @@ use yii\widgets\ActiveForm;
 		<?= $form->field($model, 'hide_on_report', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
 
-	</div>
-
-	<div class="form-group">
-		<?= $form->field($model, 'payStatus')->dropDownList(ProvisionSearch::getPayStatusNames()) ?>
 	</div>
 
 

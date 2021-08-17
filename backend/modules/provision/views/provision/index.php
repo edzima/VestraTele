@@ -4,6 +4,7 @@ use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionSearch;
+use common\models\provision\ToUserGroupProvisionSearch;
 use common\widgets\grid\CustomerDataColumn;
 use kartik\select2\Select2;
 use yii\data\ActiveDataProvider;
@@ -18,6 +19,15 @@ $this->title = Yii::t('provision', 'Provisions');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="provision-index">
+
+	<p>
+		<?= Html::a(Yii::t('provision', 'Reports'), [
+			'report/index',
+			Html::getInputName(ToUserGroupProvisionSearch::instance(), 'dateFrom') => $searchModel->dateFrom,
+			Html::getInputName(ToUserGroupProvisionSearch::instance(), 'dateTo') => $searchModel->dateTo,
+			Html::getInputName(ToUserGroupProvisionSearch::instance(), 'to_user_id') => $searchModel->to_user_id,
+		], ['class' => 'btn btn-success']) ?>
+	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 

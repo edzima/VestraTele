@@ -31,6 +31,14 @@ class ProvisionCest {
 		$I->seeResponseCodeIsSuccessful();
 	}
 
+	public function checkIndexReportLink(ProvisionManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeLink('Reports');
+		$I->click('Reports');
+		$I->seeInCurrentUrl(ProvisionReportCest::ROUTE_INDEX);
+	}
+
 	public function checkIndexPage(ProvisionManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
