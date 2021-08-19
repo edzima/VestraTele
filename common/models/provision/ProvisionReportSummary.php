@@ -27,6 +27,12 @@ class ProvisionReportSummary extends Model {
 		];
 	}
 
+	public function getProvisionsTotalSum(): Decimal {
+		/** @var ProvisionQuery $query */
+		$query = clone $this->provisionsDataProvider->query;
+		return new Decimal($query->sum(Provision::tableName() . '.value'));
+	}
+
 	public function getTotalSum(): Decimal {
 		return $this->getProvisionsSum()
 			->add($this->getNotSettledCostsSum())

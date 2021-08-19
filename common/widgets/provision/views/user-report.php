@@ -107,7 +107,6 @@ use yii\widgets\DetailView;
 	<?= GridView::widget([
 		'id' => 'report-grid',
 		'dataProvider' => $model->provisionsDataProvider,
-		'summary' => false,
 		'caption' => Yii::t('provision', 'Provisions'),
 		'showPageSummary' => true,
 		'columns' => [
@@ -145,6 +144,6 @@ use yii\widgets\DetailView;
 
 <?php if ($model->provisionsDataProvider->pagination->pageCount > 1): ?>
 	<p><?= Yii::t('provision', 'Sum {value}', [
-			'value' => Yii::$app->formatter->asCurrency($model->provisionsDataProvider->query->sum('value')),
+			'value' => Yii::$app->formatter->asCurrency($model->getProvisionsTotalSum()),
 		]) ?></p>
 <?php endif; ?>

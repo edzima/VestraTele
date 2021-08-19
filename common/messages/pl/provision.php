@@ -72,4 +72,5 @@ return [
 	'Not active {userType} types for settlement: {settlement}.' => 'Brak Aktywnych Typów prowizji ({userType}) dla rozliczenia: {settlement}.',
 	'hidden provisions' => 'ukryto prowizje',
 	'In report' => 'W Raporcie',
+	'Sum {value}' => 'Suma: {value}',
 ];
