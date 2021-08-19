@@ -25,6 +25,7 @@ class IssueSearch extends BaseIssueSearch {
 	public $excludedStages = [];
 	public bool $onlyDelayed = false;
 	public bool $onlyWithPayedPay = false;
+	public ?string $signature_act = null;
 
 	public function __construct($config = []) {
 		if (!isset($config['addressSearch'])) {
@@ -37,7 +38,7 @@ class IssueSearch extends BaseIssueSearch {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
 			[['onlyDelayed', 'onlyWithPayedPay'], 'boolean'],
-			['type_additional_date_at', 'safe'],
+			[['type_additional_date_at', 'signature_act'], 'safe'],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 		]);
 	}
@@ -81,11 +82,16 @@ class IssueSearch extends BaseIssueSearch {
 
 	protected function issueQueryFilter(IssueQuery $query): void {
 		parent::issueQueryFilter($query);
+		$this->signatureActFilter($query);
 		$this->delayedFilter($query);
 		$this->excludedStagesFilter($query);
 		$this->teleFilter($query);
 		$this->lawyerFilter($query);
 		$this->payedFilter($query);
+	}
+
+	private function signatureActFilter(IssueQuery $query): void {
+		$query->andFilterWhere(['like', Issue::tableName() . '.signature_act', $this->signature_act]);
 	}
 
 	public function applyAgentsFilters(QueryInterface $query): void {

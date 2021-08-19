@@ -137,7 +137,7 @@ class LeadReportSearch extends LeadReport {
 
 	private function applyLeadNameFilter(ActiveQuery $query) {
 		if (!empty($this->lead_name)) {
-			$query->andWhere(['like', Lead::tableName() . '.name', $this->lead_name . '%', false]);
+			$query->andWhere(['like', Lead::tableName() . '.name', $this->lead_name]);
 		}
 	}
 
