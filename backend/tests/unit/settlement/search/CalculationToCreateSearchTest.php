@@ -5,9 +5,9 @@ namespace backend\tests\unit\settlement\search;
 use backend\modules\settlement\models\search\IssueToCreateCalculationSearch;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\models\issue\Issue;
 use common\models\SearchModel;
 use common\tests\_support\UnitSearchModelTrait;
-use yii\helpers\ArrayHelper;
 
 /**
  * Class CalculationToCreateSearchTest
@@ -22,20 +22,26 @@ class CalculationToCreateSearchTest extends Unit {
 
 	public function _before(): void {
 		$this->tester->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures()),
-			IssueFixtureHelper::settlements()
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::stageAndTypesFixtures(),
+				IssueFixtureHelper::customer(true),
+				IssueFixtureHelper::issueUsers()
+			)
 		);
 		$this->model = $this->createModel();
 		parent::_before();
 	}
 
 	public function testEmpty(): void {
-		$provider = $this->search([]);
-		$ids = ArrayHelper::map($provider->getModels(), 'id', 'id');
-		$this->assertCount(3, $ids);
-		$this->assertArrayHasKey(3, $ids);
-		$this->assertArrayHasKey(4, $ids);
-		$this->assertArrayHasKey(5, $ids);
+		$models = $this->search()->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			/** @var Issue $model */
+			$stageType = $model->stageType;
+			$minCount = $stageType->min_calculation_count;
+			$this->tester->assertGreaterThan(0, $minCount);
+			$this->tester->assertLessThanOrEqual($minCount, count($model->payCalculations));
+		}
 	}
 
 	public function testIssueWithStageWithoutMinCountSettings(): void {
@@ -48,8 +54,19 @@ class CalculationToCreateSearchTest extends Unit {
 	}
 
 	public function testCustomerSearch(): void {
-		$this->assertTotalCount(2, ['customerLastname' => 'Way']);
-		$this->assertTotalCount(1, ['customerLastname' => 'Lar']);
+		$models = $this->search(['customerLastname' => 'Way'])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			/** @var Issue $model */
+			$this->tester->assertStringStartsWith('Way', $model->customer->profile->lastname);
+		}
+
+		$models = $this->search(['customerLastname' => 'Lar'])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			/** @var Issue $model */
+			$this->tester->assertStringStartsWith('Lar', $model->customer->profile->lastname);
+		}
 	}
 
 	protected function createModel(): SearchModel {

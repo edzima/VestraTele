@@ -7,24 +7,45 @@ use Yii;
 
 trait VATInfoTrait {
 
+	public function vatAttributeLabels(): array {
+		return [
+			'valueWithVAT' => Yii::t('settlement', 'Value with VAT'),
+			'valueWithoutVAT' => Yii::t('settlement', 'Value without VAT'),
+		];
+	}
+
 	public function getValueWithoutVAT(): Decimal {
-		return Yii::$app->tax->netto($this->getValueWithVAT(), $this->getVAT());
+		$vat = $this->getVAT();
+		if ($vat) {
+			return Yii::$app->tax->netto($this->getValueWithVAT(), $this->getVAT());
+		}
+		return $this->getValueWithVAT();
 	}
 
 	public function getValueWithVAT(): Decimal {
 		return new Decimal($this->{$this->valueWithVATAttribute()});
 	}
 
-	public function getVAT(): Decimal {
-		return new Decimal($this->{$this->vatAttribute()});
+	public function getVAT(): ?Decimal {
+		if ($this->hasVAT()) {
+			return new Decimal($this->{$this->vatAttribute()});
+		}
+		return null;
 	}
 
 	public function getValueVAT(): Decimal {
 		return $this->getValueWithVAT()->sub($this->getValueWithoutVAT());
 	}
 
-	public function getVATPercent(): string {
-		return Yii::$app->formatter->asPercent($this->{$this->vatAttribute()} / 100);
+	public function getVATPercent(): ?string {
+		if ($this->hasVAT()) {
+			return Yii::$app->formatter->asPercent($this->{$this->vatAttribute()} / 100);
+		}
+		return null;
+	}
+
+	public function hasVAT(): bool {
+		return $this->{$this->vatAttribute()} !== null;
 	}
 
 	protected function vatAttribute(): string {

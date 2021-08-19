@@ -41,17 +41,13 @@ class IssuePayCalculationGrid extends BaseIssuePayCalculationGrid {
 				'provision' => static function (string $url, IssuePayCalculation $model) {
 					return Yii::$app->user->can(User::PERMISSION_PROVISION)
 						? Html::a(Html::icon('usd'),
-							['/provision/settlement/set', 'id' => $model->id],
+							['/provision/settlement/view', 'id' => $model->id],
 							[
-								'title' => Yii::t('backend', 'Set provisions'),
-								'aria-label' => Yii::t('backend', 'Set provisions'),
+								'title' => Yii::t('provision', 'Provisions'),
+								'aria-label' => Yii::t('provision', 'Provisions'),
 							])
 						: '';
 				},
-			],
-
-			'contentOptions' => [
-				'class' => 'd-inline-flex width-100 justify-center',
 			],
 		];
 	}

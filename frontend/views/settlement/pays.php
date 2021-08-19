@@ -1,6 +1,6 @@
 <?php
 
-use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueSettlement;
 use common\models\settlement\PaysForm;
 use common\widgets\DateWidget;
 use common\widgets\settlement\SettlementDetailView;
@@ -10,7 +10,7 @@ use yii\bootstrap\ActiveForm;
 use yii\web\View;
 
 /* @var $this View */
-/* @var $calculation IssuePayCalculation */
+/* @var $calculation IssueSettlement */
 /* @var $model PaysForm */
 
 $this->title = Yii::t('backend', 'Generate pays for: {id}', ['id' => $calculation->getTypeName()]);
@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' =
 $this->params['breadcrumbs'][] = ['label' => $calculation->getIssueName(), 'url' => ['/issue/view', 'id' => $calculation->getIssueId()]];
 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $calculation->getTypeName(), 'url' => ['view', 'id' => $calculation->id]];
+$this->params['breadcrumbs'][] = ['label' => $calculation->getTypeName(), 'url' => ['view', 'id' => $calculation->getId()]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="settlement-calculation-pays">

@@ -9,14 +9,8 @@ use common\models\entityResponsible\EntityResponsible;
 
 class EntityResponsibleTest extends Unit {
 
-	protected function _before(): void {
-		parent::_before();
-		$this->tester->haveFixtures([
-			'entity' => [
-				'class' => EntityResponsibleFixture::class,
-				'dataFile' => IssueFixtureHelper::dataDir() . 'issue/entity_responsible.php',
-			],
-		]);
+	public function _fixtures(): array {
+		return IssueFixtureHelper::entityResponsible();
 	}
 
 	public function testDuplicateName(): void {

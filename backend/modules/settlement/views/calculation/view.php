@@ -53,7 +53,7 @@ YiiAsset::register($this);
 		?>
 
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) && $model->hasPays()
-			? Html::a(Yii::t('backend', 'Provisions'), ['/provision/settlement/set', 'id' => $model->id], ['class' => 'btn btn-success'])
+			? Html::a(Yii::t('backend', 'Provisions'), ['/provision/settlement/view', 'id' => $model->id], ['class' => 'btn btn-success'])
 			: ''
 		?>
 
@@ -86,19 +86,20 @@ YiiAsset::register($this);
 
 	<?= GridView::widget([
 		'dataProvider' => new ActiveDataProvider([
-			'query' => $model->getCosts(),
+			'query' => $model->getCosts()->joinWith('user.userProfile'),
 		]),
 		'summary' => '',
 		'showPageSummary' => true,
 		'caption' => Yii::t('settlement', 'Costs'),
 		'columns' => [
 			'typeName',
-			'vatPercent',
+			'user',
+			'vatPercent:text:' . Yii::t('settlement', 'VAT (%)'),
 			[
 				'class' => CurrencyColumn::class,
 				'attribute' => 'valueWithoutVAT',
 				'pageSummary' => true,
-				'pageSummaryFunc' => function (array $decimals): Decimal {
+				'pageSummaryFunc' => static function (array $decimals): Decimal {
 					$sum = new Decimal(0);
 					foreach ($decimals as $decimal) {
 						$sum = $sum->add($decimal);
@@ -110,7 +111,7 @@ YiiAsset::register($this);
 				'class' => CurrencyColumn::class,
 				'attribute' => 'valueWithVAT',
 				'pageSummary' => true,
-				'pageSummaryFunc' => function (array $decimals): Decimal {
+				'pageSummaryFunc' => static function (array $decimals): Decimal {
 					$sum = new Decimal(0);
 					foreach ($decimals as $decimal) {
 						$sum = $sum->add($decimal);

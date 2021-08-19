@@ -2,7 +2,9 @@
 
 namespace backend\tests;
 
+use common\fixtures\helpers\FixtureTester;
 use common\tests\_support\UserRbacActor;
+use Yii;
 
 /**
  * Inherited Methods
@@ -19,7 +21,7 @@ use common\tests\_support\UserRbacActor;
  *
  * @SuppressWarnings(PHPMD)
  */
-class FunctionalTester extends \Codeception\Actor {
+class FunctionalTester extends \Codeception\Actor implements FixtureTester {
 
 	use _generated\FunctionalTesterActions;
 	use UserRbacActor;
@@ -82,5 +84,11 @@ class FunctionalTester extends \Codeception\Actor {
 
 	public function dontSeeFlash(string $text, string $type): void {
 		$this->dontSee($text, '.alert.alert-' . $type);
+	}
+
+	public function getCSRF(): array {
+		return [
+			Yii::$app->request->csrfParam => Yii::$app->request->csrfToken,
+		];
 	}
 }

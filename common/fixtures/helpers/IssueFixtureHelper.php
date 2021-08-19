@@ -5,19 +5,16 @@ namespace common\fixtures\helpers;
 use common\fixtures\issue\EntityResponsibleFixture;
 use common\fixtures\issue\IssueFixture;
 use common\fixtures\issue\IssueUserFixture;
+use common\fixtures\issue\NoteFixture;
 use common\fixtures\issue\StageFixture;
 use common\fixtures\issue\StageTypesFixtures;
 use common\fixtures\issue\SummonFixture;
 use common\fixtures\issue\TypeFixture;
-use common\fixtures\settlement\CalculationCostFixture;
-use common\fixtures\settlement\CalculationFixture;
-use common\fixtures\settlement\CostFixture;
-use common\fixtures\settlement\PayFixture;
-use common\fixtures\settlement\PayReceivedFixture;
+use common\models\issue\Issue;
 use common\models\user\User;
 use Yii;
 
-class IssueFixtureHelper {
+class IssueFixtureHelper extends BaseFixtureHelper {
 
 	public const ISSUE_COUNT = 6;
 	public const ARCHIVED_ISSUE_COUNT = 1;
@@ -27,25 +24,38 @@ class IssueFixtureHelper {
 	public const LAWYER = 'lawyer';
 	public const TELEMARKETER = 'telemarketer';
 
-	public const CALCULATION = 'calculation';
-	public const PAY = 'pay';
 	public const ISSUE = 'issue';
-	public const PAY_RECEIVED = 'pay-received';
 
-	public const SUMMON = 'summon';
+	public const SUMMON = 'issue.summon';
 
-	public static function dataDir(): string {
-		return Yii::getAlias('@common/tests/_data/');
+	private const TYPE = 'issue.type';
+	private const STAGE = 'issue.stage';
+	private const NOTE = 'issue.note';
+
+	public function grabIssue($index): Issue {
+		return $this->tester->grabFixture(static::ISSUE, $index);
+	}
+
+	public static function dataDir(string $path = null): string {
+		return $path ? $path : Yii::getAlias('@common/tests/_data/');
+	}
+
+	protected static function getDefaultDataDirPath(): string {
+		return Yii::getAlias('@common/tests/_data/issue/');
+	}
+
+	public static function issue($dataDirPath = null): array {
+		return [
+			static::ISSUE => [
+				'class' => IssueFixture::class,
+				'dataFile' => static::getDataDirPath($dataDirPath) . 'issue.php',
+			],
+		];
 	}
 
 	public static function fixtures(): array {
 		return array_merge(
-			[
-				static::ISSUE => [
-					'class' => IssueFixture::class,
-					'dataFile' => static::dataDir() . 'issue/issue.php',
-				],
-			],
+			static::issue(),
 			static::entityResponsible(),
 			static::stageAndTypesFixtures(),
 			static::users(),
@@ -61,19 +71,71 @@ class IssueFixtureHelper {
 		];
 	}
 
-	public static function stageAndTypesFixtures(): array {
+	public static function note(): array {
 		return [
-			'stage' => [
-				'class' => StageFixture::class,
-				'dataFile' => static::dataDir() . 'issue/stage.php',
+			static::NOTE => [
+				'class' => NoteFixture::class,
+				'dataFile' => static::getDataDirPath() . 'note.php',
+
 			],
-			'type' => [
-				'class' => TypeFixture::class,
-				'dataFile' => static::dataDir() . 'issue/type.php',
-			],
+		];
+	}
+
+	public static function stageAndTypesFixtures(): array {
+		return array_merge([
 			'stage-types' => [
 				'class' => StageTypesFixtures::class,
 				'dataFile' => static::dataDir() . 'issue/stage_types.php',
+			],
+		],
+			static::stages(),
+			static::types()
+		);
+	}
+
+	public static function stages(): array {
+		return [
+			static::STAGE => [
+				'class' => StageFixture::class,
+				'dataFile' => static::dataDir() . 'issue/stage.php',
+			],
+		];
+	}
+
+	public static function types(): array {
+		return [
+			static::TYPE => [
+				'class' => TypeFixture::class,
+				'dataFile' => static::dataDir() . 'issue/type.php',
+			],
+		];
+	}
+
+	public static function agent(bool $withProfile = false): array {
+		return array_merge(
+			[
+				static::AGENT => UserFixtureHelper::agent(),
+			],
+			static::issueUsers(),
+			$withProfile ? [static::AGENT . '.profile' => UserFixtureHelper::profile(UserFixtureHelper::WORKER_AGENT)] : []
+		);
+	}
+
+	public static function customer(bool $withProfile = false): array {
+		$fixtures = [];
+		$fixtures[static::CUSTOMER] = UserFixtureHelper::customer();
+		if ($withProfile) {
+			$fixtures['customer-profile'] = UserFixtureHelper::profile(UserFixtureHelper::CUSTOMER);
+		}
+		$fixtures = array_merge($fixtures, static::issueUsers());
+		return $fixtures;
+	}
+
+	public static function issueUsers(): array {
+		return [
+			'issue-user' => [
+				'class' => IssueUserFixture::class,
+				'dataFile' => static::dataDir() . 'issue/users.php',
 			],
 		];
 	}
@@ -89,45 +151,9 @@ class IssueFixtureHelper {
 			UserFixtureHelper::addPermission($user, User::PERMISSION_ISSUE);
 		}
 		$users['customer-profile'] = UserFixtureHelper::profile(UserFixtureHelper::CUSTOMER);
-		$users['users'] = [
-			'class' => IssueUserFixture::class,
-			'dataFile' => static::dataDir() . 'issue/users.php',
-		];
+		$users = array_merge($users, static::issueUsers());
 
 		return $users;
-	}
-
-	public static function settlements(bool $withCost = false): array {
-		$fixtures = [
-			static::CALCULATION => [
-				'class' => CalculationFixture::class,
-				'dataFile' => static::dataDir() . 'settlement/calculation.php',
-			],
-			static::PAY => [
-				'class' => PayFixture::class,
-				'dataFile' => static::dataDir() . 'settlement/pay.php',
-			],
-		];
-		if ($withCost) {
-			$fixtures['cost'] = [
-				'class' => CostFixture::class,
-				'dataFile' => static::dataDir() . 'settlement/cost.php',
-			];
-			$fixtures['calculation-cost'] = [
-				'class' => CalculationCostFixture::class,
-				'dataFile' => static::dataDir() . 'settlement/calculation-cost.php',
-			];
-		}
-		return $fixtures;
-	}
-
-	public static function payReceived(): array {
-		return [
-			static::PAY_RECEIVED => [
-				'class' => PayReceivedFixture::class,
-				'dataFile' => static::dataDir() . 'settlement/pay-received.php',
-			],
-		];
 	}
 
 	public static function summon(): array {

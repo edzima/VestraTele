@@ -3,32 +3,42 @@
 namespace backend\tests\unit\provision;
 
 use backend\modules\provision\models\ProvisionTypeForm;
-use backend\tests\fixtures\ProvisionFixtureHelper;
 use backend\tests\unit\Unit;
+use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\ProvisionFixtureHelper;
 use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueUser;
+use common\models\provision\IssueProvisionType;
 use common\models\provision\ProvisionType;
+use common\tests\_support\UnitModelTrait;
+use yii\base\Model;
 
 class ProvisionTypeFormTest extends Unit {
 
+	use UnitModelTrait;
+
 	protected const DEFAULT_NAME = 'some_name';
 	protected const DEFAULT_VALUE = 25;
+	protected const DEFAULT_ISSUE_USER_TYPE = IssueUser::TYPE_AGENT;
+
+	private ProvisionTypeForm $model;
 
 	public function _before(): void {
 		parent::_before();
-		$this->tester->haveFixtures(ProvisionFixtureHelper::typesFixtures());
+		$this->tester->haveFixtures(ProvisionFixtureHelper::issueType());
+		$this->giveModel();
 	}
 
 	public function testEmpty(): void {
-		$model = new ProvisionTypeForm();
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Name cannot be blank.', $model->getFirstError('name'));
-		$this->tester->assertSame('Provision value cannot be blank.', $model->getFirstError('value'));
+		$this->model = new ProvisionTypeForm();
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Name cannot be blank.', 'name');
+		$this->thenSeeError('Value cannot be blank.', 'value');
 	}
 
 	public function testPercentage(): void {
-		$model = $this->createModel(true);
-		$model->save();
-		$this->tester->assertTrue($model->save());
+		$this->giveModel(true);
+		$this->thenSuccessSave();
 		$this->tester->seeRecord(ProvisionType::class, [
 			'name' => static::DEFAULT_NAME,
 			'value' => static::DEFAULT_VALUE,
@@ -37,35 +47,35 @@ class ProvisionTypeFormTest extends Unit {
 	}
 
 	public function testPercentageGreaterThanHundred(): void {
-		$model = $this->createModel(true, ['value' => 101]);
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Provision value must be no greater than 100.', $model->getFirstError('value'));
+		$this->giveModel(true, ['value' => 101]);
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Value must be no greater than 100.', 'value');
 	}
 
 	public function testPercentageAsHundred(): void {
-		$model = $this->createModel(true, ['value' => 100]);
-		$this->tester->assertTrue($model->save());
+		$this->giveModel(true, ['value' => 100]);
+		$this->thenSuccessSave();
 	}
 
 	public function testPercentageAsZero(): void {
-		$model = $this->createModel(true, ['value' => 0]);
-		$this->tester->assertTrue($model->save());
+		$this->giveModel(true, ['value' => 0]);
+		$this->thenSuccessSave();
 	}
 
 	public function testPercentageAsNegative(): void {
-		$model = $this->createModel(true, ['value' => -1]);
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Provision value must be no less than 0.', $model->getFirstError('value'));
+		$this->giveModel(true, ['value' => -1]);
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Value must be no less than 0.', 'value');
 	}
 
 	public function testRandomPercentage(): void {
-		$model = $this->createModel(true, ['value' => random_int(0, 100)]);
-		$this->tester->assertTrue($model->save());
+		$this->giveModel(true, ['value' => random_int(0, 100)]);
+		$this->thenSuccessSave();
 	}
 
 	public function testNotPercentage(): void {
-		$model = $this->createModel(false);
-		$this->tester->assertTrue($model->save());
+		$this->giveModel(false);
+		$this->thenSuccessSave();
 		$this->tester->seeRecord(ProvisionType::class, [
 			'name' => static::DEFAULT_NAME,
 			'value' => static::DEFAULT_VALUE,
@@ -74,70 +84,98 @@ class ProvisionTypeFormTest extends Unit {
 	}
 
 	public function testNotPercentageAsNegative(): void {
-		$model = $this->createModel(false, ['value' => -1]);
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Provision value must be no less than 0.', $model->getFirstError('value'));
+		$this->giveModel(false, ['value' => -1]);
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Value must be no less than 0.', 'value');
 	}
 
 	public function testNotPercentageAsGreatherThan100(): void {
-		$model = $this->createModel(false, ['value' => random_int(100, 10000)]);
-		$this->tester->assertTrue($model->save());
+		$this->giveModel(false, ['value' => random_int(100, 10000)]);
+		$this->thenSuccessSave();
 	}
 
-	public function testNotPercentageAsGreatherThan1000(): void {
-		$model = $this->createModel(false, ['value' => 10001]);
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Provision value must be no greater than 10000.', $model->getFirstError('value'));
-	}
-
-	public function testOneRole(): void {
-		$model = $this->createModel();
-		$model->roles = ['lawyer'];
-		$this->tester->assertTrue($model->save());
+	public function testIssueRequiredUserTypesAsNull(): void {
+		$model = $this->model;
+		$model->issueRequiredUserTypes = null;
+		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertInstanceOf(ProvisionType::class, $type);
-		$this->tester->assertContains('lawyer', $type->getRoles());
+		$this->tester->assertEmpty($type->getIssueRequiredUserTypes());
 	}
 
-	public function testFewRoles(): void {
-		$model = $this->createModel();
-		$model->roles = ['lawyer', 'agent'];
-		$this->tester->assertTrue($model->save());
+	public function testIssueRequiredUserTypesAsEmptyArray(): void {
+		$model = $this->model;
+		$model->issueRequiredUserTypes = [];
+		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertInstanceOf(ProvisionType::class, $type);
-		$this->tester->assertContains('lawyer', $type->getRoles());
-		$this->tester->assertContains('agent', $type->getRoles());
+		$this->tester->assertEmpty($type->getIssueRequiredUserTypes());
 	}
 
-	public function testEmptyRoles(): void {
-		$model = $this->createModel();
-		$model->roles = [];
-		$this->tester->assertTrue($model->save());
+	public function testNotExistedIssueRequiredUserTypes(): void {
+		$model = $this->model;
+		$model->issueRequiredUserTypes = ['not-existed-type'];
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Required issue user types is invalid.', 'issueRequiredUserTypes');
+	}
+
+	public function testValidIssueRequiredUserType(): void {
+		$model = $this->model;
+		$model->issueRequiredUserTypes = [IssueUser::TYPE_LAWYER];
+		$this->thenSuccessSave();
 		$type = $this->grabModel();
-		$this->tester->assertNotNull($type);
-		$this->tester->assertEmpty($type->getRoles());
+		$this->tester->assertInstanceOf(ProvisionType::class, $type);
+		$this->tester->assertContains(IssueUser::TYPE_LAWYER, $type->getIssueRequiredUserTypes());
 	}
 
-	public function testNotExistedRole(): void {
-		$model = $this->createModel();
-		$model->roles = ['not-existed-roles'];
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Roles is invalid.', $model->getFirstError('roles'));
+	public function testValidIssueRequiredUserTypes(): void {
+		$model = $this->model;
+		$model->issueRequiredUserTypes = [IssueUser::TYPE_LAWYER, IssueUser::TYPE_AGENT];
+		$this->thenSuccessSave();
+		$type = $this->grabModel();
+		$this->tester->assertInstanceOf(ProvisionType::class, $type);
+		$this->tester->assertContains(IssueUser::TYPE_LAWYER, $type->getIssueRequiredUserTypes());
+		$this->tester->assertContains(IssueUser::TYPE_AGENT, $type->getIssueRequiredUserTypes());
+	}
+
+	public function testIssueUserType(): void {
+		$model = $this->model;
+		$model->issueUserType = IssueUser::TYPE_LAWYER;
+		$this->thenSuccessSave();
+		$type = $this->grabModel();
+		$this->tester->assertInstanceOf(ProvisionType::class, $type);
+		$this->tester->assertTrue($type->isForIssueUser(IssueUser::TYPE_LAWYER));
+	}
+
+	public function testEmptyIssueUserType(): void {
+		$model = $this->model;
+		$model->issueUserType = null;
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('For whom cannot be blank.', 'issueUserType');
+	}
+
+	public function testNotExistedIssueUserType(): void {
+		$model = $this->model;
+		$model->issueUserType = 'not-existed-type';
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('For whom is invalid.', 'issueUserType');
 	}
 
 	public function testEmptyIssueTypes(): void {
-		$model = $this->createModel();
+		$model = $this->model;
 		$model->issueTypesIds = [];
-		$this->tester->assertTrue($model->save());
+		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertNotNull($type);
 		$this->tester->assertEmpty($type->getIssueTypesIds());
 	}
 
 	public function testSingleIssueType(): void {
-		$model = $this->createModel();
+		$this->tester->haveFixtures(IssueFixtureHelper::types());
+		$this->giveModel();
+		$model = $this->model;
 		$model->issueTypesIds = [1];
-		$this->tester->assertTrue($model->save());
+		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertNotNull($type);
 
@@ -145,9 +183,12 @@ class ProvisionTypeFormTest extends Unit {
 	}
 
 	public function testFewIssueTypes(): void {
-		$model = $this->createModel();
+		$this->tester->haveFixtures(IssueFixtureHelper::types());
+		$this->giveModel();
+		$model = $this->model;
 		$model->issueTypesIds = [1, 2, 3];
-		$this->tester->assertTrue($model->save());
+
+		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertNotNull($type);
 		$this->tester->assertContains(1, $type->getIssueTypesIds());
@@ -156,48 +197,63 @@ class ProvisionTypeFormTest extends Unit {
 	}
 
 	public function testNotExistedIssueTypes(): void {
-		$model = $this->createModel();
+		$model = $this->model;
 		$model->issueTypesIds = [10];
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Issue Types is invalid.', $model->getFirstError('issueTypesIds'));
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Issue Types is invalid.', 'issueTypesIds');
 	}
 
 	public function testEmptyCalculationTypes(): void {
-		$model = $this->createModel();
-		$model->calculationTypes = [];
-		$this->tester->assertTrue($model->save());
+		$model = $this->model;
+		$model->settlementTypes = [];
+		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertNotNull($type);
-		$this->tester->assertEmpty($type->getCalculationTypes());
+		$this->tester->assertEmpty($type->getSettlementTypes());
 	}
 
 	public function testSingleCalculationType(): void {
-		$model = $this->createModel();
-		$model->calculationTypes = [IssuePayCalculation::TYPE_ADMINISTRATIVE];
-		$this->tester->assertTrue($model->save());
+		$model = $this->model;
+		$model->settlementTypes = [IssuePayCalculation::TYPE_ADMINISTRATIVE];
+		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertNotNull($type);
-		$this->tester->assertContains(IssuePayCalculation::TYPE_ADMINISTRATIVE, $type->getCalculationTypes());
+		$this->tester->assertContains(IssuePayCalculation::TYPE_ADMINISTRATIVE, $type->getSettlementTypes());
 	}
 
 	public function testFewCalculationTypes(): void {
-		$model = $this->createModel();
-		$model->calculationTypes = [IssuePayCalculation::TYPE_ADMINISTRATIVE, IssuePayCalculation::TYPE_LAWYER];
-		$this->tester->assertTrue($model->save());
+		$model = $this->model;
+		$model->settlementTypes = [IssuePayCalculation::TYPE_ADMINISTRATIVE, IssuePayCalculation::TYPE_LAWYER];
+		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertNotNull($type);
-		$this->tester->assertContains(IssuePayCalculation::TYPE_ADMINISTRATIVE, $type->getCalculationTypes());
-		$this->tester->assertContains(IssuePayCalculation::TYPE_LAWYER, $type->getCalculationTypes());
+		$this->tester->assertContains(IssuePayCalculation::TYPE_ADMINISTRATIVE, $type->getSettlementTypes());
+		$this->tester->assertContains(IssuePayCalculation::TYPE_LAWYER, $type->getSettlementTypes());
 	}
 
-	public function testNotExistedCalculationType(): void {
-		$model = $this->createModel();
-		$model->calculationTypes = ['not-existed-calculation-type'];
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Calculation Types is invalid.', $model->getFirstError('calculationTypes'));
+	public function testNotExistedSettlementType(): void {
+		$this->model->settlementTypes = ['not-existed-calculation-type'];
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Settlement type is invalid.', 'settlementTypes');
 	}
 
-	protected function createModel(bool $isPercentage = true, array $config = []): ProvisionTypeForm {
+	public function testWithHierarchy(): void {
+		$model = $this->model;
+		$model->with_hierarchy = true;
+		$this->thenSuccessSave();
+		$type = $this->grabModel();
+		$this->tester->assertTrue($type->getWithHierarchy());
+	}
+
+	public function testWithoutHierarchy(): void {
+		$model = $this->model;
+		$model->with_hierarchy = false;
+		$this->thenSuccessSave();
+		$type = $this->grabModel();
+		$this->tester->assertFalse($type->getWithHierarchy());
+	}
+
+	protected function giveModel(bool $isPercentage = true, array $config = []): void {
 		$config['is_percentage'] = $isPercentage;
 		if (!isset($config['name'])) {
 			$config['name'] = static::DEFAULT_NAME;
@@ -205,17 +261,23 @@ class ProvisionTypeFormTest extends Unit {
 		if (!isset($config['value'])) {
 			$config['value'] = static::DEFAULT_VALUE;
 		}
-		return new ProvisionTypeForm($config);
+		if (!isset($config['issueUserType'])) {
+			$config['issueUserType'] = static::DEFAULT_ISSUE_USER_TYPE;
+		}
+		$this->model = new ProvisionTypeForm($config);
 	}
 
-	protected function grabModel(array $attributes = []): ?ProvisionType {
+	protected function grabModel(array $attributes = []): ?IssueProvisionType {
 		if (!isset($attributes['name'])) {
 			$attributes['name'] = static::DEFAULT_NAME;
 		}
 		if (!isset($attributes['value'])) {
 			$attributes['value'] = static::DEFAULT_VALUE;
 		}
-		return $this->tester->grabRecord(ProvisionType::class, $attributes);
+		return $this->tester->grabRecord(IssueProvisionType::class, $attributes);
 	}
 
+	public function getModel(): Model {
+		return $this->model;
+	}
 }

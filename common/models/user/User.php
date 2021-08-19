@@ -3,7 +3,12 @@
 namespace common\models\user;
 
 use common\models\Address;
+use common\models\hierarchy\Hierarchy;
+use common\models\issue\IssueCost;
 use common\models\issue\IssueUser;
+use common\models\provision\Provision;
+use common\models\issue\query\IssueCostQuery;
+use common\models\provision\ProvisionQuery;
 use common\models\user\query\UserQuery;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -22,7 +27,7 @@ use yii\web\IdentityInterface;
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $verification_token
- * @property string $email
+ * @property string|null $email
  * @property integer $status
  * @property string $ip
  * @property integer $created_at
@@ -37,9 +42,10 @@ use yii\web\IdentityInterface;
  * @property-read Address|null $postalAddress
  * @property-read IssueUser[] $issueUsers
  * @property-read UserTrait[] $traits
+ * @property-read IssueCost[] $costs
  *
  */
-class User extends ActiveRecord implements IdentityInterface {
+class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 
 	public const STATUS_INACTIVE = 0;
 	public const STATUS_ACTIVE = 1;
@@ -61,6 +67,7 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const ROLE_LAWYER = 'lawyer';
 
 	public const PERMISSION_ARCHIVE = 'archive';
+	public const PERMISSION_EMAIL_TEMPLATE = 'email.template';
 	public const PERMISSION_EXPORT = 'export';
 	public const PERMISSION_ISSUE = 'issue';
 	public const PERMISSION_HINT = 'hint';
@@ -156,10 +163,52 @@ class User extends ActiveRecord implements IdentityInterface {
 		];
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getUserProfile() {
+	public function hasParent(): bool {
+		return $this->getParentId() !== null;
+	}
+
+	public function getParentId(): ?int {
+		return $this->boss;
+	}
+
+	public function getParentsIds(): array {
+		if (!$this->hasParent()) {
+			return [];
+		}
+		return Yii::$app->userHierarchy->getParentsIds($this->id);
+	}
+
+	public function getChildesIds(): array {
+		return Yii::$app->userHierarchy->getChildesIds($this->id);
+	}
+
+	public function getAllChildesQuery(): UserQuery {
+		return static::find()->where(['id' => $this->getAllChildesIds()]);
+	}
+
+	public function getAllParentsQuery(): ?UserQuery {
+		if ($this->hasParent()) {
+			return static::find()->where(['id' => $this->getParentsIds()]);
+		}
+		return null;
+	}
+
+	public function getAllChildesIds(): array {
+		return Yii::$app
+			->userHierarchy->getAllChildesIds($this->id);
+	}
+
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getIssueCosts(): IssueCostQuery {
+		return $this->hasMany(IssueCost::class, ['user_id' => 'id']);
+	}
+
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getProvisions(): ProvisionQuery {
+		return $this->hasMany(Provision::class, ['to_user_id' => 'id']);
+	}
+
+	public function getUserProfile(): ActiveQuery {
 		return $this->hasOne(UserProfile::class, ['user_id' => 'id']);
 	}
 

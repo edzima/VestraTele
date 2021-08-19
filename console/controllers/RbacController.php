@@ -24,6 +24,7 @@ class RbacController extends Controller {
 
 	public array $roles = [
 		Worker::ROLE_AGENT,
+		Worker::ROLE_CO_AGENT,
 		Worker::ROLE_BOOKKEEPER,
 		Worker::ROLE_CUSTOMER_SERVICE,
 		Worker::ROLE_LAWYER,
@@ -37,6 +38,9 @@ class RbacController extends Controller {
 	public array $permissions = [
 		User::PERMISSION_ARCHIVE,
 		Worker::PERMISSION_COST => [
+			Worker::ROLE_BOOKKEEPER,
+		],
+		Worker::PERMISSION_COST_DEBT => [
 			Worker::ROLE_BOOKKEEPER,
 		],
 		Worker::PERMISSION_CALCULATION_TO_CREATE => [
@@ -73,6 +77,9 @@ class RbacController extends Controller {
 		],
 		Worker::PERMISSION_WORKERS,
 		Worker::PERMISSION_LEAD,
+		Worker::PERMISSION_EMAIL_TEMPLATE,
+		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
+
 	];
 
 	public function actionInit(): void {

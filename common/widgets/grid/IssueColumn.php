@@ -10,7 +10,6 @@ class IssueColumn extends DataColumn {
 
 	public $noWrap = true;
 
-	public ?string $issueAttribute = 'issue';
 	public $attribute = 'issue_id';
 
 	public array $linkOptions = [
@@ -32,15 +31,14 @@ class IssueColumn extends DataColumn {
 					$this->linkOptions);
 			};
 		}
+		if (empty($this->value)) {
+			$this->value = static function (IssueInterface $model): string {
+				return $model->getIssueName();
+			};
+		}
+
 		$this->options['style'] = 'width:100px';
 		parent::init();
 	}
 
-	public function getLinkText(IssueInterface $model): string {
-		return $model->getIssueName();
-	}
-
-	public function getId(IssueInterface $model): int {
-		return $model->getIssueId();
-	}
 }

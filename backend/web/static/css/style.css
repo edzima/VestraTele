@@ -130,10 +130,18 @@ div.required label:after {
 	display: inline-flex;
 }
 
-.justify-center{
+.justify-center {
 	justify-content: center;
 }
 
 .width-100 {
 	width: 100% !important;
+}
+
+
+@media (min-width: 992px) {
+	.provision-settlement-view .users-grid-wrapper {
+		display: flex;
+		flex-wrap: wrap;
+	}
 }

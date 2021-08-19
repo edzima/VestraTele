@@ -18,7 +18,7 @@ trait UnitSearchModelTrait {
 
 	abstract protected function createModel(): SearchModel;
 
-	protected function search(array $params, string $formName = null): DataProviderInterface {
+	protected function search(array $params = [], string $formName = null): DataProviderInterface {
 		if ($formName === null) {
 			$formName = $this->model->formName();
 		}
@@ -26,6 +26,11 @@ trait UnitSearchModelTrait {
 		return $this->model->search($params);
 	}
 
+	/**
+	 * @param int $count
+	 * @param array $params
+	 * @deprecated
+	 */
 	protected function assertTotalCount(int $count, array $params = []): void {
 		$this->tester->assertSame($count, $this->search($params)->getTotalCount());
 	}

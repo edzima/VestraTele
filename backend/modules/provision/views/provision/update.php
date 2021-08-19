@@ -1,15 +1,13 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
-use backend\helpers\Url;
-use backend\modules\provision\models\ProvisionForm;
-use common\widgets\settlement\SettlementDetailView;
-use yii\helpers\Html;
+use backend\modules\provision\models\ProvisionUpdateForm;
+use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model ProvisionForm */
+/* @var $model ProvisionUpdateForm */
 
-$this->title = Yii::t('provision', 'Update provision: #{id}', ['id' => $model->getId()]);
+$this->title = Yii::t('provision', 'Update provision: #{id}', ['id' => $model->getModel()->id]);
 $this->params['breadcrumbs'] = array_merge(
 	Breadcrumbs::issue($model->getModel()->pay->calculation),
 	Breadcrumbs::settlement($model->getModel()->pay->calculation)
@@ -19,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="provision-update">
 
 
-	<?= \yii\widgets\DetailView::widget([
+	<?= DetailView::widget([
 		'model' => $model->getModel(),
 		'attributes' => [
 			'toUser',
@@ -29,7 +27,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'format' => 'currency',
 			],
 			[
-				'attribute' => 'pay.value',
+				'attribute' => 'pay.valueWithVAT',
+				'format' => 'currency',
+			],
+			[
+				'attribute' => 'pay.valueWithoutVAT',
 				'format' => 'currency',
 			],
 		],

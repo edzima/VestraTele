@@ -7,7 +7,6 @@ use common\models\issue\Issue;
 use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
-use common\models\user\Customer;
 use common\models\user\User;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -38,7 +37,7 @@ class IssueForm extends Model {
 
 	public const STAGE_ARCHIVED_ID = IssueStage::ARCHIVES_ID;
 
-	private Customer $customer;
+	private User $customer;
 
 	private ?Issue $model = null;
 
@@ -104,11 +103,11 @@ class IssueForm extends Model {
 		]);
 	}
 
-	protected function setCustomer(Customer $customer): void {
+	protected function setCustomer(User $customer): void {
 		$this->customer = $customer;
 	}
 
-	public function getCustomer(): Customer {
+	public function getCustomer(): User {
 		return $this->customer;
 	}
 
@@ -121,7 +120,7 @@ class IssueForm extends Model {
 		$this->agent_id = $model->agent->id;
 		$this->lawyer_id = $model->lawyer->id;
 		$this->tele_id = $model->tele->id ?? null;
-		$this->customer = Customer::fromUser($model->customer);
+		$this->customer = $model->customer;
 		$this->entity_responsible_id = $model->entity_responsible_id;
 		$this->details = $model->details;
 		$this->signing_at = $model->signing_at;

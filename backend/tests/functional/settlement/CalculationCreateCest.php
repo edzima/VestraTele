@@ -2,8 +2,11 @@
 
 namespace backend\tests\functional\settlement;
 
+use backend\modules\settlement\controllers\CalculationController;
 use backend\tests\Step\Functional\CreateCalculationIssueManager;
+use common\fixtures\helpers\EmailTemplateFixtureHelper;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
@@ -11,12 +14,17 @@ use common\models\user\User;
 
 class CalculationCreateCest {
 
+	/** @see CalculationController::actionCreate() */
 	public const ROUTE = '/settlement/calculation/create';
 
 	public function _before(CreateCalculationIssueManager $I): void {
 		$I->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements(),
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::users(),
+			IssueFixtureHelper::stageAndTypesFixtures(),
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::pay(),
+			EmailTemplateFixtureHelper::fixture(),
 		));
 		$I->amLoggedIn();
 	}
@@ -45,19 +53,49 @@ class CalculationCreateCest {
 	}
 
 	public function checkValid(CreateCalculationIssueManager $I): void {
-		$I->amOnPage([static::ROUTE, 'id' => 1]);
+		$I->amOnPage([static::ROUTE, 'id' => 3]);
 		$I->dontSee('Problem status');
 		$I->fillField('Value with VAT', 123);
 		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
 		$I->click('Save');
 		$I->seeLink('Update');
 		$model = $I->grabRecord(IssuePayCalculation::class, [
-			'issue_id' => 1,
+			'issue_id' => 3,
 			'value' => 123,
 		]);
 		$I->seeRecord(IssuePay::class, [
 			'calculation_id' => $model->id,
 			'value' => 123,
 		]);
+		$I->seeEmailIsSent(2);
 	}
+
+	public function checkCreateWithoutSendEmailToWorker(CreateCalculationIssueManager $I): void {
+		$I->amOnPage([static::ROUTE, 'id' => 3]);
+		$I->fillField('Value with VAT', 123);
+		$I->uncheckOption('Send Email to Workers');
+		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
+		$I->click('Save');
+		$I->seeEmailIsSent(1);
+	}
+
+	public function checkCreateWithoutSendEmailToCustomer(CreateCalculationIssueManager $I): void {
+		$I->amOnPage([static::ROUTE, 'id' => 3]);
+		$I->fillField('Value with VAT', 123);
+		$I->uncheckOption('Send Email to Customer');
+		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
+		$I->click('Save');
+		$I->seeEmailIsSent(1);
+	}
+
+	public function checkCreateWithoutSendEmails(CreateCalculationIssueManager $I): void {
+		$I->amOnPage([static::ROUTE, 'id' => 1]);
+		$I->fillField('Value with VAT', 123);
+		$I->uncheckOption('Send Email to Customer');
+		$I->uncheckOption('Send Email to Workers');
+		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
+		$I->click('Save');
+		$I->dontSeeEmailIsSent();
+	}
+
 }

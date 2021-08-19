@@ -3,6 +3,8 @@
 namespace common\tests\unit\settlement\search;
 
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\ProvisionFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueStage;
 use common\models\SearchModel;
@@ -21,17 +23,30 @@ class IssuePayCalculationSearchTest extends Unit {
 	use UnitSearchModelTrait;
 
 	public function _before(): void {
-		$this->model = $this->createModel();
-		$this->tester->haveFixtures(
-			array_merge(
-				IssueFixtureHelper::fixtures(),
-				IssueFixtureHelper::settlements(),
-			));
 		parent::_before();
+		$this->tester->haveFixtures($this->fixtures());
+		$this->model = $this->createModel();
+	}
+
+	/** @todo add Provisions */
+	public function fixtures(): array {
+		return array_merge(
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::agent(),
+			IssueFixtureHelper::customer(true),
+			IssueFixtureHelper::issueUsers(),
+			IssueFixtureHelper::stageAndTypesFixtures(),
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::pay(),
+			SettlementFixtureHelper::owner(),
+			ProvisionFixtureHelper::provision(),
+		);
 	}
 
 	public function testEmpty(): void {
 		$this->assertTotalCount(5);
+		$this->model->withArchive = true;
+		$this->assertTotalCount(6);
 	}
 
 	public function testType(): void {
@@ -45,7 +60,8 @@ class IssuePayCalculationSearchTest extends Unit {
 
 	public function testWithoutProvisions(): void {
 		$this->model->withoutProvisions = true;
-		$this->assertTotalCount(4);
+		$this->assertTotalCount(3);
+		$this->assertTotalCount(3);
 	}
 
 	public function testProblemStatus(): void {
@@ -77,7 +93,7 @@ class IssuePayCalculationSearchTest extends Unit {
 
 	public function testGetStagesNames(): void {
 		$names = IssuePayCalculationSearch::getStagesNames();
-		$countAllStages = (int) IssueStage::find()->count();
+		$countAllStages = count(IssueStage::getStagesNames());
 		$this->assertNotSame(count($names), $countAllStages);
 		$this->assertCount(2, $names);
 		$this->assertArrayHasKey(1, $names);
@@ -86,25 +102,16 @@ class IssuePayCalculationSearchTest extends Unit {
 
 	public function testCustomer(): void {
 		$this->model->customerLastname = 'Lar';
-		$models = $this->search([])->getModels();
-		foreach ($models as $model){
-			codecept_debug($model->issue->customer->fullName);
-		}
 		$this->assertTotalCount(2);
-
 	}
 
 	public function testOwner(): void {
-		$this->model->owner_id = 300;
+		$this->model->owner_id = SettlementFixtureHelper::OWNER_JOHN;
 		$this->assertTotalCount(3);
-		$this->model->owner_id = 301;
-		$this->assertTotalCount(1);
+		$this->model->owner_id = SettlementFixtureHelper::OWNER_NICOLE;
+		$this->assertTotalCount(2);
 		$this->model->owner_id = 100000000;
 		$this->assertTotalCount(0);
-	}
-
-	public function testEmptyIssueUsers(): void {
-
 	}
 
 	public function testNotExistedIssueUser(): void {

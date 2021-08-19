@@ -5,6 +5,9 @@ namespace backend\tests\unit\issue\search;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
+use common\models\issue\Issue;
+use common\models\settlement\PayedInterface;
 use common\tests\_support\UnitSearchModelTrait;
 
 class IssueSearchTest extends Unit {
@@ -89,9 +92,19 @@ class IssueSearchTest extends Unit {
 		$this->tester->haveFixtures(
 			array_merge(
 				IssueFixtureHelper::fixtures(),
-				IssueFixtureHelper::settlements()
+				SettlementFixtureHelper::settlement(),
+				SettlementFixtureHelper::pay(),
 			)
 		);
-		$this->assertTotalCount(2, ['onlyWithPayedPay' => true]);
+		$models = $this->search(['onlyWithPayedPay' => true])->getModels();
+		$this->tester->assertNotEmpty($models);
+
+		foreach ($models as $model) {
+			/** @var Issue $model */
+			$payed = array_filter($model->pays, function (PayedInterface $pay) {
+				return $pay->isPayed();
+			});
+			$this->tester->assertNotEmpty($payed);
+		}
 	}
 }

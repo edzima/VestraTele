@@ -34,6 +34,7 @@ use yii\web\View;
 
 	</div>
 
+
 	<div class="row">
 		<?= $model->getModel()->isNewRecord || $model->getModel()->getPaysCount() < 2
 			? $form->field($model, 'payment_at', ['options' => ['class' => 'col-md-3 col-lg-2']])
@@ -45,17 +46,25 @@ use yii\web\View;
 	</div>
 
 	<div class="row">
-		<?=  $form->field($model, 'costs_ids', ['options' => ['class' => 'col-md-6 col-lg-4']])
-				->widget(Select2::class, [
-						'data' => $model->getCostsData(),
-						'options' => [
-							'multiple' => true,
-							'placeholder' => $model->getAttributeLabel('costs_ids'),
-						],
-					]
-				)
-			 ?>
+		<?= $form->field($model, 'costs_ids', ['options' => ['class' => 'col-md-6 col-lg-4']])
+			->widget(Select2::class, [
+					'data' => $model->getCostsData(),
+					'options' => [
+						'multiple' => true,
+						'placeholder' => $model->getAttributeLabel('costs_ids'),
+					],
+				]
+			)
+		?>
 	</div>
+
+	<?php if ($model->getModel()->isNewRecord): ?>
+		<div class="row">
+			<?= $form->field($model, 'sendEmailToCustomer', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
+
+			<?= $form->field($model, 'sendEmailToWorkers', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
+		</div>
+	<?php endif; ?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Save'), ['id' => 'save-btn', 'class' => 'btn btn-success']) ?>

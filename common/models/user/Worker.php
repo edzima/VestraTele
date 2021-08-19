@@ -4,7 +4,6 @@ namespace common\models\user;
 
 use common\models\hierarchy\ActiveHierarchy;
 use common\models\user\query\UserQuery;
-use Yii;
 use yii\db\ActiveQuery;
 
 /**
@@ -27,11 +26,10 @@ class Worker extends User implements ActiveHierarchy {
 		self::ROLE_MANAGER,
 	];
 
-	private static $USER_NAMES = [];
+	public const PERMISSION_COST_DEBT = 'cost.debt';
+	public const PERMISSION_PROVISION_CHILDREN_VISIBLE = 'provision.children.visible';
 
-	public function hasParent(): bool {
-		return $this->boss !== null;
-	}
+	private static $USER_NAMES = [];
 
 	public function getParent(): ActiveQuery {
 		return $this->hasOne(static::class, ['id' => 'boss']);
@@ -39,26 +37,6 @@ class Worker extends User implements ActiveHierarchy {
 
 	public function getParentsQuery(): ActiveQuery {
 		return static::find()->where(['id' => $this->getParentsIds()]);
-	}
-
-	public function getParentsIds(): array {
-		if (!$this->hasParent()) {
-			return [];
-		}
-		return Yii::$app->userHierarchy->getParentsIds($this->id);
-	}
-
-	public function getChildesIds(): array {
-		return Yii::$app->userHierarchy->getChildesIds($this->id);
-	}
-
-	public function getAllChildesQuery(): ActiveQuery {
-		return static::find()->where(['id' => $this->getAllChildesIds()]);
-	}
-
-	public function getAllChildesIds(): array {
-		return Yii::$app
-			->userHierarchy->getAllChildesIds($this->id);
 	}
 
 	public static function userName(int $id): string {
@@ -81,7 +59,4 @@ class Worker extends User implements ActiveHierarchy {
 		return parent::find()->workers();
 	}
 
-	public function getParentId(): ?int {
-		return $this->boss;
-	}
 }

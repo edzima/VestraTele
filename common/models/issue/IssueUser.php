@@ -33,6 +33,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	public const TYPE_VICTIM = Customer::ROLE_VICTIM;
 	public const TYPE_SHAREHOLDER = Customer::ROLE_SHAREHOLDER;
 	public const TYPE_HANDICAPPED = Customer::ROLE_HANDICAPPED;
+	public const TYPE_RECOMMENDING = 'recommending';
 
 	public const TYPES_WORKERS = [
 		self::TYPE_LAWYER,
@@ -45,6 +46,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		self::TYPE_HANDICAPPED,
 		self::TYPE_VICTIM,
 		self::TYPE_SHAREHOLDER,
+		self::TYPE_RECOMMENDING,
 	];
 
 	/**
@@ -116,6 +118,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 			static::TYPE_VICTIM => User::getRolesNames()[static::TYPE_VICTIM],
 			static::TYPE_SHAREHOLDER => User::getRolesNames()[static::TYPE_SHAREHOLDER],
 			static::TYPE_HANDICAPPED => User::getRolesNames()[static::TYPE_HANDICAPPED],
+			static::TYPE_RECOMMENDING => Yii::t('common', 'Recommending'),
 		];
 	}
 

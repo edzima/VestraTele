@@ -26,6 +26,9 @@ return [
 				'@yii/rbac/migrations/',
 				'@edzima/teryt/migrations',
 			],
+			'migrationNamespaces' => [
+				'ymaker\email\templates\migrations',
+			],
 		],
 		'fixture' => [
 			'class' => 'yii\console\controllers\FixtureController',

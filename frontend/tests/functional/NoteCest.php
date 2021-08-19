@@ -3,9 +3,9 @@
 namespace frontend\tests\functional;
 
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
-use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
 use common\models\user\User;
 use frontend\controllers\NoteController;
@@ -27,7 +27,13 @@ class NoteCest {
 	}
 
 	public function checkIssueAsCustomerService(CustomerServiceTester $I): void {
-		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		$I->haveFixtures(
+			array_merge(
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::types(),
+				IssueFixtureHelper::note(),
+			)
+		);
 		$I->assignPermission(User::PERMISSION_NOTE);
 		$I->amLoggedIn();
 		/** @var Issue $model */
@@ -46,15 +52,19 @@ class NoteCest {
 	}
 
 	public function checkSettlementAsCustomerService(CustomerServiceTester $I): void {
-		$I->haveFixtures(array_merge(
-				IssueFixtureHelper::fixtures(),
-				IssueFixtureHelper::settlements()
+		$settlementFixture = new SettlementFixtureHelper($I);
+		$settlementFixture->have(
+			array_merge(
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::agent(),
+				IssueFixtureHelper::customer(),
+				IssueFixtureHelper::note(),
+				SettlementFixtureHelper::settlement()
 			)
 		);
 		$I->assignPermission(User::PERMISSION_NOTE);
 		$I->amLoggedIn();
-		/** @var IssuePayCalculation $model */
-		$model = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
+		$model = $settlementFixture->grabSettlement('not-payed-with-double-costs');
 		$I->amOnPage([static::ROUTE_SETTLEMENT, 'id' => $model->id]);
 		$I->see('Create note for: ' . $model->getName());
 		$I->fillField('Title', 'Some title');
@@ -71,7 +81,8 @@ class NoteCest {
 
 	public function checkSummonAsCustomerService(CustomerServiceTester $I): void {
 		$I->haveFixtures(array_merge(
-				IssueFixtureHelper::fixtures(),
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::note(),
 				IssueFixtureHelper::summon()
 			)
 		);

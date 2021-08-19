@@ -15,9 +15,9 @@ class ProvisionTypeSearch extends ProvisionType {
 	 */
 	public function rules(): array {
 		return [
-			[['only_with_tele', 'is_default', 'is_percentage'], 'boolean'],
+			[['is_default', 'is_percentage', 'is_active'], 'boolean'],
 			[['id'], 'integer'],
-			[['name', 'value', 'date_from', 'date_to'], 'safe'],
+			[['name', 'value', 'from_at', 'to_at'], 'safe'],
 		];
 	}
 
@@ -37,7 +37,7 @@ class ProvisionTypeSearch extends ProvisionType {
 	 * @return ActiveDataProvider
 	 */
 	public function search($params) {
-		$query = ProvisionType::find();
+		$query = IssueProvisionType::find();
 
 		// add conditions that should always apply here
 
@@ -56,11 +56,11 @@ class ProvisionTypeSearch extends ProvisionType {
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
-			'date_from' => $this->date_from,
-			'date_to' => $this->date_to,
+			'from_at' => $this->from_at,
+			'to_at' => $this->to_at,
 			'value' => $this->value,
-			'only_with_tele' => $this->only_with_tele,
 			'is_default' => $this->is_default,
+			'is_active' => $this->is_active,
 			'is_percentage' => $this->is_percentage,
 		]);
 

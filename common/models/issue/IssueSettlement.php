@@ -1,0 +1,25 @@
+<?php
+
+namespace common\models\issue;
+
+use common\models\settlement\SettlementInterface;
+
+/**
+ * Interface IssueSettlement
+ *
+ * @property-read IssuePay[] $pays
+ * @property-read IssueCost[] $costs
+ */
+interface IssueSettlement extends IssueInterface, SettlementInterface {
+
+	public const TYPE_ADMINISTRATIVE = 10;
+	public const TYPE_HONORARIUM = 30;
+	public const TYPE_LAWYER = 40;
+	public const TYPE_SUBSCRIPTION = 50;
+	public const TYPE_DEBT = 100;
+
+	public function getId(): int;
+
+	public function getFrontendUrl(): string;
+
+}

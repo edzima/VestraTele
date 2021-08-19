@@ -20,6 +20,8 @@ use yii\db\ActiveRecord;
  * @property string $other
  * @property string $phone
  * @property string $phone_2
+ * @property string $tax_office
+ * @property string $pesel
  */
 class UserProfile extends ActiveRecord {
 
@@ -66,6 +68,8 @@ class UserProfile extends ActiveRecord {
 			['website', 'url', 'defaultScheme' => 'http', 'validSchemes' => ['http', 'https']],
 			['other', 'string', 'max' => 1024],
 			[['phone', 'phone_2'], 'string', 'max' => 20],
+			[['pesel'], 'string', 'max' => 11],
+			[['tax_office'], 'string', 'max' => 100],
 			[['phone', 'phone_2'], PhoneValidator::class, 'country' => 'PL'],
 			[['firstname', 'lastname', 'avatar_path', 'website'], 'string', 'max' => 255],
 			[['firstname', 'lastname'], 'match', 'pattern' => '/[AaĄąBbCcĆćDdEeĘęFfGgHhIiJjKkLlŁłMmNnŃńOoÓóPpRrSsŚśTtUuWwYyZzŹźŻż]/iu'],
@@ -88,6 +92,8 @@ class UserProfile extends ActiveRecord {
 			'other' => Yii::t('common', 'Other'),
 			'phone' => Yii::t('common', 'Phone number'),
 			'phone_2' => Yii::t('common', 'Phone number 2'),
+			'pesel' => Yii::t('common', 'PESEL'),
+			'tax_office' => Yii::t('settlement', 'Tax Office'),
 		];
 	}
 

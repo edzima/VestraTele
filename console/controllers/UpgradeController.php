@@ -7,14 +7,33 @@ use common\components\DbManager;
 use common\models\issue\IssueMeet;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
-use common\models\issue\IssueStage;
+use common\models\issue\IssueUser;
+use common\models\provision\IssueProvisionType;
 use common\models\user\Customer;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\console\Controller;
 use yii\helpers\Console;
+use yii\helpers\Json;
 
 class UpgradeController extends Controller {
+
+	public function actionProvisionTypeUsers(): void {
+		/** @var IssueProvisionType[] $types */
+		$types = IssueProvisionType::find()->all();
+		foreach ($types as $type) {
+			$data = Json::decode($type->data) ?? [];
+			$roles = $data['roles'] ?? [];
+			$role = reset($roles);
+			unset($data['roles']);
+			$type->data = Json::encode($data);
+			if (!$role) {
+				$role = IssueUser::TYPE_AGENT;
+			}
+			$type->setIssueUserTypes($role);
+			$type->save();
+		}
+	}
 
 	public function actionCustomerSummon(): void {
 		/** @var DbManager $auth */
@@ -39,7 +58,7 @@ class UpgradeController extends Controller {
 	public function actionProblemsPays(): void {
 		IssuePay::updateAll(['status' => null], ['or', 'status=0', 'pay_at IS NOT NULL']);
 		$pays = IssuePay::find()
-			->onlyNotPayed()
+			->onlyUnpaid()
 			->andWhere('status IS NOT NULL')
 			->indexBy('calculation_id')
 			->with('calculation')

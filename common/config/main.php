@@ -1,10 +1,11 @@
 <?php
 
 use common\components\DbManager;
+use common\components\EmailTemplateManager;
 use common\components\HierarchyComponent;
 use common\components\keyStorage\KeyStorage;
 use common\components\PayComponent;
-use common\components\Provisions;
+use common\components\provision\Provisions;
 use common\components\TaxComponent;
 use common\components\Formatter;
 use common\models\user\User;
@@ -53,6 +54,9 @@ return [
 			'charset' => 'utf8',
 			'enableSchemaCache' => YII_ENV_PROD,
 		],
+		'emailTemplate' => [
+			'class' => EmailTemplateManager::class,
+		],
 		'authManager' => [
 			'class' => DbManager::class,
 			'cache' => 'cache',
@@ -63,7 +67,6 @@ return [
 		],
 		'formatter' => [
 			'class' => Formatter::class,
-			'nullDisplay' => '',
 			'defaultTimeZone' => 'Europe/Warsaw',//@todo load from .env
 			'decimalSeparator' => ',',
 			'thousandSeparator' => ' ',

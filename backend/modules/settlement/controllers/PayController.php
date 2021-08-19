@@ -5,6 +5,8 @@ namespace backend\modules\settlement\controllers;
 use backend\helpers\Url;
 use backend\modules\settlement\models\search\IssuePaySearch;
 use backend\widgets\CsvForm;
+use common\components\provision\exception\MissingProvisionUserException;
+use common\helpers\Flash;
 use common\models\issue\IssuePay;
 use common\models\issue\query\IssuePayQuery;
 use common\models\settlement\PayPayedForm;
@@ -62,12 +64,12 @@ class PayController extends Controller {
 	}
 
 	public function actionDelayed(): string {
+		Url::remember();
 		$searchModel = new DelayedIssuePaySearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'withNav' => false,
 		]);
 	}
 
@@ -82,6 +84,7 @@ class PayController extends Controller {
 		if (!Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
 			$searchModel->calculationOwnerId = Yii::$app->user->getId();
 		}
+		Url::remember();
 		$searchModel->payStatus = $status;
 		$searchModel->delay = null;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -124,14 +127,38 @@ class PayController extends Controller {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'withNav' => true,
 		]);
 	}
 
 	public function actionPay(int $id) {
+		$pay = $this->findModel($id);
+		if ($pay->isPayed()) {
+			Flash::add(
+				Flash::TYPE_WARNING,
+				Yii::t('settlement', 'The payment: {value} has already been paid.', [
+					'value' => Yii::$app->formatter->asCurrency($pay->getValue()),
+				]));
+
+			return $this->redirect(Url::previous());
+		}
 		$model = new PayPayedForm($this->findModel($id));
 		$model->date = date('Y-m-d');
 		if ($model->load(Yii::$app->request->post()) && $model->pay()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('settlement', 'The payment: {value} marked as paid.', [
+					'value' => Yii::$app->formatter->asCurrency($pay->getValue()),
+				]));
+			if ($model->sendEmailToCustomer && $model->sendEmailToCustomer()) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'Send E-mail to Customer.')
+				);
+			}
+			if ($model->sendEmailToWorkers && $model->sendEmailsToWorkers()) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'Send E-mail to Workers.')
+				);
+			}
+
 			return $this->redirect(Url::previous());
 		}
 		return $this->render('pay', [
@@ -142,6 +169,21 @@ class PayController extends Controller {
 	public function actionUpdate(int $id) {
 		$model = $this->findModel($id);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$dirty = $model->getDirtyAttributes();
+			Yii::info([
+				'message' => 'Update pay',
+				'dirty' => $dirty,
+				'user_id' => Yii::$app->user->id,
+			], 'settlement.pay');
+			if (isset($dirty['value'])) {
+				Yii::$app->provisions->removeForPays($model->calculation->getPays()->getIds());
+				try {
+					Yii::$app->provisions->settlement($model->calculation);
+				} catch (MissingProvisionUserException $exception) {
+
+				}
+			}
+
 			return $this->redirect(Url::previous());
 		}
 		return $this->render('update', [

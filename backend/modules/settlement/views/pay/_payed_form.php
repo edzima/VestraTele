@@ -22,9 +22,15 @@ use yii\widgets\ActiveForm;
 		?>
 
 		<?= $form->field($model, 'transfer_type', ['options' => ['class' => 'col-md-2']])
-			->dropDownList(IssuePay::getTransferTypesNames())
+			->dropDownList(IssuePay::getTransfersTypesNames())
 		?>
 
+	</div>
+
+	<div class="row">
+		<?= $form->field($model, 'sendEmailToCustomer', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
+
+		<?= $form->field($model, 'sendEmailToWorkers', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
 	</div>
 
 

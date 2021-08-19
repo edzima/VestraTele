@@ -1,17 +1,17 @@
 <?php
 
+use backend\helpers\Html;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\widgets\CsvForm;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
 use common\models\issue\Issue;
 use common\models\user\User;
+use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
-use kartik\grid\ActionColumn;
-use kartik\grid\DataColumn;
+use common\widgets\grid\DataColumn;
 use kartik\grid\SerialColumn;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Html;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
@@ -20,54 +20,6 @@ use yii\widgets\Pjax;
 
 $this->title = Yii::t('backend', 'Issues');
 $this->params['breadcrumbs'][] = $this->title;
-
-$js = <<<JS
-//@todo move to external class and use in frontend.
-function moveCursorToEnd(el) {
-	if (typeof el.selectionStart == "number") {
-		el.selectionStart = el.selectionEnd = el.value.length;
-	} else if (typeof el.createTextRange != "undefined") {
-		el.focus();
-		var range = el.createTextRange();
-		range.collapse(false);
-		range.select();
-	}
-}
-	var timeout;
-	var filteredId = '';
-	var submit_form = true;
-	var filter_selector = '.dynamic-search';
-
-	
-	$("body").on('beforeFilter', "#issues-list" , function(event) {
-    return submit_form;
-});
-
-$("body").on('afterFilter', "#issues-list" , function(event) {
-    submit_form = false;
-});
-	
-	$(document)
-.off('keydown.yiiGridView change.yiiGridView', filter_selector)
-.on('keyup', filter_selector, function(evt) {
-   clearTimeout(timeout);
-			timeout = setTimeout(function(){
-				submit_form = true;
-				filteredId = evt.target.getAttribute('id');
-				$("#issues-list").yiiGridView("applyFilter");
-			},1000);
-})
-.on('pjax:success', function() {
-	submit_form = true;
-	var i = document.getElementById(filteredId);
-	if(i){
-		i.focus();
-		moveCursorToEnd(i);
-	}
-});
-
-JS;
-//$this->registerJs($js);
 
 ?>
 <div class="issue-index relative">
@@ -85,7 +37,11 @@ JS;
 	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
-	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() : '' ?>
+
+	<?= Yii::$app->user->can(User::PERMISSION_EXPORT)
+		? CsvForm::widget()
+		: ''
+	?>
 
 	<?= GridView::widget([
 		'id' => 'issues-list',
@@ -100,22 +56,9 @@ JS;
 				'class' => SerialColumn::class,
 				'width' => '40px',
 			],
-			[
-				'class' => ActionColumn::class,
-				'noWrap' => true,
-				'options' => [
-					'style' => 'width:110px',
-				],
-				'visibleButtons' => [
-					'view' => static function (Issue $model) use ($searchModel): bool {
-						return !$model->isArchived() || $searchModel->withArchive;
-					},
-					'delete' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
-				],
-			],
+
 			[
 				'class' => IssueColumn::class,
-				'issueAttribute' => null,
 			],
 			[
 				'attribute' => 'signature_act',
@@ -224,6 +167,28 @@ JS;
 				],
 				'options' => [
 					'style' => 'width:90px',
+				],
+			],
+			[
+				'class' => ActionColumn::class,
+				'template' => '{installment} {view} {update} {delete}',
+				'buttons' => [
+					'installment' => static function (string $url, Issue $model): string {
+						return Html::a('<i class="fa fa-money" aria-hidden="true"></i>',
+							['/settlement/cost/create-installment', 'id' => $model->id, 'user_id' => $model->agent->id],
+							[
+								'title' => Yii::t('settlement', 'Create Installment'),
+								'aria-label' => Yii::t('settlement', 'Create Installment'),
+							]
+						);
+					},
+				],
+				'visibleButtons' => [
+					'installment' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+					'view' => static function (Issue $model) use ($searchModel): bool {
+						return !$model->isArchived() || $searchModel->withArchive;
+					},
+					'delete' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
 				],
 			],
 
