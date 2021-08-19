@@ -7,11 +7,12 @@ use common\models\user\User;
 use Decimal\Decimal;
 use Yii;
 use yii\base\Model;
+use yii\data\ActiveDataProvider;
 use yii\data\DataProviderInterface;
 
 class ProvisionReportSummary extends Model {
 
-	public DataProviderInterface $provisionsDataProvider;
+	public ActiveDataProvider $provisionsDataProvider;
 	public DataProviderInterface $settledCostsDataProvider;
 	public DataProviderInterface $notSettledCostsDataProvider;
 

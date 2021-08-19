@@ -8,12 +8,12 @@ use common\models\issue\query\IssuePayQuery;
 use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\query\UserQuery;
+use common\models\user\User;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\QueryInterface;
-use yii\helpers\ArrayHelper;
 
 /**
  * ProvisionSearch represents the model behind the search form of `common\models\provision\Provision`.
@@ -56,10 +56,9 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 
 	public function attributeLabels(): array {
 		return array_merge([
-			'onlyPayed' => 'Tylko opłacone',
-			'dateFrom' => 'Data od',
-			'dateTo' => 'Data do',
-			'payStatus' => 'Status płatności',
+			'dateFrom' => Yii::t('provision', 'From at'),
+			'dateTo' => Yii::t('provision', 'To at'),
+			'payStatus' => Yii::t('settlement', 'Pay Status'),
 			'settlementTypes' => Yii::t('settlement', 'Settlement type'),
 		], parent::attributeLabels());
 	}
@@ -153,22 +152,33 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 		}
 	}
 
-	public function getFromUserList(): array {
+	public function getFromUserList(bool $dateFilter = true): array {
 		$query = Provision::find()
 			->select('from_user_id')
-			->groupBy('from_user_id')
-			->joinWith('fromUser.userProfile');
-		$this->applyDateFilter($query);
-		return ArrayHelper::map($query->all(), 'from_user_id', 'fromUser.fullName');
+			->andFilterWhere(['to_user_id' => $this->to_user_id])
+			->distinct();
+
+		if ($dateFilter) {
+			$this->applyDateFilter($query);
+		}
+
+		$list = User::getSelectList($query->column(), false);
+		if ($this->to_user_id) {
+			unset($list[$this->to_user_id]);
+		}
+		return $list;
 	}
 
-	public function getToUsersList(): array {
+	public function getToUsersList(bool $dateFilter = true): array {
 		$query = Provision::find()
 			->select('to_user_id')
-			->groupBy('to_user_id')
-			->joinWith('toUser.userProfile');
-		$this->applyDateFilter($query);
-		return ArrayHelper::map($query->all(), 'to_user_id', 'toUser.fullName');
+			->distinct();
+
+		if ($dateFilter) {
+			$this->applyDateFilter($query);
+		}
+
+		return User::getSelectList($query->column(), false);
 	}
 
 	protected function applyDateFilter(ActiveQuery $query): void {

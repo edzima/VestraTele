@@ -146,6 +146,7 @@ return [
 	'Send Email to Customer' => 'Wyślij E-mail do Klienta',
 	'Send Email to Workers' => 'Wyślij E-mail do Pracowników',
 	'Tax Office' => 'Urząd Skarbowy',
+	'Pay Status' => 'Status Płatności',
 	'Paid' => 'Opłacone',
 	'Unpaid' => 'Nieopłacone',
 ];

@@ -27,6 +27,7 @@ class Worker extends User implements ActiveHierarchy {
 	];
 
 	public const PERMISSION_COST_DEBT = 'cost.debt';
+	public const PERMISSION_PROVISION_CHILDREN_VISIBLE = 'provision.children.visible';
 
 	private static $USER_NAMES = [];
 

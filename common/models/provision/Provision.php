@@ -71,13 +71,13 @@ class Provision extends ActiveRecord implements IssueInterface {
 	 */
 	public function attributeLabels(): array {
 		return [
-			'pay_id' => 'Pay ID',
-			'to_user_id' => 'Dla',
-			'from_user_id' => 'Nadprowizja',
+			'pay_id' => Yii::t('settlement', 'Pay'),
+			'to_user_id' => Yii::t('provision', 'To User'),
+			'from_user_id' => Yii::t('provision', 'From User'),
 			'value' => Yii::t('provision', 'Provision ({currencySymbol})', ['currencySymbol' => Yii::$app->formatter->getCurrencySymbol()]),
-			'toUser' => 'Dla',
-			'fromUser' => 'Nadprowizja',
-			'fromUserString' => 'Nadprowizja',
+			'toUser' => Yii::t('provision', 'To User'),
+			'fromUser' => Yii::t('provision', 'From User'),
+			'fromUserString' => Yii::t('provision', 'From User'),
 			'hide_on_report' => Yii::t('provision', 'Hide on report'),
 			'provision' => Yii::t('provision', 'Provision'),
 		];

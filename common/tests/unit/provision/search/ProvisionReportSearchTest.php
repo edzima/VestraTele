@@ -22,34 +22,40 @@ class ProvisionReportSearchTest extends Unit {
 
 	public function _before() {
 		parent::_before();
-		$this->tester->haveFixtures(array_merge(
-			IssueFixtureHelper::issue(),
-			IssueFixtureHelper::agent(),
-			SettlementFixtureHelper::settlement(),
-			SettlementFixtureHelper::pay(),
-			ProvisionFixtureHelper::provision(),
-			ProvisionFixtureHelper::type(),
-		));
-	}
-
-	public function testAgentWithoutProvisions(): void {
-		$this->giveModel(UserFixtureHelper::AGENT_EMILY_PAT, '2020-01-01', '2020-02-01');
-		$this->assertTotalCount(0);
-	}
-
-	public function testAgentWithProvisions(): void {
-		$this->giveModel(UserFixtureHelper::AGENT_PETER_NOWAK, '2020-01-01', '2020-02-01');
-		$this->assertTotalCount(0);
-	}
-
-	private function giveModel(int $userId, string $dateFrom, string $dateTo): void {
 		$this->model = $this->createModel();
-		$this->model->to_user_id = $userId;
-		$this->model->dateFrom = $dateFrom;
-		$this->model->dateTo = $dateTo;
+	}
+
+	public function _fixtures(): array {
+		return array_merge(
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::users(),
+			SettlementFixtureHelper::pay(codecept_data_dir() . 'provision/'),
+			SettlementFixtureHelper::settlement(codecept_data_dir() . 'provision/'),
+			ProvisionFixtureHelper::type(),
+			ProvisionFixtureHelper::provision(),
+		);
+	}
+
+	public function testWithoutUser(): void {
+		$this->tester->assertFalse($this->model->validate());
+		$this->tester->assertSame('To User cannot be blank.', $this->model->getFirstError('to_user_id'));
+		$this->tester->assertSame(0, $this->model->search([])->getTotalCount());
+	}
+
+	public function testBindToUserIdWithSearchParam(): void {
+		$this->model->to_user_id = 1;
+		$this->model->search(['to_user_id' => 2]);
+		$this->tester->assertSame(1, $this->model->to_user_id);
+	}
+
+	public function testHasHiddenProvision(): void {
+		$this->model->to_user_id = UserFixtureHelper::AGENT_PETER_NOWAK;
+		$this->tester->assertTrue($this->model->hasHiddenProvisions());
 	}
 
 	protected function createModel(): SearchModel {
-		return new ProvisionReportSearch();
+		return new ProvisionReportSearch([
+			'defaultCurrentMonth' => false,
+		]);
 	}
 }

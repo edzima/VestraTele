@@ -4,13 +4,10 @@ namespace common\models\provision;
 
 use common\models\issue\IssueCost;
 use common\models\user\User;
-use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\data\DataProviderInterface;
-use yii\db\ActiveQuery;
-use yii\helpers\ArrayHelper;
 
 /**
  * Class ProvisionReportSearch
@@ -26,6 +23,7 @@ class ProvisionReportSearch extends ProvisionSearch {
 
 	public function rules(): array {
 		return [
+			['!to_user_id', 'required'],
 			['payStatus', 'in', 'range' => array_keys(static::getPayStatusNames())],
 			['payStatus', 'default', 'value' => static::DEFAULT_PAY_STATUS],
 			[['dateFrom', 'dateTo', 'from_user_id'], 'safe'],
@@ -43,11 +41,6 @@ class ProvisionReportSearch extends ProvisionSearch {
 		$query->notHidden();
 
 		return $provider;
-	}
-
-	public function getSum(ActiveQuery $query): string {
-		$query = clone($query);
-		return Yii::$app->formatter->asCurrency($query->sum('provision.value'));
 	}
 
 	public function getNotSettledCosts(): DataProviderInterface {
@@ -91,17 +84,6 @@ class ProvisionReportSearch extends ProvisionSearch {
 		$summary->settledCostsDataProvider = $this->getSettledCosts();
 		$summary->notSettledCostsDataProvider = $this->getNotSettledCosts();
 		return $summary;
-	}
-
-	public function getFromUserList(): array {
-		$query = Provision::find()
-			->select('from_user_id')
-			->groupBy('from_user_id')
-			->andWhere(['to_user_id' => $this->to_user_id])
-			->andWhere(['<>', 'from_user_id', $this->to_user_id])
-			->joinWith('fromUser.userProfile');
-		$this->applyDateFilter($query);
-		return ArrayHelper::map($query->all(), 'from_user_id', 'fromUser.fullName');
 	}
 
 }

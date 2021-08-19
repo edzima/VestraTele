@@ -142,3 +142,9 @@ use yii\widgets\DetailView;
 
 
 </div>
+
+<?php if ($model->provisionsDataProvider->pagination->pageCount > 1): ?>
+	<p><?= Yii::t('provision', 'Sum {value}', [
+			'value' => Yii::$app->formatter->asCurrency($model->provisionsDataProvider->query->sum('value')),
+		]) ?></p>
+<?php endif; ?>

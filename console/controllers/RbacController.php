@@ -78,6 +78,7 @@ class RbacController extends Controller {
 		Worker::PERMISSION_WORKERS,
 		Worker::PERMISSION_LEAD,
 		Worker::PERMISSION_EMAIL_TEMPLATE,
+		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
 
 	];
 

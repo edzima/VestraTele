@@ -52,6 +52,8 @@ return [
 	'Value' => 'Prowizja',
 	'From at' => 'Od dnia',
 	'To at' => 'Do dnia',
+	'To User' => 'Dla',
+	'From User' => 'Nadprowizja',
 	'Is default' => 'Domyślna',
 	'Is percentage' => 'Procentowa',
 	'Only with telemarketer' => 'Tylko z konsultantem',

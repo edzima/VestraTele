@@ -24,7 +24,7 @@ return [
 		'created_at' => '1391885313',
 		'updated_at' => '1391885313',
 		'email' => 'agent2@vestra.info',
-		'status' => User::STATUS_DELETED,
+		'status' => User::STATUS_ACTIVE,
 		'boss' => 300,
 	],
 	'with-parents-without-childs' => [
@@ -34,7 +34,7 @@ return [
 		//Test1234
 		'password_hash' => '$2y$13$d17z0w/wKC4LFwtzBcmx6up4jErQuandJqhzKGKczfWuiEhLBtQBK',
 		'email' => 'agent3@vestra.info',
-		'status' => User::STATUS_INACTIVE,
+		'status' => User::STATUS_ACTIVE,
 		'created_at' => '1548675330',
 		'updated_at' => '1548675330',
 		'verification_token' => '4ch0qbfhvWwkcuWqjN8SWRq72SOw1KYT_1548675330',
