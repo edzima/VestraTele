@@ -1,5 +1,6 @@
 <?php
 
+use backend\helpers\Html;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use yii\data\ActiveDataProvider;
@@ -15,6 +16,14 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements')
 $this->params['breadcrumbs'][] = Yii::t('backend', 'Without provisions');
 ?>
 <div class="settlement-without-provisions">
+
+	<p>
+		<?= Html::a(
+			Yii::t('backend', 'Generate'),
+			['/provision/settlement/generate-multiple', 'ids' => $dataProvider->getKeys()],
+			['class' => 'btn btn-success']
+		) ?>
+	</p>
 
 	<?= IssuePayCalculationGrid::widget([
 		'filterModel' => $searchModel,

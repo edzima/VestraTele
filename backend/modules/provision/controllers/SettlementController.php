@@ -29,7 +29,9 @@ class SettlementController extends Controller {
 			'verbs' => [
 				'class' => VerbFilter::class,
 				'actions' => [
+					'delete' => ['POST'],
 					'generate' => ['POST'],
+					'generate-without-provisions' => ['POST'],
 				],
 			],
 		];
@@ -64,20 +66,46 @@ class SettlementController extends Controller {
 
 	public function actionGenerate(int $id) {
 		$model = $this->findModel($id);
+		$this->generate($model, false);
+
+		return $this->redirect(['view', 'id' => $id]);
+	}
+
+	public function actionGenerateMultiple(array $ids) {
+		foreach ($ids as $id) {
+			$this->generate($this->findModel($id), true);
+		}
+		return $this->redirect(['/settlement/calculation/without-provisions']);
+	}
+
+	private function generate(IssueSettlement $model, bool $withName): void {
 		try {
+
+			$name = $withName ? $model->getIssueName() . ' - ' . $model->getTypeName() : null;
 			$count = Yii::$app->provisions->settlement($model);
 			if ($count === 0) {
 				Flash::add(Flash::TYPE_WARNING,
-					Yii::t('provision', 'Any user has not provision.'));
+					Yii::t('provision',
+						$name
+							? 'Any user has not provision in {name}.'
+							: 'Any user has not provision.'
+						, ['name' => $name]
+					)
+				);
 			}
 			if ($count > 0) {
-				Flash::add(Flash::TYPE_SUCCESS, Yii::t('provision', 'Success! Generate {count} provisions.', ['count' => $count]));
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('provision',
+						$name
+							? 'Success! Generate {count} provisions in {name}.'
+							: 'Success! Generate {count} provisions.',
+						['count' => $count, 'name' => $name]
+					)
+				);
 			}
 		} catch (MissingProvisionUserException $exception) {
 			Flash::add(Flash::TYPE_ERROR, $exception->getMessage());
 		}
-
-		return $this->redirect(['view', 'id' => $id]);
 	}
 
 	public function actionUser(int $id, string $issueUserType, int $typeId = null) {
