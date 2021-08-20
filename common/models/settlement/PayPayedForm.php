@@ -84,7 +84,9 @@ class PayPayedForm extends Model {
 			return false;
 		}
 		$template->parseBody([
-			'payValue' => Yii::$app->formatter->asCurrency($this->pay->getValue()),
+			'agentFullName' => $issue->agent->getFullName(),
+			'agentEmail' => $issue->agent->email,
+			'agentPhone' => $issue->agent->profile->phone,
 		]);
 		return Yii::$app
 			->mailer
