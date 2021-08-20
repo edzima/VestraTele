@@ -1,7 +1,6 @@
 <?php
 
 use common\components\EmailTemplateManager;
-use common\components\HierarchyComponent;
 use common\components\RelationComponent;
 use common\components\PayComponent;
 use common\components\provision\Provisions;
@@ -32,7 +31,6 @@ class Yii extends BaseYii {
  * @property Formatter $formatter
  * @property RelationComponent $userHierarchy
  * @property-read EmailTemplateManager $emailTemplate
- * @property HierarchyComponent $userHierarchy
  * @property LeadManager $leadManager
  * @property PayComponent $pay
  * @property Provisions $provisions

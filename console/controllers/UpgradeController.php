@@ -20,6 +20,8 @@ use yii\helpers\Json;
 
 class UpgradeController extends Controller {
 
+
+
 	public function actionProvisionTypeUsers(): void {
 		/** @var IssueProvisionType[] $types */
 		$types = IssueProvisionType::find()->all();

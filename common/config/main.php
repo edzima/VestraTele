@@ -2,7 +2,6 @@
 
 use common\components\DbManager;
 use common\components\EmailTemplateManager;
-use common\components\HierarchyComponent;
 use common\components\RelationComponent;
 use common\components\keyStorage\KeyStorage;
 use common\components\PayComponent;
