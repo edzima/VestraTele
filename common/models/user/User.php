@@ -3,7 +3,6 @@
 namespace common\models\user;
 
 use common\models\Address;
-use common\models\hierarchy\Hierarchy;
 use common\models\issue\IssueCost;
 use common\models\issue\IssueUser;
 use common\models\provision\Provision;
@@ -45,7 +44,7 @@ use yii\web\IdentityInterface;
  * @property-read UserRelation[] $toRelations
  *
  */
-class User extends ActiveRecord implements IdentityInterface, Hierarchy {
+class User extends ActiveRecord implements IdentityInterface {
 
 	public const STATUS_INACTIVE = 0;
 	public const STATUS_ACTIVE = 1;

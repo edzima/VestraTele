@@ -61,10 +61,6 @@ class HierarchyForm extends Model {
 			$this->hierarchy->assign(UserRelation::TYPE_SUPERVISOR, $this->parent_id, $this->id);
 		}
 		return true;
-		if (empty($this->parent_id)) {
-			return $this->hierarchy->unassign(UserRelation::TYPE_SUPERVISOR, $this->id);
-		}
-		return $this->hierarchy->assign(UserRelation::TYPE_SUPERVISOR, $this->id, $this->parent_id);
 	}
 
 }
