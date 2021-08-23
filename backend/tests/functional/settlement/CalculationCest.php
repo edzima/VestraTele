@@ -28,6 +28,9 @@ class CalculationCest {
 	/** @see CalculationController::actionIssue() */
 	public const ROUTE_ISSUE = 'settlement/calculation/issue';
 
+	/** @see CalculationController::actionWithoutProvisions() */
+	public const ROUTE_WITHOUT_PROVISIONS = 'settlement/calculation/without-provisions';
+
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
 		$I->dontSeeMenuLink('Settlements');

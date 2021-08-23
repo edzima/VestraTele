@@ -40,6 +40,11 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 			['class' => 'btn btn-info'])
 		?>
 
+		<?= Html::a(Yii::t('backend', 'Without provisions'),
+			['/settlement/calculation/without-provisions'],
+			['class' => 'btn btn-warning'])
+		?>
+
 		<?= $dataProvider->getTotalCount()
 			? Html::a(
 				Yii::t('provision', 'Delete provisions'),
