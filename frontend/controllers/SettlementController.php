@@ -89,6 +89,7 @@ class SettlementController extends Controller {
 				$calculationPay->setPay($pay);
 				$calculation->link('pays', $calculationPay);
 			}
+			$calculation->refresh();
 			Yii::$app->provisions->removeForPays($calculation->getPays()->getIds(true));
 			try {
 				Yii::$app->provisions->settlement($calculation);

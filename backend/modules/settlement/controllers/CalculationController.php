@@ -7,6 +7,7 @@ use backend\modules\settlement\models\AdministrativeCalculationForm;
 use backend\modules\settlement\models\CalculationForm;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\modules\settlement\models\search\IssueToCreateCalculationSearch;
+use common\components\provision\exception\MissingProvisionUserException;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
@@ -230,6 +231,12 @@ class CalculationController extends Controller {
 				$calculationPay = new IssuePay();
 				$calculationPay->setPay($pay);
 				$calculation->link('pays', $calculationPay);
+			}
+			$calculation->refresh();
+			Yii::$app->provisions->removeForPays($calculation->getPays()->getIds(true));
+			try {
+				Yii::$app->provisions->settlement($calculation);
+			} catch (MissingProvisionUserException $exception) {
 			}
 			return $this->redirect(['view', 'id' => $id]);
 		}
