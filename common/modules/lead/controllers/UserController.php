@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Url;
 use common\modules\lead\models\forms\LeadPushEmail;
 use common\modules\lead\models\forms\LeadsUserForm;
 use Yii;
@@ -63,7 +64,7 @@ class UserController extends BaseController {
 					$pushEmailModel->email = $email;
 					$pushEmailModel->sendEmail();
 				}
-				return $this->redirect(['lead/index']);
+				return $this->redirect(Url::previous());
 			}
 		}
 		return $this->render('assign', [

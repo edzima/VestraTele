@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Url;
 use common\modules\lead\models\forms\LeadForm;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
@@ -34,6 +35,7 @@ class LeadController extends BaseController {
 	 */
 	public function actionIndex() {
 		if (Yii::$app->request->post('selection')) {
+			Url::remember();
 			return $this->redirect(['user/assign', 'ids' => Yii::$app->request->post('selection')]);
 		}
 		$searchModel = new LeadSearch();
