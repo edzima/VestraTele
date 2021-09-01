@@ -18,6 +18,7 @@ class IssueNoteForm extends Model {
 	public ?int $user_id = null;
 
 	public ?string $type = null;
+	public bool $is_pinned = false;
 	public string $title = '';
 	public string $description = '';
 	public string $publish_at = '';
@@ -51,6 +52,7 @@ class IssueNoteForm extends Model {
 		return [
 			[['title', 'description', '!user_id', '!issue_id', 'publish_at'], 'required'],
 			[['issue_id', 'user_id'], 'integer'],
+			['is_pinned', 'boolean'],
 			['!type', 'string'],
 			[['title'], 'string', 'max' => 255],
 			['description', 'string'],
@@ -67,6 +69,7 @@ class IssueNoteForm extends Model {
 	public function setModel(IssueNote $model): void {
 		$this->model = $model;
 		$this->issue_id = $model->issue_id;
+		$this->is_pinned = $model->is_pinned;
 		$this->title = $model->title;
 		$this->type = $model->type;
 		$this->description = $model->description;
@@ -85,6 +88,7 @@ class IssueNoteForm extends Model {
 		if ($this->validate()) {
 			$model = $this->getModel();
 			$model->issue_id = $this->issue_id;
+			$model->is_pinned = $this->is_pinned;
 			$model->user_id = $this->user_id;
 			$model->type = $this->type;
 			$model->title = $this->title;

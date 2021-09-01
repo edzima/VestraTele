@@ -6,22 +6,23 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model IssueNote */
+/* @var $options array */
 /* @var $removeBtn bool */
 ?>
 
-<div class="panel <?= $model->isForSettlement() ? 'panel-success' : 'panel-primary' ?> panel-note">
-	<div class="panel-heading">
-		<h3 class="panel-title"><?= $model->title ?>
-			<span class="pull-right"><?= $model->user ?></span>
-		</h3>
-	</div>
-	<div class="panel-body">
-		<?= $model->description ?>
-	</div>
-	<div class="panel-footer">
-		<span class="date pull-left"><?= Yii::$app->formatter->asDateTime($model->publish_at) ?></span>
-		<?php if ($model->user_id === Yii::$app->user->id || Yii::$app->user->can(Worker::ROLE_MANAGER)): ?>
-			<span class="action pull-right">
+<?= Html::beginTag('div', $options) ?>
+<div class="panel-heading">
+	<h3 class="panel-title"><?= $model->title ?>
+		<span class="pull-right"><?= $model->user ?></span>
+	</h3>
+</div>
+<div class="panel-body">
+	<?= $model->description ?>
+</div>
+<div class="panel-footer">
+	<span class="date pull-left"><?= Yii::$app->formatter->asDateTime($model->publish_at) ?></span>
+	<?php if ($model->user_id === Yii::$app->user->id || Yii::$app->user->can(Worker::ROLE_MANAGER)): ?>
+		<span class="action pull-right">
 				<?= Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['note/update', 'id' => $model->id]) ?>
 				<?= $removeBtn ? Html::a('<i class="glyphicon glyphicon-trash"></i>', ['note/delete', 'id' => $model->id], [
 					'data' => [
@@ -31,7 +32,7 @@ use yii\helpers\Html;
 					],
 				]) : '' ?>
 					</span>
-		<?php endif; ?>
-		<div class="clearfix"></div>
-	</div>
+	<?php endif; ?>
+	<div class="clearfix"></div>
 </div>
+<?= Html::endTag('div') ?>

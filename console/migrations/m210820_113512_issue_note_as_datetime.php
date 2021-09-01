@@ -16,13 +16,14 @@ class m210820_113512_issue_note_as_datetime extends Migration {
 		$this->update('{{%issue_note}}', [
 			'publish_at' => new Expression('updated_at'),
 		], ['publish_at' => null]);
+		$this->addColumn('{{%issue_note}}', 'is_pinned', $this->boolean()->notNull()->defaultValue(0));
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function safeDown() {
-		$this->alterColumn('{{%issue_note}}', 'publish_at', $this->integer(11));
+		$this->dropColumn('{{%issue_note}}', 'is_pinned');
 	}
 
 }

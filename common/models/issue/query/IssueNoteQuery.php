@@ -12,6 +12,11 @@ use yii\db\ActiveQuery;
  */
 class IssueNoteQuery extends ActiveQuery {
 
+	public function pinned(): self {
+		$this->andWhere(['is_pinned' => true]);
+		return $this;
+	}
+
 	public function onlySettlement(int $id): self {
 		return $this->onlyType(IssueNote::TYPE_SETTLEMENT, $id);
 	}
@@ -30,6 +35,16 @@ class IssueNoteQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function withoutType(): self {
+		$this->andWhere(['type' => null]);
+		return $this;
+	}
+
+	public function withoutTypes(array $types): self {
+		$this->andWhere(['not in', 'type', $types]);
+		return $this;
+	}
+
 	/**
 	 * @inheritdoc
 	 * @return IssueNote[]|array
@@ -44,15 +59,5 @@ class IssueNoteQuery extends ActiveQuery {
 	 */
 	public function one($db = null) {
 		return parent::one($db);
-	}
-
-	public function withoutType(): self {
-		$this->andWhere(['type' => null]);
-		return $this;
-	}
-
-	public function withoutTypes(array $types): self {
-		$this->andWhere(['not in', 'type', $types]);
-		return $this;
 	}
 }

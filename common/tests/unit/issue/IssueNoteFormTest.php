@@ -64,6 +64,44 @@ class IssueNoteFormTest extends Unit {
 		]);
 	}
 
+	public function testPinned(): void {
+		$this->giveModel([
+			'issue_id' => 1,
+			'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
+			'title' => 'Some Title',
+			'description' => 'Some Desc',
+			'is_pinned' => true,
+		]);
+		$this->thenSuccessSave();
+		$this->thenSeeNote([
+			'issue_id' => 1,
+			'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
+			'title' => 'Some Title',
+			'description' => 'Some Desc',
+			'publish_at' => $this->model->publish_at,
+			'is_pinned' => true,
+		]);
+	}
+
+	public function testDontPinned(): void {
+		$this->giveModel([
+			'issue_id' => 1,
+			'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
+			'title' => 'Some Title',
+			'description' => 'Some Desc',
+			'is_pinned' => false,
+		]);
+		$this->thenSuccessSave();
+		$this->thenSeeNote([
+			'issue_id' => 1,
+			'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
+			'title' => 'Some Title',
+			'description' => 'Some Desc',
+			'publish_at' => $this->model->publish_at,
+			'is_pinned' => false,
+		]);
+	}
+
 	private function giveModel(array $config = []): void {
 		$this->model = new IssueNoteForm($config);
 	}

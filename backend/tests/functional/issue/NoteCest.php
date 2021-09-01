@@ -64,6 +64,8 @@ class NoteCest {
 		$I->seeInGridHeader('Title');
 		$I->seeInGridHeader('Description');
 		$I->seeInGridHeader('Publish At');
+		$I->seeInGridHeader('Created At');
+		$I->seeInGridHeader('Updated At');
 	}
 
 	public function checkCreateEmpty(IssueManager $I): void {
@@ -176,13 +178,16 @@ class NoteCest {
 		]);
 	}
 
-	private function formsParams($title, $description, $publish_at = null) {
+	private function formsParams($title, $description, $publish_at = null, $is_pinned = null) {
 		$params = [
 			'IssueNoteForm[title]' => $title,
 			'IssueNoteForm[description]' => $description,
 		];
 		if ($publish_at !== null) {
 			$params['IssueNoteForm[publish_at]'] = $publish_at;
+		}
+		if ($is_pinned !== null) {
+			$params['IssueNoteForm[is_pinned]'] = $is_pinned;
 		}
 		return $params;
 	}

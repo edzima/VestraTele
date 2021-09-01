@@ -70,6 +70,14 @@ $this->params['breadcrumbs'][] = $this->title;
 	</p>
 
 
+	<?= IssueNotesWidget::widget([
+		'model' => $model,
+		'notes' => $model->getIssueNotes()->joinWith('user.userProfile')->pinned()->all(),
+		'title' => Yii::t('issue', 'Pinned Issue Notes'),
+	]) ?>
+
+
+
 	<?= $calculationsDataProvider->getTotalCount() > 0
 		? IssuePayCalculationGrid::widget([
 			'dataProvider' => $calculationsDataProvider,

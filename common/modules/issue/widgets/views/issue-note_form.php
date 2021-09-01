@@ -19,6 +19,17 @@ use yii\web\JsExpression;
 
 	<?php $form = ActiveForm::begin($options); ?>
 
+	<div class="row">
+		<?= $form->field($model, 'publish_at', [
+			'options' => ['class' => 'col-md-2'],
+		])->widget(DateTimeWidget::class) ?>
+
+		<?= $form->field($model, 'is_pinned', [
+			'options' => ['class' => 'col-md-1'],
+		])->checkbox() ?>
+	</div>
+
+
 	<?= $form->field($model, 'title')->widget(Select2::class, [
 		'options' => ['placeholder' => Yii::t('issue', 'Search for a title ...')],
 		'pluginOptions' => [
@@ -60,9 +71,6 @@ use yii\web\JsExpression;
 		],
 	])
 	?>
-
-
-	<?= $form->field($model, 'publish_at')->widget(DateTimeWidget::class) ?>
 
 
 	<div class="form-group">
