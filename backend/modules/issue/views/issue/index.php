@@ -30,6 +30,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index'], ['class' => 'btn btn-warning'])
 			: ''
 		?>
+		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
+			? Html::a(Yii::t('issue', 'Issue Notes'), ['note/index'], ['class' => 'btn btn-info'])
+			: ''
+		?>
 		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
 			? Html::a(Yii::t('backend', 'Settlements'), ['/settlement/calculation/index'], ['class' => 'btn btn-success'])
 			: ''
@@ -171,7 +175,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => ActionColumn::class,
-				'template' => '{installment} {view} {update} {delete}',
+				'template' => '{installment} {note} {view} {update} {delete}',
 				'buttons' => [
 					'installment' => static function (string $url, Issue $model): string {
 						return Html::a('<i class="fa fa-money" aria-hidden="true"></i>',
@@ -182,9 +186,19 @@ $this->params['breadcrumbs'][] = $this->title;
 							]
 						);
 					},
+					'note' => static function (string $url, Issue $model): string {
+						return Html::a('<i class="fa fa-calendar-plus-o" aria-hidden="true"></i>',
+							['note/create', 'issueId' => $model->id],
+							[
+								'title' => Yii::t('issue', 'Create Issue Note'),
+								'aria-label' => Yii::t('issue', 'Create Issue Note'),
+							]
+						);
+					},
 				],
 				'visibleButtons' => [
 					'installment' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+					'note' => Yii::$app->user->can(User::PERMISSION_NOTE),
 					'view' => static function (Issue $model) use ($searchModel): bool {
 						return !$model->isArchived() || $searchModel->withArchive;
 					},

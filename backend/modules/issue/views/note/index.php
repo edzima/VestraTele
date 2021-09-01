@@ -1,36 +1,38 @@
 <?php
 
 use backend\modules\issue\models\search\IssueNoteSearch;
-use yii\helpers\Html;
-use yii\grid\GridView;
+use backend\widgets\GridView;
+use backend\widgets\IssueColumn;
+use common\widgets\grid\ActionColumn;
 
 /* @var $this yii\web\View */
 /* @var $searchModel IssueNoteSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Notatki';
+$this->title = Yii::t('issue', 'Issue Notes');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-note-index">
 
-	<h1><?= Html::encode($this->title) ?></h1>
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-			['class' => 'yii\grid\SerialColumn'],
+			['class' => IssueColumn::class],
 			[
-				'attribute' => 'issue_id',
-				'value' => 'issue',
-				'label' => 'Sprawa',
+				'attribute' => 'user_id',
+				'value' => 'user',
+				'filter' => IssueNoteSearch::getUsersNames(),
 			],
-			'user',
 			'title',
 			'description',
-
-			['class' => 'yii\grid\ActionColumn'],
+			'publish_at:datetime',
+			'created_at:datetime',
+			'updated_at:datetime',
+			['class' => ActionColumn::class],
 		],
 	]); ?>
 </div>

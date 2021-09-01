@@ -39,7 +39,7 @@ class NoteCest {
 		/** @var Issue $model */
 		$model = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $model->id]);
-		$I->see('Create note for issue: ' . $model->longId);
+		$I->see('Create Issue Note for: ' . $model->longId);
 		$I->fillField('Title', 'Some title');
 		$I->fillField('Description', 'Some description');
 		$I->click('Save');
@@ -66,7 +66,7 @@ class NoteCest {
 		$I->amLoggedIn();
 		$model = $settlementFixture->grabSettlement('not-payed-with-double-costs');
 		$I->amOnPage([static::ROUTE_SETTLEMENT, 'id' => $model->id]);
-		$I->see('Create note for: ' . $model->getName());
+		$I->see('Create Issue Note for settlement: ' . $model->getTypeName());
 		$I->fillField('Title', 'Some title');
 		$I->fillField('Description', 'Some description');
 		$I->click('Save');
@@ -91,7 +91,7 @@ class NoteCest {
 		/** @var Summon $model */
 		$model = $I->grabFixture(IssueFixtureHelper::SUMMON, 'new');
 		$I->amOnPage([static::ROUTE_SUMMON, 'id' => $model->id]);
-		$I->see('Create note for: ' . $model->getName());
+		$I->see('Create Issue Note for Summon: ' . $model->title);
 		$I->fillField('Title', 'Some title');
 		$I->fillField('Description', 'Some description');
 		$I->click('Save');

@@ -352,7 +352,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	public function getIssueNotes(): IssueNoteQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])
-			->with('user')->orderBy('created_at DESC');
+			->with('user')->orderBy('publish_at DESC');
 	}
 
 	public function getSummons(): ActiveQuery {
