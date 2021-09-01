@@ -28,6 +28,7 @@ class IssueNoteSearch extends IssueNote {
 	public function rules(): array {
 		return [
 			[['id', 'issue_id', 'user_id'], 'integer'],
+			['is_pinned', 'boolean'],
 			[['title', 'description', 'publish_at', 'created_at', 'updated_at'], 'safe'],
 		];
 	}
@@ -72,6 +73,7 @@ class IssueNoteSearch extends IssueNote {
 			'publish_at' => $this->publish_at,
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,
+			'is_pinned' => $this->is_pinned,
 		]);
 
 		$query->andFilterWhere(['like', 'title', $this->title])

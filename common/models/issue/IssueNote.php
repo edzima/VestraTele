@@ -24,6 +24,7 @@ use yii\helpers\StringHelper;
  * @property int $updated_at
  * @property int $publish_at
  * @property int $type
+ * @property int $is_pinned
  *
  * @property Issue $issue
  * @property User $user
@@ -76,6 +77,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
 			'publish_at' => Yii::t('common', 'Publish at'),
+			'is_pinned' => Yii::t('common', 'Is Pinned'),
 		];
 	}
 
@@ -91,6 +93,10 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 
 	public function isForSettlement(): bool {
 		return $this->isType(static::TYPE_SETTLEMENT);
+	}
+
+	public function isPinned(): bool {
+		return (bool) $this->is_pinned;
 	}
 
 	public function isForSummon(): bool {

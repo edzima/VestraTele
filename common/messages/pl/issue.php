@@ -10,4 +10,5 @@ return [
 	'Update Issue Note: {title}' => 'Edytuj notatkę: {title}',
 	'Search for a title ...' => 'Szukaj tytułu ...',
 	'Search for a description ...' => 'Szukaj opisu ...',
+	'Pinned Issue Notes' => 'Przypięte Notatki',
 ];
