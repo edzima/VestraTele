@@ -19,7 +19,7 @@ use yii\helpers\Html;
 		<?= $model->description ?>
 	</div>
 	<div class="panel-footer">
-		<span class="date pull-left"><?= Yii::$app->formatter->asDateTime($model->updated_at) ?></span>
+		<span class="date pull-left"><?= Yii::$app->formatter->asDateTime($model->publish_at) ?></span>
 		<?php if ($model->user_id === Yii::$app->user->id || Yii::$app->user->can(Worker::ROLE_MANAGER)): ?>
 			<span class="action pull-right">
 				<?= Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['note/update', 'id' => $model->id]) ?>

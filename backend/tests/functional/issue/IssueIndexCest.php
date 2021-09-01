@@ -15,7 +15,7 @@ class IssueIndexCest {
 	/**
 	 * @see IssueController::actionIndex()
 	 */
-	protected const ROUTE = '/issue/issue/index';
+	public const ROUTE = '/issue/issue/index';
 
 	public function checkWithoutPermission(Manager $I): void {
 		$I->amLoggedIn();

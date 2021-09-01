@@ -311,4 +311,5 @@ return [
 	'Last Month {month}' => 'Poprzedni ({month})',
 	'Current Month {month}' => 'Obecny ({month})',
 	'Next Month {month}' => 'Następny ({month})',
+	'Publish at' => 'Data',
 ];

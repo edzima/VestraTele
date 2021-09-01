@@ -22,6 +22,7 @@ use yii\helpers\StringHelper;
  * @property string $description
  * @property int $created_at
  * @property int $updated_at
+ * @property int $publish_at
  * @property int $type
  *
  * @property Issue $issue
@@ -65,36 +66,25 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules(): array {
-		return [
-			[['issue_id', 'user_id', 'title', 'description'], 'required'],
-			[['issue_id', 'user_id'], 'integer'],
-			[['created_at', 'updated_at'], 'safe'],
-			[['title', 'type'], 'string', 'max' => 255],
-			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
-			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-		];
-	}
-
-	/**
-	 * @inheritdoc
-	 */
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'issue_id' => 'Issue ID',
-			'user_id' => 'User ID',
+			'issue_id' => Yii::t('common', 'Issue'),
+			'user_id' => Yii::t('common', 'User'),
 			'title' => Yii::t('common', 'Title'),
 			'description' => Yii::t('common', 'Description'),
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
+			'publish_at' => Yii::t('common', 'Publish at'),
 		];
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getIssue(): IssueQuery {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getUser(): UserQuery {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
