@@ -115,8 +115,8 @@ class IssuePayCalculationGrid extends GridView {
 				'label' => Yii::t('common', 'Stage'),
 				'attribute' => 'issue_stage_id',
 				'value' => 'issue.stage',
-				'visible' => $this->filterModel->withIssueStage,
-				'filter' => $this->filterModel::getIssueStagesNames(),
+				'visible' => $this->filterModel ? $this->filterModel->withIssueStage : false,
+				'filter' => $this->filterModel ? $this->filterModel::getIssueStagesNames() : null,
 				'filterType' => static::FILTER_SELECT2,
 				'filterWidgetOptions' => [
 					'options' => [
