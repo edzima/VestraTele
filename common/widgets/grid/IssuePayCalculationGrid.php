@@ -7,6 +7,7 @@ use common\models\issue\IssuePayCalculation;
 use common\models\settlement\search\IssuePayCalculationSearch;
 use common\widgets\GridView;
 use Decimal\Decimal;
+use kartik\select2\Select2;
 use Yii;
 use yii\base\InvalidConfigException;
 
@@ -105,10 +106,26 @@ class IssuePayCalculationGrid extends GridView {
 			],
 			[
 				'class' => IssueTypeColumn::class,
-				'label' => Yii::t('backend', 'Issue type'),
+				'label' => Yii::t('common', 'Issue type'),
 				'attribute' => 'issue_type_id',
 				'visible' => $this->withIssueType,
 				'valueType' => $this->valueTypeIssueType,
+			],
+			[
+				'label' => Yii::t('common', 'Stage'),
+				'attribute' => 'issue_stage_id',
+				'value' => 'issue.stage',
+				'visible' => $this->filterModel->withIssueStage,
+				'filter' => $this->filterModel::getIssueStagesNames(),
+				'filterType' => static::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'options' => [
+						'multiple' => true,
+						'placeholder' => Yii::t('common', 'Stage'),
+					],
+					'size' => Select2::SIZE_SMALL,
+					'showToggleAll' => false,
+				],
 			],
 			/*
 			[

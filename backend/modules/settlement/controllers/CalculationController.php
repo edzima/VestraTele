@@ -63,6 +63,8 @@ class CalculationController extends Controller {
 		}
 		Url::remember();
 		$searchModel = new IssuePayCalculationSearch();
+		$searchModel->setScenario(IssuePayCalculationSearch::SCENARIO_ARCHIVE);
+		$searchModel->withIssueStage = true;
 		$searchModel->withoutProvisions = true;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
