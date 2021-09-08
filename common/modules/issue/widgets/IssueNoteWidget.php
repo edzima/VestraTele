@@ -14,6 +14,10 @@ use yii\base\Widget;
 
 class IssueNoteWidget extends Widget {
 
+	protected const CLASS_PINNED = 'panel-danger';
+	protected const CLASS_SETTLEMENT = 'panel-settlement';
+	protected const CLASS_DEFAULT = 'panel-primary';
+
 	public IssueNote $model;
 	public bool $removeBtn = true;
 
@@ -23,10 +27,17 @@ class IssueNoteWidget extends Widget {
 
 	public function init() {
 		parent::init();
+		$this->ensureHtmlOptions();
+	}
+
+	private function ensureHtmlOptions(): void {
 		if ($this->model->isPinned()) {
-			Html::addCssClass($this->options, 'panel-warning');
+			Html::addCssClass($this->options, static::CLASS_PINNED);
 		} else {
-			Html::addCssClass($this->options, $this->model->isForSettlement() ? 'panel-success' : 'panel-primary');
+			Html::addCssClass($this->options, $this->model->isForSettlement()
+				? static::CLASS_SETTLEMENT
+				: static::CLASS_DEFAULT
+			);
 		}
 	}
 
