@@ -187,7 +187,7 @@ $this->params['breadcrumbs'][] = $this->title;
 						);
 					},
 					'note' => static function (string $url, Issue $model): string {
-						return Html::a('<i class="fa fa-calendar-plus-o" aria-hidden="true"></i>',
+						return Html::a('<i class="fa fa-comments" aria-hidden="true"></i>',
 							['note/create', 'issueId' => $model->id],
 							[
 								'title' => Yii::t('issue', 'Create Issue Note'),
