@@ -33,6 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'issue',
 			'user',
 			'is_pinned:boolean',
+			'is_template:boolean',
 			'title',
 			'description:ntext',
 			'created_at:datetime',

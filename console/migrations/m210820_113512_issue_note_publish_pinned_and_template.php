@@ -6,7 +6,7 @@ use yii\db\Expression;
 /**
  * Class m210820_113512_issue_note_as_datetime
  */
-class m210820_113512_issue_note_as_datetime extends Migration {
+class m210820_113512_issue_note_publish_pinned_and_template extends Migration {
 
 	/**
 	 * {@inheritdoc}
@@ -17,6 +17,7 @@ class m210820_113512_issue_note_as_datetime extends Migration {
 			'publish_at' => new Expression('updated_at'),
 		], ['publish_at' => null]);
 		$this->addColumn('{{%issue_note}}', 'is_pinned', $this->boolean()->notNull()->defaultValue(0));
+		$this->addColumn('{{%issue_note}}', 'is_template', $this->boolean()->notNull()->defaultValue(0));
 	}
 
 	/**
@@ -24,6 +25,7 @@ class m210820_113512_issue_note_as_datetime extends Migration {
 	 */
 	public function safeDown() {
 		$this->dropColumn('{{%issue_note}}', 'is_pinned');
+		$this->dropColumn('{{%issue_note}}', 'is_template');
 	}
 
 }

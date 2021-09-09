@@ -25,6 +25,7 @@ use yii\helpers\StringHelper;
  * @property int $publish_at
  * @property int $type
  * @property int $is_pinned
+ * @property int $is_template
  *
  * @property Issue $issue
  * @property User $user
@@ -78,6 +79,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 			'updated_at' => Yii::t('common', 'Updated at'),
 			'publish_at' => Yii::t('common', 'Publish at'),
 			'is_pinned' => Yii::t('common', 'Is Pinned'),
+			'is_template' => Yii::t('common', 'Is Template'),
 		];
 	}
 

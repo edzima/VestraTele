@@ -23,6 +23,7 @@ class NoteTitleListAction extends Action {
 			$titles = IssueNote::find()
 				->select('title')
 				->where(['like', 'title', $q . '%', false])
+				->andWhere(['is_template' => true])
 				->distinct()
 				->limit($this->limit)
 				->addOrderBy(['created_at' => SORT_DESC])

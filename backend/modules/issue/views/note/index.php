@@ -30,6 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'title',
 			'description',
 			'is_pinned:boolean',
+			'is_template:boolean',
 			'publish_at:datetime',
 			'created_at:datetime',
 			'updated_at:datetime',
