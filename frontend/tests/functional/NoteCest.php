@@ -20,6 +20,8 @@ class NoteCest {
 	/** @see NoteController::actionSummon() */
 	public const ROUTE_SUMMON = '/note/summon';
 
+	private const SELECTOR_FORM = '#issue-note-form';
+
 	public function checkIssueAsCustomerServiceWithoutPermission(CustomerServiceTester $I): void {
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_ISSUE);
@@ -40,9 +42,10 @@ class NoteCest {
 		$model = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $model->id]);
 		$I->see('Create Issue Note for: ' . $model->longId);
-		$I->fillField('Title', 'Some title');
-		$I->fillField('Description', 'Some description');
-		$I->click('Save');
+		$I->submitForm(static::SELECTOR_FORM, $this->formsParams(
+			'Some Title',
+			'Some Description')
+		);
 		$I->seeRecord(IssueNote::class, [
 			'issue_id' => $model->id,
 			'title' => 'Some title',
@@ -67,9 +70,10 @@ class NoteCest {
 		$model = $settlementFixture->grabSettlement('not-payed-with-double-costs');
 		$I->amOnPage([static::ROUTE_SETTLEMENT, 'id' => $model->id]);
 		$I->see('Create Issue Note for settlement: ' . $model->getTypeName());
-		$I->fillField('Title', 'Some title');
-		$I->fillField('Description', 'Some description');
-		$I->click('Save');
+		$I->submitForm(static::SELECTOR_FORM, $this->formsParams(
+			'Some Title',
+			'Some Description')
+		);
 		$I->seeRecord(IssueNote::class, [
 			'issue_id' => $model->issue_id,
 			'title' => 'Some title',
@@ -92,9 +96,10 @@ class NoteCest {
 		$model = $I->grabFixture(IssueFixtureHelper::SUMMON, 'new');
 		$I->amOnPage([static::ROUTE_SUMMON, 'id' => $model->id]);
 		$I->see('Create Issue Note for Summon: ' . $model->title);
-		$I->fillField('Title', 'Some title');
-		$I->fillField('Description', 'Some description');
-		$I->click('Save');
+		$I->submitForm(static::SELECTOR_FORM, $this->formsParams(
+			'Some Title',
+			'Some Description')
+		);
 		$I->seeRecord(IssueNote::class, [
 			'issue_id' => $model->issue_id,
 			'title' => 'Some title',
@@ -104,4 +109,19 @@ class NoteCest {
 		$I->seeInCurrentUrl(SummonCest::ROUTE_VIEW);
 	}
 
+	private function formsParams($title, $description = null, $publish_at = null, $is_pinned = null) {
+		$params = [
+			'IssueNoteForm[title]' => $title,
+		];
+		if ($description !== null) {
+			$params['IssueNoteForm[description]'] = $description;
+		}
+		if ($publish_at !== null) {
+			$params['IssueNoteForm[publish_at]'] = $publish_at;
+		}
+		if ($is_pinned !== null) {
+			$params['IssueNoteForm[is_pinned]'] = $is_pinned;
+		}
+		return $params;
+	}
 }

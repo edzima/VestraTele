@@ -8,7 +8,6 @@ use backend\tests\Step\acceptance\IssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\IssueNote;
 use common\models\user\User;
-use Facebook\WebDriver\WebDriverKeys;
 use yii\helpers\Url;
 
 class NoteCest {
@@ -26,6 +25,19 @@ class NoteCest {
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::note()
 		);
+	}
+
+	public function checkCreate(AcceptanceTester $I): void {
+		$I->amOnPage(Url::to([static::ROUTE_CREATE, 'issueId' => 1]));
+		$I->fillOutSelect2OptionField('.field-issuenoteform-title', 'Not Existed Yet Title');
+		$I->fillOutSelect2OptionField('.field-issuenoteform-description', 'Not Existed Yet Description');
+		$I->click('#issue-note-form button[type=submit]');
+		$I->wait(1);
+		$I->seeRecord(IssueNote::class, [
+			'issue_id' => 1,
+			'title' => 'Not Existed Yet Title',
+			'description' => 'Not Existed Yet Description',
+		]);
 	}
 
 	public function checkFillSearch(AcceptanceTester $I): void {

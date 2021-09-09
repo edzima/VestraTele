@@ -28,9 +28,12 @@ use yii\web\JsExpression;
 			'options' => ['class' => 'col-md-1'],
 		])->checkbox() ?>
 
-		<?= $form->field($model, 'is_template', [
-			'options' => ['class' => 'col-md-1'],
-		])->checkbox() ?>
+		<?= $model->isAttributeSafe('is_template')
+			? $form->field($model, 'is_template', [
+				'options' => ['class' => 'col-md-1'],
+			])->checkbox()
+			: ''
+		?>
 	</div>
 
 
