@@ -85,7 +85,7 @@ class IssueNoteForm extends Model {
 	}
 
 	public function save(): bool {
-		if ($this->validate()) {
+		if ($this->beforeSave()) {
 			$model = $this->getModel();
 			$model->issue_id = $this->issue_id;
 			$model->is_pinned = $this->is_pinned;
@@ -97,6 +97,10 @@ class IssueNoteForm extends Model {
 			return $model->save();
 		}
 		return false;
+	}
+
+	protected function beforeSave(): bool {
+		return $this->validate();
 	}
 
 }

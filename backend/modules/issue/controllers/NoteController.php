@@ -8,6 +8,7 @@ use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
+use common\models\user\Worker;
 use common\modules\issue\actions\NoteDescriptionListAction;
 use common\modules\issue\actions\NoteTitleListAction;
 use Yii;
@@ -50,7 +51,7 @@ class NoteController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new IssueNoteSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -87,6 +88,9 @@ class NoteController extends Controller {
 			'issue_id' => $issue->getIssueId(),
 			'user_id' => Yii::$app->user->id,
 		]);
+		if (Yii::$app->user->can(Worker::PERMISSION_NOTE_TEMPLATE)) {
+			$model->scenario = IssueNoteForm::SCENARIO_TEMPLATE;
+		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirectIssue($issueId);
@@ -139,6 +143,9 @@ class NoteController extends Controller {
 	 */
 	public function actionUpdate(int $id) {
 		$model = new IssueNoteForm();
+		if (Yii::$app->user->can(Worker::PERMISSION_NOTE_TEMPLATE)) {
+			$model->scenario = IssueNoteForm::SCENARIO_TEMPLATE;
+		}
 		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {

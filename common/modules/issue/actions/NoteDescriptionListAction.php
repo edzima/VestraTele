@@ -24,6 +24,7 @@ class NoteDescriptionListAction extends Action {
 			$descriptions = IssueNote::find()
 				->select('description')
 				->where(['like', 'description', $q])
+				->andWhere(['is_template' => true])
 				->distinct()
 				->limit($this->limit)
 				->addOrderBy(['created_at' => SORT_DESC])

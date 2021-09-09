@@ -27,6 +27,10 @@ use yii\web\JsExpression;
 		<?= $form->field($model, 'is_pinned', [
 			'options' => ['class' => 'col-md-1'],
 		])->checkbox() ?>
+
+		<?= $form->field($model, 'is_template', [
+			'options' => ['class' => 'col-md-1'],
+		])->checkbox() ?>
 	</div>
 
 

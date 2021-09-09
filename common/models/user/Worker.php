@@ -26,6 +26,7 @@ class Worker extends User implements ActiveHierarchy {
 		self::ROLE_MANAGER,
 	];
 
+	public const PERMISSION_NOTE_TEMPLATE = 'note.template';
 	public const PERMISSION_COST_DEBT = 'cost.debt';
 	public const PERMISSION_PROVISION_CHILDREN_VISIBLE = 'provision.children.visible';
 

@@ -3,7 +3,6 @@
 namespace backend\tests\functional\issue;
 
 use backend\modules\issue\controllers\NoteController;
-use backend\tests\FunctionalTester;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\IssueFixtureHelper;
@@ -63,6 +62,8 @@ class NoteCest {
 		$I->seeInGridHeader('User');
 		$I->seeInGridHeader('Title');
 		$I->seeInGridHeader('Description');
+		$I->seeInGridHeader('Is Pinned');
+		$I->seeInGridHeader('Is Template');
 		$I->seeInGridHeader('Publish At');
 		$I->seeInGridHeader('Created At');
 		$I->seeInGridHeader('Updated At');
