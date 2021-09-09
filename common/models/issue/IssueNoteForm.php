@@ -20,7 +20,7 @@ class IssueNoteForm extends Model {
 	public ?string $type = null;
 	public bool $is_pinned = false;
 	public string $title = '';
-	public string $description = '';
+	public ?string $description = null;
 	public string $publish_at = '';
 
 	public string $dateFormat = 'Y-m-d H:i';
@@ -50,12 +50,13 @@ class IssueNoteForm extends Model {
 
 	public function rules(): array {
 		return [
-			[['title', 'description', '!user_id', '!issue_id', 'publish_at'], 'required'],
+			[['title', '!user_id', '!issue_id', 'publish_at'], 'required'],
 			[['issue_id', 'user_id'], 'integer'],
 			['is_pinned', 'boolean'],
 			['!type', 'string'],
 			[['title'], 'string', 'max' => 255],
 			['description', 'string'],
+			['description', 'default', 'value' => null],
 			['publish_at', 'date', 'format' => 'php:' . $this->dateFormat],
 			['issue_id', 'exist', 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			['user_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],

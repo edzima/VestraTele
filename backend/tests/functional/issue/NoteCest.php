@@ -76,7 +76,6 @@ class NoteCest {
 		$I->amOnRoute(static::ROUTE_CREATE, ['issueId' => 1]);
 		$I->submitForm(static::SELECTOR_FORM, $this->formsParams('', '', ''));
 		$I->seeValidationError('Title cannot be blank');
-		$I->seeValidationError('Description cannot be blank');
 		$I->seeValidationError('Publish At cannot be blank');
 	}
 
