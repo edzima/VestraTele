@@ -126,9 +126,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'contentOptions' => [
 					'class' => 'bold-text text-center',
 				],
-				'options' => [
-					//'style' => 'width:80px',
-				],
 			],
 			[
 				'class' => DataColumn::class,
