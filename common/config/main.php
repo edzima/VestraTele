@@ -17,7 +17,7 @@ use yii\caching\DummyCache;
 use yii\caching\FileCache;
 
 return [
-	'name' => 'Vestra CRM',
+	'name' => $_ENV['APP_NAME'],
 	'vendorPath' => dirname(__DIR__, 2) . '/vendor',
 	'extensions' => require(__DIR__ . '/../../vendor/yiisoft/extensions.php'),
 	'timeZone' => 'Europe/Warsaw', //@todo load from .env
