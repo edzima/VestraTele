@@ -69,7 +69,6 @@ YiiAsset::register($this);
 	<?= IssueNotesWidget::widget([
 		'model' => $model->issue,
 		'notes' => $model->issue->getIssueNotes()->onlySummon($model->id)->all(),
-		'addUrl' => Url::to(['/issue/note/create-summon', 'id' => $model->id]),
 	]) ?>
 
 

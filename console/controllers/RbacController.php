@@ -59,6 +59,7 @@ class RbacController extends Controller {
 		Worker::PERMISSION_MEET,
 		User::PERMISSION_NEWS,
 		User::PERMISSION_NOTE,
+		Worker::PERMISSION_NOTE_TEMPLATE,
 		User::PERMISSION_PROVISION,
 		Worker::PERMISSION_PAY => [
 			Worker::ROLE_BOOKKEEPER,

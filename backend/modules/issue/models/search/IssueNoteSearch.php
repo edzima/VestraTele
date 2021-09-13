@@ -3,6 +3,7 @@
 namespace backend\modules\issue\models\search;
 
 use common\models\issue\IssueNote;
+use common\models\user\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -11,13 +12,24 @@ use yii\data\ActiveDataProvider;
  */
 class IssueNoteSearch extends IssueNote {
 
+	public static function getUsersNames(): array {
+		return User::getSelectList(
+			IssueNote::find()
+				->select('user_id')
+				->distinct()
+				->column(),
+			false
+		);
+	}
+
 	/**
 	 * @inheritdoc
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'issue_id', 'user_id', 'created_at', 'updated_at'], 'integer'],
-			[['title', 'description'], 'safe'],
+			[['id', 'issue_id', 'user_id'], 'integer'],
+			[['is_pinned', 'is_template'], 'boolean'],
+			[['title', 'description', 'publish_at', 'created_at', 'updated_at'], 'safe'],
 		];
 	}
 
@@ -58,8 +70,11 @@ class IssueNoteSearch extends IssueNote {
 			'id' => $this->id,
 			'issue_id' => $this->issue_id,
 			'user_id' => $this->user_id,
+			'publish_at' => $this->publish_at,
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,
+			'is_pinned' => $this->is_pinned,
+			'is_template' => $this->is_template,
 		]);
 
 		$query->andFilterWhere(['like', 'title', $this->title])

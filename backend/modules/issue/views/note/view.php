@@ -32,10 +32,12 @@ $this->params['breadcrumbs'][] = $this->title;
 		'attributes' => [
 			'issue',
 			'user',
+			'is_pinned:boolean',
+			'is_template:boolean',
 			'title',
-			'description',
-			'created_at',
-			'updated_at',
+			'description:ntext',
+			'created_at:datetime',
+			'updated_at:datetime',
 		],
 	]) ?>
 

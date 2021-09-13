@@ -4,7 +4,9 @@ namespace console\controllers;
 
 use backend\modules\settlement\models\CalculationProblemStatusForm;
 use common\components\DbManager;
+use common\helpers\StringHelper;
 use common\models\issue\IssueMeet;
+use common\models\issue\IssueNote;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
@@ -17,6 +19,33 @@ use yii\helpers\Console;
 use yii\helpers\Json;
 
 class UpgradeController extends Controller {
+
+	public function actionNoteTitleDates(): void {
+		$count = 0;
+		foreach (IssueNote::find()->andWhere(['like', 'title', '('])->batch(500) as $rows) {
+			foreach ($rows as $note) {
+				/** @var IssueNote $note */
+				$date = StringHelper::between($note->title, '(', ')');
+				$dateTime = null;
+				if ($date) {
+					try {
+						$dateTime = new \DateTime($date);
+						$count++;
+						$note->detachBehaviors();
+						$note->publish_at = $dateTime->format('Y-m-d');
+						$note->title = trim(str_replace("($date)", '', $note->title));
+						if (!$note->save()) {
+							Console::output(print_r($note->getErrors()));
+						}
+					} catch (\Exception $exception) {
+						Console::output($date);
+					}
+				}
+			}
+		}
+		Console::output('Total Count: ' . IssueNote::find()->andWhere(['like', 'title', '('])->count());
+		Console::output('With Valid Date Count: ' . $count);
+	}
 
 	public function actionProvisionTypeUsers(): void {
 		/** @var IssueProvisionType[] $types */

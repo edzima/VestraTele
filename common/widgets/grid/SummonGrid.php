@@ -11,7 +11,11 @@ class SummonGrid extends GridView {
 
 	public $id = 'summon-grid';
 
-	public $actionColumn = ['class' => ActionColumn::class];
+	/** @todo add note link */
+	public $actionColumn = [
+		'class' => ActionColumn::class,
+		'template' => '{note} {view} {update} {delete}',
+	];
 
 	public string $issueColumn = IssueColumn::class;
 

@@ -2,6 +2,7 @@
 
 namespace backend\tests\functional\issue;
 
+use backend\modules\issue\controllers\IssueController;
 use backend\tests\Step\Functional\CostIssueManager;
 use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use backend\tests\Step\Functional\IssueManager;
@@ -10,6 +11,9 @@ use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
 
 class IssueViewCest {
+
+	/** @see IssueController::actionView() */
+	public const ROUTE = '/issue/issue/view';
 
 	/**
 	 * Load fixtures before db transaction begin
@@ -51,6 +55,14 @@ class IssueViewCest {
 		$I->seeResponseCodeIsSuccessful();
 	}
 
+	public function checkStageLink(IssueManager $I): void {
+		$I->amLoggedIn();
+		$this->goToIssuePage($I);
+		$I->seeLink('Change Stage');
+		$I->click('Change Stage');
+		$I->seeInCurrentUrl(IssueStageChangeCest::ROUTE);
+	}
+
 	public function checkCostLink(CostIssueManager $I): void {
 		$I->amLoggedIn();
 		$this->goToIssuePage($I);
@@ -78,7 +90,7 @@ class IssueViewCest {
 	protected function goToIssuePage(IssueManager $I, string $issueIndex = '0'): Issue {
 		/** @var Issue $model */
 		$model = $I->grabFixture(IssueFixtureHelper::ISSUE, $issueIndex);
-		$I->amOnPage(['/issue/issue/view', 'id' => $model->id]);
+		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
 		return $model;
 	}
 

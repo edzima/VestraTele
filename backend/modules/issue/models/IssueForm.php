@@ -147,11 +147,6 @@ class IssueForm extends Model {
 			$model->entity_responsible_id = $this->entity_responsible_id;
 			$model->signing_at = $this->signing_at;
 			$model->type_additional_date_at = $this->type_additional_date_at;
-			if (isset($model->dirtyAttributes['stage_id']) && $model->stage_change_at !== $this->stage_change_at) {
-				$model->stage_change_at = date('Y-m-d');
-			} else {
-				$model->stage_change_at = $this->stage_change_at;
-			}
 			if (!$model->save(false)) {
 				return false;
 			}
@@ -199,7 +194,7 @@ class IssueForm extends Model {
 		return static::getStages($this->type_id);
 	}
 
-	protected static function getStages(int $typeID): array {
+	public static function getStages(int $typeID): array {
 		$type = IssueType::get($typeID);
 		if ($type === null) {
 			return [];

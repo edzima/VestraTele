@@ -1,6 +1,7 @@
 <?php
 
 use common\models\issue\IssueUser;
+use common\models\user\User;
 use common\models\user\Worker;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
@@ -122,10 +123,22 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => ActionColumn::class,
-				'template' => '{view}',
+				'template' => '{note} {view}',
 				'visibleButtons' => [
 					'view' => static function (IssueUser $model) use ($searchModel) {
 						return !$model->issue->isArchived() || $searchModel->withArchive;
+					},
+					'note' => Yii::$app->user->can(User::PERMISSION_NOTE),
+				],
+				'buttons' => [
+					'note' => static function (string $url, IssueUser $model): string {
+						return Html::a('<i class="fa fa-comments" aria-hidden="true"></i>',
+							['note/issue', 'id' => $model->issue_id],
+							[
+								'title' => Yii::t('issue', 'Create Issue Note'),
+								'aria-label' => Yii::t('issue', 'Create Issue Note'),
+							]
+						);
 					},
 				],
 			],

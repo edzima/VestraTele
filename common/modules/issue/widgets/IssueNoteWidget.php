@@ -8,16 +8,50 @@
 
 namespace common\modules\issue\widgets;
 
+use common\helpers\Html;
+use common\models\issue\IssueNote;
 use yii\base\Widget;
 
 class IssueNoteWidget extends Widget {
 
-	public $model;
-	public $removeBtn = true;
+	protected const CLASS_PINNED = 'panel-danger';
+	protected const CLASS_SETTLEMENT = 'panel-settlement';
+	protected const CLASS_STAGE_CHANGE = 'panel-warning';
+	protected const CLASS_DEFAULT = 'panel-primary';
 
-	public function run() {
+	public IssueNote $model;
+	public bool $removeBtn = true;
+
+	public array $options = [
+		'class' => 'panel',
+	];
+
+	public function init() {
+		parent::init();
+		$this->ensureHtmlOptions();
+	}
+
+	private function ensureHtmlOptions(): void {
+		Html::addCssClass($this->options, $this->getPanelClass());
+	}
+
+	private function getPanelClass(): string {
+		if ($this->model->isPinned()) {
+			return static::CLASS_PINNED;
+		}
+		if ($this->model->isForSettlement()) {
+			return static::CLASS_SETTLEMENT;
+		}
+		if ($this->model->isForStageChange()) {
+			return static::CLASS_STAGE_CHANGE;
+		}
+		return static::CLASS_DEFAULT;
+	}
+
+	public function run(): string {
 		return $this->render('issue-note', [
 			'model' => $this->model,
+			'options' => $this->options,
 			'removeBtn' => $this->removeBtn,
 		]);
 	}

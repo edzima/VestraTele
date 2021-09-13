@@ -125,6 +125,9 @@ div.required label:after {
 	}
 }
 
+.d-inline {
+	display: inline;
+}
 
 .d-inline-flex {
 	display: inline-flex;

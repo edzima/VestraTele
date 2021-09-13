@@ -37,6 +37,8 @@ return [
 	'Clear' => 'Wyczyść',
 	'Content' => 'Treść',
 	'Competition' => 'Konkursy',
+	'Change Stage' => 'Zmień Etap',
+	'Change Stage: {issue}' => 'Zmień Etap: {issue}',
 	'Create' => 'Dodaj',
 	'Create article' => 'Dodaj post',
 	'Create article category' => 'Dodaj kategorię',

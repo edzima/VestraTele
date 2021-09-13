@@ -2,6 +2,7 @@
 
 use backend\helpers\Html;
 use backend\modules\issue\models\search\IssueSearch;
+use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\widgets\CsvForm;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
@@ -28,6 +29,10 @@ $this->params['breadcrumbs'][] = $this->title;
 	<p>
 		<?= Yii::$app->user->can(User::PERMISSION_SUMMON)
 			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index'], ['class' => 'btn btn-warning'])
+			: ''
+		?>
+		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
+			? Html::a(Yii::t('issue', 'Issue Notes'), ['note/index'], ['class' => 'btn btn-info'])
 			: ''
 		?>
 		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
@@ -105,12 +110,21 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => DataColumn::class,
 				'attribute' => 'stage_id',
 				'filter' => $searchModel->getStagesNames(),
-				'value' => 'stage.short_name',
+				'value' => static function (Issue $model): string {
+					return StageChangeButtonDropdown::widget([
+						'model' => $model,
+						'label' => $model->stage->name,
+						'options' => [
+							'class' => 'btn btn-default',
+							'title' => Yii::t('backend', 'Change Stage'),
+							'aria-label' => Yii::t('backend', 'Change Stage'),
+							'data-pjax' => 0,
+						],
+					]);
+				},
+				'format' => 'raw',
 				'contentOptions' => [
 					'class' => 'bold-text text-center',
-				],
-				'options' => [
-					'style' => 'width:60px',
 				],
 			],
 			[
@@ -171,7 +185,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => ActionColumn::class,
-				'template' => '{installment} {view} {update} {delete}',
+				'template' => '{installment} {stage} {note} {view} {update} {delete}',
 				'buttons' => [
 					'installment' => static function (string $url, Issue $model): string {
 						return Html::a('<i class="fa fa-money" aria-hidden="true"></i>',
@@ -182,9 +196,19 @@ $this->params['breadcrumbs'][] = $this->title;
 							]
 						);
 					},
+					'note' => static function (string $url, Issue $model): string {
+						return Html::a('<i class="fa fa-comments" aria-hidden="true"></i>',
+							['note/create', 'issueId' => $model->id],
+							[
+								'title' => Yii::t('issue', 'Create Issue Note'),
+								'aria-label' => Yii::t('issue', 'Create Issue Note'),
+							]
+						);
+					},
 				],
 				'visibleButtons' => [
 					'installment' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+					'note' => Yii::$app->user->can(User::PERMISSION_NOTE),
 					'view' => static function (Issue $model) use ($searchModel): bool {
 						return !$model->isArchived() || $searchModel->withArchive;
 					},

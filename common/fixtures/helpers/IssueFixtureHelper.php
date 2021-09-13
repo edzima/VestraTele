@@ -30,7 +30,7 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 
 	private const TYPE = 'issue.type';
 	private const STAGE = 'issue.stage';
-	private const NOTE = 'issue.note';
+	public const NOTE = 'issue.note';
 
 	public function grabIssue($index): Issue {
 		return $this->tester->grabFixture(static::ISSUE, $index);

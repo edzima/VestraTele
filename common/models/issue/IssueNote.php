@@ -19,10 +19,13 @@ use yii\helpers\StringHelper;
  * @property int $issue_id
  * @property int $user_id
  * @property string $title
- * @property string $description
+ * @property string|null $description
  * @property int $created_at
  * @property int $updated_at
- * @property int $type
+ * @property int $publish_at
+ * @property string $type
+ * @property int $is_pinned
+ * @property int $is_template
  *
  * @property Issue $issue
  * @property User $user
@@ -33,6 +36,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 
 	public const TYPE_SETTLEMENT = 'settlement';
 	public const TYPE_SUMMON = 'summon';
+	public const TYPE_STAGE_CHANGE = 'stage.change';
 
 	public ?string $typeName = null;
 
@@ -65,42 +69,41 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules(): array {
-		return [
-			[['issue_id', 'user_id', 'title', 'description'], 'required'],
-			[['issue_id', 'user_id'], 'integer'],
-			[['created_at', 'updated_at'], 'safe'],
-			[['title', 'type'], 'string', 'max' => 255],
-			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
-			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-		];
-	}
-
-	/**
-	 * @inheritdoc
-	 */
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'issue_id' => 'Issue ID',
-			'user_id' => 'User ID',
+			'issue_id' => Yii::t('common', 'Issue'),
+			'user_id' => Yii::t('common', 'User'),
 			'title' => Yii::t('common', 'Title'),
 			'description' => Yii::t('common', 'Description'),
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
+			'publish_at' => Yii::t('common', 'Publish at'),
+			'is_pinned' => Yii::t('common', 'Is Pinned'),
+			'is_template' => Yii::t('common', 'Is Template'),
 		];
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getIssue(): IssueQuery {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getUser(): UserQuery {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
 
 	public function isForSettlement(): bool {
 		return $this->isType(static::TYPE_SETTLEMENT);
+	}
+
+	public function isForStageChange(): bool {
+		return $this->isType(static::TYPE_STAGE_CHANGE);
+	}
+
+	public function isPinned(): bool {
+		return (bool) $this->is_pinned;
 	}
 
 	public function isForSummon(): bool {

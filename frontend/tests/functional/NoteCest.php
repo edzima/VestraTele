@@ -19,6 +19,10 @@ class NoteCest {
 	public const ROUTE_SETTLEMENT = '/note/settlement';
 	/** @see NoteController::actionSummon() */
 	public const ROUTE_SUMMON = '/note/summon';
+	/** @see NoteController::actionUpdate() */
+	public const ROUTE_UPDATE = '/note/update';
+
+	private const SELECTOR_FORM = '#issue-note-form';
 
 	public function checkIssueAsCustomerServiceWithoutPermission(CustomerServiceTester $I): void {
 		$I->amLoggedIn();
@@ -26,7 +30,33 @@ class NoteCest {
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkIssueAsCustomerService(CustomerServiceTester $I): void {
+	public function checkIssueCreateAsCustomerService(CustomerServiceTester $I): void {
+		$I->haveFixtures(
+			array_merge(
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::stageAndTypesFixtures(),
+				IssueFixtureHelper::note(),
+			)
+		);
+		$I->assignPermission(User::PERMISSION_NOTE);
+		$I->amLoggedIn();
+		/** @var Issue $model */
+		$model = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
+		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $model->id]);
+		$I->see('Create Issue Note for: ' . $model->longId);
+		$I->submitForm(static::SELECTOR_FORM, $this->formsParams(
+			'Some Title',
+			'Some Description')
+		);
+		$I->seeRecord(IssueNote::class, [
+			'issue_id' => $model->id,
+			'title' => 'Some title',
+			'description' => 'Some description',
+		]);
+		$I->seeInCurrentUrl(IssueCest::ROUTE_VIEW);
+	}
+
+	public function checkUpdateSelfNote(CustomerServiceTester $I): void {
 		$I->haveFixtures(
 			array_merge(
 				IssueFixtureHelper::issue(),
@@ -36,19 +66,30 @@ class NoteCest {
 		);
 		$I->assignPermission(User::PERMISSION_NOTE);
 		$I->amLoggedIn();
-		/** @var Issue $model */
-		$model = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
-		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $model->id]);
-		$I->see('Create note for issue: ' . $model->longId);
-		$I->fillField('Title', 'Some title');
-		$I->fillField('Description', 'Some description');
-		$I->click('Save');
-		$I->seeRecord(IssueNote::class, [
-			'issue_id' => $model->id,
-			'title' => 'Some title',
-			'description' => 'Some description',
+		$I->amOnRoute(static::ROUTE_UPDATE, [
+			'id' => $I->haveRecord(IssueNote::class, [
+				'title' => 'New Self title',
+				'user_id' => $I->getUser()->id,
+				'issue_id' => 1,
+			]),
 		]);
-		$I->seeInCurrentUrl(IssueCest::ROUTE_VIEW);
+		$I->see('Update Issue Note: New Self title');
+	}
+
+	public function checkUpdateNotSelfNote(CustomerServiceTester $I): void {
+		$I->haveFixtures(
+			array_merge(
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::types(),
+				IssueFixtureHelper::note(),
+			)
+		);
+		$I->assignPermission(User::PERMISSION_NOTE);
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_UPDATE, [
+			'id' => 1,
+		]);
+		$I->seePageNotFound();
 	}
 
 	public function checkSettlementAsCustomerService(CustomerServiceTester $I): void {
@@ -66,10 +107,11 @@ class NoteCest {
 		$I->amLoggedIn();
 		$model = $settlementFixture->grabSettlement('not-payed-with-double-costs');
 		$I->amOnPage([static::ROUTE_SETTLEMENT, 'id' => $model->id]);
-		$I->see('Create note for: ' . $model->getName());
-		$I->fillField('Title', 'Some title');
-		$I->fillField('Description', 'Some description');
-		$I->click('Save');
+		$I->see('Create Issue Note for settlement: ' . $model->getTypeName());
+		$I->submitForm(static::SELECTOR_FORM, $this->formsParams(
+			'Some Title',
+			'Some Description')
+		);
 		$I->seeRecord(IssueNote::class, [
 			'issue_id' => $model->issue_id,
 			'title' => 'Some title',
@@ -91,10 +133,11 @@ class NoteCest {
 		/** @var Summon $model */
 		$model = $I->grabFixture(IssueFixtureHelper::SUMMON, 'new');
 		$I->amOnPage([static::ROUTE_SUMMON, 'id' => $model->id]);
-		$I->see('Create note for: ' . $model->getName());
-		$I->fillField('Title', 'Some title');
-		$I->fillField('Description', 'Some description');
-		$I->click('Save');
+		$I->see('Create Issue Note for Summon: ' . $model->title);
+		$I->submitForm(static::SELECTOR_FORM, $this->formsParams(
+			'Some Title',
+			'Some Description')
+		);
 		$I->seeRecord(IssueNote::class, [
 			'issue_id' => $model->issue_id,
 			'title' => 'Some title',
@@ -104,4 +147,19 @@ class NoteCest {
 		$I->seeInCurrentUrl(SummonCest::ROUTE_VIEW);
 	}
 
+	private function formsParams($title, $description = null, $publish_at = null, $is_pinned = null) {
+		$params = [
+			'IssueNoteForm[title]' => $title,
+		];
+		if ($description !== null) {
+			$params['IssueNoteForm[description]'] = $description;
+		}
+		if ($publish_at !== null) {
+			$params['IssueNoteForm[publish_at]'] = $publish_at;
+		}
+		if ($is_pinned !== null) {
+			$params['IssueNoteForm[is_pinned]'] = $is_pinned;
+		}
+		return $params;
+	}
 }

@@ -53,7 +53,14 @@ use yii\widgets\ActiveForm;
 				->widget(DepDrop::class, [
 					'type' => DepDrop::TYPE_SELECT2,
 					'data' => $model->getStagesData(),
+					'select2Options' => [
+						'disabled' => !$model->getModel()->isNewRecord,
+					],
+					'pluginEvents' => [
+						"depdrop:afterChange" => "function(event, id, value) { event.currentTarget.disabled = false; }",
+					],
 					'pluginOptions' => [
+						'disabled' => true,
 						'depends' => [Html::getInputId($model, 'type_id')],
 						'placeholder' => $model->getAttributeLabel('stage_id'),
 						'url' => Url::to(['//issue/type/stages-list']),
@@ -175,7 +182,6 @@ const typeAdditionalDateAtField = document.getElementById('$typeAdditionalInputI
 const labelForTypeAdditionalDateAtField = typeAdditionalDateAtField.getElementsByTagName('label')[0];
 const typesAdditionalDateAtNames = $typesWithAdditionalDateAtNames;
 const archivesField = document.getElementById('archives-field');
-const stateChangeAtInput = document.getElementById('$stageChangeInputId');
 
 function isArchived(){
 	return parseInt(stageInput.value) === $archivesStageId;
@@ -189,9 +195,6 @@ stageInput.onchange = function(){
 		archivesField.classList.remove('hidden');
 	}else{
 		archivesField.classList.add('hidden');
-	}
-	if(stateChangeAtInput){
-			stateChangeAtInput.value = '';
 	}
 	
 };
