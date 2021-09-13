@@ -1,6 +1,7 @@
 <?php
 
 use common\models\issue\Issue;
+use common\models\issue\IssueInterface;
 use common\models\issue\IssueUser;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueUsersWidget;
@@ -140,6 +141,15 @@ if ($provision) {
 						[
 							'attribute' => 'stage',
 							'label' => $model->getAttributeLabel('stage_id'),
+							'value' => function (IssueInterface $issue): string {
+								if (!empty($issue->getIssueModel()->stage_change_at)) {
+									return Yii::t('issue', '{stage} ({from})', [
+										'stage' => $issue->getIssueStage()->name,
+										'from' => Yii::$app->formatter->asDate($issue->getIssueModel()->stage_change_at),
+									]);
+								}
+								return $issue->getIssueStage()->name;
+							},
 						],
 						[
 							'attribute' => 'entityResponsible',
