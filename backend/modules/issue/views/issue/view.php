@@ -1,5 +1,7 @@
 <?php
 
+use backend\helpers\Breadcrumbs;
+use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\modules\issue\widgets\SummonGrid;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\issue\Issue;
@@ -16,14 +18,15 @@ use yii\helpers\Html;
 
 $this->title = $model->longId;
 
-$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Customers'), 'url' => ['/user/customer/index']];
-$this->params['breadcrumbs'][] = ['label' => $model->customer, 'url' => ['/user/customer/view', 'id' => $model->customer->id]];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
-
+$this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 ?>
 <div class="issue-view">
 	<p>
+
+		<?= StageChangeButtonDropdown::widget([
+			'model' => $model,
+		])
+		?>
 
 		<?= Yii::$app->user->can(User::PERMISSION_NOTE) ? Html::a(Yii::t('backend', 'Create note'), ['note/create', 'issueId' => $model->id], [
 			'class' => 'btn btn-info',
@@ -36,13 +39,16 @@ $this->params['breadcrumbs'][] = $this->title;
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
 
-		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
-			'class' => 'btn btn-danger pull-right',
-			'data' => [
-				'confirm' => 'Czy napewno chcesz usunąć?',
-				'method' => 'post',
-			],
-		]) : '' ?>
+		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
+			? Html::a('Usuń', ['delete', 'id' => $model->id], [
+				'class' => 'btn btn-danger pull-right',
+				'data' => [
+					'confirm' => 'Czy napewno chcesz usunąć?',
+					'method' => 'post',
+				],
+			])
+			: ''
+		?>
 
 
 	</p>

@@ -10,6 +10,7 @@ use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssueNote;
 use common\models\issue\IssueSettlement;
 use common\models\issue\Summon;
+use frontend\helpers\Html;
 
 class NoteCest {
 
@@ -136,6 +137,34 @@ class NoteCest {
 		]);
 	}
 
+	public function chcekUpdateChangeStageNote(IssueManager $I): void {
+		$I->haveFixtures($this->fixtures());
+		$I->amLoggedIn();
+		$I->assignNotePermission();
+		/** @var IssueNote $note */
+		$note = $I->grabFixture(IssueFixtureHelper::NOTE, 'stage-change');
+		$I->amOnRoute(static::ROUTE_UPDATE, ['id' => $note->id]);
+		$I->see('Update Issue Note');
+		$I->seeInField(['name' => 'IssueNoteForm[title]'], $note->title);
+		$I->seeElement('input', [
+			'name' => 'IssueNoteForm[title]',
+			'disabled' => '1',
+		]);
+		$I->submitForm(static::SELECTOR_FORM, $this->formsParams(
+			'Try change Title',
+		)
+		);
+
+		$I->dontSeeRecord(IssueNote::class, [
+			'id' => $note->id,
+			'title' => 'Try change Title',
+		]);
+		$I->seeRecord(IssueNote::class, [
+			'id' => $note->id,
+			'title' => $note->title,
+		]);
+	}
+
 	public function checkCreateForSummon(IssueManager $I): void {
 		$I->haveFixtures(array_merge($this->fixtures(), IssueFixtureHelper::summon()));
 		$I->amLoggedIn();
@@ -150,7 +179,6 @@ class NoteCest {
 		)
 		);
 		$model = IssueNote::find()->andWhere(['title' => 'Summon Title'])->asArray()->all();
-		codecept_debug($model);
 		$I->seeRecord(IssueNote::class, [
 			'title' => 'Summon Title',
 			'description' => 'Some Description',
@@ -178,11 +206,14 @@ class NoteCest {
 		]);
 	}
 
-	private function formsParams($title, $description, $publish_at = null, $is_pinned = null) {
+	private function formsParams($title, $description = null, $publish_at = null, $is_pinned = null) {
 		$params = [
 			'IssueNoteForm[title]' => $title,
 			'IssueNoteForm[description]' => $description,
 		];
+		if ($description !== null) {
+			$params['IssueNoteForm[description]'] = $description;
+		}
 		if ($publish_at !== null) {
 			$params['IssueNoteForm[publish_at]'] = $publish_at;
 		}
@@ -196,7 +227,7 @@ class NoteCest {
 		return array_merge(
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::note(),
-			IssueFixtureHelper::types(),
+			IssueFixtureHelper::stageAndTypesFixtures(),
 			IssueFixtureHelper::users(),
 		);
 	}

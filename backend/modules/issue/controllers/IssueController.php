@@ -4,6 +4,7 @@ namespace backend\modules\issue\controllers;
 
 use backend\helpers\Url;
 use backend\modules\issue\models\IssueForm;
+use backend\modules\issue\models\IssueStageChangeForm;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
@@ -45,6 +46,7 @@ class IssueController extends Controller {
 	 */
 	public function actionIndex() {
 
+		Url::remember();
 		$searchModel = new IssueSearch();
 		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
@@ -185,10 +187,25 @@ class IssueController extends Controller {
 	public function actionUpdate($id) {
 		$form = new IssueForm(['model' => $this->findModel($id)]);
 		if ($form->load(Yii::$app->request->post()) && $form->save()) {
-			return $this->redirect(['index']);
+			return $this->redirect(Url::previous());
 		}
 		return $this->render('update', [
 			'model' => $form,
+		]);
+	}
+
+	public function actionStage(int $issueId, int $stageId = null) {
+		$model = new IssueStageChangeForm($this->findModel($issueId));
+		if ($stageId !== null) {
+			$model->stage_id = $stageId;
+		}
+		$model->date_at = date($model->dateFormat);
+		$model->user_id = Yii::$app->user->getId();
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(Url::previous());
+		}
+		return $this->render('stage', [
+			'model' => $model,
 		]);
 	}
 

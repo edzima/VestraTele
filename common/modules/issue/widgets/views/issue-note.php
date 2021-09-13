@@ -16,9 +16,11 @@ use yii\helpers\Html;
 		<span class="pull-right"><?= $model->user ?></span>
 	</h3>
 </div>
-<div class="panel-body">
-	<?= $model->description ?>
-</div>
+<?php if (!empty($model->description)): ?>
+	<div class="panel-body">
+		<?= $model->description ?>
+	</div>
+<?php endif; ?>
 <div class="panel-footer">
 	<span class="date pull-left"><?= Yii::$app->formatter->asDateTime($model->publish_at) ?></span>
 	<?php if ($model->user_id === Yii::$app->user->id || Yii::$app->user->can(Worker::ROLE_MANAGER)): ?>

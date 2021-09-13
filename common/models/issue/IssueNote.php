@@ -19,11 +19,11 @@ use yii\helpers\StringHelper;
  * @property int $issue_id
  * @property int $user_id
  * @property string $title
- * @property string $description
+ * @property string|null $description
  * @property int $created_at
  * @property int $updated_at
  * @property int $publish_at
- * @property int $type
+ * @property string $type
  * @property int $is_pinned
  * @property int $is_template
  *
@@ -36,6 +36,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 
 	public const TYPE_SETTLEMENT = 'settlement';
 	public const TYPE_SUMMON = 'summon';
+	public const TYPE_STAGE_CHANGE = 'stage.change';
 
 	public ?string $typeName = null;
 
@@ -95,6 +96,10 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 
 	public function isForSettlement(): bool {
 		return $this->isType(static::TYPE_SETTLEMENT);
+	}
+
+	public function isForStageChange(): bool {
+		return $this->isType(static::TYPE_STAGE_CHANGE);
 	}
 
 	public function isPinned(): bool {
