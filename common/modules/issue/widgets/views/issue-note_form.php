@@ -37,27 +37,29 @@ use yii\web\JsExpression;
 	</div>
 
 
-	<?= $form->field($model, 'title')->widget(Select2::class, [
-		'options' => ['placeholder' => Yii::t('issue', 'Search for a title ...')],
-		'pluginEvents' => [
-			'select2:open' => new JsExpression('function(e){
+	<?= $model->getScenario() !== IssueNoteForm::SCENARIO_STAGE_CHANGE
+		? $form->field($model, 'title')->widget(Select2::class, [
+			'options' => ['placeholder' => Yii::t('issue', 'Search for a title ...')],
+			'pluginEvents' => [
+				'select2:open' => new JsExpression('function(e){
 				let searchInput = document.getElementsByClassName("select2-search__field")[0];
 				searchInput.value = e.currentTarget.value;
 			}'),
-		],
-		'pluginOptions' => [
-			'tags' => true,
-			'minimumInputLength' => 3,
-			'ajax' => [
-				'delay' => 250,
-				'url' => $titleUrl,
-				'dataType' => 'json',
-				'data' => new JsExpression('function(params) { return {q:params.term}; }'),
-				'templateResult' => new JsExpression('function(note) { return note.text; }'),
-				'templateSelection' => new JsExpression('function (note) { return note.text; }'),
 			],
-		],
-	])
+			'pluginOptions' => [
+				'tags' => true,
+				'minimumInputLength' => 3,
+				'ajax' => [
+					'delay' => 250,
+					'url' => $titleUrl,
+					'dataType' => 'json',
+					'data' => new JsExpression('function(params) { return {q:params.term}; }'),
+					'templateResult' => new JsExpression('function(note) { return note.text; }'),
+					'templateSelection' => new JsExpression('function (note) { return note.text; }'),
+				],
+			],
+		])
+		: $form->field($model, 'title')->textInput(['disabled' => 1])
 	?>
 
 	<?= $form->field($model, 'description', [

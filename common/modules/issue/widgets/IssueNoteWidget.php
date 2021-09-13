@@ -16,6 +16,7 @@ class IssueNoteWidget extends Widget {
 
 	protected const CLASS_PINNED = 'panel-danger';
 	protected const CLASS_SETTLEMENT = 'panel-settlement';
+	protected const CLASS_STAGE_CHANGE = 'panel-warning';
 	protected const CLASS_DEFAULT = 'panel-primary';
 
 	public IssueNote $model;
@@ -31,14 +32,20 @@ class IssueNoteWidget extends Widget {
 	}
 
 	private function ensureHtmlOptions(): void {
+		Html::addCssClass($this->options, $this->getPanelClass());
+	}
+
+	private function getPanelClass(): string {
 		if ($this->model->isPinned()) {
-			Html::addCssClass($this->options, static::CLASS_PINNED);
-		} else {
-			Html::addCssClass($this->options, $this->model->isForSettlement()
-				? static::CLASS_SETTLEMENT
-				: static::CLASS_DEFAULT
-			);
+			return static::CLASS_PINNED;
 		}
+		if ($this->model->isForSettlement()) {
+			return static::CLASS_SETTLEMENT;
+		}
+		if ($this->model->isForStageChange()) {
+			return static::CLASS_STAGE_CHANGE;
+		}
+		return static::CLASS_DEFAULT;
 	}
 
 	public function run(): string {

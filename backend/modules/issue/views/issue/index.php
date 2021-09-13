@@ -2,6 +2,7 @@
 
 use backend\helpers\Html;
 use backend\modules\issue\models\search\IssueSearch;
+use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\widgets\CsvForm;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
@@ -109,12 +110,24 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => DataColumn::class,
 				'attribute' => 'stage_id',
 				'filter' => $searchModel->getStagesNames(),
-				'value' => 'stage.short_name',
+				'value' => static function (Issue $model): string {
+					return StageChangeButtonDropdown::widget([
+						'model' => $model,
+						'label' => $model->stage->name,
+						'options' => [
+							'class' => 'btn btn-default',
+							'title' => Yii::t('backend', 'Change Stage'),
+							'aria-label' => Yii::t('backend', 'Change Stage'),
+							'data-pjax' => 0,
+						],
+					]);
+				},
+				'format' => 'raw',
 				'contentOptions' => [
 					'class' => 'bold-text text-center',
 				],
 				'options' => [
-					'style' => 'width:60px',
+					//'style' => 'width:80px',
 				],
 			],
 			[
@@ -175,7 +188,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => ActionColumn::class,
-				'template' => '{installment} {note} {view} {update} {delete}',
+				'template' => '{installment} {stage} {note} {view} {update} {delete}',
 				'buttons' => [
 					'installment' => static function (string $url, Issue $model): string {
 						return Html::a('<i class="fa fa-money" aria-hidden="true"></i>',

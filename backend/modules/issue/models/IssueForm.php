@@ -199,7 +199,7 @@ class IssueForm extends Model {
 		return static::getStages($this->type_id);
 	}
 
-	protected static function getStages(int $typeID): array {
+	public static function getStages(int $typeID): array {
 		$type = IssueType::get($typeID);
 		if ($type === null) {
 			return [];

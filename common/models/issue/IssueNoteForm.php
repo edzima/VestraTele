@@ -14,6 +14,7 @@ use yii\base\Model;
  */
 class IssueNoteForm extends Model {
 
+	public const SCENARIO_STAGE_CHANGE = 'stage-change';
 	public ?int $issue_id = null;
 	public ?int $user_id = null;
 
@@ -51,6 +52,7 @@ class IssueNoteForm extends Model {
 	public function rules(): array {
 		return [
 			[['title', '!user_id', '!issue_id', 'publish_at'], 'required'],
+			[['!title'], 'required', 'on' => static::SCENARIO_STAGE_CHANGE],
 			[['issue_id', 'user_id'], 'integer'],
 			['is_pinned', 'boolean'],
 			['!type', 'string'],
@@ -76,6 +78,9 @@ class IssueNoteForm extends Model {
 		$this->description = $model->description;
 		$this->publish_at = (string) $model->publish_at;
 		$this->user_id = $model->user_id;
+		if ($model->isForStageChange()) {
+			$this->scenario = static::SCENARIO_STAGE_CHANGE;
+		}
 	}
 
 	public function getModel(): IssueNote {
