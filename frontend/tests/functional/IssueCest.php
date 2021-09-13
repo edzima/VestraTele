@@ -95,7 +95,7 @@ class IssueCest {
 		$I->haveFixtures(
 			array_merge(
 				IssueFixtureHelper::issue(),
-				IssueFixtureHelper::types(),
+				IssueFixtureHelper::stageAndTypesFixtures(),
 				IssueFixtureHelper::users(),
 				IssueFixtureHelper::entityResponsible(),
 				IssueFixtureHelper::summon()
@@ -123,7 +123,7 @@ class IssueCest {
 		$I->haveFixtures(
 			array_merge(
 				IssueFixtureHelper::issue(),
-				IssueFixtureHelper::types(),
+				IssueFixtureHelper::stageAndTypesFixtures(),
 				IssueFixtureHelper::note(),
 			)
 		);

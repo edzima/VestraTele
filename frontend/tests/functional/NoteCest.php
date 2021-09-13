@@ -19,6 +19,8 @@ class NoteCest {
 	public const ROUTE_SETTLEMENT = '/note/settlement';
 	/** @see NoteController::actionSummon() */
 	public const ROUTE_SUMMON = '/note/summon';
+	/** @see NoteController::actionUpdate() */
+	public const ROUTE_UPDATE = '/note/update';
 
 	private const SELECTOR_FORM = '#issue-note-form';
 
@@ -28,11 +30,11 @@ class NoteCest {
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkIssueAsCustomerService(CustomerServiceTester $I): void {
+	public function checkIssueCreateAsCustomerService(CustomerServiceTester $I): void {
 		$I->haveFixtures(
 			array_merge(
 				IssueFixtureHelper::issue(),
-				IssueFixtureHelper::types(),
+				IssueFixtureHelper::stageAndTypesFixtures(),
 				IssueFixtureHelper::note(),
 			)
 		);
@@ -52,6 +54,42 @@ class NoteCest {
 			'description' => 'Some description',
 		]);
 		$I->seeInCurrentUrl(IssueCest::ROUTE_VIEW);
+	}
+
+	public function checkUpdateSelfNote(CustomerServiceTester $I): void {
+		$I->haveFixtures(
+			array_merge(
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::types(),
+				IssueFixtureHelper::note(),
+			)
+		);
+		$I->assignPermission(User::PERMISSION_NOTE);
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_UPDATE, [
+			'id' => $I->haveRecord(IssueNote::class, [
+				'title' => 'New Self title',
+				'user_id' => $I->getUser()->id,
+				'issue_id' => 1,
+			]),
+		]);
+		$I->see('Update Issue Note: New Self title');
+	}
+
+	public function checkUpdateNotSelfNote(CustomerServiceTester $I): void {
+		$I->haveFixtures(
+			array_merge(
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::types(),
+				IssueFixtureHelper::note(),
+			)
+		);
+		$I->assignPermission(User::PERMISSION_NOTE);
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_UPDATE, [
+			'id' => 1,
+		]);
+		$I->seePageNotFound();
 	}
 
 	public function checkSettlementAsCustomerService(CustomerServiceTester $I): void {

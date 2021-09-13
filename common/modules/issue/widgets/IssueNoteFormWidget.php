@@ -16,7 +16,7 @@ class IssueNoteFormWidget extends Widget {
 	public array $titleListRoute = ['title-list'];
 	public array $descriptionListRoute = ['description-list'];
 
-	public function run() {
+	public function run(): string {
 		return $this->render('issue-note_form', [
 			'model' => $this->model,
 			'options' => $this->options,

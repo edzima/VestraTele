@@ -16,6 +16,7 @@ use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * CRUD for Summon model.
@@ -120,18 +121,18 @@ class NoteController extends Controller {
 	 * @return mixed
 	 */
 	public function actionUpdate(int $id) {
-		$issue = $this->findIssue($id);
+		$note = $this->findModel($id);
 		$model = new IssueNoteForm();
-		$model->setModel($this->findModel($id));
+		$model->setModel($note);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$this->redirectIssue($issue->getIssueId());
+			$this->redirectIssue($note->issue_id);
 		}
 		return $this->render('update', [
 			'model' => $model,
 		]);
 	}
 
-	private function redirectIssue(int $issueId) {
+	private function redirectIssue(int $issueId): Response {
 		return $this->redirect(['issue/view', 'id' => $issueId, '#' => 'notes-list']);
 	}
 
