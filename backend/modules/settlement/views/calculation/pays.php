@@ -52,6 +52,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			<?= $form->field($model, 'deadline_at', ['options' => ['class' => 'col-md-3 col-lg-2']])
 				->widget(DateWidget::class)
 			?>
+			<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-2']])
+				->textInput(['disabled' => true])
+			?>
+
 
 		</div>
 
