@@ -146,6 +146,10 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 			],
 			[
+				'class' => CustomerDataColumn::class,
+				'value' => 'customer.fullName',
+			],
+			[
 				'class' => DataColumn::class,
 				'attribute' => 'stage_change_at',
 				'format' => 'date',
@@ -155,11 +159,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'options' => [
 					'style' => 'width:90px',
 				],
-				'visible' => $searchModel->onlyDelayed,
-			],
-			[
-				'class' => CustomerDataColumn::class,
-				'value' => 'customer.fullName',
 			],
 			[
 				'class' => DataColumn::class,
