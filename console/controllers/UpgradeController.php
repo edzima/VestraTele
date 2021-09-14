@@ -32,6 +32,7 @@ class UpgradeController extends Controller {
 						$dateTime = new \DateTime($date);
 						$count++;
 						$note->detachBehaviors();
+						$note->updateIssueAfterSave = false;
 						$note->publish_at = $dateTime->format('Y-m-d');
 						$note->title = trim(str_replace("($date)", '', $note->title));
 						if (!$note->save()) {

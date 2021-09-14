@@ -34,6 +34,9 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 
 	use IssueTrait;
 
+	public bool $updateIssueAfterSave = true;
+	public bool $updateIssueAfterDelete = true;
+
 	public const TYPE_SETTLEMENT = 'settlement';
 	public const TYPE_SUMMON = 'summon';
 	public const TYPE_STAGE_CHANGE = 'stage.change';
@@ -57,12 +60,16 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	}
 
 	public function afterSave($insert, $changedAttributes) {
-		$this->issue->markAsUpdate();
+		if ($this->updateIssueAfterSave) {
+			$this->issue->markAsUpdate();
+		}
 		parent::afterSave($insert, $changedAttributes);
 	}
 
 	public function afterDelete() {
-		$this->issue->markAsUpdate();
+		if ($this->updateIssueAfterDelete) {
+			$this->issue->markAsUpdate();
+		}
 		parent::afterDelete();
 	}
 
