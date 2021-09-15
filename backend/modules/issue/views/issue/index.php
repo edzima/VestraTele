@@ -147,9 +147,10 @@ $this->params['breadcrumbs'][] = $this->title;
 						'placeholder' => $searchModel->getAttributeLabel('entity_responsible_id'),
 					],
 				],
+				'ellipsis' => true,
 				'value' => 'entityResponsible.name',
 				'options' => [
-					'style' => 'width:200px',
+					'style' => 'width:140px',
 				],
 			],
 
