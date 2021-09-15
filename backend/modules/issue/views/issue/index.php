@@ -61,7 +61,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => SerialColumn::class,
 				'width' => '40px',
 			],
-
 			[
 				'class' => IssueColumn::class,
 			],
@@ -72,6 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					'style' => 'width:180px',
 				],
 			],
+
 			[
 				'class' => DataColumn::class,
 				'filterType' => GridView::FILTER_SELECT2,
@@ -87,11 +87,9 @@ $this->params['breadcrumbs'][] = $this->title;
 						'placeholder' => $searchModel->getAttributeLabel('agent_id'),
 					],
 				],
-				'contentOptions' => [
-					'class' => 'ellipsis',
-				],
+				'ellipsis' => true,
 				'options' => [
-					'style' => 'width:200px',
+					'style' => 'width:10%',
 				],
 			],
 			[
@@ -99,12 +97,15 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'type_id',
 				'filter' => IssueSearch::getTypesNames(),
 				'value' => 'type.short_name',
-				'contentOptions' => [
-					'class' => 'bold-text text-center',
-				],
+				'contentBold' => true,
+				'contentCenter' => true,
 				'options' => [
 					'style' => 'width:80px',
 				],
+			],
+			[
+				'class' => CustomerDataColumn::class,
+				'value' => 'customer.fullName',
 			],
 			[
 				'class' => DataColumn::class,
@@ -114,18 +115,24 @@ $this->params['breadcrumbs'][] = $this->title;
 					return StageChangeButtonDropdown::widget([
 						'model' => $model,
 						'label' => $model->stage->name,
+						'containerOptions' => [
+							'class' => 'd-inline-flex',
+						],
 						'options' => [
-							'class' => 'btn btn-default',
+							'class' => 'btn btn-default btn-sm',
 							'title' => Yii::t('backend', 'Change Stage'),
 							'aria-label' => Yii::t('backend', 'Change Stage'),
 							'data-pjax' => 0,
 						],
 					]);
 				},
-				'format' => 'raw',
-				'contentOptions' => [
-					'class' => 'bold-text text-center',
+				'options' => [
+					'style' => 'width:250px',
 				],
+				'format' => 'raw',
+				'contentBold' => true,
+				'contentCenter' => true,
+				'ellipsis' => true,
 			],
 			[
 				'class' => DataColumn::class,
@@ -145,17 +152,12 @@ $this->params['breadcrumbs'][] = $this->title;
 					'style' => 'width:200px',
 				],
 			],
-			[
-				'class' => CustomerDataColumn::class,
-				'value' => 'customer.fullName',
-			],
+
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'stage_change_at',
 				'format' => 'date',
-				'contentOptions' => [
-					'class' => 'bold-text',
-				],
+				'contentBold' => true,
 				'options' => [
 					'style' => 'width:90px',
 				],
@@ -164,9 +166,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => DataColumn::class,
 				'attribute' => 'created_at',
 				'format' => 'date',
-				'contentOptions' => [
-					'class' => 'bold-text',
-				],
+				'contentBold' => true,
 				'options' => [
 					'style' => 'width:90px',
 				],
@@ -175,9 +175,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => DataColumn::class,
 				'attribute' => 'updated_at',
 				'format' => 'date',
-				'contentOptions' => [
-					'class' => 'bold-text',
-				],
+				'contentBold' => true,
 				'options' => [
 					'style' => 'width:90px',
 				],
