@@ -89,6 +89,7 @@ class CalculationCest {
 		$I->assignPermission(User::PERMISSION_PROVISION);
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeLink('Delete provisions');
 		$I->seeLink('Without provisions');
 		$I->click('Without provisions');
 		$I->seeResponseCodeIsSuccessful();
