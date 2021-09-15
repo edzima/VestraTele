@@ -107,14 +107,14 @@ class NoteCest {
 		$I->submitForm(static::SELECTOR_FORM, $this->formsParams(
 			'Some Title',
 			'Some Description',
-			'2020-02-02 10:00'
+			'2020-02-02 10:00:00'
 		)
 		);
 		$I->seeRecord(IssueNote::class, [
 			'issue_id' => 1,
 			'title' => 'Some Title',
 			'description' => 'Some Description',
-			'publish_at' => '2020-02-02 10:00',
+			'publish_at' => '2020-02-02 10:00:00',
 		]);
 	}
 
@@ -127,13 +127,13 @@ class NoteCest {
 		$I->submitForm(static::SELECTOR_FORM, $this->formsParams(
 			'Some Title Updated',
 			'Some Description',
-			'2020-02-02 10:00'
+			'2020-02-02 10:00:10'
 		)
 		);
 		$I->seeRecord(IssueNote::class, [
 			'title' => 'Some Title Updated',
 			'description' => 'Some Description',
-			'publish_at' => '2020-02-02 10:00',
+			'publish_at' => '2020-02-02 10:00:10',
 		]);
 	}
 

@@ -1,11 +1,13 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
+use backend\helpers\Url;
 use backend\modules\issue\models\IssueStageChangeForm;
 use common\helpers\Html;
 use common\widgets\ActiveForm;
 use common\widgets\DateTimeWidget;
 use kartik\select2\Select2;
+use yii\web\JsExpression;
 use yii\widgets\DetailView;
 
 /* @var $this \yii\web\View */
@@ -56,13 +58,43 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Change Stage');
 						'class' => 'col-md-4',
 					],
 				])
-					->widget(DateTimeWidget::class)
+					->widget(DateTimeWidget::class, [
+						'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
+					])
 				?>
 
 			</div>
 
-			<?= $form->field($model, 'description')->textarea() ?>
-
+			<?= $form->field($model, 'description', [
+				'options' => [
+					'class' => 'select-text-area-field',
+				],
+			])->widget(Select2::class, [
+				'options' => [
+					'placeholder' => Yii::t('issue', 'Search for a description ...'),
+					'class' => 'select-text-area',
+				],
+				'pluginEvents' => [
+					'select2:open' => new JsExpression('function(e){
+				let searchInput = document.getElementsByClassName("select2-search__field")[0];
+				searchInput.value = e.currentTarget.value;
+			}'),
+				],
+				'pluginOptions' => [
+					'allowClear' => true,
+					'minimumInputLength' => 3,
+					'tags' => true,
+					'ajax' => [
+						'delay' => 250,
+						'url' => Url::to(['/issue/note/description-list']),
+						'dataType' => 'json',
+						'data' => new JsExpression('function(params) { return {q:params.term}; }'),
+						'templateResult' => new JsExpression('function(note) { return note.text; }'),
+						'templateSelection' => new JsExpression('function (note) { return note.text; }'),
+					],
+				],
+			])
+			?>
 
 			<div class="form-group">
 				<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>
@@ -76,3 +108,18 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Change Stage');
 
 
 </div>
+
+
+<style>
+	.select-text-area-field .select2-selection--single {
+		height: 102px;
+	}
+
+	.select-text-area-field .select2-selection--single .select2-selection__arrow {
+		height: 100%;
+	}
+
+	.select-text-area-field .select2-selection--single .select2-selection__rendered {
+		white-space: normal;
+	}
+</style>

@@ -9,7 +9,7 @@ use yii\base\Model;
 
 class IssueStageChangeForm extends Model {
 
-	public string $dateFormat = 'Y-m-d H:i';
+	public string $dateFormat = 'Y-m-d H:i:s';
 
 	public int $stage_id;
 	public string $date_at = '';

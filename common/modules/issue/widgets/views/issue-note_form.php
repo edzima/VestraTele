@@ -22,7 +22,9 @@ use yii\web\JsExpression;
 	<div class="row">
 		<?= $form->field($model, 'publish_at', [
 			'options' => ['class' => 'col-md-2'],
-		])->widget(DateTimeWidget::class) ?>
+		])->widget(DateTimeWidget::class, [
+			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
+		]) ?>
 
 		<?= $form->field($model, 'is_pinned', [
 			'options' => ['class' => 'col-md-1'],

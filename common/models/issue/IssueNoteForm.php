@@ -24,7 +24,7 @@ class IssueNoteForm extends Model {
 	public ?string $description = null;
 	public string $publish_at = '';
 
-	public string $dateFormat = 'Y-m-d H:i';
+	public string $dateFormat = 'Y-m-d H:i:s';
 
 	private ?IssueNote $model = null;
 
