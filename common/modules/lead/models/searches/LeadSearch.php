@@ -3,6 +3,7 @@
 namespace common\modules\lead\models\searches;
 
 use common\models\AddressSearch;
+use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\models\user\User;
 use common\modules\lead\models\LeadCampaign;
@@ -12,6 +13,7 @@ use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\query\LeadAnswerQuery;
+use common\validators\PhoneValidator;
 use Yii;
 use yii\base\Model;
 use yii\base\UnknownPropertyException;
@@ -68,6 +70,7 @@ class LeadSearch extends Lead implements SearchModel {
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			[array_keys($this->questionsAttributes), 'safe'],
+			['phone', PhoneValidator::class],
 		];
 	}
 
@@ -174,6 +177,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyDuplicates($query);
 		$this->applyNameFilter($query);
 		$this->applyUserFilter($query);
+		$this->applyPhoneFilter($query);
 		$this->applyReportFilter($query);
 
 		// grid filtering conditions
@@ -191,7 +195,6 @@ class LeadSearch extends Lead implements SearchModel {
 		$query
 			->andFilterWhere(['like', Lead::tableName() . '.data', $this->data])
 			->andFilterWhere(['like', Lead::tableName() . '.email', $this->email])
-			->andFilterWhere(['like', Lead::tableName() . '.phone', $this->phone])
 			->andFilterWhere(['like', Lead::tableName() . '.postal_code', $this->postal_code]);
 
 		if (YII_ENV_TEST) {
@@ -341,6 +344,12 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private static function removeQuestionAttributePrefix(string $attribute): int {
 		return substr($attribute, strlen(static::QUESTION_ATTRIBUTE_PREFIX));
+	}
+
+	private function applyPhoneFilter(PhonableQuery $query): void {
+		if (!empty($this->phone)) {
+			$query->withPhoneNumber($this->phone);
+		}
 	}
 
 }

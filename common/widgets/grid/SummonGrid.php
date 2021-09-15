@@ -52,6 +52,13 @@ class SummonGrid extends GridView {
 				'visible' => $this->withCustomer,
 			],
 			[
+				'attribute' => 'customerPhone',
+				'value' => 'issue.customer.profile.phone',
+				'label' => Yii::t('common', 'Phone number'),
+				'format' => 'tel',
+				'noWrap' => true,
+			],
+			[
 				'attribute' => 'type',
 				'value' => 'typeName',
 				'filter' => SummonSearch::getTypesNames(),

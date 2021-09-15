@@ -9,9 +9,11 @@ use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueUserQuery;
 use common\models\issue\search\ArchivedIssueSearch;
 use common\models\issue\search\IssueTypeSearch;
+use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\User;
+use common\validators\PhoneValidator;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -40,6 +42,7 @@ abstract class IssueSearch extends Model
 	public string $createdAtFrom = '';
 	public string $createdAtTo = '';
 	public string $customerLastname = '';
+	public string $customerPhone = '';
 
 	public bool $withArchive = false;
 
@@ -68,6 +71,7 @@ abstract class IssueSearch extends Model
 					'created_at', 'updated_at', 'type_additional_date_at',
 				], 'safe',
 			],
+			['customerPhone', PhoneValidator::class],
 		];
 	}
 
@@ -106,6 +110,7 @@ abstract class IssueSearch extends Model
 		$this->archiveFilter($query);
 		$this->applyAgentsFilters($query);
 		$this->applyCustomerSurnameFilter($query);
+		$this->applyCustomerPhoneFilter($query);
 		$this->applyCreatedAtFilter($query);
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
@@ -159,14 +164,22 @@ abstract class IssueSearch extends Model
 
 	public function applyCustomerSurnameFilter(QueryInterface $query): void {
 		if (!empty($this->customerLastname)) {
-			/** @var IssueQuery $query */
 			$query->joinWith([
-				'users c' => function (IssueUserQuery $query): void {
-					$query->andWhere(['c.type' => IssueUser::TYPE_CUSTOMER]);
-					$query->joinWith('user.userProfile customerProfile');
+				'customer.userProfile CP' => function (PhonableQuery $query) {
+					$query->withPhoneNumber($this->customerPhone);
 				},
 			]);
-			$query->andWhere(['like', 'customerProfile.lastname', $this->customerLastname . '%', false]);
+			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
+		}
+	}
+
+	public function applyCustomerPhoneFilter(ActiveQuery $query): void {
+		if (!empty($this->customerPhone)) {
+			$query->joinWith([
+				'customer.userProfile CP' => function (PhonableQuery $query) {
+					$query->withPhoneNumber($this->customerPhone);
+				},
+			]);
 		}
 	}
 

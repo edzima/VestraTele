@@ -15,75 +15,99 @@ class UserSearchTest extends Unit {
 
 	public function _before(): void {
 		parent::_before();
-		$this->tester->haveFixtures(array_merge(
-				UserFixtureHelper::workers(),
-				['user-profile' => UserFixtureHelper::profile('user')],
-			)
-		);
-
 		$this->model = $this->createModel();
 	}
 
-	public function testEmpty(): void {
-		$this->assertTotalCount(13);
+	public function _fixtures(): array {
+		return array_merge(
+			UserFixtureHelper::workers(),
+			['user-profile' => UserFixtureHelper::profile('user')],
+		);
 	}
 
 	public function testRole(): void {
-		$this->assertTotalCount(5, ['role' => [User::ROLE_AGENT]]);
-		$this->assertTotalCount(4, ['role' => [User::ROLE_LAWYER]]);
-		$this->assertTotalCount(4, ['role' => [User::ROLE_TELEMARKETER]]);
-
-		$this->assertTotalCount(0, ['role' => [User::ROLE_MANAGER]]);
-		$lawyer = $this->tester->grabFixture(UserFixtureHelper::WORKER_LAWYER, '0');
-		Yii::$app->authManager->assign(Yii::$app->authManager->getRole(User::ROLE_MANAGER), $lawyer->id);
-		$this->assertTotalCount(1, ['role' => [User::ROLE_MANAGER]]);
-		$this->assertTotalCount(1, ['role' => [User::ROLE_MANAGER, User::ROLE_LAWYER]]);
-
-		$this->assertTotalCount(0, ['permission' => [User::PERMISSION_NOTE]]);
-		Yii::$app->authManager->assign(Yii::$app->authManager->getPermission(User::PERMISSION_NOTE), $lawyer->id);
-		$this->assertTotalCount(1, ['permission' => [User::PERMISSION_NOTE]]);
-		$this->assertTotalCount(1, ['role' => [User::ROLE_LAWYER], 'permission' => [User::PERMISSION_NOTE]]);
+		$keys = $this->search(['role' => [User::ROLE_AGENT]])->getKeys();
+		$this->tester->assertNotEmpty($keys);
+		foreach ($keys as $key) {
+			$this->tester->assertTrue(Yii::$app->authManager->checkAccess($key, User::ROLE_AGENT));
+		}
+		$keys = $this->search(['role' => [User::ROLE_MANAGER]])->getKeys();
+		$this->tester->assertEmpty($keys);
 	}
 
-	public function testPhone(): void {
-		$this->assertTotalCount(1, ['phone' => '+48 673 223 110']);
-		$this->assertTotalCount(1, ['phone' => '+48-673-223-110']);
-		$this->assertTotalCount(1, ['phone' => '     +48 673 223 110    ']);
-		$this->assertTotalCount(1, ['phone' => '+48 - - -673 ----223-110']);
-		$this->assertTotalCount(2, ['phone' => '23']);
-		$this->assertTotalCount(13, ['phone' => '']);
-		$this->assertTotalCount(0, ['phone' => '+48+673+223-110']);
+	public function testPermissions(): void {
+		$keys = $this->search(['permission' => [User::PERMISSION_NOTE]])->getKeys();
+		$this->tester->assertEmpty($keys);
+		Yii::$app->authManager->assign(Yii::$app->authManager->getPermission(User::PERMISSION_NOTE), User::find()->one()->id);
+		$keys = $this->search(['permission' => [User::PERMISSION_NOTE]])->getKeys();
+		$this->tester->assertNotEmpty($keys);
+		foreach ($keys as $key) {
+			$this->tester->assertTrue(Yii::$app->authManager->checkAccess($key, User::PERMISSION_NOTE));
+		}
+	}
+
+	public function testPhoneNumber(): void {
+		$models = $this->search(['phone' => '+48 673 223 110'])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			/** @var User $model */
+			$this->tester->assertSame('+48 673 223 110', $model->profile->phone);
+		}
+
+		$models = $this->search(['phone' => '+48 673-223-110'])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			/** @var User $model */
+			$this->tester->assertSame('+48 673 223 110', $model->profile->phone);
+		}
+		$models = $this->search(['phone' => '+48 673223110'])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			/** @var User $model */
+			$this->tester->assertSame('+48 673 223 110', $model->profile->phone);
+		}
 	}
 
 	public function testPhone2(): void {
-		$this->assertTotalCount(1, ['phone' => '541-211-980']);
-		$this->assertTotalCount(1, ['phone' => '541 - 211 - 980']);
-		$this->assertTotalCount(1, ['phone' => '541211980']);
-		$this->assertTotalCount(0, ['phone' => '999']);
+		$models = $this->search(['phone' => '541-211-980'])->getModels();
+		$this->tester->assertNotEmpty($models);
+
+		$models = $this->search(['phone' => '999'])->getModels();
+		$this->tester->assertEmpty($models);
 	}
 
-	public function testPhoneWithOtherCondition(): void{
-		$this->assertTotalCount(1, [
+	public function testPhoneWithLastname(): void {
+		$models = $this->search([
 			'phone' => '673223110',
-			'lastname' => 'Wayne'
-		]);
-		$this->assertTotalCount(1, [
-			'phone' => '541',
-			'lastname' => 'Wayne'
-		]);
-		$this->assertTotalCount(2, [
-			'phone' => '',
-			'lastname' => 'Wayne'
-		]);
-		$this->assertTotalCount(0, [
+			'lastname' => 'Wayne',
+		])->getModels();
+
+		$this->assertNotEmpty($models);
+		/** @var User $user */
+		$user = reset($models);
+		$this->tester->assertSame('Wayne', $user->profile->lastname);
+		$this->tester->assertSame('+48 673 223 110', $user->profile->phone);
+
+		$models = $this->search([
 			'phone' => '999',
-			'lastname' => 'Wayne'
-		]);
+			'lastname' => 'Wayne',
+		])->getModels();
+		$this->tester->assertEmpty($models);
 	}
 
 	public function testStatus(): void {
-		$this->assertTotalCount(3, ['status' => User::STATUS_INACTIVE]);
-		$this->assertTotalCount(7, ['status' => User::STATUS_ACTIVE]);
+		$models = $this->search(['status' => User::STATUS_ACTIVE])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			/** @var User $model */
+			$this->tester->assertSame(User::STATUS_ACTIVE, $model->status);
+		}
+		$models = $this->search(['status' => User::STATUS_INACTIVE])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			/** @var User $model */
+			$this->tester->assertSame(User::STATUS_INACTIVE, $model->status);
+		}
 	}
 
 	protected function createModel(): UserSearch {
