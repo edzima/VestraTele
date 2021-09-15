@@ -110,6 +110,13 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'issue.customer.fullName',
 			],
 			[
+				'attribute' => 'customerPhone',
+				'value' => 'issue.customer.profile.phone',
+				'format' => 'tel',
+				'label' => Yii::t('common', 'Phone number'),
+				'noWrap' => true,
+			],
+			[
 				'class' => DataColumn::class,
 				'attribute' => 'issue.created_at',
 				'format' => 'date',

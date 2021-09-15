@@ -3,12 +3,15 @@
 namespace common\models\issue\search;
 
 use common\models\issue\Summon;
+use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
+use common\validators\PhoneValidator;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use yii\db\QueryInterface;
 
 /**
@@ -19,6 +22,7 @@ class SummonSearch extends Summon implements
 	SearchModel {
 
 	public string $customerLastname = '';
+	public string $customerPhone = '';
 
 	protected const SUMMON_ALIAS = 'S';
 
@@ -46,6 +50,7 @@ class SummonSearch extends Summon implements
 			[['id', 'type', 'status', 'created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
 			[['title'], 'safe'],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
+			['customerPhone', PhoneValidator::class],
 		];
 	}
 
@@ -90,6 +95,7 @@ class SummonSearch extends Summon implements
 		}
 
 		$this->applyCustomerSurnameFilter($query);
+		$this->applyCustomerPhoneFilter($query);
 		// grid filtering conditions
 		$query->andFilterWhere([
 			static::SUMMON_ALIAS . '.id' => $this->id,
@@ -112,6 +118,16 @@ class SummonSearch extends Summon implements
 	public function applyCustomerSurnameFilter(QueryInterface $query): void {
 		if (!empty($this->customerLastname)) {
 			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
+		}
+	}
+
+	private function applyCustomerPhoneFilter(ActiveQuery $query): void {
+		if (!empty($this->customerPhone)) {
+			$query->joinWith([
+				'issue.customer.userProfile CP' => function (PhonableQuery $query) {
+					$query->withPhoneNumber($this->customerPhone);
+				},
+			]);
 		}
 	}
 }
