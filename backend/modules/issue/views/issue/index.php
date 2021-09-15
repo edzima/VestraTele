@@ -132,7 +132,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'format' => 'raw',
 				'contentBold' => true,
 				'contentCenter' => true,
-				'ellipsis' => true,
 			],
 			[
 				'class' => DataColumn::class,
