@@ -17,7 +17,9 @@ use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * CalculationController implements the CRUD actions for IssuePayCalculation model.
@@ -252,14 +254,19 @@ class CalculationController extends Controller {
 	 * Deletes an existing IssuePayCalculation model.
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
 	 *
-	 * @param integer $id
-	 * @return mixed
+	 * @param int $id
+	 * @return Response
 	 * @throws NotFoundHttpException if the model cannot be found
+	 * @throws MethodNotAllowedHttpException
 	 */
-	public function actionDelete(int $id) {
-		$this->findModel($id)->delete();
-
-		return $this->redirect(['index']);
+	public function actionDelete(int $id): Response {
+		$model = $this->findModel($id);
+		if ($model->owner_id === Yii::$app->user->getId()
+			|| Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
+			$model->delete();
+			return $this->redirect(['index']);
+		}
+		throw new MethodNotAllowedHttpException('Only Owner or Bookkeeper can delete settlement.');
 	}
 
 	/**

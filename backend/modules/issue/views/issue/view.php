@@ -5,7 +5,7 @@ use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\modules\issue\widgets\SummonGrid;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\issue\Issue;
-use common\models\user\User;
+use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
 use yii\data\DataProviderInterface;
@@ -28,19 +28,19 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		])
 		?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_NOTE) ? Html::a(Yii::t('backend', 'Create note'), ['note/create', 'issueId' => $model->id], [
+		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE) ? Html::a(Yii::t('backend', 'Create note'), ['note/create', 'issueId' => $model->id], [
 			'class' => 'btn btn-info',
 		]) : '' ?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_SUMMON) ? Html::a(Yii::t('backend', 'Create summon'), ['summon/create', 'issueId' => $model->id], [
+		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON) ? Html::a(Yii::t('backend', 'Create summon'), ['summon/create', 'issueId' => $model->id], [
 			'class' => 'btn btn-warning',
 		]) : '' ?>
 
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
 
-		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
-			? Html::a('Usuń', ['delete', 'id' => $model->id], [
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE)
+			? Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
 				'class' => 'btn btn-danger pull-right',
 				'data' => [
 					'confirm' => 'Czy napewno chcesz usunąć?',
@@ -53,21 +53,21 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 	</p>
 	<p>
-		<?= Yii::$app->user->can(User::PERMISSION_CALCULATION_TO_CREATE)
+		<?= Yii::$app->user->can(Worker::PERMISSION_CALCULATION_TO_CREATE)
 			? Html::a(
 				Yii::t('backend', 'Create settlement'),
 				['/settlement/calculation/create', 'id' => $model->id],
 				['class' => 'btn btn-success'])
 			: '' ?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_CALCULATION_TO_CREATE)
+		<?= Yii::$app->user->can(Worker::PERMISSION_CALCULATION_TO_CREATE)
 			? Html::a(
 				Yii::t('backend', 'Create administrative settlement'),
 				['/settlement/calculation/create-administrative', 'id' => $model->id],
 				['class' => 'btn btn-success'])
 			: '' ?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_COST)
+		<?= Yii::$app->user->can(Worker::PERMISSION_COST)
 			? Html::a(
 				Yii::t('backend', 'Costs'),
 				['/settlement/cost/issue', 'id' => $model->id],

@@ -7,7 +7,7 @@ use backend\widgets\CsvForm;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
 use common\models\issue\Issue;
-use common\models\user\User;
+use common\models\user\Worker;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
@@ -27,15 +27,15 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?php Pjax::begin(); ?>
 
 	<p>
-		<?= Yii::$app->user->can(User::PERMISSION_SUMMON)
+		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
 			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index'], ['class' => 'btn btn-warning'])
 			: ''
 		?>
-		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
+		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE)
 			? Html::a(Yii::t('issue', 'Issue Notes'), ['note/index'], ['class' => 'btn btn-info'])
 			: ''
 		?>
-		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
+		<?= Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)
 			? Html::a(Yii::t('backend', 'Settlements'), ['/settlement/calculation/index'], ['class' => 'btn btn-success'])
 			: ''
 		?>
@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
-	<?= Yii::$app->user->can(User::PERMISSION_EXPORT)
+	<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
 		? CsvForm::widget()
 		: ''
 	?>
@@ -206,12 +206,12 @@ $this->params['breadcrumbs'][] = $this->title;
 					},
 				],
 				'visibleButtons' => [
-					'installment' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
-					'note' => Yii::$app->user->can(User::PERMISSION_NOTE),
+					'installment' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
+					'note' => Yii::$app->user->can(Worker::PERMISSION_NOTE),
 					'view' => static function (Issue $model) use ($searchModel): bool {
 						return !$model->isArchived() || $searchModel->withArchive;
 					},
-					'delete' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+					'delete' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE),
 				],
 			],
 

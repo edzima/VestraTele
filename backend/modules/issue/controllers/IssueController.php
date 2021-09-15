@@ -18,6 +18,7 @@ use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 use yii2tech\csvgrid\CsvGrid;
 
 /**
@@ -184,7 +185,7 @@ class IssueController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionUpdate($id) {
+	public function actionUpdate(int $id) {
 		$form = new IssueForm(['model' => $this->findModel($id)]);
 		if ($form->load(Yii::$app->request->post()) && $form->save()) {
 			return $this->redirect(Url::previous());
@@ -216,7 +217,7 @@ class IssueController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionDelete($id) {
+	public function actionDelete(int $id): Response {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);

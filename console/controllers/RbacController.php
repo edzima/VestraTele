@@ -54,6 +54,7 @@ class RbacController extends Controller {
 		],
 		User::PERMISSION_EXPORT,
 		User::PERMISSION_ISSUE,
+		Worker::PERMISSION_ISSUE_DELETE,
 		Worker::PERMISSION_HINT,
 		User::PERMISSION_LOGS,
 		Worker::PERMISSION_MEET,
