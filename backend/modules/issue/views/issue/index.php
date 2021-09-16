@@ -1,6 +1,7 @@
 <?php
 
 use backend\helpers\Html;
+use backend\helpers\Url;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\widgets\CsvForm;
@@ -118,6 +119,7 @@ $this->params['breadcrumbs'][] = $this->title;
 						'containerOptions' => [
 							'class' => 'd-inline-flex',
 						],
+						'returnUrl' => Url::to('/issue/issue/index'),
 						'options' => [
 							'class' => 'btn btn-default btn-sm',
 							'title' => Yii::t('backend', 'Change Stage'),

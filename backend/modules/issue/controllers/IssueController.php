@@ -47,7 +47,6 @@ class IssueController extends Controller {
 	 */
 	public function actionIndex() {
 
-		Url::remember();
 		$searchModel = new IssueSearch();
 		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
@@ -147,7 +146,6 @@ class IssueController extends Controller {
 		$summonDataProvider->sort = false;
 		$summonDataProvider->pagination = false;
 
-		Url::remember();
 		return $this->render('view', [
 			'model' => $model,
 			'calculationsDataProvider' => $calculationsDataProvider,
@@ -188,14 +186,14 @@ class IssueController extends Controller {
 	public function actionUpdate(int $id) {
 		$form = new IssueForm(['model' => $this->findModel($id)]);
 		if ($form->load(Yii::$app->request->post()) && $form->save()) {
-			return $this->redirect(Url::previous());
+			return $this->redirect(['view', 'id' => $id]);
 		}
 		return $this->render('update', [
 			'model' => $form,
 		]);
 	}
 
-	public function actionStage(int $issueId, int $stageId = null) {
+	public function actionStage(int $issueId, int $stageId = null, string $returnUrl = null) {
 		$model = new IssueStageChangeForm($this->findModel($issueId));
 		if ($stageId !== null) {
 			$model->stage_id = $stageId;
@@ -203,7 +201,7 @@ class IssueController extends Controller {
 		$model->date_at = date($model->dateFormat);
 		$model->user_id = Yii::$app->user->getId();
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(Url::previous());
+			return $this->redirect($returnUrl ?? ['view', 'id' => $issueId]);
 		}
 		return $this->render('stage', [
 			'model' => $model,

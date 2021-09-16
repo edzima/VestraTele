@@ -11,6 +11,7 @@ use yii\bootstrap\ButtonDropdown;
 class StageChangeButtonDropdown extends ButtonDropdown {
 
 	public string $route = '/issue/issue/stage';
+	public ?string $returnUrl = null;
 	public $options = [
 		'class' => 'btn-success',
 	];
@@ -27,7 +28,11 @@ class StageChangeButtonDropdown extends ButtonDropdown {
 			$this->dropdown['items'] = $this->defaultItems();
 		}
 		if (!isset($this->options['href'])) {
-			$this->options['href'] = [$this->route, 'issueId' => $this->model->getIssueId()];
+			$this->options['href'] = [
+				$this->route,
+				'issueId' => $this->model->getIssueId(),
+				'returnUrl' => $this->returnUrl,
+			];
 		}
 	}
 
@@ -41,7 +46,12 @@ class StageChangeButtonDropdown extends ButtonDropdown {
 				'linkOptions' => [
 					'data-pjax' => 0,
 				],
-				'url' => Url::to([$this->route, 'issueId' => $this->model->getIssueId(), 'stageId' => $id]),
+				'url' => Url::to([
+					$this->route,
+					'issueId' => $this->model->getIssueId(),
+					'stageId' => $id,
+					'returnUrl' => $this->returnUrl,
+				]),
 			];
 		}
 		return $items;
