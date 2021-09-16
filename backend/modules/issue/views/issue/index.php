@@ -23,6 +23,17 @@ use yii\widgets\Pjax;
 $this->title = Yii::t('backend', 'Issues');
 $this->params['breadcrumbs'][] = $this->title;
 
+//@todo remove this after migrate BS4 (add data-boundary="viewport")
+//@see https://stackoverflow.com/questions/26018756/bootstrap-button-drop-down-inside-responsive-table-not-visible-because-of-scroll#answer-51992907
+$this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
+console.log('show bs');
+     $('.table-responsive').css('overflow', 'inherit' );
+});
+
+$('.table-responsive').on('hide.bs.dropdown', function () {
+     $('.table-responsive').css( 'overflow', 'auto' );
+})")
+
 ?>
 <div class="issue-index relative">
 	<?php Pjax::begin(); ?>
