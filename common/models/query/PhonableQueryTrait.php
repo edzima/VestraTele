@@ -14,9 +14,15 @@ trait PhonableQueryTrait {
 
 	public function withPhoneNumber($value): self {
 		[$table, $alias] = $this->getTableNameAndAlias();
+		$i = 0;
 		foreach ($this->getPhoneColumns() as $phoneColumn) {
 			$phoneColumn = "$alias.$phoneColumn";
-			$this->orWhere(['like', $this->preparePhoneExpression($phoneColumn), $value]);
+			if ($i === 0) {
+				$this->andWhere(['like', $this->preparePhoneExpression($phoneColumn), $value]);
+			} else {
+				$this->orWhere(['like', $this->preparePhoneExpression($phoneColumn), $value]);
+			}
+			$i++;
 		}
 		return $this;
 	}
