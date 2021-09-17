@@ -22,6 +22,7 @@ class SummonGrid extends GridView {
 	public bool $withIssue = true;
 	public bool $withCustomer = true;
 	public bool $withCaption = false;
+	public bool $withCustomerPhone = true;
 	public bool $withContractor = true;
 	public bool $withOwner = true;
 	public bool $withUpdatedAt = true;
@@ -57,6 +58,7 @@ class SummonGrid extends GridView {
 				'label' => Yii::t('common', 'Phone number'),
 				'format' => 'tel',
 				'noWrap' => true,
+				'visible' => $this->withCustomerPhone,
 			],
 			[
 				'attribute' => 'type',
@@ -71,6 +73,11 @@ class SummonGrid extends GridView {
 			[
 				'attribute' => 'title',
 				'contentOptions' => ['style' => 'width: 35%;'],
+			],
+			[
+				'attribute' => 'start_at',
+				'format' => 'date',
+				'noWrap' => true,
 			],
 			[
 				'attribute' => 'deadline_at',

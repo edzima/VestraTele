@@ -104,6 +104,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 			'dataProvider' => $summonDataProvider,
 			'summary' => '',
 			'withCaption' => true,
+			'withCustomerPhone' => false,
 			'withIssue' => false,
 			'withCustomer' => false,
 			'withOwner' => false,
