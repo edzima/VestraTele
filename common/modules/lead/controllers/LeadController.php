@@ -2,8 +2,12 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Flash;
 use common\helpers\Url;
 use common\modules\lead\models\forms\LeadForm;
+use common\modules\lead\models\forms\LeadsUserForm;
+use common\modules\lead\models\LeadUser;
+use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
 use yii\web\NotFoundHttpException;
@@ -58,6 +62,18 @@ class LeadController extends BaseController {
 		]);
 	}
 
+	public function actionPhone() {
+		$model = new LeadPhoneSearch();
+		$dataProvider = $model->search(Yii::$app->request->queryParams);
+		if (empty(Yii::$app->request->queryParams)) {
+			$model->clearErrors();
+		}
+		return $this->render('phone', [
+			'model' => $model,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
 	/**
 	 * Displays a single Lead model.
 	 *
@@ -106,6 +122,23 @@ class LeadController extends BaseController {
 		return $this->render('create', [
 			'model' => $model,
 		]);
+	}
+
+	public function actionCopy(int $id) {
+		$lead = $this->findLead($id, false);
+		if ($lead->isForUser(Yii::$app->user->getId())) {
+			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'Only not self Lead can Copy.'));
+			return $this->redirect(['index']);
+		}
+		$model = new LeadForm();
+		$model->setLead($lead);
+		$model->owner_id = Yii::$app->user->getId();
+		$lead = $this->module->manager->pushLead($model);
+		if ($lead) {
+			Yii::$app->session->addFlash('success', Yii::t('lead', 'Success Copy Lead.'));
+			return $this->redirect(['view', 'id' => $lead->getId()]);
+		}
+		return $this->redirect(Url::previous());
 	}
 
 	/**

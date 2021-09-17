@@ -15,11 +15,26 @@ use yii\widgets\DetailView;
 <div class="same-contact-lead">
 
 	<h3>
-		<?= Yii::$app->user->can(User::ROLE_MANAGER) || $model->isForUser(Yii::$app->user->getId())
+		<?= $model->isForUser(Yii::$app->user->getId())
 			? Html::a(Html::encode($model->getName()), ['view', 'id' => $model->getId()])
 			: Html::encode($model->getName())
 		?>
 	</h3>
+
+	<p>
+		<?= !$model->isForUser(Yii::$app->user->getId())
+			? Html::a(Yii::t('lead', 'Copy Lead'),
+				['copy', 'id' => $model->getId()],
+				[
+					'class' => 'btn btn-success',
+					'data' => [
+						'method' => 'POST',
+						'confirm' => Yii::t('lead', 'Are you sure you want to copy this item?'),
+					],
+				])
+			: ''
+		?>
+	</p>
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [

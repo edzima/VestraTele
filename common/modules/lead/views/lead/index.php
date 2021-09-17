@@ -38,6 +38,8 @@ foreach (LeadSearch::questions() as $question) {
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
+		<?= Html::a(Yii::t('lead', 'Phone Lead'), ['phone'], ['class' => 'btn btn-info']) ?>
+
 		<?= Html::a(Yii::t('lead', 'Create Lead'), ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
 

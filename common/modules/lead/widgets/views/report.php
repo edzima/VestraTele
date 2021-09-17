@@ -41,7 +41,7 @@ use yii\web\View;
 		<span class="date pull-left">
 			<?= $model->formattedDates ?>
 		</span>
-		<?php if ($model->owner_id === Yii::$app->user->id || Yii::$app->user->can(User::ROLE_MANAGER)): ?>
+		<?php if ($model->owner_id === Yii::$app->user->id): ?>
 			<span class="action pull-right">
 				<?= Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['/lead/report/update', 'id' => $model->id]) ?>
 				<?= $withDelete ? Html::a('<i class="glyphicon glyphicon-trash"></i>', ['/lead/report/delete', 'id' => $model->id], [

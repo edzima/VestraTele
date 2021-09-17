@@ -21,6 +21,8 @@ class LeadCest {
 	public const ROUTE_VIEW = '/lead/lead/view';
 	/* @see LeadController::actionDelete() */
 	private const ROUTE_DELETE = '/lead/lead/delete';
+	/* @see LeadController::actionPhone() */
+	private const ROUTE_PHONE = '/lead/lead/phone';
 
 	private const SELECTOR_LEAD_GRID = '#leads-grid';
 
@@ -54,6 +56,14 @@ class LeadCest {
 		$I->seeInGridHeader('Source');
 		$I->seeInGridHeader('Phone');
 		$I->seeInGridHeader('Reports');
+	}
+
+	public function checkPhonePage(LeadTester $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_PHONE);
+		$I->fillField('Phone', '777-222-122');
+		$I->click('Search');
+		$I->see('Leads');
 	}
 
 	public function checkAsUserWithoutLeads(FunctionalTester $I): void {

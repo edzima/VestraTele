@@ -26,6 +26,8 @@ return [
 		'name' => 'Alan',
 		'source_id' => 1,
 		'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
+		'email' => 'john@wayne.com',
+
 		'date_at' => '2020-02-01',
 	],
 	'new-benefits' => [
