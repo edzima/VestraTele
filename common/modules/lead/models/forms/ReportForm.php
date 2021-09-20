@@ -40,6 +40,8 @@ class ReportForm extends Model {
 	/* @var AnswerForm[] */
 	private array $answersModels = [];
 
+	public bool $withAnswers = true;
+
 	public function setOpenAnswers(array $questionsAnswers): void {
 		$models = $this->getAnswersModels();
 		foreach ($questionsAnswers as $question_id => $answer) {
@@ -157,8 +159,8 @@ class ReportForm extends Model {
 		return $this->questions;
 	}
 
-	public function save(): bool {
-		if (!$this->validate()) {
+	public function save(bool $validate = true): bool {
+		if ($validate && !$this->validate()) {
 			return false;
 		}
 
@@ -176,7 +178,9 @@ class ReportForm extends Model {
 		if ($this->status_id !== $this->lead->getStatusId()) {
 			$this->lead->updateStatus($this->status_id);
 		}
-		$this->linkAnswers(!$isNewRecord);
+		if ($this->withAnswers) {
+			$this->linkAnswers(!$isNewRecord);
+		}
 		$this->saveAddress();
 
 		return true;

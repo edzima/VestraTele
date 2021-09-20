@@ -5,6 +5,7 @@ namespace backend\modules\issue\controllers;
 use backend\helpers\Url;
 use backend\modules\issue\models\IssueForm;
 use backend\modules\issue\models\IssueStageChangeForm;
+use backend\modules\issue\models\search\IssueLeadsSearch;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
@@ -125,6 +126,15 @@ class IssueController extends Controller {
 			return $exporter->export()->send('export.csv');
 		}
 		return $this->render('index', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	public function actionLead(): string {
+		$searchModel = new IssueLeadsSearch();
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		return $this->render('lead', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
 		]);

@@ -198,6 +198,11 @@ $user = Yii::$app->user;
 							'url' => ['/issue/stage/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
+						[
+							'label' => Yii::t('common', 'Leads'),
+							'url' => ['/issue/issue/lead'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
 					],
 				],
 				[

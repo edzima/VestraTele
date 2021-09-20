@@ -53,7 +53,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	 * {@inheritdoc}
 	 */
 	public static function tableName(): string {
-		return 'issue_user';
+		return '{{%issue_user}}';
 	}
 
 	/**
