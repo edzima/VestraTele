@@ -170,7 +170,7 @@ class IssueMeet extends ActiveRecord {
 		return $this->addresses[MeetAddress::TYPE_CUSTOMER]->address ?? null;
 	}
 
-	protected function getAddresses(): ActiveQuery {
+	public function getAddresses(): ActiveQuery {
 		return $this->hasMany(MeetAddress::class, ['meet_id' => 'id'])->indexBy('type');
 	}
 
