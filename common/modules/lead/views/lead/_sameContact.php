@@ -22,11 +22,19 @@ use yii\widgets\DetailView;
 	</h3>
 
 	<p>
+
+		<?= Html::a(Yii::t('lead', 'Create Lead Report'),
+			['/lead/report/report', 'id' => $model->getId()],
+			[
+				'class' => 'btn btn-success',
+			])
+		?>
+
 		<?= !$model->isForUser(Yii::$app->user->getId())
 			? Html::a(Yii::t('lead', 'Copy Lead'),
 				['copy', 'id' => $model->getId()],
 				[
-					'class' => 'btn btn-success',
+					'class' => 'btn btn-warning',
 					'data' => [
 						'method' => 'POST',
 						'confirm' => Yii::t('lead', 'Are you sure you want to copy this item?'),

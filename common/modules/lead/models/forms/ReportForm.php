@@ -9,6 +9,7 @@ use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadUser;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -178,6 +179,9 @@ class ReportForm extends Model {
 		if ($this->status_id !== $this->lead->getStatusId()) {
 			$this->lead->updateStatus($this->status_id);
 		}
+		if (!$this->lead->isForUser($this->owner_id)) {
+			$this->lead->linkUser(LeadUser::TYPE_TELE, $this->owner_id);
+		}
 		if ($this->withAnswers) {
 			$this->linkAnswers(!$isNewRecord);
 		}
@@ -291,7 +295,7 @@ class ReportForm extends Model {
 
 	private function saveAddress(): bool {
 		if ($this->withAddress && $this->getAddress()->save()) {
-			$address = $model->addresses[$this->addressType] ?? new LeadAddress(['type' => $this->addressType]);
+			$address = $this->getLead()->addresses[$this->addressType] ?? new LeadAddress(['type' => $this->addressType]);
 			$address->lead_id = $this->getLead()->id;
 			$address->address_id = $this->getAddress()->id;
 			return $address->save();

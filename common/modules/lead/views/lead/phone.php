@@ -42,6 +42,9 @@ $this->params['breadcrumbs'][] = $this->title;
 				'dataProvider' => $dataProvider,
 				'emptyText' => false,
 				'itemView' => '_sameContact',
+				'summaryOptions' => [
+					'class' => 'col-md-12',
+				],
 				'itemOptions' => [
 					'class' => 'col-md-6',
 				],
