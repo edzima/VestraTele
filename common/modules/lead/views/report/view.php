@@ -10,7 +10,7 @@ use yii\web\YiiAsset;
 
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
-$this->params['breadcrumbs'][] = ['label' => $model->lead_id, 'url' => ['lead/view', 'id' => $model->lead_id]];
+$this->params['breadcrumbs'][] = ['label' => $model->lead->getName(), 'url' => ['lead/view', 'id' => $model->lead_id]];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Reports'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);

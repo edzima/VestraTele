@@ -35,7 +35,7 @@ return [
 			'allowDelete' => false,
 			'userClass' => User::class,
 			'userNames' => static function (): array {
-				return User::getSelectList([Yii::$app->user->getId()]);
+				return User::getSelectList(User::getAssignmentIds([User::PERMISSION_LEAD]));
 			},
 			'as access' => [
 				'class' => GlobalAccessBehavior::class,
@@ -49,6 +49,14 @@ return [
 							'lead/reminder',
 							'lead/report',
 						],
+						'permissions' => [User::PERMISSION_LEAD],
+					],
+					[
+						'allow' => true,
+						'controllers' => [
+							'lead/user',
+						],
+						'actions' => ['assign-single'],
 						'permissions' => [User::PERMISSION_LEAD],
 					],
 					[

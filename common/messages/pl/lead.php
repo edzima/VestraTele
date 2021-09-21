@@ -1,6 +1,9 @@
 <?php
 
 return [
+	'Assign User to Lead' => 'Przypisz Użytkownika do Leada',
+	'Assign User' => 'Przypisz',
+	'Success assign {user} as {type} to Lead: {lead}.' => 'Przypisano {user} jako {type} do Leada: {lead}.',
 	'From At' => 'Od',
 	'To At' => 'Do',
 	'status' => 'Status',

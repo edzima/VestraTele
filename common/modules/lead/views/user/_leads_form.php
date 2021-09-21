@@ -15,18 +15,19 @@ use kartik\select2\Select2;
 		'id' => 'leads-user-form',
 	]); ?>
 
-	<?= $form->field($model, 'leadsIds')->widget(Select2::class, [
-		'data' => LeadsUserForm::getLeadsIds(),
-		'options' => [
-			'multiple' => true,
-		],
-	]) ?>
+	<?= $model->scenario !== LeadsUserForm::SCENARIO_SINGLE
+		? $form->field($model, 'leadsIds')->widget(Select2::class, [
+			'data' => LeadsUserForm::getLeadsIds(),
+			'options' => [
+				'multiple' => true,
+			],
+		]) : '' ?>
 
 	<?= $form->field($model, 'userId')->widget(Select2::class, [
 		'data' => LeadsUserForm::getUsersNames(),
 	]) ?>
 
-	<?= $form->field($model, 'type')->dropDownList(LeadsUserForm::getTypesNames()) ?>
+	<?= $form->field($model, 'type')->dropDownList($model->getTypesNames()) ?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>

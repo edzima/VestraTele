@@ -145,9 +145,19 @@ foreach (LeadSearch::questions() as $question) {
 				],
 				[
 					'class' => ActionColumn::class,
-					'template' => '{view} {update} {report} {reminder} {delete}',
+					'template' => '{view} {update} {report} {user} {reminder} {delete}',
 					'visibleButtons' => $visibleButtons,
 					'buttons' => [
+						'user' => static function (string $url, ActiveLead $lead): string {
+							return Html::a(
+								Html::icon('plus'),
+								['user/assign-single', 'id' => $lead->getId()],
+								[
+									'title' => Yii::t('lead', 'Assign User'),
+									'aria-title' => Yii::t('lead', 'Assign User'),
+								]
+							);
+						},
 						'report' => static function (string $url, ActiveLead $lead): string {
 							return Html::a(
 								Html::icon('comment'),
