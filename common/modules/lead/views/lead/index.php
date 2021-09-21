@@ -1,6 +1,8 @@
 <?php
 
+use backend\widgets\CsvForm;
 use common\helpers\Html;
+use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\searches\LeadSearch;
 use common\widgets\grid\ActionColumn;
@@ -47,6 +49,8 @@ foreach (LeadSearch::questions() as $question) {
 	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
+
+	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() : '' ?>
 
 	<?php if ($assignUsers): ?>
 

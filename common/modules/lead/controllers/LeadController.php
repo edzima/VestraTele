@@ -2,16 +2,16 @@
 
 namespace common\modules\lead\controllers;
 
+use backend\widgets\CsvForm;
 use common\helpers\Flash;
 use common\helpers\Url;
 use common\modules\lead\models\forms\LeadForm;
-use common\modules\lead\models\forms\LeadsUserForm;
-use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii2tech\csvgrid\CsvGrid;
 
 /**
  * LeadController implements the CRUD actions for Lead model.
@@ -50,8 +50,54 @@ class LeadController extends BaseController {
 			$searchModel->setScenario(LeadSearch::SCENARIO_USER);
 			$searchModel->user_id = Yii::$app->user->getId();
 		}
-
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+		if (isset($_POST[CsvForm::BUTTON_NAME])) {
+			$query = $dataProvider->query;
+			$columns = [
+				'name',
+				'phone',
+				'email',
+			];
+			$addressSearch = $searchModel->addressSearch;
+			if (!empty($addressSearch->region_id)
+				|| !empty($addressSearch->city_name)
+				|| !empty($addressSearch->postal_code)) {
+				$query->joinWith('addresses.address.city.terc');
+				$columns = array_merge($columns, [
+					[
+						'attribute' => 'customerAddress.city.region.name',
+						'label' => Yii::t('address', 'Region'),
+					],
+					[
+						'attribute' => 'customerAddress.city.terc.district.name',
+						'label' => Yii::t('address', 'District'),
+					],
+					[
+						'attribute' => 'customerAddress.city.terc.commune.name',
+						'label' => Yii::t('address', 'Commune'),
+					],
+					[
+						'attribute' => 'customerAddress.postal_code',
+						'label' => Yii::t('address', 'Code'),
+					],
+					[
+						'attribute' => 'customerAddress.city.name',
+						'label' => Yii::t('address', 'City'),
+					],
+					[
+						'attribute' => 'customerAddress.info',
+						'label' => Yii::t('address', 'Info'),
+					],
+				]);
+			}
+			$exporter = new CsvGrid([
+				'query' => $query,
+				'columns' => $columns,
+			]);
+			return $exporter->export()->send('lead.csv');
+		}
+
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
