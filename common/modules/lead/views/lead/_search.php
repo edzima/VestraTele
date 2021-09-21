@@ -79,14 +79,13 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'withoutReport', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
+		<?= $form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
+
+		<?= $form->field($model, 'duplicateEmail', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
+
 
 	</div>
 
-	<div class="row">
-		<?php //$form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
-
-		<?php // $form->field($model, 'duplicateEmail', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
-	</div>
 
 	<?= AddressSearchWidget::widget([
 		'form' => $form,

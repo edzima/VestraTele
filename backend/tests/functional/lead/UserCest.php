@@ -55,8 +55,15 @@ class UserCest {
 			'type' => LeadUser::TYPE_TELE,
 		]);
 		$I->seeEmailIsSent(2);
+	}
 
-		$I->seeInCurrentUrl(LeadCest::ROUTE_INDEX);
+	public function checkAssignFromLeadIndex(LeadManager $I): void {
+		$I->amLoggedIn();
+		$I->haveFixtures(LeadFixtureHelper::leads());
+		$I->sendAjaxPostRequest(LeadCest::ROUTE_INDEX, array_merge([
+			'selection' => [1, 2],
+		], $I->getCSRF()));
+		$I->seeResponseCodeIsRedirection();
 	}
 
 	private function assignFormParams(array $leadsIds, int $userId, string $type): array {

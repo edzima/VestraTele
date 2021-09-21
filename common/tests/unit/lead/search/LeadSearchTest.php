@@ -5,6 +5,7 @@ namespace common\tests\unit\lead\search;
 use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadSearch;
@@ -115,7 +116,7 @@ class LeadSearchTest extends Unit {
 	public function testEmailDuplicated(): void {
 		$this->model->duplicateEmail = true;
 		$models = $this->getSearchModels();
-		$this->tester->assertCount(2, $models);
+		$this->tester->assertCount(1, $models);
 	}
 
 	public function testPhoneDuplicated(): void {
@@ -152,6 +153,18 @@ class LeadSearchTest extends Unit {
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
 			$this->tester->assertEmpty($model->reports);
+		}
+	}
+
+	public function testReportDetails(): void {
+		$this->model->reportsDetails = 'Some';
+		$models = $this->getSearchModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$reportsWithSome = array_filter($model->reports, function (LeadReport $report): bool {
+				return strpos($report->details, 'Some') !== false;
+			});
+			$this->tester->assertNotEmpty($reportsWithSome);
 		}
 	}
 

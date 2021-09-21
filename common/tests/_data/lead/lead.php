@@ -27,7 +27,6 @@ return [
 		'source_id' => 1,
 		'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
 		'email' => 'john@wayne.com',
-
 		'date_at' => '2020-02-01',
 	],
 	'new-benefits' => [
@@ -35,12 +34,14 @@ return [
 		'source_id' => 2,
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
+		'phone' => '555-222-111',
 	],
 	'new-without-owner' => [
 		'name' => 'Tommy Back',
 		'source_id' => 2,
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
+		'phone' => '555-222-111',
 	],
 ];
 

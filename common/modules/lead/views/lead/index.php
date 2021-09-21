@@ -41,6 +41,9 @@ foreach (LeadSearch::questions() as $question) {
 		<?= Html::a(Yii::t('lead', 'Phone Lead'), ['phone'], ['class' => 'btn btn-info']) ?>
 
 		<?= Html::a(Yii::t('lead', 'Create Lead'), ['create'], ['class' => 'btn btn-success']) ?>
+
+		<?= Html::a(Yii::t('lead', 'Lead Reports'), ['report/index'], ['class' => 'btn btn-warning']) ?>
+
 	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
@@ -113,12 +116,32 @@ foreach (LeadSearch::questions() as $question) {
 					'attribute' => 'customerAddress',
 				],
 				[
-					'attribute' => 'reportsCount',
-					'value' => static function (ActiveLead $lead): int {
-						return count($lead->reports);
+					'attribute' => 'reportsDetails',
+					'value' => static function (ActiveLead $lead): string {
+						$content = [];
+						foreach ($lead->reports as $report) {
+							$content[] = $report->getDetails();
+						}
+						$content = array_filter($content, static function ($value): bool {
+							return !empty(trim($value));
+						});
+						return implode(', ', $content);
 					},
-					'filter' => $searchModel::getStatusNames(),
-					'label' => Yii::t('lead', 'Reports'),
+					'label' => Yii::t('lead', 'Reports Details'),
+				],
+				[
+					'attribute' => 'reportsAnswers',
+					'value' => static function (ActiveLead $lead): string {
+						$content = [];
+						foreach ($lead->reports as $report) {
+							$content[] = $report->getAnswersQuestions();
+						}
+						$content = array_filter($content, static function ($value): bool {
+							return !empty(trim($value));
+						});
+						return implode(', ', $content);
+					},
+					'label' => Yii::t('lead', 'Reports Answers'),
 				],
 				[
 					'class' => ActionColumn::class,
@@ -126,10 +149,23 @@ foreach (LeadSearch::questions() as $question) {
 					'visibleButtons' => $visibleButtons,
 					'buttons' => [
 						'report' => static function (string $url, ActiveLead $lead): string {
-							return Html::a(Html::icon('comment'), ['report/report', 'id' => $lead->getId()]);
+							return Html::a(
+								Html::icon('comment'),
+								['report/report', 'id' => $lead->getId()],
+								[
+									'title' => Yii::t('lead', 'Create Report'),
+									'aria-title' => Yii::t('lead', 'Create Report'),
+								]
+							);
 						},
 						'reminder' => static function (string $url, ActiveLead $lead): string {
-							return Html::a(Html::icon('calendar'), ['reminder/create', 'id' => $lead->getId()]);
+							return Html::a(
+								Html::icon('calendar'),
+								['reminder/create', 'id' => $lead->getId()],
+								[
+									'title' => Yii::t('lead', 'Create Reminder'),
+									'aria-title' => Yii::t('lead', 'Create Reminder'),
+								]);
 						},
 					],
 				],

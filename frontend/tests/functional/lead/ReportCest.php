@@ -13,11 +13,11 @@ use yii\helpers\Url;
 class ReportCest {
 
 	/** @see ReportController::actionIndex() */
-	private const ROUTE_INDEX = '/lead/report/index/';
+	private const ROUTE_INDEX = '/lead/report/index';
 	/** @see ReportController::actionReport() */
-	private const ROUTE_REPORT = '/lead/report/report/';
+	private const ROUTE_REPORT = '/lead/report/report';
 	/** @see ReportController::actionUpdate() */
-	private const ROUTE_UPDATE = '/lead/report/update/';
+	private const ROUTE_UPDATE = '/lead/report/update';
 	/** @see ReportController::actionDelete() */
 	private const ROUTE_DELETE = '/lead/report/delete';
 
@@ -57,7 +57,7 @@ class ReportCest {
 		$I->amLoggedInAs(1);
 		$I->assignPermission(User::PERMISSION_LEAD);
 		$I->amOnRoute(static::ROUTE_REPORT, ['id' => 2]);
-		$I->seePageNotFound();
+		$I->see('Create Report');
 	}
 
 	public function checkReportSelfLeadPage(FunctionalTester $I): void {
@@ -113,9 +113,10 @@ class ReportCest {
 		$I->amLoggedInAs(1);
 		$I->assignPermission(User::PERMISSION_LEAD);
 		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->dontSeeGridDeleteLink();
 		$I->sendAjaxPostRequest(Url::to([static::ROUTE_DELETE, 'id' => 2]), $I->getCSRF());
-		$I->seeResponseCodeIs(405);
+		$I->dontSeeRecord(LeadReport::class, [
+			'id' => 2,
+		]);
 	}
 
 	private function fixtures(): array {

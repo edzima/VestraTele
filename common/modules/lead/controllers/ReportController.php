@@ -18,6 +18,8 @@ use yii\web\Response;
  */
 class ReportController extends BaseController {
 
+	public ?bool $allowDelete = true;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -52,9 +54,6 @@ class ReportController extends BaseController {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'visibleButtons' => [
-				'delete' => $this->module->allowDelete,
-			],
 		]);
 	}
 
