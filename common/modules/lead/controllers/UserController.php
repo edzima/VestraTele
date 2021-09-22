@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Flash;
 use common\helpers\Url;
 use common\modules\lead\models\forms\LeadPushEmail;
 use common\modules\lead\models\forms\LeadsUserForm;
@@ -52,7 +53,7 @@ class UserController extends BaseController {
 		$model->withOwner = !$this->module->onlyUser;
 		$model->leadsIds = [$lead->getId()];
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			Yii::$app->session->addFlash('success',
+			Flash::add(Flash::TYPE_SUCCESS,
 				Yii::t('lead', 'Success assign {user} as {type} to Lead: {lead}.', [
 					'user' => LeadsUserForm::getUsersNames()[$model->userId],
 					'type' => $model->getTypesNames()[$model->type],
@@ -79,7 +80,7 @@ class UserController extends BaseController {
 		if ($model->load(Yii::$app->request->post())) {
 			$count = $model->save();
 			if ($count) {
-				Yii::$app->session->addFlash('success',
+				Flash::add(Flash::TYPE_SUCCESS,
 					Yii::t('lead', 'Success assign {user} as {type} to {count} leads.', [
 						'user' => LeadsUserForm::getUsersNames()[$model->userId],
 						'type' => $model->getTypesNames()[$model->type],
