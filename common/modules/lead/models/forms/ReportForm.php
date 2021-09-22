@@ -8,6 +8,8 @@ use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadQuestion;
+use common\modules\lead\models\LeadSource;
+use common\modules\lead\models\LeadSourceInterface;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadUser;
 use Yii;
@@ -34,7 +36,7 @@ class ReportForm extends Model {
 	public bool $withAddress = false;
 	public ?Address $address = null;
 
-	private ActiveLead $lead;
+	private ?ActiveLead $lead = null;
 	private ?LeadReport $model = null;
 	/* @var LeadQuestion[] */
 	private ?array $questions = null;
@@ -42,6 +44,7 @@ class ReportForm extends Model {
 	private array $answersModels = [];
 
 	public bool $withAnswers = true;
+	private LeadSourceInterface $source;
 
 	public function setOpenAnswers(array $questionsAnswers): void {
 		$models = $this->getAnswersModels();
@@ -147,7 +150,7 @@ class ReportForm extends Model {
 			$query = LeadQuestion::find()
 				->forStatus($this->status_id)
 				->forType($this->getLeadTypeID());
-			if ($this->getModel()->isNewRecord) {
+			if ($this->getModel()->isNewRecord && $this->lead !== null) {
 				$answeredQuestionsIds = $this->lead
 					->getAnswers()
 					->select('question_id')
@@ -248,10 +251,15 @@ class ReportForm extends Model {
 	public function setLead(ActiveLead $lead): void {
 		$this->lead = $lead;
 		$this->status_id = $lead->getStatusId();
-		$this->address = $lead->addresses[$this->addressType]->address ?? null;
-		if ($this->address !== null) {
+		$this->setSource($lead->getSource());
+		if (isset($lead->addresses[$this->addressType])) {
+			$this->address = $lead->addresses[$this->addressType]->address ?? null;
 			$this->withAddress = true;
 		}
+	}
+
+	protected function setSource(LeadSourceInterface $source): void {
+		$this->source = $source;
 	}
 
 	public function getLead(): ActiveLead {
@@ -286,7 +294,7 @@ class ReportForm extends Model {
 	}
 
 	private function getLeadTypeID(): int {
-		return $this->lead->getSource()->getType()->getID();
+		return $this->source->getType()->getID();
 	}
 
 	public static function getStatusNames(): array {

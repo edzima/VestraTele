@@ -6,6 +6,9 @@ use backend\widgets\CsvForm;
 use common\helpers\Flash;
 use common\helpers\Url;
 use common\modules\lead\models\forms\LeadForm;
+use common\modules\lead\models\forms\ReportForm;
+use common\modules\lead\models\LeadSource;
+use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
@@ -167,6 +170,39 @@ class LeadController extends BaseController {
 
 		return $this->render('create', [
 			'model' => $model,
+		]);
+	}
+
+	public function actionCreateFromSource(int $id) {
+		$model = new LeadForm();
+		$model->source_id = $id;
+		if ($this->module->onlyUser) {
+			$model->setScenario(LeadForm::SCENARIO_OWNER);
+			$model->owner_id = Yii::$app->user->getId();
+		}
+		if (!$model->validate(['source_id'])) {
+			throw new NotFoundHttpException();
+		}
+		$model->date_at = date($model->dateFormat);
+		$source = LeadSource::getModels()[$id];
+		$report = new ReportForm(['source' => $source]);
+		$report->status_id = LeadStatusInterface::STATUS_NEW;
+		$report->owner_id = Yii::$app->user->getId();
+		if ($model->load(Yii::$app->request->post())
+			&& $report->load(Yii::$app->request->post())
+			&& $model->validate()
+			&& $report->validate()) {
+			$lead = $this->module->manager->pushLead($model);
+			if ($lead) {
+				$report->setLead($lead);
+				Yii::$app->session->addFlash('success', Yii::t('lead', 'Success create Lead.'));
+				$report->save(false);
+				return $this->redirect(['view', 'id' => $lead->getId()]);
+			}
+		}
+		return $this->render('create-from-source', [
+			'model' => $model,
+			'report' => $report,
 		]);
 	}
 

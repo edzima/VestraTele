@@ -1,6 +1,8 @@
 <?php
 
 use common\modules\lead\models\forms\LeadForm;
+use common\modules\lead\models\forms\ReportForm;
+use common\modules\lead\widgets\ReportFormWidget;
 use common\widgets\DateTimeWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
@@ -8,18 +10,17 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model LeadForm */
+/* @var $report ReportForm */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
 <div class="lead-form">
 
 	<?php $form = ActiveForm::begin([
-		'id' => 'lead-form',
+		'id' => 'lead-with-report-form',
 	]); ?>
 
 	<div class="row">
-		<?= $form->field($model, 'source_id', ['options' => ['class' => 'col-md-4']])->dropDownList($model->getSourcesNames()) ?>
-
 		<?= $form->field($model, 'provider', ['options' => ['class' => 'col-md-2']])->dropDownList(LeadForm::getProvidersNames(), ['prompt' => Yii::t('lead', '--- Select ---')]) ?>
 
 		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-3']])->dropDownList($model->getCampaignsNames(), ['prompt' => Yii::t('lead', '--- Select ---')]) ?>
@@ -64,6 +65,12 @@ use yii\widgets\ActiveForm;
 			],
 		]) ?>
 	</div>
+
+
+	<?= ReportFormWidget::widget([
+		'form' => $form,
+		'model' => $report,
+	]) ?>
 
 
 	<?php //form->field($model, 'data')->textarea(['rows' => 6]) ?>
