@@ -135,7 +135,7 @@ class LeadController extends BaseController {
 		$model = $this->findLead($id);
 		$sameContacts = $model->getSameContacts();
 		if (!empty($sameContacts)) {
-			Yii::$app->session->addFlash('warning',
+			Flash::add(Flash::TYPE_WARNING,
 				Yii::t('lead', 'Find Similars Leads: {count}.', [
 					'count' => count($sameContacts),
 				])
@@ -164,7 +164,7 @@ class LeadController extends BaseController {
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 			$lead = $this->module->manager->pushLead($model);
 			if ($lead) {
-				Yii::$app->session->addFlash('success', Yii::t('lead', 'Success create Lead.'));
+				Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success create Lead.'));
 				return $this->redirect(['view', 'id' => $lead->getId()]);
 			}
 		}
@@ -196,7 +196,7 @@ class LeadController extends BaseController {
 			$lead = $this->module->manager->pushLead($model);
 			if ($lead) {
 				$report->setLead($lead);
-				Yii::$app->session->addFlash('success', Yii::t('lead', 'Success create Lead.'));
+				Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success create Lead.'));
 				$report->save(false);
 				return $this->redirect(['view', 'id' => $lead->getId()]);
 			}
@@ -218,7 +218,7 @@ class LeadController extends BaseController {
 		$model->owner_id = Yii::$app->user->getId();
 		$lead = $this->module->manager->pushLead($model);
 		if ($lead) {
-			Yii::$app->session->addFlash('success', Yii::t('lead', 'Success Copy Lead.'));
+			Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success Copy Lead.'));
 			return $this->redirect(['view', 'id' => $lead->getId()]);
 		}
 		return $this->redirect(Url::previous());
