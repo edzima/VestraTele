@@ -6,6 +6,7 @@ use common\helpers\Url;
 use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\searches\LeadSearch;
+use common\modules\lead\widgets\CreateLeadBtnWidget;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AddressColumn;
 use common\widgets\grid\SerialColumn;
@@ -38,13 +39,6 @@ foreach (LeadSearch::questions() as $question) {
 	];
 }
 
-$createSourceItems = [];
-foreach ($searchModel->getSourcesNames() as $id => $name) {
-	$createSourceItems[] = [
-		'label' => $name,
-		'url' => Url::to(['create-from-source', 'id' => $id]),
-	];
-}
 ?>
 <div class="lead-index">
 
@@ -53,17 +47,8 @@ foreach ($searchModel->getSourcesNames() as $id => $name) {
 	<p>
 		<?= Html::a(Yii::t('lead', 'Phone Lead'), ['phone'], ['class' => 'btn btn-info']) ?>
 
-		<?= ButtonDropdown::widget([
-			'label' => Yii::t('lead', 'Create Lead'),
-			'split' => true,
-			'tagName' => 'a',
-			'options' => [
-				'class' => 'btn btn-success',
-				'href' => ['create'],
-			],
-			'dropdown' => [
-				'items' => $createSourceItems,
-			],
+		<?= CreateLeadBtnWidget::widget([
+			'owner_id' => $searchModel->user_id,
 		]) ?>
 
 		<?= Html::a(Yii::t('lead', 'Lead Reports'), ['report/index'], ['class' => 'btn btn-warning']) ?>

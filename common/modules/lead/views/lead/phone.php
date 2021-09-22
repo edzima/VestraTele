@@ -2,6 +2,7 @@
 
 use common\helpers\Html;
 use common\modules\lead\models\searches\LeadPhoneSearch;
+use common\modules\lead\widgets\CreateLeadBtnWidget;
 use common\widgets\ActiveForm;
 use yii\data\ActiveDataProvider;
 use yii\widgets\ListView;
@@ -19,6 +20,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="lead-phone-view">
 
 	<h1><?= Html::encode($this->title) ?></h1>
+	<p>
+		<?= !empty($model->phone) ? CreateLeadBtnWidget::widget([
+			'owner_id' => Yii::$app->user->getId(),
+			'phone' => $model->phone,
+		]) : '' ?>
+	</p>
 
 	<div class="lead-phone-search">
 

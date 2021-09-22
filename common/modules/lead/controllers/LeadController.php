@@ -154,8 +154,9 @@ class LeadController extends BaseController {
 	 *
 	 * @return mixed
 	 */
-	public function actionCreate() {
+	public function actionCreate(string $phone = null) {
 		$model = new LeadForm();
+		$model->phone = $phone;
 		$model->date_at = date($model->dateFormat);
 		if ($this->module->onlyUser) {
 			$model->setScenario(LeadForm::SCENARIO_OWNER);
@@ -174,9 +175,10 @@ class LeadController extends BaseController {
 		]);
 	}
 
-	public function actionCreateFromSource(int $id) {
+	public function actionCreateFromSource(int $id, string $phone = null) {
 		$model = new LeadForm();
 		$model->source_id = $id;
+		$model->phone = $phone;
 		if ($this->module->onlyUser) {
 			$model->setScenario(LeadForm::SCENARIO_OWNER);
 			$model->owner_id = Yii::$app->user->getId();
