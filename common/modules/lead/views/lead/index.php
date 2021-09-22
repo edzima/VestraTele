@@ -48,7 +48,7 @@ foreach (LeadSearch::questions() as $question) {
 		<?= Html::a(Yii::t('lead', 'Phone Lead'), ['phone'], ['class' => 'btn btn-info']) ?>
 
 		<?= CreateLeadBtnWidget::widget([
-			'owner_id' => $searchModel->user_id,
+			'owner_id' => is_int($searchModel->user_id) ? $searchModel->user_id : null,
 		]) ?>
 
 		<?= Html::a(Yii::t('lead', 'Lead Reports'), ['report/index'], ['class' => 'btn btn-warning']) ?>
