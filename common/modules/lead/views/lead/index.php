@@ -2,13 +2,16 @@
 
 use backend\widgets\CsvForm;
 use common\helpers\Html;
+use common\helpers\Url;
 use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\searches\LeadSearch;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AddressColumn;
+use common\widgets\grid\SerialColumn;
 use common\widgets\GridView;
 use kartik\grid\CheckboxColumn;
+use yii\bootstrap\ButtonDropdown;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadSearch */
@@ -34,6 +37,14 @@ foreach (LeadSearch::questions() as $question) {
 		},
 	];
 }
+
+$createSourceItems = [];
+foreach ($searchModel->getSourcesNames() as $id => $name) {
+	$createSourceItems[] = [
+		'label' => $name,
+		'url' => Url::to(['create-from-source', 'id' => $id]),
+	];
+}
 ?>
 <div class="lead-index">
 
@@ -42,7 +53,18 @@ foreach (LeadSearch::questions() as $question) {
 	<p>
 		<?= Html::a(Yii::t('lead', 'Phone Lead'), ['phone'], ['class' => 'btn btn-info']) ?>
 
-		<?= Html::a(Yii::t('lead', 'Create Lead'), ['create'], ['class' => 'btn btn-success']) ?>
+		<?= ButtonDropdown::widget([
+			'label' => Yii::t('lead', 'Create Lead'),
+			'split' => true,
+			'tagName' => 'a',
+			'options' => [
+				'class' => 'btn btn-success',
+				'href' => ['create'],
+			],
+			'dropdown' => [
+				'items' => $createSourceItems,
+			],
+		]) ?>
 
 		<?= Html::a(Yii::t('lead', 'Lead Reports'), ['report/index'], ['class' => 'btn btn-warning']) ?>
 
@@ -78,6 +100,7 @@ foreach (LeadSearch::questions() as $question) {
 				'class' => CheckboxColumn::class,
 				'visible' => $assignUsers,
 			],
+			['class' => SerialColumn::class],
 			[
 				'attribute' => 'owner_id',
 				'label' => Yii::t('lead', 'Owner'),

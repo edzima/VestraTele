@@ -6,6 +6,7 @@ use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadReportSearch;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\SerialColumn;
 use common\widgets\GridView;
 
 /* @var $this yii\web\View */
@@ -27,6 +28,7 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
+			['class' => SerialColumn::class],
 			[
 				'attribute' => 'lead_name',
 				'value' => 'lead.name',
