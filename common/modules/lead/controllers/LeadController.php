@@ -29,6 +29,7 @@ class LeadController extends BaseController {
 			'verbs' => [
 				'class' => VerbFilter::class,
 				'actions' => [
+					'copy' => ['POST'],
 					'delete' => ['POST'],
 				],
 			],
