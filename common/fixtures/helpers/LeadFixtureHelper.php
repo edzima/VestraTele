@@ -47,10 +47,6 @@ class LeadFixtureHelper {
 
 	public static function leads(): array {
 		return array_merge([
-			static::STATUS => [
-				'class' => StatusFixture::class,
-				'dataFile' => static::dataDir() . 'status.php',
-			],
 			static::TYPE => [
 				'class' => TypeFixture::class,
 				'dataFile' => static::dataDir() . 'type.php',
@@ -58,8 +54,18 @@ class LeadFixtureHelper {
 		],
 			static::lead(),
 			static::source(),
+			static::status(),
 			static::user(),
 		);
+	}
+
+	public static function status(): array {
+		return [
+			static::STATUS => [
+				'class' => StatusFixture::class,
+				'dataFile' => static::dataDir() . 'status.php',
+			],
+		];
 	}
 
 	public static function reports(): array {

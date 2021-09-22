@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Flash;
 use common\helpers\Url;
 use common\modules\lead\models\forms\LeadPushEmail;
 use common\modules\lead\models\forms\LeadsUserForm;
@@ -45,16 +46,44 @@ class UserController extends BaseController {
 		]);
 	}
 
+	public function actionAssignSingle(int $id) {
+		$lead = $this->findLead($id);
+		$model = new LeadsUserForm();
+		$model->scenario = LeadsUserForm::SCENARIO_SINGLE;
+		$model->withOwner = !$this->module->onlyUser;
+		$model->leadsIds = [$lead->getId()];
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('lead', 'Success assign {user} as {type} to Lead: {lead}.', [
+					'user' => LeadsUserForm::getUsersNames()[$model->userId],
+					'type' => $model->getTypesNames()[$model->type],
+					'lead' => $lead->getName(),
+				])
+			);
+			$email = $this->module->userClass::findOne($model->userId)->email ?? null;
+			if ($email) {
+				$pushEmailModel = new LeadPushEmail($lead);
+				$pushEmailModel->email = $email;
+				$pushEmailModel->sendEmail();
+			}
+			return $this->redirect(['lead/view', 'id' => $id]);
+		}
+		return $this->render('assign-single', [
+			'model' => $model,
+			'lead' => $lead,
+		]);
+	}
+
 	public function actionAssign(array $ids = []) {
 		$model = new LeadsUserForm();
 		$model->leadsIds = array_combine($ids, $ids);
 		if ($model->load(Yii::$app->request->post())) {
 			$count = $model->save();
 			if ($count) {
-				Yii::$app->session->addFlash('success',
+				Flash::add(Flash::TYPE_SUCCESS,
 					Yii::t('lead', 'Success assign {user} as {type} to {count} leads.', [
 						'user' => LeadsUserForm::getUsersNames()[$model->userId],
-						'type' => LeadsUserForm::getTypesNames()[$model->type],
+						'type' => $model->getTypesNames()[$model->type],
 						'count' => $count,
 					])
 				);

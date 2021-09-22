@@ -3,6 +3,7 @@
 use backend\modules\issue\models\search\UserSearch;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
+use common\widgets\grid\ActionColumn;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 
@@ -34,6 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'typeName',
 				'filter' => UserSearch::getTypesNames(),
 			],
+			['class' => ActionColumn::class],
 		],
 	]); ?>
 </div>

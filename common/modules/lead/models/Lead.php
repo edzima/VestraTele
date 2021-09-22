@@ -276,7 +276,12 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function isForUser($id): bool {
-		return in_array($id, $this->getUsers(), true);
+		foreach ($this->leadUsers as $user) {
+			if ($user->user_id === $id) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function getSameContacts(): array {

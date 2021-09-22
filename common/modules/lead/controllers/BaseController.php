@@ -48,8 +48,8 @@ class BaseController extends Controller {
 	 * @return ActiveLead|ActiveRecord
 	 * @throws NotFoundHttpException
 	 */
-	protected function findLead(int $id): ActiveLead {
-		$model = $this->module->manager->findById($id);
+	protected function findLead(int $id, bool $forUser = true): ActiveLead {
+		$model = $this->module->manager->findById($id, $forUser);
 		if ($model === null) {
 			throw new NotFoundHttpException();
 		}

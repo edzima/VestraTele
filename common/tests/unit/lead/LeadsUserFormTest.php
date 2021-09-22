@@ -60,8 +60,12 @@ class LeadsUserFormTest extends Unit {
 		$this->thenSeeLeadUser(2, 1, LeadUser::TYPE_TELE);
 	}
 
+	public function testTypesNamesWithoutOwner(): void {
+		$this->model->withOwner = false;
+		$this->tester->assertArrayNotHasKey(LeadUser::TYPE_OWNER, $this->model->getTypesNames());
+	}
+
 	public function testOverwrite(): void {
-		//	codecept_debug(Lead::find()->asArray()->all());
 		$this->model->leadsIds = [1, 2];
 		$this->model->userId = 1;
 		$this->model->type = LeadUser::TYPE_AGENT;

@@ -8,6 +8,7 @@ use common\models\SearchModel;
 use common\models\user\User;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadQuestion;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
@@ -41,6 +42,8 @@ class LeadSearch extends Lead implements SearchModel {
 	public $user_type;
 	public $type_id;
 
+	public string $reportsDetails = '';
+
 	public $answers = [];
 	public $closedQuestions = [];
 
@@ -66,7 +69,7 @@ class LeadSearch extends Lead implements SearchModel {
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			[['withoutUser', 'withoutReport', 'duplicatePhone', 'duplicateEmail'], 'boolean'],
 			['name', 'string', 'min' => 3],
-			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'user_type'], 'safe'],
+			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			[array_keys($this->questionsAttributes), 'safe'],
@@ -149,8 +152,8 @@ class LeadSearch extends Lead implements SearchModel {
 			->with('status')
 			->with('campaign')
 			->with('owner.userProfile')
-			//		->joinWith('addresses.address')
-			->joinWith('answers')
+			->with('reports.answers')
+			->with('reports.answers.question')
 			->groupBy(Lead::tableName() . '.id');
 
 		// add conditions that should always apply here
@@ -189,7 +192,6 @@ class LeadSearch extends Lead implements SearchModel {
 			Lead::tableName() . '.source_id' => $this->source_id,
 			Lead::tableName() . '.provider' => $this->provider,
 			'S.type_id' => $this->type_id,
-
 		]);
 
 		$query
@@ -228,8 +230,13 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private function applyReportFilter(ActiveQuery $query) {
 		if ($this->withoutReport) {
-			$query->joinWith('reports R', false, 'LEFT OUTER JOIN');
-			$query->andWhere(['R.id' => null]);
+			$query->joinWith('reports', false, 'LEFT OUTER JOIN');
+			$query->andWhere([LeadReport::tableName() . '.id' => null]);
+		} else {
+			if (!empty($this->reportsDetails)) {
+				$query->joinWith('reports');
+				$query->andWhere(['like', LeadReport::tableName() . '.details', $this->reportsDetails]);
+			}
 		}
 	}
 
@@ -257,7 +264,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 			//@todo fix multiple answers
 			$query->joinWith([
-				'answers' => function (LeadAnswerQuery $answerQuery): void {
+				'reports.answers' => function (LeadAnswerQuery $answerQuery): void {
 					$answerQuery->likeAnswers($this->answers);
 				},
 			], false);
@@ -265,14 +272,17 @@ class LeadSearch extends Lead implements SearchModel {
 	}
 
 	private function applyDuplicates(ActiveQuery $query): void {
+		if ($this->duplicateEmail || $this->duplicatePhone) {
+			$query->addSelect([Lead::tableName() . '.*']);
+		}
 		if ($this->duplicateEmail) {
 			$query->addSelect('COUNT(' . Lead::tableName() . '.email) as emailCount');
-			$query->addGroupBy(Lead::tableName() . '.email');
+			$query->groupBy(Lead::tableName() . '.email');
 			$query->having('emailCount > 1');
 		}
 		if ($this->duplicatePhone) {
-			$query->addSelect('COUNT(' . Lead::tableName() . '.phone) as phoneCount');
-			$query->addGroupBy(Lead::tableName() . '.phone');
+			$query->addSelect(['COUNT(' . Lead::tableName() . '.phone) as phoneCount']);
+			$query->groupBy(Lead::tableName() . '.phone');
 			$query->having('phoneCount > 1');
 		}
 	}

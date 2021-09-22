@@ -12,6 +12,10 @@ use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
 use common\models\provision\IssueProvisionType;
 use common\models\user\Customer;
+use common\models\user\UserProfile;
+use common\modules\lead\models\forms\ReportForm;
+use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadReport;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\console\Controller;
@@ -19,6 +23,45 @@ use yii\helpers\Console;
 use yii\helpers\Json;
 
 class UpgradeController extends Controller {
+
+	public function actionReports(int $owner_id): void {
+		$reports = LeadReport::find()
+			->joinWith('lead')
+			->andWhere([LeadReport::tableName() . '.owner_id' => $owner_id])
+			->all();
+		foreach ($reports as $report) {
+			$lead = $report->lead;
+			$lead->status_id = $report->old_status_id;
+			$lead->save();
+			$report->delete();
+		}
+	}
+
+	public function actionLeads(int $newStatus, int $owner_id): void {
+		foreach (Lead::find()
+			->distinct()
+			->andWhere(['!=', 'status_id', $newStatus])
+			->andWhere('lead.phone IS NOT NULL')
+			->leftJoin(UserProfile::tableName() . ' UP', 'UP.phone = lead.phone OR UP.phone_2 = lead.phone')
+			->andWhere('UP.user_id IS NOT NULL')
+			->batch() as $rows) {
+			foreach ($rows as $lead) {
+				/** @var Lead $lead */
+				$report = new ReportForm();
+				$report->setLead($lead);
+				$report->withAddress = false;
+				$report->withAnswers = false;
+				$report->owner_id = $owner_id;
+				$report->status_id = $newStatus;
+				$report->save(false);
+			}
+		}
+	}
+
+	public function actionLeadEmptyPhone(): void {
+		Lead::updateAll(['phone' => null], ['phone' => '+48 33 322 21 11']);
+		Lead::updateAll(['phone' => null], ['phone' => '']);
+	}
 
 	public function actionNoteTitleDates(): void {
 		$count = 0;

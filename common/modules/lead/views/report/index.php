@@ -1,16 +1,17 @@
 <?php
 
+use common\helpers\Html;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadReportSearch;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\SerialColumn;
 use common\widgets\GridView;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadReportSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-/* @var $visibleButtons array */
 
 $this->title = Yii::t('lead', 'Lead Reports');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
@@ -27,6 +28,7 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
+			['class' => SerialColumn::class],
 			[
 				'attribute' => 'lead_name',
 				'value' => 'lead.name',
@@ -71,7 +73,28 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 
 			[
 				'class' => ActionColumn::class,
-				'visibleButtons' => $visibleButtons,
+				'template' => '{report} {view} {update} {delete}',
+				'buttons' => [
+					'report' => static function (string $url, LeadReport $report): string {
+						return Html::a(
+							Html::icon('comment'),
+							['report', 'id' => $report->lead_id],
+							[
+								'title' => Yii::t('lead', 'Create Report'),
+								'aria-title' => Yii::t('lead', 'Create Report'),
+							]
+						);
+					},
+					'view' => static function (string $url, LeadReport $report): string {
+						return Html::a(
+							Html::icon('eye-open'),
+							['lead/view', 'id' => $report->lead_id], [
+								'title' => Yii::t('yii', 'View'),
+								'aria-title' => Yii::t('yii', 'View'),
+							]
+						);
+					},
+				],
 			],
 		],
 	]); ?>

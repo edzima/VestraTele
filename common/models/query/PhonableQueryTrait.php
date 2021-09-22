@@ -12,7 +12,7 @@ trait PhonableQueryTrait {
 		];
 	}
 
-	public function withPhoneNumber($value): self {
+	public function withPhoneNumber(string $value): self {
 		[$table, $alias] = $this->getTableNameAndAlias();
 		$i = 0;
 		foreach ($this->getPhoneColumns() as $phoneColumn) {
