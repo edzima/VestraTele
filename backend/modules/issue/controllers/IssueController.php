@@ -64,8 +64,12 @@ class IssueController extends Controller {
 					'label' => 'Nr',
 				],
 				[
-					'attribute' => 'customer.fullName',
-					'label' => 'Imie nazwisko',
+					'attribute' => 'customer.profile.firstname',
+					'label' => 'Imie',
+				],
+				[
+					'attribute' => 'customer.profile.lastname',
+					'label' => 'Nazwisko',
 				],
 				[
 					'attribute' => 'customer.userProfile.phone',
