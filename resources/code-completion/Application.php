@@ -8,7 +8,9 @@ use common\components\TaxComponent;
 use common\components\User;
 use common\components\Formatter;
 use common\modules\lead\components\LeadManager;
+use Edzima\Yii2Adescom\models\SenderInterface;
 use yii\BaseYii;
+use yii\queue\Queue;
 
 /**
  * Fake class to define Yii 2.0 code completion for IDE.
@@ -36,6 +38,8 @@ class Yii extends BaseYii {
  * @property Provisions $provisions
  * @property TaxComponent $tax
  * @property User $user
+ * @property SenderInterface $sms
+ * @property Queue $queue
  */
 abstract class Application extends \yii\web\Application {
 

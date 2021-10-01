@@ -305,6 +305,16 @@ $user = Yii::$app->user;
 					],
 				],
 				[
+					'label' => Yii::t('common', 'SMS'),
+					'url' => '#',
+					'icon' => '<i class="fa fa-envelope"></i>',
+					'options' => ['class' => 'treeview'],
+					'items' => [
+						['label' => Yii::t('common', 'Send SMS'), 'url' => ['/adescom-sms/send/push'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+					],
+					'visible' => $user->can(User::PERMISSION_SMS),
+				],
+				[
 					'label' => Yii::t('backend', 'Articles'),
 					'url' => '#',
 					'icon' => '<i class="fa fa-edit"></i>',

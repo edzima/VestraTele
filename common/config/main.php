@@ -13,8 +13,12 @@ use common\models\user\Worker;
 use common\modules\czater\Czater;
 use edzima\teryt\Module as TerytModule;
 use common\modules\lead\Module as LeadModule;
+use Edzima\Yii2Adescom\AdescomSender;
+use Edzima\Yii2Adescom\AdescomSoap;
 use yii\caching\DummyCache;
 use yii\caching\FileCache;
+use yii\mutex\MysqlMutex;
+use yii\queue\db\Queue;
 
 return [
 	'name' => $_ENV['APP_NAME'],
@@ -26,6 +30,7 @@ return [
 	'bootstrap' => [
 		'log',
 		'teryt',
+		'queue',
 	],
 	'aliases' => [
 		'@bower' => '@vendor/bower-asset',
@@ -131,6 +136,20 @@ return [
 		'provisions' => [
 			'class' => Provisions::class,
 		],
+		'sms' => [
+			'class' => AdescomSender::class,
+			'client' => [
+				'class' => AdescomSoap::class,
+				'login' => $_ENV['ADESCOM_LOGIN'],
+				'password' => $_ENV['ADESCOM_PASSWORD'],
+			],
+			'messageConfig' => [
+				'src' => $_ENV['ADESCOM_SRC'],
+				'overwriteSrc' => $_ENV['ADESCOM_OVERWRITE_SRC'],
+				'retryInterval' => 60,
+				'maxRetryCount' => 1,
+			],
+		],
 		'tax' => [
 			'class' => TaxComponent::class,
 		],
@@ -138,6 +157,12 @@ return [
 			'class' => HierarchyComponent::class,
 			'modelClass' => Worker::class,
 			'parentColumn' => 'boss',
+		],
+		'mutex' => [
+			'class' => MysqlMutex::class,
+		],
+		'queue' => [
+			'class' => Queue::class,
 		],
 	],
 ];

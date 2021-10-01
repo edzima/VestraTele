@@ -2,6 +2,7 @@
 
 use backend\modules\benefit\Module as BenefitModule;
 use common\models\user\User;
+use Edzima\Yii2Adescom\Module as AdescomModule;
 use motion\i18n\ConfigLanguageProvider;
 use ymaker\email\templates\Module as EmailTemplateModule;
 use backend\modules\entityResponsible\Module as EntityResponsibleModule;
@@ -84,6 +85,18 @@ return [
 		'frontendCache' => require Yii::getAlias('@frontend/config/_cache.php'),
 	],
 	'modules' => [
+		'adescom-sms' => [
+			'class' => AdescomModule::class,
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'permissions' => [User::PERMISSION_SMS],
+					],
+				],
+			],
+		],
 		'benefit' => [
 			'class' => BenefitModule::class,
 		],

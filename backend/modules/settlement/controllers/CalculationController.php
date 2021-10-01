@@ -170,6 +170,7 @@ class CalculationController extends Controller {
 		$model->vat = $issue->type->vat;
 		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			// @todo add send SMS to Customer and Agent
 			if ($model->sendEmailToCustomer) {
 				$model->sendCreateEmailToCustomer();
 			}
