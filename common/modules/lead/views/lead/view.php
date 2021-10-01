@@ -46,19 +46,26 @@ YiiAsset::register($this);
 
 		<span class="pull-right">
 
-		<?= Html::a(Yii::t('lead', 'Assign User'), ['user/assign-single', 'id' => $model->getId()],
-			['class' => 'btn btn-info']) ?>
+					<?= Yii::$app->user->can(User::PERMISSION_SMS)
+						? Html::a(Yii::t('lead', 'Send SMS'), ['sms/push', 'id' => $model->getId()],
+							['class' => 'btn btn-success'])
+						: ''
+					?>
 
-		<?= $withDelete
-			? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->getId()], [
-				'class' => 'btn btn-danger',
-				'data' => [
-					'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
-					'method' => 'post',
-				],
-			])
-			: ''
-		?>
+
+					<?= Html::a(Yii::t('lead', 'Assign User'), ['user/assign-single', 'id' => $model->getId()],
+						['class' => 'btn btn-info']) ?>
+
+					<?= $withDelete
+						? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->getId()], [
+							'class' => 'btn btn-danger',
+							'data' => [
+								'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
+								'method' => 'post',
+							],
+						])
+						: ''
+					?>
 		</span>
 
 

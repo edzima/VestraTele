@@ -10,7 +10,7 @@ return [
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
 		'email' => 'test@lead.com',
-		'phone' => '777-222-122',
+		'phone' => '48777-222-122',
 		'provider' => Lead::PROVIDER_FORM,
 	],
 	'equal-accident-phone-from-other-source' => [

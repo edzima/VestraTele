@@ -4,6 +4,7 @@ use backend\modules\benefit\Module as BenefitModule;
 use common\models\user\User;
 use Edzima\Yii2Adescom\Module as AdescomModule;
 use motion\i18n\ConfigLanguageProvider;
+use yii\base\Action;
 use ymaker\email\templates\Module as EmailTemplateModule;
 use backend\modules\entityResponsible\Module as EntityResponsibleModule;
 use backend\modules\issue\Module as IssueModule;
@@ -167,6 +168,12 @@ return [
 				'rules' => [
 					[
 						'allow' => true,
+						'matchCallback' => static function ($rule, Action $action): bool {
+							if ($action->controller->id === 'sms') {
+								return Yii::$app->user->can(User::PERMISSION_SMS);
+							}
+							return true;
+						},
 						'permissions' => [User::PERMISSION_LEAD],
 					],
 				],
