@@ -11,6 +11,7 @@ use common\fixtures\issue\StageTypesFixtures;
 use common\fixtures\issue\SummonFixture;
 use common\fixtures\issue\TypeFixture;
 use common\models\issue\Issue;
+use common\models\issue\IssueInterface;
 use common\models\user\User;
 use Yii;
 
@@ -32,7 +33,7 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 	private const STAGE = 'issue.stage';
 	public const NOTE = 'issue.note';
 
-	public function grabIssue($index): Issue {
+	public function grabIssue($index): IssueInterface {
 		return $this->tester->grabFixture(static::ISSUE, $index);
 	}
 

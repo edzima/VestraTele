@@ -315,4 +315,5 @@ return [
 	'Is Pinned' => 'Przypięta',
 	'Is Template' => 'Wzór',
 	'With Archive' => 'Z Archiwum',
+	'Send SMS' => 'Wyślij SMS',
 ];

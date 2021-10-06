@@ -27,6 +27,5 @@ return [
 		'user_id' => UserFixtureHelper::CUSTOMER_JOHN_LENNON,
 		'firstname' => 'John',
 		'lastname' => 'Lennon',
-		'phone' => '+48 222 222 222',
 	],
 ];

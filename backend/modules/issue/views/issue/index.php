@@ -195,7 +195,7 @@ $('.table-responsive').on('hide.bs.dropdown', function () {
 			],
 			[
 				'class' => ActionColumn::class,
-				'template' => '{installment} {stage} {note} {view} {update} {delete}',
+				'template' => '{installment} {note} {sms} {view} {update} {delete}',
 				'buttons' => [
 					'installment' => static function (string $url, Issue $model): string {
 						return Html::a('<i class="fa fa-money" aria-hidden="true"></i>',
@@ -215,6 +215,15 @@ $('.table-responsive').on('hide.bs.dropdown', function () {
 							]
 						);
 					},
+					'sms' => static function (string $url, Issue $model): string {
+						return Html::a('<i class="fa fa-envelope" aria-hidden="true"></i>',
+							['sms/push', 'id' => $model->id],
+							[
+								'title' => Yii::t('common', 'Send SMS'),
+								'aria-label' => Yii::t('common', 'Send SMS'),
+							]
+						);
+					},
 				],
 				'visibleButtons' => [
 					'installment' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
@@ -222,6 +231,7 @@ $('.table-responsive').on('hide.bs.dropdown', function () {
 					'view' => static function (Issue $model) use ($searchModel): bool {
 						return !$model->isArchived() || $searchModel->withArchive;
 					},
+					'sms' => Yii::$app->user->can(Worker::PERMISSION_SMS),
 					'delete' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE),
 				],
 			],

@@ -61,7 +61,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_CUSTOMER,
-		'user_id' => UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID,
+		'user_id' => UserFixtureHelper::CUSTOMER_JOHN_LENNON,
 		'issue_id' => 4,
 	],
 	[

@@ -37,6 +37,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	public bool $updateIssueAfterSave = true;
 	public bool $updateIssueAfterDelete = true;
 
+	public const TYPE_SMS = 'sms';
 	public const TYPE_SETTLEMENT = 'settlement';
 	public const TYPE_SUMMON = 'summon';
 	public const TYPE_STAGE_CHANGE = 'stage.change';
@@ -128,7 +129,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 		return StringHelper::explode($this->type, ':')[1];
 	}
 
-	public static function generateType(string $type, int $id): string {
+	public static function generateType(string $type, string $id): string {
 		return "$type:$id";
 	}
 

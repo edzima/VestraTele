@@ -28,6 +28,11 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		])
 		?>
 
+		<?= Yii::$app->user->can(Worker::PERMISSION_SMS)
+			? Html::a(Yii::t('common', 'Send SMS'), ['sms/push', 'id' => $model->id], [
+				'class' => 'btn btn-default',
+			]) : '' ?>
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE) ? Html::a(Yii::t('backend', 'Create note'), ['note/create', 'issueId' => $model->id], [
 			'class' => 'btn btn-info',
 		]) : '' ?>
