@@ -10,6 +10,7 @@ namespace common\modules\issue\widgets;
 
 use common\helpers\Html;
 use common\models\issue\IssueNote;
+use Yii;
 use yii\base\Widget;
 
 class IssueNoteWidget extends Widget {
@@ -17,10 +18,11 @@ class IssueNoteWidget extends Widget {
 	protected const CLASS_PINNED = 'panel-danger';
 	protected const CLASS_SETTLEMENT = 'panel-settlement';
 	protected const CLASS_STAGE_CHANGE = 'panel-warning';
+	protected const CLASS_SMS = 'panel-info';
 	protected const CLASS_DEFAULT = 'panel-primary';
 
 	public IssueNote $model;
-	public bool $removeBtn = true;
+	public ?bool $removeBtn = true;
 
 	public array $options = [
 		'class' => 'panel',
@@ -28,6 +30,9 @@ class IssueNoteWidget extends Widget {
 
 	public function init() {
 		parent::init();
+		if ($this->removeBtn === null) {
+			$this->removeBtn = Yii::$app->user->canDeleteNote($this->model);
+		}
 		$this->ensureHtmlOptions();
 	}
 
@@ -38,6 +43,9 @@ class IssueNoteWidget extends Widget {
 	private function getPanelClass(): string {
 		if ($this->model->isPinned()) {
 			return static::CLASS_PINNED;
+		}
+		if ($this->model->isSms()) {
+			return static::CLASS_SMS;
 		}
 		if ($this->model->isForSettlement()) {
 			return static::CLASS_SETTLEMENT;

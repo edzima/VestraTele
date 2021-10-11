@@ -3,6 +3,7 @@
 namespace common\components;
 
 use common\models\issue\Issue;
+use common\models\issue\IssueNote;
 use common\models\user\Worker;
 use Yii;
 use yii\web\User as BaseUser;
@@ -46,5 +47,12 @@ class User extends BaseUser {
 		}
 
 		return false;
+	}
+
+	public function canDeleteNote(IssueNote $note): bool {
+		if ($note->isSms()) {
+			return $this->can(Worker::ROLE_ADMINISTRATOR);
+		}
+		return $note->user_id === $this->getId() || $this->can(Worker::PERMISSION_NOTE_DELETE);
 	}
 }

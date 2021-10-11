@@ -25,7 +25,10 @@ use yii\helpers\Html;
 	<span class="date pull-left"><?= Yii::$app->formatter->asDateTime($model->publish_at) ?></span>
 	<?php if ($model->user_id === Yii::$app->user->id || Yii::$app->user->can(Worker::ROLE_MANAGER)): ?>
 		<span class="action pull-right">
-				<?= Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['note/update', 'id' => $model->id]) ?>
+				<?= !$model->isSms()
+					? Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['note/update', 'id' => $model->id])
+					: ''
+				?>
 				<?= $removeBtn ? Html::a('<i class="glyphicon glyphicon-trash"></i>', ['note/delete', 'id' => $model->id], [
 					'data' => [
 						'confirm' => 'Czy napewno chcesz usunąć?',

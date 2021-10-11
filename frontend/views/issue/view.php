@@ -75,8 +75,5 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model,
-		'noteOptions' => [
-			'removeBtn' => false,
-		],
 	]) ?>
 </div>
