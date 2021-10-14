@@ -6,18 +6,12 @@ use common\models\SmsForm;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
 use console\jobs\SmsSendJob;
-use Edzima\Yii2Adescom\models\MessageInterface;
-use Yii;
-use yii\queue\PushEvent;
-use yii\queue\Queue;
 
 abstract class SmsFormTest extends Unit {
 
 	use UnitModelTrait;
 
 	protected SmsForm $model;
-	private ?PushEvent $event = null;
-	protected MessageInterface $message;
 
 	abstract protected function jobClass(): string;
 
@@ -32,18 +26,13 @@ abstract class SmsFormTest extends Unit {
 	public function testPushJob(): void {
 		$this->giveModel();
 		$this->beforePushJob();
-		$this->model->pushJob();
-		$this->assertNotNull($this->event);
+		$smsId = $this->model->pushJob();
+		$this->tester->assertNotNull($smsId);
+		$this->assertNotNull($this->tester->grabLastPushedJob());
 		$this->afterPushJob();
 	}
 
 	protected function beforePushJob(): void {
-		Yii::$app->queue->on(Queue::EVENT_AFTER_PUSH, function (PushEvent $event) {
-			$this->event = $event;
-			$job = $event->job;
-			$this->tester->assertInstanceOf(SmsSendJob::class, $job);
-			$this->message = $job->message;
-		});
 		if (empty($this->model->message)) {
 			$this->model->message = 'Test Push Job Message';
 		}
@@ -53,9 +42,15 @@ abstract class SmsFormTest extends Unit {
 	}
 
 	protected function afterPushJob(): void {
-		$this->tester->assertInstanceOf($this->jobClass(), $this->event->job);
-		$this->tester->assertSame($this->model->message, $this->message->getMessage());
-		$this->tester->assertSame($this->model->phone, $this->message->getDst());
+		/**
+		 * @var SmsSendJob $job
+		 */
+		$job = $this->tester->grabLastPushedJob();
+		$this->tester->assertInstanceOf(SmsSendJob::class, $job);
+		$this->tester->assertInstanceOf($this->jobClass(), $job);
+		$message = $job->message;
+		$this->tester->assertSame($this->model->message, $message->getMessage());
+		$this->tester->assertSame($this->model->phone, $message->getDst());
 	}
 
 	public function getModel(): SmsForm {

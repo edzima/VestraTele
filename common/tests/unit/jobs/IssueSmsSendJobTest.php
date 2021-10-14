@@ -16,7 +16,7 @@ class IssueSmsSendJobTest extends SmsSendJobTest {
 	public function _fixtures(): array {
 		return array_merge(
 			IssueFixtureHelper::issue(),
-			IssueFixtureHelper::users(),
+			IssueFixtureHelper::users(true),
 		);
 	}
 
@@ -26,15 +26,29 @@ class IssueSmsSendJobTest extends SmsSendJobTest {
 			'owner_id' => static::OWNER_ID,
 			'note_title' => 'Test Note Title',
 		]);
+		$this->tester->wantTo('Customer Phone');
+		$this->job->message->setDst('48673222110');
 
 		$id = $this->whenRun();
 		$this->tester->assertNotEmpty($id);
-
 		$this->tester->seeRecord(IssueNote::class, [
 			'issue_id' => 1,
-			'title' => 'Test Note Title',
+			'title' => 'Test Note Title - client: Wayne John[+48 673 222 110]',
 			'description' => static::DEFAULT_MESSAGE_TEXT,
-			'type' => IssueNote::generateType(IssueNote::TYPE_SMS, $id),
+			'type' => IssueNote::genereateSmsType($this->job->message->getDst(), $id),
+		]);
+
+		$this->tester->wantTo('Agent Phone');
+		$this->job->message->setDst('48122222300');
+
+		$id = $this->whenRun();
+		codecept_debug(IssueNote::find()->asArray()->all());
+		$this->tester->assertNotEmpty($id);
+		$this->tester->seeRecord(IssueNote::class, [
+			'issue_id' => 1,
+			'title' => 'Test Note Title - agent: Nowak Peter[+48 122 222 300]',
+			'description' => static::DEFAULT_MESSAGE_TEXT,
+			'type' => IssueNote::genereateSmsType($this->job->message->getDst(), $id),
 		]);
 	}
 

@@ -11,10 +11,11 @@ use Edzima\Yii2Adescom\models\MessageInterface;
 use Edzima\Yii2Adescom\models\SenderInterface;
 use Yii;
 use yii\base\Event;
+use yii\base\InvalidConfigException;
 
 class SmsSendJobTest extends Unit {
 
-	private SmsSendJob $job;
+	protected SmsSendJob $job;
 	private SenderInterface $sender;
 	private MessageInterface $message;
 
@@ -59,7 +60,7 @@ class SmsSendJobTest extends Unit {
 	}
 
 	/**
-	 * @throws \yii\base\InvalidConfigException
+	 * @throws InvalidConfigException
 	 */
 	protected function createJob(array $config = []): SmsSendJob {
 		$config['class'] = $this->jobClass;

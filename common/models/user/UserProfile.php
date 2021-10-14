@@ -112,4 +112,8 @@ class UserProfile extends ActiveRecord {
 	public static function find(): UserProfileQuery {
 		return new UserProfileQuery(static::class);
 	}
+
+	public function hasPhones(): bool {
+		return !empty($this->phone) || !empty($this->phone_2);
+	}
 }

@@ -8,7 +8,7 @@ return [
 		'firstname' => 'John',
 		'lastname' => 'Wayne',
 		'phone' => '+48 673 222 110',
-		'phone_2' => '',
+		'phone_2' => '+48 673 222 220',
 	],
 	[
 		'user_id' => UserFixtureHelper::CUSTOMER_ERIKA_LARSON_ID,
