@@ -76,4 +76,16 @@ class QueueHelper extends Module {
 		return $this->lastJob;
 	}
 
+	public function seeJobIsPushed($num = null) {
+		if ($num === null) {
+			$this->assertNotEmpty($this->pushEvents, 'jobs were pushed');
+			return;
+		}
+		$this->assertCount($num, $this->pushEvents, 'number of pushed jobs is equal to ' . $num);
+	}
+
+	public function dontSeeJobIsPushed(): void {
+		$this->assertEmpty($this->pushEvents);
+	}
+
 }

@@ -15,6 +15,7 @@ class IssueSmsForm extends SmsForm {
 	public array $userTypes = [];
 
 	public int $owner_id;
+	public bool $allowSelf = false;
 	public ?string $note_title = null;
 
 	public string $noteTitleTemplate = '{title} - {userTypeWithPhone}';
@@ -138,7 +139,7 @@ class IssueSmsForm extends SmsForm {
 	public function getPhonesData(): array {
 		$phones = [];
 		foreach ($this->getIssue()->getIssueModel()->users as $issueUser) {
-			if (in_array($issueUser->type, $this->userTypes, true)) {
+			if ($this->allowUserTypePhones($issueUser)) {
 				$phonesTypes = [];
 				$phone1 = $issueUser->user->profile->phone;
 				$phone2 = $issueUser->user->profile->phone_2;
@@ -156,6 +157,11 @@ class IssueSmsForm extends SmsForm {
 			}
 		}
 		return $phones;
+	}
+
+	private function allowUserTypePhones(IssueUser $user): bool {
+		return in_array($user->type, $this->userTypes, true)
+			&& ($user->user_id !== $this->owner_id || $this->allowSelf);
 	}
 
 	protected function userNameWithPhone(User $user, string $phone): string {

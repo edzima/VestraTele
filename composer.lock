@@ -571,16 +571,16 @@
         },
         {
             "name": "edzima/yii2-adescom",
-            "version": "1.0.3",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/edzima/yii2-adescom.git",
-                "reference": "dd4c96682451a3bb9884462b980fc05d6966eba4"
+                "reference": "b0ef37c00c52db777b8fcb2b5be9a1374d1554cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/edzima/yii2-adescom/zipball/dd4c96682451a3bb9884462b980fc05d6966eba4",
-                "reference": "dd4c96682451a3bb9884462b980fc05d6966eba4",
+                "url": "https://api.github.com/repos/edzima/yii2-adescom/zipball/b0ef37c00c52db777b8fcb2b5be9a1374d1554cf",
+                "reference": "b0ef37c00c52db777b8fcb2b5be9a1374d1554cf",
                 "shasum": ""
             },
             "require": {
@@ -614,9 +614,9 @@
             "description": "Yii2 Module for send SMS from ADESCOM",
             "support": {
                 "issues": "https://github.com/edzima/yii2-adescom/issues",
-                "source": "https://github.com/edzima/yii2-adescom/tree/1.0.3"
+                "source": "https://github.com/edzima/yii2-adescom/tree/1.0.5"
             },
-            "time": "2021-10-04T08:05:34+00:00"
+            "time": "2021-10-15T07:42:27+00:00"
         },
         {
             "name": "edzima/yii2-teryt",

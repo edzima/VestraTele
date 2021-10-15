@@ -92,6 +92,39 @@ class IssueSmsFormTest extends SmsFormTest {
 		$this->thenSeeError('Phones numbers is invalid.', 'phones');
 	}
 
+	public function testNotSelfPhone(): void {
+		$this->giveModel([
+			'allowSelf' => false,
+			'owner_id' => UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID,
+			'userTypes' => [
+				IssueUser::TYPE_CUSTOMER,
+			],
+		]);
+		$this->tester->assertEmpty($this->model->getPhones());
+
+		$this->giveModel([
+			'allowSelf' => true,
+			'owner_id' => UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID,
+			'userTypes' => [
+				IssueUser::TYPE_CUSTOMER,
+			],
+		]);
+		$this->tester->assertNotEmpty($this->model->getPhones());
+		$this->tester->assertContains('48673222110', $this->model->getPhones());
+
+		$this->giveModel([
+			'allowSelf' => false,
+			'owner_id' => UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID,
+			'userTypes' => [
+				IssueUser::TYPE_CUSTOMER,
+				IssueUser::TYPE_AGENT,
+			],
+		]);
+		$this->tester->assertNotEmpty($this->model->getPhones());
+		$this->tester->assertNotContains('48673222110', $this->model->getPhones());
+		$this->tester->assertContains('48122222300', $this->model->getPhones());
+	}
+
 	public function testPhoneIssueUserName(): void {
 		$this->giveModel(['userTypes' => [IssueUser::TYPE_CUSTOMER]]);
 		$this->tester->assertNull($this->model->getPhoneIssueUserName());
@@ -173,6 +206,9 @@ class IssueSmsFormTest extends SmsFormTest {
 		}
 		if (!isset($config['userTypes'])) {
 			$config['userTypes'] = [IssueUser::TYPE_CUSTOMER, IssueUser::TYPE_AGENT];
+		}
+		if (!isset($config['allowSelf'])) {
+			$config['allowSelf'] = true;
 		}
 		$this->model = new IssueSmsForm($issue, $config);
 	}

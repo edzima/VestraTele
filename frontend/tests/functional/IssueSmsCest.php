@@ -1,30 +1,31 @@
 <?php
 
-namespace backend\tests\functional\issue;
+namespace frontend\tests\functional;
 
-use backend\modules\issue\controllers\SmsController;
-use backend\tests\Step\Functional\IssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
 use common\helpers\Flash;
 use common\models\issue\IssueUser;
 use common\models\user\Worker;
+use frontend\tests\_support\CustomerServiceTester;
+use frontend\tests\_support\IssueUserTester;
+use frontend\tests\FunctionalTester;
 
-class SmsCest {
+class IssueSmsCest {
 
 	/**
 	 * @see SmsController::actionPush()
 	 */
-	private const ROUTE_PUSH = '/issue/sms/push';
-	private const ROUTE_ISSUE_INDEX = IssueIndexCest::ROUTE;
-	private const ROUTE_ISSUE_VIEW = IssueViewCest::ROUTE;
+	private const ROUTE_PUSH = '/issue-sms/push';
+	private const ROUTE_ISSUE_INDEX = IssueCest::ROUTE_INDEX;
+	private const ROUTE_ISSUE_VIEW = IssueCest::ROUTE_VIEW;
 
 	private const LINK_TEXT = 'Send SMS';
 	private const SELECTOR_FORM = '#issue-sms-push-form';
 
 	private IssueFixtureHelper $issueFixture;
 
-	public function _before(IssueManager $I): void {
+	public function _before(FunctionalTester $I): void {
 		$this->issueFixture = new IssueFixtureHelper($I);
 	}
 
@@ -36,8 +37,8 @@ class SmsCest {
 		);
 	}
 
-	public function checkWithoutPermission(IssueManager $I): void {
-		$I->amLoggedIn();
+	public function checkWithoutPermission(IssueUserTester $I): void {
+		$I->amLoggedInAs(UserFixtureHelper::AGENT_PETER_NOWAK);
 		$I->wantTo('Check Access to Push Page');
 		$I->amOnRoute(static::ROUTE_PUSH, ['id' => 1]);
 		$I->seeResponseCodeIs(403);
@@ -51,8 +52,15 @@ class SmsCest {
 		$I->dontSeeLink(static::LINK_TEXT);
 	}
 
-	public function checkWithPermission(IssueManager $I): void {
-		$I->amLoggedIn();
+	public function checkWithPermissionForNotSelfIssue(IssueUserTester $I): void {
+		$I->amLoggedInAs(UserFixtureHelper::AGENT_AGNES_MILLER);
+		$I->assignPermission(Worker::PERMISSION_SMS);
+		$I->amOnRoute(static::ROUTE_PUSH, ['id' => 1]);
+		$I->seePageNotFound();
+	}
+
+	public function checkWithPermission(IssueUserTester $I): void {
+		$I->amLoggedInAs(UserFixtureHelper::AGENT_PETER_NOWAK);
 		$I->wantTo('Check Access to Push Page');
 		$I->assignPermission(Worker::PERMISSION_SMS);
 		$I->amOnRoute(static::ROUTE_PUSH, ['id' => 1]);
@@ -71,67 +79,41 @@ class SmsCest {
 		$I->seeInCurrentUrl(static::ROUTE_PUSH);
 	}
 
-	public function checkInvalidUserType(IssueManager $I): void {
-		$I->amLoggedIn();
+	public function checkInvalidUserType(IssueUserTester $I): void {
+		$I->amLoggedInAs(UserFixtureHelper::AGENT_PETER_NOWAK);
 		$I->assignPermission(Worker::PERMISSION_SMS);
 		$I->amOnRoute(static::ROUTE_PUSH, ['id' => 1, 'userType' => 'not-existed-user']);
 		$I->seePageNotFound();
 	}
 
-	public function checkTitleWithoutUserType(IssueManager $I): void {
-		$I->amLoggedIn();
+	public function checkSendSelf(IssueUserTester $I): void {
+		$I->amLoggedInAs(UserFixtureHelper::AGENT_PETER_NOWAK);
 		$I->assignPermission(Worker::PERMISSION_SMS);
-		$issue = $this->issueFixture->grabIssue(1);
-		$I->amOnRoute(static::ROUTE_PUSH, ['id' => $issue->getIssueId()]);
-		$I->seeInTitle('Send SMS for Issue: ' . $issue->getIssueName());
+		$I->amOnRoute(static::ROUTE_PUSH, ['id' => 1]);
+		$I->submitForm(static::SELECTOR_FORM, $this->formParams(['48122222300'], 'Self Message'));
+		$I->seeValidationError('Phones numbers is invalid.');
+		$I->dontSeeJobIsPushed();
 	}
 
-	public function checkPushWithUserType(IssueManager $I): void {
-		$I->amLoggedIn();
-		$I->assignPermission(Worker::PERMISSION_SMS);
+	public function checkPushWithUserType(IssueUserTester $I): void {
 		$issue = $this->issueFixture->grabIssue(1);
+		$I->amLoggedInAs($issue->getIssueModel()->agent->id);
+		$I->assignPermission(Worker::PERMISSION_SMS);
 		$I->amOnRoute(static::ROUTE_PUSH, ['id' => $issue->getIssueId(), 'userType' => IssueUser::TYPE_CUSTOMER]);
 		$I->seeInTitle('Send SMS for Issue: ' . $issue->getIssueName() . ' - ' . IssueUser::getTypesNames()[IssueUser::TYPE_CUSTOMER]);
 		$I->fillField('Message', 'Test message');
-		$I->click('Send SMS', static::SELECTOR_FORM);
+		$I->click(static::LINK_TEXT, static::SELECTOR_FORM);
 		$I->seeInCurrentUrl(static::ROUTE_ISSUE_VIEW);
 		$I->seeFlash('Success push SMS: Test message to send queue for Issue', Flash::TYPE_SUCCESS);
 		$I->seeJobIsPushed();
 	}
 
-	public function checkSubmitEmpty(IssueManager $I): void {
-		$I->amLoggedIn();
-		$I->assignPermission(Worker::PERMISSION_SMS);
-		$I->amOnRoute(static::ROUTE_PUSH, ['id' => 1]);
-		$I->seeInField('Note Title', 'SMS Sent');
-		$I->submitForm(static::SELECTOR_FORM, $this->formParams('', '', ''));
-		$I->seeValidationError('Message cannot be blank.');
-	}
-
-	public function checkSubmitToNotThisIssueNumber(IssueManager $I): void {
-		$I->amLoggedIn();
-		$I->assignPermission(Worker::PERMISSION_SMS);
-		$I->amOnRoute(static::ROUTE_PUSH, ['id' => 1]);
-		$I->wantToTest('Check Customer Phone from other Issue');
-		$I->submitForm(static::SELECTOR_FORM, $this->formParams(['48682222110'], 'Test Message'));
-		$I->seeValidationError('Phones numbers is invalid.');
-		$I->dontSeeJobIsPushed();
-	}
-
-	public function checkSubmitMultipleUsers(IssueManager $I): void {
+	public function checkSubmitMultipleUsers(CustomerServiceTester $I): void {
 		$I->amLoggedIn();
 		$I->assignPermission(Worker::PERMISSION_SMS);
 		$I->amOnRoute(static::ROUTE_PUSH, ['id' => 1]);
 		$I->submitForm(static::SELECTOR_FORM, $this->formParams(['48673222220', '48673222110'], 'Test Message'));
 		$I->seeJobIsPushed(2);
-	}
-
-	public function checkUserTypeWithoutPhones(IssueManager $I): void {
-		$I->amLoggedIn();
-		$I->assignPermission(Worker::PERMISSION_SMS);
-		$issue = $this->issueFixture->grabIssue(1);
-		$I->amOnRoute(static::ROUTE_PUSH, ['id' => $issue->getIssueId(), 'userType' => IssueUser::TYPE_AGENT]);
-		$I->seeInCurrentUrl(static::ROUTE_ISSUE_VIEW);
 	}
 
 	private function formParams($phone, $message, $noteTitle = ''): array {

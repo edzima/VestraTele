@@ -19,4 +19,5 @@ return [
 	'Send SMS for Agent absence.' => 'Wysłano SMS o niedostępności Przedstawiciela.',
 	'Send SMS for Issue: {issue} - {userType}' => 'Wyślij SMS w sprawie: {issue} - {userType}',
 	'Send SMS for Issue: {issue}' => 'Wyślij SMS w sprawie: {issue}',
+	'Success push SMS: {message} to send queue for Issue:{issue}.' => 'Sukces! Skierowano SMS: {message} do wysłania w sprawie: {issue}',
 ];

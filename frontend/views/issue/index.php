@@ -1,7 +1,6 @@
 <?php
 
 use common\models\issue\IssueUser;
-use common\models\user\User;
 use common\models\user\Worker;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
@@ -130,12 +129,14 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => ActionColumn::class,
-				'template' => '{note} {view}',
+				'template' => '{note} {sms} {view}',
 				'visibleButtons' => [
 					'view' => static function (IssueUser $model) use ($searchModel) {
 						return !$model->issue->isArchived() || $searchModel->withArchive;
 					},
-					'note' => Yii::$app->user->can(User::PERMISSION_NOTE),
+					'note' => Yii::$app->user->can(Worker::PERMISSION_NOTE),
+					'sms' => Yii::$app->user->can(Worker::PERMISSION_SMS),
+
 				],
 				'buttons' => [
 					'note' => static function (string $url, IssueUser $model): string {
@@ -144,6 +145,15 @@ $this->params['breadcrumbs'][] = $this->title;
 							[
 								'title' => Yii::t('issue', 'Create Issue Note'),
 								'aria-label' => Yii::t('issue', 'Create Issue Note'),
+							]
+						);
+					},
+					'sms' => static function (string $url, IssueUser $model): string {
+						return Html::a('<i class="fa fa-envelope" aria-hidden="true"></i>',
+							['issue-sms/push', 'id' => $model->issue_id],
+							[
+								'title' => Yii::t('common', 'Send SMS'),
+								'aria-label' => Yii::t('common', 'Send SMS'),
 							]
 						);
 					},

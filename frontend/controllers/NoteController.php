@@ -83,7 +83,7 @@ class NoteController extends Controller {
 
 	public function actionSettlement(int $id) {
 		$settlement = IssuePayCalculation::findOne($id);
-		if ($settlement === null || !Yii::$app->user->canSeeIssue($settlement->getIssueModel())) {
+		if ($settlement === null || !Yii::$app->user->canSeeIssue($settlement)) {
 			throw new NotFoundHttpException();
 		}
 		$model = IssueNoteForm::createSettlement($settlement);
@@ -100,7 +100,7 @@ class NoteController extends Controller {
 
 	public function actionSummon(int $id) {
 		$summon = Summon::findOne($id);
-		if ($summon === null || !Yii::$app->user->canSeeIssue($summon->getIssueModel())) {
+		if ($summon === null || !Yii::$app->user->canSeeIssue($summon)) {
 			throw new NotFoundHttpException();
 		}
 		$model = IssueNoteForm::createSummon($summon);

@@ -1,8 +1,9 @@
 <?php
 
-use backend\helpers\Breadcrumbs;
 use common\models\issue\IssueSmsForm;
 use common\modules\issue\widgets\IssueSmsFormWidget;
+use frontend\helpers\Breadcrumbs;
+use frontend\helpers\Html;
 use yii\web\View;
 
 /* @var $this View */
@@ -15,6 +16,7 @@ $this->params['breadcrumbs'][] = Yii::t('issue', 'Send SMS');
 ?>
 
 <div class="issue-sms-send">
+	<h1><?= Html::encode($this->title) ?></h1>
 	<?= IssueSmsFormWidget::widget([
 		'model' => $model,
 		'userTypeName' => $userTypeName,
