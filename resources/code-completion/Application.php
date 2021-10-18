@@ -1,6 +1,6 @@
 <?php
 
-use common\components\EmailTemplateManager;
+use common\components\message\MessageTemplateManager;
 use common\components\HierarchyComponent;
 use common\components\PayComponent;
 use common\components\provision\Provisions;
@@ -31,7 +31,7 @@ class Yii extends BaseYii {
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  * @mixin yii\web\Application|yii\web\Application
  * @property Formatter $formatter
- * @property-read EmailTemplateManager $emailTemplate
+ * @property-read MessageTemplateManager $emailTemplate
  * @property HierarchyComponent $userHierarchy
  * @property LeadManager $leadManager
  * @property PayComponent $pay

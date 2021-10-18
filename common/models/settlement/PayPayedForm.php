@@ -2,7 +2,7 @@
 
 namespace common\models\settlement;
 
-use common\helpers\EmailTemplateKeyHelper;
+use common\helpers\MessageTemplateKeyHelper;
 use common\models\issue\IssuePayInterface;
 use common\models\issue\IssueUser;
 use DateTime;
@@ -73,10 +73,10 @@ class PayPayedForm extends Model {
 		}
 		$issue = $this->pay->calculation->getIssueModel();
 		$template = Yii::$app->emailTemplate->getIssueTypeTemplatesLikeKey(
-			EmailTemplateKeyHelper::generateKey(
+			MessageTemplateKeyHelper::generateKey(
 				[
-					EmailTemplateKeyHelper::SETTLEMENT_PAY_PAID,
-					EmailTemplateKeyHelper::CUSTOMER,
+					MessageTemplateKeyHelper::SETTLEMENT_PAY_PAID,
+					MessageTemplateKeyHelper::CUSTOMER,
 				]
 			), $issue->type_id
 		);
@@ -117,10 +117,10 @@ class PayPayedForm extends Model {
 
 		$issue = $this->pay->calculation->getIssueModel();
 		$template = Yii::$app->emailTemplate->getIssueTypeTemplatesLikeKey(
-			EmailTemplateKeyHelper::generateKey(
+			MessageTemplateKeyHelper::generateKey(
 				[
-					EmailTemplateKeyHelper::SETTLEMENT_PAY_PAID,
-					EmailTemplateKeyHelper::WORKER,
+					MessageTemplateKeyHelper::SETTLEMENT_PAY_PAID,
+					MessageTemplateKeyHelper::WORKER,
 				]
 			), $issue->type_id
 		);

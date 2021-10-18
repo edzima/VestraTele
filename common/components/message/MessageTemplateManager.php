@@ -1,15 +1,15 @@
 <?php
 
-namespace common\components;
+namespace common\components\message;
 
-use common\helpers\EmailTemplateKeyHelper;
+use common\helpers\MessageTemplateKeyHelper;
 use Yii;
 use yii\data\ActiveDataProvider;
 use ymaker\email\templates\components\TemplateManager;
 use ymaker\email\templates\models\EmailTemplate;
 use ymaker\email\templates\queries\EmailTemplateQuery;
 
-class EmailTemplateManager extends TemplateManager {
+class MessageTemplateManager extends TemplateManager implements IssueMessageManager {
 
 	/**
 	 * @param string $key
@@ -48,7 +48,7 @@ class EmailTemplateManager extends TemplateManager {
 			return null;
 		}
 		foreach ($templates as $templateKey => $template) {
-			if (EmailTemplateKeyHelper::isForIssueType($templateKey, $typeId)) {
+			if (MessageTemplateKeyHelper::isForIssueType($templateKey, $typeId)) {
 				return $template;
 			}
 		}

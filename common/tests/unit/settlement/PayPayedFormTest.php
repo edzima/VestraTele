@@ -2,7 +2,7 @@
 
 namespace common\tests\unit\settlement;
 
-use common\fixtures\helpers\EmailTemplateFixtureHelper;
+use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssuePayInterface;
@@ -36,7 +36,7 @@ class PayPayedFormTest extends Unit {
 			IssueFixtureHelper::users(),
 			SettlementFixtureHelper::pay(),
 			SettlementFixtureHelper::settlement(),
-			EmailTemplateFixtureHelper::fixture(),
+			MessageTemplateFixtureHelper::fixture(),
 		);
 	}
 

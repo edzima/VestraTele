@@ -2,31 +2,31 @@
 
 namespace common\tests\unit;
 
-use common\helpers\EmailTemplateKeyHelper;
-use common\components\EmailTemplateManager;
-use common\fixtures\helpers\EmailTemplateFixtureHelper;
+use common\helpers\MessageTemplateKeyHelper;
+use common\components\message\MessageTemplateManager;
+use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use Yii;
 use ymaker\email\templates\entities\EmailTemplate;
 use ymaker\email\templates\entities\EmailTemplateTranslation;
 use ymaker\email\templates\repositories\EmailTemplatesRepository;
 
-class EmailTemplateTest extends Unit {
+class MessageTemplateTest extends Unit {
 
-	private EmailTemplateFixtureHelper $fixture;
+	private MessageTemplateFixtureHelper $fixture;
 	private EmailTemplatesRepository $repository;
-	private EmailTemplateManager $manager;
+	private MessageTemplateManager $manager;
 
 	public function _before() {
 		$this->repository = new EmailTemplatesRepository();
-		$this->manager = new EmailTemplateManager($this->repository);
-		$this->fixture = new EmailTemplateFixtureHelper($this->tester);
+		$this->manager = new MessageTemplateManager($this->repository);
+		$this->fixture = new MessageTemplateFixtureHelper($this->tester);
 		$this->fixture->setRepository($this->repository);
 
 		parent::_before();
 	}
 
 	public function _fixtures(): array {
-		return EmailTemplateFixtureHelper::fixture();
+		return MessageTemplateFixtureHelper::fixture();
 	}
 
 	public function testSave(): void {
@@ -53,29 +53,29 @@ class EmailTemplateTest extends Unit {
 
 	public function testIssueTypesKeys(): void {
 		$this->fixture->save(
-			'issue.create.' . EmailTemplateKeyHelper::issueTypesKeyPart([1, 2])
+			'issue.create.' . MessageTemplateKeyHelper::issueTypesKeyPart([1, 2])
 		);
 		$this->fixture->save(
-			'issue.create.' . EmailTemplateKeyHelper::issueTypesKeyPart([1, 3]),
+			'issue.create.' . MessageTemplateKeyHelper::issueTypesKeyPart([1, 3]),
 		);
 		$this->fixture->save(
-			'issue.create.' . EmailTemplateKeyHelper::issueTypesKeyPart([3]),
+			'issue.create.' . MessageTemplateKeyHelper::issueTypesKeyPart([3]),
 		);
 
 		$models = $this->getTemplatesLikeKey('issue.create');
 
 		$modelsType1 = array_filter($models, static function (string $key): bool {
-			return EmailTemplateKeyHelper::isForIssueType($key, 1);
+			return MessageTemplateKeyHelper::isForIssueType($key, 1);
 		}, ARRAY_FILTER_USE_KEY);
 		$modelsType2 = array_filter($models, static function (string $key): bool {
-			return EmailTemplateKeyHelper::isForIssueType($key, 2);
+			return MessageTemplateKeyHelper::isForIssueType($key, 2);
 		}, ARRAY_FILTER_USE_KEY);
 
 		$modelsType3 = array_filter($models, static function (string $key): bool {
-			return EmailTemplateKeyHelper::isForIssueType($key, 3);
+			return MessageTemplateKeyHelper::isForIssueType($key, 3);
 		}, ARRAY_FILTER_USE_KEY);
 		$modelsType4 = array_filter($models, static function (string $key): bool {
-			return EmailTemplateKeyHelper::isForIssueType($key, 4);
+			return MessageTemplateKeyHelper::isForIssueType($key, 4);
 		}, ARRAY_FILTER_USE_KEY);
 
 		$this->tester->assertCount(2, $modelsType1);

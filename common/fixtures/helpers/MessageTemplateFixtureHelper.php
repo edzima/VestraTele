@@ -2,17 +2,17 @@
 
 namespace common\fixtures\helpers;
 
-use common\fixtures\email\EmailTemplateFixture;
-use common\fixtures\email\EmailTemplateTranslationFixture;
+use common\fixtures\message\MessageTemplateFixture;
+use common\fixtures\message\MessageTemplateTranslationFixture;
 use Yii;
 use ymaker\email\templates\entities\EmailTemplate;
 use ymaker\email\templates\entities\EmailTemplateTranslation;
 use ymaker\email\templates\repositories\EmailTemplatesRepositoryInterface;
 
-class EmailTemplateFixtureHelper extends BaseFixtureHelper {
+class MessageTemplateFixtureHelper extends BaseFixtureHelper {
 
-	private const TEMPLATE = 'email.template';
-	private const TRANSLATION = 'email.translation';
+	private const TEMPLATE = 'message.template';
+	private const TRANSLATION = 'message.translation';
 
 	private EmailTemplatesRepositoryInterface $repository;
 
@@ -36,17 +36,17 @@ class EmailTemplateFixtureHelper extends BaseFixtureHelper {
 	}
 
 	protected static function getDefaultDataDirPath(): string {
-		return Yii::getAlias('@common/tests/_data/email-template/');
+		return Yii::getAlias('@common/tests/_data/message-template/');
 	}
 
 	public static function fixture(): array {
 		return [
 			static::TEMPLATE => [
-				'class' => EmailTemplateFixture::class,
+				'class' => MessageTemplateFixture::class,
 				'dataFile' => static::getDefaultDataDirPath() . 'template.php',
 			],
 			static::TRANSLATION => [
-				'class' => EmailTemplateTranslationFixture::class,
+				'class' => MessageTemplateTranslationFixture::class,
 				'dataFile' => static::getDefaultDataDirPath() . 'translation.php',
 			],
 		];

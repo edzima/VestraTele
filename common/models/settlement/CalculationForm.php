@@ -93,11 +93,7 @@ class CalculationForm extends PayForm {
 		return $this->model;
 	}
 
-	/**
-	 * @return int
-	 * @throws InvalidConfigException
-	 */
-	protected function getOwner(): int {
+	public function getOwner(): int {
 		return $this->owner;
 	}
 

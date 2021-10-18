@@ -4,7 +4,7 @@ namespace common\helpers;
 
 use yii\helpers\StringHelper;
 
-class EmailTemplateKeyHelper {
+class MessageTemplateKeyHelper {
 
 	public const SETTLEMENT_PAY_PAID = 'settlement' . self::PART_SEPARATOR . 'pay' . self::PART_SEPARATOR . 'paid';
 
@@ -16,6 +16,12 @@ class EmailTemplateKeyHelper {
 	private const ISSUE_TYPES_KEY = 'issueTypes:';
 	private const IDS_SEPARATOR = ',';
 	private const PART_SEPARATOR = '.';
+
+	public static function generateSmsKey(array $parts): string {
+		$smsParts = $parts;
+		array_unshift($smsParts, 'sms');
+		return static::generateKey($smsParts);
+	}
 
 	public static function generateKey(array $parts): string {
 		return implode(static::PART_SEPARATOR, $parts);

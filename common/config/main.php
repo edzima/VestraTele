@@ -1,7 +1,7 @@
 <?php
 
 use common\components\DbManager;
-use common\components\EmailTemplateManager;
+use common\components\message\MessageTemplateManager;
 use common\components\HierarchyComponent;
 use common\components\keyStorage\KeyStorage;
 use common\components\PayComponent;
@@ -60,7 +60,7 @@ return [
 			'enableSchemaCache' => YII_ENV_PROD,
 		],
 		'emailTemplate' => [
-			'class' => EmailTemplateManager::class,
+			'class' => MessageTemplateManager::class,
 		],
 		'authManager' => [
 			'class' => DbManager::class,
