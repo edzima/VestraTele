@@ -59,7 +59,7 @@ return [
 			'charset' => 'utf8',
 			'enableSchemaCache' => YII_ENV_PROD,
 		],
-		'emailTemplate' => [
+		'messageTemplate' => [
 			'class' => MessageTemplateManager::class,
 		],
 		'authManager' => [

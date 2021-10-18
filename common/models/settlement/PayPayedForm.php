@@ -72,7 +72,7 @@ class PayPayedForm extends Model {
 			return false;
 		}
 		$issue = $this->pay->calculation->getIssueModel();
-		$template = Yii::$app->emailTemplate->getIssueTypeTemplatesLikeKey(
+		$template = Yii::$app->messageTemplate->getIssueTypeTemplatesLikeKey(
 			MessageTemplateKeyHelper::generateKey(
 				[
 					MessageTemplateKeyHelper::SETTLEMENT_PAY_PAID,
@@ -116,7 +116,7 @@ class PayPayedForm extends Model {
 		}
 
 		$issue = $this->pay->calculation->getIssueModel();
-		$template = Yii::$app->emailTemplate->getIssueTypeTemplatesLikeKey(
+		$template = Yii::$app->messageTemplate->getIssueTypeTemplatesLikeKey(
 			MessageTemplateKeyHelper::generateKey(
 				[
 					MessageTemplateKeyHelper::SETTLEMENT_PAY_PAID,

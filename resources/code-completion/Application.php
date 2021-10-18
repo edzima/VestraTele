@@ -31,7 +31,7 @@ class Yii extends BaseYii {
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  * @mixin yii\web\Application|yii\web\Application
  * @property Formatter $formatter
- * @property-read MessageTemplateManager $emailTemplate
+ * @property-read MessageTemplateManager $messageTemplate
  * @property HierarchyComponent $userHierarchy
  * @property LeadManager $leadManager
  * @property PayComponent $pay

@@ -123,7 +123,7 @@ return [
 		'entity-responsible' => [
 			'class' => EntityResponsibleModule::class,
 		],
-		'email-templates' => [
+		'message-templates' => [
 			'class' => EmailTemplateModule::class,
 			'languageProvider' => [
 				'class' => ConfigLanguageProvider::class,
@@ -143,7 +143,7 @@ return [
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [User::PERMISSION_EMAIL_TEMPLATE],
+						'roles' => [User::PERMISSION_MESSAGE_TEMPLATE],
 					],
 				],
 			],

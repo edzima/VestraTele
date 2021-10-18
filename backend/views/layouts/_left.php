@@ -2,8 +2,9 @@
 
 use backend\widgets\Menu;
 use common\models\user\User;
+use yii\web\View;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 
 $user = Yii::$app->user;
 ?>
@@ -349,10 +350,10 @@ $user = Yii::$app->user;
 							'visible' => $user->can(User::PERMISSION_LOGS),
 						],
 						[
-							'label' => Yii::t('backend', 'Email Templates'),
-							'url' => ['/email-templates/default/index'],
+							'label' => Yii::t('backend', 'Message Templates'),
+							'url' => ['/message-templates/default/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => $user->can(User::PERMISSION_EMAIL_TEMPLATE),
+							'visible' => $user->can(User::PERMISSION_MESSAGE_TEMPLATE),
 						],
 						[
 							'label' => Yii::t('backend', 'DB manager'),
