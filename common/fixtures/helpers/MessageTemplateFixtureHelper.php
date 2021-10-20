@@ -20,7 +20,7 @@ class MessageTemplateFixtureHelper extends BaseFixtureHelper {
 		$this->repository = $repository;
 	}
 
-	public function save(string $key, string $subject = 'Test Subject', string $body = 'Test Body', string $language = null): void {
+	public function save(string $key, string $subject = 'Test Subject', string $body = 'Test Body', string $hint = 'Test Hint', string $language = null): void {
 		$language = $language ?: Yii::$app->language;
 		$this->repository->create();
 		$template = new EmailTemplate(['key' => $key]);
@@ -30,9 +30,14 @@ class MessageTemplateFixtureHelper extends BaseFixtureHelper {
 				$language => [
 					'subject' => $subject,
 					'body' => $body,
+					'hint' => $hint,
 				],
 			],
 		]);
+	}
+
+	public function flushAll(): void {
+		EmailTemplate::deleteAll();
 	}
 
 	protected static function getDefaultDataDirPath(): string {

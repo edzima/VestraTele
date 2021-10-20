@@ -1,10 +1,12 @@
 <?php
 
-namespace common\tests\unit;
+namespace common\tests\unit\message;
 
-use common\helpers\MessageTemplateKeyHelper;
+use common\components\message\MessageTemplate;
+use common\components\message\MessageTemplateKeyHelper;
 use common\components\message\MessageTemplateManager;
 use common\fixtures\helpers\MessageTemplateFixtureHelper;
+use common\tests\unit\Unit;
 use Yii;
 use ymaker\email\templates\entities\EmailTemplate;
 use ymaker\email\templates\entities\EmailTemplateTranslation;
@@ -21,7 +23,6 @@ class MessageTemplateTest extends Unit {
 		$this->manager = new MessageTemplateManager($this->repository);
 		$this->fixture = new MessageTemplateFixtureHelper($this->tester);
 		$this->fixture->setRepository($this->repository);
-
 		parent::_before();
 	}
 
@@ -30,28 +31,29 @@ class MessageTemplateTest extends Unit {
 	}
 
 	public function testSave(): void {
-		$this->fixture->save('issue.create', 'Issue Create', 'Issue Create Body');
+		$this->fixture->save('test.first', 'Test Some Subject', 'Test Some Body');
 		$this->tester->seeRecord(EmailTemplate::class, [
-			'key' => 'issue.create',
+			'key' => 'test.first',
 		]);
 		$this->tester->seeRecord(EmailTemplateTranslation::class, [
 			'language' => Yii::$app->language,
-			'subject' => 'Issue Create',
-			'body' => 'Issue Create Body',
+			'subject' => 'Test Some Subject',
+			'body' => 'Test Some Body',
 		]);
 	}
 
 	public function testLikeKeySearch(): void {
-		$this->fixture->save('issue.create');
-		$this->fixture->save('issue.update');
+		$this->fixture->save('test.first');
+		$this->fixture->save('test.double');
 
-		$this->tester->assertCount(1, $this->getTemplatesLikeKey('issue.create'));
-		$this->tester->assertCount(1, $this->getTemplatesLikeKey('issue.update'));
-		$this->tester->assertCount(2, $this->getTemplatesLikeKey('issue.'));
+		$this->tester->assertCount(1, $this->getTemplatesLikeKey('test.first'));
+		$this->tester->assertCount(1, $this->getTemplatesLikeKey('test.double'));
+		$this->tester->assertCount(2, $this->getTemplatesLikeKey('test.'));
 		$this->tester->assertNull($this->getTemplatesLikeKey('not-existed'));
 	}
 
 	public function testIssueTypesKeys(): void {
+		$this->fixture->flushAll();
 		$this->fixture->save(
 			'issue.create.' . MessageTemplateKeyHelper::issueTypesKeyPart([1, 2])
 		);
@@ -95,7 +97,7 @@ class MessageTemplateTest extends Unit {
 		return $this->manager->getTemplatesLikeKey($key);
 	}
 
-	private function getIssueTypeTemplatesLikeKey(string $key, int $id): ?\ymaker\email\templates\models\EmailTemplate {
+	private function getIssueTypeTemplatesLikeKey(string $key, int $id): ?MessageTemplate {
 		return $this->manager->getIssueTypeTemplatesLikeKey($key, $id);
 	}
 }
