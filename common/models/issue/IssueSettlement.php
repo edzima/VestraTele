@@ -20,6 +20,8 @@ interface IssueSettlement extends IssueInterface, SettlementInterface {
 
 	public function getId(): int;
 
+	public function getOwnerId(): int;
+
 	public function getFrontendUrl(): string;
 
 }
