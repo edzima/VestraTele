@@ -58,11 +58,17 @@ use yii\web\View;
 		?>
 	</div>
 
-	<?php if ($model->getModel()->isNewRecord): ?>
+	<?php if ($model->isCreateScenario()): ?>
 		<div class="row">
 			<?= $form->field($model, 'sendEmailToCustomer', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
 
 			<?= $form->field($model, 'sendEmailToWorkers', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
+		</div>
+
+		<div class="row">
+			<?= $form->field($model, 'sendSmsToCustomer', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
+
+			<?= $form->field($model, 'sendSmsToAgent', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
 		</div>
 	<?php endif; ?>
 

@@ -2,8 +2,7 @@
 
 namespace backend\modules\settlement\models;
 
-use backend\helpers\Html;
-use common\helpers\EmailTemplateKeyHelper;
+use common\components\message\IssueSettlementMessageFactory;
 use common\models\issue\IssueUser;
 use common\models\settlement\CalculationForm as BaseCalculationForm;
 use Yii;
@@ -12,12 +11,19 @@ class CalculationForm extends BaseCalculationForm {
 
 	public bool $sendEmailToCustomer = true;
 	public bool $sendEmailToWorkers = true;
+	public bool $sendSmsToCustomer = true;
+	public bool $sendSmsToAgent = true;
+
+	private ?IssueSettlementMessageFactory $_messageFactory = null;
 
 	public function rules(): array {
 		return array_merge(
 			parent::rules(), [
 			[
-				['sendEmailToWorkers', 'sendEmailToCustomer'], 'boolean',
+				[
+					'sendEmailToWorkers', 'sendEmailToCustomer',
+					'sendSmsToCustomer', 'sendSmsToAgent',
+				], 'boolean', 'on' => static::SCENARIO_CREATE,
 			],
 		]);
 	}
@@ -27,95 +33,88 @@ class CalculationForm extends BaseCalculationForm {
 			parent::attributeLabels(), [
 			'sendEmailToCustomer' => Yii::t('settlement', 'Send Email to Customer'),
 			'sendEmailToWorkers' => Yii::t('settlement', 'Send Email to Workers'),
+			'sendSmsToCustomer' => Yii::t('settlement', 'Send SMS to Customer'),
+			'sendSmsToAgent' => Yii::t('settlement', 'Send SMS to Agent'),
 		]);
 	}
 
 	public function init() {
 		parent::init();
-		$this->sendEmailToCustomer = !empty($this->getIssue()->customer->email);
+		if ($this->isCreateScenario()) {
+			$this->sendEmailToCustomer = !empty($this->getIssue()->customer->email);
+			$this->sendSmsToCustomer = $this->getIssue()->customer->profile->hasPhones();
+			$this->sendSmsToAgent = $this->getIssue()->agent->profile->hasPhones();
+		}
 	}
 
-	public function sendCreateEmailToCustomer(): bool {
-		$model = $this->getModel();
-		if (empty($model->getIssueModel()->customer->email)) {
-			return false;
+	protected function getMessageFactory(): IssueSettlementMessageFactory {
+		if ($this->_messageFactory === null) {
+			$this->_messageFactory = new IssueSettlementMessageFactory();
 		}
-		$template = Yii::$app->emailTemplate->getIssueTypeTemplatesLikeKey(
-			$this->getCreateEmailKeyToCustomer(),
-			$model->getIssueType()->id
-		);
-		if (!$template) {
-			return false;
-		}
-		$issue = $model->getIssueModel();
-		$template->parseBody([
-			'agentFullName' => $issue->agent->getFullName(),
-			'agentPhone' => $issue->agent->profile->phone,
-			'agentEmail' => $issue->agent->email,
-		]);
-		return Yii::$app
-			->mailer
-			->compose()
-			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' ' . Yii::t('settlement', 'Settlements')])
-			->setTo($this->getModel()->getIssueModel()->customer->email)
-			->setSubject($template->getSubject())
-			->setHtmlBody($template->getBody())
-			->send();
+		return $this->_messageFactory;
 	}
 
-	public function sendCreateEmailToWorkers(array $types = [IssueUser::TYPE_AGENT, IssueUser::TYPE_TELEMARKETER]): bool {
-		$emails = $this->getModel()
-			->getIssueModel()
-			->getUsers()
-			->withTypes($types)
-			->joinWith('user')
-			->select('user.email')
-			->column();
-		if (empty($emails)) {
-			return false;
+	public function sendAboutCreateMessages(): void {
+		if ($this->sendEmailToCustomer) {
+			$this->sendEmailAboutCreateToCustomer();
 		}
-		$model = $this->getModel();
-		$template = Yii::$app->emailTemplate->getIssueTypeTemplatesLikeKey(
-			$this->getCreateEmailKeyToWorker(),
-			$model->getIssueType()->id
-		);
-		if (!$template) {
-			return false;
+		if ($this->sendSmsToCustomer) {
+			$this->sendSmsAboutCreateToCustomer();
 		}
-		$issue = $model->getIssueModel();
-		$template->parseBody([
-			'customerFullName' => $issue->agent->getFullName(),
-			'settlementLink' => Html::a($model->getName(), $model->getFrontendUrl()),
-		]);
-
-		return Yii::$app
-			->mailer
-			->compose()
-			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' ' . Yii::t('settlement', 'Settlements')])
-			->setTo($emails)
-			->setSubject($template->getSubject())
-			->setHtmlBody($template->getBody())
-			->send();
+		if ($this->sendEmailToWorkers) {
+			$this->sendEmailAboutCreateToWorker();
+		}
+		if ($this->sendSmsToAgent) {
+			$this->sendSmsAboutCreateToAgent();
+		}
 	}
 
-	public function getCreateEmailKeyToCustomer(): string {
-		return EmailTemplateKeyHelper::generateKey(
-			[
-				EmailTemplateKeyHelper::SETTLEMENT_CREATE,
-				strtolower($this->getModel()->getTypeName()),
-				EmailTemplateKeyHelper::CUSTOMER,
-			]
-		);
+	public function sendSmsAboutCreateToCustomer(): bool {
+		if (!$this->isCreateScenario()) {
+			return false;
+		}
+		$sms = $this->getMessageFactory()
+			->getSmsAboutCreateSettlementToCustomer($this->getModel());
+		if ($sms === null) {
+			return false;
+		}
+		return !empty($sms->pushJob());
 	}
 
-	public function getCreateEmailKeyToWorker(): string {
-		return EmailTemplateKeyHelper::generateKey(
-			[
-				EmailTemplateKeyHelper::SETTLEMENT_CREATE,
-				strtolower($this->getModel()->getTypeName()),
-				EmailTemplateKeyHelper::WORKER,
-			]
-		);
+	public function sendSmsAboutCreateToAgent(): bool {
+		if (!$this->isCreateScenario()) {
+			return false;
+		}
+		$sms = $this->getMessageFactory()
+			->getSmsAboutCreateSettlementToAgent($this->getModel());
+		if ($sms === null) {
+			return false;
+		}
+		return !empty($sms->pushJob());
+	}
+
+	public function sendEmailAboutCreateToCustomer(): bool {
+		if (!$this->isCreateScenario()) {
+			return false;
+		}
+		$message = $this->getMessageFactory()
+			->getEmailAboutCreateSettlementToCustomer($this->getModel());
+		if ($message === null) {
+			return false;
+		}
+		return $message->send();
+	}
+
+	public function sendEmailAboutCreateToWorker(array $types = [IssueUser::TYPE_AGENT, IssueUser::TYPE_TELEMARKETER]): bool {
+		if (!$this->isCreateScenario()) {
+			return false;
+		}
+		$message = $this->getMessageFactory()
+			->getEmailAboutCreateSettlementToWorkers($this->getModel(), $types);
+		if ($message === null) {
+			return false;
+		}
+		return $message->send();
 	}
 
 }

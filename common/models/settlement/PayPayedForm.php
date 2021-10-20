@@ -2,7 +2,7 @@
 
 namespace common\models\settlement;
 
-use common\helpers\MessageTemplateKeyHelper;
+use common\components\message\IssueSettlementMessageFactory;
 use common\models\issue\IssuePayInterface;
 use common\models\issue\IssueUser;
 use DateTime;
@@ -18,7 +18,9 @@ class PayPayedForm extends Model {
 	public bool $sendEmailToCustomer = true;
 	public bool $sendEmailToWorkers = true;
 
+	private ?IssueSettlementMessageFactory $_messageFactory = null;
 	private IssuePayInterface $pay;
+	public bool $sendSmsToCustomer;
 
 	public function __construct(IssuePayInterface $pay, $config = []) {
 		if ($pay->isPayed()) {
@@ -30,7 +32,8 @@ class PayPayedForm extends Model {
 
 	public function init(): void {
 		parent::init();
-		$this->sendEmailToCustomer = !empty($this->pay->calculation->getIssueModel()->customer->email);
+		$this->sendSmsToCustomer = $this->getMessageFactory()->customerHasPhones();
+		$this->sendEmailToCustomer = $this->getMessageFactory()->customerHasEmail();
 	}
 
 	public function rules(): array {
@@ -38,6 +41,7 @@ class PayPayedForm extends Model {
 			[['transfer_type', 'date'], 'required'],
 			['transfer_type', 'string'],
 			['date', 'date', 'format' => 'Y-m-d'],
+			[['sendSmsToCustomer', 'sendEmailToCustomer', 'sendEmailToWorkers'], 'boolean'],
 			['transfer_type', 'in', 'range' => array_keys($this->getPay()::getTransfersTypesNames())],
 		];
 	}
@@ -45,6 +49,7 @@ class PayPayedForm extends Model {
 	public function attributeLabels(): array {
 		return [
 			'sendEmailToCustomer' => Yii::t('settlement', 'Send Email to Customer'),
+			'sendSmsToCustomer' => Yii::t('settlement', 'Send SMS to Customer'),
 			'sendEmailToWorkers' => Yii::t('settlement', 'Send Email to Workers'),
 			'transfer_type' => Yii::t('settlement', 'Transfer Type'),
 			'date' => Yii::t('settlement', 'Pay at'),
@@ -64,38 +69,32 @@ class PayPayedForm extends Model {
 		return false;
 	}
 
+	public function getMessageFactory(): IssueSettlementMessageFactory {
+		if ($this->_messageFactory === null) {
+			$this->_messageFactory = new IssueSettlementMessageFactory();
+			$this->_messageFactory->issue = $this->pay->calculation;
+		}
+		return $this->_messageFactory;
+	}
+
 	/**
 	 * @return bool
 	 */
 	public function sendEmailToCustomer(): bool {
-		if (!$this->pay->isPayed() || empty($this->pay->calculation->getIssueModel()->customer->email)) {
+		$message = $this->getMessageFactory()->getEmailAboutPayedPayToCustomer($this->pay);
+		if (!$message) {
 			return false;
 		}
-		$issue = $this->pay->calculation->getIssueModel();
-		$template = Yii::$app->messageTemplate->getIssueTypeTemplatesLikeKey(
-			MessageTemplateKeyHelper::generateKey(
-				[
-					MessageTemplateKeyHelper::SETTLEMENT_PAY_PAID,
-					MessageTemplateKeyHelper::CUSTOMER,
-				]
-			), $issue->type_id
-		);
-		if ($template === null) {
+		return $message->send();
+	}
+
+	public function sendSmsToCustomer(int $user_id): bool {
+		$sms = $this->getMessageFactory()->getSmsAboutPayedPayToCustomer($this->pay, $user_id);
+		if ($sms === null) {
 			return false;
 		}
-		$template->parseBody([
-			'agentFullName' => $issue->agent->getFullName(),
-			'agentEmail' => $issue->agent->email,
-			'agentPhone' => $issue->agent->profile->phone,
-		]);
-		return Yii::$app
-			->mailer
-			->compose()
-			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' ' . Yii::t('settlement', 'Settlements')])
-			->setTo($this->pay->calculation->getIssueModel()->customer->email)
-			->setSubject($template->getSubject())
-			->setHtmlBody($template->getBody())
-			->send();
+
+		return !empty($sms->pushJob());
 	}
 
 	/**
@@ -103,45 +102,10 @@ class PayPayedForm extends Model {
 	 * @return int
 	 */
 	public function sendEmailsToWorkers(array $types = [IssueUser::TYPE_AGENT, IssueUser::TYPE_TELEMARKETER]): bool {
-		if (!empty($types) && !$this->getPay()->isPayed()) {
+		$message = $this->getMessageFactory()->getEmailAboutPayedPayToWorkers($this->pay, $types);
+		if (!$message) {
 			return false;
 		}
-		$emails = $this->getPay()->calculation->getIssueModel()->getUsers()
-			->withTypes($types)
-			->select('user.email')
-			->joinWith('user')
-			->column();
-		if (empty($emails)) {
-			return false;
-		}
-
-		$issue = $this->pay->calculation->getIssueModel();
-		$template = Yii::$app->messageTemplate->getIssueTypeTemplatesLikeKey(
-			MessageTemplateKeyHelper::generateKey(
-				[
-					MessageTemplateKeyHelper::SETTLEMENT_PAY_PAID,
-					MessageTemplateKeyHelper::WORKER,
-				]
-			), $issue->type_id
-		);
-		if ($template === null) {
-			return false;
-		}
-
-		$template->parseBody([
-			'issue' => $issue->getIssueName(),
-			'customer' => $issue->customer->getFullName(),
-			'link' => $this->pay->calculation->getFrontendUrl(),
-			'payValue' => Yii::$app->formatter->asCurrency($this->pay->getValue()),
-		]);
-
-		return Yii::$app
-			->mailer
-			->compose()
-			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' ' . Yii::t('settlement', 'Settlements')])
-			->setTo($emails)
-			->setSubject($template->getSubject())
-			->setHtmlBody($template->getBody())
-			->send();
+		return $message->send();
 	}
 }

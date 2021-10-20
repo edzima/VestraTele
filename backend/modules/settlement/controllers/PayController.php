@@ -153,6 +153,11 @@ class PayController extends Controller {
 					Yii::t('settlement', 'Send E-mail to Customer.')
 				);
 			}
+			if ($model->sendSmsToCustomer && $model->sendSmsToCustomer(Yii::$app->user->getId())) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'Send SMS to Customer.')
+				);
+			}
 			if ($model->sendEmailToWorkers && $model->sendEmailsToWorkers()) {
 				Flash::add(Flash::TYPE_SUCCESS,
 					Yii::t('settlement', 'Send E-mail to Workers.')

@@ -28,6 +28,8 @@ use yii\widgets\ActiveForm;
 	</div>
 
 	<div class="row">
+		<?= $form->field($model, 'sendSmsToCustomer', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
+
 		<?= $form->field($model, 'sendEmailToCustomer', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
 
 		<?= $form->field($model, 'sendEmailToWorkers', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>

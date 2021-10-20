@@ -145,6 +145,8 @@ return [
 	'Nominal Value' => 'Wartość nominalna',
 	'Send Email to Customer' => 'Wyślij E-mail do Klienta',
 	'Send Email to Workers' => 'Wyślij E-mail do Pracowników',
+	'Send SMS to Customer' => 'Wyślij SMS do Klienta',
+	'Send SMS to Agent' => 'Wyślij SMS do Agenta',
 	'Tax Office' => 'Urząd Skarbowy',
 	'Pay Status' => 'Status Płatności',
 	'Paid' => 'Opłacone',

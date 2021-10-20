@@ -20,7 +20,7 @@ class CalculationCreateCest {
 	public function _before(CreateCalculationIssueManager $I): void {
 		$I->haveFixtures(array_merge(
 			IssueFixtureHelper::issue(),
-			IssueFixtureHelper::users(),
+			IssueFixtureHelper::users(true),
 			IssueFixtureHelper::stageAndTypesFixtures(),
 			SettlementFixtureHelper::settlement(),
 			SettlementFixtureHelper::pay(),
@@ -95,6 +95,25 @@ class CalculationCreateCest {
 		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
 		$I->click('Save');
 		$I->dontSeeEmailIsSent();
+	}
+
+	public function checkCreateWithoutSendSmsToCustomer(CreateCalculationIssueManager $I): void {
+		$I->amOnPage([static::ROUTE, 'id' => 3]);
+		$I->fillField('Value with VAT', 123);
+		$I->uncheckOption('Send SMS to Customer');
+		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
+		$I->click('Save');
+		$I->seeJobIsPushed(1);
+	}
+
+	public function checkCreateWithoutSendSms(CreateCalculationIssueManager $I): void {
+		$I->amOnPage([static::ROUTE, 'id' => 1]);
+		$I->fillField('Value with VAT', 123);
+		$I->uncheckOption('Send SMS to Customer');
+		$I->uncheckOption('Send SMS to Agent');
+		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
+		$I->click('Save');
+		$I->dontSeeJobIsPushed();
 	}
 
 }
