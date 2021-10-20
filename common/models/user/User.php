@@ -133,6 +133,17 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 		return $name;
 	}
 
+	public function getPhone(): ?string {
+		$profile = $this->profile;
+		if (!empty($profile->phone)) {
+			return $profile->phone;
+		}
+		if (!empty($profile->phone_2)) {
+			return $profile->phone_2;
+		}
+		return null;
+	}
+
 	/**
 	 * @inheritdoc
 	 */
