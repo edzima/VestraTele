@@ -55,15 +55,20 @@ class QueueHelper extends Module {
 	}
 
 	protected function attachEvents(): void {
-		Event::on(get_class($this->queue), Queue::EVENT_AFTER_PUSH, [$this, 'onPushEvent']);
+		if (is_object($this->queue)) {
+			Event::on(get_class($this->queue), Queue::EVENT_AFTER_PUSH, [$this, 'onPushEvent']);
+		}
 	}
 
 	protected function detachEvents(): void {
-		Event::off(get_class($this->queue), Queue::EVENT_AFTER_PUSH, [$this, 'onPushEvent']);
+		if (is_object($this->queue)) {
+			Event::off(get_class($this->queue), Queue::EVENT_AFTER_PUSH, [$this, 'onPushEvent']);
+		}
 	}
 
 	public function onPushEvent(PushEvent $event): void {
 		$this->debugSection('Queue', 'Push Job: #' . $event->id . ' to Queue:');
+		$this->debug($event->job);
 		$this->pushEvents[$event->id] = $event;
 		$this->lastJob = $event->job;
 	}
