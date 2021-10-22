@@ -1,6 +1,6 @@
 <?php
 
-use common\models\issue\IssueSmsForm;
+use common\models\message\IssueSmsForm;
 use common\modules\issue\widgets\IssueSmsFormWidget;
 use frontend\helpers\Breadcrumbs;
 use frontend\helpers\Html;

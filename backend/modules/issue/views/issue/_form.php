@@ -1,6 +1,8 @@
 <?php
 
 use backend\modules\issue\models\IssueForm;
+use common\models\message\IssueCreateMessagesForm;
+use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\DateTimeWidget;
 use common\widgets\DateWidget;
 use kartik\depdrop\DepDrop;
@@ -14,6 +16,7 @@ use yii\widgets\ActiveForm;
 /* @var $this View */
 /* @var $model IssueForm */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $messagesModel IssueCreateMessagesForm|null */
 
 ?>
 	<div class="issue-form">
@@ -154,6 +157,13 @@ use yii\widgets\ActiveForm;
 					) ?>
 			</div>
 		</fieldset>
+
+		<?= $messagesModel
+			? IssueMessagesFormWidget::widget([
+				'form' => $form,
+				'model' => $messagesModel,
+			])
+			: '' ?>
 
 		<div class="form-group">
 			<?= Html::submitButton('Zapisz', ['class' => 'btn btn-success']) ?>

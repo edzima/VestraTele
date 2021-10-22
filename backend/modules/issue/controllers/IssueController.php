@@ -12,6 +12,7 @@ use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\CsvForm;
 use common\models\issue\Issue;
 use common\models\issue\query\IssueQuery;
+use common\models\message\IssueCreateMessagesForm;
 use common\models\user\Customer;
 use common\models\user\Worker;
 use Yii;
@@ -182,11 +183,20 @@ class IssueController extends Controller {
 		}
 
 		$model = new IssueForm(['customer' => $customer]);
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+		$messagesModel = new IssueCreateMessagesForm();
+		$messagesModel->setIssue($model->getModel());
+		$data = Yii::$app->request->post();
+		if ($model->load($data)
+			&& $model->save()) {
+			$messagesModel->setIssue($model->getModel());
+			if ($messagesModel->load($data)) {
+				$messagesModel->pushMessages();
+			}
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('create', [
 			'model' => $model,
+			'messagesModel' => $messagesModel,
 		]);
 	}
 

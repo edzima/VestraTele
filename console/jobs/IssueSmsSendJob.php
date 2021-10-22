@@ -2,7 +2,7 @@
 
 namespace console\jobs;
 
-use common\models\issue\IssueSmsForm;
+use common\models\message\IssueSmsForm;
 
 class IssueSmsSendJob extends SmsSendJob {
 

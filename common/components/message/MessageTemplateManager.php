@@ -8,12 +8,10 @@ use ymaker\email\templates\components\TemplateManager;
 use ymaker\email\templates\entities\EmailTemplate;
 use ymaker\email\templates\queries\EmailTemplateQuery;
 
-class MessageTemplateManager extends TemplateManager implements IssueMessageManager {
+class MessageTemplateManager extends TemplateManager implements KeyMessageTemplateManager, IssueMessageManager {
 
 	/**
-	 * @param string $key
-	 * @param string|null $language
-	 * @return MessageTemplate[]|null indexed by Key
+	 * {@inheritDoc}
 	 */
 	public function getTemplatesLikeKey(string $key, string &$language = null): ?array {
 		$language = $language ?: Yii::$app->language;
@@ -40,6 +38,9 @@ class MessageTemplateManager extends TemplateManager implements IssueMessageMana
 		return $templates;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public function getIssueTypeTemplatesLikeKey(string $key, int $typeId, string $language = null): ?MessageTemplate {
 		$templates = $this->getTemplatesLikeKey($key, $language);
 		if (empty($templates)) {

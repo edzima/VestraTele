@@ -3,7 +3,7 @@
 namespace common\modules\issue\widgets;
 
 use common\models\issue\IssueInterface;
-use common\models\issue\IssueSmsForm;
+use common\models\message\IssueSmsForm;
 use Yii;
 use yii\base\Widget;
 

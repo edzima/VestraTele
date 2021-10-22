@@ -2,7 +2,7 @@
 
 namespace console\controllers;
 
-use common\models\issue\IssueSmsForm;
+use common\models\message\IssueSmsForm;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
 use common\models\user\User;

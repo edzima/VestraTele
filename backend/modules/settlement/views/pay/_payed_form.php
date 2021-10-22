@@ -2,6 +2,7 @@
 
 use common\models\issue\IssuePay;
 use common\models\settlement\PayPayedForm;
+use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\DateWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -27,13 +28,10 @@ use yii\widgets\ActiveForm;
 
 	</div>
 
-	<div class="row">
-		<?= $form->field($model, 'sendSmsToCustomer', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
-
-		<?= $form->field($model, 'sendEmailToCustomer', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
-
-		<?= $form->field($model, 'sendEmailToWorkers', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
-	</div>
+	<?= IssueMessagesFormWidget::widget([
+		'form' => $form,
+		'model' => $model->getMessagesModel(),
+	]) ?>
 
 
 	<div class="form-group">

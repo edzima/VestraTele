@@ -3,7 +3,7 @@
 namespace common\modules\issue\controllers;
 
 use common\helpers\Flash;
-use common\models\issue\IssueSmsForm;
+use common\models\message\IssueSmsForm;
 use common\models\issue\IssueUser;
 use Yii;
 use yii\web\Controller;

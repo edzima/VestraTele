@@ -1,7 +1,7 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
-use common\models\issue\IssueSmsForm;
+use backend\modules\issue\models\IssueSmsForm;
 use common\modules\issue\widgets\IssueSmsFormWidget;
 use yii\web\View;
 

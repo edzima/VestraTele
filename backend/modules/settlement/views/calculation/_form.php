@@ -1,6 +1,7 @@
 <?php
 
 use backend\modules\settlement\models\CalculationForm;
+use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
 use kartik\number\NumberControl;
@@ -58,18 +59,11 @@ use yii\web\View;
 		?>
 	</div>
 
-	<?php if ($model->isCreateScenario()): ?>
-		<div class="row">
-			<?= $form->field($model, 'sendEmailToCustomer', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
-
-			<?= $form->field($model, 'sendEmailToWorkers', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
-		</div>
-
-		<div class="row">
-			<?= $form->field($model, 'sendSmsToCustomer', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
-
-			<?= $form->field($model, 'sendSmsToAgent', ['options' => ['class' => 'col-xs-2']])->checkbox() ?>
-		</div>
+	<?php if ($model->getMessagesModel()): ?>
+		<?= IssueMessagesFormWidget::widget([
+			'form' => $form,
+			'model' => $model->getMessagesModel(),
+		]) ?>
 	<?php endif; ?>
 
 	<div class="form-group">

@@ -5,6 +5,7 @@ namespace common\tests\unit\settlement;
 use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssuePayInterface;
 use common\models\settlement\PayPayedForm;
 use common\tests\_support\UnitModelTrait;
@@ -12,7 +13,6 @@ use common\tests\unit\Unit;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
-use yii\swiftmailer\Message;
 
 class PayPayedFormTest extends Unit {
 
@@ -33,10 +33,11 @@ class PayPayedFormTest extends Unit {
 	public function _fixtures(): array {
 		return array_merge(
 			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::types(),
 			IssueFixtureHelper::users(),
 			SettlementFixtureHelper::pay(),
 			SettlementFixtureHelper::settlement(),
-			MessageTemplateFixtureHelper::fixture(),
+			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_PAY_PAYED),
 		);
 	}
 
@@ -67,50 +68,15 @@ class PayPayedFormTest extends Unit {
 			'value' => $this->model->getPay()->getValue()->toFixed(2),
 			'pay_at' => '2021-01-01',
 		]);
+		$this->tester->assertTrue($this->model->pushMessages(UserFixtureHelper::AGENT_EMILY_PAT));
 	}
 
-	public function testEmailsForNotPayed(): void {
+	public function testMessagesForNotPayed(): void {
 		$this->giveModel();
 		$model = $this->model;
-		$this->tester->assertFalse($model->sendEmailToCustomer());
+		$this->tester->assertFalse($model->pushMessages(UserFixtureHelper::AGENT_EMILY_PAT));
 		$this->tester->dontSeeEmailIsSent();
-		$this->tester->assertEmpty($model->sendEmailsToWorkers());
-		$this->tester->dontSeeEmailIsSent();
-	}
-
-	public function testEmailToCustomer(): void {
-		$this->giveModel();
-		$this->whenPay('2020-01-01');
-		$model = $this->model;
-		$this->tester->assertTrue($this->model->sendEmailToCustomer());
-		$this->tester->seeEmailIsSent();
-		$email = $this->tester->grabLastSentEmail();
-		$this->tester->assertTrue(array_key_exists($model->getPay()->calculation->getIssueModel()->customer->email, $email->getTo()));
-		$this->tester->assertSame('Paid Pay for Customer.', $email->getSubject());
-
-		$this->tester->assertStringNotContainsString(
-			$this->getSettlementLink(),
-			$email->toString(),
-		);
-	}
-
-	public function testEmailToWorkers(): void {
-		$this->giveModel();
-		$this->whenPay('2020-01-01');
-		$model = $this->model;
-		$this->tester->assertTrue($this->model->sendEmailsToWorkers());
-		$this->tester->seeEmailIsSent();
-		$email = $this->tester->grabLastSentEmail();
-		/**
-		 * @var Message $email
-		 */
-		$this->tester->assertTrue(array_key_exists($model->getPay()->calculation->getIssueModel()->agent->email, $email->getTo()));
-		$this->tester->assertTrue(array_key_exists($model->getPay()->calculation->getIssueModel()->tele->email, $email->getTo()));
-		$this->tester->assertSame('Paid Pay for Worker.', $email->getSubject());
-		$this->assertStringContainsString(
-			$this->getSettlementLink(),
-			$email->toString()
-		);
+		$this->tester->dontSeeJobIsPushed();
 	}
 
 	public function testWithStatus(): void {

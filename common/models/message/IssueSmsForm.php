@@ -1,8 +1,12 @@
 <?php
 
-namespace common\models\issue;
+namespace common\models\message;
 
-use common\models\SmsForm;
+use common\models\issue\Issue;
+use common\models\issue\IssueInterface;
+use common\models\issue\IssueNote;
+use common\models\issue\IssueNoteForm;
+use common\models\issue\IssueUser;
 use common\models\user\User;
 use console\jobs\IssueSmsSendJob;
 use Edzima\Yii2Adescom\models\MessageInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models;
+namespace common\models\message;
 
 use console\jobs\SmsSendJob;
 use Edzima\Yii2Adescom\models\MessageInterface;

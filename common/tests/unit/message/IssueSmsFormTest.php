@@ -1,12 +1,12 @@
 <?php
 
-namespace common\tests\unit\sms;
+namespace common\tests\unit\message;
 
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueNote;
-use common\models\issue\IssueSmsForm;
+use common\models\message\IssueSmsForm;
 use common\models\issue\IssueUser;
 use console\jobs\IssueSmsSendJob;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace common\tests\unit\sms;
+namespace common\tests\unit\message;
 
-use common\models\SmsForm;
+use common\models\message\SmsForm;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
 use console\jobs\SmsSendJob;

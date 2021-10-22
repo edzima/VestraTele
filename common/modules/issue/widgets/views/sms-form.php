@@ -1,7 +1,7 @@
 <?php
 
 use common\helpers\Html;
-use common\models\issue\IssueSmsForm;
+use common\models\message\IssueSmsForm;
 use common\widgets\ActiveForm;
 use kartik\select2\Select2;
 use yii\web\View;

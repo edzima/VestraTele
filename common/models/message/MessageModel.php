@@ -1,15 +1,17 @@
 <?php
 
-namespace common\components\message;
+namespace common\models\message;
 
-use common\models\SmsForm;
+use common\components\message\MessageTemplate;
+use common\components\message\MessageTemplateKeyHelper;
+use common\components\message\MessageTemplateManager;
 use Yii;
-use yii\base\Component;
+use yii\base\Model;
 use yii\di\Instance;
 use yii\mail\MailerInterface;
 use yii\mail\MessageInterface;
 
-class MessageFactory extends Component {
+abstract class MessageModel extends Model {
 
 	public const TYPE_EMAIL = MessageTemplateKeyHelper::TYPE_EMAIL;
 	public const TYPE_SMS = MessageTemplateKeyHelper::TYPE_SMS;
@@ -25,7 +27,7 @@ class MessageFactory extends Component {
 	public $mailer = 'mailer';
 
 	public ?string $language = null;
-	public string $smsClass = SmsForm::class;
+	public string $smsClass;
 
 	public ?string $fromEmail = null;
 	public ?string $fromNameTemplate = '{appName}';
@@ -108,7 +110,7 @@ class MessageFactory extends Component {
 
 	protected function getTemplateManager(): MessageTemplateManager {
 		if (!is_object($this->templateManager)) {
-			$this->templateManager = Instance::ensure($this->templateManager, IssueMessageManager::class);
+			$this->templateManager = Instance::ensure($this->templateManager, MessageTemplateManager::class);
 		}
 		return $this->templateManager;
 	}
