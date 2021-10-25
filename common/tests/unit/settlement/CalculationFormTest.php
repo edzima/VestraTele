@@ -6,6 +6,7 @@ use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueSettlement;
 use common\models\settlement\CalculationForm;
 use common\models\settlement\PayInterface;
 use DateTime;
@@ -37,8 +38,10 @@ class CalculationFormTest extends PayFormTest {
 	}
 
 	public function testEmpty(): void {
-		parent::testEmpty();
-		$this->thenUnsuccessSave();
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Value with VAT cannot be blank.', 'value');
+		$this->thenDontSeeError('payment_at');
+		$this->thenDontSeeError('deadline_at');
 		$this->thenSeeError('Type cannot be blank.', 'type');
 		$this->thenSeeError('Provider cannot be blank.', 'providerType');
 	}
@@ -205,10 +208,34 @@ class CalculationFormTest extends PayFormTest {
 		$this->tester->assertNull($pay->getDeadlineAt());
 	}
 
+	public function testCreateWithoutPayementAndDeadlineAt(): void {
+		$this->giveForm([
+			'value' => 123,
+			'type' => IssueSettlement::TYPE_HONORARIUM,
+			'providerType' => IssuePayCalculation::PROVIDER_CLIENT,
+		]);
+		$this->thenSuccessSave();
+		$this->tester->seeRecord(IssuePayCalculation::class, [
+			'value' => 123,
+			'type' => IssueSettlement::TYPE_HONORARIUM,
+			'payment_at' => null,
+		]);
+		$this->tester->seeRecord(IssuePay::class, [
+			'calculation_id' => $this->getModel()->getModel()->getId(),
+			'value' => 123,
+			'pay_at' => null,
+			'deadline_at' => null,
+		]);
+	}
+
 	protected function createForm(array $config = []): CalculationForm {
 		$issue = ArrayHelper::remove($config, 'issue', $this->issueFixture->grabIssue(0));
 		$ownerId = ArrayHelper::remove($config, 'ownerId', static::DEFAULT_OWNER_ID);
 		return new CalculationForm($ownerId, $issue, $config);
+	}
+
+	protected function giveForm(array $config = []): void {
+		$this->model = $this->createForm($config);
 	}
 
 	public function getModel(): CalculationForm {
