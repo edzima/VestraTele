@@ -16,6 +16,8 @@ interface IssuePayInterface extends
 	PayInterface,
 	VATInfo {
 
+	public function getId(): int;
+
 	public function markAsPaid(DateTime $date, string $transfer_type): bool;
 
 	public function getSettlementId(): int;

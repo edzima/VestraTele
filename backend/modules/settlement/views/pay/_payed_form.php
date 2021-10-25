@@ -4,6 +4,7 @@ use common\models\issue\IssuePay;
 use common\models\settlement\PayPayedForm;
 use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\DateWidget;
+use kartik\number\NumberControl;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -17,6 +18,8 @@ use yii\widgets\ActiveForm;
 	<?php $form = ActiveForm::begin(); ?>
 
 	<div class="row">
+
+		<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-2']])->widget(NumberControl::class) ?>
 
 		<?= $form->field($model, 'date', ['options' => ['class' => 'col-md-2']])
 			->widget(DateWidget::class)

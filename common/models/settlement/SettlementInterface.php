@@ -21,6 +21,8 @@ interface SettlementInterface extends PayedInterface {
 
 	public function getValue(): Decimal;
 
+	public function getValueToPay(): Decimal;
+
 	public function getPays(): ActiveQuery;
 
 	public function getCosts(): ActiveQuery;

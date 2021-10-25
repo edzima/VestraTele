@@ -10,7 +10,7 @@ use common\models\issue\IssuePayInterface;
 use common\models\settlement\PayPayedForm;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
-use Yii;
+use Decimal\Decimal;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 
@@ -35,6 +35,7 @@ class PayPayedFormTest extends Unit {
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::types(),
 			IssueFixtureHelper::users(),
+			SettlementFixtureHelper::owner(),
 			SettlementFixtureHelper::pay(),
 			SettlementFixtureHelper::settlement(),
 			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_PAY_PAYED),
@@ -49,8 +50,11 @@ class PayPayedFormTest extends Unit {
 
 	public function testEmpty(): void {
 		$this->giveModel();
+		$this->model->value = '';
+		$this->model->transfer_type = '';
 		$this->whenPay(null);
 		$this->thenUnsuccessPay();
+		$this->thenSeeError('Value cannot be blank.', 'value');
 		$this->thenSeeError('Pay at cannot be blank.', 'date');
 	}
 
@@ -69,6 +73,41 @@ class PayPayedFormTest extends Unit {
 			'pay_at' => '2021-01-01',
 		]);
 		$this->tester->assertTrue($this->model->pushMessages(UserFixtureHelper::AGENT_EMILY_PAT));
+	}
+
+	public function testValueGreaterThanPayValue(): void {
+		$this->giveModel();
+		$this->model->value = $this->model->getPay()->getValue()->add(100)->toFixed(2);
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Value must be less than or equal to "'
+			. $this->model->getPay()->getValue()->toFixed(2) . '".',
+			'value'
+		);
+	}
+
+	public function testValueEqualThanPayValue(): void {
+		$this->giveModel();
+		$this->model->value = $this->model->getPay()->getValue()->toFixed(2);
+		$this->thenSuccessValidate(['value']);
+	}
+
+	public function testValueLessThanPayValue(): void {
+		$this->giveModel();
+		$this->model->value = $this->model->getPay()->getValue()->sub(100)->toFixed(2);
+		$this->thenSuccessValidate(['value']);
+	}
+
+	public function testDivPay(): void {
+		$this->giveModel();
+		$oldPayValue = $this->model->getPay()->getValue();
+		$subValue = new Decimal(100);
+		$newPayValue = $oldPayValue->sub($subValue);
+		$this->model->value = $newPayValue->toFixed(2);
+		$newPay = $this->model->divPay();
+		$this->tester->assertNotNull($newPay);
+		$pay = $this->model->getPay();
+		$this->tester->assertTrue($pay->getValue()->equals($newPayValue));
+		$this->tester->assertTrue($newPay->getValue()->equals($subValue));
 	}
 
 	public function testMessagesForNotPayed(): void {
@@ -117,7 +156,4 @@ class PayPayedFormTest extends Unit {
 		return $this->model;
 	}
 
-	private function getSettlementLink(): string {
-		return Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['settlement/view']);
-	}
 }
