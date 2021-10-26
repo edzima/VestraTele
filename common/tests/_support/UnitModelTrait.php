@@ -44,4 +44,8 @@ trait UnitModelTrait {
 	public function thenSeeError(string $message, string $attribute): void {
 		$this->tester->assertSame($message, $this->getModel()->getFirstError($attribute));
 	}
+
+	public function thenDontSeeError(string $attribute): void {
+		$this->tester->assertNull($this->getModel()->getFirstError($attribute));
+	}
 }

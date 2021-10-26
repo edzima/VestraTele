@@ -35,6 +35,7 @@ class IssuePayGrid extends GridView {
 	public bool $visiblePayAt = true;
 	public bool $visibleProvisionsDetails = true;
 	public bool $visibleSettlementType = true;
+	public bool $visibleIssueType = true;
 	public bool $rowColors = true;
 
 	public ?int $userId = null;
@@ -51,13 +52,6 @@ class IssuePayGrid extends GridView {
 		}
 
 		parent::init();
-	}
-
-	public function renderProvision(IssuePay $model): string {
-		return ProvisionUserGrid::widget([
-			'pay' => $model,
-			'userId' => $this->userId,
-		]);
 	}
 
 	public function defaultColumns(): array {
@@ -96,6 +90,14 @@ class IssuePayGrid extends GridView {
 				'label' => Yii::t('settlement', 'Settlement type'),
 				'width' => '120px',
 				'visible' => $this->visibleSettlementType,
+			],
+			[
+				'class' => IssueTypeColumn::class,
+				'attribute' => 'issueTypesIds',
+				'value' => 'issue.type',
+				'noWrap' => true,
+				'valueType' => IssueTypeColumn::VALUE_NAME,
+				'visible' => $this->visibleIssueType,
 			],
 			[
 				'class' => AgentDataColumn::class,

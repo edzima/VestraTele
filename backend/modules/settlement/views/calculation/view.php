@@ -81,6 +81,7 @@ YiiAsset::register($this);
 		'summary' => '',
 		'visibleProvisionsDetails' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR) || $model->issue->isForUser(Yii::$app->user->getId()),
 		'visibleSettlementType' => false,
+		'visibleIssueType' => false,
 	])
 	?>
 
