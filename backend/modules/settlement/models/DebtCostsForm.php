@@ -76,7 +76,7 @@ class DebtCostsForm extends IssueCostForm {
 		$cost->base_value = $this->getValue()->toFixed(2);
 		$cost->value = $this->getValue()->mul($this->pit4Percent)->div(100)->toFixed();
 		$cost->date_at = $this->settled_at;
-		$cost->deadline_at = DateTimeHelper::addMonth(new DateTime($cost->date_at))->format('Y-m-20');
+		$cost->deadline_at = DateTimeHelper::getSameDayNextMonth(new DateTime($cost->date_at))->format('Y-m-20');
 		return $cost;
 	}
 
