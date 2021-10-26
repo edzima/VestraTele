@@ -42,7 +42,7 @@ class IssueMessagesForm extends MessageModel {
 			[['sendSmsToCustomer', 'sendEmailToCustomer', 'sendSmsToAgent', 'sendEmailToWorkers'], 'boolean'],
 			[
 				'workersTypes', 'required', 'when' => function (): bool {
-				return $this->sendEmailToWorkers;
+				return $this->sendEmailToWorkers && !empty($this->getWorkersUsersTypesNames());
 			},
 			],
 			['workersTypes', 'in', 'range' => array_keys($this->getWorkersUsersTypesNames()), 'allowArray' => true],
@@ -163,6 +163,12 @@ class IssueMessagesForm extends MessageModel {
 	public function getWorkersUsersTypesNames(): array {
 		$types = [];
 		$workers = IssueUser::TYPES_WORKERS;
+		if ($this->issue->getIssueModel()->isNewRecord) {
+			foreach ($workers as $workerType) {
+				$types[$workerType] = IssueUser::getTypesNames()[$workerType];
+			}
+			return $types;
+		}
 		foreach ($this->issue->getIssueModel()->users as $issueUser) {
 			if (in_array($issueUser->type, $workers, true)) {
 				$types[$issueUser->type] = $issueUser->getTypeWithUser();

@@ -11,6 +11,7 @@ use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\CsvForm;
 use common\models\issue\Issue;
+use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
 use common\models\message\IssueCreateMessagesForm;
 use common\models\user\Customer;
@@ -185,6 +186,11 @@ class IssueController extends Controller {
 		$model = new IssueForm(['customer' => $customer]);
 		$messagesModel = new IssueCreateMessagesForm();
 		$messagesModel->setIssue($model->getModel());
+		$messagesModel->workersTypes = [
+			IssueUser::TYPE_AGENT => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
+			IssueUser::TYPE_TELEMARKETER => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
+			IssueUser::TYPE_LAWYER => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
+		];
 		$data = Yii::$app->request->post();
 		if ($model->load($data)
 			&& $model->save()) {
