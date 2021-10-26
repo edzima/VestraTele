@@ -57,7 +57,7 @@ class LeadSmsForm extends SmsForm {
 		$report->setLead($this->lead);
 		$report->owner_id = $this->owner_id;
 		$report->status_id = $this->status_id;
-		$report->details = $this->getMessage()->getMessage() . ' - SMS_ID: ' . $smsId;
+		$report->details = Yii::t('common', 'SMS Sent: ') . $this->getMessage()->getMessage() . ' - SMS_ID: ' . $smsId;
 		if ($report->save()) {
 			return true;
 		}

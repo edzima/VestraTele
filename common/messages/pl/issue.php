@@ -13,6 +13,7 @@ return [
 	'Update Issue Note: {title}' => 'Edytuj notatkę: {title}',
 	'Search for a title ...' => 'Szukaj tytułu ...',
 	'Search for a description ...' => 'Szukaj opisu ...',
+	'Stage Change At' => 'Zmiana Etapu',
 	'Pinned Issue Notes' => 'Przypięte Notatki',
 	'Send SMS' => 'Wyślij SMS',
 	'SMS Sent' => 'Wysłano SMS',

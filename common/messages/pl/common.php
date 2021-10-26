@@ -106,6 +106,7 @@ return [
 	'Is common name' => 'Is common name',
 	'Boss' => 'Boss',
 	'Region' => 'Region',
+	'SMS Sent: ' => 'Wysłano SMS: ',
 	'Date At' => 'Data',
 	'Date at' => 'Data',
 	'Description' => 'Opis',

@@ -6,6 +6,7 @@ use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;
 use console\jobs\LeadSmsSendJob;
+use Yii;
 
 class LeadSmsSendJobTest extends SmsSendJobTest {
 
@@ -40,7 +41,7 @@ class LeadSmsSendJobTest extends SmsSendJobTest {
 			'old_status_id' => 1,
 			'status_id' => 2,
 			'owner_id' => 1,
-			'details' => static::DEFAULT_MESSAGE_TEXT . ' - SMS_ID: ' . $id,
+			'details' => Yii::t('common', 'SMS Sent: ') . static::DEFAULT_MESSAGE_TEXT . ' - SMS_ID: ' . $id,
 		]);
 	}
 

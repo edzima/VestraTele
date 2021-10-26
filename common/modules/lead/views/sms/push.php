@@ -4,8 +4,9 @@ use common\helpers\Html;
 use common\modules\lead\models\LeadSmsForm;
 use common\modules\lead\models\LeadStatus;
 use common\widgets\ActiveForm;
+use yii\web\View;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $model LeadSmsForm */
 
 $this->title = Yii::t('lead', 'Send SMS to Lead: {lead}', ['lead' => $model->getLead()->getName()]);
@@ -27,6 +28,8 @@ $this->params['breadcrumbs'][] = $this->title;
 		<?= $form->field($model, 'message')->textarea() ?>
 
 		<?= $form->field($model, 'withOverwrite')->checkbox() ?>
+
+		<?= $form->field($model, 'removeSpecialCharacters')->checkbox() ?>
 
 		<div class="form-group">
 			<?= Html::submitButton(Yii::t('lead', 'Send'), ['class' => 'btn btn-success']) ?>
