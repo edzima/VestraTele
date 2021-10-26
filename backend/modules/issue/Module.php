@@ -52,7 +52,11 @@ class Module extends BaseModule {
 						'controllers' => ['issue/issue', 'issue/type', 'issue/stage', 'issue/user'],
 						'permissions' => [Worker::PERMISSION_ISSUE],
 					],
-
+					[
+						'allow' => true,
+						'controllers' => ['issue/sms'],
+						'permissions' => [Worker::PERMISSION_SMS],
+					],
 					[
 						'allow' => true,
 						'roles' => ['administrator'],

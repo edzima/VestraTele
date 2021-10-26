@@ -29,7 +29,7 @@ class IssueNoteSearch extends IssueNote {
 		return [
 			[['id', 'issue_id', 'user_id'], 'integer'],
 			[['is_pinned', 'is_template'], 'boolean'],
-			[['title', 'description', 'publish_at', 'created_at', 'updated_at'], 'safe'],
+			[['title', 'description', 'publish_at', 'created_at', 'updated_at', 'type'], 'safe'],
 		];
 	}
 
@@ -50,6 +50,8 @@ class IssueNoteSearch extends IssueNote {
 	 */
 	public function search(array $params): ActiveDataProvider {
 		$query = IssueNote::find();
+		$query->joinWith('issue');
+		$query->joinWith('user.userProfile');
 
 		// add conditions that should always apply here
 
@@ -78,6 +80,7 @@ class IssueNoteSearch extends IssueNote {
 		]);
 
 		$query->andFilterWhere(['like', 'title', $this->title])
+			->andFilterWhere(['like', 'type', $this->type])
 			->andFilterWhere(['like', 'description', $this->description]);
 
 		return $dataProvider;

@@ -29,6 +29,8 @@ use yii\helpers\StringHelper;
  *
  * @property Issue $issue
  * @property User $user
+ *
+ * @property-read string|null $typeName
  */
 class IssueNote extends ActiveRecord implements IssueInterface {
 
@@ -37,6 +39,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	public bool $updateIssueAfterSave = true;
 	public bool $updateIssueAfterDelete = true;
 
+	protected const TYPE_SMS = 'sms';
 	public const TYPE_SETTLEMENT = 'settlement';
 	public const TYPE_SUMMON = 'summon';
 	public const TYPE_STAGE_CHANGE = 'stage.change';
@@ -88,6 +91,8 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 			'publish_at' => Yii::t('common', 'Publish at'),
 			'is_pinned' => Yii::t('common', 'Is Pinned'),
 			'is_template' => Yii::t('common', 'Is Template'),
+			'type' => Yii::t('common', 'Type'),
+			'typeFullName' => Yii::t('common', 'Type'),
 		];
 	}
 
@@ -101,6 +106,10 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
 
+	public function isPinned(): bool {
+		return (bool) $this->is_pinned;
+	}
+
 	public function isForSettlement(): bool {
 		return $this->isType(static::TYPE_SETTLEMENT);
 	}
@@ -109,12 +118,12 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 		return $this->isType(static::TYPE_STAGE_CHANGE);
 	}
 
-	public function isPinned(): bool {
-		return (bool) $this->is_pinned;
-	}
-
 	public function isForSummon(): bool {
 		return $this->isType(static::TYPE_SUMMON);
+	}
+
+	public function isSms(): bool {
+		return $this->isType(static::TYPE_SMS);
 	}
 
 	public function isType(string $type): bool {
@@ -128,14 +137,36 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 		return StringHelper::explode($this->type, ':')[1];
 	}
 
-	public static function generateType(string $type, int $id): string {
+	public function getTypeKind(): ?string {
+		$type = StringHelper::explode($this->type, ':')[0] ?? null;
+		if ($type === null) {
+			return null;
+		}
+		return static::getTypesNames()[$type];
+	}
+
+	public function getTypeFullName(): ?string {
+		$typeKind = $this->getTypeKind();
+		if (!$typeKind) {
+			return null;
+		}
+		return $typeKind . ' - ' . $this->getEntityId();
+	}
+
+	public static function generateType(string $type, string $id): string {
 		return "$type:$id";
+	}
+
+	public static function genereateSmsType(string $phone, string $id): string {
+		return static::generateType(static::generateType(static::TYPE_SMS, $id), $phone);
 	}
 
 	public static function getTypesNames(): array {
 		return [
 			static::TYPE_SETTLEMENT => Yii::t('settlement', 'Settlement'),
 			static::TYPE_SUMMON => Yii::t('common', 'Summon'),
+			static::TYPE_SMS => Yii::t('common', 'SMS'),
+			static::TYPE_STAGE_CHANGE => Yii::t('common', 'Stage Change'),
 		];
 	}
 

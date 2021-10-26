@@ -110,7 +110,7 @@ class SettlementController extends Controller {
 	 */
 	private function findModel(int $id): IssuePayCalculation {
 		$model = IssuePayCalculation::findOne($id);
-		if ($model === null || !Yii::$app->user->canSeeIssue($model->issue)) {
+		if ($model === null || !Yii::$app->user->canSeeIssue($model)) {
 			throw new NotFoundHttpException();
 		}
 		return $model;

@@ -8,12 +8,15 @@ use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
+use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\actions\NoteDescriptionListAction;
 use common\modules\issue\actions\NoteTitleListAction;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -67,7 +70,7 @@ class NoteController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionView($id) {
+	public function actionView(int $id): string {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
@@ -142,11 +145,15 @@ class NoteController extends Controller {
 	 * @return mixed
 	 */
 	public function actionUpdate(int $id) {
+		$note = $this->findModel($id);
+		if ($note->isSms()) {
+			throw new NotFoundHttpException();
+		}
 		$model = new IssueNoteForm();
 		if (Yii::$app->user->can(Worker::PERMISSION_NOTE_TEMPLATE)) {
 			$model->scenario = IssueNoteForm::SCENARIO_TEMPLATE;
 		}
-		$model->setModel($this->findModel($id));
+		$model->setModel($note);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			if ($model->getModel()->isForSettlement()) {
@@ -168,6 +175,10 @@ class NoteController extends Controller {
 	 */
 	public function actionDelete(int $id): Response {
 		$model = $this->findModel($id);
+		if (!Yii::$app->user->canDeleteNote($model)) {
+			Yii::warning('User: ' . Yii::$app->user->getId() . ' try Delete Note #:' . $model->id . ' with description: ' . $model->description);
+			throw new ForbiddenHttpException();
+		}
 		$model->delete();
 		Yii::warning('User: ' . Yii::$app->user->id . ' delete note. Title: ' . $model->title . "\n description: " . $model->description, 'note.delete');
 		return $this->redirectIssue($model->issue_id);

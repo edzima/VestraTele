@@ -58,9 +58,6 @@ YiiAsset::register($this);
 	<?= IssueNotesWidget::widget([
 		'model' => $model->issue,
 		'notes' => $model->issue->getIssueNotes()->joinWith('user.userProfile')->onlySummon($model->id)->all(),
-		'noteOptions' => [
-			'removeBtn' => false,
-		],
 	]) ?>
 
 

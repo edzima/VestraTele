@@ -17,14 +17,18 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-		<?= Html::a('Delete', ['delete', 'id' => $model->id], [
-			'class' => 'btn btn-danger',
-			'data' => [
-				'confirm' => 'Are you sure you want to delete this item?',
-				'method' => 'post',
-			],
-		]) ?>
+		<?= !$model->isSms()
+			? Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
+			: ''
+		?>
+		<?= Yii::$app->user->canDeleteNote($model)
+			? Html::a(Yii::t('common', 'Delete'), ['delete', 'id' => $model->id], [
+				'class' => 'btn btn-danger',
+				'data' => [
+					'confirm' => 'Are you sure you want to delete this item?',
+					'method' => 'post',
+				],
+			]) : '' ?>
 	</p>
 
 	<?= DetailView::widget([
@@ -34,6 +38,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			'user',
 			'is_pinned:boolean',
 			'is_template:boolean',
+			[
+				'attribute' => 'typeFullName',
+				'visible' => !empty($model->type),
+			],
 			'title',
 			'description:ntext',
 			'created_at:datetime',

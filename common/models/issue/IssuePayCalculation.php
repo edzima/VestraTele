@@ -140,6 +140,10 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 		return $this->id;
 	}
 
+	public function getOwnerId(): int {
+		return $this->owner_id;
+	}
+
 	public function getType(): int {
 		return $this->type;
 	}

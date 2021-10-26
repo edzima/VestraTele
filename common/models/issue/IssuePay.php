@@ -91,6 +91,10 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 		];
 	}
 
+	public function getId(): int {
+		return $this->id;
+	}
+
 	public function isPayed(): bool {
 		return $this->getPaymentAt() !== null;
 	}

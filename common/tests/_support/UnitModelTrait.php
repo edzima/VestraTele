@@ -9,16 +9,16 @@ trait UnitModelTrait {
 
 	abstract public function getModel(): Model;
 
-	public function thenSuccessValidate(): void {
-		$validate = $this->getModel()->validate();
+	public function thenSuccessValidate($attributeNames = null, $clearErrors = true): void {
+		$validate = $this->getModel()->validate($attributeNames, $clearErrors);
 		if (!$validate) {
 			codecept_debug($this->getModel()->getErrors());
 		}
 		$this->tester->assertTrue($validate);
 	}
 
-	public function thenUnsuccessValidate(): void {
-		$validate = $this->getModel()->validate();
+	public function thenUnsuccessValidate($attributeNames = null, $clearErrors = true): void {
+		$validate = $this->getModel()->validate($attributeNames, $clearErrors);
 		$this->tester->assertFalse($validate);
 	}
 

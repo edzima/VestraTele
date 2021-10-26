@@ -30,7 +30,7 @@ class LeadPhoneSearchTest extends Unit {
 		$models = $this->search(['phone' => '777-222-122'])->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
-			$this->tester->assertSame($model->phone, '777-222-122');
+			$this->tester->assertStringContainsString('777-222-122', $model->phone);
 		}
 	}
 

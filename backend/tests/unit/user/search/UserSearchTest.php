@@ -21,7 +21,7 @@ class UserSearchTest extends Unit {
 	public function _fixtures(): array {
 		return array_merge(
 			UserFixtureHelper::workers(),
-			['user-profile' => UserFixtureHelper::profile('user')],
+			UserFixtureHelper::profile('user'),
 		);
 	}
 

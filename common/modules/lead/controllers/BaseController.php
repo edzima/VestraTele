@@ -10,6 +10,7 @@ use yii\db\ActiveRecord;
 use yii\web\Controller;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class BaseController extends Controller {
 
@@ -54,6 +55,10 @@ class BaseController extends Controller {
 			throw new NotFoundHttpException();
 		}
 		return $model;
+	}
+
+	protected function redirectLead(int $id): Response {
+		return $this->redirect(['lead/view', 'id' => $id]);
 	}
 
 }

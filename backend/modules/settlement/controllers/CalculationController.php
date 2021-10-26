@@ -8,6 +8,7 @@ use backend\modules\settlement\models\CalculationForm;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\modules\settlement\models\search\IssueToCreateCalculationSearch;
 use common\components\provision\exception\MissingProvisionUserException;
+use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
@@ -152,8 +153,14 @@ class CalculationController extends Controller {
 	public function actionCreateAdministrative(int $id) {
 		$issue = $this->findIssueModel($id);
 		$model = new AdministrativeCalculationForm(Yii::$app->user->getId(), $issue);
+
 		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			if ($model->pushMessages(Yii::$app->user->getId())) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'Push Messages about Create Administrative Settlement.')
+				);
+			}
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('administrative', [
@@ -170,11 +177,10 @@ class CalculationController extends Controller {
 		$model->vat = $issue->type->vat;
 		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			if ($model->sendEmailToCustomer) {
-				$model->sendCreateEmailToCustomer();
-			}
-			if ($model->sendEmailToWorkers) {
-				$model->sendCreateEmailToWorkers();
+			if ($model->pushMessages(Yii::$app->user->getId())) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'Push Messages about Create Settlement.')
+				);
 			}
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}

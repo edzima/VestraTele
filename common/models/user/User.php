@@ -67,7 +67,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 	public const ROLE_LAWYER = 'lawyer';
 
 	public const PERMISSION_ARCHIVE = 'archive';
-	public const PERMISSION_EMAIL_TEMPLATE = 'email.template';
+	public const PERMISSION_MESSAGE_TEMPLATE = 'message.template';
 	public const PERMISSION_EXPORT = 'export';
 	public const PERMISSION_ISSUE = 'issue';
 	public const PERMISSION_HINT = 'hint';
@@ -92,6 +92,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 	public const PERMISSION_WORKERS = 'workers';
 	public const PERMISSION_LEAD = 'lead';
 	public const PERMISSION_CZATER = 'czater';
+	public const PERMISSION_SMS = 'sms';
 
 	private static $ROLES_NAMES;
 	private static $PERMISSIONS_NAMES;
@@ -130,6 +131,17 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 			$name = $this->username;
 		}
 		return $name;
+	}
+
+	public function getPhone(): ?string {
+		$profile = $this->profile;
+		if (!empty($profile->phone)) {
+			return $profile->phone;
+		}
+		if (!empty($profile->phone_2)) {
+			return $profile->phone_2;
+		}
+		return null;
 	}
 
 	/**

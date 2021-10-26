@@ -1,6 +1,7 @@
 <?php
 
 use common\helpers\Html;
+use common\models\user\User;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
@@ -73,7 +74,7 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 
 			[
 				'class' => ActionColumn::class,
-				'template' => '{report} {view} {update} {delete}',
+				'template' => '{report} {sms} {view} {update} {delete}',
 				'buttons' => [
 					'report' => static function (string $url, LeadReport $report): string {
 						return Html::a(
@@ -93,6 +94,18 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 								'aria-title' => Yii::t('yii', 'View'),
 							]
 						);
+					},
+					'sms' => static function (string $url, LeadReport $model): string {
+						if (Yii::$app->user->can(User::PERMISSION_SMS)) {
+							return Html::a('<i class="fa fa-envelope" aria-hidden="true"></i>',
+								['sms/push', 'id' => $model->lead_id],
+								[
+									'title' => Yii::t('lead', 'Send SMS'),
+									'aria-label' => Yii::t('lead', 'Send SMS'),
+								]
+							);
+						}
+						return '';
 					},
 				],
 			],

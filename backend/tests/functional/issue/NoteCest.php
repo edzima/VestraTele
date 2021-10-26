@@ -54,12 +54,13 @@ class NoteCest {
 		$I->seeInCurrentUrl(static::ROUTE_INDEX);
 	}
 
-	public function checkIndexAsIssueManagerWithNotePermission(IssueManager $I): void {
+	public function checkIndexGridColumns(IssueManager $I): void {
 		$I->amLoggedIn();
 		$I->assignNotePermission();
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->see('Issue Notes');
 		$I->seeInGridHeader('Issue');
+		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('User');
 		$I->seeInGridHeader('Title');
 		$I->seeInGridHeader('Description');
@@ -137,7 +138,17 @@ class NoteCest {
 		]);
 	}
 
-	public function chcekUpdateChangeStageNote(IssueManager $I): void {
+	public function checkUpdateSmsNote(IssueManager $I): void {
+		$I->haveFixtures($this->fixtures());
+		$I->amLoggedIn();
+		$I->assignNotePermission();
+		/** @var IssueNote $note */
+		$note = $I->grabFixture(IssueFixtureHelper::NOTE, 'sms_1');
+		$I->amOnRoute(static::ROUTE_UPDATE, ['id' => $note->id]);
+		$I->seePageNotFound();
+	}
+
+	public function checkUpdateChangeStageNote(IssueManager $I): void {
 		$I->haveFixtures($this->fixtures());
 		$I->amLoggedIn();
 		$I->assignNotePermission();

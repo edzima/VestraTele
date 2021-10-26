@@ -53,8 +53,19 @@ class UserFixtureHelper {
 
 	public static function profile(string $type): array {
 		return [
-			'class' => UserProfileFixture::class,
-			'dataFile' => static::dataDir() . $type . '_profile.php',
+			'user_' . $type . '_profile' => [
+				'class' => UserProfileFixture::class,
+				'dataFile' => static::dataDir() . $type . '_profile.php',
+			],
+		];
+	}
+
+	public static function profiles(): array {
+		return [
+			'user_profiles' => [
+				'class' => UserProfileFixture::class,
+				'dataFile' => static::dataDir() . 'profiles.php',
+			],
 		];
 	}
 

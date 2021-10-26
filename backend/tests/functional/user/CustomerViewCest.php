@@ -25,11 +25,10 @@ class CustomerViewCest {
 	 * @see \Codeception\Module\Yii2::_before()
 	 */
 	public function _fixtures(): array {
-		return [
+		return array_merge([
 			'customer' => UserFixtureHelper::customer(),
-			'customer-profile' => UserFixtureHelper::profile(UserFixtureHelper::CUSTOMER),
 			'customer-traits' => UserFixtureHelper::customerTraits(),
-		];
+		], UserFixtureHelper::profile(UserFixtureHelper::CUSTOMER));
 	}
 
 	public function checkLinks(Manager $I): void {

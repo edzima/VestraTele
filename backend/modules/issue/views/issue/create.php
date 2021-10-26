@@ -1,9 +1,11 @@
 <?php
 
 use backend\modules\issue\models\IssueForm;
+use common\models\message\IssueCreateMessagesForm;
 
 /* @var $this yii\web\View */
 /* @var $model IssueForm */
+/* @var $messagesModel IssueCreateMessagesForm */
 
 $this->title = Yii::t('backend', 'Create issue for: {customer}', ['customer' => $model->getCustomer()]);
 
@@ -17,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= $this->render('_form', [
 		'model' => $model,
+		'messagesModel' => $messagesModel,
 	]) ?>
 
 </div>

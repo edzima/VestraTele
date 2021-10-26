@@ -5,6 +5,7 @@ use motion\i18n\ConfigLanguageProvider;
 return [
 	'id' => 'app-backend-tests',
 	'homeUrl' => null,
+	'defaultRoute' => 'user/customer/index',
 	'components' => [
 		'assetManager' => [
 			'basePath' => __DIR__ . '/../web/assets',

@@ -3,7 +3,9 @@
 use backend\modules\issue\models\search\IssueNoteSearch;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
+use common\models\issue\IssueNote;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\DataColumn;
 
 /* @var $this yii\web\View */
 /* @var $searchModel IssueNoteSearch */
@@ -23,9 +25,22 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 			['class' => IssueColumn::class],
 			[
+				'attribute' => 'type',
+				'filter' => IssueNoteSearch::getTypesNames(),
+				'value' => 'typeKind',
+				'noWrap' => true,
+			],
+			[
+				'class' => DataColumn::class,
 				'attribute' => 'user_id',
 				'value' => 'user',
 				'filter' => IssueNoteSearch::getUsersNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'options' => [
+						'placeholder' => $searchModel->getAttributeLabel('user_id'),
+					],
+				],
 			],
 			'title',
 			'description',
@@ -34,7 +49,17 @@ $this->params['breadcrumbs'][] = $this->title;
 			'publish_at:datetime',
 			'created_at:datetime',
 			'updated_at:datetime',
-			['class' => ActionColumn::class],
+			[
+				'class' => ActionColumn::class,
+				'visibleButtons' => [
+					'update' => function (IssueNote $note): bool {
+						return !$note->isSms();
+					},
+					'delete' => function (IssueNote $note): bool {
+						return Yii::$app->user->canDeleteNote($note);
+					},
+				],
+			],
 		],
 	]); ?>
 </div>

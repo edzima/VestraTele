@@ -8,7 +8,6 @@ use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadQuestion;
-use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadSourceInterface;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadUser;

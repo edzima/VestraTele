@@ -144,18 +144,34 @@ class PayController extends Controller {
 		$model = new PayPayedForm($this->findModel($id));
 		$model->date = date('Y-m-d');
 		if ($model->load(Yii::$app->request->post()) && $model->pay()) {
-			Flash::add(Flash::TYPE_SUCCESS,
-				Yii::t('settlement', 'The payment: {value} marked as paid.', [
-					'value' => Yii::$app->formatter->asCurrency($pay->getValue()),
-				]));
-			if ($model->sendEmailToCustomer && $model->sendEmailToCustomer()) {
-				Flash::add(Flash::TYPE_SUCCESS,
-					Yii::t('settlement', 'Send E-mail to Customer.')
+			$generated = $model->getGeneratedPay();
+			if ($generated !== null) {
+				Flash::add(Flash::TYPE_WARNING,
+					Yii::t('settlement', 'An incomplete: {value} has been paid.', [
+						'value' => Yii::$app->formatter->asCurrency($model->value),
+					])
 				);
-			}
-			if ($model->sendEmailToWorkers && $model->sendEmailsToWorkers()) {
 				Flash::add(Flash::TYPE_SUCCESS,
-					Yii::t('settlement', 'Send E-mail to Workers.')
+					Yii::t('settlement', 'Generate new payment: {value}.', [
+						'value' => Yii::$app->formatter->asCurrency($generated->getValue()),
+					])
+				);
+				Yii::$app->provisions->removeForPays([$pay->getId()]);
+				try {
+					Yii::$app->provisions->settlement($pay->calculation);
+				} catch (MissingProvisionUserException $exception) {
+
+				}
+			} else {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'The payment: {value} marked as paid.', [
+						'value' => Yii::$app->formatter->asCurrency($pay->getValue()),
+					]));
+			}
+
+			if ($model->pushMessages(Yii::$app->user->getId())) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'Send Messages about Payed Pay.')
 				);
 			}
 

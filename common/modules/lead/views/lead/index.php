@@ -157,7 +157,7 @@ foreach (LeadSearch::questions() as $question) {
 				],
 				[
 					'class' => ActionColumn::class,
-					'template' => '{view} {update} {report} {user} {reminder} {delete}',
+					'template' => '{view} {update} {report} {sms} {user} {reminder} {delete}',
 					'visibleButtons' => $visibleButtons,
 					'buttons' => [
 						'user' => static function (string $url, ActiveLead $lead): string {
@@ -188,6 +188,18 @@ foreach (LeadSearch::questions() as $question) {
 									'title' => Yii::t('lead', 'Create Reminder'),
 									'aria-title' => Yii::t('lead', 'Create Reminder'),
 								]);
+						},
+						'sms' => static function (string $url, ActiveLead $model): string {
+							if (Yii::$app->user->can(User::PERMISSION_SMS)) {
+								return Html::a('<i class="fa fa-envelope" aria-hidden="true"></i>',
+									['sms/push', 'id' => $model->getId()],
+									[
+										'title' => Yii::t('lead', 'Send SMS'),
+										'aria-label' => Yii::t('lead', 'Send SMS'),
+									]
+								);
+							}
+							return '';
 						},
 					],
 				],

@@ -69,6 +69,7 @@ return [
 	'Updater' => 'Edytor',
 	'Username' => 'Login',
 	'user' => 'Użytkownik',
+	'Notifications' => 'Powiadomienia',
 	'Username or email' => 'Login lub email',
 	'Website' => 'Strona',
 	'associate_director' => 'Zastępca dyrektora',
@@ -105,6 +106,7 @@ return [
 	'Is common name' => 'Is common name',
 	'Boss' => 'Boss',
 	'Region' => 'Region',
+	'SMS Sent: ' => 'Wysłano SMS: ',
 	'Date At' => 'Data',
 	'Date at' => 'Data',
 	'Description' => 'Opis',
@@ -315,4 +317,5 @@ return [
 	'Is Pinned' => 'Przypięta',
 	'Is Template' => 'Wzór',
 	'With Archive' => 'Z Archiwum',
+	'Send SMS' => 'Wyślij SMS',
 ];

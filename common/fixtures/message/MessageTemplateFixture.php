@@ -1,11 +1,11 @@
 <?php
 
-namespace common\fixtures\email;
+namespace common\fixtures\message;
 
 use yii\test\ActiveFixture;
 use ymaker\email\templates\entities\EmailTemplate;
 
-class EmailTemplateFixture extends ActiveFixture {
+class MessageTemplateFixture extends ActiveFixture {
 
 	public $modelClass = EmailTemplate::class;
 }

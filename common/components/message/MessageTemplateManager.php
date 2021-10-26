@@ -1,20 +1,17 @@
 <?php
 
-namespace common\components;
+namespace common\components\message;
 
-use common\helpers\EmailTemplateKeyHelper;
 use Yii;
 use yii\data\ActiveDataProvider;
 use ymaker\email\templates\components\TemplateManager;
-use ymaker\email\templates\models\EmailTemplate;
+use ymaker\email\templates\entities\EmailTemplate;
 use ymaker\email\templates\queries\EmailTemplateQuery;
 
-class EmailTemplateManager extends TemplateManager {
+class MessageTemplateManager extends TemplateManager implements KeyMessageTemplateManager, IssueMessageManager {
 
 	/**
-	 * @param string $key
-	 * @param string|null $language
-	 * @return EmailTemplate[]|null indexed by Key
+	 * {@inheritDoc}
 	 */
 	public function getTemplatesLikeKey(string $key, string &$language = null): ?array {
 		$language = $language ?: Yii::$app->language;
@@ -31,24 +28,27 @@ class EmailTemplateManager extends TemplateManager {
 			return null;
 		}
 		$templates = [];
-		/** @var \ymaker\email\templates\entities\EmailTemplate[] $models */
+		/** @var EmailTemplate[] $models */
 		foreach ($models as $model) {
 			$translation = $model->getTranslation($language);
 			if ($translation && !$translation->isNewRecord) {
-				$templates[$model->key] = EmailTemplate::buildFromEntity($translation);
+				$templates[$model->key] = MessageTemplate::buildFromEntity($translation);
 			}
 		}
 		return $templates;
 	}
 
-	public function getIssueTypeTemplatesLikeKey(string $key, int $typeId, string $language = null): ?EmailTemplate {
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getIssueTypeTemplatesLikeKey(string $key, int $typeId, string $language = null): ?MessageTemplate {
 		$templates = $this->getTemplatesLikeKey($key, $language);
 		if (empty($templates)) {
 			Yii::warning("Not found templates like key: $key for $language.", 'emailTemplate');
 			return null;
 		}
 		foreach ($templates as $templateKey => $template) {
-			if (EmailTemplateKeyHelper::isForIssueType($templateKey, $typeId)) {
+			if (MessageTemplateKeyHelper::isForIssueType($templateKey, $typeId)) {
 				return $template;
 			}
 		}

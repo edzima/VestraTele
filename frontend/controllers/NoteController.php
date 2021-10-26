@@ -14,6 +14,7 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -82,7 +83,7 @@ class NoteController extends Controller {
 
 	public function actionSettlement(int $id) {
 		$settlement = IssuePayCalculation::findOne($id);
-		if ($settlement === null || !Yii::$app->user->canSeeIssue($settlement->getIssueModel())) {
+		if ($settlement === null || !Yii::$app->user->canSeeIssue($settlement)) {
 			throw new NotFoundHttpException();
 		}
 		$model = IssueNoteForm::createSettlement($settlement);
@@ -99,7 +100,7 @@ class NoteController extends Controller {
 
 	public function actionSummon(int $id) {
 		$summon = Summon::findOne($id);
-		if ($summon === null || !Yii::$app->user->canSeeIssue($summon->getIssueModel())) {
+		if ($summon === null || !Yii::$app->user->canSeeIssue($summon)) {
 			throw new NotFoundHttpException();
 		}
 		$model = IssueNoteForm::createSummon($summon);
@@ -122,6 +123,9 @@ class NoteController extends Controller {
 	 */
 	public function actionUpdate(int $id) {
 		$note = $this->findModel($id);
+		if ($note->isSms()) {
+			throw new NotFoundHttpException();
+		}
 		$model = new IssueNoteForm();
 		$model->setModel($note);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -130,6 +134,17 @@ class NoteController extends Controller {
 		return $this->render('update', [
 			'model' => $model,
 		]);
+	}
+
+	public function actionDelete(int $id): Response {
+		$model = $this->findModel($id);
+		if (!Yii::$app->user->canDeleteNote($model)) {
+			Yii::warning('User: ' . Yii::$app->user->getId() . ' try Delete Note #:' . $model->id . ' with description: ' . $model->description);
+			throw new ForbiddenHttpException();
+		}
+		$model->delete();
+		Yii::warning('User: ' . Yii::$app->user->id . ' delete note. Title: ' . $model->title . "\n description: " . $model->description, 'note.delete');
+		return $this->redirectIssue($model->issue_id);
 	}
 
 	private function redirectIssue(int $issueId): Response {
