@@ -15,7 +15,7 @@ return [
 		'stage_id' => 1,
 	],
 	'payed-with-single-costs' => [
-		'issue_id' => 2,
+		'issue_id' => 3,
 		'value' => 1230,
 		'type' => IssuePayCalculation::TYPE_ADMINISTRATIVE,
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
