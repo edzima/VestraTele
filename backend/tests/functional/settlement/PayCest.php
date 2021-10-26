@@ -63,7 +63,7 @@ class PayCest {
 			IssueFixtureHelper::users(true),
 			SettlementFixtureHelper::settlement(),
 			SettlementFixtureHelper::pay(),
-			MessageTemplateFixtureHelper::fixture(),
+			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_PAY_PAYED),
 		));
 		$I->amLoggedIn();
 		$pay = $this->settlementFixture->grabPay('not-payed');
@@ -73,7 +73,7 @@ class PayCest {
 		$I->click('Save');
 		$I->seeFlash('The payment: ' . Yii::$app->formatter->asCurrency($pay->getValue()) . ' marked as paid.', Flash::TYPE_SUCCESS);
 		$I->seeEmailIsSent(2);
-		$I->seeJobIsPushed(1);
+		$I->seeJobIsPushed(2);
 	}
 
 }

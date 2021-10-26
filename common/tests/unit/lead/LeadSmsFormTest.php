@@ -7,6 +7,7 @@ use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadSmsForm;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
+use Yii;
 
 class LeadSmsFormTest extends Unit {
 
@@ -27,6 +28,12 @@ class LeadSmsFormTest extends Unit {
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Owner Id cannot be blank.', 'owner_id');
 		$this->thenSeeError('Message cannot be blank.', 'message');
+	}
+
+	public function testEmptyOnChangeStageScenario(): void {
+		$this->giveModel();
+		$this->model->scenario = LeadSmsForm::SCENARIO_CHANGE_STATUS;
+		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Status cannot be current Status: New', 'status_id');
 	}
 
@@ -38,7 +45,7 @@ class LeadSmsFormTest extends Unit {
 		$this->thenSuccessValidate();
 		$jobId = $this->model->pushJob();
 		$this->tester->assertNotEmpty($jobId);
-		$this->tester->assertNotEmpty(\Yii::$app->queue->status($jobId));
+		$this->tester->assertNotEmpty(Yii::$app->queue->status($jobId));
 	}
 
 	private function giveModel(int $lead_id = 1): void {

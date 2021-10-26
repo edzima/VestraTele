@@ -151,4 +151,9 @@ return [
 	'Pay Status' => 'Status Płatności',
 	'Paid' => 'Opłacone',
 	'Unpaid' => 'Nieopłacone',
+	'Push Messages about Create Administrative Settlement.' => 'Wysłano Notyfikacje o Opłacie Administracyjnej.',
+	'Push Messages about Create Settlement.' => 'Wysłano Notyfikacje o nowym Rozliczeniu.',
+	'An incomplete: {value} has been paid.' => 'Opłacono niepełną kwotę: {value}.',
+	'Generate new payment: {value}.' => 'Dodano nową płatność: {value}.',
+	'Send Messages about Payed Pay.' => 'Wysłano Notyfikacje o opłaceniu.',
 ];

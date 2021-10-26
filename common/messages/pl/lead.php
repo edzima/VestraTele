@@ -185,4 +185,6 @@ return [
 	'Create Report' => 'Dodaj Raport',
 	'Send SMS to Lead: {lead}' => 'Wyślij SMS do: {lead}',
 	'Send SMS' => 'Wyślij SMS',
+	'Success add SMS: {message} to send queue.' => 'SMS: {message} skierowano do wysłania.',
+	'Try send sms to Lead: {lead} without Phone.' => 'Próba wysłania SMS do Lead: {lead} bez Numeru Telefonu.',
 ];

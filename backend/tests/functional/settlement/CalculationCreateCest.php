@@ -24,7 +24,7 @@ class CalculationCreateCest {
 			IssueFixtureHelper::stageAndTypesFixtures(),
 			SettlementFixtureHelper::settlement(),
 			SettlementFixtureHelper::pay(),
-			MessageTemplateFixtureHelper::fixture(),
+			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_SETTLEMENT_CREATE),
 		));
 		$I->amLoggedIn();
 	}
@@ -67,12 +67,13 @@ class CalculationCreateCest {
 			'value' => 123,
 		]);
 		$I->seeEmailIsSent(2);
+		$I->seeJobIsPushed(2);
 	}
 
 	public function checkCreateWithoutSendEmailToWorker(CreateCalculationIssueManager $I): void {
 		$I->amOnPage([static::ROUTE, 'id' => 3]);
 		$I->fillField('Value with VAT', 123);
-		$I->uncheckOption('Send Email to Workers');
+		$I->uncheckOption('#issuesettlementcreatemessagesform-sendemailtoworkers');
 		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
 		$I->click('Save');
 		$I->seeEmailIsSent(1);
@@ -81,7 +82,7 @@ class CalculationCreateCest {
 	public function checkCreateWithoutSendEmailToCustomer(CreateCalculationIssueManager $I): void {
 		$I->amOnPage([static::ROUTE, 'id' => 3]);
 		$I->fillField('Value with VAT', 123);
-		$I->uncheckOption('Send Email to Customer');
+		$I->uncheckOption('#issuesettlementcreatemessagesform-sendemailtocustomer');
 		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
 		$I->click('Save');
 		$I->seeEmailIsSent(1);
@@ -90,8 +91,8 @@ class CalculationCreateCest {
 	public function checkCreateWithoutSendEmails(CreateCalculationIssueManager $I): void {
 		$I->amOnPage([static::ROUTE, 'id' => 1]);
 		$I->fillField('Value with VAT', 123);
-		$I->uncheckOption('Send Email to Customer');
-		$I->uncheckOption('Send Email to Workers');
+		$I->uncheckOption('#issuesettlementcreatemessagesform-sendemailtocustomer');
+		$I->uncheckOption('#issuesettlementcreatemessagesform-sendemailtoworkers');
 		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
 		$I->click('Save');
 		$I->dontSeeEmailIsSent();
@@ -100,7 +101,7 @@ class CalculationCreateCest {
 	public function checkCreateWithoutSendSmsToCustomer(CreateCalculationIssueManager $I): void {
 		$I->amOnPage([static::ROUTE, 'id' => 3]);
 		$I->fillField('Value with VAT', 123);
-		$I->uncheckOption('Send SMS to Customer');
+		$I->uncheckOption('#issuesettlementcreatemessagesform-sendsmstocustomer');
 		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
 		$I->click('Save');
 		$I->seeJobIsPushed(1);
@@ -109,8 +110,8 @@ class CalculationCreateCest {
 	public function checkCreateWithoutSendSms(CreateCalculationIssueManager $I): void {
 		$I->amOnPage([static::ROUTE, 'id' => 1]);
 		$I->fillField('Value with VAT', 123);
-		$I->uncheckOption('Send SMS to Customer');
-		$I->uncheckOption('Send SMS to Agent');
+		$I->uncheckOption('#issuesettlementcreatemessagesform-sendsmstocustomer');
+		$I->uncheckOption('#issuesettlementcreatemessagesform-sendsmstoagent');
 		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
 		$I->click('Save');
 		$I->dontSeeJobIsPushed();

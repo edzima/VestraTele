@@ -2,13 +2,16 @@
 
 namespace common\modules\lead\models;
 
+use common\models\message\SmsForm;
 use common\modules\lead\models\forms\ReportForm;
 use console\jobs\LeadSmsSendJob;
-use Edzima\Yii2Adescom\models\SmsForm;
+use Edzima\Yii2Adescom\models\MessageInterface;
 use Yii;
 use yii\validators\CompareValidator;
 
 class LeadSmsForm extends SmsForm {
+
+	public const SCENARIO_CHANGE_STATUS = 'change-status';
 
 	private ActiveLead $lead;
 	public int $status_id;
@@ -29,6 +32,7 @@ class LeadSmsForm extends SmsForm {
 				[
 					'status_id',
 					'compare',
+					'on' => static::SCENARIO_CHANGE_STATUS,
 					'type' => CompareValidator::TYPE_NUMBER,
 					'operator' => '!==',
 					'compareValue' => $this->getLead()->getStatusId(),
@@ -45,13 +49,6 @@ class LeadSmsForm extends SmsForm {
 		return $this->lead;
 	}
 
-	public function pushJob(): ?string {
-		if (!$this->validate()) {
-			return null;
-		}
-		return Yii::$app->queue->push($this->createJob());
-	}
-
 	public function report(string $smsId): bool {
 		$report = new ReportForm();
 		$report->setLead($this->lead);
@@ -65,10 +62,13 @@ class LeadSmsForm extends SmsForm {
 		return false;
 	}
 
-	protected function createJob(): LeadSmsSendJob {
+	protected function createJob(MessageInterface $message = null): LeadSmsSendJob {
+		if ($message === null) {
+			$message = $this->getMessage();
+		}
 		return new LeadSmsSendJob([
 			'lead_id' => $this->lead->getId(),
-			'message' => $this->getMessage(),
+			'message' => $message,
 			'status_id' => $this->status_id,
 			'owner_id' => $this->owner_id,
 		]);

@@ -67,7 +67,6 @@ class IssueMessagesForm extends MessageModel {
 
 	public function pushMessages(): ?int {
 		if (!$this->validate()) {
-			codecept_debug($this->getErrors());
 			return false;
 		}
 		return $this->pushCustomerMessages() + $this->pushWorkersMessages();

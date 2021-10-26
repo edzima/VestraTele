@@ -12,8 +12,6 @@ use yii\helpers\ArrayHelper;
 
 class CalculationForm extends PayForm {
 
-	public const SCENARIO_CREATE = 'create';
-
 	private Issue $issue;
 	private int $owner;
 	public $type;
@@ -172,10 +170,6 @@ class CalculationForm extends PayForm {
 			default:
 				throw new InvalidConfigException('Invalid provider type.');
 		}
-	}
-
-	public function isCreateScenario(): bool {
-		return $this->getScenario() === static::SCENARIO_CREATE;
 	}
 
 	public function getProvidersNames(): array {

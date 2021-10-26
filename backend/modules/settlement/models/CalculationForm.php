@@ -19,12 +19,11 @@ class CalculationForm extends BaseCalculationForm {
 	}
 
 	public function getMessagesModel(): ?IssueSettlementCreateMessagesForm {
-		if (!$this->isCreateScenario()) {
-			return null;
-		}
 		if ($this->messagesForm === null) {
-			$this->messagesForm = new IssueSettlementCreateMessagesForm();
-			$this->messagesForm->setSettlement($this->getModel());
+			if ($this->getModel()->isNewRecord) {
+				$this->messagesForm = new IssueSettlementCreateMessagesForm();
+				$this->messagesForm->setSettlement($this->getModel());
+			}
 		}
 		return $this->messagesForm;
 	}

@@ -153,7 +153,6 @@ class CalculationController extends Controller {
 	public function actionCreateAdministrative(int $id) {
 		$issue = $this->findIssueModel($id);
 		$model = new AdministrativeCalculationForm(Yii::$app->user->getId(), $issue);
-		$model->scenario = AdministrativeCalculationForm::SCENARIO_CREATE;
 
 		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -172,7 +171,6 @@ class CalculationController extends Controller {
 	public function actionCreate(int $id) {
 		$issue = $this->findIssueModel($id);
 		$model = new CalculationForm(Yii::$app->user->getId(), $issue);
-		$model->scenario = CalculationForm::SCENARIO_CREATE;
 		if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
 			Yii::$app->session->addFlash('warning', Yii::t('settlement', 'You try create calculation as Admin.'));
 		}

@@ -146,12 +146,12 @@ class PayController extends Controller {
 		if ($model->load(Yii::$app->request->post()) && $model->pay()) {
 			$generated = $model->getGeneratedPay();
 			if ($generated !== null) {
-				Flash::add(Flash::TYPE_SUCCESS,
-					Yii::t('settlement', 'Payment: {value}.', [
+				Flash::add(Flash::TYPE_WARNING,
+					Yii::t('settlement', 'An incomplete: {value} has been paid.', [
 						'value' => Yii::$app->formatter->asCurrency($model->value),
 					])
 				);
-				Flash::add(Flash::TYPE_WARNING,
+				Flash::add(Flash::TYPE_SUCCESS,
 					Yii::t('settlement', 'Generate new payment: {value}.', [
 						'value' => Yii::$app->formatter->asCurrency($generated->getValue()),
 					])

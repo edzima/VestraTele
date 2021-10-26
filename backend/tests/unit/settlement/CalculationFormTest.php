@@ -29,18 +29,20 @@ class CalculationFormTest extends Unit {
 		);
 	}
 
-	public function testPushMessagesForNotCreateScenario(): void {
+	public function testPushMessagesForNotNewRecord(): void {
 		$settlement = $this->settlementFixtureHelper->grabSettlement('not-payed-with-double-costs');
+		$settlement->isNewRecord = false;
+
 		/** @var CalculationForm $model */
 		$model = CalculationForm::createFromModel($settlement);
 		$this->tester->assertNull($model->pushMessages());
 	}
 
-	public function testMessagesForScenarioCreate(): void {
+	public function testMessagesForNewRecord(): void {
 		$settlement = $this->settlementFixtureHelper->grabSettlement('many-pays-without-costs');
+		$settlement->isNewRecord = true;
 		/** @var CalculationForm $model */
 		$model = CalculationForm::createFromModel($settlement);
-		$model->scenario = CalculationForm::SCENARIO_CREATE;
 
 		$this->tester->assertGreaterThan(0, $model->pushMessages(UserFixtureHelper::AGENT_EMILY_PAT));
 		$this->tester->seeEmailIsSent();

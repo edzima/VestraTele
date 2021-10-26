@@ -38,7 +38,7 @@ return [
 		'key' => IssueSettlementCreateMessagesForm::generateKey(
 			IssueSettlementCreateMessagesForm::TYPE_SMS,
 			IssueSettlementCreateMessagesForm::keyWorkers(),
-			[1],
+			[2],
 			IssueSettlement::TYPE_HONORARIUM
 		),
 	],
