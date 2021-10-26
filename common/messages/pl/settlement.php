@@ -1,6 +1,7 @@
 <?php
 
 return [
+	'Appeal' => 'Opłata od apelacji',
 	'Base Value' => 'Kwota Bazowa',
 	'Details' => 'Szczegóły',
 	'Deadline at' => 'Termin płatności',

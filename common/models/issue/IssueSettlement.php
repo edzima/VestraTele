@@ -13,6 +13,7 @@ use common\models\settlement\SettlementInterface;
 interface IssueSettlement extends IssueInterface, SettlementInterface {
 
 	public const TYPE_ADMINISTRATIVE = 10;
+	public const TYPE_APPEAL = 15;
 	public const TYPE_HONORARIUM = 30;
 	public const TYPE_LAWYER = 40;
 	public const TYPE_SUBSCRIPTION = 50;
