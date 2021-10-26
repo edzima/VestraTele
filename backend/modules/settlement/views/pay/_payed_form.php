@@ -19,7 +19,7 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-2']])->widget(NumberControl::class) ?>
+		<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-2 col-lg-1']])->widget(NumberControl::class) ?>
 
 		<?= $form->field($model, 'date', ['options' => ['class' => 'col-md-2']])
 			->widget(DateWidget::class)
@@ -31,10 +31,14 @@ use yii\widgets\ActiveForm;
 
 	</div>
 
-	<?= IssueMessagesFormWidget::widget([
-		'form' => $form,
-		'model' => $model->getMessagesModel(),
-	]) ?>
+	<div class="row">
+		<div class="col-md-5 col-lg-3">
+			<?= IssueMessagesFormWidget::widget([
+				'form' => $form,
+				'model' => $model->getMessagesModel(),
+			]) ?>
+		</div>
+	</div>
 
 
 	<div class="form-group">

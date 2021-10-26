@@ -59,11 +59,16 @@ use yii\web\View;
 		?>
 	</div>
 
+
 	<?php if ($model->getMessagesModel()): ?>
-		<?= IssueMessagesFormWidget::widget([
-			'form' => $form,
-			'model' => $model->getMessagesModel(),
-		]) ?>
+		<div class="row">
+			<div class="col-md-4">
+				<?= IssueMessagesFormWidget::widget([
+					'form' => $form,
+					'model' => $model->getMessagesModel(),
+				]) ?>
+			</div>
+		</div>
 	<?php endif; ?>
 
 	<div class="form-group">

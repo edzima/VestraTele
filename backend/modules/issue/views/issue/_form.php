@@ -158,12 +158,17 @@ use yii\widgets\ActiveForm;
 			</div>
 		</fieldset>
 
-		<?= $messagesModel
-			? IssueMessagesFormWidget::widget([
-				'form' => $form,
-				'model' => $messagesModel,
-			])
-			: '' ?>
+		<?php if ($messagesModel): ?>
+			<div class="row">
+				<div class="col-md-6 col-lg-3">
+					<?= IssueMessagesFormWidget::widget([
+						'form' => $form,
+						'model' => $messagesModel,
+					]) ?>
+				</div>
+			</div>
+		<?php endif; ?>
+
 
 		<div class="form-group">
 			<?= Html::submitButton('Zapisz', ['class' => 'btn btn-success']) ?>

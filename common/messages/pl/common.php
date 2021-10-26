@@ -69,6 +69,7 @@ return [
 	'Updater' => 'Edytor',
 	'Username' => 'Login',
 	'user' => 'Użytkownik',
+	'Notifications' => 'Powiadomienia',
 	'Username or email' => 'Login lub email',
 	'Website' => 'Strona',
 	'associate_director' => 'Zastępca dyrektora',
