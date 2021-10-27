@@ -212,7 +212,10 @@ class IssueMessagesForm extends MessageModel {
 
 	protected function parseIssue(MessageTemplate $template): void {
 		$template->parseSubject(['issue' => $this->issue->getIssueName()]);
-		$template->parseBody(['issueLink' => $this->getIssueFrontendAbsoluteLink()]);
+		$template->parseBody([
+			'issue' => $this->issue->getIssueName(),
+			'issueLink' => $this->getIssueFrontendAbsoluteLink(),
+		]);
 	}
 
 	protected function getIssueFrontendAbsoluteLink(): string {
