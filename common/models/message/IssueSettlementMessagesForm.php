@@ -4,6 +4,7 @@ namespace common\models\message;
 
 use common\components\message\MessageTemplate;
 use common\components\message\MessageTemplateKeyHelper;
+use common\helpers\Html;
 use common\models\issue\IssueSettlement;
 use Yii;
 
@@ -20,6 +21,13 @@ class IssueSettlementMessagesForm extends IssueMessagesForm {
 
 	protected ?IssueSettlement $settlement = null;
 
+	public function init(): void {
+		parent::init();
+		if ($this->fromNameTemplate === '{appName}') {
+			$this->fromNameTemplate = '{appName} - ' . Yii::t('settlement', 'Settlements');
+		}
+	}
+
 	public function setSettlement(IssueSettlement $settlement) {
 		$this->settlement = $settlement;
 		if ($this->issue === null
@@ -35,8 +43,15 @@ class IssueSettlementMessagesForm extends IssueMessagesForm {
 	}
 
 	protected function parseSettlement(MessageTemplate $template) {
-		$template->parseBody(['settlementLink' => $this->settlement->getFrontendUrl()]);
+		$template->parseBody(['settlementLink' => $this->getSettlementLink()]);
 		$template->parseBody(['settlementValue' => Yii::$app->formatter->asCurrency($this->settlement->getValue())]);
+	}
+
+	protected function getSettlementLink(): string {
+		return Html::a(
+			$this->settlement->getIssueName() . ' - ' . $this->settlement->getTypeName(),
+			$this->settlement->getFrontendUrl()
+		);
 	}
 
 	public function keysParts(): array {
@@ -59,7 +74,7 @@ class IssueSettlementMessagesForm extends IssueMessagesForm {
 	}
 
 	public static function settlementTypeKeyPart(int $type): string {
-		return "type:$type";
+		return "settlementType:$type";
 	}
 
 }

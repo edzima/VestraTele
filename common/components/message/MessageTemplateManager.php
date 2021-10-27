@@ -24,7 +24,7 @@ class MessageTemplateManager extends TemplateManager implements KeyMessageTempla
 		$query->withTranslation($language);
 		$models = $dataProvider->getModels();
 		if (empty($models)) {
-			Yii::warning("Not found templates like key: $key.", 'emailTemplate');
+			Yii::warning("Not found templates like key: '$key'.", 'messageTemplate');
 			return null;
 		}
 		$templates = [];
@@ -44,7 +44,6 @@ class MessageTemplateManager extends TemplateManager implements KeyMessageTempla
 	public function getIssueTypeTemplatesLikeKey(string $key, int $typeId, string $language = null): ?MessageTemplate {
 		$templates = $this->getTemplatesLikeKey($key, $language);
 		if (empty($templates)) {
-			Yii::warning("Not found templates like key: $key for $language.", 'emailTemplate');
 			return null;
 		}
 		foreach ($templates as $templateKey => $template) {
@@ -52,7 +51,7 @@ class MessageTemplateManager extends TemplateManager implements KeyMessageTempla
 				return $template;
 			}
 		}
-		Yii::warning("Not found templates like key: $key for $language for Issue Type ID: $typeId.", 'emailTemplate');
+		Yii::warning("Not found templates like key: $key for $language for Issue Type ID: $typeId.", 'messageTemplate');
 
 		return null;
 	}

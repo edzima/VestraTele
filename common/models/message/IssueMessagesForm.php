@@ -20,7 +20,7 @@ class IssueMessagesForm extends MessageModel {
 	public bool $sendEmailToCustomer = false;
 	public bool $sendEmailToWorkers = false;
 
-	public array $workersTypes = [];
+	public $workersTypes = [];
 
 	public ?int $sms_owner_id = null;
 
@@ -30,10 +30,10 @@ class IssueMessagesForm extends MessageModel {
 		$this->issue = $issue;
 		if (!$this->issue->getIssueModel()->isNewRecord) {
 			$this->workersTypes = array_keys($this->getWorkersUsersTypesNames());
-			$this->sendEmailToWorkers = !empty($this->getIssueUsersEmails());
 			$this->sendSmsToCustomer = $this->customerHasPhone();
 			$this->sendSmsToAgent = $this->agentHasPhones();
 			$this->sendEmailToCustomer = $this->customerHasEmail();
+			$this->sendEmailToWorkers = !empty($this->getIssueUsersEmails());
 		}
 	}
 
@@ -41,9 +41,11 @@ class IssueMessagesForm extends MessageModel {
 		return [
 			[['sendSmsToCustomer', 'sendEmailToCustomer', 'sendSmsToAgent', 'sendEmailToWorkers'], 'boolean'],
 			[
-				'workersTypes', 'required', 'when' => function (): bool {
-				return $this->sendEmailToWorkers && !empty($this->getWorkersUsersTypesNames());
-			},
+				'workersTypes', 'required',
+				'enableClientValidation' => false,
+				'when' => function (): bool {
+					return $this->sendEmailToWorkers && !empty($this->getWorkersUsersTypesNames());
+				},
 			],
 			['workersTypes', 'in', 'range' => array_keys($this->getWorkersUsersTypesNames()), 'allowArray' => true],
 			[
@@ -67,6 +69,7 @@ class IssueMessagesForm extends MessageModel {
 
 	public function pushMessages(): ?int {
 		if (!$this->validate()) {
+			Yii::error($this->getErrors());
 			return false;
 		}
 		return $this->pushCustomerMessages() + $this->pushWorkersMessages();
@@ -199,10 +202,9 @@ class IssueMessagesForm extends MessageModel {
 	public function createSms(array $config = [], MessageTemplate $template = null): IssueSmsForm {
 		$config['class'] = $this->smsClass;
 		/** @var IssueSmsForm $model */
-
 		$model = Yii::createObject($config, [$this->issue]);
 		if ($template) {
-			$model->message = $template->getBody();
+			$model->message = $template->getSmsMessage();
 			$model->note_title = $template->getSubject();
 		}
 		return $model;

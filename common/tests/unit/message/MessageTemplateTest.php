@@ -42,6 +42,14 @@ class MessageTemplateTest extends Unit {
 		]);
 	}
 
+	public function testSmsMessageBreakLine(): void {
+		$template = new MessageTemplate(
+			'Test Subject',
+			'<p>Hello,</p><p>Your issue is Create. <br>Tel us:123-123-123</p>'
+		);
+		$this->tester->assertSame("Hello,\nYour issue is Create. \nTel us:123-123-123", $template->getSmsMessage());
+	}
+
 	public function testLikeKeySearch(): void {
 		$this->fixture->save('test.first');
 		$this->fixture->save('test.double');

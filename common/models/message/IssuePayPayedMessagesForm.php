@@ -8,9 +8,10 @@ use Yii;
 
 class IssuePayPayedMessagesForm extends IssueSettlementMessagesForm {
 
+	public const KEY_PART_PAYMENT = 'part-payment';
 	private IssuePayInterface $pay;
 
-	public bool $withSettlementTypeInKey = false;
+	public bool $isPartPayment = false;
 
 	protected static function mainKeys(): array {
 		return [
@@ -19,6 +20,14 @@ class IssuePayPayedMessagesForm extends IssueSettlementMessagesForm {
 			'pay',
 			'payed',
 		];
+	}
+
+	public function keysParts(): array {
+		$parts = parent::keysParts();
+		if ($this->isPartPayment) {
+			array_unshift($parts, static::KEY_PART_PAYMENT);
+		}
+		return $parts;
 	}
 
 	public function setPay(IssuePayInterface $pay): void {

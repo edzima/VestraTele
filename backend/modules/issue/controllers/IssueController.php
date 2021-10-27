@@ -191,6 +191,7 @@ class IssueController extends Controller {
 			IssueUser::TYPE_TELEMARKETER => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 			IssueUser::TYPE_LAWYER => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
 		];
+		$messagesModel->sms_owner_id = Yii::$app->user->getId();
 		$data = Yii::$app->request->post();
 		if ($model->load($data)
 			&& $model->save()) {

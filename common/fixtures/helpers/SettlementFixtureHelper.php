@@ -12,6 +12,7 @@ use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSettlement;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 class SettlementFixtureHelper extends BaseFixtureHelper {
 
@@ -26,7 +27,7 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 	private const PAY_RECEIVED = 'settlement.pay_received';
 	private const DEFAULT_TYPE = IssueSettlement::TYPE_HONORARIUM;
 
-	private int $lastSettlementId;
+	private ?int $lastSettlementId = null;
 
 	protected static function getDefaultDataDirPath(): string {
 		return Yii::getAlias('@common/tests/_data/settlement/');
@@ -118,6 +119,11 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 	public function havePay(string $value, array $attributes = []): int {
 		$attributes['value'] = $value;
 		if (!isset($attributes['calculation_id'])) {
+			if ($this->lastSettlementId === null) {
+				$settlementAttributes = ArrayHelper::remove($attributes, 'settlement', []);
+				$settlementValue = ArrayHelper::getValue($settlementAttributes, 'value', $value);
+				$this->haveSettlement($settlementValue, $settlementAttributes);
+			}
 			$attributes['calculation_id'] = $this->lastSettlementId;
 		}
 		if (!isset($attributes['vat'])) {

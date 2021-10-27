@@ -5,13 +5,14 @@ namespace common\tests\unit\message;
 use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssueInterface;
-use common\models\issue\IssuePay;
 use common\models\issue\IssuePayInterface;
+use common\models\issue\IssueSettlement;
 use common\models\issue\IssueUser;
 use common\models\message\IssuePayPayedMessagesForm;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\swiftmailer\Message;
+use ymaker\email\templates\entities\EmailTemplate;
 
 /**
  * @property IssuePayPayedMessagesForm $model
@@ -20,30 +21,108 @@ class IssuePayPayedMessagesFormTest extends BaseIssueMessagesFormTest {
 
 	protected const MODEL_CLASS = IssuePayPayedMessagesForm::class;
 	protected const MESSAGE_TEMPLATE_FIXTURE_DIR = MessageTemplateFixtureHelper::DIR_ISSUE_PAY_PAYED;
+	protected const DEFAULT_PAY_VALUE = 1023;
+
+	private SettlementFixtureHelper $settlementFixtureHelper;
 
 	private ?IssuePayInterface $pay = null;
+
+	public function _before() {
+		parent::_before();
+		$this->settlementFixtureHelper = new SettlementFixtureHelper($this->tester);
+	}
 
 	public function _fixtures(): array {
 		return array_merge(
 			parent::_fixtures(),
 			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::owner(),
 			SettlementFixtureHelper::pay()
 		);
 	}
 
 	public function testPayValue(): void {
-		$this->givePay(['calculation_id' => 1]);
 		$this->giveModel();
 		$email = $this->model->getEmailToCustomer();
 		$this->tester->assertNotNull($email);
-		$this->tester->assertMessageBodyContainsString(Yii::$app->formatter->asCurrency($this->pay->getValue()), $email);
-
+		$this->tester->assertMessageBodyContainsString($this->getFormattedPayValue(), $email);
 		$email = $this->model->getEmailToWorkers();
 		$this->tester->assertNotNull($email);
-		$this->tester->assertMessageBodyContainsString(Yii::$app->formatter->asCurrency($this->pay->getValue()), $email);
+		$this->tester->assertMessageBodyContainsString($this->getFormattedPayValue(), $email);
+	}
+
+	public function testPartPaymentCustomerSms(): void {
+		$this->giveModel();
+		$this->model->isPartPayment = true;
+		$smsPart = $this->model->getSmsToCustomer();
+		$this->tester->assertNotNull($smsPart);
+
+		$this->model->isPartPayment = false;
+		$smsNotPart = $this->model->getSmsToCustomer();
+		$this->tester->assertNotSame($smsPart->message, $smsNotPart->message);
+	}
+
+	/**
+	 * @dataProvider keysProvider
+	 * @param string $generated
+	 * @param string $expected
+	 */
+	public function testKeys(string $generated, string $expected): void {
+		$this->tester->assertSame($expected, $generated);
+	}
+
+	public function keysProvider(): array {
+		return [
+			'Customer Email for Honorarium With Issue Types as List' => [
+				IssuePayPayedMessagesForm::generateKey(
+					IssuePayPayedMessagesForm::TYPE_EMAIL,
+					IssuePayPayedMessagesForm::keyCustomer(),
+					[1, 2],
+					IssueSettlement::TYPE_HONORARIUM,
+				),
+				'email.issue.settlement.pay.payed.customer.settlementType:30.issueTypes:1,2',
+			],
+			'Customer SMS for Part Payed Honorarium With Issue Types as List' => [
+				IssuePayPayedMessagesForm::generateKey(
+					IssuePayPayedMessagesForm::TYPE_SMS,
+					IssuePayPayedMessagesForm::keyCustomer([IssuePayPayedMessagesForm::KEY_PART_PAYMENT]),
+					[1, 2],
+					IssueSettlement::TYPE_HONORARIUM,
+				),
+				'sms.issue.settlement.pay.payed.customer.part-payment.settlementType:30.issueTypes:1,2',
+			],
+			'Customer Email for Honorarium Without Issue Types' => [
+				IssuePayPayedMessagesForm::generateKey(
+					IssuePayPayedMessagesForm::TYPE_EMAIL,
+					IssuePayPayedMessagesForm::keyCustomer(),
+					[],
+					IssueSettlement::TYPE_HONORARIUM,
+				),
+				'email.issue.settlement.pay.payed.customer.settlementType:30',
+			],
+			'Workers Email for Honorarium With Issue Types as List' => [
+				IssuePayPayedMessagesForm::generateKey(
+					IssuePayPayedMessagesForm::TYPE_EMAIL,
+					IssuePayPayedMessagesForm::keyWorkers(),
+					[1, 2],
+					IssueSettlement::TYPE_HONORARIUM,
+				),
+				'email.issue.settlement.pay.payed.workers.settlementType:30.issueTypes:1,2',
+			],
+			'Workers Email for Honorarium Without Issue Types' => [
+				IssuePayPayedMessagesForm::generateKey(
+					IssuePayPayedMessagesForm::TYPE_EMAIL,
+					IssuePayPayedMessagesForm::keyWorkers(),
+					[],
+					IssueSettlement::TYPE_HONORARIUM,
+				),
+				'email.issue.settlement.pay.payed.workers.settlementType:30',
+			],
+		];
 	}
 
 	public function testEmailToCustomer(): void {
+		codecept_debug(EmailTemplate::find()->select('key')->column());
 		$this->giveModel();
 		$this->model->sendSmsToCustomer = false;
 		$this->tester->assertTrue((bool) $this->model->pushCustomerMessages());
@@ -97,6 +176,10 @@ class IssuePayPayedMessagesFormTest extends BaseIssueMessagesFormTest {
 	}
 
 	protected function givePay(array $config = []): void {
-		$this->pay = $this->tester->grabRecord(IssuePay::class, $config);
+		$value = ArrayHelper::getValue($config, 'value', static::DEFAULT_PAY_VALUE);
+		$this->pay = $this->settlementFixtureHelper->findPay(
+			$this->settlementFixtureHelper->havePay($value, $config)
+		);
 	}
+
 }

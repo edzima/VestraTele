@@ -21,8 +21,8 @@ return [
 	],
 	[
 		'templateId' => 4,
-		'subject' => 'Sms. New Issue (TYPE_1) for Worker.',
-		'body' => 'New Issue. Customer: {customerName} - {customerPhone}',
+		'subject' => 'Sms. New Settlement Honorarium for Issue (TYPE_1) for Worker.',
+		'body' => 'New Honorarium Settlement. Customer: {customerName} - {customerPhone}. Value: {settlementValue}',
 		'language' => 'en-US',
 	],
 	[

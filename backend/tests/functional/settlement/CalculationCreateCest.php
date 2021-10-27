@@ -67,7 +67,7 @@ class CalculationCreateCest {
 			'value' => 123,
 		]);
 		$I->seeEmailIsSent(2);
-		$I->seeJobIsPushed(2);
+		$I->seeJobIsPushed(1);
 	}
 
 	public function checkCreateWithoutSendEmailToWorker(CreateCalculationIssueManager $I): void {
@@ -104,7 +104,7 @@ class CalculationCreateCest {
 		$I->uncheckOption('#issuesettlementcreatemessagesform-sendsmstocustomer');
 		$I->selectOption('Provider', IssuePayCalculation::PROVIDER_CLIENT);
 		$I->click('Save');
-		$I->seeJobIsPushed(1);
+		$I->seeJobIsPushed(0);
 	}
 
 	public function checkCreateWithoutSendSms(CreateCalculationIssueManager $I): void {

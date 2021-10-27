@@ -31,4 +31,10 @@ return [
 		'body' => 'Pay Payed: {payValue}. Customer: {customerName} - {customerPhone}. Details: {settlementLink}',
 		'language' => 'en-US',
 	],
+	[
+		'templateId' => 6,
+		'subject' => 'Sms About Not Full Payed Pay(TYPE_1) for Customer.',
+		'body' => 'Part Pay Payed: {payValue}. Your Agent: {agentName} - {agentPhone}',
+		'language' => 'en-US',
+	],
 ];

@@ -83,10 +83,10 @@ class PayPayedForm extends Model {
 		}
 		$message = $this->getMessagesModel();
 		$message->sms_owner_id = $smsOwnerId;
+		$message->isPartPayment = $this->wasDivider();
 		return $message->pushMessages() > 0;
 	}
 
-	//@todo What message for not Full Payment.
 	public function getMessagesModel(): IssuePayPayedMessagesForm {
 		if ($this->_messagesForm === null) {
 			$this->_messagesForm = new IssuePayPayedMessagesForm();

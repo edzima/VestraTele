@@ -46,7 +46,7 @@ abstract class MessageModel extends Model {
 		 */
 		$model = Yii::createObject($config);
 		if ($template) {
-			$model->message = $template->getBody();
+			$model->message = $template->getSmsMessage();
 		}
 		return $model;
 	}
