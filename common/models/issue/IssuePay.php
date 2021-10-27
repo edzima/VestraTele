@@ -60,7 +60,6 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 	public function rules(): array {
 		return [
 			[['value', 'deadline_at', 'transfer_type', 'vat'], 'required', 'enableClientValidation' => false],
-			[['transfer_type'], 'integer'],
 			[['pay_at', 'deadline_at'], 'safe'],
 			[['value', 'vat'], 'number', 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/', 'enableClientValidation' => false],
 			['vat', 'number', 'min' => 0, 'max' => 100],

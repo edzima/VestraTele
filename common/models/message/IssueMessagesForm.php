@@ -203,6 +203,7 @@ class IssueMessagesForm extends MessageModel {
 		$config['class'] = $this->smsClass;
 		/** @var IssueSmsForm $model */
 		$model = Yii::createObject($config, [$this->issue]);
+		$model->removeSpecialCharacters = false;
 		if ($template) {
 			$model->message = $template->getSmsMessage();
 			$model->note_title = $template->getSubject();
