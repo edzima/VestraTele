@@ -3,7 +3,9 @@
 namespace console\controllers;
 
 use backend\modules\settlement\models\AdministrativeCalculationForm;
+use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
+use common\models\message\IssuePayDelayedMessagesForm;
 use Yii;
 use yii\console\Controller;
 use yii\helpers\Console;
@@ -26,6 +28,19 @@ class SettlementController extends Controller {
 				$administrative->save();
 				Yii::$app->provisions->removeForPays($model->getPays()->getIds());
 			}
+		}
+	}
+
+	public function actionDelayedPays(int $days): void {
+		$models = IssuePay::find()
+			->onlyDelayed($days)
+			->joinWith('calculation')
+			->all();
+
+		foreach ($models as $model) {
+			$message = new IssuePayDelayedMessagesForm();
+			$message->setPay($model);
+			$message->pushMessages();
 		}
 	}
 }

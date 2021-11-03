@@ -9,7 +9,6 @@ use Yii;
 class IssuePayPayedMessagesForm extends IssueSettlementMessagesForm {
 
 	public const KEY_PART_PAYMENT = 'part-payment';
-	private IssuePayInterface $pay;
 
 	public bool $isPartPayment = false;
 
@@ -30,21 +29,4 @@ class IssuePayPayedMessagesForm extends IssueSettlementMessagesForm {
 		return $parts;
 	}
 
-	public function setPay(IssuePayInterface $pay): void {
-		$this->pay = $pay;
-		if ($this->settlement === null || $this->settlement->getId() !== $pay->calculation->getId()) {
-			$this->setSettlement($pay->calculation);
-		}
-	}
-
-	protected function parseTemplate(MessageTemplate $template): void {
-		parent::parseTemplate($template);
-		$this->parsePay($template);
-	}
-
-	protected function parsePay(MessageTemplate $template) {
-		$value = Yii::$app->formatter->asCurrency($this->pay->getValue());
-		$template->parseSubject(['payValue' => $value]);
-		$template->parseBody(['payValue' => $value]);
-	}
 }

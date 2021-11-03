@@ -36,7 +36,7 @@ class IssuePayCalculationGrid extends GridView {
 
 	public $userProvisionsId = null;
 
-	public string $valueTypeIssueType = IssueTypeColumn::VALUE_SHORT;
+	public string $valueTypeIssueType = IssueTypeColumn::VALUE_NAME;
 
 	public bool $withAgent = true;
 

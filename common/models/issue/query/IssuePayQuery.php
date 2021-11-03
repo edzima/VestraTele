@@ -38,10 +38,14 @@ class IssuePayQuery extends ActiveQuery {
 		return $this;
 	}
 
-	public function onlyDelayed(): self {
+	public function onlyDelayed(int $days = null): self {
 		[, $alias] = $this->getTableNameAndAlias();
 		$this->onlyUnpaid();
-		$this->andWhere(['<=', $alias . '.deadline_at', date('Y-m-d')]);
+		if ($days === null) {
+			$this->andWhere(['<=', $alias . '.deadline_at', date('Y-m-d')]);
+		} else {
+			$this->andWhere(['=', new Expression("DATEDIFF(CURDATE(), $alias.deadline_at)"), $days]);
+		}
 		return $this;
 	}
 
