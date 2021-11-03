@@ -83,6 +83,8 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 	public const PERMISSION_CALCULATION_PAYS = 'calculation.pays';
 
 	public const PERMISSION_PAY = 'pay';
+	public const PERMISSION_PAY_UPDATE = 'pay.update';
+	public const PERMISSION_PAY_PAID = 'pay.paid';
 	public const PERMISSION_PAY_RECEIVED = 'pay.received';
 	public const PERMISSION_PAYS_DELAYED = 'pays.delayed';
 	public const PERMISSION_PAY_PART_PAYED = 'pay.part-payed';

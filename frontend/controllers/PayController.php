@@ -2,8 +2,10 @@
 
 namespace frontend\controllers;
 
+use common\components\provision\exception\MissingProvisionUserException;
+use common\helpers\Flash;
 use common\models\issue\IssuePay;
-use common\models\user\User;
+use common\models\settlement\PayPayedForm;
 use common\models\user\Worker;
 use frontend\helpers\Url;
 use frontend\models\search\IssuePaySearch;
@@ -24,7 +26,18 @@ class PayController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
+						'actions' => ['index', 'pay-provisions'],
 						'roles' => [Worker::PERMISSION_ISSUE],
+					],
+					[
+						'allow' => true,
+						'actions' => ['update'],
+						'roles' => [Worker::PERMISSION_PAY_UPDATE],
+					],
+					[
+						'allow' => true,
+						'actions' => ['pay'],
+						'roles' => [Worker::PERMISSION_PAY_PAID],
 					],
 				],
 			],
@@ -68,8 +81,8 @@ class PayController extends Controller {
 
 			$userId = Yii::$app->user->getId();
 			if ($model->calculation->issue->isForUser($userId)
-				||$model->calculation->issue->isForAgents(Yii::$app->userHierarchy->getAllChildesIds($userId))
-			){
+				|| $model->calculation->issue->isForAgents(Yii::$app->userHierarchy->getAllChildesIds($userId))
+			) {
 				$query = $model->getProvisions()
 					->joinWith('toUser.userProfile')
 					->joinWith('fromUser.userProfile')
@@ -82,9 +95,60 @@ class PayController extends Controller {
 					'dataProvider' => $dataProvider,
 				]);
 			}
-
 		}
 		return '<div class="alert alert-danger">No data found</div>';
+	}
+
+	public function actionPay(int $id) {
+		$pay = $this->findModel($id);
+		if ($pay->isPayed()) {
+			Flash::add(
+				Flash::TYPE_WARNING,
+				Yii::t('settlement', 'The payment: {value} has already been paid.', [
+					'value' => Yii::$app->formatter->asCurrency($pay->getValue()),
+				]));
+
+			return $this->redirect(\backend\helpers\Url::previous());
+		}
+		$model = new PayPayedForm($this->findModel($id));
+		$model->date = date('Y-m-d');
+		if ($model->load(Yii::$app->request->post()) && $model->pay()) {
+			$generated = $model->getGeneratedPay();
+			if ($generated !== null) {
+				Flash::add(Flash::TYPE_WARNING,
+					Yii::t('settlement', 'An incomplete: {value} has been paid.', [
+						'value' => Yii::$app->formatter->asCurrency($model->value),
+					])
+				);
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'Generate new payment: {value}.', [
+						'value' => Yii::$app->formatter->asCurrency($generated->getValue()),
+					])
+				);
+				Yii::$app->provisions->removeForPays([$pay->calculation->getPays()->getIds()]);
+				try {
+					Yii::$app->provisions->settlement($pay->calculation);
+				} catch (MissingProvisionUserException $exception) {
+
+				}
+			} else {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'The payment: {value} marked as paid.', [
+						'value' => Yii::$app->formatter->asCurrency($pay->getValue()),
+					]));
+			}
+
+			if ($model->pushMessages(Yii::$app->user->getId())) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'Send Messages about Payed Pay.')
+				);
+			}
+
+			return $this->redirect(Url::previous());
+		}
+		return $this->render('pay', [
+			'model' => $model,
+		]);
 	}
 
 	private function findModel(int $id): IssuePay {

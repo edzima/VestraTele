@@ -141,7 +141,8 @@ class IssuePayGrid extends GridView {
 			'template' => '{pay} {status} {received} {update} {delete}',
 			'visibleButtons' => [
 				'pay' => function (PayInterface $pay): bool {
-					return !$pay->isPayed() && $this->payRoute !== null;
+					return !$pay->isPayed()
+						&& $this->payRoute !== null;
 				},
 				'update' => $this->updateRoute !== null,
 				'status' => function (PayInterface $pay): bool {

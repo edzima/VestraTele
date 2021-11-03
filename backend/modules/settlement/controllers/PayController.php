@@ -156,7 +156,7 @@ class PayController extends Controller {
 						'value' => Yii::$app->formatter->asCurrency($generated->getValue()),
 					])
 				);
-				Yii::$app->provisions->removeForPays([$pay->getId()]);
+				Yii::$app->provisions->removeForPays([$pay->calculation->getPays()->getIds()]);
 				try {
 					Yii::$app->provisions->settlement($pay->calculation);
 				} catch (MissingProvisionUserException $exception) {
