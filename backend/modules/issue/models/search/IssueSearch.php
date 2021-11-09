@@ -23,6 +23,8 @@ class IssueSearch extends BaseIssueSearch {
 
 	public $parentId;
 	public $excludedStages = [];
+	public $onlyWithSettlements;
+
 	public bool $onlyDelayed = false;
 	public bool $onlyWithPayedPay = false;
 	public ?string $signature_act = null;
@@ -88,6 +90,7 @@ class IssueSearch extends BaseIssueSearch {
 		$this->teleFilter($query);
 		$this->lawyerFilter($query);
 		$this->payedFilter($query);
+		$this->settlementsFilter($query);
 	}
 
 	private function signatureActFilter(IssueQuery $query): void {

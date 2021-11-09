@@ -32,12 +32,6 @@ class IssuePayQuery extends ActiveQuery {
 		return parent::one($db);
 	}
 
-	public function onlyUnpaid(): self {
-		[, $alias] = $this->getTableNameAndAlias();
-		$this->andWhere("$alias.pay_at IS NULL");
-		return $this;
-	}
-
 	public function onlyDelayed(int $days = null): self {
 		[, $alias] = $this->getTableNameAndAlias();
 		$this->onlyUnpaid();
@@ -65,6 +59,12 @@ class IssuePayQuery extends ActiveQuery {
 	public function onlyNotDelayed(): self {
 		[, $alias] = $this->getTableNameAndAlias();
 		$this->andWhere(['>=', $alias . '.deadline_at', date('Y-m-d')]);
+		return $this;
+	}
+
+	public function onlyUnpaid(): self {
+		[, $alias] = $this->getTableNameAndAlias();
+		$this->andWhere("$alias.pay_at IS NULL");
 		return $this;
 	}
 

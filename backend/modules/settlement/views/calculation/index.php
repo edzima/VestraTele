@@ -25,11 +25,17 @@ $this->params['breadcrumbs'][] = $this->title;
 			: ''
 		?>
 
-
 		<?= Yii::$app->user->can(User::PERMISSION_COST)
 			? Html::a(Yii::t('backend', 'Costs'), ['/settlement/cost/index'], ['class' => 'btn btn-warning'])
 			: ''
 		?>
+
+
+		<?= Yii::$app->user->can(User::PERMISSION_PAY)
+			? Html::a(Yii::t('settlement', 'Pays'), ['/settlement/pay/index'], ['class' => 'btn btn-primary'])
+			: ''
+		?>
+
 
 
 		<?= Yii::$app->user->can(User::PERMISSION_PROVISION)

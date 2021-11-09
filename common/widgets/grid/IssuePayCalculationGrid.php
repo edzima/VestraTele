@@ -205,6 +205,12 @@ class IssuePayCalculationGrid extends GridView {
 				},
 			],
 			[
+				'attribute' => 'created_at',
+				'format' => 'date',
+				'noWrap' => true,
+				'visible' => $this->withDates,
+			],
+			[
 				'attribute' => 'updated_at',
 				'format' => 'date',
 				'noWrap' => true,
