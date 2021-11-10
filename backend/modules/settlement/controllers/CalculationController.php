@@ -200,7 +200,7 @@ class CalculationController extends Controller {
 	 */
 	public function actionUpdate(int $id) {
 		$calculation = $this->findModel($id);
-		if (!Yii::$app->user->can(User::ROLE_BOOKKEEPER)
+		if (!Yii::$app->user->can(User::PERMISSION_CALCULATION_UPDATE)
 			&& $calculation->owner_id !== Yii::$app->user->getId()) {
 			throw new ForbiddenHttpException(Yii::t('backend', 'Only bookkeeper or owner can update settlement.'));
 		}

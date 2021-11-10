@@ -46,6 +46,9 @@ class RbacController extends Controller {
 		Worker::PERMISSION_CALCULATION_TO_CREATE => [
 			Worker::ROLE_BOOKKEEPER,
 		],
+		Worker::PERMISSION_CALCULATION_UPDATE => [
+			Worker::ROLE_BOOKKEEPER,
+		],
 		Worker::PERMISSION_CALCULATION_PAYS => [
 			Worker::ROLE_BOOKKEEPER,
 		],
