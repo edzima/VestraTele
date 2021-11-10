@@ -55,10 +55,10 @@ class LogSearch extends Log {
 			'id' => $this->id,
 			'level' => $this->level,
 			'log_time' => $this->log_time,
-			'message' => $this->message,
 		]);
 
 		$query->andFilterWhere(['like', 'category', $this->category])
+			->andFilterWhere(['like', 'message', $this->message])
 			->andFilterWhere(['like', 'prefix', $this->prefix]);
 
 		return $dataProvider;
