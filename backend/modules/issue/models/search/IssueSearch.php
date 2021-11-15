@@ -148,15 +148,6 @@ class IssueSearch extends BaseIssueSearch {
 		}
 	}
 
-	public function getAgentsNames(): array {
-		if (empty($this->parentId) || $this->parentId < 0) {
-			return parent::getAgentsNames();
-		}
-		$ids = Yii::$app->userHierarchy->getAllChildesIds($this->parentId);
-		$ids[] = $this->parentId;
-		return User::getSelectList($ids, false);
-	}
-
 	private function payedFilter(IssueQuery $query): void {
 		if ($this->onlyWithPayedPay) {
 			$query->joinWith([
@@ -166,6 +157,28 @@ class IssueSearch extends BaseIssueSearch {
 			])
 				->groupBy(Issue::tableName() . '.id');
 		}
+	}
+
+	private function settlementsFilter(IssueQuery $query): void {
+		if ($this->onlyWithSettlements === null || $this->onlyWithSettlements === '') {
+			return;
+		}
+		$query->joinWith('payCalculations PC', false);
+
+		if ($this->onlyWithSettlements === true) {
+			$query->andWhere('PC.issue_id IS NOT NULL');
+			return;
+		}
+		$query->andWhere('PC.issue_id IS NULL');
+	}
+
+	public function getAgentsNames(): array {
+		if (empty($this->parentId) || $this->parentId < 0) {
+			return parent::getAgentsNames();
+		}
+		$ids = Yii::$app->userHierarchy->getAllChildesIds($this->parentId);
+		$ids[] = $this->parentId;
+		return User::getSelectList($ids, false);
 	}
 
 }
