@@ -80,15 +80,15 @@ class IssuePayCalculationSearchTest extends Unit {
 	public function testIssue(): void {
 		$this->model->issue_id = 1;
 
-		$models = $this->getModels(['issue_id' => 1]);
+		$models = $this->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
 			$this->tester->assertSame(1, $model->getIssueId());
 		}
 
-		$this->model->issue_id = 2;
+		$this->model->issue_id = 3;
 
-		$models = $this->getModels(['issue_id' => 2]);
+		$models = $this->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
 			$this->tester->assertSame(2, $model->getIssueId());
