@@ -91,7 +91,7 @@ class IssuePayCalculationSearchTest extends Unit {
 		$models = $this->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
-			$this->tester->assertSame(2, $model->getIssueId());
+			$this->tester->assertSame(3, $model->getIssueId());
 		}
 	}
 
