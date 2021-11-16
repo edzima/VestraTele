@@ -6,9 +6,9 @@ use common\components\message\MessageTemplate;
 use common\models\issue\IssuePayInterface;
 use Yii;
 
-class IssuePayPayedMessagesForm extends IssueSettlementMessagesForm {
+class IssuePayPayedMessagesForm extends IssuePayMessagesForm {
 
-	public const KEY_PART_PAYMENT = 'part-payment';
+	public const KEY_PART_PAYMENT = 'partPayment';
 
 	public bool $isPartPayment = false;
 

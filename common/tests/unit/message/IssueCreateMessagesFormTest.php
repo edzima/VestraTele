@@ -2,6 +2,7 @@
 
 namespace common\tests\unit\message;
 
+use common\components\message\MessageTemplateKeyHelper;
 use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\models\issue\IssueUser;
 use common\models\message\IssueCreateMessagesForm;
@@ -11,6 +12,26 @@ class IssueCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 	protected const MODEL_CLASS = IssueCreateMessagesForm::class;
 
 	protected const MESSAGE_TEMPLATE_FIXTURE_DIR = MessageTemplateFixtureHelper::DIR_ISSUE_CREATE;
+
+	public function keysProvider(): array {
+		return [
+			'SMS Customer Without Issue Types' => [
+				IssueCreateMessagesForm::generateKey(
+					IssueCreateMessagesForm::TYPE_SMS,
+					IssueCreateMessagesForm::keyCustomer(),
+				),
+				'sms.issue.create.customer',
+			],
+			'SMS Customer With Issue Types' => [
+				IssueCreateMessagesForm::generateKey(
+					IssueCreateMessagesForm::TYPE_SMS,
+					IssueCreateMessagesForm::keyCustomer(),
+					[1, 2]
+				),
+				'sms.issue.create.customer.' . MessageTemplateKeyHelper::issueTypesKeyPart([1, 2]),
+			],
+		];
+	}
 
 	public function testCustomerSmsWithIssueType1(): void {
 		$this->giveIssue(1);

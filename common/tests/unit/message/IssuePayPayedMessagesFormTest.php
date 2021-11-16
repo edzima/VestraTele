@@ -62,15 +62,6 @@ class IssuePayPayedMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->tester->assertNotSame($smsPart->message, $smsNotPart->message);
 	}
 
-	/**
-	 * @dataProvider keysProvider
-	 * @param string $generated
-	 * @param string $expected
-	 */
-	public function testKeys(string $generated, string $expected): void {
-		$this->tester->assertSame($expected, $generated);
-	}
-
 	public function keysProvider(): array {
 		return [
 			'Customer Email for Honorarium With Issue Types as List' => [
@@ -89,7 +80,7 @@ class IssuePayPayedMessagesFormTest extends BaseIssueMessagesFormTest {
 					[1, 2],
 					IssueSettlement::TYPE_HONORARIUM,
 				),
-				'sms.issue.settlement.pay.payed.customer.part-payment.settlementType:30.issueTypes:1,2',
+				'sms.issue.settlement.pay.payed.customer.partPayment.settlementType:30.issueTypes:1,2',
 			],
 			'Customer Email for Honorarium Without Issue Types' => [
 				IssuePayPayedMessagesForm::generateKey(
@@ -122,7 +113,6 @@ class IssuePayPayedMessagesFormTest extends BaseIssueMessagesFormTest {
 	}
 
 	public function testEmailToCustomer(): void {
-		codecept_debug(EmailTemplate::find()->select('key')->column());
 		$this->giveModel();
 		$this->model->sendSmsToCustomer = false;
 		$this->tester->assertTrue((bool) $this->model->pushCustomerMessages());
@@ -151,7 +141,13 @@ class IssuePayPayedMessagesFormTest extends BaseIssueMessagesFormTest {
 		 */
 		$this->tester->assertTrue(array_key_exists($this->pay->calculation->getIssueModel()->agent->email, $email->getTo()));
 		$this->tester->assertTrue(array_key_exists($this->pay->calculation->getIssueModel()->tele->email, $email->getTo()));
-		$this->tester->assertSame('Email. Pay Payed: ' . $this->getFormattedPayValue() . ' 1/10/2021 (All types) for Worker.', $email->getSubject());
+		$this->tester->assertSame(
+			'Email. Pay Payed: '
+			. $this->getFormattedPayValue()
+			. ' ' . $this->pay->calculation->getIssueName()
+			. ' (All types) for Worker.',
+			$email->getSubject()
+		);
 		$this->tester->assertMessageBodyContainsString(
 			$this->pay->calculation->getFrontendUrl(),
 			$email

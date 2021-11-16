@@ -10,6 +10,8 @@ use Yii;
 
 class IssueSettlementMessagesForm extends IssueMessagesForm {
 
+	public const KEY_SETTLEMENT_TYPE = 'settlementType';
+
 	protected static function mainKeys(): array {
 		return [
 			'issue',
@@ -57,7 +59,7 @@ class IssueSettlementMessagesForm extends IssueMessagesForm {
 	public function keysParts(): array {
 		$parts = parent::keysParts();
 		if ($this->withSettlementTypeInKey) {
-			$parts[] = static::settlementTypeKeyPart($this->settlement->getType());
+			$parts[static::KEY_SETTLEMENT_TYPE] = $this->settlement->getType();
 		}
 		return $parts;
 	}
@@ -65,16 +67,12 @@ class IssueSettlementMessagesForm extends IssueMessagesForm {
 	public static function generateKey(string $type, string $key, ?array $issueTypesIds = null, ?int $settlementType = null): string {
 		$parts = array_merge((array) $type, static::mainKeys(), (array) $key);
 		if ($settlementType !== null) {
-			$parts[] = static::settlementTypeKeyPart($settlementType);
+			$parts[static::KEY_SETTLEMENT_TYPE] = $settlementType;
 		}
 		if (!empty($issueTypesIds)) {
 			$parts[] = MessageTemplateKeyHelper::issueTypesKeyPart($issueTypesIds);
 		}
 		return MessageTemplateKeyHelper::generateKey($parts);
-	}
-
-	public static function settlementTypeKeyPart(int $type): string {
-		return "settlementType:$type";
 	}
 
 }

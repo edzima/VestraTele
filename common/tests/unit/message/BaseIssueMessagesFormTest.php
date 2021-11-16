@@ -14,7 +14,7 @@ use common\tests\unit\Unit;
 use Yii;
 use yii\base\Model;
 
-class BaseIssueMessagesFormTest extends Unit {
+abstract class BaseIssueMessagesFormTest extends Unit {
 
 	use UnitModelTrait;
 
@@ -40,6 +40,17 @@ class BaseIssueMessagesFormTest extends Unit {
 			MessageTemplateFixtureHelper::fixture(static::MESSAGE_TEMPLATE_FIXTURE_DIR),
 		);
 	}
+
+	/**
+	 * @dataProvider keysProvider
+	 * @param string $generated
+	 * @param string $expected
+	 */
+	public function testKeys(string $generated, string $expected): void {
+		$this->tester->assertSame($expected, $generated);
+	}
+
+	abstract public function keysProvider(): array;
 
 	public function testNotWorkersIssueUsersTypes(): void {
 		$this->giveModel();

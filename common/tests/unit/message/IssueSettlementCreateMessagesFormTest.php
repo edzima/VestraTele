@@ -28,12 +28,35 @@ class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 
 	private ?IssueSettlement $settlement = null;
 
+	public function keysProvider(): array {
+		return [
+			'SMS Customer With Settlement Type and Issue Type' => [
+				IssueSettlementCreateMessagesForm::generateKey(
+					IssueSettlementCreateMessagesForm::TYPE_SMS,
+					IssueSettlementCreateMessagesForm::keyCustomer(),
+					[1, 2],
+					IssueSettlement::TYPE_HONORARIUM,
+				),
+				'sms.issue.settlement.create.customer.settlementType:30.issueTypes:1,2',
+			],
+			'SMS Workers With Settlement Type and Issue Type' => [
+				IssueSettlementCreateMessagesForm::generateKey(
+					IssueSettlementCreateMessagesForm::TYPE_SMS,
+					IssueSettlementCreateMessagesForm::keyWorkers(),
+					[1, 2],
+					IssueSettlement::TYPE_HONORARIUM,
+				),
+				'sms.issue.settlement.create.workers.settlementType:30.issueTypes:1,2',
+			],
+		];
+	}
+
 	public function testDefaultCustomerSms(): void {
 		$this->giveIssue();
 		$this->giveModel();
 
 		$sms = $this->model->getSmsToCustomer();
-		$this->tester->assertSame('Sms About Create Honoarium Settlement in Issue(TYPE_1) for Customer.', $sms->note_title);
+		$this->tester->assertSame('Sms About Create Honorarium Settlement in Issue(TYPE_1) for Customer.', $sms->note_title);
 	}
 
 	public function testSettlementLinkInEmails(): void {
@@ -135,4 +158,5 @@ class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 		$config['id'] = 1000;
 		$this->settlement = new IssuePayCalculation($config);
 	}
+
 }

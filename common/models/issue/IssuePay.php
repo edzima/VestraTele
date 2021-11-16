@@ -21,12 +21,12 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property int $calculation_id
- * @property string $pay_at
- * @property string $deadline_at
- * @property string $value
- * @property string|null $transfer_type
- * @property string $vat
  * @property int $status
+ * @property string $value
+ * @property string|null $vat
+ * @property string|null $pay_at
+ * @property string|null $deadline_at
+ * @property string|null $transfer_type
  *
  * @todo replace with valueWithoutVAT
  * @property-read float $valueNetto
@@ -106,7 +106,7 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 		if ($this->isPayed() || $this->getDeadlineAt() === null) {
 			return false;
 		}
-		return new DateTime($range) > $this->getDeadlineAt();
+		return (new DateTime($range)) > $this->getDeadlineAt();
 	}
 
 	public function setPay(PayInterface $pay): void {
@@ -225,5 +225,9 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 
 	public function getSettlementId(): int {
 		return $this->calculation_id;
+	}
+
+	public function getStatus(): ?int {
+		return $this->status;
 	}
 }

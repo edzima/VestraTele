@@ -13,6 +13,9 @@ use yii\mail\MessageInterface;
 
 class IssueMessagesForm extends MessageModel {
 
+	protected const KEY_CUSTOMER = 'customer';
+	protected const KEY_WORKERS = 'workers';
+
 	public string $smsClass = IssueSmsForm::class;
 
 	public bool $sendSmsToCustomer = false;
@@ -311,12 +314,12 @@ class IssueMessagesForm extends MessageModel {
 	}
 
 	public static function keyCustomer(array $parts = []): string {
-		array_unshift($parts, 'customer');
+		array_unshift($parts, static::KEY_CUSTOMER);
 		return MessageTemplateKeyHelper::generateKey($parts);
 	}
 
 	public static function keyWorkers(array $parts = []): string {
-		array_unshift($parts, 'workers');
+		array_unshift($parts, static::KEY_WORKERS);
 		return MessageTemplateKeyHelper::generateKey($parts);
 	}
 

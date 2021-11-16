@@ -10,4 +10,6 @@ interface PayInterface extends TransferType, PayedInterface {
 
 	public function getVAT(): ?Decimal;
 
+	public function getStatus(): ?int;
+
 }

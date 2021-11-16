@@ -5,7 +5,9 @@ namespace console\models;
 use common\models\issue\IssuePay;
 use common\models\issue\IssueUser;
 use common\models\message\IssuePayDelayedMessagesForm;
+use common\models\settlement\PayInterface;
 use Yii;
+use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 
@@ -21,21 +23,9 @@ class DemandForPayment extends Model {
 		self::WHICH_THIRD,
 	];
 
+	public ?int $smsOwnerId = null;
 	public ?int $delayedDays = null;
 	public string $which = '';
-
-	private array $pays = [];
-	private IssuePay $pay;
-
-	public function rules(): array {
-		return [
-			['which', 'required'],
-			['which', 'string'],
-			['which', 'in', 'range' => static::WHICH_AVAILABLE],
-			['delayedDays', 'integer', 'min' => 0],
-			['delayedDays', 'default', 'value' => null],
-		];
-	}
 
 	public array $messageConfig = [
 		'class' => IssuePayDelayedMessagesForm::class,
@@ -44,25 +34,58 @@ class DemandForPayment extends Model {
 		'workersTypes' => [IssueUser::TYPE_AGENT],
 	];
 
-	public function markAll(): ?int {
+	private array $pays = [];
+	private IssuePay $pay;
+
+	public function rules(): array {
+		return [
+			[['which', '!smsOwnerId'], 'required'],
+			['which', 'string'],
+			['which', 'in', 'range' => static::WHICH_AVAILABLE],
+			['delayedDays', 'integer', 'min' => 0],
+			['delayedDays', 'default', 'value' => null],
+		];
+	}
+
+	public function markMultiple(array $pays = []): ?int {
 		if (!$this->validate()) {
 			return false;
 		}
+		if (empty($pays)) {
+			$pays = $this->getPays();
+		}
 		$count = 0;
-		foreach ($this->getPays() as $pay) {
-			if ($this->markOne($pay, false)) {
+		foreach ($pays as $pay) {
+			$this->setPay($pay);
+			if ($this->markOne(false)) {
 				$count++;
 			}
 		}
 		return $count;
 	}
 
-	public function markOne(IssuePay $pay, bool $validate = true): bool {
+	public function setPay(PayInterface $pay): void {
+		if ($pay->isPayed()) {
+			throw new InvalidArgumentException('Pay cannot be payed.');
+		}
+		if ($pay->getDeadlineAt() === null) {
+			throw new InvalidArgumentException('Pay must have deadline.');
+		}
+		if (!$pay->isDelayed($this->getDelayedRange())) {
+			throw new InvalidArgumentException('Pay must be delayed.');
+		}
+		if ($pay->getStatus() === $this->getPayStatus()) {
+			throw new InvalidArgumentException('Pay cannot have same demand status.');
+		}
+
 		$this->pay = $pay;
+	}
+
+	public function markOne(bool $validate = true): bool {
 		if ($validate && !$this->validate()) {
 			return false;
 		}
-		if (empty($this->pushMessages())) {
+		if ($this->pushMessages() === null) {
 			return false;
 		}
 		$this->updateStatus();
@@ -79,9 +102,11 @@ class DemandForPayment extends Model {
 		return $pay->update(false, ['status']);
 	}
 
-	private function pushMessages(): int {
+	private function pushMessages(): ?int {
 		$model = $this->createMessage();
+		$model->sms_owner_id = $this->smsOwnerId;
 		$model->setPay($this->pay);
+		$model->whichDemand = $this->which;
 		return $model->pushMessages();
 	}
 
@@ -93,6 +118,7 @@ class DemandForPayment extends Model {
 		if (empty($this->pays)) {
 			$this->pays = IssuePay::find()
 				->onlyDelayed($this->delayedDays)
+				->andWhere(['!=', 'status', $this->getPayStatus()])
 				->all();
 		}
 		return $this->pays;
@@ -108,6 +134,13 @@ class DemandForPayment extends Model {
 				return IssuePay::STATUS_DEMAND_FOR_PAYMENT_THIRD;
 		}
 		throw new InvalidConfigException('Invalid Which.');
+	}
+
+	private function getDelayedRange(): string {
+		if (empty($this->delayedDays)) {
+			return 'now';
+		}
+		return '- ' . $this->delayedDays . ' days';
 	}
 
 }

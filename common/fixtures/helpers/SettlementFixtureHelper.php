@@ -126,9 +126,6 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 			}
 			$attributes['calculation_id'] = $this->lastSettlementId;
 		}
-		if (!isset($attributes['vat'])) {
-			$attributes['vat'] = 0;
-		}
 		return $this->tester->haveRecord(IssuePay::class, $attributes);
 	}
 
