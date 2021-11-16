@@ -39,7 +39,7 @@ class IssueSearch extends BaseIssueSearch {
 	public function rules(): array {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
-			[['onlyDelayed', 'onlyWithPayedPay'], 'boolean'],
+			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements'], 'boolean'],
 			[['type_additional_date_at', 'signature_act'], 'safe'],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 		]);
@@ -51,6 +51,7 @@ class IssueSearch extends BaseIssueSearch {
 			'excludedStages' => Yii::t('backend', 'Excluded stages'),
 			'onlyDelayed' => Yii::t('backend', 'Only delayed'),
 			'onlyWithPayedPay' => Yii::t('backend', 'Only with payed pay'),
+			'onlyWithSettlements' => Yii::t('settlement', 'Only with Settlements'),
 		]);
 	}
 

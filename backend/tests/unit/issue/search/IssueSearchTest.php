@@ -4,13 +4,10 @@ namespace backend\tests\unit\issue\search;
 
 use backend\modules\issue\models\search\IssueSearch;
 use backend\tests\unit\Unit;
-use common\components\User;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
-use common\helpers\StringHelper;
 use common\models\issue\Issue;
-use common\models\issue\IssueInterface;
 use common\models\settlement\PayedInterface;
 use common\tests\_support\UnitSearchModelTrait;
 
@@ -27,9 +24,11 @@ class IssueSearchTest extends Unit {
 		$this->getModule('Yii2')->_reconfigure(['cleanup' => false]);
 		if (!static::$hasFixture) {
 			$this->tester->haveFixtures(
-				IssueFixtureHelper::fixtures(),
-				SettlementFixtureHelper::settlement(),
-				SettlementFixtureHelper::pay(),
+				array_merge(
+					IssueFixtureHelper::fixtures(),
+					SettlementFixtureHelper::settlement(),
+					SettlementFixtureHelper::pay(),
+				)
 			);
 			static::$hasFixture = true;
 		}
