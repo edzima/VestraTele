@@ -84,7 +84,7 @@ return [
 	'Male' => 'Male',
 	'Birthday' => 'Birthday',
 	'Asked for availability' => 'Asked for availability',
-	'Search issue user' => 'Szukaj po nazwisku',
+	'Search issue user' => 'Szukaj Uczestnika',
 	'New password saved.' => 'New password saved.',
 	'Choose cities' => 'Choose cities',
 	'Search' => 'Szukaj',

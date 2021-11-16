@@ -29,10 +29,17 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'user',
 			],
 			[
+				'attribute' => 'phone',
+				'value' => 'user.phone',
+				'format' => 'tel',
+				'label' => Yii::t('common', 'Phone number'),
+			],
+			[
 				'attribute' => 'type',
 				'value' => 'typeName',
 				'filter' => IssueUserSearch::getTypesNames(),
 			],
+
 		],
 	]); ?>
 </div>
