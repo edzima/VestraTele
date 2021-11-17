@@ -1,5 +1,6 @@
 <?php
 
+use common\components\keyStorage\KeyStorage;
 use common\components\message\MessageTemplateManager;
 use common\components\HierarchyComponent;
 use common\components\PayComponent;
@@ -40,6 +41,7 @@ class Yii extends BaseYii {
  * @property User $user
  * @property SenderInterface $sms
  * @property Queue $queue
+ * @property KeyStorage $keyStorage
  */
 abstract class Application extends \yii\web\Application {
 

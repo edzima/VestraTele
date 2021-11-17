@@ -2,28 +2,46 @@
 
 namespace console\controllers;
 
+use common\models\KeyStorageItem;
 use console\models\DemandForPayment;
+use Yii;
+use yii\base\InvalidConfigException;
+use yii\console\Controller;
 
-class SettlementMessagesController {
+class SettlementMessagesController extends Controller {
 
 	public function actionFirstDemand(int $delayDays): void {
-		$model = new DemandForPayment();
+		$model = $this->createModel();
 		$model->delayedDays = $delayDays;
 		$model->which = DemandForPayment::WHICH_FIRST;
-		$model->markAll();
+		$model->markMultiple();
 	}
 
 	public function actionSecondDemand(int $delayDays): void {
-		$model = new DemandForPayment();
+		$model = $this->createModel();
 		$model->which = DemandForPayment::WHICH_SECOND;
 		$model->delayedDays = $delayDays;
-		$model->markAll();
+		$model->markMultiple();
 	}
 
 	public function actionThirdDemand(int $delayDays): void {
-		$model = new DemandForPayment();
+		$model = $this->createModel();
 		$model->which = DemandForPayment::WHICH_SECOND;
 		$model->delayedDays = $delayDays;
-		$model->markAll();
+		$model->markMultiple();
+	}
+
+	protected function createModel(): DemandForPayment {
+		$model = new DemandForPayment();
+		$model->smsOwnerId = $this->getSmsOwnerId();
+		return $model;
+	}
+
+	private function getSmsOwnerId(): int {
+		$owner = Yii::$app->keyStorage->get(KeyStorageItem::KEY_ROBOT_SMS_OWNER_ID);
+		if ($owner === null) {
+			throw new InvalidConfigException('Not Set Robot SMS Owner. Key: (' . KeyStorageItem::KEY_ROBOT_SMS_OWNER_ID . ').');
+		}
+		return $owner;
 	}
 }

@@ -118,7 +118,7 @@ class DemandForPayment extends Model {
 		if (empty($this->pays)) {
 			$this->pays = IssuePay::find()
 				->onlyDelayed($this->delayedDays)
-				->andWhere(['!=', 'status', $this->getPayStatus()])
+				->andWhere('status IS NULL OR status != :status', ['status' => $this->getPayStatus()])
 				->all();
 		}
 		return $this->pays;

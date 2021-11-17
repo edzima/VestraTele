@@ -108,11 +108,59 @@ class DemandForPaymentTest extends Unit {
 		$this->tester->seeEmailIsSent();
 	}
 
+	public function testMarkMultipleWithDelayedDays(): void {
+		$this->giveModel([
+			'which' => DemandForPayment::WHICH_FIRST,
+			'smsOwnerId' => UserFixtureHelper::AGENT_PETER_NOWAK,
+			'delayedDays' => 1,
+		]);
+		$this->getPay(
+			date('Y-m-d', strtotime('yesterday')),
+			['status' => null]
+		);
+		$this->getPay(
+			date('Y-m-d', strtotime('yesterday')),
+		);
+		$this->getPay(
+			date('Y-m-d', strtotime('yesterday')),
+			['status' => $this->model->getPayStatus()]
+		);
+		$this->getPay(
+			date('Y-m-d', strtotime('-2 days')),
+		);
+
+		$this->tester->assertSame(2, $this->model->markMultiple());
+	}
+
+	public function testMarkMultipleWithoutDelayedDays(): void {
+		IssuePay::deleteAll();
+		$this->giveModel([
+			'which' => DemandForPayment::WHICH_FIRST,
+			'smsOwnerId' => UserFixtureHelper::AGENT_PETER_NOWAK,
+		]);
+		$this->getPay(
+			date('Y-m-d', strtotime('yesterday')),
+			['status' => null]
+		);
+		$this->getPay(
+			date('Y-m-d', strtotime('yesterday')),
+		);
+		$this->getPay(
+			date('Y-m-d', strtotime('yesterday')),
+			['status' => $this->model->getPayStatus()]
+		);
+		$this->getPay(
+			date('Y-m-d', strtotime('-2 days')),
+		);
+
+		$this->tester->assertSame(3, $this->model->markMultiple());
+	}
+
 	public function getModel(): DemandForPayment {
 		return $this->model;
 	}
 
-	private function getPay(string $deadlineAt = null, array $config = []) {
+	private function getPay(string $deadlineAt = null, array $config = []): IssuePay {
 		$config['deadline_at'] = $deadlineAt;
 		$value = ArrayHelper::remove($config, 'value', static::DEFAULT_VALUE);
 		return $this->settlementFixture->findPay(
