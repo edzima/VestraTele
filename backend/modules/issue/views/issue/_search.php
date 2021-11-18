@@ -1,11 +1,11 @@
 <?php
 
+use backend\helpers\Html;
 use backend\modules\issue\models\search\IssueSearch;
 use common\models\user\User;
 use common\widgets\address\AddressSearchWidget;
 use common\widgets\DateWidget;
 use kartik\select2\Select2;
-use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
@@ -71,7 +71,7 @@ use yii\widgets\ActiveForm;
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'excludedStages', ['options' => ['class' => 'col-md-7']])->widget(Select2::class, [
+		<?= $form->field($model, 'excludedStages', ['options' => ['class' => 'col-md-5 col-lg-4']])->widget(Select2::class, [
 			'data' => $model->getStagesNames(),
 			'options' => [
 				'multiple' => true,
@@ -83,14 +83,24 @@ use yii\widgets\ActiveForm;
 			'showToggleAll' => false,
 		]) ?>
 
-		<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-1']])->textInput() ?>
+		<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput() ?>
 
-		<?= $form->field($model, 'onlyDelayed', ['options' => ['class' => 'col-md-4']])->checkbox() ?>
+		<?= $form->field($model, 'onlyDelayed', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
 		<?= Yii::$app->user->can(User::PERMISSION_PAY_PART_PAYED) ?
-			$form->field($model, 'onlyWithPayedPay', ['options' => ['class' => 'col-md-4']])->checkbox()
+			$form->field($model, 'onlyWithPayedPay', ['options' => ['class' => 'col-md-2']])->checkbox()
 			: ''
 		?>
+
+		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ?
+			$form->field($model, 'onlyWithSettlements', ['options' => ['class' => 'col-md-2']])->dropDownList(Html::booleanDropdownList(), [
+				'prompt' => Yii::t('common', 'All'),
+			])
+			: ''
+		?>
+	</div>
+
+	<div class="row">
 
 	</div>
 

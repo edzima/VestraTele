@@ -3,7 +3,7 @@
 return [
 	[
 		'templateId' => 1,
-		'subject' => 'Sms About Create Honoarium Settlement in Issue(TYPE_1) for Customer.',
+		'subject' => 'Sms About Create Honorarium Settlement in Issue(TYPE_1) for Customer.',
 		'body' => 'New Issue. Your Agent: {agentName} - {agentPhone}',
 		'language' => 'en-US',
 	],
@@ -27,7 +27,7 @@ return [
 	],
 	[
 		'templateId' => 5,
-		'subject' => 'Email. New Settlement (Honorairum) {issue} (All types) for Worker.',
+		'subject' => 'Email. New Settlement (Honorarium) {issue} (All types) for Worker.',
 		'body' => 'New Issue. Customer: {customerName} - {customerPhone}. Settlement Value: {settlementValue} Details: {settlementLink}',
 		'language' => 'en-US',
 	],

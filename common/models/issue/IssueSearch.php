@@ -165,11 +165,10 @@ abstract class IssueSearch extends Model
 	public function applyCustomerSurnameFilter(QueryInterface $query): void {
 		if (!empty($this->customerLastname)) {
 			$query->joinWith([
-				'customer.userProfile CP' => function (PhonableQuery $query) {
-					$query->withPhoneNumber($this->customerPhone);
+				'customer.userProfile CP' => function (ActiveQuery $query) {
+					$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
 				},
 			]);
-			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
 		}
 	}
 

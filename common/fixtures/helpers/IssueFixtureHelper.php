@@ -17,9 +17,6 @@ use Yii;
 
 class IssueFixtureHelper extends BaseFixtureHelper {
 
-	public const ISSUE_COUNT = 6;
-	public const ARCHIVED_ISSUE_COUNT = 1;
-
 	public const AGENT = 'agent';
 	public const CUSTOMER = 'customer';
 	public const LAWYER = 'lawyer';

@@ -158,53 +158,49 @@ class PaySearchTest extends Unit {
 	public function testMinDelayedRange(): void {
 		$this->model->payStatus = IssuePaySearch::PAY_STATUS_NOT_PAYED;
 		$this->model->delay = IssuePaySearch::DELAY_MIN_30_DAYS;
-		$this->assertTotalCount(3);
-		$this->tester->haveRecord(IssuePay::class, [
-			'value' => 300,
-			'calculation_id' => 1,
-			'deadline_at' => date('Y-m-d', strtotime('- 30 days')),
-		]);
-		$this->assertTotalCount(4);
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertTrue($model->isDelayed('- 30 days'));
+		}
 	}
 
 	public function testAgent(): void {
 		$this->model->agent_id = UserFixtureHelper::AGENT_PETER_NOWAK;
 		$this->model->payStatus = IssuePaySearch::PAY_STATUS_ALL;
-		$this->assertTotalCount(5);
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame(UserFixtureHelper::AGENT_PETER_NOWAK, $model->issue->agent->id);
+		}
 		$this->model->agent_id = UserFixtureHelper::AGENT_AGNES_MILLER;
 
-		$this->assertTotalCount(2);
-		$this->model->agent_id = [UserFixtureHelper::AGENT_PETER_NOWAK, UserFixtureHelper::AGENT_AGNES_MILLER];
-		$this->assertTotalCount(7);
-		$this->model->agent_id = UserFixtureHelper::AGENT_TOMMY_SET;
-		$this->assertTotalCount(0);
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame(UserFixtureHelper::AGENT_AGNES_MILLER, $model->issue->agent->id);
+		}
 
-		$this->model->agent_id = UserFixtureHelper::AGENT_PETER_NOWAK;
-		$this->assertTotalCount(5);
-		$this->model->agent_id = UserFixtureHelper::AGENT_AGNES_MILLER;
-		$this->assertTotalCount(2);
 		$this->model->agent_id = [UserFixtureHelper::AGENT_PETER_NOWAK, UserFixtureHelper::AGENT_AGNES_MILLER];
-		$this->assertTotalCount(7);
-		$this->model->agent_id = 302;
-		$this->assertTotalCount(0);
-		$this->tester->assertSame('Agent Id is invalid.', $this->model->getFirstError('agent_id'));
-		$this->model->agent_id = 303;
-		$this->tester->assertSame('Agent Id is invalid.', $this->model->getFirstError('agent_id'));
-		$this->assertTotalCount(0);
-		$this->model->agent_id = 111111;
-		$this->assertTotalCount(0);
-		$this->tester->assertSame('Agent Id is invalid.', $this->model->getFirstError('agent_id'));
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$agentId = $model->issue->agent->id;
+			$this->tester->assertTrue(
+				$agentId === UserFixtureHelper::AGENT_PETER_NOWAK
+				|| $agentId === UserFixtureHelper::AGENT_AGNES_MILLER
+			);
+		}
 
 		$this->model->payStatus = IssuePaySearch::PAY_STATUS_NOT_PAYED;
 		$this->model->delay = IssuePaySearch::DELAY_ALL;
-		$this->model->agent_id = 300;
-		$this->assertTotalCount(3);
-		$this->model->agent_id = 301;
-		$this->assertTotalCount(0);
-		$this->model->agent_id = [300, 301];
-		$this->assertTotalCount(3);
-		$this->model->agent_id = 302;
-		$this->assertTotalCount(0);
+		$this->model->agent_id = UserFixtureHelper::AGENT_PETER_NOWAK;
+
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame(UserFixtureHelper::AGENT_PETER_NOWAK, $model->issue->agent->id);
+		}
 	}
 
 	public function testCustomer(): void {

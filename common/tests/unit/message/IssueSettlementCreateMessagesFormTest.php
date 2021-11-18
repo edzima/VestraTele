@@ -21,19 +21,45 @@ use yii\mail\MessageInterface;
 class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 
 	protected const MODEL_CLASS = IssueSettlementCreateMessagesForm::class;
-	protected const MESSAGE_TEMPLATE_FIXTURE_DIR = MessageTemplateFixtureHelper::DIR_ISSUE_SETTLEMENT_CREATE;
 
 	private const DEFAULT_SETTLEMENT_TYPE = IssueSettlement::TYPE_HONORARIUM;
 	private const DEFAULT_SETTLEMENT_VALUE = 1000;
 
 	private ?IssueSettlement $settlement = null;
 
+	protected function messageTemplateFixtureDir(): string {
+		return MessageTemplateFixtureHelper::DIR_ISSUE_SETTLEMENT_CREATE;
+	}
+
+	public function keysProvider(): array {
+		return [
+			'SMS Customer With Settlement Type and Issue Type' => [
+				IssueSettlementCreateMessagesForm::generateKey(
+					IssueSettlementCreateMessagesForm::TYPE_SMS,
+					IssueSettlementCreateMessagesForm::keyCustomer(),
+					[1, 2],
+					IssueSettlement::TYPE_HONORARIUM,
+				),
+				'sms.issue.settlement.create.customer.settlementType:30.issueTypes:1,2',
+			],
+			'SMS Workers With Settlement Type and Issue Type' => [
+				IssueSettlementCreateMessagesForm::generateKey(
+					IssueSettlementCreateMessagesForm::TYPE_SMS,
+					IssueSettlementCreateMessagesForm::keyWorkers(),
+					[1, 2],
+					IssueSettlement::TYPE_HONORARIUM,
+				),
+				'sms.issue.settlement.create.workers.settlementType:30.issueTypes:1,2',
+			],
+		];
+	}
+
 	public function testDefaultCustomerSms(): void {
 		$this->giveIssue();
 		$this->giveModel();
 
 		$sms = $this->model->getSmsToCustomer();
-		$this->tester->assertSame('Sms About Create Honoarium Settlement in Issue(TYPE_1) for Customer.', $sms->note_title);
+		$this->tester->assertSame('Sms About Create Honorarium Settlement in Issue(TYPE_1) for Customer.', $sms->note_title);
 	}
 
 	public function testSettlementLinkInEmails(): void {
@@ -52,7 +78,7 @@ class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->giveModel();
 
 		$message = $this->model->getEmailToCustomer();
-		$value = Yii::$app->formatter->asCurrency($this->settlement->getValue());
+		$value = $this->getFormattedValue(false);
 		$this->tester->assertStringNotContainsString($value, $message);
 
 		$message = $this->model->getEmailToWorkers();
@@ -77,7 +103,7 @@ class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->tester->assertNotNull($sms);
 		$this->tester->assertStringContainsString($this->getCustomer()->getFullName(), $sms->message);
 		$this->tester->assertStringContainsString($this->getCustomer()->getPhone(), $sms->message);
-		$this->tester->assertStringContainsString(Yii::$app->formatter->asCurrency($this->settlement->getValue()), $sms->message);
+		$this->tester->assertStringContainsString($this->getFormattedValue(true), $sms->message);
 	}
 
 	public function testSmsToAgentForHonorariumAndType2(): void {
@@ -93,7 +119,15 @@ class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->tester->assertNotNull($sms);
 		$this->tester->assertStringContainsString($this->getAgent()->getFullName(), $sms->message);
 		$this->tester->assertStringContainsString($this->getAgent()->getPhone(), $sms->message);
-		$this->tester->assertStringNotContainsString(Yii::$app->formatter->asCurrency($this->settlement->getValue()), $sms->message);
+		$this->tester->assertStringNotContainsString($this->getFormattedValue(true), $sms->message);
+	}
+
+	protected function getFormattedValue(bool $replaceNonBreakSpace): string {
+		$value = Yii::$app->formatter->asCurrency($this->settlement->getValue());
+		if ($replaceNonBreakSpace) {
+			$value = str_replace(["&nbsp;", ' '], ' ', $value);
+		}
+		return $value;
 	}
 
 	public function testWorkersEmails(): void {
@@ -104,7 +138,7 @@ class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->tester->assertArrayHasKey($this->getAgent()->email, $message->getTo());
 		$this->tester->assertArrayHasKey($settlement->getIssueModel()->tele->email, $message->getTo());
 		$this->tester->assertMessageBodyContainsString($settlement->getFrontendUrl(), $message);
-		$this->tester->assertStringNotContainsString(Yii::$app->formatter->asCurrency($settlement->getValue()), $message);
+		$this->tester->assertStringNotContainsString($this->getFormattedValue(false), $message);
 	}
 
 	protected function getCustomer(): User {
@@ -135,4 +169,5 @@ class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 		$config['id'] = 1000;
 		$this->settlement = new IssuePayCalculation($config);
 	}
+
 }

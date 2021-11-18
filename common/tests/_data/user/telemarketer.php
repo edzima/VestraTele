@@ -1,8 +1,11 @@
 <?php
 
+use common\fixtures\helpers\UserFixtureHelper;
+use common\models\user\User;
+
 return [
 	[
-		'id' => 400,
+		'id' => UserFixtureHelper::TELE_1,
 		'username' => 'tele1',
 		'auth_key' => 'iwTNae9t34mnK6l4T4Ieak-YWI2Rv',
 		'password_hash' => '$2y$13$CXT0Rkle1EMJ/c1l5bylL.lfmQ39O5JlHJVFpNn618OUS1HwaIi',
@@ -12,7 +15,7 @@ return [
 		'email' => 'tele1@vestra.info',
 	],
 	[
-		'id' => 401,
+		'id' => UserFixtureHelper::TELE_2,
 		'username' => 'tele2',
 		'auth_key' => 'EdKfx88weFV0IxuTMKgfK2tS3Lp',
 		'password_hash' => '$2y$13$g5nv41Px7VBqhS3hVsVN2.MKT3jFdkXEsMC4rQJLfaMa7VaJqL2',
@@ -24,27 +27,15 @@ return [
 
 	],
 	[
-		'id' => 402,
+		'id' => UserFixtureHelper::TELE_3_INACTIVE,
 		'username' => 'tele3',
 		'auth_key' => 'O87Gk3_UfmMHYkyezQmkKNsllzT',
 		//Test1234
 		'password_hash' => '$2y$13$d17z0w/wKC4LFwtzBcmx6up4jErQuandJqhzKGKczfWuiEhLBtQBK',
 		'email' => 'tele3@vestra.info',
-		'status' => '0',
+		'status' => User::STATUS_INACTIVE,
 		'created_at' => '1548675330',
 		'updated_at' => '1548675330',
 		'verification_token' => '4ch0qbfhvWwkcuWqjN8SWRq72SOw1KYT_1548675330',
-	],
-	[
-		'id' => 403,
-		'username' => 'tele4',
-		'auth_key' => '4XXdVqi3Dpa6JH6zqreFxUPcUPvJ',
-		//Test1234
-		'password_hash' => '$2y$13$d17z0w/wKC4LFwtzBcm6up4jErQuandJqhzKGKczfWuiEhLBtQBK',
-		'email' => 'tele4@vestra.info',
-		'status' => '1',
-		'created_at' => '1548675330',
-		'updated_at' => '1548675330',
-		'verification_token' => 'already_used_token_1548675330',
 	],
 ];

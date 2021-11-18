@@ -14,20 +14,19 @@ use common\tests\unit\Unit;
 use Yii;
 use yii\base\Model;
 
-class BaseIssueMessagesFormTest extends Unit {
+abstract class BaseIssueMessagesFormTest extends Unit {
 
 	use UnitModelTrait;
 
 	protected const MODEL_CLASS = IssueMessagesForm::class;
 	protected const DEFAULT_ISSUE_TYPE = 1;
 	protected const DEFAULT_SMS_OWNER_ID = UserFixtureHelper::AGENT_EMILY_PAT;
-	protected const MESSAGE_TEMPLATE_FIXTURE_DIR = '';
 
 	protected IssueMessagesForm $model;
 	protected MessageTemplateFixtureHelper $templateFixture;
 	protected ?IssueInterface $issue = null;
 
-	public function _before() {
+	public function _before(): void {
 		parent::_before();
 		$this->templateFixture = new MessageTemplateFixtureHelper($this->tester);
 	}
@@ -37,9 +36,22 @@ class BaseIssueMessagesFormTest extends Unit {
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::types(),
 			IssueFixtureHelper::users(true),
-			MessageTemplateFixtureHelper::fixture(static::MESSAGE_TEMPLATE_FIXTURE_DIR),
+			MessageTemplateFixtureHelper::fixture($this->messageTemplateFixtureDir()),
 		);
 	}
+
+	abstract protected function messageTemplateFixtureDir(): string;
+
+	/**
+	 * @dataProvider keysProvider
+	 * @param string $generated
+	 * @param string $expected
+	 */
+	public function testKeys(string $generated, string $expected): void {
+		$this->tester->assertSame($expected, $generated);
+	}
+
+	abstract public function keysProvider(): array;
 
 	public function testNotWorkersIssueUsersTypes(): void {
 		$this->giveModel();
@@ -96,8 +108,14 @@ class BaseIssueMessagesFormTest extends Unit {
 			$config['sms_owner_id'] = static::DEFAULT_SMS_OWNER_ID;
 		}
 		$config['issue'] = $issue;
-		$config['class'] = static::MODEL_CLASS;
+		$config = array_merge($config, $this->getModelDefaultConfig());
 		$this->model = Yii::createObject($config);
+	}
+
+	protected function getModelDefaultConfig(): array {
+		return [
+			'class' => static::MODEL_CLASS,
+		];
 	}
 
 	protected function giveIssue(int $type = self::DEFAULT_ISSUE_TYPE): void {

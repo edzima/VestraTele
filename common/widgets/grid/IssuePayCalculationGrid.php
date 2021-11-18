@@ -36,7 +36,7 @@ class IssuePayCalculationGrid extends GridView {
 
 	public $userProvisionsId = null;
 
-	public string $valueTypeIssueType = IssueTypeColumn::VALUE_SHORT;
+	public string $valueTypeIssueType = IssueTypeColumn::VALUE_NAME;
 
 	public bool $withAgent = true;
 
@@ -203,6 +203,12 @@ class IssuePayCalculationGrid extends GridView {
 					}
 					return $sum;
 				},
+			],
+			[
+				'attribute' => 'created_at',
+				'format' => 'date',
+				'noWrap' => true,
+				'visible' => $this->withDates,
 			],
 			[
 				'attribute' => 'updated_at',

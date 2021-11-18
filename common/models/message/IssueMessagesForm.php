@@ -13,6 +13,9 @@ use yii\mail\MessageInterface;
 
 class IssueMessagesForm extends MessageModel {
 
+	protected const KEY_CUSTOMER = 'customer';
+	protected const KEY_WORKERS = 'workers';
+
 	public string $smsClass = IssueSmsForm::class;
 
 	public bool $sendSmsToCustomer = false;
@@ -23,6 +26,8 @@ class IssueMessagesForm extends MessageModel {
 	public $workersTypes = [];
 
 	public ?int $sms_owner_id = null;
+
+	public bool $bindIssueType = false;
 
 	protected ?IssueInterface $issue = null;
 
@@ -156,11 +161,11 @@ class IssueMessagesForm extends MessageModel {
 	}
 
 	public function getCustomerTemplateKey(): string {
-		return static::keyCustomer($this->keysParts());
+		return static::keyCustomer($this->keysParts(static::KEY_CUSTOMER));
 	}
 
 	public function getWorkersTemplateKey(): string {
-		return static::keyWorkers($this->keysParts());
+		return static::keyWorkers($this->keysParts(static::KEY_WORKERS));
 	}
 
 	public function getWorkersUsersTypesNames(): array {
@@ -203,7 +208,6 @@ class IssueMessagesForm extends MessageModel {
 		$config['class'] = $this->smsClass;
 		/** @var IssueSmsForm $model */
 		$model = Yii::createObject($config, [$this->issue]);
-		$model->removeSpecialCharacters = false;
 		if ($template) {
 			$model->message = $template->getSmsMessage();
 			$model->note_title = $template->getSubject();
@@ -217,6 +221,9 @@ class IssueMessagesForm extends MessageModel {
 			'issue' => $this->issue->getIssueName(),
 			'issueLink' => $this->getIssueFrontendAbsoluteLink(),
 		]);
+		if ($this->bindIssueType) {
+			$template->parseBody(['issueType' => $this->issue->getIssueType()->name]);
+		}
 	}
 
 	protected function getIssueFrontendAbsoluteLink(): string {
@@ -311,16 +318,16 @@ class IssueMessagesForm extends MessageModel {
 	}
 
 	public static function keyCustomer(array $parts = []): string {
-		array_unshift($parts, 'customer');
+		array_unshift($parts, static::KEY_CUSTOMER);
 		return MessageTemplateKeyHelper::generateKey($parts);
 	}
 
 	public static function keyWorkers(array $parts = []): string {
-		array_unshift($parts, 'workers');
+		array_unshift($parts, static::KEY_WORKERS);
 		return MessageTemplateKeyHelper::generateKey($parts);
 	}
 
-	public function keysParts(): array {
+	public function keysParts(string $type): array {
 		return [];
 	}
 

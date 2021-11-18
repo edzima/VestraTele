@@ -6,57 +6,74 @@ use common\models\message\IssueMessagesForm;
 
 class KeyIssueMessagesFormTest extends BaseIssueMessagesFormTest {
 
-	public function testGenerateCustomKey(): void {
-		$key = IssueMessagesForm::generateKey('sms', 'custom.key');
-		$this->tester->assertSame('sms.issue.custom.key', $key);
+	protected function messageTemplateFixtureDir(): string {
+		return '';
 	}
 
-	public function testGenerateKeyWithoutIssueTypes(): void {
-		$key = IssueMessagesForm::generateKey(
-			IssueMessagesForm::TYPE_SMS,
-			IssueMessagesForm::keyCustomer(),
-		);
-		$this->tester->assertSame('sms.issue.customer', $key);
-		$key = IssueMessagesForm::generateKey(
-			IssueMessagesForm::TYPE_EMAIL,
-			IssueMessagesForm::keyCustomer(),
-		);
-		$this->tester->assertSame('email.issue.customer', $key);
+	public function keysProvider(): array {
+		return [
+			'Custom' => [
+				IssueMessagesForm::generateKey('customType', 'customKey'),
+				'customType.issue.customKey',
+			],
+			'Sms Customer Without Issue Types' => [
+				IssueMessagesForm::generateKey(
+					IssueMessagesForm::TYPE_SMS,
+					IssueMessagesForm::keyCustomer(),
+				),
+				'sms.issue.customer',
+			],
+			'Email Customer Without Issue Types' => [
+				IssueMessagesForm::generateKey(
+					IssueMessagesForm::TYPE_EMAIL,
+					IssueMessagesForm::keyCustomer(),
+				),
+				'email.issue.customer',
+			],
+			'Sms Workers Without Issue Types' => [
+				IssueMessagesForm::generateKey(
+					IssueMessagesForm::TYPE_SMS,
+					IssueMessagesForm::keyWorkers(),
+				),
+				'sms.issue.workers',
+			],
+			'Email Workers Without Issue Types' => [
+				IssueMessagesForm::generateKey(
+					IssueMessagesForm::TYPE_EMAIL,
+					IssueMessagesForm::keyWorkers(),
+				),
+				'email.issue.workers',
+			],
+			'SMS Customer With Custom Param' => [
+				IssueMessagesForm::generateKey(
+					IssueMessagesForm::TYPE_SMS,
+					IssueMessagesForm::keyCustomer(['onUpdate']),
+				),
+				'sms.issue.customer.onUpdate',
+			],
+			'SMS Workers With Custom Param' => [
+				IssueMessagesForm::generateKey(
+					IssueMessagesForm::TYPE_SMS,
+					IssueMessagesForm::keyWorkers(['onUpdate']),
+				),
+				'sms.issue.workers.onUpdate',
+			],
+			'Email Customer With Custom Param' => [
+				IssueMessagesForm::generateKey(
+					IssueMessagesForm::TYPE_EMAIL,
+					IssueMessagesForm::keyCustomer(['onUpdate']),
+				),
+				'email.issue.customer.onUpdate',
+			],
+			'Email Workers With Custom Param' => [
+				IssueMessagesForm::generateKey(
+					IssueMessagesForm::TYPE_EMAIL,
+					IssueMessagesForm::keyWorkers(['onUpdate']),
+				),
+				'email.issue.workers.onUpdate',
+			],
 
-		$key = IssueMessagesForm::generateKey(
-			IssueMessagesForm::TYPE_SMS,
-			IssueMessagesForm::keyWorkers(),
-		);
-		$this->tester->assertSame('sms.issue.workers', $key);
-		$key = IssueMessagesForm::generateKey(
-			IssueMessagesForm::TYPE_EMAIL,
-			IssueMessagesForm::keyWorkers(),
-		);
-		$this->tester->assertSame('email.issue.workers', $key);
-	}
-
-	public function testGenerateKeyWithEmptyIssueType(): void {
-		$key = IssueMessagesForm::generateKey(
-			IssueMessagesForm::TYPE_SMS,
-			'onUpdate',
-			[]
-		);
-		$this->tester->assertSame('sms.issue.onUpdate', $key);
-
-		$key = IssueMessagesForm::generateKey(
-			IssueMessagesForm::TYPE_SMS,
-			IssueMessagesForm::keyCustomer(),
-			[]
-		);
-		$this->tester->assertSame('sms.issue.customer', $key);
-	}
-
-	public function testGenerateKeyWithParams(): void {
-		$key = IssueMessagesForm::generateKey(
-			IssueMessagesForm::TYPE_SMS,
-			IssueMessagesForm::keyCustomer(['onUpdate']),
-		);
-		$this->tester->assertSame('sms.issue.customer.onUpdate', $key);
+		];
 	}
 
 	public function testCustomerSmsWithTemplateWithoutTypeIds(): void {

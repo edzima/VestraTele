@@ -23,6 +23,8 @@ class IssueSearch extends BaseIssueSearch {
 
 	public $parentId;
 	public $excludedStages = [];
+	public $onlyWithSettlements;
+
 	public bool $onlyDelayed = false;
 	public bool $onlyWithPayedPay = false;
 	public ?string $signature_act = null;
@@ -37,7 +39,7 @@ class IssueSearch extends BaseIssueSearch {
 	public function rules(): array {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
-			[['onlyDelayed', 'onlyWithPayedPay'], 'boolean'],
+			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements'], 'boolean'],
 			[['type_additional_date_at', 'signature_act'], 'safe'],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 		]);
@@ -49,6 +51,7 @@ class IssueSearch extends BaseIssueSearch {
 			'excludedStages' => Yii::t('backend', 'Excluded stages'),
 			'onlyDelayed' => Yii::t('backend', 'Only delayed'),
 			'onlyWithPayedPay' => Yii::t('backend', 'Only with payed pay'),
+			'onlyWithSettlements' => Yii::t('settlement', 'Only with Settlements'),
 		]);
 	}
 
@@ -88,6 +91,7 @@ class IssueSearch extends BaseIssueSearch {
 		$this->teleFilter($query);
 		$this->lawyerFilter($query);
 		$this->payedFilter($query);
+		$this->settlementsFilter($query);
 	}
 
 	private function signatureActFilter(IssueQuery $query): void {
@@ -145,15 +149,6 @@ class IssueSearch extends BaseIssueSearch {
 		}
 	}
 
-	public function getAgentsNames(): array {
-		if (empty($this->parentId) || $this->parentId < 0) {
-			return parent::getAgentsNames();
-		}
-		$ids = Yii::$app->userHierarchy->getAllChildesIds($this->parentId);
-		$ids[] = $this->parentId;
-		return User::getSelectList($ids, false);
-	}
-
 	private function payedFilter(IssueQuery $query): void {
 		if ($this->onlyWithPayedPay) {
 			$query->joinWith([
@@ -163,6 +158,28 @@ class IssueSearch extends BaseIssueSearch {
 			])
 				->groupBy(Issue::tableName() . '.id');
 		}
+	}
+
+	private function settlementsFilter(IssueQuery $query): void {
+		if ($this->onlyWithSettlements === null || $this->onlyWithSettlements === '') {
+			return;
+		}
+		$query->joinWith('payCalculations PC', false);
+
+		if ($this->onlyWithSettlements === true) {
+			$query->andWhere('PC.issue_id IS NOT NULL');
+			return;
+		}
+		$query->andWhere('PC.issue_id IS NULL');
+	}
+
+	public function getAgentsNames(): array {
+		if (empty($this->parentId) || $this->parentId < 0) {
+			return parent::getAgentsNames();
+		}
+		$ids = Yii::$app->userHierarchy->getAllChildesIds($this->parentId);
+		$ids[] = $this->parentId;
+		return User::getSelectList($ids, false);
 	}
 
 }

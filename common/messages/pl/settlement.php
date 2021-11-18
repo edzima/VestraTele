@@ -157,4 +157,5 @@ return [
 	'An incomplete: {value} has been paid.' => 'Opłacono niepełną kwotę: {value}.',
 	'Generate new payment: {value}.' => 'Dodano nową płatność: {value}.',
 	'Send Messages about Payed Pay.' => 'Wysłano Notyfikacje o opłaceniu.',
+	'Only with Settlements' => 'Z Rozliczeniami',
 ];
