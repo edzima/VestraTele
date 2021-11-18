@@ -20,6 +20,7 @@ class MessageTemplate extends EmailTemplate {
 			$message);
 
 		$message = strip_tags($message);
+		$message = str_replace(["&nbsp;", ' '], ' ', $message);
 		return $message;
 	}
 }

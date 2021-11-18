@@ -50,6 +50,13 @@ class MessageTemplateTest extends Unit {
 		$this->tester->assertSame("Hello,\nYour issue is Create. \nTel us:123-123-123", $template->getSmsMessage());
 	}
 
+	public function testRemoveNBSP(): void {
+		$template = new MessageTemplate('Test Subject with NBSP in Body',
+			"3 000,00 zl");
+		$this->tester->assertSame('3 000,00 zl', $template->getBody());
+		$this->tester->assertSame('3 000,00 zl', $template->getSmsMessage());
+	}
+
 	public function testLikeKeySearch(): void {
 		$this->fixture->save('test.first');
 		$this->fixture->save('test.double');
