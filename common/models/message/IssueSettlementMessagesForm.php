@@ -56,8 +56,8 @@ class IssueSettlementMessagesForm extends IssueMessagesForm {
 		);
 	}
 
-	public function keysParts(): array {
-		$parts = parent::keysParts();
+	public function keysParts(string $type): array {
+		$parts = parent::keysParts($type);
 		if ($this->withSettlementTypeInKey) {
 			$parts[static::KEY_SETTLEMENT_TYPE] = $this->settlement->getType();
 		}

@@ -21,8 +21,8 @@ class IssuePayPayedMessagesForm extends IssuePayMessagesForm {
 		];
 	}
 
-	public function keysParts(): array {
-		$parts = parent::keysParts();
+	public function keysParts(string $type): array {
+		$parts = parent::keysParts($type);
 		if ($this->isPartPayment) {
 			array_unshift($parts, static::KEY_PART_PAYMENT);
 		}

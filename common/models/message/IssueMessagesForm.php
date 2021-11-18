@@ -27,6 +27,8 @@ class IssueMessagesForm extends MessageModel {
 
 	public ?int $sms_owner_id = null;
 
+	public bool $bindIssueType = false;
+
 	protected ?IssueInterface $issue = null;
 
 	public function setIssue(IssueInterface $issue): void {
@@ -159,11 +161,11 @@ class IssueMessagesForm extends MessageModel {
 	}
 
 	public function getCustomerTemplateKey(): string {
-		return static::keyCustomer($this->keysParts());
+		return static::keyCustomer($this->keysParts(static::KEY_CUSTOMER));
 	}
 
 	public function getWorkersTemplateKey(): string {
-		return static::keyWorkers($this->keysParts());
+		return static::keyWorkers($this->keysParts(static::KEY_WORKERS));
 	}
 
 	public function getWorkersUsersTypesNames(): array {
@@ -206,7 +208,6 @@ class IssueMessagesForm extends MessageModel {
 		$config['class'] = $this->smsClass;
 		/** @var IssueSmsForm $model */
 		$model = Yii::createObject($config, [$this->issue]);
-		$model->removeSpecialCharacters = false;
 		if ($template) {
 			$model->message = $template->getSmsMessage();
 			$model->note_title = $template->getSubject();
@@ -220,6 +221,9 @@ class IssueMessagesForm extends MessageModel {
 			'issue' => $this->issue->getIssueName(),
 			'issueLink' => $this->getIssueFrontendAbsoluteLink(),
 		]);
+		if ($this->bindIssueType) {
+			$template->parseBody(['issueType' => $this->issue->getIssueType()->name]);
+		}
 	}
 
 	protected function getIssueFrontendAbsoluteLink(): string {
@@ -323,7 +327,7 @@ class IssueMessagesForm extends MessageModel {
 		return MessageTemplateKeyHelper::generateKey($parts);
 	}
 
-	public function keysParts(): array {
+	public function keysParts(string $type): array {
 		return [];
 	}
 
