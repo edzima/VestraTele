@@ -2,22 +2,29 @@
 
 namespace common\tests\unit\message;
 
+use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\models\issue\IssueSettlement;
 use common\models\message\IssuePayDelayedMessagesForm;
 use console\models\DemandForPayment;
 
-class IssuePayDelayedMessagesFormTest extends BaseIssueMessagesFormTest {
+class IssuePayDelayedMessagesFormTest extends IssuePayMessagesFormTest {
+
+	protected const MODEL_CLASS = IssuePayDelayedMessagesForm::class;
+	private const DATE_FORMAT = 'Y-m-d';
+
+	protected function messageTemplateFixtureDir(): string {
+		return MessageTemplateFixtureHelper::DIR_ISSUE_PAY_DEMAND;
+	}
 
 	public function keysProvider(): array {
 		return [
-			'SMS Customer First Demand for Honorarium Issue Type 1' => [
+			'SMS Customer First Demand Issue Type 1' => [
 				IssuePayDelayedMessagesForm::generateKey(
 					IssuePayDelayedMessagesForm::TYPE_SMS,
 					IssuePayDelayedMessagesForm::keyCustomer([IssuePayDelayedMessagesForm::KEY_DEMAND_WHICH => DemandForPayment::WHICH_FIRST]),
-					[1],
-					IssueSettlement::TYPE_HONORARIUM,
+					[1]
 				),
-				'sms.issue.settlement.pay.delayed.customer.demandWhich:first.settlementType:30.issueTypes:1',
+				'sms.issue.settlement.pay.delayed.customer.demandWhich:first.issueTypes:1',
 			],
 			'SMS Customer First Demand for Honorarium Issue Type 2 & 3' => [
 				IssuePayDelayedMessagesForm::generateKey(
@@ -28,24 +35,31 @@ class IssuePayDelayedMessagesFormTest extends BaseIssueMessagesFormTest {
 				),
 				'sms.issue.settlement.pay.delayed.customer.demandWhich:first.settlementType:30.issueTypes:2,3',
 			],
-			'SMS Workers First Demand for Honorarium Issue Type 1' => [
+			'SMS Workers Demand' => [
 				IssuePayDelayedMessagesForm::generateKey(
 					IssuePayDelayedMessagesForm::TYPE_SMS,
-					IssuePayDelayedMessagesForm::keyWorkers([IssuePayDelayedMessagesForm::KEY_DEMAND_WHICH => DemandForPayment::WHICH_FIRST]),
-					[1],
-					IssueSettlement::TYPE_HONORARIUM,
+					IssuePayDelayedMessagesForm::keyWorkers(),
 				),
-				'sms.issue.settlement.pay.delayed.workers.demandWhich:first.settlementType:30.issueTypes:1',
-			],
-			'SMS Workers First Demand for Honorarium Issue Type 2 & 3' => [
-				IssuePayDelayedMessagesForm::generateKey(
-					IssuePayDelayedMessagesForm::TYPE_SMS,
-					IssuePayDelayedMessagesForm::keyWorkers([IssuePayDelayedMessagesForm::KEY_DEMAND_WHICH => DemandForPayment::WHICH_FIRST]),
-					[2, 3],
-					IssueSettlement::TYPE_HONORARIUM,
-				),
-				'sms.issue.settlement.pay.delayed.workers.demandWhich:first.settlementType:30.issueTypes:2,3',
+				'sms.issue.settlement.pay.delayed.workers',
 			],
 		];
 	}
+
+	protected function getModelDefaultConfig(): array {
+		$config = parent::getModelDefaultConfig();
+		$config['whichDemand'] = DemandForPayment::WHICH_FIRST;
+		$config['dateFormat'] = static::DATE_FORMAT;
+		return $config;
+	}
+
+	public function testSmsCustomerPay(): void {
+		$this->givePay(['deadline_at' => '2020-02-02']);
+		$this->giveModel();
+		$sms = $this->model->getSmsToCustomer();
+		$this->tester->assertNotNull($sms);
+		$this->tester->assertStringContainsString($this->issue->getIssueType()->name, $sms->message);
+		$this->tester->assertStringContainsString($this->getFormattedPayValue(true), $sms->message);
+		$this->tester->assertStringContainsString($this->pay->getDeadlineAt()->format(static::DATE_FORMAT), $sms->message);
+	}
+
 }

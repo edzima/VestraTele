@@ -6,6 +6,10 @@ use common\models\message\IssueMessagesForm;
 
 class KeyIssueMessagesFormTest extends BaseIssueMessagesFormTest {
 
+	protected function messageTemplateFixtureDir(): string {
+		return '';
+	}
+
 	public function keysProvider(): array {
 		return [
 			'Custom' => [

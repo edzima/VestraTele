@@ -17,38 +17,22 @@ use ymaker\email\templates\entities\EmailTemplate;
 /**
  * @property IssuePayPayedMessagesForm $model
  */
-class IssuePayPayedMessagesFormTest extends BaseIssueMessagesFormTest {
+class IssuePayPayedMessagesFormTest extends IssuePayMessagesFormTest {
 
 	protected const MODEL_CLASS = IssuePayPayedMessagesForm::class;
-	protected const MESSAGE_TEMPLATE_FIXTURE_DIR = MessageTemplateFixtureHelper::DIR_ISSUE_PAY_PAYED;
-	protected const DEFAULT_PAY_VALUE = 1023;
 
-	private SettlementFixtureHelper $settlementFixtureHelper;
-
-	private ?IssuePayInterface $pay = null;
-
-	public function _before() {
-		parent::_before();
-		$this->settlementFixtureHelper = new SettlementFixtureHelper($this->tester);
-	}
-
-	public function _fixtures(): array {
-		return array_merge(
-			parent::_fixtures(),
-			SettlementFixtureHelper::settlement(),
-			SettlementFixtureHelper::owner(),
-			SettlementFixtureHelper::pay()
-		);
+	protected function messageTemplateFixtureDir(): string {
+		return MessageTemplateFixtureHelper::DIR_ISSUE_PAY_PAYED;
 	}
 
 	public function testPayValue(): void {
 		$this->giveModel();
 		$email = $this->model->getEmailToCustomer();
 		$this->tester->assertNotNull($email);
-		$this->tester->assertMessageBodyContainsString($this->getFormattedPayValue(), $email);
+		$this->tester->assertMessageBodyContainsString($this->getFormattedPayValue(false), $email);
 		$email = $this->model->getEmailToWorkers();
 		$this->tester->assertNotNull($email);
-		$this->tester->assertMessageBodyContainsString($this->getFormattedPayValue(), $email);
+		$this->tester->assertMessageBodyContainsString($this->getFormattedPayValue(false), $email);
 	}
 
 	public function testPartPaymentCustomerSms(): void {
@@ -143,7 +127,7 @@ class IssuePayPayedMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->tester->assertTrue(array_key_exists($this->pay->calculation->getIssueModel()->tele->email, $email->getTo()));
 		$this->tester->assertSame(
 			'Email. Pay Payed: '
-			. $this->getFormattedPayValue()
+			. $this->getFormattedPayValue(false)
 			. ' ' . $this->pay->calculation->getIssueName()
 			. ' (All types) for Worker.',
 			$email->getSubject()
@@ -151,30 +135,6 @@ class IssuePayPayedMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->tester->assertMessageBodyContainsString(
 			$this->pay->calculation->getFrontendUrl(),
 			$email
-		);
-	}
-
-	private function getFormattedPayValue(): string {
-		return Yii::$app->formatter->asCurrency($this->pay->getValue());
-	}
-
-	protected function giveModel(IssueInterface $issue = null, array $config = []): void {
-		$payConfig = ArrayHelper::remove($config, 'payConfig', []);
-		if ($this->pay === null || !empty($payConfig)) {
-			$this->givePay($payConfig);
-		}
-		if ($issue === null) {
-			$issue = $this->pay->calculation;
-			$this->issue = $issue;
-		}
-		parent::giveModel($issue, $config);
-		$this->model->setPay($this->pay);
-	}
-
-	protected function givePay(array $config = []): void {
-		$value = ArrayHelper::getValue($config, 'value', static::DEFAULT_PAY_VALUE);
-		$this->pay = $this->settlementFixtureHelper->findPay(
-			$this->settlementFixtureHelper->havePay($value, $config)
 		);
 	}
 

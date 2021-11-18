@@ -11,8 +11,6 @@ class IssueCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 
 	protected const MODEL_CLASS = IssueCreateMessagesForm::class;
 
-	protected const MESSAGE_TEMPLATE_FIXTURE_DIR = MessageTemplateFixtureHelper::DIR_ISSUE_CREATE;
-
 	public function keysProvider(): array {
 		return [
 			'SMS Customer Without Issue Types' => [
@@ -77,4 +75,7 @@ class IssueCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->tester->assertStringContainsString($this->issue->getIssueModel()->customer->getFullName(), $email->toString());
 	}
 
+	protected function messageTemplateFixtureDir(): string {
+		return MessageTemplateFixtureHelper::DIR_ISSUE_CREATE;
+	}
 }
