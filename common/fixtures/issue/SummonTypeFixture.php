@@ -9,7 +9,4 @@ class SummonTypeFixture extends ActiveFixture {
 
 	public $modelClass = SummonType::class;
 
-	public $depends = [
-		SummonFixture::class,
-	];
 }
