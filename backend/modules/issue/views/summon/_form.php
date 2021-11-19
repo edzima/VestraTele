@@ -26,7 +26,7 @@ use yii\widgets\ActiveForm;
 				],
 			])->textInput(['maxlength' => true]) ?>
 
-			<?= $form->field($model, 'type', [
+			<?= $form->field($model, 'type_id', [
 				'options' => [
 					'class' => 'col-md-2',
 				],

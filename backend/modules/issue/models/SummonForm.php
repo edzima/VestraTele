@@ -6,6 +6,7 @@ use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\issue\Summon;
+use common\models\issue\SummonType;
 use common\models\user\User;
 use common\models\user\Worker;
 use edzima\teryt\models\Simc;
@@ -33,7 +34,7 @@ class SummonForm extends Model {
 	public int $owner_id;
 
 	public int $status = Summon::STATUS_NEW;
-	public int $type = Summon::TYPE_APPEAL;
+	public ?int $type_id = null;
 	public $term = self::TERM_ONE_WEEK;
 	public string $title = '';
 	public ?int $issue_id = null;
@@ -52,13 +53,13 @@ class SummonForm extends Model {
 
 	public function rules(): array {
 		return [
-			[['type', 'status', 'title', 'issue_id', 'owner_id', 'contractor_id', 'start_at', 'entity_id', 'city_id'], 'required'],
-			[['type', 'issue_id', 'owner_id', 'contractor_id', 'status'], 'integer'],
+			[['type_id', 'status', 'title', 'issue_id', 'owner_id', 'contractor_id', 'start_at', 'entity_id', 'city_id'], 'required'],
+			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status'], 'integer'],
 			[['start_at', 'realize_at', 'realized_at'], 'safe'],
 			[['start_at', 'deadline_at'], 'date', 'format' => 'yyyy-MM-dd'],
 			[['realize_at', 'realized_at'], 'date', 'format' => 'yyyy-MM-dd HH:mm'],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
-			['type', 'in', 'range' => array_keys(static::getTypesNames())],
+			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
 			['term', 'in', 'range' => array_keys(static::getTermsNames())],
 			[['title'], 'string', 'max' => 255],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
@@ -88,7 +89,7 @@ class SummonForm extends Model {
 	public function setModel(Summon $model): void {
 		$this->model = $model;
 		$this->status = $model->status;
-		$this->type = $model->type;
+		$this->type_id = $model->type_id;
 		$this->issue_id = $model->issue_id;
 		$this->title = $model->title;
 		$this->contractor_id = $model->contractor_id;
@@ -107,7 +108,7 @@ class SummonForm extends Model {
 		}
 		$model = $this->getModel();
 		$model->status = $this->status;
-		$model->type = $this->type;
+		$model->type_id = $this->type_id;
 		$model->issue_id = $this->issue_id;
 		$model->title = $this->title;
 		$model->contractor_id = $this->contractor_id;
@@ -142,7 +143,7 @@ class SummonForm extends Model {
 	}
 
 	public static function getTypesNames(): array {
-		return Summon::getTypesNames();
+		return SummonType::getNames();
 	}
 
 	public static function getEntityNames(): array {

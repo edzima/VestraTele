@@ -9,6 +9,10 @@ use common\models\issue\Summon;
 use common\tests\_support\UnitSearchModelTrait;
 use common\tests\unit\Unit;
 
+/**
+ * @property SummonSearch $model
+ * @method Summon[] getModels(array $params = [])
+ */
 class SummonSearchTest extends Unit {
 
 	use UnitSearchModelTrait;
@@ -27,43 +31,71 @@ class SummonSearchTest extends Unit {
 		);
 	}
 
-	public function testEmpty(): void {
-		$this->assertTotalCount(4);
-	}
-
 	public function testIssue(): void {
-		$this->assertTotalCount(2, ['issue_id' => 1]);
-		$this->assertTotalCount(1, ['issue_id' => 2]);
-		$this->assertTotalCount(1, ['issue_id' => 3]);
+		$this->model->issue_id = 1;
+		foreach ($this->getModels() as $model) {
+			$this->tester->assertSame($model->issue_id, 1);
+		}
+		$this->model->issue_id = 2;
+		foreach ($this->getModels() as $model) {
+			$this->tester->assertSame($model->issue_id, 2);
+		}
 	}
 
 	public function testCustomerLastname(): void {
-		$this->assertTotalCount(2, ['customerLastname' => 'Way']);
+		$this->model->customerLastname = 'Lar';
+		foreach ($this->getModels() as $model) {
+			$this->tester->assertStringContainsString('Lar', $model->getIssueModel()->customer->getFullName());
+		}
+
+		$this->model->customerLastname = 'Way';
+		foreach ($this->getModels() as $model) {
+			$this->tester->assertStringContainsString('Way', $model->getIssueModel()->customer->getFullName());
+		}
 	}
 
 	public function testType(): void {
-		$this->assertTotalCount(3, ['type' => Summon::TYPE_APPEAL]);
-		$this->assertTotalCount(1, ['type' => Summon::TYPE_ANTIVINDICATION]);
-		$this->assertTotalCount(0, ['type' => Summon::TYPE_INCOMPLETE_DOCUMENTATION]);
+		$this->model->type_id = 1;
+		foreach ($this->getModels() as $model) {
+			$this->tester->assertSame($model->type_id, 1);
+		}
+		$this->model->type_id = 2;
+		foreach ($this->getModels() as $model) {
+			$this->tester->assertSame($model->type_id, 2);
+		}
 	}
 
 	public function testStatus(): void {
-		$this->assertTotalCount(1, ['status' => Summon::STATUS_NEW]);
-		$this->assertTotalCount(2, ['status' => Summon::STATUS_IN_PROGRESS]);
-		$this->assertTotalCount(1, ['status' => Summon::STATUS_REALIZED]);
-		$this->assertTotalCount(0, ['status' => Summon::STATUS_UNREALIZED]);
+		$this->model->status = Summon::STATUS_NEW;
+		foreach ($this->getModels() as $model) {
+			$this->tester->assertSame($model->status, Summon::STATUS_NEW);
+		}
+		$this->model->status = Summon::STATUS_IN_PROGRESS;
+		foreach ($this->getModels() as $model) {
+			$this->tester->assertSame($model->status, Summon::STATUS_IN_PROGRESS);
+		}
 	}
 
 	public function testContractor(): void {
-		$this->assertTotalCount(2, ['contractor_id' => 300]);
-		$this->assertTotalCount(2, ['contractor_id' => UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID]);
-		$this->assertTotalCount(0, ['contractor_id' => 302]);
+		$this->model->contractor_id = UserFixtureHelper::AGENT_PETER_NOWAK;
+		foreach ($this->getModels() as $model) {
+			$this->tester->assertSame($model->contractor_id, UserFixtureHelper::AGENT_PETER_NOWAK);
+		}
+		$this->model->contractor_id = UserFixtureHelper::AGENT_AGNES_MILLER;
+		foreach ($this->getModels() as $model) {
+			$this->tester->assertSame($model->contractor_id, UserFixtureHelper::AGENT_AGNES_MILLER);
+		}
 	}
 
 	public function testOwner(): void {
-		$this->assertTotalCount(2, ['owner_id' => 300]);
-		$this->assertTotalCount(2, ['owner_id' => 301]);
-		$this->assertTotalCount(0, ['owner_id' => 302]);
+		$this->model->owner_id = UserFixtureHelper::AGENT_PETER_NOWAK;
+		foreach ($this->getModels() as $model) {
+			$this->tester->assertSame($model->owner_id, UserFixtureHelper::AGENT_PETER_NOWAK);
+		}
+		$this->model->owner_id = UserFixtureHelper::AGENT_AGNES_MILLER;
+		foreach ($this->getModels() as $model) {
+			$this->tester->assertSame($model->owner_id, UserFixtureHelper::AGENT_AGNES_MILLER);
+		}
 	}
 
 	protected function createModel(): SummonSearch {

@@ -9,8 +9,8 @@ use common\fixtures\issue\NoteFixture;
 use common\fixtures\issue\StageFixture;
 use common\fixtures\issue\StageTypesFixtures;
 use common\fixtures\issue\SummonFixture;
+use common\fixtures\issue\SummonTypeFixture;
 use common\fixtures\issue\TypeFixture;
-use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
 use common\models\user\User;
 use Yii;
@@ -25,6 +25,7 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 	public const ISSUE = 'issue';
 
 	public const SUMMON = 'issue.summon';
+	public const SUMMON_TYPE = 'issue.summon_type';
 
 	private const TYPE = 'issue.type';
 	private const STAGE = 'issue.stage';
@@ -160,6 +161,10 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 			static::SUMMON => [
 				'class' => SummonFixture::class,
 				'dataFile' => static::dataDir() . 'issue/summon.php',
+			],
+			static::SUMMON_TYPE => [
+				'class' => SummonTypeFixture::class,
+				'dataFile' => static::dataDir() . 'issue/summon_type.php',
 			],
 		]);
 	}

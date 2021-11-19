@@ -3,6 +3,7 @@
 namespace common\models\issue\search;
 
 use common\models\issue\Summon;
+use common\models\issue\SummonType;
 use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
@@ -25,6 +26,10 @@ class SummonSearch extends Summon implements
 	public string $customerPhone = '';
 
 	protected const SUMMON_ALIAS = 'S';
+
+	public static function getTypesNames(): array {
+		return SummonType::getNames();
+	}
 
 	public static function getOwnersNames(): array {
 		return User::getSelectList(Summon::find()

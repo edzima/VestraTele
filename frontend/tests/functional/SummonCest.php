@@ -63,7 +63,7 @@ class SummonCest {
 			'contractor_id' => $I->getUser()->id,
 			'title' => 'New summon',
 			'status' => Summon::STATUS_NEW,
-			'type' => Summon::TYPE_APPEAL,
+			'type_id' => 1,
 		]);
 		$I->amOnPage([static::ROUTE_UPDATE, 'id' => $summonId]);
 		$I->see('Update summon: New summon');
@@ -106,7 +106,5 @@ class SummonCest {
 		$I->click('Create note');
 		$I->seeInCurrentUrl(NoteCest::ROUTE_SUMMON);
 	}
-
-
 
 }
