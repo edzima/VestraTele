@@ -52,7 +52,7 @@ class SummonSearch extends Summon implements
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type', 'status', 'created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
+			[['id', 'type_id', 'status', 'created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
 			[['title'], 'safe'],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['customerPhone', PhoneValidator::class],
@@ -81,6 +81,7 @@ class SummonSearch extends Summon implements
 				$query->joinWith('userProfile CP');
 			},
 		]);
+		$query->with('type');
 
 		// add conditions that should always apply here
 
@@ -104,7 +105,7 @@ class SummonSearch extends Summon implements
 		// grid filtering conditions
 		$query->andFilterWhere([
 			static::SUMMON_ALIAS . '.id' => $this->id,
-			static::SUMMON_ALIAS . '.type' => $this->type,
+			static::SUMMON_ALIAS . '.type_id' => $this->type_id,
 			static::SUMMON_ALIAS . '.status' => $this->status,
 			static::SUMMON_ALIAS . '.created_at' => $this->created_at,
 			static::SUMMON_ALIAS . '.updated_at' => $this->updated_at,
