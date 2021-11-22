@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use backend\modules\issue\models\SummonForm;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -38,7 +39,7 @@ class SummonType extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['name', 'short_name'], 'required'],
-			['term', 'integer'],
+			['term', 'integer', 'min' => 1],
 			[['name'], 'string', 'max' => 100],
 			[['short_name'], 'string', 'max' => 10],
 			[['title'], 'string', 'max' => 255],

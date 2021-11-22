@@ -59,6 +59,16 @@ class SummonCest {
 		$I->seeInGridHeader('Updated at');
 		$I->seeInGridHeader('Owner');
 		$I->seeInGridHeader('Contractor');
+		$I->dontSeeLink('Summon Types');
+	}
+
+	public function checkIndexPageAsIssueSummonManagerWithSummonManagerPermission(SummonIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(Worker::PERMISSION_SUMMON_MANAGER);
+		$I->amOnPage(static::ROUTE_INDEX);
+		$I->seeLink('Summon Types');
+		$I->click('Summon Types');
+		$I->seeInCurrentUrl(SummonTypeCest::ROUTE_INDEX);
 	}
 
 	public function checkCreateSummonLink(SummonIssueManager $I): void {
