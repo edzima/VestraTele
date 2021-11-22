@@ -5,9 +5,11 @@ namespace backend\modules\issue\controllers;
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\issue\models\SummonForm;
 use common\models\issue\Summon;
+use common\models\user\Worker;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -53,7 +55,7 @@ class SummonController extends Controller {
 	 */
 	public function actionView(int $id): string {
 		return $this->render('view', [
-			'model' => $this->findModel($id),
+			'model' => $this->findModel($id, false),
 		]);
 	}
 
@@ -89,7 +91,7 @@ class SummonController extends Controller {
 	 */
 	public function actionUpdate(int $id) {
 		$model = new SummonForm();
-		$model->setModel($this->findModel($id));
+		$model->setModel($this->findModel($id, true));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
@@ -109,7 +111,7 @@ class SummonController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionDelete(int $id) {
-		$this->findModel($id)->delete();
+		$this->findModel($id, true)->delete();
 
 		return $this->redirect(['index']);
 	}
@@ -121,10 +123,14 @@ class SummonController extends Controller {
 	 * @param integer $id
 	 * @return Summon the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
+	 * @throws MethodNotAllowedHttpException if the model is not for User.
 	 */
-	protected function findModel($id): Summon {
+	protected function findModel(int $id, bool $checkUser): Summon {
 		if (($model = Summon::findOne($id)) !== null) {
 			return $model;
+		}
+		if (!$model->isForUser(Yii::$app->user->getId()) || !Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
+			throw new MethodNotAllowedHttpException('Only User or Summon Manager can update.');
 		}
 
 		throw new NotFoundHttpException('The requested page does not exist.');

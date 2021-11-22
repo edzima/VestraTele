@@ -24,6 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= SummonGrid::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'valueType' => SummonGrid::VALUE_TYPE_NAME_SHORT,
 	]) ?>
 
 

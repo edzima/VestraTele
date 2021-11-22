@@ -28,14 +28,15 @@ class SummonSearch extends Summon implements
 	protected const SUMMON_ALIAS = 'S';
 
 	public static function getTypesNames(): array {
-		return SummonType::getNames();
+		return SummonType::getNamesWithShort();
 	}
 
 	public static function getOwnersNames(): array {
 		return User::getSelectList(Summon::find()
 			->select('owner_id')
 			->distinct()
-			->column()
+			->column(),
+			false
 		);
 	}
 
@@ -43,7 +44,8 @@ class SummonSearch extends Summon implements
 		return User::getSelectList(Summon::find()
 			->select('contractor_id')
 			->distinct()
-			->column()
+			->column(),
+			false
 		);
 	}
 
@@ -81,6 +83,8 @@ class SummonSearch extends Summon implements
 				$query->joinWith('userProfile CP');
 			},
 		]);
+		$query->with('owner.userProfile');
+		$query->with('contractor.userProfile');
 		$query->with('type');
 
 		// add conditions that should always apply here

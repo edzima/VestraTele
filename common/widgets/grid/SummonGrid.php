@@ -9,6 +9,9 @@ use Yii;
 
 class SummonGrid extends GridView {
 
+	public const VALUE_TYPE_NAME_SHORT = 'type.short_name';
+	public const VALUE_TYPE_NAME = 'type.name';
+
 	public $id = 'summon-grid';
 
 	/** @todo add note link */
@@ -18,6 +21,7 @@ class SummonGrid extends GridView {
 	];
 
 	public string $issueColumn = IssueColumn::class;
+	public string $valueType = self::VALUE_TYPE_NAME;
 
 	public bool $withIssue = true;
 	public bool $withCustomer = true;
@@ -61,9 +65,11 @@ class SummonGrid extends GridView {
 				'visible' => $this->withCustomerPhone,
 			],
 			[
-				'attribute' => 'type',
-				'value' => 'typeName',
+				'attribute' => 'type_id',
+				'value' => $this->valueType,
 				'filter' => SummonSearch::getTypesNames(),
+				'contentBold' => true,
+				'noWrap' => true,
 			],
 			[
 				'attribute' => 'status',
@@ -100,6 +106,10 @@ class SummonGrid extends GridView {
 				],
 				'filterWidgetOptions' => [
 					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
 				],
 				'visible' => $this->withOwner,
 			],
@@ -113,6 +123,10 @@ class SummonGrid extends GridView {
 				],
 				'filterWidgetOptions' => [
 					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
 				],
 				'visible' => $this->withContractor,
 			],

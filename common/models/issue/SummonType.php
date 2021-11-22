@@ -21,17 +21,15 @@ use yii\helpers\ArrayHelper;
 class SummonType extends ActiveRecord {
 
 	/**
+	 * @var mixed|null
+	 */
+	private static array $MODELS;
+
+	/**
 	 * {@inheritdoc}
 	 */
 	public static function tableName(): string {
 		return '{{%summon_type}}';
-	}
-
-	public static function getNames(): array {
-		return ArrayHelper::map(
-			static::find()
-				->all(),
-			'id', 'name');
 	}
 
 	/**
@@ -70,4 +68,31 @@ class SummonType extends ActiveRecord {
 	public function getSummons() {
 		return $this->hasMany(Summon::class, ['type' => 'id']);
 	}
+
+	public function getNameWithShort(): string {
+		return $this->short_name . ' - ' . $this->name;
+	}
+
+	public static function getNames(): array {
+		return ArrayHelper::map(static::getModels(), 'id', 'name');
+	}
+
+	public static function getShortTypesNames(): array {
+		return ArrayHelper::map(static::getModels(), 'id', 'short_name');
+	}
+
+	public static function getNamesWithShort(): array {
+		return ArrayHelper::map(static::getModels(), 'id', 'nameWithShort');
+	}
+
+	/**
+	 * @return static[]
+	 */
+	public static function getModels(): array {
+		if (empty(static::$MODELS)) {
+			static::$MODELS = static::find()->indexBy('id')->all();
+		}
+		return static::$MODELS;
+	}
+
 }

@@ -134,7 +134,9 @@ class Summon extends ActiveRecord implements IssueInterface {
 	}
 
 	public function getEntityWithCity(): string {
-		return $this->entityResponsible->name . ' - ' . $this->city->name;
+		return $this->entityResponsible->name .
+			' - '
+			. $this->city->name;
 	}
 
 	public function getTypeName(): string {
