@@ -9,6 +9,7 @@ use common\models\user\Worker;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 
@@ -87,14 +88,14 @@ class SummonController extends Controller {
 	 *
 	 * @param integer $id
 	 * @return mixed
-	 * @throws NotFoundHttpException if the model cannot be found
+	 * @throws NotFoundHttpException|MethodNotAllowedHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
 		$model = new SummonForm();
 		$model->setModel($this->findModel($id, true));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->getModel()->id]);
+			return $this->redirect(['view', 'id' => $id]);
 		}
 
 		return $this->render('update', [
@@ -123,16 +124,22 @@ class SummonController extends Controller {
 	 * @param integer $id
 	 * @return Summon the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
-	 * @throws MethodNotAllowedHttpException if the model is not for User.
+	 * @throws ForbiddenHttpException if the model is not for User.
 	 */
 	protected function findModel(int $id, bool $checkUser): Summon {
-		if (($model = Summon::findOne($id)) !== null) {
-			return $model;
+		if (($model = Summon::findOne($id)) === null) {
+			throw new NotFoundHttpException('The requested page does not exist.');
 		}
-		if (!$model->isForUser(Yii::$app->user->getId()) || !Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
-			throw new MethodNotAllowedHttpException('Only User or Summon Manager can update.');
+		if ($checkUser) {
+			codecept_debug('Summon is for User: ' . $model->isForUser(Yii::$app->user->getId()));
+			codecept_debug('Has Summon.manger: ' . Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER));
+
+			if (!$model->isForUser(Yii::$app->user->getId())
+				&& !Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
+				throw new ForbiddenHttpException('Only User or Summon Manager can update.');
+			}
 		}
 
-		throw new NotFoundHttpException('The requested page does not exist.');
+		return $model;
 	}
 }
