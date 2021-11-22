@@ -12,6 +12,7 @@ class SummonFixture extends ActiveFixture {
 
 	public $depends = [
 		IssueFixture::class,
+		SummonTypeFixture::class,
 		SimcFixture::class,
 	];
 

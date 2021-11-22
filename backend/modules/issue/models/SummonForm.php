@@ -6,6 +6,7 @@ use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\issue\Summon;
+use common\models\issue\SummonType;
 use common\models\user\User;
 use common\models\user\Worker;
 use edzima\teryt\models\Simc;
@@ -33,7 +34,7 @@ class SummonForm extends Model {
 	public int $owner_id;
 
 	public int $status = Summon::STATUS_NEW;
-	public int $type = Summon::TYPE_APPEAL;
+	public ?int $type_id = null;
 	public $term = self::TERM_ONE_WEEK;
 	public string $title = '';
 	public ?int $issue_id = null;
@@ -49,21 +50,30 @@ class SummonForm extends Model {
 	private ?Summon $model = null;
 
 	private ?array $_contractorIds = null;
+	public bool $sendEmailToContractor = true;
 
 	public function rules(): array {
 		return [
-			[['type', 'status', 'title', 'issue_id', 'owner_id', 'contractor_id', 'start_at', 'entity_id', 'city_id'], 'required'],
-			[['type', 'issue_id', 'owner_id', 'contractor_id', 'status'], 'integer'],
+			[['type_id', 'status', 'title', 'issue_id', 'owner_id', 'contractor_id', 'start_at', 'entity_id', 'city_id'], 'required'],
+			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status', 'entity_id'], 'integer'],
+			['sendEmailToContractor', 'boolean'],
+			[['title'], 'string', 'max' => 255],
 			[['start_at', 'realize_at', 'realized_at'], 'safe'],
+			[
+				'deadline_at', 'required', 'enableClientValidation' => false, 'when' => function () {
+				return $this->getModel()->isNewRecord && $this->term === static::TERM_CUSTOM;
+			},
+				'message' => Yii::t('common', 'Deadline At cannot be blank on custom term.'),
+			],
 			[['start_at', 'deadline_at'], 'date', 'format' => 'yyyy-MM-dd'],
 			[['realize_at', 'realized_at'], 'date', 'format' => 'yyyy-MM-dd HH:mm'],
+			['entity_id', 'in', 'range' => array_keys(static::getEntityNames())],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
-			['type', 'in', 'range' => array_keys(static::getTypesNames())],
+			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
 			['term', 'in', 'range' => array_keys(static::getTermsNames())],
-			[['title'], 'string', 'max' => 255],
-			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			[['contractor_id'], 'in', 'range' => array_keys($this->getContractors()),],
-			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
+			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
+			[['!owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
 		];
 	}
 
@@ -75,6 +85,7 @@ class SummonForm extends Model {
 		return array_merge(
 			$this->getModel()->attributeLabels(), [
 			'term' => Yii::t('common', 'Term'),
+			'sendEmailToContractor' => Yii::t('issue', 'Send Email To Contractor'),
 		]);
 	}
 
@@ -85,10 +96,18 @@ class SummonForm extends Model {
 		return $this->model;
 	}
 
+	public function setType(SummonType $type): void {
+		$this->type_id = $type->id;
+		if ($type->title) {
+			$this->title = $type->title;
+		}
+		$this->term = $type->term;
+	}
+
 	public function setModel(Summon $model): void {
 		$this->model = $model;
 		$this->status = $model->status;
-		$this->type = $model->type;
+		$this->type_id = $model->type_id;
 		$this->issue_id = $model->issue_id;
 		$this->title = $model->title;
 		$this->contractor_id = $model->contractor_id;
@@ -107,7 +126,7 @@ class SummonForm extends Model {
 		}
 		$model = $this->getModel();
 		$model->status = $this->status;
-		$model->type = $this->type;
+		$model->type_id = $this->type_id;
 		$model->issue_id = $this->issue_id;
 		$model->title = $this->title;
 		$model->contractor_id = $this->contractor_id;
@@ -137,12 +156,28 @@ class SummonForm extends Model {
 		return false;
 	}
 
+	public function sendEmailToContractor(): bool {
+		if (!$this->sendEmailToContractor || empty($this->getModel()->contractor->email)) {
+			return false;
+		}
+		$model = $this->getModel();
+		return Yii::$app->mailer
+			->compose(
+				['html' => 'summonCreate-html',],
+				['model' => $model]
+			)
+			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
+			->setTo($model->contractor->email)
+			->setSubject(Yii::t('issue', 'You have new Summon: {type}', ['type' => $model->getTypeName()]))
+			->send();
+	}
+
 	public static function getStatusesNames(): array {
 		return Summon::getStatusesNames();
 	}
 
 	public static function getTypesNames(): array {
-		return Summon::getTypesNames();
+		return SummonType::getNames();
 	}
 
 	public static function getEntityNames(): array {
@@ -168,18 +203,17 @@ class SummonForm extends Model {
 		return $this->_contractorIds;
 	}
 
-	//@todo add I18n
 	public static function getTermsNames(): array {
 		return [
-			static::TERM_ONE_DAY => '1 dzień',
-			static::TERM_TREE_DAYS => '3 dni',
-			static::TERM_FIVE_DAYS => '5 dni',
-			static::TERM_ONE_WEEK => 'Tydzień',
-			static::TERM_TWO_WEEKS => '2 tygodnie',
-			static::TERM_THREE_WEEKS => '3 tygodnie ',
-			static::TERM_ONE_MONTH => 'Miesiąc',
-			static::TERM_EMPTY => 'Bez terminu',
-			static::TERM_CUSTOM => 'Custom',
+			static::TERM_ONE_DAY => Yii::t('common', '1 Day'),
+			static::TERM_TREE_DAYS => Yii::t('common', '1 Days'),
+			static::TERM_FIVE_DAYS => Yii::t('common', '5 Days'),
+			static::TERM_ONE_WEEK => Yii::t('common', 'Week'),
+			static::TERM_TWO_WEEKS => Yii::t('common', '2 Weeks'),
+			static::TERM_THREE_WEEKS => Yii::t('common', '3 Weeks'),
+			static::TERM_ONE_MONTH => Yii::t('common', 'Month'),
+			static::TERM_EMPTY => Yii::t('common', 'Without Term'),
+			static::TERM_CUSTOM => Yii::t('common', 'Custom Term'),
 		];
 	}
 

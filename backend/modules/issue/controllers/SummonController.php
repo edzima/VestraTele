@@ -4,10 +4,15 @@ namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\issue\models\SummonForm;
+use common\helpers\Flash;
 use common\models\issue\Summon;
+use common\models\issue\SummonType;
+use common\models\user\Worker;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -53,7 +58,7 @@ class SummonController extends Controller {
 	 */
 	public function actionView(int $id): string {
 		return $this->render('view', [
-			'model' => $this->findModel($id),
+			'model' => $this->findModel($id, false),
 		]);
 	}
 
@@ -64,14 +69,24 @@ class SummonController extends Controller {
 	 * @param int|null $issueId
 	 * @return mixed
 	 */
-	public function actionCreate(int $issueId = null) {
+	public function actionCreate(int $issueId = null, int $typeId = null, string $returnUrl = null) {
 		$model = new SummonForm();
 		$model->owner_id = Yii::$app->user->id;
 		$model->issue_id = $issueId;
 		$model->start_at = time();
+		if ($typeId && isset(SummonType::getModels()[$typeId])) {
+			$model->setType(SummonType::getModels()[$typeId]);
+		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->getModel()->id]);
+			$summon = $model->getModel();
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('backend', 'Create Summon - {type}: {title}', [
+					'type' => $summon->type->name,
+					'title' => $summon->title,
+				]));
+			$model->sendEmailToContractor();
+			return $this->redirect($returnUrl ?? ['view', 'id' => $summon->id]);
 		}
 
 		return $this->render('create', [
@@ -85,14 +100,14 @@ class SummonController extends Controller {
 	 *
 	 * @param integer $id
 	 * @return mixed
-	 * @throws NotFoundHttpException if the model cannot be found
+	 * @throws NotFoundHttpException|MethodNotAllowedHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
 		$model = new SummonForm();
-		$model->setModel($this->findModel($id));
+		$model->setModel($this->findModel($id, true));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->getModel()->id]);
+			return $this->redirect(['view', 'id' => $id]);
 		}
 
 		return $this->render('update', [
@@ -109,7 +124,7 @@ class SummonController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionDelete(int $id) {
-		$this->findModel($id)->delete();
+		$this->findModel($id, true)->delete();
 
 		return $this->redirect(['index']);
 	}
@@ -121,12 +136,20 @@ class SummonController extends Controller {
 	 * @param integer $id
 	 * @return Summon the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
+	 * @throws ForbiddenHttpException if the model is not for User.
 	 */
-	protected function findModel($id): Summon {
-		if (($model = Summon::findOne($id)) !== null) {
-			return $model;
+	protected function findModel(int $id, bool $checkUser): Summon {
+		if (($model = Summon::findOne($id)) === null) {
+			throw new NotFoundHttpException('The requested page does not exist.');
+		}
+		if ($checkUser) {
+
+			if (!$model->isForUser(Yii::$app->user->getId())
+				&& !Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
+				throw new ForbiddenHttpException('Only User or Summon Manager can update.');
+			}
 		}
 
-		throw new NotFoundHttpException('The requested page does not exist.');
+		return $model;
 	}
 }

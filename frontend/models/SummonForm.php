@@ -45,7 +45,7 @@ class SummonForm extends Model {
 			[['status'], 'integer'],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			[['realize_at', 'realized_at'], 'safe'],
-			[['realize_at', 'realized_at'], 'date', 'format' => 'yyyy-MM-dd HH:mm'],
+			[['realize_at', 'realized_at'], 'date', 'format' => 'yyyy-MM-dd HH:ii'],
 		];
 	}
 

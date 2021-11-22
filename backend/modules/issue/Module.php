@@ -38,6 +38,11 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
+						'controllers' => ['issue/summon-type'],
+						'permissions' => [Worker::PERMISSION_SUMMON_MANAGER],
+					],
+					[
+						'allow' => true,
 						'controllers' => ['issue/issue'],
 						'actions' => ['delete'],
 						'permissions' => [Worker::PERMISSION_ISSUE_DELETE],

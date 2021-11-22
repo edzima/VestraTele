@@ -3,6 +3,7 @@
 namespace common\models\issue\search;
 
 use common\models\issue\Summon;
+use common\models\issue\SummonType;
 use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
@@ -26,11 +27,16 @@ class SummonSearch extends Summon implements
 
 	protected const SUMMON_ALIAS = 'S';
 
+	public static function getTypesNames(): array {
+		return SummonType::getNamesWithShort();
+	}
+
 	public static function getOwnersNames(): array {
 		return User::getSelectList(Summon::find()
 			->select('owner_id')
 			->distinct()
-			->column()
+			->column(),
+			false
 		);
 	}
 
@@ -38,7 +44,8 @@ class SummonSearch extends Summon implements
 		return User::getSelectList(Summon::find()
 			->select('contractor_id')
 			->distinct()
-			->column()
+			->column(),
+			false
 		);
 	}
 
@@ -47,7 +54,7 @@ class SummonSearch extends Summon implements
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type', 'status', 'created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
+			[['id', 'type_id', 'status', 'created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
 			[['title'], 'safe'],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['customerPhone', PhoneValidator::class],
@@ -76,6 +83,9 @@ class SummonSearch extends Summon implements
 				$query->joinWith('userProfile CP');
 			},
 		]);
+		$query->with('owner.userProfile');
+		$query->with('contractor.userProfile');
+		$query->with('type');
 
 		// add conditions that should always apply here
 
@@ -99,7 +109,7 @@ class SummonSearch extends Summon implements
 		// grid filtering conditions
 		$query->andFilterWhere([
 			static::SUMMON_ALIAS . '.id' => $this->id,
-			static::SUMMON_ALIAS . '.type' => $this->type,
+			static::SUMMON_ALIAS . '.type_id' => $this->type_id,
 			static::SUMMON_ALIAS . '.status' => $this->status,
 			static::SUMMON_ALIAS . '.created_at' => $this->created_at,
 			static::SUMMON_ALIAS . '.updated_at' => $this->updated_at,

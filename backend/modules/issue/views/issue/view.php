@@ -2,6 +2,7 @@
 
 use backend\helpers\Breadcrumbs;
 use backend\modules\issue\widgets\StageChangeButtonDropdown;
+use backend\modules\issue\widgets\SummonCreateButtonDropdown;
 use backend\modules\issue\widgets\SummonGrid;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\issue\Issue;
@@ -28,18 +29,27 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		])
 		?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_SMS)
+		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
+			? SummonCreateButtonDropdown::widget([
+				'issueId' => $model->getIssueId(),
+			])
+			: ''
+		?>
+
+		<?= !$model->isArchived() && Yii::$app->user->can(Worker::PERMISSION_SMS)
 			? Html::a(Yii::t('common', 'Send SMS'), ['sms/push', 'id' => $model->id], [
 				'class' => 'btn btn-default',
-			]) : '' ?>
+			])
+			: ''
+		?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE) ? Html::a(Yii::t('backend', 'Create note'), ['note/create', 'issueId' => $model->id], [
-			'class' => 'btn btn-info',
-		]) : '' ?>
+		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE)
+			? Html::a(Yii::t('backend', 'Create note'), ['note/create', 'issueId' => $model->id], [
+				'class' => 'btn btn-info',
+			])
+			: ''
+		?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON) ? Html::a(Yii::t('backend', 'Create summon'), ['summon/create', 'issueId' => $model->id], [
-			'class' => 'btn btn-warning',
-		]) : '' ?>
 
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 

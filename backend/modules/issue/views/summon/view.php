@@ -53,7 +53,7 @@ YiiAsset::register($this);
 			'issue.longId:text:Sprawa',
 			'owner',
 			'contractor',
-			'typeName',
+			'type.name',
 			'statusName',
 			'entityWithCity',
 			'start_at:date',
