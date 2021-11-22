@@ -95,7 +95,9 @@ class SummonForm extends Model {
 
 	public function setType(SummonType $type): void {
 		$this->type_id = $type->id;
-		$this->title = $type->title;
+		if ($type->title) {
+			$this->title = $type->title;
+		}
 		$this->term = $type->term;
 	}
 

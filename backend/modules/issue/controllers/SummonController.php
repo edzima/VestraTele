@@ -4,7 +4,9 @@ namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\issue\models\SummonForm;
+use common\helpers\Flash;
 use common\models\issue\Summon;
+use common\models\issue\SummonType;
 use common\models\user\Worker;
 use Yii;
 use yii\filters\VerbFilter;
@@ -67,14 +69,24 @@ class SummonController extends Controller {
 	 * @param int|null $issueId
 	 * @return mixed
 	 */
-	public function actionCreate(int $issueId = null) {
+	public function actionCreate(int $issueId = null, int $typeId = null, string $returnUrl = null) {
 		$model = new SummonForm();
 		$model->owner_id = Yii::$app->user->id;
 		$model->issue_id = $issueId;
 		$model->start_at = time();
+		if ($typeId && isset(SummonType::getModels()[$typeId])) {
+			$model->setType(SummonType::getModels()[$typeId]);
+		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->getModel()->id]);
+			$summon = $model->getModel();
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('backend', 'Create Summon - {type}: {title}', [
+					'type' => $summon->type->name,
+					'title' => $summon->title,
+				]));
+			//@todo send Email to Contractor
+			return $this->redirect($returnUrl ?? ['view', 'id' => $summon->id]);
 		}
 
 		return $this->render('create', [
