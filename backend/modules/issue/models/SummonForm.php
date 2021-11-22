@@ -54,17 +54,24 @@ class SummonForm extends Model {
 	public function rules(): array {
 		return [
 			[['type_id', 'status', 'title', 'issue_id', 'owner_id', 'contractor_id', 'start_at', 'entity_id', 'city_id'], 'required'],
-			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status'], 'integer'],
+			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status', 'entity_id'], 'integer'],
+			[['title'], 'string', 'max' => 255],
 			[['start_at', 'realize_at', 'realized_at'], 'safe'],
+			[
+				'deadline_at', 'required', 'enableClientValidation' => false, 'when' => function () {
+				return $this->getModel()->isNewRecord && $this->term === static::TERM_CUSTOM;
+			},
+				'message' => Yii::t('common', 'Deadline At cannot be blank on custom term.'),
+			],
 			[['start_at', 'deadline_at'], 'date', 'format' => 'yyyy-MM-dd'],
 			[['realize_at', 'realized_at'], 'date', 'format' => 'yyyy-MM-dd HH:mm'],
+			['entity_id', 'in', 'range' => array_keys(static::getEntityNames())],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
 			['term', 'in', 'range' => array_keys(static::getTermsNames())],
-			[['title'], 'string', 'max' => 255],
-			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			[['contractor_id'], 'in', 'range' => array_keys($this->getContractors()),],
-			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
+			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
+			[['!owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
 		];
 	}
 
@@ -84,6 +91,12 @@ class SummonForm extends Model {
 			$this->model = new Summon();
 		}
 		return $this->model;
+	}
+
+	public function setType(SummonType $type): void {
+		$this->type_id = $type->id;
+		$this->title = $type->title;
+		$this->term = $type->term;
 	}
 
 	public function setModel(Summon $model): void {
@@ -169,18 +182,17 @@ class SummonForm extends Model {
 		return $this->_contractorIds;
 	}
 
-	//@todo add I18n
 	public static function getTermsNames(): array {
 		return [
-			static::TERM_ONE_DAY => '1 dzień',
-			static::TERM_TREE_DAYS => '3 dni',
-			static::TERM_FIVE_DAYS => '5 dni',
-			static::TERM_ONE_WEEK => 'Tydzień',
-			static::TERM_TWO_WEEKS => '2 tygodnie',
-			static::TERM_THREE_WEEKS => '3 tygodnie ',
-			static::TERM_ONE_MONTH => 'Miesiąc',
-			static::TERM_EMPTY => 'Bez terminu',
-			static::TERM_CUSTOM => 'Custom',
+			static::TERM_ONE_DAY => Yii::t('common', '1 Day'),
+			static::TERM_TREE_DAYS => Yii::t('common', '1 Days'),
+			static::TERM_FIVE_DAYS => Yii::t('common', '5 Days'),
+			static::TERM_ONE_WEEK => Yii::t('common', 'Week'),
+			static::TERM_TWO_WEEKS => Yii::t('common', '2 Weeks'),
+			static::TERM_THREE_WEEKS => Yii::t('common', '3 Weeks'),
+			static::TERM_ONE_MONTH => Yii::t('common', 'Month'),
+			static::TERM_EMPTY => Yii::t('common', 'Without Term'),
+			static::TERM_CUSTOM => Yii::t('common', 'Custom Term'),
 		];
 	}
 

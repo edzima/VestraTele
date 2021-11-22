@@ -157,16 +157,17 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 	}
 
 	public static function summon(): array {
-		return array_merge(TerytFixtureHelper::fixtures(), [
-			static::SUMMON => [
-				'class' => SummonFixture::class,
-				'dataFile' => static::dataDir() . 'issue/summon.php',
-			],
-			static::SUMMON_TYPE => [
-				'class' => SummonTypeFixture::class,
-				'dataFile' => static::dataDir() . 'issue/summon_type.php',
-			],
-		]);
+		return array_merge(TerytFixtureHelper::fixtures(),
+			[
+				static::SUMMON => [
+					'class' => SummonFixture::class,
+					'dataFile' => static::dataDir() . 'issue/summon.php',
+				],
+				static::SUMMON_TYPE => [
+					'class' => SummonTypeFixture::class,
+					'dataFile' => static::dataDir() . 'issue/summon_type.php',
+				],
+			]);
 	}
 
 }
