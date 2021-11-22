@@ -50,11 +50,13 @@ class SummonForm extends Model {
 	private ?Summon $model = null;
 
 	private ?array $_contractorIds = null;
+	public bool $sendEmailToContractor = true;
 
 	public function rules(): array {
 		return [
 			[['type_id', 'status', 'title', 'issue_id', 'owner_id', 'contractor_id', 'start_at', 'entity_id', 'city_id'], 'required'],
 			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status', 'entity_id'], 'integer'],
+			['sendEmailToContractor', 'boolean'],
 			[['title'], 'string', 'max' => 255],
 			[['start_at', 'realize_at', 'realized_at'], 'safe'],
 			[
@@ -83,6 +85,7 @@ class SummonForm extends Model {
 		return array_merge(
 			$this->getModel()->attributeLabels(), [
 			'term' => Yii::t('common', 'Term'),
+			'sendEmailToContractor' => Yii::t('issue', 'Send Email To Contractor'),
 		]);
 	}
 
@@ -151,6 +154,22 @@ class SummonForm extends Model {
 		]);
 		$this->addErrors($model->getErrors());
 		return false;
+	}
+
+	public function sendEmailToContractor(): bool {
+		if (!$this->sendEmailToContractor || empty($this->getModel()->contractor->email)) {
+			return false;
+		}
+		$model = $this->getModel();
+		return Yii::$app->mailer
+			->compose(
+				['html' => 'summonCreate-html',],
+				['model' => $model]
+			)
+			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
+			->setTo($model->contractor->email)
+			->setSubject(Yii::t('issue', 'You have new Summon: {type}', ['type' => $model->getTypeName()]))
+			->send();
 	}
 
 	public static function getStatusesNames(): array {

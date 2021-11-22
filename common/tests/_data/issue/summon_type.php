@@ -2,16 +2,12 @@
 
 return [
 	[
-		'name' => 'New',
-		'short_name' => 'N',
+		'name' => 'Phone',
+		'short_name' => 'P',
 	],
 	[
-		'name' => 'Appeal',
-		'short_name' => 'AP',
-	],
-	[
-		'name' => 'Realized',
-		'short_name' => 'R',
+		'name' => 'Direct',
+		'short_name' => 'D',
 	],
 
 ];

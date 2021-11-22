@@ -69,7 +69,10 @@ use yii\widgets\ActiveForm;
 				->widget(Select2::class, [
 						'data' => $model->getContractors(),
 					]
-				) ?>
+				)
+			?>
+
+
 
 
 			<?= $form->field($model, 'entity_id', [
@@ -122,6 +125,16 @@ use yii\widgets\ActiveForm;
 			])
 				->widget(DateTimeWidget::class) : '' ?>
 
+		</div>
+		<div class="row">
+			<?= $model->getModel()->isNewRecord
+				? $form->field($model, 'sendEmailToContractor', [
+					'options' => [
+						'class' => 'col-md-2',
+					],
+				])->checkbox()
+				: ''
+			?>
 		</div>
 
 

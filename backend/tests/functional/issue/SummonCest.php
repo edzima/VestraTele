@@ -7,6 +7,7 @@ use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\SummonIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\TerytFixtureHelper;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\Summon;
 use common\models\user\Worker;
 use Yii;
@@ -31,8 +32,8 @@ class SummonCest {
 
 	public function _fixtures(): array {
 		return array_merge(
-			IssueFixtureHelper::agent(),
 			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::users(true),
 			IssueFixtureHelper::entityResponsible(),
 			IssueFixtureHelper::summon()
 		);
@@ -84,6 +85,7 @@ class SummonCest {
 		$I->submitForm('#summon-form', [
 			'SummonForm[issue_id]' => 1,
 			'SummonForm[type_id]' => 1,
+			'SummonForm[contractor_id]' => $I->getUser()->id,
 			'SummonForm[term]' => 3,
 			'SummonForm[title]' => 'Test Summon Without Issue in Route Param',
 			'SummonForm[city_id]' => TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA,
@@ -94,6 +96,7 @@ class SummonCest {
 			'type_id' => 1,
 			'title' => 'Test Summon Without Issue in Route Param',
 		]);
+		$I->seeEmailIsSent();
 	}
 
 	public function checkNotUserSummonUpdateWithoutSummonManagerPermission(SummonIssueManager $I): void {

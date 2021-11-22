@@ -20,6 +20,9 @@ class SummonFormTest extends Unit {
 	private const DEFAULT_CITY_ID = TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA;
 	private const DEFAULT_OWNER_ID = UserFixtureHelper::AGENT_PETER_NOWAK;
 	private const DEFAULT_CONTRACTOR_ID = UserFixtureHelper::AGENT_AGNES_MILLER;
+	private const DEFAULT_TYPE_ID = 1;
+	private const DEFAULT_ISSUE_ID = 1;
+	private const DEFAULT_START_AT = '2020-01-01';
 
 	private SummonForm $model;
 
@@ -30,6 +33,7 @@ class SummonFormTest extends Unit {
 			[
 				'summon-agents' => $agent,
 			],
+			IssueFixtureHelper::users(),
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::entityResponsible(),
 			IssueFixtureHelper::summon()
@@ -103,7 +107,27 @@ class SummonFormTest extends Unit {
 	}
 
 	public function testEmptyDeadlineWithEmptyTerm(): void {
+		$this->giveModel();
+		$this->model->term = SummonForm::TERM_EMPTY;
+		$this->model->deadline_at = '2020-02-02';
+		$this->model->title = 'Empty Deadline';
+		$this->setDefault();
+		$this->thenSuccessSave();
+		$this->seeRecord([
+			'title' => 'Empty Deadline',
+			'deadline_at' => null,
+		]);
+	}
 
+	public function testSendEmailToContractor(): void {
+		$this->giveModel();
+		$this->setDefault();
+		$this->model->title = 'Summon Email';
+		$this->model->sendEmailToContractor = true;
+		$this->thenSuccessSave();
+		$this->tester->assertTrue($this->model->sendEmailToContractor());
+		$this->tester->seeEmailIsSent();
+		$message = $this->tester->grabLastSentEmail();
 	}
 
 	public function testSetType(): void {
@@ -120,12 +144,44 @@ class SummonFormTest extends Unit {
 		if (!isset($config['owner_id'])) {
 			$config['owner_id'] = static::DEFAULT_OWNER_ID;
 		}
-
 		$this->model = new SummonForm($config);
+	}
+
+	private function setDefault(): void {
+		$model = $this->model;
+		$model->city_id = static::DEFAULT_CITY_ID;
+		$model->contractor_id = static::DEFAULT_CONTRACTOR_ID;
+		$model->entity_id = static::DEFAULT_ENTITY_ID;
+		$model->type_id = static::DEFAULT_TYPE_ID;
+		$model->issue_id = static::DEFAULT_ISSUE_ID;
+		$model->start_at = static::DEFAULT_START_AT;
 	}
 
 	public function getModel(): SummonForm {
 		return $this->model;
+	}
+
+	private function seeRecord(array $attributes) {
+		if (!isset($attributes['city_id'])) {
+			$attributes['city_id'] = static::DEFAULT_CITY_ID;
+		}
+		if (!isset($attributes['entity_id'])) {
+			$attributes['entity_id'] = static::DEFAULT_ENTITY_ID;
+		}
+		if (!isset($attributes['contractor_id'])) {
+			$attributes['contractor_id'] = static::DEFAULT_CONTRACTOR_ID;
+		}
+		if (!isset($attributes['type_id'])) {
+			$attributes['type_id'] = static::DEFAULT_TYPE_ID;
+		}
+		if (!isset($attributes['issue_id'])) {
+			$attributes['issue_id'] = static::DEFAULT_ISSUE_ID;
+		}
+
+		if (!isset($attributes['start_at'])) {
+			$attributes['start_at'] = static::DEFAULT_START_AT;
+		}
+		$this->tester->seeRecord(Summon::class, $attributes);
 	}
 
 }

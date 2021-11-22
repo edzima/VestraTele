@@ -27,4 +27,6 @@ return [
 	'Send Email To Customer' => 'Email do Klienta',
 	'Send Email To Workers' => 'Email do Pracowników',
 	'Workers' => 'Pracownicy',
+	'You have new Summon: {type}' => 'Masz nowe Zlecenie: {type}',
+	'Send Email To Contractor' => 'Wyślij Email do Realizującego',
 ];

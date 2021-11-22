@@ -85,7 +85,7 @@ class SummonController extends Controller {
 					'type' => $summon->type->name,
 					'title' => $summon->title,
 				]));
-			//@todo send Email to Contractor
+			$model->sendEmailToContractor();
 			return $this->redirect($returnUrl ?? ['view', 'id' => $summon->id]);
 		}
 
@@ -143,8 +143,6 @@ class SummonController extends Controller {
 			throw new NotFoundHttpException('The requested page does not exist.');
 		}
 		if ($checkUser) {
-			codecept_debug('Summon is for User: ' . $model->isForUser(Yii::$app->user->getId()));
-			codecept_debug('Has Summon.manger: ' . Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER));
 
 			if (!$model->isForUser(Yii::$app->user->getId())
 				&& !Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
