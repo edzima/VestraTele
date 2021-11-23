@@ -19,7 +19,7 @@ class LoginForm extends Model {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			// username and password are both required
 			[['username', 'password'], 'required'],
@@ -27,6 +27,14 @@ class LoginForm extends Model {
 			['rememberMe', 'boolean'],
 			// password is validated by validatePassword()
 			['password', 'validatePassword'],
+		];
+	}
+
+	public function attributeLabels() {
+		return [
+			'username' => Yii::t('frontend', 'Username'),
+			'password' => Yii::t('frontend', 'Password'),
+			'rememberMe' => Yii::t('frontend', 'Remember Me'),
 		];
 	}
 
