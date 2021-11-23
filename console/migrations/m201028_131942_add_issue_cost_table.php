@@ -23,13 +23,15 @@ class m201028_131942_add_issue_cost_table extends Migration {
 			'date_at' => $this->date()->notNull(),
 		]);
 		$this->createIndex('index_issue_cost_type', '{{%issue_cost}}', 'type');
-		$this->addForeignKey('fk_issue_cost_issue', '{{%issue_cost}}', 'issue_id', '{{%issue}}', 'id');
+		$this->addForeignKey('fk_issue_cost_issue', '{{%issue_cost}}', 'issue_id', '{{%issue}}', 'id', 'CASCADE', 'CASCADE');
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function safeDown(): void {
+		$this->dropForeignKey('fk_issue_cost_issue', '{{%issue_cost}}');
+
 		$this->dropTable('{{%issue_cost}}');
 	}
 
