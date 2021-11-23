@@ -7,9 +7,10 @@ use frontend\models\NavItem;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\Breadcrumbs;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $content string */
 
 AppAsset::register($this);
@@ -21,7 +22,11 @@ AppAsset::register($this);
 	<meta charset="<?= Yii::$app->charset ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<?php $this->registerCsrfMetaTags() ?>
-	<title><?= Html::encode($this->title) ?></title>
+	<title><?= Html::encode(strtr('{appName} - {title}', [
+				'{appName}' => Yii::$app->name,
+				'{title}' => $this->title,
+			])
+		) ?></title>
 	<?php $this->head() ?>
 </head>
 <body>
