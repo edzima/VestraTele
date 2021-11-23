@@ -2,6 +2,7 @@
 
 namespace common\helpers;
 
+use Yii;
 use yii\helpers\BaseUrl;
 
 /**
@@ -11,10 +12,26 @@ use yii\helpers\BaseUrl;
  */
 class Url extends BaseUrl {
 
-	public const ROUTE_ISSUE_VIEW = '/issue/issue/view';
+	protected const ROUTE_ISSUE_VIEW = '/issue/issue/view';
+	protected const ROUTE_SETTLEMENT_VIEW = '/settlement/settlement/view';
 
-	public static function issueView(int $id): string {
-		return static::toRoute([static::ROUTE_ISSUE_VIEW, 'id' => $id]);
+	public static function issueView(int $id, $schema = false): string {
+		return static::toRoute([static::ROUTE_ISSUE_VIEW, 'id' => $id], $schema);
+	}
+
+	public static function settlementView(int $id, $schema = false): string {
+		return static::toRoute([static::ROUTE_SETTLEMENT_VIEW, 'id' => $id], $schema);
+	}
+
+	static function getUrlManager() {
+		if (!empty(static::managerConfig())) {
+			static::$urlManager = Yii::createObject(static::managerConfig());
+		}
+		return parent::getUrlManager();
+	}
+
+	protected static function managerConfig(): array {
+		return [];
 	}
 
 }

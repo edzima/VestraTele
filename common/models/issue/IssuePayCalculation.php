@@ -10,6 +10,7 @@ use common\models\provision\ProvisionQuery;
 use common\models\user\User;
 use DateTime;
 use Decimal\Decimal;
+use frontend\helpers\Url;
 use Yii;
 use yii\base\InvalidCallException;
 use yii\behaviors\TimestampBehavior;
@@ -192,7 +193,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	}
 
 	public function getFrontendUrl(): string {
-		return Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['settlement/view', 'id' => $this->getId()]);
+		return Url::settlementView($this->getId(), true);
 	}
 
 	public function getUserProvisionsSum(int $id): Decimal {

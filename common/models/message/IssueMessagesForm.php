@@ -7,6 +7,7 @@ use common\components\message\MessageTemplateKeyHelper;
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueUser;
+use frontend\helpers\Url;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\mail\MessageInterface;
@@ -226,8 +227,8 @@ class IssueMessagesForm extends MessageModel {
 		}
 	}
 
-	protected function getIssueFrontendAbsoluteLink(): string {
-		$url = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['issue/view', 'id' => $this->issue->getIssueId()]);
+	public function getIssueFrontendAbsoluteLink(): string {
+		$url = Url::issueView($this->issue->getIssueId(), true);
 		return Html::a($this->issue->getIssueName(), $url);
 	}
 
