@@ -27,10 +27,10 @@ class IssuePayDelayedMessagesForm extends IssuePayMessagesForm {
 	protected function parsePay(MessageTemplate $template) {
 		parent::parsePay($template);
 		$template->parseBody(['deadlineAt' => $this->pay->getDeadlineAt()->format($this->dateFormat)]);
-		$template->parseBody(['deadlineDays' => $this->getDeadlineDays()]);
+		$template->parseBody(['delayedDays' => $this->getDelayedDays()]);
 	}
 
-	private function getDeadlineDays(): string {
+	private function getDelayedDays(): string {
 		return (new DateTime())->diff($this->pay->getDeadlineAt())->format("%a");
 	}
 
