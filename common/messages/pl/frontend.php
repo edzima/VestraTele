@@ -143,5 +143,5 @@ return [
 	'Sorry, we are unable to resend verification email for the provided email address.' => 'Przepraszamy, nie możemy ponownie wysłać e-maila weryfikacyjnego dla podanego adresu e-mail.',
 	'Resend verification email' => 'Wysłać ponownie email weryfikacyjny',
 	'Please fill out your email. A verification email will be sent there.' => 'Podaj swój adres e-mail. Zostanie tam wysłany e-mail weryfikacyjny.',
-	'Please choose your new password:' => 'Podaj nowe hasło:',
+	'Please choose your new password:' => 'Wybierz nowe hasło:',
 ];

@@ -279,7 +279,7 @@ return [
 	'Uncollectible' => 'Nieściągalne',
 	'Not payed' => 'Nieopłacone',
 	'Only bookkeeper or owner can update settlement.' => 'Tylko księgowy lub właściciel rozliczenia może je edytować.',
-	'Update pay: {value}' => 'Update pay: {value}',
+	'Update pay: {value}' => 'Edytuj Wpłatę: {value}',
 	'Received {count} pays. Value sum: {valueSum}' => 'Odebrano {count} wpłat. Suma: {valueSum}',
 	'Pay status: {value}' => 'Status wpłaty: {value}',
 	'Traits' => 'Cechy',
