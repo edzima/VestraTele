@@ -8,6 +8,7 @@ use Yii;
 
 class IssuePayGrid extends BaseIssuePayGrid {
 
+	public ?string $settlementViewRoute = '/settlement/view';
 	public ?string $payProvisionsRoute = '/pay/pay-provisions';
 	public ?string $payRoute = '/pay/pay';
 	public ?string $updateRoute = '/pay/update';

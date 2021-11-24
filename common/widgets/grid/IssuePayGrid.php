@@ -17,7 +17,7 @@ class IssuePayGrid extends GridView {
 	/** @var IssuePaySearch|null */
 	public $filterModel;
 
-	public ?string $settlementViewRoute = '/settlement/view';
+	public ?string $settlementViewRoute = '/settlement/calculation/view';
 	public ?string $payRoute = '/settlement/pay/pay';
 	public ?string $updateRoute = '/settlement/pay/update';
 	public ?string $statusRoute = '/settlement/pay/status';
