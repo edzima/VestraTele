@@ -114,6 +114,10 @@ class DemandForPayment extends Model {
 		return Yii::createObject($this->messageConfig);
 	}
 
+	/**
+	 * @return IssuePay[]
+	 * @throws InvalidConfigException
+	 */
 	public function getPays(): array {
 		if (empty($this->pays)) {
 			$this->pays = IssuePay::find()

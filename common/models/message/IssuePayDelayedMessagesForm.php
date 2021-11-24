@@ -3,6 +3,7 @@
 namespace common\models\message;
 
 use common\components\message\MessageTemplate;
+use DateTime;
 
 class IssuePayDelayedMessagesForm extends IssuePayMessagesForm {
 
@@ -26,6 +27,11 @@ class IssuePayDelayedMessagesForm extends IssuePayMessagesForm {
 	protected function parsePay(MessageTemplate $template) {
 		parent::parsePay($template);
 		$template->parseBody(['deadlineAt' => $this->pay->getDeadlineAt()->format($this->dateFormat)]);
+		$template->parseBody(['deadlineDays' => $this->getDeadlineDays()]);
+	}
+
+	private function getDeadlineDays(): string {
+		return (new DateTime())->diff($this->pay->getDeadlineAt())->format("%a");
 	}
 
 	public function keysParts(string $type): array {

@@ -21,14 +21,14 @@ return [
 	],
 	[
 		'templateId' => 4,
-		'subject' => 'Email. Abaout First Demand Payed: {payValue} {issue} (All types) for Worker.',
-		'body' => 'Not Payed: {payValue}. Deadline: {deadlineAt}. Customer: {customerName} - {customerPhone}. Details: {settlementLink}',
+		'subject' => 'Email. About First Demand Payed: {payValue} {issue} (All types) for Worker.',
+		'body' => 'Not Payed: {payValue} since {deadlineDays} days Customer: {customerName} - {customerPhone}. Details: {settlementLink}',
 		'language' => 'en-US',
 	],
 	[
 		'templateId' => 5,
 		'subject' => 'Sms About Not Full Payed Pay(TYPE_1) for Workers.',
-		'body' => 'Not Payed: {payValue}. Deadline: {deadlineAt}. Customer: {customerName} - {customerPhone}. Details: {settlementLink}',
+		'body' => 'Not Payed: {payValue} since {deadlineDays} days. Customer: {customerName} - {customerPhone}. Details: {settlementLink}',
 		'language' => 'en-US',
 	],
 ];

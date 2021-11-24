@@ -52,14 +52,26 @@ class IssuePayDelayedMessagesFormTest extends IssuePayMessagesFormTest {
 		return $config;
 	}
 
-	public function testSmsCustomerPay(): void {
+	public function testSmsCustomer(): void {
 		$this->givePay(['deadline_at' => '2020-02-02']);
 		$this->giveModel();
 		$sms = $this->model->getSmsToCustomer();
 		$this->tester->assertNotNull($sms);
+		$this->tester->assertStringContainsString($this->issue->getIssueModel()->agent->getFullName(), $sms->message);
+		$this->tester->assertStringNotContainsString($this->issue->getIssueModel()->customer->getFullName(), $sms->message);
 		$this->tester->assertStringContainsString($this->issue->getIssueType()->name, $sms->message);
 		$this->tester->assertStringContainsString($this->getFormattedPayValue(true), $sms->message);
 		$this->tester->assertStringContainsString($this->pay->getDeadlineAt()->format(static::DATE_FORMAT), $sms->message);
+	}
+
+	public function testSmsToAgent(): void {
+		$this->givePay(['deadline_at' => date(static::DATE_FORMAT, strtotime('- 3 days'))]);
+		$this->giveModel();
+		$sms = $this->model->getSmsToAgent();
+		$this->tester->assertNotNull($sms);
+		$this->tester->assertStringContainsString($this->issue->getIssueModel()->customer->getFullName(), $sms->message);
+		$this->tester->assertStringNotContainsString($this->issue->getIssueModel()->agent->getFullName(), $sms->message);
+		$this->tester->assertStringContainsString('since 3 days', $sms->message);
 	}
 
 }

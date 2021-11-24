@@ -10,7 +10,7 @@ use yii\console\Controller;
 
 class SettlementMessagesController extends Controller {
 
-	public function actionFirstDemand(int $delayDays): void {
+	public function actionFirstDemand(int $delayDays = null): void {
 		$model = $this->createModel();
 		$model->delayedDays = $delayDays;
 		$model->which = DemandForPayment::WHICH_FIRST;
