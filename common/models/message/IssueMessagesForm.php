@@ -236,7 +236,7 @@ class IssueMessagesForm extends MessageModel {
 		$template->parseBody([
 			'customerName' => $this->getCustomerName(),
 			'customerPhone' => $this->getCustomerPhone(),
-			'customerEmail' => $this->getCustomerName(),
+			'customerEmail' => $this->getCustomerEmail(),
 		]);
 	}
 
