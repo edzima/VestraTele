@@ -37,6 +37,13 @@ class LeadSmsFormTest extends Unit {
 		$this->thenSeeError('Status cannot be current Status: New', 'status_id');
 	}
 
+	public function testInvalidStatus(): void {
+		$this->giveModel();
+		$this->model->status_id = 1010010100;
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Status is invalid.', 'status_id');
+	}
+
 	public function testPushJob(): void {
 		$this->giveModel();
 		$this->model->message = 'Test Message';

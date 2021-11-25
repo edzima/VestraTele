@@ -5,6 +5,7 @@ use common\components\User as WebUser;
 use common\models\user\User;
 use common\modules\lead\Module as LeadModule;
 use frontend\controllers\ApiLeadController;
+use yii\base\Action;
 
 $params = array_merge(
 	require __DIR__ . '/../../common/config/params.php',
@@ -48,7 +49,14 @@ return [
 							'lead/source',
 							'lead/reminder',
 							'lead/report',
+							'lead/sms',
 						],
+						'matchCallback' => static function ($rule, Action $action): bool {
+							if ($action->controller->id === 'sms') {
+								return Yii::$app->user->can(User::PERMISSION_SMS);
+							}
+							return true;
+						},
 						'permissions' => [User::PERMISSION_LEAD],
 					],
 					[

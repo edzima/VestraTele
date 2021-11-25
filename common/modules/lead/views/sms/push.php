@@ -2,7 +2,6 @@
 
 use common\helpers\Html;
 use common\modules\lead\models\LeadSmsForm;
-use common\modules\lead\models\LeadStatus;
 use common\widgets\ActiveForm;
 use yii\web\View;
 
@@ -21,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<div class="lead-sms-push-form">
 		<?php $form = ActiveForm::begin(['id' => 'lead-sms-push-form']) ?>
 
-		<?= $form->field($model, 'status_id')->dropDownList(LeadStatus::getNames()) ?>
+		<?= $form->field($model, 'status_id')->dropDownList(LeadSmsForm::getStatusNames()) ?>
 
 		<?= $form->field($model, 'phone')->textInput(['readonly' => true]) ?>
 

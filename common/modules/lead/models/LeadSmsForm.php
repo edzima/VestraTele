@@ -24,11 +24,19 @@ class LeadSmsForm extends SmsForm {
 		parent::__construct($config);
 	}
 
+	public function attributeLabels(): array {
+		return array_merge(
+			parent::attributeLabels(), [
+			'status_id' => Yii::t('lead', 'Status'),
+		]);
+	}
+
 	public function rules(): array {
 		return array_merge(
 			[
 				[['!owner_id', 'status_id'], 'required'],
 				['status_id', 'integer'],
+				['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 				[
 					'status_id',
 					'compare',
@@ -37,7 +45,7 @@ class LeadSmsForm extends SmsForm {
 					'operator' => '!==',
 					'compareValue' => $this->getLead()->getStatusId(),
 					'message' => Yii::t('lead', 'Status cannot be current Status: {status}', [
-						'status' => LeadStatus::getNames()[$this->getLead()->getStatusId()],
+						'status' => static::getStatusNames()[$this->getLead()->getStatusId()],
 					]),
 				],
 			],
@@ -72,6 +80,10 @@ class LeadSmsForm extends SmsForm {
 			'status_id' => $this->status_id,
 			'owner_id' => $this->owner_id,
 		]);
+	}
+
+	public static function getStatusNames(): array {
+		return LeadStatus::getNames();
 	}
 
 }
