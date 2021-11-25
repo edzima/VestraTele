@@ -140,6 +140,7 @@ return [
 			'class' => AdescomSender::class,
 			'client' => [
 				'class' => AdescomSoap::class,
+				'keySessionIdCache' => null,
 				'login' => $_ENV['ADESCOM_LOGIN'],
 				'password' => $_ENV['ADESCOM_PASSWORD'],
 			],
