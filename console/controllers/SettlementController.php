@@ -31,16 +31,4 @@ class SettlementController extends Controller {
 		}
 	}
 
-	public function actionDelayedPays(int $days): void {
-		$models = IssuePay::find()
-			->onlyDelayed($days)
-			->joinWith('calculation')
-			->all();
-
-		foreach ($models as $model) {
-			$message = new IssuePayDelayedMessagesForm();
-			$message->setPay($model);
-			$message->pushMessages();
-		}
-	}
 }
