@@ -56,9 +56,6 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	public const PROBLEM_STATUS_BAILLIF = 40;
 	public const PROBLEM_STATUS_EXTERNAL_DEBT_COLLECTION = 50;
 
-	public const PROVIDER_CLIENT = 1;
-	public const PROVIDER_RESPONSIBLE_ENTITY = 10;
-
 	private static ?array $STAGES_NAMES = null;
 	private static ?array $OWNER_NAMES = null;
 
@@ -143,6 +140,10 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 
 	public function getOwnerId(): int {
 		return $this->owner_id;
+	}
+
+	public function getProviderType(): int {
+		return $this->provider_type;
 	}
 
 	public function getType(): int {

@@ -3,6 +3,7 @@
 namespace common\models\message;
 
 use common\components\message\MessageTemplate;
+use common\models\issue\IssueSettlement;
 use DateTime;
 
 class IssuePayDelayedMessagesForm extends IssuePayMessagesForm {
@@ -14,6 +15,13 @@ class IssuePayDelayedMessagesForm extends IssuePayMessagesForm {
 
 	public bool $withSettlementTypeInKey = false;
 	public bool $bindIssueType = true;
+
+	public function pushMessages(): ?int {
+		if ($this->settlement->getProviderType() === IssueSettlement::PROVIDER_CLIENT) {
+			return parent::pushMessages();
+		}
+		return null;
+	}
 
 	protected static function mainKeys(): array {
 		return [
