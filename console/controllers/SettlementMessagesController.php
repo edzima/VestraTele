@@ -34,6 +34,7 @@ class SettlementMessagesController extends Controller {
 	protected function createModel(): DemandForPayment {
 		$model = new DemandForPayment();
 		$model->smsOwnerId = $this->getSmsOwnerId();
+		$model->consoleController = $this;
 		return $model;
 	}
 

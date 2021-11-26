@@ -24,7 +24,10 @@ class IssueMessagesForm extends MessageModel {
 	public bool $sendEmailToCustomer = false;
 	public bool $sendEmailToWorkers = false;
 
-	public $workersTypes = [];
+	public $workersTypes = [
+		IssueUser::TYPE_AGENT,
+		IssueUser::TYPE_TELEMARKETER,
+	];
 
 	public ?int $sms_owner_id = null;
 
@@ -35,7 +38,6 @@ class IssueMessagesForm extends MessageModel {
 	public function setIssue(IssueInterface $issue): void {
 		$this->issue = $issue;
 		if (!$this->issue->getIssueModel()->isNewRecord) {
-			$this->workersTypes = array_keys($this->getWorkersUsersTypesNames());
 			$this->sendSmsToCustomer = $this->customerHasPhone();
 			$this->sendSmsToAgent = $this->agentHasPhones();
 			$this->sendEmailToCustomer = $this->customerHasEmail();

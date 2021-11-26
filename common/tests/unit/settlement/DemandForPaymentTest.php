@@ -7,6 +7,7 @@ use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssuePay;
+use common\models\issue\IssueUser;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
 use console\models\DemandForPayment;
@@ -29,7 +30,7 @@ class DemandForPaymentTest extends Unit {
 	public function _fixtures(): array {
 		return array_merge(
 			IssueFixtureHelper::issue(),
-			IssueFixtureHelper::users(),
+			IssueFixtureHelper::users(true),
 			IssueFixtureHelper::types(),
 			SettlementFixtureHelper::settlement(),
 			SettlementFixtureHelper::owner(),
@@ -154,6 +155,16 @@ class DemandForPaymentTest extends Unit {
 		);
 
 		$this->tester->assertSame(3, $this->model->markMultiple());
+	}
+
+	public function testDefaultMessageForm(): void {
+		$this->giveModel();
+		$message = $this->model->createMessage();
+		$message->setPay($this->getPay());
+		$this->tester->assertTrue($message->sendSmsToAgent);
+		$this->tester->assertTrue($message->sendSmsToCustomer);
+		$this->tester->assertCount(1, $message->workersTypes);
+		$this->tester->assertContains(IssueUser::TYPE_AGENT, $message->workersTypes);
 	}
 
 	public function getModel(): DemandForPayment {

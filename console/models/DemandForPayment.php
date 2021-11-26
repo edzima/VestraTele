@@ -10,8 +10,11 @@ use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
+use yii\console\Controller;
 
 class DemandForPayment extends Model {
+
+	protected const LOG_CATEGORY = 'settlement.pay.demand';
 
 	public const WHICH_FIRST = 'first';
 	public const WHICH_SECOND = 'second';
@@ -34,6 +37,8 @@ class DemandForPayment extends Model {
 		'workersTypes' => [IssueUser::TYPE_AGENT],
 	];
 
+	public ?Controller $consoleController = null;
+
 	private array $pays = [];
 	private IssuePay $pay;
 
@@ -49,11 +54,18 @@ class DemandForPayment extends Model {
 
 	public function markMultiple(array $pays = []): ?int {
 		if (!$this->validate()) {
+			Yii::error([
+				'message' => 'Mark Multiple Pays as Demand with Errors',
+				'errors' => $this->getErrors(),
+			], static::LOG_CATEGORY
+			);
 			return false;
 		}
+		$this->stdout("Mark multiple Pays. Which {$this->which}\n");
 		if (empty($pays)) {
 			$pays = $this->getPays();
 		}
+		$this->stdout('Pays to mark: ' . count($pays) . "\n");
 		$count = 0;
 		foreach ($pays as $pay) {
 			$this->setPay($pay);
@@ -82,12 +94,16 @@ class DemandForPayment extends Model {
 	}
 
 	public function markOne(bool $validate = true): bool {
+		$this->stdout('Start Mark Pay: #' . $this->pay->getId() . "\n");
 		if ($validate && !$this->validate()) {
 			return false;
 		}
-		if ($this->pushMessages() === null) {
+		$messages = $this->pushMessages();
+		if ($messages === null) {
+			Yii::warning('Dont Push Messages for Pay: ' . $this->pay->getId(), static::LOG_CATEGORY);
 			return false;
 		}
+		$this->stdout("Push Messages: $messages\n");
 		$this->updateStatus();
 		return true;
 	}
@@ -110,7 +126,7 @@ class DemandForPayment extends Model {
 		return $model->pushMessages();
 	}
 
-	private function createMessage(): IssuePayDelayedMessagesForm {
+	public function createMessage(): IssuePayDelayedMessagesForm {
 		return Yii::createObject($this->messageConfig);
 	}
 
@@ -138,6 +154,12 @@ class DemandForPayment extends Model {
 				return IssuePay::STATUS_DEMAND_FOR_PAYMENT_THIRD;
 		}
 		throw new InvalidConfigException('Invalid Which.');
+	}
+
+	protected function stdout(string $message): void {
+		if ($this->consoleController) {
+			$this->consoleController->stdout($message);
+		}
 	}
 
 	private function getDelayedRange(): string {
