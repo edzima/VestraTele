@@ -13,6 +13,7 @@ use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
 use kartik\grid\SerialColumn;
+use kartik\select2\Select2;
 use yii\data\ActiveDataProvider;
 use yii\widgets\Pjax;
 
@@ -64,10 +65,6 @@ $('.table-responsive').on('hide.bs.dropdown', function () {
 		'id' => 'issues-list',
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'resizableColumns' => false,
-		'tableOptions' => [
-			'class' => 'table-fixed-layout',
-		],
 		'columns' => [
 			[
 				'class' => SerialColumn::class,
@@ -107,12 +104,23 @@ $('.table-responsive').on('hide.bs.dropdown', function () {
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'type_id',
-				'filter' => IssueSearch::getTypesNames(),
+				'filter' => IssueSearch::getIssueTypesNames(),
 				'value' => 'type.short_name',
 				'contentBold' => true,
 				'contentCenter' => true,
 				'options' => [
 					'style' => 'width:80px',
+				],
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('issue', 'Type'),
+				],
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
 				],
 			],
 			[
@@ -145,6 +153,17 @@ $('.table-responsive').on('hide.bs.dropdown', function () {
 				'format' => 'raw',
 				'contentBold' => true,
 				'contentCenter' => true,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('issue', 'Stage'),
+				],
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			[
 				'class' => DataColumn::class,

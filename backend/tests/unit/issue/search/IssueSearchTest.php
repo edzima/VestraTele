@@ -271,6 +271,16 @@ class IssueSearchTest extends Unit {
 		$this->tester->assertEmpty($this->getModels());
 	}
 
+	public function testWithSettlementsAndAgent(): void {
+		$this->model->onlyWithSettlements = true;
+		$this->model->agent_id = UserFixtureHelper::AGENT_PETER_NOWAK;
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame(UserFixtureHelper::AGENT_PETER_NOWAK, $model->agent->id);
+		}
+	}
+
 	/**
 	 * @param array $params
 	 * @return Issue[]

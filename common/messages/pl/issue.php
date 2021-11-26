@@ -29,4 +29,6 @@ return [
 	'Workers' => 'Pracownicy',
 	'You have new Summon: {type}' => 'Masz nowe Zlecenie: {type}',
 	'Send Email To Contractor' => 'Wyślij Email do Realizującego',
+	'Type' => 'Typ',
+	'Stage' => 'Etap',
 ];

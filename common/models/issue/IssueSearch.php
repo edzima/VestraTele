@@ -64,7 +64,7 @@ abstract class IssueSearch extends Model
 			],
 			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
-			['type_id', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
+			['type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[
 				[
@@ -202,10 +202,6 @@ abstract class IssueSearch extends Model
 		return User::getSelectList(
 			IssueUser::userIds(IssueUser::TYPE_TELEMARKETER)
 		);
-	}
-
-	public static function getTypesNames(): array {
-		return IssueType::getTypesNames();
 	}
 
 	public static function getEntityNames(): array {

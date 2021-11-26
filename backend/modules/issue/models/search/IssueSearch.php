@@ -165,8 +165,8 @@ class IssueSearch extends BaseIssueSearch {
 			return;
 		}
 		$query->joinWith('payCalculations PC', false);
+		if ((bool) $this->onlyWithSettlements === true) {
 
-		if ($this->onlyWithSettlements === true) {
 			$query->andWhere('PC.issue_id IS NOT NULL');
 			return;
 		}
