@@ -10,6 +10,7 @@ use common\models\provision\ProvisionQuery;
 use common\models\user\User;
 use DateTime;
 use Decimal\Decimal;
+use frontend\helpers\Url;
 use Yii;
 use yii\base\InvalidCallException;
 use yii\behaviors\TimestampBehavior;
@@ -54,9 +55,6 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	public const PROBLEM_STATUS_JUDGEMENT = 25;
 	public const PROBLEM_STATUS_BAILLIF = 40;
 	public const PROBLEM_STATUS_EXTERNAL_DEBT_COLLECTION = 50;
-
-	public const PROVIDER_CLIENT = 1;
-	public const PROVIDER_RESPONSIBLE_ENTITY = 10;
 
 	private static ?array $STAGES_NAMES = null;
 	private static ?array $OWNER_NAMES = null;
@@ -140,6 +138,14 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 		return $this->id;
 	}
 
+	public function getOwnerId(): int {
+		return $this->owner_id;
+	}
+
+	public function getProviderType(): int {
+		return $this->provider_type;
+	}
+
 	public function getType(): int {
 		return $this->type;
 	}
@@ -188,7 +194,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	}
 
 	public function getFrontendUrl(): string {
-		return Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['settlement/view', 'id' => $this->getId()]);
+		return Url::settlementView($this->getId(), true);
 	}
 
 	public function getUserProvisionsSum(int $id): Decimal {
@@ -413,6 +419,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 		return [
 			static::TYPE_HONORARIUM => Yii::t('settlement', 'Honorarium'),
 			static::TYPE_ADMINISTRATIVE => Yii::t('settlement', 'Administrative'),
+			static::TYPE_APPEAL => Yii::t('settlement', 'Appeal'),
 			static::TYPE_LAWYER => Yii::t('settlement', 'Lawyer'),
 			static::TYPE_SUBSCRIPTION => Yii::t('settlement', 'Subscription'),
 			static::TYPE_DEBT => Yii::t('settlement', 'Debt'),

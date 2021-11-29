@@ -3,6 +3,7 @@
 namespace common\modules\lead\models;
 
 use common\models\Address;
+use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
 use common\modules\reminder\models\Reminder;
 use DateTime;
@@ -275,12 +276,21 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function isForUser($id): bool {
-		return in_array($id, $this->getUsers(), true);
+		foreach ($this->leadUsers as $user) {
+			if ($user->user_id === $id) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function getSameContacts(): array {
 		$models = static::findByLead($this);
 		unset($models[$this->id]);
 		return $models;
+	}
+
+	public static function find(): LeadQuery {
+		return new LeadQuery(static::class);
 	}
 }

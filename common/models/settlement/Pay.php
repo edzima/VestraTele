@@ -13,6 +13,7 @@ class Pay extends BaseObject implements
 	private string $transferType;
 	private Decimal $value;
 	private ?Decimal $vat;
+	private ?int $status = null;
 	private ?DateTime $paymentAt = null;
 	private ?DateTime $deadlineAt = null;
 
@@ -56,12 +57,20 @@ class Pay extends BaseObject implements
 		$this->deadlineAt = $datetime;
 	}
 
+	protected function setStatus(?int $status): void {
+		$this->status = $status;
+	}
+
 	public function getDeadlineAt(): ?DateTime {
 		return $this->deadlineAt;
 	}
 
 	public function getVAT(): ?Decimal {
 		return $this->vat;
+	}
+
+	public function getStatus(): ?int {
+		return $this->status;
 	}
 
 	public function getTransferType(): string {

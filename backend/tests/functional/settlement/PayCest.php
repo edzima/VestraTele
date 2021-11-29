@@ -5,10 +5,12 @@ namespace backend\tests\functional\settlement;
 use backend\modules\settlement\controllers\PayController;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\PayIssueManager;
-use common\fixtures\helpers\EmailTemplateFixtureHelper;
+use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\helpers\Flash;
+use common\models\issue\IssueSettlement;
+use Yii;
 
 /**
  * Class PayCest
@@ -54,23 +56,56 @@ class PayCest {
 		$I->seeInGridHeader('Customer');
 	}
 
-	public function checkPay(PayIssueManager $I): void {
+	public function checkPayHonorarium(PayIssueManager $I): void {
 		$this->settlementFixture = new SettlementFixtureHelper($I);
 		$I->haveFixtures(array_merge(
 			IssueFixtureHelper::issue(),
-			IssueFixtureHelper::users(),
+			IssueFixtureHelper::types(),
+			IssueFixtureHelper::users(true),
 			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::owner(),
 			SettlementFixtureHelper::pay(),
-			EmailTemplateFixtureHelper::fixture(),
+			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_PAY_PAYED),
 		));
 		$I->amLoggedIn();
-		$pay = $this->settlementFixture->grabPay('not-payed');
-		$I->amOnRoute(static::ROUTE_PAY, ['id' => $pay->id]);
+		$id = $this->settlementFixture->havePay(100, [
+			'settlement' => [
+				'type' => IssueSettlement::TYPE_HONORARIUM,
+			],
+		]);
+		$I->amOnRoute(static::ROUTE_PAY, ['id' => $id]);
 		$I->see('Payed pay');
 		$I->fillField('Pay at', '2020-01-01');
 		$I->click('Save');
-		$I->seeFlash('The payment: ' . \Yii::$app->formatter->asCurrency($pay->getValue()) . ' marked as paid.', Flash::TYPE_SUCCESS);
+		$I->seeFlash('The payment: ' . Yii::$app->formatter->asCurrency(100) . ' marked as paid.', Flash::TYPE_SUCCESS);
 		$I->seeEmailIsSent(2);
+		$I->seeJobIsPushed(2);
+	}
+
+	public function checkPayAdministrative(PayIssueManager $I): void {
+		$this->settlementFixture = new SettlementFixtureHelper($I);
+		$I->haveFixtures(array_merge(
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::types(),
+			IssueFixtureHelper::users(true),
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::owner(),
+			SettlementFixtureHelper::pay(),
+			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_PAY_PAYED),
+		));
+		$I->amLoggedIn();
+		$id = $this->settlementFixture->havePay(100, [
+			'settlement' => [
+				'type' => IssueSettlement::TYPE_ADMINISTRATIVE,
+			],
+		]);
+		$I->amOnRoute(static::ROUTE_PAY, ['id' => $id]);
+		$I->see('Payed pay');
+		$I->fillField('Pay at', '2020-01-01');
+		$I->click('Save');
+		$I->seeFlash('The payment: ' . Yii::$app->formatter->asCurrency(100) . ' marked as paid.', Flash::TYPE_SUCCESS);
+		$I->dontSeeEmailIsSent();
+		$I->dontSeeJobIsPushed();
 	}
 
 }

@@ -30,6 +30,7 @@ class SettlementController extends Controller {
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'delete-multi' => ['POST'],
 					'generate' => ['POST'],
 					'generate-without-provisions' => ['POST'],
 				],
@@ -214,6 +215,19 @@ class SettlementController extends Controller {
 		}
 
 		return $this->redirect(['view', 'id' => $id]);
+	}
+
+	public function actionDeleteMulti(array $ids) {
+		$count = 0;
+		foreach ($ids as $id) {
+			$model = $this->findModel($id);
+			$count += Yii::$app->provisions->removeForPays($model->getPays()->getIds());
+		}
+		if ($count) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('provision', 'Remove {count} provisions.', ['count' => $count]));
+		}
+		return $this->redirect(['/settlement/calculation/index']);
 	}
 
 	private function findModel(int $id): IssueSettlement {

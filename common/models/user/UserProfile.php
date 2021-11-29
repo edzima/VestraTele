@@ -2,6 +2,7 @@
 
 namespace common\models\user;
 
+use common\models\user\query\UserProfileQuery;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use vova07\fileapi\behaviors\UploadBehavior;
 use Yii;
@@ -106,5 +107,13 @@ class UserProfile extends ActiveRecord {
 			static::GENDER_MALE => Yii::t('common', 'Male'),
 			static::GENDER_FEMALE => Yii::t('common', 'Female'),
 		];
+	}
+
+	public static function find(): UserProfileQuery {
+		return new UserProfileQuery(static::class);
+	}
+
+	public function hasPhones(): bool {
+		return !empty($this->phone) || !empty($this->phone_2);
 	}
 }

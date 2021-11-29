@@ -53,4 +53,16 @@ return [
 		'type_id' => 4,
 		'stage_id' => IssueStage::ARCHIVES_ID,
 	],
+	[
+		'type_id' => 5,
+		'stage_id' => 1,
+	],
+	[
+		'type_id' => 5,
+		'stage_id' => 2,
+	],
+	[
+		'type_id' => 5,
+		'stage_id' => IssueStage::ARCHIVES_ID,
+	],
 ];

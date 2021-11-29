@@ -40,18 +40,33 @@ YiiAsset::register($this);
 
 		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->getId()], ['class' => 'btn btn-warning']) ?>
 
+
+
 		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary']) ?>
 
-		<?= $withDelete
-			? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->getId()], [
-				'class' => 'btn btn-danger',
-				'data' => [
-					'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
-					'method' => 'post',
-				],
-			])
-			: ''
-		?>
+		<span class="pull-right">
+
+					<?= Yii::$app->user->can(User::PERMISSION_SMS)
+						? Html::a(Yii::t('lead', 'Send SMS'), ['sms/push', 'id' => $model->getId()],
+							['class' => 'btn btn-success'])
+						: ''
+					?>
+
+
+					<?= Html::a(Yii::t('lead', 'Assign User'), ['user/assign-single', 'id' => $model->getId()],
+						['class' => 'btn btn-info']) ?>
+
+					<?= $withDelete
+						? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->getId()], [
+							'class' => 'btn btn-danger',
+							'data' => [
+								'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
+								'method' => 'post',
+							],
+						])
+						: ''
+					?>
+		</span>
 
 
 	</p>

@@ -4,12 +4,16 @@ namespace backend\modules\issue\controllers;
 
 use backend\helpers\Url;
 use backend\modules\issue\models\IssueForm;
+use backend\modules\issue\models\IssueStageChangeForm;
+use backend\modules\issue\models\search\IssueLeadsSearch;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\CsvForm;
 use common\models\issue\Issue;
+use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
+use common\models\message\IssueCreateMessagesForm;
 use common\models\user\Customer;
 use common\models\user\Worker;
 use Yii;
@@ -17,6 +21,7 @@ use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 use yii2tech\csvgrid\CsvGrid;
 
 /**
@@ -61,8 +66,12 @@ class IssueController extends Controller {
 					'label' => 'Nr',
 				],
 				[
-					'attribute' => 'customer.fullName',
-					'label' => 'Imie nazwisko',
+					'attribute' => 'customer.profile.firstname',
+					'label' => 'Imie',
+				],
+				[
+					'attribute' => 'customer.profile.lastname',
+					'label' => 'Nazwisko',
 				],
 				[
 					'attribute' => 'customer.userProfile.phone',
@@ -128,6 +137,15 @@ class IssueController extends Controller {
 		]);
 	}
 
+	public function actionLead(): string {
+		$searchModel = new IssueLeadsSearch();
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		return $this->render('lead', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
 	/**
 	 * Displays a single Issue model.
 	 *
@@ -144,7 +162,6 @@ class IssueController extends Controller {
 		$summonDataProvider->sort = false;
 		$summonDataProvider->pagination = false;
 
-		Url::remember();
 		return $this->render('view', [
 			'model' => $model,
 			'calculationsDataProvider' => $calculationsDataProvider,
@@ -167,11 +184,26 @@ class IssueController extends Controller {
 		}
 
 		$model = new IssueForm(['customer' => $customer]);
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+		$messagesModel = new IssueCreateMessagesForm();
+		$messagesModel->setIssue($model->getModel());
+		$messagesModel->workersTypes = [
+			IssueUser::TYPE_AGENT => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
+			IssueUser::TYPE_TELEMARKETER => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
+			IssueUser::TYPE_LAWYER => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
+		];
+		$messagesModel->sms_owner_id = Yii::$app->user->getId();
+		$data = Yii::$app->request->post();
+		if ($model->load($data)
+			&& $model->save()) {
+			$messagesModel->setIssue($model->getModel());
+			if ($messagesModel->load($data)) {
+				$messagesModel->pushMessages();
+			}
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('create', [
 			'model' => $model,
+			'messagesModel' => $messagesModel,
 		]);
 	}
 
@@ -182,13 +214,28 @@ class IssueController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionUpdate($id) {
+	public function actionUpdate(int $id) {
 		$form = new IssueForm(['model' => $this->findModel($id)]);
 		if ($form->load(Yii::$app->request->post()) && $form->save()) {
-			return $this->redirect(['index']);
+			return $this->redirect(['view', 'id' => $id]);
 		}
 		return $this->render('update', [
 			'model' => $form,
+		]);
+	}
+
+	public function actionStage(int $issueId, int $stageId = null, string $returnUrl = null) {
+		$model = new IssueStageChangeForm($this->findModel($issueId));
+		if ($stageId !== null) {
+			$model->stage_id = $stageId;
+		}
+		$model->date_at = date($model->dateFormat);
+		$model->user_id = Yii::$app->user->getId();
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect($returnUrl ?? ['view', 'id' => $issueId]);
+		}
+		return $this->render('stage', [
+			'model' => $model,
 		]);
 	}
 
@@ -199,7 +246,7 @@ class IssueController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionDelete($id) {
+	public function actionDelete(int $id): Response {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);

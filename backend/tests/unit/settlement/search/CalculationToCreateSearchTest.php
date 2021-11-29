@@ -45,27 +45,31 @@ class CalculationToCreateSearchTest extends Unit {
 	}
 
 	public function testIssueWithStageWithoutMinCountSettings(): void {
-		$this->assertTotalCount(0, ['issue_id' => 1]);
-		$this->assertTotalCount(0, ['issue_id' => 2]);
+		$this->model->issue_id = 1;
+		$this->tester->assertEmpty($this->model->search([])->getTotalCount());
+		$this->model->issue_id = 2;
+		$this->tester->assertEmpty($this->model->search([])->getTotalCount());
 	}
 
 	public function testIssueWithStageWithMinCountSettings(): void {
-		$this->assertTotalCount(1, ['issue_id' => 3]);
+		$this->model->issue_id = 3;
+		$this->tester->assertNotEmpty($this->model->search([])->getTotalCount());
 	}
 
 	public function testCustomerSearch(): void {
-		$models = $this->search(['customerLastname' => 'Way'])->getModels();
-		$this->tester->assertNotEmpty($models);
-		foreach ($models as $model) {
-			/** @var Issue $model */
-			$this->tester->assertStringStartsWith('Way', $model->customer->profile->lastname);
-		}
-
-		$models = $this->search(['customerLastname' => 'Lar'])->getModels();
+		$this->model->customerLastname = 'Lar';
+		$models = $this->model->search(['customerLastname' => 'Lar'])->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
 			/** @var Issue $model */
 			$this->tester->assertStringStartsWith('Lar', $model->customer->profile->lastname);
+		}
+
+		$models = $this->search(['customerLastname' => 'Len'])->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			/** @var Issue $model */
+			$this->tester->assertStringStartsWith('Len', $model->customer->profile->lastname);
 		}
 	}
 

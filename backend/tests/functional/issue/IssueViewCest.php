@@ -2,14 +2,22 @@
 
 namespace backend\tests\functional\issue;
 
+use backend\helpers\Url;
+use backend\modules\issue\controllers\IssueController;
 use backend\tests\Step\Functional\CostIssueManager;
 use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\SummonIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
+use common\models\user\Worker;
 
 class IssueViewCest {
+
+	/** @see IssueController::actionView() */
+	public const ROUTE = '/issue/issue/view';
+	/** @see IssueController::actionDelete() */
+	public const ROUTE_DELETE = '/issue/issue/delete';
 
 	/**
 	 * Load fixtures before db transaction begin
@@ -51,6 +59,14 @@ class IssueViewCest {
 		$I->seeResponseCodeIsSuccessful();
 	}
 
+	public function checkStageLink(IssueManager $I): void {
+		$I->amLoggedIn();
+		$this->goToIssuePage($I);
+		$I->seeLink('Change Stage');
+		$I->click('Change Stage');
+		$I->seeInCurrentUrl(IssueStageChangeCest::ROUTE);
+	}
+
 	public function checkCostLink(CostIssueManager $I): void {
 		$I->amLoggedIn();
 		$this->goToIssuePage($I);
@@ -75,10 +91,29 @@ class IssueViewCest {
 		$I->seeResponseCodeIsSuccessful();
 	}
 
+	public function checkDeleteLinkWithoutPermission(IssueManager $I): void {
+		$I->amLoggedIn();
+		$model = $this->goToIssuePage($I);
+		$I->dontSeeLink('Delete');
+		$I->sendAjaxPostRequest(Url::to([static::ROUTE_DELETE, 'id' => $model->id]), $I->getCSRF());
+		$I->seeResponseCodeIs(403);
+	}
+
+	public function checkDeleteLinkWithPermission(IssueManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(Worker::PERMISSION_ISSUE_DELETE);
+		$model = $this->goToIssuePage($I);
+		$I->seeLink('Delete');
+		$I->sendAjaxPostRequest(Url::to([static::ROUTE_DELETE, 'id' => $model->id]), $I->getCSRF());
+		$I->dontSeeRecord(Issue::class, [
+			'id' => $model->id,
+		]);
+	}
+
 	protected function goToIssuePage(IssueManager $I, string $issueIndex = '0'): Issue {
 		/** @var Issue $model */
 		$model = $I->grabFixture(IssueFixtureHelper::ISSUE, $issueIndex);
-		$I->amOnPage(['/issue/issue/view', 'id' => $model->id]);
+		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
 		return $model;
 	}
 

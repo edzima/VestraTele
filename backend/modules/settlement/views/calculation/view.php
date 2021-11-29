@@ -61,7 +61,7 @@ YiiAsset::register($this);
 		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger pull-right',
 			'data' => [
-				'confirm' => 'Are you sure you want to delete this item?',
+				'confirm' => Yii::t('backend', 'Are you sure you want to delete this item?'),
 				'method' => 'post',
 			],
 		]) : '' ?>
@@ -81,6 +81,7 @@ YiiAsset::register($this);
 		'summary' => '',
 		'visibleProvisionsDetails' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR) || $model->issue->isForUser(Yii::$app->user->getId()),
 		'visibleSettlementType' => false,
+		'visibleIssueType' => false,
 	])
 	?>
 

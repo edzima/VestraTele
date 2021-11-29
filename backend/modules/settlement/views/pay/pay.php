@@ -13,11 +13,10 @@ $this->title = Yii::t('settlement', 'Payed pay({partInfo}): {value}', [
 	'partInfo' => $model->getPay()->getPartInfo(),
 ]);
 $calculation = $model->getPay()->calculation;
-$issue = $calculation->issue;
-$this->params['breadcrumbs'] = Breadcrumbs::issue($issue);
+$this->params['breadcrumbs'] = Breadcrumbs::issue($calculation);
 if (Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
 	$this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['/settlement/calculation/index']];
-	$this->params['breadcrumbs'][] = ['label' => $issue->longId, 'url' => ['/settlement/calculation/issue', 'id' => $issue->id]];
+	$this->params['breadcrumbs'][] = ['label' => $calculation->getIssueName(), 'url' => ['/settlement/calculation/issue', 'id' => $calculation->getIssueId()]];
 }
 $this->params['breadcrumbs'][] = ['label' => $calculation->getTypeName(), 'url' => ['/settlement/calculation/view', 'id' => $calculation->id]];
 $this->params['breadcrumbs'][] = $this->title;

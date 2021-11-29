@@ -20,10 +20,18 @@ class UserFixtureHelper {
 	public const CUSTOMER_TOMMY_JOHNS = 102;
 	public const CUSTOMER_JOHN_LENNON = 103;
 
+	public const LAWYER_1 = 200;
+	public const LAWYER_2 = 201;
+	public const LAWYER_3_INACTIVE = 202;
+
 	public const AGENT_PETER_NOWAK = 300;
 	public const AGENT_AGNES_MILLER = 301;
 	public const AGENT_TOMMY_SET = 302;
 	public const AGENT_EMILY_PAT = 303;
+
+	public const TELE_1 = 400;
+	public const TELE_2 = 401;
+	public const TELE_3_INACTIVE = 402;
 
 	public const WORKER_AGENT = 'agent';
 	public const WORKER_LAWYER = 'lawyer';
@@ -63,8 +71,19 @@ class UserFixtureHelper {
 
 	public static function profile(string $type): array {
 		return [
-			'class' => UserProfileFixture::class,
-			'dataFile' => static::dataDir() . $type . '_profile.php',
+			'user_' . $type . '_profile' => [
+				'class' => UserProfileFixture::class,
+				'dataFile' => static::dataDir() . $type . '_profile.php',
+			],
+		];
+	}
+
+	public static function profiles(): array {
+		return [
+			'user_profiles' => [
+				'class' => UserProfileFixture::class,
+				'dataFile' => static::dataDir() . 'profiles.php',
+			],
 		];
 	}
 

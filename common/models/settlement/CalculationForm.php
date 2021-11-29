@@ -55,11 +55,11 @@ class CalculationForm extends PayForm {
 	}
 
 	public function isRequiredPaymentAt(): bool {
-		return $this->getModel()->getPaysCount() < 2 && parent::isRequiredPaymentAt();
+		return false;
 	}
 
 	public function isRequiredDeadlineAt(): bool {
-		return $this->getModel()->getPaysCount() < 2 && parent::isRequiredDeadlineAt();
+		return false;
 	}
 
 	public function setCalculation(IssuePayCalculation $model): void {
@@ -93,11 +93,7 @@ class CalculationForm extends PayForm {
 		return $this->model;
 	}
 
-	/**
-	 * @return int
-	 * @throws InvalidConfigException
-	 */
-	protected function getOwner(): int {
+	public function getOwner(): int {
 		return $this->owner;
 	}
 

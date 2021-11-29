@@ -4,12 +4,18 @@ namespace console\controllers;
 
 use backend\modules\settlement\models\CalculationProblemStatusForm;
 use common\components\DbManager;
+use common\helpers\StringHelper;
 use common\models\issue\IssueMeet;
+use common\models\issue\IssueNote;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
 use common\models\provision\IssueProvisionType;
 use common\models\user\Customer;
+use common\models\user\UserProfile;
+use common\modules\lead\models\forms\ReportForm;
+use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadReport;
 use common\models\user\User;
 use common\models\user\UserRelation;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
@@ -20,7 +26,72 @@ use yii\helpers\Json;
 
 class UpgradeController extends Controller {
 
+	public function actionReports(int $owner_id): void {
+		$reports = LeadReport::find()
+			->joinWith('lead')
+			->andWhere([LeadReport::tableName() . '.owner_id' => $owner_id])
+			->all();
+		foreach ($reports as $report) {
+			$lead = $report->lead;
+			$lead->status_id = $report->old_status_id;
+			$lead->save();
+			$report->delete();
+		}
+	}
 
+	public function actionLeads(int $newStatus, int $owner_id): void {
+		foreach (Lead::find()
+			->distinct()
+			->andWhere(['!=', 'status_id', $newStatus])
+			->andWhere('lead.phone IS NOT NULL')
+			->leftJoin(UserProfile::tableName() . ' UP', 'UP.phone = lead.phone OR UP.phone_2 = lead.phone')
+			->andWhere('UP.user_id IS NOT NULL')
+			->batch() as $rows) {
+			foreach ($rows as $lead) {
+				/** @var Lead $lead */
+				$report = new ReportForm();
+				$report->setLead($lead);
+				$report->withAddress = false;
+				$report->withAnswers = false;
+				$report->owner_id = $owner_id;
+				$report->status_id = $newStatus;
+				$report->save(false);
+			}
+		}
+	}
+
+	public function actionLeadEmptyPhone(): void {
+		Lead::updateAll(['phone' => null], ['phone' => '+48 33 322 21 11']);
+		Lead::updateAll(['phone' => null], ['phone' => '']);
+	}
+
+	public function actionNoteTitleDates(): void {
+		$count = 0;
+		foreach (IssueNote::find()->andWhere(['like', 'title', '('])->batch(500) as $rows) {
+			foreach ($rows as $note) {
+				/** @var IssueNote $note */
+				$date = StringHelper::between($note->title, '(', ')');
+				$dateTime = null;
+				if ($date) {
+					try {
+						$dateTime = new \DateTime($date);
+						$count++;
+						$note->detachBehaviors();
+						$note->updateIssueAfterSave = false;
+						$note->publish_at = $dateTime->format('Y-m-d');
+						$note->title = trim(str_replace("($date)", '', $note->title));
+						if (!$note->save()) {
+							Console::output(print_r($note->getErrors()));
+						}
+					} catch (\Exception $exception) {
+						Console::output($date);
+					}
+				}
+			}
+		}
+		Console::output('Total Count: ' . IssueNote::find()->andWhere(['like', 'title', '('])->count());
+		Console::output('With Valid Date Count: ' . $count);
+	}
 
 	public function actionProvisionTypeUsers(): void {
 		/** @var IssueProvisionType[] $types */

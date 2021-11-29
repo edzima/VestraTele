@@ -18,6 +18,8 @@ use yii\web\Response;
  */
 class ReportController extends BaseController {
 
+	public ?bool $allowDelete = true;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -52,9 +54,6 @@ class ReportController extends BaseController {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'visibleButtons' => [
-				'delete' => $this->module->allowDelete,
-			],
 		]);
 	}
 
@@ -75,7 +74,7 @@ class ReportController extends BaseController {
 	public function actionReport(int $id, int $status_id = null) {
 		$model = new ReportForm();
 		$model->owner_id = (int) Yii::$app->user->getId();
-		$model->setLead($this->findLead($id));
+		$model->setLead($this->findLead($id, false));
 		if ($status_id) {
 			$model->status_id = $status_id;
 		}

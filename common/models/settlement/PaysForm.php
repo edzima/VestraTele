@@ -11,9 +11,9 @@ use yii\helpers\ArrayHelper;
 
 class PaysForm extends PayForm {
 
-	public const DEADLINE_LAST_DAY_OF_MONTH = 'last day of next month';
+	public const DEADLINE_INTERVAL_MONTH = 'month';
 
-	public string $deadlineRange = self::DEADLINE_LAST_DAY_OF_MONTH;
+	public string $deadlineRange = self::DEADLINE_INTERVAL_MONTH;
 	public int $count = 1;
 	public int $minCount = 1;
 
@@ -124,10 +124,8 @@ class PaysForm extends PayForm {
 		for ($i = 0; $i < $this->count; $i++) {
 			$pay = $this->generatePay(false, $value->div($this->count), $deadline);
 			$pays[] = $pay;
-			if ($deadline !== null && $this->deadlineRange === static::DEADLINE_LAST_DAY_OF_MONTH) {
-				$deadline = DateTimeHelper::lastDayOfMonth(
-					DateTimeHelper::addMonth($deadline)
-				);
+			if ($deadline !== null && $this->deadlineRange === static::DEADLINE_INTERVAL_MONTH) {
+				$deadline = DateTimeHelper::getSameDayNextMonth($deadline);
 			}
 		}
 		return $pays;

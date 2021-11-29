@@ -17,7 +17,7 @@ class IssuePayGrid extends GridView {
 	/** @var IssuePaySearch|null */
 	public $filterModel;
 
-	public ?string $settlementViewRoute = '/settlement/view';
+	public ?string $settlementViewRoute = '/settlement/calculation/view';
 	public ?string $payRoute = '/settlement/pay/pay';
 	public ?string $updateRoute = '/settlement/pay/update';
 	public ?string $statusRoute = '/settlement/pay/status';
@@ -35,6 +35,7 @@ class IssuePayGrid extends GridView {
 	public bool $visiblePayAt = true;
 	public bool $visibleProvisionsDetails = true;
 	public bool $visibleSettlementType = true;
+	public bool $visibleIssueType = true;
 	public bool $rowColors = true;
 
 	public ?int $userId = null;
@@ -51,13 +52,6 @@ class IssuePayGrid extends GridView {
 		}
 
 		parent::init();
-	}
-
-	public function renderProvision(IssuePay $model): string {
-		return ProvisionUserGrid::widget([
-			'pay' => $model,
-			'userId' => $this->userId,
-		]);
 	}
 
 	public function defaultColumns(): array {
@@ -96,6 +90,14 @@ class IssuePayGrid extends GridView {
 				'label' => Yii::t('settlement', 'Settlement type'),
 				'width' => '120px',
 				'visible' => $this->visibleSettlementType,
+			],
+			[
+				'class' => IssueTypeColumn::class,
+				'attribute' => 'issueTypesIds',
+				'value' => 'issue.type',
+				'noWrap' => true,
+				'valueType' => IssueTypeColumn::VALUE_NAME,
+				'visible' => $this->visibleIssueType,
 			],
 			[
 				'class' => AgentDataColumn::class,
@@ -139,7 +141,8 @@ class IssuePayGrid extends GridView {
 			'template' => '{pay} {status} {received} {update} {delete}',
 			'visibleButtons' => [
 				'pay' => function (PayInterface $pay): bool {
-					return !$pay->isPayed() && $this->payRoute !== null;
+					return !$pay->isPayed()
+						&& $this->payRoute !== null;
 				},
 				'update' => $this->updateRoute !== null,
 				'status' => function (PayInterface $pay): bool {

@@ -8,6 +8,7 @@ use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
+use Yii;
 
 class CalculationUpdateCest {
 
@@ -83,22 +84,22 @@ class CalculationUpdateCest {
 			'value' => 215,
 			'pay_at' => '2020-02-01',
 		]);
-		$I->seeFlash('Settlement value is not same as sum value from pays. Diff: ' . \Yii::$app->formatter->asCurrency(1230) . '.', 'danger');
+		$I->seeFlash('Settlement value is not same as sum value from pays. Diff: ' . Yii::$app->formatter->asCurrency(1230) . '.', 'danger');
 	}
 
 	public function checkChangeType(Bookkeeper $I): void {
 		$calculation = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
 		$I->amOnPage([static::ROUTE, 'id' => $calculation->id]);
-		$I->seeOptionIsSelected('#calculationform-type', IssuePayCalculation::getTypesNames()[IssuePayCalculation::TYPE_ADMINISTRATIVE]);
-		$I->selectOption('#calculationform-type', IssuePayCalculation::TYPE_HONORARIUM);
+		$I->seeOptionIsSelected('#calculationform-type', IssuePayCalculation::getTypesNames()[IssuePayCalculation::TYPE_HONORARIUM]);
+		$I->selectOption('#calculationform-type', IssuePayCalculation::TYPE_ADMINISTRATIVE);
 		$I->click('Save');
 		$I->dontSeeRecord(IssuePayCalculation::class, [
 			'id' => $calculation->id,
-			'type' => IssuePayCalculation::TYPE_ADMINISTRATIVE,
+			'type' => IssuePayCalculation::TYPE_HONORARIUM,
 		]);
 		$I->seeRecord(IssuePayCalculation::class, [
 			'id' => $calculation->id,
-			'type' => IssuePayCalculation::TYPE_HONORARIUM,
+			'type' => IssuePayCalculation::TYPE_ADMINISTRATIVE,
 		]);
 	}
 

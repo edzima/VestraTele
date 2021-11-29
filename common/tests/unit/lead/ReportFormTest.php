@@ -8,6 +8,7 @@ use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatusInterface;
+use common\modules\lead\models\LeadUser;
 use common\modules\lead\Module;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
@@ -183,6 +184,26 @@ class ReportFormTest extends Unit {
 		foreach ($answered as $questionId => $answer) {
 			$this->thenSeeAnswer($questionId, $answer);
 		}
+	}
+
+	public function testNotSelfLead(): void {
+		$this->giveForm([
+			'owner_id' => 3,
+			'lead' => $this->haveLead([
+				'source_id' => 1,
+				'status_id' => LeadStatusInterface::STATUS_NEW,
+				'data' => 'test-lead',
+			]),
+			'details' => 'Report not self Lead',
+		]);
+		$this->tester->assertFalse($this->model->getLead()->isForUser(3));
+		$this->thenSuccessSave();
+		$this->tester->seeRecord(LeadUser::class, [
+			'lead_id' => $this->model->getLead()->getId(),
+			'user_id' => 3,
+			'type' => LeadUser::TYPE_TELE,
+		]);
+		$this->tester->assertTrue($this->model->getLead()->isForUser(3));
 	}
 
 	private function haveLead(array $attributes): ActiveLead {

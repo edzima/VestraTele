@@ -31,7 +31,20 @@ $this->params['breadcrumbs'][] = $this->title;
 			])
 			: ''
 		?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_SMS)
+			? Html::a(Yii::t('common', 'Send SMS'), ['/issue-sms/push', 'id' => $model->id], [
+				'class' => 'btn btn-warning',
+			])
+			: ''
+		?>
 	</p>
+
+	<?= IssueNotesWidget::widget([
+		'model' => $model,
+		'notes' => $model->getIssueNotes()->joinWith('user.userProfile')->pinned()->all(),
+		'title' => Yii::t('issue', 'Pinned Issue Notes'),
+	]) ?>
 
 	<?= $calculationsDataProvider !== null
 	&& $calculationsDataProvider->getTotalCount() > 0
@@ -69,8 +82,5 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model,
-		'noteOptions' => [
-			'removeBtn' => false,
-		],
 	]) ?>
 </div>

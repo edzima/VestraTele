@@ -46,6 +46,9 @@ class RbacController extends Controller {
 		Worker::PERMISSION_CALCULATION_TO_CREATE => [
 			Worker::ROLE_BOOKKEEPER,
 		],
+		Worker::PERMISSION_CALCULATION_UPDATE => [
+			Worker::ROLE_BOOKKEEPER,
+		],
 		Worker::PERMISSION_CALCULATION_PAYS => [
 			Worker::ROLE_BOOKKEEPER,
 		],
@@ -54,11 +57,13 @@ class RbacController extends Controller {
 		],
 		User::PERMISSION_EXPORT,
 		User::PERMISSION_ISSUE,
+		Worker::PERMISSION_ISSUE_DELETE,
 		Worker::PERMISSION_HINT,
 		User::PERMISSION_LOGS,
 		Worker::PERMISSION_MEET,
 		User::PERMISSION_NEWS,
 		User::PERMISSION_NOTE,
+		Worker::PERMISSION_NOTE_TEMPLATE,
 		User::PERMISSION_PROVISION,
 		Worker::PERMISSION_PAY => [
 			Worker::ROLE_BOOKKEEPER,
@@ -72,16 +77,23 @@ class RbacController extends Controller {
 		Worker::PERMISSION_PAY_RECEIVED => [
 			Worker::ROLE_BOOKKEEPER,
 		],
+		Worker::PERMISSION_PAY_PAID => [
+			Worker::ROLE_BOOKKEEPER,
+		],
+		Worker::PERMISSION_PAY_UPDATE => [
+			Worker::ROLE_BOOKKEEPER,
+		],
 		Worker::PERMISSION_SUMMON => [
 			Worker::ROLE_AGENT,
 		],
+		Worker::PERMISSION_SUMMON_MANAGER,
+		Worker::PERMISSION_SMS,
 		Worker::PERMISSION_WORKERS,
 		Worker::PERMISSION_LEAD,
+		Worker::PERMISSION_MESSAGE_TEMPLATE,
 		Worker::PERMISSION_CZATER,
 		Worker::PERMISSION_USER_RELATION,
 		Worker::PERMISSION_CZATER,
-		Worker::PERMISSION_USER_RELATION,
-		Worker::PERMISSION_EMAIL_TEMPLATE,
 		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
 
 	];

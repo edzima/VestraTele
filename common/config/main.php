@@ -1,7 +1,7 @@
 <?php
 
 use common\components\DbManager;
-use common\components\EmailTemplateManager;
+use common\components\message\MessageTemplateManager;
 use common\components\RelationComponent;
 use common\components\keyStorage\KeyStorage;
 use common\components\PayComponent;
@@ -9,15 +9,18 @@ use common\components\provision\Provisions;
 use common\components\TaxComponent;
 use common\components\Formatter;
 use common\models\user\User;
-use common\models\user\Worker;
 use common\modules\czater\Czater;
 use edzima\teryt\Module as TerytModule;
 use common\modules\lead\Module as LeadModule;
+use Edzima\Yii2Adescom\AdescomSender;
+use Edzima\Yii2Adescom\AdescomSoap;
 use yii\caching\DummyCache;
 use yii\caching\FileCache;
+use yii\mutex\MysqlMutex;
+use yii\queue\db\Queue;
 
 return [
-	'name' => 'Vestra CRM',
+	'name' => $_ENV['APP_NAME'],
 	'vendorPath' => dirname(__DIR__, 2) . '/vendor',
 	'extensions' => require(__DIR__ . '/../../vendor/yiisoft/extensions.php'),
 	'timeZone' => 'Europe/Warsaw', //@todo load from .env
@@ -26,6 +29,7 @@ return [
 	'bootstrap' => [
 		'log',
 		'teryt',
+		'queue',
 	],
 	'aliases' => [
 		'@bower' => '@vendor/bower-asset',
@@ -54,8 +58,8 @@ return [
 			'charset' => 'utf8',
 			'enableSchemaCache' => YII_ENV_PROD,
 		],
-		'emailTemplate' => [
-			'class' => EmailTemplateManager::class,
+		'messageTemplate' => [
+			'class' => MessageTemplateManager::class,
 		],
 		'authManager' => [
 			'class' => DbManager::class,
@@ -131,11 +135,32 @@ return [
 		'provisions' => [
 			'class' => Provisions::class,
 		],
+		'sms' => [
+			'class' => AdescomSender::class,
+			'client' => [
+				'class' => AdescomSoap::class,
+				'keySessionIdCache' => null,
+				'login' => $_ENV['ADESCOM_LOGIN'],
+				'password' => $_ENV['ADESCOM_PASSWORD'],
+			],
+			'messageConfig' => [
+				'src' => $_ENV['ADESCOM_SRC'],
+				'overwriteSrc' => $_ENV['ADESCOM_OVERWRITE_SRC'],
+				'retryInterval' => 60,
+				'maxRetryCount' => 1,
+			],
+		],
 		'tax' => [
 			'class' => TaxComponent::class,
 		],
 		'userHierarchy' => [
 			'class' => RelationComponent::class,
+		],
+		'mutex' => [
+			'class' => MysqlMutex::class,
+		],
+		'queue' => [
+			'class' => Queue::class,
 		],
 	],
 ];

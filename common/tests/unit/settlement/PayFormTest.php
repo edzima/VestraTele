@@ -13,7 +13,7 @@ class PayFormTest extends Unit {
 
 	use UnitModelTrait;
 
-	private PayForm $model;
+	protected PayForm $model;
 
 	public function _before() {
 		parent::_before();

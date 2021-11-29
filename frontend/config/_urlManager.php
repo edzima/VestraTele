@@ -4,6 +4,8 @@ return [
 	'class' => 'yii\web\UrlManager',
 	'enablePrettyUrl' => true,
 	'showScriptName' => false,
+	'hostInfo' => Yii::getAlias('@frontendUrl'),
+	'baseUrl' => '',
 	'rules' => [
 
 		// Pages

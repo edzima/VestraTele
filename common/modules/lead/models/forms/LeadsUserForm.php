@@ -10,7 +10,11 @@ use yii\base\Model;
 
 class LeadsUserForm extends Model {
 
+	public const SCENARIO_SINGLE = 'single';
+
 	public array $leadsIds = [];
+
+	public bool $withOwner = true;
 
 	public ?string $userId = null;
 	public ?string $type = null;
@@ -20,8 +24,12 @@ class LeadsUserForm extends Model {
 		return array_combine($ids, $ids);
 	}
 
-	public static function getTypesNames(): array {
-		return LeadUser::getTypesNames();
+	public function getTypesNames(): array {
+		$types = LeadUser::getTypesNames();
+		if (!$this->withOwner) {
+			unset($types[LeadUser::TYPE_OWNER]);
+		}
+		return $types;
 	}
 
 	public static function getUsersNames(): array {
@@ -31,13 +39,14 @@ class LeadsUserForm extends Model {
 	public function rules(): array {
 		return [
 			[['userId', 'type', 'leadsIds'], 'required'],
+			['!leadsIds', 'required', 'on' => static::SCENARIO_SINGLE],
 			['userId', 'integer'],
 			['type', 'string'],
 			['leadsIds', 'exist', 'skipOnError' => true, 'allowArray' => true, 'targetClass' => Lead::class, 'targetAttribute' => 'id', 'enableClientValidation' => false],
 			[
 				'userId', 'in', 'range' => array_keys(static::getUsersNames()),
 			],
-			['type', 'in', 'range' => array_keys(static::getTypesNames())],
+			['type', 'in', 'range' => array_keys($this->getTypesNames())],
 		];
 	}
 

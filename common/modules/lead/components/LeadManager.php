@@ -21,12 +21,13 @@ class LeadManager extends Component {
 	public $model = Lead::class;
 	public bool $onlyForUser = false;
 
-	public function findById(string $id): ?ActiveLead {
+	public function findById(string $id, bool $forUser = true): ?ActiveLead {
 		$model = $this->getModel()::findById($id);
-		if ($model && $this->isForUser($model)) {
-			return $model;
+		if (!$model
+			|| ($forUser && !$this->isForUser($model))) {
+			return null;
 		}
-		return null;
+		return $model;
 	}
 
 	public function isForUser(ActiveLead $lead, $userId = null): bool {

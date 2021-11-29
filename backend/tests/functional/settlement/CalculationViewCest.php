@@ -2,6 +2,7 @@
 
 namespace backend\tests\functional\settlement;
 
+use backend\modules\settlement\controllers\CalculationController;
 use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
@@ -9,6 +10,7 @@ use common\models\user\User;
 
 class CalculationViewCest {
 
+	/** @see CalculationController::actionView() */
 	public const ROUTE = '/settlement/calculation/view';
 
 	private SettlementFixtureHelper $settlementFixture;

@@ -3,6 +3,7 @@
 namespace backend\tests\functional\provision;
 
 use backend\modules\provision\controllers\SettlementController;
+use backend\tests\functional\settlement\CalculationCest;
 use backend\tests\Step\Functional\ProvisionManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
@@ -59,6 +60,14 @@ class SettlementCest {
 		$I->click('Provisions types');
 		$I->seeInCurrentUrl(ProvisionTypeCest::ROUTE_SETTLEMENT);
 		$I->see('Provisions types for settlement: ' . $settlement->getTypeName());
+	}
+
+	public function checkWithoutProvisionLinkOnViewPage(ProvisionManager $I): void {
+		$settlement = $this->grabSettlement('many-pays-without-costs');
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $settlement->id]);
+		$I->seeLink('Without provisions');
+		$I->click('Without provisions');
+		$I->seeInCurrentUrl(CalculationCest::ROUTE_WITHOUT_PROVISIONS);
 	}
 
 	public function checkSettlementWithoutTypes(ProvisionManager $I): void {

@@ -1,13 +1,13 @@
 <?php
 
 use backend\modules\issue\models\IssueNoteForm;
+use frontend\helpers\Breadcrumbs;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model IssueNoteForm */
-$this->title = 'Edytuj notatke: ' . $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Sprawy', 'url' => ['/issue/index']];
-$this->params['breadcrumbs'][] = ['label' => $model->note->issue, 'url' => ['/issue/view', 'id' => $model->note->issue->id]];
+$this->title = Yii::t('issue', 'Update Issue Note: {title}', ['title' => $model->title]);
+$this->params['breadcrumbs'] = Breadcrumbs::issue($model->getModel());
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-note-update">

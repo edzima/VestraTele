@@ -6,7 +6,9 @@ use backend\modules\settlement\models\search\PayReceivedSearch;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\models\SearchModel;
+use common\models\settlement\PayReceived;
 use common\tests\_support\UnitSearchModelTrait;
 
 /**
@@ -34,26 +36,34 @@ class PayReceivedSearchTest extends Unit {
 		parent::_before();
 	}
 
-	public function testEmpty(): void {
-		$this->assertTotalCount(6);
-	}
-
 	public function testAgent(): void {
-		$this->model->issueAgent = 300;
-		$this->assertTotalCount(5);
-		$this->model->issueAgent = 301;
-		$this->assertTotalCount(1);
-		$this->model->issueAgent = 302;
-		$this->assertTotalCount(0);
+		$this->model->issueAgent = UserFixtureHelper::AGENT_PETER_NOWAK;
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame(UserFixtureHelper::AGENT_PETER_NOWAK, $model->getIssueModel()->agent->id);
+		}
 	}
 
 	public function testUser(): void {
-		$this->model->user_id = 300;
-		$this->assertTotalCount(2);
-		$this->model->user_id = 301;
-		$this->assertTotalCount(2);
-		$this->model->user_id = 302;
-		$this->assertTotalCount(2);
+		$this->model->user_id = UserFixtureHelper::AGENT_PETER_NOWAK;
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame(UserFixtureHelper::AGENT_PETER_NOWAK, $model->user_id);
+		}
+		$this->model->user_id = UserFixtureHelper::AGENT_AGNES_MILLER;
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame(UserFixtureHelper::AGENT_AGNES_MILLER, $model->user_id);
+		}
+		$this->model->user_id = UserFixtureHelper::AGENT_TOMMY_SET;
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame(UserFixtureHelper::AGENT_TOMMY_SET, $model->user_id);
+		}
 	}
 
 	public function testCustomerLastname(): void {
@@ -72,5 +82,13 @@ class PayReceivedSearchTest extends Unit {
 
 	protected function createModel(): SearchModel {
 		return new PayReceivedSearch();
+	}
+
+	/**
+	 * @param array $params
+	 * @return PayReceived[]
+	 */
+	private function getModels(array $params = []): array {
+		return $this->model->search($params)->getModels();
 	}
 }

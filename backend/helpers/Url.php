@@ -15,4 +15,8 @@ class Url extends BaseUrl {
 		return static::to(['/provision/user/user-view', 'userId' => $userId, 'typeId' => $typeId]);
 	}
 
+	protected static function managerConfig(): array {
+		return require __DIR__ . '/../config/_urlManager.php';
+	}
+
 }

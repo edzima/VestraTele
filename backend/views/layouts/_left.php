@@ -2,8 +2,9 @@
 
 use backend\widgets\Menu;
 use common\models\user\User;
+use yii\web\View;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 
 $user = Yii::$app->user;
 ?>
@@ -198,6 +199,11 @@ $user = Yii::$app->user;
 							'url' => ['/issue/stage/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
+						[
+							'label' => Yii::t('common', 'Leads'),
+							'url' => ['/issue/issue/lead'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
 					],
 				],
 				[
@@ -300,6 +306,16 @@ $user = Yii::$app->user;
 					],
 				],
 				[
+					'label' => Yii::t('common', 'SMS'),
+					'url' => '#',
+					'icon' => '<i class="fa fa-envelope"></i>',
+					'options' => ['class' => 'treeview'],
+					'items' => [
+						['label' => Yii::t('common', 'Send SMS'), 'url' => ['/adescom-sms/send/push'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+					],
+					'visible' => $user->can(User::PERMISSION_SMS),
+				],
+				[
 					'label' => Yii::t('backend', 'Articles'),
 					'url' => '#',
 					'icon' => '<i class="fa fa-edit"></i>',
@@ -334,10 +350,10 @@ $user = Yii::$app->user;
 							'visible' => $user->can(User::PERMISSION_LOGS),
 						],
 						[
-							'label' => Yii::t('backend', 'Email Templates'),
-							'url' => ['/email-templates/default/index'],
+							'label' => Yii::t('backend', 'Message Templates'),
+							'url' => ['/message-templates/default/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
-							'visible' => $user->can(User::PERMISSION_EMAIL_TEMPLATE),
+							'visible' => $user->can(User::PERMISSION_MESSAGE_TEMPLATE),
 						],
 						[
 							'label' => Yii::t('backend', 'DB manager'),

@@ -7,6 +7,7 @@ use common\models\issue\IssuePayCalculation;
 use common\models\settlement\search\IssuePayCalculationSearch;
 use common\widgets\GridView;
 use Decimal\Decimal;
+use kartik\select2\Select2;
 use Yii;
 use yii\base\InvalidConfigException;
 
@@ -35,7 +36,7 @@ class IssuePayCalculationGrid extends GridView {
 
 	public $userProvisionsId = null;
 
-	public string $valueTypeIssueType = IssueTypeColumn::VALUE_SHORT;
+	public string $valueTypeIssueType = IssueTypeColumn::VALUE_NAME;
 
 	public bool $withAgent = true;
 
@@ -105,10 +106,26 @@ class IssuePayCalculationGrid extends GridView {
 			],
 			[
 				'class' => IssueTypeColumn::class,
-				'label' => Yii::t('backend', 'Issue type'),
+				'label' => Yii::t('common', 'Issue type'),
 				'attribute' => 'issue_type_id',
 				'visible' => $this->withIssueType,
 				'valueType' => $this->valueTypeIssueType,
+			],
+			[
+				'label' => Yii::t('common', 'Stage'),
+				'attribute' => 'issue_stage_id',
+				'value' => 'issue.stage',
+				'visible' => $this->filterModel ? $this->filterModel->withIssueStage : false,
+				'filter' => $this->filterModel ? $this->filterModel::getIssueStagesNames() : null,
+				'filterType' => static::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'options' => [
+						'multiple' => true,
+						'placeholder' => Yii::t('common', 'Stage'),
+					],
+					'size' => Select2::SIZE_SMALL,
+					'showToggleAll' => false,
+				],
 			],
 			/*
 			[
@@ -186,6 +203,12 @@ class IssuePayCalculationGrid extends GridView {
 					}
 					return $sum;
 				},
+			],
+			[
+				'attribute' => 'created_at',
+				'format' => 'date',
+				'noWrap' => true,
+				'visible' => $this->withDates,
 			],
 			[
 				'attribute' => 'updated_at',

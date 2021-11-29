@@ -9,15 +9,13 @@ use common\fixtures\issue\NoteFixture;
 use common\fixtures\issue\StageFixture;
 use common\fixtures\issue\StageTypesFixtures;
 use common\fixtures\issue\SummonFixture;
+use common\fixtures\issue\SummonTypeFixture;
 use common\fixtures\issue\TypeFixture;
-use common\models\issue\Issue;
+use common\models\issue\IssueInterface;
 use common\models\user\User;
 use Yii;
 
 class IssueFixtureHelper extends BaseFixtureHelper {
-
-	public const ISSUE_COUNT = 6;
-	public const ARCHIVED_ISSUE_COUNT = 1;
 
 	public const AGENT = 'agent';
 	public const CUSTOMER = 'customer';
@@ -27,12 +25,13 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 	public const ISSUE = 'issue';
 
 	public const SUMMON = 'issue.summon';
+	public const SUMMON_TYPE = 'issue.summon_type';
 
 	private const TYPE = 'issue.type';
 	private const STAGE = 'issue.stage';
-	private const NOTE = 'issue.note';
+	public const NOTE = 'issue.note';
 
-	public function grabIssue($index): Issue {
+	public function grabIssue($index): IssueInterface {
 		return $this->tester->grabFixture(static::ISSUE, $index);
 	}
 
@@ -117,18 +116,18 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 				static::AGENT => UserFixtureHelper::agent(),
 			],
 			static::issueUsers(),
-			$withProfile ? [static::AGENT . '.profile' => UserFixtureHelper::profile(UserFixtureHelper::WORKER_AGENT)] : []
+			$withProfile ? UserFixtureHelper::profile(UserFixtureHelper::WORKER_AGENT) : []
 		);
 	}
 
 	public static function customer(bool $withProfile = false): array {
-		$fixtures = [];
-		$fixtures[static::CUSTOMER] = UserFixtureHelper::customer();
-		if ($withProfile) {
-			$fixtures['customer-profile'] = UserFixtureHelper::profile(UserFixtureHelper::CUSTOMER);
-		}
-		$fixtures = array_merge($fixtures, static::issueUsers());
-		return $fixtures;
+		return array_merge(
+			[
+				static::CUSTOMER => UserFixtureHelper::customer(),
+			],
+			static::issueUsers(),
+			$withProfile ? UserFixtureHelper::profile(UserFixtureHelper::CUSTOMER) : []
+		);
 	}
 
 	public static function issueUsers(): array {
@@ -140,7 +139,7 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 		];
 	}
 
-	public static function users(): array {
+	public static function users(bool $profiles = false): array {
 		$users = [
 			static::AGENT => UserFixtureHelper::agent(),
 			static::CUSTOMER => UserFixtureHelper::customer(),
@@ -150,20 +149,26 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 		foreach ($users as &$user) {
 			UserFixtureHelper::addPermission($user, User::PERMISSION_ISSUE);
 		}
-		$users['customer-profile'] = UserFixtureHelper::profile(UserFixtureHelper::CUSTOMER);
-		$users = array_merge($users, static::issueUsers());
-		$users['relation'] = UserFixtureHelper::relation();
-
-		return $users;
+		return array_merge(
+			$users,
+			$profiles ? UserFixtureHelper::profiles() : UserFixtureHelper::profile(UserFixtureHelper::CUSTOMER),
+			static::issueUsers(),
+			UserFixtureHelper::relation(),
+		);
 	}
 
 	public static function summon(): array {
-		return array_merge(TerytFixtureHelper::fixtures(), [
-			static::SUMMON => [
-				'class' => SummonFixture::class,
-				'dataFile' => static::dataDir() . 'issue/summon.php',
-			],
-		]);
+		return array_merge(TerytFixtureHelper::fixtures(),
+			[
+				static::SUMMON => [
+					'class' => SummonFixture::class,
+					'dataFile' => static::dataDir() . 'issue/summon.php',
+				],
+				static::SUMMON_TYPE => [
+					'class' => SummonTypeFixture::class,
+					'dataFile' => static::dataDir() . 'issue/summon_type.php',
+				],
+			]);
 	}
 
 }

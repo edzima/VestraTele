@@ -21,12 +21,12 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property int $calculation_id
- * @property string $pay_at
- * @property string $deadline_at
- * @property string $value
- * @property string|null $transfer_type
- * @property string $vat
  * @property int $status
+ * @property string $value
+ * @property string|null $vat
+ * @property string|null $pay_at
+ * @property string|null $deadline_at
+ * @property string|null $transfer_type
  *
  * @todo replace with valueWithoutVAT
  * @property-read float $valueNetto
@@ -47,6 +47,10 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 	public const STATUS_REQUEST_REDUCTION = 40;
 	public const STATUS_ANALYSE = 50;
 
+	public const STATUS_DEMAND_FOR_PAYMENT_FIRST = 60;
+	public const STATUS_DEMAND_FOR_PAYMENT_SECOND = 61;
+	public const STATUS_DEMAND_FOR_PAYMENT_THIRD = 62;
+
 	/**
 	 * @inheritdoc
 	 */
@@ -60,7 +64,6 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 	public function rules(): array {
 		return [
 			[['value', 'deadline_at', 'transfer_type', 'vat'], 'required', 'enableClientValidation' => false],
-			[['transfer_type'], 'integer'],
 			[['pay_at', 'deadline_at'], 'safe'],
 			[['value', 'vat'], 'number', 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/', 'enableClientValidation' => false],
 			['vat', 'number', 'min' => 0, 'max' => 100],
@@ -91,6 +94,10 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 		];
 	}
 
+	public function getId(): int {
+		return $this->id;
+	}
+
 	public function isPayed(): bool {
 		return $this->getPaymentAt() !== null;
 	}
@@ -99,7 +106,7 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 		if ($this->isPayed() || $this->getDeadlineAt() === null) {
 			return false;
 		}
-		return new DateTime($range) > $this->getDeadlineAt();
+		return (new DateTime($range)) > $this->getDeadlineAt();
 	}
 
 	public function setPay(PayInterface $pay): void {
@@ -201,6 +208,10 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 			static::STATUS_REQUEST_PAY => Yii::t('settlement', 'Pay request'),
 			static::STATUS_REQUEST_REDUCTION => Yii::t('settlement', 'Reduction request'),
 			static::STATUS_ANALYSE => Yii::t('settlement', 'Analyse'),
+			static::STATUS_DEMAND_FOR_PAYMENT_FIRST => Yii::t('settlement', 'First Demand for Payment'),
+			static::STATUS_DEMAND_FOR_PAYMENT_SECOND => Yii::t('settlement', 'Second Demand for Payment'),
+			static::STATUS_DEMAND_FOR_PAYMENT_THIRD => Yii::t('settlement', 'Third Demand for Payment'),
+
 		];
 	}
 
@@ -214,5 +225,9 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 
 	public function getSettlementId(): int {
 		return $this->calculation_id;
+	}
+
+	public function getStatus(): ?int {
+		return $this->status;
 	}
 }

@@ -55,7 +55,7 @@ class IssueCostFormTest extends Unit {
 		$model = $this->model;
 		$model->type = IssueCost::TYPE_PURCHASE_OF_RECEIVABLES;
 		$model->date_at = '2020-01-01';
-		$model->settled_at = '2019-02-02 12:00';
+		$model->settled_at = '2019-02-02';
 		$model->value = 600;
 		$model->vat = 23;
 		$this->thenUnsuccessSave();

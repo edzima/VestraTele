@@ -45,13 +45,16 @@ use yii\widgets\ActiveForm;
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'owner_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
-			'data' => LeadForm::getUsersNames(),
-			'pluginOptions' => [
-				'placeholder' => $model->getAttributeLabel('owner_id'),
-				'allowClear' => true,
-			],
-		]) ?>
+		<?= $model->scenario !== LeadForm::SCENARIO_OWNER
+			? $form->field($model, 'owner_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+				'data' => LeadForm::getUsersNames(),
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('owner_id'),
+					'allowClear' => true,
+				],
+			])
+			: ''
+		?>
 
 		<?= $form->field($model, 'agent_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
 			'data' => LeadForm::getUsersNames(),

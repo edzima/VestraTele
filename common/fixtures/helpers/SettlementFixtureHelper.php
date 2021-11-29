@@ -10,18 +10,24 @@ use common\fixtures\settlement\PayReceivedFixture;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueSettlement;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 class SettlementFixtureHelper extends BaseFixtureHelper {
 
+	public const DEFAULT_ISSUE_ID = 1;
 	public const OWNER_JOHN = UserFixtureHelper::MANAGER_JOHN;
 	public const OWNER_NICOLE = UserFixtureHelper::MANAGER_NICOLE;
 
 	public const SETTLEMENT = 'settlement.settlement';
 	public const COST = 'settlement.cost';
-	private const PAY = 'settlement.pay';
+	public const PAY = 'settlement.pay';
 	private const OWNER = 'settlement.owner';
 	private const PAY_RECEIVED = 'settlement.pay_received';
+	private const DEFAULT_TYPE = IssueSettlement::TYPE_HONORARIUM;
+
+	private ?int $lastSettlementId = null;
 
 	protected static function getDefaultDataDirPath(): string {
 		return Yii::getAlias('@common/tests/_data/settlement/');
@@ -91,24 +97,40 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 		];
 	}
 
-	public function haveSettlement(string $value, int $type, array $attributes = []): int {
+	public function haveSettlement(string $value, array $attributes = []): int {
 		if (!isset($attributes['owner_id'])) {
 			$attributes['owner_id'] = static::OWNER_JOHN;
 		}
+		if (!isset($attributes['issue_id'])) {
+			$attributes['issue_id'] = static::DEFAULT_ISSUE_ID;
+		}
+		if (!isset($attributes['type'])) {
+			$attributes['type'] = static::DEFAULT_TYPE;
+		}
 		$attributes['value'] = $value;
-		$attributes['type'] = $type;
-		return $this->tester->haveRecord(IssuePayCalculation::class, $attributes);
+		$this->lastSettlementId = $this->tester->haveRecord(IssuePayCalculation::class, $attributes);
+		return $this->lastSettlementId;
+	}
+
+	public function findSettlement(int $id): IssueSettlement {
+		return IssuePayCalculation::findOne($id);
 	}
 
 	public function havePay(string $value, array $attributes = []): int {
 		$attributes['value'] = $value;
 		if (!isset($attributes['calculation_id'])) {
-			$attributes['calculation_id'] = 1;
-		}
-		if (!isset($attributes['vat'])) {
-			$attributes['vat'] = 0;
+			if ($this->lastSettlementId === null) {
+				$settlementAttributes = ArrayHelper::remove($attributes, 'settlement', []);
+				$settlementValue = ArrayHelper::getValue($settlementAttributes, 'value', $value);
+				$this->haveSettlement($settlementValue, $settlementAttributes);
+			}
+			$attributes['calculation_id'] = $this->lastSettlementId;
 		}
 		return $this->tester->haveRecord(IssuePay::class, $attributes);
+	}
+
+	public function findPay(int $id): IssuePay {
+		return IssuePay::findOne($id);
 	}
 
 }

@@ -16,7 +16,9 @@ use yii\widgets\ActiveForm;
 
 	<div class="summon-form">
 
-		<?php $form = ActiveForm::begin(); ?>
+		<?php $form = ActiveForm::begin([
+			'id' => 'summon-form',
+		]); ?>
 
 		<div class="row">
 
@@ -26,11 +28,14 @@ use yii\widgets\ActiveForm;
 				],
 			])->textInput(['maxlength' => true]) ?>
 
-			<?= $form->field($model, 'type', [
+			<?= $form->field($model, 'type_id', [
 				'options' => [
 					'class' => 'col-md-2',
 				],
-			])->dropDownList(SummonForm::getTypesNames()) ?>
+			])->widget(Select2::class, [
+					'data' => SummonForm::getTypesNames(),
+				]
+			) ?>
 
 			<?= !$model->getModel()->isNewRecord ? $form->field($model, 'status', [
 				'options' => [
@@ -49,52 +54,65 @@ use yii\widgets\ActiveForm;
 			<?= $form->field($model, 'deadline_at', [
 				'options' => [
 					'id' => 'deadline_at_field',
-					'class' => 'col-md-3' . ($model->getModel()->isNewRecord ? ' hidden' : ''),
+					'class' => 'col-md-2' . ($model->getModel()->isNewRecord ? ' hidden' : ''),
 				],
 			])
 				->widget(DateWidget::class) ?>
 
 
-
-			<?= $form->field($model, 'contractor_id', ['options' => ['class' => 'col-md-4']])
-				->widget(Select2::class, [
-						'data' => $model->getContractors(),
-					]
-				) ?>
-
 		</div>
 
 		<div class="row">
 
+			<?= $form->field($model, 'contractor_id',
+				['options' => ['class' => 'col-md-3 col-lg-2']])
+				->widget(Select2::class, [
+						'data' => $model->getContractors(),
+					]
+				)
+			?>
+
+
+
+
 			<?= $form->field($model, 'entity_id', [
 				'options' => [
-					'class' => 'col-md-3',
+					'class' => 'col-md-3 col-lg-2',
 				],
-			])->dropDownList(SummonForm::getEntityNames()) ?>
+			])->widget(Select2::class, [
+				'data' => SummonForm::getEntityNames(),
+			])
+			?>
 
 			<?= $form->field($model, 'city_id', [
 				'options' => [
-					'class' => 'col-md-4',
+					'class' => 'col-md-4 col-lg-3',
 				],
 			])->widget(CitySimcInputWidget::class) ?>
 		</div>
 
-
-		<?= $form->field($model, 'title')->textarea(['maxlength' => true]) ?>
+		<div class="row">
+			<?= $form->field($model, 'title', [
+				'options' => [
+					'class' => 'col-md-7',
+				],
+			])
+				->textarea(['maxlength' => true]) ?>
+		</div>
 
 
 		<div class="row">
 
 			<?= $form->field($model, 'start_at', [
 				'options' => [
-					'class' => 'col-md-3',
+					'class' => 'col-md-2',
 				],
 			])
 				->widget(DateWidget::class) ?>
 
 			<?= $form->field($model, 'realize_at', [
 				'options' => [
-					'class' => 'col-md-3',
+					'class' => 'col-md-2',
 				],
 			])
 				->widget(DateTimeWidget::class) ?>
@@ -102,11 +120,21 @@ use yii\widgets\ActiveForm;
 
 			<?= $model->getModel()->isRealized() ? $form->field($model, 'realized_at', [
 				'options' => [
-					'class' => 'col-md-3',
+					'class' => 'col-md-2',
 				],
 			])
 				->widget(DateTimeWidget::class) : '' ?>
 
+		</div>
+		<div class="row">
+			<?= $model->getModel()->isNewRecord
+				? $form->field($model, 'sendEmailToContractor', [
+					'options' => [
+						'class' => 'col-md-2',
+					],
+				])->checkbox()
+				: ''
+			?>
 		</div>
 
 

@@ -1,6 +1,7 @@
 <?php
 
 return [
+	'Are you sure you want to delete provisions for this settlements?' => 'Czy chcesz usunąć prowizje dla tych rozliczeń?',
 	'{fromUser} from {toUser}' => '{fromUser} dla {toUser}',
 	'Create self provision: {user}' => 'Dodaj własną prowizję: {user}',
 	'Create provision type' => 'Dodaj typ prowizji',
@@ -73,4 +74,5 @@ return [
 	'hidden provisions' => 'ukryto prowizje',
 	'In report' => 'W Raporcie',
 	'Sum {value}' => 'Suma: {value}',
+	'Remove {count} provisions.' => 'Usunięto {count} prowizje.',
 ];

@@ -66,7 +66,7 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const ROLE_LAWYER = 'lawyer';
 
 	public const PERMISSION_ARCHIVE = 'archive';
-	public const PERMISSION_EMAIL_TEMPLATE = 'email.template';
+	public const PERMISSION_MESSAGE_TEMPLATE = 'message.template';
 	public const PERMISSION_EXPORT = 'export';
 	public const PERMISSION_ISSUE = 'issue';
 	public const PERMISSION_HINT = 'hint';
@@ -78,10 +78,13 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const PERMISSION_COST = 'cost';
 
 	public const PERMISSION_CALCULATION_TO_CREATE = 'calculation.to-create';
+	public const PERMISSION_CALCULATION_UPDATE = 'calculation.update';
 	public const PERMISSION_CALCULATION_PROBLEMS = 'calculation.problems';
 	public const PERMISSION_CALCULATION_PAYS = 'calculation.pays';
 
 	public const PERMISSION_PAY = 'pay';
+	public const PERMISSION_PAY_UPDATE = 'pay.update';
+	public const PERMISSION_PAY_PAID = 'pay.paid';
 	public const PERMISSION_PAY_RECEIVED = 'pay.received';
 	public const PERMISSION_PAYS_DELAYED = 'pays.delayed';
 	public const PERMISSION_PAY_PART_PAYED = 'pay.part-payed';
@@ -91,6 +94,7 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const PERMISSION_WORKERS = 'workers';
 	public const PERMISSION_LEAD = 'lead';
 	public const PERMISSION_CZATER = 'czater';
+	public const PERMISSION_SMS = 'sms';
 	public const PERMISSION_USER_RELATION = 'user.relation';
 
 	private static $ROLES_NAMES;
@@ -130,6 +134,17 @@ class User extends ActiveRecord implements IdentityInterface {
 			$name = $this->username;
 		}
 		return $name;
+	}
+
+	public function getPhone(): ?string {
+		$profile = $this->profile;
+		if (!empty($profile->phone)) {
+			return $profile->phone;
+		}
+		if (!empty($profile->phone_2)) {
+			return $profile->phone_2;
+		}
+		return null;
 	}
 
 	/**

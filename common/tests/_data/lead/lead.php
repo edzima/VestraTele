@@ -10,8 +10,9 @@ return [
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
 		'email' => 'test@lead.com',
-		'phone' => '777-222-122',
+		'phone' => '48777-222-122',
 		'provider' => Lead::PROVIDER_FORM,
+		'data' => '{"external_id":1}',
 	],
 	'equal-accident-phone-from-other-source' => [
 		'name' => 'John2',
@@ -21,24 +22,31 @@ return [
 		'email' => 'test@lead.com',
 		'phone' => '777-222-122',
 		'provider' => Lead::PROVIDER_FORM,
+		'data' => '[]',
 	],
 	'archive-wordpress-accident' => [
 		'name' => 'Alan',
 		'source_id' => 1,
 		'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
+		'email' => 'john@wayne.com',
 		'date_at' => '2020-02-01',
+		'data' => '[]',
 	],
 	'new-benefits' => [
 		'name' => 'Emily',
 		'source_id' => 2,
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
+		'phone' => '555-222-111',
+		'data' => '[]',
 	],
 	'new-without-owner' => [
 		'name' => 'Tommy Back',
 		'source_id' => 2,
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
+		'phone' => '555-222-111',
+		'data' => '[]',
 	],
 ];
 

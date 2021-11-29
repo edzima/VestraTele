@@ -22,7 +22,7 @@ class WorkerCest {
 	public function _fixtures(): array {
 		return array_merge(
 			UserFixtureHelper::workers(),
-			['agent-profile' => UserFixtureHelper::profile(UserFixtureHelper::WORKER_AGENT)]
+			UserFixtureHelper::profile(UserFixtureHelper::WORKER_AGENT)
 		);
 	}
 

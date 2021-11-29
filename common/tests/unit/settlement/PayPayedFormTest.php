@@ -2,17 +2,17 @@
 
 namespace common\tests\unit\settlement;
 
-use common\fixtures\helpers\EmailTemplateFixtureHelper;
+use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssuePayInterface;
 use common\models\settlement\PayPayedForm;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
-use Yii;
+use Decimal\Decimal;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
-use yii\swiftmailer\Message;
 
 class PayPayedFormTest extends Unit {
 
@@ -33,10 +33,12 @@ class PayPayedFormTest extends Unit {
 	public function _fixtures(): array {
 		return array_merge(
 			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::types(),
 			IssueFixtureHelper::users(),
+			SettlementFixtureHelper::owner(),
 			SettlementFixtureHelper::pay(),
 			SettlementFixtureHelper::settlement(),
-			EmailTemplateFixtureHelper::fixture(),
+			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_PAY_PAYED),
 		);
 	}
 
@@ -48,8 +50,11 @@ class PayPayedFormTest extends Unit {
 
 	public function testEmpty(): void {
 		$this->giveModel();
+		$this->model->value = '';
+		$this->model->transfer_type = '';
 		$this->whenPay(null);
 		$this->thenUnsuccessPay();
+		$this->thenSeeError('Value cannot be blank.', 'value');
 		$this->thenSeeError('Pay at cannot be blank.', 'date');
 	}
 
@@ -67,50 +72,50 @@ class PayPayedFormTest extends Unit {
 			'value' => $this->model->getPay()->getValue()->toFixed(2),
 			'pay_at' => '2021-01-01',
 		]);
+		$this->tester->assertTrue($this->model->pushMessages(UserFixtureHelper::AGENT_EMILY_PAT));
 	}
 
-	public function testEmailsForNotPayed(): void {
+	public function testValueGreaterThanPayValue(): void {
 		$this->giveModel();
-		$model = $this->model;
-		$this->tester->assertFalse($model->sendEmailToCustomer());
-		$this->tester->dontSeeEmailIsSent();
-		$this->tester->assertEmpty($model->sendEmailsToWorkers());
-		$this->tester->dontSeeEmailIsSent();
-	}
-
-	public function testEmailToCustomer(): void {
-		$this->giveModel();
-		$this->whenPay('2020-01-01');
-		$model = $this->model;
-		$this->tester->assertTrue($this->model->sendEmailToCustomer());
-		$this->tester->seeEmailIsSent();
-		$email = $this->tester->grabLastSentEmail();
-		$this->tester->assertTrue(array_key_exists($model->getPay()->calculation->getIssueModel()->customer->email, $email->getTo()));
-		$this->tester->assertSame('Paid Pay for Customer.', $email->getSubject());
-
-		$this->tester->assertStringNotContainsString(
-			$this->getSettlementLink(),
-			$email->toString(),
+		$this->model->value = $this->model->getPay()->getValue()->add(100)->toFixed(2);
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Value must be less than or equal to "'
+			. $this->model->getPay()->getValue()->toFixed(2) . '".',
+			'value'
 		);
 	}
 
-	public function testEmailToWorkers(): void {
+	public function testValueEqualThanPayValue(): void {
 		$this->giveModel();
-		$this->whenPay('2020-01-01');
+		$this->model->value = $this->model->getPay()->getValue()->toFixed(2);
+		$this->thenSuccessValidate(['value']);
+	}
+
+	public function testValueLessThanPayValue(): void {
+		$this->giveModel();
+		$this->model->value = $this->model->getPay()->getValue()->sub(100)->toFixed(2);
+		$this->thenSuccessValidate(['value']);
+	}
+
+	public function testDivPay(): void {
+		$this->giveModel();
+		$oldPayValue = $this->model->getPay()->getValue();
+		$subValue = new Decimal(100);
+		$newPayValue = $oldPayValue->sub($subValue);
+		$this->model->value = $newPayValue->toFixed(2);
+		$newPay = $this->model->divPay();
+		$this->tester->assertNotNull($newPay);
+		$pay = $this->model->getPay();
+		$this->tester->assertTrue($pay->getValue()->equals($newPayValue));
+		$this->tester->assertTrue($newPay->getValue()->equals($subValue));
+	}
+
+	public function testMessagesForNotPayed(): void {
+		$this->giveModel();
 		$model = $this->model;
-		$this->tester->assertTrue($this->model->sendEmailsToWorkers());
-		$this->tester->seeEmailIsSent();
-		$email = $this->tester->grabLastSentEmail();
-		/**
-		 * @var Message $email
-		 */
-		$this->tester->assertTrue(array_key_exists($model->getPay()->calculation->getIssueModel()->agent->email, $email->getTo()));
-		$this->tester->assertTrue(array_key_exists($model->getPay()->calculation->getIssueModel()->tele->email, $email->getTo()));
-		$this->tester->assertSame('Paid Pay for Worker.', $email->getSubject());
-		$this->assertStringContainsString(
-			$this->getSettlementLink(),
-			$email->toString()
-		);
+		$this->tester->assertFalse($model->pushMessages(UserFixtureHelper::AGENT_EMILY_PAT));
+		$this->tester->dontSeeEmailIsSent();
+		$this->tester->dontSeeJobIsPushed();
 	}
 
 	public function testWithStatus(): void {
@@ -151,7 +156,4 @@ class PayPayedFormTest extends Unit {
 		return $this->model;
 	}
 
-	private function getSettlementLink(): string {
-		return Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['settlement/view']);
-	}
 }

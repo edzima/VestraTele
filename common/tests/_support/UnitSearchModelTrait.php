@@ -26,6 +26,10 @@ trait UnitSearchModelTrait {
 		return $this->model->search($params);
 	}
 
+	protected function getModels(array $params = []): array {
+		return $this->search($params)->getModels();
+	}
+
 	/**
 	 * @param int $count
 	 * @param array $params

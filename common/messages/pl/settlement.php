@@ -1,6 +1,7 @@
 <?php
 
 return [
+	'Appeal' => 'Opłata od apelacji',
 	'Base Value' => 'Kwota Bazowa',
 	'Details' => 'Szczegóły',
 	'Deadline at' => 'Termin płatności',
@@ -145,8 +146,19 @@ return [
 	'Nominal Value' => 'Wartość nominalna',
 	'Send Email to Customer' => 'Wyślij E-mail do Klienta',
 	'Send Email to Workers' => 'Wyślij E-mail do Pracowników',
+	'Send SMS to Customer' => 'Wyślij SMS do Klienta',
+	'Send SMS to Agent' => 'Wyślij SMS do Agenta',
 	'Tax Office' => 'Urząd Skarbowy',
 	'Pay Status' => 'Status Płatności',
 	'Paid' => 'Opłacone',
 	'Unpaid' => 'Nieopłacone',
+	'Push Messages about Create Administrative Settlement.' => 'Wysłano Notyfikacje o Opłacie Administracyjnej.',
+	'Push Messages about Create Settlement.' => 'Wysłano Notyfikacje o nowym Rozliczeniu.',
+	'An incomplete: {value} has been paid.' => 'Opłacono niepełną kwotę: {value}.',
+	'Generate new payment: {value}.' => 'Dodano nową płatność: {value}.',
+	'Send Messages about Payed Pay.' => 'Wysłano Notyfikacje o opłaceniu.',
+	'Only with Settlements' => 'Z Rozliczeniami',
+	'First Demand for Payment' => '1. Wezwanie do Zapłaty',
+	'Second Demand for Payment' => '2. Wezwanie do Zapłaty',
+	'Third Demand for Payment' => '3. Wezwanie do Zapłaty',
 ];

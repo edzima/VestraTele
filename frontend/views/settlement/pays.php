@@ -57,6 +57,10 @@ $this->params['breadcrumbs'][] = $this->title;
 					'disabled' => true,
 				]) ?>
 
+				<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-2']])
+					->textInput(['disabled' => true])
+				?>
+
 			</div>
 
 

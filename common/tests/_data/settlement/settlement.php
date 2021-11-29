@@ -8,14 +8,14 @@ return [
 	'not-payed-with-double-costs' => [
 		'issue_id' => 1,
 		'value' => 1230,
-		'type' => IssuePayCalculation::TYPE_ADMINISTRATIVE,
+		'type' => IssuePayCalculation::TYPE_HONORARIUM,
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 		'provider_id' => 200,
 		'owner_id' => SettlementFixtureHelper::OWNER_JOHN,
 		'stage_id' => 1,
 	],
 	'payed-with-single-costs' => [
-		'issue_id' => 2,
+		'issue_id' => 3,
 		'value' => 1230,
 		'type' => IssuePayCalculation::TYPE_ADMINISTRATIVE,
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
