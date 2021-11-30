@@ -43,6 +43,7 @@ use yii\widgets\ActiveForm;
 				'pluginOptions' => [
 					'placeholder' => $model->getAttributeLabel('user_id'),
 					'allowClear' => true,
+					'multiple' => true,
 				],
 			])
 			?>
