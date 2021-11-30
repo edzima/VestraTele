@@ -93,9 +93,7 @@ class RbacController extends Controller {
 		Worker::PERMISSION_MESSAGE_TEMPLATE,
 		Worker::PERMISSION_CZATER,
 		Worker::PERMISSION_USER_RELATION,
-		Worker::PERMISSION_CZATER,
 		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
-
 	];
 
 	public function actionInit(): void {
