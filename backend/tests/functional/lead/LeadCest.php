@@ -28,6 +28,10 @@ class LeadCest {
 		$this->tester = $I;
 	}
 
+	public function _fixtures(): array {
+		return LeadFixtureHelper::leads();
+	}
+
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
 		$I->dontSeeMenuLink('Leads');

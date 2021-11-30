@@ -6,7 +6,7 @@ interface FixtureTester {
 
 	public function haveFixtures($fixtures);
 
-	public function grabFixture($name, $index);
+	public function grabFixture($name, $index = null);
 
 	public function seeRecord(string $class, array $array);
 

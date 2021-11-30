@@ -170,8 +170,12 @@ return [
 						'allow' => true,
 						'matchCallback' => static function ($rule, Action $action): bool {
 							if ($action->controller->id === 'sms') {
+								if ($action->id === 'push-multiple') {
+									return Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS);
+								}
 								return Yii::$app->user->can(User::PERMISSION_SMS);
 							}
+
 							return true;
 						},
 						'permissions' => [User::PERMISSION_LEAD],

@@ -19,7 +19,7 @@ use yii\mail\MessageInterface;
  * @method void lookForwardTo($achieveValue)
  * @method void comment($description)
  * @method Friend haveFriend($name, $actorClass = null)
- * @method grabFixture(string $string, int $int)
+ * @method grabFixture($name, $index = null)
  * @method seeRecord(string $class, array $array)
  *
  * @SuppressWarnings(PHPMD)

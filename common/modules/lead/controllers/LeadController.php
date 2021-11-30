@@ -42,9 +42,13 @@ class LeadController extends BaseController {
 	 * @return mixed
 	 */
 	public function actionIndex() {
-		if (Yii::$app->request->post('selection')) {
+		if (Yii::$app->request->post('selection')
+			&& !empty(Yii::$app->request->post('route'))) {
 			Url::remember();
-			return $this->redirect(['user/assign', 'ids' => Yii::$app->request->post('selection')]);
+			return $this->redirect([
+				Yii::$app->request->post('route'),
+				'ids' => Yii::$app->request->post('selection'),
+			]);
 		}
 		$searchModel = new LeadSearch();
 		if ($this->module->onlyUser) {
@@ -55,6 +59,7 @@ class LeadController extends BaseController {
 			$searchModel->user_id = Yii::$app->user->getId();
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		$dataProvider->pagination->defaultPageSize = 50;
 
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {
 			$query = $dataProvider->query;

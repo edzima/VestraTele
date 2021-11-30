@@ -20,7 +20,7 @@ return [
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
 		'email' => 'test@lead.com',
-		'phone' => '777-222-122',
+		'phone' => '48777-222-122',
 		'provider' => Lead::PROVIDER_FORM,
 		'data' => '[]',
 	],
@@ -37,7 +37,7 @@ return [
 		'source_id' => 2,
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
-		'phone' => '555-222-111',
+		'phone' => '48555-222-111',
 		'data' => '[]',
 	],
 	'new-without-owner' => [
@@ -45,7 +45,14 @@ return [
 		'source_id' => 2,
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
-		'phone' => '555-222-111',
+		'phone' => '48555-222-111',
+		'data' => '[]',
+	],
+	'new-without-phone-and-owner' => [
+		'name' => 'Tommy Back',
+		'source_id' => 2,
+		'status_id' => LeadStatusInterface::STATUS_NEW,
+		'date_at' => '2020-01-01',
 		'data' => '[]',
 	],
 ];
