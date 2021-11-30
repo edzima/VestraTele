@@ -59,14 +59,14 @@ foreach (LeadSearch::questions() as $question) {
 
 	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() : '' ?>
 
-	<?php if ($assignUsers || Yii::$app->user->can(User::PERMISSION_SMS)): ?>
+	<?php if ($assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)): ?>
 
 		<?= Html::beginForm('', 'POST', [
 			'id' => 'form-lead-multiple-actions',
 			'data-pjax' => '',
 		]) ?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_SMS)
+		<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
 			? Html::submitButton(
 				Yii::t('lead', 'Send SMS'),
 				[
