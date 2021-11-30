@@ -16,13 +16,39 @@ use common\models\user\UserProfile;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;
+use DateTime;
+use Exception;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\console\Controller;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\helpers\Json;
 
 class UpgradeController extends Controller {
+
+	public function actionLeadSmsStatus(int $status_id, string $details): void {
+		$models = LeadReport::find()
+			->select(['id', 'lead_id'])
+			->andWhere(['like', 'details', $details])
+			->asArray()
+			->all();
+
+		LeadReport::updateAll([
+			'status_id' => $status_id,
+		],
+			[
+				'id' => ArrayHelper::getColumn($models, 'id'),
+			]
+		);
+		Lead::updateAll([
+				'status_id' => $status_id,
+			]
+			, [
+				'id' => ArrayHelper::getColumn($models, 'lead_id'),
+			]
+		);
+	}
 
 	public function actionReports(int $owner_id): void {
 		$reports = LeadReport::find()
@@ -72,7 +98,7 @@ class UpgradeController extends Controller {
 				$dateTime = null;
 				if ($date) {
 					try {
-						$dateTime = new \DateTime($date);
+						$dateTime = new DateTime($date);
 						$count++;
 						$note->detachBehaviors();
 						$note->updateIssueAfterSave = false;
@@ -81,7 +107,7 @@ class UpgradeController extends Controller {
 						if (!$note->save()) {
 							Console::output(print_r($note->getErrors()));
 						}
-					} catch (\Exception $exception) {
+					} catch (Exception $exception) {
 						Console::output($date);
 					}
 				}
