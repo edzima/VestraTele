@@ -123,7 +123,7 @@ class LeadSearchTest extends Unit {
 		$this->model->duplicatePhone = true;
 		$models = $this->getSearchModels();
 		//@todo expect 2 when add prefix Country Column.
-		$this->tester->assertCount(1, $models);
+		$this->tester->assertCount(2, $models);
 	}
 
 	public function testProvider(): void {
