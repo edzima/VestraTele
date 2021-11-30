@@ -2,7 +2,6 @@
 
 use backend\widgets\CsvForm;
 use common\helpers\Html;
-use common\helpers\Url;
 use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\searches\LeadSearch;
@@ -12,7 +11,6 @@ use common\widgets\grid\AddressColumn;
 use common\widgets\grid\SerialColumn;
 use common\widgets\GridView;
 use kartik\grid\CheckboxColumn;
-use yii\bootstrap\ButtonDropdown;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadSearch */
@@ -61,10 +59,34 @@ foreach (LeadSearch::questions() as $question) {
 
 	<?php if ($assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)): ?>
 
+
+
 		<?= Html::beginForm('', 'POST', [
 			'id' => 'form-lead-multiple-actions',
 			'data-pjax' => '',
 		]) ?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
+		&& !empty(($allIds = $searchModel->getAllIds($dataProvider->query))
+			&& count($allIds) < 6000
+		)
+			? Html::a(
+				Yii::t('lead', 'Send SMS: {count}', [
+					'count' => count($allIds),
+				]), [
+				'sms/push-multiple',
+			],
+				[
+					'data' => [
+						'method' => 'POST',
+						'params' => [
+							'leadsIds' => $allIds,
+						],
+					],
+					'class' => 'btn btn-success',
+				])
+			: ''
+		?>
 
 		<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
 			? Html::submitButton(

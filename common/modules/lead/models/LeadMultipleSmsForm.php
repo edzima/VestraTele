@@ -52,6 +52,9 @@ class LeadMultipleSmsForm extends SmsForm {
 		return ArrayHelper::map($this->getModels(), 'id', 'phone');
 	}
 
+	/**
+	 * @return ActiveLead[]
+	 */
 	public function getModels(): array {
 		if (empty($this->models)) {
 			$this->models = Lead::find()
@@ -71,7 +74,8 @@ class LeadMultipleSmsForm extends SmsForm {
 	}
 
 	public function pushJobs(): ?array {
-		if (!$this->validate()) {
+		if (!$this->validate(['message', 'status_id', 'withOverwrite', 'removeSpecialCharacters'])) {
+			Yii::error($this->getErrors());
 			return null;
 		}
 		$ids = [];

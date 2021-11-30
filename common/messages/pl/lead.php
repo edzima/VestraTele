@@ -190,4 +190,5 @@ return [
 	'Success add: {count} SMS: {message} to send queue.' => 'Dodano {count} SMS: {message} do wysłania',
 	'Try send sms to Lead: {lead} without Phone.' => 'Próba wysłania SMS do Lead: {lead} bez Numeru Telefonu.',
 	'Send multiple SMS to {count} Leads' => 'Wyślij SMS do {count} Leads',
+	'Send SMS: {count}' => 'Wyślij SMS: {count}',
 ];

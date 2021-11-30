@@ -33,7 +33,16 @@ class SmsController extends BaseController {
 		]);
 	}
 
-	public function actionPushMultiple(array $ids) {
+	public function actionPushMultiple(array $ids = []) {
+		if (empty($ids)) {
+			$postIds = Yii::$app->request->post('leadsIds');
+			if (is_string($postIds)) {
+				$postIds = explode(',', $postIds);
+			}
+			if ($postIds) {
+				$ids = $postIds;
+			}
+		}
 		if (empty($ids)) {
 			Flash::add(Flash::TYPE_WARNING, 'Ids cannot be blank.');
 			return $this->redirect(['lead/index']);

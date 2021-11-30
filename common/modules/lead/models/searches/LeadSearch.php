@@ -14,6 +14,7 @@ use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\query\LeadAnswerQuery;
+use common\modules\lead\models\query\LeadQuery;
 use common\validators\PhoneValidator;
 use Yii;
 use yii\base\Model;
@@ -204,6 +205,12 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 
 		return $dataProvider;
+	}
+
+	public function getAllIds(LeadQuery $query): array {
+		$query = clone $query;
+		$query->limit(null);
+		return $query->select(Lead::tableName() . '.id')->column();
 	}
 
 	private function applyAddressFilter(ActiveQuery $query): void {

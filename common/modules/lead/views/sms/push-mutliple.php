@@ -22,6 +22,8 @@ $this->params['breadcrumbs'][] = $this->title;
 	<div class="lead-sms-push-form">
 		<?php $form = ActiveForm::begin(['id' => 'lead-multiple-sms-push-form']) ?>
 
+		<?= Html::hiddenInput('leadsIds', implode(',', $model->ids)) ?>
+
 		<?= $form->field($model, 'status_id')->dropDownList(LeadSmsForm::getStatusNames()) ?>
 
 		<?= $form->field($model, 'message')->textarea() ?>
