@@ -37,7 +37,7 @@ class PayFormTest extends Unit {
 	public function testValueAsZero(): void {
 		$this->model->value = 0;
 		$this->thenUnsuccessValidate();
-		$this->thenSeeError('Value with VAT must be no less than 1.', 'value');
+		$this->thenSeeError('Value with VAT must be no less than 0.01.', 'value');
 	}
 
 	public function testCreateWithPayment(): void {

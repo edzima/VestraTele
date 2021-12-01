@@ -32,7 +32,7 @@ class PayForm extends Model implements PayInterface {
 			['status', 'integer'],
 			[['transferType'], 'string'],
 			['vat', 'number', 'min' => 0, 'max' => 100],
-			['value', 'number', 'min' => 1],
+			['value', 'number', 'min' => 0.01],
 			['value', 'number', 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/', 'enableClientValidation' => false],
 			[['deadline_at', 'payment_at'], 'date', 'format' => $this->dateFormat],
 			[
