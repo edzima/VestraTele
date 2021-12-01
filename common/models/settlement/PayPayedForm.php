@@ -43,7 +43,7 @@ class PayPayedForm extends Model {
 			[['value', 'transfer_type', 'date'], 'required'],
 			['transfer_type', 'string'],
 			['date', 'date', 'format' => 'Y-m-d'],
-			['value', 'number', 'min' => 1],
+			['value', 'number', 'min' => 0.01],
 			['value', 'compare', 'operator' => '<=', 'compareValue' => $this->pay->getValue(), 'enableClientValidation' => false],
 			['transfer_type', 'in', 'range' => array_keys($this->getPay()::getTransfersTypesNames())],
 		];
