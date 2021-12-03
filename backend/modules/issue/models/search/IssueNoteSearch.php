@@ -75,19 +75,19 @@ class IssueNoteSearch extends IssueNote {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
-			'issue_id' => $this->issue_id,
-			'user_id' => $this->user_id,
-			'publish_at' => $this->publish_at,
-			'created_at' => $this->created_at,
-			'updated_at' => $this->updated_at,
-			'is_pinned' => $this->is_pinned,
-			'is_template' => $this->is_template,
+			IssueNote::tableName() . '.id' => $this->id,
+			IssueNote::tableName() . '.issue_id' => $this->issue_id,
+			IssueNote::tableName() . '.user_id' => $this->user_id,
+			IssueNote::tableName() . '.publish_at' => $this->publish_at,
+			IssueNote::tableName() . '.created_at' => $this->created_at,
+			IssueNote::tableName() . '.updated_at' => $this->updated_at,
+			IssueNote::tableName() . '.is_pinned' => $this->is_pinned,
+			IssueNote::tableName() . '.is_template' => $this->is_template,
 		]);
 
-		$query->andFilterWhere(['like', 'title', $this->title])
-			->andFilterWhere(['like', 'type', $this->type])
-			->andFilterWhere(['like', 'description', $this->description]);
+		$query->andFilterWhere(['like', IssueNote::tableName() . '.title', $this->title])
+			->andFilterWhere(['like', IssueNote::tableName() . '.type', $this->type])
+			->andFilterWhere(['like', IssueNote::tableName() . '.description', $this->description]);
 
 		return $dataProvider;
 	}
