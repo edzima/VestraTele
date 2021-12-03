@@ -199,6 +199,21 @@ class RbacController extends Controller {
 		Console::output('Success add permission: ' . $name);
 	}
 
+	public function actionAddChildRolePermission(string $roleName, string $permissionName): void {
+		$auth = Yii::$app->authManager;
+		$role = $auth->getRole($roleName);
+		if ($role === null) {
+			Console::output("Role with name: $roleName not found.");
+			return;
+		}
+		$permission = $auth->getPermission($permissionName);
+		if ($permission === null) {
+			Console::output("Permission with name: $permissionName not found.");
+			return;
+		}
+		$auth->addChild($role, $permission);
+	}
+
 	public function actionCopy(int $type, string $from, string $to): void {
 		$types = [Item::TYPE_ROLE, Item::TYPE_PERMISSION];
 		if (!in_array($type, $types, true)) {
