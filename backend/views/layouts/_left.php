@@ -179,7 +179,7 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
-							'label' => Yii::t('common', 'Notes'),
+							'label' => Yii::t('issue', 'Issue Notes'),
 							'url' => ['/issue/note/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
@@ -190,12 +190,12 @@ $user = Yii::$app->user;
 						],
 
 						[
-							'label' => Yii::t('common', 'Types'),
+							'label' => Yii::t('issue', 'Types'),
 							'url' => ['/issue/type/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
-							'label' => Yii::t('common', 'Etapy'),
+							'label' => Yii::t('issue', 'Stages'),
 							'url' => ['/issue/stage/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],

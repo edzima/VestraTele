@@ -337,6 +337,7 @@ return [
 	'2 Weeks' => '2 tygodnie',
 	'3 Weeks' => '3 tygodnie ',
 	'Month' => 'Miesiąc',
+	'Without Recognition' => 'Niepotwierdzone',
 	'Without Term' => 'Bez terminu',
 	'Custom Term' => 'Data ...',
 	'Deadline At cannot be blank on custom term.' => 'Deadline nie może być pusty.',
