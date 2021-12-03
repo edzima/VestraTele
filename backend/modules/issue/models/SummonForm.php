@@ -122,6 +122,7 @@ class SummonForm extends Model {
 
 	public function save(): bool {
 		if (!$this->validate()) {
+			Yii::warning('summon.validate', $this->getErrors());
 			return false;
 		}
 		$model = $this->getModel();
@@ -148,7 +149,7 @@ class SummonForm extends Model {
 		if ($model->save()) {
 			return true;
 		}
-		Yii::warning('summon.errors', [
+		Yii::warning('summon.save.errors', [
 			'attributes' => $model->getAttributes(),
 			'errors' => $model->getErrors(),
 		]);

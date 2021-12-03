@@ -118,7 +118,7 @@ use yii\widgets\ActiveForm;
 				->widget(DateTimeWidget::class) ?>
 
 
-			<?= $model->getModel()->isRealized() ? $form->field($model, 'realized_at', [
+			<?= !$model->getModel()->isNewRecord ? $form->field($model, 'realized_at', [
 				'options' => [
 					'class' => 'col-md-2',
 				],
