@@ -82,6 +82,7 @@ class RbacController extends Controller {
 		],
 		Worker::PERMISSION_PAY_UPDATE => [
 			Worker::ROLE_BOOKKEEPER,
+			Worker::ROLE_AGENT,
 		],
 		Worker::PERMISSION_SUMMON => [
 			Worker::ROLE_AGENT,
@@ -212,6 +213,7 @@ class RbacController extends Controller {
 			return;
 		}
 		$auth->addChild($role, $permission);
+		Console::output("Success add permission: $permissionName as child: $roleName.");
 	}
 
 	public function actionCopy(int $type, string $from, string $to): void {
