@@ -15,9 +15,8 @@ use yii\widgets\ActiveForm;
 <div class="address-search-widget">
 	<div class="row">
 
-
 		<?= $form->field($model, 'region_id', [
-			'options' => ['class' => 'col-md-4'],
+			'options' => ['class' => 'col-md-4 col-lg-2'],
 		])
 			->widget(Select2::class, [
 					'data' => $model->getRegionsData(),
@@ -30,7 +29,7 @@ use yii\widgets\ActiveForm;
 		?>
 
 		<?= $form->field($model, 'district_id', [
-			'options' => ['class' => 'col-md-4'],
+			'options' => ['class' => 'col-md-4 col-lg-2'],
 		])->widget(DepDrop::class, [
 			'type' => DepDrop::TYPE_SELECT2,
 			'options' => [
@@ -52,7 +51,7 @@ use yii\widgets\ActiveForm;
 		]); ?>
 
 		<?= $form->field($model, 'commune_id', [
-			'options' => ['class' => 'col-md-4'],
+			'options' => ['class' => 'col-md-4 col-lg-2'],
 		])
 			->widget(DepDrop::class, [
 				'type' => DepDrop::TYPE_SELECT2,
@@ -81,14 +80,14 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'postal_code', [
 			'options' => [
-				'class' => 'col-md-1',
+				'class' => 'col-md-2 col-lg-1',
 			],
 		])->textInput() ?>
 
 
 		<?= $form->field($model, 'city_name', [
 			'options' => [
-				'class' => 'col-md-3',
+				'class' => 'col-md-4 col-lg-3',
 			],
 		])->textInput() ?>
 	</div>
