@@ -41,7 +41,7 @@ class LeadReport extends ActiveRecord {
 		return '{{%lead_report}}';
 	}
 
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'dateInfo' => DatesInfoBehavior::class,
 		];
@@ -101,7 +101,7 @@ class LeadReport extends ActiveRecord {
 	/**
 	 * Gets query for [[LeadAnswers]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getAnswers() {
 		return $this->hasMany(LeadAnswer::class, ['report_id' => 'id'])->indexBy('question_id');
@@ -110,7 +110,7 @@ class LeadReport extends ActiveRecord {
 	/**
 	 * Gets query for [[Questions]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getQuestions() {
 		return $this->hasMany(LeadQuestion::class, ['id' => 'question_id'])->viaTable(LeadAnswer::tableName(), ['report_id' => 'id']);
