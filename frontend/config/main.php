@@ -5,6 +5,7 @@ use common\components\User as WebUser;
 use common\models\user\User;
 use common\modules\lead\Module as LeadModule;
 use frontend\controllers\ApiLeadController;
+use frontend\controllers\LeadDialerController;
 use yii\base\Action;
 
 $params = array_merge(
@@ -31,6 +32,7 @@ return [
 			'class' => LeadModule::class,
 			'controllerMap' => [
 				'api' => ApiLeadController::class,
+				'dialer' => LeadDialerController::class,
 			],
 			'onlyUser' => true,
 			'allowDelete' => false,
@@ -74,6 +76,7 @@ return [
 						'allow' => true,
 						'controllers' => [
 							'lead/api',
+							'lead/dialer',
 						],
 					],
 				],
