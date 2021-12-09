@@ -148,7 +148,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->hasMany(LeadUser::class, ['lead_id' => 'id']);
 	}
 
-	public function getId(): string {
+	public function getId(): int {
 		return $this->id;
 	}
 
