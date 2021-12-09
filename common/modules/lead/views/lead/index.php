@@ -40,7 +40,6 @@ foreach (LeadSearch::questions() as $question) {
 
 $js = <<<JS
 const multipleForm = document.getElementById('multiple-form-wrap');
-if(multipleForm){
 const leadsGrid = jQuery("#leads-grid");
 leadsGrid.find("input[type='checkbox']").on('click',function (){
 	setTimeout(function (){
@@ -51,9 +50,7 @@ leadsGrid.find("input[type='checkbox']").on('click',function (){
 			multipleForm.classList.add('hidden');
 		}
 	}, 100);
-});	
-}
-
+});
 JS;
 
 $this->registerJs($js);
