@@ -21,9 +21,9 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-3']]) ?>
+		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-2 col-lg-1']]) ?>
 
-		<?= $form->field($model, 'provider', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+		<?= $form->field($model, 'provider', ['options' => ['class' => 'col-md-2 col-lg-1']])->widget(Select2::class, [
 			'data' => LeadSearch::getProvidersNames(),
 			'pluginOptions' => [
 				'placeholder' => $model->getAttributeLabel('provider'),
@@ -32,13 +32,9 @@ use yii\widgets\ActiveForm;
 		]) ?>
 
 
-	</div>
+		<?php if ($model->scenario !== LeadSearch::SCENARIO_USER): ?>
 
-	<?php if ($model->scenario !== LeadSearch::SCENARIO_USER): ?>
-
-		<div class="row">
-
-			<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+			<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(Select2::class, [
 				'data' => LeadSearch::getUsersNames(),
 				'pluginOptions' => [
 					'placeholder' => $model->getAttributeLabel('user_id'),
@@ -48,7 +44,7 @@ use yii\widgets\ActiveForm;
 			])
 			?>
 
-			<?= $form->field($model, 'user_type', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+			<?= $form->field($model, 'user_type', ['options' => ['class' => 'col-md-2 col-lg-1']])->widget(Select2::class, [
 				'data' => LeadSearch::getUserTypesNames(),
 				'pluginOptions' => [
 					'placeholder' => $model->getAttributeLabel('user_type'),
@@ -59,10 +55,15 @@ use yii\widgets\ActiveForm;
 
 			<?= $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
+			<?= $form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
-		</div>
+			<?= $form->field($model, 'duplicateEmail', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
-	<?php endif; ?>
+		<?php endif; ?>
+
+
+	</div>
+
 
 	<div class="row">
 
@@ -79,10 +80,6 @@ use yii\widgets\ActiveForm;
 		?>
 
 		<?= $form->field($model, 'withoutReport', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
-
-		<?= $form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
-
-		<?= $form->field($model, 'duplicateEmail', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
 
 	</div>

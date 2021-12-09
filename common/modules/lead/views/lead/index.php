@@ -11,6 +11,7 @@ use common\widgets\grid\AddressColumn;
 use common\widgets\grid\SerialColumn;
 use common\widgets\GridView;
 use kartik\grid\CheckboxColumn;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadSearch */
@@ -42,7 +43,7 @@ foreach (LeadSearch::questions() as $question) {
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
-	<p>
+	<div>
 		<?= Html::a(Yii::t('lead', 'Phone Lead'), ['phone'], ['class' => 'btn btn-info']) ?>
 
 		<?= CreateLeadBtnWidget::widget([
@@ -51,14 +52,17 @@ foreach (LeadSearch::questions() as $question) {
 
 		<?= Html::a(Yii::t('lead', 'Lead Reports'), ['report/index'], ['class' => 'btn btn-warning']) ?>
 
-	</p>
+	</div>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
-	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() : '' ?>
+	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget([
+		'formOptions' => [
+			'class' => 'pull-right',
+		],
+	]) : '' ?>
 
 	<?php if ($assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)): ?>
-
 
 
 		<?= Html::beginForm('', 'POST', [
@@ -127,25 +131,63 @@ foreach (LeadSearch::questions() as $question) {
 				'value' => 'owner',
 				'visible' => $searchModel->scenario !== LeadSearch::SCENARIO_USER,
 			],
-			'name',
+			[
+				'attribute' => 'name',
+				'contentBold' => true,
+				'noWrap' => true,
+			],
 			'phone:tel',
 			[
 				'attribute' => 'type_id',
 				'value' => 'source.type',
+				'contentBold' => true,
 				'filter' => $searchModel::getTypesNames(),
 				'label' => Yii::t('lead', 'Type'),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Type'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			[
 				'attribute' => 'status_id',
 				'value' => 'status',
 				'filter' => $searchModel::getStatusNames(),
 				'label' => Yii::t('lead', 'Status'),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Status'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			[
 				'attribute' => 'source_id',
 				'value' => 'source',
 				'filter' => $searchModel->getSourcesNames(),
 				'label' => Yii::t('lead', 'Source'),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Source'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			[
 				'attribute' => 'campaign_id',
@@ -153,6 +195,17 @@ foreach (LeadSearch::questions() as $question) {
 				'filter' => $searchModel->getCampaignNames(),
 				'label' => Yii::t('lead', 'Campaign'),
 				'visible' => $searchModel->scenario !== LeadSearch::SCENARIO_USER,
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Campaign'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			'date_at',
 		],

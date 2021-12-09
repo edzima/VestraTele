@@ -325,7 +325,7 @@ class LeadSearch extends Lead implements SearchModel {
 	}
 
 	public static function getTypesNames(): array {
-		return LeadType::getNames();
+		return LeadType::getNamesWithDescription();
 	}
 
 	public static function getUserTypesNames(): array {

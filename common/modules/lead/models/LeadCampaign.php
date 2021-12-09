@@ -75,7 +75,7 @@ class LeadCampaign extends ActiveRecord {
 	/**
 	 * Gets query for [[Leads]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getLeads() {
 		return $this->hasMany(Lead::class, ['campaign_id' => 'id']);
@@ -107,7 +107,7 @@ class LeadCampaign extends ActiveRecord {
 		if (static::$models === null || $refresh) {
 			static::$models = static::find()
 				->indexBy('id')
-				->joinWith('owner')
+				->joinWith('owner.userProfile')
 				->orderBy('sort_index')
 				->all();
 		}
