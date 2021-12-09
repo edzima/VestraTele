@@ -11,7 +11,7 @@ namespace common\modules\lead\models;
  */
 interface ActiveLead extends LeadInterface {
 
-	public function getId(): string;
+	public function getId(): int;
 
 	public function updateFromLead(LeadInterface $lead): void;
 

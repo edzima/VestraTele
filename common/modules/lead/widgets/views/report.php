@@ -27,24 +27,27 @@ use yii\web\View;
 		</div>
 		<div class="clearfix"></div>
 	</div>
-	<div class="panel-body">
-		<?php if ($model->details): ?>
-			<p>
-				<?= Html::encode($model->details) ?>
-			</p>
-		<?php endif; ?>
-		<?= LeadAnswersWidget::widget([
-			'answers' => $model->answers,
-		]) ?>
-	</div>
+	<?php if (!empty($model->details) || !empty($model->answers)) : ?>
+		<div class="panel-body">
+			<?php if ($model->details): ?>
+				<p>
+					<?= Html::encode($model->details) ?>
+				</p>
+			<?php endif; ?>
+			<?= LeadAnswersWidget::widget([
+				'answers' => $model->answers,
+			]) ?>
+		</div>
+	<?php endif; ?>
+
 	<div class="panel-footer">
 		<span class="date pull-left">
 			<?= $model->formattedDates ?>
 		</span>
-		<?php if ($model->owner_id === Yii::$app->user->id): ?>
+		<?php if ($model->owner_id === Yii::$app->user->id || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)): ?>
 			<span class="action pull-right">
 				<?= Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['/lead/report/update', 'id' => $model->id]) ?>
-				<?= $withDelete ? Html::a('<i class="glyphicon glyphicon-trash"></i>', ['/lead/report/delete', 'id' => $model->id], [
+				<?= $withDelete || Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('<i class="glyphicon glyphicon-trash"></i>', ['/lead/report/delete', 'id' => $model->id], [
 					'data' => [
 						'confirm' => Yii::t('lead', 'Are you sure you want to delete this report?'),
 						'method' => 'POST',

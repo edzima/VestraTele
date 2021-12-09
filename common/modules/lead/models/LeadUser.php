@@ -21,6 +21,7 @@ use yii\db\ActiveRecord;
 class LeadUser extends ActiveRecord {
 
 	public const TYPE_OWNER = 'owner';
+	public const TYPE_DIALER = 'dialer';
 	public const TYPE_AGENT = Worker::ROLE_AGENT;
 	public const TYPE_TELE = Worker::ROLE_TELEMARKETER;
 
@@ -85,6 +86,7 @@ class LeadUser extends ActiveRecord {
 			static::TYPE_AGENT => Yii::t('lead', 'Agent'),
 			static::TYPE_TELE => Yii::t('lead', 'Telemarketer'),
 			static::TYPE_OWNER => Yii::t('lead', 'Owner'),
+			static::TYPE_DIALER => Yii::t('lead', 'Dialer'),
 		];
 	}
 
