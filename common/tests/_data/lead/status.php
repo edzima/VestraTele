@@ -4,15 +4,24 @@ use common\modules\lead\models\LeadStatusInterface;
 
 return [
 	[
+		'id' => LeadStatusInterface::STATUS_ARCHIVE,
+		'name' => 'Archive',
+	],
+	[
 		'id' => LeadStatusInterface::STATUS_NEW,
 		'name' => 'New',
 	],
 	[
-		'id' => LeadStatusInterface::STATUS_ARCHIVE,
-		'name' => 'Archive',
+		'name' => 'Calling',
+		'short_report' => true,
 	],
 	[
 		'name' => 'Not Answered',
 		'short_report' => true,
 	],
+	[
+		'name' => 'Answered',
+		'short_report' => true,
+	],
+
 ];
