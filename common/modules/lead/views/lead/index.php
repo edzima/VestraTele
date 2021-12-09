@@ -38,6 +38,24 @@ foreach (LeadSearch::questions() as $question) {
 	];
 }
 
+$js = <<<JS
+const multipleForm = document.getElementById('multiple-form-wrap');
+const leadsGrid = jQuery("#leads-grid");
+leadsGrid.find("input[type='checkbox']").on('click',function (){
+	setTimeout(function (){
+		const selected =leadsGrid.yiiGridView('getSelectedRows');
+		if(selected.length){
+			multipleForm.classList.remove('hidden');
+		}else{
+			multipleForm.classList.add('hidden');
+		}
+	}, 100);
+});
+JS;
+
+$this->registerJs($js);
+
+$multipleForm = $assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS);
 ?>
 <div class="lead-index">
 
@@ -55,66 +73,73 @@ foreach (LeadSearch::questions() as $question) {
 	</div>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
-
-	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget([
-		'formOptions' => [
-			'class' => 'pull-right',
-		],
-	]) : '' ?>
-
-	<?php if ($assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)): ?>
+	<div class="grid-before">
 
 
-		<?= Html::beginForm('', 'POST', [
-			'id' => 'form-lead-multiple-actions',
-			'data-pjax' => '',
-		]) ?>
-
-		<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
-		&& !empty(($allIds = $searchModel->getAllIds($dataProvider->query))
-			&& count($allIds) < 6000
-		)
-			? Html::a(
-				Yii::t('lead', 'Send SMS: {count}', [
-					'count' => count($allIds),
-				]), [
-				'sms/push-multiple',
+		<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget([
+			'formOptions' => [
+				'class' => 'pull-right',
 			],
-				[
-					'data' => [
-						'method' => 'POST',
-						'params' => [
-							'leadsIds' => $allIds,
-						],
+		]) : '' ?>
+
+		<?php if ($multipleForm): ?>
+
+			<div id="multiple-form-wrap" class="hidden">
+
+				<?= Html::beginForm('', 'POST', [
+					'id' => 'form-lead-multiple-actions',
+					'data-pjax' => '',
+				]) ?>
+
+				<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
+				&& !empty(($allIds = $searchModel->getAllIds($dataProvider->query))
+					&& count($allIds) < 6000
+				)
+					? Html::a(
+						Yii::t('lead', 'Send SMS: {count}', [
+							'count' => count($allIds),
+						]), [
+						'sms/push-multiple',
 					],
-					'class' => 'btn btn-success',
-				])
-			: ''
-		?>
+						[
+							'data' => [
+								'method' => 'POST',
+								'params' => [
+									'leadsIds' => $allIds,
+								],
+							],
+							'class' => 'btn btn-success',
+						])
+					: ''
+				?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
-			? Html::submitButton(
-				Yii::t('lead', 'Send SMS'),
-				[
-					'class' => 'btn btn-success',
-					'name' => 'route',
-					'value' => 'sms/push-multiple',
-				])
-			: ''
-		?>
+				<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
+					? Html::submitButton(
+						Yii::t('lead', 'Send SMS'),
+						[
+							'class' => 'btn btn-success',
+							'name' => 'route',
+							'value' => 'sms/push-multiple',
+						])
+					: ''
+				?>
 
-		<?= $assignUsers ? Html::submitButton(
-			Yii::t('lead', 'Link users'),
-			[
-				'class' => 'btn btn-success',
-				'name' => 'route',
-				'value' => 'user/assign',
-			])
-			: ''
-		?>
+				<?= $assignUsers ? Html::submitButton(
+					Yii::t('lead', 'Link users'),
+					[
+						'class' => 'btn btn-info',
+						'name' => 'route',
+						'value' => 'user/assign',
+					])
+					: ''
+				?>
 
-	<?php endif; ?>
+			</div>
 
+		<?php endif; ?>
+
+	</div>
+	<div class="clearfix"></div>
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
@@ -294,6 +319,6 @@ foreach (LeadSearch::questions() as $question) {
 			]),
 	]) ?>
 
-	<?= $assignUsers ? Html::endForm() : '' ?>
+	<?= $multipleForm ? Html::endForm() : '' ?>
 
 </div>
