@@ -38,6 +38,23 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 				'label' => Yii::t('lead', 'Lead Name'),
 			],
 			[
+				'attribute' => 'lead_status_id',
+				'value' => 'lead.statusName',
+				'filter' => LeadStatus::getNames(),
+				'label' => Yii::t('lead', 'Current Status'),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Current Status'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+			],
+			[
 				'attribute' => 'lead_phone',
 				'value' => 'lead.phone',
 				'format' => 'tel',

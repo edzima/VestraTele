@@ -23,6 +23,7 @@ class LeadReportSearch extends LeadReport {
 	public $lead_phone;
 	public $lead_campaign_id;
 	public $lead_source_id;
+	public $lead_status_id;
 	public $lead_type_id;
 	public bool $changedStatus = false;
 	public $answersQuestions;
@@ -34,7 +35,7 @@ class LeadReportSearch extends LeadReport {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'lead_id', 'owner_id', 'status_id', 'old_status_id', 'lead_type_id', 'lead_source_id', 'lead_campaign_id'], 'integer'],
+			[['id', 'lead_id', 'owner_id', 'status_id', 'old_status_id', 'lead_type_id', 'lead_source_id', 'lead_campaign_id', 'lead_status_id'], 'integer'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['changedStatus'], 'boolean'],
 			['lead_source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
@@ -46,6 +47,7 @@ class LeadReportSearch extends LeadReport {
 
 	public function attributeLabels(): array {
 		return [
+			'lead_status_id' => Yii::t('lead', 'Current Status'),
 			'changedStatus' => Yii::t('lead', 'Changed Status'),
 			'lead_source_id' => Yii::t('lead', 'Source'),
 			'lead_campaign_id' => Yii::t('lead', 'Campaign'),
@@ -108,7 +110,7 @@ class LeadReportSearch extends LeadReport {
 			LeadReport::tableName() . '.owner_id' => $this->owner_id,
 			Lead::tableName() . '.campaign_id' => $this->lead_campaign_id,
 			Lead::tableName() . '.source_id' => $this->lead_source_id,
-
+			Lead::tableName() . '.status_id' => $this->lead_status_id,
 		]);
 
 		$query->andFilterWhere(['like', LeadReport::tableName() . '.details', $this->details]);

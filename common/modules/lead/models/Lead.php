@@ -125,6 +125,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->hasOne(LeadStatus::class, ['id' => 'status_id']);
 	}
 
+	public function getStatusName(): string {
+		return LeadStatus::getNames()[$this->status_id];
+	}
+
 	public function getAnswers(): ActiveQuery {
 		return $this->hasMany(LeadAnswer::class, ['report_id' => 'id'])->via('reports')
 			->indexBy('question_id');
