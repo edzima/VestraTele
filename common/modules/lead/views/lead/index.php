@@ -217,24 +217,6 @@ $multipleForm = $assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_S
 					],
 				],
 			],
-			[
-				'attribute' => 'campaign_id',
-				'value' => 'campaign',
-				'filter' => $searchModel->getCampaignNames(),
-				'label' => Yii::t('lead', 'Campaign'),
-				'visible' => $searchModel->scenario !== LeadSearch::SCENARIO_USER,
-				'filterType' => GridView::FILTER_SELECT2,
-				'filterInputOptions' => [
-					'placeholder' => Yii::t('lead', 'Campaign'),
-				],
-				'filterWidgetOptions' => [
-					'size' => Select2::SIZE_SMALL,
-					'pluginOptions' => [
-						'allowClear' => true,
-						'dropdownAutoWidth' => true,
-					],
-				],
-			],
 			'date_at',
 		],
 			$questionColumns,

@@ -88,6 +88,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			'name' => Yii::t('lead', 'Lead Name'),
 			'provider' => Yii::t('lead', 'Provider'),
 			'providerName' => Yii::t('lead', 'Provider'),
+			'campaign_id' => Yii::t('lead', 'Campaign'),
 			'campaign' => Yii::t('lead', 'Campaign'),
 			'phone' => Yii::t('lead', 'Phone'),
 			'postal_code' => Yii::t('lead', 'Postal Code'),

@@ -32,6 +32,14 @@ use yii\widgets\ActiveForm;
 		]) ?>
 
 
+		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-2 col-lg-2']])->widget(Select2::class, [
+			'data' => $model->getCampaignNames(),
+			'pluginOptions' => [
+				'placeholder' => Yii::t('lead', 'Campaign'),
+				'allowClear' => true,
+			],
+		]) ?>
+
 		<?php if ($model->scenario !== LeadSearch::SCENARIO_USER): ?>
 
 			<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(Select2::class, [
@@ -69,9 +77,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'closedQuestions', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
 			'data' => LeadSearch::getClosedQuestionsNames(),
-			'options' => [
-				'multiple' => true,
-			],
+			'options' => ['multiple' => true,],
 			'pluginOptions' => [
 				'placeholder' => $model->getAttributeLabel('closedQuestions'),
 				'allowClear' => true,
