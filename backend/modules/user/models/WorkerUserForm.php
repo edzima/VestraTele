@@ -43,6 +43,9 @@ class WorkerUserForm extends UserForm {
 		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
 		Worker::PERMISSION_SUMMON_MANAGER,
 		User::PERMISSION_WORKERS,
+		Worker::PERMISSION_MULTIPLE_SMS,
+		Worker::PERMISSION_SMS,
+		Worker::PERMISSION_NOTE_TEMPLATE,
 	];
 
 	public int $status = User::STATUS_ACTIVE;
