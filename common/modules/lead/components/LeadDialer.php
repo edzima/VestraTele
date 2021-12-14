@@ -42,8 +42,7 @@ class LeadDialer extends Component {
 		) {
 			return null;
 		}
-		$phone = str_replace(' ', '', $model->getPhone());
-
+		$phone = str_replace([' ', '+'], ['', '00'], $model->getPhone());
 		return [
 			'id' => $model->getId(),
 			'phone' => $phone,
@@ -108,7 +107,7 @@ class LeadDialer extends Component {
 		throw new InvalidConfigException('Invalid $status for report Event.');
 	}
 
-	protected function findToCall(): ?ActiveLead {
+	public function findToCall(): ?ActiveLead {
 		$model = $this->findNewLeadWithoutUsers();
 		if ($model) {
 			return $model;
