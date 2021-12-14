@@ -211,8 +211,9 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public function getAllIds(LeadQuery $query): array {
 		$query = clone $query;
-		$query->limit(null);
-		return $query->select(Lead::tableName() . '.id')->column();
+		$query->select(Lead::tableName() . '.id');
+		$this->applyDuplicates($query);
+		return $query->column();
 	}
 
 	private function applyAddressFilter(ActiveQuery $query): void {
