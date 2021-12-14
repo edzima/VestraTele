@@ -3,6 +3,7 @@
 namespace common\modules\lead\models;
 
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -14,6 +15,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $description
  * @property int|null $sort_index
  * @property int|null $short_report
+ * @property int|null $show_report_in_lead_index
  *
  * @property Lead[] $leads
  */
@@ -39,7 +41,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 		return [
 			[['name'], 'required'],
 			[['sort_index'], 'integer'],
-			['short_report', 'boolean'],
+			[['short_report', 'show_report_in_lead_index'], 'boolean'],
 			[['name', 'description'], 'string', 'max' => 255],
 		];
 	}
@@ -54,13 +56,14 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			'description' => Yii::t('lead', 'Description'),
 			'sort_index' => Yii::t('lead', 'Sort Index'),
 			'short_report' => Yii::t('lead', 'Short Report'),
+			'show_report_in_lead_index' => Yii::t('lead', 'Show Report In Lead Index'),
 		];
 	}
 
 	/**
 	 * Gets query for [[Leads]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getLeads() {
 		return $this->hasMany(Lead::class, ['status_id' => 'id']);

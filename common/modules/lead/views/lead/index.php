@@ -230,7 +230,9 @@ $multipleForm = $assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_S
 					'value' => static function (ActiveLead $lead): string {
 						$content = [];
 						foreach ($lead->reports as $report) {
-							$content[] = $report->getDetails();
+							if ($report->status->show_report_in_lead_index) {
+								$content[] = $report->getDetails();
+							}
 						}
 						$content = array_filter($content, static function ($value): bool {
 							return !empty(trim($value));

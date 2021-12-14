@@ -192,4 +192,5 @@ return [
 	'Try send sms to Lead: {lead} without Phone.' => 'Próba wysłania SMS do Lead: {lead} bez Numeru Telefonu.',
 	'Send multiple SMS to {count} Leads' => 'Wyślij SMS do {count} Leads',
 	'Send SMS: {count}' => 'Wyślij SMS: {count}',
+	'Show Report In Lead Index' => 'Pokazuj Raport w Lead Index',
 ];
