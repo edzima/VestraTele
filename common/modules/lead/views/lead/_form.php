@@ -18,15 +18,52 @@ use yii\widgets\ActiveForm;
 	]); ?>
 
 	<div class="row">
-		<?= $form->field($model, 'source_id', ['options' => ['class' => 'col-md-4']])->dropDownList($model->getSourcesNames()) ?>
+		<?= $form->field($model, 'source_id', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])
+			->widget(Select2::class, [
+					'data' => $model->getSourcesNames(),
+					'options' => [
+						'placeholder' => $model->getAttributeLabel('source_id'),
+					],
+				]
+			)
+		?>
 
-		<?= $form->field($model, 'provider', ['options' => ['class' => 'col-md-2']])->dropDownList(LeadForm::getProvidersNames(), ['prompt' => Yii::t('lead', '--- Select ---')]) ?>
 
-		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-3']])->dropDownList($model->getCampaignsNames(), ['prompt' => Yii::t('lead', '--- Select ---')]) ?>
+		<?= $form->field($model, 'provider', [
+			'options' => [
+				'class' => 'col-md-2 col-lg-1',
+			],
+		])
+			->widget(Select2::class, [
+					'data' => LeadForm::getProvidersNames(),
+					'options' => [
+						'placeholder' => $model->getAttributeLabel('provider'),
+					],
+				]
+			)
+		?>
 
-		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getStatusNames()) ?>
+		<?= $form->field($model, 'campaign_id', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])
+			->widget(Select2::class, [
+					'data' => $model->getCampaignsNames(),
+					'options' => [
+						'placeholder' => $model->getAttributeLabel('campaign_id'),
+					],
+				]
+			)
+		?>
 
-		<?= $form->field($model, 'date_at', ['options' => ['class' => 'col-md-3']])->widget(DateTimeWidget::class, [
+		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-3 col-lg-2']])->dropDownList(LeadForm::getStatusNames()) ?>
+
+		<?= $form->field($model, 'date_at', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(DateTimeWidget::class, [
 			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
 		]) ?>
 
@@ -35,18 +72,22 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= $form->field($model, 'name', ['options' => ['class' => 'col-md-4']])->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'name', ['options' => ['class' => 'col-md-4 col-lg-3']])->textInput(['maxlength' => true]) ?>
 
-		<?= $form->field($model, 'phone', ['options' => ['class' => 'col-md-3']])->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'phone', ['options' => ['class' => 'col-md-2']])->textInput(['maxlength' => true]) ?>
 
-		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-3']])->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-2']])->textInput(['maxlength' => true]) ?>
 
-		<?= $form->field($model, 'postal_code', ['options' => ['class' => 'col-md-2']])->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'postal_code', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput(['maxlength' => true]) ?>
 	</div>
 
 	<div class="row">
 		<?= $model->scenario !== LeadForm::SCENARIO_OWNER
-			? $form->field($model, 'owner_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+			? $form->field($model, 'owner_id', [
+				'options' => [
+					'class' => 'col-md-3 col-lg-2',
+				],
+			])->widget(Select2::class, [
 				'data' => LeadForm::getUsersNames(),
 				'pluginOptions' => [
 					'placeholder' => $model->getAttributeLabel('owner_id'),
@@ -56,7 +97,11 @@ use yii\widgets\ActiveForm;
 			: ''
 		?>
 
-		<?= $form->field($model, 'agent_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+		<?= $form->field($model, 'agent_id', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->widget(Select2::class, [
 			'data' => LeadForm::getUsersNames(),
 			'pluginOptions' => [
 				'placeholder' => $model->getAttributeLabel('agent_id'),

@@ -4,6 +4,7 @@ return [
 	'Assign User to Lead' => 'Przypisz Użytkownika do Leada',
 	'Assign User' => 'Przypisz',
 	'Create Lead: {source}' => 'Dodaj Lead: {source}',
+	'Current Status' => 'Obecny Status',
 	'Success assign {user} as {type} to Lead: {lead}.' => 'Przypisano {user} jako {type} do Leada: {lead}.',
 	'From At' => 'Od',
 	'To At' => 'Do',
@@ -149,6 +150,7 @@ return [
 	'Duplicate Email' => 'Dubel (Email)',
 	'Push new Lead from {name}' => 'Nowy Lead od: {name}',
 	'Email' => 'Email',
+	'Only Self' => 'Tylko Własne',
 	'Source: {name}' => 'Source: {name}',
 	'Closed questions must be set when details is blank.' => 'Closed questions must be set when details is blank.',
 	'Email: {email}' => 'Email: {email}',
@@ -191,4 +193,5 @@ return [
 	'Try send sms to Lead: {lead} without Phone.' => 'Próba wysłania SMS do Lead: {lead} bez Numeru Telefonu.',
 	'Send multiple SMS to {count} Leads' => 'Wyślij SMS do {count} Leads',
 	'Send SMS: {count}' => 'Wyślij SMS: {count}',
+	'Show Report In Lead Index' => 'Pokazuj Raport w Lead Index',
 ];

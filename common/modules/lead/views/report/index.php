@@ -9,6 +9,7 @@ use common\modules\lead\models\searches\LeadReportSearch;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\SerialColumn;
 use common\widgets\GridView;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadReportSearch */
@@ -33,7 +34,25 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 			[
 				'attribute' => 'lead_name',
 				'value' => 'lead.name',
+				'contentBold' => true,
 				'label' => Yii::t('lead', 'Lead Name'),
+			],
+			[
+				'attribute' => 'lead_status_id',
+				'value' => 'lead.statusName',
+				'filter' => LeadStatus::getNames(),
+				'label' => Yii::t('lead', 'Current Status'),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Current Status'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			[
 				'attribute' => 'lead_phone',
@@ -44,8 +63,20 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 			[
 				'attribute' => 'lead_type_id',
 				'value' => 'lead.source.type',
-				'filter' => LeadType::getNames(),
-				'label' => Yii::t('lead', 'Lead Type'),
+				'filter' => LeadType::getNamesWithDescription(),
+				'label' => Yii::t('lead', 'Type'),
+				'contentBold' => true,
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Type'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			[
 				'attribute' => 'owner_id',
@@ -53,28 +84,71 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 				'filter' => LeadReportSearch::getOwnersNames(),
 				'label' => Yii::t('lead', 'Owner'),
 				'visible' => $searchModel->scenario !== LeadReportSearch::SCENARIO_OWNER,
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Owner'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+
 			],
 			[
 				'attribute' => 'status_id',
 				'value' => 'status',
 				'filter' => LeadStatus::getNames(),
 				'label' => Yii::t('lead', 'Status'),
-
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Status'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			[
 				'attribute' => 'old_status_id',
 				'value' => 'oldStatus',
 				'filter' => LeadStatus::getNames(),
 				'label' => Yii::t('lead', 'Old Status'),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Old Status'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			'answersQuestions',
 			'details:text',
-			'created_at:date',
-			'updated_at:date',
+			'created_at:datetime',
+			'updated_at:datetime',
 
 			[
 				'class' => ActionColumn::class,
 				'template' => '{report} {sms} {view} {update} {delete}',
+				'visibleButtons' => [
+					'delete' => function (LeadReport $report) use ($searchModel): bool {
+						return $searchModel->scenario !== LeadReportSearch::SCENARIO_OWNER
+							|| $report->owner_id === Yii::$app->user->getId();
+					},
+					'update' => function (LeadReport $report) use ($searchModel): bool {
+						return $searchModel->scenario !== LeadReportSearch::SCENARIO_OWNER
+							|| $report->owner_id === Yii::$app->user->getId();
+					},
+				],
 				'buttons' => [
 					'report' => static function (string $url, LeadReport $report): string {
 						return Html::a(

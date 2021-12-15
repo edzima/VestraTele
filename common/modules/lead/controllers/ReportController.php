@@ -48,6 +48,7 @@ class ReportController extends BaseController {
 			}
 			$searchModel->scenario = LeadReportSearch::SCENARIO_OWNER;
 			$searchModel->owner_id = $userId;
+			$searchModel->lead_user_id = $userId;
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 

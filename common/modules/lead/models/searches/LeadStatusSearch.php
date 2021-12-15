@@ -17,7 +17,7 @@ class LeadStatusSearch extends LeadStatus {
 	public function rules(): array {
 		return [
 			[['id', 'sort_index'], 'integer'],
-			['short_report', 'boolean'],
+			[['short_report', 'show_report_in_lead_index'], 'boolean'],
 			[['name', 'description'], 'safe'],
 		];
 	}

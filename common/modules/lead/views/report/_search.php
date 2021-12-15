@@ -20,10 +20,20 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
+
+		<?= $model->scenario === LeadReportSearch::SCENARIO_OWNER
+			? $form->field($model, 'onlySelf', [
+				'options' => [
+					'class' => 'col-md-2 col-lg-1',
+				],
+			])->checkbox()
+			: ''
+		?>
+
 		<?= $form->field($model, 'from_at', [
 			'options' => [
 				'class' => [
-					'col-md-3',
+					'col-md-3 col-lg-2',
 				],
 			],
 		])->widget(DateWidget::class)
@@ -32,14 +42,14 @@ use yii\widgets\ActiveForm;
 		<?= $form->field($model, 'to_at', [
 			'options' => [
 				'class' => [
-					'col-md-3',
+					'col-md-3 col-lg-2',
 				],
 			],
 		])->widget(DateWidget::class)
 		?>
 		<?= $form->field($model, 'lead_source_id', [
 			'options' => [
-				'class' => 'col-md-3',
+				'class' => 'col-md-3 col-lg-2',
 			],
 		])->widget(Select2::class, [
 			'data' => $model->getSourcesNames(),
@@ -51,7 +61,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'lead_campaign_id', [
 			'options' => [
-				'class' => 'col-md-3',
+				'class' => 'col-md-3 col-lg-2',
 			],
 		])->widget(Select2::class, [
 			'data' => $model->getCampaignNames(),
@@ -62,10 +72,15 @@ use yii\widgets\ActiveForm;
 		]) ?>
 
 
+		<?= $form->field($model, 'changedStatus', [
+			'options' => [
+				'class' => 'col-md-2 col-lg-1',
+			],
+		])->checkbox() ?>
+
+
 	</div>
 
-
-	<?= $form->field($model, 'changedStatus')->checkbox() ?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Search'), ['class' => 'btn btn-primary']) ?>

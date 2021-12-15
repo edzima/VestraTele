@@ -3,6 +3,7 @@
 namespace common\modules\lead\models;
 
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -57,14 +58,25 @@ class LeadType extends ActiveRecord implements LeadTypeInterface {
 	/**
 	 * Gets query for [[Leads]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getLeads() {
 		return $this->hasMany(Lead::class, ['type_id' => 'id']);
 	}
 
+	public function getNameWithDescription(): string {
+		if (empty($this->description)) {
+			return $this->name;
+		}
+		return $this->name . ' - ' . $this->description;
+	}
+
 	public static function getNames(): array {
 		return ArrayHelper::map(static::getModels(), 'id', 'name');
+	}
+
+	public static function getNamesWithDescription(): array {
+		return ArrayHelper::map(static::getModels(), 'id', 'nameWithDescription');
 	}
 
 	/**

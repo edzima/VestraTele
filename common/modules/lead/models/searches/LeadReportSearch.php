@@ -7,6 +7,7 @@ use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadSource;
+use common\modules\lead\models\query\LeadReportQuery;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -23,7 +24,11 @@ class LeadReportSearch extends LeadReport {
 	public $lead_phone;
 	public $lead_campaign_id;
 	public $lead_source_id;
+	public $lead_status_id;
 	public $lead_type_id;
+	public $lead_user_id;
+
+	public $onlySelf;
 	public bool $changedStatus = false;
 	public $answersQuestions;
 	public $from_at;
@@ -34,8 +39,9 @@ class LeadReportSearch extends LeadReport {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'lead_id', 'owner_id', 'status_id', 'old_status_id', 'lead_type_id', 'lead_source_id', 'lead_campaign_id'], 'integer'],
-			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
+			[['id', 'lead_id', 'owner_id', 'lead_user_id', 'status_id', 'old_status_id', 'lead_type_id', 'lead_source_id', 'lead_campaign_id', 'lead_status_id'], 'integer'],
+			[['!owner_id', 'lead_user_id'], 'required', 'on' => static::SCENARIO_OWNER],
+			[['onlySelf'], 'boolean', 'on' => static::SCENARIO_OWNER],
 			[['changedStatus'], 'boolean'],
 			['lead_source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['lead_campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
@@ -46,11 +52,13 @@ class LeadReportSearch extends LeadReport {
 
 	public function attributeLabels(): array {
 		return [
+			'lead_status_id' => Yii::t('lead', 'Current Status'),
 			'changedStatus' => Yii::t('lead', 'Changed Status'),
 			'lead_source_id' => Yii::t('lead', 'Source'),
 			'lead_campaign_id' => Yii::t('lead', 'Campaign'),
 			'from_at' => Yii::t('lead', 'From At'),
 			'to_at' => Yii::t('lead', 'To At'),
+			'onlySelf' => Yii::t('lead', 'Only Self'),
 		];
 	}
 
@@ -92,6 +100,7 @@ class LeadReportSearch extends LeadReport {
 
 		if (!$this->validate()) {
 			$query->where('0=1');
+			Yii::warning($this->getErrors());
 			return $dataProvider;
 		}
 
@@ -100,15 +109,15 @@ class LeadReportSearch extends LeadReport {
 		$this->applyLeadNameFilter($query);
 		$this->applyLeadPhoneFilter($query);
 		$this->applyStatusesFilter($query);
+		$this->applyUserFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
 			LeadReport::tableName() . '.id' => $this->id,
 			LeadReport::tableName() . '.lead_id' => $this->lead_id,
-			LeadReport::tableName() . '.owner_id' => $this->owner_id,
 			Lead::tableName() . '.campaign_id' => $this->lead_campaign_id,
 			Lead::tableName() . '.source_id' => $this->lead_source_id,
-
+			Lead::tableName() . '.status_id' => $this->lead_status_id,
 		]);
 
 		$query->andFilterWhere(['like', LeadReport::tableName() . '.details', $this->details]);
@@ -155,6 +164,27 @@ class LeadReportSearch extends LeadReport {
 			LeadReport::tableName() . '.status_id' => $this->status_id,
 			LeadReport::tableName() . '.old_status_id' => $this->old_status_id,
 		]);
+	}
+
+	private function applyUserFilter(LeadReportQuery $query): void {
+		if (empty($this->lead_user_id) || $this->onlySelf) {
+			$query->andFilterWhere([
+				LeadReport::tableName() . '.owner_id' => $this->owner_id,
+			]);
+			return;
+		}
+		$query->joinWith('lead.leadUsers LU');
+		$query->groupBy(LeadReport::tableName() . '.id');
+		if (empty($this->owner_id)) {
+			$query->andWhere(['LU.user_id' => $this->lead_user_id]);
+			return;
+		}
+		$query->andWhere(
+			[
+				'or',
+				['LU.user_id' => $this->lead_user_id],
+				[LeadReport::tableName() . '.owner_id' => $this->owner_id],
+			]);
 	}
 
 	public function getSourcesNames(): array {

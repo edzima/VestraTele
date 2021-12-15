@@ -8,10 +8,10 @@ use yii\helpers\Html;
 /* @var $model LeadForm */
 
 $this->title = Yii::t('lead', 'Update Lead: {name}', [
-    'name' => $id,
+	'name' => $model->name,
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $id, 'url' => ['view', 'id' => $id]];
+$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $id]];
 $this->params['breadcrumbs'][] = Yii::t('lead', 'Update');
 ?>
 <div class="lead-update">

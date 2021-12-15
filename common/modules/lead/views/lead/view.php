@@ -78,7 +78,7 @@ YiiAsset::register($this);
 				'attributes' => [
 					'status',
 					[
-						'attribute' => 'source.type',
+						'attribute' => 'source.type.nameWithDescription',
 						'label' => Yii::t('lead', 'Type'),
 					],
 					'source',

@@ -243,6 +243,9 @@ class LeadController extends BaseController {
 		$model = new LeadForm();
 		$lead = $this->findLead($id);
 		$model->setLead($lead);
+		if ($this->module->onlyUser) {
+			$model->setScenario(LeadForm::SCENARIO_OWNER);
+		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 			$lead->setLead($model);

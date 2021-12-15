@@ -11,6 +11,7 @@ use common\widgets\grid\AddressColumn;
 use common\widgets\grid\SerialColumn;
 use common\widgets\GridView;
 use kartik\grid\CheckboxColumn;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadSearch */
@@ -37,12 +38,33 @@ foreach (LeadSearch::questions() as $question) {
 	];
 }
 
+$js = <<<JS
+const multipleForm = document.getElementById('multiple-form-wrap');
+if(multipleForm){
+const leadsGrid = jQuery("#leads-grid");
+leadsGrid.find("input[type='checkbox']").on('click',function (){
+	setTimeout(function (){
+		const selected =leadsGrid.yiiGridView('getSelectedRows');
+		if(selected.length){
+			multipleForm.classList.remove('hidden');
+		}else{
+			multipleForm.classList.add('hidden');
+		}
+	}, 100);
+});	
+}
+
+JS;
+
+$this->registerJs($js);
+
+$multipleForm = $assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS);
 ?>
 <div class="lead-index">
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
-	<p>
+	<div>
 		<?= Html::a(Yii::t('lead', 'Phone Lead'), ['phone'], ['class' => 'btn btn-info']) ?>
 
 		<?= CreateLeadBtnWidget::widget([
@@ -51,66 +73,76 @@ foreach (LeadSearch::questions() as $question) {
 
 		<?= Html::a(Yii::t('lead', 'Lead Reports'), ['report/index'], ['class' => 'btn btn-warning']) ?>
 
-	</p>
+	</div>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
-
-	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() : '' ?>
-
-	<?php if ($assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)): ?>
+	<div class="grid-before">
 
 
-
-		<?= Html::beginForm('', 'POST', [
-			'id' => 'form-lead-multiple-actions',
-			'data-pjax' => '',
-		]) ?>
-
-		<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
-		&& !empty(($allIds = $searchModel->getAllIds($dataProvider->query))
-			&& count($allIds) < 6000
-		)
-			? Html::a(
-				Yii::t('lead', 'Send SMS: {count}', [
-					'count' => count($allIds),
-				]), [
-				'sms/push-multiple',
+		<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget([
+			'formOptions' => [
+				'class' => 'pull-right',
 			],
-				[
-					'data' => [
-						'method' => 'POST',
-						'params' => [
-							'leadsIds' => $allIds,
-						],
+		]) : '' ?>
+
+		<?php if ($multipleForm): ?>
+
+			<div id="multiple-form-wrap" class="hidden">
+
+				<?= Html::beginForm('', 'POST', [
+					'id' => 'form-lead-multiple-actions',
+					'data-pjax' => '',
+				]) ?>
+
+				<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
+				&& !empty(($allIds = $searchModel->getAllIds($dataProvider->query))
+					&& count($allIds) < 6000
+				)
+					? Html::a(
+						Yii::t('lead', 'Send SMS: {count}', [
+							'count' => count($allIds),
+						]), [
+						'sms/push-multiple',
 					],
-					'class' => 'btn btn-success',
-				])
-			: ''
-		?>
+						[
+							'data' => [
+								'method' => 'POST',
+								'params' => [
+									'leadsIds' => $allIds,
+								],
+							],
+							'class' => 'btn btn-success',
+						])
+					: ''
+				?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
-			? Html::submitButton(
-				Yii::t('lead', 'Send SMS'),
-				[
-					'class' => 'btn btn-success',
-					'name' => 'route',
-					'value' => 'sms/push-multiple',
-				])
-			: ''
-		?>
+				<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
+					? Html::submitButton(
+						Yii::t('lead', 'Send SMS'),
+						[
+							'class' => 'btn btn-success',
+							'name' => 'route',
+							'value' => 'sms/push-multiple',
+						])
+					: ''
+				?>
 
-		<?= $assignUsers ? Html::submitButton(
-			Yii::t('lead', 'Link users'),
-			[
-				'class' => 'btn btn-success',
-				'name' => 'route',
-				'value' => 'user/assign',
-			])
-			: ''
-		?>
+				<?= $assignUsers ? Html::submitButton(
+					Yii::t('lead', 'Link users'),
+					[
+						'class' => 'btn btn-info',
+						'name' => 'route',
+						'value' => 'user/assign',
+					])
+					: ''
+				?>
 
-	<?php endif; ?>
+			</div>
 
+		<?php endif; ?>
+
+	</div>
+	<div class="clearfix"></div>
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
@@ -127,32 +159,63 @@ foreach (LeadSearch::questions() as $question) {
 				'value' => 'owner',
 				'visible' => $searchModel->scenario !== LeadSearch::SCENARIO_USER,
 			],
-			'name',
+			[
+				'attribute' => 'name',
+				'contentBold' => true,
+				'noWrap' => true,
+			],
 			'phone:tel',
 			[
 				'attribute' => 'type_id',
 				'value' => 'source.type',
+				'contentBold' => true,
 				'filter' => $searchModel::getTypesNames(),
 				'label' => Yii::t('lead', 'Type'),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Type'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			[
 				'attribute' => 'status_id',
 				'value' => 'status',
 				'filter' => $searchModel::getStatusNames(),
 				'label' => Yii::t('lead', 'Status'),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Status'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			[
 				'attribute' => 'source_id',
 				'value' => 'source',
 				'filter' => $searchModel->getSourcesNames(),
 				'label' => Yii::t('lead', 'Source'),
-			],
-			[
-				'attribute' => 'campaign_id',
-				'value' => 'campaign',
-				'filter' => $searchModel->getCampaignNames(),
-				'label' => Yii::t('lead', 'Campaign'),
-				'visible' => $searchModel->scenario !== LeadSearch::SCENARIO_USER,
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Source'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			'date_at',
 		],
@@ -167,7 +230,9 @@ foreach (LeadSearch::questions() as $question) {
 					'value' => static function (ActiveLead $lead): string {
 						$content = [];
 						foreach ($lead->reports as $report) {
-							$content[] = $report->getDetails();
+							if ($report->status->show_report_in_lead_index) {
+								$content[] = $report->getDetails();
+							}
 						}
 						$content = array_filter($content, static function ($value): bool {
 							return !empty(trim($value));
@@ -241,6 +306,6 @@ foreach (LeadSearch::questions() as $question) {
 			]),
 	]) ?>
 
-	<?= $assignUsers ? Html::endForm() : '' ?>
+	<?= $multipleForm ? Html::endForm() : '' ?>
 
 </div>
