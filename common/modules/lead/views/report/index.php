@@ -139,6 +139,16 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 			[
 				'class' => ActionColumn::class,
 				'template' => '{report} {sms} {view} {update} {delete}',
+				'visibleButtons' => [
+					'delete' => function (LeadReport $report) use ($searchModel): bool {
+						return $searchModel->scenario !== LeadReportSearch::SCENARIO_OWNER
+							|| $report->owner_id === Yii::$app->user->getId();
+					},
+					'update' => function (LeadReport $report) use ($searchModel): bool {
+						return $searchModel->scenario !== LeadReportSearch::SCENARIO_OWNER
+							|| $report->owner_id === Yii::$app->user->getId();
+					},
+				],
 				'buttons' => [
 					'report' => static function (string $url, LeadReport $report): string {
 						return Html::a(

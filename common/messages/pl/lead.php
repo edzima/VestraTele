@@ -150,6 +150,7 @@ return [
 	'Duplicate Email' => 'Dubel (Email)',
 	'Push new Lead from {name}' => 'Nowy Lead od: {name}',
 	'Email' => 'Email',
+	'Only Self' => 'Tylko Własne',
 	'Source: {name}' => 'Source: {name}',
 	'Closed questions must be set when details is blank.' => 'Closed questions must be set when details is blank.',
 	'Email: {email}' => 'Email: {email}',
