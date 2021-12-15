@@ -47,7 +47,7 @@ class IssueViewCest {
 		$I->seeLink('Update');
 		$I->dontSeeLink('Costs');
 		$I->dontSeeLink('Create settlement');
-		$I->dontSeeLink('Create summon');
+		$I->dontSeeLink('Create Summon');
 	}
 
 	public function checkNoteLink(IssueManager $I): void {
@@ -86,8 +86,8 @@ class IssueViewCest {
 	public function checkCreateSummonLink(SummonIssueManager $I): void {
 		$I->amLoggedIn();
 		$this->goToIssuePage($I);
-		$I->seeLink('Create summon');
-		$I->click('Create summon');
+		$I->seeLink('Create Summon');
+		$I->click('Create Summon');
 		$I->seeResponseCodeIsSuccessful();
 	}
 
