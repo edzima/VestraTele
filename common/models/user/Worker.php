@@ -34,6 +34,8 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_NOTE_DELETE = 'note.delete';
 	public const PERMISSION_SUMMON_MANAGER = 'summon.manager';
 
+	public const PERMISSION_PAY_ALL_PAID = 'pay.all-paid';
+
 	private static $USER_NAMES = [];
 
 	public function getParent(): ActiveQuery {

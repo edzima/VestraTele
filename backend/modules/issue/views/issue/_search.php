@@ -92,6 +92,11 @@ use yii\widgets\ActiveForm;
 			: ''
 		?>
 
+		<?= $model->scenario === IssueSearch::SCENARIO_ALL_PAYED
+			? $form->field($model, 'onlyWithAllPayedPay', ['options' => ['class' => 'col-md-2']])->checkbox()
+			: ''
+		?>
+
 		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ?
 			$form->field($model, 'onlyWithSettlements', ['options' => ['class' => 'col-md-2']])->dropDownList(Html::booleanDropdownList(), [
 				'prompt' => Yii::t('common', 'All'),

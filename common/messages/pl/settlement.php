@@ -158,6 +158,7 @@ return [
 	'Generate new payment: {value}.' => 'Dodano nową płatność: {value}.',
 	'Send Messages about Payed Pay.' => 'Wysłano Notyfikacje o opłaceniu.',
 	'Only with Settlements' => 'Z Rozliczeniami',
+	'Only with all paid Pays' => 'Wszystko Opłacone',
 	'First Demand for Payment' => '1. Wezwanie do Zapłaty',
 	'Second Demand for Payment' => '2. Wezwanie do Zapłaty',
 	'Third Demand for Payment' => '3. Wezwanie do Zapłaty',

@@ -54,6 +54,12 @@ class IssueController extends Controller {
 		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
 		}
+		if (Yii::$app->user->can(Worker::PERMISSION_PAY_ALL_PAID)) {
+			$searchModel->scenario = IssueSearch::SCENARIO_ALL_PAYED;
+			if (Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)) {
+				$searchModel->withArchiveOnAllPayedPay = true;
+			}
+		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {
 			/** @var IssueQuery $query */
@@ -131,6 +137,7 @@ class IssueController extends Controller {
 			]);
 			return $exporter->export()->send('export.csv');
 		}
+
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,

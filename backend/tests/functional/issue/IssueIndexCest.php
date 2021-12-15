@@ -64,12 +64,20 @@ class IssueIndexCest {
 		$I->see('Only delayed');
 		$I->dontSee('Structures');
 		$I->dontSee('Only with payed pay');
+		$I->dontSee('Only with all paid Pays');
 	}
 
 	public function checkSearchFieldsAsAdmin(Admin $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE);
 		$I->see('Structures');
+	}
+
+	public function checkSearchFieldsWithAllPaidPaysPermission(IssueManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(Worker::PERMISSION_PAY_ALL_PAID);
+		$I->amOnRoute(static::ROUTE);
+		$I->see('Only with all paid Pays');
 	}
 
 	public function checkSearchFieldsWithPayPartPayed(IssueManager $I): void {

@@ -63,7 +63,7 @@ return [
 		'stage_id' => 2,
 	],
 	'lawyer' => [
-		'issue_id' => 1,
+		'issue_id' => 5,
 		'value' => 100,
 		'type' => IssuePayCalculation::TYPE_LAWYER,
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,

@@ -54,4 +54,11 @@ return [
 		'deadline_at' => '2020-02-01',
 		'pay_at' => '2020-03-01',
 	],
+	[
+		'calculation_id' => 7,
+		'value' => 100,
+		'vat' => 23,
+		'deadline_at' => '2020-02-01',
+		'pay_at' => '2020-03-01',
+	],
 ];

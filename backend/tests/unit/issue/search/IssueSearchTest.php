@@ -10,6 +10,7 @@ use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\Issue;
 use common\models\settlement\PayedInterface;
 use common\tests\_support\UnitSearchModelTrait;
+use Yii;
 
 /**
  * @property IssueSearch $model
@@ -34,6 +35,11 @@ class IssueSearchTest extends Unit {
 		}
 		$this->model = $this->createModel();
 		parent::_before();
+	}
+
+	public function _after() {
+		parent::_after();
+		Yii::$app->db->close();
 	}
 
 	protected function createModel(): IssueSearch {
@@ -269,6 +275,47 @@ class IssueSearchTest extends Unit {
 		$this->model->onlyWithPayedPay = true;
 		$this->model->onlyWithSettlements = false;
 		$this->tester->assertEmpty($this->getModels());
+	}
+
+	public function testOnlyWithAllPayed(): void {
+		$this->tester->assertFalse($this->model->withArchiveOnAllPayedPay);
+		$this->getModels([
+			'onlyWithAllPayedPay' => 1,
+			'withArchiveOnAllPayedPay' => 1,
+		]);
+		$this->tester->assertFalse($this->model->onlyWithAllPayedPay);
+		$this->tester->assertFalse($this->model->withArchiveOnAllPayedPay);
+
+		$this->model->setScenario(IssueSearch::SCENARIO_ALL_PAYED);
+		$models = $this->getModels(['onlyWithAllPayedPay' => 1]);
+		$this->tester->assertTrue($this->model->onlyWithAllPayedPay);
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertFalse($model->getIssueModel()->isArchived());
+			$this->tester->assertSame(0, (int) $model->getPays()->onlyUnpaid()->count());
+		}
+
+		$this->model->withArchiveOnAllPayedPay = true;
+		$models = $this->getModels(['onlyWithAllPayedPay' => 1]);
+
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertFalse($model->getIssueModel()->isArchived());
+			$this->tester->assertSame(0, (int) $model->getPays()->onlyUnpaid()->count());
+		}
+
+		$this->model->withArchive = true;
+		$models = $this->getModels(['onlyWithAllPayedPay' => 1]);
+		$this->tester->assertNotEmpty($models);
+		$archived = false;
+		foreach ($models as $model) {
+			/** @var $model Issue */
+			$this->tester->assertSame(0, (int) $model->getPays()->onlyUnpaid()->count());
+			if ($model->isArchived()) {
+				$archived = true;
+			}
+		}
+		$this->tester->assertTrue($archived);
 	}
 
 	public function testWithSettlementsAndAgent(): void {
