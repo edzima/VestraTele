@@ -30,6 +30,7 @@ return [
 	'hint' => 'Wskazówki',
 	'logs' => 'Logi',
 	'news' => 'Newsy',
+	'pay.all-paid' => 'Wszystkie opłacone (sprawy)',
 	'note' => 'Notatki',
 	'Author' => 'Autor',
 	'Avatar' => 'Awatar',
