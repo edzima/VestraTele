@@ -195,6 +195,14 @@ class RbacController extends Controller {
 		Console::output('Success add role: ' . $name);
 	}
 
+	public function actionRemoveRole(string $name): void {
+		$auth = Yii::$app->authManager;
+		$role = $auth->getRole($name);
+		if ($role && $auth->remove($role)) {
+			Console::output('Success remove Role: ' . $name);
+		}
+	}
+
 	public function actionAddPermission(string $name, bool $admin = true): void {
 		$auth = Yii::$app->authManager;
 		$permission = $auth->createPermission($name);
