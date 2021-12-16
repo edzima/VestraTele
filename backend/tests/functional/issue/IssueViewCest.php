@@ -91,6 +91,16 @@ class IssueViewCest {
 		$I->seeResponseCodeIsSuccessful();
 	}
 
+	public function checkLinkUserLinkWithPermission(IssueManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(Worker::PERMISSION_ISSUE_LINK_USER);
+		$this->goToIssuePage($I);
+		$I->seeLink('Link User');
+		$I->click('Link User');
+		$I->seeResponseCodeIsSuccessful();
+		$I->seeInCurrentUrl(LinkUserCest::ROUTE_LINK);
+	}
+
 	public function checkDeleteLinkWithoutPermission(IssueManager $I): void {
 		$I->amLoggedIn();
 		$model = $this->goToIssuePage($I);

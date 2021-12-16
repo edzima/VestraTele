@@ -35,6 +35,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_SUMMON_MANAGER = 'summon.manager';
 
 	public const PERMISSION_PAY_ALL_PAID = 'pay.all-paid';
+	public const PERMISSION_ISSUE_LINK_USER = 'issue.link-user';
 
 	private static $USER_NAMES = [];
 

@@ -11,11 +11,6 @@ use yii\base\Model;
 
 class IssueUserForm extends Model {
 
-	public const SCENARIO_TYPE = 'type';
-	public const SCENARIO_USER_LINK = 'user-link';
-
-	public const SCENARIO_DEFAULT = self::SCENARIO_USER_LINK;
-
 	protected const UNAVAILABLE_TYPES = [
 		IssueUser::TYPE_CUSTOMER,
 		IssueUser::TYPE_LAWYER,
@@ -28,13 +23,6 @@ class IssueUserForm extends Model {
 
 	private ?User $_user = null;
 	private ?Issue $_issue = null;
-
-	public function scenarios(): array {
-		$scenarios = parent::scenarios();
-		$scenarios[static::SCENARIO_USER_LINK] = ['issue_id', 'type'];
-		$scenarios[static::SCENARIO_TYPE] = ['type'];
-		return $scenarios;
-	}
 
 	public function rules(): array {
 		return [
@@ -52,6 +40,7 @@ class IssueUserForm extends Model {
 		return [
 			'issue_id' => Yii::t('common', 'Issue'),
 			'type' => Yii::t('common', 'As role'),
+			'user_id' => Yii::t('common', 'User'),
 		];
 	}
 
@@ -112,6 +101,12 @@ class IssueUserForm extends Model {
 			Yii::warning($exception->getMessage());
 		}
 		return true;
+	}
+
+	public static function getUsersNames(): array {
+		return User::getSelectList(
+			User::getAssignmentIds([User::PERMISSION_ISSUE])
+		);
 	}
 
 }

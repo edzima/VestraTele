@@ -9,6 +9,7 @@ use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -26,6 +27,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	use IssueTrait;
 
 	public const TYPE_LAWYER = Worker::ROLE_LAWYER;
+	public const TYPE_LAWYER_ASSISTANT = 'lawyer-assistant';
 	public const TYPE_AGENT = Worker::ROLE_AGENT;
 	public const TYPE_CO_AGENT = Worker::ROLE_CO_AGENT;
 	public const TYPE_TELEMARKETER = Worker::ROLE_TELEMARKETER;
@@ -93,7 +95,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	/**
 	 * Gets query for [[Issue]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getIssue(): IssueQuery {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
@@ -102,7 +104,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	/**
 	 * Gets query for [[User]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getUser(): UserQuery {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
@@ -114,6 +116,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 			static::TYPE_AGENT => User::getRolesNames()[static::TYPE_AGENT],
 			static::TYPE_CO_AGENT => User::getRolesNames()[static::TYPE_CO_AGENT],
 			static::TYPE_LAWYER => User::getRolesNames()[static::TYPE_LAWYER],
+			static::TYPE_LAWYER_ASSISTANT => Yii::t('common', 'Lawyer Assistant'),
 			static::TYPE_TELEMARKETER => User::getRolesNames()[static::TYPE_TELEMARKETER],
 			static::TYPE_VICTIM => User::getRolesNames()[static::TYPE_VICTIM],
 			static::TYPE_SHAREHOLDER => User::getRolesNames()[static::TYPE_SHAREHOLDER],

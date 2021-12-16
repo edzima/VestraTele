@@ -27,6 +27,7 @@ return [
 	'customer_service' => 'Obsługa klienta',
 	'issue' => 'Sprawy',
 	'lawyer' => 'Prawnik',
+	'Lawyer Assistant' => 'Asystent Prawnika',
 	'hint' => 'Wskazówki',
 	'logs' => 'Logi',
 	'news' => 'Newsy',
@@ -347,5 +348,6 @@ return [
 	'lead' => 'Leads',
 	'message.template' => 'Szablony Wiadomości',
 	'issue.delete' => 'Sprawy - usuwanie',
+	'issue.link-user' => 'Sprawy - przypisywanie użytkowników',
 	'note.delete' => 'Notatki - usuwanie',
 ];

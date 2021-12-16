@@ -13,6 +13,7 @@ use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * UserController implements the CRUD actions for IssueUser model.
@@ -77,15 +78,13 @@ class UserController extends Controller {
 	 * Link a User to Issue.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 *
-	 * @return string
-	 * @throws NotFoundHttpException
+	 * @return string|Response
 	 */
-	public function actionLink(int $userId) {
+	public function actionLink(int $userId = null, int $issueId = null) {
 		$model = new IssueUserForm();
+		$model->issue_id = $issueId;
 		$model->user_id = $userId;
-		if ($model->getUser() === null) {
-			throw new NotFoundHttpException();
-		}
+
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(Url::issueView($model->issue_id));
 		}
@@ -108,21 +107,6 @@ class UserController extends Controller {
 		}
 		return $this->render('update', [
 			'model' => $model,
-		]);
-	}
-
-	/**
-	 * Displays a single IssueUser model.
-	 *
-	 * @param int $issueId
-	 * @param int $userId
-	 * @param string $type
-	 * @return mixed
-	 * @throws NotFoundHttpException
-	 */
-	public function actionView(int $issueId, int $userId, string $type) {
-		return $this->render('view', [
-			'model' => $this->findModel($issueId, $userId, $type),
 		]);
 	}
 

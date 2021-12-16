@@ -18,7 +18,6 @@ use yii\helpers\Html;
 /* @var $summonDataProvider DataProviderInterface */
 
 $this->title = $model->longId;
-
 $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 ?>
 <div class="issue-view">
@@ -50,6 +49,12 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 			: ''
 		?>
 
+		<?= !$model->isArchived() && Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER)
+			? Html::a(Yii::t('backend', 'Link user'), ['user/link', 'issueId' => $model->id], [
+				'class' => 'btn btn-success',
+			])
+			: ''
+		?>
 
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
