@@ -58,6 +58,8 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 	public const ROLE_MANAGER = 'manager';
 	public const ROLE_USER = 'user';
 
+	public const ROLE_RECCOMENDING = 'recommending';
+
 	//workers
 	public const ROLE_AGENT = 'agent';
 	public const ROLE_CO_AGENT = 'co-agent';
@@ -65,6 +67,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 	public const ROLE_CUSTOMER_SERVICE = 'customer_service';
 	public const ROLE_TELEMARKETER = 'telemarketer';
 	public const ROLE_LAWYER = 'lawyer';
+	public const ROLE_LAWYER_ASSISTANT = 'lawyer.assistant';
 
 	public const PERMISSION_ARCHIVE = 'archive';
 	public const PERMISSION_MESSAGE_TEMPLATE = 'message.template';
@@ -450,7 +453,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 			$rolesI18n = [];
 			foreach ($roles as $role) {
 				$name = $role->name;
-				$rolesI18n[$name] = Yii::t('common', $name);
+				$rolesI18n[$name] = Yii::t('rbac', $name);
 			}
 			static::$ROLES_NAMES = $rolesI18n;
 		}
@@ -463,7 +466,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 			$rolesI18n = [];
 			foreach ($roles as $role) {
 				$name = $role->name;
-				$rolesI18n[$name] = Yii::t('common', $name);
+				$rolesI18n[$name] = Yii::t('rbac', $name);
 			}
 			static::$PERMISSIONS_NAMES = $rolesI18n;
 		}

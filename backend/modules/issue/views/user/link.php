@@ -10,8 +10,8 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('backend', 'Link {user} to issue', ['user' => $model->getUser()]);
 
-$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issue Users'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' => ['/issue/issue/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issue Users'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>

@@ -92,6 +92,7 @@ class RbacController extends Controller {
 			Worker::ROLE_AGENT,
 		],
 		Worker::PERMISSION_SUMMON_MANAGER,
+		Worker::PERMISSION_SUMMON_CREATE,
 		Worker::PERMISSION_SMS,
 		Worker::PERMISSION_MULTIPLE_SMS,
 		Worker::PERMISSION_WORKERS,
@@ -202,6 +203,14 @@ class RbacController extends Controller {
 			$this->assignAdmin($permission);
 		}
 		Console::output('Success add permission: ' . $name);
+	}
+
+	public function actionRemovePermission(string $name): void {
+		$auth = Yii::$app->authManager;
+		$permission = $auth->getPermission($name);
+		if ($permission && $auth->remove($permission)) {
+			Console::output('Success remove Permission: ' . $name);
+		}
 	}
 
 	public function actionAddChildRolePermission(string $roleName, string $permissionName): void {

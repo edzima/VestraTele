@@ -27,7 +27,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	use IssueTrait;
 
 	public const TYPE_LAWYER = Worker::ROLE_LAWYER;
-	public const TYPE_LAWYER_ASSISTANT = 'lawyer-assistant';
+	public const TYPE_LAWYER_ASSISTANT = Worker::ROLE_LAWYER_ASSISTANT;
 	public const TYPE_AGENT = Worker::ROLE_AGENT;
 	public const TYPE_CO_AGENT = Worker::ROLE_CO_AGENT;
 	public const TYPE_TELEMARKETER = Worker::ROLE_TELEMARKETER;
@@ -35,11 +35,13 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	public const TYPE_VICTIM = Customer::ROLE_VICTIM;
 	public const TYPE_SHAREHOLDER = Customer::ROLE_SHAREHOLDER;
 	public const TYPE_HANDICAPPED = Customer::ROLE_HANDICAPPED;
-	public const TYPE_RECOMMENDING = 'recommending';
+	public const TYPE_RECOMMENDING = User::ROLE_RECCOMENDING;
 
 	public const TYPES_WORKERS = [
 		self::TYPE_LAWYER,
+		self::TYPE_LAWYER_ASSISTANT,
 		self::TYPE_AGENT,
+		self::TYPE_CO_AGENT,
 		self::TYPE_TELEMARKETER,
 	];
 
@@ -116,12 +118,12 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 			static::TYPE_AGENT => User::getRolesNames()[static::TYPE_AGENT],
 			static::TYPE_CO_AGENT => User::getRolesNames()[static::TYPE_CO_AGENT],
 			static::TYPE_LAWYER => User::getRolesNames()[static::TYPE_LAWYER],
-			static::TYPE_LAWYER_ASSISTANT => Yii::t('common', 'Lawyer Assistant'),
+			static::TYPE_LAWYER_ASSISTANT => User::getRolesNames()[static::TYPE_LAWYER_ASSISTANT],
 			static::TYPE_TELEMARKETER => User::getRolesNames()[static::TYPE_TELEMARKETER],
 			static::TYPE_VICTIM => User::getRolesNames()[static::TYPE_VICTIM],
 			static::TYPE_SHAREHOLDER => User::getRolesNames()[static::TYPE_SHAREHOLDER],
 			static::TYPE_HANDICAPPED => User::getRolesNames()[static::TYPE_HANDICAPPED],
-			static::TYPE_RECOMMENDING => Yii::t('common', 'Recommending'),
+			static::TYPE_RECOMMENDING => User::getRolesNames()[static::TYPE_RECOMMENDING],
 		];
 	}
 
