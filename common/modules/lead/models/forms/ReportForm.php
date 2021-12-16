@@ -177,19 +177,27 @@ class ReportForm extends Model {
 		if (!$model->save()) {
 			return false;
 		}
+		$this->linkUser();
 
 		if ($this->status_id !== $this->lead->getStatusId()) {
 			$this->lead->updateStatus($this->status_id);
 		}
-		if (!$this->lead->isForUser($this->owner_id)) {
-			$this->lead->linkUser(LeadUser::TYPE_TELE, $this->owner_id);
-		}
+
 		if ($this->withAnswers) {
 			$this->linkAnswers(!$isNewRecord);
 		}
 		$this->saveAddress();
 
 		return true;
+	}
+
+	protected function linkUser(): void {
+		if (!$this->lead->isForUser($this->owner_id)) {
+			$type = array_key_exists(LeadUser::TYPE_OWNER, $this->lead->getUsers())
+				? LeadUser::TYPE_TELE
+				: LeadUser::TYPE_OWNER;
+			$this->lead->linkUser($type, $this->owner_id);
+		}
 	}
 
 	private function linkAnswers(bool $unlink): void {

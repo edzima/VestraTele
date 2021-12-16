@@ -13,6 +13,7 @@ use common\modules\lead\Module;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
 use yii\base\Model;
+use yii\helpers\Json;
 
 class ReportFormTest extends Unit {
 
@@ -23,7 +24,6 @@ class ReportFormTest extends Unit {
 	public function _fixtures(): array {
 		return array_merge(
 			LeadFixtureHelper::leads(),
-			LeadFixtureHelper::source(),
 			LeadFixtureHelper::question(),
 			LeadFixtureHelper::reports()
 		);
@@ -33,7 +33,7 @@ class ReportFormTest extends Unit {
 		$lead = $this->haveLead([
 			'source_id' => 1,
 			'status_id' => LeadStatusInterface::STATUS_NEW,
-			'data' => 'test-lead',
+			'name' => __METHOD__,
 		]);
 		$this->giveForm([
 			'owner_id' => 1,
@@ -49,7 +49,7 @@ class ReportFormTest extends Unit {
 		$lead = $this->haveLead([
 			'source_id' => 1,
 			'status_id' => LeadStatusInterface::STATUS_NEW,
-			'data' => 'test-lead',
+			'name' => __METHOD__,
 		]);
 		$this->giveForm([
 			'owner_id' => 1,
@@ -61,7 +61,7 @@ class ReportFormTest extends Unit {
 		$this->thenSeeLead([
 			'source_id' => 1,
 			'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
-			'data' => 'test-lead',
+			'name' => __METHOD__,
 		]);
 
 		$this->thenSeeReport([
@@ -76,7 +76,7 @@ class ReportFormTest extends Unit {
 		$lead = $this->haveLead([
 			'source_id' => 1,
 			'status_id' => LeadStatusInterface::STATUS_NEW,
-			'data' => 'test-lead',
+			'name' => __METHOD__,
 		]);
 		$this->giveForm([
 			'owner_id' => 1,
@@ -92,7 +92,7 @@ class ReportFormTest extends Unit {
 		$lead = $this->haveLead([
 			'source_id' => 1,
 			'status_id' => LeadStatusInterface::STATUS_NEW,
-			'data' => 'test-lead',
+			'name' => __METHOD__,
 		]);
 		$this->giveForm([
 			'owner_id' => 1,
@@ -105,7 +105,7 @@ class ReportFormTest extends Unit {
 		$this->thenSeeLead([
 			'source_id' => 1,
 			'status_id' => LeadStatusInterface::STATUS_NEW,
-			'data' => 'test-lead',
+			'name' => __METHOD__,
 		]);
 
 		$this->thenSeeReport([
@@ -122,7 +122,7 @@ class ReportFormTest extends Unit {
 			'lead' => $this->haveLead([
 				'source_id' => 1,
 				'status_id' => LeadStatusInterface::STATUS_NEW,
-				'data' => 'test-lead',
+				'name' => __METHOD__,
 			]),
 			'closedQuestions' => [1, 2],
 		]);
@@ -137,7 +137,7 @@ class ReportFormTest extends Unit {
 			'lead' => $this->haveLead([
 				'source_id' => 1,
 				'status_id' => LeadStatusInterface::STATUS_NEW,
-				'data' => 'test-lead',
+				'name' => __METHOD__,
 			]),
 			'closedQuestions' => [3, 4],
 		]);
@@ -153,7 +153,7 @@ class ReportFormTest extends Unit {
 			'lead' => $this->haveLead([
 				'source_id' => 1,
 				'status_id' => LeadStatusInterface::STATUS_NEW,
-				'data' => 'test-lead',
+				'name' => __METHOD__,
 			]),
 			'closedQuestions' => [],
 		]);
@@ -167,7 +167,7 @@ class ReportFormTest extends Unit {
 			'lead' => $this->haveLead([
 				'source_id' => 1,
 				'status_id' => LeadStatusInterface::STATUS_NEW,
-				'data' => 'test-lead',
+				'name' => __METHOD__,
 			]),
 			'closedQuestions' => [],
 			'openAnswers' => [
@@ -186,15 +186,37 @@ class ReportFormTest extends Unit {
 		}
 	}
 
-	public function testNotSelfLead(): void {
+	public function testLeadWithoutOwner(): void {
 		$this->giveForm([
 			'owner_id' => 3,
 			'lead' => $this->haveLead([
 				'source_id' => 1,
 				'status_id' => LeadStatusInterface::STATUS_NEW,
-				'data' => 'test-lead',
+				'name' => __METHOD__,
 			]),
 			'details' => 'Report not self Lead',
+		]);
+		$this->tester->assertFalse($this->model->getLead()->isForUser(3));
+		$this->thenSuccessSave();
+		$this->tester->seeRecord(LeadUser::class, [
+			'lead_id' => $this->model->getLead()->getId(),
+			'user_id' => 3,
+			'type' => LeadUser::TYPE_OWNER,
+		]);
+		$this->tester->assertTrue($this->model->getLead()->isForUser(3));
+	}
+
+	public function testNotSelfLeadWithOwner(): void {
+		$lead = $this->haveLead([
+			'source_id' => 1,
+			'status_id' => LeadStatusInterface::STATUS_NEW,
+			'name' => __METHOD__,
+		]);
+		$lead->linkUser(LeadUser::TYPE_OWNER, 1);
+		$this->giveForm([
+			'owner_id' => 3,
+			'lead' => $lead,
+			'details' => 'Report not self Lead with Owner',
 		]);
 		$this->tester->assertFalse($this->model->getLead()->isForUser(3));
 		$this->thenSuccessSave();
@@ -207,6 +229,9 @@ class ReportFormTest extends Unit {
 	}
 
 	private function haveLead(array $attributes): ActiveLead {
+		if (empty($attributes['data'])) {
+			$attributes['data'] = Json::encode($attributes);
+		}
 		return Module::manager()->findById(
 			$this->tester->haveRecord(
 				Module::manager()->model,
