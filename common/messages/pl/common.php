@@ -109,7 +109,6 @@ return [
 	'Issues' => 'Sprawy',
 	'Entity responsible' => 'Podmiot odpowiedzialny',
 	'loginToBackend' => 'Logowanie do backendu',
-	'summon' => 'Zlecenia',
 	'Loading...' => 'Ładowanie...',
 	'Select...' => 'Wybierz...',
 	'Issue details' => 'Szczegóły sprawy',
