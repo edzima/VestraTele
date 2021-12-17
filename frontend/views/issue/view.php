@@ -1,10 +1,11 @@
 <?php
 
 use common\models\issue\Issue;
-use common\models\user\User;
+use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
 use frontend\helpers\Html;
+use frontend\widgets\issue\StageChangeButtonDropdown;
 use frontend\widgets\IssuePayCalculationGrid;
 use frontend\widgets\SummonGrid;
 use yii\data\DataProviderInterface;
@@ -25,14 +26,21 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE)
+			? StageChangeButtonDropdown::widget([
+				'model' => $model,
+			])
+			: ''
+		?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE)
 			? Html::a(Yii::t('common', 'Create note'), ['/note/issue', 'id' => $model->id], [
 				'class' => 'btn btn-info',
 			])
 			: ''
 		?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_SMS)
+		<?= Yii::$app->user->can(Worker::PERMISSION_SMS)
 			? Html::a(Yii::t('common', 'Send SMS'), ['/issue-sms/push', 'id' => $model->id], [
 				'class' => 'btn btn-warning',
 			])

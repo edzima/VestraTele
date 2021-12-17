@@ -28,11 +28,13 @@ class RbacController extends Controller {
 		Worker::ROLE_BOOKKEEPER,
 		Worker::ROLE_CUSTOMER_SERVICE,
 		Worker::ROLE_LAWYER,
+		Worker::ROLE_LAWYER_ASSISTANT,
 		Worker::ROLE_TELEMARKETER,
 		Customer::ROLE_CUSTOMER,
 		Customer::ROLE_VICTIM,
 		Customer::ROLE_SHAREHOLDER,
 		Customer::ROLE_HANDICAPPED,
+		User::ROLE_RECCOMENDING,
 	];
 
 	public array $permissions = [
@@ -59,6 +61,7 @@ class RbacController extends Controller {
 		User::PERMISSION_ISSUE,
 		Worker::PERMISSION_ISSUE_LINK_USER,
 		Worker::PERMISSION_ISSUE_DELETE,
+		Worker::PERMISSION_ISSUE_STAGE_CHANGE,
 		Worker::PERMISSION_HINT,
 		User::PERMISSION_LOGS,
 		Worker::PERMISSION_MEET,
@@ -99,7 +102,6 @@ class RbacController extends Controller {
 		Worker::PERMISSION_LEAD,
 		Worker::PERMISSION_MESSAGE_TEMPLATE,
 		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
-
 	];
 
 	public function actionInit(): void {

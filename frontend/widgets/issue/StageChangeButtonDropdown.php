@@ -1,13 +1,13 @@
 <?php
 
-namespace backend\modules\issue\widgets;
+namespace frontend\widgets\issue;
 
-use backend\modules\issue\controllers\IssueController;
 use common\modules\issue\widgets\StageChangeButtonDropdown as BaseStageChangeButtonDropdown;
+use frontend\controllers\IssueController;
 
 class StageChangeButtonDropdown extends BaseStageChangeButtonDropdown {
 
 	/** @see IssueController::actionStage() */
-	public string $route = '/issue/issue/stage';
+	public string $route = '/issue/stage';
 
 }

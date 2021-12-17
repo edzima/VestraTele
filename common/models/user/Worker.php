@@ -27,6 +27,7 @@ class Worker extends User implements ActiveHierarchy {
 	];
 
 	public const PERMISSION_ISSUE_DELETE = 'issue.delete';
+	public const PERMISSION_ISSUE_STAGE_CHANGE = 'issue.stage.change';
 
 	public const PERMISSION_NOTE_TEMPLATE = 'note.template';
 	public const PERMISSION_COST_DEBT = 'cost.debt';

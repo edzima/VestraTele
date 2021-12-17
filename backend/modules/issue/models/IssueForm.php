@@ -195,11 +195,7 @@ class IssueForm extends Model {
 	}
 
 	public static function getStages(int $typeID): array {
-		$type = IssueType::get($typeID);
-		if ($type === null) {
-			return [];
-		}
-		return ArrayHelper::map($type->stages, 'id', 'name');
+		return IssueStageChangeForm::getStagesNames($typeID);
 	}
 
 	public static function getEntityResponsibles(): array {

@@ -23,8 +23,6 @@ return [
 		'created_at' => '1391885313',
 		'updated_at' => '1391885313',
 		'email' => 'tele2@vestra.info',
-		'status' => '3',
-
 	],
 	[
 		'id' => UserFixtureHelper::TELE_3_INACTIVE,

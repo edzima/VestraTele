@@ -20,6 +20,7 @@ return [
 	'issue' => 'Sprawy',
 	'issue.delete' => 'Sprawy - usuwanie',
 	'issue.link-user' => 'Sprawy - przypisywanie użytkowników',
+	'issue.stage.change' => 'Sprawy - zmiana etapów',
 	'handicapped' => 'Niepełnosprawny',
 	'hint' => 'Wskazówki',
 	'lawyer' => 'Prawnik',

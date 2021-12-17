@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\modules\issue\models;
+namespace frontend\models;
 
 use common\models\issue\form\IssueStageChangeForm as BaseIssueStageChangeForm;
 
