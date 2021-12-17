@@ -6,6 +6,7 @@ use common\models\issue\IssueInterface;
 use common\models\issue\IssueNote;
 use common\models\user\Worker;
 use Yii;
+use yii\web\ForbiddenHttpException;
 use yii\web\User as BaseUser;
 
 class User extends BaseUser {
@@ -17,6 +18,12 @@ class User extends BaseUser {
 		return parent::can($permissionName, $params, $allowCaching);
 	}
 
+	/**
+	 * @param IssueInterface $model
+	 * @param bool $withChildes
+	 * @return bool
+	 * @throws ForbiddenHttpException
+	 */
 	public function canSeeIssue(IssueInterface $model, bool $withChildes = true): bool {
 
 		if ($this->can(Worker::ROLE_ADMINISTRATOR)) {
@@ -25,7 +32,7 @@ class User extends BaseUser {
 
 		if ($model->getIssueModel()->isArchived() && !$this->can(Worker::PERMISSION_ARCHIVE)) {
 			Yii::warning('User: ' . $this->getId() . '  without permission try view archived issue.', 'issue.archived.' . $model->getIssueName());
-			return false;
+			throw new ForbiddenHttpException(Yii::t('issue', 'The Issue is archived. You are not authorized to view the archive.'));
 		}
 
 		if ($this->can(Worker::ROLE_CUSTOMER_SERVICE) || $model->getIssueModel()->isForUser($this->getId())) {
