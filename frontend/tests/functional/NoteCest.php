@@ -53,7 +53,7 @@ class NoteCest {
 			'title' => 'Some title',
 			'description' => 'Some description',
 		]);
-		$I->seeInCurrentUrl(IssueCest::ROUTE_VIEW);
+		$I->seeInCurrentUrl(IssueViewCest::ROUTE_VIEW);
 	}
 
 	public function checkUpdateSelfNote(CustomerServiceTester $I): void {

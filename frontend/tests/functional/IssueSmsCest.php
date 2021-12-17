@@ -17,8 +17,8 @@ class IssueSmsCest {
 	 * @see SmsController::actionPush()
 	 */
 	private const ROUTE_PUSH = '/issue-sms/push';
-	private const ROUTE_ISSUE_INDEX = IssueCest::ROUTE_INDEX;
-	private const ROUTE_ISSUE_VIEW = IssueCest::ROUTE_VIEW;
+	private const ROUTE_ISSUE_INDEX = IssueIndexCest::ROUTE_INDEX;
+	private const ROUTE_ISSUE_VIEW = IssueViewCest::ROUTE_VIEW;
 
 	private const LINK_TEXT = 'Send SMS';
 	private const SELECTOR_FORM = '#issue-sms-push-form';
