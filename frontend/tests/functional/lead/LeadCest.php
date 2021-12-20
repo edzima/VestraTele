@@ -116,6 +116,7 @@ class LeadCest {
 		$I->amOnRoute(static::ROUTE_CREATE);
 		$I->fillField('Lead Name', 'Jonny Test');
 		$I->fillField('Phone', '789-789-789');
+		$I->selectOption('Source', 1);
 		$I->click('Save');
 		$I->seeRecord(Lead::class, [
 			'name' => 'Jonny Test',
