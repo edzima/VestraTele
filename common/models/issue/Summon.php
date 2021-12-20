@@ -3,6 +3,7 @@
 namespace common\models\issue;
 
 use common\models\entityResponsible\EntityResponsible;
+use common\models\issue\query\SummonQuery;
 use common\models\user\User;
 use edzima\teryt\models\Simc;
 use Yii;
@@ -216,5 +217,9 @@ class Summon extends ActiveRecord implements IssueInterface {
 
 	public function getName(): string {
 		return Yii::t('common', 'Summon {type}', ['type' => $this->getTypeName()]);
+	}
+
+	public static function find(): SummonQuery {
+		return new SummonQuery(static::class);
 	}
 }

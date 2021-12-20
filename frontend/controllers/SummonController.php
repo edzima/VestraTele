@@ -2,11 +2,15 @@
 
 namespace frontend\controllers;
 
+use common\helpers\Flash;
+use common\models\issue\Issue;
 use common\models\issue\Summon;
+use common\models\issue\SummonType;
 use common\models\user\Worker;
 use frontend\models\search\SummonSearch;
 use frontend\models\SummonForm;
 use Yii;
+use yii\base\Action;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -28,7 +32,13 @@ class SummonController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::PERMISSION_SUMMON],
+						'permissions' => [Worker::PERMISSION_SUMMON],
+						'matchCallback' => function ($rule, Action $action): bool {
+							if ($action->id === 'create') {
+								return Yii::$app->user->can(Worker::PERMISSION_SUMMON_CREATE);
+							}
+							return true;
+						},
 					],
 				],
 			],
@@ -41,12 +51,50 @@ class SummonController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex(): string {
-		$searchModel = new SummonSearch(['contractor_id' => Yii::$app->user->id]);
+		$searchModel = new SummonSearch();
+		$searchModel->user_id = Yii::$app->user->getId();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	/**
+	 * Creates a new Summon model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 *
+	 * @param int|null $issueId
+	 * @return mixed
+	 */
+	public function actionCreate(int $issueId, int $typeId = null, string $returnUrl = null) {
+		$issue = Issue::findOne($issueId);
+		if ($issue === null || !Yii::$app->user->canSeeIssue($issue)) {
+			throw new NotFoundHttpException();
+		}
+		$model = new SummonForm();
+		$model->owner_id = Yii::$app->user->id;
+		$model->issue_id = $issueId;
+		$model->start_at = time();
+		if ($typeId && isset(SummonType::getModels()[$typeId])) {
+			$model->setType(SummonType::getModels()[$typeId]);
+		}
+
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$summon = $model->getModel();
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('issue', 'Create Summon - {type}: {title}', [
+					'type' => $summon->type->name,
+					'title' => $summon->title,
+				]));
+			$model->sendEmailToContractor();
+			return $this->redirect($returnUrl ?? ['view', 'id' => $summon->id]);
+		}
+
+		return $this->render('create', [
+			'issue' => $issue,
+			'model' => $model,
 		]);
 	}
 
@@ -76,7 +124,11 @@ class SummonController extends Controller {
 		if (!$summon->isForUser(Yii::$app->user->id)) {
 			throw new ForbiddenHttpException();
 		}
-		$model = new SummonForm($summon);
+		$model = new SummonForm();
+		$model->setModel($summon);
+		if ($summon->owner_id !== Yii::$app->getUser()->getId()) {
+			$model->scenario = SummonForm::SCENARIO_CONTRACTOR;
+		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);

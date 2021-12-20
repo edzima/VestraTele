@@ -1,16 +1,16 @@
 <?php
 
-namespace backend\tests\unit\issue;
+namespace common\tests\unit\issue;
 
-use backend\modules\issue\models\SummonForm;
-use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\TerytFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
+use common\models\issue\form\SummonForm;
 use common\models\issue\Summon;
 use common\models\issue\SummonType;
 use common\models\user\Worker;
 use common\tests\_support\UnitModelTrait;
+use common\tests\unit\Unit;
 
 class SummonFormTest extends Unit {
 

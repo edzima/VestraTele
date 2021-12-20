@@ -7,6 +7,8 @@ return [
 	'Create Issue Note for Summon: {title}' => 'Dodaj notatkę do wezwania: {title}',
 	'Change Stage' => 'Zmień Etap',
 	'Change Stage: {issue}' => 'Zmień Etap: {issue}',
+	'Create Summon' => 'Dodaj zlecenie',
+	'Create Summon - {type}: {title}' => 'Dodano Zlecenie - {type}: {title}',
 	'Issues' => 'Sprawy',
 	'Issue Notes' => 'Notatki',
 	'The Issue is archived. You are not authorized to view the archive.' => 'Sprawa jest w archiwum. Nie masz uprawnień do Archiwum.',

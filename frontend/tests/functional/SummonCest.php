@@ -6,6 +6,7 @@ use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\TerytFixtureHelper;
 use common\models\issue\Summon;
 use common\models\user\User;
+use common\models\user\Worker;
 use frontend\controllers\SummonController;
 use frontend\tests\_support\CustomerServiceTester;
 
@@ -13,6 +14,9 @@ class SummonCest {
 
 	/** @see SummonController::actionIndex() */
 	public const ROUTE_INDEX = '/summon/index';
+
+	/** @see SummonController::actionCreate() */
+	public const ROUTE_CREATE = '/summon/create';
 
 	/** @see SummonController::actionView() */
 	public const ROUTE_VIEW = '/summon/view';
@@ -44,21 +48,50 @@ class SummonCest {
 		$I->dontSee('Contractor');
 	}
 
-	public function checkUpdateForNotSelfSummon(CustomerServiceTester $I): void {
+	public function checkCreateWithoutPermission(CustomerServiceTester $I): void {
+		$I->amLoggedIn();
+		$I->amOnPage([static::ROUTE_CREATE, 'issueId' => 1]);
+		$I->seeResponseCodeIs(403);
+	}
+
+	public function checkCreateWithPermission(CustomerServiceTester $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(Worker::PERMISSION_SUMMON);
+		$I->assignPermission(Worker::PERMISSION_SUMMON_CREATE);
+		$I->amOnPage([static::ROUTE_CREATE, 'issueId' => 1]);
+		$I->see('Create Summon');
+		$I->submitForm('#summon-form', [
+			'SummonForm[issue_id]' => 1,
+			'SummonForm[type_id]' => 1,
+			'SummonForm[contractor_id]' => $I->getUser()->id,
+			'SummonForm[term]' => 3,
+			'SummonForm[title]' => 'Test Summon Without Issue in Route Param',
+			'SummonForm[city_id]' => TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA,
+
+		]);
+		$I->seeRecord(Summon::class, [
+			'issue_id' => 1,
+			'type_id' => 1,
+			'title' => 'Test Summon Without Issue in Route Param',
+		]);
+		$I->seeEmailIsSent();
+	}
+
+	public function checkUpdateNotSelfSummon(CustomerServiceTester $I): void {
 		$I->assignPermission(User::PERMISSION_SUMMON);
 		$I->amLoggedIn();
 		$I->amOnPage([static::ROUTE_UPDATE, 'id' => 1]);
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkUpdateForSelfSummon(CustomerServiceTester $I): void {
+	public function checkUpdateSelfSummon(CustomerServiceTester $I): void {
 		$I->assignPermission(User::PERMISSION_SUMMON);
 		$I->amLoggedIn();
 		/** @var Summon $summon */
 		$summonId = $I->haveRecord(Summon::class, [
 			'owner_id' => 300,
 			'issue_id' => 1,
-			'city_id' => TerytFixtureHelper::SIMC_ID_DUCHOWO,
+			'city_id' => TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA,
 			'entity_id' => 1,
 			'contractor_id' => $I->getUser()->id,
 			'title' => 'New summon',

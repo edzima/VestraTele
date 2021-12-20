@@ -31,7 +31,7 @@ class SummonSearch extends Summon implements
 		return SummonType::getNamesWithShort();
 	}
 
-	public static function getOwnersNames(): array {
+	public function getOwnersNames(): array {
 		return User::getSelectList(Summon::find()
 			->select('owner_id')
 			->distinct()

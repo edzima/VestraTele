@@ -81,7 +81,7 @@ class SummonController extends Controller {
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$summon = $model->getModel();
 			Flash::add(Flash::TYPE_SUCCESS,
-				Yii::t('backend', 'Create Summon - {type}: {title}', [
+				Yii::t('issue', 'Create Summon - {type}: {title}', [
 					'type' => $summon->type->name,
 					'title' => $summon->title,
 				]));

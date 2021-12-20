@@ -6,6 +6,7 @@ use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
 use frontend\helpers\Html;
 use frontend\widgets\issue\StageChangeButtonDropdown;
+use frontend\widgets\issue\SummonCreateButtonDropdown;
 use frontend\widgets\IssuePayCalculationGrid;
 use frontend\widgets\SummonGrid;
 use yii\data\DataProviderInterface;
@@ -32,6 +33,14 @@ $this->params['breadcrumbs'][] = $this->title;
 			])
 			: ''
 		?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_CREATE)
+			? SummonCreateButtonDropdown::widget([
+				'issueId' => $model->getIssueId(),
+			])
+			: ''
+		?>
+
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE)
 			? Html::a(Yii::t('common', 'Create note'), ['/note/issue', 'id' => $model->id], [

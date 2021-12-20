@@ -294,7 +294,6 @@ return [
 	'Set parent for: {user}' => 'Ustal przełożonego dla: {user}',
 	'Only with payed pay' => 'Tylko z opłaconą wpłatą',
 	'Summon Types' => 'Typy Zleceń',
-	'Create Summon - {type}: {title}' => 'Dodano Zlecenie - {type}: {title}',
 	'Create Summon Type' => 'Dodaj Typ Zlecenia',
 	'Update Summon Type: {name}' => 'Edytuj Typ Zlecenia: {name}',
 ];

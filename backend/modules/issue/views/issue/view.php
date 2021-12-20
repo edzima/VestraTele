@@ -28,7 +28,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		])
 		?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
+		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_CREATE)
 			? SummonCreateButtonDropdown::widget([
 				'issueId' => $model->getIssueId(),
 			])

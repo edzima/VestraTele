@@ -2,8 +2,11 @@
 
 namespace frontend\models\search;
 
+use common\models\issue\query\SummonQuery;
 use common\models\issue\search\SummonSearch as BaseSummonSearch;
+use common\models\issue\Summon;
 use common\models\user\CustomerSearchInterface;
+use common\models\user\User;
 use yii\data\ActiveDataProvider;
 
 /**
@@ -13,13 +16,15 @@ use yii\data\ActiveDataProvider;
  */
 class SummonSearch extends BaseSummonSearch {
 
+	public $user_id;
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type', 'status', 'created_at', 'updated_at', 'realized_at', 'deadline_at', 'start_at', 'issue_id', 'owner_id'], 'integer'],
-			[['title'], 'safe'],
+			[['id', 'type', 'status', 'created_at', 'updated_at', 'realized_at', 'deadline_at', 'start_at', 'issue_id', 'owner_id', '!user_id'], 'integer'],
+			[['title', 'customerPhone'], 'safe'],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];
 	}
@@ -29,17 +34,27 @@ class SummonSearch extends BaseSummonSearch {
 	 */
 	public function search(array $params): ActiveDataProvider {
 		$provider = parent::search($params);
+		/** @var SummonQuery $query */
+		$query = $provider->query;
 		if (empty($this->status)) {
-			$provider->query->andWhere([
-				static::SUMMON_ALIAS . '.status' => array_keys(static::getActiveStatusesNames()),
-			]);
+			$query->active();
+		}
+		if (!empty($this->user_id)) {
+			$query->user($this->user_id);
 		}
 		return $provider;
 	}
 
-	public static function getActiveStatusesNames(): array {
-		$statuses = static::getStatusesNames();
-		unset($statuses[static::STATUS_REALIZED], $statuses[static::STATUS_UNREALIZED]);
-		return $statuses;
+	public function getOwnersNames(): array {
+		if (empty($this->user_id)) {
+			return parent::getOwnersNames();
+		}
+		return User::getSelectList(
+			Summon::find()
+				->select('owner_id')
+				->distinct()
+				->user($this->user_id)
+				->column(), false
+		);
 	}
 }

@@ -6,7 +6,11 @@ use common\models\issue\search\SummonSearch;
 use common\widgets\GridView;
 use kartik\select2\Select2;
 use Yii;
+use yii\base\InvalidConfigException;
 
+/**
+ * @property-read SummonSearch $filterModel
+ */
 class SummonGrid extends GridView {
 
 	public const VALUE_TYPE_NAME_SHORT = 'type.short_name';
@@ -32,6 +36,9 @@ class SummonGrid extends GridView {
 	public bool $withUpdatedAt = true;
 
 	public function init(): void {
+		if ($this->filterModel !== null && !$this->filterModel instanceof SummonSearch) {
+			throw new InvalidConfigException('$filterModel must be instance of: ' . SummonSearch::class . '.');
+		}
 		if (empty($this->columns)) {
 			$this->columns = $this->defaultColumns();
 		}
@@ -99,7 +106,7 @@ class SummonGrid extends GridView {
 			[
 				'attribute' => 'owner_id',
 				'value' => 'owner',
-				'filter' => SummonSearch::getOwnersNames(),
+				'filter' => $this->filterModel ? $this->filterModel->getOwnersNames() : [],
 				'filterType' => static::FILTER_SELECT2,
 				'filterInputOptions' => [
 					'placeholder' => Yii::t('common', 'Owner'),

@@ -120,4 +120,16 @@ class IssueViewCest {
 		$I->click('Change Stage');
 		$I->seeInCurrentUrl(IssueStageCest::ROUTE);
 	}
+
+	public function checkSummonCreateLinkWithPermission(CustomerServiceTester $I): void {
+		$I->amLoggedIn();
+		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		$I->assignPermission(Worker::PERMISSION_SUMMON_CREATE);
+		$issue = $this->grabIssue();
+		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->getIssueId()]);
+		$I->seeLink('Create Summon');
+		$I->click('Create Summon');
+		$I->seeInCurrentUrl(SummonCest::ROUTE_CREATE);
+	}
+
 }
