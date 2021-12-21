@@ -93,7 +93,7 @@ class IssueUserFormTest extends Unit {
 		$model = new IssueUserForm();
 		$this->tester->assertFalse($model->save());
 		$this->tester->assertSame('As role cannot be blank.', $model->getFirstError('type'));
-		$this->tester->assertSame('User Id cannot be blank.', $model->getFirstError('user_id'));
+		$this->tester->assertSame('User cannot be blank.', $model->getFirstError('user_id'));
 		$this->tester->assertSame('Issue cannot be blank.', $model->getFirstError('issue_id'));
 	}
 

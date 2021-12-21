@@ -70,6 +70,7 @@ return [
 	'Log time' => 'Czas logu',
 	'Logout' => 'Wyloguj',
 	'Link user' => 'Przypisz użytkownika',
+	'Link User' => 'Przypisz użytkownika',
 	'Logs' => 'Logi',
 	'Main' => 'Głowne',
 	'Male' => 'Mężczyzna',

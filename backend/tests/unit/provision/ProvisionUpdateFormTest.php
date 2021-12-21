@@ -39,7 +39,7 @@ class ProvisionUpdateFormTest extends Unit {
 	}
 
 	public function testEmptyPercent(): void {
-		$this->givenForm($this->grabProvision('nowak-self-payed'));
+		$this->givenForm($this->grabProvision('nowak-self-paid'));
 
 		$this->tester->assertSame($this->form->percent, '50.00');
 		$this->form->percent = null;
@@ -49,12 +49,12 @@ class ProvisionUpdateFormTest extends Unit {
 	}
 
 	public function testNotChangePercent(): void {
-		$this->givenForm($this->grabProvision('nowak-self-payed'));
+		$this->givenForm($this->grabProvision('nowak-self-paid'));
 		$this->thenSuccessSave();
 	}
 
 	public function testChangePercent(): void {
-		$this->givenForm($this->provisionFixture->grabProvision('nowak-self-payed'));
+		$this->givenForm($this->provisionFixture->grabProvision('nowak-self-paid'));
 
 		$this->form->percent = 60;
 

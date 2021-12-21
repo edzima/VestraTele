@@ -41,7 +41,7 @@ class IssueFormTest extends Unit {
 		Yii::$app->authManager->revoke(Yii::$app->authManager->getPermission(User::PERMISSION_ISSUE), $lawyer->id);
 		$this->tester->assertCount(0, IssueForm::getLawyers());
 
-		$this->tester->assertCount(1, IssueForm::getTele());
+		$this->tester->assertCount(2, IssueForm::getTele());
 		$tele = $this->tester->grabFixture(IssueFixtureHelper::TELEMARKETER, 0);
 		Yii::$app->authManager->revoke(Yii::$app->authManager->getPermission(User::PERMISSION_ISSUE), $tele->id);
 		$this->tester->assertCount(0, IssueForm::getTele());
