@@ -2,7 +2,7 @@
 
 namespace backend\tests\Step\Functional;
 
-use common\models\user\User;
+use common\models\user\Worker;
 
 /**
  * Class SummonIssueManager
@@ -16,6 +16,7 @@ class SummonIssueManager extends IssueManager {
 	}
 
 	protected function getPermissions(): array {
-		return array_merge(parent::getPermissions(), [User::PERMISSION_SUMMON]);
+		//@todo create role for Summon Manager.
+		return array_merge(parent::getPermissions(), [Worker::PERMISSION_SUMMON_MANAGER, Worker::PERMISSION_SUMMON, Worker::PERMISSION_SUMMON_CREATE]);
 	}
 }

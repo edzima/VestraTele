@@ -28,7 +28,8 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		])
 		?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_CREATE)
+		<?= (Yii::$app->user->can(Worker::PERMISSION_SUMMON_CREATE)
+			|| Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER))
 			? SummonCreateButtonDropdown::widget([
 				'issueId' => $model->getIssueId(),
 			])
@@ -50,7 +51,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		?>
 
 		<?= !$model->isArchived() && Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER)
-			? Html::a(Yii::t('backend', 'Link user'), ['user/link', 'issueId' => $model->id], [
+			? Html::a(Yii::t('backend', 'Link User'), ['user/link', 'issueId' => $model->id], [
 				'class' => 'btn btn-success',
 			])
 			: ''
