@@ -70,7 +70,7 @@ class SummonForm extends Model {
 				'message' => Yii::t('common', 'Deadline At cannot be blank on custom term.'),
 			],
 			[['start_at', 'deadline_at'], 'date', 'format' => 'yyyy-MM-dd'],
-			[['realize_at', 'realized_at'], 'date', 'format' => 'yyyy-MM-dd HH:ii'],
+			[['realize_at', 'realized_at'], 'date', 'format' => 'yyyy-MM-dd HH:mm'],
 			['entity_id', 'in', 'range' => array_keys(static::getEntityNames())],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
