@@ -26,7 +26,7 @@ class SettlementController extends Controller {
 				Console::output('Settlement: ' . $model->id . ' for Issue: ' . $model->getIssueName() . ' has not costs.');
 				$administrative = AdministrativeCalculationForm::createFromModel($model);
 				$administrative->save();
-				Yii::$app->provisions->removeForPays($model->getPays()->getIds());
+				Yii::$app->provisions->removeForPays($model->getPays()->getIds(true));
 			}
 		}
 	}

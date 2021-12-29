@@ -156,7 +156,7 @@ class PayController extends Controller {
 						'value' => Yii::$app->formatter->asCurrency($generated->getValue()),
 					])
 				);
-				Yii::$app->provisions->removeForPays([$pay->calculation->getPays()->getIds()]);
+				Yii::$app->provisions->removeForPays([$pay->calculation->getPays()->getIds(true)]);
 				try {
 					Yii::$app->provisions->settlement($pay->calculation);
 				} catch (MissingProvisionUserException $exception) {
@@ -192,7 +192,7 @@ class PayController extends Controller {
 				'user_id' => Yii::$app->user->id,
 			], 'settlement.pay');
 			if (isset($dirty['value'])) {
-				Yii::$app->provisions->removeForPays($model->calculation->getPays()->getIds());
+				Yii::$app->provisions->removeForPays($model->calculation->getPays()->getIds(true));
 				try {
 					Yii::$app->provisions->settlement($model->calculation);
 				} catch (MissingProvisionUserException $exception) {
