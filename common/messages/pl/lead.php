@@ -194,4 +194,5 @@ return [
 	'Send multiple SMS to {count} Leads' => 'Wyślij SMS do {count} Leads',
 	'Send SMS: {count}' => 'Wyślij SMS: {count}',
 	'Show Report In Lead Index' => 'Pokazuj Raport w Lead Index',
+	"Thank you for submitting your application.\nWe will contact you within 24 hours.\nIf you do not want to wait, call us directly on the number: {sourcePhone}" => "Dziękujemy za wysłanie zgłoszenia.\nSkontaktujemy się z Tobą w ciągu 24 godzin.\nJeśli nie chcesz czekać zadzwoń: {sourcePhone}",
 ];

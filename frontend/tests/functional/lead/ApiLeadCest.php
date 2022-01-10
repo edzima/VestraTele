@@ -3,6 +3,7 @@
 namespace frontend\tests\functional\lead;
 
 use common\fixtures\helpers\LeadFixtureHelper;
+use common\modules\lead\models\Lead;
 use common\modules\lead\Module;
 use frontend\controllers\ApiLeadController;
 use frontend\tests\FunctionalTester;
@@ -28,6 +29,21 @@ class ApiLeadCest {
 			'email' => 'email@example.com',
 		]);
 		$I->seeEmailIsSent();
+		$I->dontSeeSmsIsSend();
+	}
+
+	public function checkLandingForSourceWithPhone(FunctionalTester $I): void {
+		$I->sendAjaxPostRequest(static::ROUTE_LANDING, [
+			'source_id' => 1,
+			'name' => 'Jonny',
+			'phone' => '48 123123123',
+		]);
+		$I->seeRecord(Module::manager()->model, [
+			'source_id' => 1,
+			'name' => 'Jonny',
+			'phone' => '+48 12 312 31 23',
+		]);
+		$I->seeSmsIsSend();
 	}
 
 	public function checkLandingForSourceWithOwner(FunctionalTester $I): void {
@@ -43,5 +59,6 @@ class ApiLeadCest {
 			'email' => 'email@example.com',
 		]);
 		$I->seeEmailIsSent();
+		$I->dontSeeSmsIsSend();
 	}
 }

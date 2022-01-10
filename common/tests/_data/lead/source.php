@@ -5,6 +5,7 @@ return [
 		'id' => 1,
 		'name' => 'wordpress-homepage',
 		'type_id' => 1,
+		'phone' => '48 123-123-123',
 	],
 	[
 		'id' => 2,

@@ -2,13 +2,16 @@
 
 namespace frontend\controllers;
 
+use common\models\KeyStorageItem;
 use common\models\user\User;
 use common\modules\lead\components\LeadManager;
 use common\modules\lead\events\LeadEvent;
+use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\forms\CzaterLeadForm;
 use common\modules\lead\models\forms\LandingLeadForm;
 use common\modules\lead\models\forms\LeadPushEmail;
 use common\modules\lead\models\LeadInterface;
+use common\modules\lead\models\LeadSmsForm;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\Module;
 use Yii;
@@ -89,6 +92,11 @@ class ApiLeadController extends Controller {
 
 	protected function afterPush(LeadEvent $event): void {
 		$lead = $event->getLead();
+		$this->sendEmail($lead);
+		$this->sendSms($lead);
+	}
+
+	private function sendEmail(LeadInterface $lead): void {
 		$ownerId = $lead->getUsers()[LeadUser::TYPE_OWNER] ?? null;
 		$model = new LeadPushEmail($lead);
 		if ($ownerId) {
@@ -100,6 +108,28 @@ class ApiLeadController extends Controller {
 			$model->email = Yii::$app->params['leads.emailWithoutOwner'];
 		}
 		$model->sendEmail();
+	}
+
+	private function sendSms(ActiveLead $lead): void {
+		if (!empty($lead->getPhone()) && !empty($lead->getSource()->getPhone())) {
+			$message = Yii::t('lead', "Thank you for submitting your application.\n"
+				. "We will contact you within 24 hours.\n"
+				. "If you do not want to wait, call us directly on the number: {sourcePhone}", [
+				'sourcePhone' => $lead->getSource()->getPhone(),
+			]);
+			$model = new LeadSmsForm($lead);
+			$model->message = $message;
+			$model->owner_id = $this->getSmsOwnerId();
+			$model->send();
+		}
+	}
+
+	private function getSmsOwnerId(): int {
+		$owner = Yii::$app->keyStorage->get(KeyStorageItem::KEY_ROBOT_SMS_OWNER_ID);
+		if ($owner === null) {
+			throw new InvalidConfigException('Not Set Robot SMS Owner. Key: (' . KeyStorageItem::KEY_ROBOT_SMS_OWNER_ID . ').');
+		}
+		return $owner;
 	}
 
 	protected function pushLead(LeadInterface $lead): bool {
