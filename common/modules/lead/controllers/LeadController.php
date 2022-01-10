@@ -3,6 +3,7 @@
 namespace common\modules\lead\controllers;
 
 use backend\widgets\CsvForm;
+use common\behaviors\SelectionRouteBehavior;
 use common\helpers\Flash;
 use common\helpers\Url;
 use common\modules\lead\models\forms\LeadForm;
@@ -33,6 +34,9 @@ class LeadController extends BaseController {
 					'delete' => ['POST'],
 				],
 			],
+			'selection' => [
+				'class' => SelectionRouteBehavior::class,
+			],
 		];
 	}
 
@@ -42,14 +46,6 @@ class LeadController extends BaseController {
 	 * @return mixed
 	 */
 	public function actionIndex() {
-		if (Yii::$app->request->post('selection')
-			&& !empty(Yii::$app->request->post('route'))) {
-			Url::remember();
-			return $this->redirect([
-				Yii::$app->request->post('route'),
-				'ids' => Yii::$app->request->post('selection'),
-			]);
-		}
 		$searchModel = new LeadSearch();
 		if ($this->module->onlyUser) {
 			if (Yii::$app->user->getIsGuest()) {
