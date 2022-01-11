@@ -2,35 +2,19 @@
 
 namespace common\widgets\grid;
 
-use common\helpers\Html;
-use yii\base\Widget;
+use common\widgets\ActiveForm;
 
-class SelectionForm extends Widget {
+class SelectionForm extends ActiveForm {
 
-	public string $id = 'selection-form';
 	public string $gridId;
 	public string $formWrapperSelector;
-	public string $action = '';
-	private string $method = 'POST';
-	private array $options = [
-		'data-pjax' => '',
-	];
-
-	public function init(): void {
-		parent::init();
-		$options = $this->options;
-		$options['id'] = $this->getId();
-		echo Html::beginForm($this->action, $this->method, $options);
-	}
 
 	public function run(): string {
-		parent::run();
 		$this->view->registerJs($this->getJsScript());
-		return Html::endForm();
+		return parent::run();
 	}
 
 	private function getJsScript(): string {
-
 		$gridId = $this->gridId;
 		$formWrapperSelector = $this->formWrapperSelector;
 		$script = <<< JS
