@@ -33,6 +33,7 @@ class LeadReportSearch extends LeadReport {
 	public $answersQuestions;
 	public $from_at;
 	public $to_at;
+	private ?array $leadsIds = null;
 
 	/**
 	 * {@inheritdoc}
@@ -123,6 +124,15 @@ class LeadReportSearch extends LeadReport {
 		$query->andFilterWhere(['like', LeadReport::tableName() . '.details', $this->details]);
 
 		return $dataProvider;
+	}
+
+	public function getAllLeadsIds(Query $query, bool $refresh = false): array {
+		if ($refresh || $this->leadsIds === null) {
+			$query = clone $query;
+			$query->select(LeadReport::tableName() . '.lead_id');
+			$this->leadsIds = $query->column();
+		}
+		return $this->leadsIds;
 	}
 
 	private function applyAnswersFilter(Query $query): void {
