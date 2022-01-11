@@ -123,6 +123,7 @@ class StatusController extends BaseController {
 			Flash::add(Flash::TYPE_WARNING, 'Ids cannot be blank.');
 			return $this->redirect(['lead/index']);
 		}
+		$ids = array_unique($ids);
 		$model = new LeadStatusChangeForm();
 		$model->ids = $ids;
 		$model->owner_id = Yii::$app->user->id;
