@@ -1,14 +1,14 @@
 <?php
 
 use common\modules\lead\models\searches\LeadSearch;
+use common\widgets\ActiveForm;
 use common\widgets\address\AddressSearchWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model LeadSearch */
-/* @var $form yii\widgets\ActiveForm */
+/* @var $form ActiveForm */
 
 ?>
 
