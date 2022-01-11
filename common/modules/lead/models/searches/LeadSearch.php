@@ -53,6 +53,7 @@ class LeadSearch extends Lead implements SearchModel {
 	private static ?array $QUESTIONS = null;
 
 	public AddressSearch $addressSearch;
+	private ?array $ids = null;
 
 	public function __construct($config = []) {
 		if (!isset($config['addressSearch'])) {
@@ -209,11 +210,14 @@ class LeadSearch extends Lead implements SearchModel {
 		return $dataProvider;
 	}
 
-	public function getAllIds(LeadQuery $query): array {
-		$query = clone $query;
-		$query->select(Lead::tableName() . '.id');
-		$this->applyDuplicates($query);
-		return $query->column();
+	public function getAllIds(LeadQuery $query, bool $refresh = false): array {
+		if ($refresh || $this->ids === null) {
+			$query = clone $query;
+			$query->select(Lead::tableName() . '.id');
+			$this->applyDuplicates($query);
+			$this->ids = $query->column();
+		}
+		return $this->ids;
 	}
 
 	private function applyAddressFilter(ActiveQuery $query): void {
