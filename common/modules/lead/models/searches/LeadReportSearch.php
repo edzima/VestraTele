@@ -130,6 +130,7 @@ class LeadReportSearch extends LeadReport {
 		if ($refresh || $this->leadsIds === null) {
 			$query = clone $query;
 			$query->select(LeadReport::tableName() . '.lead_id');
+			$query->distinct();
 			$this->leadsIds = $query->column();
 		}
 		return $this->leadsIds;

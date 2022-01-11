@@ -61,15 +61,6 @@ class UserCest {
 		$I->seeEmailIsSent(2);
 	}
 
-	public function checkAssignFromLeadIndex(LeadManager $I): void {
-		$I->amLoggedIn();
-		$I->haveFixtures(LeadFixtureHelper::leads());
-		$I->sendAjaxPostRequest(LeadCest::ROUTE_INDEX, array_merge([
-			'selection' => [1, 2],
-		], $I->getCSRF()));
-		$I->seeResponseCodeIsRedirection();
-	}
-
 	public function checkAssignSingle(LeadManager $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(LeadFixtureHelper::leads());

@@ -42,7 +42,7 @@ class ReportCest {
 	public function checkIndex(LeadManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->seeInGridHeader('Lead Type');
+		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('Owner');
 		$I->seeInGridHeader('Status');
 		$I->seeInGridHeader('Old Status');
