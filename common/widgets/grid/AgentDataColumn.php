@@ -17,10 +17,10 @@ class AgentDataColumn extends DataColumn {
 
 	public function init(): void {
 		if (empty($this->label)) {
-			$this->label = Yii::t('common', 'agent');
+			$this->label = Yii::t('rbac', 'agent');
 		}
 		if (!isset($this->filterInputOptions['placeholder'])) {
-			$this->filterInputOptions['placeholder'] = Yii::t('common', 'agent');
+			$this->filterInputOptions['placeholder'] = Yii::t('rbac', 'agent');
 		}
 
 		if (empty($this->filter)) {

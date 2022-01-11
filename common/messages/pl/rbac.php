@@ -26,6 +26,7 @@ return [
 	'lawyer' => 'Prawnik',
 	'lawyer_assistant' => 'Asystent Prawnika',
 	'lead' => 'Leads',
+	'lead.status' => 'Leads - Statusy',
 	'logs' => 'Logi',
 	'manager' => 'Manager (Panel Admina)',
 	'message.template' => 'Szablony Wiadomości',

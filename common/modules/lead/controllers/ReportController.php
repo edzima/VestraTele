@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\behaviors\SelectionRouteBehavior;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadStatus;
@@ -30,6 +31,9 @@ class ReportController extends BaseController {
 				'actions' => [
 					'delete' => ['POST'],
 				],
+			],
+			'selection' => [
+				'class' => SelectionRouteBehavior::class,
 			],
 		];
 	}

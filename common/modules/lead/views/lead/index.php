@@ -8,6 +8,7 @@ use common\modules\lead\models\searches\LeadSearch;
 use common\modules\lead\widgets\CreateLeadBtnWidget;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AddressColumn;
+use common\widgets\grid\SelectionForm;
 use common\widgets\grid\SerialColumn;
 use common\widgets\GridView;
 use kartik\grid\CheckboxColumn;
@@ -38,27 +39,13 @@ foreach (LeadSearch::questions() as $question) {
 	];
 }
 
-$js = <<<JS
-const multipleForm = document.getElementById('multiple-form-wrap');
-if(multipleForm){
-const leadsGrid = jQuery("#leads-grid");
-leadsGrid.find("input[type='checkbox']").on('click',function (){
-	setTimeout(function (){
-		const selected =leadsGrid.yiiGridView('getSelectedRows');
-		if(selected.length){
-			multipleForm.classList.remove('hidden');
-		}else{
-			multipleForm.classList.add('hidden');
-		}
-	}, 100);
-});	
+$multipleForm = $assignUsers
+	|| Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
+	|| Yii::$app->user->can(User::PERMISSION_LEAD_STATUS);
+
+if ($multipleForm) {
+	$dataProvider->getModels();
 }
-
-JS;
-
-$this->registerJs($js);
-
-$multipleForm = $assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS);
 ?>
 <div class="lead-index">
 
@@ -87,20 +74,21 @@ $multipleForm = $assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_S
 
 		<?php if ($multipleForm): ?>
 
-			<div id="multiple-form-wrap" class="hidden">
+			<?php
+			SelectionForm::begin([
+				'formWrapperSelector' => '.selection-form-wrapper',
+				'gridId' => 'leads-grid',
+			]);
+			?>
 
-				<?= Html::beginForm('', 'POST', [
-					'id' => 'form-lead-multiple-actions',
-					'data-pjax' => '',
-				]) ?>
+			<div class="selection-form-wrapper hidden">
 
 				<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
-				&& !empty(($allIds = $searchModel->getAllIds($dataProvider->query))
-					&& count($allIds) < 6000
-				)
+				&& $dataProvider->pagination->pageCount > 1
+				&& count($searchModel->getAllIds($dataProvider->query)) < 6000
 					? Html::a(
 						Yii::t('lead', 'Send SMS: {count}', [
-							'count' => count($allIds),
+							'count' => count($searchModel->getAllIds($dataProvider->query)),
 						]), [
 						'sms/push-multiple',
 					],
@@ -108,7 +96,7 @@ $multipleForm = $assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_S
 							'data' => [
 								'method' => 'POST',
 								'params' => [
-									'leadsIds' => $allIds,
+									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
 								],
 							],
 							'class' => 'btn btn-success',
@@ -137,6 +125,36 @@ $multipleForm = $assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_S
 					: ''
 				?>
 
+				<?= Yii::$app->user->can(User::PERMISSION_LEAD_STATUS)
+					? Html::submitButton(
+						Yii::t('lead', 'Change Status'),
+						[
+							'class' => 'btn btn-warning',
+							'name' => 'route',
+							'value' => 'status/change',
+						])
+					: ''
+				?>
+
+				<?= Yii::$app->user->can(User::PERMISSION_LEAD_STATUS)
+				&& $dataProvider->pagination->pageCount > 1
+
+					? Html::a(
+						Yii::t('lead', 'Change Status ({ids})', ['ids' => $searchModel->getAllIds($dataProvider->query)]),
+						['status/change'],
+						[
+							'class' => 'btn btn-warning',
+							'data' => [
+								'method' => 'POST',
+								'params' => [
+									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
+								],
+							],
+							'value' => 'status/change',
+						])
+					: ''
+				?>
+
 			</div>
 
 		<?php endif; ?>
@@ -150,7 +168,7 @@ $multipleForm = $assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_S
 		'columns' => array_merge([
 			[
 				'class' => CheckboxColumn::class,
-				'visible' => $assignUsers,
+				'visible' => $multipleForm,
 			],
 			['class' => SerialColumn::class],
 			[
@@ -306,6 +324,9 @@ $multipleForm = $assignUsers || Yii::$app->user->can(User::PERMISSION_MULTIPLE_S
 			]),
 	]) ?>
 
-	<?= $multipleForm ? Html::endForm() : '' ?>
+	<?php if ($multipleForm) {
+		SelectionForm::end();
+	}
+	?>
 
 </div>

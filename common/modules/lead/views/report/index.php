@@ -7,8 +7,10 @@ use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadReportSearch;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\SelectionForm;
 use common\widgets\grid\SerialColumn;
 use common\widgets\GridView;
+use kartik\grid\CheckboxColumn;
 use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
@@ -18,6 +20,13 @@ use kartik\select2\Select2;
 $this->title = Yii::t('lead', 'Lead Reports');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
 $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
+
+$multipleForm = Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
+	|| Yii::$app->user->can(User::PERMISSION_LEAD_STATUS);
+
+if ($multipleForm) {
+	$dataProvider->getModels();
+}
 ?>
 <div class="lead-report-index">
 
@@ -26,10 +35,98 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
+	<?php if ($multipleForm): ?>
+		<div class="grid-before">
+			<?php
+			$ids = $searchModel->getAllLeadsIds($dataProvider->query);
+			SelectionForm::begin([
+				'formWrapperSelector' => '.selection-form-wrapper',
+				'gridId' => 'leads-report-grid',
+			]);
+			?>
+
+			<div class="selection-form-wrapper hidden">
+
+				<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
+				&& $dataProvider->pagination->pageCount > 1
+				&& count($ids) < 6000
+					? Html::a(
+						Yii::t('lead', 'Send SMS: {count}', [
+							'count' => count($ids),
+						]), [
+						'sms/push-multiple',
+					],
+						[
+							'data' => [
+								'method' => 'POST',
+								'params' => [
+									'leadsIds' => $ids,
+								],
+							],
+							'class' => 'btn btn-success',
+						])
+					: ''
+				?>
+
+				<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
+					? Html::submitButton(
+						Yii::t('lead', 'Send SMS'),
+						[
+							'class' => 'btn btn-success',
+							'name' => 'route',
+							'value' => 'sms/push-multiple',
+						])
+					: ''
+				?>
+
+				<?= Yii::$app->user->can(User::PERMISSION_LEAD_STATUS)
+					? Html::submitButton(
+						Yii::t('lead', 'Change Status'),
+						[
+							'class' => 'btn btn-warning',
+							'name' => 'route',
+							'value' => 'status/change',
+						])
+					: ''
+				?>
+
+				<?= Yii::$app->user->can(User::PERMISSION_LEAD_STATUS)
+				&& $dataProvider->pagination->pageCount > 1
+
+					? Html::a(
+						Yii::t('lead', 'Change Status ({ids})', ['ids' => count($ids)]),
+						['status/change'],
+						[
+							'class' => 'btn btn-warning',
+							'data' => [
+								'method' => 'POST',
+								'params' => [
+									'leadsIds' => $ids,
+								],
+							],
+							'value' => 'status/change',
+						])
+					: ''
+				?>
+
+			</div>
+		</div>
+
+	<?php endif; ?>
+
+
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'id' => 'leads-report-grid',
 		'columns' => [
+			[
+				'class' => CheckboxColumn::class,
+				'visible' => $multipleForm,
+				'checkboxOptions' => function (LeadReport $model, $key, $index, $column) {
+					return ['value' => $model->lead_id];
+				},
+			],
 			['class' => SerialColumn::class],
 			[
 				'attribute' => 'lead_name',
@@ -186,5 +283,9 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Reports');
 		],
 	]); ?>
 
+	<?php if ($multipleForm) {
+		SelectionForm::end();
+	}
+	?>
 
 </div>

@@ -51,6 +51,7 @@ class SmsController extends BaseController {
 			$id = reset($ids);
 			return $this->redirect(['push', 'id' => $id]);
 		}
+		$ids = array_unique($ids);
 		$model = new LeadMultipleSmsForm();
 		$model->ids = $ids;
 		$model->owner_id = Yii::$app->user->getId();

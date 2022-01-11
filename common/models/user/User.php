@@ -96,7 +96,9 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 	public const PERMISSION_PROVISION = 'provision';
 
 	public const PERMISSION_WORKERS = 'workers';
+
 	public const PERMISSION_LEAD = 'lead';
+	public const PERMISSION_LEAD_STATUS = 'lead.status';
 	public const PERMISSION_CZATER = 'czater';
 	public const PERMISSION_SMS = 'sms';
 	public const PERMISSION_MULTIPLE_SMS = 'sms.multiple';
