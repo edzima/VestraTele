@@ -168,6 +168,15 @@ return [
 				'rules' => [
 					[
 						'allow' => true,
+						'controllers' => ['lead/status'],
+						'permissions' => [User::PERMISSION_LEAD_STATUS],
+					],
+					[
+						'allow' => false,
+						'controllers' => ['lead/status'],
+					],
+					[
+						'allow' => true,
 						'matchCallback' => static function ($rule, Action $action): bool {
 							if ($action->controller->id === 'sms') {
 								if ($action->id === 'push-multiple') {

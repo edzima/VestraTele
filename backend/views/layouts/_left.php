@@ -108,6 +108,7 @@ $user = Yii::$app->user;
 							'label' => Yii::t('lead', 'Statuses'),
 							'url' => ['/lead/status/index'],
 							'icon' => '<i class="fa fa-flag"></i>',
+							'visible' => $user->can(User::PERMISSION_LEAD_STATUS),
 						],
 						[
 							'label' => Yii::t('lead', 'Types'),

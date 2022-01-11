@@ -2,6 +2,8 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Flash;
+use common\modules\lead\models\forms\LeadStatusChangeForm;
 use Yii;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadStatusSearch;
@@ -105,6 +107,39 @@ class StatusController extends BaseController {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);
+	}
+
+	public function actionChange(array $ids = []) {
+		if (empty($ids)) {
+			$postIds = Yii::$app->request->post('leadsIds');
+			if (is_string($postIds)) {
+				$postIds = explode(',', $postIds);
+			}
+			if ($postIds) {
+				$ids = $postIds;
+			}
+		}
+		if (empty($ids)) {
+			Flash::add(Flash::TYPE_WARNING, 'Ids cannot be blank.');
+			return $this->redirect(['lead/index']);
+		}
+		$model = new LeadStatusChangeForm();
+		$model->ids = $ids;
+		$model->owner_id = Yii::$app->user->id;
+		if ($model->load(Yii::$app->request->post())) {
+			$count = $model->save();
+			if ($count) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('lead', 'Success Change Status: {status} for Leads: {count}.', [
+						'status' => $this->findModel($model->status_id)->name,
+						'count' => $count,
+					]));
+				return $this->redirect(['lead/index']);
+			}
+		}
+		return $this->render('change', [
+			'model' => $model,
+		]);
 	}
 
 	/**
