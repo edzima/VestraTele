@@ -38,9 +38,11 @@ class IssuePayTest extends Unit {
 		$pays = $settlementWithPays->pays;
 		$this->tester->assertCount(3, $pays);
 		$index = 0;
+		$count = count($pays);
 		foreach ($pays as $pay) {
 			$index++;
 			$this->tester->assertSame($index, $pay->getSettlementPartIndex());
+			$this->tester->assertSame("$index/$count", $pay->getPartInfo());
 		}
 	}
 

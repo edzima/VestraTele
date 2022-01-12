@@ -43,6 +43,7 @@ class SettlementController extends Controller {
 		$dataProvider = new ActiveDataProvider([
 			'query' => Provision::find()
 				->andWhere(['pay_id' => $model->getPays()->getIds()])
+				->joinWith('pay.calculation.pays')
 				->orderBy(['value' => SORT_DESC]),
 			'pagination' => false,
 			'sort' => false,

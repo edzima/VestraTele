@@ -164,9 +164,6 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 
 	public function getPartInfo(): string {
 		$index = $this->getSettlementPartIndex();
-		if ($index === 1) {
-			return '1/1';
-		}
 		return $index . '/' . count($this->calculation->pays);
 	}
 
