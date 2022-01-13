@@ -66,7 +66,7 @@ class LeadForm extends Model implements LeadInterface {
 			],
 			[['status_id', 'source_id', 'campaign_id', 'agent_id', 'owner_id'], 'integer'],
 			[['phone', 'postal_code', 'email'], 'string'],
-			[['campaign_id'], 'default', 'value' => null],
+			[['campaign_id', 'phone'], 'default', 'value' => null],
 			['postal_code', 'string', 'max' => 6],
 			['email', 'email'],
 			['date_at', 'date', 'format' => 'php:' . $this->dateFormat],

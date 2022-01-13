@@ -69,6 +69,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			[['source_id', 'status_id', 'data', 'name'], 'required'],
 			[['status_id'], 'integer'],
 			[['phone', 'postal_code', 'email', 'provider', 'name'], 'string'],
+			['phone', 'default', 'value' => null],
 			['email', 'email'],
 			['postal_code', 'string', 'max' => 6],
 			['provider', 'in', 'range' => array_keys(static::getProvidersNames())],
