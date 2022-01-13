@@ -3,6 +3,7 @@
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\Module;
 use yii\helpers\Html;
+use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
@@ -13,7 +14,7 @@ $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Sources'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-\yii\web\YiiAsset::register($this);
+YiiAsset::register($this);
 ?>
 <div class="lead-source-view">
 
@@ -38,6 +39,8 @@ $this->params['breadcrumbs'][] = $this->title;
 			'name',
 			'url:url',
 			'owner',
+			'phone:tel',
+			'dialer_phone',
 			'sort_index',
 		],
 	]) ?>

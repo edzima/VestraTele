@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models\searches;
 
+use common\models\user\User;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadType;
 use yii\base\Model;
@@ -12,6 +13,16 @@ use yii\data\ActiveDataProvider;
  */
 class LeadSourceSearch extends LeadSource {
 
+	public static function getOwnersNames(): array {
+		return User::getSelectList(
+			LeadSource::find()
+				->select('owner_id')
+				->distinct()
+				->column(),
+			false
+		);
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -19,7 +30,7 @@ class LeadSourceSearch extends LeadSource {
 		return [
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['id', 'sort_index', 'owner_id', 'type_id'], 'integer'],
-			[['name', 'url', 'phone'], 'safe'],
+			[['name', 'url', 'phone', 'dialer_phone'], 'safe'],
 		];
 	}
 
@@ -64,6 +75,8 @@ class LeadSourceSearch extends LeadSource {
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])
+			->andFilterWhere(['like', 'phone', $this->phone])
+			->andFilterWhere(['like', 'dialer_phone', $this->dialer_phone])
 			->andFilterWhere(['like', 'url', $this->url]);
 
 		return $dataProvider;

@@ -62,6 +62,7 @@ return [
 	'Update Lead Report Schema: {name}' => 'Update Lead Report Schema: {name}',
 	'Email cannot be blank when phone is blank.' => 'Email nie może postostać bez wartości, gdy nie ma numeru telefonu.',
 	'Phone' => 'Telefon',
+	'Dialer Phone' => 'Dialer DID',
 	'Create Lead Report' => 'Raportuj Lead',
 	'Lead Reports' => 'Raporty',
 	'Lead Campaigns' => 'Kampanie',
