@@ -1,6 +1,8 @@
 <?php
 
+use backend\helpers\Html;
 use backend\widgets\IssueColumn;
+use common\models\provision\Provision;
 use common\models\provision\ProvisionReportSearch;
 use common\widgets\grid\ActionColumn;
 use common\widgets\provision\ProvisionUserReportWidget;
@@ -30,7 +32,30 @@ YiiAsset::register($this);
 	],
 	'actionColumn' => [
 		'class' => ActionColumn::class,
-		'template' => '{delete}',
+		'template' => '{update} {hide}',
+		'buttons' => [
+			'update' => static function (string $url, Provision $provision): string {
+				return Html::a(Html::icon('pencil'), [
+					'provision/update', 'id' => $provision->id,
+				], [
+					'target' => '_blank',
+					'title' => Yii::t('common', 'Update'),
+					'aria-label' => Yii::t('common', 'Update'),
+				]);
+			},
+			'hide' => static function (string $url, Provision $provision): string {
+				return Html::a(Html::icon('eye-close'), [
+					'hide', 'id' => $provision->id,
+				], [
+					'data' => [
+						'method' => 'POST',
+						'confirm' => Yii::t('provision', 'Are you sure you want to hide this provision?'),
+					],
+					'title' => Yii::t('provision', 'Hide'),
+					'aria-label' => Yii::t('provision', 'Hide'),
+				]);
+			},
+		],
 	],
 	'model' => $searchModel->summary(),
 ]) ?>

@@ -24,7 +24,7 @@ class ReportController extends Controller {
 			'verbs' => [
 				'class' => VerbFilter::class,
 				'actions' => [
-					'delete' => ['POST'],
+					'hide' => ['POST'],
 				],
 			],
 		];
@@ -80,7 +80,7 @@ class ReportController extends Controller {
 		]);
 	}
 
-	public function actionDelete(int $id): void {
+	public function actionHide(int $id): void {
 		$model = $this->findModel($id);
 		$model->hide_on_report = true;
 		$model->save(false);
