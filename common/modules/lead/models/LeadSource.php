@@ -101,11 +101,6 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 		return ArrayHelper::map($models, 'id', $name);
 	}
 
-	public static function find() {
-		return parent::find()
-			->orderBy('sort_index');
-	}
-
 	public static function getModels(bool $refresh = false): array {
 		if (static::$models === null || $refresh) {
 			static::$models = static::find()
