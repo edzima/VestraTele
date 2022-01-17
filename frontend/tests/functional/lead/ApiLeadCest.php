@@ -3,7 +3,7 @@
 namespace frontend\tests\functional\lead;
 
 use common\fixtures\helpers\LeadFixtureHelper;
-use common\modules\lead\models\Lead;
+use common\models\KeyStorageItem;
 use common\modules\lead\Module;
 use frontend\controllers\ApiLeadController;
 use frontend\tests\FunctionalTester;
@@ -12,6 +12,13 @@ class ApiLeadCest {
 
 	/** @see ApiLeadController::actionLanding() */
 	private const ROUTE_LANDING = '/lead/api/landing';
+
+	public function _before(FunctionalTester $I): void {
+		$I->haveRecord(KeyStorageItem::class, [
+			'key' => KeyStorageItem::KEY_ROBOT_SMS_OWNER_ID,
+			'value' => 1,
+		]);
+	}
 
 	public function _fixtures(): array {
 		return LeadFixtureHelper::leads();
