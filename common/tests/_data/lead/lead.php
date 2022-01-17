@@ -40,15 +40,15 @@ return [
 		'phone' => '48555-222-111',
 		'data' => '[]',
 	],
-	'new-without-owner' => [
+	'new-without-owner-with-soruce-with-dialer-phone' => [
 		'name' => 'Tommy Back',
-		'source_id' => 2,
+		'source_id' => 1,
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
 		'phone' => '48555-222-111',
 		'data' => '[]',
 	],
-	'new-without-phone-and-owner' => [
+	'new-without-phone-and-owner_and_source-without-phone' => [
 		'name' => 'Tommy Back',
 		'source_id' => 2,
 		'status_id' => LeadStatusInterface::STATUS_NEW,
