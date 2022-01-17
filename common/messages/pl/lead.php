@@ -68,7 +68,7 @@ return [
 	'Lead Campaigns' => 'Kampanie',
 	'Phone cannot be blank when email is blank.' => 'Telefon nie może postostać bez wartości, gdy nie ma Email.',
 	'Date At' => 'Data',
-	'Update Lead Source: {name}' => 'Update Lead Source: {name}',
+	'Update Lead Source: {name}' => 'Edytuj Źródło: {name}',
 	'Created At' => 'Utworzono',
 	'Old Status ID' => 'Old Status ID',
 	'Status ID' => 'Status ID',
