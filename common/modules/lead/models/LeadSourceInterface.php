@@ -16,4 +16,6 @@ interface LeadSourceInterface {
 
 	public function getOwnerId(): ?int;
 
+	public function getDialerPhone(): ?string;
+
 }

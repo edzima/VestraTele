@@ -6,11 +6,13 @@ use common\modules\lead\events\LeadDialerEvent;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;
+use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadUser;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\db\ActiveQuery;
 
 class LeadDialer extends Component {
 
@@ -22,7 +24,9 @@ class LeadDialer extends Component {
 	public int $callingStatus;
 	public int $notAnsweredStatus;
 	public int $answeredStatus;
-	public int $notAnsweredLimit = 3;
+	public ?int $callingTryDayLimit = 3;
+	public int $nextCallInterval = 1200;
+	public bool $withNewWithoutUser = false;
 
 	public function init() {
 		parent::init();
@@ -34,19 +38,23 @@ class LeadDialer extends Component {
 		}
 	}
 
-	public function calling(): ?array {
-		$model = $this->findToCall();
+	public function calling(ActiveLead $lead = null): ?array {
+		$model = $lead ?: $this->findToCall();
 		if ($model === null
-			|| empty($model->getPhone())
+			|| !$this->leadShouldCall($model)
 			|| !$this->report($model, $this->callingStatus)
 		) {
 			return null;
 		}
-		$phone = str_replace([' ', '+'], ['', '00'], $model->getPhone());
 		return [
 			'id' => $model->getId(),
-			'phone' => $phone,
+			'destination' => $model->getSource()->getDialerPhone(),
+			'phone' => $this->parsePhone($model->getPhone()),
 		];
+	}
+
+	protected function parsePhone(string $phone): string {
+		return str_replace([' ', '+'], ['', '00'], $phone);
 	}
 
 	public function answer(int $id): bool {
@@ -75,7 +83,15 @@ class LeadDialer extends Component {
 		$report->status_id = $status;
 		$report->owner_id = $this->userId;
 
-		$success = $report->save() && $lead->updateStatus($status);
+		$success = $report->save();
+
+		if (!$success) {
+			Yii::error([
+				'reportErrors' => $report->getErrors(),
+				'attributes' => $report->getAttributes(),
+			], 'lead.dialer');
+		}
+		$lead->updateStatus($status);
 		if (!isset($lead->getUsers()[LeadUser::TYPE_DIALER])) {
 			$lead->linkUser(LeadUser::TYPE_DIALER, $this->userId);
 		}
@@ -108,23 +124,29 @@ class LeadDialer extends Component {
 	}
 
 	public function findToCall(): ?ActiveLead {
-		$model = $this->findNewLeadWithoutUsers();
+		$model = $this->withNewWithoutUser ? $this->findNewLeadWithoutUsers() : null;
 		if ($model) {
+			Yii::debug('Find new Lead Without User. ID: ' . $model->getId(), 'lead.dialer');
 			return $model;
 		}
 		$model = $this->findNotAnsweredLead();
 		if ($model) {
+			Yii::debug('Find dialer User not Answered Lead. ID: ' . $model->getId(), 'lead.dialer');
 			return $model;
 		}
+		Yii::debug('Not Found Lead for User: ' . $this->userId . '.', 'lead.dialer');
+
 		return null;
 	}
 
 	public function findNewLeadWithoutUsers(): ?ActiveLead {
 		return Lead::find()
 			->withoutUsers()
+			->andWhere([Lead::tableName() . '.status_id' => LeadStatusInterface::STATUS_NEW])
+			->andWhere(Lead::tableName() . '.phone IS NOT NULL')
+			->joinWith('leadSource')
+			->andWhere(LeadSource::tableName() . '.dialer_phone IS NOT NULL')
 			->orderBy(['date_at' => SORT_DESC])
-			->andWhere('phone IS NOT NULL')
-			->andWhere(['status_id' => LeadStatusInterface::STATUS_NEW])
 			->one();
 	}
 
@@ -132,27 +154,94 @@ class LeadDialer extends Component {
 		return Lead::find()->andWhere(['id' => $id])->one();
 	}
 
-	private function findNotAnsweredLead(): ?ActiveLead {
-		$models = Lead::find()
-			->user($this->userId)
-			->andWhere([Lead::tableName() . '.status_id' => $this->notAnsweredStatus])
-			->joinWith('reports')
-			->all();
-
-		shuffle($models);
-
-		foreach ($models as $model) {
-			$notAnsweredReports = 0;
-			foreach ($model->reports as $report) {
-				if ($report->status_id === $this->notAnsweredStatus) {
-					$notAnsweredReports++;
+	public function findNotAnsweredLead(): ?ActiveLead {
+		$query = $this->notAnsweredLeadsQuery();
+		$i = 0;
+		foreach ($query->batch(10) as $rows) {
+			$i++;
+			Yii::debug("Not Answered Batch Query: $i.", 'lead.dialer');
+			foreach ($rows as $lead) {
+				/** @var $lead Lead */
+				if ($this->leadShouldCall($lead)) {
+					return $lead;
 				}
-			}
-			if ($notAnsweredReports < $this->notAnsweredLimit) {
-				return $model;
 			}
 		}
 		return null;
+	}
+
+	public function leadShouldCall(ActiveLead $lead): bool {
+		Yii::debug('Check Lead should call. ID: ' . $lead->getId());
+		if (empty($lead->getPhone())) {
+			Yii::debug("Lead without Phone.", 'lead.dialer');
+			return false;
+		}
+		if (empty($lead->getSource()->getDialerPhone())) {
+			Yii::debug("Lead with Source without Dialer Phone.", 'lead.dialer');
+			return false;
+		}
+		if ($this->callingTryDayLimit <= 0) {
+			Yii::debug("Lead with Calling Reports without Try Day Limit.", 'lead.dialer');
+			return true;
+		}
+		$reports = $lead->reports;
+		if (empty($reports)) {
+			Yii::debug("Lead without Reports.", 'lead.dialer');
+			return true;
+		}
+		$callingReports = [];
+		foreach ($reports as $report) {
+			if ($report->status_id === $this->callingStatus) {
+				$callingReports[] = strtotime($report->created_at);
+			}
+		}
+		if (empty($callingReports)) {
+			Yii::debug("Lead without calling Reports.", 'lead.dialer');
+			return true;
+		}
+
+		$lastTry = max($callingReports);
+		if ($this->shouldCallForTime($lastTry)) {
+			$today = date('Y-m-d');
+			$todayCounts = 0;
+			rsort($callingReports);
+			foreach ($callingReports as $time) {
+				if ($today === date('Y-m-d', $time)) {
+					$todayCounts++;
+				}
+			}
+			Yii::debug('Lead was today: ' . $todayCounts . ' calling tries.');
+			return $todayCounts < $this->callingTryDayLimit;
+		}
+		Yii::debug('Lead was (all time): ' . count($callingReports) . ' calling tries.');
+
+		return false;
+	}
+
+	protected function shouldCallForTime(int $lastTry): bool {
+		if ($this->nextCallInterval <= 0) {
+			return true;
+		}
+		return $lastTry < (time() - $this->nextCallInterval);
+	}
+
+	public function notAnsweredLeadsQuery(): ActiveQuery {
+		return Lead::find()
+			->select([Lead::tableName() . '.*', 'max(lead_report.created_at) as maxCreatedAt'])
+			->user($this->userId)
+			->andWhere([Lead::tableName() . '.status_id' => $this->notAnsweredStatus])
+			->andWhere(Lead::tableName() . '.phone IS NOT NULL')
+			->joinWith('leadSource')
+			->andWhere(LeadSource::tableName() . '.dialer_phone IS NOT NULL')
+			->groupBy(LeadReport::tableName() . '.lead_id')
+			->joinWith([
+				'reports' => function (ActiveQuery $query): void {
+					$query->orderBy([]);
+				},
+			])
+			->orderBy([
+				'maxCreatedAt' => SORT_ASC,
+			]);
 	}
 
 }

@@ -34,6 +34,8 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private const QUESTION_ATTRIBUTE_PREFIX = 'question';
 
+	public $dialer_id;
+
 	public bool $withoutUser = false;
 	public bool $withoutReport = false;
 	public bool $duplicateEmail = false;
@@ -67,7 +69,7 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'status_id', 'type_id', 'source_id', 'campaign_id'], 'integer'],
+			[['id', 'status_id', 'type_id', 'source_id', 'campaign_id', 'dialer_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
 			[['withoutUser', 'withoutReport', 'duplicatePhone', 'duplicateEmail'], 'boolean'],
@@ -76,6 +78,7 @@ class LeadSearch extends Lead implements SearchModel {
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
+
 			[array_keys($this->questionsAttributes), 'safe'],
 			['phone', PhoneValidator::class],
 		];
@@ -88,6 +91,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'withoutUser' => Yii::t('lead', 'Without User'),
 				'withoutReport' => Yii::t('lead', 'Without Report'),
 				'user_id' => Yii::t('lead', 'User'),
+				'dialer_id' => Yii::t('lead', 'Dialer'),
 				'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 				'duplicateEmail' => Yii::t('lead', 'Duplicate Email'),
 				'duplicatePhone' => Yii::t('lead', 'Duplicate Phone'),
@@ -337,8 +341,8 @@ class LeadSearch extends Lead implements SearchModel {
 		return LeadUser::getTypesNames();
 	}
 
-	public static function getUsersNames(): array {
-		return User::getSelectList(LeadUser::userIds());
+	public static function getUsersNames(string $type = null): array {
+		return User::getSelectList(LeadUser::userIds($type));
 	}
 
 	/**

@@ -19,6 +19,14 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Users');
 
 	<p>
 		<?= Html::a(Yii::t('lead', 'Create Lead User'), ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('lead', 'Delete'), false, [
+			'class' => 'btn btn-danger pull-right',
+			'data' => [
+				'method' => 'delete',
+				'confirm' => Yii::t('lead', 'Are you sure you want to delete this assigned users?'),
+			],
+		]) ?>
+
 	</p>
 
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>

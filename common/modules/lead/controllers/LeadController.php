@@ -103,6 +103,15 @@ class LeadController extends BaseController {
 			return $exporter->export()->send('lead.csv');
 		}
 
+		if (!$this->module->onlyUser && !empty($searchModel->dialer_id)) {
+			$dialer = $this->module->getDialer();
+			if ($dialer) {
+				$dialer->userId = $searchModel->dialer_id;
+				$dataProvider->query = $dialer->notAnsweredLeadsQuery();
+				$dataProvider->sort->defaultOrder = [];
+			}
+		}
+
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,

@@ -68,7 +68,7 @@ class LeadMultipleSmsFormTest extends Unit {
 
 	public function testFromModels(): void {
 		$leadWithPhone = $this->tester->grabFixture(LeadFixtureHelper::LEAD, 'new-wordpress-accident');
-		$leadWithoutPhone = $this->tester->grabFixture(LeadFixtureHelper::LEAD, 'new-without-phone-and-owner');
+		$leadWithoutPhone = $this->tester->grabFixture(LeadFixtureHelper::LEAD, 'new-without-phone-and-owner_and_source-without-phone');
 		$leads = [];
 		$leads[] = $leadWithoutPhone;
 		$leads[] = $leadWithPhone;

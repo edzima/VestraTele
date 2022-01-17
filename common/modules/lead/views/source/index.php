@@ -1,5 +1,6 @@
 <?php
 
+use common\modules\lead\models\LeadSourceInterface;
 use common\modules\lead\models\searches\LeadSourceSearch;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -39,12 +40,27 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Sources');
 				'filter' => $searchModel::getTypesNames(),
 				'label' => Yii::t('lead', 'Type'),
 			],
-			'url',
-			'phone',
+			[
+				'attribute' => 'url',
+				'format' => 'raw',
+				'value' => static function (LeadSourceInterface $leadSource): ?string {
+					if (!$leadSource->getURL()) {
+						return null;
+					}
+					return Html::a(Html::encode($leadSource->getURL()), $leadSource->getURL(), [
+						'target' => '_blank',
+					]);
+				},
+			],
+			'phone:tel',
+			[
+				'attribute' => 'dialer_phone',
+				'visible' => $searchModel->scenario !== $searchModel::SCENARIO_OWNER,
+			],
 			[
 				'attribute' => 'owner_id',
 				'value' => 'owner',
-				'filter' => $searchModel::getTypesNames(),
+				'filter' => $searchModel::getOwnersNames(),
 				'label' => Yii::t('lead', 'Owner'),
 				'visible' => $searchModel->scenario !== $searchModel::SCENARIO_OWNER,
 			],

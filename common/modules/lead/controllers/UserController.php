@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use backend\models\Log;
 use common\helpers\Flash;
 use common\helpers\Url;
 use common\modules\lead\models\forms\LeadPushEmail;
@@ -11,6 +12,7 @@ use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadUsersSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * UserController implements the CRUD actions for LeadUser model.
@@ -34,11 +36,16 @@ class UserController extends BaseController {
 	/**
 	 * Lists all LeadUser models.
 	 *
-	 * @return string
+	 * @return string|Response
 	 */
-	public function actionIndex(): string {
+	public function actionIndex() {
 		$searchModel = new LeadUsersSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+		if (strcasecmp(Yii::$app->request->method, 'delete') === 0) {
+			LeadUsersSearch::deleteAll($dataProvider->query->where);
+			return $this->refresh();
+		}
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,

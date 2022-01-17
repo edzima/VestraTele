@@ -15,6 +15,7 @@ use yii\helpers\ArrayHelper;
  * @property string $name
  * @property int $type_id
  * @property string|null $phone
+ * @property string|null $dialer_phone
  * @property string|null $url
  * @property int|null $sort_index
  * @property int|null $owner_id
@@ -48,7 +49,7 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['sort_index'], 'integer'],
 			[['name', 'url'], 'string', 'max' => 255],
-			['phone', 'string', 'max' => 30],
+			[['phone', 'dialer_phone'], 'string', 'max' => 30],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadType::class, 'targetAttribute' => ['type_id' => 'id']],
 			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['owner_id' => 'id']],
 		];
@@ -63,6 +64,7 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 			'name' => Yii::t('lead', 'Name'),
 			'url' => Yii::t('lead', 'URL'),
 			'phone' => Yii::t('lead', 'Phone'),
+			'dialer_phone' => Yii::t('lead', 'Dialer Phone'),
 			'sort_index' => Yii::t('lead', 'Sort Index'),
 			'type_id' => Yii::t('lead', 'Type'),
 		];
@@ -97,11 +99,6 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 			$name .= 'withType';
 		}
 		return ArrayHelper::map($models, 'id', $name);
-	}
-
-	public static function find() {
-		return parent::find()
-			->orderBy('sort_index');
 	}
 
 	public static function getModels(bool $refresh = false): array {
@@ -152,5 +149,9 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 
 	public function getPhone(): ?string {
 		return $this->phone;
+	}
+
+	public function getDialerPhone(): ?string {
+		return $this->dialer_phone;
 	}
 }

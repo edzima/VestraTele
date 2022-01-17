@@ -2,6 +2,7 @@
 
 return [
 	'Are you sure you want to delete provisions for this settlements?' => 'Czy chcesz usunąć prowizje dla tych rozliczeń?',
+	'Are you sure you want to hide this provision?' => 'Czy napewno chcesz ukryć tą prowizję z raportu?',
 	'{fromUser} from {toUser}' => '{fromUser} dla {toUser}',
 	'Create self provision: {user}' => 'Dodaj własną prowizję: {user}',
 	'Create provision type' => 'Dodaj typ prowizji',
@@ -12,6 +13,7 @@ return [
 	'Empty - all' => 'Puste - wszystkie',
 	'Is overwritten' => 'Nadpisana',
 	'Hide on report' => 'Ukryty w raporcie',
+	'Hide' => 'Ukryj',
 	'Name' => 'Nazwa',
 	'Not active types for this settlement.' => 'Brak aktywnych typów dla tego rozliczenia.',
 	'Not settled costs' => 'Zaliczki przyznane',

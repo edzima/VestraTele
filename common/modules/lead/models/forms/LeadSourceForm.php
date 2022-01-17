@@ -20,6 +20,7 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 	public string $type_id = '';
 	public ?string $url = null;
 	public ?string $phone = null;
+	public ?string $dialer_phone = null;
 	public ?string $sort_index = null;
 	public ?string $owner_id = null;
 
@@ -39,7 +40,7 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['type_id', 'owner_id'], 'integer'],
 			[['name', 'url'], 'string', 'max' => 255],
-			[['phone'], 'string', 'max' => 30],
+			[['phone', 'dialer_phone'], 'string', 'max' => 30],
 			//@todo attribute for country from Module or model?
 			['phone', PhoneValidator::class, 'country' => 'PL'],
 			['url', 'url'],
@@ -60,6 +61,7 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 			'name' => Yii::t('lead', 'Name'),
 			'type_id' => Yii::t('lead', 'Type'),
 			'phone' => Yii::t('lead', 'Phone'),
+			'dialer_phone' => Yii::t('lead', 'Dialer Phone'),
 			'sort_index' => Yii::t('lead', 'Sort Index'),
 		];
 	}
@@ -70,11 +72,12 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 	}
 
 	public function setSource(LeadSourceInterface $source): void {
-		$this->name = $source->name;
-		$this->type_id = $source->type_id;
+		$this->name = $source->getName();
+		$this->type_id = $source->getType()->getID();
 		$this->sort_index = $source->sort_index;
-		$this->phone = $source->phone;
-		$this->url = $source->url;
+		$this->phone = $source->getPhone();
+		$this->dialer_phone = $source->getDialerPhone();
+		$this->url = $source->getURL();
 	}
 
 	public function getModel(): LeadSource {
@@ -95,6 +98,7 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 		$model->owner_id = $this->owner_id;
 		$model->sort_index = $this->sort_index;
 		$model->phone = $this->phone;
+		$model->dialer_phone = $this->dialer_phone;
 		return $model->save(false);
 	}
 
@@ -120,5 +124,9 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 
 	public function getPhone(): ?string {
 		return $this->phone;
+	}
+
+	public function getDialerPhone(): ?string {
+		return $this->dialer_phone;
 	}
 }
