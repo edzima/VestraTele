@@ -17,6 +17,7 @@ use kartik\select2\Select2;
 /* @var $this yii\web\View */
 /* @var $searchModel LeadSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $onlyUser bool */
 /* @var $assignUsers bool */
 /* @var $visibleButtons array */
 
@@ -85,14 +86,14 @@ if ($multipleForm) {
 
 				<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
 				&& $dataProvider->pagination->pageCount > 1
-				&& count($searchModel->getAllIds($dataProvider->query)) < 6000
 					? Html::a(
 						Yii::t('lead', 'Send SMS: {count}', [
 							'count' => count($searchModel->getAllIds($dataProvider->query)),
 						]), [
 						'sms/push-multiple',
 					],
-						[
+						count($searchModel->getAllIds($dataProvider->query)) < 6000
+							? [
 							'data' => [
 								'method' => 'POST',
 								'params' => [
@@ -100,7 +101,14 @@ if ($multipleForm) {
 								],
 							],
 							'class' => 'btn btn-success',
-						])
+						]
+							: [
+							'disabled' => 'disabled',
+							'title' => Yii::t('lead', 'For Send SMS records must be less then 6000.'),
+							'aria-label' => 'For send',
+							'class' => 'btn btn-success disabled',
+						]
+					)
 					: ''
 				?>
 
@@ -140,7 +148,7 @@ if ($multipleForm) {
 				&& $dataProvider->pagination->pageCount > 1
 
 					? Html::a(
-						Yii::t('lead', 'Change Status ({ids})', ['ids' => $searchModel->getAllIds($dataProvider->query)]),
+						Yii::t('lead', 'Change Status ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
 						['status/change'],
 						[
 							'class' => 'btn btn-warning',
@@ -220,7 +228,16 @@ if ($multipleForm) {
 			],
 			[
 				'attribute' => 'source_id',
-				'value' => 'source',
+				'value' => function (ActiveLead $lead): string {
+					if (!$lead->getSource()->getURL()) {
+						return $lead->getSource()->getName();
+					}
+					return Html::a(Html::encode($lead->getSource()->getName()),
+						$lead->getSource()->getURL(), [
+							'target' => '_blank',
+						]);
+				},
+				'format' => 'raw',
 				'filter' => $searchModel->getSourcesNames(),
 				'label' => Yii::t('lead', 'Source'),
 				'filterType' => GridView::FILTER_SELECT2,
