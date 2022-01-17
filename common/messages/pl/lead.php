@@ -73,6 +73,7 @@ return [
 	'Old Status ID' => 'Old Status ID',
 	'Status ID' => 'Status ID',
 	'Are you sure you want to delete this item?' => 'Jesteś pewny, że chcesz usunąć ten element?',
+	'Are you sure you want to delete this assigned users?' => 'Czy na pewno chcesz usunąć tych przypisanych użytkowników?',
 	'Reports' => 'Raporty',
 	'Data' => 'Dane',
 	'Update Lead Status: {name}' => 'Update Lead Status: {name}',
