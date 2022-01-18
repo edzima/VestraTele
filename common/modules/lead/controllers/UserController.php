@@ -2,10 +2,8 @@
 
 namespace common\modules\lead\controllers;
 
-use backend\models\Log;
 use common\helpers\Flash;
 use common\helpers\Url;
-use common\modules\lead\models\forms\LeadPushEmail;
 use common\modules\lead\models\forms\LeadsUserForm;
 use Yii;
 use common\modules\lead\models\LeadUser;
@@ -77,6 +75,15 @@ class UserController extends BaseController {
 	}
 
 	public function actionAssign(array $ids = []) {
+		if (empty($ids)) {
+			$postIds = Yii::$app->request->post('leadsIds');
+			if (is_string($postIds)) {
+				$postIds = explode(',', $postIds);
+			}
+			if ($postIds) {
+				$ids = $postIds;
+			}
+		}
 		$model = new LeadsUserForm();
 		$model->leadsIds = array_combine($ids, $ids);
 		if ($model->load(Yii::$app->request->post())) {
