@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models\forms;
 
+use common\models\user\User;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\Module;
@@ -15,6 +16,7 @@ class LeadsUserForm extends Model {
 	public array $leadsIds = [];
 
 	public bool $withOwner = true;
+	public bool $sendEmail = true;
 
 	public ?string $userId = null;
 	public ?string $type = null;
@@ -42,6 +44,7 @@ class LeadsUserForm extends Model {
 			['!leadsIds', 'required', 'on' => static::SCENARIO_SINGLE],
 			['userId', 'integer'],
 			['type', 'string'],
+			['sendEmail', 'boolean'],
 			['leadsIds', 'exist', 'skipOnError' => true, 'allowArray' => true, 'targetClass' => Lead::class, 'targetAttribute' => 'id', 'enableClientValidation' => false],
 			[
 				'userId', 'in', 'range' => array_keys(static::getUsersNames()),
@@ -79,6 +82,27 @@ class LeadsUserForm extends Model {
 			->batchInsert(LeadUser::tableName(), ['lead_id', 'user_id', 'type'], $rows)
 			->
 			execute();
+	}
+
+	public function sendEmail(): ?int {
+		if (!$this->sendEmail) {
+			return null;
+		}
+		$email = User::findOne($this->userId)->email ?? null;
+		if ($email === null) {
+			return null;
+		}
+		$count = 0;
+
+		foreach ($this->leadsIds as $leadId) {
+			$lead = Lead::findById($leadId);
+			if ($lead) {
+				$pushEmailModel = new LeadPushEmail($lead);
+				$pushEmailModel->email = $email;
+				$count += $pushEmailModel->sendEmail();
+			}
+		}
+		return $count;
 	}
 
 }

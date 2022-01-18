@@ -67,12 +67,7 @@ class UserController extends BaseController {
 					'lead' => $lead->getName(),
 				])
 			);
-			$email = $this->module->userClass::findOne($model->userId)->email ?? null;
-			if ($email) {
-				$pushEmailModel = new LeadPushEmail($lead);
-				$pushEmailModel->email = $email;
-				$pushEmailModel->sendEmail();
-			}
+			$model->sendEmail();
 			return $this->redirect(['lead/view', 'id' => $id]);
 		}
 		return $this->render('assign-single', [
@@ -94,12 +89,7 @@ class UserController extends BaseController {
 						'count' => $count,
 					])
 				);
-				$email = $this->module->userClass::findOne($model->userId)->email ?? null;
-				foreach ($model->leadsIds as $leadsId) {
-					$pushEmailModel = new LeadPushEmail($this->findLead($leadsId));
-					$pushEmailModel->email = $email;
-					$pushEmailModel->sendEmail();
-				}
+				$model->sendEmail();
 				return $this->redirect(Url::previous());
 			}
 		}
