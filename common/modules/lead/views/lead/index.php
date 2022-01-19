@@ -123,13 +123,32 @@ if ($multipleForm) {
 					: ''
 				?>
 
-				<?= $assignUsers ? Html::submitButton(
-					Yii::t('lead', 'Link users'),
-					[
-						'class' => 'btn btn-info',
-						'name' => 'route',
-						'value' => 'user/assign',
-					])
+				<?= $assignUsers
+					? Html::submitButton(
+						Yii::t('lead', 'Link Users'),
+						[
+							'class' => 'btn btn-info',
+							'name' => 'route',
+							'value' => 'user/assign',
+						])
+					: ''
+				?>
+
+
+				<?= $assignUsers
+				&& $dataProvider->pagination->pageCount > 1
+					? Html::a(
+						Yii::t('lead', 'Link Users ({count})', ['count' => count($searchModel->getAllIds($dataProvider->query))]),
+						['user/assign'],
+						[
+							'class' => 'btn btn-info',
+							'data' => [
+								'method' => 'POST',
+								'params' => [
+									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
+								],
+							],
+						])
 					: ''
 				?>
 
@@ -158,7 +177,6 @@ if ($multipleForm) {
 									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
 								],
 							],
-							'value' => 'status/change',
 						])
 					: ''
 				?>

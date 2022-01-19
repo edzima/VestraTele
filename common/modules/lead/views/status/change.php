@@ -23,6 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		'id' => 'lead-status-change-form',
 	]); ?>
 
+	<?= Html::hiddenInput('leadsIds', implode(',', $model->ids)) ?>
 
 	<?= $form->field($model, 'status_id')->widget(Select2::class, [
 		'data' => LeadStatusChangeForm::getStatusNames(),
