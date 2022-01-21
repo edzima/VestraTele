@@ -21,6 +21,9 @@ use yii\web\View;
 		'data' => LeadsUserForm::getUsersNames(),
 	]) ?>
 
+	<?= Html::hiddenInput('leadsIds', implode(',', $model->leadsIds)) ?>
+
+
 	<?= $form->field($model, 'type')->dropDownList($model->getTypesNames()) ?>
 
 	<?= $form->field($model, 'sendEmail')->checkbox() ?>
