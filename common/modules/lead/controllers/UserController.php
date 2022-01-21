@@ -85,6 +85,7 @@ class UserController extends BaseController {
 			}
 		}
 		$model = new LeadsUserForm();
+		$ids = array_unique($ids);
 		$model->leadsIds = array_combine($ids, $ids);
 		if ($model->load(Yii::$app->request->post())) {
 			$count = $model->save();
