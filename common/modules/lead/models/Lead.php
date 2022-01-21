@@ -290,6 +290,9 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return false;
 	}
 
+	/**
+	 * @return static[]
+	 */
 	public function getSameContacts(): array {
 		$models = static::findByLead($this);
 		unset($models[$this->id]);
