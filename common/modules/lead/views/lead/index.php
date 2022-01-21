@@ -3,6 +3,7 @@
 use backend\widgets\CsvForm;
 use common\helpers\Html;
 use common\models\user\User;
+use common\models\user\Worker;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\searches\LeadSearch;
 use common\modules\lead\widgets\CreateLeadBtnWidget;
@@ -40,9 +41,11 @@ foreach (LeadSearch::questions() as $question) {
 	];
 }
 
-$multipleForm = $assignUsers
-	|| Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
-	|| Yii::$app->user->can(User::PERMISSION_LEAD_STATUS);
+$multipleForm = empty($searchModel->dialer_id)
+	&& ($assignUsers
+		|| Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
+		|| Yii::$app->user->can(User::PERMISSION_LEAD_STATUS)
+	);
 
 if ($multipleForm) {
 	$dataProvider->getModels();
@@ -60,6 +63,11 @@ if ($multipleForm) {
 		]) ?>
 
 		<?= Html::a(Yii::t('lead', 'Lead Reports'), ['report/index'], ['class' => 'btn btn-warning']) ?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_DIALER)
+			? Html::a(Yii::t('lead', 'Dialers'), ['dialer-lead/index'], ['class' => 'btn btn-primary'])
+			: ''
+		?>
 
 	</div>
 
