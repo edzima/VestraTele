@@ -246,13 +246,20 @@ class LeadDialer extends Component {
 
 	public function notAnsweredLeadsQuery(): ActiveQuery {
 		return Lead::find()
-			->select([Lead::tableName() . '.*', 'max(lead_report.created_at) as maxCreatedAt'])
+			->select([
+				Lead::tableName() . '.*',
+				'MAX(lead_report.created_at) as maxCreatedAt',
+			])
 			->user($this->userId)
 			->andWhere([Lead::tableName() . '.status_id' => $this->notAnsweredStatus])
 			->andWhere(Lead::tableName() . '.phone IS NOT NULL')
 			->joinWith('leadSource')
 			->andWhere(LeadSource::tableName() . '.dialer_phone IS NOT NULL')
-			->groupBy(LeadReport::tableName() . '.lead_id')
+			->groupBy([
+				Lead::tableName() . '.phone',
+				//@todo check report dates
+				//			LeadReport::tableName() . '.lead_id',
+			])
 			->joinWith([
 				'reports' => function (ActiveQuery $query): void {
 					$query->orderBy([]);
