@@ -233,7 +233,7 @@ class LeadForm extends Model implements LeadInterface {
 		return in_array($id, $this->getUsers(), true);
 	}
 
-	public function getSameContacts(): array {
+	public function getSameContacts(bool $withType = false): array {
 		return Lead::findByLead($this);
 	}
 }

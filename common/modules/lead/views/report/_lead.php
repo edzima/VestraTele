@@ -2,25 +2,25 @@
 
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\widgets\LeadAnswersWidget;
+use yii\web\View;
 use yii\widgets\DetailView;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $model ActiveLead */
 ?>
 
-<div class="row">
-	<div class="col-md-6">
-		<?= DetailView::widget([
-			'model' => $model,
-			'attributes' => [
-				'status',
-				[
-					'attribute' => 'source.type',
-					'label' => Yii::t('lead', 'Type'),
-				],
-				[
-					'attribute' => 'phone',
-					'format' => 'tel',
+<div class="lead-report-detail">
+	<?= DetailView::widget([
+		'model' => $model,
+		'attributes' => [
+			'status',
+			[
+				'attribute' => 'source.type',
+				'label' => Yii::t('lead', 'Type'),
+			],
+			[
+				'attribute' => 'phone',
+				'format' => 'tel',
 					'visible' => !empty($model->getPhone()),
 				],
 				[
@@ -38,10 +38,7 @@ use yii\widgets\DetailView;
 				],
 			],
 		]) ?>
-	</div>
-	<div class="col-md-6">
 		<?= LeadAnswersWidget::widget([
 			'answers' => $model->answers,
 		]) ?>
-	</div>
 </div>

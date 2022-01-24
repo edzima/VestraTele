@@ -143,17 +143,18 @@ class LeadController extends BaseController {
 	 */
 	public function actionView(int $id): string {
 		$model = $this->findLead($id);
-		$sameContacts = $model->getSameContacts();
-		if (!empty($sameContacts)) {
+		$sameContactsCount = count($model->getSameContacts());
+
+		if ($sameContactsCount > 0) {
 			Flash::add(Flash::TYPE_WARNING,
 				Yii::t('lead', 'Find Similars Leads: {count}.', [
-					'count' => count($sameContacts),
+					'count' => $sameContactsCount,
 				])
 			);
 		}
+
 		return $this->render('view', [
 			'model' => $model,
-			'sameContacts' => $sameContacts,
 			'withDelete' => $this->module->allowDelete,
 		]);
 	}

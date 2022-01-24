@@ -34,5 +34,4 @@ YiiAsset::register($this);
 		'model' => $model,
 	]) ?>
 
-
 </div>

@@ -90,6 +90,10 @@ class ReportForm extends Model {
 		];
 	}
 
+	public function getSameContacts(): array {
+		return $this->getLead()->getSameContacts(true);
+	}
+
 	private function hasOpenAnswer(): bool {
 		return !empty(array_filter($this->getAnswersModels(), static function (AnswerForm $answerForm): bool {
 			return !empty($answerForm->answer);

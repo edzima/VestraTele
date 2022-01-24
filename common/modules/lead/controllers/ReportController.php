@@ -3,13 +3,13 @@
 namespace common\modules\lead\controllers;
 
 use common\behaviors\SelectionRouteBehavior;
+use common\helpers\Flash;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadStatus;
 use Yii;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\searches\LeadReportSearch;
-use yii\base\BaseObject;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -82,6 +82,15 @@ class ReportController extends BaseController {
 		$model->setLead($this->findLead($id, false));
 		if ($status_id) {
 			$model->status_id = $status_id;
+		}
+		$sameCount = count($model->getSameContacts());
+		if ($sameCount > 0) {
+			Flash::add(Flash::TYPE_WARNING, Yii::t(
+				'lead',
+				'Lead has Similars: {count} Leads with same type.', [
+					'count' => $sameCount,
+				]
+			));
 		}
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['lead/view', 'id' => $id]);
