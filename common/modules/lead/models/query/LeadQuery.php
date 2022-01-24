@@ -69,4 +69,9 @@ class LeadQuery extends ActiveQuery implements PhonableQuery {
 		]);
 		return $this;
 	}
+
+	public function dialer(int $user_id): self {
+		$this->user($user_id, LeadUser::TYPE_DIALER);
+		return $this;
+	}
 }

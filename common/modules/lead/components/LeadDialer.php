@@ -250,7 +250,7 @@ class LeadDialer extends Component {
 				Lead::tableName() . '.*',
 				'MAX(lead_report.created_at) as maxCreatedAt',
 			])
-			->user($this->userId)
+			->dialer($this->userId)
 			->andWhere([Lead::tableName() . '.status_id' => $this->notAnsweredStatus])
 			->andWhere(Lead::tableName() . '.phone IS NOT NULL')
 			->joinWith('leadSource')
