@@ -21,7 +21,7 @@ $user = Yii::$app->user;
 					'label' => Yii::t('backend', 'Users'),
 					'url' => ['/user/user/index'],
 					'icon' => '<i class="fa fa-users"></i>',
-					'visible' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+					'visible' => $user->can(User::ROLE_ADMINISTRATOR),
 				],
 				[
 					'label' => Yii::t('backend', 'Workers'),
@@ -68,6 +68,12 @@ $user = Yii::$app->user;
 							'label' => Yii::t('lead', 'Browse'),
 							'url' => ['/lead/lead/index'],
 							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Dialers'),
+							'url' => ['/lead/dialer-lead/index'],
+							'icon' => '<i class="fa fa-phone"></i>',
+							'visible' => $user->can(Worker::PERMISSION_LEAD_DIALER),
 						],
 						[
 							'label' => Yii::t('lead', 'Reports'),
