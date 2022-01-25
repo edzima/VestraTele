@@ -156,6 +156,8 @@ return [
 	'Without User' => 'Brak Użytkownika',
 	'Without Report' => 'Brak Raportu',
 	'With Address' => 'Adres',
+	'With Same Contacts' => 'Z Tożsamymi',
+	'Report from same contact Lead: #{id}' => 'Raport z Lead: #{id}',
 	'Answers Questions' => 'Odpowiedzi',
 	'Changed Status' => 'Zmieniony Status',
 	'Lead Name' => 'Imię i Nazwisko',

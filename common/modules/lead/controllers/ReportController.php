@@ -83,6 +83,10 @@ class ReportController extends BaseController {
 		if ($status_id) {
 			$model->status_id = $status_id;
 		}
+
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['lead/view', 'id' => $id]);
+		}
 		$sameCount = count($model->getSameContacts());
 		if ($sameCount > 0) {
 			Flash::add(Flash::TYPE_WARNING, Yii::t(
@@ -92,10 +96,6 @@ class ReportController extends BaseController {
 				]
 			));
 		}
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['lead/view', 'id' => $id]);
-		}
-
 		return $this->render('report', [
 			'model' => $model,
 		]);
