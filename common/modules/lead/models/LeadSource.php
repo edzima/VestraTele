@@ -101,6 +101,10 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 		return ArrayHelper::map($models, 'id', $name);
 	}
 
+	/**
+	 * @param bool $refresh
+	 * @return static[]
+	 */
 	public static function getModels(bool $refresh = false): array {
 		if (static::$models === null || $refresh) {
 			static::$models = static::find()

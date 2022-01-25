@@ -2,6 +2,7 @@
 
 use backend\modules\benefit\Module as BenefitModule;
 use common\models\user\User;
+use common\models\user\Worker;
 use Edzima\Yii2Adescom\Module as AdescomModule;
 use motion\i18n\ConfigLanguageProvider;
 use yii\base\Action;
@@ -172,8 +173,13 @@ return [
 						'permissions' => [User::PERMISSION_LEAD_STATUS],
 					],
 					[
+						'allow' => true,
+						'controllers' => ['lead/dialer-lead'],
+						'permissions' => [Worker::PERMISSION_LEAD_DIALER],
+					],
+					[
 						'allow' => false,
-						'controllers' => ['lead/status'],
+						'controllers' => ['lead/dialer-lead', 'lead/status'],
 					],
 					[
 						'allow' => true,

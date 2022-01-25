@@ -28,6 +28,7 @@ class ReportForm extends Model {
 	public int $status_id;
 	public ?string $details = null;
 	public int $owner_id;
+	public bool $withSameContacts = true;
 
 	public $closedQuestions = [];
 
@@ -60,6 +61,7 @@ class ReportForm extends Model {
 			'status_id' => Yii::t('lead', 'Status'),
 			'details' => Yii::t('lead', 'Details'),
 			'withAddress' => Yii::t('lead', 'With Address'),
+			'withSameContacts' => Yii::t('lead', 'With Same Contacts'),
 			'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 		];
 	}
@@ -67,8 +69,13 @@ class ReportForm extends Model {
 	public function rules(): array {
 		return [
 			[['!owner_id', 'status_id'], 'required'],
+			[
+				'withSameContacts', 'required', 'when' => function (): bool {
+				return $this->getModel()->isNewRecord;
+			},
+			],
 			['details', 'string'],
-			['withAddress', 'boolean'],
+			[['withAddress', 'withSameContacts'], 'boolean'],
 			[
 				'details', 'required',
 				'when' => function () {
@@ -88,6 +95,13 @@ class ReportForm extends Model {
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 			['closedQuestions', 'in', 'range' => array_keys($this->getClosedQuestionsData()), 'allowArray' => true],
 		];
+	}
+
+	/**
+	 * @return ActiveLead[]
+	 */
+	public function getSameContacts(): array {
+		return $this->getLead()->getSameContacts(true);
 	}
 
 	private function hasOpenAnswer(): bool {
@@ -186,9 +200,38 @@ class ReportForm extends Model {
 		if ($this->withAnswers) {
 			$this->linkAnswers(!$isNewRecord);
 		}
+		if ($isNewRecord) {
+			$this->reportSameContacts();
+		}
 		$this->saveAddress();
 
 		return true;
+	}
+
+	protected function reportSameContacts(): bool {
+		if (!$this->withSameContacts || empty($this->getSameContacts())) {
+			return false;
+		}
+		$models = $this->getSameContacts();
+		foreach ($models as $lead) {
+			$this->reportSameContact($lead);
+		}
+		return true;
+	}
+
+	protected function reportSameContact(ActiveLead $lead): void {
+		$model = new LeadReport();
+		$model->details = Yii::t('lead', 'Report from same contact Lead: #{id}', [
+			'id' => $this->getLead()->getId(),
+		]);
+		$model->old_status_id = $lead->getStatusId();
+		$model->status_id = $this->status_id;
+		$model->owner_id = $this->owner_id;
+		$model->lead_id = $lead->getId();
+		$model->save();
+		if ($this->status_id !== $lead->getStatusId()) {
+			$lead->updateStatus($this->status_id);
+		}
 	}
 
 	protected function linkUser(): void {

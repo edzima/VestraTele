@@ -15,6 +15,7 @@ class LeadDialerTest extends Unit {
 	private const STATUS_CALLING = 2;
 	private const STATUS_NOT_ANSWERED = 3;
 	private const STATUS_ANSWERED = 4;
+	private const STATUS_CALLING_EXCEEDED_LIMIT = 5;
 	private const USER_ID = 3;
 	private const NEXT_CALL_TRY_INTERVAL = 1;
 
@@ -137,11 +138,47 @@ class LeadDialerTest extends Unit {
 		}
 	}
 
+	public function testCallingTriesWithoutDayLimitAndWithGlobalLimit(): void {
+		$this->giveDialer([
+			'withNewWithoutUser' => true,
+		]);
+		$this->dialer->callingTryDayLimit = null;
+		$limit = 3;
+		$this->dialer->callingTryGlobalLimit = $limit;
+		$data = $this->dialer->calling();
+		$this->tester->assertNotEmpty($data['id']);
+		$id = $data['id'];
+		$lead = $this->tester->grabRecord(Lead::class, ['id' => $id]);
+		/** @var Lead $lead */
+		$this->dialer->notAnswer($id);
+		$i = 0;
+		while ($i < $limit) {
+			$lead->refresh();
+			$data = $this->dialer->calling($lead);
+			$this->tester->assertSame($data['id'], $lead->getId());
+			$this->dialer->notAnswer($id);
+			$i++;
+		}
+		$lead->refresh();
+		$this->tester->assertEmpty($this->dialer->calling($lead));
+		$this->tester->seeRecord(Lead::class, [
+			'id' => $id,
+			'status_id' => $this->dialer->callingExceededLimitStatus,
+		]);
+
+		$this->tester->seeRecord(LeadReport::class, [
+			'lead_id' => $id,
+			'old_status_id' => $this->dialer->notAnsweredStatus,
+			'status_id' => $this->dialer->callingExceededLimitStatus,
+			'owner_id' => $this->dialer->userId,
+		]);
+	}
+
 	public function testCallingTriesWithDayLimitWithoutInterval(): void {
 		$this->giveDialer([
 			'withNewWithoutUser' => true,
 		]);
-		$dayLimit = 1;
+		$dayLimit = 2;
 		$this->dialer->callingTryDayLimit = $dayLimit;
 		$data = $this->dialer->calling();
 		$this->tester->assertNotEmpty($data['id']);
@@ -159,6 +196,8 @@ class LeadDialerTest extends Unit {
 			$this->dialer->notAnswer($id);
 			$i++;
 		}
+		$lead->refresh();
+
 		$this->tester->assertEmpty($this->dialer->calling($lead));
 	}
 
@@ -175,6 +214,9 @@ class LeadDialerTest extends Unit {
 		}
 		if (!isset($config['callingStatus'])) {
 			$config['callingStatus'] = static::STATUS_CALLING;
+		}
+		if (!isset($config['callingExceededLimitStatus'])) {
+			$config['callingExceededLimitStatus'] = static::STATUS_CALLING_EXCEEDED_LIMIT;
 		}
 		if (!isset($config['nextCallInterval'])) {
 			$config['nextCallInterval'] = static::NEXT_CALL_TRY_INTERVAL;

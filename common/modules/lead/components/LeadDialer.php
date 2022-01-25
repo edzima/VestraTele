@@ -19,12 +19,15 @@ class LeadDialer extends Component {
 	public const EVENT_REPORT_CALLING = 'reportCalling';
 	public const EVENT_REPORT_ANSWER = 'reportAnswer';
 	public const EVENT_REPORT_NOT_ANSWER = 'reportNotAnswer';
+	public const EVENT_REPORT_CALLING_EXCEEDED_LIMIT = 'reportCallingExceededLimit';
 
 	public $userId;
 	public int $callingStatus;
 	public int $notAnsweredStatus;
 	public int $answeredStatus;
+	public int $callingExceededLimitStatus;
 	public ?int $callingTryDayLimit = 3;
+	public ?int $callingTryGlobalLimit = 10;
 	public int $nextCallInterval = 1200;
 	public bool $withNewWithoutUser = false;
 
@@ -119,6 +122,8 @@ class LeadDialer extends Component {
 				return static::EVENT_REPORT_NOT_ANSWER;
 			case $this->answeredStatus:
 				return static::EVENT_REPORT_ANSWER;
+			case $this->callingExceededLimitStatus:
+				return static::EVENT_REPORT_CALLING_EXCEEDED_LIMIT;
 		}
 		throw new InvalidConfigException('Invalid $status for report Event.');
 	}
@@ -180,8 +185,8 @@ class LeadDialer extends Component {
 			Yii::debug("Lead with Source without Dialer Phone.", 'lead.dialer');
 			return false;
 		}
-		if ($this->callingTryDayLimit <= 0) {
-			Yii::debug("Lead with Calling Reports without Try Day Limit.", 'lead.dialer');
+		if ($this->callingTryGlobalLimit <= 0) {
+			Yii::debug("Lead with Calling Reports without global calling limit.", 'lead.dialer');
 			return true;
 		}
 		$reports = $lead->reports;
@@ -200,6 +205,17 @@ class LeadDialer extends Component {
 			return true;
 		}
 
+		if ($this->isExceededGlobalLimit(count($callingReports))) {
+			Yii::warning("Lead overwrite calling limit.", 'lead.dialer');
+			$this->report($lead, $this->callingExceededLimitStatus);
+			return false;
+		}
+
+		if ($this->callingTryDayLimit <= 0) {
+			Yii::debug("Lead with Calling Reports without day calling limit.", 'lead.dialer');
+			return true;
+		}
+
 		$lastTry = max($callingReports);
 		if ($this->shouldCallForTime($lastTry)) {
 			$today = date('Y-m-d');
@@ -214,8 +230,11 @@ class LeadDialer extends Component {
 			return $todayCounts < $this->callingTryDayLimit;
 		}
 		Yii::debug('Lead was (all time): ' . count($callingReports) . ' calling tries.');
-
 		return false;
+	}
+
+	protected function isExceededGlobalLimit(int $callingTries): bool {
+		return $this->callingTryGlobalLimit !== null && $callingTries > $this->callingTryGlobalLimit;
 	}
 
 	protected function shouldCallForTime(int $lastTry): bool {
@@ -227,13 +246,20 @@ class LeadDialer extends Component {
 
 	public function notAnsweredLeadsQuery(): ActiveQuery {
 		return Lead::find()
-			->select([Lead::tableName() . '.*', 'max(lead_report.created_at) as maxCreatedAt'])
-			->user($this->userId)
+			->select([
+				Lead::tableName() . '.*',
+				'MAX(lead_report.created_at) as maxCreatedAt',
+			])
+			->dialer($this->userId)
 			->andWhere([Lead::tableName() . '.status_id' => $this->notAnsweredStatus])
 			->andWhere(Lead::tableName() . '.phone IS NOT NULL')
 			->joinWith('leadSource')
 			->andWhere(LeadSource::tableName() . '.dialer_phone IS NOT NULL')
-			->groupBy(LeadReport::tableName() . '.lead_id')
+			->groupBy([
+				Lead::tableName() . '.phone',
+				//@todo check report dates
+				//			LeadReport::tableName() . '.lead_id',
+			])
 			->joinWith([
 				'reports' => function (ActiveQuery $query): void {
 					$query->orderBy([]);

@@ -57,6 +57,7 @@ class LeadsUserForm extends Model {
 		return [
 			'userId' => Yii::t('lead', 'User'),
 			'type' => Yii::t('lead', 'Type'),
+			'sendEmail' => Yii::t('lead', 'Send Email'),
 		];
 	}
 

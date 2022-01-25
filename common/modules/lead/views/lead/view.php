@@ -7,6 +7,7 @@ use common\modules\lead\models\LeadInterface;
 use common\modules\lead\Module;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
+use common\modules\lead\widgets\SameContactsListWidget;
 use common\modules\lead\widgets\ShortReportStatusesWidget;
 use common\modules\reminder\widgets\ReminderGridWidget;
 use common\widgets\address\AddressDetailView;
@@ -19,7 +20,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model ActiveLead */
 /* @var $sameContacts LeadInterface[]
- * /* @var $withDelete bool
+ * @var $withDelete bool
  */
 
 $this->title = $model->getName();
@@ -159,21 +160,20 @@ YiiAsset::register($this);
 				},
 			]) ?>
 
-			<?php if (!empty($sameContacts)): ?>
-				<div class="row">
-					<h3><?= Yii::t('lead', 'Same Contacts Leads') ?></h3>
-					<?php foreach ($sameContacts as $sameContact): ?>
-						<div class="col-md-6">
-							<?= $this->render('_sameContact', [
-								'model' => $sameContact,
-							]) ?>
+			<div class="clearfix"></div>
 
-						</div>
-					<?php endforeach; ?>
 
-				</div>
-			<?php endif; ?>
-
+			<?= SameContactsListWidget::widget([
+				'model' => $model,
+				'withType' => false,
+				'options' => [
+					'class' => 'row',
+				],
+				'itemOptions' => [
+					'class' => 'col-md-6',
+				],
+			]) ?>
+			<div class="clearfix"></div>
 
 		</div>
 	</div>

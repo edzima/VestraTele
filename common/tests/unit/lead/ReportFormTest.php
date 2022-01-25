@@ -228,6 +228,133 @@ class ReportFormTest extends Unit {
 		$this->tester->assertTrue($this->model->getLead()->isForUser(3));
 	}
 
+	public function testWithSameContactsWithEnableSameReports(): void {
+		$lead1 = $this->haveLead([
+			'source_id' => 1,
+			'status_id' => LeadStatusInterface::STATUS_NEW,
+			'name' => __METHOD__,
+			'phone' => '123-123-123',
+		]);
+		$lead2 = $this->haveLead([
+			'source_id' => 1,
+			'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
+			'name' => __METHOD__,
+			'phone' => '123-123-123',
+		]);
+		$lead3 = $this->haveLead([
+			'source_id' => 1,
+			'status_id' => 2,
+			'name' => __METHOD__,
+			'phone' => '123-123-123',
+		]);
+
+		$status = LeadStatusInterface::STATUS_ARCHIVE;
+		$this->giveForm([
+			'lead' => $lead1,
+			'details' => 'Report same contacts as archive',
+			'status_id' => $status,
+			'owner_id' => 1,
+		]);
+
+		$this->model->withSameContacts = true;
+		$this->thenSuccessSave();
+		$this->thenSeeLead([
+			'id' => $lead1->getId(),
+			'status_id' => $status,
+		]);
+		$this->thenSeeLead([
+			'id' => $lead2->getId(),
+			'status_id' => $status,
+		]);
+		$this->thenSeeLead([
+			'id' => $lead3->getId(),
+			'status_id' => $status,
+		]);
+
+		$this->thenSeeReport([
+			'lead_id' => $lead1->getId(),
+			'status_id' => $status,
+			'old_status_id' => LeadStatusInterface::STATUS_NEW,
+			'details' => 'Report same contacts as archive',
+		]);
+
+		$sameDetails = 'Report from same contact Lead: #' . $lead1->getId();
+		$this->thenSeeReport([
+			'lead_id' => $lead2->getId(),
+			'status_id' => $status,
+			'old_status_id' => LeadStatusInterface::STATUS_ARCHIVE,
+			'details' => $sameDetails,
+		]);
+		$this->thenSeeReport([
+			'lead_id' => $lead3->getId(),
+			'status_id' => $status,
+			'old_status_id' => 2,
+			'details' => $sameDetails,
+		]);
+	}
+
+	public function testWithSameContactsWithDisableSameReports(): void {
+		$lead1 = $this->haveLead([
+			'source_id' => 1,
+			'status_id' => LeadStatusInterface::STATUS_NEW,
+			'name' => __METHOD__,
+			'phone' => '123-123-123',
+		]);
+		$lead2 = $this->haveLead([
+			'source_id' => 1,
+			'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
+			'name' => __METHOD__,
+			'phone' => '123-123-123',
+		]);
+		$lead3 = $this->haveLead([
+			'source_id' => 1,
+			'status_id' => 2,
+			'name' => __METHOD__,
+			'phone' => '123-123-123',
+		]);
+
+		$status = LeadStatusInterface::STATUS_ARCHIVE;
+		$this->giveForm([
+			'lead' => $lead1,
+			'details' => 'Report same contacts as archive',
+			'status_id' => $status,
+			'owner_id' => 1,
+		]);
+
+		$this->model->withSameContacts = false;
+		$this->thenSuccessSave();
+		$this->thenSeeLead([
+			'id' => $lead1->getId(),
+			'status_id' => $status,
+		]);
+		$this->thenSeeLead([
+			'id' => $lead2->getId(),
+			'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
+		]);
+		$this->thenSeeLead([
+			'id' => $lead3->getId(),
+			'status_id' => 2,
+		]);
+
+		$this->thenSeeReport([
+			'lead_id' => $lead1->getId(),
+			'status_id' => $status,
+			'old_status_id' => LeadStatusInterface::STATUS_NEW,
+			'details' => 'Report same contacts as archive',
+		]);
+
+		$this->thenDontSeeReport([
+			'lead_id' => $lead2->getId(),
+			'status_id' => $status,
+			'old_status_id' => LeadStatusInterface::STATUS_ARCHIVE,
+		]);
+		$this->thenDontSeeReport([
+			'lead_id' => $lead3->getId(),
+			'status_id' => $status,
+			'old_status_id' => 2,
+		]);
+	}
+
 	private function haveLead(array $attributes): ActiveLead {
 		if (empty($attributes['data'])) {
 			$attributes['data'] = Json::encode($attributes);
@@ -252,6 +379,10 @@ class ReportFormTest extends Unit {
 		$this->tester->seeRecord(LeadReport::class, $attributes);
 	}
 
+	private function thenDontSeeReport(array $attributes) {
+		$this->tester->dontSeeRecord(LeadReport::class, $attributes);
+	}
+
 	private function thenSeeAnswer(int $question_id, string $answer = null, int $report_id = null) {
 		return $this->tester->seeRecord(LeadAnswer::class, [
 			'question_id' => $question_id,
@@ -263,4 +394,5 @@ class ReportFormTest extends Unit {
 	public function getModel(): Model {
 		return $this->model;
 	}
+
 }

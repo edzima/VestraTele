@@ -219,6 +219,7 @@ class LeadSearch extends Lead implements SearchModel {
 			$query = clone $query;
 			$query->select(Lead::tableName() . '.id');
 			$this->applyDuplicates($query);
+			$query->orderBy(['date_at' => SORT_DESC]);
 			$this->ids = $query->column();
 		}
 		return $this->ids;

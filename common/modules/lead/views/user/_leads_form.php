@@ -16,17 +16,13 @@ use yii\web\View;
 		'id' => 'leads-user-form',
 	]); ?>
 
-	<?= $model->scenario !== LeadsUserForm::SCENARIO_SINGLE
-		? $form->field($model, 'leadsIds')->widget(Select2::class, [
-			'data' => LeadsUserForm::getLeadsIds(),
-			'options' => [
-				'multiple' => true,
-			],
-		]) : '' ?>
 
 	<?= $form->field($model, 'userId')->widget(Select2::class, [
 		'data' => LeadsUserForm::getUsersNames(),
 	]) ?>
+
+	<?= Html::hiddenInput('leadsIds', implode(',', $model->leadsIds)) ?>
+
 
 	<?= $form->field($model, 'type')->dropDownList($model->getTypesNames()) ?>
 

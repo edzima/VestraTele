@@ -4,12 +4,14 @@ use common\helpers\Html;
 use common\modules\lead\models\forms\ReportForm;
 use common\widgets\address\AddressFormWidget;
 use kartik\select2\Select2;
+use yii\web\View;
 use yii\widgets\ActiveForm;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $form ActiveForm|null */
 /* @var $formOptions array */
 /* @var $model ReportForm */
+/* @var $withSameContacts bool */
 
 ?>
 
@@ -17,6 +19,12 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'status_id')
 		->widget(Select2::class, ['data' => ReportForm::getStatusNames()]) ?>
+
+	<?= $withSameContacts
+		? $form->field($model, 'withSameContacts')->checkbox()
+		: ''
+	?>
+
 
 	<?= $form->field($model, 'withAddress')->checkbox() ?>
 	<div id="address-wrapper" class="address-wrapper<?= !$model->withAddress ? ' hidden' : '' ?>">

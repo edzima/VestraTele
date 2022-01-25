@@ -6,7 +6,9 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model LeadsUserForm */
 
-$this->title = Yii::t('lead', 'Assign User to Leads');
+$this->title = Yii::t('lead', 'Assign User to Leads: {count}', [
+	'count' => count($model->leadsIds),
+]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Users'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
