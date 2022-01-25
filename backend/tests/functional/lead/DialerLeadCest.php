@@ -45,7 +45,7 @@ class DialerLeadCest {
 		$I->amLoggedIn();
 		$I->assignPermission(static::PERMISSION);
 		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->seeFlash('Not Found Lead User as Dialer', Flash::TYPE_WARNING);
+		$I->seeFlash('Not Found Lead with Dialers.', Flash::TYPE_WARNING);
 		$I->seeInCurrentUrl(LeadCest::ROUTE_INDEX);
 	}
 

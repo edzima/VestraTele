@@ -46,12 +46,7 @@ class LeadFixtureHelper {
 	}
 
 	public static function leads(): array {
-		return array_merge([
-			static::TYPE => [
-				'class' => TypeFixture::class,
-				'dataFile' => static::dataDir() . 'type.php',
-			],
-		],
+		return array_merge(
 			static::lead(),
 			static::source(),
 			static::status(),
