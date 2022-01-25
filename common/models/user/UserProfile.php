@@ -23,6 +23,7 @@ use yii\db\ActiveRecord;
  * @property string $phone_2
  * @property string $tax_office
  * @property string $pesel
+ * @property bool $email_hidden_in_frontend_issue
  */
 class UserProfile extends ActiveRecord {
 
@@ -70,7 +71,7 @@ class UserProfile extends ActiveRecord {
 			['other', 'string', 'max' => 1024],
 			[['phone', 'phone_2'], 'string', 'max' => 20],
 			[['pesel'], 'string', 'max' => 11],
-			[['tax_office'], 'string', 'max' => 100],
+			[['email_hidden_in_frontend_issue'], 'boolean'],
 			[['phone', 'phone_2'], PhoneValidator::class, 'country' => 'PL'],
 			[['firstname', 'lastname', 'avatar_path', 'website'], 'string', 'max' => 255],
 			[['firstname', 'lastname'], 'match', 'pattern' => '/[AaĄąBbCcĆćDdEeĘęFfGgHhIiJjKkLlŁłMmNnŃńOoÓóPpRrSsŚśTtUuWwYyZzŹźŻż]/iu'],
@@ -95,6 +96,7 @@ class UserProfile extends ActiveRecord {
 			'phone_2' => Yii::t('common', 'Phone number 2'),
 			'pesel' => Yii::t('common', 'PESEL'),
 			'tax_office' => Yii::t('settlement', 'Tax Office'),
+			'email_hidden_in_frontend_issue' => Yii::t('issue', 'Email hidden in Frontend Issue'),
 		];
 	}
 

@@ -8,6 +8,7 @@ use yii\widgets\ActiveForm;
 
 ?>
 
+
 <?= $form->field($model, 'firstname')->textInput(['maxlength' => true]) ?>
 
 <?= $form->field($model, 'lastname')->textInput(['maxlength' => true]) ?>
@@ -20,5 +21,8 @@ use yii\widgets\ActiveForm;
 
 <?= $form->field($model, 'phone_2')->textInput(['maxlength' => true]) ?>
 
+<?= $form->field($model, 'email_hidden_in_frontend_issue')->checkbox() ?>
+
 <?= $form->field($model, 'gender')->radioList(UserProfile::getGendersNames()) ?>
+
 

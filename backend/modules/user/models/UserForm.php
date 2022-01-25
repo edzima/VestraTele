@@ -234,6 +234,9 @@ class UserForm extends Model {
 		$profile->firstname = $this->getProfile()->firstname;
 		$profile->phone = $this->getProfile()->phone;
 		$profile->phone_2 = $this->getProfile()->phone_2;
+		$profile->gender = $this->getProfile()->gender;
+		$profile->email_hidden_in_frontend_issue = $this->getProfile()->email_hidden_in_frontend_issue;
+
 		return $profile->save();
 	}
 
