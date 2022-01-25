@@ -2,6 +2,7 @@
 
 use backend\widgets\Menu;
 use common\models\user\User;
+use common\models\user\Worker;
 use yii\web\View;
 
 /* @var $this View */
