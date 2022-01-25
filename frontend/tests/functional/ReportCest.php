@@ -64,6 +64,6 @@ class ReportCest {
 		$I->amLoggedInAs(UserFixtureHelper::AGENT_PETER_NOWAK);
 		$I->assignPermission(Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE);
 		$I->amOnPage([static::ROUTE_INDEX, 'user_id' => UserFixtureHelper::AGENT_AGNES_MILLER]);
-		$I->see('Report: agent2');
+		$I->see('Report: agnes-miller');
 	}
 }
