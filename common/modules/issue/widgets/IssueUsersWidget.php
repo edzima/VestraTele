@@ -6,6 +6,7 @@ use backend\helpers\Html;
 use Closure;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
+use common\models\user\User;
 use common\widgets\FieldsetDetailView;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -26,6 +27,7 @@ class IssueUsersWidget extends Widget {
 	public string $type;
 
 	public array $fieldsetOptions = [];
+	public bool $withCheckEmailVisibility = true;
 
 	public array $containerOptions = [
 		'class' => 'issue-users row',
@@ -48,7 +50,7 @@ class IssueUsersWidget extends Widget {
 					[
 						'attribute' => 'email',
 						'format' => 'email',
-						'visible' => !empty($user->email),
+						'visible' => $this->isEmailVisible($user),
 					],
 					[
 						'attribute' => 'profile.phone',
@@ -65,6 +67,13 @@ class IssueUsersWidget extends Widget {
 				],
 			],
 		];
+	}
+
+	public function isEmailVisible(User $user): bool {
+		if (empty($user->email)) {
+			return false;
+		}
+		return !$this->withCheckEmailVisibility || !$user->profile->email_hidden_in_frontend_issue;
 	}
 
 	/**

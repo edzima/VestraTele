@@ -4,11 +4,13 @@ namespace common\modules\issue\widgets;
 
 class IssueViewWidget extends IssueWidget {
 
-	public $usersLinks = true;
+	public bool $usersLinks = true;
+	public bool $userMailVisibilityCheck = false;
 
 	public function run(): string {
 		return $this->render('issue-view', [
 			'model' => $this->model,
+			'userMailVisibilityCheck' => $this->userMailVisibilityCheck,
 			'usersLinks' => $this->usersLinks,
 		]);
 	}

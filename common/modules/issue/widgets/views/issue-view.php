@@ -11,6 +11,7 @@ use yii\bootstrap\Html;
 /* @var $this yii\web\View */
 /* @var $model Issue */
 /* @var $usersLinks bool */
+/* @var $userMailVisibilityCheck bool */
 
 $provision = $model->getProvision();
 if ($provision) {
@@ -31,6 +32,7 @@ if ($provision) {
 				'model' => $model,
 				'type' => IssueUsersWidget::TYPE_CUSTOMERS,
 				'legendEncode' => !$usersLinks,
+				'withCheckEmailVisibility' => $userMailVisibilityCheck,
 				'legend' => static function (IssueUser $issueUser) use ($usersLinks): string {
 					$legend = $issueUser->getTypeWithUser();
 					if ($usersLinks) {
@@ -84,6 +86,7 @@ if ($provision) {
 				'model' => $model,
 				'type' => IssueUsersWidget::TYPE_WORKERS,
 				'legendEncode' => !$usersLinks,
+				'withCheckEmailVisibility' => $userMailVisibilityCheck,
 				'legend' => static function (IssueUser $issueUser) use ($usersLinks): string {
 					$legend = $issueUser->getTypeWithUser();
 					if ($usersLinks) {

@@ -81,6 +81,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= IssueViewWidget::widget([
 		'model' => $model,
 		'usersLinks' => false,
+		'userMailVisibilityCheck' => true,
 	]) ?>
 
 	<?= $summonDataProvider->getTotalCount() > 0
