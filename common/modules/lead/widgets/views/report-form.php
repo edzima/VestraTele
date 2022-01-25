@@ -11,6 +11,7 @@ use yii\widgets\ActiveForm;
 /* @var $form ActiveForm|null */
 /* @var $formOptions array */
 /* @var $model ReportForm */
+/* @var $withSameContacts bool */
 
 ?>
 
@@ -19,7 +20,7 @@ use yii\widgets\ActiveForm;
 	<?= $form->field($model, 'status_id')
 		->widget(Select2::class, ['data' => ReportForm::getStatusNames()]) ?>
 
-	<?= !empty($model->getSameContacts()) && $model->getModel()->isNewRecord
+	<?= $withSameContacts
 		? $form->field($model, 'withSameContacts')->checkbox()
 		: ''
 	?>

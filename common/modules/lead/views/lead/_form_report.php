@@ -70,6 +70,7 @@ use yii\widgets\ActiveForm;
 	<?= ReportFormWidget::widget([
 		'form' => $form,
 		'model' => $report,
+		'withSameContacts' => true,
 	]) ?>
 
 

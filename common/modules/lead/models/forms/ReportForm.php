@@ -71,7 +71,7 @@ class ReportForm extends Model {
 			[['!owner_id', 'status_id'], 'required'],
 			[
 				'withSameContacts', 'required', 'when' => function (): bool {
-				return !empty($this->getSameContacts()) && $this->getModel()->isNewRecord;
+				return $this->getModel()->isNewRecord;
 			},
 			],
 			['details', 'string'],
