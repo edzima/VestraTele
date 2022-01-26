@@ -238,3 +238,7 @@ div.required label:after {
 	}
 }
 
+th.kv-nowrap {
+	white-space: break-spaces;
+}
+
