@@ -60,9 +60,13 @@ $this->params['breadcrumbs'][] = $this->title;
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-			['class' => SerialColumn::class],
+			['class' => SerialColumn::class], // @todo to approval
 			[
 				'class' => IssueColumn::class,
+				'filterInputOptions' => [
+					'class' => 'input-sm form-control',
+					'id' => null,
+				],
 			],
 			[
 				'class' => IssueTypeColumn::class,
@@ -132,11 +136,18 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => AgentDataColumn::class,
 				'noWrap' => false,
 				'value' => 'issue.agent.fullName',
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+				],
 			],
 			[
 				'class' => CustomerDataColumn::class,
 				'value' => 'issue.customer.fullName',
 				'noWrap' => false,
+				'filterInputOptions' => [
+					'class' => 'input-sm form-control',
+					'id' => null,
+				],
 			],
 			[
 				'class' => DataColumn::class,
@@ -146,6 +157,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'width' => '124px',
 				'label' => Yii::t('common', 'Phone number'),
 				'noWrap' => true,
+				'filterInputOptions' => [
+					'class' => 'input-sm form-control',
+					'id' => null,
+					'placeholder' => Yii::t('common', 'Phone number'),
+				],
 			],
 			[
 				'class' => DataColumn::class,

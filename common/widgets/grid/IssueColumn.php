@@ -21,7 +21,7 @@ class IssueColumn extends DataColumn {
 
 	public function init(): void {
 		if (empty($this->label)) {
-			$this->label = Yii::t('common', 'Issue');
+			$this->label = Yii::t('issue', 'Issue');
 		}
 		if (!empty($this->viewBaseUrl) && !empty($this->linkOptions)) {
 			$this->format = 'raw';
@@ -34,7 +34,9 @@ class IssueColumn extends DataColumn {
 				return $model->getIssueName();
 			};
 		}
-
+		if (!isset($this->filterInputOptions['placeholder'])) {
+			$this->filterInputOptions['placeholder'] = Yii::t('issue', 'Issue Name');
+		}
 		$this->options['style'] = 'width:100px';
 		parent::init();
 	}

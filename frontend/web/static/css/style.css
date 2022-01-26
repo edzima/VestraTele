@@ -221,7 +221,6 @@ div.required label:after {
 }
 
 
-
 .pay-wrapper {
 	padding: 16px;
 	margin-bottom: 16px;
@@ -246,7 +245,30 @@ div.required label:after {
 	}
 }
 
+@media (max-width: 480px) {
+
+	.grid-view colgroup {
+		display: none;
+	}
+
+	.grid-view .filters td:first-child {
+		display: none;
+	}
+
+	.grid-view thead tr:first-child {
+		display: none;
+	}
+
+	.grid-view .select2-selection {
+		text-align: left;
+	}
+}
+
 th.kv-nowrap {
 	white-space: break-spaces;
 }
 
+
+.input-sm {
+	height: 30px;
+}

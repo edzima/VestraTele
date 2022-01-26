@@ -155,7 +155,7 @@ AppAsset::register($this);
 
 <footer class="footer">
 	<div class="container">
-		<p class="pull-right"> All Rights Reserved 2016 &copy; - EdziMa</p>
+		<p class="pull-right"> All Rights Reserved <?= date('Y') ?> &copy; - EdziMa</p>
 	</div>
 </footer>
 

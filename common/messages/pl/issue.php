@@ -40,4 +40,6 @@ return [
 	'Type' => 'Typ',
 	'Types' => 'Type',
 	'Entity' => 'Podmiot',
+	'Issue' => 'Sprawa',
+	'Issue Name' => 'Nr Sprawy',
 ];
