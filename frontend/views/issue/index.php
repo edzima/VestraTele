@@ -1,16 +1,21 @@
 <?php
 
+use common\models\issue\IssueInterface;
 use common\models\issue\IssueUser;
 use common\models\user\Worker;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\AgentDataColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
 use common\widgets\grid\IssueTypeColumn;
+use frontend\helpers\Html;
+use frontend\helpers\Url;
 use frontend\models\search\IssueSearch;
+use frontend\widgets\GridView;
+use frontend\widgets\issue\StageChangeButtonDropdown;
 use frontend\widgets\IssueColumn;
-use kartik\grid\GridView;
+use kartik\select2\Select2;
 use yii\grid\SerialColumn;
-use yii\helpers\Html;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
@@ -36,15 +41,24 @@ $this->params['breadcrumbs'][] = $this->title;
 		?>
 	</p>
 	<?php Pjax::begin(); ?>
-	<?= $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
+	<?php
+	//@todo remove this after migrate BS4 (add data-boundary="viewport")
+	//@see https://stackoverflow.com/questions/26018756/bootstrap-button-drop-down-inside-responsive-table-not-visible-because-of-scroll#answer-51992907
+	$this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
+	     $('.table-responsive').css('overflow', 'inherit' );
+		});
+
+		$('.table-responsive').on('hide.bs.dropdown', function () {
+            $('.table-responsive').css( 'overflow', 'auto' );
+	})"
+	);
+	?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'tableOptions' => [
-			'class' => 'ellipsis',
-		],
 		'columns' => [
 			['class' => SerialColumn::class],
 			[
@@ -52,22 +66,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => IssueTypeColumn::class,
-				'valueType' => IssueTypeColumn::VALUE_NAME,
 				'attribute' => 'type_id',
+				'noWrap' => true,
 			],
-			[
-				'class' => DataColumn::class,
-				'attribute' => 'stage_id',
-				'label' => $searchModel->getAttributeLabel('stage_id'),
-				'filter' => $searchModel->getStagesNames(),
-				'value' => 'issue.stage.short_name',
-				'contentOptions' => [
-					'class' => 'bold-text text-center',
-				],
-				'options' => [
-					'style' => 'width:60px',
-				],
-			],
+
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'entity_responsible_id',
@@ -77,38 +79,67 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filterWidgetOptions' => [
 					'pluginOptions' => [
 						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+
 					],
 					'options' => [
 						'placeholder' => $searchModel->getAttributeLabel('entity_responsible_id'),
 					],
+					'size' => Select2::SIZE_SMALL,
 				],
 				'value' => 'issue.entityResponsible.name',
-				'options' => [
-					'style' => 'width:200px',
-				],
 			],
 			[
 				'class' => DataColumn::class,
+				'attribute' => 'stage_id',
+				'label' => $searchModel->getAttributeLabel('stage_id'),
+				'filter' => $searchModel->getStagesNames(),
 				'filterType' => GridView::FILTER_SELECT2,
-				'attribute' => 'agent_id',
-				'label' => $searchModel->getAttributeLabel('agent_id'),
-				'value' => 'issue.agent.fullName',
-				'filter' => $searchModel->getAgentsList(),
 				'filterWidgetOptions' => [
+					'options' => [
+						'placeholder' => $searchModel->getAttributeLabel('stage_id'),
+					],
 					'pluginOptions' => [
 						'allowClear' => true,
-						'width' => '180px',
+						'dropdownAutoWidth' => true,
 					],
-					'options' => [
-						'placeholder' => $searchModel->getAttributeLabel('agent_id'),
-					],
+					'size' => Select2::SIZE_SMALL,
 				],
+				'value' => static function (IssueInterface $model): string {
+					if (Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE)) {
+						return StageChangeButtonDropdown::widget([
+							'model' => $model,
+							'label' => $model->getIssueStage()->name,
+							'containerOptions' => [
+								'class' => 'd-inline-flex',
+							],
+							'returnUrl' => Url::to('/issue/index'),
+							'options' => [
+								'class' => 'btn btn-default btn-sm',
+								'title' => Yii::t('issue', 'Change Stage'),
+								'aria-label' => Yii::t('issue', 'Change Stage'),
+								'data-pjax' => 0,
+							],
+						]);
+					}
+					return Html::encode($model->getIssueStage()->short_name);
+				},
+				'format' => 'raw',
+				'contentBold' => true,
+				'contentCenter' => true,
+			],
+			[
+				'class' => AgentDataColumn::class,
+				'noWrap' => false,
+				'value' => 'issue.agent.fullName',
 			],
 			[
 				'class' => CustomerDataColumn::class,
 				'value' => 'issue.customer.fullName',
+				'noWrap' => false,
 			],
 			[
+				'class' => DataColumn::class,
 				'attribute' => 'customerPhone',
 				'value' => 'issue.customer.profile.phone',
 				'format' => 'tel',
@@ -119,12 +150,10 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => DataColumn::class,
 				'attribute' => 'issue.created_at',
 				'format' => 'date',
-				'width' => '80px',
 			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'issue.updated_at',
-				'width' => '80px',
 				'format' => 'date',
 			],
 			[
