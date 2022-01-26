@@ -18,9 +18,17 @@ body {
 
 
 /* Large Devices, Wide Screens */
+@media only screen and (min-width: 768px) {
+	.wrap > .container {
+		width: calc(100vw - 16px);
+	}
+}
+
+/* Large Devices, Wide Screens */
 @media only screen and (min-width: 1400px) {
 	.wrap > .container {
 		width: 90%;
+		/*width: calc(100vw - 120px);*/
 	}
 }
 
