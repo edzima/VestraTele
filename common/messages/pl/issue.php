@@ -39,4 +39,5 @@ return [
 	'Stages' => 'Etapy',
 	'Type' => 'Typ',
 	'Types' => 'Type',
+	'Entity' => 'Podmiot',
 ];

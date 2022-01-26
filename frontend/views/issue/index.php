@@ -143,6 +143,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'customerPhone',
 				'value' => 'issue.customer.profile.phone',
 				'format' => 'tel',
+				'width' => '124px',
 				'label' => Yii::t('common', 'Phone number'),
 				'noWrap' => true,
 			],
@@ -150,11 +151,13 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => DataColumn::class,
 				'attribute' => 'issue.created_at',
 				'format' => 'date',
+				'noWrap' => true,
 			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'issue.updated_at',
 				'format' => 'date',
+				'noWrap' => true,
 			],
 			[
 				'class' => ActionColumn::class,

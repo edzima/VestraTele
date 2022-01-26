@@ -2,9 +2,9 @@
 
 namespace common\widgets\grid;
 
+use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use Yii;
-use yii\helpers\Html;
 
 class IssueColumn extends DataColumn {
 
@@ -14,6 +14,7 @@ class IssueColumn extends DataColumn {
 
 	public array $linkOptions = [
 		'target' => '_blank',
+		'data-pjax' => '0',
 	];
 
 	public ?string $viewBaseUrl = null;
@@ -25,10 +26,7 @@ class IssueColumn extends DataColumn {
 		if (!empty($this->viewBaseUrl) && !empty($this->linkOptions)) {
 			$this->format = 'raw';
 			$this->value = function (IssueInterface $model): string {
-				return Html::a(
-					$model->getIssueName(),
-					[$this->viewBaseUrl, 'id' => $model->getIssueId()],
-					$this->linkOptions);
+				return $this->renderIssueLink($model);
 			};
 		}
 		if (empty($this->value)) {
@@ -39,6 +37,12 @@ class IssueColumn extends DataColumn {
 
 		$this->options['style'] = 'width:100px';
 		parent::init();
+	}
+
+	public function renderIssueLink(IssueInterface $model): string {
+		return Html::a($model->getIssueName(),
+			[$this->viewBaseUrl, 'id' => $model->getIssueId()],
+			$this->linkOptions);
 	}
 
 }
