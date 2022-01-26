@@ -12,6 +12,7 @@ use common\models\user\Worker;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
+use common\widgets\grid\IssueTypeColumn;
 use kartik\grid\SerialColumn;
 use kartik\select2\Select2;
 use yii\data\ActiveDataProvider;
@@ -104,26 +105,8 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 			],
 			[
-				'class' => DataColumn::class,
+				'class' => IssueTypeColumn::class,
 				'attribute' => 'type_id',
-				'filter' => IssueSearch::getIssueTypesNames(),
-				'value' => 'type.short_name',
-				'contentBold' => true,
-				'contentCenter' => true,
-				'options' => [
-					'style' => 'width:80px',
-				],
-				'filterInputOptions' => [
-					'placeholder' => Yii::t('issue', 'Type'),
-				],
-				'filterType' => GridView::FILTER_SELECT2,
-				'filterWidgetOptions' => [
-					'size' => Select2::SIZE_SMALL,
-					'pluginOptions' => [
-						'allowClear' => true,
-						'dropdownAutoWidth' => true,
-					],
-				],
 			],
 			[
 				'class' => CustomerDataColumn::class,
