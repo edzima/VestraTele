@@ -13,7 +13,6 @@ class AgentDataColumn extends DataColumn {
 
 	public $attribute = 'agent_id';
 	public $value = 'agent.fullName';
-	public $width = '250px';
 
 	public function init(): void {
 		if (empty($this->label)) {
@@ -38,6 +37,9 @@ class AgentDataColumn extends DataColumn {
 				'options' => [
 					'multiple' => true,
 					'placeholder' => $this->label,
+				],
+				'pluginOptions' => [
+					'dropdownAutoWidth' => true,
 				],
 				'size' => Select2::SIZE_SMALL,
 				'showToggleAll' => false,
