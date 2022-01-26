@@ -213,7 +213,7 @@ abstract class IssueSearch extends Model
 	}
 
 	public static function getIssueTypesNames(): array {
-		return IssueType::getTypesNames();
+		return IssueType::getTypesNamesWithShort();
 	}
 
 	public function applyIssueTypeFilter(QueryInterface $query): void {
