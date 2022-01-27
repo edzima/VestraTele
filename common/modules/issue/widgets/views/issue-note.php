@@ -12,7 +12,7 @@ use yii\helpers\Html;
 
 <?= Html::beginTag('div', $options) ?>
 <div class="panel-heading">
-	<h3 class="panel-title"><?= $model->title ?>
+	<h3 class="panel-title text-uppercase"><?= $model->title ?>
 		<span class="pull-right"><?= $model->user ?></span>
 	</h3>
 </div>

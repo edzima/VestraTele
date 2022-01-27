@@ -42,6 +42,11 @@ div.required label:after {
 	overflow: hidden;
 }
 
+.text-uppercase {
+	text-transform: uppercase;
+}
+
+
 @media (min-width: 776px) {
 	.table-fixed-layout {
 		table-layout: fixed;
