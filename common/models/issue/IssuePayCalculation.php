@@ -59,8 +59,6 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	private static ?array $STAGES_NAMES = null;
 	private static ?array $OWNER_NAMES = null;
 
-	private static array $USER_PROVISIONS_SUM = [];
-
 	public function afterSave($insert, $changedAttributes): void {
 		parent::afterSave($insert, $changedAttributes);
 		$this->issue->markAsUpdate();
@@ -197,43 +195,23 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 		return Url::settlementView($this->getId(), true);
 	}
 
-	public function getUserProvisionsSum(int $id): Decimal {
-		if (!isset(static::$USER_PROVISIONS_SUM[$id])) {
-			$sum = (string) $this->getPays()
-				->joinWith([
-					'provisions PR' => function (ProvisionQuery $query) use ($id): void {
-						$query->user($id);
-					},
-				])
-				->sum('PR.value');
-			if (empty($sum)) {
-				$sum = 0;
-			}
-			static::$USER_PROVISIONS_SUM[$id] = new Decimal($sum);
-		}
-		return static::$USER_PROVISIONS_SUM[$id];
-	}
-
 	public function isForUser(int $id): bool {
 		return $this->owner_id === $id ||
 			$this->issue->isForUser($id);
 	}
 
+	public function getProvisionsSum(): Decimal {
+		return Yii::$app->provisions->sumProvision($this->pays);
+	}
+
+	public function getUserProvisionsSum(int $id): Decimal {
+		return Yii::$app->provisions->sumProvision($this->pays, $id);
+	}
+
 	public function getUserProvisionsSumNotPay(int $id): Decimal {
-		if (!$this->getUserProvisionsSum($id)->isPositive()) {
-			return new Decimal(0);
-		}
-		$sum = (string) $this->getNotPayedPays()
-			->joinWith([
-				'provisions PR' => function (ProvisionQuery $query) use ($id): void {
-					$query->user($id);
-				},
-			])
-			->sum('PR.value');
-		if (empty($sum)) {
-			$sum = 0;
-		}
-		return new Decimal($sum);
+		/** @var IssuePay[] $pays */
+		$pays = Yii::$app->pay->notPayedFilter($this->pays);
+		return Yii::$app->provisions->sumProvision($pays, $id);
 	}
 
 	public function getCosts(): ActiveQuery {

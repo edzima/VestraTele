@@ -10,6 +10,7 @@ use common\models\user\Worker;
 use frontend\helpers\Url;
 use frontend\models\search\IssuePayCalculationSearch;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -38,6 +39,9 @@ class SettlementController extends Controller {
 		$searchModel->issueUsersIds = $ids;
 
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		/** @var ActiveQuery $query */
+		$query = $dataProvider->query;
+		$query->with('pays.provisions');
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,

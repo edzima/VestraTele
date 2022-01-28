@@ -36,7 +36,7 @@ class IssuePayCalculationGrid extends GridView {
 
 	public $userProvisionsId = null;
 
-	public string $valueTypeIssueType = IssueTypeColumn::VALUE_NAME;
+	public string $valueTypeIssueType = IssueTypeColumn::VALUE_SHORT;
 
 	public bool $withAgent = true;
 
@@ -73,7 +73,6 @@ class IssuePayCalculationGrid extends GridView {
 
 	public function defaultColumns(): array {
 		return [
-			$this->actionColumn(),
 			[
 				'class' => $this->issueColumn,
 				'visible' => $this->withIssue,
@@ -140,18 +139,12 @@ class IssuePayCalculationGrid extends GridView {
 				'class' => CurrencyColumn::class,
 				'pageSummary' => $this->withValueSummary,
 				'attribute' => 'value',
+				'contentBold' => false,
 			],
 			[
 				'class' => CurrencyColumn::class,
 				'attribute' => 'valueToPay',
 				'pageSummary' => $this->withValueSummary,
-				'pageSummaryFunc' => function (array $decimals): Decimal {
-					$sum = new Decimal(0);
-					foreach ($decimals as $decimal) {
-						$sum = $sum->add($decimal);
-					}
-					return $sum;
-				},
 			],
 			/*
 			[
@@ -167,9 +160,8 @@ class IssuePayCalculationGrid extends GridView {
 			*/
 			[
 				'class' => CurrencyColumn::class,
-
 				'attribute' => 'userProvisionsSum',
-				'format' => 'currency',
+				'contentBold' => false,
 				'visible' => $this->userProvisionsId !== null,
 				'pageSummary' => true,
 				'value' => function (IssuePayCalculation $model): ?Decimal {
@@ -177,17 +169,10 @@ class IssuePayCalculationGrid extends GridView {
 						? null
 						: $model->getUserProvisionsSum($this->userProvisionsId);
 				},
-				'pageSummaryFunc' => function ($decimals): Decimal {
-					$sum = new Decimal(0);
-					foreach ($decimals as $decimal) {
-						$sum = $sum->add($decimal);
-					}
-					return $sum;
-				},
 			],
 			[
+				'class' => CurrencyColumn::class,
 				'attribute' => 'userProvisionsSumNotPay',
-				'format' => 'currency',
 				'visible' => $this->userProvisionsId !== null,
 				'pageSummary' => true,
 				'value' => function (IssuePayCalculation $model): ?Decimal {
@@ -195,13 +180,6 @@ class IssuePayCalculationGrid extends GridView {
 						return new Decimal(0);
 					}
 					return $model->getUserProvisionsSumNotPay($this->userProvisionsId);
-				},
-				'pageSummaryFunc' => function ($decimals): Decimal {
-					$sum = new Decimal(0);
-					foreach ($decimals as $decimal) {
-						$sum = $sum->add($decimal);
-					}
-					return $sum;
 				},
 			],
 			[
@@ -216,6 +194,7 @@ class IssuePayCalculationGrid extends GridView {
 				'noWrap' => true,
 				'visible' => $this->withDates,
 			],
+			$this->actionColumn(),
 		];
 	}
 

@@ -236,7 +236,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	}
 
 	public static function getIssueTypesNames(): array {
-		return IssueType::getTypesNames();
+		return IssueType::getTypesNamesWithShort();
 	}
 
 	public static function getIssueStagesNames(): array {

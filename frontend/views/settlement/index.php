@@ -12,11 +12,10 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('frontend', 'Yours settlements');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/index']];
-
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<div class="issue-index">
+<div class="settlement-index">
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
