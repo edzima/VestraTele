@@ -16,7 +16,6 @@ use Decimal\Decimal;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-use yii\base\Model;
 
 class Provisions extends Component {
 
@@ -28,6 +27,24 @@ class Provisions extends Component {
 		'type_id',
 		'percent',
 	];
+
+	/**
+	 * @param IssuePay[] $pays
+	 * @param int|null $to_user_id
+	 * @return Decimal
+	 */
+	public function sumProvision(array $pays, int $to_user_id = null): Decimal {
+		$sum = new Decimal(0);
+		foreach ($pays as $pay) {
+			$provisions = $pay->provisions;
+			foreach ($provisions as $provision) {
+				if ($to_user_id === null || $provision->to_user_id === $to_user_id) {
+					$sum = $sum->add($provision->getValue());
+				}
+			}
+		}
+		return $sum;
+	}
 
 	public function removeForPays(array $ids): int {
 		if (!empty($ids)) {
