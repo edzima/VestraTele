@@ -3,6 +3,7 @@
 namespace frontend\tests\functional;
 
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\models\user\User;
 use frontend\controllers\IssueController;
 use frontend\tests\_support\CustomerServiceTester;
@@ -24,6 +25,21 @@ class IssueIndexCest {
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->dontSeeMenuLink('Issues');
+	}
+
+	public function checkGrid(IssueUserTester $I): void {
+		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		$I->amLoggedInAs(UserFixtureHelper::AGENT_PETER_NOWAK);
+		$I->amOnPage(static::ROUTE_INDEX);
+		$I->seeInGridHeader('Issue');
+		$I->seeInGridHeader('Type');
+		$I->seeInGridHeader('Entity');
+		$I->seeInGridHeader('Stage');
+		$I->seeInGridHeader('Agent');
+		$I->seeInGridHeader('Customer');
+		$I->seeInGridHeader('Phone');
+		$I->see('Updated At');
+		$I->see('Notes');
 	}
 
 	public function checkAsAgent(FunctionalTester $I): void {

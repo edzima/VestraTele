@@ -21,13 +21,21 @@ class TooltipAsset extends AssetBundle {
 
 	public static function initScript(?string $selector = null, array $options = []): string {
 		if ($selector === null) {
-			$selector = '[' . static::DEFAULT_ATTRIBUTE_NAME . ']';
+			$selector = static::defaultSelector();
 		}
 		if (!empty($options)) {
 			$json = Json::encode($options);
 			return "tippy('$selector', $json);";
 		}
 		return "tippy('$selector');";
+	}
+
+	public static function defaultSelector(string $parent = ''): string {
+		$selector = '[' . static::DEFAULT_ATTRIBUTE_NAME . ']';
+		if ($parent) {
+			$selector = $parent . ' ' . $selector;
+		}
+		return $selector;
 	}
 
 }

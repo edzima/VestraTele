@@ -16,16 +16,17 @@ class DataColumn extends BaseDataColumn {
 	public bool $contentCenter = false;
 	public bool $ellipsis = false;
 
-	public function init() {
+	protected function fetchContentOptions($model, $key, $index): array {
+		$options = parent::fetchContentOptions($model, $key, $index);
 		if ($this->contentBold) {
-			Html::addCssStyle($this->contentOptions, 'font-weight:bold');
+			Html::addCssStyle($options, 'font-weight:bold');
 		}
 		if ($this->contentCenter) {
-			Html::addCssClass($this->contentOptions, 'text-center');
+			Html::addCssClass($options, 'text-center');
 		}
 		if ($this->ellipsis) {
-			Html::addCssClass($this->contentOptions, 'ellipsis');
+			Html::addCssClass($options, 'ellipsis');
 		}
-		parent::init();
+		return $options;
 	}
 }

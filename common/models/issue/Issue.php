@@ -272,7 +272,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getClientCity() {
 		return $this->hasOne(City::class, ['id' => 'client_city_id'])->cache();
@@ -308,7 +308,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getVictimCity() {
 		if ($this->victim_city_id === null) {
@@ -352,7 +352,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	public function getIssueNotes(): IssueNoteQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])
-			->with('user')->orderBy('publish_at DESC');
+			->orderBy('publish_at DESC');
 	}
 
 	public function getSummons(): ActiveQuery {

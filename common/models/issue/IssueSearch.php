@@ -6,7 +6,6 @@ use common\models\AddressSearch;
 use common\models\AgentSearchInterface;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
-use common\models\issue\query\IssueUserQuery;
 use common\models\issue\search\ArchivedIssueSearch;
 use common\models\issue\search\IssueTypeSearch;
 use common\models\query\PhonableQuery;
@@ -138,6 +137,7 @@ abstract class IssueSearch extends Model
 			'entityResponsible',
 			'stage.types',
 			'type',
+			'issueNotes',
 		];
 	}
 

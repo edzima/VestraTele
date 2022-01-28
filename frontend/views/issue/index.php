@@ -1,8 +1,8 @@
 <?php
 
 use common\models\issue\IssueInterface;
-use common\models\issue\IssueUser;
 use common\models\user\Worker;
+use common\modules\issue\IssueNoteColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AgentDataColumn;
 use common\widgets\grid\CustomerDataColumn;
@@ -52,7 +52,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 		$('.table-responsive').on('hide.bs.dropdown', function () {
             $('.table-responsive').css( 'overflow', 'auto' );
-	})"
+		});
+		"
 	);
 	?>
 
@@ -165,40 +166,37 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => DataColumn::class,
-				'attribute' => 'issue.created_at',
-				'format' => 'date',
-				'noWrap' => true,
-			],
-			[
-				'class' => DataColumn::class,
 				'attribute' => 'issue.updated_at',
 				'format' => 'date',
 				'noWrap' => true,
 			],
 			[
+				'class' => IssueNoteColumn::class,
+			],
+			[
 				'class' => ActionColumn::class,
 				'template' => '{note} {sms} {view}',
 				'visibleButtons' => [
-					'view' => static function (IssueUser $model) use ($searchModel) {
-						return !$model->issue->isArchived() || $searchModel->withArchive;
+					'view' => static function (IssueInterface $model) use ($searchModel) {
+						return !$model->getIssueModel()->isArchived() || $searchModel->withArchive;
 					},
 					'note' => Yii::$app->user->can(Worker::PERMISSION_NOTE),
 					'sms' => Yii::$app->user->can(Worker::PERMISSION_SMS),
 
 				],
 				'buttons' => [
-					'note' => static function (string $url, IssueUser $model): string {
+					'note' => static function (string $url, IssueInterface $model): string {
 						return Html::a('<i class="fa fa-comments" aria-hidden="true"></i>',
-							['note/issue', 'id' => $model->issue_id],
+							['note/issue', 'id' => $model->getIssueId()],
 							[
 								'title' => Yii::t('issue', 'Create Issue Note'),
 								'aria-label' => Yii::t('issue', 'Create Issue Note'),
 							]
 						);
 					},
-					'sms' => static function (string $url, IssueUser $model): string {
+					'sms' => static function (string $url, IssueInterface $model): string {
 						return Html::a('<i class="fa fa-envelope" aria-hidden="true"></i>',
-							['issue-sms/push', 'id' => $model->issue_id],
+							['issue-sms/push', 'id' => $model->getIssueId()],
 							[
 								'title' => Yii::t('common', 'Send SMS'),
 								'aria-label' => Yii::t('common', 'Send SMS'),

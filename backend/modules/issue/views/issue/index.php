@@ -9,6 +9,7 @@ use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
 use common\models\issue\Issue;
 use common\models\user\Worker;
+use common\modules\issue\IssueNoteColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
@@ -196,6 +197,9 @@ $this->params['breadcrumbs'][] = $this->title;
 				'options' => [
 					'style' => 'width:90px',
 				],
+			],
+			[
+				'class' => IssueNoteColumn::class,
 			],
 			[
 				'class' => ActionColumn::class,
