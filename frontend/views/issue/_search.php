@@ -1,7 +1,7 @@
 <?php
 
 use common\widgets\ActiveForm;
-use common\widgets\DateTimeWidget;
+use common\widgets\DateWidget;
 use frontend\helpers\Html;
 use frontend\models\search\IssueSearch;
 
@@ -19,10 +19,10 @@ use frontend\models\search\IssueSearch;
 	<div class="row">
 
 		<?= $form->field($model, 'createdAtFrom', ['options' => ['class' => 'col-md-3 col-lg-2']])
-			->widget(DateTimeWidget::class) ?>
+			->widget(DateWidget::class) ?>
 
 		<?= $form->field($model, 'createdAtTo', ['options' => ['class' => 'col-md-3 col-lg-2']])
-			->widget(DateTimeWidget::class) ?>
+			->widget(DateWidget::class) ?>
 
 	</div>
 
