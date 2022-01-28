@@ -43,6 +43,10 @@ abstract class IssueSearch extends Model
 	public string $customerLastname = '';
 	public string $customerPhone = '';
 
+	public $noteFilter;
+
+	public const NOTE_ONLY_PINNED = 'only-pinned';
+
 	public bool $withArchive = false;
 
 	public $agent_id;
@@ -61,6 +65,7 @@ abstract class IssueSearch extends Model
 					'issue_id', 'agent_id', 'stage_id', 'entity_responsible_id',
 				], 'integer',
 			],
+			['noteFilter', 'string'],
 			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			['type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
@@ -79,7 +84,7 @@ abstract class IssueSearch extends Model
 	 */
 	public function attributeLabels(): array {
 		return array_merge([
-			'issue_id' => Yii::t('common', 'Issue'),
+			'issue_id' => Yii::t('issue', 'Issue'),
 			'createdAtFrom' => Yii::t('common', 'Created at from'),
 			'createdAtTo' => Yii::t('common', 'Created at to'),
 			'agent_id' => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
@@ -111,6 +116,7 @@ abstract class IssueSearch extends Model
 		$this->applyCustomerSurnameFilter($query);
 		$this->applyCustomerPhoneFilter($query);
 		$this->applyCreatedAtFilter($query);
+		$this->applyNotesFilter($query);
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
 			Issue::tableName() . '.stage_id' => $this->stage_id,
@@ -218,5 +224,14 @@ abstract class IssueSearch extends Model
 
 	public function applyIssueTypeFilter(QueryInterface $query): void {
 		$query->andFilterWhere([Issue::tableName() . '.type_id' => $this->type_id]);
+	}
+
+	private function applyNotesFilter(IssueQuery $query) {
+		switch ($this->noteFilter) {
+			case static::NOTE_ONLY_PINNED:
+				$query->joinWith('issueNotes');
+				$query->andWhere([IssueNote::tableName() . '.is_pinned' => true]);
+				break;
+		}
 	}
 }

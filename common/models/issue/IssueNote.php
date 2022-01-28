@@ -170,6 +170,12 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 		];
 	}
 
+	public static function pinnedNotesFilter(array $notes): array {
+		return array_filter($notes, static function (IssueNote $note) {
+			return $note->isPinned();
+		});
+	}
+
 	/**
 	 * @inheritdoc
 	 * @return IssueNoteQuery the active query used by this AR class.

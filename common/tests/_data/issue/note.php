@@ -9,6 +9,7 @@ return [
 		'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
 		'issue_id' => 1,
 		'publish_at' => '2020-01-01',
+		'is_pinned' => true,
 	],
 	'stage-change' => [
 		'title' => 'Proposal (previous: Completing documents)',

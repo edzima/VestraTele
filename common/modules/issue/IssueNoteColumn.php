@@ -6,12 +6,14 @@ use common\assets\TooltipAsset;
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueNote;
+use common\models\issue\IssueSearch;
 use common\widgets\grid\DataColumn;
 use common\widgets\GridView;
 use Yii;
 
 class IssueNoteColumn extends DataColumn {
 
+	public $attribute = 'noteFilter';
 	public $noWrap = true;
 	public bool $contentCenter = true;
 	public $format = 'html';
@@ -31,6 +33,11 @@ class IssueNoteColumn extends DataColumn {
 				)
 			);
 		});
+		if ($this->filter === null && $this->grid->filterModel instanceof IssueSearch) {
+			$this->filter = [
+				IssueSearch::NOTE_ONLY_PINNED => Yii::t('issue', 'Only Pinned'),
+			];
+		}
 	}
 
 	public function getDataCellValue($model, $key, $index): string {
@@ -39,7 +46,7 @@ class IssueNoteColumn extends DataColumn {
 		if (empty($issue->issueNotes)) {
 			return 0;
 		}
-		$pinned = static::pinnedNotesFilter($issue->issueNotes);
+		$pinned = IssueNote::pinnedNotesFilter($issue->issueNotes);
 		if (empty($pinned)) {
 			return count($issue->issueNotes);
 		}
@@ -56,17 +63,12 @@ class IssueNoteColumn extends DataColumn {
 		if (!empty($notes)) {
 			$last = reset($notes);
 			$options[TooltipAsset::DEFAULT_ATTRIBUTE_NAME] = Html::encode($last->title);
-			if (!empty($this->pinnedContentClass) && !empty(static::pinnedNotesFilter($notes))) {
+			if (!empty($this->pinnedContentClass) && !empty(IssueNote::pinnedNotesFilter($notes))) {
 				Html::addCssClass($options, $this->pinnedContentClass);
 			}
 		}
 		return $options;
 	}
 
-	public static function pinnedNotesFilter(array $notes): array {
-		return array_filter($notes, static function (IssueNote $note) {
-			return $note->isPinned();
-		});
-	}
 
 }

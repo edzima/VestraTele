@@ -8,7 +8,9 @@ use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\Issue;
+use common\models\issue\IssueNote;
 use common\models\settlement\PayedInterface;
+use common\modules\issue\IssueNoteColumn;
 use common\tests\_support\UnitSearchModelTrait;
 use Yii;
 
@@ -27,6 +29,7 @@ class IssueSearchTest extends Unit {
 			$this->tester->haveFixtures(
 				array_merge(
 					IssueFixtureHelper::fixtures(),
+					IssueFixtureHelper::note(),
 					SettlementFixtureHelper::settlement(),
 					SettlementFixtureHelper::pay(),
 				)
@@ -275,6 +278,15 @@ class IssueSearchTest extends Unit {
 		$this->model->onlyWithPayedPay = true;
 		$this->model->onlyWithSettlements = false;
 		$this->tester->assertEmpty($this->getModels());
+	}
+
+	public function testOnlyPinnedNotesFilter(): void {
+		$this->model->noteFilter = IssueSearch::NOTE_ONLY_PINNED;
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertNotEmpty(IssueNote::pinnedNotesFilter($model->issueNotes));
+		}
 	}
 
 	public function testOnlyWithAllPayed(): void {

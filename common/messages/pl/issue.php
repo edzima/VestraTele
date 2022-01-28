@@ -42,4 +42,5 @@ return [
 	'Entity' => 'Podmiot',
 	'Issue' => 'Sprawa',
 	'Issue Name' => 'Nr Sprawy',
+	'Only Pinned' => 'Przypięte',
 ];
