@@ -153,6 +153,7 @@ return [
 	'Link users' => 'Przypisz użytkownika',
 	'Link Users' => 'Przypisz użytkownika',
 	'Link Users ({count})' => 'Przypisz Użytkowników ({count})',
+	'Without Archives' => 'Bez Archiwum',
 	'Without User' => 'Brak Użytkownika',
 	'Without Report' => 'Brak Raportu',
 	'With Address' => 'Adres',

@@ -11,6 +11,7 @@ use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\query\LeadAnswerQuery;
@@ -40,6 +41,9 @@ class LeadSearch extends Lead implements SearchModel {
 	public bool $withoutReport = false;
 	public bool $duplicateEmail = false;
 	public bool $duplicatePhone = false;
+
+	public bool $withoutArchives = true;
+
 	public $name = '';
 	public $user_id;
 	public $user_type;
@@ -72,13 +76,12 @@ class LeadSearch extends Lead implements SearchModel {
 			[['id', 'status_id', 'type_id', 'source_id', 'campaign_id', 'dialer_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
-			[['withoutUser', 'withoutReport', 'duplicatePhone', 'duplicateEmail'], 'boolean'],
+			[['withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail'], 'boolean'],
 			['name', 'string', 'min' => 3],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
-
 			[array_keys($this->questionsAttributes), 'safe'],
 			['phone', PhoneValidator::class],
 		];
@@ -88,6 +91,7 @@ class LeadSearch extends Lead implements SearchModel {
 		return array_merge(
 			parent::attributeLabels(),
 			[
+				'withoutArchives' => Yii::t('lead', 'Without Archives'),
 				'withoutUser' => Yii::t('lead', 'Without User'),
 				'withoutReport' => Yii::t('lead', 'Without Report'),
 				'user_id' => Yii::t('lead', 'User'),
@@ -189,13 +193,13 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyNameFilter($query);
 		$this->applyUserFilter($query);
 		$this->applyPhoneFilter($query);
+		$this->applyStatusFilter($query);
 		$this->applyReportFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
 			Lead::tableName() . '.id' => $this->id,
 			Lead::tableName() . '.date_at' => $this->date_at,
-			Lead::tableName() . '.status_id' => $this->status_id,
 			Lead::tableName() . '.campaign_id' => $this->campaign_id,
 			Lead::tableName() . '.source_id' => $this->source_id,
 			Lead::tableName() . '.provider' => $this->provider,
@@ -379,6 +383,16 @@ class LeadSearch extends Lead implements SearchModel {
 		if (!empty($this->phone)) {
 			$query->withPhoneNumber($this->phone);
 		}
+	}
+
+	private function applyStatusFilter(LeadQuery $query): void {
+		if ((int) $this->status_id === LeadStatusInterface::STATUS_ARCHIVE) {
+			$this->withoutArchives = false;
+		}
+		if ($this->withoutArchives && empty($this->status_id)) {
+			$query->andWhere(['<>', Lead::tableName() . '.status_id', LeadStatusInterface::STATUS_ARCHIVE]);
+		}
+		$query->andFilterWhere([Lead::tableName() . '.status_id' => $this->status_id]);
 	}
 
 }

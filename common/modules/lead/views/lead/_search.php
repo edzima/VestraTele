@@ -99,6 +99,8 @@ use yii\helpers\Html;
 		])
 		?>
 
+		<?= $form->field($model, 'withoutArchives', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
+
 		<?= $form->field($model, 'withoutReport', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
 
