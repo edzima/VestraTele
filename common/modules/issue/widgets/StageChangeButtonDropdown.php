@@ -7,6 +7,7 @@ use backend\modules\issue\models\IssueStageChangeForm;
 use common\models\issue\IssueInterface;
 use Yii;
 use yii\bootstrap\ButtonDropdown;
+use yii\helpers\ArrayHelper;
 
 class StageChangeButtonDropdown extends ButtonDropdown {
 
@@ -39,6 +40,7 @@ class StageChangeButtonDropdown extends ButtonDropdown {
 	public function defaultItems(): array {
 		$stages = IssueStageChangeForm::getStagesNames($this->model->getIssueType()->id);
 		unset($stages[$this->model->getIssueStage()->id]);
+		asort($stages);
 		$items = [];
 		foreach ($stages as $id => $stage) {
 			$items[] = [
