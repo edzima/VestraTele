@@ -16,7 +16,10 @@ use yii\widgets\ActiveForm;
 <div id="issue-search" class="issue-search">
 
 	<?php $form = ActiveForm::begin([
-		'action' => ['index'],
+		'options' => [
+			'data-pjax' => 1,
+		],
+		'id' => 'issue-search-form',
 		'method' => 'get',
 	]); ?>
 
@@ -105,10 +108,6 @@ use yii\widgets\ActiveForm;
 		?>
 	</div>
 
-	<div class="row">
-
-	</div>
-
 	<?= $model->addressSearch !== null
 		? AddressSearchWidget::widget([
 			'form' => $form,
@@ -120,7 +119,10 @@ use yii\widgets\ActiveForm;
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Search'), ['class' => 'btn btn-primary']) ?>
-		<?= Html::a(Yii::t('backend', 'Reset'), 'index', ['class' => 'btn btn-default']) ?>
+		<?= Html::a(Yii::t('backend', 'Reset'),
+			['index'], [
+				'class' => 'btn btn-default',
+			]) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>
