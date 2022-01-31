@@ -55,7 +55,7 @@ if ($multipleForm) {
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
-	<div>
+	<p style="display: inline">
 		<?= Html::a(Yii::t('lead', 'Phone Lead'), ['phone'], ['class' => 'btn btn-info']) ?>
 
 		<?= CreateLeadBtnWidget::widget([
@@ -64,12 +64,13 @@ if ($multipleForm) {
 
 		<?= Html::a(Yii::t('lead', 'Lead Reports'), ['report/index'], ['class' => 'btn btn-warning']) ?>
 
+		<?= Html::a(Yii::t('lead', 'Lead Reminders'), ['reminder/index'], ['class' => 'btn btn-danger']) ?>
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_DIALER)
 			? Html::a(Yii::t('lead', 'Dialers'), ['dialer-lead/index'], ['class' => 'btn btn-primary'])
 			: ''
 		?>
-
-	</div>
+	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 	<div class="grid-before">
@@ -214,9 +215,13 @@ if ($multipleForm) {
 			[
 				'attribute' => 'name',
 				'contentBold' => true,
-				'noWrap' => true,
 			],
-			'phone:tel',
+			[
+				'attribute' => 'phone',
+				'format' => 'tel',
+				'noWrap' => true,
+				'width' => '124px',
+			],
 			[
 				'attribute' => 'type_id',
 				'value' => 'source.type',

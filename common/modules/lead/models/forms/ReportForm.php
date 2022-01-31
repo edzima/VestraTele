@@ -25,6 +25,7 @@ use yii\helpers\ArrayHelper;
  */
 class ReportForm extends Model {
 
+	public string $leadName = '';
 	public int $status_id;
 	public ?string $details = null;
 	public int $owner_id;
@@ -63,6 +64,7 @@ class ReportForm extends Model {
 			'withAddress' => Yii::t('lead', 'With Address'),
 			'withSameContacts' => Yii::t('lead', 'With Same Contacts'),
 			'closedQuestions' => Yii::t('lead', 'Closed Questions'),
+			'leadName' => Yii::t('lead', 'Lead Name'),
 		];
 	}
 
@@ -74,7 +76,7 @@ class ReportForm extends Model {
 				return $this->getModel()->isNewRecord;
 			},
 			],
-			['details', 'string'],
+			[['details', 'leadName'], 'string'],
 			[['withAddress', 'withSameContacts'], 'boolean'],
 			[
 				'details', 'required',
@@ -193,6 +195,9 @@ class ReportForm extends Model {
 		}
 		$this->linkUser();
 
+		if ($this->leadName !== $this->lead->getName()) {
+			$this->lead->updateName($this->leadName);
+		}
 		if ($this->status_id !== $this->lead->getStatusId()) {
 			$this->lead->updateStatus($this->status_id);
 		}
@@ -231,6 +236,9 @@ class ReportForm extends Model {
 		$model->save();
 		if ($this->status_id !== $lead->getStatusId()) {
 			$lead->updateStatus($this->status_id);
+		}
+		if ($this->leadName !== $lead->getName()) {
+			$lead->updateName($this->leadName);
 		}
 	}
 
@@ -302,6 +310,7 @@ class ReportForm extends Model {
 		$this->lead = $lead;
 		$this->status_id = $lead->getStatusId();
 		$this->setSource($lead->getSource());
+		$this->leadName = $lead->getName();
 		if (isset($lead->addresses[$this->addressType])) {
 			$this->address = $lead->addresses[$this->addressType]->address ?? null;
 			$this->withAddress = true;

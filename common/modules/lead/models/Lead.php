@@ -240,6 +240,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->updateAttributes(['status_id' => $status_id]) > 0;
 	}
 
+	public function updateName(string $name): bool {
+		return $this->updateAttributes(['name' => $name]) > 0;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */

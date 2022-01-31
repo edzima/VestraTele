@@ -3,6 +3,7 @@
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use yii\web\View;
+use common\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this View */
@@ -21,24 +22,39 @@ use yii\widgets\DetailView;
 			[
 				'attribute' => 'phone',
 				'format' => 'tel',
-					'visible' => !empty($model->getPhone()),
-				],
-				[
-					'attribute' => 'email',
-					'format' => 'email',
-					'visible' => !empty($model->getEmail()),
-				],
-				[
-					'attribute' => 'postal_code',
-					'visible' => !empty($model->getPostalCode()),
-				],
-				[
-					'attribute' => 'providerName',
-					'visible' => !empty($model->getProvider()),
-				],
+				'visible' => !empty($model->getPhone()),
 			],
-		]) ?>
-		<?= LeadAnswersWidget::widget([
-			'answers' => $model->answers,
-		]) ?>
+			[
+				'attribute' => 'email',
+				'format' => 'email',
+				'visible' => !empty($model->getEmail()),
+			],
+			[
+				'attribute' => 'postal_code',
+				'visible' => !empty($model->getPostalCode()),
+			],
+			[
+				'attribute' => 'providerName',
+				'visible' => !empty($model->getProvider()),
+			],
+			[
+				'attribute' => 'source',
+				'format' => 'raw',
+				'value' => $model->getSource()->getURL()
+					? Html::a(
+						Html::encode($model->getSource()->getURL()),
+						$model->getSource()->getURL(), [
+						'target' => '_blank',
+					]) : Html::encode($model->getSource()->getName()),
+				'visible' => !empty($model->getProvider()),
+			],
+			[
+				'attribute' => 'date_at',
+				'format' => 'date',
+			],
+		],
+	]) ?>
+	<?= LeadAnswersWidget::widget([
+		'answers' => $model->answers,
+	]) ?>
 </div>
