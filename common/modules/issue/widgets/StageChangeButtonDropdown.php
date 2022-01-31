@@ -7,7 +7,6 @@ use backend\modules\issue\models\IssueStageChangeForm;
 use common\models\issue\IssueInterface;
 use Yii;
 use yii\bootstrap\ButtonDropdown;
-use yii\helpers\ArrayHelper;
 
 class StageChangeButtonDropdown extends ButtonDropdown {
 
