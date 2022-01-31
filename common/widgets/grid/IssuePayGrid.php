@@ -60,7 +60,6 @@ class IssuePayGrid extends GridView {
 				'class' => SerialColumn::class,
 				'visible' => $this->dataProvider->getTotalCount() > 1,
 			],
-			$this->actionColumn(),
 			[
 				'class' => ExpandRowColumn::class,
 				'value' => function () {
@@ -73,7 +72,7 @@ class IssuePayGrid extends GridView {
 				'class' => DataColumn::class,
 				'attribute' => 'calculationType',
 				'format' => 'raw',
-				'value' => function (IssuePay $model) {
+				'value' => function (IssuePay $model): string {
 					$name = $model->calculation->getTypeName();
 					if ($this->settlementViewRoute === null) {
 						return $name;
@@ -132,6 +131,7 @@ class IssuePayGrid extends GridView {
 				'width' => '140px',
 				'visible' => $this->visiblePayAt,
 			],
+			$this->actionColumn(),
 		];
 	}
 
