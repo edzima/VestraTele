@@ -18,18 +18,20 @@ class SelectionForm extends ActiveForm {
 		$gridId = $this->gridId;
 		$formWrapperSelector = $this->formWrapperSelector;
 		$script = <<< JS
-		const grid = jQuery('#$gridId');
-		const formWrapper = document.querySelector('$formWrapperSelector');
-		grid.find("input[type='checkbox']").on('click', function () {
-			setTimeout(function () {
-				const selected = grid.yiiGridView('getSelectedRows');
-				if (selected.length) {
-					formWrapper.classList . remove('hidden');
-				} else {
-					formWrapper.classList . add('hidden');
-				}
-			}, 100);
-		});
+		(function () {
+			let grid = jQuery('#$gridId');
+			let formWrapper = document.querySelector('$formWrapperSelector');
+			grid.find("input[type='checkbox']").on('click', function () {
+				setTimeout(function () {
+					const selected = grid.yiiGridView('getSelectedRows');
+					if (selected.length) {
+						formWrapper.classList . remove('hidden');
+					} else {
+						formWrapper.classList . add('hidden');
+					}
+				}, 100);
+			});
+		})();
 		JS;
 		return $script;
 	}
