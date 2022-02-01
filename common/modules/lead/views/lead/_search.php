@@ -16,7 +16,6 @@ use yii\helpers\Html;
 <div class="lead-search">
 
 	<?php $form = ActiveForm::begin([
-		'action' => ['index'],
 		'method' => 'get',
 	]); ?>
 
