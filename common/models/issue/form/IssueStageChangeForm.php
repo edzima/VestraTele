@@ -77,6 +77,7 @@ class IssueStageChangeForm extends Model {
 	public function getStagesData(): array {
 		$names = static::getStagesNames($this->getIssue()->getIssueType()->id);
 		unset($names[$this->getIssue()->getIssueStage()->id]);
+		asort($names);
 		return $names;
 	}
 
