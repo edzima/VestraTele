@@ -33,13 +33,13 @@ class PaysFormTest extends PayFormTest {
 		$this->tester->assertNull($pay->getPaymentAt());
 	}
 
-	public function testGenerateDouble(): void {
+	public function testGenerateDoubleForFebruary(): void {
 		$model = $this->createForm();
 		$model->count = 2;
 		$model->value = 246;
 		$model->vat = 23;
 		$model->deadline_at = '2020-01-31';
-		$model->deadlineRange = PaysForm::DEADLINE_LAST_DAY_OF_MONTH;
+		$model->deadlineRange = PaysForm::DEADLINE_INTERVAL_MONTH;
 		$pays = $model->generatePays(false);
 		$this->tester->assertCount(2, $pays);
 		$pay1 = $pays[0];
@@ -54,6 +54,31 @@ class PaysFormTest extends PayFormTest {
 		$this->tester->assertNull($pay2->getPaymentAt());
 		$this->tester->assertNotNull($pay2->getDeadlineAt());
 		$this->tester->assertSame('2020-02-29', $pay2->getDeadlineAt()->format($model->dateFormat));
+	}
+
+	public function testGenerateDoubleWithCustomDate(): void {
+		$model = $this->createForm();
+		$model->count = 2;
+		$model->value = 246;
+		$model->vat = 23;
+		$model->deadline_at = '2020-01-15';
+		$model->deadlineRange = PaysForm::DEADLINE_INTERVAL_MONTH;
+		$pays = $model->generatePays(false);
+		$this->tester->assertCount(2, $pays);
+		$pay1 = $pays[0];
+		$this->tester->assertTrue($pay1->getValue()->equals(new Decimal(123)));
+		$this->tester->assertTrue($pay1->getVAT()->equals(new Decimal(23)));
+		$this->tester->assertNull($pay1->getPaymentAt());
+		$this->tester->assertNotNull($pay1->getDeadlineAt());
+		$this->tester->assertSame('2020-01-15', $pay1->getDeadlineAt()->format($model->dateFormat));
+
+		$pay2 = $pays[1];
+		$this->tester->assertInstanceOf(PayInterface::class, $pay2);
+		$this->tester->assertTrue($pay2->getValue()->equals(new Decimal(123)));
+		$this->tester->assertTrue($pay2->getVAT()->equals(new Decimal(23)));
+		$this->tester->assertNull($pay2->getPaymentAt());
+		$this->tester->assertNotNull($pay2->getDeadlineAt());
+		$this->tester->assertSame('2020-02-15', $pay2->getDeadlineAt()->format($model->dateFormat));
 	}
 
 	protected function createForm(array $config = []): PaysForm {

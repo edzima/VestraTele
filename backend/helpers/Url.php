@@ -11,8 +11,12 @@ use common\helpers\Url as BaseUrl;
  */
 class Url extends BaseUrl {
 
-	public static function userProvisions(int $userId): string {
-		return static::to(['/provision/user/user', 'id' => $userId]);
+	public static function userProvisions(int $userId, int $typeId = null): string {
+		return static::to(['/provision/user/user-view', 'userId' => $userId, 'typeId' => $typeId]);
+	}
+
+	protected static function managerConfig(): array {
+		return require __DIR__ . '/../config/_urlManager.php';
 	}
 
 }

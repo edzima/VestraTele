@@ -4,8 +4,13 @@ namespace backend\tests\functional\lead;
 
 use backend\tests\Step\Functional\LeadManager;
 use backend\tests\Step\Functional\Manager;
+use common\fixtures\helpers\LeadFixtureHelper;
+use common\models\user\Worker;
 use common\modules\lead\controllers\StatusController;
+use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadStatusInterface;
 
 class StatusCest {
 
@@ -14,7 +19,22 @@ class StatusCest {
 	/** @see StatusController::actionCreate() */
 	private const ROUTE_CREATE = '/lead/status/create';
 
-	protected const FORM_SELECTOR = '#lead-status-form';
+	/** @see StatusController::actionChange() */
+	private const ROUTE_CHANGE = '/lead/status/change';
+
+	protected const FORM_CREATE_SELECTOR = '#lead-status-form';
+	protected const FORM_CHANGE_SELECTOR = '#lead-status-change-form';
+
+	const PERMISSION = Worker::PERMISSION_LEAD_STATUS;
+
+	public function _fixtures(): array {
+		return array_merge(
+			LeadFixtureHelper::lead(),
+			LeadFixtureHelper::status(),
+			LeadFixtureHelper::source(),
+			LeadFixtureHelper::reports()
+		);
+	}
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -24,6 +44,7 @@ class StatusCest {
 	}
 
 	public function checkMenuLink(LeadManager $I): void {
+		$I->assignPermission(static::PERMISSION);
 		$I->amLoggedIn();
 		$I->seeMenuLink('Statuses');
 		$I->clickMenuLink('Statuses');
@@ -33,6 +54,7 @@ class StatusCest {
 
 	public function checkIndexPage(LeadManager $I): void {
 		$I->amLoggedIn();
+		$I->assignPermission(static::PERMISSION);
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeInGridHeader('ID');
 		$I->seeInGridHeader('Name');
@@ -43,8 +65,9 @@ class StatusCest {
 
 	public function checkCreateWithOnlyName(LeadManager $I): void {
 		$I->amLoggedIn();
+		$I->assignPermission(static::PERMISSION);
 		$I->amOnRoute(static::ROUTE_CREATE);
-		$I->submitForm(static::FORM_SELECTOR, $this->formParams('Some Name'));
+		$I->submitForm(static::FORM_CREATE_SELECTOR, $this->formParams('Some Name'));
 		$I->seeRecord(LeadStatus::class, [
 			'name' => 'Some Name',
 		]);
@@ -67,11 +90,39 @@ class StatusCest {
 
 	public function checkCreateWithShorReportName(LeadManager $I): void {
 		$I->amLoggedIn();
+		$I->assignPermission(static::PERMISSION);
 		$I->amOnRoute(static::ROUTE_CREATE);
-		$I->submitForm(static::FORM_SELECTOR, $this->formParams('Short Report Status', true));
+		$I->submitForm(static::FORM_CREATE_SELECTOR, $this->formParams('Short Report Status', true));
 		$I->seeRecord(LeadStatus::class, [
 			'name' => 'Short Report Status',
 			'short_report' => true,
+		]);
+	}
+
+	public function checkChangeStatusForLeads(LeadManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(static::PERMISSION);
+		$I->amOnRoute(static::ROUTE_CHANGE, [
+			'ids' => [1, 2],
+		]);
+		$I->see('Change Status for Leads: 2');
+		$I->submitForm(static::FORM_CHANGE_SELECTOR, [
+			'LeadStatusChangeForm[status_id]' => LeadStatusInterface::STATUS_ARCHIVE,
+		]);
+
+		$I->seeRecord(Lead::class, [
+			'id' => 1,
+			'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
+		]);
+		$I->seeRecord(LeadReport::class, [
+			'lead_id' => 1,
+			'old_status_id' => LeadStatusInterface::STATUS_NEW,
+			'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
+			'owner_id' => $I->getUser()->id,
+		]);
+		$I->seeRecord(Lead::class, [
+			'id' => 2,
+			'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
 		]);
 	}
 

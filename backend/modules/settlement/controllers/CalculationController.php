@@ -7,6 +7,8 @@ use backend\modules\settlement\models\AdministrativeCalculationForm;
 use backend\modules\settlement\models\CalculationForm;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\modules\settlement\models\search\IssueToCreateCalculationSearch;
+use common\components\provision\exception\MissingProvisionUserException;
+use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
@@ -16,7 +18,9 @@ use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * CalculationController implements the CRUD actions for IssuePayCalculation model.
@@ -62,6 +66,8 @@ class CalculationController extends Controller {
 		}
 		Url::remember();
 		$searchModel = new IssuePayCalculationSearch();
+		$searchModel->setScenario(IssuePayCalculationSearch::SCENARIO_ARCHIVE);
+		$searchModel->withIssueStage = true;
 		$searchModel->withoutProvisions = true;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -147,8 +153,14 @@ class CalculationController extends Controller {
 	public function actionCreateAdministrative(int $id) {
 		$issue = $this->findIssueModel($id);
 		$model = new AdministrativeCalculationForm(Yii::$app->user->getId(), $issue);
+
 		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			if ($model->pushMessages(Yii::$app->user->getId())) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'Push Messages about Create Administrative Settlement.')
+				);
+			}
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('administrative', [
@@ -165,6 +177,11 @@ class CalculationController extends Controller {
 		$model->vat = $issue->type->vat;
 		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			if ($model->pushMessages(Yii::$app->user->getId())) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('settlement', 'Push Messages about Create Settlement.')
+				);
+			}
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
@@ -183,7 +200,7 @@ class CalculationController extends Controller {
 	 */
 	public function actionUpdate(int $id) {
 		$calculation = $this->findModel($id);
-		if (!Yii::$app->user->can(User::ROLE_BOOKKEEPER)
+		if (!Yii::$app->user->can(User::PERMISSION_CALCULATION_UPDATE)
 			&& $calculation->owner_id !== Yii::$app->user->getId()) {
 			throw new ForbiddenHttpException(Yii::t('backend', 'Only bookkeeper or owner can update settlement.'));
 		}
@@ -209,7 +226,7 @@ class CalculationController extends Controller {
 		$model->count = 2;
 		$pay = $calculation->getPays()->one();
 		if ($pay) {
-			$model->vat = $pay->getVAT()->toFixed(2);
+			$model->vat = $pay->getVAT() ? $pay->getVAT()->toFixed(2) : null;
 		} else {
 			$model->vat = $calculation->issue->type->vat;
 		}
@@ -225,6 +242,12 @@ class CalculationController extends Controller {
 				$calculationPay->setPay($pay);
 				$calculation->link('pays', $calculationPay);
 			}
+			$calculation->refresh();
+			Yii::$app->provisions->removeForPays($calculation->getPays()->getIds(true));
+			try {
+				Yii::$app->provisions->settlement($calculation);
+			} catch (MissingProvisionUserException $exception) {
+			}
 			return $this->redirect(['view', 'id' => $id]);
 		}
 		return $this->render('pays', [
@@ -237,14 +260,19 @@ class CalculationController extends Controller {
 	 * Deletes an existing IssuePayCalculation model.
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
 	 *
-	 * @param integer $id
-	 * @return mixed
+	 * @param int $id
+	 * @return Response
 	 * @throws NotFoundHttpException if the model cannot be found
+	 * @throws MethodNotAllowedHttpException
 	 */
-	public function actionDelete(int $id) {
-		$this->findModel($id)->delete();
-
-		return $this->redirect(['index']);
+	public function actionDelete(int $id): Response {
+		$model = $this->findModel($id);
+		if ($model->owner_id === Yii::$app->user->getId()
+			|| Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
+			$model->delete();
+			return $this->redirect(['index']);
+		}
+		throw new MethodNotAllowedHttpException('Only Owner or Bookkeeper can delete settlement.');
 	}
 
 	/**

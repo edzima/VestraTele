@@ -4,27 +4,47 @@ use common\helpers\Html;
 use common\modules\lead\models\forms\ReportForm;
 use common\widgets\address\AddressFormWidget;
 use kartik\select2\Select2;
+use yii\web\View;
 use yii\widgets\ActiveForm;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $form ActiveForm|null */
 /* @var $formOptions array */
 /* @var $model ReportForm */
+/* @var $withSameContacts bool */
 
 ?>
 
 <div class="lead-report-form-fields">
 
-	<?= $form->field($model, 'status_id')
-		->widget(Select2::class, ['data' => ReportForm::getStatusNames()]) ?>
+	<div class="row">
 
-	<?= $form->field($model, 'withAddress')->checkbox() ?>
+		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-4']])
+			->widget(Select2::class, ['data' => ReportForm::getStatusNames()])
+		?>
+
+		<?= $form->field($model, 'leadName', ['options' => ['class' => 'col-md-6']])->textInput() ?>
+
+		<?= $form->field($model, 'withAddress', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
+	</div>
+
+
 	<div id="address-wrapper" class="address-wrapper<?= !$model->withAddress ? ' hidden' : '' ?>">
 		<?= AddressFormWidget::widget([
 			'form' => $form,
 			'model' => $model->getAddress(),
 		]) ?>
 	</div>
+
+
+	<?= $form->field($model, 'details')->textarea() ?>
+
+
+	<?= $withSameContacts
+		? $form->field($model, 'withSameContacts')->checkbox()
+		: ''
+	?>
+
 
 
 	<?php foreach ($model->getAnswersModels() as $id => $answer): ?>
@@ -48,9 +68,6 @@ use yii\widgets\ActiveForm;
 		])
 		: ''
 	?>
-
-
-	<?= $form->field($model, 'details')->textarea() ?>
 
 
 </div>

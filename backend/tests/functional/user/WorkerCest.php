@@ -2,6 +2,7 @@
 
 namespace backend\tests\functional\user;
 
+use backend\tests\functional\provision\ProvisionUserCest;
 use backend\tests\Step\Functional\Admin;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\WorkersManager;
@@ -16,13 +17,12 @@ class WorkerCest {
 
 	protected const ROUTE_INDEX = '/user/worker/index';
 	protected const ROUTE_CREATE = '/user/worker/create';
-	protected const ROUTE_PROVISION = '/provision/user/user';
 	protected const ROUTE_HIERARCHY = '/user/worker/hierarchy';
 
 	public function _fixtures(): array {
 		return array_merge(
 			UserFixtureHelper::workers(),
-			['agent-profile' => UserFixtureHelper::profile(UserFixtureHelper::WORKER_AGENT)]
+			UserFixtureHelper::profile(UserFixtureHelper::WORKER_AGENT)
 		);
 	}
 
@@ -84,7 +84,7 @@ class WorkerCest {
 
 	public function checkProvisionAsWorkerManager(WorkersManager $I): void {
 		$I->amLoggedIn();
-		$I->amOnPage([static::ROUTE_PROVISION, 'id' => $I->grabFixture(UserFixtureHelper::WORKER_TELEMARKETER, 0)->id]);
+		$I->amOnPage([ProvisionUserCest::ROUTE_USER_VIEW, 'userId' => $I->grabFixture(UserFixtureHelper::WORKER_TELEMARKETER, 0)->id]);
 		$I->seeResponseCodeIs(403);
 	}
 

@@ -1,9 +1,9 @@
 <?php
 
-use common\widgets\DateTimeWidget;
+use common\widgets\ActiveForm;
+use common\widgets\DateWidget;
+use frontend\helpers\Html;
 use frontend\models\search\IssueSearch;
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model IssueSearch */
@@ -18,44 +18,17 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= $form->field($model, 'createdAtFrom', ['options' => ['class' => 'col-md-6']])
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
+		<?= $form->field($model, 'createdAtFrom', ['options' => ['class' => 'col-md-3 col-lg-2']])
+			->widget(DateWidget::class) ?>
 
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
-				]) ?>
-
-		<?= $form->field($model, 'createdAtTo', ['options' => ['class' => 'col-md-6']])
-			->widget(DateTimeWidget::class,
-				[
-					'phpDatetimeFormat' => 'yyyy-MM-dd',
-					'clientOptions' => [
-
-						'allowInputToggle' => true,
-						'sideBySide' => true,
-						'widgetPositioning' => [
-							'horizontal' => 'auto',
-							'vertical' => 'auto',
-						],
-					],
-				]) ?>
+		<?= $form->field($model, 'createdAtTo', ['options' => ['class' => 'col-md-3 col-lg-2']])
+			->widget(DateWidget::class) ?>
 
 	</div>
 
-	<div class="row">
-		<?php // $form->field($model, 'type')->checkboxList($model->getUserTypeNames()) ?>
-	</div>
 
 	<div class="form-group">
-		<?= Html::submitButton('Szukaj', ['class' => 'btn btn-primary']) ?>
+		<?= Html::submitButton(Yii::t('frontend', 'Search'), ['class' => 'btn btn-primary']) ?>
 		<?= Html::a('Reset', 'index', ['class' => 'btn btn-default']) ?>
 	</div>
 

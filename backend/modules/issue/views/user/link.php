@@ -1,6 +1,7 @@
 <?php
 
 use backend\modules\issue\models\IssueUserForm;
+use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
@@ -9,8 +10,8 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('backend', 'Link {user} to issue', ['user' => $model->getUser()]);
 
-$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issue Users'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' => ['/issue/issue/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issue Users'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
@@ -33,6 +34,20 @@ $this->params['breadcrumbs'][] = $this->title;
 					'class' => 'col-md-2',
 				],
 			])->dropDownList(IssueUserForm::getTypesNames()) ?>
+
+			<?= empty($model->user_id)
+				? $form->field($model, 'user_id', [
+					'options' => [
+						'class' => 'col-md-3 col-lg-2',
+					],
+				])->widget(Select2::class, [
+					'data' => IssueUserForm::getUsersNames(),
+					'pluginOptions' => [
+						'placeholder' => $model->getAttributeLabel('user_id'),
+					],
+				])
+				: ''
+			?>
 		</div>
 
 

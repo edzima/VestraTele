@@ -1,6 +1,7 @@
 <?php
 
 use common\models\user\User;
+use common\modules\lead\components\LeadDialer;
 use common\modules\lead\Module;
 use yii\helpers\ArrayHelper;
 
@@ -25,7 +26,12 @@ return [
 			'userNames' => static function () {
 				return ArrayHelper::map(User::find()->asArray()->all(), 'id', 'username');
 			},
-
+			'dialer' => [
+				'class' => LeadDialer::class,
+				'callingStatus' => 2,
+				'notAnsweredStatus' => 3,
+				'answeredStatus' => 4,
+			],
 		],
 	],
 ];

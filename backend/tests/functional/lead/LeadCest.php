@@ -28,6 +28,10 @@ class LeadCest {
 		$this->tester = $I;
 	}
 
+	public function _fixtures(): array {
+		return LeadFixtureHelper::leads();
+	}
+
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
 		$I->dontSeeMenuLink('Leads');
@@ -38,7 +42,8 @@ class LeadCest {
 	public function checkAsLeadManager(LeadManager $I): void {
 		$I->amLoggedIn();
 		$I->seeMenuLink('Leads');
-		$I->clickMenuLink('Leads');
+		$I->seeMenuSubLink('Browse');
+		$I->clickMenuSubLink('Browse');
 		$I->seeInCurrentUrl(static::ROUTE_INDEX);
 		$I->see('Leads', 'h1');
 	}
@@ -98,7 +103,7 @@ class LeadCest {
 			'LeadForm[name]' => 'Jonny',
 			'LeadForm[phone]' => '555-222-111',
 		]);
-		$I->seeFlash(' Success create Lead. ', 'success');
+		$I->seeFlash('Success create Lead.', 'success');
 		$I->seeInCurrentUrl(static::ROUTE_VIEW);
 	}
 

@@ -3,13 +3,15 @@
 use common\helpers\Html;
 use common\helpers\Url;
 use common\modules\lead\models\LeadReminder;
+use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadReminderSearch;
 use common\modules\reminder\models\Reminder;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use yii\data\DataProviderInterface;
+use yii\web\View;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $searchModel LeadReminderSearch */
 /* @var $dataProvider DataProviderInterface */
 
@@ -32,6 +34,13 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'leadName',
 				'value' => 'lead.name',
 				'label' => Yii::t('lead', 'Lead Name'),
+			],
+
+			[
+				'attribute' => 'leadStatusId',
+				'value' => 'lead.status.name',
+				'filter' => LeadStatus::getNames(),
+				'label' => Yii::t('lead', 'Lead Status'),
 			],
 			[
 				'attribute' => 'details',

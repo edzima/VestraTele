@@ -3,7 +3,6 @@
 namespace common\tests\unit\lead\search;
 
 use common\fixtures\helpers\LeadFixtureHelper;
-use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\searches\LeadReportSearch;
@@ -96,6 +95,22 @@ class LeadReportSearchTest extends Unit {
 		$this->tester->assertEmpty($models);
 	}
 
+	public function testLeadUserId(): void {
+		$this->model->lead_user_id = 1;
+		$models = $this->getSearchModels();
+		foreach ($models as $model) {
+			$this->tester->assertTrue($model->lead->isForUser(1));
+		}
+		$this->model->owner_id = 2;
+		$models = $this->getSearchModels();
+		foreach ($models as $model) {
+			$this->tester->assertTrue(
+				$model->lead->isForUser(1)
+				|| $model->owner_id === 2
+			);
+		}
+	}
+
 	public function testDate(): void {
 		$this->model->from_at = '2020-01-01';
 		$models = $this->getSearchModels();
@@ -116,7 +131,7 @@ class LeadReportSearchTest extends Unit {
 
 	/**
 	 * @param bool $refresh
-	 * @return Lead[]
+	 * @return LeadReport[]
 	 */
 	private function getSearchModels(bool $refresh = false): array {
 		if ($refresh || $this->models === null) {

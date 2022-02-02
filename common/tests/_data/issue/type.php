@@ -34,4 +34,11 @@ return [
 		'with_additional_date' => true,
 		'provision_type' => Provision::TYPE_PERCENTAGE,
 	],
+	[
+		'name' => 'Anti Vindication',
+		'short_name' => 'AV',
+		'meet' => true,
+		'vat' => 0,
+		'provision_type' => Provision::TYPE_PERCENTAGE,
+	],
 ];

@@ -6,6 +6,7 @@ use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReminder;
 use common\modules\reminder\models\ReminderQuery;
 use common\modules\reminder\models\searches\ReminderSearch;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\data\DataProviderInterface;
@@ -17,11 +18,13 @@ class LeadReminderSearch extends ReminderSearch {
 	public const SCENARIO_USER = 'user';
 
 	public ?string $leadName = null;
+	public $leadStatusId;
 	public ?int $user_id = null;
 
 	public function rules(): array {
 		return array_merge([
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
+			['leadStatusId', 'integer'],
 			['leadName', 'trim'],
 			['leadName', 'string', 'min' => 3],
 		], parent::rules());
@@ -47,6 +50,7 @@ class LeadReminderSearch extends ReminderSearch {
 			},
 		]);
 		$this->applyLeadNameFilter($query);
+		$this->applyLeadStatusFilter($query);
 
 		if ($this->scenario === static::SCENARIO_USER) {
 			if (empty($this->user_id)) {
@@ -64,7 +68,7 @@ class LeadReminderSearch extends ReminderSearch {
 
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
-				'leadName' => \Yii::t('lead', 'Lead Name'),
+				'leadName' => Yii::t('lead', 'Lead Name'),
 			]
 		);
 	}
@@ -72,6 +76,12 @@ class LeadReminderSearch extends ReminderSearch {
 	private function applyLeadNameFilter(ActiveQuery $query) {
 		if (!empty($this->leadName)) {
 			$query->andFilterWhere(['like', Lead::tableName() . '.name', $this->leadName]);
+		}
+	}
+
+	private function applyLeadStatusFilter(ActiveQuery $query) {
+		if (!empty($this->leadStatusId)) {
+			$query->andFilterWhere([Lead::tableName() . '.status_id' => $this->leadStatusId]);
 		}
 	}
 

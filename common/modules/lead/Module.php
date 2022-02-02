@@ -2,32 +2,39 @@
 
 namespace common\modules\lead;
 
+use Closure;
+use common\models\user\User;
+use common\modules\lead\components\LeadDialer;
 use common\modules\lead\components\LeadManager;
 use yii\base\BootstrapInterface;
 use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
 use yii\db\ActiveRecord;
+use yii\di\Instance;
 
 /**
  * Class Module
  *
  * @property LeadManager $manager
+ * @property LeadDialer $dialer
  */
 class Module extends BaseModule implements BootstrapInterface {
-
-	protected const REMINDER_MODULE_ID = 'reminder';
 
 	public $controllerNamespace = 'common\modules\lead\controllers';
 
 	/**
 	 * @var string|ActiveRecord
 	 */
-	public string $userClass;
-	/** @var \Closure|array */
+	public string $userClass = User::class;
+	/** @var Closure|array */
 	public $userNames;
 
 	public bool $onlyUser = false;
 	public bool $allowDelete = true;
+
+	protected $dialer = [
+		'class' => LeadDialer::class,
+	];
 
 	public $components = [
 		'manager' => [
@@ -41,6 +48,20 @@ class Module extends BaseModule implements BootstrapInterface {
 		if ($this->onlyUser) {
 			$this->manager->onlyForUser = true;
 		}
+	}
+
+	protected function setDialer($dialer): void {
+		$this->dialer = $dialer;
+	}
+
+	public function getDialer(): ?LeadDialer {
+		if ($this->dialer === null) {
+			return null;
+		}
+		if (!is_object($this->dialer)) {
+			$this->dialer = Instance::ensure($this->dialer, LeadDialer::class);
+		}
+		return $this->dialer;
 	}
 
 	public function bootstrap($app) {

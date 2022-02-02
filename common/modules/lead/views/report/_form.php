@@ -4,33 +4,28 @@ use common\helpers\Html;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\widgets\ReportFormWidget;
 use common\widgets\ActiveForm;
+use yii\web\View;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $model ReportForm */
 
 ?>
-	<div class="row">
-		<div class="col-md-6">
-			<div class="lead-report-form">
 
-				<?php $form = ActiveForm::begin([
-					'id' => 'lead-report-form',
-				]); ?>
+<div class="lead-report-form">
 
-				<?= ReportFormWidget::widget([
-					'form' => $form,
-					'model' => $model,
-				]) ?>
+	<?php $form = ActiveForm::begin([
+		'id' => 'lead-report-form',
+	]); ?>
 
-				<div class="form-group">
-					<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>
-				</div>
+	<?= ReportFormWidget::widget([
+		'form' => $form,
+		'model' => $model,
+	]) ?>
 
-				<?php ActiveForm::end(); ?>
-
-			</div>
-		</div>
+	<div class="form-group">
+		<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>
 	</div>
 
+	<?php ActiveForm::end(); ?>
 
-<?php
+</div>

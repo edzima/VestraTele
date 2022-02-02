@@ -3,6 +3,7 @@
 namespace common\tests\_support;
 
 use common\models\user\User;
+use Exception;
 use Yii;
 use yii\rbac\ManagerInterface;
 
@@ -77,7 +78,7 @@ trait UserRbacActor {
 		try {
 			$auth->assign($auth->getRole($name), $this->getUser()->id);
 			codecept_debug('Assign role: ' . $name);
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 			codecept_debug($exception->getMessage());
 		}
 	}
@@ -87,13 +88,15 @@ trait UserRbacActor {
 		try {
 			$auth->assign($auth->getPermission($name), $this->getUser()->id);
 			codecept_debug('Assign permission: ' . $name);
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 			codecept_debug($exception->getMessage());
 		}
 	}
 
 	private function createUser(): User {
+		User::deleteAll(['username' => $this->getUsername()]);
 		$user = new User();
+		$user->email = 'test@test.com';
 		$user->username = $this->getUsername();
 		$user->setPassword($this->getPassword());
 		$user->status = User::STATUS_ACTIVE;

@@ -2,8 +2,10 @@
 
 namespace backend\modules\issue\models\search;
 
+use backend\modules\issue\models\IssueStage;
 use common\models\AddressSearch;
 use common\models\issue\Issue;
+use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSearch as BaseIssueSearch;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
@@ -21,10 +23,19 @@ use yii\helpers\ArrayHelper;
  */
 class IssueSearch extends BaseIssueSearch {
 
+	public const SCENARIO_ALL_PAYED = 'allPayed';
+
 	public $parentId;
 	public $excludedStages = [];
+	public $onlyWithSettlements;
+
 	public bool $onlyDelayed = false;
 	public bool $onlyWithPayedPay = false;
+	public bool $onlyWithAllPayedPay = false;
+	public bool $withArchiveOnAllPayedPay = false;
+
+	public ?string $signature_act = null;
+	private ?array $ids = null;
 
 	public function __construct($config = []) {
 		if (!isset($config['addressSearch'])) {
@@ -36,8 +47,9 @@ class IssueSearch extends BaseIssueSearch {
 	public function rules(): array {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
-			[['onlyDelayed', 'onlyWithPayedPay'], 'boolean'],
-			['type_additional_date_at', 'safe'],
+			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements'], 'boolean'],
+			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
+			[['type_additional_date_at', 'signature_act'], 'safe'],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 		]);
 	}
@@ -48,6 +60,8 @@ class IssueSearch extends BaseIssueSearch {
 			'excludedStages' => Yii::t('backend', 'Excluded stages'),
 			'onlyDelayed' => Yii::t('backend', 'Only delayed'),
 			'onlyWithPayedPay' => Yii::t('backend', 'Only with payed pay'),
+			'onlyWithSettlements' => Yii::t('settlement', 'Only with Settlements'),
+			'onlyWithAllPayedPay' => Yii::t('settlement', 'Only with all paid Pays'),
 		]);
 	}
 
@@ -79,13 +93,26 @@ class IssueSearch extends BaseIssueSearch {
 		return $dataProvider;
 	}
 
+	protected function archiveFilter(IssueQuery $query): void {
+		parent::archiveFilter($query);
+		if ($this->onlyWithAllPayedPay && !$this->withArchiveOnAllPayedPay) {
+			$query->withoutArchives();
+		}
+	}
+
 	protected function issueQueryFilter(IssueQuery $query): void {
 		parent::issueQueryFilter($query);
+		$this->signatureActFilter($query);
 		$this->delayedFilter($query);
 		$this->excludedStagesFilter($query);
 		$this->teleFilter($query);
 		$this->lawyerFilter($query);
 		$this->payedFilter($query);
+		$this->settlementsFilter($query);
+	}
+
+	private function signatureActFilter(IssueQuery $query): void {
+		$query->andFilterWhere(['like', Issue::tableName() . '.signature_act', $this->signature_act]);
 	}
 
 	public function applyAgentsFilters(QueryInterface $query): void {
@@ -110,7 +137,7 @@ class IssueSearch extends BaseIssueSearch {
 					$query->orFilterWhere([
 						'and',
 						[
-							'stage_id' => array_keys($ids),
+							Issue::tableName() . '.stage_id' => array_keys($ids),
 						],
 						[
 							'<=', new Expression("DATE_ADD(stage_change_at, INTERVAL $day DAY)"), new Expression('NOW()'),
@@ -118,13 +145,13 @@ class IssueSearch extends BaseIssueSearch {
 					]);
 				}
 			}
-			$query->andWhere('stage_change_at IS NOT NULL');
-			$query->andWhere('issue_stage.days_reminder is NOT NULL');
+			$query->andWhere(Issue::tableName() . '.stage_change_at IS NOT NULL');
+			$query->andWhere(IssueStage::tableName() . '.days_reminder is NOT NULL');
 		}
 	}
 
 	protected function excludedStagesFilter(IssueQuery $query): void {
-		$query->andFilterWhere(['NOT IN', 'stage_id', $this->excludedStages]);
+		$query->andFilterWhere(['NOT IN', Issue::tableName() . '.stage_id', $this->excludedStages]);
 	}
 
 	protected function lawyerFilter(IssueQuery $query): void {
@@ -139,6 +166,36 @@ class IssueSearch extends BaseIssueSearch {
 		}
 	}
 
+	private function payedFilter(IssueQuery $query): void {
+		if ($this->onlyWithPayedPay || $this->onlyWithAllPayedPay) {
+			$query->joinWith([
+				'pays P' => function (IssuePayQuery $payQuery) {
+					if ($this->onlyWithPayedPay && !$this->onlyWithAllPayedPay) {
+						$payQuery->onlyPaid();
+					}
+				},
+			])
+				->groupBy(IssuePayCalculation::tableName() . '.issue_id');
+			if ($this->onlyWithAllPayedPay) {
+				$query->select(['issue.*', new Expression('SUM(ISNULL(P.pay_at)) as notPayedCount')]);
+				$query->having('notPayedCount = 0');
+			}
+		}
+	}
+
+	private function settlementsFilter(IssueQuery $query): void {
+		if ($this->onlyWithSettlements === null || $this->onlyWithSettlements === '') {
+			return;
+		}
+		$query->joinWith('payCalculations PC', false);
+		if ((bool) $this->onlyWithSettlements === true) {
+
+			$query->andWhere('PC.issue_id IS NOT NULL');
+			return;
+		}
+		$query->andWhere('PC.issue_id IS NULL');
+	}
+
 	public function getAgentsNames(): array {
 		if (empty($this->parentId) || $this->parentId < 0) {
 			return parent::getAgentsNames();
@@ -148,15 +205,13 @@ class IssueSearch extends BaseIssueSearch {
 		return User::getSelectList($ids, false);
 	}
 
-	private function payedFilter(IssueQuery $query): void {
-		if ($this->onlyWithPayedPay) {
-			$query->joinWith([
-				'pays' => function (IssuePayQuery $payQuery) {
-					$payQuery->onlyPayed();
-				},
-			])
-				->groupBy(Issue::tableName() . '.id');
+	public function getAllIds(QueryInterface $query, bool $refresh = false): array {
+		if ($refresh || $this->ids === null) {
+			$query = clone $query;
+			$query->select(Issue::tableName() . '.id');
+			$this->ids = $query->column();
 		}
+		return $this->ids;
 	}
 
 }

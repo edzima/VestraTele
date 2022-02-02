@@ -2,22 +2,31 @@
 
 namespace common\tests\unit\settlement;
 
-use common\fixtures\helpers\IssueFixtureHelper;
-use common\models\issue\IssuePayCalculation;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\tests\unit\Unit;
 use Decimal\Decimal;
 
 class CalculationTest extends Unit {
 
+	private SettlementFixtureHelper $settlementFixture;
+
+	public function _before() {
+		parent::_before();
+		$this->settlementFixture = new SettlementFixtureHelper($this->tester);
+	}
+
 	/**
 	 * @return array
 	 */
 	public function _fixtures(): array {
-		return array_merge(IssueFixtureHelper::fixtures(), IssueFixtureHelper::settlements());
+		return array_merge(
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::pay(),
+		);
 	}
 
 	public function testPayed(): void {
-		$model = $this->grabCalculation('payed');
+		$model = $this->settlementFixture->grabSettlement('payed-with-single-costs');
 		$this->tester->assertTrue($model->isPayed());
 		$this->tester->assertTrue(
 			(new Decimal(1230))
@@ -30,7 +39,7 @@ class CalculationTest extends Unit {
 	}
 
 	public function testNotPayed(): void {
-		$model = $this->grabCalculation('not-payed');
+		$model = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
 		$this->tester->assertFalse($model->isPayed());
 		$this->tester->assertTrue(
 			(new Decimal(0))
@@ -42,7 +51,4 @@ class CalculationTest extends Unit {
 		);
 	}
 
-	protected function grabCalculation($index): IssuePayCalculation {
-		return $this->tester->grabFixture(IssueFixtureHelper::CALCULATION, $index);
-	}
 }

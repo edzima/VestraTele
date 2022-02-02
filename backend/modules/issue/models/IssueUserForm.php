@@ -5,18 +5,16 @@ namespace backend\modules\issue\models;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\user\User;
+use Exception;
 use Yii;
 use yii\base\Model;
 
 class IssueUserForm extends Model {
 
-	public const SCENARIO_TYPE = 'type';
-	public const SCENARIO_USER_LINK = 'user-link';
-
-	public const SCENARIO_DEFAULT = self::SCENARIO_USER_LINK;
-
 	protected const UNAVAILABLE_TYPES = [
-		IssueUser::TYPE_CUSTOMER, IssueUser::TYPE_LAWYER,
+		IssueUser::TYPE_CUSTOMER,
+		IssueUser::TYPE_LAWYER,
+		IssueUser::TYPE_AGENT,
 	];
 
 	public $user_id;
@@ -25,13 +23,6 @@ class IssueUserForm extends Model {
 
 	private ?User $_user = null;
 	private ?Issue $_issue = null;
-
-	public function scenarios(): array {
-		$scenarios = parent::scenarios();
-		$scenarios[static::SCENARIO_USER_LINK] = ['issue_id', 'type'];
-		$scenarios[static::SCENARIO_TYPE] = ['type'];
-		return $scenarios;
-	}
 
 	public function rules(): array {
 		return [
@@ -49,6 +40,7 @@ class IssueUserForm extends Model {
 		return [
 			'issue_id' => Yii::t('common', 'Issue'),
 			'type' => Yii::t('common', 'As role'),
+			'user_id' => Yii::t('common', 'User'),
 		];
 	}
 
@@ -93,15 +85,28 @@ class IssueUserForm extends Model {
 		if (!$issue) {
 			return false;
 		}
-		$issue->linkUser($this->getUser()->id, $this->type);
-		$auth = Yii::$app->authManager;
-		if (!$auth->checkAccess($this->getUser()->id, $this->type)) {
-			$auth->assign($auth->getRole($this->type), $this->getUser()->id);
-		}
-		if (!$auth->checkAccess($this->getUser()->id, User::PERMISSION_ISSUE)) {
-			$auth->assign($auth->getPermission(User::PERMISSION_ISSUE), $this->getUser()->id);
+		$userId = $this->getUser()->id;
+		$issue->linkUser($userId, $this->type);
+		try {
+			$auth = Yii::$app->authManager;
+			$issuePermission = $auth->getPermission(User::PERMISSION_ISSUE);
+			if ($issuePermission && !$auth->checkAccess($userId, $issuePermission->name)) {
+				$auth->assign($issuePermission, $userId);
+			}
+			$role = $auth->getRole($this->type);
+			if ($role && !$auth->checkAccess($userId, $role->name)) {
+				$auth->assign($role, $userId);
+			}
+		} catch (Exception $exception) {
+			Yii::warning($exception->getMessage());
 		}
 		return true;
+	}
+
+	public static function getUsersNames(): array {
+		return User::getSelectList(
+			User::getAssignmentIds([User::PERMISSION_ISSUE])
+		);
 	}
 
 }

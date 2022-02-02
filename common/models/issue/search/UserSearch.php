@@ -4,10 +4,12 @@ namespace common\models\issue\search;
 
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
+use common\models\query\PhonableQuery;
 use common\models\user\SurnameSearchInterface;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use yii\db\QueryInterface;
 
 /**
@@ -19,6 +21,7 @@ class UserSearch extends IssueUser implements
 	SurnameSearchInterface {
 
 	public string $surname = '';
+	public string $phone = '';
 	public bool $withArchive = false;
 
 	/**
@@ -28,7 +31,7 @@ class UserSearch extends IssueUser implements
 	public function rules(): array {
 		return [
 			[['issue_id'], 'integer'],
-			[['type'], 'string'],
+			[['type', 'phone'], 'string'],
 			['surname', 'string', 'min' => SurnameSearchInterface::MIN_LENGTH],
 
 		];
@@ -79,6 +82,7 @@ class UserSearch extends IssueUser implements
 		}
 
 		$this->applySurnameFilter($query);
+		$this->applyPhoneFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -95,8 +99,17 @@ class UserSearch extends IssueUser implements
 
 	public function applySurnameFilter(QueryInterface $query): void {
 		if (!empty($this->surname)) {
-			$query->with('user.userProfile');
 			$query->andWhere(['like', 'user_profile.lastname', $this->surname . '%', false]);
+		}
+	}
+
+	public function applyPhoneFilter(ActiveQuery $query): void {
+		if (!empty($this->phone)) {
+			$query->joinWith([
+				'user.userProfile' => function (PhonableQuery $query) {
+					$query->withPhoneNumber($this->phone);
+				},
+			]);
 		}
 	}
 }

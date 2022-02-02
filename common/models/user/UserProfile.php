@@ -2,6 +2,7 @@
 
 namespace common\models\user;
 
+use common\models\user\query\UserProfileQuery;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use vova07\fileapi\behaviors\UploadBehavior;
 use Yii;
@@ -20,6 +21,9 @@ use yii\db\ActiveRecord;
  * @property string $other
  * @property string $phone
  * @property string $phone_2
+ * @property string $tax_office
+ * @property string $pesel
+ * @property bool $email_hidden_in_frontend_issue
  */
 class UserProfile extends ActiveRecord {
 
@@ -66,6 +70,8 @@ class UserProfile extends ActiveRecord {
 			['website', 'url', 'defaultScheme' => 'http', 'validSchemes' => ['http', 'https']],
 			['other', 'string', 'max' => 1024],
 			[['phone', 'phone_2'], 'string', 'max' => 20],
+			[['pesel'], 'string', 'max' => 11],
+			[['email_hidden_in_frontend_issue'], 'boolean'],
 			[['phone', 'phone_2'], PhoneValidator::class, 'country' => 'PL'],
 			[['firstname', 'lastname', 'avatar_path', 'website'], 'string', 'max' => 255],
 			[['firstname', 'lastname'], 'match', 'pattern' => '/[AaĄąBbCcĆćDdEeĘęFfGgHhIiJjKkLlŁłMmNnŃńOoÓóPpRrSsŚśTtUuWwYyZzŹźŻż]/iu'],
@@ -88,6 +94,9 @@ class UserProfile extends ActiveRecord {
 			'other' => Yii::t('common', 'Other'),
 			'phone' => Yii::t('common', 'Phone number'),
 			'phone_2' => Yii::t('common', 'Phone number 2'),
+			'pesel' => Yii::t('common', 'PESEL'),
+			'tax_office' => Yii::t('settlement', 'Tax Office'),
+			'email_hidden_in_frontend_issue' => Yii::t('issue', 'Email hidden in Frontend Issue'),
 		];
 	}
 
@@ -100,5 +109,13 @@ class UserProfile extends ActiveRecord {
 			static::GENDER_MALE => Yii::t('common', 'Male'),
 			static::GENDER_FEMALE => Yii::t('common', 'Female'),
 		];
+	}
+
+	public static function find(): UserProfileQuery {
+		return new UserProfileQuery(static::class);
+	}
+
+	public function hasPhones(): bool {
+		return !empty($this->phone) || !empty($this->phone_2);
 	}
 }

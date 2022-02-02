@@ -35,7 +35,7 @@ class SourceCest {
 	}
 
 	public function checkWithoutPermission(FunctionalTester $I): void {
-		$I->amLoggedInAs(1);
+		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeResponseCodeIs(403);
 	}

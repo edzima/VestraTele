@@ -2,17 +2,22 @@
 
 namespace frontend\controllers;
 
-use backend\modules\issue\models\IssueNoteForm;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
 use common\models\user\Worker;
+use common\modules\issue\actions\NoteDescriptionListAction;
+use common\modules\issue\actions\NoteTitleListAction;
+use frontend\models\IssueNoteForm;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * CRUD for Summon model.
@@ -20,6 +25,16 @@ use yii\web\NotFoundHttpException;
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  */
 class NoteController extends Controller {
+
+	/**
+	 * @inheritdoc
+	 */
+	public function actions(): array {
+		return [
+			'title-list' => NoteTitleListAction::class,
+			'description-list' => NoteDescriptionListAction::class,
+		];
+	}
 
 	/**
 	 * @inheritdoc
@@ -51,34 +66,28 @@ class NoteController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIssue(int $id) {
-		$issue = Issue::findOne($id);
-		if ($issue === null || !Yii::$app->user->canSeeIssue($issue)) {
-			throw new NotFoundHttpException();
-		}
-		$note = new IssueNote();
-		$note->issue_id = $issue->id;
-		$note->user_id = Yii::$app->user->getId();
-
-		$model = new IssueNoteForm($note);
+		$issue = $this->findIssue($id);
+		$model = new IssueNoteForm([
+			'issue_id' => $issue->getIssueId(),
+			'user_id' => Yii::$app->user->getId(),
+		]);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$this->redirect(['/issue/view', 'id' => $issue->id]);
+			$this->redirect(['/issue/view', 'id' => $issue->getIssueId()]);
 		}
 		return $this->render('issue', [
 			'model' => $model,
+			'issue' => $issue,
 		]);
 	}
 
 	public function actionSettlement(int $id) {
 		$settlement = IssuePayCalculation::findOne($id);
-		if ($settlement === null || !Yii::$app->user->canSeeIssue($settlement->getIssueModel())) {
+		if ($settlement === null || !Yii::$app->user->canSeeIssue($settlement)) {
 			throw new NotFoundHttpException();
 		}
-		$note = new IssueNote();
-		$note->issue_id = $settlement->issue_id;
-		$note->user_id = Yii::$app->user->getId();
-		$note->type = IssueNote::generateType(IssueNote::TYPE_SETTLEMENT, $settlement->id);
-		$model = new IssueNoteForm($note);
+		$model = IssueNoteForm::createSettlement($settlement);
+		$model->user_id = Yii::$app->user->getId();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$this->redirect(['/settlement/view', 'id' => $settlement->id]);
@@ -91,14 +100,11 @@ class NoteController extends Controller {
 
 	public function actionSummon(int $id) {
 		$summon = Summon::findOne($id);
-		if ($summon === null || !Yii::$app->user->canSeeIssue($summon->getIssueModel())) {
+		if ($summon === null || !Yii::$app->user->canSeeIssue($summon)) {
 			throw new NotFoundHttpException();
 		}
-		$note = new IssueNote();
-		$note->issue_id = $summon->issue_id;
-		$note->user_id = Yii::$app->user->id;
-		$note->type = IssueNote::generateType(IssueNote::TYPE_SUMMON, $summon->id);
-		$model = new IssueNoteForm($note);
+		$model = IssueNoteForm::createSummon($summon);
+		$model->user_id = Yii::$app->user->getId();
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$this->redirect(['/summon/view', 'id' => $summon->id]);
 		}
@@ -116,16 +122,32 @@ class NoteController extends Controller {
 	 * @return mixed
 	 */
 	public function actionUpdate(int $id) {
-		$model = new IssueNoteForm($this->findModel($id));
+		$note = $this->findModel($id);
+		if ($note->isSms()) {
+			throw new NotFoundHttpException();
+		}
+		$model = new IssueNoteForm();
+		$model->setModel($note);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$this->redirectIssue($model->getNote()->issue_id);
+			$this->redirectIssue($note->issue_id);
 		}
 		return $this->render('update', [
 			'model' => $model,
 		]);
 	}
 
-	private function redirectIssue(int $issueId) {
+	public function actionDelete(int $id): Response {
+		$model = $this->findModel($id);
+		if (!Yii::$app->user->canDeleteNote($model)) {
+			Yii::warning('User: ' . Yii::$app->user->getId() . ' try Delete Note #:' . $model->id . ' with description: ' . $model->description);
+			throw new ForbiddenHttpException();
+		}
+		$model->delete();
+		Yii::warning('User: ' . Yii::$app->user->id . ' delete note. Title: ' . $model->title . "\n description: " . $model->description, 'note.delete');
+		return $this->redirectIssue($model->issue_id);
+	}
+
+	private function redirectIssue(int $issueId): Response {
 		return $this->redirect(['issue/view', 'id' => $issueId, '#' => 'notes-list']);
 	}
 
@@ -149,4 +171,14 @@ class NoteController extends Controller {
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}
 
+	protected function findIssue(int $id): Issue {
+		$issue = Issue::findOne($id);
+		if ($issue === null) {
+			throw new NotFoundHttpException();
+		}
+		if (!Yii::$app->user->canSeeIssue($issue)) {
+			throw new MethodNotAllowedHttpException();
+		}
+		return $issue;
+	}
 }

@@ -6,7 +6,7 @@ use Decimal\Decimal;
 
 interface VATInfo {
 
-	public function getVAT(): Decimal;
+	public function getVAT(): ?Decimal;
 
 	public function getValueVAT(): Decimal;
 
@@ -14,6 +14,8 @@ interface VATInfo {
 
 	public function getValueWithoutVAT(): Decimal;
 
-	public function getVATPercent(): string;
+	public function getVATPercent(): ?string;
+
+	public function hasVAT(): bool;
 
 }

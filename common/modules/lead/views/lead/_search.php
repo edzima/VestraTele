@@ -1,29 +1,29 @@
 <?php
 
+use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadSearch;
+use common\widgets\ActiveForm;
 use common\widgets\address\AddressSearchWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model LeadSearch */
-/* @var $form yii\widgets\ActiveForm */
+/* @var $form ActiveForm */
 
 ?>
 
 <div class="lead-search">
 
 	<?php $form = ActiveForm::begin([
-		'action' => ['index'],
 		'method' => 'get',
 	]); ?>
 
 	<div class="row">
 
-		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-3']]) ?>
+		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-2 col-lg-1']]) ?>
 
-		<?= $form->field($model, 'provider', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+		<?= $form->field($model, 'provider', ['options' => ['class' => 'col-md-2 col-lg-1']])->widget(Select2::class, [
 			'data' => LeadSearch::getProvidersNames(),
 			'pluginOptions' => [
 				'placeholder' => $model->getAttributeLabel('provider'),
@@ -32,22 +32,27 @@ use yii\widgets\ActiveForm;
 		]) ?>
 
 
-	</div>
+		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-2 col-lg-2']])->widget(Select2::class, [
+			'data' => $model->getCampaignNames(),
+			'pluginOptions' => [
+				'placeholder' => Yii::t('lead', 'Campaign'),
+				'allowClear' => true,
+			],
+		]) ?>
 
-	<?php if ($model->scenario !== LeadSearch::SCENARIO_USER): ?>
+		<?php if ($model->scenario !== LeadSearch::SCENARIO_USER): ?>
 
-		<div class="row">
-
-			<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+			<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(Select2::class, [
 				'data' => LeadSearch::getUsersNames(),
 				'pluginOptions' => [
 					'placeholder' => $model->getAttributeLabel('user_id'),
 					'allowClear' => true,
+					'multiple' => true,
 				],
 			])
 			?>
 
-			<?= $form->field($model, 'user_type', ['options' => ['class' => 'col-md-3']])->widget(Select2::class, [
+			<?= $form->field($model, 'user_type', ['options' => ['class' => 'col-md-2 col-lg-1']])->widget(Select2::class, [
 				'data' => LeadSearch::getUserTypesNames(),
 				'pluginOptions' => [
 					'placeholder' => $model->getAttributeLabel('user_type'),
@@ -56,20 +61,36 @@ use yii\widgets\ActiveForm;
 			])
 			?>
 
+			<?php
+			$dialers = LeadSearch::getUsersNames(LeadUser::TYPE_DIALER);
+			if (!empty($dialers)) {
+				echo $form->field($model, 'dialer_id', ['options' => ['class' => 'col-md-3 col-lg-1']])->widget(Select2::class, [
+					'data' => $dialers,
+					'pluginOptions' => [
+						'placeholder' => $model->getAttributeLabel('dialer_id'),
+						'allowClear' => true,
+					],
+				]);
+			}
+			?>
+
 			<?= $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
+			<?= $form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
-		</div>
+			<?= $form->field($model, 'duplicateEmail', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
-	<?php endif; ?>
+		<?php endif; ?>
+
+
+	</div>
+
 
 	<div class="row">
 
 		<?= $form->field($model, 'closedQuestions', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
 			'data' => LeadSearch::getClosedQuestionsNames(),
-			'options' => [
-				'multiple' => true,
-			],
+			'options' => ['multiple' => true,],
 			'pluginOptions' => [
 				'placeholder' => $model->getAttributeLabel('closedQuestions'),
 				'allowClear' => true,
@@ -77,16 +98,13 @@ use yii\widgets\ActiveForm;
 		])
 		?>
 
+		<?= $form->field($model, 'withoutArchives', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
+
 		<?= $form->field($model, 'withoutReport', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
 
 	</div>
 
-	<div class="row">
-		<?php //$form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
-
-		<?php // $form->field($model, 'duplicateEmail', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
-	</div>
 
 	<?= AddressSearchWidget::widget([
 		'form' => $form,

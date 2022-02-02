@@ -2,6 +2,9 @@
 
 namespace frontend\tests;
 
+use Codeception\Actor;
+use Codeception\Lib\Friend;
+use common\fixtures\helpers\FixtureTester;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\user\Worker;
 use common\tests\_support\UserRbacActor;
@@ -18,14 +21,16 @@ use Yii;
  * @method void am($role)
  * @method void lookForwardTo($achieveValue)
  * @method void comment($description)
- * @method \Codeception\Lib\Friend haveFriend($name, $actorClass = null)
+ * @method Friend haveFriend($name, $actorClass = null)
  *
  * @SuppressWarnings(PHPMD)
  */
-class FunctionalTester extends \Codeception\Actor {
+class FunctionalTester extends Actor implements FixtureTester {
 
 	use _generated\FunctionalTesterActions;
 	use UserRbacActor;
+
+	private const DEFAULT_GRID_SELECTOR = '.grid-view';
 
 	public function seeValidationError($message): void {
 		$this->see($message, '.help-block');
@@ -89,6 +94,21 @@ class FunctionalTester extends \Codeception\Actor {
 		return [
 			Yii::$app->request->csrfParam => Yii::$app->request->csrfToken,
 		];
+	}
+
+	public function seeGridActionLink(string $title, string $selector = self::DEFAULT_GRID_SELECTOR): void {
+		$selector .= ' .action-column a';
+		$this->seeElement($selector, ['title' => $title]);
+	}
+
+	public function dontSeeGridActionLink(string $title, string $selector = self::DEFAULT_GRID_SELECTOR): void {
+		$selector .= ' .action-column a';
+		$this->dontSeeElement($selector, ['title' => $title]);
+	}
+
+	public function clickGridActionLink(string $title, string $gridSelector = self::DEFAULT_GRID_SELECTOR) {
+		$selector = $gridSelector . ' a[title="' . $title . '"]';
+		$this->click($selector);
 	}
 
 }

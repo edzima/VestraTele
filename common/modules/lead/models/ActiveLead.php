@@ -5,17 +5,19 @@ namespace common\modules\lead\models;
 /**
  * Interface ActiveLead
  *
- * @property-read LeadReportInterface[] $reports
+ * @property-read LeadReport[] $reports
  * @property-read LeadAnswer[] $answers
  * @property-read LeadAddress[] $addresses
  */
 interface ActiveLead extends LeadInterface {
 
-	public function getId(): string;
+	public function getId(): int;
 
 	public function updateFromLead(LeadInterface $lead): void;
 
 	public function updateStatus(int $status_id): bool;
+
+	public function updateName(string $name): bool;
 
 	public function unlinkUsers(): void;
 

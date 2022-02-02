@@ -6,6 +6,7 @@ use common\models\issue\IssueSearch as BaseIssueSearch;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
 use common\models\user\User;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 
@@ -20,6 +21,12 @@ class IssueSearch extends BaseIssueSearch {
 		return array_merge(parent::rules(), [
 			['agent_id', 'in', 'range' => $this->getAvailableAgentsIds()],
 		]);
+	}
+
+	public function attributeLabels(): array {
+		$labels = parent::attributeLabels();
+		$labels['entity_responsible_id'] = Yii::t('issue', 'Entity');
+		return $labels;
 	}
 
 	/**
@@ -96,12 +103,13 @@ class IssueSearch extends BaseIssueSearch {
 		return $this->availableAgentsIds;
 	}
 
-	public function getAgentsList(): array {
+	public function getAgentsNames(): array {
 		return User::getSelectList(
 			IssueUser::find()
 				->select('user_id')
 				->withType(IssueUser::TYPE_AGENT)
 				->andWhere(['user_id' => $this->getAvailableAgentsIds()])
+				->distinct()
 				->column()
 		);
 	}

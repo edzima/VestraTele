@@ -6,8 +6,8 @@ use common\modules\lead\models\ActiveLead;
 /* @var $this yii\web\View */
 /* @var $lead ActiveLead $lead */
 
-$leadLink = Yii::$app->urlManager->createAbsoluteUrl(['lead/lead/view', 'id' => $lead->getId()]);
-$reportLink = Yii::$app->urlManager->createAbsoluteUrl(['lead/report/report', 'id' => $lead->getId()]);
+$leadLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/lead/view', 'id' => $lead->getId()]);
+$reportLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/report/report', 'id' => $lead->getId()]);
 
 ?>
 <div class="lead-push-email">

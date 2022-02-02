@@ -7,6 +7,7 @@ use Yii;
 class CustomerDataColumn extends DataColumn {
 
 	public $noWrap = true;
+	public bool $ellipsis = true;
 	public bool $contentBold = true;
 
 	public $attribute = 'customerLastname';

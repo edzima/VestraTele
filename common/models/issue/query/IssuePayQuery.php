@@ -32,16 +32,14 @@ class IssuePayQuery extends ActiveQuery {
 		return parent::one($db);
 	}
 
-	public function onlyNotPayed(): self {
+	public function onlyDelayed(int $days = null): self {
 		[, $alias] = $this->getTableNameAndAlias();
-		$this->andWhere("$alias.pay_at IS NULL");
-		return $this;
-	}
-
-	public function onlyDelayed(): self {
-		[, $alias] = $this->getTableNameAndAlias();
-		$this->onlyNotPayed();
-		$this->andWhere(['<=', $alias . '.deadline_at', date('Y-m-d')]);
+		$this->onlyUnpaid();
+		if ($days === null) {
+			$this->andWhere(['<=', $alias . '.deadline_at', date('Y-m-d')]);
+		} else {
+			$this->andWhere(['=', new Expression("DATEDIFF(CURDATE(), $alias.deadline_at)"), $days]);
+		}
 		return $this;
 	}
 
@@ -64,7 +62,13 @@ class IssuePayQuery extends ActiveQuery {
 		return $this;
 	}
 
-	public function onlyPayed(): self {
+	public function onlyUnpaid(): self {
+		[, $alias] = $this->getTableNameAndAlias();
+		$this->andWhere("$alias.pay_at IS NULL");
+		return $this;
+	}
+
+	public function onlyPaid(): self {
 		[, $alias] = $this->getTableNameAndAlias();
 		$this->andWhere($alias . '.pay_at IS NOT NULL');
 		return $this;
@@ -81,7 +85,7 @@ class IssuePayQuery extends ActiveQuery {
 
 	public function getPayedSum(): Decimal {
 		$query = clone $this;
-		return $query->onlyPayed()->getValueSum();
+		return $query->onlyPaid()->getValueSum();
 	}
 
 	public function onlyWithoutDeadline(): self {

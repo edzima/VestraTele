@@ -3,15 +3,20 @@
 namespace common\modules\lead\models\searches;
 
 use common\models\AddressSearch;
+use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\models\user\User;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadQuestion;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\query\LeadAnswerQuery;
+use common\modules\lead\models\query\LeadQuery;
+use common\validators\PhoneValidator;
 use Yii;
 use yii\base\Model;
 use yii\base\UnknownPropertyException;
@@ -30,14 +35,21 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private const QUESTION_ATTRIBUTE_PREFIX = 'question';
 
+	public $dialer_id;
+
 	public bool $withoutUser = false;
 	public bool $withoutReport = false;
 	public bool $duplicateEmail = false;
 	public bool $duplicatePhone = false;
+
+	public bool $withoutArchives = true;
+
 	public $name = '';
 	public $user_id;
 	public $user_type;
 	public $type_id;
+
+	public string $reportsDetails = '';
 
 	public $answers = [];
 	public $closedQuestions = [];
@@ -47,6 +59,7 @@ class LeadSearch extends Lead implements SearchModel {
 	private static ?array $QUESTIONS = null;
 
 	public AddressSearch $addressSearch;
+	private ?array $ids = null;
 
 	public function __construct($config = []) {
 		if (!isset($config['addressSearch'])) {
@@ -60,14 +73,17 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'status_id', 'type_id', 'source_id', 'user_id', 'campaign_id'], 'integer'],
+			[['id', 'status_id', 'type_id', 'source_id', 'campaign_id', 'dialer_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
-			[['withoutUser', 'withoutReport', 'duplicatePhone', 'duplicateEmail'], 'boolean'],
+			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
+			[['withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail'], 'boolean'],
 			['name', 'string', 'min' => 3],
-			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'user_type'], 'safe'],
+			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
+			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
 			[array_keys($this->questionsAttributes), 'safe'],
+			['phone', PhoneValidator::class],
 		];
 	}
 
@@ -75,9 +91,11 @@ class LeadSearch extends Lead implements SearchModel {
 		return array_merge(
 			parent::attributeLabels(),
 			[
+				'withoutArchives' => Yii::t('lead', 'Without Archives'),
 				'withoutUser' => Yii::t('lead', 'Without User'),
 				'withoutReport' => Yii::t('lead', 'Without Report'),
 				'user_id' => Yii::t('lead', 'User'),
+				'dialer_id' => Yii::t('lead', 'Dialer'),
 				'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 				'duplicateEmail' => Yii::t('lead', 'Duplicate Email'),
 				'duplicatePhone' => Yii::t('lead', 'Duplicate Phone'),
@@ -146,8 +164,8 @@ class LeadSearch extends Lead implements SearchModel {
 			->with('status')
 			->with('campaign')
 			->with('owner.userProfile')
-			//		->joinWith('addresses.address')
-			->joinWith('answers')
+			->with('reports.answers')
+			->with('reports.answers.question')
 			->groupBy(Lead::tableName() . '.id');
 
 		// add conditions that should always apply here
@@ -174,24 +192,23 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyDuplicates($query);
 		$this->applyNameFilter($query);
 		$this->applyUserFilter($query);
+		$this->applyPhoneFilter($query);
+		$this->applyStatusFilter($query);
 		$this->applyReportFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
 			Lead::tableName() . '.id' => $this->id,
 			Lead::tableName() . '.date_at' => $this->date_at,
-			Lead::tableName() . '.status_id' => $this->status_id,
 			Lead::tableName() . '.campaign_id' => $this->campaign_id,
 			Lead::tableName() . '.source_id' => $this->source_id,
 			Lead::tableName() . '.provider' => $this->provider,
 			'S.type_id' => $this->type_id,
-
 		]);
 
 		$query
 			->andFilterWhere(['like', Lead::tableName() . '.data', $this->data])
 			->andFilterWhere(['like', Lead::tableName() . '.email', $this->email])
-			->andFilterWhere(['like', Lead::tableName() . '.phone', $this->phone])
 			->andFilterWhere(['like', Lead::tableName() . '.postal_code', $this->postal_code]);
 
 		if (YII_ENV_TEST) {
@@ -199,6 +216,17 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 
 		return $dataProvider;
+	}
+
+	public function getAllIds(LeadQuery $query, bool $refresh = false): array {
+		if ($refresh || $this->ids === null) {
+			$query = clone $query;
+			$query->select(Lead::tableName() . '.id');
+			$this->applyDuplicates($query);
+			$query->orderBy(['date_at' => SORT_DESC]);
+			$this->ids = $query->column();
+		}
+		return $this->ids;
 	}
 
 	private function applyAddressFilter(ActiveQuery $query): void {
@@ -225,8 +253,13 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private function applyReportFilter(ActiveQuery $query) {
 		if ($this->withoutReport) {
-			$query->joinWith('reports R', false, 'LEFT OUTER JOIN');
-			$query->andWhere(['R.id' => null]);
+			$query->joinWith('reports', false, 'LEFT OUTER JOIN');
+			$query->andWhere([LeadReport::tableName() . '.id' => null]);
+		} else {
+			if (!empty($this->reportsDetails)) {
+				$query->joinWith('reports');
+				$query->andWhere(['like', LeadReport::tableName() . '.details', $this->reportsDetails]);
+			}
 		}
 	}
 
@@ -254,7 +287,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 			//@todo fix multiple answers
 			$query->joinWith([
-				'answers' => function (LeadAnswerQuery $answerQuery): void {
+				'reports.answers' => function (LeadAnswerQuery $answerQuery): void {
 					$answerQuery->likeAnswers($this->answers);
 				},
 			], false);
@@ -262,14 +295,17 @@ class LeadSearch extends Lead implements SearchModel {
 	}
 
 	private function applyDuplicates(ActiveQuery $query): void {
+		if ($this->duplicateEmail || $this->duplicatePhone) {
+			$query->addSelect([Lead::tableName() . '.*']);
+		}
 		if ($this->duplicateEmail) {
 			$query->addSelect('COUNT(' . Lead::tableName() . '.email) as emailCount');
-			$query->addGroupBy(Lead::tableName() . '.email');
+			$query->groupBy(Lead::tableName() . '.email');
 			$query->having('emailCount > 1');
 		}
 		if ($this->duplicatePhone) {
-			$query->addSelect('COUNT(' . Lead::tableName() . '.phone) as phoneCount');
-			$query->addGroupBy(Lead::tableName() . '.phone');
+			$query->addSelect(['COUNT(' . Lead::tableName() . '.phone) as phoneCount']);
+			$query->groupBy(Lead::tableName() . '.phone');
 			$query->having('phoneCount > 1');
 		}
 	}
@@ -303,15 +339,15 @@ class LeadSearch extends Lead implements SearchModel {
 	}
 
 	public static function getTypesNames(): array {
-		return LeadType::getNames();
+		return LeadType::getNamesWithDescription();
 	}
 
 	public static function getUserTypesNames(): array {
 		return LeadUser::getTypesNames();
 	}
 
-	public static function getUsersNames(): array {
-		return User::getSelectList(LeadUser::userIds());
+	public static function getUsersNames(string $type = null): array {
+		return User::getSelectList(LeadUser::userIds($type));
 	}
 
 	/**
@@ -341,6 +377,22 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private static function removeQuestionAttributePrefix(string $attribute): int {
 		return substr($attribute, strlen(static::QUESTION_ATTRIBUTE_PREFIX));
+	}
+
+	private function applyPhoneFilter(PhonableQuery $query): void {
+		if (!empty($this->phone)) {
+			$query->withPhoneNumber($this->phone);
+		}
+	}
+
+	private function applyStatusFilter(LeadQuery $query): void {
+		if ((int) $this->status_id === LeadStatusInterface::STATUS_ARCHIVE) {
+			$this->withoutArchives = false;
+		}
+		if ($this->withoutArchives && empty($this->status_id)) {
+			$query->andWhere(['<>', Lead::tableName() . '.status_id', LeadStatusInterface::STATUS_ARCHIVE]);
+		}
+		$query->andFilterWhere([Lead::tableName() . '.status_id' => $this->status_id]);
 	}
 
 }

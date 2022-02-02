@@ -8,6 +8,7 @@ use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\ProblemCalculationIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\Issue;
 use common\models\user\User;
 
@@ -26,6 +27,9 @@ class CalculationCest {
 
 	/** @see CalculationController::actionIssue() */
 	public const ROUTE_ISSUE = 'settlement/calculation/issue';
+
+	/** @see CalculationController::actionWithoutProvisions() */
+	public const ROUTE_WITHOUT_PROVISIONS = 'settlement/calculation/without-provisions';
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -85,6 +89,7 @@ class CalculationCest {
 		$I->assignPermission(User::PERMISSION_PROVISION);
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeLink('Delete provisions');
 		$I->seeLink('Without provisions');
 		$I->click('Without provisions');
 		$I->seeResponseCodeIsSuccessful();
@@ -105,7 +110,7 @@ class CalculationCest {
 
 	public function checkToCreateWithMinCountSettings(CreateCalculationIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		$I->haveFixtures(IssueFixtureHelper::stageAndTypesFixtures());
 		$I->amOnPage(static::ROUTE_TO_CREATE);
 		$I->dontSeeFlash('Min calculation count must be set.', 'warning');
 		$I->see('Issues to create calculations');
@@ -117,7 +122,7 @@ class CalculationCest {
 
 	public function checkIssueWithoutCalculation(Bookkeeper $I): void {
 		$I->amLoggedIn();
-		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		$I->haveFixtures(IssueFixtureHelper::issue());
 		/** @var Issue $issue */
 		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
@@ -127,8 +132,8 @@ class CalculationCest {
 	public function checkIssueWithCalculationAndNotMinLimit(Bookkeeper $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements()
+			IssueFixtureHelper::issue(),
+			SettlementFixtureHelper::settlement()
 		));
 		/** @var Issue $issue */
 		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
@@ -146,8 +151,11 @@ class CalculationCest {
 	public function checkIssueCreateLink(Bookkeeper $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements()
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::types(),
+			IssueFixtureHelper::customer(),
+			IssueFixtureHelper::issueUsers(),
+			SettlementFixtureHelper::settlement()
 		));
 		/** @var Issue $issue */
 		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
@@ -159,7 +167,7 @@ class CalculationCest {
 
 	public function checkNotExistIssue(CreateCalculationIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		$I->haveFixtures(IssueFixtureHelper::issue());
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => 1000]);
 		$I->seeResponseCodeIs(403);
 	}

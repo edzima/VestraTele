@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
 use Yii;
 use yii\db\ActiveRecord;
@@ -70,13 +71,12 @@ class IssueType extends ActiveRecord {
 		];
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getIssues() {
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getIssues(): IssueQuery {
 		return $this->hasMany(Issue::class, ['type_id' => 'id']);
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getStages(): IssueStageQuery {
 		return $this->hasMany(IssueStage::class, ['id' => 'stage_id'])
 			->viaTable('{{%issue_stage_type}}', ['type_id' => 'id']);
@@ -105,6 +105,10 @@ class IssueType extends ActiveRecord {
 		return ArrayHelper::map(static::getTypes(), 'id', 'name');
 	}
 
+	public static function getTypesNamesWithShort(): array {
+		return ArrayHelper::map(static::getTypes(), 'id', 'nameWithShort');
+	}
+
 	public static function get(int $typeId): ?self {
 		return static::getTypes()[$typeId] ?? null;
 	}
@@ -114,7 +118,10 @@ class IssueType extends ActiveRecord {
 	 */
 	public static function getTypes(): array {
 		if (empty(static::$TYPES)) {
-			static::$TYPES = static::find()->indexBy('id')->all();
+			static::$TYPES = static::find()
+				->orderBy('name')
+				->indexBy('id')
+				->all();
 		}
 		return static::$TYPES;
 	}

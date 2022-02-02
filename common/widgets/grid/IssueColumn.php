@@ -2,45 +2,49 @@
 
 namespace common\widgets\grid;
 
+use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use Yii;
-use yii\helpers\Html;
 
 class IssueColumn extends DataColumn {
 
 	public $noWrap = true;
 
-	public ?string $issueAttribute = 'issue';
 	public $attribute = 'issue_id';
 
 	public array $linkOptions = [
 		'target' => '_blank',
+		'data-pjax' => '0',
 	];
 
 	public ?string $viewBaseUrl = null;
 
 	public function init(): void {
 		if (empty($this->label)) {
-			$this->label = Yii::t('common', 'Issue');
+			$this->label = Yii::t('issue', 'Issue');
 		}
 		if (!empty($this->viewBaseUrl) && !empty($this->linkOptions)) {
 			$this->format = 'raw';
 			$this->value = function (IssueInterface $model): string {
-				return Html::a(
-					$model->getIssueName(),
-					[$this->viewBaseUrl, 'id' => $model->getIssueId()],
-					$this->linkOptions);
+				return $this->renderIssueLink($model);
 			};
+		}
+		if (empty($this->value)) {
+			$this->value = static function (IssueInterface $model): string {
+				return $model->getIssueName();
+			};
+		}
+		if (!isset($this->filterInputOptions['placeholder'])) {
+			$this->filterInputOptions['placeholder'] = Yii::t('issue', 'Issue Name');
 		}
 		$this->options['style'] = 'width:100px';
 		parent::init();
 	}
 
-	public function getLinkText(IssueInterface $model): string {
-		return $model->getIssueName();
+	public function renderIssueLink(IssueInterface $model): string {
+		return Html::a($model->getIssueName(),
+			[$this->viewBaseUrl, 'id' => $model->getIssueId()],
+			$this->linkOptions);
 	}
 
-	public function getId(IssueInterface $model): int {
-		return $model->getIssueId();
-	}
 }

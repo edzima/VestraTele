@@ -2,20 +2,26 @@
 
 namespace common\models\provision;
 
-use common\models\user\Worker;
+use common\models\user\User;
+use DateTime;
 use Decimal\Decimal;
+use Yii;
+use yii\base\InvalidArgumentException;
 use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "provision_user".
  *
+ * @property int $id
  * @property int $from_user_id
  * @property int $to_user_id
  * @property int $type_id
  * @property string $value
+ * @property string $from_at
+ * @property string $to_at
  *
- * @property Worker $fromUser
- * @property Worker $toUser
+ * @property-read User $fromUser
+ * @property-read User $toUser
  * @property ProvisionType $type
  *
  * @property-read string $typeWithValue
@@ -25,8 +31,8 @@ class ProvisionUser extends ActiveRecord {
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function tableName() {
-		return 'provision_user';
+	public static function tableName(): string {
+		return '{{%provision_user}}';
 	}
 
 	/**
@@ -37,9 +43,8 @@ class ProvisionUser extends ActiveRecord {
 			[['from_user_id', 'to_user_id', 'type_id', 'value'], 'required'],
 			[['from_user_id', 'to_user_id', 'type_id'], 'integer'],
 			[['value'], 'number', 'min' => 0],
-			[['from_user_id', 'to_user_id', 'type_id'], 'unique', 'targetAttribute' => ['from_user_id', 'to_user_id', 'type_id']],
-			[['from_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['from_user_id' => 'id']],
-			[['to_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Worker::class, 'targetAttribute' => ['to_user_id' => 'id']],
+			[['from_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['from_user_id' => 'id']],
+			[['to_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['to_user_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ProvisionType::class, 'targetAttribute' => ['type_id' => 'id']],
 		];
 	}
@@ -49,26 +54,39 @@ class ProvisionUser extends ActiveRecord {
 	 */
 	public function attributeLabels(): array {
 		return [
-			'from_user_id' => 'Od',
-			'to_user_id' => 'Do',
-			'type_id' => 'Typ',
-			'value' => 'Prowizja',
-			'isDefaultValue' => 'Domyślna prowizja',
+			'from_user_id' => Yii::t('provision', 'From'),
+			'to_user_id' => Yii::t('provision', 'To'),
+			'type_id' => Yii::t('provision', 'Type'),
+			'value' => Yii::t('provision', 'Value'),
+			'isOverwritten' => Yii::t('provision', 'Is overwritten'),
+			'from_at' => Yii::t('provision', 'From at'),
+			'to_at' => Yii::t('provision', 'To at'),
+			'fromUser' => Yii::t('provision', 'From'),
+			'toUser' => Yii::t('provision', 'To'),
+			'fromUserNameWhenNotSelf' => Yii::t('provision', 'From'),
+			'formattedValue' => Yii::t('provision', 'Provision'),
 		];
+	}
+
+	public function getFromUserNameWhenNotSelf(): ?string {
+		if ($this->isSelf()) {
+			return null;
+		}
+		return $this->fromUser->getFullName();
 	}
 
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getFromUser() {
-		return $this->hasOne(Worker::class, ['id' => 'from_user_id']);
+		return $this->hasOne(User::class, ['id' => 'from_user_id']);
 	}
 
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getToUser() {
-		return $this->hasOne(Worker::class, ['id' => 'to_user_id']);
+		return $this->hasOne(User::class, ['id' => 'to_user_id']);
 	}
 
 	/**
@@ -83,8 +101,8 @@ class ProvisionUser extends ActiveRecord {
 		$this->type_id = $type->id;
 	}
 
-	public function getIsDefaultValue(): bool {
-		return $this->value === $this->type->value;
+	public function getIsOverwritten(): bool {
+		return $this->getValue()->equals($this->type->getValue());
 	}
 
 	public function getTypeWithValue(): string {
@@ -101,6 +119,37 @@ class ProvisionUser extends ActiveRecord {
 
 	public static function find(): ProvisionUserQuery {
 		return new ProvisionUserQuery(static::class);
+	}
+
+	public function isSelf(): bool {
+		return $this->from_user_id === $this->to_user_id;
+	}
+
+	public function isForDate($date): bool {
+		if (empty($this->from_at) && empty($this->to_at)) {
+			return true;
+		}
+		if (!$date instanceof DateTime) {
+			$date = new DateTime($date);
+		}
+		if (!empty($this->from_at)) {
+			$fromAt = new DateTime($this->from_at);
+			if (empty($this->to_at)) {
+				return $date >= $fromAt;
+			}
+			return $date >= $fromAt && $date <= new DateTime($this->to_at);
+		}
+		return $date <= new DateTime($this->to_at);
+	}
+
+	public function generateProvision(Decimal $value = null): Decimal {
+		if (!$this->type->is_percentage) {
+			return $this->getValue();
+		}
+		if ($value === null) {
+			new InvalidArgumentException('$value must be Decimal when type is percentage.');
+		}
+		return $value->mul($this->getValue())->div(100);
 	}
 
 }

@@ -1,6 +1,12 @@
 <?php
 
 use backend\modules\benefit\Module as BenefitModule;
+use common\models\user\User;
+use common\models\user\Worker;
+use Edzima\Yii2Adescom\Module as AdescomModule;
+use motion\i18n\ConfigLanguageProvider;
+use yii\base\Action;
+use ymaker\email\templates\Module as EmailTemplateModule;
 use backend\modules\entityResponsible\Module as EntityResponsibleModule;
 use backend\modules\issue\Module as IssueModule;
 use backend\modules\hint\Module as HintModule;
@@ -12,7 +18,6 @@ use common\modules\lead\Module as LeadModule;
 use common\behaviors\GlobalAccessBehavior;
 use common\behaviors\LastActionBehavior;
 use common\components\User as WebUser;
-use common\models\user\User;
 use yii\web\UserEvent;
 
 $params = array_merge(
@@ -82,6 +87,18 @@ return [
 		'frontendCache' => require Yii::getAlias('@frontend/config/_cache.php'),
 	],
 	'modules' => [
+		'adescom-sms' => [
+			'class' => AdescomModule::class,
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'permissions' => [User::PERMISSION_SMS],
+					],
+				],
+			],
+		],
 		'benefit' => [
 			'class' => BenefitModule::class,
 		],
@@ -107,6 +124,31 @@ return [
 		'entity-responsible' => [
 			'class' => EntityResponsibleModule::class,
 		],
+		'message-templates' => [
+			'class' => EmailTemplateModule::class,
+			'languageProvider' => [
+				'class' => ConfigLanguageProvider::class,
+				'languages' => [
+					[
+						'locale' => 'pl',
+						'label' => 'Polski',
+					],
+				],
+				'defaultLanguage' => [
+					'locale' => 'pl',
+					'label' => 'Polski',
+				],
+			],
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'roles' => [User::PERMISSION_MESSAGE_TEMPLATE],
+					],
+				],
+			],
+		],
 		'gridview' => [
 			'class' => '\kartik\grid\Module',
 		],
@@ -127,6 +169,30 @@ return [
 				'rules' => [
 					[
 						'allow' => true,
+						'controllers' => ['lead/status'],
+						'permissions' => [User::PERMISSION_LEAD_STATUS],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['lead/dialer-lead'],
+						'permissions' => [Worker::PERMISSION_LEAD_DIALER],
+					],
+					[
+						'allow' => false,
+						'controllers' => ['lead/dialer-lead', 'lead/status'],
+					],
+					[
+						'allow' => true,
+						'matchCallback' => static function ($rule, Action $action): bool {
+							if ($action->controller->id === 'sms') {
+								if ($action->id === 'push-multiple') {
+									return Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS);
+								}
+								return Yii::$app->user->can(User::PERMISSION_SMS);
+							}
+
+							return true;
+						},
 						'permissions' => [User::PERMISSION_LEAD],
 					],
 				],

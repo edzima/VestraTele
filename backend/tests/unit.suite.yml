@@ -5,3 +5,5 @@ modules:
     - Yii2:
         part: [ orm, email, fixtures ]
     - Asserts
+    - \common\tests\Helper\QueueHelper:
+        depends: Yii2

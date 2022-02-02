@@ -12,19 +12,12 @@ class DateTimeMonthIntervalTest extends Unit {
 	public function testFebrurary(): void {
 		$this->tester->assertSame(
 			'2019-02-28',
-			DateTimeHelper::addMonth(new DateTime('2019-01-31'))
+			DateTimeHelper::getSameDayNextMonth(new DateTime('2019-01-31'))
 				->format(static::FORMAT)
 		);
 		$this->tester->assertSame(
 			'2020-02-29',
-			DateTimeHelper::addMonth(new DateTime('2020-01-31'))
-				->format(static::FORMAT)
-		);
-		$this->tester->assertSame(
-			'2020-03-31',
-			DateTimeHelper::lastDayOfMonth(
-				DateTimeHelper::addMonth(new DateTime('2020-02-29'))
-			)
+			DateTimeHelper::getSameDayNextMonth(new DateTime('2020-01-31'))
 				->format(static::FORMAT)
 		);
 	}

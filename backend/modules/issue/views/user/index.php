@@ -3,6 +3,7 @@
 use backend\modules\issue\models\search\UserSearch;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
+use common\widgets\grid\ActionColumn;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 
@@ -10,7 +11,7 @@ use yii\helpers\Html;
 /* @var $searchModel UserSearch */
 /* @var $dataProvider ActiveDataProvider */
 
-$this->title = Yii::t('common', 'Issues users');
+$this->title = Yii::t('backend', 'Issues Users');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' => ['/issue/issue/index']];
 
 $this->params['breadcrumbs'][] = $this->title;
@@ -34,6 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'typeName',
 				'filter' => UserSearch::getTypesNames(),
 			],
+			['class' => ActionColumn::class],
 		],
 	]); ?>
 </div>

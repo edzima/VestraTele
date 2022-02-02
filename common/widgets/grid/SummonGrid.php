@@ -6,23 +6,39 @@ use common\models\issue\search\SummonSearch;
 use common\widgets\GridView;
 use kartik\select2\Select2;
 use Yii;
+use yii\base\InvalidConfigException;
 
+/**
+ * @property-read SummonSearch $filterModel
+ */
 class SummonGrid extends GridView {
+
+	public const VALUE_TYPE_NAME_SHORT = 'type.short_name';
+	public const VALUE_TYPE_NAME = 'type.name';
 
 	public $id = 'summon-grid';
 
-	public $actionColumn = ['class' => ActionColumn::class];
+	/** @todo add note link */
+	public $actionColumn = [
+		'class' => ActionColumn::class,
+		'template' => '{note} {view} {update} {delete}',
+	];
 
 	public string $issueColumn = IssueColumn::class;
+	public string $valueType = self::VALUE_TYPE_NAME;
 
 	public bool $withIssue = true;
 	public bool $withCustomer = true;
 	public bool $withCaption = false;
+	public bool $withCustomerPhone = true;
 	public bool $withContractor = true;
 	public bool $withOwner = true;
 	public bool $withUpdatedAt = true;
 
 	public function init(): void {
+		if ($this->filterModel !== null && !$this->filterModel instanceof SummonSearch) {
+			throw new InvalidConfigException('$filterModel must be instance of: ' . SummonSearch::class . '.');
+		}
 		if (empty($this->columns)) {
 			$this->columns = $this->defaultColumns();
 		}
@@ -48,9 +64,19 @@ class SummonGrid extends GridView {
 				'visible' => $this->withCustomer,
 			],
 			[
-				'attribute' => 'type',
-				'value' => 'typeName',
+				'attribute' => 'customerPhone',
+				'value' => 'issue.customer.profile.phone',
+				'label' => Yii::t('common', 'Phone number'),
+				'format' => 'tel',
+				'noWrap' => true,
+				'visible' => $this->withCustomerPhone,
+			],
+			[
+				'attribute' => 'type_id',
+				'value' => $this->valueType,
 				'filter' => SummonSearch::getTypesNames(),
+				'contentBold' => true,
+				'noWrap' => true,
 			],
 			[
 				'attribute' => 'status',
@@ -60,6 +86,11 @@ class SummonGrid extends GridView {
 			[
 				'attribute' => 'title',
 				'contentOptions' => ['style' => 'width: 35%;'],
+			],
+			[
+				'attribute' => 'start_at',
+				'format' => 'date',
+				'noWrap' => true,
 			],
 			[
 				'attribute' => 'deadline_at',
@@ -75,13 +106,17 @@ class SummonGrid extends GridView {
 			[
 				'attribute' => 'owner_id',
 				'value' => 'owner',
-				'filter' => SummonSearch::getOwnersNames(),
+				'filter' => $this->filterModel ? $this->filterModel->getOwnersNames() : [],
 				'filterType' => static::FILTER_SELECT2,
 				'filterInputOptions' => [
 					'placeholder' => Yii::t('common', 'Owner'),
 				],
 				'filterWidgetOptions' => [
 					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
 				],
 				'visible' => $this->withOwner,
 			],
@@ -95,6 +130,10 @@ class SummonGrid extends GridView {
 				],
 				'filterWidgetOptions' => [
 					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
 				],
 				'visible' => $this->withContractor,
 			],

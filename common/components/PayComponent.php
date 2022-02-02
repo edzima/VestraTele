@@ -24,7 +24,7 @@ class PayComponent extends Component {
 		$payed = $this->payedFilter($pays);
 		$sum = new Decimal(0);
 		foreach ($payed as $pay) {
-		 	$sum = $sum->add($pay->getValue());
+			$sum = $sum->add($pay->getValue());
 		}
 		return $sum;
 	}
@@ -36,6 +36,16 @@ class PayComponent extends Component {
 	public function payedFilter(array $pays): array {
 		return array_filter($pays, static function (PayInterface $pay): bool {
 			return $pay->isPayed();
+		});
+	}
+
+	/**
+	 * @param PayInterface[] $pays
+	 * @return PayInterface[]
+	 */
+	public function notPayedFilter(array $pays): array {
+		return array_filter($pays, static function (PayInterface $pay): bool {
+			return !$pay->isPayed();
 		});
 	}
 }

@@ -8,7 +8,9 @@ use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadQuestion;
+use common\modules\lead\models\LeadSourceInterface;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadUser;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -23,9 +25,11 @@ use yii\helpers\ArrayHelper;
  */
 class ReportForm extends Model {
 
+	public string $leadName = '';
 	public int $status_id;
 	public ?string $details = null;
 	public int $owner_id;
+	public bool $withSameContacts = true;
 
 	public $closedQuestions = [];
 
@@ -33,12 +37,15 @@ class ReportForm extends Model {
 	public bool $withAddress = false;
 	public ?Address $address = null;
 
-	private ActiveLead $lead;
+	private ?ActiveLead $lead = null;
 	private ?LeadReport $model = null;
 	/* @var LeadQuestion[] */
 	private ?array $questions = null;
 	/* @var AnswerForm[] */
 	private array $answersModels = [];
+
+	public bool $withAnswers = true;
+	private LeadSourceInterface $source;
 
 	public function setOpenAnswers(array $questionsAnswers): void {
 		$models = $this->getAnswersModels();
@@ -55,15 +62,22 @@ class ReportForm extends Model {
 			'status_id' => Yii::t('lead', 'Status'),
 			'details' => Yii::t('lead', 'Details'),
 			'withAddress' => Yii::t('lead', 'With Address'),
+			'withSameContacts' => Yii::t('lead', 'With Same Contacts'),
 			'closedQuestions' => Yii::t('lead', 'Closed Questions'),
+			'leadName' => Yii::t('lead', 'Lead Name'),
 		];
 	}
 
 	public function rules(): array {
 		return [
 			[['!owner_id', 'status_id'], 'required'],
-			['details', 'string'],
-			['withAddress', 'boolean'],
+			[
+				'withSameContacts', 'required', 'when' => function (): bool {
+				return $this->getModel()->isNewRecord;
+			},
+			],
+			[['details', 'leadName'], 'string'],
+			[['withAddress', 'withSameContacts'], 'boolean'],
 			[
 				'details', 'required',
 				'when' => function () {
@@ -83,6 +97,13 @@ class ReportForm extends Model {
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 			['closedQuestions', 'in', 'range' => array_keys($this->getClosedQuestionsData()), 'allowArray' => true],
 		];
+	}
+
+	/**
+	 * @return ActiveLead[]
+	 */
+	public function getSameContacts(): array {
+		return $this->getLead()->getSameContacts(true);
 	}
 
 	private function hasOpenAnswer(): bool {
@@ -144,7 +165,7 @@ class ReportForm extends Model {
 			$query = LeadQuestion::find()
 				->forStatus($this->status_id)
 				->forType($this->getLeadTypeID());
-			if ($this->getModel()->isNewRecord) {
+			if ($this->getModel()->isNewRecord && $this->lead !== null) {
 				$answeredQuestionsIds = $this->lead
 					->getAnswers()
 					->select('question_id')
@@ -157,8 +178,8 @@ class ReportForm extends Model {
 		return $this->questions;
 	}
 
-	public function save(): bool {
-		if (!$this->validate()) {
+	public function save(bool $validate = true): bool {
+		if ($validate && !$this->validate()) {
 			return false;
 		}
 
@@ -172,14 +193,62 @@ class ReportForm extends Model {
 		if (!$model->save()) {
 			return false;
 		}
+		$this->linkUser();
 
+		if ($this->leadName !== $this->lead->getName()) {
+			$this->lead->updateName($this->leadName);
+		}
 		if ($this->status_id !== $this->lead->getStatusId()) {
 			$this->lead->updateStatus($this->status_id);
 		}
-		$this->linkAnswers(!$isNewRecord);
+
+		if ($this->withAnswers) {
+			$this->linkAnswers(!$isNewRecord);
+		}
+		if ($isNewRecord) {
+			$this->reportSameContacts();
+		}
 		$this->saveAddress();
 
 		return true;
+	}
+
+	protected function reportSameContacts(): bool {
+		if (!$this->withSameContacts || empty($this->getSameContacts())) {
+			return false;
+		}
+		$models = $this->getSameContacts();
+		foreach ($models as $lead) {
+			$this->reportSameContact($lead);
+		}
+		return true;
+	}
+
+	protected function reportSameContact(ActiveLead $lead): void {
+		$model = new LeadReport();
+		$model->details = Yii::t('lead', 'Report from same contact Lead: #{id}', [
+			'id' => $this->getLead()->getId(),
+		]);
+		$model->old_status_id = $lead->getStatusId();
+		$model->status_id = $this->status_id;
+		$model->owner_id = $this->owner_id;
+		$model->lead_id = $lead->getId();
+		$model->save();
+		if ($this->status_id !== $lead->getStatusId()) {
+			$lead->updateStatus($this->status_id);
+		}
+		if ($this->leadName !== $lead->getName()) {
+			$lead->updateName($this->leadName);
+		}
+	}
+
+	protected function linkUser(): void {
+		if (!$this->lead->isForUser($this->owner_id)) {
+			$type = array_key_exists(LeadUser::TYPE_OWNER, $this->lead->getUsers())
+				? LeadUser::TYPE_TELE
+				: LeadUser::TYPE_OWNER;
+			$this->lead->linkUser($type, $this->owner_id);
+		}
 	}
 
 	private function linkAnswers(bool $unlink): void {
@@ -240,10 +309,16 @@ class ReportForm extends Model {
 	public function setLead(ActiveLead $lead): void {
 		$this->lead = $lead;
 		$this->status_id = $lead->getStatusId();
-		$this->address = $lead->addresses[$this->addressType]->address ?? null;
-		if ($this->address !== null) {
+		$this->setSource($lead->getSource());
+		$this->leadName = $lead->getName();
+		if (isset($lead->addresses[$this->addressType])) {
+			$this->address = $lead->addresses[$this->addressType]->address ?? null;
 			$this->withAddress = true;
 		}
+	}
+
+	protected function setSource(LeadSourceInterface $source): void {
+		$this->source = $source;
 	}
 
 	public function getLead(): ActiveLead {
@@ -278,7 +353,7 @@ class ReportForm extends Model {
 	}
 
 	private function getLeadTypeID(): int {
-		return $this->lead->getSource()->getType()->getID();
+		return $this->source->getType()->getID();
 	}
 
 	public static function getStatusNames(): array {
@@ -287,7 +362,7 @@ class ReportForm extends Model {
 
 	private function saveAddress(): bool {
 		if ($this->withAddress && $this->getAddress()->save()) {
-			$address = $model->addresses[$this->addressType] ?? new LeadAddress(['type' => $this->addressType]);
+			$address = $this->getLead()->addresses[$this->addressType] ?? new LeadAddress(['type' => $this->addressType]);
 			$address->lead_id = $this->getLead()->id;
 			$address->address_id = $this->getAddress()->id;
 			return $address->save();

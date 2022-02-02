@@ -66,7 +66,7 @@ class LeadForm extends Model implements LeadInterface {
 			],
 			[['status_id', 'source_id', 'campaign_id', 'agent_id', 'owner_id'], 'integer'],
 			[['phone', 'postal_code', 'email'], 'string'],
-			[['campaign_id'], 'default', 'value' => null],
+			[['campaign_id', 'phone'], 'default', 'value' => null],
 			['postal_code', 'string', 'max' => 6],
 			['email', 'email'],
 			['date_at', 'date', 'format' => 'php:' . $this->dateFormat],
@@ -193,6 +193,12 @@ class LeadForm extends Model implements LeadInterface {
 			if (!is_int($this->owner_id)) {
 				throw new InvalidConfigException('Owner must be integer.');
 			}
+			$names = LeadCampaign::getNames($this->owner_id);
+			if (!empty($this->campaign_id)
+				&& !isset($names[$this->campaign_id])
+				&& isset(LeadCampaign::getNames()[$this->campaign_id])) {
+				$names[$this->campaign_id] = LeadCampaign::getNames()[$this->campaign_id];
+			}
 			return LeadCampaign::getNames($this->owner_id);
 		}
 		return LeadCampaign::getNames();
@@ -227,7 +233,7 @@ class LeadForm extends Model implements LeadInterface {
 		return in_array($id, $this->getUsers(), true);
 	}
 
-	public function getSameContacts(): array {
+	public function getSameContacts(bool $withType = false): array {
 		return Lead::findByLead($this);
 	}
 }

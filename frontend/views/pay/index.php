@@ -27,15 +27,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
-
-	<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) && $dataProvider->totalCount > 0
-		? $this->render('_summary', [
-			'searchModel' => $searchModel,
-			'dataProvider' => $dataProvider,
-		])
-		: ''
-	?>
-
 	<?= IssuePayGrid::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,

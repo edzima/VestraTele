@@ -3,7 +3,7 @@
 namespace frontend\tests\functional;
 
 use common\fixtures\helpers\IssueFixtureHelper;
-use common\models\issue\IssuePayCalculation;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\user\User;
 use frontend\controllers\SettlementController;
 use frontend\tests\_support\CustomerServiceTester;
@@ -11,6 +11,8 @@ use frontend\tests\_support\IssueUserTester;
 use frontend\tests\FunctionalTester;
 
 class SettlementCest {
+
+	private SettlementFixtureHelper $settlementFixture;
 
 	/** @see SettlementController::actionIndex() */
 	public const ROUTE_INDEX = 'settlement/index';
@@ -21,16 +23,21 @@ class SettlementCest {
 	/** @see SettlementController::actionPays() */
 	public const ROUTE_PAYS = 'settlement/pays';
 
+	public function _before(FunctionalTester $I): void {
+		$this->settlementFixture = new SettlementFixtureHelper($I);
+	}
+
 	public function _fixtures(): array {
 		return array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements()
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::types(),
+			IssueFixtureHelper::users(),
+			SettlementFixtureHelper::settlement()
 		);
 	}
 
 	public function checkAsGuest(FunctionalTester $I): void {
-		$id = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-pay');
-		$I->amOnPage([static::ROUTE_VIEW, 'id' => $id]);
+		$I->amOnPage([static::ROUTE_VIEW, 'id' => 1]);
 		$I->seeInLoginUrl();
 	}
 
@@ -51,7 +58,7 @@ class SettlementCest {
 
 	public function checkViewAsAgent(FunctionalTester $I): void {
 		$I->amLoggedInAs($I->grabAgent('with-childs'));
-		$model = $this->grabCalculation($I, 'not-payed');
+		$model = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
 		$I->amOnPage([static::ROUTE_VIEW, 'id' => $model->id]);
 		$I->see('Settlement ' . $model->getTypeName());
 		$I->dontSeeLink('Generate pays');
@@ -60,7 +67,7 @@ class SettlementCest {
 	public function checkGeneratePaysLinkForNotPayedSettlement(CustomerServiceTester $I): void {
 		$I->assignPermission(User::PERMISSION_CALCULATION_PAYS);
 		$I->amLoggedIn();
-		$model = $this->grabCalculation($I, 'not-payed');
+		$model = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
 		$I->amOnPage([static::ROUTE_VIEW, 'id' => $model->id]);
 		$I->seeLink('Generate pays');
 		$I->click('Generate pays');
@@ -70,7 +77,7 @@ class SettlementCest {
 
 	public function checkGeneratePaysWithoutPermission(CustomerServiceTester $I): void {
 		$I->amLoggedIn();
-		$model = $this->grabCalculation($I, 'not-payed');
+		$model = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
 		$I->amOnPage([static::ROUTE_PAYS, 'id' => $model->id]);
 		$I->seeResponseCodeIs(403);
 	}
@@ -78,7 +85,7 @@ class SettlementCest {
 	public function checkGeneratePaysWithPermission(CustomerServiceTester $I): void {
 		$I->assignPermission(User::PERMISSION_CALCULATION_PAYS);
 		$I->amLoggedIn();
-		$model = $this->grabCalculation($I, 'not-payed');
+		$model = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
 		$I->amOnPage([static::ROUTE_PAYS, 'id' => $model->id]);
 		$I->see('Generate pays for: ' . $model->getTypeName());
 		$I->click('Save');
@@ -88,12 +95,9 @@ class SettlementCest {
 	public function checkGeneratePaysLinkForPayedSettlement(IssueUserTester $I): void {
 		$I->assignPermission(User::PERMISSION_CALCULATION_PAYS);
 		$I->amLoggedIn();
-		$model = $this->grabCalculation($I, 'payed');
+		$model = $this->settlementFixture->grabSettlement('payed-with-single-costs');
 		$I->amOnPage([static::ROUTE_VIEW, 'id' => $model->id]);
 		$I->dontSeeLink('Generate pays');
 	}
 
-	private function grabCalculation(FunctionalTester $I, $index): IssuePayCalculation {
-		return $I->grabFixture(IssueFixtureHelper::CALCULATION, $index);
-	}
 }

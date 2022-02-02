@@ -53,7 +53,7 @@ YiiAsset::register($this);
 		?>
 
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) && $model->hasPays()
-			? Html::a(Yii::t('backend', 'Provisions'), ['/provision/settlement/set', 'id' => $model->id], ['class' => 'btn btn-success'])
+			? Html::a(Yii::t('backend', 'Provisions'), ['/provision/settlement/view', 'id' => $model->id], ['class' => 'btn btn-success'])
 			: ''
 		?>
 
@@ -61,7 +61,7 @@ YiiAsset::register($this);
 		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger pull-right',
 			'data' => [
-				'confirm' => 'Are you sure you want to delete this item?',
+				'confirm' => Yii::t('backend', 'Are you sure you want to delete this item?'),
 				'method' => 'post',
 			],
 		]) : '' ?>
@@ -81,24 +81,26 @@ YiiAsset::register($this);
 		'summary' => '',
 		'visibleProvisionsDetails' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR) || $model->issue->isForUser(Yii::$app->user->getId()),
 		'visibleSettlementType' => false,
+		'visibleIssueType' => false,
 	])
 	?>
 
 	<?= GridView::widget([
 		'dataProvider' => new ActiveDataProvider([
-			'query' => $model->getCosts(),
+			'query' => $model->getCosts()->joinWith('user.userProfile'),
 		]),
 		'summary' => '',
 		'showPageSummary' => true,
 		'caption' => Yii::t('settlement', 'Costs'),
 		'columns' => [
 			'typeName',
-			'vatPercent',
+			'user',
+			'vatPercent:text:' . Yii::t('settlement', 'VAT (%)'),
 			[
 				'class' => CurrencyColumn::class,
 				'attribute' => 'valueWithoutVAT',
 				'pageSummary' => true,
-				'pageSummaryFunc' => function (array $decimals): Decimal {
+				'pageSummaryFunc' => static function (array $decimals): Decimal {
 					$sum = new Decimal(0);
 					foreach ($decimals as $decimal) {
 						$sum = $sum->add($decimal);
@@ -110,7 +112,7 @@ YiiAsset::register($this);
 				'class' => CurrencyColumn::class,
 				'attribute' => 'valueWithVAT',
 				'pageSummary' => true,
-				'pageSummaryFunc' => function (array $decimals): Decimal {
+				'pageSummaryFunc' => static function (array $decimals): Decimal {
 					$sum = new Decimal(0);
 					foreach ($decimals as $decimal) {
 						$sum = $sum->add($decimal);

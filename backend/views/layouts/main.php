@@ -2,8 +2,9 @@
 
 use yii\bootstrap\Html;
 use backend\assets\AppAsset;
+use yii\web\View;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $content string */
 
 ?>
@@ -22,7 +23,11 @@ use backend\assets\AppAsset;
 		<meta charset="<?= Yii::$app->charset ?>">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<?php $this->registerCsrfMetaTags() ?>
-		<title><?= Html::encode($this->title) ?></title>
+		<title><?= Html::encode(strtr('{appName} - {title}', [
+					'{appName}' => Yii::$app->name,
+					'{title}' => $this->title,
+				])
+			) ?></title>
 		<?php $this->head() ?>
 	</head>
 	<?= Html::beginTag('body', [
@@ -47,7 +52,7 @@ use backend\assets\AppAsset;
 		) ?>
 	</div>
 	<?php $this->endBody() ?>
-	</body>
+	<?= Html::endTag('body') ?>
 	</html>
 	<?php $this->endPage() ?>
 <?php endif; ?>

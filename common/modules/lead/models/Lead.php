@@ -3,6 +3,7 @@
 namespace common\modules\lead\models;
 
 use common\models\Address;
+use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
 use common\modules\reminder\models\Reminder;
 use DateTime;
@@ -43,6 +44,8 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	private ?array $users_ids = null;
 
+	private array $sameContacts = [];
+
 	public string $dateFormat = 'Y-m-d H:i:s';
 
 	public function afterSave($insert, $changedAttributes): void {
@@ -68,6 +71,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			[['source_id', 'status_id', 'data', 'name'], 'required'],
 			[['status_id'], 'integer'],
 			[['phone', 'postal_code', 'email', 'provider', 'name'], 'string'],
+			['phone', 'default', 'value' => null],
 			['email', 'email'],
 			['postal_code', 'string', 'max' => 6],
 			['provider', 'in', 'range' => array_keys(static::getProvidersNames())],
@@ -87,6 +91,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			'name' => Yii::t('lead', 'Lead Name'),
 			'provider' => Yii::t('lead', 'Provider'),
 			'providerName' => Yii::t('lead', 'Provider'),
+			'campaign_id' => Yii::t('lead', 'Campaign'),
 			'campaign' => Yii::t('lead', 'Campaign'),
 			'phone' => Yii::t('lead', 'Phone'),
 			'postal_code' => Yii::t('lead', 'Postal Code'),
@@ -124,6 +129,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->hasOne(LeadStatus::class, ['id' => 'status_id']);
 	}
 
+	public function getStatusName(): string {
+		return LeadStatus::getNames()[$this->status_id];
+	}
+
 	public function getAnswers(): ActiveQuery {
 		return $this->hasMany(LeadAnswer::class, ['report_id' => 'id'])->via('reports')
 			->indexBy('question_id');
@@ -147,7 +156,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->hasMany(LeadUser::class, ['lead_id' => 'id']);
 	}
 
-	public function getId(): string {
+	public function getId(): int {
 		return $this->id;
 	}
 
@@ -231,6 +240,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->updateAttributes(['status_id' => $status_id]) > 0;
 	}
 
+	public function updateName(string $name): bool {
+		return $this->updateAttributes(['name' => $name]) > 0;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -275,12 +288,42 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function isForUser($id): bool {
-		return in_array($id, $this->getUsers(), true);
+		foreach ($this->leadUsers as $user) {
+			if ($user->user_id === $id) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	public function getSameContacts(): array {
-		$models = static::findByLead($this);
-		unset($models[$this->id]);
-		return $models;
+	/**
+	 * @return static[]
+	 */
+	public function getSameContacts(bool $withType = false, bool $refresh = false): array {
+		if (empty($this->sameContacts) || $refresh) {
+			$models = static::findByLead($this);
+			unset($models[$this->id]);
+			$this->sameContacts = $models;
+		}
+		if ($withType) {
+			$typeId = LeadSource::getModels()[$this->source_id]->type_id;
+			return static::typeFilter($this->sameContacts, $typeId);
+		}
+		return $this->sameContacts;
+	}
+
+	/**
+	 * @param static[] $models
+	 * @param int $type
+	 * @return static[]
+	 */
+	public static function typeFilter(array $models, int $type): array {
+		return array_filter($models, function (self $model) use ($type): bool {
+			return LeadSource::getModels()[$model->source_id]->type_id === $type;
+		});
+	}
+
+	public static function find(): LeadQuery {
+		return new LeadQuery(static::class);
 	}
 }

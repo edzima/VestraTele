@@ -48,9 +48,8 @@ class LeadFixtureHelper {
 	public static function leads(): array {
 		return array_merge(
 			static::lead(),
-			static::status(),
 			static::source(),
-			static::type(),
+			static::status(),
 			static::user(),
 		);
 	}
@@ -63,6 +62,7 @@ class LeadFixtureHelper {
 			],
 		];
 	}
+
 
 	public static function type(): array {
 		return [

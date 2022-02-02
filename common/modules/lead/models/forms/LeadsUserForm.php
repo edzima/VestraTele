@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models\forms;
 
+use common\models\user\User;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\Module;
@@ -10,7 +11,12 @@ use yii\base\Model;
 
 class LeadsUserForm extends Model {
 
+	public const SCENARIO_SINGLE = 'single';
+
 	public array $leadsIds = [];
+
+	public bool $withOwner = true;
+	public bool $sendEmail = true;
 
 	public ?string $userId = null;
 	public ?string $type = null;
@@ -20,8 +26,12 @@ class LeadsUserForm extends Model {
 		return array_combine($ids, $ids);
 	}
 
-	public static function getTypesNames(): array {
-		return LeadUser::getTypesNames();
+	public function getTypesNames(): array {
+		$types = LeadUser::getTypesNames();
+		if (!$this->withOwner) {
+			unset($types[LeadUser::TYPE_OWNER]);
+		}
+		return $types;
 	}
 
 	public static function getUsersNames(): array {
@@ -31,13 +41,15 @@ class LeadsUserForm extends Model {
 	public function rules(): array {
 		return [
 			[['userId', 'type', 'leadsIds'], 'required'],
+			['!leadsIds', 'required', 'on' => static::SCENARIO_SINGLE],
 			['userId', 'integer'],
 			['type', 'string'],
+			['sendEmail', 'boolean'],
 			['leadsIds', 'exist', 'skipOnError' => true, 'allowArray' => true, 'targetClass' => Lead::class, 'targetAttribute' => 'id', 'enableClientValidation' => false],
 			[
 				'userId', 'in', 'range' => array_keys(static::getUsersNames()),
 			],
-			['type', 'in', 'range' => array_keys(static::getTypesNames())],
+			['type', 'in', 'range' => array_keys($this->getTypesNames())],
 		];
 	}
 
@@ -45,6 +57,7 @@ class LeadsUserForm extends Model {
 		return [
 			'userId' => Yii::t('lead', 'User'),
 			'type' => Yii::t('lead', 'Type'),
+			'sendEmail' => Yii::t('lead', 'Send Email'),
 		];
 	}
 
@@ -70,6 +83,27 @@ class LeadsUserForm extends Model {
 			->batchInsert(LeadUser::tableName(), ['lead_id', 'user_id', 'type'], $rows)
 			->
 			execute();
+	}
+
+	public function sendEmail(): ?int {
+		if (!$this->sendEmail) {
+			return null;
+		}
+		$email = User::findOne($this->userId)->email ?? null;
+		if ($email === null) {
+			return null;
+		}
+		$count = 0;
+
+		foreach ($this->leadsIds as $leadId) {
+			$lead = Lead::findById($leadId);
+			if ($lead) {
+				$pushEmailModel = new LeadPushEmail($lead);
+				$pushEmailModel->email = $email;
+				$count += $pushEmailModel->sendEmail();
+			}
+		}
+		return $count;
 	}
 
 }

@@ -10,13 +10,13 @@ use common\models\address\State;
 use common\models\address\SubProvince;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\entityResponsible\EntityResponsibleQuery;
+use common\models\issue\query\IssueCostQuery;
 use common\models\issue\query\IssueNoteQuery;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
 use common\models\issue\query\IssueUserQuery;
-use common\models\user\Customer;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -61,7 +61,7 @@ use yii\db\Expression;
  * @property string $archives_nr
  * @property int $lawyer_id
  * @property bool $payed
- * @property string|null $signing_at
+ * @property string $signing_at
  * @property string|null $type_additional_date_at
  * @property string $stage_change_at
  * @property string|null $signature_act
@@ -73,7 +73,7 @@ use yii\db\Expression;
  * @property City $victimCity
  * @property Worker $agent
  * @property Worker $lawyer
- * @property-read Customer $customer
+ * @property-read User $customer
  * @property Worker|null $tele
  * @property IssuePay[] $pays
  * @property EntityResponsible $entityResponsible
@@ -87,6 +87,7 @@ use yii\db\Expression;
  * @property-read Summon[] $summons
  * @property-read IssueUser[] $users
  * @property-read IssueCost[] $costs
+ * @property-read StageType $stageType
  */
 class Issue extends ActiveRecord implements IssueInterface {
 
@@ -197,7 +198,8 @@ class Issue extends ActiveRecord implements IssueInterface {
 		});
 	}
 
-	public function getCosts(): ActiveQuery {
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getCosts(): IssueCostQuery {
 		return $this->hasMany(IssueCost::class, ['issue_id' => 'id']);
 	}
 
@@ -270,7 +272,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getClientCity() {
 		return $this->hasOne(City::class, ['id' => 'client_city_id'])->cache();
@@ -306,7 +308,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getVictimCity() {
 		if ($this->victim_city_id === null) {
@@ -350,7 +352,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	public function getIssueNotes(): IssueNoteQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])
-			->with('user')->orderBy('created_at DESC');
+			->orderBy('publish_at DESC');
 	}
 
 	public function getSummons(): ActiveQuery {
@@ -363,6 +365,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function getPays(): IssuePayQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(IssuePay::class, ['calculation_id' => 'id'])
 			->via('payCalculations');
 	}
@@ -433,7 +436,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	/**
 	 * @param string $type
 	 */
-	public function unlinkUser(string $type) {
+	public function unlinkUser(string $type): void {
 		$user = $this->getUsers()->withType($type)->one();
 		if ($user !== null) {
 			$this->unlink('users', $user, true);
@@ -445,7 +448,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	 * @return IssueQuery the active query used by this AR class.
 	 */
 	public static function find(): IssueQuery {
-		return new IssueQuery(get_called_class());
+		return new IssueQuery(static::class);
 	}
 
 	public function isForUser(int $id): bool {

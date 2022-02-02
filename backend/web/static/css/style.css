@@ -42,6 +42,11 @@ div.required label:after {
 	overflow: hidden;
 }
 
+.text-uppercase {
+	text-transform: uppercase;
+}
+
+
 @media (min-width: 776px) {
 	.table-fixed-layout {
 		table-layout: fixed;
@@ -125,15 +130,26 @@ div.required label:after {
 	}
 }
 
+.d-inline {
+	display: inline;
+}
 
 .d-inline-flex {
 	display: inline-flex;
 }
 
-.justify-center{
+.justify-center {
 	justify-content: center;
 }
 
 .width-100 {
 	width: 100% !important;
+}
+
+
+@media (min-width: 992px) {
+	.provision-settlement-view .users-grid-wrapper {
+		display: flex;
+		flex-wrap: wrap;
+	}
 }

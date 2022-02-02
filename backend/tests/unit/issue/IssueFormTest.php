@@ -8,33 +8,43 @@ use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\user\User;
+use common\tests\_support\UnitModelTrait;
 use Yii;
 use yii\base\InvalidConfigException;
 
 class IssueFormTest extends Unit {
 
+	use UnitModelTrait;
+
+	private IssueFixtureHelper $issueFixture;
+	private IssueForm $model;
+
 	protected function _before(): void {
 		parent::_before();
-		$this->tester->haveFixtures(IssueFixtureHelper::fixtures());
+		$this->issueFixture = new IssueFixtureHelper($this->tester);
+	}
+
+	public function _fixtures(): array {
+		return IssueFixtureHelper::fixtures();
 	}
 
 	public function testWorkersList(): void {
-		$activeAgentsCount = 3;
+		$activeAgentsCount = 5;
 
 		$this->tester->assertCount($activeAgentsCount, IssueForm::getAgents());
 		$agent = $this->tester->grabFixture(IssueFixtureHelper::AGENT, 'some-agent');
 		Yii::$app->authManager->revoke(Yii::$app->authManager->getPermission(User::PERMISSION_ISSUE), $agent->id);
 		$this->tester->assertCount($activeAgentsCount - 1, IssueForm::getAgents());
 
-		$this->tester->assertCount(2, IssueForm::getLawyers());
+		$this->tester->assertCount(1, IssueForm::getLawyers());
 		$lawyer = $this->tester->grabFixture(IssueFixtureHelper::LAWYER, 0);
 		Yii::$app->authManager->revoke(Yii::$app->authManager->getPermission(User::PERMISSION_ISSUE), $lawyer->id);
-		$this->tester->assertCount(1, IssueForm::getLawyers());
+		$this->tester->assertCount(0, IssueForm::getLawyers());
 
 		$this->tester->assertCount(2, IssueForm::getTele());
 		$tele = $this->tester->grabFixture(IssueFixtureHelper::TELEMARKETER, 0);
 		Yii::$app->authManager->revoke(Yii::$app->authManager->getPermission(User::PERMISSION_ISSUE), $tele->id);
-		$this->tester->assertCount(1, IssueForm::getTele());
+		$this->tester->assertCount(0, IssueForm::getTele());
 	}
 
 	public function testCreateWithoutCustomerOrModel(): void {
@@ -83,7 +93,7 @@ class IssueFormTest extends Unit {
 		]);
 	}
 
-	public function testCheckStateAtWithoutChangeStage(): void {
+	public function testCheckStageAtWithoutChangeStage(): void {
 		/** @var Issue $issue */
 		$issue = $this->tester->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$this->tester->assertNull($issue->stage_change_at);
@@ -93,7 +103,7 @@ class IssueFormTest extends Unit {
 		$this->tester->assertSame(date('Y-m-d'), date('Y-m-d', strtotime($model->getModel()->stage_change_at)));
 	}
 
-	public function testChangeStateWithDate(): void {
+	public function testChangeStageWithDate(): void {
 		/** @var Issue $issue */
 		$issue = $this->tester->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$this->tester->assertNull($issue->stage_change_at);
@@ -130,6 +140,23 @@ class IssueFormTest extends Unit {
 		$this->tester->assertSame('Signature act "I OC 22" has already been taken.', $model->getFirstError('signature_act'));
 	}
 
+	public function testChangeStageNote(): void {
+		$issue = $this->issueFixture->grabIssue(0);
+		$this->tester->assertNotSame(2, $issue->stage_id);
+		$this->model = $this->createForIssue($issue);
+		$this->model->stage_id = 2;
+
+		$this->thenSuccessSave();
+		$this->tester->seeRecord(Issue::class, [
+			'id' => $issue->getIssueId(),
+			'stage_id' => 2,
+		]);
+	}
+
+	private function createForIssue(Issue $model) {
+		return new IssueForm(['model' => $model]);
+	}
+
 	private function createModel(array $attributes = []): IssueForm {
 		if (!isset($attributes['customer'])) {
 			$attributes['customer'] = $this->tester->grabFixture(IssueFixtureHelper::CUSTOMER, 0);
@@ -157,5 +184,9 @@ class IssueFormTest extends Unit {
 		}
 
 		return new IssueForm($attributes);
+	}
+
+	public function getModel(): IssueForm {
+		return $this->model;
 	}
 }

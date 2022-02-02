@@ -11,13 +11,16 @@ namespace frontend\controllers;
 use common\models\issue\Issue;
 use common\models\user\Worker;
 use frontend\helpers\Url;
+use frontend\models\IssueStageChangeForm;
 use frontend\models\search\IssuePayCalculationSearch;
 use frontend\models\search\IssueSearch;
 use frontend\models\search\IssueUserSearch;
 use frontend\models\search\SummonSearch;
 use Yii;
+use yii\base\Action;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class IssueController extends Controller {
@@ -29,7 +32,13 @@ class IssueController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::PERMISSION_ISSUE],
+						'permissions' => [Worker::PERMISSION_ISSUE],
+						'matchCallback' => function ($rule, Action $action): bool {
+							if ($action->id === 'stage') {
+								return Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE);
+							}
+							return true;
+						},
 					],
 				],
 			],
@@ -84,7 +93,7 @@ class IssueController extends Controller {
 	 *
 	 * @param integer $id
 	 * @return string
-	 * @throws NotFoundHttpException
+	 * @throws NotFoundHttpException|ForbiddenHttpException
 	 */
 	public function actionView(int $id): string {
 		$model = $this->findModel($id);
@@ -96,6 +105,7 @@ class IssueController extends Controller {
 		) {
 			$search = new IssuePayCalculationSearch();
 			$search->issue_id = $id;
+			$search->onlyToPayed = false;
 			$search->withAgents = false;
 			$search->withArchive = true;
 			$calculationsDataProvider = $search->search([]);
@@ -112,6 +122,21 @@ class IssueController extends Controller {
 		]);
 	}
 
+	public function actionStage(int $issueId, int $stageId = null, string $returnUrl = null) {
+		$model = new IssueStageChangeForm($this->findModel($issueId));
+		if ($stageId !== null) {
+			$model->stage_id = $stageId;
+		}
+		$model->date_at = date($model->dateFormat);
+		$model->user_id = Yii::$app->user->getId();
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect($returnUrl ?? ['view', 'id' => $issueId]);
+		}
+		return $this->render('stage', [
+			'model' => $model,
+		]);
+	}
+
 	/**
 	 * Finds the Issue model based on its primary key value.
 	 * If the model is not found, a 404 HTTP exception will be thrown.
@@ -119,6 +144,7 @@ class IssueController extends Controller {
 	 * @param integer $id
 	 * @return Issue the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
+	 * @throws ForbiddenHttpException if the model is Archived and User can not archive permission.
 	 */
 	private function findModel(int $id): Issue {
 		$model = Issue::findOne($id);

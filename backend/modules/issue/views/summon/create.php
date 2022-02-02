@@ -1,10 +1,9 @@
 <?php
 
-/* @var $this yii\web\View */
-
-/* @var $model SummonForm */
-
 use backend\modules\issue\models\SummonForm;
+
+/* @var $this yii\web\View */
+/* @var $model SummonForm */
 
 $this->title = Yii::t('backend', 'Create summon');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];

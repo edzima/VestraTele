@@ -2,8 +2,10 @@
 
 use backend\widgets\Menu;
 use common\models\user\User;
+use common\models\user\Worker;
+use yii\web\View;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 
 $user = Yii::$app->user;
 ?>
@@ -20,7 +22,7 @@ $user = Yii::$app->user;
 					'label' => Yii::t('backend', 'Users'),
 					'url' => ['/user/user/index'],
 					'icon' => '<i class="fa fa-users"></i>',
-					'visible' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+					'visible' => $user->can(User::ROLE_ADMINISTRATOR),
 				],
 				[
 					'label' => Yii::t('backend', 'Workers'),
@@ -69,6 +71,12 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-eye"></i>',
 						],
 						[
+							'label' => Yii::t('lead', 'Dialers'),
+							'url' => ['/lead/dialer-lead/index'],
+							'icon' => '<i class="fa fa-phone"></i>',
+							'visible' => $user->can(Worker::PERMISSION_LEAD_DIALER),
+						],
+						[
 							'label' => Yii::t('lead', 'Reports'),
 							'url' => ['/lead/report/index'],
 							'icon' => '<i class="fa fa-table"></i>',
@@ -107,6 +115,7 @@ $user = Yii::$app->user;
 							'label' => Yii::t('lead', 'Statuses'),
 							'url' => ['/lead/status/index'],
 							'icon' => '<i class="fa fa-flag"></i>',
+							'visible' => $user->can(User::PERMISSION_LEAD_STATUS),
 						],
 						[
 							'label' => Yii::t('lead', 'Types'),
@@ -178,7 +187,7 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
-							'label' => Yii::t('common', 'Notes'),
+							'label' => Yii::t('issue', 'Issue Notes'),
 							'url' => ['/issue/note/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
@@ -189,13 +198,18 @@ $user = Yii::$app->user;
 						],
 
 						[
-							'label' => Yii::t('common', 'Types'),
+							'label' => Yii::t('issue', 'Types'),
 							'url' => ['/issue/type/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
-							'label' => Yii::t('common', 'Etapy'),
+							'label' => Yii::t('issue', 'Stages'),
 							'url' => ['/issue/stage/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => Yii::t('common', 'Leads'),
+							'url' => ['/issue/issue/lead'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 					],
@@ -271,33 +285,43 @@ $user = Yii::$app->user;
 					],
 				],
 				[
-					'label' => Yii::t('backend', 'Provisions'),
-					'url' => '#',
+					'label' => Yii::t('provision', 'Provisions'),
+					'url' => ['/provision/provision/index'],
 					'icon' => '<i class="fa fa-percent"></i>',
 					'options' => ['class' => 'treeview'],
 					'visible' => $user->can(User::PERMISSION_PROVISION),
 					'items' => [
 						[
-							'label' => Yii::t('issue', 'Raporty'),
+							'label' => Yii::t('provision', 'Reports'),
 							'url' => ['/provision/report/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-table"></i>',
 						],
 						[
-							'label' => Yii::t('issue', 'Przyznane'),
+							'label' => Yii::t('provision', 'Provisions'),
 							'url' => ['/provision/provision/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-percent"></i>',
 						],
 						[
-							'label' => 'Ustalone',
+							'label' => Yii::t('provision', 'Schemas'),
 							'url' => ['/provision/user/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-users"></i>',
 						],
 						[
-							'label' => Yii::t('issue', 'Typy'),
+							'label' => Yii::t('common', 'Types'),
 							'url' => ['/provision/type/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-magnet"></i>',
 						],
 					],
+				],
+				[
+					'label' => Yii::t('common', 'SMS'),
+					'url' => '#',
+					'icon' => '<i class="fa fa-envelope"></i>',
+					'options' => ['class' => 'treeview'],
+					'items' => [
+						['label' => Yii::t('common', 'Send SMS'), 'url' => ['/adescom-sms/send/push'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+					],
+					'visible' => $user->can(User::PERMISSION_SMS),
 				],
 				[
 					'label' => Yii::t('backend', 'Articles'),
@@ -332,6 +356,12 @@ $user = Yii::$app->user;
 							'url' => ['/log/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 							'visible' => $user->can(User::PERMISSION_LOGS),
+						],
+						[
+							'label' => Yii::t('backend', 'Message Templates'),
+							'url' => ['/message-templates/default/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'visible' => $user->can(User::PERMISSION_MESSAGE_TEMPLATE),
 						],
 						[
 							'label' => Yii::t('backend', 'DB manager'),

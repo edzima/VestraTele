@@ -10,6 +10,7 @@ use yii\db\ActiveRecord;
 use yii\web\Controller;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class BaseController extends Controller {
 
@@ -48,12 +49,16 @@ class BaseController extends Controller {
 	 * @return ActiveLead|ActiveRecord
 	 * @throws NotFoundHttpException
 	 */
-	protected function findLead(int $id): ActiveLead {
-		$model = $this->module->manager->findById($id);
+	protected function findLead(int $id, bool $forUser = true): ActiveLead {
+		$model = $this->module->manager->findById($id, $forUser);
 		if ($model === null) {
 			throw new NotFoundHttpException();
 		}
 		return $model;
+	}
+
+	protected function redirectLead(int $id): Response {
+		return $this->redirect(['lead/view', 'id' => $id]);
 	}
 
 }

@@ -1,14 +1,16 @@
 <?php
 
+use common\modules\lead\models\searches\LeadStatusSearch;
 use common\modules\lead\models\LeadStatus;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel common\modules\lead\models\searches\LeadStatusSearch */
+/* @var $searchModel LeadStatusSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('lead', 'Lead Statuses');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="lead-status-index">
@@ -29,6 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'name',
 			'description',
 			'short_report:boolean',
+			'show_report_in_lead_index:boolean',
 			'sort_index',
 			[
 				'attribute' => 'filterOptions.color',

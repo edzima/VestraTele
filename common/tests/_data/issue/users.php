@@ -11,7 +11,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_LAWYER,
-		'user_id' => 200,
+		'user_id' => UserFixtureHelper::LAWYER_1,
 		'issue_id' => 1,
 	],
 	[
@@ -21,7 +21,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_TELEMARKETER,
-		'user_id' => 400,
+		'user_id' => UserFixtureHelper::TELE_1,
 		'issue_id' => 1,
 	],
 	[
@@ -31,7 +31,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_LAWYER,
-		'user_id' => 201,
+		'user_id' => UserFixtureHelper::LAWYER_2,
 		'issue_id' => 2,
 	],
 	[
@@ -41,7 +41,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_TELEMARKETER,
-		'user_id' => 401,
+		'user_id' => UserFixtureHelper::TELE_2,
 		'issue_id' => 2,
 	],
 	[
@@ -51,7 +51,7 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_LAWYER,
-		'user_id' => 201,
+		'user_id' => UserFixtureHelper::LAWYER_2,
 		'issue_id' => 3,
 	],
 	[
@@ -61,17 +61,17 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_CUSTOMER,
-		'user_id' => UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID,
+		'user_id' => UserFixtureHelper::CUSTOMER_JOHN_LENNON,
 		'issue_id' => 4,
 	],
 	[
 		'type' => IssueUser::TYPE_LAWYER,
-		'user_id' => 201,
+		'user_id' => UserFixtureHelper::LAWYER_2,
 		'issue_id' => 4,
 	],
 	[
 		'type' => IssueUser::TYPE_TELEMARKETER,
-		'user_id' => 300,
+		'user_id' => UserFixtureHelper::TELE_1,
 		'issue_id' => 4,
 	],
 	[
@@ -86,12 +86,12 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_LAWYER,
-		'user_id' => 201,
+		'user_id' => UserFixtureHelper::LAWYER_2,
 		'issue_id' => 5,
 	],
 	[
 		'type' => IssueUser::TYPE_TELEMARKETER,
-		'user_id' => 300,
+		'user_id' => UserFixtureHelper::TELE_1,
 		'issue_id' => 5,
 	],
 	[
@@ -106,12 +106,12 @@ return [
 	],
 	[
 		'type' => IssueUser::TYPE_LAWYER,
-		'user_id' => 202,
+		'user_id' => UserFixtureHelper::LAWYER_3_INACTIVE,
 		'issue_id' => 6,
 	],
 	[
 		'type' => IssueUser::TYPE_TELEMARKETER,
-		'user_id' => 300,
+		'user_id' => UserFixtureHelper::TELE_3_INACTIVE,
 		'issue_id' => 6,
 	],
 	[

@@ -1,15 +1,18 @@
 <?php
 
+use common\modules\lead\models\LeadStatus;
 use yii\helpers\Html;
+use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model common\modules\lead\models\LeadStatus */
+/* @var $model LeadStatus */
 
 $this->title = $model->name;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Statuses'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-\yii\web\YiiAsset::register($this);
+YiiAsset::register($this);
 ?>
 <div class="lead-status-view">
 
@@ -32,6 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'id',
 			'name',
 			'description',
+			'show_report_in_lead_index:boolean',
 			'short_report:boolean',
 			'sort_index',
 			'filterOptions.color',

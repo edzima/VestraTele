@@ -40,6 +40,6 @@ interface LeadInterface {
 	/**
 	 * @return static[]
 	 */
-	public function getSameContacts(): array;
+	public function getSameContacts(bool $withType = false): array;
 
 }

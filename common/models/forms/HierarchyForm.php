@@ -3,7 +3,7 @@
 namespace common\models\forms;
 
 use common\components\HierarchyComponent;
-use common\models\hierarchy\Hierarchy;
+use common\models\hierarchy\ActiveHierarchy;
 use Yii;
 use yii\base\Model;
 
@@ -14,7 +14,7 @@ class HierarchyForm extends Model {
 
 	public array $parentsMap = [];
 
-	public ?Hierarchy $model = null;
+	public ?ActiveHierarchy $model = null;
 
 	private HierarchyComponent $hierarchy;
 
@@ -23,7 +23,7 @@ class HierarchyForm extends Model {
 		parent::__construct($config);
 	}
 
-	public function getModel(): Hierarchy {
+	public function getModel(): ActiveHierarchy {
 		if ($this->model === null) {
 			$this->model = $this->hierarchy->getModel($this->id);
 		}

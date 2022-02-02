@@ -2,7 +2,9 @@
 
 namespace backend\tests;
 
+use common\fixtures\helpers\FixtureTester;
 use common\tests\_support\UserRbacActor;
+use Yii;
 
 /**
  * Inherited Methods
@@ -19,10 +21,12 @@ use common\tests\_support\UserRbacActor;
  *
  * @SuppressWarnings(PHPMD)
  */
-class FunctionalTester extends \Codeception\Actor {
+class FunctionalTester extends \Codeception\Actor implements FixtureTester {
 
 	use _generated\FunctionalTesterActions;
 	use UserRbacActor;
+
+	private const DEFAULT_GRID_SELECTOR = '.grid-view';
 
 	/**
 	 * Define custom actions here
@@ -60,20 +64,29 @@ class FunctionalTester extends \Codeception\Actor {
 		$this->dontSee($text, '.main-sidebar .treeview-menu li a');
 	}
 
-	public function seeInGridHeader($text, string $selector = null): void {
-		if ($selector === null) {
-			$selector = '.grid-view';
-		}
+	public function seeInGridHeader($text, string $selector = self::DEFAULT_GRID_SELECTOR): void {
 		$selector .= ' th';
 		$this->see($text, $selector);
 	}
 
-	public function dontSeeInGridHeader($text, string $selector = null): void {
-		if ($selector === null) {
-			$selector = '.grid-view';
-		}
+	public function dontSeeInGridHeader($text, string $selector = self::DEFAULT_GRID_SELECTOR): void {
 		$selector .= ' th';
 		$this->dontSee($text, $selector);
+	}
+
+	public function seeGridActionLink(string $title, string $selector = self::DEFAULT_GRID_SELECTOR): void {
+		$selector .= ' .action-column a';
+		$this->seeElement($selector, ['title' => $title]);
+	}
+
+	public function dontSeeGridActionLink(string $title, string $selector = self::DEFAULT_GRID_SELECTOR): void {
+		$selector .= ' .action-column a';
+		$this->dontSeeElement($selector, ['title' => $title]);
+	}
+
+	public function clickGridActionLink(string $title, string $gridSelector = self::DEFAULT_GRID_SELECTOR) {
+		$selector = $gridSelector . ' a[title="' . $title . '"]';
+		$this->click($selector);
 	}
 
 	public function seeFlash(string $text, string $type): void {
@@ -82,5 +95,11 @@ class FunctionalTester extends \Codeception\Actor {
 
 	public function dontSeeFlash(string $text, string $type): void {
 		$this->dontSee($text, '.alert.alert-' . $type);
+	}
+
+	public function getCSRF(): array {
+		return [
+			Yii::$app->request->csrfParam => Yii::$app->request->csrfToken,
+		];
 	}
 }

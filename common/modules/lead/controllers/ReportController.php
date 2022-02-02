@@ -2,13 +2,14 @@
 
 namespace common\modules\lead\controllers;
 
+use common\behaviors\SelectionRouteBehavior;
+use common\helpers\Flash;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadStatus;
 use Yii;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\searches\LeadReportSearch;
-use yii\base\BaseObject;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -17,6 +18,8 @@ use yii\web\Response;
  * ReportController implements the CRUD actions for LeadReport model.
  */
 class ReportController extends BaseController {
+
+	public ?bool $allowDelete = true;
 
 	/**
 	 * {@inheritdoc}
@@ -28,6 +31,9 @@ class ReportController extends BaseController {
 				'actions' => [
 					'delete' => ['POST'],
 				],
+			],
+			'selection' => [
+				'class' => SelectionRouteBehavior::class,
 			],
 		];
 	}
@@ -46,15 +52,13 @@ class ReportController extends BaseController {
 			}
 			$searchModel->scenario = LeadReportSearch::SCENARIO_OWNER;
 			$searchModel->owner_id = $userId;
+			$searchModel->lead_user_id = $userId;
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'visibleButtons' => [
-				'delete' => $this->module->allowDelete,
-			],
 		]);
 	}
 
@@ -75,14 +79,23 @@ class ReportController extends BaseController {
 	public function actionReport(int $id, int $status_id = null) {
 		$model = new ReportForm();
 		$model->owner_id = (int) Yii::$app->user->getId();
-		$model->setLead($this->findLead($id));
+		$model->setLead($this->findLead($id, false));
 		if ($status_id) {
 			$model->status_id = $status_id;
 		}
+
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['lead/view', 'id' => $id]);
 		}
-
+		$sameCount = count($model->getSameContacts());
+		if ($sameCount > 0) {
+			Flash::add(Flash::TYPE_WARNING, Yii::t(
+				'lead',
+				'Lead has Similars: {count} Leads with same type.', [
+					'count' => $sameCount,
+				]
+			));
+		}
 		return $this->render('report', [
 			'model' => $model,
 		]);

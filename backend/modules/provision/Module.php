@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: edzima
- * Date: 2019-03-01
- * Time: 22:39
- */
 
 namespace backend\modules\provision;
 
@@ -23,7 +17,7 @@ class Module extends BaseModule {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::ROLE_ADMINISTRATOR],
+						'permissions' => [Worker::PERMISSION_PROVISION],
 					],
 				],
 			],

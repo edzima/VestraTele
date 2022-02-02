@@ -2,6 +2,11 @@
 
 namespace common\tests;
 
+use Codeception\Actor;
+use Codeception\Lib\Friend;
+use common\fixtures\helpers\FixtureTester;
+use yii\mail\MessageInterface;
+
 /**
  * Inherited Methods
  * @method void wantToTest($text)
@@ -13,16 +18,27 @@ namespace common\tests;
  * @method void am($role)
  * @method void lookForwardTo($achieveValue)
  * @method void comment($description)
- * @method \Codeception\Lib\Friend haveFriend($name, $actorClass = null)
- * @method grabFixture(string $string, int $int)
+ * @method Friend haveFriend($name, $actorClass = null)
+ * @method grabFixture($name, $index = null)
  * @method seeRecord(string $class, array $array)
  *
  * @SuppressWarnings(PHPMD)
  */
-class UnitTester extends \Codeception\Actor {
+class UnitTester extends Actor implements FixtureTester {
 
 	use _generated\UnitTesterActions;
+
 	/**
 	 * Define custom actions here
 	 */
+
+	public function assertMessageBodyContainsString(string $text, MessageInterface $message): void {
+		$body = $message->getSwiftMessage()->getBody();
+		$this->assertStringContainsString($text, $body);
+	}
+
+	public function assertMessageBodyNotContainsString(string $text, MessageInterface $message): void {
+		$body = $message->getSwiftMessage()->getBody();
+		$this->assertStringNotContainsString($text, $body);
+	}
 }

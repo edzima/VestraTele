@@ -24,14 +24,17 @@ class RbacController extends Controller {
 
 	public array $roles = [
 		Worker::ROLE_AGENT,
+		Worker::ROLE_CO_AGENT,
 		Worker::ROLE_BOOKKEEPER,
 		Worker::ROLE_CUSTOMER_SERVICE,
 		Worker::ROLE_LAWYER,
+		Worker::ROLE_LAWYER_ASSISTANT,
 		Worker::ROLE_TELEMARKETER,
 		Customer::ROLE_CUSTOMER,
 		Customer::ROLE_VICTIM,
 		Customer::ROLE_SHAREHOLDER,
 		Customer::ROLE_HANDICAPPED,
+		User::ROLE_RECCOMENDING,
 	];
 
 	public array $permissions = [
@@ -39,7 +42,13 @@ class RbacController extends Controller {
 		Worker::PERMISSION_COST => [
 			Worker::ROLE_BOOKKEEPER,
 		],
+		Worker::PERMISSION_COST_DEBT => [
+			Worker::ROLE_BOOKKEEPER,
+		],
 		Worker::PERMISSION_CALCULATION_TO_CREATE => [
+			Worker::ROLE_BOOKKEEPER,
+		],
+		Worker::PERMISSION_CALCULATION_UPDATE => [
 			Worker::ROLE_BOOKKEEPER,
 		],
 		Worker::PERMISSION_CALCULATION_PAYS => [
@@ -50,11 +59,15 @@ class RbacController extends Controller {
 		],
 		User::PERMISSION_EXPORT,
 		User::PERMISSION_ISSUE,
+		Worker::PERMISSION_ISSUE_LINK_USER,
+		Worker::PERMISSION_ISSUE_DELETE,
+		Worker::PERMISSION_ISSUE_STAGE_CHANGE,
 		Worker::PERMISSION_HINT,
 		User::PERMISSION_LOGS,
 		Worker::PERMISSION_MEET,
 		User::PERMISSION_NEWS,
 		User::PERMISSION_NOTE,
+		Worker::PERMISSION_NOTE_TEMPLATE,
 		User::PERMISSION_PROVISION,
 		Worker::PERMISSION_PAY => [
 			Worker::ROLE_BOOKKEEPER,
@@ -68,11 +81,29 @@ class RbacController extends Controller {
 		Worker::PERMISSION_PAY_RECEIVED => [
 			Worker::ROLE_BOOKKEEPER,
 		],
+		Worker::PERMISSION_PAY_PAID => [
+			Worker::ROLE_BOOKKEEPER,
+		],
+		Worker::PERMISSION_PAY_UPDATE => [
+			Worker::ROLE_BOOKKEEPER,
+			Worker::ROLE_AGENT,
+		],
+		Worker::PERMISSION_PAY_ALL_PAID => [
+			Worker::ROLE_BOOKKEEPER,
+		],
 		Worker::PERMISSION_SUMMON => [
 			Worker::ROLE_AGENT,
 		],
+		Worker::PERMISSION_SUMMON_MANAGER,
+		Worker::PERMISSION_SUMMON_CREATE,
+		Worker::PERMISSION_SMS,
+		Worker::PERMISSION_MULTIPLE_SMS,
 		Worker::PERMISSION_WORKERS,
 		Worker::PERMISSION_LEAD,
+		Worker::PERMISSION_LEAD_STATUS,
+		Worker::PERMISSION_LEAD_DIALER,
+		Worker::PERMISSION_MESSAGE_TEMPLATE,
+		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
 	];
 
 	public function actionInit(): void {
@@ -168,6 +199,14 @@ class RbacController extends Controller {
 		Console::output('Success add role: ' . $name);
 	}
 
+	public function actionRemoveRole(string $name): void {
+		$auth = Yii::$app->authManager;
+		$role = $auth->getRole($name);
+		if ($role && $auth->remove($role)) {
+			Console::output('Success remove Role: ' . $name);
+		}
+	}
+
 	public function actionAddPermission(string $name, bool $admin = true): void {
 		$auth = Yii::$app->authManager;
 		$permission = $auth->createPermission($name);
@@ -176,6 +215,30 @@ class RbacController extends Controller {
 			$this->assignAdmin($permission);
 		}
 		Console::output('Success add permission: ' . $name);
+	}
+
+	public function actionRemovePermission(string $name): void {
+		$auth = Yii::$app->authManager;
+		$permission = $auth->getPermission($name);
+		if ($permission && $auth->remove($permission)) {
+			Console::output('Success remove Permission: ' . $name);
+		}
+	}
+
+	public function actionAddChildRolePermission(string $roleName, string $permissionName): void {
+		$auth = Yii::$app->authManager;
+		$role = $auth->getRole($roleName);
+		if ($role === null) {
+			Console::output("Role with name: $roleName not found.");
+			return;
+		}
+		$permission = $auth->getPermission($permissionName);
+		if ($permission === null) {
+			Console::output("Permission with name: $permissionName not found.");
+			return;
+		}
+		$auth->addChild($role, $permission);
+		Console::output("Success add permission: $permissionName as child: $roleName.");
 	}
 
 	public function actionCopy(int $type, string $from, string $to): void {

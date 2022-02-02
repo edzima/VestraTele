@@ -8,16 +8,32 @@ use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
+use common\models\user\User;
+use common\models\user\Worker;
+use common\modules\issue\actions\NoteDescriptionListAction;
+use common\modules\issue\actions\NoteTitleListAction;
 use Yii;
-use yii\base\InvalidConfigException;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * NoteController implements the CRUD actions for IssueNote model.
  */
 class NoteController extends Controller {
+
+	/**
+	 * @inheritdoc
+	 */
+	public function actions(): array {
+		return [
+			'title-list' => NoteTitleListAction::class,
+			'description-list' => NoteDescriptionListAction::class,
+		];
+	}
 
 	/**
 	 * @inheritdoc
@@ -38,7 +54,7 @@ class NoteController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new IssueNoteSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -54,55 +70,47 @@ class NoteController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionView($id) {
+	public function actionView(int $id): string {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
 	}
 
 	/**
-	 * Creates a new IssueNote model.
-	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 * Creates a new IssueNote model for Issue.
+	 * If creation is successful, the browser will be redirected to the Issue 'view' page.
 	 *
 	 * @param int $issueId
 	 * @param string|null $type
 	 * @return mixed
 	 * @throws NotFoundHttpException
-	 * @throws InvalidConfigException
-	 * @todo add test for them
 	 */
-	public function actionCreate(int $issueId, string $type = null) {
-		if ($type !== null && !isset(IssueNote::getTypesNames()[$type])) {
-			throw new NotFoundHttpException('The requested page does not exist.');
+	public function actionCreate(int $issueId) {
+		$issue = $this->findIssueModel($issueId);
+		$model = new IssueNoteForm([
+			'issue_id' => $issue->getIssueId(),
+			'user_id' => Yii::$app->user->id,
+		]);
+		if (Yii::$app->user->can(Worker::PERMISSION_NOTE_TEMPLATE)) {
+			$model->scenario = IssueNoteForm::SCENARIO_TEMPLATE;
 		}
-		$note = new IssueNote();
-		$note->issue_id = $this->findIssueModel($issueId)->id;
-		$note->user_id = Yii::$app->user->id;
-		$note->type = $type;
-
-		$model = new IssueNoteForm($note);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			if ($type === IssueNote::TYPE_SETTLEMENT) {
-				return $this->redirectPayCalculation($issueId);
-			}
 			return $this->redirectIssue($issueId);
 		}
 		return $this->render('create', [
 			'model' => $model,
+			'issue' => $issue,
 		]);
 	}
 
 	public function actionCreateSettlement(int $id) {
 		$settlement = IssuePayCalculation::findOne($id);
-		if ($settlement === null || !Yii::$app->user->canSeeIssue($settlement->getIssueModel())) {
+		if ($settlement === null) {
 			throw new NotFoundHttpException();
 		}
-		$note = new IssueNote();
-		$note->issue_id = $settlement->issue_id;
-		$note->user_id = Yii::$app->user->getId();
-		$note->type = IssueNote::generateType(IssueNote::TYPE_SETTLEMENT, $settlement->id);
-		$model = new IssueNoteForm($note);
+		$model = IssueNoteForm::createSettlement($settlement);
+		$model->user_id = Yii::$app->user->getId();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['/settlement/calculation/view', 'id' => $settlement->id]);
@@ -118,16 +126,14 @@ class NoteController extends Controller {
 		if ($summon === null) {
 			throw new NotFoundHttpException('The requested page does not exist.');
 		}
-		$note = new IssueNote();
-		$note->issue_id = $summon->issue_id;
-		$note->user_id = Yii::$app->user->id;
-		$note->type = IssueNote::generateType(IssueNote::TYPE_SUMMON, $summon->id);
-		$model = new IssueNoteForm($note);
+		$model = IssueNoteForm::createSummon($summon);
+		$model->user_id = Yii::$app->user->getId();
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirectIssue($summon->issue_id);
 		}
-		return $this->render('create', [
+		return $this->render('create-summon', [
 			'model' => $model,
+			'summon' => $summon,
 		]);
 	}
 
@@ -139,13 +145,21 @@ class NoteController extends Controller {
 	 * @return mixed
 	 */
 	public function actionUpdate(int $id) {
-		$model = new IssueNoteForm($this->findModel($id));
+		$note = $this->findModel($id);
+		if ($note->isSms()) {
+			throw new NotFoundHttpException();
+		}
+		$model = new IssueNoteForm();
+		if (Yii::$app->user->can(Worker::PERMISSION_NOTE_TEMPLATE)) {
+			$model->scenario = IssueNoteForm::SCENARIO_TEMPLATE;
+		}
+		$model->setModel($note);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			if ($model->note->isForSettlement()) {
-				return $this->redirect(['/settlement/calculation/view', 'id' => $model->note->getEntityId()]);
+			if ($model->getModel()->isForSettlement()) {
+				return $this->redirect(['/settlement/calculation/view', 'id' => $model->getModel()->getEntityId()]);
 			}
-			return $this->redirectIssue($model->getNote()->issue_id);
+			return $this->redirectIssue($model->getModel()->getIssueId());
 		}
 		return $this->render('update', [
 			'model' => $model,
@@ -159,19 +173,18 @@ class NoteController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionDelete(int $id) {
+	public function actionDelete(int $id): Response {
 		$model = $this->findModel($id);
-		$issueId = $model->issue_id;
+		if (!Yii::$app->user->canDeleteNote($model)) {
+			Yii::warning('User: ' . Yii::$app->user->getId() . ' try Delete Note #:' . $model->id . ' with description: ' . $model->description);
+			throw new ForbiddenHttpException();
+		}
 		$model->delete();
 		Yii::warning('User: ' . Yii::$app->user->id . ' delete note. Title: ' . $model->title . "\n description: " . $model->description, 'note.delete');
-		return $this->redirectIssue($issueId);
+		return $this->redirectIssue($model->issue_id);
 	}
 
-	private function redirectPayCalculation(int $issueId) {
-		return $this->redirect(['/settlement/calculation/pay-calculation/view', 'id' => $issueId]);
-	}
-
-	private function redirectIssue(int $issueId) {
+	private function redirectIssue(int $issueId): Response {
 		return $this->redirect(['issue/view', 'id' => $issueId]);
 	}
 
@@ -183,7 +196,7 @@ class NoteController extends Controller {
 	 * @return IssueNote the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): IssueNote {
+	protected function findModel(int $id): IssueNote {
 		if (($model = IssueNote::findOne($id)) !== null) {
 			return $model;
 		}

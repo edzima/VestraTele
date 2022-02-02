@@ -1,6 +1,7 @@
 <?php
 
 use common\models\issue\Issue;
+use common\models\issue\IssueInterface;
 use common\models\issue\IssueUser;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueUsersWidget;
@@ -10,6 +11,7 @@ use yii\bootstrap\Html;
 /* @var $this yii\web\View */
 /* @var $model Issue */
 /* @var $usersLinks bool */
+/* @var $userMailVisibilityCheck bool */
 
 $provision = $model->getProvision();
 if ($provision) {
@@ -30,6 +32,7 @@ if ($provision) {
 				'model' => $model,
 				'type' => IssueUsersWidget::TYPE_CUSTOMERS,
 				'legendEncode' => !$usersLinks,
+				'withCheckEmailVisibility' => $userMailVisibilityCheck,
 				'legend' => static function (IssueUser $issueUser) use ($usersLinks): string {
 					$legend = $issueUser->getTypeWithUser();
 					if ($usersLinks) {
@@ -37,32 +40,43 @@ if ($provision) {
 							'target' => '_blank',
 						]);
 					}
+					return $legend;
+				},
+				'afterLegend' => static function (IssueUser $issueUser) use ($usersLinks): string {
 					if ($issueUser->type === IssueUser::TYPE_CUSTOMER || !$usersLinks) {
-						return $legend;
+						return '';
 					}
-					$legend .= Html::beginTag('span', ['class' => 'pull-right']);
-					$legend .= Html::a(Html::icon('pencil'),
+					$content = Html::beginTag('span', ['class' => 'pull-right form-group']);
+					$content .= Html::a(Html::icon('pencil'),
 						[
 							'/issue/user/update-type',
 							'issueId' => $issueUser->issue_id,
 							'userId' => $issueUser->user_id,
 							'type' => $issueUser->type,
+						],
+						[
+							'class' => 'btn btn-xs btn-primary',
+							'title' => Yii::t('common', 'Update'),
+							'aria-label' => Yii::t('common', 'Update'),
 						]);
 					if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
-						$legend .= Html::a(Html::icon('trash'),
-							[
-								'/issue/user/delete',
-								'issueId' => $issueUser->issue_id,
-								'userId' => $issueUser->user_id,
-								'type' => $issueUser->type,
-							], [
-								'data-method' => 'POST',
-								'data-confirm' => Yii::t('backend', 'Are you sure you want to delete this item?'),
-							]);
-					}
-					$legend .= Html::endTag('span');
+						$content .= ' ' . Html::a(Html::icon('trash'),
+								[
+									'/issue/user/delete',
+									'issueId' => $issueUser->issue_id,
+									'userId' => $issueUser->user_id,
+									'type' => $issueUser->type,
+								], [
 
-					return $legend;
+									'class' => 'btn btn-xs btn-danger',
+									'data-method' => 'POST',
+									'title' => Yii::t('common', 'Delete'),
+									'aria-label' => Yii::t('common', 'Delete'),
+									'data-confirm' => Yii::t('backend', 'Are you sure you want to delete this item?'),
+								]);
+					}
+					$content .= Html::endTag('span');
+					return $content;
 				},
 				'withAddress' => static function (IssueUser $issueUser): bool {
 					return $issueUser->type === IssueUser::TYPE_CUSTOMER;
@@ -72,6 +86,7 @@ if ($provision) {
 				'model' => $model,
 				'type' => IssueUsersWidget::TYPE_WORKERS,
 				'legendEncode' => !$usersLinks,
+				'withCheckEmailVisibility' => $userMailVisibilityCheck,
 				'legend' => static function (IssueUser $issueUser) use ($usersLinks): string {
 					$legend = $issueUser->getTypeWithUser();
 					if ($usersLinks) {
@@ -80,8 +95,26 @@ if ($provision) {
 								'target' => '_blank',
 							]);
 					}
-
 					return $legend;
+				},
+				'afterLegend' => static function (IssueUser $issueUser) use ($usersLinks): string {
+					if (!$usersLinks) {
+						return '';
+					}
+					$content = Html::beginTag('span', ['class' => 'pull-right form-group']);
+					$content .= Html::a('<i class="fa fa-money" aria-hidden="true"></i>',
+						[
+							'/settlement/cost/create-installment',
+							'id' => $issueUser->issue_id,
+							'user_id' => $issueUser->user_id,
+						], [
+							'class' => 'btn btn-success btn-xs',
+							'title' => Yii::t('settlement', 'Create Installment'),
+							'aria-label' => Yii::t('settlement', 'Create Installment'),
+						]);
+					$content .= Html::endTag('span');
+
+					return $content;
 				},
 			]) ?>
 		</div>
@@ -111,6 +144,15 @@ if ($provision) {
 						[
 							'attribute' => 'stage',
 							'label' => $model->getAttributeLabel('stage_id'),
+							'value' => function (IssueInterface $issue): string {
+								if (!empty($issue->getIssueModel()->stage_change_at)) {
+									return Yii::t('issue', '{stage} ({from})', [
+										'stage' => $issue->getIssueStage()->name,
+										'from' => Yii::$app->formatter->asDate($issue->getIssueModel()->stage_change_at),
+									]);
+								}
+								return $issue->getIssueStage()->name;
+							},
 						],
 						[
 							'attribute' => 'entityResponsible',

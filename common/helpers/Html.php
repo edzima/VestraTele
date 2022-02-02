@@ -3,7 +3,8 @@
 namespace common\helpers;
 
 use common\models\issue\IssueInterface;
-use common\models\settlement\PayInterface;
+use common\models\settlement\PayedInterface;
+use Yii;
 use yii\bootstrap\BaseHtml;
 
 class Html extends BaseHtml {
@@ -21,7 +22,7 @@ class Html extends BaseHtml {
 		return static::a($issue->getIssueName(), $url::issueView($issue->getIssueId()), $options);
 	}
 
-	public static function payStatusRowOptions(PayInterface $pay): array {
+	public static function payStatusRowOptions(PayedInterface $pay): array {
 		$options = [];
 		if ($pay->isPayed()) {
 			static::addCssClass($options, 'payed-row success');
@@ -29,6 +30,17 @@ class Html extends BaseHtml {
 			static::addCssClass($options, 'delayed-row warning');
 		}
 		return $options;
+	}
+
+	public static function booleanDropdownList(): array {
+		return [
+			1 => Yii::t('common', 'Yes'),
+			0 => Yii::t('common', 'No'),
+		];
+	}
+
+	public static function addNoPrintClass(array &$options): void {
+		static::addCssClass($options, 'no-print');
 	}
 
 }

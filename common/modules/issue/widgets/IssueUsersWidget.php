@@ -6,6 +6,7 @@ use backend\helpers\Html;
 use Closure;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
+use common\models\user\User;
 use common\widgets\FieldsetDetailView;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -26,12 +27,14 @@ class IssueUsersWidget extends Widget {
 	public string $type;
 
 	public array $fieldsetOptions = [];
+	public bool $withCheckEmailVisibility = true;
 
 	public array $containerOptions = [
 		'class' => 'issue-users row',
 	];
 
 	public ?Closure $legend = null;
+	public ?Closure $afterLegend = null;
 	public ?Closure $withAddress = null;
 	public bool $legendEncode = true;
 
@@ -47,7 +50,7 @@ class IssueUsersWidget extends Widget {
 					[
 						'attribute' => 'email',
 						'format' => 'email',
-						'visible' => !empty($user->email),
+						'visible' => $this->isEmailVisible($user),
 					],
 					[
 						'attribute' => 'profile.phone',
@@ -64,6 +67,13 @@ class IssueUsersWidget extends Widget {
 				],
 			],
 		];
+	}
+
+	public function isEmailVisible(User $user): bool {
+		if (empty($user->email)) {
+			return false;
+		}
+		return !$this->withCheckEmailVisibility || !$user->profile->email_hidden_in_frontend_issue;
 	}
 
 	/**
@@ -147,6 +157,7 @@ class IssueUsersWidget extends Widget {
 			}
 		}
 		$options['legend'] = $this->generateLegend($issueUser);
+		$options['afterLegend'] = $this->renderAfterLegend($issueUser);
 		$options['legendOptions']['encode'] = $this->legendEncode;
 		$options['detailConfig']['model'] = $issueUser->user;
 		return $class::widget($options);
@@ -158,5 +169,12 @@ class IssueUsersWidget extends Widget {
 			return $legend($issueUser);
 		}
 		return $issueUser->getTypeName();
+	}
+
+	public function renderAfterLegend(IssueUser $issueUser): string {
+		if ($this->afterLegend instanceof Closure) {
+			return call_user_func($this->afterLegend, $issueUser);
+		}
+		return '';
 	}
 }
