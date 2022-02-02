@@ -34,7 +34,7 @@ class IssueSmsSendJobTest extends SmsSendJobTest {
 		$this->tester->assertNotEmpty($id);
 		$this->tester->seeRecord(IssueNote::class, [
 			'issue_id' => 1,
-			'title' => 'Test Note Title - client: Wayne John[+48 673 222 110]',
+			'title' => 'Test Note Title - client: Wayne John [+48 673 222 110]',
 			'description' => static::DEFAULT_MESSAGE_TEXT,
 			'type' => IssueNote::genereateSmsType($this->job->message->getDst(), $id),
 		]);

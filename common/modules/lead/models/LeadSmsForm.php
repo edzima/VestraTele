@@ -2,14 +2,14 @@
 
 namespace common\modules\lead\models;
 
-use common\models\message\SmsForm;
+use common\models\message\QueueSmsForm;
 use common\modules\lead\models\forms\ReportForm;
 use console\jobs\LeadSmsSendJob;
 use Edzima\Yii2Adescom\models\MessageInterface;
 use Yii;
 use yii\validators\CompareValidator;
 
-class LeadSmsForm extends SmsForm {
+class LeadSmsForm extends QueueSmsForm {
 
 	public const SCENARIO_CHANGE_STATUS = 'change-status';
 

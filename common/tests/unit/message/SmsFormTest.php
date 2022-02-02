@@ -2,7 +2,7 @@
 
 namespace common\tests\unit\message;
 
-use common\models\message\SmsForm;
+use common\models\message\QueueSmsForm;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
 use console\jobs\SmsSendJob;
@@ -11,7 +11,7 @@ abstract class SmsFormTest extends Unit {
 
 	use UnitModelTrait;
 
-	protected SmsForm $model;
+	protected QueueSmsForm $model;
 
 	abstract protected function jobClass(): string;
 
@@ -53,7 +53,7 @@ abstract class SmsFormTest extends Unit {
 		$this->tester->assertSame($this->model->phone, $message->getDst());
 	}
 
-	public function getModel(): SmsForm {
+	public function getModel(): QueueSmsForm {
 		return $this->model;
 	}
 

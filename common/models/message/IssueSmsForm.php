@@ -14,7 +14,7 @@ use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 
-class IssueSmsForm extends SmsForm {
+class IssueSmsForm extends QueueSmsForm {
 
 	public array $userTypes = [];
 
@@ -24,7 +24,7 @@ class IssueSmsForm extends SmsForm {
 
 	public string $noteTitleTemplate = '{title} - {userTypeWithPhone}';
 	public string $userTypeWithPhone = '{type}: {userWithPhone}';
-	public string $userWithPhoneTemplate = '{user}[{phone}]';
+	public string $userWithPhoneTemplate = '{user} [{phone}]';
 
 	private IssueInterface $_issue;
 

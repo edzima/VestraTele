@@ -39,10 +39,10 @@ abstract class MessageModel extends Model {
 		}
 	}
 
-	public function createSms(array $config = [], MessageTemplate $template = null): SmsForm {
+	public function createSms(array $config = [], MessageTemplate $template = null): QueueSmsForm {
 		$config['class'] = $this->smsClass;
 		/**
-		 * @var SmsForm $model
+		 * @var QueueSmsForm $model
 		 */
 		$model = Yii::createObject($config);
 		if ($template) {

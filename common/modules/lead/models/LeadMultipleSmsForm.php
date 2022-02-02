@@ -2,14 +2,14 @@
 
 namespace common\modules\lead\models;
 
-use common\models\message\SmsForm;
+use common\models\message\QueueSmsForm;
 use console\jobs\SmsSendJob;
 use Edzima\Yii2Adescom\models\MessageInterface;
 use Yii;
 use yii\base\InvalidCallException;
 use yii\helpers\ArrayHelper;
 
-class LeadMultipleSmsForm extends SmsForm {
+class LeadMultipleSmsForm extends QueueSmsForm {
 
 	public const SCENARIO_DEFAULT = self::SCENARIO_MULTIPLE;
 
