@@ -19,6 +19,8 @@
 return [
 	'Activate' => 'Aktywuj',
 	'Active' => 'Aktywny',
+	'Add {count} SMS: {message} to Send Queue.' => 'Dodano {count} SMS: {message} do kolejki.',
+	'Problem with add SMS to Queue' => 'Problem z dodaniem SMS do kolejki',
 	'Addresses' => 'Adresy',
 	'Application settings' => 'Ustawienia aplikacji',
 	'Are you sure you want to delete this item?' => 'Czy jesteś pewny, że chcesz to usunąć?',
@@ -297,4 +299,6 @@ return [
 	'Summon Types' => 'Typy Zleceń',
 	'Create Summon Type' => 'Dodaj Typ Zlecenia',
 	'Update Summon Type: {name}' => 'Edytuj Typ Zlecenia: {name}',
+	'Send SMS' => 'Wyślij SMS',
+	'Sens SMS: {count}' => 'Wyślij SMS: {count}',
 ];

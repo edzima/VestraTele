@@ -117,7 +117,7 @@ return [
 	'Reminder (days)' => 'Przypomnij (dni)',
 	'Shortname' => 'Skrót',
 	'Short Name' => 'Skrót',
-	'Stage date' => 'Data zmiany etapu',
+	'Stage date' => 'Zmiana etapu',
 	'Type' => 'Typ',
 	'Details' => 'Szczegóły',
 	'Accident date' => 'Data wypadku',

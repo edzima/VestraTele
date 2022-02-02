@@ -35,6 +35,7 @@ class IssueSearch extends BaseIssueSearch {
 	public bool $withArchiveOnAllPayedPay = false;
 
 	public ?string $signature_act = null;
+	private ?array $ids = null;
 
 	public function __construct($config = []) {
 		if (!isset($config['addressSearch'])) {
@@ -202,6 +203,15 @@ class IssueSearch extends BaseIssueSearch {
 		$ids = Yii::$app->userHierarchy->getAllChildesIds($this->parentId);
 		$ids[] = $this->parentId;
 		return User::getSelectList($ids, false);
+	}
+
+	public function getAllIds(QueryInterface $query, bool $refresh = false): array {
+		if ($refresh || $this->ids === null) {
+			$query = clone $query;
+			$query->select(Issue::tableName() . '.id');
+			$this->ids = $query->column();
+		}
+		return $this->ids;
 	}
 
 }

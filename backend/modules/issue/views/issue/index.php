@@ -14,6 +14,8 @@ use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
 use common\widgets\grid\IssueTypeColumn;
+use common\widgets\grid\SelectionForm;
+use kartik\grid\CheckboxColumn;
 use kartik\grid\SerialColumn;
 use kartik\select2\Select2;
 use yii\data\ActiveDataProvider;
@@ -28,7 +30,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 <div class="issue-index relative">
-	<?php Pjax::begin(); ?>
 
 	<p>
 		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
@@ -43,14 +44,66 @@ $this->params['breadcrumbs'][] = $this->title;
 			? Html::a(Yii::t('backend', 'Settlements'), ['/settlement/calculation/index'], ['class' => 'btn btn-success'])
 			: ''
 		?>
+		<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
+			? CsvForm::widget()
+			: ''
+		?>
 	</p>
+
+	<?php Pjax::begin([
+		'timeout' => 2000,
+	]); ?>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
-	<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
-		? CsvForm::widget()
-		: ''
-	?>
+	<div class="grid-selection-links-wrapper">
+
+
+		<?php
+		SelectionForm::begin([
+			'formWrapperSelector' => '.selection-form-wrapper',
+			'gridId' => 'issues-list',
+		]);
+		?>
+
+		<p class="selection-form-wrapper hidden">
+			<?= Yii::$app->user->can(Worker::PERMISSION_MULTIPLE_SMS)
+			&& !empty($dataProvider->getModels())
+			&& $dataProvider->pagination->pageCount > 1
+				? Html::a(
+					Yii::t('backend', 'Send SMS: {count}', [
+						'count' => count($searchModel->getAllIds($dataProvider->query)),
+					]), [
+					'sms/push-multiple',
+				],
+					[
+						'data' => [
+							'pjax' => '0',
+							'method' => 'POST',
+							'params' => [
+								'ids' => $searchModel->getAllIds($dataProvider->query),
+							],
+						],
+						'class' => 'btn btn-success',
+					]
+				)
+				: ''
+			?>
+
+			<?= Yii::$app->user->can(Worker::PERMISSION_MULTIPLE_SMS)
+				? Html::submitButton(
+					Yii::t('backend', 'Send SMS'),
+					[
+						'class' => 'btn btn-success',
+						'name' => 'route',
+						'value' => 'sms/push-multiple',
+						'data-pjax' => '0',
+					])
+				: ''
+			?>
+		</p>
+	</div>
+
 
 	<?php
 	//@todo remove this after migrate BS4 (add data-boundary="viewport")
@@ -70,6 +123,11 @@ $this->params['breadcrumbs'][] = $this->title;
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
+			Yii::$app->user->can(Worker::PERMISSION_MULTIPLE_SMS)
+				? [
+				'class' => CheckboxColumn::class,
+			]
+				: [],
 			[
 				'class' => SerialColumn::class,
 				'width' => '40px',
@@ -246,5 +304,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 		],
 	]); ?>
-	<?php Pjax::end(); ?>
+	<?php
+	SelectionForm::end();
+	Pjax::end();
+	?>
+
+
 </div>

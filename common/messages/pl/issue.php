@@ -43,4 +43,6 @@ return [
 	'Issue' => 'Sprawa',
 	'Issue Name' => 'Nr Sprawy',
 	'Only Pinned' => 'Przypięte',
+	'User Types' => 'Uczestnicy',
+	'Send SMS to Issues: {count}' => 'Wyślij SMS do Spraw: {count}',
 ];

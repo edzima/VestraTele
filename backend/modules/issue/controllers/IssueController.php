@@ -2,7 +2,6 @@
 
 namespace backend\modules\issue\controllers;
 
-use backend\helpers\Url;
 use backend\modules\issue\models\IssueForm;
 use backend\modules\issue\models\IssueStageChangeForm;
 use backend\modules\issue\models\search\IssueLeadsSearch;
@@ -10,6 +9,7 @@ use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\CsvForm;
+use common\behaviors\SelectionRouteBehavior;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
@@ -39,6 +39,9 @@ class IssueController extends Controller {
 				'actions' => [
 					'delete' => ['POST'],
 				],
+			],
+			'selection' => [
+				'class' => SelectionRouteBehavior::class,
 			],
 		];
 	}
