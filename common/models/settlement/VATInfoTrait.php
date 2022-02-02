@@ -16,7 +16,7 @@ trait VATInfoTrait {
 
 	public function getValueWithoutVAT(): Decimal {
 		$vat = $this->getVAT();
-		if ($vat) {
+		if ($vat !== null) {
 			return Yii::$app->tax->netto($this->getValueWithVAT(), $this->getVAT());
 		}
 		return $this->getValueWithVAT();
@@ -45,7 +45,7 @@ trait VATInfoTrait {
 	}
 
 	public function hasVAT(): bool {
-		return $this->{$this->vatAttribute()} !== null;
+		return !empty($this->{$this->vatAttribute()}) && $this->{$this->vatAttribute()} > 0;
 	}
 
 	protected function vatAttribute(): string {
