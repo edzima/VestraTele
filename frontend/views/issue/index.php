@@ -166,6 +166,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => DataColumn::class,
+				'attribute' => 'issue.created_at',
+				'format' => 'date',
+				'noWrap' => true,
+			],
+			[
+				'class' => DataColumn::class,
 				'attribute' => 'issue.updated_at',
 				'format' => 'date',
 				'noWrap' => true,
