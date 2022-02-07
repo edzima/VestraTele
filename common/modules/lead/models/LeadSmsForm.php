@@ -59,6 +59,7 @@ class LeadSmsForm extends QueueSmsForm {
 
 	public function report(string $smsId): bool {
 		$report = new ReportForm();
+		$report->withSameContacts = false;
 		$report->setLead($this->lead);
 		$report->owner_id = $this->owner_id;
 		$report->status_id = $this->status_id;
