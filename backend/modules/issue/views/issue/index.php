@@ -127,7 +127,9 @@ $this->params['breadcrumbs'][] = $this->title;
 				? [
 				'class' => CheckboxColumn::class,
 			]
-				: [],
+				: [
+				'visible' => false,
+			],
 			[
 				'class' => SerialColumn::class,
 				'width' => '40px',
