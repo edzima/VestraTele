@@ -158,4 +158,8 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 	public function getDialerPhone(): ?string {
 		return $this->dialer_phone;
 	}
+
+	public static function typeId(int $sourceId): int {
+		return static::getModels()[$sourceId]->type_id;
+	}
 }
