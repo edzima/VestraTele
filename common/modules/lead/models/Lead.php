@@ -35,6 +35,8 @@ use yii\helpers\Json;
  * @property-read LeadReport[] $reports
  * @property-read LeadAnswer[] $answers
  * @property-read LeadAddress[] $addresses
+ * @property-read Lead[] $samePhoneLeads
+ * @property-read Lead[] $sameEmailLeads
  */
 class Lead extends ActiveRecord implements ActiveLead {
 
@@ -219,6 +221,14 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->leadSource;
 	}
 
+	public function getTypeId(): int {
+		return LeadSource::typeId($this->getSourceId());
+	}
+
+	public function getTypeName(): string {
+		return LeadType::getNames()[$this->getTypeId()];
+	}
+
 	public function updateFromLead(LeadInterface $lead): void {
 		if (!empty($lead->getEmail()) && empty($this->email)) {
 			$this->email = $lead->getEmail();
@@ -300,16 +310,22 @@ class Lead extends ActiveRecord implements ActiveLead {
 	 * @return static[]
 	 */
 	public function getSameContacts(bool $withType = false, bool $refresh = false): array {
-		if (empty($this->sameContacts) || $refresh) {
-			$models = static::findByLead($this);
-			unset($models[$this->id]);
-			$this->sameContacts = $models;
+		$models = [];
+		if (!empty($this->phone)) {
+			foreach ($this->samePhoneLeads as $phoneLead) {
+				$models[$phoneLead->getId()] = $phoneLead;
+			}
 		}
+		if (!empty($this->email)) {
+			foreach ($this->sameEmailLeads as $emailLead) {
+				$models[$emailLead->getId()] = $emailLead;
+			}
+		}
+		unset($models[$this->id]);
 		if ($withType) {
-			$typeId = LeadSource::getModels()[$this->source_id]->type_id;
-			return static::typeFilter($this->sameContacts, $typeId);
+			return static::typeFilter($models, $this->getTypeId());
 		}
-		return $this->sameContacts;
+		return $models;
 	}
 
 	/**
@@ -318,12 +334,22 @@ class Lead extends ActiveRecord implements ActiveLead {
 	 * @return static[]
 	 */
 	public static function typeFilter(array $models, int $type): array {
-		return array_filter($models, function (self $model) use ($type): bool {
-			return LeadSource::getModels()[$model->source_id]->type_id === $type;
+		return array_filter($models, static function (self $model) use ($type): bool {
+			return $model->getTypeId() === $type;
 		});
 	}
 
 	public static function find(): LeadQuery {
 		return new LeadQuery(static::class);
+	}
+
+	public function getSamePhoneLeads(): LeadQuery {
+		return $this->hasMany(static::class, ['phone' => 'phone'])
+			->indexBy('id');
+	}
+
+	public function getSameEmailLeads(): LeadQuery {
+		return $this->hasMany(static::class, ['email' => 'email'])
+			->indexBy('id');
 	}
 }
