@@ -24,6 +24,16 @@ return [
 		'provider' => Lead::PROVIDER_FORM,
 		'data' => '[]',
 	],
+	'equal-accident-phone-from-other-source-and-archive' => [
+		'name' => 'John2',
+		'source_id' => 2,
+		'status_id' => LeadStatusInterface::STATUS_ARCHIVE,
+		'date_at' => '2020-01-01',
+		'email' => 'test@lead.com',
+		'phone' => '48777-222-122',
+		'provider' => Lead::PROVIDER_FORM,
+		'data' => '[]',
+	],
 	'archive-wordpress-accident' => [
 		'name' => 'Alan',
 		'source_id' => 1,

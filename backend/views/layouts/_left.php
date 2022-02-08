@@ -71,6 +71,12 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-eye"></i>',
 						],
 						[
+							'label' => Yii::t('lead', 'Duplicates'),
+							'url' => ['/lead/duplicate/index'],
+							'icon' => '<i class="fa fa-magnet"></i>',
+							'visible' => $user->can(Worker::PERMISSION_LEAD_DUPLICATE),
+						],
+						[
 							'label' => Yii::t('lead', 'Dialers'),
 							'url' => ['/lead/dialer-lead/index'],
 							'icon' => '<i class="fa fa-phone"></i>',

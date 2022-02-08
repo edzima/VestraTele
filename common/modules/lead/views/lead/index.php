@@ -70,6 +70,11 @@ if ($multipleForm) {
 			? Html::a(Yii::t('lead', 'Dialers'), ['dialer-lead/index'], ['class' => 'btn btn-primary'])
 			: ''
 		?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_DUPLICATE)
+			? Html::a(Yii::t('lead', 'Duplicates'), ['duplicate/index'], ['class' => 'btn btn-warning'])
+			: ''
+		?>
 	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
@@ -242,7 +247,7 @@ if ($multipleForm) {
 			],
 			[
 				'attribute' => 'status_id',
-				'value' => 'status',
+				'value' => 'statusName',
 				'filter' => $searchModel::getStatusNames(),
 				'label' => Yii::t('lead', 'Status'),
 				'filterType' => GridView::FILTER_SELECT2,
@@ -257,33 +262,33 @@ if ($multipleForm) {
 					],
 				],
 			],
-			[
-				'attribute' => 'source_id',
-				'value' => function (ActiveLead $lead): string {
-					if (!$lead->getSource()->getURL()) {
-						return $lead->getSource()->getName();
-					}
-					return Html::a(Html::encode($lead->getSource()->getName()),
-						$lead->getSource()->getURL(), [
-							'target' => '_blank',
-						]);
-				},
-				'format' => 'raw',
-				'filter' => $searchModel->getSourcesNames(),
-				'label' => Yii::t('lead', 'Source'),
-				'filterType' => GridView::FILTER_SELECT2,
-				'filterInputOptions' => [
-					'placeholder' => Yii::t('lead', 'Source'),
-				],
-				'filterWidgetOptions' => [
-					'size' => Select2::SIZE_SMALL,
-					'pluginOptions' => [
-						'allowClear' => true,
-						'dropdownAutoWidth' => true,
-					],
-				],
-			],
-			'date_at',
+			//			[
+			//				'attribute' => 'source_id',
+			//				'value' => function (ActiveLead $lead): string {
+			//					if (!$lead->getSource()->getURL()) {
+			//						return $lead->getSource()->getName();
+			//					}
+			//					return Html::a(Html::encode($lead->getSource()->getName()),
+			//						$lead->getSource()->getURL(), [
+			//							'target' => '_blank',
+			//						]);
+			//				},
+			//				'format' => 'raw',
+			//				'filter' => $searchModel->getSourcesNames(),
+			//				'label' => Yii::t('lead', 'Source'),
+			//				'filterType' => GridView::FILTER_SELECT2,
+			//				'filterInputOptions' => [
+			//					'placeholder' => Yii::t('lead', 'Source'),
+			//				],
+			//				'filterWidgetOptions' => [
+			//					'size' => Select2::SIZE_SMALL,
+			//					'pluginOptions' => [
+			//						'allowClear' => true,
+			//						'dropdownAutoWidth' => true,
+			//					],
+			//				],
+			//			],
+			'date_at:date',
 		],
 			$questionColumns,
 			[

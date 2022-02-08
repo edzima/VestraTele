@@ -11,6 +11,10 @@ return [
 	'Success assign {user} as {type} to Lead: {lead}.' => 'Przypisano {user} jako {type} do Leada: {lead}.',
 	'From At' => 'Od',
 	'To At' => 'Do',
+	'Duplicate Count' => 'Ilość',
+	'Various' => 'Niejednolite',
+	'Same' => 'Powielone',
+	'Duplicates Leads' => 'Duplikaty',
 	'status' => 'Status',
 	'Delete' => 'Usuń',
 	'Calling' => 'Próba połączenia',
@@ -212,6 +216,7 @@ return [
 	'Send multiple SMS to {count} Leads' => 'Wyślij SMS do {count} Leads',
 	'Send SMS: {count}' => 'Wyślij SMS: {count}',
 	'Show Report In Lead Index' => 'Pokazuj Raport w Lead Index',
+	'Duplicates' => 'Duplikaty',
 	'Success Change Status: {status} for Leads: {count}.' => 'Pomyślnie Zmieniono Status na: {status} dla Leads: {count}.',
 	"Thank you for submitting your application.\nWe will contact you within 24 hours.\nIf you do not want to wait, call us directly on the number: {sourcePhone}" => "Dziękujemy za wysłanie zgłoszenia.\nSkontaktujemy się z Tobą w ciągu 24 godzin.\nJeśli nie chcesz czekać zadzwoń: {sourcePhone}",
 ];

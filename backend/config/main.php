@@ -1,24 +1,24 @@
 <?php
 
 use backend\modules\benefit\Module as BenefitModule;
-use common\models\user\User;
-use common\models\user\Worker;
-use Edzima\Yii2Adescom\Module as AdescomModule;
-use motion\i18n\ConfigLanguageProvider;
-use yii\base\Action;
-use ymaker\email\templates\Module as EmailTemplateModule;
 use backend\modules\entityResponsible\Module as EntityResponsibleModule;
-use backend\modules\issue\Module as IssueModule;
 use backend\modules\hint\Module as HintModule;
+use backend\modules\issue\Module as IssueModule;
 use backend\modules\provision\Module as ProvisionModule;
 use backend\modules\settlement\Module as SettlementModule;
 use backend\modules\user\Module as UserModule;
-use common\modules\czater\Module as CzaterModule;
-use common\modules\lead\Module as LeadModule;
 use common\behaviors\GlobalAccessBehavior;
 use common\behaviors\LastActionBehavior;
 use common\components\User as WebUser;
+use common\models\user\User;
+use common\models\user\Worker;
+use common\modules\czater\Module as CzaterModule;
+use common\modules\lead\Module as LeadModule;
+use Edzima\Yii2Adescom\Module as AdescomModule;
+use motion\i18n\ConfigLanguageProvider;
+use yii\base\Action;
 use yii\web\UserEvent;
+use ymaker\email\templates\Module as EmailTemplateModule;
 
 $params = array_merge(
 	require __DIR__ . '/../../common/config/params.php',
@@ -178,8 +178,13 @@ return [
 						'permissions' => [Worker::PERMISSION_LEAD_DIALER],
 					],
 					[
+						'allow' => true,
+						'controllers' => ['lead/duplicate'],
+						'permissions' => [Worker::PERMISSION_LEAD_DUPLICATE],
+					],
+					[
 						'allow' => false,
-						'controllers' => ['lead/dialer-lead', 'lead/status'],
+						'controllers' => ['lead/dialer-lead', 'lead/status', 'lead/duplicate'],
 					],
 					[
 						'allow' => true,
