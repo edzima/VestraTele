@@ -6,6 +6,7 @@ use common\models\user\Customer;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\rbac\OwnModelRule;
+use Exception;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\console\Controller;
@@ -13,7 +14,6 @@ use yii\helpers\Console;
 use yii\rbac\Item;
 use yii\rbac\Permission;
 use yii\rbac\Role;
-use Exception;
 
 /**
  * Class RbacController
@@ -100,8 +100,9 @@ class RbacController extends Controller {
 		Worker::PERMISSION_MULTIPLE_SMS,
 		Worker::PERMISSION_WORKERS,
 		Worker::PERMISSION_LEAD,
-		Worker::PERMISSION_LEAD_STATUS,
 		Worker::PERMISSION_LEAD_DIALER,
+		Worker::PERMISSION_LEAD_DUPLICATE,
+		Worker::PERMISSION_LEAD_STATUS,
 		Worker::PERMISSION_MESSAGE_TEMPLATE,
 		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
 	];
