@@ -30,8 +30,21 @@ class LeadFixController extends Controller {
 		}
 	}
 
+	public function actionEmptyContact(): void {
+		$this->actionEmptyPhone();
+		$this->actionEmptyEmail();
+		Console::output('Empty Phone and Email: ') . Lead::deleteAll([
+			'phone' => null,
+			'email' => null,
+		]);
+	}
+
 	public function actionEmptyPhone(): void {
-		Lead::updateAll(['phone' => null], ['phone' => '']);
+		Console::output('Empty Phone as Null: ') . Lead::updateAll(['phone' => null], ['phone' => '']);
+	}
+
+	public function actionEmptyEmail(): void {
+		Console::output('Empty Email as Null: ') . Lead::updateAll(['email' => null], ['email' => '']);
 	}
 
 	public function actionMergeStatus(int $status): void {
