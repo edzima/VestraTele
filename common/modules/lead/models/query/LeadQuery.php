@@ -74,4 +74,10 @@ class LeadQuery extends ActiveQuery implements PhonableQuery {
 		$this->user($user_id, LeadUser::TYPE_DIALER);
 		return $this;
 	}
+
+	public function type(int $type_id): self {
+		$this->joinWith('leadSource S');
+		$this->andWhere(['S.type_id' => $type_id]);
+		return $this;
+	}
 }
