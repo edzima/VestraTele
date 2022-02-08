@@ -58,7 +58,6 @@ class LeadCest {
 		$I->dontSeeInGridHeader('Owner');
 		$I->seeInGridHeader('Type');
 		$I->seeInGridHeader('Status');
-		$I->seeInGridHeader('Source');
 		$I->seeInGridHeader('Phone');
 		$I->seeInGridHeader('Reports');
 	}
@@ -210,7 +209,7 @@ class LeadCest {
 		$I->amLoggedInAs(1);
 		$I->assignPermission(User::PERMISSION_LEAD);
 		$I->amOnRoute(static::ROUTE_VIEW, ['id' => 1]);
-		$I->seeFlash('Find Similars Leads: 1.', 'warning');
+		$I->seeFlash('Find Similars Leads: 2.', 'warning');
 		$I->see('Same Contacts Leads', 'h3');
 		$I->dontSeeLink('John2');
 		$I->see('Type', '.same-contact-lead');
