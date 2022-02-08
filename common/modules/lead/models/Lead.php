@@ -46,8 +46,6 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	private ?array $users_ids = null;
 
-	private array $sameContacts = [];
-
 	public string $dateFormat = 'Y-m-d H:i:s';
 
 	public function afterSave($insert, $changedAttributes): void {
