@@ -262,32 +262,32 @@ if ($multipleForm) {
 					],
 				],
 			],
-			//			[
-			//				'attribute' => 'source_id',
-			//				'value' => function (ActiveLead $lead): string {
-			//					if (!$lead->getSource()->getURL()) {
-			//						return $lead->getSource()->getName();
-			//					}
-			//					return Html::a(Html::encode($lead->getSource()->getName()),
-			//						$lead->getSource()->getURL(), [
-			//							'target' => '_blank',
-			//						]);
-			//				},
-			//				'format' => 'raw',
-			//				'filter' => $searchModel->getSourcesNames(),
-			//				'label' => Yii::t('lead', 'Source'),
-			//				'filterType' => GridView::FILTER_SELECT2,
-			//				'filterInputOptions' => [
-			//					'placeholder' => Yii::t('lead', 'Source'),
-			//				],
-			//				'filterWidgetOptions' => [
-			//					'size' => Select2::SIZE_SMALL,
-			//					'pluginOptions' => [
-			//						'allowClear' => true,
-			//						'dropdownAutoWidth' => true,
-			//					],
-			//				],
-			//			],
+			[
+				'attribute' => 'source_id',
+				'value' => function (ActiveLead $lead): string {
+					if (!$lead->getSource()->getURL()) {
+						return $lead->getSource()->getName();
+					}
+					return Html::a(Html::encode($lead->getSource()->getName()),
+						$lead->getSource()->getURL(), [
+							'target' => '_blank',
+						]);
+				},
+				'format' => 'raw',
+				'filter' => $searchModel->getSourcesNames(),
+				'label' => Yii::t('lead', 'Source'),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Source'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+			],
 			'date_at:date',
 		],
 			$questionColumns,
