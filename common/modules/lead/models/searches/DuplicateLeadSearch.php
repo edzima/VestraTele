@@ -5,6 +5,7 @@ namespace common\modules\lead\models\searches;
 use common\models\SearchModel;
 use common\modules\lead\models\DuplicateLead;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadType;
@@ -18,32 +19,36 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 	public const STATUS_VARIOUS = 'various';
 	public const STATUS_VARIOUS_WITHOUT_ARCHIVE = 'various-without-archive';
 
-	public $status;
-	public $status_id;
 	public $type_id;
+
+	public static function getSourcesNames(): array {
+		return LeadSource::getNames();
+	}
 
 	public function rules(): array {
 		return [
-			[['status', 'name', 'phone'], 'string'],
-			[['status_id', 'type_id'], 'integer'],
+			[['status', 'name', 'phone', 'provider'], 'string'],
+			[['status_id', 'type_id', 'source_id'], 'integer'],
 		];
 	}
 
 	public function search(array $params): ActiveDataProvider {
 		$this->load($params);
-
 		$sub = Lead::find()
 			->alias('duplicateLead')
 			->addSelect([
 				'duplicateLead.id',
 				'duplicateLead.name',
 				'duplicateLead.phone',
+				'duplicateLead.provider',
 				'duplicateLead.source_id',
 				'duplicateLead.status_id',
 				'duplicateCount' => 'count(*)',
 			])
 			->groupBy(['duplicateLead.phone', 'duplicateLead.email'])
+			->andFilterWhere(['duplicateLead.provider' => $this->provider])
 			->andFilterWhere(['duplicateLead.status_id' => $this->status_id])
+			->andFilterWhere(['duplicateLead.source_id' => $this->source_id])
 			->andFilterWhere(['like', 'duplicateLead.name', $this->name])
 			->having('COUNT(*) >1');
 

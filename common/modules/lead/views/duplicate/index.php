@@ -45,6 +45,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'width' => '124px',
 			],
 			[
+				'attribute' => 'provider',
+				'value' => 'providerName',
+				'filter' => DuplicateLeadSearch::getProvidersNames(),
+			],
+			[
 				'attribute' => 'type_id',
 				'value' => function (DuplicateLead $lead): string {
 					return implode(', ', $lead->getSameContactsTypesNames());
@@ -55,6 +60,25 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filterType' => GridView::FILTER_SELECT2,
 				'filterInputOptions' => [
 					'placeholder' => Yii::t('lead', 'Type'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+			],
+			[
+				'attribute' => 'source_id',
+				'value' => function (DuplicateLead $lead): string {
+					return implode(', ', $lead->getSameSourcesNames());
+				},
+				'filter' => $searchModel::getSourcesNames(),
+				'label' => Yii::t('lead', 'Source'),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('lead', 'Source'),
 				],
 				'filterWidgetOptions' => [
 					'size' => Select2::SIZE_SMALL,
