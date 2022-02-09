@@ -10,7 +10,6 @@ use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\data\DataProviderInterface;
 use yii\db\ActiveQuery;
 
 class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
@@ -20,10 +19,6 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 
 	public $type_id;
 
-	public static function getSourcesNames(): array {
-		return LeadSource::getNames();
-	}
-
 	public function rules(): array {
 		return [
 			[['status', 'name', 'phone', 'provider'], 'string'],
@@ -31,7 +26,7 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 		];
 	}
 
-	public function search(array $params): DataProviderInterface {
+	public function search(array $params): ActiveDataProvider {
 		$this->load($params);
 		$sub = Lead::find()
 			->alias('duplicateLead')
@@ -87,6 +82,12 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 		return $dataProvider;
 	}
 
+	public function getAllIds(ActiveQuery $query): array {
+		$query = clone $query;
+		$query->select('duplicateLead.id');
+		return $query->column();
+	}
+
 	protected function applyStatusFilter(ActiveQuery $query): void {
 		switch ($this->status) {
 			case static::STATUS_SAME:
@@ -111,6 +112,10 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 			static::STATUS_VARIOUS => Yii::t('lead', 'Various'),
 			static::STATUS_SAME => Yii::t('lead', 'Same'),
 		];
+	}
+
+	public static function getSourcesNames(): array {
+		return LeadSource::getNames();
 	}
 
 }

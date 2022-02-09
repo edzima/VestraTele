@@ -24,6 +24,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
+	<p>
+		<?= Html::a(Yii::t('lead', 'Delete'), false, [
+			'class' => 'pull-right btn btn-danger',
+			'data-method' => 'delete',
+			'data-confirm' => Yii::t('lead', 'Are you sure you want to delete this items?'),
+		]) ?>
+	</p>
+
 	<?= $this->render('_search', [
 		'model' => $searchModel,
 	])
