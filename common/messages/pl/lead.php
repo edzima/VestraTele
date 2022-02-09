@@ -239,4 +239,8 @@ return [
 	'Move All types to Archive' => 'Archiwuzuj Wszystkie',
 	'Success Archive Lead.' => 'Zarchiwizowano Leada',
 	'Success Archive {count} Leads.' => 'Zarchiwizowano {count} Leads.',
+	'Import Leads' => 'Import',
+	'Import Leads from CSV' => 'Import Lead z CSV',
+	'Problem with Import Leads from CSV.' => 'Problem z Importem Leads z CSV',
+	'Success Import: {count} from CSV.' => 'Sukces! Importowano: {count} Leads z CSV.',
 ];
