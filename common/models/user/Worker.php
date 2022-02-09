@@ -42,6 +42,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_CAMPAIGN = 'campaign';
 	public const PERMISSION_LEAD_DIALER = 'lead.dialer';
 	public const PERMISSION_LEAD_DUPLICATE = 'lead.duplicate';
+	public const PERMISSION_LEAD_IMPORT = 'lead.import';
 
 	private static $USER_NAMES = [];
 
