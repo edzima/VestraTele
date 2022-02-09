@@ -83,6 +83,7 @@ return [
 	'Old Status ID' => 'Old Status ID',
 	'Status ID' => 'Status ID',
 	'Are you sure you want to delete this item?' => 'Jesteś pewny, że chcesz usunąć ten element?',
+	'Are you sure you want to delete this items?' => 'Czy chesz usunać te Leady?',
 	'Are you sure you want to delete this assigned users?' => 'Czy na pewno chcesz usunąć tych przypisanych użytkowników?',
 	'Reports' => 'Raporty',
 	'Data' => 'Dane',
@@ -234,4 +235,5 @@ return [
 	'Import Leads from CSV' => 'Import Lead z CSV',
 	'Problem with Import Leads from CSV.' => 'Problem z Importem Leads z CSV',
 	'Success Import: {count} from CSV.' => 'Sukces! Importowano: {count} Leads z CSV.',
+	'Delete Leads: {count}.' => 'Usunięto Leads: {count}',
 ];

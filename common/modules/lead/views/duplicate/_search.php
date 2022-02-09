@@ -15,11 +15,19 @@ use yii\widgets\ActiveForm;
 		'method' => 'get',
 	]); ?>
 
-	<?= $form->field($model, 'status')->dropDownList(
-		DuplicateLeadSearch::getStatusFilterNames(), [
-		'prompt' => Yii::t('lead', 'Select...'),
-	]) ?>
+	<div class="row">
 
+		<?= $form->field($model, 'status', [
+			'options' => [
+				'class' => [
+					'col-md-3',
+				],
+			],
+		])->dropDownList(
+			DuplicateLeadSearch::getStatusFilterNames(), [
+			'prompt' => Yii::t('lead', 'Select...'),
+		]) ?>
+	</div>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Search'), ['class' => 'btn btn-primary']) ?>
