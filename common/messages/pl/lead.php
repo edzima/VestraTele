@@ -219,4 +219,8 @@ return [
 	'Duplicates' => 'Duplikaty',
 	'Success Change Status: {status} for Leads: {count}.' => 'Pomyślnie Zmieniono Status na: {status} dla Leads: {count}.',
 	"Thank you for submitting your application.\nWe will contact you within 24 hours.\nIf you do not want to wait, call us directly on the number: {sourcePhone}" => "Dziękujemy za wysłanie zgłoszenia.\nSkontaktujemy się z Tobą w ciągu 24 godzin.\nJeśli nie chcesz czekać zadzwoń: {sourcePhone}",
+	'Import Leads' => 'Import',
+	'Import Leads from CSV' => 'Import Lead z CSV',
+	'Problem with Import Leads from CSV.' => 'Problem z Importem Leads z CSV',
+	'Success Import: {count} from CSV.' => 'Sukces! Importowano: {count} Leads z CSV.',
 ];
