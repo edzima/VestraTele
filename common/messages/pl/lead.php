@@ -243,4 +243,5 @@ return [
 	'Import Leads from CSV' => 'Import Lead z CSV',
 	'Problem with Import Leads from CSV.' => 'Problem z Importem Leads z CSV',
 	'Success Import: {count} from CSV.' => 'Sukces! Importowano: {count} Leads z CSV.',
+	'Delete Leads: {count}.' => 'Usunięto Leads: {count}',
 ];
