@@ -35,7 +35,7 @@ class LeadCSVImportTest extends Unit {
 		$this->tester->assertEmpty($this->model->import());
 	}
 
-	public function testPlay(): void {
+	public function testCentralPhone(): void {
 		$this->giveFile('central-phone.csv');
 		$this->giveModel();
 		$this->model->source_id = 1;
@@ -46,7 +46,6 @@ class LeadCSVImportTest extends Unit {
 		$this->model->nameColumn = null;
 		$this->thenSuccessValidate();
 		$this->tester->assertSame(4, $this->model->import());
-		codecept_debug(Lead::find()->asArray()->all());
 		$this->tester->seeRecord(Lead::class, [
 				'name' => 'central-phone.2',
 				'source_id' => 1,
@@ -63,6 +62,58 @@ class LeadCSVImportTest extends Unit {
 				'provider' => Lead::PROVIDER_CENTRAL_PHONE,
 			]
 		);
+	}
+
+	public function testComma(): void {
+		$this->giveFile('comma.csv');
+		$this->giveModel();
+		$this->model->source_id = 1;
+		$this->model->provider = Lead::PROVIDER_CENTRAL_PHONE;
+		$this->model->csvDelimiter = LeadCSVImport::DELIMITER_COMMA;
+		$this->model->status_id = 2;
+		$this->model->dateColumn = null;
+		$this->model->phoneColumn = 3;
+		$this->model->nameColumn = null;
+		$this->tester->assertSame(2, $this->model->import());
+	}
+
+	public function testNotUtf(): void {
+		$this->giveFile('not-utf.csv');
+		$this->giveModel([
+			'source_id' => 3,
+			'csvDelimiter' => LeadCSVImport::DELIMITER_SEMICOLON,
+			'phoneColumn' => 1,
+			'dateColumn' => null,
+			'nameColumn' => null,
+		]);
+
+		$this->assertSame(2, $this->model->import());
+	}
+
+	public function testCommaFileWithSemicolonDelimiter(): void {
+		$this->giveFile('comma.csv');
+		$this->giveModel();
+		$this->model->source_id = 1;
+		$this->model->provider = Lead::PROVIDER_CENTRAL_PHONE;
+		$this->model->csvDelimiter = LeadCSVImport::DELIMITER_SEMICOLON;
+		$this->model->status_id = 2;
+		$this->model->dateColumn = null;
+		$this->model->phoneColumn = 3;
+		$this->model->nameColumn = null;
+		$this->tester->assertSame(0, $this->model->import());
+	}
+
+	public function testCommaFileWithColonDelimiter(): void {
+		$this->giveFile('comma.csv');
+		$this->giveModel();
+		$this->model->source_id = 1;
+		$this->model->provider = Lead::PROVIDER_CENTRAL_PHONE;
+		$this->model->csvDelimiter = LeadCSVImport::DELIMITER_COLON;
+		$this->model->status_id = 2;
+		$this->model->dateColumn = null;
+		$this->model->phoneColumn = 3;
+		$this->model->nameColumn = null;
+		$this->tester->assertSame(0, $this->model->import());
 	}
 
 	protected function giveFile(string $fileName): void {
