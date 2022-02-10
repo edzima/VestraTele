@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models;
 
+use common\helpers\ArrayHelper;
 use common\modules\lead\models\forms\LeadForm;
 use DateTime;
 use Exception;
@@ -10,12 +11,17 @@ use ruskid\csvimporter\CSVReader;
 use ruskid\csvimporter\ImportInterface;
 use ruskid\csvimporter\MultipleImportStrategy;
 use Yii;
+use yii\base\InvalidArgumentException;
 use yii\base\Model;
 use yii\behaviors\AttributeTypecastBehavior;
 use yii\helpers\Json;
 use yii\web\UploadedFile;
 
 class LeadCSVImport extends Model {
+
+	public const DELIMITER_COMMA = ',';
+	public const DELIMITER_SEMICOLON = ';';
+	public const DELIMITER_COLON = ':';
 
 	/**
 	 * @var UploadedFile
@@ -26,7 +32,7 @@ class LeadCSVImport extends Model {
 	public $nameColumn = 1;
 	public $dateColumn = 2;
 
-	public string $csvDelimiter = ';';
+	public string $csvDelimiter = self::DELIMITER_SEMICOLON;
 	public int $startFromLine = 1;
 
 	public int $status_id = LeadStatus::STATUS_NEW;
@@ -174,7 +180,15 @@ class LeadCSVImport extends Model {
 			[
 				'attribute' => 'data',
 				'value' => function (array $row): string {
-					return Json::encode($row);
+					try {
+						return Json::encode($row);
+					} catch (InvalidArgumentException $e) {
+						if ($e->getCode() === JSON_ERROR_UTF8) {
+							$row = ArrayHelper::toUtf8($row);
+							return Json::encode($row);
+						}
+						throw $e;
+					}
 				},
 			],
 		];
@@ -202,8 +216,10 @@ class LeadCSVImport extends Model {
 
 	public static function delimiters(): array {
 		return [
-			':' => ':',
-			';' => ';',
+			static::DELIMITER_COMMA => ',',
+			static::DELIMITER_COLON => ':',
+			static::DELIMITER_SEMICOLON => ';',
 		];
 	}
+
 }
