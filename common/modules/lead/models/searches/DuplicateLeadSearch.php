@@ -17,6 +17,7 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 	public const STATUS_SAME = 'same';
 	public const STATUS_VARIOUS = 'various';
 
+	public $status;
 	public $type_id;
 
 	public function rules(): array {
