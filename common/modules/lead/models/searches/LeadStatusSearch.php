@@ -2,9 +2,9 @@
 
 namespace common\modules\lead\models\searches;
 
+use common\modules\lead\models\LeadStatus;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\modules\lead\models\LeadStatus;
 
 /**
  * LeadStatusSearch represents the model behind the search form of `common\modules\lead\models\LeadStatus`.
@@ -17,7 +17,7 @@ class LeadStatusSearch extends LeadStatus {
 	public function rules(): array {
 		return [
 			[['id', 'sort_index'], 'integer'],
-			[['short_report', 'show_report_in_lead_index'], 'boolean'],
+			[['short_report', 'show_report_in_lead_index', 'not_for_dialer'], 'boolean'],
 			[['name', 'description'], 'safe'],
 		];
 	}
@@ -59,6 +59,7 @@ class LeadStatusSearch extends LeadStatus {
 			'id' => $this->id,
 			'sort_index' => $this->sort_index,
 			'short_report' => $this->short_report,
+			'not_for_dialer' => $this->not_for_dialer,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])

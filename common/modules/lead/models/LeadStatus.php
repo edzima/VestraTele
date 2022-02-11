@@ -16,6 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null $sort_index
  * @property int|null $short_report
  * @property int|null $show_report_in_lead_index
+ * @property int|null $not_for_dialer
  *
  * @property Lead[] $leads
  */
@@ -57,6 +58,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			'sort_index' => Yii::t('lead', 'Sort Index'),
 			'short_report' => Yii::t('lead', 'Short Report'),
 			'show_report_in_lead_index' => Yii::t('lead', 'Show Report In Lead Index'),
+			'not_for_dialer' => Yii::t('lead', 'Not for Dialer'),
 		];
 	}
 
