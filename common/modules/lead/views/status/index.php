@@ -1,8 +1,8 @@
 <?php
 
 use common\modules\lead\models\searches\LeadStatusSearch;
-use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadStatusSearch */
@@ -33,6 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'description',
 			'short_report:boolean',
 			'show_report_in_lead_index:boolean',
+			'not_for_dialer:boolean',
 			'sort_index',
 
 			['class' => 'yii\grid\ActionColumn'],

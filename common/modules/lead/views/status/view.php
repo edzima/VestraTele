@@ -35,6 +35,7 @@ YiiAsset::register($this);
 			'id',
 			'name',
 			'description',
+			'not_for_dialer:boolean',
 			'show_report_in_lead_index:boolean',
 			'short_report:boolean',
 			'sort_index',
