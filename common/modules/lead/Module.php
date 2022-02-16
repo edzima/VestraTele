@@ -4,7 +4,7 @@ namespace common\modules\lead;
 
 use Closure;
 use common\models\user\User;
-use common\modules\lead\components\LeadDialer;
+use common\modules\lead\components\LeadDialerManager;
 use common\modules\lead\components\LeadManager;
 use yii\base\BootstrapInterface;
 use yii\base\InvalidConfigException;
@@ -16,7 +16,7 @@ use yii\di\Instance;
  * Class Module
  *
  * @property LeadManager $manager
- * @property LeadDialer $dialer
+ * @property LeadDialerManager $dialer
  */
 class Module extends BaseModule implements BootstrapInterface {
 
@@ -33,7 +33,7 @@ class Module extends BaseModule implements BootstrapInterface {
 	public bool $allowDelete = true;
 
 	protected $dialer = [
-		'class' => LeadDialer::class,
+		'class' => LeadDialerManager::class,
 	];
 
 	public $components = [
@@ -54,12 +54,12 @@ class Module extends BaseModule implements BootstrapInterface {
 		$this->dialer = $dialer;
 	}
 
-	public function getDialer(): ?LeadDialer {
+	public function getDialer(): ?LeadDialerManager {
 		if ($this->dialer === null) {
 			return null;
 		}
 		if (!is_object($this->dialer)) {
-			$this->dialer = Instance::ensure($this->dialer, LeadDialer::class);
+			$this->dialer = Instance::ensure($this->dialer, LeadDialerManager::class);
 		}
 		return $this->dialer;
 	}

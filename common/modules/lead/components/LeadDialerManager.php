@@ -14,7 +14,7 @@ use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
 
-class LeadDialer extends Component {
+class LeadDialerManager extends Component {
 
 	public const EVENT_REPORT_CALLING = 'reportCalling';
 	public const EVENT_REPORT_ANSWER = 'reportAnswer';
