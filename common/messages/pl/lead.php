@@ -206,6 +206,9 @@ return [
 	'Calendar -  Leads' => 'Calendar -  Leads',
 	'Success Copy Lead.' => 'Sukces! Skopiowano Leada.',
 	'Calendar' => 'Kalendarz',
+	'Lead Dialer Types' => 'Typy Leads Dialer',
+	'Update Type: {name}' => 'Edytuj Typ: {name}',
+	'Create Lead Dialer Type' => 'Dodaj typ',
 	'Reports Details' => 'Szczegóły',
 	'Calendar Data' => 'Calendar Data',
 	'Only not self Lead can Copy.' => 'Nie możesz skopiować własnego Leada.',
@@ -245,4 +248,7 @@ return [
 	'Problem with Import Leads from CSV.' => 'Problem z Importem Leads z CSV',
 	'Success Import: {count} from CSV.' => 'Sukces! Importowano: {count} Leads z CSV.',
 	'Delete Leads: {count}.' => 'Usunięto Leads: {count}',
+	'Active' => 'Aktywny',
+	'Inactive' => 'Nieaktywny',
+	'Deleted' => 'Usunięty',
 ];

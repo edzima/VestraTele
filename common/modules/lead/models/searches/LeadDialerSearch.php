@@ -3,8 +3,9 @@
 namespace common\modules\lead\models\searches;
 
 use common\models\user\User;
-use common\modules\lead\components\LeadDialer;
+use common\modules\lead\components\LeadDialer as LeadDialerComponent;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadDialer;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadUser;
@@ -20,7 +21,7 @@ class LeadDialerSearch extends Model {
 	private static array $IDS = [];
 	private static array $DIALERS_NAMES = [];
 
-	private LeadDialer $dialer;
+	private LeadDialerComponent $dialer;
 
 	public string $from_at = '';
 	public string $to_at = '';
@@ -42,10 +43,10 @@ class LeadDialerSearch extends Model {
 		'class' => ActiveDataProvider::class,
 	];
 
-	public function __construct(LeadDialer $dialer, $config = []) {
-		$this->dialer = $dialer;
-		parent::__construct($config);
-	}
+//	public function __construct(LeadDialer $dialer, $config = []) {
+//		$this->dialer = $dialer;
+//		parent::__construct($config);
+//	}
 
 	public function getNewWithoutUserDataProvider(): ?DataProviderInterface {
 		if (!$this->dialer->withNewWithoutUser) {
@@ -138,5 +139,19 @@ class LeadDialerSearch extends Model {
 			static::$IDS = LeadUser::userIds(LeadUser::TYPE_DIALER);
 		}
 		return static::$IDS;
+	}
+
+	public function search(array $params = []) {
+		$query = LeadDialer::find();
+
+		// add conditions that should always apply here
+
+		$dataProvider = new ActiveDataProvider([
+			'query' => $query,
+		]);
+
+		$this->load($params);
+
+		return $dataProvider;
 	}
 }
