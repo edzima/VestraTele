@@ -2,7 +2,7 @@
 
 namespace common\modules\lead\events;
 
-use common\modules\lead\components\LeadDialer;
+use common\modules\lead\components\LeadDialerManager;
 use common\modules\lead\models\ActiveLead;
 use yii\base\Event;
 
@@ -12,7 +12,7 @@ use yii\base\Event;
 class LeadDialerEvent extends Event {
 
 	/**
-	 * @var LeadDialer
+	 * @var LeadDialerManager
 	 * @inheritdoc
 	 */
 	public $sender;

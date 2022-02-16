@@ -3,14 +3,14 @@
 namespace common\tests\unit\lead;
 
 use common\fixtures\helpers\LeadFixtureHelper;
-use common\modules\lead\components\LeadDialer;
+use common\modules\lead\components\LeadDialerManager;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatusInterface;
 use common\tests\unit\Unit;
 
-class LeadDialerTest extends Unit {
+class LeadDialerManagerTest extends Unit {
 
 	private const STATUS_CALLING = 2;
 	private const STATUS_NOT_ANSWERED = 3;
@@ -19,7 +19,7 @@ class LeadDialerTest extends Unit {
 	private const USER_ID = 3;
 	private const NEXT_CALL_TRY_INTERVAL = 1;
 
-	private LeadDialer $dialer;
+	private LeadDialerManager $dialer;
 
 	public function _fixtures(): array {
 		return array_merge(
@@ -224,7 +224,7 @@ class LeadDialerTest extends Unit {
 		if (!isset($config['userId'])) {
 			$config['userId'] = static::USER_ID;
 		}
-		$this->dialer = new LeadDialer($config);
+		$this->dialer = new LeadDialerManager($config);
 	}
 
 }

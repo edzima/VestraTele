@@ -3,7 +3,7 @@
 namespace common\modules\lead\models\searches;
 
 use common\models\user\User;
-use common\modules\lead\components\LeadDialer as LeadDialerComponent;
+use common\modules\lead\components\LeadDialerManager;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadDialer;
 use common\modules\lead\models\LeadReport;
@@ -21,7 +21,7 @@ class LeadDialerSearch extends Model {
 	private static array $IDS = [];
 	private static array $DIALERS_NAMES = [];
 
-	private LeadDialerComponent $dialer;
+	private LeadDialerManager $dialer;
 
 	public string $from_at = '';
 	public string $to_at = '';

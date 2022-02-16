@@ -2,9 +2,8 @@
 
 namespace frontend\controllers;
 
-use common\modules\lead\components\LeadDialer;
+use common\modules\lead\components\LeadDialerManager;
 use common\modules\lead\Module;
-use Yii;
 use yii\filters\auth\HttpHeaderAuth;
 use yii\filters\VerbFilter;
 use yii\rest\Controller;
@@ -15,7 +14,7 @@ use yii\web\NotFoundHttpException;
  */
 class LeadDialerController extends Controller {
 
-	private LeadDialer $dialer;
+	private LeadDialerManager $dialer;
 
 	public function behaviors(): array {
 		$behaviors = parent::behaviors();
