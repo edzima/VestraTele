@@ -243,4 +243,13 @@ return [
 	'Active' => 'Aktywny',
 	'Inactive' => 'Nieaktywny',
 	'Deleted' => 'Usunięty',
+	'Priority' => 'Priorytet',
+	'Next call interval' => 'Interwał',
+	'Daily attempts limit' => 'Dzienny Limit',
+	'Globally attempts limit' => 'Globalny Limit',
+	'Seconds' => 'Sekundy',
+	'Dialer Config' => 'Konfiguracja',
+	'Low Priority' => 'Niski',
+	'High Priority' => 'Wysoki',
+	'Medium Priority' => 'Średni',
 ];
