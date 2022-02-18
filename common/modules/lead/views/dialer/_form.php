@@ -1,10 +1,12 @@
 <?php
 
+use common\modules\lead\models\forms\LeadDialerForm;
+use kartik\number\NumberControl;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\modules\lead\models\LeadDialer */
+/* @var $model LeadDialerForm */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -12,17 +14,65 @@ use yii\widgets\ActiveForm;
 
 	<?php $form = ActiveForm::begin(); ?>
 
-	<?= $form->field($model, 'lead_id')->textInput() ?>
+	<div class="row">
+		<?= $form->field($model, 'leadId', [
+			'options' => [
+				'class' => 'col-md-1',
+			],
+		])->textInput()
+		?>
 
-	<?= $form->field($model, 'type_id')->textInput() ?>
+		<?= $form->field($model, 'typeId', [
+			'options' => [
+				'class' => 'col-md-1',
+			],
+		])
+			->dropDownList(LeadDialerForm::getTypesNames())
+		?>
 
-	<?= $form->field($model, 'priority')->textInput() ?>
 
-	<?= $form->field($model, 'created_at')->textInput() ?>
+		<?= $form->field($model, 'priority', [
+			'options' => [
+				'class' => 'col-md-1',
+			],
+		])
+			->dropDownList(LeadDialerForm::getPriorityNames())
+		?>
 
-	<?= $form->field($model, 'updated_at')->textInput() ?>
+	</div>
 
-	<?= $form->field($model, 'dialer_config')->textarea(['rows' => 6]) ?>
+
+	<div class="row">
+		<fieldset>
+			<legend class="col-md-12"><?= Yii::t('lead', 'Dialer Config') ?></legend>
+
+
+			<?= $form->field($model, 'nextCallInterval', [
+				'options' => [
+					'class' => 'col-md-1',
+				],
+			])
+				->widget(NumberControl::class)->hint(
+					Yii::t('lead', 'Seconds')
+				) ?>
+
+			<?= $form->field($model, 'dailyAttemptsLimit', [
+				'options' => [
+					'class' => 'col-md-1',
+				],
+			])
+				->widget(NumberControl::class) ?>
+
+			<?= $form->field($model, 'globallyAttemptsLimit', [
+				'options' => [
+					'class' => 'col-md-1',
+				],
+			])
+				->widget(NumberControl::class) ?>
+
+		</fieldset>
+	</div>
+
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>
