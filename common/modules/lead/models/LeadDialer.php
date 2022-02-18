@@ -2,9 +2,14 @@
 
 namespace common\modules\lead\models;
 
+use common\modules\lead\entities\DialerConfig;
+use common\modules\lead\entities\DialerConfigInterface;
+use common\modules\lead\models\query\LeadDialerQuery;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "lead_dialer".
@@ -21,6 +26,18 @@ use yii\db\ActiveRecord;
  * @property LeadDialerType $type
  */
 class LeadDialer extends ActiveRecord {
+
+	public const PRIORITY_LOW = 0;
+	public const PRIORITY_MEDIUM = 5;
+	public const PRIORITY_HIGH = 10;
+
+	public function behaviors() {
+		return [
+			'timestamp' => [
+				'class' => TimestampBehavior::class,
+			],
+		];
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -74,5 +91,21 @@ class LeadDialer extends ActiveRecord {
 	 */
 	public function getType() {
 		return $this->hasOne(LeadDialerType::class, ['id' => 'type_id']);
+	}
+
+	public static function getPriorityNames(): array {
+		return [
+			static::PRIORITY_LOW => Yii::t('lead', 'Low Priority'),
+			static::PRIORITY_MEDIUM => Yii::t('lead', 'Medium Priority'),
+			static::PRIORITY_HIGH => Yii::t('lead', 'High Priority'),
+		];
+	}
+
+	public static function find(): LeadDialerQuery {
+		return new LeadDialerQuery(static::class);
+	}
+
+	public function getConfig(): DialerConfigInterface {
+		return new DialerConfig(Json::decode($this->dialer_config));
 	}
 }
