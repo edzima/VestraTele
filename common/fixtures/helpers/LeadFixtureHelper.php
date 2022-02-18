@@ -4,6 +4,8 @@ namespace common\fixtures\helpers;
 
 use common\fixtures\ReminderFixture;
 use common\modules\lead\fixtures\CampaignFixture;
+use common\modules\lead\fixtures\DialerFixture;
+use common\modules\lead\fixtures\DialerTypeFixture;
 use common\modules\lead\fixtures\LeadAnswerFixture;
 use common\modules\lead\fixtures\LeadFixture;
 use common\modules\lead\fixtures\LeadQuestionFixture;
@@ -35,6 +37,8 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 	private const REMINDER = 'reminder';
 	private const LEAD_REMINDER = 'lead-reminder';
 	private const ANSWER = 'answer';
+	private const DIALER = 'lead.dialer';
+	private const DIALER_TYPE = 'lead.dialer-type';
 
 	public const DEFAULT_PHONE = '+48 123-123-123';
 	public const DEFAULT_SOURCE_ID = 1;
@@ -180,6 +184,19 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 		];
 	}
 
+	public static function dialer(): array {
+		return [
+			static::DIALER => [
+				'class' => DialerFixture::class,
+				'dataFile' => static::dataDir() . 'dialer.php',
+			],
+			static::DIALER_TYPE => [
+				'class' => DialerTypeFixture::class,
+				'dataFile' => static::dataDir() . 'dialer-type.php',
+			],
+		];
+	}
+
 	public function seeLead(array $atributtes) {
 		$this->tester->seeRecord(Lead::class, $atributtes);
 	}
@@ -195,5 +212,7 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 	public function dontSeeReport(array $atributtes) {
 		$this->tester->dontSeeRecord(LeadReport::class, $atributtes);
 	}
+
+
 
 }
