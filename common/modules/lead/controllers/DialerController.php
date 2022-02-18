@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\modules\lead\models\forms\LeadDialerForm;
 use common\modules\lead\models\LeadDialer;
 use common\modules\lead\models\searches\LeadDialerSearch;
 use Yii;
@@ -62,7 +63,7 @@ class DialerController extends BaseController {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new LeadDialer();
+		$model = new LeadDialerForm();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
