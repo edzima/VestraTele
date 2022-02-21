@@ -6,8 +6,8 @@ use common\models\Address;
 use common\models\hierarchy\Hierarchy;
 use common\models\issue\IssueCost;
 use common\models\issue\IssueUser;
-use common\models\provision\Provision;
 use common\models\issue\query\IssueCostQuery;
+use common\models\provision\Provision;
 use common\models\provision\ProvisionQuery;
 use common\models\user\query\UserQuery;
 use Yii;
@@ -99,6 +99,9 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 
 	public const PERMISSION_LEAD = 'lead';
 	public const PERMISSION_LEAD_STATUS = 'lead.status';
+	public const PERMISSION_LEAD_DIALER = 'lead.dialer';
+	public const PERMISSION_LEAD_DUPLICATE = 'lead.duplicate';
+
 	public const PERMISSION_CZATER = 'czater';
 	public const PERMISSION_SMS = 'sms';
 	public const PERMISSION_MULTIPLE_SMS = 'sms.multiple';

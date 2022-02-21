@@ -4,6 +4,7 @@ use common\helpers\Url;
 use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadInterface;
+use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\Module;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
@@ -41,9 +42,21 @@ YiiAsset::register($this);
 
 		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->getId()], ['class' => 'btn btn-warning']) ?>
 
-
-
 		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary']) ?>
+
+		<?= $model->getStatusId() !== LeadStatusInterface::STATUS_ARCHIVE
+			? Html::a(Yii::t('lead', 'Archive'), ['archive/self', 'id' => $model->getId()], [
+				'class' => 'btn btn-danger',
+				'data' => [
+					'method' => 'POST',
+					'confirm' => Yii::t('lead', 'Move Lead: {lead} to Archive?', [
+						'lead' => $model->getName(),
+					]),
+				],
+			])
+			: ''
+		?>
+
 
 		<span class="pull-right">
 
@@ -165,6 +178,7 @@ YiiAsset::register($this);
 
 			<?= SameContactsListWidget::widget([
 				'model' => $model,
+				'archiveBtn' => Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE),
 				'withType' => false,
 				'options' => [
 					'class' => 'row',

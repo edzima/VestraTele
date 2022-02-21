@@ -35,18 +35,12 @@ class ArchiveForm extends Model {
 			return false;
 		}
 		if ($this->selfChange) {
-			codecept_debug('change self: ' . $this->lead->getId());
 			$this->changeStatusWithReport($this->lead);
 		}
 		if ($this->withSameContacts) {
 			$leads = $this->lead->getSameContacts($this->withSameContactWithType);
 			foreach ($leads as $lead) {
-
-				if ($this->changeStatusWithReport($lead)) {
-					codecept_debug('Success change same contact lead: ' . $lead->getId());
-				} else {
-					codecept_debug('Error change same contact lead: ' . $lead->getId());
-				}
+				$this->changeStatusWithReport($lead);
 			}
 		}
 		return true;
@@ -61,9 +55,8 @@ class ArchiveForm extends Model {
 		$report->old_status_id = $lead->getStatusId();
 		$report->status_id = LeadStatusInterface::STATUS_ARCHIVE;
 		$report->owner_id = $this->userId;
-		if ($this->lead->getId() === $lead->getId()) {
-			$report->details = Yii::t('lead', 'Move to Archive');
-		} else {
+		if ($this->lead->getId() !== $lead->getId()) {
+
 			$report->details = Yii::t('lead', 'Move to Archive from Same Lead: {lead}', [
 				'lead' => $this->lead->getId(),
 			]);
