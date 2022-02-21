@@ -1,7 +1,6 @@
 <?php
 
 use common\helpers\Html;
-use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
@@ -10,13 +9,14 @@ use yii\widgets\DetailView;
 
 /* @var $this View */
 /* @var $model ActiveLead */
-
+/* @var $viewLink bool */
+/* @var $updateLink bool */
 ?>
 
 <div class="same-contact-lead">
 
 	<h3>
-		<?= $model->isForUser(Yii::$app->user->getId())
+		<?= $viewLink || $model->isForUser(Yii::$app->user->getId())
 			? Html::a(Html::encode($model->getName()), ['view', 'id' => $model->getId()])
 			: Html::encode($model->getName())
 		?>
@@ -43,6 +43,16 @@ use yii\widgets\DetailView;
 				])
 			: ''
 		?>
+
+		<?= $updateLink
+			? Html::a(Yii::t('lead', 'Update'),
+				['lead/update', 'id' => $model->getId()],
+				[
+					'class' => 'btn btn-primary',
+				])
+			: ''
+		?>
+
 	</p>
 	<?= DetailView::widget([
 		'model' => $model,

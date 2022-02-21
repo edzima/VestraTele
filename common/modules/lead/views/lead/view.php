@@ -5,7 +5,6 @@ use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadStatusInterface;
-use common\modules\lead\Module;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
@@ -20,9 +19,9 @@ use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model ActiveLead */
-/* @var $sameContacts LeadInterface[]
- * @var $withDelete bool
- */
+/* @var $sameContacts LeadInterface[] */
+/* @var $withDelete bool */
+/* @var $onlyUser bool */
 
 $this->title = $model->getName();
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['index']];
@@ -142,7 +141,7 @@ YiiAsset::register($this);
 				'model' => $model->getCustomerAddress(),
 			]) : '' ?>
 
-			<?= !Module::getInstance()->onlyUser || count($model->getUsers()) > 1
+			<?= !$onlyUser || count($model->getUsers()) > 1
 				? GridView::widget([
 					'caption' => Yii::t('lead', 'Users'),
 					'dataProvider' => new ActiveDataProvider(['query' => $model->getLeadUsers()->with('user.userProfile')]),
@@ -164,7 +163,7 @@ YiiAsset::register($this);
 
 			<?= ReminderGridWidget::widget([
 				'dataProvider' => new ActiveDataProvider(['query' => $model->getReminders()]),
-				'urlCreator' => function ($action, $reminder, $key, $index) use ($model) {
+				'urlCreator' => static function ($action, $reminder, $key, $index) use ($model) {
 					return Url::toRoute([
 						'reminder/' . $action,
 						'reminder_id' => $reminder->id,
@@ -178,6 +177,8 @@ YiiAsset::register($this);
 
 			<?= SameContactsListWidget::widget([
 				'model' => $model,
+				'viewLink' => !$onlyUser,
+				'updateLink' => !$onlyUser,
 				'archiveBtn' => Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE),
 				'withType' => false,
 				'options' => [

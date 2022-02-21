@@ -13,8 +13,8 @@ use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
-use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 use yii2tech\csvgrid\CsvGrid;
 
 /**
@@ -156,6 +156,7 @@ class LeadController extends BaseController {
 		return $this->render('view', [
 			'model' => $model,
 			'withDelete' => $this->module->allowDelete,
+			'onlyUser' => $this->module->onlyUser,
 		]);
 	}
 
