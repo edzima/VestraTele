@@ -219,4 +219,6 @@ return [
 	'Duplicates' => 'Duplikaty',
 	'Success Change Status: {status} for Leads: {count}.' => 'Pomyślnie Zmieniono Status na: {status} dla Leads: {count}.',
 	"Thank you for submitting your application.\nWe will contact you within 24 hours.\nIf you do not want to wait, call us directly on the number: {sourcePhone}" => "Dziękujemy za wysłanie zgłoszenia.\nSkontaktujemy się z Tobą w ciągu 24 godzin.\nJeśli nie chcesz czekać zadzwoń: {sourcePhone}",
+	'Move to Archive' => 'Przeniesiono do Archiwum',
+	'Move to Archive from Same Lead: {lead}' => 'Przeniesiono do Archiwum. Tożsamy: {lead}',
 ];
