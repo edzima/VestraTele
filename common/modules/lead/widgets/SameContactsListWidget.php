@@ -3,14 +3,14 @@
 namespace common\modules\lead\widgets;
 
 use common\helpers\Html;
-use common\modules\lead\models\LeadInterface;
+use common\modules\lead\models\ActiveLead;
 use Yii;
 use yii\data\ArrayDataProvider;
 use yii\widgets\ListView;
 
 class SameContactsListWidget extends ListView {
 
-	public LeadInterface $model;
+	public ActiveLead $model;
 	public bool $withType = false;
 
 	public $itemView = '@common/modules/lead/widgets/views/_same-contact';
@@ -21,6 +21,7 @@ class SameContactsListWidget extends ListView {
 
 	public string $headerTag = 'h3';
 	public array $headerOptions = [];
+	public bool $archiveBtn = false;
 
 	public function init() {
 		if ($this->dataProvider === null) {
@@ -40,13 +41,48 @@ class SameContactsListWidget extends ListView {
 
 	public function renderHeader(): string {
 		if ($this->dataProvider->getCount() > 0) {
-			return Html::tag($this->headerTag, Yii::t('lead', 'Same Contacts Leads'), $this->headerOptions);
+			return Html::tag($this->headerTag, $this->renderHeaderContent(), $this->headerOptions);
 		}
 		return '';
 	}
 
+	public function renderHeaderContent(): string {
+		$content = Yii::t('lead', 'Same Contacts Leads');
+		if (!$this->archiveBtn) {
+			return $content;
+		}
+		return $content . $this->renderArchiveBtn();
+	}
+
 	private function getModels(): array {
 		return $this->model->getSameContacts($this->withType);
+	}
+
+	private function renderArchiveBtn(): string {
+		if (!$this->model->getSameContacts(true)) {
+			return '';
+		}
+		$content = Html::a(
+			Yii::t('lead', 'Move {type} to Archive', [
+				'type' => $this->model->getTypeName(),
+			]),
+			[
+				'/lead/archive/same-contact',
+				'id' => $this->model->getId(),
+				'onlySameType' => true,
+			],
+			[
+				'class' => 'btn btn-danger',
+				'data' => [
+					'method' => 'POST',
+					'confirm' => Yii::t('lead',
+						'Move {type} Same Contact to Archive?', [
+							'type' => $this->model->getTypeName(),
+						]),
+				],
+			]
+		);
+		return Html::tag('span', $content, ['class' => 'btn-wrapper pull-right']);
 	}
 
 }
