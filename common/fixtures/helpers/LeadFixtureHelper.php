@@ -6,18 +6,22 @@ use common\fixtures\ReminderFixture;
 use common\modules\lead\fixtures\CampaignFixture;
 use common\modules\lead\fixtures\LeadAnswerFixture;
 use common\modules\lead\fixtures\LeadFixture;
-use common\modules\lead\fixtures\LeadReportFixture;
 use common\modules\lead\fixtures\LeadQuestionFixture;
+use common\modules\lead\fixtures\LeadReportFixture;
 use common\modules\lead\fixtures\ReminderFixture as LeadReminderFixture;
 use common\modules\lead\fixtures\SourceFixture;
 use common\modules\lead\fixtures\StatusFixture;
 use common\modules\lead\fixtures\TypeFixture;
 use common\modules\lead\fixtures\UserFixture;
+use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadUser;
 use Yii;
+use yii\helpers\Json;
 use yii\test\ActiveFixture;
 
-class LeadFixtureHelper {
+class LeadFixtureHelper extends BaseFixtureHelper {
 
 	public const LEAD = 'lead';
 	public const TYPE = 'type';
@@ -32,7 +36,28 @@ class LeadFixtureHelper {
 	private const LEAD_REMINDER = 'lead-reminder';
 	private const ANSWER = 'answer';
 
-	public static function dataDir(): string {
+	public const DEFAULT_PHONE = '+48 123-123-123';
+	public const DEFAULT_SOURCE_ID = 1;
+
+	public function haveLead(array $attributes): ActiveLead {
+		if (!isset($attributes['phone'])) {
+			$attributes['phone'] = static::DEFAULT_PHONE;
+		}
+		if (!isset($attributes['source_id'])) {
+			$attributes['source_id'] = static::DEFAULT_SOURCE_ID;
+		}
+
+		if (!isset($attributes['data'])) {
+			$attributes['data'] = Json::encode($attributes);
+		}
+		$id = $this->tester->haveRecord(Lead::class, $attributes);
+
+		return $this->tester->grabRecord(Lead::class, [
+			'id' => $id,
+		]);
+	}
+
+	public static function getDefaultDataDirPath(): string {
 		return Yii::getAlias('@common/tests/_data/lead/');
 	}
 
@@ -40,7 +65,7 @@ class LeadFixtureHelper {
 		return [
 			static::LEAD => [
 				'class' => LeadFixture::class,
-				'dataFile' => static::dataDir() . 'lead.php',
+				'dataFile' => static::getDataDirPath() . 'lead.php',
 			],
 		];
 	}
@@ -58,7 +83,7 @@ class LeadFixtureHelper {
 		return [
 			static::STATUS => [
 				'class' => StatusFixture::class,
-				'dataFile' => static::dataDir() . 'status.php',
+				'dataFile' => static::getDataDirPath() . 'status.php',
 			],
 		];
 	}
@@ -67,15 +92,15 @@ class LeadFixtureHelper {
 		return [
 			static::ANSWER => [
 				'class' => LeadAnswerFixture::class,
-				'dataFile' => static::dataDir() . 'answer.php',
+				'dataFile' => static::getDataDirPath() . 'answer.php',
 			],
 			static::QUESTION => [
 				'class' => LeadQuestionFixture::class,
-				'dataFile' => static::dataDir() . 'question.php',
+				'dataFile' => static::getDataDirPath() . 'question.php',
 			],
 			static::REPORT => [
 				'class' => LeadReportFixture::class,
-				'dataFile' => static::dataDir() . 'report.php',
+				'dataFile' => static::getDataDirPath() . 'report.php',
 			],
 
 		];
@@ -85,11 +110,11 @@ class LeadFixtureHelper {
 		return [
 			static::USER => [
 				'class' => UserFixture::class,
-				'dataFile' => static::dataDir() . 'user.php',
+				'dataFile' => static::getDataDirPath() . 'user.php',
 			],
 			static::SOURCE => [
 				'class' => CampaignFixture::class,
-				'dataFile' => static::dataDir() . 'campaign.php',
+				'dataFile' => static::getDataDirPath() . 'campaign.php',
 			],
 		];
 	}
@@ -98,15 +123,15 @@ class LeadFixtureHelper {
 		return [
 			static::SOURCE => [
 				'class' => SourceFixture::class,
-				'dataFile' => static::dataDir() . 'source.php',
+				'dataFile' => static::getDataDirPath() . 'source.php',
 			],
 			static::TYPE => [
 				'class' => TypeFixture::class,
-				'dataFile' => static::dataDir() . 'type.php',
+				'dataFile' => static::getDataDirPath() . 'type.php',
 			],
 			static::USER => [
 				'class' => UserFixture::class,
-				'dataFile' => static::dataDir() . 'user.php',
+				'dataFile' => static::getDataDirPath() . 'user.php',
 			],
 		];
 	}
@@ -115,15 +140,15 @@ class LeadFixtureHelper {
 		return [
 			static::QUESTION => [
 				'class' => LeadQuestionFixture::class,
-				'dataFile' => static::dataDir() . 'question.php',
+				'dataFile' => static::getDataDirPath() . 'question.php',
 			],
 			static::STATUS => [
 				'class' => StatusFixture::class,
-				'dataFile' => static::dataDir() . 'status.php',
+				'dataFile' => static::getDataDirPath() . 'status.php',
 			],
 			static::TYPE => [
 				'class' => TypeFixture::class,
-				'dataFile' => static::dataDir() . 'type.php',
+				'dataFile' => static::getDataDirPath() . 'type.php',
 			],
 		];
 	}
@@ -132,12 +157,12 @@ class LeadFixtureHelper {
 		return [
 			static::USER => [
 				'class' => UserFixture::class,
-				'dataFile' => static::dataDir() . 'user.php',
+				'dataFile' => static::getDataDirPath() . 'user.php',
 			],
 			static::LEAD_USER => [
 				'class' => ActiveFixture::class,
 				'modelClass' => LeadUser::class,
-				'dataFile' => static::dataDir() . 'lead-user.php',
+				'dataFile' => static::getDataDirPath() . 'lead-user.php',
 			],
 		];
 	}
@@ -146,13 +171,29 @@ class LeadFixtureHelper {
 		return [
 			static::REMINDER => [
 				'class' => ReminderFixture::class,
-				'dataFile' => static::dataDir() . 'reminder.php',
+				'dataFile' => static::getDataDirPath() . 'reminder.php',
 			],
 			static::LEAD_REMINDER => [
 				'class' => LeadReminderFixture::class,
-				'dataFile' => static::dataDir() . 'lead-reminder.php',
+				'dataFile' => static::getDataDirPath() . 'lead-reminder.php',
 			],
 		];
+	}
+
+	public function seeLead(array $atributtes) {
+		$this->tester->seeRecord(Lead::class, $atributtes);
+	}
+
+	public function dontSeeLead(array $atributtes) {
+		$this->tester->dontSeeRecord(Lead::class, $atributtes);
+	}
+
+	public function seeReport(array $atributtes) {
+		$this->tester->seeRecord(LeadReport::class, $atributtes);
+	}
+
+	public function dontSeeReport(array $atributtes) {
+		$this->tester->dontSeeRecord(LeadReport::class, $atributtes);
 	}
 
 }
