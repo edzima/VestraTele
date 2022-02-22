@@ -13,6 +13,7 @@ return [
 	'To At' => 'Do',
 	'Duplicate Count' => 'Ilość',
 	'Various' => 'Niejednolite',
+	'Various without Archive' => 'Niejednolite bez Archiwum',
 	'Same' => 'Powielone',
 	'Duplicates Leads' => 'Duplikaty',
 	'status' => 'Status',
