@@ -178,7 +178,7 @@ YiiAsset::register($this);
 			<?= SameContactsListWidget::widget([
 				'model' => $model,
 				'viewLink' => !$onlyUser,
-				'updateLink' => !$onlyUser,
+				'updateLink' => !$onlyUser && Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE),
 				'headerOptions' => [
 					'class' => 'col-md-12',
 				],
