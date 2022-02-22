@@ -179,6 +179,9 @@ YiiAsset::register($this);
 				'model' => $model,
 				'viewLink' => !$onlyUser,
 				'updateLink' => !$onlyUser,
+				'headerOptions' => [
+					'class' => 'col-md-12',
+				],
 				'archiveBtn' => Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE),
 				'withType' => false,
 				'options' => [
