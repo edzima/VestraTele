@@ -37,7 +37,7 @@ trait UnitModelTrait {
 		if (!$this->getModel()->hasMethod('save')) {
 			throw new InvalidCallException('$model: ' . $this->getModel()::className() . ' has not save() method.');
 		}
-		$save = $this->getModel()->save();
+		$save = (bool) $this->getModel()->save();
 		$this->tester->assertFalse($save);
 	}
 

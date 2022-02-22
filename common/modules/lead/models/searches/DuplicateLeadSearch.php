@@ -6,16 +6,17 @@ use common\models\SearchModel;
 use common\modules\lead\models\DuplicateLead;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadType;
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\data\DataProviderInterface;
 use yii\db\ActiveQuery;
 
 class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 
 	public const STATUS_SAME = 'same';
 	public const STATUS_VARIOUS = 'various';
+	public const STATUS_VARIOUS_WITHOUT_ARCHIVE = 'various-without-archive';
 
 	public $status;
 	public $status_id;
@@ -28,7 +29,7 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 		];
 	}
 
-	public function search(array $params): DataProviderInterface {
+	public function search(array $params): ActiveDataProvider {
 		$this->load($params);
 
 		$sub = Lead::find()
@@ -90,6 +91,11 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 			case static::STATUS_VARIOUS:
 				$query->andWhere('sameLead.status_id <> duplicateLead.status_id');
 				break;
+			case static::STATUS_VARIOUS_WITHOUT_ARCHIVE:
+				$query->andWhere('sameLead.status_id <> duplicateLead.status_id');
+				$query->andWhere('duplicateLead.status_id <> ' . LeadStatusInterface::STATUS_ARCHIVE);
+				$query->andWhere('sameLead.status_id <> ' . LeadStatusInterface::STATUS_ARCHIVE);
+				break;
 		}
 	}
 
@@ -104,6 +110,7 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 	public static function getStatusFilterNames(): array {
 		return [
 			static::STATUS_VARIOUS => Yii::t('lead', 'Various'),
+			static::STATUS_VARIOUS_WITHOUT_ARCHIVE => Yii::t('lead', 'Various without Archive'),
 			static::STATUS_SAME => Yii::t('lead', 'Same'),
 		];
 	}
