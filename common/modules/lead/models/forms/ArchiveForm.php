@@ -30,20 +30,21 @@ class ArchiveForm extends Model {
 		$this->lead = $lead;
 	}
 
-	public function save(): bool {
+	public function save(): ?int {
 		if (!$this->validate()) {
-			return false;
+			return null;
 		}
+		$count = 0;
 		if ($this->selfChange) {
-			$this->changeStatusWithReport($this->lead);
+			$count += $this->changeStatusWithReport($this->lead);
 		}
 		if ($this->withSameContacts) {
 			$leads = $this->lead->getSameContacts($this->withSameContactWithType);
 			foreach ($leads as $lead) {
-				$this->changeStatusWithReport($lead);
+				$count += $this->changeStatusWithReport($lead);
 			}
 		}
-		return true;
+		return $count;
 	}
 
 	private function changeStatusWithReport(ActiveLead $lead): bool {

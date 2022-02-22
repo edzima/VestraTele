@@ -59,7 +59,7 @@ class ArchiveFormTest extends Unit {
 
 		$this->model->userId = static::DEFAULT_USER_ID;
 		$this->model->selfChange = false;
-		$this->thenSuccessSave();
+		$this->thenUnsuccessSave();
 
 		$this->dontSeeArchiveLead();
 		$this->dontSeeArchiveReport();
@@ -81,7 +81,8 @@ class ArchiveFormTest extends Unit {
 		$this->model->selfChange = true;
 		$this->model->withSameContactWithType = true;
 		$this->model->withSameContacts = true;
-		$this->thenSuccessSave();
+		$count = $this->model->save();
+		$this->tester->assertSame(2, $count);
 
 		$this->seeArchiveLead($lead1->getId());
 		$this->seeArchiveLead($lead2->getId());
@@ -108,7 +109,8 @@ class ArchiveFormTest extends Unit {
 		$this->model->selfChange = true;
 		$this->model->withSameContactWithType = false;
 		$this->model->withSameContacts = true;
-		$this->thenSuccessSave();
+		$count = $this->model->save();
+		$this->tester->assertSame(3, $count);
 
 		$this->seeArchiveLead($lead1->getId());
 		$this->seeArchiveLead($lead2->getId());
@@ -135,7 +137,9 @@ class ArchiveFormTest extends Unit {
 		$this->model->selfChange = false;
 		$this->model->withSameContactWithType = false;
 		$this->model->withSameContacts = true;
-		$this->thenSuccessSave();
+
+		$count = $this->model->save();
+		$this->tester->assertSame(2, $count);
 
 		$this->dontSeeArchiveLead($lead1->getId());
 		$this->seeArchiveLead($lead2->getId());

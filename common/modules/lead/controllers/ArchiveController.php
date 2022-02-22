@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Flash;
 use common\modules\lead\models\forms\ArchiveForm;
 use Yii;
 use yii\filters\VerbFilter;
@@ -41,7 +42,15 @@ class ArchiveController extends BaseController {
 		$model->selfChange = false;
 		$model->withSameContacts = true;
 		$model->withSameContactWithType = $onlySameType;
-		$model->save();
+		$count = $model->save();
+		if ($count) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('lead',
+					'Success Archive {count} Leads.', [
+						'count' => $count,
+					])
+			);
+		}
 		return $this->redirectLead($id);
 	}
 
