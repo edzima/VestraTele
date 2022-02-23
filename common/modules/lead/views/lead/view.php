@@ -5,6 +5,7 @@ use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadStatusInterface;
+use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
@@ -33,56 +34,59 @@ YiiAsset::register($this);
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
-	<p>
 
-		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->getId()], ['class' => 'btn btn-success']) ?>
+	<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->getId()], ['class' => 'btn btn-success']) ?>
 
-		<?= ShortReportStatusesWidget::widget(['lead_id' => $model->getId()]) ?>
+	<?= ShortReportStatusesWidget::widget(['lead_id' => $model->getId()]) ?>
 
-		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->getId()], ['class' => 'btn btn-warning']) ?>
+	<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->getId()], ['class' => 'btn btn-warning']) ?>
 
-		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary']) ?>
+	<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary']) ?>
 
-		<?= $model->getStatusId() !== LeadStatusInterface::STATUS_ARCHIVE
-			? Html::a(Yii::t('lead', 'Archive'), ['archive/self', 'id' => $model->getId()], [
-				'class' => 'btn btn-danger',
-				'data' => [
-					'method' => 'POST',
-					'confirm' => Yii::t('lead', 'Move Lead: {lead} to Archive?', [
-						'lead' => $model->getName(),
-					]),
-				],
-			])
+	<?= $model->getStatusId() !== LeadStatusInterface::STATUS_ARCHIVE
+		? Html::a(Yii::t('lead', 'Archive'), ['archive/self', 'id' => $model->getId()], [
+			'class' => 'btn btn-danger',
+			'data' => [
+				'method' => 'POST',
+				'confirm' => Yii::t('lead', 'Move Lead: {lead} to Archive?', [
+					'lead' => $model->getName(),
+				]),
+			],
+		])
+		: ''
+	?>
+
+
+	<div class="pull-right d-inline">
+
+		<?= CopyLeadBtnWidget::widget([
+			'leadId' => $model->getId(),
+		]) ?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_SMS)
+			? Html::a(Yii::t('lead', 'Send SMS'), ['sms/push', 'id' => $model->getId()],
+				['class' => 'btn btn-success'])
 			: ''
 		?>
 
 
-		<span class="pull-right">
+		<?= Html::a(Yii::t('lead', 'Assign User'), ['user/assign-single', 'id' => $model->getId()],
+			['class' => 'btn btn-info']) ?>
 
-					<?= Yii::$app->user->can(User::PERMISSION_SMS)
-						? Html::a(Yii::t('lead', 'Send SMS'), ['sms/push', 'id' => $model->getId()],
-							['class' => 'btn btn-success'])
-						: ''
-					?>
-
-
-					<?= Html::a(Yii::t('lead', 'Assign User'), ['user/assign-single', 'id' => $model->getId()],
-						['class' => 'btn btn-info']) ?>
-
-					<?= $withDelete
-						? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->getId()], [
-							'class' => 'btn btn-danger',
-							'data' => [
-								'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
-								'method' => 'post',
-							],
-						])
-						: ''
-					?>
-		</span>
+		<?= $withDelete
+			? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->getId()], [
+				'class' => 'btn btn-danger',
+				'data' => [
+					'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
+					'method' => 'post',
+				],
+			])
+			: ''
+		?>
+	</div>
 
 
-	</p>
+	<p></p>
 
 	<div class="row">
 		<div class="col-md-4">
