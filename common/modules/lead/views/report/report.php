@@ -1,6 +1,7 @@
 <?php
 
 use common\modules\lead\models\forms\ReportForm;
+use common\modules\lead\widgets\LeadReportWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
 use yii\helpers\Html;
 use yii\web\View;
@@ -29,6 +30,19 @@ $this->params['breadcrumbs'][] = $this->title;
 		</div>
 
 		<div class="col-md-6">
+			<?php if (!empty($model->getLead()->reports)): ?>
+				<h4><?= Yii::t('lead', 'Reports') ?></h4>
+				<?php foreach ($model->getLead()->reports as $report): ?>
+
+					<?= LeadReportWidget::widget([
+						'model' => $report,
+						'withDelete' => false,
+					]) ?>
+
+
+				<?php endforeach; ?>
+			<?php endif; ?>
+
 			<?= SameContactsListWidget::widget([
 				'model' => $model->getLead(),
 				'withType' => true,
