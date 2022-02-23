@@ -87,15 +87,20 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 		return $this->hasOne(Module::userClass(), ['id' => 'owner_id']);
 	}
 
-	public static function getNames(int $owner_id = null, bool $withType = false): array {
+	public static function getNames(int $owner_id = null, bool $withType = false, int $typeId = null): array {
 		$models = static::getModels();
 		if ($owner_id) {
 			$models = array_filter($models, static function (LeadSource $model) use ($owner_id): bool {
 				return $model->owner_id === null || $model->owner_id === $owner_id;
 			});
 		}
+		if ($typeId) {
+			$models = array_filter($models, static function (LeadSource $model) use ($typeId): bool {
+				return $model->type_id === $typeId;
+			});
+		}
 		$name = $owner_id ? 'name' : 'nameWithOwner';
-		if ($withType) {
+		if ($withType && $typeId === null) {
 			$name .= 'withType';
 		}
 		return ArrayHelper::map($models, 'id', $name);
