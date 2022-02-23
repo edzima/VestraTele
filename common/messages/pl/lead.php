@@ -228,5 +228,6 @@ return [
 	'Move Same Contact to Archive?' => 'Przenieść do Archiwum tożsame Leady?',
 	'Move {type} Same Contact to Archive?' => 'Przenieść do Archiwum tożsame {type} Leady?',
 	'Move All types to Archive' => 'Archiwuzuj Wszystkie',
+	'Success Archive Lead.' => 'Zarchiwizowano Leada',
 	'Success Archive {count} Leads.' => 'Zarchiwizowano {count} Leads.',
 ];
