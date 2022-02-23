@@ -12,6 +12,7 @@ use yii\widgets\ActiveForm;
 /* @var $model LeadForm */
 /* @var $report ReportForm */
 /* @var $form yii\widgets\ActiveForm */
+
 ?>
 
 <div class="lead-form">
@@ -21,28 +22,52 @@ use yii\widgets\ActiveForm;
 	]); ?>
 
 	<div class="row">
-		<?= $form->field($model, 'provider', ['options' => ['class' => 'col-md-2']])->dropDownList(LeadForm::getProvidersNames(), ['prompt' => Yii::t('lead', '--- Select ---')]) ?>
 
-		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-3']])->dropDownList($model->getCampaignsNames(), ['prompt' => Yii::t('lead', '--- Select ---')]) ?>
+		<?= $model->typeId ?
+			$form->field($model, 'source_id', [
+				'options' => ['class' => 'col-md-3 col-lg-2'],
+			])->widget(Select2::class, [
+				'data' => $model->getSourcesNames(),
+			])
+			: ''
+		?>
 
-		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-3']])->dropDownList(LeadForm::getStatusNames()) ?>
+		<?=
+		$model->scenario !== LeadForm::SCENARIO_OWNER
+			? $form->field($model, 'provider', ['options' => ['class' => 'col-md-2']])
+			->dropDownList(LeadForm::getProvidersNames(), ['prompt' => Yii::t('lead', '--- Select ---')])
+			: ''
+		?>
 
-		<?= $form->field($model, 'date_at', ['options' => ['class' => 'col-md-3']])->widget(DateTimeWidget::class, [
-			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
-		]) ?>
+		<?= $form->field($model, 'campaign_id', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])
+			->widget(Select2::class, [
+					'data' => $model->getCampaignsNames(),
+					'options' => [
+						'placeholder' => $model->getAttributeLabel('campaign_id'),
+					],
+				]
+			)
+		?>
 
+
+
+		<?= $form->field($model, 'date_at', ['options' => ['class' => 'col-md-3']])
+			->widget(DateTimeWidget::class, [
+				'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
+			]) ?>
 	</div>
 
 
 	<div class="row">
 
-		<?= $form->field($model, 'name', ['options' => ['class' => 'col-md-4']])->textInput(['maxlength' => true]) ?>
-
 		<?= $form->field($model, 'phone', ['options' => ['class' => 'col-md-3']])->textInput(['maxlength' => true]) ?>
 
 		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-3']])->textInput(['maxlength' => true]) ?>
 
-		<?= $form->field($model, 'postal_code', ['options' => ['class' => 'col-md-2']])->textInput(['maxlength' => true]) ?>
 	</div>
 
 	<div class="row">
@@ -72,9 +97,6 @@ use yii\widgets\ActiveForm;
 		'model' => $report,
 		'withSameContacts' => true,
 	]) ?>
-
-
-	<?php //form->field($model, 'data')->textarea(['rows' => 6]) ?>
 
 
 	<div class="form-group">
