@@ -23,7 +23,7 @@ use yii\widgets\ActiveForm;
 			->widget(Select2::class, ['data' => ReportForm::getStatusNames()])
 		?>
 
-		<?= $form->field($model, 'leadName', ['options' => ['class' => 'col-md-6']])->textInput() ?>
+		<?= $form->field($model, 'leadName', ['options' => ['class' => 'col-md-5']])->textInput() ?>
 
 		<?= $form->field($model, 'withAddress', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 	</div>
