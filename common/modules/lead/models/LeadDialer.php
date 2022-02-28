@@ -4,8 +4,11 @@ namespace common\modules\lead\models;
 
 use common\modules\lead\entities\DialerConfig;
 use common\modules\lead\entities\DialerConfigInterface;
+use common\modules\lead\entities\DialerInterface;
+use common\modules\lead\entities\LeadDialerEntity;
 use common\modules\lead\models\query\LeadDialerQuery;
 use Yii;
+use yii\base\InvalidArgumentException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -17,13 +20,18 @@ use yii\helpers\Json;
  * @property int $id
  * @property int $lead_id
  * @property int $type_id
+ * @property int $status
  * @property int|null $priority
  * @property string $created_at
  * @property string $updated_at
+ * @property string|null $last_at
  * @property string|null $dialer_config
  *
  * @property Lead $lead
  * @property LeadDialerType $type
+ *
+ * @property-read string|null $dialerStatusName
+ * @property-read DialerInterface|null $dialer
  */
 class LeadDialer extends ActiveRecord {
 
@@ -31,7 +39,14 @@ class LeadDialer extends ActiveRecord {
 	public const PRIORITY_MEDIUM = 5;
 	public const PRIORITY_HIGH = 10;
 
-	public function behaviors() {
+	public static function toCallStatuses(): array {
+		return [
+			LeadDialerEntity::STATUS_NEW,
+			LeadDialerEntity::STATUS_NOT_ESTABLISH,
+		];
+	}
+
+	public function behaviors(): array {
 		return [
 			'timestamp' => [
 				'class' => TimestampBehavior::class,
@@ -42,7 +57,7 @@ class LeadDialer extends ActiveRecord {
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function tableName() {
+	public static function tableName(): string {
 		return '{{%lead_dialer}}';
 	}
 
@@ -52,7 +67,7 @@ class LeadDialer extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['lead_id', 'type_id'], 'required'],
-			[['lead_id', 'type_id', 'priority'], 'integer'],
+			[['lead_id', 'type_id', 'priority', 'status'], 'integer'],
 			[['created_at', 'updated_at'], 'safe'],
 			[['dialer_config'], 'string'],
 			[['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => ['lead_id' => 'id']],
@@ -72,6 +87,9 @@ class LeadDialer extends ActiveRecord {
 			'created_at' => Yii::t('lead', 'Created At'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
 			'dialer_config' => Yii::t('lead', 'Dialer Config'),
+			'status' => Yii::t('lead', 'Status'),
+			'statusName' => Yii::t('lead', 'Status'),
+			'dialerStatusName' => Yii::t('lead', 'Dialer Status'),
 		];
 	}
 
@@ -93,6 +111,32 @@ class LeadDialer extends ActiveRecord {
 		return $this->hasOne(LeadDialerType::class, ['id' => 'type_id']);
 	}
 
+	public function getConfig(): DialerConfigInterface {
+		return new DialerConfig(Json::decode($this->dialer_config));
+	}
+
+	public function getStatusName(): string {
+		return static::getStatusesNames()[$this->status];
+	}
+
+	public function getDialerStatusName(): ?string {
+		$dialer = $this->getDialer();
+		if ($dialer) {
+			return static::getStatusesNames()[$dialer->getStatusId()];
+		}
+		return null;
+	}
+
+	public function getDialer(): ?DialerInterface {
+		try {
+			return new LeadDialerEntity($this);
+		} catch (InvalidArgumentException $e) {
+			$message = 'LeadDialer: ' . $this->id . ' without valid Dialer. ' . $e->getMessage();
+			Yii::warning($message, 'lead.LeadDialer.dialer');
+		}
+		return null;
+	}
+
 	public static function getPriorityNames(): array {
 		return [
 			static::PRIORITY_LOW => Yii::t('lead', 'Low Priority'),
@@ -101,11 +145,12 @@ class LeadDialer extends ActiveRecord {
 		];
 	}
 
+	public static function getStatusesNames(): array {
+		return LeadDialerEntity::getStatusesNames();
+	}
+
 	public static function find(): LeadDialerQuery {
 		return new LeadDialerQuery(static::class);
 	}
 
-	public function getConfig(): DialerConfigInterface {
-		return new DialerConfig(Json::decode($this->dialer_config));
-	}
 }
