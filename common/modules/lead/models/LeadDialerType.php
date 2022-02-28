@@ -86,4 +86,8 @@ class LeadDialerType extends ActiveRecord {
 			static::STATUS_DELETED => Yii::t('lead', 'Deleted'),
 		];
 	}
+
+	public function isActive(): bool {
+		return $this->status === static::STATUS_ACTIVE;
+	}
 }
