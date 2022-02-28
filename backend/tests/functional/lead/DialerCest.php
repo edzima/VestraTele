@@ -4,16 +4,14 @@ namespace backend\tests\functional\lead;
 
 use backend\tests\Step\Functional\LeadManager;
 use common\fixtures\helpers\LeadFixtureHelper;
-use common\helpers\Flash;
 use common\models\user\Worker;
-use common\modules\lead\controllers\DialerLeadController;
-use common\modules\lead\models\LeadUser;
+use common\modules\lead\controllers\DialerController;
 
 class DialerCest {
 
-	/** @see DialerLeadController::actionIndex() */
+	/** @see DialerController::actionIndex() */
 	public const ROUTE_INDEX = '/lead/dialer/index';
-	public const PERMISSION = Worker::PERMISSION_LEAD_DIALER;
+	public const PERMISSION = Worker::PERMISSION_LEAD_DIALER_MANAGER;
 
 	public function _fixtures(): array {
 		return array_merge(
@@ -36,17 +34,7 @@ class DialerCest {
 		$I->clickMenuSubLink('Dialers');
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeResponseCodeIsSuccessful();
-	}
-
-	public function checkWithoutLeadUserDialers(LeadManager $I): void {
-		LeadUser::deleteAll([
-			'type' => LeadUser::TYPE_DIALER,
-		]);
-		$I->amLoggedIn();
-		$I->assignPermission(static::PERMISSION);
-		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->seeFlash('Not Found Lead with Dialers.', Flash::TYPE_WARNING);
-		$I->seeInCurrentUrl(LeadCest::ROUTE_INDEX);
+		$I->see('Lead Dialers');
 	}
 
 	public function checkLinkOnLeadIndex(LeadManager $I): void {

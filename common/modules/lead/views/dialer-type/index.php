@@ -1,5 +1,6 @@
 <?php
 
+use common\modules\lead\models\LeadDialerType;
 use common\modules\lead\models\searches\LeadDialerTypeSearch;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -40,6 +41,12 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Types');
 				'attribute' => 'user_id',
 				'value' => 'user',
 				'filter' => LeadDialerTypeSearch::getUsersNames(),
+			],
+			[
+				'label' => Yii::t('lead', 'Count'),
+				'value' => static function (LeadDialerType $model): int {
+					return $model->getLeadDialers()->count();
+				},
 			],
 			['class' => 'yii\grid\ActionColumn'],
 		],

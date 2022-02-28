@@ -17,6 +17,7 @@ return [
 	'Same' => 'Powielone',
 	'Duplicates Leads' => 'Duplikaty',
 	'status' => 'Status',
+	'Count' => 'Ilość',
 	'Delete' => 'Usuń',
 	'Calling' => 'Próba połączenia',
 	'Calls queue' => 'Kolejka połączeń',
