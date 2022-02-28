@@ -27,6 +27,7 @@ return [
 	'lawyer_assistant' => 'Asystent Prawnika',
 	'lead' => 'Leads',
 	'lead.dialer' => 'Leads - Dialer',
+	'lead.dialer.manager' => 'Leads- Dialer (Manager)',
 	'lead.duplicate' => 'Leads - Duplikaty',
 	'lead.import' => 'Leads - Import',
 	'lead.status' => 'Leads - Statusy',
