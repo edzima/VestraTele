@@ -89,6 +89,10 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 		return static::$models;
 	}
 
+	public static function notForDialer(int $id): bool {
+		return (bool) static::getModels()[$id]->not_for_dialer;
+	}
+
 	public function getId(): int {
 		return $this->id;
 	}
