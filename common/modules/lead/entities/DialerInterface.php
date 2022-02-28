@@ -10,9 +10,15 @@ interface DialerInterface {
 
 	public function getOrigin(): string;
 
+	public function getStatusId(): int;
+
+	public function updateStatus(int $id): void;
+
 	/**
 	 * @return int[] Connection Attempts timestamp
 	 */
 	public function getConnectionAttempts(): array;
+
+	public function shouldCall(): bool;
 
 }
