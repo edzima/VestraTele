@@ -17,13 +17,13 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 	public $leadId;
 	public $typeId;
 	public $priority;
+	public $status;
 
 	public $dailyAttemptsLimit;
 	public $globallyAttemptsLimit;
 	public $nextCallInterval;
 
 	private ?LeadDialer $model = null;
-	public ?DialerConfig $config = null;
 
 	public function rules(): array {
 		return [
@@ -33,6 +33,7 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 			],
 			['typeId', 'in', 'range' => array_keys(static::getTypesNames())],
 			['priority', 'in', 'range' => array_keys(static::getPriorityNames())],
+			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			[
 				'leadId', 'exist', 'targetClass' => Lead::class, 'targetAttribute' => ['leadId' => 'id'],
 			],
@@ -50,6 +51,12 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 		];
 	}
 
+	public function setConfig(DialerConfigInterface $config): void {
+		$this->dailyAttemptsLimit = $config->getDailyAttemptsLimit();
+		$this->globallyAttemptsLimit = $config->getGloballyAttemptsLimit();
+		$this->nextCallInterval = $config->getNextCallInterval();
+	}
+
 	public function getModel(): LeadDialer {
 		if ($this->model === null) {
 			$this->model = new LeadDialer();
@@ -60,9 +67,10 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 	public function setModel(LeadDialer $model): void {
 		$this->model = $model;
 		$this->priority = $model->priority;
+		$this->status = $model->status;
 		$this->leadId = $model->lead_id;
 		$this->typeId = $model->type_id;
-		$config = $this->model->getConfig();
+		$this->setConfig($this->model->getConfig());
 	}
 
 	public function save(): bool {
@@ -72,6 +80,7 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 		$model = $this->getModel();
 		$model->lead_id = $this->leadId;
 		$model->type_id = $this->typeId;
+		$model->status = $this->status;
 		$model->priority = $this->priority;
 		$model->dialer_config = Json::encode($this->getDialerConfig()->toArray());
 		return $model->save(false);
@@ -95,6 +104,10 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 
 	public static function getPriorityNames(): array {
 		return LeadDialer::getPriorityNames();
+	}
+
+	public static function getStatusesNames(): array {
+		return LeadDialer::getStatusesNames();
 	}
 
 	public static function getTypesNames(): array {
