@@ -34,4 +34,10 @@ class LeadDialerQuery extends ActiveQuery {
 		$this->andWhere([LeadDialerType::tableName() . '.status' => LeadDialerType::STATUS_ACTIVE]);
 		return $this;
 	}
+
+	public function userType(int $userId): self {
+		$this->joinWith('type');
+		$this->andWhere([LeadDialerType::tableName() . '.user_id' => $userId]);
+		return $this;
+	}
 }
