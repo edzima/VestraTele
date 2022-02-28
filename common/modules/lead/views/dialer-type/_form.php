@@ -13,7 +13,9 @@ use yii\widgets\ActiveForm;
 
 <div class="lead-dialer-type-form">
 
-	<?php $form = ActiveForm::begin(); ?>
+	<?php $form = ActiveForm::begin([
+		'id' => 'lead-dialer-type-form',
+	]); ?>
 
 	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 

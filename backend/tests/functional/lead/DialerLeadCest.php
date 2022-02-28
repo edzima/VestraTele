@@ -6,9 +6,14 @@ use backend\tests\Step\Functional\LeadManager;
 use common\fixtures\helpers\LeadFixtureHelper;
 use common\helpers\Flash;
 use common\models\user\Worker;
+use common\modules\lead\controllers\DialerController;
 use common\modules\lead\controllers\DialerLeadController;
 use common\modules\lead\models\LeadUser;
 
+/**
+ * @deprecated remove After Full Refactor
+ * @see DialerController
+ */
 class DialerLeadCest {
 
 	/** @see DialerLeadController::actionIndex() */

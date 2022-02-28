@@ -174,8 +174,8 @@ return [
 					],
 					[
 						'allow' => true,
-						'controllers' => ['lead/dialer-lead'],
-						'permissions' => [Worker::PERMISSION_LEAD_DIALER],
+						'controllers' => ['lead/dialer', 'lead/dialer-type'],
+						'permissions' => [Worker::PERMISSION_LEAD_DIALER_MANAGER],
 					],
 					[
 						'allow' => true,
@@ -187,9 +187,12 @@ return [
 						'controllers' => ['lead/import'],
 						'permissions' => [Worker::PERMISSION_LEAD_IMPORT],
 					],
+
 					[
 						'allow' => false,
 						'controllers' => [
+							'lead/dialer',
+							'lead/dialer-type',
 							'lead/dialer-lead',
 							'lead/status',
 							'lead/duplicate',
