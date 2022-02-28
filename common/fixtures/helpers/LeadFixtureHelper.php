@@ -188,11 +188,11 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 		return [
 			static::DIALER => [
 				'class' => DialerFixture::class,
-				'dataFile' => static::dataDir() . 'dialer.php',
+				'dataFile' => static::getDataDirPath() . 'dialer.php',
 			],
 			static::DIALER_TYPE => [
 				'class' => DialerTypeFixture::class,
-				'dataFile' => static::dataDir() . 'dialer-type.php',
+				'dataFile' => static::getDataDirPath() . 'dialer-type.php',
 			],
 		];
 	}
