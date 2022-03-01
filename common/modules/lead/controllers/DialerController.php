@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Flash;
 use common\modules\lead\models\forms\LeadDialerForm;
 use common\modules\lead\models\LeadDialer;
 use common\modules\lead\models\searches\LeadDialerSearch;
@@ -50,7 +51,7 @@ class DialerController extends BaseController {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView($id) {
+	public function actionView(int $id) {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
@@ -62,13 +63,51 @@ class DialerController extends BaseController {
 	 *
 	 * @return mixed
 	 */
-	public function actionCreate() {
+	public function actionCreate(int $id = null) {
 		$model = new LeadDialerForm();
+		$model->leadId = $id;
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
 		}
 
+		return $this->render('create', [
+			'model' => $model,
+		]);
+	}
+
+	public function actionCreateMultiple(array $ids = []) {
+		if (empty($ids)) {
+			$postIds = Yii::$app->request->post('leadsIds');
+			if (is_string($postIds)) {
+				$postIds = explode(',', $postIds);
+			}
+			if ($postIds) {
+				$ids = $postIds;
+			}
+		}
+		if (empty($ids)) {
+			Flash::add(Flash::TYPE_WARNING, 'Ids cannot be blank.');
+			return $this->redirect(['lead/index']);
+		}
+		if (count($ids) === 1) {
+			$id = reset($ids);
+			return $this->redirect(['create', 'id' => $id]);
+		}
+		$model = new LeadDialerForm();
+		$model->scenario = LeadDialerForm::SCENARIO_MULTIPLE;
+		$model->leadId = $ids;
+		if ($model->load(Yii::$app->request->post())) {
+			$count = $model->saveMultiple();
+			if ($count) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('lead', 'Success add Leads: {count} to Dialer.', [
+						'count' => $count,
+					])
+				);
+				return $this->redirect(['index']);
+			}
+		}
 		return $this->render('create', [
 			'model' => $model,
 		]);
@@ -82,11 +121,12 @@ class DialerController extends BaseController {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionUpdate($id) {
-		$model = $this->findModel($id);
+	public function actionUpdate(int $id) {
+		$model = new LeadDialerForm();
+		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
 		return $this->render('update', [
@@ -102,7 +142,7 @@ class DialerController extends BaseController {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionDelete($id) {
+	public function actionDelete(int $id) {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);
@@ -116,7 +156,7 @@ class DialerController extends BaseController {
 	 * @return LeadDialer the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id) {
+	protected function findModel(int $id): LeadDialer {
 		if (($model = LeadDialer::findOne($id)) !== null) {
 			return $model;
 		}

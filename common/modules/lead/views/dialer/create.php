@@ -6,7 +6,15 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model LeadDialerForm */
 
-$this->title = Yii::t('lead', 'Create Lead Dialer');
+if ($model->scenario === LeadDialerForm::SCENARIO_MULTIPLE) {
+	$this->title = Yii::t('lead', 'Assign {count} Leads to Dialer', [
+		'count' => count($model->leadId),
+	]);
+} else {
+	$this->title = Yii::t('lead', 'Assign Lead to Dialer');
+}
+
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Dialers'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

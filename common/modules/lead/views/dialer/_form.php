@@ -15,11 +15,14 @@ use yii\widgets\ActiveForm;
 	<?php $form = ActiveForm::begin(); ?>
 
 	<div class="row">
-		<?= $form->field($model, 'leadId', [
-			'options' => [
-				'class' => 'col-md-1',
-			],
-		])->textInput()
+
+		<?= $model->scenario === LeadDialerForm::SCENARIO_MULTIPLE
+			? Html::hiddenInput('leadsIds', implode(',', $model->leadId))
+			: $form->field($model, 'leadId', [
+				'options' => [
+					'class' => 'col-md-1',
+				],
+			])->textInput()
 		?>
 
 		<?= $form->field($model, 'typeId', [
