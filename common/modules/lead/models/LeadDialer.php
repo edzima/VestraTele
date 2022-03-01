@@ -50,6 +50,9 @@ class LeadDialer extends ActiveRecord {
 		return [
 			'timestamp' => [
 				'class' => TimestampBehavior::class,
+				'value' => static function () {
+					return date(DATE_ATOM);
+				},
 			],
 		];
 	}
@@ -93,6 +96,10 @@ class LeadDialer extends ActiveRecord {
 		];
 	}
 
+	public function getPriorityName(): string {
+		return static::getPriorityNames()[$this->priority];
+	}
+
 	/**
 	 * Gets query for [[Lead]].
 	 *
@@ -109,6 +116,10 @@ class LeadDialer extends ActiveRecord {
 	 */
 	public function getType() {
 		return $this->hasOne(LeadDialerType::class, ['id' => 'type_id']);
+	}
+
+	public function setConfig(DialerConfigInterface $config): void {
+		$this->dialer_config = static::generateDialerConfigColumn($config);
 	}
 
 	public function getConfig(): DialerConfigInterface {
@@ -135,6 +146,10 @@ class LeadDialer extends ActiveRecord {
 			Yii::warning($message, 'lead.LeadDialer.dialer');
 		}
 		return null;
+	}
+
+	public static function generateDialerConfigColumn(DialerConfigInterface $config): string {
+		return Json::encode(DialerConfig::fromConfig($config)->toArray());
 	}
 
 	public static function getPriorityNames(): array {
