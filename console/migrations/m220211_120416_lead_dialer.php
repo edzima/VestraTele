@@ -38,10 +38,10 @@ class m220211_120416_lead_dialer extends Migration {
 			'lead_id' => $this->integer()->notNull(),
 			'type_id' => $this->integer()->notNull(),
 			'priority' => $this->smallInteger(),
-			'created_at' => $this->timestamp()->notNull(),
-			'updated_at' => $this->timestamp()->notNull(),
+			'created_at' => $this->dateTime()->notNull(),
+			'updated_at' => $this->dateTime()->notNull(),
 			'status' => $this->smallInteger()->notNull(),
-			'last_at' => $this->timestamp(),
+			'last_at' => $this->dateTime()->null(),
 			'dialer_config' => $this->json(),
 		]);
 
