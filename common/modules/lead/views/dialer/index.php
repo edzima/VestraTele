@@ -11,7 +11,7 @@ use yii\helpers\Html;
 /* @var $searchModel LeadDialerSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('lead', 'Lead Dialers');
+$this->title = Yii::t('lead', 'Dialers');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
