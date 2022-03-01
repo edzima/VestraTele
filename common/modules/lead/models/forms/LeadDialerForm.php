@@ -3,21 +3,23 @@
 namespace common\modules\lead\models\forms;
 
 use common\helpers\ArrayHelper;
-use common\modules\lead\entities\DialerConfig;
+use common\modules\lead\entities\Dialer;
 use common\modules\lead\entities\DialerConfigInterface;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadDialer;
 use common\modules\lead\models\LeadDialerType;
 use Yii;
 use yii\base\Model;
-use yii\helpers\Json;
+use yii\db\QueryInterface;
 
 class LeadDialerForm extends Model implements DialerConfigInterface {
+
+	public const SCENARIO_MULTIPLE = 'multiple';
 
 	public $leadId;
 	public $typeId;
 	public $priority;
-	public $status;
+	public $status = Dialer::STATUS_NEW;
 
 	public $dailyAttemptsLimit;
 	public $globallyAttemptsLimit;
@@ -27,15 +29,74 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 
 	public function rules(): array {
 		return [
-			[['leadId', 'typeId', 'priority', 'nextCallInterval', 'dailyAttemptsLimit', 'globallyAttemptsLimit'], 'required'],
 			[
-				['leadId', 'typeId', 'priority', 'nextCallInterval', 'globallyAttemptsLimit', 'dailyAttemptsLimit'], 'integer',
+				[
+					'leadId', 'typeId', 'priority', 'status',
+					'nextCallInterval', 'dailyAttemptsLimit', 'globallyAttemptsLimit',
+				], 'required',
 			],
+			[
+				[
+					'typeId', 'priority', 'status',
+					'nextCallInterval', 'globallyAttemptsLimit', 'dailyAttemptsLimit',
+				], 'integer',
+			],
+			['leadId', 'integer', 'on' => static::SCENARIO_DEFAULT],
 			['typeId', 'in', 'range' => array_keys(static::getTypesNames())],
 			['priority', 'in', 'range' => array_keys(static::getPriorityNames())],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			[
-				'leadId', 'exist', 'targetClass' => Lead::class, 'targetAttribute' => ['leadId' => 'id'],
+				'leadId', 'exist', 'targetClass' => Lead::class,
+				'targetAttribute' => ['leadId' => 'id'],
+				'allowArray' => false,
+				'except' => static::SCENARIO_MULTIPLE,
+			],
+			[
+				'leadId', 'exist', 'targetClass' => Lead::class,
+				'targetAttribute' => 'id',
+				'on' => static::SCENARIO_MULTIPLE,
+				'allowArray' => true,
+			],
+			[
+				['typeId'], 'unique',
+				'targetAttribute' => ['leadId' => 'lead_id', 'typeId' => 'type_id'],
+				'targetClass' => LeadDialer::class,
+				'filter' => function (QueryInterface $query) {
+					if (!$this->getModel()->isNewRecord) {
+						$query->andWhere(['not', ['id' => $this->getModel()->id]]);
+					}
+				},
+				'except' => static::SCENARIO_MULTIPLE,
+			],
+			[
+				'leadId', 'filter',
+				'on' => static::SCENARIO_MULTIPLE,
+				'filter' => function (array $ids): array {
+					$typeIds = LeadDialer::find()
+						->select('lead_id')
+						->andWhere(['type_id' => $this->typeId])
+						->indexBy('lead_id')
+						->column();
+
+					return array_filter($ids, static function (int $id) use ($typeIds) {
+						return !isset($typeIds[$id]);
+					});
+				},
+			],
+			[
+				'leadId', 'filter',
+				'on' => static::SCENARIO_MULTIPLE,
+				'filter' => function (array $ids): array {
+					$typeIds = LeadDialer::find()
+						->select('lead_id')
+						->andWhere(['type_id' => $this->typeId])
+						->indexBy('lead_id')
+						->column();
+
+					return array_filter($ids, static function (int $id) use ($typeIds) {
+						return !isset($typeIds[$id]);
+					});
+				},
 			],
 		];
 	}
@@ -45,23 +106,11 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 			'leadId' => Yii::t('lead', 'Lead'),
 			'typeId' => Yii::t('lead', 'Type'),
 			'priority' => Yii::t('lead', 'Priority'),
+			'status' => Yii::t('lead', 'Status'),
 			'dailyAttemptsLimit' => Yii::t('lead', 'Daily attempts limit'),
 			'globallyAttemptsLimit' => Yii::t('lead', 'Globally attempts limit'),
 			'nextCallInterval' => Yii::t('lead', 'Next call interval'),
 		];
-	}
-
-	public function setConfig(DialerConfigInterface $config): void {
-		$this->dailyAttemptsLimit = $config->getDailyAttemptsLimit();
-		$this->globallyAttemptsLimit = $config->getGloballyAttemptsLimit();
-		$this->nextCallInterval = $config->getNextCallInterval();
-	}
-
-	public function getModel(): LeadDialer {
-		if ($this->model === null) {
-			$this->model = new LeadDialer();
-		}
-		return $this->model;
 	}
 
 	public function setModel(LeadDialer $model): void {
@@ -82,8 +131,52 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 		$model->type_id = $this->typeId;
 		$model->status = $this->status;
 		$model->priority = $this->priority;
-		$model->dialer_config = Json::encode($this->getDialerConfig()->toArray());
+		$model->setConfig($this);
 		return $model->save(false);
+	}
+
+	public function saveMultiple(): ?int {
+		if ($this->scenario !== static::SCENARIO_MULTIPLE || !$this->validate()) {
+			return null;
+		}
+		$ids = (array) $this->leadId;
+		$config = LeadDialer::generateDialerConfigColumn($this);
+		$rows = [];
+		foreach ($ids as $id) {
+			$rows[] = [
+				'lead_id' => $id,
+				'type_id' => $this->typeId,
+				'status' => $this->status,
+				'priority' => $this->priority,
+				'dialer_config' => $config,
+				'created_at' => date(DATE_ATOM),
+				'updated_at' => date(DATE_ATOM),
+			];
+		}
+		return LeadDialer::getDb()->createCommand()
+			->batchInsert(LeadDialer::tableName(), [
+				'lead_id',
+				'type_id',
+				'status',
+				'priority',
+				'dialer_config',
+				'created_at',
+				'updated_at',
+			], $rows)
+			->execute();
+	}
+
+	public function getModel(): LeadDialer {
+		if ($this->model === null) {
+			$this->model = new LeadDialer();
+		}
+		return $this->model;
+	}
+
+	public function setConfig(DialerConfigInterface $config): void {
+		$this->dailyAttemptsLimit = $config->getDailyAttemptsLimit();
+		$this->globallyAttemptsLimit = $config->getGloballyAttemptsLimit();
+		$this->nextCallInterval = $config->getNextCallInterval();
 	}
 
 	public function getDailyAttemptsLimit(): int {
@@ -96,10 +189,6 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 
 	public function getNextCallInterval(): int {
 		return $this->nextCallInterval;
-	}
-
-	public function getDialerConfig(): DialerConfig {
-		return DialerConfig::fromConfig($this);
 	}
 
 	public static function getPriorityNames(): array {
