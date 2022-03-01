@@ -1,10 +1,14 @@
 <?php
 
-use yii\grid\GridView;
+use common\modules\lead\models\LeadDialer;
+use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\searches\LeadDialerSearch;
+use common\widgets\grid\ActionColumn;
+use common\widgets\GridView;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $searchModel common\modules\lead\models\searches\LeadDialerSearch */
+/* @var $searchModel LeadDialerSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('lead', 'Lead Dialers');
@@ -30,14 +34,50 @@ $this->params['breadcrumbs'][] = $this->title;
 			['class' => 'yii\grid\SerialColumn'],
 
 			'id',
-			'lead_id',
-			'type_id',
-			'priority',
-			'created_at',
-			//'updated_at',
+			[
+				'attribute' => 'lead_id',
+				'value' => function (LeadDialer $model): string {
+					return Html::a(
+						Html::encode($model->lead->getName()),
+						['lead/view', 'id' => $model->lead_id],
+						['target' => '_blank']
+					);
+				},
+				'format' => 'raw',
+				'label' => Yii::t('lead', 'Lead'),
+			],
+			[
+				'attribute' => 'lead_status_id',
+				'value' => 'lead.statusName',
+				'label' => Yii::t('lead', 'Lead Status'),
+				'filter' => LeadStatus::getNames(),
+			],
+			[
+				'attribute' => 'status',
+				'value' => 'statusName',
+				'filter' => LeadDialerSearch::getStatusesNames(),
+			],
+			[
+				'value' => 'dialerStatusName',
+				'filter' => LeadDialerSearch::getStatusesNames(),
+				'label' => Yii::t('lead', 'Dialer Status'),
+			],
+			[
+				'attribute' => 'type_id',
+				'value' => 'type.name',
+				'filter' => LeadDialerSearch::getTypesNames(),
+			],
+			[
+				'attribute' => 'priority',
+				'value' => 'priorityName',
+				'filter' => LeadDialerSearch::getPriorityNames(),
+			],
+			'created_at:datetime',
+			'updated_at:datetime',
+			'last_at:datetime',
 			//'dialer_config:ntext',
 
-			['class' => 'yii\grid\ActionColumn'],
+			['class' => ActionColumn::class],
 		],
 	]); ?>
 

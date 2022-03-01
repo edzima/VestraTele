@@ -47,4 +47,19 @@ class DialerCest {
 		$I->click('Dialers', '.lead-index');
 		$I->seeInCurrentUrl(static::ROUTE_INDEX);
 	}
+
+	public function checkIndexGrid(LeadManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(static::PERMISSION);
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeInGridHeader('Lead');
+		$I->seeInGridHeader('Lead Status');
+		$I->seeInGridHeader('Status');
+		$I->seeInGridHeader('Dialer Status');
+		$I->seeInGridHeader('Type');
+		$I->see('Priority');
+		$I->see('Created At');
+		$I->see('Updated At');
+		$I->see('Last At');
+	}
 }
