@@ -12,7 +12,7 @@ $this->title = Yii::t('lead', 'Update Lead Dialer: {name}', [
 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
 $this->params['breadcrumbs'][] = ['label' => $model->getModel()->lead->getName(), 'url' => ['lead/view', 'id' => $model->getModel()->lead_id]];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Dialers'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Dialers'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->getModel()->id, 'url' => ['view', 'id' => $model->getModel()->id]];
 $this->params['breadcrumbs'][] = Yii::t('lead', 'Update');
 ?>
