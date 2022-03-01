@@ -32,10 +32,11 @@ YiiAsset::register($this);
 		'attributes' => [
 			'id',
 			'lead_id',
-			'type_id',
-			'priority',
-			'created_at',
-			'updated_at',
+			'type.name',
+			'priorityName',
+			'last_at:datetime',
+			'created_at:datetime',
+			'updated_at:datetime',
 			'dialer_config:ntext',
 		],
 	]) ?>
