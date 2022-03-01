@@ -4,6 +4,7 @@ namespace common\modules\lead\models\forms;
 
 use common\helpers\ArrayHelper;
 use common\modules\lead\entities\Dialer;
+use common\modules\lead\entities\DialerConfig;
 use common\modules\lead\entities\DialerConfigInterface;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadDialer;
@@ -26,6 +27,13 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 	public $nextCallInterval;
 
 	private ?LeadDialer $model = null;
+
+	public function init() {
+		parent::init();
+		if (empty($this->dailyAttemptsLimit) && empty($this->globallyAttemptsLimit) && empty($this->nextCallInterval)) {
+			$this->setConfig(new DialerConfig());
+		}
+	}
 
 	public function rules(): array {
 		return [
@@ -119,7 +127,7 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 		$this->status = $model->status;
 		$this->leadId = $model->lead_id;
 		$this->typeId = $model->type_id;
-		$this->setConfig($this->model->getConfig());
+		$this->setConfig($model->getConfig());
 	}
 
 	public function save(): bool {

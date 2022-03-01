@@ -198,7 +198,7 @@ if ($multipleForm) {
 
 				<?= Yii::$app->user->can(User::PERMISSION_LEAD_DIALER_MANAGER)
 					? Html::submitButton(
-						Yii::t('lead', 'Move to Dialer'),
+						Yii::t('lead', 'Assign to Dialer'),
 						[
 							'class' => 'btn btn-primary',
 							'name' => 'route',
@@ -211,7 +211,7 @@ if ($multipleForm) {
 				&& $dataProvider->pagination->pageCount > 1
 
 					? Html::a(
-						Yii::t('lead', 'Move to Dialer ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
+						Yii::t('lead', 'Assign to Dialer ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
 						['dialer/create-multiple'],
 						[
 							'class' => 'btn btn-primary',

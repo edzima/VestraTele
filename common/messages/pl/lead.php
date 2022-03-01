@@ -266,4 +266,7 @@ return [
 	'Assign Lead to Dialer' => 'Przypisz Lead do Dialer',
 	'Assign {count} Leads to Dialer' => 'Przypisz {count} Leads do Dialer',
 	'Update Lead Dialer: {name}' => 'Edytuj Lead Dialer: {name}',
+	'Last At' => 'Próba',
+	'Assign to Dialer' => 'Przypisz do Dialer',
+	'Assign to Dialer ({ids})' => 'Przypisz do Dialer ({ids})',
 ];
