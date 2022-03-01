@@ -42,7 +42,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 		return [
 			[['name'], 'required'],
 			[['sort_index'], 'integer'],
-			[['short_report', 'show_report_in_lead_index'], 'boolean'],
+			[['short_report', 'show_report_in_lead_index', 'not_for_dialer'], 'boolean'],
 			[['name', 'description'], 'string', 'max' => 255],
 		];
 	}
