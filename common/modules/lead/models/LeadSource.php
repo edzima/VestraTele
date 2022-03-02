@@ -109,7 +109,7 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 		if (static::$models === null || $refresh) {
 			static::$models = static::find()
 				->indexBy('id')
-				->joinWith('owner')
+				->joinWith('owner.userProfile')
 				->orderBy('sort_index')
 				->all();
 		}
