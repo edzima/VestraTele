@@ -29,6 +29,26 @@ class LeadDialerQuery extends ActiveQuery {
 		return parent::one($db);
 	}
 
+	public function toCall(): self {
+		$this->activeType();
+		$this->toCallsStatus();
+		$this->toCallOrder();
+		return $this;
+	}
+
+	public function toCallOrder(): self {
+		$this->orderBy([
+			LeadDialer::tableName() . '.priority' => SORT_DESC,
+			LeadDialer::tableName() . '.last_at' => SORT_ASC,
+		]);
+		return $this;
+	}
+
+	public function toCallsStatus(): self {
+		$this->andWhere([LeadDialer::tableName() . '.status' => LeadDialer::toCallStatuses()]);
+		return $this;
+	}
+
 	public function activeType(): self {
 		$this->joinWith('type');
 		$this->andWhere([LeadDialerType::tableName() . '.status' => LeadDialerType::STATUS_ACTIVE]);
