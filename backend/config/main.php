@@ -193,7 +193,6 @@ return [
 						'controllers' => [
 							'lead/dialer',
 							'lead/dialer-type',
-							'lead/dialer-lead',
 							'lead/status',
 							'lead/duplicate',
 							'lead/import',
