@@ -34,7 +34,7 @@ class DialerController extends BaseController {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new LeadDialerSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 

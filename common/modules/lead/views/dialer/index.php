@@ -25,18 +25,21 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	</p>
 
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
-
-			'id',
+			[
+				'attribute' => 'type_id',
+				'value' => 'type.name',
+				'filter' => LeadDialerSearch::getTypesNames(),
+			],
 			[
 				'attribute' => 'lead_id',
-				'value' => function (LeadDialer $model): string {
+				'value' => static function (LeadDialer $model): string {
 					return Html::a(
 						Html::encode($model->lead->getName()),
 						['lead/view', 'id' => $model->lead_id],
@@ -47,10 +50,17 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('lead', 'Lead'),
 			],
 			[
-				'attribute' => 'lead_status_id',
+				'attribute' => 'leadStatusId',
 				'value' => 'lead.statusName',
 				'label' => Yii::t('lead', 'Lead Status'),
 				'filter' => LeadStatus::getNames(),
+			],
+			[
+				'attribute' => 'leadSourceId',
+				'value' => 'lead.source.name',
+				'label' => Yii::t('lead', 'Lead Source'),
+				'visible' => $searchModel->leadSourceWithoutDialer,
+				'filter' => $searchModel::getLeadSourcesNames(),
 			],
 			[
 				'attribute' => 'status',
@@ -62,11 +72,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => LeadDialerSearch::getStatusesNames(),
 				'label' => Yii::t('lead', 'Dialer Status'),
 			],
-			[
-				'attribute' => 'type_id',
-				'value' => 'type.name',
-				'filter' => LeadDialerSearch::getTypesNames(),
-			],
+
 			[
 				'attribute' => 'priority',
 				'value' => 'priorityName',
@@ -75,6 +81,11 @@ $this->params['breadcrumbs'][] = $this->title;
 			'created_at:datetime',
 			'updated_at:datetime',
 			'last_at:datetime',
+			[
+				'attribute' => 'attemptsCount',
+				'noWrap' => true,
+			],
+			//	'attemptsCount',
 			//'dialer_config:ntext',
 
 			['class' => ActionColumn::class],

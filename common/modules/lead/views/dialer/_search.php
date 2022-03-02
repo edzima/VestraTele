@@ -1,10 +1,11 @@
 <?php
 
+use common\modules\lead\models\searches\LeadDialerSearch;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\modules\lead\models\searches\LeadDialerSearch */
+/* @var $model LeadDialerSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -15,23 +16,34 @@ use yii\widgets\ActiveForm;
 		'method' => 'get',
 	]); ?>
 
-	<?= $form->field($model, 'id') ?>
+	<div class="row">
 
-	<?= $form->field($model, 'lead_id') ?>
+		<?= $form->field($model, 'onlyToCall', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])->checkbox() ?>
 
-	<?= $form->field($model, 'type_id') ?>
+		<?= $form->field($model, 'leadStatusNotForDialer', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])->checkbox() ?>
 
-	<?= $form->field($model, 'priority') ?>
+		<?= $form->field($model, 'leadSourceWithoutDialer', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])->checkbox() ?>
 
-	<?= $form->field($model, 'created_at') ?>
 
-	<?php // echo $form->field($model, 'updated_at') ?>
+	</div>
 
-	<?php // echo $form->field($model, 'dialer_config') ?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Search'), ['class' => 'btn btn-primary']) ?>
-		<?= Html::resetButton(Yii::t('lead', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>
+
+		<?= Html::a(Yii::t('lead', 'Reset'), 'index', ['class' => 'btn btn-default']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>
