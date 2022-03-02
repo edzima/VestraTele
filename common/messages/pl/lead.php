@@ -265,6 +265,8 @@ return [
 	'Establish' => 'Nawiązano',
 	'Not Establish' => 'Nienawiązano',
 	'Should Call' => 'Do zadzwonienia',
+	'Empty Lead Phone' => 'Brak numeru',
+	'Empty Lead Source Dialer Phone' => 'Źródło nie ma numeru Dialera',
 	'This Lead has status not for dialer' => 'Lead o niedozwolonym statusie',
 	'Same Lead has status not for dialer' => 'Tożsamy Lead o niedozwolonym statusie',
 	'Globally attempts limit exceeded' => '> Globalny limit',
@@ -274,7 +276,12 @@ return [
 	'Assign Lead to Dialer' => 'Przypisz Lead do Dialer',
 	'Assign {count} Leads to Dialer' => 'Przypisz {count} Leads do Dialer',
 	'Update Lead Dialer: {name}' => 'Edytuj Lead Dialer: {name}',
-	'Last At' => 'Próba',
+	'Last At' => 'Połączenie',
 	'Assign to Dialer' => 'Przypisz do Dialer',
 	'Assign to Dialer ({ids})' => 'Przypisz do Dialer ({ids})',
+	'Only to Call' => 'Tylko do zadzwonienia',
+	'Lead Status not for Dialer' => 'Lead Status niedozwolony',
+	'Lead Source without Dialer' => 'Źrodło bez Dialera',
+	'Attempts Count' => 'Połączeń',
+
 ];
