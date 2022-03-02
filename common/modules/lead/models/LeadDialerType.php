@@ -27,7 +27,7 @@ class LeadDialerType extends ActiveRecord {
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function tableName() {
+	public static function tableName(): string {
 		return '{{%lead_dialer_type}}';
 	}
 
@@ -48,11 +48,12 @@ class LeadDialerType extends ActiveRecord {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'id' => Yii::t('lead', 'ID'),
 			'name' => Yii::t('lead', 'Name'),
 			'status' => Yii::t('lead', 'Status'),
+			'statusName' => Yii::t('lead', 'Status'),
 			'user_id' => Yii::t('lead', 'User ID'),
 		];
 	}
