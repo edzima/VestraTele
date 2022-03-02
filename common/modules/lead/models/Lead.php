@@ -216,7 +216,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function getSource(): LeadSourceInterface {
-		return $this->leadSource;
+		return LeadSource::getModels()[$this->source_id];
 	}
 
 	public function getTypeId(): int {
