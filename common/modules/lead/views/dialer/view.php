@@ -8,7 +8,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model LeadDialer */
 
-$this->title = $model->id;
+$this->title = $model->type->name . ' - ' . $model->lead->getName();
 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
 $this->params['breadcrumbs'][] = ['label' => $model->lead->getName(), 'url' => ['lead/view', 'id' => $model->lead_id]];
@@ -31,18 +31,56 @@ YiiAsset::register($this);
 		]) ?>
 	</p>
 
-	<?= DetailView::widget([
-		'model' => $model,
-		'attributes' => [
-			'id',
-			'lead_id',
-			'type.name',
-			'priorityName',
-			'last_at:datetime',
-			'created_at:datetime',
-			'updated_at:datetime',
-			'dialer_config:ntext',
-		],
-	]) ?>
+	<div class="row">
+		<div class="col-md-5">
+
+
+			<?= DetailView::widget([
+				'model' => $model,
+				'attributes' => [
+					'id',
+					'lead_id',
+					'type.name',
+					'statusName',
+					'priorityName',
+					'last_at:datetime',
+					'created_at:datetime',
+					'updated_at:datetime',
+				],
+			]) ?>
+
+		</div>
+
+		<div class="col-md-4">
+			<?= DetailView::widget([
+				'model' => $model->getDialer(),
+				'attributes' => [
+					[
+						'value' => $model->getDialerStatusName(),
+						'label' => Yii::t('lead', 'Status'),
+					],
+					[
+						'attribute' => 'origin',
+						'format' => 'tel',
+						'label' => Yii::t('lead', 'Origin'),
+					],
+					[
+						'attribute' => 'destination',
+						'label' => Yii::t('lead', 'Destination'),
+					],
+				],
+			]) ?>
+
+		</div>
+
+		<div class="col-md-3">
+			<?= DetailView::widget([
+				'model' => $model->getConfig(),
+			]) ?>
+		</div>
+
+
+	</div>
+
 
 </div>
