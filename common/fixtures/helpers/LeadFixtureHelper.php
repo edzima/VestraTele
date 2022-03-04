@@ -43,7 +43,7 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 	public const DEFAULT_PHONE = '+48 123-123-123';
 	public const DEFAULT_SOURCE_ID = 1;
 
-	public function haveLead(array $attributes): ActiveLead {
+	public function haveLead(array $attributes): int {
 		if (!isset($attributes['phone'])) {
 			$attributes['phone'] = static::DEFAULT_PHONE;
 		}
@@ -54,11 +54,15 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 		if (!isset($attributes['data'])) {
 			$attributes['data'] = Json::encode($attributes);
 		}
-		$id = $this->tester->haveRecord(Lead::class, $attributes);
+		return $this->tester->haveRecord(Lead::class, $attributes);
+	}
 
-		return $this->tester->grabRecord(Lead::class, [
-			'id' => $id,
-		]);
+	public function grabLeadById(int $id): ActiveLead {
+		return $this->grabLead(['id' => $id]);
+	}
+
+	public function grabLead(array $attributes): ActiveLead {
+		return $this->tester->grabRecord(Lead::class, $attributes);
 	}
 
 	public static function getDefaultDataDirPath(): string {
@@ -212,7 +216,5 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 	public function dontSeeReport(array $atributtes) {
 		$this->tester->dontSeeRecord(LeadReport::class, $atributtes);
 	}
-
-
 
 }
