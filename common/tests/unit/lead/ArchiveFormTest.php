@@ -227,7 +227,9 @@ class ArchiveFormTest extends Unit {
 
 	private function giveLead(int $statusId = LeadStatusInterface::STATUS_NEW, array $attributes = []): ActiveLead {
 		$attributes['status_id'] = $statusId;
-		$this->lead = $this->leadFixtureHelper->haveLead($attributes);
+		$this->lead = $this->leadFixtureHelper->grabLeadById(
+			$this->leadFixtureHelper->haveLead($attributes)
+		);
 		return $this->lead;
 	}
 }
