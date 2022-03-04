@@ -16,6 +16,16 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
+		<?= !$model->getModel()->isNewRecord ?
+			$form->field($model, 'status', [
+				'options' => [
+					'class' => 'col-md-3',
+				],
+			])
+				->dropDownList(LeadDialerForm::getStatusesNames())
+			: ''
+		?>
+
 		<?= $model->scenario === LeadDialerForm::SCENARIO_MULTIPLE
 			? Html::hiddenInput('leadsIds', implode(',', $model->leadId))
 			: $form->field($model, 'leadId', [
@@ -27,12 +37,11 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'typeId', [
 			'options' => [
-				'class' => 'col-md-1',
+				'class' => 'col-md-3',
 			],
 		])
 			->dropDownList(LeadDialerForm::getTypesNames())
 		?>
-
 
 		<?= $form->field($model, 'priority', [
 			'options' => [
@@ -41,6 +50,7 @@ use yii\widgets\ActiveForm;
 		])
 			->dropDownList(LeadDialerForm::getPriorityNames())
 		?>
+
 
 	</div>
 
