@@ -275,5 +275,7 @@ return [
 	'Lead Status not for Dialer' => 'Lead Status niedozwolony',
 	'Lead Source without Dialer' => 'Źrodło bez Dialera',
 	'Attempts Count' => 'Połączeń',
+	'Origin' => 'Źródło',
+	'Destination' => 'Cel',
 
 ];

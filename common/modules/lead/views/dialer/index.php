@@ -66,11 +66,26 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'status',
 				'value' => 'statusName',
 				'filter' => LeadDialerSearch::getStatusesNames(),
+
 			],
 			[
 				'value' => 'dialerStatusName',
 				'filter' => LeadDialerSearch::getStatusesNames(),
 				'label' => Yii::t('lead', 'Dialer Status'),
+			],
+			[
+				'attribute' => 'dialerOrigin',
+				'value' => 'dialer.origin',
+				'label' => Yii::t('lead', 'Origin'),
+				'format' => 'tel',
+				'noWrap' => true,
+			],
+			[
+				'attribute' => 'dialerDestination',
+				'value' => 'dialer.destination',
+				'label' => Yii::t('lead', 'Destination'),
+				'noWrap' => true,
+				'filter' => LeadDialerSearch::getDialerDestinationsNames(),
 			],
 
 			[
@@ -78,15 +93,17 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'priorityName',
 				'filter' => LeadDialerSearch::getPriorityNames(),
 			],
-			'created_at:datetime',
-			'updated_at:datetime',
+			[
+				'attribute' => 'created_at',
+				'format' => 'date',
+				'width' => '90px',
+			],
+			//	'updated_at:datetime',
+
 			'last_at:datetime',
 			[
 				'attribute' => 'attemptsCount',
-				'noWrap' => true,
 			],
-			//	'attemptsCount',
-			//'dialer_config:ntext',
 
 			['class' => ActionColumn::class],
 		],
