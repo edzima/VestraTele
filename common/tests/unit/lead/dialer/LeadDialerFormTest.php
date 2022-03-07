@@ -25,6 +25,7 @@ class LeadDialerFormTest extends Unit {
 
 	public function testEmpty(): void {
 		$this->giveModel();
+		$this->model->nextCallInterval = null;
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Lead cannot be blank.', 'leadId');
 		$this->thenSeeError('Type cannot be blank.', 'typeId');
@@ -36,7 +37,7 @@ class LeadDialerFormTest extends Unit {
 		$this->giveModel();
 		$model = $this->getModel();
 		$model->leadId = 1;
-		$model->typeId = 1;
+		$model->typeId = 2;
 		$model->priority = LeadDialer::PRIORITY_MEDIUM;
 		$model->nextCallInterval = 1200;
 		$model->globallyAttemptsLimit = 5;
@@ -45,7 +46,7 @@ class LeadDialerFormTest extends Unit {
 
 		$this->tester->seeRecord(LeadDialer::class, [
 			'lead_id' => 1,
-			'type_id' => 1,
+			'type_id' => 2,
 			'priority' => LeadDialer::PRIORITY_MEDIUM,
 			'status' => Dialer::STATUS_NEW,
 			'dialer_config' => Json::encode([
