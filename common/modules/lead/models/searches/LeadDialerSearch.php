@@ -3,6 +3,7 @@
 namespace common\modules\lead\models\searches;
 
 use common\helpers\ArrayHelper;
+use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadDialer;
@@ -21,23 +22,28 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 
 	public ?int $typeUserId = null;
 
+	public $dialerOrigin;
+	public $dialerDestination;
+
 	public $leadStatusId;
 	public $leadSourceId;
-	public string $from_at = '';
-	public string $to_at = '';
+
+	public string $fromLastAt = '';
+	public string $toLastAt = '';
 
 	public function rules(): array {
 		return [
 			[['type_id', 'priority', 'leadStatusId', 'leadSourceId', 'lead_id', 'status', 'typeUserId'], 'integer'],
 			[['onlyToCall', 'leadSourceWithoutDialer', 'leadStatusNotForDialer'], 'boolean'],
-			[['from_at', 'to_at', 'created_at', 'updated_at', 'last_at'], 'safe'],
+			[['dialerOrigin', 'dialerDestination'], 'string'],
+			[['fromLastAt', 'toLastAt', 'created_at', 'updated_at', 'last_at'], 'safe'],
 		];
 	}
 
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
-			'from_at' => Yii::t('lead', 'From At'),
-			'to_at' => Yii::t('lead', 'To At'),
+			'fromLastAt' => Yii::t('lead', 'From At'),
+			'toLastAt' => Yii::t('lead', 'To At'),
 			'onlyToCall' => Yii::t('lead', 'Only to Call'),
 			'leadSourceWithoutDialer' => Yii::t('lead', 'Lead Source without Dialer'),
 			'leadStatusNotForDialer' => Yii::t('lead', 'Lead Status not for Dialer'),
@@ -57,6 +63,8 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 
 		$this->load($params);
 
+		$this->applyDialerFilter($query);
+		$this->applyLastAtFilter($query);
 		$this->applyLeadSourceFilter($query);
 		$this->applyLeadStatusFilter($query);
 		$this->applyToCallFilter($query);
@@ -69,6 +77,28 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 		]);
 
 		return $dataProvider;
+	}
+
+	private function applyDialerFilter(LeadDialerQuery $query) {
+		$this->applyDialerOriginFilter($query);
+		$this->applyDialerDestinationFilter($query);
+	}
+
+	private function applyDialerOriginFilter(LeadDialerQuery $query): void {
+		if (!empty($this->dialerOrigin)) {
+			$query->joinWith([
+				'lead' => function (PhonableQuery $phonableQuery): void {
+					$phonableQuery->withPhoneNumber($this->dialerOrigin);
+				},
+			]);
+		}
+	}
+
+	private function applyDialerDestinationFilter(LeadDialerQuery $query): void {
+		if (!empty($this->dialerDestination)) {
+			$query->joinWith('lead.leadSource');
+			$query->andWhere([LeadSource::tableName() . '.dialer_phone' => $this->dialerDestination]);
+		}
 	}
 
 	private function applyToCallFilter(LeadDialerQuery $query): void {
@@ -121,6 +151,25 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 			}
 		}
 		return $names;
+	}
+
+	public static function getDialerDestinationsNames(): array {
+		$names = [];
+		foreach (LeadSource::getModels() as $source) {
+			if (!empty($source->dialer_phone)) {
+				$names[$source->dialer_phone] = $source->dialer_phone;
+			}
+		}
+		return $names;
+	}
+
+	private function applyLastAtFilter(LeadDialerQuery $query): void {
+		if (!empty($this->fromLastAt)) {
+			$query->andWhere(['>', LeadDialer::tableName() . '.last_at', date(DATE_ATOM, $this->fromLastAt)]);
+		}
+		if (!empty($this->toLastAt)) {
+			$query->andWhere(['<', LeadDialer::tableName() . '.last_at', date(DATE_ATOM, $this->toLastAt)]);
+		}
 	}
 
 }

@@ -8,7 +8,6 @@ use common\modules\lead\entities\DialerInterface;
 use common\modules\lead\entities\LeadDialerEntity;
 use common\modules\lead\models\query\LeadDialerQuery;
 use Yii;
-use yii\base\InvalidArgumentException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -30,14 +29,18 @@ use yii\helpers\Json;
  * @property Lead $lead
  * @property LeadDialerType $type
  *
- * @property-read string|null $dialerStatusName
- * @property-read DialerInterface|null $dialer
+ * @property-read string $priorityName
+ * @property-read string $dialerStatusName
+ * @property-read DialerInterface $dialer
+ * @property-read int $attemptsCount
  */
 class LeadDialer extends ActiveRecord {
 
 	public const PRIORITY_LOW = 0;
 	public const PRIORITY_MEDIUM = 5;
 	public const PRIORITY_HIGH = 10;
+
+	private ?LeadDialerEntity $dialer = null;
 
 	public static function toCallStatuses(): array {
 		return [
@@ -89,15 +92,13 @@ class LeadDialer extends ActiveRecord {
 			'priority' => Yii::t('lead', 'Priority'),
 			'created_at' => Yii::t('lead', 'Created At'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
+			'last_at' => Yii::t('lead', 'Last At'),
 			'dialer_config' => Yii::t('lead', 'Dialer Config'),
 			'status' => Yii::t('lead', 'Status'),
 			'statusName' => Yii::t('lead', 'Status'),
 			'dialerStatusName' => Yii::t('lead', 'Dialer Status'),
+			'attemptsCount' => Yii::t('lead', 'Attempts Count'),
 		];
-	}
-
-	public function getPriorityName(): string {
-		return static::getPriorityNames()[$this->priority];
 	}
 
 	/**
@@ -126,26 +127,34 @@ class LeadDialer extends ActiveRecord {
 		return new DialerConfig(Json::decode($this->dialer_config));
 	}
 
+	public function getPriorityName(): string {
+		return static::getPriorityNames()[$this->priority];
+	}
+
+	public function getAttemptsCount(): int {
+		return count($this->getDialer()->getConnectionAttempts());
+	}
+
 	public function getStatusName(): string {
 		return static::getStatusesNames()[$this->status];
 	}
 
-	public function getDialerStatusName(): ?string {
-		$dialer = $this->getDialer();
-		if ($dialer) {
-			return static::getStatusesNames()[$dialer->getStatusId()];
-		}
-		return null;
+	public function getDialerStatusName(): string {
+		return static::getStatusesNames()[$this->getDialer()->getStatusId()];
 	}
 
-	public function getDialer(): ?DialerInterface {
-		try {
-			return new LeadDialerEntity($this);
-		} catch (InvalidArgumentException $e) {
-			$message = 'LeadDialer: ' . $this->id . ' without valid Dialer. ' . $e->getMessage();
-			Yii::warning($message, 'lead.LeadDialer.dialer');
+	public function getDialer(): DialerInterface {
+		if ($this->dialer === null) {
+			$this->dialer = $this->createDialer();
 		}
-		return null;
+		return $this->dialer;
+	}
+
+	/**
+	 * @return DialerInterface
+	 */
+	protected function createDialer(): DialerInterface {
+		return new LeadDialerEntity($this);
 	}
 
 	public static function generateDialerConfigColumn(DialerConfigInterface $config): string {
