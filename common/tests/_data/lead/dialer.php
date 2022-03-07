@@ -11,7 +11,7 @@ return [
 		'status' => Dialer::STATUS_ESTABLISH,
 	],
 	[
-		'lead_id' => 5,
+		'lead_id' => 2,
 		'type_id' => 1,
 		'priority' => LeadDialer::PRIORITY_HIGH,
 		'status' => Dialer::STATUS_NEW,

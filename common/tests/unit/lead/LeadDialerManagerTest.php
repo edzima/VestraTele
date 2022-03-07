@@ -10,6 +10,9 @@ use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatusInterface;
 use common\tests\unit\Unit;
 
+/**
+ * @deprecated
+ */
 class LeadDialerManagerTest extends Unit {
 
 	private const STATUS_CALLING = 2;

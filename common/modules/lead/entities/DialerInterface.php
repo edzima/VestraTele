@@ -12,7 +12,7 @@ interface DialerInterface {
 
 	public function getStatusId(): int;
 
-	public function updateStatus(int $id): void;
+	public function updateStatus(int $status): void;
 
 	/**
 	 * @return int[] Connection Attempts timestamp
