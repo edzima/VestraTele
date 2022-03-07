@@ -1,6 +1,7 @@
 <?php
 
 use common\modules\lead\models\searches\LeadDialerSearch;
+use common\widgets\DateTimeWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -36,6 +37,24 @@ use yii\widgets\ActiveForm;
 			],
 		])->checkbox() ?>
 
+
+	</div>
+
+
+	<div class="row">
+		<?= $form->field($model, 'fromLastAt', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->widget(DateTimeWidget::class)
+		?>
+
+		<?= $form->field($model, 'toLastAt', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->widget(DateTimeWidget::class)
+		?>
 
 	</div>
 
