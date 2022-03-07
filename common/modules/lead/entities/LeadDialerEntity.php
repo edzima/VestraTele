@@ -76,7 +76,7 @@ class LeadDialerEntity extends Dialer {
 	}
 
 	public function getOrigin(): string {
-		return (string) $this->parsePhone($this->getLead()->getPhone());
+		return $this->parsePhone($this->getLead()->getPhone());
 	}
 
 	public function updateStatus(int $status): void {
@@ -86,16 +86,27 @@ class LeadDialerEntity extends Dialer {
 				break;
 			case static::STATUS_ESTABLISH:
 				$this->onEstablish();
+				break;
+			case static::STATUS_NOT_ESTABLISH:
+				$this->onNotEstablish();
+				break;
 		}
 		$this->status = $status;
-		$this->dialer->updateAttributes([
-			'last_at' => time(),
-			'status' => $status,
-		]);
+		$this->dialer->last_at = time();
+		$this->dialer->status = $status;
+		$this->dialer->save(false);
 	}
 
 	protected function onCallingStatus(): void {
 		$this->report($this->callingReportStatus);
+	}
+
+	protected function onEstablish() {
+		$this->report(static::STATUS_ESTABLISH);
+	}
+
+	protected function onNotEstablish() {
+		$this->report(static::STATUS_NOT_ESTABLISH);
 	}
 
 	protected function report(int $status): void {

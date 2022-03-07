@@ -17,7 +17,7 @@ return [
 	],
 	'equal-accident-phone-from-other-source' => [
 		'name' => 'John2',
-		'source_id' => 2,
+		'source_id' => 3,
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
 		'email' => 'test@lead.com',

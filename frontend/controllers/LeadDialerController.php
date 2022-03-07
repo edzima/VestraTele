@@ -2,19 +2,18 @@
 
 namespace frontend\controllers;
 
-use common\modules\lead\components\LeadDialerManager;
-use common\modules\lead\Module;
+use common\modules\lead\components\DialerManager;
+use common\modules\lead\entities\DialerInterface;
+use Yii;
 use yii\filters\auth\HttpHeaderAuth;
 use yii\filters\VerbFilter;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
-/**
- * @property-read Module $module
- */
 class LeadDialerController extends Controller {
 
-	private LeadDialerManager $dialer;
+	private DialerManager $dialer;
 
 	public function behaviors(): array {
 		$behaviors = parent::behaviors();
@@ -35,31 +34,46 @@ class LeadDialerController extends Controller {
 
 	public function beforeAction($action) {
 		$before = parent::beforeAction($action);
-		$this->dialer = $this->module->getDialer();
+		$this->dialer = new DialerManager();
 		return $before;
 	}
 
-	public function actionCall() {
-		$data = $this->dialer->calling();
-		if ($data === null) {
-			throw new NotFoundHttpException();
-		}
+	public function actionCall(int $typeId = null) {
+		$this->dialer->type = $typeId;
+		$this->dialer->userId = Yii::$app->user->getId();
 
-		return $this->asJson($data);
+		$model = $this->dialer->findToCall();
+		if ($model && $this->dialer->calling($model)) {
+			$this->dialer->calling($model);
+			return $this->asJson([
+				'id' => $model->getID(),
+				'origin' => $model->getOrigin(),
+				'destination' => $model->getDestination(),
+			]);
+		}
+		throw new NotFoundHttpException();
 	}
 
-	public function actionAnswered(int $id) {
-		$success = $this->dialer->answer($id);
+	public function actionAnswered(int $id): Response {
+		$success = $this->dialer->establish($this->findModel($id));
 		return $this->asJson([
 			'success' => $success,
 		]);
 	}
 
-	public function actionNotAnswered(int $id) {
-		$success = $this->dialer->notAnswer($id);
-		return [
+	public function actionNotAnswered(int $id): Response {
+		$success = $this->dialer->notEstablish($this->findModel($id));
+		return $this->asJson([
 			'success' => $success,
-		];
+		]);
+	}
+
+	protected function findModel(int $id): DialerInterface {
+		$model = $this->dialer->find($id);
+		if ($model) {
+			return $model;
+		}
+		throw new NotFoundHttpException();
 	}
 
 }

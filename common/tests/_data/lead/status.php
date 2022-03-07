@@ -25,7 +25,14 @@ return [
 		'id' => Dialer::STATUS_NOT_ESTABLISH,
 	],
 	[
+		'name' => 'Establish',
+		'short_report' => true,
+		'not_for_dialer' => false,
+		'id' => Dialer::STATUS_ESTABLISH,
+	],
+	[
 		'name' => 'Calling',
+		'not_for_dialer' => false,
 		'id' => Dialer::STATUS_CALLING,
 	],
 ];

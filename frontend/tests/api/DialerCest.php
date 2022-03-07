@@ -3,11 +3,11 @@
 namespace frontend\tests\api;
 
 use common\fixtures\helpers\LeadFixtureHelper;
-use common\modules\lead\models\ActiveLead;
+use common\modules\lead\entities\Dialer;
+use common\modules\lead\entities\LeadDialerEntity;
 use common\modules\lead\models\Lead;
-use common\modules\lead\models\LeadStatusInterface;
-use common\modules\lead\Module;
-use common\tests\helpers\LeadFactory;
+use common\modules\lead\models\LeadDialer;
+use common\modules\lead\models\LeadReport;
 use frontend\controllers\LeadDialerController;
 use frontend\helpers\Url;
 use frontend\tests\ApiTester;
@@ -27,16 +27,10 @@ class DialerCest {
 
 	public function _fixtures(): array {
 		return array_merge(
-			LeadFixtureHelper::lead(),
-			LeadFixtureHelper::source(),
-			LeadFixtureHelper::status(),
+			LeadFixtureHelper::leads(),
 			LeadFixtureHelper::reports(),
-			LeadFixtureHelper::user(),
+			LeadFixtureHelper::dialer()
 		);
-	}
-
-	public function _before(): void {
-		Lead::deleteAll();
 	}
 
 	public function checkCallWithoutAuth(ApiTester $I): void {
@@ -50,62 +44,136 @@ class DialerCest {
 		$I->seeResponseCodeIs(405);
 	}
 
-	public function checkCallWithoutLeads(ApiTester $I): void {
+	public function checkCallWithoutDialers(ApiTester $I): void {
+		LeadDialer::deleteAll();
 		$I->amHeaderAuth(static::ACCESS_TOKEN, static::HEADER_AUTH);
 		$I->sendPost(static::ROUTE_CALLING);
 		$I->seeResponseCodeIs(404);
 	}
 
-	public function checkCallWithNewLead(ApiTester $I): void {
+	public function checkCallAndEstablish(ApiTester $I): void {
 		$I->amHeaderAuth(static::ACCESS_TOKEN, static::HEADER_AUTH);
-		$lead = $this->pushLead('123 123 123');
 		$I->sendPost(static::ROUTE_CALLING);
-		$I->seeResponseIsJson();
+		$I->seeResponseCodeIsSuccessful();
+		$I->seeRecord(LeadDialer::class, [
+			'id' => 2,
+			'status' => Dialer::STATUS_CALLING,
+		]);
 
-		$I->see($lead->getId());
-		$I->see('123123123');
+		/**
+		 * @var LeadDialer $leadDialer
+		 */
+		$leadDialer = $I->grabRecord(LeadDialer::class, ['id' => 2]);
 
-		$I->seeResponseJsonMatchesJsonPath('$.id');
-		$I->seeResponseJsonMatchesJsonPath('$.phone');
-		$I->dontSeeResponseJsonMatchesJsonPath('$.name');
-		$I->dontSeeResponseJsonMatchesJsonPath('$.email');
-		$I->seeResponseMatchesJsonType([
-			'id' => 'integer',
-			'phone' => 'string',
+		$I->seeRecord(LeadReport::class, [
+			'lead_id' => $leadDialer->lead_id,
+			'status_id' => Dialer::STATUS_CALLING,
+			'old_status_id' => $leadDialer->lead->getStatusId(),
+		]);
+
+		$I->dontSeeRecord(Lead::class, [
+			'id' => $leadDialer->lead_id,
+			'status_id' => Dialer::STATUS_CALLING,
 		]);
 
 		$I->sendPost(static::ROUTE_CALLING);
-		$I->seeResponseCodeIs(404);
-		$I->sendPost(Url::to([static::ROUTE_ANSWERED, 'id' => $lead->getId()]));
-		$I->seeResponseCodeIsSuccessful();
-		$I->sendPost(static::ROUTE_CALLING);
-		$I->seeResponseCodeIs(404);
+		$I->seePageNotFound();
+
+		$I->sendPost(Url::to([static::ROUTE_ANSWERED, 'id' => 2]));
+		$I->seeRecord(LeadDialer::class, [
+			'id' => 2,
+			'status' => Dialer::STATUS_ESTABLISH,
+		]);
 	}
 
-	public function checkCallWithNewLeadWithOwner(ApiTester $I): void {
+	public function checkCallAndNotEstablish(ApiTester $I): void {
 		$I->amHeaderAuth(static::ACCESS_TOKEN, static::HEADER_AUTH);
-		$this->pushLead('123-123-123', ['owner_id' => 1]);
 		$I->sendPost(static::ROUTE_CALLING);
-		$I->seeResponseCodeIs(404);
+		$I->seeResponseCodeIsSuccessful();
+		$I->seeRecord(LeadDialer::class, [
+			'id' => 2,
+			'status' => Dialer::STATUS_CALLING,
+		]);
+
+		/**
+		 * @var LeadDialer $leadDialer
+		 */
+		$leadDialer = $I->grabRecord(LeadDialer::class, ['id' => 2]);
+
+		$I->seeRecord(LeadReport::class, [
+			'lead_id' => $leadDialer->lead_id,
+			'status_id' => Dialer::STATUS_CALLING,
+			'old_status_id' => $leadDialer->lead->getStatusId(),
+		]);
+
+		$I->dontSeeRecord(Lead::class, [
+			'id' => $leadDialer->lead_id,
+			'status_id' => Dialer::STATUS_CALLING,
+		]);
+
+		$I->sendPost(static::ROUTE_CALLING);
+		$I->seePageNotFound();
+
+		$I->sendPost(Url::to([static::ROUTE_NOT_ANSWERED, 'id' => 2]));
+		$I->seeRecord(LeadDialer::class, [
+			'id' => 2,
+			'status' => Dialer::STATUS_NOT_ESTABLISH,
+		]);
+
+		$I->sendPost(static::ROUTE_CALLING);
+
+		$I->seeRecord(LeadDialer::class, [
+			'id' => 2,
+			'status' => LeadDialerEntity::STATUS_NEXT_CALL_INTERVAL_NOT_EXCEEDED,
+		]);
+
+		$I->seePageNotFound();
 	}
 
-	public function checkAnswered(ApiTester $I): void {
+	public function checkEstablishNotEstablished(ApiTester $I): void {
+		$I->amHeaderAuth(static::ACCESS_TOKEN, static::HEADER_AUTH);
+		$I->dontSeeRecord(LeadDialer::class, [
+			'id' => 2,
+			'status' => Dialer::STATUS_ESTABLISH,
+		]);
+
+		$I->sendPost(Url::to([static::ROUTE_ANSWERED, 'id' => 2]));
+		$I->seeRecord(LeadDialer::class, [
+			'id' => 2,
+			'status' => Dialer::STATUS_ESTABLISH,
+		]);
+
+		$I->seeResponseContainsJson(['success' => true]);
+
+		/**
+		 * @var LeadDialer $leadDialer
+		 */
+		$leadDialer = $I->grabRecord(LeadDialer::class, ['id' => 2]);
+		$I->seeRecord(LeadReport::class, [
+			'lead_id' => $leadDialer->lead_id,
+			'status_id' => Dialer::STATUS_ESTABLISH,
+			'old_status_id' => $leadDialer->lead->status_id,
+		]);
+	}
+
+	public function checkEstablishAlreadyEstablish(ApiTester $I): void {
 		$I->amHeaderAuth(static::ACCESS_TOKEN, static::HEADER_AUTH);
 		$I->sendPost(Url::to([static::ROUTE_ANSWERED, 'id' => 1]));
-	}
+		$I->seeRecord(LeadDialer::class, [
+			'id' => 1,
+			'status' => Dialer::STATUS_ESTABLISH,
+		]);
 
-	private function pushLead(string $phone, array $config = []): ActiveLead {
-		$config['phone'] = $phone;
-		if (!isset($config['status_id'])) {
-			$config['status_id'] = LeadStatusInterface::STATUS_NEW;
-		}
-		if (!isset($config['name'])) {
-			$config['name'] = __METHOD__;
-		}
-		if (!isset($config['source_id'])) {
-			$config['source_id'] = 1;
-		}
-		return Module::manager()->pushLead(LeadFactory::createLead($config));
+		$I->seeResponseContainsJson(['success' => false]);
+
+		/**
+		 * @var LeadDialer $leadDialer
+		 */
+		$leadDialer = $I->grabRecord(LeadDialer::class, ['id' => 1]);
+		$I->dontSeeRecord(LeadReport::class, [
+			'lead_id' => $leadDialer->lead_id,
+			'status_id' => Dialer::STATUS_ESTABLISH,
+		]);
 	}
 
 }
