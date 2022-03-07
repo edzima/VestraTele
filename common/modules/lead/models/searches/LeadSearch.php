@@ -6,6 +6,7 @@ use common\models\AddressSearch;
 use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\models\user\User;
+use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadReport;
@@ -21,7 +22,6 @@ use Yii;
 use yii\base\Model;
 use yii\base\UnknownPropertyException;
 use yii\data\ActiveDataProvider;
-use common\modules\lead\models\Lead;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
@@ -34,8 +34,6 @@ class LeadSearch extends Lead implements SearchModel {
 	public const SCENARIO_USER = 'user';
 
 	private const QUESTION_ATTRIBUTE_PREFIX = 'question';
-
-	public $dialer_id;
 
 	public bool $withoutUser = false;
 	public bool $withoutReport = false;
@@ -73,7 +71,7 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'status_id', 'type_id', 'source_id', 'campaign_id', 'dialer_id'], 'integer'],
+			[['id', 'status_id', 'type_id', 'source_id', 'campaign_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
 			[['withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail'], 'boolean'],
@@ -95,7 +93,6 @@ class LeadSearch extends Lead implements SearchModel {
 				'withoutUser' => Yii::t('lead', 'Without User'),
 				'withoutReport' => Yii::t('lead', 'Without Report'),
 				'user_id' => Yii::t('lead', 'User'),
-				'dialer_id' => Yii::t('lead', 'Dialer'),
 				'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 				'duplicateEmail' => Yii::t('lead', 'Duplicate Email'),
 				'duplicatePhone' => Yii::t('lead', 'Duplicate Phone'),

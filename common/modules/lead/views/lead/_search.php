@@ -1,6 +1,5 @@
 <?php
 
-use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadSearch;
 use common\widgets\ActiveForm;
 use common\widgets\address\AddressSearchWidget;
@@ -61,18 +60,6 @@ use yii\helpers\Html;
 			])
 			?>
 
-			<?php
-			$dialers = LeadSearch::getUsersNames(LeadUser::TYPE_DIALER);
-			if (!empty($dialers)) {
-				echo $form->field($model, 'dialer_id', ['options' => ['class' => 'col-md-3 col-lg-1']])->widget(Select2::class, [
-					'data' => $dialers,
-					'pluginOptions' => [
-						'placeholder' => $model->getAttributeLabel('dialer_id'),
-						'allowClear' => true,
-					],
-				]);
-			}
-			?>
 
 			<?= $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
