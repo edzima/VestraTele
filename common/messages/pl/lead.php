@@ -191,7 +191,7 @@ return [
 	'Closed questions' => 'Closed questions',
 	'Lead Source' => 'Źródło',
 	'Reminder' => 'Przypomnieni',
-	'Not for Dialer' => 'Nie dla Dialer',
+	'Not for Dialer' => 'Nie dzwonić',
 	'Update At' => 'Update At',
 	'Name: {name}' => 'Kto: {name}',
 	'Success assign {user} as to {count} leads' => 'Sukces! Przypisano {user} do {count} Lead',

@@ -2,6 +2,7 @@
 
 use common\modules\lead\models\LeadDialer;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadDialerSearch;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -23,6 +24,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 		<?= Html::a(Yii::t('lead', 'Types'), ['dialer-type/index'], ['class' => 'btn btn-info']) ?>
 
+		<?= Html::a(Yii::t('backend', 'Clear'), false, ['class' => 'btn btn-danger pull-right', 'data-method' => 'delete']) ?>
+
 	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
@@ -38,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => LeadDialerSearch::getTypesNames(),
 			],
 			[
-				'attribute' => 'lead_id',
+				'attribute' => 'leadName',
 				'value' => static function (LeadDialer $model): string {
 					return Html::a(
 						Html::encode($model->lead->getName()),
@@ -56,10 +59,15 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => LeadStatus::getNames(),
 			],
 			[
+				'attribute' => 'leadTypeId',
+				'value' => 'lead.typeName',
+				'label' => Yii::t('lead', 'Lead Type'),
+				'filter' => LeadType::getNames(),
+			],
+			[
 				'attribute' => 'leadSourceId',
 				'value' => 'lead.source.name',
 				'label' => Yii::t('lead', 'Lead Source'),
-				'visible' => $searchModel->leadSourceWithoutDialer,
 				'filter' => $searchModel::getLeadSourcesNames(),
 			],
 			[
