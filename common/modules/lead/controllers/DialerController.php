@@ -5,6 +5,7 @@ namespace common\modules\lead\controllers;
 use common\helpers\Flash;
 use common\modules\lead\models\forms\LeadDialerForm;
 use common\modules\lead\models\LeadDialer;
+use common\modules\lead\models\query\LeadDialerQuery;
 use common\modules\lead\models\searches\LeadDialerSearch;
 use Yii;
 use yii\filters\VerbFilter;
@@ -34,10 +35,17 @@ class DialerController extends BaseController {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionIndex() {
 		$searchModel = new LeadDialerSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+		if (Yii::$app->request->isDelete) {
+			/** @var LeadDialerQuery $query */
+			$query = $dataProvider->query;
+			$query->select(LeadDialer::tableName() . '.id');
+			LeadDialer::deleteAll(['id' => $query]);
+			return $this->refresh();
+		}
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
