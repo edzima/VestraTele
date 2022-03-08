@@ -25,6 +25,8 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 	public $dialerOrigin;
 	public $dialerDestination;
 
+	public $leadName;
+	public $leadTypeId;
 	public $leadStatusId;
 	public $leadSourceId;
 
@@ -33,9 +35,9 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 
 	public function rules(): array {
 		return [
-			[['type_id', 'priority', 'leadStatusId', 'leadSourceId', 'lead_id', 'status', 'typeUserId'], 'integer'],
+			[['type_id', 'priority', 'leadStatusId', 'leadSourceId', 'leadTypeId', 'lead_id', 'leadTypeId', 'status', 'typeUserId'], 'integer'],
 			[['onlyToCall', 'leadSourceWithoutDialer', 'leadStatusNotForDialer'], 'boolean'],
-			[['dialerOrigin', 'dialerDestination'], 'string'],
+			[['dialerOrigin', 'dialerDestination', 'leadName'], 'string'],
 			[['fromLastAt', 'toLastAt', 'created_at', 'updated_at', 'last_at'], 'safe'],
 		];
 	}
@@ -67,6 +69,7 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 		$this->applyLastAtFilter($query);
 		$this->applyLeadSourceFilter($query);
 		$this->applyLeadStatusFilter($query);
+		$this->applyLeadTypeFilter($query);
 		$this->applyToCallFilter($query);
 		$this->applyTypeUserIdFilter($query);
 
@@ -131,6 +134,15 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 		$query->andFilterWhere([
 			Lead::tableName() . '.status_id' => $this->leadStatusId,
 		]);
+	}
+
+	private function applyLeadTypeFilter(LeadDialerQuery $query) {
+		if (!empty($this->leadTypeId)) {
+			$query->joinWith('lead.leadSource');
+			$query->andWhere([
+				LeadSource::tableName() . '.type_id' => $this->leadTypeId,
+			]);
+		}
 	}
 
 	public static function getTypesNames(): array {
