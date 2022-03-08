@@ -207,7 +207,7 @@ if ($multipleForm) {
 					: ''
 				?>
 
-				<?= Yii::$app->user->can(User::PERMISSION_LEAD_STATUS)
+				<?= Yii::$app->user->can(User::PERMISSION_LEAD_DIALER_MANAGER)
 				&& $dataProvider->pagination->pageCount > 1
 
 					? Html::a(
