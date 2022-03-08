@@ -5,11 +5,13 @@ namespace common\modules\lead\controllers;
 use backend\widgets\CsvForm;
 use common\behaviors\SelectionRouteBehavior;
 use common\helpers\Flash;
-use common\helpers\Url;
 use common\modules\lead\models\forms\LeadForm;
 use common\modules\lead\models\forms\ReportForm;
+use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatusInterface;
+use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
@@ -30,7 +32,6 @@ class LeadController extends BaseController {
 			'verbs' => [
 				'class' => VerbFilter::class,
 				'actions' => [
-					'copy' => ['POST'],
 					'delete' => ['POST'],
 				],
 			],
@@ -190,7 +191,6 @@ class LeadController extends BaseController {
 	public function actionCreateFromSource(int $id, string $phone = null) {
 		$model = new LeadForm();
 		$model->source_id = $id;
-		$model->phone = $phone;
 		if ($this->module->onlyUser) {
 			$model->setScenario(LeadForm::SCENARIO_OWNER);
 			$model->owner_id = Yii::$app->user->getId();
@@ -198,9 +198,11 @@ class LeadController extends BaseController {
 		if (!$model->validate(['source_id'])) {
 			throw new NotFoundHttpException();
 		}
+		$model->phone = $phone;
 		$model->date_at = date($model->dateFormat);
 		$source = LeadSource::getModels()[$id];
-		$report = new ReportForm(['source' => $source]);
+		$report = new ReportForm();
+		$report->lead_type_id = $source->getType()->getID();
 		$report->status_id = LeadStatusInterface::STATUS_NEW;
 		$report->owner_id = Yii::$app->user->getId();
 		if ($model->load(Yii::$app->request->post())
@@ -209,7 +211,7 @@ class LeadController extends BaseController {
 			&& $report->validate()) {
 			$lead = $this->module->manager->pushLead($model);
 			if ($lead) {
-				$report->setLead($lead);
+				$report->setLead($lead, false);
 				Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success create Lead.'));
 				$report->save(false);
 				return $this->redirect(['view', 'id' => $lead->getId()]);
@@ -221,21 +223,55 @@ class LeadController extends BaseController {
 		]);
 	}
 
-	public function actionCopy(int $id) {
+	public function actionCopy(int $id, int $typeId) {
+		if (!isset(LeadType::getModels()[$typeId])) {
+			throw new NotFoundHttpException();
+		}
+		$type = LeadType::getModels()[$typeId];
 		$lead = $this->findLead($id, false);
-		if ($lead->isForUser(Yii::$app->user->getId())) {
-			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'Only not self Lead can Copy.'));
-			return $this->redirect(['index']);
-		}
 		$model = new LeadForm();
+		$model->scenario = LeadForm::SCENARIO_OWNER;
 		$model->setLead($lead);
+		$model->typeId = $typeId;
+		$model->status_id = LeadStatusInterface::STATUS_NEW;
+		$model->provider = Lead::PROVIDER_COPY;
+		$model->date_at = date($model->dateFormat);
 		$model->owner_id = Yii::$app->user->getId();
-		$lead = $this->module->manager->pushLead($model);
-		if ($lead) {
-			Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success Copy Lead.'));
-			return $this->redirect(['view', 'id' => $lead->getId()]);
+		$report = new ReportForm();
+		$report->setLead($lead, true);
+		$report->withSameContacts = false;
+		$report->leadName = $lead->getName();
+		$report->lead_type_id = $typeId;
+		$report->status_id = LeadStatusInterface::STATUS_NEW;
+		$report->owner_id = Yii::$app->user->getId();
+		if ($model->load(Yii::$app->request->post())
+			&& $report->load(Yii::$app->request->post())
+			&& $model->validate()
+			&& $report->validate()) {
+			$newLead = $this->module->manager->pushLead($model);
+			if ($newLead) {
+				$parentLeadReport = new LeadReport([
+					'lead_id' => $lead->getId(),
+					'old_status_id' => $lead->getStatusId(),
+					'status_id' => $lead->getStatusId(),
+					'details' => Yii::t('lead', 'Copied Lead: {id} from this', [
+						'id' => $newLead->getId(),
+					]),
+					'owner_id' => Yii::$app->user->getId(),
+				]);
+				$parentLeadReport->save();
+				$report->setLead($newLead, false);
+				$report->save(false);
+				Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success Copy Lead.'));
+				return $this->redirect(['view', 'id' => $newLead->getId()]);
+			}
 		}
-		return $this->redirect(Url::previous());
+		return $this->render('copy', [
+			'lead' => $lead,
+			'model' => $model,
+			'type' => $type,
+			'report' => $report,
+		]);
 	}
 
 	/**

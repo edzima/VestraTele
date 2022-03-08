@@ -6,9 +6,8 @@ use common\models\Address;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadAnswer;
-use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadQuestion;
-use common\modules\lead\models\LeadSourceInterface;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadUser;
 use Yii;
@@ -18,7 +17,6 @@ use yii\helpers\ArrayHelper;
 /**
  * ReportForm Class.
  *
- * @property-read int $leadTypeID
  * @property-read array $closedQuestionsData
  * @property-write array $openAnswers
  * @property-read LeadQuestion[] $openQuestions
@@ -34,7 +32,7 @@ class ReportForm extends Model {
 	public $closedQuestions = [];
 
 	public int $addressType = LeadAddress::TYPE_CUSTOMER;
-	public bool $withAddress = false;
+	public bool $withAddress = true;
 	public ?Address $address = null;
 
 	private ?ActiveLead $lead = null;
@@ -45,7 +43,7 @@ class ReportForm extends Model {
 	private array $answersModels = [];
 
 	public bool $withAnswers = true;
-	private LeadSourceInterface $source;
+	public int $lead_type_id;
 
 	public function setOpenAnswers(array $questionsAnswers): void {
 		$models = $this->getAnswersModels();
@@ -164,7 +162,7 @@ class ReportForm extends Model {
 
 			$query = LeadQuestion::find()
 				->forStatus($this->status_id)
-				->forType($this->getLeadTypeID());
+				->forType($this->lead_type_id);
 			if ($this->getModel()->isNewRecord && $this->lead !== null) {
 				$answeredQuestionsIds = $this->lead
 					->getAnswers()
@@ -306,19 +304,17 @@ class ReportForm extends Model {
 			&& ($this->withAddress ? $this->getAddress()->validate() : true);
 	}
 
-	public function setLead(ActiveLead $lead): void {
+	public function setLead(ActiveLead $lead, bool $withFields = true): void {
 		$this->lead = $lead;
-		$this->status_id = $lead->getStatusId();
-		$this->setSource($lead->getSource());
-		$this->leadName = $lead->getName();
-		if (isset($lead->addresses[$this->addressType])) {
-			$this->address = $lead->addresses[$this->addressType]->address ?? null;
-			$this->withAddress = true;
+		if ($withFields) {
+			$this->status_id = $lead->getStatusId();
+			$this->lead_type_id = $lead->getSource()->getType()->getID();
+			$this->leadName = $lead->getName();
+			if (isset($lead->addresses[$this->addressType])) {
+				$this->address = $lead->addresses[$this->addressType]->address ?? null;
+				$this->withAddress = true;
+			}
 		}
-	}
-
-	protected function setSource(LeadSourceInterface $source): void {
-		$this->source = $source;
 	}
 
 	public function getLead(): ActiveLead {
@@ -350,10 +346,6 @@ class ReportForm extends Model {
 			$this->address = new Address();
 		}
 		return $this->address;
-	}
-
-	private function getLeadTypeID(): int {
-		return $this->source->getType()->getID();
 	}
 
 	public static function getStatusNames(): array {
