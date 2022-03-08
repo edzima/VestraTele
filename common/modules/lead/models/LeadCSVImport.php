@@ -129,8 +129,9 @@ class LeadCSVImport extends Model {
 			[
 				'attribute' => 'name',
 				'value' => function (array $line) {
-					if ($this->nameColumn) {
-						return $line[$this->nameColumn];
+					$name = $line[$this->nameColumn] ?? null;
+					if (!empty($name)) {
+						return $name;
 					}
 					return $this->csvFile->getBaseName() . '.' . $this->index;
 				},

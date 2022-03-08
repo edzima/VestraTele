@@ -35,6 +35,31 @@ class LeadCSVImportTest extends Unit {
 		$this->tester->assertEmpty($this->model->import());
 	}
 
+	public function testStartFromFirstLine(): void {
+		$this->giveFile('without-header.csv');
+		$this->giveModel();
+		$this->model->source_id = 1;
+		$this->model->startFromLine = 0;
+		$this->model->nameColumn = 0;
+		$this->model->phoneColumn = 1;
+		$this->model->dateColumn = null;
+		$this->thenSuccessValidate();
+		$this->tester->assertSame(2, $this->model->import());
+		$this->tester->seeRecord(Lead::class, [
+				'name' => 'Patryk Kowalski',
+				'source_id' => 1,
+				'phone' => '+48 723 848 321',
+			]
+		);
+
+		$this->tester->seeRecord(Lead::class, [
+				'name' => 'Roman Nowak',
+				'source_id' => 1,
+				'phone' => '+48 669 436 524',
+			]
+		);
+	}
+
 	public function testCentralPhone(): void {
 		$this->giveFile('central-phone.csv');
 		$this->giveModel();
