@@ -40,6 +40,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_ISSUE_LINK_USER = 'issue.link-user';
 
 	public const PERMISSION_CAMPAIGN = 'campaign';
+	public const PERMISSION_LEAD_IMPORT = 'lead.import';
 
 	private static $USER_NAMES = [];
 

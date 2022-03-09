@@ -34,27 +34,31 @@ YiiAsset::register($this);
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
+	<p>
 
-	<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->getId()], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->getId()], ['class' => 'btn btn-success']) ?>
 
-	<?= ShortReportStatusesWidget::widget(['lead_id' => $model->getId()]) ?>
+		<?= ShortReportStatusesWidget::widget(['lead_id' => $model->getId()]) ?>
 
-	<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->getId()], ['class' => 'btn btn-warning']) ?>
+		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->getId()], ['class' => 'btn btn-warning']) ?>
 
-	<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary']) ?>
+		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary']) ?>
 
-	<?= $model->getStatusId() !== LeadStatusInterface::STATUS_ARCHIVE
-		? Html::a(Yii::t('lead', 'Archive'), ['archive/self', 'id' => $model->getId()], [
-			'class' => 'btn btn-danger',
-			'data' => [
-				'method' => 'POST',
-				'confirm' => Yii::t('lead', 'Move Lead: {lead} to Archive?', [
-					'lead' => $model->getName(),
-				]),
-			],
-		])
-		: ''
-	?>
+		<?= $model->getStatusId() !== LeadStatusInterface::STATUS_ARCHIVE
+			? Html::a(Yii::t('lead', 'Archive'), ['archive/self', 'id' => $model->getId()], [
+				'class' => 'btn btn-danger',
+				'data' => [
+					'method' => 'POST',
+					'confirm' => Yii::t('lead', 'Move Lead: {lead} to Archive?', [
+						'lead' => $model->getName(),
+					]),
+				],
+			])
+			: ''
+		?>
+
+
+		<span class="pull-right">
 
 
 	<div class="pull-right d-inline">

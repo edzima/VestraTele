@@ -183,8 +183,18 @@ return [
 						'permissions' => [Worker::PERMISSION_LEAD_DUPLICATE],
 					],
 					[
+						'allow' => true,
+						'controllers' => ['lead/import'],
+						'permissions' => [Worker::PERMISSION_LEAD_IMPORT],
+					],
+					[
 						'allow' => false,
-						'controllers' => ['lead/dialer-lead', 'lead/status', 'lead/duplicate'],
+						'controllers' => [
+							'lead/dialer-lead',
+							'lead/status',
+							'lead/duplicate',
+							'lead/import',
+						],
 					],
 					[
 						'allow' => true,

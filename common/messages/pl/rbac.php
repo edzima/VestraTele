@@ -28,6 +28,7 @@ return [
 	'lead' => 'Leads',
 	'lead.dialer' => 'Leads - Dialer',
 	'lead.duplicate' => 'Leads - Duplikaty',
+	'lead.import' => 'Leads - Import',
 	'lead.status' => 'Leads - Statusy',
 	'logs' => 'Logi',
 	'manager' => 'Manager (Panel Admina)',

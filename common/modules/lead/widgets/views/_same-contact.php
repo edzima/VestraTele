@@ -26,7 +26,7 @@ use yii\widgets\DetailView;
 	<p>
 
 		<?= Html::a(Yii::t('lead', 'Create Lead Report'),
-			['report/report', 'id' => $model->getId()],
+			['/lead/report/report', 'id' => $model->getId()],
 			[
 				'class' => 'btn btn-success',
 			])
@@ -47,6 +47,7 @@ use yii\widgets\DetailView;
 				])
 			: ''
 		?>
+
 
 	</p>
 	<?= DetailView::widget([
