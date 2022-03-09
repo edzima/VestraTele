@@ -3,6 +3,7 @@
 namespace common\modules\lead\models;
 
 use common\models\Address;
+use common\modules\lead\models\query\LeadDialerQuery;
 use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
 use common\modules\reminder\models\Reminder;
@@ -37,6 +38,7 @@ use yii\helpers\Json;
  * @property-read LeadAddress[] $addresses
  * @property-read Lead[] $samePhoneLeads
  * @property-read Lead[] $sameEmailLeads
+ * @property-read LeadDialer[] $dialers
  */
 class Lead extends ActiveRecord implements ActiveLead {
 
@@ -102,6 +104,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function getCustomerAddress(): ?Address {
 		return $this->addresses[LeadAddress::TYPE_CUSTOMER]->address ?? null;
+	}
+
+	public function getDialers(): LeadDialerQuery {
+		return $this->hasMany(LeadDialer::class, ['lead_id' => 'id']);
 	}
 
 	protected function getAddresses(): ActiveQuery {

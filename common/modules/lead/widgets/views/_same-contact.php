@@ -4,6 +4,7 @@ use common\helpers\Html;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
+use common\modules\lead\widgets\LeadDialersGridView;
 use common\modules\lead\widgets\LeadReportWidget;
 use yii\web\View;
 use yii\widgets\DetailView;
@@ -11,6 +12,7 @@ use yii\widgets\DetailView;
 /* @var $this View */
 /* @var $model ActiveLead */
 /* @var $viewLink bool */
+/* @var $withDialers bool */
 /* @var $updateLink bool */
 ?>
 
@@ -102,5 +104,11 @@ use yii\widgets\DetailView;
 		<?php endforeach; ?>
 	<?php endif; ?>
 
+	<?= $withDialers
+		? LeadDialersGridView::widget([
+			'lead' => $model,
+		])
+		: ''
+	?>
 
 </div>

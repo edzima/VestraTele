@@ -90,6 +90,7 @@ class LeadDialer extends ActiveRecord {
 			'lead_id' => Yii::t('lead', 'Lead ID'),
 			'type_id' => Yii::t('lead', 'Type ID'),
 			'priority' => Yii::t('lead', 'Priority'),
+			'priorityName' => Yii::t('lead', 'Priority'),
 			'created_at' => Yii::t('lead', 'Created At'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
 			'last_at' => Yii::t('lead', 'Last At'),

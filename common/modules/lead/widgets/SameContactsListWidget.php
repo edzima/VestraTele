@@ -12,6 +12,7 @@ class SameContactsListWidget extends ListView {
 
 	public ActiveLead $model;
 	public bool $withType = false;
+	public bool $withDialers = false;
 	public bool $viewLink = false;
 	public bool $updateLink = false;
 
@@ -34,6 +35,7 @@ class SameContactsListWidget extends ListView {
 		$this->viewParams = [
 			'viewLink' => $this->viewLink,
 			'updateLink' => $this->updateLink,
+			'withDialers' => $this->withDialers,
 		];
 		parent::init();
 	}

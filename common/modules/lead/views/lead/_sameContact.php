@@ -1,13 +1,14 @@
 <?php
 
 use common\helpers\Html;
-use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\widgets\LeadAnswersWidget;
+use common\modules\lead\widgets\LeadDialersGridView;
 use common\modules\lead\widgets\LeadReportWidget;
+use yii\web\View;
 use yii\widgets\DetailView;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $model ActiveLead */
 
 ?>
@@ -73,6 +74,10 @@ use yii\widgets\DetailView;
 			],
 			'owner',
 		],
+	]) ?>
+
+	<?= LeadDialersGridView::widget([
+		'lead' => $model,
 	]) ?>
 
 
