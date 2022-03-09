@@ -31,7 +31,6 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 
 	public function search(array $params): ActiveDataProvider {
 		$this->load($params);
-
 		$sub = Lead::find()
 			->alias('duplicateLead')
 			->addSelect([
