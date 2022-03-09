@@ -56,8 +56,8 @@ class LeadCSVImport extends Model {
 
 	public function rules(): array {
 		return [
-			[['source_id', 'status_id', 'phoneColumn', 'csvDelimiter'], 'required'],
-			[['phoneColumn', 'nameColumn', 'dateColumn'], 'integer', 'min' => 0],
+			[['source_id', 'status_id', 'phoneColumn', 'csvDelimiter', 'startFromLine'], 'required'],
+			[['phoneColumn', 'nameColumn', 'dateColumn', 'startFromLine'], 'integer', 'min' => 0],
 			[['source_id', 'status_id'], 'integer'],
 			[
 				'!csvFile',
