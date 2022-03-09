@@ -74,6 +74,13 @@ return [
 					],
 					[
 						'allow' => true,
+						'actions' => ['self'],
+						'controllers' => [
+							'lead/archive',
+						],
+					],
+					[
+						'allow' => true,
 						'controllers' => [
 							'lead/api',
 							'lead/dialer',

@@ -2,6 +2,7 @@
 
 use common\helpers\Html;
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
 use yii\web\View;
@@ -32,15 +33,9 @@ use yii\widgets\DetailView;
 		?>
 
 		<?= !$model->isForUser(Yii::$app->user->getId())
-			? Html::a(Yii::t('lead', 'Copy Lead'),
-				['copy', 'id' => $model->getId()],
-				[
-					'class' => 'btn btn-warning',
-					'data' => [
-						'method' => 'POST',
-						'confirm' => Yii::t('lead', 'Are you sure you want to copy this item?'),
-					],
-				])
+			? CopyLeadBtnWidget::widget([
+				'leadId' => $model->getId(),
+			])
 			: ''
 		?>
 
@@ -52,6 +47,7 @@ use yii\widgets\DetailView;
 				])
 			: ''
 		?>
+
 
 	</p>
 	<?= DetailView::widget([

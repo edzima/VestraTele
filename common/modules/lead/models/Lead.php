@@ -40,6 +40,7 @@ use yii\helpers\Json;
  */
 class Lead extends ActiveRecord implements ActiveLead {
 
+	public const PROVIDER_COPY = 'copy';
 	public const PROVIDER_FORM = 'form';
 	public const PROVIDER_CZATER = 'czater';
 	public const PROVIDER_CENTRAL_PHONE = 'central-phone';
@@ -275,6 +276,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 	public static function getProvidersNames(): array {
 		//@todo load from Lead Module
 		return [
+			static::PROVIDER_COPY => Yii::t('lead', 'Copy'),
 			static::PROVIDER_FORM => Yii::t('lead', 'Form'),
 			static::PROVIDER_CZATER => Yii::t('lead', 'Czater'),
 			static::PROVIDER_CENTRAL_PHONE => Yii::t('lead', 'Central phone'),

@@ -31,7 +31,11 @@ class ArchiveController extends BaseController {
 		$model->userId = Yii::$app->user->getId();
 		$model->selfChange = true;
 		$model->withSameContacts = false;
-		$model->save();
+		if ($model->save()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('lead', 'Success Archive Lead.')
+			);
+		}
 		return $this->redirectLead($id);
 	}
 

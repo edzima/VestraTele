@@ -5,6 +5,7 @@ use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadStatusInterface;
+use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
@@ -59,30 +60,37 @@ YiiAsset::register($this);
 
 		<span class="pull-right">
 
-					<?= Yii::$app->user->can(User::PERMISSION_SMS)
-						? Html::a(Yii::t('lead', 'Send SMS'), ['sms/push', 'id' => $model->getId()],
-							['class' => 'btn btn-success'])
-						: ''
-					?>
+
+	<div class="pull-right d-inline">
+
+		<?= CopyLeadBtnWidget::widget([
+			'leadId' => $model->getId(),
+		]) ?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_SMS)
+			? Html::a(Yii::t('lead', 'Send SMS'), ['sms/push', 'id' => $model->getId()],
+				['class' => 'btn btn-success'])
+			: ''
+		?>
 
 
-					<?= Html::a(Yii::t('lead', 'Assign User'), ['user/assign-single', 'id' => $model->getId()],
-						['class' => 'btn btn-info']) ?>
+		<?= Html::a(Yii::t('lead', 'Assign User'), ['user/assign-single', 'id' => $model->getId()],
+			['class' => 'btn btn-info']) ?>
 
-					<?= $withDelete
-						? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->getId()], [
-							'class' => 'btn btn-danger',
-							'data' => [
-								'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
-								'method' => 'post',
-							],
-						])
-						: ''
-					?>
-		</span>
+		<?= $withDelete
+			? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->getId()], [
+				'class' => 'btn btn-danger',
+				'data' => [
+					'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
+					'method' => 'post',
+				],
+			])
+			: ''
+		?>
+	</div>
 
 
-	</p>
+	<p></p>
 
 	<div class="row">
 		<div class="col-md-4">

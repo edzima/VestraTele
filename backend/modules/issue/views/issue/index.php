@@ -30,6 +30,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 <div class="issue-index relative">
+	<?php Pjax::begin([
+		'timeout' => 2000,
+	]); ?>
 
 	<p>
 		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
@@ -50,9 +53,6 @@ $this->params['breadcrumbs'][] = $this->title;
 		?>
 	</p>
 
-	<?php Pjax::begin([
-		'timeout' => 2000,
-	]); ?>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
