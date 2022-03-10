@@ -24,6 +24,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
 		<?= Html::a(Yii::t('lead', 'Types'), ['dialer-type/index'], ['class' => 'btn btn-info']) ?>
 
+		<?= Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE)
+			? Html::a(Yii::t('lead', 'Duplicates'), ['duplicate/dialers'], ['class' => 'btn btn-warning'])
+			: ''
+		?>
+
 		<?= Html::a(Yii::t('backend', 'Clear'), false, ['class' => 'btn btn-danger pull-right', 'data-method' => 'delete']) ?>
 
 	</p>

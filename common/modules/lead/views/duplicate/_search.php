@@ -1,5 +1,6 @@
 <?php
 
+use common\models\user\User;
 use common\modules\lead\models\searches\DuplicateLeadSearch;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -27,6 +28,11 @@ use yii\widgets\ActiveForm;
 			DuplicateLeadSearch::getStatusFilterNames(), [
 			'prompt' => Yii::t('lead', 'Select...'),
 		]) ?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_LEAD_DIALER_MANAGER)
+			? $form->field($model, 'onlyDialers')->checkbox()
+			: ''
+		?>
 	</div>
 
 	<div class="form-group">
