@@ -16,6 +16,8 @@ use yii\data\ActiveDataProvider;
 
 class LeadDialerSearch extends LeadDialer implements SearchModel {
 
+	public const DESTINATION_EMPTY = 'empty';
+
 	public bool $onlyToCall = false;
 	public bool $leadSourceWithoutDialer = false;
 	public bool $leadStatusNotForDialer = false;
@@ -100,7 +102,25 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 	private function applyDialerDestinationFilter(LeadDialerQuery $query): void {
 		if (!empty($this->dialerDestination)) {
 			$query->joinWith('lead.leadSource');
-			$query->andWhere([LeadSource::tableName() . '.dialer_phone' => $this->dialerDestination]);
+			if ($this->dialerDestination === static::DESTINATION_EMPTY) {
+				$query->andWhere([
+					LeadDialer::tableName() . '.destination' => null,
+
+					LeadSource::tableName() . '.dialer_phone' => null,
+
+				]);
+			} else {
+				$query->andWhere([
+					'or',
+					[
+						LeadDialer::tableName() . '.destination' => $this->dialerDestination,
+					],
+					[
+						LeadSource::tableName() . '.dialer_phone' => $this->dialerDestination,
+						LeadDialer::tableName() . '.destination' => null,
+					],
+				]);
+			}
 		}
 	}
 
@@ -167,11 +187,20 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 
 	public static function getDialerDestinationsNames(): array {
 		$names = [];
+		$names[static::DESTINATION_EMPTY] = Yii::t('lead', 'Without Destination');
 		foreach (LeadSource::getModels() as $source) {
 			if (!empty($source->dialer_phone)) {
 				$names[$source->dialer_phone] = $source->dialer_phone;
 			}
 		}
+		foreach (LeadDialer::find()
+			->select('destination')
+			->andWhere('destination IS NOT NULL')
+			->distinct()
+			->column() as $destination) {
+			$names[$destination] = $destination;
+		}
+		asort($names);
 		return $names;
 	}
 
