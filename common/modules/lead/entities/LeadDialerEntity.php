@@ -72,6 +72,9 @@ class LeadDialerEntity extends Dialer {
 	}
 
 	public function getDestination(): string {
+		if (!empty($this->dialer->destination)) {
+			return (string) $this->dialer->destination;
+		}
 		return (string) $this->getLead()->getSource()->getDialerPhone();
 	}
 
@@ -171,7 +174,7 @@ class LeadDialerEntity extends Dialer {
 		if ($this->isNotForDialerLeadStatus($this->getLead()->getStatusId())) {
 			return static::STATUS_CURRENT_LEAD_STATUS_NOT_FOR_DIALER;
 		}
-		if (empty($this->lead->getSource()->getDialerPhone())) {
+		if (empty($this->getDestination())) {
 			return static::STATUS_EMPTY_LEAD_SOURCE_DIALER_PHONE;
 		}
 		if ($this->hasSameLeadWithStatusNotForDialer()) {

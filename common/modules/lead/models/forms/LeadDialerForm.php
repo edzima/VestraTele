@@ -21,6 +21,7 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 	public $typeId;
 	public $priority;
 	public $status = Dialer::STATUS_NEW;
+	public $destination;
 
 	public $dailyAttemptsLimit;
 	public $globallyAttemptsLimit;
@@ -49,6 +50,8 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 					'nextCallInterval', 'globallyAttemptsLimit', 'dailyAttemptsLimit',
 				], 'integer',
 			],
+			['destination', 'integer', 'min' => 0],
+			['destination', 'default', 'value' => null],
 			['leadId', 'integer', 'on' => static::SCENARIO_DEFAULT],
 			['typeId', 'in', 'range' => array_keys(static::getTypesNames())],
 			['priority', 'in', 'range' => array_keys(static::getPriorityNames())],
@@ -118,6 +121,7 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 			'dailyAttemptsLimit' => Yii::t('lead', 'Daily attempts limit'),
 			'globallyAttemptsLimit' => Yii::t('lead', 'Globally attempts limit'),
 			'nextCallInterval' => Yii::t('lead', 'Next call interval'),
+			'destination' => Yii::t('lead', 'Destination'),
 		];
 	}
 
@@ -127,6 +131,7 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 		$this->status = $model->status;
 		$this->leadId = $model->lead_id;
 		$this->typeId = $model->type_id;
+		$this->destination = $model->destination;
 		$this->setConfig($model->getConfig());
 	}
 
@@ -139,6 +144,7 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 		$model->type_id = $this->typeId;
 		$model->status = $this->status;
 		$model->priority = $this->priority;
+		$model->destination = $this->destination;
 		$model->setConfig($this);
 		return $model->save(false);
 	}
@@ -156,6 +162,7 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 				'type_id' => $this->typeId,
 				'status' => $this->status,
 				'priority' => $this->priority,
+				'destination' => $this->destination,
 				'dialer_config' => $config,
 				'created_at' => date(DATE_ATOM),
 				'updated_at' => date(DATE_ATOM),
@@ -167,6 +174,7 @@ class LeadDialerForm extends Model implements DialerConfigInterface {
 				'type_id',
 				'status',
 				'priority',
+				'destination',
 				'dialer_config',
 				'created_at',
 				'updated_at',

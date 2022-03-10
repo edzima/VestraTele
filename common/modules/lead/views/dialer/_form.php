@@ -52,6 +52,14 @@ use yii\widgets\ActiveForm;
 		?>
 
 
+		<?= $form->field($model, 'destination', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])
+			->textInput()->hint(Yii::t('lead', 'When empty: from Source'))
+		?>
+
 	</div>
 
 

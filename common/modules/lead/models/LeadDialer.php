@@ -25,6 +25,7 @@ use yii\helpers\Json;
  * @property string $updated_at
  * @property string|null $last_at
  * @property string|null $dialer_config
+ * @property string|null $destination
  *
  * @property Lead $lead
  * @property LeadDialerType $type
@@ -99,6 +100,7 @@ class LeadDialer extends ActiveRecord {
 			'statusName' => Yii::t('lead', 'Status'),
 			'dialerStatusName' => Yii::t('lead', 'Dialer Status'),
 			'attemptsCount' => Yii::t('lead', 'Attempts Count'),
+			'destination' => Yii::t('lead', 'Destination'),
 		];
 	}
 

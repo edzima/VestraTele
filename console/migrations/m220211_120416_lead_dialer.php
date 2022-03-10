@@ -43,6 +43,7 @@ class m220211_120416_lead_dialer extends Migration {
 			'status' => $this->smallInteger()->notNull(),
 			'last_at' => $this->dateTime()->null(),
 			'dialer_config' => $this->json(),
+			'destination' => $this->string(20)->null(),
 		]);
 
 		$this->addForeignKey(
