@@ -280,5 +280,5 @@ return [
 	'Attempts Count' => 'Połączeń',
 	'Origin' => 'Źródło',
 	'Destination' => 'Cel',
-
+	'Success add Leads: {count} to Dialer.' => 'Dodano {count} Leads do Dialera',
 ];

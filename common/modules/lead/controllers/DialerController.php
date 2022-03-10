@@ -95,7 +95,7 @@ class DialerController extends BaseController {
 			}
 		}
 		if (empty($ids)) {
-			Flash::add(Flash::TYPE_WARNING, 'Ids cannot be blank.');
+			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'Ids cannot be blank.'));
 			return $this->redirect(['lead/index']);
 		}
 		if (count($ids) === 1) {
