@@ -45,7 +45,7 @@ class LeadDialer extends ActiveRecord {
 	public static function toCallStatuses(): array {
 		return [
 			LeadDialerEntity::STATUS_NEW,
-			LeadDialerEntity::STATUS_NOT_ESTABLISH,
+			LeadDialerEntity::STATUS_UNESTABLISHED,
 		];
 	}
 

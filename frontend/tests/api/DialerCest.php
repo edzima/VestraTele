@@ -82,7 +82,7 @@ class DialerCest {
 		$I->sendPost(Url::to([static::ROUTE_ANSWERED, 'id' => 2]));
 		$I->seeRecord(LeadDialer::class, [
 			'id' => 2,
-			'status' => Dialer::STATUS_ESTABLISH,
+			'status' => Dialer::STATUS_ESTABLISHED,
 		]);
 	}
 
@@ -117,7 +117,7 @@ class DialerCest {
 		$I->sendPost(Url::to([static::ROUTE_NOT_ANSWERED, 'id' => 2]));
 		$I->seeRecord(LeadDialer::class, [
 			'id' => 2,
-			'status' => Dialer::STATUS_NOT_ESTABLISH,
+			'status' => Dialer::STATUS_UNESTABLISHED,
 		]);
 
 		$I->sendPost(static::ROUTE_CALLING);
@@ -134,13 +134,13 @@ class DialerCest {
 		$I->amHeaderAuth(static::ACCESS_TOKEN, static::HEADER_AUTH);
 		$I->dontSeeRecord(LeadDialer::class, [
 			'id' => 2,
-			'status' => Dialer::STATUS_ESTABLISH,
+			'status' => Dialer::STATUS_ESTABLISHED,
 		]);
 
 		$I->sendPost(Url::to([static::ROUTE_ANSWERED, 'id' => 2]));
 		$I->seeRecord(LeadDialer::class, [
 			'id' => 2,
-			'status' => Dialer::STATUS_ESTABLISH,
+			'status' => Dialer::STATUS_ESTABLISHED,
 		]);
 
 		$I->seeResponseContainsJson(['success' => true]);
@@ -151,7 +151,7 @@ class DialerCest {
 		$leadDialer = $I->grabRecord(LeadDialer::class, ['id' => 2]);
 		$I->seeRecord(LeadReport::class, [
 			'lead_id' => $leadDialer->lead_id,
-			'status_id' => Dialer::STATUS_ESTABLISH,
+			'status_id' => Dialer::STATUS_ESTABLISHED,
 			'old_status_id' => $leadDialer->lead->status_id,
 		]);
 	}
@@ -161,7 +161,7 @@ class DialerCest {
 		$I->sendPost(Url::to([static::ROUTE_ANSWERED, 'id' => 1]));
 		$I->seeRecord(LeadDialer::class, [
 			'id' => 1,
-			'status' => Dialer::STATUS_ESTABLISH,
+			'status' => Dialer::STATUS_ESTABLISHED,
 		]);
 
 		$I->seeResponseContainsJson(['success' => false]);
@@ -172,7 +172,7 @@ class DialerCest {
 		$leadDialer = $I->grabRecord(LeadDialer::class, ['id' => 1]);
 		$I->dontSeeRecord(LeadReport::class, [
 			'lead_id' => $leadDialer->lead_id,
-			'status_id' => Dialer::STATUS_ESTABLISH,
+			'status_id' => Dialer::STATUS_ESTABLISHED,
 		]);
 	}
 

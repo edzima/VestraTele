@@ -12,7 +12,7 @@ class LeadDialerEntity extends Dialer {
 
 	public const NOT_CALCULATE_STATUS = [
 		self::STATUS_CALLING,
-		self::STATUS_ESTABLISH,
+		self::STATUS_ESTABLISHED,
 	];
 
 	const STATUS_EMPTY_LEAD_PHONE = 5;
@@ -84,10 +84,10 @@ class LeadDialerEntity extends Dialer {
 			case static::STATUS_CALLING:
 				$this->onCallingStatus();
 				break;
-			case static::STATUS_ESTABLISH:
+			case static::STATUS_ESTABLISHED:
 				$this->onEstablish();
 				break;
-			case static::STATUS_NOT_ESTABLISH:
+			case static::STATUS_UNESTABLISHED:
 				$this->onNotEstablish();
 				break;
 		}
@@ -102,11 +102,11 @@ class LeadDialerEntity extends Dialer {
 	}
 
 	protected function onEstablish() {
-		$this->report(static::STATUS_ESTABLISH);
+		$this->report(static::STATUS_ESTABLISHED);
 	}
 
 	protected function onNotEstablish() {
-		$this->report(static::STATUS_NOT_ESTABLISH);
+		$this->report(static::STATUS_UNESTABLISHED);
 	}
 
 	protected function report(int $status): void {

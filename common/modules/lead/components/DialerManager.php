@@ -5,15 +5,18 @@ namespace common\modules\lead\components;
 use common\modules\lead\entities\Dialer;
 use common\modules\lead\entities\DialerInterface;
 use common\modules\lead\models\LeadDialer;
-use common\modules\lead\models\query\LeadDialerQuery;
+use common\modules\lead\models\searches\LeadDialerSearch;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\data\ActiveDataProvider;
 
 class DialerManager extends Component {
 
+	protected const LOG_CATEGORY = 'lead.dialer.manager';
+
 	public $userId;
-	public ?int $type = null;
+	public ?int $typeId = null;
 
 	public function init() {
 		parent::init();
@@ -27,33 +30,41 @@ class DialerManager extends Component {
 
 	public function calling(DialerInterface $dialer): bool {
 		if (!$dialer->shouldCall()) {
+			Yii::warning(static::logMessage('Dialer dont should call', $dialer), static::LOG_CATEGORY);
 			$dialer->updateStatus($dialer->getStatusId());
 			return false;
 		}
+		Yii::debug(static::logMessage('Calling Dialer', $dialer), static::LOG_CATEGORY);
+
 		$dialer->updateStatus(Dialer::STATUS_CALLING);
 		return true;
 	}
 
 	public function establish(DialerInterface $dialer): bool {
-		if ($dialer->getStatusId() !== Dialer::STATUS_ESTABLISH) {
-			$dialer->updateStatus(Dialer::STATUS_ESTABLISH);
-			return true;
+		if ($dialer->getStatusId() !== Dialer::STATUS_CALLING) {
+			Yii::warning(static::logMessage('Only already called Dialer can be established.', $dialer), static::LOG_CATEGORY);
+			return false;
 		}
-		return false;
+		Yii::debug(static::logMessage('Dialer establish.', $dialer), static::LOG_CATEGORY);
+		$dialer->updateStatus(Dialer::STATUS_ESTABLISHED);
+		return true;
 	}
 
 	public function notEstablish(DialerInterface $dialer): bool {
-		if ($dialer->getStatusId() !== Dialer::STATUS_NOT_ESTABLISH) {
-			$dialer->updateStatus(Dialer::STATUS_NOT_ESTABLISH);
-			return true;
+		if ($dialer->getStatusId() !== Dialer::STATUS_CALLING) {
+			Yii::warning(static::logMessage('Only already called Dialer can be unestablished.', $dialer), static::LOG_CATEGORY);
+			return false;
 		}
-		return false;
+		Yii::debug(static::logMessage('Dialer not establish.', $dialer), static::LOG_CATEGORY);
+
+		$dialer->updateStatus(Dialer::STATUS_UNESTABLISHED);
+		return true;
 	}
 
 	public function find(int $id): ?DialerInterface {
 		$model = LeadDialer::find()
 			->userType($this->userId)
-			->andWhere([LeadDialer::tableName() . '.id' => $id])
+			->andWhere([LeadDialer::tableName() . ' . id' => $id])
 			->one();
 		if ($model) {
 			return $model->getDialer();
@@ -62,7 +73,7 @@ class DialerManager extends Component {
 	}
 
 	public function findToCall(bool $updateStatus = true): ?DialerInterface {
-		$query = $this->toCallQuery();
+		$query = $this->getDataProvider()->query;
 		foreach ($query->batch(10) as $rows) {
 			foreach ($rows as $row) {
 				/** @var LeadDialer $row */
@@ -71,6 +82,7 @@ class DialerManager extends Component {
 					return $dialer;
 				}
 				if ($updateStatus) {
+					Yii::debug(static::logMessage('Update Dialer status when find to call.', $dialer), static::LOG_CATEGORY);
 					$dialer->updateStatus($dialer->getStatusId());
 				}
 			}
@@ -78,16 +90,19 @@ class DialerManager extends Component {
 		return null;
 	}
 
-	public function toCallQuery(): LeadDialerQuery {
-		$query = LeadDialer::find()
-			->activeType()
-			->toCall()
-			->userType($this->userId)
-			->joinWith('lead')
-			->joinWith('lead.reports');
-		if ($this->type) {
-			$query->type($this->type);
-		}
-		return $query;
+	public function getDataProvider(): ActiveDataProvider {
+		$searchModel = new LeadDialerSearch();
+		$searchModel->onlyToCall = true;
+		$searchModel->type_id = $this->typeId;
+		$searchModel->typeUserId = $this->userId;
+		return $searchModel->search();
+	}
+
+	protected static function logMessage(string $message, DialerInterface $dialer): array {
+		return [
+			'message' => $message,
+			'id' => $dialer->getID(),
+			'status' => $dialer->getStatusId(),
+		];
 	}
 }

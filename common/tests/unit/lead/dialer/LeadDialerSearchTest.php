@@ -110,11 +110,11 @@ class LeadDialerSearchTest extends Unit {
 			$this->tester->assertSame(Dialer::STATUS_NEW, $model->status);
 		}
 
-		$this->model->status = Dialer::STATUS_ESTABLISH;
+		$this->model->status = Dialer::STATUS_ESTABLISHED;
 		$models = $this->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
-			$this->tester->assertSame(Dialer::STATUS_ESTABLISH, $model->status);
+			$this->tester->assertSame(Dialer::STATUS_ESTABLISHED, $model->status);
 		}
 	}
 

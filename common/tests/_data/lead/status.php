@@ -22,17 +22,17 @@ return [
 		'name' => 'Not Answered',
 		'short_report' => true,
 		'not_for_dialer' => false,
-		'id' => Dialer::STATUS_NOT_ESTABLISH,
+		'id' => Dialer::STATUS_UNESTABLISHED,
 	],
 	[
 		'name' => 'Establish',
 		'short_report' => true,
-		'not_for_dialer' => false,
-		'id' => Dialer::STATUS_ESTABLISH,
+		'not_for_dialer' => true,
+		'id' => Dialer::STATUS_ESTABLISHED,
 	],
 	[
 		'name' => 'Calling',
-		'not_for_dialer' => false,
+		'not_for_dialer' => true,
 		'id' => Dialer::STATUS_CALLING,
 	],
 ];

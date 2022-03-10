@@ -18,4 +18,9 @@ return [
 		'status' => LeadDialerType::STATUS_DELETED,
 		'user_id' => 2,
 	],
+	[
+		'name' => 'Dialer Second Active',
+		'status' => LeadDialerType::STATUS_ACTIVE,
+		'user_id' => 1,
+	],
 ];

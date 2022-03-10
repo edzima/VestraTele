@@ -72,6 +72,13 @@ return [
 		'date_at' => '2020-01-01',
 		'data' => '[]',
 	],
-
+	'new-with-phone-and-source-with-phone' => [
+		'name' => 'Tommy Back',
+		'source_id' => 3,
+		'status_id' => LeadStatusInterface::STATUS_NEW,
+		'phone' => '551 122 122',
+		'date_at' => '2020-01-01',
+		'data' => '[]',
+	],
 ];
 

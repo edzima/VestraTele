@@ -8,7 +8,7 @@ return [
 		'lead_id' => 1,
 		'type_id' => 1,
 		'priority' => LeadDialer::PRIORITY_MEDIUM,
-		'status' => Dialer::STATUS_ESTABLISH,
+		'status' => Dialer::STATUS_ESTABLISHED,
 	],
 	[
 		'lead_id' => 2,
@@ -24,13 +24,25 @@ return [
 		'last_at' => strtotime('2020-01-01'),
 	],
 	[
+		'lead_id' => 1,
+		'type_id' => 4,
+		'priority' => LeadDialer::PRIORITY_MEDIUM,
+		'status' => Dialer::STATUS_UNESTABLISHED,
+	],
+	[
 		'lead_id' => 2,
 		'type_id' => 2,
 		'priority' => LeadDialer::PRIORITY_MEDIUM,
 		'status' => Dialer::STATUS_NEW,
 	],
 	[
-		'lead_id' => 3,
+		'lead_id' => 4,
+		'type_id' => 1,
+		'priority' => LeadDialer::PRIORITY_MEDIUM,
+		'status' => Dialer::STATUS_NEW,
+	],
+	[
+		'lead_id' => 7,
 		'type_id' => 1,
 		'priority' => LeadDialer::PRIORITY_MEDIUM,
 		'status' => Dialer::STATUS_NEW,
