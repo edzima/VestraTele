@@ -1,5 +1,6 @@
 <?php
 
+use common\models\user\User;
 use common\modules\lead\models\LeadDialer;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
