@@ -2,7 +2,9 @@
 
 namespace common\modules\lead\widgets;
 
+use common\models\user\User;
 use common\modules\lead\models\Lead;
+use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -42,6 +44,11 @@ class LeadDialersGridView extends GridView {
 			'statusName',
 			'dialerStatusName',
 			'last_at:datetime',
+			[
+				'class' => ActionColumn::class,
+				'controller' => '/lead/dialer',
+				'visible' => Yii::$app->user->can(User::PERMISSION_LEAD_DIALER_MANAGER),
+			],
 		];
 	}
 
