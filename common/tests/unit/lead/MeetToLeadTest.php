@@ -2,8 +2,8 @@
 
 namespace common\tests\unit\lead;
 
+use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\LeadFixtureHelper;
-use common\fixtures\issue\TypeFixture;
 use common\models\issue\IssueMeet;
 use common\modules\lead\components\LeadManager;
 use common\modules\lead\models\ActiveLead;
@@ -14,6 +14,9 @@ use common\tests\unit\Unit;
 use console\components\MeetToLeadCreator;
 use yii\helpers\Json;
 
+/**
+ * @deprecated
+ */
 class MeetToLeadTest extends Unit {
 
 	private array $creatorConfig = [
@@ -35,14 +38,10 @@ class MeetToLeadTest extends Unit {
 
 	public function _fixtures(): array {
 		return
-			array_merge([
-				'issue-type' => [
-					'class' => TypeFixture::class,
-					'dataFile' => codecept_data_dir() . 'issue/type.php',
-				],
-			],
-				LeadFixtureHelper::campaign(),
+			array_merge(
+				IssueFixtureHelper::types(),
 				LeadFixtureHelper::leads(),
+				LeadFixtureHelper::campaign(),
 				LeadFixtureHelper::question(),
 			);
 	}

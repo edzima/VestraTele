@@ -36,13 +36,19 @@ return [
 		'status' => Dialer::STATUS_NEW,
 	],
 	[
-		'lead_id' => 4,
+		'lead_id' => 8,
 		'type_id' => 1,
 		'priority' => LeadDialer::PRIORITY_MEDIUM,
 		'status' => Dialer::STATUS_NEW,
 	],
 	[
 		'lead_id' => 7,
+		'type_id' => 1,
+		'priority' => LeadDialer::PRIORITY_MEDIUM,
+		'status' => Dialer::STATUS_NEW,
+	],
+	[
+		'lead_id' => 3,
 		'type_id' => 1,
 		'priority' => LeadDialer::PRIORITY_MEDIUM,
 		'status' => Dialer::STATUS_NEW,

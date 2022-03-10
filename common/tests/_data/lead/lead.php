@@ -25,12 +25,6 @@ return [
 		'provider' => Lead::PROVIDER_FORM,
 		'data' => '[]',
 	],
-	'agree' => [
-		'name' => 'John',
-		'source_id' => 1,
-		'status_id' => 2,
-		'data' => '{"external_id":2, "agree" :"2020-01-01"}',
-	],
 	'equal-accident-phone-from-other-source-and-archive' => [
 		'name' => 'John2',
 		'source_id' => 2,
@@ -79,6 +73,12 @@ return [
 		'phone' => '551 122 122',
 		'date_at' => '2020-01-01',
 		'data' => '[]',
+	],
+	'agree' => [
+		'name' => 'John',
+		'source_id' => 1,
+		'status_id' => 2,
+		'data' => '{"external_id":2, "agree" :"2020-01-01"}',
 	],
 ];
 

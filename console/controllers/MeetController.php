@@ -13,6 +13,9 @@ use console\components\MeetToLeadCreator;
 use yii\console\Controller;
 use yii\helpers\Console;
 
+/**
+ * @deprecated
+ */
 class MeetController extends Controller {
 
 	public function actionEmptyPhone(): void {

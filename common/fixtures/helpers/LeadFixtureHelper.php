@@ -25,18 +25,18 @@ use yii\test\ActiveFixture;
 
 class LeadFixtureHelper extends BaseFixtureHelper {
 
-	public const LEAD = 'lead';
-	public const TYPE = 'type';
-	private const STATUS = 'status';
-	private const SOURCE = 'source';
+	public const LEAD = 'lead.lead';
+	public const TYPE = 'lead.type';
+	private const STATUS = 'lead.status';
+	private const SOURCE = 'lead.source';
 
-	private const REPORT = 'report';
-	private const QUESTION = 'question';
-	private const USER = 'user';
-	private const LEAD_USER = 'lead-user';
-	private const REMINDER = 'reminder';
-	private const LEAD_REMINDER = 'lead-reminder';
-	private const ANSWER = 'answer';
+	private const REPORT = 'lead.report';
+	private const QUESTION = 'lead.question';
+	private const USER = 'lead.user';
+	private const LEAD_USER = 'lead.lead-user';
+	private const REMINDER = 'lead.reminder';
+	private const LEAD_REMINDER = 'lead.lead-reminder';
+	private const ANSWER = 'lead.answer';
 	private const DIALER = 'lead.dialer';
 	private const DIALER_TYPE = 'lead.dialer-type';
 

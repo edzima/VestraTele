@@ -41,6 +41,7 @@ class LeadDialerEntityTest extends Unit {
 			'name' => 'For Dialer, Make CALL!',
 			'not_for_dialer' => false,
 		]);
+		LeadStatus::getModels(true);
 
 		parent::_before();
 	}
