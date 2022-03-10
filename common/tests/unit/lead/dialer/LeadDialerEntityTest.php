@@ -77,6 +77,19 @@ class LeadDialerEntityTest extends Unit {
 		$this->assertSameStatus(LeadDialerEntity::STATUS_EMPTY_LEAD_SOURCE_DIALER_PHONE);
 	}
 
+	public function testLeadSourceAndDialerWithoutDestination(): void {
+		$source = $this->tester->grabRecord(LeadSource::class, [
+			'dialer_phone' => null,
+		]);
+		$leadDialer = $this->haveLeadDialer(
+			$this->haveLead(['source_id' => $source->id])
+		);
+
+		$this->giveEntity($leadDialer);
+		$this->tester->assertEmpty($this->entity->getDestination());
+		$this->assertSameStatus(LeadDialerEntity::STATUS_EMPTY_LEAD_SOURCE_DIALER_PHONE);
+	}
+
 	public function testCurrentLeadStatusNotForDialer(): void {
 		$leadDialer = $this->haveLeadDialer(
 			$this->haveLead(['status_id' => $this->leadStatusNotForDialer])

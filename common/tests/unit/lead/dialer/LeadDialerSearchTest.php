@@ -118,6 +118,18 @@ class LeadDialerSearchTest extends Unit {
 		}
 	}
 
+	public function testDialerEmpty(): void {
+		$this->model->dialerDestination = LeadDialerSearch::DESTINATION_EMPTY;
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertTrue(
+				empty($model->destination)
+				|| empty($model->lead->getSource()->getDialerPhone())
+			);
+		}
+	}
+
 	protected function createModel(): LeadDialerSearch {
 		return new LeadDialerSearch();
 	}
