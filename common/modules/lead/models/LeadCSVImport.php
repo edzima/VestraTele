@@ -58,6 +58,7 @@ class LeadCSVImport extends Model {
 		return [
 			[['source_id', 'status_id', 'phoneColumn', 'csvDelimiter', 'startFromLine'], 'required'],
 			[['phoneColumn', 'nameColumn', 'dateColumn', 'startFromLine'], 'integer', 'min' => 0],
+			[['nameColumn', 'dateColumn'], 'default', 'null'],
 			[['source_id', 'status_id'], 'integer'],
 			[
 				'!csvFile',
@@ -129,10 +130,13 @@ class LeadCSVImport extends Model {
 			[
 				'attribute' => 'name',
 				'value' => function (array $line) {
-					$name = $line[$this->nameColumn] ?? null;
-					if (!empty($name)) {
-						return $name;
+					if (is_int($this->nameColumn)) {
+						$name = $line[$this->nameColumn] ?? null;
+						if (!empty($name)) {
+							return $name;
+						}
 					}
+
 					return $this->csvFile->getBaseName() . '.' . $this->index;
 				},
 			],
