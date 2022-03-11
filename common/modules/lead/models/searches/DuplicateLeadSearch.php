@@ -27,7 +27,7 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 
 	public function rules(): array {
 		return [
-			[['status', 'name', 'phone', 'provider'], 'string'],
+			[['status', 'name', 'phone', 'provider', 'date_at'], 'string'],
 			[['status_id', 'type_id', 'source_id'], 'integer'],
 			['onlyDialers', 'boolean'],
 		];
@@ -58,6 +58,11 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 			->andFilterWhere(['duplicateLead.source_id' => $this->source_id])
 			->andFilterWhere(['like', 'duplicateLead.name', $this->name])
 			->having('COUNT(*) >1');
+
+		if (!empty($this->date_at)) {
+			$sub->andWhere(['>', 'date_at', date('Y-m-d 00:00:00', strtotime($this->date_at))]);
+			$sub->andWhere(['<', 'date_at', date('Y-m-d 23:59:59', strtotime($this->date_at))]);
+		}
 
 		if (!empty($this->type_id)) {
 			$sub->type($this->type_id);
