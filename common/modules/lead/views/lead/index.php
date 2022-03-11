@@ -225,6 +225,26 @@ if ($multipleForm) {
 					: ''
 				?>
 
+
+				<?= Yii::$app->user->can(User::PERMISSION_LEAD_DELETE)
+					?
+					Html::a(
+						Yii::t('lead', 'Delete'),
+						['delete-multiple'],
+						[
+							'class' => 'btn btn-danger',
+							'data' => [
+								'method' => 'POST',
+								'confirm' => Yii::t('lead', 'Are you sure you want to delete this items?'),
+								'params' => [
+									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
+								],
+							],
+						])
+
+					: ''
+				?>
+
 			</div>
 
 		<?php endif; ?>

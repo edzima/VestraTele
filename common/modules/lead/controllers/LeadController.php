@@ -33,6 +33,7 @@ class LeadController extends BaseController {
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'delete-multiple' => ['POST'],
 				],
 			],
 			'selection' => [
@@ -304,6 +305,14 @@ class LeadController extends BaseController {
 	public function actionDelete(int $id) {
 		$this->findLead($id)->delete();
 
+		return $this->redirect(['index']);
+	}
+
+	public function actionDeleteMultiple() {
+		$ids = Yii::$app->request->post('ids') ?: Yii::$app->request->post('selection');
+		if (!empty($ids)) {
+			Lead::deleteAll(['id' => $ids]);
+		}
 		return $this->redirect(['index']);
 	}
 
