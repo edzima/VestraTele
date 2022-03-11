@@ -58,7 +58,7 @@ class LeadCSVImport extends Model {
 		return [
 			[['source_id', 'status_id', 'phoneColumn', 'csvDelimiter', 'startFromLine'], 'required'],
 			[['phoneColumn', 'nameColumn', 'dateColumn', 'startFromLine'], 'integer', 'min' => 0],
-			[['nameColumn', 'dateColumn'], 'default', 'value' => 'null'],
+			[['nameColumn', 'dateColumn'], 'default', 'value' => null],
 			[['source_id', 'status_id'], 'integer'],
 			[
 				'!csvFile',
