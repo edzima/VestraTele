@@ -31,8 +31,8 @@ class LeadDialerType extends ActiveRecord {
 
 	public static function getTypesNames(): array {
 		return [
-			static::TYPE_EXTENSION => Yii::t('lead', 'Extension'),
 			static::TYPE_QUEUE => Yii::t('lead', 'Queue'),
+			static::TYPE_EXTENSION => Yii::t('lead', 'Extension'),
 		];
 	}
 
