@@ -12,7 +12,6 @@ class LeadDialerEntity extends Dialer {
 
 	public const NOT_CALCULATE_STATUS = [
 		self::STATUS_CALLING,
-		self::STATUS_ESTABLISHED,
 	];
 
 	const STATUS_EMPTY_LEAD_PHONE = 5;
