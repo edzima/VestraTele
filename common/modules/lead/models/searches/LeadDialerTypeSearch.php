@@ -58,10 +58,12 @@ class LeadDialerTypeSearch extends LeadDialerType {
 		$query->andFilterWhere([
 			'id' => $this->id,
 			'status' => $this->status,
+			'type' => $this->type,
 			'user_id' => $this->user_id,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name]);
+		$query->andFilterWhere(['like', 'did', $this->did]);
 
 		return $dataProvider;
 	}
