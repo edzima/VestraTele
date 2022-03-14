@@ -284,4 +284,6 @@ return [
 	'Only Dialers' => 'Tylko Dialer',
 	'When empty: from Source' => 'Kiedy pusty: z Źródła',
 	'Without Destination' => 'Brak',
+	'Queue' => 'Kolejka',
+	'Extension' => 'Wewnętrzny',
 ];

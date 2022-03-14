@@ -38,6 +38,12 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Types');
 				'filter' => LeadDialerTypeSearch::getStatusesNames(),
 			],
 			[
+				'attribute' => 'type',
+				'value' => 'typeName',
+				'filter' => LeadDialerTypeSearch::getTypesNames(),
+			],
+			'did',
+			[
 				'attribute' => 'user_id',
 				'value' => 'user',
 				'filter' => LeadDialerTypeSearch::getUsersNames(),

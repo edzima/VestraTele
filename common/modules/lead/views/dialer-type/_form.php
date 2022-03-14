@@ -7,7 +7,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\modules\lead\models\LeadDialerType */
+/* @var $model LeadDialerType */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -20,6 +20,10 @@ use yii\widgets\ActiveForm;
 	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'status')->dropDownList(LeadDialerType::getStatusesNames()) ?>
+
+	<?= $form->field($model, 'type')->dropDownList(LeadDialerType::getTypesNames()) ?>
+
+	<?= $form->field($model, 'did')->textInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'user_id')->widget(Select2::class, [
 		'data' => User::getSelectList(

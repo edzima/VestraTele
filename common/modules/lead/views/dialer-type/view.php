@@ -36,6 +36,8 @@ YiiAsset::register($this);
 			'id',
 			'name',
 			'statusName',
+			'typeName',
+			'did',
 			'user',
 		],
 	]) ?>

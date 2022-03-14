@@ -1,9 +1,10 @@
 <?php
 
+use common\modules\lead\models\LeadDialerType;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model common\modules\lead\models\LeadDialerType */
+/* @var $model LeadDialerType */
 
 $this->title = Yii::t('lead', 'Create Lead Dialer Type');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];

@@ -18,8 +18,10 @@ class m220211_120416_lead_dialer extends Migration {
 		$this->createTable('{{%lead_dialer_type}}', [
 			'id' => $this->primaryKey(),
 			'name' => $this->string()->notNull()->unique(),
-			'status' => $this->smallInteger()->notNull(),
+			'status' => $this->tinyInteger()->notNull(),
+			'type' => $this->tinyInteger()->notNull(),
 			'user_id' => $this->integer()->notNull(),
+			'did' => $this->smallInteger()->unsigned(),
 		]);
 		/** @var ActiveRecord $userClass */
 		$userClass = Module::userClass();

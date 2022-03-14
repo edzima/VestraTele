@@ -14,6 +14,8 @@ use yii\db\ActiveRecord;
  * @property string $name
  * @property int $status
  * @property int $user_id
+ * @property int $type
+ * @property int $did
  *
  * @property LeadDialer[] $leadDialers
  * @property User $user
@@ -23,6 +25,16 @@ class LeadDialerType extends ActiveRecord {
 	public const STATUS_ACTIVE = 1;
 	public const STATUS_INACTIVE = 0;
 	public const STATUS_DELETED = 2;
+
+	public const TYPE_EXTENSION = 1;
+	public const TYPE_QUEUE = 10;
+
+	public static function getTypesNames(): array {
+		return [
+			static::TYPE_EXTENSION => Yii::t('lead', 'Extension'),
+			static::TYPE_QUEUE => Yii::t('lead', 'Queue'),
+		];
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -36,11 +48,12 @@ class LeadDialerType extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['name', 'status', 'user_id'], 'required'],
-			[['status', 'user_id'], 'integer'],
+			[['name', 'status', 'user_id', 'type'], 'required'],
+			[['status', 'user_id', 'did', 'type'], 'integer'],
 			[['name'], 'string', 'max' => 255],
 			[['name'], 'unique'],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 		];
 	}
@@ -55,6 +68,9 @@ class LeadDialerType extends ActiveRecord {
 			'status' => Yii::t('lead', 'Status'),
 			'statusName' => Yii::t('lead', 'Status'),
 			'user_id' => Yii::t('lead', 'User ID'),
+			'type' => Yii::t('lead', 'Type'),
+			'typeName' => Yii::t('lead', 'Type'),
+			'did' => Yii::t('lead', 'DID'),
 		];
 	}
 
@@ -78,6 +94,10 @@ class LeadDialerType extends ActiveRecord {
 
 	public function getStatusName(): string {
 		return static::getStatusesNames()[$this->status];
+	}
+
+	public function getTypeName(): string {
+		return static::getTypesNames()[$this->type];
 	}
 
 	public static function getStatusesNames(): array {

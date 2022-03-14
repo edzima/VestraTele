@@ -17,7 +17,7 @@ class LeadDialerTypeSearch extends LeadDialerType {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'status', 'user_id'], 'integer'],
+			[['id', 'status', 'user_id', 'type', 'did'], 'integer'],
 			[['name'], 'safe'],
 		];
 	}
