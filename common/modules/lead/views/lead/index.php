@@ -45,6 +45,7 @@ $multipleForm = empty($searchModel->dialer_id)
 	&& ($assignUsers
 		|| Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
 		|| Yii::$app->user->can(User::PERMISSION_LEAD_STATUS)
+		|| Yii::$app->user->can(User::PERMISSION_LEAD_DIALER_MANAGER)
 	);
 
 if ($multipleForm) {
@@ -66,8 +67,8 @@ if ($multipleForm) {
 
 		<?= Html::a(Yii::t('lead', 'Lead Reminders'), ['reminder/index'], ['class' => 'btn btn-danger']) ?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_DIALER)
-			? Html::a(Yii::t('lead', 'Dialers'), ['dialer-lead/index'], ['class' => 'btn btn-primary'])
+		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_DIALER_MANAGER)
+			? Html::a(Yii::t('lead', 'Dialers'), ['dialer/index'], ['class' => 'btn btn-primary'])
 			: ''
 		?>
 
@@ -192,6 +193,55 @@ if ($multipleForm) {
 								],
 							],
 						])
+					: ''
+				?>
+
+				<?= Yii::$app->user->can(User::PERMISSION_LEAD_DIALER_MANAGER)
+					? Html::submitButton(
+						Yii::t('lead', 'Assign to Dialer'),
+						[
+							'class' => 'btn btn-primary',
+							'name' => 'route',
+							'value' => 'dialer/create-multiple',
+						])
+					: ''
+				?>
+
+				<?= Yii::$app->user->can(User::PERMISSION_LEAD_DIALER_MANAGER)
+				&& $dataProvider->pagination->pageCount > 1
+
+					? Html::a(
+						Yii::t('lead', 'Assign to Dialer ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
+						['dialer/create-multiple'],
+						[
+							'class' => 'btn btn-primary',
+							'data' => [
+								'method' => 'POST',
+								'params' => [
+									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
+								],
+							],
+						])
+					: ''
+				?>
+
+
+				<?= Yii::$app->user->can(User::PERMISSION_LEAD_DELETE)
+					?
+					Html::a(
+						Yii::t('lead', 'Delete'),
+						['delete-multiple'],
+						[
+							'class' => 'btn btn-danger',
+							'data' => [
+								'method' => 'POST',
+								'confirm' => Yii::t('lead', 'Are you sure you want to delete this items?'),
+								'params' => [
+									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
+								],
+							],
+						])
+
 					: ''
 				?>
 

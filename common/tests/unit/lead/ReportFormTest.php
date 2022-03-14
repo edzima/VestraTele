@@ -369,6 +369,7 @@ class ReportFormTest extends Unit {
 
 	private function giveForm(array $config): void {
 		$this->model = new ReportForm($config);
+		$this->model->withAddress = false;
 	}
 
 	private function thenSeeLead(array $attributes): void {

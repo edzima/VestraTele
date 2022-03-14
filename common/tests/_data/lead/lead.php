@@ -4,6 +4,7 @@ use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadStatusInterface;
 
 return [
+
 	'new-wordpress-accident' => [
 		'name' => 'John',
 		'source_id' => 1,
@@ -16,7 +17,7 @@ return [
 	],
 	'equal-accident-phone-from-other-source' => [
 		'name' => 'John2',
-		'source_id' => 2,
+		'source_id' => 3,
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
 		'email' => 'test@lead.com',
@@ -64,6 +65,20 @@ return [
 		'status_id' => LeadStatusInterface::STATUS_NEW,
 		'date_at' => '2020-01-01',
 		'data' => '[]',
+	],
+	'new-with-phone-and-source-with-phone' => [
+		'name' => 'Tommy Back',
+		'source_id' => 3,
+		'status_id' => LeadStatusInterface::STATUS_NEW,
+		'phone' => '551 122 122',
+		'date_at' => '2020-01-01',
+		'data' => '[]',
+	],
+	'agree' => [
+		'name' => 'John',
+		'source_id' => 1,
+		'status_id' => 2,
+		'data' => '{"external_id":2, "agree" :"2020-01-01"}',
 	],
 ];
 

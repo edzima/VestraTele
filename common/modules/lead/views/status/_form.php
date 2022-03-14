@@ -19,6 +19,8 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
 
+	<?= $form->field($model, 'not_for_dialer')->checkbox() ?>
+
 	<?= $form->field($model, 'short_report')->checkbox() ?>
 
 	<?= $form->field($model, 'show_report_in_lead_index')->checkbox() ?>

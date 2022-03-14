@@ -3,11 +3,11 @@
 namespace common\tests\unit\lead;
 
 use common\fixtures\helpers\LeadFixtureHelper;
+use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadMultipleSmsForm;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
 use console\jobs\LeadSmsSendJob;
-use Yii;
 
 class LeadMultipleSmsFormTest extends Unit {
 
@@ -47,7 +47,7 @@ class LeadMultipleSmsFormTest extends Unit {
 
 	public function testFromIds(): void {
 		$this->giveModel([
-			'ids' => [1, 3, 5],
+			'ids' => [1, $this->tester->grabRecord(Lead::class, ['phone' => null]), 5],
 			'status_id' => 2,
 			'message' => 'Message for #1 and #2',
 		]);

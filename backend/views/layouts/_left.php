@@ -78,9 +78,9 @@ $user = Yii::$app->user;
 						],
 						[
 							'label' => Yii::t('lead', 'Dialers'),
-							'url' => ['/lead/dialer-lead/index'],
+							'url' => ['/lead/dialer/index'],
 							'icon' => '<i class="fa fa-phone"></i>',
-							'visible' => $user->can(Worker::PERMISSION_LEAD_DIALER),
+							'visible' => $user->can(Worker::PERMISSION_LEAD_DIALER_MANAGER),
 						],
 						[
 							'label' => Yii::t('lead', 'Import Leads'),

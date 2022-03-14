@@ -33,6 +33,7 @@ class LeadController extends BaseController {
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'delete-multiple' => ['POST'],
 				],
 			],
 			'selection' => [
@@ -102,15 +103,6 @@ class LeadController extends BaseController {
 				'columns' => $columns,
 			]);
 			return $exporter->export()->send('lead.csv');
-		}
-
-		if (!$this->module->onlyUser && !empty($searchModel->dialer_id)) {
-			$dialer = $this->module->getDialer();
-			if ($dialer) {
-				$dialer->userId = $searchModel->dialer_id;
-				$dataProvider->query = $dialer->notAnsweredLeadsQuery();
-				$dataProvider->sort->defaultOrder = [];
-			}
 		}
 
 		return $this->render('index', [
@@ -313,6 +305,14 @@ class LeadController extends BaseController {
 	public function actionDelete(int $id) {
 		$this->findLead($id)->delete();
 
+		return $this->redirect(['index']);
+	}
+
+	public function actionDeleteMultiple() {
+		$ids = Yii::$app->request->post('ids') ?: Yii::$app->request->post('selection');
+		if (!empty($ids)) {
+			Lead::deleteAll(['id' => $ids]);
+		}
 		return $this->redirect(['index']);
 	}
 

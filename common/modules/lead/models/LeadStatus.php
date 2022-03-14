@@ -16,6 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null $sort_index
  * @property int|null $short_report
  * @property int|null $show_report_in_lead_index
+ * @property int|null $not_for_dialer
  *
  * @property Lead[] $leads
  */
@@ -41,7 +42,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 		return [
 			[['name'], 'required'],
 			[['sort_index'], 'integer'],
-			[['short_report', 'show_report_in_lead_index'], 'boolean'],
+			[['short_report', 'show_report_in_lead_index', 'not_for_dialer'], 'boolean'],
 			[['name', 'description'], 'string', 'max' => 255],
 		];
 	}
@@ -57,6 +58,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			'sort_index' => Yii::t('lead', 'Sort Index'),
 			'short_report' => Yii::t('lead', 'Short Report'),
 			'show_report_in_lead_index' => Yii::t('lead', 'Show Report In Lead Index'),
+			'not_for_dialer' => Yii::t('lead', 'Not for Dialer'),
 		];
 	}
 
@@ -85,6 +87,10 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 				->all();
 		}
 		return static::$models;
+	}
+
+	public static function notForDialer(int $id): bool {
+		return (bool) static::getModels()[$id]->not_for_dialer;
 	}
 
 	public function getId(): int {

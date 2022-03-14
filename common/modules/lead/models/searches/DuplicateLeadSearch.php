@@ -5,6 +5,7 @@ namespace common\modules\lead\models\searches;
 use common\models\SearchModel;
 use common\modules\lead\models\DuplicateLead;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadDialer;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadStatusInterface;
@@ -22,16 +23,24 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 	public $status;
 	public $type_id;
 
+	public $onlyDialers;
+
 	public function rules(): array {
 		return [
-			[['status', 'name', 'phone', 'provider'], 'string'],
+			[['status', 'name', 'phone', 'provider', 'date_at'], 'string'],
 			[['status_id', 'type_id', 'source_id'], 'integer'],
+			['onlyDialers', 'boolean'],
 		];
+	}
+
+	public function attributeLabels(): array {
+		return parent::attributeLabels() + [
+				'onlyDialers' => Yii::t('lead', 'Only Dialers'),
+			];
 	}
 
 	public function search(array $params): ActiveDataProvider {
 		$this->load($params);
-
 		$sub = Lead::find()
 			->alias('duplicateLead')
 			->addSelect([
@@ -50,6 +59,11 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 			->andFilterWhere(['like', 'duplicateLead.name', $this->name])
 			->having('COUNT(*) >1');
 
+		if (!empty($this->date_at)) {
+			$sub->andWhere(['>', 'date_at', date('Y-m-d 00:00:00', strtotime($this->date_at))]);
+			$sub->andWhere(['<', 'date_at', date('Y-m-d 23:59:59', strtotime($this->date_at))]);
+		}
+
 		if (!empty($this->type_id)) {
 			$sub->type($this->type_id);
 		}
@@ -66,6 +80,10 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 			->andWhere('duplicateLead.id <> sameLead.id')
 			->distinct();
 
+		if ($this->onlyDialers) {
+			$query->joinWith('dialers');
+			$query->andWhere(LeadDialer::tableName() . '.id IS NOT NULL');
+		}
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
 			'sort' => [

@@ -1,6 +1,8 @@
 <?php
 
+use common\models\user\User;
 use common\modules\lead\models\searches\DuplicateLeadSearch;
+use common\widgets\DateWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -26,7 +28,31 @@ use yii\widgets\ActiveForm;
 		])->dropDownList(
 			DuplicateLeadSearch::getStatusFilterNames(), [
 			'prompt' => Yii::t('lead', 'Select...'),
-		]) ?>
+		])
+		?>
+
+
+		<?= $form->field($model, 'date_at', [
+			'options' => [
+				'class' => [
+					'col-md-2',
+				],
+			],
+		])->widget(DateWidget::class)
+		?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_LEAD_DIALER_MANAGER)
+			? $form->field($model, 'onlyDialers', [
+				'options' => [
+					'class' => [
+						'col-md-2',
+					],
+				],
+			])->checkbox()
+			: ''
+		?>
+
+
 	</div>
 
 	<div class="form-group">

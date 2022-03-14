@@ -1,7 +1,7 @@
 <?php
 
 use common\models\user\User;
-use common\modules\lead\components\LeadDialer;
+use common\modules\lead\components\LeadDialerManager;
 use common\modules\lead\Module;
 use yii\helpers\ArrayHelper;
 
@@ -27,7 +27,7 @@ return [
 				return ArrayHelper::map(User::find()->asArray()->all(), 'id', 'username');
 			},
 			'dialer' => [
-				'class' => LeadDialer::class,
+				'class' => LeadDialerManager::class,
 				'callingStatus' => 2,
 				'notAnsweredStatus' => 3,
 				'answeredStatus' => 4,

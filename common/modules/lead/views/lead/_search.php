@@ -1,9 +1,9 @@
 <?php
 
-use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadSearch;
 use common\widgets\ActiveForm;
 use common\widgets\address\AddressSearchWidget;
+use common\widgets\DateWidget;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 
@@ -61,18 +61,6 @@ use yii\helpers\Html;
 			])
 			?>
 
-			<?php
-			$dialers = LeadSearch::getUsersNames(LeadUser::TYPE_DIALER);
-			if (!empty($dialers)) {
-				echo $form->field($model, 'dialer_id', ['options' => ['class' => 'col-md-3 col-lg-1']])->widget(Select2::class, [
-					'data' => $dialers,
-					'pluginOptions' => [
-						'placeholder' => $model->getAttributeLabel('dialer_id'),
-						'allowClear' => true,
-					],
-				]);
-			}
-			?>
 
 			<?= $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
@@ -105,6 +93,25 @@ use yii\helpers\Html;
 
 	</div>
 
+	<div class="row">
+		<?= $form->field($model, 'from_at', [
+			'options' => [
+				'class' => [
+					'col-md-3 col-lg-2',
+				],
+			],
+		])->widget(DateWidget::class)
+		?>
+
+		<?= $form->field($model, 'to_at', [
+			'options' => [
+				'class' => [
+					'col-md-3 col-lg-2',
+				],
+			],
+		])->widget(DateWidget::class)
+		?>
+	</div>
 
 	<?= AddressSearchWidget::widget([
 		'form' => $form,

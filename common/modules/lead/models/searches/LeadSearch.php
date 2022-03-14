@@ -6,6 +6,7 @@ use common\models\AddressSearch;
 use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\models\user\User;
+use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadReport;
@@ -21,7 +22,6 @@ use Yii;
 use yii\base\Model;
 use yii\base\UnknownPropertyException;
 use yii\data\ActiveDataProvider;
-use common\modules\lead\models\Lead;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
@@ -35,8 +35,6 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private const QUESTION_ATTRIBUTE_PREFIX = 'question';
 
-	public $dialer_id;
-
 	public bool $withoutUser = false;
 	public bool $withoutReport = false;
 	public bool $duplicateEmail = false;
@@ -48,6 +46,9 @@ class LeadSearch extends Lead implements SearchModel {
 	public $user_id;
 	public $user_type;
 	public $type_id;
+
+	public $from_at;
+	public $to_at;
 
 	public string $reportsDetails = '';
 
@@ -73,7 +74,7 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'status_id', 'type_id', 'source_id', 'campaign_id', 'dialer_id'], 'integer'],
+			[['id', 'status_id', 'type_id', 'source_id', 'campaign_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
 			[['withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail'], 'boolean'],
@@ -82,6 +83,7 @@ class LeadSearch extends Lead implements SearchModel {
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
+			[['from_at', 'to_at'], 'safe'],
 			[array_keys($this->questionsAttributes), 'safe'],
 			['phone', PhoneValidator::class],
 		];
@@ -95,11 +97,12 @@ class LeadSearch extends Lead implements SearchModel {
 				'withoutUser' => Yii::t('lead', 'Without User'),
 				'withoutReport' => Yii::t('lead', 'Without Report'),
 				'user_id' => Yii::t('lead', 'User'),
-				'dialer_id' => Yii::t('lead', 'Dialer'),
 				'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 				'duplicateEmail' => Yii::t('lead', 'Duplicate Email'),
 				'duplicatePhone' => Yii::t('lead', 'Duplicate Phone'),
 				'user_type' => Yii::t('lead', 'Type'),
+				'from_at' => Yii::t('lead', 'From At'),
+				'to_at' => Yii::t('lead', 'To At'),
 			]
 		);
 	}
@@ -189,6 +192,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 		$this->applyAddressFilter($query);
 		$this->applyAnswerFilter($query);
+		$this->applyDateFilter($query);
 		$this->applyDuplicates($query);
 		$this->applyNameFilter($query);
 		$this->applyUserFilter($query);
@@ -310,6 +314,10 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 	}
 
+	private function applyDuplicatePhoneFilter(ActiveQuery $query): void {
+
+	}
+
 	private function applyNameFilter(ActiveQuery $query) {
 		if (!empty($this->name)) {
 			$query->andFilterWhere(['like', Lead::tableName() . '.name', $this->name]);
@@ -393,6 +401,15 @@ class LeadSearch extends Lead implements SearchModel {
 			$query->andWhere(['<>', Lead::tableName() . '.status_id', LeadStatusInterface::STATUS_ARCHIVE]);
 		}
 		$query->andFilterWhere([Lead::tableName() . '.status_id' => $this->status_id]);
+	}
+
+	private function applyDateFilter(LeadQuery $query) {
+		if (!empty($this->from_at)) {
+			$query->andWhere(['>=', Lead::tableName() . '.date_at', date('Y-m-d 00:00:00', strtotime($this->from_at))]);
+		}
+		if (!empty($this->to_at)) {
+			$query->andWhere(['<=', Lead::tableName() . '.date_at', date('Y-m-d 23:59:59', strtotime($this->to_at))]);
+		}
 	}
 
 }

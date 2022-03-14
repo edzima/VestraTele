@@ -6,12 +6,12 @@ use common\models\user\User;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadCampaign;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\query\LeadReportQuery;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\modules\lead\models\LeadReport;
 use yii\db\ActiveQuery;
 use yii\db\Query;
 
@@ -119,6 +119,7 @@ class LeadReportSearch extends LeadReport {
 			Lead::tableName() . '.campaign_id' => $this->lead_campaign_id,
 			Lead::tableName() . '.source_id' => $this->lead_source_id,
 			Lead::tableName() . '.status_id' => $this->lead_status_id,
+			LeadSource::tableName() . '.type_id' => $this->lead_type_id,
 		]);
 
 		$query->andFilterWhere(['like', LeadReport::tableName() . '.details', $this->details]);

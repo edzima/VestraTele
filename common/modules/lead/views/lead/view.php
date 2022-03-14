@@ -7,6 +7,7 @@ use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
+use common\modules\lead\widgets\LeadDialersGridView;
 use common\modules\lead\widgets\LeadReportWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
 use common\modules\lead\widgets\ShortReportStatusesWidget;
@@ -135,6 +136,9 @@ YiiAsset::register($this);
 				],
 			]) ?>
 
+			<?= LeadDialersGridView::widget([
+				'lead' => $model,
+			]) ?>
 
 		</div>
 		<div class="col-md-8">
@@ -192,6 +196,7 @@ YiiAsset::register($this);
 				],
 				'archiveBtn' => Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE),
 				'withType' => false,
+				'withDialers' => true,
 				'options' => [
 					'class' => 'row',
 				],

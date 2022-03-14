@@ -3,6 +3,7 @@
 namespace common\modules\lead\controllers;
 
 use common\helpers\Flash;
+use common\helpers\Html;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\searches\DuplicateLeadSearch;
 use Yii;
@@ -26,6 +27,14 @@ class DuplicateController extends BaseController {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	public function actionDialers() {
+		$searchModel = new DuplicateLeadSearch();
+		return $this->redirect([
+			'index',
+			Html::getInputName($searchModel, 'onlyDialers') => true,
 		]);
 	}
 

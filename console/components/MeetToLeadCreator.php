@@ -14,6 +14,9 @@ use yii\base\Component;
 use yii\helpers\Json;
 use yii\helpers\StringHelper;
 
+/**
+ * @deprecated
+ */
 class MeetToLeadCreator extends Component {
 
 	public string $sourceName = 'meets';
