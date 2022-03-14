@@ -5,6 +5,7 @@ namespace common\modules\lead\components;
 use common\modules\lead\entities\Dialer;
 use common\modules\lead\entities\DialerInterface;
 use common\modules\lead\models\LeadDialer;
+use common\modules\lead\models\LeadDialerType;
 use common\modules\lead\models\searches\LeadDialerSearch;
 use Yii;
 use yii\base\Component;
@@ -15,8 +16,11 @@ class DialerManager extends Component {
 
 	protected const LOG_CATEGORY = 'lead.dialer.manager';
 
+	public const TYPE_EXTENSION = LeadDialerType::TYPE_EXTENSION;
+	public const TYPE_QUEUE = LeadDialerType::TYPE_QUEUE;
+
 	public $userId;
-	public ?int $typeId = null;
+	public ?int $type = null;
 
 	public function init() {
 		parent::init();
@@ -93,7 +97,7 @@ class DialerManager extends Component {
 	public function getDataProvider(): ActiveDataProvider {
 		$searchModel = new LeadDialerSearch();
 		$searchModel->onlyToCall = true;
-		$searchModel->type_id = $this->typeId;
+		$searchModel->kindOfType = $this->type;
 		$searchModel->typeUserId = $this->userId;
 		return $searchModel->search();
 	}

@@ -26,6 +26,9 @@ class LeadDialerController extends Controller {
 			'actions' => [
 				'answered' => ['POST'],
 				'call' => ['POST'],
+				'calling' => ['POST'],
+				'extension' => ['POST'],
+				'queue' => ['POST'],
 				'not-answered' => ['POST'],
 			],
 		];
@@ -38,10 +41,7 @@ class LeadDialerController extends Controller {
 		return $before;
 	}
 
-	public function actionCall(int $typeId = null) {
-		$this->dialer->type = $typeId;
-		$this->dialer->userId = Yii::$app->user->getId();
-
+	public function actionCall() {
 		$model = $this->dialer->findToCall();
 		if ($model && $this->dialer->calling($model)) {
 			$this->dialer->calling($model);
@@ -52,6 +52,41 @@ class LeadDialerController extends Controller {
 			]);
 		}
 		throw new NotFoundHttpException();
+	}
+
+	public function actionExtension() {
+		$this->dialer->type = DialerManager::TYPE_EXTENSION;
+		$model = $this->dialer->findToCall();
+		if ($model) {
+			return $this->asJson([
+				'id' => $model->getID(),
+				'origin' => $model->getOrigin(),
+				'destination' => $model->getDestination(),
+				'did' => $model->getDID(),
+			]);
+		}
+		throw new NotFoundHttpException();
+	}
+
+	public function actionQueue() {
+		$this->dialer->userId = Yii::$app->user->getId();
+		$model = $this->dialer->findToCall();
+		if ($model) {
+			return $this->asJson([
+				'id' => $model->getID(),
+				'origin' => $model->getOrigin(),
+				'destination' => $model->getDestination(),
+				'did' => $model->getDID(),
+			]);
+		}
+		throw new NotFoundHttpException();
+	}
+
+	public function actionCalling(int $id) {
+		$success = $this->dialer->calling($this->findModel($id));
+		return $this->asJson([
+			'success' => $success,
+		]);
 	}
 
 	public function actionAnswered(int $id): Response {

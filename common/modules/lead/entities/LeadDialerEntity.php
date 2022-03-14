@@ -82,6 +82,10 @@ class LeadDialerEntity extends Dialer {
 		return $this->parsePhone($this->getLead()->getPhone());
 	}
 
+	public function getDID(): string {
+		return (string) $this->dialer->type->did;
+	}
+
 	public function updateStatus(int $status): void {
 		switch ($status) {
 			case static::STATUS_CALLING:

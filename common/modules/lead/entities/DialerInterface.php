@@ -10,6 +10,8 @@ interface DialerInterface {
 
 	public function getOrigin(): string;
 
+	public function getDID(): string;
+
 	public function getStatusId(): int;
 
 	public function updateStatus(int $status): void;
