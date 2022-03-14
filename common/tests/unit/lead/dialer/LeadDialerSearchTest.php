@@ -5,6 +5,7 @@ namespace common\tests\unit\lead\dialer;
 use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\entities\Dialer;
 use common\modules\lead\models\LeadDialer;
+use common\modules\lead\models\LeadDialerType;
 use common\modules\lead\models\searches\LeadDialerSearch;
 use common\tests\_support\UnitSearchModelTrait;
 use common\tests\unit\Unit;
@@ -127,6 +128,22 @@ class LeadDialerSearchTest extends Unit {
 				empty($model->destination)
 				|| empty($model->lead->getSource()->getDialerPhone())
 			);
+		}
+	}
+
+	public function testDialerKindOfType(): void {
+		$this->model->kindOfType = LeadDialerType::TYPE_QUEUE;
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame(LeadDialerType::TYPE_QUEUE, $model->type->type);
+		}
+
+		$this->model->kindOfType = LeadDialerType::TYPE_EXTENSION;
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame(LeadDialerType::TYPE_EXTENSION, $model->type->type);
 		}
 	}
 

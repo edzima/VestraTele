@@ -22,6 +22,8 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 	public bool $leadSourceWithoutDialer = false;
 	public bool $leadStatusNotForDialer = false;
 
+	public $kindOfType;
+
 	public ?int $typeUserId = null;
 
 	public $dialerOrigin;
@@ -37,7 +39,7 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 
 	public function rules(): array {
 		return [
-			[['type_id', 'priority', 'leadStatusId', 'leadSourceId', 'leadTypeId', 'lead_id', 'leadTypeId', 'status', 'typeUserId'], 'integer'],
+			[['type_id', 'priority', 'leadStatusId', 'leadSourceId', 'leadTypeId', 'lead_id', 'leadTypeId', 'status', 'typeUserId', 'kindOfType'], 'integer'],
 			[['onlyToCall', 'leadSourceWithoutDialer', 'leadStatusNotForDialer'], 'boolean'],
 			[['dialerOrigin', 'dialerDestination', 'leadName'], 'string'],
 			[['fromLastAt', 'toLastAt', 'created_at', 'updated_at', 'last_at'], 'safe'],
@@ -47,6 +49,7 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
 			'fromLastAt' => Yii::t('lead', 'From At'),
+			'kindOfType' => Yii::t('lead', 'Kind of Type'),
 			'toLastAt' => Yii::t('lead', 'To At'),
 			'onlyToCall' => Yii::t('lead', 'Only to Call'),
 			'leadSourceWithoutDialer' => Yii::t('lead', 'Lead Source without Dialer'),
@@ -68,6 +71,7 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 		$this->load($params);
 
 		$this->applyDialerFilter($query);
+		$this->applyDialerTypeFilter($query);
 		$this->applyLastAtFilter($query);
 		$this->applyLeadSourceFilter($query);
 		$this->applyLeadStatusFilter($query);
@@ -77,11 +81,22 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 
 		$query->andFilterWhere([
 			LeadDialer::tableName() . '.status' => $this->status,
-			LeadDialer::tableName() . '.type_id' => $this->type_id,
 			LeadDialer::tableName() . '.priority' => $this->priority,
 		]);
 
 		return $dataProvider;
+	}
+
+	private function applyDialerTypeFilter(LeadDialerQuery $query): void {
+		$query->andFilterWhere([
+			LeadDialer::tableName() . '.type_id' => $this->type_id,
+		]);
+		if (!empty($this->kindOfType)) {
+			$query->joinWith('type');
+			$query->andWhere([
+				LeadDialerType::tableName() . '.type' => $this->kindOfType,
+			]);
+		}
 	}
 
 	private function applyDialerFilter(LeadDialerQuery $query) {
@@ -167,6 +182,10 @@ class LeadDialerSearch extends LeadDialer implements SearchModel {
 
 	public static function getTypesNames(): array {
 		return ArrayHelper::map(LeadDialerType::find()->all(), 'id', 'name');
+	}
+
+	public static function getKindOfTypes(): array {
+		return LeadDialerType::getTypesNames();
 	}
 
 	public static function getLeadSourcesNames(): array {

@@ -56,6 +56,16 @@ use yii\widgets\ActiveForm;
 		])->widget(DateTimeWidget::class)
 		?>
 
+
+		<?= $form->field($model, 'kindOfType', [
+			'options' => [
+				'class' => [
+					'col-md-3 col-lg-2',
+				],
+			],
+		])->dropDownList(LeadDialerSearch::getKindOfTypes(), ['prompt' => Yii::t('lead', 'Select...')])
+		?>
+
 	</div>
 
 

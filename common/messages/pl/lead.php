@@ -286,4 +286,5 @@ return [
 	'Without Destination' => 'Brak',
 	'Queue' => 'Kolejka',
 	'Extension' => 'Wewnętrzny',
+	'Kind of Type' => 'Rodzaj',
 ];
