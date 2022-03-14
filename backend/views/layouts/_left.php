@@ -86,7 +86,7 @@ $user = Yii::$app->user;
 							'label' => Yii::t('lead', 'Import Leads'),
 							'url' => ['/lead/import/csv'],
 							'icon' => '<i class="fa fa-upload"></i>',
-							'visible' => $user->can(Worker::PERMISSION_LEAD_DIALER),
+							'visible' => $user->can(Worker::PERMISSION_LEAD_IMPORT),
 						],
 						[
 							'label' => Yii::t('lead', 'Reports'),
