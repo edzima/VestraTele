@@ -99,7 +99,7 @@ class LeadDialerEntity extends Dialer {
 				break;
 		}
 		$this->status = $status;
-		$this->dialer->last_at = time();
+		$this->dialer->last_at = date(DATE_ATOM);
 		$this->dialer->status = $status;
 		$this->dialer->save(false);
 	}
