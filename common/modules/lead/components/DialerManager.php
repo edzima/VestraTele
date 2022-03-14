@@ -68,7 +68,7 @@ class DialerManager extends Component {
 	public function find(int $id): ?DialerInterface {
 		$model = LeadDialer::find()
 			->userType($this->userId)
-			->andWhere([LeadDialer::tableName() . ' . id' => $id])
+			->andWhere([LeadDialer::tableName() . '.id' => $id])
 			->one();
 		if ($model) {
 			return $model->getDialer();

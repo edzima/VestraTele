@@ -4,7 +4,6 @@ namespace frontend\controllers;
 
 use common\modules\lead\components\DialerManager;
 use common\modules\lead\entities\DialerInterface;
-use Yii;
 use yii\filters\auth\HttpHeaderAuth;
 use yii\filters\VerbFilter;
 use yii\rest\Controller;
@@ -69,7 +68,8 @@ class LeadDialerController extends Controller {
 	}
 
 	public function actionQueue() {
-		$this->dialer->userId = Yii::$app->user->getId();
+		$this->dialer->type = DialerManager::TYPE_QUEUE;
+
 		$model = $this->dialer->findToCall();
 		if ($model) {
 			return $this->asJson([
