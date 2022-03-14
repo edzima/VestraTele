@@ -38,7 +38,7 @@ class LeadSearch extends Lead implements SearchModel {
 	public bool $withoutUser = false;
 	public bool $withoutReport = false;
 	public bool $duplicateEmail = false;
-	public bool $duplicatePhone = false;
+	public $duplicatePhone;
 
 	public bool $withoutArchives = true;
 
@@ -187,6 +187,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 		if (!$this->validate()) {
 			$query->where('0=1');
+			Yii::warning($this->getErrors(), 'lead.search');
 			return $dataProvider;
 		}
 
@@ -299,7 +300,7 @@ class LeadSearch extends Lead implements SearchModel {
 	}
 
 	private function applyDuplicates(ActiveQuery $query): void {
-		if ($this->duplicateEmail || $this->duplicatePhone) {
+		if ($this->duplicateEmail) {
 			$query->addSelect([Lead::tableName() . '.*']);
 		}
 		if ($this->duplicateEmail) {
@@ -307,15 +308,17 @@ class LeadSearch extends Lead implements SearchModel {
 			$query->groupBy(Lead::tableName() . '.email');
 			$query->having('emailCount > 1');
 		}
-		if ($this->duplicatePhone) {
-			$query->addSelect(['COUNT(' . Lead::tableName() . '.phone) as phoneCount']);
-			$query->groupBy(Lead::tableName() . '.phone');
-			$query->having('phoneCount > 1');
+		if ($this->duplicatePhone === null || $this->duplicatePhone === '') {
+			return;
 		}
-	}
-
-	private function applyDuplicatePhoneFilter(ActiveQuery $query): void {
-
+		$query->addSelect([Lead::tableName() . '.*']);
+		$query->addSelect(['COUNT(' . Lead::tableName() . '.phone) as phoneCount']);
+		$query->groupBy(Lead::tableName() . '.phone');
+		if ($this->duplicatePhone) {
+			$query->having('phoneCount > 1');
+		} else {
+			$query->having('phoneCount = 1');
+		}
 	}
 
 	private function applyNameFilter(ActiveQuery $query) {

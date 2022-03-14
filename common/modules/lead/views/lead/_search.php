@@ -1,11 +1,11 @@
 <?php
 
+use common\helpers\Html;
 use common\modules\lead\models\searches\LeadSearch;
 use common\widgets\ActiveForm;
 use common\widgets\address\AddressSearchWidget;
 use common\widgets\DateWidget;
 use kartik\select2\Select2;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model LeadSearch */
@@ -64,7 +64,9 @@ use yii\helpers\Html;
 
 			<?= $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
-			<?= $form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
+			<?= $form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->dropDownList(Html::booleanDropdownList(), [
+				'prompt' => Yii::t('lead', 'Select...'),
+			]) ?>
 
 			<?= $form->field($model, 'duplicateEmail', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
