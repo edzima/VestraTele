@@ -48,7 +48,7 @@ class LeadDialerType extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['name', 'status', 'user_id', 'type'], 'required'],
+			[['name', 'status', 'user_id', 'type', 'did'], 'required'],
 			[['status', 'user_id', 'did', 'type'], 'integer'],
 			[['name'], 'string', 'max' => 255],
 			[['name'], 'unique'],

@@ -21,7 +21,7 @@ class m220211_120416_lead_dialer extends Migration {
 			'status' => $this->tinyInteger()->notNull(),
 			'type' => $this->tinyInteger()->notNull(),
 			'user_id' => $this->integer()->notNull(),
-			'did' => $this->smallInteger()->unsigned(),
+			'did' => $this->smallInteger()->unsigned()->notNull(),
 		]);
 		/** @var ActiveRecord $userClass */
 		$userClass = Module::userClass();
