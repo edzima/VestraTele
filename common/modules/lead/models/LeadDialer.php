@@ -47,6 +47,7 @@ class LeadDialer extends ActiveRecord {
 		return [
 			LeadDialerEntity::STATUS_NEW,
 			LeadDialerEntity::STATUS_UNESTABLISHED,
+			LeadDialerEntity::STATUS_NEXT_CALL_INTERVAL_NOT_EXCEEDED,
 		];
 	}
 
