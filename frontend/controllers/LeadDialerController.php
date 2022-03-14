@@ -43,7 +43,6 @@ class LeadDialerController extends Controller {
 	public function actionCall() {
 		$model = $this->dialer->findToCall();
 		if ($model && $this->dialer->calling($model)) {
-			$this->dialer->calling($model);
 			return $this->asJson([
 				'id' => $model->getID(),
 				'origin' => $model->getOrigin(),
