@@ -6,6 +6,7 @@ use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\search\UserSearch;
 use common\models\user\SurnameSearchInterface;
+use common\validators\PhoneValidator;
 use yii\data\ActiveDataProvider;
 
 class IssueUserSearch extends UserSearch {
@@ -13,6 +14,7 @@ class IssueUserSearch extends UserSearch {
 	public function rules(): array {
 		return [
 			['surname', 'string', 'min' => SurnameSearchInterface::MIN_LENGTH],
+			['phone', PhoneValidator::class],
 			['phone', 'string', 'min' => 9],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 		];
