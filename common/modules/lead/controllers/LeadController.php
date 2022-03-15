@@ -65,7 +65,6 @@ class LeadController extends BaseController {
 					'count' => $count,
 				]));
 			}
-			Yii::warning('TRy delete');
 			return $this->refresh();
 		}
 		$dataProvider->pagination->defaultPageSize = 50;
