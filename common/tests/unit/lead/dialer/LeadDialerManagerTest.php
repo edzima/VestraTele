@@ -98,4 +98,40 @@ class LeadDialerManagerTest extends Unit {
 			'status' => Dialer::STATUS_UNESTABLISHED,
 		]);
 	}
+
+	public function testUpdateStatusesNotForDialer(): void {
+		$models = $this->manager->getDataProvider()->getModels();
+		$modelsNotForStatuses = array_filter($models, static function (LeadDialer $model) {
+			$status = $model->getDialer()->getStatusId();
+			return $status === LeadDialerEntity::STATUS_CURRENT_LEAD_STATUS_NOT_FOR_DIALER
+				|| $status === LeadDialerEntity::STATUS_SAME_LEAD_STATUS_NOT_FOR_DIALER;
+		});
+		$this->tester->assertNotEmpty($modelsNotForStatuses);
+
+		$this->tester->assertNotEmpty($this->manager->updateNotForDialerStatuses());
+
+		$models = $this->manager->getDataProvider()->getModels();
+		$modelsNotForStatuses = array_filter($models, static function (LeadDialer $model) {
+			$status = $model->getDialer()->getStatusId();
+			return $status === LeadDialerEntity::STATUS_CURRENT_LEAD_STATUS_NOT_FOR_DIALER
+				|| $status === LeadDialerEntity::STATUS_SAME_LEAD_STATUS_NOT_FOR_DIALER;
+		});
+		$this->tester->assertNotEmpty($modelsNotForStatuses);
+		$this->tester->seeRecord(LeadDialer::class, [
+			'status' => LeadDialerEntity::STATUS_CURRENT_LEAD_STATUS_NOT_FOR_DIALER,
+		]);
+
+		$models = $this->manager->getDataProvider()->getModels();
+		$newModelsNotForStatuses = array_filter($models, static function (LeadDialer $model) {
+			if ($model->status === LeadDialerEntity::STATUS_NEW) {
+				return false;
+			}
+			$status = $model->getDialer()->getStatusId();
+			return $status === LeadDialerEntity::STATUS_CURRENT_LEAD_STATUS_NOT_FOR_DIALER
+				|| $status === LeadDialerEntity::STATUS_SAME_LEAD_STATUS_NOT_FOR_DIALER;
+		});
+
+		$this->tester->assertNotEmpty($newModelsNotForStatuses);
+		$this->tester->assertEmpty($this->manager->updateNotForDialerStatuses());
+	}
 }

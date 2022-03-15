@@ -289,4 +289,6 @@ return [
 	'Kind of Type' => 'Rodzaj',
 	'Delete ({count})' => 'Usuń ({count})',
 	'Success Delete Leads: {count}.' => 'Poprawnie Usunięto {count} Leads',
+	'Success Update: {count} New Dialers with Lead Status not for them.' => 'Zaktualizowano {count} Nowych Dialers z nieodpowiednim Lead Statusem.',
+	'Update New' => 'Zaktualizuj Nowe',
 ];

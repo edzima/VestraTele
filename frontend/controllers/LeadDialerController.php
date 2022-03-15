@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\modules\lead\components\DialerManager;
 use common\modules\lead\entities\DialerInterface;
+use Yii;
 use yii\filters\auth\HttpHeaderAuth;
 use yii\filters\VerbFilter;
 use yii\rest\Controller;
@@ -37,6 +38,7 @@ class LeadDialerController extends Controller {
 	public function beforeAction($action) {
 		$before = parent::beforeAction($action);
 		$this->dialer = new DialerManager();
+		$this->dialer->userId = Yii::$app->user->getId();
 		return $before;
 	}
 

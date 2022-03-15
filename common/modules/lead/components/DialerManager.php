@@ -4,12 +4,12 @@ namespace common\modules\lead\components;
 
 use common\modules\lead\entities\Dialer;
 use common\modules\lead\entities\DialerInterface;
+use common\modules\lead\entities\LeadDialerEntity;
 use common\modules\lead\models\LeadDialer;
 use common\modules\lead\models\LeadDialerType;
 use common\modules\lead\models\searches\LeadDialerSearch;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 
 class DialerManager extends Component {
@@ -21,16 +21,6 @@ class DialerManager extends Component {
 
 	public $userId;
 	public ?int $type = null;
-
-	public function init() {
-		parent::init();
-		if ($this->userId === null) {
-			$this->userId = Yii::$app->user->getId();
-		}
-		if ($this->userId === null) {
-			throw new InvalidConfigException('$userId must be set or User must be logged.');
-		}
-	}
 
 	public function calling(DialerInterface $dialer): bool {
 		if (!$dialer->shouldCall()) {
@@ -92,6 +82,29 @@ class DialerManager extends Component {
 			}
 		}
 		return null;
+	}
+
+	public function updateNotForDialerStatuses(): int {
+		$rows = [];
+		foreach (LeadDialer::find()
+			->andWhere(['status' => Dialer::STATUS_NEW])
+			->batch() as $models) {
+			foreach ($models as $row) {
+				/** @var LeadDialer $row */
+				$dialer = $row->getDialer();
+				$dialerStatus = $dialer->getStatusId();
+				if ($dialerStatus === LeadDialerEntity::STATUS_SAME_LEAD_STATUS_NOT_FOR_DIALER) {
+					$rows[LeadDialerEntity::STATUS_SAME_LEAD_STATUS_NOT_FOR_DIALER][] = $dialer->getID();
+				} elseif ($dialerStatus === LeadDialerEntity::STATUS_CURRENT_LEAD_STATUS_NOT_FOR_DIALER) {
+					$rows[LeadDialerEntity::STATUS_CURRENT_LEAD_STATUS_NOT_FOR_DIALER][] = $dialer->getID();
+				}
+			}
+		}
+		$count = 0;
+		foreach ($rows as $status => $ids) {
+			$count += LeadDialer::updateAll(['status' => $status], ['id' => $ids]);
+		}
+		return $count;
 	}
 
 	public function getDataProvider(): ActiveDataProvider {

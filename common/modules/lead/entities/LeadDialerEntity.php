@@ -78,7 +78,7 @@ class LeadDialerEntity extends Dialer {
 	}
 
 	public function getOrigin(): string {
-		return $this->parsePhone($this->getLead()->getPhone());
+		return $this->parsePhone((string) $this->getLead()->getPhone());
 	}
 
 	public function getDID(): string {

@@ -3,6 +3,7 @@
 namespace common\modules\lead\controllers;
 
 use common\helpers\Flash;
+use common\modules\lead\components\DialerManager;
 use common\modules\lead\models\forms\LeadDialerForm;
 use common\modules\lead\models\LeadDialer;
 use common\modules\lead\models\query\LeadDialerQuery;
@@ -25,6 +26,7 @@ class DialerController extends BaseController {
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'update-new' => ['POST'],
 				],
 			],
 		];
@@ -50,6 +52,19 @@ class DialerController extends BaseController {
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
 		]);
+	}
+
+	public function actionUpdateNew() {
+		$manager = new DialerManager();
+		$count = $manager->updateNotForDialerStatuses();
+		codecept_debug('UPDATE NEW');
+		codecept_debug($count);
+		if ($count) {
+			Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success Update: {count} New Dialers with Lead Status not for them.', [
+				'count' => $count,
+			]));
+		}
+		return $this->redirect(['index']);
 	}
 
 	/**

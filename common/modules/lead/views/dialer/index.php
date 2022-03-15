@@ -30,6 +30,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			: ''
 		?>
 
+		<?= Html::a(Yii::t('lead', 'Update New'), ['update-new'], [
+			'class' => 'btn btn-success',
+			'data-method' => 'post',
+		])
+		?>
+
 		<?= Html::a(Yii::t('backend', 'Clear'), false, ['class' => 'btn btn-danger pull-right', 'data-method' => 'delete']) ?>
 
 	</p>

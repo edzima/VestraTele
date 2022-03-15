@@ -11,12 +11,16 @@ class DialerCest {
 
 	/** @see DialerController::actionIndex() */
 	public const ROUTE_INDEX = '/lead/dialer/index';
+	/** @see DialerController::actionUpdateNew() */
+	const ROUTE_UPDATE_NEW = '/lead/dialer/update-new';
+
 	public const PERMISSION = Worker::PERMISSION_LEAD_DIALER_MANAGER;
 
 	public function _fixtures(): array {
 		return array_merge(
 			LeadFixtureHelper::leads(),
-			LeadFixtureHelper::reports()
+			LeadFixtureHelper::reports(),
+			LeadFixtureHelper::dialer(),
 		);
 	}
 
@@ -34,7 +38,7 @@ class DialerCest {
 		$I->clickMenuSubLink('Dialers');
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeResponseCodeIsSuccessful();
-		$I->see('Lead Dialers');
+		$I->see('Dialers');
 	}
 
 	public function checkLinkOnLeadIndex(LeadManager $I): void {
@@ -59,7 +63,17 @@ class DialerCest {
 		$I->seeInGridHeader('Type');
 		$I->see('Priority');
 		$I->see('Created At');
-		$I->see('Updated At');
 		$I->see('Last At');
+	}
+
+	public function checkUpdateNew(LeadManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(static::PERMISSION);
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeLink('Update New');
+		$I->click('Update New');
+		$I->seeInCurrentUrl(static::ROUTE_UPDATE_NEW);
+		$I->sendAjaxPostRequest(static::ROUTE_UPDATE_NEW, $I->getCSRF());
+		$I->seeResponseCodeIsRedirection();
 	}
 }
