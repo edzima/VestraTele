@@ -57,6 +57,17 @@ class LeadController extends BaseController {
 			$searchModel->user_id = Yii::$app->user->getId();
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+		if (Yii::$app->request->isDelete) {
+			$count = Lead::deleteAll(['id' => $searchModel->getAllIds($dataProvider->query)]);
+			if ($count) {
+				Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success Delete Leads: {count}.', [
+					'count' => $count,
+				]));
+			}
+			Yii::warning('TRy delete');
+			return $this->refresh();
+		}
 		$dataProvider->pagination->defaultPageSize = 50;
 
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {
@@ -311,7 +322,12 @@ class LeadController extends BaseController {
 	public function actionDeleteMultiple() {
 		$ids = Yii::$app->request->post('ids') ?: Yii::$app->request->post('selection');
 		if (!empty($ids)) {
-			Lead::deleteAll(['id' => $ids]);
+			$count = Lead::deleteAll(['id' => $ids]);
+			if ($count) {
+				Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success Delete Leads: {count}.', [
+					'count' => $count,
+				]));
+			}
 		}
 		return $this->redirect(['index']);
 	}

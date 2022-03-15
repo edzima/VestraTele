@@ -287,4 +287,6 @@ return [
 	'Queue' => 'Kolejka',
 	'Extension' => 'Wewnętrzny',
 	'Kind of Type' => 'Rodzaj',
+	'Delete ({count})' => 'Usuń ({count})',
+	'Success Delete Leads: {count}.' => 'Poprawnie Usunięto {count} Leads',
 ];

@@ -76,6 +76,25 @@ if ($multipleForm) {
 			? Html::a(Yii::t('lead', 'Duplicates'), ['duplicate/index'], ['class' => 'btn btn-warning'])
 			: ''
 		?>
+		<?= Yii::$app->user->can(User::PERMISSION_LEAD_DELETE)
+		&& $dataProvider->pagination->pageCount > 1
+			?
+			Html::a(
+				Yii::t('lead', 'Delete ({count})', [
+					'count' => $dataProvider->getTotalCount(),
+				]),
+				false,
+				[
+					'class' => 'btn btn-danger pull-right',
+					'data' => [
+						'method' => 'delete',
+						'confirm' => Yii::t('lead', 'Are you sure you want to delete this items?'),
+					],
+				])
+
+			: ''
+		?>
+
 	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
@@ -225,25 +244,6 @@ if ($multipleForm) {
 					: ''
 				?>
 
-
-				<?= Yii::$app->user->can(User::PERMISSION_LEAD_DELETE)
-					?
-					Html::a(
-						Yii::t('lead', 'Delete'),
-						['delete-multiple'],
-						[
-							'class' => 'btn btn-danger',
-							'data' => [
-								'method' => 'POST',
-								'confirm' => Yii::t('lead', 'Are you sure you want to delete this items?'),
-								'params' => [
-									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-								],
-							],
-						])
-
-					: ''
-				?>
 
 			</div>
 
