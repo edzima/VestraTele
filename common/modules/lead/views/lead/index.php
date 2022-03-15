@@ -2,9 +2,11 @@
 
 use backend\widgets\CsvForm;
 use common\helpers\Html;
+use common\helpers\StringHelper;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\LeadSmsForm;
 use common\modules\lead\models\searches\LeadSearch;
 use common\modules\lead\widgets\CreateLeadBtnWidget;
 use common\widgets\grid\ActionColumn;
@@ -348,12 +350,22 @@ if ($multipleForm) {
 				],
 				[
 					'attribute' => 'reportsDetails',
+					'format' => 'html',
 					'value' => static function (ActiveLead $lead): string {
 						$content = [];
+						$smsCount = 0;
 						foreach ($lead->reports as $report) {
 							if ($report->status->show_report_in_lead_index) {
-								$content[] = $report->getDetails();
+								$details = $report->getDetails();
+								if (StringHelper::startsWith($details, LeadSmsForm::detailsPrefix())) {
+									$smsCount++;
+								} else {
+									$content[] = Html::encode($details);
+								}
 							}
+						}
+						if ($smsCount) {
+							$content[] = LeadSmsForm::detailsPrefix() . "<strong>$smsCount</strong>";
 						}
 						$content = array_filter($content, static function ($value): bool {
 							return !empty(trim($value));

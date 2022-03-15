@@ -63,12 +63,16 @@ class LeadSmsForm extends QueueSmsForm {
 		$report->setLead($this->lead);
 		$report->owner_id = $this->owner_id;
 		$report->status_id = $this->status_id;
-		$report->details = Yii::t('common', 'SMS Sent: ') . $this->getMessage()->getMessage() . ' - SMS_ID: ' . $smsId;
+		$report->details = static::detailsPrefix() . $this->getMessage()->getMessage() . ' - SMS_ID: ' . $smsId;
 		if ($report->save()) {
 			return true;
 		}
 		Yii::error($report->getErrors(), __METHOD__);
 		return false;
+	}
+
+	public static function detailsPrefix(): string {
+		return Yii::t('common', 'SMS Sent: ');
 	}
 
 	protected function createJob(MessageInterface $message = null): LeadSmsSendJob {
