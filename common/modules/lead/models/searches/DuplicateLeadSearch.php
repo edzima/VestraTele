@@ -55,7 +55,7 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 			->groupBy(['duplicateLead.phone', 'duplicateLead.email'])
 			->andFilterWhere(['duplicateLead.provider' => $this->provider])
 			->andFilterWhere(['duplicateLead.status_id' => $this->status_id])
-			->andFilterWhere(['duplicateLead.source_id' => $this->source_id])
+
 			->andFilterWhere(['like', 'duplicateLead.name', $this->name])
 			->having('COUNT(*) >1');
 
@@ -77,6 +77,7 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 			])
 			->joinWith('samePhoneLeads sameLead')
 			->joinWith('sameEmailLeads sameLead')
+			->andFilterWhere(['sameLead.source_id' => $this->source_id])
 			->andWhere('duplicateLead.id <> sameLead.id')
 			->distinct();
 
