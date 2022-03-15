@@ -9,6 +9,11 @@ use yii\web\UploadedFile;
 
 class ImportController extends BaseController {
 
+	public function init() {
+		@set_time_limit(300) or Yii::warning('Not set time limit');
+		parent::init();
+	}
+
 	public function actionCsv() {
 		$model = new LeadCSVImport();
 		if (Yii::$app->request->isPost) {
