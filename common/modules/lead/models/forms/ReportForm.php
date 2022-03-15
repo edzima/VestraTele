@@ -32,7 +32,7 @@ class ReportForm extends Model {
 	public $closedQuestions = [];
 
 	public int $addressType = LeadAddress::TYPE_CUSTOMER;
-	public bool $withAddress = true;
+	public bool $withAddress = false;
 	public ?Address $address = null;
 
 	private ?ActiveLead $lead = null;
