@@ -57,8 +57,6 @@ class DialerController extends BaseController {
 	public function actionUpdateNew() {
 		$manager = new DialerManager();
 		$count = $manager->updateNotForDialerStatuses();
-		codecept_debug('UPDATE NEW');
-		codecept_debug($count);
 		if ($count) {
 			Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success Update: {count} New Dialers with Lead Status not for them.', [
 				'count' => $count,
