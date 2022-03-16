@@ -148,6 +148,35 @@ class RbacController extends Controller {
 		Console::output('Success! RBAC roles has been added.');
 	}
 
+	public function actionCreateNotExist(): void {
+		$auth = Yii::$app->authManager;
+		$roles = $auth->getRoles();
+		$newRoles = [];
+		foreach ($this->roles as $role) {
+			if (!isset($roles[$role])) {
+				Console::output('New Role to Add: ' . $role);
+				$newRoles[] = $role;
+			}
+		}
+
+		$this->createRoles($newRoles);
+
+		$permissions = $auth->getPermissions();
+		$newPermissions = [];
+
+		foreach ($this->permissions as $permissionName => $roles) {
+			if (!is_string($permissionName) && is_string($roles)) {
+				$permissionName = $roles;
+			}
+			if (!isset($permissions[$permissionName])) {
+				Console::output('New Permission to Add: ' . $permissionName);
+				$newPermissions[$permissionName] = $roles;
+			}
+		}
+
+		$this->createPermissions($newPermissions);
+	}
+
 	private function createRoles(array $roles): array {
 		if (empty($roles)) {
 			return [];
