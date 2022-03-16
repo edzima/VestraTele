@@ -3,9 +3,9 @@
 namespace backend\tests\functional\settlement;
 
 use backend\modules\settlement\controllers\CalculationController;
-use backend\tests\Step\Functional\Bookkeeper;
 use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use backend\tests\Step\Functional\Manager;
+use backend\tests\Step\Functional\ProvisionManager;
 use common\models\user\User;
 
 class CalculationWithoutProvisionsCest {
@@ -13,6 +13,8 @@ class CalculationWithoutProvisionsCest {
 	/** @see CalculationController::actionWithoutProvisions() */
 	public const ROUTE = '/settlement/calculation/without-provisions';
 	private const MENU_LINK_TEXT = 'Without provisions';
+
+	private const PERMISSION_PROVISION = User::PERMISSION_PROVISION;
 
 	public function checkPageAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -27,16 +29,16 @@ class CalculationWithoutProvisionsCest {
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkMenuLinkWithProvisionPermission(CreateCalculationIssueManager $I):void{
-		$I->assignPermission(User::PERMISSION_PROVISION);
+	public function checkMenuLinkWithProvisionPermission(CreateCalculationIssueManager $I): void {
+		$I->assignPermission(static::PERMISSION_PROVISION);
 		$I->amLoggedIn();
 		$I->seeMenuLink(static::MENU_LINK_TEXT);
 		$I->clickMenuLink(static::MENU_LINK_TEXT);
 		$I->seeInCurrentUrl(static::ROUTE);
 	}
 
-	public function checkPageAsCalculationManagerWithProvisionPermission(Bookkeeper $I): void {
-		$I->assignPermission(User::PERMISSION_PROVISION);
+	public function checkPageAsCalculationManagerWithProvisionPermission(ProvisionManager $I): void {
+		$I->assignPermission(static::PERMISSION_PROVISION);
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE);
 		$I->seeResponseCodeIsSuccessful();
@@ -54,7 +56,7 @@ class CalculationWithoutProvisionsCest {
 	}
 
 	public function checkIndexPageLinkAsCalculationManagerWithProvisionPermission(CreateCalculationIssueManager $I): void {
-		$I->assignPermission(User::PERMISSION_PROVISION);
+		$I->assignPermission(static::PERMISSION_PROVISION);
 		$I->amLoggedIn();
 		$I->amOnRoute(CalculationCest::ROUTE_INDEX);
 		$I->seeLink('Without provisions');
