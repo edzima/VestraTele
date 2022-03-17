@@ -75,6 +75,7 @@ class IssueSearch extends BaseIssueSearch {
 		$query->andFilterWhere([
 			'issue_user.user_id' => empty($this->agentsIds) ? $this->user_id : array_merge($this->agentsIds, [$this->user_id]),
 		]);
+		$query->groupBy('issue_user.issue_id');
 		return $dataProvider;
 	}
 
