@@ -89,7 +89,16 @@ class IssuePayCalculationGrid extends GridView {
 			[
 				'attribute' => 'type',
 				'value' => 'typeName',
-				'filter' => IssuePayCalculationSearch::getTypesNames(),
+				'filter' => $this->filterModel ? $this->filterModel::getTypesNames() : null,
+				'filterType' => static::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'options' => [
+						'multiple' => true,
+						'placeholder' => Yii::t('common', 'Type'),
+					],
+					'size' => Select2::SIZE_SMALL,
+					'showToggleAll' => false,
+				],
 			],
 			[
 				'attribute' => 'problem_status',

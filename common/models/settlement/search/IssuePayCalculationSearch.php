@@ -57,7 +57,8 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	 */
 	public function rules(): array {
 		return [
-			[['issue_id', 'stage_id', 'type', 'problem_status', 'owner_id'], 'integer'],
+			[['issue_id', 'stage_id', 'problem_status', 'owner_id'], 'integer'],
+			['type', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
 			['issue_type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
 			['issue_stage_id', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true, 'when' => function (): bool { return $this->withIssueStage; }],
 

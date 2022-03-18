@@ -12,10 +12,12 @@ use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
+use common\models\KeyStorageItem;
 use common\models\settlement\PaysForm;
 use common\models\user\User;
 use Yii;
 use yii\filters\VerbFilter;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\MethodNotAllowedHttpException;
@@ -67,8 +69,11 @@ class CalculationController extends Controller {
 		Url::remember();
 		$searchModel = new IssuePayCalculationSearch();
 		$searchModel->setScenario(IssuePayCalculationSearch::SCENARIO_ARCHIVE);
+		$searchModel->withArchive = true;
 		$searchModel->withIssueStage = true;
 		$searchModel->withoutProvisions = true;
+
+		$searchModel->type = Json::decode(Yii::$app->keyStorage->get(KeyStorageItem::KEY_SETTLEMENT_TYPES_FOR_PROVISIONS, []));
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('without-provisions', [
