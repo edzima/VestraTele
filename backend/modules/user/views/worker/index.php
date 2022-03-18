@@ -98,7 +98,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					'view' => true,
 					'update' => Yii::$app->user->can(Worker::PERMISSION_WORKERS),
 					'delete' => Yii::$app->user->can(Worker::PERMISSION_WORKERS),
-					'hierarchy' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
+					'hierarchy' => Yii::$app->user->can(Worker::PERMISSION_WORKERS_HIERARCHY),
 					'link' => Yii::$app->user->can(Worker::PERMISSION_ISSUE),
 					'provision' => Yii::$app->user->can(Worker::PERMISSION_PROVISION),
 				],

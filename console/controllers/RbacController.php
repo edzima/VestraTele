@@ -64,7 +64,6 @@ class RbacController extends Controller {
 		Worker::PERMISSION_ISSUE_STAGE_CHANGE,
 		Worker::PERMISSION_HINT,
 		User::PERMISSION_LOGS,
-		Worker::PERMISSION_MEET,
 		User::PERMISSION_NEWS,
 		User::PERMISSION_NOTE,
 		Worker::PERMISSION_NOTE_TEMPLATE,
@@ -99,6 +98,7 @@ class RbacController extends Controller {
 		Worker::PERMISSION_SMS,
 		Worker::PERMISSION_MULTIPLE_SMS,
 		Worker::PERMISSION_WORKERS,
+		Worker::PERMISSION_WORKERS_HIERARCHY,
 		Worker::PERMISSION_LEAD,
 		Worker::PERMISSION_LEAD_DELETE,
 		Worker::PERMISSION_LEAD_DIALER,
@@ -146,6 +146,35 @@ class RbacController extends Controller {
 		}
 
 		Console::output('Success! RBAC roles has been added.');
+	}
+
+	public function actionCreateNotExist(): void {
+		$auth = Yii::$app->authManager;
+		$roles = $auth->getRoles();
+		$newRoles = [];
+		foreach ($this->roles as $role) {
+			if (!isset($roles[$role])) {
+				Console::output('New Role to Add: ' . $role);
+				$newRoles[] = $role;
+			}
+		}
+
+		$this->createRoles($newRoles);
+
+		$permissions = $auth->getPermissions();
+		$newPermissions = [];
+
+		foreach ($this->permissions as $permissionName => $roles) {
+			if (!is_string($permissionName) && is_string($roles)) {
+				$permissionName = $roles;
+			}
+			if (!isset($permissions[$permissionName])) {
+				Console::output('New Permission to Add: ' . $permissionName);
+				$newPermissions[$permissionName] = $roles;
+			}
+		}
+
+		$this->createPermissions($newPermissions);
 	}
 
 	private function createRoles(array $roles): array {

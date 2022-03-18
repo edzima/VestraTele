@@ -33,6 +33,12 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
+						'actions' => ['without-provisions'],
+						'controllers' => ['settlement/calculation'],
+						'permissions' => [Worker::PERMISSION_PROVISION],
+					],
+					[
+						'allow' => true,
 						'controllers' => ['settlement/calculation-problem'],
 						'permissions' => [Worker::PERMISSION_CALCULATION_PROBLEMS],
 					],
