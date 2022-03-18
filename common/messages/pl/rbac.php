@@ -57,6 +57,7 @@ return [
 	'telemarketer' => 'Konsultant',
 	'user' => 'Użytkownik',
 	'workers' => 'Lista pracowników',
+	'workers.hierarchy' => 'Lista pracowników - hierarchia',
 	'victim' => 'Poszkodowany',
 
 ];
