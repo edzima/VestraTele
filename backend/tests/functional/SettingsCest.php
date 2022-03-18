@@ -5,6 +5,7 @@ namespace backend\tests\functional;
 use backend\controllers\SiteController;
 use backend\tests\Step\Functional\Admin;
 use backend\tests\Step\Functional\Manager;
+use common\models\user\User;
 
 class SettingsCest {
 
@@ -26,6 +27,7 @@ class SettingsCest {
 		$I->see('Backend sidebar collapsed');
 		$I->see('Backend sidebar mini');
 		$I->dontSee('Robot SMS Owner');
+		$I->dontSee('Settlement types excluded for provisions');
 	}
 
 	public function checkAsAdmin(Admin $I): void {
@@ -41,6 +43,13 @@ class SettingsCest {
 		$I->see('Backend sidebar collapsed');
 		$I->see('Backend sidebar mini');
 		$I->see('Robot SMS Owner');
+	}
+
+	public function checkWithProvisionsPermission(Admin $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(User::PERMISSION_PROVISION);
+		$I->amOnRoute(static::ROUTE);
+		$I->see('Settlement types excluded for provisions');
 	}
 
 }
