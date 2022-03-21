@@ -73,7 +73,10 @@ class CalculationController extends Controller {
 		$searchModel->withIssueStage = true;
 		$searchModel->withoutProvisions = true;
 
-		$searchModel->type = Json::decode(Yii::$app->keyStorage->get(KeyStorageItem::KEY_SETTLEMENT_TYPES_FOR_PROVISIONS, []));
+		$types = Yii::$app->keyStorage->get(KeyStorageItem::KEY_SETTLEMENT_TYPES_FOR_PROVISIONS, []);
+		if (!empty($types)) {
+			$searchModel->type = Json::decode($types);
+		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('without-provisions', [
