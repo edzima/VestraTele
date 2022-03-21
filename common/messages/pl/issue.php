@@ -38,7 +38,7 @@ return [
 	'Stage' => 'Etap',
 	'Stages' => 'Etapy',
 	'Type' => 'Typ',
-	'Types' => 'Type',
+	'Types' => 'Typy',
 	'Entity' => 'Podmiot',
 	'Issue' => 'Sprawa',
 	'Issue Name' => 'Nr Sprawy',
