@@ -79,6 +79,10 @@ class IssueSearch extends BaseIssueSearch {
 			],
 		]);
 
+		if ($this->scenario === static::SCENARIO_ALL_PAYED) {
+			$query->with('pays');
+		}
+
 		$this->load($params);
 		if ($this->addressSearch) {
 			$this->addressSearch->load($params);
@@ -209,6 +213,7 @@ class IssueSearch extends BaseIssueSearch {
 		if ($refresh || $this->ids === null) {
 			$query = clone $query;
 			$query->select(Issue::tableName() . '.id');
+			$this->payedFilter($query);
 			$this->ids = $query->column();
 		}
 		return $this->ids;
