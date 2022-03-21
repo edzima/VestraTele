@@ -153,7 +153,7 @@ class CalculationCest {
 		$I->haveFixtures(array_merge(
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::types(),
-			IssueFixtureHelper::customer(),
+			IssueFixtureHelper::users(),
 			IssueFixtureHelper::issueUsers(),
 			SettlementFixtureHelper::settlement()
 		));
