@@ -8,7 +8,6 @@ use common\models\issue\IssueInterface;
 use common\models\issue\IssueNote;
 use common\models\issue\IssueSearch;
 use common\widgets\grid\DataColumn;
-use common\widgets\GridView;
 use Yii;
 
 class IssueNoteColumn extends DataColumn {
@@ -17,6 +16,7 @@ class IssueNoteColumn extends DataColumn {
 	public $noWrap = true;
 	public bool $contentCenter = true;
 	public $format = 'html';
+	public bool $tooltip = true;
 
 	public ?string $pinnedContentClass = 'warning';
 
@@ -25,14 +25,6 @@ class IssueNoteColumn extends DataColumn {
 		if (empty($this->label)) {
 			$this->label = Yii::t('issue', 'Issue Notes');
 		}
-		$this->grid->on(GridView::EVENT_AFTER_RUN, function () {
-			TooltipAsset::register($this->_view);
-			$this->_view->registerJs(
-				TooltipAsset::initScript(
-					TooltipAsset::defaultSelector('#' . $this->grid->getId())
-				)
-			);
-		});
 		if ($this->filter === null && $this->grid->filterModel instanceof IssueSearch) {
 			$this->filter = [
 				IssueSearch::NOTE_ONLY_PINNED => Yii::t('issue', 'Only Pinned'),
@@ -69,6 +61,5 @@ class IssueNoteColumn extends DataColumn {
 		}
 		return $options;
 	}
-
 
 }

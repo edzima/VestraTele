@@ -2,7 +2,9 @@
 
 namespace common\widgets\grid;
 
+use common\assets\TooltipAsset;
 use common\helpers\Html;
+use common\widgets\GridView;
 use kartik\grid\DataColumn as BaseDataColumn;
 
 /**
@@ -15,6 +17,26 @@ class DataColumn extends BaseDataColumn {
 	public bool $contentBold = false;
 	public bool $contentCenter = false;
 	public bool $ellipsis = false;
+
+	public bool $tooltip = false;
+
+	public function init() {
+		parent::init();
+		if ($this->tooltip) {
+			$this->tooltipInit();
+		}
+	}
+
+	protected function tooltipInit(): void {
+		$this->grid->on(GridView::EVENT_AFTER_RUN, function () {
+			TooltipAsset::register($this->_view);
+			$this->_view->registerJs(
+				TooltipAsset::initScript(
+					TooltipAsset::defaultSelector('#' . $this->grid->getId())
+				)
+			);
+		});
+	}
 
 	protected function fetchContentOptions($model, $key, $index): array {
 		$options = parent::fetchContentOptions($model, $key, $index);
