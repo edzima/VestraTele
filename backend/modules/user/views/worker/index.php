@@ -61,6 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'profile.genderName',
 				'filter' => UserProfile::getGendersNames(),
 			],
+			'created_at:datetime',
 			'action_at:Datetime',
 			[
 				'class' => ActionColumn::class,
