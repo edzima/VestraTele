@@ -15,6 +15,7 @@ use yii\base\InvalidArgumentException;
 use yii\base\Model;
 use yii\behaviors\AttributeTypecastBehavior;
 use yii\helpers\Json;
+use yii\helpers\VarDumper;
 use yii\web\UploadedFile;
 
 class LeadCSVImport extends Model {
@@ -208,6 +209,13 @@ class LeadCSVImport extends Model {
 		$model = new LeadForm(['phone' => $phone]);
 		$model->phone = $phone;
 
+		$skip = !$model->validate(['phone']);
+		if ($skip) {
+			Yii::warning('Skip Lead Row: ' . VarDumper::dumpAsString($row)
+				. '. With errors: ' . VarDumper::dumpAsString($model->getErrors()),
+				'lead.csvImport'
+			);
+		}
 		return !$model->validate(['phone']);
 	}
 
