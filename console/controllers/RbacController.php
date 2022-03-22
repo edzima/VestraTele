@@ -35,6 +35,7 @@ class RbacController extends Controller {
 		Customer::ROLE_SHAREHOLDER,
 		Customer::ROLE_HANDICAPPED,
 		User::ROLE_RECCOMENDING,
+		User::ROLE_GUARDIAN,
 	];
 
 	public array $permissions = [

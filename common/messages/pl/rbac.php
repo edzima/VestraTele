@@ -21,6 +21,7 @@ return [
 	'issue.delete' => 'Sprawy - usuwanie',
 	'issue.link-user' => 'Sprawy - przypisywanie użytkowników',
 	'issue.stage.change' => 'Sprawy - zmiana etapów',
+	'guardian' => 'Opiekun',
 	'handicapped' => 'Niepełnosprawny',
 	'hint' => 'Wskazówki',
 	'lawyer' => 'Prawnik',
