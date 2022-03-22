@@ -13,7 +13,6 @@ class IssueColumn extends DataColumn {
 	public $attribute = 'issue_id';
 
 	public array $linkOptions = [
-		'target' => '_blank',
 		'data-pjax' => '0',
 	];
 
