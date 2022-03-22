@@ -42,9 +42,7 @@ if ($provision) {
 				'legend' => static function (IssueUser $issueUser) use ($usersLinks): string {
 					$legend = $issueUser->getTypeWithUser();
 					if ($usersLinks) {
-						$legend = Html::a($legend, ['/user/customer/view', 'id' => $issueUser->user_id], [
-							'target' => '_blank',
-						]);
+						$legend = Html::a($legend, ['/user/customer/view', 'id' => $issueUser->user_id]);
 					}
 					return $legend;
 				},
@@ -102,9 +100,7 @@ if ($provision) {
 					$legend = $issueUser->getTypeWithUser();
 					if ($usersLinks) {
 						$legend = Html::a($legend,
-							['/user/worker/view', 'id' => $issueUser->user_id], [
-								'target' => '_blank',
-							]);
+							['/user/worker/view', 'id' => $issueUser->user_id]);
 					}
 					return $legend;
 				},
