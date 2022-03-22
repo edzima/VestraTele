@@ -268,7 +268,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => ActionColumn::class,
-				'template' => '{installment} {note} {sms} {view} {update} {delete}',
+				'template' => '{installment} {link} {note} {sms} {view} {update} {delete}',
 				'buttons' => [
 					'installment' => static function (string $url, Issue $model): string {
 						return Html::a('<i class="fa fa-money" aria-hidden="true"></i>',
@@ -278,6 +278,15 @@ $this->params['breadcrumbs'][] = $this->title;
 								'aria-label' => Yii::t('settlement', 'Create Installment'),
 							]
 						);
+					},
+					'link' => static function (string $url, Issue $model) {
+						return Html::a('<span class="glyphicon glyphicon-paperclip"></span>',
+							['/issue/relation/create', 'id' => $model->id],
+							[
+								'title' => Yii::t('backend', 'Link'),
+								'aria-label' => Yii::t('backend', 'Link'),
+								'data-pjax' => '0',
+							]);
 					},
 					'note' => static function (string $url, Issue $model): string {
 						return Html::a('<i class="fa fa-comments" aria-hidden="true"></i>',

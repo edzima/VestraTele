@@ -1,16 +1,22 @@
 <?php
 
+use common\helpers\Url;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueRelation;
 use common\models\issue\IssueUser;
-use common\models\user\User;
+use common\models\user\Worker;
 use common\modules\issue\widgets\IssueUsersWidget;
 use common\widgets\FieldsetDetailView;
+use common\widgets\grid\ActionColumn;
+use common\widgets\GridView;
 use yii\bootstrap\Html;
+use yii\data\ActiveDataProvider;
 
 /* @var $this yii\web\View */
 /* @var $model Issue */
 /* @var $usersLinks bool */
+/* @var $relationActionColumn bool */
 /* @var $userMailVisibilityCheck bool */
 
 $provision = $model->getProvision();
@@ -47,19 +53,20 @@ if ($provision) {
 						return '';
 					}
 					$content = Html::beginTag('span', ['class' => 'pull-right form-group']);
-					$content .= Html::a(Html::icon('pencil'),
-						[
-							'/issue/user/update-type',
-							'issueId' => $issueUser->issue_id,
-							'userId' => $issueUser->user_id,
-							'type' => $issueUser->type,
-						],
-						[
-							'class' => 'btn btn-xs btn-primary',
-							'title' => Yii::t('common', 'Update'),
-							'aria-label' => Yii::t('common', 'Update'),
-						]);
-					if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
+					if (Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER)) {
+						$content .= Html::a(Html::icon('pencil'),
+							[
+								'/issue/user/update-type',
+								'issueId' => $issueUser->issue_id,
+								'userId' => $issueUser->user_id,
+								'type' => $issueUser->type,
+							],
+							[
+								'class' => 'btn btn-xs btn-primary',
+								'title' => Yii::t('common', 'Update'),
+								'aria-label' => Yii::t('common', 'Update'),
+							]);
+
 						$content .= ' ' . Html::a(Html::icon('trash'),
 								[
 									'/issue/user/delete',
@@ -82,6 +89,10 @@ if ($provision) {
 					return $issueUser->type === IssueUser::TYPE_CUSTOMER;
 				},
 			]) ?>
+
+			<p>
+
+			</p>
 			<?= IssueUsersWidget::widget([
 				'model' => $model,
 				'type' => IssueUsersWidget::TYPE_WORKERS,
@@ -102,16 +113,54 @@ if ($provision) {
 						return '';
 					}
 					$content = Html::beginTag('span', ['class' => 'pull-right form-group']);
-					$content .= Html::a('<i class="fa fa-money" aria-hidden="true"></i>',
-						[
-							'/settlement/cost/create-installment',
-							'id' => $issueUser->issue_id,
-							'user_id' => $issueUser->user_id,
-						], [
-							'class' => 'btn btn-success btn-xs',
-							'title' => Yii::t('settlement', 'Create Installment'),
-							'aria-label' => Yii::t('settlement', 'Create Installment'),
-						]);
+					if (Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)) {
+						$content .= Html::a('<i class="fa fa-money" aria-hidden="true"></i>',
+							[
+								'/settlement/cost/create-installment',
+								'id' => $issueUser->issue_id,
+								'user_id' => $issueUser->user_id,
+							], [
+								'class' => 'btn btn-success btn-xs',
+								'title' => Yii::t('settlement', 'Create Installment'),
+								'aria-label' => Yii::t('settlement', 'Create Installment'),
+							]);
+					}
+
+					if (Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER)) {
+						$content .= ' ' . Html::a(Html::icon('pencil'),
+								[
+									'/issue/user/update-type',
+									'issueId' => $issueUser->issue_id,
+									'userId' => $issueUser->user_id,
+									'type' => $issueUser->type,
+								],
+								[
+									'class' => 'btn btn-xs btn-primary',
+									'title' => Yii::t('common', 'Update'),
+									'aria-label' => Yii::t('common', 'Update'),
+								]);
+
+						$requiredTypes = [
+							IssueUser::TYPE_AGENT,
+							IssueUser::TYPE_LAWYER,
+						];
+						if (!in_array($issueUser->type, $requiredTypes)) {
+							$content .= ' ' . Html::a(Html::icon('trash'),
+									[
+										'/issue/user/delete',
+										'issueId' => $issueUser->issue_id,
+										'userId' => $issueUser->user_id,
+										'type' => $issueUser->type,
+									], [
+
+										'class' => 'btn btn-xs btn-danger',
+										'data-method' => 'POST',
+										'title' => Yii::t('common', 'Delete'),
+										'aria-label' => Yii::t('common', 'Delete'),
+										'data-confirm' => Yii::t('backend', 'Are you sure you want to delete this item?'),
+									]);
+						}
+					}
 					$content .= Html::endTag('span');
 
 					return $content;
@@ -119,6 +168,56 @@ if ($provision) {
 			]) ?>
 		</div>
 		<div class="col-md-4 col-lg-5">
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getIssues(),
+				]),
+				'summary' => '',
+				'caption' => Yii::t('issue', 'Linked'),
+				'emptyText' => '',
+				'showOnEmpty' => false,
+				'columns' => [
+					[
+						'label' => Yii::t('issue', 'Issue'),
+						'format' => 'html',
+						'value' => static function (IssueRelation $relation) use ($model): string {
+							$issue = $relation->issue_id_1 === $model->getIssueId()
+								? $relation->issue2
+								: $relation->issue;
+
+							return Html::a($issue->getIssueName(), ['issue/view', 'id' => $issue->getIssueId()]);
+						},
+					],
+					[
+						'label' => Yii::t('issue', 'Type'),
+						'value' => static function (IssueRelation $relation) use ($model): string {
+							$issue = $relation->issue_id_1 === $model->getIssueId()
+								? $relation->issue2
+								: $relation->issue;
+							return $issue->getTypeName();
+						},
+					],
+					[
+						'label' => Yii::t('issue', 'Customer'),
+						'value' => static function (IssueRelation $relation) use ($model): string {
+							$issue = $relation->issue_id_1 === $model->getIssueId()
+								? $relation->issue2
+								: $relation->issue;
+							return $issue->customer->getFullName();
+						},
+					],
+					[
+						'class' => ActionColumn::class,
+						'controller' => '/issue/relation',
+						'template' => '{delete}',
+						'visible' => $relationActionColumn,
+						'urlCreator' => static function (string $action, IssueRelation $relation): string {
+							return Url::to(['/issue/relation/delete', 'id' => $relation->id, 'returnUrl' => Url::current()]);
+						},
+					],
+				],
+			]) ?>
+
 			<?= FieldsetDetailView::widget([
 				'legend' => Yii::t('common', 'Issue details'),
 				'toggle' => false,
@@ -171,6 +270,8 @@ if ($provision) {
 
 				],
 			]) ?>
+
+
 		</div>
 	</div>
 

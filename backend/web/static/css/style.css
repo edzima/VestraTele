@@ -153,3 +153,9 @@ div.required label:after {
 		flex-wrap: wrap;
 	}
 }
+
+.issue-users {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(315px, 1fr));
+	grid-gap: 1rem;
+}

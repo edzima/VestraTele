@@ -30,7 +30,7 @@ class IssueUsersWidget extends Widget {
 	public bool $withCheckEmailVisibility = true;
 
 	public array $containerOptions = [
-		'class' => 'issue-users row',
+		'class' => 'issue-users',
 	];
 
 	public ?Closure $legend = null;
@@ -43,7 +43,7 @@ class IssueUsersWidget extends Widget {
 		return [
 			'toggle' => false,
 			'htmlOptions' => [
-				'class' => 'col-md-6',
+				//		'class' => 'col-md-6',
 			],
 			'detailConfig' => [
 				'attributes' => [

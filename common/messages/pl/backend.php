@@ -18,6 +18,7 @@
  */
 return [
 	'Activate' => 'Aktywuj',
+	'Link' => 'Połącz',
 	'Active' => 'Aktywny',
 	'Add {count} SMS: {message} to Send Queue.' => 'Dodano {count} SMS: {message} do kolejki.',
 	'Problem with add SMS to Queue' => 'Problem z dodaniem SMS do kolejki',

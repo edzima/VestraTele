@@ -472,4 +472,14 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return 'id';
 	}
 
+	public function getIssues(): ActiveQuery {
+		return IssueRelation::find()
+			->andWhere(['issue_id_1' => $this->id])
+			->orWhere(['issue_id_2' => $this->id]);
+	}
+
+	public function getTypeName(): string {
+		return IssueType::getTypesNames()[$this->type_id];
+	}
+
 }
