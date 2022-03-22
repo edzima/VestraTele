@@ -3,6 +3,8 @@
 namespace backend\controllers;
 
 use common\components\keyStorage\FormModel;
+use common\helpers\Flash;
+use common\models\issue\IssuePayCalculation;
 use common\models\KeyStorageItem;
 use common\models\user\LoginForm;
 use common\models\user\User;
@@ -86,7 +88,7 @@ class SiteController extends Controller {
 
 	public function actionSettings() {
 		$keys = [
-			'frontend.registration' => [
+			KeyStorageItem::KEY_FRONTEND_REGISTRATION => [
 				'label' => Yii::t('backend', 'Registration'),
 				'type' => FormModel::TYPE_DROPDOWN,
 				'items' => [
@@ -94,7 +96,7 @@ class SiteController extends Controller {
 					true => Yii::t('backend', 'Enabled'),
 				],
 			],
-			'frontend.email-confirm' => [
+			KeyStorageItem::KEY_FRONTEND_EMAIL_CONFIRM => [
 				'label' => Yii::t('backend', 'Email confirm'),
 				'type' => FormModel::TYPE_DROPDOWN,
 				'items' => [
@@ -102,15 +104,7 @@ class SiteController extends Controller {
 					true => Yii::t('backend', 'Enabled'),
 				],
 			],
-			'frontend.maintenance' => [
-				'label' => Yii::t('backend', 'Frontend maintenance mode'),
-				'type' => FormModel::TYPE_DROPDOWN,
-				'items' => [
-					false => Yii::t('backend', 'Disabled'),
-					true => Yii::t('backend', 'Enabled'),
-				],
-			],
-			'backend.theme-skin' => [
+			KeyStorageItem::KEY_BACKEND_THEME_SKIN => [
 				'label' => Yii::t('backend', 'Backend theme'),
 				'type' => FormModel::TYPE_DROPDOWN,
 				'items' => [
@@ -146,18 +140,32 @@ class SiteController extends Controller {
 			],
 
 		];
+
 		if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
 			$keys[KeyStorageItem::KEY_ROBOT_SMS_OWNER_ID] = [
 				'label' => Yii::t('backend', 'Robot SMS Owner'),
 				'type' => FormModel::TYPE_TEXTINPUT,
 			];
 		}
+
+		if (Yii::$app->user->can(User::PERMISSION_PROVISION)) {
+			$keys[KeyStorageItem::KEY_SETTLEMENT_TYPES_FOR_PROVISIONS] = [
+				'label' => Yii::t('backend', 'Settlement types for provisions'),
+				'type' => FormModel::TYPE_CHECKBOXLIST,
+				'json' => true,
+				'items' => IssuePayCalculation::getTypesNames(),
+				'rules' => [
+					['in', 'range' => array_keys(IssuePayCalculation::getTypesNames()), 'allowArray' => true],
+				],
+			];
+		}
+
 		$model = new FormModel([
 			'keys' => $keys,
 		]);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			Yii::$app->session->setFlash('success', Yii::t('backend', 'Settings was successfully saved.'));
+			Flash::add(Flash::TYPE_SUCCESS, Yii::t('backend', 'Settings was successfully saved.'));
 
 			return $this->refresh();
 		}

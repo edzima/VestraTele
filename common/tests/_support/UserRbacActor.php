@@ -96,12 +96,15 @@ trait UserRbacActor {
 	private function createUser(): User {
 		User::deleteAll(['username' => $this->getUsername()]);
 		$user = new User();
-		$user->email = 'test@test.com';
+		$user->email = $this->getUsername() . '@test.com';
 		$user->username = $this->getUsername();
 		$user->setPassword($this->getPassword());
 		$user->status = User::STATUS_ACTIVE;
 		$user->generateAuthKey();
 		$user->save();
+		if ($user->hasErrors()) {
+			codecept_debug($user->getErrors());
+		}
 		return $user;
 	}
 

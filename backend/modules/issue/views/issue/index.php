@@ -10,6 +10,7 @@ use backend\widgets\IssueColumn;
 use common\models\issue\Issue;
 use common\models\user\Worker;
 use common\modules\issue\IssueNoteColumn;
+use common\modules\issue\widgets\IssuePaysColumnWidget;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
@@ -260,6 +261,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => IssueNoteColumn::class,
+			],
+			[
+				'class' => IssuePaysColumnWidget::class,
+				'visible' => Yii::$app->user->can(Worker::PERMISSION_PAY_ALL_PAID),
 			],
 			[
 				'class' => ActionColumn::class,

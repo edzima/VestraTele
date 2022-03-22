@@ -15,7 +15,13 @@ use yii\db\ActiveRecord;
  */
 class KeyStorageItem extends ActiveRecord {
 
+	public const KEY_BACKEND_THEME_SKIN = 'backend.theme-skin';
+
+	public const KEY_FRONTEND_REGISTRATION = 'frontend.registration';
+	public const KEY_FRONTEND_EMAIL_CONFIRM = 'frontend.email-confirm';
+
 	public const KEY_ROBOT_SMS_OWNER_ID = 'robot-sms-owner-id';
+	public const KEY_SETTLEMENT_TYPES_FOR_PROVISIONS = 'provisions.settlement.types';
 
 	/**
 	 * @inheritdoc

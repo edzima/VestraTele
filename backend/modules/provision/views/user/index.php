@@ -20,7 +20,10 @@ $this->params['breadcrumbs'][] = Yii::t('provision', 'Schemas')
 <div class="provision-user-index">
 
 	<p>
-		<?= Html::a(Yii::t('provision', 'Create provision schema'), 'create', ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('provision', 'Create provision schema'),
+			['create', 'toUserId' => $searchModel->from_user_id, 'typeId' => !empty($searchModel->type_id) ? $searchModel->type_id : null], [
+				'class' => 'btn btn-success',
+			]) ?>
 		<?= Html::a(Yii::t('provision', 'Create provision type'), '/provision/type/create', ['class' => 'btn btn-success']) ?>
 
 	</p>

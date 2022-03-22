@@ -2,15 +2,17 @@
 
 namespace common\components\keyStorage;
 
-use Yii;
 use yii\base\Exception;
-use yii\base\InvalidParamException;
+use yii\base\InvalidArgumentException;
 use yii\base\Model;
+use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
+use yii\helpers\Json;
 
 /**
  * @author Eugene Terentev <eugene@terentev.net>
+ * @author Lukasz Wojda <lukasz.wojda@protonmail.com>
  * @var array $keys Array of the keyStorage keys to be handled by this model ($key => $config)
  * Example:
  * [
@@ -26,251 +28,233 @@ use yii\helpers\Inflector;
  *    ]
  * ]
  */
-class FormModel extends Model
-{
-    const TYPE_DROPDOWN = 'dropdownList';
-    const TYPE_TEXTINPUT = 'textInput';
-    const TYPE_TEXTAREA = 'textarea';
-    const TYPE_CHECKBOX = 'checkbox';
-    const TYPE_RADIOLIST = 'radioList';
-    const TYPE_CHECKBOXLIST = 'checkboxList';
-    const TYPE_WIDGET = 'widget';
+class FormModel extends Model {
 
-    /**
-     * @var array
-     */
-    protected $keys = [];
-    /**
-     * @var array
-     */
-    protected $map = [];
+	public const TYPE_DROPDOWN = 'dropdownList';
+	public const TYPE_TEXTINPUT = 'textInput';
+	public const TYPE_TEXTAREA = 'textarea';
+	public const TYPE_CHECKBOX = 'checkbox';
+	public const TYPE_RADIOLIST = 'radioList';
+	public const TYPE_CHECKBOXLIST = 'checkboxList';
+	public const TYPE_WIDGET = 'widget';
 
-    /**
-     * @var string
-     */
-    public $keyStorage = 'keyStorage';
+	/**
+	 * @var array
+	 */
+	protected array $keys = [];
+	/**
+	 * @var array
+	 */
+	protected array $map = [];
 
-    /**
-     * @var array
-     */
-    protected $attributes;
+	protected array $json = [];
 
-    /**
-     * @param $keys
-     */
-    public function setKeys($keys)
-    {
-        $variablized = $values = [];
-        foreach ($keys as $key => $data) {
-            $variablizedKey = Inflector::variablize($key);
-            $this->map[$variablizedKey] = $key;
-            $values[$variablizedKey] = $this->getKeyStorage()->get($key, null, false);
-            $variablized[$variablizedKey] = $data;
-        }
-        $this->keys = $variablized;
-        foreach ($values as $k => $v) {
-            $this->setAttribute($k, $v);
-        }
-        parent::init();
-    }
+	/**
+	 * @var string|array|KeyStorage
+	 */
+	public $keyStorage = 'keyStorage';
 
-    /**
-     * @return array
-     */
-    public function getKeys()
-    {
-        return $this->keys;
-    }
+	/**
+	 * @var array
+	 */
+	protected $attributes;
 
-    /**
-     * Returns the list of attribute names.
-     * By default, this method returns all public non-static properties of the class.
-     * You may override this method to change the default behavior.
-     *
-     * @return array list of attribute names.
-     */
-    public function attributes()
-    {
-        $names = [];
-        foreach ($this->keys as $attribute => $values) {
-            $names[] = $attribute;
-        }
+	public function init(): void {
+		$this->keyStorage = Instance::ensure($this->keyStorage, KeyStorage::class);
+		parent::init();
+	}
 
-        return $names;
-    }
+	/**
+	 * @param $keys
+	 */
+	public function setKeys(array $keys): void {
+		$variablized = $values = [];
+		foreach ($keys as $key => $data) {
+			$variablizedKey = static::attributeName($key);
+			$this->map[$variablizedKey] = $key;
+			$value = $this->getKeyStorage()->get($key, null, false);
+			$json = ArrayHelper::getValue($data, 'json', false);
+			if ($json) {
+				$this->json[$variablizedKey] = $value;
+				$value = Json::decode($value);
+			}
+			$values[$variablizedKey] = $value;
+			$variablized[$variablizedKey] = $data;
+		}
+		$this->keys = $variablized;
+		foreach ($values as $k => $v) {
+			$this->setAttribute($k, $v);
+		}
+		parent::init();
+	}
 
-    /**
-     * @return array
-     */
-    public function rules()
-    {
-        $rules = [];
-        foreach ($this->keys as $attribute => $data) {
-            $attributeRules = ArrayHelper::getValue($data, 'rules', []);
-            if (!empty($attributeRules)) {
-                foreach ($attributeRules as $rule) {
-                    array_unshift($rule, $attribute);
-                    $rules[] = $rule;
-                }
-            } else {
-                $rules[] = [$attribute, 'safe'];
-            }
-        }
+	protected function getKeyStorage(): KeyStorage {
+		$this->keyStorage = Instance::ensure($this->keyStorage, KeyStorage::class);
+		return $this->keyStorage;
+	}
 
-        return $rules;
-    }
+	/**
+	 * @return array
+	 */
+	public function getKeys(): array {
+		return $this->keys;
+	}
 
-    /**
-     * @return array
-     */
-    public function attributeLabels()
-    {
-        $labels = [];
-        foreach ($this->keys as $attribute => $data) {
-            $label = is_array($data) ? ArrayHelper::getValue($data, 'label') : $data;
-            $labels[$attribute] = $label;
-        }
+	/**
+	 * Returns the list of attribute names.
+	 * By default, this method returns all public non-static properties of the class.
+	 * You may override this method to change the default behavior.
+	 *
+	 * @return array list of attribute names.
+	 */
+	public function attributes(): array {
+		$names = [];
+		foreach ($this->keys as $attribute => $values) {
+			$names[] = $attribute;
+		}
 
-        return $labels;
-    }
+		return $names;
+	}
 
-    /**
-     * @param bool $runValidation
-     * @return bool
-     * @throws Exception
-     */
-    public function save($runValidation = true)
-    {
-        if ($runValidation && !$this->validate()) {
-            return false;
-        }
-        foreach ($this->attributes as $variablizedKey => $value) {
-            $originalKey = ArrayHelper::getValue($this->map, $variablizedKey);
-            if (!$originalKey) {
-                throw new Exception();
-            }
-            $this->getKeyStorage()->set($originalKey, $value);
-        }
+	public function rules(): array {
+		$rules = [];
+		foreach ($this->keys as $attribute => $data) {
+			$attributeRules = ArrayHelper::getValue($data, 'rules', []);
+			if (!empty($attributeRules)) {
+				foreach ($attributeRules as $rule) {
+					array_unshift($rule, $attribute);
+					$rules[] = $rule;
+				}
+			} else {
+				$rules[] = [$attribute, 'safe'];
+			}
+		}
 
-        return true;
-    }
+		return $rules;
+	}
 
-    /**
-     * @return null|object
-     * @throws \yii\base\InvalidConfigException
-     */
-    protected function getKeyStorage()
-    {
-        return Yii::$app->get($this->keyStorage);
-    }
+	public function attributeLabels(): array {
+		$labels = [];
+		foreach ($this->keys as $attribute => $data) {
+			$label = is_array($data) ? ArrayHelper::getValue($data, 'label') : $data;
+			$labels[$attribute] = $label;
+		}
 
-    /**
-     * PHP getter magic method.
-     * This method is overridden so that attributes and related objects can be accessed like properties.
-     *
-     * @param string $name property name
-     * @throws \yii\base\InvalidParamException if relation name is wrong
-     * @return mixed property value
-     * @see getAttribute()
-     */
-    public function __get($name)
-    {
-        if (isset($this->attributes[$name]) || array_key_exists($name, $this->attributes)) {
-            return $this->attributes[$name];
-        } elseif ($this->hasAttribute($name)) {
-            return;
-        } else {
-            $value = parent::__get($name);
+		return $labels;
+	}
 
-            return $value;
-        }
-    }
+	/**
+	 * @param bool $validate
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function save(bool $validate = true): bool {
+		if ($validate && !$this->validate()) {
+			return false;
+		}
+		foreach ($this->attributes as $variablizedKey => $value) {
 
-    /**
-     * PHP setter magic method.
-     * This method is overridden so that AR attributes can be accessed like properties.
-     *
-     * @param string $name  property name
-     * @param mixed  $value property value
-     */
-    public function __set($name, $value)
-    {
-        if ($this->hasAttribute($name)) {
-            $this->attributes[$name] = $value;
-        } else {
-            parent::__set($name, $value);
-        }
-    }
+			$originalKey = ArrayHelper::getValue($this->map, $variablizedKey);
 
-    /**
-     * Checks if a property value is null.
-     * This method overrides the parent implementation by checking if the named attribute is null or not.
-     *
-     * @param string $name the property name or the event name
-     * @return bool whether the property value is null
-     */
-    public function __isset($name)
-    {
-        try {
-            return $this->__get($name) !== null;
-        } catch (Exception $e) {
-            return false;
-        }
-    }
+			if (!$originalKey) {
+				throw new Exception();
+			}
 
-    /**
-     * Sets a component property to be null.
-     * This method overrides the parent implementation by clearing
-     * the specified attribute value.
-     *
-     * @param string $name the property name or the event name
-     */
-    public function __unset($name)
-    {
-        if ($this->hasAttribute($name)) {
-            unset($this->attributes[$name]);
-        }
-    }
+			if (array_key_exists($variablizedKey, $this->json)) {
+				$value = Json::encode($value);
+			}
 
-    /**
-     * Returns a value indicating whether the model has an attribute with the specified name.
-     *
-     * @param string $name the name of the attribute
-     * @return bool whether the model has an attribute with the specified name.
-     */
-    public function hasAttribute($name)
-    {
-        return isset($this->attributes[$name]) || in_array($name, $this->attributes(), false);
-    }
+			$this->getKeyStorage()->set($originalKey, $value);
+		}
 
-    /**
-     * Returns the named attribute value.
-     * If this record is the result of a query and the attribute is not loaded,
-     * null will be returned.
-     *
-     * @param string $name the attribute name
-     * @return mixed the attribute value. Null if the attribute is not set or does not exist.
-     * @see hasAttribute()
-     */
-    public function getAttribute($name)
-    {
-        return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
-    }
+		return true;
+	}
 
-    /**
-     * Sets the named attribute value.
-     *
-     * @param string $name  the attribute name
-     * @param mixed  $value the attribute value.
-     * @throws InvalidParamException if the named attribute does not exist.
-     * @see hasAttribute()
-     */
-    public function setAttribute($name, $value)
-    {
-        if ($this->hasAttribute($name)) {
-            $this->attributes[$name] = $value;
-        } else {
-            throw new InvalidParamException(get_class($this) . ' has no attribute named "' . $name . '".');
-        }
-    }
+	/**
+	 * PHP getter magic method.
+	 * This method is overridden so that attributes and related objects can be accessed like properties.
+	 *
+	 * @param string $name property name
+	 * @return mixed property value
+	 * {@inheritDoc}
+	 */
+	public function __get($name) {
+		if ($this->hasAttribute($name)) {
+			return $this->attributes[$name];
+		}
+
+		return parent::__get($name);
+	}
+
+	/**
+	 * PHP setter magic method.
+	 * This method is overridden so that AR attributes can be accessed like properties.
+	 *
+	 * @param string $name property name
+	 * @param mixed $value property value
+	 */
+	public function __set($name, $value) {
+		if ($this->hasAttribute($name)) {
+			$this->attributes[$name] = $value;
+		} else {
+			parent::__set($name, $value);
+		}
+	}
+
+	/**
+	 * Checks if a property value is null.
+	 * This method overrides the parent implementation by checking if the named attribute is null or not.
+	 *
+	 * @param string $name the property name or the event name
+	 * @return bool whether the property value is null
+	 */
+	public function __isset($name) {
+		try {
+			return $this->__get($name) !== null;
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Sets a component property to be null.
+	 * This method overrides the parent implementation by clearing
+	 * the specified attribute value.
+	 *
+	 * @param string $name the property name or the event name
+	 */
+	public function __unset($name) {
+		if ($this->hasAttribute($name)) {
+			unset($this->attributes[$name]);
+		}
+	}
+
+	/**
+	 * Returns a value indicating whether the model has an attribute with the specified name.
+	 *
+	 * @param string $name the name of the attribute
+	 * @return bool whether the model has an attribute with the specified name.
+	 */
+	public function hasAttribute(string $name): bool {
+		return isset($this->attributes[$name]) || in_array($name, $this->attributes(), false);
+	}
+
+	/**
+	 * Sets the named attribute value.
+	 *
+	 * @param string $name the attribute name
+	 * @param mixed $value the attribute value.
+	 * @throws InvalidArgumentException if the named attribute does not exist.
+	 * @see hasAttribute()
+	 */
+	public function setAttribute(string $name, $value): void {
+		if (!$this->hasAttribute($name)) {
+			throw new InvalidArgumentException(static::class . ' has no attribute named "' . $name . '".');
+		}
+		$this->attributes[$name] = $value;
+	}
+
+	public static function attributeName(string $name): string {
+		return Inflector::variablize($name);
+	}
 }

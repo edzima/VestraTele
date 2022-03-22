@@ -301,4 +301,5 @@ return [
 	'Update Summon Type: {name}' => 'Edytuj Typ Zlecenia: {name}',
 	'Send SMS' => 'Wyślij SMS',
 	'Sens SMS: {count}' => 'Wyślij SMS: {count}',
+	'Settlement types for provisions' => 'Typy rozliczeń do prowizji',
 ];
