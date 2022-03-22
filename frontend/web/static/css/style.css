@@ -276,3 +276,9 @@ th.kv-nowrap {
 .text-uppercase {
 	text-transform: uppercase;
 }
+
+.issue-users {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(315px, 1fr));
+	grid-gap: 1rem;
+}
