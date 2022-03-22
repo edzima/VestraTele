@@ -60,6 +60,12 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
 
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
+			? Html::a(Yii::t('backend', 'Link'), ['relation/create', 'id' => $model->id], ['class' => 'btn btn-primary'])
+			: ''
+		?>
+
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE)
 			? Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
 				'class' => 'btn btn-danger pull-right',
@@ -118,7 +124,10 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		: ''
 	?>
 
-	<?= IssueViewWidget::widget(['model' => $model]) ?>
+	<?= IssueViewWidget::widget([
+		'model' => $model,
+		'relationActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
+	]) ?>
 
 	<?= $summonDataProvider->getTotalCount() > 0
 		? SummonGrid::widget([

@@ -1,16 +1,22 @@
 <?php
 
+use common\helpers\Url;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueRelation;
 use common\models\issue\IssueUser;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueUsersWidget;
 use common\widgets\FieldsetDetailView;
+use common\widgets\grid\ActionColumn;
+use common\widgets\GridView;
 use yii\bootstrap\Html;
+use yii\data\ActiveDataProvider;
 
 /* @var $this yii\web\View */
 /* @var $model Issue */
 /* @var $usersLinks bool */
+/* @var $relationActionColumn bool */
 /* @var $userMailVisibilityCheck bool */
 
 $provision = $model->getProvision();
@@ -119,6 +125,56 @@ if ($provision) {
 			]) ?>
 		</div>
 		<div class="col-md-4 col-lg-5">
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getIssues(),
+				]),
+				'summary' => '',
+				'caption' => Yii::t('issue', 'Linked'),
+				'emptyText' => '',
+				'showOnEmpty' => false,
+				'columns' => [
+					[
+						'label' => Yii::t('issue', 'Issue'),
+						'format' => 'html',
+						'value' => static function (IssueRelation $relation) use ($model): string {
+							$issue = $relation->issue_id_1 === $model->getIssueId()
+								? $relation->issue2
+								: $relation->issue;
+
+							return Html::a($issue->getIssueName(), ['issue/view', 'id' => $issue->getIssueId()]);
+						},
+					],
+					[
+						'label' => Yii::t('issue', 'Type'),
+						'value' => static function (IssueRelation $relation) use ($model): string {
+							$issue = $relation->issue_id_1 === $model->getIssueId()
+								? $relation->issue2
+								: $relation->issue;
+							return $issue->getTypeName();
+						},
+					],
+					[
+						'label' => Yii::t('issue', 'Customer'),
+						'value' => static function (IssueRelation $relation) use ($model): string {
+							$issue = $relation->issue_id_1 === $model->getIssueId()
+								? $relation->issue2
+								: $relation->issue;
+							return $issue->customer->getFullName();
+						},
+					],
+					[
+						'class' => ActionColumn::class,
+						'controller' => '/issue/relation',
+						'template' => '{delete}',
+						'visible' => $relationActionColumn,
+						'urlCreator' => static function (string $action, IssueRelation $relation): string {
+							return Url::to(['/issue/relation/delete', 'id' => $relation->id, 'returnUrl' => Url::current()]);
+						},
+					],
+				],
+			]) ?>
+
 			<?= FieldsetDetailView::widget([
 				'legend' => Yii::t('common', 'Issue details'),
 				'toggle' => false,
@@ -171,6 +227,8 @@ if ($provision) {
 
 				],
 			]) ?>
+
+
 		</div>
 	</div>
 

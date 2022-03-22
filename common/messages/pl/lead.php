@@ -8,6 +8,7 @@ return [
 	'Change Status' => 'Zmień Status',
 	'Change Status ({ids})' => 'Zmień Status ({ids})',
 	'Change Status for Leads: {count}' => 'Zmień Status dla {count} Leads',
+	'Create Issue Relation' => 'Przypnij sprawę',
 	'Success assign {user} as {type} to Lead: {lead}.' => 'Przypisano {user} jako {type} do Leada: {lead}.',
 	'From At' => 'Od',
 	'To At' => 'Do',

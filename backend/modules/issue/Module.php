@@ -48,6 +48,11 @@ class Module extends BaseModule {
 						'permissions' => [Worker::PERMISSION_ISSUE_DELETE],
 					],
 					[
+						'allow' => true,
+						'controllers' => ['issue/relation'],
+						'permissions' => [Worker::PERMISSION_ISSUE_CREATE],
+					],
+					[
 						'allow' => false,
 						'controllers' => ['issue/issue'],
 						'actions' => ['delete'],

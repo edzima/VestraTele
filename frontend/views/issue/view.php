@@ -81,6 +81,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= IssueViewWidget::widget([
 		'model' => $model,
 		'usersLinks' => false,
+		'relationActionColumn' => false,
 		'userMailVisibilityCheck' => true,
 	]) ?>
 
