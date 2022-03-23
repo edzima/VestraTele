@@ -8,31 +8,45 @@ use yii\helpers\Console;
 
 class DialerController extends Controller {
 
-	public function actionActivateType(int $id): void {
-		$model = LeadDialerType::findOne($id);
-		if (!$model) {
-			Console::output('Not Found Type with ID: ' . $id);
-		} elseif ($model->status !== LeadDialerType::STATUS_ACTIVE) {
-			$model->status = LeadDialerType::STATUS_ACTIVE;
-			if ($model->save()) {
-				Console::output('Success Activate Type: ' . $model->name);
-			}
-		} else {
-			Console::output('Type: ' . $model->name . ' is already active.');
+	public function actionActivateTypes(array $ids): void {
+		$models = LeadDialerType::find()
+			->andWhere(['id' => $ids])
+			->all();
+
+		foreach ($models as $model) {
+			$this->activeType($model);
 		}
 	}
 
-	public function actionInactivateType(int $id): void {
-		$model = LeadDialerType::findOne($id);
-		if (!$model) {
-			Console::output('Not Found Type with ID: ' . $id);
-		} elseif ($model->status !== LeadDialerType::STATUS_INACTIVE) {
-			$model->status = LeadDialerType::STATUS_INACTIVE;
-			if ($model->save()) {
-				Console::output('Success Inactive Type: ' . $model->name);
+	public function actionInactivateTypes(array $ids): void {
+		$models = LeadDialerType::find()
+			->andWhere(['id' => $ids])
+			->all();
+
+		foreach ($models as $model) {
+			$this->inactiveType($model);
+		}
+	}
+
+	public function activeType(LeadDialerType $type): void {
+		if ($type->status !== LeadDialerType::STATUS_ACTIVE) {
+			$type->status = LeadDialerType::STATUS_ACTIVE;
+			if ($type->save()) {
+				Console::output('Success Activate Type: ' . $type->name);
 			}
 		} else {
-			Console::output('Type: ' . $model->name . ' is already inactive.');
+			Console::output('Type: ' . $type->name . ' is already active.');
+		}
+	}
+
+	public function inactiveType(LeadDialerType $type): void {
+		if ($type->status !== LeadDialerType::STATUS_INACTIVE) {
+			$type->status = LeadDialerType::STATUS_INACTIVE;
+			if ($type->save()) {
+				Console::output('Success Inactive Type: ' . $type->name);
+			}
+		} else {
+			Console::output('Type: ' . $type->name . ' is already inactive.');
 		}
 	}
 
