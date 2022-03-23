@@ -50,6 +50,12 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 			: ''
 		?>
 
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
+			? Html::a(Yii::t('backend', 'Link'), ['relation/create', 'id' => $model->id], ['class' => 'btn btn-primary'])
+			: ''
+		?>
+
 		<?= !$model->isArchived() && Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER)
 			? Html::a(Yii::t('backend', 'Link User'), ['user/link', 'issueId' => $model->id], [
 				'class' => 'btn btn-success',
@@ -58,12 +64,6 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		?>
 
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-
-
-		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
-			? Html::a(Yii::t('backend', 'Link'), ['relation/create', 'id' => $model->id], ['class' => 'btn btn-primary'])
-			: ''
-		?>
 
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE)
