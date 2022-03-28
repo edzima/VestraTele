@@ -5,6 +5,7 @@ namespace backend\tests\functional\issue;
 use backend\modules\issue\controllers\IssueController;
 use backend\tests\Step\Functional\IssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 
@@ -16,8 +17,10 @@ class IssueStageChangeCest {
 	public function _fixtures(): array {
 		return array_merge(
 			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::users(),
 			IssueFixtureHelper::note(),
-			IssueFixtureHelper::stageAndTypesFixtures()
+			IssueFixtureHelper::stageAndTypesFixtures(),
+			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_STAGE_CHANGE),
 		);
 	}
 
@@ -35,6 +38,7 @@ class IssueStageChangeCest {
 			'user_id' => $I->getUser()->id,
 			'title' => 'Proposal (previous: Completing documents)',
 		]);
+		$I->seeEmailIsSent();
 	}
 
 	public function checkStageWithStageParam(IssueManager $I): void {
@@ -50,5 +54,6 @@ class IssueStageChangeCest {
 			'user_id' => $I->getUser()->id,
 			'title' => 'Proposal (previous: Completing documents)',
 		]);
+		$I->seeEmailIsSent();
 	}
 }

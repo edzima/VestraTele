@@ -13,6 +13,8 @@ use ymaker\email\templates\repositories\EmailTemplatesRepositoryInterface;
 class MessageTemplateFixtureHelper extends BaseFixtureHelper {
 
 	public const DIR_ISSUE_CREATE = 'issue-create';
+	public const DIR_ISSUE_STAGE_CHANGE = 'issue-stage-change';
+
 	public const DIR_ISSUE_PAY_PAYED = 'issue-pay-payed';
 	public const DIR_ISSUE_PAY_DEMAND = 'issue-pay-demand';
 	public const DIR_ISSUE_SETTLEMENT_CREATE = 'issue-settlement-create';
