@@ -33,6 +33,7 @@ YiiAsset::register($this);
 		'attributes' => [
 			'id',
 			'name',
+			'show_on_issue_view:boolean',
 		],
 	]) ?>
 

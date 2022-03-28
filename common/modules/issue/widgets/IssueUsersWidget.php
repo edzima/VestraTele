@@ -37,9 +37,18 @@ class IssueUsersWidget extends Widget {
 	public ?Closure $afterLegend = null;
 	public ?Closure $withAddress = null;
 	public bool $legendEncode = true;
+	public bool $withTraits = false;
 
 	public function getDefaultFieldsetOptions(IssueUser $issueUser): array {
 		$user = $issueUser->user;
+		$traits = [];
+		if ($this->withTraits) {
+			$traits = $issueUser->user->getTraits()
+				->joinWith('trait')
+				->andWhere(['show_on_issue_view' => true])
+				->all();
+		}
+
 		return [
 			'toggle' => false,
 			'htmlOptions' => [
@@ -63,6 +72,11 @@ class IssueUsersWidget extends Widget {
 						'label' => Yii::t('common', 'Phone number 2'),
 						'format' => 'tel',
 						'visible' => !empty($user->profile->phone_2),
+					],
+					[
+						'label' => Yii::t('common', 'Traits'),
+						'visible' => !empty($traits),
+						'value' => implode(', ', ArrayHelper::getColumn($traits, 'name')),
 					],
 				],
 			],

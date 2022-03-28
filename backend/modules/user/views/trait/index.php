@@ -29,6 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			['class' => 'yii\grid\SerialColumn'],
 
 			'name',
+			'show_on_issue_view:boolean',
 
 			['class' => 'yii\grid\ActionColumn'],
 		],

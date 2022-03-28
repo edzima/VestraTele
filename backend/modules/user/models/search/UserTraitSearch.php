@@ -16,7 +16,7 @@ class UserTraitSearch extends UserTrait {
 	 */
 	public function rules(): array {
 		return [
-			[['id'], 'integer'],
+			[['id', 'show_on_issue_view'], 'integer'],
 			[['name'], 'safe'],
 		];
 	}
@@ -56,6 +56,7 @@ class UserTraitSearch extends UserTrait {
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
+			'show_on_issue_view' => $this->show_on_issue_view,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name]);

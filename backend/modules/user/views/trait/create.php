@@ -5,7 +5,7 @@
 
 $this->title = Yii::t('backend', 'Create User Trait');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Customers'), 'url' => ['customer/index']];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'User Traits'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'User Traits'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-trait-create">
