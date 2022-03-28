@@ -58,6 +58,7 @@ return [
 	'summon.manager' => 'Zlecenia - manager',
 	'telemarketer' => 'Konsultant',
 	'user' => 'Użytkownik',
+	'user.traits' => 'Użytkownicy - Cechy',
 	'workers' => 'Lista pracowników',
 	'workers.hierarchy' => 'Lista pracowników - hierarchia',
 	'victim' => 'Poszkodowany',

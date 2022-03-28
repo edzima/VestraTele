@@ -3,7 +3,6 @@
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
 use common\models\issue\Issue;
-use common\models\issue\IssueUser;
 use common\models\user\Customer;
 use common\models\user\User;
 use common\widgets\address\AddressDetailView;
@@ -19,6 +18,7 @@ use yii\widgets\DetailView;
 $this->title = $model->getFullName();
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Customers'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 
 <div class="user-view">
@@ -49,73 +49,77 @@ $this->params['breadcrumbs'][] = $this->title;
 		//  Html::a(Yii::t('backend', 'Generate password'), ['/issue/user/link', 'userId' => $model->id], ['class' => 'btn btn-success']) ?>
 	</p>
 
-
-	<?= DetailView::widget([
-		'model' => $model,
-		'attributes' => [
-			[
-				'label' => Yii::t('backend', 'Email'),
-				'value' => $model->email,
-				'format' => 'email',
-				'visible' => !empty($model->email),
-			],
-			[
-				'label' => Yii::t('common', 'Phone number'),
-				'value' => $model->profile->phone,
-				'visible' => !empty($model->profile->phone),
-			],
-			[
-				'label' => Yii::t('common', 'Phone number 2'),
-				'value' => $model->profile->phone_2,
-				'visible' => !empty($model->profile->phone_2),
-			],
-			[
-				'label' => Yii::t('backend', 'Traits'),
-				'value' => $model->getTraitsNames(),
-				'visible' => !empty($model->traits),
-			],
-			[
-				'label' => Yii::t('backend', 'Status'),
-				'value' => $model->getStatusName(),
-			],
-			'pesel',
-			'tax_office',
-			[
-				'label' => Yii::t('backend', 'Username'),
-				'value' => $model->username,
-			],
-			[
-				'label' => Yii::t('backend', 'Other'),
-				'value' => $model->profile->other,
-				'visible' => !empty($model->profile->other),
-			],
-		],
-	]) ?>
-
 	<div class="row">
-		<?= FieldsetDetailView::widget([
-			'legend' => Yii::t('common', 'Home address'),
-			'detailConfig' => [
-				'class' => AddressDetailView::class,
-				'model' => $model->homeAddress,
-			],
-			'htmlOptions' => [
-				'class' => 'col-md-6',
-			],
-		]) ?>
+		<div class="col-md-6">
+			<?= DetailView::widget([
+				'model' => $model,
+				'attributes' => [
+					[
+						'label' => Yii::t('backend', 'Email'),
+						'value' => $model->email,
+						'format' => 'email',
+						'visible' => !empty($model->email),
+					],
+					[
+						'label' => Yii::t('common', 'Phone number'),
+						'value' => $model->profile->phone,
+						'visible' => !empty($model->profile->phone),
+					],
+					[
+						'label' => Yii::t('common', 'Phone number 2'),
+						'value' => $model->profile->phone_2,
+						'visible' => !empty($model->profile->phone_2),
+					],
+					[
+						'label' => Yii::t('backend', 'Traits'),
+						'value' => $model->getTraitsNames(),
+						'visible' => !empty($model->traits),
+					],
+					[
+						'label' => Yii::t('backend', 'Status'),
+						'value' => $model->getStatusName(),
+					],
+					[
+						'label' => Yii::t('backend', 'PESEL'),
+						'visible' => !empty($model->profile->pesel),
+					],
+					[
+						'label' => Yii::t('settlement', 'Tax Office'),
+						'value' => $model->profile->tax_office,
+						'visible' => !empty($model->profile->tax_office),
+					],
+					[
+						'label' => Yii::t('backend', 'Username'),
+						'value' => $model->username,
+					],
+					[
+						'label' => Yii::t('backend', 'Other'),
+						'value' => $model->profile->other,
+						'visible' => !empty($model->profile->other),
+					],
+				],
+			]) ?>
+		</div>
 
-		<?= FieldsetDetailView::widget([
-			'legend' => Yii::t('common', 'Postals address'),
-			'detailConfig' => [
-				'class' => AddressDetailView::class,
-				'model' => $model->postalAddress,
-			],
-			'htmlOptions' => [
-				'class' => 'col-md-6',
-			],
-		]) ?>
+		<div class="col-md-6">
+			<?= FieldsetDetailView::widget([
+				'legend' => Yii::t('common', 'Home address'),
+				'detailConfig' => [
+					'class' => AddressDetailView::class,
+					'model' => $model->homeAddress,
+				],
 
+			]) ?>
 
+			<?= FieldsetDetailView::widget([
+				'legend' => Yii::t('common', 'Postals address'),
+				'detailConfig' => [
+					'class' => AddressDetailView::class,
+					'model' => $model->postalAddress,
+				],
+			]) ?>
+
+		</div>
 	</div>
 
 
@@ -151,7 +155,8 @@ $this->params['breadcrumbs'][] = $this->title;
 					'format' => 'date',
 				],
 			],
-		]) ?>
+		])
+		?>
 
 	</fieldset>
 

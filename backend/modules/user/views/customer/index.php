@@ -4,6 +4,7 @@ use backend\helpers\Url;
 use backend\modules\user\models\search\CustomerUserSearch;
 use backend\widgets\GridView;
 use common\models\user\Customer;
+use common\models\user\User;
 use common\models\user\UserProfile;
 use kartik\grid\ActionColumn;
 use yii\bootstrap\Html;
@@ -20,6 +21,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create customer'), ['create'], ['class' => 'btn btn-success']) ?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_USER_TRAITS)
+			? Html::a(Yii::t('common', 'User Traits'), ['trait/index'], ['class' => 'btn btn-warning'])
+			: ''
+		?>
 	</p>
 
 	<?= GridView::widget([

@@ -51,6 +51,7 @@ return [
 	'Create customer' => 'Dodaj klienta',
 	'Create worker' => 'Dodaj pracownika',
 	'Create installment cost: {issue}' => 'Dodaj zaliczkę: {issue}',
+	'Create User Trait' => 'Dodaj Cechę',
 	'Customers' => 'Klienci',
 	'DB manager' => 'Zarządzanie Bazą Danych',
 	'Delete' => 'Usuń',
@@ -286,7 +287,6 @@ return [
 	'Pay status: {value}' => 'Status wpłaty: {value}',
 	'Traits' => 'Cechy',
 	'Create addministrative settlement for: {issue}' => 'Create addministrative settlement for: {issue}',
-	'Create User Trait' => 'Create User Trait',
 	'Received {count} pays. Sum value: {sumValue}' => 'Received {count} pays. Sum value: {sumValue}',
 	'Create administrative settlement' => 'Dodaj opłate administracyjną',
 	'Create administrative settlement for: {issue}' => 'Dodaj opłate administracyjną: {issue}',
@@ -303,4 +303,5 @@ return [
 	'Send SMS' => 'Wyślij SMS',
 	'Sens SMS: {count}' => 'Wyślij SMS: {count}',
 	'Settlement types for provisions' => 'Typy rozliczeń do prowizji',
+	'Update User Trait: {name}' => 'Edytuj Cechę: {name}',
 ];
