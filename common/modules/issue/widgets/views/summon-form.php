@@ -28,7 +28,7 @@ use yii\web\View;
 					'data' => SummonForm::getDocNames(),
 					'options' => [
 						'multiple' => true,
-						'placeholder' => $model->getAttributeLabel('doc_type_id'),
+						'placeholder' => $model->getAttributeLabel('doc_types_ids'),
 					],
 					'pluginOptions' => [
 						'allowClear' => true,
