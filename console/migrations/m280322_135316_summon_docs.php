@@ -14,7 +14,7 @@ class m280322_135316_summon_docs extends Migration {
 
 		$this->createTable('{{%summon_doc}}', [
 			'id' => $this->primaryKey(),
-			'name' => $this->string(50)->notNull()->unique(),
+			'name' => $this->string()->notNull()->unique(),
 		]);
 
 		$this->addColumn('{{%summon}}', 'doc_type_id', $this->integer()->null());

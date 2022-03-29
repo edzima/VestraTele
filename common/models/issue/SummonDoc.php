@@ -5,6 +5,7 @@ namespace common\models\issue;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "summon_doc".
@@ -23,13 +24,17 @@ class SummonDoc extends ActiveRecord {
 		return '{{%summon_doc}}';
 	}
 
+	public static function getNames(): array {
+		return ArrayHelper::map(static::find()->all(), 'id', 'name');
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
 			[['name'], 'required'],
-			[['name'], 'string', 'max' => 50],
+			[['name'], 'string', 'max' => 255],
 			[['name'], 'unique'],
 		];
 	}

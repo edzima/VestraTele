@@ -1,10 +1,11 @@
 <?php
 
+use common\models\issue\SummonDoc;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\SummonDoc */
+/* @var $model SummonDoc */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
