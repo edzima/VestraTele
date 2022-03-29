@@ -17,6 +17,10 @@ use yii\helpers\ArrayHelper;
  */
 class SummonDoc extends ActiveRecord {
 
+	public static function viaTableName(): string {
+		return '{{%summon_doc_list}}';
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -55,6 +59,7 @@ class SummonDoc extends ActiveRecord {
 	 * @return ActiveQuery
 	 */
 	public function getSummons() {
-		return $this->hasMany(Summon::class, ['doc_type_id' => 'id']);
+		return $this->hasMany(Summon::class, ['id' => 'summon_id'])->viaTable(static::viaTableName(), ['doc_type_id' => 'id']);
 	}
+
 }

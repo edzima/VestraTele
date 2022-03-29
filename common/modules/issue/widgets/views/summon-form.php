@@ -20,6 +20,24 @@ use yii\web\View;
 		]); ?>
 
 		<div class="row">
+			<?= $form->field($model, 'doc_types_ids', [
+				'options' => [
+					'class' => 'col-md-12',
+				],
+			])->widget(Select2::class, [
+					'data' => SummonForm::getDocNames(),
+					'options' => [
+						'multiple' => true,
+						'placeholder' => $model->getAttributeLabel('doc_type_id'),
+					],
+					'pluginOptions' => [
+						'allowClear' => true,
+					],
+				]
+			) ?>
+		</div>
+
+		<div class="row">
 
 			<?= $form->field($model, 'issue_id', [
 				'options' => [
@@ -36,20 +54,7 @@ use yii\web\View;
 				]
 			) ?>
 
-			<?= $form->field($model, 'doc_type_id', [
-				'options' => [
-					'class' => 'col-md-2',
-				],
-			])->widget(Select2::class, [
-					'data' => SummonForm::getDocNames(),
-					'options' => [
-						'placeholder' => $model->getAttributeLabel('doc_type_id'),
-					],
-					'pluginOptions' => [
-						'allowClear' => true,
-					],
-				]
-			) ?>
+
 
 			<?= !$model->getModel()->isNewRecord ? $form->field($model, 'status', [
 				'options' => [

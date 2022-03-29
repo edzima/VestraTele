@@ -80,8 +80,8 @@ class SummonGrid extends GridView {
 				'noWrap' => true,
 			],
 			[
-				'attribute' => 'doc_type_id',
-				'value' => 'doc.name',
+				'attribute' => 'doc_types_ids',
+				'value' => 'docsNames',
 				'filter' => SummonSearch::getDocTypesNames(),
 				'options' => [
 					'style' => [

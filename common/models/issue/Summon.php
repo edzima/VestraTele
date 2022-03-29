@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\helpers\ArrayHelper;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\SummonQuery;
 use common\models\user\User;
@@ -29,7 +30,6 @@ use yii\db\ActiveRecord;
  * @property int $contractor_id
  * @property int $entity_id
  * @property int $city_id
- * @property int|null $doc_type_id
  *
  * @property-read string $statusName
  * @property-read string $typeName
@@ -41,7 +41,7 @@ use yii\db\ActiveRecord;
  * @property-read User $owner
  * @property-read Simc $city
  * @property-read EntityResponsible $entityResponsible
- * @property-read SummonDoc|null $doc
+ * @property-read SummonDoc[] $docs
  */
 class Summon extends ActiveRecord implements IssueInterface {
 
@@ -97,8 +97,6 @@ class Summon extends ActiveRecord implements IssueInterface {
 			[['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Simc::class, 'targetAttribute' => ['city_id' => 'id']],
 			[['contractor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['contractor_id' => 'id']],
 			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
-			[['doc_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => SummonDoc::class, 'targetAttribute' => ['doc_type_id' => 'id']],
-
 		];
 	}
 
@@ -131,8 +129,16 @@ class Summon extends ActiveRecord implements IssueInterface {
 			'entity' => Yii::t('common', 'Entity responsible'),
 			'entityWithCity' => Yii::t('common', 'Entity responsible'),
 			'deadline_at' => Yii::t('common', 'Deadline at'),
-			'doc_type_id' => Yii::t('common', 'Doc Type'),
+			'doc_types_ids' => Yii::t('common', 'Doc Types'),
 		];
+	}
+
+	public function getDocsNames(): ?string {
+		$docs = $this->docs;
+		if (empty($docs)) {
+			return null;
+		}
+		return implode(', ', ArrayHelper::getColumn($docs, 'name'));
 	}
 
 	public function getType(): ActiveQuery {
@@ -190,8 +196,8 @@ class Summon extends ActiveRecord implements IssueInterface {
 		return $this->hasOne(Simc::class, ['id' => 'city_id']);
 	}
 
-	public function getDoc() {
-		return $this->hasOne(SummonDoc::class, ['id' => 'doc_type_id']);
+	public function getDocs() {
+		return $this->hasMany(SummonDoc::class, ['id' => 'doc_type_id'])->viaTable(SummonDoc::viaTableName(), ['summon_id' => 'id']);
 	}
 
 	/**

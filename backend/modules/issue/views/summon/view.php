@@ -49,8 +49,7 @@ YiiAsset::register($this);
 		'model' => $model,
 		'attributes' => [
 			[
-				'attribute' => 'doc_type_id',
-				'value' => $model->doc->name,
+				'attribute' => 'docsNames',
 			],
 			'title:text',
 			'issue.longId:text:Sprawa',

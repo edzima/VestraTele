@@ -23,6 +23,8 @@ class SummonSearch extends Summon implements
 	CustomerSearchInterface,
 	SearchModel {
 
+	public $doc_types_ids;
+
 	public string $customerLastname = '';
 	public string $customerPhone = '';
 
@@ -59,8 +61,9 @@ class SummonSearch extends Summon implements
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type_id', 'doc_type_id', 'status', 'created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
+			[['id', 'type_id', 'status', 'created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
 			[['title'], 'safe'],
+			['doc_types_ids', 'in', 'range' => array_keys(static::getDocTypesNames()), 'allowArray' => true],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['customerPhone', PhoneValidator::class],
 		];
@@ -69,7 +72,7 @@ class SummonSearch extends Summon implements
 	/**
 	 * {@inheritdoc}
 	 */
-	public function scenarios() {
+	public function scenarios(): array {
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
 	}
@@ -88,7 +91,7 @@ class SummonSearch extends Summon implements
 				$query->joinWith('userProfile CP');
 			},
 		]);
-		$query->with('doc');
+		$query->with('docs');
 		$query->with('owner.userProfile');
 		$query->with('contractor.userProfile');
 		$query->with('type');
@@ -110,13 +113,17 @@ class SummonSearch extends Summon implements
 			return $dataProvider;
 		}
 
+		if (!empty($this->doc_types_ids)) {
+			$query->joinWith('docs');
+			$query->andFilterWhere([SummonDoc::tableName() . '.id' => $this->doc_types_ids]);
+		}
+
 		$this->applyCustomerSurnameFilter($query);
 		$this->applyCustomerPhoneFilter($query);
 		// grid filtering conditions
 		$query->andFilterWhere([
 			static::SUMMON_ALIAS . '.id' => $this->id,
 			static::SUMMON_ALIAS . '.type_id' => $this->type_id,
-			static::SUMMON_ALIAS . '.doc_type_id' => $this->doc_type_id,
 			static::SUMMON_ALIAS . '.status' => $this->status,
 			static::SUMMON_ALIAS . '.created_at' => $this->created_at,
 			static::SUMMON_ALIAS . '.updated_at' => $this->updated_at,
