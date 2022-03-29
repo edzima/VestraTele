@@ -6,6 +6,7 @@ use backend\helpers\Url;
 use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionUser;
 use common\models\provision\ProvisionUserData;
+use common\models\provision\ProvisionUserQuery;
 use Yii;
 use yii\base\Widget;
 use yii\data\ActiveDataProvider;
@@ -89,14 +90,20 @@ class UserProvisionsWidget extends Widget {
 		if (!isset($config['class'])) {
 			$config['class'] = ActiveDataProvider::class;
 		}
+		if ($query instanceof ProvisionUserQuery) {
+			$this->orderByTypeNameAndDate($query);
+		}
+		$config['query'] = $query;
+
+		return Yii::createObject($config);
+	}
+
+	protected function orderByTypeNameAndDate(ProvisionUserQuery $query): void {
 		$query->joinWith('type');
 		$query->orderBy([
 			ProvisionType::tableName() . '.name' => SORT_ASC,
 			ProvisionUser::tableName() . '.from_at' => SORT_ASC,
 		]);
-		$config['query'] = $query;
-
-		return Yii::createObject($config);
 	}
 
 }
