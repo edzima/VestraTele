@@ -46,7 +46,7 @@ class SummonForm extends Model {
 	public ?int $contractor_id = null;
 	public ?int $entity_id = null;
 	public ?int $city_id = null;
-	public ?int $doc_type_id = null;
+	public $doc_type_id;
 
 	public $start_at;
 	public $deadline_at;
