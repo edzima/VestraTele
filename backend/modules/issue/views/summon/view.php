@@ -1,7 +1,6 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
-use backend\helpers\Url;
 use common\models\issue\Summon;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
@@ -49,6 +48,10 @@ YiiAsset::register($this);
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [
+			[
+				'attribute' => 'doc_type_id',
+				'value' => $model->doc->name,
+			],
 			'title:text',
 			'issue.longId:text:Sprawa',
 			'owner',

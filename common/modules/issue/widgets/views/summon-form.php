@@ -36,6 +36,21 @@ use yii\web\View;
 				]
 			) ?>
 
+			<?= $form->field($model, 'doc_type_id', [
+				'options' => [
+					'class' => 'col-md-2',
+				],
+			])->widget(Select2::class, [
+					'data' => SummonForm::getDocNames(),
+					'options' => [
+						'placeholder' => $model->getAttributeLabel('doc_type_id'),
+					],
+					'pluginOptions' => [
+						'allowClear' => true,
+					],
+				]
+			) ?>
+
 			<?= !$model->getModel()->isNewRecord ? $form->field($model, 'status', [
 				'options' => [
 					'class' => 'col-md-3',

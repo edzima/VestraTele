@@ -63,6 +63,7 @@ class SummonGrid extends GridView {
 				'class' => CustomerDataColumn::class,
 				'visible' => $this->withCustomer,
 			],
+
 			[
 				'attribute' => 'customerPhone',
 				'value' => 'issue.customer.profile.phone',
@@ -79,9 +80,24 @@ class SummonGrid extends GridView {
 				'noWrap' => true,
 			],
 			[
+				'attribute' => 'doc_type_id',
+				'value' => 'doc.name',
+				'filter' => SummonSearch::getDocTypesNames(),
+				'options' => [
+					'style' => [
+						'min-width' => '200px',
+					],
+				],
+			],
+			[
 				'attribute' => 'status',
 				'value' => 'statusName',
 				'filter' => SummonSearch::getStatusesNames(),
+				'options' => [
+					'style' => [
+						'min-width' => '115px',
+					],
+				],
 			],
 			[
 				'attribute' => 'title',

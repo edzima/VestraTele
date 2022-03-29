@@ -38,7 +38,7 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
-						'controllers' => ['issue/summon-type'],
+						'controllers' => ['issue/summon-type', 'issue/summon-doc'],
 						'permissions' => [Worker::PERMISSION_SUMMON_MANAGER],
 					],
 					[

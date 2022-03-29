@@ -305,4 +305,5 @@ return [
 	'Deadline At cannot be blank on custom term.' => 'Deadline nie może być pusty.',
 	'User Traits' => 'Cechy',
 	'Show on Issue View' => 'Pokazuj na Karcie sprawy',
+	'Doc Type' => 'Typ Dokumentu',
 ];

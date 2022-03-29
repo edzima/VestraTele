@@ -6,6 +6,7 @@ use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\issue\Summon;
+use common\models\issue\SummonDoc;
 use common\models\issue\SummonType;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -45,6 +46,7 @@ class SummonForm extends Model {
 	public ?int $contractor_id = null;
 	public ?int $entity_id = null;
 	public ?int $city_id = null;
+	public ?int $doc_type_id = null;
 
 	public $start_at;
 	public $deadline_at;
@@ -59,7 +61,7 @@ class SummonForm extends Model {
 	public function rules(): array {
 		return [
 			[['type_id', 'status', 'title', 'issue_id', 'owner_id', 'contractor_id', 'start_at', 'entity_id', 'city_id'], 'required'],
-			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status', 'entity_id'], 'integer'],
+			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status', 'entity_id', 'doc_type_id'], 'integer'],
 			['sendEmailToContractor', 'boolean'],
 			[['title'], 'string', 'max' => 255],
 			[['start_at', 'realize_at', 'realized_at'], 'safe'],
@@ -74,6 +76,7 @@ class SummonForm extends Model {
 			['entity_id', 'in', 'range' => array_keys(static::getEntityNames())],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
+			['doc_type_id', 'in', 'range' => array_keys(static::getDocNames())],
 			['term', 'in', 'range' => array_keys(static::getTermsNames())],
 			[['contractor_id'], 'in', 'range' => array_keys($this->getContractors()),],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
@@ -122,6 +125,7 @@ class SummonForm extends Model {
 		$this->model = $model;
 		$this->status = $model->status;
 		$this->type_id = $model->type_id;
+		$this->doc_type_id = $model->doc_type_id;
 		$this->issue_id = $model->issue_id;
 		$this->title = $model->title;
 		$this->contractor_id = $model->contractor_id;
@@ -142,6 +146,7 @@ class SummonForm extends Model {
 		$model = $this->getModel();
 		$model->status = $this->status;
 		$model->type_id = $this->type_id;
+		$model->doc_type_id = $this->doc_type_id;
 		$model->issue_id = $this->issue_id;
 		$model->title = $this->title;
 		$model->contractor_id = $this->contractor_id;
@@ -185,6 +190,10 @@ class SummonForm extends Model {
 			->setTo($model->contractor->email)
 			->setSubject(Yii::t('issue', 'You have new Summon: {type}', ['type' => $model->getTypeName()]))
 			->send();
+	}
+
+	public static function getDocNames(): array {
+		return SummonDoc::getNames();
 	}
 
 	public static function getStatusesNames(): array {

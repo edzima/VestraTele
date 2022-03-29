@@ -2,8 +2,8 @@
 
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\issue\widgets\SummonGrid;
-use yii\helpers\Html;
 use common\models\user\Worker;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel SummonSearch */
@@ -20,6 +20,11 @@ $this->params['breadcrumbs'][] = $this->title;
 		<?= Html::a(Yii::t('backend', 'Create summon'), ['create'], ['class' => 'btn btn-success']) ?>
 		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
 			? Html::a(Yii::t('backend', 'Summon Types'), ['summon-type/index'], ['class' => 'btn btn-info'])
+			: ''
+		?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
+			? Html::a(Yii::t('backend', 'Summon Docs'), ['summon-doc/index'], ['class' => 'btn btn-warning'])
 			: ''
 		?>
 

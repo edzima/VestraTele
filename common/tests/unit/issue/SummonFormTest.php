@@ -7,6 +7,7 @@ use common\fixtures\helpers\TerytFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\form\SummonForm;
 use common\models\issue\Summon;
+use common\models\issue\SummonDoc;
 use common\models\issue\SummonType;
 use common\models\user\Worker;
 use common\tests\_support\UnitModelTrait;
@@ -69,6 +70,36 @@ class SummonFormTest extends Unit {
 			'type_id' => 1,
 			'title' => 'Test Unit Summon Title',
 			'start_at' => '2020-01-01',
+			'doc_type_id' => null,
+			'entity_id' => static::DEFAULT_ENTITY_ID,
+			'contractor_id' => static::DEFAULT_CONTRACTOR_ID,
+			'owner_id' => static::DEFAULT_OWNER_ID,
+			'city_id' => static::DEFAULT_CITY_ID,
+		]);
+	}
+
+	public function testSaveWithDocType(): void {
+		$summonDocTypeId = $this->tester->haveRecord(SummonDoc::class, [
+			'name' => 'Test summon Doc',
+		]);
+		$this->giveModel();
+		$model = $this->model;
+		$model->issue_id = 1;
+		$model->type_id = 1;
+		$model->doc_type_id = $summonDocTypeId;
+		$model->start_at = '2020-01-01';
+		$model->title = 'Test Unit Summon Title';
+		$model->city_id = static::DEFAULT_CITY_ID;
+		$model->contractor_id = static::DEFAULT_CONTRACTOR_ID;
+		$model->entity_id = static::DEFAULT_ENTITY_ID;
+
+		$this->thenSuccessSave();
+		$this->tester->seeRecord(Summon::class, [
+			'issue_id' => 1,
+			'type_id' => 1,
+			'title' => 'Test Unit Summon Title',
+			'start_at' => '2020-01-01',
+			'doc_type_id' => $summonDocTypeId,
 			'entity_id' => static::DEFAULT_ENTITY_ID,
 			'contractor_id' => static::DEFAULT_CONTRACTOR_ID,
 			'owner_id' => static::DEFAULT_OWNER_ID,
