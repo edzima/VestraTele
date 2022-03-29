@@ -43,14 +43,14 @@ class PayController extends Controller {
 		if (isset($_POST['expandRowKey'])) {
 			$model = $this->findModel($_POST['expandRowKey']);
 			$userId = Yii::$app->user->getId();
-			if (!Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
+			if (!Yii::$app->user->can(User::PERMISSION_PROVISION)
 				&& !$model->calculation->issue->isForUser($userId)) {
 				throw new NotFoundHttpException();
 			}
 			$query = $model->getProvisions()
 				->joinWith('toUser.userProfile')
 				->joinWith('fromUser.userProfile');
-			if (!Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
+			if (!Yii::$app->user->can(User::PERMISSION_PROVISION)) {
 				$query->user($userId);
 			}
 			$dataProvider = new ActiveDataProvider([
