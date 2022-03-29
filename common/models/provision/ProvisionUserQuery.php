@@ -15,10 +15,10 @@ class ProvisionUserQuery extends ActiveQuery {
 	public function forDate(string $date): self {
 		$this->andWhere([
 			'and', [
-				'or', ['<=', 'from_at', $date], ['from_at' => null],
+				'or', ['<=', ProvisionUser::tableName() . '.from_at', $date], [ProvisionUser::tableName() . '.from_at' => null],
 			],
 			[
-				'or', ['>=', 'to_at', $date], ['to_at' => null],
+				'or', ['>=', ProvisionUser::tableName() . '.to_at', $date], [ProvisionUser::tableName() . '.to_at' => null],
 			],
 		]);
 		return $this;
