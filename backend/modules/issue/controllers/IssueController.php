@@ -75,6 +75,10 @@ class IssueController extends Controller {
 					'label' => 'Nr',
 				],
 				[
+					'attribute' => 'agent.fullName',
+					'label' => Yii::t('issue', 'Agent'),
+				],
+				[
 					'attribute' => 'customer.profile.firstname',
 					'label' => 'Imie',
 				],
@@ -95,8 +99,12 @@ class IssueController extends Controller {
 					'label' => 'Email',
 				],
 				[
-					'attribute' => 'type.name',
-					'label' => 'Typ',
+					'attribute' => 'typeName',
+					'label' => Yii::t('issue', 'Type'),
+				],
+				[
+					'attribute' => 'stageName',
+					'label' => Yii::t('issue', 'Stage'),
 				],
 			];
 			$addressSearch = $searchModel->addressSearch;

@@ -482,4 +482,8 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return IssueType::getTypesNames()[$this->type_id];
 	}
 
+	public function getStageName(): string {
+		return IssueStage::getStagesNames(true)[$this->stage_id];
+	}
+
 }
