@@ -43,6 +43,12 @@ class ProvisionTypeSearch extends ProvisionType {
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
+			'sort' => [
+				'defaultOrder' => [
+					'name' => SORT_ASC,
+					'from_at' => SORT_ASC,
+				],
+			],
 		]);
 
 		$this->load($params);

@@ -3,6 +3,8 @@
 namespace backend\modules\provision\widgets;
 
 use backend\helpers\Url;
+use common\models\provision\ProvisionType;
+use common\models\provision\ProvisionUser;
 use common\models\provision\ProvisionUserData;
 use Yii;
 use yii\base\Widget;
@@ -87,7 +89,13 @@ class UserProvisionsWidget extends Widget {
 		if (!isset($config['class'])) {
 			$config['class'] = ActiveDataProvider::class;
 		}
+		$query->joinWith('type');
+		$query->orderBy([
+			ProvisionType::tableName() . '.name' => SORT_ASC,
+			ProvisionUser::tableName() . '.from_at' => SORT_ASC,
+		]);
 		$config['query'] = $query;
+
 		return Yii::createObject($config);
 	}
 

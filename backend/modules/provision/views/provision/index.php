@@ -27,6 +27,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			Html::getInputName(ToUserGroupProvisionSearch::instance(), 'dateTo') => $searchModel->dateTo,
 			Html::getInputName(ToUserGroupProvisionSearch::instance(), 'to_user_id') => $searchModel->to_user_id,
 		], ['class' => 'btn btn-success']) ?>
+
+		<?= Html::a(Yii::t('settlement', 'Without provisions'), [
+			'/settlement/calculation/without-provisions',
+		], [
+			'class' => 'btn btn-warning',
+		]) ?>
 	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
