@@ -79,7 +79,7 @@ YiiAsset::register($this);
 		'visibleCustomer' => false,
 		'caption' => Yii::t('settlement', 'Pays'),
 		'summary' => '',
-		'visibleProvisionsDetails' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR) || $model->issue->isForUser(Yii::$app->user->getId()),
+		'visibleProvisionsDetails' => Yii::$app->user->can(User::PERMISSION_PROVISION) || $model->issue->isForUser(Yii::$app->user->getId()),
 		'visibleSettlementType' => false,
 		'visibleIssueType' => false,
 	])
