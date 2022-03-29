@@ -241,7 +241,10 @@ class IssueController extends Controller {
 		}
 		$model->date_at = date($model->dateFormat);
 		$model->user_id = Yii::$app->user->getId();
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+		if ($model->load(Yii::$app->request->post())
+			&& $model->save()
+		) {
+			$model->pushMessages();
 			return $this->redirect($returnUrl ?? ['view', 'id' => $issueId]);
 		}
 		return $this->render('stage', [

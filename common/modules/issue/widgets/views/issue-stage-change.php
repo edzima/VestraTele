@@ -2,6 +2,7 @@
 
 use common\helpers\Html;
 use common\models\issue\form\IssueStageChangeForm;
+use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\ActiveForm;
 use common\widgets\DateTimeWidget;
 use kartik\select2\Select2;
@@ -91,6 +92,11 @@ use yii\widgets\DetailView;
 				])
 				: ''
 			?>
+
+			<?= IssueMessagesFormWidget::widget([
+				'form' => $form,
+				'model' => $model->getMessagesModel(),
+			]) ?>
 
 			<div class="form-group">
 				<?= Html::submitButton(Yii::t('common', 'Save'), ['class' => 'btn btn-success']) ?>

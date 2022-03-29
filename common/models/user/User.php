@@ -41,7 +41,7 @@ use yii\web\IdentityInterface;
  * @property-read Address|null $homeAddress
  * @property-read Address|null $postalAddress
  * @property-read IssueUser[] $issueUsers
- * @property-read UserTrait[] $traits
+ * @property-read UserTraitAssign[] $traits
  * @property-read IssueCost[] $costs
  *
  */
@@ -110,6 +110,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 	public const PERMISSION_SMS = 'sms';
 	public const PERMISSION_MULTIPLE_SMS = 'sms.multiple';
 	public const PERMISSION_LEAD_DELETE = 'lead.delete';
+	public const PERMISSION_USER_TRAITS = 'user.traits';
 
 	private static $ROLES_NAMES;
 	private static $PERMISSIONS_NAMES;
@@ -254,7 +255,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 	}
 
 	public function getTraits(): ActiveQuery {
-		return $this->hasMany(UserTrait::class, ['user_id' => 'id'])->indexBy('trait_id');
+		return $this->hasMany(UserTraitAssign::class, ['user_id' => 'id'])->indexBy('trait_id');
 	}
 
 	public function getTraitsNames(): string {

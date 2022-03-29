@@ -9,7 +9,7 @@ use common\fixtures\user\CustomerFixture;
 use common\fixtures\user\UserAddressFixture;
 use common\models\user\User;
 use common\models\user\UserProfile;
-use common\models\user\UserTrait;
+use common\models\user\UserTraitAssign;
 
 /**
  * Class CustomerCreateCest
@@ -129,7 +129,7 @@ class CustomerCreateCest {
 		$I->fillField('Firstname', 'Fred');
 		$I->fillField('Lastname', 'Johansson');
 		$I->fillField('Postal Code', '34-200');
-		$I->selectOption('Traits', UserTrait::TRAIT_COMMISSION_REFUND);
+		$I->selectOption('Traits', UserTraitAssign::TRAIT_COMMISSION_REFUND);
 		$this->sendForm($I);
 
 		$user = $I->grabRecord(User::class, [
@@ -142,8 +142,8 @@ class CustomerCreateCest {
 			'lastname' => 'Johansson',
 		]);
 
-		$I->seeRecord(UserTrait::class, [
-			'trait_id' => UserTrait::TRAIT_COMMISSION_REFUND,
+		$I->seeRecord(UserTraitAssign::class, [
+			'trait_id' => UserTraitAssign::TRAIT_COMMISSION_REFUND,
 			'user_id' => $user->id,
 
 		]);

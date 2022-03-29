@@ -34,6 +34,8 @@ class IssueSearch extends BaseIssueSearch {
 	public bool $onlyWithAllPayedPay = false;
 	public bool $withArchiveOnAllPayedPay = false;
 
+	public $stage_change_at;
+
 	public ?string $signature_act = null;
 	private ?array $ids = null;
 
@@ -49,7 +51,7 @@ class IssueSearch extends BaseIssueSearch {
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
 			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements'], 'boolean'],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
-			[['type_additional_date_at', 'signature_act'], 'safe'],
+			[['type_additional_date_at', 'signature_act', 'stage_change_at'], 'safe'],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 		]);
 	}
@@ -113,6 +115,7 @@ class IssueSearch extends BaseIssueSearch {
 		$this->lawyerFilter($query);
 		$this->payedFilter($query);
 		$this->settlementsFilter($query);
+		$this->stageChangeAtFilter($query);
 	}
 
 	private function signatureActFilter(IssueQuery $query): void {
@@ -217,6 +220,13 @@ class IssueSearch extends BaseIssueSearch {
 			$this->ids = $query->column();
 		}
 		return $this->ids;
+	}
+
+	private function stageChangeAtFilter(IssueQuery $query): void {
+		if (!empty($this->stage_change_at)) {
+			$query->andWhere(['>=', Issue::tableName() . '.stage_change_at', date('Y-m-d 00:00:00', strtotime($this->stage_change_at))]);
+			$query->andWhere(['<=', Issue::tableName() . '.stage_change_at', date('Y-m-d 23:59:59', strtotime($this->stage_change_at))]);
+		}
 	}
 
 }

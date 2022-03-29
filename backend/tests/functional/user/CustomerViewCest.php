@@ -2,11 +2,11 @@
 
 namespace backend\tests\functional\user;
 
+use backend\modules\user\controllers\CustomerController;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\UserFixtureHelper;
 use common\models\user\User;
-use common\models\user\UserTrait;
 
 /**
  * Class CustomerViewCest
@@ -14,6 +14,9 @@ use common\models\user\UserTrait;
  */
 class CustomerViewCest {
 
+	/**
+	 * @see CustomerController
+	 */
 	protected const ROUTE = 'user/customer/view';
 
 	/**
@@ -28,6 +31,7 @@ class CustomerViewCest {
 		return array_merge([
 			'customer' => UserFixtureHelper::customer(),
 			'customer-traits' => UserFixtureHelper::customerTraits(),
+			'trait' => UserFixtureHelper::traits(),
 		], UserFixtureHelper::profile(UserFixtureHelper::CUSTOMER));
 	}
 
@@ -63,8 +67,9 @@ class CustomerViewCest {
 		$I->see('+48 673 222 110');
 		$I->see('customer.wayne');
 		$I->see(User::getStatusesNames()[User::STATUS_ACTIVE]);
-		$I->see(UserTrait::getNames()[UserTrait::TRAIT_BAILIFF]);
-		$I->dontSee(UserTrait::getNames()[UserTrait::TRAIT_ANTYVINDICATION]);
+		$I->wantTo('Check Trait Visible');
+		$I->see('Bailiff');
+		$I->dontSee('Antyvindication');
 
 		$I->amOnPage([static::ROUTE, 'id' => UserFixtureHelper::CUSTOMER_ERIKA_LARSON_ID]);
 		$I->see('Larson Erika', 'h1');

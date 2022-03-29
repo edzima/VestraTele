@@ -5,7 +5,9 @@ namespace common\models\issue\form;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueNote;
 use common\models\issue\IssueNoteForm;
+use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
+use common\models\message\IssueStageChangeMessagesForm;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -21,7 +23,8 @@ class IssueStageChangeForm extends Model {
 	public ?string $description = null;
 
 	private IssueInterface $issue;
-	private int $old_stage_id;
+	private int $previous_stage_id;
+	private ?IssueStageChangeMessagesForm $_messagesForm = null;
 
 	public function __construct(IssueInterface $issue, array $config = []) {
 		$this->issue = $issue;
@@ -47,12 +50,16 @@ class IssueStageChangeForm extends Model {
 		];
 	}
 
+	public function load($data, $formName = null) {
+		return parent::load($data, $formName) && $this->getMessagesModel()->load($data, $formName);
+	}
+
 	public function save(): bool {
 		if (!$this->validate()) {
 			return false;
 		}
 		$model = $this->getIssue()->getIssueModel();
-		$this->old_stage_id = $model->stage_id;
+		$this->previous_stage_id = $model->stage_id;
 		$update = (bool) $model->updateAttributes([
 			'stage_id' => $this->stage_id,
 			'stage_change_at' => $this->date_at,
@@ -64,7 +71,7 @@ class IssueStageChangeForm extends Model {
 		$issueNote = new IssueNoteForm();
 		$issueNote->type = IssueNote::generateType(
 			IssueNote::generateType(IssueNote::TYPE_STAGE_CHANGE, $this->stage_id),
-			$this->old_stage_id
+			$this->previous_stage_id
 		);
 		$issueNote->issue_id = $this->getIssue()->getIssueId();
 		$issueNote->user_id = $this->user_id;
@@ -98,7 +105,23 @@ class IssueStageChangeForm extends Model {
 
 		return Yii::t('issue', '{newStage} (previous: {previousStage})', [
 			'newStage' => $names[$this->stage_id],
-			'previousStage' => $names[$this->old_stage_id],
+			'previousStage' => $names[$this->previous_stage_id],
 		]);
+	}
+
+	public function pushMessages(): bool {
+		$message = $this->getMessagesModel();
+		$message->previousStage = IssueStage::getStages()[$this->previous_stage_id];
+		return $message->pushMessages() > 0;
+	}
+
+	public function getMessagesModel(): IssueStageChangeMessagesForm {
+		if ($this->_messagesForm === null) {
+			$this->_messagesForm = new IssueStageChangeMessagesForm([
+				'issue' => $this->issue,
+			]);
+			$this->_messagesForm->setIssue($this->issue);
+		}
+		return $this->_messagesForm;
 	}
 }

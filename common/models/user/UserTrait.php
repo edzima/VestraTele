@@ -2,30 +2,37 @@
 
 namespace common\models\user;
 
-use common\models\user\query\UserQuery;
+use common\helpers\ArrayHelper;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "customer_trait".
+ * This is the model class for table "user_trait".
  *
- * @property int $user_id
- * @property int $trait_id
+ * @property int $id
+ * @property string|null $name
+ * @property int $show_on_issue_view
  *
- * @property User $user
+ * @property UserTraitAssign[] $userTraitAssigns
+ * @property User[] $users
  */
 class UserTrait extends ActiveRecord {
 
-	public const TRAIT_ANTYVINDICATION = 100;
-	public const TRAIT_BAILIFF = 150;
-	public const TRAIT_COMMISSION_REFUND = 200;
-	public const TRAIT_DISABILITY_RESULT_OF_CASE = 300;
+	private static $NAMES;
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function tableName(): string {
-		return '{{%customer_trait}}';
+	public static function tableName() {
+		return '{{%user_trait}}';
+	}
+
+	public static function getNames(): array {
+		if (empty(static::$NAMES)) {
+			static::$NAMES = ArrayHelper::map(static::find()->asArray()->all(), 'id', 'name');
+		}
+		return static::$NAMES;
 	}
 
 	/**
@@ -33,64 +40,38 @@ class UserTrait extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['user_id', 'trait_id'], 'required'],
-			[['user_id', 'trait_id'], 'integer'],
-			[['user_id', 'trait_id'], 'unique', 'targetAttribute' => ['user_id', 'trait_id']],
-			['trait_id', 'in', 'range' => array_keys(static::getNames())],
-			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+			[['name'], 'string', 'max' => 50],
+			[['name'], 'unique'],
+			[['show_on_issue_view'], 'boolean'],
 		];
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function attributeLabels(): array {
+	public function attributeLabels() {
 		return [
-			'user_id' => Yii::t('common', 'User ID'),
-			'trait_id' => Yii::t('common', 'Trait ID'),
-		];
-	}
-
-	public function getName(): string {
-		return static::getNames()[$this->trait_id];
-	}
-
-	/** @noinspection PhpIncompatibleReturnTypeInspection */
-	public function getUser(): UserQuery {
-		return $this->hasOne(User::class, ['id' => 'user_id']);
-	}
-
-	public static function getNames(): array {
-		return [
-			static::TRAIT_ANTYVINDICATION => Yii::t('common', 'Antyvindication'),
-			static::TRAIT_BAILIFF => Yii::t('common', 'Bailiff'),
-			static::TRAIT_COMMISSION_REFUND => Yii::t('common', 'Commision refund'),
-			static::TRAIT_DISABILITY_RESULT_OF_CASE => Yii::t('common', 'Disability result of case'),
+			'id' => Yii::t('common', 'ID'),
+			'name' => Yii::t('common', 'Name'),
+			'show_on_issue_view' => Yii::t('common', 'Show on Issue View'),
 		];
 	}
 
 	/**
-	 * @param int $userId
-	 * @param int[] $traitsIds
-	 * @param bool $withDelete
-	 * @throws \yii\db\Exception
+	 * Gets query for [[UserTraitAssigns]].
+	 *
+	 * @return ActiveQuery
 	 */
-	public static function assignUser(int $userId, array $traitsIds): void {
-		if (empty($traitsIds)) {
-			static::unassignUser($userId);
-			return;
-		}
-		$userTraits = [];
-		foreach ($traitsIds as $id) {
-			$userTraits[] = [
-				'user_id' => $userId,
-				'trait_id' => $id,
-			];
-		}
-		static::getDb()->createCommand()->batchInsert(self::tableName(), ['user_id', 'trait_id'], $userTraits)->execute();
+	public function getUserTraitAssigns() {
+		return $this->hasMany(UserTraitAssign::class, ['trait_id' => 'id']);
 	}
 
-	public static function unassignUser(int $userId): void {
-		static::deleteAll(['user_id' => $userId]);
+	/**
+	 * Gets query for [[Users]].
+	 *
+	 * @return ActiveQuery
+	 */
+	public function getUsers() {
+		return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('user_trait_assign', ['trait_id' => 'id']);
 	}
 }

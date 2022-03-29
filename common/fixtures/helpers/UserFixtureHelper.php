@@ -8,8 +8,10 @@ use common\fixtures\user\LawyerFixture;
 use common\fixtures\user\TelemarketerFixture;
 use common\fixtures\UserFixture;
 use common\fixtures\UserProfileFixture;
-use common\fixtures\UserTraitFixture;
+use common\fixtures\UserTraitAssignFixture;
+use common\models\user\UserTrait;
 use Yii;
+use yii\test\ActiveFixture;
 
 class UserFixtureHelper {
 
@@ -39,6 +41,11 @@ class UserFixtureHelper {
 
 	public const MANAGER_JOHN = 500;
 	public const MANAGER_NICOLE = 501;
+
+	public const TRAIT_ANTYVINDICATION = 100;
+	public const TRAIT_BAILIFF = 150;
+	public const TRAIT_COMMISSION_REFUND = 200;
+	public const TRAIT_DISABILITY_RESULT_OF_CASE = 300;
 
 	public static function dataDir(): string {
 		return Yii::getAlias('@common/tests/_data/user/');
@@ -93,8 +100,16 @@ class UserFixtureHelper {
 
 	public static function customerTraits(): array {
 		return [
-			'class' => UserTraitFixture::class,
-			'dataFile' => static::dataDir() . 'customer_trait.php',
+			'class' => UserTraitAssignFixture::class,
+			'dataFile' => static::dataDir() . 'customer_trait_assign.php',
+		];
+	}
+
+	public static function traits(): array {
+		return [
+			'class' => ActiveFixture::class,
+			'modelClass' => UserTrait::class,
+			'dataFile' => static::dataDir() . 'trait.php',
 		];
 	}
 

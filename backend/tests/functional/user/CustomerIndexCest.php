@@ -2,6 +2,7 @@
 
 namespace backend\tests\functional\user;
 
+use backend\modules\user\controllers\CustomerController;
 use backend\tests\FunctionalTester;
 use backend\tests\Step\Functional\Manager;
 use common\fixtures\user\CustomerFixture;
@@ -10,6 +11,9 @@ use common\fixtures\user\CustomerFixture;
  * Class CustomerIndexCest
  */
 class CustomerIndexCest {
+
+	/** @see CustomerController::actionIndex() */
+	public const ROUTE_INDEX = '/user/customer/index';
 
 	/**
 	 * Load fixtures before db transaction begin
@@ -30,16 +34,16 @@ class CustomerIndexCest {
 
 	public function _before(Manager $I): void {
 		$I->amLoggedIn();
-		$I->amOnRoute('/user/customer/index');
+		$I->amOnRoute(static::ROUTE_INDEX);
 	}
 
 	public function checkTable(FunctionalTester $I): void {
 		$I->see('Customers');
-		$I->see('Firstname', 'table');
-		$I->see('Lastname', 'table');
-		$I->see('City', 'table');
-		$I->see('Email', 'table');
-		$I->see('Phone', 'table');
+		$I->seeInGridHeader('Firstname');
+		$I->seeInGridHeader('Lastname');
+		$I->seeInGridHeader('City');
+		$I->seeInGridHeader('Email');
+		$I->seeInGridHeader('Phone');
 	}
 
 	public function checkCreateCustomerLink(FunctionalTester $I): void {

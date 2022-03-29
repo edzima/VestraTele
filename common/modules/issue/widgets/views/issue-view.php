@@ -39,6 +39,7 @@ if ($provision) {
 				'type' => IssueUsersWidget::TYPE_CUSTOMERS,
 				'legendEncode' => !$usersLinks,
 				'withCheckEmailVisibility' => $userMailVisibilityCheck,
+				'withTraits' => true,
 				'legend' => static function (IssueUser $issueUser) use ($usersLinks): string {
 					$legend = $issueUser->getTypeWithUser();
 					if ($usersLinks) {

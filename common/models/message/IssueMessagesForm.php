@@ -19,10 +19,10 @@ class IssueMessagesForm extends MessageModel {
 
 	public string $smsClass = IssueSmsForm::class;
 
-	public bool $sendSmsToCustomer = false;
-	public bool $sendSmsToAgent = false;
-	public bool $sendEmailToCustomer = false;
-	public bool $sendEmailToWorkers = false;
+	public ?bool $sendSmsToCustomer = null;
+	public ?bool $sendSmsToAgent = null;
+	public ?bool $sendEmailToCustomer = null;
+	public ?bool $sendEmailToWorkers = null;
 
 	public $workersTypes = [
 		IssueUser::TYPE_AGENT,
@@ -38,10 +38,18 @@ class IssueMessagesForm extends MessageModel {
 	public function setIssue(IssueInterface $issue): void {
 		$this->issue = $issue;
 		if (!$this->issue->getIssueModel()->isNewRecord) {
-			$this->sendSmsToCustomer = $this->customerHasPhone();
-			$this->sendSmsToAgent = $this->agentHasPhones();
-			$this->sendEmailToCustomer = $this->customerHasEmail();
-			$this->sendEmailToWorkers = !empty($this->getIssueUsersEmails());
+			if ($this->sendSmsToCustomer === null) {
+				$this->sendSmsToCustomer = $this->customerHasPhone();
+			}
+			if ($this->sendSmsToAgent === null) {
+				$this->sendSmsToAgent = $this->agentHasPhones();
+			}
+			if ($this->sendEmailToCustomer === null) {
+				$this->sendEmailToCustomer = $this->customerHasEmail();
+			}
+			if ($this->sendEmailToWorkers === null) {
+				$this->sendEmailToWorkers = !empty($this->getIssueUsersEmails());
+			}
 		}
 	}
 
