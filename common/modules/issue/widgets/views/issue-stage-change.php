@@ -72,9 +72,10 @@ use yii\widgets\DetailView;
 					],
 					'pluginEvents' => [
 						'select2:open' => new JsExpression('function(e){
-				let searchInput = document.getElementsByClassName("select2-search__field")[0];
-				searchInput.value = e.currentTarget.value;
-			}'),
+								let searchInput = document.querySelector(".select2-search--dropdown input");
+								searchInput.value = e.currentTarget.value;
+							}'
+						),
 					],
 					'pluginOptions' => [
 						'allowClear' => true,
