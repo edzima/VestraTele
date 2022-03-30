@@ -40,7 +40,7 @@ class m200913_114017_summon extends Migration {
 	}
 
 	/**
-	 * {@inheritdoc}0
+	 * {@inheritdoc}
 	 */
 	public function safeDown() {
 		$this->dropColumn('{{%issue_entity_responsible}}', 'is_for_summon');
