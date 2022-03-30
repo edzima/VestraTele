@@ -130,6 +130,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 			'entityWithCity' => Yii::t('common', 'Entity responsible'),
 			'deadline_at' => Yii::t('common', 'Deadline at'),
 			'doc_types_ids' => Yii::t('common', 'Doc Types'),
+			'docsNames' => Yii::t('common', 'Doc Types'),
 		];
 	}
 
