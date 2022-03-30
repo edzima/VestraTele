@@ -184,7 +184,6 @@ class SummonForm extends Model {
 		$rows = [];
 		if (!empty($this->doc_types_ids)) {
 			$docs = (array) $this->doc_types_ids;
-			var_dump($docs);
 			foreach ($docs as $id) {
 				$rows[] = [
 					'summon_id' => $model->id,
