@@ -182,12 +182,17 @@ class SummonForm extends Model {
 		$model = $this->getModel();
 		$model->unlinkAll('docs', true);
 		$rows = [];
-		foreach ($this->doc_types_ids as $id) {
-			$rows[] = [
-				'summon_id' => $model->id,
-				'doc_type_id' => $id,
-			];
+		if (!empty($this->doc_types_ids)) {
+			$docs = (array) $this->doc_types_ids;
+			var_dump($docs);
+			foreach ($docs as $id) {
+				$rows[] = [
+					'summon_id' => $model->id,
+					'doc_type_id' => $id,
+				];
+			}
 		}
+
 		if (!empty($rows)) {
 			Yii::$app->db->createCommand()
 				->batchInsert(SummonDoc::viaTableName(), [
