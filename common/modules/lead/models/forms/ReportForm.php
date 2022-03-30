@@ -27,7 +27,7 @@ class ReportForm extends Model {
 	public int $status_id;
 	public ?string $details = null;
 	public int $owner_id;
-	public bool $withSameContacts = true;
+	public bool $withSameContacts = false;
 
 	public $closedQuestions = [];
 
