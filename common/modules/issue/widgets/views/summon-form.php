@@ -2,6 +2,7 @@
 
 use common\helpers\Html;
 use common\models\issue\form\SummonForm;
+use common\models\user\Worker;
 use common\widgets\ActiveForm;
 use common\widgets\address\CitySimcInputWidget;
 use common\widgets\DateTimeWidget;
@@ -20,21 +21,24 @@ use yii\web\View;
 		]); ?>
 
 		<div class="row">
-			<?= $form->field($model, 'doc_types_ids', [
-				'options' => [
-					'class' => 'col-md-12',
-				],
-			])->widget(Select2::class, [
-					'data' => SummonForm::getDocNames(),
+			<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
+				? $form->field($model, 'doc_types_ids', [
 					'options' => [
-						'multiple' => true,
-						'placeholder' => $model->getAttributeLabel('doc_types_ids'),
+						'class' => 'col-md-12',
 					],
-					'pluginOptions' => [
-						'allowClear' => true,
-					],
-				]
-			) ?>
+				])->widget(Select2::class, [
+						'data' => SummonForm::getDocNames(),
+						'options' => [
+							'multiple' => true,
+							'placeholder' => $model->getAttributeLabel('doc_types_ids'),
+						],
+						'pluginOptions' => [
+							'allowClear' => true,
+						],
+					]
+				)
+				: ''
+			?>
 		</div>
 
 		<div class="row">
