@@ -61,8 +61,24 @@ class SummonForm extends Model {
 
 	public function rules(): array {
 		return [
-			[['type_id', 'status', 'title', 'issue_id', 'owner_id', 'contractor_id', 'start_at', 'entity_id', 'city_id'], 'required'],
+			[['type_id', 'status', 'issue_id', 'owner_id', 'contractor_id', 'start_at', 'entity_id', 'city_id'], 'required'],
 			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status', 'entity_id'], 'integer'],
+			[
+				'title', 'required',
+				'message' => Yii::t('issue', 'Title cannot be blank when Docs are empty.'),
+				'when' => function (): bool {
+					return empty($this->doc_types_ids);
+				},
+				'enableClientValidation' => false,
+			],
+			[
+				'doc_types_ids', 'required',
+				'message' => Yii::t('issue', 'Docs cannot be blank when Title is empty.'),
+				'when' => function (): bool {
+					return empty($this->title);
+				},
+				'enableClientValidation' => false,
+			],
 			['sendEmailToContractor', 'boolean'],
 			[['title'], 'string', 'max' => 255],
 			[['start_at', 'realize_at', 'realized_at'], 'safe'],

@@ -45,12 +45,32 @@ class SummonFormTest extends Unit {
 		$this->giveModel();
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Type cannot be blank.', 'type_id');
-		$this->thenSeeError('Title cannot be blank.', 'title');
+		$this->thenSeeError('Title cannot be blank when Docs are empty.', 'title');
+		$this->thenSeeError('Docs cannot be blank when Title is empty.', 'doc_types_ids');
+
 		$this->thenSeeError('Start at cannot be blank.', 'start_at');
 		$this->thenSeeError('Contractor cannot be blank.', 'contractor_id');
 		$this->thenSeeError('Issue cannot be blank.', 'issue_id');
 		$this->thenSeeError('Entity responsible cannot be blank.', 'entity_id');
 		$this->thenSeeError('City cannot be blank.', 'city_id');
+	}
+
+	public function testWithTitleAndEmptyDocs(): void {
+		$this->giveModel();
+		$this->model->title = 'Some Title';
+		$this->model->validate();
+		$this->thenDontSeeError('title');
+		$this->thenDontSeeError('doc_types_ids');
+	}
+
+	public function testWithDocsAndEmptyTitle(): void {
+		$this->giveModel();
+		$this->model->doc_types_ids = [
+			1,
+		];
+		$this->model->validate();
+		$this->thenDontSeeError('title');
+		$this->thenDontSeeError('doc_types_ids');
 	}
 
 	public function testSave(): void {
@@ -70,7 +90,6 @@ class SummonFormTest extends Unit {
 			'type_id' => 1,
 			'title' => 'Test Unit Summon Title',
 			'start_at' => '2020-01-01',
-			'doc_type_id' => null,
 			'entity_id' => static::DEFAULT_ENTITY_ID,
 			'contractor_id' => static::DEFAULT_CONTRACTOR_ID,
 			'owner_id' => static::DEFAULT_OWNER_ID,
@@ -78,15 +97,25 @@ class SummonFormTest extends Unit {
 		]);
 	}
 
-	public function testSaveWithDocType(): void {
-		$summonDocTypeId = $this->tester->haveRecord(SummonDoc::class, [
-			'name' => 'Test summon Doc',
+	public function testSaveWithDocTypes(): void {
+		$summonDocTypeId1 = $this->tester->haveRecord(SummonDoc::class, [
+			'name' => 'Test summon Doc 1',
+		]);
+
+		$summonDocTypeId2 = $this->tester->haveRecord(SummonDoc::class, [
+			'name' => 'Test summon Doc 2',
+		]);
+
+		$summonDocTypeId3 = $this->tester->haveRecord(SummonDoc::class, [
+			'name' => 'Test summon Doc 3',
 		]);
 		$this->giveModel();
 		$model = $this->model;
 		$model->issue_id = 1;
 		$model->type_id = 1;
-		$model->doc_type_id = $summonDocTypeId;
+		$model->doc_types_ids = [
+			$summonDocTypeId1, $summonDocTypeId2,
+		];
 		$model->start_at = '2020-01-01';
 		$model->title = 'Test Unit Summon Title';
 		$model->city_id = static::DEFAULT_CITY_ID;
@@ -99,12 +128,22 @@ class SummonFormTest extends Unit {
 			'type_id' => 1,
 			'title' => 'Test Unit Summon Title',
 			'start_at' => '2020-01-01',
-			'doc_type_id' => $summonDocTypeId,
 			'entity_id' => static::DEFAULT_ENTITY_ID,
 			'contractor_id' => static::DEFAULT_CONTRACTOR_ID,
 			'owner_id' => static::DEFAULT_OWNER_ID,
 			'city_id' => static::DEFAULT_CITY_ID,
 		]);
+
+		$model = $this->model->getModel();
+		$this->tester->assertSame(
+			'Test summon Doc 1, Test summon Doc 2',
+			$model->getDocsNames()
+		);
+
+		$this->tester->assertSame(
+			'Test Unit Summon Title - ' . $model->getDocsNames(),
+			$model->getTitleWithDocs()
+		);
 	}
 
 	public function testDeadlineFromTerm(): void {

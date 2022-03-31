@@ -48,4 +48,7 @@ return [
 	'Only Pinned' => 'Przypięte',
 	'User Types' => 'Uczestnicy',
 	'Send SMS to Issues: {count}' => 'Wyślij SMS do Spraw: {count}',
+	'Title with Docs' => 'Dokumenty do uzupełniania',
+	'Title cannot be blank when Docs are empty.' => 'Tytuł nie może pozostać pusty gdy nie wybrano dokumentów.',
+	'Docs cannot be blank when Title is empty.' => 'Dokumenty nie mogą pozostać pustę gdy nie podano tytułu.',
 ];

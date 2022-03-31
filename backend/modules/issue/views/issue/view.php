@@ -133,6 +133,9 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		? SummonGrid::widget([
 			'dataProvider' => $summonDataProvider,
 			'summary' => '',
+			'withTitle' => false,
+			'withDocs' => false,
+			'withTitleWithDocs' => true,
 			'withCaption' => true,
 			'withCustomerPhone' => false,
 			'withIssue' => false,

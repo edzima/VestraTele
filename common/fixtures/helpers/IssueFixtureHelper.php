@@ -8,6 +8,7 @@ use common\fixtures\issue\IssueUserFixture;
 use common\fixtures\issue\NoteFixture;
 use common\fixtures\issue\StageFixture;
 use common\fixtures\issue\StageTypesFixtures;
+use common\fixtures\issue\SummonDocFixture;
 use common\fixtures\issue\SummonFixture;
 use common\fixtures\issue\SummonTypeFixture;
 use common\fixtures\issue\TypeFixture;
@@ -25,6 +26,7 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 	public const ISSUE = 'issue';
 
 	public const SUMMON = 'issue.summon';
+	public const SUMMON_DOC = 'issue.summon_doc';
 	public const SUMMON_TYPE = 'issue.summon_type';
 
 	private const TYPE = 'issue.type';
@@ -157,6 +159,7 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 	}
 
 	public static function summon(): array {
+
 		return array_merge(TerytFixtureHelper::fixtures(),
 			[
 				static::SUMMON => [
@@ -166,6 +169,10 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 				static::SUMMON_TYPE => [
 					'class' => SummonTypeFixture::class,
 					'dataFile' => static::dataDir() . 'issue/summon_type.php',
+				],
+				static::SUMMON_DOC => [
+					'class' => SummonDocFixture::class,
+					'dataFile' => static::dataDir() . 'issue/summon_doc.php',
 				],
 			]);
 	}

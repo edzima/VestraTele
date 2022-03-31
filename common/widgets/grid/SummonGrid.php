@@ -27,6 +27,9 @@ class SummonGrid extends GridView {
 	public string $issueColumn = IssueColumn::class;
 	public string $valueType = self::VALUE_TYPE_NAME;
 
+	public bool $withTitle = true;
+	public bool $withDocs = true;
+	public bool $withTitleWithDocs = false;
 	public bool $withIssue = true;
 	public bool $withCustomer = true;
 	public bool $withCaption = false;
@@ -79,16 +82,7 @@ class SummonGrid extends GridView {
 				'contentBold' => true,
 				'noWrap' => true,
 			],
-			[
-				'attribute' => 'doc_types_ids',
-				'value' => 'docsNames',
-				'filter' => SummonSearch::getDocTypesNames(),
-				'options' => [
-					'style' => [
-						'min-width' => '200px',
-					],
-				],
-			],
+
 			[
 				'attribute' => 'status',
 				'value' => 'statusName',
@@ -100,8 +94,25 @@ class SummonGrid extends GridView {
 				],
 			],
 			[
+				'attribute' => 'titleWithDocs',
+				'contentOptions' => ['style' => 'width: 35%;'],
+				'visible' => $this->withTitleWithDocs,
+			],
+			[
 				'attribute' => 'title',
 				'contentOptions' => ['style' => 'width: 35%;'],
+				'visible' => $this->withTitle,
+			],
+			[
+				'attribute' => 'doc_types_ids',
+				'value' => 'docsNames',
+				'filter' => SummonSearch::getDocTypesNames(),
+				'options' => [
+					'style' => [
+						'min-width' => '200px',
+					],
+				],
+				'visible' => $this->withDocs,
 			],
 			[
 				'attribute' => 'start_at',

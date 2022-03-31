@@ -48,14 +48,11 @@ YiiAsset::register($this);
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [
-			[
-				'attribute' => 'docsNames',
-			],
-			'title:text',
+			'type.name',
+			'titleWithDocs:text',
 			'issue.longId:text:Sprawa',
 			'owner',
 			'contractor',
-			'type.name',
 			'statusName',
 			'entityWithCity',
 			'start_at:date',

@@ -42,6 +42,15 @@ use yii\web\View;
 		</div>
 
 		<div class="row">
+			<?= $form->field($model, 'title', [
+				'options' => [
+					'class' => 'col-md-7',
+				],
+			])
+				->textarea(['maxlength' => true]) ?>
+		</div>
+
+		<div class="row">
 
 			<?= $form->field($model, 'issue_id', [
 				'options' => [
@@ -112,15 +121,6 @@ use yii\web\View;
 					'class' => 'col-md-4 col-lg-3',
 				],
 			])->widget(CitySimcInputWidget::class) ?>
-		</div>
-
-		<div class="row">
-			<?= $form->field($model, 'title', [
-				'options' => [
-					'class' => 'col-md-7',
-				],
-			])
-				->textarea(['maxlength' => true]) ?>
 		</div>
 
 

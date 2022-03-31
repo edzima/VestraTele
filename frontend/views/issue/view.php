@@ -89,6 +89,9 @@ $this->params['breadcrumbs'][] = $this->title;
 		? SummonGrid::widget([
 			'dataProvider' => $summonDataProvider,
 			'summary' => '',
+			'withTitle' => false,
+			'withDocs' => false,
+			'withTitleWithDocs' => true,
 			'withCaption' => true,
 			'withIssue' => false,
 			'withCustomer' => false,

@@ -18,7 +18,7 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property int $status
  * @property int $type_id
- * @property string $title
+ * @property string|null $title
  * @property int $created_at
  * @property int $updated_at
  * @property string $start_at
@@ -86,7 +86,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 	 */
 	public function rules(): array {
 		return [
-			[['status', 'title', 'issue_id', 'owner_id', 'contractor_id', 'entity_id', 'city_id', 'type_id'], 'required'],
+			[['status', 'issue_id', 'owner_id', 'contractor_id', 'entity_id', 'city_id', 'type_id'], 'required'],
 			[['status', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
 			[['title'], 'string', 'max' => 255],
 			[['created_at', 'updated_at', 'realized_at', 'start_at'], 'safe'],
@@ -131,7 +131,18 @@ class Summon extends ActiveRecord implements IssueInterface {
 			'deadline_at' => Yii::t('common', 'Deadline at'),
 			'doc_types_ids' => Yii::t('common', 'Doc Types'),
 			'docsNames' => Yii::t('common', 'Doc Types'),
+			'titleWithDocs' => Yii::t('issue', 'Title with Docs'),
 		];
+	}
+
+	public function getTitleWithDocs(): string {
+		if (empty($this->title)) {
+			return $this->getDocsNames();
+		}
+		if (empty($this->docs)) {
+			return $this->title;
+		}
+		return $this->title . ' - ' . $this->getDocsNames();
 	}
 
 	public function getDocsNames(): ?string {
