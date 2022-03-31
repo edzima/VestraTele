@@ -163,7 +163,7 @@ abstract class IssueSearch extends Model
 
 		if (!empty($this->createdAtTo)) {
 			$query->andFilterWhere([
-				'>=', Issue::tableName() . '.created_at',
+				'<=', Issue::tableName() . '.created_at',
 				date('Y-m-d 23:59:59', strtotime($this->createdAtTo)),
 			]);
 		}
