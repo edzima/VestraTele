@@ -31,7 +31,7 @@ return [
 		'type_id' => 3,
 		'stage_id' => 2,
 		'entity_responsible_id' => 2,
-		'signing_at' => '2020-01-02',
+		'signing_at' => '2019-01-02',
 		'type_additional_date_at' => '2020-01-02',
 	],
 	'archived' => [

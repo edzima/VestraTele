@@ -40,6 +40,8 @@ abstract class IssueSearch extends Model
 	public string $updated_at = '';
 	public string $createdAtFrom = '';
 	public string $createdAtTo = '';
+	public string $signedAtFrom = '';
+	public string $signedAtTo = '';
 	public string $customerLastname = '';
 	public string $customerPhone = '';
 
@@ -66,7 +68,7 @@ abstract class IssueSearch extends Model
 				], 'integer',
 			],
 			['noteFilter', 'string'],
-			[['createdAtTo', 'createdAtFrom'], 'date', 'format' => DATE_ATOM],
+			[['createdAtTo', 'createdAtFrom', 'signedAtFrom', 'signedAtTo'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			['type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
@@ -90,6 +92,8 @@ abstract class IssueSearch extends Model
 			'agent_id' => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
 			'lawyer_id' => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
+			'signedAtFrom' => Yii::t('issue', 'Signed At from'),
+			'signedAtTo' => Yii::t('issue', 'Signed At to'),
 		], Issue::instance()->attributeLabels());
 	}
 
@@ -116,6 +120,7 @@ abstract class IssueSearch extends Model
 		$this->applyCustomerSurnameFilter($query);
 		$this->applyCustomerPhoneFilter($query);
 		$this->applyCreatedAtFilter($query);
+		$this->applySignedAtFilter($query);
 		$this->applyNotesFilter($query);
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
@@ -148,12 +153,36 @@ abstract class IssueSearch extends Model
 	}
 
 	protected function applyCreatedAtFilter(QueryInterface $query): void {
-		if (!empty($this->createdAtTo)) {
-			$this->createdAtTo = date('Y-m-d 23:59:59', strtotime($this->createdAtTo));
+
+		if (!empty($this->createdAtFrom)) {
+			$query->andFilterWhere([
+				'>=', Issue::tableName() . '.created_at',
+				date('Y-m-d 00:00:00', strtotime($this->createdAtFrom)),
+			]);
 		}
 
-		$query->andFilterWhere(['>=', 'issue.' . 'created_at', $this->createdAtFrom])
-			->andFilterWhere(['<=', 'issue.' . 'created_at', $this->createdAtTo]);
+		if (!empty($this->createdAtTo)) {
+			$query->andFilterWhere([
+				'>=', Issue::tableName() . '.created_at',
+				date('Y-m-d 23:59:59', strtotime($this->createdAtTo)),
+			]);
+		}
+	}
+
+	protected function applySignedAtFilter(QueryInterface $query): void {
+		if (!empty($this->signedAtFrom)) {
+			$query->andFilterWhere([
+				'>=', Issue::tableName() . '.signing_at',
+				date('Y-m-d 00:00:00', strtotime($this->signedAtFrom)),
+			]);
+		}
+
+		if (!empty($this->signedAtTo)) {
+			$query->andFilterWhere([
+				'<=', Issue::tableName() . '.signing_at',
+				date('Y-m-d 23:59:59', strtotime($this->signedAtTo)),
+			]);
+		}
 	}
 
 	protected function archiveFilter(IssueQuery $query): void {

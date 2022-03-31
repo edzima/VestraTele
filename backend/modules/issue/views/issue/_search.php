@@ -25,18 +25,29 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= $form->field($model, 'createdAtFrom', ['options' => ['class' => 'col-md-3']])
-			->widget(DateWidget::class)
-		?>
-		<?= $form->field($model, 'createdAtTo', ['options' => ['class' => 'col-md-3']])
+		<?= $form->field($model, 'createdAtFrom', ['options' => ['class' => 'col-md-2']])
 			->widget(DateWidget::class)
 		?>
 
-		<?= $form->field($model, 'type_additional_date_at', ['options' => ['class' => 'col-md-3']])
+		<?= $form->field($model, 'createdAtTo', ['options' => ['class' => 'col-md-2']])
 			->widget(DateWidget::class)
 		?>
 
-		<?= $form->field($model, 'stage_change_at', ['options' => ['class' => 'col-md-3']])
+
+		<?= $form->field($model, 'signedAtFrom', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+		<?= $form->field($model, 'signedAtTo', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+
+		<?= $form->field($model, 'type_additional_date_at', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+		<?= $form->field($model, 'stage_change_at', ['options' => ['class' => 'col-md-2']])
 			->widget(DateWidget::class)
 		?>
 

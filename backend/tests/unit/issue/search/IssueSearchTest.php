@@ -10,7 +10,6 @@ use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\settlement\PayedInterface;
-use common\modules\issue\IssueNoteColumn;
 use common\tests\_support\UnitSearchModelTrait;
 use Yii;
 
@@ -119,6 +118,18 @@ class IssueSearchTest extends Unit {
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
 			$this->tester->assertSame(2, $model->stage_id);
+		}
+	}
+
+	public function testForSigningAt(): void {
+		$this->model->signedAtFrom = '2019-01-01';
+		$this->model->signedAtTo = '2020-01-01';
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertNotEmpty($model->signing_at);
+			$this->tester->assertGreaterThanOrEqual(strtotime($this->model->signedAtFrom), strtotime($model->signing_at));
+			$this->tester->assertLessThanOrEqual(strtotime($this->model->signedAtTo), strtotime($model->signing_at));
 		}
 	}
 
