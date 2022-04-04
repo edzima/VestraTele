@@ -2,6 +2,7 @@
 
 namespace console\controllers;
 
+use common\components\DbManager;
 use common\models\user\Customer;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -298,5 +299,18 @@ class RbacController extends Controller {
 			}
 		}
 		Console::output('Copy rbac items: ' . $count);
+	}
+
+	public function actionClearAssignments(): void {
+		$auth = Yii::$app->authManager;
+		if ($auth instanceof DbManager) {
+			$count = Yii::$app->db->createCommand()
+				->delete($auth->assignmentTable, [
+					'NOT IN', 'user_id', User::find()->select('id')->column(),
+				])
+				->execute();
+
+			Console::output('Delete Assignmnets: ' . $count);
+		}
 	}
 }
