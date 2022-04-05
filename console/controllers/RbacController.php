@@ -97,6 +97,7 @@ class RbacController extends Controller {
 		Worker::PERMISSION_SUMMON => [
 			Worker::ROLE_AGENT,
 		],
+		Worker::PERMISSION_CZATER,
 		Worker::PERMISSION_SUMMON_MANAGER,
 		Worker::PERMISSION_SUMMON_CREATE,
 		Worker::PERMISSION_SMS,

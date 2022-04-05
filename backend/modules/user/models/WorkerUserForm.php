@@ -22,7 +22,6 @@ class WorkerUserForm extends UserForm {
 
 	protected const EXCLUDED_PERMISSIONS = [
 		'loginToBackend',
-		Worker::PERMISSION_CZATER,
 		Worker::PERMISSION_ISSUE_DELETE,
 		Worker::PERMISSION_MESSAGE_TEMPLATE,
 		User::PERMISSION_ARCHIVE,
