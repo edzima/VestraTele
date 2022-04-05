@@ -322,6 +322,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					'view' => static function (Issue $model) use ($searchModel): bool {
 						return !$model->isArchived() || $searchModel->withArchive;
 					},
+					'link' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
 					'sms' => Yii::$app->user->can(Worker::PERMISSION_SMS),
 					'delete' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE),
 				],
