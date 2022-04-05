@@ -120,6 +120,15 @@ return [
 		],
 		'czater' => [
 			'class' => CzaterModule::class,
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'permissions' => [Worker::PERMISSION_CZATER],
+					],
+				],
+			],
 		],
 		'entity-responsible' => [
 			'class' => EntityResponsibleModule::class,
