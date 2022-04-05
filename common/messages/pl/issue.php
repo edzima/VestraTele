@@ -53,5 +53,5 @@ return [
 	'Docs cannot be blank when Title is empty.' => 'Dokumenty nie mogą pozostać pustę gdy nie podano tytułu.',
 	'Signed At from' => 'Podpisano (od)',
 	'Signed At to' => 'Podpisano (do)',
-
+	'Issues Count' => 'Ilość Spraw',
 ];
