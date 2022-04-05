@@ -3,6 +3,7 @@
 namespace backend\modules\issue\models\search;
 
 use backend\modules\issue\models\IssueStage;
+use common\models\issue\IssueType;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -11,6 +12,8 @@ use yii\data\ActiveDataProvider;
  */
 class IssueStageSearch extends IssueStage {
 
+	public $typesFilter;
+
 	/**
 	 * @inheritdoc
 	 */
@@ -18,6 +21,7 @@ class IssueStageSearch extends IssueStage {
 		return [
 			[['id', 'days_reminder'], 'integer'],
 			[['name', 'short_name'], 'safe'],
+			['typesFilter', 'in', 'range' => array_keys(IssueType::getTypesNames()), 'allowArray' => true],
 		];
 	}
 
@@ -38,6 +42,7 @@ class IssueStageSearch extends IssueStage {
 	 */
 	public function search(array $params): ActiveDataProvider {
 		$query = IssueStage::find();
+		$query->joinWith('types');
 
 		// add conditions that should always apply here
 
@@ -51,6 +56,10 @@ class IssueStageSearch extends IssueStage {
 			// uncomment the following line if you do not want to return any records when validation fails
 			// $query->where('0=1');
 			return $dataProvider;
+		}
+
+		if (!empty($this->typesFilter)) {
+			$query->andWhere([IssueType::tableName() . '.id' => $this->typesFilter]);
 		}
 
 		// grid filtering conditions
