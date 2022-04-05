@@ -43,6 +43,7 @@ class IssueStageSearch extends IssueStage {
 	public function search(array $params): ActiveDataProvider {
 		$query = IssueStage::find();
 		$query->joinWith('types');
+		$query->groupBy('id');
 
 		// add conditions that should always apply here
 
