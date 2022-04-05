@@ -80,6 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
 						'value' => $model->getStatusName(),
 					],
 					[
+						'attribute' => 'profile.pesel',
 						'label' => Yii::t('backend', 'PESEL'),
 						'visible' => !empty($model->profile->pesel),
 					],
