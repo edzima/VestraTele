@@ -145,6 +145,16 @@ $user = Yii::$app->user;
 					'visible' => $user->can(User::PERMISSION_CZATER),
 					'items' => [
 						[
+							'label' => Yii::t('czater', 'Clients'),
+							'url' => ['/czater/client/index'],
+							'icon' => '<i class="fa fa-users"></i>',
+						],
+						[
+							'label' => Yii::t('czater', 'Convs'),
+							'url' => ['/czater/conv/index'],
+							'icon' => '<i class="fa fa-comments"></i>',
+						],
+						[
 							'label' => Yii::t('czater', 'Consultants'),
 							'url' => ['/czater/consultant/index'],
 							'icon' => '<i class="fa fa-users"></i>',

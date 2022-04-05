@@ -6,6 +6,10 @@ use common\models\user\Worker;
 
 class CzaterManager extends Manager {
 
+	protected function getUsername(): string {
+		return 'czater-manager';
+	}
+
 	protected function getPermissions(): array {
 		return [
 			Worker::PERMISSION_CZATER,

@@ -1,6 +1,9 @@
 <?php
 
 return [
-	'Consultants' => 'Konsultanci',
 	'Calls' => 'Połączenia',
+	'Clients' => 'Klienci',
+	'Consultants' => 'Konsultanci',
+	'Convs' => 'Czaty',
+	'Czater' => 'Czater',
 ];

@@ -2,7 +2,7 @@
 
 namespace common\modules\czater\controllers;
 
-class CallController extends BaseController {
+class ClientController extends BaseController {
 
 	public function actionIndex(): string {
 		$dataProvider = $this->createDataProvider();
@@ -11,4 +11,5 @@ class CallController extends BaseController {
 			'dataProvider' => $dataProvider,
 		]);
 	}
+
 }

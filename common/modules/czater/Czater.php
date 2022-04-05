@@ -3,7 +3,9 @@
 namespace common\modules\czater;
 
 use common\modules\czater\entities\Call;
+use common\modules\czater\entities\Client;
 use common\modules\czater\entities\Consultant;
+use common\modules\czater\entities\Conv;
 use Yii;
 use yii\base\Component;
 use yii\helpers\Json;
@@ -14,10 +16,12 @@ class Czater extends Component {
 
 	private const TYPE_CALL = 'call';
 	private const TYPE_CONS = 'cons';
+	private const TYPE_CONV = 'conv';
+	private const TYPE_CLIENTS = 'clients';
 
 	public string $apiKey;
 
-	public function call(int $idDataset): ?Call {
+	public function getCall(int $idDataset): ?Call {
 		$url = $this->buildUrl(static::TYPE_CALL, [
 			'idDataset' => $idDataset,
 		]);
@@ -31,7 +35,7 @@ class Czater extends Component {
 			'message' => 'Invalid Call Response',
 			'response' => $response,
 			'url' => $url,
-		], 'czater.call');
+		], 'czater.getCall');
 		return null;
 	}
 
@@ -39,7 +43,7 @@ class Czater extends Component {
 	 * @param int $offset
 	 * @return Call[]|null
 	 */
-	public function calls(int $offset = 0): ?array {
+	public function getCalls(int $offset = 0): ?array {
 		$url = $this->buildUrl(static::TYPE_CALL, [
 			'offset' => $offset,
 		]);
@@ -59,7 +63,68 @@ class Czater extends Component {
 			'message' => 'Invalid Calls Response',
 			'response' => $response,
 			'url' => $url,
-		], 'czater.calls');
+		], 'czater.getCalls');
+
+		return null;
+	}
+
+	public function getConvs(int $offset = 0): ?array {
+		$url = $this->buildUrl(static::TYPE_CONV, [
+			'offset' => $offset,
+		]);
+		$response = $this->response($url);
+		$responseKey = static::typeResponseKeyMap()[static::TYPE_CONV];
+		if ($response
+			&& $this->responseIsSuccess($response)
+			&& isset($response[$responseKey])
+		) {
+			$models = [];
+			$rows = $response[$responseKey];
+			foreach ($rows as $row) {
+				$models[] = new Conv($row);
+			}
+			return $models;
+		}
+		Yii::warning([
+			'message' => 'Invalid Convs Response',
+			'response' => $response,
+			'url' => $url,
+		], 'czater.getConvs');
+
+		return null;
+	}
+
+	private static function typeResponseKeyMap(): array {
+		return [
+			static::TYPE_CONS => 'cons',
+			static::TYPE_CALL => 'calls',
+			static::TYPE_CONV => 'convs',
+			static::TYPE_CLIENTS => 'clients',
+		];
+	}
+
+	public function getClients(int $offset = 0): ?array {
+		$url = $this->buildUrl(static::TYPE_CLIENTS, [
+			'offset' => $offset,
+		]);
+		$response = $this->response($url);
+		$responseKey = static::typeResponseKeyMap()[static::TYPE_CLIENTS];
+		if ($response
+			&& $this->responseIsSuccess($response)
+			&& isset($response[$responseKey])
+		) {
+			$models = [];
+			$rows = $response[$responseKey];
+			foreach ($rows as $row) {
+				$models[] = new Client($row);
+			}
+			return $models;
+		}
+		Yii::warning([
+			'message' => 'Invalid Clients Response',
+			'response' => $response,
+			'url' => $url,
+		], 'czater.getClients');
 
 		return null;
 	}
@@ -67,7 +132,7 @@ class Czater extends Component {
 	/**
 	 * @return Consultant[]|null
 	 */
-	public function consultants(): ?array {
+	public function getConsultants(): ?array {
 		$url = $this->buildUrl(static::TYPE_CONS);
 		$response = $this->response($url);
 		$consultants = [];
@@ -85,13 +150,19 @@ class Czater extends Component {
 			'message' => 'Invalid Consultants Response',
 			'response' => $response,
 			'url' => $url,
-		], 'czater.consultants');
+		], 'czater.getConsultants');
 
 		return null;
 	}
 
 	protected function response(string $url): ?array {
+		Yii::debug('Czater Response for Url: ' . $url, __METHOD__);
+
+		Yii::beginProfile($url, __METHOD__);
 		$content = file_get_contents($url);
+		Yii::debug($content, __METHOD__);
+		Yii::endProfile($content, __METHOD__);
+
 		if ($content) {
 			return Json::decode($content);
 		}
@@ -107,4 +178,5 @@ class Czater extends Component {
 	private function responseIsSuccess(array $response): bool {
 		return isset($response['status']) && $response['status'] === 'success';
 	}
+
 }

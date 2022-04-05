@@ -4,24 +4,24 @@ namespace backend\tests\functional\czater;
 
 use backend\tests\Step\Functional\CzaterManager;
 use backend\tests\Step\Functional\Manager;
-use common\modules\czater\controllers\ConsultantController;
+use common\modules\czater\controllers\ConvController;
 
-class ConsultantCest {
+class ConvCest {
 
-	/** @see ConsultantController::actionIndex() */
-	private const ROUTE_INDEX = '/czater/consultant/index';
+	/** @see ConvController::actionIndex() */
+	private const ROUTE_INDEX = '/czater/conv/index';
 
 	public function checkWithoutPermission(Manager $I): void {
 		$I->amLoggedIn();
-		$I->dontSeeMenuLink('Consultants');
+		$I->dontSeeMenuLink('Convs');
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeResponseCodeIs(403);
 	}
 
 	public function checkAsCzaterManager(CzaterManager $I): void {
 		$I->amLoggedIn();
-		$I->seeMenuLink('Consultants');
-		$I->clickMenuLink('Consultants');
+		$I->seeMenuLink('Convs');
+		$I->clickMenuLink('Convs');
 		$I->seeInCurrentUrl(static::ROUTE_INDEX);
 		$I->seeResponseCodeIsSuccessful();
 	}
@@ -29,6 +29,6 @@ class ConsultantCest {
 	public function checkIndex(CzaterManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->see('Consultants', 'h1');
+		$I->see('Convs', 'h1');
 	}
 }

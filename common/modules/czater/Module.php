@@ -16,7 +16,7 @@ class Module extends BaseModule {
 	public $controllerNamespace = 'common\modules\czater\controllers';
 
 	/**
-	 * var Czater|array|string
+	 * @var Czater|array|string
 	 */
 	public $czater = 'czater';
 
