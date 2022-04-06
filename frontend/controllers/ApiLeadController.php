@@ -7,7 +7,6 @@ use common\models\user\User;
 use common\modules\lead\components\LeadManager;
 use common\modules\lead\events\LeadEvent;
 use common\modules\lead\models\ActiveLead;
-use common\modules\lead\models\forms\CzaterLeadForm;
 use common\modules\lead\models\forms\LandingLeadForm;
 use common\modules\lead\models\forms\LeadPushEmail;
 use common\modules\lead\models\LeadInterface;
@@ -52,38 +51,6 @@ class ApiLeadController extends Controller {
 			'post' => Yii::$app->request->post(),
 			'error' => $model->getErrors(),
 		], 'lead.landing.error');
-		return [
-			'status' => 'warning',
-			'message' => 'Not Send Data',
-		];
-	}
-
-	public function actionCzater() {
-		Yii::warning([
-			'headers' => Yii::$app->request->headers->toArray(),
-			'message' => Yii::$app->request->post(),
-		], 'lead.czater');
-
-		//musimy pobrac szczegoly rozmowy, pozniej pobrac id konsultana i tam mamy zrodlo
-		$model = new CzaterLeadForm();
-		if ($model->load(Yii::$app->request->post())) {
-			if ($model->validate() && $this->pushLead($model)) {
-				return [
-					'status' => 'success',
-				];
-			}
-
-			Yii::warning([
-				'message' => 'Czater lead with validate errors.',
-				'post' => Yii::$app->request->post(),
-				'error' => $model->getErrors(),
-			], 'lead.landing.error');
-
-			return [
-				'status' => 'error',
-				'errors' => $model->getErrors(),
-			];
-		}
 		return [
 			'status' => 'warning',
 			'message' => 'Not Send Data',
