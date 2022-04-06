@@ -7,6 +7,7 @@ return [
 		'type_id' => 1,
 		'phone' => '48 123-123-123',
 		'dialer_phone' => '810',
+		'url' => 'https://www.test.com',
 	],
 	[
 		'id' => 2,
@@ -19,5 +20,6 @@ return [
 		'name' => 'facebook-funpage',
 		'type_id' => 2,
 		'dialer_phone' => '820',
+		'url' => 'https://facebook.com/fanpage',
 	],
 ];
