@@ -2,9 +2,15 @@
 
 namespace common\modules\czater\entities;
 
-use yii\base\BaseObject;
+use common\modules\czater\Czater;
+use yii\base\Model;
 
-class Conv extends BaseObject {
+class Conv extends Model {
+
+	public function __construct(Czater $owner, $config = []) {
+		$this->owner = $owner;
+		parent::__construct($config);
+	}
 
 	public int $id;
 	public int $idOwner;
@@ -15,5 +21,15 @@ class Conv extends BaseObject {
 	public ?string $dateBegin;
 	public string $firstMessage;
 	public ?string $referer;
+
+	private ?Client $client;
+	private Czater $owner;
+
+	public function getClient(): Client {
+		if ($this->client === null) {
+			$this->client = $this->owner->getClient($this->idClient);
+		}
+		return $this->client;
+	}
 
 }
