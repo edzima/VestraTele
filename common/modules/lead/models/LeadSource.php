@@ -167,4 +167,16 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 	public static function typeId(int $sourceId): int {
 		return static::getModels()[$sourceId]->type_id;
 	}
+
+	public static function findByReferer(string $url): ?self {
+		$parse = parse_url($url);
+		if (empty($parse) || !isset($parse['host'])) {
+			Yii::warning('Try find by referer for invalid URL: ' . $url, __METHOD__);
+			return null;
+		}
+		$host = preg_replace('/^www\./i', '', $parse['host']);
+		return static::find()
+			->andWhere(['like', 'url', $host])
+			->one();
+	}
 }
