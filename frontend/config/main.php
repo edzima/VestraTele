@@ -5,6 +5,7 @@ use common\components\User as WebUser;
 use common\models\user\User;
 use common\modules\lead\Module as LeadModule;
 use frontend\controllers\ApiLeadController;
+use frontend\controllers\LeadCzaterController;
 use frontend\controllers\LeadDialerController;
 use yii\base\Action;
 
@@ -33,6 +34,7 @@ return [
 			'controllerMap' => [
 				'api' => ApiLeadController::class,
 				'dialer' => LeadDialerController::class,
+				'czater' => LeadCzaterController::class,
 			],
 			'onlyUser' => true,
 			'allowDelete' => false,
@@ -84,6 +86,7 @@ return [
 						'controllers' => [
 							'lead/api',
 							'lead/dialer',
+							'lead/czater',
 						],
 					],
 				],

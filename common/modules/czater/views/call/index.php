@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		'clientFullNumber',
 		'clientName',
 		'duration',
-		'status',
+		'statusName',
 		'dateRequested:datetime',
 		'consultantName',
 		'consultantNumber',
