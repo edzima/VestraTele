@@ -40,6 +40,7 @@ return [
 	'minor' => 'Nieletni',
 	'news' => 'Newsy',
 	'note' => 'Notatki',
+	'note.update' => 'Notatki - edycja',
 	'note.template' => 'Notatki - szablony',
 	'note.delete' => 'Notatki - usuwanie',
 	'pay' => 'Wpłaty',

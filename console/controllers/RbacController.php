@@ -69,6 +69,7 @@ class RbacController extends Controller {
 		User::PERMISSION_LOGS,
 		User::PERMISSION_NEWS,
 		User::PERMISSION_NOTE,
+		User::PERMISSION_NOTE_UPDATE,
 		Worker::PERMISSION_NOTE_TEMPLATE,
 		User::PERMISSION_PROVISION,
 		Worker::PERMISSION_PAY => [
@@ -163,7 +164,10 @@ class RbacController extends Controller {
 			}
 		}
 
-		$this->createRoles($newRoles);
+		$roles = $this->createRoles($newRoles);
+		foreach ($roles as $role) {
+			$this->assignAdmin($role);
+		}
 
 		$permissions = $auth->getPermissions();
 		$newPermissions = [];
@@ -178,7 +182,10 @@ class RbacController extends Controller {
 			}
 		}
 
-		$this->createPermissions($newPermissions);
+		$permissions = $this->createPermissions($newPermissions);
+		foreach ($permissions as $permission) {
+			$this->assignAdmin($permission);
+		}
 	}
 
 	private function createRoles(array $roles): array {

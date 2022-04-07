@@ -111,6 +111,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 	public const PERMISSION_MULTIPLE_SMS = 'sms.multiple';
 	public const PERMISSION_LEAD_DELETE = 'lead.delete';
 	public const PERMISSION_USER_TRAITS = 'user.traits';
+	public const PERMISSION_NOTE_UPDATE = 'note.update';
 
 	private static $ROLES_NAMES;
 	private static $PERMISSIONS_NAMES;
