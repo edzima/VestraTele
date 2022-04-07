@@ -1,12 +1,12 @@
 <?php
 
 use common\models\issue\IssueNote;
-use common\models\user\Worker;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model IssueNote */
 /* @var $options array */
+/* @var $editBtn bool */
 /* @var $removeBtn bool */
 ?>
 
@@ -23,9 +23,9 @@ use yii\helpers\Html;
 <?php endif; ?>
 <div class="panel-footer">
 	<span class="date pull-left"><?= Yii::$app->formatter->asDateTime($model->publish_at) ?></span>
-	<?php if ($model->user_id === Yii::$app->user->id || Yii::$app->user->can(Worker::ROLE_MANAGER)): ?>
-		<span class="action pull-right">
-				<?= !$model->isSms()
+
+	<span class="action pull-right">
+				<?= $editBtn
 					? Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['note/update', 'id' => $model->id])
 					: ''
 				?>
@@ -37,7 +37,6 @@ use yii\helpers\Html;
 					],
 				]) : '' ?>
 					</span>
-	<?php endif; ?>
 	<div class="clearfix"></div>
 </div>
 <?= Html::endTag('div') ?>

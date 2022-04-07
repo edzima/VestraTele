@@ -10,6 +10,7 @@ namespace common\modules\issue\widgets;
 
 use common\helpers\Html;
 use common\models\issue\IssueNote;
+use common\models\user\User;
 use Yii;
 use yii\base\Widget;
 
@@ -22,7 +23,8 @@ class IssueNoteWidget extends Widget {
 	protected const CLASS_DEFAULT = 'panel-primary';
 
 	public IssueNote $model;
-	public ?bool $removeBtn = true;
+	public ?bool $editBtn = null;
+	public ?bool $removeBtn = null;
 
 	public array $options = [
 		'class' => 'panel',
@@ -32,6 +34,13 @@ class IssueNoteWidget extends Widget {
 		parent::init();
 		if ($this->removeBtn === null) {
 			$this->removeBtn = Yii::$app->user->canDeleteNote($this->model);
+		}
+		if ($this->editBtn === null) {
+			if ($this->model->isSms()) {
+				$this->editBtn = Yii::$app->user->can(User::ROLE_ADMINISTRATOR);
+			} else {
+				$this->editBtn = Yii::$app->user->getId() === $this->model->user_id || Yii::$app->user->can(User::PERMISSION_NOTE_UPDATE);
+			}
 		}
 		$this->ensureHtmlOptions();
 	}
@@ -60,6 +69,7 @@ class IssueNoteWidget extends Widget {
 		return $this->render('issue-note', [
 			'model' => $this->model,
 			'options' => $this->options,
+			'editBtn' => $this->editBtn,
 			'removeBtn' => $this->removeBtn,
 		]);
 	}

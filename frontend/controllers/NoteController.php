@@ -6,6 +6,7 @@ use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
+use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\actions\NoteDescriptionListAction;
 use common\modules\issue\actions\NoteTitleListAction;
@@ -124,7 +125,11 @@ class NoteController extends Controller {
 	public function actionUpdate(int $id) {
 		$note = $this->findModel($id);
 		if ($note->isSms()) {
-			throw new NotFoundHttpException();
+			throw new NotFoundHttpException('Cannot update SMS Note.');
+		}
+		if (
+			$note->user_id !== Yii::$app->user->getId() && !Yii::$app->user->can(User::PERMISSION_NOTE_UPDATE)) {
+			throw new ForbiddenHttpException('Only self note can update or User with Note Update permission.');
 		}
 		$model = new IssueNoteForm();
 		$model->setModel($note);

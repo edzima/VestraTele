@@ -16,7 +16,6 @@ use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
-use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -147,7 +146,11 @@ class NoteController extends Controller {
 	public function actionUpdate(int $id) {
 		$note = $this->findModel($id);
 		if ($note->isSms()) {
-			throw new NotFoundHttpException();
+			throw new NotFoundHttpException('Cannot update SMS Note.');
+		}
+		if (
+			$note->user_id !== Yii::$app->user->getId() && !Yii::$app->user->can(User::PERMISSION_NOTE_UPDATE)) {
+			throw new ForbiddenHttpException('Only self note can update or User with Note Update permission.');
 		}
 		$model = new IssueNoteForm();
 		if (Yii::$app->user->can(Worker::PERMISSION_NOTE_TEMPLATE)) {
