@@ -145,6 +145,16 @@ class IssuePayCalculationGrid extends GridView {
 			],
 			*/
 			[
+				'attribute' => 'providerName',
+				'filter' => IssuePayCalculation::getProvidersTypesNames(),
+				'value' => function (IssuePayCalculation $model): string {
+					if ($model->provider_type === IssuePayCalculation::PROVIDER_RESPONSIBLE_ENTITY) {
+						return $model->getProviderName();
+					}
+					return IssuePayCalculation::getProvidersTypesNames()[IssuePayCalculation::PROVIDER_CLIENT];
+				},
+			],
+			[
 				'class' => CurrencyColumn::class,
 				'pageSummary' => $this->withValueSummary,
 				'attribute' => 'value',
@@ -155,18 +165,7 @@ class IssuePayCalculationGrid extends GridView {
 				'attribute' => 'valueToPay',
 				'pageSummary' => $this->withValueSummary,
 			],
-			/*
-			[
-				'attribute' => 'providerName',
-				'filter' => IssuePayCalculation::getProvidersTypesNames(),
-				'value' => function (IssuePayCalculation $model): string {
-					if ($model->provider_type === IssuePayCalculation::PROVIDER_RESPONSIBLE_ENTITY) {
-						return $model->getProviderName();
-					}
-					return IssuePayCalculation::getProvidersTypesNames()[IssuePayCalculation::PROVIDER_CLIENT];
-				},
-			],
-			*/
+
 			[
 				'class' => CurrencyColumn::class,
 				'attribute' => 'userProvisionsSum',
