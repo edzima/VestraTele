@@ -16,6 +16,7 @@ interface IssueSettlement extends IssueInterface, SettlementInterface {
 	public const TYPE_APPEAL = 15;
 	public const TYPE_HONORARIUM = 30;
 	public const TYPE_LAWYER = 40;
+	public const TYPE_REQUEST_FOR_JUSTIFICATION = 45;
 	public const TYPE_SUBSCRIPTION = 50;
 	public const TYPE_DEBT = 100;
 

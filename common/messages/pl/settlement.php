@@ -162,4 +162,5 @@ return [
 	'First Demand for Payment' => '1. Wezwanie do Zapłaty',
 	'Second Demand for Payment' => '2. Wezwanie do Zapłaty',
 	'Third Demand for Payment' => '3. Wezwanie do Zapłaty',
+	'Request for Justification' => 'Wniosek o Uzasadnienie',
 ];
