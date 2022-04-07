@@ -65,7 +65,7 @@ abstract class MessageModel extends Model {
 
 	protected function getFromMailer(): ?array {
 		if (empty($this->fromEmail)) {
-			$this->fromEmail = Yii::$app->params['supportEmail'];
+			$this->fromEmail = Yii::$app->params['senderEmail'];
 		}
 		$name = $this->getFromName();
 		if ($name === null) {
