@@ -4,7 +4,6 @@ namespace common\models\issue\form;
 
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueNote;
-use common\models\issue\IssueNoteForm;
 use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
 use common\models\message\IssueStageChangeMessagesForm;
@@ -25,6 +24,7 @@ class IssueStageChangeForm extends Model {
 	private IssueInterface $issue;
 	private int $previous_stage_id;
 	private ?IssueStageChangeMessagesForm $_messagesForm = null;
+	private ?IssueNote $note = null;
 
 	public function __construct(IssueInterface $issue, array $config = []) {
 		$this->issue = $issue;
@@ -68,7 +68,7 @@ class IssueStageChangeForm extends Model {
 	}
 
 	public function saveNote(): bool {
-		$issueNote = new IssueNoteForm();
+		$issueNote = $this->getNote();
 		$issueNote->type = IssueNote::generateType(
 			IssueNote::generateType(IssueNote::TYPE_STAGE_CHANGE, $this->stage_id),
 			$this->previous_stage_id
@@ -79,6 +79,13 @@ class IssueStageChangeForm extends Model {
 		$issueNote->description = $this->description;
 		$issueNote->publish_at = $this->date_at;
 		return $issueNote->save();
+	}
+
+	protected function getNote(): IssueNote {
+		if ($this->note === null) {
+			$this->note = new IssueNote();
+		}
+		return $this->note;
 	}
 
 	public function getStagesData(): array {
@@ -119,6 +126,7 @@ class IssueStageChangeForm extends Model {
 		if ($this->_messagesForm === null) {
 			$this->_messagesForm = new IssueStageChangeMessagesForm([
 				'issue' => $this->issue,
+				'note' => $this->getNote(),
 			]);
 			$this->_messagesForm->setIssue($this->issue);
 		}
