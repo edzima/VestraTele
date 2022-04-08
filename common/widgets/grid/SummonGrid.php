@@ -37,6 +37,9 @@ class SummonGrid extends GridView {
 	public bool $withContractor = true;
 	public bool $withOwner = true;
 	public bool $withUpdatedAt = true;
+	public bool $withDeadline = true;
+	public bool $withStatus = true;
+	public bool $withRealizedAt = false;
 
 	public function init(): void {
 		if ($this->filterModel !== null && !$this->filterModel instanceof SummonSearch) {
@@ -92,6 +95,7 @@ class SummonGrid extends GridView {
 						'min-width' => '115px',
 					],
 				],
+				'visible' => $this->withStatus,
 			],
 			[
 				'attribute' => 'titleWithDocs',
@@ -123,11 +127,18 @@ class SummonGrid extends GridView {
 				'attribute' => 'deadline_at',
 				'format' => 'date',
 				'noWrap' => true,
+				'visible' => $this->withDeadline,
 			],
 			[
 				'attribute' => 'updated_at',
 				'format' => 'date',
 				'visible' => $this->withUpdatedAt,
+				'noWrap' => true,
+			],
+			[
+				'attribute' => 'realized_at',
+				'format' => 'date',
+				'visible' => $this->withRealizedAt,
 				'noWrap' => true,
 			],
 			[
