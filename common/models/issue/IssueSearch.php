@@ -17,6 +17,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
 
@@ -42,7 +43,7 @@ abstract class IssueSearch extends Model
 	public string $createdAtTo = '';
 	public string $signedAtFrom = '';
 	public string $signedAtTo = '';
-	public string $customerLastname = '';
+	public string $customerName = '';
 	public string $customerPhone = '';
 
 	public $noteFilter;
@@ -71,7 +72,7 @@ abstract class IssueSearch extends Model
 			[['createdAtTo', 'createdAtFrom', 'signedAtFrom', 'signedAtTo'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			['type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
-			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
+			['customerName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[
 				[
 					'created_at', 'updated_at', 'type_additional_date_at',
@@ -117,7 +118,7 @@ abstract class IssueSearch extends Model
 		$this->addressFilter($query);
 		$this->archiveFilter($query);
 		$this->applyAgentsFilters($query);
-		$this->applyCustomerSurnameFilter($query);
+		$this->applyCustomerNameFilter($query);
 		$this->applyCustomerPhoneFilter($query);
 		$this->applyCreatedAtFilter($query);
 		$this->applySignedAtFilter($query);
@@ -197,11 +198,15 @@ abstract class IssueSearch extends Model
 		}
 	}
 
-	public function applyCustomerSurnameFilter(QueryInterface $query): void {
-		if (!empty($this->customerLastname)) {
+	public function applyCustomerNameFilter(QueryInterface $query): void {
+		if (!empty($this->customerName)) {
 			$query->joinWith([
 				'customer.userProfile CP' => function (ActiveQuery $query) {
-					$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
+					$query->andWhere([
+						'like',
+						new Expression("CONCAT(CP.lastname,' ', CP.firstname)"),
+						$this->customerName . '%', false,
+					]);
 				},
 			]);
 		}

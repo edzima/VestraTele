@@ -56,7 +56,7 @@ class IssueToCreateCalculationSearch extends IssueSearch {
 			return $provider;
 		}
 
-		$this->applyCustomerSurnameFilter($query);
+		$this->applyCustomerNameFilter($query);
 
 		$query->andFilterWhere([Issue::tableName() . '.id' => $this->issue_id])
 			->andFilterWhere([Issue::tableName() . '.type_id' => $this->type_id])

@@ -172,7 +172,7 @@ class IssuePaySearch extends IssuePay implements
 		}
 
 		$this->applyAgentsFilters($query);
-		$this->applyCustomerSurnameFilter($query);
+		$this->applyCustomerNameFilter($query);
 		$this->applyDelayFilter($query);
 		$this->applyIssueTypeFilter($query);
 
@@ -202,7 +202,7 @@ class IssuePaySearch extends IssuePay implements
 		}
 	}
 
-	public function applyCustomerSurnameFilter(QueryInterface $query): void {
+	public function applyCustomerNameFilter(QueryInterface $query): void {
 		if (!empty($this->customerLastname)) {
 			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
 		}

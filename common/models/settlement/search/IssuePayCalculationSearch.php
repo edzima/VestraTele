@@ -137,7 +137,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 			return $dataProvider;
 		}
 		$this->applyAgentsFilters($query);
-		$this->applyCustomerSurnameFilter($query);
+		$this->applyCustomerNameFilter($query);
 		$this->applyIssueUsersFilter($query);
 		$this->applyProblemStatusFilter($query);
 		$this->applyIssueStageFilter($query);
@@ -210,7 +210,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		}
 	}
 
-	public function applyCustomerSurnameFilter(QueryInterface $query): void {
+	public function applyCustomerNameFilter(QueryInterface $query): void {
 		if ($this->withCustomer || !empty($this->customerLastname)) {
 			$query->joinWith([
 				'issue.customer C' => function (UserQuery $query) {

@@ -110,7 +110,7 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 			return $dataProvider;
 		}
 
-		$this->applyCustomerSurnameFilter($query);
+		$this->applyCustomerNameFilter($query);
 		$this->applyDateFilter($query);
 		$this->applyPayStatusFilter($query);
 		$this->applySettlementFilter($query);
@@ -201,7 +201,7 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 		}
 	}
 
-	public function applyCustomerSurnameFilter(QueryInterface $query): void {
+	public function applyCustomerNameFilter(QueryInterface $query): void {
 		if (!empty($this->customerLastname)) {
 			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
 		}

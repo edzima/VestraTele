@@ -118,7 +118,7 @@ class SummonSearch extends Summon implements
 			$query->andFilterWhere([SummonDoc::tableName() . '.id' => $this->doc_types_ids]);
 		}
 
-		$this->applyCustomerSurnameFilter($query);
+		$this->applyCustomerNameFilter($query);
 		$this->applyCustomerPhoneFilter($query);
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -139,7 +139,7 @@ class SummonSearch extends Summon implements
 		return $dataProvider;
 	}
 
-	public function applyCustomerSurnameFilter(QueryInterface $query): void {
+	public function applyCustomerNameFilter(QueryInterface $query): void {
 		if (!empty($this->customerLastname)) {
 			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
 		}

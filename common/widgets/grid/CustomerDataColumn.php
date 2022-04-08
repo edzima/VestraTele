@@ -18,7 +18,7 @@ class CustomerDataColumn extends DataColumn {
 			$this->label = Yii::t('common', 'Customer');
 		}
 		if (!isset($this->filterInputOptions['placeholder'])) {
-			$this->filterInputOptions['placeholder'] = Yii::t('common', 'Lastname');
+			$this->filterInputOptions['placeholder'] = Yii::t('common', 'Customer');
 		}
 		parent::init();
 	}

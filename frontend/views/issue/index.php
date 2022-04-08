@@ -143,6 +143,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => CustomerDataColumn::class,
+				'attribute' => 'customerName',
 				'value' => 'issue.customer.fullName',
 				'noWrap' => false,
 				'filterInputOptions' => [

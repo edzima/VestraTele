@@ -173,6 +173,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'class' => CustomerDataColumn::class,
 				'value' => 'customer.fullName',
+				'attribute' => 'customerName',
 			],
 			[
 				'class' => DataColumn::class,

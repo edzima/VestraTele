@@ -150,7 +150,7 @@ class IssueSearchTest extends Unit {
 	}
 
 	public function testCustomerLastname(): void {
-		$this->model->customerLastname = 'Lars';
+		$this->model->customerName = 'Lars';
 		$models = $this->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
@@ -208,7 +208,7 @@ class IssueSearchTest extends Unit {
 
 	public function testCustomerWithAgent(): void {
 		$this->model->agent_id = UserFixtureHelper::AGENT_PETER_NOWAK;
-		$this->model->customerLastname = 'Lar';
+		$this->model->customerName = 'Lar';
 		$models = $this->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
