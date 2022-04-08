@@ -186,6 +186,10 @@ class Summon extends ActiveRecord implements IssueInterface {
 		return (int) $this->status === static::STATUS_REALIZED;
 	}
 
+	public function isUnrealized(): bool {
+		return (int) $this->status === static::STATUS_UNREALIZED;
+	}
+
 	/**
 	 * Gets query for [[Issue]].
 	 *
