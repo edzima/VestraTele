@@ -3,7 +3,9 @@
 namespace common\widgets\grid;
 
 use common\models\issue\search\SummonSearch;
+use common\models\issue\Summon;
 use common\widgets\GridView;
+use DateTime;
 use kartik\select2\Select2;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -37,6 +39,15 @@ class SummonGrid extends GridView {
 	public bool $withContractor = true;
 	public bool $withOwner = true;
 	public bool $withUpdatedAt = true;
+	public bool $withDeadline = true;
+	public bool $withStatus = true;
+	public bool $withRealizedAt = false;
+
+	public bool $rowColors = true;
+	public string $realizedClass = 'success';
+	public string $unrealizedClass = 'half-transparent';
+	public string $deadlineExceededClass = 'danger';
+	private string $todayDeadlineClass = 'warning';
 
 	public function init(): void {
 		if ($this->filterModel !== null && !$this->filterModel instanceof SummonSearch) {
@@ -52,8 +63,41 @@ class SummonGrid extends GridView {
 		if ($this->withCaption && empty($this->caption)) {
 			$this->caption = Yii::t('common', 'Summons');
 		}
+		if ($this->rowColors && empty($this->rowOptions)) {
+			$this->rowOptions = function (Summon $model): array {
+				return $this->colorRowOptions($model);
+			};
+		}
 
 		parent::init();
+	}
+
+	public function colorRowOptions(Summon $model): array {
+		if ($model->isRealized()) {
+			return [
+				'class' => $this->realizedClass,
+			];
+		}
+		if ($model->isUnrealized()) {
+			return [
+				'class' => $this->unrealizedClass,
+			];
+		}
+		if (!empty($model->deadline_at)) {
+			$deadline = new DateTime($model->deadline_at);
+			$nowDiff = $deadline->diff(new DateTime());
+			if ($nowDiff->days === 0) {
+				return [
+					'class' => $this->todayDeadlineClass,
+				];
+			}
+			if (!$nowDiff->invert && $nowDiff->days > 0) {
+				return [
+					'class' => $this->deadlineExceededClass,
+				];
+			}
+		}
+		return [];
 	}
 
 	public function defaultColumns(): array {
@@ -92,6 +136,7 @@ class SummonGrid extends GridView {
 						'min-width' => '115px',
 					],
 				],
+				'visible' => $this->withStatus,
 			],
 			[
 				'attribute' => 'titleWithDocs',
@@ -123,11 +168,18 @@ class SummonGrid extends GridView {
 				'attribute' => 'deadline_at',
 				'format' => 'date',
 				'noWrap' => true,
+				'visible' => $this->withDeadline,
 			],
 			[
 				'attribute' => 'updated_at',
 				'format' => 'date',
 				'visible' => $this->withUpdatedAt,
+				'noWrap' => true,
+			],
+			[
+				'attribute' => 'realized_at',
+				'format' => 'date',
+				'visible' => $this->withRealizedAt,
 				'noWrap' => true,
 			],
 			[

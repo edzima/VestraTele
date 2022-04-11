@@ -282,3 +282,8 @@ th.kv-nowrap {
 	grid-template-columns: repeat(auto-fit, minmax(315px, 1fr));
 	grid-gap: 1rem;
 }
+
+
+.half-transparent {
+	opacity: 0.5;
+}

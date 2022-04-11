@@ -54,4 +54,6 @@ return [
 	'Signed At from' => 'Podpisano (od)',
 	'Signed At to' => 'Podpisano (do)',
 	'Issues Count' => 'Ilość Spraw',
+	'Summons' => 'Zlecenia',
+	'Realized: {count}' => 'Zrealizowane: {count}',
 ];
