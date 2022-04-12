@@ -41,6 +41,7 @@ if (!empty($modelsRealized)) {
 	'emptyText' => '',
 	'dataProvider' => new ArrayDataProvider([
 		'models' => $modelsWithoutRealized,
+		'modelClass' => Summon::class,
 	]),
 	'summary' => '',
 	'withTitle' => false,
