@@ -37,7 +37,7 @@ if (!empty($modelsRealized)) {
 
 <?= SummonGrid::widget([
 	'caption' => $caption,
-	'showOnEmpty' => false,
+	'showOnEmpty' => !empty($dataProvider->getModels()),
 	'emptyText' => '',
 	'dataProvider' => new ArrayDataProvider([
 		'models' => $modelsWithoutRealized,
