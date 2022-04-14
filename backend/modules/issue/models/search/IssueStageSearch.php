@@ -69,8 +69,8 @@ class IssueStageSearch extends IssueStage {
 			'days_reminder' => $this->days_reminder,
 		]);
 
-		$query->andFilterWhere(['like', 'name', $this->name])
-			->andFilterWhere(['like', 'short_name', $this->short_name]);
+		$query->andFilterWhere(['like', IssueStage::tableName() . '.name', $this->name])
+			->andFilterWhere(['like', IssueStage::tableName() . '.short_name', $this->short_name]);
 
 		$query->addOrderBy('posi');
 
