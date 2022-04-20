@@ -8,35 +8,30 @@ use yii\base\Action;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
 
-class NoteDescriptionListAction extends Action {
+class NoteDescriptionListAction extends Action
+{
 
-	public int $minLength = 3;
-	public int $limit = 50;
+    public int $minLength = 3;
+    public int $limit = 50;
 
-	public function init(): void {
-		parent::init();
-		Yii::$app->response->format = Response::FORMAT_JSON;
-	}
+    public function init(): void
+    {
+        parent::init();
+        Yii::$app->response->format = Response::FORMAT_JSON;
+    }
 
-	public function run(string $q = null): array {
-		$out = ['results' => []];
-		if (strlen($q) >= $this->minLength) {
-			$descriptions = IssueNote::find()
-				->select('description')
-				->where(['like', 'description', $q])
-				->andWhere(['is_template' => true])
-				->distinct()
-				->limit($this->limit)
-				->addOrderBy(['created_at' => SORT_DESC])
-				->column();
-
-			foreach ($descriptions as $description) {
-				$out['results'][] = [
-					'id' => $description,
-					'text' => $description,
-				];
-			}
-		}
-		return $out;
-	}
+    public function run(string $term = null): array
+    {
+        if (strlen($term) >= $this->minLength) {
+            return IssueNote::find()
+                ->select('description')
+                ->andWhere(['is_template' => true])
+                ->andWhere(['like', 'description', $term])
+                ->distinct()
+                ->limit($this->limit)
+                ->addOrderBy(['created_at' => SORT_DESC])
+                ->column();
+        }
+        return [];
+    }
 }

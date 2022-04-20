@@ -287,3 +287,9 @@ th.kv-nowrap {
 .half-transparent {
 	opacity: 0.5;
 }
+
+
+.ui-autocomplete-loading {
+	background: url('/static/img/indicator.gif') no-repeat center center;
+	background-size: 20px 20px;
+}

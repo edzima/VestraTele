@@ -43,7 +43,8 @@
 		"kartik-v/yii2-date-range": "~1.7.0",
 		"yiimaker/yii2-email-templates": "~4.1",
 		"edzima/yii2-adescom": "^1.0",
-		"yiisoft/yii2-queue": "^2.3"
+		"yiisoft/yii2-queue": "^2.3",
+		"yiisoft/yii2-jui": "^2.0"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-latest",
