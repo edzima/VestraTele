@@ -37,7 +37,7 @@ class IssueNoteWidget extends Widget {
 		}
 		if ($this->editBtn === null) {
 			if ($this->model->isSms()) {
-				$this->editBtn = Yii::$app->user->can(User::ROLE_ADMINISTRATOR);
+				$this->editBtn = false;
 			} else {
 				$this->editBtn = Yii::$app->user->getId() === $this->model->user_id || Yii::$app->user->can(User::PERMISSION_NOTE_UPDATE);
 			}
