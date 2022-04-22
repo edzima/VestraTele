@@ -17,24 +17,29 @@ use yii\web\View;
 
 <div class="issue-note-form">
 
-	<?php $form = ActiveForm::begin($options); ?>
+    <?php $form = ActiveForm::begin($options); ?>
 
-	<div class="row">
-		<?= $form->field($model, 'publish_at', [
-			'options' => ['class' => 'col-md-2'],
-		])->widget(DateTimeWidget::class, [
-			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
-		]) ?>
+    <div class="row">
+        <?= $form->field($model, 'publish_at', [
+            'options' => ['class' => 'col-md-2'],
+        ])->widget(DateTimeWidget::class, [
+            'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
+        ]) ?>
 
-		<?= $form->field($model, 'is_pinned', [
-			'options' => ['class' => 'col-md-1'],
-		])->checkbox() ?>
+        <?= $model->getScenario() === IssueNoteForm::SCENARIO_STAGE_CHANGE ? $form->field($model, 'stageChangeAtMerge', [
+            'options' => ['class' => 'col-md-2'],
+        ])->checkbox()
+            : '' ?>
 
-		<?= $model->isAttributeSafe('is_template')
-			? $form->field($model, 'is_template', [
-				'options' => ['class' => 'col-md-1'],
-			])->checkbox()
-			: ''
+        <?= $form->field($model, 'is_pinned', [
+            'options' => ['class' => 'col-md-1'],
+        ])->checkbox() ?>
+
+        <?= $model->isAttributeSafe('is_template')
+            ? $form->field($model, 'is_template', [
+                'options' => ['class' => 'col-md-1'],
+            ])->checkbox()
+            : ''
 		?>
 	</div>
 

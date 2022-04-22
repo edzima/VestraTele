@@ -56,4 +56,5 @@ return [
 	'Issues Count' => 'Ilość Spraw',
 	'Summons' => 'Zlecenia',
 	'Realized: {count}' => 'Zrealizowane: {count}',
+    'Stage change At merge' => 'Zaktualizuj Datę zmianę etapu'
 ];
