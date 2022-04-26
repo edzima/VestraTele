@@ -30,7 +30,7 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 	public $trait = [];
 
 	public array $defaultOrder = [
-		'action_at' => 'DESC',
+		'action_at' => SORT_DESC,
 	];
 
 	public function attributeLabels(): array {

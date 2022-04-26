@@ -306,4 +306,6 @@ return [
 	'User Traits' => 'Cechy',
 	'Show on Issue View' => 'Pokazuj na Karcie sprawy',
 	'Doc Types' => 'Dokumenty',
+	'Show on Mainpage' => 'Pokazuj na Stronie Głównej',
+	'Empty: not visible. Number for Order.' => 'Puste: nie wyświetlaj. Kolejność',
 ];

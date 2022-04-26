@@ -1,18 +1,18 @@
 <?php
 
 use common\components\DbManager;
-use common\components\message\MessageTemplateManager;
+use common\components\Formatter;
 use common\components\HierarchyComponent;
 use common\components\keyStorage\KeyStorage;
+use common\components\message\MessageTemplateManager;
 use common\components\PayComponent;
 use common\components\provision\Provisions;
 use common\components\TaxComponent;
-use common\components\Formatter;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\czater\Czater;
-use edzima\teryt\Module as TerytModule;
 use common\modules\lead\Module as LeadModule;
+use edzima\teryt\Module as TerytModule;
 use Edzima\Yii2Adescom\AdescomSender;
 use Edzima\Yii2Adescom\AdescomSoap;
 use yii\caching\DummyCache;
@@ -106,6 +106,13 @@ return [
 				'db_rbac' => [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',
+				],
+				'vova07/imperavi' => [
+					'class' => 'yii\i18n\PhpMessageSource',
+					'basePath' => '@common/messages',
+					'fileMap' => [
+						'vova07/imperavi' => 'imperavi.php',
+					],
 				],
 				'*' => [
 					'class' => 'yii\i18n\PhpMessageSource',

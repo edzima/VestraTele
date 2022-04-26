@@ -22,7 +22,7 @@
 		"ext-mbstring": "*",
 		"ext-decimal": "*",
 		"php-decimal/php-decimal": "^1.1",
-		"yiisoft/yii2": "2.0.38",
+		"yiisoft/yii2": "^2.0.38",
 		"yiisoft/yii2-bootstrap": "^2.0.10",
 		"yiisoft/yii2-swiftmailer": "^2.1.2",
 		"vlucas/phpdotenv": "^5.1.0",

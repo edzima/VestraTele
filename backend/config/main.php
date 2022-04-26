@@ -261,6 +261,15 @@ return [
 				'roles' => ['?', '@'],
 			],
 			[
+				'controllers' => ['article', 'article-category'],
+				'allow' => true,
+				'permissions' => [User::PERMISSION_NEWS],
+			],
+			[
+				'controllers' => ['article', 'article-category'],
+				'allow' => false,
+			],
+			[
 				'allow' => true,
 				'roles' => ['manager'],
 			],

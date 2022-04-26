@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\helpers\Flash;
+use common\models\Article;
 use common\models\user\LoginForm;
 use frontend\models\ContactForm;
 use frontend\models\PasswordResetRequestForm;
@@ -12,6 +13,7 @@ use frontend\models\VerifyEmailForm;
 use vova07\fileapi\actions\UploadAction as FileAPIUpload;
 use Yii;
 use yii\base\InvalidArgumentException;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
@@ -73,7 +75,18 @@ class SiteController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex() {
-		return $this->render('index');
+
+		$articlesDataProvider = null;
+		if (!Yii::$app->user->isGuest) {
+			$articlesDataProvider = new ActiveDataProvider([
+				'query' => Article::find()
+					->published()
+					->mainpage(),
+			]);
+		}
+		return $this->render('index', [
+			'articlesDataProvider' => $articlesDataProvider,
+		]);
 	}
 
 	/**
