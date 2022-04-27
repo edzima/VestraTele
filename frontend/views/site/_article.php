@@ -3,8 +3,16 @@
 use common\models\Article;
 use frontend\helpers\Html;
 use yii\helpers\HtmlPurifier;
+use yii\web\View;
 
+/** @var $this View */
 /** @var Article $model */
+if (strpos($model->body, 'panel-heading') && strpos($model->body, 'panel-collapse')) {
+	$this->registerJs("$('.panel-heading').on('click', function(){
+	$(this).next('div.panel-collapse.collapse').collapse('toggle');
+	});"
+	);
+}
 ?>
 
 <div class="article-view">
