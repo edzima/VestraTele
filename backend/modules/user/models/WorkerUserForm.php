@@ -44,7 +44,6 @@ class WorkerUserForm extends UserForm {
 		Worker::PERMISSION_SUMMON_MANAGER,
 		User::PERMISSION_WORKERS,
 		Worker::PERMISSION_MULTIPLE_SMS,
-		Worker::PERMISSION_SMS,
 		Worker::PERMISSION_NOTE_TEMPLATE,
 	];
 

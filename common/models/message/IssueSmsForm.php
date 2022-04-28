@@ -60,6 +60,21 @@ class IssueSmsForm extends QueueSmsForm {
 		);
 	}
 
+	public function afterValidate() {
+		parent::afterValidate();
+		if (!$this->hasErrors()) {
+			$this->message = $this->bindIssueParams($this->message);
+		}
+	}
+
+	public function bindIssueParams(string $message): string {
+		return strtr($message, [
+			'{agentName}' => $this->getIssue()->getIssueModel()->agent->getFullName(),
+			'{customerName}' => $this->getIssue()->getIssueModel()->customer->getFullName(),
+			'{issueName}' => $this->getIssue()->getIssueName(),
+		]);
+	}
+
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
 			'note_title' => Yii::t('issue', 'Note Title'),
