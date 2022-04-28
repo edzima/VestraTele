@@ -70,7 +70,9 @@ class IssueSmsForm extends QueueSmsForm {
 	public function bindIssueParams(string $message): string {
 		return strtr($message, [
 			'{agentName}' => $this->getIssue()->getIssueModel()->agent->getFullName(),
+			'{agentPhone}' => $this->getIssue()->getIssueModel()->agent->getPhone(),
 			'{customerName}' => $this->getIssue()->getIssueModel()->customer->getFullName(),
+			'{customerPhone}' => $this->getIssue()->getIssueModel()->customer->getPhone(),
 			'{issueName}' => $this->getIssue()->getIssueName(),
 		]);
 	}
