@@ -20,6 +20,7 @@ class Call extends Model {
 	public int $duration;
 	public string $dateRequested;
 	public string $status;
+	public ?string $referer = null;
 
 	public ?string $consultantName;
 	public ?string $consultantNumber;
