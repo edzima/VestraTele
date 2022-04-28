@@ -1,6 +1,7 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
+use backend\modules\issue\widgets\IssueSmsButtonDropdown;
 use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\modules\issue\widgets\SummonCreateButtonDropdown;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
@@ -36,8 +37,8 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		?>
 
 		<?= !$model->isArchived() && Yii::$app->user->can(Worker::PERMISSION_SMS)
-			? Html::a(Yii::t('common', 'Send SMS'), ['sms/push', 'id' => $model->id], [
-				'class' => 'btn btn-default',
+			? IssueSmsButtonDropdown::widget([
+				'model' => $model,
 			])
 			: ''
 		?>
