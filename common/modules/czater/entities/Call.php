@@ -2,10 +2,16 @@
 
 namespace common\modules\czater\entities;
 
+use common\modules\czater\Czater;
 use Yii;
 use yii\base\Model;
 
 class Call extends Model {
+
+	public function __construct(Czater $owner, $config = []) {
+		$this->owner = $owner;
+		parent::__construct($config);
+	}
 
 	public const STATUS_ANSWERED = 'answered';
 	public const STATUS_NOANSWERED = 'noanswered';
@@ -14,6 +20,7 @@ class Call extends Model {
 	public const STATUS_BUSYED = 'busyed';
 
 	public int $id;
+	public ?int $idClient = null;
 	public string $clientDirectional;
 	public string $clientNumber;
 	public ?string $clientName;
@@ -26,6 +33,16 @@ class Call extends Model {
 	public ?string $consultantNumber;
 	public ?string $dateStart;
 	public ?string $dateFinish;
+
+	private ?Client $client;
+	private Czater $owner;
+
+	public function getClient(): ?Client {
+		if ($this->client === null && $this->idClient !== null) {
+			$this->client = $this->owner->getClient($this->idClient);
+		}
+		return $this->client;
+	}
 
 	public function getClientFullNumber(): string {
 		return $this->clientDirectional . ' ' . $this->clientNumber;
@@ -44,4 +61,5 @@ class Call extends Model {
 			static::STATUS_REQUESTED => Yii::t('czater', 'Requested'),
 		];
 	}
+
 }

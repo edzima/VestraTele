@@ -29,8 +29,9 @@ class Czater extends Component {
 		$key = static::typeResponseKeyMap()[static::TYPE_CALL];
 		if ($response
 			&& $this->responseIsSuccess($response)
-			&& isset($response[$key])) {
-			return new Call($response[$key][0]);
+			&& isset($response[$key][0])
+		) {
+			return new Call($this, $response[$key][0]);
 		}
 		Yii::warning([
 			'message' => 'Invalid Call Response',
@@ -57,7 +58,7 @@ class Czater extends Component {
 			$calls = [];
 			$callsAttributes = $response[$key];
 			foreach ($callsAttributes as $attributes) {
-				$calls[] = new Call($attributes);
+				$calls[] = new Call($this, $attributes);
 			}
 			return $calls;
 		}
@@ -78,7 +79,7 @@ class Czater extends Component {
 		$key = static::typeResponseKeyMap()[static::TYPE_CONV];
 		if ($response
 			&& $this->responseIsSuccess($response)
-			&& isset($response[$key])
+			&& isset($response[$key][0])
 		) {
 			return new Conv($this, $response[$key][0]);
 		}
@@ -123,12 +124,12 @@ class Czater extends Component {
 			'id' => $id,
 		]);
 		$response = $this->response($url);
-		$responseKey = static::typeResponseKeyMap()[static::TYPE_CLIENTS];
+		$key = static::typeResponseKeyMap()[static::TYPE_CLIENTS];
 		if ($response
 			&& $this->responseIsSuccess($response)
-			&& isset($response[$responseKey])
+			&& isset($response[$key][0])
 		) {
-			return new Client($response[$responseKey][0]);
+			return new Client($response[$key][0]);
 		}
 		Yii::warning([
 			'message' => 'Invalid Clients Response',
@@ -140,6 +141,10 @@ class Czater extends Component {
 		return null;
 	}
 
+	/**
+	 * @param int $offset
+	 * @return Client[]|null
+	 */
 	public function getClients(int $offset = 0): ?array {
 		$url = $this->buildUrl(static::TYPE_CLIENTS, [
 			'offset' => $offset,
