@@ -13,7 +13,6 @@ class WorkerUserForm extends UserForm {
 		User::ROLE_BOOKKEEPER,
 		User::ROLE_USER,
 		User::ROLE_MANAGER,
-		User::ROLE_CUSTOMER_SERVICE,
 		Customer::ROLE_CUSTOMER,
 		Customer::ROLE_HANDICAPPED,
 		Customer::ROLE_SHAREHOLDER,
