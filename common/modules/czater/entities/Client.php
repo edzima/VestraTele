@@ -8,7 +8,7 @@ class Client extends BaseObject {
 
 	public string $id;
 	public int $idClient;
-	public string $name;
+	public ?string $name = null;
 	public ?string $email;
 	public ?string $phone;
 
