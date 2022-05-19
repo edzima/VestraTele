@@ -46,6 +46,13 @@ class WorkerUserForm extends UserForm {
 		Worker::PERMISSION_NOTE_TEMPLATE,
 	];
 
+	public function rules(): array {
+		return array_merge([
+			['roles', 'required'],
+		], parent::rules()
+		);
+	}
+
 	public int $status = User::STATUS_ACTIVE;
 
 	protected function createModel(): Worker {
