@@ -4,9 +4,10 @@ namespace common\modules\lead\models\forms;
 
 use common\modules\czater\entities\Call;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadSource;
+use common\modules\lead\models\LeadStatusInterface;
 use DateTime;
 use Yii;
-use yii\base\InvalidConfigException;
 use yii\helpers\Json;
 
 class CzaterCallLeadForm extends CzaterLeadForm {
@@ -17,11 +18,28 @@ class CzaterCallLeadForm extends CzaterLeadForm {
 
 	public function setCall(Call $call): void {
 		$this->call = $call;
+		$this->id = $call->id;
+		$this->referer = !empty($call->referer) ? $call->referer : $call->getClient()->firstReferer;
+		$this->source_id = LeadSource::findByURL($this->referer)->id ?? null;
 		$this->name = $this->getName();
-		$this->phone = $this->getPhone();
-		$this->source_id = $this->getSourceId();
+		$this->phone = $call->getClientFullNumber();
 		$this->date_at = $this->getDateTime()->format($this->dateFormat);
+		$this->status_id = $this->getStatusId();
 		$this->data = Json::encode($this->getData());
+	}
+
+	public function getStatusId(): int {
+		if ($this->validate(['phone', 'email'])) {
+			$sameLeads = $this->getSameContacts();
+			if (!empty($sameLeads)) {
+				foreach ($sameLeads as $sameLead) {
+					if ($sameLead->getSourceId() === $this->getSourceId()) {
+						return LeadStatusInterface::STATUS_ARCHIVE;
+					}
+				}
+			}
+		}
+		return LeadStatusInterface::STATUS_NEW;
 	}
 
 	public function getData(): array {
@@ -34,22 +52,9 @@ class CzaterCallLeadForm extends CzaterLeadForm {
 
 	public function getName(): string {
 		if (empty($this->call->clientName)) {
-			return Yii::t('lead', 'Czater Call Lead');
+			return $this->call->getClient()->name ?? Yii::t('lead', 'Czater Call Lead');
 		}
 		return $this->call->clientName;
-	}
-
-	public function getPhone(): string {
-		return $this->call->getClientFullNumber();
-	}
-
-	public function getSourceId(): int {
-		$parts = explode('_', $this->call->consultantName);
-		$sourceID = (int) end($parts);
-		if ($sourceID) {
-			return $sourceID;
-		}
-		throw new InvalidConfigException('Not Found Source ID on End of ConsultantName: ' . $this->call->consultantName);
 	}
 
 }

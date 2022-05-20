@@ -16,10 +16,12 @@ class CzaterConvLeadForm extends CzaterLeadForm {
 
 	public function setConv(Conv $conv): void {
 		$this->conv = $conv;
+		$this->id = $conv->id;
+		$this->referer = !empty($conv->referer) ? $conv->referer : $conv->getClient()->firstReferer;
+		$this->source_id = LeadSource::findByURL($this->referer)->id ?? null;
 		$this->email = $this->getEmail();
 		$this->name = $this->getName();
 		$this->phone = $this->getPhone();
-		$this->source_id = $this->getSourceId();
 		$this->date_at = $this->getDateTime()->format($this->dateFormat);
 		$this->data = Json::encode($this->getData());
 	}
@@ -42,13 +44,6 @@ class CzaterConvLeadForm extends CzaterLeadForm {
 
 	public function getEmail(): ?string {
 		return $this->conv->getClient()->email;
-	}
-
-	public function getSourceId(): int {
-		if (empty($this->source_id)) {
-			$this->source_id = LeadSource::findByReferer($this->conv->referer)->id ?? null;
-		}
-		return $this->source_id;
 	}
 
 }
