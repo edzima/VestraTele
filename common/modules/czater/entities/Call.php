@@ -8,16 +8,16 @@ use yii\base\Model;
 
 class Call extends Model {
 
-	public function __construct(Czater $owner, $config = []) {
-		$this->owner = $owner;
-		parent::__construct($config);
-	}
-
 	public const STATUS_ANSWERED = 'answered';
 	public const STATUS_NOANSWERED = 'noanswered';
 	public const STATUS_CLIENT_FAULT = 'client_fault';
 	public const STATUS_REQUESTED = 'requested';
 	public const STATUS_BUSYED = 'busyed';
+
+	public function __construct(Czater $owner, $config = []) {
+		$this->owner = $owner;
+		parent::__construct($config);
+	}
 
 	public int $id;
 	public ?int $idClient = null;
@@ -34,7 +34,7 @@ class Call extends Model {
 	public ?string $dateStart;
 	public ?string $dateFinish;
 
-	private ?Client $client;
+	private ?Client $client = null;
 	private Czater $owner;
 
 	public function getClient(): ?Client {

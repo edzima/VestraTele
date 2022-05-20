@@ -2,6 +2,7 @@
 
 namespace common\modules\czater\controllers;
 
+use common\modules\czater\entities\Call;
 use yii\web\NotFoundHttpException;
 
 class CallController extends BaseController {
@@ -16,13 +17,16 @@ class CallController extends BaseController {
 	}
 
 	public function actionView(int $id): string {
+		return $this->render('view', [
+			'model' => $this->findModel($id),
+		]);
+	}
+
+	private function findModel(int $id): Call {
 		$model = $this->module->czater->getCall($id);
 		if ($model === null) {
 			throw new NotFoundHttpException();
 		}
-
-		return $this->render('view', [
-			'model' => $model,
-		]);
+		return $model;
 	}
 }
