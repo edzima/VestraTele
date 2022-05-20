@@ -16,6 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null $owner_id
  * @property int|null $parent_id
  * @property int|null $sort_index
+ * @property string $url_search_part
  *
  * @property-read Lead[] $leads
  * @property-read LeadCampaign $parent
@@ -51,7 +52,7 @@ class LeadCampaign extends ActiveRecord {
 		return [
 			[['name'], 'required'],
 			[['sort_index'], 'integer'],
-			[['name'], 'string', 'max' => 255],
+			[['name', 'url_search_part'], 'string', 'max' => 255],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['name', 'owner_id'], 'unique', 'targetAttribute' => ['name', 'owner_id']],
 			[['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => static::class, 'targetAttribute' => ['parent_id' => 'id']],
@@ -69,6 +70,7 @@ class LeadCampaign extends ActiveRecord {
 			'parent_id' => Yii::t('lead', 'Parent'),
 			'owner_id' => Yii::t('lead', 'Owner'),
 			'sort_index' => Yii::t('lead', 'Sort Index'),
+			'url_search_part' => Yii::t('lead', 'URL Search Part'),
 		];
 	}
 

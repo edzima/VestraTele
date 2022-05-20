@@ -1,6 +1,7 @@
 <?php
 
 use common\helpers\Html;
+use common\helpers\Url;
 use common\modules\czater\entities\Call;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -43,7 +44,13 @@ $this->params['breadcrumbs'][] = $this->title;
 		],
 		[
 			'class' => ActionColumn::class,
-			'template' => '{view}',
+			'template' => '{view} {lead}',
+			'buttons' => [
+				'lead' => function (string $url, Call $model): string {
+					$url = Url::to(['/lead/czater/call', 'id' => $model->id]);
+					return Html::a('lead', $url);
+				},
+			],
 		],
 	],
 ]) ?>
