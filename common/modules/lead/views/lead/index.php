@@ -79,7 +79,6 @@ if ($multipleForm) {
 			: ''
 		?>
 		<?= Yii::$app->user->can(User::PERMISSION_LEAD_DELETE)
-		&& $dataProvider->pagination->pageCount > 1
 			?
 			Html::a(
 				Yii::t('lead', 'Delete ({count})', [
@@ -93,7 +92,6 @@ if ($multipleForm) {
 						'confirm' => Yii::t('lead', 'Are you sure you want to delete this items?'),
 					],
 				])
-
 			: ''
 		?>
 
