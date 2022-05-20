@@ -29,6 +29,8 @@ use yii\widgets\ActiveForm;
 		])
 		: '' ?>
 
+	<?= $form->field($model, 'url_search_part')->textInput() ?>
+
 	<?= $form->field($model, 'sort_index')->textInput() ?>
 
 	<div class="form-group">

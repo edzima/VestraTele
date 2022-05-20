@@ -53,6 +53,7 @@ class LeadCampaign extends ActiveRecord {
 			[['name'], 'required'],
 			[['sort_index'], 'integer'],
 			[['name', 'url_search_part'], 'string', 'max' => 255],
+			['url_search_part', 'default', 'value' => null],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['name', 'owner_id'], 'unique', 'targetAttribute' => ['name', 'owner_id']],
 			[['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => static::class, 'targetAttribute' => ['parent_id' => 'id']],
@@ -114,5 +115,27 @@ class LeadCampaign extends ActiveRecord {
 				->all();
 		}
 		return static::$models;
+	}
+
+	public static function findByURL(string $url): ?self {
+		$models = static::find()
+			->andWhere('url_search_part IS NOT NULL')
+			->all();
+
+		foreach ($models as $model) {
+			if ($model->isForURL($url)) {
+				return $model;
+			}
+		}
+
+		return null;
+	}
+
+	public function isForURL(string $url): bool {
+		if (empty($this->url_search_part)) {
+			return false;
+		}
+
+		return strpos($url, $this->url_search_part) !== false;
 	}
 }
