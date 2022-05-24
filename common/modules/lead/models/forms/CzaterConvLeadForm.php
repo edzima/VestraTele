@@ -4,7 +4,6 @@ namespace common\modules\lead\models\forms;
 
 use common\modules\czater\entities\Conv;
 use common\modules\lead\models\Lead;
-use common\modules\lead\models\LeadSource;
 use DateTime;
 use yii\helpers\Json;
 
@@ -17,8 +16,7 @@ class CzaterConvLeadForm extends CzaterLeadForm {
 	public function setConv(Conv $conv): void {
 		$this->conv = $conv;
 		$this->id = $conv->id;
-		$this->referer = !empty($conv->referer) ? $conv->referer : $conv->getClient()->firstReferer;
-		$this->source_id = LeadSource::findByURL($this->referer)->id ?? null;
+		$this->setReferer(!empty($conv->referer) ? $conv->referer : $conv->getClient()->firstReferer);
 		$this->email = $this->getEmail();
 		$this->name = $this->getName();
 		$this->phone = $this->getPhone();

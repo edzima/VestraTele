@@ -74,7 +74,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 	public function rules(): array {
 		return [
 			[['source_id', 'status_id', 'data', 'name'], 'required'],
-			[['status_id'], 'integer'],
+			[['status_id', 'campaign_id', 'status_id', 'source_id'], 'integer'],
 			[['phone', 'postal_code', 'email', 'provider', 'name'], 'string'],
 			[['phone', 'email', 'provider'], 'default', 'value' => null],
 			['email', 'email'],

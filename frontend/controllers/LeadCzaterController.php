@@ -4,7 +4,6 @@ namespace frontend\controllers;
 
 use common\modules\lead\models\forms\CzaterCallLeadForm;
 use common\modules\lead\models\forms\CzaterConvLeadForm;
-use common\modules\lead\Module;
 use Yii;
 use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
@@ -28,16 +27,10 @@ class LeadCzaterController extends Controller {
 		$czaterLead = new CzaterConvLeadForm();
 		$czaterLead->setConv($model);
 		if ($czaterLead->validate()) {
-			$lead = $czaterLead->findLead();
-			if ($lead === null) {
-				$lead = Module::manager()->pushLead($czaterLead);
-			}
-			if ($lead) {
-				return true;
-			}
-		} else {
-			Yii::warning($czaterLead->getErrors(), 'lead.czater.convBegin.errors');
+			return $czaterLead->pushOrUpdateLead(false) !== null;
 		}
+
+		Yii::warning($czaterLead->getErrors(), 'lead.czater.convBegin.errors');
 	}
 
 	public function actionConvEnd(): void {
@@ -65,16 +58,9 @@ class LeadCzaterController extends Controller {
 		$czaterLead = new CzaterCallLeadForm();
 		$czaterLead->setCall($model);
 		if ($czaterLead->validate()) {
-			$lead = $czaterLead->findLead();
-			if ($lead === null) {
-				$lead = Module::manager()->pushLead($czaterLead);
-			}
-			if ($lead) {
-				return true;
-			}
-		} else {
-			Yii::warning($czaterLead->getErrors(), 'lead.czater.callEnd.errors');
+			return $czaterLead->pushOrUpdateLead(false) !== null;
 		}
+		Yii::warning($czaterLead->getErrors(), 'lead.czater.callEnd.errors');
 	}
 
 }

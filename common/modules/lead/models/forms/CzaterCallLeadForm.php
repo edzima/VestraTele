@@ -4,7 +4,6 @@ namespace common\modules\lead\models\forms;
 
 use common\modules\czater\entities\Call;
 use common\modules\lead\models\Lead;
-use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatusInterface;
 use DateTime;
 use Yii;
@@ -19,9 +18,13 @@ class CzaterCallLeadForm extends CzaterLeadForm {
 	public function setCall(Call $call): void {
 		$this->call = $call;
 		$this->id = $call->id;
-		$this->referer = !empty($call->referer) ? $call->referer : $call->getClient()->firstReferer;
-		$this->source_id = LeadSource::findByURL($this->referer)->id ?? null;
+		$this->setReferer(
+			!empty($call->referer)
+				? $call->referer
+				: $call->getClient()->firstReferer
+		);
 		$this->name = $this->getName();
+		$this->email = $this->getEmail();
 		$this->phone = $call->getClientFullNumber();
 		$this->date_at = $this->getDateTime()->format($this->dateFormat);
 		$this->status_id = $this->getStatusId();
@@ -29,15 +32,9 @@ class CzaterCallLeadForm extends CzaterLeadForm {
 	}
 
 	public function getStatusId(): int {
-		if ($this->validate(['phone', 'email'])) {
-			$sameLeads = $this->getSameContacts();
-			if (!empty($sameLeads)) {
-				foreach ($sameLeads as $sameLead) {
-					if ($sameLead->getSourceId() === $this->getSourceId()) {
-						return LeadStatusInterface::STATUS_ARCHIVE;
-					}
-				}
-			}
+		if ($this->validate(['phone', 'email', 'source_id'])) {
+			$sameLeads = $this->getSameContacts(true);
+			return empty($sameLeads) ? LeadStatusInterface::STATUS_NEW : LeadStatusInterface::STATUS_ARCHIVE;
 		}
 		return LeadStatusInterface::STATUS_NEW;
 	}

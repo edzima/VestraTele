@@ -18,7 +18,7 @@ class LeadCampaignSearch extends LeadCampaign {
 		return [
 			[['id', 'sort_index', 'owner_id'], 'integer'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
-			[['name'], 'safe'],
+			[['name', 'url_search_part'], 'safe'],
 		];
 	}
 
@@ -60,7 +60,8 @@ class LeadCampaignSearch extends LeadCampaign {
 			'owner_id' => $this->owner_id,
 		]);
 
-		$query->andFilterWhere(['like', 'name', $this->name]);
+		$query->andFilterWhere(['like', 'name', $this->name])
+			->andFilterWhere(['like', 'url_search_part', $this->url_search_part]);
 
 		return $dataProvider;
 	}

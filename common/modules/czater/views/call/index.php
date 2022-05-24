@@ -44,11 +44,10 @@ $this->params['breadcrumbs'][] = $this->title;
 		],
 		[
 			'class' => ActionColumn::class,
-			'template' => '{view} {lead}',
+			'template' => '{view} {client}',
 			'buttons' => [
-				'lead' => function (string $url, Call $model): string {
-					$url = Url::to(['/lead/czater/call', 'id' => $model->id]);
-					return Html::a('lead', $url);
+				'client' => function (string $url, Call $model): string {
+					return Html::a(Html::icon('user'), Url::to(['client/view', 'id' => $model->idClient]));
 				},
 			],
 		],

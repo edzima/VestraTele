@@ -104,6 +104,7 @@ class LeadForm extends Model implements LeadInterface {
 	public function setLead(LeadInterface $lead): void {
 		$this->setSource($lead->getSource());
 		$this->setUsers($lead->getUsers());
+		$this->campaign_id = $lead->getCampaignId();
 		$this->name = $lead->getName();
 		$this->status_id = $lead->getStatusId();
 		$this->date_at = $lead->getDateTime()->format($this->dateFormat);
