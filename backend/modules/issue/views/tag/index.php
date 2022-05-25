@@ -1,0 +1,48 @@
+<?php
+
+use backend\modules\issue\models\search\TagSearch;
+use common\models\issue\IssueTag;
+use yii\grid\GridView;
+use yii\helpers\Html;
+
+/* @var $this yii\web\View */
+/* @var $searchModel TagSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = Yii::t('issue', 'Issue Tags');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<div class="issue-tag-index">
+
+	<h1><?= Html::encode($this->title) ?></h1>
+
+	<p>
+		<?= Html::a(Yii::t('issue', 'Create Issue Tag'), ['create'], ['class' => 'btn btn-success']) ?>
+	</p>
+
+	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+	<?= GridView::widget([
+		'dataProvider' => $dataProvider,
+		'filterModel' => $searchModel,
+		'columns' => [
+			['class' => 'yii\grid\SerialColumn'],
+
+			//	'id',
+			'name',
+			'description',
+			'is_active:boolean',
+			[
+				'label' => Yii::t('issue', 'Issues'),
+				'value' => function (IssueTag $tag): int {
+					return count($tag->issueTagLinks);
+				},
+			],
+
+			['class' => 'yii\grid\ActionColumn'],
+		],
+	]); ?>
+
+
+</div>
