@@ -3,6 +3,7 @@
 namespace common\models\issue;
 
 use common\behaviors\DateIDBehavior;
+use common\helpers\ArrayHelper;
 use common\models\address\Address as LegacyAddress;
 use common\models\address\City;
 use common\models\address\Province;
@@ -85,6 +86,7 @@ use yii\db\Expression;
  * @property SubProvince $victimSubprovince
  * @property IssuePayCalculation[] $payCalculations
  * @property-read Summon[] $summons
+ * @property-read IssueTag[] $tags
  * @property-read IssueUser[] $users
  * @property-read IssueCost[] $costs
  * @property-read StageType $stageType
@@ -167,6 +169,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 			'stage_change_at' => Yii::t('common', 'Stage date'),
 			'signature_act' => Yii::t('common', 'Signature act'),
 			'customer' => IssueUser::getTypesNames()[IssueUser::TYPE_CUSTOMER],
+			'tagsNames' => Yii::t('issue', 'Tags Names'),
 		];
 	}
 
@@ -370,6 +373,10 @@ class Issue extends ActiveRecord implements IssueInterface {
 			->via('payCalculations');
 	}
 
+	public function getTags() {
+		return $this->hasMany(IssueTag::class, ['id' => 'tag_id'])->viaTable(IssueTagLink::tableName(), ['issue_id' => 'id']);
+	}
+
 	public function isArchived(): bool {
 		return (int) $this->stage_id === IssueStage::ARCHIVES_ID;
 	}
@@ -421,6 +428,13 @@ class Issue extends ActiveRecord implements IssueInterface {
 
 	public function markAsUpdate(): void {
 		$this->touch('updated_at');
+	}
+
+	public function getTagsNames(): ?string {
+		if (empty($this->tags)) {
+			return null;
+		}
+		return implode(', ', ArrayHelper::getColumn($this->tags, 'name'));
 	}
 
 	public function linkUser(int $userId, string $type): void {

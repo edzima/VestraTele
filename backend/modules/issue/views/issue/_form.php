@@ -116,6 +116,20 @@ use yii\widgets\ActiveForm;
 		</div>
 
 		<div class="row">
+			<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-5']])
+				->widget(Select2::class, [
+					'data' => IssueForm::getTagsNames($model->getModel()->isNewRecord),
+					'options' => [
+						'multiple' => true,
+					],
+					'pluginOptions' => [
+						'tags' => true,
+					],
+				]) ?>
+
+		</div>
+
+		<div class="row">
 			<?= $form->field($model, 'details', ['options' => ['class' => 'col-md-5']])
 				->textarea(['rows' => 5, 'maxlength' => true]) ?>
 

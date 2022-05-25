@@ -193,6 +193,7 @@ $user = Yii::$app->user;
 							'url' => ['/issue/issue/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
+
 						[
 							'label' => Yii::t('common', 'Issues users'),
 							'url' => ['/issue/user/index'],
@@ -202,6 +203,11 @@ $user = Yii::$app->user;
 							'label' => Yii::t('issue', 'Issue Notes'),
 							'url' => ['/issue/note/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => Yii::t('issue', 'Tags'),
+							'url' => ['/issue/tag/index'],
+							'icon' => '<i class="fa fa-tags"></i>',
 						],
 						[
 							'label' => 'Podmioty',

@@ -177,12 +177,12 @@ if ($provision) {
 					[
 						'label' => Yii::t('issue', 'Issue'),
 						'format' => 'html',
-						'value' => static function (IssueRelation $relation) use ($model): string {
+						'value' => function (IssueRelation $relation) use ($model): string {
 							$issue = $relation->issue_id_1 === $model->getIssueId()
 								? $relation->issue2
 								: $relation->issue;
 
-							return Html::a($issue->getIssueName(), ['issue/view', 'id' => $issue->getIssueId()]);
+							return Html::a($issue->getIssueName(), ['issue/view', 'id' => $issue->getIssueId()]) . $this->render('_tags', ['models' => $issue->tags]);
 						},
 					],
 					[
@@ -216,7 +216,10 @@ if ($provision) {
 			]) ?>
 
 			<?= FieldsetDetailView::widget([
-				'legend' => Yii::t('common', 'Issue details'),
+				'legend' => Yii::t('common', 'Issue details') . $this->render('_tags', ['models' => $model->tags]),
+				'legendOptions' => [
+					'encode' => false,
+				],
 				'toggle' => false,
 				'detailConfig' => [
 					'id' => 'base-details',
