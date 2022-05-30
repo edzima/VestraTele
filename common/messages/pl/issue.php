@@ -70,4 +70,5 @@ return [
 	'Who' => 'Kto',
 	'Entity Responsible' => 'Podmiot Odpowiedzialny',
 	'Date At' => 'Data',
+	'Company Claim Trying Value' => 'Roszczenie',
 ];

@@ -149,6 +149,10 @@ class IssueController extends Controller {
 			return $exporter->export()->send('export.csv');
 		}
 
+		if (Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM)) {
+			$dataProvider->query->joinWith('claims');
+		}
+
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,

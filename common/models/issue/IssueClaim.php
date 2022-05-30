@@ -36,6 +36,14 @@ class IssueClaim extends ActiveRecord implements IssueInterface {
 
 	public const SCENARIO_TYPE = 'type';
 
+	public function isCompany(): bool {
+		return $this->type === static::TYPE_COMPANY;
+	}
+
+	public function isCustomer(): bool {
+		return $this->type === static::TYPE_CUSTOMER;
+	}
+
 	public function getTypeWithEntityName(): string {
 		return $this->getTypeName() . ' -> ' . $this->entityResponsible->name;
 	}
