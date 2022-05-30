@@ -21,6 +21,7 @@ return [
 	'issue.create' => 'Sprawy - dodawanie',
 	'issue.delete' => 'Sprawy - usuwanie',
 	'issue.link-user' => 'Sprawy - przypisywanie użytkowników',
+	'issue.provision' => 'Sprawy - Prowizje',
 	'issue.stage.change' => 'Sprawy - zmiana etapów',
 	'guardian' => 'Opiekun',
 	'handicapped' => 'Niepełnosprawny',

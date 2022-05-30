@@ -16,6 +16,7 @@ use yii\data\ActiveDataProvider;
 /* @var $this yii\web\View */
 /* @var $model Issue */
 /* @var $usersLinks bool */
+/* @var $claimActionColumn bool */
 /* @var $relationActionColumn bool */
 /* @var $userMailVisibilityCheck bool */
 
@@ -214,6 +215,30 @@ if ($provision) {
 					],
 				],
 			]) ?>
+
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getClaims(),
+				]),
+				'summary' => '',
+				'caption' => Yii::t('issue', 'Issue Claims'),
+				'emptyText' => '',
+				'showOnEmpty' => false,
+				'columns' => [
+					'typeName',
+					'entityResponsible.name:text:' . Yii::t('issue', 'Entity Responsible'),
+					'trying_value:currency',
+					'obtained_value:currency',
+					'is_percent:boolean',
+					[
+						'class' => ActionColumn::class,
+						'controller' => '/issue/claim',
+						'template' => '{update} {delete}',
+						'visible' => $claimActionColumn,
+					],
+				],
+			]) ?>
+
 
 			<?= FieldsetDetailView::widget([
 				'legend' => Yii::t('common', 'Issue details'),

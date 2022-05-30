@@ -88,6 +88,7 @@ use yii\db\Expression;
  * @property-read IssueUser[] $users
  * @property-read IssueCost[] $costs
  * @property-read StageType $stageType
+ * @property-read IssueClaim[] $claims
  */
 class Issue extends ActiveRecord implements IssueInterface {
 
@@ -374,6 +375,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return (int) $this->stage_id === IssueStage::ARCHIVES_ID;
 	}
 
+	/** @deprecated */
 	public function getProvision(): ?Provision {
 		if ($this->provision === null) {
 			if ($this->isNewRecord) {
@@ -389,6 +391,10 @@ class Issue extends ActiveRecord implements IssueInterface {
 			}
 		}
 		return $this->provision;
+	}
+
+	public function getClaims(): ActiveQuery {
+		return $this->hasMany(IssueClaim::class, ['issue_id' => 'id']);
 	}
 
 	public function hasTele(): bool {
