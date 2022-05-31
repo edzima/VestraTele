@@ -15,8 +15,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-tag-index">
 
-	<h1><?= Html::encode($this->title) ?></h1>
-
 	<p>
 		<?= Html::a(Yii::t('issue', 'Create Issue Tag'), ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
@@ -32,6 +30,11 @@ $this->params['breadcrumbs'][] = $this->title;
 			//	'id',
 			'name',
 			'description',
+			[
+				'attribute' => 'type',
+				'value' => 'typeName',
+				'filter' => TagSearch::getTypesNames(),
+			],
 			'is_active:boolean',
 			[
 				'label' => Yii::t('issue', 'Issues'),

@@ -1,6 +1,7 @@
 <?php
 
 return [
+	'Client' => 'Klient',
 	'Create Issue Note' => 'Dodaj notatkę',
 	'Create Issue Note for: {issue}' => 'Dodaj notatkę do sprawy: {issue}',
 	'Create Issue Note for settlement: {typeName}' => 'Dodaj notatkę do rozliczenia: {typeName}',
@@ -25,6 +26,7 @@ return [
 	'Stage Change At' => 'Zmiana Etapu',
 	'Pinned Issue Notes' => 'Przypięte Notatki',
 	'Not Found Phones for this Issue: {issue}' => 'Brak Numerów Telefonów w Sprawie: {issue}',
+	'Settlement' => 'Rozliczenie',
 	'Send SMS' => 'Wyślij SMS',
 	'SMS Sent' => 'Wysłano SMS',
 	'Send SMS for Agent absence.' => 'Wysłano SMS o niedostępności Przedstawiciela.',
