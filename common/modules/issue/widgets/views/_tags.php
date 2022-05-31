@@ -7,6 +7,17 @@ use yii\web\View;
 /* @var $this View */
 /* @var $models IssueTag[] */
 
+$labelClass = function (string $type = null): string {
+	switch ($type) {
+		case IssueTag::TYPE_CLIENT:
+			return 'label-danger';
+		case IssueTag::TYPE_SETTLEMENT:
+			return 'label-warning';
+		default:
+			return 'label-primary';
+	}
+}
+
 ?>
 
 <?php if (!empty($models)): ?>
@@ -14,7 +25,7 @@ use yii\web\View;
 	<?php foreach ($models as $model): ?>
 		<?= Html::a(Html::encode($model->name), ['index', 'IssueSearch[tagsIds]' => $model->id],
 			[
-				'class' => 'badge badge-secondary',
+				'class' => 'label ' . $labelClass($model->type),
 			])
 		?>
 

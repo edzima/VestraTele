@@ -29,6 +29,21 @@ class IssueTag extends ActiveRecord {
 		return '{{%issue_tag}}';
 	}
 
+	/**
+	 * @param static[] $tags
+	 * @param string $type
+	 * @return static[]
+	 */
+	public static function typeFilter(array $tags, string $type = null): array {
+		$models = [];
+		foreach ($tags as $tag) {
+			if ($tag->type === $type) {
+				$models[$tag->id] = $tag;
+			}
+		}
+		return $models;
+	}
+
 	public static function getTypesNames(): array {
 		return [
 			static::TYPE_CLIENT => Yii::t('issue', 'Client'),
