@@ -11,6 +11,9 @@ namespace common\models\issue;
 use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
 
+/**
+ * @deprecated
+ */
 class Provision extends BaseObject {
 
 	public const TYPE_PERCENTAGE = 1;
