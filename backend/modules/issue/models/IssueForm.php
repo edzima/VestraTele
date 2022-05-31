@@ -60,7 +60,13 @@ class IssueForm extends Model {
 		if ($onlyActive) {
 			$models->andWhere(['is_active' => true]);
 		}
-		return ArrayHelper::map($models->all(), 'id', 'name');
+		$models = $models->all();
+
+		$data = [];
+		foreach ($models as $model) {
+			$data[$model->getTypeName()][$model->id] = $model->name;
+		}
+		return $data;
 	}
 
 	public function rules(): array {
@@ -80,7 +86,8 @@ class IssueForm extends Model {
 			['signature_act', 'string', 'max' => 30],
 			['signature_act', 'default', 'value' => null],
 			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
-			['tagsIds', 'in', 'range' => array_keys(static::getTagsNames(false)), 'allowArray' => true],
+			['tagsIds', 'in', 'range' => IssueTag::find()->select('id')->column(), 'allowArray' => true],
+
 			[['signing_at', 'type_additional_date_at', 'stage_change_at'], 'date', 'format' => 'Y-m-d'],
 			[
 				'archives_nr',
