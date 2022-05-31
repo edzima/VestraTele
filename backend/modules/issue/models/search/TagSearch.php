@@ -17,7 +17,7 @@ class TagSearch extends IssueTag {
 	public function rules(): array {
 		return [
 			[['id', 'is_active'], 'integer'],
-			[['name', 'description'], 'safe'],
+			[['name', 'description', 'type'], 'safe'],
 		];
 	}
 
@@ -60,6 +60,7 @@ class TagSearch extends IssueTag {
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])
+			->andFilterWhere(['like', 'type', $this->type])
 			->andFilterWhere(['like', 'description', $this->description]);
 
 		return $dataProvider;

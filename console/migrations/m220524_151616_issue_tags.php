@@ -3,7 +3,10 @@
 use console\base\Migration;
 
 /**
- * Class m220113_131816_lead_source-dialer_phone
+ * Class m220524_151616_issue_tags
+ *
+ * @see IssueTag
+ * @see IssueTagLink
  */
 class m220524_151616_issue_tags extends Migration {
 
@@ -15,6 +18,7 @@ class m220524_151616_issue_tags extends Migration {
 			'id' => $this->primaryKey(),
 			'name' => $this->string()->notNull()->unique(),
 			'description' => $this->string(),
+			'type' => $this->string()->null(),
 			'is_active' => $this->boolean(),
 		]);
 
