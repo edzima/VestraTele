@@ -54,8 +54,8 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
-						'controllers' => ['issue/provision'],
-						'roles' => [Worker::PERMISSION_ISSUE_CLAIM],
+						'controllers' => ['issue/claim'],
+						'permissions' => [Worker::PERMISSION_ISSUE_CLAIM],
 					],
 					[
 						'allow' => false,
