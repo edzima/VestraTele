@@ -17,6 +17,10 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-claim-create">
 
+	<?= $this->render('_issue_view', [
+		'model' => $model->getIssueModel(),
+	]) ?>
+
 	<?= $this->render('_form', [
 		'model' => $model,
 		'onlyField' => false,

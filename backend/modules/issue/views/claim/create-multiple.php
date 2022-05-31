@@ -22,7 +22,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="create-multiple-issue-claims-form">
 
+
+	<?= $this->render('_issue_view', [
+		'model' => $model->getIssue(),
+	]) ?>
+
 	<?php $form = ActiveForm::begin(); ?>
+
 
 	<div class="customer-claim">
 
