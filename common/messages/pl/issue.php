@@ -64,6 +64,8 @@ return [
 	'Customer Claim' => 'Klient',
 	'Company Claim' => 'Kancelaria',
 	'Trying Value' => 'Kwota Roszczenia',
+	'Claim' => 'Roszczenie',
+	'Obtained' => 'Uzyskana',
 	'Obtained Value' => 'Kwota Uzyskana',
 	'Is Percent' => '%',
 	'Details' => 'Szczegóły',
@@ -71,4 +73,5 @@ return [
 	'Entity Responsible' => 'Podmiot Odpowiedzialny',
 	'Date At' => 'Data',
 	'Company Claim Trying Value' => 'Roszczenie',
+	'Update Issue Claim: {name}' => 'Edytuj Roszczenie: {name}',
 ];

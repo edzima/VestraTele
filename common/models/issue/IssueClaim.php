@@ -17,7 +17,7 @@ use yii\db\ActiveRecord;
  * @property string $type
  * @property float|null $trying_value
  * @property float|null $obtained_value
- * @property int|null $is_percent
+ * @property float|null $percent_value
  * @property string|null $details
  * @property string $date
  * @property int $entity_responsible_id
@@ -79,8 +79,7 @@ class IssueClaim extends ActiveRecord implements IssueInterface {
 			[['issue_id', 'type', 'entity_responsible_id', 'date'], 'required'],
 			[['!type'], 'required', 'on' => static::SCENARIO_TYPE],
 			[['issue_id'], 'integer'],
-			[['is_percent'], 'boolean'],
-			[['trying_value', 'obtained_value'], 'number', 'min' => 0],
+			[['trying_value', 'obtained_value', 'percent_value'], 'number', 'min' => 0],
 			[['type'], 'string', 'max' => 10],
 			[['details'], 'string', 'max' => 255],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
@@ -99,7 +98,7 @@ class IssueClaim extends ActiveRecord implements IssueInterface {
 			'typeName' => Yii::t('issue', 'Who'),
 			'trying_value' => Yii::t('issue', 'Trying Value'),
 			'obtained_value' => Yii::t('issue', 'Obtained Value'),
-			'is_percent' => Yii::t('issue', 'Is Percent'),
+			'percent_value' => Yii::t('issue', '%'),
 			'details' => Yii::t('issue', 'Details'),
 			'entity_responsible_id' => Yii::t('issue', 'Entity Responsible'),
 			'entityResponsible' => Yii::t('issue', 'Entity Responsible'),

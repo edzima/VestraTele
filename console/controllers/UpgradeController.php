@@ -10,6 +10,7 @@ use common\models\issue\IssueNote;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
+use common\models\issue\Provision;
 use common\models\provision\IssueProvisionType;
 use common\models\user\Customer;
 use common\models\user\UserProfile;
@@ -26,6 +27,12 @@ use yii\helpers\Console;
 use yii\helpers\Json;
 
 class UpgradeController extends Controller {
+
+	public function actionIssueProvisions(): void {
+		$a = '10.3';
+
+		Console::output(is_numeric($a));
+	}
 
 	public function actionLeadSmsStatus(int $status_id, string $details): void {
 		$models = LeadReport::find()

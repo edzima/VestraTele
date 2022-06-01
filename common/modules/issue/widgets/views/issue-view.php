@@ -20,16 +20,6 @@ use yii\data\ActiveDataProvider;
 /* @var $relationActionColumn bool */
 /* @var $userMailVisibilityCheck bool */
 
-$provision = $model->getProvision();
-if ($provision) {
-	$details = [];
-	$details[] = 'PROWIZJA - rodzaj: ' . $provision->getTypeName();
-	$details[] = 'Podstawa: ' . $provision->getBase();
-	$details[] = 'Procent\krotność: ' . $provision->getValue();
-	$details[] = $model->details;
-	$model->details = implode("\n", $details);
-}
-
 ?>
 
 <div id="issue-details">
@@ -226,11 +216,12 @@ if ($provision) {
 				'showOnEmpty' => false,
 				'columns' => [
 					'typeName',
-					'entityResponsible.name:text:' . Yii::t('issue', 'Entity Responsible'),
-					'trying_value:currency',
-					'obtained_value:currency',
+					'entityResponsible.name:text:' . Yii::t('issue', 'Entity'),
+					'trying_value:currency:' . Yii::t('issue', 'Claim'),
+					'percent_value',
+					'obtained_value:currency:' . Yii::t('issue', 'Obtained'),
+					'details:ntext',
 					'date:date',
-					//	'is_percent:boolean',
 					[
 						'class' => ActionColumn::class,
 						'controller' => '/issue/claim',

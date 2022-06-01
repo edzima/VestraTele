@@ -17,9 +17,9 @@ class ClaimSearch extends IssueClaim {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'issue_id', 'is_percent', 'entity_responsible_id'], 'integer'],
+			[['id', 'issue_id', 'entity_responsible_id'], 'integer'],
 			[['type', 'details'], 'safe'],
-			[['trying_value', 'obtained_value'], 'number'],
+			[['trying_value', 'obtained_value', 'percent_value'], 'number'],
 		];
 	}
 
@@ -63,7 +63,7 @@ class ClaimSearch extends IssueClaim {
 			'issue_id' => $this->issue_id,
 			'trying_value' => $this->trying_value,
 			'obtained_value' => $this->obtained_value,
-			'is_percent' => $this->is_percent,
+			'percent_value' => $this->percent_value,
 		]);
 
 		$query

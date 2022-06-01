@@ -52,9 +52,6 @@ use yii\db\Expression;
  * @property string $victim_street
  * @property string $victim_phone
  * @property string $details
- * @property int $provision_type
- * @property string $provision_value
- * @property string $provision_base
  * @property int $stage_id
  * @property int $type_id
  * @property int $entity_responsible_id
@@ -80,7 +77,6 @@ use yii\db\Expression;
  * @property IssueStage $stage
  * @property IssueType $type
  * @property IssueNote[] $issueNotes
- * @property Provision $provision
  * @property SubProvince $clientSubprovince
  * @property SubProvince $victimSubprovince
  * @property IssuePayCalculation[] $payCalculations
@@ -94,15 +90,10 @@ class Issue extends ActiveRecord implements IssueInterface {
 
 	use IssueTrait;
 
-	private const DEFAULT_PROVISION = Provision::TYPE_PERCENTAGE;
-
 	/* @var LegacyAddress */
 	private $clientAddress;
 	/* @var LegacyAddress */
 	private $victimAddress;
-
-	/* @var Provision */
-	private $provision;
 
 	public function __toString(): string {
 		return $this->longId;
@@ -375,24 +366,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return (int) $this->stage_id === IssueStage::ARCHIVES_ID;
 	}
 
-	/** @deprecated */
-	public function getProvision(): ?Provision {
-		if ($this->provision === null) {
-			if ($this->isNewRecord) {
-				$type = static::DEFAULT_PROVISION;
-			} else {
-				$type = $this->provision_type;
-			}
-			if ($type > 0) {
-				$this->provision = new Provision($type, [
-					'base' => (float) $this->provision_base,
-					'value' => (float) $this->provision_value,
-				]);
-			}
-		}
-		return $this->provision;
-	}
-
 	public function getClaims(): ActiveQuery {
 		return $this->hasMany(IssueClaim::class, ['issue_id' => 'id']);
 	}
@@ -403,10 +376,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 
 	public function hasLawyer(): bool {
 		return $this->lawyer !== null;
-	}
-
-	public function hasProvision(): bool {
-		return $this->provision_base > 0;
 	}
 
 	public function getClientFullName(): string {

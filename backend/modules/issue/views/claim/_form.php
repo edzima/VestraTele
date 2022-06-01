@@ -47,11 +47,7 @@ use yii\helpers\Html;
 			],
 		])->widget(DateWidget::class) ?>
 
-		<?= $form->field($model, 'is_percent', [
-			'options' => [
-				'class' => 'col-md-1',
-			],
-		])->checkbox() ?>
+
 
 
 		<?= $form->field($model, 'trying_value', [
@@ -59,6 +55,13 @@ use yii\helpers\Html;
 				'class' => 'col-md-3 col-lg-2',
 			],
 		])->widget(NumberControl::class) ?>
+
+		<?= $form->field($model, 'percent_value', [
+			'options' => [
+				'class' => 'col-md-2 col-lg-1',
+			],
+		])->widget(NumberControl::class) ?>
+
 
 		<?= $form->field($model, 'obtained_value', [
 			'options' => [

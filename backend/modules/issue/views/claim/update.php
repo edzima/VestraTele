@@ -1,15 +1,17 @@
 <?php
 
+use backend\helpers\Breadcrumbs;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\issue\IssueClaim */
 
 $this->title = Yii::t('issue', 'Update Issue Claim: {name}', [
-	'name' => $model->id,
+	'name' => $model->getTypeWithEntityName(),
 ]);
+
+$this->params['breadcrumbs'] = Breadcrumbs::issue($model->issue);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issue Claims'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 ?>
 <div class="issue-claim-update">

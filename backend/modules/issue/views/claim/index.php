@@ -3,6 +3,7 @@
 use backend\modules\issue\models\search\ClaimSearch;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
+use common\widgets\grid\ActionColumn;
 
 /* @var $this yii\web\View */
 /* @var $searchModel ClaimSearch */
@@ -40,10 +41,13 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			'trying_value:currency',
 			'obtained_value:currency',
-			'is_percent:boolean',
+			'percent_value',
 			'details:ntext',
-
-			['class' => 'yii\grid\ActionColumn'],
+			'date:date',
+			[
+				'class' => ActionColumn::class,
+				'template' => '{update} {delete}',
+			],
 		],
 	]); ?>
 

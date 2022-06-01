@@ -7,9 +7,13 @@ use yii\widgets\DetailView;
 
 ?>
 
-<?= DetailView::widget([
-	'model' => $model,
-	'attributes' => [
-		'details:ntext',
-	],
-]);
+<?= !empty($model->getIssueModel()->details)
+	? DetailView::widget([
+		'model' => $model->getIssueModel(),
+		'attributes' => [
+			'details:ntext',
+		],
+
+	])
+	: ''
+?>
