@@ -1,13 +1,16 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
+use backend\modules\issue\widgets\IssueSmsButtonDropdown;
 use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\modules\issue\widgets\SummonCreateButtonDropdown;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\issue\Issue;
+use common\models\issue\IssueClaim;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
+use yii\bootstrap\ButtonDropdown;
 use yii\data\DataProviderInterface;
 use yii\helpers\Html;
 
@@ -36,8 +39,8 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		?>
 
 		<?= !$model->isArchived() && Yii::$app->user->can(Worker::PERMISSION_SMS)
-			? Html::a(Yii::t('common', 'Send SMS'), ['sms/push', 'id' => $model->id], [
-				'class' => 'btn btn-default',
+			? IssueSmsButtonDropdown::widget([
+				'model' => $model,
 			])
 			: ''
 		?>
@@ -64,7 +67,6 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
-
 		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE)
 			? Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
 				'class' => 'btn btn-danger pull-right',
@@ -79,6 +81,38 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 	</p>
 	<p>
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM)
+			? ButtonDropdown::widget([
+				'label' => Yii::t('issue', 'Create Claims'),
+				'tagName' => 'a',
+				'options' => [
+					'href' => ['claim/create-multiple', 'issueId' => $model->id],
+					'class' => 'btn btn-danger',
+				],
+				'split' => true,
+				'dropdown' => [
+					'items' => [
+						[
+							'label' => Yii::t('issue', 'Customer Claim'),
+							'url' => [
+								'claim/create',
+								'issueId' => $model->id, 'type' => IssueClaim::TYPE_CUSTOMER,
+							],
+						],
+						[
+							'label' => Yii::t('issue', 'Company Claim'),
+							'url' => [
+								'claim/create',
+								'issueId' => $model->id, 'type' => IssueClaim::TYPE_COMPANY,
+							],
+						],
+					],
+				],
+			])
+			: ''
+		?>
+
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_CALCULATION_TO_CREATE)
 			? Html::a(
 				Yii::t('backend', 'Create settlement'),
@@ -126,6 +160,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 	<?= IssueViewWidget::widget([
 		'model' => $model,
 		'relationActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
+		'claimActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
 	]) ?>
 
 	<?= $this->render('_summon', [

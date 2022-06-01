@@ -3,8 +3,9 @@
 namespace common\modules\issue\controllers;
 
 use common\helpers\Flash;
-use common\models\message\IssueSmsForm;
 use common\models\issue\IssueUser;
+use common\models\KeyStorageItem;
+use common\models\message\IssueSmsForm;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -42,6 +43,12 @@ abstract class SmsController extends Controller {
 		if ($userType !== null) {
 			$model->userTypes = [$userType];
 			$model->setFirstAvailablePhone();
+			if ($userType === IssueUser::TYPE_AGENT) {
+				$model->message = Yii::$app->keyStorage->get(KeyStorageItem::KEY_ISSUE_AGENT_DEFAULT_SMS_MESSAGE, '');
+			}
+			if ($userType === IssueUser::TYPE_CUSTOMER) {
+				$model->message = Yii::$app->keyStorage->get(KeyStorageItem::KEY_ISSUE_CUSTOMER_DEFAULT_SMS_MESSAGE, '');
+			}
 		}
 		$phonesCount = count($model->getPhones());
 		if ($phonesCount === 0) {

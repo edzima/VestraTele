@@ -13,7 +13,6 @@ class WorkerUserForm extends UserForm {
 		User::ROLE_BOOKKEEPER,
 		User::ROLE_USER,
 		User::ROLE_MANAGER,
-		User::ROLE_CUSTOMER_SERVICE,
 		Customer::ROLE_CUSTOMER,
 		Customer::ROLE_HANDICAPPED,
 		Customer::ROLE_SHAREHOLDER,
@@ -43,9 +42,15 @@ class WorkerUserForm extends UserForm {
 		Worker::PERMISSION_SUMMON_MANAGER,
 		User::PERMISSION_WORKERS,
 		Worker::PERMISSION_MULTIPLE_SMS,
-		Worker::PERMISSION_SMS,
 		Worker::PERMISSION_NOTE_TEMPLATE,
 	];
+
+	public function rules(): array {
+		return array_merge([
+			['roles', 'required'],
+		], parent::rules()
+		);
+	}
 
 	public int $status = User::STATUS_ACTIVE;
 

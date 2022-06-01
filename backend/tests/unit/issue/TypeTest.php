@@ -5,7 +5,6 @@ namespace backend\tests\unit\issue;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\IssueType;
-use common\models\issue\Provision;
 
 class TypeTest extends Unit {
 
@@ -54,14 +53,12 @@ class TypeTest extends Unit {
 		$model = new IssueType([
 			'name' => 'Some name',
 			'short_name' => 'SN',
-			'provision_type' => Provision::TYPE_PERCENTAGE,
 			'vat' => 23,
 		]);
 		$this->tester->assertTrue($model->save());
 		$this->tester->seeRecord(IssueType::class, [
 			'name' => 'Some name',
 			'short_name' => 'SN',
-			'provision_type' => Provision::TYPE_PERCENTAGE,
 			'vat' => 23,
 		]);
 	}

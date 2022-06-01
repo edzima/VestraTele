@@ -10,6 +10,7 @@ use backend\widgets\IssueColumn;
 use common\models\issue\Issue;
 use common\models\user\Worker;
 use common\modules\issue\IssueNoteColumn;
+use common\modules\issue\widgets\IssueClaimCompanyColumn;
 use common\modules\issue\widgets\IssuePaysColumnWidget;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
@@ -137,6 +138,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => IssueColumn::class,
+				'attribute' => 'id',
 			],
 			[
 				'attribute' => 'signature_act',
@@ -239,7 +241,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'format' => 'date',
 				'contentBold' => true,
 				'options' => [
-					'style' => 'width:90px',
+					'style' => 'width:95px',
 				],
 			],
 			[
@@ -266,8 +268,12 @@ $this->params['breadcrumbs'][] = $this->title;
 				'format' => 'date',
 				'contentBold' => true,
 				'options' => [
-					'style' => 'width:90px',
+					'style' => 'width:99px',
 				],
+			],
+			[
+				'class' => IssueClaimCompanyColumn::class,
+				'attribute' => 'claimCompanyTryingValue',
 			],
 			[
 				'class' => IssueNoteColumn::class,

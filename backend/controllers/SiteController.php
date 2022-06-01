@@ -138,6 +138,14 @@ class SiteController extends Controller {
 				'label' => Yii::t('backend', 'Backend sidebar mini'),
 				'type' => FormModel::TYPE_CHECKBOX,
 			],
+			KeyStorageItem::KEY_ISSUE_AGENT_DEFAULT_SMS_MESSAGE => [
+				'label' => Yii::t('backend', 'Issue Agent SMS'),
+				'type' => FormModel::TYPE_TEXTAREA,
+			],
+			KeyStorageItem::KEY_ISSUE_CUSTOMER_DEFAULT_SMS_MESSAGE => [
+				'label' => Yii::t('backend', 'Issue Customer SMS'),
+				'type' => FormModel::TYPE_TEXTAREA,
+			],
 
 		];
 

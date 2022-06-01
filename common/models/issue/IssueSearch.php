@@ -56,6 +56,8 @@ abstract class IssueSearch extends Model
 	public $lawyer_id;
 	public $tele_id;
 
+	public $tagsIds;
+
 	public ?AddressSearch $addressSearch = null;
 
 	/**
@@ -73,6 +75,7 @@ abstract class IssueSearch extends Model
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			['type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
 			['customerName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
+			['tagsIds', 'in', 'range' => array_keys(static::getTagsNames()), 'allowArray' => true],
 			[
 				[
 					'created_at', 'updated_at', 'type_additional_date_at',
@@ -95,6 +98,7 @@ abstract class IssueSearch extends Model
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 			'signedAtFrom' => Yii::t('issue', 'Signed At from'),
 			'signedAtTo' => Yii::t('issue', 'Signed At to'),
+			'tagsIds' => Yii::t('issue', 'Tags'),
 		], Issue::instance()->attributeLabels());
 	}
 
@@ -123,6 +127,7 @@ abstract class IssueSearch extends Model
 		$this->applyCreatedAtFilter($query);
 		$this->applySignedAtFilter($query);
 		$this->applyNotesFilter($query);
+		$this->applyTagsFilter($query);
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
 			Issue::tableName() . '.stage_id' => $this->stage_id,
@@ -244,6 +249,10 @@ abstract class IssueSearch extends Model
 		);
 	}
 
+	public static function getTagsNames(): array {
+		return ArrayHelper::map(IssueTag::find()->asArray()->all(), 'id', 'name');
+	}
+
 	public static function getEntityNames(): array {
 		return ArrayHelper::map(EntityResponsible::find()->asArray()->all(), 'id', 'name');
 	}
@@ -266,6 +275,14 @@ abstract class IssueSearch extends Model
 				$query->joinWith('issueNotes');
 				$query->andWhere([IssueNote::tableName() . '.is_pinned' => true]);
 				break;
+		}
+	}
+
+	private function applyTagsFilter(IssueQuery $query): void {
+		if (!empty($this->tagsIds)) {
+			$query->joinWith('tags');
+			$query->distinct();
+			$query->andWhere([IssueTag::tableName() . '.id' => $this->tagsIds]);
 		}
 	}
 }

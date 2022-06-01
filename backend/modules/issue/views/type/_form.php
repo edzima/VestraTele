@@ -21,8 +21,6 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'short_name')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'provision_type')->dropDownList(Provision::getTypesNames()) ?>
-
 	<?= $form->field($model, 'vat')->textInput() ?>
 
 	<?= $form->field($model, 'meet')->checkbox() ?>

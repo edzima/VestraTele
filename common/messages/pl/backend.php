@@ -306,4 +306,6 @@ return [
 	'Create Summon Doc' => 'Dodaj Typ Dokumentu',
 	'Update Summon Doc: {name}' => 'Edytuj Typ Dokumnetu: {name}',
 	'Summon Docs' => 'Dokumenty',
+	'Issue Agent SMS' => 'SMS do Przedstawiciela w Sprawie',
+	'Issue Customer SMS' => 'SMS do Klienta w Sprawie',
 ];

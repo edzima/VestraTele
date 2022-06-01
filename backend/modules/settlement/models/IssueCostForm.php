@@ -104,6 +104,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		$this->date_at = $cost->date_at;
 		$this->confirmed_at = $cost->confirmed_at;
 
+		$this->deadline_at = $cost->deadline_at;
 		$this->settled_at = $cost->settled_at;
 		$this->base_value = $cost->getBaseValue() ? $cost->getBaseValue()->toFixed(2) : null;
 		$this->value = $cost->getValueWithVAT()->toFixed(2);
@@ -139,6 +140,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		$model->date_at = $this->date_at;
 		$model->user_id = $this->user_id;
 		$model->settled_at = $this->settled_at;
+		$model->deadline_at = $this->deadline_at;
 		return $model->save(false);
 	}
 

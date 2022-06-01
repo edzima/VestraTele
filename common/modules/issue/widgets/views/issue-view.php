@@ -4,6 +4,7 @@ use common\helpers\Url;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueRelation;
+use common\models\issue\IssueTag;
 use common\models\issue\IssueUser;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueUsersWidget;
@@ -16,38 +17,38 @@ use yii\data\ActiveDataProvider;
 /* @var $this yii\web\View */
 /* @var $model Issue */
 /* @var $usersLinks bool */
+/* @var $claimActionColumn bool */
 /* @var $relationActionColumn bool */
 /* @var $userMailVisibilityCheck bool */
-
-$provision = $model->getProvision();
-if ($provision) {
-	$details = [];
-	$details[] = 'PROWIZJA - rodzaj: ' . $provision->getTypeName();
-	$details[] = 'Podstawa: ' . $provision->getBase();
-	$details[] = 'Procent\krotność: ' . $provision->getValue();
-	$details[] = $model->details;
-	$model->details = implode("\n", $details);
-}
 
 ?>
 
 <div id="issue-details">
 	<div class="row">
-		<div class="col-md-8 col-lg-7">
+		<div class="col-md-7 col-lg-6">
 			<?= IssueUsersWidget::widget([
 				'model' => $model,
 				'type' => IssueUsersWidget::TYPE_CUSTOMERS,
 				'legendEncode' => !$usersLinks,
 				'withCheckEmailVisibility' => $userMailVisibilityCheck,
 				'withTraits' => true,
-				'legend' => static function (IssueUser $issueUser) use ($usersLinks): string {
-					$legend = $issueUser->getTypeWithUser();
+				'legend' => function (IssueUser $issueUser) use ($usersLinks, $model): string {
+					$legend = Html::encode($issueUser->getTypeWithUser());
+					if ($issueUser->type === IssueUser::TYPE_CUSTOMER) {
+						$tags = IssueTag::typeFilter($model->tags, IssueTag::TYPE_CLIENT);
+						if (!empty($tags)) {
+							$legend .= $this->render('_tags', [
+								'models' => $tags,
+							]);
+						}
+					}
 					if ($usersLinks) {
 						$legend = Html::a($legend, ['/user/customer/view', 'id' => $issueUser->user_id]);
 					}
 					return $legend;
 				},
 				'afterLegend' => static function (IssueUser $issueUser) use ($usersLinks): string {
+
 					if ($issueUser->type === IssueUser::TYPE_CUSTOMER || !$usersLinks) {
 						return '';
 					}
@@ -164,7 +165,7 @@ if ($provision) {
 				},
 			]) ?>
 		</div>
-		<div class="col-md-4 col-lg-5">
+		<div class="col-md-5 col-lg-6">
 			<?= GridView::widget([
 				'dataProvider' => new ActiveDataProvider([
 					'query' => $model->getIssues(),
@@ -177,12 +178,13 @@ if ($provision) {
 					[
 						'label' => Yii::t('issue', 'Issue'),
 						'format' => 'html',
-						'value' => static function (IssueRelation $relation) use ($model): string {
+						'value' => function (IssueRelation $relation) use ($model): string {
 							$issue = $relation->issue_id_1 === $model->getIssueId()
 								? $relation->issue2
 								: $relation->issue;
 
-							return Html::a($issue->getIssueName(), ['issue/view', 'id' => $issue->getIssueId()]);
+							return Html::a(
+									Html::encode($issue->getIssueName()), ['issue/view', 'id' => $issue->getIssueId()]) . $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags)]);
 						},
 					],
 					[
@@ -196,11 +198,12 @@ if ($provision) {
 					],
 					[
 						'label' => Yii::t('issue', 'Customer'),
-						'value' => static function (IssueRelation $relation) use ($model): string {
+						'format' => 'html',
+						'value' => function (IssueRelation $relation) use ($model): string {
 							$issue = $relation->issue_id_1 === $model->getIssueId()
 								? $relation->issue2
 								: $relation->issue;
-							return $issue->customer->getFullName();
+							return Html::encode($issue->customer->getFullName()) . $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags, IssueTag::TYPE_CLIENT)]);
 						},
 					],
 					[
@@ -215,8 +218,37 @@ if ($provision) {
 				],
 			]) ?>
 
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getClaims(),
+				]),
+				'summary' => '',
+				'caption' => Yii::t('issue', 'Issue Claims'),
+				'emptyText' => '',
+				'showOnEmpty' => false,
+				'columns' => [
+					'typeName',
+					'entityResponsible.name:text:' . Yii::t('issue', 'Entity'),
+					'trying_value:currency:' . Yii::t('issue', 'Claim'),
+					'percent_value',
+					'obtained_value:currency:' . Yii::t('issue', 'Obtained'),
+					'details:ntext',
+					'date:date',
+					[
+						'class' => ActionColumn::class,
+						'controller' => '/issue/claim',
+						'template' => '{update} {delete}',
+						'visible' => $claimActionColumn,
+					],
+				],
+			]) ?>
+
+
 			<?= FieldsetDetailView::widget([
-				'legend' => Yii::t('common', 'Issue details'),
+				'legend' => Yii::t('common', 'Issue details') . $this->render('_tags', ['models' => IssueTag::typeFilter($model->tags)]),
+				'legendOptions' => [
+					'encode' => false,
+				],
 				'toggle' => false,
 				'detailConfig' => [
 					'id' => 'base-details',

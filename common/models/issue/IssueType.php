@@ -21,11 +21,8 @@ use yii\helpers\ArrayHelper;
  *
  * @property Issue[] $issues
  * @property IssueStage[] $stages
- * @property Provision $provision
  */
 class IssueType extends ActiveRecord {
-
-	private ?Provision $provision = null;
 
 	private static ?array $TYPES = null;
 
@@ -52,7 +49,6 @@ class IssueType extends ActiveRecord {
 			[['name'], 'unique'],
 			['vat', 'number', 'min' => 0, 'max' => 100],
 			[['short_name'], 'unique'],
-			['provision_type', 'in', 'range' => array_keys(Provision::getTypesNames())],
 		];
 	}
 
@@ -80,13 +76,6 @@ class IssueType extends ActiveRecord {
 	public function getStages(): IssueStageQuery {
 		return $this->hasMany(IssueStage::class, ['id' => 'stage_id'])
 			->viaTable('{{%issue_stage_type}}', ['type_id' => 'id']);
-	}
-
-	public function getProvision(): Provision {
-		if ($this->provision === null) {
-			$this->provision = new Provision($this->provision_type);
-		}
-		return $this->provision;
 	}
 
 	public function getNameWithShort(): string {

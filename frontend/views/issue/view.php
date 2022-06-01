@@ -82,6 +82,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		'model' => $model,
 		'usersLinks' => false,
 		'relationActionColumn' => false,
+		'claimActionColumn' => false,
 		'userMailVisibilityCheck' => true,
 	]) ?>
 
