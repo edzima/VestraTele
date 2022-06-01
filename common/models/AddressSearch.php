@@ -23,6 +23,13 @@ class AddressSearch extends Address implements SearchModel {
 	public $commune_id;
 	public $city_name;
 
+	public function isNotEmpty(): bool {
+		return !empty($this->region_id)
+			|| !empty($this->district_id)
+			|| !empty($this->commune_id)
+			|| !empty($this->city_name);
+	}
+
 	public function rules(): array {
 		return [
 			[['region_id', 'id', 'district_id', 'commune_id'], 'integer'],

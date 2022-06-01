@@ -108,4 +108,6 @@ return [
 	'Date At' => 'Data',
 	'Company Claim Trying Value' => 'Roszczenie',
 	'Update Issue Claim: {name}' => 'Edytuj Roszczenie: {name}',
+	'Issue User' => 'Uczestnik',
+	'Address filter not available with Issue User Name' => 'Filtr Adresu niedostępny z Uczestnikiem',
 ];

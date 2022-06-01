@@ -45,6 +45,7 @@ abstract class IssueSearch extends Model
 	public string $signedAtTo = '';
 	public string $customerName = '';
 	public string $customerPhone = '';
+	public string $userName = '';
 
 	public $noteFilter;
 
@@ -74,7 +75,7 @@ abstract class IssueSearch extends Model
 			[['createdAtTo', 'createdAtFrom', 'signedAtFrom', 'signedAtTo'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			['type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
-			['customerName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
+			[['customerName', 'userName'], 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['tagsIds', 'in', 'range' => array_keys(static::getTagsNames()), 'allowArray' => true],
 			[
 				[
@@ -99,6 +100,7 @@ abstract class IssueSearch extends Model
 			'signedAtFrom' => Yii::t('issue', 'Signed At from'),
 			'signedAtTo' => Yii::t('issue', 'Signed At to'),
 			'tagsIds' => Yii::t('issue', 'Tags'),
+			'userName' => Yii::t('issue', 'Issue User'),
 		], Issue::instance()->attributeLabels());
 	}
 
@@ -127,6 +129,7 @@ abstract class IssueSearch extends Model
 		$this->applyCreatedAtFilter($query);
 		$this->applySignedAtFilter($query);
 		$this->applyNotesFilter($query);
+		$this->applyUserNameFilter($query);
 		$this->applyTagsFilter($query);
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
@@ -139,11 +142,18 @@ abstract class IssueSearch extends Model
 
 	protected function addressFilter(IssueQuery $query): void {
 		if ($this->addressSearch !== null && $this->addressSearch->validate()) {
-			$query->joinWith([
-				'customer.addresses.address' => function (ActiveQuery $addressQuery) {
-					$this->addressSearch->applySearch($addressQuery);
-				},
-			]);
+
+			if ($this->addressSearch->isNotEmpty()) {
+				if (empty($this->userName)) {
+					$query->joinWith([
+						'customer.addresses.address' => function (ActiveQuery $addressQuery) {
+							$this->addressSearch->applySearch($addressQuery);
+						},
+					]);
+				} else {
+					$this->addError('userName', Yii::t('issue', 'Address filter not available with Issue User Name'));
+				}
+			}
 		}
 	}
 
@@ -214,6 +224,21 @@ abstract class IssueSearch extends Model
 					]);
 				},
 			]);
+		}
+	}
+
+	public function applyUserNameFilter(ActiveQuery $query): void {
+		if (!empty($this->userName)) {
+			$query->joinWith([
+				'users.user.userProfile UP' => function (ActiveQuery $query) {
+					$query->andWhere([
+						'like',
+						new Expression("CONCAT(UP.lastname,' ', UP.firstname)"),
+						$this->userName . '%', false,
+					]);
+				},
+			]);
+			$query->distinct();
 		}
 	}
 

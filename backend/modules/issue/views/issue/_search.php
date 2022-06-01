@@ -135,6 +135,10 @@ use yii\widgets\ActiveForm;
 
 
 	<div class="row">
+		<?= $form->field($model, 'userName', ['options' => ['class' => 'col-md-2']])
+			->textInput()
+		?>
+
 		<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-8 col-lg-6']])->widget(Select2::class, [
 			'data' => IssueSearch::getTagsNames(),
 			'options' => [
