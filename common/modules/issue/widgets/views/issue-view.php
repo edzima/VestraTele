@@ -183,7 +183,8 @@ use yii\data\ActiveDataProvider;
 								? $relation->issue2
 								: $relation->issue;
 
-							return Html::a($issue->getIssueName(), ['issue/view', 'id' => $issue->getIssueId()]) . $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags)]);
+							return Html::a(
+									Html::encode($issue->getIssueName()), ['issue/view', 'id' => $issue->getIssueId()]) . $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags)]);
 						},
 					],
 					[
@@ -197,11 +198,12 @@ use yii\data\ActiveDataProvider;
 					],
 					[
 						'label' => Yii::t('issue', 'Customer'),
+						'format' => 'html',
 						'value' => function (IssueRelation $relation) use ($model): string {
 							$issue = $relation->issue_id_1 === $model->getIssueId()
 								? $relation->issue2
 								: $relation->issue;
-							return $issue->customer->getFullName() . $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags, IssueTag::TYPE_CLIENT)]);
+							return Html::encode($issue->customer->getFullName()) . $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags, IssueTag::TYPE_CLIENT)]);
 						},
 					],
 					[
