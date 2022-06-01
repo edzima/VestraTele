@@ -138,7 +138,6 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => IssueColumn::class,
-				'attribute' => 'id',
 			],
 			[
 				'attribute' => 'signature_act',
