@@ -3,12 +3,14 @@
 namespace frontend\models\search;
 
 use common\models\issue\IssueSearch as BaseIssueSearch;
+use common\models\issue\IssueTag;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
 use common\models\user\User;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 
 class IssueSearch extends BaseIssueSearch {
 
@@ -27,6 +29,13 @@ class IssueSearch extends BaseIssueSearch {
 		$labels = parent::attributeLabels();
 		$labels['entity_responsible_id'] = Yii::t('issue', 'Entity');
 		return $labels;
+	}
+
+	public static function getTagsNames(): array {
+		return ArrayHelper::map(IssueTag::find()
+			->andWhere(['is_active' => true])
+			->asArray()
+			->all(), 'id', 'name');
 	}
 
 	/**

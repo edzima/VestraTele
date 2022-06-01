@@ -134,6 +134,21 @@ use yii\widgets\ActiveForm;
 	?>
 
 
+	<div class="row">
+		<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-8 col-lg-6']])->widget(Select2::class, [
+			'data' => IssueSearch::getTagsNames(),
+			'options' => [
+				'multiple' => true,
+				'placeholder' => Yii::t('issue', 'Tags'),
+			],
+			'pluginOptions' => [
+				'allowClear' => true,
+			],
+			'showToggleAll' => false,
+		]) ?>
+	</div>
+
+
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Search'), ['class' => 'btn btn-primary']) ?>
 		<?= Html::a(Yii::t('backend', 'Reset'),

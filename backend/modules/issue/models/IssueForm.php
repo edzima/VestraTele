@@ -5,6 +5,8 @@ namespace backend\modules\issue\models;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\Issue;
 use common\models\issue\IssueStage;
+use common\models\issue\IssueTag;
+use common\models\issue\IssueTagLink;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use common\models\user\User;
@@ -37,6 +39,8 @@ class IssueForm extends Model {
 
 	public const STAGE_ARCHIVED_ID = IssueStage::ARCHIVES_ID;
 
+	public $tagsIds = [];
+
 	private User $customer;
 
 	private ?Issue $model = null;
@@ -49,6 +53,20 @@ class IssueForm extends Model {
 			throw new InvalidConfigException('$customer or $model must be set.');
 		}
 		parent::__construct($config);
+	}
+
+	public static function getTagsNames(bool $onlyActive): array {
+		$models = IssueTag::find();
+		if ($onlyActive) {
+			$models->andWhere(['is_active' => true]);
+		}
+		$models = $models->all();
+
+		$data = [];
+		foreach ($models as $model) {
+			$data[$model->getTypeName()][$model->id] = $model->name;
+		}
+		return $data;
 	}
 
 	public function rules(): array {
@@ -68,6 +86,8 @@ class IssueForm extends Model {
 			['signature_act', 'string', 'max' => 30],
 			['signature_act', 'default', 'value' => null],
 			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
+			['tagsIds', 'in', 'range' => IssueTag::find()->select('id')->column(), 'allowArray' => true],
+
 			[['signing_at', 'type_additional_date_at', 'stage_change_at'], 'date', 'format' => 'Y-m-d'],
 			[
 				'archives_nr',
@@ -100,6 +120,7 @@ class IssueForm extends Model {
 			'agent_id' => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
 			'lawyer_id' => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
+			'tagsIds' => Yii::t('issue', 'Tags'),
 		]);
 	}
 
@@ -126,6 +147,7 @@ class IssueForm extends Model {
 		$this->signing_at = $model->signing_at;
 		$this->type_additional_date_at = $model->type_additional_date_at;
 		$this->stage_change_at = $model->stage_change_at;
+		$this->tagsIds = ArrayHelper::getColumn($model->tags, 'id');
 	}
 
 	public function getModel(): Issue {
@@ -150,6 +172,23 @@ class IssueForm extends Model {
 			if (!$model->save(false)) {
 				return false;
 			}
+			if (!$model->isNewRecord) {
+				IssueTagLink::deleteAll(['issue_id' => $model->id]);
+			}
+
+			if (!empty($this->tagsIds)) {
+				$rows = [];
+				foreach ((array) $this->tagsIds as $id) {
+					$rows[] = [
+						'issue_id' => $model->id,
+						'tag_id' => $id,
+					];
+				}
+				IssueTagLink::getDb()->createCommand()->batchInsert(IssueTagLink::tableName(), [
+					'issue_id', 'tag_id',
+				], $rows)->execute();
+			}
+
 			$model->linkUser($this->customer->id, IssueUser::TYPE_CUSTOMER);
 			$model->linkUser($this->agent_id, IssueUser::TYPE_AGENT);
 			$model->linkUser($this->lawyer_id, IssueUser::TYPE_LAWYER);
