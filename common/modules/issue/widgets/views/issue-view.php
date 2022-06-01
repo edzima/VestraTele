@@ -16,24 +16,15 @@ use yii\data\ActiveDataProvider;
 /* @var $this yii\web\View */
 /* @var $model Issue */
 /* @var $usersLinks bool */
+/* @var $claimActionColumn bool */
 /* @var $relationActionColumn bool */
 /* @var $userMailVisibilityCheck bool */
-
-$provision = $model->getProvision();
-if ($provision) {
-	$details = [];
-	$details[] = 'PROWIZJA - rodzaj: ' . $provision->getTypeName();
-	$details[] = 'Podstawa: ' . $provision->getBase();
-	$details[] = 'Procent\krotność: ' . $provision->getValue();
-	$details[] = $model->details;
-	$model->details = implode("\n", $details);
-}
 
 ?>
 
 <div id="issue-details">
 	<div class="row">
-		<div class="col-md-8 col-lg-7">
+		<div class="col-md-7 col-lg-6">
 			<?= IssueUsersWidget::widget([
 				'model' => $model,
 				'type' => IssueUsersWidget::TYPE_CUSTOMERS,
@@ -164,7 +155,7 @@ if ($provision) {
 				},
 			]) ?>
 		</div>
-		<div class="col-md-4 col-lg-5">
+		<div class="col-md-5 col-lg-6">
 			<?= GridView::widget([
 				'dataProvider' => new ActiveDataProvider([
 					'query' => $model->getIssues(),
@@ -214,6 +205,32 @@ if ($provision) {
 					],
 				],
 			]) ?>
+
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getClaims(),
+				]),
+				'summary' => '',
+				'caption' => Yii::t('issue', 'Issue Claims'),
+				'emptyText' => '',
+				'showOnEmpty' => false,
+				'columns' => [
+					'typeName',
+					'entityResponsible.name:text:' . Yii::t('issue', 'Entity'),
+					'trying_value:currency:' . Yii::t('issue', 'Claim'),
+					'percent_value',
+					'obtained_value:currency:' . Yii::t('issue', 'Obtained'),
+					'details:ntext',
+					'date:date',
+					[
+						'class' => ActionColumn::class,
+						'controller' => '/issue/claim',
+						'template' => '{update} {delete}',
+						'visible' => $claimActionColumn,
+					],
+				],
+			]) ?>
+
 
 			<?= FieldsetDetailView::widget([
 				'legend' => Yii::t('common', 'Issue details'),

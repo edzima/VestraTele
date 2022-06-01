@@ -18,6 +18,7 @@ return [
 	'customer_service' => 'Obsługa klienta',
 	'export' => 'Eksport',
 	'issue' => 'Sprawy',
+	'issue.claim' => 'Sprawy - Roszczenia',
 	'issue.create' => 'Sprawy - dodawanie',
 	'issue.delete' => 'Sprawy - usuwanie',
 	'issue.link-user' => 'Sprawy - przypisywanie użytkowników',

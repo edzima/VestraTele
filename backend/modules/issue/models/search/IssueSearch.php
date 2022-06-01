@@ -5,6 +5,7 @@ namespace backend\modules\issue\models\search;
 use backend\modules\issue\models\IssueStage;
 use common\models\AddressSearch;
 use common\models\issue\Issue;
+use common\models\issue\IssueClaim;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSearch as BaseIssueSearch;
 use common\models\issue\query\IssuePayQuery;
@@ -29,6 +30,8 @@ class IssueSearch extends BaseIssueSearch {
 	public $excludedStages = [];
 	public $onlyWithSettlements;
 
+	public ?string $claimCompanyTryingValue = null;
+
 	public bool $onlyDelayed = false;
 	public bool $onlyWithPayedPay = false;
 	public bool $onlyWithAllPayedPay = false;
@@ -50,6 +53,7 @@ class IssueSearch extends BaseIssueSearch {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
 			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements'], 'boolean'],
+			['claimCompanyTryingValue', 'number', 'min' => 0],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
 			[['type_additional_date_at', 'signature_act', 'stage_change_at'], 'safe'],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
@@ -116,6 +120,7 @@ class IssueSearch extends BaseIssueSearch {
 		$this->payedFilter($query);
 		$this->settlementsFilter($query);
 		$this->stageChangeAtFilter($query);
+		$this->claimFilter($query);
 	}
 
 	private function signatureActFilter(IssueQuery $query): void {
@@ -226,6 +231,16 @@ class IssueSearch extends BaseIssueSearch {
 		if (!empty($this->stage_change_at)) {
 			$query->andWhere(['>=', Issue::tableName() . '.stage_change_at', date('Y-m-d 00:00:00', strtotime($this->stage_change_at))]);
 			$query->andWhere(['<=', Issue::tableName() . '.stage_change_at', date('Y-m-d 23:59:59', strtotime($this->stage_change_at))]);
+		}
+	}
+
+	private function claimFilter(IssueQuery $query): void {
+		if (!empty($this->claimCompanyTryingValue)) {
+			$query->joinWith('claims');
+			$query->andWhere([
+				IssueClaim::tableName() . '.type' => IssueClaim::TYPE_COMPANY,
+			]);
+			$query->andWhere(['like', IssueClaim::tableName() . '.trying_value', $this->claimCompanyTryingValue]);
 		}
 	}
 

@@ -204,6 +204,12 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
+							'label' => Yii::t('issue', 'Issue Claims'),
+							'url' => ['/issue/claim/index'],
+							'icon' => '<i class="fa fa-percent"></i>',
+							'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
+						],
+						[
 							'label' => 'Podmioty',
 							'url' => ['/entity-responsible/default/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',

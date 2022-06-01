@@ -48,6 +48,16 @@ class IssueViewCest {
 		$I->dontSeeLink('Costs');
 		$I->dontSeeLink('Create settlement');
 		$I->dontSeeLink('Create Summon');
+		$I->dontSeeLink('Create Provision');
+	}
+
+	public function checkProvisionLink(IssueManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(ClaimCest::PERMISSION);
+		$this->goToIssuePage($I);
+		$I->seeLink('Create Provision');
+		$I->click('Create Provision');
+		$I->seeInCurrentUrl(ClaimCest::ROUTE_CREATE);
 	}
 
 	public function checkNoteLink(IssueManager $I): void {

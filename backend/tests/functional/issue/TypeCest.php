@@ -5,7 +5,6 @@ namespace backend\tests\functional\issue;
 use backend\modules\issue\controllers\TypeController;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
-use common\models\issue\Provision;
 
 class TypeCest {
 
@@ -48,18 +47,16 @@ class TypeCest {
 		$I->submitForm(static::FORM_SELECTOR, $this->formParams(
 			'Some new type name',
 			'SNTM',
-			Provision::TYPE_PERCENTAGE,
 			0,
 		)
 		);
 		$I->seeInTitle('Some new type name');
 	}
 
-	private function formParams($name, $shortname, $provisionType, $vat): array {
+	private function formParams($name, $shortname, $vat): array {
 		return [
 			'IssueType[name]' => $name,
 			'IssueType[short_name]' => $shortname,
-			'IssueType[provision_type]' => $provisionType,
 			'IssueType[vat]' => $vat,
 		];
 	}

@@ -53,6 +53,11 @@ class Module extends BaseModule {
 						'permissions' => [Worker::PERMISSION_ISSUE_CREATE],
 					],
 					[
+						'allow' => true,
+						'controllers' => ['issue/claim'],
+						'permissions' => [Worker::PERMISSION_ISSUE_CLAIM],
+					],
+					[
 						'allow' => false,
 						'controllers' => ['issue/issue'],
 						'actions' => ['delete'],
