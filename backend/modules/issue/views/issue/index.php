@@ -253,15 +253,15 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 				'visible' => !empty($searchModel->signedAtFrom) || !empty($searchModel->signedAtTo),
 			],
-			//			[
-			//				'class' => DataColumn::class,
-			//				'attribute' => 'created_at',
-			//				'format' => 'date',
-			//				'contentBold' => true,
-			//				'options' => [
-			//					'style' => 'width:90px',
-			//				],
-			//			],
+			[
+				'class' => DataColumn::class,
+				'attribute' => 'created_at',
+				'format' => 'date',
+				'contentBold' => true,
+				'options' => [
+					'style' => 'width:90px',
+				],
+			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'updated_at',
