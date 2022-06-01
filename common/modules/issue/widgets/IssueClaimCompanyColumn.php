@@ -26,15 +26,6 @@ class IssueClaimCompanyColumn extends DataColumn {
 			$this->label = Yii::t('issue', 'Company Claim Trying Value');
 		}
 		$this->visible = Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM);
-		if ($this->visible) {
-			$hasCompanyClaims = !empty(array_filter($this->grid->dataProvider->getModels(), static function (IssueInterface $issue) {
-				$claims = $issue->getIssueModel()->claims;
-				return !empty(array_filter($claims, static function (IssueClaim $claim) {
-					return $claim->isCompany() && !empty($claim->trying_value);
-				}));
-			}));
-			$this->visible = $hasCompanyClaims;
-		}
 	}
 
 	public function getDataCellValue($model, $key, $index): ?string {
