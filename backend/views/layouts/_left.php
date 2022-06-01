@@ -215,6 +215,11 @@ $user = Yii::$app->user;
 							'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
 						],
 						[
+							'label' => Yii::t('issue', 'Tags'),
+							'url' => ['/issue/tag/index'],
+							'icon' => '<i class="fa fa-tags"></i>',
+						],
+						[
 							'label' => 'Podmioty',
 							'url' => ['/entity-responsible/default/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
