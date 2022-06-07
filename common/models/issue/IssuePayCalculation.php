@@ -292,7 +292,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 		return static::getProblemStatusesNames()[$this->problem_status];
 	}
 
-	public function getStageName(): string {
+	public function getStageName(): ?string {
 		return static::getStagesNames()[$this->stage_id];
 	}
 
