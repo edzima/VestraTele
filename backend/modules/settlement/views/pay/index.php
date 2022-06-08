@@ -3,18 +3,18 @@
 use backend\modules\settlement\models\search\IssuePaySearch;
 use backend\modules\settlement\widgets\IssuePayGrid;
 use backend\widgets\CsvForm;
+use common\models\settlement\search\DelayedIssuePaySearch;
 use common\models\user\User;
 use yii\data\ActiveDataProvider;
 
 /* @var $this yii\web\View */
-/* @var $searchModel IssuePaySearch */
+/* @var $searchModel IssuePaySearch | DelayedIssuePaySearch */
 /* @var $dataProvider ActiveDataProvider */
 
 $this->title = Yii::t('settlement', 'Pays');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['/settlement/calculation/index']];
 $this->params['breadcrumbs'][] = $this->title;
-
 ?>
 <div class="settlement-pay-index">
 

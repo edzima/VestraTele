@@ -50,6 +50,7 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 	public const STATUS_DEMAND_FOR_PAYMENT_FIRST = 60;
 	public const STATUS_DEMAND_FOR_PAYMENT_SECOND = 61;
 	public const STATUS_DEMAND_FOR_PAYMENT_THIRD = 62;
+	public const STATUS_DEMAND_BEFORE_JUDGMENT = 65;
 
 	/**
 	 * @inheritdoc
@@ -208,7 +209,7 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 			static::STATUS_DEMAND_FOR_PAYMENT_FIRST => Yii::t('settlement', 'First Demand for Payment'),
 			static::STATUS_DEMAND_FOR_PAYMENT_SECOND => Yii::t('settlement', 'Second Demand for Payment'),
 			static::STATUS_DEMAND_FOR_PAYMENT_THIRD => Yii::t('settlement', 'Third Demand for Payment'),
-
+			static::STATUS_DEMAND_BEFORE_JUDGMENT => Yii::t('settlement', 'Demand before Judgement'),
 		];
 	}
 
