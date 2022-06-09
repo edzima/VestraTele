@@ -26,7 +26,7 @@ class SummonForm extends Model {
 
 	public const SCENARIO_CONTRACTOR = 'contractor';
 
-	public const TERM_EMPTY = null;
+	public const TERM_EMPTY = 'empty';
 	public const TERM_ONE_DAY = 1;
 	public const TERM_TREE_DAYS = 3;
 	public const TERM_FIVE_DAYS = 5;
@@ -88,6 +88,7 @@ class SummonForm extends Model {
 			},
 				'message' => Yii::t('common', 'Deadline At cannot be blank on custom term.'),
 			],
+			['deadline_at', 'default', 'value' => null],
 			[['start_at', 'deadline_at'], 'date', 'format' => 'yyyy-MM-dd'],
 			[['realize_at', 'realized_at'], 'date', 'format' => 'yyyy-MM-dd HH:mm'],
 			['entity_id', 'in', 'range' => array_keys(static::getEntityNames())],
@@ -228,7 +229,7 @@ class SummonForm extends Model {
 				['html' => 'summonCreate-html',],
 				['model' => $model]
 			)
-			->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
+			->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
 			->setTo($model->contractor->email)
 			->setSubject(Yii::t('issue', 'You have new Summon: {type}', ['type' => $model->getTypeName()]))
 			->send();

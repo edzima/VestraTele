@@ -89,7 +89,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 			[['status', 'issue_id', 'owner_id', 'contractor_id', 'entity_id', 'city_id', 'type_id'], 'required'],
 			[['status', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
 			[['title'], 'string', 'max' => 255],
-			[['created_at', 'updated_at', 'realized_at', 'start_at'], 'safe'],
+			[['created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at'], 'safe'],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => SummonType::class, 'targetAttribute' => ['type_id' => 'id']],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],

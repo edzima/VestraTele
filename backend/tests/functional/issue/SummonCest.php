@@ -3,14 +3,14 @@
 namespace backend\tests\functional\issue;
 
 use backend\modules\issue\controllers\SummonController;
+use backend\modules\issue\models\SummonForm;
+use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\SummonIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\TerytFixtureHelper;
-use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\Summon;
 use common\models\user\Worker;
-use Yii;
 
 class SummonCest {
 
@@ -25,10 +25,6 @@ class SummonCest {
 
 	/** @see SummonController::actionView() */
 	public const ROUTE_VIEW = '/issue/summon/view';
-
-	public function _before(): void {
-		codecept_debug(array_keys($this->_fixtures()));
-	}
 
 	public function _fixtures(): array {
 		return array_merge(
@@ -45,8 +41,9 @@ class SummonCest {
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkIndexPageAsIssueSummonManager(SummonIssueManager $I): void {
+	public function checkIndexPageAsIssueManager(IssueManager $I): void {
 		$I->amLoggedIn();
+		$I->assignPermission(Worker::PERMISSION_SUMMON);
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->see('Summons');
 		$I->seeLink('Create summon');
@@ -86,7 +83,7 @@ class SummonCest {
 			'SummonForm[issue_id]' => 1,
 			'SummonForm[type_id]' => 1,
 			'SummonForm[contractor_id]' => $I->getUser()->id,
-			'SummonForm[term]' => 3,
+			'SummonForm[term]' => SummonForm::TERM_FIVE_DAYS,
 			'SummonForm[title]' => 'Test Summon Without Issue in Route Param',
 			'SummonForm[city_id]' => TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA,
 
@@ -99,7 +96,29 @@ class SummonCest {
 		$I->seeEmailIsSent();
 	}
 
-	public function checkNotUserSummonUpdateWithoutSummonManagerPermission(SummonIssueManager $I): void {
+	public function checkCreateWithEmptyTerm(SummonIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_CREATE);
+		$I->submitForm('#summon-form', [
+			'SummonForm[issue_id]' => 1,
+			'SummonForm[type_id]' => 1,
+			'SummonForm[contractor_id]' => $I->getUser()->id,
+			'SummonForm[term]' => SummonForm::TERM_EMPTY,
+			'SummonForm[title]' => 'Test Summon With Empty Term',
+			'SummonForm[city_id]' => TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA,
+
+		]);
+
+		$I->seeRecord(Summon::class, [
+			'issue_id' => 1,
+			'type_id' => 1,
+			'title' => 'Test Summon With Empty Term',
+			'deadline_at' => null,
+		]);
+	}
+
+	public function checkNotUserSummonUpdateWithoutSummonManagerPermission(IssueManager $I): void {
+		$I->assignPermission(Worker::PERMISSION_SUMMON);
 		$I->amLoggedIn();
 		/**
 		 * @var Summon $summon
@@ -113,7 +132,6 @@ class SummonCest {
 		$I->assignPermission(Worker::PERMISSION_SUMMON_MANAGER);
 
 		$I->amLoggedIn();
-		codecept_debug('Has permission: ' . Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER));
 
 		/**
 		 * @var Summon $summon
