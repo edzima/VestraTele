@@ -33,7 +33,7 @@ class TaxComponent extends Component {
 	 * @throws InvalidArgumentException
 	 */
 	private function checkTax(Decimal $tax): void {
-		if ($tax <= 0) {
+		if ($tax < 0) {
 			throw new InvalidArgumentException('$tax must best greater than 0');
 		}
 	}

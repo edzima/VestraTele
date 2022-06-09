@@ -42,7 +42,7 @@ class IssueType extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['name', 'short_name', 'vat', 'provision_type'], 'required'],
+			[['name', 'short_name', 'vat'], 'required'],
 			[['provision_type'], 'integer'],
 			[['meet', 'with_additional_date'], 'boolean'],
 			[['name', 'short_name'], 'string', 'max' => 255],
