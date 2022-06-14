@@ -31,12 +31,13 @@ $this->title = Yii::t('backend', 'Issues');
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<div class="issue-index relative">
+<div class="issue-index">
 	<?php Pjax::begin([
 		'timeout' => 2000,
 	]); ?>
 
-	<p>
+	<div class="clearfix form-group">
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
 			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index'], ['class' => 'btn btn-warning'])
 			: ''
@@ -50,10 +51,14 @@ $this->params['breadcrumbs'][] = $this->title;
 			: ''
 		?>
 		<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
-			? CsvForm::widget()
+			? CsvForm::widget([
+				'formOptions' => ['class' => 'pull-right'],
+			])
 			: ''
 		?>
-	</p>
+
+
+	</div>
 
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
