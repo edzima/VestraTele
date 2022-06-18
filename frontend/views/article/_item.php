@@ -23,6 +23,9 @@ use yii\helpers\HtmlPurifier;
 	</div>
 
 	<div class="article-text">
-		<?= HtmlPurifier::process($model->preview) ?>
+		<?= HtmlPurifier::process($model->preview, function ($config) {
+			$config->set('HTML.SafeIframe', true);
+			$config->set('URI.SafeIframeRegexp', '%^(https?:)?//(www\.youtube(?:-nocookie)?\.com/embed/|player\.vimeo\.com/video/)%');
+		}) ?>
 	</div>
 </div>
