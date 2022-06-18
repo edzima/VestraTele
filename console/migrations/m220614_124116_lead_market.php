@@ -17,8 +17,9 @@ class m220614_124116_lead_market extends Migration {
 			'id' => $this->primaryKey(),
 			'lead_id' => $this->integer()->notNull(),
 			'status' => $this->smallInteger()->notNull(),
-			'created_at' => $this->timestamp(),
-			'updated_at' => $this->timestamp(),
+			'details' => $this->text()->null(),
+			'created_at' => $this->timestamp()->notNull(),
+			'updated_at' => $this->timestamp()->notNull(),
 			'options' => $this->json(),
 		]);
 
@@ -28,9 +29,13 @@ class m220614_124116_lead_market extends Migration {
 			'lead_id' => $this->integer()->notNull(),
 			'user_id' => $this->integer()->notNull(),
 			'status' => $this->smallInteger()->notNull(),
-			'created_at' => $this->timestamp(),
-			'updated_at' => $this->timestamp(),
+			'created_at' => $this->timestamp()->notNull(),
+			'updated_at' => $this->timestamp()->notNull(),
+
 		]);
+
+		$this->createIndex('{{%index_lead_market_status}}', '{{%lead_market}}', 'status', false);
+		$this->createIndex('{{%index_lead_market_user_status}}', '{{%lead_market_user}}', 'status', false);
 
 		$this->addForeignKey('{{%fk_lead_market_lead}}',
 			'{{%lead_market}}', 'lead_id',

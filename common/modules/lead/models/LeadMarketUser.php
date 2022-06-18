@@ -5,6 +5,7 @@ namespace common\modules\lead\models;
 use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -23,6 +24,8 @@ use yii\db\ActiveRecord;
  */
 class LeadMarketUser extends ActiveRecord {
 
+	public const STATUS_TO_CONFIRM = 1;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -33,11 +36,19 @@ class LeadMarketUser extends ActiveRecord {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function rules() {
+	public function behaviors(): array {
+		return [
+			TimestampBehavior::class,
+		];
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function rules(): array {
 		return [
 			[['market_id', 'lead_id', 'status', 'user_id'], 'required'],
 			[['market_id', 'lead_id', 'status', 'user_id'], 'integer'],
-			[['created_at', 'updated_at'], 'safe'],
 			[['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadMarket::class, 'targetAttribute' => ['lead_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['user_id' => 'id']],
 		];

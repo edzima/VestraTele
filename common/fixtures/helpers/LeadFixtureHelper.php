@@ -10,6 +10,8 @@ use common\modules\lead\fixtures\LeadAnswerFixture;
 use common\modules\lead\fixtures\LeadFixture;
 use common\modules\lead\fixtures\LeadQuestionFixture;
 use common\modules\lead\fixtures\LeadReportFixture;
+use common\modules\lead\fixtures\MarketFixture;
+use common\modules\lead\fixtures\MarketUserFixture;
 use common\modules\lead\fixtures\ReminderFixture as LeadReminderFixture;
 use common\modules\lead\fixtures\SourceFixture;
 use common\modules\lead\fixtures\StatusFixture;
@@ -39,9 +41,24 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 	private const ANSWER = 'lead.answer';
 	private const DIALER = 'lead.dialer';
 	private const DIALER_TYPE = 'lead.dialer-type';
+	private const MARKET = 'lead.market';
+	private const MARKET_USER = 'lead.market-user';
 
 	public const DEFAULT_PHONE = '+48 123-123-123';
 	public const DEFAULT_SOURCE_ID = 1;
+
+	public static function market(): array {
+		return [
+			static::MARKET => [
+				'class' => MarketFixture::class,
+				'dataFile' => static::getDataDirPath() . 'market.php',
+			],
+			static::MARKET_USER => [
+				'class' => MarketUserFixture::class,
+				'dataFile' => static::getDefaultDataDirPath() . 'market-user.php',
+			],
+		];
+	}
 
 	public function haveLead(array $attributes): int {
 		if (!isset($attributes['phone'])) {
