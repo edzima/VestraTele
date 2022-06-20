@@ -70,7 +70,13 @@ class LeadMarketFormTest extends Unit {
 			'model' => $market,
 		]);
 
-		$this->model->status = LeadMarket::STATUS_NEW;
+		$this->model->details = 'updated details';
+
+		$this->thenSuccessSave();
+		$this->tester->seeRecord(LeadMarket::class, [
+			'id' => $market->id,
+			'details' => 'updated details',
+		]);
 	}
 
 	private function giveModel(array $config = []): void {

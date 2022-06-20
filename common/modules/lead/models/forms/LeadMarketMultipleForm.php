@@ -3,16 +3,16 @@
 namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\entities\LeadMarketOptions;
+use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadMarket;
 use yii\base\Model;
 
-class LeadMarketForm extends Model {
+class LeadMarketMultipleForm extends Model {
 
-	public $lead_id;
+	public array $leadsIds = [];
 	public $status;
 	public string $details = '';
 
-	private ?LeadMarket $model = null;
 	private ?LeadMarketOptions $options = null;
 
 	public static function getStatusesNames(): array {
@@ -21,9 +21,10 @@ class LeadMarketForm extends Model {
 
 	public function rules(): array {
 		return [
-			[['lead_id', 'status'], 'required'],
-			[['lead_id', 'status'], 'integer'],
+			[['leadsIds', 'status'], 'required'],
+			['leadsIds', 'each', 'rule' => ['integer']],
 			['details', 'string'],
+			[['leadsIds'], 'exist', 'allowArray' => true, 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => 'id'],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 		];
 	}
@@ -33,36 +34,31 @@ class LeadMarketForm extends Model {
 			&& $this->getOptions()->validate($attributeNames, $clearErrors);
 	}
 
-	public function getModel(): LeadMarket {
-		if ($this->model === null) {
-			$this->model = new LeadMarket();
-		}
-		return $this->model;
-	}
-
-	public function setModel(LeadMarket $model): void {
-		$this->model = $model;
-		$this->lead_id = $model->lead_id;
-		$this->status = $model->status;
-		$this->details = $model->details;
-		$this->setOptions($model->getMarketOptions());
-	}
-
-	public function save(): bool {
+	public function save(): ?int {
 		if (!$this->validate()) {
-			return false;
+			return null;
 		}
-		$model = $this->getModel();
-		$model->lead_id = $this->lead_id;
-		$model->status = $this->status;
-		$model->options = $this->getOptions()->toString();
-		$model->details = $this->details;
-		return $model->save();
+		$rows = [];
+		foreach ($this->leadsIds as $leadId) {
+			$rows[$leadId] = [
+				'lead_id' => $leadId,
+				'status' => $this->status,
+				'details' => $this->details,
+				'options' => $this->getOptions()->toString(),
+			];
+		}
+		return LeadMarket::getDb()->createCommand()
+			->batchInsert(LeadMarket::tableName(), [
+				'lead_id',
+				'status',
+				'details',
+				'options',
+			], $rows)->execute();
 	}
 
 	public function getOptions(): LeadMarketOptions {
 		if ($this->options === null) {
-			$this->options = $this->getModel()->getMarketOptions();
+			$this->options = new LeadMarketOptions();
 		}
 		return $this->options;
 	}
