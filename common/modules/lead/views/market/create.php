@@ -1,10 +1,12 @@
 <?php
 
-use common\modules\lead\models\LeadMarket;
+use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\forms\LeadMarketForm;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model LeadMarket */
+/* @var $lead ActiveLead */
+/* @var $model LeadMarketForm */
 
 $this->title = Yii::t('lead', 'Create Lead Market');
 

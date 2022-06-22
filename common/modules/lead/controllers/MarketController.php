@@ -6,13 +6,12 @@ use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\searches\LeadMarketSearch;
 use Yii;
 use yii\filters\VerbFilter;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 /**
  * MarketController implements the CRUD actions for LeadMarket model.
  */
-class MarketController extends Controller {
+class MarketController extends BaseController {
 
 	/**
 	 * {@inheritdoc}
@@ -62,8 +61,10 @@ class MarketController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionCreate() {
+	public function actionCreate(int $id) {
+		$lead = $this->findLead($id);
 		$model = new LeadMarket();
+		$model->lead_id = $lead->getId();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
@@ -71,6 +72,7 @@ class MarketController extends Controller {
 
 		return $this->render('create', [
 			'model' => $model,
+			'lead' => $lead,
 		]);
 	}
 
@@ -116,7 +118,7 @@ class MarketController extends Controller {
 	 * @return LeadMarket the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): LeadMarket {
+	protected function findModel(int $id): LeadMarket {
 		if (($model = LeadMarket::findOne($id)) !== null) {
 			return $model;
 		}
