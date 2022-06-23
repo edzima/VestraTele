@@ -8,6 +8,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model LeadMarketForm|LeadMarketMultipleForm */
 /* @var $form ActiveForm */
+
 ?>
 
 <div class="lead-market-form">
@@ -22,7 +23,7 @@ use yii\widgets\ActiveForm;
 		<div class="col-md-6">
 
 			<?= $model instanceof LeadMarketForm && !$model->getModel()->isNewRecord
-				? $form->field($model, 'status')->textInput()
+				? $form->field($model, 'status')->dropDownList(LeadMarketForm::getStatusesNames())
 				: ''
 			?>
 

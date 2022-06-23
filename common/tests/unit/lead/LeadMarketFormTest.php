@@ -28,12 +28,25 @@ class LeadMarketFormTest extends Unit {
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Lead Id cannot be blank.', 'lead_id');
 		$this->thenSeeError('Status cannot be blank.', 'status');
+		$this->thenSeeError('Creator Id cannot be blank.', 'creator_id');
+	}
+
+	public function testCreateForLeadFromFixture(): void {
+		$this->giveModel([
+			'status' => LeadMarket::STATUS_NEW,
+			'lead_id' => 1,
+			'details' => 'Duplicate Lead from Fixture',
+		]);
+
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Lead Id "1" has already been taken.', 'lead_id');
 	}
 
 	public function testSaveNew(): void {
 		$this->giveModel([
+			'creator_id' => 1,
 			'status' => LeadMarket::STATUS_NEW,
-			'lead_id' => 1,
+			'lead_id' => 2,
 			'details' => 'New Market Test Lead',
 			'options' => new LeadMarketOptions([
 				'visibleRegion' => true,
@@ -47,15 +60,17 @@ class LeadMarketFormTest extends Unit {
 		]);
 
 		$this->tester->assertNotNull($market);
-		$this->tester->assertSame(1, $market->lead_id);
+		$this->tester->assertSame(1, $market->creator_id);
+		$this->tester->assertSame(2, $market->lead_id);
 		$this->tester->assertSame(LeadMarket::STATUS_NEW, $market->status);
 		$this->tester->assertTrue($market->getMarketOptions()->visibleRegion);
 	}
 
 	public function testUpdate(): void {
 		$this->giveModel([
+			'creator_id' => 1,
 			'status' => LeadMarket::STATUS_NEW,
-			'lead_id' => 1,
+			'lead_id' => 3,
 			'details' => 'New Market Test Lead',
 			'options' => new LeadMarketOptions([
 				'visibleRegion' => true,

@@ -55,6 +55,7 @@ class MarketCest {
 
 		$I->seeRecord(LeadMarket::class, [
 			'details' => 'Test Details Create CEST',
+			'creator_id' => $I->getUser()->getId(),
 			'options' => [
 				'visibleRegion' => true,
 				'visibleCommune' => false,

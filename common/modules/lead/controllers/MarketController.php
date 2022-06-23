@@ -69,8 +69,8 @@ class MarketController extends BaseController {
 		$model = new LeadMarketForm();
 		$model->lead_id = $lead->getId();
 		$model->status = LeadMarket::STATUS_NEW;
+		$model->creator_id = Yii::$app->user->getId();
 
-		Yii::warning($model->load(Yii::$app->request->post()));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
@@ -101,6 +101,7 @@ class MarketController extends BaseController {
 		}
 		$ids = array_unique($ids);
 		$model = new LeadMarketMultipleForm();
+		$model->creator_id = Yii::$app->user->getId();
 		$model->leadsIds = $ids;
 		if ($model->load(Yii::$app->request->post()) && ($count = $model->save()) !== null) {
 			Flash::add(Flash::TYPE_SUCCESS,
@@ -123,10 +124,12 @@ class MarketController extends BaseController {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$model = $this->findModel($id);
+		$model = new LeadMarketForm([
+			'model' => $this->findModel($id),
+		]);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $id]);
 		}
 
 		return $this->render('update', [

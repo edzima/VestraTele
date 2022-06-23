@@ -295,6 +295,7 @@ return [
 	'Move to Market' => '-> Giełdę',
 	'Move to Market ({count})' => '-> Giełde ({count})',
 	'Move Leads to Market ({count})' => 'Dodaj {count} Leads na Giełdę',
+	'Update Lead Market: {name}' => 'Edytuj Giełdę: {name}',
 	'Visible Region' => 'Pokaż Województwo',
 	'Visible District' => 'Pokaż Powiat',
 	'Visible Commune' => 'Pokaż Gminę',

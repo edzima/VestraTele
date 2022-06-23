@@ -11,5 +11,6 @@ class MarketFixture extends ActiveFixture {
 
 	public $depends = [
 		LeadFixture::class,
+		UserFixture::class,
 	];
 }

@@ -2,8 +2,10 @@
 
 namespace common\modules\lead\models;
 
+use common\models\user\User;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\query\LeadQuery;
+use common\modules\lead\Module;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -17,6 +19,7 @@ use yii\helpers\Json;
  * @property int $id
  * @property int $lead_id
  * @property int $status
+ * @property int $creator_id
  * @property string|null $details
  * @property string $created_at
  * @property string $updated_at
@@ -24,6 +27,7 @@ use yii\helpers\Json;
  *
  * @property Lead $lead
  * @property LeadMarketUser[] $leadMarketUsers
+ * @property User $creator
  */
 class LeadMarket extends ActiveRecord {
 
@@ -65,6 +69,7 @@ class LeadMarket extends ActiveRecord {
 			[['lead_id', 'status'], 'integer'],
 			[['options', 'details'], 'string'],
 			[['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => ['lead_id' => 'id']],
+			[['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['creator_id' => 'id']],
 		];
 	}
 
@@ -81,11 +86,16 @@ class LeadMarket extends ActiveRecord {
 			'created_at' => Yii::t('lead', 'Created At'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
 			'options' => Yii::t('lead', 'Options'),
+			'creator' => Yii::t('lead', 'Creator'),
 		];
 	}
 
 	public function getLead(): LeadQuery {
 		return $this->hasOne(Lead::class, ['id' => 'lead_id']);
+	}
+
+	public function getCreator(): ActiveQuery {
+		return $this->hasOne(Module::userClass(), ['id' => 'creator_id']);
 	}
 
 	public function getMarketOptions(): LeadMarketOptions {
@@ -101,7 +111,7 @@ class LeadMarket extends ActiveRecord {
 	 * @return ActiveQuery
 	 */
 	public function getLeadMarketUsers() {
-		return $this->hasMany(LeadMarketUser::class, ['lead_id' => 'id']);
+		return $this->hasMany(LeadMarketUser::class, ['market_id' => 'id']);
 	}
 
 	public function getStatusName(): string {

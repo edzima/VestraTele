@@ -13,6 +13,11 @@ class m220614_124116_lead_market extends Migration {
 	 * {@inheritdoc}
 	 */
 	public function safeUp() {
+
+
+		/** @var ActiveRecord $userClass */
+		$userClass = Module::userClass();
+
 		$this->createTable('{{%lead_market}}', [
 			'id' => $this->primaryKey(),
 			'lead_id' => $this->integer()->notNull(),
@@ -20,22 +25,32 @@ class m220614_124116_lead_market extends Migration {
 			'details' => $this->text()->null(),
 			'created_at' => $this->timestamp()->notNull(),
 			'updated_at' => $this->timestamp()->notNull(),
+			'creator_id' => $this->integer()->notNull(),
 			'options' => $this->json(),
 		]);
 
 		$this->createTable('{{%lead_market_user}}', [
-			'id' => $this->primaryKey(),
 			'market_id' => $this->integer()->notNull(),
-			'lead_id' => $this->integer()->notNull(),
 			'user_id' => $this->integer()->notNull(),
 			'status' => $this->smallInteger()->notNull(),
 			'created_at' => $this->timestamp()->notNull(),
 			'updated_at' => $this->timestamp()->notNull(),
+			'details' => $this->text()->null(),
+		]);
 
+		$this->addPrimaryKey('{{%PK_lead_market_user}}', '{{%lead_market_user}}', [
+			'market_id',
+			'user_id',
 		]);
 
 		$this->createIndex('{{%index_lead_market_status}}', '{{%lead_market}}', 'status', false);
 		$this->createIndex('{{%index_lead_market_user_status}}', '{{%lead_market_user}}', 'status', false);
+
+		$this->addForeignKey('{{%fk_lead_market_creator}}',
+			'{{%lead_market}}', 'creator_id',
+			$userClass::tableName(), 'id',
+			'CASCADE', 'CASCADE'
+		);
 
 		$this->addForeignKey('{{%fk_lead_market_lead}}',
 			'{{%lead_market}}', 'lead_id',
@@ -44,13 +59,11 @@ class m220614_124116_lead_market extends Migration {
 		);
 
 		$this->addForeignKey('{{%fk_lead_market_user_market}}',
-			'{{%lead_market_user}}', 'lead_id',
+			'{{%lead_market_user}}', 'market_id',
 			'{{%lead_market}}', 'id',
 			'CASCADE', 'CASCADE'
 		);
 
-		/** @var ActiveRecord $userClass */
-		$userClass = Module::userClass();
 		$this->addForeignKey('{{%fk_lead_market_user_user}}',
 			'{{%lead_market_user}}', 'user_id',
 			$userClass::tableName(), 'id',
