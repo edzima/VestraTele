@@ -2,6 +2,9 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Flash;
+use common\modules\lead\models\forms\LeadMarketForm;
+use common\modules\lead\models\forms\LeadMarketMultipleForm;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\searches\LeadMarketSearch;
 use Yii;
@@ -63,16 +66,51 @@ class MarketController extends BaseController {
 	 */
 	public function actionCreate(int $id) {
 		$lead = $this->findLead($id);
-		$model = new LeadMarket();
+		$model = new LeadMarketForm();
 		$model->lead_id = $lead->getId();
+		$model->status = LeadMarket::STATUS_NEW;
 
+		Yii::warning($model->load(Yii::$app->request->post()));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
 		return $this->render('create', [
 			'model' => $model,
 			'lead' => $lead,
+		]);
+	}
+
+	public function actionCreateMultiple(array $ids = []) {
+		if (empty($ids)) {
+			$postIds = Yii::$app->request->post('leadsIds');
+			if (is_string($postIds)) {
+				$postIds = explode(',', $postIds);
+			}
+			if ($postIds) {
+				$ids = $postIds;
+			}
+		}
+		if (empty($ids)) {
+			Flash::add(Flash::TYPE_WARNING, 'Ids cannot be blank.');
+			return $this->redirect(['lead/index']);
+		}
+		if (count($ids) === 1) {
+			$id = reset($ids);
+			return $this->redirect(['create', 'id' => $id]);
+		}
+		$ids = array_unique($ids);
+		$model = new LeadMarketMultipleForm();
+		$model->leadsIds = $ids;
+		if ($model->load(Yii::$app->request->post()) && ($count = $model->save()) !== null) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('lead', 'Success add: {count} Leads to Market.', [
+					'count' => $count,
+				]));
+			return $this->redirect(['lead/index']);
+		}
+		return $this->render('create-multiple', [
+			'model' => $model,
 		]);
 	}
 

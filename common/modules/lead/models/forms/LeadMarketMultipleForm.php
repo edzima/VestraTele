@@ -29,7 +29,12 @@ class LeadMarketMultipleForm extends Model {
 		];
 	}
 
-	public function validate($attributeNames = null, $clearErrors = true) {
+	public function load($attributeNames = null, $clearErrors = true): bool {
+		return parent::load($attributeNames, $clearErrors)
+			&& $this->getOptions()->load($attributeNames, $clearErrors);
+	}
+
+	public function validate($attributeNames = null, $clearErrors = true): bool {
 		return parent::validate($attributeNames, $clearErrors)
 			&& $this->getOptions()->validate($attributeNames, $clearErrors);
 	}
@@ -44,7 +49,7 @@ class LeadMarketMultipleForm extends Model {
 				'lead_id' => $leadId,
 				'status' => $this->status,
 				'details' => $this->details,
-				'options' => $this->getOptions()->toString(),
+				'options' => $this->getOptions()->toJson(),
 			];
 		}
 		return LeadMarket::getDb()->createCommand()

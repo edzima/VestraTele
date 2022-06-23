@@ -292,4 +292,12 @@ return [
 	'Success Delete Leads: {count}.' => 'Poprawnie Usunięto {count} Leads',
 	'Success Update: {count} New Dialers with Lead Status not for them.' => 'Zaktualizowano {count} Nowych Dialers z nieodpowiednim Lead Statusem.',
 	'Update New' => 'Zaktualizuj Nowe',
+	'Move to Market' => '-> Giełdę',
+	'Move to Market ({count})' => '-> Giełde ({count})',
+	'Move Leads to Market ({count})' => 'Dodaj {count} Leads na Giełdę',
+	'Visible Region' => 'Pokaż Województwo',
+	'Visible District' => 'Pokaż Powiat',
+	'Visible Commune' => 'Pokaż Gminę',
+	'Visible City' => 'Pokaż Miejscowość',
+	'Visible Address Details' => 'Pokaż Ulice / Nr',
 ];

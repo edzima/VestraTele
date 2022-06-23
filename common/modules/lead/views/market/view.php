@@ -10,6 +10,7 @@ use yii\widgets\DetailView;
 
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
+$this->params['breadcrumbs'][] = ['label' => $model->lead->getName(), 'url' => ['lead/view', 'id' => $model->lead_id]];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Markets'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -30,16 +31,33 @@ YiiAsset::register($this);
 		]) ?>
 	</p>
 
-	<?= DetailView::widget([
-		'model' => $model,
-		'attributes' => [
-			'id',
-			'lead_id',
-			'status',
-			'created_at',
-			'updated_at',
-			'options:ntext',
-		],
-	]) ?>
+	<div class="row">
 
+
+		<div class="col-md-4">
+			<?= DetailView::widget([
+				'model' => $model,
+				'attributes' => [
+					'statusName',
+					'created_at:datetime',
+					'updated_at:datetime',
+				],
+			]) ?>
+		</div>
+
+
+		<div class="col-md-3">
+			<?= DetailView::widget([
+				'model' => $model->getMarketOptions(),
+				'attributes' => [
+					'visibleRegion:boolean',
+					'visibleDistrict:boolean',
+					'visibleCommune:boolean',
+					'visibleCity:boolean',
+					'visibleAddressDetails:boolean',
+				],
+			]) ?>
+		</div>
+
+	</div>
 </div>

@@ -28,7 +28,12 @@ class LeadMarketForm extends Model {
 		];
 	}
 
-	public function validate($attributeNames = null, $clearErrors = true) {
+	public function load($attributeNames = null, $clearErrors = true): bool {
+		return parent::load($attributeNames, $clearErrors)
+			&& $this->getOptions()->load($attributeNames, $clearErrors);
+	}
+
+	public function validate($attributeNames = null, $clearErrors = true): bool {
 		return parent::validate($attributeNames, $clearErrors)
 			&& $this->getOptions()->validate($attributeNames, $clearErrors);
 	}
@@ -55,7 +60,7 @@ class LeadMarketForm extends Model {
 		$model = $this->getModel();
 		$model->lead_id = $this->lead_id;
 		$model->status = $this->status;
-		$model->options = $this->getOptions()->toString();
+		$model->options = $this->getOptions()->toJson();
 		$model->details = $this->details;
 		return $model->save();
 	}

@@ -1,23 +1,47 @@
 <?php
 
-use common\modules\lead\models\LeadMarket;
+use common\modules\lead\models\forms\LeadMarketForm;
+use common\modules\lead\models\forms\LeadMarketMultipleForm;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model LeadMarket */
-/* @var $form yii\widgets\ActiveForm */
+/* @var $model LeadMarketForm|LeadMarketMultipleForm */
+/* @var $form ActiveForm */
 ?>
 
 <div class="lead-market-form">
 
-	<?php $form = ActiveForm::begin(); ?>
+	<?php $form = ActiveForm::begin([
+		'id' => 'lead-market-form',
+	]); ?>
 
-	<?= $form->field($model, 'lead_id')->textInput() ?>
+	<div class="row">
 
-	<?= $form->field($model, 'status')->textInput() ?>
 
-	<?= $form->field($model, 'options')->textarea(['rows' => 6]) ?>
+		<div class="col-md-6">
+
+			<?= $model instanceof LeadMarketForm && !$model->getModel()->isNewRecord
+				? $form->field($model, 'status')->textInput()
+				: ''
+			?>
+
+			<?= $form->field($model, 'details')->textarea() ?>
+
+		</div>
+
+		<div class="col-md-6">
+
+			<?= $this->render('_options_form', [
+				'form' => $form,
+				'model' => $model->getOptions(),
+			])
+			?>
+		</div>
+
+
+	</div>
+
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>

@@ -1,21 +1,20 @@
 <?php
 
-use common\modules\lead\models\ActiveLead;
-use common\modules\lead\models\forms\LeadMarketForm;
-use yii\helpers\Html;
+use common\helpers\Html;
+use common\modules\lead\models\forms\LeadMarketMultipleForm;
 
 /* @var $this yii\web\View */
-/* @var $lead ActiveLead */
-/* @var $model LeadMarketForm */
+/* @var $model LeadMarketMultipleForm */
 
-$this->title = Yii::t('lead', 'Move Lead to Market');
+$this->title = Yii::t('lead', 'Move Leads to Market ({count})', [
+	'count' => count($model->leadsIds),
+]);
 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
-$this->params['breadcrumbs'][] = ['label' => $lead->getName(), 'url' => ['lead/view', 'id' => $lead->getId()]];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Markets'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="lead-market-create">
+<div class="lead-market-create-multiple">
 
 	<h1><?= Html::encode($this->title) ?></h1>
 

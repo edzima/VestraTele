@@ -76,6 +76,7 @@ class LeadMarket extends ActiveRecord {
 			'id' => Yii::t('lead', 'ID'),
 			'lead_id' => Yii::t('lead', 'Lead ID'),
 			'status' => Yii::t('lead', 'Status'),
+			'statusName' => Yii::t('lead', 'Status'),
 			'details' => Yii::t('lead', 'Details'),
 			'created_at' => Yii::t('lead', 'Created At'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
@@ -101,5 +102,9 @@ class LeadMarket extends ActiveRecord {
 	 */
 	public function getLeadMarketUsers() {
 		return $this->hasMany(LeadMarketUser::class, ['lead_id' => 'id']);
+	}
+
+	public function getStatusName(): string {
+		return static::getStatusesNames()[$this->status];
 	}
 }
