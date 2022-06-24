@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\models\message\IssueNoteMessagesForm;
 use common\models\user\User;
 use Yii;
 use yii\base\Model;
@@ -15,28 +16,29 @@ use yii\base\Model;
  */
 class IssueNoteForm extends Model {
 
-    public const SCENARIO_STAGE_CHANGE = 'stage-change';
-    public ?int $issue_id = null;
-    public ?int $user_id = null;
+	public const SCENARIO_STAGE_CHANGE = 'stage-change';
+	public ?int $issue_id = null;
+	public ?int $user_id = null;
 
-    public ?string $type = null;
-    public bool $is_pinned = false;
-    public string $title = '';
-    public ?string $description = null;
-    public string $publish_at = '';
+	public ?string $type = null;
+	public bool $is_pinned = false;
+	public string $title = '';
+	public ?string $description = null;
+	public string $publish_at = '';
 
-    public ?bool $stageChangeAtMerge = null;
+	public ?bool $stageChangeAtMerge = null;
 
-    public string $dateFormat = 'Y-m-d H:i:s';
+	public string $dateFormat = 'Y-m-d H:i:s';
 
-    private ?IssueNote $model = null;
+	public ?IssueNoteMessagesForm $messagesForm = null;
 
-    public static function createSettlement(IssueSettlement $settlement)
-    {
-        $model = new static();
-        $model->issue_id = $settlement->getIssueId();
-        $model->type = IssueNote::generateType(IssueNote::TYPE_SETTLEMENT, $settlement->getId());
-        return $model;
+	private ?IssueNote $model = null;
+
+	public static function createSettlement(IssueSettlement $settlement) {
+		$model = new static();
+		$model->issue_id = $settlement->getIssueId();
+		$model->type = IssueNote::generateType(IssueNote::TYPE_SETTLEMENT, $settlement->getId());
+		return $model;
 	}
 
 	public static function createSummon(Summon $summon) {
@@ -55,30 +57,53 @@ class IssueNoteForm extends Model {
 
 	public function rules(): array {
 		return [
-            [['title', '!user_id', '!issue_id', 'publish_at'], 'required'],
-            [['!title'], 'required', 'on' => static::SCENARIO_STAGE_CHANGE],
-            [['stageChangeAtMerge'], 'required', 'on' => static::SCENARIO_STAGE_CHANGE],
-            [['issue_id', 'user_id'], 'integer'],
-            ['is_pinned', 'boolean'],
-            ['!type', 'string'],
-            [['title'], 'string', 'max' => 255],
-            ['description', 'string'],
-            ['description', 'default', 'value' => null],
-            ['publish_at', 'date', 'format' => 'php:' . $this->dateFormat],
-            ['issue_id', 'exist', 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
-            ['user_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-        ];
+			[['title', '!user_id', '!issue_id', 'publish_at'], 'required'],
+			[['!title'], 'required', 'on' => static::SCENARIO_STAGE_CHANGE],
+			[['stageChangeAtMerge'], 'required', 'on' => static::SCENARIO_STAGE_CHANGE],
+			[['issue_id', 'user_id'], 'integer'],
+			['is_pinned', 'boolean'],
+			['!type', 'string'],
+			[['title'], 'string', 'max' => 255],
+			['description', 'string'],
+			['description', 'default', 'value' => null],
+			['publish_at', 'date', 'format' => 'php:' . $this->dateFormat],
+			['issue_id', 'exist', 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
+			['user_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+		];
 	}
 
-	public function attributeLabels(): array
-    {
-        return array_merge(
-            IssueNote::instance()->attributeLabels(),
-            [
-                'stageChangeAtMerge' => Yii::t('issue', 'Stage change At merge'),
-            ]
-        );
-    }
+	public function attributeLabels(): array {
+		return array_merge(
+			IssueNote::instance()->attributeLabels(),
+			[
+				'stageChangeAtMerge' => Yii::t('issue', 'Stage change At merge'),
+			]
+		);
+	}
+
+	public function validate($attributeNames = null, $clearErrors = true) {
+		$validate = parent::validate($attributeNames, $clearErrors);
+		if ($this->messagesForm) {
+			$validate &= $this->messagesForm->validate();
+		}
+		return $validate;
+	}
+
+	public function load($data, $formName = null) {
+		$load = parent::load($data, $formName);
+		if ($this->messagesForm) {
+			$load &= $this->messagesForm->load($data, $formName);
+		}
+		return $load;
+	}
+
+	public function sendMessages(): ?bool {
+		if ($this->messagesForm) {
+			$this->messagesForm->setNote($this->getModel());
+			return $this->messagesForm->pushMessages();
+		}
+		return null;
+	}
 
 	public function setModel(IssueNote $model): void {
 		$this->model = $model;
@@ -103,36 +128,33 @@ class IssueNoteForm extends Model {
 
 	public function save(): bool {
 		if ($this->beforeSave()) {
-            $model = $this->getModel();
-            $model->issue_id = $this->issue_id;
-            $model->is_pinned = $this->is_pinned;
-            $model->user_id = $this->user_id;
-            $model->type = $this->type;
-            $model->title = $this->title;
-            $model->description = $this->description;
-            $model->publish_at = $this->publish_at;
-            $save = $model->save();
-            if ($save) {
-                $this->mergeStageChangeAt();
-                return $save;
-            }
+			$model = $this->getModel();
+			$model->issue_id = $this->issue_id;
+			$model->is_pinned = $this->is_pinned;
+			$model->user_id = $this->user_id;
+			$model->type = $this->type;
+			$model->title = $this->title;
+			$model->description = $this->description;
+			$model->publish_at = $this->publish_at;
+			$save = $model->save();
+			if ($save) {
+				$this->mergeStageChangeAt();
+				return $save;
+			}
+		}
+		return false;
+	}
 
-        }
-        return false;
-    }
+	protected function mergeStageChangeAt(): void {
+		if ($this->getModel()->isForStageChange() && $this->stageChangeAtMerge) {
+			$issue = $this->getModel()->getIssueModel();
+			$issue->stage_change_at = $this->publish_at;
+			$issue->save();
+		}
+	}
 
-    protected function mergeStageChangeAt(): void
-    {
-        if ($this->getModel()->isForStageChange() && $this->stageChangeAtMerge) {
-            $issue = $this->getModel()->getIssueModel();
-            $issue->stage_change_at = $this->publish_at;
-            $issue->save();
-        }
-    }
-
-    protected function beforeSave(): bool
-    {
-        return $this->validate();
-    }
+	protected function beforeSave(): bool {
+		return $this->validate();
+	}
 
 }

@@ -8,6 +8,7 @@ use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
+use common\models\message\IssueNoteMessagesForm;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\actions\NoteDescriptionListAction;
@@ -90,11 +91,15 @@ class NoteController extends Controller {
 			'issue_id' => $issue->getIssueId(),
 			'user_id' => Yii::$app->user->id,
 		]);
+		$model->messagesForm = new IssueNoteMessagesForm([
+			'issue' => $issue,
+		]);
 		if (Yii::$app->user->can(Worker::PERMISSION_NOTE_TEMPLATE)) {
 			$model->scenario = IssueNoteForm::SCENARIO_TEMPLATE;
 		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$model->sendMessages();
 			return $this->redirectIssue($issueId);
 		}
 		return $this->render('create', [

@@ -8,6 +8,8 @@ use yii\widgets\ActiveForm;
 
 class IssueMessagesFormWidget extends Widget {
 
+	public bool $withWorkersTypes = true;
+
 	public ActiveForm $form;
 	public IssueMessagesForm $model;
 	public array $checkboxesAttributes = [
@@ -22,6 +24,7 @@ class IssueMessagesFormWidget extends Widget {
 			'form' => $this->form,
 			'model' => $this->model,
 			'checkboxesAttributes' => $this->checkboxesAttributes,
+			'withWorkersTypes' => $this->withWorkersTypes,
 		]);
 	}
 }
