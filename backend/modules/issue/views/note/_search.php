@@ -28,7 +28,7 @@ use yii\widgets\ActiveForm;
 	</div>
 
 	<div class="form-group">
-		<?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
+		<?= Html::submitButton(Yii::t('backend', 'Search'), ['class' => 'btn btn-primary']) ?>
 		<?= Html::a(Yii::t('backend', 'Reset'),
 			['index'], [
 				'class' => 'btn btn-default',
