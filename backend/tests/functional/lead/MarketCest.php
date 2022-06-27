@@ -7,6 +7,7 @@ use common\fixtures\helpers\LeadFixtureHelper;
 use common\models\user\User;
 use common\modules\lead\controllers\MarketController;
 use common\modules\lead\models\LeadMarket;
+use common\modules\lead\models\LeadReport;
 
 class MarketCest {
 
@@ -34,17 +35,18 @@ class MarketCest {
 	}
 
 	public function actionCreate(LeadManager $I): void {
-		$I->assignPermission(static::PERMISSION);
-		$I->amLoggedIn();
-
 		$I->haveFixtures(
 			array_merge(
 				LeadFixtureHelper::lead(),
-				LeadFixtureHelper::market()
+				LeadFixtureHelper::market(),
+				LeadFixtureHelper::status(),
+				LeadFixtureHelper::reports(),
 			)
 		);
+		$I->assignPermission(static::PERMISSION);
+		$I->amLoggedIn();
 
-		$I->amOnRoute(static::ROUTE_CREATE, ['id' => 1]);
+		$I->amOnRoute(static::ROUTE_CREATE, ['id' => 2]);
 
 		$I->submitForm('#lead-market-form', [
 			'LeadMarketForm[details]' => 'Test Details Create CEST',
@@ -60,6 +62,12 @@ class MarketCest {
 				'visibleRegion' => true,
 				'visibleCommune' => false,
 			],
+		]);
+
+		$I->seeRecord(LeadReport::class, [
+			'details' => 'Move Lead to Market',
+			'owner_id' => $I->getUser()->getId(),
+			'lead_id' => 2,
 		]);
 	}
 }

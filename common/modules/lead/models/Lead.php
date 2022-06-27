@@ -107,7 +107,12 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function getDialers(): LeadDialerQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(LeadDialer::class, ['lead_id' => 'id']);
+	}
+
+	public function getMarkets() {
+		return $this->hasMany(LeadMarket::class, ['lead_id' => 'id']);
 	}
 
 	protected function getAddresses(): ActiveQuery {

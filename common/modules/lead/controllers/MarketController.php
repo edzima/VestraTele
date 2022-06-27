@@ -71,7 +71,10 @@ class MarketController extends BaseController {
 		$model->status = LeadMarket::STATUS_NEW;
 		$model->creator_id = Yii::$app->user->getId();
 
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+		if ($model->load(Yii::$app->request->post())
+			&& $model->save()
+			&& $model->saveReport(false)
+		) {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 

@@ -5,7 +5,9 @@ namespace common\modules\lead\models\forms;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadMarket;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\Module;
+use Yii;
 use yii\base\Model;
 use yii\db\QueryInterface;
 
@@ -40,8 +42,31 @@ class LeadMarketForm extends Model {
 					}
 				},
 			],
-
+			['lead_id', 'uniqueWithSameContactValidator'],
 		];
+	}
+
+	public function uniqueWithSameContactValidator(): void {
+		$lead = Lead::findById($this->lead_id);
+		if ($lead) {
+			$sameContacts = $lead->getSameContacts(true);
+			if ($this->leadsHasMarket($sameContacts)) {
+				$this->addError('lead_id', 'Same Lead has already in Market.');
+			}
+		}
+	}
+
+	/**
+	 * @param Lead[] $leads
+	 * @return bool
+	 */
+	private function leadsHasMarket(array $leads): bool {
+		foreach ($leads as $lead) {
+			if ($lead->getMarkets()->exists()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function load($data, $formName = null): bool {
@@ -52,10 +77,6 @@ class LeadMarketForm extends Model {
 	public function validate($attributeNames = null, $clearErrors = true): bool {
 		return parent::validate($attributeNames, $clearErrors)
 			&& $this->getOptions()->validate($attributeNames, $clearErrors);
-	}
-
-	public function afterValidate() {
-		parent::afterValidate();
 	}
 
 	public function getModel(): LeadMarket {
@@ -85,6 +106,23 @@ class LeadMarketForm extends Model {
 		$model->options = $this->getOptions()->toJson();
 		$model->details = $this->details;
 		return $model->save();
+	}
+
+	public function saveReport(bool $validate = true): bool {
+		if ($validate && !$this->validate()) {
+			return false;
+		}
+		$model = $this->getModel();
+		if ($model->isNewRecord) {
+			return false;
+		}
+		$report = new LeadReport();
+		$report->owner_id = $this->creator_id;
+		$report->lead_id = $this->lead_id;
+		$report->old_status_id = $model->lead->getStatusId();
+		$report->status_id = $model->lead->getStatusId();
+		$report->details = Yii::t('lead', 'Move Lead to Market');
+		return $report->save();
 	}
 
 	public function getOptions(): LeadMarketOptions {

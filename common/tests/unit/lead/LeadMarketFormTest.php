@@ -6,6 +6,7 @@ use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\forms\LeadMarketForm;
 use common\modules\lead\models\LeadMarket;
+use common\modules\lead\models\LeadReport;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
 
@@ -18,12 +19,23 @@ class LeadMarketFormTest extends Unit {
 	public function _fixtures(): array {
 		return array_merge(
 			LeadFixtureHelper::lead(),
+			LeadFixtureHelper::market(),
+			LeadFixtureHelper::status(),
 			LeadFixtureHelper::user(),
-			LeadFixtureHelper::market()
+			LeadFixtureHelper::reports(),
+			LeadFixtureHelper::source(),
 		);
 	}
 
 	public function testEmpty(): void {
+		$this->giveModel();
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Lead Id cannot be blank.', 'lead_id');
+		$this->thenSeeError('Status cannot be blank.', 'status');
+		$this->thenSeeError('Creator Id cannot be blank.', 'creator_id');
+	}
+
+	public function testLeadWithSameContactAndType(): void {
 		$this->giveModel();
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Lead Id cannot be blank.', 'lead_id');
@@ -66,15 +78,51 @@ class LeadMarketFormTest extends Unit {
 		$this->tester->assertTrue($market->getMarketOptions()->visibleRegion);
 	}
 
-	public function testUpdate(): void {
+	public function testReportWithoutSave(): void {
+		$this->giveModel([
+			'creator_id' => 1,
+			'status' => LeadMarket::STATUS_NEW,
+			'lead_id' => 2,
+			'details' => 'New Market Test Lead',
+		]);
+
+		$this->tester->assertFalse($this->getModel()->saveReport());
+	}
+
+	public function testReportAfterSave(): void {
+		$this->giveModel([
+			'creator_id' => 1,
+			'status' => LeadMarket::STATUS_NEW,
+			'lead_id' => 2,
+			'details' => 'New Market Test Lead',
+		]);
+		$this->thenSuccessSave();
+		$this->tester->assertTrue($this->getModel()->saveReport());
+		$this->tester->seeRecord(LeadReport::class, [
+			'owner_id' => 1,
+			'lead_id' => 2,
+			'details' => 'Move Lead to Market',
+		]);
+	}
+
+	public function testSameLeadAlreadyInMarket(): void {
 		$this->giveModel([
 			'creator_id' => 1,
 			'status' => LeadMarket::STATUS_NEW,
 			'lead_id' => 3,
-			'details' => 'New Market Test Lead',
-			'options' => new LeadMarketOptions([
-				'visibleRegion' => true,
-			]),
+			'details' => 'Market for Lead with same contacts in Market.',
+		]);
+
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Same Lead has already in Market.', 'lead_id');
+	}
+
+	public function testUpdate(): void {
+		$this->giveModel([
+			'creator_id' => 1,
+			'status' => LeadMarket::STATUS_NEW,
+			'lead_id' => 2,
+			'details' => 'Market Lead test for Update',
 		]);
 
 		$this->thenSuccessSave();
