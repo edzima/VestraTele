@@ -4,13 +4,18 @@ namespace backend\modules\issue\models\search;
 
 use common\models\issue\IssueNote;
 use common\models\user\User;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\QueryInterface;
 
 /**
  * IssueNoteSearch represents the model behind the search form of `common\models\issue\IssueNote`.
  */
 class IssueNoteSearch extends IssueNote {
+
+	public $dateFrom;
+	public $dateTo;
 
 	public static function getUsersNames(): array {
 		return User::getSelectList(
@@ -29,8 +34,16 @@ class IssueNoteSearch extends IssueNote {
 		return [
 			[['id', 'issue_id', 'user_id'], 'integer'],
 			[['is_pinned', 'is_template'], 'boolean'],
-			[['title', 'description', 'publish_at', 'created_at', 'updated_at', 'type'], 'safe'],
+			[['title', 'description', 'publish_at', 'created_at', 'updated_at', 'type', 'dateFrom', 'dateTo'], 'safe'],
 		];
+	}
+
+	public function attributeLabels(): array {
+		return array_merge(parent::attributeLabels(), [
+				'dateFrom' => Yii::t('common', 'Date from'),
+				'dateTo' => Yii::t('common', 'Date to'),
+			]
+		);
 	}
 
 	/**
@@ -73,6 +86,8 @@ class IssueNoteSearch extends IssueNote {
 			return $dataProvider;
 		}
 
+		$this->applyDateFilter($query);
+
 		// grid filtering conditions
 		$query->andFilterWhere([
 			IssueNote::tableName() . '.id' => $this->id,
@@ -90,5 +105,22 @@ class IssueNoteSearch extends IssueNote {
 			->andFilterWhere(['like', IssueNote::tableName() . '.description', $this->description]);
 
 		return $dataProvider;
+	}
+
+	protected function applyDateFilter(QueryInterface $query): void {
+
+		if (!empty($this->dateFrom)) {
+			$query->andFilterWhere([
+				'>=', IssueNote::tableName() . '.publish_at',
+				date('Y-m-d 00:00:00', strtotime($this->dateFrom)),
+			]);
+		}
+
+		if (!empty($this->dateTo)) {
+			$query->andFilterWhere([
+				'<=', IssueNote::tableName() . '.publish_at',
+				date('Y-m-d 23:59:59', strtotime($this->dateTo)),
+			]);
+		}
 	}
 }
