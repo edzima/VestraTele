@@ -78,6 +78,11 @@ if ($multipleForm) {
 			? Html::a(Yii::t('lead', 'Duplicates'), ['duplicate/index'], ['class' => 'btn btn-warning'])
 			: ''
 		?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_MARKET)
+			? Html::a(Yii::t('lead', 'Lead Markets'), ['market/index'], ['class' => 'btn btn-success'])
+			: ''
+		?>
 		<?= Yii::$app->user->can(User::PERMISSION_LEAD_DELETE)
 		&& $dataProvider->pagination->pageCount > 1
 			?

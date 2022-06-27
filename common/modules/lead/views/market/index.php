@@ -17,9 +17,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
-	<p>
-		<?= Html::a(Yii::t('lead', 'Create Lead Market'), ['create'], ['class' => 'btn btn-success']) ?>
-	</p>
 
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -29,11 +26,15 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
 
-			'id',
+			//'id',
 			'lead_id',
-			'status',
-			'created_at',
-			'updated_at',
+			[
+				'attribute' => 'status',
+				'value' => 'statusName',
+				'filter' => LeadMarketSearch::getStatusesNames(),
+			],
+			'created_at:datetime',
+			//'updated_at',
 			//'options:ntext',
 
 			['class' => 'yii\grid\ActionColumn'],

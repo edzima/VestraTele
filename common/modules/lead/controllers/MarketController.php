@@ -101,6 +101,7 @@ class MarketController extends BaseController {
 		}
 		$ids = array_unique($ids);
 		$model = new LeadMarketMultipleForm();
+		$model->status = LeadMarket::STATUS_NEW;
 		$model->creator_id = Yii::$app->user->getId();
 		$model->leadsIds = $ids;
 		if ($model->load(Yii::$app->request->post()) && ($count = $model->save()) !== null) {

@@ -292,6 +292,7 @@ return [
 	'Success Delete Leads: {count}.' => 'Poprawnie Usunięto {count} Leads',
 	'Success Update: {count} New Dialers with Lead Status not for them.' => 'Zaktualizowano {count} Nowych Dialers z nieodpowiednim Lead Statusem.',
 	'Update New' => 'Zaktualizuj Nowe',
+	'Lead Markets' => 'Giełda',
 	'Move to Market' => '-> Giełdę',
 	'Move to Market ({count})' => '-> Giełde ({count})',
 	'Move Leads to Market ({count})' => 'Dodaj {count} Leads na Giełdę',
