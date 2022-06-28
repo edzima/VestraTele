@@ -5,8 +5,12 @@ namespace common\modules\lead\models\forms;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadMarket;
+use common\modules\lead\models\LeadReport;
+use common\modules\lead\models\searches\DuplicateLeadSearch;
 use common\modules\lead\Module;
+use Yii;
 use yii\base\Model;
+use yii\db\ActiveQuery;
 
 class LeadMarketMultipleForm extends Model {
 
@@ -29,8 +33,40 @@ class LeadMarketMultipleForm extends Model {
 			['details', 'string'],
 			[['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['creator_id' => 'id']],
 			[['leadsIds'], 'exist', 'allowArray' => true, 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => 'id'],
+			['leadsIds', 'alreadyExistFilter'],
+			['leadsIds', 'alreadyExistSameContactsFilter'],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 		];
+	}
+
+	public function alreadyExistFilter(): void {
+		if (!$this->hasErrors('leadsIds')) {
+			$ids = LeadMarket::find()
+				->select('lead_id')
+				->andWhere(['lead_id' => $this->leadsIds])
+				->distinct()
+				->asArray()
+				->column();
+			if (!empty($ids)) {
+				$this->leadsIds = array_diff($this->leadsIds, $ids);
+			}
+		}
+	}
+
+	public function alreadyExistSameContactsFilter(): void {
+		if (!$this->hasErrors('leadsIds')) {
+			$duplicate = new DuplicateLeadSearch();
+			$duplicate->id = $this->leadsIds;
+			$dataProvider = $duplicate->search([]);
+			/** @var ActiveQuery $query */
+			$query = $dataProvider->query;
+			$query->joinWith('markets', false, 'LEFT OUTER JOIN');
+			$query->andWhere(LeadMarket::tableName() . '.id IS NULL');
+			$ids = $dataProvider->getKeys();
+			if (!empty($ids)) {
+				$this->leadsIds = array_diff($this->leadsIds, $ids);
+			}
+		}
 	}
 
 	public function load($data, $formName = null): bool {
@@ -64,6 +100,36 @@ class LeadMarketMultipleForm extends Model {
 				'status',
 				'details',
 				'options',
+			], $rows)->execute();
+	}
+
+	public function saveReports(bool $validate = true): ?int {
+		if ($validate && !$this->validate()) {
+			return null;
+		}
+
+		$statuses = Lead::find()
+			->select(['status_id'])
+			->indexBy('id')
+			->andWhere(['id' => $this->leadsIds])
+			->column();
+		$rows = [];
+		foreach ($statuses as $id => $status) {
+			$rows[] = [
+				'owner_id' => $this->creator_id,
+				'lead_id' => $id,
+				'status_id' => $status,
+				'old_status_id' => $status,
+				'details' => Yii::t('lead', 'Move Lead to Market'),
+			];
+		}
+		return LeadReport::getDb()->createCommand()
+			->batchInsert(LeadReport::tableName(), [
+				'owner_id',
+				'lead_id',
+				'status_id',
+				'old_status_id',
+				'details',
 			], $rows)->execute();
 	}
 

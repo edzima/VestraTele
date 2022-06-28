@@ -107,9 +107,12 @@ class MarketController extends BaseController {
 		$model->status = LeadMarket::STATUS_NEW;
 		$model->creator_id = Yii::$app->user->getId();
 		$model->leadsIds = $ids;
-		if ($model->load(Yii::$app->request->post()) && ($count = $model->save()) !== null) {
+		if ($model->load(Yii::$app->request->post())
+			&& ($count = $model->save()) !== null
+			&& $model->saveReports(false)
+		) {
 			Flash::add(Flash::TYPE_SUCCESS,
-				Yii::t('lead', 'Success add: {count} Leads to Market.', [
+				Yii::t('lead', 'Success Move {count} Leads to Market', [
 					'count' => $count,
 				]));
 			return $this->redirect(['lead/index']);
