@@ -77,6 +77,10 @@ class MarketController extends BaseController {
 		) {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
+		if ($model->hasErrors('lead_id')) {
+			Flash::add(Flash::TYPE_WARNING, $model->getFirstError('lead_id'));
+			return $this->redirectLead($id);
+		}
 
 		return $this->render('create', [
 			'model' => $model,
@@ -108,7 +112,7 @@ class MarketController extends BaseController {
 		$model->creator_id = Yii::$app->user->getId();
 		$model->leadsIds = $ids;
 		if ($model->load(Yii::$app->request->post())
-			&& ($count = $model->save()) !== null
+			&& ($count = $model->save()) > 0
 			&& $model->saveReports(false)
 		) {
 			Flash::add(Flash::TYPE_SUCCESS,
@@ -117,6 +121,11 @@ class MarketController extends BaseController {
 				]));
 			return $this->redirect(['lead/index']);
 		}
+		if (Yii::$app->request->isPost && empty($model->leadsIds)) {
+			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'All Leads are already on Market'));
+			return $this->redirect(['lead/index']);
+		}
+
 		return $this->render('create-multiple', [
 			'model' => $model,
 		]);

@@ -79,8 +79,8 @@ class LeadMarketMultipleForm extends Model {
 			&& $this->getOptions()->validate($attributeNames, $clearErrors);
 	}
 
-	public function save(): ?int {
-		if (!$this->validate()) {
+	public function save(bool $validate = true): ?int {
+		if ($validate && !$this->validate()) {
 			return null;
 		}
 		$rows = [];

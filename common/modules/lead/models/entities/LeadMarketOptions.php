@@ -8,8 +8,8 @@ use yii\helpers\Json;
 
 class LeadMarketOptions extends Model {
 
-	public bool $visibleRegion = false;
-	public bool $visibleDistrict = false;
+	public bool $visibleRegion = true;
+	public bool $visibleDistrict = true;
 	public bool $visibleCommune = false;
 	public bool $visibleCity = false;
 	public bool $visibleAddressDetails = false;

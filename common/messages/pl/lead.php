@@ -302,4 +302,6 @@ return [
 	'Visible Commune' => 'Pokaż Gminę',
 	'Visible City' => 'Pokaż Miejscowość',
 	'Visible Address Details' => 'Pokaż Ulice / Nr',
+	'Success Move {count} Leads to Market' => 'Przeniesiono {count} Leads na Giełdę',
+	'All Leads are already on Market' => 'Wszystkie Leads są już na Giełdzie',
 ];
