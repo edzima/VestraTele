@@ -93,6 +93,7 @@ class NoteController extends Controller {
 		]);
 		$model->messagesForm = new IssueNoteMessagesForm([
 			'issue' => $issue,
+			'sms_owner_id' => Yii::$app->user->getId(),
 		]);
 		if (Yii::$app->user->can(Worker::PERMISSION_NOTE_TEMPLATE)) {
 			$model->scenario = IssueNoteForm::SCENARIO_TEMPLATE;
