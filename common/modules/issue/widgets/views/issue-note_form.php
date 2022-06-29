@@ -85,6 +85,7 @@ use yii\web\View;
 			'model' => $model->messagesForm,
 			'form' => $form,
 			'checkboxesAttributes' => [
+				'sendSmsToCustomer',
 				'sendEmailToWorkers',
 			],
 		])
