@@ -293,6 +293,7 @@ return [
 	'Success Update: {count} New Dialers with Lead Status not for them.' => 'Zaktualizowano {count} Nowych Dialers z nieodpowiednim Lead Statusem.',
 	'Update New' => 'Zaktualizuj Nowe',
 	'Lead Markets' => 'Giełda',
+	'Add Lead: {name} to Market' => 'Dodaj Lead: {name} na Giełdę',
 	'Move to Market' => '-> Giełdę',
 	'Move to Market ({count})' => '-> Giełde ({count})',
 	'Move Leads to Market ({count})' => 'Dodaj {count} Leads na Giełdę',
@@ -304,4 +305,8 @@ return [
 	'Visible Address Details' => 'Pokaż Ulice / Nr',
 	'Success Move {count} Leads to Market' => 'Przeniesiono {count} Leads na Giełdę',
 	'All Leads are already on Market' => 'Wszystkie Leads są już na Giełdzie',
+	'Reserved' => 'Zarezerwowany',
+	'Available Again' => 'Ponownie Dostępny',
+	'Done' => 'Zrealizowano',
+	'Archived' => 'Archiwum',
 ];

@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
 use common\modules\lead\models\searches\LeadMarketUserSearch;
 use Yii;
@@ -62,7 +63,14 @@ class MarketUserController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionCreate() {
+	public function actionCreate(int $market_id) {
+		$market = LeadMarket::findOne($market_id);
+		if ($market === null) {
+			throw new NotFoundHttpException();
+		}
+		if ($market->hasUser(Yii::$app->user->getId())) {
+			return $this->redirect(['update', 'market_id' => $market_id, 'user_id' => Yii::$app->user->getId()]);
+		}
 		$model = new LeadMarketUser();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {

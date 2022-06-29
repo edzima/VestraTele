@@ -39,6 +39,12 @@ class LeadMarketMultipleForm extends Model {
 		];
 	}
 
+	public function attributeLabels() {
+		return [
+			'details' => Yii::t('lead', 'Details'),
+		];
+	}
+
 	public function alreadyExistFilter(): void {
 		if (!$this->hasErrors('leadsIds')) {
 			$ids = LeadMarket::find()

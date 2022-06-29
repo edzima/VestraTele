@@ -31,7 +31,11 @@ use yii\helpers\Json;
  */
 class LeadMarket extends ActiveRecord {
 
+	public const STATUS_ARCHIVED = -1;
 	public const STATUS_NEW = 1;
+	public const STATUS_RESERVED = 2;
+	public const STATUS_AVAILABLE_AGAIN = 5;
+	public const STATUS_DONE = 10;
 
 	private ?LeadMarketOptions $marketOptions = null;
 
@@ -45,6 +49,10 @@ class LeadMarket extends ActiveRecord {
 	public static function getStatusesNames(): array {
 		return [
 			static::STATUS_NEW => Yii::t('lead', 'New'),
+			static::STATUS_RESERVED => Yii::t('lead', 'Reserved'),
+			static::STATUS_AVAILABLE_AGAIN => Yii::t('lead', 'Available Again'),
+			static::STATUS_DONE => Yii::t('lead', 'Done'),
+			static::STATUS_ARCHIVED => Yii::t('lead', 'Archived'),
 		];
 	}
 
@@ -111,10 +119,29 @@ class LeadMarket extends ActiveRecord {
 	 * @return ActiveQuery
 	 */
 	public function getLeadMarketUsers() {
-		return $this->hasMany(LeadMarketUser::class, ['market_id' => 'id']);
+		return $this->hasMany(LeadMarketUser::class, ['market_id' => 'id'])->indexBy('user_id');
 	}
 
 	public function getStatusName(): string {
 		return static::getStatusesNames()[$this->status];
+	}
+
+	public function isAvailableForUser(): bool {
+		if (!$this->isArchived() && !$this->isDone()) {
+			$users = $this->leadMarketUsers;
+		}
+		return !$this->isArchived() && !$this->isDone();
+	}
+
+	public function isArchived(): bool {
+		return $this->status === static::STATUS_ARCHIVED;
+	}
+
+	public function isDone(): bool {
+		return $this->status === static::STATUS_DONE;
+	}
+
+	public function hasUser(int $userId): bool {
+		return isset($this->leadMarketUsers[$userId]);
 	}
 }

@@ -1,9 +1,12 @@
 <?php
 
+use common\helpers\Html;
+use common\helpers\Url;
+use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\searches\LeadMarketSearch;
+use common\widgets\grid\ActionColumn;
+use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
-use yii\grid\GridView;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadMarketSearch */
@@ -33,11 +36,39 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'statusName',
 				'filter' => LeadMarketSearch::getStatusesNames(),
 			],
+			'details:ntext',
+
 			'created_at:datetime',
+			[
+				'attribute' => 'booleanOptions',
+				'value' => function (LeadMarket $data): string {
+					$attributes = $data->getMarketOptions()->booleanTrueAttributeLabels();
+					if (empty($attributes)) {
+						return '';
+					}
+					return implode(', ', $attributes);
+				},
+			],
 			//'updated_at',
 			//'options:ntext',
 
-			['class' => 'yii\grid\ActionColumn'],
+			[
+				'class' => ActionColumn::class,
+				'template' => '{user} {view} {update} {delete}',
+				'buttons' => [
+					'user' => function (string $url, LeadMarket $data): ?string {
+						if ($data->isDone() || $data->isArchived()) {
+							return null;
+						}
+						if ($data->hasUser(Yii::$app->user->getId())) {
+							$url = Url::to(['market-user/view', 'user_id' => Yii::$app->user->getId(), 'market_id' => $data->id]);
+						} else {
+							$url = Url::to(['market-user/create', 'market_id' => $data->id]);
+						}
+						return Html::a(Html::icon('check'), $url);
+					},
+				],
+			],
 		],
 	]); ?>
 

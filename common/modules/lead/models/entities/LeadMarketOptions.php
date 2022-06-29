@@ -23,6 +23,9 @@ class LeadMarketOptions extends Model {
 		];
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public function attributeLabels(): array {
 		return [
 			'visibleRegion' => Yii::t('lead', 'Visible Region'),
@@ -31,6 +34,16 @@ class LeadMarketOptions extends Model {
 			'visibleCity' => Yii::t('lead', 'Visible City'),
 			'visibleAddressDetails' => Yii::t('lead', 'Visible Address Details'),
 		];
+	}
+
+	public function booleanTrueAttributeLabels(): array {
+		$attributes = [];
+		foreach ($this->getAttributes() as $attribute => $value) {
+			if (is_bool($value) && $value) {
+				$attributes[] = $this->getAttributeLabel($attribute);
+			}
+		}
+		return $attributes;
 	}
 
 	public function toJson(): string {

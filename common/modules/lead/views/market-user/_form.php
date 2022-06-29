@@ -13,11 +13,9 @@ use yii\widgets\ActiveForm;
 
 	<?php $form = ActiveForm::begin(); ?>
 
-	<?= $form->field($model, 'market_id')->textInput() ?>
-
-	<?= $form->field($model, 'lead_id')->textInput() ?>
-
 	<?= $form->field($model, 'status')->textInput() ?>
+
+	<?= $form->field($model, 'details')->textarea() ?>
 
 
 	<div class="form-group">

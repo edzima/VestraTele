@@ -14,9 +14,9 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property int $market_id
- * @property int $lead_id
  * @property int $user_id
  * @property int $status
+ * @property string|null $details
  * @property string $created_at
  * @property string $updated_at
  *
@@ -47,9 +47,10 @@ class LeadMarketUser extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['market_id', 'lead_id', 'status', 'user_id'], 'required'],
-			[['market_id', 'lead_id', 'status', 'user_id'], 'integer'],
-			[['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadMarket::class, 'targetAttribute' => ['lead_id' => 'id']],
+			[['market_id', 'status', 'user_id'], 'required'],
+			[['market_id', 'status', 'user_id'], 'integer'],
+			[['details'], 'string'],
+			[['market_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadMarket::class, 'targetAttribute' => ['market_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['user_id' => 'id']],
 		];
 	}

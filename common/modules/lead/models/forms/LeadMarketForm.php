@@ -46,6 +46,12 @@ class LeadMarketForm extends Model {
 		];
 	}
 
+	public function attributeLabels() {
+		return [
+			'details' => Yii::t('lead', 'Details'),
+		];
+	}
+
 	public function uniqueWithSameContactValidator(): void {
 		$lead = Lead::findById($this->lead_id);
 		if ($lead) {

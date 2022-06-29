@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models\searches;
 
+use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\LeadMarket;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -11,13 +12,15 @@ use yii\data\ActiveDataProvider;
  */
 class LeadMarketSearch extends LeadMarket {
 
+	public $booleanOptions;
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
 			[['id', 'lead_id', 'status', 'creator_id'], 'integer'],
-			[['created_at', 'updated_at', 'options'], 'safe'],
+			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details'], 'safe'],
 		];
 	}
 
@@ -63,8 +66,12 @@ class LeadMarketSearch extends LeadMarket {
 			'updated_at' => $this->updated_at,
 		]);
 
-		$query->andFilterWhere(['like', 'options', $this->options]);
+		$query->andFilterWhere(['like', 'details', $this->details]);
 
 		return $dataProvider;
+	}
+
+	public function getBooleanOptionsNames(): array {
+		return LeadMarketOptions::getBooleanLabels();
 	}
 }
