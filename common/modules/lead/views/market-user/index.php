@@ -1,9 +1,9 @@
 <?php
 
+use common\helpers\Html;
 use common\modules\lead\models\searches\LeadMarketUserSearch;
+use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
-use yii\grid\GridView;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadMarketUserSearch */
@@ -20,7 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Html::a(Yii::t('lead', 'Create Lead Market User'), ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
 
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -33,7 +32,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 			'id',
 			'market_id',
-			'lead_id',
 			'status',
 			'created_at',
 			//'updated_at',

@@ -16,8 +16,8 @@ class LeadMarketUserSearch extends LeadMarketUser {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'market_id', 'lead_id', 'status', 'user_id'], 'integer'],
-			[['created_at', 'updated_at'], 'safe'],
+			[['market_id', 'days_reservation', 'status', 'user_id'], 'integer'],
+			[['created_at', 'updated_at', 'reserved_at'], 'safe'],
 		];
 	}
 
@@ -55,13 +55,12 @@ class LeadMarketUserSearch extends LeadMarketUser {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
 			'market_id' => $this->market_id,
-			'lead_id' => $this->lead_id,
 			'user_id' => $this->user_id,
 			'status' => $this->status,
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,
+			'reserved_at' => $this->reserved_at,
 		]);
 
 		return $dataProvider;
