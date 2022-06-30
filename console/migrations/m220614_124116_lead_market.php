@@ -33,6 +33,8 @@ class m220614_124116_lead_market extends Migration {
 			'market_id' => $this->integer()->notNull(),
 			'user_id' => $this->integer()->notNull(),
 			'status' => $this->smallInteger()->notNull(),
+			'days_reservation' => $this->smallInteger()->notNull(),
+			'reserved_at' => $this->date()->null(),
 			'created_at' => $this->timestamp()->notNull(),
 			'updated_at' => $this->timestamp()->notNull(),
 			'details' => $this->text()->null(),
@@ -44,7 +46,9 @@ class m220614_124116_lead_market extends Migration {
 		]);
 
 		$this->createIndex('{{%index_lead_market_status}}', '{{%lead_market}}', 'status', false);
+
 		$this->createIndex('{{%index_lead_market_user_status}}', '{{%lead_market_user}}', 'status', false);
+		$this->createIndex('{{%index_lead_market_user_reserved_at}}', '{{%lead_market_user}}', 'reserved_at', false);
 
 		$this->addForeignKey('{{%fk_lead_market_creator}}',
 			'{{%lead_market}}', 'creator_id',

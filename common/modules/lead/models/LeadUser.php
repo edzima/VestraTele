@@ -16,7 +16,7 @@ use yii\db\ActiveRecord;
  * @property string $type
  *
  * @property Lead $lead
- * @property Worker $user
+ * @property LeadUserInterface $user
  */
 class LeadUser extends ActiveRecord {
 

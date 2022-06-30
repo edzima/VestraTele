@@ -2,10 +2,12 @@
 
 namespace common\modules\lead\controllers;
 
+use common\modules\lead\models\forms\LeadMarketAccessRequest;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
 use common\modules\lead\models\searches\LeadMarketUserSearch;
 use Yii;
+use yii\base\InvalidArgumentException;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -63,18 +65,21 @@ class MarketUserController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionCreate(int $market_id) {
+	public function actionAccessRequest(int $market_id) {
 		$market = LeadMarket::findOne($market_id);
 		if ($market === null) {
 			throw new NotFoundHttpException();
 		}
-		if ($market->hasUser(Yii::$app->user->getId())) {
-			return $this->redirect(['update', 'market_id' => $market_id, 'user_id' => Yii::$app->user->getId()]);
+		$model = new LeadMarketAccessRequest();
+		try {
+			$model->setMarket($market);
+		} catch (InvalidArgumentException $exception) {
+			throw new NotFoundHttpException($exception->getMessage());
 		}
-		$model = new LeadMarketUser();
+		$model->user_id = Yii::$app->user->getId();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['market/view', 'id' => $market_id]);
 		}
 
 		return $this->render('create', [

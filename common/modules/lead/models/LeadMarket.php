@@ -2,7 +2,6 @@
 
 namespace common\modules\lead\models;
 
-use common\models\user\User;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
@@ -27,7 +26,7 @@ use yii\helpers\Json;
  *
  * @property Lead $lead
  * @property LeadMarketUser[] $leadMarketUsers
- * @property User $creator
+ * @property LeadUserInterface $creator
  */
 class LeadMarket extends ActiveRecord {
 

@@ -41,8 +41,8 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 	private const ANSWER = 'lead.answer';
 	private const DIALER = 'lead.dialer';
 	private const DIALER_TYPE = 'lead.dialer-type';
-	private const MARKET = 'lead.market';
-	private const MARKET_USER = 'lead.market-user';
+	public const MARKET = 'lead.market';
+	public const MARKET_USER = 'lead.market-user';
 
 	public const DEFAULT_PHONE = '+48 123-123-123';
 	public const DEFAULT_SOURCE_ID = 1;
