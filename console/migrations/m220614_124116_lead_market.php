@@ -23,8 +23,8 @@ class m220614_124116_lead_market extends Migration {
 			'lead_id' => $this->integer()->notNull(),
 			'status' => $this->smallInteger()->notNull(),
 			'details' => $this->text()->null(),
-			'created_at' => $this->timestamp()->notNull(),
-			'updated_at' => $this->timestamp()->notNull(),
+			'created_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
+			'updated_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
 			'creator_id' => $this->integer()->notNull(),
 			'options' => $this->json(),
 		]);
@@ -35,8 +35,8 @@ class m220614_124116_lead_market extends Migration {
 			'status' => $this->smallInteger()->notNull(),
 			'days_reservation' => $this->smallInteger()->notNull(),
 			'reserved_at' => $this->date()->null(),
-			'created_at' => $this->timestamp()->notNull(),
-			'updated_at' => $this->timestamp()->notNull(),
+			'created_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
+			'updated_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
 			'details' => $this->text()->null(),
 		]);
 
