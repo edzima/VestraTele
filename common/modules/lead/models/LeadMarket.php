@@ -143,4 +143,9 @@ class LeadMarket extends ActiveRecord {
 	public function hasUser(int $userId): bool {
 		return isset($this->leadMarketUsers[$userId]);
 	}
+
+	public function isCreatorOrOwnerLead(int $userId): bool {
+		return $this->creator_id === $userId
+			|| $this->lead->owner->getID() === $userId;
+	}
 }

@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Flash;
 use common\modules\lead\models\forms\LeadMarketAccessRequest;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
@@ -9,13 +10,13 @@ use common\modules\lead\models\searches\LeadMarketUserSearch;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\filters\VerbFilter;
-use yii\web\Controller;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
  * MarketUserController implements the CRUD actions for LeadMarketUser model.
  */
-class MarketUserController extends Controller {
+class MarketUserController extends BaseController {
 
 	/**
 	 * {@inheritdoc}
@@ -25,6 +26,8 @@ class MarketUserController extends Controller {
 			'verbs' => [
 				'class' => VerbFilter::class,
 				'actions' => [
+					'accept' => ['POST'],
+					'reject' => ['POST'],
 					'delete' => ['POST'],
 				],
 			],
@@ -46,6 +49,35 @@ class MarketUserController extends Controller {
 		]);
 	}
 
+	public function actionAccept(int $market_id, int $user_id) {
+		$model = $this->findModel($market_id, $user_id);
+		if ($model->isAccepted()) {
+			throw new NotFoundHttpException('Model is already accepted.');
+		}
+		if (!$model->market->isCreatorOrOwnerLead(Yii::$app->user->getId())) {
+			throw new MethodNotAllowedHttpException('Only Lead Owner or Market Creator can Accepted.');
+		}
+		$model->accept();
+		Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead',
+			'Success Reserved Lead Market to: {reserved_at}', [
+				'reserved_at' => Yii::$app->formatter->asDate($model->reserved_at),
+			])
+		);
+		return $this->redirect(['view', 'market_id' => $market_id, 'user_id' => $user_id]);
+	}
+
+	public function actionReject(int $market_id, int $user_id) {
+		$model = $this->findModel($market_id, $user_id);
+		if (!$model->isToConfirm()) {
+			throw new NotFoundHttpException('Model is not to Confirm');
+		}
+		if (!$model->market->isCreatorOrOwnerLead(Yii::$app->user->getId())) {
+			throw new MethodNotAllowedHttpException('Only Lead Owner or Market Creator can Rejected.');
+		}
+		$model->reject();
+		return $this->redirect(['view', 'market_id' => $market_id, 'user_id' => $user_id]);
+	}
+
 	/**
 	 * Displays a single LeadMarketUser model.
 	 *
@@ -53,9 +85,9 @@ class MarketUserController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView(int $id): string {
+	public function actionView(int $market_id, int $user_id): string {
 		return $this->render('view', [
-			'model' => $this->findModel($id),
+			'model' => $this->findModel($market_id, $user_id),
 		]);
 	}
 
@@ -88,35 +120,21 @@ class MarketUserController extends Controller {
 	}
 
 	/**
-	 * Updates an existing LeadMarketUser model.
-	 * If update is successful, the browser will be redirected to the 'view' page.
-	 *
-	 * @param integer $id
-	 * @return mixed
-	 * @throws NotFoundHttpException if the model cannot be found
-	 */
-	public function actionUpdate(int $id) {
-		$model = $this->findModel($id);
-
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
-		}
-
-		return $this->render('update', [
-			'model' => $model,
-		]);
-	}
-
-	/**
 	 * Deletes an existing LeadMarketUser model.
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
 	 *
-	 * @param integer $id
-	 * @return mixed
+	 * @param int $market_id
+	 * @param int $user_id
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionDelete(int $id) {
-		$this->findModel($id)->delete();
+	public function actionDelete(int $market_id, int $user_id) {
+		$model = $this->findModel($market_id, $user_id);
+		if ($model->isToConfirm() && Yii::$app->user->getId() === $user_id) {
+			$model->delete();
+		} else {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('lead', 'Allow Delete only self Model who is to Confirm.'));
+		}
 
 		return $this->redirect(['index']);
 	}
@@ -125,12 +143,15 @@ class MarketUserController extends Controller {
 	 * Finds the LeadMarketUser model based on its primary key value.
 	 * If the model is not found, a 404 HTTP exception will be thrown.
 	 *
-	 * @param integer $id
+	 * @param integer $market_id
 	 * @return LeadMarketUser the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel(int $id): LeadMarketUser {
-		if (($model = LeadMarketUser::findOne($id)) !== null) {
+	protected function findModel(int $market_id, int $user_id): LeadMarketUser {
+		if (($model = LeadMarketUser::findOne([
+				'market_id' => $market_id,
+				'user_id' => $user_id,
+			])) !== null) {
 			return $model;
 		}
 

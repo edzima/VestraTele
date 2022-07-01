@@ -309,4 +309,5 @@ return [
 	'Available Again' => 'Ponownie Dostępny',
 	'Done' => 'Zrealizowano',
 	'Archived' => 'Archiwum',
+	'Success Reserved Lead Market to: {reserved_at}' => 'Zarezerwowano dostęp do Giełdy do: {reserved_at}.',
 ];

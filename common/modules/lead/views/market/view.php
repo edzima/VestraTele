@@ -1,7 +1,11 @@
 <?php
 
+use common\helpers\Html;
 use common\modules\lead\models\LeadMarket;
-use yii\helpers\Html;
+use common\modules\lead\models\LeadMarketUser;
+use common\widgets\grid\ActionColumn;
+use common\widgets\GridView;
+use yii\data\ActiveDataProvider;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
@@ -41,12 +45,14 @@ YiiAsset::register($this);
 					'statusName',
 					'created_at:datetime',
 					'updated_at:datetime',
+					'creator.fullName',
+					'leadOwner.fullName',
 				],
 			]) ?>
 		</div>
 
 
-		<div class="col-md-3">
+		<div class="col-md-2">
 			<?= DetailView::widget([
 				'model' => $model->getMarketOptions(),
 				'attributes' => [
@@ -55,6 +61,41 @@ YiiAsset::register($this);
 					'visibleCommune:boolean',
 					'visibleCity:boolean',
 					'visibleAddressDetails:boolean',
+				],
+			]) ?>
+		</div>
+
+		<div class="col-md-5">
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getLeadMarketUsers(),
+				]),
+				'columns' => [
+					'user.fullName',
+					'statusName',
+					'days_reservation',
+					'details',
+					'created_at:datetime',
+					'updated_at:datetime',
+					'reserved_at:datetime',
+					[
+						'class' => ActionColumn::class,
+						'controller' => 'market-user',
+						'template' => '{access-request} {delete}',
+						'visibleButtons' => [
+							'access-request' => static function (LeadMarketUser $model) {
+								return $model->user_id === Yii::$app->user->getId();
+							},
+							'delete' => static function (LeadMarketUser $model) {
+								return $model->isToConfirm() && $model->user_id === Yii::$app->user->getId();
+							},
+						],
+						'buttons' => [
+							'access-request' => static function (string $url): string {
+								return Html::a(Html::icon('check'), $url);
+							},
+						],
+					],
 				],
 			]) ?>
 		</div>
