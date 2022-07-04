@@ -82,7 +82,8 @@ class LeadMarketAccessRequest extends Model {
 			)
 			->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
 			->setTo($emails)
-			->setSubject(Yii::t('lead', 'Access request for Lead: {lead} Market: {status}', [
+			->setSubject(Yii::t('lead', '{user} Access request for Lead: {lead} Market: {status}', [
+				'user' => $this->getModel()->user->getFullName(),
 				'lead' => $this->market->lead->getName(),
 				'status' => $this->market->getStatusName(),
 			]))

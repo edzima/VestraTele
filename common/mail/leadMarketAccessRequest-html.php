@@ -8,6 +8,8 @@ use common\modules\lead\models\LeadMarketUser;
 
 $lead = $model->market->lead;
 $leadLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/lead/view', 'id' => $lead->getId()]);
+$acceptLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/market-user/accept', 'market_id' => $model->market_id, 'user_id' => $model->user_id]);
+$rejectLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/market-user/reject', 'market_id' => $model->market_id, 'user_id' => $model->user_id]);
 
 ?>
 <div class="lead-market-access-request-email">
@@ -17,8 +19,12 @@ $leadLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['l
 		]) ?>
 	</p>
 
+	<p><?= Html::a(Yii::t('lead', 'Accept'), $acceptLink) ?></p>
+	<p><?= Html::a(Yii::t('lead', 'Reject'), $rejectLink) ?></p>
+
 	<p><?= Yii::t('lead', 'Status') ?>: <?= $model->market->getStatusName() ?></p>
 
 	<p><?= Html::a(Html::encode($leadLink), $leadLink) ?></p>
+
 
 </div>

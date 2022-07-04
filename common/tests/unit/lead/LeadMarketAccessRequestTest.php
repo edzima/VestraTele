@@ -58,7 +58,16 @@ class LeadMarketAccessRequestTest extends Unit {
 
 		$this->tester->seeEmailIsSent();
 		$email = $this->tester->grabLastSentEmail();
-		/** @todo check email content after create them */
+
+		$this->tester->assertMessageBodyContainsString(
+			'Accept',
+			$email
+		);
+
+		$this->tester->assertMessageBodyContainsString(
+			'Reject',
+			$email
+		);
 	}
 
 	public function testUpdate(): void {
