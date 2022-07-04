@@ -310,4 +310,5 @@ return [
 	'Done' => 'Zrealizowano',
 	'Archived' => 'Archiwum',
 	'Success Reserved Lead Market to: {reserved_at}' => 'Zarezerwowano dostęp do Giełdy do: {reserved_at}.',
+	'Details cannot be blank when Days is other than: {defaultDays}.' => 'Szczegóły obowiązkowe gdy dni rezerwacji różne od: {defaultDays}.',
 ];

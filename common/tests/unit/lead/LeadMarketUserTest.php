@@ -2,10 +2,18 @@
 
 namespace common\tests\unit\lead;
 
+use common\fixtures\helpers\LeadFixtureHelper;
+use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
 use common\tests\unit\Unit;
 
 class LeadMarketUserTest extends Unit {
+
+	public function _fixtures(): array {
+		return array_merge(
+			LeadFixtureHelper::market()
+		);
+	}
 
 	public function testGenerateReservedAt(): void {
 		$model = new LeadMarketUser();
@@ -23,10 +31,12 @@ class LeadMarketUserTest extends Unit {
 
 	public function testAccepted(): void {
 		$model = new LeadMarketUser();
+		$model->market_id = 1;
 		$model->days_reservation = 2;
 		$model->accept();
 		$this->tester->assertSame(LeadMarketUser::STATUS_ACCEPTED, $model->status);
 		$this->tester->assertSame($this->generateReservedAt(2), $model->reserved_at);
+		$this->tester->assertSame(LeadMarket::STATUS_BOOKED, $model->market->status);
 	}
 
 	public function testRejected(): void {

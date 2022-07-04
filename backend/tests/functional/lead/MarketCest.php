@@ -34,6 +34,15 @@ class MarketCest {
 		$I->seeResponseCodeIsSuccessful();
 	}
 
+	public function checkUsersLink(LeadManager $I): void {
+		$I->assignPermission(static::PERMISSION);
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeLink('Market Users');
+		$I->click('Market Users');
+		$I->seeInCurrentUrl(MarketUserCest::ROUTE_INDEX);
+	}
+
 	public function actionCreate(LeadManager $I): void {
 		$I->haveFixtures(
 			array_merge(
@@ -41,6 +50,7 @@ class MarketCest {
 				LeadFixtureHelper::market(),
 				LeadFixtureHelper::status(),
 				LeadFixtureHelper::reports(),
+				LeadFixtureHelper::source(),
 			)
 		);
 		$I->assignPermission(static::PERMISSION);

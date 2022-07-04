@@ -120,6 +120,7 @@ class LeadMarketUser extends ActiveRecord {
 				'reserved_at',
 			]);
 		}
+		$this->market->bookIt($update);
 	}
 
 	public function reject(bool $update = true): void {

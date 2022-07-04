@@ -189,7 +189,7 @@ return [
 					],
 					[
 						'allow' => true,
-						'controllers' => ['lead/market'],
+						'controllers' => ['lead/market', 'lead/market-user'],
 						'permissions' => [Worker::PERMISSION_LEAD_MARKET],
 					],
 					[
@@ -201,6 +201,8 @@ return [
 							'lead/duplicate',
 							'lead/import',
 							'lead/market',
+							'lead/market-user',
+
 						],
 					],
 					[

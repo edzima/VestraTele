@@ -32,11 +32,25 @@ class LeadMarket extends ActiveRecord {
 
 	public const STATUS_ARCHIVED = -1;
 	public const STATUS_NEW = 1;
-	public const STATUS_RESERVED = 2;
+	public const STATUS_BOOKED = 2;
 	public const STATUS_AVAILABLE_AGAIN = 5;
 	public const STATUS_DONE = 10;
 
 	private ?LeadMarketOptions $marketOptions = null;
+
+	public function bookIt(bool $update = true): void {
+		$this->status = static::STATUS_BOOKED;
+		if ($update) {
+			$this->updateAttributes(['status']);
+		}
+	}
+
+	public function bookOff(bool $update = true): void {
+		$this->status = static::STATUS_AVAILABLE_AGAIN;
+		if ($update) {
+			$this->updateAttributes(['status']);
+		}
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -48,7 +62,7 @@ class LeadMarket extends ActiveRecord {
 	public static function getStatusesNames(): array {
 		return [
 			static::STATUS_NEW => Yii::t('lead', 'New'),
-			static::STATUS_RESERVED => Yii::t('lead', 'Reserved'),
+			static::STATUS_BOOKED => Yii::t('lead', 'Booked'),
 			static::STATUS_AVAILABLE_AGAIN => Yii::t('lead', 'Available Again'),
 			static::STATUS_DONE => Yii::t('lead', 'Done'),
 			static::STATUS_ARCHIVED => Yii::t('lead', 'Archived'),
