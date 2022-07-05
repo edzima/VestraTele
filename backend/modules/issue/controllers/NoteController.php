@@ -57,6 +57,7 @@ class NoteController extends Controller {
 	public function actionIndex(): string {
 		$searchModel = new IssueNoteSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		$dataProvider->pagination->pageSize = 50;
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,
