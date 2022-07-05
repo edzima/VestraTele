@@ -305,7 +305,7 @@ return [
 	'Visible Address Details' => 'Pokaż Ulice / Nr',
 	'Success Move {count} Leads to Market' => 'Przeniesiono {count} Leads na Giełdę',
 	'All Leads are already on Market' => 'Wszystkie Leads są już na Giełdzie',
-	'Reserved' => 'Zarezerwowany',
+	'Booked' => 'Zarezerwowany',
 	'Available Again' => 'Ponownie Dostępny',
 	'Done' => 'Zrealizowano',
 	'Archived' => 'Archiwum',
@@ -314,4 +314,6 @@ return [
 	'Accept' => 'Akceptuj',
 	'Reject' => 'Odrzuć',
 	'User: {userName} send request to Access Lead Market: {lead}' => '{userName} wysłał prośbe o Leada z Giełdy: {lead}',
+	'Market Status' => 'Status Giełdy',
+	'Move Lead to Market' => 'Przeniesiono Leada na Giełdę',
 ];

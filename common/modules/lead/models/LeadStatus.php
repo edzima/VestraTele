@@ -17,8 +17,10 @@ use yii\helpers\ArrayHelper;
  * @property int|null $short_report
  * @property int|null $show_report_in_lead_index
  * @property int|null $not_for_dialer
+ * @property int|null $market_status
  *
- * @property Lead[] $leads
+ * @property-read Lead[] $leads
+ * @property-read string $marketStatusName
  */
 class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 
@@ -26,6 +28,14 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 
 	public function __toString(): string {
 		return $this->name;
+	}
+
+	public function getMarketStatusName(): string {
+		return static::getMarketStatusesNames()[$this->market_status];
+	}
+
+	public static function getMarketStatusesNames(): array {
+		return LeadMarket::getStatusesNames();
 	}
 
 	/**
@@ -41,9 +51,10 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 	public function rules(): array {
 		return [
 			[['name'], 'required'],
-			[['sort_index'], 'integer'],
+			[['sort_index', 'market_status'], 'integer'],
 			[['short_report', 'show_report_in_lead_index', 'not_for_dialer'], 'boolean'],
 			[['name', 'description'], 'string', 'max' => 255],
+			[['market_status'], 'in', 'range' => array_keys(static::getMarketStatusesNames())],
 		];
 	}
 
@@ -59,6 +70,8 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			'short_report' => Yii::t('lead', 'Short Report'),
 			'show_report_in_lead_index' => Yii::t('lead', 'Show Report In Lead Index'),
 			'not_for_dialer' => Yii::t('lead', 'Not for Dialer'),
+			'market_status' => Yii::t('lead', 'Market Status'),
+			'marketStatusName' => Yii::t('lead', 'Market Status'),
 		];
 	}
 
