@@ -16,7 +16,7 @@ class LeadStatusSearch extends LeadStatus {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'sort_index'], 'integer'],
+			[['id', 'sort_index', 'market_status'], 'integer'],
 			[['short_report', 'show_report_in_lead_index', 'not_for_dialer'], 'boolean'],
 			[['name', 'description'], 'safe'],
 		];
@@ -57,6 +57,7 @@ class LeadStatusSearch extends LeadStatus {
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
+			'market_status' => $this->market_status,
 			'sort_index' => $this->sort_index,
 			'short_report' => $this->short_report,
 			'not_for_dialer' => $this->not_for_dialer,

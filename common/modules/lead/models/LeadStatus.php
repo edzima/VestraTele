@@ -30,7 +30,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 		return $this->name;
 	}
 
-	public function getMarketStatusName(): string {
+	public function getMarketStatusName(): ?string {
 		return static::getMarketStatusesNames()[$this->market_status];
 	}
 

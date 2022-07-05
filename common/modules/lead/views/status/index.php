@@ -37,6 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'sort_index',
 			[
 				'attribute' => 'market_status',
+				'value' => 'marketStatusName',
 				'filter' => LeadStatusSearch::getMarketStatusesNames(),
 			],
 
