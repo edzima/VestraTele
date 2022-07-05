@@ -18,6 +18,7 @@ use yii\widgets\ActiveForm;
 	]); ?>
 
 	<div class="row">
+
 		<?= $form->field($model, 'dateFrom', ['options' => ['class' => 'col-md-2']])
 			->widget(DateWidget::class)
 		?>
@@ -25,6 +26,11 @@ use yii\widgets\ActiveForm;
 		<?= $form->field($model, 'dateTo', ['options' => ['class' => 'col-md-2']])
 			->widget(DateWidget::class)
 		?>
+
+		<?= $form->field($model, 'issueGrouped', ['options' => ['class' => 'col-md-2']])
+			->checkbox()
+		?>
+
 	</div>
 
 	<div class="form-group">

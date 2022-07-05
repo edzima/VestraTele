@@ -16,6 +16,7 @@ class IssueNoteSearch extends IssueNote {
 
 	public $dateFrom;
 	public $dateTo;
+	public $issueGrouped;
 
 	public static function getUsersNames(): array {
 		return User::getSelectList(
@@ -33,7 +34,7 @@ class IssueNoteSearch extends IssueNote {
 	public function rules(): array {
 		return [
 			[['id', 'issue_id', 'user_id'], 'integer'],
-			[['is_pinned', 'is_template'], 'boolean'],
+			[['is_pinned', 'is_template', 'issueGrouped'], 'boolean'],
 			[['title', 'description', 'publish_at', 'created_at', 'updated_at', 'type', 'dateFrom', 'dateTo'], 'safe'],
 		];
 	}
@@ -42,6 +43,7 @@ class IssueNoteSearch extends IssueNote {
 		return array_merge(parent::attributeLabels(), [
 				'dateFrom' => Yii::t('common', 'Date from'),
 				'dateTo' => Yii::t('common', 'Date to'),
+				'issueGrouped' => Yii::t('common', 'Issue Grouped'),
 			]
 		);
 	}
@@ -87,6 +89,10 @@ class IssueNoteSearch extends IssueNote {
 		}
 
 		$this->applyDateFilter($query);
+
+		if ($this->issueGrouped) {
+			$query->groupBy(IssueNote::tableName() . '.issue_id');
+		}
 
 		// grid filtering conditions
 		$query->andFilterWhere([
