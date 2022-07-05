@@ -56,7 +56,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			//'updated_at',
 			//'options:ntext',
-
+			[
+				'attribute' => 'usersCount',
+				'enableSorting' => true,
+			],
 			[
 				'class' => ActionColumn::class,
 				'template' => '{access-request} {view} {update} {delete}',
@@ -66,7 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
 							return null;
 						}
 
-						return Html::a(Html::icon('check'), ['market-user/access-request', 'market_id' => $data->id]);
+						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', ['market-user/access-request', 'market_id' => $data->id]);
 					},
 				],
 			],

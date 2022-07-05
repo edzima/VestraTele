@@ -30,6 +30,8 @@ use yii\helpers\Json;
  */
 class LeadMarket extends ActiveRecord {
 
+	public ?int $usersCount = null;
+
 	public const STATUS_ARCHIVED = -1;
 	public const STATUS_NEW = 1;
 	public const STATUS_BOOKED = 2;
@@ -108,6 +110,7 @@ class LeadMarket extends ActiveRecord {
 			'updated_at' => Yii::t('lead', 'Updated At'),
 			'options' => Yii::t('lead', 'Options'),
 			'creator' => Yii::t('lead', 'Creator'),
+			'usersCount' => Yii::t('lead', 'Users Count'),
 		];
 	}
 

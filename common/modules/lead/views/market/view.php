@@ -81,19 +81,32 @@ YiiAsset::register($this);
 					[
 						'class' => ActionColumn::class,
 						'controller' => 'market-user',
-						'template' => '{access-request} {delete}',
+						'template' => '{access-request} {accept} {reject} {delete}',
 						'visibleButtons' => [
+							'accept' => static function () use ($model): bool {
+								return $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
+							},
 							'access-request' => static function (LeadMarketUser $model) {
 								return $model->user_id === Yii::$app->user->getId();
 							},
 							'delete' => static function (LeadMarketUser $model) {
 								return $model->isToConfirm() && $model->user_id === Yii::$app->user->getId();
 							},
+							'reject' => static function () use ($model): bool {
+								return $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
+							},
 						],
 						'buttons' => [
-							'access-request' => static function (string $url): string {
+							'accept' => static function (string $url): string {
 								return Html::a(Html::icon('check'), $url);
 							},
+							'access-request' => static function (string $url): string {
+								return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', $url);
+							},
+							'reject' => static function (string $url): string {
+								return Html::a(Html::icon('remove'), $url);
+							},
+
 						],
 					],
 				],

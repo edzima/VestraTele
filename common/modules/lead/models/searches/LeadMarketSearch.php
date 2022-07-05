@@ -4,6 +4,7 @@ namespace common\modules\lead\models\searches;
 
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\LeadMarket;
+use common\modules\lead\models\LeadMarketUser;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -19,7 +20,7 @@ class LeadMarketSearch extends LeadMarket {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'lead_id', 'status', 'creator_id'], 'integer'],
+			[['id', 'lead_id', 'status', 'creator_id', 'usersCount'], 'integer'],
 			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details'], 'safe'],
 		];
 	}
@@ -41,6 +42,12 @@ class LeadMarketSearch extends LeadMarket {
 	 */
 	public function search($params) {
 		$query = LeadMarket::find();
+		$query->select([
+			LeadMarket::tableName() . '.*',
+			'COUNT(' . LeadMarketUser::tableName() . '.market_id' . ') as usersCount',
+		]);
+		$query->groupBy(LeadMarket::tableName() . '.id');
+		$query->joinWith('leadMarketUsers');
 
 		// add conditions that should always apply here
 
