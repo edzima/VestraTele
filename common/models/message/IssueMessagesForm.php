@@ -134,6 +134,12 @@ class IssueMessagesForm extends MessageModel {
 		return $this->createCustomerSms($template);
 	}
 
+	public function hasSmsCustomerTemplate(bool $withIssueType = true): bool {
+		return $withIssueType
+			? $this->getTemplate(static::TYPE_SMS, $this->getCustomerTemplateKey()) !== null
+			: parent::getTemplate(static::TYPE_SMS, $this->getCustomerTemplateKey()) !== null;
+	}
+
 	protected function parseTemplate(MessageTemplate $template): void {
 		$this->parseAgent($template);
 		$this->parseCustomer($template);
