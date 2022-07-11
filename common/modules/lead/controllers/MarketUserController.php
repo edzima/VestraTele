@@ -39,6 +39,10 @@ class MarketUserController extends BaseController {
 	 */
 	public function actionIndex(): string {
 		$searchModel = new LeadMarketUserSearch();
+		if ($this->module->onlyUser) {
+			$searchModel->scenario = LeadMarketUserSearch::SCENARIO_USER;
+			$searchModel->user_id = Yii::$app->user->getId();
+		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [

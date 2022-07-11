@@ -5,6 +5,8 @@ namespace common\modules\lead\models\searches;
 use common\models\AddressSearch;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\LeadMarket;
+use common\modules\lead\models\LeadMarketUser;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -16,6 +18,10 @@ use yii\db\Expression;
 class LeadMarketSearch extends LeadMarket {
 
 	public $visibleArea;
+	public $userId;
+
+	public bool $withoutSelfAssign = true;
+
 	public ?AddressSearch $addressSearch = null;
 
 	public function __construct($config = []) {
@@ -34,7 +40,8 @@ class LeadMarketSearch extends LeadMarket {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'lead_id', 'status', 'creator_id', 'usersCount', 'visibleArea'], 'integer'],
+			[['!userId', 'id', 'lead_id', 'status', 'creator_id', 'usersCount', 'visibleArea'], 'integer'],
+			[['withoutSelfAssign'], 'boolean'],
 			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details'], 'safe'],
 		];
 	}
@@ -45,6 +52,12 @@ class LeadMarketSearch extends LeadMarket {
 	public function scenarios(): array {
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
+	}
+
+	public function attributeLabels(): array {
+		return parent::attributeLabels() + [
+				'withoutSelfAssign' => Yii::t('lead', 'Without Self Assign'),
+			];
 	}
 
 	/**
@@ -69,12 +82,13 @@ class LeadMarketSearch extends LeadMarket {
 
 		if (!$this->validate()) {
 			// uncomment the following line if you do not want to return any records when validation fails
-			// $query->where('0=1');
+			$query->where('0=1');
 			return $dataProvider;
 		}
 
 		$this->applyAddressFilter($query);
 		$this->applyVisibleAreaFilter($query);
+		$this->applyWithoutSelfAssign($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -133,6 +147,19 @@ class LeadMarketSearch extends LeadMarket {
 			$query->andWhere(new Expression("JSON_CONTAINS(options,:type, '$.visibleArea')", [
 				'type' => (int) $this->visibleArea,
 			]));
+		}
+	}
+
+	private function applyWithoutSelfAssign(ActiveQuery $query): void {
+
+		if (!empty($this->userId) && $this->withoutSelfAssign) {
+			$query->andWhere([
+				'not', [
+					LeadMarket::tableName() . '.id' => LeadMarketUser::find()
+						->select('market_id')
+						->andWhere(['user_id' => $this->userId]),
+				],
+			]);
 		}
 	}
 }

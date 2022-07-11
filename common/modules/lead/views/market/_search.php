@@ -23,6 +23,10 @@ use yii\widgets\ActiveForm;
 		'model' => $model->addressSearch,
 	]) ?>
 
+	<div class="row">
+		<?= $form->field($model, 'withoutSelfAssign')->checkbox() ?>
+	</div>
+
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Search'), ['class' => 'btn btn-primary']) ?>

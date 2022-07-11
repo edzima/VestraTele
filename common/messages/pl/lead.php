@@ -314,4 +314,7 @@ return [
 	'Market Status' => 'Status Giełdy',
 	'Move Lead to Market' => 'Przeniesiono Leada na Giełdę',
 	'Market Address Details' => 'Skąd',
+	'Users Count' => 'Zapytań',
+	'Market Users' => 'Prośby',
+	'Without Self Assign' => 'Bez własnych Zapytań',
 ];

@@ -12,7 +12,7 @@ use yii\data\ActiveDataProvider;
 $this->title = Yii::t('lead', 'Lead Market Users');
 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Market'), 'url' => ['market/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Markets'), 'url' => ['market/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="lead-market-user-index">
@@ -29,11 +29,15 @@ $this->params['breadcrumbs'][] = $this->title;
 		'filterModel' => $searchModel,
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
-
-			'id',
 			'market_id',
-			'status',
-			'created_at',
+			[
+				'attribute' => 'status',
+				'filter' => LeadMarketUserSearch::getStatusesNames(),
+				'value' => 'statusName',
+			],
+			'days_reservation',
+			'details:ntext',
+			'created_at:datetime',
 			//'updated_at',
 
 			['class' => 'yii\grid\ActionColumn'],

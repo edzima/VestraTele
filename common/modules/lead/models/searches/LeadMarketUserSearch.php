@@ -11,12 +11,16 @@ use yii\data\ActiveDataProvider;
  */
 class LeadMarketUserSearch extends LeadMarketUser {
 
+	public const SCENARIO_USER = 'user';
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
+			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			[['market_id', 'days_reservation', 'status', 'user_id'], 'integer'],
+			[['details'], 'string'],
 			[['created_at', 'updated_at', 'reserved_at'], 'safe'],
 		];
 	}
@@ -49,7 +53,7 @@ class LeadMarketUserSearch extends LeadMarketUser {
 
 		if (!$this->validate()) {
 			// uncomment the following line if you do not want to return any records when validation fails
-			// $query->where('0=1');
+			$query->where('0=1');
 			return $dataProvider;
 		}
 

@@ -9,7 +9,6 @@ use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\searches\LeadMarketSearch;
 use Yii;
 use yii\filters\VerbFilter;
-use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -33,6 +32,7 @@ class MarketController extends BaseController {
 
 	public function actionUser(): string {
 		$searchModel = new LeadMarketSearch();
+		$searchModel->userId = Yii::$app->user->getId();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		$dataProvider->setModels($searchModel->filterAddressOptions($dataProvider->getModels()));
 
@@ -47,9 +47,9 @@ class MarketController extends BaseController {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionIndex() {
 		if ($this->module->onlyUser) {
-			throw new MethodNotAllowedHttpException();
+			return $this->redirect(['user']);
 		}
 		$searchModel = new LeadMarketSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
