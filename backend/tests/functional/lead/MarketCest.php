@@ -60,18 +60,11 @@ class MarketCest {
 
 		$I->submitForm('#lead-market-form', [
 			'LeadMarketForm[details]' => 'Test Details Create CEST',
-			'LeadMarketOptions[visibleRegion]' => true,
-			'LeadMarketOptions[visibleDistrict]' => true,
-			'LeadMarketOptions[visibleCommune]' => false,
 		]);
 
 		$I->seeRecord(LeadMarket::class, [
 			'details' => 'Test Details Create CEST',
 			'creator_id' => $I->getUser()->getId(),
-			'options' => [
-				'visibleRegion' => true,
-				'visibleCommune' => false,
-			],
 		]);
 
 		$I->seeRecord(LeadReport::class, [

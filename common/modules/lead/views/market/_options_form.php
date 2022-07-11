@@ -12,13 +12,7 @@ use yii\widgets\ActiveForm;
 
 <div class="options-form-fields-wrapper">
 
-	<?= $form->field($model, 'visibleRegion')->checkbox() ?>
-
-	<?= $form->field($model, 'visibleDistrict')->checkbox() ?>
-
-	<?= $form->field($model, 'visibleCommune')->checkbox() ?>
-
-	<?= $form->field($model, 'visibleCity')->checkbox() ?>
+	<?= $form->field($model, 'visibleArea')->dropDownList(LeadMarketOptions::visibleAreaNames()) ?>
 
 	<?= $form->field($model, 'visibleAddressDetails')->checkbox() ?>
 

@@ -61,7 +61,7 @@ class LeadMarketFormTest extends Unit {
 			'lead_id' => 2,
 			'details' => 'New Market Test Lead',
 			'options' => new LeadMarketOptions([
-				'visibleRegion' => true,
+				'visibleArea' => LeadMarketOptions::VISIBLE_ADDRESS_REGION,
 			]),
 		]);
 
@@ -75,7 +75,7 @@ class LeadMarketFormTest extends Unit {
 		$this->tester->assertSame(1, $market->creator_id);
 		$this->tester->assertSame(2, $market->lead_id);
 		$this->tester->assertSame(LeadMarket::STATUS_NEW, $market->status);
-		$this->tester->assertTrue($market->getMarketOptions()->visibleRegion);
+		$this->tester->assertSame(LeadMarketOptions::VISIBLE_ADDRESS_REGION, $market->getMarketOptions()->visibleArea);
 	}
 
 	public function testReportWithoutSave(): void {

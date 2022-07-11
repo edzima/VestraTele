@@ -56,10 +56,7 @@ YiiAsset::register($this);
 			<?= DetailView::widget([
 				'model' => $model->getMarketOptions(),
 				'attributes' => [
-					'visibleRegion:boolean',
-					'visibleDistrict:boolean',
-					'visibleCommune:boolean',
-					'visibleCity:boolean',
+					'visibleAreaName',
 					'visibleAddressDetails:boolean',
 				],
 			]) ?>

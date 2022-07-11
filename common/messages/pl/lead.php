@@ -298,10 +298,7 @@ return [
 	'Move to Market ({count})' => '-> Giełde ({count})',
 	'Move Leads to Market ({count})' => 'Dodaj {count} Leads na Giełdę',
 	'Update Lead Market: {name}' => 'Edytuj Giełdę: {name}',
-	'Visible Region' => 'Pokaż Województwo',
-	'Visible District' => 'Pokaż Powiat',
-	'Visible Commune' => 'Pokaż Gminę',
-	'Visible City' => 'Pokaż Miejscowość',
+	'Visible Area' => 'Pokaż Obszar',
 	'Visible Address Details' => 'Pokaż Ulice / Nr',
 	'Success Move {count} Leads to Market' => 'Przeniesiono {count} Leads na Giełdę',
 	'All Leads are already on Market' => 'Wszystkie Leads są już na Giełdzie',
@@ -316,4 +313,5 @@ return [
 	'User: {userName} send request to Access Lead Market: {lead}' => '{userName} wysłał prośbe o Leada z Giełdy: {lead}',
 	'Market Status' => 'Status Giełdy',
 	'Move Lead to Market' => 'Przeniesiono Leada na Giełdę',
+	'Market Address Details' => 'Skąd',
 ];

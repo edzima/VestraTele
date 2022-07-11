@@ -30,7 +30,7 @@ use yii\helpers\Json;
  */
 class LeadMarket extends ActiveRecord {
 
-	public ?int $usersCount = null;
+	public $usersCount;
 
 	public const STATUS_ARCHIVED = -1;
 	public const STATUS_NEW = 1;
@@ -111,7 +111,39 @@ class LeadMarket extends ActiveRecord {
 			'options' => Yii::t('lead', 'Options'),
 			'creator' => Yii::t('lead', 'Creator'),
 			'usersCount' => Yii::t('lead', 'Users Count'),
+			'addressDetails' => Yii::t('lead', 'Market Address Details'),
 		];
+	}
+
+	public function getAddressDetails(): ?string {
+		$options = $this->getMarketOptions();
+		if (!$options->hasAddressVisible() || $this->lead->getCustomerAddress() === null) {
+			return null;
+		}
+		$address = $this->lead->getCustomerAddress();
+		$details = [];
+		switch ($options->visibleArea) {
+			case LeadMarketOptions::VISIBLE_ADDRESS_REGION:
+				$details[] = $address->city->region->name;
+				break;
+			case LeadMarketOptions::VISIBLE_ADDRESS_REGION_AND_DISTRICT:
+				$details[] = $address->city->terc->region->name;
+				$details[] = $address->city->terc->district->name;
+				break;
+			case LeadMarketOptions::VISIBLE_ADDRESS_REGION_AND_DISTRICT_WITH_COMMUNE:
+				$details[] = $address->city->terc->region->name;
+				$details[] = $address->city->terc->district->name;
+				$details[] = $address->city->terc->commune->name;
+				break;
+			case LeadMarketOptions::VISIBLE_ADDRESS_CITY:
+				$details[] = $address->city->getNameWithRegionAndDistrict();
+				break;
+		}
+
+		if ($options->visibleAddressDetails) {
+			$details[] = $address->info;
+		}
+		return implode(', ', $details);
 	}
 
 	public function getLead(): LeadQuery {

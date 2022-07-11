@@ -1,6 +1,7 @@
 <?php
 
 use common\modules\lead\models\searches\LeadMarketSearch;
+use common\widgets\address\AddressSearchWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -12,25 +13,20 @@ use yii\widgets\ActiveForm;
 <div class="lead-market-search">
 
 	<?php $form = ActiveForm::begin([
-		'action' => ['index'],
+		//'action' => '',,
 		'method' => 'get',
 	]); ?>
 
-	<?= $form->field($model, 'id') ?>
 
-	<?= $form->field($model, 'lead_id') ?>
+	<?= AddressSearchWidget::widget([
+		'form' => $form,
+		'model' => $model->addressSearch,
+	]) ?>
 
-	<?= $form->field($model, 'status') ?>
-
-	<?= $form->field($model, 'created_at') ?>
-
-	<?= $form->field($model, 'updated_at') ?>
-
-	<?php // echo $form->field($model, 'options') ?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Search'), ['class' => 'btn btn-primary']) ?>
-		<?= Html::resetButton(Yii::t('lead', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>
+		<?= Html::a(Yii::t('backend', 'Reset'), 'user', ['class' => 'btn btn-default']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

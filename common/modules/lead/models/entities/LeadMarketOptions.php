@@ -8,18 +8,42 @@ use yii\helpers\Json;
 
 class LeadMarketOptions extends Model {
 
-	public bool $visibleRegion = true;
-	public bool $visibleDistrict = true;
-	public bool $visibleCommune = false;
-	public bool $visibleCity = false;
+	public const VISIBLE_ADDRESS_REGION = 1;
+	public const VISIBLE_ADDRESS_REGION_AND_DISTRICT = 2;
+	public const VISIBLE_ADDRESS_REGION_AND_DISTRICT_WITH_COMMUNE = 3;
+	public const VISIBLE_ADDRESS_CITY = 4;
+
 	public bool $visibleAddressDetails = false;
+
+	public int $visibleArea = self::VISIBLE_ADDRESS_REGION_AND_DISTRICT;
+
+	public function getVisibleAreaName(): string {
+		return static::visibleAreaNames()[$this->visibleArea];
+	}
+
+	public static function visibleAreaNames(): array {
+		return [
+			static::VISIBLE_ADDRESS_REGION => Yii::t('address', 'Region'),
+			static::VISIBLE_ADDRESS_REGION_AND_DISTRICT => Yii::t('address', 'Region') . ' & ' . Yii::t('address', 'District'),
+			static::VISIBLE_ADDRESS_REGION_AND_DISTRICT_WITH_COMMUNE => Yii::t('address', 'Region')
+				. ' & ' . Yii::t('address', 'District')
+				. ' & ' . Yii::t('address', 'Commune'),
+			static::VISIBLE_ADDRESS_CITY => Yii::t('address', 'City'),
+		];
+	}
+
+	public function hasAddressVisible(): bool {
+		return $this->visibleArea > 0
+			|| $this->visibleAddressDetails;
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function rules(): array {
 		return [
-			[['visibleRegion', 'visibleDistrict', 'visibleCommune', 'visibleCity', 'visibleAddressDetails'], 'boolean'],
+			[['visibleAddressDetails'], 'boolean'],
+			['visibleArea', 'in', 'range' => array_keys(static::visibleAreaNames())],
 		];
 	}
 
@@ -28,22 +52,10 @@ class LeadMarketOptions extends Model {
 	 */
 	public function attributeLabels(): array {
 		return [
-			'visibleRegion' => Yii::t('lead', 'Visible Region'),
-			'visibleDistrict' => Yii::t('lead', 'Visible District'),
-			'visibleCommune' => Yii::t('lead', 'Visible Commune'),
-			'visibleCity' => Yii::t('lead', 'Visible City'),
+			'visibleArea' => Yii::t('lead', 'Visible Area'),
+			'visibleAreaName' => Yii::t('lead', 'Visible Area'),
 			'visibleAddressDetails' => Yii::t('lead', 'Visible Address Details'),
 		];
-	}
-
-	public function booleanTrueAttributeLabels(): array {
-		$attributes = [];
-		foreach ($this->getAttributes() as $attribute => $value) {
-			if (is_bool($value) && $value) {
-				$attributes[] = $this->getAttributeLabel($attribute);
-			}
-		}
-		return $attributes;
 	}
 
 	public function toJson(): string {

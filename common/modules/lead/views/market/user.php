@@ -15,7 +15,7 @@ $this->title = Yii::t('lead', 'Lead Markets');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="lead-market-index">
+<div class="lead-market-user">
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		]) ?>
 	</p>
 
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]); ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
@@ -35,21 +35,17 @@ $this->params['breadcrumbs'][] = $this->title;
 			['class' => 'yii\grid\SerialColumn'],
 
 			//'id',
-			'lead_id',
+			[
+				'attribute' => 'addressDetails',
+			],
 			[
 				'attribute' => 'status',
 				'value' => 'statusName',
 				'filter' => LeadMarketSearch::getStatusesNames(),
 			],
 			'details:ntext',
-
 			'created_at:datetime',
-			[
-				'attribute' => 'visibleArea',
-				'value' => 'marketOptions.visibleAreaName',
-				'label' => Yii::t('lead', 'Visible Area'),
-				'filter' => LeadMarketSearch::getVisibleAreaNames(),
-			],
+
 			//'updated_at',
 			//'options:ntext',
 			[
