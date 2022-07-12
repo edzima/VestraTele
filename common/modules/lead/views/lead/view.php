@@ -15,6 +15,7 @@ use common\modules\reminder\widgets\ReminderGridWidget;
 use common\widgets\address\AddressDetailView;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
+use yii\data\DataProviderInterface;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -24,6 +25,8 @@ use yii\widgets\DetailView;
 /* @var $sameContacts LeadInterface[] */
 /* @var $withDelete bool */
 /* @var $onlyUser bool */
+/* @var $isOwner bool */
+/* @var $usersDataProvider null|DataProviderInterface */
 
 $this->title = $model->getName();
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['index']];
@@ -44,6 +47,15 @@ YiiAsset::register($this);
 		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->getId()], ['class' => 'btn btn-warning']) ?>
 
 		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary']) ?>
+
+
+		<?= (!$onlyUser || $isOwner)
+		&& Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)
+		&& empty($model->markets)
+			? Html::a(Yii::t('lead', '-> Market'), ['market/create', 'id' => $model->getId()], ['class' => 'btn btn-success'])
+			: ''
+		?>
+
 
 		<?= $model->getStatusId() !== LeadStatusInterface::STATUS_ARCHIVE
 			? Html::a(Yii::t('lead', 'Archive'), ['archive/self', 'id' => $model->getId()], [
@@ -149,14 +161,17 @@ YiiAsset::register($this);
 			]) ?>
 
 
-			<?= $model->getCustomerAddress() ? AddressDetailView::widget([
-				'model' => $model->getCustomerAddress(),
-			]) : '' ?>
+			<?= $model->getCustomerAddress()
+				? AddressDetailView::widget([
+					'model' => $model->getCustomerAddress(),
+				])
+				: ''
+			?>
 
-			<?= !$onlyUser || count($model->getUsers()) > 1
+			<?= $usersDataProvider !== null
 				? GridView::widget([
 					'caption' => Yii::t('lead', 'Users'),
-					'dataProvider' => new ActiveDataProvider(['query' => $model->getLeadUsers()->with('user.userProfile')]),
+					'dataProvider' => $usersDataProvider,
 					'showOnEmpty' => false,
 					'emptyText' => false,
 					'summary' => false,
@@ -169,6 +184,7 @@ YiiAsset::register($this);
 					],
 				])
 				: '' ?>
+
 
 			<div class="clearfix"></div>
 

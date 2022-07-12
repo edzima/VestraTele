@@ -12,9 +12,11 @@ use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadType;
+use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
+use yii\data\ArrayDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
 use yii2tech\csvgrid\CsvGrid;
@@ -145,6 +147,9 @@ class LeadController extends BaseController {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionView(int $id): string {
+		/**
+		 * @var Lead $model
+		 */
 		$model = $this->findLead($id);
 		$sameContactsCount = count($model->getSameContacts());
 
@@ -156,10 +161,30 @@ class LeadController extends BaseController {
 			);
 		}
 
+		$users = $model->leadUsers;
+
+		$isOwner = false;
+		foreach ($users as $leadUser) {
+			if ($leadUser->type === LeadUser::TYPE_OWNER && $leadUser->user_id === Yii::$app->user->getId()) {
+				$isOwner = true;
+				break;
+			}
+		}
+
+		$usersDataProvider = null;
+		if (!$this->module->onlyUser
+			|| ($isOwner && count($users) > 1)) {
+			$usersDataProvider = new ArrayDataProvider([
+				'allModels' => $users,
+			]);
+		}
+
 		return $this->render('view', [
 			'model' => $model,
 			'withDelete' => $this->module->allowDelete,
 			'onlyUser' => $this->module->onlyUser,
+			'isOwner' => $isOwner,
+			'usersDataProvider' => $usersDataProvider,
 		]);
 	}
 
