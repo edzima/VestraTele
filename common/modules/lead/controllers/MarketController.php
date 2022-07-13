@@ -9,6 +9,7 @@ use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\searches\LeadMarketSearch;
 use Yii;
 use yii\filters\VerbFilter;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -33,6 +34,9 @@ class MarketController extends BaseController {
 	public function actionUser(): string {
 		$searchModel = new LeadMarketSearch();
 		$searchModel->userId = Yii::$app->user->getId();
+		$searchModel->withoutArchive = true;
+		$searchModel->selfMarket = 0;
+		$searchModel->selfAssign = 0;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		$dataProvider->setModels($searchModel->filterAddressOptions($dataProvider->getModels()));
 
@@ -70,6 +74,7 @@ class MarketController extends BaseController {
 	public function actionView(int $id): string {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
+			'onlyUser' => $this->module->onlyUser,
 		]);
 	}
 
@@ -155,6 +160,10 @@ class MarketController extends BaseController {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
+		$market = $this->findModel($id);
+		if ($this->module->onlyUser && !$market->isCreatorOrOwnerLead(Yii::$app->user->getId())) {
+			throw new MethodNotAllowedHttpException('Only User or Market Creator can Edit Market.');
+		}
 		$model = new LeadMarketForm([
 			'model' => $this->findModel($id),
 		]);
@@ -177,7 +186,11 @@ class MarketController extends BaseController {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionDelete(int $id) {
-		$this->findModel($id)->delete();
+		$model = $this->findModel($id);
+		if ($this->module->onlyUser && !$model->isCreatorOrOwnerLead(Yii::$app->user->getId())) {
+			throw new MethodNotAllowedHttpException('Only User or Market Creator can Delete Market.');
+		}
+		$model->delete();
 
 		return $this->redirect(['index']);
 	}

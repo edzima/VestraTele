@@ -1,8 +1,8 @@
 <?php
 
+use common\helpers\Html;
 use common\modules\lead\models\searches\LeadMarketSearch;
 use common\widgets\address\AddressSearchWidget;
-use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
@@ -13,7 +13,6 @@ use yii\widgets\ActiveForm;
 <div class="lead-market-search">
 
 	<?php $form = ActiveForm::begin([
-		//'action' => '',,
 		'method' => 'get',
 	]); ?>
 
@@ -24,9 +23,24 @@ use yii\widgets\ActiveForm;
 	]) ?>
 
 	<div class="row">
-		<?= $form->field($model, 'withoutSelfAssign')->checkbox() ?>
-	</div>
+		<?= $form->field($model, 'selfAssign', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])->dropDownList(Html::booleanDropdownList(), ['prompt' => Yii::t('common', 'All')]) ?>
 
+		<?= $form->field($model, 'selfMarket', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])->dropDownList(Html::booleanDropdownList(), ['prompt' => Yii::t('common', 'All')]) ?>
+
+		<?= $form->field($model, 'withoutArchive', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])->checkbox() ?>
+	</div>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Search'), ['class' => 'btn btn-primary']) ?>

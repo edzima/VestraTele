@@ -20,9 +20,20 @@ class LeadMarketSearch extends LeadMarket {
 	public $visibleArea;
 	public $userId;
 
-	public bool $withoutSelfAssign = true;
+	public $selfAssign;
+	public $selfMarket;
+
+	public $withoutArchive;
 
 	public ?AddressSearch $addressSearch = null;
+
+	public function attributeLabels(): array {
+		return parent::attributeLabels() + [
+				'selfAssign' => Yii::t('lead', 'Self Assign'),
+				'selfMarket' => Yii::t('lead', 'Self Market'),
+				'withoutArchive' => Yii::t('lead', 'Without Archives'),
+			];
+	}
 
 	public function __construct($config = []) {
 		if (!isset($config['addressSearch'])) {
@@ -41,7 +52,7 @@ class LeadMarketSearch extends LeadMarket {
 	public function rules(): array {
 		return [
 			[['!userId', 'id', 'lead_id', 'status', 'creator_id', 'usersCount', 'visibleArea'], 'integer'],
-			[['withoutSelfAssign'], 'boolean'],
+			[['selfAssign', 'selfMarket'], 'boolean'],
 			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details'], 'safe'],
 		];
 	}
@@ -54,12 +65,6 @@ class LeadMarketSearch extends LeadMarket {
 		return Model::scenarios();
 	}
 
-	public function attributeLabels(): array {
-		return parent::attributeLabels() + [
-				'withoutSelfAssign' => Yii::t('lead', 'Without Self Assign'),
-			];
-	}
-
 	/**
 	 * Creates data provider instance with search query applied
 	 *
@@ -70,6 +75,7 @@ class LeadMarketSearch extends LeadMarket {
 	public function search(array $params = []) {
 		$query = LeadMarket::find();
 		$query->joinWith('leadMarketUsers');
+		$query->groupBy(LeadMarket::tableName() . '.id');
 
 		// add conditions that should always apply here
 
@@ -88,7 +94,9 @@ class LeadMarketSearch extends LeadMarket {
 
 		$this->applyAddressFilter($query);
 		$this->applyVisibleAreaFilter($query);
-		$this->applyWithoutSelfAssign($query);
+		$this->applySelfMarketFilter($query);
+		$this->applySelfAssignFilter($query);
+		$this->applyWithoutArchiveFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -150,16 +158,53 @@ class LeadMarketSearch extends LeadMarket {
 		}
 	}
 
-	private function applyWithoutSelfAssign(ActiveQuery $query): void {
-
-		if (!empty($this->userId) && $this->withoutSelfAssign) {
-			$query->andWhere([
-				'not', [
+	private function applySelfAssignFilter(ActiveQuery $query): void {
+		if (!empty($this->userId)) {
+			if ($this->selfAssign === null || $this->selfAssign === '') {
+				return;
+			}
+			if ($this->selfAssign) {
+				$query->andWhere([
 					LeadMarket::tableName() . '.id' => LeadMarketUser::find()
 						->select('market_id')
 						->andWhere(['user_id' => $this->userId]),
+				]);
+			} else {
+				$query->andWhere([
+					'not', [
+						LeadMarket::tableName() . '.id' => LeadMarketUser::find()
+							->select('market_id')
+							->andWhere(['user_id' => $this->userId]),
+					],
+				]);
+			}
+		}
+	}
+
+	private function applySelfMarketFilter(ActiveQuery $query) {
+		if (!empty($this->userId)) {
+
+			if ($this->selfMarket === null || $this->selfMarket === '') {
+				return;
+			}
+			if ($this->selfMarket) {
+				$query->andWhere([
+					LeadMarket::tableName() . '.creator_id' => $this->userId,
 				],
-			]);
+				);
+			} else {
+				$query->andWhere([
+					'not', [
+						LeadMarket::tableName() . '.creator_id' => $this->userId,
+					],
+				]);
+			}
+		}
+	}
+
+	private function applyWithoutArchiveFilter(ActiveQuery $query): void {
+		if ($this->withoutArchive && $this->status !== LeadMarket::STATUS_ARCHIVED) {
+			$query->andWhere(['!=', LeadMarket::tableName() . '.status', LeadMarket::STATUS_ARCHIVED]);
 		}
 	}
 }

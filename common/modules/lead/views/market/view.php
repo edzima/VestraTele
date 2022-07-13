@@ -11,6 +11,7 @@ use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model LeadMarket */
+/* @var $onlyUser bool */
 
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
@@ -25,14 +26,19 @@ YiiAsset::register($this);
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-		<?= Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->id], [
-			'class' => 'btn btn-danger',
-			'data' => [
-				'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
-				'method' => 'post',
-			],
-		]) ?>
+		<?= $model->isCreatorOrOwnerLead(Yii::$app->user->getId()) || !$onlyUser
+			? Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
+			: ''
+		?>
+		<?= $model->isCreatorOrOwnerLead(Yii::$app->user->getId()) || !$onlyUser
+			? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->id], [
+				'class' => 'btn btn-danger',
+				'data' => [
+					'confirm' => Yii::t('lead', 'Are you sure you want to delete this item?'),
+					'method' => 'post',
+				],
+			])
+			: '' ?>
 	</p>
 
 	<div class="row">
@@ -45,8 +51,8 @@ YiiAsset::register($this);
 					'statusName',
 					'created_at:datetime',
 					'updated_at:datetime',
-					'creator.fullName',
-					'leadOwner.fullName',
+					'creator.fullName:text:' . Yii::t('lead', 'Creator'),
+					'lead.owner.fullName:text:' . Yii::t('lead', 'Owner'),
 				],
 			]) ?>
 		</div>
@@ -67,6 +73,7 @@ YiiAsset::register($this);
 				'dataProvider' => new ActiveDataProvider([
 					'query' => $model->getLeadMarketUsers(),
 				]),
+				'summary' => false,
 				'columns' => [
 					'user.fullName',
 					'statusName',
@@ -80,8 +87,8 @@ YiiAsset::register($this);
 						'controller' => 'market-user',
 						'template' => '{access-request} {accept} {reject} {delete}',
 						'visibleButtons' => [
-							'accept' => static function () use ($model): bool {
-								return $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
+							'accept' => static function (LeadMarketUser $data) use ($model): bool {
+								return $data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
 							},
 							'access-request' => static function (LeadMarketUser $model) {
 								return $model->user_id === Yii::$app->user->getId();
@@ -89,8 +96,8 @@ YiiAsset::register($this);
 							'delete' => static function (LeadMarketUser $model) {
 								return $model->isToConfirm() && $model->user_id === Yii::$app->user->getId();
 							},
-							'reject' => static function () use ($model): bool {
-								return $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
+							'reject' => static function (LeadMarketUser $data) use ($model): bool {
+								return $data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
 							},
 						],
 						'buttons' => [
@@ -103,7 +110,6 @@ YiiAsset::register($this);
 							'reject' => static function (string $url): string {
 								return Html::a(Html::icon('remove'), $url);
 							},
-
 						],
 					],
 				],

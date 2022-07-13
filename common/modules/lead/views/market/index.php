@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			['class' => 'yii\grid\SerialColumn'],
 
 			//'id',
-			'lead_id',
+			'lead.name',
 			[
 				'attribute' => 'status',
 				'value' => 'statusName',
@@ -50,6 +50,8 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('lead', 'Visible Area'),
 				'filter' => LeadMarketSearch::getVisibleAreaNames(),
 			],
+			'creator.fullName',
+			'lead.owner.fullName',
 			//'updated_at',
 			//'options:ntext',
 			[

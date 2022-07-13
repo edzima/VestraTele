@@ -316,5 +316,12 @@ return [
 	'Market Address Details' => 'Skąd',
 	'Users Count' => 'Zapytań',
 	'Market Users' => 'Prośby',
-	'Without Self Assign' => 'Bez własnych Zapytań',
+	'Self Assign' => 'Wysłane prośby',
+	'Self Market' => 'Własna Giełda',
+	'Creator' => 'Twórca',
+	'Days Reservation' => 'Na ile dni',
+	'Reserved At' => 'Zarezerwowano',
+	'To Confirm' => 'Do Potwierdzenia',
+	'Accepted' => 'Zaakceptowano',
+	'Rejected' => 'Odrzucono',
 ];

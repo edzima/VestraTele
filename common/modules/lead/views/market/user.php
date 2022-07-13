@@ -45,7 +45,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			'details:ntext',
 			'created_at:datetime',
-
+			[
+				'attribute' => 'creator_id',
+				'value' => 'creator.fullName',
+				'label' => Yii::t('lead', 'Creator'),
+				'visible' => !$searchModel->selfMarket,
+			],
 			//'updated_at',
 			//'options:ntext',
 			[

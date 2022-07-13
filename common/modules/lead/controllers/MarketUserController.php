@@ -81,19 +81,6 @@ class MarketUserController extends BaseController {
 	}
 
 	/**
-	 * Displays a single LeadMarketUser model.
-	 *
-	 * @param integer $id
-	 * @return mixed
-	 * @throws NotFoundHttpException if the model cannot be found
-	 */
-	public function actionView(int $market_id, int $user_id): string {
-		return $this->render('view', [
-			'model' => $this->findModel($market_id, $user_id),
-		]);
-	}
-
-	/**
 	 * Creates a new LeadMarketUser model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 *
