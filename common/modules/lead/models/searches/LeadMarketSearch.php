@@ -3,6 +3,7 @@
 namespace common\modules\lead\models\searches;
 
 use common\models\AddressSearch;
+use common\models\user\User;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
@@ -51,7 +52,7 @@ class LeadMarketSearch extends LeadMarket {
 	 */
 	public function rules(): array {
 		return [
-			[['!userId', 'id', 'lead_id', 'status', 'creator_id', 'usersCount', 'visibleArea'], 'integer'],
+			[['!userId', 'id', 'lead_id', 'status', 'creator_id', 'visibleArea'], 'integer'],
 			[['selfAssign', 'selfMarket'], 'boolean'],
 			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details'], 'safe'],
 		];
@@ -206,5 +207,14 @@ class LeadMarketSearch extends LeadMarket {
 		if ($this->withoutArchive && $this->status !== LeadMarket::STATUS_ARCHIVED) {
 			$query->andWhere(['!=', LeadMarket::tableName() . '.status', LeadMarket::STATUS_ARCHIVED]);
 		}
+	}
+
+	public static function getCreatorsNames(): array {
+		return User::getSelectList(
+			LeadMarket::find()
+				->select('creator_id')
+				->distinct()
+				->column()
+			, false);
 	}
 }

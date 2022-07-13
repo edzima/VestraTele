@@ -30,8 +30,6 @@ use yii\helpers\Json;
  */
 class LeadMarket extends ActiveRecord {
 
-	public $usersCount;
-
 	public const STATUS_ARCHIVED = -1;
 	public const STATUS_NEW = 1;
 	public const STATUS_BOOKED = 2;
@@ -113,6 +111,10 @@ class LeadMarket extends ActiveRecord {
 			'usersCount' => Yii::t('lead', 'Users Count'),
 			'addressDetails' => Yii::t('lead', 'Market Address Details'),
 		];
+	}
+
+	public function getUsersCount(): int {
+		return count($this->leadMarketUsers);
 	}
 
 	public function getAddressDetails(): ?string {

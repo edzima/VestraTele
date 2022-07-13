@@ -50,6 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'creator.fullName',
 				'label' => Yii::t('lead', 'Creator'),
 				'visible' => !$searchModel->selfMarket,
+				'filter' => $searchModel::getCreatorsNames(),
 			],
 			//'updated_at',
 			//'options:ntext',
@@ -66,6 +67,14 @@ $this->params['breadcrumbs'][] = $this->title;
 						}
 
 						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', ['market-user/access-request', 'market_id' => $data->id]);
+					},
+				],
+				'visibleButtons' => [
+					'update' => function (LeadMarket $data): bool {
+						return $data->isCreatorOrOwnerLead(Yii::$app->user->getId());
+					},
+					'delete' => function (LeadMarket $data): bool {
+						return $data->status === LeadMarket::STATUS_NEW && $data->isCreatorOrOwnerLead(Yii::$app->user->getId());
 					},
 				],
 			],
