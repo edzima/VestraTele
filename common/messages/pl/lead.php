@@ -324,4 +324,5 @@ return [
 	'To Confirm' => 'Do Potwierdzenia',
 	'Accepted' => 'Zaakceptowano',
 	'Rejected' => 'Odrzucono',
+	'{which}. from Market' => '{which}. z Giełdy',
 ];
