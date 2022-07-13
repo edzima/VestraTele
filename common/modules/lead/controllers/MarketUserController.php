@@ -6,6 +6,7 @@ use common\helpers\Flash;
 use common\modules\lead\models\forms\LeadMarketAccessRequest;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
+use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadMarketUserSearch;
 use Yii;
 use yii\base\InvalidArgumentException;
@@ -65,6 +66,20 @@ class MarketUserController extends BaseController {
 				'reserved_at' => Yii::$app->formatter->asDate($model->reserved_at),
 			])
 		);
+		$type = $model->addUserToLead();
+		if ($type) {
+			Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead',
+				'Assign User: {user} as {typeName} to Lead: {leadName}.', [
+					'leadName' => $model->market->lead->getName(),
+					'user' => $model->user->getFullName(),
+					'typeName' => LeadUser::getTypesNames()[$type],
+				])
+			);
+		} else {
+			Flash::add(Flash::TYPE_WARNING, Yii::t('lead',
+				'Problem with add User to Lead.')
+			);
+		}
 		return $this->redirect(['market/view', 'market_id' => $market_id, 'user_id' => $user_id]);
 	}
 

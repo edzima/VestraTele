@@ -125,6 +125,40 @@ class LeadMarketUser extends ActiveRecord {
 		$this->market->bookIt($update);
 	}
 
+	public function addUserToLead(): ?string {
+		if ($this->market->lead->isForUser($this->user_id)) {
+			Yii::warning('Try add User: ' . $this->user_id . ' from Market: ' . $this->market_id . ' who already in Lead.', 'lead.market.user');
+			return null;
+		}
+		$type = $this->getLeadUserMarketTypeToAssign();
+		if ($type) {
+			$this->market->lead->linkUser($type, $this->user_id);
+			return $type;
+		}
+	}
+
+	private function getLeadUserMarketTypeToAssign(): ?string {
+		$marketUsersCount = count(array_filter($this->market->lead->leadUsers, static function (LeadUser $leadUser): bool {
+			return $leadUser->isMarketType();
+		}));
+		switch ($marketUsersCount) {
+			case 0:
+				return LeadUser::TYPE_MARKET_FIRST;
+			case 1:
+				return LeadUser::TYPE_MARKET_SECOND;
+			case 2:
+				return LeadUser::TYPE_MARKET_THIRD;
+		}
+		Yii::warning([
+			'message' => 'Invalid Market Users Count to Assign',
+			'market_id' => $this->market_id,
+			'user_id' => $this->user_id,
+			'leadUsers' => $this->market->lead->getUsers(),
+			'marketUsersCount' => $marketUsersCount,
+		], 'lead.market.user');
+		return null;
+	}
+
 	public function reject(bool $update = true): void {
 		$this->status = static::STATUS_REJECTED;
 		$this->reserved_at = null;

@@ -325,4 +325,5 @@ return [
 	'Accepted' => 'Zaakceptowano',
 	'Rejected' => 'Odrzucono',
 	'{which}. from Market' => '{which}. z Giełdy',
+	'Assign User: {user} as {typeName} to Lead: {leadName}.' => 'Przypisano {user} jako {typeName} do Lead: {leadName}.',
 ];

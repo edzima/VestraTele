@@ -106,4 +106,12 @@ class LeadUser extends ActiveRecord {
 		return $this->user->getFullName() . ' - ' . $this->getTypeName();
 	}
 
+	public function isMarketType(): bool {
+		return in_array($this->type, [
+			static::TYPE_MARKET_FIRST,
+			static::TYPE_MARKET_SECOND,
+			static::TYPE_MARKET_THIRD,
+		]);
+	}
+
 }
