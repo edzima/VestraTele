@@ -80,7 +80,7 @@ class MarketUserController extends BaseController {
 				'Problem with add User to Lead.')
 			);
 		}
-		return $this->redirect(['market/view', 'market_id' => $market_id, 'user_id' => $user_id]);
+		return $this->redirect(['market/view', 'id' => $market_id]);
 	}
 
 	public function actionReject(int $market_id, int $user_id) {
@@ -92,7 +92,7 @@ class MarketUserController extends BaseController {
 			throw new MethodNotAllowedHttpException('Only Lead Owner or Market Creator can Rejected.');
 		}
 		$model->reject();
-		return $this->redirect(['market/view', 'market_id' => $market_id, 'user_id' => $user_id]);
+		return $this->redirect(['market/view', 'id' => $market_id]);
 	}
 
 	/**
