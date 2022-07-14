@@ -86,6 +86,9 @@ class MarketController extends BaseController {
 	 */
 	public function actionCreate(int $id) {
 		$lead = $this->findLead($id);
+		if ($lead->market !== null) {
+			return $this->redirect(['update', 'id' => $lead->market->id]);
+		}
 		$model = new LeadMarketForm();
 		$model->lead_id = $lead->getId();
 		$model->status = LeadMarket::STATUS_NEW;

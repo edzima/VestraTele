@@ -68,7 +68,7 @@ class LeadMarketForm extends Model {
 	 */
 	private function leadsHasMarket(array $leads): bool {
 		foreach ($leads as $lead) {
-			if ($lead->getMarkets()->exists()) {
+			if ($lead->getMarket()->exists()) {
 				return true;
 			}
 		}

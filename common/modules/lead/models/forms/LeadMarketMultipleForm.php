@@ -66,7 +66,7 @@ class LeadMarketMultipleForm extends Model {
 			$dataProvider = $duplicate->search([]);
 			/** @var ActiveQuery $query */
 			$query = $dataProvider->query;
-			$query->joinWith('markets', false, 'LEFT OUTER JOIN');
+			$query->joinWith('market', false, 'LEFT OUTER JOIN');
 			$query->andWhere(LeadMarket::tableName() . '.id IS NULL');
 			$ids = $dataProvider->getKeys();
 			if (!empty($ids)) {

@@ -8,7 +8,7 @@ namespace common\modules\lead\models;
  * @property-read LeadReport[] $reports
  * @property-read LeadAnswer[] $answers
  * @property-read LeadAddress[] $addresses
- * @property-read LeadMarket[] $markets
+ * @property-read LeadMarket|null $market
  */
 interface ActiveLead extends LeadInterface {
 

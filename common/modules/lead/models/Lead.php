@@ -112,8 +112,9 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->hasMany(LeadDialer::class, ['lead_id' => 'id']);
 	}
 
-	public function getMarkets() {
-		return $this->hasMany(LeadMarket::class, ['lead_id' => 'id']);
+	//@todo probalby single market for Lead
+	public function getMarket() {
+		return $this->hasOne(LeadMarket::class, ['lead_id' => 'id']);
 	}
 
 	protected function getAddresses(): ActiveQuery {
@@ -260,12 +261,11 @@ class Lead extends ActiveRecord implements ActiveLead {
 	public function updateStatus(int $status_id): bool {
 		if ($this->status_id !== $status_id) {
 			$status = LeadStatus::getModels()[$status_id];
-			if (!empty($status->market_status) && $this->getMarkets()->exists()) {
-				LeadMarket::updateAll([
-					'status' => $status->market_status,
-				], [
-					'lead_id' => $this->getId(),
-				]);
+			if (!empty($status->market_status)) {
+				//@todo check same contact lead with the same type has Market with same Contact flag
+				if ($this->market !== null) {
+					$this->market->status = $status->market_status;
+				}
 			}
 			$this->updateAttributes([
 				'status_id' => $status_id,
