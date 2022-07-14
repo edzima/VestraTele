@@ -19,6 +19,7 @@ class m220614_124116_lead_market extends Migration {
 		$userClass = Module::userClass();
 
 		$this->addColumn('{{%lead_status}}', 'market_status', $this->smallInteger()->null());
+		$this->addColumn('{{%lead_status}}', 'market_status_same_contacts', $this->smallInteger()->null());
 
 		$this->createTable('{{%lead_market}}', [
 			'id' => $this->primaryKey(),
@@ -83,7 +84,9 @@ class m220614_124116_lead_market extends Migration {
 	public function safeDown() {
 		$this->dropTable('{{%lead_market_user}}');
 		$this->dropTable('{{%lead_market}}');
+
 		$this->dropColumn('{{%lead_status}}', 'market_status');
+		$this->dropColumn('{{%lead_status}}', 'market_status_same_contacts');
 	}
 
 }

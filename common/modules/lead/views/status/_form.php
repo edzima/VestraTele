@@ -23,6 +23,9 @@ use yii\widgets\ActiveForm;
 		'prompt' => Yii::t('lead', 'Select...'),
 	]) ?>
 
+	<?= $form->field($model, 'market_status_same_contacts')->checkbox() ?>
+
+
 	<?= $form->field($model, 'not_for_dialer')->checkbox() ?>
 
 	<?= $form->field($model, 'short_report')->checkbox() ?>
