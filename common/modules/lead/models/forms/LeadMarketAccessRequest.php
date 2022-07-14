@@ -77,8 +77,8 @@ class LeadMarketAccessRequest extends Model {
 
 	protected function sendEmail(): bool {
 		$owner = $this->market->lead->owner;
-		$emails = [$this->market->lead->owner->getEmail()];
-		if ($owner->getID() !== $this->market->creator_id) {
+		$emails = [$this->market->creator->getEmail()];
+		if ($owner !== null && $owner->getID() !== $this->market->creator_id) {
 			$emails[] = $this->market->creator->getEmail();
 		}
 		return Yii::$app
