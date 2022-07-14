@@ -62,10 +62,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'template' => '{access-request} {view} {update} {delete}',
 				'buttons' => [
 					'access-request' => function (string $url, LeadMarket $data): ?string {
-						if ($data->isDone() || $data->isArchived()) {
-							return null;
-						}
-
 						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', ['market-user/access-request', 'market_id' => $data->id]);
 					},
 				],

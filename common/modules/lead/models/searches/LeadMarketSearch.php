@@ -76,6 +76,11 @@ class LeadMarketSearch extends LeadMarket {
 	public function search(array $params = []) {
 		$query = LeadMarket::find();
 		$query->joinWith('leadMarketUsers');
+		$query->with([
+			'creator.userProfile',
+			'lead',
+			'lead.owner',
+		]);
 		$query->groupBy(LeadMarket::tableName() . '.id');
 
 		// add conditions that should always apply here
@@ -101,12 +106,12 @@ class LeadMarketSearch extends LeadMarket {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
-			'lead_id' => $this->lead_id,
-			'creator_id' => $this->creator_id,
-			'status' => $this->status,
-			'created_at' => $this->created_at,
-			'updated_at' => $this->updated_at,
+			LeadMarket::tableName() . '.id' => $this->id,
+			LeadMarket::tableName() . '.lead_id' => $this->lead_id,
+			LeadMarket::tableName() . '.creator_id' => $this->creator_id,
+			LeadMarket::tableName() . '.status' => $this->status,
+			LeadMarket::tableName() . '.created_at' => $this->created_at,
+			LeadMarket::tableName() . '.updated_at' => $this->updated_at,
 		]);
 
 		$query->andFilterWhere(['like', 'details', $this->details]);
@@ -142,7 +147,7 @@ class LeadMarketSearch extends LeadMarket {
 	}
 
 	private function applyAddressFilter(ActiveQuery $query): void {
-		if ($this->addressSearch->validate() && $this->addressSearch->isNotEmpty()) {
+		if ($this->addressSearch->validate()) {
 			$query->joinWith([
 				'lead.addresses.address' => function (ActiveQuery $addressQuery) {
 					$this->addressSearch->applySearch($addressQuery);

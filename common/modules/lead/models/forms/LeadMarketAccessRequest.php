@@ -36,6 +36,13 @@ class LeadMarketAccessRequest extends Model {
 		];
 	}
 
+	public function attributeLabels() {
+		return [
+			'details' => Yii::t('lead', 'Details'),
+			'days' => Yii::t('lead', 'How many Days'),
+		];
+	}
+
 	public function getMarket(): LeadMarket {
 		return $this->market;
 	}

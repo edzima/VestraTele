@@ -81,10 +81,12 @@ class LeadMarketUser extends ActiveRecord {
 			'market_id' => Yii::t('lead', 'Market ID'),
 			'user_id' => Yii::t('lead', 'User ID'),
 			'status' => Yii::t('lead', 'Status'),
+			'statusName' => Yii::t('lead', 'Status'),
 			'created_at' => Yii::t('lead', 'Created At'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
 			'days_reservation' => Yii::t('lead', 'Days Reservation'),
 			'reserved_at' => Yii::t('lead', 'Reserved At'),
+			'details' => Yii::t('lead', 'Details'),
 		];
 	}
 

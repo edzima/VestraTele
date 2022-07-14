@@ -43,7 +43,6 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			'details:ntext',
 
-			'created_at:datetime',
 			[
 				'attribute' => 'visibleArea',
 				'value' => 'marketOptions.visibleAreaName',
@@ -51,12 +50,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => LeadMarketSearch::getVisibleAreaNames(),
 			],
 			'creator.fullName',
-			'lead.owner.fullName',
-			//'updated_at',
-			//'options:ntext',
 			[
 				'attribute' => 'usersCount',
 			],
+			'created_at:datetime',
+
 			[
 				'class' => ActionColumn::class,
 				'template' => '{access-request} {view} {update} {delete}',

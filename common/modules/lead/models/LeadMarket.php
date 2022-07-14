@@ -176,11 +176,8 @@ class LeadMarket extends ActiveRecord {
 		return static::getStatusesNames()[$this->status];
 	}
 
-	public function isAvailableForUser(): bool {
-		if (!$this->isArchived() && !$this->isDone()) {
-			$users = $this->leadMarketUsers;
-		}
-		return !$this->isArchived() && !$this->isDone();
+	public function userCanAccessRequest(int $userId): bool {
+		return !$this->isArchived() && !$this->isDone() && $this->hasUser($userId);
 	}
 
 	public function isArchived(): bool {
@@ -197,6 +194,6 @@ class LeadMarket extends ActiveRecord {
 
 	public function isCreatorOrOwnerLead(int $userId): bool {
 		return $this->creator_id === $userId
-			|| $this->lead->owner->getID() === $userId;
+			|| ($this->lead->owner !== null && $this->lead->owner->getID() === $userId);
 	}
 }

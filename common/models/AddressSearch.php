@@ -101,7 +101,7 @@ class AddressSearch extends Address implements SearchModel {
 	}
 
 	public function applySearch(ActiveQuery $query): void {
-		if ($this->validate()) {
+		if ($this->validate() && $this->isNotEmpty()) {
 			$query->joinWith('city C');
 			$query->alias('A');
 			$this->applyCityNameFilter($query);

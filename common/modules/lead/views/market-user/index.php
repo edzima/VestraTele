@@ -31,11 +31,16 @@ $this->params['breadcrumbs'][] = $this->title;
 		'filterModel' => $searchModel,
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
-			'market_id',
 			[
 				'attribute' => 'status',
 				'filter' => LeadMarketUserSearch::getStatusesNames(),
 				'value' => 'statusName',
+			],
+			[
+				'attribute' => 'user_id',
+				'filter' => LeadMarketUserSearch::getUsersNames(),
+				'value' => 'user.fullName',
+				'label' => Yii::t('lead', 'User'),
 			],
 			'days_reservation',
 			'details:ntext',

@@ -258,7 +258,21 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function updateStatus(int $status_id): bool {
-		return $this->updateAttributes(['status_id' => $status_id]) > 0;
+		if ($this->status_id !== $status_id) {
+			$status = LeadStatus::getModels()[$status_id];
+			if (!empty($status->market_status) && $this->getMarkets()->exists()) {
+				LeadMarket::updateAll([
+					'status' => $status->market_status,
+				], [
+					'lead_id' => $this->getId(),
+				]);
+			}
+			$this->updateAttributes([
+				'status_id' => $status_id,
+			]);
+			return true;
+		}
+		return false;
 	}
 
 	public function updateName(string $name): bool {

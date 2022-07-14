@@ -26,6 +26,10 @@ YiiAsset::register($this);
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
+		<?= !$model->userCanAccessRequest(Yii::$app->user->getId())
+			? Html::a(Yii::t('lead', 'Request Access'), ['market-user/access-request', 'market_id' => $model->id], ['class' => 'btn btn-success'])
+			: ''
+		?>
 		<?= $model->isCreatorOrOwnerLead(Yii::$app->user->getId()) || !$onlyUser
 			? Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: ''
@@ -44,7 +48,7 @@ YiiAsset::register($this);
 	<div class="row">
 
 
-		<div class="col-md-4">
+		<div class="col-md-5">
 			<?= DetailView::widget([
 				'model' => $model,
 				'attributes' => [
@@ -58,63 +62,62 @@ YiiAsset::register($this);
 		</div>
 
 
-		<div class="col-md-2">
-			<?= DetailView::widget([
-				'model' => $model->getMarketOptions(),
-				'attributes' => [
-					'visibleAreaName',
-					'visibleAddressDetails:boolean',
-				],
-			]) ?>
-		</div>
-
-		<div class="col-md-5">
-			<?= GridView::widget([
-				'dataProvider' => new ActiveDataProvider([
-					'query' => $model->getLeadMarketUsers(),
-				]),
-				'summary' => false,
-				'columns' => [
-					'user.fullName',
-					'statusName',
-					'days_reservation',
-					'details',
-					'created_at:datetime',
-					'updated_at:datetime',
-					'reserved_at:datetime',
-					[
-						'class' => ActionColumn::class,
-						'controller' => 'market-user',
-						'template' => '{access-request} {accept} {reject} {delete}',
-						'visibleButtons' => [
-							'accept' => static function (LeadMarketUser $data) use ($model): bool {
-								return $data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
-							},
-							'access-request' => static function (LeadMarketUser $model) {
-								return $model->user_id === Yii::$app->user->getId();
-							},
-							'delete' => static function (LeadMarketUser $model) {
-								return $model->isToConfirm() && $model->user_id === Yii::$app->user->getId();
-							},
-							'reject' => static function (LeadMarketUser $data) use ($model): bool {
-								return $data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
-							},
-						],
-						'buttons' => [
-							'accept' => static function (string $url): string {
-								return Html::a(Html::icon('check'), $url);
-							},
-							'access-request' => static function (string $url): string {
-								return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', $url);
-							},
-							'reject' => static function (string $url): string {
-								return Html::a(Html::icon('remove'), $url);
-							},
-						],
+		<div class="col-md-4">
+			<?= $model->isCreatorOrOwnerLead(Yii::$app->user->getId())
+				? DetailView::widget([
+					'model' => $model->getMarketOptions(),
+					'attributes' => [
+						'visibleAreaName',
+						'visibleAddressDetails:boolean',
 					],
-				],
-			]) ?>
+				])
+				: ''
+			?>
 		</div>
-
 	</div>
+
+	<?= GridView::widget([
+		'dataProvider' => new ActiveDataProvider([
+			'query' => $model->getLeadMarketUsers(),
+		]),
+		'summary' => false,
+		'columns' => [
+			'user.fullName',
+			'statusName',
+			'days_reservation',
+			'details',
+			'created_at:datetime',
+			'updated_at:datetime',
+			'reserved_at:datetime',
+			[
+				'class' => ActionColumn::class,
+				'controller' => 'market-user',
+				'template' => '{accept} {reject} {delete}',
+				'visibleButtons' => [
+					'accept' => static function (LeadMarketUser $data) use ($model): bool {
+						return $data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
+					},
+					'delete' => static function (LeadMarketUser $model) {
+						return $model->isToConfirm() && $model->user_id === Yii::$app->user->getId();
+					},
+					'reject' => static function (LeadMarketUser $data) use ($model): bool {
+						return $data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
+					},
+				],
+				'buttons' => [
+					'accept' => static function (string $url): string {
+						return Html::a(Html::icon('check'), $url);
+					},
+					'access-request' => static function (string $url): string {
+						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', $url);
+					},
+					'reject' => static function (string $url): string {
+						return Html::a(Html::icon('remove'), $url);
+					},
+				],
+			],
+		],
+	]) ?>
+
+
 </div>

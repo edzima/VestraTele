@@ -20,7 +20,7 @@ use yii\widgets\ActiveForm;
 	<div class="row">
 
 
-		<div class="col-md-6">
+		<div class="col-md-5 col-lg-4">
 
 			<?= $form->field($model, 'days')->widget(NumberControl::class, [
 				'maskedInputOptions' => [
@@ -37,7 +37,7 @@ use yii\widgets\ActiveForm;
 
 
 	<div class="form-group">
-		<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>
+		<?= Html::submitButton(Yii::t('lead', 'Request Access'), ['class' => 'btn btn-success']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

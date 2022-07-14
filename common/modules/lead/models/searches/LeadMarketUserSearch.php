@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models\searches;
 
+use common\models\user\User;
 use common\modules\lead\models\LeadMarketUser;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -12,6 +13,15 @@ use yii\data\ActiveDataProvider;
 class LeadMarketUserSearch extends LeadMarketUser {
 
 	public const SCENARIO_USER = 'user';
+
+	public static function getUsersNames(): array {
+		return User::getSelectList(
+			LeadMarketUser::find()
+				->select('user_id')
+				->distinct()
+				->column(),
+			false);
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -48,6 +58,9 @@ class LeadMarketUserSearch extends LeadMarketUser {
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
 		]);
+		if ($this->scenario !== self::SCENARIO_USER) {
+			$query->joinWith('user.userProfile');
+		}
 
 		$this->load($params);
 
