@@ -72,12 +72,12 @@ class LeadMarketUserSearch extends LeadMarketUser {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'market_id' => $this->market_id,
-			'user_id' => $this->user_id,
-			'status' => $this->status,
-			'created_at' => $this->created_at,
-			'updated_at' => $this->updated_at,
-			'reserved_at' => $this->reserved_at,
+			LeadMarketUser::tableName() . '.market_id' => $this->market_id,
+			LeadMarketUser::tableName() . '.user_id' => $this->user_id,
+			LeadMarketUser::tableName() . '.status' => $this->status,
+			LeadMarketUser::tableName() . '.created_at' => $this->created_at,
+			LeadMarketUser::tableName() . '.updated_at' => $this->updated_at,
+			LeadMarketUser::tableName() . '.reserved_at' => $this->reserved_at,
 		]);
 
 		return $dataProvider;
