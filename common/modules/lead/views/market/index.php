@@ -33,13 +33,16 @@ $this->params['breadcrumbs'][] = $this->title;
 		'filterModel' => $searchModel,
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
-
-			//'id',
-			'lead.name',
 			[
 				'attribute' => 'status',
 				'value' => 'statusName',
 				'filter' => LeadMarketSearch::getStatusesNames(),
+			],
+			'lead.name',
+			[
+				'attribute' => 'leadStatus',
+				'value' => 'lead.statusName',
+				'filter' => LeadMarketSearch::getLeadStatusesNames(),
 			],
 			'details:ntext',
 
@@ -49,7 +52,12 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('lead', 'Visible Area'),
 				'filter' => LeadMarketSearch::getVisibleAreaNames(),
 			],
-			'creator.fullName',
+			[
+				'attribute' => 'creator_id',
+				'value' => 'creator.fullName',
+				'label' => Yii::t('lead', 'Creator'),
+				'filter' => $searchModel::getCreatorsNames(),
+			],
 			[
 				'attribute' => 'usersCount',
 			],
@@ -59,12 +67,13 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => ActionColumn::class,
 				'template' => '{access-request} {view} {update} {delete}',
 				'buttons' => [
-					'access-request' => function (string $url, LeadMarket $data): ?string {
-						if ($data->isDone() || $data->isArchived()) {
-							return null;
-						}
-
+					'access-request' => function (string $url, LeadMarket $data): string {
 						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', ['market-user/access-request', 'market_id' => $data->id]);
+					},
+				],
+				'visibleButtons' => [
+					'access-request' => static function (LeadMarket $data): bool {
+						return $data->userCanAccessRequest(Yii::$app->user->getId());
 					},
 				],
 			],

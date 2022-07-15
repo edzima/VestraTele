@@ -5,8 +5,10 @@ namespace common\modules\lead\models\searches;
 use common\models\AddressSearch;
 use common\models\user\User;
 use common\modules\lead\models\entities\LeadMarketOptions;
+use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
+use common\modules\lead\models\LeadStatus;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -19,6 +21,9 @@ use yii\db\Expression;
 class LeadMarketSearch extends LeadMarket {
 
 	public $visibleArea;
+
+	public $leadStatus;
+
 	public $userId;
 
 	public $selfAssign;
@@ -28,11 +33,16 @@ class LeadMarketSearch extends LeadMarket {
 
 	public ?AddressSearch $addressSearch = null;
 
+	public static function getLeadStatusesNames(): array {
+		return LeadStatus::getNames();
+	}
+
 	public function attributeLabels(): array {
 		return parent::attributeLabels() + [
 				'selfAssign' => Yii::t('lead', 'Self Assign'),
 				'selfMarket' => Yii::t('lead', 'Self Market'),
 				'withoutArchive' => Yii::t('lead', 'Without Archives'),
+				'leadStatus' => Yii::t('lead', 'Lead Status'),
 			];
 	}
 
@@ -52,7 +62,7 @@ class LeadMarketSearch extends LeadMarket {
 	 */
 	public function rules(): array {
 		return [
-			[['!userId', 'id', 'lead_id', 'status', 'creator_id', 'visibleArea'], 'integer'],
+			[['!userId', 'creator_id', 'id', 'lead_id', 'status', 'creator_id', 'visibleArea', 'leadStatus'], 'integer'],
 			[['selfAssign', 'selfMarket'], 'boolean'],
 			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details'], 'safe'],
 		];
@@ -112,6 +122,7 @@ class LeadMarketSearch extends LeadMarket {
 			LeadMarket::tableName() . '.status' => $this->status,
 			LeadMarket::tableName() . '.created_at' => $this->created_at,
 			LeadMarket::tableName() . '.updated_at' => $this->updated_at,
+			Lead::tableName() . '.status' => $this->leadStatus,
 		]);
 
 		$query->andFilterWhere(['like', 'details', $this->details]);
