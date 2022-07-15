@@ -108,7 +108,7 @@ class LeadMarket extends ActiveRecord {
 			'updated_at' => Yii::t('lead', 'Updated At'),
 			'options' => Yii::t('lead', 'Options'),
 			'creator' => Yii::t('lead', 'Creator'),
-			'usersCount' => Yii::t('lead', 'Users Count'),
+			'usersCount' => Yii::t('lead', 'Market Users Count'),
 			'addressDetails' => Yii::t('lead', 'Market Address Details'),
 		];
 	}

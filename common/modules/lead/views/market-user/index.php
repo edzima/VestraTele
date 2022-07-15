@@ -21,8 +21,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
-	<p>
-	</p>
 
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -31,6 +29,16 @@ $this->params['breadcrumbs'][] = $this->title;
 		'filterModel' => $searchModel,
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
+			[
+				'value' => 'market.lead.name',
+				'label' => Yii::t('lead', 'Lead Name'),
+			],
+			[
+				'attribute' => 'marketCreatorId',
+				'filter' => LeadMarketUserSearch::getMarketCreatorsNames(),
+				'value' => 'market.creator.fullName',
+				'label' => Yii::t('lead', 'Creator'),
+			],
 			[
 				'attribute' => 'status',
 				'filter' => LeadMarketUserSearch::getStatusesNames(),
@@ -41,6 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => LeadMarketUserSearch::getUsersNames(),
 				'value' => 'user.fullName',
 				'label' => Yii::t('lead', 'User'),
+				'visible' => $searchModel->scenario !== LeadMarketUserSearch::SCENARIO_USER,
 			],
 			'days_reservation',
 			'details:ntext',

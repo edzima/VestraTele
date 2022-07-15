@@ -3,14 +3,18 @@
 namespace common\modules\lead\models\searches;
 
 use common\models\user\User;
+use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 
 /**
  * LeadMarketUserSearch represents the model behind the search form of `common\modules\lead\models\LeadMarketUser`.
  */
 class LeadMarketUserSearch extends LeadMarketUser {
+
+	public $marketCreatorId;
 
 	public const SCENARIO_USER = 'user';
 
@@ -23,13 +27,17 @@ class LeadMarketUserSearch extends LeadMarketUser {
 			false);
 	}
 
+	public static function getMarketCreatorsNames() {
+		return LeadMarketSearch::getCreatorsNames();
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
-			[['market_id', 'days_reservation', 'status', 'user_id'], 'integer'],
+			[['market_id', 'days_reservation', 'status', 'user_id', 'marketCreatorId'], 'integer'],
 			[['details'], 'string'],
 			[['created_at', 'updated_at', 'reserved_at'], 'safe'],
 		];
@@ -52,6 +60,7 @@ class LeadMarketUserSearch extends LeadMarketUser {
 	 */
 	public function search(array $params) {
 		$query = LeadMarketUser::find();
+		$query->with('market');
 
 		// add conditions that should always apply here
 
@@ -70,6 +79,8 @@ class LeadMarketUserSearch extends LeadMarketUser {
 			return $dataProvider;
 		}
 
+		$this->applyMarketCreatorFilter($query);
+
 		// grid filtering conditions
 		$query->andFilterWhere([
 			LeadMarketUser::tableName() . '.market_id' => $this->market_id,
@@ -81,5 +92,12 @@ class LeadMarketUserSearch extends LeadMarketUser {
 		]);
 
 		return $dataProvider;
+	}
+
+	private function applyMarketCreatorFilter(ActiveQuery $query): void {
+		if (!empty($this->marketCreatorId)) {
+			$query->joinWith('market');
+			$query->andWhere([LeadMarket::tableName() . '.creator_id' => $this->marketCreatorId]);
+		}
 	}
 }

@@ -51,7 +51,7 @@ YiiAsset::register($this);
 
 		<?= (!$onlyUser || $isOwner)
 		&& Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)
-		&& empty($model->markets)
+		&& $model->market === null
 			? Html::a(Yii::t('lead', '-> Market'), ['market/create', 'id' => $model->getId()], ['class' => 'btn btn-success'])
 			: ''
 		?>
