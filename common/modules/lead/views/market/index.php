@@ -2,6 +2,7 @@
 
 use common\helpers\Html;
 use common\modules\lead\models\LeadMarket;
+use common\modules\lead\models\LeadMarketUser;
 use common\modules\lead\models\searches\LeadMarketSearch;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -18,7 +19,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="lead-market-index">
 
 	<h1><?= Html::encode($this->title) ?></h1>
-
 
 	<p>
 		<?= Html::a(Yii::t('lead', 'Market Users'), ['market-user/index',], [
@@ -56,10 +56,32 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'creator_id',
 				'value' => 'creator.fullName',
 				'label' => Yii::t('lead', 'Creator'),
-				'filter' => $searchModel::getCreatorsNames(),
+				'filter' => LeadMarketSearch::getCreatorsNames(),
 			],
 			[
-				'attribute' => 'usersCount',
+				'attribute' => 'userStatus',
+				'filter' => LeadMarketSearch::getMarketUserStatusesNames(),
+				'format' => 'ntext',
+				'label' => Yii::t('lead', 'Market Users Count'),
+				'value' => function (LeadMarket $data): ?string {
+					$users = $data->leadMarketUsers;
+					if (empty($users)) {
+						return null;
+					}
+					$statuses = [];
+					foreach ($users as $marketUser) {
+						if (!isset($statuses[$marketUser->status])) {
+							$statuses[$marketUser->status] = 1;
+						} else {
+							$statuses[$marketUser->status]++;
+						}
+					}
+					$content = [];
+					foreach ($statuses as $status => $count) {
+						$content[] = LeadMarketUser::getStatusesNames()[$status] . ': ' . $count;
+					}
+					return implode("\n", $content);
+				},
 			],
 			'created_at:datetime',
 

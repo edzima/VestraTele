@@ -78,7 +78,8 @@ YiiAsset::register($this);
 
 	<?= GridView::widget([
 		'dataProvider' => new ActiveDataProvider([
-			'query' => $model->getLeadMarketUsers(),
+			'query' => $model->getLeadMarketUsers()
+				->orderBy(['created_at' => SORT_ASC]),
 		]),
 		'summary' => false,
 		'columns' => [
@@ -87,8 +88,8 @@ YiiAsset::register($this);
 			'days_reservation',
 			'details',
 			'created_at:datetime',
-			'updated_at:datetime',
-			'reserved_at:datetime',
+			//	'updated_at:datetime',
+			'reserved_at:date',
 			[
 				'class' => ActionColumn::class,
 				'controller' => 'market-user',

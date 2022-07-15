@@ -20,6 +20,10 @@ use yii\db\Expression;
  */
 class LeadMarketSearch extends LeadMarket {
 
+	private const WITHOUT_MARKET_USERS = -10;
+
+	public $userStatus;
+
 	public $visibleArea;
 
 	public $leadStatus;
@@ -35,6 +39,12 @@ class LeadMarketSearch extends LeadMarket {
 
 	public static function getLeadStatusesNames(): array {
 		return LeadStatus::getNames();
+	}
+
+	public static function getMarketUserStatusesNames(): array {
+		$statuses = LeadMarketUser::getStatusesNames();
+		$statuses[self::WITHOUT_MARKET_USERS] = Yii::t('lead', 'Without Market Users');
+		return $statuses;
 	}
 
 	public function attributeLabels(): array {
@@ -62,7 +72,12 @@ class LeadMarketSearch extends LeadMarket {
 	 */
 	public function rules(): array {
 		return [
-			[['!userId', 'creator_id', 'id', 'lead_id', 'status', 'creator_id', 'visibleArea', 'leadStatus'], 'integer'],
+			[
+				[
+					'!userId', 'creator_id', 'id', 'lead_id', 'status', 'creator_id',
+					'visibleArea', 'leadStatus', 'userStatus',
+				], 'integer',
+			],
 			[['selfAssign', 'selfMarket'], 'boolean'],
 			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details'], 'safe'],
 		];
@@ -85,11 +100,12 @@ class LeadMarketSearch extends LeadMarket {
 	 */
 	public function search(array $params = []) {
 		$query = LeadMarket::find();
-		$query->joinWith('leadMarketUsers');
+
 		$query->with([
 			'creator.userProfile',
 			'lead',
 			'lead.owner',
+			'leadMarketUsers',
 		]);
 		$query->groupBy(LeadMarket::tableName() . '.id');
 
@@ -118,6 +134,8 @@ class LeadMarketSearch extends LeadMarket {
 		$this->applySelfMarketFilter($query);
 		$this->applySelfAssignFilter($query);
 		$this->applyWithoutArchiveFilter($query);
+		$this->applyLeadStatusFilter($query);
+		$this->applyMarketUserStatusFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -127,7 +145,6 @@ class LeadMarketSearch extends LeadMarket {
 			LeadMarket::tableName() . '.status' => $this->status,
 			LeadMarket::tableName() . '.created_at' => $this->created_at,
 			LeadMarket::tableName() . '.updated_at' => $this->updated_at,
-			Lead::tableName() . '.status' => $this->leadStatus,
 		]);
 
 		$query->andFilterWhere(['like', 'details', $this->details]);
@@ -164,11 +181,15 @@ class LeadMarketSearch extends LeadMarket {
 
 	private function applyAddressFilter(ActiveQuery $query): void {
 		if ($this->addressSearch->validate()) {
-			$query->joinWith([
-				'lead.addresses.address' => function (ActiveQuery $addressQuery) {
-					$this->addressSearch->applySearch($addressQuery);
-				},
-			]);
+			if ($this->addressSearch->isNotEmpty()) {
+				$query->joinWith([
+					'lead.addresses.address' => function (ActiveQuery $addressQuery) {
+						$this->addressSearch->applySearch($addressQuery);
+					},
+				]);
+			} else {
+				$query->with('lead.addresses.address.city.terc');
+			}
 		}
 	}
 
@@ -237,5 +258,28 @@ class LeadMarketSearch extends LeadMarket {
 				->distinct()
 				->column()
 			, false);
+	}
+
+	private function applyLeadStatusFilter(ActiveQuery $query): void {
+		if (!empty($this->leadStatus)) {
+			$query->joinWith('lead');
+			$query->andWhere([
+				Lead::tableName() . '.status_id' => $this->leadStatus,
+			]);
+		}
+	}
+
+	private function applyMarketUserStatusFilter(ActiveQuery $query): void {
+		if (!empty($this->userStatus)) {
+			if ($this->userStatus === static::WITHOUT_MARKET_USERS) {
+				$query->joinWith('leadMarketUsers');
+				$query->andWhere([LeadMarketUser::tableName() . '.status' => $this->userStatus]);
+			} else {
+				$query->joinWith('leadMarketUsers', false, 'LEFT OUTER JOIN');
+				$query->andWhere([
+					LeadMarketUser::tableName() . '.market_id' => null,
+				]);
+			}
+		}
 	}
 }

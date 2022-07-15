@@ -10,9 +10,8 @@ $this->title = Yii::t('lead', 'Access Request for Lead: {name} from Market', [
 	'name' => $model->getMarket()->lead->getName(),
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
-$this->params['breadcrumbs'][] = ['label' => $model->getMarket()->lead->getName(), 'url' => ['lead/view', 'id' => $model->getMarket()->lead_id]];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Market'), 'url' => ['market/index']];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Market Users'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Market Users'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="lead-market-user-create">

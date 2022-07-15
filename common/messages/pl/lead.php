@@ -315,6 +315,7 @@ return [
 	'Market Address Details' => 'Skąd',
 	'Market Users Count' => 'Prośby',
 	'Market Users' => 'Prośby',
+	'Without Market Users' => 'Brak',
 	'Self Assign' => 'Wysłane prośby',
 	'Self Market' => 'Własna Giełda',
 	'Creator' => 'Twórca',
