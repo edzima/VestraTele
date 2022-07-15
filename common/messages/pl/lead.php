@@ -329,4 +329,8 @@ return [
 	'Access Request for Lead: {name} from Market' => 'Prośba o Dostęp do Lead: {name} z Giełdy',
 	'{which}. from Market' => '{which}. z Giełdy',
 	'Assign User: {user} as {typeName} to Lead: {leadName}.' => 'Przypisano {user} jako {typeName} do Lead: {leadName}.',
+	'Lead Market' => 'Giełda',
+	'Market Status same Contacts' => 'Status Giełdy - Tożsame',
+	'Lead Status' => 'Status Leada',
+	'With Address' => 'Z Adresem',
 ];

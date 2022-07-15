@@ -7,6 +7,7 @@ use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\models\user\User;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadReport;
@@ -41,6 +42,7 @@ class LeadSearch extends Lead implements SearchModel {
 	public $duplicatePhone;
 
 	public bool $withoutArchives = true;
+	public $withAddress;
 
 	public $name = '';
 	public $user_id;
@@ -77,7 +79,7 @@ class LeadSearch extends Lead implements SearchModel {
 			[['id', 'status_id', 'type_id', 'source_id', 'campaign_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
-			[['withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail'], 'boolean'],
+			[['withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress'], 'boolean'],
 			['name', 'string', 'min' => 3],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
@@ -93,6 +95,7 @@ class LeadSearch extends Lead implements SearchModel {
 		return array_merge(
 			parent::attributeLabels(),
 			[
+				'withAddress' => Yii::t('lead', 'With Address'),
 				'withoutArchives' => Yii::t('lead', 'Without Archives'),
 				'withoutUser' => Yii::t('lead', 'Without User'),
 				'withoutReport' => Yii::t('lead', 'Without Report'),
@@ -235,6 +238,10 @@ class LeadSearch extends Lead implements SearchModel {
 	}
 
 	private function applyAddressFilter(ActiveQuery $query): void {
+		if ($this->withAddress) {
+			$query->joinWith('addresses');
+			$query->andWhere(LeadAddress::tableName() . '.lead_id IS NOT NULL');
+		}
 		if ($this->addressSearch->validate()) {
 			$query->joinWith([
 				'addresses.address' => function (ActiveQuery $addressQuery) {
@@ -414,5 +421,4 @@ class LeadSearch extends Lead implements SearchModel {
 			$query->andWhere(['<=', Lead::tableName() . '.date_at', date('Y-m-d 23:59:59', strtotime($this->to_at))]);
 		}
 	}
-
 }

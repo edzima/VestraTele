@@ -62,6 +62,7 @@ use kartik\select2\Select2;
 			?>
 
 
+
 			<?= $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
 			<?= $form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->dropDownList(Html::booleanDropdownList(), [
@@ -91,6 +92,8 @@ use kartik\select2\Select2;
 		<?= $form->field($model, 'withoutArchives', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
 		<?= $form->field($model, 'withoutReport', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
+
+		<?= $form->field($model, 'withAddress', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
 
 	</div>

@@ -71,7 +71,7 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-eye"></i>',
 						],
 						[
-							'label' => Yii::t('lead', 'Leads Market'),
+							'label' => Yii::t('lead', 'Lead Market'),
 							'url' => ['/lead/market/index'],
 							'icon' => '<i class="fa fa-bullhorn"></i>',
 							'visible' => $user->can(Worker::PERMISSION_LEAD_MARKET),
