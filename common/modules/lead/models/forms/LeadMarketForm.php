@@ -4,6 +4,7 @@ namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\Module;
@@ -43,10 +44,14 @@ class LeadMarketForm extends Model {
 				},
 			],
 			['lead_id', 'uniqueWithSameContactValidator'],
+			[
+				['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadAddress::class, 'targetAttribute' => ['lead_id' => 'lead_id'],
+				'message' => Yii::t('lead', 'Lead must have Address.'),
+			],
 		];
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'details' => Yii::t('lead', 'Details'),
 		];

@@ -9,7 +9,7 @@ return [
 		'creator_id' => 1,
 	],
 	[
-		'lead_id' => 2,
+		'lead_id' => 3,
 		'status' => LeadMarket::STATUS_NEW,
 		'creator_id' => 2,
 	],

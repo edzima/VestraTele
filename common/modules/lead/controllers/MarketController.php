@@ -91,6 +91,12 @@ class MarketController extends BaseController {
 		}
 		$model = new LeadMarketForm();
 		$model->lead_id = $lead->getId();
+		if (!$model->validate(['lead_id'])) {
+			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'Problem with move Lead to Market: {error}', [
+				'error' => $model->getFirstError('lead_id'),
+			]));
+			return $this->redirectLead($id);
+		}
 		$model->status = LeadMarket::STATUS_NEW;
 		$model->creator_id = Yii::$app->user->getId();
 

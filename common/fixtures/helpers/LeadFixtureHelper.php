@@ -6,6 +6,7 @@ use common\fixtures\ReminderFixture;
 use common\modules\lead\fixtures\CampaignFixture;
 use common\modules\lead\fixtures\DialerFixture;
 use common\modules\lead\fixtures\DialerTypeFixture;
+use common\modules\lead\fixtures\LeadAddressFixture;
 use common\modules\lead\fixtures\LeadAnswerFixture;
 use common\modules\lead\fixtures\LeadFixture;
 use common\modules\lead\fixtures\LeadQuestionFixture;
@@ -43,9 +44,19 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 	private const DIALER_TYPE = 'lead.dialer-type';
 	public const MARKET = 'lead.market';
 	public const MARKET_USER = 'lead.market-user';
+	private const ADDRESS = 'lead.address';
 
 	public const DEFAULT_PHONE = '+48 123-123-123';
 	public const DEFAULT_SOURCE_ID = 1;
+
+	public static function address(): array {
+		return [
+			static::ADDRESS => [
+				'class' => LeadAddressFixture::class,
+				'dataFile' => static::getDataDirPath() . 'address.php',
+			],
+		];
+	}
 
 	public static function market(): array {
 		return [

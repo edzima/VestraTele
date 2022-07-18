@@ -3,6 +3,7 @@
 namespace common\tests\unit\lead;
 
 use common\fixtures\helpers\LeadFixtureHelper;
+use common\fixtures\helpers\TerytFixtureHelper;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\forms\LeadMarketForm;
 use common\modules\lead\models\LeadMarket;
@@ -18,12 +19,14 @@ class LeadMarketFormTest extends Unit {
 
 	public function _fixtures(): array {
 		return array_merge(
+			LeadFixtureHelper::address(),
 			LeadFixtureHelper::lead(),
 			LeadFixtureHelper::market(),
 			LeadFixtureHelper::status(),
 			LeadFixtureHelper::user(),
 			LeadFixtureHelper::reports(),
 			LeadFixtureHelper::source(),
+			TerytFixtureHelper::fixtures(),
 		);
 	}
 
@@ -76,6 +79,17 @@ class LeadMarketFormTest extends Unit {
 		$this->tester->assertSame(2, $market->lead_id);
 		$this->tester->assertSame(LeadMarket::STATUS_NEW, $market->status);
 		$this->tester->assertSame(LeadMarketOptions::VISIBLE_ADDRESS_REGION, $market->getMarketOptions()->visibleArea);
+	}
+
+	public function testSaveWithoutAddress(): void {
+		$this->giveModel([
+			'status' => LeadMarket::STATUS_NEW,
+			'lead_id' => 4,
+			'details' => 'Lead without Address',
+		]);
+
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Lead must have Address.', 'lead_id');
 	}
 
 	public function testReportWithoutSave(): void {
