@@ -116,6 +116,9 @@ use kartik\select2\Select2;
 			],
 		])->widget(DateWidget::class)
 		?>
+
+		<?= $form->field($model, 'fromMarket', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
+
 	</div>
 
 	<?= AddressSearchWidget::widget([

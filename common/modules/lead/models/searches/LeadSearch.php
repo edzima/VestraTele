@@ -9,6 +9,7 @@ use common\models\user\User;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadCampaign;
+use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
@@ -42,6 +43,9 @@ class LeadSearch extends Lead implements SearchModel {
 	public $duplicatePhone;
 
 	public bool $withoutArchives = true;
+
+	public $fromMarket;
+
 	public $withAddress;
 
 	public $name = '';
@@ -79,7 +83,7 @@ class LeadSearch extends Lead implements SearchModel {
 			[['id', 'status_id', 'type_id', 'source_id', 'campaign_id'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
-			[['withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress'], 'boolean'],
+			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress'], 'boolean'],
 			['name', 'string', 'min' => 3],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
@@ -106,6 +110,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'user_type' => Yii::t('lead', 'Type'),
 				'from_at' => Yii::t('lead', 'From At'),
 				'to_at' => Yii::t('lead', 'To At'),
+				'fromMarket' => Yii::t('lead', 'From Market'),
 			]
 		);
 	}
@@ -198,6 +203,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyAnswerFilter($query);
 		$this->applyDateFilter($query);
 		$this->applyDuplicates($query);
+		$this->applyFromMarketFilter($query);
 		$this->applyNameFilter($query);
 		$this->applyUserFilter($query);
 		$this->applyPhoneFilter($query);
@@ -419,6 +425,13 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 		if (!empty($this->to_at)) {
 			$query->andWhere(['<=', Lead::tableName() . '.date_at', date('Y-m-d 23:59:59', strtotime($this->to_at))]);
+		}
+	}
+
+	public function applyFromMarketFilter(LeadQuery $query): void {
+		if ($this->fromMarket) {
+			$query->joinWith('market');
+			$query->andWhere(LeadMarket::tableName() . '.lead_id IS NOT NULL');
 		}
 	}
 }
