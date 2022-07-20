@@ -33,6 +33,8 @@ class MarketManager extends Component {
 			])
 			->one();
 
-		return $model?->isExpired();
+		return $model
+			? $model->isExpired()
+			: null;
 	}
 }
