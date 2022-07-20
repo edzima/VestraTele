@@ -320,7 +320,7 @@ return [
 	'Self Market' => 'Własna Giełda',
 	'Creator' => 'Twórca',
 	'Days Reservation' => 'Ile Dni',
-	'Reserved At' => 'Zarezerwowano',
+	'Reserved At' => 'Rezerwacja Do',
 	'To Confirm' => 'Do Potwierdzenia',
 	'Accepted' => 'Zaakceptowano',
 	'Rejected' => 'Odrzucono',
@@ -335,4 +335,6 @@ return [
 	'With Address' => 'Z Adresem',
 	'Lead must have Address.' => 'Lead musi mieć Adres.',
 	'Problem with move Lead to Market: {error}' => 'Problem z przeniesiem na Giełdę: {error}',
+	'From Market' => 'Z Giełdy',
+	'Reservation for Lead: {lead} from Market has expired.' => 'Rezerwacja Leada: {lead} z Giełdy wygasła.',
 ];

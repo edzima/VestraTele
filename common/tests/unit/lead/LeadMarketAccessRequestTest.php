@@ -55,6 +55,14 @@ class LeadMarketAccessRequestTest extends Unit {
 			'market_id' => $market->id,
 			'days_reservation' => LeadMarketAccessRequest::DEFAULT_DAYS,
 		]);
+	}
+
+	public function testEmail(): void {
+		$this->giveModel([
+			'model' => $this->tester->grabFixture(LeadFixtureHelper::MARKET_USER, 0),
+		]);
+
+		$this->tester->assertTrue($this->model->sendEmail());
 
 		$this->tester->seeEmailIsSent();
 		$email = $this->tester->grabLastSentEmail();
@@ -73,6 +81,8 @@ class LeadMarketAccessRequestTest extends Unit {
 	public function testUpdate(): void {
 		/** @var LeadMarketUser $marketUser */
 		$marketUser = $this->tester->grabFixture(LeadFixtureHelper::MARKET_USER, 0);
+		$marketUser->reserved_at = '2020-02-01';
+		$marketUser->status = LeadMarketUser::STATUS_ACCEPTED;
 		$this->giveModel([
 			'model' => $marketUser,
 		]);
@@ -82,9 +92,9 @@ class LeadMarketAccessRequestTest extends Unit {
 			'user_id' => $marketUser->user_id,
 			'market_id' => $marketUser->market_id,
 			'details' => 'New Details Updated',
+			'reserved_at' => null,
+			'status' => LeadMarketUser::STATUS_TO_CONFIRM,
 		]);
-
-		$this->tester->dontSeeEmailIsSent();
 	}
 
 	public function giveModel(array $config = []): void {

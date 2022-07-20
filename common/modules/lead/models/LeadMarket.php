@@ -177,7 +177,8 @@ class LeadMarket extends ActiveRecord {
 	}
 
 	public function userCanAccessRequest(int $userId): bool {
-		return !$this->isArchived() && !$this->isDone() && $this->hasUser($userId);
+		return !$this->isArchived() && !$this->isDone() && $this->hasUser($userId)
+			&& !$this->leadMarketUsers[$userId]->isExpired();
 	}
 
 	public function isArchived(): bool {

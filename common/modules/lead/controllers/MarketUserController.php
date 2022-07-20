@@ -115,6 +115,7 @@ class MarketUserController extends BaseController {
 		$model->user_id = Yii::$app->user->getId();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$model->sendEmail();
 			return $this->redirect(['market/view', 'id' => $market_id]);
 		}
 

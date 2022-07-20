@@ -75,7 +75,7 @@ class LeadMarketAccessRequest extends Model {
 		$this->market = $market;
 	}
 
-	protected function sendEmail(): bool {
+	public function sendEmail(): bool {
 		$owner = $this->market->lead->owner;
 		$emails = [$this->market->creator->getEmail()];
 		if ($owner !== null && $owner->getID() !== $this->market->creator_id) {
@@ -102,21 +102,13 @@ class LeadMarketAccessRequest extends Model {
 			return false;
 		}
 		$model = $this->getModel();
-		$isNewRecord = $model->isNewRecord;
-		if ($isNewRecord) {
-			$model->status = LeadMarketUser::STATUS_TO_CONFIRM;
-		}
 		$model->market_id = $this->market->id;
 		$model->user_id = $this->user_id;
 		$model->details = $this->details;
 		$model->days_reservation = $this->days;
-		if ($model->save()) {
-			if ($isNewRecord) {
-				$this->sendEmail();
-			}
-			return true;
-		}
-		return false;
+		$model->reserved_at = null;
+		$model->status = LeadMarketUser::STATUS_TO_CONFIRM;
+		return $model->save();
 	}
 
 }
