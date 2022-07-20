@@ -210,6 +210,9 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return isset($this->answers[$question_id]);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public function getUsers(): array {
 		if (empty($this->users_ids)) {
 			$this->users_ids = ArrayHelper::map($this->leadUsers, 'type', 'user_id');

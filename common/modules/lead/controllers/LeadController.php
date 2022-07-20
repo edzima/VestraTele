@@ -12,7 +12,6 @@ use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadType;
-use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
@@ -146,11 +145,25 @@ class LeadController extends BaseController {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView(int $id): string {
+	public function actionView(int $id) {
 		/**
 		 * @var Lead $model
 		 */
 		$model = $this->findLead($id);
+		if (
+			$this->module->market->isFromMarket($model->getUsers(), Yii::$app->user->getId())
+			&& $this->module->market->hasExpiredReservation($id, Yii::$app->user->getId())
+		) {
+			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'Reservation for Lead: {lead} from Market has expired.', [
+				'lead' => $model->getName(),
+			])
+			);
+
+			if ($model->market) {
+				return $this->redirect(['market/view', 'id' => $model->market->id]);
+			}
+			return $this->redirect(['index']);
+		}
 		$sameContactsCount = count($model->getSameContacts());
 
 		if ($sameContactsCount > 0) {
@@ -161,16 +174,8 @@ class LeadController extends BaseController {
 			);
 		}
 
+		$isOwner = $this->module->manager->isOwner($model, Yii::$app->user->getId());
 		$users = $model->leadUsers;
-
-		$isOwner = false;
-		foreach ($users as $leadUser) {
-			if ($leadUser->type === LeadUser::TYPE_OWNER && $leadUser->user_id === Yii::$app->user->getId()) {
-				$isOwner = true;
-				break;
-			}
-		}
-
 		$usersDataProvider = null;
 		if (!$this->module->onlyUser
 			|| ($isOwner && count($users) > 1)) {

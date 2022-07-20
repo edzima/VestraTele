@@ -107,11 +107,15 @@ class LeadUser extends ActiveRecord {
 	}
 
 	public function isMarketType(): bool {
-		return in_array($this->type, [
+		return in_array($this->type, static::marketTypes());
+	}
+
+	public static function marketTypes(): array {
+		return [
 			static::TYPE_MARKET_FIRST,
 			static::TYPE_MARKET_SECOND,
 			static::TYPE_MARKET_THIRD,
-		]);
+		];
 	}
 
 }

@@ -6,6 +6,7 @@ use Closure;
 use common\models\user\User;
 use common\modules\lead\components\LeadDialerManager;
 use common\modules\lead\components\LeadManager;
+use common\modules\lead\components\MarketManager;
 use yii\base\BootstrapInterface;
 use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
@@ -17,6 +18,7 @@ use yii\di\Instance;
  *
  * @property LeadManager $manager
  * @property LeadDialerManager $dialer
+ * @property MarketManager $market
  */
 class Module extends BaseModule implements BootstrapInterface {
 
@@ -34,6 +36,10 @@ class Module extends BaseModule implements BootstrapInterface {
 
 	protected $dialer = [
 		'class' => LeadDialerManager::class,
+	];
+
+	protected $market = [
+		'class' => MarketManager::class,
 	];
 
 	public $components = [
@@ -62,6 +68,20 @@ class Module extends BaseModule implements BootstrapInterface {
 			$this->dialer = Instance::ensure($this->dialer, LeadDialerManager::class);
 		}
 		return $this->dialer;
+	}
+
+	protected function setMarket($market): void {
+		$this->market = $market;
+	}
+
+	public function getMarket(): ?MarketManager {
+		if ($this->market === null) {
+			return null;
+		}
+		if (!is_object($this->market)) {
+			$this->market = Instance::ensure($this->market, MarketManager::class);
+		}
+		return $this->market;
 	}
 
 	public function bootstrap($app) {

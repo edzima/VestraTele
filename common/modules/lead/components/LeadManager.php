@@ -6,6 +6,7 @@ use common\modules\lead\events\LeadEvent;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadInterface;
+use common\modules\lead\models\LeadUser;
 use Yii;
 use yii\base\Component;
 use yii\db\ActiveRecord;
@@ -28,6 +29,15 @@ class LeadManager extends Component {
 			return null;
 		}
 		return $model;
+	}
+
+	public function isOwner(ActiveLead $lead, int $userId): bool {
+		foreach ($lead->getUsers() as $type => $id) {
+			if ($id === $userId && $type === LeadUser::TYPE_OWNER) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function isForUser(ActiveLead $lead, $userId = null): bool {
