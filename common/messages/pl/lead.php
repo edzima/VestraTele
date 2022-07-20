@@ -338,4 +338,7 @@ return [
 	'From Market' => 'Z Giełdy',
 	'Reservation for Lead: {lead} from Market has expired.' => 'Rezerwacja Leada: {lead} z Giełdy wygasła.',
 	'{count} Leads without Address - is required for Market.' => '{count} Leads bez Adresów - wymagany na Giełdę.',
+	'{user} Access request for Lead: {lead} Market: {status}' => 'Giełda - {status}, {user} poprosił o dostęp do Leada: {lead}.',
+	'{n,plural,=0{Today} =1{Tomorrow} other{In # days}} you will lose access to the Lead from Market.' => '{n,plural,=0{Dziś} =1{Jutro} other{Za # Dni}} utracisz dostęp do Leada z Giełdy.',
+	'You will soon lose access to Lead.' => 'Niebawem utracisz dostęp do Leada.',
 ];
