@@ -22,6 +22,12 @@ use yii\widgets\ActiveForm;
 
 		<div class="col-md-6">
 
+			<?= $model instanceof LeadMarketMultipleForm ?
+				Html::hiddenInput('leadsIds', implode(',', $model->leadsIds))
+				: ''
+			?>
+
+
 			<?= $model instanceof LeadMarketForm && !$model->getModel()->isNewRecord
 				? $form->field($model, 'status')->dropDownList(LeadMarketForm::getStatusesNames())
 				: ''

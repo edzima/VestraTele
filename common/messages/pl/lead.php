@@ -337,4 +337,5 @@ return [
 	'Problem with move Lead to Market: {error}' => 'Problem z przeniesiem na Giełdę: {error}',
 	'From Market' => 'Z Giełdy',
 	'Reservation for Lead: {lead} from Market has expired.' => 'Rezerwacja Leada: {lead} z Giełdy wygasła.',
+	'{count} Leads without Address - is required for Market.' => '{count} Leads bez Adresów - wymagany na Giełdę.',
 ];

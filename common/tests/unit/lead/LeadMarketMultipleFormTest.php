@@ -17,6 +17,7 @@ class LeadMarketMultipleFormTest extends Unit {
 
 	public function _fixtures(): array {
 		return array_merge(
+			LeadFixtureHelper::address(),
 			LeadFixtureHelper::lead(),
 			LeadFixtureHelper::user(),
 			LeadFixtureHelper::market(),

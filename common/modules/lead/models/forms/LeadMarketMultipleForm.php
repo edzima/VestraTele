@@ -4,6 +4,7 @@ namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\searches\DuplicateLeadSearch;
@@ -18,6 +19,8 @@ class LeadMarketMultipleForm extends Model {
 	public $creator_id;
 	public $status;
 	public string $details = '';
+
+	private int $withoutAddressCount = 0;
 
 	private ?LeadMarketOptions $options = null;
 
@@ -35,6 +38,7 @@ class LeadMarketMultipleForm extends Model {
 			[['leadsIds'], 'exist', 'allowArray' => true, 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => 'id'],
 			['leadsIds', 'alreadyExistFilter'],
 			['leadsIds', 'alreadyExistSameContactsFilter'],
+			['leadsIds', 'withoutAddressFilter'],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 		];
 	}
@@ -51,7 +55,6 @@ class LeadMarketMultipleForm extends Model {
 				->select('lead_id')
 				->andWhere(['lead_id' => $this->leadsIds])
 				->distinct()
-				->asArray()
 				->column();
 			if (!empty($ids)) {
 				$this->leadsIds = array_diff($this->leadsIds, $ids);
@@ -73,6 +76,22 @@ class LeadMarketMultipleForm extends Model {
 				$this->leadsIds = array_diff($this->leadsIds, $ids);
 			}
 		}
+	}
+
+	public function withoutAddressFilter(): void {
+		if (!$this->hasErrors('leadsIds')) {
+			$ids = LeadAddress::find()
+				->select('lead_id')
+				->andWhere(['lead_id' => $this->leadsIds])
+				->distinct()
+				->column();
+			$this->withoutAddressCount = count($this->leadsIds) - count($ids);
+			$this->leadsIds = $ids;
+		}
+	}
+
+	public function getWithoutAddressCount(): int {
+		return $this->withoutAddressCount;
 	}
 
 	public function load($data, $formName = null): bool {

@@ -38,7 +38,16 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'statusName',
 				'filter' => LeadMarketSearch::getStatusesNames(),
 			],
-			'lead.name',
+			[
+				'attribute' => 'leadName',
+				'value' => function (LeadMarket $data): string {
+					return Html::a(Html::encode($data->lead->getName()), [
+						'lead/view', 'id' => $data->lead_id,
+					]);
+				},
+				'format' => 'html',
+				'filter' => LeadMarketSearch::getStatusesNames(),
+			],
 			[
 				'attribute' => 'leadStatus',
 				'value' => 'lead.statusName',

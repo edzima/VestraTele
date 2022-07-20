@@ -140,6 +140,14 @@ class MarketController extends BaseController {
 		$model->status = LeadMarket::STATUS_NEW;
 		$model->creator_id = Yii::$app->user->getId();
 		$model->leadsIds = $ids;
+		if (Yii::$app->request->isGet) {
+			$model->validate(['leadsIds']);
+			if ($model->getWithoutAddressCount()) {
+				Flash::add(Flash::TYPE_WARNING, Yii::t('lead', '{count} Leads without Address - is required for Market.', [
+					'count' => $model->getWithoutAddressCount(),
+				]));
+			}
+		}
 		if ($model->load(Yii::$app->request->post())
 			&& ($count = $model->save()) > 0
 			&& $model->saveReports(false)
@@ -151,7 +159,14 @@ class MarketController extends BaseController {
 			return $this->redirect(['lead/index']);
 		}
 		if (Yii::$app->request->isPost && empty($model->leadsIds)) {
-			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'All Leads are already on Market'));
+			if ($model->getWithoutAddressCount()) {
+				Flash::add(Flash::TYPE_WARNING, Yii::t('lead', '{count} Leads without Address - is required for Market.', [
+					'count' => $model->getWithoutAddressCount(),
+				]));
+			} else {
+				Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'All Leads are already on Market'));
+			}
+
 			return $this->redirect(['lead/index']);
 		}
 
