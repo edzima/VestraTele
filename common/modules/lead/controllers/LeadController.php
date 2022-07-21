@@ -5,6 +5,8 @@ namespace common\modules\lead\controllers;
 use backend\widgets\CsvForm;
 use common\behaviors\SelectionRouteBehavior;
 use common\helpers\Flash;
+use common\helpers\Html;
+use common\models\user\User;
 use common\modules\lead\models\forms\LeadForm;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\Lead;
@@ -163,6 +165,12 @@ class LeadController extends BaseController {
 				return $this->redirect(['market/view', 'id' => $model->market->id]);
 			}
 			return $this->redirect(['index']);
+		}
+		if ($model->market !== null && Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)) {
+			Flash::add(Flash::TYPE_INFO,
+				Yii::t('lead', 'Lead is in Market') . ' '
+				. Html::a(Html::icon('link'), ['market/view', 'id' => $model->market->id])
+			);
 		}
 		$sameContactsCount = count($model->getSameContacts());
 

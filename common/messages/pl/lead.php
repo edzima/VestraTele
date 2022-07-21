@@ -343,4 +343,5 @@ return [
 	'You will soon lose access to Lead.' => 'Niebawem utracisz dostęp do Leada.',
 	'New {count} Leads on Market.' => 'Nowe Leady na Giełdzie: {count}.',
 	'Others' => 'Pozostałe',
+	'Lead is in Market' => 'Lead jest na Giełdzie',
 ];
