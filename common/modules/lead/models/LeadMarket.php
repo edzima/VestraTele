@@ -36,6 +36,18 @@ class LeadMarket extends ActiveRecord {
 	public const STATUS_AVAILABLE_AGAIN = 5;
 	public const STATUS_DONE = 10;
 
+	/**
+	 * {@inheritdoc}
+	 */
+	public function behaviors(): array {
+		return [
+			'time' => [
+				'class' => TimestampBehavior::class,
+				'value' => new Expression('NOW()'),
+			],
+		];
+	}
+
 	private ?LeadMarketOptions $marketOptions = null;
 
 	public function bookIt(bool $update = true): void {
@@ -66,18 +78,6 @@ class LeadMarket extends ActiveRecord {
 			static::STATUS_AVAILABLE_AGAIN => Yii::t('lead', 'Available Again'),
 			static::STATUS_DONE => Yii::t('lead', 'Done'),
 			static::STATUS_ARCHIVED => Yii::t('lead', 'Archived'),
-		];
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function behaviors(): array {
-		return [
-			[
-				'class' => TimestampBehavior::class,
-				'value' => new Expression('NOW()'),
-			],
 		];
 	}
 
@@ -119,10 +119,13 @@ class LeadMarket extends ActiveRecord {
 
 	public function getAddressDetails(): ?string {
 		$options = $this->getMarketOptions();
-		if (!$options->hasAddressVisible() || $this->lead->getCustomerAddress() === null) {
+		if (!$options->hasAddressVisible()) {
 			return null;
 		}
 		$address = $this->lead->getCustomerAddress();
+		if ($address === null) {
+			return null;
+		}
 		$details = [];
 		switch ($options->visibleArea) {
 			case LeadMarketOptions::VISIBLE_ADDRESS_REGION:

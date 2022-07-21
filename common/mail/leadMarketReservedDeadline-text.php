@@ -1,6 +1,5 @@
 <?php
 
-use common\helpers\Html;
 use common\modules\lead\models\LeadMarketUser;
 
 /* @var $this yii\web\View */
@@ -11,5 +10,5 @@ $leadLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['l
 
 ?>
 <?= Yii::t('lead', 'You will soon lose access to Lead.') ?>
-<?= Html::a(Html::encode($leadLink), $leadLink) ?>
+<?= $leadLink ?>
 
