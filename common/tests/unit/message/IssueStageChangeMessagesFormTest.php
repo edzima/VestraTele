@@ -42,9 +42,41 @@ class IssueStageChangeMessagesFormTest extends BaseIssueMessagesFormTest {
 					IssueStageChangeMessagesForm::keyWorkers(),
 					[1, 2]
 				),
-				'email.issue.stageChange.workers.' . MessageTemplateKeyHelper::issueTypesKeyPart([1, 2]),
+				'sms.issue.stageChange.workers.' . MessageTemplateKeyHelper::issueTypesKeyPart([1, 2]),
+			],
+			'SMS Customer With Stage ID without Issue Types' => [
+				IssueStageChangeMessagesForm::generateKey(
+					IssueStageChangeMessagesForm::TYPE_SMS,
+					IssueStageChangeMessagesForm::keyCustomer(),
+					[],
+					1
+				),
+				'sms.issue.stageChange.customer.stageID:1',
+			],
+			'SMS Customer With Stage ID and Issue Types' => [
+				IssueStageChangeMessagesForm::generateKey(
+					IssueStageChangeMessagesForm::TYPE_SMS,
+					IssueStageChangeMessagesForm::keyCustomer(),
+					[1, 2],
+					1
+				),
+				'sms.issue.stageChange.customer.stageID:1.' . MessageTemplateKeyHelper::issueTypesKeyPart([1, 2]),
 			],
 		];
+	}
+
+	public function testReminderDayKeys(): void {
+		$templates = IssueStageChangeMessagesForm::daysReminderTemplates();
+
+		$customers = $templates[IssueStageChangeMessagesForm::KEY_CUSTOMER];
+		$workers = $templates[IssueStageChangeMessagesForm::KEY_WORKERS];
+
+		foreach ($customers as $key => $customer) {
+			if ($key === 'sms.issue.stageChange.customer.reminderDays:7.stageID:1') {
+				$this->tester->assertSame(7, IssueStageChangeMessagesForm::getDaysReminder($key));
+				$this->tester->assertSame(1, IssueStageChangeMessagesForm::getStageID($key));
+			}
+		}
 	}
 
 	public function testStagesNamesInEmails(): void {

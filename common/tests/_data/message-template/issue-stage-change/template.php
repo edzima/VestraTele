@@ -10,4 +10,14 @@ return [
 			IssueStageChangeMessagesForm::keyWorkers(),
 		),
 	],
+	[
+		'id' => 2,
+		'key' => IssueStageChangeMessagesForm::generateKey(
+			IssueStageChangeMessagesForm::TYPE_SMS,
+			IssueStageChangeMessagesForm::keyCustomer(),
+			[],
+			1,
+			7
+		),
+	],
 ];
