@@ -9,6 +9,7 @@ use common\models\issue\IssueNote;
 use common\models\issue\IssueStage;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
+use yii\db\Expression;
 
 class IssueStageChangeMessagesForm extends IssueMessagesForm {
 
@@ -29,6 +30,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 	}
 
 	public bool $withDaysReminderKey = false;
+	public bool $withStageIdKey = true;
 
 	public ?bool $sendSmsToCustomer = false;
 	public ?bool $sendEmailToCustomer = false;
@@ -37,6 +39,66 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 	public $workersTypes = [
 		IssueUser::TYPE_AGENT,
 	];
+
+	public static function pushDelayedMessages(int $smsOwnerId): array {
+		$templates = static::daysReminderTemplates();
+
+		$customers = $templates[static::KEY_CUSTOMER];
+		$workers = $templates[static::KEY_WORKERS];
+
+		$customersSMS = 0;
+		$customersEmail = 0;
+		$agentSMS = 0;
+		$agentEmail = 0;
+		foreach ($customers as $key => $template) {
+			$issues = static::findIssues($key)->all();
+			foreach ($issues as $issue) {
+				$model = new static();
+				$model->setIssue($issue);
+
+				if (MessageTemplateKeyHelper::isSMS($key)) {
+					$model->sendSmsToCustomer = true;
+					$model->sendEmailToCustomer = false;
+					$model->sms_owner_id = $smsOwnerId;
+					$model->setCustomerSMSTemplate($template);
+					$customersSMS += $model->pushCustomerMessages();
+				} elseif (MessageTemplateKeyHelper::isEmail($key)) {
+					$model->sendEmailToCustomer = true;
+					$model->sendSmsToCustomer = false;
+					$model->setCustomerEmailTemplate($template);
+					$customersEmail += $model->pushCustomerMessages();
+				}
+			}
+		}
+
+		foreach ($workers as $key => $template) {
+			$issues = static::findIssues($key)->all();
+			foreach ($issues as $issue) {
+				$model = new static();
+				$model->setIssue($issue);
+				if (MessageTemplateKeyHelper::isSMS($key)) {
+					$model->sendSmsToAgent = true;
+					$model->sendEmailToWorkers = false;
+					$model->sms_owner_id = $smsOwnerId;
+					$model->setAgentSMSTemplate($template);
+					$model->pushWorkersMessages();
+				} elseif (MessageTemplateKeyHelper::isEmail($key)) {
+					$model->sendSmsToAgent = false;
+					$model->sendEmailToWorkers = true;
+					$model->workersTypes = [IssueUser::TYPE_AGENT];
+					$model->setWorkersEmailTemplate($template);
+					$agentEmail += $model->pushWorkersMessages();
+				}
+			}
+		}
+
+		return [
+			'customersSMS' => $customersSMS,
+			'customersEmail' => $customersEmail,
+			'agentsSMS' => $agentSMS,
+			'agentsEmail' => $agentEmail,
+		];
+	}
 
 	/**
 	 * @param string|null $language
@@ -58,10 +120,13 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 
 	public static function findIssues(string $key): IssueQuery {
 		$stageId = static::getStageID($key);
+		$typesId = static::getTypesIds($key);
 		$days = static::getDaysReminder($key);
 
 		return Issue::find()
-			->andFilterWhere(['stage_id' => $stageId]);
+			->andFilterWhere(['stage_id' => $stageId])
+			->andFilterWhere(['type_id' => $typesId])
+			->andFilterWhere(['=', new Expression("DATEDIFF(CURDATE(), stage_change_at)"), $days]);
 	}
 
 	public static function getDaysReminder(string $key): ?int {
@@ -103,7 +168,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 		if ($this->withDaysReminderKey) {
 			$parts[] = static::KEY_REMINDER_DAYS;
 		}
-		if ($this->issue) {
+		if ($this->issue && $this->withStageIdKey) {
 			$parts[static::KEY_STAGE_ID] = $this->issue->getIssueStage()->id;
 		}
 		return $parts;
@@ -120,7 +185,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 		}
 
 		if (!empty($issueTypesIds)) {
-			$parts[] = MessageTemplateKeyHelper::issueTypesKeyPart($issueTypesIds);
+			$parts[] = static::issueTypesKeyPart($issueTypesIds);
 		}
 		return MessageTemplateKeyHelper::generateKey($parts);
 	}
