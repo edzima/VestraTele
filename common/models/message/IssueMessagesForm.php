@@ -14,6 +14,8 @@ use yii\mail\MessageInterface;
 
 class IssueMessagesForm extends MessageModel {
 
+	protected const KEY_ISSUE_TYPES = 'issueTypes';
+
 	protected const KEY_CUSTOMER = 'customer';
 	protected const KEY_WORKERS = 'workers';
 
@@ -323,7 +325,7 @@ class IssueMessagesForm extends MessageModel {
 	public static function generateKey(string $type, string $key, ?array $issueTypesIds = null): string {
 		$parts = array_merge((array) $type, static::mainKeys(), (array) $key);
 		if (!empty($issueTypesIds)) {
-			$parts[] = MessageTemplateKeyHelper::issueTypesKeyPart($issueTypesIds);
+			$parts[] = static::issueTypesKeyPart($issueTypesIds);
 		}
 		return MessageTemplateKeyHelper::generateKey($parts);
 	}
@@ -346,6 +348,23 @@ class IssueMessagesForm extends MessageModel {
 
 	public function keysParts(string $type): array {
 		return [];
+	}
+
+	public static function isForIssueType(string $key, int $id): bool {
+		$ids = (array) static::getTypesIds($key);
+		return empty($ids)
+			|| in_array($id, $ids);
+	}
+
+	public static function issueTypesKeyPart(array $ids): string {
+		if (empty($ids)) {
+			return '';
+		}
+		return MessageTemplateKeyHelper::generateKey([static::KEY_ISSUE_TYPES => $ids]);
+	}
+
+	protected static function getTypesIds(string $key) {
+		return MessageTemplateKeyHelper::getValue($key, static::KEY_ISSUE_TYPES);
 	}
 
 }

@@ -111,21 +111,5 @@ class KeyHelperTest extends Unit {
 		));
 	}
 
-	public function testEmptyIssueType(): void {
-		$this->tester->assertSame('issue.create', MessageTemplateKeyHelper::generateKey(
-			['issue', 'create', MessageTemplateKeyHelper::issueTypesKeyPart([])]
-		));
-	}
 
-	public function testSingleIssueType(): void {
-		$this->tester->assertSame('issue.create.issueTypes:1', MessageTemplateKeyHelper::generateKey(
-			['issue', 'create', MessageTemplateKeyHelper::issueTypesKeyPart([1])]
-		));
-	}
-
-	public function testMultipleIssueTypes(): void {
-		$this->tester->assertSame('issue.create.issueTypes:1,2', MessageTemplateKeyHelper::generateKey(
-			['issue', 'create', MessageTemplateKeyHelper::issueTypesKeyPart([1, 2])]
-		));
-	}
 }

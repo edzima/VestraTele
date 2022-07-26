@@ -70,7 +70,7 @@ class IssueSettlementMessagesForm extends IssueMessagesForm {
 			$parts[static::KEY_SETTLEMENT_TYPE] = $settlementType;
 		}
 		if (!empty($issueTypesIds)) {
-			$parts[] = MessageTemplateKeyHelper::issueTypesKeyPart($issueTypesIds);
+			$parts[] = static::issueTypesKeyPart($issueTypesIds);
 		}
 		return MessageTemplateKeyHelper::generateKey($parts);
 	}

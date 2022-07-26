@@ -9,8 +9,6 @@ class MessageTemplateKeyHelper {
 	public const TYPE_SMS = 'sms';
 	public const TYPE_EMAIL = 'email';
 
-	private const KEY_ISSUE_TYPES = 'issueTypes';
-
 	protected const PART_SEPARATOR = '.';
 	protected const VALUES_PREFIX = ':';
 	protected const VALUES_SEPARATOR = ',';
@@ -33,37 +31,12 @@ class MessageTemplateKeyHelper {
 		return implode($separator, $keys);
 	}
 
-	public static function issueTypesKeyPart(array $ids): string {
-		if (empty($ids)) {
-			return '';
-		}
-		return static::generateKey([static::KEY_ISSUE_TYPES => $ids], static::VALUES_SEPARATOR);
-	}
-
 	public static function isSMS(string $key): bool {
 		return StringHelper::startsWith($key, static::TYPE_SMS . static::PART_SEPARATOR);
 	}
 
 	public static function isEmail(string $key): bool {
 		return StringHelper::startsWith($key, static::TYPE_EMAIL . static::PART_SEPARATOR);
-	}
-
-	public static function isForIssueType(string $key, int $id): bool {
-		$partKey = static::KEY_ISSUE_TYPES . static::VALUES_PREFIX;
-		if (strpos($key, $partKey) === false) {
-			return true;
-		}
-		$parts = static::explodeKey($key);
-		foreach ($parts as $part) {
-			if (StringHelper::startsWith($part, $partKey)) {
-				$withoutKey = str_replace($partKey, '', $part);
-				$ids = static::explodeValues($withoutKey);
-				if (empty($ids) || in_array($id, $ids)) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	public static function getValue(string $key, string $valueKey) {
