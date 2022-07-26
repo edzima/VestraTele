@@ -37,6 +37,11 @@ class IssueMessagesForm extends MessageModel {
 
 	protected ?IssueInterface $issue = null;
 
+	protected ?MessageTemplate $customerSMSTemplate = null;
+	protected ?MessageTemplate $agentSMSTemplate = null;
+	protected ?MessageTemplate $customerEmailTemplate = null;
+	protected ?MessageTemplate $workersEmailTemplate = null;
+
 	public function setIssue(IssueInterface $issue): void {
 		$this->issue = $issue;
 		if (!$this->issue->getIssueModel()->isNewRecord) {
@@ -128,12 +133,26 @@ class IssueMessagesForm extends MessageModel {
 	}
 
 	public function getSmsToCustomer(): ?IssueSmsForm {
-		if (!$this->customerHasPhone()
-			|| ($template = $this->getSmsTemplate($this->getCustomerTemplateKey())) === null) {
+		if (!$this->customerHasPhone()) {
+			return null;
+		}
+		$template = $this->getCustomerSMSTemplate();
+		if ($template === null) {
 			return null;
 		}
 		$this->parseTemplate($template);
 		return $this->createCustomerSms($template);
+	}
+
+	protected function getCustomerSMSTemplate(): ?MessageTemplate {
+		if ($this->customerSMSTemplate === null) {
+			$this->customerSMSTemplate = $this->getSmsTemplate($this->getCustomerTemplateKey());
+		}
+		return $this->customerSMSTemplate;
+	}
+
+	public function setCustomerSMSTemplate(MessageTemplate $messageTemplate): void {
+		$this->customerSMSTemplate = $messageTemplate;
 	}
 
 	public function hasSmsCustomerTemplate(bool $withIssueType = true): bool {
@@ -149,21 +168,49 @@ class IssueMessagesForm extends MessageModel {
 	}
 
 	public function getSmsToAgent(): ?IssueSmsForm {
-		if (!$this->agentHasPhones()
-			|| ($template = $this->getSmsTemplate($this->getWorkersTemplateKey())) === null) {
+		if (!$this->agentHasPhones()) {
+			return null;
+		}
+		$template = $this->getAgentSMSTemplate();
+		if ($template === null) {
 			return null;
 		}
 		$this->parseTemplate($template);
 		return $this->createAgentSms($template);
 	}
 
+	protected function getAgentSMSTemplate(): ?MessageTemplate {
+		if ($this->agentSMSTemplate === null) {
+			$this->agentSMSTemplate = $this->getSmsTemplate($this->getWorkersTemplateKey());
+		}
+		return $this->agentSMSTemplate;
+	}
+
+	public function setAgentSMSTemplate(MessageTemplate $messageTemplate): void {
+		$this->agentSMSTemplate = $messageTemplate;
+	}
+
 	public function getEmailToCustomer(): ?MessageInterface {
-		if (!$this->customerHasEmail()
-			|| ($template = $this->getEmailTemplate($this->getCustomerTemplateKey())) === null) {
+		if (!$this->customerHasEmail()) {
+			return null;
+		}
+		$template = $this->getCustomerEmailTemplate();
+		if ($template === null) {
 			return null;
 		}
 		$this->parseTemplate($template);
 		return $this->createEmail($template)->setTo($this->getCustomerEmail());
+	}
+
+	private function getCustomerEmailTemplate(): ?MessageTemplate {
+		if ($this->customerEmailTemplate === null) {
+			$this->customerEmailTemplate = $this->getEmailTemplate($this->getCustomerTemplateKey());
+		}
+		return $this->customerEmailTemplate;
+	}
+
+	public function setCustomerEmailTemplate(MessageTemplate $messageTemplate): void {
+		$this->customerEmailTemplate = $messageTemplate;
 	}
 
 	public function getEmailToWorkers(): ?MessageInterface {
@@ -171,12 +218,23 @@ class IssueMessagesForm extends MessageModel {
 		if (empty($emails)) {
 			return null;
 		}
-		$template = $this->getEmailTemplate($this->getWorkersTemplateKey());
+		$template = $this->getWorkersTemplate();
 		if ($template === null) {
 			return null;
 		}
 		$this->parseTemplate($template);
 		return $this->createEmail($template)->setTo($emails);
+	}
+
+	protected function getWorkersTemplate(): ?MessageTemplate {
+		if ($this->workersEmailTemplate === null) {
+			$this->workersEmailTemplate = $this->getEmailTemplate($this->getWorkersTemplateKey());
+		}
+		return $this->workersEmailTemplate;
+	}
+
+	public function setWorkersEmailTemplate(MessageTemplate $messageTemplate): void {
+		$this->workersEmailTemplate = $messageTemplate;
 	}
 
 	public function getCustomerTemplateKey(): string {
