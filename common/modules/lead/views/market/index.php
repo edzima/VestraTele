@@ -46,7 +46,6 @@ $this->params['breadcrumbs'][] = $this->title;
 					]);
 				},
 				'format' => 'html',
-				'filter' => LeadMarketSearch::getStatusesNames(),
 			],
 			[
 				'attribute' => 'leadStatus',
@@ -99,7 +98,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'template' => '{access-request} {view} {update} {delete}',
 				'buttons' => [
 					'access-request' => function (string $url, LeadMarket $data): string {
-						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', ['market-user/access-request', 'market_id' => $data->id]);
+						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', ['market-user/access-request', 'market_id' => $data->id], [
+							'aria-label' => Yii::t('lead', 'Request Access'),
+							'title' => Yii::t('lead', 'Request Access'),
+							'data-pjax' => 0,
+						]);
 					},
 				],
 				'visibleButtons' => [

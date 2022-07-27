@@ -62,14 +62,20 @@ $this->params['breadcrumbs'][] = $this->title;
 				'template' => '{access-request} {view} {update} {delete}',
 				'buttons' => [
 					'access-request' => function (string $url, LeadMarket $data): ?string {
-						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', ['market-user/access-request', 'market_id' => $data->id]);
+						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', ['market-user/access-request', 'market_id' => $data->id], [
+							'aria-label' => Yii::t('lead', 'Request Access'),
+							'title' => Yii::t('lead', 'Request Access'),
+						]);
 					},
 				],
 				'visibleButtons' => [
-					'update' => function (LeadMarket $data): bool {
+					'access-request' => function (LeadMarket $data): bool {
+						return $data->userCanAccessRequest(Yii::$app->user->getId());
+					},
+					'update' => static function (LeadMarket $data): bool {
 						return $data->isCreatorOrOwnerLead(Yii::$app->user->getId());
 					},
-					'delete' => function (LeadMarket $data): bool {
+					'delete' => static function (LeadMarket $data): bool {
 						return $data->status === LeadMarket::STATUS_NEW && $data->isCreatorOrOwnerLead(Yii::$app->user->getId());
 					},
 				],

@@ -58,19 +58,16 @@ $this->params['breadcrumbs'][] = $this->title;
 			//'updated_at',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{view} {access-request} {accept} {reject} {delete}',
+				'template' => '{accept} {reject} {view} {delete}',
 				'visibleButtons' => [
-					'access-request' => static function (LeadMarketUser $model) {
-						return $model->user_id === Yii::$app->user->getId();
-					},
 					'accept' => static function (LeadMarketUser $model): bool {
+						return $model->isToConfirm() && $model->market->isCreatorOrOwnerLead(Yii::$app->user->getId());
+					},
+					'reject' => static function (LeadMarketUser $model): bool {
 						return $model->isToConfirm() && $model->market->isCreatorOrOwnerLead(Yii::$app->user->getId());
 					},
 					'delete' => static function (LeadMarketUser $model) {
 						return $model->isToConfirm() && $model->user_id === Yii::$app->user->getId();
-					},
-					'reject' => static function (LeadMarketUser $model): bool {
-						return $model->isToConfirm() && $model->market->isCreatorOrOwnerLead(Yii::$app->user->getId());
 					},
 				],
 				'buttons' => [
@@ -78,13 +75,18 @@ $this->params['breadcrumbs'][] = $this->title;
 						return Html::a(Html::icon('eye-open'), ['market/view', 'id' => $model->market_id]);
 					},
 					'accept' => static function (string $url): string {
-						return Html::a(Html::icon('check'), $url);
-					},
-					'access-request' => static function (string $url): string {
-						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', $url);
+						return Html::a(Html::icon('check'), $url, [
+							'title' => Yii::t('lead', 'Accept'),
+							'aria-label' => Yii::t('lead', 'Accept'),
+							'data-pjax' => 1,
+						]);
 					},
 					'reject' => static function (string $url): string {
-						return Html::a(Html::icon('remove'), $url);
+						return Html::a(Html::icon('remove'), $url, [
+							'title' => Yii::t('lead', 'Reject'),
+							'aria-label' => Yii::t('lead', 'Reject'),
+							'data-pjax' => 1,
+						]);
 					},
 				],
 			],

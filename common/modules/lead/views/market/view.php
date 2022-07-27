@@ -15,7 +15,11 @@ use yii\widgets\DetailView;
 
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
-$this->params['breadcrumbs'][] = ['label' => $model->lead->getName(), 'url' => ['lead/view', 'id' => $model->lead_id]];
+if (!$onlyUser || $model->hasAccessToLead(Yii::$app->user->getId())) {
+	$this->params['breadcrumbs'][] = ['label' => $model->lead->getName(), 'url' => ['lead/view', 'id' => $model->lead_id]];
+} else {
+	$this->params['breadcrumbs'][] = $model->lead->getName();
+}
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Markets'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -26,7 +30,7 @@ YiiAsset::register($this);
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= !$model->userCanAccessRequest(Yii::$app->user->getId())
+		<?= $model->userCanAccessRequest(Yii::$app->user->getId())
 			? Html::a(Yii::t('lead', 'Request Access'), ['market-user/access-request', 'market_id' => $model->id], ['class' => 'btn btn-success'])
 			: ''
 		?>
@@ -106,14 +110,27 @@ YiiAsset::register($this);
 					},
 				],
 				'buttons' => [
-					'accept' => static function (string $url): string {
-						return Html::a(Html::icon('check'), $url);
-					},
 					'access-request' => static function (string $url): string {
-						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', $url);
+						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', $url, [
+							'title' => Yii::t('lead', 'Request Access'),
+							'aria-label' => Yii::t('lead', 'Request Access'),
+							'data-pjax' => 0,
+						]);
 					},
+					'accept' => static function (string $url): string {
+						return Html::a(Html::icon('check'), $url, [
+							'title' => Yii::t('lead', 'Accept'),
+							'aria-label' => Yii::t('lead', 'Accept'),
+							'data-pjax' => 1,
+						]);
+					},
+
 					'reject' => static function (string $url): string {
-						return Html::a(Html::icon('remove'), $url);
+						return Html::a(Html::icon('remove'), $url, [
+							'title' => Yii::t('lead', 'Reject'),
+							'aria-label' => Yii::t('lead', 'Reject'),
+							'data-pjax' => 1,
+						]);
 					},
 				],
 			],
