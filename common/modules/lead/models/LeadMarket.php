@@ -180,8 +180,9 @@ class LeadMarket extends ActiveRecord {
 	}
 
 	public function userCanAccessRequest(int $userId): bool {
-		return !$this->isArchived() && !$this->isDone() && $this->hasUser($userId)
-			&& !$this->leadMarketUsers[$userId]->isExpired();
+		return !$this->isArchived() && !$this->isDone()
+			&& !$this->isCreatorOrOwnerLead($userId)
+			&& (!$this->hasUser($userId) || $this->leadMarketUsers[$userId]->isExpired());
 	}
 
 	public function isArchived(): bool {
@@ -199,5 +200,12 @@ class LeadMarket extends ActiveRecord {
 	public function isCreatorOrOwnerLead(int $userId): bool {
 		return $this->creator_id === $userId
 			|| ($this->lead->owner !== null && $this->lead->owner->getID() === $userId);
+	}
+
+	public function hasAccessToLead(int $userId): bool {
+		return $this->isCreatorOrOwnerLead($userId) ||
+			(
+				Module::getInstance()->market->isFromMarket($this->lead->getUsers(), $userId)
+				&& !Module::getInstance()->market->hasExpiredReservation($this->lead_id, $userId));
 	}
 }
