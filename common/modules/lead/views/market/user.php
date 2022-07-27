@@ -19,14 +19,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
-
 	<p>
 		<?= Html::a(Yii::t('lead', 'Market Users'), ['market-user/index',], [
 			'class' => 'btn btn-success',
 		]) ?>
 	</p>
 
-	<?= $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', [
+		'action' => 'user',
+		'model' => $searchModel,
+	]); ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
@@ -44,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => LeadMarketSearch::getStatusesNames(),
 			],
 			'details:ntext',
-			'created_at:datetime',
+			'created_at:date',
 			[
 				'attribute' => 'creator_id',
 				'value' => 'creator.fullName',

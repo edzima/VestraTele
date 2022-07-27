@@ -13,9 +13,11 @@ use yii\widgets\DetailView;
 /* @var $model LeadMarket */
 /* @var $onlyUser bool */
 
+$showLead = !$onlyUser || $model->hasAccessToLead(Yii::$app->user->getId());
+
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
-if (!$onlyUser || $model->hasAccessToLead(Yii::$app->user->getId())) {
+if ($showLead) {
 	$this->params['breadcrumbs'][] = ['label' => $model->lead->getName(), 'url' => ['lead/view', 'id' => $model->lead_id]];
 } else {
 	$this->params['breadcrumbs'][] = $model->lead->getName();
@@ -53,6 +55,7 @@ YiiAsset::register($this);
 
 
 		<div class="col-md-5">
+
 			<?= DetailView::widget([
 				'model' => $model,
 				'attributes' => [
@@ -61,22 +64,35 @@ YiiAsset::register($this);
 					'updated_at:datetime',
 					'creator.fullName:text:' . Yii::t('lead', 'Creator'),
 					'lead.owner.fullName:text:' . Yii::t('lead', 'Owner'),
+					[
+						'value' => $model->getUser(Yii::$app->user->getId())
+							? $model->getUser(Yii::$app->user->getId())->reserved_at
+							: null,
+						'format' => 'date',
+						'label' => Yii::t('lead', 'Reserved At'),
+						'visible' => $model->getUser(Yii::$app->user->getId()) !== null,
+					],
 				],
 			]) ?>
+
+
+			<?= $showLead
+				? $this->render('_lead', [
+					'model' => $model->lead,
+				])
+				: ''
+			?>
 		</div>
 
 
 		<div class="col-md-4">
 			<?= $model->isCreatorOrOwnerLead(Yii::$app->user->getId())
-				? DetailView::widget([
+				? $this->render('_options_details', [
 					'model' => $model->getMarketOptions(),
-					'attributes' => [
-						'visibleAreaName',
-						'visibleAddressDetails:boolean',
-					],
 				])
 				: ''
 			?>
+
 		</div>
 	</div>
 

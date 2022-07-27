@@ -113,6 +113,10 @@ class LeadMarket extends ActiveRecord {
 		];
 	}
 
+	public function getUser(int $userId): ?LeadMarketUser {
+		return $this->leadMarketUsers[$userId] ?? null;
+	}
+
 	public function getUsersCount(): int {
 		return count($this->leadMarketUsers);
 	}

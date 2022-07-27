@@ -8,12 +8,14 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model LeadMarketSearch */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $action string */
 ?>
 
 <div class="lead-market-search">
 
 	<?php $form = ActiveForm::begin([
 		'method' => 'get',
+		'action' => $action,
 	]); ?>
 
 
@@ -44,7 +46,7 @@ use yii\widgets\ActiveForm;
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Search'), ['class' => 'btn btn-primary']) ?>
-		<?= Html::a(Yii::t('backend', 'Reset'), '', ['class' => 'btn btn-default']) ?>
+		<?= Html::a(Yii::t('backend', 'Reset'), $action, ['class' => 'btn btn-default']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>
