@@ -27,6 +27,7 @@ class LeadMarketSearch extends LeadMarket {
 	public $visibleArea;
 
 	public $leadStatus;
+	public $leadName;
 
 	public $userId;
 
@@ -79,7 +80,7 @@ class LeadMarketSearch extends LeadMarket {
 				], 'integer',
 			],
 			[['selfAssign', 'selfMarket'], 'boolean'],
-			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details'], 'safe'],
+			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details', 'leadName'], 'safe'],
 		];
 	}
 
@@ -134,6 +135,7 @@ class LeadMarketSearch extends LeadMarket {
 		$this->applySelfMarketFilter($query);
 		$this->applySelfAssignFilter($query);
 		$this->applyWithoutArchiveFilter($query);
+		$this->applyLeadNameFilter($query);
 		$this->applyLeadStatusFilter($query);
 		$this->applyMarketUserStatusFilter($query);
 
@@ -265,6 +267,15 @@ class LeadMarketSearch extends LeadMarket {
 			$query->joinWith('lead');
 			$query->andWhere([
 				Lead::tableName() . '.status_id' => $this->leadStatus,
+			]);
+		}
+	}
+
+	private function applyLeadNameFilter(ActiveQuery $query): void {
+		if (!empty($this->leadStatus)) {
+			$query->joinWith('lead');
+			$query->andWhere([
+				Lead::tableName() . '.name' => $this->leadName,
 			]);
 		}
 	}
