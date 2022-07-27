@@ -245,7 +245,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 	private function applyAddressFilter(ActiveQuery $query): void {
 		if ($this->withAddress) {
-			$query->joinWith('addresses');
+			$query->joinWith('addresses.address.city');
 			$query->andWhere(LeadAddress::tableName() . '.lead_id IS NOT NULL');
 		}
 		if ($this->addressSearch->validate()) {
