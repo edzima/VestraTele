@@ -4,9 +4,9 @@ namespace common\modules\lead\controllers;
 
 use common\helpers\Flash;
 use common\modules\lead\models\forms\LeadMarketAccessRequest;
+use common\modules\lead\models\forms\LeadMarketAccessResponseForm;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
-use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadMarketUserSearch;
 use Yii;
 use yii\base\InvalidArgumentException;
@@ -60,21 +60,23 @@ class MarketUserController extends BaseController {
 		if (!$model->market->isCreatorOrOwnerLead(Yii::$app->user->getId())) {
 			throw new MethodNotAllowedHttpException('Only Lead Owner or Market Creator can Accepted.');
 		}
-		$model->accept();
+		$responseForm = new LeadMarketAccessResponseForm($model);
+		$responseForm->accept();
 		Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead',
 			'Success Reserved Lead Market to: {reserved_at}', [
 				'reserved_at' => Yii::$app->formatter->asDate($model->reserved_at),
 			])
 		);
-		$type = $model->addUserToLead();
+		$type = $responseForm->linkUserToLead();
 		if ($type) {
 			Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead',
 				'Assign User: {user} as {typeName} to Lead: {leadName}.', [
 					'leadName' => $model->market->lead->getName(),
 					'user' => $model->user->getFullName(),
-					'typeName' => LeadUser::getTypesNames()[$type],
+					'typeName' => LeadMarketAccessResponseForm::getLinkedUserTypeName($type),
 				])
 			);
+			$responseForm->sendAcceptEmail();
 		} else {
 			Flash::add(Flash::TYPE_WARNING, Yii::t('lead',
 				'Problem with add User to Lead.')
@@ -91,7 +93,9 @@ class MarketUserController extends BaseController {
 		if (!$model->market->isCreatorOrOwnerLead(Yii::$app->user->getId())) {
 			throw new MethodNotAllowedHttpException('Only Lead Owner or Market Creator can Rejected.');
 		}
-		$model->reject();
+		$responseForm = new LeadMarketAccessResponseForm($model);
+		$responseForm->reject();
+		$responseForm->sendRejectEmail();
 		return $this->redirect(['market/view', 'id' => $market_id]);
 	}
 
