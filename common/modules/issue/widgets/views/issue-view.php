@@ -3,7 +3,6 @@
 use common\helpers\Url;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
-use common\models\issue\IssueRelation;
 use common\models\issue\IssueTag;
 use common\models\issue\IssueUser;
 use common\models\user\Worker;
@@ -168,7 +167,9 @@ use yii\data\ActiveDataProvider;
 		<div class="col-md-5 col-lg-6">
 			<?= GridView::widget([
 				'dataProvider' => new ActiveDataProvider([
-					'query' => $model->getIssues(),
+					'query' => $model->getLinkedIssues()
+						->with('customer')
+						->with('tags'),
 				]),
 				'summary' => '',
 				'caption' => Yii::t('issue', 'Linked'),
@@ -178,41 +179,30 @@ use yii\data\ActiveDataProvider;
 					[
 						'label' => Yii::t('issue', 'Issue'),
 						'format' => 'html',
-						'value' => function (IssueRelation $relation) use ($model): string {
-							$issue = $relation->issue_id_1 === $model->getIssueId()
-								? $relation->issue2
-								: $relation->issue;
-
+						'value' => function (IssueInterface $issue): string {
 							return Html::a(
 									Html::encode($issue->getIssueName()), ['issue/view', 'id' => $issue->getIssueId()]) . $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags)]);
 						},
 					],
 					[
 						'label' => Yii::t('issue', 'Type'),
-						'value' => static function (IssueRelation $relation) use ($model): string {
-							$issue = $relation->issue_id_1 === $model->getIssueId()
-								? $relation->issue2
-								: $relation->issue;
-							return $issue->getTypeName();
-						},
+						'attribute' => 'typeName',
 					],
 					[
 						'label' => Yii::t('issue', 'Customer'),
 						'format' => 'html',
-						'value' => function (IssueRelation $relation) use ($model): string {
-							$issue = $relation->issue_id_1 === $model->getIssueId()
-								? $relation->issue2
-								: $relation->issue;
-							return Html::encode($issue->customer->getFullName()) . $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags, IssueTag::TYPE_CLIENT)]);
+						'value' => function (IssueInterface $issue): string {
+							return Html::encode($issue->getIssueModel()->customer->getFullName()) . $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags, IssueTag::TYPE_CLIENT)]);
 						},
+						'attribute' => 'customer',
 					],
 					[
 						'class' => ActionColumn::class,
 						'controller' => '/issue/relation',
 						'template' => '{delete}',
 						'visible' => $relationActionColumn,
-						'urlCreator' => static function (string $action, IssueRelation $relation): string {
-							return Url::to(['/issue/relation/delete', 'id' => $relation->id, 'returnUrl' => Url::current()]);
+						'urlCreator' => static function (string $action, IssueInterface $issue) use ($model): string {
+							return Url::to(['/issue/relation/delete', 'id' => $model->getIssueRelationId($issue->getIssueId()), 'returnUrl' => Url::current()]);
 						},
 					],
 				],
