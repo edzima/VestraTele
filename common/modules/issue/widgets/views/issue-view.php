@@ -189,6 +189,10 @@ use yii\data\ActiveDataProvider;
 						'attribute' => 'typeName',
 					],
 					[
+						'label' => Yii::t('issue', 'Stage'),
+						'attribute' => 'stageName',
+					],
+					[
 						'label' => Yii::t('issue', 'Customer'),
 						'format' => 'html',
 						'value' => function (IssueInterface $issue): string {
