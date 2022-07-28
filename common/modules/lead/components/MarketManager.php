@@ -69,18 +69,4 @@ class MarketManager extends Component {
 		return null;
 	}
 
-	public function accept(int $marketId, int $userId): void {
-		$model = LeadMarketUser::find()
-			->andWhere([
-				'market_id' => $marketId,
-				'user_id' => $userId,
-			])->one();
-		if ($model !== null) {
-			$model->status = LeadMarketUser::STATUS_ACCEPTED;
-			$model->reserved_at = $model->generateReservedAt();
-			$model->save(false);
-			$model->market->status = LeadMarket::STATUS_BOOKED;
-			$model->market->bookIt();
-		}
-	}
 }
