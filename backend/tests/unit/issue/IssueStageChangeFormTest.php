@@ -22,7 +22,8 @@ class IssueStageChangeFormTest extends Unit {
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::stageAndTypesFixtures(),
 			IssueFixtureHelper::note(),
-			IssueFixtureHelper::agent()
+			IssueFixtureHelper::users(true),
+			IssueFixtureHelper::linkedIssues(),
 		);
 	}
 
@@ -31,6 +32,15 @@ class IssueStageChangeFormTest extends Unit {
 		$this->thenUnsuccessSave();
 		$this->thenSeeError('Date At cannot be blank.', 'date_at');
 		$this->thenSeeError('New Stage must be other than old.', 'stage_id');
+	}
+
+	public function testLinkedIssueWithNotLinkedId(): void {
+		/** @var Issue $issue */
+		$issue = $this->tester->grabFixture(IssueFixtureHelper::ISSUE, 0);
+		$this->giveModel($issue);
+		$this->model->linkedIssues = [3];
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Linked Issues is invalid.', 'linkedIssues');
 	}
 
 	public function testNotTypeStage(): void {
@@ -64,6 +74,27 @@ class IssueStageChangeFormTest extends Unit {
 		]);
 		$this->assertNotNull($note);
 		$this->assertTrue($note->isForStageChange());
+	}
+
+	public function testValidWithLinked(): void {
+		/** @var Issue $issue */
+		$issue = $this->tester->grabFixture(IssueFixtureHelper::ISSUE, 0);
+		$this->giveModel($issue);
+		$this->model->linkedIssues = [4];
+		$this->model->user_id = UserFixtureHelper::AGENT_PETER_NOWAK;
+		$this->model->date_at = date($this->model->dateFormat);
+		$this->model->stage_id = 2;
+
+		$this->tester->dontSeeRecord(Issue::class, [
+			'stage_id' => 2,
+			'id' => 4,
+		]);
+		$this->thenSuccessSave();
+
+		$this->tester->seeRecord(Issue::class, [
+			'stage_id' => 2,
+			'id' => 4,
+		]);
 	}
 
 	public function getModel(): IssueStageChangeForm {

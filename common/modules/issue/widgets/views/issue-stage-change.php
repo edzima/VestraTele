@@ -97,10 +97,17 @@ use yii\widgets\DetailView;
 			?>
 
 
+
 			<?= IssueMessagesFormWidget::widget([
 				'form' => $form,
 				'model' => $model->getMessagesModel(),
 			]) ?>
+
+			<?= !empty($model->getLinkedIssuesNames())
+				? $form->field($model, 'linkedIssuesMessages')->checkbox()
+				: ''
+			?>
+
 
 			<div class="form-group">
 				<?= Html::submitButton(Yii::t('common', 'Save'), ['class' => 'btn btn-success']) ?>

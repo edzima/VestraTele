@@ -22,6 +22,7 @@ class IssueStageChangeForm extends Model {
 	public ?string $description = null;
 
 	public array $linkedIssues = [];
+	public bool $linkedIssuesMessages = true;
 
 	private IssueInterface $issue;
 	private int $previous_stage_id;
@@ -40,7 +41,17 @@ class IssueStageChangeForm extends Model {
 			['stage_id', 'compare', 'operator' => '!=', 'compareValue' => $this->getIssue()->getIssueStage()->id, 'message' => Yii::t('issue', 'New Stage must be other than old.')],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesData())],
 			['description', 'string'],
+			['linkedIssuesMessages', 'boolean'],
 			['date_at', 'date', 'format' => 'php:' . $this->dateFormat],
+			[
+				'linkedIssues',
+				'in',
+				'range' => array_keys($this->getLinkedIssuesNames()),
+				'when' => function (): bool {
+					return !empty($this->getLinkedIssuesNames());
+				},
+				'allowArray' => true,
+			],
 		];
 	}
 
@@ -58,6 +69,7 @@ class IssueStageChangeForm extends Model {
 			'date_at' => Yii::t('common', 'Date At'),
 			'description' => Yii::t('common', 'Description'),
 			'linkedIssues' => Yii::t('issue', 'Linked Issues'),
+			'linkedIssuesMessages' => Yii::t('issue', 'Linked Issues Messages'),
 		];
 	}
 
@@ -75,7 +87,7 @@ class IssueStageChangeForm extends Model {
 			'stage_id' => $this->stage_id,
 			'stage_change_at' => $this->date_at,
 		]);
-		return $update && $this->saveNote();
+		return $update && $this->saveNote() && $this->saveLinked();
 	}
 
 	public function saveNote(): bool {
@@ -130,7 +142,13 @@ class IssueStageChangeForm extends Model {
 	public function pushMessages(): bool {
 		$message = $this->getMessagesModel();
 		$message->previousStage = IssueStage::getStages()[$this->previous_stage_id];
+		$message->sms_owner_id = $this->user_id;
 		return $message->pushMessages() > 0;
+	}
+
+	public function setMessagesModel(IssueStageChangeMessagesForm $messagesForm): void {
+		$this->_messagesForm = $messagesForm;
+		$this->_messagesForm->setIssue($this->issue);
 	}
 
 	public function getMessagesModel(): IssueStageChangeMessagesForm {
@@ -142,5 +160,35 @@ class IssueStageChangeForm extends Model {
 			$this->_messagesForm->setIssue($this->issue);
 		}
 		return $this->_messagesForm;
+	}
+
+	private function saveLinked(): bool {
+		if (!empty($this->linkedIssues)) {
+			/**
+			 * @var IssueInterface[] $issues
+			 */
+			$issues = array_filter($this->getIssue()->getIssueModel()->linkedIssues, function (IssueInterface $issue): bool {
+				return $issue->getIssueStageId() !== $this->stage_id;
+			});
+
+			foreach ($issues as $issue) {
+				$model = new static($issue);
+				$model->setAttributes($this->getAttributes(null, [
+					'linkedIssues',
+				]), false);
+				$model->getMessagesModel()->setAttributes($this->getMessagesModel()->getAttributes());
+				if ($model->save()) {
+					if ($this->linkedIssuesMessages) {
+						$model->pushMessages();
+					}
+				} else {
+					Yii::warning(
+						array_merge($model->getErrors(), [
+							'issue_id' => $issue->getIssueId(),
+						]), 'issue.stageChangeForm.linked');
+				}
+			}
+		}
+		return true;
 	}
 }
