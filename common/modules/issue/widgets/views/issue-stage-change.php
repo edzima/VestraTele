@@ -19,82 +19,98 @@ use yii\widgets\DetailView;
 
 <div class="issue-stage-change">
 
-    <div class="row">
-        <div class="col-md-6">
-            <?= DetailView::widget([
-                'model' => $model->getIssue(),
-                'attributes' => [
-                    'type',
-                    'stage',
-                ],
-            ]) ?>
+	<div class="row">
+		<div class="col-md-6">
+			<?= DetailView::widget([
+				'model' => $model->getIssue(),
+				'attributes' => [
+					'type',
+					'stage',
+				],
+			]) ?>
 
-        </div>
-    </div>
-    <div class="row">
-        <div class="issue-stage-form col-md-6">
+		</div>
+	</div>
+	<div class="row">
+		<div class="issue-stage-form col-md-6">
 
-            <?php $form = ActiveForm::begin(
-                ['id' => 'issue-stage-form']
-            ); ?>
-            <div class="row">
-                <?= $form->field($model, 'stage_id', [
-                    'options' => [
-                        'class' => 'col-md-8',
-                    ],
-                ])
-                    ->widget(Select2::class, [
-                        'data' => $model->getStagesData(),
-                    ])
-                ?>
+			<?php $form = ActiveForm::begin(
+				['id' => 'issue-stage-form']
+			); ?>
+			<div class="row">
+				<?= !empty($model->getLinkedIssuesNames())
+					? $form->field($model, 'linkedIssues', [
+						'options' => [
+							'class' => 'col-md-12',
+						],
+					])
+						->widget(Select2::class, [
+							'data' => $model->getLinkedIssuesNames(),
+							'options' => [
+								'multiple' => true,
+							],
+						])
+						->hint(Yii::t('issue', 'Change Stage also in Linked Issues.'))
+					: ''
+				?>
 
-                <?= $form->field($model, 'date_at', [
-                    'options' => [
-                        'class' => 'col-md-4',
-                    ],
-                ])
-                    ->widget(DateTimeWidget::class, [
-                        'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
-                    ])
-                ?>
+				<?= $form->field($model, 'stage_id', [
+					'options' => [
+						'class' => 'col-md-8',
+					],
+				])
+					->widget(Select2::class, [
+						'data' => $model->getStagesData(),
+					])
+				?>
 
-            </div>
+				<?= $form->field($model, 'date_at', [
+					'options' => [
+						'class' => 'col-md-4',
+					],
+				])
+					->widget(DateTimeWidget::class, [
+						'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
+					])
+				?>
 
-            <?= !empty($noteDescriptionUrl)
-                ? $form->field($model, 'description', [
-                    'options' => [
-                        'class' => 'select-text-area-field',
-                    ],
-                ])->widget(AutoCompleteTextarea::class, [
-                    'clientOptions' => [
-                        'source' => $noteDescriptionUrl,
-                        'autoFocus' => true,
-                        'delay' => 500,
-                        'minLength' => 5,
-                    ],
-                    'options' => [
-                        'rows' => 5,
-                        'class' => 'form-control',
-                    ]
-                ])
-                : ''
-            ?>
+			</div>
 
-
-            <?= IssueMessagesFormWidget::widget([
-                'form' => $form,
-                'model' => $model->getMessagesModel(),
-            ]) ?>
-
-            <div class="form-group">
-                <?= Html::submitButton(Yii::t('common', 'Save'), ['class' => 'btn btn-success']) ?>
-            </div>
-
-            <?php ActiveForm::end(); ?>
-        </div>
+			<?= !empty($noteDescriptionUrl)
+				? $form->field($model, 'description', [
+					'options' => [
+						'class' => 'select-text-area-field',
+					],
+				])->widget(AutoCompleteTextarea::class, [
+					'clientOptions' => [
+						'source' => $noteDescriptionUrl,
+						'autoFocus' => true,
+						'delay' => 500,
+						'minLength' => 5,
+					],
+					'options' => [
+						'rows' => 5,
+						'class' => 'form-control',
+					],
+				])
+				: ''
+			?>
 
 
-    </div>
+			<?= IssueMessagesFormWidget::widget([
+				'form' => $form,
+				'model' => $model->getMessagesModel(),
+			]) ?>
+
+			<div class="form-group">
+				<?= Html::submitButton(Yii::t('common', 'Save'), ['class' => 'btn btn-success']) ?>
+			</div>
+
+			<?php ActiveForm::end(); ?>
+		</div>
+
+
+	</div>
 
 
 </div>

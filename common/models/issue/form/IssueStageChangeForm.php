@@ -21,6 +21,8 @@ class IssueStageChangeForm extends Model {
 	public ?int $user_id = null;
 	public ?string $description = null;
 
+	public array $linkedIssues = [];
+
 	private IssueInterface $issue;
 	private int $previous_stage_id;
 	private ?IssueStageChangeMessagesForm $_messagesForm = null;
@@ -42,11 +44,20 @@ class IssueStageChangeForm extends Model {
 		];
 	}
 
+	public function getLinkedIssuesNames(): array {
+		$names = [];
+		foreach ($this->getIssue()->getIssueModel()->linkedIssues as $issue) {
+			$names[$issue->getIssueId()] = $issue->getIssueName() . ' - ' . $issue->customer;
+		}
+		return $names;
+	}
+
 	public function attributeLabels(): array {
 		return [
 			'stage_id' => Yii::t('common', 'Stage'),
 			'date_at' => Yii::t('common', 'Date At'),
 			'description' => Yii::t('common', 'Description'),
+			'linkedIssues' => Yii::t('issue', 'Linked Issues'),
 		];
 	}
 
