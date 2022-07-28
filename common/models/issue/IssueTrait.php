@@ -20,8 +20,16 @@ trait IssueTrait {
 		return $this->getIssueModel()->longId;
 	}
 
+	public function getIssueTypeId(): int {
+		return $this->getIssueModel()->type_id;
+	}
+
 	public function getIssueType(): IssueType {
 		return $this->getIssueModel()->type;
+	}
+
+	public function getIssueStageId(): int {
+		return $this->getIssueModel()->stage_id;
 	}
 
 	public function getIssueStage(): IssueStage {
