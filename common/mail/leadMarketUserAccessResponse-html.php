@@ -14,7 +14,7 @@ use common\modules\lead\models\LeadMarketUser;
 	$leadLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/lead/view', 'id' => $lead->getId()]);
 	?>
 	<h1>
-		<?= Yii::t('lead', 'Your Access Request for Lead:{lead} from Market is Accepted for {reserved_at}.', [
+		<?= Yii::t('lead', 'Your Access Request for Lead: {lead} from Market is Accepted.', [
 			'lead' => $lead->getName(),
 		]) ?>
 	</h1>
@@ -24,7 +24,7 @@ use common\modules\lead\models\LeadMarketUser;
 	<p><?= Html::a(Html::encode($leadLink), $leadLink) ?></p>
 <?php elseif ($model->isRejected()): ?>
 	<h1>
-		<?= Yii::t('lead', 'Your Access Request for Lead:{lead} from Market is rejected.', [
+		<?= Yii::t('lead', 'Your Access Request for Lead: {lead} from Market is rejected.', [
 			'lead' => $model->market->lead->getName(),
 		]) ?>
 	</h1>

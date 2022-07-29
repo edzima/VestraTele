@@ -348,4 +348,5 @@ return [
 	'Your Access Request for Lead: {lead} from Market is rejected.' => 'Twoja Prośba o Leada: {lead} została odrzucona.',
 	'Your Access Request is Accepted.' => 'Zaakceptowano Prośbe o Leada.',
 	'Your Access Request is Rejected.' => 'Odrzucono Prośbe o Leada.',
+	'Problem with add User to Lead.' => 'Problem z Dodaniem Użytkownika do Leada',
 ];
