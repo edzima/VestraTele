@@ -26,12 +26,16 @@ class IssueNoteForm extends Model {
 	public ?string $description = null;
 	public string $publish_at = '';
 
+	public array $linkedIssues = [];
+	public bool $linkedIssuesMessages = true;
+
 	public ?bool $stageChangeAtMerge = null;
 
 	public string $dateFormat = 'Y-m-d H:i:s';
 
 	public ?IssueNoteMessagesForm $messagesForm = null;
 
+	private ?IssueInterface $issue = null;
 	private ?IssueNote $model = null;
 
 	public static function createSettlement(IssueSettlement $settlement) {
@@ -69,7 +73,35 @@ class IssueNoteForm extends Model {
 			['publish_at', 'date', 'format' => 'php:' . $this->dateFormat],
 			['issue_id', 'exist', 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			['user_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+			['linkedIssuesMessages', 'boolean'],
+			[
+				'linkedIssues',
+				'in',
+				'range' => array_keys($this->getLinkedIssuesNames()),
+				'when' => function (): bool {
+					return !empty($this->getLinkedIssuesNames());
+				},
+				'allowArray' => true,
+			],
 		];
+	}
+
+	public function getLinkedIssuesNames(): array {
+		if ($this->getIssue() === null) {
+			return [];
+		}
+		$names = [];
+		foreach ($this->getIssue()->getIssueModel()->linkedIssues as $issue) {
+			$names[$issue->getIssueId()] = $issue->getIssueName() . ' - ' . $issue->customer;
+		}
+		return $names;
+	}
+
+	protected function getIssue(): ?IssueInterface {
+		if ($this->issue === null || $this->issue_id !== $this->issue->getIssueId()) {
+			$this->issue = Issue::findOne($this->issue_id);
+		}
+		return $this->issue;
 	}
 
 	public function attributeLabels(): array {
@@ -77,6 +109,8 @@ class IssueNoteForm extends Model {
 			IssueNote::instance()->attributeLabels(),
 			[
 				'stageChangeAtMerge' => Yii::t('issue', 'Stage change At merge'),
+				'linkedIssues' => Yii::t('issue', 'Linked Issues'),
+				'linkedIssuesMessages' => Yii::t('issue', 'Linked Issues Messages'),
 			]
 		);
 	}
@@ -97,7 +131,7 @@ class IssueNoteForm extends Model {
 		return $load;
 	}
 
-	public function sendMessages(): ?bool {
+	public function pushMessages(): ?bool {
 		if ($this->messagesForm) {
 			$this->messagesForm->setNote($this->getModel());
 			return $this->messagesForm->pushMessages();
@@ -139,6 +173,7 @@ class IssueNoteForm extends Model {
 			$save = $model->save();
 			if ($save) {
 				$this->mergeStageChangeAt();
+				$this->saveLinked();
 				return $save;
 			}
 		}
@@ -155,6 +190,40 @@ class IssueNoteForm extends Model {
 
 	protected function beforeSave(): bool {
 		return $this->validate();
+	}
+
+	private function saveLinked(): bool {
+		if (!empty($this->linkedIssues)) {
+
+			/**
+			 * @var IssueInterface[] $issues
+			 */
+			$issues = array_filter($this->getIssue()->getIssueModel()->linkedIssues, function (IssueInterface $issue): bool {
+				return in_array($issue->getIssueId(), $this->linkedIssues);
+			});
+			foreach ($issues as $issue) {
+
+				$model = new static();
+				$model->setAttributes($this->getAttributes(null, [
+					'linkedIssues',
+					'issue_id',
+				]), false);
+
+				$model->issue_id = $issue->getIssueId();
+
+				if ($model->save()) {
+					if ($this->linkedIssuesMessages) {
+						$model->pushMessages();
+					}
+				} else {
+					Yii::warning(
+						array_merge($model->getErrors(), [
+							'issue_id' => $issue->getIssueId(),
+						]), 'issue.stageChangeForm.linked');
+				}
+			}
+		}
+		return true;
 	}
 
 }
