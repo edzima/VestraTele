@@ -164,11 +164,12 @@ class IssueStageChangeForm extends Model {
 
 	private function saveLinked(): bool {
 		if (!empty($this->linkedIssues)) {
+
 			/**
 			 * @var IssueInterface[] $issues
 			 */
 			$issues = array_filter($this->getIssue()->getIssueModel()->linkedIssues, function (IssueInterface $issue): bool {
-				return $issue->getIssueStageId() !== $this->stage_id;
+				return in_array($issue->getIssueId(), $this->linkedIssues) && $issue->getIssueStageId() !== $this->stage_id;
 			});
 
 			foreach ($issues as $issue) {
