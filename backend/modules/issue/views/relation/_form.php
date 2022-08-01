@@ -14,8 +14,15 @@ use yii\widgets\ActiveForm;
 
 	<?php $form = ActiveForm::begin(); ?>
 
-	<?= $form->field($model, 'issue_id_2')->textInput() ?>
+	<div class="row">
 
+
+		<?= $form->field($model, 'issue_id_2', [
+			'options' => [
+				'class' => 'col-md-1',
+			],
+		])->textInput() ?>
+	</div>
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>
 	</div>

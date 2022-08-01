@@ -4,6 +4,7 @@ namespace common\fixtures\helpers;
 
 use common\fixtures\issue\EntityResponsibleFixture;
 use common\fixtures\issue\IssueFixture;
+use common\fixtures\issue\IssueRelationFixture;
 use common\fixtures\issue\IssueUserFixture;
 use common\fixtures\issue\NoteFixture;
 use common\fixtures\issue\StageFixture;
@@ -32,6 +33,16 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 	private const TYPE = 'issue.type';
 	private const STAGE = 'issue.stage';
 	public const NOTE = 'issue.note';
+	private const LINKED_ISSUES = 'issue.linked';
+
+	public static function linkedIssues(): array {
+		return [
+			static::LINKED_ISSUES => [
+				'class' => IssueRelationFixture::class,
+				'dataFile' => static::getDataDirPath() . 'relation.php',
+			],
+		];
+	}
 
 	public function grabIssue($index): IssueInterface {
 		return $this->tester->grabFixture(static::ISSUE, $index);

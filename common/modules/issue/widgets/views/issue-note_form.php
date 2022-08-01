@@ -6,6 +6,7 @@ use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\ActiveForm;
 use common\widgets\AutoCompleteTextarea;
 use common\widgets\DateTimeWidget;
+use kartik\select2\Select2;
 use yii\web\View;
 
 /* @var $this View */
@@ -44,6 +45,18 @@ use yii\web\View;
 		?>
 	</div>
 
+
+	<?= $model->getModel()->isNewRecord && !empty($model->getLinkedIssuesNames())
+		? $form->field($model, 'linkedIssues')
+			->widget(Select2::class, [
+				'data' => $model->getLinkedIssuesNames(),
+				'options' => [
+					'multiple' => true,
+				],
+			])
+			->hint(Yii::t('issue', 'Create Note also in Linked Issues.'))
+		: ''
+	?>
 
 	<?= $model->getScenario() !== IssueNoteForm::SCENARIO_STAGE_CHANGE
 		? $form->field($model, 'title')->widget(AutoCompleteTextarea::class, [
@@ -91,6 +104,12 @@ use yii\web\View;
 		])
 		: ''
 	?>
+
+	<?= $model->getModel()->isNewRecord && $model->messagesForm !== null && !empty($model->getLinkedIssuesNames())
+		? $form->field($model, 'linkedIssuesMessages')->checkbox()
+		: ''
+	?>
+
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('common', 'Save'), ['class' => 'btn btn-success']) ?>

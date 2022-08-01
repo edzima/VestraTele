@@ -19,7 +19,8 @@ class IssueNoteFormTest extends Unit {
 		return array_merge(
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::note(),
-			IssueFixtureHelper::agent()
+			IssueFixtureHelper::users(true),
+			IssueFixtureHelper::linkedIssues(),
 		);
 	}
 
@@ -99,6 +100,42 @@ class IssueNoteFormTest extends Unit {
 			'description' => 'Some Desc',
 			'publish_at' => $this->model->publish_at,
 			'is_pinned' => false,
+		]);
+	}
+
+	public function testInvalidLinkedId(): void {
+		$this->giveModel([
+			'issue_id' => 1,
+			'linkedIssues' => [3],
+		]);
+
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Linked Issues is invalid.', 'linkedIssues');
+	}
+
+	public function testWithLinkedIssues(): void {
+		$this->giveModel([
+			'issue_id' => 1,
+			'linkedIssues' => [2],
+			'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
+			'title' => 'Some Title',
+			'description' => 'Some Desc',
+		]);
+
+		$this->thenSuccessSave();
+		$this->thenSeeNote([
+			'issue_id' => 1,
+			'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
+			'title' => 'Some Title',
+			'description' => 'Some Desc',
+			'publish_at' => $this->model->publish_at,
+		]);
+		$this->thenSeeNote([
+			'issue_id' => 2,
+			'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
+			'title' => 'Some Title',
+			'description' => 'Some Desc',
+			'publish_at' => $this->model->publish_at,
 		]);
 	}
 

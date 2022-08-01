@@ -110,4 +110,8 @@ return [
 	'Update Issue Claim: {name}' => 'Edytuj Roszczenie: {name}',
 	'Issue User' => 'Uczestnik',
 	'Address filter not available with Issue User Name' => 'Filtr Adresu niedostępny z Uczestnikiem',
+	'Linked Issues' => 'Połączone Sprawy',
+	'Change Stage also in Linked Issues.' => 'Zmień Etap również w Połączonych Sprawach.',
+	'Linked Issues Messages' => 'Powiadomienia do Połączonych Spraw',
+	'Create Note also in Linked Issues.' => 'Dodaj Notatkę również w Połączonych Sprawach.',
 ];

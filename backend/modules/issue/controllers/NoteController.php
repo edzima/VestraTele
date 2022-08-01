@@ -101,7 +101,7 @@ class NoteController extends Controller {
 		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$model->sendMessages();
+			$model->pushMessages();
 			return $this->redirectIssue($issueId);
 		}
 		return $this->render('create', [
