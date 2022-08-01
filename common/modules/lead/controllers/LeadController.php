@@ -152,8 +152,9 @@ class LeadController extends BaseController {
 		 * @var Lead $model
 		 */
 		$model = $this->findLead($id);
+		$userIsFromMarket = $this->module->market->isFromMarket($model->getUsers(), Yii::$app->user->getId());
 		if (
-			$this->module->market->isFromMarket($model->getUsers(), Yii::$app->user->getId())
+			$userIsFromMarket
 			&& $this->module->market->hasExpiredReservation($id, Yii::$app->user->getId())
 		) {
 			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'Reservation for Lead: {lead} from Market has expired.', [
@@ -194,9 +195,10 @@ class LeadController extends BaseController {
 
 		return $this->render('view', [
 			'model' => $model,
-			'withDelete' => $this->module->allowDelete,
+			'withDelete' => $this->module->allowDelete && !$userIsFromMarket,
 			'onlyUser' => $this->module->onlyUser,
 			'isOwner' => $isOwner,
+			'userIsFromMarket' => $userIsFromMarket,
 			'usersDataProvider' => $usersDataProvider,
 		]);
 	}

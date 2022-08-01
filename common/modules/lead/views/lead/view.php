@@ -26,6 +26,7 @@ use yii\widgets\DetailView;
 /* @var $withDelete bool */
 /* @var $onlyUser bool */
 /* @var $isOwner bool */
+/* @var $userIsFromMarket bool */
 /* @var $usersDataProvider null|DataProviderInterface */
 
 $this->title = $model->getName();
@@ -46,7 +47,10 @@ YiiAsset::register($this);
 
 		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->getId()], ['class' => 'btn btn-warning']) ?>
 
-		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary']) ?>
+		<?= !$userIsFromMarket
+			? Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary'])
+			: ''
+		?>
 
 
 		<?= (!$onlyUser || $isOwner)
@@ -57,7 +61,7 @@ YiiAsset::register($this);
 		?>
 
 
-		<?= $model->getStatusId() !== LeadStatusInterface::STATUS_ARCHIVE
+		<?= !$userIsFromMarket && $model->getStatusId() !== LeadStatusInterface::STATUS_ARCHIVE
 			? Html::a(Yii::t('lead', 'Archive'), ['archive/self', 'id' => $model->getId()], [
 				'class' => 'btn btn-danger',
 				'data' => [
@@ -76,9 +80,12 @@ YiiAsset::register($this);
 
 	<div class="pull-right d-inline">
 
-		<?= CopyLeadBtnWidget::widget([
-			'leadId' => $model->getId(),
-		]) ?>
+		<?= !$userIsFromMarket
+			? CopyLeadBtnWidget::widget([
+				'leadId' => $model->getId(),
+			])
+			: ''
+		?>
 
 		<?= Yii::$app->user->can(User::PERMISSION_SMS)
 			? Html::a(Yii::t('lead', 'Send SMS'), ['sms/push', 'id' => $model->getId()],
@@ -87,8 +94,11 @@ YiiAsset::register($this);
 		?>
 
 
-		<?= Html::a(Yii::t('lead', 'Assign User'), ['user/assign-single', 'id' => $model->getId()],
-			['class' => 'btn btn-info']) ?>
+		<?= !$userIsFromMarket ?
+			Html::a(Yii::t('lead', 'Assign User'), ['user/assign-single', 'id' => $model->getId()],
+				['class' => 'btn btn-info'])
+			: ''
+		?>
 
 		<?= $withDelete
 			? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->getId()], [
@@ -210,7 +220,7 @@ YiiAsset::register($this);
 				'headerOptions' => [
 					'class' => 'col-md-12',
 				],
-				'archiveBtn' => Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE),
+				'archiveBtn' => Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE) && !$userIsFromMarket,
 				'withType' => false,
 				'withDialers' => true,
 				'options' => [
