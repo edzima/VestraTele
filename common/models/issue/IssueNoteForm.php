@@ -26,7 +26,7 @@ class IssueNoteForm extends Model {
 	public ?string $description = null;
 	public string $publish_at = '';
 
-	public array $linkedIssues = [];
+	public $linkedIssues = [];
 	public bool $linkedIssuesMessages = true;
 
 	public ?bool $stageChangeAtMerge = null;
@@ -199,7 +199,7 @@ class IssueNoteForm extends Model {
 			 * @var IssueInterface[] $issues
 			 */
 			$issues = array_filter($this->getIssue()->getIssueModel()->linkedIssues, function (IssueInterface $issue): bool {
-				return in_array($issue->getIssueId(), $this->linkedIssues);
+				return in_array($issue->getIssueId(), (array) $this->linkedIssues);
 			});
 			foreach ($issues as $issue) {
 

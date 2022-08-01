@@ -21,7 +21,7 @@ class IssueStageChangeForm extends Model {
 	public ?int $user_id = null;
 	public ?string $description = null;
 
-	public array $linkedIssues = [];
+	public $linkedIssues = [];
 	public bool $linkedIssuesMessages = true;
 
 	private IssueInterface $issue;
@@ -169,7 +169,7 @@ class IssueStageChangeForm extends Model {
 			 * @var IssueInterface[] $issues
 			 */
 			$issues = array_filter($this->getIssue()->getIssueModel()->linkedIssues, function (IssueInterface $issue): bool {
-				return in_array($issue->getIssueId(), $this->linkedIssues) && $issue->getIssueStageId() !== $this->stage_id;
+				return in_array($issue->getIssueId(), (array) $this->linkedIssues) && $issue->getIssueStageId() !== $this->stage_id;
 			});
 
 			foreach ($issues as $issue) {
