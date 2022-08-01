@@ -3,6 +3,7 @@
 namespace common\modules\lead\models;
 
 use common\models\Address;
+use common\modules\lead\events\LeadEvent;
 use common\modules\lead\models\query\LeadDialerQuery;
 use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
@@ -42,6 +43,8 @@ use yii\helpers\Json;
  * @property-read LeadDialer[] $dialers
  */
 class Lead extends ActiveRecord implements ActiveLead {
+
+	public const EVENT_AFTER_STATUS_UPDATE = 'afterStatusUpdate';
 
 	public const PROVIDER_COPY = 'copy';
 	public const PROVIDER_FORM = 'form';
@@ -263,16 +266,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function updateStatus(int $status_id): bool {
 		if ($this->status_id !== $status_id) {
-			$status = LeadStatus::getModels()[$status_id];
-			if (!empty($status->market_status)) {
-				//@todo check same contact lead with the same type has Market with same Contact flag
-				if ($this->market !== null) {
-					$this->market->status = $status->market_status;
-				}
-			}
 			$this->updateAttributes([
 				'status_id' => $status_id,
 			]);
+			$this->trigger(static::EVENT_AFTER_STATUS_UPDATE, new LeadEvent($this));
 			return true;
 		}
 		return false;

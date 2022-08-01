@@ -5,9 +5,15 @@ namespace common\modules\lead\components;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
 use common\modules\lead\models\LeadUser;
+use Yii;
 use yii\base\Component;
 
 class MarketManager extends Component {
+
+	public function init() {
+		parent::init();
+		Yii::error('MarketManager INIT()');
+	}
 
 	/**
 	 * @param int[] $users users IDs indexed by type.
@@ -67,6 +73,29 @@ class MarketManager extends Component {
 			]);
 		}
 		return null;
+	}
+
+	public function sendLeadChangeStatus(LeadMarket $market): bool {
+		$emails = [];
+		$emails[] = $market->creator->getEmail();
+		if ($market->lead->owner) {
+			$emails[] = $market->lead->owner->getEmail();
+		}
+		return Yii::$app
+			->mailer
+			->compose(
+				['html' => 'leadFromMarketChangeStatus-html', 'text' => 'leadFromMarketChangeStatus-text'],
+				[
+					'model' => $market,
+				]
+			)
+			->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
+			->setTo($emails)
+			->setSubject(Yii::t('lead', 'Lead: {lead} from Market change Status: {status}.', [
+				'lead' => $market->lead->getName(),
+				'status' => $market->lead->getStatusName(),
+			]))
+			->send();
 	}
 
 }
