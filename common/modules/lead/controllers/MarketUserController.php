@@ -61,26 +61,30 @@ class MarketUserController extends BaseController {
 			throw new MethodNotAllowedHttpException('Only Lead Owner or Market Creator can Accepted.');
 		}
 		$responseForm = new LeadMarketAccessResponseForm($model);
-		$responseForm->accept();
-		Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead',
-			'Success Reserved Lead Market to: {reserved_at}', [
-				'reserved_at' => Yii::$app->formatter->asDate($model->reserved_at),
-			])
-		);
-		$type = $responseForm->linkUserToLead();
-		if ($type) {
+		if ($responseForm->accept()) {
 			Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead',
-				'Assign User: {user} as {typeName} to Lead: {leadName}.', [
-					'leadName' => $model->market->lead->getName(),
-					'user' => $model->user->getFullName(),
-					'typeName' => LeadMarketAccessResponseForm::getLinkedUserTypeName($type),
+				'Success Reserved Lead Market to: {reserved_at}', [
+					'reserved_at' => Yii::$app->formatter->asDate($model->reserved_at),
 				])
 			);
-			$responseForm->sendAcceptEmail();
-		} else {
-			Flash::add(Flash::TYPE_WARNING, Yii::t('lead',
-				'Problem with add User to Lead.')
-			);
+			$type = $responseForm->linkUserToLead();
+			if ($type) {
+				Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead',
+					'Assign User: {user} as {typeName} to Lead: {leadName}.', [
+						'leadName' => $model->market->lead->getName(),
+						'user' => $model->user->getFullName(),
+						'typeName' => LeadMarketAccessResponseForm::getLinkedUserTypeName($type),
+					])
+				);
+				$responseForm->sendAcceptEmail();
+			} else {
+				Flash::add(Flash::TYPE_WARNING, Yii::t('lead',
+					'Problem with add User to Lead.')
+				);
+			}
+		} elseif ($model->isWaiting()) {
+			Yii::t('lead', 'Access Request cannot be Accepted. Market is Already Reserved.');
+			$responseForm->sendWaitingEmail();
 		}
 		return $this->redirect(['market/view', 'id' => $market_id]);
 	}

@@ -349,4 +349,7 @@ return [
 	'Your Access Request is Accepted.' => 'Zaakceptowano Prośbe o Leada.',
 	'Your Access Request is Rejected.' => 'Odrzucono Prośbe o Leada.',
 	'Problem with add User to Lead.' => 'Problem z Dodaniem Użytkownika do Leada',
+	'Your Access Request is Waiting.' => 'Prośba jest w Oczekiwaniu.',
+	'Your Access Request for Lead: {lead} from Market is Waiting.' => 'Prośba o Leada: {lead} została wstępnie Zaakceptowana i jest w Oczekiwaniu na koniec aktualnej rezerwacji.',
+	'Access Request cannot be Accepted. Market is Already Reserved.' => 'Prośba nie może zostać Zaakceptowana. Giełda jest już Zarezerwowana.',
 ];

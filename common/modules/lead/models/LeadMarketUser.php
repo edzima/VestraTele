@@ -28,6 +28,7 @@ use yii\db\Expression;
 class LeadMarketUser extends ActiveRecord {
 
 	public const STATUS_TO_CONFIRM = 1;
+	public const STATUS_WAITING = 3;
 	public const STATUS_ACCEPTED = 5;
 	public const STATUS_REJECTED = 2;
 
@@ -101,6 +102,10 @@ class LeadMarketUser extends ActiveRecord {
 	public function isToConfirm(): bool {
 		//@todo maybe or with status Rejected.
 		return $this->status === LeadMarketUser::STATUS_TO_CONFIRM;
+	}
+
+	public function isWaiting(): bool {
+		return $this->status === static::STATUS_WAITING;
 	}
 
 	public function isAccepted(): bool {

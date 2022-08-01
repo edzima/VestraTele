@@ -32,5 +32,12 @@ use common\modules\lead\models\LeadMarketUser;
 		Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/market-user/access-request', 'id' => $model->market_id])
 	) ?>
 
+
+<?php elseif ($model->isWaiting()): ?>
+	<h1>
+		<?= Yii::t('lead', 'Your Access Request for Lead: {lead} from Market is Waiting.', ['lead' => $model->market->lead->getName()]) ?>
+	</h1>
+
 <?php endif; ?>
+
 

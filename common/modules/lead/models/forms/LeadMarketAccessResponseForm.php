@@ -18,6 +18,11 @@ class LeadMarketAccessResponseForm extends Model {
 	}
 
 	public function accept(): bool {
+		if ($this->model->market->hasActiveReservation()) {
+			$this->model->status = LeadMarketUser::STATUS_WAITING;
+			$this->model->updateAttributes(['status']);
+			return false;
+		}
 		$this->model->status = LeadMarketUser::STATUS_ACCEPTED;
 		$this->model->generateReservedAt();
 		$this->model->market->status = LeadMarket::STATUS_BOOKED;
@@ -103,6 +108,24 @@ class LeadMarketAccessResponseForm extends Model {
 			->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
 			->setTo($this->model->user->getEmail())
 			->setSubject(Yii::t('lead', 'Your Access Request is Rejected.'))
+			->send();
+	}
+
+	public function sendWaitingEmail(): bool {
+		if (!$this->model->isWaiting()) {
+			return false;
+		}
+		return Yii::$app
+			->mailer
+			->compose(
+				['html' => 'leadMarketUserAccessResponse-html', 'text' => 'leadMarketUserAccessResponse-text'],
+				[
+					'model' => $this->model,
+				]
+			)
+			->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
+			->setTo($this->model->user->getEmail())
+			->setSubject(Yii::t('lead', 'Your Access Request is Waiting.'))
 			->send();
 	}
 
