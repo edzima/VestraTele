@@ -2,6 +2,7 @@
 
 namespace common\tests\unit\message;
 
+use common\components\message\MessageTemplateKeyHelper;
 use common\models\message\IssueMessagesForm;
 
 class KeyIssueMessagesFormTest extends BaseIssueMessagesFormTest {
@@ -110,6 +111,24 @@ class KeyIssueMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->giveModel();
 		$sms = $this->model->getSmsToCustomer();
 		$this->tester->assertNotNull($sms);
+	}
+
+	public function testEmptyIssueType(): void {
+		$this->tester->assertSame('issue.create', MessageTemplateKeyHelper::generateKey(
+			['issue', 'create', IssueMessagesForm::issueTypesKeyPart([])]
+		));
+	}
+
+	public function testSingleIssueType(): void {
+		$this->tester->assertSame('issue.create.issueTypes:1', MessageTemplateKeyHelper::generateKey(
+			['issue', 'create', IssueMessagesForm::issueTypesKeyPart([1])]
+		));
+	}
+
+	public function testMultipleIssueTypes(): void {
+		$this->tester->assertSame('issue.create.issueTypes:1,2', MessageTemplateKeyHelper::generateKey(
+			['issue', 'create', IssueMessagesForm::issueTypesKeyPart([1, 2])]
+		));
 	}
 
 }

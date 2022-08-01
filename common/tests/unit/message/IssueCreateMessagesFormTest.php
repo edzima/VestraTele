@@ -2,7 +2,6 @@
 
 namespace common\tests\unit\message;
 
-use common\components\message\MessageTemplateKeyHelper;
 use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\models\issue\IssueUser;
 use common\models\message\IssueCreateMessagesForm;
@@ -26,7 +25,7 @@ class IssueCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 					IssueCreateMessagesForm::keyCustomer(),
 					[1, 2]
 				),
-				'sms.issue.create.customer.' . MessageTemplateKeyHelper::issueTypesKeyPart([1, 2]),
+				'sms.issue.create.customer.' . IssueCreateMessagesForm::issueTypesKeyPart([1, 2]),
 			],
 		];
 	}

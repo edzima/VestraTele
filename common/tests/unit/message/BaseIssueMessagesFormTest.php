@@ -22,13 +22,16 @@ abstract class BaseIssueMessagesFormTest extends Unit {
 	protected const DEFAULT_ISSUE_TYPE = 1;
 	protected const DEFAULT_SMS_OWNER_ID = UserFixtureHelper::AGENT_EMILY_PAT;
 
-	protected IssueMessagesForm $model;
-	protected MessageTemplateFixtureHelper $templateFixture;
 	protected ?IssueInterface $issue = null;
+	protected IssueMessagesForm $model;
+
+	protected MessageTemplateFixtureHelper $templateFixture;
+	protected IssueFixtureHelper $issueFixture;
 
 	public function _before(): void {
 		parent::_before();
 		$this->templateFixture = new MessageTemplateFixtureHelper($this->tester);
+		$this->issueFixture = new IssueFixtureHelper($this->tester);
 	}
 
 	public function _fixtures(): array {
