@@ -155,6 +155,7 @@ class LeadMarket extends ActiveRecord {
 		return implode(', ', $details);
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getLead(): LeadQuery {
 		return $this->hasOne(Lead::class, ['id' => 'lead_id']);
 	}
@@ -186,6 +187,7 @@ class LeadMarket extends ActiveRecord {
 	public function userCanAccessRequest(int $userId): bool {
 		return !$this->isArchived() && !$this->isDone()
 			&& !$this->isCreatorOrOwnerLead($userId)
+			&& !$this->hasActiveReservation()
 			&& (!$this->hasUser($userId) || $this->leadMarketUsers[$userId]->isExpired());
 	}
 
