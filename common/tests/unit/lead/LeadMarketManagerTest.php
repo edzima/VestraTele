@@ -8,6 +8,7 @@ use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
 use common\tests\unit\Unit;
 use yii\base\InvalidArgumentException;
+use yii\mail\MessageInterface;
 
 class LeadMarketManagerTest extends Unit {
 
@@ -23,8 +24,17 @@ class LeadMarketManagerTest extends Unit {
 			array_merge(
 				LeadFixtureHelper::market(),
 				LeadFixtureHelper::lead(),
-				LeadFixtureHelper::user()
+				LeadFixtureHelper::user(),
+				LeadFixtureHelper::status(),
 			);
+	}
+
+	public function testEmailLeadStatus(): void {
+		$this->tester->assertTrue($this->manager->sendLeadChangeStatus($this->tester->grabFixture(LeadFixtureHelper::MARKET, 0)));
+		$this->tester->seeEmailIsSent();
+		/** @var MessageInterface $mail */
+		$mail = $this->tester->grabLastSentEmail();
+		$this->tester->assertSame('Lead: John from Market change Status: New.', $mail->getSubject());
 	}
 
 	public function testRenewExpired(): void {
