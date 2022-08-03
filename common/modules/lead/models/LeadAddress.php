@@ -5,7 +5,6 @@ namespace common\modules\lead\models;
 use common\models\Address;
 use Yii;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "lead_address".

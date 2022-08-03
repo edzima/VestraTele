@@ -10,7 +10,6 @@ use common\modules\lead\models\query\LeadDialerQuery;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\helpers\Json;
 
 /**

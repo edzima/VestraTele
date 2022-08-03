@@ -8,10 +8,8 @@ use common\components\message\MessageTemplateManager;
 use common\components\PayComponent;
 use common\components\provision\Provisions;
 use common\components\TaxComponent;
-use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\czater\Czater;
-use common\modules\lead\Module as LeadModule;
 use edzima\teryt\Module as TerytModule;
 use Edzima\Yii2Adescom\AdescomSender;
 use Edzima\Yii2Adescom\AdescomSoap;
@@ -19,6 +17,8 @@ use yii\caching\DummyCache;
 use yii\caching\FileCache;
 use yii\mutex\MysqlMutex;
 use yii\queue\db\Queue;
+
+$leadConfig = require __DIR__ . '/lead-module-config.php';
 
 return [
 	'name' => $_ENV['APP_NAME'],
@@ -40,10 +40,7 @@ return [
 		'teryt' => [
 			'class' => TerytModule::class,
 		],
-		'lead' => [
-			'class' => LeadModule::class,
-			'userClass' => User::class,
-		],
+		'lead' => $leadConfig,
 	],
 	'components' => [
 		'czater' => [

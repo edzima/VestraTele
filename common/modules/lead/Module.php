@@ -10,6 +10,7 @@ use yii\base\BootstrapInterface;
 use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
 use yii\db\ActiveRecord;
+use yii\db\Connection;
 use yii\di\Instance;
 
 /**
@@ -17,6 +18,7 @@ use yii\di\Instance;
  *
  * @property LeadManager $manager
  * @property LeadDialerManager $dialer
+ * @property Connection|null $db
  */
 class Module extends BaseModule implements BootstrapInterface {
 
@@ -36,15 +38,13 @@ class Module extends BaseModule implements BootstrapInterface {
 		'class' => LeadDialerManager::class,
 	];
 
-	public $components = [
-		'manager' => [
-			'class' => LeadManager::class,
-		],
+	protected $manager = [
+		'class' => LeadManager::class,
 	];
 
 	public function init(): void {
 		parent::init();
-		$this->setComponents($this->components);
+
 		if ($this->onlyUser) {
 			$this->manager->onlyForUser = true;
 		}
@@ -62,6 +62,17 @@ class Module extends BaseModule implements BootstrapInterface {
 			$this->dialer = Instance::ensure($this->dialer, LeadDialerManager::class);
 		}
 		return $this->dialer;
+	}
+
+	protected function setManager($manager): void {
+		$this->manager = $manager;
+	}
+
+	public function getManager(): LeadManager {
+		if (!is_object($this->manager)) {
+			$this->manager = Instance::ensure($this->manager, LeadManager::class);
+		}
+		return $this->manager;
 	}
 
 	public function bootstrap($app) {
