@@ -4,7 +4,7 @@ namespace common\modules\lead\models;
 
 use common\modules\reminder\models\Reminder;
 use Yii;
-use yii\db\ActiveRecord;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "lead_reminder".
@@ -51,7 +51,7 @@ class LeadReminder extends ActiveRecord {
 	/**
 	 * Gets query for [[Lead]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getLead() {
 		return $this->hasOne(Lead::class, ['id' => 'lead_id']);
@@ -60,7 +60,7 @@ class LeadReminder extends ActiveRecord {
 	/**
 	 * Gets query for [[Reminder]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getReminder() {
 		return $this->hasOne(Reminder::class, ['id' => 'reminder_id']);

@@ -5,7 +5,6 @@ namespace common\modules\lead\models;
 use common\modules\lead\models\query\LeadAnswerQuery;
 use Yii;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "lead_answer".
@@ -66,7 +65,7 @@ class LeadAnswer extends ActiveRecord {
 	/**
 	 * Gets query for [[Question]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getQuestion(): ActiveQuery {
 		return $this->hasOne(LeadQuestion::class, ['id' => 'question_id']);
@@ -75,7 +74,7 @@ class LeadAnswer extends ActiveRecord {
 	/**
 	 * Gets query for [[Report]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getReport(): ActiveQuery {
 		return $this->hasOne(LeadReport::class, ['id' => 'report_id']);

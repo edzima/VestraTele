@@ -11,7 +11,6 @@ use common\modules\reminder\models\Reminder;
 use DateTime;
 use Yii;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 

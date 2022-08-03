@@ -5,7 +5,6 @@ namespace common\modules\lead\models;
 use common\modules\lead\Module;
 use Yii;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**

@@ -11,6 +11,7 @@ use yii\base\BootstrapInterface;
 use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
 use yii\db\ActiveRecord;
+use yii\db\Connection;
 use yii\di\Instance;
 
 /**
@@ -19,6 +20,7 @@ use yii\di\Instance;
  * @property LeadManager $manager
  * @property LeadDialerManager $dialer
  * @property MarketManager $market
+ * @property Connection|null $db
  */
 class Module extends BaseModule implements BootstrapInterface {
 
@@ -48,6 +50,7 @@ class Module extends BaseModule implements BootstrapInterface {
 
 	public function init(): void {
 		parent::init();
+
 		if ($this->onlyUser) {
 			$this->getManager()->onlyForUser = true;
 		}
@@ -81,8 +84,9 @@ class Module extends BaseModule implements BootstrapInterface {
 		return $this->market;
 	}
 
+
 	protected function setManager($manager): void {
-		$this->$manager = $manager;
+		$this->manager = $manager;
 	}
 
 	public function getManager(): LeadManager {
