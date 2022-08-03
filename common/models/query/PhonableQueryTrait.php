@@ -12,15 +12,23 @@ trait PhonableQueryTrait {
 		];
 	}
 
-	public function withPhoneNumber(string $value): self {
+	public function withPhoneNumber($value): self {
 		[$table, $alias] = $this->getTableNameAndAlias();
 		$i = 0;
 		foreach ($this->getPhoneColumns() as $phoneColumn) {
 			$phoneColumn = "$alias.$phoneColumn";
 			if ($i === 0) {
-				$this->andWhere(['like', $this->preparePhoneExpression($phoneColumn), $value]);
+				if (empty($value)) {
+					$this->andWhere([$phoneColumn => null]);
+				} else {
+					$this->andWhere(['like', $this->preparePhoneExpression($phoneColumn), $value]);
+				}
 			} else {
-				$this->orWhere(['like', $this->preparePhoneExpression($phoneColumn), $value]);
+				if (empty($value)) {
+					$this->andWhere([$phoneColumn => null]);
+				} else {
+					$this->orWhere(['like', $this->preparePhoneExpression($phoneColumn), $value]);
+				}
 			}
 			$i++;
 		}
