@@ -8,6 +8,7 @@ use common\models\issue\IssuePayCalculation;
 use common\models\KeyStorageItem;
 use common\models\user\LoginForm;
 use common\models\user\User;
+use common\modules\lead\models\LeadCrm;
 use vova07\fileapi\actions\UploadAction as FileAPIUpload;
 use vova07\imperavi\actions\UploadFileAction;
 use Yii;
@@ -148,6 +149,17 @@ class SiteController extends Controller {
 			],
 
 		];
+		if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
+			$keys[KeyStorageItem::KEY_ROBOT_SMS_OWNER_ID] = [
+				'label' => Yii::t('backend', 'Robot SMS Owner'),
+				'type' => FormModel::TYPE_TEXTINPUT,
+			];
+			$keys[KeyStorageItem::KEY_LEAD_CRM_ID] = [
+				'label' => Yii::t('backend', 'Lead CRM Id'),
+				'type' => FormModel::TYPE_DROPDOWN,
+				'items' => LeadCrm::getNames(),
+			];
+		}
 
 		if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
 			$keys[KeyStorageItem::KEY_ROBOT_SMS_OWNER_ID] = [

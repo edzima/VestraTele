@@ -24,6 +24,7 @@ class KeyStorageItem extends ActiveRecord {
 	public const KEY_SETTLEMENT_TYPES_FOR_PROVISIONS = 'provisions.settlement.types';
 	public const KEY_ISSUE_CUSTOMER_DEFAULT_SMS_MESSAGE = 'issue.sms.customer';
 	public const KEY_ISSUE_AGENT_DEFAULT_SMS_MESSAGE = 'issue.sms.agent';
+	public const KEY_LEAD_CRM_ID = 'lead.crm.id';
 
 	/**
 	 * @inheritdoc
