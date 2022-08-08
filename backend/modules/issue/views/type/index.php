@@ -30,6 +30,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			'provision',
 			'with_additional_date:boolean',
 			'meet:boolean',
+			[
+				'attribute' => 'lead_type_id',
+				'value' => 'leadTypeName',
+			],
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>

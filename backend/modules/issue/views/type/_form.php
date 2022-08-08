@@ -1,7 +1,7 @@
 <?php
 
 use common\models\issue\IssueType;
-use common\models\issue\Provision;
+use common\modules\lead\models\LeadType;
 use yii\helpers\Html;
 use yii\web\View;
 use yii\widgets\ActiveForm;
@@ -20,6 +20,8 @@ use yii\widgets\ActiveForm;
 	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'short_name')->textInput(['maxlength' => true]) ?>
+
+	<?= $form->field($model, 'lead_type_id')->dropDownList(LeadType::getNamesWithDescription()) ?>
 
 	<?= $form->field($model, 'vat')->textInput() ?>
 

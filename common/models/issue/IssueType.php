@@ -4,6 +4,7 @@ namespace common\models\issue;
 
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
+use common\modules\lead\models\LeadType;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -18,6 +19,7 @@ use yii\helpers\ArrayHelper;
  * @property string $vat
  * @property bool $meet
  * @property bool $with_additional_date
+ * @property int $lead_type_id
  *
  * @property Issue[] $issues
  * @property IssueStage[] $stages
@@ -43,7 +45,7 @@ class IssueType extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['name', 'short_name', 'vat'], 'required'],
-			[['provision_type'], 'integer'],
+			[['provision_type', 'lead_type_id'], 'integer'],
 			[['meet', 'with_additional_date'], 'boolean'],
 			[['name', 'short_name'], 'string', 'max' => 255],
 			[['name'], 'unique'],
@@ -113,6 +115,10 @@ class IssueType extends ActiveRecord {
 				->all();
 		}
 		return static::$TYPES;
+	}
+
+	public function getLeadTypeName(): ?string {
+		return LeadType::getNamesWithDescription()[$this->lead_type_id] ?? null;
 	}
 
 }
