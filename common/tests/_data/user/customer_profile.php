@@ -14,7 +14,7 @@ return [
 		'user_id' => UserFixtureHelper::CUSTOMER_ERIKA_LARSON_ID,
 		'firstname' => 'Erika',
 		'lastname' => 'Larson',
-		'phone' => '+48 682 222 110',
+		'phone' => '+48 682 333 110',
 		'phone_2' => '',
 	],
 	[
