@@ -34,6 +34,7 @@ return [
 	'lead.dialer.manager' => 'Leads- Dialer (Manager)',
 	'lead.duplicate' => 'Leads - Duplikaty',
 	'lead.import' => 'Leads - Import',
+	'lead.issue' => 'Leads - Sprawy',
 	'lead.status' => 'Leads - Statusy',
 	'logs' => 'Logi',
 	'manager' => 'Manager (Panel Admina)',
