@@ -26,6 +26,8 @@ class Worker extends User implements ActiveHierarchy {
 		self::ROLE_MANAGER,
 	];
 
+	public const PERMISSION_LEAD_ISSUE = 'lead.issue';
+
 	public const PERMISSION_ISSUE_CREATE = 'issue.create';
 	public const PERMISSION_ISSUE_DELETE = 'issue.delete';
 	public const PERMISSION_ISSUE_LINK_USER = 'issue.link-user';
