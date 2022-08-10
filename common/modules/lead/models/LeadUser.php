@@ -102,9 +102,20 @@ class LeadUser extends ActiveRecord {
 	}
 
 	public function getUserWithTypeName(): string {
-		return $this->user->getFullName() . ' - ' . $this->getTypeName();
+		return $this->getUserName() . ' - ' . $this->getTypeName();
 	}
 
+	public function getTypeNameWithUser(): string {
+		return $this->getTypeName() . ' - ' . $this->getUserName();
+	}
+
+	public function getUserName(): string {
+		return $this->user->getFullName();
+	}
+
+	public function isOwner(): bool {
+		return $this->type === static::TYPE_OWNER;
+	}
 	public function isMarketType(): bool {
 		return in_array($this->type, static::marketTypes());
 	}
