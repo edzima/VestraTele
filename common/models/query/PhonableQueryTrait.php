@@ -21,13 +21,21 @@ trait PhonableQueryTrait {
 				if (empty($value)) {
 					$this->andWhere([$phoneColumn => null]);
 				} else {
-					$this->andWhere(['like', $this->preparePhoneExpression($phoneColumn), $value]);
+					if (is_array($value)) {
+						$this->andWhere(['REGEXP', $this->preparePhoneExpression($phoneColumn), implode('|', $value)]);
+					} else {
+						$this->andWhere(['like', $this->preparePhoneExpression($phoneColumn), $value]);
+					}
 				}
 			} else {
 				if (empty($value)) {
-					$this->andWhere([$phoneColumn => null]);
+					$this->orWhere([$phoneColumn => null]);
 				} else {
-					$this->orWhere(['like', $this->preparePhoneExpression($phoneColumn), $value]);
+					if (is_array($value)) {
+						$this->orWhere(['REGEXP', $this->preparePhoneExpression($phoneColumn), implode('|', $value)]);
+					} else {
+						$this->orWhere(['like', $this->preparePhoneExpression($phoneColumn), $value]);
+					}
 				}
 			}
 			$i++;
@@ -36,6 +44,9 @@ trait PhonableQueryTrait {
 	}
 
 	protected function preparePhoneExpression(string $phoneColumn): Expression {
+//		return new Expression("REGEXP_REPLACE(REPLACE($phoneColumn, ' ', '-'),
+//                      '[^0-9]+',
+//                      '')");
 		return new Expression(
 			"REPLACE( REPLACE($phoneColumn, ' ', '') , '-', '')"
 		);
