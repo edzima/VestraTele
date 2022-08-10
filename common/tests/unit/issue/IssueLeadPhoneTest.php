@@ -18,6 +18,7 @@ class IssueLeadPhoneTest extends Unit {
 	public function _fixtures(): array {
 		return array_merge(
 			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::types(),
 			IssueFixtureHelper::users(true),
 			LeadFixtureHelper::lead(),
 		);
@@ -36,13 +37,36 @@ class IssueLeadPhoneTest extends Unit {
 		}
 	}
 
+	public function testPhoneAsStringWithLead(): void {
+		$this->giveModel('48777-222-122');
+		$this->model->validate();
+		$this->tester->assertSame('48777222122', $this->model->phone);
+		$leads = $this->model->findLeads()->all();
+		$this->tester->assertNotEmpty($leads);
+	}
+
+	public function testPhoneAsArrayWithNotUniqueValues(): void {
+		$this->giveModel([
+			'48777-222-122',
+			'+48 673 222 110',
+			'48777-222-122',
+			'48777-222-122',
+			'+48673222-110',
+			'123-123-123',
+		]);
+		$this->model->validate();
+		$this->tester->assertCount(3, $this->model->phone);
+	}
+
 	public function testPhoneAsArray(): void {
 		$this->giveModel([
 			'48777-222-122',
 			'+48 673 222 110',
 		]);
 		$this->model->validate();
-		foreach ($this->model->findLeads()->all() as $lead) {
+		$leads = $this->model->findLeads()->all();
+		$this->tester->assertNotEmpty($leads);
+		foreach ($leads as $lead) {
 			$this->tester->assertNotEmpty($lead->getPhone());
 		}
 		foreach ($this->model->findIssues()->all() as $issue) {
@@ -79,7 +103,6 @@ class IssueLeadPhoneTest extends Unit {
 				/** @var Issue $row */
 				$model = new IssueLeadPhone();
 				$model->setIssue($row);
-				codecept_debug($model->phone);
 				if (!empty($model->phone)) {
 					$leadsCount = $model->findLeads()->count();
 					if ($leadsCount) {

@@ -4,6 +4,7 @@ namespace common\models\issue\form;
 
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
 use common\models\query\PhonableQuery;
@@ -24,15 +25,36 @@ class IssueLeadPhone extends Model {
 
 	public function rules(): array {
 		return [
+			['phone', 'required'],
 			['leadType', 'integer'],
-			['phone', 'each', 'rule' => [PhoneValidator::class]],
-		];
-	}
+			[
+				'phone', PhoneValidator::class,
+				'when' => function (): bool {
+					return is_string($this->phone);
+				},
+			],
+			[
+				'phone', 'each', 'rule' => [PhoneValidator::class],
+				'when' => function (): bool {
+					return is_array($this->phone);
+				},
+			],
+			[
+				'phone', 'each', 'rule' => [PhoneValidator::class],
+				'when' => function (): bool {
+					return is_array($this->phone);
+				},
+			],
+			[
+				'phone', 'filter', 'filter' => function (): array {
+				return array_unique($this->phone);
+			},
+				'when' => function (): bool {
+					return is_array($this->phone);
+				},
+			],
 
-	public static function createForUser(User $user): self {
-		return new static([
-			'phone' => static::getUserPhones($user),
-		]);
+		];
 	}
 
 	public function setIssue(IssueInterface $issue): void {
@@ -40,8 +62,7 @@ class IssueLeadPhone extends Model {
 		if (!$issue->getIssueModel()->isNewRecord) {
 			$this->phone = $this->getIssueUsersPhones();
 		}
-
-		$this->leadType = $this->issue->getIssueType()->lead_type_id;
+		$this->leadType = IssueType::get($this->issue->getIssueTypeId())->lead_type_id;
 	}
 
 	/**
