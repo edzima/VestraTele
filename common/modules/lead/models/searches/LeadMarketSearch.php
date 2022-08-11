@@ -282,7 +282,7 @@ class LeadMarketSearch extends LeadMarket {
 
 	private function applyMarketUserStatusFilter(ActiveQuery $query): void {
 		if (!empty($this->userStatus)) {
-			if ($this->userStatus !== static::WITHOUT_MARKET_USERS) {
+			if ((int) $this->userStatus !== static::WITHOUT_MARKET_USERS) {
 				$query->joinWith('leadMarketUsers');
 				$query->andWhere([LeadMarketUser::tableName() . '.status' => $this->userStatus]);
 			} else {
