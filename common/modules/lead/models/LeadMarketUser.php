@@ -43,6 +43,7 @@ class LeadMarketUser extends ActiveRecord {
 		return [
 			static::STATUS_TO_CONFIRM => Yii::t('lead', 'To Confirm'),
 			static::STATUS_ACCEPTED => Yii::t('lead', 'Accepted'),
+			static::STATUS_WAITING => Yii::t('lead', 'Waiting'),
 			static::STATUS_REJECTED => Yii::t('lead', 'Rejected'),
 		];
 	}

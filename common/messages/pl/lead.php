@@ -354,4 +354,5 @@ return [
 	'Access Request cannot be Accepted. Market is Already Reserved.' => 'Prośba nie może zostać Zaakceptowana. Giełda jest już Zarezerwowana.',
 	'Lead: {lead} from Market change Status: {status}.' => 'Zmiana Statusu: {status} dla Lead: {lead} z Giełdy.',
 	'Market Status: {status}.' => 'Status Giełdy: {status}.',
+	'Waiting' => 'Oczekujący',
 ];
