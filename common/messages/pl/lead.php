@@ -356,4 +356,6 @@ return [
 	'Market Status: {status}.' => 'Status Giełdy: {status}.',
 	'Waiting' => 'Oczekujący',
 	'Same Lead has already in Market. ' => 'Ten Lead lub Tożsamy jest już na Giełdzie.',
+	'Access Request to self Market' => 'Prośby do Mnie',
+	'Self Access Request' => 'Moje Prośby',
 ];

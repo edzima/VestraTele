@@ -15,6 +15,7 @@ use yii\db\ActiveQuery;
  */
 class LeadMarketUserSearch extends LeadMarketUser {
 
+	const SCENARIO_USER_MARKET = 'user-market';
 	public $marketStatus;
 	public $marketCreatorId;
 
@@ -44,6 +45,7 @@ class LeadMarketUserSearch extends LeadMarketUser {
 	 */
 	public function rules(): array {
 		return [
+			['!marketCreatorId', 'required', 'on' => static::SCENARIO_USER_MARKET],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			[['market_id', 'days_reservation', 'status', 'user_id', 'marketCreatorId', 'marketStatus'], 'integer'],
 			[['details'], 'string'],

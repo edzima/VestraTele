@@ -3,6 +3,7 @@
 use common\helpers\Html;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\searches\LeadMarketSearch;
+use common\modules\lead\Module;
 use common\modules\lead\widgets\LeadMarketUserStatusColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -21,9 +22,20 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Html::a(Yii::t('lead', 'Market Users'), ['market-user/index',], [
-			'class' => 'btn btn-success',
-		]) ?>
+		<?php if (!Module::getInstance()->onlyUser): ?>
+			<?= Html::a(Yii::t('lead', 'Market Users'), ['market-user/index',], [
+				'class' => 'btn btn-success',
+			]) ?>
+		<?php else: ?>
+			<?= Html::a(Yii::t('lead', 'Access Request to self Market'), ['market-user/self-market',], [
+				'class' => 'btn btn-warning',
+			]) ?>
+
+			<?= Html::a(Yii::t('lead', 'Self Access Request'), ['market-user/self',], [
+				'class' => 'btn btn-success',
+			]) ?>
+		<?php endif; ?>
+
 	</p>
 
 	<?= $this->render('_search', [

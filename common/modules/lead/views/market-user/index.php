@@ -12,6 +12,12 @@ use yii\data\ActiveDataProvider;
 /* @var $dataProvider ActiveDataProvider */
 
 $this->title = Yii::t('lead', 'Market Users');
+if ($searchModel->scenario === LeadMarketUserSearch::SCENARIO_USER_MARKET) {
+	$this->title = Yii::t('lead', 'Access Request to self Market');
+}
+if ($searchModel->scenario === LeadMarketUserSearch::SCENARIO_USER) {
+	$this->title = Yii::t('lead', 'Self Access Request');
+}
 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Markets'), 'url' => ['market/index']];
@@ -44,6 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => LeadMarketUserSearch::getMarketCreatorsNames(),
 				'value' => 'market.creator.fullName',
 				'label' => Yii::t('lead', 'Creator'),
+				'visible' => $searchModel->scenario !== LeadMarketUserSearch::SCENARIO_USER_MARKET,
 			],
 			[
 				'attribute' => 'status',
@@ -61,7 +68,6 @@ $this->params['breadcrumbs'][] = $this->title;
 			'details:ntext',
 			'created_at:date',
 			'reserved_at:date',
-			//'updated_at',
 			[
 				'class' => ActionColumn::class,
 				'template' => '{accept} {reject} {view} {delete}',

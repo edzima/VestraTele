@@ -52,6 +52,30 @@ class MarketUserController extends BaseController {
 		]);
 	}
 
+	public function actionSelfMarket(): string {
+		$searchModel = new LeadMarketUserSearch();
+		$searchModel->marketCreatorId = Yii::$app->user->getId();
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		$searchModel->scenario = LeadMarketUserSearch::SCENARIO_USER_MARKET;
+
+		return $this->render('index', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	public function actionSelf(): string {
+		$searchModel = new LeadMarketUserSearch();
+		$searchModel->user_id = Yii::$app->user->getId();
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		$searchModel->scenario = LeadMarketUserSearch::SCENARIO_USER;
+
+		return $this->render('index', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
 	public function actionAccept(int $market_id, int $user_id) {
 		$model = $this->findModel($market_id, $user_id);
 		if ($model->isAccepted()) {
