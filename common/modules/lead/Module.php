@@ -49,7 +49,7 @@ class Module extends BaseModule implements BootstrapInterface {
 	public function init(): void {
 		parent::init();
 		if ($this->onlyUser) {
-			$this->manager->onlyForUser = true;
+			$this->getManager()->onlyForUser = true;
 		}
 	}
 
@@ -97,7 +97,7 @@ class Module extends BaseModule implements BootstrapInterface {
 	}
 
 	public static function manager(): LeadManager {
-		return static::instance()->manager;
+		return static::instance()->getManager();
 	}
 
 	public static function userClass(): string {
