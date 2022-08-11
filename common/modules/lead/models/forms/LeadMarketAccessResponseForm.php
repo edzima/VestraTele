@@ -30,7 +30,7 @@ class LeadMarketAccessResponseForm extends Model {
 				'status',
 				'reserved_at',
 			])
-			&& $this->model->updateAttributes(['status']);
+			&& $this->model->market->updateAttributes(['status']);
 	}
 
 	public function linkUserToLead(): ?string {
