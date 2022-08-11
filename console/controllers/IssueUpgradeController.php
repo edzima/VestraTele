@@ -24,6 +24,11 @@ class IssueUpgradeController extends Controller {
 
 	private $foundedCities = [];
 
+	public function actionLeadsMerge(): void {
+		$count = Yii::$app->issuesLeads->mergeNotLinkedIssues();
+		Console::output('Merge Issues: ' . $count . ' with Leads.');
+	}
+
 	public function actionCheckLead(): void {
 		$ids = [];
 		foreach (IssueUser::find()

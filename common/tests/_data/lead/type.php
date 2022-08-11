@@ -13,4 +13,8 @@ return [
 		'id' => 3,
 		'name' => 'Commission refunds',
 	],
+	[
+		'id' => 4,
+		'name' => 'Anti Vindication',
+	],
 ];

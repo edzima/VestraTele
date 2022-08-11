@@ -31,6 +31,7 @@ return [
 	'id' => 'app-backend',
 	'homeUrl' => Yii::getAlias('@backendUrl'),
 	'basePath' => dirname(__DIR__),
+	'bootstrap' => ['lead'], //@todo
 	'controllerNamespace' => 'backend\controllers',
 	'defaultRoute' => 'issue/issue/index',
 	'controllerMap' => [

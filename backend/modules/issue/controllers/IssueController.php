@@ -10,6 +10,7 @@ use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\CsvForm;
 use common\behaviors\SelectionRouteBehavior;
+use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
@@ -203,6 +204,14 @@ class IssueController extends Controller {
 		$customer = Customer::findOne($customerId);
 		if ($customer === null) {
 			throw new NotFoundHttpException('Client not exist');
+		}
+
+		$leadsQuery = Yii::$app->issuesLeads->userLeads($customer);
+		if ($leadsQuery && $leadsQuery->exists()) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('issue', '{customer} is probalby from Leads.', [
+					'customer' => $customer->getFullName(),
+				]));
 		}
 
 		$model = new IssueForm(['customer' => $customer]);

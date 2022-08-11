@@ -371,4 +371,7 @@ return [
 	'Without City' => 'Brak Miejscowości',
 	'Without Address Filter' => 'Odfiltruj bez Adresów',
 	'Your Access Request is waiting for Accept. You will be notify by Email.' => 'Czekaj na Email z Potwierdzeniem dostępu do Leada',
+	'Lead Issues' => 'Leads - Sprawy',
+	'Issue ID' => 'ID Sprawy',
+	'Issue Duplicated' => 'Sprawa - Zdublowana',
 ];

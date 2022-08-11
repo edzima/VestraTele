@@ -1,18 +1,23 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
+use backend\helpers\Html;
 use backend\modules\issue\widgets\IssueSmsButtonDropdown;
 use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\modules\issue\widgets\SummonCreateButtonDropdown;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
+use backend\widgets\GridView;
 use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
+use common\modules\lead\models\LeadIssue;
+use common\modules\lead\widgets\LeadIssueActionColumn;
+use common\modules\lead\widgets\LeadUsersColumn;
 use yii\bootstrap\ButtonDropdown;
+use yii\data\ActiveDataProvider;
 use yii\data\DataProviderInterface;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model Issue */
@@ -21,7 +26,43 @@ use yii\helpers\Html;
 
 $this->title = $model->longId;
 $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
+
 ?>
+
+
+<?=
+GridView::widget([
+	'dataProvider' => new ActiveDataProvider([
+		'query' => $model->getLinkedLeads()
+			->orderBy(['lead.date_at' => SORT_ASC])
+			->joinWith('lead')
+			->with('lead.leadUsers.user.userProfile')
+			->with('lead.leadSource'),
+
+	]),
+	'columns' => [
+		[
+			'attribute' => 'lead_id',
+			'value' => static function (LeadIssue $leadIssue): string {
+				return Html::a(Html::encode($leadIssue->lead->getName()), ['/lead/lead/view', 'id' => $leadIssue->lead_id]);
+			},
+			'format' => 'html',
+		],
+		'lead.statusName',
+		'lead.leadSource.name',
+		'lead.date_at:date',
+		[
+			'class' => LeadUsersColumn::class,
+			'attribute' => 'lead.leadUsers',
+		],
+		'confirmed_at:date',
+		[
+			'class' => LeadIssueActionColumn::class,
+		],
+	],
+])
+?>
+
 <div class="issue-view">
 	<p>
 

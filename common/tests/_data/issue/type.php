@@ -6,12 +6,14 @@ return [
 		'short_name' => 'ACC',
 		'meet' => true,
 		'vat' => 23,
+		'lead_type_id' => 1,
 	],
 	[
 		'name' => 'Benefits - administrative proceedings',
 		'short_name' => 'B-AP',
 		'meet' => true,
 		'vat' => 23,
+		'lead_type_id' => 2,
 	],
 	[
 		'name' => 'Benefits - civil proceedings',
@@ -19,6 +21,7 @@ return [
 		'meet' => false,
 		'vat' => 23,
 		'with_additional_date' => true,
+		'lead_type_id' => 2,
 
 	],
 	[
@@ -27,11 +30,13 @@ return [
 		'meet' => true,
 		'vat' => 0,
 		'with_additional_date' => true,
+		'lead_type_id' => 3,
 	],
 	[
 		'name' => 'Anti Vindication',
 		'short_name' => 'AV',
 		'meet' => true,
 		'vat' => 0,
+		'lead_type_id' => 4,
 	],
 ];
