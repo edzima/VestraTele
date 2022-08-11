@@ -24,7 +24,6 @@ class LeadManager extends Component {
 		Event::on(Lead::class, Lead::EVENT_AFTER_STATUS_UPDATE, function (LeadEvent $event): void {
 			$this->afterStatusUpdate($event);
 		});
-		Yii::error('LeadManager INIT()');
 	}
 
 	/**

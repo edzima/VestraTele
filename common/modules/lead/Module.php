@@ -42,15 +42,14 @@ class Module extends BaseModule implements BootstrapInterface {
 		'class' => MarketManager::class,
 	];
 
-	public $components = [
-		'manager' => [
-			'class' => LeadManager::class,
+	protected $manager = [
+		'class' => [
+			LeadManager::class,
 		],
 	];
 
 	public function init(): void {
 		parent::init();
-		$this->setComponents($this->components);
 		if ($this->onlyUser) {
 			$this->manager->onlyForUser = true;
 		}
@@ -82,6 +81,17 @@ class Module extends BaseModule implements BootstrapInterface {
 			$this->market = Instance::ensure($this->market, MarketManager::class);
 		}
 		return $this->market;
+	}
+
+	protected function setManager($manager): void {
+		$this->$manager = $manager;
+	}
+
+	public function getManager(): LeadManager {
+		if (!is_object($this->manager)) {
+			$this->manager = Instance::ensure($this->manager, LeadManager::class);
+		}
+		return $this->manager;
 	}
 
 	public function bootstrap($app) {
