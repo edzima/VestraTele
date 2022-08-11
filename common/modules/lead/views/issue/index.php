@@ -3,7 +3,8 @@
 use common\models\issue\IssueStage;
 use common\modules\lead\models\LeadIssue;
 use common\modules\lead\models\searches\LeadIssueSearch;
-use yii\grid\GridView;
+use common\modules\lead\widgets\LeadIssueActionColumn;
+use common\widgets\GridView;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
@@ -19,9 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
-	<p>
-		<?= Html::a(Yii::t('lead', 'Create Lead Issue'), ['create'], ['class' => 'btn btn-success']) ?>
-	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -80,8 +78,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => LeadIssueSearch::getCrmsNames(),
 			],
 			'created_at:datetime',
-
-			['class' => 'yii\grid\ActionColumn'],
+			'updated_at:datetime',
+			'confirmed_at:datetime',
+			[
+				'class' => LeadIssueActionColumn::class,
+			],
 		],
 	]); ?>
 

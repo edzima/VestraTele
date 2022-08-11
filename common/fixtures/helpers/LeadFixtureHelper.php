@@ -7,7 +7,9 @@ use common\modules\lead\fixtures\CampaignFixture;
 use common\modules\lead\fixtures\DialerFixture;
 use common\modules\lead\fixtures\DialerTypeFixture;
 use common\modules\lead\fixtures\LeadAnswerFixture;
+use common\modules\lead\fixtures\LeadCrmFixture;
 use common\modules\lead\fixtures\LeadFixture;
+use common\modules\lead\fixtures\LeadIssueFixture;
 use common\modules\lead\fixtures\LeadQuestionFixture;
 use common\modules\lead\fixtures\LeadReportFixture;
 use common\modules\lead\fixtures\ReminderFixture as LeadReminderFixture;
@@ -39,6 +41,9 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 	private const ANSWER = 'lead.answer';
 	private const DIALER = 'lead.dialer';
 	private const DIALER_TYPE = 'lead.dialer-type';
+
+	private const ISSUE = 'lead.issue';
+	private const CRM = 'lead.crm';
 
 	public const DEFAULT_PHONE = '+48 123-123-123';
 	public const DEFAULT_SOURCE_ID = 1;
@@ -197,6 +202,19 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 			static::DIALER_TYPE => [
 				'class' => DialerTypeFixture::class,
 				'dataFile' => static::getDataDirPath() . 'dialer-type.php',
+			],
+		];
+	}
+
+	public static function issue(): array {
+		return [
+			static::ISSUE => [
+				'class' => LeadIssueFixture::class,
+				'dataFile' => static::getDataDirPath() . 'issue.php',
+			],
+			static::CRM => [
+				'class' => LeadCrmFixture::class,
+				'dataFile' => static::getDataDirPath() . 'crm.php',
 			],
 		];
 	}

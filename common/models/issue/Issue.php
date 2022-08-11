@@ -21,6 +21,7 @@ use common\models\issue\query\IssueUserQuery;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\lead\models\Lead;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -63,6 +64,7 @@ use yii\db\Expression;
  * @property string|null $type_additional_date_at
  * @property string $stage_change_at
  * @property string|null $signature_act
+ * @property int|null $lead_id
  *
  * @property string $longId
  * @property int $clientStateId
@@ -89,6 +91,7 @@ use yii\db\Expression;
  * @property-read IssueClaim[] $claims
  * @property-read IssueRelation[] $issuesRelations
  * @property-read Issue[] $linkedIssues
+ * @property-read Lead|null $lead
  */
 class Issue extends ActiveRecord implements IssueInterface {
 
@@ -173,6 +176,11 @@ class Issue extends ActiveRecord implements IssueInterface {
 
 	public function getStageName(): string {
 		return IssueStage::getStagesNames(true)[$this->stage_id];
+	}
+
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getLinkedLeads(): ActiveQuery {
+		return Yii::$app->issuesLeads->linkedLeads($this->id);
 	}
 
 	public function getCustomer(): UserQuery {

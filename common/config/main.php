@@ -3,6 +3,7 @@
 use common\components\DbManager;
 use common\components\Formatter;
 use common\components\HierarchyComponent;
+use common\components\IssuesLeads;
 use common\components\keyStorage\KeyStorage;
 use common\components\message\MessageTemplateManager;
 use common\components\PayComponent;
@@ -123,7 +124,9 @@ return [
 				],
 			],
 		],
-
+		'issuesLeads' => [
+			'class' => IssuesLeads::class,
+		],
 		'keyStorage' => [
 			'class' => KeyStorage::class,
 		],

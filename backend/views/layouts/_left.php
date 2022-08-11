@@ -135,6 +135,19 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-sitemap"></i>',
 						],
 
+						[
+							'label' => Yii::t('issue', 'Issues'),
+							'url' => ['/lead/issue/index'],
+							'icon' => '<i class="fa fa-suitcase"></i>',
+							'visible' => $user->can(Worker::PERMISSION_LEAD_ISSUE),
+						],
+						[
+							'label' => Yii::t('lead', 'CRM'),
+							'url' => ['/lead/crm/index'],
+							'icon' => '<i class="fa fa-external-link"></i>',
+							'visible' => $user->can(User::ROLE_ADMINISTRATOR),
+						],
+
 					],
 				],
 				[
