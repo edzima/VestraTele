@@ -5,6 +5,7 @@ namespace common\modules\lead\models\searches;
 use common\models\user\User;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -14,7 +15,10 @@ use yii\db\ActiveQuery;
  */
 class LeadMarketUserSearch extends LeadMarketUser {
 
+	public $marketStatus;
 	public $marketCreatorId;
+
+	public $withoutArchiveMarket = true;
 
 	public const SCENARIO_USER = 'user';
 
@@ -31,16 +35,28 @@ class LeadMarketUserSearch extends LeadMarketUser {
 		return LeadMarketSearch::getCreatorsNames();
 	}
 
+	public static function getMarketStatusesNames(): array {
+		return LeadMarket::getStatusesNames();
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
-			[['market_id', 'days_reservation', 'status', 'user_id', 'marketCreatorId'], 'integer'],
+			[['market_id', 'days_reservation', 'status', 'user_id', 'marketCreatorId', 'marketStatus'], 'integer'],
 			[['details'], 'string'],
+			[['withoutArchiveMarket'], 'boolean'],
 			[['created_at', 'updated_at', 'reserved_at'], 'safe'],
 		];
+	}
+
+	public function attributeLabels(): array {
+		return parent::attributeLabels() + [
+				'withoutArchiveMarket' => Yii::t('lead', 'Without Archives'),
+				'marketStatus' => Yii::t('lead', 'Market Status'),
+			];
 	}
 
 	/**
@@ -79,7 +95,9 @@ class LeadMarketUserSearch extends LeadMarketUser {
 			return $dataProvider;
 		}
 
+		$this->applyMarketStatusFilter($query);
 		$this->applyMarketCreatorFilter($query);
+		$this->applyWithoutArchivedMarketFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -94,10 +112,24 @@ class LeadMarketUserSearch extends LeadMarketUser {
 		return $dataProvider;
 	}
 
+	private function applyMarketStatusFilter(ActiveQuery $query): void {
+		if (!empty($this->marketStatus)) {
+			$query->joinWith('market');
+			$query->andWhere([LeadMarket::tableName() . '.status' => $this->marketStatus]);
+		}
+	}
+
 	private function applyMarketCreatorFilter(ActiveQuery $query): void {
 		if (!empty($this->marketCreatorId)) {
 			$query->joinWith('market');
 			$query->andWhere([LeadMarket::tableName() . '.creator_id' => $this->marketCreatorId]);
+		}
+	}
+
+	private function applyWithoutArchivedMarketFilter(ActiveQuery $query): void {
+		if ($this->withoutArchiveMarket) {
+			$query->joinWith('market');
+			$query->andWhere(['!=', LeadMarket::tableName() . '.status', LeadMarket::STATUS_ARCHIVED]);
 		}
 	}
 }

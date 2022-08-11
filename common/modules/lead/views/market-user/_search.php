@@ -16,21 +16,12 @@ use yii\widgets\ActiveForm;
 		'method' => 'get',
 	]); ?>
 
-	<?= $form->field($model, 'id') ?>
+	<?= $form->field($model, 'withoutArchiveMarket')->checkbox() ?>
 
-	<?= $form->field($model, 'market_id') ?>
-
-	<?= $form->field($model, 'lead_id') ?>
-
-	<?= $form->field($model, 'status') ?>
-
-	<?= $form->field($model, 'created_at') ?>
-
-	<?php // echo $form->field($model, 'updated_at') ?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Search'), ['class' => 'btn btn-primary']) ?>
-		<?= Html::resetButton(Yii::t('lead', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>
+		<?= Html::a(Yii::t('lead', 'Reset'), 'index', ['class' => 'btn btn-default']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

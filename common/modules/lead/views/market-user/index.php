@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]); ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
@@ -32,6 +32,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'value' => 'market.lead.name',
 				'label' => Yii::t('lead', 'Lead Name'),
+			],
+			[
+				'attribute' => 'marketStatus',
+				'filter' => LeadMarketUserSearch::getMarketStatusesNames(),
+				'value' => 'market.statusName',
+				'label' => $searchModel->getAttributeLabel('marketStatus'),
 			],
 			[
 				'attribute' => 'marketCreatorId',
