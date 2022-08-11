@@ -43,9 +43,7 @@ class Module extends BaseModule implements BootstrapInterface {
 	];
 
 	protected $manager = [
-		'class' => [
-			LeadManager::class,
-		],
+		'class' => LeadManager::class,
 	];
 
 	public function init(): void {

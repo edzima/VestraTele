@@ -19,18 +19,18 @@ class LeadManager extends Component {
 
 	public const EVENT_AFTER_PUSH = 'push.after';
 
+	/**
+	 * @var string|array
+	 */
+	public $model = Lead::class;
+	public bool $onlyForUser = false;
+
 	public function init() {
 		parent::init();
 		Event::on(Lead::class, Lead::EVENT_AFTER_STATUS_UPDATE, function (LeadEvent $event): void {
 			$this->afterStatusUpdate($event);
 		});
 	}
-
-	/**
-	 * @var string|array
-	 */
-	public $model = Lead::class;
-	public bool $onlyForUser = false;
 
 	public function findById(string $id, bool $forUser = true): ?ActiveLead {
 		$model = $this->getModel()::findById($id);

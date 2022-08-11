@@ -1,14 +1,13 @@
 <?php
 
+use common\components\Formatter;
+use common\components\HierarchyComponent;
 use common\components\keyStorage\KeyStorage;
 use common\components\message\MessageTemplateManager;
-use common\components\HierarchyComponent;
 use common\components\PayComponent;
 use common\components\provision\Provisions;
 use common\components\TaxComponent;
 use common\components\User;
-use common\components\Formatter;
-use common\modules\lead\components\LeadManager;
 use Edzima\Yii2Adescom\models\SenderInterface;
 use yii\BaseYii;
 use yii\queue\Queue;
@@ -34,7 +33,6 @@ class Yii extends BaseYii {
  * @property Formatter $formatter
  * @property-read MessageTemplateManager $messageTemplate
  * @property HierarchyComponent $userHierarchy
- * @property LeadManager $leadManager
  * @property PayComponent $pay
  * @property Provisions $provisions
  * @property TaxComponent $tax
