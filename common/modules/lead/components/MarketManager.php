@@ -10,11 +10,6 @@ use yii\base\Component;
 
 class MarketManager extends Component {
 
-	public function init() {
-		parent::init();
-		Yii::error('MarketManager INIT()');
-	}
-
 	/**
 	 * @param int[] $users users IDs indexed by type.
 	 * @param int $userId
