@@ -117,8 +117,11 @@ class LeadMarketUser extends ActiveRecord {
 		return $this->status === static::STATUS_REJECTED;
 	}
 
-	public function isExpired(): bool {
-		return $this->reserved_at !== null && strtotime($this->reserved_at) < time();
+	public function isExpired(): ?bool {
+		if ($this->reserved_at === null) {
+			return null;
+		}
+		return strtotime($this->reserved_at) < time();
 	}
 
 	public function getStatusName(): string {

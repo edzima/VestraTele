@@ -215,12 +215,13 @@ class LeadMarket extends ActiveRecord {
 				&& !Module::getInstance()->market->hasExpiredReservation($this->lead_id, $userId));
 	}
 
-	public function hasActiveReservation(): bool {
+	public function hasActiveReservation(): ?bool {
 		if (empty($this->leadMarketUsers)) {
-			return false;
+			return null;
 		}
 		foreach ($this->leadMarketUsers as $marketUser) {
-			if (!$marketUser->isExpired()) {
+			$isExpired = $marketUser->isExpired();
+			if ($isExpired !== null && !$isExpired) {
 				return true;
 			}
 		}

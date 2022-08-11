@@ -84,6 +84,21 @@ class LeadMarketManagerTest extends Unit {
 		]);
 	}
 
+	public function testMarketHasExpiredReservation(): void {
+		/** @var LeadMarket $market */
+		$market = $this->tester->grabRecord(LeadMarket::class, ['id' => $this->haveMarket()]);
+
+		$this->tester->assertNull($market->hasActiveReservation());
+
+		$this->haveMarketUser($market->id, 1, null, LeadMarketUser::STATUS_TO_CONFIRM);
+		$market->refresh();
+		$this->tester->assertFalse($market->hasActiveReservation());
+
+		$this->haveMarketUser($market->id, 2, date(DATE_ATOM, strtotime('+ 1 day')), LeadMarketUser::STATUS_ACCEPTED);
+		$market->refresh();
+		$this->tester->assertTrue($market->hasActiveReservation());
+	}
+
 	private function haveMarket(array $attributes = []): int {
 		if (!isset($attributes['lead_id'])) {
 			$attributes['lead_id'] = 1;
