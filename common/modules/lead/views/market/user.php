@@ -3,6 +3,7 @@
 use common\helpers\Html;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\searches\LeadMarketSearch;
+use common\modules\lead\widgets\LeadMarketUserStatusColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
@@ -57,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			//'updated_at',
 			//'options:ntext',
 			[
-				'attribute' => 'usersCount',
+				'class' => LeadMarketUserStatusColumn::class,
 			],
 			[
 				'class' => ActionColumn::class,

@@ -355,4 +355,5 @@ return [
 	'Lead: {lead} from Market change Status: {status}.' => 'Zmiana Statusu: {status} dla Lead: {lead} z Giełdy.',
 	'Market Status: {status}.' => 'Status Giełdy: {status}.',
 	'Waiting' => 'Oczekujący',
+	'Same Lead has already in Market. ' => 'Ten Lead lub Tożsamy jest już na Giełdzie.',
 ];
