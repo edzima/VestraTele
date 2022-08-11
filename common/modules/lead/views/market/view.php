@@ -3,6 +3,7 @@
 use common\helpers\Html;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
+use common\widgets\address\AddressDetailView;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
@@ -79,6 +80,14 @@ YiiAsset::register($this);
 			<?= $showLead
 				? $this->render('_lead', [
 					'model' => $model->lead,
+				])
+				: ''
+			?>
+
+
+			<?= $showLead && $model->lead->getCustomerAddress()
+				? AddressDetailView::widget([
+					'model' => $model->lead->getCustomerAddress(),
 				])
 				: ''
 			?>
