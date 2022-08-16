@@ -1,13 +1,14 @@
 <?php
 
 use common\modules\lead\models\LeadMarket;
+use frontend\helpers\Url as FrontendUrl;
 
 /* @var $this yii\web\View */
 /* @var $regionsModels LeadMarket[] */
 /* @var $withoutRegionsModels LeadMarket[] */
 /* @var $totalCount int */
 
-$marketUrl = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/market/index']);
+$marketUrl = FrontendUrl::toRoute(['/lead/market/index'], true);
 
 ?>
 <?= Yii::t('lead', 'New {count} Leads on Market.', [

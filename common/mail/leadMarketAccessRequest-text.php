@@ -1,15 +1,16 @@
 <?php
 
 use common\modules\lead\models\LeadMarketUser;
+use frontend\helpers\Url as FrontendUrl;
 
 /* @var $this yii\web\View */
 /* @var $model LeadMarketUser */
 
 $lead = $model->market->lead;
-$leadLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/lead/view', 'id' => $lead->getId()]);
-$acceptLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/market-user/accept', 'market_id' => $model->market_id, 'user_id' => $model->user_id]);
-$rejectLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/market-user/reject', 'market_id' => $model->market_id, 'user_id' => $model->user_id]);
 
+$leadLink = FrontendUrl::leadView($lead->getId());
+$acceptLink = FrontendUrl::toRoute(['/lead/market-user/accept', 'market_id' => $model->market_id, 'user_id' => $model->user_id], true);
+$rejectLink = FrontendUrl::toRoute(['/lead/market-user/reject', 'market_id' => $model->market_id, 'user_id' => $model->user_id], true);
 ?>
 
 <?= Yii::t('lead', 'User: {userName} send request to Access Lead Market: {lead}', [

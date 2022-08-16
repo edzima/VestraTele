@@ -2,12 +2,13 @@
 
 use common\helpers\Html;
 use common\modules\lead\models\LeadMarket;
+use frontend\helpers\Url as FrontendUrl;
 
 /* @var $this yii\web\View */
 /* @var $model LeadMarket */
 
 $lead = $model->lead;
-$leadLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/lead/view', 'id' => $lead->getId()]);
+$leadLink = FrontendUrl::leadView($lead->getId(), true);
 
 ?>
 <div class="lead-from-market-change-status">

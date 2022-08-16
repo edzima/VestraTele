@@ -1,13 +1,16 @@
 <?php
 
 use common\modules\lead\models\ActiveLead;
+use frontend\helpers\Url as FrontendUrl;
 
 /* @var $this yii\web\View */
 /* @var $lead ActiveLead $lead */
 
-$leadLink = Yii::$app->urlManager->createAbsoluteUrl(['lead/lead/view', 'id' => $lead->getId()]);
-$reportLink = Yii::$app->urlManager->createAbsoluteUrl(['lead/report/report', 'id' => $lead->getId()]);
-
+$leadLink = FrontendUrl::leadView($lead->getId(), true);
+$reportLink = FrontendUrl::toRoute(
+	['/lead/report/report', 'id' => $lead->getId()],
+	true
+);
 ?>
 <?= Yii::t('lead', 'Source: {name}', ['name' => $lead->getSource()->getType()->getName()]) ?>
 <?= Yii::t('lead', 'Type: {name}', ['name' => $lead->getSource()->getType()->getName()]) ?>
