@@ -10,8 +10,13 @@ use frontend\helpers\Url as FrontendUrl;
 
 $lead = $model->lead;
 $leadLink = FrontendUrl::leadView($lead->getId(), true);
+$marketLink = FrontendUrl::toRoute(['/lead/market/view', 'id' => $model->id], true);
 
 ?>
+
+<?= Yii::t('lead', 'Status Market') . ': ' . $model->getStatusName() ?>
+<?= $marketLink ?>
+
 <?php foreach ($users as $user): ?>
 	<?= $user->user->getFullName() ?>
 
@@ -24,4 +29,8 @@ $leadLink = FrontendUrl::leadView($lead->getId(), true);
 
 <?php endforeach; ?>
 
-<?= $leadLink ?>
+<?= Yii::t('lead', 'Status Lead') ?>: <?= $lead->getStatusName() ?>
+
+<?= Yii::t('lead', 'Type Lead') ?>: <?= $lead->getTypeName() ?>
+
+<?= $lead->getName() . ': ' . $leadLink ?>

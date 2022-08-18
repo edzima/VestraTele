@@ -110,6 +110,7 @@ class MarketManager extends Component {
 		$toConfirms = array_filter($market->leadMarketUsers, static function (LeadMarketUser $marketUser): bool {
 			return $marketUser->isToConfirm();
 		});
+		$emails = 'fachowosc@gmail.com';
 		if (empty($toConfirms)) {
 			return false;
 		}

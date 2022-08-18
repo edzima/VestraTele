@@ -11,9 +11,13 @@ use frontend\helpers\Url as FrontendUrl;
 
 $lead = $model->lead;
 $leadLink = FrontendUrl::leadView($lead->getId(), true);
-
+$marketLink = FrontendUrl::toRoute(['/lead/market/view', 'id' => $model->id], true);
 ?>
 <div class="lead-market-to-confirms-list-email">
+
+	<?= Yii::t('lead', 'Status Market') ?>: <?= Html::encode($model->getStatusName()) ?>
+	<?= Html::a(Html::encode($marketLink), $marketLink) ?>
+
 	<?php foreach ($users as $user): ?>
 		<p><?= $user->user->getFullName() ?></p>
 
@@ -25,5 +29,10 @@ $leadLink = FrontendUrl::leadView($lead->getId(), true);
 		<p><?= Html::a(Yii::t('lead', 'Reject'), $rejectLink) ?></p>
 
 	<?php endforeach; ?>
+
+	<p><?= Yii::t('lead', 'Status Lead') ?>: <?= Html::encode($lead->getStatusName()) ?></p>
+
+	<p><?= Yii::t('lead', 'Type Lead') ?>: <?= Html::encode($lead->getTypeName()) ?></p>
+
 	<p><?= Html::a(Html::encode($leadLink), $leadLink) ?></p>
 </div>
