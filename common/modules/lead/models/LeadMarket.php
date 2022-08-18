@@ -154,6 +154,12 @@ class LeadMarket extends ActiveRecord {
 		if ($options->visibleAddressDetails) {
 			$details[] = $address->info;
 		}
+		$details = array_filter($details, static function ($value) {
+			return !empty($value);
+		});
+		if (empty($details)) {
+			return '';
+		}
 		return implode(', ', $details);
 	}
 

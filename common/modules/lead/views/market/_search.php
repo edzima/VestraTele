@@ -47,7 +47,7 @@ use yii\widgets\ActiveForm;
 			],
 		])->checkbox() ?>
 
-		<?= $form->field($model, 'withoutAddress', [
+		<?= $form->field($model, 'withoutCity', [
 			'options' => [
 				'class' => 'col-md-2',
 			],

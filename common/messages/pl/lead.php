@@ -367,4 +367,5 @@ return [
 	'Status Lead' => 'Status Leada',
 	'Type Lead' => 'Typ Leada',
 	'Without Address' => 'Brak Adresu',
+	'Without City' => 'Brak Miejscowości',
 ];

@@ -31,8 +31,8 @@ $marketUrl = FrontendUrl::toRoute(['/lead/market/user'], true);
 
 	<?php if (!empty($withoutRegionsModels)): ?>
 		<p><?= Html::a(
-				Yii::t('lead', 'Without Address'),
-				FrontendUrl::to(['/lead/market/user', 'withoutAddress' => true], true)
+				Yii::t('lead', 'Without City'),
+				FrontendUrl::to(['/lead/market/user', 'withoutCity' => true], true)
 			) ?>: <strong><?= count($withoutRegionsModels) ?></strong>
 		</p>
 

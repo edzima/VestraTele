@@ -26,11 +26,11 @@ $marketUrl = FrontendUrl::toRoute(['/lead/market/user'], true);
 <?php endforeach; ?>
 
 <?= !empty($withoutRegionsModels)
-	? (Yii::t('lead', 'Without Address')
+	? (Yii::t('lead', 'Without City')
 		. ': '
 		. count($withoutRegionsModels)
 		. ' '
-		. FrontendUrl::to(['/lead/market/user', 'withoutAddress' => true], true)
+		. FrontendUrl::to(['/lead/market/user', 'withoutCity' => true], true)
 	)
 	: ''
 ?>

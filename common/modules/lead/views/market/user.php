@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 
-	<?= Html::a(Yii::t('lead', 'Access Request to self Market'), ['market-user/self-market',], [
+		<?= Html::a(Yii::t('lead', 'Access Request to self Market'), ['market-user/self-market',], [
 			'class' => 'btn btn-warning',
 		]) ?>
 
@@ -45,6 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			//'id',
 			[
 				'attribute' => 'addressDetails',
+				'visible' => !$searchModel->withoutCity,
 			],
 			[
 				'attribute' => 'status',

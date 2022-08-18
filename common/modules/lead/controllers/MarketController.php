@@ -31,11 +31,11 @@ class MarketController extends BaseController {
 		];
 	}
 
-	public function actionUser(int $regionId = null, bool $withoutAddress = false): string {
+	public function actionUser(int $regionId = null, bool $withoutCity = false): string {
 		$searchModel = new LeadMarketSearch();
-		if ($withoutAddress) {
+		if ($withoutCity) {
 			$searchModel->addressSearch = null;
-			$searchModel->withoutAddress = true;
+			$searchModel->withoutCity = true;
 			$regionId = null;
 		} elseif ($regionId !== null) {
 			$searchModel->addressSearch->region_id = $regionId;

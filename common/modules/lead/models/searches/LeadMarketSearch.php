@@ -6,7 +6,6 @@ use common\models\AddressSearch;
 use common\models\user\User;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\Lead;
-use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
 use common\modules\lead\models\LeadStatus;
@@ -36,7 +35,7 @@ class LeadMarketSearch extends LeadMarket {
 	public $selfMarket;
 
 	public $withoutArchive;
-	public $withoutAddress;
+	public $withoutCity;
 
 	public ?AddressSearch $addressSearch = null;
 
@@ -54,7 +53,7 @@ class LeadMarketSearch extends LeadMarket {
 		return parent::attributeLabels() + [
 				'selfAssign' => Yii::t('lead', 'Self Assign'),
 				'selfMarket' => Yii::t('lead', 'Self Market'),
-				'withoutAddress' => Yii::t('lead', 'Without Address'),
+				'withoutCity' => Yii::t('lead', 'Without City'),
 				'withoutArchive' => Yii::t('lead', 'Without Archives'),
 				'leadStatus' => Yii::t('lead', 'Lead Status'),
 			];
@@ -82,7 +81,7 @@ class LeadMarketSearch extends LeadMarket {
 					'visibleArea', 'leadStatus', 'userStatus',
 				], 'integer',
 			],
-			[['selfAssign', 'selfMarket', 'withoutArchive', 'withoutAddress'], 'boolean'],
+			[['selfAssign', 'selfMarket', 'withoutArchive', 'withoutCity'], 'boolean'],
 			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details', 'leadName'], 'safe'],
 		];
 	}
@@ -125,7 +124,7 @@ class LeadMarketSearch extends LeadMarket {
 		]);
 
 		$this->load($params);
-		if ($this->withoutAddress) {
+		if ($this->withoutCity) {
 			$this->addressSearch = null;
 		}
 		if ($this->addressSearch) {
@@ -190,9 +189,9 @@ class LeadMarketSearch extends LeadMarket {
 	}
 
 	private function applyAddressFilter(ActiveQuery $query): void {
-		if ($this->withoutAddress) {
-			$query->joinWith('lead.addresses');
-			$query->andWhere(LeadAddress::tableName() . '.address_id IS NULL');
+		if ($this->withoutCity) {
+			$query->joinWith('lead.addresses.address', false, 'LEFT OUTER JOIN');
+			$query->andWhere('city_id IS NULL');
 		} else {
 			if ($this->addressSearch->validate()) {
 				if ($this->addressSearch->isNotEmpty()) {
