@@ -365,6 +365,7 @@ return [
 	'Not Realized' => 'Niezrealizowane',
 	'{count} Access Request to Confirm for Lead: {lead} from Market.' => 'Prośby do Potwierdzenia: {count} dla Leada: {lead} z Giełdy',
 	'Status Lead' => 'Status Leada',
+	'Status Market' => 'Status Giełdy',
 	'Type Lead' => 'Typ Leada',
 	'Without Address' => 'Brak Adresu',
 	'Without City' => 'Brak Miejscowości',

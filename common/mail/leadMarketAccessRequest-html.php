@@ -21,6 +21,8 @@ $rejectLink = FrontendUrl::toRoute(['/lead/market-user/reject', 'market_id' => $
 		]) ?>
 	</p>
 
+	<?= Yii::t('lead', 'Status Market') ?>: <?= $model->market->getStatusName() ?>
+	
 	<p>
 		<?= Yii::t('lead', 'Details') . ': ' . Html::encode($model->details) ?>
 	</p>
@@ -29,7 +31,6 @@ $rejectLink = FrontendUrl::toRoute(['/lead/market-user/reject', 'market_id' => $
 	<p><?= Html::a(Yii::t('lead', 'Accept'), $acceptLink) ?></p>
 	<p><?= Html::a(Yii::t('lead', 'Reject'), $rejectLink) ?></p>
 
-	<p><?= Yii::t('lead', 'Status') ?>: <?= Html::encode($model->market->getStatusName()) ?></p>
 
 	<p><?= Yii::t('lead', 'Status Lead') ?>: <?= Html::encode($lead->getStatusName()) ?></p>
 
