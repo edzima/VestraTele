@@ -24,18 +24,6 @@ class LeadMarketController extends Controller {
 		Console::output('Send Create Summary Email. Models: ' . $count . '.');
 	}
 
-	public function actionTodaySummaryEmail(): void {
-		$model = new LeadMarketCreateSummaryEmail();
-		$model->scenario = LeadMarketCreateSummaryEmail::SCENARIO_TODAY;
-		$model->emails = ['fachowosc@gmail.com'];
-		$count = $model->sendEmail();
-		if ($count) {
-			Console::output('Send Create Summary Email. Models: ' . $count . '.');
-		} else {
-			Console::output('Not Found Model to Expired Renew.');
-		}
-	}
-
 	public function actionExpiredRenew(): void {
 		$count = Module::getInstance()->market->expiredRenew();
 		if ($count) {
