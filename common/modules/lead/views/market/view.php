@@ -122,17 +122,21 @@ YiiAsset::register($this);
 			[
 				'class' => ActionColumn::class,
 				'controller' => 'market-user',
-				'template' => '{accept} {reject} {delete}',
+				'template' => '{accept} {give-up} {reject} {delete}',
 				'visibleButtons' => [
 					'accept' => static function (LeadMarketUser $data) use ($model): bool {
 						return $data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
 					},
-					'delete' => static function (LeadMarketUser $model) {
-						return $model->isToConfirm() && $model->user_id === Yii::$app->user->getId();
+					'delete' => static function (LeadMarketUser $data) {
+						return $data->isToConfirm() && $data->user_id === Yii::$app->user->getId();
+					},
+					'give-up' => static function (LeadMarketUser $data): bool {
+						return $data->isAllowGiven() && Yii::$app->user->getId() === $data->user_id;
 					},
 					'reject' => static function (LeadMarketUser $data) use ($model): bool {
 						return $data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
 					},
+
 				],
 				'buttons' => [
 					'access-request' => static function (string $url): string {
@@ -143,15 +147,21 @@ YiiAsset::register($this);
 						]);
 					},
 					'accept' => static function (string $url): string {
-						return Html::a(Html::icon('check'), $url, [
+						return Html::a(Html::icon('ok'), $url, [
 							'title' => Yii::t('lead', 'Accept'),
 							'aria-label' => Yii::t('lead', 'Accept'),
 							'data-pjax' => 1,
 						]);
 					},
-
-					'reject' => static function (string $url): string {
+					'give-up' => static function (string $url): string {
 						return Html::a(Html::icon('remove'), $url, [
+							'title' => Yii::t('lead', 'Give Up'),
+							'aria-label' => Yii::t('lead', 'Give Up'),
+							'data-pjax' => 1,
+						]);
+					},
+					'reject' => static function (string $url): string {
+						return Html::a(Html::icon('minus'), $url, [
 							'title' => Yii::t('lead', 'Reject'),
 							'aria-label' => Yii::t('lead', 'Reject'),
 							'data-pjax' => 1,

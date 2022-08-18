@@ -70,16 +70,19 @@ $this->params['breadcrumbs'][] = $this->title;
 			'reserved_at:date',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{accept} {reject} {view} {delete}',
+				'template' => '{accept} {give-up} {reject} {view} {delete}',
 				'visibleButtons' => [
 					'accept' => static function (LeadMarketUser $model): bool {
 						return $model->isToConfirm() && $model->market->isCreatorOrOwnerLead(Yii::$app->user->getId());
 					},
-					'reject' => static function (LeadMarketUser $model): bool {
-						return $model->isToConfirm() && $model->market->isCreatorOrOwnerLead(Yii::$app->user->getId());
-					},
 					'delete' => static function (LeadMarketUser $model) {
 						return $model->isToConfirm() && $model->user_id === Yii::$app->user->getId();
+					},
+					'give-up' => static function (LeadMarketUser $data): bool {
+						return $data->isAllowGiven() && Yii::$app->user->getId() === $data->user_id;
+					},
+					'reject' => static function (LeadMarketUser $model): bool {
+						return $model->isToConfirm() && $model->market->isCreatorOrOwnerLead(Yii::$app->user->getId());
 					},
 				],
 				'buttons' => [
@@ -87,23 +90,35 @@ $this->params['breadcrumbs'][] = $this->title;
 						return Html::a(Html::icon('eye-open'), ['market/view', 'id' => $model->market_id]);
 					},
 					'accept' => static function (string $url): string {
-						return Html::a(Html::icon('check'), $url, [
+						return Html::a(Html::icon('ok'), $url, [
 							'title' => Yii::t('lead', 'Accept'),
 							'aria-label' => Yii::t('lead', 'Accept'),
 							'data-pjax' => 1,
+							'data-method' => 'POST',
+						]);
+					},
+					'give-up' => static function (string $url): string {
+						return Html::a(Html::icon('remove'), $url, [
+							'title' => Yii::t('lead', 'Give Up'),
+							'aria-label' => Yii::t('lead', 'Give Up'),
+							'data-pjax' => 1,
+							'data-method' => 'POST',
 						]);
 					},
 					'reject' => static function (string $url): string {
-						return Html::a(Html::icon('remove'), $url, [
+						return Html::a(Html::icon('minus'), $url, [
 							'title' => Yii::t('lead', 'Reject'),
 							'aria-label' => Yii::t('lead', 'Reject'),
 							'data-pjax' => 1,
+							'data-method' => 'POST',
 						]);
 					},
 				],
 			],
 		],
-	]); ?>
+	]);
+
+	?>
 
 
 </div>
