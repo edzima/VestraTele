@@ -19,6 +19,14 @@ class LeadMarketAccessResponseForm extends Model {
 
 	public function accept(bool $checkActiveReservation = true): ?string {
 		if ($this->userAlreadyInLead()) {
+			if ($this->model->isToConfirm()) {
+				Yii::warning([
+					'message' => 'User is Already in Lead',
+					'market_id' => $this->model->market_id,
+					'user_id' => $this->model->user_id,
+				]);
+				$this->model->delete();
+			}
 			return null;
 		}
 		if ($checkActiveReservation && $this->model->market->hasActiveReservation()) {
@@ -60,7 +68,7 @@ class LeadMarketAccessResponseForm extends Model {
 		return null;
 	}
 
-	private function userAlreadyInLead(): bool {
+	public function userAlreadyInLead(): bool {
 		return $this->model->market->lead->isForUser($this->model->user_id);
 	}
 
