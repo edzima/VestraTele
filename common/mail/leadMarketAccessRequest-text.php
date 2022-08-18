@@ -8,7 +8,7 @@ use frontend\helpers\Url as FrontendUrl;
 
 $lead = $model->market->lead;
 
-$leadLink = FrontendUrl::leadView($lead->getId());
+$leadLink = FrontendUrl::toRoute($lead->getId(), true);
 $acceptLink = FrontendUrl::toRoute(['/lead/market-user/accept', 'market_id' => $model->market_id, 'user_id' => $model->user_id], true);
 $rejectLink = FrontendUrl::toRoute(['/lead/market-user/reject', 'market_id' => $model->market_id, 'user_id' => $model->user_id], true);
 ?>
