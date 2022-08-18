@@ -10,7 +10,7 @@ use frontend\helpers\Url as FrontendUrl;
 /* @var $users LeadMarketUser[] */
 
 $lead = $model->lead;
-$leadLink = FrontendUrl::leadView($lead->getId());
+$leadLink = FrontendUrl::leadView($lead->getId(), true);
 
 ?>
 <div class="lead-market-to-confirms-list-email">
