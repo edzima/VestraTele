@@ -44,12 +44,15 @@ class LeadMarketReservedDeadlineEmail extends Model {
 		}
 		$models = $this->findModels();
 		if (empty($models)) {
+			Yii::warning('not find models');
 			return null;
 		}
 
 		$count = 0;
 		foreach ($models as $model) {
 			if ($this->sendEmail($model)) {
+				Yii::warning(
+					'Send Email');
 				$count++;
 			}
 		}
@@ -63,8 +66,8 @@ class LeadMarketReservedDeadlineEmail extends Model {
 		return LeadMarketUser::find()
 			->joinWith('market')
 			->with('user')
-			->andWhere(['=', new Expression('DATEDIFF(CURDATE(), reserved_at)'), $this->days])
-			->andWhere([LeadMarket::tableName() . '.status' => [LeadMarket::STATUS_BOOKED, LeadMarket::STATUS_AVAILABLE_AGAIN]])
+			->andWhere(['=', new Expression('DATEDIFF(CURDATE(), reserved_at)'), -($this->days)])
+			->andWhere([LeadMarket::tableName() . '.status' => LeadMarket::STATUS_BOOKED])
 			->all();
 	}
 

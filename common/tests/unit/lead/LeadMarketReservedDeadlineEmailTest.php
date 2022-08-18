@@ -39,7 +39,7 @@ class LeadMarketReservedDeadlineEmailTest extends Unit {
 		$this->tester->haveRecord(LeadMarketUser::class, [
 			'market_id' => $this->haveMarket(LeadMarket::STATUS_BOOKED),
 			'user_id' => 1,
-			'reserved_at' => date('Y-m-d', strtotime('- 1 day')),
+			'reserved_at' => date('Y-m-d', strtotime('+ 1 day')),
 		]);
 
 		$this->tester->assertSame(1, $model->sendEmails());
@@ -47,25 +47,25 @@ class LeadMarketReservedDeadlineEmailTest extends Unit {
 		$this->tester->haveRecord(LeadMarketUser::class, [
 			'market_id' => $this->haveMarket(LeadMarket::STATUS_BOOKED),
 			'user_id' => 1,
-			'reserved_at' => date('Y-m-d', strtotime('- 2 days')),
+			'reserved_at' => date('Y-m-d', strtotime('+ 2 days')),
 		]);
 
 		$this->tester->haveRecord(LeadMarketUser::class, [
 			'market_id' => $this->haveMarket(LeadMarket::STATUS_BOOKED),
 			'user_id' => 1,
-			'reserved_at' => date('Y-m-d', strtotime('- 3 days')),
+			'reserved_at' => date('Y-m-d', strtotime('+ 3 days')),
 		]);
 
 		$this->tester->haveRecord(LeadMarketUser::class, [
 			'market_id' => $this->haveMarket(LeadMarket::STATUS_ARCHIVED),
 			'user_id' => 2,
-			'reserved_at' => date('Y-m-d', strtotime('- 1 day')),
+			'reserved_at' => date('Y-m-d', strtotime('+ 1 day')),
 		]);
 
 		$this->tester->haveRecord(LeadMarketUser::class, [
-			'market_id' => $this->haveMarket(LeadMarket::STATUS_AVAILABLE_AGAIN),
+			'market_id' => $this->haveMarket(LeadMarket::STATUS_BOOKED),
 			'user_id' => 2,
-			'reserved_at' => date('Y-m-d', strtotime('- 1 day')),
+			'reserved_at' => date('Y-m-d', strtotime('+ 1 day')),
 		]);
 
 		$this->tester->assertSame(2, $model->sendEmails());
@@ -97,8 +97,8 @@ class LeadMarketReservedDeadlineEmailTest extends Unit {
 			'user_id' => 2,
 			'reserved_at' => date('Y-m-d'),
 		]);
-		$this->tester->assertSame(2, $model->sendEmails());
-		$this->tester->seeEmailIsSent(2);
+		$this->tester->assertSame(1, $model->sendEmails());
+		$this->tester->seeEmailIsSent(1);
 		/** @var MessageInterface $email */
 		$email = $this->tester->grabLastSentEmail();
 		$this->tester->assertSame('Today you will lose access to the Lead from Market.', $email->getSubject());
@@ -112,7 +112,7 @@ class LeadMarketReservedDeadlineEmailTest extends Unit {
 		$this->tester->haveRecord(LeadMarketUser::class, [
 			'market_id' => $this->haveMarket(LeadMarket::STATUS_BOOKED),
 			'user_id' => 1,
-			'reserved_at' => date('Y-m-d', strtotime('+ 1 day')),
+			'reserved_at' => date('Y-m-d', strtotime('- 1 day')),
 		]);
 
 		$this->tester->haveRecord(LeadMarketUser::class, [
@@ -124,7 +124,7 @@ class LeadMarketReservedDeadlineEmailTest extends Unit {
 		$this->tester->haveRecord(LeadMarketUser::class, [
 			'market_id' => $this->haveMarket(LeadMarket::STATUS_AVAILABLE_AGAIN),
 			'user_id' => 2,
-			'reserved_at' => date('Y-m-d', strtotime('+ 1 day')),
+			'reserved_at' => date('Y-m-d', strtotime('- 1 day')),
 		]);
 		$this->tester->assertNull($model->sendEmails());
 	}
@@ -137,24 +137,24 @@ class LeadMarketReservedDeadlineEmailTest extends Unit {
 		$this->tester->haveRecord(LeadMarketUser::class, [
 			'market_id' => $this->haveMarket(LeadMarket::STATUS_BOOKED),
 			'user_id' => 1,
-			'reserved_at' => date('Y-m-d', strtotime('- 2 days')),
+			'reserved_at' => date('Y-m-d', strtotime('+ 2 days')),
 		]);
 		$this->tester->haveRecord(LeadMarketUser::class, [
 			'market_id' => $this->haveMarket(LeadMarket::STATUS_BOOKED),
 			'user_id' => 1,
-			'reserved_at' => date('Y-m-d', strtotime('- 3 days')),
+			'reserved_at' => date('Y-m-d', strtotime('+ 3 days')),
 		]);
 
 		$this->tester->haveRecord(LeadMarketUser::class, [
 			'market_id' => $this->haveMarket(LeadMarket::STATUS_ARCHIVED),
 			'user_id' => 2,
-			'reserved_at' => date('Y-m-d', strtotime('- 2 days')),
+			'reserved_at' => date('Y-m-d', strtotime('+ 2 days')),
 		]);
 
 		$this->tester->haveRecord(LeadMarketUser::class, [
-			'market_id' => $this->haveMarket(LeadMarket::STATUS_AVAILABLE_AGAIN),
+			'market_id' => $this->haveMarket(LeadMarket::STATUS_BOOKED),
 			'user_id' => 2,
-			'reserved_at' => date('Y-m-d', strtotime('- 2 days')),
+			'reserved_at' => date('Y-m-d', strtotime('+ 2 days')),
 		]);
 
 		$this->tester->assertSame(2, $model->sendEmails());
