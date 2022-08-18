@@ -149,6 +149,9 @@ class MarketUserController extends BaseController {
 		if ($market === null) {
 			throw new NotFoundHttpException();
 		}
+		if (!$market->userCanAccessRequest(Yii::$app->user->getId())) {
+			throw new MethodNotAllowedHttpException('You cant access request for this market.');
+		}
 		$model = new LeadMarketAccessRequest();
 		try {
 			$model->setMarket($market);
