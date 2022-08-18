@@ -17,7 +17,17 @@ $rejectLink = FrontendUrl::toRoute(['/lead/market-user/reject', 'market_id' => $
 	'userName' => $model->user->getFullName(),
 	'lead' => $lead->getName(),
 ]) ?>
-<?= $lead->getPhone() ? Yii::t('lead', 'Phone: {phone}', ['phone' => $lead->getPhone()]) : '' ?>
-<?= $lead->getEmail() ? Yii::t('lead', 'Email: {email}', ['email' => $lead->getEmail()]) : '' ?>
 
-<?= Yii::t('lead', 'Details') . ': ' . $leadLink ?>
+<?= Yii::t('lead', 'Details') . ': ' . $model->details ?>
+
+<?= Yii::t('lead', 'Accept') . ': ' . $acceptLink ?>
+
+<?= Yii::t('lead', 'Reject') . ': ' . $rejectLink ?>
+
+<?= Yii::t('lead', 'Status') ?>: <?= $model->market->getStatusName() ?>
+
+<?= Yii::t('lead', 'Status Lead') ?>: <?= $lead->getStatusName() ?>
+
+<?= Yii::t('lead', 'Type Lead') ?>: <?= $lead->getTypeName() ?>
+
+<?= $lead->getName() . ': ' . $leadLink ?>
