@@ -8,7 +8,9 @@ use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
+use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadType;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -28,6 +30,7 @@ class LeadMarketSearch extends LeadMarket {
 
 	public $leadStatus;
 	public $leadName;
+	public $leadType;
 
 	public $userId;
 
@@ -38,10 +41,6 @@ class LeadMarketSearch extends LeadMarket {
 	public $withoutCity;
 
 	public ?AddressSearch $addressSearch = null;
-
-	public static function getLeadStatusesNames(): array {
-		return LeadStatus::getNames();
-	}
 
 	public static function getMarketUserStatusesNames(): array {
 		$statuses = LeadMarketUser::getStatusesNames();
@@ -79,6 +78,7 @@ class LeadMarketSearch extends LeadMarket {
 				[
 					'!userId', 'creator_id', 'id', 'lead_id', 'status', 'creator_id',
 					'visibleArea', 'leadStatus', 'userStatus',
+					'leadStatus', 'leadType',
 				], 'integer',
 			],
 			[['selfAssign', 'selfMarket', 'withoutArchive', 'withoutCity'], 'boolean'],
@@ -108,6 +108,7 @@ class LeadMarketSearch extends LeadMarket {
 			'creator.userProfile',
 			'lead',
 			'lead.owner',
+			'lead.leadSource',
 			'leadMarketUsers',
 		]);
 		$query->groupBy(LeadMarket::tableName() . '.id');
@@ -144,6 +145,7 @@ class LeadMarketSearch extends LeadMarket {
 		$this->applyWithoutArchiveFilter($query);
 		$this->applyLeadNameFilter($query);
 		$this->applyLeadStatusFilter($query);
+		$this->applyLeadTypeFilter($query);
 		$this->applyMarketUserStatusFilter($query);
 
 		// grid filtering conditions
@@ -283,8 +285,17 @@ class LeadMarketSearch extends LeadMarket {
 		}
 	}
 
+	private function applyLeadTypeFilter(ActiveQuery $query): void {
+		if (!empty($this->leadType)) {
+			$query->joinWith('lead.leadSource');
+			$query->andWhere([
+				LeadSource::tableName() . '.type_id' => $this->leadType,
+			]);
+		}
+	}
+
 	private function applyLeadNameFilter(ActiveQuery $query): void {
-		if (!empty($this->leadStatus)) {
+		if (!empty($this->leadName)) {
 			$query->joinWith('lead');
 			$query->andWhere([
 				Lead::tableName() . '.name' => $this->leadName,
@@ -305,4 +316,33 @@ class LeadMarketSearch extends LeadMarket {
 			}
 		}
 	}
+
+	public static function getLeadTypesNames(): array {
+		$ids = LeadMarket::find()
+			->select('type_id')
+			->joinWith('lead.leadSource')
+			->distinct()
+			->column();
+
+		$names = [];
+		foreach ($ids as $id) {
+			$names[$id] = LeadType::getNames()[$id];
+		}
+		return $names;
+	}
+
+	public static function getLeadStatusesNames(): array {
+		$ids = LeadMarket::find()
+			->select('status_id')
+			->joinWith('lead')
+			->distinct()
+			->column();
+
+		$names = [];
+		foreach ($ids as $id) {
+			$names[$id] = LeadStatus::getNames()[$id];
+		}
+		return $names;
+	}
+
 }
