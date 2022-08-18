@@ -20,6 +20,8 @@ class LeadMarketMultipleForm extends Model {
 	public $status;
 	public string $details = '';
 
+	public bool $withoutAddressFilter = true;
+
 	private int $withoutAddressCount = 0;
 
 	private ?LeadMarketOptions $options = null;
@@ -34,6 +36,7 @@ class LeadMarketMultipleForm extends Model {
 			['creator_id', 'integer'],
 			['leadsIds', 'each', 'rule' => ['integer']],
 			['details', 'string'],
+			['withoutAddressFilter', 'boolean'],
 			[['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['creator_id' => 'id']],
 			[['leadsIds'], 'exist', 'allowArray' => true, 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => 'id'],
 			['leadsIds', 'alreadyExistFilter'],
@@ -46,6 +49,7 @@ class LeadMarketMultipleForm extends Model {
 	public function attributeLabels() {
 		return [
 			'details' => Yii::t('lead', 'Details'),
+			'withoutAddressFilter' => Yii::t('lead', 'Without Address Filter'),
 		];
 	}
 
@@ -79,7 +83,7 @@ class LeadMarketMultipleForm extends Model {
 	}
 
 	public function withoutAddressFilter(): void {
-		if (!$this->hasErrors('leadsIds')) {
+		if ($this->withoutAddressFilter && !$this->hasErrors('leadsIds')) {
 			$ids = LeadAddress::find()
 				->select('lead_id')
 				->andWhere(['lead_id' => $this->leadsIds])

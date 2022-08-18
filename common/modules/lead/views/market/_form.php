@@ -35,6 +35,12 @@ use yii\widgets\ActiveForm;
 
 			<?= $form->field($model, 'details')->textarea() ?>
 
+			<?= $model instanceof LeadMarketMultipleForm || $model->getModel()->isNewRecord
+				? $form->field($model, 'withoutAddressFilter')->checkbox()
+				: ''
+			?>
+
+
 		</div>
 
 		<div class="col-md-6">

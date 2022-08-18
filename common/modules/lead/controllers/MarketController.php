@@ -99,12 +99,6 @@ class MarketController extends BaseController {
 		}
 		$model = new LeadMarketForm();
 		$model->lead_id = $lead->getId();
-		if (!$model->validate(['lead_id'])) {
-			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'Problem with move Lead to Market: {error}', [
-				'error' => $model->getFirstError('lead_id'),
-			]));
-			return $this->redirectLead($id);
-		}
 		$model->status = LeadMarket::STATUS_NEW;
 		$model->creator_id = Yii::$app->user->getId();
 
@@ -148,14 +142,6 @@ class MarketController extends BaseController {
 		$model->status = LeadMarket::STATUS_NEW;
 		$model->creator_id = Yii::$app->user->getId();
 		$model->leadsIds = $ids;
-		if (Yii::$app->request->isGet) {
-			$model->validate(['leadsIds']);
-			if ($model->getWithoutAddressCount()) {
-				Flash::add(Flash::TYPE_WARNING, Yii::t('lead', '{count} Leads without Address - is required for Market.', [
-					'count' => $model->getWithoutAddressCount(),
-				]));
-			}
-		}
 		if ($model->load(Yii::$app->request->post())
 			&& ($count = $model->save()) > 0
 			&& $model->saveReports(false)
@@ -167,7 +153,7 @@ class MarketController extends BaseController {
 			return $this->redirect(['lead/index']);
 		}
 		if (Yii::$app->request->isPost && empty($model->leadsIds)) {
-			if ($model->getWithoutAddressCount()) {
+			if ($model->withoutAddressFilter && $model->getWithoutAddressCount()) {
 				Flash::add(Flash::TYPE_WARNING, Yii::t('lead', '{count} Leads without Address - is required for Market.', [
 					'count' => $model->getWithoutAddressCount(),
 				]));

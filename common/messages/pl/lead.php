@@ -368,4 +368,5 @@ return [
 	'Type Lead' => 'Typ Leada',
 	'Without Address' => 'Brak Adresu',
 	'Without City' => 'Brak Miejscowości',
+	'Without Address Filter' => 'Odfiltruj bez Adresów',
 ];

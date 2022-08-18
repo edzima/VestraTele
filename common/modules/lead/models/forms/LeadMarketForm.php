@@ -18,6 +18,7 @@ class LeadMarketForm extends Model {
 	public $creator_id;
 	public $status;
 	public string $details = '';
+	public bool $withoutAddressFilter = true;
 
 	private ?LeadMarket $model = null;
 	private ?LeadMarketOptions $options = null;
@@ -31,6 +32,7 @@ class LeadMarketForm extends Model {
 			[['!lead_id', 'status', '!creator_id'], 'required'],
 			[['lead_id', 'status', 'creator_id'], 'integer'],
 			['details', 'string'],
+			['withoutAddressFilter', 'boolean'],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			[['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => ['lead_id' => 'id']],
 			[['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['creator_id' => 'id']],
@@ -45,7 +47,13 @@ class LeadMarketForm extends Model {
 			],
 			['lead_id', 'uniqueWithSameContactValidator'],
 			[
-				['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadAddress::class, 'targetAttribute' => ['lead_id' => 'lead_id'],
+				['lead_id'], 'exist',
+				'skipOnError' => true,
+				'targetClass' => LeadAddress::class,
+				'targetAttribute' => ['lead_id' => 'lead_id'],
+				'when' => function (): bool {
+					return $this->withoutAddressFilter && $this->getModel()->isNewRecord;
+				},
 				'message' => Yii::t('lead', 'Lead must have Address.'),
 			],
 		];
@@ -54,6 +62,7 @@ class LeadMarketForm extends Model {
 	public function attributeLabels(): array {
 		return [
 			'details' => Yii::t('lead', 'Details'),
+			'withoutAddressFilter' => Yii::t('lead', 'Without Address Filter'),
 		];
 	}
 

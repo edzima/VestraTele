@@ -27,6 +27,7 @@ class LeadMarketController extends Controller {
 	public function actionTodaySummaryEmail(): void {
 		$model = new LeadMarketCreateSummaryEmail();
 		$model->scenario = LeadMarketCreateSummaryEmail::SCENARIO_TODAY;
+		$model->emails = ['fachowosc@gmail.com'];
 		$count = $model->sendEmail();
 		if ($count) {
 			Console::output('Send Create Summary Email. Models: ' . $count . '.');
