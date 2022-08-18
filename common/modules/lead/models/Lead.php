@@ -30,7 +30,7 @@ use yii\helpers\Json;
  * @property string|null $email
  * @property int|null $campaign_id
  *
- * @property-read LeadUserInterface $owner
+ * @property-read LeadUserInterface|null $owner
  * @property-read LeadCampaign|null $campaign
  * @property-read LeadStatus $status
  * @property-read LeadSource $leadSource

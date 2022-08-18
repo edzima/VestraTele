@@ -6,6 +6,7 @@ use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\components\MarketManager;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
+use common\modules\lead\models\LeadUser;
 use common\tests\unit\Unit;
 use yii\base\InvalidArgumentException;
 use yii\mail\MessageInterface;
@@ -29,59 +30,181 @@ class LeadMarketManagerTest extends Unit {
 			);
 	}
 
+	public function testFirstWaitingUser(): void {
+		$marketId = $this->haveMarket();
+
+		$this->haveMarketUser($marketId, 1, null, LeadMarketUser::STATUS_TO_CONFIRM);
+		sleep(0.5);
+		$this->haveMarketUser($marketId, 2, null, LeadMarketUser::STATUS_WAITING);
+		sleep(0.5);
+		$this->haveMarketUser($marketId, 3, null, LeadMarketUser::STATUS_WAITING);
+
+		$first = $this->manager->getFirstWaitingUser($this->tester->grabRecord(LeadMarket::class, [
+			'id' => $marketId,
+		]));
+
+		$this->tester->assertSame($first->user_id, 2);
+
+		$updatedBefore = $this->tester->grabRecord(LeadMarketUser::class, [
+			'user_id' => 1,
+			'market_id' => $marketId,
+		]);
+		$updatedBefore->status = LeadMarketUser::STATUS_WAITING;
+		$first = $this->manager->getFirstWaitingUser($this->tester->grabRecord(LeadMarket::class, [
+			'id' => $marketId,
+		]));
+		$this->tester->assertSame($first->user_id, 2);
+	}
+
 	public function testEmailLeadStatus(): void {
-		$this->tester->assertTrue($this->manager->sendLeadChangeStatus($this->tester->grabFixture(LeadFixtureHelper::MARKET, 0)));
+		$this->tester->assertTrue($this->manager->sendLeadChangeStatusEmail($this->tester->grabFixture(LeadFixtureHelper::MARKET, 0)));
 		$this->tester->seeEmailIsSent();
 		/** @var MessageInterface $mail */
 		$mail = $this->tester->grabLastSentEmail();
 		$this->tester->assertSame('Lead: John from Market change Status: New.', $mail->getSubject());
 	}
 
-	public function testRenewExpired(): void {
-		$this->tester->assertNull($this->manager->expiredRenew());
+	public function testExpireProcessForNotBooked(): void {
+		$statuses = array_keys(LeadMarket::getStatusesNames());
+		unset($statuses[LeadMarket::STATUS_BOOKED]);
 
-		$marketDone = $this->haveMarket([
-			'status' => LeadMarket::STATUS_DONE,
-		]);
+		$count = $this->manager->expireProcess($this->grabMarket([
+			'id' => $this->haveMarket([
+				'status' => array_rand($statuses),
+			]),
+		]));
+		$this->tester->assertNull($count);
+	}
 
-		$marketBooked1 = $this->haveMarket([
+	public function testExpireProcessForBookedWithoutUsers(): void {
+		$count = $this->manager->expireProcess($this->grabMarket([
+			'id' => $this->haveMarket([
+				'status' => LeadMarket::STATUS_BOOKED,
+			]),
+		]));
+		$this->tester->assertNull($count);
+	}
+
+	public function testExpireProcessWithNotExpiredUser(): void {
+		$marketId = $this->haveMarket([
 			'status' => LeadMarket::STATUS_BOOKED,
 		]);
 
-		$marketBooked2 = $this->haveMarket([
+		$this->haveAcceptedUser(
+			$marketId,
+			1,
+			date(DATE_ATOM, strtotime('+ 1 day'))
+		);
+
+		$count = $this->manager->expireProcess(
+			$this->grabMarket([
+				'id' => $marketId,
+			])
+		);
+		$this->tester->assertSame(0, $count);
+	}
+
+	public function testExpireProcessWithExpiredUserWithoutWaiting(): void {
+		$marketId = $this->haveMarket([
 			'status' => LeadMarket::STATUS_BOOKED,
 		]);
 
-		$this->tester->assertNull($this->manager->expiredRenew());
+		$this->haveAcceptedUser(
+			$marketId,
+			1,
+			date(DATE_ATOM, strtotime('- 1 day'))
+		);
 
-		$this->haveMarketUser($marketDone, 2, date(DATE_ATOM, strtotime('- 1 day')));
-		$this->haveMarketUser($marketBooked1, 2, date(DATE_ATOM, strtotime('- 1 day')));
-		$this->haveMarketUser($marketBooked2, 2, date(DATE_ATOM, strtotime('+ 1 day')));
+		$this->haveAcceptedUser(
+			$marketId,
+			2,
+			date(DATE_ATOM, strtotime('+ 1 day'))
+		);
 
-		$this->tester->assertSame(1, $this->manager->expiredRenew());
+		$count = $this->manager->expireProcess(
+			$this->grabMarket([
+				'id' => $marketId,
+			])
+		);
+		$this->tester->assertSame(1, $count);
+	}
 
-		$this->tester->seeRecord(LeadMarket::class, [
-			'id' => $marketBooked1,
-			'status' => LeadMarket::STATUS_AVAILABLE_AGAIN,
-		]);
-
-		$this->tester->dontSeeRecord(LeadMarket::class, [
-			'id' => $marketBooked2,
-			'status' => LeadMarket::STATUS_AVAILABLE_AGAIN,
-		]);
-
-		$marketBookedMultiple = $this->haveMarket([
+	public function testExpireProcessWithExpiredUserWithDoubleWaiting(): void {
+		LeadUser::deleteAll();
+		$marketId = $this->haveMarket([
 			'status' => LeadMarket::STATUS_BOOKED,
 		]);
 
-		$this->haveMarketUser($marketBookedMultiple, 2, date(DATE_ATOM, strtotime('- 1 day')));
-		$this->haveMarketUser($marketBookedMultiple, 3, date(DATE_ATOM, strtotime('+ 1 day')));
-		$this->tester->assertNull($this->manager->expiredRenew());
+		$this->haveAcceptedUser(
+			$marketId,
+			1,
+			date(DATE_ATOM, strtotime('- 1 day'))
+		);
 
-		$this->tester->dontSeeRecord(LeadMarket::class, [
-			'id' => $marketBookedMultiple,
-			'status' => LeadMarket::STATUS_AVAILABLE_AGAIN,
+		$this->haveMarketUser(
+			$marketId,
+			2,
+			null,
+			LeadMarketUser::STATUS_WAITING,
+		);
+
+		$this->haveMarketUser(
+			$marketId,
+			3,
+			null,
+			LeadMarketUser::STATUS_WAITING,
+		);
+
+		$count = $this->manager->expireProcess(
+			$this->grabMarket([
+				'id' => $marketId,
+			])
+		);
+		$this->tester->assertSame(1, $count);
+		$this->tester->seeEmailIsSent(1);
+		/**
+		 * @var MessageInterface $mail
+		 */
+		$mail = $this->tester->grabLastSentEmail();
+		$this->tester->assertSame('Your Access Request is Accepted.', $mail->getSubject());
+	}
+
+	public function testExpireProcessWithExpiredUserAndToConfirms(): void {
+		$marketId = $this->haveMarket([
+			'status' => LeadMarket::STATUS_BOOKED,
 		]);
+
+		$this->haveAcceptedUser(
+			$marketId,
+			1,
+			date(DATE_ATOM, strtotime('- 1 day'))
+		);
+
+		$this->haveMarketUser(
+			$marketId,
+			2,
+			null,
+			LeadMarketUser::STATUS_TO_CONFIRM,
+		);
+
+		$this->haveMarketUser(
+			$marketId,
+			3,
+			null,
+			LeadMarketUser::STATUS_TO_CONFIRM,
+		);
+		$market = $this->grabMarket([
+			'id' => $marketId,
+		]);
+		$count = $this->manager->expireProcess($market);
+		$this->tester->assertSame(1, $count);
+		$this->tester->seeEmailIsSent(1);
+		$this->tester->seeEmailIsSent(1);
+		/**
+		 * @var MessageInterface $mail
+		 */
+		$mail = $this->tester->grabLastSentEmail();
+		$this->tester->assertSame('2 Access Request to Confirm for Lead: ' . $market->lead->getName() . ' from Market.', $mail->getSubject());
 	}
 
 	public function testMarketHasExpiredReservation(): void {
@@ -94,7 +217,7 @@ class LeadMarketManagerTest extends Unit {
 		$market->refresh();
 		$this->tester->assertFalse($market->hasActiveReservation());
 
-		$this->haveMarketUser($market->id, 2, date(DATE_ATOM, strtotime('+ 1 day')), LeadMarketUser::STATUS_ACCEPTED);
+		$this->haveMarketUser($market->id, 2, date(DATE_ATOM, strtotime(' + 1 day')), LeadMarketUser::STATUS_ACCEPTED);
 		$market->refresh();
 		$this->tester->assertTrue($market->hasActiveReservation());
 	}
@@ -109,9 +232,13 @@ class LeadMarketManagerTest extends Unit {
 		return $this->tester->haveRecord(LeadMarket::class, $attributes);
 	}
 
-	private function haveMarketUser(int $marketId, int $userId, string $reserved_at = null, int $status = LeadMarketUser::STATUS_ACCEPTED) {
+	private function haveAcceptedUser(int $marketId, int $userId, string $reservedAt): array {
+		return $this->haveMarketUser($marketId, $userId, $reservedAt, LeadMarketUser::STATUS_ACCEPTED);
+	}
+
+	private function haveMarketUser(int $marketId, int $userId, string $reserved_at = null, int $status = LeadMarketUser::STATUS_ACCEPTED): array {
 		if ($status === LeadMarketUser::STATUS_ACCEPTED && $reserved_at === null) {
-			throw new InvalidArgumentException('Reserved At must be set on Status Booked.');
+			throw new InvalidArgumentException('Reserved At must be set on Status Booked . ');
 		}
 		return $this->tester->haveRecord(LeadMarketUser::class, [
 			'market_id' => $marketId,
@@ -119,5 +246,9 @@ class LeadMarketManagerTest extends Unit {
 			'status' => $status,
 			'reserved_at' => $reserved_at,
 		]);
+	}
+
+	private function grabMarket(array $attributes): LeadMarket {
+		return $this->tester->grabRecord(LeadMarket::class, $attributes);
 	}
 }

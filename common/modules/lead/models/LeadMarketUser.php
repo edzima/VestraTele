@@ -28,9 +28,11 @@ use yii\db\Expression;
 class LeadMarketUser extends ActiveRecord {
 
 	public const STATUS_TO_CONFIRM = 1;
-	public const STATUS_WAITING = 3;
-	public const STATUS_ACCEPTED = 5;
 	public const STATUS_REJECTED = 2;
+	public const STATUS_WAITING = 3;
+	public const STATUS_GIVEN_UP = 4;
+	public const STATUS_ACCEPTED = 5;
+	public const STATUS_NOT_REALIZED = 6;
 
 	/**
 	 * {@inheritdoc}
@@ -45,6 +47,8 @@ class LeadMarketUser extends ActiveRecord {
 			static::STATUS_ACCEPTED => Yii::t('lead', 'Accepted'),
 			static::STATUS_WAITING => Yii::t('lead', 'Waiting'),
 			static::STATUS_REJECTED => Yii::t('lead', 'Rejected'),
+			static::STATUS_GIVEN_UP => Yii::t('lead', 'Given Up'),
+			static::STATUS_NOT_REALIZED => Yii::t('lead', 'Not Realized'),
 		];
 	}
 
@@ -101,8 +105,7 @@ class LeadMarketUser extends ActiveRecord {
 	}
 
 	public function isToConfirm(): bool {
-		//@todo maybe or with status Rejected.
-		return $this->status === LeadMarketUser::STATUS_TO_CONFIRM;
+		return $this->status === static::STATUS_TO_CONFIRM;
 	}
 
 	public function isWaiting(): bool {
@@ -122,6 +125,10 @@ class LeadMarketUser extends ActiveRecord {
 			return null;
 		}
 		return strtotime($this->reserved_at) < time();
+	}
+
+	public function isAllowGiven(): bool {
+		return ($this->isAccepted() || $this->isWaiting()) && $this->market->isAllowGiven();
 	}
 
 	public function getStatusName(): string {

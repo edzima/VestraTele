@@ -35,6 +35,7 @@ class LeadMarket extends ActiveRecord {
 	public const STATUS_BOOKED = 2;
 	public const STATUS_AVAILABLE_AGAIN = 5;
 	public const STATUS_DONE = 10;
+	public const STATUS_USERS_COUNT_LIMIT_EXCEED = 15;
 
 	/**
 	 * {@inheritdoc}
@@ -78,6 +79,7 @@ class LeadMarket extends ActiveRecord {
 			static::STATUS_AVAILABLE_AGAIN => Yii::t('lead', 'Available Again'),
 			static::STATUS_DONE => Yii::t('lead', 'Done'),
 			static::STATUS_ARCHIVED => Yii::t('lead', 'Archived'),
+			static::STATUS_USERS_COUNT_LIMIT_EXCEED => Yii::t('lead', 'Users count Limit exceed'),
 		];
 	}
 
@@ -226,5 +228,17 @@ class LeadMarket extends ActiveRecord {
 			}
 		}
 		return false;
+	}
+
+	public function isBooked(): bool {
+		return $this->status === static::STATUS_BOOKED;
+	}
+
+	public function isAllowGiven(): bool {
+		return in_array($this->status, [
+			static::STATUS_NEW,
+			static::STATUS_BOOKED,
+			static::STATUS_AVAILABLE_AGAIN,
+		]);
 	}
 }

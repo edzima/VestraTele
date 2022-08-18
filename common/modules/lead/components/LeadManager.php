@@ -121,7 +121,7 @@ class LeadManager extends Component {
 			if ($market->updateAttributes([
 				'status',
 			])) {
-				Module::getInstance()->market->sendLeadChangeStatus($market);
+				Module::getInstance()->market->sendLeadChangeStatusEmail($market);
 			}
 		}
 	}

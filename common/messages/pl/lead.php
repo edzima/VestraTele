@@ -358,4 +358,10 @@ return [
 	'Same Lead has already in Market. ' => 'Ten Lead lub Tożsamy jest już na Giełdzie.',
 	'Access Request to self Market' => 'Prośby do Mnie',
 	'Self Access Request' => 'Moje Prośby',
+	'Give Up' => 'Porzuć',
+	'Given Up' => 'Porzucono',
+	'Your Access Request is Given Up.' => 'Twoja prośba o dostęp została odrzucona.',
+	'Users count Limit exceed' => '> Użytkowników',
+	'Not Realized' => 'Niezrealizowane',
+	'{count} Access Request to Confirm for Lead: {lead} from Market.' => 'Prośby do Potwierdzenia: {count} dla Leada: {lead} z Giełdy',
 ];
