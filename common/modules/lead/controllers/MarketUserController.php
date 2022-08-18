@@ -13,6 +13,7 @@ use yii\base\InvalidArgumentException;
 use yii\filters\VerbFilter;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * MarketUserController implements the CRUD actions for LeadMarketUser model.
@@ -30,6 +31,7 @@ class MarketUserController extends BaseController {
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'give-up' => ['POST'],
 				],
 			],
 		];
@@ -83,49 +85,56 @@ class MarketUserController extends BaseController {
 		if ($model->isAccepted()) {
 			throw new NotFoundHttpException('Model is already accepted.');
 		}
-		if (!$model->market->isCreatorOrOwnerLead(Yii::$app->user->getId())) {
-			throw new MethodNotAllowedHttpException('Only Lead Owner or Market Creator can Accepted.');
-		}
+		$this->checkIsCreatorOrOwnerLead($model);
 		$responseForm = new LeadMarketAccessResponseForm($model);
-		if ($responseForm->accept()) {
+		$type = $responseForm->accept();
+		if ($type) {
 			Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead',
 				'Success Reserved Lead Market to: {reserved_at}', [
 					'reserved_at' => Yii::$app->formatter->asDate($model->reserved_at),
 				])
 			);
-			$type = $responseForm->linkUserToLead();
-			if ($type) {
-				Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead',
-					'Assign User: {user} as {typeName} to Lead: {leadName}.', [
-						'leadName' => $model->market->lead->getName(),
-						'user' => $model->user->getFullName(),
-						'typeName' => LeadMarketAccessResponseForm::getLinkedUserTypeName($type),
-					])
-				);
-				$responseForm->sendAcceptEmail();
-			} else {
-				Flash::add(Flash::TYPE_WARNING, Yii::t('lead',
-					'Problem with add User to Lead.')
-				);
-			}
+			Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead',
+				'Assign User: {user} as {typeName} to Lead: {leadName}.', [
+					'leadName' => $model->market->lead->getName(),
+					'user' => $model->user->getFullName(),
+					'typeName' => LeadMarketAccessResponseForm::getLinkedUserTypeName($type),
+				])
+			);
+			$responseForm->sendAcceptEmail();
 		} elseif ($model->isWaiting()) {
-			Yii::t('lead', 'Access Request cannot be Accepted. Market is Already Reserved.');
 			$responseForm->sendWaitingEmail();
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('lead', 'Access Request cannot be Accepted. Market is Already Reserved.')
+			);
 		}
 		return $this->redirect(['market/view', 'id' => $market_id]);
 	}
 
-	public function actionReject(int $market_id, int $user_id) {
+	public function actionReject(int $market_id, int $user_id): Response {
 		$model = $this->findModel($market_id, $user_id);
 		if (!$model->isToConfirm()) {
 			throw new NotFoundHttpException('Model is not to Confirm');
 		}
-		if (!$model->market->isCreatorOrOwnerLead(Yii::$app->user->getId())) {
-			throw new MethodNotAllowedHttpException('Only Lead Owner or Market Creator can Rejected.');
-		}
+		$this->checkIsCreatorOrOwnerLead($model);
+
 		$responseForm = new LeadMarketAccessResponseForm($model);
 		$responseForm->reject();
 		$responseForm->sendRejectEmail();
+		return $this->redirect(['market/view', 'id' => $market_id]);
+	}
+
+	public function actionGiveUp(int $market_id): Response {
+		$model = $this->findModel($market_id, Yii::$app->user->getId());
+		if (!$model->isAllowGiven()) {
+			throw new MethodNotAllowedHttpException('This Access Request cannot be given up.');
+		}
+
+		$responseForm = new LeadMarketAccessResponseForm($model);
+		$responseForm->giveUp();
+		Flash::add(Flash::TYPE_SUCCESS,
+			Yii::t('lead', 'Your Access Request is Given Up.')
+		);
 		return $this->redirect(['market/view', 'id' => $market_id]);
 	}
 
@@ -166,9 +175,9 @@ class MarketUserController extends BaseController {
 	 * @param int $user_id
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionDelete(int $market_id, int $user_id) {
-		$model = $this->findModel($market_id, $user_id);
-		if ($model->isToConfirm() && Yii::$app->user->getId() === $user_id) {
+	public function actionDelete(int $market_id) {
+		$model = $this->findModel($market_id, Yii::$app->user->getId());
+		if ($model->isToConfirm()) {
 			$model->delete();
 		} else {
 			Flash::add(Flash::TYPE_WARNING,
@@ -195,5 +204,16 @@ class MarketUserController extends BaseController {
 		}
 
 		throw new NotFoundHttpException(Yii::t('lead', 'The requested page does not exist.'));
+	}
+
+	/**
+	 * @param LeadMarketUser $model
+	 * @return void
+	 * @throws MethodNotAllowedHttpException
+	 */
+	private function checkIsCreatorOrOwnerLead(LeadMarketUser $model): void {
+		if (!$model->market->isCreatorOrOwnerLead(Yii::$app->user->getId())) {
+			throw new MethodNotAllowedHttpException('Only Lead Owner or Market Creator make this Action.');
+		}
 	}
 }

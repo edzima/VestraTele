@@ -36,11 +36,13 @@ class LeadMarketUserAccessResponseTest extends Unit {
 
 	public function testAccepted(): void {
 		$model = new LeadMarketUser();
-		$model->market_id = 1;
+		$model->market_id = 2;
 		$model->days_reservation = 2;
+		$model->user_id = 3;
 
 		$responseModel = $this->giveModel($model);
-		$responseModel->accept();
+		$this->tester->assertNotNull($responseModel->accept());
+
 		$this->tester->assertSame(LeadMarketUser::STATUS_ACCEPTED, $model->status);
 		$this->tester->assertSame($this->generateReservedAt(2), $model->reserved_at);
 		$this->tester->assertSame(LeadMarket::STATUS_BOOKED, $model->market->status);

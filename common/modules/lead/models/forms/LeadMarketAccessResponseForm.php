@@ -17,24 +17,35 @@ class LeadMarketAccessResponseForm extends Model {
 		parent::__construct($config);
 	}
 
-	public function accept(): bool {
-		if ($this->model->market->hasActiveReservation()) {
+	public function accept(bool $checkActiveReservation = true): ?string {
+		if ($this->userAlreadyInLead()) {
+			return null;
+		}
+		if ($checkActiveReservation && $this->model->market->hasActiveReservation()) {
 			$this->model->status = LeadMarketUser::STATUS_WAITING;
 			$this->model->updateAttributes(['status']);
-			return false;
+			return null;
+		}
+
+		$type = $this->linkUserToLead();
+		if ($type === null) {
+			$this->model->market->status = LeadMarket::STATUS_USERS_COUNT_LIMIT_EXCEED;
+			$this->model->market->updateAttributes(['status']);
+			return null;
 		}
 		$this->model->status = LeadMarketUser::STATUS_ACCEPTED;
 		$this->model->generateReservedAt();
 		$this->model->market->status = LeadMarket::STATUS_BOOKED;
-		return $this->model->updateAttributes([
-				'status',
-				'reserved_at',
-			])
-			&& $this->model->market->updateAttributes(['status']);
+		$this->model->updateAttributes([
+			'status',
+			'reserved_at',
+		]);
+		$this->model->market->updateAttributes(['status']);
+		return $type;
 	}
 
 	public function linkUserToLead(): ?string {
-		if ($this->model->market->lead->isForUser($this->model->user_id)) {
+		if ($this->userAlreadyInLead()) {
 			Yii::warning('Try add User: ' . $this->model->user_id .
 				' from Market: ' . $this->model->market_id . ' who already in Lead.',
 				'lead.market.user'
@@ -47,6 +58,10 @@ class LeadMarketAccessResponseForm extends Model {
 			return $type;
 		}
 		return null;
+	}
+
+	private function userAlreadyInLead(): bool {
+		return $this->model->market->lead->isForUser($this->model->user_id);
 	}
 
 	private function getLeadUserMarketTypeToAssign(): ?string {
@@ -133,6 +148,15 @@ class LeadMarketAccessResponseForm extends Model {
 		$this->model->status = LeadMarketUser::STATUS_REJECTED;
 		$this->model->reserved_at = null;
 
+		$this->model->updateAttributes([
+			'status',
+			'reserved_at',
+		]);
+	}
+
+	public function giveUp(): void {
+		$this->model->status = LeadMarketUser::STATUS_GIVEN_UP;
+		$this->model->reserved_at = null;
 		$this->model->updateAttributes([
 			'status',
 			'reserved_at',
