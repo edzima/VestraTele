@@ -52,14 +52,6 @@ class LeadMarketCreateSummaryEmail extends Model {
 		];
 	}
 
-	public function findModels(): array {
-		return LeadMarket::find()
-			->andWhere(['>=', LeadMarket::tableName() . '.created_at', $this->createdFrom])
-			->andWhere(['<=', LeadMarket::tableName() . '.created_at', $this->createdTo])
-			->with('lead.addresses.address.city')
-			->all();
-	}
-
 	public function sendEmail(): ?int {
 		if (!$this->validate()) {
 			return null;
@@ -91,6 +83,14 @@ class LeadMarketCreateSummaryEmail extends Model {
 		return $count;
 	}
 
+	public function findModels(): array {
+		return LeadMarket::find()
+			->andWhere(['>=', LeadMarket::tableName() . '.created_at', $this->createdFrom])
+			->andWhere(['<=', LeadMarket::tableName() . '.created_at', $this->createdTo])
+			->with('lead.addresses.address.city')
+			->all();
+	}
+
 	/**
 	 * @param LeadMarket[] $models
 	 * @return LeadMarket[][]
@@ -100,8 +100,8 @@ class LeadMarketCreateSummaryEmail extends Model {
 		$withoutRegions = [];
 		foreach ($models as $model) {
 			$address = $model->lead->getCustomerAddress();
-			if ($address !== null) {
-				$region = $address->city->getRegion()->name;
+			if ($address !== null && $address->city !== null) {
+				$region = $address->city->region_id;
 				if (!isset($regions[$region])) {
 					$regions[$region] = [];
 				}
