@@ -21,7 +21,8 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Html::a(Yii::t('lead', 'Access Request to self Market'), ['market-user/self-market',], [
+
+	<?= Html::a(Yii::t('lead', 'Access Request to self Market'), ['market-user/self-market',], [
 			'class' => 'btn btn-warning',
 		]) ?>
 

@@ -366,4 +366,5 @@ return [
 	'{count} Access Request to Confirm for Lead: {lead} from Market.' => 'Prośby do Potwierdzenia: {count} dla Leada: {lead} z Giełdy',
 	'Status Lead' => 'Status Leada',
 	'Type Lead' => 'Typ Leada',
+	'Without Address' => 'Brak Adresu',
 ];

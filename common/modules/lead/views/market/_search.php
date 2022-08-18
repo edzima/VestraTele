@@ -19,10 +19,14 @@ use yii\widgets\ActiveForm;
 	]); ?>
 
 
-	<?= AddressSearchWidget::widget([
-		'form' => $form,
-		'model' => $model->addressSearch,
-	]) ?>
+	<?= $model->addressSearch !== null
+		?
+		AddressSearchWidget::widget([
+			'form' => $form,
+			'model' => $model->addressSearch,
+		])
+		: ''
+	?>
 
 	<div class="row">
 		<?= $form->field($model, 'selfAssign', [
@@ -38,6 +42,12 @@ use yii\widgets\ActiveForm;
 		])->dropDownList(Html::booleanDropdownList(), ['prompt' => Yii::t('common', 'All')]) ?>
 
 		<?= $form->field($model, 'withoutArchive', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])->checkbox() ?>
+
+		<?= $form->field($model, 'withoutAddress', [
 			'options' => [
 				'class' => 'col-md-2',
 			],

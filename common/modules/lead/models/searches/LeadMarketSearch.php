@@ -6,6 +6,7 @@ use common\models\AddressSearch;
 use common\models\user\User;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
 use common\modules\lead\models\LeadStatus;
@@ -35,6 +36,7 @@ class LeadMarketSearch extends LeadMarket {
 	public $selfMarket;
 
 	public $withoutArchive;
+	public $withoutAddress;
 
 	public ?AddressSearch $addressSearch = null;
 
@@ -52,6 +54,7 @@ class LeadMarketSearch extends LeadMarket {
 		return parent::attributeLabels() + [
 				'selfAssign' => Yii::t('lead', 'Self Assign'),
 				'selfMarket' => Yii::t('lead', 'Self Market'),
+				'withoutAddress' => Yii::t('lead', 'Without Address'),
 				'withoutArchive' => Yii::t('lead', 'Without Archives'),
 				'leadStatus' => Yii::t('lead', 'Lead Status'),
 			];
@@ -79,7 +82,7 @@ class LeadMarketSearch extends LeadMarket {
 					'visibleArea', 'leadStatus', 'userStatus',
 				], 'integer',
 			],
-			[['selfAssign', 'selfMarket'], 'boolean'],
+			[['selfAssign', 'selfMarket', 'withoutArchive', 'withoutAddress'], 'boolean'],
 			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details', 'leadName'], 'safe'],
 		];
 	}
@@ -122,7 +125,12 @@ class LeadMarketSearch extends LeadMarket {
 		]);
 
 		$this->load($params);
-		$this->addressSearch->load($params);
+		if ($this->withoutAddress) {
+			$this->addressSearch = null;
+		}
+		if ($this->addressSearch) {
+			$this->addressSearch->load($params);
+		}
 
 		if (!$this->validate()) {
 			// uncomment the following line if you do not want to return any records when validation fails
@@ -182,15 +190,20 @@ class LeadMarketSearch extends LeadMarket {
 	}
 
 	private function applyAddressFilter(ActiveQuery $query): void {
-		if ($this->addressSearch->validate()) {
-			if ($this->addressSearch->isNotEmpty()) {
-				$query->joinWith([
-					'lead.addresses.address' => function (ActiveQuery $addressQuery) {
-						$this->addressSearch->applySearch($addressQuery);
-					},
-				]);
-			} else {
-				$query->with('lead.addresses.address.city.terc');
+		if ($this->withoutAddress) {
+			$query->joinWith('lead.addresses');
+			$query->andWhere(LeadAddress::tableName() . '.address_id IS NULL');
+		} else {
+			if ($this->addressSearch->validate()) {
+				if ($this->addressSearch->isNotEmpty()) {
+					$query->joinWith([
+						'lead.addresses.address' => function (ActiveQuery $addressQuery) {
+							$this->addressSearch->applySearch($addressQuery);
+						},
+					]);
+				} else {
+					$query->with('lead.addresses.address.city.terc');
+				}
 			}
 		}
 	}
