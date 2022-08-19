@@ -43,10 +43,6 @@ use yii\widgets\DetailView;
 				'attribute' => 'postal_code',
 				'visible' => !empty($model->postal_code),
 			],
-			[
-				'attribute' => 'providerName',
-				'visible' => !empty($model->provider),
-			],
 		],
 	]) ?>
 
