@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models;
 
+use common\helpers\ArrayHelper;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
@@ -115,6 +116,15 @@ class LeadMarket extends ActiveRecord {
 		];
 	}
 
+	public function getReservedAt(): ?string {
+		$users = $this->leadMarketUsers;
+		if (empty($users)) {
+			return null;
+		}
+		$reservedAt = ArrayHelper::getColumn($users, 'reserved_at');
+		return max($reservedAt);
+	}
+
 	public function getUser(int $userId): ?LeadMarketUser {
 		return $this->leadMarketUsers[$userId] ?? null;
 	}
@@ -195,7 +205,7 @@ class LeadMarket extends ActiveRecord {
 	public function userCanAccessRequest(int $userId): bool {
 		return !$this->isArchived() && !$this->isDone()
 			&& !$this->isCreatorOrOwnerLead($userId)
-			&& !$this->hasActiveReservation()
+			&& !$this->hasAccessToLead($userId)
 			&& (!$this->hasUser($userId) || $this->leadMarketUsers[$userId]->isExpired());
 	}
 
@@ -217,10 +227,23 @@ class LeadMarket extends ActiveRecord {
 	}
 
 	public function hasAccessToLead(int $userId): bool {
-		return $this->isCreatorOrOwnerLead($userId) ||
-			(
-				Module::getInstance()->market->isFromMarket($this->lead->getUsers(), $userId)
-				&& !Module::getInstance()->market->hasExpiredReservation($this->lead_id, $userId));
+		if (!Module::getInstance()->onlyUser) {
+			return true;
+		}
+		return $this->lead->isForUser($userId)
+			&& (!$this->isLeadUserNotFromMarket($userId) || $this->userHasActiveAccess($userId));
+	}
+
+	private function isLeadUserNotFromMarket(int $userId): bool {
+		return Module::getInstance()->market->isFromMarket($this->lead->getUsers(), $userId);
+	}
+
+	private function userHasActiveAccess(int $userId): bool {
+		if (!isset($this->leadMarketUsers[$userId])) {
+			return false;
+		}
+		$marketUser = $this->leadMarketUsers[$userId];
+		return $marketUser->isAccepted() && !$marketUser->isExpired();
 	}
 
 	public function hasActiveReservation(): ?bool {
@@ -247,4 +270,5 @@ class LeadMarket extends ActiveRecord {
 			static::STATUS_AVAILABLE_AGAIN,
 		]);
 	}
+
 }

@@ -99,6 +99,12 @@ class MarketManager extends Component {
 			}
 		}
 
+		if (!$market->hasActiveReservation()) {
+			$market->updateAttributes([
+				'status' => LeadMarket::STATUS_AVAILABLE_AGAIN,
+			]);
+		}
+
 		return $expired;
 	}
 

@@ -85,24 +85,15 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => LeadMarketUserStatusColumn::class,
 			],
 			'created_at:datetime',
-
+			'updated_at:datetime',
+			[
+				'attribute' => 'reservedAt',
+				'format' => 'date',
+				'label' => Yii::t('lead', 'Reserved At'),
+			],
 			[
 				'class' => ActionColumn::class,
-				'template' => '{access-request} {view} {update} {delete}',
-				'buttons' => [
-					'access-request' => function (string $url, LeadMarket $data): string {
-						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', ['market-user/access-request', 'market_id' => $data->id], [
-							'aria-label' => Yii::t('lead', 'Request Access'),
-							'title' => Yii::t('lead', 'Request Access'),
-							'data-pjax' => 0,
-						]);
-					},
-				],
-				'visibleButtons' => [
-					'access-request' => static function (LeadMarket $data): bool {
-						return $data->userCanAccessRequest(Yii::$app->user->getId());
-					},
-				],
+				'template' => '{view} {update} {delete}',
 			],
 		],
 	]); ?>

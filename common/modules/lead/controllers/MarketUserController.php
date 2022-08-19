@@ -3,6 +3,7 @@
 namespace common\modules\lead\controllers;
 
 use common\helpers\Flash;
+use common\helpers\Url;
 use common\modules\lead\models\forms\LeadMarketAccessRequest;
 use common\modules\lead\models\forms\LeadMarketAccessResponseForm;
 use common\modules\lead\models\LeadMarket;
@@ -132,6 +133,7 @@ class MarketUserController extends BaseController {
 
 		$responseForm = new LeadMarketAccessResponseForm($model);
 		$responseForm->giveUp();
+		$this->module->getMarket()->expireProcess($model->market);
 		Flash::add(Flash::TYPE_SUCCESS,
 			Yii::t('lead', 'Your Access Request is Given Up.')
 		);
@@ -144,7 +146,7 @@ class MarketUserController extends BaseController {
 	 *
 	 * @return mixed
 	 */
-	public function actionAccessRequest(int $market_id) {
+	public function actionAccessRequest(int $market_id, int $days = LeadMarketAccessRequest::DEFAULT_DAYS, string $returnUrl = null) {
 		$market = LeadMarket::findOne($market_id);
 		if ($market === null) {
 			throw new NotFoundHttpException();
@@ -153,16 +155,29 @@ class MarketUserController extends BaseController {
 			throw new MethodNotAllowedHttpException('You cant access request for this market.');
 		}
 		$model = new LeadMarketAccessRequest();
+
 		try {
 			$model->setMarket($market);
 		} catch (InvalidArgumentException $exception) {
 			throw new NotFoundHttpException($exception->getMessage());
 		}
+		$model->days = $days;
 		$model->user_id = Yii::$app->user->getId();
 
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$model->sendEmail();
-			return $this->redirect(['market/view', 'id' => $market_id]);
+		if (Yii::$app->request->isPost) {
+			$model->load(Yii::$app->request->post());
+		}
+		if ($model->save()) {
+			if ($model->getModel()->isToConfirm()) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('lead', 'Your Access Request is waiting for Accept. You will be notify by Email.')
+				);
+				$model->sendEmail();
+			}
+			if ($returnUrl === null) {
+				$returnUrl = Url::toRoute(['market/view', 'id' => $market_id]);
+			}
+			return $this->redirect($returnUrl);
 		}
 
 		return $this->render('create', [

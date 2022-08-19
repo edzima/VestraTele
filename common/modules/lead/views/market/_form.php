@@ -28,9 +28,10 @@ use yii\widgets\ActiveForm;
 			?>
 
 
-			<?= $model instanceof LeadMarketForm && !$model->getModel()->isNewRecord
-				? $form->field($model, 'status')->dropDownList(LeadMarketForm::getStatusesNames())
-				: ''
+			<?php
+			//			$model instanceof LeadMarketForm && !$model->getModel()->isNewRecord
+			//				? $form->field($model, 'status')->dropDownList(LeadMarketForm::getStatusesNames())
+			//				: ''
 			?>
 
 			<?= $form->field($model, 'details')->textarea() ?>
