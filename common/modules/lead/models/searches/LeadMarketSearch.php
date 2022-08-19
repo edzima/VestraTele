@@ -11,6 +11,7 @@ use common\modules\lead\models\LeadMarketUser;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
+use common\modules\lead\models\LeadUser;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -249,12 +250,20 @@ class LeadMarketSearch extends LeadMarket {
 			if ($this->selfMarket) {
 				$query->andWhere([
 					LeadMarket::tableName() . '.creator_id' => $this->userId,
-				],
-				);
+				]);
+				$query->joinWith('lead.leadUsers');
+				$query->orWhere([LeadUser::tableName() . '.user_id' => $this->userId]);
 			} else {
 				$query->andWhere([
 					'not', [
 						LeadMarket::tableName() . '.creator_id' => $this->userId,
+					],
+				]);
+				$query->andWhere([
+					'not', [
+						LeadMarket::tableName() . '.lead_id' => LeadUser::find()
+							->select('lead_id')
+							->andWhere(['user_id' => $this->userId]),
 					],
 				]);
 			}
