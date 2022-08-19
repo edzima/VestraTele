@@ -5,10 +5,10 @@ namespace common\models\settlement;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssuePay;
-use common\models\issue\IssueStage;
-use common\models\issue\IssueType;
+use common\models\issue\IssueTrait;
 use common\models\user\User;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -23,6 +23,16 @@ use yii\db\ActiveRecord;
  * @property User $user
  */
 class PayReceived extends ActiveRecord implements IssueInterface {
+
+	use IssueTrait;
+
+	public function getIssueId(): int {
+		return $this->getIssueModel()->id;
+	}
+
+	public function getIssueModel(): Issue {
+		return $this->pay->calculation->issue;
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -59,7 +69,7 @@ class PayReceived extends ActiveRecord implements IssueInterface {
 	/**
 	 * Gets query for [[Pay]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getPay() {
 		return $this->hasOne(IssuePay::class, ['id' => 'pay_id']);
@@ -68,29 +78,10 @@ class PayReceived extends ActiveRecord implements IssueInterface {
 	/**
 	 * Gets query for [[User]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getUser() {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
 
-	public function getIssueId(): int {
-		return $this->pay->calculation->issue_id;
-	}
-
-	public function getIssueName(): string {
-		return $this->getIssueModel()->longId;
-	}
-
-	public function getIssueModel(): Issue {
-		return $this->pay->calculation->issue;
-	}
-
-	public function getIssueType(): IssueType {
-		return $this->getIssueModel()->type;
-	}
-
-	public function getIssueStage(): IssueStage {
-		return $this->getIssueModel()->stage;
-	}
 }

@@ -4,6 +4,7 @@ namespace common\fixtures\helpers;
 
 use common\fixtures\issue\EntityResponsibleFixture;
 use common\fixtures\issue\IssueFixture;
+use common\fixtures\issue\IssueRelationFixture;
 use common\fixtures\issue\IssueUserFixture;
 use common\fixtures\issue\NoteFixture;
 use common\fixtures\issue\StageFixture;
@@ -12,11 +13,17 @@ use common\fixtures\issue\SummonDocFixture;
 use common\fixtures\issue\SummonFixture;
 use common\fixtures\issue\SummonTypeFixture;
 use common\fixtures\issue\TypeFixture;
+use common\helpers\ArrayHelper;
+use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueUser;
 use common\models\user\User;
 use Yii;
 
 class IssueFixtureHelper extends BaseFixtureHelper {
+
+	public const DEFAULT_AGENT_ID = UserFixtureHelper::AGENT_PETER_NOWAK;
+	public const DEFAULT_CUSTOMER_ID = UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID;
 
 	public const AGENT = 'agent';
 	public const CUSTOMER = 'customer';
@@ -32,9 +39,47 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 	private const TYPE = 'issue.type';
 	private const STAGE = 'issue.stage';
 	public const NOTE = 'issue.note';
+	private const LINKED_ISSUES = 'issue.linked';
+
+	public static function linkedIssues(): array {
+		return [
+			static::LINKED_ISSUES => [
+				'class' => IssueRelationFixture::class,
+				'dataFile' => static::getDataDirPath() . 'relation.php',
+			],
+		];
+	}
 
 	public function grabIssue($index): IssueInterface {
 		return $this->tester->grabFixture(static::ISSUE, $index);
+	}
+
+	public function haveIssue(array $attributes = []): int {
+		$agentId = ArrayHelper::remove($attributes, 'agent_id', static::DEFAULT_AGENT_ID);
+		$customerId = ArrayHelper::remove($attributes, 'customer_id', static::DEFAULT_CUSTOMER_ID);
+
+		if (!isset($attributes['stage_id'])) {
+			$attributes['stage_id'] = 1;
+		}
+		if (!isset($attributes['type_id'])) {
+			$attributes['type_id'] = 1;
+		}
+		if (!isset($attributes['entity_responsible_id'])) {
+			$attributes['entity_responsible_id'] = 1;
+		}
+
+		$id = $this->tester->haveRecord(Issue::class, $attributes);
+		$this->tester->haveRecord(IssueUser::class, [
+			'user_id' => $agentId,
+			'issue_id' => $id,
+			'type' => IssueUser::TYPE_AGENT,
+		]);
+		$this->tester->haveRecord(IssueUser::class, [
+			'user_id' => $customerId,
+			'issue_id' => $id,
+			'type' => IssueUser::TYPE_CUSTOMER,
+		]);
+		return $id;
 	}
 
 	public static function dataDir(string $path = null): string {

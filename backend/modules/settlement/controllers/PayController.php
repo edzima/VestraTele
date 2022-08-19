@@ -97,16 +97,30 @@ class PayController extends Controller {
 			$exporter = new CsvGrid([
 				'query' => $query,
 				'columns' => [
-
 					[
 						'attribute' => 'calculation.issue.longId',
-						'label' => 'Sprawa',
+						'label' => Yii::t('issue', 'Issue'),
+					],
+					[
+						'attribute' => 'calculation.typeName',
+						'label' => Yii::t('settlement', 'Settlement'),
+					],
+					[
+						'attribute' => 'calculation.value',
+						'label' => Yii::t('settlement', 'Value'),
+					],
+					[
+						'attribute' => 'calculation.valueToPay',
+						'label' => Yii::t('settlement', 'Value to pay'),
+					],
+					[
+						'attribute' => 'calculation.issue.agent.fullName',
+						'label' => Yii::t('issue', 'Agent'),
 					],
 					[
 						'attribute' => 'calculation.issue.customer.fullName',
-						'label' => 'Klient',
+						'label' => Yii::t('issue', 'Customer'),
 					],
-
 					[
 						'attribute' => 'calculation.issue.customer.profile.phone',
 						'label' => 'Telefon [1]',
@@ -119,6 +133,7 @@ class PayController extends Controller {
 						'attribute' => 'calculation.issue.customer.email',
 						'label' => 'Email',
 					],
+
 				],
 			]);
 			return $exporter->export()->send('export.csv');

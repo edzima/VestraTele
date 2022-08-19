@@ -87,6 +87,8 @@ use yii\db\Expression;
  * @property-read IssueCost[] $costs
  * @property-read StageType $stageType
  * @property-read IssueClaim[] $claims
+ * @property-read IssueRelation[] $issuesRelations
+ * @property-read Issue[] $linkedIssues
  */
 class Issue extends ActiveRecord implements IssueInterface {
 
@@ -163,6 +165,14 @@ class Issue extends ActiveRecord implements IssueInterface {
 			'customer' => IssueUser::getTypesNames()[IssueUser::TYPE_CUSTOMER],
 			'tagsNames' => Yii::t('issue', 'Tags Names'),
 		];
+	}
+
+	public function getTypeName(): string {
+		return IssueType::getTypesNames()[$this->type_id];
+	}
+
+	public function getStageName(): string {
+		return IssueStage::getStagesNames(true)[$this->stage_id];
 	}
 
 	public function getCustomer(): UserQuery {
@@ -461,18 +471,34 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return 'id';
 	}
 
-	public function getIssues(): ActiveQuery {
-		return IssueRelation::find()
-			->andWhere(['issue_id_1' => $this->id])
-			->orWhere(['issue_id_2' => $this->id]);
+	public function getIssueRelationId(int $issueId): ?int {
+		return array_search($issueId, $this->getLinkedIssuesIds());
 	}
 
-	public function getTypeName(): string {
-		return IssueType::getTypesNames()[$this->type_id];
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getLinkedIssues(): IssueQuery {
+		return $this->hasMany(static::class, ['id' => 'linkedIssuesIds']);
 	}
 
-	public function getStageName(): string {
-		return IssueStage::getStagesNames(true)[$this->stage_id];
+	/**
+	 * @return int[] Linked Issues IDs indexed by Relation ID.
+	 */
+	public function getLinkedIssuesIds(): array {
+		$relations = $this->issuesRelations;
+		$ids = [];
+		foreach ($relations as $relation) {
+			if ($relation->issue_id_1 === $this->id) {
+				$ids[$relation->id] = $relation->issue_id_2;
+			} else {
+				$ids[$relation->id] = $relation->issue_id_1;
+			}
+		}
+		return $ids;
+	}
+
+	public function getIssuesRelations(): ActiveQuery {
+		return $this->hasMany(IssueRelation::class, ['issue_id_1' => 'id'])
+			->onCondition('1=1) OR (issue_id_2 = :id', [':id' => $this->id]);
 	}
 
 }

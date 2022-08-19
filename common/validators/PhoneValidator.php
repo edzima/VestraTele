@@ -18,6 +18,7 @@ class PhoneValidator extends StringValidator {
 	}
 
 	protected function filterValue($value): string {
+		$value = ltrim($value, '0');
 		return preg_replace('/[^0-9.]+/', '', $value);
 	}
 }

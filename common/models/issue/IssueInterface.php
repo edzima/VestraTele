@@ -14,4 +14,8 @@ interface IssueInterface {
 
 	public function getIssueStage(): IssueStage;
 
+	public function getIssueStageId(): int;
+
+	public function getIssueTypeId(): int;
+
 }

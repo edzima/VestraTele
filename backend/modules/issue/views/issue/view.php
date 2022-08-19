@@ -38,7 +38,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 			: ''
 		?>
 
-		<?= !$model->isArchived() && Yii::$app->user->can(Worker::PERMISSION_SMS)
+		<?= Yii::$app->user->can(Worker::PERMISSION_SMS)
 			? IssueSmsButtonDropdown::widget([
 				'model' => $model,
 			])

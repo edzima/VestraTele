@@ -6,12 +6,19 @@ use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
 use common\models\KeyStorageItem;
 use common\models\message\IssueSmsForm;
+use common\models\message\IssueStageChangeMessagesForm;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\console\Controller;
 use yii\helpers\Console;
+use yii\helpers\VarDumper;
 
 class IssueMessageController extends Controller {
+
+	public function actionIssueStageDelayedMessage(): void {
+		Console::output('Push Issue Stage Delayed Messages: ');
+		Console::output(VarDumper::dumpAsString(IssueStageChangeMessagesForm::pushDelayedMessages($this->getSmsOwnerId())));
+	}
 
 	public function actionAgentToCustomer(int $agentId, string $message = null, bool $withArchive = false): void {
 		$models = IssueUser::find()

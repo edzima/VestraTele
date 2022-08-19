@@ -6,8 +6,8 @@ use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueNote;
-use common\models\message\IssueSmsForm;
 use common\models\issue\IssueUser;
+use common\models\message\IssueSmsForm;
 use console\jobs\IssueSmsSendJob;
 
 /**
@@ -130,23 +130,23 @@ class IssueSmsFormTest extends SmsFormTest {
 		$this->tester->assertNull($this->model->getPhoneIssueUserName());
 		$this->model->setFirstAvailablePhone();
 		$this->tester->assertSame(
-			'client: Wayne John[+48 673 222 110]',
+			'client: Wayne John [+48 673 222 110]',
 			$this->model->getPhoneIssueUserName()
 		);
 		$this->tester->assertSame(
-			'client: Wayne John[+48 673 222 110]',
+			'client: Wayne John [+48 673 222 110]',
 			$this->model->getPhoneIssueUserName(null, IssueUser::TYPE_CUSTOMER)
 		);
 		$this->tester->assertSame(
-			'client: Wayne John[+48 673 222 110]',
+			'client: Wayne John [+48 673 222 110]',
 			$this->model->getPhoneIssueUserName('48 673 222 110')
 		);
 		$this->tester->assertSame(
-			'client: Wayne John[+48 673 222 110]',
+			'client: Wayne John [+48 673 222 110]',
 			$this->model->getPhoneIssueUserName('48 673 222 110', IssueUser::TYPE_CUSTOMER)
 		);
 		$this->tester->assertSame(
-			'client: Wayne John[+48 673 222 220]',
+			'client: Wayne John [+48 673 222 220]',
 			$this->model->getPhoneIssueUserName('48673222220')
 		);
 		$this->tester->assertNull($this->model->getPhoneIssueUserName(null, IssueUser::TYPE_AGENT));
@@ -154,16 +154,16 @@ class IssueSmsFormTest extends SmsFormTest {
 		$this->giveModel(['userTypes' => [IssueUser::TYPE_AGENT]]);
 		$this->tester->assertNull($this->model->getPhoneIssueUserName());
 		$this->model->setFirstAvailablePhone();
-		$this->tester->assertSame('agent: Nowak Peter[+48 122 222 300]', $this->model->getPhoneIssueUserName());
-		$this->tester->assertSame('agent: Nowak Peter[+48 122 222 300]', $this->model->getPhoneIssueUserName('+48 122 222 300'));
+		$this->tester->assertSame('agent: Nowak Peter [+48 122 222 300]', $this->model->getPhoneIssueUserName());
+		$this->tester->assertSame('agent: Nowak Peter [+48 122 222 300]', $this->model->getPhoneIssueUserName('+48 122 222 300'));
 
 		$this->giveModel(['userTypes' => [IssueUser::TYPE_CUSTOMER, IssueUser::TYPE_AGENT]]);
 		$this->tester->assertNull($this->model->getPhoneIssueUserName());
 		$this->tester->assertSame(
-			'client: Wayne John[+48 673 222 110]',
+			'client: Wayne John [+48 673 222 110]',
 			$this->model->getPhoneIssueUserName('48 673 222 110', IssueUser::TYPE_CUSTOMER)
 		);
-		$this->tester->assertSame('agent: Nowak Peter[+48 122 222 300]', $this->model->getPhoneIssueUserName('+48 122 222 300'));
+		$this->tester->assertSame('agent: Nowak Peter [+48 122 222 300]', $this->model->getPhoneIssueUserName('+48 122 222 300'));
 	}
 
 	public function testNoteWithDefaultTitle(): void {

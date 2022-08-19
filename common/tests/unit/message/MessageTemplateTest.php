@@ -3,9 +3,9 @@
 namespace common\tests\unit\message;
 
 use common\components\message\MessageTemplate;
-use common\components\message\MessageTemplateKeyHelper;
 use common\components\message\MessageTemplateManager;
 use common\fixtures\helpers\MessageTemplateFixtureHelper;
+use common\models\message\IssueMessagesForm;
 use common\tests\unit\Unit;
 use Yii;
 use ymaker\email\templates\entities\EmailTemplate;
@@ -70,29 +70,29 @@ class MessageTemplateTest extends Unit {
 	public function testIssueTypesKeys(): void {
 		$this->fixture->flushAll();
 		$this->fixture->save(
-			'issue.create.' . MessageTemplateKeyHelper::issueTypesKeyPart([1, 2])
+			'issue.create.' . IssueMessagesForm::issueTypesKeyPart([1, 2])
 		);
 		$this->fixture->save(
-			'issue.create.' . MessageTemplateKeyHelper::issueTypesKeyPart([1, 3]),
+			'issue.create.' . IssueMessagesForm::issueTypesKeyPart([1, 3]),
 		);
 		$this->fixture->save(
-			'issue.create.' . MessageTemplateKeyHelper::issueTypesKeyPart([3]),
+			'issue.create.' . IssueMessagesForm::issueTypesKeyPart([3]),
 		);
 
 		$models = $this->getTemplatesLikeKey('issue.create');
 
 		$modelsType1 = array_filter($models, static function (string $key): bool {
-			return MessageTemplateKeyHelper::isForIssueType($key, 1);
+			return IssueMessagesForm::isForIssueType($key, 1);
 		}, ARRAY_FILTER_USE_KEY);
 		$modelsType2 = array_filter($models, static function (string $key): bool {
-			return MessageTemplateKeyHelper::isForIssueType($key, 2);
+			return IssueMessagesForm::isForIssueType($key, 2);
 		}, ARRAY_FILTER_USE_KEY);
 
 		$modelsType3 = array_filter($models, static function (string $key): bool {
-			return MessageTemplateKeyHelper::isForIssueType($key, 3);
+			return IssueMessagesForm::isForIssueType($key, 3);
 		}, ARRAY_FILTER_USE_KEY);
 		$modelsType4 = array_filter($models, static function (string $key): bool {
-			return MessageTemplateKeyHelper::isForIssueType($key, 4);
+			return IssueMessagesForm::isForIssueType($key, 4);
 		}, ARRAY_FILTER_USE_KEY);
 
 		$this->tester->assertCount(2, $modelsType1);
@@ -115,4 +115,5 @@ class MessageTemplateTest extends Unit {
 	private function getIssueTypeTemplatesLikeKey(string $key, int $id): ?MessageTemplate {
 		return $this->manager->getIssueTypeTemplatesLikeKey($key, $id);
 	}
+
 }

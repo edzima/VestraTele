@@ -2,6 +2,7 @@
 
 namespace common\components\message;
 
+use common\models\message\IssueMessagesForm;
 use Yii;
 use yii\data\ActiveDataProvider;
 use ymaker\email\templates\components\TemplateManager;
@@ -47,7 +48,7 @@ class MessageTemplateManager extends TemplateManager implements KeyMessageTempla
 			return null;
 		}
 		foreach ($templates as $templateKey => $template) {
-			if (MessageTemplateKeyHelper::isForIssueType($templateKey, $typeId)) {
+			if (IssueMessagesForm::isForIssueType($templateKey, $typeId)) {
 				return $template;
 			}
 		}

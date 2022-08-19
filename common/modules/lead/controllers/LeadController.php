@@ -128,8 +128,11 @@ class LeadController extends BaseController {
 		]);
 	}
 
-	public function actionPhone() {
+	public function actionPhone(string $phone = null) {
 		$model = new LeadPhoneSearch();
+		if ($phone !== null) {
+			$model->phone = $phone;
+		}
 		$dataProvider = $model->search(Yii::$app->request->queryParams);
 		if (empty(Yii::$app->request->queryParams)) {
 			$model->clearErrors();

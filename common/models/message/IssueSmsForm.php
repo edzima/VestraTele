@@ -233,7 +233,7 @@ class IssueSmsForm extends QueueSmsForm {
 	public static function findIssue(int $issue_id): ?IssueInterface {
 		return Issue::find()
 			->andWhere(['id' => $issue_id])
-			->withoutArchives()
+		//	->withoutArchives()
 			->one();
 	}
 
