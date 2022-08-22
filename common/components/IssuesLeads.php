@@ -25,6 +25,15 @@ class IssuesLeads extends Component {
 		'class' => IssueLeadPhone::class,
 	];
 
+	public string $leadModuleId = 'lead';
+
+	public function init() {
+		parent::init();
+		if (Yii::$app->getModule($this->leadModuleId) === null) {
+			throw new InvalidConfigException('Lead module must be configured: #' . $this->leadModuleId);
+		}
+	}
+
 	public function userLeads(UserModel $user): ?LeadQuery {
 		$model = $this->createPhoneModel();
 		$model->phone = $model::getUserPhones($user);
