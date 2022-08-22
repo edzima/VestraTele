@@ -2,6 +2,7 @@
 
 use backend\helpers\Breadcrumbs;
 use backend\helpers\Html;
+use backend\helpers\Url;
 use backend\modules\issue\widgets\IssueSmsButtonDropdown;
 use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\modules\issue\widgets\SummonCreateButtonDropdown;
@@ -58,6 +59,7 @@ GridView::widget([
 		'confirmed_at:date',
 		[
 			'class' => LeadIssueActionColumn::class,
+			'returnUrl' => Url::current(),
 		],
 	],
 ])
