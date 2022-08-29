@@ -150,9 +150,10 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 			IssuePayCalculation::tableName() . '.value' => $this->value,
 			IssuePayCalculation::tableName() . '.type' => $this->type,
 			IssuePayCalculation::tableName() . '.stage_id' => $this->stage_id,
+			IssuePayCalculation::tableName() . '.issue_id' => $this->issue_id,
+
 		]);
 
-		$query->andFilterWhere(['like', 'issue.id', $this->issue_id]);
 		$query->andFilterWhere(['like', 'owner_id', $this->owner_id]);
 
 		return $dataProvider;
