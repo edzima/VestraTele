@@ -27,6 +27,12 @@ use yii\widgets\ActiveForm;
 
 		<div class="row">
 
+			<?= $form->field($model, 'lead_id', [
+				'options' => [
+					'class' => 'col-md-1',
+				],
+			])->textInput() ?>
+
 			<?= $form->field($model, 'type_id', [
 				'options' => [
 					'class' => 'col-md-3',

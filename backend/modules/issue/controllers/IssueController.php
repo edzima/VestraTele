@@ -18,6 +18,7 @@ use common\models\message\IssueCreateMessagesForm;
 use common\models\user\Customer;
 use common\models\user\Worker;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\MethodNotAllowedHttpException;
@@ -206,14 +207,6 @@ class IssueController extends Controller {
 			throw new NotFoundHttpException('Client not exist');
 		}
 
-		$leadsQuery = Yii::$app->issuesLeads->userLeads($customer);
-		if ($leadsQuery && $leadsQuery->exists()) {
-			Flash::add(Flash::TYPE_WARNING,
-				Yii::t('issue', '{customer} is probalby from Leads.', [
-					'customer' => $customer->getFullName(),
-				]));
-		}
-
 		$model = new IssueForm(['customer' => $customer]);
 		$messagesModel = new IssueCreateMessagesForm();
 		$messagesModel->setIssue($model->getModel());
@@ -233,9 +226,20 @@ class IssueController extends Controller {
 			}
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
+
+		$leadsDataProvider = new ActiveDataProvider([
+			'query' => Yii::$app->issuesLeads->userLeads($customer),
+		]);
+		if (!empty($leadsDataProvider->getModels())) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('issue', '{customer} is probalby from Leads.', [
+					'customer' => $customer->getFullName(),
+				]));
+		}
 		return $this->render('create', [
 			'model' => $model,
 			'messagesModel' => $messagesModel,
+			'leadsDataProvider' => $leadsDataProvider,
 		]);
 	}
 

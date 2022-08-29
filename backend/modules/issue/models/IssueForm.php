@@ -37,6 +37,8 @@ class IssueForm extends Model {
 	public ?string $details = null;
 	public ?string $signature_act = null;
 
+	public ?int $lead_id = null;
+
 	public const STAGE_ARCHIVED_ID = IssueStage::ARCHIVES_ID;
 
 	public $tagsIds = [];
@@ -72,7 +74,7 @@ class IssueForm extends Model {
 	public function rules(): array {
 		return [
 			[['agent_id', 'lawyer_id', 'type_id', 'stage_id', 'entity_responsible_id', 'signing_at'], 'required'],
-			[['agent_id', 'lawyer_id', 'tele_id', 'type_id', 'stage_id', 'entity_responsible_id'], 'integer'],
+			[['agent_id', 'lawyer_id', 'tele_id', 'type_id', 'stage_id', 'entity_responsible_id', 'lead_id'], 'integer'],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
 			[['stage_id'], 'filter', 'filter' => 'intval'],
 			[
