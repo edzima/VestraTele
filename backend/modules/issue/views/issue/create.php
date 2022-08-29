@@ -1,9 +1,12 @@
 <?php
 
+use backend\helpers\Html;
 use backend\modules\issue\models\IssueForm;
 use common\models\message\IssueCreateMessagesForm;
+use yii\data\DataProviderInterface;
 
 /* @var $this yii\web\View */
+/* @var $leadsDataProvider DataProviderInterface */
 /* @var $model IssueForm */
 /* @var $messagesModel IssueCreateMessagesForm */
 
@@ -16,6 +19,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 <div class="issue-create">
+
+	<?= $this->render('_leads', [
+		'dataProvider' => $leadsDataProvider,
+		'leadInputId' => Html::getInputId($model, 'lead_id'),
+	]) ?>
 
 	<?= $this->render('_form', [
 		'model' => $model,
