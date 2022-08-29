@@ -16,7 +16,7 @@ use yii\db\ActiveRecord;
  * @property string $type
  *
  * @property Lead $lead
- * @property Worker $user
+ * @property LeadUserInterface $user
  */
 class LeadUser extends ActiveRecord {
 
@@ -24,6 +24,9 @@ class LeadUser extends ActiveRecord {
 	public const TYPE_DIALER = 'dialer';
 	public const TYPE_AGENT = Worker::ROLE_AGENT;
 	public const TYPE_TELE = Worker::ROLE_TELEMARKETER;
+	public const TYPE_MARKET_FIRST = 'market-first';
+	public const TYPE_MARKET_SECOND = 'market-second';
+	public const TYPE_MARKET_THIRD = 'market-third';
 
 	/**
 	 * {@inheritdoc}
@@ -84,6 +87,15 @@ class LeadUser extends ActiveRecord {
 	public static function getTypesNames(): array {
 		return [
 			static::TYPE_AGENT => Yii::t('lead', 'Agent'),
+			static::TYPE_MARKET_FIRST => Yii::t('lead', '{which}. from Market', [
+				'which' => 1,
+			]),
+			static::TYPE_MARKET_SECOND => Yii::t('lead', '{which}. from Market', [
+				'which' => 2,
+			]),
+			static::TYPE_MARKET_THIRD => Yii::t('lead', '{which}. from Market', [
+				'which' => 3,
+			]),
 			static::TYPE_TELE => Yii::t('lead', 'Telemarketer'),
 			static::TYPE_OWNER => Yii::t('lead', 'Owner'),
 			static::TYPE_DIALER => Yii::t('lead', 'Dialer'),
@@ -92,6 +104,18 @@ class LeadUser extends ActiveRecord {
 
 	public function getUserWithTypeName(): string {
 		return $this->user->getFullName() . ' - ' . $this->getTypeName();
+	}
+
+	public function isMarketType(): bool {
+		return in_array($this->type, static::marketTypes());
+	}
+
+	public static function marketTypes(): array {
+		return [
+			static::TYPE_MARKET_FIRST,
+			static::TYPE_MARKET_SECOND,
+			static::TYPE_MARKET_THIRD,
+		];
 	}
 
 }

@@ -187,7 +187,11 @@ return [
 						'controllers' => ['lead/import'],
 						'permissions' => [Worker::PERMISSION_LEAD_IMPORT],
 					],
-
+					[
+						'allow' => true,
+						'controllers' => ['lead/market', 'lead/market-user'],
+						'permissions' => [Worker::PERMISSION_LEAD_MARKET],
+					],
 					[
 						'allow' => false,
 						'controllers' => [
@@ -196,6 +200,9 @@ return [
 							'lead/status',
 							'lead/duplicate',
 							'lead/import',
+							'lead/market',
+							'lead/market-user',
+
 						],
 					],
 					[

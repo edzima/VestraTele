@@ -19,6 +19,13 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
 
+	<?= $form->field($model, 'market_status')->dropDownList(LeadStatus::getMarketStatusesNames(), [
+		'prompt' => Yii::t('lead', 'Select...'),
+	]) ?>
+
+	<?= $form->field($model, 'market_status_same_contacts')->checkbox() ?>
+
+
 	<?= $form->field($model, 'not_for_dialer')->checkbox() ?>
 
 	<?= $form->field($model, 'short_report')->checkbox() ?>

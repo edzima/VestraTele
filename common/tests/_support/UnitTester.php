@@ -5,7 +5,7 @@ namespace common\tests;
 use Codeception\Actor;
 use Codeception\Lib\Friend;
 use common\fixtures\helpers\FixtureTester;
-use yii\mail\MessageInterface;
+use common\models\message\Message;
 
 /**
  * Inherited Methods
@@ -32,13 +32,14 @@ class UnitTester extends Actor implements FixtureTester {
 	 * Define custom actions here
 	 */
 
-	public function assertMessageBodyContainsString(string $text, MessageInterface $message): void {
-		$body = $message->getSwiftMessage()->getBody();
+	public function assertMessageBodyContainsString(string $text, Message $message): void {
+		$body = $message->getHtmlBody();
+		codecept_debug($body);
 		$this->assertStringContainsString($text, $body);
 	}
 
-	public function assertMessageBodyNotContainsString(string $text, MessageInterface $message): void {
-		$body = $message->getSwiftMessage()->getBody();
+	public function assertMessageBodyNotContainsString(string $text, Message $message): void {
+		$body = $message->getBody();
 		$this->assertStringNotContainsString($text, $body);
 	}
 }

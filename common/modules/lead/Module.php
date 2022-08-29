@@ -6,6 +6,7 @@ use Closure;
 use common\models\user\User;
 use common\modules\lead\components\LeadDialerManager;
 use common\modules\lead\components\LeadManager;
+use common\modules\lead\components\MarketManager;
 use yii\base\BootstrapInterface;
 use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
@@ -17,6 +18,7 @@ use yii\di\Instance;
  *
  * @property LeadManager $manager
  * @property LeadDialerManager $dialer
+ * @property MarketManager $market
  */
 class Module extends BaseModule implements BootstrapInterface {
 
@@ -36,17 +38,18 @@ class Module extends BaseModule implements BootstrapInterface {
 		'class' => LeadDialerManager::class,
 	];
 
-	public $components = [
-		'manager' => [
-			'class' => LeadManager::class,
-		],
+	protected $market = [
+		'class' => MarketManager::class,
+	];
+
+	protected $manager = [
+		'class' => LeadManager::class,
 	];
 
 	public function init(): void {
 		parent::init();
-		$this->setComponents($this->components);
 		if ($this->onlyUser) {
-			$this->manager->onlyForUser = true;
+			$this->getManager()->onlyForUser = true;
 		}
 	}
 
@@ -64,12 +67,37 @@ class Module extends BaseModule implements BootstrapInterface {
 		return $this->dialer;
 	}
 
+	protected function setMarket($market): void {
+		$this->market = $market;
+	}
+
+	public function getMarket(): ?MarketManager {
+		if ($this->market === null) {
+			return null;
+		}
+		if (!is_object($this->market)) {
+			$this->market = Instance::ensure($this->market, MarketManager::class);
+		}
+		return $this->market;
+	}
+
+	protected function setManager($manager): void {
+		$this->$manager = $manager;
+	}
+
+	public function getManager(): LeadManager {
+		if (!is_object($this->manager)) {
+			$this->manager = Instance::ensure($this->manager, LeadManager::class);
+		}
+		return $this->manager;
+	}
+
 	public function bootstrap($app) {
 
 	}
 
 	public static function manager(): LeadManager {
-		return static::instance()->manager;
+		return static::instance()->getManager();
 	}
 
 	public static function userClass(): string {

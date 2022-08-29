@@ -5,6 +5,7 @@ use common\helpers\Url;
 use common\models\AddressSearch;
 use kartik\depdrop\DepDrop;
 use kartik\select2\Select2;
+use yii\web\JsExpression;
 use yii\web\View;
 use yii\widgets\ActiveForm;
 
@@ -24,6 +25,18 @@ use yii\widgets\ActiveForm;
 						'id' => Html::getInputId($model, 'region_id'),
 						'placeholder' => $model->getAttributeLabel('region_id'),
 					],
+					'pluginOptions' => [
+						'allowClear' => true,
+					],
+					'pluginEvents' => [
+						'select2:clear' => new JsExpression('function(){
+							setTimeout(function(){
+								$("#' . Html::getInputId($model, 'commune_id') . '").val(null).trigger("change");
+								$("#' . Html::getInputId($model, 'district_id') . '").val(null).trigger("change");
+							},500);
+						}'),
+					],
+
 				]
 			)
 		?>
@@ -43,10 +56,19 @@ use yii\widgets\ActiveForm;
 				'loading' => Yii::t('common', 'Loading...'),
 				'params' => [Html::getInputId($model, 'district_id')],
 			],
+			'pluginEvents' => [],
 			'select2Options' => [
 				'pluginOptions' => [
 					'allowClear' => true,
 				],
+				'pluginEvents' => [
+					'select2:clear' => new JsExpression('function(){
+							setTimeout(function(){
+								$("#' . Html::getInputId($model, 'commune_id') . '").val(null).trigger("change");
+							},500);
+						}'),
+				],
+
 			],
 		]); ?>
 

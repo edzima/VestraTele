@@ -6,10 +6,13 @@ use common\fixtures\ReminderFixture;
 use common\modules\lead\fixtures\CampaignFixture;
 use common\modules\lead\fixtures\DialerFixture;
 use common\modules\lead\fixtures\DialerTypeFixture;
+use common\modules\lead\fixtures\LeadAddressFixture;
 use common\modules\lead\fixtures\LeadAnswerFixture;
 use common\modules\lead\fixtures\LeadFixture;
 use common\modules\lead\fixtures\LeadQuestionFixture;
 use common\modules\lead\fixtures\LeadReportFixture;
+use common\modules\lead\fixtures\MarketFixture;
+use common\modules\lead\fixtures\MarketUserFixture;
 use common\modules\lead\fixtures\ReminderFixture as LeadReminderFixture;
 use common\modules\lead\fixtures\SourceFixture;
 use common\modules\lead\fixtures\StatusFixture;
@@ -39,9 +42,34 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 	private const ANSWER = 'lead.answer';
 	private const DIALER = 'lead.dialer';
 	private const DIALER_TYPE = 'lead.dialer-type';
+	public const MARKET = 'lead.market';
+	public const MARKET_USER = 'lead.market-user';
+	private const ADDRESS = 'lead.address';
 
 	public const DEFAULT_PHONE = '+48 123-123-123';
 	public const DEFAULT_SOURCE_ID = 1;
+
+	public static function address(): array {
+		return [
+			static::ADDRESS => [
+				'class' => LeadAddressFixture::class,
+				'dataFile' => static::getDataDirPath() . 'address.php',
+			],
+		];
+	}
+
+	public static function market(): array {
+		return [
+			static::MARKET => [
+				'class' => MarketFixture::class,
+				'dataFile' => static::getDataDirPath() . 'market.php',
+			],
+			static::MARKET_USER => [
+				'class' => MarketUserFixture::class,
+				'dataFile' => static::getDefaultDataDirPath() . 'market-user.php',
+			],
+		];
+	}
 
 	public function haveLead(array $attributes): int {
 		if (!isset($attributes['phone'])) {

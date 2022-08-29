@@ -15,6 +15,7 @@ use common\modules\reminder\widgets\ReminderGridWidget;
 use common\widgets\address\AddressDetailView;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
+use yii\data\DataProviderInterface;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -24,6 +25,9 @@ use yii\widgets\DetailView;
 /* @var $sameContacts LeadInterface[] */
 /* @var $withDelete bool */
 /* @var $onlyUser bool */
+/* @var $isOwner bool */
+/* @var $userIsFromMarket bool */
+/* @var $usersDataProvider null|DataProviderInterface */
 
 $this->title = $model->getName();
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['index']];
@@ -43,9 +47,21 @@ YiiAsset::register($this);
 
 		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->getId()], ['class' => 'btn btn-warning']) ?>
 
-		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary']) ?>
+		<?= !$userIsFromMarket
+			? Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary'])
+			: ''
+		?>
 
-		<?= $model->getStatusId() !== LeadStatusInterface::STATUS_ARCHIVE
+
+		<?= (!$onlyUser || $isOwner)
+		&& Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)
+		&& $model->market === null
+			? Html::a(Yii::t('lead', '-> Market'), ['market/create', 'id' => $model->getId()], ['class' => 'btn btn-success'])
+			: ''
+		?>
+
+
+		<?= !$userIsFromMarket && $model->getStatusId() !== LeadStatusInterface::STATUS_ARCHIVE
 			? Html::a(Yii::t('lead', 'Archive'), ['archive/self', 'id' => $model->getId()], [
 				'class' => 'btn btn-danger',
 				'data' => [
@@ -64,9 +80,12 @@ YiiAsset::register($this);
 
 	<div class="pull-right d-inline">
 
-		<?= CopyLeadBtnWidget::widget([
-			'leadId' => $model->getId(),
-		]) ?>
+		<?= !$userIsFromMarket
+			? CopyLeadBtnWidget::widget([
+				'leadId' => $model->getId(),
+			])
+			: ''
+		?>
 
 		<?= Yii::$app->user->can(User::PERMISSION_SMS)
 			? Html::a(Yii::t('lead', 'Send SMS'), ['sms/push', 'id' => $model->getId()],
@@ -75,8 +94,11 @@ YiiAsset::register($this);
 		?>
 
 
-		<?= Html::a(Yii::t('lead', 'Assign User'), ['user/assign-single', 'id' => $model->getId()],
-			['class' => 'btn btn-info']) ?>
+		<?= !$userIsFromMarket ?
+			Html::a(Yii::t('lead', 'Assign User'), ['user/assign-single', 'id' => $model->getId()],
+				['class' => 'btn btn-info'])
+			: ''
+		?>
 
 		<?= $withDelete
 			? Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->getId()], [
@@ -149,14 +171,17 @@ YiiAsset::register($this);
 			]) ?>
 
 
-			<?= $model->getCustomerAddress() ? AddressDetailView::widget([
-				'model' => $model->getCustomerAddress(),
-			]) : '' ?>
+			<?= $model->getCustomerAddress()
+				? AddressDetailView::widget([
+					'model' => $model->getCustomerAddress(),
+				])
+				: ''
+			?>
 
-			<?= !$onlyUser || count($model->getUsers()) > 1
+			<?= $usersDataProvider !== null
 				? GridView::widget([
 					'caption' => Yii::t('lead', 'Users'),
-					'dataProvider' => new ActiveDataProvider(['query' => $model->getLeadUsers()->with('user.userProfile')]),
+					'dataProvider' => $usersDataProvider,
 					'showOnEmpty' => false,
 					'emptyText' => false,
 					'summary' => false,
@@ -169,6 +194,7 @@ YiiAsset::register($this);
 					],
 				])
 				: '' ?>
+
 
 			<div class="clearfix"></div>
 
@@ -194,7 +220,7 @@ YiiAsset::register($this);
 				'headerOptions' => [
 					'class' => 'col-md-12',
 				],
-				'archiveBtn' => Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE),
+				'archiveBtn' => Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE) && !$userIsFromMarket,
 				'withType' => false,
 				'withDialers' => true,
 				'options' => [

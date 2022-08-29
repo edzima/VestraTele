@@ -3,6 +3,7 @@
 namespace common\modules\lead\models;
 
 use common\models\Address;
+use common\modules\lead\events\LeadEvent;
 use common\modules\lead\models\query\LeadDialerQuery;
 use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
@@ -29,6 +30,7 @@ use yii\helpers\Json;
  * @property string|null $email
  * @property int|null $campaign_id
  *
+ * @property-read LeadUserInterface|null $owner
  * @property-read LeadCampaign|null $campaign
  * @property-read LeadStatus $status
  * @property-read LeadSource $leadSource
@@ -41,6 +43,8 @@ use yii\helpers\Json;
  * @property-read LeadDialer[] $dialers
  */
 class Lead extends ActiveRecord implements ActiveLead {
+
+	public const EVENT_AFTER_STATUS_UPDATE = 'afterStatusUpdate';
 
 	public const PROVIDER_COPY = 'copy';
 	public const PROVIDER_FORM = 'form';
@@ -107,7 +111,13 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function getDialers(): LeadDialerQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(LeadDialer::class, ['lead_id' => 'id']);
+	}
+
+	//@todo probalby single market for Lead
+	public function getMarket() {
+		return $this->hasOne(LeadMarket::class, ['lead_id' => 'id']);
 	}
 
 	protected function getAddresses(): ActiveQuery {
@@ -203,6 +213,9 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return isset($this->answers[$question_id]);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public function getUsers(): array {
 		if (empty($this->users_ids)) {
 			$this->users_ids = ArrayHelper::map($this->leadUsers, 'type', 'user_id');
@@ -252,7 +265,14 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function updateStatus(int $status_id): bool {
-		return $this->updateAttributes(['status_id' => $status_id]) > 0;
+		if ($this->status_id !== $status_id) {
+			$this->updateAttributes([
+				'status_id' => $status_id,
+			]);
+			$this->trigger(static::EVENT_AFTER_STATUS_UPDATE, new LeadEvent($this));
+			return true;
+		}
+		return false;
 	}
 
 	public function updateName(string $name): bool {

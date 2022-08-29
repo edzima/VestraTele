@@ -35,6 +35,11 @@ $this->params['breadcrumbs'][] = $this->title;
 			'show_report_in_lead_index:boolean',
 			'not_for_dialer:boolean',
 			'sort_index',
+			[
+				'attribute' => 'market_status',
+				'value' => 'marketStatusName',
+				'filter' => LeadStatusSearch::getMarketStatusesNames(),
+			],
 
 			['class' => 'yii\grid\ActionColumn'],
 		],

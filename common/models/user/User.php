@@ -10,6 +10,7 @@ use common\models\issue\query\IssueCostQuery;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionQuery;
 use common\models\user\query\UserQuery;
+use common\modules\lead\models\LeadUserInterface;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -45,7 +46,7 @@ use yii\web\IdentityInterface;
  * @property-read IssueCost[] $costs
  *
  */
-class User extends ActiveRecord implements IdentityInterface, Hierarchy {
+class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUserInterface {
 
 	public const STATUS_INACTIVE = 0;
 	public const STATUS_ACTIVE = 1;
@@ -103,6 +104,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 	public const PERMISSION_LEAD_DIALER = 'lead.dialer';
 	public const PERMISSION_LEAD_DIALER_MANAGER = 'lead.dialer.manager';
 	public const PERMISSION_LEAD_IMPORT = 'lead.import';
+	public const PERMISSION_LEAD_MARKET = 'lead.market';
 	public const PERMISSION_LEAD_STATUS = 'lead.status';
 	public const PERMISSION_LEAD_DUPLICATE = 'lead.duplicate';
 
@@ -514,4 +516,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy {
 		return new UserQuery(static::class);
 	}
 
+	public function getEmail(): string {
+		return $this->email;
+	}
 }

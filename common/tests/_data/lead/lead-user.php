@@ -28,4 +28,9 @@ return [
 		'user_id' => 2,
 		'lead_id' => 3,
 	],
+	[
+		'type' => LeadUser::TYPE_MARKET_FIRST,
+		'user_id' => 3,
+		'lead_id' => 1,
+	],
 ];

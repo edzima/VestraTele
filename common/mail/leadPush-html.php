@@ -2,12 +2,16 @@
 
 use common\helpers\Html;
 use common\modules\lead\models\ActiveLead;
+use frontend\helpers\Url as FrontendUrl;
 
 /* @var $this yii\web\View */
 /* @var $lead ActiveLead $lead */
 
-$leadLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/lead/view', 'id' => $lead->getId()]);
-$reportLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['lead/report/report', 'id' => $lead->getId()]);
+$leadLink = FrontendUrl::leadView($lead->getId(), true);
+$reportLink = FrontendUrl::toRoute(
+	['/lead/report/report', 'id' => $lead->getId()],
+	true
+);
 
 ?>
 <div class="lead-push-email">
@@ -19,5 +23,4 @@ $reportLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl([
 
 	<p><?= Html::a(Html::encode($leadLink), $leadLink) ?></p>
 	<p><?= Html::a(Yii::t('lead', 'Create Lead Report'), $reportLink) ?></p>
-
 </div>

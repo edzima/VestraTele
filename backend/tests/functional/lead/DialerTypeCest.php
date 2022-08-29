@@ -63,21 +63,24 @@ class DialerTypeCest {
 		$I->submitForm(static::SELECTOR_FORM, $this->formParams(
 			'New Dialer Type',
 			1,
-			LeadDialerType::STATUS_ACTIVE
+			LeadDialerType::STATUS_ACTIVE,
+			200
 		));
 
 		$I->seeRecord(LeadDialerType::class, [
 			'name' => 'New Dialer Type',
 			'status' => LeadDialerType::STATUS_ACTIVE,
 			'user_id' => 1,
+			'did' => 200,
 		]);
 	}
 
-	private function formParams($name, $user_id, $status): array {
+	private function formParams($name, $user_id, $status, $did): array {
 		return [
 			'LeadDialerType[name]' => $name,
 			'LeadDialerType[user_id]' => $user_id,
 			'LeadDialerType[status]' => $status,
+			'LeadDialerType[did]' => $did,
 		];
 	}
 

@@ -14,9 +14,14 @@ class Url extends BaseUrl {
 
 	protected const ROUTE_ISSUE_VIEW = '/issue/issue/view';
 	protected const ROUTE_SETTLEMENT_VIEW = '/settlement/settlement/view';
+	protected const ROUTE_LEAD_VIEW = '/lead/lead/view';
 
 	public static function issueView(int $id, $schema = false): string {
 		return static::toRoute([static::ROUTE_ISSUE_VIEW, 'id' => $id], $schema);
+	}
+
+	public static function leadView(int $id, $schema = false): string {
+		return static::toRoute([static::ROUTE_LEAD_VIEW, 'id' => $id], $schema);
 	}
 
 	public static function settlementView(int $id, $schema = false): string {

@@ -28,7 +28,7 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 	public function rules(): array {
 		return [
 			[['status', 'name', 'phone', 'provider', 'date_at'], 'string'],
-			[['status_id', 'type_id', 'source_id'], 'integer'],
+			[['status_id', 'type_id', 'source_id', 'id'], 'integer'],
 			['onlyDialers', 'boolean'],
 		];
 	}
@@ -39,7 +39,7 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 			];
 	}
 
-	public function search(array $params): ActiveDataProvider {
+	public function search(array $params = []): ActiveDataProvider {
 		$this->load($params);
 		$sub = Lead::find()
 			->alias('duplicateLead')
@@ -55,7 +55,7 @@ class DuplicateLeadSearch extends DuplicateLead implements SearchModel {
 			->groupBy(['duplicateLead.phone', 'duplicateLead.email'])
 			->andFilterWhere(['duplicateLead.provider' => $this->provider])
 			->andFilterWhere(['duplicateLead.status_id' => $this->status_id])
-
+			->andFilterWhere(['duplicateLead.id' => $this->id])
 			->andFilterWhere(['like', 'duplicateLead.name', $this->name])
 			->having('COUNT(*) >1');
 

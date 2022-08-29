@@ -56,6 +56,11 @@ AppAsset::register($this);
 					'url' => ['/lead/lead/index'],
 				],
 				[
+					'label' => Yii::t('lead', 'Lead Markets'),
+					'url' => ['/lead/market/user'],
+					'visible' => Yii::$app->user->can(User::PERMISSION_LEAD_MARKET),
+				],
+				[
 					'label' => Yii::t('lead', 'Create Lead'),
 					'url' => ['/lead/lead/create'],
 				],

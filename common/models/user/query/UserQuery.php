@@ -9,8 +9,6 @@ use common\models\user\Worker;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
-use yii\db\conditions\LikeCondition;
-use yii\db\Expression;
 
 /**
  * This is the ActiveQuery class for [[\common\models\User]].
@@ -128,7 +126,7 @@ class UserQuery extends ActiveQuery {
 	}
 
 	public function active(): self {
-		$this->andWhere(['status' => User::STATUS_ACTIVE]);
+		$this->andWhere([User::tableName() . '.status' => User::STATUS_ACTIVE]);
 		return $this;
 	}
 

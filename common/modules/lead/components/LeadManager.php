@@ -6,8 +6,12 @@ use common\modules\lead\events\LeadEvent;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadInterface;
+use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadUser;
+use common\modules\lead\Module;
 use Yii;
 use yii\base\Component;
+use yii\base\Event;
 use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
 
@@ -21,6 +25,13 @@ class LeadManager extends Component {
 	public $model = Lead::class;
 	public bool $onlyForUser = false;
 
+	public function init() {
+		parent::init();
+		Event::on(Lead::class, Lead::EVENT_AFTER_STATUS_UPDATE, function (LeadEvent $event): void {
+			$this->afterStatusUpdate($event);
+		});
+	}
+
 	public function findById(string $id, bool $forUser = true): ?ActiveLead {
 		$model = $this->getModel()::findById($id);
 		if (!$model
@@ -28,6 +39,15 @@ class LeadManager extends Component {
 			return null;
 		}
 		return $model;
+	}
+
+	public function isOwner(ActiveLead $lead, int $userId): bool {
+		foreach ($lead->getUsers() as $type => $id) {
+			if ($id === $userId && $type === LeadUser::TYPE_OWNER) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function isForUser(ActiveLead $lead, $userId = null): bool {
@@ -85,6 +105,23 @@ class LeadManager extends Component {
 		if (count($models) > 1) {
 			foreach ($models as $model) {
 				$model->updateFromLead($lead);
+			}
+		}
+	}
+
+	protected function afterStatusUpdate(LeadEvent $event): void {
+		/** @var ActiveLead $lead */
+		$lead = $event->getLead();
+		$status = LeadStatus::getModels()[$lead->getStatusId()];
+		if (!empty($status->market_status) && $lead->market !== null) {
+
+			$market = $lead->market;
+			$market->status = $status->market_status;
+
+			if ($market->updateAttributes([
+				'status',
+			])) {
+				Module::getInstance()->market->sendLeadChangeStatusEmail($market);
 			}
 		}
 	}

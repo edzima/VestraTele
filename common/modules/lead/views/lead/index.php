@@ -78,6 +78,11 @@ if ($multipleForm) {
 			? Html::a(Yii::t('lead', 'Duplicates'), ['duplicate/index'], ['class' => 'btn btn-warning'])
 			: ''
 		?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_MARKET)
+			? Html::a(Yii::t('lead', 'Lead Markets'), ['market/index'], ['class' => 'btn btn-success'])
+			: ''
+		?>
 		<?= Yii::$app->user->can(User::PERMISSION_LEAD_DELETE)
 		&& $dataProvider->pagination->pageCount > 1
 			?
@@ -247,6 +252,35 @@ if ($multipleForm) {
 				?>
 
 
+				<?= Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)
+					? Html::submitButton(
+						Yii::t('lead', 'Move to Market'),
+						[
+							'class' => 'btn btn-success',
+							'name' => 'route',
+							'value' => 'market/create-multiple',
+						])
+					: ''
+				?>
+
+				<?= Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)
+				&& $dataProvider->pagination->pageCount > 1
+
+					? Html::a(
+						Yii::t('lead', 'Move to Market ({count})', ['count' => count($searchModel->getAllIds($dataProvider->query))]),
+						['market/create-multiple'],
+						[
+							'class' => 'btn btn-success',
+							'data' => [
+								'method' => 'POST',
+								'params' => [
+									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
+								],
+							],
+						])
+					: ''
+				?>
+
 			</div>
 
 		<?php endif; ?>
@@ -390,9 +424,21 @@ if ($multipleForm) {
 				],
 				[
 					'class' => ActionColumn::class,
-					'template' => '{view} {update} {report} {sms} {user} {reminder} {delete}',
+					'template' => '{view} {update} {report} {sms} {user} {reminder} {market} {delete}',
 					'visibleButtons' => $visibleButtons,
 					'buttons' => [
+						'market' => static function (string $url, ActiveLead $model): string {
+							if (Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)) {
+								return Html::a('<i class="fa fa-bullhorn" aria-hidden="true"></i>',
+									['market/create', 'id' => $model->getId()],
+									[
+										'title' => Yii::t('lead', 'Move to Market'),
+										'aria-label' => Yii::t('lead', 'Move to Market'),
+									]
+								);
+							}
+							return '';
+						},
 						'user' => static function (string $url, ActiveLead $lead): string {
 							return Html::a(
 								Html::icon('plus'),

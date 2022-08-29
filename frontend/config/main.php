@@ -67,6 +67,14 @@ return [
 					[
 						'allow' => true,
 						'controllers' => [
+							'lead/market',
+							'lead/market-user',
+						],
+						'permissions' => [User::PERMISSION_LEAD_MARKET],
+					],
+					[
+						'allow' => true,
+						'controllers' => [
 							'lead/user',
 						],
 						'actions' => ['assign-single'],

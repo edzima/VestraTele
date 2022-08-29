@@ -5,6 +5,8 @@ namespace common\modules\lead\controllers;
 use backend\widgets\CsvForm;
 use common\behaviors\SelectionRouteBehavior;
 use common\helpers\Flash;
+use common\helpers\Html;
+use common\models\user\User;
 use common\modules\lead\models\forms\LeadForm;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\Lead;
@@ -15,6 +17,7 @@ use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
+use yii\data\ArrayDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
 use yii2tech\csvgrid\CsvGrid;
@@ -147,8 +150,32 @@ class LeadController extends BaseController {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView(int $id): string {
+	public function actionView(int $id) {
+		/**
+		 * @var Lead $model
+		 */
 		$model = $this->findLead($id);
+		$userIsFromMarket = $this->module->market->isFromMarket($model->getUsers(), Yii::$app->user->getId());
+		if (
+			$userIsFromMarket
+			&& $this->module->market->hasExpiredReservation($id, Yii::$app->user->getId())
+		) {
+			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'Reservation for Lead: {lead} from Market has expired.', [
+				'lead' => $model->getName(),
+			])
+			);
+
+			if ($model->market) {
+				return $this->redirect(['market/view', 'id' => $model->market->id]);
+			}
+			return $this->redirect(['index']);
+		}
+		if ($model->market !== null && Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)) {
+			Flash::add(Flash::TYPE_INFO,
+				Yii::t('lead', 'Lead is in Market') . ' '
+				. Html::a(Html::icon('link'), ['market/view', 'id' => $model->market->id])
+			);
+		}
 		$sameContactsCount = count($model->getSameContacts());
 
 		if ($sameContactsCount > 0) {
@@ -159,10 +186,23 @@ class LeadController extends BaseController {
 			);
 		}
 
+		$isOwner = $this->module->manager->isOwner($model, Yii::$app->user->getId());
+		$users = $model->leadUsers;
+		$usersDataProvider = null;
+		if (!$this->module->onlyUser
+			|| ($isOwner && count($users) > 1)) {
+			$usersDataProvider = new ArrayDataProvider([
+				'allModels' => $users,
+			]);
+		}
+
 		return $this->render('view', [
 			'model' => $model,
-			'withDelete' => $this->module->allowDelete,
+			'withDelete' => $this->module->allowDelete && !$userIsFromMarket,
 			'onlyUser' => $this->module->onlyUser,
+			'isOwner' => $isOwner,
+			'userIsFromMarket' => $userIsFromMarket,
+			'usersDataProvider' => $usersDataProvider,
 		]);
 	}
 

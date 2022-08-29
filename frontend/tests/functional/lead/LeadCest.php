@@ -17,7 +17,7 @@ use yii\helpers\Url;
 class LeadCest {
 
 	/* @see LeadController::actionIndex() */
-	private const ROUTE_INDEX = '/lead/lead/index';
+	public const ROUTE_INDEX = '/lead/lead/index';
 	/* @see LeadController::actionCreate() */
 	private const ROUTE_CREATE = '/lead/lead/create';
 	/* @see LeadController::actionCreateFromSource() */

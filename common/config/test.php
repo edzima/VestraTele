@@ -1,5 +1,6 @@
 <?php
 
+use common\models\message\Message;
 use common\models\user\User;
 use common\modules\lead\components\LeadDialerManager;
 use common\modules\lead\Module;
@@ -31,6 +32,17 @@ return [
 				'callingStatus' => 2,
 				'notAnsweredStatus' => 3,
 				'answeredStatus' => 4,
+			],
+		],
+	],
+	'container' => [
+		'definitions' => [
+			'yii\swiftmailer\Message' => Message::class,
+			'yii\mail\BaseMailer' => [
+				'messageClass' => Message::class,
+			],
+			'Codeception\Lib\Connector\Yii2\TestMailer' => [
+				'messageClass' => Message::class,
 			],
 		],
 	],
