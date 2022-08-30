@@ -309,4 +309,5 @@ return [
 	'Show on Mainpage' => 'Pokazuj na Stronie Głównej',
 	'Empty: not visible. Number for Order.' => 'Puste: nie wyświetlaj. Kolejność',
 	'Issue Grouped' => 'Sprawy - Grupuj',
+	'Sum' => 'Razem',
 ];
