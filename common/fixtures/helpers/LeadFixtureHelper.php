@@ -51,6 +51,9 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 	private const ISSUE = 'lead.issue';
 	private const CRM = 'lead.crm';
 
+	private const ISSUE = 'lead.issue';
+	private const CRM = 'lead.crm';
+
 	public const DEFAULT_PHONE = '+48 123-123-123';
 	public const DEFAULT_SOURCE_ID = 1;
 
