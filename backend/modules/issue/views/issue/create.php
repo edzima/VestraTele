@@ -22,6 +22,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= $this->render('_leads', [
 		'dataProvider' => $leadsDataProvider,
+		'agentInputId' => Html::getInputId($model, 'agent_id'),
+		'teleInputId' => Html::getInputId($model, 'tele_id'),
 		'leadInputId' => Html::getInputId($model, 'lead_id'),
 	]) ?>
 
