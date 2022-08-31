@@ -48,6 +48,7 @@ $multipleForm = empty($searchModel->dialer_id)
 		|| Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
 		|| Yii::$app->user->can(User::PERMISSION_LEAD_STATUS)
 		|| Yii::$app->user->can(User::PERMISSION_LEAD_DIALER_MANAGER)
+		|| Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)
 	);
 
 if ($multipleForm) {
