@@ -69,7 +69,6 @@ $script = <<<JS
 		leadInput.value = key;
 		if(value.length){
 			const users = JSON.parse(value);
-			console.log(users);
 			if(users.owner){
 				agentInput.val(users.owner);
 				agentInput.trigger('change');
@@ -77,7 +76,6 @@ $script = <<<JS
 			if(users.agent){
 				agentInput.val(users.agent);
 				agentInput.trigger('change');
-
 			}
 			if(users.telemarketer){
 				teleinput.val(users.telemarketer);
