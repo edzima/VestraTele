@@ -10,6 +10,8 @@ use yii\db\ActiveQuery;
 
 /**
  * IssueMeetSearch represents the model behind the search form of `common\models\issue\IssueMeet`.
+ *
+ * @deprecated
  */
 class IssueMeetSearch extends IssueMeet {
 

@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models;
 
+use borales\extensions\phoneInput\PhoneInputBehavior;
 use common\modules\lead\Module;
 use Yii;
 use yii\db\ActiveQuery;
@@ -38,6 +39,14 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 	 */
 	public static function tableName(): string {
 		return '{{%lead_source}}';
+	}
+
+	public function behaviors(): array {
+		return [
+			[
+				'class' => PhoneInputBehavior::class,
+			],
+		];
 	}
 
 	/**

@@ -21,7 +21,6 @@ use common\models\issue\query\IssueUserQuery;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
-use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -135,7 +134,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueType::class, 'targetAttribute' => ['type_id' => 'id']],
 			//@todo remove this rules after create customers from production Issues.
 			[['client_email', 'victim_email'], 'email'],
-			[['client_phone_1', 'client_phone_2', 'victim_phone'], PhoneValidator::class, 'country' => 'PL'],
 		];
 	}
 
