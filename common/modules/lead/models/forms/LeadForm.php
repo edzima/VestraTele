@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models\forms;
 
+use borales\extensions\phoneInput\PhoneInputValidator;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadInterface;
@@ -11,7 +12,6 @@ use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\Module;
 use DateTime;
-use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
@@ -72,12 +72,12 @@ class LeadForm extends Model implements LeadInterface {
 			['postal_code', 'string', 'max' => 6],
 			['email', 'email'],
 			['date_at', 'date', 'format' => 'php:' . $this->dateFormat],
-			[['phone'], PhoneValidator::class, 'country' => 'PL'],
 			[
 				['owner_id', 'agent_id'], 'in', 'range' => function (): array {
 				return array_keys(static::getUsersNames());
 			},
 			],
+			[['phone'], PhoneInputValidator::class],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignsNames())],
 			['provider', 'in', 'range' => array_keys(static::getProvidersNames())],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],

@@ -5,12 +5,10 @@ namespace console\controllers;
 use backend\modules\settlement\models\CalculationProblemStatusForm;
 use common\components\DbManager;
 use common\helpers\StringHelper;
-use common\models\issue\IssueMeet;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
-use common\models\issue\Provision;
 use common\models\provision\IssueProvisionType;
 use common\models\user\Customer;
 use common\models\user\UserProfile;
@@ -19,7 +17,6 @@ use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;
 use DateTime;
 use Exception;
-use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
@@ -175,22 +172,6 @@ class UpgradeController extends Controller {
 			$model->save();
 		}
 		Console::output(count($pays));
-	}
-
-	public function actionFixPhone(): void {
-		$validator = new PhoneValidator();
-		$validator->country = 'PL';
-		foreach (IssueMeet::find()->batch() as $models) {
-			foreach ($models as $model) {
-				$validator->validateAttribute($model, 'phone');
-				/** @var IssueMeet $model */
-				if (!$model->hasErrors('phone')) {
-					$model->update(false, ['phone']);
-				} else {
-					Console::output($model->id);
-				}
-			}
-		}
 	}
 
 }

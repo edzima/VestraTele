@@ -49,6 +49,7 @@ use yii\helpers\ArrayHelper;
  * @property-read Campaign|null $campaign
  * @property-read MeetAddress[] $addresses
  * @property-read Address|null $customerAddress
+ * @deprecated
  */
 class IssueMeet extends ActiveRecord {
 
@@ -188,7 +189,7 @@ class IssueMeet extends ActiveRecord {
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getCity() {
 		return $this->hasOne(City::class, ['id' => 'city_id'])->cache();

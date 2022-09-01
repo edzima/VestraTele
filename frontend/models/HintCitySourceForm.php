@@ -2,10 +2,10 @@
 
 namespace frontend\models;
 
+use borales\extensions\phoneInput\PhoneInputValidator;
 use common\models\hint\HintCity;
 use common\models\hint\HintCitySource;
 use common\models\hint\HintSource;
-use udokmeci\yii2PhoneValidator\PhoneValidator;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
@@ -26,7 +26,7 @@ class HintCitySourceForm extends Model {
 		return [
 			[['source_id', 'rating', 'phone', 'status'], 'required'],
 			[['phone', 'rating', 'details', 'status'], 'string'],
-			['phone', PhoneValidator::class, 'country' => 'PL'],
+			['phone', PhoneInputValidator::class],
 			['rating', 'in', 'range' => array_keys(static::getRatingsNames())],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
