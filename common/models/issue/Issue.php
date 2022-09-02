@@ -21,6 +21,7 @@ use common\models\issue\query\IssueUserQuery;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
+use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -497,6 +498,19 @@ class Issue extends ActiveRecord implements IssueInterface {
 	public function getIssuesRelations(): ActiveQuery {
 		return $this->hasMany(IssueRelation::class, ['issue_id_1' => 'id'])
 			->onCondition('1=1) OR (issue_id_2 = :id', [':id' => $this->id]);
+	}
+
+	public function hasDelayedStage(): ?bool {
+		if (empty($this->stage_change_at)) {
+			return null;
+		}
+		$days = $this->getIssueStage()->days_reminder;
+		if (empty($days)) {
+			return null;
+		}
+		$date = new DateTime($this->stage_change_at);
+		$daysDiff = $date->diff(new DateTime())->days;
+		return $daysDiff >= $days;
 	}
 
 }
