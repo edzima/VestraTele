@@ -129,6 +129,14 @@ $this->params['breadcrumbs'][] = $this->title;
 		'id' => 'issues-list',
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'rowOptions' => function (Issue $issue): array {
+			if ($issue->hasDelayedStage()) {
+				return [
+					'class' => 'danger',
+				];
+			}
+			return [];
+		},
 		'columns' => [
 			Yii::$app->user->can(Worker::PERMISSION_MULTIPLE_SMS)
 				? [
