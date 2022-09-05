@@ -44,6 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'phone',
 				'value' => 'profile.phone',
 				'label' => UserProfile::instance()->getAttributeLabel('phone'),
+				'format' => 'tel',
 			],
 			[
 				'attribute' => 'status',

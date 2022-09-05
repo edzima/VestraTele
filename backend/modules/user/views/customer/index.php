@@ -64,6 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'phone',
 				'value' => 'profile.phone',
 				'label' => Yii::t('common', 'Phone number'),
+				'format' => 'tel',
 			],
 			'updated_at:datetime',
 			[

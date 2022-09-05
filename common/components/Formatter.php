@@ -2,8 +2,12 @@
 
 namespace common\components;
 
+use common\helpers\ArrayHelper;
 use common\helpers\Html;
 use Decimal\Decimal;
+use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 use NumberFormatter;
 use yii\i18n\Formatter as BaseFormatter;
 
@@ -14,6 +18,8 @@ class Formatter extends BaseFormatter {
 	public $numberFormatterOptions = [
 		NumberFormatter::MIN_FRACTION_DIGITS => self::FRACTION_DIGITS,
 	];
+	public string $defaultPhoneRegion = 'PL';
+	public int $defaultPhoneFormat = PhoneNumberFormat::INTERNATIONAL;
 
 	public function asCityCode(?string $city, ?string $code) {
 		if ($city === null && $code === null) {
@@ -61,8 +67,20 @@ class Formatter extends BaseFormatter {
 		if ($value === null) {
 			return $this->nullDisplay;
 		}
+		$defaultRegion = ArrayHelper::remove($options, 'default_region', $this->defaultPhoneRegion);
+		$format = ArrayHelper::remove($options, 'format', $this->defaultPhoneFormat);
+
+		try {
+			$phoneValue = $this->getPhoneUtil()->parse($value, $defaultRegion);
+			$value = $this->getPhoneUtil()->format($phoneValue, $format);
+		} catch (NumberParseException $e) {
+		}
 
 		return Html::telLink(Html::encode($value), $value, $options);
+	}
+
+	protected function getPhoneUtil(): PhoneNumberUtil {
+		return PhoneNumberUtil::getInstance();
 	}
 
 }
