@@ -39,10 +39,19 @@ class LeadForm extends Model implements LeadInterface {
 	public ?string $phone = null;
 	public ?string $postal_code = null;
 
+	public ?string $phoneRegion = null;
+
 	public $owner_id;
 	public $agent_id;
 
 	public string $dateFormat = 'Y-m-d H:i:s';
+
+	public function init(): void {
+		parent::init();
+		if ($this->phoneRegion === null) {
+			$this->phoneRegion = Yii::$app->formatter->defaultPhoneRegion;
+		}
+	}
 
 	public function behaviors(): array {
 		return [
@@ -77,7 +86,11 @@ class LeadForm extends Model implements LeadInterface {
 				return array_keys(static::getUsersNames());
 			},
 			],
-			[['phone'], PhoneInputValidator::class],
+			[
+				['phone'], PhoneInputValidator::class,
+				'default_region' => $this->phoneRegion,
+				'region' => Yii::$app->params['phoneInput.preferredCountries'],
+			],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignsNames())],
 			['provider', 'in', 'range' => array_keys(static::getProvidersNames())],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],

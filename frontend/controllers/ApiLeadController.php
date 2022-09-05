@@ -25,10 +25,14 @@ class ApiLeadController extends Controller {
 		parent::init();
 	}
 
-	public function actionLanding() {
+	public function actionLanding(string $region = null) {
+		if ($region === null) {
+			$region = Yii::$app->formatter->defaultPhoneRegion;
+		}
 
 		$model = new LandingLeadForm();
 		$model->date_at = date($model->dateFormat);
+		$model->phoneRegion = $region;
 
 		if ($model->load(Yii::$app->request->post())) {
 			if ($model->validate() && $this->pushLead($model)) {

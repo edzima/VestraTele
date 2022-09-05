@@ -46,6 +46,19 @@ class LeadFormTest extends Unit {
 		$this->thenSuccessValidate();
 	}
 
+	public function testUkrainePhoneNumber():void{
+		$this->giveLead([
+			'name' => 'Test lead',
+			'phone' => '+380 44 123-12-12',
+			'status_id' => 1,
+			'source_id' => 1,
+			'date_at' => '2020-01-01 12:00:00',
+		]);
+		$this->lead->phoneRegion = 'UA';
+
+		$this->thenSuccessValidate();
+	}
+
 	public function testWithEmail(): void {
 		$this->giveLead([
 			'name' => 'Test lead',
@@ -57,6 +70,8 @@ class LeadFormTest extends Unit {
 
 		$this->thenSuccessValidate();
 	}
+
+
 
 	public function testInvalidProvider(): void {
 		$this->giveLead([

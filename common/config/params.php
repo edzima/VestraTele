@@ -8,7 +8,7 @@ return [
 	'user.passwordResetTokenExpire' => 3600,
 	'user.passwordMinLength' => 8,
 	'phoneInput.preferredCountries' => [
-		'pl',
-		'ua',
+		'PL',
+		'UA',
 	],
 ];
