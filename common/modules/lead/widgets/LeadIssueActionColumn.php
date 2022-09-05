@@ -2,9 +2,11 @@
 
 namespace common\modules\lead\widgets;
 
+use common\helpers\Html;
 use common\modules\lead\controllers\IssueController;
 use common\modules\lead\models\LeadIssue;
 use common\widgets\grid\ActionColumn;
+use Yii;
 
 class LeadIssueActionColumn extends ActionColumn {
 
@@ -25,18 +27,27 @@ class LeadIssueActionColumn extends ActionColumn {
 				},
 			];
 		}
-	}
+		$this->buttons['confirm'] = function ($url, $model, $key): string {
+			return Html::a(
+				Html::icon('check'),
+				$url, [
+					'title' => \Yii::t('lead', 'Confirm'),
+					'aria-label' => Yii::t('lead', 'Confirm'),
+					'data-method' => 'POST',
+				]
+			);
+		};
 
-	/**
-	 * {@inheritdoc}
-	 */
-	protected function initDefaultButtons() {
-		$this->initDefaultButton('confirm', 'check', [
-			'data-method' => 'post',
-		]);
-		$this->initDefaultButton('unconfirm', 'unchecked', [
-			'data-method' => 'post',
-		]);
+		$this->buttons['unconfirm'] = function ($url, $model, $key): string {
+			return Html::a(
+				Html::icon('unchecked'),
+				$url, [
+					'title' => Yii::t('lead', 'Unconfirm'),
+					'aria-label' => Yii::t('lead', 'Unconfirm'),
+					'data-method' => 'POST',
+				]
+			);
+		};
 	}
 
 	public function createUrl($action, $model, $key, $index) {

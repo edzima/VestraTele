@@ -56,6 +56,8 @@ class LeadIssue extends ActiveRecord {
 			'issue_id' => Yii::t('lead', 'Issue ID'),
 			'crm_id' => Yii::t('lead', 'Crm'),
 			'created_at' => Yii::t('lead', 'Created At'),
+			'updated_at' => Yii::t('lead', 'Updated At'),
+			'confirmed_at' => Yii::t('lead', 'Confirmed At'),
 		];
 	}
 

@@ -378,4 +378,7 @@ return [
 	'Lead Issues' => 'Leads - Sprawy',
 	'Issue ID' => 'ID Sprawy',
 	'Issue Duplicated' => 'Sprawa - Zdublowana',
+	'Confirm' => 'Potwierdź',
+	'Confirmed At' => 'Potwierdzono',
+	'Unconfirm' => 'Odrzuć',
 ];
