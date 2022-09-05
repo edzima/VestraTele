@@ -2,7 +2,9 @@
 
 namespace common\models\hint;
 
+use borales\extensions\phoneInput\PhoneInputBehavior;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -31,6 +33,14 @@ class HintCitySource extends ActiveRecord {
 	public const RATING_POSITIVE = 'positive';
 	public const RATING_NEUTRAL = 'neutral';
 	public const RATING_NEGATIVE = 'negative';
+
+	public function behaviors(): array {
+		return [
+			[
+				'class' => PhoneInputBehavior::class,
+			],
+		];
+	}
 
 	public static function getStatusesNames(): array {
 		return [
@@ -102,7 +112,7 @@ class HintCitySource extends ActiveRecord {
 	/**
 	 * Gets query for [[Hint]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getHint() {
 		return $this->hasOne(HintCity::class, ['id' => 'hint_id']);
@@ -111,7 +121,7 @@ class HintCitySource extends ActiveRecord {
 	/**
 	 * Gets query for [[Source]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getSource() {
 		return $this->hasOne(HintSource::class, ['id' => 'source_id']);

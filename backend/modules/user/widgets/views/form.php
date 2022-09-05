@@ -1,6 +1,7 @@
 <?php
 
 use common\models\user\UserProfile;
+use common\widgets\PhoneInput;
 use yii\widgets\ActiveForm;
 
 /* @var ActiveForm $form */
@@ -17,9 +18,12 @@ use yii\widgets\ActiveForm;
 
 <?= $form->field($model, 'tax_office')->textInput(['maxlength' => true]) ?>
 
-<?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
+<div class="row">
+	<?= $form->field($model, 'phone', ['options' => ['class' => 'col-md-2']])->widget(PhoneInput::class) ?>
 
-<?= $form->field($model, 'phone_2')->textInput(['maxlength' => true]) ?>
+	<?= $form->field($model, 'phone_2', ['options' => ['class' => 'col-md-2']])->widget(PhoneInput::class) ?>
+</div>
+
 
 <?= $form->field($model, 'email_hidden_in_frontend_issue')->checkbox() ?>
 

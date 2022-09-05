@@ -2,8 +2,9 @@
 
 namespace common\models\user;
 
+use borales\extensions\phoneInput\PhoneInputBehavior;
+use borales\extensions\phoneInput\PhoneInputValidator;
 use common\models\user\query\UserProfileQuery;
-use udokmeci\yii2PhoneValidator\PhoneValidator;
 use vova07\fileapi\behaviors\UploadBehavior;
 use Yii;
 use yii\db\ActiveRecord;
@@ -52,6 +53,10 @@ class UserProfile extends ActiveRecord {
 					],
 				],
 			],
+			'phoneInput' => [
+				'class' => PhoneInputBehavior::class,
+				'attributes' => ['phone', 'phone_2'],
+			],
 		];
 	}
 
@@ -72,7 +77,7 @@ class UserProfile extends ActiveRecord {
 			[['phone', 'phone_2'], 'string', 'max' => 20],
 			[['pesel'], 'string', 'max' => 11],
 			[['email_hidden_in_frontend_issue'], 'boolean'],
-			[['phone', 'phone_2'], PhoneValidator::class, 'country' => 'PL'],
+			[['phone', 'phone_2'], PhoneInputValidator::class],
 			[['firstname', 'lastname', 'avatar_path', 'website'], 'string', 'max' => 255],
 			[['firstname', 'lastname'], 'match', 'pattern' => '/[AaĄąBbCcĆćDdEeĘęFfGgHhIiJjKkLlŁłMmNnŃńOoÓóPpRrSsŚśTtUuWwYyZzŹźŻż]/iu'],
 			['user_id', 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],

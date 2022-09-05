@@ -64,11 +64,13 @@ $this->params['breadcrumbs'][] = $this->title;
 						'label' => Yii::t('common', 'Phone number'),
 						'value' => $model->profile->phone,
 						'visible' => !empty($model->profile->phone),
+						'format' => 'tel',
 					],
 					[
 						'label' => Yii::t('common', 'Phone number 2'),
 						'value' => $model->profile->phone_2,
 						'visible' => !empty($model->profile->phone_2),
+						'format' => 'tel',
 					],
 					[
 						'label' => Yii::t('backend', 'Traits'),

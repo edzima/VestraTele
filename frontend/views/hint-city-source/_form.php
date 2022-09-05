@@ -1,10 +1,12 @@
 <?php
 
 use common\widgets\ActiveForm;
+use common\widgets\PhoneInput;
 use frontend\helpers\Html;
 use frontend\models\HintCitySourceForm;
+use yii\web\View;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $model HintCitySourceForm */
 
 ?>
@@ -19,7 +21,7 @@ use frontend\models\HintCitySourceForm;
 
 	<?= $form->field($model, 'rating')->dropDownList(HintCitySourceForm::getRatingsNames()) ?>
 
-	<?= $form->field($model, 'phone')->textInput() ?>
+	<?= $form->field($model, 'phone')->widget(PhoneInput::class) ?>
 
 	<?= $form->field($model, 'details')->textarea() ?>
 

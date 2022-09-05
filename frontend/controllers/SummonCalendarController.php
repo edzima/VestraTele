@@ -3,9 +3,7 @@
 namespace frontend\controllers;
 
 use common\models\issue\IssueMeet;
-use common\models\User;
 use frontend\models\AgentMeetCalendarSearch;
-use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -104,12 +102,7 @@ class SummonCalendarController extends Controller {
 	}
 
 	private function getPhone(IssueMeet $model): string {
-		$validator = new PhoneValidator();
-		$validator->country = 'PL';
-		if ($validator->validateAttribute($model, 'phone')) {
-			return $model->phone;
-		}
-		return '';
+		return $model->phone;
 	}
 
 	private function getTooltipContent(IssueMeet $model): string {

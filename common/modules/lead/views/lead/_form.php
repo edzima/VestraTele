@@ -2,6 +2,7 @@
 
 use common\modules\lead\models\forms\LeadForm;
 use common\widgets\DateTimeWidget;
+use common\widgets\PhoneInput;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -83,7 +84,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'name', ['options' => ['class' => 'col-md-4 col-lg-3']])->textInput(['maxlength' => true]) ?>
 
-		<?= $form->field($model, 'phone', ['options' => ['class' => 'col-md-2']])->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'phone', ['options' => ['class' => 'col-md-2']])->widget(PhoneInput::class) ?>
 
 		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-2']])->textInput(['maxlength' => true]) ?>
 

@@ -2,12 +2,12 @@
 
 namespace common\modules\lead\models\forms;
 
+use borales\extensions\phoneInput\PhoneInputValidator;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadSourceInterface;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\LeadTypeInterface;
 use common\modules\lead\Module;
-use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
 use yii\base\Model;
 use yii\db\QueryInterface;
@@ -41,8 +41,7 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 			[['type_id', 'owner_id'], 'integer'],
 			[['name', 'url'], 'string', 'max' => 255],
 			[['phone', 'dialer_phone'], 'string', 'max' => 30],
-			//@todo attribute for country from Module or model?
-			['phone', PhoneValidator::class, 'country' => 'PL'],
+			['phone', PhoneInputValidator::class],
 			['url', 'url'],
 			[
 				'name', 'unique', 'targetClass' => LeadSource::class, 'filter' => function (QueryInterface $query) {

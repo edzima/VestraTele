@@ -23,6 +23,7 @@ use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\lead\models\Lead;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
+use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -64,7 +65,6 @@ use yii\db\Expression;
  * @property string|null $type_additional_date_at
  * @property string $stage_change_at
  * @property string|null $signature_act
- * @property int|null $lead_id
  *
  * @property string $longId
  * @property int $clientStateId
@@ -138,7 +138,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueType::class, 'targetAttribute' => ['type_id' => 'id']],
 			//@todo remove this rules after create customers from production Issues.
 			[['client_email', 'victim_email'], 'email'],
-			[['client_phone_1', 'client_phone_2', 'victim_phone'], PhoneValidator::class, 'country' => 'PL'],
 		];
 	}
 
@@ -507,6 +506,19 @@ class Issue extends ActiveRecord implements IssueInterface {
 	public function getIssuesRelations(): ActiveQuery {
 		return $this->hasMany(IssueRelation::class, ['issue_id_1' => 'id'])
 			->onCondition('1=1) OR (issue_id_2 = :id', [':id' => $this->id]);
+	}
+
+	public function hasDelayedStage(): ?bool {
+		if (empty($this->stage_change_at)) {
+			return null;
+		}
+		$days = $this->getIssueStage()->days_reminder;
+		if (empty($days)) {
+			return null;
+		}
+		$date = new DateTime($this->stage_change_at);
+		$daysDiff = $date->diff(new DateTime())->days;
+		return $daysDiff >= $days;
 	}
 
 }

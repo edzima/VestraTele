@@ -7,7 +7,6 @@ use common\models\issue\IssueMeet;
 use common\models\issue\IssueMeetSearch;
 use common\models\issue\MeetAddress;
 use common\models\user\User;
-use udokmeci\yii2PhoneValidator\PhoneValidator;
 use yii\base\Model;
 
 /**
@@ -16,6 +15,7 @@ use yii\base\Model;
  * @property integer $id
  *
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
+ * @deprecated
  */
 class MeetForm extends Model {
 
@@ -46,7 +46,6 @@ class MeetForm extends Model {
 			[['clientName', 'clientSurname', 'phone', 'email', 'details'], 'string'],
 			[['status', 'typeId'], 'integer'],
 			['email', 'email'],
-			['phone', PhoneValidator::class, 'country' => 'PL'],
 			[
 				'phone', 'required', 'when' => function () {
 				return empty($this->email);

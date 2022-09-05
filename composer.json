@@ -38,13 +38,13 @@
 		"kartik-v/yii2-grid": "^3.3.5",
 		"kartik-v/yii2-number": "^1.0",
 		"yii2tech/csv-grid": "^1.0",
-		"udokmeci/yii2-phone-validator": "~1.0.3",
 		"edzima/yii2-teryt": "^1.1.0",
 		"kartik-v/yii2-date-range": "~1.7.0",
 		"yiimaker/yii2-email-templates": "~4.1",
 		"edzima/yii2-adescom": "^1.0",
 		"yiisoft/yii2-queue": "^2.3",
-		"yiisoft/yii2-jui": "^2.0"
+		"yiisoft/yii2-jui": "^2.0",
+		"borales/yii2-phone-input": "^0.3.0"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-latest",
@@ -75,6 +75,9 @@
 		"process-timeout": 1800,
 		"fxp-asset": {
 			"enabled": false
+		},
+		"allow-plugins": {
+			"yiisoft/yii2-composer": true
 		}
 	},
 	"autoload": {
