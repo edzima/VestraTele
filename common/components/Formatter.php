@@ -79,6 +79,19 @@ class Formatter extends BaseFormatter {
 		return Html::telLink(Html::encode($value), $value, $options);
 	}
 
+	public function asPhoneDatabase($value, $options = []): ?string {
+		if ($value === null) {
+			return $this->nullDisplay;
+		}
+		$defaultRegion = ArrayHelper::remove($options, 'default_region', $this->defaultPhoneRegion);
+		try {
+			$phoneValue = $this->getPhoneUtil()->parse($value, $defaultRegion);
+			return $this->getPhoneUtil()->format($phoneValue, PhoneNumberFormat::E164);
+		} catch (NumberParseException $e) {
+		}
+		return null;
+	}
+
 	protected function getPhoneUtil(): PhoneNumberUtil {
 		return PhoneNumberUtil::getInstance();
 	}

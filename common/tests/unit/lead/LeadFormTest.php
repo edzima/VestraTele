@@ -71,8 +71,6 @@ class LeadFormTest extends Unit {
 		$this->thenSuccessValidate();
 	}
 
-
-
 	public function testInvalidProvider(): void {
 		$this->giveLead([
 			'provider' => 'some-not-existed-provider',

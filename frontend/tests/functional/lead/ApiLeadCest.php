@@ -43,12 +43,12 @@ class ApiLeadCest {
 		$I->sendAjaxPostRequest(static::ROUTE_LANDING, [
 			'source_id' => 1,
 			'name' => 'Jonny',
-			'phone' => '48 123123123',
+			'phone' => '123123123',
 		]);
 		$I->seeRecord(Module::manager()->model, [
 			'source_id' => 1,
 			'name' => 'Jonny',
-			'phone' => '+48 12 312 31 23',
+			'phone' => '+48123123123',
 		]);
 		$I->seeSmsIsSend();
 	}

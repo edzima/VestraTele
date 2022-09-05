@@ -158,6 +158,11 @@ class LeadForm extends Model implements LeadInterface {
 	}
 
 	public function getPhone(): ?string {
+		if ($this->phone) {
+			return Yii::$app->formatter->asPhoneDatabase($this->phone, [
+				'default_region' => $this->phoneRegion,
+			]);
+		}
 		return $this->phone;
 	}
 
