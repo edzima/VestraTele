@@ -39,7 +39,7 @@ YiiAsset::register($this);
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
-	<p>
+	<p class="pull-left">
 
 		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->getId()], ['class' => 'btn btn-success']) ?>
 
@@ -112,8 +112,8 @@ YiiAsset::register($this);
 		?>
 	</div>
 
+	<p class="clearfix"></p>
 
-	<p></p>
 
 	<div class="row">
 		<div class="col-md-4">
