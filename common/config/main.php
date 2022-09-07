@@ -1,27 +1,36 @@
 <?php
 
 use common\components\DbManager;
+use common\components\Formatter;
 use common\components\HierarchyComponent;
 use common\components\keyStorage\KeyStorage;
+use common\components\message\MessageTemplateManager;
 use common\components\PayComponent;
-use common\components\Provisions;
+use common\components\provision\Provisions;
 use common\components\TaxComponent;
-use common\formatters\Formatter;
+use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\czater\Czater;
+use common\modules\lead\Module as LeadModule;
 use edzima\teryt\Module as TerytModule;
+use Edzima\Yii2Adescom\AdescomSender;
+use Edzima\Yii2Adescom\AdescomSoap;
 use yii\caching\DummyCache;
 use yii\caching\FileCache;
+use yii\mutex\MysqlMutex;
+use yii\queue\db\Queue;
 
 return [
-	'name' => 'Vestra CRM',
+	'name' => $_ENV['APP_NAME'],
 	'vendorPath' => dirname(__DIR__, 2) . '/vendor',
 	'extensions' => require(__DIR__ . '/../../vendor/yiisoft/extensions.php'),
-	'timeZone' => 'Europe/Warsaw',
+	'timeZone' => 'Europe/Warsaw', //@todo load from .env
 	'sourceLanguage' => 'en-US',
 	'language' => 'pl',
 	'bootstrap' => [
 		'log',
 		'teryt',
+		'queue',
 	],
 	'aliases' => [
 		'@bower' => '@vendor/bower-asset',
@@ -31,8 +40,16 @@ return [
 		'teryt' => [
 			'class' => TerytModule::class,
 		],
+		'lead' => [
+			'class' => LeadModule::class,
+			'userClass' => User::class,
+		],
 	],
 	'components' => [
+		'czater' => [
+			'class' => Czater::class,
+			'apiKey' => $_ENV['CZATER_API_KEY'],
+		],
 		'db' => [
 			'class' => 'yii\db\Connection',
 			'dsn' => getenv('DB_DSN'),
@@ -41,6 +58,9 @@ return [
 			'tablePrefix' => getenv('DB_TABLE_PREFIX'),
 			'charset' => 'utf8',
 			'enableSchemaCache' => YII_ENV_PROD,
+		],
+		'messageTemplate' => [
+			'class' => MessageTemplateManager::class,
 		],
 		'authManager' => [
 			'class' => DbManager::class,
@@ -52,7 +72,7 @@ return [
 		],
 		'formatter' => [
 			'class' => Formatter::class,
-			'nullDisplay' => '',
+			'defaultTimeZone' => 'Europe/Warsaw',//@todo load from .env
 			'decimalSeparator' => ',',
 			'thousandSeparator' => ' ',
 			'currencyCode' => 'PLN',
@@ -87,6 +107,13 @@ return [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',
 				],
+				'vova07/imperavi' => [
+					'class' => 'yii\i18n\PhpMessageSource',
+					'basePath' => '@common/messages',
+					'fileMap' => [
+						'vova07/imperavi' => 'imperavi.php',
+					],
+				],
 				'*' => [
 					'class' => 'yii\i18n\PhpMessageSource',
 					'basePath' => '@common/messages',
@@ -116,6 +143,21 @@ return [
 		'provisions' => [
 			'class' => Provisions::class,
 		],
+		'sms' => [
+			'class' => AdescomSender::class,
+			'client' => [
+				'class' => AdescomSoap::class,
+				'keySessionIdCache' => null,
+				'login' => $_ENV['ADESCOM_LOGIN'],
+				'password' => $_ENV['ADESCOM_PASSWORD'],
+			],
+			'messageConfig' => [
+				'src' => $_ENV['ADESCOM_SRC'],
+				'overwriteSrc' => $_ENV['ADESCOM_OVERWRITE_SRC'],
+				'retryInterval' => 60,
+				'maxRetryCount' => 1,
+			],
+		],
 		'tax' => [
 			'class' => TaxComponent::class,
 		],
@@ -123,6 +165,12 @@ return [
 			'class' => HierarchyComponent::class,
 			'modelClass' => Worker::class,
 			'parentColumn' => 'boss',
+		],
+		'mutex' => [
+			'class' => MysqlMutex::class,
+		],
+		'queue' => [
+			'class' => Queue::class,
 		],
 	],
 ];

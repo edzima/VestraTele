@@ -9,6 +9,7 @@ use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -26,16 +27,22 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	use IssueTrait;
 
 	public const TYPE_LAWYER = Worker::ROLE_LAWYER;
+	public const TYPE_LAWYER_ASSISTANT = Worker::ROLE_LAWYER_ASSISTANT;
 	public const TYPE_AGENT = Worker::ROLE_AGENT;
+	public const TYPE_CO_AGENT = Worker::ROLE_CO_AGENT;
 	public const TYPE_TELEMARKETER = Worker::ROLE_TELEMARKETER;
 	public const TYPE_CUSTOMER = Customer::ROLE_CUSTOMER;
 	public const TYPE_VICTIM = Customer::ROLE_VICTIM;
 	public const TYPE_SHAREHOLDER = Customer::ROLE_SHAREHOLDER;
 	public const TYPE_HANDICAPPED = Customer::ROLE_HANDICAPPED;
+	public const TYPE_RECOMMENDING = User::ROLE_RECCOMENDING;
+	public const TYPE_GUARDIAN = User::ROLE_GUARDIAN;
 
 	public const TYPES_WORKERS = [
 		self::TYPE_LAWYER,
+		self::TYPE_LAWYER_ASSISTANT,
 		self::TYPE_AGENT,
+		self::TYPE_CO_AGENT,
 		self::TYPE_TELEMARKETER,
 	];
 
@@ -44,13 +51,15 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		self::TYPE_HANDICAPPED,
 		self::TYPE_VICTIM,
 		self::TYPE_SHAREHOLDER,
+		self::TYPE_RECOMMENDING,
+		self::TYPE_GUARDIAN,
 	];
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public static function tableName(): string {
-		return 'issue_user';
+		return '{{%issue_user}}';
 	}
 
 	/**
@@ -90,7 +99,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	/**
 	 * Gets query for [[Issue]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getIssue(): IssueQuery {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
@@ -99,7 +108,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	/**
 	 * Gets query for [[User]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getUser(): UserQuery {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
@@ -108,12 +117,16 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	public static function getTypesNames(): array {
 		return [
 			static::TYPE_CUSTOMER => User::getRolesNames()[static::TYPE_CUSTOMER],
+			static::TYPE_GUARDIAN => User::getRolesNames()[static::TYPE_GUARDIAN],
 			static::TYPE_AGENT => User::getRolesNames()[static::TYPE_AGENT],
+			static::TYPE_CO_AGENT => User::getRolesNames()[static::TYPE_CO_AGENT],
 			static::TYPE_LAWYER => User::getRolesNames()[static::TYPE_LAWYER],
+			static::TYPE_LAWYER_ASSISTANT => User::getRolesNames()[static::TYPE_LAWYER_ASSISTANT],
 			static::TYPE_TELEMARKETER => User::getRolesNames()[static::TYPE_TELEMARKETER],
 			static::TYPE_VICTIM => User::getRolesNames()[static::TYPE_VICTIM],
 			static::TYPE_SHAREHOLDER => User::getRolesNames()[static::TYPE_SHAREHOLDER],
 			static::TYPE_HANDICAPPED => User::getRolesNames()[static::TYPE_HANDICAPPED],
+			static::TYPE_RECOMMENDING => User::getRolesNames()[static::TYPE_RECOMMENDING],
 		];
 	}
 

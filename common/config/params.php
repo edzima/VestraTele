@@ -7,4 +7,8 @@ return [
 	'senderName' => 'Vestra CRM mailer',
 	'user.passwordResetTokenExpire' => 3600,
 	'user.passwordMinLength' => 8,
+	'phoneInput.preferredCountries' => [
+		'PL',
+		'UA',
+	],
 ];

@@ -2,14 +2,19 @@
 
 namespace console\controllers;
 
+use common\components\DbManager;
 use common\models\user\Customer;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\rbac\OwnModelRule;
+use Exception;
 use Yii;
+use yii\base\InvalidArgumentException;
 use yii\console\Controller;
 use yii\helpers\Console;
 use yii\rbac\Item;
+use yii\rbac\Permission;
+use yii\rbac\Role;
 
 /**
  * Class RbacController
@@ -20,14 +25,18 @@ class RbacController extends Controller {
 
 	public array $roles = [
 		Worker::ROLE_AGENT,
+		Worker::ROLE_CO_AGENT,
 		Worker::ROLE_BOOKKEEPER,
 		Worker::ROLE_CUSTOMER_SERVICE,
 		Worker::ROLE_LAWYER,
+		Worker::ROLE_LAWYER_ASSISTANT,
 		Worker::ROLE_TELEMARKETER,
 		Customer::ROLE_CUSTOMER,
 		Customer::ROLE_VICTIM,
 		Customer::ROLE_SHAREHOLDER,
 		Customer::ROLE_HANDICAPPED,
+		User::ROLE_RECCOMENDING,
+		User::ROLE_GUARDIAN,
 	];
 
 	public array $permissions = [
@@ -35,7 +44,13 @@ class RbacController extends Controller {
 		Worker::PERMISSION_COST => [
 			Worker::ROLE_BOOKKEEPER,
 		],
+		Worker::PERMISSION_COST_DEBT => [
+			Worker::ROLE_BOOKKEEPER,
+		],
 		Worker::PERMISSION_CALCULATION_TO_CREATE => [
+			Worker::ROLE_BOOKKEEPER,
+		],
+		Worker::PERMISSION_CALCULATION_UPDATE => [
 			Worker::ROLE_BOOKKEEPER,
 		],
 		Worker::PERMISSION_CALCULATION_PAYS => [
@@ -46,10 +61,17 @@ class RbacController extends Controller {
 		],
 		User::PERMISSION_EXPORT,
 		User::PERMISSION_ISSUE,
+		Worker::PERMISSION_ISSUE_CREATE,
+		Worker::PERMISSION_ISSUE_LINK_USER,
+		Worker::PERMISSION_ISSUE_DELETE,
+		Worker::PERMISSION_ISSUE_STAGE_CHANGE,
+		Worker::PERMISSION_ISSUE_CLAIM,
+		Worker::PERMISSION_HINT,
 		User::PERMISSION_LOGS,
-		Worker::PERMISSION_MEET,
 		User::PERMISSION_NEWS,
 		User::PERMISSION_NOTE,
+		User::PERMISSION_NOTE_UPDATE,
+		Worker::PERMISSION_NOTE_TEMPLATE,
 		User::PERMISSION_PROVISION,
 		Worker::PERMISSION_PAY => [
 			Worker::ROLE_BOOKKEEPER,
@@ -57,13 +79,42 @@ class RbacController extends Controller {
 		Worker::PERMISSION_PAYS_DELAYED => [
 			Worker::ROLE_BOOKKEEPER,
 		],
+		Worker::PERMISSION_PAY_PART_PAYED => [
+			Worker::ROLE_BOOKKEEPER,
+		],
 		Worker::PERMISSION_PAY_RECEIVED => [
+			Worker::ROLE_BOOKKEEPER,
+		],
+		Worker::PERMISSION_PAY_PAID => [
+			Worker::ROLE_BOOKKEEPER,
+		],
+		Worker::PERMISSION_PAY_UPDATE => [
+			Worker::ROLE_BOOKKEEPER,
+			Worker::ROLE_AGENT,
+		],
+		Worker::PERMISSION_PAY_ALL_PAID => [
 			Worker::ROLE_BOOKKEEPER,
 		],
 		Worker::PERMISSION_SUMMON => [
 			Worker::ROLE_AGENT,
 		],
+		Worker::PERMISSION_SUMMON_MANAGER,
+		Worker::PERMISSION_SUMMON_CREATE,
+		Worker::PERMISSION_SMS,
+		Worker::PERMISSION_MULTIPLE_SMS,
+		User::PERMISSION_USER_TRAITS,
 		Worker::PERMISSION_WORKERS,
+		Worker::PERMISSION_WORKERS_HIERARCHY,
+		Worker::PERMISSION_LEAD,
+		Worker::PERMISSION_LEAD_DELETE,
+		Worker::PERMISSION_LEAD_DIALER,
+		Worker::PERMISSION_LEAD_DIALER_MANAGER,
+		Worker::PERMISSION_LEAD_DUPLICATE,
+		Worker::PERMISSION_LEAD_IMPORT,
+		Worker::PERMISSION_LEAD_MARKET,
+		Worker::PERMISSION_LEAD_STATUS,
+		Worker::PERMISSION_MESSAGE_TEMPLATE,
+		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
 	];
 
 	public function actionInit(): void {
@@ -102,6 +153,41 @@ class RbacController extends Controller {
 		}
 
 		Console::output('Success! RBAC roles has been added.');
+	}
+
+	public function actionCreateNotExist(): void {
+		$auth = Yii::$app->authManager;
+		$roles = $auth->getRoles();
+		$newRoles = [];
+		foreach ($this->roles as $role) {
+			if (!isset($roles[$role])) {
+				Console::output('New Role to Add: ' . $role);
+				$newRoles[] = $role;
+			}
+		}
+
+		$roles = $this->createRoles($newRoles);
+		foreach ($roles as $role) {
+			$this->assignAdmin($role);
+		}
+
+		$permissions = $auth->getPermissions();
+		$newPermissions = [];
+
+		foreach ($this->permissions as $permissionName => $roles) {
+			if (!is_string($permissionName) && is_string($roles)) {
+				$permissionName = $roles;
+			}
+			if (!isset($permissions[$permissionName])) {
+				Console::output('New Permission to Add: ' . $permissionName);
+				$newPermissions[$permissionName] = $roles;
+			}
+		}
+
+		$permissions = $this->createPermissions($newPermissions);
+		foreach ($permissions as $permission) {
+			$this->assignAdmin($permission);
+		}
 	}
 
 	private function createRoles(array $roles): array {
@@ -159,6 +245,14 @@ class RbacController extends Controller {
 		Console::output('Success add role: ' . $name);
 	}
 
+	public function actionRemoveRole(string $name): void {
+		$auth = Yii::$app->authManager;
+		$role = $auth->getRole($name);
+		if ($role && $auth->remove($role)) {
+			Console::output('Success remove Role: ' . $name);
+		}
+	}
+
 	public function actionAddPermission(string $name, bool $admin = true): void {
 		$auth = Yii::$app->authManager;
 		$permission = $auth->createPermission($name);
@@ -167,5 +261,65 @@ class RbacController extends Controller {
 			$this->assignAdmin($permission);
 		}
 		Console::output('Success add permission: ' . $name);
+	}
+
+	public function actionRemovePermission(string $name): void {
+		$auth = Yii::$app->authManager;
+		$permission = $auth->getPermission($name);
+		if ($permission && $auth->remove($permission)) {
+			Console::output('Success remove Permission: ' . $name);
+		}
+	}
+
+	public function actionAddChildRolePermission(string $roleName, string $permissionName): void {
+		$auth = Yii::$app->authManager;
+		$role = $auth->getRole($roleName);
+		if ($role === null) {
+			Console::output("Role with name: $roleName not found.");
+			return;
+		}
+		$permission = $auth->getPermission($permissionName);
+		if ($permission === null) {
+			Console::output("Permission with name: $permissionName not found.");
+			return;
+		}
+		$auth->addChild($role, $permission);
+		Console::output("Success add permission: $permissionName as child: $roleName.");
+	}
+
+	public function actionCopy(int $type, string $from, string $to): void {
+		$types = [Item::TYPE_ROLE, Item::TYPE_PERMISSION];
+		if (!in_array($type, $types, true)) {
+			throw new InvalidArgumentException('Invalid Rbac Item $type.');
+		}
+		$auth = Yii::$app->authManager;
+		$ids = $auth->getUserIdsByRole($from);
+		$item = $type === Item::TYPE_ROLE
+			? new Role()
+			: new Permission();
+		$item->name = $to;
+		$count = 0;
+		foreach ($ids as $id) {
+			try {
+				$auth->assign($item, $id);
+				$count++;
+			} catch (Exception $exception) {
+				Console::output($exception->getMessage());
+			}
+		}
+		Console::output('Copy rbac items: ' . $count);
+	}
+
+	public function actionClearAssignments(): void {
+		$auth = Yii::$app->authManager;
+		if ($auth instanceof DbManager) {
+			$count = Yii::$app->db->createCommand()
+				->delete($auth->assignmentTable, [
+					'NOT IN', 'user_id', User::find()->select('id')->column(),
+				])
+				->execute();
+
+			Console::output('Delete Assignmnets: ' . $count);
+		}
 	}
 }

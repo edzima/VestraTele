@@ -1,7 +1,6 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
-use backend\helpers\Url;
 use common\models\issue\Summon;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
@@ -49,11 +48,11 @@ YiiAsset::register($this);
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [
-			'title:text',
+			'type.name',
+			'titleWithDocs:text',
 			'issue.longId:text:Sprawa',
 			'owner',
 			'contractor',
-			'typeName',
 			'statusName',
 			'entityWithCity',
 			'start_at:date',
@@ -69,7 +68,6 @@ YiiAsset::register($this);
 	<?= IssueNotesWidget::widget([
 		'model' => $model->issue,
 		'notes' => $model->issue->getIssueNotes()->onlySummon($model->id)->all(),
-		'addUrl' => Url::to(['/issue/note/create-summon', 'id' => $model->id]),
 	]) ?>
 
 

@@ -6,4 +6,7 @@ modules:
     - Yii2:
         part: [ orm, fixtures, email ]
         cleanup: true
+    - \common\tests\Helper\QueueHelper:
+        - depends: Yii2
     - Asserts
+

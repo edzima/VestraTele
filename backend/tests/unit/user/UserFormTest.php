@@ -6,12 +6,14 @@ use backend\modules\user\models\UserForm;
 use backend\tests\unit\Unit;
 use common\fixtures\AddressFixture;
 use common\fixtures\helpers\TerytFixtureHelper;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\fixtures\user\UserAddressFixture;
 use common\fixtures\UserFixture;
 use common\fixtures\UserProfileFixture;
-use common\fixtures\UserTraitFixture;
+use common\fixtures\UserTraitAssignFixture;
 use common\models\user\User;
-use common\models\user\UserTrait;
+use common\models\user\UserTraitAssign;
+use Yii;
 
 class UserFormTest extends Unit {
 
@@ -36,9 +38,10 @@ class UserFormTest extends Unit {
 						'dataFile' => codecept_data_dir() . 'address.php',
 					],
 					'user-trait' => [
-						'class' => UserTraitFixture::class,
+						'class' => UserTraitAssignFixture::class,
 						'dataFile' => codecept_data_dir() . 'user_trait.php',
 					],
+					'trait' => UserFixtureHelper::traits(),
 				],
 				TerytFixtureHelper::fixtures()
 			)
@@ -75,8 +78,8 @@ class UserFormTest extends Unit {
 
 		expect($mail)->isInstanceOf('yii\mail\MessageInterface');
 		expect($mail->getTo())->hasKey('test@email.com');
-		expect($mail->getFrom())->hasKey(\Yii::$app->params['supportEmail']);
-		expect($mail->getSubject())->equals('Account registration at ' . \Yii::$app->name);
+		expect($mail->getFrom())->hasKey(Yii::$app->params['supportEmail']);
+		expect($mail->getSubject())->equals('Account registration at ' . Yii::$app->name);
 		//l	expect($mail->toString())->stringContainsString($user->verification_token);
 
 	}
@@ -109,42 +112,42 @@ class UserFormTest extends Unit {
 		$model = new UserForm();
 		$user = $this->tester->grabFixture('user', 0);
 		$model->setModel($user);
-		$model->traits = [UserTrait::TRAIT_BAILIFF];
+		$model->traits = [UserTraitAssign::TRAIT_BAILIFF];
 		$this->tester->assertTrue($model->save());
-		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
-		$this->tester->dontSeeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_COMMISSION_REFUND, 'user_id' => $user->id]);
+		$this->tester->seeRecord(UserTraitAssign::class, ['trait_id' => UserTraitAssign::TRAIT_BAILIFF, 'user_id' => $user->id]);
+		$this->tester->dontSeeRecord(UserTraitAssign::class, ['trait_id' => UserTraitAssign::TRAIT_COMMISSION_REFUND, 'user_id' => $user->id]);
 	}
 
 	public function testAssignTraitsToUser(): void {
 		$model = new UserForm();
 		$user = $this->tester->grabFixture('user', 0);
 		$model->setModel($user);
-		$model->traits = [UserTrait::TRAIT_COMMISSION_REFUND, UserTrait::TRAIT_BAILIFF];
+		$model->traits = [UserTraitAssign::TRAIT_COMMISSION_REFUND, UserTraitAssign::TRAIT_BAILIFF];
 		$this->tester->assertTrue($model->validate());
 		$this->tester->assertTrue($model->save());
-		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_BAILIFF, 'user_id' => $user->id]);
-		$this->tester->seeRecord(UserTrait::class, ['trait_id' => UserTrait::TRAIT_COMMISSION_REFUND, 'user_id' => $user->id]);
+		$this->tester->seeRecord(UserTraitAssign::class, ['trait_id' => UserTraitAssign::TRAIT_BAILIFF, 'user_id' => $user->id]);
+		$this->tester->seeRecord(UserTraitAssign::class, ['trait_id' => UserTraitAssign::TRAIT_COMMISSION_REFUND, 'user_id' => $user->id]);
 	}
 
 	public function testAssignTraitAsEmptyArray(): void {
 		$model = new UserForm();
 		$user = $this->tester->grabFixture('user', 0);
-		$this->tester->seeRecord(UserTrait::class, ['user_id' => $user->id]);
+		$this->tester->seeRecord(UserTraitAssign::class, ['user_id' => $user->id]);
 		$model->setModel($user);
 		$model->traits = [];
 		$this->tester->assertTrue($model->save());
-		$this->tester->dontSeeRecord(UserTrait::class, ['user_id' => $user->id]);
-		$this->tester->seeRecord(UserTrait::class, ['user_id' => 2]);
+		$this->tester->dontSeeRecord(UserTraitAssign::class, ['user_id' => $user->id]);
+		$this->tester->seeRecord(UserTraitAssign::class, ['user_id' => 2]);
 	}
 
 	public function testAssignTraitAsEmptyString(): void {
 		$model = new UserForm();
 		$user = $this->tester->grabFixture('user', 0);
-		$this->tester->seeRecord(UserTrait::class, ['user_id' => $user->id]);
+		$this->tester->seeRecord(UserTraitAssign::class, ['user_id' => $user->id]);
 		$model->setModel($user);
 		$model->traits = '';
 		$this->tester->assertTrue($model->save());
-		$this->tester->dontSeeRecord(UserTrait::class, ['user_id' => $user->id]);
-		$this->tester->seeRecord(UserTrait::class, ['user_id' => 2]);
+		$this->tester->dontSeeRecord(UserTraitAssign::class, ['user_id' => $user->id]);
+		$this->tester->seeRecord(UserTraitAssign::class, ['user_id' => 2]);
 	}
 }

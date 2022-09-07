@@ -102,7 +102,7 @@ class PayReceivedSearch extends PayReceived
 		}
 
 		$this->applyAgentsFilters($query);
-		$this->applyCustomerSurnameFilter($query);
+		$this->applyCustomerNameFilter($query);
 		$this->applyTransferFilter($query);
 
 		// grid filtering conditions
@@ -150,7 +150,7 @@ class PayReceivedSearch extends PayReceived
 		}
 	}
 
-	public function applyCustomerSurnameFilter(QueryInterface $query): void {
+	public function applyCustomerNameFilter(QueryInterface $query): void {
 		if (!empty($this->customerLastname)) {
 			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
 		}

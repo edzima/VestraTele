@@ -44,6 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'phone',
 				'value' => 'profile.phone',
 				'label' => UserProfile::instance()->getAttributeLabel('phone'),
+				'format' => 'tel',
 			],
 			[
 				'attribute' => 'status',
@@ -61,6 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'profile.genderName',
 				'filter' => UserProfile::getGendersNames(),
 			],
+			'created_at:datetime',
 			'action_at:Datetime',
 			[
 				'class' => ActionColumn::class,
@@ -75,8 +77,17 @@ $this->params['breadcrumbs'][] = $this->title;
 								'data-pjax' => '0',
 							]);
 					},
+					'link' => static function (string $url, Worker $model) {
+						return Html::a('<span class="glyphicon glyphicon-paperclip"></span>',
+							['/issue/user/link', 'userId' => $model->id],
+							[
+								'title' => Yii::t('backend', 'Link to issue'),
+								'aria-label' => Yii::t('backend', 'Link to issue'),
+								'data-pjax' => '0',
+							]);
+					},
 					'provision' => static function (string $url, Worker $model) {
-						return Html::a('<span class="glyphicon glyphicon-usd"></span>',
+						return Html::a('<i class="fa fa-percent"></i>',
 							Url::userProvisions($model->id),
 							[
 								'title' => Yii::t('backend', 'Provisions'),
@@ -89,8 +100,9 @@ $this->params['breadcrumbs'][] = $this->title;
 					'view' => true,
 					'update' => Yii::$app->user->can(Worker::PERMISSION_WORKERS),
 					'delete' => Yii::$app->user->can(Worker::PERMISSION_WORKERS),
-					'hierarchy' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
-					'provision' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
+					'hierarchy' => Yii::$app->user->can(Worker::PERMISSION_WORKERS_HIERARCHY),
+					'link' => Yii::$app->user->can(Worker::PERMISSION_ISSUE),
+					'provision' => Yii::$app->user->can(Worker::PERMISSION_PROVISION),
 				],
 
 			],

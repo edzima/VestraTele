@@ -1,36 +1,65 @@
 <?php
 
 use backend\modules\issue\models\search\IssueNoteSearch;
-use yii\helpers\Html;
-use yii\grid\GridView;
+use backend\widgets\GridView;
+use backend\widgets\IssueColumn;
+use common\models\issue\IssueNote;
+use common\widgets\grid\ActionColumn;
+use common\widgets\grid\DataColumn;
 
 /* @var $this yii\web\View */
 /* @var $searchModel IssueNoteSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Notatki';
+$this->title = Yii::t('issue', 'Issue Notes');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-note-index">
 
-	<h1><?= Html::encode($this->title) ?></h1>
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]); ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-			['class' => 'yii\grid\SerialColumn'],
+			['class' => IssueColumn::class],
 			[
-				'attribute' => 'issue_id',
-				'value' => 'issue',
-				'label' => 'Sprawa',
+				'attribute' => 'type',
+				'filter' => IssueNoteSearch::getTypesNames(),
+				'value' => 'typeKind',
+				'noWrap' => true,
 			],
-			'user',
+			[
+				'class' => DataColumn::class,
+				'attribute' => 'user_id',
+				'value' => 'user',
+				'filter' => IssueNoteSearch::getUsersNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'options' => [
+						'placeholder' => $searchModel->getAttributeLabel('user_id'),
+					],
+				],
+			],
 			'title',
 			'description',
-
-			['class' => 'yii\grid\ActionColumn'],
+			'is_pinned:boolean',
+			'is_template:boolean',
+			'publish_at:datetime',
+			'created_at:datetime',
+			'updated_at:datetime',
+			[
+				'class' => ActionColumn::class,
+				'visibleButtons' => [
+					'update' => function (IssueNote $note): bool {
+						return !$note->isSms();
+					},
+					'delete' => function (IssueNote $note): bool {
+						return Yii::$app->user->canDeleteNote($note);
+					},
+				],
+			],
 		],
 	]); ?>
 </div>

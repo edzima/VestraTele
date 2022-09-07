@@ -1,17 +1,26 @@
 <?php
 
+use backend\helpers\Html;
+use backend\helpers\Url;
 use backend\modules\issue\models\search\IssueSearch;
+use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\widgets\CsvForm;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
 use common\models\issue\Issue;
-use common\models\user\User;
+use common\models\user\Worker;
+use common\modules\issue\IssueNoteColumn;
+use common\modules\issue\widgets\IssueClaimCompanyColumn;
+use common\modules\issue\widgets\IssuePaysColumnWidget;
+use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
-use kartik\grid\ActionColumn;
-use kartik\grid\DataColumn;
+use common\widgets\grid\DataColumn;
+use common\widgets\grid\IssueTypeColumn;
+use common\widgets\grid\SelectionForm;
+use kartik\grid\CheckboxColumn;
 use kartik\grid\SerialColumn;
+use kartik\select2\Select2;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Html;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
@@ -21,102 +30,136 @@ use yii\widgets\Pjax;
 $this->title = Yii::t('backend', 'Issues');
 $this->params['breadcrumbs'][] = $this->title;
 
-$js = <<<JS
-//@todo move to external class and use in frontend.
-function moveCursorToEnd(el) {
-	if (typeof el.selectionStart == "number") {
-		el.selectionStart = el.selectionEnd = el.value.length;
-	} else if (typeof el.createTextRange != "undefined") {
-		el.focus();
-		var range = el.createTextRange();
-		range.collapse(false);
-		range.select();
-	}
-}
-	var timeout;
-	var filteredId = '';
-	var submit_form = true;
-	var filter_selector = '.dynamic-search';
-
-	
-	$("body").on('beforeFilter', "#issues-list" , function(event) {
-    return submit_form;
-});
-
-$("body").on('afterFilter', "#issues-list" , function(event) {
-    submit_form = false;
-});
-	
-	$(document)
-.off('keydown.yiiGridView change.yiiGridView', filter_selector)
-.on('keyup', filter_selector, function(evt) {
-   clearTimeout(timeout);
-			timeout = setTimeout(function(){
-				submit_form = true;
-				filteredId = evt.target.getAttribute('id');
-				$("#issues-list").yiiGridView("applyFilter");
-			},1000);
-})
-.on('pjax:success', function() {
-	submit_form = true;
-	var i = document.getElementById(filteredId);
-	if(i){
-		i.focus();
-		moveCursorToEnd(i);
-	}
-});
-
-JS;
-//$this->registerJs($js);
-
 ?>
-<div class="issue-index relative">
-	<?php Pjax::begin(); ?>
+<div class="issue-index">
+	<?php Pjax::begin([
+		'timeout' => 2000,
+	]); ?>
 
-	<p>
-		<?= Yii::$app->user->can(User::PERMISSION_SUMMON)
+	<div class="clearfix form-group">
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
 			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index'], ['class' => 'btn btn-warning'])
 			: ''
 		?>
-		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER)
+		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE)
+			? Html::a(Yii::t('issue', 'Issue Notes'), ['note/index'], ['class' => 'btn btn-info'])
+			: ''
+		?>
+		<?= Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)
 			? Html::a(Yii::t('backend', 'Settlements'), ['/settlement/calculation/index'], ['class' => 'btn btn-success'])
 			: ''
 		?>
-	</p>
+		<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
+			? CsvForm::widget([
+				'formOptions' => ['class' => 'pull-right'],
+			])
+			: ''
+		?>
+
+
+	</div>
+
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
-	<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget() : '' ?>
+
+	<div class="grid-selection-links-wrapper">
+
+
+		<?php
+		SelectionForm::begin([
+			'formWrapperSelector' => '.selection-form-wrapper',
+			'gridId' => 'issues-list',
+		]);
+		?>
+
+		<p class="selection-form-wrapper hidden">
+			<?= Yii::$app->user->can(Worker::PERMISSION_MULTIPLE_SMS)
+			&& !empty($dataProvider->getModels())
+			&& $dataProvider->pagination->pageCount > 1
+				? Html::a(
+					Yii::t('backend', 'Send SMS: {count}', [
+						'count' => count($searchModel->getAllIds($dataProvider->query)),
+					]), [
+					'sms/push-multiple',
+				],
+					[
+						'data' => [
+							'pjax' => '0',
+							'method' => 'POST',
+							'params' => [
+								'ids' => $searchModel->getAllIds($dataProvider->query),
+							],
+						],
+						'class' => 'btn btn-success',
+					]
+				)
+				: ''
+			?>
+
+			<?= Yii::$app->user->can(Worker::PERMISSION_MULTIPLE_SMS)
+				? Html::submitButton(
+					Yii::t('backend', 'Send SMS'),
+					[
+						'class' => 'btn btn-success',
+						'name' => 'route',
+						'value' => 'sms/push-multiple',
+						'data-pjax' => '0',
+					])
+				: ''
+			?>
+		</p>
+	</div>
+
+
+	<?php
+	//@todo remove this after migrate BS4 (add data-boundary="viewport")
+	//@see https://stackoverflow.com/questions/26018756/bootstrap-button-drop-down-inside-responsive-table-not-visible-because-of-scroll#answer-51992907
+	$this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
+	     $('.table-responsive').css('overflow', 'inherit' );
+		});
+
+		$('.table-responsive').on('hide.bs.dropdown', function () {
+            $('.table-responsive').css( 'overflow', 'auto' );
+	})"
+	);
+	?>
 
 	<?= GridView::widget([
 		'id' => 'issues-list',
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'resizableColumns' => false,
-		'tableOptions' => [
-			'class' => 'table-fixed-layout',
-		],
+		'rowOptions' => function (Issue $issue): array {
+			if ($issue->hasDelayedStage()) {
+				return [
+					'class' => 'danger',
+				];
+			}
+			return [];
+		},
 		'columns' => [
+			Yii::$app->user->can(Worker::PERMISSION_MULTIPLE_SMS)
+				? [
+				'class' => CheckboxColumn::class,
+			]
+				: [
+				'visible' => false,
+			],
 			[
 				'class' => SerialColumn::class,
 				'width' => '40px',
 			],
 			[
-				'class' => ActionColumn::class,
-				'noWrap' => true,
-				'options' => [
-					'style' => 'width:110px',
-				],
-				'visibleButtons' => [
-					'view' => static function (Issue $model) use ($searchModel): bool {
-						return !$model->isArchived() || $searchModel->withArchive;
-					},
-					'delete' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
-				],
+				'class' => IssueColumn::class,
 			],
 			[
-				'class' => IssueColumn::class,
-				'issueAttribute' => null,
+				'attribute' => 'signature_act',
+				'visible' => !empty($searchModel->signature_act),
+				'options' => [
+					'style' => 'width:180px',
+				],
 			],
+
 			[
 				'class' => DataColumn::class,
 				'filterType' => GridView::FILTER_SELECT2,
@@ -132,35 +175,56 @@ JS;
 						'placeholder' => $searchModel->getAttributeLabel('agent_id'),
 					],
 				],
-				'contentOptions' => [
-					'class' => 'ellipsis',
-				],
+				'ellipsis' => true,
 				'options' => [
-					'style' => 'width:200px',
+					'style' => 'width:10%',
 				],
 			],
 			[
-				'class' => DataColumn::class,
+				'class' => IssueTypeColumn::class,
 				'attribute' => 'type_id',
-				'filter' => IssueSearch::getTypesNames(),
-				'value' => 'type.short_name',
-				'contentOptions' => [
-					'class' => 'bold-text text-center',
-				],
-				'options' => [
-					'style' => 'width:80px',
-				],
+			],
+			[
+				'class' => CustomerDataColumn::class,
+				'value' => 'customer.fullName',
+				'attribute' => 'customerName',
 			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'stage_id',
 				'filter' => $searchModel->getStagesNames(),
-				'value' => 'stage.short_name',
-				'contentOptions' => [
-					'class' => 'bold-text text-center',
-				],
+				'value' => static function (Issue $model): string {
+					return StageChangeButtonDropdown::widget([
+						'model' => $model,
+						'label' => $model->stage->name,
+						'containerOptions' => [
+							'class' => 'd-inline-flex',
+						],
+						'returnUrl' => Url::to('/issue/issue/index'),
+						'options' => [
+							'class' => 'btn btn-default btn-sm',
+							'title' => Yii::t('backend', 'Change Stage'),
+							'aria-label' => Yii::t('backend', 'Change Stage'),
+							'data-pjax' => 0,
+						],
+					]);
+				},
 				'options' => [
-					'style' => 'width:60px',
+					'style' => 'width:250px',
+				],
+				'format' => 'raw',
+				'contentBold' => true,
+				'contentCenter' => true,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('issue', 'Stage'),
+				],
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
 				],
 			],
 			[
@@ -176,34 +240,36 @@ JS;
 						'placeholder' => $searchModel->getAttributeLabel('entity_responsible_id'),
 					],
 				],
+				'ellipsis' => true,
 				'value' => 'entityResponsible.name',
 				'options' => [
-					'style' => 'width:200px',
+					'style' => 'width:140px',
 				],
 			],
+
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'stage_change_at',
 				'format' => 'date',
-				'contentOptions' => [
-					'class' => 'bold-text',
+				'contentBold' => true,
+				'options' => [
+					'style' => 'width:95px',
 				],
+			],
+			[
+				'class' => DataColumn::class,
+				'attribute' => 'signing_at',
+				'format' => 'date',
 				'options' => [
 					'style' => 'width:90px',
 				],
-				'visible' => $searchModel->onlyDelayed,
-			],
-			[
-				'class' => CustomerDataColumn::class,
-				'value' => 'customer.fullName',
+				'visible' => !empty($searchModel->signedAtFrom) || !empty($searchModel->signedAtTo),
 			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'created_at',
 				'format' => 'date',
-				'contentOptions' => [
-					'class' => 'bold-text',
-				],
+				'contentBold' => true,
 				'options' => [
 					'style' => 'width:90px',
 				],
@@ -212,15 +278,81 @@ JS;
 				'class' => DataColumn::class,
 				'attribute' => 'updated_at',
 				'format' => 'date',
-				'contentOptions' => [
-					'class' => 'bold-text',
-				],
+				'contentBold' => true,
 				'options' => [
-					'style' => 'width:90px',
+					'style' => 'width:99px',
+				],
+			],
+			[
+				'class' => IssueClaimCompanyColumn::class,
+				'attribute' => 'claimCompanyTryingValue',
+			],
+			[
+				'class' => IssueNoteColumn::class,
+			],
+			[
+				'class' => IssuePaysColumnWidget::class,
+				'visible' => Yii::$app->user->can(Worker::PERMISSION_PAY_ALL_PAID),
+			],
+			[
+				'class' => ActionColumn::class,
+				'template' => '{installment} {link} {note} {sms} {view} {update} {delete}',
+				'buttons' => [
+					'installment' => static function (string $url, Issue $model): string {
+						return Html::a('<i class="fa fa-money" aria-hidden="true"></i>',
+							['/settlement/cost/create-installment', 'id' => $model->id, 'user_id' => $model->agent->id],
+							[
+								'title' => Yii::t('settlement', 'Create Installment'),
+								'aria-label' => Yii::t('settlement', 'Create Installment'),
+							]
+						);
+					},
+					'link' => static function (string $url, Issue $model) {
+						return Html::a('<span class="glyphicon glyphicon-paperclip"></span>',
+							['/issue/relation/create', 'id' => $model->id],
+							[
+								'title' => Yii::t('backend', 'Link'),
+								'aria-label' => Yii::t('backend', 'Link'),
+								'data-pjax' => '0',
+							]);
+					},
+					'note' => static function (string $url, Issue $model): string {
+						return Html::a('<i class="fa fa-comments" aria-hidden="true"></i>',
+							['note/create', 'issueId' => $model->id],
+							[
+								'title' => Yii::t('issue', 'Create Issue Note'),
+								'aria-label' => Yii::t('issue', 'Create Issue Note'),
+							]
+						);
+					},
+					'sms' => static function (string $url, Issue $model): string {
+						return Html::a('<i class="fa fa-envelope" aria-hidden="true"></i>',
+							['sms/push', 'id' => $model->id],
+							[
+								'title' => Yii::t('common', 'Send SMS'),
+								'aria-label' => Yii::t('common', 'Send SMS'),
+							]
+						);
+					},
+				],
+				'visibleButtons' => [
+					'installment' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
+					'note' => Yii::$app->user->can(Worker::PERMISSION_NOTE),
+					'view' => static function (Issue $model) use ($searchModel): bool {
+						return !$model->isArchived() || $searchModel->withArchive;
+					},
+					'link' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
+					'sms' => Yii::$app->user->can(Worker::PERMISSION_SMS),
+					'delete' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE),
 				],
 			],
 
 		],
 	]); ?>
-	<?php Pjax::end(); ?>
+	<?php
+	SelectionForm::end();
+	Pjax::end();
+	?>
+
+
 </div>

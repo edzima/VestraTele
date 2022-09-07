@@ -2,9 +2,8 @@
 
 namespace common\models\user;
 
-use common\models\hierarchy\HierarchyModel;
+use common\models\hierarchy\ActiveHierarchy;
 use common\models\user\query\UserQuery;
-use Yii;
 use yii\db\ActiveQuery;
 
 /**
@@ -16,7 +15,7 @@ use yii\db\ActiveQuery;
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  *
  */
-class Worker extends User implements HierarchyModel {
+class Worker extends User implements ActiveHierarchy {
 
 	public const ROLES = [
 		self::ROLE_AGENT,
@@ -24,13 +23,25 @@ class Worker extends User implements HierarchyModel {
 		self::ROLE_BOOKKEEPER,
 		self::ROLE_CUSTOMER_SERVICE,
 		self::ROLE_LAWYER,
+		self::ROLE_MANAGER,
 	];
 
-	private static $USER_NAMES = [];
+	public const PERMISSION_ISSUE_CREATE = 'issue.create';
+	public const PERMISSION_ISSUE_DELETE = 'issue.delete';
+	public const PERMISSION_ISSUE_LINK_USER = 'issue.link-user';
+	public const PERMISSION_ISSUE_CLAIM = 'issue.claim';
+	public const PERMISSION_ISSUE_STAGE_CHANGE = 'issue.stage.change';
 
-	public function hasParent(): bool {
-		return $this->boss !== null;
-	}
+	public const PERMISSION_NOTE_TEMPLATE = 'note.template';
+	public const PERMISSION_COST_DEBT = 'cost.debt';
+	public const PERMISSION_PROVISION_CHILDREN_VISIBLE = 'provision.children.visible';
+	public const PERMISSION_NOTE_DELETE = 'note.delete';
+	public const PERMISSION_SUMMON_MANAGER = 'summon.manager';
+	public const PERMISSION_SUMMON_CREATE = 'summon.create';
+
+	public const PERMISSION_PAY_ALL_PAID = 'pay.all-paid';
+
+	private static $USER_NAMES = [];
 
 	public function getParent(): ActiveQuery {
 		return $this->hasOne(static::class, ['id' => 'boss']);
@@ -38,26 +49,6 @@ class Worker extends User implements HierarchyModel {
 
 	public function getParentsQuery(): ActiveQuery {
 		return static::find()->where(['id' => $this->getParentsIds()]);
-	}
-
-	public function getParentsIds(): array {
-		if (!$this->hasParent()) {
-			return [];
-		}
-		return Yii::$app->userHierarchy->getParentsIds($this->id);
-	}
-
-	public function getChildesIds(): array {
-		return Yii::$app->userHierarchy->getChildesIds($this->id);
-	}
-
-	public function getAllChildesQuery(): ActiveQuery {
-		return static::find()->where(['id' => $this->getAllChildesIds()]);
-	}
-
-	public function getAllChildesIds(): array {
-		return Yii::$app
-			->userHierarchy->getAllChildesIds($this->id);
 	}
 
 	public static function userName(int $id): string {
@@ -80,7 +71,4 @@ class Worker extends User implements HierarchyModel {
 		return parent::find()->workers();
 	}
 
-	public function getParentId(): ?int {
-		return $this->boss;
-	}
 }

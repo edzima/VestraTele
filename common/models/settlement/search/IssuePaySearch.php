@@ -4,10 +4,12 @@ namespace common\models\settlement\search;
 
 use common\models\AgentSearchInterface;
 use common\models\issue\IssuePay;
+use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\search\ArchivedIssueSearch;
+use common\models\issue\search\IssueTypeSearch;
 use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\query\UserQuery;
@@ -24,6 +26,7 @@ use yii\db\QueryInterface;
 class IssuePaySearch extends IssuePay implements
 	AgentSearchInterface,
 	ArchivedIssueSearch,
+	IssueTypeSearch,
 	CustomerSearchInterface,
 	SearchModel {
 
@@ -49,6 +52,7 @@ class IssuePaySearch extends IssuePay implements
 
 	public $agent_id;
 
+	public $issueTypesIds = [];
 	public $calculationType;
 	public $deadlineAtFrom;
 	public $deadlineAtTo;
@@ -86,6 +90,7 @@ class IssuePaySearch extends IssuePay implements
 				return array_keys($this->getAgentsNames());
 			}, 'allowArray' => true,
 			],
+			['issueTypesIds', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
 		];
 	}
 
@@ -139,6 +144,7 @@ class IssuePaySearch extends IssuePay implements
 				$query->joinWith('userProfile CP');
 			},
 		]);
+		$query->joinWith('issue.type IT');
 		if (!$this->getWithArchive()) {
 			$query->joinWith([
 				'issue' => function (IssueQuery $query): void {
@@ -166,8 +172,9 @@ class IssuePaySearch extends IssuePay implements
 		}
 
 		$this->applyAgentsFilters($query);
-		$this->applyCustomerSurnameFilter($query);
+		$this->applyCustomerNameFilter($query);
 		$this->applyDelayFilter($query);
+		$this->applyIssueTypeFilter($query);
 
 		//	$this->applyStatusFilter($query);
 
@@ -195,7 +202,7 @@ class IssuePaySearch extends IssuePay implements
 		}
 	}
 
-	public function applyCustomerSurnameFilter(QueryInterface $query): void {
+	public function applyCustomerNameFilter(QueryInterface $query): void {
 		if (!empty($this->customerLastname)) {
 			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
 		}
@@ -238,10 +245,10 @@ class IssuePaySearch extends IssuePay implements
 			case static::PAY_STATUS_ALL:
 				break;
 			case static::PAY_STATUS_NOT_PAYED:
-				$query->onlyNotPayed();
+				$query->onlyUnpaid();
 				break;
 			case static::PAY_STATUS_PAYED:
-				$query->onlyPayed();
+				$query->onlyPaid();
 				break;
 		}
 	}
@@ -298,5 +305,15 @@ class IssuePaySearch extends IssuePay implements
 
 	public function getWithArchive(): bool {
 		return $this->withArchive;
+	}
+
+	public function applyIssueTypeFilter(QueryInterface $query): void {
+		if (!empty($this->issueTypesIds)) {
+			$query->andWhere(['IT.id' => $this->issueTypesIds]);
+		}
+	}
+
+	public static function getIssueTypesNames(): array {
+		return IssueType::getTypesNames();
 	}
 }

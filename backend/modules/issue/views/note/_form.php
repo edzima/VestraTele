@@ -1,26 +1,15 @@
 <?php
 
 use backend\modules\issue\models\IssueNoteForm;
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use common\modules\issue\widgets\IssueNoteFormWidget;
 
 /* @var $this yii\web\View */
 /* @var $model IssueNoteForm */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="issue-note-form">
+<?= IssueNoteFormWidget::widget([
+	'model' => $model,
+]) ?>
 
-	<?php $form = ActiveForm::begin(); ?>
 
-	<?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-
-	<?= $form->field($model, 'description')->textarea(['rows' => 4, 'autocomplete' => true]) ?>
-
-	<div class="form-group">
-		<?= Html::submitButton('Zapisz', ['class' => 'btn btn-success']) ?>
-	</div>
-
-	<?php ActiveForm::end(); ?>
-
-</div>

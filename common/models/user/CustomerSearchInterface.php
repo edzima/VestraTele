@@ -6,5 +6,5 @@ use yii\db\QueryInterface;
 
 interface CustomerSearchInterface extends SurnameSearchInterface {
 	
-	public function applyCustomerSurnameFilter(QueryInterface $query): void;
+	public function applyCustomerNameFilter(QueryInterface $query): void;
 }

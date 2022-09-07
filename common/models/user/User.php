@@ -3,8 +3,14 @@
 namespace common\models\user;
 
 use common\models\Address;
+use common\models\hierarchy\Hierarchy;
+use common\models\issue\IssueCost;
 use common\models\issue\IssueUser;
+use common\models\issue\query\IssueCostQuery;
+use common\models\provision\Provision;
+use common\models\provision\ProvisionQuery;
 use common\models\user\query\UserQuery;
+use common\modules\lead\models\LeadUserInterface;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -22,7 +28,7 @@ use yii\web\IdentityInterface;
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $verification_token
- * @property string $email
+ * @property string|null $email
  * @property integer $status
  * @property string $ip
  * @property integer $created_at
@@ -36,10 +42,11 @@ use yii\web\IdentityInterface;
  * @property-read Address|null $homeAddress
  * @property-read Address|null $postalAddress
  * @property-read IssueUser[] $issueUsers
- * @property-read UserTrait[] $traits
+ * @property-read UserTraitAssign[] $traits
+ * @property-read IssueCost[] $costs
  *
  */
-class User extends ActiveRecord implements IdentityInterface {
+class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUserInterface {
 
 	public const STATUS_INACTIVE = 0;
 	public const STATUS_ACTIVE = 1;
@@ -52,16 +59,23 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const ROLE_MANAGER = 'manager';
 	public const ROLE_USER = 'user';
 
+	public const ROLE_RECCOMENDING = 'recommending';
+
 	//workers
 	public const ROLE_AGENT = 'agent';
+	public const ROLE_CO_AGENT = 'co-agent';
 	public const ROLE_BOOKKEEPER = 'book_keeper';
 	public const ROLE_CUSTOMER_SERVICE = 'customer_service';
 	public const ROLE_TELEMARKETER = 'telemarketer';
 	public const ROLE_LAWYER = 'lawyer';
+	public const ROLE_LAWYER_ASSISTANT = 'lawyer_assistant';
+	public const ROLE_GUARDIAN = 'guardian';
 
 	public const PERMISSION_ARCHIVE = 'archive';
+	public const PERMISSION_MESSAGE_TEMPLATE = 'message.template';
 	public const PERMISSION_EXPORT = 'export';
 	public const PERMISSION_ISSUE = 'issue';
+	public const PERMISSION_HINT = 'hint';
 	public const PERMISSION_LOGS = 'logs';
 	public const PERMISSION_MEET = 'meet';
 	public const PERMISSION_NEWS = 'news';
@@ -70,16 +84,36 @@ class User extends ActiveRecord implements IdentityInterface {
 	public const PERMISSION_COST = 'cost';
 
 	public const PERMISSION_CALCULATION_TO_CREATE = 'calculation.to-create';
+	public const PERMISSION_CALCULATION_UPDATE = 'calculation.update';
 	public const PERMISSION_CALCULATION_PROBLEMS = 'calculation.problems';
 	public const PERMISSION_CALCULATION_PAYS = 'calculation.pays';
 
 	public const PERMISSION_PAY = 'pay';
+	public const PERMISSION_PAY_UPDATE = 'pay.update';
+	public const PERMISSION_PAY_PAID = 'pay.paid';
 	public const PERMISSION_PAY_RECEIVED = 'pay.received';
 	public const PERMISSION_PAYS_DELAYED = 'pays.delayed';
+	public const PERMISSION_PAY_PART_PAYED = 'pay.part-payed';
 
 	public const PERMISSION_PROVISION = 'provision';
 
 	public const PERMISSION_WORKERS = 'workers';
+	public const PERMISSION_WORKERS_HIERARCHY = 'workers.hierarchy';
+
+	public const PERMISSION_LEAD = 'lead';
+	public const PERMISSION_LEAD_DIALER = 'lead.dialer';
+	public const PERMISSION_LEAD_DIALER_MANAGER = 'lead.dialer.manager';
+	public const PERMISSION_LEAD_IMPORT = 'lead.import';
+	public const PERMISSION_LEAD_MARKET = 'lead.market';
+	public const PERMISSION_LEAD_STATUS = 'lead.status';
+	public const PERMISSION_LEAD_DUPLICATE = 'lead.duplicate';
+
+	public const PERMISSION_CZATER = 'czater';
+	public const PERMISSION_SMS = 'sms';
+	public const PERMISSION_MULTIPLE_SMS = 'sms.multiple';
+	public const PERMISSION_LEAD_DELETE = 'lead.delete';
+	public const PERMISSION_USER_TRAITS = 'user.traits';
+	public const PERMISSION_NOTE_UPDATE = 'note.update';
 
 	private static $ROLES_NAMES;
 	private static $PERMISSIONS_NAMES;
@@ -120,6 +154,17 @@ class User extends ActiveRecord implements IdentityInterface {
 		return $name;
 	}
 
+	public function getPhone(): ?string {
+		$profile = $this->profile;
+		if (!empty($profile->phone)) {
+			return $profile->phone;
+		}
+		if (!empty($profile->phone_2)) {
+			return $profile->phone_2;
+		}
+		return null;
+	}
+
 	/**
 	 * @inheritdoc
 	 */
@@ -151,10 +196,52 @@ class User extends ActiveRecord implements IdentityInterface {
 		];
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getUserProfile() {
+	public function hasParent(): bool {
+		return $this->getParentId() !== null;
+	}
+
+	public function getParentId(): ?int {
+		return $this->boss;
+	}
+
+	public function getParentsIds(): array {
+		if (!$this->hasParent()) {
+			return [];
+		}
+		return Yii::$app->userHierarchy->getParentsIds($this->id);
+	}
+
+	public function getChildesIds(): array {
+		return Yii::$app->userHierarchy->getChildesIds($this->id);
+	}
+
+	public function getAllChildesQuery(): UserQuery {
+		return static::find()->where(['id' => $this->getAllChildesIds()]);
+	}
+
+	public function getAllParentsQuery(): ?UserQuery {
+		if ($this->hasParent()) {
+			return static::find()->where(['id' => $this->getParentsIds()]);
+		}
+		return null;
+	}
+
+	public function getAllChildesIds(): array {
+		return Yii::$app
+			->userHierarchy->getAllChildesIds($this->id);
+	}
+
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getIssueCosts(): IssueCostQuery {
+		return $this->hasMany(IssueCost::class, ['user_id' => 'id']);
+	}
+
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getProvisions(): ProvisionQuery {
+		return $this->hasMany(Provision::class, ['to_user_id' => 'id']);
+	}
+
+	public function getUserProfile(): ActiveQuery {
 		return $this->hasOne(UserProfile::class, ['user_id' => 'id']);
 	}
 
@@ -171,7 +258,7 @@ class User extends ActiveRecord implements IdentityInterface {
 	}
 
 	public function getTraits(): ActiveQuery {
-		return $this->hasMany(UserTrait::class, ['user_id' => 'id'])->indexBy('trait_id');
+		return $this->hasMany(UserTraitAssign::class, ['user_id' => 'id'])->indexBy('trait_id');
 	}
 
 	public function getTraitsNames(): string {
@@ -380,7 +467,7 @@ class User extends ActiveRecord implements IdentityInterface {
 			$rolesI18n = [];
 			foreach ($roles as $role) {
 				$name = $role->name;
-				$rolesI18n[$name] = Yii::t('common', $name);
+				$rolesI18n[$name] = Yii::t('rbac', $name);
 			}
 			static::$ROLES_NAMES = $rolesI18n;
 		}
@@ -393,7 +480,7 @@ class User extends ActiveRecord implements IdentityInterface {
 			$rolesI18n = [];
 			foreach ($roles as $role) {
 				$name = $role->name;
-				$rolesI18n[$name] = Yii::t('common', $name);
+				$rolesI18n[$name] = Yii::t('rbac', $name);
 			}
 			static::$PERMISSIONS_NAMES = $rolesI18n;
 		}
@@ -429,4 +516,7 @@ class User extends ActiveRecord implements IdentityInterface {
 		return new UserQuery(static::class);
 	}
 
+	public function getEmail(): string {
+		return $this->email;
+	}
 }

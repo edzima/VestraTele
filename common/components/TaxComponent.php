@@ -10,11 +10,17 @@ class TaxComponent extends Component {
 
 	public function netto(Decimal $brutto, Decimal $tax): Decimal {
 		$this->checkTax($tax);
+		if ($tax->isZero()) {
+			return $brutto;
+		}
 		return $brutto->div($this->ratio($tax));
 	}
 
 	public function brutto(Decimal $netto, Decimal $tax): Decimal {
 		$this->checkTax($tax);
+		if ($tax->isZero()) {
+			return $netto;
+		}
 		return $netto->mul($this->ratio($tax));
 	}
 
@@ -27,7 +33,7 @@ class TaxComponent extends Component {
 	 * @throws InvalidArgumentException
 	 */
 	private function checkTax(Decimal $tax): void {
-		if (!$tax->isPositive()) {
+		if ($tax < 0) {
 			throw new InvalidArgumentException('$tax must best greater than 0');
 		}
 	}

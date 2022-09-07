@@ -2,6 +2,7 @@
 
 use backend\modules\benefit\Module as BenefitModule;
 use backend\modules\entityResponsible\Module as EntityResponsibleModule;
+use backend\modules\hint\Module as HintModule;
 use backend\modules\issue\Module as IssueModule;
 use backend\modules\provision\Module as ProvisionModule;
 use backend\modules\settlement\Module as SettlementModule;
@@ -10,7 +11,14 @@ use common\behaviors\GlobalAccessBehavior;
 use common\behaviors\LastActionBehavior;
 use common\components\User as WebUser;
 use common\models\user\User;
+use common\models\user\Worker;
+use common\modules\czater\Module as CzaterModule;
+use common\modules\lead\Module as LeadModule;
+use Edzima\Yii2Adescom\Module as AdescomModule;
+use motion\i18n\ConfigLanguageProvider;
+use yii\base\Action;
 use yii\web\UserEvent;
+use ymaker\email\templates\Module as EmailTemplateModule;
 
 $params = array_merge(
 	require __DIR__ . '/../../common/config/params.php',
@@ -79,6 +87,18 @@ return [
 		'frontendCache' => require Yii::getAlias('@frontend/config/_cache.php'),
 	],
 	'modules' => [
+		'adescom-sms' => [
+			'class' => AdescomModule::class,
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'permissions' => [User::PERMISSION_SMS],
+					],
+				],
+			],
+		],
 		'benefit' => [
 			'class' => BenefitModule::class,
 		],
@@ -98,14 +118,109 @@ return [
 				],
 			],
 		],
+		'czater' => [
+			'class' => CzaterModule::class,
+		],
 		'entity-responsible' => [
 			'class' => EntityResponsibleModule::class,
+		],
+		'message-templates' => [
+			'class' => EmailTemplateModule::class,
+			'languageProvider' => [
+				'class' => ConfigLanguageProvider::class,
+				'languages' => [
+					[
+						'locale' => 'pl',
+						'label' => 'Polski',
+					],
+				],
+				'defaultLanguage' => [
+					'locale' => 'pl',
+					'label' => 'Polski',
+				],
+			],
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'roles' => [User::PERMISSION_MESSAGE_TEMPLATE],
+					],
+				],
+			],
 		],
 		'gridview' => [
 			'class' => '\kartik\grid\Module',
 		],
 		'issue' => [
 			'class' => IssueModule::class,
+		],
+		'hint' => [
+			'class' => HintModule::class,
+		],
+		'lead' => [
+			'class' => LeadModule::class,
+			'userClass' => User::class,
+			'userNames' => static function (): array {
+				return User::getSelectList(User::getAssignmentIds([User::PERMISSION_LEAD]));
+			},
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'controllers' => ['lead/status'],
+						'permissions' => [User::PERMISSION_LEAD_STATUS],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['lead/dialer', 'lead/dialer-type'],
+						'permissions' => [Worker::PERMISSION_LEAD_DIALER_MANAGER],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['lead/duplicate'],
+						'permissions' => [Worker::PERMISSION_LEAD_DUPLICATE],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['lead/import'],
+						'permissions' => [Worker::PERMISSION_LEAD_IMPORT],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['lead/market', 'lead/market-user'],
+						'permissions' => [Worker::PERMISSION_LEAD_MARKET],
+					],
+					[
+						'allow' => false,
+						'controllers' => [
+							'lead/dialer',
+							'lead/dialer-type',
+							'lead/status',
+							'lead/duplicate',
+							'lead/import',
+							'lead/market',
+							'lead/market-user',
+
+						],
+					],
+					[
+						'allow' => true,
+						'matchCallback' => static function ($rule, Action $action): bool {
+							if ($action->controller->id === 'sms') {
+								if ($action->id === 'push-multiple') {
+									return Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS);
+								}
+								return Yii::$app->user->can(User::PERMISSION_SMS);
+							}
+
+							return true;
+						},
+						'permissions' => [User::PERMISSION_LEAD],
+					],
+				],
+			],
 		],
 		'settlement' => [
 			'class' => SettlementModule::class,
@@ -151,6 +266,15 @@ return [
 				'allow' => true,
 				'actions' => ['error'],
 				'roles' => ['?', '@'],
+			],
+			[
+				'controllers' => ['article', 'article-category'],
+				'allow' => true,
+				'permissions' => [User::PERMISSION_NEWS],
+			],
+			[
+				'controllers' => ['article', 'article-category'],
+				'allow' => false,
 			],
 			[
 				'allow' => true,

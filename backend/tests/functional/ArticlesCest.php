@@ -2,40 +2,40 @@
 
 namespace backend\tests\functional;
 
+use backend\controllers\ArticleController;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\NewsManager;
-use common\fixtures\ArticleCategoryFixture;
-use common\fixtures\UserFixture;
+use common\fixtures\helpers\ArticleFixtureHelper;
+use common\models\Article;
 
 class ArticlesCest {
 
-	public const ROUTE_INDEX = '/address/index';
+	/* @see ArticleController::actionIndex() */
+	public const ROUTE_INDEX = '/article/index';
+	/* @see ArticleController::actionCreate() */
+	public const ROUTE_CREATE = '/article/create';
 
-	public function _fixtures() {
-		return [
-			'user' => [
-				'class' => UserFixture::class,
-				'dataFile' => codecept_data_dir() . 'user.php',
-			],
-			'articleCategory' => [
-				'class' => ArticleCategoryFixture::class,
-				'dataFile' => codecept_data_dir() . 'article_category.php',
-			],
-		];
+	public function _fixtures(): array {
+		return ArticleFixtureHelper::fixtures();
 	}
 
-	public function checkWithoutPermission(Manager $I): void {
+	public function checkMenuLinkWithoutPermission(Manager $I): void {
 		$I->amLoggedIn();
 		$I->dontseeMenuLink('Articles');
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeResponseCodeIs(403);
 	}
 
 	public function checkWithPermission(NewsManager $I): void {
 		$I->amLoggedIn();
 		$I->seeMenuLink('Articles');
+		$I->clickMenuSubLink('Articles');
+		$I->seeInCurrentUrl(static::ROUTE_INDEX);
 	}
-	public function checkArticleSubmitNoData(NewsManager $I): void{
+
+	public function checkArticleSubmitNoData(NewsManager $I): void {
 		$I->amLoggedIn();
-		$I->amOnRoute('/article/create');
+		$I->amOnRoute(static::ROUTE_CREATE);
 		$I->submitForm('#article-form', []);
 		$I->seeValidationError('Title cannot be blank');
 		$I->seeValidationError('Text cannot be blank');
@@ -44,19 +44,28 @@ class ArticlesCest {
 
 	public function checkCreateArticleWithSimpleBody(NewsManager $I): void {
 		$I->amLoggedIn();
-		$I->amOnRoute('/article/create');
+		$I->amOnRoute(static::ROUTE_CREATE);
 
 		$I->submitForm('#article-form', [
 			'Article[title]' => "test",
 			'Article[slug]' => "test",
 			'Article[body]' => "test",
-			'Article[status]' => 1,
+			'Article[status]' => Article::STATUS_ACTIVE,
+			'Article[show_on_mainpage]' => 1,
 			'Article[category_id]' => 1,
 			'Article[published_at]' => "2020-01-28 10:00",
 		]);
 		$I->dontseeValidationError('Title cannot be blank');
 		$I->dontseeValidationError('Text cannot be blank');
 		$I->dontseeValidationError('Category cannot be blank');
+		$I->seeRecord(Article::class, [
+			'title' => 'test',
+			'slug' => 'test',
+			'body' => 'test',
+			'category_id' => 1,
+			'show_on_mainpage' => 1,
+			'status' => Article::STATUS_ACTIVE,
+		]);
 	}
 
 }

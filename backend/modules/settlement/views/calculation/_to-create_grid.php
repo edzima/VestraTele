@@ -43,12 +43,12 @@ use yii\web\View;
 		],
 		[
 			'class' => IssueColumn::class,
-			'issueAttribute' => null,
 			'visible' => $withIssue,
 		],
 		[
 			'class' => CustomerDataColumn::class,
 			'value' => 'customer.fullName',
+			'attribute' => 'customerName',
 			'visible' => $withCustomer,
 		],
 		[

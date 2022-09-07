@@ -19,7 +19,6 @@ use Yii;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
-use yii\helpers\StringHelper;
 
 class IssueUpgradeController extends Controller {
 
@@ -46,14 +45,13 @@ class IssueUpgradeController extends Controller {
 					->andWhere(['phone' => $phones])
 					->column();
 
-				foreach ($meetIds as $id){
+				foreach ($meetIds as $id) {
 					$ids[$id] = $id;
 				}
 			}
-
 		}
 		Console::output(print_r($ids));
-		Console::output('Count: '. count($ids));
+		Console::output('Count: ' . count($ids));
 	}
 
 	public function actionWorkers(): void {
@@ -96,27 +94,6 @@ class IssueUpgradeController extends Controller {
 		}
 
 		Console::output('Successful imported ' . $count . ' users.');
-	}
-
-	public function actionProvision(): void {
-		foreach (Issue::find()
-			->batch() as $rows) {
-			foreach ($rows as $issue) {
-				/** @var $issue Issue */
-				if (!StringHelper::startsWith($issue->details, 'PROWIZJA -')) {
-					$provision = $issue->getProvision();
-					if ($provision) {
-						$details = [];
-						$details[] = 'PROWIZJA - rodzaj: ' . $provision->getTypeName();
-						$details[] = 'Podstawa: ' . $provision->getBase();
-						$details[] = 'Procent\krotność: ' . $provision->getValue();
-						$details[] = $issue->details;
-						$issue->details = implode("\n", $details);
-						$issue->save(false, ['details']);
-					}
-				}
-			}
-		}
 	}
 
 	public function actionCheckCustomer(): void {

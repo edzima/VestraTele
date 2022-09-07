@@ -4,3 +4,7 @@ modules:
   enabled:
     - Filesystem
     - Yii2
+    - \common\tests\Helper\SmsHelper:
+        - depends: Yii2
+    - \common\tests\Helper\QueueHelper:
+        depends: Yii2

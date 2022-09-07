@@ -1,18 +1,18 @@
 <?php
 
-use common\models\user\UserTrait;
+use common\fixtures\helpers\UserFixtureHelper;
 
 return [
 	[
 		'user_id' => 2,
-		'trait_id' => UserTrait::TRAIT_BAILIFF,
+		'trait_id' => UserFixtureHelper::TRAIT_BAILIFF,
 	],
 	[
 		'user_id' => 3,
-		'trait_id' => UserTrait::TRAIT_BAILIFF,
+		'trait_id' => UserFixtureHelper::TRAIT_BAILIFF,
 	],
 	[
 		'user_id' => 3,
-		'trait_id' => UserTrait::TRAIT_DISABILITY_RESULT_OF_CASE,
+		'trait_id' => UserFixtureHelper::TRAIT_DISABILITY_RESULT_OF_CASE,
 	],
 ];

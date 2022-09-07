@@ -8,7 +8,7 @@ use common\models\user\query\UserQuery;
 class CustomerUserSearch extends UserSearch {
 
 	public array $defaultOrder = [
-		'updated_at' => 'DESC',
+		'updated_at' => SORT_DESC,
 	];
 
 	protected function createQuery(): UserQuery {

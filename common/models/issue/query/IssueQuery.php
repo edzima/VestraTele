@@ -24,11 +24,6 @@ class IssueQuery extends ActiveQuery {
 		return $this;
 	}
 
-	public function onlyPositiveDecision(): self {
-		$this->andWhere(['stage_id' => IssueStage::POSITIVE_DECISION_ID]);
-		return $this;
-	}
-
 	public function onlyPayed(): self {
 		$this->andWhere(['payed' => true]);
 		return $this;

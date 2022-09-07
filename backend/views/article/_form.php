@@ -1,11 +1,11 @@
 <?php
 
 use common\widgets\DateTimeWidget;
+use vova07\imperavi\Widget;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
-use vova07\imperavi\Widget;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Article */
@@ -31,6 +31,7 @@ use vova07\imperavi\Widget;
 				'imagemanager',
 				'table',
 				'video',
+				'style',
 			],
 			'imageUpload' => Url::to(['/site/image-upload']),
 			'fileUpload' => Url::to(['/site/file-upload']),
@@ -47,7 +48,11 @@ use vova07\imperavi\Widget;
 				'imagemanager',
 				'table',
 				'video',
+				'style',
 			],
+			'convertDivs' => false,
+			'replaceDivs' => false,
+			'removeEmptyTags' => true,
 			'imageUpload' => Url::to(['/site/image-upload']),
 			'fileUpload' => Url::to(['/site/file-upload']),
 		],
@@ -55,28 +60,18 @@ use vova07\imperavi\Widget;
 
 	<?= $form->field($model, 'status')->checkbox(['label' => Yii::t('backend', 'Activate')]) ?>
 
-	<?= $form->field($model, 'category_id', ['options' => ['class' => 'col-md-8']])->dropDownList(ArrayHelper::map(
+	<?= $form->field($model, 'show_on_mainpage')->textInput()->hint(Yii::t('common', 'Empty: not visible. Number for Order.')) ?>
+
+
+	<?= $form->field($model, 'category_id')->dropDownList(ArrayHelper::map(
 		$categories,
 		'id',
 		'title'
-	), ['prompt' => '']
+	), ['prompt' => Yii::t('common', 'Select...')]
 	) ?>
 
 
-	<?= $form->field($model, 'published_at')->widget(
-		DateTimeWidget::class,
-		[
-			'clientOptions' => [
-
-				'allowInputToggle' => true,
-				'sideBySide' => true,
-				'widgetPositioning' => [
-					'horizontal' => 'auto',
-					'vertical' => 'auto',
-				],
-			],
-		]
-	) ?>
+	<?= $form->field($model, 'published_at')->widget(DateTimeWidget::class) ?>
 
 
 	<div class="form-group">

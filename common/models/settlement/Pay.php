@@ -4,14 +4,16 @@ namespace common\models\settlement;
 
 use DateTime;
 use Decimal\Decimal;
+use Yii;
 use yii\base\BaseObject;
 
 class Pay extends BaseObject implements
 	PayInterface {
 
-	private int $transferType;
+	private string $transferType;
 	private Decimal $value;
 	private ?Decimal $vat;
+	private ?int $status = null;
 	private ?DateTime $paymentAt = null;
 	private ?DateTime $deadlineAt = null;
 
@@ -28,7 +30,7 @@ class Pay extends BaseObject implements
 		$this->vat = $vat;
 	}
 
-	protected function setTransferType(int $type): void {
+	protected function setTransferType(string $type): void {
 		$this->transferType = $type;
 	}
 
@@ -55,6 +57,10 @@ class Pay extends BaseObject implements
 		$this->deadlineAt = $datetime;
 	}
 
+	protected function setStatus(?int $status): void {
+		$this->status = $status;
+	}
+
 	public function getDeadlineAt(): ?DateTime {
 		return $this->deadlineAt;
 	}
@@ -63,8 +69,18 @@ class Pay extends BaseObject implements
 		return $this->vat;
 	}
 
-	public function getTransferType(): int {
+	public function getStatus(): ?int {
+		return $this->status;
+	}
+
+	public function getTransferType(): string {
 		return $this->transferType;
 	}
 
+	public static function getTransfersTypesNames(): array {
+		return [
+			static::TRANSFER_TYPE_BANK => Yii::t('settlement', 'Bank Transfer'),
+			static::TRANSFER_TYPE_CASH => Yii::t('settlement', 'Cash'),
+		];
+	}
 }

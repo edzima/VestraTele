@@ -1,16 +1,21 @@
 <?php
 
-use common\models\issue\IssueUser;
+use common\models\issue\IssueInterface;
 use common\models\user\Worker;
+use common\modules\issue\IssueNoteColumn;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\AgentDataColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
 use common\widgets\grid\IssueTypeColumn;
+use frontend\helpers\Html;
+use frontend\helpers\Url;
 use frontend\models\search\IssueSearch;
+use frontend\widgets\GridView;
+use frontend\widgets\issue\StageChangeButtonDropdown;
 use frontend\widgets\IssueColumn;
-use kartik\grid\GridView;
+use kartik\select2\Select2;
 use yii\grid\SerialColumn;
-use yii\helpers\Html;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
@@ -36,38 +41,40 @@ $this->params['breadcrumbs'][] = $this->title;
 		?>
 	</p>
 	<?php Pjax::begin(); ?>
-	<?= $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]) ?>
 
+	<?php
+	//@todo remove this after migrate BS4 (add data-boundary="viewport")
+	//@see https://stackoverflow.com/questions/26018756/bootstrap-button-drop-down-inside-responsive-table-not-visible-because-of-scroll#answer-51992907
+	$this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
+	     $('.table-responsive').css('overflow', 'inherit' );
+		});
+
+		$('.table-responsive').on('hide.bs.dropdown', function () {
+            $('.table-responsive').css( 'overflow', 'auto' );
+		});
+		"
+	);
+	?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'tableOptions' => [
-			'class' => 'ellipsis',
-		],
 		'columns' => [
-			['class' => SerialColumn::class],
+			['class' => SerialColumn::class], // @todo to approval
 			[
 				'class' => IssueColumn::class,
+				'filterInputOptions' => [
+					'class' => 'input-sm form-control',
+					'id' => null,
+				],
 			],
 			[
 				'class' => IssueTypeColumn::class,
-				'valueType' => IssueTypeColumn::VALUE_NAME,
 				'attribute' => 'type_id',
+				'noWrap' => true,
 			],
-			[
-				'class' => DataColumn::class,
-				'attribute' => 'stage_id',
-				'label' => $searchModel->getAttributeLabel('stage_id'),
-				'filter' => $searchModel->getStagesNames(),
-				'value' => 'issue.stage.short_name',
-				'contentOptions' => [
-					'class' => 'bold-text text-center',
-				],
-				'options' => [
-					'style' => 'width:60px',
-				],
-			],
+
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'entity_responsible_id',
@@ -77,55 +84,131 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filterWidgetOptions' => [
 					'pluginOptions' => [
 						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+
 					],
 					'options' => [
 						'placeholder' => $searchModel->getAttributeLabel('entity_responsible_id'),
 					],
+					'size' => Select2::SIZE_SMALL,
 				],
 				'value' => 'issue.entityResponsible.name',
-				'options' => [
-					'style' => 'width:200px',
-				],
 			],
 			[
 				'class' => DataColumn::class,
+				'attribute' => 'stage_id',
+				'label' => $searchModel->getAttributeLabel('stage_id'),
+				'filter' => $searchModel->getStagesNames(),
 				'filterType' => GridView::FILTER_SELECT2,
-				'attribute' => 'agent_id',
-				'label' => $searchModel->getAttributeLabel('agent_id'),
-				'value' => 'issue.agent.fullName',
-				'filter' => $searchModel->getAgentsList(),
 				'filterWidgetOptions' => [
+					'options' => [
+						'placeholder' => $searchModel->getAttributeLabel('stage_id'),
+					],
 					'pluginOptions' => [
 						'allowClear' => true,
-						'width' => '180px',
+						'dropdownAutoWidth' => true,
 					],
-					'options' => [
-						'placeholder' => $searchModel->getAttributeLabel('agent_id'),
-					],
+					'size' => Select2::SIZE_SMALL,
+				],
+				'value' => static function (IssueInterface $model): string {
+					if (Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE)) {
+						return StageChangeButtonDropdown::widget([
+							'model' => $model,
+							'label' => $model->getIssueStage()->name,
+							'containerOptions' => [
+								'class' => 'd-inline-flex',
+							],
+							'returnUrl' => Url::to('/issue/index'),
+							'options' => [
+								'class' => 'btn btn-default btn-sm',
+								'title' => Yii::t('issue', 'Change Stage'),
+								'aria-label' => Yii::t('issue', 'Change Stage'),
+								'data-pjax' => 0,
+							],
+						]);
+					}
+					return Html::encode($model->getIssueStage()->short_name);
+				},
+				'format' => 'raw',
+				'contentBold' => true,
+				'contentCenter' => true,
+			],
+			[
+				'class' => AgentDataColumn::class,
+				'noWrap' => false,
+				'value' => 'issue.agent.fullName',
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
 				],
 			],
 			[
 				'class' => CustomerDataColumn::class,
+				'attribute' => 'customerName',
 				'value' => 'issue.customer.fullName',
+				'noWrap' => false,
+				'filterInputOptions' => [
+					'class' => 'input-sm form-control',
+					'id' => null,
+				],
+			],
+			[
+				'class' => DataColumn::class,
+				'attribute' => 'customerPhone',
+				'value' => 'issue.customer.profile.phone',
+				'format' => 'tel',
+				'width' => '124px',
+				'label' => Yii::t('common', 'Phone number'),
+				'noWrap' => true,
+				'filterInputOptions' => [
+					'class' => 'input-sm form-control',
+					'id' => null,
+					'placeholder' => Yii::t('common', 'Phone number'),
+				],
 			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'issue.created_at',
 				'format' => 'date',
-				'width' => '80px',
+				'noWrap' => true,
 			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'issue.updated_at',
-				'width' => '80px',
 				'format' => 'date',
+				'noWrap' => true,
+			],
+			[
+				'class' => IssueNoteColumn::class,
 			],
 			[
 				'class' => ActionColumn::class,
-				'template' => '{view}',
+				'template' => '{note} {sms} {view}',
 				'visibleButtons' => [
-					'view' => static function (IssueUser $model) use ($searchModel) {
-						return !$model->issue->isArchived() || $searchModel->withArchive;
+					'view' => static function (IssueInterface $model) use ($searchModel) {
+						return !$model->getIssueModel()->isArchived() || $searchModel->withArchive;
+					},
+					'note' => Yii::$app->user->can(Worker::PERMISSION_NOTE),
+					'sms' => Yii::$app->user->can(Worker::PERMISSION_SMS),
+
+				],
+				'buttons' => [
+					'note' => static function (string $url, IssueInterface $model): string {
+						return Html::a('<i class="fa fa-comments" aria-hidden="true"></i>',
+							['note/issue', 'id' => $model->getIssueId()],
+							[
+								'title' => Yii::t('issue', 'Create Issue Note'),
+								'aria-label' => Yii::t('issue', 'Create Issue Note'),
+							]
+						);
+					},
+					'sms' => static function (string $url, IssueInterface $model): string {
+						return Html::a('<i class="fa fa-envelope" aria-hidden="true"></i>',
+							['issue-sms/push', 'id' => $model->getIssueId()],
+							[
+								'title' => Yii::t('common', 'Send SMS'),
+								'aria-label' => Yii::t('common', 'Send SMS'),
+							]
+						);
 					},
 				],
 			],

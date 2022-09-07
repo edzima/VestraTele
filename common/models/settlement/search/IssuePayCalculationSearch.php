@@ -4,6 +4,7 @@ namespace common\models\settlement\search;
 
 use common\models\AgentSearchInterface;
 use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssuePayQuery;
@@ -15,8 +16,10 @@ use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQueryInterface;
 use yii\db\QueryInterface;
 
 /**
@@ -29,18 +32,21 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	AgentSearchInterface,
 	SearchModel {
 
+	public const SCENARIO_ARCHIVE = 'archive';
+
 	public $agent_id;
 	public string $customerLastname = '';
 	public $issue_type_id;
-
-	public bool $withArchive = false;
+	public $issue_stage_id;
 
 	/**
 	 * @var int[]|null
 	 */
 	public array $issueUsersIds = [];
+	public bool $withIssueStage = false;
 	public bool $withCustomer = true;
 	public bool $withAgents = true;
+	public bool $withArchive = false;
 	public ?bool $withoutProvisions = null;
 
 	public ?bool $onlyWithProblems = null;
@@ -51,13 +57,26 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	 */
 	public function rules(): array {
 		return [
-			[['issue_id', 'stage_id', 'type', 'problem_status', 'owner_id'], 'integer'],
+			[['issue_id', 'stage_id', 'problem_status', 'owner_id'], 'integer'],
+			['type', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
 			['issue_type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
+			['issue_stage_id', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true, 'when' => function (): bool { return $this->withIssueStage; }],
+
 			['agent_id', 'in', 'range' => array_keys($this->getAgentsNames()), 'allowArray' => true],
 			['problem_status', 'in', 'range' => array_keys(static::getProblemStatusesNames())],
 			[['value'], 'number'],
+			['withArchive', 'boolean', 'on' => static::SCENARIO_ARCHIVE],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];
+	}
+
+	public function attributeLabels(): array {
+		return array_merge(
+			parent::attributeLabels(),
+			[
+				'withArchive' => Yii::t('common', 'With Archive'),
+			]
+		);
 	}
 
 	public function getAgentsNames(): array {
@@ -66,6 +85,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 			->joinWith([
 				'issue.agent',
 			])
+			->distinct()
 			->column();
 		return User::getSelectList($ids);
 	}
@@ -117,9 +137,10 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 			return $dataProvider;
 		}
 		$this->applyAgentsFilters($query);
-		$this->applyCustomerSurnameFilter($query);
+		$this->applyCustomerNameFilter($query);
 		$this->applyIssueUsersFilter($query);
 		$this->applyProblemStatusFilter($query);
+		$this->applyIssueStageFilter($query);
 		$this->applyIssueTypeFilter($query);
 		$this->applyToPayedPaysFilter($query);
 		$this->applyWithoutProvisionsFilter($query);
@@ -129,9 +150,10 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 			IssuePayCalculation::tableName() . '.value' => $this->value,
 			IssuePayCalculation::tableName() . '.type' => $this->type,
 			IssuePayCalculation::tableName() . '.stage_id' => $this->stage_id,
+			IssuePayCalculation::tableName() . '.issue_id' => $this->issue_id,
+
 		]);
 
-		$query->andFilterWhere(['like', 'issue.id', $this->issue_id]);
 		$query->andFilterWhere(['like', 'owner_id', $this->owner_id]);
 
 		return $dataProvider;
@@ -141,7 +163,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		if ($this->onlyToPayed === true) {
 			$query->joinWith([
 				'pays P' => function (IssuePayQuery $payQuery) {
-					$payQuery->onlyNotPayed();
+					$payQuery->onlyUnpaid();
 				},
 			]);
 		}
@@ -189,7 +211,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		}
 	}
 
-	public function applyCustomerSurnameFilter(QueryInterface $query): void {
+	public function applyCustomerNameFilter(QueryInterface $query): void {
 		if ($this->withCustomer || !empty($this->customerLastname)) {
 			$query->joinWith([
 				'issue.customer C' => function (UserQuery $query) {
@@ -202,6 +224,13 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		}
 	}
 
+	public function applyIssueStageFilter(ActiveQueryInterface $query): void {
+		if ($this->withIssueStage) {
+			$query->joinWith('issue.stage IS');
+			$query->andFilterWhere(['IS.id' => $this->issue_stage_id]);
+		}
+	}
+
 	public function applyIssueTypeFilter(QueryInterface $query): void {
 		if (!empty($this->issue_type_id)) {
 			$query->andWhere(['IT.id' => $this->issue_type_id]);
@@ -209,7 +238,11 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	}
 
 	public static function getIssueTypesNames(): array {
-		return IssueType::getTypesNames();
+		return IssueType::getTypesNamesWithShort();
+	}
+
+	public static function getIssueStagesNames(): array {
+		return IssueStage::getStagesNames(true);
 	}
 
 	//@todo add archive filter when withArchive is true.

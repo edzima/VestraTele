@@ -24,7 +24,7 @@ class Module extends BaseModule {
 					[
 						'allow' => true,
 						'controllers' => ['issue/meet'],
-						'permissions' => [Worker::PERMISSION_MEET],
+						'roles' => [Worker::ROLE_ADMINISTRATOR],
 					],
 					[
 						'allow' => true,
@@ -38,8 +38,39 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
-						'controllers' => ['issue/issue', 'issue/type', 'issue/stage', 'issue/user'],
+						'controllers' => ['issue/summon-type', 'issue/summon-doc'],
+						'permissions' => [Worker::PERMISSION_SUMMON_MANAGER],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['issue/issue'],
+						'actions' => ['delete'],
+						'permissions' => [Worker::PERMISSION_ISSUE_DELETE],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['issue/relation'],
+						'permissions' => [Worker::PERMISSION_ISSUE_CREATE],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['issue/claim'],
+						'permissions' => [Worker::PERMISSION_ISSUE_CLAIM],
+					],
+					[
+						'allow' => false,
+						'controllers' => ['issue/issue'],
+						'actions' => ['delete'],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['issue/issue', 'issue/type', 'issue/stage', 'issue/user', 'issue/tag'],
 						'permissions' => [Worker::PERMISSION_ISSUE],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['issue/sms'],
+						'permissions' => [Worker::PERMISSION_SMS],
 					],
 					[
 						'allow' => true,

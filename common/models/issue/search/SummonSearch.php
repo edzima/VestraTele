@@ -3,12 +3,17 @@
 namespace common\models\issue\search;
 
 use common\models\issue\Summon;
+use common\models\issue\SummonDoc;
+use common\models\issue\SummonType;
+use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
+use common\validators\PhoneValidator;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use yii\db\QueryInterface;
 
 /**
@@ -18,15 +23,27 @@ class SummonSearch extends Summon implements
 	CustomerSearchInterface,
 	SearchModel {
 
+	public $doc_types_ids;
+
 	public string $customerLastname = '';
+	public string $customerPhone = '';
 
 	protected const SUMMON_ALIAS = 'S';
 
-	public static function getOwnersNames(): array {
+	public static function getTypesNames(): array {
+		return SummonType::getNamesWithShort();
+	}
+
+	public static function getDocTypesNames(): array {
+		return SummonDoc::getNames();
+	}
+
+	public function getOwnersNames(): array {
 		return User::getSelectList(Summon::find()
 			->select('owner_id')
 			->distinct()
-			->column()
+			->column(),
+			false
 		);
 	}
 
@@ -34,7 +51,8 @@ class SummonSearch extends Summon implements
 		return User::getSelectList(Summon::find()
 			->select('contractor_id')
 			->distinct()
-			->column()
+			->column(),
+			false
 		);
 	}
 
@@ -43,16 +61,18 @@ class SummonSearch extends Summon implements
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type', 'status', 'created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
+			[['id', 'type_id', 'status', 'created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
 			[['title'], 'safe'],
+			['doc_types_ids', 'in', 'range' => array_keys(static::getDocTypesNames()), 'allowArray' => true],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
+			['customerPhone', PhoneValidator::class],
 		];
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function scenarios() {
+	public function scenarios(): array {
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
 	}
@@ -71,6 +91,10 @@ class SummonSearch extends Summon implements
 				$query->joinWith('userProfile CP');
 			},
 		]);
+		$query->with('docs');
+		$query->with('owner.userProfile');
+		$query->with('contractor.userProfile');
+		$query->with('type');
 
 		// add conditions that should always apply here
 
@@ -89,11 +113,17 @@ class SummonSearch extends Summon implements
 			return $dataProvider;
 		}
 
-		$this->applyCustomerSurnameFilter($query);
+		if (!empty($this->doc_types_ids)) {
+			$query->joinWith('docs');
+			$query->andFilterWhere([SummonDoc::tableName() . '.id' => $this->doc_types_ids]);
+		}
+
+		$this->applyCustomerNameFilter($query);
+		$this->applyCustomerPhoneFilter($query);
 		// grid filtering conditions
 		$query->andFilterWhere([
 			static::SUMMON_ALIAS . '.id' => $this->id,
-			static::SUMMON_ALIAS . '.type' => $this->type,
+			static::SUMMON_ALIAS . '.type_id' => $this->type_id,
 			static::SUMMON_ALIAS . '.status' => $this->status,
 			static::SUMMON_ALIAS . '.created_at' => $this->created_at,
 			static::SUMMON_ALIAS . '.updated_at' => $this->updated_at,
@@ -109,9 +139,19 @@ class SummonSearch extends Summon implements
 		return $dataProvider;
 	}
 
-	public function applyCustomerSurnameFilter(QueryInterface $query): void {
+	public function applyCustomerNameFilter(QueryInterface $query): void {
 		if (!empty($this->customerLastname)) {
 			$query->andWhere(['like', 'CP.lastname', $this->customerLastname . '%', false]);
+		}
+	}
+
+	private function applyCustomerPhoneFilter(ActiveQuery $query): void {
+		if (!empty($this->customerPhone)) {
+			$query->joinWith([
+				'issue.customer.userProfile CP' => function (PhonableQuery $query) {
+					$query->withPhoneNumber($this->customerPhone);
+				},
+			]);
 		}
 	}
 }

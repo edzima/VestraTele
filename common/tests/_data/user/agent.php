@@ -6,7 +6,7 @@ use common\models\user\User;
 return [
 	'with-childs' => [
 		'id' => UserFixtureHelper::AGENT_PETER_NOWAK,
-		'username' => 'agent1',
+		'username' => 'peter-nowak',
 		'auth_key' => 'iwTNae9t34mnK6l4vT4IeaTk-YWI2Rv',
 		'password_hash' => '$2y$13$CXT0Rkle1EMJ/c1l5bylL.lfmQ39O5JlHJVFpNn618OUS1HwaIi',
 		'password_reset_token' => 't5GU9NwpuGYSfFEZMAxqtuz2PkEvv_' . time(),
@@ -17,24 +17,24 @@ return [
 	],
 	'with-parent-and-child' => [
 		'id' => UserFixtureHelper::AGENT_AGNES_MILLER,
-		'username' => 'agent2',
+		'username' => 'agnes-miller',
 		'auth_key' => 'EdKfXrx88weFMV0IxuTMKgfK2tS3Lp',
 		'password_hash' => '$2y$13$g5nv41Px7VBqhS3hVsVN2.MKT3jFdkXEsMC4rQJLfaMa7VaJqL2',
 		'password_reset_token' => '4NyiZNAuxjs5Mty990c47sVrgllIi_' . time(),
 		'created_at' => '1391885313',
 		'updated_at' => '1391885313',
 		'email' => 'agent2@vestra.info',
-		'status' => User::STATUS_DELETED,
+		'status' => User::STATUS_ACTIVE,
 		'boss' => 300,
 	],
 	'with-parents-without-childs' => [
 		'id' => UserFixtureHelper::AGENT_TOMMY_SET,
-		'username' => 'agent3',
+		'username' => 'tommy',
 		'auth_key' => 'O87Gk3_UfmMHYkyezZ7QLmkKNsllzT',
 		//Test1234
 		'password_hash' => '$2y$13$d17z0w/wKC4LFwtzBcmx6up4jErQuandJqhzKGKczfWuiEhLBtQBK',
 		'email' => 'agent3@vestra.info',
-		'status' => User::STATUS_INACTIVE,
+		'status' => User::STATUS_ACTIVE,
 		'created_at' => '1548675330',
 		'updated_at' => '1548675330',
 		'verification_token' => '4ch0qbfhvWwkcuWqjN8SWRq72SOw1KYT_1548675330',
@@ -42,7 +42,7 @@ return [
 	],
 	'without-parent-and-childs' => [
 		'id' => UserFixtureHelper::AGENT_EMILY_PAT,
-		'username' => 'agent4',
+		'username' => 'emily',
 		'auth_key' => '4XXdVqi3rDpa_a6JH6zqreFxUPcUPvJ',
 		//Test1234
 		'password_hash' => '$2y$13$d17z0w/wKC4LFwtzBcm6up4jErQuandJqhzKGKczfWuiEhLBtQBK',
@@ -64,5 +64,5 @@ return [
 		'updated_at' => '1548675330',
 		'verification_token' => 'already_used_token_1548675330',
 		'boss' => null,
-	]
+	],
 ];

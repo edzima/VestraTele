@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\components\provision\exception\MissingProvisionUserException;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\settlement\PaysForm;
@@ -9,6 +10,7 @@ use common\models\user\Worker;
 use frontend\helpers\Url;
 use frontend\models\search\IssuePayCalculationSearch;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -37,6 +39,9 @@ class SettlementController extends Controller {
 		$searchModel->issueUsersIds = $ids;
 
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		/** @var ActiveQuery $query */
+		$query = $dataProvider->query;
+		$query->with('pays.provisions');
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,
@@ -72,7 +77,7 @@ class SettlementController extends Controller {
 		$model->count = 2;
 		$pay = $calculation->getPays()->one();
 		if ($pay) {
-			$model->vat = $pay->getVAT()->toFixed(2);
+			$model->vat = $pay->getVAT() ? $pay->getVAT()->toFixed(2) : null;
 		} else {
 			$model->vat = $calculation->issue->type->vat;
 		}
@@ -87,6 +92,12 @@ class SettlementController extends Controller {
 				$calculationPay = new IssuePay();
 				$calculationPay->setPay($pay);
 				$calculation->link('pays', $calculationPay);
+			}
+			$calculation->refresh();
+			Yii::$app->provisions->removeForPays($calculation->getPays()->getIds(true));
+			try {
+				Yii::$app->provisions->settlement($calculation);
+			} catch (MissingProvisionUserException $exception) {
 			}
 			return $this->redirect(['view', 'id' => $id]);
 		}
@@ -103,7 +114,7 @@ class SettlementController extends Controller {
 	 */
 	private function findModel(int $id): IssuePayCalculation {
 		$model = IssuePayCalculation::findOne($id);
-		if ($model === null || !Yii::$app->user->canSeeIssue($model->issue)) {
+		if ($model === null || !Yii::$app->user->canSeeIssue($model)) {
 			throw new NotFoundHttpException();
 		}
 		return $model;

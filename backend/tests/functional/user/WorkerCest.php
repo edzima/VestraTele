@@ -2,10 +2,13 @@
 
 namespace backend\tests\functional\user;
 
+use backend\modules\user\controllers\WorkerController;
+use backend\tests\functional\provision\ProvisionUserCest;
 use backend\tests\Step\Functional\Admin;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\WorkersManager;
 use common\fixtures\helpers\UserFixtureHelper;
+use common\models\user\User;
 
 /**
  * Class WorkerCest
@@ -14,15 +17,17 @@ use common\fixtures\helpers\UserFixtureHelper;
  */
 class WorkerCest {
 
+	/* @see WorkerController::actionIndex() */
 	protected const ROUTE_INDEX = '/user/worker/index';
+	/* @see WorkerController::actionCreate() */
 	protected const ROUTE_CREATE = '/user/worker/create';
-	protected const ROUTE_PROVISION = '/provision/user/user';
+	/* @see WorkerController::actionHierarchy() */
 	protected const ROUTE_HIERARCHY = '/user/worker/hierarchy';
 
 	public function _fixtures(): array {
 		return array_merge(
 			UserFixtureHelper::workers(),
-			['agent-profile' => UserFixtureHelper::profile(UserFixtureHelper::WORKER_AGENT)]
+			UserFixtureHelper::profile(UserFixtureHelper::WORKER_AGENT)
 		);
 	}
 
@@ -82,9 +87,19 @@ class WorkerCest {
 		$I->seeElement('a', ['title' => 'Hierarchy']);
 	}
 
+	public function checkVisibleHierarchyActionButtonInIndexPage(WorkersManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->dontSeeElement('a', ['title' => 'Hierarchy']);
+
+		$I->assignPermission(User::PERMISSION_WORKERS_HIERARCHY);
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeElement('a', ['title' => 'Hierarchy']);
+	}
+
 	public function checkProvisionAsWorkerManager(WorkersManager $I): void {
 		$I->amLoggedIn();
-		$I->amOnPage([static::ROUTE_PROVISION, 'id' => $I->grabFixture(UserFixtureHelper::WORKER_TELEMARKETER, 0)->id]);
+		$I->amOnPage([ProvisionUserCest::ROUTE_USER_VIEW, 'userId' => $I->grabFixture(UserFixtureHelper::WORKER_TELEMARKETER, 0)->id]);
 		$I->seeResponseCodeIs(403);
 	}
 

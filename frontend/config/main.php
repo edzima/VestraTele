@@ -1,7 +1,12 @@
 <?php
 
+use common\behaviors\GlobalAccessBehavior;
 use common\components\User as WebUser;
 use common\models\user\User;
+use common\modules\lead\Module as LeadModule;
+use frontend\controllers\ApiLeadController;
+use frontend\controllers\LeadDialerController;
+use yii\base\Action;
 
 $params = array_merge(
 	require __DIR__ . '/../../common/config/params.php',
@@ -22,6 +27,75 @@ return [
 		],
 		'gridview' => [
 			'class' => '\kartik\grid\Module',
+		],
+		'lead' => [
+			'class' => LeadModule::class,
+			'controllerMap' => [
+				'api' => ApiLeadController::class,
+				'dialer' => LeadDialerController::class,
+			],
+			'onlyUser' => true,
+			'allowDelete' => false,
+			'userClass' => User::class,
+			'userNames' => static function (): array {
+				return User::getSelectList(User::getAssignmentIds([User::PERMISSION_LEAD]));
+			},
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'controllers' => [
+							'lead/lead',
+							'lead/campaign',
+							'lead/source',
+							'lead/reminder',
+							'lead/report',
+							'lead/sms',
+						],
+						'matchCallback' => static function ($rule, Action $action): bool {
+							if ($action->controller->id === 'sms') {
+								if ($action->id === 'push-multiple') {
+									return Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS);
+								}
+								return Yii::$app->user->can(User::PERMISSION_SMS);
+							}
+							return true;
+						},
+						'permissions' => [User::PERMISSION_LEAD],
+					],
+					[
+						'allow' => true,
+						'controllers' => [
+							'lead/market',
+							'lead/market-user',
+						],
+						'permissions' => [User::PERMISSION_LEAD_MARKET],
+					],
+					[
+						'allow' => true,
+						'controllers' => [
+							'lead/user',
+						],
+						'actions' => ['assign-single'],
+						'permissions' => [User::PERMISSION_LEAD],
+					],
+					[
+						'allow' => true,
+						'actions' => ['self'],
+						'controllers' => [
+							'lead/archive',
+						],
+					],
+					[
+						'allow' => true,
+						'controllers' => [
+							'lead/api',
+							'lead/dialer',
+						],
+					],
+				],
+			],
 		],
 	],
 	'components' => [

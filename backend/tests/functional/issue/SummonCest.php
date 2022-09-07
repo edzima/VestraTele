@@ -3,9 +3,12 @@
 namespace backend\tests\functional\issue;
 
 use backend\modules\issue\controllers\SummonController;
+use backend\modules\issue\models\SummonForm;
+use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\SummonIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\TerytFixtureHelper;
 use common\models\issue\Summon;
 use common\models\user\Worker;
 
@@ -17,8 +20,20 @@ class SummonCest {
 	/** @see SummonController::actionCreate() */
 	public const ROUTE_CREATE = '/issue/summon/create';
 
+	/** @see SummonController::actionUpdate() */
+	public const ROUTE_UPDATE = '/issue/summon/update';
+
 	/** @see SummonController::actionView() */
 	public const ROUTE_VIEW = '/issue/summon/view';
+
+	public function _fixtures(): array {
+		return array_merge(
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::users(true),
+			IssueFixtureHelper::entityResponsible(),
+			IssueFixtureHelper::summon()
+		);
+	}
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -26,8 +41,9 @@ class SummonCest {
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkAsIssueSummonManager(SummonIssueManager $I): void {
+	public function checkIndexPageAsIssueManager(IssueManager $I): void {
 		$I->amLoggedIn();
+		$I->assignPermission(Worker::PERMISSION_SUMMON);
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->see('Summons');
 		$I->seeLink('Create summon');
@@ -41,6 +57,16 @@ class SummonCest {
 		$I->seeInGridHeader('Updated at');
 		$I->seeInGridHeader('Owner');
 		$I->seeInGridHeader('Contractor');
+		$I->dontSeeLink('Summon Types');
+	}
+
+	public function checkIndexPageAsIssueSummonManagerWithSummonManagerPermission(SummonIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(Worker::PERMISSION_SUMMON_MANAGER);
+		$I->amOnPage(static::ROUTE_INDEX);
+		$I->seeLink('Summon Types');
+		$I->click('Summon Types');
+		$I->seeInCurrentUrl(SummonTypeCest::ROUTE_INDEX);
 	}
 
 	public function checkCreateSummonLink(SummonIssueManager $I): void {
@@ -50,11 +76,72 @@ class SummonCest {
 		$I->seeInCurrentUrl(static::ROUTE_CREATE);
 	}
 
+	public function checkCreate(SummonIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_CREATE);
+		$I->submitForm('#summon-form', [
+			'SummonForm[issue_id]' => 1,
+			'SummonForm[type_id]' => 1,
+			'SummonForm[contractor_id]' => $I->getUser()->id,
+			'SummonForm[term]' => SummonForm::TERM_FIVE_DAYS,
+			'SummonForm[title]' => 'Test Summon Without Issue in Route Param',
+			'SummonForm[city_id]' => TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA,
+
+		]);
+		$I->seeRecord(Summon::class, [
+			'issue_id' => 1,
+			'type_id' => 1,
+			'title' => 'Test Summon Without Issue in Route Param',
+		]);
+		$I->seeEmailIsSent();
+	}
+
+	public function checkCreateWithEmptyTerm(SummonIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_CREATE);
+		$I->submitForm('#summon-form', [
+			'SummonForm[issue_id]' => 1,
+			'SummonForm[type_id]' => 1,
+			'SummonForm[contractor_id]' => $I->getUser()->id,
+			'SummonForm[term]' => SummonForm::TERM_EMPTY,
+			'SummonForm[title]' => 'Test Summon With Empty Term',
+			'SummonForm[city_id]' => TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA,
+
+		]);
+
+		$I->seeRecord(Summon::class, [
+			'issue_id' => 1,
+			'type_id' => 1,
+			'title' => 'Test Summon With Empty Term',
+			'deadline_at' => null,
+		]);
+	}
+
+	public function checkNotUserSummonUpdateWithoutSummonManagerPermission(IssueManager $I): void {
+		$I->assignPermission(Worker::PERMISSION_SUMMON);
+		$I->amLoggedIn();
+		/**
+		 * @var Summon $summon
+		 */
+		$summon = $I->grabFixture(IssueFixtureHelper::SUMMON, 'new');
+		$I->amOnPage([static::ROUTE_UPDATE, 'id' => $summon->id]);
+		$I->seeResponseCodeIs(403);
+	}
+
+	public function checkNotUserSummonUpdateWithSummonManagerPermission(SummonIssueManager $I): void {
+		$I->assignPermission(Worker::PERMISSION_SUMMON_MANAGER);
+
+		$I->amLoggedIn();
+
+		/**
+		 * @var Summon $summon
+		 */
+		$summon = $I->grabFixture(IssueFixtureHelper::SUMMON, 'new');
+		$I->amOnPage([static::ROUTE_UPDATE, 'id' => $summon->id]);
+		$I->seeResponseCodeIsSuccessful();
+	}
+
 	public function checkView(SummonIssueManager $I): void {
-		$I->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::summon(),
-		));
 		/** @var Summon $summon */
 		$summon = $I->grabFixture(IssueFixtureHelper::SUMMON, 'new');
 		$I->amLoggedIn();
@@ -71,10 +158,6 @@ class SummonCest {
 	}
 
 	public function checkViewWithNotePermission(SummonIssueManager $I): void {
-		$I->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::summon(),
-		));
 		/** @var Summon $summon */
 		$summon = $I->grabFixture(IssueFixtureHelper::SUMMON, 'new');
 		$I->assignPermission(Worker::PERMISSION_NOTE);

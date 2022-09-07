@@ -21,6 +21,12 @@ class UserQuery extends ActiveQuery {
 
 	protected static $assignmentJoinCount = 0;
 
+	public function orderByLastname(): self {
+		$this->joinWith('userProfile');
+		$this->addOrderBy(['user_profile.lastname' => SORT_ASC]);
+		return $this;
+	}
+
 	public function workers(): self {
 		return $this->onlyAssignments(Worker::ROLES, false);
 	}
@@ -120,7 +126,8 @@ class UserQuery extends ActiveQuery {
 	}
 
 	public function active(): self {
-		$this->andWhere(['status' => User::STATUS_ACTIVE]);
+		$this->andWhere([User::tableName() . '.status' => User::STATUS_ACTIVE]);
 		return $this;
 	}
+
 }

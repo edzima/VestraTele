@@ -1,11 +1,11 @@
 <?php
 
+use backend\helpers\Html;
 use backend\modules\issue\models\search\IssueSearch;
 use common\models\user\User;
 use common\widgets\address\AddressSearchWidget;
 use common\widgets\DateWidget;
 use kartik\select2\Select2;
-use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
@@ -16,20 +16,40 @@ use yii\widgets\ActiveForm;
 <div id="issue-search" class="issue-search">
 
 	<?php $form = ActiveForm::begin([
-		'action' => ['index'],
+		'options' => [
+			'data-pjax' => 1,
+		],
+		'id' => 'issue-search-form',
 		'method' => 'get',
 	]); ?>
 
 	<div class="row">
 
-		<?= $form->field($model, 'createdAtFrom', ['options' => ['class' => 'col-md-4']])
+		<?= $form->field($model, 'createdAtFrom', ['options' => ['class' => 'col-md-2']])
 			->widget(DateWidget::class)
 		?>
-		<?= $form->field($model, 'createdAtTo', ['options' => ['class' => 'col-md-4']])
-			->widget(DateWidget::class) ?>
 
-		<?= $form->field($model, 'accident_at', ['options' => ['class' => 'col-md-4']])
-			->widget(DateWidget::class) ?>
+		<?= $form->field($model, 'createdAtTo', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+
+		<?= $form->field($model, 'signedAtFrom', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+		<?= $form->field($model, 'signedAtTo', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+
+		<?= $form->field($model, 'type_additional_date_at', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+		<?= $form->field($model, 'stage_change_at', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
 
 	</div>
 	<div class="row">
@@ -71,7 +91,7 @@ use yii\widgets\ActiveForm;
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'excludedStages', ['options' => ['class' => 'col-md-8']])->widget(Select2::class, [
+		<?= $form->field($model, 'excludedStages', ['options' => ['class' => 'col-md-5 col-lg-4']])->widget(Select2::class, [
 			'data' => $model->getStagesNames(),
 			'options' => [
 				'multiple' => true,
@@ -83,8 +103,26 @@ use yii\widgets\ActiveForm;
 			'showToggleAll' => false,
 		]) ?>
 
+		<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput() ?>
 
-		<?= $form->field($model, 'onlyDelayed', ['options' => ['class' => 'col-md-4']])->checkbox() ?>
+		<?= $form->field($model, 'onlyDelayed', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_PAY_PART_PAYED) ?
+			$form->field($model, 'onlyWithPayedPay', ['options' => ['class' => 'col-md-2']])->checkbox()
+			: ''
+		?>
+
+		<?= $model->scenario === IssueSearch::SCENARIO_ALL_PAYED
+			? $form->field($model, 'onlyWithAllPayedPay', ['options' => ['class' => 'col-md-2']])->checkbox()
+			: ''
+		?>
+
+		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ?
+			$form->field($model, 'onlyWithSettlements', ['options' => ['class' => 'col-md-2']])->dropDownList(Html::booleanDropdownList(), [
+				'prompt' => Yii::t('common', 'All'),
+			])
+			: ''
+		?>
 	</div>
 
 	<?= $model->addressSearch !== null
@@ -96,9 +134,31 @@ use yii\widgets\ActiveForm;
 	?>
 
 
+	<div class="row">
+		<?= $form->field($model, 'userName', ['options' => ['class' => 'col-md-2']])
+			->textInput()
+		?>
+
+		<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-8 col-lg-6']])->widget(Select2::class, [
+			'data' => IssueSearch::getTagsNames(),
+			'options' => [
+				'multiple' => true,
+				'placeholder' => Yii::t('issue', 'Tags'),
+			],
+			'pluginOptions' => [
+				'allowClear' => true,
+			],
+			'showToggleAll' => false,
+		]) ?>
+	</div>
+
+
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Search'), ['class' => 'btn btn-primary']) ?>
-		<?= Html::a(Yii::t('backend', 'Reset'), 'index', ['class' => 'btn btn-default']) ?>
+		<?= Html::a(Yii::t('backend', 'Reset'),
+			['index'], [
+				'class' => 'btn btn-default',
+			]) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

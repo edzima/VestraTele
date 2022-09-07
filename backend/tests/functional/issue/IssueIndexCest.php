@@ -8,13 +8,14 @@ use backend\tests\Step\Functional\Admin;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\SummonIssueManager;
+use common\models\user\Worker;
 
 class IssueIndexCest {
 
 	/**
 	 * @see IssueController::actionIndex()
 	 */
-	protected const ROUTE = '/issue/issue/index';
+	public const ROUTE = '/issue/issue/index';
 
 	public function checkWithoutPermission(Manager $I): void {
 		$I->amLoggedIn();
@@ -56,12 +57,14 @@ class IssueIndexCest {
 		$I->amOnRoute(static::ROUTE);
 		$I->see('Created at from');
 		$I->see('Created at to');
-		$I->see('Accident date');
+		$I->see('Additional Date for Type');
 		$I->see('Lawyer');
 		$I->see('Agent');
 		$I->see('Telemarketer');
 		$I->see('Only delayed');
 		$I->dontSee('Structures');
+		$I->dontSee('Only with payed pay');
+		$I->dontSee('Only with all paid Pays');
 	}
 
 	public function checkSearchFieldsAsAdmin(Admin $I): void {
@@ -70,4 +73,17 @@ class IssueIndexCest {
 		$I->see('Structures');
 	}
 
+	public function checkSearchFieldsWithAllPaidPaysPermission(IssueManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(Worker::PERMISSION_PAY_ALL_PAID);
+		$I->amOnRoute(static::ROUTE);
+		$I->see('Only with all paid Pays');
+	}
+
+	public function checkSearchFieldsWithPayPartPayed(IssueManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(Worker::PERMISSION_PAY_PART_PAYED);
+		$I->amOnRoute(static::ROUTE);
+		$I->see('Only with payed pay');
+	}
 }

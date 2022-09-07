@@ -1,6 +1,7 @@
 <?php
 
 use backend\modules\settlement\models\CalculationForm;
+use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
 use kartik\number\NumberControl;
@@ -34,6 +35,7 @@ use yii\web\View;
 
 	</div>
 
+
 	<div class="row">
 		<?= $model->getModel()->isNewRecord || $model->getModel()->getPaysCount() < 2
 			? $form->field($model, 'payment_at', ['options' => ['class' => 'col-md-3 col-lg-2']])
@@ -45,17 +47,29 @@ use yii\web\View;
 	</div>
 
 	<div class="row">
-		<?=  $form->field($model, 'costs_ids', ['options' => ['class' => 'col-md-6 col-lg-4']])
-				->widget(Select2::class, [
-						'data' => $model->getCostsData(),
-						'options' => [
-							'multiple' => true,
-							'placeholder' => $model->getAttributeLabel('costs_ids'),
-						],
-					]
-				)
-			 ?>
+		<?= $form->field($model, 'costs_ids', ['options' => ['class' => 'col-md-6 col-lg-4']])
+			->widget(Select2::class, [
+					'data' => $model->getCostsData(),
+					'options' => [
+						'multiple' => true,
+						'placeholder' => $model->getAttributeLabel('costs_ids'),
+					],
+				]
+			)
+		?>
 	</div>
+
+
+	<?php if ($model->getMessagesModel()): ?>
+		<div class="row">
+			<div class="col-md-4">
+				<?= IssueMessagesFormWidget::widget([
+					'form' => $form,
+					'model' => $model->getMessagesModel(),
+				]) ?>
+			</div>
+		</div>
+	<?php endif; ?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Save'), ['id' => 'save-btn', 'class' => 'btn btn-success']) ?>

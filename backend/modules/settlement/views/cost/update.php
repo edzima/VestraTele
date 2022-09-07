@@ -1,14 +1,16 @@
 <?php
 
+use backend\helpers\Breadcrumbs;
 use backend\modules\settlement\models\IssueCostForm;
 
 /* @var $this yii\web\View */
 /* @var $model IssueCostForm */
 
-$this->title = Yii::t('backend', 'Update cost: {issue}', ['issue' => $model->getIssue()->longId]);
-$this->params['breadcrumbs'][] = ['label' => 'Issue Costs', 'url' => ['index']];
+$this->title = Yii::t('settlement', 'Update Issue Cost: {issue}', ['issue' => $model->getIssue()->getIssueName()]);
+$this->params['breadcrumbs'] = Breadcrumbs::issue($model->getIssue());
+$this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Costs'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->getModel()->id, 'url' => ['view', 'id' => $model->getModel()->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->params['breadcrumbs'][] = Yii::t('common', 'Update');
 ?>
 <div class="issue-cost-update">
 

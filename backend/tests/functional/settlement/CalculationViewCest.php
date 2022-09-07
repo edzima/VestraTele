@@ -2,26 +2,32 @@
 
 namespace backend\tests\functional\settlement;
 
+use backend\modules\settlement\controllers\CalculationController;
 use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
-use common\models\issue\IssuePayCalculation;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\user\User;
 
 class CalculationViewCest {
 
+	/** @see CalculationController::actionView() */
 	public const ROUTE = '/settlement/calculation/view';
 
+	private SettlementFixtureHelper $settlementFixture;
+
 	public function _before(CreateCalculationIssueManager $I): void {
+		$this->settlementFixture = new SettlementFixtureHelper($I);
 		$I->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements(),
+			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::customer(),
+			IssueFixtureHelper::issueUsers(),
+			SettlementFixtureHelper::settlement(),
 		));
 		$I->amLoggedIn();
 	}
 
 	public function checkPayed(CreateCalculationIssueManager $I): void {
-		/** @var IssuePayCalculation $model */
-		$model = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'payed');
+		$model = $this->settlementFixture->grabSettlement('payed-with-single-costs');
 
 		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
 		$I->see('Settlement ' . $model->getTypeName());
@@ -33,8 +39,8 @@ class CalculationViewCest {
 	}
 
 	public function checkNotPayed(CreateCalculationIssueManager $I): void {
-		/** @var IssuePayCalculation $model */
-		$model = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
+		$model = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
+
 		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
 		$I->see('Settlement ' . $model->getTypeName());
 		$I->see('Value to pay');
@@ -43,15 +49,16 @@ class CalculationViewCest {
 
 	public function checkNotPayedWithPayPermission(CreateCalculationIssueManager $I): void {
 		$I->assignPermission(User::PERMISSION_CALCULATION_PAYS);
-		/** @var IssuePayCalculation $model */
-		$model = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
+		$model = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
+
 		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
 		$I->seeLink('Generate pays');
 	}
 
 	public function checkWithNotePermission(CreateCalculationIssueManager $I): void {
 		$I->assignPermission(User::PERMISSION_NOTE);
-		$model = $I->grabFixture(IssueFixtureHelper::CALCULATION, 'not-payed');
+		$model = $this->settlementFixture->grabSettlement('not-payed-with-double-costs');
+
 		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
 		$I->seeLink('Create note');
 		$I->click('Create note');

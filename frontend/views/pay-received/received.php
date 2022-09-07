@@ -14,7 +14,7 @@ $this->title = Yii::t('settlement', 'Received pay: {value}', [
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['issue/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['settlement/index']];
-$this->params['breadcrumbs'][] = ['label' => $model->getPay()->calculation->getTypeName(), 'url' => ['settlement/view', 'id' => $model->getPay()->calculation_id]];
+$this->params['breadcrumbs'][] = ['label' => $model->getPay()->calculation->getTypeName(), 'url' => ['settlement/view', 'id' => $model->getPay()->calculation->getId()]];
 
 $this->params['breadcrumbs'][] = $this->title;
 

@@ -49,7 +49,7 @@ YiiAsset::register($this);
 		'visibleCustomer' => false,
 		'caption' => Yii::t('settlement', 'Pays'),
 		'summary' => '',
-
+		'visibleIssueType' => false,
 		'visibleProvisionsDetails' => $model->issue->isForUser(Yii::$app->user->getId())
 			|| $model->issue->isForAgents(Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId())),
 		'visibleSettlementType' => false,

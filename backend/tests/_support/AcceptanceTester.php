@@ -26,16 +26,28 @@ class AcceptanceTester extends \Codeception\Actor {
 	use UserRbacActor;
 
 	protected function checkIsLogged(): void {
-		$this->wait(1);
+		$this->wait(0.2);
 		$this->see($this->getUsername());
 	}
 
-	public function fillOutSelect2OptionField(string $selector, $value) {
+	public function fillOutSelect2OptionField(string $selector, $value, bool $pressEnter = true) {
 		$I = $this;
 		$I->click($selector);
 		$searchField = '.select2-search__field';
 		$I->waitForElementVisible($searchField);
 		$I->fillField($searchField, $value);
+		if ($pressEnter) {
+			$I->wait(1);
+			$I->pressKey($searchField, WebDriverKeys::ENTER);
+		}
+	}
+
+	public function seeInSelect2OptionSearchField(string $selector, $text): void {
+		$I = $this;
+		$I->click($selector);
+		$searchField = '.select2-search__field';
+		$I->waitForElementVisible($searchField);
+		$I->seeInField($searchField, $text);
 		$I->pressKey($searchField, WebDriverKeys::ENTER);
 	}
 
@@ -48,9 +60,9 @@ class AcceptanceTester extends \Codeception\Actor {
 	}
 
 	public function seeImageLoaded(string $element): void {
-		$this->waitForElement($element,5);
+		$this->waitForElement($element, 5);
 		$naturalHeight = $this->grabAttributeFrom($element, 'naturalHeight');
-		$this->assertGreaterThan(0,$naturalHeight);
+		$this->assertGreaterThan(0, $naturalHeight);
 	}
 
 }

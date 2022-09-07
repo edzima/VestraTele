@@ -2,11 +2,13 @@
 
 namespace backend\modules\user\models\search;
 
+use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\models\user\query\UserQuery;
 use common\models\user\SurnameSearchInterface;
 use common\models\user\User;
 use common\models\user\UserTrait;
+use common\validators\PhoneValidator;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -28,7 +30,7 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 	public $trait = [];
 
 	public array $defaultOrder = [
-		'action_at' => 'DESC',
+		'action_at' => SORT_DESC,
 	];
 
 	public function attributeLabels(): array {
@@ -38,6 +40,7 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 				'role' => Yii::t('common', 'Role'),
 				'permission' => Yii::t('common', 'Permission'),
 				'trait' => Yii::t('common', 'Trait'),
+				'phone' => Yii::t('common', 'Phone number'),
 			]
 		);
 	}
@@ -53,7 +56,7 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 			['role', 'in', 'range' => array_keys(static::getRolesNames()), 'allowArray' => true],
 			['permission', 'in', 'range' => array_keys(static::getPermissionsNames()), 'allowArray' => true],
 			['trait', 'in', 'range' => array_keys(static::getUserTraitsNames()), 'allowArray' => true],
-
+			['phone', PhoneValidator::class],
 		];
 	}
 
@@ -93,13 +96,13 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 		if (!$this->validate()) {
 			// uncomment the following line if you do not want to return any records when validation fails
 			// $query->where('0=1');
-
 			return $dataProvider;
 		}
 
 		$this->applySurnameFilter($query);
 		$this->applyAssigmentFilter($query);
 		$this->applyTraitFilter($query);
+		$this->applyPhoneFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -113,7 +116,6 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 
 		$query->andFilterWhere(['like', 'username', $this->username])
 			->andFilterWhere(['like', 'user_profile.firstname', $this->firstname])
-			->andFilterWhere(['like', 'user_profile.phone', $this->phone])
 			->andFilterWhere(['like', 'email', $this->email])
 			->andFilterWhere(['like', 'teryt_simc.region_id', $this->region_id])
 			->andFilterWhere(['like', 'teryt_simc.name', $this->city])
@@ -124,6 +126,16 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 
 	protected function createQuery(): UserQuery {
 		return User::find();
+	}
+
+	private function applyPhoneFilter(UserQuery $query): void {
+		if (!empty($this->phone)) {
+			$query->joinWith([
+				'userProfile' => function (PhonableQuery $query): void {
+					$query->withPhoneNumber($this->phone);
+				},
+			]);
+		}
 	}
 
 	protected function applySurnameFilter(UserQuery $query): void {

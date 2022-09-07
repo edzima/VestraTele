@@ -22,12 +22,34 @@ $this->params['breadcrumbs'][] = $this->title;
 
 		<?= Yii::$app->user->can(User::PERMISSION_PROVISION)
 			? Html::a(Yii::t('backend', 'Without provisions'), ['without-provisions'], ['class' => 'btn btn-info'])
-			: '' ?>
-
+			: ''
+		?>
 
 		<?= Yii::$app->user->can(User::PERMISSION_COST)
 			? Html::a(Yii::t('backend', 'Costs'), ['/settlement/cost/index'], ['class' => 'btn btn-warning'])
-			: '' ?>
+			: ''
+		?>
+
+
+		<?= Yii::$app->user->can(User::PERMISSION_PAY)
+			? Html::a(Yii::t('settlement', 'Pays'), ['/settlement/pay/index'], ['class' => 'btn btn-primary'])
+			: ''
+		?>
+
+
+
+		<?= Yii::$app->user->can(User::PERMISSION_PROVISION)
+			? Html::a(Yii::t('provision', 'Delete provisions'),
+				['/provision/settlement/delete-multi', 'ids' => $dataProvider->getKeys()],
+				[
+					'class' => 'btn btn-danger pull-right',
+					'data' => [
+						'confirm' => Yii::t('provision', 'Are you sure you want to delete provisions for this settlements?'),
+						'method' => 'post',
+					],
+				])
+			: ''
+		?>
 
 
 	</p>

@@ -2,11 +2,14 @@
 
 namespace common\models\issue;
 
+use common\helpers\ArrayHelper;
 use common\models\entityResponsible\EntityResponsible;
+use common\models\issue\query\SummonQuery;
 use common\models\user\User;
 use edzima\teryt\models\Simc;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -14,8 +17,8 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property int $status
- * @property int $type
- * @property string $title
+ * @property int $type_id
+ * @property string|null $title
  * @property int $created_at
  * @property int $updated_at
  * @property string $start_at
@@ -32,12 +35,13 @@ use yii\db\ActiveRecord;
  * @property-read string $typeName
  * @property-read string $entityWithCity
  *
+ * @property-read SummonType $type
  * @property-read Issue $issue
  * @property-read User $contractor
  * @property-read User $owner
  * @property-read Simc $city
  * @property-read EntityResponsible $entityResponsible
- * @property int $term [smallint]
+ * @property-read SummonDoc[] $docs
  */
 class Summon extends ActiveRecord implements IssueInterface {
 
@@ -49,15 +53,6 @@ class Summon extends ActiveRecord implements IssueInterface {
 	public const STATUS_TO_CONFIRM = 4;
 	public const STATUS_REALIZED = 5;
 	public const STATUS_UNREALIZED = 6;
-
-	public const TYPE_APPEAL = 10;
-	public const TYPE_INCOMPLETE_DOCUMENTATION = 15;
-	public const TYPE_PHONE = 20;
-	public const TYPE_ANTIVINDICATION = 30;
-	public const TYPE_URGENCY = 40;
-	public const TYPE_RESIGNATION = 50;
-
-
 
 	/**
 	 * @inheritdoc
@@ -91,12 +86,12 @@ class Summon extends ActiveRecord implements IssueInterface {
 	 */
 	public function rules(): array {
 		return [
-			[['status', 'title', 'issue_id', 'owner_id', 'contractor_id', 'entity_id', 'city_id', 'type'], 'required'],
+			[['status', 'issue_id', 'owner_id', 'contractor_id', 'entity_id', 'city_id', 'type_id'], 'required'],
 			[['status', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
 			[['title'], 'string', 'max' => 255],
-			[['created_at', 'updated_at', 'realized_at', 'start_at'], 'safe'],
-			['type', 'in', 'range' => array_keys(static::getTypesNames())],
+			[['created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at'], 'safe'],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
+			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => SummonType::class, 'targetAttribute' => ['type_id' => 'id']],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			[['entity_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_id' => 'id']],
 			[['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Simc::class, 'targetAttribute' => ['city_id' => 'id']],
@@ -112,6 +107,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 		return [
 			'id' => 'ID',
 			'type' => Yii::t('common', 'Type'),
+			'type_id' => Yii::t('common', 'Type'),
 			'typeName' => Yii::t('common', 'Type'),
 			'status' => Yii::t('common', 'Status'),
 			'statusName' => Yii::t('common', 'Status'),
@@ -133,46 +129,56 @@ class Summon extends ActiveRecord implements IssueInterface {
 			'entity' => Yii::t('common', 'Entity responsible'),
 			'entityWithCity' => Yii::t('common', 'Entity responsible'),
 			'deadline_at' => Yii::t('common', 'Deadline at'),
+			'doc_types_ids' => Yii::t('common', 'Doc Types'),
+			'docsNames' => Yii::t('common', 'Doc Types'),
+			'titleWithDocs' => Yii::t('issue', 'Title with Docs'),
 		];
 	}
 
+	public function getTitleWithDocs(): string {
+		if (empty($this->title)) {
+			return $this->getDocsNames();
+		}
+		if (empty($this->docs)) {
+			return $this->title;
+		}
+		return $this->title . ' - ' . $this->getDocsNames();
+	}
+
+	public function getDocsNames(): ?string {
+		$docs = $this->docs;
+		if (empty($docs)) {
+			return null;
+		}
+		return implode(', ', ArrayHelper::getColumn($docs, 'name'));
+	}
+
+	public function getType(): ActiveQuery {
+		return $this->hasOne(SummonType::class, ['id' => 'type_id']);
+	}
+
 	public function getEntityWithCity(): string {
-		return $this->entityResponsible->name . ' - ' . $this->city->name;
+		return $this->entityResponsible->name .
+			' - '
+			. $this->city->name;
 	}
 
 	public function getTypeName(): string {
-		return static::getTypesNames()[$this->type];
+		return $this->type->name;
 	}
 
 	public function getStatusName(): string {
 		return static::getStatusesNames()[$this->status];
 	}
 
-
-
-
-
-
-	//@todo add I18n
 	public static function getStatusesNames(): array {
 		return [
-			static::STATUS_NEW => 'Nowe',
-			static::STATUS_IN_PROGRESS => 'W trakcie realizacji',
-			static::STATUS_WITHOUT_RECOGNITION => 'Bez rozpoznania',
-			static::STATUS_TO_CONFIRM => 'Do potwierdzenia',
-			static::STATUS_REALIZED => 'Zrealizowane',
-			static::STATUS_UNREALIZED => 'Niezrealizowane',
-		];
-	}
-
-	public static function getTypesNames(): array {
-		return [
-			static::TYPE_APPEAL => Yii::t('common', 'Appeal'),
-			static::TYPE_INCOMPLETE_DOCUMENTATION => Yii::t('common', 'Incomplete documentation'),
-			static::TYPE_PHONE => Yii::t('common', 'Phonable summon'),
-			static::TYPE_ANTIVINDICATION => Yii::t('common', 'Antyvindication'),
-			static::TYPE_RESIGNATION => Yii::t('common', 'Resignation'),
-			static::TYPE_URGENCY => Yii::t('common', 'Urgency'),
+			static::STATUS_NEW => Yii::t('common', 'New'),
+			static::STATUS_IN_PROGRESS => Yii::t('common', 'In progress'),
+			static::STATUS_WITHOUT_RECOGNITION => Yii::t('common', 'Without Recognition'),
+			static::STATUS_TO_CONFIRM => Yii::t('common', 'To Confirm'),
+			static::STATUS_REALIZED => Yii::t('common', 'Realized'),
+			static::STATUS_UNREALIZED => Yii::t('common', 'Unrealized'),
 		];
 	}
 
@@ -180,10 +186,14 @@ class Summon extends ActiveRecord implements IssueInterface {
 		return (int) $this->status === static::STATUS_REALIZED;
 	}
 
+	public function isUnrealized(): bool {
+		return (int) $this->status === static::STATUS_UNREALIZED;
+	}
+
 	/**
 	 * Gets query for [[Issue]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getIssue() {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
@@ -192,7 +202,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 	/**
 	 * Gets query for [[EntityResponsible]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getEntityResponsible() {
 		return $this->hasOne(EntityResponsible::class, ['id' => 'entity_id']);
@@ -202,10 +212,14 @@ class Summon extends ActiveRecord implements IssueInterface {
 		return $this->hasOne(Simc::class, ['id' => 'city_id']);
 	}
 
+	public function getDocs() {
+		return $this->hasMany(SummonDoc::class, ['id' => 'doc_type_id'])->viaTable(SummonDoc::viaTableName(), ['summon_id' => 'id']);
+	}
+
 	/**
 	 * Gets query for [[Contractor]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getContractor() {
 		return $this->hasOne(User::class, ['id' => 'contractor_id']);
@@ -214,7 +228,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 	/**
 	 * Gets query for [[Owner]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getOwner() {
 		return $this->hasOne(User::class, ['id' => 'owner_id']);
@@ -234,5 +248,9 @@ class Summon extends ActiveRecord implements IssueInterface {
 
 	public function getName(): string {
 		return Yii::t('common', 'Summon {type}', ['type' => $this->getTypeName()]);
+	}
+
+	public static function find(): SummonQuery {
+		return new SummonQuery(static::class);
 	}
 }

@@ -6,8 +6,8 @@ use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionQuery;
+use common\models\settlement\Pay;
 use common\models\settlement\PayInterface;
-use common\models\settlement\VATInfo;
 use common\models\settlement\VATInfoTrait;
 use DateTime;
 use Decimal\Decimal;
@@ -21,28 +21,25 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property int $calculation_id
- * @property string $pay_at
- * @property string $deadline_at
- * @property string $value
- * @property int $transfer_type
- * @property string $vat
  * @property int $status
+ * @property string $value
+ * @property string|null $vat
+ * @property string|null $pay_at
+ * @property string|null $deadline_at
+ * @property string|null $transfer_type
  *
+ * @todo replace with valueWithoutVAT
  * @property-read float $valueNetto
  *
  * @property-read Issue $issue
- * @property-read IssuePay[] $pays
  * @property-read Provision[] $provisions
  * @property-read IssuePayCalculation $calculation
  */
-class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
+class IssuePay extends ActiveRecord implements IssuePayInterface {
 
 	use VATInfoTrait;
 
 	public const DATE_FORMAT = 'Y-m-d';
-
-	public const TRANSFER_TYPE_DIRECT = 1;
-	public const TRANSFER_TYPE_BANK = 2;
 
 	public const STATUS_INFORMED = 1;
 	public const STATUS_NO_CONTACT = 10;
@@ -50,11 +47,16 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 	public const STATUS_REQUEST_REDUCTION = 40;
 	public const STATUS_ANALYSE = 50;
 
+	public const STATUS_DEMAND_FOR_PAYMENT_FIRST = 60;
+	public const STATUS_DEMAND_FOR_PAYMENT_SECOND = 61;
+	public const STATUS_DEMAND_FOR_PAYMENT_THIRD = 62;
+	public const STATUS_DEMAND_BEFORE_JUDGMENT = 65;
+
 	/**
 	 * @inheritdoc
 	 */
 	public static function tableName(): string {
-		return 'issue_pay';
+		return '{{%issue_pay}}';
 	}
 
 	/**
@@ -63,7 +65,6 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 	public function rules(): array {
 		return [
 			[['value', 'deadline_at', 'transfer_type', 'vat'], 'required', 'enableClientValidation' => false],
-			[['transfer_type'], 'integer'],
 			[['pay_at', 'deadline_at'], 'safe'],
 			[['value', 'vat'], 'number', 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/', 'enableClientValidation' => false],
 			['vat', 'number', 'min' => 0, 'max' => 100],
@@ -72,9 +73,41 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 				return !empty($this->status);
 			},
 			],
-			[['transfer_type'], 'in', 'range' => array_keys(static::getTransferTypesNames())],
+			[['transfer_type'], 'in', 'range' => array_keys(static::getTransfersTypesNames())],
 			[['calculation_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssuePayCalculation::class, 'targetAttribute' => ['calculation_id' => 'id']],
 		];
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function attributeLabels(): array {
+		return [
+			'id' => 'ID',
+			'pay_at' => Yii::t('settlement', 'Pay at'),
+			'deadline_at' => Yii::t('settlement', 'Deadline at'),
+			'value' => Yii::t('settlement', 'Value with VAT'),
+			'valueNetto' => Yii::t('settlement', 'Value without VAT'),
+			'transfer_type' => Yii::t('settlement', 'Transfer Type'),
+			'partInfo' => Yii::t('settlement', 'Part Info'),
+			'vat' => Yii::t('settlement', 'VAT (%)'),
+			'vatPercent' => Yii::t('settlement', 'VAT (%)'),
+		];
+	}
+
+	public function getId(): int {
+		return $this->id;
+	}
+
+	public function isPayed(): bool {
+		return $this->getPaymentAt() !== null;
+	}
+
+	public function isDelayed(string $range = 'now'): bool {
+		if ($this->isPayed() || $this->getDeadlineAt() === null) {
+			return false;
+		}
+		return (new DateTime($range)) > $this->getDeadlineAt();
 	}
 
 	public function setPay(PayInterface $pay): void {
@@ -108,21 +141,8 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 		}
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public function attributeLabels(): array {
-		return [
-			'id' => 'ID',
-			'pay_at' => Yii::t('settlement', 'Pay at'),
-			'deadline_at' => Yii::t('settlement', 'Deadline at'),
-			'value' => Yii::t('settlement', 'Value with VAT'),
-			'valueNetto' => 'Honorarium (Netto)',
-			'transfer_type' => 'Typ płatności',
-			'partInfo' => 'Część',
-			'vat' => 'VAT (%)',
-			'vatPercent' => 'VAT (%)',
-		];
+	public function getTransferType(): ?string {
+		return $this->transfer_type;
 	}
 
 	public function getCalculation(): ActiveQuery {
@@ -143,28 +163,25 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 		return $this->hasMany(Provision::class, ['pay_id' => 'id']);
 	}
 
-	public function isPayed(): bool {
-		return $this->getPaymentAt() !== null;
-	}
-
-	public function getTransferType(): int {
-		return $this->transfer_type;
-	}
-
 	public function getPartInfo(): string {
-		$pays = $this->calculation->pays;
-		$count = count($pays);
-		if ($count === 1) {
-			return '1/1';
+		$index = $this->getSettlementPartIndex();
+		return $index . '/' . count($this->calculation->pays);
+	}
+
+	public function getSettlementPartIndex(): int {
+		if ($this->getValue()->equals($this->calculation->getValue())
+			|| count($this->calculation->pays) === 1) {
+			return 1;
 		}
+		$pays = $this->calculation->pays;
 		$i = 0;
 		foreach ($pays as $pay) {
 			$i++;
 			if ($pay->id === $this->id) {
-				return $i . '/' . $count;
+				break;
 			}
 		}
-		return '';
+		return $i;
 	}
 
 	public function getStatusName(): ?string {
@@ -172,14 +189,14 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 	}
 
 	public function getTransferTypeName(): string {
-		return static::getTransferTypesNames()[$this->transfer_type];
+		return static::getTransfersTypesNames()[$this->transfer_type];
 	}
 
-	public static function getTransferTypesNames(): array {
-		return [
-			static::TRANSFER_TYPE_BANK => 'Przelew',
-			static::TRANSFER_TYPE_DIRECT => 'Gotówka',
-		];
+	public function markAsPaid(DateTime $date, string $transfer_type): bool {
+		$this->pay_at = $date->format('Y-m-d');
+		$this->transfer_type = $transfer_type;
+		$this->status = null;
+		return $this->save(false);
 	}
 
 	public static function getStatusNames(): array {
@@ -189,31 +206,26 @@ class IssuePay extends ActiveRecord implements PayInterface, VATInfo {
 			static::STATUS_REQUEST_PAY => Yii::t('settlement', 'Pay request'),
 			static::STATUS_REQUEST_REDUCTION => Yii::t('settlement', 'Reduction request'),
 			static::STATUS_ANALYSE => Yii::t('settlement', 'Analyse'),
+			static::STATUS_DEMAND_FOR_PAYMENT_FIRST => Yii::t('settlement', 'First Demand for Payment'),
+			static::STATUS_DEMAND_FOR_PAYMENT_SECOND => Yii::t('settlement', 'Second Demand for Payment'),
+			static::STATUS_DEMAND_FOR_PAYMENT_THIRD => Yii::t('settlement', 'Third Demand for Payment'),
+			static::STATUS_DEMAND_BEFORE_JUDGMENT => Yii::t('settlement', 'Demand before Judgement'),
 		];
+	}
+
+	public static function getTransfersTypesNames(): array {
+		return Pay::getTransfersTypesNames();
 	}
 
 	public static function find(): IssuePayQuery {
 		return new IssuePayQuery(static::class);
 	}
 
-	public function isDelayed(string $range = 'now'): bool {
-		if ($this->isPayed() || $this->getDeadlineAt() === null) {
-			return false;
-		}
-		return new DateTime($range) > $this->getDeadlineAt();
+	public function getSettlementId(): int {
+		return $this->calculation_id;
 	}
 
-	public function markAsPayment(DateTime $dateTime): void {
-		$this->pay_at = $dateTime->format('Y-m-d');
-		$this->status = null;
-		$this->save(false);
-	}
-
-	public function getCosts(bool $withVAT = false): Decimal {
-		if ($this->calculation->hasCosts) {
-			return $this->calculation->getCostsSum($withVAT)
-				->div($this->calculation->getPaysCount());
-		}
-		return new Decimal(0);
+	public function getStatus(): ?int {
+		return $this->status;
 	}
 }

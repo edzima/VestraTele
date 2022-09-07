@@ -2,8 +2,10 @@
 
 namespace common\models\issue;
 
+use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -21,20 +23,19 @@ use yii\helpers\ArrayHelper;
  */
 class IssueStage extends ActiveRecord {
 
-	public const ARCHIVES_ID = 6;
-	public const POSITIVE_DECISION_ID = 18;
+	public const ARCHIVES_ID = -1;
 
 	public static array $STAGES = [];
-
-	public function __toString(): string {
-		return $this->name;
-	}
 
 	/**
 	 * @inheritdoc
 	 */
 	public static function tableName(): string {
-		return 'issue_stage';
+		return '{{%issue_stage}}';
+	}
+
+	public function __toString(): string {
+		return $this->name;
 	}
 
 	/**
@@ -51,27 +52,22 @@ class IssueStage extends ActiveRecord {
 		];
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getIssues() {
-		return $this->hasMany(Issue::class, ['stage_id' => 'id']);
-	}
-
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getTypes() {
-		return $this->hasMany(IssueType::class, ['id' => 'type_id'])
-			->viaTable('{{%issue_stage_type}}', ['stage_id' => 'id']);
-	}
-
 	public function getNameWithShort(): string {
 		return $this->name . ' (' . $this->short_name . ')';
 	}
 
 	public function getTypesName(): string {
 		return implode(', ', $this->types);
+	}
+
+	public function getIssues(): IssueQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
+		return $this->hasMany(Issue::class, ['stage_id' => 'id']);
+	}
+
+	public function getTypes(): ActiveQuery {
+		return $this->hasMany(IssueType::class, ['id' => 'type_id'])
+			->viaTable('{{%issue_stage_type}}', ['stage_id' => 'id']);
 	}
 
 	public static function getStagesNames(bool $withArchive = false): array {
@@ -82,9 +78,15 @@ class IssueStage extends ActiveRecord {
 		return $names;
 	}
 
+	/**
+	 * @return static[]
+	 */
 	public static function getStages(): array {
 		if (empty(static::$STAGES)) {
-			static::$STAGES = static::find()->indexBy('id')->all();
+			static::$STAGES = static::find()
+				->orderBy('name')
+				->indexBy('id')
+				->all();
 		}
 		return static::$STAGES;
 	}

@@ -6,6 +6,7 @@ use backend\helpers\Html;
 use Closure;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
+use common\models\user\User;
 use common\widgets\FieldsetDetailView;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -25,27 +26,69 @@ class IssueUsersWidget extends Widget {
 
 	public string $type;
 
-	public array $fieldsetOptions = [
-		'toggle' => false,
-		'htmlOptions' => [
-			'class' => 'col-md-6',
-		],
-		'detailConfig' => [
-			'attributes' => [
-				'email:email',
-				'profile.phone:text:Telefon',
-				'profile.phone_2:text:Telefon[2]',
-			],
-		],
-	];
+	public array $fieldsetOptions = [];
+	public bool $withCheckEmailVisibility = true;
 
 	public array $containerOptions = [
-		'class' => 'issue-users row',
+		'class' => 'issue-users',
 	];
 
 	public ?Closure $legend = null;
+	public ?Closure $afterLegend = null;
 	public ?Closure $withAddress = null;
 	public bool $legendEncode = true;
+	public bool $withTraits = false;
+
+	public function getDefaultFieldsetOptions(IssueUser $issueUser): array {
+		$user = $issueUser->user;
+		$traits = [];
+		if ($this->withTraits) {
+			$traits = $issueUser->user->getTraits()
+				->joinWith('trait')
+				->andWhere(['show_on_issue_view' => true])
+				->all();
+		}
+
+		return [
+			'toggle' => false,
+			'htmlOptions' => [
+				//		'class' => 'col-md-6',
+			],
+			'detailConfig' => [
+				'attributes' => [
+					[
+						'attribute' => 'email',
+						'format' => 'email',
+						'visible' => $this->isEmailVisible($user),
+					],
+					[
+						'attribute' => 'profile.phone',
+						'format' => 'tel',
+						'label' => Yii::t('common', 'Phone number'),
+						'visible' => !empty($user->profile->phone),
+					],
+					[
+						'attribute' => 'profile.phone_2',
+						'label' => Yii::t('common', 'Phone number 2'),
+						'format' => 'tel',
+						'visible' => !empty($user->profile->phone_2),
+					],
+					[
+						'label' => Yii::t('common', 'Traits'),
+						'visible' => !empty($traits),
+						'value' => implode(', ', ArrayHelper::getColumn($traits, 'name')),
+					],
+				],
+			],
+		];
+	}
+
+	public function isEmailVisible(User $user): bool {
+		if (empty($user->email)) {
+			return false;
+		}
+		return !$this->withCheckEmailVisibility || !$user->profile->email_hidden_in_frontend_issue;
+	}
 
 	/**
 	 * @return string
@@ -102,6 +145,9 @@ class IssueUsersWidget extends Widget {
 
 	public function renderUser(IssueUser $issueUser): string {
 		$options = $this->fieldsetOptions;
+		if (empty($options)) {
+			$options = $this->getDefaultFieldsetOptions($issueUser);
+		}
 		$class = ArrayHelper::remove($options, 'class', FieldsetDetailView::class);
 		if ($this->withAddress !== null) {
 			if (call_user_func($this->withAddress, $issueUser) && $issueUser->user->homeAddress) {
@@ -125,6 +171,7 @@ class IssueUsersWidget extends Widget {
 			}
 		}
 		$options['legend'] = $this->generateLegend($issueUser);
+		$options['afterLegend'] = $this->renderAfterLegend($issueUser);
 		$options['legendOptions']['encode'] = $this->legendEncode;
 		$options['detailConfig']['model'] = $issueUser->user;
 		return $class::widget($options);
@@ -136,5 +183,12 @@ class IssueUsersWidget extends Widget {
 			return $legend($issueUser);
 		}
 		return $issueUser->getTypeName();
+	}
+
+	public function renderAfterLegend(IssueUser $issueUser): string {
+		if ($this->afterLegend instanceof Closure) {
+			return call_user_func($this->afterLegend, $issueUser);
+		}
+		return '';
 	}
 }

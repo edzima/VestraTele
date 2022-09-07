@@ -1,5 +1,6 @@
 <?php
 
+
 $params = array_merge(
 	require __DIR__ . '/../../common/config/params.php',
 	require __DIR__ . '/../../common/config/params-local.php',
@@ -10,7 +11,7 @@ $params = array_merge(
 return [
 	'id' => 'app-console',
 	'basePath' => dirname(__DIR__),
-	'bootstrap' => ['log', 'teryt'],
+	'bootstrap' => ['log', 'teryt', 'lead'],
 	'controllerNamespace' => 'console\controllers',
 	'aliases' => [
 		'@bower' => '@vendor/bower-asset',
@@ -25,6 +26,10 @@ return [
 				'@yii/log/migrations',
 				'@yii/rbac/migrations/',
 				'@edzima/teryt/migrations',
+			],
+			'migrationNamespaces' => [
+				'ymaker\email\templates\migrations',
+				'yii\queue\db\migrations',
 			],
 		],
 		'fixture' => [

@@ -1,0 +1,9 @@
+suite_namespace: frontend\tests\api
+actor: ApiTester
+modules:
+  enabled:
+    - REST:
+        url: 'https://frontend.dev'
+        shortDebugResponse: 300
+        depends: Yii2
+    - Yii2

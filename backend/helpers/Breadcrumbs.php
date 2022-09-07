@@ -22,8 +22,7 @@ class Breadcrumbs {
 	public static function settlement(IssuePayCalculation $model, bool $withView = true): array {
 		$breadcrumbs = [];
 		if (Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
-			$breadcrumbs[] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['index']];
-			$breadcrumbs[] = ['label' => $model->getIssueName(), 'url' => ['/settlement/calculation/issue', 'id' => $model->getIssueId()]];
+			$breadcrumbs[] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['/settlement/calculation/issue', 'id' => $model->getIssueId()]];
 		}
 		if ($withView) {
 			$breadcrumbs[] = ['label' => $model->getTypeName(), 'url' => ['/settlement/calculation/view', 'id' => $model->id]];

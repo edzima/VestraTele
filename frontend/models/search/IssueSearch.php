@@ -3,11 +3,14 @@
 namespace frontend\models\search;
 
 use common\models\issue\IssueSearch as BaseIssueSearch;
+use common\models\issue\IssueTag;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
 use common\models\user\User;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 
 class IssueSearch extends BaseIssueSearch {
 
@@ -20,6 +23,19 @@ class IssueSearch extends BaseIssueSearch {
 		return array_merge(parent::rules(), [
 			['agent_id', 'in', 'range' => $this->getAvailableAgentsIds()],
 		]);
+	}
+
+	public function attributeLabels(): array {
+		$labels = parent::attributeLabels();
+		$labels['entity_responsible_id'] = Yii::t('issue', 'Entity');
+		return $labels;
+	}
+
+	public static function getTagsNames(): array {
+		return ArrayHelper::map(IssueTag::find()
+			->andWhere(['is_active' => true])
+			->asArray()
+			->all(), 'id', 'name');
 	}
 
 	/**
@@ -68,6 +84,7 @@ class IssueSearch extends BaseIssueSearch {
 		$query->andFilterWhere([
 			'issue_user.user_id' => empty($this->agentsIds) ? $this->user_id : array_merge($this->agentsIds, [$this->user_id]),
 		]);
+		$query->groupBy('issue_user.issue_id');
 		return $dataProvider;
 	}
 
@@ -96,12 +113,13 @@ class IssueSearch extends BaseIssueSearch {
 		return $this->availableAgentsIds;
 	}
 
-	public function getAgentsList(): array {
+	public function getAgentsNames(): array {
 		return User::getSelectList(
 			IssueUser::find()
 				->select('user_id')
 				->withType(IssueUser::TYPE_AGENT)
 				->andWhere(['user_id' => $this->getAvailableAgentsIds()])
+				->distinct()
 				->column()
 		);
 	}

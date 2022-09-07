@@ -7,9 +7,10 @@ use frontend\models\NavItem;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\Breadcrumbs;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $content string */
 
 AppAsset::register($this);
@@ -21,7 +22,11 @@ AppAsset::register($this);
 	<meta charset="<?= Yii::$app->charset ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<?php $this->registerCsrfMetaTags() ?>
-	<title><?= Html::encode($this->title) ?></title>
+	<title><?= Html::encode(strtr('{appName} - {title}', [
+				'{appName}' => Yii::$app->name,
+				'{title}' => $this->title,
+			])
+		) ?></title>
 	<?php $this->head() ?>
 </head>
 <body>
@@ -39,23 +44,57 @@ AppAsset::register($this);
 	if (Yii::$app->user->isGuest) {
 		$menuItems[] = ['label' => Yii::t('frontend', 'Login'), 'url' => ['/site/login']];
 	} else {
-		$menuItems[] = [
-			'label' => 'Lead',
-			'url' => '#',
-			'visible' => Yii::$app->user->can(User::PERMISSION_MEET),
 
+
+		$menuItems[] = [
+			'label' => Yii::t('lead', 'Leads'),
+			'url' => '#',
+			'visible' => Yii::$app->user->can(User::PERMISSION_LEAD),
 			'items' => [
 				[
 					'label' => Yii::t('common', 'Browse'),
-					'url' => ['/meet/index'],
+					'url' => ['/lead/lead/index'],
 				],
 				[
-					'label' => 'Nowy',
-					'url' => ['/meet/create'],
+					'label' => Yii::t('lead', 'Lead Markets'),
+					'url' => ['/lead/market/user'],
+					'visible' => Yii::$app->user->can(User::PERMISSION_LEAD_MARKET),
 				],
 				[
-					'label' => 'Kalendarz',
-					'url' => ['/meet-calendar/index'],
+					'label' => Yii::t('lead', 'Create Lead'),
+					'url' => ['/lead/lead/create'],
+				],
+				[
+					'label' => Yii::t('lead', 'Lead Reports'),
+					'url' => ['/lead/report/index'],
+				],
+				[
+					'label' => Yii::t('lead', 'Reminders'),
+					'url' => ['/lead/reminder/index'],
+				],
+				[
+					'label' => Yii::t('lead', 'Campaigns'),
+					'url' => ['/lead/campaign/index'],
+				],
+				[
+					'label' => Yii::t('lead', 'Sources'),
+					'url' => ['/lead/source/index'],
+				],
+			],
+		];
+
+		$menuItems[] = [
+			'label' => Yii::t('hint', 'Hints'),
+			'url' => '#',
+			'visible' => Yii::$app->user->can(User::PERMISSION_HINT),
+			'items' => [
+				[
+					'label' => Yii::t('hint', 'Hint Cities'),
+					'url' => ['/hint-city/index'],
+				],
+				[
+					'label' => Yii::t('hint', 'Hint Sources'),
+					'url' => ['/hint-city-source/index'],
 				],
 			],
 		];
@@ -134,7 +173,7 @@ AppAsset::register($this);
 
 <footer class="footer">
 	<div class="container">
-		<p class="pull-right"> All Rights Reserved 2016 &copy; - EdziMa</p>
+		<p class="pull-right"> All Rights Reserved <?= date('Y') ?> &copy; - EdziMa</p>
 	</div>
 </footer>
 

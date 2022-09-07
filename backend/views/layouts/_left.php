@@ -2,8 +2,10 @@
 
 use backend\widgets\Menu;
 use common\models\user\User;
+use common\models\user\Worker;
+use yii\web\View;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 
 $user = Yii::$app->user;
 ?>
@@ -20,7 +22,7 @@ $user = Yii::$app->user;
 					'label' => Yii::t('backend', 'Users'),
 					'url' => ['/user/user/index'],
 					'icon' => '<i class="fa fa-users"></i>',
-					'visible' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+					'visible' => $user->can(User::ROLE_ADMINISTRATOR),
 				],
 				[
 					'label' => Yii::t('backend', 'Workers'),
@@ -56,6 +58,134 @@ $user = Yii::$app->user;
 						],
 					],
 				],
+				[
+					'label' => Yii::t('common', 'Leads'),
+					'url' => '#',
+					'visible' => $user->can(User::PERMISSION_LEAD),
+					'options' => ['class' => 'treeview'],
+					'icon' => '<i class="fa fa-vcard"></i>',
+					'items' => [
+						[
+							'label' => Yii::t('lead', 'Browse'),
+							'url' => ['/lead/lead/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Lead Market'),
+							'url' => ['/lead/market/index'],
+							'icon' => '<i class="fa fa-bullhorn"></i>',
+							'visible' => $user->can(Worker::PERMISSION_LEAD_MARKET),
+						],
+						[
+							'label' => Yii::t('lead', 'Duplicates'),
+							'url' => ['/lead/duplicate/index'],
+							'icon' => '<i class="fa fa-magnet"></i>',
+							'visible' => $user->can(Worker::PERMISSION_LEAD_DUPLICATE),
+						],
+						[
+							'label' => Yii::t('lead', 'Dialers'),
+							'url' => ['/lead/dialer/index'],
+							'icon' => '<i class="fa fa-phone"></i>',
+							'visible' => $user->can(Worker::PERMISSION_LEAD_DIALER_MANAGER),
+						],
+						[
+							'label' => Yii::t('lead', 'Import Leads'),
+							'url' => ['/lead/import/csv'],
+							'icon' => '<i class="fa fa-upload"></i>',
+							'visible' => $user->can(Worker::PERMISSION_LEAD_IMPORT),
+						],
+						[
+							'label' => Yii::t('lead', 'Reports'),
+							'url' => ['/lead/report/index'],
+							'icon' => '<i class="fa fa-table"></i>',
+						],
+						[
+							'label' => Yii::t('common', 'Reminders'),
+							'url' => ['/lead/reminder/index'],
+							'icon' => '<i class="fa fa-calendar-check-o"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Answers'),
+							'url' => ['/lead/answer/index'],
+							'icon' => '<i class="fa fa-quote-left"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Questions'),
+							'url' => ['/lead/question/index'],
+							'icon' => '<i class="fa fa-question"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Users'),
+							'url' => ['/lead/user/index'],
+							'icon' => '<i class="fa fa-users"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Campaigns'),
+							'url' => ['/lead/campaign/index'],
+							'icon' => '<i class="fa fa-bullhorn"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Sources'),
+							'url' => ['/lead/source/index'],
+							'icon' => '<i class="fa fa-feed"></i>',
+						],
+						[
+							'label' => Yii::t('lead', 'Statuses'),
+							'url' => ['/lead/status/index'],
+							'icon' => '<i class="fa fa-flag"></i>',
+							'visible' => $user->can(User::PERMISSION_LEAD_STATUS),
+						],
+						[
+							'label' => Yii::t('lead', 'Types'),
+							'url' => ['/lead/type/index'],
+							'icon' => '<i class="fa fa-sitemap"></i>',
+						],
+
+					],
+				],
+				[
+					'label' => Yii::t('czater', 'Czater'),
+					'url' => '#',
+					'icon' => '<i class="fa fa fa-commenting"></i>',
+					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(User::PERMISSION_CZATER),
+					'items' => [
+						[
+							'label' => Yii::t('czater', 'Consultants'),
+							'url' => ['/czater/consultant/index'],
+							'icon' => '<i class="fa fa-users"></i>',
+						],
+						[
+							'label' => Yii::t('czater', 'Calls'),
+							'url' => ['/czater/call/index'],
+							'icon' => '<i class="fa fa-volume-control-phone "></i>',
+						],
+					],
+				],
+				[
+					'label' => Yii::t('hint', 'Hints'),
+					'url' => ['/hint/city/index'],
+					'icon' => '<i class="fa fa fa-map-marker"></i>',
+					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(User::PERMISSION_HINT),
+					'items' => [
+						[
+							'label' => Yii::t('hint', 'Hint Cities'),
+							'url' => ['/hint/city/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => Yii::t('hint', 'Hint Cities Sources'),
+							'url' => ['/hint/city-source/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => Yii::t('hint', 'Hint Sources'),
+							'url' => ['/hint/source/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+					],
+				],
 
 				[
 					'label' => Yii::t('common', 'Issues'),
@@ -75,9 +205,20 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
-							'label' => Yii::t('common', 'Notes'),
+							'label' => Yii::t('issue', 'Issue Notes'),
 							'url' => ['/issue/note/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => Yii::t('issue', 'Issue Claims'),
+							'url' => ['/issue/claim/index'],
+							'icon' => '<i class="fa fa-percent"></i>',
+							'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
+						],
+						[
+							'label' => Yii::t('issue', 'Tags'),
+							'url' => ['/issue/tag/index'],
+							'icon' => '<i class="fa fa-tags"></i>',
 						],
 						[
 							'label' => 'Podmioty',
@@ -86,13 +227,18 @@ $user = Yii::$app->user;
 						],
 
 						[
-							'label' => Yii::t('common', 'Types'),
+							'label' => Yii::t('issue', 'Types'),
 							'url' => ['/issue/type/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 						[
-							'label' => Yii::t('common', 'Etapy'),
+							'label' => Yii::t('issue', 'Stages'),
 							'url' => ['/issue/stage/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+						],
+						[
+							'label' => Yii::t('common', 'Leads'),
+							'url' => ['/issue/issue/lead'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 						],
 					],
@@ -168,33 +314,43 @@ $user = Yii::$app->user;
 					],
 				],
 				[
-					'label' => Yii::t('backend', 'Provisions'),
-					'url' => '#',
+					'label' => Yii::t('provision', 'Provisions'),
+					'url' => ['/provision/provision/index'],
 					'icon' => '<i class="fa fa-percent"></i>',
 					'options' => ['class' => 'treeview'],
 					'visible' => $user->can(User::PERMISSION_PROVISION),
 					'items' => [
 						[
-							'label' => Yii::t('issue', 'Raporty'),
+							'label' => Yii::t('provision', 'Reports'),
 							'url' => ['/provision/report/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-table"></i>',
 						],
 						[
-							'label' => Yii::t('issue', 'Przyznane'),
+							'label' => Yii::t('provision', 'Provisions'),
 							'url' => ['/provision/provision/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-percent"></i>',
 						],
 						[
-							'label' => 'Ustalone',
+							'label' => Yii::t('provision', 'Schemas'),
 							'url' => ['/provision/user/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-users"></i>',
 						],
 						[
-							'label' => Yii::t('issue', 'Typy'),
+							'label' => Yii::t('common', 'Types'),
 							'url' => ['/provision/type/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-magnet"></i>',
 						],
 					],
+				],
+				[
+					'label' => Yii::t('common', 'SMS'),
+					'url' => '#',
+					'icon' => '<i class="fa fa-envelope"></i>',
+					'options' => ['class' => 'treeview'],
+					'items' => [
+						['label' => Yii::t('common', 'Send SMS'), 'url' => ['/adescom-sms/send/push'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
+					],
+					'visible' => $user->can(User::PERMISSION_SMS),
 				],
 				[
 					'label' => Yii::t('backend', 'Articles'),
@@ -229,6 +385,12 @@ $user = Yii::$app->user;
 							'url' => ['/log/index'],
 							'icon' => '<i class="fa fa-angle-double-right"></i>',
 							'visible' => $user->can(User::PERMISSION_LOGS),
+						],
+						[
+							'label' => Yii::t('backend', 'Message Templates'),
+							'url' => ['/message-templates/default/index'],
+							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'visible' => $user->can(User::PERMISSION_MESSAGE_TEMPLATE),
 						],
 						[
 							'label' => Yii::t('backend', 'DB manager'),

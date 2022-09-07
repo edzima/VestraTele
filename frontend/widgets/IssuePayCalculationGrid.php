@@ -6,7 +6,6 @@ use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\IssuePayCalculationGrid as BaseIssuePayCalculationGrid;
-use common\widgets\grid\IssueTypeColumn;
 use frontend\helpers\Html;
 use frontend\helpers\Url;
 use frontend\models\search\IssuePayCalculationSearch;
@@ -17,7 +16,6 @@ class IssuePayCalculationGrid extends BaseIssuePayCalculationGrid {
 	public string $issueColumn = IssueColumn::class;
 	public bool $withOwner = false;
 	public bool $withStageOnCreate = false;
-	public string $valueTypeIssueType = IssueTypeColumn::VALUE_NAME_WITH_SHORT;
 
 	protected function actionColumn(): array {
 		return [

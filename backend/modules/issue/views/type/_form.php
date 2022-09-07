@@ -13,17 +13,19 @@ use yii\widgets\ActiveForm;
 
 <div class="issue-type-form">
 
-	<?php $form = ActiveForm::begin(); ?>
+	<?php $form = ActiveForm::begin([
+		'id' => 'issue-type-form',
+	]); ?>
 
 	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'short_name')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'provision_type')->dropDownList(Provision::getTypesNames()) ?>
-
 	<?= $form->field($model, 'vat')->textInput() ?>
 
 	<?= $form->field($model, 'meet')->checkbox() ?>
+
+	<?= $form->field($model, 'with_additional_date')->checkbox() ?>
 
 	<div class="form-group">
 		<?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

@@ -2,13 +2,14 @@
 
 namespace common\models;
 
+use common\models\query\ArticleQuery;
+use common\models\user\User;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use common\models\query\ArticleQuery;
-use common\models\user\User;
 
 /**
  * This is the model class for table "{{%article}}".
@@ -25,6 +26,7 @@ use common\models\user\User;
  * @property integer $published_at
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $show_on_mainpage
  *
  *
  * @property User $author
@@ -77,8 +79,9 @@ class Article extends ActiveRecord {
 				},
 			],
 			['published_at', 'filter', 'filter' => 'strtotime'],
-			[['status', 'category_id', 'author_id', 'updater_id', 'created_at', 'updated_at'], 'integer'],
+			[['status', 'category_id', 'author_id', 'updater_id', 'created_at', 'updated_at', 'show_on_mainpage'], 'integer'],
 			[['title', 'slug'], 'string', 'max' => 255],
+			['show_on_mainpage', 'default', 'value' => null],
 			['status', 'default', 'value' => self::STATUS_DRAFT],
 			['author_id', 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['author_id' => 'id']],
 			['category_id', 'exist', 'skipOnError' => true, 'targetClass' => ArticleCategory::class, 'targetAttribute' => ['category_id' => 'id']],
@@ -104,6 +107,7 @@ class Article extends ActiveRecord {
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
 			'tagValues' => Yii::t('common', 'Tags'),
+			'show_on_mainpage' => Yii::t('common', 'Show on Mainpage'),
 		];
 	}
 
@@ -117,21 +121,21 @@ class Article extends ActiveRecord {
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getAuthor() {
 		return $this->hasOne(User::class, ['id' => 'author_id']);
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getCategory() {
 		return $this->hasOne(ArticleCategory::class, ['id' => 'category_id']);
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getUpdater() {
 		return $this->hasOne(User::class, ['id' => 'updater_id']);

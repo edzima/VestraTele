@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
 use Yii;
 use yii\db\ActiveRecord;
@@ -15,16 +16,13 @@ use yii\helpers\ArrayHelper;
  * @property string $short_name
  * @property int $provision_type
  * @property string $vat
- * @property boolean $meet
+ * @property bool $meet
+ * @property bool $with_additional_date
  *
  * @property Issue[] $issues
  * @property IssueStage[] $stages
- * @property Provision $provision
  */
 class IssueType extends ActiveRecord {
-
-	public const ACCIDENT_ID = 1;
-	private ?Provision $provision = null;
 
 	private static ?array $TYPES = null;
 
@@ -36,7 +34,7 @@ class IssueType extends ActiveRecord {
 	 * @inheritdoc
 	 */
 	public static function tableName(): string {
-		return 'issue_type';
+		return '{{%issue_type}}';
 	}
 
 	/**
@@ -44,14 +42,13 @@ class IssueType extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['name', 'short_name', 'vat', 'provision_type'], 'required'],
+			[['name', 'short_name', 'vat'], 'required'],
 			[['provision_type'], 'integer'],
-			['meet', 'boolean'],
+			[['meet', 'with_additional_date'], 'boolean'],
 			[['name', 'short_name'], 'string', 'max' => 255],
 			[['name'], 'unique'],
 			['vat', 'number', 'min' => 0, 'max' => 100],
 			[['short_name'], 'unique'],
-			['provision_type', 'in', 'range' => array_keys(Provision::getTypesNames())],
 		];
 	}
 
@@ -65,27 +62,20 @@ class IssueType extends ActiveRecord {
 			'short_name' => Yii::t('common', 'Shortname'),
 			'provision_type' => Yii::t('common', 'Provision type'),
 			'vat' => 'VAT (%)',
+			'with_additional_date' => Yii::t('common', 'With additional Date'),
 			'meet' => Yii::t('common', 'meet'),
 		];
 	}
 
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getIssues() {
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getIssues(): IssueQuery {
 		return $this->hasMany(Issue::class, ['type_id' => 'id']);
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getStages(): IssueStageQuery {
 		return $this->hasMany(IssueStage::class, ['id' => 'stage_id'])
 			->viaTable('{{%issue_stage_type}}', ['type_id' => 'id']);
-	}
-
-	public function getProvision(): Provision {
-		if ($this->provision === null) {
-			$this->provision = new Provision($this->provision_type);
-		}
-		return $this->provision;
 	}
 
 	public function getNameWithShort(): string {
@@ -104,13 +94,23 @@ class IssueType extends ActiveRecord {
 		return ArrayHelper::map(static::getTypes(), 'id', 'name');
 	}
 
+	public static function getTypesNamesWithShort(): array {
+		return ArrayHelper::map(static::getTypes(), 'id', 'nameWithShort');
+	}
+
 	public static function get(int $typeId): ?self {
 		return static::getTypes()[$typeId] ?? null;
 	}
 
+	/**
+	 * @return static[]
+	 */
 	public static function getTypes(): array {
 		if (empty(static::$TYPES)) {
-			static::$TYPES = static::find()->indexBy('id')->all();
+			static::$TYPES = static::find()
+				->orderBy('name')
+				->indexBy('id')
+				->all();
 		}
 		return static::$TYPES;
 	}

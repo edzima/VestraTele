@@ -19,20 +19,30 @@ use yii\helpers\StringHelper;
  * @property int $issue_id
  * @property int $user_id
  * @property string $title
- * @property string $description
+ * @property string|null $description
  * @property int $created_at
  * @property int $updated_at
- * @property int $type
+ * @property int $publish_at
+ * @property string $type
+ * @property int $is_pinned
+ * @property int $is_template
  *
  * @property Issue $issue
  * @property User $user
+ *
+ * @property-read string|null $typeName
  */
 class IssueNote extends ActiveRecord implements IssueInterface {
 
 	use IssueTrait;
 
+	public bool $updateIssueAfterSave = true;
+	public bool $updateIssueAfterDelete = true;
+
+	protected const TYPE_SMS = 'sms';
 	public const TYPE_SETTLEMENT = 'settlement';
 	public const TYPE_SUMMON = 'summon';
+	public const TYPE_STAGE_CHANGE = 'stage.change';
 
 	public ?string $typeName = null;
 
@@ -53,27 +63,17 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	}
 
 	public function afterSave($insert, $changedAttributes) {
-		$this->issue->markAsUpdate();
+		if ($this->updateIssueAfterSave) {
+			$this->issue->markAsUpdate();
+		}
 		parent::afterSave($insert, $changedAttributes);
 	}
 
 	public function afterDelete() {
-		$this->issue->markAsUpdate();
+		if ($this->updateIssueAfterDelete) {
+			$this->issue->markAsUpdate();
+		}
 		parent::afterDelete();
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function rules(): array {
-		return [
-			[['issue_id', 'user_id', 'title', 'description'], 'required'],
-			[['issue_id', 'user_id'], 'integer'],
-			[['created_at', 'updated_at'], 'safe'],
-			[['title', 'type'], 'string', 'max' => 255],
-			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
-			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-		];
 	}
 
 	/**
@@ -82,29 +82,48 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
-			'issue_id' => 'Issue ID',
-			'user_id' => 'User ID',
+			'issue_id' => Yii::t('common', 'Issue'),
+			'user_id' => Yii::t('common', 'User'),
 			'title' => Yii::t('common', 'Title'),
 			'description' => Yii::t('common', 'Description'),
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
+			'publish_at' => Yii::t('common', 'Publish at'),
+			'is_pinned' => Yii::t('common', 'Is Pinned'),
+			'is_template' => Yii::t('common', 'Is Template'),
+			'type' => Yii::t('common', 'Type'),
+			'typeFullName' => Yii::t('common', 'Type'),
 		];
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getIssue(): IssueQuery {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getUser(): UserQuery {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
+	}
+
+	public function isPinned(): bool {
+		return (bool) $this->is_pinned;
 	}
 
 	public function isForSettlement(): bool {
 		return $this->isType(static::TYPE_SETTLEMENT);
 	}
 
+	public function isForStageChange(): bool {
+		return $this->isType(static::TYPE_STAGE_CHANGE);
+	}
+
 	public function isForSummon(): bool {
 		return $this->isType(static::TYPE_SUMMON);
+	}
+
+	public function isSms(): bool {
+		return $this->isType(static::TYPE_SMS);
 	}
 
 	public function isType(string $type): bool {
@@ -118,15 +137,43 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 		return StringHelper::explode($this->type, ':')[1];
 	}
 
-	public static function generateType(string $type, int $id): string {
+	public function getTypeKind(): ?string {
+		$type = StringHelper::explode($this->type, ':')[0] ?? null;
+		if ($type === null) {
+			return null;
+		}
+		return static::getTypesNames()[$type];
+	}
+
+	public function getTypeFullName(): ?string {
+		$typeKind = $this->getTypeKind();
+		if (!$typeKind) {
+			return null;
+		}
+		return $typeKind . ' - ' . $this->getEntityId();
+	}
+
+	public static function generateType(string $type, string $id): string {
 		return "$type:$id";
+	}
+
+	public static function genereateSmsType(string $phone, string $id): string {
+		return static::generateType(static::generateType(static::TYPE_SMS, $id), $phone);
 	}
 
 	public static function getTypesNames(): array {
 		return [
 			static::TYPE_SETTLEMENT => Yii::t('settlement', 'Settlement'),
 			static::TYPE_SUMMON => Yii::t('common', 'Summon'),
+			static::TYPE_SMS => Yii::t('common', 'SMS'),
+			static::TYPE_STAGE_CHANGE => Yii::t('common', 'Stage Change'),
 		];
+	}
+
+	public static function pinnedNotesFilter(array $notes): array {
+		return array_filter($notes, static function (IssueNote $note) {
+			return $note->isPinned();
+		});
 	}
 
 	/**

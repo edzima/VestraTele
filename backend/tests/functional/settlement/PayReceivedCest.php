@@ -6,6 +6,9 @@ use backend\modules\settlement\controllers\PayReceivedController;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\PayReceivedManager;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
+use common\fixtures\helpers\UserFixtureHelper;
+use common\models\settlement\PayReceived;
 use Yii;
 
 class PayReceivedCest {
@@ -47,22 +50,26 @@ class PayReceivedCest {
 
 	public function checkReceivePays(PayReceivedManager $I): void {
 		$I->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements(),
-			IssueFixtureHelper::payReceived()
+			IssueFixtureHelper::agent(),
+			SettlementFixtureHelper::pay(),
+			SettlementFixtureHelper::payReceived()
 		));
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_RECEIVE_PAYS);
 		$I->see('Receive pays');
-		$I->submitForm(static::FORM_SELECTOR, $this->formParams(300, [1], '2020-12-12'));
+		$I->submitForm(static::FORM_SELECTOR, $this->formParams(UserFixtureHelper::AGENT_PETER_NOWAK, [1], '2020-12-12'));
+		$I->seeRecord(PayReceived::class, [
+			'pay_id' => 1,
+			'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
+			'transfer_at' => '2020-12-12',
+		]);
 		$I->seeFlash('Received 1 pays. Sum value: ' . Yii::$app->formatter->asCurrency(1230), 'success');
 	}
 
 	public function checkReceivePaysEmptyForm(PayReceivedManager $I): void {
 		$I->haveFixtures(array_merge(
-			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::settlements(),
-			IssueFixtureHelper::payReceived()
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::payReceived()
 		));
 		$I->amLoggedIn();
 		$I->amOnPage(static::ROUTE_RECEIVE_PAYS);

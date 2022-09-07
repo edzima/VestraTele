@@ -2,9 +2,13 @@
 
 namespace common\models\provision;
 
+use common\models\issue\Issue;
+use common\models\issue\IssueInterface;
 use common\models\issue\IssuePay;
+use common\models\issue\IssueTrait;
 use common\models\user\User;
 use Decimal\Decimal;
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -17,7 +21,8 @@ use yii\db\ActiveRecord;
  * @property int $type_id
  * @property int $from_user_id
  * @property int $to_user_id
- * @property bool $hide_on_report
+ * @property int $hide_on_report
+ * @property string|null $percent
  *
  * @property-read string $provision
  * @property-read IssuePay $pay
@@ -25,7 +30,17 @@ use yii\db\ActiveRecord;
  * @property-read User $toUser
  * @property-read User $fromUser
  */
-class Provision extends ActiveRecord {
+class Provision extends ActiveRecord implements IssueInterface {
+
+	use IssueTrait;
+
+	public function getIssueId(): int {
+		return $this->getIssueModel()->id;
+	}
+
+	public function getIssueModel(): Issue {
+		return $this->pay->issue;
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -56,15 +71,15 @@ class Provision extends ActiveRecord {
 	 */
 	public function attributeLabels(): array {
 		return [
-			'pay_id' => 'Pay ID',
-			'to_user_id' => 'Dla',
-			'from_user_id' => 'Nadprowizja',
-			'value' => 'Honorarium (netto)',
-			'toUser' => 'Dla',
-			'fromUser' => 'Nadprowizja',
-			'fromUserString' => 'Nadprowizja',
-			'provision' => 'Prowizja (%)',
-			'hide_on_report' => 'Ukryty w raporcie',
+			'pay_id' => Yii::t('settlement', 'Pay'),
+			'to_user_id' => Yii::t('provision', 'To User'),
+			'from_user_id' => Yii::t('provision', 'From User'),
+			'value' => Yii::t('provision', 'Provision ({currencySymbol})', ['currencySymbol' => Yii::$app->formatter->getCurrencySymbol()]),
+			'toUser' => Yii::t('provision', 'To User'),
+			'fromUser' => Yii::t('provision', 'From User'),
+			'fromUserString' => Yii::t('provision', 'From User'),
+			'hide_on_report' => Yii::t('provision', 'Hide on report'),
+			'provision' => Yii::t('provision', 'Provision'),
 		];
 	}
 
@@ -94,13 +109,21 @@ class Provision extends ActiveRecord {
 		return new Decimal($this->value);
 	}
 
-	public function getProvision(): string {
-		return $this->getProvisionDecimal()->toFixed(2);
+	public function getPercent(): ?Decimal {
+		if ($this->percent) {
+			return new Decimal($this->percent);
+		}
+		if ($this->type->is_percentage) {
+			return $this->getValue()->div(Yii::$app->provisions->issuePayValue($this->pay))->mul(100);
+		}
+		return null;
 	}
 
-	public function getProvisionDecimal(): Decimal {
-		return $this->getValue()
-			->div($this->pay->getValueWithoutVAT());
+	public function getProvision(): string {
+		if ($this->percent) {
+			return Yii::$app->formatter->asPercent($this->percent / 100);
+		}
+		return Yii::$app->formatter->asCurrency($this->getValue());
 	}
 
 	public static function find(): ProvisionQuery {

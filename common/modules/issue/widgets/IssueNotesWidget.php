@@ -3,6 +3,7 @@
 namespace common\modules\issue\widgets;
 
 use common\models\issue\IssueNote;
+use Yii;
 use yii\helpers\Url;
 
 /**
@@ -15,8 +16,7 @@ class IssueNotesWidget extends IssueWidget {
 	public const TYPE_SETTLEMENT = IssueNote::TYPE_SETTLEMENT;
 	public const TYPE_SUMMON = IssueNote::TYPE_SUMMON;
 
-	public bool $addBtn = true;
-	public ?string $addUrl = null;
+	public ?string $title = null;
 
 	public ?array $notes = null;
 	public ?string $type = null;
@@ -38,8 +38,8 @@ class IssueNotesWidget extends IssueWidget {
 				->joinWith('user.userProfile')
 				->all();
 		}
-		if ($this->addBtn && $this->addUrl === null) {
-			$this->addUrl = Url::to(['note/create', 'issueId' => $this->model->id]);
+		if ($this->title === null) {
+			$this->title = Yii::t('issue', 'Issue Notes');
 		}
 	}
 
@@ -52,11 +52,10 @@ class IssueNotesWidget extends IssueWidget {
 		}
 		return $this->render('issue-notes', [
 			'model' => $this->model,
-			'addUrl' => $this->addUrl,
-			'addBtn' => $this->addBtn,
 			'noteOptions' => $this->noteOptions,
 			'notes' => $this->notes,
-			'type' => $this->type,
+			'title' => $this->title,
+			'id' => $this->getId(),
 		]);
 	}
 

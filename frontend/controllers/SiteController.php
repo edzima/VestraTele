@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+use common\helpers\Flash;
+use common\models\Article;
 use common\models\user\LoginForm;
 use frontend\models\ContactForm;
 use frontend\models\PasswordResetRequestForm;
@@ -11,6 +13,7 @@ use frontend\models\VerifyEmailForm;
 use vova07\fileapi\actions\UploadAction as FileAPIUpload;
 use Yii;
 use yii\base\InvalidArgumentException;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
@@ -72,7 +75,18 @@ class SiteController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex() {
-		return $this->render('index');
+
+		$articlesDataProvider = null;
+		if (!Yii::$app->user->isGuest) {
+			$articlesDataProvider = new ActiveDataProvider([
+				'query' => Article::find()
+					->published()
+					->mainpage(),
+			]);
+		}
+		return $this->render('index', [
+			'articlesDataProvider' => $articlesDataProvider,
+		]);
 	}
 
 	/**
@@ -84,17 +98,24 @@ class SiteController extends Controller {
 		$model = new ContactForm();
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 			if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-				Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
+				Flash::add(
+					Flash::TYPE_SUCCESS,
+					Yii::t('frontend',
+						'Thank you for contacting us. We will respond to you as soon as possible.'
+					)
+				);
 			} else {
-				Yii::$app->session->setFlash('error', 'There was an error sending your message.');
+				Flash::add(
+					Flash::TYPE_ERROR,
+					Yii::t('frontend', 'There was an error sending your message.')
+				);
 			}
 
 			return $this->refresh();
-		} else {
-			return $this->render('contact', [
-				'model' => $model,
-			]);
 		}
+		return $this->render('contact', [
+			'model' => $model,
+		]);
 	}
 
 	/**
@@ -110,13 +131,12 @@ class SiteController extends Controller {
 		$model = new LoginForm();
 		if ($model->load(Yii::$app->request->post()) && $model->login()) {
 			return $this->goBack();
-		} else {
-			$model->password = '';
-
-			return $this->render('login', [
-				'model' => $model,
-			]);
 		}
+		$model->password = '';
+
+		return $this->render('login', [
+			'model' => $model,
+		]);
 	}
 
 	/**
@@ -139,12 +159,15 @@ class SiteController extends Controller {
 		$model = new PasswordResetRequestForm();
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 			if ($model->sendEmail()) {
-				Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('frontend', 'Check your email for further instructions.')
+				);
 
 				return $this->goHome();
-			} else {
-				Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for the provided email address.');
 			}
+			Flash::add(Flash::TYPE_ERROR,
+				Yii::t('frontend', 'Sorry, we are unable to reset password for the provided email address.')
+			);
 		}
 
 		return $this->render('requestPasswordResetToken', [
@@ -159,7 +182,7 @@ class SiteController extends Controller {
 	 * @return mixed
 	 * @throws BadRequestHttpException
 	 */
-	public function actionResetPassword($token) {
+	public function actionResetPassword(string $token) {
 		try {
 			$model = new ResetPasswordForm($token);
 		} catch (InvalidArgumentException $e) {
@@ -167,7 +190,9 @@ class SiteController extends Controller {
 		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
-			Yii::$app->session->setFlash('success', 'New password saved.');
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('frontend', 'New password saved.')
+			);
 
 			return $this->goHome();
 		}
@@ -192,12 +217,16 @@ class SiteController extends Controller {
 		}
 		if ($user = $model->verifyEmail()) {
 			if (Yii::$app->user->login($user)) {
-				Yii::$app->session->setFlash('success', 'Your email has been confirmed!');
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('frontend', 'Your email has been confirmed!')
+				);
 				return $this->goHome();
 			}
 		}
 
-		Yii::$app->session->setFlash('error', 'Sorry, we are unable to verify your account with provided token.');
+		Flash::add(Flash::TYPE_ERROR,
+			Yii::t('frontend', 'Sorry, we are unable to verify your account with provided token.')
+		);
 		return $this->goHome();
 	}
 
@@ -210,10 +239,15 @@ class SiteController extends Controller {
 		$model = new ResendVerificationEmailForm();
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 			if ($model->sendEmail()) {
-				Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('frontend', 'Check your email for further instructions.')
+				);
+
 				return $this->goHome();
 			}
-			Yii::$app->session->setFlash('error', 'Sorry, we are unable to resend verification email for the provided email address.');
+			Flash::add(Flash::TYPE_ERROR,
+				Yii::t('frontend', 'Sorry, we are unable to resend verification email for the provided email address.')
+			);
 		}
 
 		return $this->render('resendVerificationEmail', [

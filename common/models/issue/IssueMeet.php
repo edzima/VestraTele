@@ -25,7 +25,8 @@ use yii\helpers\ArrayHelper;
  * @property string $phone
  * @property string $client_name
  * @property string $client_surname
- * @property int $agent_id
+ * @property int|null $agent_id
+ * @property int|null $tele_id
  * @property string $created_at
  * @property string $updated_at
  * @property string $date_at
@@ -45,9 +46,10 @@ use yii\helpers\ArrayHelper;
  * @property-read State $state
  * @property-read Province $province
  * @property-read SubProvince $subProvince
- * @property-read Campaign $campaign
+ * @property-read Campaign|null $campaign
  * @property-read MeetAddress[] $addresses
  * @property-read Address|null $customerAddress
+ * @deprecated
  */
 class IssueMeet extends ActiveRecord {
 
@@ -165,15 +167,13 @@ class IssueMeet extends ActiveRecord {
 		return 'Własna';
 	}
 
-
 	public function getCustomerAddress(): ?Address {
 		return $this->addresses[MeetAddress::TYPE_CUSTOMER]->address ?? null;
 	}
-	protected function getAddresses(): ActiveQuery {
+
+	public function getAddresses(): ActiveQuery {
 		return $this->hasMany(MeetAddress::class, ['meet_id' => 'id'])->indexBy('type');
 	}
-
-
 
 	public function getAgent(): UserQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
@@ -189,7 +189,7 @@ class IssueMeet extends ActiveRecord {
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getCity() {
 		return $this->hasOne(City::class, ['id' => 'city_id'])->cache();

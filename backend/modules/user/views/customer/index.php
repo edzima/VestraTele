@@ -4,6 +4,7 @@ use backend\helpers\Url;
 use backend\modules\user\models\search\CustomerUserSearch;
 use backend\widgets\GridView;
 use common\models\user\Customer;
+use common\models\user\User;
 use common\models\user\UserProfile;
 use kartik\grid\ActionColumn;
 use yii\bootstrap\Html;
@@ -20,11 +21,23 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create customer'), ['create'], ['class' => 'btn btn-success']) ?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_USER_TRAITS)
+			? Html::a(Yii::t('common', 'User Traits'), ['trait/index'], ['class' => 'btn btn-warning'])
+			: ''
+		?>
 	</p>
+
+
+	<?= $this->render('_search', [
+		'model' => $searchModel,
+	]) ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'id' => 'customer-grid',
+		'filterOnFocusOut' => false,
 		'columns' => [
 			[
 				'attribute' => 'firstname',
@@ -51,11 +64,12 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'phone',
 				'value' => 'profile.phone',
 				'label' => Yii::t('common', 'Phone number'),
+				'format' => 'tel',
 			],
 			'updated_at:datetime',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{create-issue} {view} {update}',
+				'template' => '{create-issue} {link} {view} {update}',
 				'buttons' => [
 					'create-issue' => static function (string $url, Customer $model): string {
 						return Html::a(
@@ -64,6 +78,15 @@ $this->params['breadcrumbs'][] = $this->title;
 							[
 								'title' => Yii::t('backend', 'Create issue'),
 								'aria-label' => Yii::t('backend', 'Create issue'),
+							]);
+					},
+					'link' => static function (string $url, Customer $model) {
+						return Html::a('<span class="glyphicon glyphicon-paperclip"></span>',
+							['/issue/user/link', 'userId' => $model->id],
+							[
+								'title' => Yii::t('backend', 'Link to issue'),
+								'aria-label' => Yii::t('backend', 'Link to issue'),
+								'data-pjax' => '0',
 							]);
 					},
 				],

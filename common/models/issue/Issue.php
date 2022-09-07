@@ -3,6 +3,7 @@
 namespace common\models\issue;
 
 use common\behaviors\DateIDBehavior;
+use common\helpers\ArrayHelper;
 use common\models\address\Address as LegacyAddress;
 use common\models\address\City;
 use common\models\address\Province;
@@ -10,17 +11,17 @@ use common\models\address\State;
 use common\models\address\SubProvince;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\entityResponsible\EntityResponsibleQuery;
+use common\models\issue\query\IssueCostQuery;
 use common\models\issue\query\IssueNoteQuery;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
 use common\models\issue\query\IssueUserQuery;
-use common\models\user\Customer;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
-use udokmeci\yii2PhoneValidator\PhoneValidator;
+use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -52,18 +53,14 @@ use yii\db\Expression;
  * @property string $victim_street
  * @property string $victim_phone
  * @property string $details
- * @property int $provision_type
- * @property string $provision_value
- * @property string $provision_base
  * @property int $stage_id
  * @property int $type_id
  * @property int $entity_responsible_id
  * @property string $archives_nr
  * @property int $lawyer_id
- * @property int $tele_id
  * @property bool $payed
- * @property string|null $signing_at
- * @property string|null $accident_at
+ * @property string $signing_at
+ * @property string|null $type_additional_date_at
  * @property string $stage_change_at
  * @property string|null $signature_act
  *
@@ -74,34 +71,33 @@ use yii\db\Expression;
  * @property City $victimCity
  * @property Worker $agent
  * @property Worker $lawyer
- * @property-read Customer $customer
+ * @property-read User $customer
  * @property Worker|null $tele
  * @property IssuePay[] $pays
  * @property EntityResponsible $entityResponsible
  * @property IssueStage $stage
  * @property IssueType $type
  * @property IssueNote[] $issueNotes
- * @property Provision $provision
  * @property SubProvince $clientSubprovince
  * @property SubProvince $victimSubprovince
  * @property IssuePayCalculation[] $payCalculations
  * @property-read Summon[] $summons
+ * @property-read IssueTag[] $tags
  * @property-read IssueUser[] $users
  * @property-read IssueCost[] $costs
+ * @property-read StageType $stageType
+ * @property-read IssueClaim[] $claims
+ * @property-read IssueRelation[] $issuesRelations
+ * @property-read Issue[] $linkedIssues
  */
 class Issue extends ActiveRecord implements IssueInterface {
 
 	use IssueTrait;
 
-	private const DEFAULT_PROVISION = Provision::TYPE_PERCENTAGE;
-
 	/* @var LegacyAddress */
 	private $clientAddress;
 	/* @var LegacyAddress */
 	private $victimAddress;
-
-	/* @var Provision */
-	private $provision;
 
 	public function __toString(): string {
 		return $this->longId;
@@ -139,7 +135,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueType::class, 'targetAttribute' => ['type_id' => 'id']],
 			//@todo remove this rules after create customers from production Issues.
 			[['client_email', 'victim_email'], 'email'],
-			[['client_phone_1', 'client_phone_2', 'victim_phone'], PhoneValidator::class, 'country' => 'PL'],
 		];
 	}
 
@@ -158,13 +153,25 @@ class Issue extends ActiveRecord implements IssueInterface {
 			'stage' => Yii::t('common', 'Stage'),
 			'type' => Yii::t('common', 'Type'),
 			'entity_responsible_id' => Yii::t('common', 'Entity responsible'),
+			'entityResponsible' => Yii::t('common', 'Entity responsible'),
 			'signing_at' => Yii::t('common', 'Signing at'),
 			'archives_nr' => Yii::t('common', 'Archives'),
-			'accident_at' => Yii::t('common', 'Accident date'),
+			'type_additional_date_at' => $this->type
+				? Yii::t('common', 'Date at ({type})', ['type' => $this->type->name])
+				: Yii::t('common', 'Additional Date for Type'),
 			'stage_change_at' => Yii::t('common', 'Stage date'),
 			'signature_act' => Yii::t('common', 'Signature act'),
 			'customer' => IssueUser::getTypesNames()[IssueUser::TYPE_CUSTOMER],
+			'tagsNames' => Yii::t('issue', 'Tags Names'),
 		];
+	}
+
+	public function getTypeName(): string {
+		return IssueType::getTypesNames()[$this->type_id];
+	}
+
+	public function getStageName(): string {
+		return IssueStage::getStagesNames(true)[$this->stage_id];
 	}
 
 	public function getCustomer(): UserQuery {
@@ -195,7 +202,8 @@ class Issue extends ActiveRecord implements IssueInterface {
 		});
 	}
 
-	public function getCosts(): ActiveQuery {
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getCosts(): IssueCostQuery {
 		return $this->hasMany(IssueCost::class, ['issue_id' => 'id']);
 	}
 
@@ -268,7 +276,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getClientCity() {
 		return $this->hasOne(City::class, ['id' => 'client_city_id'])->cache();
@@ -304,7 +312,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getVictimCity() {
 		if ($this->victim_city_id === null) {
@@ -348,7 +356,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	public function getIssueNotes(): IssueNoteQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])
-			->with('user')->orderBy('created_at DESC');
+			->orderBy('publish_at DESC');
 	}
 
 	public function getSummons(): ActiveQuery {
@@ -362,52 +370,28 @@ class Issue extends ActiveRecord implements IssueInterface {
 
 	public function getPays(): IssuePayQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		//@todo check when directly get pays.
-		// ->orderBy(IssuePay::tableName() . '.deadline_at ASC, ' . IssuePay::tableName() . '.pay_at DESC');
-
 		return $this->hasMany(IssuePay::class, ['calculation_id' => 'id'])
 			->via('payCalculations');
+	}
+
+	public function getTags() {
+		return $this->hasMany(IssueTag::class, ['id' => 'tag_id'])->viaTable(IssueTagLink::tableName(), ['issue_id' => 'id']);
 	}
 
 	public function isArchived(): bool {
 		return (int) $this->stage_id === IssueStage::ARCHIVES_ID;
 	}
 
-	public function isPositiveDecision(): bool {
-		return (int) $this->stage_id === IssueStage::POSITIVE_DECISION_ID;
-	}
-
-	public function isAccident(): bool {
-		return (int) $this->type_id === IssueType::ACCIDENT_ID;
-	}
-
-	public function getProvision(): ?Provision {
-		if ($this->provision === null) {
-			if ($this->isNewRecord) {
-				$type = static::DEFAULT_PROVISION;
-			} else {
-				$type = $this->provision_type;
-			}
-			if ($type > 0) {
-				$this->provision = new Provision($type, [
-					'base' => (float) $this->provision_base,
-					'value' => (float) $this->provision_value,
-				]);
-			}
-		}
-		return $this->provision;
+	public function getClaims(): ActiveQuery {
+		return $this->hasMany(IssueClaim::class, ['issue_id' => 'id']);
 	}
 
 	public function hasTele(): bool {
-		return $this->tele_id !== null && $this->tele !== null;
+		return $this->tele !== null;
 	}
 
 	public function hasLawyer(): bool {
 		return $this->lawyer !== null;
-	}
-
-	public function hasProvision(): bool {
-		return $this->provision_base > 0;
 	}
 
 	public function getClientFullName(): string {
@@ -430,6 +414,13 @@ class Issue extends ActiveRecord implements IssueInterface {
 		$this->touch('updated_at');
 	}
 
+	public function getTagsNames(): ?string {
+		if (empty($this->tags)) {
+			return null;
+		}
+		return implode(', ', ArrayHelper::getColumn($this->tags, 'name'));
+	}
+
 	public function linkUser(int $userId, string $type): void {
 		$user = $this->getUsers()->withType($type)->one();
 		if ($user !== null) {
@@ -442,14 +433,12 @@ class Issue extends ActiveRecord implements IssueInterface {
 
 	/**
 	 * @param string $type
-	 * @param bool $delete
 	 */
-	public function unlinkUser(string $type) {
+	public function unlinkUser(string $type): void {
 		$user = $this->getUsers()->withType($type)->one();
 		if ($user !== null) {
-			return $this->unlink('users', $user, true);
+			$this->unlink('users', $user, true);
 		}
-		return false;
 	}
 
 	/**
@@ -457,7 +446,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	 * @return IssueQuery the active query used by this AR class.
 	 */
 	public static function find(): IssueQuery {
-		return new IssueQuery(get_called_class());
+		return new IssueQuery(static::class);
 	}
 
 	public function isForUser(int $id): bool {
@@ -479,6 +468,49 @@ class Issue extends ActiveRecord implements IssueInterface {
 
 	public static function getIssueIdAttribute(): string {
 		return 'id';
+	}
+
+	public function getIssueRelationId(int $issueId): ?int {
+		return array_search($issueId, $this->getLinkedIssuesIds());
+	}
+
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getLinkedIssues(): IssueQuery {
+		return $this->hasMany(static::class, ['id' => 'linkedIssuesIds']);
+	}
+
+	/**
+	 * @return int[] Linked Issues IDs indexed by Relation ID.
+	 */
+	public function getLinkedIssuesIds(): array {
+		$relations = $this->issuesRelations;
+		$ids = [];
+		foreach ($relations as $relation) {
+			if ($relation->issue_id_1 === $this->id) {
+				$ids[$relation->id] = $relation->issue_id_2;
+			} else {
+				$ids[$relation->id] = $relation->issue_id_1;
+			}
+		}
+		return $ids;
+	}
+
+	public function getIssuesRelations(): ActiveQuery {
+		return $this->hasMany(IssueRelation::class, ['issue_id_1' => 'id'])
+			->onCondition('1=1) OR (issue_id_2 = :id', [':id' => $this->id]);
+	}
+
+	public function hasDelayedStage(): ?bool {
+		if (empty($this->stage_change_at)) {
+			return null;
+		}
+		$days = $this->getIssueStage()->days_reminder;
+		if (empty($days)) {
+			return null;
+		}
+		$date = new DateTime($this->stage_change_at);
+		$daysDiff = $date->diff(new DateTime())->days;
+		return $daysDiff >= $days;
 	}
 
 }

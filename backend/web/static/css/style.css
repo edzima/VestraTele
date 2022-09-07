@@ -42,6 +42,11 @@ div.required label:after {
 	overflow: hidden;
 }
 
+.text-uppercase {
+	text-transform: uppercase;
+}
+
+
 @media (min-width: 776px) {
 	.table-fixed-layout {
 		table-layout: fixed;
@@ -125,15 +130,61 @@ div.required label:after {
 	}
 }
 
+.d-inline {
+	display: inline;
+}
 
 .d-inline-flex {
 	display: inline-flex;
 }
 
-.justify-center{
+.justify-center {
 	justify-content: center;
 }
 
 .width-100 {
 	width: 100% !important;
 }
+
+
+@media (min-width: 992px) {
+	.provision-settlement-view .users-grid-wrapper {
+		display: flex;
+		flex-wrap: wrap;
+	}
+}
+
+.issue-users {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(315px, 1fr));
+	grid-gap: 1rem;
+}
+
+
+.half-transparent {
+	opacity: 0.5;
+}
+
+.ui-autocomplete-loading {
+	background: url('/static/img/indicator.gif') no-repeat center center;
+	background-size: 20px 20px;
+}
+
+
+input[type="tel"]::placeholder {
+	color: transparent;
+}
+
+input[type="tel"]::-moz-placeholder {
+	color: transparent;
+}
+
+input[type="tel"]::-webkit-input-placeholder {
+	color: transparent;
+}
+
+input[type="tel"]::-ms-input-placeholder {
+	color: transparent;
+}
+
+

@@ -7,6 +7,7 @@ use common\models\user\User;
 use common\models\user\UserAddress;
 use common\models\user\UserProfile;
 use common\models\user\UserTrait;
+use common\models\user\UserTraitAssign;
 use Yii;
 use yii\base\Model;
 use yii\db\QueryInterface;
@@ -221,10 +222,10 @@ class UserForm extends Model {
 
 	private function assignTraits(int $userId, bool $isNewRecord): void {
 		if (!$isNewRecord || empty($this->traits)) {
-			UserTrait::unassignUser($userId);
+			UserTraitAssign::unassignUser($userId);
 		}
 		if (!empty($this->traits)) {
-			UserTrait::assignUser($userId, $this->traits);
+			UserTraitAssign::assignUser($userId, $this->traits);
 		}
 	}
 
@@ -234,6 +235,9 @@ class UserForm extends Model {
 		$profile->firstname = $this->getProfile()->firstname;
 		$profile->phone = $this->getProfile()->phone;
 		$profile->phone_2 = $this->getProfile()->phone_2;
+		$profile->gender = $this->getProfile()->gender;
+		$profile->email_hidden_in_frontend_issue = $this->getProfile()->email_hidden_in_frontend_issue;
+
 		return $profile->save();
 	}
 

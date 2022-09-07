@@ -47,11 +47,15 @@ $this->params['breadcrumbs'][] = $this->title;
 			<?= $form->field($model, 'count', ['options' => ['class' => 'col-md-1 col-lg-1']])
 				->textInput() ?>
 
-			<?= $form->field($model, 'transferType', ['options' => ['class' => 'col-md-3 col-lg-2']])->dropDownList(PaysForm::getTransferTypesNames()) ?>
+			<?= $form->field($model, 'transferType', ['options' => ['class' => 'col-md-3 col-lg-2']])->dropDownList(PaysForm::getTransfersTypesNames()) ?>
 
 			<?= $form->field($model, 'deadline_at', ['options' => ['class' => 'col-md-3 col-lg-2']])
 				->widget(DateWidget::class)
 			?>
+			<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-2']])
+				->textInput(['disabled' => true])
+			?>
+
 
 		</div>
 

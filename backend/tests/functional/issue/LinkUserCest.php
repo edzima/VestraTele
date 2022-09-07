@@ -2,14 +2,16 @@
 
 namespace backend\tests\functional\issue;
 
+use backend\modules\issue\controllers\UserController;
 use backend\tests\Step\Functional\IssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
 
 class LinkUserCest {
 
+	/** @see UserController::actionLink() */
+	public const ROUTE_LINK = 'issue/user/link';
 	protected const FORM_SELECTOR = '#issue-user-form';
-	protected const ROUTE_LINK = 'issue/user/link';
 
 	/**
 	 * Load fixtures before db transaction begin

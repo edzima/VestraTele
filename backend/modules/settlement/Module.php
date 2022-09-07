@@ -27,9 +27,15 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
-						'actions' => ['to-create', 'create', 'create-administrative', 'view', 'update', 'pays'],
+						'actions' => ['to-create', 'create', 'create-administrative', 'view', 'update', 'pays', 'delete'],
 						'controllers' => ['settlement/calculation'],
 						'permissions' => [Worker::PERMISSION_CALCULATION_TO_CREATE],
+					],
+					[
+						'allow' => true,
+						'actions' => ['without-provisions'],
+						'controllers' => ['settlement/calculation'],
+						'permissions' => [Worker::PERMISSION_PROVISION],
 					],
 					[
 						'allow' => true,

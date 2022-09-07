@@ -3,6 +3,7 @@
 namespace backend\modules\issue\models\search;
 
 use backend\modules\issue\models\IssueStage;
+use common\models\issue\IssueType;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -11,6 +12,8 @@ use yii\data\ActiveDataProvider;
  */
 class IssueStageSearch extends IssueStage {
 
+	public $typesFilter;
+
 	/**
 	 * @inheritdoc
 	 */
@@ -18,6 +21,7 @@ class IssueStageSearch extends IssueStage {
 		return [
 			[['id', 'days_reminder'], 'integer'],
 			[['name', 'short_name'], 'safe'],
+			['typesFilter', 'in', 'range' => array_keys(IssueType::getTypesNames()), 'allowArray' => true],
 		];
 	}
 
@@ -38,6 +42,8 @@ class IssueStageSearch extends IssueStage {
 	 */
 	public function search(array $params): ActiveDataProvider {
 		$query = IssueStage::find();
+		$query->joinWith('types');
+		$query->groupBy('id');
 
 		// add conditions that should always apply here
 
@@ -53,14 +59,18 @@ class IssueStageSearch extends IssueStage {
 			return $dataProvider;
 		}
 
+		if (!empty($this->typesFilter)) {
+			$query->andWhere([IssueType::tableName() . '.id' => $this->typesFilter]);
+		}
+
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
 			'days_reminder' => $this->days_reminder,
 		]);
 
-		$query->andFilterWhere(['like', 'name', $this->name])
-			->andFilterWhere(['like', 'short_name', $this->short_name]);
+		$query->andFilterWhere(['like', IssueStage::tableName() . '.name', $this->name])
+			->andFilterWhere(['like', IssueStage::tableName() . '.short_name', $this->short_name]);
 
 		$query->addOrderBy('posi');
 

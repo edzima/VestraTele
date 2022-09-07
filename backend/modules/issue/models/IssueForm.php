@@ -5,9 +5,10 @@ namespace backend\modules\issue\models;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\Issue;
 use common\models\issue\IssueStage;
+use common\models\issue\IssueTag;
+use common\models\issue\IssueTagLink;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
-use common\models\user\Customer;
 use common\models\user\User;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -24,24 +25,23 @@ class IssueForm extends Model {
 
 	public ?int $agent_id = null;
 	public ?int $lawyer_id = null;
-	public $tele_id = null;
+	public $tele_id;
 
 	public ?int $type_id = null;
 	public ?int $stage_id = null;
 	public ?int $entity_responsible_id = null;
 	public ?string $signing_at = null;
-	public ?string $accident_at = null;
+	public ?string $type_additional_date_at = null;
 	public ?string $stage_change_at = null;
 	public ?string $archives_nr = null;
 	public ?string $details = null;
 	public ?string $signature_act = null;
 
-	public const TYPE_ACCIDENT_ID = IssueType::ACCIDENT_ID;
-
 	public const STAGE_ARCHIVED_ID = IssueStage::ARCHIVES_ID;
-	public const STAGE_POSITIVE_DECISION_ID = IssueStage::POSITIVE_DECISION_ID;
 
-	private Customer $customer;
+	public $tagsIds = [];
+
+	private User $customer;
 
 	private ?Issue $model = null;
 
@@ -53,6 +53,20 @@ class IssueForm extends Model {
 			throw new InvalidConfigException('$customer or $model must be set.');
 		}
 		parent::__construct($config);
+	}
+
+	public static function getTagsNames(bool $onlyActive): array {
+		$models = IssueTag::find();
+		if ($onlyActive) {
+			$models->andWhere(['is_active' => true]);
+		}
+		$models = $models->all();
+
+		$data = [];
+		foreach ($models as $model) {
+			$data[$model->getTypeName()][$model->id] = $model->name;
+		}
+		return $data;
 	}
 
 	public function rules(): array {
@@ -72,7 +86,9 @@ class IssueForm extends Model {
 			['signature_act', 'string', 'max' => 30],
 			['signature_act', 'default', 'value' => null],
 			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
-			[['signing_at', 'accident_at', 'stage_change_at'], 'date', 'format' => 'Y-m-d'],
+			['tagsIds', 'in', 'range' => IssueTag::find()->select('id')->column(), 'allowArray' => true],
+
+			[['signing_at', 'type_additional_date_at', 'stage_change_at'], 'date', 'format' => 'Y-m-d'],
 			[
 				'archives_nr',
 				'required',
@@ -104,14 +120,15 @@ class IssueForm extends Model {
 			'agent_id' => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
 			'lawyer_id' => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
+			'tagsIds' => Yii::t('issue', 'Tags'),
 		]);
 	}
 
-	protected function setCustomer(Customer $customer): void {
+	protected function setCustomer(User $customer): void {
 		$this->customer = $customer;
 	}
 
-	public function getCustomer(): Customer {
+	public function getCustomer(): User {
 		return $this->customer;
 	}
 
@@ -124,12 +141,13 @@ class IssueForm extends Model {
 		$this->agent_id = $model->agent->id;
 		$this->lawyer_id = $model->lawyer->id;
 		$this->tele_id = $model->tele->id ?? null;
-		$this->customer = Customer::fromUser($model->customer);
+		$this->customer = $model->customer;
 		$this->entity_responsible_id = $model->entity_responsible_id;
 		$this->details = $model->details;
 		$this->signing_at = $model->signing_at;
-		$this->accident_at = $model->accident_at;
+		$this->type_additional_date_at = $model->type_additional_date_at;
 		$this->stage_change_at = $model->stage_change_at;
+		$this->tagsIds = ArrayHelper::getColumn($model->tags, 'id');
 	}
 
 	public function getModel(): Issue {
@@ -150,15 +168,27 @@ class IssueForm extends Model {
 			$model->stage_change_at = $this->stage_change_at;
 			$model->entity_responsible_id = $this->entity_responsible_id;
 			$model->signing_at = $this->signing_at;
-			$model->accident_at = $this->accident_at;
-			if (isset($model->dirtyAttributes['stage_id']) && $model->stage_change_at !== $this->stage_change_at) {
-				$model->stage_change_at = date('Y-m-d');
-			} else {
-				$model->stage_change_at = $this->stage_change_at;
-			}
+			$model->type_additional_date_at = $this->type_additional_date_at;
 			if (!$model->save(false)) {
 				return false;
 			}
+			if (!$model->isNewRecord) {
+				IssueTagLink::deleteAll(['issue_id' => $model->id]);
+			}
+
+			if (!empty($this->tagsIds)) {
+				$rows = [];
+				foreach ((array) $this->tagsIds as $id) {
+					$rows[] = [
+						'issue_id' => $model->id,
+						'tag_id' => $id,
+					];
+				}
+				IssueTagLink::getDb()->createCommand()->batchInsert(IssueTagLink::tableName(), [
+					'issue_id', 'tag_id',
+				], $rows)->execute();
+			}
+
 			$model->linkUser($this->customer->id, IssueUser::TYPE_CUSTOMER);
 			$model->linkUser($this->agent_id, IssueUser::TYPE_AGENT);
 			$model->linkUser($this->lawyer_id, IssueUser::TYPE_LAWYER);
@@ -203,16 +233,22 @@ class IssueForm extends Model {
 		return static::getStages($this->type_id);
 	}
 
-	protected static function getStages(int $typeID): array {
-		$type = IssueType::get($typeID);
-		if ($type === null) {
-			return [];
-		}
-		return ArrayHelper::map($type->stages, 'id', 'name');
+	public static function getStages(int $typeID): array {
+		return IssueStageChangeForm::getStagesNames($typeID);
 	}
 
 	public static function getEntityResponsibles(): array {
 		return ArrayHelper::map(EntityResponsible::find()->asArray()->all(), 'id', 'name');
+	}
+
+	public static function getTypesWithAdditionalDateNames(): array {
+		$names = [];
+		foreach (IssueType::getTypes() as $type) {
+			if ($type->with_additional_date) {
+				$names[$type->id] = Yii::t('common', 'Date at ({type})', ['type' => $type->name]);
+			}
+		}
+		return $names;
 	}
 
 }

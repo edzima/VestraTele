@@ -3,6 +3,7 @@
 namespace common\tests\_support;
 
 use common\models\user\User;
+use Exception;
 use Yii;
 use yii\rbac\ManagerInterface;
 
@@ -20,8 +21,14 @@ trait UserRbacActor {
 
 	public function getUser(): User {
 		if ($this->user === null) {
-			$this->user = $this->createUser();
-			codecept_debug('Create user: ' . $this->user->username);
+			$user = Yii::$app->user;
+			if ($user && $user->getIdentity()) {
+				$this->user = Yii::$app->user->getIdentity();
+				codecept_debug('Load user from identity: ' . $this->user->username);
+			} else {
+				$this->user = $this->createUser();
+				codecept_debug('Create user: ' . $this->user->username);
+			}
 			$this->revokeAll();
 			$this->assignRoles();
 			$this->assignPermissions();
@@ -78,7 +85,7 @@ trait UserRbacActor {
 		try {
 			$auth->assign($auth->getRole($name), $this->getUser()->id);
 			codecept_debug('Assign role: ' . $name);
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 			codecept_debug($exception->getMessage());
 		}
 	}
@@ -88,18 +95,23 @@ trait UserRbacActor {
 		try {
 			$auth->assign($auth->getPermission($name), $this->getUser()->id);
 			codecept_debug('Assign permission: ' . $name);
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 			codecept_debug($exception->getMessage());
 		}
 	}
 
 	private function createUser(): User {
+		User::deleteAll(['username' => $this->getUsername()]);
 		$user = new User();
+		$user->email = $this->getUsername() . '@test.com';
 		$user->username = $this->getUsername();
 		$user->setPassword($this->getPassword());
 		$user->status = User::STATUS_ACTIVE;
 		$user->generateAuthKey();
 		$user->save();
+		if ($user->hasErrors()) {
+			codecept_debug($user->getErrors());
+		}
 		return $user;
 	}
 

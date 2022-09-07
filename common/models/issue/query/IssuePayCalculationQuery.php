@@ -13,6 +13,12 @@ use yii\db\ActiveQuery;
  */
 class IssuePayCalculationQuery extends ActiveQuery {
 
+	public function onlyTypes(array $types): self {
+		[$table, $alias] = $this->getTableNameAndAlias();
+		$this->andWhere([$alias . '.type' => $types]);
+		return $this;
+	}
+
 	public function withoutProvisions(): self {
 		$this->joinWith('pays.provisions');
 		$this->andWhere(['provision.pay_id' => null]);

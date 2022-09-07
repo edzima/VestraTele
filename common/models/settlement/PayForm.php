@@ -2,7 +2,6 @@
 
 namespace common\models\settlement;
 
-use common\models\issue\IssuePay;
 use DateTime;
 use Decimal\Decimal;
 use Yii;
@@ -20,18 +19,20 @@ class PayForm extends Model implements PayInterface {
 
 	public string $value = '';
 	public ?string $vat = null;
+	public ?string $status = null;
 	public ?string $payment_at = null;
 	public ?string $deadline_at = null;
-	public ?int $transferType = IssuePay::TRANSFER_TYPE_BANK;
+	public ?string $transferType = TransferType::TRANSFER_TYPE_BANK;
 
 	public string $dateFormat = 'Y-m-d';
 
 	public function rules(): array {
 		return [
 			[['value', 'transferType'], 'required'],
-			[['transferType'], 'integer'],
+			['status', 'integer'],
+			[['transferType'], 'string'],
 			['vat', 'number', 'min' => 0, 'max' => 100],
-			['value', 'number', 'min' => 1],
+			['value', 'number', 'min' => 0.01],
 			['value', 'number', 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/', 'enableClientValidation' => false],
 			[['deadline_at', 'payment_at'], 'date', 'format' => $this->dateFormat],
 			[
@@ -44,7 +45,7 @@ class PayForm extends Model implements PayInterface {
 				return $this->isRequiredDeadlineAt();
 			}, 'message' => Yii::t('settlement', '{attribute} is required when {secondLabel} is empty.', ['secondLabel' => $this->getAttributeLabel('paymentAt')]),
 			],
-			['transferType', 'in', 'range' => array_keys(static::getTransferTypesNames())],
+			['transferType', 'in', 'range' => array_keys(static::getTransfersTypesNames())],
 			['deadlineInterval', 'in', 'range' => array_keys(static::getDeadlineIntervals())],
 		];
 	}
@@ -61,11 +62,12 @@ class PayForm extends Model implements PayInterface {
 		return [
 			'deadline_at' => Yii::t('settlement', 'Deadline at'),
 			'deadlineAt' => Yii::t('settlement', 'Deadline at'),
-			'transferType' => Yii::t('settlement', 'Pay transfer type'),
+			'transferType' => Yii::t('settlement', 'Transfer Type'),
 			'value' => Yii::t('settlement', 'Value with VAT'),
 			'vat' => Yii::t('settlement', 'VAT'),
 			'payment_at' => Yii::t('settlement', 'Payment at'),
 			'paymentAt' => Yii::t('settlement', 'Payment at'),
+			'status' => Yii::t('settlement', 'Status'),
 		];
 	}
 
@@ -74,6 +76,7 @@ class PayForm extends Model implements PayInterface {
 		$this->vat = $pay->getVAT() ? $pay->getVAT()->toFixed(2) : null;
 		$this->payment_at = $pay->getPaymentAt() ? $pay->getPaymentAt()->format($this->dateFormat) : null;
 		$this->deadline_at = $pay->getDeadlineAt() ? $pay->getDeadlineAt()->format($this->dateFormat) : null;
+		$this->status = $pay->getStatus();
 	}
 
 	public function generatePay(bool $validate = true): ?PayInterface {
@@ -85,6 +88,7 @@ class PayForm extends Model implements PayInterface {
 			'transferType' => $this->getTransferType(),
 			'paymentAt' => $this->getPaymentAt(),
 			'deadlineAt' => $this->getDeadlineAt(),
+			'status' => $this->status,
 		]);
 	}
 
@@ -120,12 +124,12 @@ class PayForm extends Model implements PayInterface {
 		return null;
 	}
 
-	public function getTransferType(): int {
+	public function getTransferType(): ?string {
 		return $this->transferType;
 	}
 
-	public static function getTransferTypesNames(): array {
-		return IssuePay::getTransferTypesNames();
+	public static function getTransfersTypesNames(): array {
+		return Pay::getTransfersTypesNames();
 	}
 
 	public static function getDeadlineIntervals(): array {
@@ -144,5 +148,9 @@ class PayForm extends Model implements PayInterface {
 			return false;
 		}
 		return new DateTime($range) > $this->getDeadlineAt();
+	}
+
+	public function getStatus(): ?int {
+		return $this->status;
 	}
 }

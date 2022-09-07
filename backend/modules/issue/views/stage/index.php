@@ -1,8 +1,10 @@
 <?php
 
+use backend\modules\issue\models\IssueStage;
 use backend\modules\issue\models\search\IssueStageSearch;
-use yii\helpers\Html;
+use common\models\issue\IssueType;
 use yii\grid\GridView;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel IssueStageSearch */
@@ -27,10 +29,18 @@ $this->params['breadcrumbs'][] = $this->title;
 			'name',
 			'short_name',
 			[
-				'attribute' => 'typesName',
+				'attribute' => 'typesFilter',
+				'value' => 'typesName',
 				'label' => 'Rodzaje',
+				'filter' => IssueType::getTypesNames(),
 			],
 			'days_reminder',
+			[
+				'label' => Yii::t('issue', 'Issues Count'),
+				'value' => function (IssueStage $stage): int {
+					return $stage->getIssues()->count();
+				},
+			],
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>

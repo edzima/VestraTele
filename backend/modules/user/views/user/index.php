@@ -18,6 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create user'), ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('common', 'User Traits'), ['trait/index'], ['class' => 'btn btn-warning']) ?>
 	</p>
 
 	<?= $this->render('_search', [
@@ -31,6 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			//['class' => 'yii\grid\SerialColumn'],
 			'id',
 			'username',
+			'email:email',
 			[
 				'attribute' => 'firstname',
 				'value' => 'profile.firstname',

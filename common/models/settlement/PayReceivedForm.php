@@ -3,6 +3,7 @@
 namespace common\models\settlement;
 
 use common\models\issue\IssuePay;
+use common\models\issue\IssuePayInterface;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 
@@ -35,7 +36,7 @@ class PayReceivedForm extends Model {
 		];
 	}
 
-	public function getPay(): IssuePay {
+	public function getPay(): IssuePayInterface {
 		return $this->pay;
 	}
 
@@ -45,7 +46,7 @@ class PayReceivedForm extends Model {
 		}
 		$pay = $this->pay;
 		$pay->pay_at = $this->date;
-		$pay->transfer_type = IssuePay::TRANSFER_TYPE_DIRECT;
+		$pay->transfer_type = TransferType::TRANSFER_TYPE_CASH;
 		$received = new PayReceived();
 		$received->user_id = $this->user_id;
 		$received->pay_id = $pay->id;

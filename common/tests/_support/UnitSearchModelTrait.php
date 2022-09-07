@@ -11,12 +11,14 @@ use yii\data\DataProviderInterface;
  */
 trait UnitSearchModelTrait {
 
+	/**
+	 * @todo refactor createModel() as getter and remove this property.
+	 */
 	private SearchModel $model;
-
 
 	abstract protected function createModel(): SearchModel;
 
-	protected function search(array $params, string $formName = null): DataProviderInterface {
+	protected function search(array $params = [], string $formName = null): DataProviderInterface {
 		if ($formName === null) {
 			$formName = $this->model->formName();
 		}
@@ -24,6 +26,15 @@ trait UnitSearchModelTrait {
 		return $this->model->search($params);
 	}
 
+	protected function getModels(array $params = []): array {
+		return $this->search($params)->getModels();
+	}
+
+	/**
+	 * @param int $count
+	 * @param array $params
+	 * @deprecated
+	 */
 	protected function assertTotalCount(int $count, array $params = []): void {
 		$this->tester->assertSame($count, $this->search($params)->getTotalCount());
 	}

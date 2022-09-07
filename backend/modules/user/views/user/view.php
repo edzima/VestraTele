@@ -18,6 +18,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 		<?= Html::a('Edytuj', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_ISSUE)
+			? Html::a(
+				Yii::t('backend', 'Link to issue'),
+				['/issue/user/link', 'userId' => $model->id],
+				['class' => 'btn btn-success']
+			)
+			: ''
+		?>
+
 		<?= Html::a('Usuń', ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',
 			'data' => [

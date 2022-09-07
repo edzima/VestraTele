@@ -13,14 +13,13 @@ class AgentDataColumn extends DataColumn {
 
 	public $attribute = 'agent_id';
 	public $value = 'agent.fullName';
-	public $width = '250px';
 
 	public function init(): void {
 		if (empty($this->label)) {
-			$this->label = Yii::t('common', 'agent');
+			$this->label = Yii::t('rbac', 'agent');
 		}
 		if (!isset($this->filterInputOptions['placeholder'])) {
-			$this->filterInputOptions['placeholder'] = Yii::t('common', 'agent');
+			$this->filterInputOptions['placeholder'] = Yii::t('rbac', 'agent');
 		}
 
 		if (empty($this->filter)) {
@@ -38,6 +37,9 @@ class AgentDataColumn extends DataColumn {
 				'options' => [
 					'multiple' => true,
 					'placeholder' => $this->label,
+				],
+				'pluginOptions' => [
+					'dropdownAutoWidth' => true,
 				],
 				'size' => Select2::SIZE_SMALL,
 				'showToggleAll' => false,

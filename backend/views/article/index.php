@@ -1,13 +1,16 @@
 <?php
 
-use yii\bootstrap\Html;
-use yii\grid\GridView;
-use yii\helpers\ArrayHelper;
+use backend\helpers\Html;
+use backend\models\search\ArticleSearch;
+use backend\widgets\GridView;
+use common\helpers\ArrayHelper;
 use common\models\Article;
 use common\models\ArticleCategory;
+use common\widgets\grid\ActionColumn;
+use common\widgets\grid\SerialColumn;
 
 /* @var $this yii\web\View */
-/* @var $searchModel backend\models\search\ArticleSearch */
+/* @var $searchModel ArticleSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('backend', 'Articles');
@@ -17,15 +20,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create article'), ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('backend', 'Category'), ['article-category/index'], ['class' => 'btn btn-info']) ?>
+
 	</p>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-			//['class' => 'yii\grid\SerialColumn'],
+			['class' => SerialColumn::class],
 
-			'id',
+			//'id',
 			'title',
 			// 'slug',
 			// 'description',
@@ -42,6 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					Article::STATUS_ACTIVE => Yii::t('backend', 'Active'),
 				],
 			],
+			'show_on_mainpage',
 			[
 				'attribute' => 'category_id',
 				'value' => function ($model) {
@@ -51,17 +57,16 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'attribute' => 'author_id',
-				'value' => function ($model) {
-					return $model->author->username;
-				},
+				'value' => 'author',
+				'filter' => ArticleSearch::authorNames(),
 			],
 			// 'updater_id',
-			'published_at:date',
-			// 'created_at',
-			// 'updated_at'
+			'published_at:datetime',
+			'created_at:datetime',
+			'updated_at:datetime',
 
 			[
-				'class' => 'yii\grid\ActionColumn',
+				'class' => ActionColumn::class,
 				'template' => '{update} {delete}',
 			],
 		],

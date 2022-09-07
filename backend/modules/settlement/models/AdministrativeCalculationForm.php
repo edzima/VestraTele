@@ -13,6 +13,7 @@ class AdministrativeCalculationForm extends CalculationForm implements HiddenFie
 	public string $value = '130';
 	public ?string $vat = '23';
 	public ?int $providerType = IssuePayCalculation::PROVIDER_CLIENT;
+	public bool $withOfficeCost = false;
 
 	public $officeCost = [
 		'value' => 30,
@@ -31,6 +32,9 @@ class AdministrativeCalculationForm extends CalculationForm implements HiddenFie
 	protected function saveCosts(): void {
 		$cost = $this->createOfficeCost();
 		if ($cost) {
+			if (empty($cost->date_at)) {
+				$cost->date_at = $this->getModel()->created_at;
+			}
 			$cost->save();
 			$this->costs_ids[] = $cost->id;
 		}
@@ -41,7 +45,11 @@ class AdministrativeCalculationForm extends CalculationForm implements HiddenFie
 		return !in_array($attribute, $this->hiddenFields);
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	private function createOfficeCost(): ?IssueCost {
+		if (!$this->withOfficeCost) {
+			return null;
+		}
 		if (!empty($this->officeCost)) {
 			$options = $this->officeCost;
 			if (!isset($options['class'])) {

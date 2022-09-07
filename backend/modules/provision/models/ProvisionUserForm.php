@@ -4,183 +4,162 @@ namespace backend\modules\provision\models;
 
 use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionUser;
+use common\models\user\User;
 use common\models\user\Worker;
 use Yii;
-use yii\base\InvalidConfigException;
 use yii\base\Model;
-use yii\helpers\ArrayHelper;
 
 class ProvisionUserForm extends Model {
 
-	/**
-	 * @var ProvisionType
-	 */
-	private $types;
+	public const SCENARIO_SELF = 'self';
 
-	/**
-	 * @var Worker
-	 */
-	private $user;
+	public $from_user_id;
+	public $to_user_id;
+	public $value;
+	public $from_at;
+	public $to_at;
+	public $type_id;
 
-	/**
-	 * @var ProvisionUser[]
-	 */
-	private $models;
+	private ?ProvisionUser $model = null;
 
-	public function __construct(Worker $user, $config = []) {
-		$this->user = $user;
-		parent::__construct($config);
+	public static function createUserSelfForm(int $userId): self {
+		$model = new static();
+		$model->scenario = static::SCENARIO_SELF;
+		$model->from_user_id = $userId;
+		$model->to_user_id = $userId;
+		return $model;
 	}
 
-	public function getUser(): Worker {
-		return $this->user;
+	public function isSelf(): bool {
+		return $this->scenario === static::SCENARIO_SELF ||
+			(!$this->getModel()->isNewRecord && $this->getModel()->isSelf());
 	}
 
-	/**
-	 * @param ProvisionType[] $types
-	 */
-	public function setTypes(array $types): void {
-		$this->types = $types;
+	public function attributeLabels() {
+		return $this->getModel()->attributeLabels();
 	}
 
-	public function getTypesNames(): array {
-		return ArrayHelper::map($this->getTypes(), 'id', 'name');
+	public function rules(): array {
+		return [
+			[['value', 'from_user_id', 'to_user_id', 'type_id'], 'required'],
+			[['type_id', 'from_user_id', 'to_user_id'], 'integer'],
+			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
+			[
+				'value', 'number', 'min' => 0,
+			],
+			[
+				'value', 'number', 'max' => 100, 'enableClientValidation' => false,
+				'when' => function () {
+					$type = $this->getType();
+					return $type->is_percentage ?? false;
+				},
+			],
+			['from_user_id', 'compare', 'compareAttribute' => 'to_user_id', 'on' => static::SCENARIO_SELF],
+			[['from_at', 'to_at'], 'date', 'format' => 'Y-m-d'],
+			[
+				'to_at', 'compare', 'compareAttribute' => 'from_at', 'operator' => '>=',
+				'enableClientValidation' => false,
+			],
+			[
+				'from_at', 'required', 'enableClientValidation' => false, 'when' => function (): bool {
+				$exist = ProvisionUser::find()
+					->andWhere([
+						'from_user_id' => $this->from_user_id,
+						'to_user_id' => $this->to_user_id,
+						'type_id' => $this->type_id,
+					]);
+				if (!$this->getModel()->isNewRecord) {
+					$exist->andWhere(['<>', 'id', $this->model->id]);
+				}
+				return $exist->exists();
+			},
+			],
+			[
+				'to_at', 'required', 'enableClientValidation' => false, 'when' => function (): bool {
+				$exist = ProvisionUser::find()
+					->andWhere([
+						'from_user_id' => $this->from_user_id,
+						'to_user_id' => $this->to_user_id,
+						'type_id' => $this->type_id,
+						'to_at' => null,
+					])
+					->andWhere(['IS NOT', 'from_at', null]);
+				if (!$this->getModel()->isNewRecord) {
+					$exist->andWhere(['<>', 'id', $this->model->id]);
+				}
+				return $exist->exists();
+			},
+			],
+		];
 	}
 
-	public function getParentsModels(): array {
-		if (!$this->user->hasParent()) {
-			return [];
+	public function setType(ProvisionType $type): void {
+		$this->type_id = $type->id;
+		$this->value = $type->value;
+		$this->from_at = $type->from_at;
+		$this->to_at = $type->to_at;
+	}
+
+	public function getType(): ?ProvisionType {
+		if ($this->type_id) {
+			return ProvisionType::getType($this->type_id, true);
 		}
-		return array_filter($this->getModels(), function (ProvisionUser $provisionUser) {
-			return $provisionUser->from_user_id === $this->user->id && $provisionUser->to_user_id !== $this->user->id;
-		});
+		return null;
 	}
 
-	public function getChildesModels(): array {
-		return array_filter($this->getModels(), function (ProvisionUser $provisionUser) {
-			return $provisionUser->to_user_id === $this->user->id && $provisionUser->from_user_id !== $this->user->id;
-		});
-	}
-
-	public function getSelfModels(): array {
-		return array_filter($this->getModels(), function (ProvisionUser $provisionUser) {
-			return $provisionUser->to_user_id === $this->user->id
-				&& $provisionUser->from_user_id === $this->user->id;
-		});
-	}
-
-	/**
-	 * @return ProvisionType[]
-	 */
-	private function getTypes(): array {
-		if (empty($this->types)) {
-			$types = Yii::$app->provisions->getTypes();
-			if (empty($types)) {
-				throw new InvalidConfigException('Provision type must be set');
-			}
-			$this->types = $types;
+	public function setModel(ProvisionUser $model): void {
+		$this->model = $model;
+		$this->from_user_id = $model->from_user_id;
+		$this->to_user_id = $model->to_user_id;
+		if ($model->isSelf()) {
+			$this->setScenario(static::SCENARIO_SELF);
 		}
-		return $this->types;
+		$this->value = $model->value;
+		$this->type_id = $model->type_id;
+		$this->from_at = $model->from_at;
+		$this->to_at = $model->to_at;
 	}
 
-	public function load($data, $formName = null): bool {
-		return static::loadMultiple($this->getModels(), $data, $formName);
+	public function getModel(): ProvisionUser {
+		if ($this->model === null) {
+			$this->model = new ProvisionUser();
+		}
+		return $this->model;
 	}
 
 	public function save(): bool {
-		if ($this->validate()) {
-			foreach ($this->getModels() as $model) {
-				$model->save();
-			}
-			return true;
+		if (!$this->validate()) {
+			return false;
 		}
-		return false;
+		$model = $this->getModel();
+		$model->value = $this->value;
+		$model->from_user_id = $this->from_user_id;
+		$model->to_user_id = $this->to_user_id;
+		$model->type_id = $this->type_id;
+		$model->from_at = $this->from_at;
+		$model->to_at = $this->to_at;
+		return $model->save();
 	}
 
-	/**
-	 * @return ProvisionUser[]
-	 */
-	private function getModels(): array {
-		if ($this->models === null) {
-			$this->models = $this->createModels($this->getExistedModels());
+	public function getName(): string {
+		if ($this->isSelf()) {
+			return Yii::t('provision',
+				'Self - {user}',
+				['user' => $this->getModel()->toUser->getFullName()]
+			);
 		}
-
-		return $this->models;
-	}
-
-	/**
-	 * @return ProvisionUser[]
-	 */
-	private function getExistedModels(): array {
-		return ProvisionUser::find()
-			->with('type')
-			->user($this->user)
-			->all();
-	}
-
-	/**
-	 * @param ProvisionUser[] $existed
-	 * @return ProvisionUser[]
-	 */
-	private function createModels(array $existed): array {
-		$models = [];
-		$models = array_merge($models, $this->createSelfModels($existed));
-
-		$parentsExistedIds = ArrayHelper::map($existed, 'type_id', 'to_user_id', 'to_user_id');
-		foreach ($this->user->getParentsIds() as $id) {
-			$models = array_merge($models, $this->createTypesModels($this->user->id, $id, (array) ($parentsExistedIds[$id] ?? [])));
-		}
-		$childesExistedIds = ArrayHelper::map($existed, 'type_id', 'from_user_id', 'from_user_id');
-		foreach ($this->user->getAllChildesIds() as $id) {
-			$models = array_merge($models, $this->createTypesModels($id, $this->user->id, (array) ($childesExistedIds[$id] ?? [])));
-		}
-
-		return array_merge($models, $existed);
-	}
-
-	/**
-	 * @param ProvisionUser[] $existed
-	 * @return ProvisionUser[]
-	 */
-	private function createSelfModels(array $existed): array {
-		$selfExisted = [];
-		foreach ($existed as $provisionUser) {
-			if ($provisionUser->from_user_id === $this->user->id && $provisionUser->to_user_id === $this->user->id) {
-				$selfExisted[$provisionUser->type_id] = $this->user->id;
-			}
-		}
-		return $this->createTypesModels($this->user->id, $this->user->id, $selfExisted);
-	}
-
-	/**
-	 * @param int $fromUserId
-	 * @param int $toUserId
-	 * @param array $excluded
-	 * @return ProvisionUser[]
-	 */
-	private function createTypesModels(int $fromUserId, int $toUserId, array $excluded = []): array {
-		$models = [];
-		foreach ($this->getTypes() as $type) {
-			if (!isset($excluded[$type->id])) {
-				$model = $this->createModel($fromUserId, $toUserId, $type);
-				if ($model !== null) {
-					$models[] = $model;
-				}
-			}
-		}
-		return $models;
-	}
-
-	private function createModel(int $fromUser, int $toUser, ProvisionType $type): ?ProvisionUser {
-		if (!Yii::$app->provisions->isTypeForUser($type, $fromUser)) {
-			return null;
-		}
-		return new ProvisionUser([
-			'from_user_id' => $fromUser,
-			'to_user_id' => $toUser,
-			'type' => $type,
-			'value' => $type->value,
+		return Yii::t('provision', '{fromUser} from {toUser}', [
+			'fromUser' => $this->getModel()->fromUser->getFullName(),
+			'toUser' => $this->getModel()->toUser->getFullName(),
 		]);
+	}
+
+	public static function getTypesNames(): array {
+		return ProvisionType::getTypesNames(true, true);
+	}
+
+	public static function getUserNames(): array {
+		return User::getSelectList(User::getAssignmentIds(Worker::ROLES, false));
 	}
 
 }

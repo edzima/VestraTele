@@ -9,11 +9,11 @@
 namespace console\components\oldCrmData;
 
 use common\models\address\City;
-use common\models\issue\Issue;
+use common\models\address\State;
 use common\models\entityResponsible\EntityResponsible;
+use common\models\issue\Issue;
 use common\models\issue\IssueStage;
 use common\models\issue\Provision;
-use common\models\address\State;
 use console\components\oldCrmData\exceptions\CityNotFoundExcepion;
 use Yii;
 use yii\db\ActiveRecord;
@@ -98,15 +98,6 @@ class IssueDataTransfer extends DataTransfer {
 		if ($data['stage_id'] === IssueStage::ARCHIVES_ID) {
 			$data['archives_nr'] = 'nieznane';
 		}
-		$provisionBase = (float) $row['issue_money'];
-		if ($provisionBase > 0) {
-			$data['provision_base'] = $provisionBase;
-		}
-		$provisionValue = (float) $row['issue_percentage'];
-		if ($provisionValue > 0) {
-			$data['provision_value'] = $provisionValue;
-		}
-		$data['provision_type'] = Provision::TYPE_PERCENTAGE;
 
 		$data['created_at'] = $row['datestamp'];
 		$data['updated_at'] = $row['edit_datestamp'];

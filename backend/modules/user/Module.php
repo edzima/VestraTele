@@ -40,6 +40,17 @@ class Module extends BaseModule {
 						'permissions' => [User::PERMISSION_WORKERS],
 					],
 					[
+						'controllers' => ['user/worker'],
+						'actions' => ['hierarchy'],
+						'allow' => true,
+						'permissions' => [User::PERMISSION_WORKERS_HIERARCHY],
+					],
+					[
+						'controllers' => ['user/trait'],
+						'allow' => true,
+						'permissions' => [User::PERMISSION_USER_TRAITS],
+					],
+					[
 						'allow' => true,
 						'roles' => ['administrator'],
 					],
