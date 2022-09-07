@@ -27,7 +27,9 @@ class AddressSearch extends Address implements SearchModel {
 		return !empty($this->region_id)
 			|| !empty($this->district_id)
 			|| !empty($this->commune_id)
-			|| !empty($this->city_name);
+			|| !empty($this->postal_code)
+			|| !empty($this->city_name)
+			|| !empty($this->info);
 	}
 
 	public function rules(): array {
@@ -106,6 +108,7 @@ class AddressSearch extends Address implements SearchModel {
 			$query->alias('A');
 			$this->applyCityNameFilter($query);
 			$this->applyPostalCodeFilter($query);
+			$this->applyInfoFilter($query);
 			$this->applyRegionFilter($query);
 			$this->applyDistrictFilter($query);
 			$this->applyCommuneFilter($query);
@@ -115,6 +118,12 @@ class AddressSearch extends Address implements SearchModel {
 	private function applyPostalCodeFilter(QueryInterface $query): void {
 		if (!empty($this->postal_code)) {
 			$query->andWhere(['like', 'A.postal_code', $this->postal_code . '%', false]);
+		}
+	}
+
+	private function applyInfoFilter(QueryInterface $query): void {
+		if (!empty($this->info)) {
+			$query->andWhere(['like', 'A.info', $this->info]);
 		}
 	}
 

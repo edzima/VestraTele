@@ -2,6 +2,7 @@
 
 namespace common\fixtures\helpers;
 
+use common\fixtures\AddressFixture;
 use common\fixtures\issue\EntityResponsibleFixture;
 use common\fixtures\issue\IssueFixture;
 use common\fixtures\issue\IssueRelationFixture;
@@ -13,6 +14,7 @@ use common\fixtures\issue\SummonDocFixture;
 use common\fixtures\issue\SummonFixture;
 use common\fixtures\issue\SummonTypeFixture;
 use common\fixtures\issue\TypeFixture;
+use common\fixtures\user\UserAddressFixture;
 use common\helpers\ArrayHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
@@ -106,6 +108,20 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 			static::stageAndTypesFixtures(),
 			static::users(),
 		);
+	}
+
+	public static function customerAddress(): array {
+		return [
+			'issue.customer.address' => [
+				'class' => UserAddressFixture::class,
+				'dataFile' => BaseFixtureHelper::getDataDirPath() . '/user/customer_address.php',
+
+			],
+			'address' => [
+				'class' => AddressFixture::class,
+				'dataFile' => BaseFixtureHelper::getDataDirPath() . 'address.php',
+			],
+		];
 	}
 
 	public static function entityResponsible(): array {

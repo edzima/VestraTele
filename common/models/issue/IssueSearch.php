@@ -141,6 +141,7 @@ abstract class IssueSearch extends Model
 	}
 
 	protected function addressFilter(IssueQuery $query): void {
+
 		if ($this->addressSearch !== null && $this->addressSearch->validate()) {
 
 			if ($this->addressSearch->isNotEmpty()) {

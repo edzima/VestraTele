@@ -28,6 +28,7 @@ class IssueSearchTest extends Unit {
 			$this->tester->haveFixtures(
 				array_merge(
 					IssueFixtureHelper::fixtures(),
+					IssueFixtureHelper::customerAddress(),
 					IssueFixtureHelper::note(),
 					SettlementFixtureHelper::settlement(),
 					SettlementFixtureHelper::pay(),
@@ -87,6 +88,16 @@ class IssueSearchTest extends Unit {
 		$this->tester->assertNotEmpty($models);
 		$issue = reset($models);
 		$this->tester->assertSame(1, $issue->getIssueId());
+	}
+
+	public function testCustomerAddress(): void {
+		$this->model->withArchive = true;
+		$this->model->addressSearch->postal_code = '43-310';
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertSame('43-310', $model->customer->homeAddress->postal_code);
+		}
 	}
 
 	public function testForType(): void {
