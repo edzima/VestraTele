@@ -41,6 +41,11 @@ class SummonController extends Controller {
 	 */
 	public function actionIndex(): string {
 		$searchModel = new SummonSearch();
+		if (!Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
+			&& isset(SummonSearch::getContractorsNames()[Yii::$app->user->getId()])) {
+			$searchModel->contractor_id = Yii::$app->user->getId();
+		}
+
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
