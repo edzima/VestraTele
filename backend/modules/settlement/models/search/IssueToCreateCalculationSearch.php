@@ -22,7 +22,7 @@ class IssueToCreateCalculationSearch extends IssueSearch {
 		return [
 			[['issue_id', 'stage_id'], 'integer'],
 			['type_id', 'in', 'range' => IssueType::getTypesIds(), 'allowArray' => true],
-			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
+			['customerName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];
 	}
 

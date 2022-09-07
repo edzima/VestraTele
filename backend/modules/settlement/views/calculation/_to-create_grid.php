@@ -48,6 +48,7 @@ use yii\web\View;
 		[
 			'class' => CustomerDataColumn::class,
 			'value' => 'customer.fullName',
+			'attribute' => 'customerName',
 			'visible' => $withCustomer,
 		],
 		[
