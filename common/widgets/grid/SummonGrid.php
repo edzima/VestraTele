@@ -47,7 +47,9 @@ class SummonGrid extends GridView {
 	public string $realizedClass = 'success';
 	public string $unrealizedClass = 'half-transparent';
 	public string $deadlineExceededClass = 'danger';
-	private string $todayDeadlineClass = 'warning';
+	public string $tightDeadlineClass = 'warning';
+
+	public int $tightDeadlineDays = 3;
 
 	public function init(): void {
 		if ($this->filterModel !== null && !$this->filterModel instanceof SummonSearch) {
@@ -86,15 +88,18 @@ class SummonGrid extends GridView {
 		if (!empty($model->deadline_at)) {
 			$deadline = new DateTime($model->deadline_at);
 			$nowDiff = $deadline->diff(new DateTime());
-			if ($nowDiff->days === 0) {
-				return [
-					'class' => $this->todayDeadlineClass,
-				];
-			}
-			if (!$nowDiff->invert && $nowDiff->days > 0) {
-				return [
-					'class' => $this->deadlineExceededClass,
-				];
+			if (!$nowDiff->invert) {
+				$days = $nowDiff->days;
+				if ($days >= 0 && $days > $this->tightDeadlineDays) {
+					return [
+						'class' => $this->deadlineExceededClass,
+					];
+				}
+				if ($nowDiff->days <= $this->tightDeadlineDays) {
+					return [
+						'class' => $this->tightDeadlineClass,
+					];
+				}
 			}
 		}
 		return [];
