@@ -64,7 +64,7 @@ use yii\web\View;
 				'source' => $titleUrl,
 				'autoFocus' => true,
 				'delay' => 500,
-				'minLength' => 5,
+				'minLength' => 3,
 			],
 			'options' => [
 				'rows' => 2,
@@ -83,7 +83,7 @@ use yii\web\View;
 			'source' => $descriptionUrl,
 			'autoFocus' => true,
 			'delay' => 500,
-			'minLength' => 5,
+			'minLength' => 3,
 		],
 		'options' => [
 			'rows' => 5,
