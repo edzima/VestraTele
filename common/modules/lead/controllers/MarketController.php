@@ -17,6 +17,8 @@ use yii\web\NotFoundHttpException;
  */
 class MarketController extends BaseController {
 
+	public ?bool $allowDelete = true;
+
 	/**
 	 * {@inheritdoc}
 	 */
