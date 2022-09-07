@@ -307,7 +307,7 @@ class LeadMarketSearch extends LeadMarket {
 		if (!empty($this->leadName)) {
 			$query->joinWith('lead');
 			$query->andWhere([
-				Lead::tableName() . '.name' => $this->leadName,
+				'like', Lead::tableName() . '.name', $this->leadName,
 			]);
 		}
 	}
