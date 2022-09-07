@@ -44,9 +44,7 @@ class IssueController extends BaseController {
 	}
 
 	public function actionConfirm(int $lead_id, int $issue_id, string $returnUrl = null) {
-		$model = $this->findModel($lead_id, $issue_id, Yii::$app->issuesLeads->getCrmId());
-		$model->confirmed_at = date(DATE_ATOM);
-		$model->save();
+		Yii::$app->issuesLeads->confirm($lead_id, $issue_id);
 		//@todo add Confirm Model with Email
 		if (empty($returnUrl)) {
 			return $this->redirect(['index']);

@@ -18,7 +18,6 @@ use common\models\message\IssueCreateMessagesForm;
 use common\models\user\Customer;
 use common\models\user\Worker;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\MethodNotAllowedHttpException;
@@ -227,19 +226,15 @@ class IssueController extends Controller {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
-		$leadsDataProvider = new ActiveDataProvider([
-			'query' => Yii::$app->issuesLeads->userLeads($customer),
-		]);
-		if (!empty($leadsDataProvider->getModels())) {
+		if (!empty($model->getLeadsDataProvider()->getModels())) {
 			Flash::add(Flash::TYPE_WARNING,
-				Yii::t('issue', '{customer} is probalby from Leads.', [
+				Yii::t('issue', '{customer} is probably from Leads.', [
 					'customer' => $customer->getFullName(),
 				]));
 		}
 		return $this->render('create', [
 			'model' => $model,
 			'messagesModel' => $messagesModel,
-			'leadsDataProvider' => $leadsDataProvider,
 		]);
 	}
 

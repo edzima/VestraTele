@@ -19,7 +19,13 @@ $this->params['breadcrumbs'][] = 'Edycja';
 ?>
 <div class="issue-update">
 
-	<h1><?= Html::encode($this->title) ?></h1>
+	<?= $this->render('_leads', [
+		'dataProvider' => $model->getLeadsDataProvider(),
+		'agentInputId' => Html::getInputId($model, 'agent_id'),
+		'teleInputId' => Html::getInputId($model, 'tele_id'),
+		'leadInputId' => Html::getInputId($model, 'lead_id'),
+		'selectedLeadId' => $model->lead_id,
+	]) ?>
 
 	<?= $this->render('_form', [
 		'model' => $model,

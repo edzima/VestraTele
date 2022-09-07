@@ -11,6 +11,7 @@ use yii\web\View;
 
 /* @var $this View */
 /* @var $dataProvider DataProviderInterface */
+/* @var $selectedLeadId int|null */
 /* @var $leadInputId string */
 /* @var $agentInputId string */
 /* @var $teleInputId string */
@@ -31,10 +32,10 @@ use yii\web\View;
 
 					[
 						'class' => RadioColumn::class,
-						'radioOptions' => function (ActiveLead $model, $key, $index, $column) {
+						'radioOptions' => function (ActiveLead $model, $key, $index, $column) use ($selectedLeadId) {
 							return [
-
 								'value' => Json::encode($model->getUsers()),
+								'checked' => $selectedLeadId !== null && $model->getId() === $selectedLeadId,
 							];
 						},
 					],

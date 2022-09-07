@@ -27,11 +27,48 @@ class IssuesLeads extends Component {
 
 	public string $leadModuleId = 'lead';
 
-	public function init() {
+	public function init(): void {
 		parent::init();
 		if (Yii::$app->getModule($this->leadModuleId) === null) {
 			throw new InvalidConfigException('Lead module must be configured: #' . $this->leadModuleId);
 		}
+	}
+
+	public function confirm(int $lead_id, int $issue_id): ?LeadIssue {
+		$model = LeadIssue::find()
+			->andWhere([
+				'issue_id' => $issue_id,
+				'lead_id' => $lead_id,
+				'crm_id' => $this->getCrmId(),
+			])
+			->one();
+		if ($model) {
+			$this->confirmModel($model);
+		}
+		return $model;
+	}
+
+	public function linkIssue(int $issueId, int $leadId): LeadIssue {
+		$model = new LeadIssue();
+		$model->crm_id = $this->getCrmId();
+		$model->issue_id = $issueId;
+		$model->lead_id = $leadId;
+		$model->confirmed_at = date(DATE_ATOM);
+		$this->confirmModel($model);
+		return $model;
+	}
+
+	private function confirmModel(LeadIssue $model): void {
+		LeadIssue::updateAll([
+			'confirmed_at' => null,
+		], [
+			'issue_id' => $model->issue_id,
+			'crm_id' => $model->crm_id,
+		]);
+
+		$model->confirmed_at = date(DATE_ATOM);
+		$model->save();
+		//@todo maybe send Email to Lead Users
 	}
 
 	public function userLeads(UserModel $user): ?LeadQuery {
@@ -52,12 +89,16 @@ class IssuesLeads extends Component {
 		return null;
 	}
 
-	public function linkedLeads(int $id): ActiveQuery {
-		return LeadIssue::find()
+	public function linkedLeads(int $id, bool $confirmed = false): ActiveQuery {
+		$query = LeadIssue::find()
 			->andWhere([
 				'crm_id' => $this->getCrmId(),
 				'issue_id' => $id,
 			]);
+		if ($confirmed) {
+			$query->andWhere(LeadIssue::tableName() . '.confirmed_at IS NOT NULL');
+		}
+		return $query;
 	}
 
 	public function mergeNotLinkedIssues(): ?int {

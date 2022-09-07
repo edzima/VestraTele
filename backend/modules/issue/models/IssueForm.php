@@ -10,9 +10,11 @@ use common\models\issue\IssueTagLink;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use common\models\user\User;
+use common\modules\lead\models\LeadIssue;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
+use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
@@ -47,6 +49,8 @@ class IssueForm extends Model {
 
 	private ?Issue $model = null;
 
+	private ?ActiveDataProvider $leadsDataProvider = null;
+
 	/**
 	 * @inheritdoc
 	 */
@@ -55,6 +59,16 @@ class IssueForm extends Model {
 			throw new InvalidConfigException('$customer or $model must be set.');
 		}
 		parent::__construct($config);
+	}
+
+	public function init() {
+		parent::init();
+		if (!$this->getModel()->isNewRecord) {
+			$linked = Yii::$app->issuesLeads->linkedLeads($this->getModel()->getIssueId(), true)->orderBy('confirmed_at')->one();
+			if ($linked instanceof LeadIssue) {
+				$this->lead_id = $linked->lead_id;
+			}
+		}
 	}
 
 	public static function getTagsNames(bool $onlyActive): array {
@@ -76,6 +90,7 @@ class IssueForm extends Model {
 			[['agent_id', 'lawyer_id', 'type_id', 'stage_id', 'entity_responsible_id', 'signing_at'], 'required'],
 			[['agent_id', 'lawyer_id', 'tele_id', 'type_id', 'stage_id', 'entity_responsible_id', 'lead_id'], 'integer'],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
+			['lead_id', 'in', 'range' => $this->getLeadsDataProvider()->getKeys()],
 			[['stage_id'], 'filter', 'filter' => 'intval'],
 			[
 				'stage_id', 'in', 'when' => function (): bool {
@@ -123,6 +138,7 @@ class IssueForm extends Model {
 			'lawyer_id' => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 			'tagsIds' => Yii::t('issue', 'Tags'),
+			'lead_id' => Yii::t('lead', 'Lead'),
 		]);
 	}
 
@@ -174,36 +190,62 @@ class IssueForm extends Model {
 			if (!$model->save(false)) {
 				return false;
 			}
-			if (!$model->isNewRecord) {
-				IssueTagLink::deleteAll(['issue_id' => $model->id]);
-			}
 
-			if (!empty($this->tagsIds)) {
-				$rows = [];
-				foreach ((array) $this->tagsIds as $id) {
-					$rows[] = [
-						'issue_id' => $model->id,
-						'tag_id' => $id,
-					];
-				}
-				IssueTagLink::getDb()->createCommand()->batchInsert(IssueTagLink::tableName(), [
-					'issue_id', 'tag_id',
-				], $rows)->execute();
-			}
-
-			$model->linkUser($this->customer->id, IssueUser::TYPE_CUSTOMER);
-			$model->linkUser($this->agent_id, IssueUser::TYPE_AGENT);
-			$model->linkUser($this->lawyer_id, IssueUser::TYPE_LAWYER);
-			if (!empty($this->tele_id)) {
-				$model->linkUser($this->tele_id, IssueUser::TYPE_TELEMARKETER);
-			} else {
-				$model->unlinkUser(IssueUser::TYPE_TELEMARKETER);
-			}
+			$this->linkTags();
+			$this->linkUsers();
+			$this->linkLead();
 
 			return true;
 		}
 		Yii::error($this->getModel()->getErrors(), 'issueForm');
 		return false;
+	}
+
+	private function linkLead(): void {
+		if (!empty($this->lead_id)) {
+			Yii::$app->issuesLeads->linkIssue($this->getModel()->getIssueId(), $this->lead_id);
+		}
+	}
+
+	private function linkUsers(): void {
+		$model = $this->getModel();
+		$model->linkUser($this->customer->id, IssueUser::TYPE_CUSTOMER);
+		$model->linkUser($this->agent_id, IssueUser::TYPE_AGENT);
+		$model->linkUser($this->lawyer_id, IssueUser::TYPE_LAWYER);
+		if (!empty($this->tele_id)) {
+			$model->linkUser($this->tele_id, IssueUser::TYPE_TELEMARKETER);
+		} else {
+			$model->unlinkUser(IssueUser::TYPE_TELEMARKETER);
+		}
+	}
+
+	private function linkTags(): void {
+		$model = $this->getModel();
+		if (!$model->isNewRecord) {
+			IssueTagLink::deleteAll(['issue_id' => $model->id]);
+		}
+
+		if (!empty($this->tagsIds)) {
+			$rows = [];
+			foreach ((array) $this->tagsIds as $id) {
+				$rows[] = [
+					'issue_id' => $model->id,
+					'tag_id' => $id,
+				];
+			}
+			IssueTagLink::getDb()->createCommand()->batchInsert(IssueTagLink::tableName(), [
+				'issue_id', 'tag_id',
+			], $rows)->execute();
+		}
+	}
+
+	public function getLeadsDataProvider(): ActiveDataProvider {
+		if ($this->leadsDataProvider === null) {
+			$this->leadsDataProvider = new ActiveDataProvider([
+				'query' => Yii::$app->issuesLeads->userLeads($this->customer),
+			]);
+		}
+		return $this->leadsDataProvider;
 	}
 
 	public static function getAgents(): array {
