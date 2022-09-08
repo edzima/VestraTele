@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 use common\models\issue\Summon;
+use common\models\issue\SummonType;
 use frontend\models\search\SummonSearch;
 use yii\data\ActiveDataProvider;
 
@@ -29,9 +30,9 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 			'pagination' => false,
 		]);
 
-		$query->andWhere(['owner_id' => $this->owner_id])
-			->andWhere([' >= ', 'start_at', $this->start])
-			->andWhere([' <= ', 'start_at', $this->end]);
+		$query->andWhere(['contractor_id' => $this->contractor_id])
+			->andWhere(['>=', 'start_at', $this->start])
+			->andWhere(['<=', 'start_at', $this->end]);
 
 		return $dataProvider;
 	}
@@ -54,30 +55,29 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 		],
 		self::STATUS_UNREALIZED => [
 			'color' => '#616161',
-		]
+		],
 	];
-
-
-	public const TYPE_FILTERS = [
-		self::TYPE_APPEAL => [
-			'color' => '#E64A19',
-		],
-		self::TYPE_INCOMPLETE_DOCUMENTATION => [
-			'color' => '#0097A7',
-		],
-		self::TYPE_PHONE => [
-			'color' => '#00796B',
-		],
-		self::TYPE_ANTIVINDICATION => [
-			'color' => '#388E3C',
-		],
-		self::TYPE_URGENCY => [
-			'color' => '#689F38',
-		],
-		self::TYPE_RESIGNATION => [
-			'color' => '#AFB42B',
-		]
-	];
+//
+//	public const TYPE_FILTERS = [
+//		self::TYPE_APPEAL => [
+//			'color' => '#E64A19',
+//		],
+//		self::TYPE_INCOMPLETE_DOCUMENTATION => [
+//			'color' => '#0097A7',
+//		],
+//		self::TYPE_PHONE => [
+//			'color' => '#00796B',
+//		],
+//		self::TYPE_ANTIVINDICATION => [
+//			'color' => '#388E3C',
+//		],
+//		self::TYPE_URGENCY => [
+//			'color' => '#689F38',
+//		],
+//		self::TYPE_RESIGNATION => [
+//			'color' => '#AFB42B',
+//		],
+//	];
 
 	public static function getStatusFiltersOptions(): array {
 		$options = [];
@@ -96,24 +96,30 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 		return $options;
 	}
 
-	public static function getTypesFilterOptions(): array{
+	public static function getTypesFilterOptions(): array {
 		$options = [];
-		$typesNames = Summon::getTypesNames();
-		foreach (static::TYPE_FILTERS as $type => $filter) {
+		$typesNames = SummonType::getNames();
+
+		$colors = [
+			'#E64A19', '#0097A7', '#00796B', '#388E3C', '#689F38', '#AFB42B',
+		];
+
+		foreach ($typesNames as $id => $name) {
+			$color = $colors[array_rand($colors)];
 			$options[] = [
-				'value' => $type,
+				'value' => $id,
 				'isActive' => true,
-				'label' => $typesNames[$type],
-				'color' => $filter['color'],
+				'label' => $name,
+				'color' => $color,
 				'eventColors' => [
-					'badge' => $filter['color'],
+					'badge' => $color,
 				],
 			];
 		}
 		return $options;
 	}
 
-	public static function getKindFilterOptions(): array{
+	public static function getKindFilterOptions(): array {
 		$options = [];
 		$options[] = [
 			'value' => 'event',
@@ -121,7 +127,7 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 			'label' => 'wezwanie',
 			'color' => '#2196F3',
 			'eventColors' => [
-				'outline' => '#2196F3'
+				'outline' => '#2196F3',
 			],
 		];
 		$options[] = [
@@ -131,7 +137,7 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 			'color' => '#F44336',
 			'eventColors' => [
 				'border' => '#F44336',
-				'background' => '#000000'
+				'background' => '#000000',
 			],
 		];
 		return $options;

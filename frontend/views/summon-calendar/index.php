@@ -9,7 +9,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 
 $this->title = 'Kalendarz';
-$this->params['breadcrumbs'][] = ['label' => 'Leady', 'url' => ['/meet/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Summons'), 'url' => ['/summon/index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 CalendarAsset::register($this);
@@ -47,12 +47,12 @@ $props = [
 			'url' => '/summon-calendar/deadline',
 			'allDayDefault' => false,
 			'urlUpdate' => '',
-			'editable' => false
+			'editable' => false,
 		],
 	],
 
 	'URLAddEvent' => Url::to('/summon/create'),
-	'notesEnabled' => false,
+	'notesEnabled' => true,
 ];
 ?>
 <div class="meet-calendar-calendar">

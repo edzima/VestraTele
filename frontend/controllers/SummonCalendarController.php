@@ -5,7 +5,6 @@ namespace frontend\controllers;
 use common\models\issue\Summon;
 use frontend\helpers\Html;
 use frontend\models\ContactorSummonCalendarSearch;
-use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
@@ -53,22 +52,25 @@ class SummonCalendarController extends Controller {
 			$end = date('Y-m-t 23:59:59');
 		}
 		$model = new ContactorSummonCalendarSearch();
-		$model->owner_id = (int) Yii::$app->user->getId();
-		$model->start = (string) $start;
-		$model->end = (string) $end;
+		$model->contractor_id = 542;
+		$model->start = $start;
+		$model->end = $end;
 		$data = [];
 
 		foreach ($model->search()->getModels() as $model) {
+			/**
+			 * @var Summon $model
+			 */
 			$data[] = [
 				'id' => $model->id,
 				'url' => Url::to(['summon/view', 'id' => $model->id]),
 				'is' => 'event',
-				'title' => $this->getClientFullName($model)." - ".$model->title,
+				'title' => $this->getClientFullName($model) . " - " . $model->title,
 				'start' => $model->start_at,
 				'end' => $model->start_at,
 				'phone' => Html::encode($this->getPhone($model)),
 				'statusId' => $model->status,
-				'typeId' => $model->type,
+				'typeId' => $model->type_id,
 				'tooltipContent' => $this->getClientFullName($model),
 			];
 		}
@@ -85,9 +87,9 @@ class SummonCalendarController extends Controller {
 		}
 		$model = new ContactorSummonCalendarSearch();
 
-		$model->owner_id = (int) Yii::$app->user->getId();
-		$model->start = (string) $start;
-		$model->end = (string) $end;
+		$model->contractor_id = 542;
+		$model->start = $start;
+		$model->end = $end;
 		$data = [];
 
 		foreach ($model->search()->getModels() as $model) {
@@ -114,7 +116,7 @@ class SummonCalendarController extends Controller {
 	}
 
 	private function getClientFullName(Summon $model): string {
-		return $model->contractor->getFullName();
+		return $model->getTitleWithDocs();
 	}
 
 	public function actionUpdate(int $id, string $date_at): Response {
