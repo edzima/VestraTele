@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models;
 
+use common\models\Address;
 use common\modules\lead\events\LeadEvent;
 use common\modules\lead\models\query\LeadDialerQuery;
 use common\modules\lead\models\query\LeadQuery;
