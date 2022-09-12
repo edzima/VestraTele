@@ -49,7 +49,6 @@ class IssueNoteForm extends Model {
 		$model = new static();
 		$model->type = IssueNote::generateType(IssueNote::TYPE_SUMMON, $summon->id);
 		$model->issue_id = $summon->getIssueId();
-		$model->title = $summon->getTitleWithDocs();
 		return $model;
 	}
 

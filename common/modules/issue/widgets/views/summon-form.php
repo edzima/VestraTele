@@ -34,11 +34,12 @@ use yii\web\View;
 					],
 					'pluginOptions' => [
 						'allowClear' => true,
-						'disabled' => !(
-							Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
-							|| (!$model->getModel()->isNewRecord && $model->getModel()->owner_id === Yii::$app->user->getId())
-						),
+
 					],
+					'disabled' => !(
+						Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
+						|| (!$model->getModel()->isNewRecord && $model->getModel()->owner_id === Yii::$app->user->getId())
+					),
 				]
 			)
 
