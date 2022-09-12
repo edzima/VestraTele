@@ -59,7 +59,7 @@ class IssueController extends Controller {
 		}
 		if (Yii::$app->user->can(Worker::PERMISSION_PAY_ALL_PAID)) {
 			$searchModel->scenario = IssueSearch::SCENARIO_ALL_PAYED;
-			if (Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)) {
+			if (Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)) {
 				$searchModel->withArchiveOnAllPayedPay = true;
 			}
 		}

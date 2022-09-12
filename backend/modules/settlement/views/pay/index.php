@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		: ''
 	?>
 
-	<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) && $dataProvider->totalCount > 0
+	<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) && $dataProvider->totalCount > 0
 		? $this->render('_summary', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= IssuePayGrid::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'showPageSummary' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+		'showPageSummary' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
 		'visibleStatus' => !$searchModel->isPayed(),
 		'rowColors' => !$searchModel->isPayed(),
 	]) ?>

@@ -336,7 +336,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					},
 				],
 				'visibleButtons' => [
-					'installment' => Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR),
+					'installment' => Yii::$app->user->can(Worker::ROLE_BOOKKEEPER),
 					'note' => Yii::$app->user->can(Worker::PERMISSION_NOTE),
 					'view' => static function (Issue $model) use ($searchModel): bool {
 						return !$model->isArchived() || $searchModel->withArchive;

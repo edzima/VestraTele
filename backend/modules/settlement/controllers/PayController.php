@@ -81,7 +81,7 @@ class PayController extends Controller {
 	 */
 	public function actionIndex(string $status = IssuePaySearch::PAY_STATUS_NOT_PAYED) {
 		$searchModel = new IssuePaySearch();
-		if (!Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
+		if (!Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
 			$searchModel->calculationOwnerId = Yii::$app->user->getId();
 		}
 		Url::remember();
