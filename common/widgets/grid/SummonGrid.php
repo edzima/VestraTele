@@ -161,7 +161,7 @@ class SummonGrid extends GridView {
 				'filterWidgetOptions' => [
 					'options' => [
 						'multiple' => true,
-						'placeholder' => $this->filterModel->getAttributeLabel('doc_types_ids'),
+						'placeholder' => SummonSearch::instance()->getAttributeLabel('doc_types_ids'),
 					],
 				],
 				'options' => [
