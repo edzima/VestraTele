@@ -1,5 +1,6 @@
 <?php
 
+use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadUsersSearch;
 use common\modules\lead\Module;
 use yii\helpers\Html;
@@ -38,6 +39,16 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Users');
 			['class' => 'yii\grid\SerialColumn'],
 
 			'lead_id',
+			[
+				'attribute' => 'leadName',
+				'value' => 'lead.name',
+			],
+			[
+				'attribute' => 'leadStatusId',
+				'value' => 'lead.statusName',
+				'label' => Yii::t('lead', 'Status'),
+				'filter' => LeadStatus::getNames(),
+			],
 			[
 				'attribute' => 'user_id',
 				'value' => 'user',

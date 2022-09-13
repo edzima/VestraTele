@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models\searches;
 
+use common\modules\lead\models\Lead;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\modules\lead\models\LeadUser;
@@ -12,13 +13,16 @@ use yii\data\DataProviderInterface;
  */
 class LeadUsersSearch extends LeadUser {
 
+	public $leadStatusId;
+	public $leadName;
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['lead_id', 'user_id'], 'integer'],
-			[['type'], 'safe'],
+			[['lead_id', 'user_id', 'leadStatusId'], 'integer'],
+			[['type', 'leadName'], 'safe'],
 		];
 	}
 
@@ -40,6 +44,7 @@ class LeadUsersSearch extends LeadUser {
 	public function search(array $params): DataProviderInterface {
 		$query = LeadUser::find();
 		$query->with('user');
+		$query->joinWith('lead');
 
 		// add conditions that should always apply here
 
@@ -59,9 +64,15 @@ class LeadUsersSearch extends LeadUser {
 		$query->andFilterWhere([
 			'lead_id' => $this->lead_id,
 			'user_id' => $this->user_id,
+			Lead::tableName() . '.status_id' => $this->leadStatusId,
 		]);
 
-		$query->andFilterWhere(['like', 'type', $this->type]);
+		$query->andFilterWhere([
+			'like', 'type', $this->type,
+		])
+			->andFilterWhere([
+				'like', Lead::tableName() . '.name', $this->leadName,
+			]);
 
 		return $dataProvider;
 	}
