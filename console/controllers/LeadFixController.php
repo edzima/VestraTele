@@ -9,10 +9,32 @@ use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadUser;
 use Yii;
 use yii\console\Controller;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 
 class LeadFixController extends Controller {
+
+	public function actionPhoneFormat(): void {
+		Console::output('Leads Phone with " ": ' .
+			Lead::find()
+				->andWhere(['like', 'phone', ' '])
+				->count()
+		);
+		Lead::updateAll([
+			'phone' => new Expression("REPLACE(phone,' ','')"),
+		], 'phone IS NOT NULL');
+
+		Console::output('Leads Phone with "-": ' .
+			Lead::find()
+				->andWhere(['like', 'phone', '-'])
+				->count()
+		);
+
+		Lead::updateAll([
+			'phone' => new Expression("REPLACE(phone,'-','')"),
+		], 'phone IS NOT NULL');
+	}
 
 	public function actionOwnerFromReports(): void {
 		$query = Lead::find()
