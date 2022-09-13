@@ -10,13 +10,11 @@ class SelectionForm extends ActiveForm {
 	public string $formWrapperSelector;
 
 	public function run(): string {
-		$this->view->registerJs($this->getJsScript());
+		$this->view->registerJs(static::generateScript($this->gridId, $this->formWrapperSelector));
 		return parent::run();
 	}
 
-	private function getJsScript(): string {
-		$gridId = $this->gridId;
-		$formWrapperSelector = $this->formWrapperSelector;
+	public static function generateScript(string $gridId, string $formWrapperSelector): string {
 		$script = <<< JS
 		(function () {
 			let grid = jQuery('#$gridId');
