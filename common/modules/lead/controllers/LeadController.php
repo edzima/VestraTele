@@ -61,16 +61,18 @@ class LeadController extends BaseController {
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-		if (Yii::$app->request->isDelete) {
-			$count = Lead::deleteAll(['id' => $searchModel->getAllIds($dataProvider->query)]);
-			if ($count) {
-				Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success Delete Leads: {count}.', [
-					'count' => $count,
-				]));
-			}
-			return $this->refresh();
-		}
 		$dataProvider->pagination->defaultPageSize = 50;
+
+		if (Yii::$app->request->isPjax) {
+			return $this->renderAjax('_grid', [
+				'dataProvider' => $dataProvider,
+				'searchModel' => $searchModel,
+				'assignUsers' => !$this->module->onlyUser,
+				'visibleButtons' => [
+					'delete' => $this->module->allowDelete,
+				],
+			]);
+		}
 
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {
 			$query = $dataProvider->query;
@@ -361,8 +363,12 @@ class LeadController extends BaseController {
 		return $this->redirect(['index']);
 	}
 
-	public function actionDeleteMultiple() {
-		$ids = Yii::$app->request->post('ids') ?: Yii::$app->request->post('selection');
+	public function actionDeleteMultiple(array $ids) {
+		$selection = Yii::$app->request->post('selection');
+		if (is_array($selection)) {
+			$ids = $selection;
+		}
+
 		if (!empty($ids)) {
 			$count = Lead::deleteAll(['id' => $ids]);
 			if ($count) {
