@@ -35,6 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => IssueType::getTypesNames(),
 			],
 			'days_reminder',
+			'posi',
 			[
 				'label' => Yii::t('issue', 'Issues Count'),
 				'value' => function (IssueStage $stage): int {
