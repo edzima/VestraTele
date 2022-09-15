@@ -10,7 +10,7 @@ use yii\base\Model;
 
 class LeadMarketAccessRequest extends Model {
 
-	public const DEFAULT_DAYS = 2;
+	public const DEFAULT_DAYS = 4;
 
 	public $user_id;
 	public string $details = '';
