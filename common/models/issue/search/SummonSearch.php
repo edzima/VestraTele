@@ -123,6 +123,7 @@ class SummonSearch extends Summon implements
 		// grid filtering conditions
 		$query->andFilterWhere([
 			static::SUMMON_ALIAS . '.id' => $this->id,
+			static::SUMMON_ALIAS . '.issue_id' => $this->issue_id,
 			static::SUMMON_ALIAS . '.type_id' => $this->type_id,
 			static::SUMMON_ALIAS . '.status' => $this->status,
 			static::SUMMON_ALIAS . '.created_at' => $this->created_at,
@@ -133,7 +134,6 @@ class SummonSearch extends Summon implements
 			static::SUMMON_ALIAS . '.contractor_id' => $this->contractor_id,
 		]);
 
-		$query->andFilterWhere(['like', static::SUMMON_ALIAS . '.issue_id', $this->issue_id]);
 		$query->andFilterWhere(['like', static::SUMMON_ALIAS . '.title', $this->title]);
 
 		return $dataProvider;
