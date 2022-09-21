@@ -10,6 +10,7 @@ use common\models\issue\SummonDoc;
 use common\models\issue\SummonType;
 use common\models\user\User;
 use common\models\user\Worker;
+use DateTime;
 use edzima\teryt\models\Simc;
 use Yii;
 use yii\base\Model;
@@ -172,8 +173,13 @@ class SummonForm extends Model {
 		$model->start_at = $this->start_at;
 		$model->city_id = $this->city_id;
 		$model->entity_id = $this->entity_id;
+		if (empty($this->realize_at)) {
+			$dateTime = new DateTime($this->start_at);
+			$dateTime->setTime(date('H'), date('i'));
+			$this->realize_at = $dateTime->format(DATE_ATOM);
+		}
 		$model->realize_at = $this->realize_at;
-		$model->realized_at = $this->realized_at;
+
 		if ($model->isNewRecord && $this->term !== static::TERM_CUSTOM) {
 			if ($this->term === static::TERM_EMPTY) {
 				$this->deadline_at = null;
@@ -183,6 +189,10 @@ class SummonForm extends Model {
 		}
 
 		$model->deadline_at = $this->deadline_at;
+		if (empty($this->realized_at) && $this->status === Summon::STATUS_UNREALIZED) {
+			$this->realized_at = date(DATE_ATOM);
+		}
+		$model->realized_at = $this->realized_at;
 		if ($model->save()) {
 			$this->saveDocs();
 			return true;
