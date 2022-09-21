@@ -114,4 +114,5 @@ return [
 	'Change Stage also in Linked Issues.' => 'Zmień Etap również w Połączonych Sprawach.',
 	'Linked Issues Messages' => 'Powiadomienia do Połączonych Spraw',
 	'Create Note also in Linked Issues.' => 'Dodaj Notatkę również w Połączonych Sprawach.',
+	'Used for the Calendar.' => 'Do Kalendarza',
 ];
