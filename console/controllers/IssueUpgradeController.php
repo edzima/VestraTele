@@ -11,9 +11,11 @@ use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
 use common\models\issue\MeetAddress;
+use common\models\issue\Summon;
 use common\models\meet\MeetForm;
 use common\models\user\Customer;
 use common\models\user\User;
+use DateTime;
 use edzima\teryt\models\Simc;
 use Yii;
 use yii\console\Controller;
@@ -23,6 +25,23 @@ use yii\helpers\Console;
 class IssueUpgradeController extends Controller {
 
 	private $foundedCities = [];
+
+	public function actionSummonRealizeTime(): void {
+		foreach (Summon::find()
+			->andWhere(['!=', 'status', Summon::STATUS_REALIZED])
+			->batch() as $rows) {
+			foreach ($rows as $model) {
+				/** @var Summon $model */
+				$realize = new DateTime($model->realize_at);
+				if ($realize->format('H') === '00') {
+					$realize->setTime(date('H', $model->created_at), date('i', $model->created_at));
+					$model->updateAttributes([
+						'realize_at' => $realize->format(DATE_ATOM),
+					]);
+				}
+			}
+		}
+	}
 
 	public function actionCheckLead(): void {
 		$ids = [];
