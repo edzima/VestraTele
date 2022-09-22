@@ -28,7 +28,6 @@ class IssueUpgradeController extends Controller {
 
 	public function actionSummonRealizeTime(): void {
 		foreach (Summon::find()
-			->andWhere(['!=', 'status', Summon::STATUS_REALIZED])
 			->batch() as $rows) {
 			foreach ($rows as $model) {
 				/** @var Summon $model */
