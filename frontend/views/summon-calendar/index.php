@@ -8,7 +8,7 @@ use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 
-$this->title = 'Kalendarz';
+$this->title = Yii::t('issue', 'Calendar');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Summons'), 'url' => ['/summon/index']];
 $this->params['breadcrumbs'][] = $this->title;
 

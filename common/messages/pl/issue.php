@@ -115,4 +115,5 @@ return [
 	'Linked Issues Messages' => 'Powiadomienia do Połączonych Spraw',
 	'Create Note also in Linked Issues.' => 'Dodaj Notatkę również w Połączonych Sprawach.',
 	'Used for the Calendar.' => 'Do Kalendarza',
+	'Calendar' => 'Kalendarz',
 ];

@@ -16,6 +16,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
+
+	<p>
+		<?= Html::a(Yii::t('issue', 'Calendar'), ['summon-calendar/index'], [
+			'class' => 'btn btn-success',
+		]) ?>
+	</p>
+
 	<?= SummonGrid::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
