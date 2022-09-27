@@ -65,7 +65,7 @@ class Formatter extends BaseFormatter {
 
 	public function asTel($value, $options = []) {
 		if ($value === null) {
-			return $this->nullDisplay;
+			return ArrayHelper::getValue($options, 'nullDisplay', $this->nullDisplay);
 		}
 		$defaultRegion = ArrayHelper::remove($options, 'default_region', $this->defaultPhoneRegion);
 		$format = ArrayHelper::remove($options, 'format', $this->defaultPhoneFormat);
@@ -76,7 +76,11 @@ class Formatter extends BaseFormatter {
 		} catch (NumberParseException $e) {
 		}
 
-		return Html::telLink(Html::encode($value), $value, $options);
+		$asLink = ArrayHelper::remove($options, 'asLink', true);
+		if ($asLink) {
+			return Html::telLink(Html::encode($value), $value, $options);
+		}
+		return Html::encode($value);
 	}
 
 	public function asPhoneDatabase($value, $options = []): ?string {
