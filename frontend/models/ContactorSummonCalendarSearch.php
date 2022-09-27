@@ -2,13 +2,17 @@
 
 namespace frontend\models;
 
+use common\models\issue\query\SummonQuery;
 use common\models\issue\Summon;
 use common\models\issue\SummonType;
+use common\models\user\User;
 use frontend\models\search\SummonSearch;
+use Yii;
 use yii\data\ActiveDataProvider;
 
 class ContactorSummonCalendarSearch extends SummonSearch {
 
+	public const SCENARIO_DEADLINE = 'deadline';
 	public string $start;
 	public string $end;
 	public int $contractor_id;
@@ -16,12 +20,46 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 	public int $typeId;
 	public int $title;
 
+	public static function getSelfContractorsNames(int $userId): array {
+		$ids = Summon::find()
+			->select('contractor_id')
+			->distinct()
+			->andWhere(['owner_id' => $userId])
+			->column();
+
+		$ids[] = $userId;
+		return User::getSelectList($ids, false);
+	}
+
+	public function rules(): array {
+		return [
+			[['contractor_id', 'start', 'end'], 'required'],
+			[['contractor_id'], 'integer'],
+		];
+	}
+
+	public function getEventsData(): array {
+		$data = [];
+		foreach ($this->search()->getModels() as $model) {
+			$event = new SummonCalendarEvent();
+			if ($this->scenario === static::SCENARIO_DEADLINE) {
+				$event->is = SummonCalendarEvent::IS_DEADLINE;
+			}
+			$event->setModel($model);
+
+			$data[] = $event->toArray();
+		}
+		return $data;
+	}
+
 	/**
 	 * @param array $params
 	 * @return ActiveDataProvider
 	 */
 	public function search(array $params = []): ActiveDataProvider {
 		$query = Summon::find();
+		$query->with('docs');
+		$query->with('issue.customer.userProfile');
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
 			'sort' => [
@@ -29,68 +67,27 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 			],
 			'pagination' => false,
 		]);
+		if (!$this->validate()) {
+			$query->andWhere('0=1');
+			return $dataProvider;
+		}
 
-		$query->andWhere(['contractor_id' => $this->contractor_id])
-			->andWhere(['>=', 'start_at', $this->start])
-			->andWhere(['<=', 'start_at', $this->end]);
-
+		$this->applyDateFilter($query);
+		$query->andFilterWhere([
+			'contractor_id' => $this->contractor_id,
+		]);
 		return $dataProvider;
 	}
-
-	public const STATUS_FILTERS = [
-		self::STATUS_NEW => [
-			'color' => '#d32f2f',
-		],
-		self::STATUS_IN_PROGRESS => [
-			'color' => '#C2185B',
-		],
-		self::STATUS_WITHOUT_RECOGNITION => [
-			'color' => '#7B1FA2',
-		],
-		self::STATUS_TO_CONFIRM => [
-			'color' => '#FF9100',
-		],
-		self::STATUS_REALIZED => [
-			'color' => '#303F9F',
-		],
-		self::STATUS_UNREALIZED => [
-			'color' => '#616161',
-		],
-	];
-//
-//	public const TYPE_FILTERS = [
-//		self::TYPE_APPEAL => [
-//			'color' => '#E64A19',
-//		],
-//		self::TYPE_INCOMPLETE_DOCUMENTATION => [
-//			'color' => '#0097A7',
-//		],
-//		self::TYPE_PHONE => [
-//			'color' => '#00796B',
-//		],
-//		self::TYPE_ANTIVINDICATION => [
-//			'color' => '#388E3C',
-//		],
-//		self::TYPE_URGENCY => [
-//			'color' => '#689F38',
-//		],
-//		self::TYPE_RESIGNATION => [
-//			'color' => '#AFB42B',
-//		],
-//	];
 
 	public static function getStatusFiltersOptions(): array {
 		$options = [];
 		$statusNames = Summon::getStatusesNames();
-		foreach (static::STATUS_FILTERS as $status => $filter) {
+		foreach (SummonCalendarEvent::getStatusesBackgroundColors() as $status => $backgroundColor) {
 			$options[] = [
 				'value' => $status,
 				'isActive' => true,
 				'label' => $statusNames[$status],
-				'color' => $filter['color'],
-				'eventColors' => [
-					'background' => $filter['color'],
-				],
+				'color' => $backgroundColor,
 			];
 		}
 		return $options;
@@ -111,8 +108,9 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 				'isActive' => true,
 				'label' => $name,
 				'color' => $color,
-				'eventColors' => [
-					'badge' => $color,
+				'badge' => [
+					'background' => $color,
+					'text' => SummonType::getShortTypesNames()[$id],
 				],
 			];
 		}
@@ -122,24 +120,29 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 	public static function getKindFilterOptions(): array {
 		$options = [];
 		$options[] = [
-			'value' => 'event',
+			'value' => SummonCalendarEvent::IS_SUMMON,
 			'isActive' => true,
-			'label' => 'wezwanie',
+			'label' => Yii::t('issue', 'Summons'),
 			'color' => '#2196F3',
-			'eventColors' => [
-				'outline' => '#2196F3',
-			],
 		];
 		$options[] = [
-			'value' => 'deadline',
+			'value' => SummonCalendarEvent::IS_DEADLINE,
 			'isActive' => true,
-			'label' => 'deadline',
-			'color' => '#F44336',
-			'eventColors' => [
-				'border' => '#F44336',
-				'background' => '#000000',
-			],
+			'label' => Yii::t('issue', 'Deadline'),
+			'color' => SummonCalendarEvent::DEADLINE_BACKGROUND_COLOR,
 		];
 		return $options;
+	}
+
+	private function applyDateFilter(SummonQuery $query) {
+		if ($this->scenario === static::SCENARIO_DEADLINE) {
+			$query
+				->andWhere(['>=', Summon::tableName() . '.deadline_at', $this->start])
+				->andWhere(['<=', Summon::tableName() . '.deadline_at', $this->end]);
+			return;
+		}
+		$query
+			->andWhere(['>=', Summon::tableName() . '.realize_at', $this->start])
+			->andWhere(['<=', Summon::tableName() . '.realize_at', $this->end]);
 	}
 }

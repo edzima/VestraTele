@@ -13,16 +13,13 @@ use yii\web\Response;
 
 class CalendarNoteController extends Controller {
 
-
 	/**
 	 * @inheritdoc
 	 */
-	public function beforeAction($action)
-	{
-		$this->enableCsrfValidation = false;
+	public function beforeAction($action) {
+		$this->enableCsrfValidation = YII_ENV_PROD;
 		return parent::beforeAction($action);
 	}
-
 
 	public function behaviors(): array {
 		return [
@@ -68,16 +65,16 @@ class CalendarNoteController extends Controller {
 				'title' => $model->text,
 				'start' => $model->start_at,
 				'end' => $model->end_at,
-				'isNote' => true
+				'isNote' => true,
 			];
 		}
 
 		return $this->asJson($data);
 	}
 
-	public function actionAdd(int $agentId, string $news, string $date): Response {
+	public function actionAdd(string $news, string $date): Response {
 		$model = new CalendarNews();
-		$model->user_id = $agentId;
+		$model->user_id = Yii::$app->user->getId();
 		$model->text = $news;
 		$model->start_at = $date;
 		$model->end_at = $date;
@@ -89,11 +86,17 @@ class CalendarNoteController extends Controller {
 		return $this->asJson(['errors' => $model->getErrors()]);
 	}
 
-	public function actionUpdate(int $id, string $start='', string $end='', string $news='' ): Response {
+	public function actionUpdate(int $id, ?string $start_at = null, ?string $end_at = null, ?string $news = null): Response {
 		$model = $this->findModel($id);
-		$model->start_at = $start !== '' ? $start : $model->start_at ;
-		$model->end_at = $end !== '' ? $end: $model->end_at;
-		$model->text = $news !== '' ? $news: $model->text;
+		if ($start_at !== null) {
+			$model->start_at = $start_at;
+		}
+		if ($end_at !== null) {
+			$model->end_at = $end_at;
+		}
+		if ($news !== null) {
+			$model->text = $news;
+		}
 
 		if ($model->save()) {
 			return $this->asJson(['success' => true]);

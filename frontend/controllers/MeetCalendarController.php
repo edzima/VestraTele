@@ -8,7 +8,6 @@ use common\models\user\Worker;
 use frontend\models\AgentMeetCalendarSearch;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
-use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -18,25 +17,31 @@ use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
+/**
+ * @deprecated
+ * @todo Remove before Merge with Master
+ */
 class MeetCalendarController extends Controller {
+
+	public $enableCsrfValidation = false;
 
 	public function behaviors(): array {
 		return [
-			'access' => [
-				'class' => AccessControl::class,
-				'rules' => [
-					[
-						'allow' => true,
-						'roles' => [Worker::PERMISSION_MEET, Worker::ROLE_AGENT],
-					],
-				],
-			],
-			'verbs' => [
-				'class' => VerbFilter::class,
-				'actions' => [
-					'update' => ['POST'],
-				],
-			],
+//			'access' => [
+//				'class' => AccessControl::class,
+//				'rules' => [
+//					[
+//						'allow' => true,
+//						'roles' => [Worker::PERMISSION_MEET, Worker::ROLE_AGENT],
+//					],
+//				],
+//			],
+'verbs' => [
+	'class' => VerbFilter::class,
+	'actions' => [
+		'update' => ['POST'],
+	],
+],
 		];
 	}
 
@@ -58,7 +63,7 @@ class MeetCalendarController extends Controller {
 			$me = User::findOne(["id" => $myId]);
 			$myOption = [
 				"id" => $myId,
-				'fullName' => $me->getFullName()
+				'fullName' => $me->getFullName(),
 			];
 
 			$agents = Worker::find()

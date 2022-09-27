@@ -3,10 +3,9 @@ export interface Filter {
     label: string,
     color: string
     value: string | number
-    eventColors?: {
+    badge?: {
+        text?: string// @todo rename to badgeBackground
         background?: string
-        badge?: string
-        border?: string
     };
 }
 

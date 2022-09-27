@@ -2,14 +2,16 @@
 
 namespace frontend\controllers;
 
-use common\models\issue\Summon;
-use frontend\helpers\Html;
+use common\helpers\ArrayHelper;
+use common\models\user\Worker;
+use DateTime;
+use Exception;
 use frontend\models\ContactorSummonCalendarSearch;
+use frontend\models\SummonCalendarEvent;
+use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\helpers\Url;
 use yii\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class SummonCalendarController extends Controller {
@@ -35,112 +37,82 @@ class SummonCalendarController extends Controller {
 
 	public function runAction($id, $params = []) {
 		if ($id !== 'index') {
-			$params = array_merge($_POST, $params);
+			$params = ArrayHelper::merge(Yii::$app->getRequest()->getBodyParams(), $params);
 		}
 		return parent::runAction($id, $params);
 	}
 
-	public function actionIndex(): string {
-		return $this->render('index');
+	public function actionIndex(int $userId = null): string {
+		$users = null;
+		if ($userId === null) {
+			$userId = Yii::$app->user->getId();
+		}
+		if (Yii::$app->user->can(Worker::PERMISSION_SUMMON_CREATE)) {
+			$users = ContactorSummonCalendarSearch::getSelfContractorsNames(Yii::$app->user->getId());
+		}
+		return $this->render('index', [
+			'users' => $users,
+			'user_id' => $userId,
+		]);
 	}
 
-	public function actionList(string $start = null, string $end = null): Response {
+	public function actionList(string $start = null, string $end = null, int $userId = null): Response {
 		if ($start === null) {
 			$start = date('Y-m-01');
 		}
 		if ($end === null) {
 			$end = date('Y-m-t 23:59:59');
 		}
+		if ($userId === null) {
+			$userId = Yii::$app->user->getId();
+		}
 		$model = new ContactorSummonCalendarSearch();
-		$model->contractor_id = 542;
+		$model->contractor_id = $userId;
 		$model->start = $start;
 		$model->end = $end;
-		$data = [];
 
-		foreach ($model->search()->getModels() as $model) {
-			/**
-			 * @var Summon $model
-			 */
-			$data[] = [
-				'id' => $model->id,
-				'url' => Url::to(['summon/view', 'id' => $model->id]),
-				'is' => 'event',
-				'title' => $this->getClientFullName($model) . " - " . $model->title,
-				'start' => $model->start_at,
-				'end' => $model->start_at,
-				'phone' => Html::encode($this->getPhone($model)),
-				'statusId' => $model->status,
-				'typeId' => $model->type_id,
-				'tooltipContent' => $this->getClientFullName($model),
-			];
-		}
-
-		return $this->asJson($data);
+		return $this->asJson($model->getEventsData());
 	}
 
-	public function actionDeadline(string $start = null, string $end = null): Response {
+	public function actionDeadline(string $start = null, string $end = null, int $userId = null): Response {
 		if ($start === null) {
 			$start = date('Y-m-01');
 		}
 		if ($end === null) {
 			$end = date('Y-m-t 23:59:59');
 		}
+		if ($userId === null) {
+			$userId = Yii::$app->user->getId();
+		}
 		$model = new ContactorSummonCalendarSearch();
+		$model->scenario = ContactorSummonCalendarSearch::SCENARIO_DEADLINE;
 
-		$model->contractor_id = 542;
+		$model->contractor_id = $userId;
 		$model->start = $start;
 		$model->end = $end;
-		$data = [];
 
-		foreach ($model->search()->getModels() as $model) {
-			$data[] = [
-				'id' => $model->id,
-				'url' => Url::to(['summon/view', 'id' => $model->id]),
-				'is' => 'deadline',
-				'title' => $this->getClientFullName($model),
-				'start' => $model->deadline_at,
-				'end' => $model->deadline_at,
-				'tooltipContent' => 'test',
-			];
-		}
-
-		return $this->asJson($data);
+		return $this->asJson($model->getEventsData());
 	}
 
-	private function getPhone(Summon $model): string {
-		$phone = $model->contractor->getProfile()->phone;
-		if ($phone) {
-			return $phone;
+	public function actionUpdate(int $id, string $start_at): Response {
+		$model = new SummonCalendarEvent();
+		$model->id = $id;
+		try {
+			$start_at = (new DateTime($start_at))->format(DATE_ATOM);
+		} catch (Exception $e) {
+			return $this->asJson([
+				'success' => false,
+				'message' => 'Invalid Start Date format',
+			]);
 		}
-		return '';
-	}
 
-	private function getClientFullName(Summon $model): string {
-		return $model->getTitleWithDocs();
-	}
+		//@todo add check is for User
 
-	public function actionUpdate(int $id, string $date_at): Response {
-		$model = $this->findModel($id);
-		$model->start_at = $date_at;
-		if ($model->save()) {
-			return $this->asJson(['success' => true]);
-		}
+		$model->updateDate($start_at);
 		return $this->asJson([
 			'success' => false,
 			'errors' => $model->getErrors(),
 		]);
-	}
-
-	/**
-	 * @param int $id
-	 * @return Summon
-	 * @throws NotFoundHttpException
-	 */
-	private function findModel(int $id): Summon {
-		if (($model = Summon::findOne($id)) !== null) {
-			return $model;
-		}
-		throw new NotFoundHttpException();
 	}
 
 }

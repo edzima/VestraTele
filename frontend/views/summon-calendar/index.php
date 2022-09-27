@@ -1,12 +1,17 @@
 <?php
 
+use common\models\issue\Summon;
 use frontend\assets\CalendarAsset;
 use frontend\models\ContactorSummonCalendarSearch;
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
+/* @var $users string[]|null */
+/* @var $user_id int|null */
 
 $this->title = Yii::t('issue', 'Calendar');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Summons'), 'url' => ['/summon/index']];
@@ -53,11 +58,29 @@ $props = [
 
 	'URLAddEvent' => Url::to('/summon/create'),
 	'notesEnabled' => true,
+	'extraHTTPParams' => [
+		[
+			'name' => 'userId',
+			'value' => $user_id,
+		],
+	],
 ];
 ?>
 <div class="meet-calendar-calendar">
 
-	<h1><?= Html::encode($this->title) ?></h1>
+	<?= !empty($users)
+		? Select2::widget([
+			'data' => $users,
+			'name' => 'user_id',
+			'value' => $user_id,
+			'pluginOptions' => [
+				'placeholder' => Summon::instance()->getAttributeLabel('contractor_id'),
+			],
+			'pluginEvents' => [
+				'change' => new JsExpression('function(event){ window.location.replace("' . Url::to('/summon-calendar/index?userId=') . '" + this.value);}'),
+			],
+		])
+		: '' ?>
 
 	<?= Html::tag('div', '', ['id' => 'app', 'data-props' => Json::encode($props)]) ?>
 

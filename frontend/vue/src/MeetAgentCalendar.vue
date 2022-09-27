@@ -83,23 +83,19 @@ export default class App extends Vue {
         })
     }
 
+    @Prop({
+        default: () => 100
+    })
+    private NoteResourceId!: number;
+
     private getNotesSettings(): EventSourceObject {
         if (!this.notesEnabled) return {};
         return {
-            id: 1,
+            id: this.NoteResourceId,
             url: this.URLGetNotes,
             extraParams: mapExtraParamsToObj(this.extraHTTPParams),
             allDayDefault: true,
         }
-    }
-
-    private dateClick(dateInfo: any): void {
-        // if (dateInfo.view.type === 'dayGridMonth') return;
-        if(!this.notesEnabled) return;
-        this.dayNotes = this.getNotesFromDayInfo(dateInfo);
-        this.notePopupTitle = 'Notatki ' + prettify(dateInfo.dateStr);
-        this.notePopupDate = dateInfo.date;
-        this.notesPopup.show();
     }
 
     private getNotesFromDayInfo(event: any): NoteInterface[] {
@@ -118,9 +114,13 @@ export default class App extends Vue {
 
     }
 
-    private dateDoubleClick(dateInfo: DateClickWithDayEvents): void {
-        if (dateInfo.allDay) return; //its a note
-        this.addEvent(dateInfo.date);
+    private dateClick(dateInfo: any): void {
+        // if (dateInfo.view.type === 'dayGridMonth') return;
+        if (!this.notesEnabled) return;
+        this.dayNotes = this.getNotesFromDayInfo(dateInfo);
+        this.notePopupTitle = 'Notatki ' + prettify(dateInfo.dateStr);
+        this.notePopupDate = dateInfo.date;
+        this.notesPopup.show();
     }
 
     private async deleteNote(noteToDel: NoteInterface): Promise<boolean> {
@@ -135,19 +135,9 @@ export default class App extends Vue {
         return true;
     }
 
-    private async addNote(newNote: NoteInterface): Promise<number | false> {
-        const params: URLSearchParams = new URLSearchParams();
-        params.append('news', newNote.content);
-        params.append('date', dateToW3C(this.notePopupDate));
-        this.extraHTTPParams.forEach((param: ExtraParam) => {
-            params.append(param.name, String(param.value));
-        })
-
-        const res = await this.axios.post(this.URLNewNote, params);
-        if (res.status !== 200) return false;
-        if (!res.data.id) return false;
-        this.calendarFilter.update();
-        return res.data.id;
+    private dateDoubleClick(dateInfo: DateClickWithDayEvents): void {
+        if (dateInfo.allDay) return; //it's a note
+        this.addEvent(dateInfo.date);
     }
 
     private addEvent(date: Date): void {
@@ -172,35 +162,19 @@ export default class App extends Vue {
         return true;
     }
 
-    private async updateDates(e: any): Promise<void> {
-        ignoreAllSelections();
-        hideAllTippy();
-        const event: EventObject = e.event;
-        const isNote: boolean = event.extendedProps.isNote;
-        const dateFrom: string = dateToW3C(event.start);
-        const dateTo: string = dateToW3C(event.end);
-
+    private async addNote(newNote: NoteInterface): Promise<number | false> {
         const params: URLSearchParams = new URLSearchParams();
-        params.append('id', String(event.id));
-        if (isNote) {
-            params.append('start', String(dateFrom));
-            params.append('end', String(dateFrom));
-        } else {
-            params.append('date_at', String(dateFrom));
-            params.append('date_end_at', String(dateTo));
-        }
+        params.append('news', newNote.content);
+        params.append('date', dateToW3C(this.notePopupDate));
         this.extraHTTPParams.forEach((param: ExtraParam) => {
             params.append(param.name, String(param.value));
         })
-        let res;
-        try {
-            res = await this.axios.post(isNote ? this.URLUpdateNote : event.extendedProps.urlUpdate, params);
-        } catch {
-            e.revert();
-        }
-        if (res.status !== 200) {
-            e.revert();
-        }
+
+        const res = await this.axios.post(this.URLNewNote, params);
+        if (res.status !== 200) return false;
+        if (!res.data.id) return false;
+        this.calendarFilter.calendar.refeatch(this.NoteResourceId);
+        return res.data.id;
     }
 
     @Prop({
@@ -243,6 +217,34 @@ export default class App extends Vue {
         default: () => '/calendar-note/delete'
     })
     private URLDeleteNote!: string;
+
+    private async updateDates(e: any): Promise<void> {
+        ignoreAllSelections();
+        hideAllTippy();
+        const event: EventObject = e.event;
+        const isNote: boolean = event.extendedProps.isNote;
+
+        const url: string = isNote ? this.URLUpdateNote : event.extendedProps.urlUpdate;
+
+        const params: URLSearchParams = new URLSearchParams();
+        params.append('id', String(event.id))
+        if (event.start) {
+            params.append('start_at', event.start.toJSON());
+        }
+        if (event.end) {
+            params.append('end_at', event.end.toJSON());
+        }
+
+        try {
+            const res = await this.axios.post(url, params);
+            if (res.status !== 200) {
+                e.revert();
+            }
+        } catch {
+            e.revert();
+        }
+
+    }
 
     @Prop({
         required: true

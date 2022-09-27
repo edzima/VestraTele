@@ -27,164 +27,151 @@ import FilterManager from "@/components/FilterManager.vue";
 import Calendar from "@/components/Calendar.vue";
 import {Filter, FilterGroup} from "@/types/Filter";
 import {DateClickWithDayEvents, EventInfo, EventObject, EventSourceObject} from "@/types/FullCalendar";
-import {createBadge, telLink} from "@/helpers/HTMLHelper";
+import {createBadge} from "@/helpers/HTMLHelper";
 
 @Component({
     components: {Calendar, FilterManager}
 })
 export default class FilterCalendar extends Vue {
-    @Prop() filterGroups!: FilterGroup[];
-    @Prop() private readonly eventSources!: EventSourceObject[];
-    @Prop({default: ()=>true}) private readonly notesEnabled!: boolean
-    @Prop({
-        default: () => true,
-        type: Boolean,
+  @Prop() filterGroups!: FilterGroup[];
+  @Ref() calendar!: Calendar;
+  @Ref() filterManager!: FilterManager;
+  usableFilterGroups: FilterGroup[] = [];
+  @Prop() private readonly eventSources!: EventSourceObject[];
+  @Prop({default: () => true}) private readonly notesEnabled!: boolean
+  @Prop({default: () => true}) private editable!: boolean; // allow user to edit events
+
+  mounted(): void {
+    this.usableFilterGroups = this.filterGroups;
+  }
+
+  refreshFilterGroups(updatedGroup: FilterGroup): void {
+    this.usableFilterGroups = this.usableFilterGroups.map((oldGroup: FilterGroup) => {
+      if (oldGroup.id === updatedGroup.id) {
+        return updatedGroup
+      }
+      return oldGroup
     })
-    private editable!: boolean; // allow user to edit events
+    this.rerenderCalendar()
+  }
 
-    @Ref() calendar!: Calendar;
-    @Ref() filterManager!: FilterManager;
-
-    usableFilterGroups: FilterGroup[] = [];
-
-    mounted(): void {
-        this.usableFilterGroups = this.filterGroups;
-    }
-
-    checkGroupFilters(event: EventObject): boolean {
-        let allGroupVisible = true;
-
-        this.usableFilterGroups.forEach((filterGroup: FilterGroup) => {
-            allGroupVisible = allGroupVisible && this.checkIsEventVisibleInGroup(event, filterGroup);
-        })
-
-        return allGroupVisible
-    }
-
-    checkIsEventVisibleInGroup(event: EventObject, filterGroup: FilterGroup): boolean {
-        let isElementVisibleInGroup = false;
-        const activeInGroup = this.activeValuesInFilterGroup(filterGroup);
+  parseEventStyles(eventInfo: EventInfo): void {
+    this.usableFilterGroups.forEach((filterGroup: FilterGroup) => {
+      filterGroup.filters.forEach((filter: Filter) => {
+        if (!filter.badge) return;
         const key = filterGroup.filteredPropertyName;
-        const hasKey = key in event.extendedProps
-        if(!hasKey) {
-            return true
+        if (eventInfo.event.extendedProps[key] === filter.value) {
+          this.parseBadge(filter, eventInfo);
         }
+      })
+    })
+  }
 
-        activeInGroup.forEach(value => {
-            if (value === event.extendedProps[filterGroup.filteredPropertyName]) {
-                isElementVisibleInGroup = true
-            }
-        })
-        return isElementVisibleInGroup;
-    }
+  public rerenderCalendar(): void {
+    this.calendar.rerenderEvents();
+  }
 
-    activeValuesInFilterGroup(filterGroup: FilterGroup): Filter["value"][] {
-        const actives = filterGroup.filters.filter((filter: Filter) => filter.isActive);
-        return actives.map((filter: Filter) => filter.value);
-    }
+  public updateCalendarEventProp(event: EventObject, propName: string, newContent: string | number) {
+    this.calendar.updateCalendarEventProp(event, propName, newContent)
+  }
 
-    private eventRender(info: EventInfo): void {
-        this.parseVisible(info);
-        this.parsePhone(info);
-        this.parseEventStyles(info);
-    }
+  public deleteEventById(id: number): void {
+    return this.calendar.deleteEventById(id);
+  }
 
-    refreshFilterGroups(updatedGroup: FilterGroup):void{
-        this.usableFilterGroups = this.usableFilterGroups.map((oldGroup: FilterGroup)=>{
-            if(oldGroup.id === updatedGroup.id){
-                return updatedGroup
-            }
-            return oldGroup
-        })
-        this.rerenderCalendar()
-    }
-    private eventClick(event: EventObject){
-        this.$emit('eventClick', event)
-    }
+  public findCalendarEvent(id: number): EventObject {
+    return this.calendar.findCalendarEvent(id)
+  }
 
-    private parseVisible(eventInfo: EventInfo): void {
-        try {
-            const isVisible = this.checkGroupFilters(eventInfo.event);
-            if (isVisible) {
-                eventInfo.el.classList.remove('hide');
-            } else {
-                eventInfo.el.classList.add('hide')
-            }
-        } catch (err) {
-            console.error(err);
-        }
+  private eventRender(eventInfo: EventInfo): boolean {
+    if (this.parseVisible(eventInfo)) {
+      this.parsePhone(eventInfo);
+      this.parseEventStyles(eventInfo);
+      return true;
     }
+    return false;
+  }
 
-    private parsePhone(info: EventInfo): void {
-        const phone = info.event.extendedProps.phone;
-        if (phone) {
-            const title = info.el.querySelector('.fc-title');
-            if (title) {
-                title.innerHTML = telLink(phone, info.event.title).outerHTML;
-            }
-        }
+  private parseVisible(eventInfo: EventInfo): boolean {
+    if (this.eventShouldVisible(eventInfo.event)) {
+      this.revealEvent(eventInfo);
+      return true;
     }
+    this.hideEvent(eventInfo);
+    return false;
+  }
 
-    private emitDateClick(data: DateClickWithDayEvents) {
-        this.$emit('dateClick', data);
-    }
+  private eventShouldVisible(event: EventObject): boolean {
+    let allGroupVisible = true;
 
-    private emitDateDoubleClick(data: DateClickWithDayEvents) {
-        this.$emit('dateDoubleClick', data);
-    }
+    this.usableFilterGroups.forEach((filterGroup: FilterGroup) => {
+      allGroupVisible = allGroupVisible && this.checkIsEventVisibleInGroup(event, filterGroup);
+    })
+    return allGroupVisible
+  }
 
-    private emitEventEdit(e: any) {
-        this.$emit('eventEdit', e);
-    }
+  private emitDateClick(data: DateClickWithDayEvents) {
+    this.$emit('dateClick', data);
+  }
 
-    parseEventStyles(eventInfo:EventInfo):void{
-        this.usableFilterGroups.forEach((filterGroup: FilterGroup)=>{
-            filterGroup.filters.forEach((filter: Filter)=>{
-                if(!filter.eventColors) return;
-                const key = filterGroup.filteredPropertyName;
-                if(eventInfo.event.extendedProps[key] === filter.value){
-                    const backgroundColor = filter.eventColors.background
-                    const borderColor = filter.eventColors.border
-                    const badgeColor = filter.eventColors.badge
+  private emitDateDoubleClick(data: DateClickWithDayEvents) {
+    this.$emit('dateDoubleClick', data);
+  }
 
-                    if(backgroundColor){
-                        eventInfo.el.style.backgroundColor = backgroundColor;
-                    }
-                    if(borderColor){
-                        eventInfo.el.style.border = `dotted 3px ${borderColor}`;
-                    }
-                    if(badgeColor){
-                        this.parseBadge(eventInfo.el, badgeColor);
-                    }
-                }
-            })
-        })
-    }
+  private emitEventEdit(e: any) {
+    this.$emit('eventEdit', e);
+  }
 
-    parseBadge(event: EventInfo["el"], badgeColor): void{
-        console.log(event);
-        const badgeElem = createBadge(badgeColor);
-        const body = event.querySelector('.fc-content');
-        body?.appendChild(badgeElem);
+  private checkIsEventVisibleInGroup(event: EventObject, filterGroup: FilterGroup): boolean {
+    const key = filterGroup.filteredPropertyName;
+    if (!(key in event.extendedProps)) {
+      return true
     }
+    const filteredEventValue = event.extendedProps[key];
+    return filterGroup
+        .filters
+        .some(
+            (filter: Filter) => filter.isActive && filter.value === filteredEventValue
+        );
+  }
 
-    public rerenderCalendar():void{
-        this.calendar.rerenderEvents();
-    }
-    public updateCalendarEventProp(event: EventObject, propName: string, newContent: string | number){
-        this.calendar.updateCalendarEventProp(event,propName,newContent)
-    }
-    public update():void{
-        this.calendar.update();
-    }
+  private hideEvent(eventInfo: EventInfo): void {
+    eventInfo.event.setProp('display', 'none')
+  }
 
-    public deleteEventById(id: number):void{
-        return this.calendar.deleteEventById(id);
-    }
+  private revealEvent(eventInfo: EventInfo): void {
+    eventInfo.event.setProp('display', 'auto')
+  }
 
-    public findCalendarEvent(id: number): EventObject{
-        return this.calendar.findCalendarEvent(id)
+  private parsePhone(info: EventInfo): void {
+    const phone = info.event.extendedProps.phone;
+    if (phone) {
+      const title = info.el.querySelector('.fc-title');
+      if (title) {
+        title.innerHTML += '<br>' + phone;
+      }
     }
+  }
+
+  private eventClick(event: EventObject) {
+    this.$emit('eventClick', event)
+  }
+
+  private parseBadge(filter: Filter, event: EventInfo): void {
+    if (filter.badge) {
+      const badgeColor = filter.badge.background;
+      const badgeText = filter.badge.text;
+      if (badgeColor && badgeText) {
+        this.appendBadge(event, badgeColor, badgeText);
+      }
+    }
+  }
+
+  private appendBadge(event: EventInfo, badgeColor: string, text: string): void {
+    event.el.appendChild(
+        createBadge(badgeColor, text)
+    );
+  }
 }
 </script>
 <style>

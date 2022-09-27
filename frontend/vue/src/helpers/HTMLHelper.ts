@@ -1,18 +1,7 @@
-//@todo add phone validator
-export function telLink(number: string, text?: string): HTMLElement {
-    const element = document.createElement('a');
-    element.href = 'tel:' + number;
-    if (!text) {
-        text = number;
-    }
-    element.text = text;
-    element.classList.add('tel-link');
-    return element;
-}
-
-export function createBadge(color: string): HTMLElement {
-    const element = document.createElement('div');
+export function createBadge(color: string, text: string): HTMLElement {
+    const element = document.createElement('span');
     element.classList.add('event-badge');
+    element.textContent = text;
     element.style.backgroundColor = color;
     return element;
 }
