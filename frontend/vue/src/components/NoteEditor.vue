@@ -5,7 +5,7 @@
 			<textarea class="form-control" id="note-editor" ref="noteEditor" rows="3" v-model.trim="newNote.content"></textarea>
 
 			<div class="note-editor-controls">
-				<button :class="{disabled: !isNoteEdited}" :disabled="!isNoteEdited" @click="saveEditNote" class="btn btn-primary note-edit-controll" type="button">zapisz</button>
+				<button :class="{disabled: !isNoteEdited}" :disabled="!isNoteEdited" class="btn btn-primary note-edit-controll" type="button" @click="saveEditNote">Zapisz</button>
 				<button @click="discardChanges" class="btn btn-danger note-edit-controll" type="button">anuluj</button>
 			</div>
 		</div>
@@ -13,29 +13,29 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-    import {NoteInterface} from "@/components/Note.vue";
-    import {noteEditConfirmSwal} from "@/helpers/swalAlertConfigs";
+import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+import {NoteInterface} from "@/components/Note.vue";
+import {noteEditConfirmSwal} from "@/helpers/swalAlertConfigs";
 
-    @Component
-    export default class NoteEditor extends Vue {
-        @Prop({required: true}) note!: NoteInterface;
-        @Prop({type: Boolean, default: () => false}) autoFocus!: boolean;
-        @Prop({type: Boolean, default: () => false}) confirmEdit!: boolean;
+@Component
+export default class NoteEditor extends Vue {
+    @Prop({required: true}) note!: NoteInterface;
+    @Prop({type: Boolean, default: () => false}) autoFocus!: boolean;
+    @Prop({type: Boolean, default: () => false}) confirmEdit!: boolean;
 
-        private newNote: NoteInterface = {
-            id: 0,
-            content: ''
-        };
-        private isNoteEdited: boolean = false;
+    private newNote: NoteInterface = {
+        id: 0,
+        content: ''
+    };
+    private isNoteEdited: boolean = false;
 
-        get noteTextArea(): HTMLElement {
-            return (this.$refs.noteEditor as HTMLElement)
-        }
+    get noteTextArea(): HTMLElement {
+        return (this.$refs.noteEditor as HTMLElement)
+    }
 
-        @Watch('newNote', {deep: true})
-        onPropertyChanged() {
-            this.isNoteEdited = this.newNote.content !== this.note.content;
+    @Watch('newNote', {deep: true})
+    onPropertyChanged() {
+        this.isNoteEdited = this.newNote.content !== this.note.content;
         }
 
         mounted(): void {
@@ -44,7 +44,7 @@
         }
 
         private async saveEditNote(): Promise<void> {
-            if (this.confirmEdit) {
+            if (this.note.id) {
                 const confirmed = await this.$swal(noteEditConfirmSwal);
                 if (!confirmed.value) return;
             }

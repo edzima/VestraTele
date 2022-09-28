@@ -14,10 +14,10 @@
 
 <script>
 	props = {
-		notesEnabled: false,
+		notesEnabled: true,
 		extraHTTPParams: [
 			{
-				name: "agentId",
+				name: "userId",
 				value: 17302
 			}
 		],
@@ -108,7 +108,14 @@
 				allDayDefault: false,
 				urlUpdate: '/summon-calendar/update'
 			},
-		]
+			{
+				id: 1,
+				url: '/summon-calendar/deadline',
+				allDayDefault: true,
+				urlUpdate: '/summon-calendar/update'
+			},
+		],
+
 	}
 	document.getElementsByTagName("div")[0].setAttribute('data-props', JSON.stringify(props));
 </script>

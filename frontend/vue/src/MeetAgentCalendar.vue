@@ -28,9 +28,7 @@ import {
     EventSourceObject
 } from "@/types/FullCalendar";
 
-import Calendar from '@/components/Calendar.vue';
 import FilterManager from '@/components/FilterManager.vue';
-import {dateToW3C, prettify} from '@/helpers/dateHelper.ts';
 import {FilterGroup} from "@/types/Filter";
 import CalendarNotes from "@/components/CalendarNotes.vue";
 import {NoteInterface} from "@/components/Note.vue";
@@ -43,11 +41,10 @@ import FilterCalendar from "@/components/FilterCalendar.vue";
 
 @Component({
     components: {
-        FilterCalendar,
         BootstrapPopup,
         CalendarNotes,
-        Calendar,
-        FilterManager
+        FilterManager,
+        FilterCalendar
     }
 })
 export default class App extends Vue {
@@ -56,7 +53,6 @@ export default class App extends Vue {
         default: () => []
     }) filterGroups!: FilterGroup[];
 
-    @Ref() calendar!: Calendar;
     @Ref() calendarFilter!: FilterCalendar;
     @Ref() notesPopup!: PopupInterface;
 
@@ -100,7 +96,9 @@ export default class App extends Vue {
 
     private getNotesFromDayInfo(event: any): NoteInterface[] {
         return event.dayEvents
-            .filter((event) => event.allDay)
+            .filter((event: EventObject) => {
+                return event.allDay && this.eventIsNote(event)
+            })
             .map((event: EventObject) => ({
                 content: event.title,
                 id: event.id
@@ -108,17 +106,22 @@ export default class App extends Vue {
     }
 
     private eventClick(event: EventInfo) {
-        if (this.notesEnabled && event.event.extendedProps.isNote) {
+        if (this.notesEnabled && this.eventIsNote(event.event)) {
             this.dateClick(event)
         }
+    }
 
+    private eventIsNote(event: EventObject): boolean {
+        return event?.source?.id == this.NoteResourceId;
     }
 
     private dateClick(dateInfo: any): void {
-        // if (dateInfo.view.type === 'dayGridMonth') return;
         if (!this.notesEnabled) return;
         this.dayNotes = this.getNotesFromDayInfo(dateInfo);
-        this.notePopupTitle = 'Notatki ' + prettify(dateInfo.dateStr);
+        console.log(dateInfo);
+        console.log(dateInfo.date);
+        console.log(dateInfo.dateStr);
+        this.notePopupTitle = 'Notatki ' + dateInfo.date.toLocaleDateString();
         this.notePopupDate = dateInfo.date;
         this.notesPopup.show();
     }
@@ -141,7 +144,8 @@ export default class App extends Vue {
     }
 
     private addEvent(date: Date): void {
-        window.open(`${this.URLAddEvent}?date=${dateToW3C(date)}`);
+        const dateString = date.toJSON();
+        window.open(`${this.URLAddEvent}?date=${dateString}`);
     }
 
     private async editNoteText(newNote: NoteInterface): Promise<boolean> {
@@ -165,7 +169,7 @@ export default class App extends Vue {
     private async addNote(newNote: NoteInterface): Promise<number | false> {
         const params: URLSearchParams = new URLSearchParams();
         params.append('news', newNote.content);
-        params.append('date', dateToW3C(this.notePopupDate));
+        params.append('date', this.notePopupDate.toJSON());
         this.extraHTTPParams.forEach((param: ExtraParam) => {
             params.append(param.name, String(param.value));
         })
@@ -173,7 +177,7 @@ export default class App extends Vue {
         const res = await this.axios.post(this.URLNewNote, params);
         if (res.status !== 200) return false;
         if (!res.data.id) return false;
-        this.calendarFilter.calendar.refeatch(this.NoteResourceId);
+        this.resourceNotes();
         return res.data.id;
     }
 
@@ -218,11 +222,17 @@ export default class App extends Vue {
     })
     private URLDeleteNote!: string;
 
+    private resourceNotes(): void {
+        if (this.notesEnabled) {
+            this.calendarFilter.calendar.refeatch(this.NoteResourceId);
+        }
+    }
+
     private async updateDates(e: any): Promise<void> {
         ignoreAllSelections();
         hideAllTippy();
         const event: EventObject = e.event;
-        const isNote: boolean = event.extendedProps.isNote;
+        const isNote = this.eventIsNote(event);
 
         const url: string = isNote ? this.URLUpdateNote : event.extendedProps.urlUpdate;
 
