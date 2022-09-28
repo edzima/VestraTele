@@ -1,20 +1,14 @@
 <template>
-    <div class="calendar no-select"
-        onmousedown="return false;"
-        onselectstart="return false;"
-        unselectable="on"
-    >
-        <FullCalendar
-            ref="fullCalendar"
-            :eventRender="renderItem"
-            :eventSources="eventSources"
-            v-bind="fullCalendarProps"
-            @dateClick="handleDateClick"
-            @eventClick="clickEvent"
-            @eventDrop="handleChangeDates"
-            @eventResize="handleChangeDates"
-        />
-    </div>
+    <FullCalendar
+        ref="fullCalendar"
+        :eventRender="renderItem"
+        :eventSources="eventSources"
+        v-bind="fullCalendarProps"
+        @dateClick="handleDateClick"
+        @eventClick="clickEvent"
+        @eventDrop="handleChangeDates"
+        @eventResize="handleChangeDates"
+    />
 </template>
 
 <script lang="ts">
@@ -29,8 +23,6 @@ import {DateClickInfo, EventInfo, EventObject, EventSourceObject} from "@/types/
 
 import 'tippy.js/dist/tippy.css';
 import tippy, {Instance, Props as TooltipOptions} from "tippy.js";
-
-import {isSameDate} from "@/helpers/dateHelper";
 
 const FullCalendar = require('@fullcalendar/vue').default;
 
@@ -93,6 +85,8 @@ export default class Calendar extends Vue {
         default: () => {
         }
     }) private readonly options!: any;
+
+
     @Prop({
         default: () => {
             return {
@@ -107,6 +101,7 @@ export default class Calendar extends Vue {
         }
     }) private readonly tooltipOptions!: TooltipOptions;
     private currentShowTippy?: Instance;
+
     private clickCheckerId: number | undefined = undefined;
 
     get fullCalendarProps(): any {
@@ -201,7 +196,8 @@ export default class Calendar extends Vue {
     private getDayEvents(date: Date): EventObject[] {
         const fcApi = this.fullCalendar.getApi();
         const activeViewEcents: EventObject[] = fcApi.getEvents();
-        return activeViewEcents.filter((event: EventObject) => isSameDate(event.start, date));
+        const dateString = date.toDateString();
+        return activeViewEcents.filter((event: EventObject) => event.start.toDateString() === dateString);
     }
 
     private handleChangeDates(e: any): void {
@@ -221,14 +217,14 @@ export default class Calendar extends Vue {
 </script>
 
 <style lang='less'>
-@import "~@fullcalendar/core/main.css";
-@import "~@fullcalendar/daygrid/main.css";
-@import "~@fullcalendar/timegrid/main.css";
+@import '~@fullcalendar/core/main.css';
+@import '~@fullcalendar/daygrid/main.css';
+@import '~@fullcalendar/timegrid/main.css';
+
 
 .event-badge {
     position: absolute;
     height: 2rem;
-    //   width: 20px;
     z-index: 10;
     top: -0.5rem;
     right: -0.5rem;
@@ -238,30 +234,5 @@ export default class Calendar extends Vue {
     line-height: 2rem;
 }
 
-//.fc-event {
-//    overflow: visible;
-//    border: none;
-//    padding: 2px;
-//
-//    .fc-content {
-//        height: 100%;
-//        overflow: visible;
-//
-//        &a {
-//            &:hover {
-//                opacity: 0.5;
-//            }
-//        }
-//    }
-//}
-
-.no-select {
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none;
-}
 
 </style>
