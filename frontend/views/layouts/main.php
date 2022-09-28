@@ -116,11 +116,10 @@ AppAsset::register($this);
 				],
 				[
 					'label' => 'Kalendarz',
-					'url' => ['/summon-calendar/index'],
+					'url' => ['/calendar/summon-calendar/index'],
 				],
 			],
 		];
-
 
 		$menuItems[] = [
 			'label' => Yii::t('frontend', 'Articles'),

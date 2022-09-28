@@ -1,10 +1,10 @@
 <?php
 
-namespace frontend\models;
+namespace common\modules\calendar\models;
 
+use common\helpers\Html;
+use common\helpers\Url;
 use common\models\issue\Summon;
-use frontend\helpers\Html;
-use frontend\helpers\Url;
 use Yii;
 
 class SummonCalendarEvent extends FullCalendarEvent {
@@ -19,7 +19,13 @@ class SummonCalendarEvent extends FullCalendarEvent {
 	public int $typeId;
 	public ?string $eventBorderColor = null;
 
+	protected string $urlRoute = '/summon/view';
+
 	private ?Summon $model = null;
+
+	public function setUrlRoute(string $route): void {
+		$this->urlRoute = $route;
+	}
 
 	public static function getStatusesBackgroundColors(): array {
 		return [
@@ -81,12 +87,16 @@ class SummonCalendarEvent extends FullCalendarEvent {
 			'nullDisplay' => null,
 			'asLink' => false,
 		]);
-		$this->url = Url::to(['/summon/view', 'id' => $this->id]);
+		$this->url = $this->getUrl();
 		$this->statusId = $model->status;
 		$this->typeId = $model->type_id;
 		$this->backgroundColor = $this->getBackgroundColor();
 		$this->borderColor = $this->getBorderColor();
 		$this->tooltipContent = $this->getTooltipContent();
+	}
+
+	protected function getUrl(): string {
+		return Url::to([$this->urlRoute, 'id' => $this->getModel()->id]);
 	}
 
 	protected function getStart(): string {

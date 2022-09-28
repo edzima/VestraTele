@@ -1,7 +1,7 @@
 <?php
 
 use common\models\CalendarNews;
-use frontend\assets\CalendarAsset;
+use common\modules\calendar\CalendarAsset;
 use frontend\models\AgentMeetCalendarSearch;
 use yii\helpers\Html;
 use yii\helpers\Json;

@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\controllers;
+namespace common\modules\calendar\controllers;
 
 use common\models\CalendarNews;
 use common\models\user\User;

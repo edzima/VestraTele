@@ -1,12 +1,12 @@
 <?php
 
-namespace frontend\assets;
+namespace common\modules\calendar;
 
 use yii\web\AssetBundle;
 
 class CalendarAsset extends AssetBundle {
 
-	public $sourcePath = '@webroot/static/calendar';
+	public $sourcePath = '@common/modules/calendar/static';
 
 	public $js = [
 		'js/chunk-vendors.js',

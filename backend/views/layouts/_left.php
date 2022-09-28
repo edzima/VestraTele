@@ -247,7 +247,20 @@ $user = Yii::$app->user;
 					'label' => Yii::t('backend', 'Summons'),
 					'url' => ['/issue/summon/index'],
 					'icon' => '<i class="fa fa-bolt"></i>',
+					'options' => ['class' => 'treeview'],
 					'visible' => $user->can(User::PERMISSION_SUMMON),
+					'items' => [
+						[
+							'label' => Yii::t('common', 'Browse'),
+							'url' => ['/issue/summon/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						], [
+							'label' => Yii::t('issue', 'Calendar'),
+							'url' => ['/calendar/summon-calendar/index'],
+							'icon' => '<i class="fa fa-calendar"></i>',
+						],
+
+					],
 				],
 
 				[

@@ -4,9 +4,9 @@ namespace frontend\tests\unit\models;
 
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Summon;
+use common\modules\calendar\models\SummonCalendarEvent;
 use common\tests\_support\UnitModelTrait;
 use DateTime;
-use frontend\models\SummonCalendarEvent;
 use frontend\tests\unit\Unit;
 use yii\base\Model;
 

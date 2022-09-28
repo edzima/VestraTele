@@ -19,13 +19,13 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Component, Prop, Vue} from 'vue-property-decorator';
 
-    export interface PopupInterface extends Element {
-        readonly show: Function;
-        readonly hide: Function;
-        readonly visible: boolean;
-    }
+export interface PopupInterface extends Element {
+    readonly show: Function;
+    readonly hide: Function;
+    readonly visible: boolean;
+}
 
     @Component({})
     export default class BootstrapPopup extends Vue {

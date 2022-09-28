@@ -1,8 +1,8 @@
 <?php
 
 use common\models\issue\Summon;
-use frontend\assets\CalendarAsset;
-use frontend\models\ContactorSummonCalendarSearch;
+use common\modules\calendar\CalendarAsset;
+use common\modules\calendar\models\searches\ContactorSummonCalendarSearch;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -12,9 +12,10 @@ use yii\web\JsExpression;
 /* @var $this yii\web\View */
 /* @var $users string[]|null */
 /* @var $user_id int|null */
+/* @var $indexUrl string */
 
 $this->title = Yii::t('issue', 'Calendar');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Summons'), 'url' => ['/summon/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Summons'), 'url' => $indexUrl];
 $this->params['breadcrumbs'][] = $this->title;
 
 CalendarAsset::register($this);
@@ -43,13 +44,13 @@ $props = [
 	'eventSourcesConfig' => [
 		[
 			'id' => 0,
-			'url' => '/summon-calendar/list',
+			'url' => Url::to(['summon-calendar/list']),
 			'allDayDefault' => false,
 			'urlUpdate' => '/summon-calendar/update',
 		],
 		[
 			'id' => 1,
-			'url' => '/summon-calendar/deadline',
+			'url' => Url::to(['summon-calendar/deadline']),
 			'allDayDefault' => true,
 			'urlUpdate' => '',
 			'editable' => false,
@@ -63,6 +64,10 @@ $props = [
 			'value' => $user_id,
 		],
 	],
+	'URLGetNotes' => Url::to(['calendar-note/list']),
+	'URLNewNote' => Url::to(['calendar-note/add']),
+	'URLUpdateNote' => Url::to(['calendar-note/update']),
+	'URLDeleteNote' => Url::to(['calendar-note/delete']),
 ];
 ?>
 <div class="meet-calendar-calendar">
@@ -76,7 +81,7 @@ $props = [
 				'placeholder' => Summon::instance()->getAttributeLabel('contractor_id'),
 			],
 			'pluginEvents' => [
-				'change' => new JsExpression('function(event){ window.location.replace("' . Url::to('/summon-calendar/index?userId=') . '" + this.value);}'),
+				'change' => new JsExpression('function(event){ window.location.replace("' . Url::to('index?userId=') . '" + this.value);}'),
 			],
 		])
 		: '' ?>

@@ -1,11 +1,12 @@
 <?php
 
-namespace frontend\models;
+namespace common\modules\calendar\models\searches;
 
 use common\models\issue\query\SummonQuery;
 use common\models\issue\Summon;
 use common\models\issue\SummonType;
 use common\models\user\User;
+use common\modules\calendar\models\SummonCalendarEvent;
 use frontend\models\search\SummonSearch;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -19,6 +20,8 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 	public int $owner_id;
 	public int $typeId;
 	public int $title;
+
+	protected const EVENT_CLASS = SummonCalendarEvent::class;
 
 	public static function getSelfContractorsNames(int $userId): array {
 		$ids = Summon::find()
@@ -38,10 +41,16 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 		];
 	}
 
-	public function getEventsData(): array {
+	public function getEventsData(array $config = []): array {
 		$data = [];
 		foreach ($this->search()->getModels() as $model) {
-			$event = new SummonCalendarEvent();
+			if (!isset($config['class'])) {
+				$config['class'] = static::EVENT_CLASS;
+			}
+			/**
+			 * @var SummonCalendarEvent $event
+			 */
+			$event = Yii::createObject($config);
 			if ($this->scenario === static::SCENARIO_DEADLINE) {
 				$event->is = SummonCalendarEvent::IS_DEADLINE;
 			}

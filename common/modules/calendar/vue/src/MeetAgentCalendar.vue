@@ -118,9 +118,6 @@ export default class App extends Vue {
     private dateClick(dateInfo: any): void {
         if (!this.notesEnabled) return;
         this.dayNotes = this.getNotesFromDayInfo(dateInfo);
-        console.log(dateInfo);
-        console.log(dateInfo.date);
-        console.log(dateInfo.dateStr);
         this.notePopupTitle = 'Notatki ' + dateInfo.date.toLocaleDateString();
         this.notePopupDate = dateInfo.date;
         this.notesPopup.show();
@@ -193,7 +190,7 @@ export default class App extends Vue {
     private extraHTTPParams!: ExtraParam[];
 
     @Prop({
-        default: () => '/meet/create'
+        default: () => '/summon/create'
     })
     private URLAddEvent!: string;
 

@@ -1,5 +1,5 @@
 module.exports = {
-    outputDir: '../web/static/calendar',
+    outputDir: '../static',
     devServer: {
         proxy: 'https://edzima.vestra.edzima.net'
     },

@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 	<p>
-		<?= Html::a(Yii::t('issue', 'Calendar'), ['summon-calendar/index'], [
+		<?= Html::a(Yii::t('issue', 'Calendar'), ['/calendar/summon-calendar/index'], [
 			'class' => 'btn btn-success',
 		]) ?>
 	</p>

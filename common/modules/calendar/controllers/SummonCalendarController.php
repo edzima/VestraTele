@@ -1,13 +1,14 @@
 <?php
 
-namespace frontend\controllers;
+namespace common\modules\calendar\controllers;
 
 use common\helpers\ArrayHelper;
+use common\helpers\Url;
 use common\models\user\Worker;
+use common\modules\calendar\models\searches\ContactorSummonCalendarSearch;
+use common\modules\calendar\models\SummonCalendarEvent;
 use DateTime;
 use Exception;
-use frontend\models\ContactorSummonCalendarSearch;
-use frontend\models\SummonCalendarEvent;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -15,6 +16,10 @@ use yii\web\Controller;
 use yii\web\Response;
 
 class SummonCalendarController extends Controller {
+
+	public string $summonIndexRoute = '/summon/index';
+	public string $summonCreateRoute = '/summon/create';
+	public string $summonViewRoute = '/summon/view';
 
 	public function behaviors(): array {
 		return [
@@ -53,6 +58,8 @@ class SummonCalendarController extends Controller {
 		return $this->render('index', [
 			'users' => $users,
 			'user_id' => $userId,
+			'indexUrl' => Url::to($this->summonIndexRoute),
+			'createUrl' => Url::to($this->summonCreateRoute),
 		]);
 	}
 
@@ -71,7 +78,9 @@ class SummonCalendarController extends Controller {
 		$model->start = $start;
 		$model->end = $end;
 
-		return $this->asJson($model->getEventsData());
+		return $this->asJson($model->getEventsData([
+			'urlRoute' => $this->summonViewRoute,
+		]));
 	}
 
 	public function actionDeadline(string $start = null, string $end = null, int $userId = null): Response {
@@ -91,7 +100,9 @@ class SummonCalendarController extends Controller {
 		$model->start = $start;
 		$model->end = $end;
 
-		return $this->asJson($model->getEventsData());
+		return $this->asJson($model->getEventsData([
+			'urlRoute' => $this->summonViewRoute,
+		]));
 	}
 
 	public function actionUpdate(int $id, string $start_at): Response {
