@@ -50,12 +50,11 @@ $props = [
 		[
 			'id' => 1,
 			'url' => '/summon-calendar/deadline',
-			'allDayDefault' => false,
+			'allDayDefault' => true,
 			'urlUpdate' => '',
 			'editable' => false,
 		],
 	],
-
 	'URLAddEvent' => Url::to('/summon/create'),
 	'notesEnabled' => true,
 	'extraHTTPParams' => [

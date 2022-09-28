@@ -33,7 +33,7 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 
 	public function rules(): array {
 		return [
-			[['contractor_id', 'start', 'end'], 'required'],
+			[['contractor_id', 'start', 'end'], 'required', 'on' => [static::SCENARIO_DEADLINE, static::SCENARIO_DEFAULT]],
 			[['contractor_id'], 'integer'],
 		];
 	}
@@ -73,9 +73,9 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 		}
 
 		$this->applyDateFilter($query);
-		$query->andFilterWhere([
-			'contractor_id' => $this->contractor_id,
-		]);
+//		$query->andFilterWhere([
+//			'contractor_id' => $this->contractor_id,
+//		]);
 		return $dataProvider;
 	}
 
