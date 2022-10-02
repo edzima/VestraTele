@@ -23,6 +23,11 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 
 	protected const EVENT_CLASS = SummonCalendarEvent::class;
 
+	protected const EXCLUDED_STATUSES = [
+		Summon::STATUS_REALIZED,
+		Summon::STATUS_UNREALIZED,
+	];
+
 	public static function getSelfContractorsNames(int $userId): array {
 		$ids = Summon::find()
 			->select('contractor_id')
@@ -44,13 +49,7 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 	public function getEventsData(array $config = []): array {
 		$data = [];
 		foreach ($this->search()->getModels() as $model) {
-			if (!isset($config['class'])) {
-				$config['class'] = static::EVENT_CLASS;
-			}
-			/**
-			 * @var SummonCalendarEvent $event
-			 */
-			$event = Yii::createObject($config);
+			$event = static::createEvent($config);
 			if ($this->scenario === static::SCENARIO_DEADLINE) {
 				$event->is = SummonCalendarEvent::IS_DEADLINE;
 			}
@@ -76,30 +75,49 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 			],
 			'pagination' => false,
 		]);
+
 		if (!$this->validate()) {
 			$query->andWhere('0=1');
 			return $dataProvider;
 		}
-
+		$query->andFilterWhere([
+			'NOT IN', Summon::tableName() . '.status', static::EXCLUDED_STATUSES,
+		]);
 		$this->applyDateFilter($query);
-//		$query->andFilterWhere([
-//			'contractor_id' => $this->contractor_id,
-//		]);
+		$query->andWhere([
+			'contractor_id' => $this->contractor_id,
+		]);
 		return $dataProvider;
 	}
 
 	public static function getStatusFiltersOptions(): array {
 		$options = [];
-		$statusNames = Summon::getStatusesNames();
-		foreach (SummonCalendarEvent::getStatusesBackgroundColors() as $status => $backgroundColor) {
+		$statusNames = static::getStatusesNames();
+		$event = static::createEvent();
+		foreach ($statusNames as $statusId => $statusName) {
 			$options[] = [
-				'value' => $status,
+				'value' => $statusId,
 				'isActive' => true,
-				'label' => $statusNames[$status],
-				'color' => $backgroundColor,
+				'label' => $statusName,
+				'color' => $event::getStatusesBackgroundColors()[$statusId],
 			];
 		}
 		return $options;
+	}
+
+	public static function createEvent(array $config = []): SummonCalendarEvent {
+		if (!isset($config['class'])) {
+			$config['class'] = static::EVENT_CLASS;
+		}
+		return Yii::createObject($config);
+	}
+
+	public static function getStatusesNames(): array {
+		$statuses = parent::getStatusesNames();
+		foreach (static::EXCLUDED_STATUSES as $statusId) {
+			unset($statuses[$statusId]);
+		}
+		return $statuses;
 	}
 
 	public static function getTypesFilterOptions(): array {

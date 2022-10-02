@@ -70,11 +70,9 @@ class SummonCalendarController extends Controller {
 		if ($end === null) {
 			$end = date('Y-m-t 23:59:59');
 		}
-		if ($userId === null) {
-			$userId = Yii::$app->user->getId();
-		}
+
 		$model = new ContactorSummonCalendarSearch();
-		$model->contractor_id = $userId;
+		$model->contractor_id = $this->ensureUserId($userId);
 		$model->start = $start;
 		$model->end = $end;
 
@@ -90,19 +88,33 @@ class SummonCalendarController extends Controller {
 		if ($end === null) {
 			$end = date('Y-m-t 23:59:59');
 		}
-		if ($userId === null) {
-			$userId = Yii::$app->user->getId();
-		}
+
 		$model = new ContactorSummonCalendarSearch();
 		$model->scenario = ContactorSummonCalendarSearch::SCENARIO_DEADLINE;
 
-		$model->contractor_id = $userId;
+		$model->contractor_id = $this->ensureUserId($userId);
 		$model->start = $start;
 		$model->end = $end;
 
 		return $this->asJson($model->getEventsData([
 			'urlRoute' => $this->summonViewRoute,
 		]));
+	}
+
+	protected function ensureUserId(int $userId = null): int {
+		if ($userId === null) {
+			$userId = Yii::$app->user->getId();
+		}
+		if (Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
+			return $userId;
+		}
+		if ($userId !== Yii::$app->user->getId()) {
+			if (!Yii::$app->user->can(Worker::PERMISSION_SUMMON_CREATE)
+				|| !isset(ContactorSummonCalendarSearch::getSelfContractorsNames(Yii::$app->user->getId())[$userId])) {
+				$userId = Yii::$app->user->getId();
+			}
+		}
+		return $userId;
 	}
 
 	public function actionUpdate(int $id, string $start_at): Response {

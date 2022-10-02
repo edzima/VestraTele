@@ -46,7 +46,7 @@ $props = [
 			'id' => 0,
 			'url' => Url::to(['summon-calendar/list']),
 			'allDayDefault' => false,
-			'urlUpdate' => '/summon-calendar/update',
+			'urlUpdate' => Url::to(['summon-calendar/update']),
 		],
 		[
 			'id' => 1,
@@ -56,7 +56,6 @@ $props = [
 			'editable' => false,
 		],
 	],
-	'URLAddEvent' => Url::to('/summon/create'),
 	'notesEnabled' => true,
 	'extraHTTPParams' => [
 		[
@@ -64,6 +63,7 @@ $props = [
 			'value' => $user_id,
 		],
 	],
+	'URLAddEvent' => Url::to('/summon/create'),
 	'URLGetNotes' => Url::to(['calendar-note/list']),
 	'URLNewNote' => Url::to(['calendar-note/add']),
 	'URLUpdateNote' => Url::to(['calendar-note/update']),

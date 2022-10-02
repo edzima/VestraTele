@@ -18,6 +18,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create summon'), ['create'], ['class' => 'btn btn-success']) ?>
+
+		<?= Html::a(Yii::t('issue', 'Calendar'), ['/calendar/summon-calendar/index'], ['class' => 'btn btn-primary']) ?>
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
 			? Html::a(Yii::t('backend', 'Summon Types'), ['summon-type/index'], ['class' => 'btn btn-info'])
 			: ''

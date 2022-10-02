@@ -2,8 +2,9 @@
 
 namespace common\modules\calendar\controllers;
 
+use common\helpers\ArrayHelper;
 use common\models\CalendarNews;
-use common\models\user\User;
+use common\models\user\Worker;
 use frontend\helpers\Html;
 use Yii;
 use yii\filters\VerbFilter;
@@ -36,7 +37,7 @@ class CalendarNoteController extends Controller {
 	}
 
 	public function runAction($id, $params = []) {
-		$params = array_merge($_POST, $params);
+		$params = ArrayHelper::merge(Yii::$app->getRequest()->getBodyParams(), $params);
 		return parent::runAction($id, $params);
 	}
 
@@ -44,7 +45,7 @@ class CalendarNoteController extends Controller {
 		if ($userId === null) {
 			$userId = (int) Yii::$app->user->getId();
 		}
-		if ($userId !== (int) Yii::$app->user->getId() && !Yii::$app->user->can(User::ROLE_MANAGER)) {
+		if ($userId !== (int) Yii::$app->user->getId() && !Yii::$app->user->can(Worker::PERMISSION_SUMMON_CREATE)) {
 			throw new MethodNotAllowedHttpException();
 		}
 		if ($start === null) {
