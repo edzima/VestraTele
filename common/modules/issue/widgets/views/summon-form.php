@@ -21,23 +21,28 @@ use yii\web\View;
 		]); ?>
 
 		<div class="row">
-			<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
-				? $form->field($model, 'doc_types_ids', [
+			<?= $form->field($model, 'doc_types_ids', [
+				'options' => [
+					'class' => 'col-md-12',
+				],
+
+			])->widget(Select2::class, [
+					'data' => SummonForm::getDocNames(),
 					'options' => [
-						'class' => 'col-md-12',
+						'multiple' => true,
+						'placeholder' => $model->getAttributeLabel('doc_types_ids'),
 					],
-				])->widget(Select2::class, [
-						'data' => SummonForm::getDocNames(),
-						'options' => [
-							'multiple' => true,
-							'placeholder' => $model->getAttributeLabel('doc_types_ids'),
-						],
-						'pluginOptions' => [
-							'allowClear' => true,
-						],
-					]
-				)
-				: ''
+					'pluginOptions' => [
+						'allowClear' => true,
+
+					],
+					'disabled' => !(
+						Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
+						|| (!$model->getModel()->isNewRecord && $model->getModel()->owner_id === Yii::$app->user->getId())
+					),
+				]
+			)
+
 			?>
 		</div>
 

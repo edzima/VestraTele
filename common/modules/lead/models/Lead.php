@@ -2,7 +2,6 @@
 
 namespace common\modules\lead\models;
 
-use borales\extensions\phoneInput\PhoneInputBehavior;
 use common\models\Address;
 use common\modules\lead\events\LeadEvent;
 use common\modules\lead\models\query\LeadDialerQuery;
@@ -55,14 +54,6 @@ class Lead extends ActiveRecord implements ActiveLead {
 	private ?array $users_ids = null;
 
 	public string $dateFormat = 'Y-m-d H:i:s';
-
-	public function behaviors(): array {
-		return [
-			[
-				'class' => PhoneInputBehavior::class,
-			],
-		];
-	}
 
 	public function afterSave($insert, $changedAttributes): void {
 		parent::afterSave($insert, $changedAttributes);

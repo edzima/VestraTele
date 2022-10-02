@@ -59,7 +59,7 @@ class IssueController extends Controller {
 		}
 		if (Yii::$app->user->can(Worker::PERMISSION_PAY_ALL_PAID)) {
 			$searchModel->scenario = IssueSearch::SCENARIO_ALL_PAYED;
-			if (Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)) {
+			if (Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)) {
 				$searchModel->withArchiveOnAllPayedPay = true;
 			}
 		}
@@ -68,6 +68,7 @@ class IssueController extends Controller {
 			/** @var IssueQuery $query */
 			$query = clone($dataProvider->query);
 			$query->with('customer.userProfile');
+			$query->with('tele.userProfile');
 			$query->with('type');
 			$columns = [
 				[
@@ -76,7 +77,11 @@ class IssueController extends Controller {
 				],
 				[
 					'attribute' => 'agent.fullName',
-					'label' => Yii::t('issue', 'Agent'),
+					'label' => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
+				],
+				[
+					'attribute' => 'tele.fullName',
+					'label' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 				],
 				[
 					'attribute' => 'customer.profile.firstname',

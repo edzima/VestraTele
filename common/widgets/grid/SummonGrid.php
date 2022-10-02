@@ -157,6 +157,13 @@ class SummonGrid extends GridView {
 				'attribute' => 'doc_types_ids',
 				'value' => 'docsNames',
 				'filter' => SummonSearch::getDocTypesNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'options' => [
+						'multiple' => true,
+						'placeholder' => SummonSearch::instance()->getAttributeLabel('doc_types_ids'),
+					],
+				],
 				'options' => [
 					'style' => [
 						'min-width' => '200px',

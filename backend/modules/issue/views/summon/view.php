@@ -2,7 +2,7 @@
 
 use backend\helpers\Breadcrumbs;
 use common\models\issue\Summon;
-use common\models\user\User;
+use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
@@ -20,7 +20,7 @@ YiiAsset::register($this);
 <div class="summon-view">
 
 	<p>
-		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
+		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE)
 			? Html::a(
 				Yii::t('common', 'Create note'),
 				['/issue/note/create-summon', 'id' => $model->id],
@@ -29,11 +29,11 @@ YiiAsset::register($this);
 				])
 			: ''
 		?>
-		<?= $model->isForUser(Yii::$app->user->getId()) || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
+		<?= $model->isForUser(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
 			? Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: ''
 		?>
-		<?= $model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
+		<?= $model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)
 			? Html::a(Yii::t('common', 'Delete'), ['delete', 'id' => $model->id], [
 				'class' => 'btn btn-danger',
 				'data' => [

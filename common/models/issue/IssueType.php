@@ -75,6 +75,7 @@ class IssueType extends ActiveRecord {
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getStages(): IssueStageQuery {
 		return $this->hasMany(IssueStage::class, ['id' => 'stage_id'])
+			->orderBy(['posi' => SORT_DESC, 'name' => SORT_ASC])
 			->viaTable('{{%issue_stage_type}}', ['type_id' => 'id']);
 	}
 

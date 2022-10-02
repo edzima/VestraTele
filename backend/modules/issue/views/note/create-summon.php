@@ -1,6 +1,7 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
+use backend\helpers\Html;
 use backend\modules\issue\models\IssueNoteForm;
 use common\models\issue\Summon;
 
@@ -15,6 +16,8 @@ $this->params['breadcrumbs'][] = ['label' => $summon->title, 'url' => ['summon/v
 $this->params['breadcrumbs'][] = Yii::t('issue', 'Create Issue Note');
 ?>
 <div class="issue-note-create-summon">
+
+	<h3><?= Html::encode($summon->getDocsNames()) ?></h3>
 
 	<?= $this->render('_form', [
 		'model' => $model,
