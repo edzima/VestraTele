@@ -310,4 +310,5 @@ return [
 	'Empty: not visible. Number for Order.' => 'Puste: nie wyświetlaj. Kolejność',
 	'Issue Grouped' => 'Sprawy - Grupuj',
 	'Sum' => 'Razem',
+	'Calendar Background' => 'Kalendarz - Kolor',
 ];

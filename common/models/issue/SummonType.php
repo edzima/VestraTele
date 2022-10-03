@@ -2,7 +2,6 @@
 
 namespace common\models\issue;
 
-use backend\modules\issue\models\SummonForm;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -16,6 +15,7 @@ use yii\helpers\ArrayHelper;
  * @property string $short_name
  * @property string|null $title
  * @property string|null $term
+ * @property string|null $calendar_background
  *
  * @property Summon[] $summons
  */
@@ -42,7 +42,8 @@ class SummonType extends ActiveRecord {
 			['term', 'integer', 'min' => 1],
 			[['name'], 'string', 'max' => 100],
 			[['short_name'], 'string', 'max' => 10],
-			[['title'], 'string', 'max' => 255],
+			[['title', 'calendar_background'], 'string', 'max' => 255],
+			['calendar_background', 'default', 'value' => null],
 			[['name'], 'unique'],
 			[['short_name'], 'unique'],
 		];
@@ -58,6 +59,7 @@ class SummonType extends ActiveRecord {
 			'short_name' => Yii::t('common', 'Short Name'),
 			'title' => Yii::t('common', 'Title'),
 			'term' => Yii::t('common', 'Term'),
+			'calendar_background' => Yii::t('common', 'Calendar Background'),
 		];
 	}
 

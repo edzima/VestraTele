@@ -37,6 +37,7 @@ YiiAsset::register($this);
 			'short_name',
 			'title',
 			'term',
+			'calendar_background',
 		],
 	]) ?>
 

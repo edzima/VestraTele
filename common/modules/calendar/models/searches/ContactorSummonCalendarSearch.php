@@ -2,6 +2,7 @@
 
 namespace common\modules\calendar\models\searches;
 
+use common\helpers\Html;
 use common\models\issue\query\SummonQuery;
 use common\models\issue\Summon;
 use common\models\issue\SummonType;
@@ -122,22 +123,24 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 
 	public static function getTypesFilterOptions(): array {
 		$options = [];
-		$typesNames = SummonType::getNames();
+		$types = SummonType::find()
+			->andWhere('calendar_background IS NOT NULL')
+			->orderBy('name')
+			->all();
 
-		$colors = [
-			'#E64A19', '#0097A7', '#00796B', '#388E3C', '#689F38', '#AFB42B',
-		];
-
-		foreach ($typesNames as $id => $name) {
-			$color = $colors[array_rand($colors)];
+		foreach ($types as $type) {
+			/**
+			 * @var SummonType $type
+			 */
+			$color = $type->calendar_background;
 			$options[] = [
-				'value' => $id,
+				'value' => $type->id,
 				'isActive' => true,
-				'label' => $name,
+				'label' => Html::encode($type->name),
 				'color' => $color,
 				'badge' => [
 					'background' => $color,
-					'text' => SummonType::getShortTypesNames()[$id],
+					'text' => Html::encode($type->short_name),
 				],
 			];
 		}
