@@ -37,6 +37,16 @@ $this->params['breadcrumbs'][] = $this->title;
 			'days_reminder',
 			'posi',
 			[
+				'attribute' => 'calendar_background',
+				'contentOptions' => static function (IssueStage $data): array {
+					$options = [];
+					if (!empty($data->calendar_background)) {
+						$options['style']['background-color'] = $data->calendar_background;
+					}
+					return $options;
+				},
+			],
+			[
 				'label' => Yii::t('issue', 'Issues Count'),
 				'value' => function (IssueStage $stage): int {
 					return $stage->getIssues()->count();

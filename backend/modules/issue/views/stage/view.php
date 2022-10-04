@@ -7,7 +7,8 @@ use yii\widgets\DetailView;
 /* @var $model common\models\issue\IssueStage */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Etapy', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Stages'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-stage-view">
@@ -32,6 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'name',
 			'short_name',
 			'days_reminder',
+			'calendar_background',
 		],
 	]) ?>
 

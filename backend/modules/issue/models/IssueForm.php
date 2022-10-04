@@ -37,6 +37,8 @@ class IssueForm extends Model {
 	public ?string $details = null;
 	public ?string $signature_act = null;
 
+	public ?string $stage_deadline_at = null;
+
 	public const STAGE_ARCHIVED_ID = IssueStage::ARCHIVES_ID;
 
 	public $tagsIds = [];
@@ -88,7 +90,7 @@ class IssueForm extends Model {
 			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
 			['tagsIds', 'in', 'range' => IssueTag::find()->select('id')->column(), 'allowArray' => true],
 
-			[['signing_at', 'type_additional_date_at', 'stage_change_at'], 'date', 'format' => 'Y-m-d'],
+			[['signing_at', 'type_additional_date_at', 'stage_change_at', 'stage_deadline_at'], 'date', 'format' => 'Y-m-d'],
 			[
 				'archives_nr',
 				'required',
@@ -147,6 +149,7 @@ class IssueForm extends Model {
 		$this->signing_at = $model->signing_at;
 		$this->type_additional_date_at = $model->type_additional_date_at;
 		$this->stage_change_at = $model->stage_change_at;
+		$this->stage_deadline_at = $model->stage_deadline_at;
 		$this->tagsIds = ArrayHelper::getColumn($model->tags, 'id');
 	}
 
@@ -166,6 +169,7 @@ class IssueForm extends Model {
 			$model->signature_act = $this->signature_act;
 			$model->details = $this->details;
 			$model->stage_change_at = $this->stage_change_at;
+			$model->stage_deadline_at = $this->stage_deadline_at;
 			$model->entity_responsible_id = $this->entity_responsible_id;
 			$model->signing_at = $this->signing_at;
 			$model->type_additional_date_at = $this->type_additional_date_at;

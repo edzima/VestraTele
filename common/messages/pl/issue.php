@@ -116,4 +116,5 @@ return [
 	'Create Note also in Linked Issues.' => 'Dodaj Notatkę również w Połączonych Sprawach.',
 	'Used for the Calendar.' => 'Do Kalendarza',
 	'Calendar' => 'Kalendarz',
+	'Stage Deadline At' => 'Termin Etapu',
 ];
