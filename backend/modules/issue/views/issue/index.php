@@ -51,11 +51,11 @@ $this->params['breadcrumbs'][] = $this->title;
 			: ''
 		?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE)
-			? Html::a('<i class="fa fa-calendar"></i>' . ' ' . Yii::t('issue', 'Stages Deadlines'),
-				['/calendar/issue-stage-deadline/index'],
-				['class' => 'btn btn-warning'])
-			: ''
+		<?php // Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE)
+		//			? Html::a('<i class="fa fa-calendar"></i>' . ' ' . Yii::t('issue', 'Stages Deadlines'),
+		//				['/calendar/issue-stage-deadline/index'],
+		//				['class' => 'btn btn-warning'])
+		//			: ''
 		?>
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
