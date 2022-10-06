@@ -61,14 +61,14 @@ export default class FilterManager extends Vue {
     .filters-nav {
 
         .filter-item {
-            margin: 1%;
+            margin: 0 0.5rem 0.5rem 0;
 
             .filter-btn {
                 color: white;
-                box-shadow: 0 0 3px rgba(93, 87, 87,0.3);
+                box-shadow: 0 0 3px rgba(93, 87, 87, 0.3);
 
                 &:hover {
-                    box-shadow: 0 0 5px rgba(93, 87, 87,0.7);
+                    box-shadow: 0 0 5px rgba(93, 87, 87, 0.7);
                     color: white;
                 }
             }

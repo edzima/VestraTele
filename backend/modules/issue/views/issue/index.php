@@ -50,6 +50,14 @@ $this->params['breadcrumbs'][] = $this->title;
 			? Html::a(Yii::t('backend', 'Settlements'), ['/settlement/calculation/index'], ['class' => 'btn btn-success'])
 			: ''
 		?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE)
+			? Html::a('<i class="fa fa-calendar"></i>' . ' ' . Yii::t('issue', 'Stages Deadlines'),
+				['/calendar/issue-stage-deadline/index'],
+				['class' => 'btn btn-warning'])
+			: ''
+		?>
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
 			? CsvForm::widget([
 				'formOptions' => ['class' => 'pull-right'],

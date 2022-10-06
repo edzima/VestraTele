@@ -90,6 +90,7 @@ use yii\db\Expression;
  * @property-read IssueClaim[] $claims
  * @property-read IssueRelation[] $issuesRelations
  * @property-read Issue[] $linkedIssues
+ * @property-read IssueNote|null $newestNote
  */
 class Issue extends ActiveRecord implements IssueInterface {
 
@@ -353,6 +354,11 @@ class Issue extends ActiveRecord implements IssueInterface {
 
 	public function getStageType(): ActiveQuery {
 		return $this->hasOne(StageType::class, ['type_id' => 'type_id', 'stage_id' => 'stage_id']);
+	}
+
+	public function getNewestNote(): IssueNoteQuery {
+		return $this->hasOne(IssueNote::class, ['issue_id' => 'id'])
+			->orderBy('publish_at DESC');
 	}
 
 	public function getIssueNotes(): IssueNoteQuery {

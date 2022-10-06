@@ -117,4 +117,5 @@ return [
 	'Used for the Calendar.' => 'Do Kalendarza',
 	'Calendar' => 'Kalendarz',
 	'Stage Deadline At' => 'Termin Etapu',
+	'Stages Deadlines' => 'Terminy Etapów',
 ];
