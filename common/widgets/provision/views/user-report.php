@@ -7,9 +7,10 @@ use common\widgets\grid\CurrencyColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\GridView;
 use Decimal\Decimal;
+use yii\web\View;
 use yii\widgets\DetailView;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $model ProvisionReportSummary */
 /* @var $issueColumn array */
 /* @var $actionColumn array */
@@ -55,6 +56,10 @@ use yii\widgets\DetailView;
 				'columns' => [
 					$issueColumn,
 					[
+						'attribute' => 'issue.stageName',
+						'noPrint' => true,
+					],
+					[
 						'class' => CustomerDataColumn::class,
 						'value' => 'issue.customer.fullName',
 					],
@@ -80,6 +85,10 @@ use yii\widgets\DetailView;
 				'caption' => Yii::t('provision', 'Settled costs'),
 				'columns' => [
 					$issueColumn,
+					[
+						'attribute' => 'issue.stageName',
+						'noPrint' => true,
+					],
 					[
 						'class' => CustomerDataColumn::class,
 						'value' => 'issue.customer.fullName',
