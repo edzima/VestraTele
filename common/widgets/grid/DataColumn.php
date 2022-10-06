@@ -17,6 +17,7 @@ class DataColumn extends BaseDataColumn {
 	public bool $contentBold = false;
 	public bool $contentCenter = false;
 	public bool $ellipsis = false;
+	public bool $noPrint = false;
 
 	public bool $tooltip = false;
 
@@ -24,6 +25,11 @@ class DataColumn extends BaseDataColumn {
 		parent::init();
 		if ($this->tooltip) {
 			$this->tooltipInit();
+		}
+		if ($this->noPrint) {
+			Html::addNoPrintClass($this->headerOptions);
+			Html::addNoPrintClass($this->contentOptions);
+			Html::addNoPrintClass($this->footerOptions);
 		}
 	}
 

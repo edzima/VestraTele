@@ -166,6 +166,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 			'customer' => IssueUser::getTypesNames()[IssueUser::TYPE_CUSTOMER],
 			'tagsNames' => Yii::t('issue', 'Tags Names'),
 			'stage_deadline_at' => Yii::t('issue', 'Stage Deadline At'),
+			'stageName' => Yii::t('issue', 'Stage'),
 		];
 	}
 

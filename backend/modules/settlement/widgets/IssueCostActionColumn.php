@@ -12,11 +12,12 @@ use Yii;
 class IssueCostActionColumn extends ActionColumn {
 
 	public $controller = '/settlement/cost';
-	public $template = '{settle} {link} {unlink} {view} {update} {delete}';
+	public $template = '{issue} {settle} {link} {unlink} {view} {update} {delete}';
 	public ?string $settleRedirectUrl = null;
 	public bool $settle = true;
 	public bool $unlink = false;
 	public bool $link = false;
+	public bool $issue = true;
 
 	public ?IssuePayCalculation $settlement = null;
 
@@ -25,11 +26,17 @@ class IssueCostActionColumn extends ActionColumn {
 		if ($this->settleRedirectUrl === null) {
 			$this->settleRedirectUrl = Url::current();
 		}
+		if ($this->issue && !isset($this->buttons['issue'])) {
+			$this->buttons['issue'] = function (string $key, IssueCost $cost): string {
+				return $this->issueLink($cost);
+			};
+		}
 		if ($this->settle && !isset($this->buttons['settle'])) {
 			$this->buttons['settle'] = function (string $key, IssueCost $cost): string {
 				return $this->settleLink($cost);
 			};
 		}
+
 		if ($this->settlement) {
 			if ($this->unlink && !isset($this->buttons['unlink'])) {
 				$this->buttons['unlink'] = function (string $key, IssueCost $cost): string {
@@ -50,7 +57,7 @@ class IssueCostActionColumn extends ActionColumn {
 		}
 		return Html::a(
 			Html::icon('check'),
-			['settle', 'id' => $cost->id, 'redirectUrl' => $this->settleRedirectUrl], [
+			['/settlement/cost/settle', 'id' => $cost->id, 'redirectUrl' => $this->settleRedirectUrl], [
 			'title' => Yii::t('settlement', 'Settle'),
 			'aria-label' => Yii::t('settlement', 'Settle'),
 		]);
@@ -72,5 +79,12 @@ class IssueCostActionColumn extends ActionColumn {
 				'title' => Yii::t('settlement', 'Link with settlement'),
 				'aria-label' => Yii::t('settlement', 'Link with settlement'),
 			]);
+	}
+
+	public function issueLink(IssueCost $cost): string {
+		return Html::a(
+			'<i class="fa fa-suitcase"></i>',
+			Url::issueView($cost->getIssueId())
+		);
 	}
 }
