@@ -140,6 +140,23 @@ class MarketUserController extends BaseController {
 		return $this->redirect(['market/view', 'id' => $market_id]);
 	}
 
+	public function actionUpdateReserved(int $market_id, int $user_id) {
+		$model = $this->findModel($market_id, $user_id);
+		if ($model->isToConfirm()) {
+			throw new NotFoundHttpException('Model is to Confirm');
+		}
+		$this->checkIsCreatorOrOwnerLead($model);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			if (isset($model->getDirtyAttributes()['status'])) {
+				$this->module->getMarket()->expireProcess($model->market);
+			}
+			return $this->redirect(['market/view', 'id' => $market_id]);
+		}
+		return $this->render('update', [
+			'model' => $model,
+		]);
+	}
+
 	/**
 	 * Creates a new LeadMarketUser model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.

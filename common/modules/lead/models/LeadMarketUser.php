@@ -73,6 +73,7 @@ class LeadMarketUser extends ActiveRecord {
 			[['market_id', 'status', 'user_id', 'days_reservation'], 'integer'],
 			['days_reservation', 'integer', 'min' => 1],
 			[['details'], 'string'],
+			['reserved_at', 'safe'],
 			[['market_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadMarket::class, 'targetAttribute' => ['market_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['user_id' => 'id']],
 		];

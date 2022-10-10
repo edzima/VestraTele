@@ -371,4 +371,5 @@ return [
 	'Without City' => 'Brak Miejscowości',
 	'Without Address Filter' => 'Odfiltruj bez Adresów',
 	'Your Access Request is waiting for Accept. You will be notify by Email.' => 'Czekaj na Email z Potwierdzeniem dostępu do Leada',
+	'Update Lead: {lead} Market User: {user}' => 'Edytuj Dostęp do Leada',
 ];

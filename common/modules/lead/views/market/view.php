@@ -122,7 +122,7 @@ YiiAsset::register($this);
 			[
 				'class' => ActionColumn::class,
 				'controller' => 'market-user',
-				'template' => '{accept} {give-up} {reject} {delete}',
+				'template' => '{accept} {give-up} {reject} {update-reserved} {delete}',
 				'visibleButtons' => [
 					'accept' => static function (LeadMarketUser $data) use ($model): bool {
 						return $data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
@@ -136,7 +136,9 @@ YiiAsset::register($this);
 					'reject' => static function (LeadMarketUser $data) use ($model): bool {
 						return $data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
 					},
-
+					'update-reserved' => static function (LeadMarketUser $data) use ($model): bool {
+						return !$data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
+					},
 				],
 				'buttons' => [
 					'access-request' => static function (string $url): string {
@@ -164,6 +166,13 @@ YiiAsset::register($this);
 						return Html::a(Html::icon('minus'), $url, [
 							'title' => Yii::t('lead', 'Reject'),
 							'aria-label' => Yii::t('lead', 'Reject'),
+							'data-pjax' => 1,
+						]);
+					},
+					'update-reserved' => static function (string $url): string {
+						return Html::a(Html::icon('pencil'), $url, [
+							'title' => Yii::t('lead', 'Update Reserved At'),
+							'aria-label' => Yii::t('lead', 'Update Reserved At'),
 							'data-pjax' => 1,
 						]);
 					},
