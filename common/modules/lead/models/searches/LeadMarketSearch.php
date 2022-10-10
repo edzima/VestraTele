@@ -29,6 +29,7 @@ class LeadMarketSearch extends LeadMarket {
 
 	public $visibleArea;
 
+	public $leadSource;
 	public $leadStatus;
 	public $leadName;
 	public $leadType;
@@ -43,12 +44,6 @@ class LeadMarketSearch extends LeadMarket {
 
 	public ?AddressSearch $addressSearch = null;
 
-	public static function getMarketUserStatusesNames(): array {
-		$statuses = LeadMarketUser::getStatusesNames();
-		$statuses[self::WITHOUT_MARKET_USERS] = Yii::t('lead', 'Without Market Users');
-		return $statuses;
-	}
-
 	public function attributeLabels(): array {
 		return parent::attributeLabels() + [
 				'selfAssign' => Yii::t('lead', 'Self Assign'),
@@ -56,6 +51,7 @@ class LeadMarketSearch extends LeadMarket {
 				'withoutCity' => Yii::t('lead', 'Without City'),
 				'withoutArchive' => Yii::t('lead', 'Without Archives'),
 				'leadStatus' => Yii::t('lead', 'Lead Status'),
+				'leadSource' => Yii::t('lead', 'Source'),
 			];
 	}
 
@@ -79,7 +75,7 @@ class LeadMarketSearch extends LeadMarket {
 				[
 					'!userId', 'creator_id', 'id', 'lead_id', 'status', 'creator_id',
 					'visibleArea', 'leadStatus', 'userStatus',
-					'leadStatus', 'leadType',
+					'leadStatus', 'leadType', 'leadSource',
 				], 'integer',
 			],
 			[['selfAssign', 'selfMarket', 'withoutArchive', 'withoutCity'], 'boolean'],
@@ -145,6 +141,7 @@ class LeadMarketSearch extends LeadMarket {
 		$this->applySelfAssignFilter($query);
 		$this->applyWithoutArchiveFilter($query);
 		$this->applyLeadNameFilter($query);
+		$this->applyLeadSourceNameFilter($query);
 		$this->applyLeadStatusFilter($query);
 		$this->applyLeadTypeFilter($query);
 		$this->applyMarketUserStatusFilter($query);
@@ -285,6 +282,15 @@ class LeadMarketSearch extends LeadMarket {
 			, false);
 	}
 
+	private function applyLeadSourceNameFilter(ActiveQuery $query) {
+		if (!empty($this->leadSource)) {
+			$query->joinWith('lead');
+			$query->andWhere([
+				Lead::tableName() . '.source' => $this->leadSource,
+			]);
+		}
+	}
+
 	private function applyLeadStatusFilter(ActiveQuery $query): void {
 		if (!empty($this->leadStatus)) {
 			$query->joinWith('lead');
@@ -326,16 +332,15 @@ class LeadMarketSearch extends LeadMarket {
 		}
 	}
 
-	public static function getLeadTypesNames(): array {
+	public static function getLeadSourcesNames(): array {
 		$ids = LeadMarket::find()
-			->select('type_id')
-			->joinWith('lead.leadSource')
+			->select('source_id')
+			->joinWith('lead')
 			->distinct()
 			->column();
-
 		$names = [];
 		foreach ($ids as $id) {
-			$names[$id] = LeadType::getNames()[$id];
+			$names[$id] = LeadSource::getNames()[$id];
 		}
 		return $names;
 	}
@@ -352,6 +357,26 @@ class LeadMarketSearch extends LeadMarket {
 			$names[$id] = LeadStatus::getNames()[$id];
 		}
 		return $names;
+	}
+
+	public static function getLeadTypesNames(): array {
+		$ids = LeadMarket::find()
+			->select('type_id')
+			->joinWith('lead.leadSource')
+			->distinct()
+			->column();
+
+		$names = [];
+		foreach ($ids as $id) {
+			$names[$id] = LeadType::getNames()[$id];
+		}
+		return $names;
+	}
+
+	public static function getMarketUserStatusesNames(): array {
+		$statuses = LeadMarketUser::getStatusesNames();
+		$statuses[self::WITHOUT_MARKET_USERS] = Yii::t('lead', 'Without Market Users');
+		return $statuses;
 	}
 
 }
