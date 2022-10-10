@@ -325,6 +325,7 @@ return [
 	'Accepted' => 'Zaakceptowano',
 	'Rejected' => 'Odrzucono',
 	'Request Access' => 'Zainteresowany',
+	'Request Access ({days} days)' => 'Zainteresowany ({days} dni)',
 	'How many Days' => 'Na ile Dni',
 	'Access Request for Lead: {name} from Market' => 'Prośba o Dostęp do Lead: {name} z Giełdy',
 	'{which}. from Market' => '{which}. z Giełdy',

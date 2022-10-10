@@ -3,6 +3,7 @@
 use common\helpers\Html;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
+use common\modules\lead\widgets\LeadMarketAccessRequestBtnWidget;
 use common\widgets\address\AddressDetailView;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -34,7 +35,13 @@ YiiAsset::register($this);
 
 	<p>
 		<?= $model->userCanAccessRequest(Yii::$app->user->getId())
-			? Html::a(Yii::t('lead', 'Request Access'), ['market-user/access-request', 'market_id' => $model->id], ['class' => 'btn btn-success'])
+			? LeadMarketAccessRequestBtnWidget::widget([
+				'marketId' => $model->id,
+				'options' => [
+					'class' => 'btn btn-success',
+				],
+				'inGrid' => false,
+			])
 			: ''
 		?>
 		<?= $model->isCreatorOrOwnerLead(Yii::$app->user->getId()) || !$onlyUser
@@ -141,11 +148,9 @@ YiiAsset::register($this);
 					},
 				],
 				'buttons' => [
-					'access-request' => static function (string $url): string {
-						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', $url, [
-							'title' => Yii::t('lead', 'Request Access'),
-							'aria-label' => Yii::t('lead', 'Request Access'),
-							'data-pjax' => 0,
+					'access-request' => static function (string $url, LeadMarketUser $model): string {
+						return LeadMarketAccessRequestBtnWidget::widget([
+							'marketId' => $model->market_id,
 						]);
 					},
 					'accept' => static function (string $url): string {
