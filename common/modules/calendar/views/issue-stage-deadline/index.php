@@ -15,7 +15,6 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' =>
 $this->params['breadcrumbs'][] = $this->title;
 
 CalendarAsset::register($this);
-
 $props = [
 	'filterGroups' => [
 		[
@@ -23,6 +22,12 @@ $props = [
 			'title' => Yii::t('issue', 'Stages'),
 			'filteredPropertyName' => 'stageId',
 			'filters' => IssueStageDeadlineCalendarSearch::getStagesFilters(),
+		],
+		[
+			'id' => 1,
+			'title' => Yii::t('issue', 'Lawyer'),
+			'filteredPropertyName' => 'lawyerId',
+			'filters' => IssueStageDeadlineCalendarSearch::getLawyersFilters(),
 		],
 	],
 	'eventSourcesConfig' => [
@@ -33,11 +38,10 @@ $props = [
 			'urlUpdate' => Url::to(['update']),
 		],
 	],
-	'notesEnabled' => true,
-	'URLGetNotes' => Url::to(['calendar-note/list']),
-	'URLNewNote' => Url::to(['calendar-note/add']),
-	'URLUpdateNote' => Url::to(['calendar-note/update']),
-	'URLDeleteNote' => Url::to(['calendar-note/delete']),
+	'notesEnabled' => false,
+	'calendarOptions' => [
+		'eventLimit' => 10,
+	],
 ];
 ?>
 <div class="meet-calendar-calendar">

@@ -118,4 +118,5 @@ return [
 	'Calendar' => 'Kalendarz',
 	'Stage Deadline At' => 'Termin Etapu',
 	'Stages Deadlines' => 'Terminy Etapów',
+	'Lawyer' => 'Prawnik',
 ];

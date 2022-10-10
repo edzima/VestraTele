@@ -14,6 +14,7 @@ class IssueStageDeadlineEvent extends FullCalendarEvent {
 	private static array $STAGES = [];
 
 	public int $stageId;
+	public int $lawyerId;
 
 	protected string $urlRoute = '/issue/issue/view';
 
@@ -26,6 +27,7 @@ class IssueStageDeadlineEvent extends FullCalendarEvent {
 	public function setModel(IssueInterface $issue): void {
 		$this->issue = $issue;
 		$this->id = $issue->getIssueId();
+		$this->lawyerId = $issue->getIssueModel()->lawyer->id;
 		$this->stageId = $issue->getIssueStageId();
 		$this->title = $this->getTitle();
 		$this->start = $this->getStart();
@@ -36,7 +38,7 @@ class IssueStageDeadlineEvent extends FullCalendarEvent {
 	}
 
 	protected function getTitle(): string {
-		return $this->issue->getIssueModel()->customer->getFullName() . ' - ' . $this->issue->getIssueModel()->lawyer->getFullName();
+		return $this->issue->getIssueModel()->customer->getFullName();
 	}
 
 	protected function getStart(): string {
@@ -50,7 +52,7 @@ class IssueStageDeadlineEvent extends FullCalendarEvent {
 	}
 
 	protected function getUrl(): string {
-		return Url::to([$this->urlRoute, 'id', $this->id]);
+		return Url::to([$this->urlRoute, 'id' => $this->id]);
 	}
 
 	private function getTooltipContent(): ?string {
