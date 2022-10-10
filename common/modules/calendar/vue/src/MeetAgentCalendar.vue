@@ -9,6 +9,7 @@
             :notesEnabled="notesEnabled"
             :eventSources="eventSources"
             :editable="allowUpdate"
+            :calendarOptions="calendarOptions"
             @dateClick="dateClick"
             @dateDoubleClick="dateDoubleClick"
             @eventEdit="updateDates"
@@ -52,6 +53,11 @@ export default class App extends Vue {
     @Prop({
         default: () => []
     }) filterGroups!: FilterGroup[];
+
+    @Prop({
+        default: () => {
+        }
+    }) private calendarOptions!: any;
 
     @Ref() calendarFilter!: FilterCalendar;
     @Ref() notesPopup!: PopupInterface;

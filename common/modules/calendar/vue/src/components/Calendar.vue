@@ -26,6 +26,7 @@ import tippy, {Instance, Props as TooltipOptions} from "tippy.js";
 
 const FullCalendar = require('@fullcalendar/vue').default;
 
+
 const defaultCalendarOptions: any = {
     plugins: [dayGridPlugin, listWeekPlugin, timeGridPlugin, interactionPlugin],
     header: {
@@ -34,7 +35,7 @@ const defaultCalendarOptions: any = {
         right: 'dayGridMonth,timeGridWeek,dayGridDay'
     },
     timeZone: 'Europe/Warsaw',
-    eventLimit: 5, // for all non-TimeGrid views
+    eventLimit: 8, // for all non-TimeGrid views
     defaultView: 'timeGridWeek',
     locale: plLang,
     droppable: false, // external calendars events
