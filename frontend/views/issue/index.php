@@ -31,12 +31,17 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Html::a(Yii::t('frontend', 'Search issue user'), 'user', ['class' => 'btn btn-info']) ?>
-		<?= Html::a(Yii::t('frontend', 'Yours settlements'), '/settlement/index', ['class' => 'btn btn-success']) ?>
-		<?= Html::a(Yii::t('settlement', 'Pays'), '/pay/index', ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('frontend', 'Search issue user'), ['user'], ['class' => 'btn btn-info']) ?>
+		<?= Html::a(Yii::t('frontend', 'Yours settlements'), ['/settlement/index'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('settlement', 'Pays'), ['/pay/index'], ['class' => 'btn btn-success']) ?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
+			? Html::a(Yii::t('issue', 'Summons'), ['/summon/index'], ['class' => 'btn btn-warning'])
+			: ''
+		?>
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_PAY_RECEIVED)
-			? Html::a(Yii::t('settlement', 'Received pays'), '/pay-received/index', ['class' => 'btn btn-primary'])
+			? Html::a(Yii::t('settlement', 'Received pays'), ['/pay-received/index'], ['class' => 'btn btn-primary'])
 			: ''
 		?>
 	</p>

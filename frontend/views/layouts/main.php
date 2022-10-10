@@ -108,7 +108,19 @@ AppAsset::register($this);
 			'label' => Yii::t('common', 'Summons'),
 			'url' => ['/summon/index'],
 			'visible' => Yii::$app->user->can(User::PERMISSION_SUMMON),
+
+			'items' => [
+				[
+					'label' => Yii::t('common', 'Browse'),
+					'url' => ['/summon/index'],
+				],
+				[
+					'label' => 'Kalendarz',
+					'url' => ['/calendar/summon-calendar/index'],
+				],
+			],
 		];
+
 		$menuItems[] = [
 			'label' => Yii::t('frontend', 'Articles'),
 			'url' => ['/article/index'],

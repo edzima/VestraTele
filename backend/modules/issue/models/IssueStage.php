@@ -20,8 +20,9 @@ class IssueStage extends BaseIssueStage {
 			[['name', 'short_name', 'typesIds'], 'required'],
 			[['posi', 'days_reminder'], 'integer'],
 			['posi', 'default', 'value' => 0],
+			['calendar_background', 'default', 'value' => null],
 			['days_reminder', 'integer', 'min' => 1, 'max' => 365],
-			[['name', 'short_name'], 'string', 'max' => 255],
+			[['name', 'short_name', 'calendar_background'], 'string', 'max' => 255],
 			[['name', 'short_name'], 'unique'],
 			[
 				'typesIds', 'each',
@@ -45,7 +46,7 @@ class IssueStage extends BaseIssueStage {
 			$this->link('types', IssueType::get($typeId));
 		}
 
-		return parent::afterSave($insert, $changedAttributes);
+		parent::afterSave($insert, $changedAttributes);
 	}
 
 }

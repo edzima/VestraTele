@@ -82,6 +82,15 @@ use yii\widgets\ActiveForm;
 				: '' ?>
 
 
+			<?= $form->field($model, 'stage_deadline_at', [
+				'options' => [
+					'class' => 'col-md-3 col-lg-2',
+				],
+			])
+				->widget(DateTimeWidget::class, ['phpDatetimeFormat' => 'yyyy-MM-dd'])
+			?>
+
+
 		</div>
 
 

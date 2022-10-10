@@ -83,9 +83,13 @@ class IssueStageChangeForm extends Model {
 		}
 		$model = $this->getIssue()->getIssueModel();
 		$this->previous_stage_id = $model->stage_id;
+		$model->stage_id = $this->stage_id;
+		$model->stage_change_at = $this->date_at;
+		$model->generateStageDeadlineAt();
 		$update = (bool) $model->updateAttributes([
-			'stage_id' => $this->stage_id,
-			'stage_change_at' => $this->date_at,
+			'stage_id',
+			'stage_change_at',
+			'stage_deadline_at',
 		]);
 		return $update && $this->saveNote() && $this->saveLinked();
 	}

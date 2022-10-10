@@ -1,6 +1,7 @@
 <?php
 
-use frontend\assets\CalendarAsset;
+use common\models\CalendarNews;
+use common\modules\calendar\CalendarAsset;
 use frontend\models\AgentMeetCalendarSearch;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -8,20 +9,39 @@ use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $agents string[] */
-/* @var $agentId int */
+/* @var $extraParams string[] */
 
 $this->title = 'Kalendarz';
 $this->params['breadcrumbs'][] = ['label' => 'Leady', 'url' => ['/meet/index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 CalendarAsset::register($this);
+$agentId = $extraParams[0]['value'];
 
 $props = [
-	'agentId' => $agentId,
-	'filtersItems' => AgentMeetCalendarSearch::getFiltersOptions(),
-
-	'URLGetEvents' => Url::to('/meet-calendar/list'),
-	'URLUpdateEvent' => Url::to('/meet-calendar/update'),
+	'extraHTTPParams' => $extraParams,
+	'filterGroups' => [
+		[
+			'id' => 0,
+			'title' => 'Statusy',
+			'filteredPropertyName' => 'statusId',
+			'filters' => AgentMeetCalendarSearch::getFiltersOptions(),
+		],
+		[
+			'id' => 1,
+			'title' => 'Notatki',
+			'filteredPropertyName' => 'isNote',
+			'filters' => CalendarNews::getFilters(),
+		],
+	],
+	'eventSourcesConfig' => [
+		[
+			'id' => 0,
+			'url' => '/meet-calendar/list',
+			'allDayDefault' => false,
+			'urlUpdate' => '/meet-calendar/update'
+		],
+	],
 
 	'URLAddEvent' => Url::to('/meet/create'),
 

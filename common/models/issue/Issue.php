@@ -63,6 +63,7 @@ use yii\db\Expression;
  * @property string|null $type_additional_date_at
  * @property string $stage_change_at
  * @property string|null $signature_act
+ * @property string|null $stage_deadline_at
  *
  * @property string $longId
  * @property int $clientStateId
@@ -89,6 +90,7 @@ use yii\db\Expression;
  * @property-read IssueClaim[] $claims
  * @property-read IssueRelation[] $issuesRelations
  * @property-read Issue[] $linkedIssues
+ * @property-read IssueNote|null $newestNote
  */
 class Issue extends ActiveRecord implements IssueInterface {
 
@@ -163,6 +165,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 			'signature_act' => Yii::t('common', 'Signature act'),
 			'customer' => IssueUser::getTypesNames()[IssueUser::TYPE_CUSTOMER],
 			'tagsNames' => Yii::t('issue', 'Tags Names'),
+			'stage_deadline_at' => Yii::t('issue', 'Stage Deadline At'),
 			'stageName' => Yii::t('issue', 'Stage'),
 		];
 	}
@@ -354,6 +357,11 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return $this->hasOne(StageType::class, ['type_id' => 'type_id', 'stage_id' => 'stage_id']);
 	}
 
+	public function getNewestNote(): IssueNoteQuery {
+		return $this->hasOne(IssueNote::class, ['issue_id' => 'id'])
+			->orderBy('publish_at DESC');
+	}
+
 	public function getIssueNotes(): IssueNoteQuery {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(IssueNote::class, ['issue_id' => 'id'])
@@ -512,6 +520,17 @@ class Issue extends ActiveRecord implements IssueInterface {
 		$date = new DateTime($this->stage_change_at);
 		$daysDiff = $date->diff(new DateTime())->days;
 		return $daysDiff >= $days;
+	}
+
+	public function generateStageDeadlineAt(): void {
+		if (empty($this->stage->days_reminder)) {
+			$this->stage_deadline_at = null;
+		} else {
+			$days = $this->stage->days_reminder;
+			$date = new DateTime($this->stage_change_at);
+			$date->modify("+ $days days");
+			$this->stage_deadline_at = $date->format(DATE_ATOM);
+		}
 	}
 
 }

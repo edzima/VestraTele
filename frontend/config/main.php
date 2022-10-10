@@ -3,6 +3,7 @@
 use common\behaviors\GlobalAccessBehavior;
 use common\components\User as WebUser;
 use common\models\user\User;
+use common\modules\calendar\Module as CalendarModule;
 use common\modules\lead\Module as LeadModule;
 use frontend\controllers\ApiLeadController;
 use frontend\controllers\LeadDialerController;
@@ -22,6 +23,9 @@ return [
 	'bootstrap' => ['log'],
 	'controllerNamespace' => 'frontend\controllers',
 	'modules' => [
+		'calendar' => [
+			'class' => CalendarModule::class,
+		],
 		'account' => [
 			'class' => 'frontend\modules\account\Module',
 		],

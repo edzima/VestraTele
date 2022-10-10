@@ -3,11 +3,11 @@
 namespace frontend\controllers;
 
 use common\models\issue\IssueMeet;
+use common\models\user\User;
 use common\models\user\Worker;
 use frontend\models\AgentMeetCalendarSearch;
 use udokmeci\yii2PhoneValidator\PhoneValidator;
 use Yii;
-use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -17,25 +17,31 @@ use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
+/**
+ * @deprecated
+ * @todo Remove before Merge with Master
+ */
 class MeetCalendarController extends Controller {
+
+	public $enableCsrfValidation = false;
 
 	public function behaviors(): array {
 		return [
-			'access' => [
-				'class' => AccessControl::class,
-				'rules' => [
-					[
-						'allow' => true,
-						'roles' => [Worker::PERMISSION_MEET, Worker::ROLE_AGENT],
-					],
-				],
-			],
-			'verbs' => [
-				'class' => VerbFilter::class,
-				'actions' => [
-					'update' => ['POST'],
-				],
-			],
+//			'access' => [
+//				'class' => AccessControl::class,
+//				'rules' => [
+//					[
+//						'allow' => true,
+//						'roles' => [Worker::PERMISSION_MEET, Worker::ROLE_AGENT],
+//					],
+//				],
+//			],
+'verbs' => [
+	'class' => VerbFilter::class,
+	'actions' => [
+		'update' => ['POST'],
+	],
+],
 		];
 	}
 
@@ -53,18 +59,31 @@ class MeetCalendarController extends Controller {
 
 		$agents = [];
 		if (Yii::$app->user->can(Worker::ROLE_MANAGER)) {
+			$myId = Yii::$app->user->getId();
+			$me = User::findOne(["id" => $myId]);
+			$myOption = [
+				"id" => $myId,
+				'fullName' => $me->getFullName(),
+			];
+
 			$agents = Worker::find()
 				->with('userProfile')
 				->leftJoin('issue_meet', 'user.id = issue_meet.agent_id')
 				->where('issue_meet.agent_id IS NOT NULL')
 				->all();
 
+			array_unshift($agents, $myOption);
 			$agents = ArrayHelper::map($agents, 'id', 'fullName');
 		}
 
 		return $this->render('index', [
 			'agents' => $agents,
-			'agentId' => $agentId,
+			'extraParams' => [
+				[
+					'name' => 'agentId',
+					'value' => $agentId,
+				],
+			],
 		]);
 	}
 
@@ -129,10 +148,12 @@ class MeetCalendarController extends Controller {
 		if ($model->save()) {
 			return $this->asJson(['success' => true]);
 		}
-		return $this->asJson([
+		$response = $this->asJson([
 			'success' => false,
 			'errors' => $model->getErrors(),
 		]);
+		$response->statusCode = 400;
+		return $response;
 	}
 
 	/**

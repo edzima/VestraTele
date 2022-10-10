@@ -70,17 +70,6 @@ class Summon extends ActiveRecord implements IssueInterface {
 		return '{{%summon}}';
 	}
 
-	public function beforeSave($insert) {
-		if (empty($this->realize_at)) {
-			// set hours
-			$this->realize_at = $this->start_at;
-		}
-		if (empty($this->realized_at) && $this->isRealized()) {
-			$this->realized_at = date('Y-m-d H:i:s');
-		}
-		return parent::beforeSave($insert);
-	}
-
 	/**
 	 * {@inheritdoc}
 	 */

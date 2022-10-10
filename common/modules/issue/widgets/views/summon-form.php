@@ -142,7 +142,7 @@ use yii\web\View;
 				'options' => [
 					'class' => 'col-md-2',
 				],
-			])
+			])->hint(Yii::t('issue', 'Used for the Calendar.'))
 				->widget(DateTimeWidget::class) ?>
 
 

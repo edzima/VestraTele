@@ -11,9 +11,11 @@ use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueUser;
 use common\models\issue\MeetAddress;
+use common\models\issue\Summon;
 use common\models\meet\MeetForm;
 use common\models\user\Customer;
 use common\models\user\User;
+use DateTime;
 use edzima\teryt\models\Simc;
 use Yii;
 use yii\console\Controller;
@@ -23,6 +25,31 @@ use yii\helpers\Console;
 class IssueUpgradeController extends Controller {
 
 	private $foundedCities = [];
+
+	public function actionSummonTimes(): void {
+		foreach (Summon::find()
+			->batch() as $rows) {
+			foreach ($rows as $model) {
+				/** @var Summon $model */
+				$realize = new DateTime($model->realize_at);
+				$attributes = [];
+				if ($realize->format('H') === '00') {
+					$realize->setTime(date('H', $model->created_at), date('i', $model->created_at));
+					$model->realize_at = $realize->format(DATE_ATOM);
+					$attributes[] = 'realize_at';
+				}
+				$deadline = new DateTime($model->deadline_at);
+				if ($deadline->format('H') === '00') {
+					$deadline->setTime(date('H', $model->created_at), date('i', $model->created_at));
+					$model->deadline_at = $deadline->format(DATE_ATOM);
+					$attributes[] = 'deadline_at';
+				}
+				if (!empty($attributes)) {
+					$model->updateAttributes($attributes);
+				}
+			}
+		}
+	}
 
 	public function actionCheckLead(): void {
 		$ids = [];

@@ -2,6 +2,7 @@
 
 use backend\modules\issue\models\IssueStage;
 use common\models\issue\IssueType;
+use kartik\color\ColorInput;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -30,6 +31,11 @@ use yii\widgets\ActiveForm;
 	]) ?>
 
 	<?= $form->field($model, 'days_reminder')->textInput(['maxlength' => true]) ?>
+
+	<?= $form->field($model, 'calendar_background')->widget(
+		ColorInput::class
+	) ?>
+
 
 	<div class="form-group">
 		<?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

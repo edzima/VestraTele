@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<title></title>
+	<!-- Latest compiled and minified CSS -->
+	<!--Bootstrap css-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+	props = {
+		notesEnabled: true,
+		extraHTTPParams: [
+			{
+				name: "userId",
+				value: 17302
+			}
+		],
+		filterGroups: [
+
+
+			{
+				"id": 0,
+				"title": "Statusy",
+				"filteredPropertyName": "statusId",
+				"filters": [{"value": 1, "isActive": true, "label": "Nowe", "color": "#00cc99"}, {
+					"value": 2,
+					"isActive": true,
+					"label": "W trakcie realizacji",
+					"color": "#C2185B"
+				}, {"value": 3, "isActive": true, "label": "Niepotwierdzone", "color": "#7B1FA2"}, {
+					"value": 4,
+					"isActive": true,
+					"label": "Do potwierdzenia",
+					"color": "#FF9100"
+				}, {"value": 5, "isActive": true, "label": "Zrealizowane", "color": "#303F9F"}, {
+					"value": 6,
+					"isActive": true,
+					"label": "Niezrealizowane",
+					"color": "#616161"
+				}]
+			},
+			{
+				"id": 1,
+				"title": "Typy",
+				"filteredPropertyName": "typeId",
+				"filters": [{
+					"value": 10,
+					"isActive": true,
+					"label": "Wezwanie",
+					"color": "#388E3C",
+					"badge": {"background": "#388E3C", "text": "WEZ"}
+				}, {
+					"value": 15,
+					"isActive": true,
+					"label": "Dokumentacja niekompletna",
+					"color": "#689F38",
+					"badge": {"background": "#689F38", "text": "DOK"}
+				}, {
+					"value": 20,
+					"isActive": true,
+					"label": "Telefoniczne Wezwanie",
+					"color": "#0097A7",
+					"badge": {"background": "#0097A7", "text": "TEL"}
+				}, {
+					"value": 30,
+					"isActive": true,
+					"label": "Antywindykacja",
+					"color": "#0097A7",
+					"badge": {"background": "#0097A7", "text": "ANT"}
+				}, {
+					"value": 40,
+					"isActive": true,
+					"label": "Rezygnacja",
+					"color": "#0097A7",
+					"badge": {"background": "#0097A7", "text": "REZ"}
+				}, {
+					"value": 50,
+					"isActive": true,
+					"label": "Ponaglenie",
+					"color": "#AFB42B",
+					"badge": {"background": "#AFB42B", "text": "PON"}
+				}, {
+					"value": 51,
+					"isActive": true,
+					"label": "Dokumentacja medyczna",
+					"color": "#00796B",
+					"badge": {"background": "#00796B", "text": "DM"}
+				}, {
+					"value": 52,
+					"isActive": true,
+					"label": "Decyzja do ponownego rozpatrzenia",
+					"color": "#E64A19",
+					"badge": {"background": "#E64A19", "text": "DPR"}
+				}]
+			}
+
+		],
+		eventSourcesConfig: [
+			{
+				id: 0,
+				url: '/summon-calendar/list',
+				allDayDefault: false,
+				urlUpdate: '/summon-calendar/update'
+			},
+			{
+				id: 1,
+				url: '/summon-calendar/deadline',
+				allDayDefault: true,
+				urlUpdate: '/summon-calendar/update'
+			},
+		],
+
+	}
+	document.getElementsByTagName("div")[0].setAttribute('data-props', JSON.stringify(props));
+</script>
+
+<!--jQuery-->
+<script crossorigin="anonymous" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+<!--Bootstrap js-->
+<script crossorigin="anonymous" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>
+</html>

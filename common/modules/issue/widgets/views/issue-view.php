@@ -277,6 +277,12 @@ use yii\data\ActiveDataProvider;
 							},
 						],
 						[
+							'attribute' => 'stage_deadline_at',
+							'label' => $model->getAttributeLabel('stage_deadline_at'),
+							'format' => 'date',
+							'visible' => !empty($model->getIssueModel()->stage_deadline_at),
+						],
+						[
 							'attribute' => 'entityResponsible',
 							'label' => $model->getAttributeLabel('entity_responsible_id'),
 						],
