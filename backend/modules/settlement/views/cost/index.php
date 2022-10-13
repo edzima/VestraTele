@@ -49,6 +49,13 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('common', 'Issue type'),
 			],
 			[
+				'attribute' => 'issueStage',
+				'label' => Yii::t('common', 'Issue stage'),
+				'value' => static function (IssueCost $model) {
+					return $model->getIssueModel()->getStageName() . ' - ' . Yii::$app->formatter->asDate($model->getIssueModel()->stage_change_at);
+				},
+			],
+			[
 				'attribute' => 'type',
 				'value' => 'typeName',
 				'filter' => IssueCostSearch::getTypesNames(),
