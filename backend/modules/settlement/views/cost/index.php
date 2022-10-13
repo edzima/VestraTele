@@ -8,6 +8,7 @@ use common\helpers\Html;
 use common\models\issue\IssueCost;
 use common\models\issue\IssueCostInterface;
 use common\widgets\grid\IssueTypeColumn;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model IssueCostSearch */
@@ -54,6 +55,19 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => static function (IssueCost $model) {
 					return $model->getIssueModel()->getStageName() . ' - ' . Yii::$app->formatter->asDate($model->getIssueModel()->stage_change_at);
 				},
+				'filter' => IssueCostSearch::getIssueStagesNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'options' => [
+						'multiple' => true,
+						'placeholder' => Yii::t('common', 'Issue stage'),
+					],
+					'pluginOptions' => [
+						'dropdownAutoWidth' => true,
+					],
+					'size' => Select2::SIZE_SMALL,
+					'showToggleAll' => false,
+				],
 			],
 			[
 				'attribute' => 'type',

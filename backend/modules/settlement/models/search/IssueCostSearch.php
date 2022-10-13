@@ -24,6 +24,7 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 	public $withSettlements;
 	public $is_confirmed;
 	public $issueType;
+	public $issueStage;
 
 	public $dateRange;
 	public $dateStart;
@@ -77,7 +78,9 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 			[['created_at', 'updated_at', 'date_at', 'settled_at'], 'safe'],
 			[['dateRange', 'deadlineRange', 'settledRange'], 'match', 'pattern' => '/^.+\s\-\s.+$/'],
 			[['value', 'base_value', 'vat'], 'number'],
-			['issueType', 'in', 'range' => array_keys(static::getIssueTypesNames())],
+			['issueType', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
+			['issueStage', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true],
+
 		];
 	}
 
@@ -131,7 +134,7 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 
 		$this->applyConfirmedFilter($query);
 		$this->applyDatesFilter($query);
-		//	$this->applyIssueStageFilter($query);
+		$this->applyIssueStageFilter($query);
 		$this->applyIssueTypeFilter($query);
 		$this->applySettledFilter($query);
 		$this->applyWithSettlementsFilter($query);
