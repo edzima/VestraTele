@@ -1,5 +1,7 @@
 <?php
 
+use common\models\issue\Summon;
+use common\models\SummonTypeOptions;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -29,16 +31,68 @@ YiiAsset::register($this);
 		]) ?>
 	</p>
 
-	<?= DetailView::widget([
-		'model' => $model,
-		'attributes' => [
-			'id',
-			'name',
-			'short_name',
-			'title',
-			'term',
-			'calendar_background',
-		],
-	]) ?>
+	<div class="row">
+		<div class="col-md-6">
+			<?= DetailView::widget([
+				'model' => $model,
+				'attributes' => [
+					'id',
+					'name',
+					'short_name',
+					'calendar_background',
+				],
+			]) ?>
+		</div>
+		<div class="col-md-6">
+			<?= DetailView::widget([
+				'model' => $model->getOptions(),
+				'attributes' => [
+					'showOnTop:boolean',
+					'title',
+					[
+						'attribute' => 'status',
+						'value' => Summon::getStatusesNames()[$model->getOptions()->status] ?? null,
+					],
+					[
+						'attribute' => 'formFields',
+						'value' => static function (SummonTypeOptions $options): string {
+							$fields = $options->getFormAttributesNames();
+							if (empty($fields)) {
+								return Yii::t('common', 'All');
+							}
+							return Html::ul($fields);
+						},
+						'label' => $model->getOptions()->getAttributeLabel('formAttributes'),
+						'format' => 'html',
+					],
+					[
+						'attribute' => 'visibleFields',
+						'value' => static function (SummonTypeOptions $options): string {
+							$fields = $options->getVisibleSummonAttributesNames();
+							if (empty($fields)) {
+								return Yii::t('common', 'All');
+							}
+							return Html::ul($fields);
+						},
+						'label' => $model->getOptions()->getAttributeLabel('visibleSummonFields'),
+						'format' => 'html',
+					],
+					[
+						'attribute' => 'requiredFields',
+						'value' => static function (SummonTypeOptions $options): string {
+							$fields = $options->getRequiredFieldsNames();
+							if (empty($fields)) {
+								return Yii::t('common', 'Default');
+							}
+							return Html::ul($fields);
+						},
+						'label' => $model->getOptions()->getAttributeLabel('requiredFields'),
+						'format' => 'html',
+					],
+				],
+			]) ?>
+		</div>
+	</div>
+
 
 </div>

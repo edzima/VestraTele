@@ -33,8 +33,6 @@ $this->params['breadcrumbs'][] = $this->title;
 			['class' => 'yii\grid\SerialColumn'],
 			'name',
 			'short_name',
-			'title',
-			'term',
 			[
 				'attribute' => 'calendar_background',
 				'contentOptions' => function (SummonType $data): array {
