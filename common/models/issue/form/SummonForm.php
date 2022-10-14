@@ -3,11 +3,13 @@
 namespace common\models\issue\form;
 
 use common\models\entityResponsible\EntityResponsible;
+use common\models\forms\HiddenFieldsModel;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\issue\Summon;
 use common\models\issue\SummonDoc;
 use common\models\issue\SummonType;
+use common\models\SummonTypeOptions;
 use common\models\user\User;
 use common\models\user\Worker;
 use DateTime;
@@ -23,7 +25,7 @@ use yii\helpers\ArrayHelper;
  *
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  */
-class SummonForm extends Model {
+class SummonForm extends Model implements HiddenFieldsModel {
 
 	public const SCENARIO_CONTRACTOR = 'contractor';
 
@@ -55,20 +57,22 @@ class SummonForm extends Model {
 	public $realize_at;
 	public $realized_at;
 
-	private ?Summon $model = null;
-
-	private ?array $_contractorIds = null;
 	public bool $sendEmailToContractor = true;
+
+	private ?Summon $model = null;
+	private ?array $_contractorIds = null;
+	private ?SummonType $type = null;
 
 	public function rules(): array {
 		return [
-			[['type_id', 'status', 'issue_id', 'owner_id', 'contractor_id', 'start_at', 'entity_id', 'city_id'], 'required'],
+			[['type_id', 'status', 'issue_id', 'owner_id', 'start_at'], 'required'],
+			[$this->requiredFields(), 'required'],
 			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status', 'entity_id'], 'integer'],
 			[
 				'title', 'required',
 				'message' => Yii::t('issue', 'Title cannot be blank when Docs are empty.'),
 				'when' => function (): bool {
-					return empty($this->doc_types_ids);
+					return $this->getType() === null && empty($this->doc_types_ids);
 				},
 				'enableClientValidation' => false,
 			],
@@ -76,7 +80,7 @@ class SummonForm extends Model {
 				'doc_types_ids', 'required',
 				'message' => Yii::t('issue', 'Docs cannot be blank when Title is empty.'),
 				'when' => function (): bool {
-					return empty($this->title);
+					return $this->getType() === null && empty($this->title);
 				},
 				'enableClientValidation' => false,
 			],
@@ -91,7 +95,7 @@ class SummonForm extends Model {
 			],
 			['deadline_at', 'default', 'value' => null],
 			[['start_at', 'deadline_at'], 'date', 'format' => 'yyyy-MM-dd'],
-			[['realize_at', 'realized_at'], 'date', 'format' => 'yyyy-MM-dd HH:mm'],
+			[['realize_at', 'realized_at'], 'datetime', 'format' => 'yyyy-MM-dd HH:mm:00'],
 			['entity_id', 'in', 'range' => array_keys(static::getEntityNames())],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
@@ -101,6 +105,17 @@ class SummonForm extends Model {
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			[['!owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
 		];
+	}
+
+	protected function requiredFields(): array {
+		if ($this->getType() === null || empty($this->getType()->getOptions()->requiredFields)) {
+			return [
+				'city_id',
+				'entity_id',
+				'contractor_id',
+			];
+		}
+		return $this->getType()->getOptions()->requiredFields;
 	}
 
 	public function scenarios(): array {
@@ -122,6 +137,7 @@ class SummonForm extends Model {
 			$this->getModel()->attributeLabels(), [
 			'term' => Yii::t('common', 'Term'),
 			'sendEmailToContractor' => Yii::t('issue', 'Send Email To Contractor'),
+			'start_at' => Yii::t('issue', 'Date At'),
 		]);
 	}
 
@@ -133,11 +149,19 @@ class SummonForm extends Model {
 	}
 
 	public function setType(SummonType $type): void {
+		$this->type = $type;
 		$this->type_id = $type->id;
-		if ($type->title) {
-			$this->title = $type->title;
+		$this->setOptions($type->getOptions());
+	}
+
+	public function setOptions(SummonTypeOptions $options): void {
+		if ($options->status) {
+			$this->status = $options->status;
 		}
-		$this->term = $type->term;
+		if ($options->title) {
+			$this->title = $options->title;
+		}
+		$this->term = $options->term;
 	}
 
 	public function setModel(Summon $model): void {
@@ -159,7 +183,7 @@ class SummonForm extends Model {
 
 	public function save(): bool {
 		if (!$this->validate()) {
-			Yii::warning('summon.validate', $this->getErrors());
+			Yii::warning($this->getErrors(), 'summonForm.validate');
 			return false;
 		}
 		$model = $this->getModel();
@@ -197,10 +221,7 @@ class SummonForm extends Model {
 			$this->saveDocs();
 			return true;
 		}
-		Yii::warning('summon.save.errors', [
-			'attributes' => $model->getAttributes(),
-			'errors' => $model->getErrors(),
-		]);
+		Yii::warning($model->getErrors(), 'summonForm.save');
 		$this->addErrors($model->getErrors());
 		return false;
 	}
@@ -294,4 +315,24 @@ class SummonForm extends Model {
 		];
 	}
 
+	public function isVisibleField(string $attribute): bool {
+		if (!array_key_exists($attribute, $this->attributes)) {
+			return true;
+		}
+		if ($this->getType() === null) {
+			return true;
+		}
+		if ($attribute === 'type_id') {
+			return false;
+		}
+
+		return $this->getType()->isForFormAttribute($attribute);
+	}
+
+	public function getType(): ?SummonType {
+		if ($this->type === null && !$this->getModel()->isNewRecord) {
+			return $this->getModel()->type;
+		}
+		return $this->type;
+	}
 }

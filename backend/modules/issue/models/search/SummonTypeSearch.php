@@ -2,9 +2,9 @@
 
 namespace backend\modules\issue\models\search;
 
+use common\models\issue\SummonType;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\issue\SummonType;
 
 /**
  * SummonTypeSearch represents the model behind the search form of `common\models\issue\SummonType`.
@@ -16,8 +16,8 @@ class SummonTypeSearch extends SummonType {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'term'], 'integer'],
-			[['name', 'short_name', 'title'], 'safe'],
+			[['id'], 'integer'],
+			[['name', 'short_name'], 'safe'],
 		];
 	}
 
@@ -56,12 +56,10 @@ class SummonTypeSearch extends SummonType {
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
-			'term' => $this->term,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])
-			->andFilterWhere(['like', 'short_name', $this->short_name])
-			->andFilterWhere(['like', 'title', $this->title]);
+			->andFilterWhere(['like', 'short_name', $this->short_name]);
 
 		return $dataProvider;
 	}
