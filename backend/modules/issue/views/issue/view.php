@@ -2,6 +2,8 @@
 
 use backend\helpers\Breadcrumbs;
 use backend\modules\issue\widgets\IssueSmsButtonDropdown;
+use backend\modules\issue\widgets\IssueViewSummonsWidgets;
+use backend\modules\issue\widgets\IssueViewTopSummonsWidgets;
 use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\modules\issue\widgets\SummonCreateButtonDropdown;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
@@ -157,15 +159,21 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		: ''
 	?>
 
+	<?= IssueViewTopSummonsWidgets::widget([
+		'dataProvider' => $summonDataProvider,
+	]) ?>
+
+
 	<?= IssueViewWidget::widget([
 		'model' => $model,
 		'relationActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
 		'claimActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
 	]) ?>
 
-	<?= $this->render('_summon', [
+	<?= IssueViewSummonsWidgets::widget([
 		'dataProvider' => $summonDataProvider,
 	]) ?>
+
 
 	<?= IssueNotesWidget::widget(['model' => $model]) ?>
 
