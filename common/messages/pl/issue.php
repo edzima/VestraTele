@@ -119,4 +119,6 @@ return [
 	'Stage Deadline At' => 'Termin Etapu',
 	'Stages Deadlines' => 'Terminy Etapów',
 	'Lawyer' => 'Prawnik',
+	'Summon Date: {type}' => 'Data: {type}',
+	'Summon At' => 'Data',
 ];

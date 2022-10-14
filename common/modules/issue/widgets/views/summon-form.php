@@ -74,17 +74,22 @@ use yii\web\View;
 
 
 
-			<?= !$model->getModel()->isNewRecord ? $form->field($model, 'status', [
-				'options' => [
-					'class' => 'col-md-3',
-				],
-			])->dropDownList(SummonForm::getStatusesNames()) : '' ?>
+			<?= !$model->getModel()->isNewRecord
+				? $form->field($model, 'status', [
+					'options' => [
+						'class' => 'col-md-3',
+					],
+				])->dropDownList(SummonForm::getStatusesNames())
+				: ''
+			?>
 
-			<?= $model->getModel()->isNewRecord ? $form->field($model, 'term', [
-				'options' => [
-					'class' => 'col-md-2',
-				],
-			])->dropDownList(SummonForm::getTermsNames()) : ''
+			<?= $model->getModel()->isNewRecord
+				? $form->field($model, 'term', [
+					'options' => [
+						'class' => 'col-md-2',
+					],
+				])->dropDownList(SummonForm::getTermsNames())
+				: ''
 			?>
 
 
@@ -108,9 +113,6 @@ use yii\web\View;
 					]
 				)
 			?>
-
-
-
 
 			<?= $form->field($model, 'entity_id', [
 				'options' => [
@@ -146,12 +148,15 @@ use yii\web\View;
 				->widget(DateTimeWidget::class) ?>
 
 
-			<?= !$model->getModel()->isNewRecord ? $form->field($model, 'realized_at', [
-				'options' => [
-					'class' => 'col-md-2',
-				],
-			])
-				->widget(DateTimeWidget::class) : '' ?>
+			<?= !$model->getModel()->isNewRecord
+				? $form->field($model, 'realized_at', [
+					'options' => [
+						'class' => 'col-md-2',
+					],
+				])
+					->widget(DateTimeWidget::class)
+				: ''
+			?>
 
 		</div>
 		<div class="row">
