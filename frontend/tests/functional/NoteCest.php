@@ -52,6 +52,7 @@ class NoteCest {
 			'issue_id' => $model->id,
 			'title' => 'Some title',
 			'description' => 'Some description',
+			'type' => IssueNote::TYPE_USER_FRONT,
 		]);
 		$I->seeInCurrentUrl(IssueViewCest::ROUTE_VIEW);
 	}

@@ -58,10 +58,12 @@ trait UserRbacActor {
 		$this->checkIsLogged();
 	}
 	public function waitPageLoad($wait= 0.5,$timeout = 5): void {
-		if($wait){
-			$this->wait($wait);
+		if (method_exists($this, 'wait')) {
+			if ($wait) {
+				$this->wait($wait);
+			}
+			$this->waitForJs('return document.readyState == "complete"', $timeout);
 		}
-		$this->waitForJs('return document.readyState == "complete"', $timeout);
 	}
 
 	protected function checkIsLogged(): void {

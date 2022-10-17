@@ -4,7 +4,6 @@ namespace common\modules\issue\widgets;
 
 use common\models\issue\IssueNote;
 use Yii;
-use yii\helpers\Url;
 
 /**
  * Widget for render Issue Notes.
@@ -16,12 +15,15 @@ class IssueNotesWidget extends IssueWidget {
 	public const TYPE_SETTLEMENT = IssueNote::TYPE_SETTLEMENT;
 	public const TYPE_SUMMON = IssueNote::TYPE_SUMMON;
 
+	public bool $hideUserFront = false;
+
 	public ?string $title = null;
 
 	public ?array $notes = null;
 	public ?string $type = null;
+
 	/**
-	 * @var IssueNote[]
+	 * @see IssueNoteWidget
 	 */
 	public array $noteOptions = [];
 
@@ -50,8 +52,10 @@ class IssueNotesWidget extends IssueWidget {
 		if (empty($this->notes)) {
 			return '';
 		}
+		if ($this->hideUserFront) {
+			$this->noteOptions['collapseTypes'] = [IssueNote::TYPE_USER_FRONT];
+		}
 		return $this->render('issue-notes', [
-			'model' => $this->model,
 			'noteOptions' => $this->noteOptions,
 			'notes' => $this->notes,
 			'title' => $this->title,

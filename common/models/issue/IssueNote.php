@@ -39,10 +39,11 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	public bool $updateIssueAfterSave = true;
 	public bool $updateIssueAfterDelete = true;
 
-	protected const TYPE_SMS = 'sms';
+	public const TYPE_SMS = 'sms';
 	public const TYPE_SETTLEMENT = 'settlement';
 	public const TYPE_SUMMON = 'summon';
 	public const TYPE_STAGE_CHANGE = 'stage.change';
+	public const TYPE_USER_FRONT = 'user.front';
 
 	public ?string $typeName = null;
 
@@ -118,6 +119,10 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 		return $this->isType(static::TYPE_STAGE_CHANGE);
 	}
 
+	public function isUserFrontend(): bool {
+		return $this->isType(static::TYPE_USER_FRONT);
+	}
+
 	public function isForSummon(): bool {
 		return $this->isType(static::TYPE_SUMMON);
 	}
@@ -138,15 +143,19 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	}
 
 	public function getTypeKind(): ?string {
-		$type = StringHelper::explode($this->type, ':')[0] ?? null;
-		if ($type === null) {
-			return null;
+		return StringHelper::explode($this->type, ':')[0] ?? null;
+	}
+
+	public function getTypeKindName(): ?string {
+		$typeKind = $this->getTypeKind();
+		if ($typeKind) {
+			return static::getTypesNames()[$typeKind];
 		}
-		return static::getTypesNames()[$type];
+		return null;
 	}
 
 	public function getTypeFullName(): ?string {
-		$typeKind = $this->getTypeKind();
+		$typeKind = $this->getTypeKindName();
 		if (!$typeKind) {
 			return null;
 		}
@@ -167,6 +176,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 			static::TYPE_SUMMON => Yii::t('common', 'Summon'),
 			static::TYPE_SMS => Yii::t('common', 'SMS'),
 			static::TYPE_STAGE_CHANGE => Yii::t('common', 'Stage Change'),
+			static::TYPE_USER_FRONT => Yii::t('common', 'User Frontend'),
 		];
 	}
 

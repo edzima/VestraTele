@@ -317,4 +317,6 @@ return [
 	'Form Attributes' => 'Pola Formularza',
 	'Visible Summon Fields' => 'Widoczne Kolumny',
 	'Required Fields' => 'Wymagane Pola',
+	'Stage Change' => 'Zmiana Etapu',
+	'User Frontend' => 'Użytkownik Frontend',
 ];
