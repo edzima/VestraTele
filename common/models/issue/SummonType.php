@@ -2,10 +2,12 @@
 
 namespace common\models\issue;
 
+use common\models\SummonTypeOptions;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "summon_type".
@@ -13,13 +15,14 @@ use yii\helpers\ArrayHelper;
  * @property int $id
  * @property string $name
  * @property string $short_name
- * @property string|null $title
- * @property string|null $term
  * @property string|null $calendar_background
+ * @property string|null $options
  *
  * @property Summon[] $summons
  */
 class SummonType extends ActiveRecord {
+
+	private ?SummonTypeOptions $typeModel = null;
 
 	/**
 	 * @var mixed|null
@@ -39,10 +42,9 @@ class SummonType extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['name', 'short_name'], 'required'],
-			['term', 'integer', 'min' => 1],
 			[['name'], 'string', 'max' => 100],
 			[['short_name'], 'string', 'max' => 10],
-			[['title', 'calendar_background'], 'string', 'max' => 255],
+			[['calendar_background'], 'string', 'max' => 255],
 			['calendar_background', 'default', 'value' => null],
 			[['name'], 'unique'],
 			[['short_name'], 'unique'],
@@ -57,8 +59,6 @@ class SummonType extends ActiveRecord {
 			'id' => 'ID',
 			'name' => Yii::t('common', 'Name'),
 			'short_name' => Yii::t('common', 'Short Name'),
-			'title' => Yii::t('common', 'Title'),
-			'term' => Yii::t('common', 'Term'),
 			'calendar_background' => Yii::t('common', 'Calendar Background'),
 		];
 	}
@@ -96,6 +96,29 @@ class SummonType extends ActiveRecord {
 			static::$MODELS = static::find()->indexBy('id')->all();
 		}
 		return static::$MODELS;
+	}
+
+	public function getOptions(): SummonTypeOptions {
+		if ($this->typeModel === null) {
+			$this->typeModel = new SummonTypeOptions(Json::decode($this->options));
+		}
+		return $this->typeModel;
+	}
+
+	public function isForFormAttribute(string $attribute): bool {
+		$fields = $this->getOptions()->formAttributes;
+		if (empty($fields)) {
+			return true;
+		}
+		return in_array($attribute, (array) $fields, true);
+	}
+
+	public function hasSummonVisibleField(string $attribute): bool {
+		$visibleFields = $this->getOptions()->visibleSummonFields;
+		if (empty($visibleFields)) {
+			return true;
+		}
+		return in_array($attribute, (array) $visibleFields, true);
 	}
 
 }

@@ -308,4 +308,5 @@ return [
 	'Summon Docs' => 'Dokumenty',
 	'Issue Agent SMS' => 'SMS do Przedstawiciela w Sprawie',
 	'Issue Customer SMS' => 'SMS do Klienta w Sprawie',
+	'Create Summon: {type}' => 'Dodaj - {type}',
 ];

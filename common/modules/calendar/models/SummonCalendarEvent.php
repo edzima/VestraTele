@@ -114,8 +114,12 @@ class SummonCalendarEvent extends FullCalendarEvent {
 		return static::getStatusesBackgroundColors()[$this->getModel()->status];
 	}
 
-	protected function getTooltipContent(): string {
-		return Html::encode($this->getModel()->getTitleWithDocs());
+	protected function getTooltipContent(): ?string {
+		$title = $this->getModel()->getTitleWithDocs();
+		if ($title) {
+			return Html::encode($title);
+		}
+		return null;
 	}
 
 }

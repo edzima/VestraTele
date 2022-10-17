@@ -11,10 +11,10 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model Summon */
 
-$this->title = Yii::t('common', 'Summon #{id}', ['id' => $model->id]);
+$this->title = Yii::t('common', 'Summon: {type}', ['type' => $model->typeName]);
 $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Summons'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = $model->id;
+$this->params['breadcrumbs'][] = $model->typeName;
 YiiAsset::register($this);
 ?>
 <div class="summon-view">

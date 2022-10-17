@@ -75,7 +75,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 	 */
 	public function rules(): array {
 		return [
-			[['status', 'issue_id', 'owner_id', 'contractor_id', 'entity_id', 'city_id', 'type_id'], 'required'],
+			[['status', 'issue_id', 'owner_id', 'type_id'], 'required'],
 			[['status', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
 			[['title'], 'string', 'max' => 255],
 			[['created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at'], 'safe'],
@@ -124,7 +124,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 		];
 	}
 
-	public function getTitleWithDocs(): string {
+	public function getTitleWithDocs(): ?string {
 		if (empty($this->title)) {
 			return $this->getDocsNames();
 		}

@@ -1,9 +1,10 @@
 <?php
 
-use yii\helpers\Html;
+use backend\helpers\Html;
+use backend\modules\issue\models\SummonTypeForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\SummonType */
+/* @var $model SummonTypeForm */
 
 $this->title = Yii::t('backend', 'Create Summon Type');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];

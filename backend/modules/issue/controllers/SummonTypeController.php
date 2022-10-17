@@ -2,12 +2,13 @@
 
 namespace backend\modules\issue\controllers;
 
-use Yii;
-use common\models\issue\SummonType;
 use backend\modules\issue\models\search\SummonTypeSearch;
+use backend\modules\issue\models\SummonTypeForm;
+use common\models\issue\SummonType;
+use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * SummonTypeController implements the CRUD actions for SummonType model.
@@ -63,10 +64,10 @@ class SummonTypeController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new SummonType();
+		$model = new SummonTypeForm();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
 		return $this->render('create', [
@@ -83,10 +84,12 @@ class SummonTypeController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate($id) {
-		$model = $this->findModel($id);
+		$model = new SummonTypeForm([
+			'model' => $this->findModel($id),
+		]);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
 		return $this->render('update', [
