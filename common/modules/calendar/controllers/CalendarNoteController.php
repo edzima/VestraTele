@@ -74,7 +74,7 @@ class CalendarNoteController extends Controller {
 		return $this->asJson($data);
 	}
 
-	public function actionAdd(string $news, string $date): Response {
+	public function actionAdd(string $news, string $date, string $type): Response {
 		$model = new CalendarNews();
 		$model->user_id = Yii::$app->user->getId();
 		$model->text = $news;
