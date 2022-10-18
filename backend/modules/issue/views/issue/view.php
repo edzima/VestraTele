@@ -177,7 +177,6 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model,
-		'hideUserFront' => true,
 	]) ?>
 
 </div>

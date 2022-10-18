@@ -12,15 +12,20 @@ use Yii;
  */
 class IssueNotesWidget extends IssueWidget {
 
+	public const TYPE_USER_FRONT = IssueNote::TYPE_USER_FRONT;
 	public const TYPE_SETTLEMENT = IssueNote::TYPE_SETTLEMENT;
 	public const TYPE_SUMMON = IssueNote::TYPE_SUMMON;
-
-	public bool $hideUserFront = false;
+	public const TYPE_SMS = IssueNote::TYPE_SMS;
 
 	public ?string $title = null;
 
 	public ?array $notes = null;
 	public ?string $type = null;
+
+	public array $collapseTypes = [
+		self::TYPE_SMS,
+		self::TYPE_USER_FRONT,
+	];
 
 	/**
 	 * @see IssueNoteWidget
@@ -52,9 +57,7 @@ class IssueNotesWidget extends IssueWidget {
 		if (empty($this->notes)) {
 			return '';
 		}
-		if ($this->hideUserFront) {
-			$this->noteOptions['collapseTypes'] = [IssueNote::TYPE_USER_FRONT];
-		}
+		$this->noteOptions['collapseTypes'] = $this->collapseTypes;
 		return $this->render('issue-notes', [
 			'noteOptions' => $this->noteOptions,
 			'notes' => $this->notes,
