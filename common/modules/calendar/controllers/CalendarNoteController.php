@@ -3,17 +3,20 @@
 namespace common\modules\calendar\controllers;
 
 use common\helpers\ArrayHelper;
+use common\helpers\Html;
 use common\models\CalendarNews;
-use common\models\user\Worker;
-use frontend\helpers\Html;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
-use yii\web\ForbiddenHttpException;
-use yii\web\MethodNotAllowedHttpException;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
-class CalendarNoteController extends Controller {
+abstract class CalendarNoteController extends Controller {
+
+	abstract protected function getType(): string;
+
+	public bool $allowWithoutUser = false;
+	public bool $alwaysWithoutUser = false;
 
 	/**
 	 * @inheritdoc
@@ -28,7 +31,7 @@ class CalendarNoteController extends Controller {
 			'verbs' => [
 				'class' => VerbFilter::class,
 				'actions' => [
-					'add' => ['POST'],
+					'create' => ['POST'],
 					'update' => ['POST'],
 					'delete' => ['POST'],
 				],
@@ -42,11 +45,11 @@ class CalendarNoteController extends Controller {
 	}
 
 	public function actionList(string $start = null, string $end = null, int $userId = null): Response {
-		if ($userId === null) {
+		if ($userId === null && !$this->allowWithoutUser) {
 			$userId = (int) Yii::$app->user->getId();
 		}
-		if ($userId !== (int) Yii::$app->user->getId() && !Yii::$app->user->can(Worker::PERMISSION_SUMMON_CREATE)) {
-			throw new MethodNotAllowedHttpException();
+		if ($this->alwaysWithoutUser) {
+			$userId = null;
 		}
 		if ($start === null) {
 			$start = date('Y-m-01');
@@ -54,32 +57,41 @@ class CalendarNoteController extends Controller {
 		if ($end === null) {
 			$end = date('Y-m-t 23:59:59');
 		}
+
 		/** @var CalendarNews[] $models */
 		$models = CalendarNews::find()
-			->andWhere(['user_id' => $userId])
+			->andFilterWhere(['user_id' => $userId])
 			->andWhere(['>=', 'start_at', $start])
 			->andWhere(['<=', 'end_at', $end])
+			->andWhere(['type' => $this->getType()])
 			->all();
 		$data = [];
 		foreach ($models as $model) {
-			$data[] = [
-				'id' => $model->id,
-				'title' => Html::encode($model->text),
-				'start' => $model->start_at,
-				'end' => $model->end_at,
-				'isNote' => true,
-			];
+			$data[] = $this->getListEventData($model);
 		}
 
 		return $this->asJson($data);
 	}
 
-	public function actionAdd(string $news, string $date, string $type): Response {
+	protected function getListEventData(CalendarNews $model): array {
+		return [
+			'id' => $model->id,
+			'title' => Html::encode($model->text),
+			'start' => $model->start_at,
+			'end' => $model->end_at,
+			'isNote' => true,
+			'delete' => $this->allowDelete($model),
+			'update' => $this->allowUpdate($model),
+		];
+	}
+
+	public function actionCreate(string $news, string $date): Response {
 		$model = new CalendarNews();
 		$model->user_id = Yii::$app->user->getId();
 		$model->text = $news;
 		$model->start_at = $date;
 		$model->end_at = $date;
+		$model->type = $this->getType();
 		if ($model->save()) {
 			return $this->asJson([
 				'id' => $model->id,
@@ -110,17 +122,34 @@ class CalendarNoteController extends Controller {
 
 	public function actionDelete(int $id): Response {
 		$model = $this->findModel($id);
+		if ($this->allowDelete($model)) {
+			return $this->asJson([
+				'success' => $model->delete(),
+			]);
+		}
 		return $this->asJson([
-			'success' => $model->delete(),
+			'success' => false,
 		]);
 	}
 
-	private function findModel(int $id): CalendarNews {
-		$model = CalendarNews::findOne($id);
+	protected function findModel(int $id): CalendarNews {
+		$model = CalendarNews::find()
+			->andWhere(['id' => $id])
+			->andWhere(['type' => $this->getType()])
+			->one();
+
 		if ($model !== null) {
 			return $model;
 		}
-		throw new ForbiddenHttpException();
+		throw new NotFoundHttpException();
+	}
+
+	protected function allowDelete(CalendarNews $model): bool {
+		return $model->user_id === Yii::$app->user->getId();
+	}
+
+	protected function allowUpdate(CalendarNews $model) {
+		return $model->user_id === Yii::$app->user->getId();
 	}
 
 }
