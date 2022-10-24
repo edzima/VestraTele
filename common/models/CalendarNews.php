@@ -14,10 +14,14 @@ use yii\db\ActiveRecord;
  * @property int $user_id
  * @property string $start_at
  * @property string $end_at
+ * @property string $type
  *
  * @property-read User $user
  */
 class CalendarNews extends ActiveRecord {
+
+	public const TYPE_ISSUE_STAGE_DEADLINE = 'issue.stage.deadline';
+	public const TYPE_SUMMON = 'summon';
 
 	/**
 	 * @inheritdoc
@@ -48,20 +52,6 @@ class CalendarNews extends ActiveRecord {
 			'user_id' => 'User',
 			'start_at' => 'Start',
 			'end_at' => 'End',
-		];
-	}
-
-	public static function getFilters(): array {
-		return [
-			[
-				'value' => true,
-				'isActive' => true,
-				'label' => 'notatka',
-				'color' => '#009688',
-				'eventColors' => [
-					'background' => '#009688',
-				],
-			]
 		];
 	}
 

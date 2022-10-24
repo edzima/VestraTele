@@ -1,7 +1,13 @@
 <template>
     <div class="calendar-notes">
         <template v-if="isOperation('view')">
-            <NotesList v-if="operation==='view'" :notes="localNotes" confirmDelete editable @deleteClick="deleteNote" @editClick="editNote"/>
+            <NotesList
+                :notes="localNotes"
+                confirmDelete
+                editable
+                @deleteClick="deleteNote"
+                @editClick="editNote"
+            />
             <p v-if="!localNotes.length" class="note-placeholder text-primary"> Brak notatek </p>
             <Button class="btn btn-primary" @click="addNote">Dodaj Notatkę</Button>
         </template>
@@ -24,10 +30,10 @@ import NotesList from "@/components/NotesList.vue";
 export default class CalendarNotes extends Vue {
 
     @Prop() onNoteUpdate: Function | undefined;
-    @Prop() onNoteDelete: Function | undefined;
     @Prop() onNoteAdd: Function | undefined;
     @Prop({default: () => []}) notes!: NoteInterface[];
     @Prop({default: () => false}) editable!: boolean;
+    @Prop() URLDelete!: string;
 
     private noteToEdit: NoteInterface | null = null;
     private operation: 'view' | 'edit' = 'view';
@@ -48,13 +54,21 @@ export default class CalendarNotes extends Vue {
 
     private addNote() {
         this.operation = "edit";
-        this.noteToEdit = {id: null, content: ''};
+        this.noteToEdit = {id: null, content: '', update: true, delete: true};
     }
 
-    private async deleteNote(noteToDel: NoteInterface): Promise<void> {
-        const success = typeof this.onNoteUpdate === "function" ? await this.onNoteDelete!(noteToDel) : true;
-        if (!success) return;
-        this.removeNoteFromList(noteToDel);
+    private async deleteNote(note: NoteInterface): Promise<boolean> {
+        if (this.URLDelete) {
+            const params: URLSearchParams = new URLSearchParams();
+            params.append('id', String(note.id));
+            const res = await this.axios.post(this.URLDelete, params);
+            if (res.status !== 200) return false;
+            this.removeNoteFromList(note);
+            this.$emit('deleteNote', note);
+            return true;
+        }
+        return false;
+
     }
 
     private noteChangesHandler(note: NoteInterface): void {
@@ -63,14 +77,13 @@ export default class CalendarNotes extends Vue {
         } else {
             this.addAndSaveNote(note);
         }
-        this.noteToEdit = {id: null, content: ''};
-        this.operation = "view";
+        this.discardEditChanges();
     }
 
     private async addAndSaveNote(note: NoteInterface): Promise<void> {
         const noteId = typeof this.onNoteAdd === "function" ? await this.onNoteAdd!(note) : true;
         if (!noteId) return;
-        this.addNoteToList({id: noteId, content: note.content});
+        this.addNoteToList({id: noteId, content: note.content, update: true, delete: true});
     }
 
     private addNoteToList(newNote: NoteInterface) {
@@ -90,9 +103,8 @@ export default class CalendarNotes extends Vue {
                     ...note,
                     content: newNote.content
                 }
-            } else {
-                return note;
             }
+            return note;
         })
     }
 
@@ -101,7 +113,7 @@ export default class CalendarNotes extends Vue {
     }
 
     private discardEditChanges(): void {
-        this.noteToEdit = {id: null, content: ''};
+        this.noteToEdit = {id: null, content: '', delete: true, update: true};
         this.operation = "view";
     }
 }

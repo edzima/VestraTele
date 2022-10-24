@@ -64,10 +64,10 @@ $props = [
 		],
 	],
 	'URLAddEvent' => Url::to('/summon/create'),
-	'URLGetNotes' => Url::to(['calendar-note/list']),
-	'URLNewNote' => Url::to(['calendar-note/add']),
-	'URLUpdateNote' => Url::to(['calendar-note/update']),
-	'URLDeleteNote' => Url::to(['calendar-note/delete']),
+	'URLGetNotes' => Url::to(['summon-calendar-note/list']),
+	'URLCreateNote' => Url::to(['summon-calendar-note/create']),
+	'URLUpdateNote' => Url::to(['summon-calendar-note/update']),
+	'URLDeleteNote' => Url::to(['summon-calendar-note/delete']),
 ];
 ?>
 <div class="meet-calendar-calendar">

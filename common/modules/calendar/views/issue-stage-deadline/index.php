@@ -10,7 +10,7 @@ use yii\helpers\Url;
 /* @var $users string[]|null */
 /* @var $indexUrl string */
 
-$this->title = Yii::t('issue', 'Calendar');
+$this->title = Yii::t('issue', 'Stages Deadlines');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => $indexUrl];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -38,10 +38,14 @@ $props = [
 			'urlUpdate' => Url::to(['update']),
 		],
 	],
-	'notesEnabled' => false,
 	'calendarOptions' => [
 		'eventLimit' => 10,
 	],
+	'notesEnabled' => true,
+	'URLGetNotes' => Url::to(['issue-stage-deadline-calendar-note/list']),
+	'URLCreateNote' => Url::to(['issue-stage-deadline-calendar-note/create']),
+	'URLUpdateNote' => Url::to(['issue-stage-deadline-calendar-note/update']),
+	'URLDeleteNote' => Url::to(['issue-stage-deadline-calendar-note/delete']),
 ];
 ?>
 <div class="meet-calendar-calendar">

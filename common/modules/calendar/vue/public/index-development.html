@@ -21,9 +21,11 @@
 				value: 17302
 			}
 		],
+		URLGetNotes: '/issue-stage-deadline-calendar-note/list',
+		URLDeleteNote: '/issue-stage-deadline-calendar-note/delete',
+		URLCreateNote: '/issue-stage-deadline-calendar-note/create',
+		URLUpdateNote: '/issue-stage-deadline-calendar-note/update',
 		filterGroups: [
-
-
 			{
 				"id": 0,
 				"title": "Statusy",
@@ -104,16 +106,10 @@
 		eventSourcesConfig: [
 			{
 				id: 0,
-				url: '/summon-calendar/list',
+				url: '/issue-stage-deadline/list',
 				allDayDefault: false,
-				urlUpdate: '/summon-calendar/update'
-			},
-			{
-				id: 1,
-				url: '/summon-calendar/deadline',
-				allDayDefault: true,
-				urlUpdate: '/summon-calendar/update'
-			},
+				urlUpdate: '/issue-stage-deadline/update'
+			}
 		],
 
 	}
