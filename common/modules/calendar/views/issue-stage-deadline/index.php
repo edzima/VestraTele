@@ -10,7 +10,7 @@ use yii\helpers\Url;
 /* @var $users string[]|null */
 /* @var $indexUrl string */
 
-$this->title = Yii::t('issue', 'Calendar');
+$this->title = Yii::t('issue', 'Stages Deadlines');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => $indexUrl];
 $this->params['breadcrumbs'][] = $this->title;
 
