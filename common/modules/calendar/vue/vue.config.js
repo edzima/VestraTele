@@ -1,7 +1,7 @@
 module.exports = {
     outputDir: '../static',
     devServer: {
-        proxy: 'https://edzima.vestra.edzima.net'
+        proxy: 'https://edzima.vestra.edzima.net/calendar/'
     },
     filenameHashing: false,
     chainWebpack: config => {

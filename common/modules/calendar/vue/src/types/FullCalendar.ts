@@ -13,9 +13,12 @@ export interface EventObject {
     remove: Function;
 }
 
+
 export interface EventProps {
     isNote?: boolean,
-    tooltipContent?: string
+    tooltipContent?: string,
+    update?: boolean,
+    delete?: boolean
 }
 
 export interface EventSourceObject {

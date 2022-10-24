@@ -1,7 +1,14 @@
 <template>
     <div class="filter-calendar">
         <BootstrapPopup :title="this.notePopupTitle" outerDissmisable ref="notesPopup" v-if="notesEnabled">
-            <CalendarNotes :notes="dayNotes" :onNoteAdd="addNote" :onNoteDelete="deleteNote" :onNoteUpdate="editNoteText" editable/>
+            <CalendarNotes
+                :URLDelete="URLDeleteNote"
+                :notes="dayNotes"
+                :onNoteAdd="addNote"
+                :onNoteUpdate="editNoteText"
+                editable
+                @deleteNote="deleteNote"
+            />
         </BootstrapPopup>
 
         <FilterCalendar
@@ -59,12 +66,49 @@ export default class App extends Vue {
         }
     }) private calendarOptions!: any;
 
+    @Prop({
+        default: () => true // to change
+    })
+    private allowUpdate!: boolean; // allow user to edit events
+
+    @Prop({
+        required: false,
+        default: () => []
+    })
+    private extraHTTPParams!: ExtraParam[];
+
+    @Prop()
+    private URLAddEvent!: string;
+
+    @Prop({
+        default: () => true
+    })
+    private notesEnabled!: boolean;
+
+    @Prop()
+    private URLGetNotes!: string;
+
+    @Prop()
+    private URLCreateNote!: string;
+
+    @Prop()
+    private URLUpdateNote!: string;
+
+    @Prop()
+    private URLDeleteNote!: string;
+
+    @Prop({
+        default: () => 100
+    })
+    private NoteResourceId!: number;
+
     @Ref() calendarFilter!: FilterCalendar;
     @Ref() notesPopup!: PopupInterface;
 
     private dayNotes: NoteInterface[] = [];
     private notePopupTitle: string = '';
     private notePopupDate!: Date;
+
 
     get eventSources(): EventSourceObject[] {
         return [...this.mapEventSources(this.eventSourcesConfig), this.getNotesSettings()]
@@ -85,10 +129,6 @@ export default class App extends Vue {
         })
     }
 
-    @Prop({
-        default: () => 100
-    })
-    private NoteResourceId!: number;
 
     private getNotesSettings(): EventSourceObject {
         if (!this.notesEnabled) return {};
@@ -107,7 +147,9 @@ export default class App extends Vue {
             })
             .map((event: EventObject) => ({
                 content: event.title,
-                id: event.id
+                id: event.id,
+                update: event.extendedProps.update,
+                delete: event.extendedProps.delete
             }));
     }
 
@@ -123,22 +165,15 @@ export default class App extends Vue {
 
     private dateClick(dateInfo: any): void {
         if (!this.notesEnabled) return;
+        const date = dateInfo.date ? dateInfo.date : dateInfo.event.start;
         this.dayNotes = this.getNotesFromDayInfo(dateInfo);
-        this.notePopupTitle = 'Notatki ' + dateInfo.date.toLocaleDateString();
-        this.notePopupDate = dateInfo.date;
+        this.notePopupTitle = 'Notatki ' + date.toLocaleDateString();
+        this.notePopupDate = date;
         this.notesPopup.show();
     }
 
-    private async deleteNote(noteToDel: NoteInterface): Promise<boolean> {
-        const params: URLSearchParams = new URLSearchParams();
-        params.append('id', String(noteToDel.id));
-        this.extraHTTPParams.forEach((param: ExtraParam) => {
-            params.append(param.name, String(param.value));
-        })
-        const res = await this.axios.post(this.URLDeleteNote, params);
-        if (res.status !== 200) return false;
+    private deleteNote(noteToDel: NoteInterface): void {
         this.calendarFilter.deleteEventById(noteToDel.id!);
-        return true;
     }
 
     private dateDoubleClick(dateInfo: DateClickWithDayEvents): void {
@@ -177,53 +212,13 @@ export default class App extends Vue {
             params.append(param.name, String(param.value));
         })
 
-        const res = await this.axios.post(this.URLNewNote, params);
+        const res = await this.axios.post(this.URLCreateNote, params);
         if (res.status !== 200) return false;
         if (!res.data.id) return false;
         this.resourceNotes();
         return res.data.id;
     }
 
-    @Prop({
-        default: () => true // to change
-    })
-    private allowUpdate!: boolean; // allow user to edit events
-
-    @Prop({
-        required: false,
-        default: () => []
-    })
-    private extraHTTPParams!: ExtraParam[];
-
-    @Prop({
-        default: () => '/summon/create'
-    })
-    private URLAddEvent!: string;
-
-    @Prop({
-        default: () => true
-    })
-    private notesEnabled!: boolean;
-
-    @Prop({
-        default: () => '/calendar-note/list'
-    })
-    private URLGetNotes!: string;
-
-    @Prop({
-        default: () => '/calendar-note/add'
-    })
-    private URLNewNote!: string;
-
-    @Prop({
-        default: () => '/calendar-note/update'
-    })
-    private URLUpdateNote!: string;
-
-    @Prop({
-        default: () => '/calendar-note/delete'
-    })
-    private URLDeleteNote!: string;
 
     private resourceNotes(): void {
         if (this.notesEnabled) {
@@ -236,6 +231,10 @@ export default class App extends Vue {
         hideAllTippy();
         const event: EventObject = e.event;
         const isNote = this.eventIsNote(event);
+        if (isNote && !event.extendedProps.update) {
+            e.revert();
+            return;
+        }
 
         const url: string = isNote ? this.URLUpdateNote : event.extendedProps.urlUpdate;
 
