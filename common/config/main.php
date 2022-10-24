@@ -69,6 +69,7 @@ return [
 		'assetManager' => [
 			'class' => 'yii\web\AssetManager',
 			'linkAssets' => getenv('LINK_ASSETS'),
+			'appendTimestamp' => true,
 		],
 		'formatter' => [
 			'class' => Formatter::class,
