@@ -147,7 +147,7 @@ class LeadCSVImport extends Model {
 					$phone = $line[$this->phoneColumn];
 					$model = new LeadForm(['phone' => $phone]);
 					$model->validate(['phone']);
-					return $model->phone;
+					return $model->getPhone();
 				},
 				'unique' => true,
 			],
