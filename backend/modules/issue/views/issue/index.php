@@ -39,22 +39,34 @@ $this->params['breadcrumbs'][] = $this->title;
 	<div class="clearfix form-group">
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
-			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index'], ['class' => 'btn btn-warning'])
+			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index'], [
+				'class' => 'btn btn-warning',
+				'data-pjax' => 0,
+			])
 			: ''
 		?>
 		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE)
-			? Html::a(Yii::t('issue', 'Issue Notes'), ['note/index'], ['class' => 'btn btn-info'])
+			? Html::a(Yii::t('issue', 'Issue Notes'), ['note/index'], [
+				'class' => 'btn btn-info',
+				'data-pjax' => 0,
+			])
 			: ''
 		?>
 		<?= Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)
-			? Html::a(Yii::t('backend', 'Settlements'), ['/settlement/calculation/index'], ['class' => 'btn btn-success'])
+			? Html::a(Yii::t('backend', 'Settlements'), ['/settlement/calculation/index'], [
+				'class' => 'btn btn-success',
+				'data-pjax' => 0,
+			])
 			: ''
 		?>
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE)
 			? Html::a('<i class="fa fa-calendar"></i>' . ' ' . Yii::t('issue', 'Stages Deadlines'),
 				['/calendar/issue-stage-deadline/index'],
-				['class' => 'btn btn-warning'])
+				[
+					'class' => 'btn btn-warning',
+					'data-pjax' => 0,
+				])
 			: ''
 		?>
 
