@@ -4,6 +4,7 @@ namespace backend\modules\provision\controllers;
 
 use backend\helpers\Url;
 use backend\modules\provision\models\SettlementUserProvisionsForm;
+use common\components\provision\exception\Exception;
 use common\components\provision\exception\MissingProvisionUserException;
 use common\helpers\Flash;
 use common\models\issue\IssueCost;
@@ -105,7 +106,7 @@ class SettlementController extends Controller {
 					)
 				);
 			}
-		} catch (MissingProvisionUserException $exception) {
+		} catch (Exception $exception) {
 			Flash::add(Flash::TYPE_ERROR, $exception->getMessage());
 		}
 	}
