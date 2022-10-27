@@ -30,6 +30,7 @@ class ProvisionType extends ActiveRecord {
 	protected const INDEX_KEY = 'id';
 
 	public const KEY_DATA_WITH_HIERARCHY = 'with-hierarchy';
+	public const KEY_DATA_BASE_TYPE_ID = 'base-type_id';
 
 	/**
 	 * @var static[]|null
@@ -68,7 +69,16 @@ class ProvisionType extends ActiveRecord {
 			'is_percentage' => Yii::t('provision', 'Is percentage'),
 			'is_active' => Yii::t('common', 'Is active'),
 			'withHierarchy' => Yii::t('provision', 'With hierarchy'),
+			'baseTypeId' => Yii::t('provision', 'Base Type'),
 		];
+	}
+
+	public function getBaseType(): ?self {
+		$typeId = $this->getBaseTypeId();
+		if ($typeId === null) {
+			return null;
+		}
+		return static::getType($typeId, false);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
@@ -125,6 +135,14 @@ class ProvisionType extends ActiveRecord {
 			return $date >= $fromAt && $date <= new DateTime($this->to_at);
 		}
 		return $date <= new DateTime($this->to_at);
+	}
+
+	public function getBaseTypeId(): ?int {
+		return $this->getDataArray()[static::KEY_DATA_BASE_TYPE_ID] ?? null;
+	}
+
+	public function setBaseTypeId(?int $value): void {
+		$this->setDataValues(static::KEY_DATA_BASE_TYPE_ID, $value);
 	}
 
 	public function setWithHierarchy(bool $withHierarchy): void {

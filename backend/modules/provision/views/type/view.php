@@ -44,9 +44,11 @@ YiiAsset::register($this);
 		'attributes' => [
 			'name',
 			'is_active:boolean',
+			'baseType.name:text:' . Yii::t('provision', 'Base Type'),
 			'formattedValue',
 			'issueUserTypeName',
 			'issueRequiredUserTypesNames',
+			'issueExcludedUserTypesNames',
 			'issueTypesNames',
 			'issueStagesNames',
 			'settlementTypesNames',

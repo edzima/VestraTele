@@ -34,7 +34,15 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'issueUserTypeName',
 				'noWrap' => true,
 			],
-			'issueRequiredUserTypesNames',
+			[
+				'attribute' => 'issueRequiredUserTypesNames',
+				'noWrap' => true,
+			],
+			[
+				'attribute' => 'baseType.name',
+				'noWrap' => true,
+				'label' => Yii::t('provision', 'Base Type'),
+			],
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'value',

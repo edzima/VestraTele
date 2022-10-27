@@ -69,7 +69,7 @@ return [
 	'Type' => 'Typ',
 	'Types not set.' => 'Typy nieustalone.',
 	'For whom' => 'Dla kogo',
-	'Required issue user types' => 'Kto musi być w sprawie',
+	'Required issue user types' => 'Kto musi być w Sprawie',
 	'Any user has not provision.' => 'Żadnemu użytkownikowi nie należy się prowizja.',
 	'Not active types for settlement: {settlement}.' => 'Brak Aktywnych Typów prowizji dla rozliczenia: {settlement}.',
 	'Not active {userType} types for settlement: {settlement}.' => 'Brak Aktywnych Typów prowizji ({userType}) dla rozliczenia: {settlement}.',
@@ -77,4 +77,11 @@ return [
 	'In report' => 'W Raporcie',
 	'Sum {value}' => 'Suma: {value}',
 	'Remove {count} provisions.' => 'Usunięto {count} prowizje.',
+	'Success! Generate {count} provisions.' => 'Sukces. Wygenerowano {count} prowizji.',
+	'Base Type' => 'Typ Podstawowy',
+	'Settlement: {type} has more than one active provision type for user type: {userType}.' => 'Rozliczenie: {type} dla {userType} ma więcej niż 1 aktywny typ prowizji.',
+	'Excluded Users Types' => 'Wykluczeni',
+	'Excluded issue user types' => 'Kto nie może być w Sprawie',
 ];
+
+

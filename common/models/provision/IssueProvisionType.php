@@ -20,6 +20,7 @@ class IssueProvisionType extends ProvisionType {
 	private const KEY_DATA_ISSUE_TYPES = 'issue.types';
 	private const KEY_DATA_ISSUE_REQUIRED_USER_TYPES = 'issue.user.types.required';
 	public const KEY_DATA_ISSUE_USER_TYPE = 'issue.user.type';
+	public const KEY_DATA_ISSUE_EXCLUDED_USER_TYPES = 'issue.user.types.excluded';
 
 	public static function settlementTypesNames(): array {
 		return IssuePayCalculation::getTypesNames();
@@ -44,6 +45,7 @@ class IssueProvisionType extends ProvisionType {
 			'issueTypesNames' => Yii::t('common', 'Issue Types'),
 			'issueStagesNames' => Yii::t('common', 'Issue Stages'),
 			'issueUserTypeName' => Yii::t('common', 'Issue user type'),
+			'issueExcludedUserTypesNames' => Yii::t('provision', 'Excluded Users Types'),
 		]);
 	}
 
@@ -90,6 +92,14 @@ class IssueProvisionType extends ProvisionType {
 		$this->setDataValues(static::KEY_DATA_ISSUE_REQUIRED_USER_TYPES, $types);
 	}
 
+	public function getIssueExcludedUserTypes(): array {
+		return $this->getDataArray()[static::KEY_DATA_ISSUE_EXCLUDED_USER_TYPES] ?? [];
+	}
+
+	public function setIssueExcludedUserTypes(array $types): void {
+		$this->setDataValues(static::KEY_DATA_ISSUE_EXCLUDED_USER_TYPES, $types);
+	}
+
 	public function getSettlementTypesNames(): string {
 		$types = $this->getSettlementTypes();
 		if (empty($types)) {
@@ -121,7 +131,14 @@ class IssueProvisionType extends ProvisionType {
 	}
 
 	public function getIssueRequiredUserTypesNames(): string {
-		$types = $this->getIssueRequiredUserTypes();
+		return static::getIssueUserTypesNames($this->getIssueRequiredUserTypes());
+	}
+
+	public function getIssueExcludedUserTypesNames(): string {
+		return static::getIssueUserTypesNames($this->getIssueExcludedUserTypes());
+	}
+
+	protected static function getIssueUserTypesNames(array $types): string {
 		if (empty($types)) {
 			return Yii::t('yii', '(not set)');
 		}
@@ -136,6 +153,7 @@ class IssueProvisionType extends ProvisionType {
 	public function isForIssue(Issue $issue): bool {
 		return
 			$this->hasRequiredIssueUserTypes($issue)
+			&& !$this->hasExcludedIssueUserTypes($issue)
 			&& $this->isForDate($issue->created_at)
 			&& $this->isForIssueStage($issue->stage_id)
 			&& $this->isForIssueType($issue->type_id);
@@ -158,6 +176,25 @@ class IssueProvisionType extends ProvisionType {
 			}
 		}
 		return true;
+	}
+
+	public function hasExcludedIssueUserTypes(Issue $issue = null, array $types = []): bool {
+		$excludedTypes = $this->getIssueExcludedUserTypes();
+		if (empty($excludedTypes)) {
+			return false;
+		}
+		if (empty($types)) {
+			if ($issue === null) {
+				throw new InvalidCallException('$types cannot be empty when $issue is null.');
+			}
+			$types = ArrayHelper::getColumn($issue->users, 'type');
+		}
+		foreach ($excludedTypes as $type) {
+			if (in_array($type, $types, true)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function isForSettlementType(int $type): bool {
