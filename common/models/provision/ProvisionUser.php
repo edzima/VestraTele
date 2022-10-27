@@ -7,6 +7,7 @@ use DateTime;
 use Decimal\Decimal;
 use Yii;
 use yii\base\InvalidArgumentException;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -27,6 +28,8 @@ use yii\db\ActiveRecord;
  * @property-read string $typeWithValue
  */
 class ProvisionUser extends ActiveRecord {
+
+	private ?ProvisionType $baseType = null;
 
 	/**
 	 * {@inheritdoc}
@@ -76,21 +79,21 @@ class ProvisionUser extends ActiveRecord {
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getFromUser() {
 		return $this->hasOne(User::class, ['id' => 'from_user_id']);
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getToUser() {
 		return $this->hasOne(User::class, ['id' => 'to_user_id']);
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getType() {
 		return $this->hasOne(ProvisionType::class, ['id' => 'type_id']);
@@ -99,6 +102,10 @@ class ProvisionUser extends ActiveRecord {
 	public function setType(ProvisionType $type): void {
 		$this->type = $type;
 		$this->type_id = $type->id;
+	}
+
+	public function setBaseType(ProvisionType $type): void {
+		$this->baseType = $type;
 	}
 
 	public function getIsOverwritten(): bool {
@@ -114,7 +121,17 @@ class ProvisionUser extends ActiveRecord {
 	}
 
 	public function getValue(): Decimal {
-		return new Decimal($this->value);
+		$value = new Decimal($this->value);
+		if ($this->baseType === null) {
+			return $value;
+		}
+		if ($this->type->is_percentage && $this->baseType->is_percentage) {
+			$value = $value->mul($this->baseType->getValue())->div(100);
+		}
+		if (!$this->type->is_percentage && !$this->baseType->is_percentage) {
+			$value = $value->add($this->baseType->getValue());
+		}
+		return $value;
 	}
 
 	public static function find(): ProvisionUserQuery {
@@ -142,14 +159,22 @@ class ProvisionUser extends ActiveRecord {
 		return $date <= new DateTime($this->to_at);
 	}
 
+	/**
+	 * @param Decimal|null $value
+	 * @return Decimal
+	 */
 	public function generateProvision(Decimal $value = null): Decimal {
 		if (!$this->type->is_percentage) {
 			return $this->getValue();
 		}
 		if ($value === null) {
-			new InvalidArgumentException('$value must be Decimal when type is percentage.');
+			throw new InvalidArgumentException('$value must be Decimal when type is percentage.');
 		}
 		return $value->mul($this->getValue())->div(100);
+	}
+
+	public function getBaseType(): ?ProvisionType {
+		return $this->baseType;
 	}
 
 }
