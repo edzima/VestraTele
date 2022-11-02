@@ -19,19 +19,13 @@ class ProvisionUserTest extends Unit {
 		$this->tester->assertTrue($generate->equals(50));
 	}
 
-	private function getType(bool $isPercentage, string $value = '100'): ProvisionType {
-		$model = new ProvisionType();
-		$model->value = $value;
-		$model->is_percentage = $isPercentage;
-		return $model;
-	}
-
-	public function testProvisionForPercentTypeWithBaseType(): void {
+	public function testProvisionForPercentBaseType(): void {
 		$model = new ProvisionUser();
 		$model->setType($this->getType(true));
-		$model->setBaseType($this->getType(true, 50));
 		$model->value = 50;
-		$generate = $model->generateProvision(new Decimal(100));
+
+		$fromBase = ProvisionUser::createFromBaseType($model, $this->getType(true, 50));
+		$generate = $fromBase->generateProvision(new Decimal(100));
 		$this->tester->assertTrue($generate->equals(25));
 	}
 
@@ -43,12 +37,19 @@ class ProvisionUserTest extends Unit {
 		$this->tester->assertTrue($generate->equals(50));
 	}
 
-	public function testProvisionNotPercentValueWithBaseType(): void {
+	public function testProvisionForNotPercentBaseType(): void {
 		$model = new ProvisionUser();
 		$model->setType($this->getType(false));
-		$model->setBaseType($this->getType(false, 50));
 		$model->value = 50;
-		$generate = $model->generateProvision(new Decimal(10));
+		$fromBase = ProvisionUser::createFromBaseType($model, $this->getType(false, 50));
+		$generate = $fromBase->generateProvision(new Decimal(10));
 		$this->tester->assertTrue($generate->equals(100));
+	}
+
+	private function getType(bool $isPercentage, string $value = '100'): ProvisionType {
+		$model = new ProvisionType();
+		$model->value = $value;
+		$model->is_percentage = $isPercentage;
+		return $model;
 	}
 }

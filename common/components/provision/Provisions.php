@@ -5,6 +5,7 @@ namespace common\components\provision;
 use common\components\provision\exception\MissingParentProvisionUserException;
 use common\components\provision\exception\MissingProvisionUserException;
 use common\components\provision\exception\MissingSelfProvisionUserException;
+use common\components\provision\exception\MultipleSettlementProvisionTypesException;
 use common\models\issue\IssuePay;
 use common\models\issue\IssueSettlement;
 use common\models\provision\IssueProvisionType;
@@ -59,7 +60,7 @@ class Provisions extends Component {
 	 * @param array $config
 	 * @return int
 	 * @throws InvalidConfigException
-	 * @throws MissingProvisionUserException
+	 * @throws MissingProvisionUserException|MultipleSettlementProvisionTypesException
 	 * @todo maybe add $throwException param.
 	 */
 	public function settlement(IssueSettlement $model, array $userTypes = [], array $config = []): int {
@@ -81,24 +82,30 @@ class Provisions extends Component {
 		foreach ($forms as $form) {
 			$typesCount = count($form->getTypes());
 			$form->linkIssueNotSettledUserCosts();
+			if ($typesCount > 1) {
+				$withBaseTypes = array_filter($form->getTypes(), static function (IssueProvisionType $type) {
+					return $type->getBaseTypeId() !== null;
+				});
+				if (count($withBaseTypes) > 1) {
+					$message = Yii::t('provision', 'Settlement: {type} has more than one active provision type for user type: {userType}.', [
+						'type' => $form->getModel()->getTypeName(),
+						'userType' => $form->getIssueUser()->getTypeName(),
+					]);
+					Yii::warning([
+						'message' => $message,
+						'settlement' => [
+							'id' => $model->getId(),
+							'issueId' => $model->getIssueId(),
+							'type' => $model->getTypeName(),
+						],
+						'types' => $form->getTypesNames(),
+					], 'provision.settlement');
+					throw new MultipleSettlementProvisionTypesException($message);
+				}
+			}
 			if ($typesCount === 1) {
 				$form->typeId = array_key_first($form->getTypes());
 				$provisions[] = $this->generateProvisionsData($form->getData(), $form->getPaysValues());
-			}
-
-			if ($typesCount > 1) {
-				Yii::warning([
-					'message' => Yii::t('provision', 'Settlement: {type} has more than one active provision type for user type: {userType}.', [
-						'type' => $form->getModel()->getTypeName(),
-						'userType' => $form->getIssueUser()->getTypeName(),
-					]),
-					'settlement' => [
-						'id' => $model->getId(),
-						'issueId' => $model->getIssueId(),
-						'type' => $model->getTypeName(),
-					],
-					'types' => $form->getTypesNames(),
-				], 'provision.settlement');
 			}
 		}
 
@@ -123,8 +130,12 @@ class Provisions extends Component {
 			throw new InvalidConfigException('Type for userData must be set before generate provisions.');
 		}
 		$type = $userData->type;
+		$baseType = $type->getBaseType();
 		$provisions = [];
 
+		if ($baseType !== null) {
+			$userData->type = $baseType;
+		}
 		$selfModels = $userData->getSelfQuery()->all();
 
 		if (empty($selfModels)) {
@@ -137,6 +148,9 @@ class Provisions extends Component {
 			throw new MissingSelfProvisionUserException($message);
 		}
 		foreach ($selfModels as $model) {
+			if ($baseType !== null) {
+				$model = ProvisionUser::createFromBaseType($model, $type);
+			}
 			foreach ($pays as $payId => $payValue) {
 				$provisions[] = $this->generateData($payId, $model, $payValue);
 			}
@@ -159,6 +173,9 @@ class Provisions extends Component {
 
 			$toModels = $userData->getToQuery()->all();
 			foreach ($toModels as $model) {
+				if ($baseType !== null) {
+					$model = ProvisionUser::createFromBaseType($model, $type);
+				}
 				foreach ($pays as $payId => $payValue) {
 					$provisions[] = $this->generateData($payId, $model, $payValue);
 				}
@@ -181,13 +198,19 @@ class Provisions extends Component {
 	}
 
 	protected function generateData(int $pay_id, ProvisionUser $provisionUser, Decimal $baseValue = null): array {
+		$type = $provisionUser->type;
+		$value = $provisionUser->generateProvision($baseValue);
+		$percent = null;
+		if ($type->is_percentage && $baseValue !== null) {
+			$percent = $value->div($baseValue)->mul(100);
+		}
 		return [
 			'pay_id' => $pay_id,
-			'value' => $provisionUser->generateProvision($baseValue)->toFixed(2),
+			'value' => $value->toFixed(2),
 			'to_user_id' => $provisionUser->to_user_id,
 			'from_user_id' => $provisionUser->from_user_id,
-			'type_id' => $provisionUser->type_id,
-			'percent' => $provisionUser->type->is_percentage ? $provisionUser->value : null,
+			'type_id' => $type->id,
+			'percent' => $percent ? $percent->toFixed(2) : null,
 		];
 	}
 

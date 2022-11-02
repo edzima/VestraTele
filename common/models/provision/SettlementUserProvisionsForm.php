@@ -155,7 +155,7 @@ class SettlementUserProvisionsForm extends Model {
 		if ($this->types === null) {
 			$types = IssueProvisionType::findSettlementTypes($this->model, $this->user->type);
 			if (count($types) > 1) {
-				$types = IssueProvisionType::filter($types, function (IssueProvisionType $type): bool {
+				$types = IssueProvisionType::filter($types, static function (IssueProvisionType $type): bool {
 					return !empty($type->getIssueRequiredUserTypes());
 				});
 			}

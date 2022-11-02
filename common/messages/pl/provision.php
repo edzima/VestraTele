@@ -82,6 +82,7 @@ return [
 	'Settlement: {type} has more than one active provision type for user type: {userType}.' => 'Rozliczenie: {type} dla {userType} ma więcej niż 1 aktywny typ prowizji.',
 	'Excluded Users Types' => 'Wykluczeni',
 	'Excluded issue user types' => 'Kto nie może być w Sprawie',
+	'Type has Base Type: {name}.' => 'Typ Podstawowy: {name}.',
 ];
 
 
