@@ -9,8 +9,10 @@ use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "issue_user".
@@ -18,6 +20,8 @@ use yii\db\ActiveRecord;
  * @property int $user_id
  * @property int $issue_id
  * @property string $type
+ * @property int $created_at
+ * @property int $updated_at
  *
  * @property Issue $issue
  * @property User $user
@@ -65,11 +69,24 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	/**
 	 * {@inheritdoc}
 	 */
+	public function behaviors(): array {
+		return [
+			[
+				'class' => TimestampBehavior::class,
+				'value' => new Expression('CURRENT_TIMESTAMP'),
+			],
+		];
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function rules(): array {
 		return [
 			[['user_id', 'issue_id', 'type'], 'required'],
 			[['user_id', 'issue_id'], 'integer'],
 			[['type'], 'string', 'max' => 255],
+			[['created_at', 'updated_at'], 'safe'],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 			[['user_id', 'issue_id'], 'unique', 'targetAttribute' => ['user_id', 'issue_id']],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],

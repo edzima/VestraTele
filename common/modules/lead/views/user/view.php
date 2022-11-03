@@ -2,6 +2,7 @@
 
 use common\modules\lead\models\LeadUser;
 use yii\helpers\Html;
+use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
@@ -9,10 +10,10 @@ use yii\widgets\DetailView;
 
 $this->title = $model->getUserWithTypeName();
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
-$this->params['breadcrumbs'][] = ['label' => $model->lead_id, 'url' => ['lead/view', 'id' => $model->lead_id]];
+$this->params['breadcrumbs'][] = ['label' => $model->lead->getName(), 'url' => ['lead/view', 'id' => $model->lead_id]];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Users'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-\yii\web\YiiAsset::register($this);
+YiiAsset::register($this);
 ?>
 <div class="lead-user-view">
 
@@ -35,6 +36,8 @@ $this->params['breadcrumbs'][] = $this->title;
 			'lead_id',
 			'user_id',
 			'type',
+			'created_at:datetime',
+			'updated_at:datetime',
 		],
 	]) ?>
 

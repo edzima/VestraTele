@@ -57,15 +57,34 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function afterSave($insert, $changedAttributes): void {
 		parent::afterSave($insert, $changedAttributes);
-		$this->linkUsers(!$insert);
+		$this->linkUsers();
 	}
 
-	private function linkUsers(bool $withUnlink): void {
-		if ($withUnlink) {
+	private function linkUsers(): void {
+		if ($this->users_ids !== null && empty($this->users_ids)) {
 			$this->unlinkUsers();
-		}
-		foreach ($this->getUsers() as $type => $id) {
-			$this->linkUser($type, $id);
+		} else {
+			$leadUsers = $this->leadUsers;
+			$currentTypes = [];
+			foreach ($leadUsers as $key => $leadUser) {
+				$userId = $this->users_ids[$leadUser->type] ?? null;
+				if ($userId === null) {
+					$leadUser->delete();
+					unset($leadUsers[$key]);
+				} else {
+					$currentTypes[] = $leadUser->type;
+					if ($leadUser->user_id !== $userId) {
+						$leadUser->user_id = $userId;
+						$leadUser->save();
+					}
+				}
+			}
+
+			foreach ($this->users_ids as $type => $userId) {
+				if (!in_array($type, $currentTypes, true)) {
+					$this->linkUser($type, $userId);
+				}
+			}
 		}
 	}
 

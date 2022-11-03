@@ -431,7 +431,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function linkUser(int $userId, string $type): void {
-		$user = $this->getUsers()->withType($type)->one();
+		$user = $this->getIssueUser($type);
 		if ($user !== null) {
 			$user->user_id = $userId;
 			$user->save();
@@ -440,14 +440,21 @@ class Issue extends ActiveRecord implements IssueInterface {
 		}
 	}
 
-	/**
-	 * @param string $type
-	 */
 	public function unlinkUser(string $type): void {
-		$user = $this->getUsers()->withType($type)->one();
+		$user = $this->getIssueUser($type);
 		if ($user !== null) {
 			$this->unlink('users', $user, true);
 		}
+	}
+
+	private function getIssueUser(string $type): ?IssueUser {
+		$users = $this->users;
+		foreach ($users as $issueUser) {
+			if ($issueUser->type === $type) {
+				return $issueUser;
+			}
+		}
+		return null;
 	}
 
 	/**

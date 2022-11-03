@@ -176,36 +176,46 @@ class IssueForm extends Model {
 			if (!$model->save(false)) {
 				return false;
 			}
-			if (!$model->isNewRecord) {
-				IssueTagLink::deleteAll(['issue_id' => $model->id]);
-			}
 
-			if (!empty($this->tagsIds)) {
-				$rows = [];
-				foreach ((array) $this->tagsIds as $id) {
-					$rows[] = [
-						'issue_id' => $model->id,
-						'tag_id' => $id,
-					];
-				}
-				IssueTagLink::getDb()->createCommand()->batchInsert(IssueTagLink::tableName(), [
-					'issue_id', 'tag_id',
-				], $rows)->execute();
-			}
-
-			$model->linkUser($this->customer->id, IssueUser::TYPE_CUSTOMER);
-			$model->linkUser($this->agent_id, IssueUser::TYPE_AGENT);
-			$model->linkUser($this->lawyer_id, IssueUser::TYPE_LAWYER);
-			if (!empty($this->tele_id)) {
-				$model->linkUser($this->tele_id, IssueUser::TYPE_TELEMARKETER);
-			} else {
-				$model->unlinkUser(IssueUser::TYPE_TELEMARKETER);
-			}
+			$this->linkTags();
+			$this->linkUsers();
 
 			return true;
 		}
 		Yii::error($this->getModel()->getErrors(), 'issueForm');
 		return false;
+	}
+
+	private function linkUsers(): void {
+		$model = $this->getModel();
+		$model->linkUser($this->customer->id, IssueUser::TYPE_CUSTOMER);
+		$model->linkUser($this->agent_id, IssueUser::TYPE_AGENT);
+		$model->linkUser($this->lawyer_id, IssueUser::TYPE_LAWYER);
+		if (!empty($this->tele_id)) {
+			$model->linkUser($this->tele_id, IssueUser::TYPE_TELEMARKETER);
+		} else {
+			$model->unlinkUser(IssueUser::TYPE_TELEMARKETER);
+		}
+	}
+
+	private function linkTags(): void {
+		$model = $this->getModel();
+		if (!$model->isNewRecord) {
+			IssueTagLink::deleteAll(['issue_id' => $model->id]);
+		}
+
+		if (!empty($this->tagsIds)) {
+			$rows = [];
+			foreach ((array) $this->tagsIds as $id) {
+				$rows[] = [
+					'issue_id' => $model->id,
+					'tag_id' => $id,
+				];
+			}
+			IssueTagLink::getDb()->createCommand()->batchInsert(IssueTagLink::tableName(), [
+				'issue_id', 'tag_id',
+			], $rows)->execute();
+		}
 	}
 
 	public static function getAgents(): array {

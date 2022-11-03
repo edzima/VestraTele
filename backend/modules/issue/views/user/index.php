@@ -35,6 +35,8 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'typeName',
 				'filter' => UserSearch::getTypesNames(),
 			],
+			'created_at:datetime',
+			'updated_at:datetime',
 			['class' => ActionColumn::class],
 		],
 	]); ?>
