@@ -179,6 +179,7 @@ class SettlementController extends Controller {
 					$settlement->getCostsWithoutUser($model->getIssueUser()->user_id)
 				),
 				'modelClass' => IssueCost::class,
+				'key' => 'id',
 			]
 		);
 

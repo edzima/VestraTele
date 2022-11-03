@@ -83,6 +83,7 @@ return [
 	'Excluded Users Types' => 'Wykluczeni',
 	'Excluded issue user types' => 'Kto nie może być w Sprawie',
 	'Type has Base Type: {name}.' => 'Typ Podstawowy: {name}.',
+	'Generate provisions for: {user}' => 'Generuj Prowizje dla: {user}',
 ];
 
 
