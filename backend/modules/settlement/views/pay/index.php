@@ -42,6 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		'showPageSummary' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
 		'visibleStatus' => !$searchModel->isPayed(),
 		'rowColors' => !$searchModel->isPayed(),
+		'visibleIssueStage' => true,
 	]) ?>
 
 </div>
