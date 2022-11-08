@@ -1,6 +1,7 @@
 <?php
 
 use common\models\user\User;
+use common\models\user\Worker;
 use common\widgets\Alert;
 use frontend\assets\AppAsset;
 use frontend\models\NavItem;
@@ -46,6 +47,11 @@ AppAsset::register($this);
 	} else {
 
 
+		$menuItems[] = [
+			'label' => Yii::t('common', 'Potential Clients'),
+			'url' => ['/potential-client/index'],
+			'visible' => Yii::$app->user->can(Worker::PERMISSION_POTENTIAL_CLIENT),
+		];
 		$menuItems[] = [
 			'label' => Yii::t('lead', 'Leads'),
 			'url' => '#',
