@@ -13,9 +13,9 @@ use yii\db\Expression;
  * This is the model class for table "potential_client".
  *
  * @property int $id
- * @property string $name
+ * @property string $firstname
+ * @property string $lastname
  * @property int $owner_id
- * @property int|null $updater_id
  * @property string|null $details
  * @property int|null $city_id
  * @property string|null $birthday
@@ -25,13 +25,14 @@ use yii\db\Expression;
  *
  * @property Simc $city
  * @property User $owner
- * @property User|null $updater
  */
 class PotentialClient extends ActiveRecord {
 
 	public const STATUS_NEW = 0;
+	public const STATUS_ADDRESS = 1;
 	public const STATUS_NOT_QUALIFY = 5;
-	public const STATUS_QUALIFIES = 10;
+	public const STATUS_QUALIFIES_BUT_NOT_INTEREST = 10;
+	public const STATUS_AGREEMENT = 20;
 
 	/**
 	 * {@inheritdoc}
@@ -54,14 +55,13 @@ class PotentialClient extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['name', '!owner_id'], 'required'],
+			[['firstname', 'lastname', '!owner_id', 'birthday', 'status'], 'required'],
 			[['details'], 'string'],
 			[['city_id', 'status'], 'integer'],
 			[['birthday', 'created_at', 'updated_at'], 'safe'],
-			[['name'], 'string', 'max' => 255],
+			[['firstname', 'lastname'], 'string', 'max' => 255],
 			[['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Simc::class, 'targetAttribute' => ['city_id' => 'id']],
 			[['!owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
-			[['!updater_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updater_id' => 'id']],
 		];
 	}
 
@@ -81,9 +81,13 @@ class PotentialClient extends ActiveRecord {
 			'created_at' => Yii::t('common', 'Created At'),
 			'updated_at' => Yii::t('common', 'Updated At'),
 			'ownerName' => Yii::t('common', 'Owner'),
-			'updater_id' => Yii::t('common', 'Updater'),
-			'updaterName' => Yii::t('common', 'Updater'),
+			'firstname' => Yii::t('common', 'Firstname'),
+			'lastname' => Yii::t('common', 'Lastname'),
 		];
+	}
+
+	public function getName(): string {
+		return $this->firstname . ' ' . $this->lastname;
 	}
 
 	public function isOwner(int $userId): bool {
@@ -110,18 +114,6 @@ class PotentialClient extends ActiveRecord {
 		return $this->hasOne(User::class, ['id' => 'owner_id']);
 	}
 
-	public function getUpdaterName(): ?string {
-		$updater = $this->updater;
-		if ($updater !== null) {
-			return $updater->getFullName();
-		}
-		return null;
-	}
-
-	public function getUpdater() {
-		return $this->hasOne(User::class, ['id' => 'updater_id']);
-	}
-
 	public function getStatusName(): string {
 		return static::getStatusesNames()[$this->status];
 	}
@@ -129,8 +121,11 @@ class PotentialClient extends ActiveRecord {
 	public static function getStatusesNames(): array {
 		return [
 			static::STATUS_NEW => Yii::t('common', 'New'),
+			static::STATUS_ADDRESS => Yii::t('common', 'Address'),
+			static::STATUS_QUALIFIES_BUT_NOT_INTEREST => Yii::t('common', 'Qualifies but not interest'),
 			static::STATUS_NOT_QUALIFY => Yii::t('common', 'Not qualify'),
-			static::STATUS_QUALIFIES => Yii::t('common', 'Qualifies'),
+			static::STATUS_AGREEMENT => Yii::t('common', 'Agreement'),
+
 		];
 	}
 }

@@ -40,15 +40,35 @@ class PotentialClientController extends Controller {
 	}
 
 	/**
-	 * Lists all PotentialClient models.
+	 * Search PotentialClient models.
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionSearch(): string {
 		$searchModel = new PotentialClientSearch();
+		$searchModel->scenario = PotentialClientSearch::SCENARIO_REQUIRED_FIELDS;
+		if (empty(Yii::$app->request->queryParams)) {
+			$dataProvider = null;
+		} else {
+			$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		}
+		return $this->render('search', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	/**
+	 * Search PotentialClient models.
+	 *
+	 * @return mixed
+	 */
+	public function actionSelf(): string {
+		$searchModel = new PotentialClientSearch();
+		$searchModel->owner_id = Yii::$app->user->getId();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-		return $this->render('index', [
+		return $this->render('self', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
 		]);
@@ -77,6 +97,9 @@ class PotentialClientController extends Controller {
 	 */
 	protected function findModel(int $id): PotentialClient {
 		if (($model = PotentialClient::findOne($id)) !== null) {
+			if (!$model->isOwner(Yii::$app->user->getId())) {
+				throw new NotFoundHttpException('This model is not Your.');
+			}
 			return $model;
 		}
 
@@ -111,7 +134,6 @@ class PotentialClientController extends Controller {
 	 */
 	public function actionUpdate(int $id) {
 		$model = $this->findModel($id);
-		$model->updater_id = Yii::$app->user->getId();
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
 		}

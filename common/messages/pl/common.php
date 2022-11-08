@@ -325,4 +325,10 @@ return [
 	'Qualifies' => 'Kwalifikuje się',
 	'Birthday' => 'Data Urodzenia',
 	'Who' => 'Kto',
+	'My Potential Clients' => 'Potencjalny Klient - Własne',
+	'Potential Clients - Search' => 'Potencjalny Klient - Szukaj',
+	'Self' => 'Własne',
+	'List' => 'Lista',
+	'Agreement' => 'Umowa',
+	'Qualifies but not interest' => 'Kwalifikuje się - nie chce',
 ];

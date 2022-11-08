@@ -49,8 +49,19 @@ AppAsset::register($this);
 
 		$menuItems[] = [
 			'label' => Yii::t('common', 'Potential Clients'),
-			'url' => ['/potential-client/index'],
+			'url' => '#',
 			'visible' => Yii::$app->user->can(Worker::PERMISSION_POTENTIAL_CLIENT),
+			'items' => [
+				[
+					'label' => Yii::t('common', 'Search'),
+					'url' => ['/potential-client/search'],
+				],
+				[
+					'label' => Yii::t('common', 'Self'),
+					'url' => ['/potential-client/self'],
+				],
+
+			],
 		];
 		$menuItems[] = [
 			'label' => Yii::t('lead', 'Leads'),

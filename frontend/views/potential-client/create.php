@@ -7,7 +7,7 @@ use yii\helpers\Html;
 /* @var $model PotentialClient */
 
 $this->title = Yii::t('common', 'Create Potential Client');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Potential Clients'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Potential Clients'), 'url' => ['self']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="potential-client-create">

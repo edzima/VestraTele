@@ -15,15 +15,32 @@ use yii\widgets\ActiveForm;
 
 	<?php $form = ActiveForm::begin(); ?>
 
-	<?= $form->field($model, 'status')->dropDownList(PotentialClient::getStatusesNames()) ?>
+	<div class="row">
+		<?= $form->field($model, 'firstname', [
+			'options' => [
+				'class' => 'col-md-4',
+			],
+		])->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'lastname', [
+			'options' => [
+				'class' => 'col-md-4',
+			],
+		])->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'details')->textarea(['rows' => 4]) ?>
+		<?= $form->field($model, 'birthday', [
+			'options' => [
+				'class' => 'col-md-4',
+			],
+		])->widget(DateWidget::class) ?>
+
+	</div>
 
 	<?= $form->field($model, 'city_id')->widget(CitySimcInputWidget::class) ?>
 
-	<?= $form->field($model, 'birthday')->widget(DateWidget::class) ?>
+	<?= $form->field($model, 'status')->dropDownList(PotentialClient::getStatusesNames()) ?>
+
+	<?= $form->field($model, 'details')->textarea(['rows' => 4]) ?>
 
 
 	<div class="form-group">

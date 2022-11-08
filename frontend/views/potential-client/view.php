@@ -9,7 +9,7 @@ use yii\widgets\DetailView;
 /* @var $model PotentialClient */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Potential Clients'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Potential Clients'), 'url' => ['self']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 
@@ -20,15 +20,14 @@ YiiAsset::register($this);
 
 	<p>
 		<?= Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-		<?= $model->isOwner(Yii::$app->user->getId())
-			? Html::a(Yii::t('common', 'Delete'), ['delete', 'id' => $model->id], [
-				'class' => 'btn btn-danger',
-				'data' => [
-					'confirm' => 'Are you sure you want to delete this item?',
-					'method' => 'post',
-				],
-			])
-			: '' ?>
+		<?= Html::a(Yii::t('common', 'Delete'), ['delete', 'id' => $model->id], [
+			'class' => 'btn btn-danger',
+			'data' => [
+				'confirm' => 'Are you sure you want to delete this item?',
+				'method' => 'post',
+			],
+		])
+		?>
 	</p>
 
 	<?= DetailView::widget([
@@ -44,11 +43,7 @@ YiiAsset::register($this);
 			[
 				'attribute' => 'updated_at',
 				'format' => 'datetime',
-				//		'visible' => $model->created_at !== $model->updated_at,
-			],
-			[
-				'attribute' => 'updaterName',
-				'visible' => $model->updater_id !== null && $model->updater_id !== $model->owner_id,
+				'visible' => $model->created_at !== $model->updated_at,
 			],
 		],
 	])

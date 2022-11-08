@@ -1,6 +1,5 @@
 <?php
 
-use common\models\PotentialClient;
 use common\widgets\grid\ActionColumn;
 use frontend\helpers\Html;
 use frontend\models\search\PotentialClientSearch;
@@ -10,7 +9,7 @@ use frontend\widgets\GridView;
 /* @var $searchModel PotentialClientSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('common', 'Potential Clients');
+$this->title = Yii::t('common', 'My Potential Clients');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="potential-client-index">
@@ -18,10 +17,19 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
+		<?= Html::a(Yii::t('common', 'Search'), ['search'], ['class' => 'btn btn-info']) ?>
+
 		<?= Html::a(Yii::t('common', 'Create Potential Client'), ['create'], ['class' => 'btn btn-success']) ?>
+
 	</p>
 
-	<?= $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', [
+		'model' => $searchModel,
+		'withAddress' => true,
+		'withFirstname' => true,
+		'withLastname' => true,
+		'action' => 'self',
+	]); ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
@@ -33,20 +41,15 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'statusName',
 				'filter' => PotentialClientSearch::getStatusesNames(),
 			],
-			'name',
+			'firstname',
+			'lastname',
+			'birthday',
 			'details:ntext',
 			'cityName',
-			'birthday',
-			//'created_at',
+			'created_at',
 			'updated_at:date',
-
 			[
 				'class' => ActionColumn::class,
-				'visibleButtons' => [
-					'delete' => function (PotentialClient $data): bool {
-						return $data->isOwner(Yii::$app->user->getId());
-					},
-				],
 			],
 		],
 	]); ?>
