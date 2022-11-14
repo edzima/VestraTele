@@ -65,5 +65,6 @@ return [
 	'workers' => 'Lista pracowników',
 	'workers.hierarchy' => 'Lista pracowników - hierarchia',
 	'victim' => 'Poszkodowany',
+	'vindicator' => 'Windykator',
 
 ];
