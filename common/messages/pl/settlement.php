@@ -164,4 +164,5 @@ return [
 	'Third Demand for Payment' => '3. Wezwanie do Zapłaty',
 	'Request for Justification' => 'Wniosek o Uzasadnienie',
 	'Demand before Judgement' => 'Wezwanie Przedsądowe',
+	'Honorarium - Vindication' => 'Honorarium - Windykacja',
 ];

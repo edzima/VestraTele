@@ -396,6 +396,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	public static function getTypesNames(): array {
 		return [
 			static::TYPE_HONORARIUM => Yii::t('settlement', 'Honorarium'),
+			static::TYPE_HONORARIUM_VINDICATION => Yii::t('settlement', 'Honorarium - Vindication'),
 			static::TYPE_ADMINISTRATIVE => Yii::t('settlement', 'Administrative'),
 			static::TYPE_APPEAL => Yii::t('settlement', 'Appeal'),
 			static::TYPE_LAWYER => Yii::t('settlement', 'Lawyer'),
