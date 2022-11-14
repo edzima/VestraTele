@@ -102,9 +102,9 @@ class ProvisionType extends ActiveRecord {
 	}
 
 	/**  @todo add Decimal Type. */
-	public function getFormattedValue($value = null): string {
+	public function getFormattedValue(?Decimal $value = null): string {
 		if ($value === null) {
-			$value = $this->value;
+			$value = $this->getValue();
 		}
 		if ($this->is_percentage) {
 			return Yii::$app->formatter->asPercent($value / 100);
