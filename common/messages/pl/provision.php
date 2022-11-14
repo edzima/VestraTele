@@ -84,6 +84,9 @@ return [
 	'Excluded issue user types' => 'Kto nie może być w Sprawie',
 	'Type has Base Type: {name}.' => 'Typ Podstawowy: {name}.',
 	'Generate provisions for: {user}' => 'Generuj Prowizje dla: {user}',
+	'{user} has not set self provision for type: {type}' => '{user} nie ma ustalonej własnej Prowizji dla: {type}',
+	'{user} has not setted parents ({count}) provision for type: {type}' => '{user} - brakuje dla Przełożonych ({count}) schematu Prowizji: {type}',
+	'Not found active type for settlement: {type}' => 'Nie znaleziono aktywnych typów Prowizji dla Rozliczenia: {type}',
 ];
 
 

@@ -56,6 +56,7 @@ use yii\web\View;
 					if (empty($selfies)) {
 						return null;
 					}
+
 					if (count($selfies) === 1) {
 						$self = reset($selfies);
 						if ($type->getBaseType() !== null) {
@@ -63,7 +64,14 @@ use yii\web\View;
 						}
 						return $self->getFormattedValue();
 					}
-					$values = ArrayHelper::getColumn($selfies, 'formattedValue');
+					$values = [];
+					if ($type->getBaseType() !== null) {
+						foreach ($selfies as $self) {
+							$values[] = ProvisionUser::createFromBaseType($self, $type)->getFormattedValue();
+						}
+					} else {
+						$values = ArrayHelper::getColumn($selfies, 'formattedValue');
+					}
 					return implode(', ', $values);
 				},
 			],
