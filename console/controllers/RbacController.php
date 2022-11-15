@@ -95,6 +95,7 @@ class RbacController extends Controller {
 		Worker::PERMISSION_PAY_ALL_PAID => [
 			Worker::ROLE_BOOKKEEPER,
 		],
+		Worker::PERMISSION_POTENTIAL_CLIENT,
 		Worker::PERMISSION_SUMMON => [
 			Worker::ROLE_AGENT,
 		],
