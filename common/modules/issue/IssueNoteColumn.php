@@ -2,6 +2,7 @@
 
 namespace common\modules\issue;
 
+use Closure;
 use common\assets\TooltipAsset;
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
@@ -17,6 +18,8 @@ class IssueNoteColumn extends DataColumn {
 	public bool $contentCenter = true;
 	public $format = 'html';
 	public bool $tooltip = true;
+
+	public ?Closure $tooltiplContent = null;
 
 	public ?string $pinnedContentClass = 'warning';
 
@@ -44,7 +47,7 @@ class IssueNoteColumn extends DataColumn {
 		}
 		$firstPinned = reset($pinned);
 		return Html::tag('strong', count($pinned), [
-				TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Html::encode($firstPinned->title),
+				TooltipAsset::DEFAULT_ATTRIBUTE_NAME => $this->getNoteTooltipContent($firstPinned),
 			]) . ' / ' . count($issue->issueNotes);
 	}
 
@@ -54,12 +57,23 @@ class IssueNoteColumn extends DataColumn {
 		$notes = $model->getIssueModel()->issueNotes;
 		if (!empty($notes)) {
 			$last = reset($notes);
-			$options[TooltipAsset::DEFAULT_ATTRIBUTE_NAME] = Html::encode($last->title);
+			$options[TooltipAsset::DEFAULT_ATTRIBUTE_NAME] = $this->getNoteTooltipContent($last);
 			if (!empty($this->pinnedContentClass) && !empty(IssueNote::pinnedNotesFilter($notes))) {
 				Html::addCssClass($options, $this->pinnedContentClass);
 			}
 		}
 		return $options;
+	}
+
+	public function getNoteTooltipContent(IssueNote $note): string {
+		if ($this->tooltiplContent !== null) {
+			return call_user_func($this->tooltiplContent, $note);
+		}
+		$content = Html::encode(strtoupper($note->title));
+		if (!empty($note->description)) {
+			$content .= '<br>' . Html::encode($note->description);
+		}
+		return $content;
 	}
 
 }
