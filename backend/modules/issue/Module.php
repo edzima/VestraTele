@@ -8,13 +8,22 @@
 
 namespace backend\modules\issue;
 
+use common\models\issue\event\IssueUserEvent;
 use common\models\user\Worker;
+use Yii;
 use yii\base\Module as BaseModule;
 use yii\filters\AccessControl;
 
 class Module extends BaseModule {
 
 	public $controllerNamespace = 'backend\modules\issue\controllers';
+
+	public function init() {
+		parent::init();
+		$this->on(IssueUserEvent::WILDCARD_EVENT, function (IssueUserEvent $event): void {
+			Yii::$app->provisions->onIssueUserEvent($event);
+		});
+	}
 
 	public function behaviors(): array {
 		return [

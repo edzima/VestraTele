@@ -11,6 +11,7 @@ use common\models\address\State;
 use common\models\address\SubProvince;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\entityResponsible\EntityResponsibleQuery;
+use common\models\issue\event\IssueUserEvent;
 use common\models\issue\query\IssueCostQuery;
 use common\models\issue\query\IssueNoteQuery;
 use common\models\issue\query\IssuePayCalculationQuery;
@@ -431,20 +432,37 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function linkUser(int $userId, string $type): void {
-		$user = $this->getIssueUser($type);
-		if ($user !== null) {
-			$user->user_id = $userId;
-			$user->save();
-		} else {
-			$this->link('users', new IssueUser(['user_id' => $userId, 'type' => $type]));
+		$issueUser = $this->getIssueUser($type);
+
+		if ($issueUser === null) {
+			$issueUser = new IssueUser(['user_id' => $userId, 'type' => $type]);
+			$this->link('users', $issueUser);
+			$this->afterLinkUserCreate($issueUser);
+		} elseif ($issueUser->user_id !== $userId) {
+			$issueUser->user_id = $userId;
+			$issueUser->save();
+			$this->afterLinkUserUpdate($issueUser);
 		}
+	}
+
+	public function afterLinkUserCreate(IssueUser $issueUser): void {
+		$this->trigger(IssueUserEvent::EVENT_AFTER_LINK_USER_CREATE, new IssueUserEvent(['model' => $issueUser]));
+	}
+
+	public function afterLinkUserUpdate(IssueUser $issueUser): void {
+		$this->trigger(IssueUserEvent::EVENT_AFTER_LINK_USER_UPDATE, new IssueUserEvent($issueUser));
 	}
 
 	public function unlinkUser(string $type): void {
 		$user = $this->getIssueUser($type);
 		if ($user !== null) {
 			$this->unlink('users', $user, true);
+			$this->afterUnlinkUser($user);
 		}
+	}
+
+	public function afterUnlinkUser(IssueUser $issueUser): void {
+		$this->trigger(IssueUserEvent::EVENT_UNLINK_USER, new IssueUserEvent($issueUser));
 	}
 
 	private function getIssueUser(string $type): ?IssueUser {

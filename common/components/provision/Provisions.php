@@ -6,6 +6,7 @@ use common\components\provision\exception\MissingParentProvisionUserException;
 use common\components\provision\exception\MissingProvisionUserException;
 use common\components\provision\exception\MissingSelfProvisionUserException;
 use common\components\provision\exception\MultipleSettlementProvisionTypesException;
+use common\models\issue\event\IssueUserEvent;
 use common\models\issue\IssuePay;
 use common\models\issue\IssueSettlement;
 use common\models\provision\IssueProvisionType;
@@ -28,6 +29,10 @@ class Provisions extends Component {
 		'type_id',
 		'percent',
 	];
+
+	public function onIssueUserEvent(IssueUserEvent $event): void {
+		Yii::debug('Provisions::onIssueUserEvent');
+	}
 
 	/**
 	 * @param IssuePay[] $pays
