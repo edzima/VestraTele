@@ -21,6 +21,7 @@ class IssueUserForm extends Model {
 	public $issue_id;
 	public string $type = '';
 
+	public bool $withArchive = false;
 	private ?User $_user = null;
 	private ?Issue $_issue = null;
 
@@ -45,8 +46,10 @@ class IssueUserForm extends Model {
 	}
 
 	public function validateArchivedIssue($attribute): void {
-		if ($this->getIssue() && $this->getIssue()->isArchived()) {
-			$this->addError($attribute, 'Issue cannot be archived.');
+		if (!$this->withArchive) {
+			if ($this->getIssue() && $this->getIssue()->isArchived()) {
+				$this->addError($attribute, 'Issue cannot be archived.');
+			}
 		}
 	}
 

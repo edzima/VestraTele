@@ -84,6 +84,7 @@ class UserController extends Controller {
 		$model = new IssueUserForm();
 		$model->issue_id = $issueId;
 		$model->user_id = $userId;
+		$model->withArchive = Yii::$app->user->can(User::PERMISSION_ARCHIVE);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(Url::issueView($model->issue_id));
@@ -99,6 +100,7 @@ class UserController extends Controller {
 		$model->setIssue($issue);
 		$model->user_id = $userId;
 		$model->type = $type;
+		$model->withArchive = Yii::$app->user->can(User::PERMISSION_ARCHIVE);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			if ($model->type !== $type) {
 				$issue->unlinkUser($type);
