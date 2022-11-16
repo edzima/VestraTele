@@ -57,14 +57,34 @@ YiiAsset::register($this);
 			: ''
 		?>
 
+		<span class="pull-right">
+
+		<?= $model->hasProblemStatus() && Yii::$app->user->can(User::PERMISSION_CALCULATION_PROBLEMS)
+			? Html::a(Yii::t('backend', 'Remove problem status'), [
+				'/settlement/calculation-problem/remove', 'id' => $model->id,
+			], [
+				'class' => 'btn btn-warning',
+				'data' => [
+					'confirm' => Yii::t('backend', 'Are you sure you want to remove this problem: {problem}?', [
+						'problem' => $model->getProblemStatusName(),
+					]),
+					'method' => 'post',
+				],
+			])
+			: ''
+		?>
+
 
 		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ? Html::a('Usuń', ['delete', 'id' => $model->id], [
-			'class' => 'btn btn-danger pull-right',
+			'class' => 'btn btn-danger',
 			'data' => [
 				'confirm' => Yii::t('backend', 'Are you sure you want to delete this item?'),
 				'method' => 'post',
 			],
 		]) : '' ?>
+		</span>
+
+
 	</p>
 
 	<?= SettlementDetailView::widget([

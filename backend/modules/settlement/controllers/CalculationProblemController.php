@@ -7,11 +7,26 @@ use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use common\models\issue\IssuePayCalculation;
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class CalculationProblemController extends Controller {
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function behaviors(): array {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'remove' => ['POST'],
+				],
+			],
+		];
+	}
 
 	public function actionIndex(): string {
 		$searchModel = new IssuePayCalculationSearch();
@@ -23,7 +38,6 @@ class CalculationProblemController extends Controller {
 			'dataProvider' => $dataProvider,
 		]);
 	}
-
 
 	/**
 	 * @param int $id
@@ -44,6 +58,13 @@ class CalculationProblemController extends Controller {
 		} catch (InvalidConfigException $exception) {
 			Yii::$app->session->addFlash('warning', Yii::t('backend', 'Only not payed calculation can be set problem status.'));
 		}
+		return $this->redirect(['/settlement/calculation/view', 'id' => $id]);
+	}
+
+	public function actionRemove(int $id) {
+		$model = $this->findModel($id);
+		$model->problem_status = null;
+		$model->save(false);
 		return $this->redirect(['/settlement/calculation/view', 'id' => $id]);
 	}
 
