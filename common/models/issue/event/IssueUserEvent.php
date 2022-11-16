@@ -12,5 +12,5 @@ class IssueUserEvent extends Event {
 	const EVENT_AFTER_LINK_USER_UPDATE = 'issueUserEvent.afterLinkUserUpdate';
 	const EVENT_UNLINK_USER = 'issueUserEvent.unlinkUser';
 
-	public IssueUser $issueUser;
+	public IssueUser $model;
 }

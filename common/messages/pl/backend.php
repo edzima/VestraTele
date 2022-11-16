@@ -309,4 +309,6 @@ return [
 	'Issue Agent SMS' => 'SMS do Przedstawiciela w Sprawie',
 	'Issue Customer SMS' => 'SMS do Klienta w Sprawie',
 	'Create Summon: {type}' => 'Dodaj - {type}',
+	'Remove problem status' => 'Brak Problemu',
+	'Are you sure you want to remove this problem: {problem}?' => 'Jesteś pewny, że Rozliczenie nie jest już: {problem}?',
 ];

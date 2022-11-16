@@ -9,6 +9,7 @@
 namespace backend\modules\issue;
 
 use common\models\issue\event\IssueUserEvent;
+use common\models\issue\Issue;
 use common\models\user\Worker;
 use Yii;
 use yii\base\Module as BaseModule;
@@ -20,7 +21,7 @@ class Module extends BaseModule {
 
 	public function init() {
 		parent::init();
-		$this->on(IssueUserEvent::WILDCARD_EVENT, function (IssueUserEvent $event): void {
+		IssueUserEvent::on(Issue::class, IssueUserEvent::WILDCARD_EVENT, static function (IssueUserEvent $event): void {
 			Yii::$app->provisions->onIssueUserEvent($event);
 		});
 	}

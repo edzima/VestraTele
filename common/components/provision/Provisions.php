@@ -7,6 +7,7 @@ use common\components\provision\exception\MissingProvisionUserException;
 use common\components\provision\exception\MissingSelfProvisionUserException;
 use common\components\provision\exception\MultipleSettlementProvisionTypesException;
 use common\models\issue\event\IssueUserEvent;
+use common\models\issue\IssueInterface;
 use common\models\issue\IssuePay;
 use common\models\issue\IssueSettlement;
 use common\models\provision\IssueProvisionType;
@@ -31,7 +32,24 @@ class Provisions extends Component {
 	];
 
 	public function onIssueUserEvent(IssueUserEvent $event): void {
-		Yii::debug('Provisions::onIssueUserEvent');
+		$issue = $event->sender;
+		if (!$issue instanceof IssueInterface) {
+			$issue = $event->model->issue;
+		}
+		if (!empty($issue->getIssueModel()->payCalculations)) {
+			Yii::warning('Change User for Issue: ' . $issue->getIssueName() . ' who has Settlements.');
+			$provisions = $issue->getIssueModel()
+				->getPays()
+				->joinWith('provisions p')
+				->andWhere('p.id IS NOT NULL')
+				->exists();
+			if ($provisions) {
+				//@todo dont remove provision
+				//@todo send Email to Provision Manager about Settlement with provision control problem.
+				//@todo create settlement note with issue details.
+				Yii::warning('Issue has already Provisions.');
+			}
+		}
 	}
 
 	/**

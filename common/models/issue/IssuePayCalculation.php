@@ -56,6 +56,8 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	public const PROBLEM_STATUS_BAILLIF = 40;
 	public const PROBLEM_STATUS_EXTERNAL_DEBT_COLLECTION = 50;
 
+	public const PROBLEM_STATUS_PROVISION_CONTROL = 60;
+
 	private static ?array $STAGES_NAMES = null;
 	private static ?array $OWNER_NAMES = null;
 

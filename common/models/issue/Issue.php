@@ -450,7 +450,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function afterLinkUserUpdate(IssueUser $issueUser): void {
-		$this->trigger(IssueUserEvent::EVENT_AFTER_LINK_USER_UPDATE, new IssueUserEvent($issueUser));
+		$this->trigger(IssueUserEvent::EVENT_AFTER_LINK_USER_UPDATE, new IssueUserEvent(['model' => $issueUser]));
 	}
 
 	public function unlinkUser(string $type): void {
@@ -462,7 +462,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function afterUnlinkUser(IssueUser $issueUser): void {
-		$this->trigger(IssueUserEvent::EVENT_UNLINK_USER, new IssueUserEvent($issueUser));
+		$this->trigger(IssueUserEvent::EVENT_UNLINK_USER, new IssueUserEvent(['model' => $issueUser]));
 	}
 
 	private function getIssueUser(string $type): ?IssueUser {
