@@ -4,11 +4,6 @@ namespace common\models\issue;
 
 use common\behaviors\DateIDBehavior;
 use common\helpers\ArrayHelper;
-use common\models\address\Address as LegacyAddress;
-use common\models\address\City;
-use common\models\address\Province;
-use common\models\address\State;
-use common\models\address\SubProvince;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\entityResponsible\EntityResponsibleQuery;
 use common\models\issue\query\IssueCostQuery;
@@ -20,7 +15,6 @@ use common\models\issue\query\IssueStageQuery;
 use common\models\issue\query\IssueUserQuery;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
-use common\models\user\Worker;
 use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -34,54 +28,27 @@ use yii\db\Expression;
  * @property int $id
  * @property string $created_at
  * @property string $updated_at
- * @property int $agent_id
- * @property string $client_first_name
- * @property string $client_surname
- * @property string $client_phone_1
- * @property string $client_phone_2
- * @property string $client_email
- * @property int $client_city_id
- * @property int $client_subprovince_id
- * @property string $client_city_code
- * @property string $client_street
- * @property string $victim_first_name
- * @property string $victim_surname
- * @property string $victim_email
- * @property int $victim_subprovince_id
- * @property int $victim_city_id
- * @property string $victim_city_code
- * @property string $victim_street
- * @property string $victim_phone
  * @property string $details
  * @property int $stage_id
  * @property int $type_id
  * @property int $entity_responsible_id
  * @property string $archives_nr
- * @property int $lawyer_id
- * @property bool $payed
  * @property string $signing_at
  * @property string|null $type_additional_date_at
  * @property string $stage_change_at
  * @property string|null $signature_act
  * @property string|null $stage_deadline_at
- *
- * @property string $longId
- * @property int $clientStateId
- * @property int $clientProvinceId
- * @property City $clientCity
- * @property City $victimCity
- * @property Worker $agent
- * @property Worker $lawyer
- * @property-read User $customer
- * @property Worker|null $tele
  * @property IssuePay[] $pays
  * @property EntityResponsible $entityResponsible
  * @property IssueStage $stage
  * @property IssueType $type
  * @property IssueNote[] $issueNotes
- * @property SubProvince $clientSubprovince
- * @property SubProvince $victimSubprovince
  * @property IssuePayCalculation[] $payCalculations
+ * @property-read string $longId
+ * @property-read User $agent
+ * @property-read User $lawyer
+ * @property-read User $customer
+ * @property-read User|null $tele
  * @property-read Summon[] $summons
  * @property-read IssueTag[] $tags
  * @property-read IssueUser[] $users
@@ -95,11 +62,6 @@ use yii\db\Expression;
 class Issue extends ActiveRecord implements IssueInterface {
 
 	use IssueTrait;
-
-	/* @var LegacyAddress */
-	private $clientAddress;
-	/* @var LegacyAddress */
-	private $victimAddress;
 
 	public function __toString(): string {
 		return $this->longId;
@@ -131,12 +93,9 @@ class Issue extends ActiveRecord implements IssueInterface {
 			[['stage_id', 'type_id', 'entity_responsible_id',], 'required',],
 			[['stage_id', 'type_id', 'entity_responsible_id'], 'integer'],
 			[['details', 'signature_act'], 'string'],
-			['archives_nr', 'unique'],
 			[['entity_responsible_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_responsible_id' => 'id']],
 			[['stage_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueStage::class, 'targetAttribute' => ['stage_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueType::class, 'targetAttribute' => ['type_id' => 'id']],
-			//@todo remove this rules after create customers from production Issues.
-			[['client_email', 'victim_email'], 'email'],
 		];
 	}
 
@@ -214,129 +173,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getUsers(): IssueUserQuery {
 		return $this->hasMany(IssueUser::class, ['issue_id' => 'id']);
-	}
-
-	public function getClientStateId(): ?int {
-		return $this->getClientAddress()->stateId;
-	}
-
-	public function getClientProvinceId(): ?int {
-		return $this->getClientAddress()->provinceId;
-	}
-
-	/** @deprecated */
-	public function getClientState(): ActiveQuery {
-		return $this->hasOne(State::class, ['id' => 'wojewodztwo_id'])->via('clientCity');
-	}
-
-	/** @deprecated */
-	public function getClientProvince(): ActiveQuery {
-		return $this->hasOne(Province::class, ['id' => 'powiat_id', 'wojewodztwo_id' => 'wojewodztwo_id'])->via('clientCity');
-	}
-
-	public function getClientAddress(): LegacyAddress {
-		if ($this->clientAddress === null) {
-			$address = new LegacyAddress();
-			$address->formName = 'clientAddress';
-			if ($this->clientCity) {
-				$address->setCity($this->clientCity);
-			}
-			if ($this->hasClientSubprovince()) {
-				$address->setSubProvince($this->clientSubprovince);
-			}
-			$address->customRules = [
-				[['street', 'cityCode'], 'required'],
-			];
-			$address->street = $this->client_street;
-			$address->cityCode = $this->client_city_code;
-			$this->clientAddress = $address;
-		}
-		return $this->clientAddress;
-	}
-
-	public function getVictimAddress(): LegacyAddress {
-		if ($this->victimAddress === null) {
-			$address = new LegacyAddress();
-			if ($this->victimCity) {
-				$address->setCity($this->victimCity);
-			} elseif ($this->clientCity) {
-				$address->setCity($this->clientCity);
-			}
-			if ($this->hasVictimSubprovince()) {
-				$address->setSubProvince($this->victimSubprovince);
-			}
-			$address->requiredCity = false;
-			$address->formName = 'victimAddress';
-			$address->cityCode = $this->getVictimCityCode();
-			$address->street = $this->getVictimStreet();
-			$this->victimAddress = $address;
-		}
-		return $this->victimAddress;
-	}
-
-	/** @deprecated */
-	public function getClientSubprovince(): ActiveQuery {
-		return $this->hasOne(SubProvince::class, ['id' => 'client_subprovince_id']);
-	}
-
-	/**
-	 * @return ActiveQuery
-	 */
-	public function getClientCity() {
-		return $this->hasOne(City::class, ['id' => 'client_city_id'])->cache();
-	}
-
-	/**
-	 * @return ActiveQuery
-	 * @deprecated
-	 */
-	public function getVictimSubprovince() {
-		return $this->hasOne(SubProvince::class, ['id' => 'victim_subprovince_id']);
-	}
-
-	public function getVictimFirstName(): string {
-		if ($this->victim_first_name === null) {
-			return $this->client_first_name;
-		}
-		return $this->victim_first_name;
-	}
-
-	public function getVictimSurname(): string {
-		if ($this->victim_surname === null) {
-			return $this->client_surname;
-		}
-		return $this->victim_surname;
-	}
-
-	public function getVictimPhone(): string {
-		if ($this->victim_phone === null) {
-			return $this->client_phone_1;
-		}
-		return $this->victim_phone;
-	}
-
-	/**
-	 * @return ActiveQuery
-	 */
-	public function getVictimCity() {
-		if ($this->victim_city_id === null) {
-			return $this->getClientCity();
-		}
-		return $this->hasOne(City::class, ['id' => 'victim_city_id']);
-	}
-
-	public function getVictimCityCode(): ?string {
-		if ($this->victim_city_code === null) {
-			return $this->client_city_code;
-		}
-		return $this->victim_city_code;
-	}
-
-	public function getVictimStreet(): ?string {
-		if ($this->victim_street === null) {
-			return $this->client_street;
-		}
-		return $this->victim_street;
 	}
 
 	public function getEntityResponsible(): EntityResponsibleQuery {
