@@ -13,7 +13,6 @@ use common\models\user\User;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
-use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -86,11 +85,10 @@ class IssueForm extends Model {
 			],
 			[['details', 'signature_act'], 'string'],
 			['signature_act', 'string', 'max' => 30],
-			['signature_act', 'default', 'value' => null],
-			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
-			['tagsIds', 'in', 'range' => IssueTag::find()->select('id')->column(), 'allowArray' => true],
-
 			[['signing_at', 'type_additional_date_at', 'stage_change_at', 'stage_deadline_at'], 'date', 'format' => 'Y-m-d'],
+			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
+			[['signature_act', 'stage_deadline_at', 'stage_change_at'], 'default', 'value' => null],
+			['tagsIds', 'in', 'range' => IssueTag::find()->select('id')->column(), 'allowArray' => true],
 			[
 				'archives_nr',
 				'required',
@@ -102,15 +100,6 @@ class IssueForm extends Model {
 				}',
 			],
 			[['archives_nr'], 'string', 'max' => 10],
-			[
-				'signature_act', 'unique', 'targetClass' => Issue::class,
-				'filter' => function (ActiveQuery $query): void {
-					if (!$this->getModel()->isNewRecord) {
-						$query->andWhere(['not', 'id' => $this->getModel()->id]);
-					}
-				},
-			],
-
 		];
 	}
 
@@ -169,10 +158,14 @@ class IssueForm extends Model {
 			$model->signature_act = $this->signature_act;
 			$model->details = $this->details;
 			$model->stage_change_at = $this->stage_change_at;
-			$model->stage_deadline_at = $this->stage_deadline_at;
 			$model->entity_responsible_id = $this->entity_responsible_id;
 			$model->signing_at = $this->signing_at;
 			$model->type_additional_date_at = $this->type_additional_date_at;
+			if ($model->isNewRecord) {
+				$model->generateStageDeadlineAt();
+			} else {
+				$model->stage_deadline_at = $this->stage_deadline_at;
+			}
 			if (!$model->save(false)) {
 				return false;
 			}
