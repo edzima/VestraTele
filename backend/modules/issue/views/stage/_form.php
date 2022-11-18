@@ -9,13 +9,16 @@ use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model IssueStageForm */
-/* @var $form yii\widgets\ActiveForm */
+/* @var $form ActiveForm */
 
 ?>
 
 <div class="issue-stage-form">
 
-	<?php $form = ActiveForm::begin(); ?>
+
+	<?php
+	$form = ActiveForm::begin(['id' => 'issue-stage-form']);
+	?>
 
 	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
