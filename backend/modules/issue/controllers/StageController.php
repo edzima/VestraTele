@@ -3,11 +3,12 @@
 namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueStage;
+use backend\modules\issue\models\IssueStageForm;
 use backend\modules\issue\models\search\IssueStageSearch;
 use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * StageController implements the CRUD actions for IssueStage model.
@@ -62,10 +63,10 @@ class StageController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new IssueStage();
+		$model = new IssueStageForm();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('create', [
 			'model' => $model,
@@ -80,10 +81,11 @@ class StageController extends Controller {
 	 * @return mixed
 	 */
 	public function actionUpdate($id) {
-		$model = $this->findModel($id);
+		$model = new IssueStageForm();
+		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('update', [
 			'model' => $model,

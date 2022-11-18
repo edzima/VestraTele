@@ -1,14 +1,14 @@
 <?php
 
-use backend\modules\issue\models\IssueStage;
+use backend\helpers\Html;
+use backend\modules\issue\models\IssueStageForm;
 use common\models\issue\IssueType;
+use common\widgets\ActiveForm;
 use kartik\color\ColorInput;
 use kartik\select2\Select2;
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model IssueStage */
+/* @var $model IssueStageForm */
 /* @var $form yii\widgets\ActiveForm */
 
 ?>
@@ -38,7 +38,7 @@ use yii\widgets\ActiveForm;
 
 
 	<div class="form-group">
-		<?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

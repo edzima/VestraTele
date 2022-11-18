@@ -1,18 +1,19 @@
 <?php
 
-use yii\helpers\Html;
+use backend\modules\issue\models\IssueStageForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\IssueStage */
+/* @var $model IssueStageForm */
 
-$this->title = 'Edytuj etap: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Etapy', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->title = Yii::t('backend', 'Update Issue Stage: {name}', [
+	'name' => $model->getModel()->name,
+]);
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Stages'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->getModel()->name, 'url' => ['view', 'id' => $model->getModel()->id]];
+$this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 ?>
 <div class="issue-stage-update">
-
-	<h1><?= Html::encode($this->title) ?></h1>
 
 	<?= $this->render('_form', [
 		'model' => $model,

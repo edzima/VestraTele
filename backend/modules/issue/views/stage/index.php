@@ -1,25 +1,27 @@
 <?php
 
+use backend\helpers\Html;
 use backend\modules\issue\models\IssueStage;
 use backend\modules\issue\models\search\IssueStageSearch;
+use backend\widgets\GridView;
 use common\models\issue\IssueType;
-use yii\grid\GridView;
-use yii\helpers\Html;
+use common\widgets\grid\DataColumn;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $searchModel IssueStageSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Etapy';
+$this->title = Yii::t('issue', 'Stages');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-stage-index">
 
-	<h1><?= Html::encode($this->title) ?></h1>
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
 	<p>
-		<?= Html::a('Dodaj', ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('backend', 'Create'), ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
 
 	<?= GridView::widget([
@@ -29,10 +31,24 @@ $this->params['breadcrumbs'][] = $this->title;
 			'name',
 			'short_name',
 			[
+				'class' => DataColumn::class,
 				'attribute' => 'typesFilter',
-				'value' => 'typesName',
-				'label' => 'Rodzaje',
-				'filter' => IssueType::getTypesNames(),
+				'value' => 'typesShortNames',
+				'label' => Yii::t('issue', 'Issues Types'),
+				'filter' => IssueType::getTypesNamesWithShort(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'options' => [
+						'multiple' => true,
+						'placeholder' => Yii::t('issue', 'Issues Types'),
+					],
+					'pluginOptions' => [
+						'dropdownAutoWidth' => true,
+					],
+					'size' => Select2::SIZE_SMALL,
+					'showToggleAll' => false,
+				],
+				'contentBold' => true,
 			],
 			'days_reminder',
 			'posi',

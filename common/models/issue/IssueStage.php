@@ -59,7 +59,19 @@ class IssueStage extends ActiveRecord {
 	}
 
 	public function getTypesName(): string {
-		return implode(', ', $this->types);
+		$names = [];
+		foreach ($this->types as $type) {
+			$names[] = $type->name;
+		}
+		return implode(', ', $names);
+	}
+
+	public function getTypesShortNames(): string {
+		$names = [];
+		foreach ($this->types as $type) {
+			$names[] = $type->short_name;
+		}
+		return implode(', ', $names);
 	}
 
 	public function getIssues(): IssueQuery {
@@ -69,7 +81,8 @@ class IssueStage extends ActiveRecord {
 
 	public function getTypes(): ActiveQuery {
 		return $this->hasMany(IssueType::class, ['id' => 'type_id'])
-			->viaTable('{{%issue_stage_type}}', ['stage_id' => 'id']);
+			->viaTable('{{%issue_stage_type}}', ['stage_id' => 'id'])
+			->indexBy('id');
 	}
 
 	public static function getStagesNames(bool $withArchive = false): array {
