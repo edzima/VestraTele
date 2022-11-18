@@ -123,6 +123,7 @@ use yii\widgets\ActiveForm;
 			])
 			: ''
 		?>
+
 	</div>
 
 	<?= $model->addressSearch !== null
@@ -150,6 +151,14 @@ use yii\widgets\ActiveForm;
 			],
 			'showToggleAll' => false,
 		]) ?>
+
+
+		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ?
+			$form->field($model, 'onlyWithClaims', ['options' => ['class' => 'col-md-2']])->dropDownList(Html::booleanDropdownList(), [
+				'prompt' => Yii::t('common', 'All'),
+			])
+			: ''
+		?>
 	</div>
 
 

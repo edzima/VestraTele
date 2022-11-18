@@ -28,6 +28,7 @@ class IssueSearch extends BaseIssueSearch {
 	public $excludedStages = [];
 	public $onlyWithSettlements;
 
+	public $onlyWithClaims;
 	public ?string $claimCompanyTryingValue = null;
 
 	public bool $onlyDelayed = false;
@@ -50,7 +51,7 @@ class IssueSearch extends BaseIssueSearch {
 	public function rules(): array {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
-			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements'], 'boolean'],
+			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims'], 'boolean'],
 			['claimCompanyTryingValue', 'number', 'min' => 0],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
 			[['type_additional_date_at', 'signature_act', 'stage_change_at'], 'safe'],
@@ -63,6 +64,7 @@ class IssueSearch extends BaseIssueSearch {
 			'parentId' => Yii::t('backend', 'Structures'),
 			'excludedStages' => Yii::t('backend', 'Excluded stages'),
 			'onlyDelayed' => Yii::t('backend', 'Only delayed'),
+			'onlyWithClaims' => Yii::t('backend', 'Only with Claims'),
 			'onlyWithPayedPay' => Yii::t('backend', 'Only with payed pay'),
 			'onlyWithSettlements' => Yii::t('settlement', 'Only with Settlements'),
 			'onlyWithAllPayedPay' => Yii::t('settlement', 'Only with all paid Pays'),
@@ -233,6 +235,17 @@ class IssueSearch extends BaseIssueSearch {
 			]);
 			$query->andWhere(['like', IssueClaim::tableName() . '.trying_value', $this->claimCompanyTryingValue]);
 		}
+
+		if ($this->onlyWithClaims === null || $this->onlyWithClaims === '') {
+			return;
+		}
+		$query->joinWith('claims', false);
+		if ((bool) $this->onlyWithClaims === true) {
+			$query->andWhere(IssueClaim::tableName() . '.trying_value IS NOT NULL');
+
+			return;
+		}
+		$query->andWhere(IssueClaim::tableName() . '.issue_id IS NULL');
 	}
 
 }
