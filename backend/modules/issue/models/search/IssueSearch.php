@@ -98,6 +98,11 @@ class IssueSearch extends BaseIssueSearch {
 		}
 		$this->issueQueryFilter($query);
 
+		$dataProvider->sort->attributes['claimCompanyTryingValue'] = [
+			'asc' => ['trying_value' => SORT_ASC],
+			'desc' => ['trying_value' => SORT_DESC],
+		];
+
 		return $dataProvider;
 	}
 
