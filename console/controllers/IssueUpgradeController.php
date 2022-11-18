@@ -4,14 +4,56 @@ namespace console\controllers;
 
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
-use common\models\issue\IssueUser;
+use common\models\issue\IssueStage;
 use common\models\issue\Summon;
 use DateTime;
 use yii\console\Controller;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 
 class IssueUpgradeController extends Controller {
+
+	public function actionIssueStageDeadlineUpdate(): void {
+		$stages = IssueStage::find()
+			->andWhere('days_reminder IS NOT NULL')
+			->indexBy('id')
+			->all();
+
+		if (empty($stages)) {
+			Console::output('Not Found Stages with days reminder.');
+			return;
+		}
+		foreach ($stages as $stage) {
+			Console::output($stage->name . ' with ID: ' . $stage->id . ' days: ' . $stage->days_reminder);
+		}
+		Console::output('Find Stages with Days Reminders: ' . count($stages));
+		$emptyStageChangeAt = Issue::updateAll(
+			['stage_change_at' => 'created_at'],
+			[
+				'stage_change_at' => null,
+				'stage_id' => array_keys($stages),
+			]
+		);
+		Console::output('Update empty stage_change_at from created_at: ' . $emptyStageChangeAt);
+
+		$daysStages = [];
+		foreach ($stages as $stage) {
+			$daysStages[$stage->days_reminder][] = $stage->id;
+		}
+
+		foreach ($daysStages as $days => $stagesIDs) {
+			foreach ($stagesIDs as $stageId) {
+				Console::output($stages[$stageId]->name);
+			}
+			$count = Issue::updateAll([
+				'stage_deadline_at' => new Expression("DATE_ADD(stage_change_at, INTERVAL $days DAY)"),
+			], [
+				'stage_id' => $stagesIDs,
+			]);
+			Console::output("Updated Issues: $count  for Days: $days.\n");
+		}
+	}
 
 	public function actionRestoreUpdateAt(string $date): void {
 		$models = Issue::find()
@@ -75,33 +117,4 @@ class IssueUpgradeController extends Controller {
 		}
 	}
 
-	public function actionCheckLead(): void {
-		$ids = [];
-		foreach (IssueUser::find()
-			->withType(IssueUser::TYPE_CUSTOMER)
-			->with('user.userProfile')
-			->batch() as $rows) {
-			foreach ($rows as $issueUser) {
-				/** @var $issueUser IssueUser */
-				$userProfile = $issueUser->user->profile;
-				$phones = [];
-				if (!empty($userProfile->phone)) {
-					$phones[] = $userProfile->phone;
-				}
-				if (!empty($userProfile->phone_2)) {
-					$phones[] = $userProfile->phone_2;
-				}
-				$meetIds = IssueMeet::find()->
-				select('id')
-					->andWhere(['phone' => $phones])
-					->column();
-
-				foreach ($meetIds as $id) {
-					$ids[$id] = $id;
-				}
-			}
-		}
-		Console::output(print_r($ids));
-		Console::output('Count: ' . count($ids));
-	}
 }
