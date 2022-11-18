@@ -2,7 +2,6 @@
 
 namespace backend\modules\issue\models\search;
 
-use backend\modules\issue\models\IssueStage;
 use common\models\AddressSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
@@ -15,7 +14,6 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
 use yii\db\QueryInterface;
-use yii\helpers\ArrayHelper;
 
 /**
  * IssueSearch model for backend app.
@@ -141,24 +139,12 @@ class IssueSearch extends BaseIssueSearch {
 
 	private function delayedFilter(IssueQuery $query): void {
 		if (!empty($this->onlyDelayed)) {
-			$query->joinWith('stage');
-			$daysGroups = ArrayHelper::map($this->getStagesNames(), 'id', 'days_reminder', 'days_reminder');
-
-			foreach ($daysGroups as $day => $ids) {
-				if (!empty($day)) {
-					$query->orFilterWhere([
-						'and',
-						[
-							Issue::tableName() . '.stage_id' => array_keys($ids),
-						],
-						[
-							'<=', new Expression("DATE_ADD(stage_change_at, INTERVAL $day DAY)"), new Expression('NOW()'),
-						],
-					]);
-				}
-			}
-			$query->andWhere(Issue::tableName() . '.stage_change_at IS NOT NULL');
-			$query->andWhere(IssueStage::tableName() . '.days_reminder is NOT NULL');
+			$query->andWhere('stage_deadline_at IS NOT NULL');
+			$query->andWhere([
+				'<=',
+				'stage_deadline_at',
+				new Expression('NOW()'),
+			]);
 		}
 	}
 
