@@ -56,7 +56,7 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 		return $this->tester->grabFixture(static::ISSUE, $index);
 	}
 
-	public function haveIssue(array $attributes = []): int {
+	public function haveIssue(array $attributes = [], bool $withAgentAndCustomer = true): int {
 		$agentId = ArrayHelper::remove($attributes, 'agent_id', static::DEFAULT_AGENT_ID);
 		$customerId = ArrayHelper::remove($attributes, 'customer_id', static::DEFAULT_CUSTOMER_ID);
 
@@ -71,16 +71,19 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 		}
 
 		$id = $this->tester->haveRecord(Issue::class, $attributes);
-		$this->tester->haveRecord(IssueUser::class, [
-			'user_id' => $agentId,
-			'issue_id' => $id,
-			'type' => IssueUser::TYPE_AGENT,
-		]);
-		$this->tester->haveRecord(IssueUser::class, [
-			'user_id' => $customerId,
-			'issue_id' => $id,
-			'type' => IssueUser::TYPE_CUSTOMER,
-		]);
+		if ($withAgentAndCustomer) {
+			$this->tester->haveRecord(IssueUser::class, [
+				'user_id' => $agentId,
+				'issue_id' => $id,
+				'type' => IssueUser::TYPE_AGENT,
+			]);
+			$this->tester->haveRecord(IssueUser::class, [
+				'user_id' => $customerId,
+				'issue_id' => $id,
+				'type' => IssueUser::TYPE_CUSTOMER,
+			]);
+		}
+
 		return $id;
 	}
 

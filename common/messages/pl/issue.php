@@ -121,4 +121,5 @@ return [
 	'Lawyer' => 'Prawnik',
 	'Summon Date: {type}' => 'Data: {type}',
 	'Summon At' => 'Data',
+	'Issues Types' => 'Typy Spraw',
 ];

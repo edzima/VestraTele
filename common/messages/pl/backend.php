@@ -309,4 +309,8 @@ return [
 	'Issue Agent SMS' => 'SMS do Przedstawiciela w Sprawie',
 	'Issue Customer SMS' => 'SMS do Klienta w Sprawie',
 	'Create Summon: {type}' => 'Dodaj - {type}',
+	'Create Issue Stage' => 'Dodaj Etap Sprawy',
+	'Update Issue Stage: {name}' => 'Edytuj Etap Sprawy: {name}',
+	'Only with Claims' => 'Z Rozszczeniami',
+	'Are you sure you want to delete this Stage with all Issues with then?' => 'Jesteś pewien, że chcesz usunac ten Etap oraz WSZYSTKIE Sprawy do niego przypisane?',
 ];
