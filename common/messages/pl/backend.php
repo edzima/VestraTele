@@ -311,4 +311,8 @@ return [
 	'Create Summon: {type}' => 'Dodaj - {type}',
 	'Remove problem status' => 'Brak Problemu',
 	'Are you sure you want to remove this problem: {problem}?' => 'Jesteś pewny, że Rozliczenie nie jest już: {problem}?',
+	'Create Issue Stage' => 'Dodaj Etap Sprawy',
+	'Update Issue Stage: {name}' => 'Edytuj Etap Sprawy: {name}',
+	'Only with Claims' => 'Z Rozszczeniami',
+	'Are you sure you want to delete this Stage with all Issues with then?' => 'Jesteś pewien, że chcesz usunac ten Etap oraz WSZYSTKIE Sprawy do niego przypisane?',
 ];

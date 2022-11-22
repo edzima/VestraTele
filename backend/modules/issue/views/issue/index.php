@@ -149,10 +149,12 @@ $this->params['breadcrumbs'][] = $this->title;
 		'id' => 'issues-list',
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'rowOptions' => function (Issue $issue): array {
+		'rowOptions' => static function (Issue $issue): array {
 			if ($issue->hasDelayedStage()) {
 				return [
-					'class' => 'danger',
+					'style' => [
+						'background-color' => '#f5c6cb',
+					],
 				];
 			}
 			return [];
@@ -272,6 +274,14 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'stage_change_at',
 				'format' => 'date',
 				'contentBold' => true,
+				'options' => [
+					'style' => 'width:95px',
+				],
+			],
+			[
+				'class' => DataColumn::class,
+				'attribute' => 'stage_deadline_at',
+				'format' => 'date',
 				'options' => [
 					'style' => 'width:95px',
 				],

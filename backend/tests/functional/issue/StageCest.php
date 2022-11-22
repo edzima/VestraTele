@@ -2,46 +2,46 @@
 
 namespace backend\tests\functional\issue;
 
-use backend\modules\issue\controllers\TypeController;
+use backend\modules\issue\controllers\StageController;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\user\Worker;
 
-class TypeCest {
+class StageCest {
 
-	/** @see TypeController::actionIndex() */
-	private const ROUTE_INDEX = '/issue/type/index';
-	/** @see TypeController::actionCreate() */
-	private const ROUTE_CREATE = '/issue/type/create';
+	/** @see StageController::actionIndex() */
+	private const ROUTE_INDEX = '/issue/stage/index';
+	/** @see StageController::actionCreate() */
+	private const ROUTE_CREATE = '/issue/stage/create';
 
-	private const FORM_SELECTOR = '#issue-type-form';
+	private const FORM_SELECTOR = '#issue-stage-form';
 
-	private const PERMISSION = Worker::PERMISSION_ISSUE_TYPE_MANAGER;
+	private const PERMISSION = Worker::PERMISSION_ISSUE_STAGE_MANAGER;
 
 	public function _fixtures(): array {
-		return IssueFixtureHelper::types();
+		return IssueFixtureHelper::stageAndTypesFixtures();
 	}
 
 	public function checkAsManager(Manager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->dontSeeMenuSubLink('Types');
+		$I->dontSeeMenuSubLink('Stages');
 		$I->seeResponseCodeIs(403);
 	}
 
 	public function checkAsIssueManager(IssueManager $I): void {
 		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->dontSeeMenuSubLink('Types');
+		$I->dontSeeMenuSubLink('Stages');
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkAsIssueManagerWithTypePermission(IssueManager $I): void {
+	public function checkAsIssueManagerWithStagePermission(IssueManager $I): void {
 		$I->assignPermission(static::PERMISSION);
 		$I->amLoggedIn();
-		$I->seeMenuSubLink('Types');
-		$I->clickMenuSubLink('Types');
+		$I->seeMenuSubLink('Stages');
+		$I->clickMenuSubLink('Stages');
 		$I->seeInCurrentUrl(static::ROUTE_INDEX);
 		$I->seeResponseCodeIsSuccessful();
 	}
@@ -52,30 +52,31 @@ class TypeCest {
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeInGridHeader('Name');
 		$I->seeInGridHeader('Shortname');
-		$I->seeInGridHeader('VAT (%)');
-		$I->seeInGridHeader('Provision');
-		$I->seeInGridHeader('With additional Date');
-		$I->seeInGridHeader('Meet');
+		$I->seeInGridHeader('Issues Types');
+		$I->seeInGridHeader('Reminder (days)');
+		$I->seeInGridHeader('Posi');
+		$I->seeInGridHeader('Issues Count');
+		$I->seeInGridHeader('Calendar Background');
 	}
 
 	public function checkCreate(IssueManager $I): void {
-		$I->amLoggedIn();
 		$I->assignPermission(static::PERMISSION);
+		$I->amLoggedIn();
 		$I->amOnRoute(static::ROUTE_CREATE);
 		$I->submitForm(static::FORM_SELECTOR, $this->formParams(
-			'Some new type name',
+			'Some new stage name',
 			'SNTM',
-			0,
+			[1, 2],
 		)
 		);
-		$I->seeInTitle('Some new type name');
+		$I->seeInTitle('Some new stage name');
 	}
 
-	private function formParams($name, $shortname, $vat): array {
+	private function formParams($name, $shortname, $typesIds): array {
 		return [
-			'IssueType[name]' => $name,
-			'IssueType[short_name]' => $shortname,
-			'IssueType[vat]' => $vat,
+			'IssueStageForm[name]' => $name,
+			'IssueStageForm[short_name]' => $shortname,
+			'IssueStageForm[typesIds]' => $typesIds,
 		];
 	}
 

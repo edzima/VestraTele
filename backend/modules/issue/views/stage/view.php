@@ -1,26 +1,30 @@
 <?php
 
+use backend\modules\issue\models\IssueStage;
 use yii\helpers\Html;
+use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\IssueStage */
+/* @var $model IssueStage */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Stages'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+YiiAsset::register($this);
+
 ?>
 <div class="issue-stage-view">
 
-	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?= Html::a('Edycja', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-		<?= Html::a('Usuń', ['delete', 'id' => $model->id], [
+		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+		<?= Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',
 			'data' => [
-				'confirm' => 'Are you sure you want to delete this item?',
+				'confirm' => Yii::t('backend', 'Are you sure you want to delete this Stage with all Issues with then?'),
 				'method' => 'post',
 			],
 		]) ?>
@@ -29,11 +33,26 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [
-			'id',
 			'name',
 			'short_name',
-			'days_reminder',
-			'calendar_background',
+			[
+				'format' => 'html',
+				'value' => Html::ul($model->types),
+				'label' => Yii::t('issue', 'Issues Types'),
+			],
+			[
+				'attribute' => 'days_reminder',
+				'visible' => $model->days_reminder !== null,
+			],
+			[
+				'attribute' => 'calendar_background',
+				'visible' => $model->calendar_background !== null,
+				'contentOptions' => [
+					'style' => [
+						'background-color' => $model->calendar_background,
+					],
+				],
+			],
 		],
 	]) ?>
 

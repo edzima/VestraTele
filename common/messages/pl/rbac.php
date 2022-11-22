@@ -23,6 +23,8 @@ return [
 	'issue.delete' => 'Sprawy - usuwanie',
 	'issue.link-user' => 'Sprawy - przypisywanie użytkowników',
 	'issue.stage.change' => 'Sprawy - zmiana etapów',
+	'issue.stage.manager' => 'Etapy Spraw - (Manager)',
+	'issue.type.manager' => 'Type Spraw - (Manager)',
 	'guardian' => 'Opiekun',
 	'handicapped' => 'Niepełnosprawny',
 	'hint' => 'Wskazówki',
@@ -66,5 +68,5 @@ return [
 	'workers.hierarchy' => 'Lista pracowników - hierarchia',
 	'victim' => 'Poszkodowany',
 	'vindicator' => 'Windykator',
-
+	'potential-client' => 'Potencjalny Klient',
 ];

@@ -35,7 +35,7 @@ class IssueClaimCompanyColumn extends DataColumn {
 			return null;
 		}
 		$values = [];
-		foreach ($model->claims as $claim) {
+		foreach ($issue->claims as $claim) {
 			if ($claim->isCompany()) {
 				if (!empty($claim->trying_value)) {
 					$values[] = Yii::$app->formatter->asCurrency($claim->trying_value);
