@@ -165,4 +165,5 @@ return [
 	'Request for Justification' => 'Wniosek o Uzasadnienie',
 	'Demand before Judgement' => 'Wezwanie Przedsądowe',
 	'Honorarium - Vindication' => 'Honorarium - Windykacja',
+	'Provison control' => 'Kontrola Prowizji',
 ];

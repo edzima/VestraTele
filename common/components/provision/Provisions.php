@@ -37,6 +37,31 @@ class Provisions extends Component {
 			$issue = $event->model->issue;
 		}
 		if (!empty($issue->getIssueModel()->payCalculations)) {
+			foreach ($issue->getIssueModel()->payCalculations as $settlement) {
+				if (!$settlement->isProvisionControl() && $settlement->hasProvisions()) {
+					$settlement->markAsProvisionControl();
+					$settlement->save(false);
+
+					$message = Yii::t('provision', 'Change User: {user} in Settlement: {settlement} with Provision.', [
+						'user' => $event->model->getTypeWithUser(),
+						'settlement' => $settlement->getTypeName(),
+					]);
+					Yii::warning($message, 'provision.issueUserEvent');
+					Yii::$app
+						->mailer
+						->compose(
+							['html' => 'issueUserChangeForSettlementWithProvisions-html', 'text' => 'issueUserChangeForSettlementWithProvisions-text'],
+							[
+								'event' => $event,
+								'settlement' => $settlement,
+							]
+						)
+						->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
+						->setTo(Yii::$app->params['provisionEmail'])
+						->setSubject($message)
+						->send();
+				}
+			}
 			Yii::warning('Change User for Issue: ' . $issue->getIssueName() . ' who has Settlements.');
 			$provisions = $issue->getIssueModel()
 				->getPays()

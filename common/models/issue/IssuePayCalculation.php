@@ -10,7 +10,7 @@ use common\models\provision\ProvisionQuery;
 use common\models\user\User;
 use DateTime;
 use Decimal\Decimal;
-use frontend\helpers\Url;
+use frontend\helpers\Url as FrontendUrl;
 use Yii;
 use yii\base\InvalidCallException;
 use yii\behaviors\TimestampBehavior;
@@ -194,7 +194,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	}
 
 	public function getFrontendUrl(): string {
-		return Url::settlementView($this->getId(), true);
+		return FrontendUrl::settlementView($this->getId(), true);
 	}
 
 	public function isForUser(int $id): bool {
@@ -347,6 +347,21 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 		return $count;
 	}
 
+	public function hasProvisions(): bool {
+		return $this->getPays()
+			->joinWith('provisions p')
+			->andWhere('p.id IS NOT NULL')
+			->exists();
+	}
+
+	public function isProvisionControl(): bool {
+		return $this->problem_status === static::PROBLEM_STATUS_PROVISION_CONTROL;
+	}
+
+	public function markAsProvisionControl(): void {
+		$this->problem_status = static::PROBLEM_STATUS_PROVISION_CONTROL;
+	}
+
 	public static function getOwnerNames(): array {
 		if (static::$OWNER_NAMES === null) {
 			$ids = self::find()
@@ -370,6 +385,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 			static::PROBLEM_STATUS_JUDGEMENT => Yii::t('settlement', 'Judgement'),
 			static::PROBLEM_STATUS_BAILLIF => Yii::t('settlement', 'Baillif'),
 			static::PROBLEM_STATUS_EXTERNAL_DEBT_COLLECTION => Yii::t('settlement', 'External debt collection'),
+			static::PROBLEM_STATUS_PROVISION_CONTROL => Yii::t('settlement', 'Provison control'),
 		];
 	}
 
