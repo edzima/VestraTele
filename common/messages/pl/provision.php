@@ -89,6 +89,7 @@ return [
 	'Not found active type for settlement: {type}' => 'Nie znaleziono aktywnych typów Prowizji dla Rozliczenia: {type}',
 	'Settlement mark as Provision Control.' => 'Należy skontrolować prowizję w Rozliczeniu',
 	'Change User: {user} in Settlement: {settlement} with Provision.' => 'Zmiana w uczestnikach: {user} Sprawy w Rozliczeniu: {settlement} z Prowizjami',
+	'Unmark provision control.' => 'Odznaczono Kontrole Prowizji',
 ];
 
 

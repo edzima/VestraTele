@@ -53,7 +53,7 @@ class CalculationController extends Controller {
 			throw new ForbiddenHttpException();
 		}
 		$searchModel = new IssuePayCalculationSearch();
-		$searchModel->onlyWithProblems = false;
+		$searchModel->onlyWithPayProblems = false;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
