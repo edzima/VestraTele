@@ -314,5 +314,7 @@ return [
 	'Create Issue Stage' => 'Dodaj Etap Sprawy',
 	'Update Issue Stage: {name}' => 'Edytuj Etap Sprawy: {name}',
 	'Only with Claims' => 'Z Rozszczeniami',
+	'Unmark Provision Control' => 'Odznacz Kontrole Prowizji',
+	'Are you sure you want to delete all provisions for this settlement? Provision Control will be unmark.' => 'Jesteś pewny, że chcesz usunąć wszystkie Prowizję dla tego Rozlcizenia? KONTROLA PROWIZJI zostanie zdjęta.',
 	'Are you sure you want to delete this Stage with all Issues with then?' => 'Jesteś pewien, że chcesz usunac ten Etap oraz WSZYSTKIE Sprawy do niego przypisane?',
 ];

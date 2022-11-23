@@ -49,6 +49,15 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 
 	use IssueTrait;
 
+	public static array $paysProblems = [
+		self::PROBLEM_STATUS_PREPEND_DEMAND,
+		self::PROBLEM_STATUS_DEMAND,
+		self::PROBLEM_STATUS_PREPEND_JUDGEMENT,
+		self::PROBLEM_STATUS_JUDGEMENT,
+		self::PROBLEM_STATUS_BAILLIF,
+		self::PROBLEM_STATUS_EXTERNAL_DEBT_COLLECTION,
+	];
+
 	public const PROBLEM_STATUS_PREPEND_DEMAND = 10;
 	public const PROBLEM_STATUS_DEMAND = 15;
 	public const PROBLEM_STATUS_PREPEND_JUDGEMENT = 20;
@@ -362,6 +371,14 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 		$this->problem_status = static::PROBLEM_STATUS_PROVISION_CONTROL;
 	}
 
+	public function unmarkProvisionControl(): void {
+		if ($this->isProvisionControl()) {
+			$this->updateAttributes([
+				'problem_status' => null,
+			]);
+		}
+	}
+
 	public static function getOwnerNames(): array {
 		if (static::$OWNER_NAMES === null) {
 			$ids = self::find()
@@ -385,7 +402,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 			static::PROBLEM_STATUS_JUDGEMENT => Yii::t('settlement', 'Judgement'),
 			static::PROBLEM_STATUS_BAILLIF => Yii::t('settlement', 'Baillif'),
 			static::PROBLEM_STATUS_EXTERNAL_DEBT_COLLECTION => Yii::t('settlement', 'External debt collection'),
-			static::PROBLEM_STATUS_PROVISION_CONTROL => Yii::t('settlement', 'Provison control'),
+			static::PROBLEM_STATUS_PROVISION_CONTROL => Yii::t('settlement', 'Provision Control'),
 		];
 	}
 

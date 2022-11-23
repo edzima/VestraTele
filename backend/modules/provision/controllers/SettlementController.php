@@ -216,6 +216,11 @@ class SettlementController extends Controller {
 			Flash::add(Flash::TYPE_SUCCESS,
 				Yii::t('provision', 'Remove {count} provisions.', ['count' => $count]));
 		}
+		if ($model->isProvisionControl()) {
+			$model->unmarkProvisionControl();
+			Flash::add(Flash::TYPE_INFO,
+				Yii::t('provision', 'Unmark provision control.'));
+		}
 
 		return $this->redirect(['view', 'id' => $id]);
 	}
@@ -224,8 +229,12 @@ class SettlementController extends Controller {
 		$count = 0;
 		foreach ($ids as $id) {
 			$model = $this->findModel($id);
+			if ($model->isProvisionControl()) {
+				$model->unmarkProvisionControl();
+			}
 			$count += Yii::$app->provisions->removeForPays($model->getPays()->getIds());
 		}
+
 		if ($count) {
 			Flash::add(Flash::TYPE_SUCCESS,
 				Yii::t('provision', 'Remove {count} provisions.', ['count' => $count]));
@@ -233,7 +242,7 @@ class SettlementController extends Controller {
 		return $this->redirect(['/settlement/calculation/index']);
 	}
 
-	private function findModel(int $id): IssueSettlement {
+	private function findModel(int $id): IssuePayCalculation {
 		$model = IssuePayCalculation::findOne($id);
 		if ($model === null) {
 			throw new NotFoundHttpException();
