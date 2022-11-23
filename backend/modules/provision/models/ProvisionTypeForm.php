@@ -38,7 +38,7 @@ class ProvisionTypeForm extends Model {
 	public function rules(): array {
 		return [
 			[['name', 'value', 'is_percentage', 'issueUserType', 'is_active', 'with_hierarchy'], 'required'],
-			['name', 'string', 'max' => 50],
+			['name', 'string', 'max' => 255],
 			[
 				'name', 'unique', 'targetClass' => IssueProvisionType::class,
 				'filter' => function (QueryInterface $query): void {
