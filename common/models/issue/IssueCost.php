@@ -30,6 +30,7 @@ use yii\db\ActiveRecord;
  * @property string|null $settled_at
  * @property string|null $confirmed_at
  * @property int|null $user_id
+ * @property int|null $hide_on_report
  *
  * @property-read bool $is_confirmed
  * @property-read string|null $transferTypeName
@@ -99,6 +100,7 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 			'transferTypeName' => Yii::t('settlement', 'Transfer Type'),
 			'base_value' => Yii::t('settlement', 'Base Value'),
 			'is_confirmed' => Yii::t('settlement', 'Is Confirmed'),
+			'hide_on_report' => Yii::t('provision', 'Hide on report'),
 		]);
 	}
 

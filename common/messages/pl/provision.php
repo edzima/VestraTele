@@ -90,6 +90,8 @@ return [
 	'Settlement mark as Provision Control.' => 'Należy skontrolować prowizję w Rozliczeniu',
 	'Change User: {user} in Settlement: {settlement} with Provision.' => 'Zmiana w uczestnikach: {user} Sprawy w Rozliczeniu: {settlement} z Prowizjami',
 	'Unmark provision control.' => 'Odznaczono Kontrole Prowizji',
+	'Hide on Report' => 'Ukryj w Raporcie',
+	'Visible on Report' => 'Pokazuj w Raporcie',
 ];
 
 
