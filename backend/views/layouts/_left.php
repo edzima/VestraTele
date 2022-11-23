@@ -297,6 +297,16 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-calculator"></i>',
 							'visible' => $user->can(User::PERMISSION_PROVISION),
 						],
+						$user->can(User::PERMISSION_PROVISION) && Yii::$app->provisions->getProvisionControlSettlementCount() > 0 ?
+							[
+								'label' => Yii::t('settlement', 'Provision Control {count}', [
+									'count' => Yii::$app->provisions->getProvisionControlSettlementCount(),
+								]),
+								'url' => ['/settlement/calculation-problem/provision-control'],
+								'icon' => '<i class="fa fa-flag"></i>',
+								'visible' => $user->can(User::PERMISSION_PROVISION),
+							]
+							: [],
 						[
 							'label' => Yii::t('backend', 'Calculation to create'),
 							'url' => ['/settlement/calculation/to-create'],

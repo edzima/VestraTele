@@ -9,6 +9,7 @@ use common\components\provision\exception\MultipleSettlementProvisionTypesExcept
 use common\models\issue\event\IssueUserEvent;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssuePay;
+use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSettlement;
 use common\models\provision\IssueProvisionType;
 use common\models\provision\Provision;
@@ -30,6 +31,17 @@ class Provisions extends Component {
 		'type_id',
 		'percent',
 	];
+
+	private ?int $provisionControlSettlementCount = null;
+
+	public function getProvisionControlSettlementCount(bool $refresh = false): int {
+		if ($this->provisionControlSettlementCount === null || $refresh) {
+			$this->provisionControlSettlementCount = IssuePayCalculation::find()
+				->onlyProblems([IssuePayCalculation::PROBLEM_STATUS_PROVISION_CONTROL])
+				->count();
+		}
+		return $this->provisionControlSettlementCount;
+	}
 
 	public function onIssueUserEvent(IssueUserEvent $event): void {
 		$issue = $event->sender;

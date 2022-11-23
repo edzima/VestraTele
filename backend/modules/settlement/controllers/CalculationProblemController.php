@@ -2,13 +2,16 @@
 
 namespace backend\modules\settlement\controllers;
 
+use backend\helpers\Url;
 use backend\modules\settlement\models\CalculationProblemStatusForm;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use common\models\issue\IssuePayCalculation;
+use common\models\user\User;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -28,9 +31,25 @@ class CalculationProblemController extends Controller {
 		];
 	}
 
+	public function actionProvisionControl(): string {
+		if (!Yii::$app->user->can(User::PERMISSION_PROVISION)) {
+			throw new ForbiddenHttpException();
+		}
+		Url::remember();
+		$searchModel = new IssuePayCalculationSearch();
+		$searchModel->setScenario(IssuePayCalculationSearch::SCENARIO_ARCHIVE);
+		$searchModel->withArchive = true;
+		$searchModel->problem_status = IssuePayCalculationSearch::PROBLEM_STATUS_PROVISION_CONTROL;
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		return $this->render('provision-control', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
 	public function actionIndex(): string {
 		$searchModel = new IssuePayCalculationSearch();
-		$searchModel->onlyWithProblems = true;
+		$searchModel->onlyWithPayProblems = true;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
