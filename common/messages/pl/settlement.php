@@ -169,4 +169,5 @@ return [
 	'Provision Control {count}' => 'Kontrola Prowizji ({count})',
 	'Hide Cost: {value} in Report.' => 'Ukryto Koszt: {value} w Raporcie.',
 	'Visible Cost: {value} in Report.' => 'Koszt: {value} będzie ponownie w Raporcie.',
+	'Payed Sum' => 'Opłacono',
 ];

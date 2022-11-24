@@ -29,10 +29,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'attribute' => 'pay.valueWithVAT',
 				'format' => 'currency',
+				'label' => Yii::t('settlement', 'Value with VAT'),
 			],
 			[
 				'attribute' => 'pay.valueWithoutVAT',
 				'format' => 'currency',
+				'label' => Yii::t('settlement', 'Value without VAT'),
 			],
 		],
 	]) ?>

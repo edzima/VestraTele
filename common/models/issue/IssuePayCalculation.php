@@ -140,6 +140,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 			'is_provider_notified' => Yii::t('common', 'Is provider notified'),
 			'costsSum' => Yii::t('settlement', 'Costs sum'),
 			'valueWithoutCosts' => Yii::t('settlement', 'Value without costs'),
+			'payedSum' => Yii::t('settlement', 'Payed Sum'),
 		];
 	}
 
@@ -258,6 +259,10 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 			return false;
 		}
 		return $this->getValueToPay()->isZero();
+	}
+
+	public function getPayedSum(): Decimal {
+		return Yii::$app->pay->payedSum($this->pays);
 	}
 
 	public function getDecimalValue(): Decimal {
