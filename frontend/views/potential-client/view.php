@@ -8,7 +8,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model PotentialClient */
 
-$this->title = $model->name;
+$this->title = $model->getName();
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Potential Clients'), 'url' => ['self']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
