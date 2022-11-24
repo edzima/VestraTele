@@ -128,7 +128,10 @@ class IssueCostActionColumn extends ActionColumn {
 	public function issueLink(IssueCost $cost): string {
 		return Html::a(
 			'<i class="fa fa-suitcase"></i>',
-			Url::issueView($cost->getIssueId())
+			Url::issueView($cost->getIssueId()), [
+				'title' => $cost->getIssueName(),
+				'aria-label' => $cost->getIssueName(),
+			]
 		);
 	}
 }

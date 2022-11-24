@@ -62,6 +62,7 @@ class ReportController extends Controller {
 		$searchModel->to_user_id = $id;
 		$searchModel->dateTo = $dateTo;
 		$searchModel->dateFrom = $dateFrom;
+		$searchModel->hide_on_report = false;
 		if ($searchModel->hasHiddenProvisions()) {
 			$link = Html::a(Yii::t('provision', 'hidden provisions'), [
 					'/provision/provision/index',

@@ -15,6 +15,7 @@ use yii\data\DataProviderInterface;
 class ProvisionReportSearch extends ProvisionSearch {
 
 	public int $limit = 500;
+	public $hide_on_report = false;
 
 	public function setToUser(User $user): void {
 		$this->toUser = $user;
@@ -40,7 +41,6 @@ class ProvisionReportSearch extends ProvisionSearch {
 		$query = $provider->query;
 		$query->notHidden();
 		$query->joinWith('pay.calculation.pays');
-
 		return $provider;
 	}
 
@@ -55,6 +55,7 @@ class ProvisionReportSearch extends ProvisionSearch {
 				])
 				->user($this->to_user_id)
 				->notSettled()
+				->notHidden()
 				->andWhere(['between', 'date_at', $this->dateFrom, $this->dateTo])
 				->all(),
 			'pagination' => false,
@@ -70,6 +71,7 @@ class ProvisionReportSearch extends ProvisionSearch {
 					'issue.customer.userProfile',
 				])
 				->user($this->to_user_id)
+				->notHidden()
 				->settled($this->dateFrom, $this->dateTo)
 				->all(),
 			'pagination' => false,
