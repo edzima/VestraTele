@@ -79,7 +79,15 @@ class ProvisionUpdateForm extends Model {
 		$model = $this->model;
 		$model->value = $this->generateValue()->toFixed(2);
 		$model->hide_on_report = $this->hide_on_report;
+		$model->percent = $this->generatePercent()->toFixed(2);
 		return $model->save(false);
+	}
+
+	public function generatePercent(?Decimal $value = null): Decimal {
+		if ($value === null) {
+			$value = $this->model->getValue();
+		}
+		return $value->div(Yii::$app->provisions->issuePayValue($this->model->pay))->mul(100);
 	}
 
 	public function generateValue(): Decimal {
