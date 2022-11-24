@@ -54,6 +54,11 @@ class IssueCostQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function hidden(): self {
+		$this->andWhere(['hide_on_report' => true]);
+		return $this;
+	}
+
 	/**
 	 * @inheritdoc
 	 * @return IssueCost[]|array
