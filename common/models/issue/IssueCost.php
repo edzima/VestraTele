@@ -136,7 +136,7 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 	}
 
 	public function getIsSettled(): bool {
-		return !empty($this->settled_at) || $this->getHasSettlements();
+		return !empty($this->settled_at);
 	}
 
 	public function getIsConfirmed(): bool {

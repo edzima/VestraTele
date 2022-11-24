@@ -44,7 +44,7 @@ class IssueCostActionColumn extends ActionColumn {
 			};
 		}
 
-		if ($this->report) {
+		if ($this->settlement) {
 			if ($this->unlink && !isset($this->buttons['unlink'])) {
 				$this->buttons['unlink'] = function (string $key, IssueCost $cost): string {
 					return $this->unlinkSettlementLink($cost, $this->settlement);
