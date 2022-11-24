@@ -18,5 +18,4 @@ $issueLink = Url::issueView($settlement->getIssueId(), true);
 
 <?= $issueLink ?>
 
-<?= $settlementLink ?>
 

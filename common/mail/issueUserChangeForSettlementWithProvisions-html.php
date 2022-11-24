@@ -18,7 +18,6 @@ $issueLink = Url::issueView($settlement->getIssueId(), true);
 
 	<p><?= Yii::t('provision', 'Settlement mark as Provision Control.') ?></p>
 
-	<p><?= Html::a(Html::encode($settlement->getIssueName(), $issueLink)) ?></p>
+	<p><?= Html::a(Html::encode($settlement->getIssueName()), $issueLink) ?></p>
 
-	<p><?= Html::a(Html::encode($settlement->getTypeName()), $settlementLink) ?></p>
 </div>
