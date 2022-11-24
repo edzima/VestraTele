@@ -92,6 +92,8 @@ return [
 	'Unmark provision control.' => 'Odznaczono Kontrole Prowizji',
 	'Hide on Report' => 'Ukryj w Raporcie',
 	'Visible on Report' => 'Pokazuj w Raporcie',
+	'In report {link}' => 'W Raporcie {link}',
+	'hidden costs' => 'ukryto koszty',
 ];
 
 

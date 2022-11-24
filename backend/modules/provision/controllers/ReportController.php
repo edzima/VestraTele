@@ -3,6 +3,7 @@
 namespace backend\modules\provision\controllers;
 
 use backend\helpers\Url;
+use backend\modules\settlement\models\search\IssueCostSearch;
 use common\helpers\Flash;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionReportSearch;
@@ -71,7 +72,25 @@ class ReportController extends Controller {
 				]
 			);
 			Flash::add(Flash::TYPE_WARNING,
-				Yii::t('provision', 'In report' . ' ' . $link)
+				Yii::t('provision', 'In report {link}', [
+					'link' => $link,
+				])
+			);
+		}
+
+		if ($searchModel->hasHiddenCost()) {
+			$link = Html::a(Yii::t('provision', 'hidden costs'), [
+					'/settlement/cost/index',
+					Html::getInputName(IssueCostSearch::instance(), 'dateStart') => $dateFrom,
+					Html::getInputName(IssueCostSearch::instance(), 'dateEnd') => $dateTo,
+					Html::getInputName(IssueCostSearch::instance(), 'user_id') => $id,
+					Html::getInputName(IssueCostSearch::instance(), 'hide_on_report') => true,
+				]
+			);
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('provision', 'In report {link}', [
+					'link' => $link,
+				])
 			);
 		}
 

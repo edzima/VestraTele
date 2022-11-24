@@ -86,6 +86,15 @@ class ProvisionReportSearch extends ProvisionSearch {
 		return $query->exists();
 	}
 
+	public function hasHiddenCost(): bool {
+		return IssueCost::find()
+			->hidden()
+			->andFilterWhere(['>=', 'date_at', $this->dateFrom])
+			->andFilterWhere(['<=', 'date_at', $this->dateTo])
+			->user($this->to_user_id)
+			->exists();
+	}
+
 	public function summary(): ProvisionReportSummary {
 		if ($this->toUser === null) {
 			throw new InvalidConfigException('Not Found User with ID: ' . $this->to_user_id);
