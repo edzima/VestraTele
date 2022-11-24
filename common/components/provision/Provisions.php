@@ -36,9 +36,14 @@ class Provisions extends Component {
 
 	public function getProvisionControlSettlementCount(bool $refresh = false): int {
 		if ($this->provisionControlSettlementCount === null || $refresh) {
-			$this->provisionControlSettlementCount = IssuePayCalculation::find()
-				->onlyProblems([IssuePayCalculation::PROBLEM_STATUS_PROVISION_CONTROL])
-				->count();
+			if ($refresh) {
+				Yii::$app->cache->set('provision.control_settlement_count', null);
+			}
+			$this->provisionControlSettlementCount = Yii::$app->cache->getOrSet('provision.control_settlement_count', function (): int {
+				return IssuePayCalculation::find()
+					->onlyProblems([IssuePayCalculation::PROBLEM_STATUS_PROVISION_CONTROL])
+					->count();
+			}, 0);
 		}
 		return $this->provisionControlSettlementCount;
 	}
@@ -49,10 +54,12 @@ class Provisions extends Component {
 			$issue = $event->model->issue;
 		}
 		if (!empty($issue->getIssueModel()->payCalculations)) {
+			$provisionControl = false;
 			foreach ($issue->getIssueModel()->payCalculations as $settlement) {
 				if (!$settlement->isProvisionControl() && $settlement->hasProvisions()) {
 					$settlement->markAsProvisionControl();
 					$settlement->save(false);
+					$provisionControl = true;
 
 					$message = Yii::t('provision', 'Change User: {user} in Settlement: {settlement} with Provision.', [
 						'user' => $event->model->getTypeWithUser(),
@@ -75,16 +82,8 @@ class Provisions extends Component {
 				}
 			}
 			Yii::warning('Change User for Issue: ' . $issue->getIssueName() . ' who has Settlements.');
-			$provisions = $issue->getIssueModel()
-				->getPays()
-				->joinWith('provisions p')
-				->andWhere('p.id IS NOT NULL')
-				->exists();
-			if ($provisions) {
-				//@todo dont remove provision
-				//@todo send Email to Provision Manager about Settlement with provision control problem.
-				//@todo create settlement note with issue details.
-				Yii::warning('Issue has already Provisions.');
+			if ($provisionControl) {
+				$this->getProvisionControlSettlementCount(true);
 			}
 		}
 	}
