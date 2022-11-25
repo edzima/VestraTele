@@ -177,6 +177,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model,
+		'collapseTypes' => [IssueNotesWidget::TYPE_SMS],
 	]) ?>
 
 </div>
