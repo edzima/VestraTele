@@ -105,8 +105,5 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model,
-		'collapseTypes' => [
-			IssueNotesWidget::TYPE_SMS,
-		],
 	]) ?>
 </div>

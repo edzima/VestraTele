@@ -22,10 +22,7 @@ class IssueNotesWidget extends IssueWidget {
 	public ?array $notes = null;
 	public ?string $type = null;
 
-	public array $collapseTypes = [
-		self::TYPE_SMS,
-		self::TYPE_USER_FRONT,
-	];
+	public array $collapseTypes = [];
 
 	/**
 	 * @see IssueNoteWidget
