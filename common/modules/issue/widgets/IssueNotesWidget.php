@@ -23,7 +23,7 @@ class IssueNotesWidget extends IssueWidget {
 	public ?string $type = null;
 
 	public array $collapseTypes = [];
-	public bool $withProvisionControl = false;
+	public bool $withProvisionControl = true;
 
 	/**
 	 * @see IssueNoteWidget
@@ -41,8 +41,9 @@ class IssueNotesWidget extends IssueWidget {
 				->joinWith('user.userProfile');
 
 			if (!$this->withProvisionControl) {
-				$query->withoutTypes([IssueNote::TYPE_SETTLEMENT_PROVISION_CONTROL]);
+				//	$query->withoutTypes([IssueNote::TYPE_SETTLEMENT_PROVISION_CONTROL]);
 			}
+
 			$this->notes = $query->all();
 		}
 		if ($this->title === null) {
