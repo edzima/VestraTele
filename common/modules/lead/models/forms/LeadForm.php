@@ -45,6 +45,7 @@ class LeadForm extends Model implements LeadInterface {
 	public $agent_id;
 
 	public string $dateFormat = 'Y-m-d H:i:s';
+	private array $users = [];
 
 	public function init(): void {
 		parent::init();
@@ -133,6 +134,7 @@ class LeadForm extends Model implements LeadInterface {
 	}
 
 	public function setUsers(array $users): void {
+		$this->users = $users;
 		$this->agent_id = $users[static::USER_AGENT] ?? null;
 		$this->owner_id = $users[static::USER_OWNER] ?? null;
 	}
@@ -187,15 +189,19 @@ class LeadForm extends Model implements LeadInterface {
 	}
 
 	public function getUsers(): array {
-		$users = [];
+		$users = $this->users;
 
 		$ownerId = $this->getOwnerId();
 		if ($ownerId !== null) {
 			$users[static::USER_OWNER] = $ownerId;
+		} else {
+			unset($users[static::USER_OWNER]);
 		}
 
 		if (!empty($this->agent_id)) {
 			$users[static::USER_AGENT] = $this->agent_id;
+		} else {
+			unset($users[static::USER_AGENT]);
 		}
 
 		return $users;

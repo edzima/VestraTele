@@ -8,13 +8,26 @@
 
 namespace backend\modules\issue;
 
+use backend\modules\issue\models\IssueUserChangeHandler;
+use common\models\issue\event\IssueUserEvent;
+use common\models\issue\Issue;
 use common\models\user\Worker;
+use Yii;
 use yii\base\Module as BaseModule;
 use yii\filters\AccessControl;
 
 class Module extends BaseModule {
 
 	public $controllerNamespace = 'backend\modules\issue\controllers';
+
+	public function init() {
+		parent::init();
+		IssueUserEvent::on(Issue::class, IssueUserEvent::WILDCARD_EVENT, static function (IssueUserEvent $event): void {
+			$model = new IssueUserChangeHandler($event);
+			$model->user_id = Yii::$app->user->getId();
+			$model->parse();
+		});
+	}
 
 	public function behaviors(): array {
 		return [

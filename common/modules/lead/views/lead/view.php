@@ -5,6 +5,7 @@ use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadStatusInterface;
+use common\modules\lead\models\LeadUser;
 use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadDialersGridView;
@@ -39,7 +40,7 @@ YiiAsset::register($this);
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
-	<p>
+	<p class="d-inline">
 
 		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->getId()], ['class' => 'btn btn-success']) ?>
 
@@ -190,6 +191,16 @@ YiiAsset::register($this);
 						[
 							'label' => Yii::t('lead', 'User'),
 							'value' => 'user.fullName',
+						],
+						[
+							'label' => Yii::t('lead', 'Date At'),
+							'value' => function (LeadUser $issueUser): string {
+								$date = Yii::$app->formatter->asDatetime($issueUser->created_at);
+								if ($issueUser->created_at !== $issueUser->updated_at) {
+									$date .= ' ( ' . Yii::$app->formatter->asDatetime($issueUser->updated_at) . ' )';
+								}
+								return $date;
+							},
 						],
 					],
 				])

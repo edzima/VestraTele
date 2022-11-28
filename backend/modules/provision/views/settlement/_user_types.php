@@ -5,6 +5,7 @@ use backend\helpers\Url;
 use backend\modules\provision\models\SettlementUserProvisionsForm;
 use backend\widgets\GridView;
 use common\models\provision\IssueProvisionType;
+use common\models\provision\ProvisionUser;
 use common\widgets\grid\ActionColumn;
 use yii\data\ArrayDataProvider;
 use yii\helpers\ArrayHelper;
@@ -38,7 +39,7 @@ use yii\web\View;
 				'attribute' => 'name',
 				'label' => Yii::t('provision', 'Name'),
 				'format' => 'html',
-				'value' => function (IssueProvisionType $type): string {
+				'value' => static function (IssueProvisionType $type): string {
 					return Html::tag('strong', '( ' . $type->getTypeName() . ' ) ') . Html::encode($type->name);
 				},
 			],
@@ -47,15 +48,33 @@ use yii\web\View;
 				'value' => static function (IssueProvisionType $type) use ($model): ?string {
 					$data = $model->getData();
 					$data->type = $type;
+					if ($type->getIsForDateFromSettlement()) {
+						$data->date = $model->getModel()->getCreatedAt();
+					}
 					$selfies = $data->getSelfQuery()->all();
+					if (empty($selfies) && $type->getBaseType() !== null) {
+						$data->type = $type->getBaseType();
+						$selfies = $data->getSelfQuery()->all();
+					}
 					if (empty($selfies)) {
 						return null;
 					}
+
 					if (count($selfies) === 1) {
 						$self = reset($selfies);
+						if ($type->getBaseType() !== null) {
+							return ProvisionUser::createFromBaseType($self, $type)->getFormattedValue();
+						}
 						return $self->getFormattedValue();
 					}
-					$values = ArrayHelper::getColumn($selfies, 'formattedValue');
+					$values = [];
+					if ($type->getBaseType() !== null) {
+						foreach ($selfies as $self) {
+							$values[] = ProvisionUser::createFromBaseType($self, $type)->getFormattedValue();
+						}
+					} else {
+						$values = ArrayHelper::getColumn($selfies, 'formattedValue');
+					}
 					return implode(', ', $values);
 				},
 			],

@@ -122,4 +122,8 @@ return [
 	'Summon Date: {type}' => 'Data: {type}',
 	'Summon At' => 'Data',
 	'Issues Types' => 'Typy Spraw',
+	'Add {user} as {type}.' => 'Dodano {user} jako: {type}.',
+	'Update {user} as {type}.' => 'Edycja {type} - {user}.',
+	'Delete {user} as {type}.' => 'Usunięto {type}: {user}.',
+	'Change User in Issue: {issue}.' => 'Zmiana w Sprawie: {issue}.',
 ];

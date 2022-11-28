@@ -115,7 +115,7 @@ class IssuePayCalculationSearchTest extends Unit {
 	}
 
 	public function testOnlyWithProblems(): void {
-		$this->model->onlyWithProblems = true;
+		$this->model->onlyWithPayProblems = true;
 		$models = $this->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
@@ -124,7 +124,7 @@ class IssuePayCalculationSearchTest extends Unit {
 	}
 
 	public function testOnlyWithoutProblems(): void {
-		$this->model->onlyWithProblems = false;
+		$this->model->onlyWithPayProblems = false;
 		$models = $this->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {

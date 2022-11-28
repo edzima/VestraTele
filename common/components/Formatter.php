@@ -14,6 +14,7 @@ use yii\i18n\Formatter as BaseFormatter;
 class Formatter extends BaseFormatter {
 
 	public const FRACTION_DIGITS = 2;
+	public const FRACTION_PERCENT_DIGITS = 4;
 
 	public $numberFormatterOptions = [
 		NumberFormatter::MIN_FRACTION_DIGITS => self::FRACTION_DIGITS,
@@ -40,7 +41,7 @@ class Formatter extends BaseFormatter {
 
 	public function asPercent($value, $decimals = null, $options = [], $textOptions = []) {
 		if ($value instanceof Decimal) {
-			$value = $value->toFixed(self::FRACTION_DIGITS);
+			$value = $value->toFixed(self::FRACTION_PERCENT_DIGITS);
 		}
 		return parent::asPercent($value, $decimals, $options, $textOptions);
 	}

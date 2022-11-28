@@ -23,6 +23,7 @@ class IssueNotesWidget extends IssueWidget {
 	public ?string $type = null;
 
 	public array $collapseTypes = [];
+	public bool $withProvisionControl = false;
 
 	/**
 	 * @see IssueNoteWidget
@@ -35,12 +36,14 @@ class IssueNotesWidget extends IssueWidget {
 	public function init(): void {
 		parent::init();
 		if ($this->notes === null) {
-			$this->notes = $this->model
+			$query = $this->model
 				->getIssueNotes()
-				->withoutTypes([IssueNote::TYPE_SETTLEMENT])
-				->orWhere(['type' => null])
-				->joinWith('user.userProfile')
-				->all();
+				->joinWith('user.userProfile');
+
+			if (!$this->withProvisionControl) {
+				$query->withoutTypes([IssueNote::TYPE_SETTLEMENT_PROVISION_CONTROL]);
+			}
+			$this->notes = $query->all();
 		}
 		if ($this->title === null) {
 			$this->title = Yii::t('issue', 'Issue Notes');

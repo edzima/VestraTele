@@ -164,4 +164,10 @@ return [
 	'Third Demand for Payment' => '3. Wezwanie do Zapłaty',
 	'Request for Justification' => 'Wniosek o Uzasadnienie',
 	'Demand before Judgement' => 'Wezwanie Przedsądowe',
+	'Honorarium - Vindication' => 'Honorarium - Windykacja',
+	'Provision Control' => 'Kontrola Prowizji',
+	'Provision Control {count}' => 'Kontrola Prowizji ({count})',
+	'Hide Cost: {value} in Report.' => 'Ukryto Koszt: {value} w Raporcie.',
+	'Visible Cost: {value} in Report.' => 'Koszt: {value} będzie ponownie w Raporcie.',
+	'Payed Sum' => 'Opłacono',
 ];

@@ -37,6 +37,7 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 	public $settledRange;
 	public $settledStart;
 	public $settledEnd;
+	public $hide_on_report;
 
 	public function behaviors(): array {
 		return [
@@ -74,7 +75,7 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 		return [
 			[['id', 'issue_id', 'user_id'], 'integer'],
 			[['type', 'transfer_type'], 'string'],
-			[['settled', 'withSettlements', 'is_confirmed'], 'boolean'],
+			[['settled', 'withSettlements', 'is_confirmed', 'hide_on_report'], 'boolean'],
 			[['created_at', 'updated_at', 'date_at', 'settled_at'], 'safe'],
 			[['dateRange', 'deadlineRange', 'settledRange'], 'match', 'pattern' => '/^.+\s\-\s.+$/'],
 			[['value', 'base_value', 'vat'], 'number'],
@@ -149,6 +150,7 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 			IssueCost::tableName() . '.vat' => $this->vat,
 			IssueCost::tableName() . '.type' => $this->type,
 			IssueCost::tableName() . '.transfer_type' => $this->transfer_type,
+			IssueCost::tableName() . '.hide_on_report' => $this->hide_on_report,
 		]);
 
 		return $dataProvider;

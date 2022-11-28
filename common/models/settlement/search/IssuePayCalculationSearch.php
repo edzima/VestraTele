@@ -34,6 +34,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 	public const SCENARIO_ARCHIVE = 'archive';
 
+
 	public $agent_id;
 	public string $customerLastname = '';
 	public $issue_type_id;
@@ -49,7 +50,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public bool $withArchive = false;
 	public ?bool $withoutProvisions = null;
 
-	public ?bool $onlyWithProblems = null;
+	public ?bool $onlyWithPayProblems = null;
 	public bool $onlyToPayed = false;
 
 	/**
@@ -170,10 +171,10 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	}
 
 	protected function applyProblemStatusFilter(IssuePayCalculationQuery $query): void {
-		if ($this->onlyWithProblems === false) {
+		if ($this->onlyWithPayProblems === false) {
 			$query->onlyWithoutProblems();
-		} elseif ($this->onlyWithProblems === true) {
-			$query->onlyProblems();
+		} elseif ($this->onlyWithPayProblems === true) {
+			$query->onlyProblems(static::$paysProblems);
 		}
 		if ($this->problem_status > 0) {
 			$query->onlyProblems((array) $this->problem_status);

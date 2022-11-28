@@ -13,7 +13,7 @@ use yii\helpers\BaseUrl;
 class Url extends BaseUrl {
 
 	protected const ROUTE_ISSUE_VIEW = '/issue/issue/view';
-	protected const ROUTE_SETTLEMENT_VIEW = '/settlement/settlement/view';
+	protected const ROUTE_SETTLEMENT_VIEW = '/settlement/calculation/view';
 	protected const ROUTE_LEAD_VIEW = '/lead/lead/view';
 
 	public static function issueView(int $id, $schema = false): string {

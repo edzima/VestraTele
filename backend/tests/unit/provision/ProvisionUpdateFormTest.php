@@ -51,6 +51,7 @@ class ProvisionUpdateFormTest extends Unit {
 	public function testNotChangePercent(): void {
 		$this->givenForm($this->grabProvision('nowak-self-paid'));
 		$this->thenSuccessSave();
+		$this->thenSeeProvision(new Decimal(500), new Decimal(50));
 	}
 
 	public function testChangePercent(): void {
@@ -59,13 +60,17 @@ class ProvisionUpdateFormTest extends Unit {
 		$this->form->percent = 60;
 
 		$this->thenSuccessSave();
-		$this->thenSeeProvision(new Decimal(600));
+		$this->thenSeeProvision(new Decimal(600), new Decimal(60));
+		$this->thenSeeProvision();
 	}
 
-	private function thenSeeProvision(Decimal $value = null): void {
+	private function thenSeeProvision(Decimal $value = null, Decimal $percent = null): void {
 		$attributes = $this->form->getModel()->getAttributes();
 		if ($value !== null) {
 			$attributes['value'] = $value->toFixed(2);
+		}
+		if ($percent !== null) {
+			$attributes['percent'] = $percent->toFixed(2);
 		}
 		$this->tester->seeRecord(Provision::class, $attributes);
 	}

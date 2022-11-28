@@ -3,7 +3,7 @@
 namespace console\controllers;
 
 use backend\modules\issue\models\search\IssueSearch;
-use common\components\provision\exception\MissingProvisionUserException;
+use common\components\provision\exception\Exception;
 use common\helpers\ArrayHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssuePayCalculation;
@@ -114,7 +114,7 @@ class ProvisionController extends Controller {
 					Yii::$app->provisions->settlement($calculation);
 					$calculation->refresh();
 					$sumAfter = $sumAfter->add($calculation->getProvisionsSum());
-				} catch (MissingProvisionUserException $exception) {
+				} catch (Exception $exception) {
 					Console::output($exception->getMessage());
 				}
 			}
@@ -309,7 +309,7 @@ class ProvisionController extends Controller {
 		Yii::$app->provisions->removeForPays($model->getPays()->getIds());
 		try {
 			Yii::$app->provisions->settlement($model);
-		} catch (MissingProvisionUserException $exception) {
+		} catch (Exception $exception) {
 			Console::output($exception->getMessage());
 		}
 	}

@@ -2,7 +2,7 @@
 
 namespace frontend\controllers;
 
-use common\components\provision\exception\MissingProvisionUserException;
+use common\components\provision\exception\Exception;
 use common\helpers\Flash;
 use common\models\issue\IssuePay;
 use common\models\settlement\PayPayedForm;
@@ -128,7 +128,7 @@ class PayController extends Controller {
 				Yii::$app->provisions->removeForPays($pay->calculation->getPays()->getIds(true));
 				try {
 					Yii::$app->provisions->settlement($pay->calculation);
-				} catch (MissingProvisionUserException $exception) {
+				} catch (Exception $exception) {
 
 				}
 			} else {

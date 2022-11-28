@@ -131,8 +131,8 @@ class UserController extends Controller {
 		if (in_array($type, $required, true)) {
 			throw new BadRequestHttpException('Invalid Type');
 		}
-
-		$this->findModel($issueId, $userId, $type)->delete();
+		$issue = $this->findIssue($issueId);
+		$issue->unlinkUser($type);
 		return $this->redirect(Url::issueView($issueId));
 	}
 

@@ -31,6 +31,7 @@ class RbacController extends Controller {
 		Worker::ROLE_LAWYER,
 		Worker::ROLE_LAWYER_ASSISTANT,
 		Worker::ROLE_TELEMARKETER,
+		Worker::ROLE_VINDICATOR,
 		Customer::ROLE_CUSTOMER,
 		Customer::ROLE_VICTIM,
 		Customer::ROLE_SHAREHOLDER,
@@ -119,6 +120,23 @@ class RbacController extends Controller {
 		Worker::PERMISSION_MESSAGE_TEMPLATE,
 		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
 	];
+
+	public function actionAddPermissionToWorkers(string $name, array $assignments): void {
+		$auth = Yii::$app->authManager;
+		$permission = $auth->getPermission($name);
+		if ($permission === null) {
+			Console::output('Not Find Permission: ' . $name);
+			return;
+		}
+
+		foreach (Worker::getAssignmentIds($assignments) as $id) {
+			try {
+				$auth->assign($permission, $id);
+			} catch (\yii\base\Exception $exception) {
+				Console::output($exception->getMessage());
+			}
+		}
+	}
 
 	public function actionInit(): void {
 		$auth = Yii::$app->authManager;

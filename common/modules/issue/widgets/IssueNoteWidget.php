@@ -17,7 +17,7 @@ use yii\base\Widget;
 class IssueNoteWidget extends Widget {
 
 	protected const CLASS_PINNED = 'panel-danger';
-	protected const CLASS_SETTLEMENT = 'panel-settlement';
+	protected const CLASS_SETTLEMENT = 'panel-success';
 	protected const CLASS_STAGE_CHANGE = 'panel-warning';
 	protected const CLASS_SMS = 'panel-info';
 	protected const CLASS_DEFAULT = 'panel-primary';
@@ -25,6 +25,7 @@ class IssueNoteWidget extends Widget {
 
 	protected const CLASS_BASE = 'panel';
 	protected const CLASS_COLLAPSE = 'collapse';
+	protected const CLASS_PROVISION_CONTROL = 'panel-warning';
 
 	public IssueNote $model;
 	public ?bool $editBtn = null;
@@ -78,6 +79,12 @@ class IssueNoteWidget extends Widget {
 		}
 		if ($this->model->isSms()) {
 			return static::CLASS_SMS;
+		}
+		if ($this->model->isForSettlement()) {
+			if ($this->model->isForSettlementProvisionControl()) {
+				return static::CLASS_PROVISION_CONTROL;
+			}
+			return static::CLASS_SETTLEMENT;
 		}
 		if ($this->model->isForSettlement()) {
 			return static::CLASS_SETTLEMENT;

@@ -6,23 +6,30 @@ use backend\helpers\Html;
 use backend\helpers\Url;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
+use common\models\user\User;
 use common\widgets\grid\ActionColumn;
 use Yii;
 
 class IssueCostActionColumn extends ActionColumn {
 
 	public $controller = '/settlement/cost';
-	public $template = '{issue} {settle} {link} {unlink} {view} {update} {delete}';
+	public $template = '{issue} {settle} {link} {unlink} {view} {update} {delete} {hide-on-report} {visible-on-report}';
 	public ?string $settleRedirectUrl = null;
 	public bool $settle = true;
 	public bool $unlink = false;
 	public bool $link = false;
 	public bool $issue = true;
+	public bool $report = true;
 
 	public ?IssuePayCalculation $settlement = null;
 
 	public function init() {
 		parent::init();
+
+		if ($this->report && !Yii::$app->user->can(User::PERMISSION_PROVISION)) {
+			$this->report = false;
+		}
+
 		if ($this->settleRedirectUrl === null) {
 			$this->settleRedirectUrl = Url::current();
 		}
@@ -46,6 +53,25 @@ class IssueCostActionColumn extends ActionColumn {
 			if ($this->link && !isset($this->buttons['link'])) {
 				$this->buttons['link'] = function (string $key, IssueCost $cost): string {
 					return $this->linkSettlementLink($cost, $this->settlement);
+				};
+			}
+		}
+
+		if ($this->report) {
+			if (!isset($this->buttons['hide-on-report'])) {
+				$this->buttons['hide-on-report'] = function (string $key, IssueCost $cost): string {
+					if (!$cost->hide_on_report) {
+						return $this->hideOnReportLink($cost);
+					}
+					return '';
+				};
+			}
+			if (!isset($this->buttons['visible-on-report'])) {
+				$this->buttons['visible-on-report'] = function (string $key, IssueCost $cost): string {
+					if ($cost->hide_on_report) {
+						return $this->visibleOnReportLink($cost);
+					}
+					return '';
 				};
 			}
 		}
@@ -81,10 +107,31 @@ class IssueCostActionColumn extends ActionColumn {
 			]);
 	}
 
+	public function hideOnReportLink(IssueCost $cost): string {
+		return Html::a(Html::icon('eye-close'),
+			['/settlement/cost/hide-on-report', 'id' => $cost->id], [
+				'data-method' => 'POST',
+				'title' => Yii::t('provision', 'Hide on Report'),
+				'aria-label' => Yii::t('provision', 'Hide on Report'),
+			]);
+	}
+
+	public function visibleOnReportLink(IssueCost $cost): string {
+		return Html::a(Html::icon('eye-open'),
+			['/settlement/cost/visible-on-report', 'id' => $cost->id], [
+				'data-method' => 'POST',
+				'title' => Yii::t('provision', 'Visible on Report'),
+				'aria-label' => Yii::t('provision', 'Visible on Report'),
+			]);
+	}
+
 	public function issueLink(IssueCost $cost): string {
 		return Html::a(
 			'<i class="fa fa-suitcase"></i>',
-			Url::issueView($cost->getIssueId())
+			Url::issueView($cost->getIssueId()), [
+				'title' => $cost->getIssueName(),
+				'aria-label' => $cost->getIssueName(),
+			]
 		);
 	}
 }

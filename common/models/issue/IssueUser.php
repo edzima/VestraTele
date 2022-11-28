@@ -9,8 +9,10 @@ use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\models\user\Worker;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "issue_user".
@@ -18,6 +20,8 @@ use yii\db\ActiveRecord;
  * @property int $user_id
  * @property int $issue_id
  * @property string $type
+ * @property int $created_at
+ * @property int $updated_at
  *
  * @property Issue $issue
  * @property User $user
@@ -37,6 +41,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	public const TYPE_HANDICAPPED = Customer::ROLE_HANDICAPPED;
 	public const TYPE_RECOMMENDING = User::ROLE_RECCOMENDING;
 	public const TYPE_GUARDIAN = User::ROLE_GUARDIAN;
+	public const TYPE_VINDICATOR = User::ROLE_VINDICATOR;
 
 	public const TYPES_WORKERS = [
 		self::TYPE_LAWYER,
@@ -44,6 +49,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		self::TYPE_AGENT,
 		self::TYPE_CO_AGENT,
 		self::TYPE_TELEMARKETER,
+		self::TYPE_VINDICATOR,
 	];
 
 	public const TYPES_CUSTOMERS = [
@@ -65,11 +71,24 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	/**
 	 * {@inheritdoc}
 	 */
+	public function behaviors(): array {
+		return [
+			[
+				'class' => TimestampBehavior::class,
+				'value' => new Expression('CURRENT_TIMESTAMP'),
+			],
+		];
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function rules(): array {
 		return [
 			[['user_id', 'issue_id', 'type'], 'required'],
 			[['user_id', 'issue_id'], 'integer'],
 			[['type'], 'string', 'max' => 255],
+			[['created_at', 'updated_at'], 'safe'],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 			[['user_id', 'issue_id'], 'unique', 'targetAttribute' => ['user_id', 'issue_id']],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
@@ -123,6 +142,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 			static::TYPE_LAWYER => User::getRolesNames()[static::TYPE_LAWYER],
 			static::TYPE_LAWYER_ASSISTANT => User::getRolesNames()[static::TYPE_LAWYER_ASSISTANT],
 			static::TYPE_TELEMARKETER => User::getRolesNames()[static::TYPE_TELEMARKETER],
+			static::TYPE_VINDICATOR => User::getRolesNames()[static::TYPE_VINDICATOR],
 			static::TYPE_VICTIM => User::getRolesNames()[static::TYPE_VICTIM],
 			static::TYPE_SHAREHOLDER => User::getRolesNames()[static::TYPE_SHAREHOLDER],
 			static::TYPE_HANDICAPPED => User::getRolesNames()[static::TYPE_HANDICAPPED],

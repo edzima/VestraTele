@@ -35,7 +35,13 @@ class SettlementDetailView extends DetailView {
 		return [
 			[
 				'attribute' => 'problemStatusName',
-				'visible' => $this->model->hasProblemStatus(),
+				'visible' => $this->model->hasProblemStatus() && !$this->model->isProvisionControl(),
+			],
+			[
+				'label' => Yii::t('settlement', 'Provision Control'),
+				'format' => 'boolean',
+				'value' => $this->model->isProvisionControl(),
+				'visible' => $this->model->isProvisionControl(),
 			],
 			[
 				'attribute' => 'typeName',

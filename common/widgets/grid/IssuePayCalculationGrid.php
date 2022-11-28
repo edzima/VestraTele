@@ -162,10 +162,14 @@ class IssuePayCalculationGrid extends GridView {
 			],
 			[
 				'class' => CurrencyColumn::class,
+				'attribute' => 'payedSum',
+				'pageSummary' => $this->withValueSummary,
+			],
+			[
+				'class' => CurrencyColumn::class,
 				'attribute' => 'valueToPay',
 				'pageSummary' => $this->withValueSummary,
 			],
-
 			[
 				'class' => CurrencyColumn::class,
 				'attribute' => 'userProvisionsSum',

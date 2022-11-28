@@ -3,21 +3,19 @@
 namespace backend\modules\settlement\controllers;
 
 use backend\helpers\Url;
-use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\settlement\models\DebtCostsForm;
 use backend\modules\settlement\models\IssueCostForm;
 use backend\modules\settlement\models\search\IssueCostSearch;
-use backend\widgets\IssueColumn;
 use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
-use common\models\user\Worker;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 use yii2tech\csvgrid\CsvGrid;
 
 /**
@@ -186,7 +184,7 @@ class CostController extends Controller {
 	 * Create Debt Costs for Issue
 	 *
 	 * @param int $issue_id
-	 * @return string|\yii\web\Response
+	 * @return string|Response
 	 * @throws NotFoundHttpException
 	 */
 	public function actionCreateDebt(int $issue_id) {
@@ -213,6 +211,30 @@ class CostController extends Controller {
 		$settlement = IssuePayCalculation::findOne($settlementId);
 		if ($settlement) {
 			$model->unlinkSettlement($settlementId);
+		}
+		return $this->redirect(Url::previous());
+	}
+
+	public function actionHideOnReport(int $id) {
+		$model = $this->findModel($id);
+		if (!$model->hide_on_report) {
+			$model->hide_on_report = true;
+			$model->updateAttributes(['hide_on_report']);
+			Flash::add(Flash::TYPE_SUCCESS, Yii::t('settlement', 'Hide Cost: {value} in Report.', [
+				'value' => Yii::$app->formatter->asCurrency($model->getValue()),
+			]));
+		}
+		return $this->redirect(Url::previous());
+	}
+
+	public function actionVisibleOnReport(int $id) {
+		$model = $this->findModel($id);
+		if ($model->hide_on_report) {
+			$model->hide_on_report = false;
+			$model->updateAttributes(['hide_on_report']);
+			Flash::add(Flash::TYPE_SUCCESS, Yii::t('settlement', 'Visible Cost: {value} in Report.', [
+				'value' => Yii::$app->formatter->asCurrency($model->getValue()),
+			]));
 		}
 		return $this->redirect(Url::previous());
 	}

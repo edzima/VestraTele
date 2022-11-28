@@ -20,8 +20,13 @@ $this->params['breadcrumbs'][] = $this->title;
 		<?= Html::a(Yii::t('backend', 'To create'), ['to-create'], ['class' => 'btn btn-success']) ?>
 		<?= Html::a(Yii::t('settlement', 'Uncollectible'), ['/settlement/calculation-problem/index'], ['class' => 'btn btn-warning']) ?>
 
+
 		<?= Yii::$app->user->can(User::PERMISSION_PROVISION)
-			? Html::a(Yii::t('backend', 'Without provisions'), ['without-provisions'], ['class' => 'btn btn-info'])
+			? Html::a(Yii::t('backend', 'Without provisions'),
+				['without-provisions'], ['class' => 'btn btn-info'])
+			. ' '
+			. Html::a(Yii::t('settlement', 'Provision Control'),
+				['calculation-problem/provision-control'], ['class' => 'btn btn-warning'])
 			: ''
 		?>
 

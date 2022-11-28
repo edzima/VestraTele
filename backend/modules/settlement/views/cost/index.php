@@ -7,6 +7,7 @@ use backend\widgets\IssueColumn;
 use common\helpers\Html;
 use common\models\issue\IssueCost;
 use common\models\issue\IssueCostInterface;
+use common\models\user\User;
 use common\widgets\grid\IssueTypeColumn;
 use kartik\select2\Select2;
 
@@ -85,6 +86,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'value',
 				'format' => 'currency',
 				'pageSummary' => true,
+			],
+			[
+				'attribute' => 'hide_on_report',
+				'format' => 'boolean',
+				'visible' => Yii::$app->user->can(User::PERMISSION_PROVISION),
 			],
 			[
 				'attribute' => 'transfer_type',
