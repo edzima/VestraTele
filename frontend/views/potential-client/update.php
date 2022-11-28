@@ -11,7 +11,7 @@ $this->title = Yii::t('common',
 		'name' => $model->getName(),
 	]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Potential Clients'), 'url' => ['self']];
-$this->params['breadcrumbs'][] = ['label' => $model->getName, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => $model->getName(), 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('common', 'Update');
 ?>
 <div class="potential-client-update">

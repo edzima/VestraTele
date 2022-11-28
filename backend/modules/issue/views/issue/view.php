@@ -178,6 +178,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model,
+		'collapseTypes' => [IssueNotesWidget::TYPE_SMS],
 		'withProvisionControl' => Yii::$app->user->can(User::PERMISSION_PROVISION),
 	]) ?>
 
