@@ -178,7 +178,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model,
-		'withSettlements' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
+		'withProvisionControl' => Yii::$app->user->can(User::PERMISSION_PROVISION),
 	]) ?>
 
 </div>

@@ -22,7 +22,7 @@ class IssueNotesWidget extends IssueWidget {
 	public ?array $notes = null;
 	public ?string $type = null;
 
-	public bool $withSettlements = true;
+	public bool $withProvisionControl = false;
 
 	public array $collapseTypes = [
 		self::TYPE_SMS,
@@ -42,12 +42,10 @@ class IssueNotesWidget extends IssueWidget {
 		if ($this->notes === null) {
 			$query = $this->model
 				->getIssueNotes()
-				->withoutTypes([IssueNote::TYPE_SETTLEMENT])
-				->orWhere(['type' => null])
 				->joinWith('user.userProfile');
 
-			if (!$this->withSettlements) {
-				$query->withoutTypes([IssueNote::TYPE_SETTLEMENT]);
+			if (!$this->withProvisionControl) {
+				$query->withoutTypes([IssueNote::TYPE_SETTLEMENT_PROVISION_CONTROL]);
 			}
 			$this->notes = $query->all();
 		}
