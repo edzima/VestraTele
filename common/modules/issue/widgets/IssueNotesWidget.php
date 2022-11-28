@@ -22,6 +22,8 @@ class IssueNotesWidget extends IssueWidget {
 	public ?array $notes = null;
 	public ?string $type = null;
 
+	public bool $withSettlements = true;
+
 	public array $collapseTypes = [
 		self::TYPE_SMS,
 		self::TYPE_USER_FRONT,
@@ -38,12 +40,16 @@ class IssueNotesWidget extends IssueWidget {
 	public function init(): void {
 		parent::init();
 		if ($this->notes === null) {
-			$this->notes = $this->model
+			$query = $this->model
 				->getIssueNotes()
 				->withoutTypes([IssueNote::TYPE_SETTLEMENT])
 				->orWhere(['type' => null])
-				->joinWith('user.userProfile')
-				->all();
+				->joinWith('user.userProfile');
+
+			if (!$this->withSettlements) {
+				$query->withoutTypes([IssueNote::TYPE_SETTLEMENT]);
+			}
+			$this->notes = $query->all();
 		}
 		if ($this->title === null) {
 			$this->title = Yii::t('issue', 'Issue Notes');

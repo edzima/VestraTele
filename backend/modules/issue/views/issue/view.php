@@ -9,6 +9,7 @@ use backend\modules\issue\widgets\SummonCreateButtonDropdown;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
+use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
@@ -177,6 +178,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model,
+		'withSettlements' => Yii::$app->user->can(User::ROLE_BOOKKEEPER),
 	]) ?>
 
 </div>

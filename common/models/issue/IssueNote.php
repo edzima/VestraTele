@@ -117,6 +117,10 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 		return $this->isType(static::TYPE_SETTLEMENT);
 	}
 
+	public function isForSettlementProvisionControl(): bool {
+		return $this->isType(static::TYPE_SETTLEMENT_PROVISION_CONTROL);
+	}
+
 	public function isForStageChange(): bool {
 		return $this->isType(static::TYPE_STAGE_CHANGE);
 	}
