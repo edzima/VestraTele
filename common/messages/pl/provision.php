@@ -94,6 +94,8 @@ return [
 	'Visible on Report' => 'Pokazuj w Raporcie',
 	'In report {link}' => 'W Raporcie {link}',
 	'hidden costs' => 'ukryto koszty',
+	'Empty - From Issue Created At' => 'Puste - Data założenia Sprawy',
+	'Date from Settlement' => 'Data z Rozliczenia',
 ];
 
 

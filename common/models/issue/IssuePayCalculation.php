@@ -223,6 +223,10 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 		return FrontendUrl::settlementView($this->getId(), true);
 	}
 
+	public function getCreatedAt(): string {
+		return $this->created_at;
+	}
+
 	public function isForUser(int $id): bool {
 		return $this->owner_id === $id ||
 			$this->issue->isForUser($id);

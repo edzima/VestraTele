@@ -21,6 +21,7 @@ class IssueProvisionType extends ProvisionType {
 	private const KEY_DATA_ISSUE_REQUIRED_USER_TYPES = 'issue.user.types.required';
 	public const KEY_DATA_ISSUE_USER_TYPE = 'issue.user.type';
 	public const KEY_DATA_ISSUE_EXCLUDED_USER_TYPES = 'issue.user.types.excluded';
+	public const KEY_DATA_SETTLEMENT_DATE = 'dateFromSettlement';
 
 	public static function settlementTypesNames(): array {
 		return IssuePayCalculation::getTypesNames();
@@ -46,7 +47,16 @@ class IssueProvisionType extends ProvisionType {
 			'issueStagesNames' => Yii::t('common', 'Issue Stages'),
 			'issueUserTypeName' => Yii::t('common', 'Issue user type'),
 			'issueExcludedUserTypesNames' => Yii::t('provision', 'Excluded Users Types'),
+			'isForDateFromSettlement' => Yii::t('provision', 'Date from Settlement'),
 		]);
+	}
+
+	public function getIsForDateFromSettlement(): bool {
+		return $this->getDataArray()[static::KEY_DATA_SETTLEMENT_DATE] ?? false;
+	}
+
+	public function setIsForDateFromSettlement(bool $value): void {
+		$this->setDataValues(static::KEY_DATA_SETTLEMENT_DATE, $value);
 	}
 
 	public function getSettlementTypes(): array {

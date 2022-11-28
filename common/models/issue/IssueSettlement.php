@@ -32,4 +32,6 @@ interface IssueSettlement extends IssueInterface, SettlementInterface {
 
 	public function getFrontendUrl(): string;
 
+	public function getCreatedAt(): string;
+
 }

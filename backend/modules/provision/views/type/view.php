@@ -53,6 +53,7 @@ YiiAsset::register($this);
 			'issueStagesNames',
 			'settlementTypesNames',
 			'withHierarchy:boolean',
+			'isForDateFromSettlement:boolean',
 			'from_at:date',
 			'to_at:date',
 		],

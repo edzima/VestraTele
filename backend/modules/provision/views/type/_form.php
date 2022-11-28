@@ -102,6 +102,9 @@ use yii\widgets\ActiveForm;
 			->hint(Yii::t('provision', 'Percent or Const'))
 		?>
 
+		<?= $form->field($model, 'isDateFromSettlement', ['options' => ['class' => 'col-md-2']])->checkbox()
+			->hint(Yii::t('provision', 'Empty - From Issue Created At'))
+		?>
 	</div>
 
 

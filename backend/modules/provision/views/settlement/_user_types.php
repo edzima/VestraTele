@@ -48,6 +48,9 @@ use yii\web\View;
 				'value' => static function (IssueProvisionType $type) use ($model): ?string {
 					$data = $model->getData();
 					$data->type = $type;
+					if ($type->getIsForDateFromSettlement()) {
+						$data->date = $model->getModel()->getCreatedAt();
+					}
 					$selfies = $data->getSelfQuery()->all();
 					if (empty($selfies) && $type->getBaseType() !== null) {
 						$data->type = $type->getBaseType();

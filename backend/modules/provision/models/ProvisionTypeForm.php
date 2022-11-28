@@ -17,6 +17,7 @@ class ProvisionTypeForm extends Model {
 
 	public bool $is_default = false;
 	public bool $with_hierarchy = true;
+	public bool $isDateFromSettlement = false;
 	public $issueUserType;
 	public $issueTypesIds = [];
 	public $issueStagesIds = [];
@@ -61,7 +62,7 @@ class ProvisionTypeForm extends Model {
 				'enableClientValidation' => false,
 			],
 			[['baseTypeId'], 'integer'],
-			[['is_default', 'is_percentage', 'is_active', 'with_hierarchy'], 'boolean'],
+			[['is_default', 'is_percentage', 'is_active', 'with_hierarchy', 'isDateFromSettlement'], 'boolean'],
 			['baseTypeId', 'default', 'value' => null],
 			['baseTypeId', 'in', 'range' => array_keys(static::getTypesNames())],
 			['settlementTypes', 'in', 'range' => array_keys(static::getSettlementTypesNames()), 'allowArray' => true],
@@ -82,6 +83,7 @@ class ProvisionTypeForm extends Model {
 			'issueRequiredUserTypes' => Yii::t('provision', 'Required issue user types'),
 			'issueExcludedUserTypes' => Yii::t('provision', 'Excluded issue user types'),
 			'with_hierarchy' => Yii::t('provision', 'With hierarchy'),
+			'isDateFromSettlement' => Yii::t('provision', 'Date from Settlement'),
 		]);
 	}
 
@@ -100,6 +102,7 @@ class ProvisionTypeForm extends Model {
 		$this->settlementTypes = $model->getSettlementTypes();
 		$this->with_hierarchy = $model->getWithHierarchy();
 		$this->baseTypeId = $model->getBaseTypeId();
+		$this->isDateFromSettlement = $model->getIsForDateFromSettlement();
 	}
 
 	public function getModel(): IssueProvisionType {
@@ -123,6 +126,7 @@ class ProvisionTypeForm extends Model {
 		$model->to_at = $this->to_at;
 		$model->setBaseTypeId($this->baseTypeId);
 		$model->setWithHierarchy($this->with_hierarchy);
+		$model->setIsForDateFromSettlement($this->isDateFromSettlement);
 		$model->setIssueUserTypes($this->issueUserType);
 		$model->setIssueStagesIds(is_array($this->issueStagesIds) ? $this->issueStagesIds : []);
 		$model->setIssueTypesIds(is_array($this->issueTypesIds) ? $this->issueTypesIds : []);

@@ -86,7 +86,11 @@ class SettlementUserProvisionsForm extends Model {
 		$data = new ProvisionUserData($this->user->user);
 		$data->date = $this->model->issue->created_at;
 		if ($this->typeId) {
-			$data->type = $this->getType($this->typeId);
+			$type = $this->getType($this->typeId);
+			$data->type = $type;
+			if ($type !== null && $type->getIsForDateFromSettlement()) {
+				$data->date = $this->model->getCreatedAt();
+			}
 		}
 		return $data;
 	}
