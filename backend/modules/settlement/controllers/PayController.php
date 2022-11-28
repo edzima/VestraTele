@@ -5,7 +5,7 @@ namespace backend\modules\settlement\controllers;
 use backend\helpers\Url;
 use backend\modules\settlement\models\search\IssuePaySearch;
 use backend\widgets\CsvForm;
-use common\components\provision\exception\MissingProvisionUserException;
+use common\components\provision\exception\Exception as ProvisionException;
 use common\helpers\Flash;
 use common\models\issue\IssuePay;
 use common\models\issue\query\IssuePayQuery;
@@ -174,7 +174,7 @@ class PayController extends Controller {
 				Yii::$app->provisions->removeForPays([$pay->calculation->getPays()->getIds(true)]);
 				try {
 					Yii::$app->provisions->settlement($pay->calculation);
-				} catch (MissingProvisionUserException $exception) {
+				} catch (ProvisionException $exception) {
 
 				}
 			} else {
@@ -210,7 +210,7 @@ class PayController extends Controller {
 				Yii::$app->provisions->removeForPays($model->calculation->getPays()->getIds(true));
 				try {
 					Yii::$app->provisions->settlement($model->calculation);
-				} catch (MissingProvisionUserException $exception) {
+				} catch (ProvisionException $exception) {
 
 				}
 			}

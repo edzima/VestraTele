@@ -5,7 +5,6 @@ namespace backend\modules\provision\controllers;
 use backend\helpers\Url;
 use backend\modules\provision\models\SettlementUserProvisionsForm;
 use common\components\provision\exception\Exception;
-use common\components\provision\exception\MissingProvisionUserException;
 use common\helpers\Flash;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
@@ -196,7 +195,7 @@ class SettlementController extends Controller {
 					Flash::add(Flash::TYPE_SUCCESS, Yii::t('provision', 'Success! Generate {count} provisions.', ['count' => $count]));
 				}
 				return $this->redirect(['view', 'id' => $id]);
-			} catch (MissingProvisionUserException $exception) {
+			} catch (Exception $exception) {
 				Flash::add(Flash::TYPE_ERROR, $exception->getMessage());
 			}
 		}

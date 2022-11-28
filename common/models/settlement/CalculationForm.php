@@ -2,7 +2,7 @@
 
 namespace common\models\settlement;
 
-use common\components\provision\exception\MissingProvisionUserException;
+use common\components\provision\exception\Exception;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
@@ -138,7 +138,7 @@ class CalculationForm extends PayForm {
 		}
 		try {
 			Yii::$app->provisions->settlement($model);
-		} catch (MissingProvisionUserException $exception) {
+		} catch (Exception $exception) {
 			if ($throwException) {
 				throw $exception;
 			}
