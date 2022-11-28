@@ -6,10 +6,7 @@ use common\components\provision\exception\MissingParentProvisionUserException;
 use common\components\provision\exception\MissingProvisionUserException;
 use common\components\provision\exception\MissingSelfProvisionUserException;
 use common\components\provision\exception\MultipleSettlementProvisionTypesException;
-use common\models\issue\event\IssueUserEvent;
-use common\models\issue\IssueInterface;
 use common\models\issue\IssuePay;
-use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSettlement;
 use common\models\provision\IssueProvisionType;
 use common\models\provision\Provision;
@@ -31,62 +28,6 @@ class Provisions extends Component {
 		'type_id',
 		'percent',
 	];
-
-	private ?int $provisionControlSettlementCount = null;
-
-	public function getProvisionControlSettlementCount(bool $refresh = false): int {
-		if ($this->provisionControlSettlementCount === null || $refresh) {
-			if ($refresh) {
-				Yii::$app->cache->set('provision.control_settlement_count', null);
-			}
-			$this->provisionControlSettlementCount = Yii::$app->cache->getOrSet('provision.control_settlement_count', function (): int {
-				return IssuePayCalculation::find()
-					->onlyProblems([IssuePayCalculation::PROBLEM_STATUS_PROVISION_CONTROL])
-					->count();
-			}, 0);
-		}
-		return $this->provisionControlSettlementCount;
-	}
-
-	public function onIssueUserEvent(IssueUserEvent $event): void {
-		$issue = $event->sender;
-		if (!$issue instanceof IssueInterface) {
-			$issue = $event->model->issue;
-		}
-		if (!empty($issue->getIssueModel()->payCalculations)) {
-			$provisionControl = false;
-			foreach ($issue->getIssueModel()->payCalculations as $settlement) {
-				if (!$settlement->isProvisionControl() && $settlement->hasProvisions()) {
-					$settlement->markAsProvisionControl();
-					$settlement->save(false);
-					$provisionControl = true;
-
-					$message = Yii::t('provision', 'Change User: {user} in Settlement: {settlement} with Provision.', [
-						'user' => $event->model->getTypeWithUser(),
-						'settlement' => $settlement->getTypeName(),
-					]);
-					Yii::warning($message, 'provision.issueUserEvent');
-					Yii::$app
-						->mailer
-						->compose(
-							['html' => 'issueUserChangeForSettlementWithProvisions-html', 'text' => 'issueUserChangeForSettlementWithProvisions-text'],
-							[
-								'event' => $event,
-								'settlement' => $settlement,
-							]
-						)
-						->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
-						->setTo(Yii::$app->params['provisionEmail'])
-						->setSubject($message)
-						->send();
-				}
-			}
-			Yii::warning('Change User for Issue: ' . $issue->getIssueName() . ' who has Settlements.');
-			if ($provisionControl) {
-				$this->getProvisionControlSettlementCount(true);
-			}
-		}
-	}
 
 	/**
 	 * @param IssuePay[] $pays

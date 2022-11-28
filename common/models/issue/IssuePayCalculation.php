@@ -70,6 +70,22 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	private static ?array $STAGES_NAMES = null;
 	private static ?array $OWNER_NAMES = null;
 
+	private static ?int $provisionControlCount = null;
+
+	public static function getProvisionControlSettlementCount(bool $refresh = false): int {
+		if (static::$provisionControlCount === null || $refresh) {
+			if ($refresh) {
+				Yii::$app->cache->set('provision.control_settlement_count', null);
+			}
+			static::$provisionControlCount = (int) Yii::$app->cache->getOrSet('provision.control_settlement_count', function (): int {
+				return IssuePayCalculation::find()
+					->onlyProblems([IssuePayCalculation::PROBLEM_STATUS_PROVISION_CONTROL])
+					->count();
+			}, 0);
+		}
+		return static::$provisionControlCount;
+	}
+
 	public function afterSave($insert, $changedAttributes): void {
 		parent::afterSave($insert, $changedAttributes);
 		$this->issue->markAsUpdate();

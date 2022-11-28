@@ -1,6 +1,7 @@
 <?php
 
 use backend\widgets\Menu;
+use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
 use common\models\user\Worker;
 use yii\web\View;
@@ -297,10 +298,10 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-calculator"></i>',
 							'visible' => $user->can(User::PERMISSION_PROVISION),
 						],
-						$user->can(User::PERMISSION_PROVISION) && Yii::$app->provisions->getProvisionControlSettlementCount() > 0 ?
+						$user->can(User::PERMISSION_PROVISION) && IssuePayCalculation::getProvisionControlSettlementCount() > 0 ?
 							[
 								'label' => Yii::t('settlement', 'Provision Control {count}', [
-									'count' => Yii::$app->provisions->getProvisionControlSettlementCount(),
+									'count' => IssuePayCalculation::getProvisionControlSettlementCount(),
 								]),
 								'url' => ['/settlement/calculation-problem/provision-control'],
 								'icon' => '<i class="fa fa-flag"></i>',
