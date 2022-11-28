@@ -45,6 +45,13 @@ class IssueNoteForm extends Model {
 		return $model;
 	}
 
+	public static function createSettlementProvisionControl(IssueSettlement $settlement) {
+		$model = new static();
+		$model->issue_id = $settlement->getIssueId();
+		$model->type = IssueNote::generateType(IssueNote::TYPE_SETTLEMENT_PROVISION_CONTROL, $settlement->getId());
+		return $model;
+	}
+
 	public static function createSummon(Summon $summon) {
 		$model = new static();
 		$model->type = IssueNote::generateType(IssueNote::TYPE_SUMMON, $summon->id);

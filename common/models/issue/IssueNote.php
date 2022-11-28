@@ -41,6 +41,8 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 
 	public const TYPE_SMS = 'sms';
 	public const TYPE_SETTLEMENT = 'settlement';
+	public const TYPE_SETTLEMENT_PROVISION_CONTROL = 'settlement.provisionControl';
+
 	public const TYPE_SUMMON = 'summon';
 	public const TYPE_STAGE_CHANGE = 'stage.change';
 	public const TYPE_USER_FRONT = 'user.front';
@@ -177,6 +179,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 			static::TYPE_SMS => Yii::t('common', 'SMS'),
 			static::TYPE_STAGE_CHANGE => Yii::t('common', 'Stage Change'),
 			static::TYPE_USER_FRONT => Yii::t('common', 'User Frontend'),
+			static::TYPE_SETTLEMENT_PROVISION_CONTROL => Yii::t('settlement', 'Provision Control'),
 		];
 	}
 

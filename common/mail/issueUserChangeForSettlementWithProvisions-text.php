@@ -1,18 +1,16 @@
 <?php
 
 use backend\helpers\Url;
-use common\models\issue\event\IssueUserEvent;
-use common\models\issue\IssueSettlement;
+use common\models\issue\IssueInterface;
 
 /* @var $this yii\web\View */
-/* @var $event IssueUserEvent */
-/* @var $settlement IssueSettlement */
+/* @var $title string */
+/* @var $issue IssueInterface */
 
-$settlementLink = Url::settlementView($settlement->getId(), true);
-$issueLink = Url::issueView($settlement->getIssueId(), true);
+$issueLink = Url::issueView($issue->getIssueId(), true);
 
 ?>
-<?= $event->getTranslateName() ?>
+<?= $title ?>
 
 <?= Yii::t('provision', 'Settlement mark as Provision Control.') ?>
 

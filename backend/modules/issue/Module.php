@@ -8,6 +8,7 @@
 
 namespace backend\modules\issue;
 
+use backend\modules\issue\models\IssueUserChangeHandler;
 use common\models\issue\event\IssueUserEvent;
 use common\models\issue\Issue;
 use common\models\user\Worker;
@@ -22,7 +23,9 @@ class Module extends BaseModule {
 	public function init() {
 		parent::init();
 		IssueUserEvent::on(Issue::class, IssueUserEvent::WILDCARD_EVENT, static function (IssueUserEvent $event): void {
-			Yii::$app->provisions->onIssueUserEvent($event);
+			$model = new IssueUserChangeHandler($event);
+			$model->user_id = Yii::$app->user->getId();
+			$model->parse();
 		});
 	}
 

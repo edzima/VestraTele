@@ -121,8 +121,9 @@ return [
 	'Lawyer' => 'Prawnik',
 	'Summon Date: {type}' => 'Data: {type}',
 	'Summon At' => 'Data',
-	'Add {userWithType} to Issue: {issue}.' => 'Dodano {userWithType} do Sprawy: {issue}.',
-	'Update {userWithType} to Issue: {issue}.' => 'Edytowano {userWithType} w Sprawie: {issue}.',
-	'Delete {userWithType} from Issue: {issue}.' => 'Usunięto {userWithType} w Sprawie: {issue}.',
 	'Issues Types' => 'Typy Spraw',
+	'Add {user} as {type}.' => 'Dodano {user} jako: {type}.',
+	'Update {user} as {type}.' => 'Edycja {type} - {user}.',
+	'Delete {user} as {type}.' => 'Usunięto {type}: {user}.',
+	'Change User in Issue: {issue}.' => 'Zmiana w Sprawie: {issue}.',
 ];
