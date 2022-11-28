@@ -3,13 +3,15 @@
 namespace common\modules\lead\controllers;
 
 use common\modules\lead\models\LeadReminder;
+use common\modules\lead\models\searches\LeadReminderSearch;
 use common\modules\lead\models\searches\LeadSearch;
 use common\modules\reminder\models\ReminderForm;
-use common\modules\lead\models\searches\LeadReminderSearch;
 use Yii;
 use yii\web\NotFoundHttpException;
 
 class ReminderController extends BaseController {
+
+	public ?bool $allowDelete = true;
 
 	public function actionIndex() {
 		$searchModel = new LeadReminderSearch();
