@@ -2,6 +2,7 @@
 
 namespace backend\modules\user\models\search;
 
+use common\models\Address;
 use common\models\query\PhonableQuery;
 use common\models\SearchModel;
 use common\models\user\query\UserQuery;
@@ -9,9 +10,11 @@ use common\models\user\SurnameSearchInterface;
 use common\models\user\User;
 use common\models\user\UserTrait;
 use common\validators\PhoneValidator;
+use edzima\teryt\models\Simc;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\data\Sort;
 
 /**
  * UserSearch represents the model behind the search form about `common\models\User`.
@@ -24,6 +27,7 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 	public $gender;
 	public $region_id;
 	public $city;
+	public $addressInfo;
 
 	public $role = [];
 	public $permission = [];
@@ -51,7 +55,7 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 	public function rules(): array {
 		return [
 			[['id', 'status', 'created_at', 'updated_at', 'action_at', 'gender', 'region_id'], 'integer'],
-			[['username', 'email', 'ip', 'firstname', 'lastname', 'phone', 'city'], 'safe'],
+			[['username', 'email', 'ip', 'firstname', 'lastname', 'phone', 'city', 'addressInfo'], 'safe'],
 			['lastname', 'string', 'min' => SurnameSearchInterface::MIN_LENGTH],
 			['role', 'in', 'range' => array_keys(static::getRolesNames()), 'allowArray' => true],
 			['permission', 'in', 'range' => array_keys(static::getPermissionsNames()), 'allowArray' => true],
@@ -86,9 +90,7 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
-			'sort' => [
-				'defaultOrder' => $this->defaultOrder,
-			],
+			'sort' => $this->getSort(),
 		]);
 
 		$this->load($params);
@@ -117,11 +119,37 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 		$query->andFilterWhere(['like', 'username', $this->username])
 			->andFilterWhere(['like', 'user_profile.firstname', $this->firstname])
 			->andFilterWhere(['like', 'email', $this->email])
-			->andFilterWhere(['like', 'teryt_simc.region_id', $this->region_id])
-			->andFilterWhere(['like', 'teryt_simc.name', $this->city])
+			->andFilterWhere(['like', Simc::tableName() . '.region_id', $this->region_id])
+			->andFilterWhere(['like', Simc::tableName() . '.name', $this->city])
+			->andFilterWhere(['like', Address::tableName() . '.info', $this->addressInfo])
 			->andFilterWhere(['like', 'ip', $this->ip]);
 
 		return $dataProvider;
+	}
+
+	protected function getSort(): Sort {
+		return new Sort([
+			'defaultOrder' => $this->defaultOrder,
+			'attributes' => [
+				'id',
+				'username',
+				'action_at',
+				'firstname',
+				'lastname',
+				'city' => [
+					'asc' => [Simc::tableName() . '.name' => SORT_ASC],
+					'desc' => [Simc::tableName() . '.name' => SORT_DESC],
+				],
+				'addressInfo' => [
+					'asc' => [Address::tableName() . '.info' => SORT_ASC],
+					'desc' => [Address::tableName() . '.info' => SORT_DESC],
+				],
+				'email',
+				'phone',
+				'created_at',
+				'updated_at',
+			],
+		]);
 	}
 
 	protected function createQuery(): UserQuery {

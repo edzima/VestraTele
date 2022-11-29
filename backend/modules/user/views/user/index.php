@@ -1,10 +1,10 @@
 <?php
 
+use backend\helpers\Html;
 use backend\modules\user\models\search\UserSearch;
 use backend\widgets\GridView;
 use common\models\user\UserProfile;
 use common\widgets\grid\ActionColumn;
-use yii\bootstrap\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel UserSearch */

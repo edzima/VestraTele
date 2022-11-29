@@ -55,7 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('common', 'City'),
 			],
 			[
-				'attribute' => 'street',
+				'attribute' => 'addressInfo',
 				'value' => 'homeAddress.info',
 				'label' => Yii::t('common', 'Street'),
 			],
