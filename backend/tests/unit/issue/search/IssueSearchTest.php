@@ -160,6 +160,22 @@ class IssueSearchTest extends Unit {
 		}
 	}
 
+	public function testExcludedTypes(): void {
+		$this->model->excludedTypes = [1];
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertNotSame(1, $model->type_id);
+		}
+		$this->model->excludedTypes = [1, 2];
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertNotSame(1, $model->type_id);
+			$this->tester->assertNotSame(2, $model->type_id);
+		}
+	}
+
 	public function testCustomerLastname(): void {
 		$this->model->customerName = 'Lars';
 		$models = $this->getModels();
