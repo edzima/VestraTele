@@ -14,6 +14,7 @@ use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadSmsForm;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\Module;
+use Edzima\Yii2Adescom\exceptions\Exception;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\rest\Controller;
@@ -124,7 +125,11 @@ class ApiLeadController extends Controller {
 			$model = new LeadSmsForm($lead);
 			$model->message = $message;
 			$model->owner_id = $this->getSmsOwnerId();
-			$model->send();
+			try {
+				$model->send();
+			} catch (Exception $exception) {
+				Yii::error($exception->getMessage(), 'lead.api.sendSms');
+			}
 		}
 	}
 
