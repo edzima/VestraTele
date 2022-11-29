@@ -73,17 +73,18 @@ class Provisions extends Component {
 					'settlement_id' => $model->id,
 					'issue_id' => $model->issue_id,
 				]
-				, 'provision.settlement'
+				, __METHOD__
 			);
 			return 0;
 		}
 		$forms = SettlementUserProvisionsForm::createModels($model, $userTypes, $config);
 		$provisions = [];
 		foreach ($forms as $form) {
-			$typesCount = count($form->getTypes());
+			$types = $form->getTypes();
+			$typesCount = count($types);
 			$form->linkIssueNotSettledUserCosts();
 			if ($typesCount > 1) {
-				$withBaseTypes = array_filter($form->getTypes(), static function (IssueProvisionType $type) {
+				$withBaseTypes = array_filter($types, static function (IssueProvisionType $type) {
 					return $type->getBaseTypeId() !== null;
 				});
 				if (count($withBaseTypes) > 1) {
@@ -99,12 +100,18 @@ class Provisions extends Component {
 							'type' => $model->getTypeName(),
 						],
 						'types' => $form->getTypesNames(),
-					], 'provision.settlement');
+					], __METHOD__);
 					throw new MultipleSettlementProvisionTypesException($message);
 				}
 			}
 			if ($typesCount === 1) {
-				$form->typeId = array_key_first($form->getTypes());
+				$type = reset($types);
+				Yii::debug(
+					Yii::t('provision', 'Found Active Type for Settlement: {settlementType} for: {userWithType}.', [
+						'settlementType' => $form->getModel()->getTypeName(),
+						'userWithType' => $form->getIssueUser()->getTypeWithUser(),
+					]), __METHOD__);
+				$form->typeId = $type->id;
 				$provisions[] = $this->generateProvisionsData($form->getData(), $form->getPaysValues());
 			}
 		}
@@ -129,10 +136,15 @@ class Provisions extends Component {
 		if (!$userData->type) {
 			throw new InvalidConfigException('Type for userData must be set before generate provisions.');
 		}
+		Yii::debug(
+			Yii::t('provision', 'Generate Provision: {type} for user: {user} with date: {date}', [
+				'type' => $userData->type->name,
+				'user' => $userData->getUser()->getFullName(),
+				'date' => Yii::$app->formatter->asDate($userData->date),
+			]), __METHOD__);
 		$type = $userData->type;
 		$baseType = $type->getBaseType();
 		$provisions = [];
-
 		if ($baseType !== null) {
 			$userData->type = $baseType;
 		}
@@ -144,7 +156,7 @@ class Provisions extends Component {
 				'type' => $userData->type->getNameWithTypeName(),
 			]);
 
-			Yii::warning($message, 'provision.user.self');
+			Yii::warning($message, __METHOD__);
 			throw new MissingSelfProvisionUserException($message);
 		}
 		foreach ($selfModels as $model) {
@@ -166,7 +178,7 @@ class Provisions extends Component {
 						'count' => $parentsWithoutProvisionsCount,
 					]);
 
-					Yii::warning($message, 'provision.user.parents');
+					Yii::warning($message, __METHOD__);
 					throw new MissingParentProvisionUserException($message);
 				}
 			}
