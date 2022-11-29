@@ -25,6 +25,7 @@ class IssueSearch extends BaseIssueSearch {
 	public const SCENARIO_ALL_PAYED = 'allPayed';
 
 	public $parentId;
+	public $excludedTypes = [];
 	public $excludedStages = [];
 	public $onlyWithSettlements;
 
@@ -55,6 +56,7 @@ class IssueSearch extends BaseIssueSearch {
 			['claimCompanyTryingValue', 'number', 'min' => 0],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
 			[['type_additional_date_at', 'signature_act', 'stage_change_at'], 'safe'],
+			['excludedTypes', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 		]);
 	}
@@ -63,6 +65,7 @@ class IssueSearch extends BaseIssueSearch {
 		return array_merge(parent::attributeLabels(), [
 			'parentId' => Yii::t('backend', 'Structures'),
 			'excludedStages' => Yii::t('backend', 'Excluded stages'),
+			'excludedTypes' => Yii::t('backend', 'Excluded types'),
 			'onlyDelayed' => Yii::t('backend', 'Only delayed'),
 			'onlyWithClaims' => Yii::t('backend', 'Only with Claims'),
 			'onlyWithPayedPay' => Yii::t('backend', 'Only with payed pay'),
@@ -120,6 +123,7 @@ class IssueSearch extends BaseIssueSearch {
 		$this->signatureActFilter($query);
 		$this->delayedFilter($query);
 		$this->excludedStagesFilter($query);
+		$this->excludedTypesFilter($query);
 		$this->teleFilter($query);
 		$this->lawyerFilter($query);
 		$this->payedFilter($query);
@@ -157,6 +161,10 @@ class IssueSearch extends BaseIssueSearch {
 
 	protected function excludedStagesFilter(IssueQuery $query): void {
 		$query->andFilterWhere(['NOT IN', Issue::tableName() . '.stage_id', $this->excludedStages]);
+	}
+
+	protected function excludedTypesFilter(IssueQuery $query): void {
+		$query->andFilterWhere(['NOT IN', Issue::tableName() . '.type_id', $this->excludedTypes]);
 	}
 
 	protected function lawyerFilter(IssueQuery $query): void {

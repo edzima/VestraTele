@@ -189,6 +189,7 @@ return [
 	'Only delayed' => 'Tylko opóźnione',
 	'Structures' => 'Struktury',
 	'Excluded stages' => 'Wykluczone etapy',
+	'Excluded types' => 'Wykluczone typy',
 	'Update relation in {issue} for: {user}' => '{user} w sprawie: {issue}',
 	'Update cost: {issue}' => 'Edytuj koszt: {issue}',
 	'Costs' => 'Koszty',
