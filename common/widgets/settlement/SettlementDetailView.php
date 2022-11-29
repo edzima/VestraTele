@@ -18,6 +18,7 @@ class SettlementDetailView extends DetailView {
 	public bool $withType = true;
 	public bool $withOwner = true;
 
+	public bool $withCreatedAt = false;
 	public bool $withValueWithoutCosts = false;
 
 	public function init(): void {
@@ -101,6 +102,11 @@ class SettlementDetailView extends DetailView {
 				'value' => function (IssuePayCalculation $model): Decimal {
 					return $model->getUserProvisionsSumNotPay($this->userIdProvisions);
 				},
+			],
+			[
+				'attribute' => 'created_at',
+				'visible' => $this->withCreatedAt,
+				'format' => 'date',
 			],
 		];
 	}

@@ -70,6 +70,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 		<div class="col-md-4 col-lg-3">
 			<?= SettlementDetailView::widget([
 				'model' => $model,
+				'withCreatedAt' => true,
 			]) ?>
 		</div>
 		<div class="col-md-8 col-lg-9">
