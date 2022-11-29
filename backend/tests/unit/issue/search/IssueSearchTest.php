@@ -176,6 +176,54 @@ class IssueSearchTest extends Unit {
 		}
 	}
 
+	public function testWithTelemarkerAsEmpty(): void {
+		$this->model->onlyWithTelemarketers = null;
+		$models = $this->getModels();
+		$tele = array_filter($models, function (Issue $model): bool {
+			return $model->tele !== null;
+		});
+		$this->tester->assertNotEmpty($tele);
+
+		$this->model->onlyWithTelemarketers = '';
+		$models = $this->getModels();
+		$tele = array_filter($models, function (Issue $model): bool {
+			return $model->tele !== null;
+		});
+		$this->tester->assertNotEmpty($tele);
+	}
+
+	public function testWithTelemarkerAsEnable(): void {
+		$this->model->onlyWithTelemarketers = '1';
+		$models = $this->getModels();
+		$tele = array_filter($models, function (Issue $model): bool {
+			return $model->tele !== null;
+		});
+		$this->tester->assertNotEmpty($tele);
+
+		$this->model->onlyWithTelemarketers = true;
+		$models = $this->getModels();
+		$tele = array_filter($models, function (Issue $model): bool {
+			return $model->tele !== null;
+		});
+		$this->tester->assertNotEmpty($tele);
+	}
+
+	public function testWithTelemarkerAsDisable(): void {
+		$this->model->onlyWithTelemarketers = '0';
+		$models = $this->getModels();
+		$tele = array_filter($models, function (Issue $model): bool {
+			return $model->tele !== null;
+		});
+		$this->tester->assertEmpty($tele);
+
+		$this->model->onlyWithTelemarketers = false;
+		$models = $this->getModels();
+		$tele = array_filter($models, function (Issue $model): bool {
+			return $model->tele !== null;
+		});
+		$this->tester->assertEmpty($tele);
+	}
+
 	public function testCustomerLastname(): void {
 		$this->model->customerName = 'Lars';
 		$models = $this->getModels();

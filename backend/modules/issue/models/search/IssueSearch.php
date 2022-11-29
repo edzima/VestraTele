@@ -7,6 +7,7 @@ use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSearch as BaseIssueSearch;
+use common\models\issue\IssueUser;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\user\User;
@@ -32,6 +33,8 @@ class IssueSearch extends BaseIssueSearch {
 	public $onlyWithClaims;
 	public ?string $claimCompanyTryingValue = null;
 
+	public $onlyWithTelemarketers;
+
 	public bool $onlyDelayed = false;
 	public bool $onlyWithPayedPay = false;
 	public bool $onlyWithAllPayedPay = false;
@@ -52,7 +55,8 @@ class IssueSearch extends BaseIssueSearch {
 	public function rules(): array {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
-			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims'], 'boolean'],
+			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims', 'onlyWithTelemarketers'], 'boolean'],
+			[['onlyWithSettlements', 'onlyWithClaims', 'onlyWithTelemarketers'], 'default', 'value' => null],
 			['claimCompanyTryingValue', 'number', 'min' => 0],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
 			[['type_additional_date_at', 'signature_act', 'stage_change_at'], 'safe'],
@@ -71,6 +75,7 @@ class IssueSearch extends BaseIssueSearch {
 			'onlyWithPayedPay' => Yii::t('backend', 'Only with payed pay'),
 			'onlyWithSettlements' => Yii::t('settlement', 'Only with Settlements'),
 			'onlyWithAllPayedPay' => Yii::t('settlement', 'Only with all paid Pays'),
+			'onlyWithTelemarketers' => Yii::t('backend', 'Only with Telemarketers'),
 		]);
 	}
 
@@ -130,6 +135,7 @@ class IssueSearch extends BaseIssueSearch {
 		$this->settlementsFilter($query);
 		$this->stageChangeAtFilter($query);
 		$this->claimFilter($query);
+		$this->onlyWithTelemarketers($query);
 	}
 
 	private function signatureActFilter(IssueQuery $query): void {
@@ -209,6 +215,24 @@ class IssueSearch extends BaseIssueSearch {
 		$query->andWhere('PC.issue_id IS NULL');
 	}
 
+	private function onlyWithTelemarketers(IssueQuery $query): void {
+		if ($this->onlyWithTelemarketers === null || $this->onlyWithTelemarketers === '') {
+			return;
+		}
+		if ((bool) $this->onlyWithTelemarketers === true) {
+			$query->joinWith('tele T', false);
+			$query->andWhere('T.id IS NOT NULL');
+		} else {
+			$query->andWhere([
+					'NOT IN', Issue::tableName() . '.id',
+					IssueUser::find()
+						->select('issue_id')
+						->withType(IssueUser::TYPE_TELEMARKETER),
+				]
+			);
+		}
+	}
+
 	public function getAgentsNames(): array {
 		if (empty($this->parentId) || $this->parentId < 0) {
 			return parent::getAgentsNames();
@@ -250,7 +274,6 @@ class IssueSearch extends BaseIssueSearch {
 		$query->joinWith('claims', false);
 		if ((bool) $this->onlyWithClaims === true) {
 			$query->andWhere(IssueClaim::tableName() . '.trying_value IS NOT NULL');
-
 			return;
 		}
 		$query->andWhere(IssueClaim::tableName() . '.issue_id IS NULL');

@@ -53,7 +53,10 @@ use yii\widgets\ActiveForm;
 
 	</div>
 	<div class="row">
-		<?= $form->field($model, 'tele_id', ['options' => ['class' => 'col-md-4']])
+
+		<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput() ?>
+
+		<?= $form->field($model, 'tele_id', ['options' => ['class' => 'col-md-3 col-lg-2']])
 			->widget(Select2::class, [
 					'data' => IssueSearch::getTelemarketersNames(),
 					'options' => [
@@ -64,7 +67,13 @@ use yii\widgets\ActiveForm;
 					],
 				]
 			) ?>
-		<?= $form->field($model, 'lawyer_id', ['options' => ['class' => 'col-md-4']])
+
+		<?= $form->field($model, 'onlyWithTelemarketers', ['options' => ['class' => 'col-md-2']])
+			->dropDownList(Html::booleanDropdownList(), [
+				'prompt' => Yii::t('common', 'All'),
+			])
+		?>
+		<?= $form->field($model, 'lawyer_id', ['options' => ['class' => 'col-md-3 col-lg-2']])
 			->widget(Select2::class, [
 					'data' => IssueSearch::getLawyersNames(),
 					'options' => [
@@ -77,7 +86,7 @@ use yii\widgets\ActiveForm;
 			) ?>
 
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ?
-			$form->field($model, 'parentId', ['options' => ['class' => 'col-md-4']])
+			$form->field($model, 'parentId', ['options' => ['class' => 'col-md-3 col-lg-2']])
 				->widget(Select2::class, [
 						'data' => User::getSelectList(Yii::$app->userHierarchy->getAllParentsIds()),
 						'options' => [
@@ -114,7 +123,6 @@ use yii\widgets\ActiveForm;
 			],
 		]) ?>
 
-		<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput() ?>
 
 		<?= $form->field($model, 'onlyDelayed', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
@@ -170,6 +178,8 @@ use yii\widgets\ActiveForm;
 			])
 			: ''
 		?>
+
+
 	</div>
 
 
