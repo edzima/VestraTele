@@ -224,7 +224,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	}
 
 	public function getCreatedAt(): string {
-		return $this->created_at;
+		return date(DATE_ATOM, strtotime($this->created_at));
 	}
 
 	public function isForUser(int $id): bool {
