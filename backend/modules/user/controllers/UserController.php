@@ -4,6 +4,7 @@ namespace backend\modules\user\controllers;
 
 use backend\modules\user\models\search\UserSearch;
 use backend\modules\user\models\UserForm;
+use common\helpers\Flash;
 use common\models\user\User;
 use Yii;
 use yii\filters\VerbFilter;
@@ -47,7 +48,17 @@ class UserController extends Controller {
 		$model = new $this->formModel();
 		$model->setScenario(UserForm::SCENARIO_CREATE);
 
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+		if (
+			$model->load(Yii::$app->request->post())
+			&& $model->validate()
+			&& $model->acceptDuplicates()
+			&& $model->save(false)
+		) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('backend', 'Created Account: {user}.', [
+					'user' => $model->getModel()->getFullName(),
+				])
+			);
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 

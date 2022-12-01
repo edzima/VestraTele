@@ -13,9 +13,14 @@ use common\fixtures\UserProfileFixture;
 use common\fixtures\UserTraitAssignFixture;
 use common\models\user\User;
 use common\models\user\UserTraitAssign;
+use common\tests\_support\UnitModelTrait;
 use Yii;
 
 class UserFormTest extends Unit {
+
+	use UnitModelTrait;
+
+	private UserForm $model;
 
 	public function _before(): void {
 		parent::_before();
@@ -48,8 +53,40 @@ class UserFormTest extends Unit {
 		);
 	}
 
+	public function testDuplicatesWithEmptyNames(): void {
+		$this->giveModel();
+		$this->tester->assertNull($this->getModel()->getDuplicatesDataProvider());
+	}
+
+	public function testDuplicatesFromFixtures(): void {
+		$this->giveModel();
+		$model = $this->getModel();
+		$model->scenario = UserForm::SCENARIO_CREATE;
+		$model->username = 'some_username';
+		$model->email = 'test@email.com';
+		$model->password = 'some_password';
+		$profile = $model->getProfile();
+		$profile->firstname = 'John';
+		$profile->lastname = 'Wayne';
+		$address = $model->getHomeAddress();
+		$address->postal_code = '34-100';
+
+		$duplicates = $model->getDuplicatesDataProvider();
+		$this->tester->assertNotNull($duplicates);
+
+		$this->tester->assertSame(1, $duplicates->getTotalCount());
+		$this->tester->assertTrue($model->hasDuplicates());
+		$this->tester->assertFalse($model->acceptDuplicates());
+
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('You must accept duplicates before create User.', 'acceptDuplicates');
+		$this->model->acceptDuplicates = true;
+		$this->thenSuccessSave();
+	}
+
 	public function testCorrectCreate(): void {
-		$model = new UserForm();
+		$this->giveModel();
+		$model = $this->getModel();
 		$model->sendEmail = true;
 
 		$model->username = 'some_username';
@@ -85,13 +122,14 @@ class UserFormTest extends Unit {
 	}
 
 	public function testUpdate(): void {
-		$model = new UserForm();
+		$this->giveModel();
+		$model = $this->getModel();
 		$user = $this->tester->grabFixture('user', 0);
 		$model->setModel($user);
 		$model->username = 'new_username';
 		$model->getProfile()->lastname = 'lastname';
 		$model->getProfile()->firstname = 'firstname';
-		expect($model->save())->true();
+		$this->thenSuccessSave();
 		/** @var User $user */
 		$user = $this->tester->grabRecord(User::class, ['username' => 'new_username']);
 		expect($user)->isInstanceOf(User::class);
@@ -100,54 +138,66 @@ class UserFormTest extends Unit {
 	}
 
 	public function testInvalidTrait(): void {
-		$model = new UserForm();
+		$this->giveModel();
+		$model = $this->getModel();
 		$user = $this->tester->grabFixture('user', 0);
 		$model->setModel($user);
 		$model->traits = [121212];
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Traits is invalid.', $model->getFirstError('traits'));
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Traits is invalid.', 'traits');
 	}
 
 	public function testAssignTraitToUser(): void {
-		$model = new UserForm();
+		$this->giveModel();
+		$model = $this->getModel();
 		$user = $this->tester->grabFixture('user', 0);
 		$model->setModel($user);
 		$model->traits = [UserTraitAssign::TRAIT_BAILIFF];
-		$this->tester->assertTrue($model->save());
+		$this->thenSuccessSave();
 		$this->tester->seeRecord(UserTraitAssign::class, ['trait_id' => UserTraitAssign::TRAIT_BAILIFF, 'user_id' => $user->id]);
 		$this->tester->dontSeeRecord(UserTraitAssign::class, ['trait_id' => UserTraitAssign::TRAIT_COMMISSION_REFUND, 'user_id' => $user->id]);
 	}
 
 	public function testAssignTraitsToUser(): void {
-		$model = new UserForm();
+		$this->giveModel();
+		$model = $this->getModel();
 		$user = $this->tester->grabFixture('user', 0);
 		$model->setModel($user);
 		$model->traits = [UserTraitAssign::TRAIT_COMMISSION_REFUND, UserTraitAssign::TRAIT_BAILIFF];
-		$this->tester->assertTrue($model->validate());
-		$this->tester->assertTrue($model->save());
+		$this->thenSuccessSave();
 		$this->tester->seeRecord(UserTraitAssign::class, ['trait_id' => UserTraitAssign::TRAIT_BAILIFF, 'user_id' => $user->id]);
 		$this->tester->seeRecord(UserTraitAssign::class, ['trait_id' => UserTraitAssign::TRAIT_COMMISSION_REFUND, 'user_id' => $user->id]);
 	}
 
 	public function testAssignTraitAsEmptyArray(): void {
-		$model = new UserForm();
+		$this->giveModel();
+		$model = $this->getModel();
 		$user = $this->tester->grabFixture('user', 0);
 		$this->tester->seeRecord(UserTraitAssign::class, ['user_id' => $user->id]);
 		$model->setModel($user);
 		$model->traits = [];
-		$this->tester->assertTrue($model->save());
+		$this->thenSuccessSave();
 		$this->tester->dontSeeRecord(UserTraitAssign::class, ['user_id' => $user->id]);
 		$this->tester->seeRecord(UserTraitAssign::class, ['user_id' => 2]);
 	}
 
 	public function testAssignTraitAsEmptyString(): void {
-		$model = new UserForm();
+		$this->giveModel();
+		$model = $this->getModel();
 		$user = $this->tester->grabFixture('user', 0);
 		$this->tester->seeRecord(UserTraitAssign::class, ['user_id' => $user->id]);
 		$model->setModel($user);
 		$model->traits = '';
-		$this->tester->assertTrue($model->save());
+		$this->thenSuccessSave();
 		$this->tester->dontSeeRecord(UserTraitAssign::class, ['user_id' => $user->id]);
 		$this->tester->seeRecord(UserTraitAssign::class, ['user_id' => 2]);
+	}
+
+	private function giveModel(array $config = []): void {
+		$this->model = new UserForm($config);
+	}
+
+	public function getModel(): UserForm {
+		return $this->model;
 	}
 }
