@@ -22,7 +22,7 @@ class Formatter extends BaseFormatter {
 	public string $defaultPhoneRegion = 'PL';
 	public int $defaultPhoneFormat = PhoneNumberFormat::INTERNATIONAL;
 
-	public function asCityCode(?string $city, ?string $code) {
+	public function asCityCode(?string $city, ?string $code, bool $postalStrongTag = true) {
 		if ($city === null && $code === null) {
 			return $this->nullDisplay;
 		}
@@ -32,7 +32,12 @@ class Formatter extends BaseFormatter {
 		if ($code === null) {
 			return Html::encode($city);
 		}
-		return Html::encode("$city - ($code)");
+		$city = Html::encode($city);
+		$code = Html::encode($code);
+		if ($postalStrongTag) {
+			$code = Html::tag('strong', $code);
+		}
+		return "$city - [$code]";
 	}
 
 	public function asMonthDay($date): string {
