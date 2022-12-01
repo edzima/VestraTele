@@ -14,6 +14,12 @@ use yii\bootstrap\Html;
 
 <?php $form = ActiveForm::begin(['id' => 'customer-form']) ?>
 
+<?= $model->scenario === CustomerUserForm::SCENARIO_CREATE
+&& $model->hasDuplicates()
+	? $form->field($model, 'acceptDuplicates')->checkbox()
+	: ''
+?>
+
 <?= !$model->getModel()->isNewRecord ? $form->field($model, 'username')->textInput(['maxlength' => true]) : '' ?>
 
 <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>

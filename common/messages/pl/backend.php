@@ -319,4 +319,8 @@ return [
 	'Unmark Provision Control' => 'Odznacz Kontrole Prowizji',
 	'Are you sure you want to delete all provisions for this settlement? Provision Control will be unmark.' => 'Jesteś pewny, że chcesz usunąć wszystkie Prowizję dla tego Rozlcizenia? KONTROLA PROWIZJI zostanie zdjęta.',
 	'Are you sure you want to delete this Stage with all Issues with then?' => 'Jesteś pewien, że chcesz usunac ten Etap oraz WSZYSTKIE Sprawy do niego przypisane?',
+	'Created Account: {user}.' => 'Dodano Konto: {user}.',
+	'Duplicates' => 'Tożsame',
+	'Accept Duplicates' => 'Akceptuj Tożsame',
+	'You must accept duplicates before create User.' => 'Upewnij się czy Użytkownik już istnieje.',
 ];
