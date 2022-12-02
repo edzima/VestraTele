@@ -247,8 +247,9 @@ class IssueController extends Controller {
 			],
 		]);
 		if ($duplicatesCustomersDataProvider->totalCount) {
-			Flash::add(Flash::TYPE_WARNING, Yii::t('backend', 'Warning! Duplicates Customers exists: {count}.', [
+			Flash::add(Flash::TYPE_WARNING, Yii::t('backend', 'Warning! Duplicates Customers ({user}) exists: {count}.', [
 				'count' => $duplicatesCustomersDataProvider->totalCount,
+				'user' => $customer->getFullName(),
 			]));
 		}
 		return $this->render('create', [
