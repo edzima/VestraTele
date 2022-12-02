@@ -72,8 +72,16 @@ class DuplicateUserGridView extends GridView {
 			],
 			'created_at:datetime',
 			[
+				'value' => function (User $user): int {
+					return $user->getIssueUsers()->groupBy('issue_id')->count();
+				},
+				'label' => Yii::t('issue', 'Issues Count'),
+
+			],
+			[
 				'class' => ActionColumn::class,
 				'template' => $this->actionTemplate,
+				'controller' => '/user/customer',
 				'visibleButtons' => [
 					'create-issue' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
 					'link' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER),
