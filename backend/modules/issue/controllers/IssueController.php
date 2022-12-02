@@ -10,13 +10,16 @@ use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\CsvForm;
 use common\behaviors\SelectionRouteBehavior;
+use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
 use common\models\message\IssueCreateMessagesForm;
 use common\models\user\Customer;
+use common\models\user\User;
 use common\models\user\Worker;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\MethodNotAllowedHttpException;
@@ -229,8 +232,28 @@ class IssueController extends Controller {
 			}
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
+
+		$duplicatesCustomersDataProvider = new ActiveDataProvider([
+			'query' => User::find()
+				->joinWith('userProfile UP')
+				->joinWith('addresses.address.city')
+				->andWhere(['UP.firstname' => $customer->profile->firstname])
+				->andWhere(['UP.lastname' => $customer->profile->lastname])
+				->andWhere(['<>', User::tableName() . '.id', $customer->id]),
+			'sort' => [
+				'defaultOrder' => [
+					'updated_at' => SORT_DESC,
+				],
+			],
+		]);
+		if ($duplicatesCustomersDataProvider->totalCount) {
+			Flash::add(Flash::TYPE_WARNING, Yii::t('backend', 'Warning! Duplicates Customers exists: {count}.', [
+				'count' => $duplicatesCustomersDataProvider->totalCount,
+			]));
+		}
 		return $this->render('create', [
 			'model' => $model,
+			'duplicatesCustomersDataProvider' => $duplicatesCustomersDataProvider,
 			'messagesModel' => $messagesModel,
 		]);
 	}

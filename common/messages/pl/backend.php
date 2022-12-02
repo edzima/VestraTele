@@ -322,5 +322,6 @@ return [
 	'Created Account: {user}.' => 'Dodano Konto: {user}.',
 	'Duplicates' => 'Tożsame',
 	'Accept Duplicates' => 'Akceptuj Tożsame',
-	'You must accept duplicates before create User.' => 'Upewnij się czy Użytkownik już istnieje.',
+	'Warning! Duplicates exists.' => 'Uwaga! Istnieją Duplikaty.',
+	'Warning! Duplicates Customers exists: {count}.' => 'Uwaga! Istnieje kilku takich Klientów: {count}.',
 ];
