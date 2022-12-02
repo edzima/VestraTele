@@ -8,7 +8,7 @@ use common\modules\lead\models\LeadUser;
 use console\base\Migration;
 
 /**
- * Class m221014_151226_calendar_news_type
+ * Class m221102_121226_user_types_timestamp
  */
 class m221102_121226_user_types_timestamp extends Migration {
 
