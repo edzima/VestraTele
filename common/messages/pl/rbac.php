@@ -44,6 +44,7 @@ return [
 	'minor' => 'Nieletni',
 	'news' => 'Newsy',
 	'note' => 'Notatki',
+	'note.self' => 'Notatki - Własne (widoczne tylko na froncie)',
 	'note.update' => 'Notatki - edycja',
 	'note.template' => 'Notatki - szablony',
 	'note.delete' => 'Notatki - usuwanie',

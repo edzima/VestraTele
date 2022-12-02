@@ -53,7 +53,7 @@ class NoteController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::PERMISSION_NOTE],
+						'roles' => [Worker::PERMISSION_NOTE, Worker::PERMISSION_NOTE_SELF],
 					],
 				],
 			],
@@ -68,10 +68,15 @@ class NoteController extends Controller {
 	 */
 	public function actionIssue(int $id) {
 		$issue = $this->findIssue($id);
+
 		$model = new IssueNoteForm([
 			'issue_id' => $issue->getIssueId(),
 			'user_id' => Yii::$app->user->getId(),
 		]);
+
+		if (!Yii::$app->user->can(User::PERMISSION_NOTE)) {
+			$model->type = IssueNote::TYPE_SELF;
+		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$this->redirect(['/issue/view', 'id' => $issue->getIssueId()]);
