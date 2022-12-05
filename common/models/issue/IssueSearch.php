@@ -223,6 +223,11 @@ abstract class IssueSearch extends Model
 						new Expression("CONCAT(CP.lastname,' ', CP.firstname)"),
 						$this->customerName . '%', false,
 					]);
+					$query->orWhere([
+						'like',
+						new Expression("CONCAT(CP.firstname,' ', CP.lastname)"),
+						$this->customerName . '%', false,
+					]);
 				},
 			]);
 		}
