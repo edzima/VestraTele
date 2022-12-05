@@ -5,11 +5,13 @@ namespace backend\tests\unit\issue;
 use backend\modules\issue\models\IssueStageChangeForm;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueNote;
 use common\tests\_support\UnitModelTrait;
+use yii\mail\MessageInterface;
 
 class IssueStageChangeFormTest extends Unit {
 
@@ -24,6 +26,7 @@ class IssueStageChangeFormTest extends Unit {
 			IssueFixtureHelper::note(),
 			IssueFixtureHelper::users(true),
 			IssueFixtureHelper::linkedIssues(),
+			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_STAGE_CHANGE),
 		);
 	}
 
@@ -74,6 +77,7 @@ class IssueStageChangeFormTest extends Unit {
 		]);
 		$this->assertNotNull($note);
 		$this->assertTrue($note->isForStageChange());
+		$this->model->save();
 	}
 
 	public function testValidWithLinked(): void {
@@ -95,6 +99,41 @@ class IssueStageChangeFormTest extends Unit {
 			'stage_id' => 2,
 			'id' => 4,
 		]);
+	}
+
+	public function testPushMessagesForStageIdTemplate(): void {
+		$this->giveModel(Issue::find()->andWhere([
+			'type_id' => 1,
+			'stage_id' => 1,
+		])->one());
+		$this->model->stage_id = 2;
+		$this->model->date_at = date($this->model->dateFormat);
+		$this->model->user_id = UserFixtureHelper::AGENT_PETER_NOWAK;
+		$this->thenSuccessSave();
+		$this->tester->assertTrue($this->model->pushMessages());
+		/**
+		 * @var MessageInterface $email
+		 */
+		$email = $this->tester->grabLastSentEmail();
+		$this->tester->assertStringContainsString('Global Email to Workers', $email->getSubject());
+	}
+
+	public function testPushMessagesForStageIdWithoutTemplate(): void {
+		$this->giveModel(Issue::find()->andWhere([
+			'type_id' => 1,
+			'stage_id' => 2,
+		])->one());
+		$this->model->stage_id = 1;
+		$this->model->date_at = date($this->model->dateFormat);
+		$this->model->user_id = UserFixtureHelper::AGENT_PETER_NOWAK;
+		$this->thenSuccessSave();
+
+		$this->tester->assertTrue($this->model->pushMessages());
+		/**
+		 * @var MessageInterface $email
+		 */
+		$email = $this->tester->grabLastSentEmail();
+		$this->tester->assertStringContainsString('Dedicated Email Subject for Stage: Completing Documents', $email->getSubject());
 	}
 
 	public function getModel(): IssueStageChangeForm {

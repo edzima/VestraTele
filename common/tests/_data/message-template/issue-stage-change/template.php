@@ -20,4 +20,13 @@ return [
 			7
 		),
 	],
+	[
+		'id' => 3,
+		'key' => IssueStageChangeMessagesForm::generateKey(
+			IssueStageChangeMessagesForm::TYPE_EMAIL,
+			IssueStageChangeMessagesForm::keyWorkers(),
+			[],
+			1
+		),
+	],
 ];
