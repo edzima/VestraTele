@@ -28,7 +28,7 @@ use yii\data\ActiveDataProvider;
 			<?= IssueUsersWidget::widget([
 				'model' => $model,
 				'type' => IssueUsersWidget::TYPE_CUSTOMERS,
-				'legendEncode' => !$usersLinks,
+				'legendEncode' => false,
 				'withCheckEmailVisibility' => $userMailVisibilityCheck,
 				'withTraits' => true,
 				'legend' => function (IssueUser $issueUser) use ($usersLinks, $model): string {
