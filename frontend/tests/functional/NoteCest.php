@@ -30,7 +30,7 @@ class NoteCest {
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkIssueCreateAsCustomerService(CustomerServiceTester $I): void {
+	public function checkIssueCreateAsCustomerServiceWithNotePermission(CustomerServiceTester $I): void {
 		$I->haveFixtures(
 			array_merge(
 				IssueFixtureHelper::issue(),
@@ -53,6 +53,33 @@ class NoteCest {
 			'title' => 'Some title',
 			'description' => 'Some description',
 			'type' => IssueNote::TYPE_USER_FRONT,
+		]);
+		$I->seeInCurrentUrl(IssueViewCest::ROUTE_VIEW);
+	}
+
+	public function checkIssueCreateAsCustomerServiceWithNoteSelfPermission(CustomerServiceTester $I): void {
+		$I->haveFixtures(
+			array_merge(
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::stageAndTypesFixtures(),
+				IssueFixtureHelper::note(),
+			)
+		);
+		$I->assignPermission(User::PERMISSION_NOTE_SELF);
+		$I->amLoggedIn();
+		/** @var Issue $model */
+		$model = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
+		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $model->id]);
+		$I->see('Create Issue Note for: ' . $model->longId);
+		$I->submitForm(static::SELECTOR_FORM, $this->formsParams(
+			'Some Title',
+			'Some Description')
+		);
+		$I->seeRecord(IssueNote::class, [
+			'issue_id' => $model->id,
+			'title' => 'Some title',
+			'description' => 'Some description',
+			'type' => IssueNote::TYPE_SELF,
 		]);
 		$I->seeInCurrentUrl(IssueViewCest::ROUTE_VIEW);
 	}

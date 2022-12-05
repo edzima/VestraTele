@@ -21,11 +21,12 @@ class IssueNoteWidget extends Widget {
 	protected const CLASS_STAGE_CHANGE = 'panel-warning';
 	protected const CLASS_SMS = 'panel-info';
 	protected const CLASS_DEFAULT = 'panel-primary';
-	protected const CLASS_USER_FRONTEND = 'panel-default';
+	protected const CLASS_SELF = 'panel-default';
 
 	protected const CLASS_BASE = 'panel';
 	protected const CLASS_COLLAPSE = 'collapse';
 	protected const CLASS_PROVISION_CONTROL = 'panel-warning';
+	protected const CLASS_USER_FRONTEND = self::CLASS_DEFAULT;
 
 	public IssueNote $model;
 	public ?bool $editBtn = null;
@@ -77,6 +78,9 @@ class IssueNoteWidget extends Widget {
 		if ($this->model->isUserFrontend()) {
 			return static::CLASS_USER_FRONTEND;
 		}
+		if ($this->model->isSelf()) {
+			return static::CLASS_SELF;
+		}
 		if ($this->model->isSms()) {
 			return static::CLASS_SMS;
 		}
@@ -96,12 +100,26 @@ class IssueNoteWidget extends Widget {
 	}
 
 	public function run(): string {
+		if (!$this->shouldRender()) {
+			return '';
+		}
 		return $this->render('issue-note', [
 			'model' => $this->model,
 			'options' => $this->options,
 			'editBtn' => $this->editBtn,
 			'removeBtn' => $this->removeBtn,
 		]);
+	}
+
+	public function shouldRender(): bool {
+		if ($this->model->isSelf()) {
+			return Yii::$app->user->getId() === $this->model->user_id;
+		}
+		if ($this->model->isForSettlementProvisionControl()) {
+			return Yii::$app->user->can(User::PERMISSION_PROVISION);
+		}
+
+		return true;
 	}
 
 }

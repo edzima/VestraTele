@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
@@ -53,7 +54,7 @@ class NoteController extends Controller {
 				'rules' => [
 					[
 						'allow' => true,
-						'roles' => [Worker::PERMISSION_NOTE],
+						'roles' => [Worker::PERMISSION_NOTE, Worker::PERMISSION_NOTE_SELF],
 					],
 				],
 			],
@@ -68,10 +69,17 @@ class NoteController extends Controller {
 	 */
 	public function actionIssue(int $id) {
 		$issue = $this->findIssue($id);
+
 		$model = new IssueNoteForm([
 			'issue_id' => $issue->getIssueId(),
 			'user_id' => Yii::$app->user->getId(),
 		]);
+
+		if (!Yii::$app->user->can(User::PERMISSION_NOTE)) {
+			$model->type = IssueNote::TYPE_SELF;
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('frontend', 'Warning! This note will only be visible to you.'));
+		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$this->redirect(['/issue/view', 'id' => $issue->getIssueId()]);

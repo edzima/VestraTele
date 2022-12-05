@@ -46,6 +46,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	public const TYPE_SUMMON = 'summon';
 	public const TYPE_STAGE_CHANGE = 'stage.change';
 	public const TYPE_USER_FRONT = 'user.front';
+	public const TYPE_SELF = 'self';
 
 	public ?string $typeName = null;
 
@@ -129,6 +130,10 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 		return $this->isType(static::TYPE_USER_FRONT);
 	}
 
+	public function isSelf(): bool {
+		return $this->isType(static::TYPE_SELF);
+	}
+
 	public function isForSummon(): bool {
 		return $this->isType(static::TYPE_SUMMON);
 	}
@@ -182,6 +187,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 			static::TYPE_SUMMON => Yii::t('common', 'Summon'),
 			static::TYPE_SMS => Yii::t('common', 'SMS'),
 			static::TYPE_STAGE_CHANGE => Yii::t('common', 'Stage Change'),
+			static::TYPE_SELF => Yii::t('common', 'Self'),
 			static::TYPE_USER_FRONT => Yii::t('common', 'User Frontend'),
 			static::TYPE_SETTLEMENT_PROVISION_CONTROL => Yii::t('settlement', 'Provision Control'),
 		];
