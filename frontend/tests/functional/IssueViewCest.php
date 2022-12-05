@@ -4,6 +4,7 @@ namespace frontend\tests\functional;
 
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
+use common\helpers\Flash;
 use common\models\issue\IssueInterface;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -108,6 +109,26 @@ class IssueViewCest {
 		$I->seeLink('Create note');
 		$I->click('Create note');
 		$I->seeInCurrentUrl(NoteCest::ROUTE_ISSUE);
+		$I->dontSeeFlash('Warning! This note will only be visible to you.', Flash::TYPE_WARNING);
+	}
+
+	public function checkSelfNoteLinkWithPermission(CustomerServiceTester $I): void {
+		$I->haveFixtures(
+			array_merge(
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::stageAndTypesFixtures(),
+				IssueFixtureHelper::note(),
+			)
+		);
+
+		$I->assignPermission(User::PERMISSION_NOTE_SELF);
+		$I->amLoggedIn();
+		$issue = $this->grabIssue();
+		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->getIssueId()]);
+		$I->seeLink('Create note');
+		$I->click('Create note');
+		$I->seeInCurrentUrl(NoteCest::ROUTE_ISSUE);
+		$I->seeFlash('Warning! This note will only be visible to you.', Flash::TYPE_WARNING);
 	}
 
 	public function checkStageChangeLinkWithPermission(CustomerServiceTester $I): void {

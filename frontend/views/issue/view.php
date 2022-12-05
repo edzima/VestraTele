@@ -42,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		?>
 
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE)
+		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE) || Yii::$app->user->can(Worker::PERMISSION_NOTE_SELF)
 			? Html::a(Yii::t('common', 'Create note'), ['/note/issue', 'id' => $model->id], [
 				'class' => 'btn btn-info',
 			])
