@@ -31,6 +31,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 
 	public bool $withDaysReminderKey = false;
 	public bool $withStageIdKey = true;
+	public bool $withWithoutStageIdOnNotFound = false;
 
 	public ?bool $sendSmsToCustomer = false;
 	public ?bool $sendEmailToCustomer = false;
@@ -192,7 +193,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 
 	protected function getAgentSMSTemplate(): ?MessageTemplate {
 		$template = parent::getAgentSMSTemplate();
-		if ($template === null && $this->withStageIdKey) {
+		if ($template === null && $this->withWithoutStageIdOnNotFound && $this->withStageIdKey) {
 			$self = clone($this);
 			$self->withStageIdKey = false;
 			$template = $self->getAgentSMSTemplate();
@@ -202,7 +203,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 
 	protected function getCustomerSMSTemplate(): ?MessageTemplate {
 		$template = parent::getCustomerSMSTemplate();
-		if ($template === null && $this->withStageIdKey) {
+		if ($template === null && $this->withWithoutStageIdOnNotFound && $this->withStageIdKey) {
 			$self = clone($this);
 			$self->withStageIdKey = false;
 			$template = $self->getCustomerSMSTemplate();
@@ -212,7 +213,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 
 	protected function getCustomerEmailTemplate(): ?MessageTemplate {
 		$template = parent::getCustomerEmailTemplate();
-		if ($template === null && $this->withStageIdKey) {
+		if ($template === null && $this->withWithoutStageIdOnNotFound && $this->withStageIdKey) {
 			$self = clone($this);
 			$self->withStageIdKey = false;
 			$template = $self->getCustomerEmailTemplate();
@@ -222,7 +223,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 
 	protected function getWorkersTemplate(): ?MessageTemplate {
 		$template = parent::getWorkersTemplate();
-		if ($template === null && $this->withStageIdKey) {
+		if ($template === null && $this->withWithoutStageIdOnNotFound && $this->withStageIdKey) {
 			$self = clone($this);
 			$self->withStageIdKey = false;
 			$template = $self->getWorkersTemplate();

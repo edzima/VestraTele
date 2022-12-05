@@ -145,6 +145,7 @@ class IssueStageChangeForm extends Model {
 
 	public function pushMessages(): bool {
 		$message = $this->getMessagesModel();
+		$message->withWithoutStageIdOnNotFound = true;
 		$message->previousStage = IssueStage::getStages()[$this->previous_stage_id];
 		$message->sms_owner_id = $this->user_id;
 		return $message->pushMessages() > 0;
