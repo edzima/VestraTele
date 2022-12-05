@@ -2,6 +2,7 @@
 
 namespace backend\modules\issue\models\search;
 
+use common\helpers\ArrayHelper;
 use common\models\AddressSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
@@ -62,6 +63,15 @@ class IssueSearch extends BaseIssueSearch {
 			[['type_additional_date_at', 'signature_act', 'stage_change_at'], 'safe'],
 			['excludedTypes', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
+			[
+				'excludedStages', 'filter', 'filter' => function ($stages): array {
+				$stages = (array) $stages;
+				foreach ([$this->stage_id] as $id) {
+					ArrayHelper::removeValue($stages, $id);
+				}
+				return $stages;
+			},
+			],
 		]);
 	}
 

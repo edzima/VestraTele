@@ -52,6 +52,7 @@ abstract class IssueSearch extends Model
 	public const NOTE_ONLY_PINNED = 'only-pinned';
 
 	public bool $withArchive = false;
+	public bool $allowArchiveFilter = false;
 
 	public $agent_id;
 	public $lawyer_id;

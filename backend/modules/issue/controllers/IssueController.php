@@ -3,6 +3,7 @@
 namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueForm;
+use backend\modules\issue\models\IssueStage;
 use backend\modules\issue\models\IssueStageChangeForm;
 use backend\modules\issue\models\search\IssueLeadsSearch;
 use backend\modules\issue\models\search\IssueSearch;
@@ -56,6 +57,7 @@ class IssueController extends Controller {
 		$searchModel = new IssueSearch();
 		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
+			$searchModel->excludedStages = [IssueStage::ARCHIVES_ID];
 		}
 		if (Yii::$app->user->can(Worker::PERMISSION_PAY_ALL_PAID)) {
 			$searchModel->scenario = IssueSearch::SCENARIO_ALL_PAYED;
