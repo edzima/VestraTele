@@ -159,6 +159,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			}
 			return [];
 		},
+		'emptyText' => $searchModel->hasExcludedArchiveStage() ? Yii::t('issue', 'Archive is Excluded. Check in them.') : null,
 		'columns' => [
 			Yii::$app->user->can(Worker::PERMISSION_MULTIPLE_SMS)
 				? [

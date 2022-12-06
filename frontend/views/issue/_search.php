@@ -39,7 +39,37 @@ use kartik\select2\Select2;
 			'showToggleAll' => false,
 		]) ?>
 
+	</div>
 
+	<div class="row">
+		<?= $form->field($model, 'excludedTypes', ['options' => ['class' => 'col-md-5 col-lg-4']])->widget(Select2::class, [
+			'data' => IssueSearch::getIssueTypesNames(),
+			'options' => [
+				'multiple' => true,
+				'placeholder' => $model->getAttributeLabel('excludedTypes'),
+			],
+			'pluginOptions' => [
+				'allowClear' => true,
+			],
+		]) ?>
+
+		<?= $form->field($model, 'excludedStages', ['options' => ['class' => 'col-md-5 col-lg-4']])->widget(Select2::class, [
+			'data' => $model->getStagesNames(),
+			'options' => [
+				'multiple' => true,
+				'placeholder' => $model->getAttributeLabel('excludedStages'),
+			],
+			'pluginOptions' => [
+				'allowClear' => true,
+			],
+		]) ?>
+
+
+		<?= $form->field($model, 'onlyWithTelemarketers', ['options' => ['class' => 'col-md-2']])
+			->dropDownList(Html::booleanDropdownList(), [
+				'prompt' => Yii::t('common', 'All'),
+			])
+		?>
 	</div>
 
 

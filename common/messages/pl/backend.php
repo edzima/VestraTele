@@ -188,8 +188,7 @@ return [
 	'Update relation {user} for issue' => 'Update relation {user} for issue',
 	'Only delayed' => 'Tylko opóźnione',
 	'Structures' => 'Struktury',
-	'Excluded stages' => 'Wykluczone etapy',
-	'Excluded types' => 'Wykluczone typy',
+
 	'Update relation in {issue} for: {user}' => '{user} w sprawie: {issue}',
 	'Update cost: {issue}' => 'Edytuj koszt: {issue}',
 	'Costs' => 'Koszty',
@@ -315,7 +314,6 @@ return [
 	'Create Issue Stage' => 'Dodaj Etap Sprawy',
 	'Update Issue Stage: {name}' => 'Edytuj Etap Sprawy: {name}',
 	'Only with Claims' => 'Z Rozszczeniami',
-	'Only with Telemarketers' => 'Z konsultantem',
 	'Unmark Provision Control' => 'Odznacz Kontrole Prowizji',
 	'Are you sure you want to delete all provisions for this settlement? Provision Control will be unmark.' => 'Jesteś pewny, że chcesz usunąć wszystkie Prowizję dla tego Rozlcizenia? KONTROLA PROWIZJI zostanie zdjęta.',
 	'Are you sure you want to delete this Stage with all Issues with then?' => 'Jesteś pewien, że chcesz usunac ten Etap oraz WSZYSTKIE Sprawy do niego przypisane?',

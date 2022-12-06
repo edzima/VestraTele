@@ -126,4 +126,8 @@ return [
 	'Update {user} as {type}.' => 'Edycja {type} - {user}.',
 	'Delete {user} as {type}.' => 'Usunięto {type}: {user}.',
 	'Change User in Issue: {issue}.' => 'Zmiana w Sprawie: {issue}.',
+	'Excluded stages' => 'Wykluczone etapy',
+	'Excluded types' => 'Wykluczone typy',
+	'Only with Telemarketers' => 'Z konsultantem',
+	'Archive is Excluded. Check in them.' => 'Archiwum jest wykluczone. Sprawdź w nim',
 ];

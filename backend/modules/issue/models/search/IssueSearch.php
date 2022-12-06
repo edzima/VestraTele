@@ -2,13 +2,11 @@
 
 namespace backend\modules\issue\models\search;
 
-use common\helpers\ArrayHelper;
 use common\models\AddressSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSearch as BaseIssueSearch;
-use common\models\issue\IssueUser;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\user\User;
@@ -27,14 +25,11 @@ class IssueSearch extends BaseIssueSearch {
 	public const SCENARIO_ALL_PAYED = 'allPayed';
 
 	public $parentId;
-	public $excludedTypes = [];
-	public $excludedStages = [];
 	public $onlyWithSettlements;
 
 	public $onlyWithClaims;
 	public ?string $claimCompanyTryingValue = null;
 
-	public $onlyWithTelemarketers;
 
 	public bool $onlyDelayed = false;
 	public bool $onlyWithPayedPay = false;
@@ -56,36 +51,24 @@ class IssueSearch extends BaseIssueSearch {
 	public function rules(): array {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
-			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims', 'onlyWithTelemarketers'], 'boolean'],
-			[['onlyWithSettlements', 'onlyWithClaims', 'onlyWithTelemarketers'], 'default', 'value' => null],
+			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims',], 'boolean'],
+			[['onlyWithSettlements', 'onlyWithClaims'], 'default', 'value' => null],
 			['claimCompanyTryingValue', 'number', 'min' => 0],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
 			[['type_additional_date_at', 'signature_act', 'stage_change_at'], 'safe'],
-			['excludedTypes', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
-			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
-			[
-				'excludedStages', 'filter', 'filter' => function ($stages): array {
-				$stages = (array) $stages;
-				foreach ([$this->stage_id] as $id) {
-					ArrayHelper::removeValue($stages, $id);
-				}
-				return $stages;
-			},
-			],
+
 		]);
 	}
 
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
 			'parentId' => Yii::t('backend', 'Structures'),
-			'excludedStages' => Yii::t('backend', 'Excluded stages'),
-			'excludedTypes' => Yii::t('backend', 'Excluded types'),
+
 			'onlyDelayed' => Yii::t('backend', 'Only delayed'),
 			'onlyWithClaims' => Yii::t('backend', 'Only with Claims'),
 			'onlyWithPayedPay' => Yii::t('backend', 'Only with payed pay'),
 			'onlyWithSettlements' => Yii::t('settlement', 'Only with Settlements'),
 			'onlyWithAllPayedPay' => Yii::t('settlement', 'Only with all paid Pays'),
-			'onlyWithTelemarketers' => Yii::t('backend', 'Only with Telemarketers'),
 		]);
 	}
 
@@ -137,15 +120,12 @@ class IssueSearch extends BaseIssueSearch {
 		parent::issueQueryFilter($query);
 		$this->signatureActFilter($query);
 		$this->delayedFilter($query);
-		$this->excludedStagesFilter($query);
-		$this->excludedTypesFilter($query);
 		$this->teleFilter($query);
 		$this->lawyerFilter($query);
 		$this->payedFilter($query);
 		$this->settlementsFilter($query);
 		$this->stageChangeAtFilter($query);
 		$this->claimFilter($query);
-		$this->onlyWithTelemarketers($query);
 	}
 
 	private function signatureActFilter(IssueQuery $query): void {
@@ -175,13 +155,7 @@ class IssueSearch extends BaseIssueSearch {
 		}
 	}
 
-	protected function excludedStagesFilter(IssueQuery $query): void {
-		$query->andFilterWhere(['NOT IN', Issue::tableName() . '.stage_id', $this->excludedStages]);
-	}
 
-	protected function excludedTypesFilter(IssueQuery $query): void {
-		$query->andFilterWhere(['NOT IN', Issue::tableName() . '.type_id', $this->excludedTypes]);
-	}
 
 	protected function lawyerFilter(IssueQuery $query): void {
 		if (!empty($this->lawyer_id)) {
@@ -223,24 +197,6 @@ class IssueSearch extends BaseIssueSearch {
 			return;
 		}
 		$query->andWhere('PC.issue_id IS NULL');
-	}
-
-	private function onlyWithTelemarketers(IssueQuery $query): void {
-		if ($this->onlyWithTelemarketers === null || $this->onlyWithTelemarketers === '') {
-			return;
-		}
-		if ((bool) $this->onlyWithTelemarketers === true) {
-			$query->joinWith('tele T', false);
-			$query->andWhere('T.id IS NOT NULL');
-		} else {
-			$query->andWhere([
-					'NOT IN', Issue::tableName() . '.id',
-					IssueUser::find()
-						->select('issue_id')
-						->withType(IssueUser::TYPE_TELEMARKETER),
-				]
-			);
-		}
 	}
 
 	public function getAgentsNames(): array {

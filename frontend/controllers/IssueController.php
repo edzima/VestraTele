@@ -55,6 +55,7 @@ class IssueController extends Controller {
 		$searchModel = new IssueSearch();
 		if ($user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
+			$searchModel->excludeArchiveStage();
 		}
 		$searchModel->user_id = (int) $user->getId();
 

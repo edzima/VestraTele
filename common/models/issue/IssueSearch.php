@@ -47,6 +47,11 @@ abstract class IssueSearch extends Model
 	public string $customerPhone = '';
 	public string $userName = '';
 
+	public $excludedTypes = [];
+	public $excludedStages = [];
+
+	public $onlyWithTelemarketers;
+
 	public $noteFilter;
 
 	public const NOTE_ONLY_PINNED = 'only-pinned';
@@ -72,6 +77,9 @@ abstract class IssueSearch extends Model
 					'issue_id', 'agent_id', 'stage_id', 'entity_responsible_id',
 				], 'integer',
 			],
+			[['onlyWithTelemarketers'], 'boolean'],
+			[['onlyWithTelemarketers'], 'default', 'value' => null],
+
 			['noteFilter', 'string'],
 			[['createdAtTo', 'createdAtFrom', 'signedAtFrom', 'signedAtTo'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
@@ -84,6 +92,17 @@ abstract class IssueSearch extends Model
 				], 'safe',
 			],
 			['customerPhone', PhoneValidator::class],
+			['excludedTypes', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
+			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
+			[
+				'excludedStages', 'filter', 'filter' => function ($stages): array {
+				$stages = (array) $stages;
+				foreach ([$this->stage_id] as $id) {
+					\common\helpers\ArrayHelper::removeValue($stages, $id);
+				}
+				return $stages;
+			},
+			],
 		];
 	}
 
@@ -92,15 +111,18 @@ abstract class IssueSearch extends Model
 	 */
 	public function attributeLabels(): array {
 		return array_merge([
-			'issue_id' => Yii::t('issue', 'Issue'),
+			'agent_id' => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
 			'createdAtFrom' => Yii::t('common', 'Created at from'),
 			'createdAtTo' => Yii::t('common', 'Created at to'),
-			'agent_id' => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
+			'excludedStages' => Yii::t('issue', 'Excluded stages'),
+			'excludedTypes' => Yii::t('issue', 'Excluded types'),
+			'issue_id' => Yii::t('issue', 'Issue'),
 			'lawyer_id' => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
-			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
+			'onlyWithTelemarketers' => Yii::t('issue', 'Only with Telemarketers'),
 			'signedAtFrom' => Yii::t('issue', 'Signed At from'),
 			'signedAtTo' => Yii::t('issue', 'Signed At to'),
 			'tagsIds' => Yii::t('issue', 'Tags'),
+			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 			'userName' => Yii::t('issue', 'Issue User'),
 		], Issue::instance()->attributeLabels());
 	}
@@ -128,10 +150,14 @@ abstract class IssueSearch extends Model
 		$this->applyCustomerNameFilter($query);
 		$this->applyCustomerPhoneFilter($query);
 		$this->applyCreatedAtFilter($query);
-		$this->applySignedAtFilter($query);
 		$this->applyNotesFilter($query);
+		$this->excludedStagesFilter($query);
+		$this->excludedTypesFilter($query);
+		$this->applySignedAtFilter($query);
 		$this->applyUserNameFilter($query);
 		$this->applyTagsFilter($query);
+		$this->applyOnlyWithTelemarketersFilter($query);
+
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
 			Issue::tableName() . '.stage_id' => $this->stage_id,
@@ -234,6 +260,42 @@ abstract class IssueSearch extends Model
 		}
 	}
 
+	public function applyCustomerPhoneFilter(ActiveQuery $query): void {
+		if (!empty($this->customerPhone)) {
+			$query->joinWith([
+				'customer.userProfile CP' => function (PhonableQuery $query) {
+					$query->withPhoneNumber($this->customerPhone);
+				},
+			]);
+		}
+	}
+
+	protected function applyOnlyWithTelemarketersFilter(IssueQuery $query): void {
+		if ($this->onlyWithTelemarketers === null || $this->onlyWithTelemarketers === '') {
+			return;
+		}
+		if ((bool) $this->onlyWithTelemarketers === true) {
+			$query->joinWith('tele T', false);
+			$query->andWhere('T.id IS NOT NULL');
+		} else {
+			$query->andWhere([
+					'NOT IN', Issue::tableName() . '.id',
+					IssueUser::find()
+						->select('issue_id')
+						->withType(IssueUser::TYPE_TELEMARKETER),
+				]
+			);
+		}
+	}
+
+	protected function excludedStagesFilter(IssueQuery $query): void {
+		$query->andFilterWhere(['NOT IN', Issue::tableName() . '.stage_id', $this->excludedStages]);
+	}
+
+	protected function excludedTypesFilter(IssueQuery $query): void {
+		$query->andFilterWhere(['NOT IN', Issue::tableName() . '.type_id', $this->excludedTypes]);
+	}
+
 	public function applyUserNameFilter(ActiveQuery $query): void {
 		if (!empty($this->userName)) {
 			$query->joinWith([
@@ -246,16 +308,6 @@ abstract class IssueSearch extends Model
 				},
 			]);
 			$query->distinct();
-		}
-	}
-
-	public function applyCustomerPhoneFilter(ActiveQuery $query): void {
-		if (!empty($this->customerPhone)) {
-			$query->joinWith([
-				'customer.userProfile CP' => function (PhonableQuery $query) {
-					$query->withPhoneNumber($this->customerPhone);
-				},
-			]);
 		}
 	}
 
@@ -316,5 +368,13 @@ abstract class IssueSearch extends Model
 			$query->distinct();
 			$query->andWhere([IssueTag::tableName() . '.id' => $this->tagsIds]);
 		}
+	}
+
+	public function excludeArchiveStage(): void {
+		$this->excludedStages[] = IssueStage::ARCHIVES_ID;
+	}
+
+	public function hasExcludedArchiveStage(): bool {
+		return in_array(IssueStage::ARCHIVES_ID, $this->excludedStages);
 	}
 }

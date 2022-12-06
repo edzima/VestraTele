@@ -65,6 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'emptyText' => $searchModel->hasExcludedArchiveStage() ? Yii::t('issue', 'Archive is Excluded. Check in them.') : null,
 		'columns' => [
 			['class' => SerialColumn::class], // @todo to approval
 			[
