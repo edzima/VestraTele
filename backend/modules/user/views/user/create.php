@@ -1,10 +1,7 @@
 <?php
 
 use backend\modules\user\models\UserForm;
-use backend\modules\user\widgets\UserProfileFormWidget;
-use common\widgets\address\AddressFormWidget;
-use yii\bootstrap\ActiveForm;
-use yii\bootstrap\Html;
+use backend\modules\user\widgets\DuplicateUserGridView;
 
 /* @var $this yii\web\View */
 /* @var $model UserForm */
@@ -17,35 +14,19 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-create">
 
-	<?php $form = ActiveForm::begin(['id' => 'user-create-form']) ?>
 
-	<?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
-	<?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-	<?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?>
-
-
-	<?= UserProfileFormWidget::widget([
-		'model' => $model->getProfile(),
-		'form' => $form,
-	]) ?>
-
-	<?= AddressFormWidget::widget([
-		'form' => $form,
-		'model' => $model->getHomeAddress(),
-	]) ?>
-
-	<?= $form->field($model, 'status')->radioList($model::getStatusNames()) ?>
-
-	<?= $form->field($model, 'roles')->checkboxList($model::getRolesNames()) ?>
-
-	<?= $form->field($model, 'permissions')->checkboxList($model::getPermissionsNames()) ?>
-
-	<div class="form-group">
-		<?= Html::submitButton(Yii::t('backend', 'Create'), ['class' => 'btn btn-primary']) ?>
-	</div>
+	<?= $model->getDuplicatesDataProvider() !== null
+		? DuplicateUserGridView::widget([
+			'dataProvider' => $model->getDuplicatesDataProvider(),
+		])
+		: ''
+	?>
 
 
-	<?php ActiveForm::end() ?>
+	<?= $this->render('_form', [
+			'model' => $model,
+		]
+	) ?>
 
 
 </div>

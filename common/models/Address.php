@@ -95,4 +95,13 @@ class Address extends ActiveRecord {
 		return $this->city->getAddress()->fullName;
 	}
 
+	public function getCityWithPostalCode(bool $withRegionAndProvince = false): ?string {
+		$city = $this->city;
+		if ($city === null) {
+			return Yii::$app->formatter->asCityCode(null, $this->postal_code);
+		}
+		$cityName = $withRegionAndProvince ? $city->nameWithRegionAndDistrict : $city->name;
+		return Yii::$app->formatter->asCityCode($cityName, $this->postal_code);
+	}
+
 }

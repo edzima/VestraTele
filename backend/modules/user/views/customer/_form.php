@@ -14,26 +14,59 @@ use yii\bootstrap\Html;
 
 <?php $form = ActiveForm::begin(['id' => 'customer-form']) ?>
 
-<?= !$model->getModel()->isNewRecord ? $form->field($model, 'username')->textInput(['maxlength' => true]) : '' ?>
+<div class="row">
 
-<?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
+	<?= $model->scenario === CustomerUserForm::SCENARIO_CREATE
+	&& $model->hasDuplicates()
+		? $form->field($model, 'acceptDuplicates', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->checkbox()
+		: ''
+	?>
+
+
+	<?= !$model->getModel()->isNewRecord ? $form->field($model, 'username', [
+		'options' => [
+			'class' => 'col-md-3 col-lg-2',
+		],
+	])->textInput(['maxlength' => true]) : '' ?>
+
+	<?= $form->field($model, 'email', [
+		'options' => [
+			'class' => 'col-md-3 col-lg-2',
+		],
+	])->textInput(['maxlength' => true]) ?>
+
+
+</div>
 <?= UserProfileFormWidget::widget([
 	'model' => $model->getProfile(),
 	'form' => $form,
 ]) ?>
 
-<?= $form->field($model, 'traits')->widget(Select2::class, [
-	'data' => CustomerUserForm::getTraitsNames(),
-	'options' => [
-		'multiple' => true,
-	],
-]) ?>
+<div class="row">
 
-<?= AddressFormWidget::widget([
-	'form' => $form,
-	'model' => $model->getHomeAddress(),
-]) ?>
+	<div class="col-md-10 col-lg-8">
+
+
+		<?= AddressFormWidget::widget([
+			'form' => $form,
+			'model' => $model->getHomeAddress(),
+		]) ?>
+
+
+		<?= $form->field($model, 'traits')->widget(Select2::class, [
+			'data' => CustomerUserForm::getTraitsNames(),
+			'options' => [
+				'multiple' => true,
+			],
+		]) ?>
+
+	</div>
+</div>
 
 
 <div class="form-group">

@@ -1,9 +1,12 @@
 <?php
 
 use backend\modules\issue\models\IssueForm;
+use backend\modules\user\widgets\DuplicateUserGridView;
 use common\models\message\IssueCreateMessagesForm;
+use yii\data\ActiveDataProvider;
 
 /* @var $this yii\web\View */
+/* @var $duplicatesCustomersDataProvider ActiveDataProvider */
 /* @var $model IssueForm */
 /* @var $messagesModel IssueCreateMessagesForm */
 
@@ -16,6 +19,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 <div class="issue-create">
+
+	<?= DuplicateUserGridView::widget([
+		'dataProvider' => $duplicatesCustomersDataProvider,
+		'showOnEmpty' => false,
+		'emptyText' => false,
+	]) ?>
 
 	<?= $this->render('_form', [
 		'model' => $model,

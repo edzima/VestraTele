@@ -1,7 +1,7 @@
 <?php
 
 use backend\modules\user\models\CustomerUserForm;
-
+use backend\modules\user\widgets\DuplicateUserGridView;
 
 /* @var $this yii\web\View */
 /* @var $model CustomerUserForm */
@@ -13,9 +13,19 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="customer-create">
 
-	<?= $this->render('_form',[
-			'model' => $model
+
+	<?= $model->getDuplicatesDataProvider() !== null
+		? DuplicateUserGridView::widget([
+			'dataProvider' => $model->getDuplicatesDataProvider(),
+		])
+		: ''
+	?>
+
+
+	<?= $this->render('_form', [
+			'model' => $model,
 		]
-	)?>
+	) ?>
+
 
 </div>
