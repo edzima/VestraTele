@@ -96,6 +96,8 @@ return [
 	'hidden costs' => 'ukryto koszty',
 	'Empty - From Issue Created At' => 'Puste - Data założenia Sprawy',
 	'Date from Settlement' => 'Data z Rozliczenia',
+	'Doubles' => 'Duplikaty',
+	'Provision - Doubles' => 'Prowizje - Duplikaty',
 ];
 
 

@@ -72,6 +72,12 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 				'model' => $model,
 				'withCreatedAt' => true,
 			]) ?>
+
+			<?= $this->render(
+				'_user_provisions', [
+					'dataProvider' => $dataProvider,
+				]
+			) ?>
 		</div>
 		<div class="col-md-8 col-lg-9">
 			<?= GridView::widget([
