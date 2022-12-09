@@ -44,6 +44,7 @@ class SettlementController extends Controller {
 			'query' => Provision::find()
 				->andWhere(['pay_id' => $model->getPays()->getIds()])
 				->joinWith('pay.calculation.pays')
+				->with(['type', 'fromUser.userProfile', 'toUser.userProfile'])
 				->orderBy(['value' => SORT_DESC]),
 			'pagination' => false,
 			'sort' => false,
