@@ -14,7 +14,12 @@ use yii\helpers\Html;
 /* @var $searchModel ProvisionDoubleSearch */
 
 $this->title = Yii::t('provision', 'Provision - Doubles');
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = [
+	'label' => Yii::t('provision', 'Provisions'),
+	'url' => ['index'],
+];
+
+$this->params['breadcrumbs'][] = Yii::t('provision', 'Doubles');
 ?>
 <div class="provision-doubles">
 
