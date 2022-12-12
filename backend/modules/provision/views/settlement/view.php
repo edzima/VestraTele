@@ -95,6 +95,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 					'value:currency',
 					'provision',
 					'pay.value:currency',
+					'pay.pay_at:date',
 					[
 						'class' => ActionColumn::class,
 						'controller' => '/provision/provision',
