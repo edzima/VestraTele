@@ -29,6 +29,7 @@ class IssueStageForm extends Model {
 			['posi', 'default', 'value' => 0],
 			['calendar_background', 'default', 'value' => null],
 			['days_reminder', 'integer', 'min' => 1, 'max' => 365],
+			['days_reminder', 'default', 'value' => null],
 			[['name', 'short_name', 'calendar_background'], 'string', 'max' => 255],
 			[
 				['name', 'short_name'],
