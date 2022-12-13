@@ -109,6 +109,8 @@ class IssueController extends Controller {
 			$search->onlyToPayed = false;
 			$search->withAgents = false;
 			$search->withArchive = true;
+			$search->onlyWithPayProblems = null;
+			$search->problem_status = null;
 			$calculationsDataProvider = $search->search([]);
 		}
 		$summonDataProvider = (new SummonSearch(['issue_id' => $model->id]))->search([]);
