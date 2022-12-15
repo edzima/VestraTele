@@ -323,4 +323,5 @@ return [
 	'Warning! Duplicates exists.' => 'Uwaga! Istnieją Duplikaty.',
 	'Warning! Duplicates Customers ({user}) exists: {count}.' => 'Uwaga! Istnieje kilku takich Klientów ({user}): {count}.',
 	'You must accept duplicates before create User.' => 'Upewnij się, że użytkownik nie istnieje.',
+	'Create Issue Type' => 'Dodaj Typ Sprawy',
 ];

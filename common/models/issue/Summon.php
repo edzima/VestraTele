@@ -52,7 +52,9 @@ class Summon extends ActiveRecord implements IssueInterface {
 	public const STATUS_WITHOUT_RECOGNITION = 3;
 	public const STATUS_TO_CONFIRM = 4;
 	public const STATUS_REALIZED = 5;
-	public const STATUS_UNREALIZED = 6;
+
+	public const STATUS_UNREALIZED = 6; // @todo to client
+	public const STATUS_UNREALIZED_COMPANY = 8;//@company as new kind of status.
 
 	/**
 	 * @inheritdoc

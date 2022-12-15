@@ -5,6 +5,7 @@ namespace common\models\issue;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -14,10 +15,9 @@ use yii\helpers\ArrayHelper;
  * @property int $id
  * @property string $name
  * @property string $short_name
- * @property int $provision_type
  * @property string $vat
- * @property bool $meet
  * @property bool $with_additional_date
+ * @property int|null $parent_id
  *
  * @property Issue[] $issues
  * @property IssueStage[] $stages
@@ -40,30 +40,13 @@ class IssueType extends ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules(): array {
-		return [
-			[['name', 'short_name', 'vat'], 'required'],
-			[['provision_type'], 'integer'],
-			[['meet', 'with_additional_date'], 'boolean'],
-			[['name', 'short_name'], 'string', 'max' => 255],
-			[['name'], 'unique'],
-			['vat', 'number', 'min' => 0, 'max' => 100],
-			[['short_name'], 'unique'],
-		];
-	}
-
-	/**
-	 * @inheritdoc
-	 */
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
 			'name' => Yii::t('common', 'Name'),
 			'short_name' => Yii::t('common', 'Shortname'),
-			'provision_type' => Yii::t('common', 'Provision type'),
 			'vat' => 'VAT (%)',
 			'with_additional_date' => Yii::t('common', 'With additional Date'),
-			'meet' => Yii::t('common', 'meet'),
 		];
 	}
 
@@ -77,6 +60,10 @@ class IssueType extends ActiveRecord {
 		return $this->hasMany(IssueStage::class, ['id' => 'stage_id'])
 			->orderBy(['posi' => SORT_DESC, 'name' => SORT_ASC])
 			->viaTable('{{%issue_stage_type}}', ['type_id' => 'id']);
+	}
+
+	public function getParent(): ActiveQuery {
+		return $this->hasOne(static::class, ['parent_id' => 'id']);
 	}
 
 	public function getNameWithShort(): string {
@@ -114,6 +101,20 @@ class IssueType extends ActiveRecord {
 				->all();
 		}
 		return static::$TYPES;
+	}
+
+	public static function getParents(): array {
+		$types = static::getTypes();
+		$parents = [];
+		foreach ($types as $type) {
+			if ($type->parent_id && !isset($parents[$type->parent_id])) {
+				$parent = $types[$type->parent_id] ?? null;
+				if ($parent) {
+					$parents[$parent->id] = $parent;
+				}
+			}
+		}
+		return $parents;
 	}
 
 }
