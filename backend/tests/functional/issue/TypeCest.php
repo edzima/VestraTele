@@ -6,6 +6,7 @@ use backend\modules\issue\controllers\TypeController;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\models\issue\IssueType;
 use common\models\user\Worker;
 
 class TypeCest {
@@ -68,14 +69,20 @@ class TypeCest {
 			0,
 		)
 		);
+		$I->seeRecord(IssueType::class, [
+			'name' => 'Some new type name',
+			'short_name' => 'SNTM',
+			'vat' => 0,
+		]);
 		$I->seeInTitle('Some new type name');
 	}
 
-	private function formParams($name, $shortname, $vat): array {
+	private function formParams($name, $shortname, $vat, $parent_id = null): array {
 		return [
-			'IssueType[name]' => $name,
-			'IssueType[short_name]' => $shortname,
-			'IssueType[vat]' => $vat,
+			'IssueTypeForm[name]' => $name,
+			'IssueTypeForm[short_name]' => $shortname,
+			'IssueTypeForm[vat]' => $vat,
+			'IssueTypeForm[parent_id]' => $parent_id,
 		];
 	}
 

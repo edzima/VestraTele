@@ -2,6 +2,7 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\modules\issue\models\IssueTypeForm;
 use backend\modules\issue\models\search\IssueTypeSearch;
 use common\models\issue\IssueType;
 use Yii;
@@ -64,10 +65,10 @@ class TypeController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new IssueType();
+		$model = new IssueTypeForm();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('create', [
 			'model' => $model,
@@ -81,11 +82,12 @@ class TypeController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionUpdate($id) {
-		$model = $this->findModel($id);
+	public function actionUpdate(int $id) {
+		$model = new IssueTypeForm();
+		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('update', [
 			'model' => $model,
