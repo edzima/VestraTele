@@ -23,6 +23,7 @@ class CalculationForm extends BaseCalculationForm {
 			if ($this->getModel()->isNewRecord) {
 				$this->messagesForm = new IssueSettlementCreateMessagesForm();
 				$this->messagesForm->setSettlement($this->getModel());
+				$this->messagesForm->sendSmsToCustomer = false;
 			}
 		}
 		return $this->messagesForm;

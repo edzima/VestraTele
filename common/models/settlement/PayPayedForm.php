@@ -90,6 +90,7 @@ class PayPayedForm extends Model {
 	public function getMessagesModel(): IssuePayPayedMessagesForm {
 		if ($this->_messagesForm === null) {
 			$this->_messagesForm = new IssuePayPayedMessagesForm();
+			$this->_messagesForm->sendSmsToCustomer = false;
 			$this->_messagesForm->setPay($this->pay);
 		}
 		return $this->_messagesForm;
