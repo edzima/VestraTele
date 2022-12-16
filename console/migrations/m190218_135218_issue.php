@@ -34,7 +34,6 @@ class m190218_135218_issue extends Migration {
 		]);
 
 		$this->addForeignKey('issue_stage_type_type', '{{%issue_stage_type}}', 'type_id', '{{%issue_type}}', 'id', 'CASCADE', 'CASCADE');
-
 		$this->addForeignKey('issue_stage_type_stage', '{{%issue_stage_type}}', 'stage_id', '{{%issue_stage}}', 'id', 'CASCADE', 'CASCADE');
 
 		$this->createTable('{{%issue}}', [

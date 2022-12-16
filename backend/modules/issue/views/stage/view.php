@@ -1,6 +1,8 @@
 <?php
 
 use backend\modules\issue\models\IssueStage;
+use backend\widgets\GridView;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -56,4 +58,16 @@ YiiAsset::register($this);
 		],
 	]) ?>
 
+
+	<?= GridView::widget([
+		'dataProvider' => new ActiveDataProvider([
+			'query' => $model->getStageTypes(),
+			'pagination' => false,
+		]),
+		'columns' => [
+			'typeName',
+			'days_reminder',
+			'calendar_background',
+		],
+	]) ?>
 </div>

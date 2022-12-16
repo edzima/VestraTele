@@ -85,6 +85,10 @@ class IssueStage extends ActiveRecord {
 			->indexBy('id');
 	}
 
+	public function getStageTypes(): ActiveQuery {
+		return $this->hasMany(IssueStageType::class, ['stage_id' => 'id']);
+	}
+
 	public static function getStagesNames(bool $withArchive = false): array {
 		$names = ArrayHelper::map(static::getStages(), 'id', 'nameWithShort');
 		if (!$withArchive) {
