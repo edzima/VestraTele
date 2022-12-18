@@ -21,6 +21,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property Issue[] $issues
  * @property IssueStage[] $stages
+ * @property static|null $parent
  */
 class IssueType extends ActiveRecord {
 
@@ -47,6 +48,10 @@ class IssueType extends ActiveRecord {
 			'short_name' => Yii::t('common', 'Shortname'),
 			'vat' => 'VAT (%)',
 			'with_additional_date' => Yii::t('common', 'With additional Date'),
+			'parent_id' => Yii::t('issue', 'Type Parent'),
+			'parent' => Yii::t('issue', 'Type Parent'),
+			'parentName' => Yii::t('issue', 'Type Parent'),
+
 		];
 	}
 
@@ -63,7 +68,7 @@ class IssueType extends ActiveRecord {
 	}
 
 	public function getParent(): ActiveQuery {
-		return $this->hasOne(static::class, ['parent_id' => 'id']);
+		return $this->hasOne(static::class, ['id' => 'parent_id']);
 	}
 
 	public function getNameWithShort(): string {
@@ -88,6 +93,13 @@ class IssueType extends ActiveRecord {
 
 	public static function get(int $typeId): ?self {
 		return static::getTypes()[$typeId] ?? null;
+	}
+
+	public function getParentName(): ?string {
+		if ($this->parent_id) {
+			return static::getTypesNames()[$this->parent_id] ?? null;
+		}
+		return null;
 	}
 
 	/**

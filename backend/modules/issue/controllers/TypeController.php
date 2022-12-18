@@ -36,7 +36,7 @@ class TypeController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new IssueTypeSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -52,7 +52,7 @@ class TypeController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionView($id) {
+	public function actionView(int $id) {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
