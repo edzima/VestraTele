@@ -14,7 +14,7 @@ class IssueTypeForm extends Model {
 	public string $short_name = '';
 	public string $vat = '';
 	public ?bool $with_additional_date = null;
-	public ?int $parent_id = null;
+	public $parent_id;
 
 	private ?IssueType $model = null;
 
@@ -82,6 +82,7 @@ class IssueTypeForm extends Model {
 			'short_name' => Yii::t('common', 'Shortname'),
 			'vat' => 'VAT (%)',
 			'with_additional_date' => Yii::t('common', 'With additional Date'),
+			'parent_id' => Yii::t('issue', 'Type Parent'),
 		];
 	}
 

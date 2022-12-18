@@ -16,7 +16,9 @@ class IssueTypeSearch extends IssueType {
 	 */
 	public function rules(): array {
 		return [
+			[['parent_id'], 'integer'],
 			[['with_additional_date'], 'boolean'],
+			[['with_additional_date'], 'default', 'value' => null],
 			[['name', 'short_name'], 'safe'],
 		];
 	}
@@ -56,6 +58,7 @@ class IssueTypeSearch extends IssueType {
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'with_additional_date' => $this->with_additional_date,
+			'parent_id' => $this->parent_id,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])

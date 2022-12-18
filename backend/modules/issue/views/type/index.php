@@ -1,6 +1,7 @@
 <?php
 
 use backend\modules\issue\models\search\IssueTypeSearch;
+use common\helpers\ArrayHelper;
 use yii\grid\GridView;
 use yii\helpers\Html;
 
@@ -9,6 +10,7 @@ use yii\helpers\Html;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('backend', 'Issue Types');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-type-index">
@@ -27,9 +29,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			'name',
 			'short_name',
 			'vat',
-			'provision',
 			'with_additional_date:boolean',
-			'meet:boolean',
+			[
+				'attribute' => 'parent_id',
+				'value' => 'parentName',
+				'filter' => ArrayHelper::map(IssueTypeSearch::getParents(), 'id', 'name'),
+			],
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>

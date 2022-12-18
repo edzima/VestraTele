@@ -7,7 +7,6 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('backend', 'Create Issue Type');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
-
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Types'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

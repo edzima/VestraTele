@@ -46,6 +46,7 @@ use yii\web\View;
 			],
 		])->widget(Select2::class, [
 			'data' => $model->getParentsData(),
+			'options' => ['placeholder' => $model->getAttributeLabel('parent_id')],
 		]) ?>
 	</div>
 

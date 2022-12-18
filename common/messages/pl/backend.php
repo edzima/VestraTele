@@ -324,6 +324,7 @@ return [
 	'Warning! Duplicates Customers ({user}) exists: {count}.' => 'Uwaga! Istnieje kilku takich Klientów ({user}): {count}.',
 	'You must accept duplicates before create User.' => 'Upewnij się, że użytkownik nie istnieje.',
 	'Create Issue Type' => 'Dodaj Typ Sprawy',
+	'Update Issue Type: {name}' => 'Edytuj Typ: {name}',
 	'User Visibles' => 'Widoczność Użytkowników',
 	'Create User Visible' => 'Ustal Widoczność',
 	'Update User Visible: {user}' =>'Edytuj widoczność: {user}'
