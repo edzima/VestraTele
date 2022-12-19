@@ -80,7 +80,7 @@ class StageController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionUpdate($id) {
+	public function actionUpdate(int $id) {
 		$model = new IssueStageForm();
 		$model->setModel($this->findModel($id));
 
@@ -99,7 +99,7 @@ class StageController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionDelete($id) {
+	public function actionDelete(int $id) {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);
@@ -113,7 +113,7 @@ class StageController extends Controller {
 	 * @return IssueStage the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): IssueStage {
+	protected function findModel(int $id): IssueStage {
 		if (($model = IssueStage::findOne($id)) !== null) {
 			return $model;
 		}

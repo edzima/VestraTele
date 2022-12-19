@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -19,8 +20,21 @@ use yii\db\ActiveRecord;
  */
 class IssueStageType extends ActiveRecord {
 
+	public function attributeLabels(): array {
+		return [
+			'stageName' => Yii::t('issue', 'Stage'),
+			'typeName' => Yii::t('issue', 'Type'),
+			'days_reminder' => Yii::t('common', 'Reminder (days)'),
+			'calendar_background' => Yii::t('common', 'Calendar Background'),
+		];
+	}
+
 	public function getTypeName(): string {
 		return IssueType::getTypesNames()[$this->type_id];
+	}
+
+	public function getStageName(): string {
+		return IssueStage::getStagesNames(true)[$this->stage_id];
 	}
 
 	public function getStages(): ActiveQuery {

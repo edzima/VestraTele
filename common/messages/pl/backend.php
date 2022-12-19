@@ -325,4 +325,9 @@ return [
 	'You must accept duplicates before create User.' => 'Upewnij się, że użytkownik nie istnieje.',
 	'Create Issue Type' => 'Dodaj Typ Sprawy',
 	'Update Issue Type: {name}' => 'Edytuj Typ: {name}',
+	'Stage: {stage} for Type: {type}' => 'Etap: {stage} dla Typu: {type}',
+	'Link with Stage' => 'Połącz Etap',
+	'Link: {stage} with Type: {type}' => 'Połącz Etap: {stage} z Typem: {type}',
+	'Link: {type} with Stage' => 'Połącz: {type} z Etapem',
+	'Link: {stage} with Type' => 'Połącz: {stage} z Typem',
 ];

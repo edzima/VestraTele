@@ -331,4 +331,5 @@ return [
 	'List' => 'Lista',
 	'Agreement' => 'Umowa',
 	'Qualifies but not interest' => 'Kwalifikuje się - nie chce',
+	'Order' => 'Kolejność',
 ];

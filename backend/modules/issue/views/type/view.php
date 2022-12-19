@@ -1,6 +1,10 @@
 <?php
 
+use backend\widgets\GridView;
+use common\models\issue\IssueStageType;
 use common\models\issue\IssueType;
+use common\widgets\grid\ActionColumn;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -8,14 +12,15 @@ use yii\widgets\DetailView;
 /* @var $model IssueType */
 
 $this->title = $model->name;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issue Types'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-type-view">
 
-	<h1><?= Html::encode($this->title) ?></h1>
-
 	<p>
+		<?= Html::a(Yii::t('backend', 'Link with Stage'), ['stage-type/create', 'type_id' => $model->id], ['class' => 'btn btn-success']) ?>
+
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 		<?= Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',
@@ -47,6 +52,42 @@ $this->params['breadcrumbs'][] = $this->title;
 			'short_name',
 			'vat',
 			'with_additional_date:boolean',
+		],
+	]) ?>
+
+
+	<?= GridView::widget([
+		'caption' => Yii::t('issue', 'Stages'),
+		'dataProvider' => new ActiveDataProvider([
+			'query' => $model->getTypeStages(),
+			'pagination' => false,
+		]),
+		'emptyText' => false,
+		'showOnEmpty' => false,
+		'columns' => [
+			[
+				'attribute' => 'stageName',
+				'value' => static function (IssueStageType $data): string {
+					return Html::a(Html::encode($data->getStageName()), ['stage/view', 'id' => $data->stage_id]);
+				},
+				'format' => 'html',
+			],
+			'days_reminder',
+			[
+				'attribute' => 'calendar_background',
+				'contentOptions' => static function (IssueStageType $data): array {
+					$options = [];
+					if (!empty($data->calendar_background)) {
+						$options['style']['background-color'] = $data->calendar_background;
+					}
+					return $options;
+				},
+			],
+			[
+				'class' => ActionColumn::class,
+				'controller' => 'stage-type',
+				'template' => '{update} {delete}',
+			],
 		],
 	]) ?>
 

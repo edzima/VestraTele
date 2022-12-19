@@ -54,7 +54,7 @@ use yii\web\View;
 	<?= $form->field($model, 'with_additional_date')->checkbox() ?>
 
 	<div class="form-group">
-		<?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>
