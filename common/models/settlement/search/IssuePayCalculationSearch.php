@@ -60,7 +60,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		return [
 			[['issue_id', 'stage_id', 'problem_status', 'owner_id'], 'integer'],
 			['type', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
-			['issue_type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
+			['issue_type_id', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			['issue_stage_id', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true, 'when' => function (): bool { return $this->withIssueStage; }],
 
 			['agent_id', 'in', 'range' => array_keys($this->getAgentsNames()), 'allowArray' => true],
@@ -238,7 +238,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		}
 	}
 
-	public static function getIssueTypesNames(): array {
+	public function getIssueTypesNames(): array {
 		return IssueType::getTypesNamesWithShort();
 	}
 

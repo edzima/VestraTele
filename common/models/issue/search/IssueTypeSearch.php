@@ -8,5 +8,5 @@ interface IssueTypeSearch {
 
 	public function applyIssueTypeFilter(QueryInterface $query): void;
 
-	public static function getIssueTypesNames(): array;
+	public function getIssueTypesNames(): array;
 }

@@ -79,7 +79,7 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 			[['created_at', 'updated_at', 'date_at', 'settled_at'], 'safe'],
 			[['dateRange', 'deadlineRange', 'settledRange'], 'match', 'pattern' => '/^.+\s\-\s.+$/'],
 			[['value', 'base_value', 'vat'], 'number'],
-			['issueType', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
+			['issueType', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			['issueStage', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true],
 
 		];
@@ -217,7 +217,7 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 			->column(), false);
 	}
 
-	public static function getIssueTypesNames(): array {
+	public function getIssueTypesNames(): array {
 		return IssueType::getShortTypesNames();
 	}
 
