@@ -22,6 +22,7 @@ use yii\helpers\ArrayHelper;
  * @property Issue[] $issues
  * @property IssueStage[] $stages
  * @property static|null $parent
+ * @property IssueStageType[] $typeStages
  */
 class IssueType extends ActiveRecord {
 
@@ -58,6 +59,10 @@ class IssueType extends ActiveRecord {
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getIssues(): IssueQuery {
 		return $this->hasMany(Issue::class, ['type_id' => 'id']);
+	}
+
+	public function getTypeStages(): ActiveQuery {
+		return $this->hasMany(IssueStageType::class, ['type_id' => 'id']);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */

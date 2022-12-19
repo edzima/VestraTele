@@ -4,6 +4,7 @@ namespace backend\modules\issue\models;
 
 use common\models\issue\Issue;
 use common\models\issue\IssueType;
+use Yii;
 use yii\base\Model;
 use yii\db\Expression;
 use yii\db\QueryInterface;
@@ -67,8 +68,10 @@ class IssueStageForm extends Model {
 		$this->typesIds = array_map('intval', $model->getTypes()->select('id')->column());
 	}
 
-	public function attributeLabels() {
-		return IssueStage::instance()->attributeLabels();
+	public function attributeLabels(): array {
+		return array_merge(IssueStage::instance()->attributeLabels(), [
+			'typesIds' => Yii::t('issue', 'Types'),
+		]);
 	}
 
 	public function save(bool $validate = true) {

@@ -14,12 +14,13 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' =>
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-type-index">
-
-	<h1><?= Html::encode($this->title) ?></h1>
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create issue type'), ['create'], ['class' => 'btn btn-success']) ?>
+
+		<?= Html::a(Yii::t('issue', 'Stages'), ['stage/index'], ['class' => 'btn btn-info']) ?>
+
 	</p>
 
 	<?= GridView::widget([

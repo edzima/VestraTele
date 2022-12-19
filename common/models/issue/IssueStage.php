@@ -20,6 +20,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $calendar_background
  *
  * @property Issue[] $issues
+ * @property IssueStageType $stageTypes
  * @property issueType[] $types
  */
 class IssueStage extends ActiveRecord {
@@ -47,8 +48,7 @@ class IssueStage extends ActiveRecord {
 			'id' => 'ID',
 			'name' => Yii::t('common', 'Name'),
 			'short_name' => Yii::t('common', 'Shortname'),
-			'posi' => Yii::t('common', 'Position'),
-			'typesIds' => Yii::t('common', 'Types'),
+			'posi' => Yii::t('common', 'Order'),
 			'days_reminder' => Yii::t('common', 'Reminder (days)'),
 			'calendar_background' => Yii::t('common', 'Calendar Background'),
 		];
@@ -116,6 +116,10 @@ class IssueStage extends ActiveRecord {
 	 */
 	public static function find(): IssueStageQuery {
 		return new IssueStageQuery(static::class);
+	}
+
+	public static function get(int $id): ?self {
+		return static::getStages()[$id] ?? null;
 	}
 
 }
