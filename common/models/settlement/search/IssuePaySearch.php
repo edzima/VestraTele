@@ -96,7 +96,7 @@ class IssuePaySearch extends IssuePay implements
 			],
 			['issueStagesIds', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
 
-			['issueTypesIds', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
+			['issueTypesIds', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 		];
 	}
 
@@ -322,7 +322,7 @@ class IssuePaySearch extends IssuePay implements
 		}
 	}
 
-	public static function getIssueTypesNames(): array {
+	public function getIssueTypesNames(): array {
 		return IssueType::getTypesNames();
 	}
 
