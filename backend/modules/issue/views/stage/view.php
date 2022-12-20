@@ -24,7 +24,7 @@ YiiAsset::register($this);
 
 
 	<p>
-		<?= Html::a(Yii::t('backend', 'Link with Stage'), ['stage-type/create', 'stage_id' => $model->id], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('backend', 'Link with Type'), ['stage-type/create', 'stage_id' => $model->id], ['class' => 'btn btn-success']) ?>
 
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 		<?= Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [

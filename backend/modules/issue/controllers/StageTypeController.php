@@ -14,6 +14,7 @@ class StageTypeController extends Controller {
 
 	public function actionCreate(int $stage_id = null, int $type_id = null) {
 		$model = new StageTypeForm();
+		$model->scenario = StageTypeForm::SCENARIO_CREATE;
 		$model->stage_id = $stage_id;
 		$model->type_id = $type_id;
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -22,10 +23,11 @@ class StageTypeController extends Controller {
 			}
 			return $this->redirect(['stage/view', 'id' => $model->stage_id]);
 		}
+
 		return $this->render('create', [
 			'model' => $model,
 			'type' => $type_id !== null ? IssueType::get($type_id) : null,
-			'stage' => $type_id !== null ? IssueStage::get($type_id) : null,
+			'stage' => $stage_id !== null ? IssueStage::get($stage_id) : null,
 		]);
 	}
 

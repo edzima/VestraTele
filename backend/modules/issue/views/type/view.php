@@ -31,64 +31,90 @@ $this->params['breadcrumbs'][] = $this->title;
 		]) ?>
 	</p>
 
-	<?= DetailView::widget([
-		'model' => $model,
-		'attributes' => [
-			[
-				'attribute' => 'parentName',
-				'value' => function () use ($model): string {
-					$name = $model->getParentName();
-					if ($name) {
-						return Html::a(Html::encode($name), [
-							'view', 'id' => $model->parent_id,
-						]);
-					}
-					return '';
-				},
-				'visible' => $model->parent !== null,
-				'format' => 'html',
-			],
-			'name',
-			'short_name',
-			'vat',
-			'with_additional_date:boolean',
-		],
-	]) ?>
+	<div class="row">
+		<div class="col-md-3">
+			<?= DetailView::widget([
+				'model' => $model,
+				'attributes' => [
+					[
+						'attribute' => 'parentName',
+						'value' => function () use ($model): string {
+							$name = $model->getParentName();
+							if ($name) {
+								return Html::a(Html::encode($name), [
+									'view', 'id' => $model->parent_id,
+								]);
+							}
+							return '';
+						},
+						'visible' => $model->parent !== null,
+						'format' => 'html',
+					],
+					'name',
+					'short_name',
+					'vat',
+					'with_additional_date:boolean',
+				],
+			]) ?>
+		</div>
+		<div class="col-md-4">
 
+			<?= GridView::widget([
+				'caption' => Yii::t('issue', 'Child Types'),
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getChilds(),
+					'pagination' => false,
+				]),
+				'summary' => false,
+				'emptyText' => false,
+				'showOnEmpty' => false,
+				'columns' => [
+					'name',
+					[
+						'class' => ActionColumn::class,
+						'template' => '{view} {update} {delete}',
+					],
+				],
+			]) ?>
+		</div>
 
-	<?= GridView::widget([
-		'caption' => Yii::t('issue', 'Stages'),
-		'dataProvider' => new ActiveDataProvider([
-			'query' => $model->getTypeStages(),
-			'pagination' => false,
-		]),
-		'emptyText' => false,
-		'showOnEmpty' => false,
-		'columns' => [
-			[
-				'attribute' => 'stageName',
-				'value' => static function (IssueStageType $data): string {
-					return Html::a(Html::encode($data->getStageName()), ['stage/view', 'id' => $data->stage_id]);
-				},
-				'format' => 'html',
-			],
-			'days_reminder',
-			[
-				'attribute' => 'calendar_background',
-				'contentOptions' => static function (IssueStageType $data): array {
-					$options = [];
-					if (!empty($data->calendar_background)) {
-						$options['style']['background-color'] = $data->calendar_background;
-					}
-					return $options;
-				},
-			],
-			[
-				'class' => ActionColumn::class,
-				'controller' => 'stage-type',
-				'template' => '{update} {delete}',
-			],
-		],
-	]) ?>
+		<div class="col-md-5">
+			<?= GridView::widget([
+				'caption' => Yii::t('issue', 'Stages'),
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getTypeStages(),
+					'pagination' => false,
+				]),
+				'summary' => false,
+				'emptyText' => false,
+				'showOnEmpty' => false,
+				'columns' => [
+					[
+						'attribute' => 'stageName',
+						'value' => static function (IssueStageType $data): string {
+							return Html::a(Html::encode($data->getStageName()), ['stage/view', 'id' => $data->stage_id]);
+						},
+						'format' => 'html',
+					],
+					'days_reminder',
+					[
+						'attribute' => 'calendar_background',
+						'contentOptions' => static function (IssueStageType $data): array {
+							$options = [];
+							if (!empty($data->calendar_background)) {
+								$options['style']['background-color'] = $data->calendar_background;
+							}
+							return $options;
+						},
+					],
+					[
+						'class' => ActionColumn::class,
+						'controller' => 'stage-type',
+						'template' => '{update} {delete}',
+					],
+				],
+			]) ?>
+		</div>
+	</div>
 
 </div>
