@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\helpers\ArrayHelper;
 use common\models\AddressSearch;
 use common\models\AgentSearchInterface;
 use common\models\entityResponsible\EntityResponsible;
@@ -19,7 +20,6 @@ use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\db\QueryInterface;
-use yii\helpers\ArrayHelper;
 
 /**
  * IssueSearch represents the model behind the search form of `common\models\issue\Issue`.
@@ -85,7 +85,7 @@ abstract class IssueSearch extends Model
 			['noteFilter', 'string'],
 			[['createdAtTo', 'createdAtFrom', 'signedAtFrom', 'signedAtTo'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
-			['type_id', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
+			[['type_id', 'excludedTypes'], 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			[['customerName', 'userName'], 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['tagsIds', 'in', 'range' => array_keys(static::getTagsNames()), 'allowArray' => true],
 			[
@@ -94,21 +94,19 @@ abstract class IssueSearch extends Model
 				], 'safe',
 			],
 			['customerPhone', PhoneValidator::class],
-			['excludedTypes', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 			['parentTypeId', 'in', 'range' => array_keys(static::getParentsTypesNames())],
 			[
 				'excludedStages', 'filter', 'filter' => function ($stages): array {
 				$stages = (array) $stages;
 				foreach ([$this->stage_id] as $id) {
-					\common\helpers\ArrayHelper::removeValue($stages, $id);
+					ArrayHelper::removeValue($stages, $id);
 				}
 				return $stages;
 			},
 			],
 		];
 	}
-
 
 	/**
 	 * @inheritdoc
@@ -354,10 +352,23 @@ abstract class IssueSearch extends Model
 	}
 
 	public function getStagesNames(): array {
-		return IssueStage::getStagesNames($this->getWithArchive());
+		$stages = IssueStage::getStagesNames($this->getWithArchive());
+		if ($this->getParentType() === null) {
+			return $stages;
+		}
+		$parent = $this->getParentType();
+		foreach ($stages as $id => $name) {
+			if (!$parent->hasStage($id)) {
+				unset($stages[$id]);
+			}
+		}
+		return $stages;
 	}
 
 	public function getIssueTypesNames(): array {
+		if ($this->getParentType()) {
+			return ArrayHelper::map($this->getParentType()->childs, 'id', 'nameWithShort');
+		}
 		return IssueType::getTypesNamesWithShort();
 	}
 
@@ -383,6 +394,9 @@ abstract class IssueSearch extends Model
 	}
 
 	public function excludeArchiveStage(): void {
+		if ($this->getParentType() && !$this->getParentType()->hasStage(IssueStage::ARCHIVES_ID)) {
+			return;
+		}
 		$this->excludedStages[] = IssueStage::ARCHIVES_ID;
 	}
 

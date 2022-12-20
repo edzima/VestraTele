@@ -20,18 +20,33 @@ use common\widgets\grid\SelectionForm;
 use kartik\grid\CheckboxColumn;
 use kartik\grid\SerialColumn;
 use kartik\select2\Select2;
+use yii\bootstrap\Nav;
 use yii\data\ActiveDataProvider;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $searchModel IssueSearch */
 /* @var $dataProvider ActiveDataProvider */
+/* @var $menuItems array */
 
 $this->title = Yii::t('backend', 'Issues');
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
+
+$parentType = $searchModel->getParentType();
+if ($parentType) {
+	$this->params['breadcrumbs'][] = ['label' => $parentType->name, 'url' => ['index', 'parentTypeId' => $parentType->id]];
+}
+$this->params['content-header.class'] = 'title-with-nav';
+$this->blocks['content-header'] = $this->title . Nav::widget([
+		'items' => $menuItems,
+		'options' => [
+			'class' => 'nav nav-pills',
+		],
+	]);
 
 ?>
 <div class="issue-index">
+
 	<?php Pjax::begin([
 		'timeout' => 2000,
 	]); ?>
