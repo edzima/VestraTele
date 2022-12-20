@@ -127,7 +127,14 @@ class IssueStageChangeForm extends Model {
 		if ($type === null) {
 			return [];
 		}
-		return ArrayHelper::map($type->stages, 'id', 'name');
+		$stages = ArrayHelper::map($type->stages, 'id', 'name');
+		if ($type->parent) {
+			$stagesParent = ArrayHelper::map($type->parent->stages, 'id', 'name');
+		}
+		if (empty($stagesParent)) {
+			$stages = array_merge($stages, $stagesParent);
+		}
+		return $stages;
 	}
 
 	public function getIssue(): IssueInterface {
