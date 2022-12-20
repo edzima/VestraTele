@@ -27,22 +27,24 @@ use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $searchModel IssueSearch */
 /* @var $dataProvider ActiveDataProvider */
-/* @var $menuItems array */
 
 $this->title = Yii::t('backend', 'Issues');
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
 
 $parentType = $searchModel->getParentType();
 if ($parentType) {
-	$this->params['breadcrumbs'][] = ['label' => $parentType->name, 'url' => ['index', 'parentTypeId' => $parentType->id]];
+	$this->params['breadcrumbs'][] = ['label' => $parentType->name];
 }
-$this->params['content-header.class'] = 'title-with-nav';
-$this->blocks['content-header'] = $this->title . Nav::widget([
-		'items' => $menuItems,
-		'options' => [
-			'class' => 'nav nav-pills',
-		],
-	]);
+$parentMenuItems = Html::issueParentTypeItems();
+if (!empty($parentMenuItems)) {
+	$this->params['content-header.class'] = 'title-with-nav';
+	$this->blocks['content-header'] = $this->title . Nav::widget([
+			'items' => Html::issueParentTypeItems(),
+			'options' => [
+				'class' => 'nav nav-pills',
+			],
+		]);
+}
 
 ?>
 <div class="issue-index">

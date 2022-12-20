@@ -132,4 +132,5 @@ return [
 	'Archive is Excluded. Check in them.' => 'Archiwum jest wykluczone. Sprawdź w nim',
 	'Type Parent' => 'Nadrzędny Typ',
 	'Child Types' => 'Podtypy',
+	'All Issues' => 'Wszystkie',
 ];
