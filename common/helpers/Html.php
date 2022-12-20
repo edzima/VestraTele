@@ -3,6 +3,7 @@
 namespace common\helpers;
 
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueType;
 use common\models\settlement\PayedInterface;
 use Yii;
 use yii\bootstrap\BaseHtml;
@@ -41,6 +42,30 @@ class Html extends BaseHtml {
 
 	public static function addNoPrintClass(array &$options): void {
 		static::addCssClass($options, 'no-print');
+	}
+
+	public static function issueParentTypeItems(): array {
+		/** @var $url Url */
+		$url = static::URL_HELPER;
+		$param = $url::PARAM_ISSUE_PARENT_TYPE;
+		$items = [];
+		$models = IssueType::getParents();
+
+		foreach ($models as $model) {
+			$items[] = [
+				'url' => [$url::ROUTE_ISSUE_INDEX, $param => $model->id],
+				'label' => $model->name,
+			];
+		}
+		if (!empty($items)) {
+			$items[] = [
+				'url' => [$url::ROUTE_ISSUE_INDEX],
+				'label' => Yii::t('issue', 'All Issues'),
+				'active' => !isset(Yii::$app->request->getQueryParams()[$param]),
+			];
+		}
+
+		return $items;
 	}
 
 }

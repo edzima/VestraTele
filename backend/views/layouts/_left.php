@@ -1,6 +1,7 @@
 <?php
 
 use backend\widgets\Menu;
+use common\helpers\Html;
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -198,7 +199,13 @@ $user = Yii::$app->user;
 						[
 							'label' => Yii::t('common', 'Browse'),
 							'url' => ['/issue/issue/index'],
+							'options' => empty(Html::issueParentTypeItems())
+								? []
+								: [
+									'class' => 'treeview',
+								],
 							'icon' => '<i class="fa fa-eye"></i>',
+							'items' => Html::issueParentTypeItems(),
 						],
 						[
 							'label' => Yii::t('common', 'Issues users'),

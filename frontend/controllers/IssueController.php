@@ -48,11 +48,14 @@ class IssueController extends Controller {
 	/**
 	 * Lists all Issue models available for current User.
 	 *
+	 * @param int|null $parentTypeId
 	 * @return string
+	 * @see Url::PARAM_ISSUE_PARENT_TYPE
 	 */
-	public function actionIndex(): string {
+	public function actionIndex(int $parentTypeId = null): string {
 		$user = Yii::$app->user;
 		$searchModel = new IssueSearch();
+		$searchModel->parentTypeId = $parentTypeId;
 		if ($user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
 			$searchModel->excludeArchiveStage();

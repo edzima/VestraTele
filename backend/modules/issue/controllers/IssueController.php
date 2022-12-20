@@ -12,7 +12,6 @@ use backend\widgets\CsvForm;
 use common\behaviors\SelectionRouteBehavior;
 use common\helpers\Flash;
 use common\models\issue\Issue;
-use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
 use common\models\message\IssueCreateMessagesForm;
@@ -166,7 +165,6 @@ class IssueController extends Controller {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'menuItems' => static::getMenuItems($parentTypeId),
 		]);
 	}
 
@@ -331,17 +329,5 @@ class IssueController extends Controller {
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}
 
-	public static function getMenuItems(int $active = null): array {
-		$items = [];
-		$models = IssueType::getParents();
-		foreach ($models as $model) {
-			$items[] = [
-				'url' => ['index', 'parentTypeId' => $model->id],
-				'label' => $model->name,
-				'active' => $model->id === $active,
-			];
-		}
-
-		return $items;
-	}
 }
+
