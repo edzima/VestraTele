@@ -3,13 +3,16 @@
 use common\widgets\Alert;
 use yii\bootstrap\Html;
 use yii\helpers\Inflector;
+use yii\web\View;
 use yii\widgets\Breadcrumbs;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $content string */
+$class = $this->params['content-header.class'] ?? '';
+
 ?>
 <div class="content-wrapper">
-	<section class="content-header">
+	<section class="content-header <?= $class ?>">
 		<?php if (isset($this->blocks['content-header'])) { ?>
 			<h1><?= $this->blocks['content-header'] ?></h1>
 		<?php } else { ?>
