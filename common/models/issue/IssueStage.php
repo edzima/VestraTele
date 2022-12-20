@@ -20,7 +20,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $calendar_background
  *
  * @property Issue[] $issues
- * @property IssueStageType $stageTypes
+ * @property IssueStageType[] $stageTypes
  * @property issueType[] $types
  */
 class IssueStage extends ActiveRecord {
@@ -108,6 +108,16 @@ class IssueStage extends ActiveRecord {
 				->all();
 		}
 		return static::$STAGES;
+	}
+
+	public function hasType(int $id): bool {
+		$stageTypes = $this->stageTypes;
+		foreach ($stageTypes as $stageType) {
+			if ($stageType->type_id === $id) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

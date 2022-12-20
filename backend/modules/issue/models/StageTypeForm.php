@@ -9,6 +9,8 @@ use yii\base\Model;
 
 class StageTypeForm extends Model {
 
+	public const SCENARIO_CREATE = 'create';
+
 	public $type_id;
 	public $stage_id;
 	public $calendar_background;
@@ -18,7 +20,7 @@ class StageTypeForm extends Model {
 
 	public function rules(): array {
 		return [
-			[['type_id', 'stage_id'], 'required'],
+			[['type_id', 'stage_id'], 'required', 'on' => [static::SCENARIO_CREATE, static::SCENARIO_DEFAULT]],
 			[['type_id', 'stage_id', 'days_reminder'], 'integer'],
 			[['calendar_background'], 'string'],
 			[['days_reminder', 'calendar_background'], 'default', 'value' => null],
@@ -28,11 +30,33 @@ class StageTypeForm extends Model {
 	}
 
 	public function getTypesNames(): array {
-		return IssueType::getTypesNames();
+		$names = IssueType::getTypesNames();
+		if ($this->scenario === static::SCENARIO_CREATE && $this->stage_id !== null) {
+			$stage = IssueStage::get($this->stage_id);
+			if ($stage !== null) {
+				foreach ($names as $id => $name) {
+					if ($stage->hasType($id)) {
+						unset($names[$id]);
+					}
+				}
+			}
+		}
+		return $names;
 	}
 
 	public function getStagesNames(): array {
-		return IssueStage::getStagesNames(true);
+		$names = IssueStage::getStagesNames(true);
+		if ($this->scenario === static::SCENARIO_CREATE && $this->type_id !== null) {
+			$type = IssueType::get($this->type_id);
+			if ($type !== null) {
+				foreach ($names as $id => $name) {
+					if ($type->hasStage($id)) {
+						unset($names[$id]);
+					}
+				}
+			}
+		}
+		return $names;
 	}
 
 	public function attributeLabels(): array {

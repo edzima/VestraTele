@@ -23,6 +23,7 @@ use yii\helpers\ArrayHelper;
  * @property IssueStage[] $stages
  * @property static|null $parent
  * @property IssueStageType[] $typeStages
+ * @property static[] $childs
  */
 class IssueType extends ActiveRecord {
 
@@ -76,6 +77,10 @@ class IssueType extends ActiveRecord {
 		return $this->hasOne(static::class, ['id' => 'parent_id']);
 	}
 
+	public function getChilds(): ActiveQuery {
+		return $this->hasMany(static::class, ['parent_id' => 'id']);
+	}
+
 	public function getNameWithShort(): string {
 		return $this->name . ' (' . $this->short_name . ')';
 	}
@@ -115,6 +120,7 @@ class IssueType extends ActiveRecord {
 			static::$TYPES = static::find()
 				->orderBy('name')
 				->indexBy('id')
+				->with('childs')
 				->all();
 		}
 		return static::$TYPES;
@@ -132,6 +138,16 @@ class IssueType extends ActiveRecord {
 			}
 		}
 		return $parents;
+	}
+
+	public function hasStage(int $id): bool {
+		$typeStages = $this->typeStages;
+		foreach ($typeStages as $stageType) {
+			if ($stageType->stage_id === $id) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
