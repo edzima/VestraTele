@@ -9,6 +9,7 @@
 namespace frontend\controllers;
 
 use common\models\issue\Issue;
+use common\models\user\UserVisible;
 use common\models\user\Worker;
 use frontend\helpers\Url;
 use frontend\models\IssueStageChangeForm;
@@ -60,8 +61,11 @@ class IssueController extends Controller {
 		$searchModel->user_id = (int) $user->getId();
 
 		if ($user->can(Worker::ROLE_AGENT)) {
-			$searchModel->agentsIds = Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId());
+			$searchModel->includedUsersIds = Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId());
 		}
+		$visible = UserVisible::visibleUsers(Yii::$app->user->getId());
+		$searchModel->includedUsersIds = array_unique(array_merge($searchModel->includedUsersIds, $visible));
+		$searchModel->excludedUsersIds = UserVisible::hiddenUsers(Yii::$app->user->getId());
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		return $this->render('index', [
 			'searchModel' => $searchModel,

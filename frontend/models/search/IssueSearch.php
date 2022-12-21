@@ -15,7 +15,8 @@ use yii\helpers\ArrayHelper;
 class IssueSearch extends BaseIssueSearch {
 
 	public int $user_id;
-	public ?array $agentsIds = null;
+	public array $includedUsersIds = [];
+	public array $excludedUsersIds = [];
 
 	private ?array $availableAgentsIds = null;
 
@@ -47,6 +48,7 @@ class IssueSearch extends BaseIssueSearch {
 		if (empty($this->user_id)) {
 			throw new InvalidConfigException('user_id must be set.');
 		}
+
 		$query = IssueUser::find();
 		$query->joinWith([
 			'issue' => function (IssueQuery $query): void {
@@ -82,15 +84,17 @@ class IssueSearch extends BaseIssueSearch {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'issue_user.user_id' => empty($this->agentsIds) ? $this->user_id : array_merge($this->agentsIds, [$this->user_id]),
+			'issue_user.user_id' => empty($this->includedUsersIds) ? $this->user_id : array_merge($this->includedUsersIds, [$this->user_id]),
 		]);
 		$query->groupBy('issue_user.issue_id');
+
+		$query->andFilterWhere(['NOT IN', 'issue_user.user_id', $this->excludedUsersIds]);
 		return $dataProvider;
 	}
 
 	protected function getAvailableAgentsIds(): array {
 		if ($this->availableAgentsIds === null) {
-			if (empty($this->agentsIds)) {
+			if (empty($this->includedUsersIds)) {
 				$ids = IssueUser::find()
 					->from([
 						IssueUser::tableName() . ' IU_1',
@@ -103,7 +107,7 @@ class IssueSearch extends BaseIssueSearch {
 					->distinct()
 					->column();
 			} else {
-				$ids = $this->agentsIds;
+				$ids = $this->includedUsersIds;
 				if (!in_array($this->user_id, $ids)) {
 					$ids[] = $this->user_id;
 				}

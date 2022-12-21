@@ -38,6 +38,9 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 		return $this->payStatus === static::PAY_STATUS_UNPAID;
 	}
 
+	public ?bool $withoutEmpty = null;
+	public array $excludedFromUsers = [];
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -114,6 +117,8 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 		$this->applyDateFilter($query);
 		$this->applyPayStatusFilter($query);
 		$this->applySettlementFilter($query);
+		$this->applyWithoutEmptyFilter($query);
+		$this->applyExcluedFromUsersFilter($query);
 
 		if (!empty($this->issue_id)) {
 			$query->joinWith('pay.issue');
@@ -133,6 +138,14 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 		]);
 
 		return $dataProvider;
+	}
+
+	protected function applyWithoutEmptyFilter(ProvisionQuery $query): void {
+		if ($this->withoutEmpty) {
+			$query->andWhere([
+				'>', Provision::tableName() . '.value', 0,
+			]);
+		}
 	}
 
 	protected function applyPayStatusFilter(ProvisionQuery $query): void {
@@ -161,6 +174,8 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 		if ($dateFilter) {
 			$this->applyDateFilter($query);
 		}
+		$this->applyExcluedFromUsersFilter($query);
+		$this->applyWithoutEmptyFilter($query);
 
 		$list = User::getSelectList($query->column(), false);
 		if ($this->to_user_id) {
@@ -220,5 +235,11 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 
 	public static function getTypesNames(): array {
 		return ProvisionType::getTypesNames(false);
+	}
+
+	private function applyExcluedFromUsersFilter(ProvisionQuery $query): void {
+		$query->andFilterWhere([
+			'NOT IN', Provision::tableName() . '.from_user_id', $this->excludedFromUsers,
+		]);
 	}
 }

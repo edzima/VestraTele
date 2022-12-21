@@ -19,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create user'), ['create'], ['class' => 'btn btn-success']) ?>
 		<?= Html::a(Yii::t('common', 'User Traits'), ['trait/index'], ['class' => 'btn btn-warning']) ?>
+		<?= Html::a(Yii::t('backend', 'User Visible'), ['visible/index'], ['class' => 'btn btn-info']) ?>
 	</p>
 
 	<?= $this->render('_search', [

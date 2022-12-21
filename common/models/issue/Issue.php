@@ -397,4 +397,13 @@ class Issue extends ActiveRecord implements IssueInterface {
 		}
 	}
 
+	public function hasUser(int $id, string $type = null): bool {
+		foreach ($this->users as $issueUser) {
+			if ($issueUser->user_id === $id) {
+				return $type === null || $issueUser->type === $type;
+			}
+		}
+		return false;
+	}
+
 }

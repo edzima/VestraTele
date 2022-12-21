@@ -323,4 +323,7 @@ return [
 	'Warning! Duplicates exists.' => 'Uwaga! Istnieją Duplikaty.',
 	'Warning! Duplicates Customers ({user}) exists: {count}.' => 'Uwaga! Istnieje kilku takich Klientów ({user}): {count}.',
 	'You must accept duplicates before create User.' => 'Upewnij się, że użytkownik nie istnieje.',
+	'User Visibles' => 'Widoczność Użytkowników',
+	'Create User Visible' => 'Ustal Widoczność',
+	'Update User Visible: {user}' =>'Edytuj widoczność: {user}'
 ];
