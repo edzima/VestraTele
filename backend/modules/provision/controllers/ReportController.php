@@ -3,12 +3,13 @@
 namespace backend\modules\provision\controllers;
 
 use backend\helpers\Url;
+use backend\modules\provision\models\ProvisionReportSearch;
 use backend\modules\settlement\models\search\IssueCostSearch;
 use common\helpers\Flash;
 use common\models\provision\Provision;
-use common\models\provision\ProvisionReportSearch;
 use common\models\provision\ProvisionSearch;
 use common\models\provision\ToUserGroupProvisionSearch;
+use common\models\user\UserVisible;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
@@ -55,14 +56,24 @@ class ReportController extends Controller {
 		]);
 	}
 
-	public function actionView(int $id, string $dateTo, string $dateFrom): string {
+	public function actionView(int $id, string $dateTo = null, string $dateFrom= null): string {
 		Url::remember();
 
 		$searchModel = new ProvisionReportSearch();
 		$searchModel->to_user_id = $id;
+		if (empty($dateFrom)) {
+			$dateFrom = date('Y-m-d', strtotime('first day of this month'));
+		}
+		if (empty($dateTo)) {
+			$dateTo = date('Y-m-d', strtotime('last day of this month'));
+		}
 		$searchModel->dateTo = $dateTo;
 		$searchModel->dateFrom = $dateFrom;
 		$searchModel->hide_on_report = false;
+		$searchModel->withoutEmpty = true;
+		$searchModel->excludedFromUsers = UserVisible::hiddenUsers($id);
+		$searchModel->load(Yii::$app->request->queryParams);
+
 		if ($searchModel->hasHiddenProvisions()) {
 			$link = Html::a(Yii::t('provision', 'hidden provisions'), [
 					'/provision/provision/index',

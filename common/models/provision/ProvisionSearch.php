@@ -63,6 +63,8 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 			'dateTo' => Yii::t('provision', 'To at'),
 			'payStatus' => Yii::t('settlement', 'Pay Status'),
 			'settlementTypes' => Yii::t('settlement', 'Settlement type'),
+			'excludedFromUsers' => Yii::t('provision','Excluded from Users'),
+			'withoutEmpty' => Yii::t('provision','Without Empty'),
 		], parent::attributeLabels());
 	}
 

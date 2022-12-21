@@ -98,6 +98,8 @@ return [
 	'Date from Settlement' => 'Data z Rozliczenia',
 	'Doubles' => 'Duplikaty',
 	'Provision - Doubles' => 'Prowizje - Duplikaty',
+	'Excluded from Users' => 'Wykluczeni',
+	'Without Empty' => '> 0',
 ];
 
 

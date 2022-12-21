@@ -25,6 +25,9 @@ $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 ?>
 
+<?= $this->render('_view_search', ['model' => $searchModel]) ?>
+
+
 <?= ProvisionUserReportWidget::widget([
 	'issueColumn' => [
 		'class' => IssueColumn::class,
