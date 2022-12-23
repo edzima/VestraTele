@@ -1,5 +1,6 @@
 <?php
 
+use backend\helpers\Url;
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\issue\widgets\SummonGrid;
 use common\models\user\Worker;
@@ -11,7 +12,15 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('common', 'Summons');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];
+if ($searchModel->getIssueParentType()) {
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name, 'url' => Url::issuesParentType($searchModel->issueParentTypeId)];
+}
+
 $this->params['breadcrumbs'][] = $this->title;
+
+$this->params['issueParentTypeNav'] = [
+	'route' => ['/issue/summon/index'],
+];
 
 ?>
 <div class="summon-index">

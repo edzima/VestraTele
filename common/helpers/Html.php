@@ -44,22 +44,25 @@ class Html extends BaseHtml {
 		static::addCssClass($options, 'no-print');
 	}
 
-	public static function issueParentTypeItems(): array {
+	public static function issueParentTypeItems(array $config = []): array {
 		/** @var $url Url */
 		$url = static::URL_HELPER;
 		$param = $url::PARAM_ISSUE_PARENT_TYPE;
 		$items = [];
 		$models = IssueType::getParents();
+		$route = ArrayHelper::getValue($config, 'route', [$url::ROUTE_ISSUE_INDEX]);
 
 		foreach ($models as $model) {
+			$typeRoute = $route;
+			$typeRoute[$param] = $model->id;
 			$items[] = [
-				'url' => [$url::ROUTE_ISSUE_INDEX, $param => $model->id],
+				'url' => $typeRoute,
 				'label' => $model->name,
 			];
 		}
 		if (!empty($items)) {
 			$items[] = [
-				'url' => [$url::ROUTE_ISSUE_INDEX],
+				'url' => $route,
 				'label' => Yii::t('issue', 'All Issues'),
 				'active' => !isset(Yii::$app->request->getQueryParams()[$param]),
 			];

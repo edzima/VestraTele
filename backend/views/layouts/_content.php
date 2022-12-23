@@ -1,14 +1,29 @@
 <?php
 
+use backend\helpers\Html;
 use common\widgets\Alert;
-use yii\bootstrap\Html;
+use yii\bootstrap\Nav;
 use yii\helpers\Inflector;
 use yii\web\View;
 use yii\widgets\Breadcrumbs;
 
 /* @var $this View */
 /* @var $content string */
-$class = $this->params['content-header.class'] ?? '';
+
+$class = '';
+if (isset($this->params['issueParentTypeNav'])) {
+	$config = $this->params['issueParentTypeNav'];
+	$parentMenuItems = Html::issueParentTypeItems();
+	if (!empty($parentMenuItems)) {
+		$class = 'title-with-nav';
+		$this->blocks['content-header'] = $this->title . Nav::widget([
+				'items' => Html::issueParentTypeItems($config),
+				'options' => [
+					'class' => 'nav nav-pills',
+				],
+			]);
+	}
+}
 
 ?>
 <div class="content-wrapper">
