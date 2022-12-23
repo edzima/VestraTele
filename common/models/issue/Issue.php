@@ -377,7 +377,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 		if (!empty($this->stage_deadline_at)) {
 			return strtotime($this->stage_deadline_at) < time();
 		}
-		$days = $this->getDaysReminder();
+		$days = $this->getIssueStage()->days_reminder;
 		if (empty($days)) {
 			return null;
 		}
