@@ -64,49 +64,62 @@ class StageTypeFormTest extends Unit {
 		]);
 	}
 
-//	public function testUpdateDayReminderAsNull(): void {
-//		$this->giveModel([
-//			'name' => 'Test Stage',
-//			'short_name' => 'TS',
-//			'typesIds' => [1],
-//			'days_reminder' => 5,
-//		]);
-//
-//		$this->thenSuccessSave();
-//
-//		$this->thenSeeStage([
-//			'name' => 'Test Stage',
-//			'days_reminder' => 5,
-//		]);
-//
-//		$createdStage = $this->model->getModel();
-//
-//		$issueWithStageChangeAt = $this->issueFixtureHelper->haveIssue([
-//			'stage_id' => $createdStage->id,
-//			'stage_change_at' => '2020-02-01 10:00:00',
-//		], false);
-//
-//		$issueWithoutStageChangeAt = $this->issueFixtureHelper->haveIssue([
-//			'stage_id' => $createdStage->id,
-//		], false);
-//
-//		$this->giveModel([
-//			'model' => $createdStage,
-//			'days_reminder' => null,
-//		]);
-//
-//		$this->thenSuccessSave();
-//
-//		$this->tester->seeRecord(Issue::class, [
-//			'id' => $issueWithStageChangeAt,
-//			'stage_deadline_at' => null,
-//		]);
-//
-//		$this->tester->seeRecord(Issue::class, [
-//			'id' => $issueWithoutStageChangeAt,
-//			'stage_deadline_at' => null,
-//		]);
-//	}
+	public function testUpdateDayReminderAsNull(): void {
+		$stageId = $this->tester->haveRecord(IssueStage::class, [
+			'name' => 'Test Stage',
+			'short_name' => 'TS',
+		]);
+
+		$typeLinkedId = $this->tester->haveRecord(IssueType::class, [
+			'name' => 'Linked Type with Stage',
+			'short_name' => 'L',
+		]);
+
+		$typeNotLinkedId = $this->tester->haveRecord(IssueType::class, [
+			'name' => 'Not Linked Type with Stage',
+			'short_name' => 'NL',
+		]);
+
+		IssueType::getTypes(true);
+		IssueStage::getStages(true);
+
+		$this->giveModel([
+			'stage_id' => $stageId,
+			'type_id' => $typeLinkedId,
+		]);
+
+		$this->thenSuccessSave();
+
+		$issueWithLinkedTypeAndWithStageDeadlineAt = $this->issueFixtureHelper->haveIssue([
+			'stage_id' => $stageId,
+			'stage_deadline_at' => '2020-01-05 00:00:00',
+			'type_id' => $typeLinkedId,
+		], false);
+
+		$issueWithoutLinkedTypeAndWithStageDeadline = $this->issueFixtureHelper->haveIssue([
+			'stage_id' => $stageId,
+			'type_id' => $typeNotLinkedId,
+			'stage_deadline_at' => '2020-01-05 00:00:00',
+		], false);
+
+		$this->giveModel([
+			'stage_id' => $stageId,
+			'type_id' => $typeLinkedId,
+			'days_reminder' => null,
+		]);
+
+		$this->thenSuccessSave();
+
+		$this->tester->seeRecord(Issue::class, [
+			'id' => $issueWithLinkedTypeAndWithStageDeadlineAt,
+			'stage_deadline_at' => null,
+		]);
+
+		$this->tester->seeRecord(Issue::class, [
+			'id' => $issueWithoutLinkedTypeAndWithStageDeadline,
+			'stage_deadline_at' => '2020-01-05 00:00:00',
+		]);
+	}
 
 	public function testUpdateDayReminder(): void {
 		$stageId = $this->tester->haveRecord(IssueStage::class, [
@@ -146,11 +159,7 @@ class StageTypeFormTest extends Unit {
 			'stage_id' => $stageId,
 			'stage_change_at' => '2020-02-01 10:00:00',
 			'type_id' => $typeNotLinkedId,
-		], false);
-
-		$issueWithoutLinkedTypeAndWithoutStageChangeAt = $this->issueFixtureHelper->haveIssue([
-			'stage_id' => $stageId,
-			'type_id' => $typeNotLinkedId,
+			'stage_deadline_at' => '2020-01-05 00:00:00',
 		], false);
 
 		$this->giveModel([
@@ -168,7 +177,7 @@ class StageTypeFormTest extends Unit {
 
 		$this->tester->seeRecord(Issue::class, [
 			'id' => $issueWithoutLinkedTypeAndWithStageChangeAt,
-			'stage_deadline_at' => '2020-02-01 10:00:00',
+			'stage_deadline_at' => '2020-01-05 00:00:00',
 		]);
 
 		/**
