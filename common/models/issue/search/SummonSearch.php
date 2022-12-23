@@ -2,6 +2,10 @@
 
 namespace common\models\issue\search;
 
+use common\helpers\ArrayHelper;
+use common\models\issue\Issue;
+use common\models\issue\IssueType;
+use common\models\issue\query\IssueQuery;
 use common\models\issue\Summon;
 use common\models\issue\SummonDoc;
 use common\models\issue\SummonType;
@@ -23,6 +27,7 @@ class SummonSearch extends Summon implements
 	CustomerSearchInterface,
 	SearchModel {
 
+	public ?int $issueParentTypeId = null;
 	public $doc_types_ids;
 
 	public string $customerLastname = '';
@@ -120,6 +125,7 @@ class SummonSearch extends Summon implements
 
 		$this->applyCustomerNameFilter($query);
 		$this->applyCustomerPhoneFilter($query);
+		$this->applyIssueParentType($query);
 		// grid filtering conditions
 		$query->andFilterWhere([
 			static::SUMMON_ALIAS . '.id' => $this->id,
@@ -154,4 +160,20 @@ class SummonSearch extends Summon implements
 			]);
 		}
 	}
+
+	private function applyIssueParentType(ActiveQuery $query): void {
+		$parentType = $this->getIssueParentType();
+		if ($parentType) {
+			$childs = ArrayHelper::getColumn($parentType->childs, 'id');
+			$query->andFilterWhere([Issue::tableName() . '.type_id' => $childs]);
+		}
+	}
+
+	public function getIssueParentType(): ?IssueType {
+		if ($this->issueParentTypeId) {
+			return IssueType::get($this->issueParentTypeId);
+		}
+		return null;
+	}
+
 }

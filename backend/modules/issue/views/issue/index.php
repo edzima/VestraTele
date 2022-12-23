@@ -31,20 +31,12 @@ use yii\widgets\Pjax;
 $this->title = Yii::t('backend', 'Issues');
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
 
-$parentType = $searchModel->getParentType();
-if ($parentType) {
-	$this->params['breadcrumbs'][] = ['label' => $parentType->name];
+if ($searchModel->getParentType()) {
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getParentType()->name];
 }
-$parentMenuItems = Html::issueParentTypeItems();
-if (!empty($parentMenuItems)) {
-	$this->params['content-header.class'] = 'title-with-nav';
-	$this->blocks['content-header'] = $this->title . Nav::widget([
-			'items' => Html::issueParentTypeItems(),
-			'options' => [
-				'class' => 'nav nav-pills',
-			],
-		]);
-}
+$this->params['issueParentTypeNav'] = [
+	'route' => ['/issue/issue/index'],
+];
 
 ?>
 <div class="issue-index">
@@ -56,7 +48,7 @@ if (!empty($parentMenuItems)) {
 	<div class="clearfix form-group">
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
-			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index'], [
+			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index', 'parentTypeId' => $searchModel->parentTypeId], [
 				'class' => 'btn btn-warning',
 				'data-pjax' => 0,
 			])
