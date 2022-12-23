@@ -377,7 +377,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 		if (!empty($this->stage_deadline_at)) {
 			return strtotime($this->stage_deadline_at) < time();
 		}
-		$days = $this->getIssueStage()->days_reminder;
+		$days = $this->getDaysReminder();
 		if (empty($days)) {
 			return null;
 		}
@@ -387,14 +387,30 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function generateStageDeadlineAt(): void {
-		if (empty($this->stage->days_reminder)) {
+		$days = $this->getDaysReminder();
+		if ($days) {
 			$this->stage_deadline_at = null;
 		} else {
-			$days = $this->stage->days_reminder;
 			$date = new DateTime($this->stage_change_at);
 			$date->modify("+ $days days");
 			$this->stage_deadline_at = $date->format(DATE_ATOM);
 		}
+	}
+
+	private function getDaysReminder(): ?int {
+		return $this->getIssueStageType() ? $this->getIssueStageType()->days_reminder : null;
+	}
+
+	public function getIssueStageType(): ?IssueStageType {
+		$stage = IssueStage::get($this->stage_id);
+		$stageType = $stage->stageTypes[$this->type_id] ?? null;
+		if ($stageType === null) {
+			$type = IssueType::get($this->type_id);
+			if ($type->parent_id) {
+				$stageType = $stage->stageTypes[$type->parent_id] ?? null;
+			}
+		}
+		return $stageType;
 	}
 
 	public function hasUser(int $id, string $type = null): bool {
