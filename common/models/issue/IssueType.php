@@ -115,8 +115,8 @@ class IssueType extends ActiveRecord {
 	/**
 	 * @return static[]
 	 */
-	public static function getTypes(): array {
-		if (empty(static::$TYPES)) {
+	public static function getTypes(bool $refresh = false): array {
+		if (empty(static::$TYPES) || $refresh) {
 			static::$TYPES = static::find()
 				->orderBy('name')
 				->indexBy('id')

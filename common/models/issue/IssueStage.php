@@ -100,8 +100,8 @@ class IssueStage extends ActiveRecord {
 	/**
 	 * @return static[]
 	 */
-	public static function getStages(): array {
-		if (empty(static::$STAGES)) {
+	public static function getStages(bool $refresh = false): array {
+		if (empty(static::$STAGES) || $refresh) {
 			static::$STAGES = static::find()
 				->orderBy('name')
 				->indexBy('id')
