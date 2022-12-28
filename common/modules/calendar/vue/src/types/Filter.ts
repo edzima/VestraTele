@@ -6,6 +6,7 @@ export interface Filter {
     badge?: {
         text?: string// @todo rename to badgeBackground
         background?: string
+        color?: string
     };
 }
 

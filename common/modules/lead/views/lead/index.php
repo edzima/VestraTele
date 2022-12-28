@@ -68,7 +68,10 @@ if ($multipleForm) {
 
 		<?= Html::a(Yii::t('lead', 'Lead Reports'), ['report/index'], ['class' => 'btn btn-warning']) ?>
 
-		<?= Html::a(Yii::t('lead', 'Lead Reminders'), ['reminder/index'], ['class' => 'btn btn-danger']) ?>
+		<span class="btn-group">
+			<?= Html::a(Yii::t('lead', 'Lead Reminders'), ['reminder/index'], ['class' => 'btn btn-danger']) ?>
+			<?= Html::a(Html::icon('calendar'), ['/calendar/lead-reminder/index'], ['class' => 'btn btn-danger']) ?>
+		</span>
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_DIALER_MANAGER)
 			? Html::a(Yii::t('lead', 'Dialers'), ['dialer/index'], ['class' => 'btn btn-primary'])
@@ -88,9 +91,7 @@ if ($multipleForm) {
 		&& $dataProvider->pagination->pageCount > 1
 			?
 			Html::a(
-				Yii::t('lead', 'Delete ({count})', [
-					'count' => $dataProvider->getTotalCount(),
-				]),
+				Yii::t('lead', 'Delete ({count})', ['count' => $dataProvider->getTotalCount(),]),
 				false,
 				[
 					'class' => 'btn btn-danger pull-right',
@@ -109,11 +110,7 @@ if ($multipleForm) {
 	<div class="grid-before">
 
 
-		<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget([
-			'formOptions' => [
-				'class' => 'pull-right',
-			],
-		]) : '' ?>
+		<?= Yii::$app->user->can(User::PERMISSION_EXPORT) ? CsvForm::widget(['formOptions' => ['class' => 'pull-right',],]) : '' ?>
 
 		<?php if ($multipleForm): ?>
 
@@ -129,18 +126,12 @@ if ($multipleForm) {
 				<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
 				&& $dataProvider->pagination->pageCount > 1
 					? Html::a(
-						Yii::t('lead', 'Send SMS: {count}', [
-							'count' => count($searchModel->getAllIds($dataProvider->query)),
-						]), [
-						'sms/push-multiple',
-					],
+						Yii::t('lead', 'Send SMS: {count}', ['count' => count($searchModel->getAllIds($dataProvider->query)),]), ['sms/push-multiple',],
 						count($searchModel->getAllIds($dataProvider->query)) < 6000
 							? [
 							'data' => [
 								'method' => 'POST',
-								'params' => [
-									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-								],
+								'params' => ['leadsIds' => $searchModel->getAllIds($dataProvider->query),],
 							],
 							'class' => 'btn btn-success',
 						]
@@ -186,9 +177,7 @@ if ($multipleForm) {
 							'class' => 'btn btn-info',
 							'data' => [
 								'method' => 'POST',
-								'params' => [
-									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-								],
+								'params' => ['leadsIds' => $searchModel->getAllIds($dataProvider->query),],
 							],
 						])
 					: ''
@@ -215,9 +204,7 @@ if ($multipleForm) {
 							'class' => 'btn btn-warning',
 							'data' => [
 								'method' => 'POST',
-								'params' => [
-									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-								],
+								'params' => ['leadsIds' => $searchModel->getAllIds($dataProvider->query),],
 							],
 						])
 					: ''
@@ -244,9 +231,7 @@ if ($multipleForm) {
 							'class' => 'btn btn-primary',
 							'data' => [
 								'method' => 'POST',
-								'params' => [
-									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-								],
+								'params' => ['leadsIds' => $searchModel->getAllIds($dataProvider->query),],
 							],
 						])
 					: ''
@@ -274,9 +259,7 @@ if ($multipleForm) {
 							'class' => 'btn btn-success',
 							'data' => [
 								'method' => 'POST',
-								'params' => [
-									'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-								],
+								'params' => ['leadsIds' => $searchModel->getAllIds($dataProvider->query),],
 							],
 						])
 					: ''
@@ -321,9 +304,7 @@ if ($multipleForm) {
 				'filter' => $searchModel::getTypesNames(),
 				'label' => Yii::t('lead', 'Type'),
 				'filterType' => GridView::FILTER_SELECT2,
-				'filterInputOptions' => [
-					'placeholder' => Yii::t('lead', 'Type'),
-				],
+				'filterInputOptions' => ['placeholder' => Yii::t('lead', 'Type'),],
 				'filterWidgetOptions' => [
 					'size' => Select2::SIZE_SMALL,
 					'pluginOptions' => [
@@ -338,9 +319,7 @@ if ($multipleForm) {
 				'filter' => $searchModel::getStatusNames(),
 				'label' => Yii::t('lead', 'Status'),
 				'filterType' => GridView::FILTER_SELECT2,
-				'filterInputOptions' => [
-					'placeholder' => Yii::t('lead', 'Status'),
-				],
+				'filterInputOptions' => ['placeholder' => Yii::t('lead', 'Status'),],
 				'filterWidgetOptions' => [
 					'size' => Select2::SIZE_SMALL,
 					'pluginOptions' => [
@@ -356,17 +335,13 @@ if ($multipleForm) {
 						return $lead->getSource()->getName();
 					}
 					return Html::a(Html::encode($lead->getSource()->getName()),
-						$lead->getSource()->getURL(), [
-							'target' => '_blank',
-						]);
+						$lead->getSource()->getURL(), ['target' => '_blank',]);
 				},
 				'format' => 'raw',
 				'filter' => $searchModel->getSourcesNames(),
 				'label' => Yii::t('lead', 'Source'),
 				'filterType' => GridView::FILTER_SELECT2,
-				'filterInputOptions' => [
-					'placeholder' => Yii::t('lead', 'Source'),
-				],
+				'filterInputOptions' => ['placeholder' => Yii::t('lead', 'Source'),],
 				'filterWidgetOptions' => [
 					'size' => Select2::SIZE_SMALL,
 					'pluginOptions' => [

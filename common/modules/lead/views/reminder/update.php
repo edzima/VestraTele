@@ -9,11 +9,11 @@ use yii\helpers\Html;
 /* @var $model ReminderForm */
 /* @var $lead ActiveLead */
 
-$this->title = Yii::t('reminder', 'Update Reminder for Lead: #{id}', ['id' => $lead->getId()]);
+$this->title = Yii::t('lead', 'Update Reminder for Lead: {lead}', ['lead' => $lead->getName()]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
-$this->params['breadcrumbs'][] = ['label' => $lead->getId(), 'url' => ['lead/view', 'id' => $lead->getId()]];
+$this->params['breadcrumbs'][] = ['label' => $lead->getName(), 'url' => ['lead/view', 'id' => $lead->getId()]];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Reminders'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = Yii::t('common', 'Update');
 ?>
 <div class="lead-reminder-update">
 
