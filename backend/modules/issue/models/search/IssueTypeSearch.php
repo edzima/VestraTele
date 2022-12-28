@@ -16,8 +16,9 @@ class IssueTypeSearch extends IssueType {
 	 */
 	public function rules(): array {
 		return [
-			[['provision_type'], 'integer'],
-			[['meet', 'with_additional_date'], 'boolean'],
+			[['parent_id'], 'integer'],
+			[['with_additional_date'], 'boolean'],
+			[['with_additional_date'], 'default', 'value' => null],
 			[['name', 'short_name'], 'safe'],
 		];
 	}
@@ -56,9 +57,8 @@ class IssueTypeSearch extends IssueType {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'provision_type' => $this->provision_type,
 			'with_additional_date' => $this->with_additional_date,
-			'meet' => $this->meet,
+			'parent_id' => $this->parent_id,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])

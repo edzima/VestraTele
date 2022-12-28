@@ -310,3 +310,15 @@ input[type="tel"]::-ms-input-placeholder {
 	color: transparent;
 }
 
+
+.title-with-nav {
+	display: flex;
+	align-items: center;
+}
+
+.title-with-nav .nav {
+	font-size: 14px;
+	margin-left: 1rem;
+	text-transform: uppercase;
+	font-weight: bold;
+}

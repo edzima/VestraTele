@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\helpers\ArrayHelper;
 use common\models\AddressSearch;
 use common\models\AgentSearchInterface;
 use common\models\entityResponsible\EntityResponsible;
@@ -19,7 +20,6 @@ use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\db\QueryInterface;
-use yii\helpers\ArrayHelper;
 
 /**
  * IssueSearch represents the model behind the search form of `common\models\issue\Issue`.
@@ -36,6 +36,8 @@ abstract class IssueSearch extends Model
 	public $type_id;
 	public $entity_responsible_id;
 	public $type_additional_date_at;
+
+	public ?int $parentTypeId = null;
 
 	public string $created_at = '';
 	public string $updated_at = '';
@@ -83,7 +85,7 @@ abstract class IssueSearch extends Model
 			['noteFilter', 'string'],
 			[['createdAtTo', 'createdAtFrom', 'signedAtFrom', 'signedAtTo'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
-			['type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
+			[['type_id', 'excludedTypes'], 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			[['customerName', 'userName'], 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['tagsIds', 'in', 'range' => array_keys(static::getTagsNames()), 'allowArray' => true],
 			[
@@ -92,13 +94,13 @@ abstract class IssueSearch extends Model
 				], 'safe',
 			],
 			['customerPhone', PhoneValidator::class],
-			['excludedTypes', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
+			['parentTypeId', 'in', 'range' => array_keys(static::getParentsTypesNames())],
 			[
 				'excludedStages', 'filter', 'filter' => function ($stages): array {
 				$stages = (array) $stages;
 				foreach ([$this->stage_id] as $id) {
-					\common\helpers\ArrayHelper::removeValue($stages, $id);
+					ArrayHelper::removeValue($stages, $id);
 				}
 				return $stages;
 			},
@@ -157,6 +159,7 @@ abstract class IssueSearch extends Model
 		$this->applyUserNameFilter($query);
 		$this->applyTagsFilter($query);
 		$this->applyOnlyWithTelemarketersFilter($query);
+		$this->applyParentTypeFilter($query);
 
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
@@ -183,6 +186,13 @@ abstract class IssueSearch extends Model
 				}
 			}
 		}
+	}
+
+	public function getParentType(): ?IssueType {
+		if ($this->parentTypeId) {
+			return IssueType::get($this->parentTypeId);
+		}
+		return null;
 	}
 
 	protected function issueWith(): array {
@@ -342,10 +352,23 @@ abstract class IssueSearch extends Model
 	}
 
 	public function getStagesNames(): array {
-		return IssueStage::getStagesNames($this->getWithArchive());
+		$stages = IssueStage::getStagesNames($this->getWithArchive());
+		if ($this->getParentType() === null) {
+			return $stages;
+		}
+		$parent = $this->getParentType();
+		foreach ($stages as $id => $name) {
+			if (!$parent->hasStage($id)) {
+				unset($stages[$id]);
+			}
+		}
+		return $stages;
 	}
 
-	public static function getIssueTypesNames(): array {
+	public function getIssueTypesNames(): array {
+		if ($this->getParentType()) {
+			return ArrayHelper::map($this->getParentType()->childs, 'id', 'nameWithShort');
+		}
 		return IssueType::getTypesNamesWithShort();
 	}
 
@@ -371,10 +394,28 @@ abstract class IssueSearch extends Model
 	}
 
 	public function excludeArchiveStage(): void {
+		if ($this->getParentType() && !$this->getParentType()->hasStage(IssueStage::ARCHIVES_ID)) {
+			return;
+		}
 		$this->excludedStages[] = IssueStage::ARCHIVES_ID;
 	}
 
 	public function hasExcludedArchiveStage(): bool {
 		return in_array(IssueStage::ARCHIVES_ID, $this->excludedStages);
 	}
+
+	private function applyParentTypeFilter(IssueQuery $query): void {
+		if (!empty($this->parentTypeId)) {
+			$type = IssueType::get($this->parentTypeId);
+			if ($type) {
+				$childs = ArrayHelper::getColumn($type->childs, 'id');
+				$query->andFilterWhere([Issue::tableName() . '.type_id' => $childs]);
+			}
+		}
+	}
+
+	public static function getParentsTypesNames(): array {
+		return ArrayHelper::map(IssueType::getParents(), 'id', 'name');
+	}
+
 }

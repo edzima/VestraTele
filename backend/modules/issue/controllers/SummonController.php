@@ -39,8 +39,9 @@ class SummonController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionIndex(int $parentTypeId = null): string {
 		$searchModel = new SummonSearch();
+		$searchModel->issueParentTypeId = $parentTypeId;
 		if (!Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
 			&& isset(SummonSearch::getContractorsNames()[Yii::$app->user->getId()])) {
 			$searchModel->contractor_id = Yii::$app->user->getId();

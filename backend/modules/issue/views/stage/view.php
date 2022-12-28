@@ -1,6 +1,10 @@
 <?php
 
 use backend\modules\issue\models\IssueStage;
+use backend\widgets\GridView;
+use common\models\issue\IssueStageType;
+use common\widgets\grid\ActionColumn;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -20,6 +24,8 @@ YiiAsset::register($this);
 
 
 	<p>
+		<?= Html::a(Yii::t('backend', 'Link with Type'), ['stage-type/create', 'stage_id' => $model->id], ['class' => 'btn btn-success']) ?>
+
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 		<?= Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',
@@ -36,11 +42,6 @@ YiiAsset::register($this);
 			'name',
 			'short_name',
 			[
-				'format' => 'html',
-				'value' => Html::ul($model->types),
-				'label' => Yii::t('issue', 'Issues Types'),
-			],
-			[
 				'attribute' => 'days_reminder',
 				'visible' => $model->days_reminder !== null,
 			],
@@ -56,4 +57,37 @@ YiiAsset::register($this);
 		],
 	]) ?>
 
+
+	<?= GridView::widget([
+		'caption' => Yii::t('issue', 'Types'),
+		'dataProvider' => new ActiveDataProvider([
+			'query' => $model->getStageTypes(),
+			'pagination' => false,
+		]),
+		'columns' => [
+			[
+				'attribute' => 'typeName',
+				'value' => function (IssueStageType $data): string {
+					return Html::a(Html::encode($data->getTypeName()), ['type/view', 'id' => $data->type_id]);
+				},
+				'format' => 'html',
+			],
+			'days_reminder',
+			[
+				'attribute' => 'calendar_background',
+				'contentOptions' => static function (IssueStageType $data): array {
+					$options = [];
+					if (!empty($data->calendar_background)) {
+						$options['style']['background-color'] = $data->calendar_background;
+					}
+					return $options;
+				},
+			],
+			[
+				'class' => ActionColumn::class,
+				'controller' => 'stage-type',
+				'template' => '{update} {delete}',
+			],
+		],
+	]) ?>
 </div>

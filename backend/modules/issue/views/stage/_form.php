@@ -20,11 +20,28 @@ use kartik\select2\Select2;
 	$form = ActiveForm::begin(['id' => 'issue-stage-form']);
 	?>
 
-	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+	<div class="row">
 
-	<?= $form->field($model, 'short_name')->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'name', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'posi')->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'short_name', [
+			'options' => [
+				'class' => 'col-md-2 col-lg-1',
+			],
+		])->textInput(['maxlength' => true]) ?>
+
+		<?= $form->field($model, 'posi', [
+			'options' => [
+				'class' => 'col-md-1',
+			],
+		])->textInput(['maxlength' => true]) ?>
+
+	</div>
+
 
 	<?= $form->field($model, 'typesIds')->widget(Select2::class, [
 		'data' => IssueType::getTypesNames(),

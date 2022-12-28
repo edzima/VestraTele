@@ -54,9 +54,9 @@ class IssueController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
-
+	public function actionIndex(int $parentTypeId = null) {
 		$searchModel = new IssueSearch();
+		$searchModel->parentTypeId = $parentTypeId;
 		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
 			$searchModel->excludeArchiveStage();
@@ -328,4 +328,6 @@ class IssueController extends Controller {
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}
+
 }
+

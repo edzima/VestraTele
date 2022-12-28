@@ -56,7 +56,7 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
-						'controllers' => ['issue/issue'],
+						'controllers' => ['issue/issue', 'issue/user', 'issue/tag'],
 						'actions' => ['delete'],
 						'permissions' => [Worker::PERMISSION_ISSUE_DELETE],
 					],
@@ -70,20 +70,15 @@ class Module extends BaseModule {
 						'controllers' => ['issue/claim'],
 						'permissions' => [Worker::PERMISSION_ISSUE_CLAIM],
 					],
-					[
-						'allow' => false,
-						'controllers' => ['issue/issue'],
-						'actions' => ['delete'],
-						'permissions' => [Worker::PERMISSION_ISSUE_DELETE],
-					],
+
 					[
 						'allow' => true,
-						'controllers' => ['issue/stage'],
+						'controllers' => ['issue/stage', 'issue/stage-type'],
 						'permissions' => [Worker::PERMISSION_ISSUE_STAGE_MANAGER],
 					],
 					[
 						'allow' => true,
-						'controllers' => ['issue/type'],
+						'controllers' => ['issue/type', 'issue/stage-type'],
 						'permissions' => [Worker::PERMISSION_ISSUE_TYPE_MANAGER],
 					],
 					[
@@ -93,10 +88,17 @@ class Module extends BaseModule {
 						'permissions' => [Worker::PERMISSION_ISSUE_CREATE],
 					],
 					[
-						'allow' => true,
-						'controllers' => ['issue/issue', 'issue', 'issue/user', 'issue/tag'],
+						'allow' => false,
+						'controllers' => ['issue/issue', 'issue/user', 'issue/tag'],
+						'actions' => ['delete'],
 						'permissions' => [Worker::PERMISSION_ISSUE],
 					],
+					[
+						'allow' => true,
+						'controllers' => ['issue/issue', 'issue/user', 'issue/tag'],
+						'permissions' => [Worker::PERMISSION_ISSUE],
+					],
+
 					[
 						'allow' => true,
 						'controllers' => ['issue/sms'],

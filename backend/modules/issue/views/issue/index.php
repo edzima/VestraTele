@@ -20,6 +20,7 @@ use common\widgets\grid\SelectionForm;
 use kartik\grid\CheckboxColumn;
 use kartik\grid\SerialColumn;
 use kartik\select2\Select2;
+use yii\bootstrap\Nav;
 use yii\data\ActiveDataProvider;
 use yii\widgets\Pjax;
 
@@ -28,10 +29,18 @@ use yii\widgets\Pjax;
 /* @var $dataProvider ActiveDataProvider */
 
 $this->title = Yii::t('backend', 'Issues');
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
+
+if ($searchModel->getParentType()) {
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getParentType()->name];
+}
+$this->params['issueParentTypeNav'] = [
+	'route' => ['/issue/issue/index'],
+];
 
 ?>
 <div class="issue-index">
+
 	<?php Pjax::begin([
 		'timeout' => 2000,
 	]); ?>
@@ -39,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<div class="clearfix form-group">
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
-			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index'], [
+			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index', 'parentTypeId' => $searchModel->parentTypeId], [
 				'class' => 'btn btn-warning',
 				'data-pjax' => 0,
 			])

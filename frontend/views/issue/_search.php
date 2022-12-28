@@ -43,7 +43,7 @@ use kartik\select2\Select2;
 
 	<div class="row">
 		<?= $form->field($model, 'excludedTypes', ['options' => ['class' => 'col-md-5 col-lg-4']])->widget(Select2::class, [
-			'data' => IssueSearch::getIssueTypesNames(),
+			'data' => $model->getIssueTypesNames(),
 			'options' => [
 				'multiple' => true,
 				'placeholder' => $model->getAttributeLabel('excludedTypes'),

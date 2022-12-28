@@ -20,6 +20,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $calendar_background
  *
  * @property Issue[] $issues
+ * @property IssueStageType[] $stageTypes
  * @property issueType[] $types
  */
 class IssueStage extends ActiveRecord {
@@ -47,8 +48,7 @@ class IssueStage extends ActiveRecord {
 			'id' => 'ID',
 			'name' => Yii::t('common', 'Name'),
 			'short_name' => Yii::t('common', 'Shortname'),
-			'posi' => Yii::t('common', 'Position'),
-			'typesIds' => Yii::t('common', 'Types'),
+			'posi' => Yii::t('common', 'Order'),
 			'days_reminder' => Yii::t('common', 'Reminder (days)'),
 			'calendar_background' => Yii::t('common', 'Calendar Background'),
 		];
@@ -85,6 +85,10 @@ class IssueStage extends ActiveRecord {
 			->indexBy('id');
 	}
 
+	public function getStageTypes(): ActiveQuery {
+		return $this->hasMany(IssueStageType::class, ['stage_id' => 'id'])->indexBy('type_id');
+	}
+
 	public static function getStagesNames(bool $withArchive = false): array {
 		$names = ArrayHelper::map(static::getStages(), 'id', 'nameWithShort');
 		if (!$withArchive) {
@@ -96,8 +100,8 @@ class IssueStage extends ActiveRecord {
 	/**
 	 * @return static[]
 	 */
-	public static function getStages(): array {
-		if (empty(static::$STAGES)) {
+	public static function getStages(bool $refresh = false): array {
+		if (empty(static::$STAGES) || $refresh) {
 			static::$STAGES = static::find()
 				->orderBy('name')
 				->indexBy('id')
@@ -106,12 +110,26 @@ class IssueStage extends ActiveRecord {
 		return static::$STAGES;
 	}
 
+	public function hasType(int $id): bool {
+		$stageTypes = $this->stageTypes;
+		foreach ($stageTypes as $stageType) {
+			if ($stageType->type_id === $id) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * @inheritdoc
 	 * @return IssueStageQuery the active query used by this AR class.
 	 */
 	public static function find(): IssueStageQuery {
 		return new IssueStageQuery(static::class);
+	}
+
+	public static function get(int $id): ?self {
+		return static::getStages()[$id] ?? null;
 	}
 
 }

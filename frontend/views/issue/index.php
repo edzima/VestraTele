@@ -15,6 +15,7 @@ use frontend\widgets\GridView;
 use frontend\widgets\issue\StageChangeButtonDropdown;
 use frontend\widgets\IssueColumn;
 use kartik\select2\Select2;
+use yii\bootstrap\Nav;
 use yii\grid\SerialColumn;
 use yii\widgets\Pjax;
 
@@ -23,12 +24,31 @@ use yii\widgets\Pjax;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('common', 'Issues');
-$this->params['breadcrumbs'][] = $this->title;
+if ($searchModel->getParentType()) {
+	$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getParentType()->name, Url::issuesParentType($searchModel->getParentType()->id)];
+} else {
+	$this->params['breadcrumbs'][] = $this->title;
+}
+$parentMenuItems = Html::issueParentTypeItems();
 
 ?>
 <div class="issue-index">
 
-	<h1><?= Html::encode($this->title) ?></h1>
+	<?php if (empty($parentMenuItems)): ?>
+		<h1><?= Html::encode($this->title) ?></h1>
+	<?php else: ?>
+		<h1 class="title-with-nav">
+			<?= Html::encode($this->title) ?>
+			<?= Nav::widget([
+				'items' => $parentMenuItems,
+				'options' => [
+					'class' => 'nav nav-pills',
+				],
+			]); ?>
+		</h1>
+
+	<?php endif; ?>
 
 	<p>
 		<?= Html::a(Yii::t('frontend', 'Search issue user'), ['user'], ['class' => 'btn btn-info']) ?>

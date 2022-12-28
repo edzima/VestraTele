@@ -5,6 +5,7 @@ namespace common\models\issue;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -14,13 +15,15 @@ use yii\helpers\ArrayHelper;
  * @property int $id
  * @property string $name
  * @property string $short_name
- * @property int $provision_type
  * @property string $vat
- * @property bool $meet
  * @property bool $with_additional_date
+ * @property int|null $parent_id
  *
  * @property Issue[] $issues
  * @property IssueStage[] $stages
+ * @property static|null $parent
+ * @property IssueStageType[] $typeStages
+ * @property static[] $childs
  */
 class IssueType extends ActiveRecord {
 
@@ -40,30 +43,17 @@ class IssueType extends ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules(): array {
-		return [
-			[['name', 'short_name', 'vat'], 'required'],
-			[['provision_type'], 'integer'],
-			[['meet', 'with_additional_date'], 'boolean'],
-			[['name', 'short_name'], 'string', 'max' => 255],
-			[['name'], 'unique'],
-			['vat', 'number', 'min' => 0, 'max' => 100],
-			[['short_name'], 'unique'],
-		];
-	}
-
-	/**
-	 * @inheritdoc
-	 */
 	public function attributeLabels(): array {
 		return [
 			'id' => 'ID',
 			'name' => Yii::t('common', 'Name'),
 			'short_name' => Yii::t('common', 'Shortname'),
-			'provision_type' => Yii::t('common', 'Provision type'),
 			'vat' => 'VAT (%)',
 			'with_additional_date' => Yii::t('common', 'With additional Date'),
-			'meet' => Yii::t('common', 'meet'),
+			'parent_id' => Yii::t('issue', 'Type Parent'),
+			'parent' => Yii::t('issue', 'Type Parent'),
+			'parentName' => Yii::t('issue', 'Type Parent'),
+
 		];
 	}
 
@@ -72,11 +62,23 @@ class IssueType extends ActiveRecord {
 		return $this->hasMany(Issue::class, ['type_id' => 'id']);
 	}
 
+	public function getTypeStages(): ActiveQuery {
+		return $this->hasMany(IssueStageType::class, ['type_id' => 'id']);
+	}
+
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getStages(): IssueStageQuery {
 		return $this->hasMany(IssueStage::class, ['id' => 'stage_id'])
 			->orderBy(['posi' => SORT_DESC, 'name' => SORT_ASC])
 			->viaTable('{{%issue_stage_type}}', ['type_id' => 'id']);
+	}
+
+	public function getParent(): ActiveQuery {
+		return $this->hasOne(static::class, ['id' => 'parent_id']);
+	}
+
+	public function getChilds(): ActiveQuery {
+		return $this->hasMany(static::class, ['parent_id' => 'id']);
 	}
 
 	public function getNameWithShort(): string {
@@ -103,17 +105,49 @@ class IssueType extends ActiveRecord {
 		return static::getTypes()[$typeId] ?? null;
 	}
 
+	public function getParentName(): ?string {
+		if ($this->parent_id) {
+			return static::getTypesNames()[$this->parent_id] ?? null;
+		}
+		return null;
+	}
+
 	/**
 	 * @return static[]
 	 */
-	public static function getTypes(): array {
-		if (empty(static::$TYPES)) {
+	public static function getTypes(bool $refresh = false): array {
+		if (empty(static::$TYPES) || $refresh) {
 			static::$TYPES = static::find()
 				->orderBy('name')
 				->indexBy('id')
+				->with('childs')
 				->all();
 		}
 		return static::$TYPES;
+	}
+
+	public static function getParents(): array {
+		$types = static::getTypes();
+		$parents = [];
+		foreach ($types as $type) {
+			if ($type->parent_id && !isset($parents[$type->parent_id])) {
+				$parent = $types[$type->parent_id] ?? null;
+				if ($parent) {
+					$parents[$parent->id] = $parent;
+				}
+			}
+		}
+		return $parents;
+	}
+
+	public function hasStage(int $id): bool {
+		$typeStages = $this->typeStages;
+		foreach ($typeStages as $stageType) {
+			if ($stageType->stage_id === $id) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
