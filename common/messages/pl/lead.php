@@ -375,4 +375,5 @@ return [
 	'Update Lead: {lead} Market User: {user}' => 'Edytuj Dostęp do Leada',
 	'In progress' => 'W trakcie realizacji',
 	'Calendar Background' => 'Kalendarz - Kolor',
+	'Update Reminder for Lead: {lead}' => 'Edytuj Przypomnienie Lead: {lead}',
 ];
