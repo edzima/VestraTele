@@ -1,6 +1,7 @@
 <?php
 
 use common\modules\lead\models\LeadStatus;
+use kartik\color\ColorInput;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -33,6 +34,10 @@ use yii\widgets\ActiveForm;
 	<?= $form->field($model, 'show_report_in_lead_index')->checkbox() ?>
 
 	<?= $form->field($model, 'sort_index')->textInput() ?>
+
+	<?= $form->field($model, 'calendar_background')->widget(
+		ColorInput::class
+	) ?>
 
 
 	<div class="form-group">

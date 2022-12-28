@@ -19,6 +19,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null $not_for_dialer
  * @property int|null $market_status
  * @property int|null $market_status_same_contacts
+ * @property string|null $calendar_background
  *
  * @property-read Lead[] $leads
  * @property-read string $marketStatusName
@@ -55,6 +56,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			[['sort_index', 'market_status'], 'integer'],
 			[['short_report', 'show_report_in_lead_index', 'not_for_dialer', 'market_status_same_contacts'], 'boolean'],
 			[['name', 'description'], 'string', 'max' => 255],
+			[['calendar_background'], 'string'],
 			[['market_status'], 'in', 'range' => array_keys(static::getMarketStatusesNames())],
 		];
 	}
@@ -74,6 +76,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			'market_status' => Yii::t('lead', 'Market Status'),
 			'marketStatusName' => Yii::t('lead', 'Market Status'),
 			'market_status_same_contacts' => Yii::t('lead', 'Market Status same Contacts'),
+			'calendar_background' => Yii::t('lead', 'Calendar Background'),
 		];
 	}
 

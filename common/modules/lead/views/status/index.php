@@ -1,5 +1,6 @@
 <?php
 
+use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadStatusSearch;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -35,6 +36,16 @@ $this->params['breadcrumbs'][] = $this->title;
 			'show_report_in_lead_index:boolean',
 			'not_for_dialer:boolean',
 			'sort_index',
+			[
+				'attribute' => 'calendar_background',
+				'contentOptions' => static function (LeadStatus $data): array {
+					$options = [];
+					if (!empty($data->calendar_background)) {
+						$options['style']['background-color'] = $data->calendar_background;
+					}
+					return $options;
+				},
+			],
 			[
 				'attribute' => 'market_status',
 				'value' => 'marketStatusName',

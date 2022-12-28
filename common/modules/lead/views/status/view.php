@@ -40,6 +40,15 @@ YiiAsset::register($this);
 			'show_report_in_lead_index:boolean',
 			'short_report:boolean',
 			'sort_index',
+			[
+				'attribute' => 'calendar_background',
+				'visible' => $model->calendar_background !== null,
+				'contentOptions' => [
+					'style' => [
+						'background-color' => $model->calendar_background,
+					],
+				],
+			],
 		],
 	]) ?>
 
