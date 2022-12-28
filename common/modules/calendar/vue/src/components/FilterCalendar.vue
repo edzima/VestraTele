@@ -164,17 +164,19 @@ export default class FilterCalendar extends Vue {
 
     private parseBadge(filter: Filter, event: EventInfo): void {
         if (filter.badge) {
-            const badgeColor = filter.badge.background;
-            const badgeText = filter.badge.text;
-            if (badgeColor && badgeText) {
-                this.appendBadge(event, badgeColor, badgeText);
+            const background = filter.badge.background;
+            const text = filter.badge.text;
+            const color = filter.badge.color;
+
+            if (background && text) {
+                this.appendBadge(event, background, text, color);
             }
         }
     }
 
-    private appendBadge(event: EventInfo, badgeColor: string, text: string): void {
+    private appendBadge(event: EventInfo, badgeColor: string, text: string, color?: string): void {
         event.el.appendChild(
-            createBadge(badgeColor, text)
+            createBadge(badgeColor, text,color)
         );
     }
 }
