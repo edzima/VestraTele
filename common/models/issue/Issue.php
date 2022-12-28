@@ -388,12 +388,12 @@ class Issue extends ActiveRecord implements IssueInterface {
 
 	public function generateStageDeadlineAt(): void {
 		$days = $this->getDaysReminder();
-		if ($days) {
-			$this->stage_deadline_at = null;
-		} else {
+		if ($days > 0) {
 			$date = new DateTime($this->stage_change_at);
 			$date->modify("+ $days days");
 			$this->stage_deadline_at = $date->format(DATE_ATOM);
+		} else {
+			$this->stage_deadline_at = null;
 		}
 	}
 
