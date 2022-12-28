@@ -2,8 +2,11 @@
 
 namespace common\modules\lead\models\searches;
 
+use common\modules\calendar\models\LeadReminderCalendarEvent;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReminder;
+use common\modules\lead\models\LeadStatus;
+use common\modules\reminder\models\Reminder;
 use common\modules\reminder\models\ReminderQuery;
 use common\modules\reminder\models\searches\ReminderSearch;
 use Yii;
@@ -16,6 +19,7 @@ use yii\db\QueryInterface;
 class LeadReminderSearch extends ReminderSearch {
 
 	public const SCENARIO_USER = 'user';
+	protected const EVENT_CLASS = LeadReminderCalendarEvent::class;
 
 	public ?string $leadName = null;
 	public $leadStatusId;
@@ -92,6 +96,72 @@ class LeadReminderSearch extends ReminderSearch {
 		if (!empty($this->leadStatusId)) {
 			$query->andFilterWhere([Lead::tableName() . '.status_id' => $this->leadStatusId]);
 		}
+	}
+
+	public function getEventsData(): array {
+		$models = $this->search([])->getModels();
+		$data = [];
+		foreach ($models as $model) {
+			$event = static::createEvent();
+			$event->setModel($model);
+			$data[] = $event->toArray();
+		}
+		return $data;
+	}
+
+	public static function getPriorityFilters(): array {
+		$options = [];
+		$priorityNames = static::getPriorityNames();
+		$event = static::createEvent();
+		foreach ($priorityNames as $priority => $name) {
+			$color = $event::getPriorityColors()[$priority];
+			$badgeText = '!';
+			switch ($priority) {
+				case Reminder::PRIORITY_LOW:
+					$badgeText = ' ! ';
+					break;
+				case Reminder::PRIORITY_MEDIUM:
+					$badgeText = ' ! ! ';
+					break;
+				case Reminder::PRIORITY_HIGH:
+					$badgeText = ' ! ! ! ';
+			}
+			$options[] = [
+				'value' => $priority,
+				'isActive' => true,
+				'label' => $name,
+				'color' => $event::getPriorityColors()[$priority],
+				'badge' => [
+					'text' => $badgeText,
+					'background' => $color,
+					'color' => 'red',
+				],
+			];
+		}
+		return $options;
+	}
+
+	public static function getStatusesFilters(): array {
+		$models = LeadStatus::find()
+			->andWhere('calendar_background IS NOT NULL')
+			->all();
+		$options = [];
+		foreach ($models as $model) {
+			$options[] = [
+				'value' => $model->id,
+				'isActive' => true,
+				'label' => $model->name,
+				'color' => $model->calendar_background,
+			];
+		}
+		return $options;
+	}
+
+	protected static function createEvent(array $config = []): LeadReminderCalendarEvent {
+		if (!isset($config['class'])) {
+			$config['class'] = static::EVENT_CLASS;
+		}
+		return Yii::createObject($config);
 	}
 
 }

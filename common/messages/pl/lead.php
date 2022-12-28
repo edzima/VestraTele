@@ -374,4 +374,5 @@ return [
 	'Your Access Request is waiting for Accept. You will be notify by Email.' => 'Czekaj na Email z Potwierdzeniem dostępu do Leada',
 	'Update Lead: {lead} Market User: {user}' => 'Edytuj Dostęp do Leada',
 	'In progress' => 'W trakcie realizacji',
+	'Calendar Background' => 'Kalendarz - Kolor',
 ];
