@@ -22,6 +22,7 @@ class CalendarNews extends ActiveRecord {
 
 	public const TYPE_ISSUE_STAGE_DEADLINE = 'issue.stage.deadline';
 	public const TYPE_SUMMON = 'summon';
+	public const TYPE_LEAD_REMINDER = 'lead.reminder';
 
 	/**
 	 * @inheritdoc
