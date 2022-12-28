@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models\searches;
 
+use common\models\query\PhonableQuery;
 use common\modules\calendar\models\LeadReminderCalendarEvent;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReminder;
@@ -9,6 +10,7 @@ use common\modules\lead\models\LeadStatus;
 use common\modules\reminder\models\Reminder;
 use common\modules\reminder\models\ReminderQuery;
 use common\modules\reminder\models\searches\ReminderSearch;
+use common\validators\PhoneValidator;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
@@ -22,6 +24,7 @@ class LeadReminderSearch extends ReminderSearch {
 	protected const EVENT_CLASS = LeadReminderCalendarEvent::class;
 
 	public ?string $leadName = null;
+	public ?string $leadPhone = null;
 	public $leadStatusId;
 	public ?int $user_id = null;
 
@@ -31,6 +34,8 @@ class LeadReminderSearch extends ReminderSearch {
 			['leadStatusId', 'integer'],
 			['leadName', 'trim'],
 			['leadName', 'string', 'min' => 3],
+			['leadPhone', PhoneValidator::class],
+
 		], parent::rules());
 	}
 
@@ -62,6 +67,7 @@ class LeadReminderSearch extends ReminderSearch {
 				$this->applyReminderFilter($query);
 			},
 		]);
+		$this->applyLeadPhoneFilter($query);
 		$this->applyLeadNameFilter($query);
 		$this->applyLeadStatusFilter($query);
 
@@ -162,6 +168,16 @@ class LeadReminderSearch extends ReminderSearch {
 			$config['class'] = static::EVENT_CLASS;
 		}
 		return Yii::createObject($config);
+	}
+
+	private function applyLeadPhoneFilter(ActiveQuery $query): void {
+		if (!empty($this->leadPhone)) {
+			$query->joinWith([
+				'lead' => function (PhonableQuery $query) {
+					$query->withPhoneNumber($this->leadPhone);
+				},
+			]);
+		}
 	}
 
 }

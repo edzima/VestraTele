@@ -38,7 +38,12 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'lead.name',
 				'label' => Yii::t('lead', 'Lead Name'),
 			],
-
+			[
+				'attribute' => 'leadPhone',
+				'value' => 'lead.phone',
+				'format' => 'tel',
+				'label' => Yii::t('lead', 'Phone'),
+			],
 			[
 				'attribute' => 'leadStatusId',
 				'value' => 'lead.status.name',
