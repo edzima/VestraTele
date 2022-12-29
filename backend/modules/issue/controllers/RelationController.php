@@ -51,7 +51,7 @@ class RelationController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView($id) {
+	public function actionView(int $id) {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
@@ -72,7 +72,7 @@ class RelationController extends Controller {
 		$model->issue_id_1 = $id;
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['issue/view', 'id' => $model->issue_id_2]);
+			return $this->redirect(['issue/view', 'id' => (int) $model->issue_id_2]);
 		}
 
 		return $this->render('create', [
