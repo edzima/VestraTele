@@ -126,6 +126,9 @@ class IssueType extends ActiveRecord {
 		return static::$TYPES;
 	}
 
+	/**
+	 * @return static[]
+	 */
 	public static function getParents(): array {
 		$types = static::getTypes();
 		$parents = [];
