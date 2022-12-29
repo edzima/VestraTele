@@ -2,6 +2,7 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\modules\issue\models\IssueStageChangeForm;
 use backend\modules\issue\models\IssueTypeForm;
 use backend\modules\issue\models\search\IssueTypeSearch;
 use common\models\issue\IssueType;
@@ -101,7 +102,7 @@ class TypeController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionDelete($id) {
+	public function actionDelete(int $id) {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);
@@ -114,11 +115,20 @@ class TypeController extends Controller {
 		}
 		Yii::$app->response->format = Response::FORMAT_JSON;
 		$id = (int) reset($params);
-		$stages = $this->findModel($id)->stages;
+
+		$stages = IssueStageChangeForm::getStagesNames($id);
+		$output = [];
+		foreach ($stages as $id => $name) {
+			$output[] = [
+				'id' => $id,
+				'name' => $name,
+			];
+		}
+		$selected = array_key_first($stages);
 
 		return [
-			'output' => $stages,
-			'selected' => (string) reset($stages)->id,
+			'output' => $output,
+			'selected' => $selected,
 		];
 	}
 
