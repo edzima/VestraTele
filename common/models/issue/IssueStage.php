@@ -103,7 +103,7 @@ class IssueStage extends ActiveRecord {
 	public static function getStages(bool $refresh = false): array {
 		if (empty(static::$STAGES) || $refresh) {
 			static::$STAGES = static::find()
-				->orderBy('name')
+				->orderBy(['posi' => SORT_ASC, 'name' => SORT_ASC])
 				->indexBy('id')
 				->all();
 		}
