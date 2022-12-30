@@ -19,10 +19,12 @@ class Worker extends User implements ActiveHierarchy {
 
 	public const ROLES = [
 		self::ROLE_AGENT,
+		self::ROLE_CO_AGENT,
 		self::ROLE_TELEMARKETER,
 		self::ROLE_BOOKKEEPER,
 		self::ROLE_CUSTOMER_SERVICE,
 		self::ROLE_LAWYER,
+		self::ROLE_LAWYER_ASSISTANT,
 		self::ROLE_MANAGER,
 	];
 
