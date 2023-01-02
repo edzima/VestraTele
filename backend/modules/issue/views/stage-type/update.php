@@ -14,7 +14,7 @@ $this->title = Yii::t('backend', 'Stage: {stage} for Type: {type}', [
 	'type' => $model->getModel()->getTypeName(),
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Stages'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Stages'), 'url' => ['stage/index']];
 $this->params['breadcrumbs'][] = ['label' => $model->getModel()->getStageName(), 'url' => ['stage/view', 'id' => $model->getModel()->stage_id]];
 $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 ?>
