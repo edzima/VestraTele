@@ -25,6 +25,7 @@ class KeyStorageItem extends ActiveRecord {
 	public const KEY_ISSUE_CUSTOMER_DEFAULT_SMS_MESSAGE = 'issue.sms.customer';
 	public const KEY_ISSUE_AGENT_DEFAULT_SMS_MESSAGE = 'issue.sms.agent';
 	public const KEY_CALENDAR_USERS_BACKGROUND = 'calendar.users.background';
+	public const KEY_ISSUE_DEEP_ARCHIVE_DAYS = 'issue.deep_archive_days';
 
 	/**
 	 * @inheritdoc
