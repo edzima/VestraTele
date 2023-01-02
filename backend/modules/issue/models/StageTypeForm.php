@@ -92,8 +92,6 @@ class StageTypeForm extends Model {
 	public function getType(): ?IssueType {
 		if ($this->type_id) {
 			return IssueType::get($this->type_id);
-
-			return IssueType::findOne($this->type_id);
 		}
 		return null;
 	}
@@ -121,7 +119,7 @@ class StageTypeForm extends Model {
 		if ($type === null) {
 			return null;
 		}
-		codecept_debug('find type: ' . $type->name);
+
 		$typesIds = [];
 
 		$typesIds[$type->id] = $type->id;
@@ -130,16 +128,16 @@ class StageTypeForm extends Model {
 		}
 		$count = 0;
 		$days = (int) $this->days_reminder;
-		codecept_debug($days);
 		$stageId = $this->stage_id;
 		if ($days) {
 			$count += Issue::updateAll([
 				'stage_deadline_at' => new Expression("DATE_ADD(stage_change_at, INTERVAL $days DAY)"),
 			],
-				'stage_id = :stageId AND type_ID IN(:typesIds) AND stage_change_at IS NOT NULL',
 				[
-					'stageId' => $stageId,
-					'typesIds' => implode(', ', $typesIds),
+					'AND',
+					['IS NOT', 'stage_change_at', null],
+					['stage_id' => $stageId],
+					['type_id' => $typesIds],
 				]
 			);
 			$count += Issue::updateAll([
@@ -161,8 +159,6 @@ class StageTypeForm extends Model {
 				]
 			);
 		}
-		codecept_debug('Update Count: ' . $count);
-
 		return $count;
 	}
 
