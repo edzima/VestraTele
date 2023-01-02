@@ -68,7 +68,7 @@ use yii\widgets\ActiveForm;
 				]
 			) ?>
 
-		<?= $form->field($model, 'onlyWithTelemarketers', ['options' => ['class' => 'col-md-2']])
+		<?= $form->field($model, 'onlyWithTelemarketers', ['options' => ['class' => 'col-md-2 col-lg-1']])
 			->dropDownList(Html::booleanDropdownList(), [
 				'prompt' => Yii::t('common', 'All'),
 			])
@@ -97,6 +97,14 @@ use yii\widgets\ActiveForm;
 						],
 					]
 				) : '' ?>
+
+		<?= $form->field($model, 'stageDeadlineFromAt', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+		<?= $form->field($model, 'stageDeadlineToAt', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
 	</div>
 
 	<div class="row">

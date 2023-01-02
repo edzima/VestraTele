@@ -30,13 +30,15 @@ class IssueSearch extends BaseIssueSearch {
 	public $onlyWithClaims;
 	public ?string $claimCompanyTryingValue = null;
 
-
 	public bool $onlyDelayed = false;
 	public bool $onlyWithPayedPay = false;
 	public bool $onlyWithAllPayedPay = false;
 	public bool $withArchiveOnAllPayedPay = false;
 
 	public $stage_change_at;
+
+	public $stageDeadlineFromAt;
+	public $stageDeadlineToAt;
 
 	public ?string $signature_act = null;
 	private ?array $ids = null;
@@ -55,7 +57,7 @@ class IssueSearch extends BaseIssueSearch {
 			[['onlyWithSettlements', 'onlyWithClaims'], 'default', 'value' => null],
 			['claimCompanyTryingValue', 'number', 'min' => 0],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
-			[['type_additional_date_at', 'signature_act', 'stage_change_at'], 'safe'],
+			[['type_additional_date_at', 'signature_act', 'stage_change_at', 'stageDeadlineFromAt', 'stageDeadlineToAt'], 'safe'],
 
 		]);
 	}
@@ -69,6 +71,8 @@ class IssueSearch extends BaseIssueSearch {
 			'onlyWithPayedPay' => Yii::t('backend', 'Only with payed pay'),
 			'onlyWithSettlements' => Yii::t('settlement', 'Only with Settlements'),
 			'onlyWithAllPayedPay' => Yii::t('settlement', 'Only with all paid Pays'),
+			'stageDeadlineFromAt' => Yii::t('backend', 'Stage Deadline from at'),
+			'stageDeadlineToAt' => Yii::t('backend', 'Stage Deadline to at'),
 		]);
 	}
 
@@ -125,6 +129,7 @@ class IssueSearch extends BaseIssueSearch {
 		$this->payedFilter($query);
 		$this->settlementsFilter($query);
 		$this->stageChangeAtFilter($query);
+		$this->applyStageDeadlineFilter($query);
 		$this->claimFilter($query);
 	}
 
@@ -154,8 +159,6 @@ class IssueSearch extends BaseIssueSearch {
 			]);
 		}
 	}
-
-
 
 	protected function lawyerFilter(IssueQuery $query): void {
 		if (!empty($this->lawyer_id)) {
@@ -243,6 +246,15 @@ class IssueSearch extends BaseIssueSearch {
 			return;
 		}
 		$query->andWhere(IssueClaim::tableName() . '.issue_id IS NULL');
+	}
+
+	private function applyStageDeadlineFilter(IssueQuery $query): void {
+		if (!empty($this->stageDeadlineFromAt)) {
+			$query->andWhere(['>', Issue::tableName() . '.stage_deadline_at', date('Y-m-d 00:00:00', strtotime($this->stageDeadlineFromAt))]);
+		}
+		if (!empty($this->stageDeadlineToAt)) {
+			$query->andWhere(['<', Issue::tableName() . '.stage_deadline_at', date('Y-m-d 23:59:59', strtotime($this->stageDeadlineToAt))]);
+		}
 	}
 
 }

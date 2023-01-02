@@ -333,5 +333,7 @@ return [
 	'Link: {stage} with Type' => 'Połącz: {stage} z Typem',
 	'User Visibles' => 'Widoczność Użytkowników',
 	'Create User Visible' => 'Ustal Widoczność',
-	'Update User Visible: {user}' =>'Edytuj widoczność: {user}'
+	'Update User Visible: {user}' => 'Edytuj widoczność: {user}',
+	'Stage Deadline from at' => 'Termin (od)',
+	'Stage Deadline to at' => 'Termin (do)',
 ];
