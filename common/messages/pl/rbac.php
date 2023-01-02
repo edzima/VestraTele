@@ -4,6 +4,7 @@ return [
 	'administrator' => 'Admin',
 	'agent' => 'Przedstawiciel',
 	'archive' => 'Archiwum',
+	'archive.deep' => 'Archiwum - Glębokie',
 	'book_keeper' => 'Księgowy',
 	'book_keeper_delayed' => 'Księgowy - przeterminowane',
 	'calculation.to-create' => 'Rozliczenia - dodawanie',

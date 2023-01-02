@@ -42,6 +42,7 @@ class RbacController extends Controller {
 
 	public array $permissions = [
 		User::PERMISSION_ARCHIVE,
+		User::PERMISSION_ARCHIVE_DEEP,
 		Worker::PERMISSION_COST => [
 			Worker::ROLE_BOOKKEEPER,
 		],
