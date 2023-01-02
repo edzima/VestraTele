@@ -33,8 +33,8 @@ class IssueStageType extends ActiveRecord {
 		return IssueType::getTypesNames()[$this->type_id];
 	}
 
-	public function getStageName(): string {
-		return IssueStage::getStagesNames(true)[$this->stage_id];
+	public function getStageName(): ?string {
+		return IssueStage::getStagesNames(true, true)[$this->stage_id];
 	}
 
 	public function getStages(): ActiveQuery {

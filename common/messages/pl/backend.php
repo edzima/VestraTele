@@ -336,4 +336,5 @@ return [
 	'Update User Visible: {user}' => 'Edytuj widoczność: {user}',
 	'Stage Deadline from at' => 'Termin (od)',
 	'Stage Deadline to at' => 'Termin (do)',
+	'Archives Deep - Days' => 'Archiwum Głębokie - Po ilu dniach',
 ];

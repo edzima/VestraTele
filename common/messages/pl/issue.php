@@ -133,4 +133,6 @@ return [
 	'Type Parent' => 'Nadrzędny Typ',
 	'Child Types' => 'Podtypy',
 	'All Issues' => 'Wszystkie',
+	'Issue is Archived.' => 'Sprawa jest w Archiwum.',
+	'Issue is Deep Archived.' => 'Sprawa jest w Głębokim Archiwum.',
 ];
