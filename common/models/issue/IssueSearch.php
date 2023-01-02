@@ -59,6 +59,7 @@ abstract class IssueSearch extends Model
 	public const NOTE_ONLY_PINNED = 'only-pinned';
 
 	public bool $withArchive = false;
+	public bool $withArchiveDeep = false;
 	public bool $allowArchiveFilter = false;
 
 	public $agent_id;
@@ -68,6 +69,7 @@ abstract class IssueSearch extends Model
 	public $tagsIds;
 
 	public ?AddressSearch $addressSearch = null;
+	private array $stagesIdsForParentType = [];
 
 	/**
 	 * @inheritdoc
@@ -96,11 +98,12 @@ abstract class IssueSearch extends Model
 			['customerPhone', PhoneValidator::class],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 			['parentTypeId', 'in', 'range' => array_keys(static::getParentsTypesNames())],
+
 			[
 				'excludedStages', 'filter', 'filter' => function ($stages): array {
-				$stages = (array) $stages;
+				$stages = array_map('intval', $stages);
 				foreach ([$this->stage_id] as $id) {
-					ArrayHelper::removeValue($stages, $id);
+					ArrayHelper::removeValue($stages, (int) $id);
 				}
 				return $stages;
 			},
@@ -325,6 +328,10 @@ abstract class IssueSearch extends Model
 		return $this->withArchive;
 	}
 
+	public function getWithArchiveDeep(): bool {
+		return $this->withArchiveDeep;
+	}
+
 	public function getAgentsNames(): array {
 		return User::getSelectList(
 			IssueUser::userIds(IssueUser::TYPE_AGENT)
@@ -352,17 +359,30 @@ abstract class IssueSearch extends Model
 	}
 
 	public function getStagesNames(): array {
-		$stages = IssueStage::getStagesNames($this->getWithArchive());
+		$stages = IssueStage::getStagesNames($this->withArchive, $this->withArchiveDeep);
 		if ($this->getParentType() === null) {
 			return $stages;
 		}
-		$parent = $this->getParentType();
-		foreach ($stages as $id => $name) {
-			if (!$parent->hasStage($id)) {
-				unset($stages[$id]);
+		$ids = $this->getStagesIdsForParentType();
+		$currentStages = [];
+		foreach ($ids as $id) {
+			$stage = $stages[$id] ?? null;
+			if ($stage) {
+				$currentStages[$id] = $stage;
 			}
 		}
-		return $stages;
+		return $currentStages;
+	}
+
+	private function getStagesIdsForParentType(): array {
+		if (empty($this->stagesIdsForParentType)) {
+			$query = Issue::find()
+				->select('stage_id')
+				->distinct();
+			$this->applyParentTypeFilter($query);
+			$this->stagesIdsForParentType = $query->column();
+		}
+		return $this->stagesIdsForParentType;
 	}
 
 	public function getIssueTypesNames(): array {
@@ -394,10 +414,18 @@ abstract class IssueSearch extends Model
 	}
 
 	public function excludeArchiveStage(): void {
-		if ($this->getParentType() && !$this->getParentType()->hasStage(IssueStage::ARCHIVES_ID)) {
+		$this->excludeStage(IssueStage::ARCHIVES_ID);
+	}
+
+	public function excludeArchiveDeepStage(): void {
+		$this->excludeStage(IssueStage::ARCHIVES_DEEP_ID);
+	}
+
+	public function excludeStage(int $stage_id): void {
+		if ($this->getParentType() && !$this->getParentType()->hasStage($stage_id)) {
 			return;
 		}
-		$this->excludedStages[] = IssueStage::ARCHIVES_ID;
+		$this->excludedStages[] = $stage_id;
 	}
 
 	public function hasExcludedArchiveStage(): bool {
@@ -406,9 +434,9 @@ abstract class IssueSearch extends Model
 
 	private function applyParentTypeFilter(IssueQuery $query): void {
 		if (!empty($this->parentTypeId)) {
-			$type = IssueType::get($this->parentTypeId);
-			if ($type) {
-				$childs = ArrayHelper::getColumn($type->childs, 'id');
+			$parent = $this->getParentType();
+			if ($parent) {
+				$childs = ArrayHelper::getColumn($parent->childs, 'id');
 				$query->andFilterWhere([Issue::tableName() . '.type_id' => $childs]);
 			}
 		}

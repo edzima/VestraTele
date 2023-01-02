@@ -52,6 +52,7 @@ class IssuePaySearch extends IssuePay implements
 	public ?string $calculationOwnerId = null;
 	public ?string $customerLastname = null;
 	public bool $withArchive = true;
+	public bool $withArchiveDeep = true;
 
 	public $agent_id;
 
@@ -314,6 +315,10 @@ class IssuePaySearch extends IssuePay implements
 
 	public function getWithArchive(): bool {
 		return $this->withArchive;
+	}
+
+	public function getWithArchiveDeep(): bool {
+		return $this->withArchiveDeep;
 	}
 
 	public function applyIssueTypeFilter(QueryInterface $query): void {

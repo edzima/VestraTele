@@ -48,6 +48,8 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public bool $withCustomer = true;
 	public bool $withAgents = true;
 	public bool $withArchive = false;
+	public bool $withArchiveDeep = false;
+
 	public ?bool $withoutProvisions = null;
 
 	public ?bool $onlyWithPayProblems = null;
@@ -249,6 +251,10 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	//@todo add archive filter when withArchive is true.
 	public function getWithArchive(): bool {
 		return $this->withArchive;
+	}
+
+	public function getWithArchiveDeep(): bool {
+		return $this->withArchiveDeep;
 	}
 
 	private function applyIssueUsersFilter(IssuePayCalculationQuery $query): void {

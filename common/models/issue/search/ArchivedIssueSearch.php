@@ -10,4 +10,6 @@ interface ArchivedIssueSearch {
 
 	public function getWithArchive(): bool;
 
+	public function getWithArchiveDeep(): bool;
+
 }
