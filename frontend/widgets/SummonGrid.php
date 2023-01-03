@@ -4,7 +4,7 @@ namespace frontend\widgets;
 
 use common\models\issue\Summon;
 use common\widgets\grid\SummonGrid as BaseSummonGrid;
-use Yii;
+use frontend\controllers\SummonController;
 
 class SummonGrid extends BaseSummonGrid {
 
@@ -16,7 +16,7 @@ class SummonGrid extends BaseSummonGrid {
 		$this->actionColumn['controller'] = '/summon';
 		$this->actionColumn['template'] = '{view} {update}';
 		$this->actionColumn['visibleButtons']['update'] = static function (Summon $model): bool {
-			return $model->isForUser(Yii::$app->user->getId());
+			return SummonController::canUpdate($model);
 		};
 		parent::init();
 	}

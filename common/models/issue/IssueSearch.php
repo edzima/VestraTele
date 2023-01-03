@@ -37,6 +37,8 @@ abstract class IssueSearch extends Model
 	public $entity_responsible_id;
 	public $type_additional_date_at;
 
+	public $summonsStatusFilter;
+
 	public ?int $parentTypeId = null;
 
 	public string $created_at = '';
@@ -69,6 +71,10 @@ abstract class IssueSearch extends Model
 
 	public ?AddressSearch $addressSearch = null;
 
+	public static function getSummonsStatusesNames(): array {
+		return Summon::getStatusesNames();
+	}
+
 	/**
 	 * @inheritdoc
 	 */
@@ -93,6 +99,7 @@ abstract class IssueSearch extends Model
 					'created_at', 'updated_at', 'type_additional_date_at',
 				], 'safe',
 			],
+			['summonsStatusFilter', 'in', 'range' => array_keys(static::getSummonsStatusesNames())],
 			['customerPhone', PhoneValidator::class],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 			['parentTypeId', 'in', 'range' => array_keys(static::getParentsTypesNames())],
@@ -160,6 +167,7 @@ abstract class IssueSearch extends Model
 		$this->applyTagsFilter($query);
 		$this->applyOnlyWithTelemarketersFilter($query);
 		$this->applyParentTypeFilter($query);
+		$this->applySummonsStatusFilter($query);
 
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
@@ -203,6 +211,7 @@ abstract class IssueSearch extends Model
 			'stage.types',
 			'type',
 			'issueNotes',
+			'summons',
 		];
 	}
 
@@ -416,6 +425,16 @@ abstract class IssueSearch extends Model
 
 	public static function getParentsTypesNames(): array {
 		return ArrayHelper::map(IssueType::getParents(), 'id', 'name');
+	}
+
+	private function applySummonsStatusFilter(IssueQuery $query): void {
+		if (!empty($this->summonsStatusFilter)) {
+			$query->joinWith('summons');
+			$query->groupBy(Summon::tableName() . '.issue_id');
+			$query->andWhere([
+				Summon::tableName() . '.status' => $this->summonsStatusFilter,
+			]);
+		}
 	}
 
 }

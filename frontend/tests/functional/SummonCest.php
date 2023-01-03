@@ -4,6 +4,7 @@ namespace frontend\tests\functional;
 
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\TerytFixtureHelper;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\Summon;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -84,7 +85,52 @@ class SummonCest {
 		$I->seeResponseCodeIs(403);
 	}
 
-	public function checkUpdateSelfSummon(CustomerServiceTester $I): void {
+	public function checkUpdateSelfSummonAsOwner(CustomerServiceTester $I): void {
+		$I->assignPermission(User::PERMISSION_SUMMON);
+		$I->amLoggedIn();
+		/** @var Summon $summon */
+		$summonId = $I->haveRecord(Summon::class, [
+			'owner_id' => $I->getUser()->id,
+			'issue_id' => 1,
+			'city_id' => TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA,
+			'entity_id' => 1,
+			'contractor_id' => UserFixtureHelper::TELE_1,
+			'title' => 'New summon',
+			'status' => Summon::STATUS_NEW,
+			'type_id' => 1,
+		]);
+		$I->amOnPage([static::ROUTE_UPDATE, 'id' => $summonId]);
+		$I->see('Update summon: New summon');
+		$I->selectOption('Status', Summon::STATUS_IN_PROGRESS);
+		$I->click('Save');
+		$I->seeInCurrentUrl(static::ROUTE_VIEW);
+		$I->see(Summon::getStatusesNames()[Summon::STATUS_IN_PROGRESS]);
+	}
+
+	public function checkUpdateNotSelfSummonWithSummonManagerPermission(CustomerServiceTester $I): void {
+		$I->assignPermission(Worker::PERMISSION_SUMMON);
+		$I->assignPermission(Worker::PERMISSION_SUMMON_MANAGER);
+		$I->amLoggedIn();
+		/** @var Summon $summon */
+		$summonId = $I->haveRecord(Summon::class, [
+			'owner_id' => UserFixtureHelper::AGENT_EMILY_PAT,
+			'issue_id' => 1,
+			'city_id' => TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA,
+			'entity_id' => 1,
+			'contractor_id' => UserFixtureHelper::TELE_1,
+			'title' => 'New summon',
+			'status' => Summon::STATUS_NEW,
+			'type_id' => 1,
+		]);
+		$I->amOnPage([static::ROUTE_UPDATE, 'id' => $summonId]);
+		$I->see('Update summon: New summon');
+		$I->selectOption('Status', Summon::STATUS_IN_PROGRESS);
+		$I->click('Save');
+		$I->seeInCurrentUrl(static::ROUTE_VIEW);
+		$I->see(Summon::getStatusesNames()[Summon::STATUS_IN_PROGRESS]);
+	}
+
+	public function checkUpdateSelfSummonAsContractor(CustomerServiceTester $I): void {
 		$I->assignPermission(User::PERMISSION_SUMMON);
 		$I->amLoggedIn();
 		/** @var Summon $summon */
@@ -99,11 +145,7 @@ class SummonCest {
 			'type_id' => 1,
 		]);
 		$I->amOnPage([static::ROUTE_UPDATE, 'id' => $summonId]);
-		$I->see('Update summon: New summon');
-		$I->selectOption('Status', Summon::STATUS_IN_PROGRESS);
-		$I->click('Save');
-		$I->seeInCurrentUrl(static::ROUTE_VIEW);
-		$I->see(Summon::getStatusesNames()[Summon::STATUS_IN_PROGRESS]);
+		$I->seeResponseCodeIs(403);
 	}
 
 	public function checkView(CustomerServiceTester $I): void {
