@@ -3,6 +3,7 @@
 use common\models\issue\IssueInterface;
 use common\models\user\Worker;
 use common\modules\issue\IssueNoteColumn;
+use common\modules\issue\widgets\IssueSummonsColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AgentDataColumn;
 use common\widgets\grid\CustomerDataColumn;
@@ -205,6 +206,9 @@ $parentMenuItems = Html::issueParentTypeItems();
 			],
 			[
 				'class' => IssueNoteColumn::class,
+			],
+			[
+				'class' => IssueSummonsColumn::class,
 			],
 			[
 				'class' => ActionColumn::class,

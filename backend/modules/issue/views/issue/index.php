@@ -12,6 +12,7 @@ use common\models\user\Worker;
 use common\modules\issue\IssueNoteColumn;
 use common\modules\issue\widgets\IssueClaimCompanyColumn;
 use common\modules\issue\widgets\IssuePaysColumnWidget;
+use common\modules\issue\widgets\IssueSummonsColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
@@ -20,7 +21,6 @@ use common\widgets\grid\SelectionForm;
 use kartik\grid\CheckboxColumn;
 use kartik\grid\SerialColumn;
 use kartik\select2\Select2;
-use yii\bootstrap\Nav;
 use yii\data\ActiveDataProvider;
 use yii\widgets\Pjax;
 
@@ -329,6 +329,9 @@ $this->params['issueParentTypeNav'] = [
 			],
 			[
 				'class' => IssueNoteColumn::class,
+			],
+			[
+				'class' => IssueSummonsColumn::class,
 			],
 			[
 				'class' => IssuePaysColumnWidget::class,
