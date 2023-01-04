@@ -1,4 +1,5 @@
 function copyToClipboard(textToCopy) {
+	textToCopy = textToCopy.replace(/<br>/g, "\n"); // or \r\n
 	// navigator clipboard api needs a secure context (https)
 	if (navigator.clipboard && window.isSecureContext) {
 		// navigator clipboard api method'
@@ -21,3 +22,4 @@ function copyToClipboard(textToCopy) {
 		});
 	}
 }
+

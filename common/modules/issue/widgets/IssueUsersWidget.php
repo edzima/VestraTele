@@ -229,7 +229,7 @@ class IssueUsersWidget extends Widget {
 			return null;
 		}
 		$text = [];
-		$text[] = $issueUser->user->getFullName();
+		$text[] = trim($issueUser->user->profile->firstname . ' ' . $issueUser->user->profile->lastname);
 		if ($address->info) {
 			$text[] = $address->info;
 		}
@@ -241,12 +241,12 @@ class IssueUsersWidget extends Widget {
 			$cityWithPostal[] = $address->city->name;
 		}
 		if (!empty($cityWithPostal)) {
-			$text[] = implode(' - ', $cityWithPostal);
+			$text[] = trim(implode(' ', $cityWithPostal));
 		}
 		$text = array_map(static function ($value): string {
 			return Html::encode($value);
 		}, $text);
-		return implode(", ", $text);
+		return implode("<br>", $text);
 	}
 
 }
