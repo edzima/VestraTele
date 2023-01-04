@@ -133,4 +133,5 @@ return [
 	'Type Parent' => 'Nadrzędny Typ',
 	'Child Types' => 'Podtypy',
 	'All Issues' => 'Wszystkie',
+	'Click for Copy to Clipboard' => 'Kliknij aby skopiować',
 ];
