@@ -158,14 +158,11 @@ class SummonController extends Controller {
 	}
 
 	public static function canUpdate(Summon $model): bool {
-		return static::isOwnerOrSummonManager($model);
+		return $model->isForUser(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER);
 	}
 
 	public static function canDelete(Summon $model): bool {
-		return static::isOwnerOrSummonManager($model);
-	}
-
-	private static function isOwnerOrSummonManager(Summon $model): bool {
 		return $model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER);
 	}
+
 }
