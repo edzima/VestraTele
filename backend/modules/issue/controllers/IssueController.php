@@ -319,19 +319,10 @@ class IssueController extends Controller {
 	 * @param integer $id
 	 * @return Issue the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
+	 * @throws ForbiddenHttpException
 	 */
 	protected function findModel(int $id): Issue {
-		if (($model = Issue::findOne($id)) !== null) {
-			if ($model->isArchived()) {
-				if (!Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
-					Yii::warning('User: ' . Yii::$app->user->id . ' try view archived issue: ' . $model->id, 'issue');
-					throw new ForbiddenHttpException(Yii::t('issue', 'Issue is Archived.'));
-				}
-				if ($model->isDeepArchived() && !Yii::$app->user->can(Worker::PERMISSION_ARCHIVE_DEEP)) {
-					Yii::warning('User: ' . Yii::$app->user->id . ' try view deep archived issue: ' . $model->id, 'issue');
-					throw new ForbiddenHttpException(Yii::t('issue', 'Issue is Deep Archived.'));
-				}
-			}
+		if (($model = Issue::findOne($id)) !== null && Yii::$app->user->canSeeIssue($model)) {
 			return $model;
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');

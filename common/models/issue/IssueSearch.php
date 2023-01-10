@@ -60,7 +60,6 @@ abstract class IssueSearch extends Model
 
 	public bool $withArchive = false;
 	public bool $withArchiveDeep = false;
-	public bool $allowArchiveFilter = false;
 
 	public $agent_id;
 	public $lawyer_id;
@@ -101,7 +100,7 @@ abstract class IssueSearch extends Model
 
 			[
 				'excludedStages', 'filter', 'filter' => function ($stages): array {
-				$stages = array_map('intval', $stages);
+				$stages = array_map('intval', (array) $stages);
 				foreach ([$this->stage_id] as $id) {
 					ArrayHelper::removeValue($stages, (int) $id);
 				}

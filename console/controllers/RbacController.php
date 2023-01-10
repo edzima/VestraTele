@@ -78,6 +78,10 @@ class RbacController extends Controller {
 		User::PERMISSION_NOTE_UPDATE,
 		Worker::PERMISSION_NOTE_TEMPLATE,
 		User::PERMISSION_PROVISION,
+		User::PERMISSION_ISSUE_VISIBLE_NOT_SELF => [
+			User::ROLE_MANAGER,
+			User::ROLE_CUSTOMER_SERVICE,
+		],
 		Worker::PERMISSION_PAY => [
 			Worker::ROLE_BOOKKEEPER,
 		],
