@@ -9,6 +9,7 @@ use common\models\issue\form\SummonForm;
 use common\models\issue\Summon;
 use common\models\issue\SummonDoc;
 use common\models\issue\SummonType;
+use common\models\SummonTypeOptions;
 use common\models\user\Worker;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
@@ -48,7 +49,7 @@ class SummonFormTest extends Unit {
 		$this->thenSeeError('Title cannot be blank when Docs are empty.', 'title');
 		$this->thenSeeError('Docs cannot be blank when Title is empty.', 'doc_types_ids');
 
-		$this->thenSeeError('Start at cannot be blank.', 'start_at');
+		$this->thenSeeError('Date At cannot be blank.', 'start_at');
 		$this->thenSeeError('Contractor cannot be blank.', 'contractor_id');
 		$this->thenSeeError('Issue cannot be blank.', 'issue_id');
 		$this->thenSeeError('Entity responsible cannot be blank.', 'entity_id');
@@ -202,12 +203,15 @@ class SummonFormTest extends Unit {
 
 	public function testSetType(): void {
 		$this->giveModel();
-		$type = new SummonType(['title' => 'Test Title', 'id' => 100, 'term' => SummonForm::TERM_ONE_MONTH]);
+		$type = new SummonType(['name' => 'Test Type', 'id' => 100]);
+		$options = new SummonTypeOptions(['title' => 'Test Title', 'term' => SummonForm::TERM_ONE_MONTH, 'status' => Summon::STATUS_IN_PROGRESS]);
+		$type->setOptions($options);
 		$this->tester->assertEmpty($this->model->title);
 		$this->model->setType($type);
 		$this->tester->assertSame($type->id, $this->model->type_id);
-		$this->tester->assertSame($type->title, $this->model->title);
-		$this->tester->assertSame($type->term, $this->model->term);
+		$this->tester->assertSame($type->getOptions()->title, $this->model->title);
+		$this->tester->assertSame($type->getOptions()->term, $this->model->term);
+		$this->tester->assertSame($type->getOptions()->status, $this->model->status);
 	}
 
 	private function giveModel(array $config = []) {

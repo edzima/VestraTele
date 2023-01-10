@@ -290,6 +290,8 @@ return [
 	'To Confirm' => 'Do potwierdzenia',
 	'Realized' => 'Zrealizowane',
 	'Unrealized' => 'Niezrealizowane',
+	'Unrealized - Client' => 'Niezrealizowane - Klient',
+	'Unrealized - Company' => 'Niezrealizowane - Biuro',
 	'1 Day' => '1 dzień',
 	'1 Days' => '3 dni',
 	'5 Days' => '5 dni',
@@ -335,4 +337,5 @@ return [
 	'Agreement' => 'Umowa',
 	'Qualifies but not interest' => 'Kwalifikuje się - nie chce',
 	'Order' => 'Kolejność',
+	'Suspended' => 'Zawieszenie',
 ];

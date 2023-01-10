@@ -26,8 +26,8 @@ class SummonQuery extends ActiveQuery {
 	}
 
 	public function active(): self {
-		[, $alias] = $this->getTableNameAndAlias();
-		$this->andWhere(['!=', $alias . '.status', [Summon::STATUS_REALIZED, Summon::STATUS_UNREALIZED]]);
+		[$table, $alias] = $this->getTableNameAndAlias();
+		$this->andWhere(['!=', $alias . '.status', Summon::notActiveStatuses()]);
 		return $this;
 	}
 

@@ -34,7 +34,8 @@ class SummonCalendarEvent extends FullCalendarEvent {
 			Summon::STATUS_WITHOUT_RECOGNITION => '#7B1FA2',
 			Summon::STATUS_TO_CONFIRM => '#FF9100',
 			Summon::STATUS_REALIZED => '#303F9F',
-			Summon::STATUS_UNREALIZED => '#616161',
+			Summon::STATUS_UNREALIZED_CLIENT => '#616161',
+			Summon::STATUS_UNREALIZED_COMPANY => '#CFCFCF',
 		];
 	}
 

@@ -24,11 +24,6 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 
 	protected const EVENT_CLASS = SummonCalendarEvent::class;
 
-	protected const EXCLUDED_STATUSES = [
-		Summon::STATUS_REALIZED,
-		Summon::STATUS_UNREALIZED,
-	];
-
 	public static function getSelfContractorsNames(int $userId): array {
 		$ids = Summon::find()
 			->select('contractor_id')
@@ -82,13 +77,17 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 			return $dataProvider;
 		}
 		$query->andFilterWhere([
-			'NOT IN', Summon::tableName() . '.status', static::EXCLUDED_STATUSES,
+			'NOT IN', Summon::tableName() . '.status', static::getExcludedStatuses(),
 		]);
 		$this->applyDateFilter($query);
 		$query->andWhere([
 			'contractor_id' => $this->contractor_id,
 		]);
 		return $dataProvider;
+	}
+
+	public static function getExcludedStatuses(): array {
+		return Summon::notActiveStatuses();
 	}
 
 	public static function getStatusFiltersOptions(): array {
@@ -115,7 +114,7 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 
 	public static function getStatusesNames(): array {
 		$statuses = parent::getStatusesNames();
-		foreach (static::EXCLUDED_STATUSES as $statusId) {
+		foreach (static::getExcludedStatuses() as $statusId) {
 			unset($statuses[$statusId]);
 		}
 		return $statuses;
