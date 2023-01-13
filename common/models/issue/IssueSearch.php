@@ -245,6 +245,9 @@ abstract class IssueSearch extends Model
 		if (!$this->getWithArchive()) {
 			$query->withoutArchives();
 		}
+		if (!$this->getWithArchiveDeep()) {
+			$query->withoutArchiveDeep();
+		}
 	}
 
 	public function applyAgentsFilters(QueryInterface $query): void {
