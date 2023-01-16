@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use backend\modules\issue\models\IssueStage;
 use common\helpers\ArrayHelper;
 use common\models\AddressSearch;
 use common\models\AgentSearchInterface;
@@ -172,6 +173,16 @@ abstract class IssueSearch extends Model
 		]);
 	}
 
+	public function getTotalCountWithArchive(): int {
+		$self = clone $this;
+		$self->withArchiveDeep = true;
+		$self->withArchive = true;
+		foreach (IssueStage::ARCHIVES_IDS as $id) {
+			ArrayHelper::removeValue($self->excludedStages, $id);
+		}
+		return $self->search([])->totalCount;
+	}
+
 	protected function addressFilter(IssueQuery $query): void {
 
 		if ($this->addressSearch !== null && $this->addressSearch->validate()) {
@@ -242,10 +253,19 @@ abstract class IssueSearch extends Model
 	}
 
 	protected function archiveFilter(IssueQuery $query): void {
+		Yii::warning([
+			'msg' => 'archiveFilter',
+			'withArchive' => $this->getWithArchive(),
+			'deepArchive' => $this->getWithArchiveDeep(),
+			'exludedStages' => $this->excludedStages,
+		]);
 		if (!$this->getWithArchive()) {
+			Yii::warning('withoutARchives');
 			$query->withoutArchives();
 		}
 		if (!$this->getWithArchiveDeep()) {
+			Yii::warning('withoutDeepARchives');
+
 			$query->withoutArchiveDeep();
 		}
 	}
@@ -431,7 +451,9 @@ abstract class IssueSearch extends Model
 	}
 
 	public function hasExcludedArchiveStage(): bool {
-		return in_array(IssueStage::ARCHIVES_ID, $this->excludedStages);
+		return in_array(IssueStage::ARCHIVES_ID, $this->excludedStages)
+			|| !$this->getWithArchiveDeep()
+			|| !$this->getWithArchive();
 	}
 
 	private function applyParentTypeFilter(IssueQuery $query): void {

@@ -15,6 +15,7 @@ use frontend\widgets\GridView;
 use frontend\widgets\issue\StageChangeButtonDropdown;
 use frontend\widgets\IssueColumn;
 use kartik\select2\Select2;
+use yii\bootstrap\Alert;
 use yii\bootstrap\Nav;
 use yii\grid\SerialColumn;
 use yii\widgets\Pjax;
@@ -85,7 +86,16 @@ $parentMenuItems = Html::issueParentTypeItems();
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'emptyText' => $searchModel->hasExcludedArchiveStage() ? Yii::t('issue', 'Archive is Excluded. Check in them.') : null,
+		'emptyText' => $searchModel->hasExcludedArchiveStage()
+			? Alert::widget([
+				'body' => Yii::t('issue', 'The archive is excluded. Matching Issues found in it: {count}.', [
+					'count' => $searchModel->getTotalCountWithArchive(),
+				]),
+				'options' => [
+					'class' => 'alert-warning text-center mb-0',
+				],
+			])
+			: null,
 		'columns' => [
 			['class' => SerialColumn::class], // @todo to approval
 			[

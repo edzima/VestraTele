@@ -20,7 +20,7 @@ use common\widgets\grid\SelectionForm;
 use kartik\grid\CheckboxColumn;
 use kartik\grid\SerialColumn;
 use kartik\select2\Select2;
-use yii\bootstrap\Nav;
+use yii\bootstrap\Alert;
 use yii\data\ActiveDataProvider;
 use yii\widgets\Pjax;
 
@@ -168,7 +168,16 @@ $this->params['issueParentTypeNav'] = [
 			}
 			return [];
 		},
-		'emptyText' => $searchModel->hasExcludedArchiveStage() ? Yii::t('issue', 'Archive is Excluded. Check in them.') : null,
+		'emptyText' => $searchModel->hasExcludedArchiveStage()
+			? Alert::widget([
+				'body' => Yii::t('issue', 'The archive is excluded. Matching Issues found in it: {count}.', [
+					'count' => $searchModel->getTotalCountWithArchive(),
+				]),
+				'options' => [
+					'class' => 'alert-warning text-center mb-0',
+				],
+			])
+			: null,
 		'columns' => [
 			Yii::$app->user->can(Worker::PERMISSION_MULTIPLE_SMS)
 				? [

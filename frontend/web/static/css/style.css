@@ -322,3 +322,7 @@ input[type="tel"]::-ms-input-placeholder {
 	text-transform: uppercase;
 	font-weight: bold;
 }
+
+.mb-0 {
+	margin-bottom: 0;
+}

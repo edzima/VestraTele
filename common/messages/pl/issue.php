@@ -137,4 +137,5 @@ return [
 	'Issue is Deep Archived.' => 'Sprawa jest w Głębokim Archiwum.',
 	'The Issue is Archived. You are not authorized to view.' => 'Sprawa jest w Archiwum. Nie posiadasz dostępu.',
 	'The Issue is Deep Archive. You are not authorized to view.' => 'Sprawa jest w Głębokim Archiwum. Nie posiadasz dostępu.',
+	'The archive is excluded. Matching Issues found in it: {count}.' => 'Archiwum jest wykluczone. Znaleziono w nim Spraw: {count}.',
 ];
