@@ -253,19 +253,10 @@ abstract class IssueSearch extends Model
 	}
 
 	protected function archiveFilter(IssueQuery $query): void {
-		Yii::warning([
-			'msg' => 'archiveFilter',
-			'withArchive' => $this->getWithArchive(),
-			'deepArchive' => $this->getWithArchiveDeep(),
-			'exludedStages' => $this->excludedStages,
-		]);
 		if (!$this->getWithArchive()) {
-			Yii::warning('withoutARchives');
 			$query->withoutArchives();
 		}
 		if (!$this->getWithArchiveDeep()) {
-			Yii::warning('withoutDeepARchives');
-
 			$query->withoutArchiveDeep();
 		}
 	}
