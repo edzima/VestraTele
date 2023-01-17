@@ -15,6 +15,18 @@ use yii\web\View;
 /* @var $titleUrl string */
 /* @var $descriptionUrl string */
 
+$this->registerJs("window.onbeforeunload = function (e) {
+    e = e || window.event;
+	const activeElement = e.target.activeElement;
+	if(activeElement.tagName != 'BUTTON'){
+	    e.preventDefault();
+	    // For IE and Firefox prior to version 4
+	    if (e) {
+	        e.returnValue = 'Sure?';
+	    }
+	}
+
+};", View::POS_HEAD);
 ?>
 
 <div class="issue-note-form">
