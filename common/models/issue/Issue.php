@@ -54,7 +54,7 @@ use yii\db\Expression;
  * @property-read IssueTag[] $tags
  * @property-read IssueUser[] $users
  * @property-read IssueCost[] $costs
- * @property-read StageType $stageType
+ * @property-read IssueStageType $stageType
  * @property-read IssueClaim[] $claims
  * @property-read IssueRelation[] $issuesRelations
  * @property-read Issue[] $linkedIssues
@@ -191,7 +191,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function getStageType(): ActiveQuery {
-		return $this->hasOne(StageType::class, ['type_id' => 'type_id', 'stage_id' => 'stage_id']);
+		return $this->hasOne(IssueStageType::class, ['type_id' => 'type_id', 'stage_id' => 'stage_id']);
 	}
 
 	public function getNewestNote(): IssueNoteQuery {
@@ -238,22 +238,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 
 	public function hasLawyer(): bool {
 		return $this->lawyer !== null;
-	}
-
-	public function getClientFullName(): string {
-		return trim($this->client_surname) . ' ' . trim($this->client_first_name);
-	}
-
-	public function getVictimFullName(): string {
-		return trim($this->victim_surname) . ' ' . trim($this->victim_first_name);
-	}
-
-	public function hasClientSubprovince(): bool {
-		return $this->client_subprovince_id !== null && $this->clientSubprovince !== null;
-	}
-
-	public function hasVictimSubprovince(): bool {
-		return $this->victim_subprovince_id !== null && $this->victimSubprovince !== null;
 	}
 
 	public function markAsUpdate(): void {
