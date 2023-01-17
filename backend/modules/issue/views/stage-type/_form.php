@@ -26,7 +26,7 @@ use kartik\select2\Select2;
 		<?= $withType
 			? $form->field($model, 'type_id', [
 				'options' => [
-					'class' => 'col-md-6',
+					'class' => 'col-md-3',
 				],
 			])->widget(Select2::class, [
 				'data' => $model->getTypesNames(),
@@ -37,7 +37,7 @@ use kartik\select2\Select2;
 		<?= $withStage
 			? $form->field($model, 'stage_id', [
 				'options' => [
-					'class' => 'col-md-6',
+					'class' => 'col-md-3',
 				],
 			])->widget(Select2::class, [
 				'data' => $model->getStagesNames(),
@@ -47,40 +47,18 @@ use kartik\select2\Select2;
 	<div class="row">
 		<?= $form->field($model, 'days_reminder', [
 			'options' => [
-				'class' => 'col-md-1',
+				'class' => 'col-md-2',
 			],
 		])->textInput(['maxlength' => true]) ?>
 
-		<?= $form->field($model, 'days_reminder_second', [
+		<?= $form->field($model, 'calendar_background', [
 			'options' => [
-				'class' => 'col-md-1',
+				'class' => 'col-md-2',
 			],
-		])->textInput(['maxlength' => true]) ?>
-
-
-		<?= $form->field($model, 'days_reminder_third', [
-			'options' => [
-				'class' => 'col-md-1',
-			],
-		])->textInput(['maxlength' => true]) ?>
-
-		<?= $form->field($model, 'days_reminder_fourth', [
-			'options' => [
-				'class' => 'col-md-1',
-			],
-		])->textInput(['maxlength' => true]) ?>
-
-		<?= $form->field($model, 'days_reminder_fifth', [
-			'options' => [
-				'class' => 'col-md-1',
-			],
-		])->textInput(['maxlength' => true]) ?>
+		])->widget(
+			ColorInput::class
+		) ?>
 	</div>
-
-
-	<?= $form->field($model, 'calendar_background')->widget(
-		ColorInput::class
-	) ?>
 
 
 	<div class="form-group">

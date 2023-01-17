@@ -135,11 +135,6 @@ return [
 	'All Issues' => 'Wszystkie',
 	'Click for Copy to Clipboard' => 'Kliknij aby skopiować',
 	'Days Reminders' => 'Przypomnij (dni)',
-	'1. Reminder (days)' => '1. Przypomnij (dni)',
-	'2. Reminder (days)' => '2. Przypomnij (dni)',
-	'3. Reminder (days)' => '3. Przypomnij (dni)',
-	'4. Reminder (days)' => '4. Przypomnij (dni)',
-	'5. Reminder (days)' => '5. Przypomnij (dni)',
 	'Unlink Types' => 'Rozłącz Typy',
 	'Are you sure you want to unlink this types?' => 'Jesteś pewny, że chcesz rozłączyć te Typy?',
 ];

@@ -83,16 +83,7 @@ $typesDataProvider = new ActiveDataProvider([
 				'format' => 'html',
 			],
 			[
-				'attribute' => 'daysReminders',
-				'label' => Yii::t('issue', 'Days Reminders'),
-				'value' => static function (IssueStageType $data): ?string {
-					$daysReminder = $data->getDaysReminders();
-					if (empty($daysReminder)) {
-						return null;
-					}
-					return Html::ul($daysReminder);
-				},
-				'format' => 'html',
+				'attribute' => 'days_reminder',
 			],
 			[
 				'attribute' => 'calendar_background',

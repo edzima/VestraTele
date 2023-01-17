@@ -5,6 +5,7 @@ use backend\modules\issue\models\IssueStage;
 use backend\modules\issue\models\search\IssueStageSearch;
 use backend\widgets\GridView;
 use common\models\issue\IssueType;
+use common\widgets\grid\ActionColumn;
 use common\widgets\grid\DataColumn;
 use kartik\select2\Select2;
 
@@ -56,11 +57,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'attribute' => 'days_reminder',
 				'value' => function (IssueStage $model): ?string {
-					$daysTypes = [];
+					$days = [];
 					foreach ($model->stageTypes as $stageType) {
-						$daysTypes[] = $stageType->getDaysReminders();
+						if ($stageType->days_reminder) {
+							$days[] = $stageType->days_reminder;
+						}
 					}
-					$days = array_merge([], ...$daysTypes);
 					if (empty($days)) {
 						return null;
 					}
@@ -75,7 +77,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					return $stage->getIssues()->count();
 				},
 			],
-			['class' => 'yii\grid\ActionColumn'],
+			['class' => ActionColumn::class],
 		],
 	]); ?>
 </div>

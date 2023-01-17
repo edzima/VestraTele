@@ -17,43 +17,16 @@ class StageTypeForm extends Model {
 	public $stage_id;
 	public $calendar_background;
 	public $days_reminder;
-	public $days_reminder_second;
-	public $days_reminder_third;
-	public $days_reminder_fourth;
-	public $days_reminder_fifth;
 
 	private ?IssueStageType $model = null;
 
 	public function rules(): array {
 		return [
 			[['type_id', 'stage_id'], 'required', 'on' => [static::SCENARIO_CREATE, static::SCENARIO_DEFAULT]],
-			[['type_id', 'stage_id', 'days_reminder', 'days_reminder_second', 'days_reminder_third', 'days_reminder_fourth', 'days_reminder_fifth'], 'integer'],
+			[['type_id', 'stage_id', 'days_reminder'], 'integer'],
 			[['calendar_background'], 'string'],
-			[['days_reminder', 'calendar_background', 'days_reminder_second', 'days_reminder_third', 'days_reminder_fourth', 'days_reminder_fifth'], 'default', 'value' => null],
-			['days_reminder_second', 'compare', 'operator' => '>', 'compareAttribute' => 'days_reminder', 'enableClientValidation' => false],
-			['days_reminder_third', 'compare', 'operator' => '>', 'compareAttribute' => 'days_reminder_second', 'enableClientValidation' => false],
-			['days_reminder_fourth', 'compare', 'operator' => '>', 'compareAttribute' => 'days_reminder_third', 'enableClientValidation' => false],
-			['days_reminder_fifth', 'compare', 'operator' => '>', 'compareAttribute' => 'days_reminder_fourth', 'enableClientValidation' => false],
-			[
-				'days_reminder', 'compare', 'operator' => '<', 'compareAttribute' => 'days_reminder_second', 'enableClientValidation' => false, 'when' => function (): bool {
-				return !empty($this->days_reminder_second);
-			},
-			],
-			[
-				'days_reminder_second', 'compare', 'operator' => '<', 'compareAttribute' => 'days_reminder_third', 'enableClientValidation' => false, 'when' => function (): bool {
-				return !empty($this->days_reminder_third);
-			},
-			],
-			[
-				'days_reminder_third', 'compare', 'operator' => '<', 'compareAttribute' => 'days_reminder_fourth', 'enableClientValidation' => false, 'when' => function (): bool {
-				return !empty($this->days_reminder_fourth);
-			},
-			],
-			[
-				'days_reminder_fourth', 'compare', 'operator' => '<', 'compareAttribute' => 'days_reminder_fifth', 'enableClientValidation' => false, 'when' => function (): bool {
-				return !empty($this->days_reminder_fifth);
-			},
-			],
+			[['days_reminder', 'calendar_background'], 'default', 'value' => null],
+			['days_reminder', 'integer', 'min' => 1],
 			['type_id', 'in', 'range' => array_keys($this->getTypesNames())],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 		];
@@ -109,10 +82,6 @@ class StageTypeForm extends Model {
 				'type_id' => $this->type_id,
 				'calendar_background' => $this->calendar_background,
 				'days_reminder' => $this->days_reminder,
-				'days_reminder_second' => $this->days_reminder_second,
-				'days_reminder_third' => $this->days_reminder_third,
-				'days_reminder_fourth' => $this->days_reminder_fourth,
-				'days_reminder_fifth' => $this->days_reminder_fifth,
 			])->execute();
 	}
 
@@ -136,10 +105,6 @@ class StageTypeForm extends Model {
 		$this->stage_id = $model->stage_id;
 		$this->calendar_background = $model->calendar_background;
 		$this->days_reminder = $model->days_reminder;
-		$this->days_reminder_second = $model->days_reminder_second;
-		$this->days_reminder_third = $model->days_reminder_third;
-		$this->days_reminder_fourth = $model->days_reminder_fourth;
-		$this->days_reminder_fifth = $model->days_reminder_fifth;
 	}
 
 	private function updateIssuesStageDeadlineAt(): ?int {
