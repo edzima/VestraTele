@@ -140,4 +140,6 @@ return [
 	'3. Reminder (days)' => '3. Przypomnij (dni)',
 	'4. Reminder (days)' => '4. Przypomnij (dni)',
 	'5. Reminder (days)' => '5. Przypomnij (dni)',
+	'Unlink Types' => 'Rozłącz Typy',
+	'Are you sure you want to unlink this types?' => 'Jesteś pewny, że chcesz rozłączyć te Typy?',
 ];

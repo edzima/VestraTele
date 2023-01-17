@@ -50,7 +50,7 @@ class StageController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionView(int $id) {
+	public function actionView(int $id): string {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);

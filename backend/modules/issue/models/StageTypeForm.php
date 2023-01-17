@@ -136,6 +136,10 @@ class StageTypeForm extends Model {
 		$this->stage_id = $model->stage_id;
 		$this->calendar_background = $model->calendar_background;
 		$this->days_reminder = $model->days_reminder;
+		$this->days_reminder_second = $model->days_reminder_second;
+		$this->days_reminder_third = $model->days_reminder_third;
+		$this->days_reminder_fourth = $model->days_reminder_fourth;
+		$this->days_reminder_fifth = $model->days_reminder_fifth;
 	}
 
 	private function updateIssuesStageDeadlineAt(): ?int {

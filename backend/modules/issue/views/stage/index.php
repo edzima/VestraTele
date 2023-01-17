@@ -53,18 +53,22 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 				'contentBold' => true,
 			],
-			'days_reminder',
-			'posi',
 			[
-				'attribute' => 'calendar_background',
-				'contentOptions' => static function (IssueStage $data): array {
-					$options = [];
-					if (!empty($data->calendar_background)) {
-						$options['style']['background-color'] = $data->calendar_background;
+				'attribute' => 'days_reminder',
+				'value' => function (IssueStage $model): ?string {
+					$daysTypes = [];
+					foreach ($model->stageTypes as $stageType) {
+						$daysTypes[] = $stageType->getDaysReminders();
 					}
-					return $options;
+					$days = array_merge([], ...$daysTypes);
+					if (empty($days)) {
+						return null;
+					}
+					$days = array_unique($days);
+					return implode(', ', $days);
 				},
 			],
+			'posi',
 			[
 				'label' => Yii::t('issue', 'Issues Count'),
 				'value' => function (IssueStage $stage): int {

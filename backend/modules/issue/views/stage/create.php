@@ -7,7 +7,7 @@ use backend\modules\issue\models\IssueStageForm;
 
 $this->title = Yii::t('backend', 'Create Issue Stage');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Stages'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Stages'), 'url' => ['stage/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-stage-create">

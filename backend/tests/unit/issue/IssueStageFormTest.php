@@ -34,7 +34,6 @@ class IssueStageFormTest extends Unit {
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Name cannot be blank.', 'name');
 		$this->thenSeeError('Shortname cannot be blank.', 'short_name');
-		$this->thenSeeError('Types cannot be blank.', 'typesIds');
 	}
 
 	private function giveModel(array $config = []): void {
@@ -45,7 +44,6 @@ class IssueStageFormTest extends Unit {
 		$this->giveModel([
 			'name' => 'Test Stage',
 			'short_name' => 'TS',
-			'typesIds' => [1],
 		]);
 
 		$this->thenSuccessSave();
@@ -53,38 +51,16 @@ class IssueStageFormTest extends Unit {
 			'name' => 'Test Stage',
 			'short_name' => 'TS',
 		]);
-
-		/**
-		 * @var IssueStage $stage
-		 */
-		$stage = $this->tester->grabRecord(IssueStage::class, [
-			'name' => 'Test Stage',
-		]);
-
-		$types = $stage->types;
-
-		$this->tester->assertNotEmpty($types);
-		$type = reset($types);
-		$this->tester->assertSame(1, $type->id);
 	}
 
 	private function thenSeeStage(array $attributes): void {
 		$this->tester->seeRecord(IssueStage::class, $attributes);
 	}
 
-	public function testNotExistedTypes(): void {
-		$this->giveModel([
-			'typesIds' => [1122112],
-		]);
-		$this->thenUnsuccessValidate();
-		$this->thenSeeError('Types is invalid.', 'typesIds');
-	}
-
 	public function testNotUniqueName(): void {
 		$this->giveModel([
 			'name' => 'Test Stage',
 			'short_name' => 'TS',
-			'typesIds' => [1],
 		]);
 
 		$this->thenSuccessSave();
@@ -92,7 +68,6 @@ class IssueStageFormTest extends Unit {
 		$this->giveModel([
 			'name' => 'Test Stage',
 			'short_name' => 'TS2',
-			'typesIds' => [2],
 		]);
 
 		$this->thenUnsuccessValidate();
@@ -103,7 +78,6 @@ class IssueStageFormTest extends Unit {
 		$this->giveModel([
 			'name' => 'Test Stage',
 			'short_name' => 'TS',
-			'typesIds' => [1],
 		]);
 
 		$this->thenSuccessSave();
@@ -111,18 +85,14 @@ class IssueStageFormTest extends Unit {
 		$this->giveModel([
 			'name' => 'Test Stage 2',
 			'short_name' => 'TS',
-			'typesIds' => [2],
 		]);
 
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Shortname "TS" has already been taken.', 'short_name');
 	}
 
-
-
 	public function getModel(): Model {
 		return $this->model;
 	}
-
 
 }

@@ -7,10 +7,25 @@ use backend\modules\issue\models\StageTypeForm;
 use common\models\issue\IssueStageType;
 use common\models\issue\IssueType;
 use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 class StageTypeController extends Controller {
+
+	/**
+	 * @inheritdoc
+	 */
+	public function behaviors(): array {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'unlink-stage-types' => ['POST'],
+				],
+			],
+		];
+	}
 
 	public function actionCreate(int $stage_id = null, int $type_id = null) {
 		$model = new StageTypeForm();
@@ -57,6 +72,16 @@ class StageTypeController extends Controller {
 	public function actionDelete(int $stage_id, int $type_id) {
 		$model = $this->findModel($stage_id, $type_id);
 		$model->delete();
+		return $this->redirect(['stage/view', 'id' => $stage_id]);
+	}
+
+	public function actionUnlinkStageTypes(int $stage_id) {
+		$model = IssueStage::findOne($stage_id);
+		if ($model === null) {
+			throw new NotFoundHttpException();
+		}
+
+		$model->unlinkAll('types', true);
 		return $this->redirect(['stage/view', 'id' => $stage_id]);
 	}
 

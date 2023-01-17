@@ -19,6 +19,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
 YiiAsset::register($this);
 
+$typesDataProvider = new ActiveDataProvider([
+	'query' => $model->getStageTypes(),
+	'pagination' => false,
+]);
+
 ?>
 <div class="issue-stage-view">
 
@@ -41,29 +46,34 @@ YiiAsset::register($this);
 		'attributes' => [
 			'name',
 			'short_name',
-			[
-				'attribute' => 'days_reminder',
-				'visible' => $model->days_reminder !== null,
-			],
-			[
-				'attribute' => 'calendar_background',
-				'visible' => $model->calendar_background !== null,
-				'contentOptions' => [
-					'style' => [
-						'background-color' => $model->calendar_background,
-					],
-				],
-			],
+			'posi',
 		],
 	]) ?>
 
 
+	<p class="clearfix">
+		<span class="pull-right">
+			<?= $typesDataProvider->totalCount
+				? Html::a(
+					Yii::t('issue', 'Unlink Types'),
+					['stage-type/unlink-stage-types', 'stage_id' => $model->id], [
+					'class' => [
+						'btn btn-danger',
+					],
+					'data' => [
+						'method' => 'POST',
+						'confirm' => Yii::t('issue', 'Are you sure you want to unlink this types?'),
+					],
+				])
+				: ''
+			?>
+		</span>
+	</p>
+
 	<?= GridView::widget([
 		'caption' => Yii::t('issue', 'Types'),
-		'dataProvider' => new ActiveDataProvider([
-			'query' => $model->getStageTypes(),
-			'pagination' => false,
-		]),
+		'dataProvider' => $typesDataProvider,
+		'emptyText' => Html::a(Yii::t('backend', 'Create'), ['stage-type/create', 'stage_id' => $model->id], ['class' => 'btn btn-success']),
 		'columns' => [
 			[
 				'attribute' => 'typeName',
@@ -72,7 +82,18 @@ YiiAsset::register($this);
 				},
 				'format' => 'html',
 			],
-			'days_reminder',
+			[
+				'attribute' => 'daysReminders',
+				'label' => Yii::t('issue', 'Days Reminders'),
+				'value' => static function (IssueStageType $data): ?string {
+					$daysReminder = $data->getDaysReminders();
+					if (empty($daysReminder)) {
+						return null;
+					}
+					return Html::ul($daysReminder);
+				},
+				'format' => 'html',
+			],
 			[
 				'attribute' => 'calendar_background',
 				'contentOptions' => static function (IssueStageType $data): array {
@@ -90,4 +111,6 @@ YiiAsset::register($this);
 			],
 		],
 	]) ?>
+
+
 </div>
