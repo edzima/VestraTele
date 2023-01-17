@@ -2,11 +2,7 @@
 
 use backend\modules\issue\models\IssueStage;
 use backend\modules\issue\models\StageTypeForm;
-use common\helpers\Html;
 use common\models\issue\IssueType;
-use common\widgets\ActiveForm;
-use kartik\color\ColorInput;
-use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model StageTypeForm */
@@ -43,39 +39,10 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Link');
 ?>
 <div class="issue-stage-type-create">
 
-	<div class="issue-stage-type-form">
-
-
-		<?php
-		$form = ActiveForm::begin(['id' => 'issue-stage-type-form']);
-		?>
-
-		<?= $type === null
-			? $form->field($model, 'type_id')->widget(Select2::class, [
-				'data' => $model->getTypesNames(),
-			])
-			: ''
-		?>
-
-		<?= $stage === null
-			? $form->field($model, 'stage_id')->widget(Select2::class, [
-				'data' => $model->getStagesNames(),
-			]) : '' ?>
-
-		<?= $form->field($model, 'days_reminder')->textInput(['maxlength' => true]) ?>
-
-		<?= $form->field($model, 'calendar_background')->widget(
-			ColorInput::class
-		) ?>
-
-
-		<div class="form-group">
-			<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>
-		</div>
-
-		<?php ActiveForm::end(); ?>
-
-	</div>
-
+	<?= $this->render('_form', [
+		'model' => $model,
+		'withType' => $type === null,
+		'withStage' => $stage === null,
+	]) ?>
 
 </div>
