@@ -344,4 +344,31 @@ class RbacController extends Controller {
 			Console::output('Delete Assignmnets: ' . $count);
 		}
 	}
+
+	public function actionAssignPermission(string $name, array $usersIds): void {
+		$auth = Yii::$app->authManager;
+		$permission = $auth->getPermission($name);
+		if ($permission) {
+			$count = 0;
+			foreach ($usersIds as $id) {
+				$auth->assign($permission, $id);
+				$count++;
+			}
+			Console::output('Assign for Users: ' . $count);
+		}
+	}
+
+	public function actionRevokePermission(string $name): void {
+		$auth = Yii::$app->authManager;
+		$permission = $auth->getPermission($name);
+		if ($permission) {
+			$count = 0;
+			$users = User::getAssignmentIds([User::PERMISSION_WORKERS]);
+			foreach ($users as $id) {
+				$auth->revoke($permission, $id);
+				$count++;
+			}
+			Console::output('Revoke for Users: ' . $count);
+		}
+	}
 }
