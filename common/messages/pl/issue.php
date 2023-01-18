@@ -134,4 +134,6 @@ return [
 	'Child Types' => 'Podtypy',
 	'All Issues' => 'Wszystkie',
 	'Click for Copy to Clipboard' => 'Kliknij aby skopiować',
+	'All Realized' => 'Zrealizowane - Wszystkie',
+	'Some Active' => 'Do Zrobienia',
 ];

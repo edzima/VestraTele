@@ -69,10 +69,16 @@ abstract class IssueSearch extends Model
 
 	public $tagsIds;
 
+	public const SUMMON_ALL_REALIZED = 'all-realized';
+	public const SUMMON_SOME_ACTIVE = 'some-active';
+
 	public ?AddressSearch $addressSearch = null;
 
 	public static function getSummonsStatusesNames(): array {
-		return Summon::getStatusesNames();
+		return [
+				static::SUMMON_ALL_REALIZED => Yii::t('issue', 'All Realized'),
+				static::SUMMON_SOME_ACTIVE => Yii::t('issue', 'Some Active'),
+			] + Summon::getStatusesNames();
 	}
 
 	/**
@@ -99,7 +105,7 @@ abstract class IssueSearch extends Model
 					'created_at', 'updated_at', 'type_additional_date_at',
 				], 'safe',
 			],
-			['summonsStatusFilter', 'in', 'range' => array_keys(static::getSummonsStatusesNames())],
+			['summonsStatusFilter', 'in', 'range' => array_keys(static::getSummonsStatusesNames()), 'allowArray' => true],
 			['customerPhone', PhoneValidator::class],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 			['parentTypeId', 'in', 'range' => array_keys(static::getParentsTypesNames())],
@@ -431,9 +437,30 @@ abstract class IssueSearch extends Model
 		if (!empty($this->summonsStatusFilter)) {
 			$query->joinWith('summons');
 			$query->groupBy(Summon::tableName() . '.issue_id');
-			$query->andWhere([
-				Summon::tableName() . '.status' => $this->summonsStatusFilter,
-			]);
+			$summonsStatuses = [];
+			foreach ($this->summonsStatusFilter as $summonFilter) {
+				switch ($summonFilter) {
+					case static::SUMMON_SOME_ACTIVE:
+						$query->andWhere(['NOT IN', Summon::tableName() . '.status', [Summon::STATUS_REALIZED]]);
+						break;
+					case static::SUMMON_ALL_REALIZED:
+						$query->andWhere([Summon::tableName() . '.status' => Summon::STATUS_REALIZED]);
+						$query->andWhere([
+							'NOT IN',
+							Issue::tableName() . '.id',
+							Summon::find()
+								->andWhere(['<>', 'status', Summon::STATUS_REALIZED])
+								->select('issue_id')
+								->distinct(),
+						]);
+						break;
+					default:
+						$summonsStatuses[] = $summonFilter;
+				}
+			}
+			if (!empty($summonsStatuses)) {
+				$query->andWhere([Summon::tableName() . '.status' => $summonsStatuses]);
+			}
 		}
 	}
 

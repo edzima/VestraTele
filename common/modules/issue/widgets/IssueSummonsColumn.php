@@ -7,6 +7,8 @@ use common\models\issue\IssueInterface;
 use common\models\issue\IssueSearch;
 use common\models\issue\Summon;
 use common\widgets\grid\DataColumn;
+use common\widgets\GridView;
+use kartik\select2\Select2;
 use Yii;
 
 class IssueSummonsColumn extends DataColumn {
@@ -26,6 +28,20 @@ class IssueSummonsColumn extends DataColumn {
 			&& $this->attribute === 'summonsStatusFilter'
 		) {
 			$this->filter = $this->grid->filterModel::getSummonsStatusesNames();
+			$this->filterType = GridView::FILTER_SELECT2;
+			if (empty($this->filterWidgetOptions)) {
+				$this->filterWidgetOptions = [
+					'options' => [
+						'multiple' => true,
+						'placeholder' => $this->label,
+					],
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				];
+			}
 		}
 	}
 
