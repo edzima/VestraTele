@@ -50,6 +50,7 @@ abstract class IssueSearch extends Model
 	public string $customerName = '';
 	public string $customerPhone = '';
 	public string $userName = '';
+	public string $userType = '';
 
 	public $excludedTypes = [];
 	public $excludedStages = [];
@@ -81,6 +82,20 @@ abstract class IssueSearch extends Model
 			] + Summon::getStatusesNames();
 	}
 
+	public static function getIssueUserTypesNames(): array {
+		$names = IssueUser::getTypesNames();
+		$unsetTypes = [
+			IssueUser::TYPE_AGENT,
+			IssueUser::TYPE_LAWYER,
+			IssueUser::TYPE_TELEMARKETER,
+			IssueUser::TYPE_CUSTOMER,
+		];
+		foreach ($unsetTypes as $unsetType) {
+			unset($names[$unsetType]);
+		}
+		return $names;
+	}
+
 	/**
 	 * @inheritdoc
 	 */
@@ -108,6 +123,7 @@ abstract class IssueSearch extends Model
 			['summonsStatusFilter', 'in', 'range' => array_keys(static::getSummonsStatusesNames()), 'allowArray' => true],
 			['customerPhone', PhoneValidator::class],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
+			['userType', 'in', 'range' => array_keys(static::getIssueUserTypesNames())],
 			['parentTypeId', 'in', 'range' => array_keys(static::getParentsTypesNames())],
 			[
 				'excludedStages', 'filter', 'filter' => function ($stages): array {
@@ -138,7 +154,8 @@ abstract class IssueSearch extends Model
 			'signedAtTo' => Yii::t('issue', 'Signed At to'),
 			'tagsIds' => Yii::t('issue', 'Tags'),
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
-			'userName' => Yii::t('issue', 'Issue User'),
+			'userName' => Yii::t('issue', 'First name & surname'),
+			'userType' => Yii::t('issue', 'Who'),
 		], Issue::instance()->attributeLabels());
 	}
 
@@ -323,15 +340,35 @@ abstract class IssueSearch extends Model
 
 	public function applyUserNameFilter(ActiveQuery $query): void {
 		if (!empty($this->userName)) {
-			$query->joinWith([
-				'users.user.userProfile UP' => function (ActiveQuery $query) {
-					$query->andWhere([
-						'like',
-						new Expression("CONCAT(UP.lastname,' ', UP.firstname)"),
-						$this->userName . '%', false,
-					]);
-				},
-			]);
+			if (empty($this->userType)) {
+				$query->joinWith([
+					'users.user.userProfile UP' => function (ActiveQuery $query) {
+						$query->andWhere([
+							'like',
+							new Expression("CONCAT(UP.lastname,' ', UP.firstname)"),
+							$this->userName . '%', false,
+						]);
+					},
+				]);
+			} else {
+				$query->joinWith([
+					'users IU' => function (ActiveQuery $userQuery) {
+						$userQuery->andWhere(
+							['IU.type' => $this->userType]
+						);
+						$userQuery->joinWith([
+							'user.userProfile UP' => function (ActiveQuery $query) {
+								$query->andWhere([
+									'like',
+									new Expression("CONCAT(UP.lastname,' ', UP.firstname)"),
+									$this->userName . '%', false,
+								]);
+							},
+						]);
+					},
+				]);
+			}
+
 			$query->distinct();
 		}
 	}

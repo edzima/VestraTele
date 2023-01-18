@@ -136,4 +136,6 @@ return [
 	'Click for Copy to Clipboard' => 'Kliknij aby skopiować',
 	'All Realized' => 'Zrealizowane - Wszystkie',
 	'Some Active' => 'Do Zrobienia',
+	'First name & surname' => 'Nazwisko & Imie',
+	'As who' => 'Jako kto',
 ];
