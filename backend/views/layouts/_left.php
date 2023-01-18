@@ -211,29 +211,32 @@ $user = Yii::$app->user;
 							'label' => Yii::t('common', 'Issues users'),
 							'url' => ['/issue/user/index'],
 							'icon' => '<i class="fa fa-users"></i>',
+							'visible' => $user->can(Worker::PERMISSION_ISSUE_LINK_USER),
 						],
 						[
 							'label' => Yii::t('issue', 'Issue Notes'),
 							'url' => ['/issue/note/index'],
 							'icon' => '<i class="fa fa-comments"></i>',
+							'visible' => $user->can(Worker::PERMISSION_NOTE_TEMPLATE),
 						],
 						[
 							'label' => Yii::t('issue', 'Issue Claims'),
 							'url' => ['/issue/claim/index'],
 							'icon' => '<i class="fa fa-percent"></i>',
-							'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
+							'visible' => $user->can(Worker::PERMISSION_ISSUE_CLAIM),
 						],
 						[
 							'label' => Yii::t('issue', 'Tags'),
 							'url' => ['/issue/tag/index'],
 							'icon' => '<i class="fa fa-tags"></i>',
+							'visible' => $user->can(Worker::PERMISSION_ISSUE_TAG_MANAGER),
 						],
 						[
 							'label' => Yii::t('issue', 'Entity Responsible'),
 							'url' => ['/entity-responsible/default/index'],
 							'icon' => '<i class="fa fa-legal"></i>',
+							'visible' => $user->can(Worker::PERMISSION_ENTITY_RESPONSIBLE_MANAGER),
 						],
-
 						[
 							'label' => Yii::t('issue', 'Types'),
 							'url' => ['/issue/type/index'],

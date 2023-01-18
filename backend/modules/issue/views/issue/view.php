@@ -123,7 +123,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 				['class' => 'btn btn-success'])
 			: '' ?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_CALCULATION_TO_CREATE)
+		<?= Yii::$app->user->can(Worker::PERMISSION_SETTLEMENT_ADMINISTRATIVE_CREATE)
 			? Html::a(
 				Yii::t('backend', 'Create administrative settlement'),
 				['/settlement/calculation/create-administrative', 'id' => $model->id],
