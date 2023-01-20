@@ -48,6 +48,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_SETTLEMENT_ADMINISTRATIVE_CREATE = 'settlement.administrative.create';
 	public const PERMISSION_PAY_ALL_PAID = 'pay.all-paid';
 	public const PERMISSION_POTENTIAL_CLIENT = 'potential-client';
+	public const PERMISSION_SETTLEMENT_DELETE_NOT_SELF = 'settlement.delete-not-self';
 
 	private static $USER_NAMES = [];
 

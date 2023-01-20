@@ -73,4 +73,5 @@ return [
 	'victim' => 'Poszkodowany',
 	'vindicator' => 'Windykator',
 	'potential-client' => 'Potencjalny Klient',
+	'settlement.delete-not-self' => 'Rozliczenia - Usuwanie nie swoich',
 ];
