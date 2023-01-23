@@ -139,6 +139,78 @@ class IssueNoteFormTest extends Unit {
 		]);
 	}
 
+	public function testUpdateNoteWithDirtyTitle(): void {
+		$noteId = $this->tester->haveRecord(IssueNote::class, [
+			'issue_id' => 1,
+			'title' => 'Test Title for Update',
+			'description' => 'Some Desc for Update',
+			'user_id' => UserFixtureHelper::AGENT_EMILY_PAT,
+		]);
+		$this->giveModel([
+			'model' => $this->tester->grabRecord(IssueNote::class, [
+				'id' => $noteId,
+			]),
+		]);
+
+		$this->model->title = 'Updated Title';
+		$this->thenSuccessSave();
+		$this->thenSeeNote(
+			[
+				'id' => $noteId,
+				'title' => 'Updated Title',
+			]
+		);
+		$this->tester->assertTrue($this->model->hasDirtyTitleOrDescription());
+	}
+
+	public function testUpdateNoteWithDirtyDescription(): void {
+		$noteId = $this->tester->haveRecord(IssueNote::class, [
+			'issue_id' => 1,
+			'title' => 'Test Title for Update',
+			'description' => 'Some Desc for Update',
+			'user_id' => UserFixtureHelper::AGENT_EMILY_PAT,
+		]);
+		$this->giveModel([
+			'model' => $this->tester->grabRecord(IssueNote::class, [
+				'id' => $noteId,
+			]),
+		]);
+
+		$this->model->description = 'Updated Description';
+		$this->thenSuccessSave();
+		$this->thenSeeNote(
+			[
+				'id' => $noteId,
+				'description' => 'Updated Description',
+			]
+		);
+		$this->tester->assertTrue($this->model->hasDirtyTitleOrDescription());
+	}
+
+	public function testUpdateNoteWithoutDirtyTitleOrDescription(): void {
+		$noteId = $this->tester->haveRecord(IssueNote::class, [
+			'issue_id' => 1,
+			'title' => 'Test Title for Update',
+			'description' => 'Some Desc for Update',
+			'user_id' => UserFixtureHelper::AGENT_EMILY_PAT,
+		]);
+		$this->giveModel([
+			'model' => $this->tester->grabRecord(IssueNote::class, [
+				'id' => $noteId,
+			]),
+		]);
+
+		$this->model->description = 'Some Desc for Update';
+		$this->thenSuccessSave();
+		$this->thenSeeNote(
+			[
+				'id' => $noteId,
+				'description' => 'Some Desc for Update',
+			]
+		);
+		$this->tester->assertFalse($this->model->hasDirtyTitleOrDescription());
+	}
+
 	private function giveModel(array $config = []): void {
 		$this->model = new IssueNoteForm($config);
 	}

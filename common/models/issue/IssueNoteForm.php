@@ -26,6 +26,9 @@ class IssueNoteForm extends Model {
 	public ?string $description = null;
 	public string $publish_at = '';
 
+	private ?string $_title = null;
+	private ?string $_description = null;
+
 	public $linkedIssues = [];
 	public bool $linkedIssuesMessages = true;
 
@@ -151,6 +154,8 @@ class IssueNoteForm extends Model {
 		$this->issue_id = $model->issue_id;
 		$this->is_pinned = $model->is_pinned;
 		$this->title = $model->title;
+		$this->_title = $model->title;
+		$this->_description = $model->description;
 		$this->type = $model->type;
 		$this->description = $model->description;
 		$this->publish_at = (string) $model->publish_at;
@@ -170,6 +175,7 @@ class IssueNoteForm extends Model {
 	public function save(): bool {
 		if ($this->beforeSave()) {
 			$model = $this->getModel();
+			$model->setAttributes(['title' => $this->title], false);
 			$model->issue_id = $this->issue_id;
 			$model->is_pinned = $this->is_pinned;
 			$model->user_id = $this->user_id;
@@ -177,7 +183,7 @@ class IssueNoteForm extends Model {
 			$model->title = $this->title;
 			$model->description = $this->description;
 			$model->publish_at = $this->publish_at;
-			$save = $model->save();
+			$save = $model->save(false);
 			if ($save) {
 				$this->mergeStageChangeAt();
 				$this->saveLinked();
@@ -185,6 +191,11 @@ class IssueNoteForm extends Model {
 			}
 		}
 		return false;
+	}
+
+	public function hasDirtyTitleOrDescription(): bool {
+		return ($this->_title !== null && $this->_title !== $this->title)
+			|| ($this->_description !== null && $this->_description !== $this->description);
 	}
 
 	protected function mergeStageChangeAt(): void {
