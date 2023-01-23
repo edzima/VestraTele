@@ -24,6 +24,10 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 
 	protected const EVENT_CLASS = SummonCalendarEvent::class;
 
+	public static function getExcludedStatuses(): array {
+		return Summon::notActiveStatuses();
+	}
+
 	public static function getSelfContractorsNames(int $userId): array {
 		$ids = Summon::find()
 			->select('contractor_id')
@@ -80,27 +84,36 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 			'NOT IN', Summon::tableName() . '.status', static::getExcludedStatuses(),
 		]);
 		$this->applyDateFilter($query);
-		$query->andWhere([
-			'contractor_id' => $this->contractor_id,
-		]);
+		$this->applyIssueParentType($query);
+		$this->applyContractorFilter($query);
 		return $dataProvider;
 	}
 
-	public static function getExcludedStatuses(): array {
-		return Summon::notActiveStatuses();
+	protected function applyContractorFilter(SummonQuery $query): void {
+		$query->andWhere([
+			'contractor_id' => $this->contractor_id,
+		]);
 	}
 
-	public static function getStatusFiltersOptions(): array {
+	public function getStatusFiltersOptions(): array {
 		$options = [];
+		$query = Summon::find()
+			->select('status')
+			->distinct();
+		$this->applyIssueParentType($query);
+		$this->applyContractorFilter($query);
+		$ids = $query->column();
 		$statusNames = static::getStatusesNames();
 		$event = static::createEvent();
 		foreach ($statusNames as $statusId => $statusName) {
-			$options[] = [
-				'value' => $statusId,
-				'isActive' => true,
-				'label' => $statusName,
-				'color' => $event::getStatusesBackgroundColors()[$statusId],
-			];
+			if (in_array($statusId, $ids)) {
+				$options[] = [
+					'value' => $statusId,
+					'isActive' => true,
+					'label' => $statusName,
+					'color' => $event::getStatusesBackgroundColors()[$statusId],
+				];
+			}
 		}
 		return $options;
 	}
@@ -109,6 +122,7 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 		if (!isset($config['class'])) {
 			$config['class'] = static::EVENT_CLASS;
 		}
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return Yii::createObject($config);
 	}
 
@@ -120,13 +134,17 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 		return $statuses;
 	}
 
-	public static function getTypesFilterOptions(): array {
+	public function getTypesFilterOptions(): array {
 		$options = [];
-		$types = SummonType::find()
+		$query = Summon::find()
+			->select(Summon::tableName() . '.type_id')
+			->joinWith('type')
 			->andWhere('calendar_background IS NOT NULL')
-			->orderBy('name')
-			->all();
-
+			->orderBy(SummonType::tableName() . '.name')
+			->distinct();
+		$this->applyIssueParentType($query);
+		$this->applyContractorFilter($query);
+		$types = SummonType::find()->andWhere(['id' => $query])->all();
 		foreach ($types as $type) {
 			/**
 			 * @var SummonType $type

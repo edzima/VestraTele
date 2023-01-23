@@ -5,7 +5,6 @@ namespace common\models\issue\search;
 use common\helpers\ArrayHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueType;
-use common\models\issue\query\IssueQuery;
 use common\models\issue\Summon;
 use common\models\issue\SummonDoc;
 use common\models\issue\SummonType;
@@ -52,11 +51,16 @@ class SummonSearch extends Summon implements
 		);
 	}
 
-	public static function getContractorsNames(): array {
-		return User::getSelectList(Summon::find()
+	public function getContractorsNames(int $ownerId = null): array {
+		$query = Summon::find()
 			->select('contractor_id')
-			->distinct()
-			->column(),
+			->distinct();
+		if ($ownerId) {
+			$query->andWhere(['owner_id' => $ownerId]);
+		}
+		$this->applyIssueParentType($query);
+		$ids = $query->column();
+		return User::getSelectList($ids,
 			false
 		);
 	}
@@ -161,10 +165,11 @@ class SummonSearch extends Summon implements
 		}
 	}
 
-	private function applyIssueParentType(ActiveQuery $query): void {
+	protected function applyIssueParentType(ActiveQuery $query): void {
 		$parentType = $this->getIssueParentType();
 		if ($parentType) {
 			$childs = ArrayHelper::getColumn($parentType->childs, 'id');
+			$query->joinWith('issue');
 			$query->andFilterWhere([Issue::tableName() . '.type_id' => $childs]);
 		}
 	}

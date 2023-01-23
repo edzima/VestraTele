@@ -1,46 +1,76 @@
 <?php
 
+use common\helpers\Url;
+use common\models\issue\IssueType;
 use common\models\issue\Summon;
 use common\modules\calendar\CalendarAsset;
 use common\modules\calendar\models\searches\ContactorSummonCalendarSearch;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\helpers\Json;
-use yii\helpers\Url;
 use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $users string[]|null */
 /* @var $user_id int|null */
+/* @var $parentType IssueType|null */
 /* @var $indexUrl string */
+/* @var $searchModel ContactorSummonCalendarSearch */
 
 $this->title = Yii::t('issue', 'Calendar');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Summons'), 'url' => $indexUrl];
 $this->params['breadcrumbs'][] = $this->title;
+$this->params['issueParentTypeNav'] = [
+	'route' => ['/calendar/summon-calendar/index', 'userId' => $user_id],
+];
+
+if ($searchModel->getIssueParentType()) {
+	$this->params['breadcrumbs'][] = [
+		'label' => $searchModel->getIssueParentType()->name,
+	];
+}
 
 CalendarAsset::register($this);
-
-$props = [
-	'filterGroups' => [
-		[
-			'id' => 0,
-			'title' => 'Statusy',
-			'filteredPropertyName' => 'statusId',
-			'filters' => ContactorSummonCalendarSearch::getStatusFiltersOptions(),
-		],
-		[
-			'id' => 1,
-			'title' => 'Typy',
-			'filteredPropertyName' => 'typeId',
-			'filters' => ContactorSummonCalendarSearch::getTypesFilterOptions(),
-		],
-		[
-			'id' => 2,
-			'title' => 'Rodzaj',
-			'filteredPropertyName' => 'is',
-			'filters' => ContactorSummonCalendarSearch::getKindFilterOptions(),
-		],
+$filterGroups = [];
+$statuses = $searchModel->getStatusFiltersOptions();
+if (!empty($statuses)) {
+	$filterGroups[] = [
+		'id' => 0,
+		'title' => 'Statusy',
+		'filteredPropertyName' => 'statusId',
+		'filters' => $statuses,
+	];
+}
+$types = $searchModel->getTypesFilterOptions();
+if (!empty($types)) {
+	$filterGroups[] = [
+		'id' => 1,
+		'title' => 'Typy',
+		'filteredPropertyName' => 'typeId',
+		'filters' => $types,
+	];
+}
+$filterGroups[] = [
+	//'id' => 2,
+	'title' => 'Rodzaj',
+	'filteredPropertyName' => 'is',
+	'filters' => ContactorSummonCalendarSearch::getKindFilterOptions(),
+];
+$httpParams = [
+	[
+		'name' => 'userId',
+		'value' => $user_id,
 	],
+];
+if ($searchModel->getIssueParentType()) {
+	$httpParams[] =
+		[
+			'name' => Url::PARAM_ISSUE_PARENT_TYPE,
+			'value' => $searchModel->getIssueParentType()->id,
+		];
+}
+$props = [
+	'filterGroups' => $filterGroups,
 	'eventSourcesConfig' => [
 		[
 			'id' => 0,
@@ -57,12 +87,7 @@ $props = [
 		],
 	],
 	'notesEnabled' => true,
-	'extraHTTPParams' => [
-		[
-			'name' => 'userId',
-			'value' => $user_id,
-		],
-	],
+	'extraHTTPParams' => $httpParams,
 	'URLAddEvent' => Url::to('/summon/create'),
 	'URLGetNotes' => Url::to(['summon-calendar-note/list']),
 	'URLCreateNote' => Url::to(['summon-calendar-note/create']),
@@ -81,7 +106,10 @@ $props = [
 				'placeholder' => Summon::instance()->getAttributeLabel('contractor_id'),
 			],
 			'pluginEvents' => [
-				'change' => new JsExpression('function(event){ window.location.replace("' . Url::to('index?userId=') . '" + this.value);}'),
+				'change' => new JsExpression('function(event){ window.location.replace("'
+					. 'index?' . Url::PARAM_ISSUE_PARENT_TYPE . "=$searchModel->issueParentTypeId"
+					. '&userId='
+					. '" + this.value);}'),
 			],
 		])
 		: '' ?>

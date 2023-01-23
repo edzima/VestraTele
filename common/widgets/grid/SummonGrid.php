@@ -214,7 +214,7 @@ class SummonGrid extends GridView {
 			[
 				'attribute' => 'contractor_id',
 				'value' => 'contractor',
-				'filter' => SummonSearch::getContractorsNames(),
+				'filter' => $this->filterModel ? $this->filterModel->getContractorsNames() : [],
 				'filterType' => static::FILTER_SELECT2,
 				'filterInputOptions' => [
 					'placeholder' => Yii::t('common', 'Contractor'),

@@ -18,7 +18,6 @@ use yii\web\Response;
 class SummonCalendarController extends Controller {
 
 	public string $summonIndexRoute = '/summon/index';
-	public string $summonCreateRoute = '/summon/create';
 	public string $summonViewRoute = '/summon/view';
 
 	public function behaviors(): array {
@@ -47,23 +46,28 @@ class SummonCalendarController extends Controller {
 		return parent::runAction($id, $params);
 	}
 
-	public function actionIndex(int $userId = null): string {
+	public function actionIndex(int $userId = null, int $parentTypeId = null): string {
 		$users = null;
 		if ($userId === null) {
 			$userId = Yii::$app->user->getId();
 		}
-		if (Yii::$app->user->can(Worker::PERMISSION_SUMMON_CREATE)) {
-			$users = ContactorSummonCalendarSearch::getSelfContractorsNames(Yii::$app->user->getId());
+		$searchModel = new ContactorSummonCalendarSearch();
+		$searchModel->issueParentTypeId = $parentTypeId;
+		$searchModel->contractor_id = $this->ensureUserId($userId);
+		if (Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
+			$users = $searchModel->getContractorsNames();
+		} elseif (Yii::$app->user->can(Worker::PERMISSION_SUMMON_CREATE)) {
+			$users = $searchModel->getContractorsNames(Yii::$app->user->id);
 		}
 		return $this->render('index', [
 			'users' => $users,
 			'user_id' => $userId,
 			'indexUrl' => Url::to($this->summonIndexRoute),
-			'createUrl' => Url::to($this->summonCreateRoute),
+			'searchModel' => $searchModel,
 		]);
 	}
 
-	public function actionList(string $start = null, string $end = null, int $userId = null): Response {
+	public function actionList(string $start = null, string $end = null, int $userId = null, int $parentTypeId = null): Response {
 		if ($start === null) {
 			$start = date('Y-m-01');
 		}
@@ -72,6 +76,7 @@ class SummonCalendarController extends Controller {
 		}
 
 		$model = new ContactorSummonCalendarSearch();
+		$model->issueParentTypeId = $parentTypeId;
 		$model->contractor_id = $this->ensureUserId($userId);
 		$model->start = $start;
 		$model->end = $end;
@@ -81,7 +86,7 @@ class SummonCalendarController extends Controller {
 		]));
 	}
 
-	public function actionDeadline(string $start = null, string $end = null, int $userId = null): Response {
+	public function actionDeadline(string $start = null, string $end = null, int $userId = null, int $parentTypeId = null): Response {
 		if ($start === null) {
 			$start = date('Y-m-01');
 		}
@@ -91,7 +96,7 @@ class SummonCalendarController extends Controller {
 
 		$model = new ContactorSummonCalendarSearch();
 		$model->scenario = ContactorSummonCalendarSearch::SCENARIO_DEADLINE;
-
+		$model->issueParentTypeId = $parentTypeId;
 		$model->contractor_id = $this->ensureUserId($userId);
 		$model->start = $start;
 		$model->end = $end;
