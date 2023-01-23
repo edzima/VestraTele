@@ -84,7 +84,7 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 			'NOT IN', Summon::tableName() . '.status', static::getExcludedStatuses(),
 		]);
 		$this->applyDateFilter($query);
-		$this->applyIssueParentType($query);
+		$this->applyIssueParentTypeFilter($query);
 		$this->applyContractorFilter($query);
 		return $dataProvider;
 	}
@@ -100,7 +100,7 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 		$query = Summon::find()
 			->select('status')
 			->distinct();
-		$this->applyIssueParentType($query);
+		$this->applyIssueParentTypeFilter($query);
 		$this->applyContractorFilter($query);
 		$ids = $query->column();
 		$statusNames = static::getStatusesNames();
@@ -142,7 +142,7 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 			->andWhere('calendar_background IS NOT NULL')
 			->orderBy(SummonType::tableName() . '.name')
 			->distinct();
-		$this->applyIssueParentType($query);
+		$this->applyIssueParentTypeFilter($query);
 		$this->applyContractorFilter($query);
 		$types = SummonType::find()->andWhere(['id' => $query])->all();
 		foreach ($types as $type) {

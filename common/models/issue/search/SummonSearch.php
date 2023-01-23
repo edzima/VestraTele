@@ -24,6 +24,7 @@ use yii\db\QueryInterface;
  */
 class SummonSearch extends Summon implements
 	CustomerSearchInterface,
+	IssueParentTypeSearchable,
 	SearchModel {
 
 	public ?int $issueParentTypeId = null;
@@ -58,7 +59,7 @@ class SummonSearch extends Summon implements
 		if ($ownerId) {
 			$query->andWhere(['owner_id' => $ownerId]);
 		}
-		$this->applyIssueParentType($query);
+		$this->applyIssueParentTypeFilter($query);
 		$ids = $query->column();
 		return User::getSelectList($ids,
 			false
@@ -129,7 +130,7 @@ class SummonSearch extends Summon implements
 
 		$this->applyCustomerNameFilter($query);
 		$this->applyCustomerPhoneFilter($query);
-		$this->applyIssueParentType($query);
+		$this->applyIssueParentTypeFilter($query);
 		// grid filtering conditions
 		$query->andFilterWhere([
 			static::SUMMON_ALIAS . '.id' => $this->id,
@@ -165,7 +166,7 @@ class SummonSearch extends Summon implements
 		}
 	}
 
-	protected function applyIssueParentType(ActiveQuery $query): void {
+	public function applyIssueParentTypeFilter(ActiveQuery $query): void {
 		$parentType = $this->getIssueParentType();
 		if ($parentType) {
 			$childs = ArrayHelper::getColumn($parentType->childs, 'id');

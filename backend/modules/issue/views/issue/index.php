@@ -31,8 +31,8 @@ use yii\widgets\Pjax;
 $this->title = Yii::t('backend', 'Issues');
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
 
-if ($searchModel->getParentType()) {
-	$this->params['breadcrumbs'][] = ['label' => $searchModel->getParentType()->name];
+if ($searchModel->getIssueParentType()) {
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name];
 }
 $this->params['issueParentTypeNav'] = [
 	'route' => ['/issue/issue/index'],

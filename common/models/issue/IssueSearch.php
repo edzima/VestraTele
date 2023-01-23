@@ -8,6 +8,7 @@ use common\models\AgentSearchInterface;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\search\ArchivedIssueSearch;
+use common\models\issue\search\IssueParentTypeSearchable;
 use common\models\issue\search\IssueTypeSearch;
 use common\models\query\PhonableQuery;
 use common\models\SearchModel;
@@ -28,6 +29,7 @@ abstract class IssueSearch extends Model
 	implements AgentSearchInterface,
 	ArchivedIssueSearch,
 	CustomerSearchInterface,
+	IssueParentTypeSearchable,
 	IssueTypeSearch,
 	SearchModel {
 
@@ -189,7 +191,7 @@ abstract class IssueSearch extends Model
 		$this->applyUserNameFilter($query);
 		$this->applyTagsFilter($query);
 		$this->applyOnlyWithTelemarketersFilter($query);
-		$this->applyParentTypeFilter($query);
+		$this->applyIssueParentTypeFilter($query);
 		$this->applySummonsStatusFilter($query);
 
 		$query->andFilterWhere([
@@ -219,7 +221,7 @@ abstract class IssueSearch extends Model
 		}
 	}
 
-	public function getParentType(): ?IssueType {
+	public function getIssueParentType(): ?IssueType {
 		if ($this->parentTypeId) {
 			return IssueType::get($this->parentTypeId);
 		}
@@ -405,10 +407,10 @@ abstract class IssueSearch extends Model
 
 	public function getStagesNames(): array {
 		$stages = IssueStage::getStagesNames($this->getWithArchive());
-		if ($this->getParentType() === null) {
+		if ($this->getIssueParentType() === null) {
 			return $stages;
 		}
-		$parent = $this->getParentType();
+		$parent = $this->getIssueParentType();
 		foreach ($stages as $id => $name) {
 			if (!$parent->hasStage($id)) {
 				unset($stages[$id]);
@@ -418,8 +420,8 @@ abstract class IssueSearch extends Model
 	}
 
 	public function getIssueTypesNames(): array {
-		if ($this->getParentType()) {
-			return ArrayHelper::map($this->getParentType()->childs, 'id', 'nameWithShort');
+		if ($this->getIssueParentType()) {
+			return ArrayHelper::map($this->getIssueParentType()->childs, 'id', 'nameWithShort');
 		}
 		return IssueType::getTypesNamesWithShort();
 	}
@@ -446,7 +448,7 @@ abstract class IssueSearch extends Model
 	}
 
 	public function excludeArchiveStage(): void {
-		if ($this->getParentType() && !$this->getParentType()->hasStage(IssueStage::ARCHIVES_ID)) {
+		if ($this->getIssueParentType() && !$this->getIssueParentType()->hasStage(IssueStage::ARCHIVES_ID)) {
 			return;
 		}
 		$this->excludedStages[] = IssueStage::ARCHIVES_ID;
@@ -456,7 +458,7 @@ abstract class IssueSearch extends Model
 		return in_array(IssueStage::ARCHIVES_ID, $this->excludedStages);
 	}
 
-	private function applyParentTypeFilter(IssueQuery $query): void {
+	public function applyIssueParentTypeFilter(ActiveQuery $query): void {
 		if (!empty($this->parentTypeId)) {
 			$type = IssueType::get($this->parentTypeId);
 			if ($type) {
