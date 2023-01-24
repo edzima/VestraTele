@@ -20,18 +20,18 @@ class IssuePayCalculationGrid extends BaseIssuePayCalculationGrid {
 	protected function actionColumn(): array {
 		return [
 			'class' => ActionColumn::class,
-			'template' => '{view} {note}',
+			'template' => '{note} {view}',
 			'visibleButtons' => [
 				'note' => Yii::$app->user->can(User::PERMISSION_NOTE),
 			],
 			'buttons' => [
 				'note' => function ($url, IssuePayCalculation $model): string {
 					return Html::a(
-						'<span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>',
+						'<i class="fa fa-comments" aria-hidden="true"></i>',
 						Url::toRoute([$this->noteRoute, 'id' => $model->id]),
 						[
-							'title' => Yii::t('common', 'Create note'),
-							'aria-label' => Yii::t('common', 'Create note'),
+							'title' => Yii::t('issue', 'Create Note'),
+							'aria-label' => Yii::t('issue', 'Create Note'),
 						]);
 				},
 			],

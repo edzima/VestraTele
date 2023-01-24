@@ -11,10 +11,11 @@ class SummonGrid extends BaseSummonGrid {
 	public string $issueColumn = IssueColumn::class;
 
 	public bool $withContractor = false;
+	public ?string $noteRoute = '/note/summon';
 
 	public function init(): void {
 		$this->actionColumn['controller'] = '/summon';
-		$this->actionColumn['template'] = '{view} {update}';
+		$this->actionColumn['template'] = '{note} {view} {update}';
 		$this->actionColumn['visibleButtons']['update'] = static function (Summon $model): bool {
 			return SummonController::canUpdate($model);
 		};

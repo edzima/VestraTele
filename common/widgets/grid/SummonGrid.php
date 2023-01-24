@@ -2,8 +2,10 @@
 
 namespace common\widgets\grid;
 
+use common\helpers\Html;
 use common\models\issue\search\SummonSearch;
 use common\models\issue\Summon;
+use common\models\user\User;
 use common\widgets\GridView;
 use DateTime;
 use kartik\select2\Select2;
@@ -25,6 +27,8 @@ class SummonGrid extends GridView {
 		'class' => ActionColumn::class,
 		'template' => '{note} {view} {update} {delete}',
 	];
+
+	public ?string $noteRoute = '/issue/note/create-summon';
 
 	public string $issueColumn = IssueColumn::class;
 	public string $valueType = self::VALUE_TYPE_NAME;
@@ -55,6 +59,18 @@ class SummonGrid extends GridView {
 		if ($this->filterModel !== null && !$this->filterModel instanceof SummonSearch) {
 			throw new InvalidConfigException('$filterModel must be instance of: ' . SummonSearch::class . '.');
 		}
+		if (!empty($this->noteRoute) && Yii::$app->user->can(User::PERMISSION_NOTE)) {
+			$this->actionColumn['buttons']['note'] = function (string $url, Summon $model): string {
+				return Html::a('<i class="fa fa-comments" aria-hidden="true"></i>',
+					[$this->noteRoute, 'id' => $model->id],
+					[
+						'title' => Yii::t('issue', 'Create Note'),
+						'aria-label' => Yii::t('issue', 'Create Note'),
+					]
+				);
+			};
+		}
+
 		if (empty($this->columns)) {
 			$this->columns = $this->defaultColumns();
 		}

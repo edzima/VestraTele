@@ -138,4 +138,5 @@ return [
 	'Some Active' => 'Do Zrobienia',
 	'First name & surname' => 'Nazwisko & Imie',
 	'As who' => 'Jako kto',
+	'Create Note' => 'Dodaj Notatkę',
 ];

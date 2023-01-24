@@ -8,12 +8,15 @@ use common\models\user\User;
 use common\models\user\Worker;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\IssuePayCalculationGrid as BaseIssuePayCalculationGrid;
+use frontend\helpers\Url;
 use Yii;
 use yii\bootstrap\Html;
 
 class IssuePayCalculationGrid extends BaseIssuePayCalculationGrid {
 
 	public string $issueColumn = IssueColumn::class;
+
+	public ?string $noteRoute = '/issue/note/create-settlement';
 
 	public function init(): void {
 		if (Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
@@ -25,7 +28,7 @@ class IssuePayCalculationGrid extends BaseIssuePayCalculationGrid {
 	protected function actionColumn(): array {
 		return [
 			'class' => ActionColumn::class,
-			'template' => '{provision} {problem-status} {view} {update} {delete}',
+			'template' => '{note} {provision} {problem-status} {view} {update} {delete}',
 			'controller' => '/settlement/calculation',
 			'visible' => [
 				'delete' => function (IssuePayCalculation $model): bool {
@@ -33,6 +36,15 @@ class IssuePayCalculationGrid extends BaseIssuePayCalculationGrid {
 				},
 			],
 			'buttons' => [
+				'note' => function ($url, IssuePayCalculation $model): string {
+					return \frontend\helpers\Html::a(
+						'<i class="fa fa-comments" aria-hidden="true"></i>',
+						Url::toRoute([$this->noteRoute, 'id' => $model->id]),
+						[
+							'title' => Yii::t('issue', 'Create Note'),
+							'aria-label' => Yii::t('issue', 'Create Note'),
+						]);
+				},
 				'problem-status' => static function (string $url, IssuePayCalculation $model): string {
 					if ($model->isPayed()) {
 						return '';
