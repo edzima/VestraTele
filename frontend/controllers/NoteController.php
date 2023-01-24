@@ -7,7 +7,6 @@ use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
-use common\models\message\IssueNoteMessagesForm;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\actions\NoteDescriptionListAction;
@@ -115,12 +114,7 @@ class NoteController extends Controller {
 		}
 		$model = IssueNoteForm::createSummon($summon);
 		$model->user_id = Yii::$app->user->getId();
-		$model->messagesForm = new IssueNoteMessagesForm([
-			'issue' => $summon->issue,
-			'sms_owner_id' => Yii::$app->user->getId(),
-		]);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$model->pushMessages();
 			$this->redirect(['/summon/view', 'id' => $summon->id]);
 		}
 		return $this->render('summon', [
