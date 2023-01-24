@@ -134,7 +134,12 @@ class NoteController extends Controller {
 		}
 		$model = IssueNoteForm::createSummon($summon);
 		$model->user_id = Yii::$app->user->getId();
+		$model->messagesForm = new IssueNoteMessagesForm([
+			'issue' => $summon->issue,
+			'sms_owner_id' => Yii::$app->user->getId(),
+		]);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$model->pushMessages();
 			return $this->redirectIssue($summon->issue_id);
 		}
 		return $this->render('create-summon', [
