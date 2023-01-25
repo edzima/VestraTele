@@ -139,4 +139,5 @@ return [
 	'First name & surname' => 'Nazwisko & Imie',
 	'As who' => 'Jako kto',
 	'Create Note' => 'Dodaj Notatkę',
+	'Send Email to: {worker}' => 'Wyślij Email do: {worker}',
 ];

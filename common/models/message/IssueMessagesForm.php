@@ -5,14 +5,16 @@ namespace common\models\message;
 use common\components\message\MessageTemplate;
 use common\components\message\MessageTemplateKeyHelper;
 use common\helpers\Html;
+use common\models\forms\HiddenFieldsModel;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueUser;
+use common\models\user\User;
 use frontend\helpers\Url;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\mail\MessageInterface;
 
-class IssueMessagesForm extends MessageModel {
+class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 
 	protected const KEY_ISSUE_TYPES = 'issueTypes';
 
@@ -25,6 +27,12 @@ class IssueMessagesForm extends MessageModel {
 	public ?bool $sendSmsToAgent = null;
 	public ?bool $sendEmailToCustomer = null;
 	public ?bool $sendEmailToWorkers = null;
+	public ?bool $sendEmailToExtraWorker = null;
+	public ?User $emailExtraWorker;
+
+	public array $extraWorkersEmails = [];
+
+	public array $hiddenFields = [];
 
 	public $workersTypes = [
 		IssueUser::TYPE_AGENT,
@@ -41,6 +49,12 @@ class IssueMessagesForm extends MessageModel {
 	protected ?MessageTemplate $agentSMSTemplate = null;
 	protected ?MessageTemplate $customerEmailTemplate = null;
 	protected ?MessageTemplate $workersEmailTemplate = null;
+
+	public function addWorkerEmail(User $user): void {
+		if ($user->email) {
+			$this->extraWorkersEmails[$user->email] = $user->getFullName();
+		}
+	}
 
 	public function setIssue(IssueInterface $issue): void {
 		$this->issue = $issue;
@@ -62,7 +76,8 @@ class IssueMessagesForm extends MessageModel {
 
 	public function rules(): array {
 		return [
-			[['sendSmsToCustomer', 'sendEmailToCustomer', 'sendSmsToAgent', 'sendEmailToWorkers'], 'boolean'],
+			['!emailUserId', 'integer'],
+			[['sendSmsToCustomer', 'sendEmailToCustomer', 'sendSmsToAgent', 'sendEmailToWorkers', 'sendEmailToExtraWorker'], 'boolean'],
 			[
 				'workersTypes', 'required',
 				'enableClientValidation' => false,
@@ -87,7 +102,24 @@ class IssueMessagesForm extends MessageModel {
 			'sendEmailToCustomer' => Yii::t('issue', 'Send Email To Customer'),
 			'sendEmailToWorkers' => Yii::t('issue', 'Send Email To Workers'),
 			'workersTypes' => Yii::t('issue', 'Workers'),
+			'extraWorkersEmails' => Yii::t('issue', 'Extra Workers Emails'),
 		];
+	}
+
+	private array $_extraWorkersEmails = [];
+	/**
+	 * @var string[] extra users names indexed by IDs.
+	 */
+	public array $extraWorkers = [];
+
+	public function getExtraWorkersEmailsData(): array {
+		if (empty($this->_extraWorkersEmails) && !empty($this->extra)) {
+//@todo
+		}
+		return User::find()
+			->joinWith('userProfile')
+			->andWhere(['id' => $this->extraWorkersEmails])
+			->all();
 	}
 
 	public function pushMessages(): ?int {
@@ -425,4 +457,7 @@ class IssueMessagesForm extends MessageModel {
 		return MessageTemplateKeyHelper::getValue($key, static::KEY_ISSUE_TYPES);
 	}
 
+	public function isVisibleField(string $attribute): bool {
+		return empty($this->hiddenFields) || !in_array($attribute, $this->hiddenFields, true);
+	}
 }
