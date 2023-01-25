@@ -4,6 +4,7 @@ use common\models\issue\Issue;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
+use frontend\helpers\Breadcrumbs;
 use frontend\helpers\Html;
 use frontend\widgets\issue\StageChangeButtonDropdown;
 use frontend\widgets\issue\SummonCreateButtonDropdown;
@@ -17,8 +18,7 @@ use yii\data\DataProviderInterface;
 /* @var $summonDataProvider DataProviderInterface|null */
 
 $this->title = $model->longId;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 ?>
 <div class="issue-view">
@@ -42,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		?>
 
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE)
+		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE) || Yii::$app->user->can(Worker::PERMISSION_NOTE_SELF)
 			? Html::a(Yii::t('common', 'Create note'), ['/note/issue', 'id' => $model->id], [
 				'class' => 'btn btn-info',
 			])

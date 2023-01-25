@@ -3,6 +3,7 @@
 use common\models\issue\IssueInterface;
 use common\models\user\Worker;
 use common\modules\issue\IssueNoteColumn;
+use common\modules\issue\widgets\IssueSummonsColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AgentDataColumn;
 use common\widgets\grid\CustomerDataColumn;
@@ -15,6 +16,7 @@ use frontend\widgets\GridView;
 use frontend\widgets\issue\StageChangeButtonDropdown;
 use frontend\widgets\IssueColumn;
 use kartik\select2\Select2;
+use yii\bootstrap\Nav;
 use yii\grid\SerialColumn;
 use yii\widgets\Pjax;
 
@@ -23,20 +25,44 @@ use yii\widgets\Pjax;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('common', 'Issues');
-$this->params['breadcrumbs'][] = $this->title;
+if ($searchModel->getIssueParentType()) {
+	$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name, Url::issuesParentType($searchModel->getIssueParentType()->id)];
+} else {
+	$this->params['breadcrumbs'][] = $this->title;
+}
+$parentMenuItems = Html::issueParentTypeItems();
 
 ?>
 <div class="issue-index">
 
-	<h1><?= Html::encode($this->title) ?></h1>
+	<?php if (empty($parentMenuItems)): ?>
+		<h1><?= Html::encode($this->title) ?></h1>
+	<?php else: ?>
+		<h1 class="title-with-nav">
+			<?= Html::encode($this->title) ?>
+			<?= Nav::widget([
+				'items' => $parentMenuItems,
+				'options' => [
+					'class' => 'nav nav-pills',
+				],
+			]); ?>
+		</h1>
+
+	<?php endif; ?>
 
 	<p>
-		<?= Html::a(Yii::t('frontend', 'Search issue user'), 'user', ['class' => 'btn btn-info']) ?>
-		<?= Html::a(Yii::t('frontend', 'Yours settlements'), '/settlement/index', ['class' => 'btn btn-success']) ?>
-		<?= Html::a(Yii::t('settlement', 'Pays'), '/pay/index', ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('frontend', 'Search issue user'), ['user'], ['class' => 'btn btn-info']) ?>
+		<?= Html::a(Yii::t('frontend', 'Yours settlements'), ['/settlement/index'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('settlement', 'Pays'), ['/pay/index'], ['class' => 'btn btn-success']) ?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
+			? Html::a(Yii::t('issue', 'Summons'), ['/summon/index'], ['class' => 'btn btn-warning'])
+			: ''
+		?>
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_PAY_RECEIVED)
-			? Html::a(Yii::t('settlement', 'Received pays'), '/pay-received/index', ['class' => 'btn btn-primary'])
+			? Html::a(Yii::t('settlement', 'Received pays'), ['/pay-received/index'], ['class' => 'btn btn-primary'])
 			: ''
 		?>
 	</p>
@@ -60,6 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'emptyText' => $searchModel->hasExcludedArchiveStage() ? Yii::t('issue', 'Archive is Excluded. Check in them.') : null,
 		'columns' => [
 			['class' => SerialColumn::class], // @todo to approval
 			[
@@ -179,6 +206,9 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => IssueNoteColumn::class,
+			],
+			[
+				'class' => IssueSummonsColumn::class,
 			],
 			[
 				'class' => ActionColumn::class,

@@ -2,11 +2,14 @@
 
 use backend\helpers\Breadcrumbs;
 use backend\modules\issue\widgets\IssueSmsButtonDropdown;
+use backend\modules\issue\widgets\IssueViewSummonsWidgets;
+use backend\modules\issue\widgets\IssueViewTopSummonsWidgets;
 use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\modules\issue\widgets\SummonCreateButtonDropdown;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
+use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
@@ -120,7 +123,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 				['class' => 'btn btn-success'])
 			: '' ?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_CALCULATION_TO_CREATE)
+		<?= Yii::$app->user->can(Worker::PERMISSION_SETTLEMENT_ADMINISTRATIVE_CREATE)
 			? Html::a(
 				Yii::t('backend', 'Create administrative settlement'),
 				['/settlement/calculation/create-administrative', 'id' => $model->id],
@@ -157,16 +160,26 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		: ''
 	?>
 
+	<?= IssueViewTopSummonsWidgets::widget([
+		'dataProvider' => $summonDataProvider,
+	]) ?>
+
+
 	<?= IssueViewWidget::widget([
 		'model' => $model,
 		'relationActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
 		'claimActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
 	]) ?>
 
-	<?= $this->render('_summon', [
+	<?= IssueViewSummonsWidgets::widget([
 		'dataProvider' => $summonDataProvider,
 	]) ?>
 
-	<?= IssueNotesWidget::widget(['model' => $model]) ?>
+
+	<?= IssueNotesWidget::widget([
+		'model' => $model,
+		'collapseTypes' => [IssueNotesWidget::TYPE_SMS],
+		'withProvisionControl' => Yii::$app->user->can(User::PERMISSION_PROVISION),
+	]) ?>
 
 </div>

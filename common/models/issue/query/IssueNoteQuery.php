@@ -41,7 +41,9 @@ class IssueNoteQuery extends ActiveQuery {
 	}
 
 	public function withoutTypes(array $types): self {
-		$this->andWhere(['not in', 'type', $types]);
+		foreach ($types as $type) {
+			$this->andWhere(['NOT LIKE', 'type', $type]);
+		}
 		return $this;
 	}
 

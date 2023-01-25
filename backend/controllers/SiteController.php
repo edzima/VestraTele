@@ -154,6 +154,10 @@ class SiteController extends Controller {
 				'label' => Yii::t('backend', 'Robot SMS Owner'),
 				'type' => FormModel::TYPE_TEXTINPUT,
 			];
+			$keys[KeyStorageItem::KEY_CALENDAR_USERS_BACKGROUND] = [
+				'label' => Yii::t('backend', 'Calendar - Users Color'),
+				'type' => FormModel::TYPE_TEXTAREA,
+			];
 		}
 
 		if (Yii::$app->user->can(User::PERMISSION_PROVISION)) {

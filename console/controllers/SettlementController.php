@@ -3,7 +3,7 @@
 namespace console\controllers;
 
 use backend\modules\settlement\models\AdministrativeCalculationForm;
-use common\components\provision\exception\MissingProvisionUserException;
+use common\components\provision\exception\Exception;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
 use Yii;
@@ -34,7 +34,7 @@ class SettlementController extends Controller {
 				Yii::$app->provisions->removeForPays($model->getPays()->getIds());
 				try {
 					Yii::$app->provisions->settlement($model);
-				} catch (MissingProvisionUserException $exception) {
+				} catch (Exception $exception) {
 					Console::output($exception->getMessage());
 				}
 			}

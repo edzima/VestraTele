@@ -29,6 +29,41 @@ class IssueProvisionTypeTest extends ProvisionTypeTest {
 		});
 	}
 
+	public function testExcludedIssueUserTypesWithoutSet(): void {
+		$type = new IssueProvisionType();
+		$this->tester->assertFalse($type->hasExcludedIssueUserTypes(null, [
+			IssueUser::TYPE_AGENT,
+		]));
+
+		$type->setIssueExcludedUserTypes([]);
+		$this->tester->assertFalse($type->hasExcludedIssueUserTypes(null, [
+			IssueUser::TYPE_AGENT,
+		]));
+	}
+
+	public function testExcludedIssueUserTypesWithoutIssue(): void {
+		$type = new IssueProvisionType();
+		$type->setIssueExcludedUserTypes([
+			IssueUser::TYPE_LAWYER,
+			IssueUser::TYPE_TELEMARKETER,
+		]);
+
+		$this->tester->assertFalse($type->hasExcludedIssueUserTypes(null, [
+			IssueUser::TYPE_CUSTOMER,
+			IssueUser::TYPE_AGENT,
+		]));
+
+		$this->tester->assertTrue($type->hasExcludedIssueUserTypes(null, [
+			IssueUser::TYPE_LAWYER,
+			IssueUser::TYPE_TELEMARKETER,
+		]));
+
+		$this->tester->assertTrue($type->hasExcludedIssueUserTypes(null, [
+			IssueUser::TYPE_LAWYER,
+			IssueUser::TYPE_TELEMARKETER,
+		]));
+	}
+
 	public function testRequiredIssueUserTypesWithoutRequired(): void {
 		$type = new IssueProvisionType();
 		$this->tester->assertTrue($type->hasRequiredIssueUserTypes(null, [

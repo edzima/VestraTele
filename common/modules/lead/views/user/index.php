@@ -1,10 +1,11 @@
 <?php
 
+use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadUsersSearch;
 use common\modules\lead\Module;
-use yii\helpers\Html;
 use common\widgets\GridView;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadUsersSearch */
@@ -37,8 +38,15 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Users');
 		'filterModel' => $searchModel,
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
-
-			'lead_id',
+			[
+				'attribute' => 'lead_id',
+				'format' => 'html',
+				'value' => function (LeadUser $data): string {
+					return Html::a(Html::encode($data->lead->getName()), [
+						'lead/view', 'id' => $data->lead_id,
+					]);
+				},
+			],
 			[
 				'attribute' => 'leadName',
 				'value' => 'lead.name',
@@ -68,6 +76,8 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Users');
 				'value' => 'typeName',
 				'filter' => LeadUsersSearch::getTypesNames(),
 			],
+			'created_at:datetime',
+			'updated_at:datetime',
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>

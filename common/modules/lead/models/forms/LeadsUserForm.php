@@ -65,6 +65,18 @@ class LeadsUserForm extends Model {
 		if (!$this->validate()) {
 			return null;
 		}
+		if ($this->scenario === static::SCENARIO_SINGLE || count($this->leadsIds) === 1) {
+			$leadId = reset($this->leadsIds);
+			$this->saveSingle($leadId, $this->type, $this->userId);
+			return 1;
+		}
+		return $this->saveMultiple();
+	}
+
+	protected function saveMultiple(): int {
+		if (empty($this->leadsIds)) {
+			return 0;
+		}
 		$rows = [];
 		foreach ($this->leadsIds as $leadId) {
 			$rows[] = [
@@ -104,6 +116,24 @@ class LeadsUserForm extends Model {
 			}
 		}
 		return $count;
+	}
+
+	private function saveSingle(int $leadId, string $type, int $userId) {
+		$user = LeadUser::find()
+			->andWhere([
+				'lead_id' => $leadId,
+				'type' => $type,
+			])
+			->one();
+		if ($user === null) {
+			$user = new LeadUser();
+			$user->lead_id = $leadId;
+			$user->type = $type;
+			$user->user_id = $userId;
+		}
+		if ($user->user_id !== $userId) {
+			$user->save();
+		}
 	}
 
 }

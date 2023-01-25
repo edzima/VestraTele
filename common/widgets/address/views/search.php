@@ -12,6 +12,7 @@ use yii\widgets\ActiveForm;
 /* @var $this View */
 /* @var $form ActiveForm */
 /* @var $model AddressSearch */
+/* @var $withPostalCode bool */
 ?>
 <div class="address-search-widget">
 	<div class="row">
@@ -100,11 +101,14 @@ use yii\widgets\ActiveForm;
 
 
 
-		<?= $form->field($model, 'postal_code', [
-			'options' => [
-				'class' => 'col-md-2 col-lg-1',
-			],
-		])->textInput() ?>
+		<?= $withPostalCode
+			? $form->field($model, 'postal_code', [
+				'options' => [
+					'class' => 'col-md-2 col-lg-1',
+				],
+			])->textInput()
+			: ''
+		?>
 
 
 		<?= $form->field($model, 'city_name', [

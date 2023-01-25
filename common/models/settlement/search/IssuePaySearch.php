@@ -4,11 +4,13 @@ namespace common\models\settlement\search;
 
 use common\models\AgentSearchInterface;
 use common\models\issue\IssuePay;
+use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\search\ArchivedIssueSearch;
+use common\models\issue\search\IssueStageSearchable;
 use common\models\issue\search\IssueTypeSearch;
 use common\models\SearchModel;
 use common\models\user\CustomerSearchInterface;
@@ -27,6 +29,7 @@ class IssuePaySearch extends IssuePay implements
 	AgentSearchInterface,
 	ArchivedIssueSearch,
 	IssueTypeSearch,
+	IssueStageSearchable,
 	CustomerSearchInterface,
 	SearchModel {
 
@@ -52,6 +55,7 @@ class IssuePaySearch extends IssuePay implements
 
 	public $agent_id;
 
+	public $issueStagesIds = [];
 	public $issueTypesIds = [];
 	public $calculationType;
 	public $deadlineAtFrom;
@@ -90,7 +94,9 @@ class IssuePaySearch extends IssuePay implements
 				return array_keys($this->getAgentsNames());
 			}, 'allowArray' => true,
 			],
-			['issueTypesIds', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
+			['issueStagesIds', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
+
+			['issueTypesIds', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 		];
 	}
 
@@ -145,6 +151,8 @@ class IssuePaySearch extends IssuePay implements
 			},
 		]);
 		$query->joinWith('issue.type IT');
+		$query->joinWith('issue.stage IS');
+
 		if (!$this->getWithArchive()) {
 			$query->joinWith([
 				'issue' => function (IssueQuery $query): void {
@@ -175,6 +183,7 @@ class IssuePaySearch extends IssuePay implements
 		$this->applyCustomerNameFilter($query);
 		$this->applyDelayFilter($query);
 		$this->applyIssueTypeFilter($query);
+		$this->applyIssueStageFilter($query);
 
 		//	$this->applyStatusFilter($query);
 
@@ -313,7 +322,17 @@ class IssuePaySearch extends IssuePay implements
 		}
 	}
 
-	public static function getIssueTypesNames(): array {
+	public function getIssueTypesNames(): array {
 		return IssueType::getTypesNames();
+	}
+
+	public function getIssueStagesNames(): array {
+		return IssueStage::getStagesNames(true);
+	}
+
+	public function applyIssueStageFilter(QueryInterface $query): void {
+		if (!empty($this->issueStagesIds)) {
+			$query->andWhere(['IS.id' => $this->issueStagesIds]);
+		}
 	}
 }

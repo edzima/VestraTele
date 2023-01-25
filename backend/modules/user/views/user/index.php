@@ -1,10 +1,10 @@
 <?php
 
+use backend\helpers\Html;
 use backend\modules\user\models\search\UserSearch;
 use backend\widgets\GridView;
 use common\models\user\UserProfile;
 use common\widgets\grid\ActionColumn;
-use yii\bootstrap\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel UserSearch */
@@ -19,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create user'), ['create'], ['class' => 'btn btn-success']) ?>
 		<?= Html::a(Yii::t('common', 'User Traits'), ['trait/index'], ['class' => 'btn btn-warning']) ?>
+		<?= Html::a(Yii::t('backend', 'User Visibles'), ['visible/index'], ['class' => 'btn btn-info']) ?>
 	</p>
 
 	<?= $this->render('_search', [

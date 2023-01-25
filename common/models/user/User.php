@@ -70,6 +70,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const ROLE_LAWYER = 'lawyer';
 	public const ROLE_LAWYER_ASSISTANT = 'lawyer_assistant';
 	public const ROLE_GUARDIAN = 'guardian';
+	public const ROLE_VINDICATOR = 'vindicator';
 
 	public const PERMISSION_ARCHIVE = 'archive';
 	public const PERMISSION_MESSAGE_TEMPLATE = 'message.template';
@@ -80,6 +81,8 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const PERMISSION_MEET = 'meet';
 	public const PERMISSION_NEWS = 'news';
 	public const PERMISSION_NOTE = 'note';
+	public const PERMISSION_NOTE_SELF = 'note.self';
+
 	public const PERMISSION_SUMMON = 'summon';
 	public const PERMISSION_COST = 'cost';
 

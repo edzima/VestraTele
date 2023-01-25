@@ -48,15 +48,15 @@ class IssueViewCest {
 		$I->dontSeeLink('Costs');
 		$I->dontSeeLink('Create settlement');
 		$I->dontSeeLink('Create Summon');
-		$I->dontSeeLink('Create Provision');
+		$I->dontSeeLink('Create Claims');
 	}
 
-	public function checkProvisionLink(IssueManager $I): void {
+	public function checkClaimLink(IssueManager $I): void {
 		$I->amLoggedIn();
 		$I->assignPermission(ClaimCest::PERMISSION);
 		$this->goToIssuePage($I);
-		$I->seeLink('Create Provision');
-		$I->click('Create Provision');
+		$I->seeLink('Create Claims');
+		$I->click('Create Claims');
 		$I->seeInCurrentUrl(ClaimCest::ROUTE_CREATE);
 	}
 
@@ -117,6 +117,9 @@ class IssueViewCest {
 		$I->dontSeeLink('Delete');
 		$I->sendAjaxPostRequest(Url::to([static::ROUTE_DELETE, 'id' => $model->id]), $I->getCSRF());
 		$I->seeResponseCodeIs(403);
+		$I->seeRecord(Issue::class, [
+			'id' => $model->id,
+		]);
 	}
 
 	public function checkDeleteLinkWithPermission(IssueManager $I): void {

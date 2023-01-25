@@ -134,6 +134,7 @@ class NoteController extends Controller {
 		}
 		$model = IssueNoteForm::createSummon($summon);
 		$model->user_id = Yii::$app->user->getId();
+
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirectIssue($summon->issue_id);
 		}
@@ -160,12 +161,19 @@ class NoteController extends Controller {
 			throw new ForbiddenHttpException('Only self note can update or User with Note Update permission.');
 		}
 		$model = new IssueNoteForm();
+		$model->messagesForm = new IssueNoteMessagesForm([
+			'issue' => $note->issue,
+			'sms_owner_id' => Yii::$app->user->getId(),
+		]);
 		if (Yii::$app->user->can(Worker::PERMISSION_NOTE_TEMPLATE)) {
 			$model->scenario = IssueNoteForm::SCENARIO_TEMPLATE;
 		}
 		$model->setModel($note);
-
+		$model->getModel()->getDirtyAttributes();
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			if ($model->hasDirtyTitleOrDescription()) {
+				$model->pushMessages();
+			}
 			if ($model->getModel()->isForSettlement()) {
 				return $this->redirect(['/settlement/calculation/view', 'id' => $model->getModel()->getEntityId()]);
 			}

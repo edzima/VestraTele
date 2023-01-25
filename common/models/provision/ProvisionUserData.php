@@ -37,6 +37,11 @@ class ProvisionUserData extends BaseObject {
 			->distinct()
 			->column();
 		$types = ProvisionType::getTypes(true);
+		foreach ($types as $id => $type) {
+			if ($type->getBaseType() !== null) {
+				unset($types[$id]);
+			}
+		}
 		if (empty($typesIds)) {
 			return $types;
 		}

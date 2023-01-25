@@ -10,7 +10,7 @@ use yii\helpers\Html;
 
 class LastCurrentNextMonthNav extends Nav {
 
-	public $baseRoute = 'index';
+	public $route = ['index'];
 	public array $extraParams = [];
 	public string $linkDateFormat = 'Y-m';
 	public string $modelDateFormat = 'Y-m-d';
@@ -22,6 +22,8 @@ class LastCurrentNextMonthNav extends Nav {
 	public Model $model;
 	public string $dateFromAttribute = 'dateFrom';
 	public string $dateToAttribute = 'dateTo';
+	public ?string $dateFromParamName = null;
+	public ?string $dateToParamName = null;
 
 	public function init() {
 		parent::init();
@@ -97,11 +99,18 @@ class LastCurrentNextMonthNav extends Nav {
 	}
 
 	protected function generateUrl(string $dateFromValue, string $dateToValue): string {
-		$route = [];
-		$route[] = $this->baseRoute;
-		$route[Html::getInputName($this->model, $this->dateFromAttribute)] = $dateFromValue;
-		$route[Html::getInputName($this->model, $this->dateToAttribute)] = $dateToValue;
+		$route = $this->route;
+		$route[$this->getDateFromParamName()] = $dateFromValue;
+		$route[$this->getDateToParamName()] = $dateToValue;
 		return Url::to(array_merge($route, $this->extraParams));
+	}
+
+	protected function getDateFromParamName(): string {
+		return $this->dateFromParamName ?: Html::getInputName($this->model, $this->dateFromAttribute);
+	}
+
+	protected function getDateToParamName(): string {
+		return $this->dateToParamName ?: Html::getInputName($this->model, $this->dateToAttribute);
 	}
 
 }

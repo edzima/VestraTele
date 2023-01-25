@@ -4,7 +4,7 @@ namespace backend\modules\provision\controllers;
 
 use backend\helpers\Url;
 use backend\modules\provision\models\SettlementUserProvisionsForm;
-use common\components\provision\exception\MissingProvisionUserException;
+use common\components\provision\exception\Exception;
 use common\helpers\Flash;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
@@ -44,6 +44,7 @@ class SettlementController extends Controller {
 			'query' => Provision::find()
 				->andWhere(['pay_id' => $model->getPays()->getIds()])
 				->joinWith('pay.calculation.pays')
+				->with(['type', 'fromUser.userProfile', 'toUser.userProfile'])
 				->orderBy(['value' => SORT_DESC]),
 			'pagination' => false,
 			'sort' => false,
@@ -105,7 +106,7 @@ class SettlementController extends Controller {
 					)
 				);
 			}
-		} catch (MissingProvisionUserException $exception) {
+		} catch (Exception $exception) {
 			Flash::add(Flash::TYPE_ERROR, $exception->getMessage());
 		}
 	}
@@ -178,6 +179,7 @@ class SettlementController extends Controller {
 					$settlement->getCostsWithoutUser($model->getIssueUser()->user_id)
 				),
 				'modelClass' => IssueCost::class,
+				'key' => 'id',
 			]
 		);
 
@@ -194,7 +196,7 @@ class SettlementController extends Controller {
 					Flash::add(Flash::TYPE_SUCCESS, Yii::t('provision', 'Success! Generate {count} provisions.', ['count' => $count]));
 				}
 				return $this->redirect(['view', 'id' => $id]);
-			} catch (MissingProvisionUserException $exception) {
+			} catch (Exception $exception) {
 				Flash::add(Flash::TYPE_ERROR, $exception->getMessage());
 			}
 		}
@@ -214,6 +216,11 @@ class SettlementController extends Controller {
 			Flash::add(Flash::TYPE_SUCCESS,
 				Yii::t('provision', 'Remove {count} provisions.', ['count' => $count]));
 		}
+		if ($model->isProvisionControl()) {
+			$model->unmarkProvisionControl();
+			Flash::add(Flash::TYPE_INFO,
+				Yii::t('provision', 'Unmark provision control.'));
+		}
 
 		return $this->redirect(['view', 'id' => $id]);
 	}
@@ -222,8 +229,12 @@ class SettlementController extends Controller {
 		$count = 0;
 		foreach ($ids as $id) {
 			$model = $this->findModel($id);
+			if ($model->isProvisionControl()) {
+				$model->unmarkProvisionControl();
+			}
 			$count += Yii::$app->provisions->removeForPays($model->getPays()->getIds());
 		}
+
 		if ($count) {
 			Flash::add(Flash::TYPE_SUCCESS,
 				Yii::t('provision', 'Remove {count} provisions.', ['count' => $count]));
@@ -231,7 +242,7 @@ class SettlementController extends Controller {
 		return $this->redirect(['/settlement/calculation/index']);
 	}
 
-	private function findModel(int $id): IssueSettlement {
+	private function findModel(int $id): IssuePayCalculation {
 		$model = IssuePayCalculation::findOne($id);
 		if ($model === null) {
 			throw new NotFoundHttpException();

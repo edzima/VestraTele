@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'attribute' => 'type',
 				'filter' => IssueNoteSearch::getTypesNames(),
-				'value' => 'typeKind',
+				'value' => 'typeKindName',
 				'noWrap' => true,
 			],
 			[

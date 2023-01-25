@@ -5,8 +5,10 @@ namespace backend\tests\functional\user;
 use backend\tests\FunctionalTester;
 use backend\tests\Step\Functional\Manager;
 use common\fixtures\AddressFixture;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\fixtures\user\CustomerFixture;
 use common\fixtures\user\UserAddressFixture;
+use common\fixtures\UserProfileFixture;
 use common\models\user\User;
 use common\models\user\UserProfile;
 use common\models\user\UserTraitAssign;
@@ -30,6 +32,11 @@ class CustomerCreateCest {
 				'class' => CustomerFixture::class,
 				'dataFile' => codecept_data_dir() . 'customer.php',
 			],
+			'customer-profile' => [
+				'class' => UserProfileFixture::class,
+				'dataFile' => codecept_data_dir() . 'customer_profile.php',
+			],
+			'traits' => UserFixtureHelper::traits(),
 			'user-address' => [
 				'class' => UserAddressFixture::class,
 				'dataFile' => codecept_data_dir() . 'customer_address.php',
@@ -91,6 +98,16 @@ class CustomerCreateCest {
 		]);
 	}
 
+	public function checkDuplicateWithFixtures(FunctionalTester $I): void {
+		$I->fillField('Firstname', 'John');
+		$I->fillField('Lastname', 'Wayne');
+		$I->fillField('Postal Code', '34-200');
+		$this->sendForm($I);
+		$I->seeValidationError('You must accept duplicates before create User.');
+		$I->dontSeeEmailIsSent();
+		$I->seeInGridHeader('Firstname');
+	}
+
 	public function checkCorrectWithSendEmail(FunctionalTester $I): void {
 		$I->fillField('Email', 'fred@test.com');
 		$I->fillField('Firstname', 'Fred');
@@ -119,6 +136,8 @@ class CustomerCreateCest {
 	}
 
 	public function checkInvalidEmail(FunctionalTester $I): void {
+		$I->fillField('Firstname', 'Fred');
+		$I->fillField('Lastname', 'Johansson');
 		$I->fillField('Email', 'not-address-email');
 		$this->sendForm($I);
 		$I->dontSeeEmailIsSent();

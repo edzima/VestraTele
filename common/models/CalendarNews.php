@@ -14,10 +14,15 @@ use yii\db\ActiveRecord;
  * @property int $user_id
  * @property string $start_at
  * @property string $end_at
+ * @property string $type
  *
  * @property-read User $user
  */
 class CalendarNews extends ActiveRecord {
+
+	public const TYPE_ISSUE_STAGE_DEADLINE = 'issue.stage.deadline';
+	public const TYPE_SUMMON = 'summon';
+	public const TYPE_LEAD_REMINDER = 'lead.reminder';
 
 	/**
 	 * @inheritdoc

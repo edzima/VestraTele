@@ -10,7 +10,7 @@ use common\models\provision\ProvisionQuery;
 use common\models\user\User;
 use DateTime;
 use Decimal\Decimal;
-use frontend\helpers\Url;
+use frontend\helpers\Url as FrontendUrl;
 use Yii;
 use yii\base\InvalidCallException;
 use yii\behaviors\TimestampBehavior;
@@ -49,6 +49,15 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 
 	use IssueTrait;
 
+	public static array $paysProblems = [
+		self::PROBLEM_STATUS_PREPEND_DEMAND,
+		self::PROBLEM_STATUS_DEMAND,
+		self::PROBLEM_STATUS_PREPEND_JUDGEMENT,
+		self::PROBLEM_STATUS_JUDGEMENT,
+		self::PROBLEM_STATUS_BAILLIF,
+		self::PROBLEM_STATUS_EXTERNAL_DEBT_COLLECTION,
+	];
+
 	public const PROBLEM_STATUS_PREPEND_DEMAND = 10;
 	public const PROBLEM_STATUS_DEMAND = 15;
 	public const PROBLEM_STATUS_PREPEND_JUDGEMENT = 20;
@@ -56,8 +65,26 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	public const PROBLEM_STATUS_BAILLIF = 40;
 	public const PROBLEM_STATUS_EXTERNAL_DEBT_COLLECTION = 50;
 
+	public const PROBLEM_STATUS_PROVISION_CONTROL = 60;
+
 	private static ?array $STAGES_NAMES = null;
 	private static ?array $OWNER_NAMES = null;
+
+	private static ?int $provisionControlCount = null;
+
+	public static function getProvisionControlSettlementCount(bool $refresh = false): int {
+		if (static::$provisionControlCount === null || $refresh) {
+			if ($refresh) {
+				Yii::$app->cache->set('provision.control_settlement_count', null);
+			}
+			static::$provisionControlCount = (int) Yii::$app->cache->getOrSet('provision.control_settlement_count', function (): int {
+				return IssuePayCalculation::find()
+					->onlyProblems([IssuePayCalculation::PROBLEM_STATUS_PROVISION_CONTROL])
+					->count();
+			}, 0);
+		}
+		return static::$provisionControlCount;
+	}
 
 	public function afterSave($insert, $changedAttributes): void {
 		parent::afterSave($insert, $changedAttributes);
@@ -129,6 +156,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 			'is_provider_notified' => Yii::t('common', 'Is provider notified'),
 			'costsSum' => Yii::t('settlement', 'Costs sum'),
 			'valueWithoutCosts' => Yii::t('settlement', 'Value without costs'),
+			'payedSum' => Yii::t('settlement', 'Payed Sum'),
 		];
 	}
 
@@ -192,7 +220,11 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	}
 
 	public function getFrontendUrl(): string {
-		return Url::settlementView($this->getId(), true);
+		return FrontendUrl::settlementView($this->getId(), true);
+	}
+
+	public function getCreatedAt(): string {
+		return date(DATE_ATOM, strtotime($this->created_at));
 	}
 
 	public function isForUser(int $id): bool {
@@ -247,6 +279,10 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 			return false;
 		}
 		return $this->getValueToPay()->isZero();
+	}
+
+	public function getPayedSum(): Decimal {
+		return Yii::$app->pay->payedSum($this->pays);
 	}
 
 	public function getDecimalValue(): Decimal {
@@ -345,6 +381,29 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 		return $count;
 	}
 
+	public function hasProvisions(): bool {
+		return $this->getPays()
+			->joinWith('provisions p')
+			->andWhere('p.id IS NOT NULL')
+			->exists();
+	}
+
+	public function isProvisionControl(): bool {
+		return $this->problem_status === static::PROBLEM_STATUS_PROVISION_CONTROL;
+	}
+
+	public function markAsProvisionControl(): void {
+		$this->problem_status = static::PROBLEM_STATUS_PROVISION_CONTROL;
+	}
+
+	public function unmarkProvisionControl(): void {
+		if ($this->isProvisionControl()) {
+			$this->updateAttributes([
+				'problem_status' => null,
+			]);
+		}
+	}
+
 	public static function getOwnerNames(): array {
 		if (static::$OWNER_NAMES === null) {
 			$ids = self::find()
@@ -368,6 +427,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 			static::PROBLEM_STATUS_JUDGEMENT => Yii::t('settlement', 'Judgement'),
 			static::PROBLEM_STATUS_BAILLIF => Yii::t('settlement', 'Baillif'),
 			static::PROBLEM_STATUS_EXTERNAL_DEBT_COLLECTION => Yii::t('settlement', 'External debt collection'),
+			static::PROBLEM_STATUS_PROVISION_CONTROL => Yii::t('settlement', 'Provision Control'),
 		];
 	}
 
@@ -396,6 +456,7 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 	public static function getTypesNames(): array {
 		return [
 			static::TYPE_HONORARIUM => Yii::t('settlement', 'Honorarium'),
+			static::TYPE_HONORARIUM_VINDICATION => Yii::t('settlement', 'Honorarium - Vindication'),
 			static::TYPE_ADMINISTRATIVE => Yii::t('settlement', 'Administrative'),
 			static::TYPE_APPEAL => Yii::t('settlement', 'Appeal'),
 			static::TYPE_LAWYER => Yii::t('settlement', 'Lawyer'),

@@ -5,9 +5,7 @@ namespace backend\modules\issue\widgets;
 use backend\modules\issue\controllers\SummonController;
 use backend\widgets\IssueColumn;
 use common\models\issue\Summon;
-use common\models\user\Worker;
 use common\widgets\grid\SummonGrid as BaseSummonGrid;
-use Yii;
 
 class SummonGrid extends BaseSummonGrid {
 
@@ -18,10 +16,10 @@ class SummonGrid extends BaseSummonGrid {
 		$this->actionColumn['controller'] = '/issue/summon';
 		$this->actionColumn['visibleButtons'] = [
 			'update' => function (Summon $model): bool {
-				return $model->isForUser(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER);
+				return SummonController::canUpdate($model);
 			},
 			'delete' => function (Summon $model): bool {
-				return $model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER);
+				return SummonController::canDelete($model);
 			},
 		];
 		parent::init();

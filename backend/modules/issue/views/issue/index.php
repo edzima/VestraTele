@@ -12,6 +12,7 @@ use common\models\user\Worker;
 use common\modules\issue\IssueNoteColumn;
 use common\modules\issue\widgets\IssueClaimCompanyColumn;
 use common\modules\issue\widgets\IssuePaysColumnWidget;
+use common\modules\issue\widgets\IssueSummonsColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
@@ -28,10 +29,18 @@ use yii\widgets\Pjax;
 /* @var $dataProvider ActiveDataProvider */
 
 $this->title = Yii::t('backend', 'Issues');
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
+
+if ($searchModel->getIssueParentType()) {
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name];
+}
+$this->params['issueParentTypeNav'] = [
+	'route' => ['/issue/issue/index'],
+];
 
 ?>
 <div class="issue-index">
+
 	<?php Pjax::begin([
 		'timeout' => 2000,
 	]); ?>
@@ -39,17 +48,37 @@ $this->params['breadcrumbs'][] = $this->title;
 	<div class="clearfix form-group">
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
-			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index'], ['class' => 'btn btn-warning'])
+			? Html::a(Yii::t('common', 'Summons'), ['/issue/summon/index', 'parentTypeId' => $searchModel->parentTypeId], [
+				'class' => 'btn btn-warning',
+				'data-pjax' => 0,
+			])
 			: ''
 		?>
 		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE)
-			? Html::a(Yii::t('issue', 'Issue Notes'), ['note/index'], ['class' => 'btn btn-info'])
+			? Html::a(Yii::t('issue', 'Issue Notes'), ['note/index'], [
+				'class' => 'btn btn-info',
+				'data-pjax' => 0,
+			])
 			: ''
 		?>
 		<?= Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)
-			? Html::a(Yii::t('backend', 'Settlements'), ['/settlement/calculation/index'], ['class' => 'btn btn-success'])
+			? Html::a(Yii::t('backend', 'Settlements'), ['/settlement/calculation/index'], [
+				'class' => 'btn btn-success',
+				'data-pjax' => 0,
+			])
 			: ''
 		?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE)
+			? Html::a('<i class="fa fa-calendar"></i>' . ' ' . Yii::t('issue', 'Stages Deadlines'),
+				['/calendar/issue-stage-deadline/index'],
+				[
+					'class' => 'btn btn-warning',
+					'data-pjax' => 0,
+				])
+			: ''
+		?>
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
 			? CsvForm::widget([
 				'formOptions' => ['class' => 'pull-right'],
@@ -129,14 +158,17 @@ $this->params['breadcrumbs'][] = $this->title;
 		'id' => 'issues-list',
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'rowOptions' => function (Issue $issue): array {
+		'rowOptions' => static function (Issue $issue): array {
 			if ($issue->hasDelayedStage()) {
 				return [
-					'class' => 'danger',
+					'style' => [
+						'background-color' => '#f5c6cb',
+					],
 				];
 			}
 			return [];
 		},
+		'emptyText' => $searchModel->hasExcludedArchiveStage() ? Yii::t('issue', 'Archive is Excluded. Check in them.') : null,
 		'columns' => [
 			Yii::$app->user->can(Worker::PERMISSION_MULTIPLE_SMS)
 				? [
@@ -258,6 +290,14 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => DataColumn::class,
+				'attribute' => 'stage_deadline_at',
+				'format' => 'date',
+				'options' => [
+					'style' => 'width:95px',
+				],
+			],
+			[
+				'class' => DataColumn::class,
 				'attribute' => 'signing_at',
 				'format' => 'date',
 				'options' => [
@@ -289,6 +329,9 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => IssueNoteColumn::class,
+			],
+			[
+				'class' => IssueSummonsColumn::class,
 			],
 			[
 				'class' => IssuePaysColumnWidget::class,

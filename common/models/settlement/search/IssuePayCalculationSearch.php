@@ -34,6 +34,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 	public const SCENARIO_ARCHIVE = 'archive';
 
+
 	public $agent_id;
 	public string $customerLastname = '';
 	public $issue_type_id;
@@ -49,7 +50,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public bool $withArchive = false;
 	public ?bool $withoutProvisions = null;
 
-	public ?bool $onlyWithProblems = null;
+	public ?bool $onlyWithPayProblems = null;
 	public bool $onlyToPayed = false;
 
 	/**
@@ -59,7 +60,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		return [
 			[['issue_id', 'stage_id', 'problem_status', 'owner_id'], 'integer'],
 			['type', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
-			['issue_type_id', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
+			['issue_type_id', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			['issue_stage_id', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true, 'when' => function (): bool { return $this->withIssueStage; }],
 
 			['agent_id', 'in', 'range' => array_keys($this->getAgentsNames()), 'allowArray' => true],
@@ -170,10 +171,10 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	}
 
 	protected function applyProblemStatusFilter(IssuePayCalculationQuery $query): void {
-		if ($this->onlyWithProblems === false) {
+		if ($this->onlyWithPayProblems === false) {
 			$query->onlyWithoutProblems();
-		} elseif ($this->onlyWithProblems === true) {
-			$query->onlyProblems();
+		} elseif ($this->onlyWithPayProblems === true) {
+			$query->onlyProblems(static::$paysProblems);
 		}
 		if ($this->problem_status > 0) {
 			$query->onlyProblems((array) $this->problem_status);
@@ -237,7 +238,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		}
 	}
 
-	public static function getIssueTypesNames(): array {
+	public function getIssueTypesNames(): array {
 		return IssueType::getTypesNamesWithShort();
 	}
 

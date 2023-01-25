@@ -2,7 +2,6 @@
 
 namespace backend\modules\issue\models\search;
 
-use backend\modules\issue\models\IssueStage;
 use common\models\AddressSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
@@ -15,7 +14,6 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
 use yii\db\QueryInterface;
-use yii\helpers\ArrayHelper;
 
 /**
  * IssueSearch model for backend app.
@@ -27,9 +25,9 @@ class IssueSearch extends BaseIssueSearch {
 	public const SCENARIO_ALL_PAYED = 'allPayed';
 
 	public $parentId;
-	public $excludedStages = [];
 	public $onlyWithSettlements;
 
+	public $onlyWithClaims;
 	public ?string $claimCompanyTryingValue = null;
 
 	public bool $onlyDelayed = false;
@@ -38,6 +36,9 @@ class IssueSearch extends BaseIssueSearch {
 	public bool $withArchiveOnAllPayedPay = false;
 
 	public $stage_change_at;
+
+	public $stageDeadlineFromAt;
+	public $stageDeadlineToAt;
 
 	public ?string $signature_act = null;
 	private ?array $ids = null;
@@ -52,22 +53,26 @@ class IssueSearch extends BaseIssueSearch {
 	public function rules(): array {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
-			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements'], 'boolean'],
+			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims',], 'boolean'],
+			[['onlyWithSettlements', 'onlyWithClaims'], 'default', 'value' => null],
 			['claimCompanyTryingValue', 'number', 'min' => 0],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
-			[['type_additional_date_at', 'signature_act', 'stage_change_at'], 'safe'],
-			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
+			[['type_additional_date_at', 'signature_act', 'stage_change_at', 'stageDeadlineFromAt', 'stageDeadlineToAt'], 'safe'],
+
 		]);
 	}
 
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
 			'parentId' => Yii::t('backend', 'Structures'),
-			'excludedStages' => Yii::t('backend', 'Excluded stages'),
+
 			'onlyDelayed' => Yii::t('backend', 'Only delayed'),
+			'onlyWithClaims' => Yii::t('backend', 'Only with Claims'),
 			'onlyWithPayedPay' => Yii::t('backend', 'Only with payed pay'),
 			'onlyWithSettlements' => Yii::t('settlement', 'Only with Settlements'),
 			'onlyWithAllPayedPay' => Yii::t('settlement', 'Only with all paid Pays'),
+			'stageDeadlineFromAt' => Yii::t('backend', 'Stage Deadline from at'),
+			'stageDeadlineToAt' => Yii::t('backend', 'Stage Deadline to at'),
 		]);
 	}
 
@@ -100,6 +105,11 @@ class IssueSearch extends BaseIssueSearch {
 		}
 		$this->issueQueryFilter($query);
 
+		$dataProvider->sort->attributes['claimCompanyTryingValue'] = [
+			'asc' => ['trying_value' => SORT_ASC],
+			'desc' => ['trying_value' => SORT_DESC],
+		];
+
 		return $dataProvider;
 	}
 
@@ -114,12 +124,12 @@ class IssueSearch extends BaseIssueSearch {
 		parent::issueQueryFilter($query);
 		$this->signatureActFilter($query);
 		$this->delayedFilter($query);
-		$this->excludedStagesFilter($query);
 		$this->teleFilter($query);
 		$this->lawyerFilter($query);
 		$this->payedFilter($query);
 		$this->settlementsFilter($query);
 		$this->stageChangeAtFilter($query);
+		$this->applyStageDeadlineFilter($query);
 		$this->claimFilter($query);
 	}
 
@@ -141,29 +151,13 @@ class IssueSearch extends BaseIssueSearch {
 
 	private function delayedFilter(IssueQuery $query): void {
 		if (!empty($this->onlyDelayed)) {
-			$query->joinWith('stage');
-			$daysGroups = ArrayHelper::map($this->getStagesNames(), 'id', 'days_reminder', 'days_reminder');
-
-			foreach ($daysGroups as $day => $ids) {
-				if (!empty($day)) {
-					$query->orFilterWhere([
-						'and',
-						[
-							Issue::tableName() . '.stage_id' => array_keys($ids),
-						],
-						[
-							'<=', new Expression("DATE_ADD(stage_change_at, INTERVAL $day DAY)"), new Expression('NOW()'),
-						],
-					]);
-				}
-			}
-			$query->andWhere(Issue::tableName() . '.stage_change_at IS NOT NULL');
-			$query->andWhere(IssueStage::tableName() . '.days_reminder is NOT NULL');
+			$query->andWhere('stage_deadline_at IS NOT NULL');
+			$query->andWhere([
+				'<=',
+				'stage_deadline_at',
+				new Expression('NOW()'),
+			]);
 		}
-	}
-
-	protected function excludedStagesFilter(IssueQuery $query): void {
-		$query->andFilterWhere(['NOT IN', Issue::tableName() . '.stage_id', $this->excludedStages]);
 	}
 
 	protected function lawyerFilter(IssueQuery $query): void {
@@ -241,6 +235,25 @@ class IssueSearch extends BaseIssueSearch {
 				IssueClaim::tableName() . '.type' => IssueClaim::TYPE_COMPANY,
 			]);
 			$query->andWhere(['like', IssueClaim::tableName() . '.trying_value', $this->claimCompanyTryingValue]);
+		}
+
+		if ($this->onlyWithClaims === null || $this->onlyWithClaims === '') {
+			return;
+		}
+		$query->joinWith('claims', false);
+		if ((bool) $this->onlyWithClaims === true) {
+			$query->andWhere(IssueClaim::tableName() . '.trying_value IS NOT NULL');
+			return;
+		}
+		$query->andWhere(IssueClaim::tableName() . '.issue_id IS NULL');
+	}
+
+	private function applyStageDeadlineFilter(IssueQuery $query): void {
+		if (!empty($this->stageDeadlineFromAt)) {
+			$query->andWhere(['>', Issue::tableName() . '.stage_deadline_at', date('Y-m-d 00:00:00', strtotime($this->stageDeadlineFromAt))]);
+		}
+		if (!empty($this->stageDeadlineToAt)) {
+			$query->andWhere(['<', Issue::tableName() . '.stage_deadline_at', date('Y-m-d 23:59:59', strtotime($this->stageDeadlineToAt))]);
 		}
 	}
 

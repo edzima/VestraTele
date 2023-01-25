@@ -65,7 +65,10 @@ $this->registerJs($js);
 
 		<?= Html::a(Yii::t('lead', 'Lead Reports'), ['report/index'], ['class' => 'btn btn-warning']) ?>
 
-		<?= Html::a(Yii::t('lead', 'Lead Reminders'), ['reminder/index'], ['class' => 'btn btn-danger']) ?>
+		<span class="btn-group">
+			<?= Html::a(Yii::t('lead', 'Lead Reminders'), ['reminder/index'], ['class' => 'btn btn-danger']) ?>
+			<?= Html::a(Html::icon('calendar'), ['/calendar/lead-reminder/index'], ['class' => 'btn btn-danger']) ?>
+		</span>
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_DIALER_MANAGER)
 			? Html::a(Yii::t('lead', 'Dialers'), ['dialer/index'], ['class' => 'btn btn-primary'])

@@ -15,6 +15,9 @@ class Breadcrumbs {
 			$breadcrumbs = static::customer($model->getIssueModel()->customer);
 		}
 		$breadcrumbs[] = ['label' => Yii::t('backend', 'Issues'), 'url' => ['/issue/issue/index']];
+		if ($model->getIssueType()->getParentName()) {
+			$breadcrumbs[] = ['label' => $model->getIssueType()->getParentName(), 'url' => ['/issue/issue/index', 'parentTypeId' => $model->getIssueType()->parent_id]];
+		}
 		$breadcrumbs[] = ['label' => $model->getIssueName(), 'url' => Url::issueView($model->getIssueId())];
 		return $breadcrumbs;
 	}

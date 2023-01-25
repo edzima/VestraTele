@@ -14,7 +14,8 @@ use yii\data\DataProviderInterface;
  */
 class ProvisionReportSearch extends ProvisionSearch {
 
-	public int $limit = 100;
+	public int $limit = 500;
+	public $hide_on_report = false;
 
 	public function setToUser(User $user): void {
 		$this->toUser = $user;
@@ -39,7 +40,7 @@ class ProvisionReportSearch extends ProvisionSearch {
 		/* @var $query ProvisionQuery */
 		$query = $provider->query;
 		$query->notHidden();
-
+		$query->joinWith('pay.calculation.pays');
 		return $provider;
 	}
 
@@ -47,11 +48,17 @@ class ProvisionReportSearch extends ProvisionSearch {
 		return new ArrayDataProvider([
 			'allModels' => IssueCost::find()
 				->indexBy('id')
-				->with('issue')
+				->with([
+					'issue',
+					'issue.customer.userProfile',
+					'settlements',
+				])
 				->user($this->to_user_id)
 				->notSettled()
+				->notHidden()
 				->andWhere(['between', 'date_at', $this->dateFrom, $this->dateTo])
 				->all(),
+			'pagination' => false,
 		]);
 	}
 
@@ -59,10 +66,16 @@ class ProvisionReportSearch extends ProvisionSearch {
 		return new ArrayDataProvider([
 			'allModels' => IssueCost::find()
 				->indexBy('id')
-				->with('issue')
+				->with([
+					'issue',
+					'issue.customer.userProfile',
+				])
 				->user($this->to_user_id)
+				->notHidden()
 				->settled($this->dateFrom, $this->dateTo)
 				->all(),
+			'pagination' => false,
+
 		]);
 	}
 
@@ -73,6 +86,15 @@ class ProvisionReportSearch extends ProvisionSearch {
 
 		$this->applyDateFilter($query);
 		return $query->exists();
+	}
+
+	public function hasHiddenCost(): bool {
+		return IssueCost::find()
+			->hidden()
+			->andFilterWhere(['>=', 'date_at', $this->dateFrom])
+			->andFilterWhere(['<=', 'date_at', $this->dateTo])
+			->user($this->to_user_id)
+			->exists();
 	}
 
 	public function summary(): ProvisionReportSummary {

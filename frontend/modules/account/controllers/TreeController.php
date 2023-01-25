@@ -2,6 +2,7 @@
 
 namespace frontend\modules\account\controllers;
 
+use common\models\user\UserVisible;
 use common\models\user\Worker;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -34,7 +35,9 @@ class TreeController extends Controller {
 			throw new NotFoundHttpException('Only for worker.');
 		}
 		$dataProvider = new ActiveDataProvider([
-			'query' => $worker->getAllChildesQuery()->with(['userProfile']),
+			'query' => $worker->getAllChildesQuery()
+				->with(['userProfile'])
+				->andFilterWhere(['NOT IN', Worker::tableName() . '.id', UserVisible::hiddenUsers($worker->id)]),
 		]);
 		return $this->render('index', [
 			'dataProvider' => $dataProvider,

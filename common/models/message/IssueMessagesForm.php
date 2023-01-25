@@ -202,7 +202,7 @@ class IssueMessagesForm extends MessageModel {
 		return $this->createEmail($template)->setTo($this->getCustomerEmail());
 	}
 
-	private function getCustomerEmailTemplate(): ?MessageTemplate {
+	protected function getCustomerEmailTemplate(): ?MessageTemplate {
 		if ($this->customerEmailTemplate === null) {
 			$this->customerEmailTemplate = $this->getEmailTemplate($this->getCustomerTemplateKey());
 		}

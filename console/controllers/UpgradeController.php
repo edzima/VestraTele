@@ -5,6 +5,7 @@ namespace console\controllers;
 use backend\modules\settlement\models\CalculationProblemStatusForm;
 use common\components\DbManager;
 use common\helpers\StringHelper;
+use common\models\CalendarNews;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
@@ -24,6 +25,10 @@ use yii\helpers\Console;
 use yii\helpers\Json;
 
 class UpgradeController extends Controller {
+
+	public function actionCalendarNewsType(): void {
+		CalendarNews::updateAll(['type' => CalendarNews::TYPE_SUMMON]);
+	}
 
 	public function actionIssueProvisions(): void {
 		$a = '10.3';

@@ -66,6 +66,13 @@ class UserController extends Controller {
 		}
 		Url::remember();
 
+		if ($model->type && $model->type->getBaseType()) {
+			Flash::add(Flash::TYPE_INFO,
+				Yii::t('provision', 'Type has Base Type: {name}.', [
+					'name' => $model->type->getBaseType()->name,
+				]));
+		}
+
 		$allChildesQuery = $model->getAllChildesQueryWithoutProvision();
 		if ($allChildesQuery && ($childesCount = $allChildesQuery->count()) > 0) {
 			Flash::add(Flash::TYPE_WARNING,

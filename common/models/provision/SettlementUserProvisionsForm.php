@@ -86,7 +86,11 @@ class SettlementUserProvisionsForm extends Model {
 		$data = new ProvisionUserData($this->user->user);
 		$data->date = $this->model->issue->created_at;
 		if ($this->typeId) {
-			$data->type = $this->getType($this->typeId);
+			$type = $this->getType($this->typeId);
+			$data->type = $type;
+			if ($type !== null && $type->getIsForDateFromSettlement()) {
+				$data->date = $this->model->getCreatedAt();
+			}
 		}
 		return $data;
 	}
@@ -155,7 +159,7 @@ class SettlementUserProvisionsForm extends Model {
 		if ($this->types === null) {
 			$types = IssueProvisionType::findSettlementTypes($this->model, $this->user->type);
 			if (count($types) > 1) {
-				$types = IssueProvisionType::filter($types, function (IssueProvisionType $type): bool {
+				$types = IssueProvisionType::filter($types, static function (IssueProvisionType $type): bool {
 					return !empty($type->getIssueRequiredUserTypes());
 				});
 			}

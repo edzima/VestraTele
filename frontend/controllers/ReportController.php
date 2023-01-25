@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\models\provision\ProvisionReportSearch;
+use common\models\user\UserVisible;
 use common\models\user\Worker;
 use Yii;
 use yii\filters\AccessControl;
@@ -32,8 +33,14 @@ class ReportController extends Controller {
 	public function actionIndex(int $user_id = null): string {
 		$currentUserId = Yii::$app->user->getId();
 		$searchModel = new ProvisionReportSearch();
+		$searchModel->excludedFromUsers = UserVisible::hiddenUsers(Yii::$app->user->getId());
 		$searchModel->to_user_id = $currentUserId;
+		$searchModel->withoutEmpty = true;
 		if ($user_id !== null && $user_id !== $currentUserId) {
+			if (in_array($user_id, $searchModel->excludedFromUsers)) {
+				Yii::warning("User: $currentUserId try view provision report for excluded user: " . $user_id);
+				throw new NotFoundHttpException();
+			}
 			if (!Yii::$app->user->can(Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE)) {
 				Yii::warning("User: $currentUserId without permission try visible child: $user_id provision.");
 				throw new MethodNotAllowedHttpException();

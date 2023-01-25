@@ -3,6 +3,7 @@
 use backend\helpers\Html;
 use backend\modules\issue\models\search\SummonTypeSearch;
 use backend\widgets\GridView;
+use common\models\issue\SummonType;
 use common\widgets\grid\ActionColumn;
 
 /* @var $this yii\web\View */
@@ -32,8 +33,16 @@ $this->params['breadcrumbs'][] = $this->title;
 			['class' => 'yii\grid\SerialColumn'],
 			'name',
 			'short_name',
-			'title',
-			'term',
+			[
+				'attribute' => 'calendar_background',
+				'contentOptions' => function (SummonType $data): array {
+					$options = [];
+					if (!empty($data->calendar_background)) {
+						$options['style']['background-color'] = $data->calendar_background;
+					}
+					return $options;
+				},
+			],
 			['class' => ActionColumn::class],
 		],
 	]); ?>

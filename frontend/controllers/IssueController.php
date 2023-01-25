@@ -9,6 +9,7 @@
 namespace frontend\controllers;
 
 use common\models\issue\Issue;
+use common\models\user\UserVisible;
 use common\models\user\Worker;
 use frontend\helpers\Url;
 use frontend\models\IssueStageChangeForm;
@@ -48,19 +49,26 @@ class IssueController extends Controller {
 	/**
 	 * Lists all Issue models available for current User.
 	 *
+	 * @param int|null $parentTypeId
 	 * @return string
+	 * @see Url::PARAM_ISSUE_PARENT_TYPE
 	 */
-	public function actionIndex(): string {
+	public function actionIndex(int $parentTypeId = null): string {
 		$user = Yii::$app->user;
 		$searchModel = new IssueSearch();
+		$searchModel->parentTypeId = $parentTypeId;
 		if ($user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
+			$searchModel->excludeArchiveStage();
 		}
 		$searchModel->user_id = (int) $user->getId();
 
 		if ($user->can(Worker::ROLE_AGENT)) {
-			$searchModel->agentsIds = Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId());
+			$searchModel->includedUsersIds = Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId());
 		}
+		$visible = UserVisible::visibleUsers(Yii::$app->user->getId());
+		$searchModel->includedUsersIds = array_unique(array_merge($searchModel->includedUsersIds, $visible));
+		$searchModel->excludedUsersIds = UserVisible::hiddenUsers(Yii::$app->user->getId());
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		return $this->render('index', [
 			'searchModel' => $searchModel,
@@ -108,6 +116,8 @@ class IssueController extends Controller {
 			$search->onlyToPayed = false;
 			$search->withAgents = false;
 			$search->withArchive = true;
+			$search->onlyWithPayProblems = null;
+			$search->problem_status = null;
 			$calculationsDataProvider = $search->search([]);
 		}
 		$summonDataProvider = (new SummonSearch(['issue_id' => $model->id]))->search([]);

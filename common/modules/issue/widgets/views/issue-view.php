@@ -28,7 +28,7 @@ use yii\data\ActiveDataProvider;
 			<?= IssueUsersWidget::widget([
 				'model' => $model,
 				'type' => IssueUsersWidget::TYPE_CUSTOMERS,
-				'legendEncode' => !$usersLinks,
+				'legendEncode' => false,
 				'withCheckEmailVisibility' => $userMailVisibilityCheck,
 				'withTraits' => true,
 				'legend' => function (IssueUser $issueUser) use ($usersLinks, $model): string {
@@ -275,6 +275,12 @@ use yii\data\ActiveDataProvider;
 								}
 								return $issue->getIssueStage()->name;
 							},
+						],
+						[
+							'attribute' => 'stage_deadline_at',
+							'label' => $model->getAttributeLabel('stage_deadline_at'),
+							'format' => 'date',
+							'visible' => !empty($model->getIssueModel()->stage_deadline_at),
 						],
 						[
 							'attribute' => 'entityResponsible',

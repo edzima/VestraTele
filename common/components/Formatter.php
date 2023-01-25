@@ -14,6 +14,7 @@ use yii\i18n\Formatter as BaseFormatter;
 class Formatter extends BaseFormatter {
 
 	public const FRACTION_DIGITS = 2;
+	public const FRACTION_PERCENT_DIGITS = 4;
 
 	public $numberFormatterOptions = [
 		NumberFormatter::MIN_FRACTION_DIGITS => self::FRACTION_DIGITS,
@@ -21,7 +22,7 @@ class Formatter extends BaseFormatter {
 	public string $defaultPhoneRegion = 'PL';
 	public int $defaultPhoneFormat = PhoneNumberFormat::INTERNATIONAL;
 
-	public function asCityCode(?string $city, ?string $code) {
+	public function asCityCode(?string $city, ?string $code, bool $postalStrongTag = true) {
 		if ($city === null && $code === null) {
 			return $this->nullDisplay;
 		}
@@ -31,7 +32,12 @@ class Formatter extends BaseFormatter {
 		if ($code === null) {
 			return Html::encode($city);
 		}
-		return Html::encode("$city - ($code)");
+		$city = Html::encode($city);
+		$code = Html::encode($code);
+		if ($postalStrongTag) {
+			$code = Html::tag('strong', $code);
+		}
+		return "$city - [$code]";
 	}
 
 	public function asMonthDay($date): string {
@@ -40,7 +46,7 @@ class Formatter extends BaseFormatter {
 
 	public function asPercent($value, $decimals = null, $options = [], $textOptions = []) {
 		if ($value instanceof Decimal) {
-			$value = $value->toFixed(self::FRACTION_DIGITS);
+			$value = $value->toFixed(self::FRACTION_PERCENT_DIGITS);
 		}
 		return parent::asPercent($value, $decimals, $options, $textOptions);
 	}
@@ -65,7 +71,7 @@ class Formatter extends BaseFormatter {
 
 	public function asTel($value, $options = []) {
 		if ($value === null) {
-			return $this->nullDisplay;
+			return ArrayHelper::getValue($options, 'nullDisplay', $this->nullDisplay);
 		}
 		$defaultRegion = ArrayHelper::remove($options, 'default_region', $this->defaultPhoneRegion);
 		$format = ArrayHelper::remove($options, 'format', $this->defaultPhoneFormat);
@@ -76,7 +82,11 @@ class Formatter extends BaseFormatter {
 		} catch (NumberParseException $e) {
 		}
 
-		return Html::telLink(Html::encode($value), $value, $options);
+		$asLink = ArrayHelper::remove($options, 'asLink', true);
+		if ($asLink) {
+			return Html::telLink(Html::encode($value), $value, $options);
+		}
+		return Html::encode($value);
 	}
 
 	public function asPhoneDatabase($value, $options = []): ?string {

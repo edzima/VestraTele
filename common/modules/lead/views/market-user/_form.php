@@ -1,6 +1,7 @@
 <?php
 
 use common\modules\lead\models\LeadMarketUser;
+use common\widgets\DateWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -13,9 +14,13 @@ use yii\widgets\ActiveForm;
 
 	<?php $form = ActiveForm::begin(); ?>
 
-	<?= $form->field($model, 'status')->textInput() ?>
+	<?= $form->field($model, 'status')->dropDownList(LeadMarketUser::getStatusesNames()) ?>
 
 	<?= $form->field($model, 'details')->textarea() ?>
+
+	<?= $form->field($model, 'reserved_at')->widget(
+		DateWidget::class
+	) ?>
 
 
 	<div class="form-group">

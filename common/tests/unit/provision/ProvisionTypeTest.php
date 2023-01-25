@@ -44,6 +44,17 @@ class ProvisionTypeTest extends Unit {
 		$this->tester->assertSame('Provision (' . Yii::$app->formatter->getCurrencySymbol() . ')', $type->getAttributeLabel('formattedValue'));
 	}
 
+	public function testBaseTypeId(): void {
+		$type = new ProvisionType();
+		$this->tester->assertNull($type->getBaseTypeId());
+		$type->setBaseTypeId(null);
+		$this->tester->assertNull($type->getBaseTypeId());
+		$type->setBaseTypeId(1);
+		$this->tester->assertSame(1, $type->getBaseTypeId());
+		$type->setBaseTypeId(null);
+		$this->tester->assertNull($type->getBaseTypeId());
+	}
+
 	protected function grabType(string $index): ProvisionType {
 		return $this->tester->grabFixture(ProvisionFixtureHelper::TYPE, $index);
 	}

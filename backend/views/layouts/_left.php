@@ -1,6 +1,8 @@
 <?php
 
 use backend\widgets\Menu;
+use common\helpers\Html;
+use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
 use common\models\user\Worker;
 use yii\web\View;
@@ -197,49 +199,60 @@ $user = Yii::$app->user;
 						[
 							'label' => Yii::t('common', 'Browse'),
 							'url' => ['/issue/issue/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'options' => empty(Html::issueParentTypeItems())
+								? []
+								: [
+									'class' => 'treeview',
+								],
+							'icon' => '<i class="fa fa-eye"></i>',
+							'items' => Html::issueParentTypeItems(),
 						],
 						[
 							'label' => Yii::t('common', 'Issues users'),
 							'url' => ['/issue/user/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-users"></i>',
+							'visible' => $user->can(Worker::PERMISSION_ISSUE_LINK_USER),
 						],
 						[
 							'label' => Yii::t('issue', 'Issue Notes'),
 							'url' => ['/issue/note/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-comments"></i>',
+							'visible' => $user->can(Worker::PERMISSION_NOTE_TEMPLATE),
 						],
 						[
 							'label' => Yii::t('issue', 'Issue Claims'),
 							'url' => ['/issue/claim/index'],
 							'icon' => '<i class="fa fa-percent"></i>',
-							'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
+							'visible' => $user->can(Worker::PERMISSION_ISSUE_CLAIM),
 						],
 						[
 							'label' => Yii::t('issue', 'Tags'),
 							'url' => ['/issue/tag/index'],
 							'icon' => '<i class="fa fa-tags"></i>',
+							'visible' => $user->can(Worker::PERMISSION_ISSUE_TAG_MANAGER),
 						],
 						[
-							'label' => 'Podmioty',
+							'label' => Yii::t('issue', 'Entity Responsible'),
 							'url' => ['/entity-responsible/default/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-legal"></i>',
+							'visible' => $user->can(Worker::PERMISSION_ENTITY_RESPONSIBLE_MANAGER),
 						],
-
 						[
 							'label' => Yii::t('issue', 'Types'),
 							'url' => ['/issue/type/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-sitemap"></i>',
+							'visible' => $user->can(Worker::PERMISSION_ISSUE_TYPE_MANAGER),
 						],
 						[
 							'label' => Yii::t('issue', 'Stages'),
 							'url' => ['/issue/stage/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-flag"></i>',
+							'visible' => $user->can(Worker::PERMISSION_ISSUE_STAGE_MANAGER),
 						],
 						[
 							'label' => Yii::t('common', 'Leads'),
 							'url' => ['/issue/issue/lead'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
+							'icon' => '<i class="fa fa-vcard"></i>',
 						],
 					],
 				],
@@ -247,7 +260,27 @@ $user = Yii::$app->user;
 					'label' => Yii::t('backend', 'Summons'),
 					'url' => ['/issue/summon/index'],
 					'icon' => '<i class="fa fa-bolt"></i>',
+					'options' => ['class' => 'treeview'],
 					'visible' => $user->can(User::PERMISSION_SUMMON),
+					'items' => [
+						[
+							'label' => Yii::t('common', 'Browse'),
+							'url' => ['/issue/summon/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('issue', 'Calendar'),
+							'url' => ['/calendar/summon-calendar/index'],
+							'icon' => '<i class="fa fa-calendar"></i>',
+						],
+						[
+							'label' => Yii::t('issue', 'Types'),
+							'url' => ['/issue/summon-type/index'],
+							'icon' => '<i class="fa fa-sitemap"></i>',
+							'visible' => $user->can(Worker::PERMISSION_SUMMON_MANAGER),
+						],
+
+					],
 				],
 
 				[
@@ -275,6 +308,16 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-calculator"></i>',
 							'visible' => $user->can(User::PERMISSION_PROVISION),
 						],
+						$user->can(User::PERMISSION_PROVISION) && IssuePayCalculation::getProvisionControlSettlementCount() > 0 ?
+							[
+								'label' => Yii::t('settlement', 'Provision Control {count}', [
+									'count' => IssuePayCalculation::getProvisionControlSettlementCount(),
+								]),
+								'url' => ['/settlement/calculation-problem/provision-control'],
+								'icon' => '<i class="fa fa-flag"></i>',
+								'visible' => $user->can(User::PERMISSION_PROVISION),
+							]
+							: [],
 						[
 							'label' => Yii::t('backend', 'Calculation to create'),
 							'url' => ['/settlement/calculation/to-create'],

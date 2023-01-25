@@ -7,7 +7,9 @@ use backend\widgets\IssueColumn;
 use common\helpers\Html;
 use common\models\issue\IssueCost;
 use common\models\issue\IssueCostInterface;
+use common\models\user\User;
 use common\widgets\grid\IssueTypeColumn;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model IssueCostSearch */
@@ -49,6 +51,26 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('common', 'Issue type'),
 			],
 			[
+				'attribute' => 'issueStage',
+				'label' => Yii::t('common', 'Issue stage'),
+				'value' => static function (IssueCost $model) {
+					return $model->getIssueModel()->getStageName() . ' - ' . Yii::$app->formatter->asDate($model->getIssueModel()->stage_change_at);
+				},
+				'filter' => IssueCostSearch::getIssueStagesNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'options' => [
+						'multiple' => true,
+						'placeholder' => Yii::t('common', 'Issue stage'),
+					],
+					'pluginOptions' => [
+						'dropdownAutoWidth' => true,
+					],
+					'size' => Select2::SIZE_SMALL,
+					'showToggleAll' => false,
+				],
+			],
+			[
 				'attribute' => 'type',
 				'value' => 'typeName',
 				'filter' => IssueCostSearch::getTypesNames(),
@@ -64,6 +86,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'value',
 				'format' => 'currency',
 				'pageSummary' => true,
+			],
+			[
+				'attribute' => 'hide_on_report',
+				'format' => 'boolean',
+				'visible' => Yii::$app->user->can(User::PERMISSION_PROVISION),
 			],
 			[
 				'attribute' => 'transfer_type',

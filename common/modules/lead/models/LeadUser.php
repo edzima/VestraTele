@@ -5,8 +5,10 @@ namespace common\modules\lead\models;
 use common\models\user\Worker;
 use common\modules\lead\Module;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "lead_user".
@@ -14,6 +16,8 @@ use yii\db\ActiveRecord;
  * @property int $user_id
  * @property int $lead_id
  * @property string $type
+ * @property int $created_at
+ * @property int $updated_at
  *
  * @property Lead $lead
  * @property LeadUserInterface $user
@@ -31,6 +35,18 @@ class LeadUser extends ActiveRecord {
 	/**
 	 * {@inheritdoc}
 	 */
+	public function behaviors(): array {
+		return [
+			[
+				'class' => TimestampBehavior::class,
+				'value' => new Expression('CURRENT_TIMESTAMP'),
+			],
+		];
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public static function tableName(): string {
 		return '{{%lead_user}}';
 	}
@@ -42,6 +58,7 @@ class LeadUser extends ActiveRecord {
 		return [
 			[['user_id', 'lead_id', 'type'], 'required'],
 			[['user_id', 'lead_id'], 'integer'],
+			[['created_at', 'updated_at'], 'safe'],
 			[['type'], 'string', 'max' => 255],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 			[['user_id', 'lead_id', 'type'], 'unique', 'targetAttribute' => ['user_id', 'lead_id', 'type']],
@@ -59,6 +76,8 @@ class LeadUser extends ActiveRecord {
 			'lead_id' => Yii::t('lead', 'Lead'),
 			'type' => Yii::t('lead', 'Type'),
 			'typeName' => Yii::t('lead', 'Type'),
+			'created_at' => Yii::t('lead', 'Created At'),
+			'updated_at' => Yii::t('lead', 'Updated At'),
 		];
 	}
 

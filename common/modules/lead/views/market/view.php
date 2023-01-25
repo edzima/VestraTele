@@ -3,6 +3,7 @@
 use common\helpers\Html;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
+use common\modules\lead\widgets\LeadMarketAccessRequestBtnWidget;
 use common\widgets\address\AddressDetailView;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -34,7 +35,13 @@ YiiAsset::register($this);
 
 	<p>
 		<?= $model->userCanAccessRequest(Yii::$app->user->getId())
-			? Html::a(Yii::t('lead', 'Request Access'), ['market-user/access-request', 'market_id' => $model->id], ['class' => 'btn btn-success'])
+			? LeadMarketAccessRequestBtnWidget::widget([
+				'marketId' => $model->id,
+				'options' => [
+					'class' => 'btn btn-success',
+				],
+				'inGrid' => false,
+			])
 			: ''
 		?>
 		<?= $model->isCreatorOrOwnerLead(Yii::$app->user->getId()) || !$onlyUser
@@ -122,7 +129,7 @@ YiiAsset::register($this);
 			[
 				'class' => ActionColumn::class,
 				'controller' => 'market-user',
-				'template' => '{accept} {give-up} {reject} {delete}',
+				'template' => '{accept} {give-up} {reject} {update-reserved} {delete}',
 				'visibleButtons' => [
 					'accept' => static function (LeadMarketUser $data) use ($model): bool {
 						return $data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
@@ -136,14 +143,14 @@ YiiAsset::register($this);
 					'reject' => static function (LeadMarketUser $data) use ($model): bool {
 						return $data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
 					},
-
+					'update-reserved' => static function (LeadMarketUser $data) use ($model): bool {
+						return !$data->isToConfirm() && $model->isCreatorOrOwnerLead(Yii::$app->user->getId());
+					},
 				],
 				'buttons' => [
-					'access-request' => static function (string $url): string {
-						return Html::a('<i class="fa fa-unlock" aria-hidden="true"></i>', $url, [
-							'title' => Yii::t('lead', 'Request Access'),
-							'aria-label' => Yii::t('lead', 'Request Access'),
-							'data-pjax' => 0,
+					'access-request' => static function (string $url, LeadMarketUser $model): string {
+						return LeadMarketAccessRequestBtnWidget::widget([
+							'marketId' => $model->market_id,
 						]);
 					},
 					'accept' => static function (string $url): string {
@@ -164,6 +171,13 @@ YiiAsset::register($this);
 						return Html::a(Html::icon('minus'), $url, [
 							'title' => Yii::t('lead', 'Reject'),
 							'aria-label' => Yii::t('lead', 'Reject'),
+							'data-pjax' => 1,
+						]);
+					},
+					'update-reserved' => static function (string $url): string {
+						return Html::a(Html::icon('pencil'), $url, [
+							'title' => Yii::t('lead', 'Update Reserved At'),
+							'aria-label' => Yii::t('lead', 'Update Reserved At'),
 							'data-pjax' => 1,
 						]);
 					},

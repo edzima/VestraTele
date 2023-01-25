@@ -52,7 +52,21 @@ class Summon extends ActiveRecord implements IssueInterface {
 	public const STATUS_WITHOUT_RECOGNITION = 3;
 	public const STATUS_TO_CONFIRM = 4;
 	public const STATUS_REALIZED = 5;
-	public const STATUS_UNREALIZED = 6;
+	public const STATUS_SUSPENDED = 15;
+
+	public const STATUS_UNREALIZED_CLIENT = 6;
+	public const STATUS_UNREALIZED_COMPANY = 8;
+
+	public const STATUSES_UNREALIZED = [
+		self::STATUS_UNREALIZED_CLIENT,
+		self::STATUS_UNREALIZED_COMPANY,
+	];
+
+	public static function notActiveStatuses(): array {
+		$statuses = static::STATUSES_UNREALIZED;
+		$statuses[] = static::STATUS_REALIZED;
+		return $statuses;
+	}
 
 	/**
 	 * @inheritdoc
@@ -70,23 +84,12 @@ class Summon extends ActiveRecord implements IssueInterface {
 		return '{{%summon}}';
 	}
 
-	public function beforeSave($insert) {
-		if (empty($this->realize_at)) {
-			// set hours
-			$this->realize_at = $this->start_at;
-		}
-		if (empty($this->realized_at) && $this->isRealized()) {
-			$this->realized_at = date('Y-m-d H:i:s');
-		}
-		return parent::beforeSave($insert);
-	}
-
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['status', 'issue_id', 'owner_id', 'contractor_id', 'entity_id', 'city_id', 'type_id'], 'required'],
+			[['status', 'issue_id', 'owner_id', 'type_id'], 'required'],
 			[['status', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
 			[['title'], 'string', 'max' => 255],
 			[['created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at'], 'safe'],
@@ -135,7 +138,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 		];
 	}
 
-	public function getTitleWithDocs(): string {
+	public function getTitleWithDocs(): ?string {
 		if (empty($this->title)) {
 			return $this->getDocsNames();
 		}
@@ -178,7 +181,9 @@ class Summon extends ActiveRecord implements IssueInterface {
 			static::STATUS_WITHOUT_RECOGNITION => Yii::t('common', 'Without Recognition'),
 			static::STATUS_TO_CONFIRM => Yii::t('common', 'To Confirm'),
 			static::STATUS_REALIZED => Yii::t('common', 'Realized'),
-			static::STATUS_UNREALIZED => Yii::t('common', 'Unrealized'),
+			static::STATUS_SUSPENDED => Yii::t('common', 'Suspended'),
+			static::STATUS_UNREALIZED_CLIENT => Yii::t('common', 'Unrealized - Client'),
+			static::STATUS_UNREALIZED_COMPANY => Yii::t('common', 'Unrealized - Company'),
 		];
 	}
 
@@ -187,7 +192,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 	}
 
 	public function isUnrealized(): bool {
-		return (int) $this->status === static::STATUS_UNREALIZED;
+		return in_array((int) $this->status, static::STATUSES_UNREALIZED, true);
 	}
 
 	/**

@@ -12,6 +12,8 @@ use common\behaviors\LastActionBehavior;
 use common\components\User as WebUser;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\calendar\controllers\SummonCalendarController;
+use common\modules\calendar\Module as CalendarModule;
 use common\modules\czater\Module as CzaterModule;
 use common\modules\lead\Module as LeadModule;
 use Edzima\Yii2Adescom\Module as AdescomModule;
@@ -101,6 +103,16 @@ return [
 		],
 		'benefit' => [
 			'class' => BenefitModule::class,
+		],
+		'calendar' => [
+			'class' => CalendarModule::class,
+			'controllerMap' => [
+				'summon-calendar' => [
+					'class' => SummonCalendarController::class,
+					'summonIndexRoute' => '/issue/summon/index',
+					'summonViewRoute' => '/issue/summon/view',
+				],
+			],
 		],
 		'db-manager' => [
 			'class' => 'bs\dbManager\Module',

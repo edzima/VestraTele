@@ -160,6 +160,70 @@ class IssueSearchTest extends Unit {
 		}
 	}
 
+	public function testExcludedTypes(): void {
+		$this->model->excludedTypes = [1];
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertNotSame(1, $model->type_id);
+		}
+		$this->model->excludedTypes = [1, 2];
+		$models = $this->getModels();
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertNotSame(1, $model->type_id);
+			$this->tester->assertNotSame(2, $model->type_id);
+		}
+	}
+
+	public function testWithTelemarkerAsEmpty(): void {
+		$this->model->onlyWithTelemarketers = null;
+		$models = $this->getModels();
+		$tele = array_filter($models, function (Issue $model): bool {
+			return $model->tele !== null;
+		});
+		$this->tester->assertNotEmpty($tele);
+
+		$this->model->onlyWithTelemarketers = '';
+		$models = $this->getModels();
+		$tele = array_filter($models, function (Issue $model): bool {
+			return $model->tele !== null;
+		});
+		$this->tester->assertNotEmpty($tele);
+	}
+
+	public function testWithTelemarkerAsEnable(): void {
+		$this->model->onlyWithTelemarketers = '1';
+		$models = $this->getModels();
+		$tele = array_filter($models, function (Issue $model): bool {
+			return $model->tele !== null;
+		});
+		$this->tester->assertNotEmpty($tele);
+
+		$this->model->onlyWithTelemarketers = true;
+		$models = $this->getModels();
+		$tele = array_filter($models, function (Issue $model): bool {
+			return $model->tele !== null;
+		});
+		$this->tester->assertNotEmpty($tele);
+	}
+
+	public function testWithTelemarkerAsDisable(): void {
+		$this->model->onlyWithTelemarketers = '0';
+		$models = $this->getModels();
+		$tele = array_filter($models, function (Issue $model): bool {
+			return $model->tele !== null;
+		});
+		$this->tester->assertEmpty($tele);
+
+		$this->model->onlyWithTelemarketers = false;
+		$models = $this->getModels();
+		$tele = array_filter($models, function (Issue $model): bool {
+			return $model->tele !== null;
+		});
+		$this->tester->assertEmpty($tele);
+	}
+
 	public function testCustomerLastname(): void {
 		$this->model->customerName = 'Lars';
 		$models = $this->getModels();

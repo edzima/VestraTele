@@ -83,9 +83,13 @@ class IssueStageChangeForm extends Model {
 		}
 		$model = $this->getIssue()->getIssueModel();
 		$this->previous_stage_id = $model->stage_id;
+		$model->stage_id = $this->stage_id;
+		$model->stage_change_at = $this->date_at;
+		$model->generateStageDeadlineAt();
 		$update = (bool) $model->updateAttributes([
-			'stage_id' => $this->stage_id,
-			'stage_change_at' => $this->date_at,
+			'stage_id',
+			'stage_change_at',
+			'stage_deadline_at',
 		]);
 		return $update && $this->saveNote() && $this->saveLinked();
 	}
@@ -123,7 +127,11 @@ class IssueStageChangeForm extends Model {
 		if ($type === null) {
 			return [];
 		}
-		return ArrayHelper::map($type->stages, 'id', 'name');
+		$stages = ArrayHelper::map($type->stages, 'id', 'name');
+		if ($type->parent_id) {
+			$stages += static::getStagesNames($type->parent_id);
+		}
+		return $stages;
 	}
 
 	public function getIssue(): IssueInterface {
@@ -141,6 +149,7 @@ class IssueStageChangeForm extends Model {
 
 	public function pushMessages(): bool {
 		$message = $this->getMessagesModel();
+		$message->withWithoutStageIdOnNotFound = true;
 		$message->previousStage = IssueStage::getStages()[$this->previous_stage_id];
 		$message->sms_owner_id = $this->user_id;
 		return $message->pushMessages() > 0;

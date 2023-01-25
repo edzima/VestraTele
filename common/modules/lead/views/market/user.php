@@ -1,9 +1,9 @@
 <?php
 
 use common\helpers\Html;
-use common\helpers\Url;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\searches\LeadMarketSearch;
+use common\modules\lead\widgets\LeadMarketAccessRequestBtnWidget;
 use common\modules\lead\widgets\LeadMarketUserStatusColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -61,6 +61,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			'details:ntext',
 			[
+				'attribute' => 'leadSource',
+				'value' => 'lead.sourceName',
+				'filter' => LeadMarketSearch::getLeadSourcesNames(),
+				'label' => $searchModel->getAttributeLabel('leadSource'),
+			],
+			[
 				'attribute' => 'leadType',
 				'label' => Yii::t('lead', 'Type Lead'),
 				'value' => 'lead.typeName',
@@ -94,16 +100,9 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => ActionColumn::class,
 				'template' => '{access-request} {view} {update} {delete}',
 				'buttons' => [
-					'access-request' => function (string $url, LeadMarket $data): ?string {
-						return Html::a(
-							'<i class="fa fa-unlock" aria-hidden="true"></i>',
-							[
-								'market-user/access-request', 'market_id' => $data->id,
-								'returnUrl' => Url::current(),
-							], [
-							'aria-label' => Yii::t('lead', 'Request Access'),
-							'title' => Yii::t('lead', 'Request Access'),
-							'data-pjax' => 1,
+					'access-request' => static function (string $url, LeadMarket $data): ?string {
+						return LeadMarketAccessRequestBtnWidget::widget([
+							'marketId' => $data->id,
 						]);
 					},
 				],

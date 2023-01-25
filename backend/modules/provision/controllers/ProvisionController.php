@@ -4,6 +4,7 @@ namespace backend\modules\provision\controllers;
 
 use backend\helpers\Url;
 use backend\modules\provision\models\ProvisionUpdateForm;
+use backend\modules\provision\models\search\ProvisionDoubleSearch;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionSearch;
 use Yii;
@@ -28,6 +29,16 @@ class ProvisionController extends Controller {
 				],
 			],
 		];
+	}
+
+	public function actionDoubles(): string {
+		$searchModel = new ProvisionDoubleSearch();
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+		return $this->render('doubles', [
+			'dataProvider' => $dataProvider,
+			'searchModel' => $searchModel,
+		]);
 	}
 
 	/**

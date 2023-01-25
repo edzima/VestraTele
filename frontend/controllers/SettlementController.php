@@ -2,10 +2,11 @@
 
 namespace frontend\controllers;
 
-use common\components\provision\exception\MissingProvisionUserException;
+use common\components\provision\exception\Exception;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\settlement\PaysForm;
+use common\models\user\UserVisible;
 use common\models\user\Worker;
 use frontend\helpers\Url;
 use frontend\models\search\IssuePayCalculationSearch;
@@ -36,6 +37,7 @@ class SettlementController extends Controller {
 		$searchModel = new IssuePayCalculationSearch();
 		$ids = Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId());
 		$ids[] = Yii::$app->user->getId();
+		$ids = array_diff($ids, UserVisible::hiddenUsers(Yii::$app->user->getId()));
 		$searchModel->issueUsersIds = $ids;
 
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -97,7 +99,7 @@ class SettlementController extends Controller {
 			Yii::$app->provisions->removeForPays($calculation->getPays()->getIds(true));
 			try {
 				Yii::$app->provisions->settlement($calculation);
-			} catch (MissingProvisionUserException $exception) {
+			} catch (Exception $exception) {
 			}
 			return $this->redirect(['view', 'id' => $id]);
 		}

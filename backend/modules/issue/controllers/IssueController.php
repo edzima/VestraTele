@@ -10,13 +10,16 @@ use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\CsvForm;
 use common\behaviors\SelectionRouteBehavior;
+use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
 use common\models\message\IssueCreateMessagesForm;
 use common\models\user\Customer;
+use common\models\user\User;
 use common\models\user\Worker;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\MethodNotAllowedHttpException;
@@ -51,11 +54,12 @@ class IssueController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
-
+	public function actionIndex(int $parentTypeId = null) {
 		$searchModel = new IssueSearch();
+		$searchModel->parentTypeId = $parentTypeId;
 		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
+			$searchModel->excludeArchiveStage();
 		}
 		if (Yii::$app->user->can(Worker::PERMISSION_PAY_ALL_PAID)) {
 			$searchModel->scenario = IssueSearch::SCENARIO_ALL_PAYED;
@@ -68,6 +72,7 @@ class IssueController extends Controller {
 			/** @var IssueQuery $query */
 			$query = clone($dataProvider->query);
 			$query->with('customer.userProfile');
+			$query->with('tele.userProfile');
 			$query->with('type');
 			$columns = [
 				[
@@ -76,7 +81,11 @@ class IssueController extends Controller {
 				],
 				[
 					'attribute' => 'agent.fullName',
-					'label' => Yii::t('issue', 'Agent'),
+					'label' => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
+				],
+				[
+					'attribute' => 'tele.fullName',
+					'label' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 				],
 				[
 					'attribute' => 'customer.profile.firstname',
@@ -224,8 +233,29 @@ class IssueController extends Controller {
 			}
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
+
+		$duplicatesCustomersDataProvider = new ActiveDataProvider([
+			'query' => User::find()
+				->joinWith('userProfile UP')
+				->joinWith('addresses.address.city')
+				->andWhere(['UP.firstname' => $customer->profile->firstname])
+				->andWhere(['UP.lastname' => $customer->profile->lastname])
+				->andWhere(['<>', User::tableName() . '.id', $customer->id]),
+			'sort' => [
+				'defaultOrder' => [
+					'updated_at' => SORT_DESC,
+				],
+			],
+		]);
+		if ($duplicatesCustomersDataProvider->totalCount) {
+			Flash::add(Flash::TYPE_WARNING, Yii::t('backend', 'Warning! Duplicates Customers ({user}) exists: {count}.', [
+				'count' => $duplicatesCustomersDataProvider->totalCount,
+				'user' => $customer->getFullName(),
+			]));
+		}
 		return $this->render('create', [
 			'model' => $model,
+			'duplicatesCustomersDataProvider' => $duplicatesCustomersDataProvider,
 			'messagesModel' => $messagesModel,
 		]);
 	}
@@ -298,4 +328,6 @@ class IssueController extends Controller {
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}
+
 }
+

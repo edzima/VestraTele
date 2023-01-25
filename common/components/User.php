@@ -4,6 +4,7 @@ namespace common\components;
 
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueNote;
+use common\models\user\UserVisible;
 use common\models\user\Worker;
 use Yii;
 use yii\web\ForbiddenHttpException;
@@ -39,6 +40,21 @@ class User extends BaseUser {
 			Yii::info('User: ' . $this->getId() . ' view issue.', 'issue.' . $model->getIssueName());
 			return true;
 		}
+		$excluded = UserVisible::hiddenUsers($this->getId());
+		$issue = $model->getIssueModel();
+		foreach ($excluded as $userId) {
+			if ($issue->hasUser($userId)) {
+				Yii::warning('User: ' . $this->getId() . ' try view issue for excluded user: ' . $userId . '.', 'issue.' . $model->getIssueName());
+				return false;
+			}
+		}
+		$included = UserVisible::visibleUsers($this->getId());
+		foreach ($included as $userId) {
+			if ($issue->hasUser($userId)) {
+				return true;
+			}
+		}
+
 		if ($withChildes) {
 			if ($this->can(Worker::ROLE_AGENT)) {
 				$childesIds = Yii::$app->userHierarchy->getAllChildesIds($this->getId());
@@ -49,8 +65,8 @@ class User extends BaseUser {
 						return true;
 					}
 				}
+				Yii::warning('Agent: ' . $this->getId() . ' try view issue for not self childes.', 'issue.' . $model->getIssueName());
 			}
-			Yii::warning('Agent: ' . $this->getId() . ' try view issue for not self childes.', 'issue.' . $model->getIssueName());
 		}
 
 		return false;

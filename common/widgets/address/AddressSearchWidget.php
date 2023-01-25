@@ -11,10 +11,13 @@ class AddressSearchWidget extends Widget {
 	public AddressSearch $model;
 	public ActiveForm $form;
 
+	public bool $withPostalCode = true;
+
 	public function run(): string {
 		return $this->render('search', [
 			'form' => $this->form,
 			'model' => $this->model,
+			'withPostalCode' => $this->withPostalCode,
 		]);
 	}
 }

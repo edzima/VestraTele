@@ -2,6 +2,8 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\modules\issue\models\IssueStageChangeForm;
+use backend\modules\issue\models\IssueTypeForm;
 use backend\modules\issue\models\search\IssueTypeSearch;
 use common\models\issue\IssueType;
 use Yii;
@@ -35,7 +37,7 @@ class TypeController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new IssueTypeSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -51,7 +53,7 @@ class TypeController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionView($id) {
+	public function actionView(int $id) {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
@@ -64,10 +66,10 @@ class TypeController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new IssueType();
+		$model = new IssueTypeForm();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('create', [
 			'model' => $model,
@@ -81,11 +83,12 @@ class TypeController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionUpdate($id) {
-		$model = $this->findModel($id);
+	public function actionUpdate(int $id) {
+		$model = new IssueTypeForm();
+		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('update', [
 			'model' => $model,
@@ -99,7 +102,7 @@ class TypeController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionDelete($id) {
+	public function actionDelete(int $id) {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);
@@ -112,11 +115,20 @@ class TypeController extends Controller {
 		}
 		Yii::$app->response->format = Response::FORMAT_JSON;
 		$id = (int) reset($params);
-		$stages = $this->findModel($id)->stages;
+
+		$stages = IssueStageChangeForm::getStagesNames($id);
+		$output = [];
+		foreach ($stages as $id => $name) {
+			$output[] = [
+				'id' => $id,
+				'name' => $name,
+			];
+		}
+		$selected = array_key_first($stages);
 
 		return [
-			'output' => $stages,
-			'selected' => (string) reset($stages)->id,
+			'output' => $output,
+			'selected' => $selected,
 		];
 	}
 

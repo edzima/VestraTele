@@ -39,10 +39,11 @@ class SummonController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionIndex(int $parentTypeId = null): string {
 		$searchModel = new SummonSearch();
+		$searchModel->issueParentTypeId = $parentTypeId;
 		if (!Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
-			&& isset(SummonSearch::getContractorsNames()[Yii::$app->user->getId()])) {
+			&& isset($searchModel->getContractorsNames()[Yii::$app->user->getId()])) {
 			$searchModel->contractor_id = Yii::$app->user->getId();
 		}
 
@@ -63,7 +64,7 @@ class SummonController extends Controller {
 	 */
 	public function actionView(int $id): string {
 		return $this->render('view', [
-			'model' => $this->findModel($id, false),
+			'model' => $this->findModel($id),
 		]);
 	}
 
@@ -109,7 +110,11 @@ class SummonController extends Controller {
 	 */
 	public function actionUpdate(int $id) {
 		$model = new SummonForm();
-		$model->setModel($this->findModel($id, true));
+		$summon = $this->findModel($id);
+		if (!static::canUpdate($summon)) {
+			throw new ForbiddenHttpException('Only for Owner or Summon Manager.');
+		}
+		$model->setModel($summon);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $id]);
@@ -129,7 +134,10 @@ class SummonController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionDelete(int $id) {
-		$this->findModel($id, true)->delete();
+		$model = $this->findModel($id);
+		if (static::canDelete($model)) {
+			$model->delete();
+		}
 
 		return $this->redirect(['index']);
 	}
@@ -141,20 +149,20 @@ class SummonController extends Controller {
 	 * @param integer $id
 	 * @return Summon the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
-	 * @throws ForbiddenHttpException if the model is not for User.
 	 */
-	protected function findModel(int $id, bool $checkUser): Summon {
+	protected function findModel(int $id): Summon {
 		if (($model = Summon::findOne($id)) === null) {
 			throw new NotFoundHttpException('The requested page does not exist.');
 		}
-		if ($checkUser) {
-
-			if (!$model->isForUser(Yii::$app->user->getId())
-				&& !Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
-				throw new ForbiddenHttpException('Only User or Summon Manager can update.');
-			}
-		}
-
 		return $model;
 	}
+
+	public static function canUpdate(Summon $model): bool {
+		return $model->isForUser(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER);
+	}
+
+	public static function canDelete(Summon $model): bool {
+		return $model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER);
+	}
+
 }

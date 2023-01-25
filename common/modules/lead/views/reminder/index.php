@@ -23,6 +23,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="lead-reminder-index">
 	<h1><?= Html::encode($this->title) ?></h1>
+	<p>
+		<?= Html::a(Yii::t('lead', 'Calendar'), ['/calendar/lead-reminder/index'], ['class' => 'btn btn-warning']) ?>
+	</p>
 	<?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
 	<?= GridView::widget([
@@ -35,7 +38,12 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'lead.name',
 				'label' => Yii::t('lead', 'Lead Name'),
 			],
-
+			[
+				'attribute' => 'leadPhone',
+				'value' => 'lead.phone',
+				'format' => 'tel',
+				'label' => Yii::t('lead', 'Phone'),
+			],
 			[
 				'attribute' => 'leadStatusId',
 				'value' => 'lead.status.name',

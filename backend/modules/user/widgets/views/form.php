@@ -9,24 +9,45 @@ use yii\widgets\ActiveForm;
 
 ?>
 
+<div class="user-profile-form">
 
-<?= $form->field($model, 'firstname')->textInput(['maxlength' => true]) ?>
+	<div class="row">
+		<?= $form->field($model, 'firstname', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->textInput(['maxlength' => true]) ?>
 
-<?= $form->field($model, 'lastname')->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'lastname', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->textInput(['maxlength' => true]) ?>
 
-<?= $form->field($model, 'pesel')->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'pesel', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->textInput(['maxlength' => true]) ?>
 
-<?= $form->field($model, 'tax_office')->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'tax_office', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->textInput(['maxlength' => true]) ?>
+	</div>
 
-<div class="row">
-	<?= $form->field($model, 'phone', ['options' => ['class' => 'col-md-2']])->widget(PhoneInput::class) ?>
 
-	<?= $form->field($model, 'phone_2', ['options' => ['class' => 'col-md-2']])->widget(PhoneInput::class) ?>
+	<div class="row">
+		<?= $form->field($model, 'phone', ['options' => ['class' => 'col-md-2 col-lg-2']])->widget(PhoneInput::class) ?>
+
+		<?= $form->field($model, 'phone_2', ['options' => ['class' => 'col-md-2 col-lg-2']])->widget(PhoneInput::class) ?>
+	</div>
+
+
+	<?= $form->field($model, 'email_hidden_in_frontend_issue')->checkbox() ?>
+
+	<?= $form->field($model, 'gender')->radioList(UserProfile::getGendersNames()) ?>
+
+
 </div>
-
-
-<?= $form->field($model, 'email_hidden_in_frontend_issue')->checkbox() ?>
-
-<?= $form->field($model, 'gender')->radioList(UserProfile::getGendersNames()) ?>
-
-

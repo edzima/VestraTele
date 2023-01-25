@@ -6,6 +6,7 @@ use common\helpers\Html;
 use common\helpers\Url;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
+use common\models\issue\search\IssueStageSearchable;
 use common\models\settlement\PayInterface;
 use common\models\settlement\search\IssuePaySearch;
 use common\widgets\GridView;
@@ -35,14 +36,23 @@ class IssuePayGrid extends GridView {
 	public bool $visiblePayAt = true;
 	public bool $visibleProvisionsDetails = true;
 	public bool $visibleSettlementType = true;
+	public bool $visibleIssueStage = false;
 	public bool $visibleIssueType = true;
 	public bool $rowColors = true;
 
 	public ?int $userId = null;
 
+	public array $stagesFilters = [];
+
 	public function init(): void {
 		if (empty($this->columns)) {
 			$this->columns = $this->defaultColumns();
+		}
+
+		if ($this->visibleIssueStage
+			&& empty($this->stagesFilters)
+			&& $this->filterModel instanceof IssueStageSearchable) {
+			$this->stagesFilters = $this->filterModel->getIssueStagesNames();
 		}
 
 		if (empty($this->rowOptions) && $this->rowColors) {
@@ -97,6 +107,14 @@ class IssuePayGrid extends GridView {
 				'noWrap' => true,
 				'valueType' => IssueTypeColumn::VALUE_NAME,
 				'visible' => $this->visibleIssueType,
+			],
+			[
+				'class' => IssueStageColumn::class,
+				'attribute' => 'issueStagesIds',
+				'value' => 'issue.stageName',
+				'filter' => $this->stagesFilters,
+				'visible' => $this->visibleIssueStage,
+				'noWrap' => true,
 			],
 			[
 				'class' => AgentDataColumn::class,

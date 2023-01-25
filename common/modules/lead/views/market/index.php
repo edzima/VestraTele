@@ -67,6 +67,12 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'lead.statusName',
 				'filter' => LeadMarketSearch::getLeadStatusesNames(),
 			],
+			[
+				'attribute' => 'leadSource',
+				'value' => 'lead.sourceName',
+				'filter' => LeadMarketSearch::getLeadSourcesNames(),
+				'label' => $searchModel->getAttributeLabel('leadSource'),
+			],
 			'details:ntext',
 
 			[

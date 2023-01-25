@@ -13,7 +13,6 @@ use common\models\user\User;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
-use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -36,6 +35,8 @@ class IssueForm extends Model {
 	public ?string $archives_nr = null;
 	public ?string $details = null;
 	public ?string $signature_act = null;
+
+	public ?string $stage_deadline_at = null;
 
 	public const STAGE_ARCHIVED_ID = IssueStage::ARCHIVES_ID;
 
@@ -73,7 +74,6 @@ class IssueForm extends Model {
 		return [
 			[['agent_id', 'lawyer_id', 'type_id', 'stage_id', 'entity_responsible_id', 'signing_at'], 'required'],
 			[['agent_id', 'lawyer_id', 'tele_id', 'type_id', 'stage_id', 'entity_responsible_id'], 'integer'],
-			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
 			[['stage_id'], 'filter', 'filter' => 'intval'],
 			[
 				'stage_id', 'in', 'when' => function (): bool {
@@ -84,11 +84,11 @@ class IssueForm extends Model {
 			],
 			[['details', 'signature_act'], 'string'],
 			['signature_act', 'string', 'max' => 30],
-			['signature_act', 'default', 'value' => null],
+			[['signing_at', 'type_additional_date_at', 'stage_change_at', 'stage_deadline_at'], 'date', 'format' => 'Y-m-d'],
 			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
+			[['signature_act', 'stage_deadline_at', 'stage_change_at'], 'default', 'value' => null],
+			['type_id', 'in', 'range' => static::getTypesIds()],
 			['tagsIds', 'in', 'range' => IssueTag::find()->select('id')->column(), 'allowArray' => true],
-
-			[['signing_at', 'type_additional_date_at', 'stage_change_at'], 'date', 'format' => 'Y-m-d'],
 			[
 				'archives_nr',
 				'required',
@@ -100,15 +100,6 @@ class IssueForm extends Model {
 				}',
 			],
 			[['archives_nr'], 'string', 'max' => 10],
-			[
-				'signature_act', 'unique', 'targetClass' => Issue::class,
-				'filter' => function (ActiveQuery $query): void {
-					if (!$this->getModel()->isNewRecord) {
-						$query->andWhere(['not', 'id' => $this->getModel()->id]);
-					}
-				},
-			],
-
 		];
 	}
 
@@ -147,6 +138,7 @@ class IssueForm extends Model {
 		$this->signing_at = $model->signing_at;
 		$this->type_additional_date_at = $model->type_additional_date_at;
 		$this->stage_change_at = $model->stage_change_at;
+		$this->stage_deadline_at = $model->stage_deadline_at;
 		$this->tagsIds = ArrayHelper::getColumn($model->tags, 'id');
 	}
 
@@ -169,39 +161,54 @@ class IssueForm extends Model {
 			$model->entity_responsible_id = $this->entity_responsible_id;
 			$model->signing_at = $this->signing_at;
 			$model->type_additional_date_at = $this->type_additional_date_at;
+			if ($model->isNewRecord) {
+				$model->generateStageDeadlineAt();
+			} else {
+				$model->stage_deadline_at = $this->stage_deadline_at;
+			}
 			if (!$model->save(false)) {
 				return false;
 			}
-			if (!$model->isNewRecord) {
-				IssueTagLink::deleteAll(['issue_id' => $model->id]);
-			}
 
-			if (!empty($this->tagsIds)) {
-				$rows = [];
-				foreach ((array) $this->tagsIds as $id) {
-					$rows[] = [
-						'issue_id' => $model->id,
-						'tag_id' => $id,
-					];
-				}
-				IssueTagLink::getDb()->createCommand()->batchInsert(IssueTagLink::tableName(), [
-					'issue_id', 'tag_id',
-				], $rows)->execute();
-			}
-
-			$model->linkUser($this->customer->id, IssueUser::TYPE_CUSTOMER);
-			$model->linkUser($this->agent_id, IssueUser::TYPE_AGENT);
-			$model->linkUser($this->lawyer_id, IssueUser::TYPE_LAWYER);
-			if (!empty($this->tele_id)) {
-				$model->linkUser($this->tele_id, IssueUser::TYPE_TELEMARKETER);
-			} else {
-				$model->unlinkUser(IssueUser::TYPE_TELEMARKETER);
-			}
+			$this->linkTags();
+			$this->linkUsers();
 
 			return true;
 		}
 		Yii::error($this->getModel()->getErrors(), 'issueForm');
 		return false;
+	}
+
+	private function linkUsers(): void {
+		$model = $this->getModel();
+		$model->linkUser($this->customer->id, IssueUser::TYPE_CUSTOMER);
+		$model->linkUser($this->agent_id, IssueUser::TYPE_AGENT);
+		$model->linkUser($this->lawyer_id, IssueUser::TYPE_LAWYER);
+		if (!empty($this->tele_id)) {
+			$model->linkUser($this->tele_id, IssueUser::TYPE_TELEMARKETER);
+		} else {
+			$model->unlinkUser(IssueUser::TYPE_TELEMARKETER);
+		}
+	}
+
+	private function linkTags(): void {
+		$model = $this->getModel();
+		if (!$model->isNewRecord) {
+			IssueTagLink::deleteAll(['issue_id' => $model->id]);
+		}
+
+		if (!empty($this->tagsIds)) {
+			$rows = [];
+			foreach ((array) $this->tagsIds as $id) {
+				$rows[] = [
+					'issue_id' => $model->id,
+					'tag_id' => $id,
+				];
+			}
+			IssueTagLink::getDb()->createCommand()->batchInsert(IssueTagLink::tableName(), [
+				'issue_id', 'tag_id',
+			], $rows)->execute();
+		}
 	}
 
 	public static function getAgents(): array {
@@ -223,7 +230,29 @@ class IssueForm extends Model {
 	}
 
 	public static function getTypesNames(): array {
-		return IssueType::getTypesNames();
+		$parents = IssueType::getParents();
+		if (empty($parents)) {
+			return IssueType::getTypesNames();
+		}
+		$names = [];
+		foreach ($parents as $parent) {
+			$names[$parent->name] = ArrayHelper::map($parent->childs, 'id', 'name');
+		}
+		return $names;
+	}
+
+	public static function getTypesIds(): array {
+		$parents = IssueType::getParents();
+		if (empty($parents)) {
+			return array_keys(IssueType::getTypesNames());
+		}
+		$ids = [];
+		foreach ($parents as $parent) {
+			foreach ($parent->childs as $child) {
+				$ids[] = $child->id;
+			}
+		}
+		return $ids;
 	}
 
 	public function getStagesData(): array {

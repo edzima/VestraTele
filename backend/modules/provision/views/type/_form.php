@@ -38,6 +38,16 @@ use yii\widgets\ActiveForm;
 			])
 		?>
 
+
+		<?= $form->field($model, 'issueExcludedUserTypes', ['options' => ['class' => 'col-md-3 col-lg-2']])
+			->widget(Select2::class, [
+				'data' => ProvisionTypeForm::getIssueUserTypesNames(),
+				'options' => [
+					'multiple' => true,
+				],
+			])
+		?>
+
 		<?= $form->field($model, 'name', ['options' => ['class' => 'col-md-4']])
 			->textInput(['maxlength' => true])
 		?>
@@ -77,12 +87,24 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
+		<?= $form->field($model, 'baseTypeId', ['options' => ['class' => 'col-md-3 col-lg-2']])
+			->widget(Select2::class, [
+				'data' => ProvisionTypeForm::getTypesNames(),
+				'options' => [
+					'placeholder' => $model->getAttributeLabel('baseTypeId'),
+				],
+			])
+		?>
+
 		<?= $form->field($model, 'value', ['options' => ['class' => 'col-md-3 col-lg-2']])->textInput() ?>
 
 		<?= $form->field($model, 'is_percentage', ['options' => ['class' => 'col-md-2']])->checkbox()
 			->hint(Yii::t('provision', 'Percent or Const'))
 		?>
 
+		<?= $form->field($model, 'isDateFromSettlement', ['options' => ['class' => 'col-md-2']])->checkbox()
+			->hint(Yii::t('provision', 'Empty - From Issue Created At'))
+		?>
 	</div>
 
 

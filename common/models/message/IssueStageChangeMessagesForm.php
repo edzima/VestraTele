@@ -31,6 +31,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 
 	public bool $withDaysReminderKey = false;
 	public bool $withStageIdKey = true;
+	public bool $withWithoutStageIdOnNotFound = false;
 
 	public ?bool $sendSmsToCustomer = false;
 	public ?bool $sendEmailToCustomer = false;
@@ -169,7 +170,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 			$parts[] = static::KEY_REMINDER_DAYS;
 		}
 		if ($this->issue && $this->withStageIdKey) {
-			$parts[static::KEY_STAGE_ID] = $this->issue->getIssueStage()->id;
+			$parts[static::KEY_STAGE_ID] = $this->issue->getIssueStageId();
 		}
 		return $parts;
 	}
@@ -189,4 +190,45 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 		}
 		return MessageTemplateKeyHelper::generateKey($parts);
 	}
+
+	protected function getAgentSMSTemplate(): ?MessageTemplate {
+		$template = parent::getAgentSMSTemplate();
+		if ($template === null && $this->withWithoutStageIdOnNotFound && $this->withStageIdKey) {
+			$self = clone($this);
+			$self->withStageIdKey = false;
+			$template = $self->getAgentSMSTemplate();
+		}
+		return $template;
+	}
+
+	protected function getCustomerSMSTemplate(): ?MessageTemplate {
+		$template = parent::getCustomerSMSTemplate();
+		if ($template === null && $this->withWithoutStageIdOnNotFound && $this->withStageIdKey) {
+			$self = clone($this);
+			$self->withStageIdKey = false;
+			$template = $self->getCustomerSMSTemplate();
+		}
+		return $template;
+	}
+
+	protected function getCustomerEmailTemplate(): ?MessageTemplate {
+		$template = parent::getCustomerEmailTemplate();
+		if ($template === null && $this->withWithoutStageIdOnNotFound && $this->withStageIdKey) {
+			$self = clone($this);
+			$self->withStageIdKey = false;
+			$template = $self->getCustomerEmailTemplate();
+		}
+		return $template;
+	}
+
+	protected function getWorkersTemplate(): ?MessageTemplate {
+		$template = parent::getWorkersTemplate();
+		if ($template === null && $this->withWithoutStageIdOnNotFound && $this->withStageIdKey) {
+			$self = clone($this);
+			$self->withStageIdKey = false;
+			$template = $self->getWorkersTemplate();
+		}
+		return $template;
+	}
+
 }

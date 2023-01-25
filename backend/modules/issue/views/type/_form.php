@@ -1,13 +1,14 @@
 <?php
 
-use common\models\issue\IssueType;
-use common\models\issue\Provision;
+use backend\modules\issue\models\IssueTypeForm;
+use common\widgets\ActiveForm;
+use kartik\number\NumberControl;
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\web\View;
-use yii\widgets\ActiveForm;
 
 /* @var $this View */
-/* @var $model IssueType */
+/* @var $model IssueTypeForm */
 /* @var $form ActiveForm */
 ?>
 
@@ -17,18 +18,43 @@ use yii\widgets\ActiveForm;
 		'id' => 'issue-type-form',
 	]); ?>
 
-	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+	<div class="row">
+		<?= $form->field($model, 'name', [
+			'options' => [
+				'class' => 'col-md-4',
+			],
+		])->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'short_name')->textInput(['maxlength' => true]) ?>
+		<?= $form->field($model, 'short_name', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'vat')->textInput() ?>
+		<?= $form->field($model, 'vat', [
+			'options' => [
+				'class' => 'col-md-1',
+			],
+		])->widget(NumberControl::class) ?>
 
-	<?= $form->field($model, 'meet')->checkbox() ?>
+	</div>
+
+	<div class="row">
+		<?= $form->field($model, 'parent_id', [
+			'options' => [
+				'class' => 'col-md-4',
+			],
+		])->widget(Select2::class, [
+			'data' => $model->getParentsData(),
+			'options' => ['placeholder' => $model->getAttributeLabel('parent_id')],
+		]) ?>
+	</div>
+
 
 	<?= $form->field($model, 'with_additional_date')->checkbox() ?>
 
 	<div class="form-group">
-		<?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

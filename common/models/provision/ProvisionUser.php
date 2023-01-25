@@ -7,6 +7,7 @@ use DateTime;
 use Decimal\Decimal;
 use Yii;
 use yii\base\InvalidArgumentException;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -76,21 +77,21 @@ class ProvisionUser extends ActiveRecord {
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getFromUser() {
 		return $this->hasOne(User::class, ['id' => 'from_user_id']);
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getToUser() {
 		return $this->hasOne(User::class, ['id' => 'to_user_id']);
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getType() {
 		return $this->hasOne(ProvisionType::class, ['id' => 'type_id']);
@@ -99,6 +100,9 @@ class ProvisionUser extends ActiveRecord {
 	public function setType(ProvisionType $type): void {
 		$this->type = $type;
 		$this->type_id = $type->id;
+		if ($this->value === null) {
+			$this->value = $type->value;
+		}
 	}
 
 	public function getIsOverwritten(): bool {
@@ -110,15 +114,11 @@ class ProvisionUser extends ActiveRecord {
 	}
 
 	public function getFormattedValue(): string {
-		return $this->type->getFormattedValue($this->value);
+		return $this->type->getFormattedValue($this->getValue());
 	}
 
 	public function getValue(): Decimal {
 		return new Decimal($this->value);
-	}
-
-	public static function find(): ProvisionUserQuery {
-		return new ProvisionUserQuery(static::class);
 	}
 
 	public function isSelf(): bool {
@@ -142,14 +142,45 @@ class ProvisionUser extends ActiveRecord {
 		return $date <= new DateTime($this->to_at);
 	}
 
+	/**
+	 * @param Decimal|null $value
+	 * @return Decimal
+	 */
 	public function generateProvision(Decimal $value = null): Decimal {
 		if (!$this->type->is_percentage) {
 			return $this->getValue();
 		}
 		if ($value === null) {
-			new InvalidArgumentException('$value must be Decimal when type is percentage.');
+			throw new InvalidArgumentException('$value must be Decimal when type is percentage.');
 		}
 		return $value->mul($this->getValue())->div(100);
 	}
 
+	public static function find(): ProvisionUserQuery {
+		return new ProvisionUserQuery(static::class);
+	}
+
+	public static function createFromBaseType(ProvisionUser $model, ProvisionType $type): self {
+		$self = new static();
+		$self->from_at = $model->from_at;
+		$self->to_at = $model->to_at;
+		$self->from_user_id = $model->from_user_id;
+		$self->to_user_id = $model->to_user_id;
+		$self->setType($type);
+		$self->value = static::addValue($model, $self)->toFixed(2);
+		return $self;
+	}
+
+	public static function addValue(ProvisionUser $a, ProvisionUser $b): Decimal {
+		if ($a->type->is_percentage && !$b->type->is_percentage) {
+			throw new InvalidArgumentException('Percentage/Const of Type must be same.');
+		}
+		$type = $a->type;
+		$valueA = $a->getValue();
+		$valueB = $b->getValue();
+		if (!$type->is_percentage) {
+			return $valueA->add($valueB);
+		}
+		return $valueA->mul($valueB)->div(100);
+	}
 }

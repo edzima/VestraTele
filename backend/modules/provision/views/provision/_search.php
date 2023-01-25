@@ -1,8 +1,8 @@
 <?php
 
 use common\models\provision\ProvisionSearch;
-use common\widgets\LastCurrentNextMonthNav;
 use common\widgets\DateWidget;
+use common\widgets\LastCurrentNextMonthNav;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -10,12 +10,13 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model ProvisionSearch */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $action string */
 ?>
 
 <div class="provision-search">
 
 	<?php $form = ActiveForm::begin([
-		'action' => ['index'],
+		'action' => [$action],
 		'method' => 'get',
 	]); ?>
 
@@ -45,6 +46,7 @@ use yii\widgets\ActiveForm;
 			<div class="pull-right">
 				<?= LastCurrentNextMonthNav::widget([
 					'model' => $model,
+					'baseRoute' => $action,
 					'dateFromAttribute' => 'dateFrom',
 					'dateToAttribute' => 'dateTo',
 				]) ?>
@@ -89,7 +91,7 @@ use yii\widgets\ActiveForm;
 
 	<div class="form-group">
 		<?= Html::submitButton('Szukaj', ['class' => 'btn btn-primary']) ?>
-		<?= Html::a('Reset', 'index', ['class' => 'btn btn-outline-secondary']) ?>
+		<?= Html::a('Reset', $action, ['class' => 'btn btn-outline-secondary']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

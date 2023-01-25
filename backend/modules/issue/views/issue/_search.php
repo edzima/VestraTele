@@ -53,7 +53,10 @@ use yii\widgets\ActiveForm;
 
 	</div>
 	<div class="row">
-		<?= $form->field($model, 'tele_id', ['options' => ['class' => 'col-md-4']])
+
+		<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput() ?>
+
+		<?= $form->field($model, 'tele_id', ['options' => ['class' => 'col-md-3 col-lg-2']])
 			->widget(Select2::class, [
 					'data' => IssueSearch::getTelemarketersNames(),
 					'options' => [
@@ -64,7 +67,13 @@ use yii\widgets\ActiveForm;
 					],
 				]
 			) ?>
-		<?= $form->field($model, 'lawyer_id', ['options' => ['class' => 'col-md-4']])
+
+		<?= $form->field($model, 'onlyWithTelemarketers', ['options' => ['class' => 'col-md-2 col-lg-1']])
+			->dropDownList(Html::booleanDropdownList(), [
+				'prompt' => Yii::t('common', 'All'),
+			])
+		?>
+		<?= $form->field($model, 'lawyer_id', ['options' => ['class' => 'col-md-3 col-lg-2']])
 			->widget(Select2::class, [
 					'data' => IssueSearch::getLawyersNames(),
 					'options' => [
@@ -77,7 +86,7 @@ use yii\widgets\ActiveForm;
 			) ?>
 
 		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ?
-			$form->field($model, 'parentId', ['options' => ['class' => 'col-md-4']])
+			$form->field($model, 'parentId', ['options' => ['class' => 'col-md-3 col-lg-2']])
 				->widget(Select2::class, [
 						'data' => User::getSelectList(Yii::$app->userHierarchy->getAllParentsIds()),
 						'options' => [
@@ -88,22 +97,40 @@ use yii\widgets\ActiveForm;
 						],
 					]
 				) : '' ?>
+
+		<?= $form->field($model, 'stageDeadlineFromAt', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+		<?= $form->field($model, 'stageDeadlineToAt', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'excludedStages', ['options' => ['class' => 'col-md-5 col-lg-4']])->widget(Select2::class, [
-			'data' => $model->getStagesNames(),
+
+		<?= $form->field($model, 'excludedTypes', ['options' => ['class' => 'col-md-5 col-lg-4']])->widget(Select2::class, [
+			'data' => $model->getIssueTypesNames(),
 			'options' => [
 				'multiple' => true,
-				'placeholder' => Yii::t('backend', 'Excluded stages'),
+				'placeholder' => $model->getAttributeLabel('excludedTypes'),
 			],
 			'pluginOptions' => [
 				'allowClear' => true,
 			],
-			'showToggleAll' => false,
 		]) ?>
 
-		<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput() ?>
+		<?= $form->field($model, 'excludedStages', ['options' => ['class' => 'col-md-5 col-lg-4']])->widget(Select2::class, [
+			'data' => $model->getStagesNames(),
+			'options' => [
+				'multiple' => true,
+				'placeholder' => $model->getAttributeLabel('excludedStages'),
+			],
+			'pluginOptions' => [
+				'allowClear' => true,
+			],
+		]) ?>
+
 
 		<?= $form->field($model, 'onlyDelayed', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
@@ -123,6 +150,7 @@ use yii\widgets\ActiveForm;
 			])
 			: ''
 		?>
+
 	</div>
 
 	<?= $model->addressSearch !== null
@@ -135,6 +163,13 @@ use yii\widgets\ActiveForm;
 
 
 	<div class="row">
+
+		<?= $form->field($model, 'userType', ['options' => ['class' => 'col-md-2']])
+			->dropDownList(IssueSearch::getIssueUserTypesNames(), [
+				'prompt' => Yii::t('common', 'Select...'),
+			])
+		?>
+
 		<?= $form->field($model, 'userName', ['options' => ['class' => 'col-md-2']])
 			->textInput()
 		?>
@@ -150,6 +185,16 @@ use yii\widgets\ActiveForm;
 			],
 			'showToggleAll' => false,
 		]) ?>
+
+
+		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ?
+			$form->field($model, 'onlyWithClaims', ['options' => ['class' => 'col-md-2']])->dropDownList(Html::booleanDropdownList(), [
+				'prompt' => Yii::t('common', 'All'),
+			])
+			: ''
+		?>
+
+
 	</div>
 
 

@@ -3,11 +3,12 @@
 namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueStage;
+use backend\modules\issue\models\IssueStageForm;
 use backend\modules\issue\models\search\IssueStageSearch;
 use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * StageController implements the CRUD actions for IssueStage model.
@@ -49,7 +50,7 @@ class StageController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionView($id) {
+	public function actionView(int $id) {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
@@ -62,10 +63,10 @@ class StageController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new IssueStage();
+		$model = new IssueStageForm();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('create', [
 			'model' => $model,
@@ -79,11 +80,12 @@ class StageController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionUpdate($id) {
-		$model = $this->findModel($id);
+	public function actionUpdate(int $id) {
+		$model = new IssueStageForm();
+		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('update', [
 			'model' => $model,
@@ -97,7 +99,7 @@ class StageController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionDelete($id) {
+	public function actionDelete(int $id) {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);
@@ -111,7 +113,7 @@ class StageController extends Controller {
 	 * @return IssueStage the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): IssueStage {
+	protected function findModel(int $id): IssueStage {
 		if (($model = IssueStage::findOne($id)) !== null) {
 			return $model;
 		}

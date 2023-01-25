@@ -105,7 +105,7 @@ class SummonController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView(int $id) {
+	public function actionView(int $id): string {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
@@ -121,8 +121,8 @@ class SummonController extends Controller {
 	 */
 	public function actionUpdate(int $id) {
 		$summon = $this->findModel($id);
-		if (!$summon->isForUser(Yii::$app->user->id)) {
-			throw new ForbiddenHttpException();
+		if (!static::canUpdate($summon)) {
+			throw new ForbiddenHttpException('Only for Owner or Summon Manager.');
 		}
 		$model = new SummonForm();
 		$model->setModel($summon);
@@ -153,5 +153,13 @@ class SummonController extends Controller {
 		}
 
 		throw new NotFoundHttpException('The requested page does not exist.');
+	}
+
+	public static function canUpdate(Summon $model): bool {
+		return static::isOwnerOrSummonManager($model);
+	}
+
+	private static function isOwnerOrSummonManager(Summon $model): bool {
+		return $model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER);
 	}
 }

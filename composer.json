@@ -40,6 +40,7 @@
 		"yii2tech/csv-grid": "^1.0",
 		"edzima/yii2-teryt": "^1.1.0",
 		"kartik-v/yii2-date-range": "~1.7.0",
+		"kartik-v/yii2-widget-colorinput": "^v1.0.6",
 		"yiimaker/yii2-email-templates": "~4.1",
 		"edzima/yii2-adescom": "^1.0",
 		"yiisoft/yii2-queue": "^2.3",

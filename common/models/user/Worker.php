@@ -19,18 +19,24 @@ class Worker extends User implements ActiveHierarchy {
 
 	public const ROLES = [
 		self::ROLE_AGENT,
+		self::ROLE_CO_AGENT,
 		self::ROLE_TELEMARKETER,
 		self::ROLE_BOOKKEEPER,
 		self::ROLE_CUSTOMER_SERVICE,
 		self::ROLE_LAWYER,
+		self::ROLE_LAWYER_ASSISTANT,
 		self::ROLE_MANAGER,
 	];
+	public const PERMISSION_ENTITY_RESPONSIBLE_MANAGER = 'entity_responsible.manager';
 
+	public const PERMISSION_ISSUE_CLAIM = 'issue.claim';
 	public const PERMISSION_ISSUE_CREATE = 'issue.create';
 	public const PERMISSION_ISSUE_DELETE = 'issue.delete';
 	public const PERMISSION_ISSUE_LINK_USER = 'issue.link-user';
-	public const PERMISSION_ISSUE_CLAIM = 'issue.claim';
 	public const PERMISSION_ISSUE_STAGE_CHANGE = 'issue.stage.change';
+	public const PERMISSION_ISSUE_STAGE_MANAGER = 'issue.stage.manager';
+	public const PERMISSION_ISSUE_TAG_MANAGER = 'issue.tag.manager';
+	public const PERMISSION_ISSUE_TYPE_MANAGER = 'issue.type.manager';
 
 	public const PERMISSION_NOTE_TEMPLATE = 'note.template';
 	public const PERMISSION_COST_DEBT = 'cost.debt';
@@ -39,7 +45,10 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_SUMMON_MANAGER = 'summon.manager';
 	public const PERMISSION_SUMMON_CREATE = 'summon.create';
 
+	public const PERMISSION_SETTLEMENT_ADMINISTRATIVE_CREATE = 'settlement.administrative.create';
 	public const PERMISSION_PAY_ALL_PAID = 'pay.all-paid';
+	public const PERMISSION_POTENTIAL_CLIENT = 'potential-client';
+	public const PERMISSION_SETTLEMENT_DELETE_NOT_SELF = 'settlement.delete-not-self';
 
 	private static $USER_NAMES = [];
 

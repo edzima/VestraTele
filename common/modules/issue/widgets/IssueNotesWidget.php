@@ -4,7 +4,6 @@ namespace common\modules\issue\widgets;
 
 use common\models\issue\IssueNote;
 use Yii;
-use yii\helpers\Url;
 
 /**
  * Widget for render Issue Notes.
@@ -13,15 +12,21 @@ use yii\helpers\Url;
  */
 class IssueNotesWidget extends IssueWidget {
 
+	public const TYPE_USER_FRONT = IssueNote::TYPE_USER_FRONT;
 	public const TYPE_SETTLEMENT = IssueNote::TYPE_SETTLEMENT;
 	public const TYPE_SUMMON = IssueNote::TYPE_SUMMON;
+	public const TYPE_SMS = IssueNote::TYPE_SMS;
 
 	public ?string $title = null;
 
 	public ?array $notes = null;
 	public ?string $type = null;
+
+	public array $collapseTypes = [];
+	public bool $withProvisionControl = true;
+
 	/**
-	 * @var IssueNote[]
+	 * @see IssueNoteWidget
 	 */
 	public array $noteOptions = [];
 
@@ -31,12 +36,15 @@ class IssueNotesWidget extends IssueWidget {
 	public function init(): void {
 		parent::init();
 		if ($this->notes === null) {
-			$this->notes = $this->model
+			$query = $this->model
 				->getIssueNotes()
-				->withoutTypes([IssueNote::TYPE_SETTLEMENT])
-				->orWhere(['type' => null])
-				->joinWith('user.userProfile')
-				->all();
+				->joinWith('user.userProfile');
+
+			if (!$this->withProvisionControl) {
+				//	$query->withoutTypes([IssueNote::TYPE_SETTLEMENT_PROVISION_CONTROL]);
+			}
+
+			$this->notes = $query->all();
 		}
 		if ($this->title === null) {
 			$this->title = Yii::t('issue', 'Issue Notes');
@@ -50,8 +58,8 @@ class IssueNotesWidget extends IssueWidget {
 		if (empty($this->notes)) {
 			return '';
 		}
+		$this->noteOptions['collapseTypes'] = $this->collapseTypes;
 		return $this->render('issue-notes', [
-			'model' => $this->model,
 			'noteOptions' => $this->noteOptions,
 			'notes' => $this->notes,
 			'title' => $this->title,

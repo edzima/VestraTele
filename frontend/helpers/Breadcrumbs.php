@@ -12,7 +12,13 @@ class Breadcrumbs {
 		if ($model->getIssueModel()->customer) {
 			$breadcrumbs[] = $model->getIssueModel()->customer->getFullName();
 		}
-		$breadcrumbs[] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/index']];
+		$breadcrumbs[] = ['label' => Yii::t('issue', 'Issues'), 'url' => [Url::ROUTE_ISSUE_INDEX]];
+		if ($model->getIssueType()->parent) {
+			$breadcrumbs[] = [
+				'label' => $model->getIssueType()->parent->name,
+				'url' => Url::issuesParentType($model->getIssueType()->parent_id),
+			];
+		}
 		$breadcrumbs[] = ['label' => $model->getIssueName(), 'url' => Url::issueView($model->getIssueId())];
 		return $breadcrumbs;
 	}

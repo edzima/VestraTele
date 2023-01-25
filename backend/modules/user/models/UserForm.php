@@ -10,6 +10,7 @@ use common\models\user\UserTrait;
 use common\models\user\UserTraitAssign;
 use Yii;
 use yii\base\Model;
+use yii\data\ActiveDataProvider;
 use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
 
@@ -32,6 +33,8 @@ class UserForm extends Model {
 	public bool $sendEmail = false;
 	public bool $isEmailRequired = true;
 
+	public ?bool $acceptDuplicates = null;
+
 	private ?User $model = null;
 	private ?UserProfile $profile = null;
 	private ?Address $homeAddress = null;
@@ -39,6 +42,32 @@ class UserForm extends Model {
 
 	protected const EXCLUDED_ROLES = [];
 	protected const EXCLUDED_PERMISSIONS = [];
+
+	private ?ActiveDataProvider $duplicatesDataProvider = null;
+
+	public function getDuplicatesDataProvider(): ?ActiveDataProvider {
+		if (
+			$this->duplicatesDataProvider === null
+			&& !empty($this->getProfile()->firstname)
+			&& !empty($this->getProfile()->lastname)
+
+		) {
+
+			$this->duplicatesDataProvider = new ActiveDataProvider([
+				'query' => User::find()
+					->joinWith('userProfile')
+					->joinWith('addresses.address.city')
+					->andWhere([UserProfile::tableName() . '.firstname' => $this->getProfile()->firstname])
+					->andWhere([UserProfile::tableName() . '.lastname' => $this->getProfile()->lastname]),
+				'sort' => [
+					'defaultOrder' => [
+						'updated_at' => SORT_DESC,
+					],
+				],
+			]);
+		}
+		return $this->duplicatesDataProvider;
+	}
 
 	/**
 	 * @inheritdoc
@@ -75,6 +104,12 @@ class UserForm extends Model {
 			['email', 'string', 'max' => 255],
 			['email', 'default', 'value' => null],
 			['status', 'integer'],
+			[
+				'acceptDuplicates', 'required', 'on' => static::SCENARIO_CREATE, 'when' => function (): bool {
+				return $this->hasDuplicates();
+			}, 'message' => Yii::t('backend', 'You must accept duplicates before create User.'),
+			],
+			['acceptDuplicates', 'boolean'],
 			['status', 'in', 'range' => array_keys(static::getStatusNames())],
 			['traits', 'in', 'range' => array_keys(static::getTraitsNames()), 'allowArray' => true],
 			[
@@ -114,6 +149,7 @@ class UserForm extends Model {
 			'roles' => Yii::t('backend', 'Roles'),
 			'permissions' => Yii::t('backend', 'Permissions'),
 			'traits' => Yii::t('common', 'Traits'),
+			'acceptDuplicates' => Yii::t('backend', 'Accept Duplicates'),
 		];
 	}
 
@@ -169,17 +205,31 @@ class UserForm extends Model {
 			&& $this->getHomeAddress()->load($data);
 	}
 
+	public function hasDuplicates(): bool {
+		if ($this->getDuplicatesDataProvider()) {
+			return $this->getDuplicatesDataProvider()->totalCount > 0;
+		}
+		return false;
+	}
+
+	public function acceptDuplicates(): bool {
+		if (!$this->hasDuplicates()) {
+			return true;
+		}
+		return (bool) $this->acceptDuplicates;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function validate($attributeNames = null, $clearErrors = true) {
-		return parent::validate($attributeNames, $clearErrors)
-			&& $this->getProfile()->validate($attributeNames, $clearErrors)
+		return $this->getProfile()->validate($attributeNames, $clearErrors) // first profile for duplicatesConfirm rule
+			&& parent::validate($attributeNames, $clearErrors)
 			&& $this->getHomeAddress()->validate($attributeNames, $clearErrors);
 	}
 
-	public function save(): bool {
-		if (!$this->validate()) {
+	public function save(bool $validate = true): bool {
+		if ($validate && !$this->validate()) {
 			return false;
 		}
 

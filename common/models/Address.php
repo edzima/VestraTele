@@ -83,16 +83,21 @@ class Address extends ActiveRecord {
 		return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('{{%user_address}}', ['address_id' => 'id']);
 	}
 
-	public function getMeets(): ActiveQuery {
-		return $this->hasMany(IssueMeet::class, ['id' => 'meet_id'])->viaTable('{{%meet_address}}', ['address_id' => 'id']);
-	}
-
 	public function getLeads(): ActiveQuery {
 		return $this->hasMany(Lead::class, ['id' => 'lead_id'])->viaTable('{{%lead_address}}', ['address_id' => 'id']);
 	}
 
 	public function getCityFullName(): string {
 		return $this->city->getAddress()->fullName;
+	}
+
+	public function getCityWithPostalCode(bool $withRegionAndProvince = false, bool $strongPostalCodeTag = true): ?string {
+		$city = $this->city;
+		if ($city === null) {
+			return Yii::$app->formatter->asCityCode(null, $this->postal_code);
+		}
+		$cityName = $withRegionAndProvince ? $city->nameWithRegionAndDistrict : $city->name;
+		return Yii::$app->formatter->asCityCode($cityName, $this->postal_code, $strongPostalCodeTag);
 	}
 
 }

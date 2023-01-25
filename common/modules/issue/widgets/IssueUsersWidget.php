@@ -2,8 +2,10 @@
 
 namespace common\modules\issue\widgets;
 
+use backend\assets\CopyToClipboardAsset;
 use backend\helpers\Html;
 use Closure;
+use common\assets\TooltipAsset;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\user\User;
@@ -55,6 +57,7 @@ class IssueUsersWidget extends Widget {
 				//		'class' => 'col-md-6',
 			],
 			'detailConfig' => [
+				'id' => $this->getId(),
 				'attributes' => [
 					[
 						'attribute' => 'email',
@@ -156,16 +159,41 @@ class IssueUsersWidget extends Widget {
 				if ($address->postal_code) {
 					$name = $address->postal_code . ' ' . $name;
 				}
+				$this->view->registerAssetBundle(CopyToClipboardAsset::class);
+				$this->view->registerAssetBundle(TooltipAsset::class);
+				$this->view->registerJs(TooltipAsset::initScript(TooltipAsset::defaultSelector(
+					'#' . $this->getId()
+				)));
+
+				$clipboardText = $this->getClipboardText($issueUser);
+				$onClick = 'copyToClipboard("' . $clipboardText . '")';
 				$options['detailConfig']['attributes'] = array_merge($options['detailConfig']['attributes'], [
 					[
 						'attribute' => 'homeAddress.city.nameWithRegionAndDistrict',
 						'label' => Yii::t('common', 'City'),
 						'value' => $name,
+						'captionOptions' => [
+							'onClick' => $onClick,
+							TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::t('issue', 'Click for Copy to Clipboard'),
+						],
+						'contentOptions' => [
+							'onClick' => $onClick,
+							TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::t('issue', 'Click for Copy to Clipboard'),
+						],
 					],
 					[
 						'attribute' => 'homeAddress.info',
 						'label' => 'Ulica i nr',
 						'visible' => !empty($address->info),
+						'captionOptions' => [
+							'onClick' => $onClick,
+							TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::t('issue', 'Click for Copy to Clipboard'),
+						],
+						'contentOptions' => [
+							'onClick' => $onClick,
+							TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::t('issue', 'Click for Copy to Clipboard'),
+						],
+
 					],
 				]);
 			}
@@ -191,4 +219,34 @@ class IssueUsersWidget extends Widget {
 		}
 		return '';
 	}
+
+	private function getClipboardText(IssueUser $issueUser): ?string {
+		if (!$this->withAddress) {
+			return null;
+		}
+		$address = $issueUser->user->homeAddress;
+		if ($address === null) {
+			return null;
+		}
+		$text = [];
+		$text[] = trim($issueUser->user->profile->firstname . ' ' . $issueUser->user->profile->lastname);
+		if ($address->info) {
+			$text[] = $address->info;
+		}
+		$cityWithPostal = [];
+		if ($address->postal_code) {
+			$cityWithPostal[] = $address->postal_code;
+		}
+		if ($address->city) {
+			$cityWithPostal[] = $address->city->name;
+		}
+		if (!empty($cityWithPostal)) {
+			$text[] = trim(implode(' ', $cityWithPostal));
+		}
+		$text = array_map(static function ($value): string {
+			return Html::encode($value);
+		}, $text);
+		return implode("<br>", $text);
+	}
+
 }

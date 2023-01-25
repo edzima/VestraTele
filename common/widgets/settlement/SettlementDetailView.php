@@ -18,6 +18,7 @@ class SettlementDetailView extends DetailView {
 	public bool $withType = true;
 	public bool $withOwner = true;
 
+	public bool $withCreatedAt = false;
 	public bool $withValueWithoutCosts = false;
 
 	public function init(): void {
@@ -35,7 +36,13 @@ class SettlementDetailView extends DetailView {
 		return [
 			[
 				'attribute' => 'problemStatusName',
-				'visible' => $this->model->hasProblemStatus(),
+				'visible' => $this->model->hasProblemStatus() && !$this->model->isProvisionControl(),
+			],
+			[
+				'label' => Yii::t('settlement', 'Provision Control'),
+				'format' => 'boolean',
+				'value' => $this->model->isProvisionControl(),
+				'visible' => $this->model->isProvisionControl(),
 			],
 			[
 				'attribute' => 'typeName',
@@ -95,6 +102,11 @@ class SettlementDetailView extends DetailView {
 				'value' => function (IssuePayCalculation $model): Decimal {
 					return $model->getUserProvisionsSumNotPay($this->userIdProvisions);
 				},
+			],
+			[
+				'attribute' => 'created_at',
+				'visible' => $this->withCreatedAt,
+				'format' => 'date',
 			],
 		];
 	}

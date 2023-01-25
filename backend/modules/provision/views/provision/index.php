@@ -33,9 +33,18 @@ $this->params['breadcrumbs'][] = $this->title;
 		], [
 			'class' => 'btn btn-warning',
 		]) ?>
+
+		<?= Html::a(Yii::t('provision', 'Doubles'), [
+			'doubles',
+		], [
+			'class' => 'btn btn-danger',
+		]) ?>
 	</p>
 
-	<?= $this->render('_search', ['model' => $searchModel]) ?>
+	<?= $this->render('_search', [
+		'action' => 'index',
+		'model' => $searchModel,
+	]) ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,

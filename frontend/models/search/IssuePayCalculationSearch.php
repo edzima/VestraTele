@@ -23,7 +23,7 @@ class IssuePayCalculationSearch extends BaseIssuePayCalculationSearch {
 
 	protected function applyProblemStatusFilter(IssuePayCalculationQuery $query): void {
 		if ((int) $this->problem_status === static::PROBLEM_STATUS_NONE) {
-			$this->onlyWithProblems = false;
+			$this->onlyWithPayProblems = false;
 		}
 		parent::applyProblemStatusFilter($query);
 	}

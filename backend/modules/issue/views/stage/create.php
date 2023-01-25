@@ -1,17 +1,16 @@
 <?php
 
-use yii\helpers\Html;
+use backend\modules\issue\models\IssueStageForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\IssueStage */
+/* @var $model IssueStageForm */
 
-$this->title = 'Dodaj etap';
-$this->params['breadcrumbs'][] = ['label' => 'Issue Stages', 'url' => ['index']];
+$this->title = Yii::t('backend', 'Create Issue Stage');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['issue/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Stages'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-stage-create">
-
-	<h1><?= Html::encode($this->title) ?></h1>
 
 	<?= $this->render('_form', [
 		'model' => $model,

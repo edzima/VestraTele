@@ -253,6 +253,14 @@ class ProvisionTypeFormTest extends Unit {
 		$this->tester->assertFalse($type->getWithHierarchy());
 	}
 
+	public function testWithBaseTypeId(): void {
+		$model = $this->model;
+		$model->baseTypeId = 1;
+		$this->thenSuccessSave();
+		$type = $this->grabModel();
+		$this->tester->assertSame(1, $type->getBaseTypeId());
+	}
+
 	protected function giveModel(bool $isPercentage = true, array $config = []): void {
 		$config['is_percentage'] = $isPercentage;
 		if (!isset($config['name'])) {

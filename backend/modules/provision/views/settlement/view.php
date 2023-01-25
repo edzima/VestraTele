@@ -45,6 +45,13 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 			['class' => 'btn btn-warning'])
 		?>
 
+		<?= $model->isProvisionControl()
+			? Html::a(Yii::t('backend', 'Unmark Provision Control'),
+				['/settlement/calculation-problem/remove', 'id' => $model->id],
+				['class' => 'btn btn-warning'])
+			: ''
+		?>
+
 		<?= $dataProvider->getTotalCount()
 			? Html::a(
 				Yii::t('provision', 'Delete provisions'),
@@ -52,7 +59,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 				[
 					'class' => 'btn btn-danger pull-right',
 					'data-method' => 'POST',
-					'data-confirm' => Yii::t('backend', 'Are you sure you want to delete all provisions for this settlement?'),
+					'data-confirm' => Yii::t('backend', 'Are you sure you want to delete all provisions for this settlement? Provision Control will be unmark.'),
 				]
 			)
 			: ''
@@ -63,7 +70,14 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 		<div class="col-md-4 col-lg-3">
 			<?= SettlementDetailView::widget([
 				'model' => $model,
+				'withCreatedAt' => true,
 			]) ?>
+
+			<?= $this->render(
+				'_user_provisions', [
+					'dataProvider' => $dataProvider,
+				]
+			) ?>
 		</div>
 		<div class="col-md-8 col-lg-9">
 			<?= GridView::widget([
@@ -81,6 +95,7 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Provisions');
 					'value:currency',
 					'provision',
 					'pay.value:currency',
+					'pay.pay_at:date',
 					[
 						'class' => ActionColumn::class,
 						'controller' => '/provision/provision',

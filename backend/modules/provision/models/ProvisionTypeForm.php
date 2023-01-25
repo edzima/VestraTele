@@ -3,6 +3,7 @@
 namespace backend\modules\provision\models;
 
 use common\models\provision\IssueProvisionType;
+use common\models\provision\ProvisionType;
 use Yii;
 use yii\base\Model;
 use yii\db\QueryInterface;
@@ -16,21 +17,29 @@ class ProvisionTypeForm extends Model {
 
 	public bool $is_default = false;
 	public bool $with_hierarchy = true;
+	public bool $isDateFromSettlement = false;
 	public $issueUserType;
 	public $issueTypesIds = [];
 	public $issueStagesIds = [];
 	public $settlementTypes = [];
 	public $issueRequiredUserTypes = [];
+	public $issueExcludedUserTypes = [];
 
 	public ?string $from_at = null;
 	public ?string $to_at = null;
 
+	public $baseTypeId;
+
 	private ?IssueProvisionType $model = null;
+
+	public static function getTypesNames(): array {
+		return ProvisionType::getTypesNames(false);
+	}
 
 	public function rules(): array {
 		return [
 			[['name', 'value', 'is_percentage', 'issueUserType', 'is_active', 'with_hierarchy'], 'required'],
-			['name', 'string', 'max' => 50],
+			['name', 'string', 'max' => 255],
 			[
 				'name', 'unique', 'targetClass' => IssueProvisionType::class,
 				'filter' => function (QueryInterface $query): void {
@@ -52,11 +61,14 @@ class ProvisionTypeForm extends Model {
 				},
 				'enableClientValidation' => false,
 			],
-			[['is_default', 'is_percentage', 'is_active', 'with_hierarchy'], 'boolean'],
+			[['baseTypeId'], 'integer'],
+			[['is_default', 'is_percentage', 'is_active', 'with_hierarchy', 'isDateFromSettlement'], 'boolean'],
+			['baseTypeId', 'default', 'value' => null],
+			['baseTypeId', 'in', 'range' => array_keys(static::getTypesNames())],
 			['settlementTypes', 'in', 'range' => array_keys(static::getSettlementTypesNames()), 'allowArray' => true],
 			['issueTypesIds', 'in', 'range' => array_keys(static::getIssueTypesNames()), 'allowArray' => true],
 			['issueStagesIds', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true],
-			['issueRequiredUserTypes', 'in', 'range' => array_keys(static::getIssueUserTypesNames()), 'allowArray' => true],
+			[['issueRequiredUserTypes', 'issueExcludedUserTypes'], 'in', 'range' => array_keys(static::getIssueUserTypesNames()), 'allowArray' => true],
 			['issueUserType', 'in', 'range' => array_keys(static::getIssueUserTypesNames())],
 			['settlementTypes', 'each', 'rule' => ['integer']],
 		];
@@ -69,7 +81,9 @@ class ProvisionTypeForm extends Model {
 			'issueTypesIds' => Yii::t('common', 'Issue Types'),
 			'issueUserType' => Yii::t('provision', 'For whom'),
 			'issueRequiredUserTypes' => Yii::t('provision', 'Required issue user types'),
+			'issueExcludedUserTypes' => Yii::t('provision', 'Excluded issue user types'),
 			'with_hierarchy' => Yii::t('provision', 'With hierarchy'),
+			'isDateFromSettlement' => Yii::t('provision', 'Date from Settlement'),
 		]);
 	}
 
@@ -84,8 +98,11 @@ class ProvisionTypeForm extends Model {
 		$this->issueUserType = $model->getIssueUserType();
 		$this->issueTypesIds = $model->getIssueTypesIds();
 		$this->issueRequiredUserTypes = $model->getIssueRequiredUserTypes();
+		$this->issueExcludedUserTypes = $model->getIssueExcludedUserTypes();
 		$this->settlementTypes = $model->getSettlementTypes();
 		$this->with_hierarchy = $model->getWithHierarchy();
+		$this->baseTypeId = $model->getBaseTypeId();
+		$this->isDateFromSettlement = $model->getIsForDateFromSettlement();
 	}
 
 	public function getModel(): IssueProvisionType {
@@ -107,11 +124,14 @@ class ProvisionTypeForm extends Model {
 		$model->is_default = $this->is_default;
 		$model->from_at = $this->from_at;
 		$model->to_at = $this->to_at;
+		$model->setBaseTypeId($this->baseTypeId);
 		$model->setWithHierarchy($this->with_hierarchy);
+		$model->setIsForDateFromSettlement($this->isDateFromSettlement);
 		$model->setIssueUserTypes($this->issueUserType);
 		$model->setIssueStagesIds(is_array($this->issueStagesIds) ? $this->issueStagesIds : []);
 		$model->setIssueTypesIds(is_array($this->issueTypesIds) ? $this->issueTypesIds : []);
 		$model->setIssueRequiredUserTypes(is_array($this->issueRequiredUserTypes) ? $this->issueRequiredUserTypes : []);
+		$model->setIssueExcludedUserTypes(is_array($this->issueExcludedUserTypes) ? $this->issueExcludedUserTypes : []);
 		$model->setSettlementTypes(is_array($this->settlementTypes) ? $this->settlementTypes : []);
 		return $model->save();
 	}
