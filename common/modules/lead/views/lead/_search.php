@@ -17,6 +17,7 @@ use kartik\select2\Select2;
 
 	<?php $form = ActiveForm::begin([
 		'method' => 'get',
+		'id' => 'lead-header-filter-form',
 	]); ?>
 
 	<div class="row">
