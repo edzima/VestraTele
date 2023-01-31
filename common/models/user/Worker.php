@@ -38,6 +38,10 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_ISSUE_TAG_MANAGER = 'issue.tag.manager';
 	public const PERMISSION_ISSUE_TYPE_MANAGER = 'issue.type.manager';
 
+	public const PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE = 'issue.message.note.issue';
+	public const PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SUMMON = 'issue.message.note.summon';
+	public const PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SETTLEMENT = 'issue.message.note.settlement';
+
 	public const PERMISSION_NOTE_TEMPLATE = 'note.template';
 	public const PERMISSION_COST_DEBT = 'cost.debt';
 	public const PERMISSION_PROVISION_CHILDREN_VISIBLE = 'provision.children.visible';
