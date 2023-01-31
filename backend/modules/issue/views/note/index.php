@@ -42,6 +42,18 @@ $this->params['breadcrumbs'][] = $this->title;
 					],
 				],
 			],
+			[
+				'class' => DataColumn::class,
+				'attribute' => 'updater_id',
+				'value' => 'updater',
+				'filter' => IssueNoteSearch::getUpdatersNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'options' => [
+						'placeholder' => $searchModel->getAttributeLabel('updater_id'),
+					],
+				],
+			],
 			'title',
 			'description',
 			'is_pinned:boolean',

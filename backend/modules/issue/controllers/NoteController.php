@@ -172,6 +172,7 @@ class NoteController extends Controller {
 			throw new ForbiddenHttpException('Only self note can update or User with Note Update permission.');
 		}
 		$model = new IssueNoteForm();
+		$model->updater_id = Yii::$app->user->getId();
 		$model->messagesForm = new IssueNoteMessagesForm([
 			'issue' => $note->issue,
 			'sms_owner_id' => Yii::$app->user->getId(),

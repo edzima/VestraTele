@@ -19,6 +19,7 @@ class IssueNoteForm extends Model {
 	public const SCENARIO_STAGE_CHANGE = 'stage-change';
 	public ?int $issue_id = null;
 	public ?int $user_id = null;
+	public ?int $updater_id = null;
 
 	public ?string $type = null;
 	public bool $is_pinned = false;
@@ -72,6 +73,11 @@ class IssueNoteForm extends Model {
 	public function rules(): array {
 		return [
 			[['title', '!user_id', '!issue_id', 'publish_at'], 'required'],
+			[
+				['!updater_id'], 'required', 'when' => function (): bool {
+				return !$this->getModel()->isNewRecord;
+			},
+			],
 			[['!title'], 'required', 'on' => static::SCENARIO_STAGE_CHANGE],
 			[['stageChangeAtMerge'], 'required', 'on' => static::SCENARIO_STAGE_CHANGE],
 			[['issue_id', 'user_id'], 'integer'],
@@ -82,7 +88,7 @@ class IssueNoteForm extends Model {
 			['description', 'default', 'value' => null],
 			['publish_at', 'date', 'format' => 'php:' . $this->dateFormat],
 			['issue_id', 'exist', 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
-			['user_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+			[['user_id', 'updater_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 			['linkedIssuesMessages', 'boolean'],
 			[
 				'linkedIssues',
@@ -179,6 +185,7 @@ class IssueNoteForm extends Model {
 			$model->issue_id = $this->issue_id;
 			$model->is_pinned = $this->is_pinned;
 			$model->user_id = $this->user_id;
+			$model->updater_id = $this->updater_id;
 			$model->type = $this->type;
 			$model->title = $this->title;
 			$model->description = $this->description;

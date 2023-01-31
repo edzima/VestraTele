@@ -142,4 +142,5 @@ return [
 	'Issue Workers Types' => 'Pracownicy dot. Sprawy',
 	'Send Email to: {worker}' => 'Wyślij Email do: {worker}',
 	'Extra Workers Emails' => 'Dodatkowo',
+	'Updated by: {user}' => 'Edytowano {user}',
 ];
