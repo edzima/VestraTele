@@ -7,6 +7,8 @@ use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
+use common\models\message\IssueNoteMessagesForm;
+use common\models\message\SummonNoteMessagesForm;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\actions\NoteDescriptionListAction;
@@ -75,6 +77,18 @@ class NoteController extends Controller {
 			'user_id' => Yii::$app->user->getId(),
 		]);
 
+		$message = new IssueNoteMessagesForm([
+			'issue' => $issue,
+			'sms_owner_id' => Yii::$app->user->getId(),
+			'hiddenFields' => [
+				'sendSmsToCustomer',
+				'sendEmailToCustomer',
+			],
+			'sendEmailToWorkers' => true,
+		]);
+		$message->setExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE));
+		$model->messagesForm = $message;
+
 		if (!Yii::$app->user->can(User::PERMISSION_NOTE)) {
 			$model->type = IssueNote::TYPE_SELF;
 			Flash::add(Flash::TYPE_WARNING,
@@ -97,6 +111,17 @@ class NoteController extends Controller {
 		}
 		$model = IssueNoteForm::createSettlement($settlement);
 		$model->user_id = Yii::$app->user->getId();
+		$message = new IssueNoteMessagesForm([
+			'issue' => $settlement->issue,
+			'sms_owner_id' => Yii::$app->user->getId(),
+			'hiddenFields' => [
+				'sendSmsToCustomer',
+				'sendEmailToCustomer',
+			],
+			'sendEmailToWorkers' => true,
+		]);
+		$message->setExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SETTLEMENT));
+		$model->messagesForm = $message;
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$this->redirect(['/settlement/view', 'id' => $settlement->id]);
@@ -114,6 +139,17 @@ class NoteController extends Controller {
 		}
 		$model = IssueNoteForm::createSummon($summon);
 		$model->user_id = Yii::$app->user->getId();
+		$message = new SummonNoteMessagesForm([
+			'summon' => $summon,
+			'sms_owner_id' => Yii::$app->user->getId(),
+			'hiddenFields' => [
+				'sendSmsToCustomer',
+				'sendEmailToCustomer',
+			],
+			'sendEmailToWorkers' => true,
+		]);
+		$message->setExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SUMMON));
+		$model->messagesForm = $message;
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$this->redirect(['/summon/view', 'id' => $summon->id]);
 		}

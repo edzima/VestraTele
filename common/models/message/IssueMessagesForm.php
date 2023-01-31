@@ -101,6 +101,17 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 		];
 	}
 
+	public function setExtraWorkersEmailsIds(array $ids) {
+		$users = User::find()
+			->andWhere(['id' => $ids])
+			->joinWith('userProfile')
+			->active()
+			->all();
+		foreach ($users as $user) {
+			$this->addExtraWorkerEmail($user);
+		}
+	}
+
 	public function addExtraWorkerEmail(User $user, string $prefix = null, bool $select = true): void {
 		if ($user->email) {
 			$name = $prefix ? $prefix . ' - ' . $user->getFullName() : $user->getFullName();
