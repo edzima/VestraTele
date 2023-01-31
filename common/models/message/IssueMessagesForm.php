@@ -4,6 +4,7 @@ namespace common\models\message;
 
 use common\components\message\MessageTemplate;
 use common\components\message\MessageTemplateKeyHelper;
+use common\helpers\ArrayHelper;
 use common\helpers\Html;
 use common\models\forms\HiddenFieldsModel;
 use common\models\issue\IssueInterface;
@@ -27,10 +28,9 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 	public ?bool $sendSmsToAgent = null;
 	public ?bool $sendEmailToCustomer = null;
 	public ?bool $sendEmailToWorkers = null;
-	public ?bool $sendEmailToExtraWorker = null;
-	public ?User $emailExtraWorker;
 
-	public array $extraWorkersEmails = [];
+	public $extraWorkersEmails = [];
+	private array $_extraWorkersEmailsData = [];
 
 	public array $hiddenFields = [];
 
@@ -49,12 +49,6 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 	protected ?MessageTemplate $agentSMSTemplate = null;
 	protected ?MessageTemplate $customerEmailTemplate = null;
 	protected ?MessageTemplate $workersEmailTemplate = null;
-
-	public function addWorkerEmail(User $user): void {
-		if ($user->email) {
-			$this->extraWorkersEmails[$user->email] = $user->getFullName();
-		}
-	}
 
 	public function setIssue(IssueInterface $issue): void {
 		$this->issue = $issue;
@@ -76,8 +70,7 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 
 	public function rules(): array {
 		return [
-			['!emailUserId', 'integer'],
-			[['sendSmsToCustomer', 'sendEmailToCustomer', 'sendSmsToAgent', 'sendEmailToWorkers', 'sendEmailToExtraWorker'], 'boolean'],
+			[['sendSmsToCustomer', 'sendEmailToCustomer', 'sendSmsToAgent', 'sendEmailToWorkers'], 'boolean'],
 			[
 				'workersTypes', 'required',
 				'enableClientValidation' => false,
@@ -86,6 +79,8 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 				},
 			],
 			['workersTypes', 'in', 'range' => array_keys($this->getWorkersUsersTypesNames()), 'allowArray' => true],
+			['extraWorkersEmails', 'in', 'range' => array_keys($this->getExtraWorkersEmailsData()), 'allowArray' => true],
+
 			[
 				'!sms_owner_id', 'required', 'when' => function (): bool {
 				return $this->sendSmsToCustomer || $this->sendSmsToAgent;
@@ -101,25 +96,33 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 			'sendSmsToAgent' => Yii::t('issue', 'Send SMS to Agent'),
 			'sendEmailToCustomer' => Yii::t('issue', 'Send Email To Customer'),
 			'sendEmailToWorkers' => Yii::t('issue', 'Send Email To Workers'),
-			'workersTypes' => Yii::t('issue', 'Workers'),
+			'workersTypes' => Yii::t('issue', 'Issue Workers Types'),
 			'extraWorkersEmails' => Yii::t('issue', 'Extra Workers Emails'),
 		];
 	}
 
-	private array $_extraWorkersEmails = [];
-	/**
-	 * @var string[] extra users names indexed by IDs.
-	 */
-	public array $extraWorkers = [];
+	public function addExtraWorkerEmail(User $user, string $prefix = null, bool $select = true): void {
+		if ($user->email) {
+			$name = $prefix ? $prefix . ' - ' . $user->getFullName() : $user->getFullName();
+			$this->_extraWorkersEmailsData[$user->email] = $name;
+			if ($select) {
+				$this->extraWorkersEmails[] = $user->email;
+			}
+		}
+	}
 
 	public function getExtraWorkersEmailsData(): array {
-		if (empty($this->_extraWorkersEmails) && !empty($this->extra)) {
-//@todo
+		if (empty($this->_extraWorkersEmailsData)) {
+			$this->_extraWorkersEmailsData = ArrayHelper::map(User::find()
+				->joinWith('userProfile')
+				->andWhere(['email' => array_keys($this->extraWorkersEmails)])
+				->active()
+				->all(),
+				'email',
+				'fullName'
+			);
 		}
-		return User::find()
-			->joinWith('userProfile')
-			->andWhere(['id' => $this->extraWorkersEmails])
-			->all();
+		return $this->_extraWorkersEmailsData;
 	}
 
 	public function pushMessages(): ?int {
@@ -246,7 +249,12 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 	}
 
 	public function getEmailToWorkers(): ?MessageInterface {
-		$emails = $this->getIssueUsersEmails();
+		$emails = array_unique(
+			array_merge(
+				$this->getIssueUsersEmails(),
+				(array) $this->extraWorkersEmails
+			)
+		);
 		if (empty($emails)) {
 			return null;
 		}

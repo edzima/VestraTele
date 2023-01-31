@@ -139,5 +139,7 @@ return [
 	'First name & surname' => 'Nazwisko & Imie',
 	'As who' => 'Jako kto',
 	'Create Note' => 'Dodaj Notatkę',
+	'Issue Workers Types' => 'Pracownicy dot. Sprawy',
 	'Send Email to: {worker}' => 'Wyślij Email do: {worker}',
+	'Extra Workers Emails' => 'Dodatkowo',
 ];
