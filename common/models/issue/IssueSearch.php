@@ -426,7 +426,7 @@ abstract class IssueSearch extends Model
 	}
 
 	public function getStagesNames(): array {
-		$stages = IssueStage::getStagesNames($this->withArchive, $this->withArchiveDeep));
+		$stages = IssueStage::getStagesNames($this->withArchive, $this->withArchiveDeep);
 		if ($this->getIssueParentType() === null) {
 			return $stages;
 		}
@@ -476,7 +476,7 @@ abstract class IssueSearch extends Model
 	}
 
 	public function excludeStage(int $stage_id): void {
-		if ($this->getParentType() && !$this->getParentType()->hasStage($stage_id)) {
+		if ($this->getIssueParentType() && !$this->getIssueParentType()->hasStage($stage_id)) {
 			return;
 		}
 		$this->excludedStages[] = $stage_id;
