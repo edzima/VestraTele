@@ -227,7 +227,6 @@ class NoteController extends Controller {
 		if (($model = IssueNote::find()
 				->andWhere([
 					'id' => $id,
-					'user_id' => Yii::$app->user->id,
 				])
 				->one()) !== null) {
 			return $model;
