@@ -2,6 +2,8 @@
 
 namespace common\models\message;
 
+use common\components\message\MessageTemplate;
+
 class UpdateNoteMessagesForm extends IssueNoteMessagesForm {
 
 	public ?bool $sendEmailToWorkers = true;
@@ -12,6 +14,16 @@ class UpdateNoteMessagesForm extends IssueNoteMessagesForm {
 			'note',
 			'update',
 		];
+	}
+
+	protected function parseNote(MessageTemplate $template) {
+		parent::parseNote($template);
+		$template->parseSubject([
+			'noteUpdater' => $this->note->updater->getFullName(),
+		]);
+		$template->parseBody([
+			'noteUpdater' => $this->note->updater->getFullName(),
+		]);
 	}
 
 }
