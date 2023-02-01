@@ -139,7 +139,7 @@ class IssueNoteFormTest extends Unit {
 		]);
 	}
 
-	public function testUpdateNoteWithDirtyTitle(): void {
+	public function testUpdateNoteWithoutUpdaterId(): void {
 		$noteId = $this->tester->haveRecord(IssueNote::class, [
 			'issue_id' => 1,
 			'title' => 'Test Title for Update',
@@ -151,6 +151,23 @@ class IssueNoteFormTest extends Unit {
 				'id' => $noteId,
 			]),
 		]);
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Updater cannot be blank.', 'updater_id');
+	}
+
+	public function testUpdateNoteWithDirtyTitle(): void {
+		$noteId = $this->tester->haveRecord(IssueNote::class, [
+			'issue_id' => 1,
+			'title' => 'Test Title for Update',
+			'description' => 'Some Desc for Update',
+			'user_id' => UserFixtureHelper::AGENT_EMILY_PAT,
+		]);
+		$this->giveModel([
+			'model' => $this->tester->grabRecord(IssueNote::class, [
+				'id' => $noteId,
+			]),
+			'updater_id' => UserFixtureHelper::AGENT_EMILY_PAT,
+		]);
 
 		$this->model->title = 'Updated Title';
 		$this->thenSuccessSave();
@@ -158,6 +175,8 @@ class IssueNoteFormTest extends Unit {
 			[
 				'id' => $noteId,
 				'title' => 'Updated Title',
+				'updater_id' => UserFixtureHelper::AGENT_EMILY_PAT,
+
 			]
 		);
 		$this->tester->assertTrue($this->model->hasDirtyTitleOrDescription());
@@ -174,6 +193,7 @@ class IssueNoteFormTest extends Unit {
 			'model' => $this->tester->grabRecord(IssueNote::class, [
 				'id' => $noteId,
 			]),
+			'updater_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
 		]);
 
 		$this->model->description = 'Updated Description';
@@ -182,6 +202,8 @@ class IssueNoteFormTest extends Unit {
 			[
 				'id' => $noteId,
 				'description' => 'Updated Description',
+				'user_id' => UserFixtureHelper::AGENT_EMILY_PAT,
+				'updater_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
 			]
 		);
 		$this->tester->assertTrue($this->model->hasDirtyTitleOrDescription());
@@ -198,6 +220,7 @@ class IssueNoteFormTest extends Unit {
 			'model' => $this->tester->grabRecord(IssueNote::class, [
 				'id' => $noteId,
 			]),
+			'updater_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
 		]);
 
 		$this->model->description = 'Some Desc for Update';

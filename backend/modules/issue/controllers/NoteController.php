@@ -9,6 +9,8 @@ use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
 use common\models\message\IssueNoteMessagesForm;
+use common\models\message\SummonNoteMessagesForm;
+use common\models\message\UpdateNoteMessagesForm;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\actions\NoteDescriptionListAction;
@@ -134,8 +136,18 @@ class NoteController extends Controller {
 		}
 		$model = IssueNoteForm::createSummon($summon);
 		$model->user_id = Yii::$app->user->getId();
+		$messageForm = new SummonNoteMessagesForm([
+			'summon' => $summon,
+			'hiddenFields' => [
+				'sendSmsToCustomer',
+				'sendSmsToAgent',
+			],
+		]);
+		$messageForm->addExtraWorkerEmail($summon->owner, Yii::t('common', 'Owner'));
 
+		$model->messagesForm = $messageForm;
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$model->pushMessages();
 			return $this->redirectIssue($summon->issue_id);
 		}
 		return $this->render('create-summon', [
@@ -161,7 +173,8 @@ class NoteController extends Controller {
 			throw new ForbiddenHttpException('Only self note can update or User with Note Update permission.');
 		}
 		$model = new IssueNoteForm();
-		$model->messagesForm = new IssueNoteMessagesForm([
+		$model->updater_id = Yii::$app->user->getId();
+		$model->messagesForm = new UpdateNoteMessagesForm([
 			'issue' => $note->issue,
 			'sms_owner_id' => Yii::$app->user->getId(),
 		]);

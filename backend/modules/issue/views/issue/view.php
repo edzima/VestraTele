@@ -141,7 +141,11 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model,
-		'notes' => $model->getIssueNotes()->joinWith('user.userProfile')->pinned()->all(),
+		'notes' => $model->getIssueNotes()
+			->joinWith('user.userProfile')
+			->joinWith('updater.userProfile')
+			->pinned()
+			->all(),
 		'title' => Yii::t('issue', 'Pinned Issue Notes'),
 	]) ?>
 

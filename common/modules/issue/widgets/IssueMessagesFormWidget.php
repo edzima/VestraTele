@@ -9,6 +9,7 @@ use yii\widgets\ActiveForm;
 class IssueMessagesFormWidget extends Widget {
 
 	public bool $withWorkersTypes = true;
+	public bool $withExtraWorkers = true;
 
 	public ActiveForm $form;
 	public IssueMessagesForm $model;
@@ -25,6 +26,7 @@ class IssueMessagesFormWidget extends Widget {
 			'model' => $this->model,
 			'checkboxesAttributes' => $this->checkboxesAttributes,
 			'withWorkersTypes' => $this->withWorkersTypes,
+			'withExtraWorkers' => $this->withExtraWorkers,
 		]);
 	}
 }

@@ -26,9 +26,11 @@ use yii\helpers\StringHelper;
  * @property string $type
  * @property int $is_pinned
  * @property int $is_template
+ * @property int|null $updater_id
  *
  * @property Issue $issue
  * @property User $user
+ * @property User|null $updater
  *
  * @property-read string|null $typeName
  */
@@ -97,6 +99,8 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 			'is_template' => Yii::t('common', 'Is Template'),
 			'type' => Yii::t('common', 'Type'),
 			'typeFullName' => Yii::t('common', 'Type'),
+			'updater_id' => Yii::t('common', 'Updater'),
+			'updater' => Yii::t('common', 'Updater'),
 		];
 	}
 
@@ -108,6 +112,11 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getUser(): UserQuery {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
+	}
+
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getUpdater(): UserQuery {
+		return $this->hasOne(User::class, ['id' => 'updater_id']);
 	}
 
 	public function isPinned(): bool {

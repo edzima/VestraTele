@@ -1,5 +1,6 @@
 <?php
 
+use backend\helpers\Breadcrumbs;
 use common\models\issue\IssueNote;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
@@ -8,8 +9,8 @@ use yii\widgets\DetailView;
 /* @var $model IssueNote */
 
 $this->title = $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Notatki', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->issue, 'url' => ['index', 'IssueNoteSearch[issue_id]' => $model->issue->id]];
+$this->params['breadcrumbs'] = Breadcrumbs::issue($model);
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issue Notes'), 'url' => ['index', 'IssueNoteSearch[issue_id]' => $model->issue->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-note-view">
@@ -36,6 +37,10 @@ $this->params['breadcrumbs'][] = $this->title;
 		'attributes' => [
 			'issue',
 			'user',
+			[
+				'attribute' => 'updater',
+				'visible' => !empty($model->updater),
+			],
 			'is_pinned:boolean',
 			'is_template:boolean',
 			[
