@@ -10,6 +10,7 @@ use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
 use common\models\message\IssueNoteMessagesForm;
 use common\models\message\SummonNoteMessagesForm;
+use common\models\message\UpdateNoteMessagesForm;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\actions\NoteDescriptionListAction;
@@ -173,7 +174,7 @@ class NoteController extends Controller {
 		}
 		$model = new IssueNoteForm();
 		$model->updater_id = Yii::$app->user->getId();
-		$model->messagesForm = new IssueNoteMessagesForm([
+		$model->messagesForm = new UpdateNoteMessagesForm([
 			'issue' => $note->issue,
 			'sms_owner_id' => Yii::$app->user->getId(),
 		]);

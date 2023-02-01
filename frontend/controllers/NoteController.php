@@ -9,6 +9,7 @@ use common\models\issue\IssuePayCalculation;
 use common\models\issue\Summon;
 use common\models\message\IssueNoteMessagesForm;
 use common\models\message\SummonNoteMessagesForm;
+use common\models\message\UpdateNoteMessagesForm;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\actions\NoteDescriptionListAction;
@@ -176,7 +177,18 @@ class NoteController extends Controller {
 			throw new ForbiddenHttpException('Only self note can update or User with Note Update permission.');
 		}
 		$model = new IssueNoteForm();
+		$model->updater_id = Yii::$app->user->getId();
 		$model->setModel($note);
+		$message = new UpdateNoteMessagesForm([
+			'note' => $note,
+			'sms_owner_id' => Yii::$app->user->getId(),
+			'hiddenFields' => [
+				'sendSmsToCustomer',
+				'sendEmailToCustomer',
+			],
+			'sendEmailToWorkers' => true,
+		]);
+		$model->messagesForm = $message;
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$this->redirectIssue($note->issue_id);
 		}
