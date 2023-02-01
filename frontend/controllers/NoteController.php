@@ -190,6 +190,9 @@ class NoteController extends Controller {
 		]);
 		$model->messagesForm = $message;
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			if ($model->hasDirtyTitleOrDescription()) {
+				$model->pushMessages();
+			}
 			$this->redirectIssue($note->issue_id);
 		}
 		return $this->render('update', [
