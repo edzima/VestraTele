@@ -88,6 +88,11 @@ class Module extends BaseModule {
 						'permissions' => [Worker::PERMISSION_ISSUE_CREATE],
 					],
 					[
+						'allow' => true,
+						'controllers' => ['issue/tag'],
+						'permissions' => [Worker::PERMISSION_ISSUE_TAG_MANAGER],
+					],
+					[
 						'allow' => false,
 						'controllers' => ['issue/issue', 'issue/user', 'issue/tag'],
 						'actions' => ['delete'],
@@ -95,7 +100,7 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
-						'controllers' => ['issue/issue', 'issue/user', 'issue/tag'],
+						'controllers' => ['issue/issue', 'issue/user'],
 						'permissions' => [Worker::PERMISSION_ISSUE],
 					],
 

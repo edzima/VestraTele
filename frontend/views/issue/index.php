@@ -3,6 +3,7 @@
 use common\models\issue\IssueInterface;
 use common\models\user\Worker;
 use common\modules\issue\IssueNoteColumn;
+use common\modules\issue\widgets\IssueSummonsColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AgentDataColumn;
 use common\widgets\grid\CustomerDataColumn;
@@ -25,9 +26,9 @@ use yii\widgets\Pjax;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('common', 'Issues');
-if ($searchModel->getParentType()) {
+if ($searchModel->getIssueParentType()) {
 	$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
-	$this->params['breadcrumbs'][] = ['label' => $searchModel->getParentType()->name, Url::issuesParentType($searchModel->getParentType()->id)];
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name, Url::issuesParentType($searchModel->getIssueParentType()->id)];
 } else {
 	$this->params['breadcrumbs'][] = $this->title;
 }
@@ -215,6 +216,9 @@ $parentMenuItems = Html::issueParentTypeItems();
 			],
 			[
 				'class' => IssueNoteColumn::class,
+			],
+			[
+				'class' => IssueSummonsColumn::class,
 			],
 			[
 				'class' => ActionColumn::class,

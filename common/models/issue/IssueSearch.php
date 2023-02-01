@@ -9,6 +9,7 @@ use common\models\AgentSearchInterface;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\search\ArchivedIssueSearch;
+use common\models\issue\search\IssueParentTypeSearchable;
 use common\models\issue\search\IssueTypeSearch;
 use common\models\query\PhonableQuery;
 use common\models\SearchModel;
@@ -29,6 +30,7 @@ abstract class IssueSearch extends Model
 	implements AgentSearchInterface,
 	ArchivedIssueSearch,
 	CustomerSearchInterface,
+	IssueParentTypeSearchable,
 	IssueTypeSearch,
 	SearchModel {
 
@@ -37,6 +39,8 @@ abstract class IssueSearch extends Model
 	public $type_id;
 	public $entity_responsible_id;
 	public $type_additional_date_at;
+
+	public $summonsStatusFilter;
 
 	public ?int $parentTypeId = null;
 
@@ -49,6 +53,7 @@ abstract class IssueSearch extends Model
 	public string $customerName = '';
 	public string $customerPhone = '';
 	public string $userName = '';
+	public string $userType = '';
 
 	public $excludedTypes = [];
 	public $excludedStages = [];
@@ -68,8 +73,32 @@ abstract class IssueSearch extends Model
 
 	public $tagsIds;
 
+	public const SUMMON_ALL_REALIZED = 'all-realized';
+	public const SUMMON_SOME_ACTIVE = 'some-active';
+
 	public ?AddressSearch $addressSearch = null;
 	private array $stagesIdsForParentType = [];
+
+	public static function getSummonsStatusesNames(): array {
+		return [
+				static::SUMMON_ALL_REALIZED => Yii::t('issue', 'All Realized'),
+				static::SUMMON_SOME_ACTIVE => Yii::t('issue', 'Some Active'),
+			] + Summon::getStatusesNames();
+	}
+
+	public static function getIssueUserTypesNames(): array {
+		$names = IssueUser::getTypesNames();
+		$unsetTypes = [
+			IssueUser::TYPE_AGENT,
+			IssueUser::TYPE_LAWYER,
+			IssueUser::TYPE_TELEMARKETER,
+			IssueUser::TYPE_CUSTOMER,
+		];
+		foreach ($unsetTypes as $unsetType) {
+			unset($names[$unsetType]);
+		}
+		return $names;
+	}
 
 	/**
 	 * @inheritdoc
@@ -95,8 +124,10 @@ abstract class IssueSearch extends Model
 					'created_at', 'updated_at', 'type_additional_date_at',
 				], 'safe',
 			],
+			['summonsStatusFilter', 'in', 'range' => array_keys(static::getSummonsStatusesNames()), 'allowArray' => true],
 			['customerPhone', PhoneValidator::class],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
+			['userType', 'in', 'range' => array_keys(static::getIssueUserTypesNames())],
 			['parentTypeId', 'in', 'range' => array_keys(static::getParentsTypesNames())],
 
 			[
@@ -128,7 +159,8 @@ abstract class IssueSearch extends Model
 			'signedAtTo' => Yii::t('issue', 'Signed At to'),
 			'tagsIds' => Yii::t('issue', 'Tags'),
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
-			'userName' => Yii::t('issue', 'Issue User'),
+			'userName' => Yii::t('issue', 'First name & surname'),
+			'userType' => Yii::t('issue', 'Who'),
 		], Issue::instance()->attributeLabels());
 	}
 
@@ -162,7 +194,8 @@ abstract class IssueSearch extends Model
 		$this->applyUserNameFilter($query);
 		$this->applyTagsFilter($query);
 		$this->applyOnlyWithTelemarketersFilter($query);
-		$this->applyParentTypeFilter($query);
+		$this->applyIssueParentTypeFilter($query);
+		$this->applySummonsStatusFilter($query);
 
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
@@ -201,7 +234,7 @@ abstract class IssueSearch extends Model
 		}
 	}
 
-	public function getParentType(): ?IssueType {
+	public function getIssueParentType(): ?IssueType {
 		if ($this->parentTypeId) {
 			return IssueType::get($this->parentTypeId);
 		}
@@ -216,6 +249,7 @@ abstract class IssueSearch extends Model
 			'stage.types',
 			'type',
 			'issueNotes',
+			'summons',
 		];
 	}
 
@@ -324,15 +358,35 @@ abstract class IssueSearch extends Model
 
 	public function applyUserNameFilter(ActiveQuery $query): void {
 		if (!empty($this->userName)) {
-			$query->joinWith([
-				'users.user.userProfile UP' => function (ActiveQuery $query) {
-					$query->andWhere([
-						'like',
-						new Expression("CONCAT(UP.lastname,' ', UP.firstname)"),
-						$this->userName . '%', false,
-					]);
-				},
-			]);
+			if (empty($this->userType)) {
+				$query->joinWith([
+					'users.user.userProfile UP' => function (ActiveQuery $query) {
+						$query->andWhere([
+							'like',
+							new Expression("CONCAT(UP.lastname,' ', UP.firstname)"),
+							$this->userName . '%', false,
+						]);
+					},
+				]);
+			} else {
+				$query->joinWith([
+					'users IU' => function (ActiveQuery $userQuery) {
+						$userQuery->andWhere(
+							['IU.type' => $this->userType]
+						);
+						$userQuery->joinWith([
+							'user.userProfile UP' => function (ActiveQuery $query) {
+								$query->andWhere([
+									'like',
+									new Expression("CONCAT(UP.lastname,' ', UP.firstname)"),
+									$this->userName . '%', false,
+								]);
+							},
+						]);
+					},
+				]);
+			}
+
 			$query->distinct();
 		}
 	}
@@ -372,35 +426,22 @@ abstract class IssueSearch extends Model
 	}
 
 	public function getStagesNames(): array {
-		$stages = IssueStage::getStagesNames($this->withArchive, $this->withArchiveDeep);
-		if ($this->getParentType() === null) {
+		$stages = IssueStage::getStagesNames($this->withArchive, $this->withArchiveDeep));
+		if ($this->getIssueParentType() === null) {
 			return $stages;
 		}
-		$ids = $this->getStagesIdsForParentType();
-		$currentStages = [];
-		foreach ($ids as $id) {
-			$stage = $stages[$id] ?? null;
-			if ($stage) {
-				$currentStages[$id] = $stage;
+		$parent = $this->getIssueParentType();
+		foreach ($stages as $id => $name) {
+			if (!$parent->hasStage($id)) {
+				unset($stages[$id]);
 			}
 		}
-		return $currentStages;
-	}
-
-	private function getStagesIdsForParentType(): array {
-		if (empty($this->stagesIdsForParentType)) {
-			$query = Issue::find()
-				->select('stage_id')
-				->distinct();
-			$this->applyParentTypeFilter($query);
-			$this->stagesIdsForParentType = $query->column();
-		}
-		return $this->stagesIdsForParentType;
+		return $stages;
 	}
 
 	public function getIssueTypesNames(): array {
-		if ($this->getParentType()) {
-			return ArrayHelper::map($this->getParentType()->childs, 'id', 'nameWithShort');
+		if ($this->getIssueParentType()) {
+			return ArrayHelper::map($this->getIssueParentType()->childs, 'id', 'nameWithShort');
 		}
 		return IssueType::getTypesNamesWithShort();
 	}
@@ -447,11 +488,11 @@ abstract class IssueSearch extends Model
 			|| !$this->getWithArchive();
 	}
 
-	private function applyParentTypeFilter(IssueQuery $query): void {
+	public function applyIssueParentTypeFilter(ActiveQuery $query): void {
 		if (!empty($this->parentTypeId)) {
-			$parent = $this->getParentType();
-			if ($parent) {
-				$childs = ArrayHelper::getColumn($parent->childs, 'id');
+			$type = IssueType::get($this->parentTypeId);
+			if ($type) {
+				$childs = ArrayHelper::getColumn($type->childs, 'id');
 				$query->andFilterWhere([Issue::tableName() . '.type_id' => $childs]);
 			}
 		}
@@ -459,6 +500,37 @@ abstract class IssueSearch extends Model
 
 	public static function getParentsTypesNames(): array {
 		return ArrayHelper::map(IssueType::getParents(), 'id', 'name');
+	}
+
+	private function applySummonsStatusFilter(IssueQuery $query): void {
+		if (!empty($this->summonsStatusFilter)) {
+			$query->joinWith('summons');
+			$query->groupBy(Summon::tableName() . '.issue_id');
+			$summonsStatuses = [];
+			foreach ($this->summonsStatusFilter as $summonFilter) {
+				switch ($summonFilter) {
+					case static::SUMMON_SOME_ACTIVE:
+						$query->andWhere(['NOT IN', Summon::tableName() . '.status', [Summon::STATUS_REALIZED]]);
+						break;
+					case static::SUMMON_ALL_REALIZED:
+						$query->andWhere([Summon::tableName() . '.status' => Summon::STATUS_REALIZED]);
+						$query->andWhere([
+							'NOT IN',
+							Issue::tableName() . '.id',
+							Summon::find()
+								->andWhere(['<>', 'status', Summon::STATUS_REALIZED])
+								->select('issue_id')
+								->distinct(),
+						]);
+						break;
+					default:
+						$summonsStatuses[] = $summonFilter;
+				}
+			}
+			if (!empty($summonsStatuses)) {
+				$query->andWhere([Summon::tableName() . '.status' => $summonsStatuses]);
+			}
+		}
 	}
 
 }

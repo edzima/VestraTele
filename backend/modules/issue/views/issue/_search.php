@@ -163,6 +163,13 @@ use yii\widgets\ActiveForm;
 
 
 	<div class="row">
+
+		<?= $form->field($model, 'userType', ['options' => ['class' => 'col-md-2']])
+			->dropDownList(IssueSearch::getIssueUserTypesNames(), [
+				'prompt' => Yii::t('common', 'Select...'),
+			])
+		?>
+
 		<?= $form->field($model, 'userName', ['options' => ['class' => 'col-md-2']])
 			->textInput()
 		?>

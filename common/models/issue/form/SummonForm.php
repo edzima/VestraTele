@@ -213,7 +213,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		}
 
 		$model->deadline_at = $this->deadline_at;
-		if (empty($this->realized_at) && $this->status === Summon::STATUS_UNREALIZED) {
+		if (empty($this->realized_at) && in_array($this->status, Summon::STATUSES_UNREALIZED)) {
 			$this->realized_at = date(DATE_ATOM);
 		}
 		$model->realized_at = $this->realized_at;

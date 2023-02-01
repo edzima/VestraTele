@@ -38,7 +38,8 @@ class IssueNotesWidget extends IssueWidget {
 		if ($this->notes === null) {
 			$query = $this->model
 				->getIssueNotes()
-				->joinWith('user.userProfile');
+				->joinWith('user.userProfile')
+				->joinWith('updater.userProfile');
 
 			if (!$this->withProvisionControl) {
 				//	$query->withoutTypes([IssueNote::TYPE_SETTLEMENT_PROVISION_CONTROL]);

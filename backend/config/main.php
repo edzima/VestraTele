@@ -110,7 +110,6 @@ return [
 				'summon-calendar' => [
 					'class' => SummonCalendarController::class,
 					'summonIndexRoute' => '/issue/summon/index',
-					'summonCreateRoute' => '/issue/summon/create',
 					'summonViewRoute' => '/issue/summon/view',
 				],
 			],

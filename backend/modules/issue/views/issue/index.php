@@ -12,6 +12,7 @@ use common\models\user\Worker;
 use common\modules\issue\IssueNoteColumn;
 use common\modules\issue\widgets\IssueClaimCompanyColumn;
 use common\modules\issue\widgets\IssuePaysColumnWidget;
+use common\modules\issue\widgets\IssueSummonsColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
@@ -31,8 +32,8 @@ use yii\widgets\Pjax;
 $this->title = Yii::t('backend', 'Issues');
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
 
-if ($searchModel->getParentType()) {
-	$this->params['breadcrumbs'][] = ['label' => $searchModel->getParentType()->name];
+if ($searchModel->getIssueParentType()) {
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name];
 }
 $this->params['issueParentTypeNav'] = [
 	'route' => ['/issue/issue/index'],
@@ -338,6 +339,9 @@ $this->params['issueParentTypeNav'] = [
 			],
 			[
 				'class' => IssueNoteColumn::class,
+			],
+			[
+				'class' => IssueSummonsColumn::class,
 			],
 			[
 				'class' => IssuePaysColumnWidget::class,

@@ -15,6 +15,18 @@ use yii\web\View;
 /* @var $titleUrl string */
 /* @var $descriptionUrl string */
 
+$this->registerJs("window.onbeforeunload = function (e) {
+    e = e || window.event;
+	const activeElement = e.target.activeElement;
+	if(activeElement.tagName != 'BUTTON'){
+	    e.preventDefault();
+	    // For IE and Firefox prior to version 4
+	    if (e) {
+	        e.returnValue = 'Sure?';
+	    }
+	}
+
+};", View::POS_HEAD);
 ?>
 
 <div class="issue-note-form">
@@ -22,93 +34,94 @@ use yii\web\View;
 	<?php $form = ActiveForm::begin($options); ?>
 
 	<div class="row">
-		<?= $form->field($model, 'publish_at', [
-			'options' => ['class' => 'col-md-2'],
-		])->widget(DateTimeWidget::class, [
-			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
-		]) ?>
+		<div class="col-md-6">
+			<div class="row">
+				<?= $form->field($model, 'publish_at', [
+					'options' => ['class' => 'col-md-4'],
+				])->widget(DateTimeWidget::class, [
+					'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
+				]) ?>
 
-		<?= $model->getScenario() === IssueNoteForm::SCENARIO_STAGE_CHANGE ? $form->field($model, 'stageChangeAtMerge', [
-			'options' => ['class' => 'col-md-2'],
-		])->checkbox()
-			: '' ?>
+				<?= $model->getScenario() === IssueNoteForm::SCENARIO_STAGE_CHANGE ? $form->field($model, 'stageChangeAtMerge', [
+					'options' => ['class' => 'col-md-4'],
+				])->checkbox()
+					: '' ?>
 
-		<?= $form->field($model, 'is_pinned', [
-			'options' => ['class' => 'col-md-1'],
-		])->checkbox() ?>
+				<?= $form->field($model, 'is_pinned', [
+					'options' => ['class' => 'col-md-1'],
+				])->checkbox() ?>
 
-		<?= $model->isAttributeSafe('is_template')
-			? $form->field($model, 'is_template', [
-				'options' => ['class' => 'col-md-1'],
-			])->checkbox()
-			: ''
-		?>
-	</div>
+				<?= $model->isAttributeSafe('is_template')
+					? $form->field($model, 'is_template', [
+						'options' => ['class' => 'col-md-1'],
+					])->checkbox()
+					: ''
+				?>
+			</div>
+			<?= $model->getModel()->isNewRecord && !empty($model->getLinkedIssuesNames())
+				? $form->field($model, 'linkedIssues')
+					->widget(Select2::class, [
+						'data' => $model->getLinkedIssuesNames(),
+						'options' => [
+							'multiple' => true,
+						],
+					])
+					->hint(Yii::t('issue', 'Create Note also in Linked Issues.'))
+				: ''
+			?>
 
+			<?= $model->getScenario() !== IssueNoteForm::SCENARIO_STAGE_CHANGE
+				? $form->field($model, 'title')->widget(AutoCompleteTextarea::class, [
+					'clientOptions' => [
+						'source' => $titleUrl,
+						'autoFocus' => true,
+						'delay' => 500,
+						'minLength' => 3,
+					],
+					'options' => [
+						'rows' => 2,
+						'class' => 'form-control',
+					],
+				])
+				: $form->field($model, 'title')->textInput(['disabled' => 1])
+			?>
 
-	<?= $model->getModel()->isNewRecord && !empty($model->getLinkedIssuesNames())
-		? $form->field($model, 'linkedIssues')
-			->widget(Select2::class, [
-				'data' => $model->getLinkedIssuesNames(),
+			<?= $form->field($model, 'description', [
 				'options' => [
-					'multiple' => true,
+					'class' => 'select-text-area-field',
+				],
+			])->widget(AutoCompleteTextarea::class, [
+				'clientOptions' => [
+					'source' => $descriptionUrl,
+					'autoFocus' => true,
+					'delay' => 500,
+					'minLength' => 3,
+				],
+				'options' => [
+					'rows' => 3,
+					'class' => 'form-control',
 				],
 			])
-			->hint(Yii::t('issue', 'Create Note also in Linked Issues.'))
-		: ''
-	?>
-
-	<?= $model->getScenario() !== IssueNoteForm::SCENARIO_STAGE_CHANGE
-		? $form->field($model, 'title')->widget(AutoCompleteTextarea::class, [
-			'clientOptions' => [
-				'source' => $titleUrl,
-				'autoFocus' => true,
-				'delay' => 500,
-				'minLength' => 3,
-			],
-			'options' => [
-				'rows' => 2,
-				'class' => 'form-control',
-			],
-		])
-		: $form->field($model, 'title')->textInput(['disabled' => 1])
-	?>
-
-	<?= $form->field($model, 'description', [
-		'options' => [
-			'class' => 'select-text-area-field',
-		],
-	])->widget(AutoCompleteTextarea::class, [
-		'clientOptions' => [
-			'source' => $descriptionUrl,
-			'autoFocus' => true,
-			'delay' => 500,
-			'minLength' => 3,
-		],
-		'options' => [
-			'rows' => 5,
-			'class' => 'form-control',
-		],
-	])
-	?>
-
-
-	<?= $model->messagesForm !== null
-		? IssueMessagesFormWidget::widget([
-			'model' => $model->messagesForm,
-			'form' => $form,
-			'checkboxesAttributes' => [
-				'sendSmsToCustomer',
-				'sendEmailToWorkers',
-			],
-		])
-		: ''
-	?>
-
-	<?= $model->getModel()->isNewRecord && $model->messagesForm !== null && !empty($model->getLinkedIssuesNames())
-		? $form->field($model, 'linkedIssuesMessages')->checkbox()
-		: ''
-	?>
+			?>
+			<?= $model->getModel()->isNewRecord && $model->messagesForm !== null && !empty($model->getLinkedIssuesNames())
+				? $form->field($model, 'linkedIssuesMessages')->checkbox()
+				: ''
+			?>
+		</div>
+		<div class="col-md-6">
+			<?= $model->messagesForm !== null
+				? IssueMessagesFormWidget::widget([
+					'model' => $model->messagesForm,
+					'form' => $form,
+					'checkboxesAttributes' => [
+						'sendSmsToCustomer',
+						'sendEmailToWorkers',
+					],
+				])
+				: ''
+			?>
+		</div>
+	</div>
 
 
 	<div class="form-group">

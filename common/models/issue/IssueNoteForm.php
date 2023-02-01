@@ -19,12 +19,16 @@ class IssueNoteForm extends Model {
 	public const SCENARIO_STAGE_CHANGE = 'stage-change';
 	public ?int $issue_id = null;
 	public ?int $user_id = null;
+	public ?int $updater_id = null;
 
 	public ?string $type = null;
 	public bool $is_pinned = false;
 	public string $title = '';
 	public ?string $description = null;
 	public string $publish_at = '';
+
+	private ?string $_title = null;
+	private ?string $_description = null;
 
 	public $linkedIssues = [];
 	public bool $linkedIssuesMessages = true;
@@ -69,6 +73,11 @@ class IssueNoteForm extends Model {
 	public function rules(): array {
 		return [
 			[['title', '!user_id', '!issue_id', 'publish_at'], 'required'],
+			[
+				['!updater_id'], 'required', 'when' => function (): bool {
+				return !$this->getModel()->isNewRecord;
+			},
+			],
 			[['!title'], 'required', 'on' => static::SCENARIO_STAGE_CHANGE],
 			[['stageChangeAtMerge'], 'required', 'on' => static::SCENARIO_STAGE_CHANGE],
 			[['issue_id', 'user_id'], 'integer'],
@@ -79,7 +88,7 @@ class IssueNoteForm extends Model {
 			['description', 'default', 'value' => null],
 			['publish_at', 'date', 'format' => 'php:' . $this->dateFormat],
 			['issue_id', 'exist', 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
-			['user_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+			[['user_id', 'updater_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 			['linkedIssuesMessages', 'boolean'],
 			[
 				'linkedIssues',
@@ -151,6 +160,8 @@ class IssueNoteForm extends Model {
 		$this->issue_id = $model->issue_id;
 		$this->is_pinned = $model->is_pinned;
 		$this->title = $model->title;
+		$this->_title = $model->title;
+		$this->_description = $model->description;
 		$this->type = $model->type;
 		$this->description = $model->description;
 		$this->publish_at = (string) $model->publish_at;
@@ -170,14 +181,16 @@ class IssueNoteForm extends Model {
 	public function save(): bool {
 		if ($this->beforeSave()) {
 			$model = $this->getModel();
+			$model->setAttributes(['title' => $this->title], false);
 			$model->issue_id = $this->issue_id;
 			$model->is_pinned = $this->is_pinned;
 			$model->user_id = $this->user_id;
+			$model->updater_id = $this->updater_id;
 			$model->type = $this->type;
 			$model->title = $this->title;
 			$model->description = $this->description;
 			$model->publish_at = $this->publish_at;
-			$save = $model->save();
+			$save = $model->save(false);
 			if ($save) {
 				$this->mergeStageChangeAt();
 				$this->saveLinked();
@@ -185,6 +198,11 @@ class IssueNoteForm extends Model {
 			}
 		}
 		return false;
+	}
+
+	public function hasDirtyTitleOrDescription(): bool {
+		return ($this->_title !== null && $this->_title !== $this->title)
+			|| ($this->_description !== null && $this->_description !== $this->description);
 	}
 
 	protected function mergeStageChangeAt(): void {

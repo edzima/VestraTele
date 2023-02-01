@@ -3,8 +3,8 @@
 use common\models\issue\Summon;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
-use yii\helpers\Html;
-use yii\helpers\Url;
+use frontend\controllers\SummonController;
+use frontend\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
@@ -27,7 +27,10 @@ YiiAsset::register($this);
 			? Html::a(Yii::t('common', 'Create note'), ['/note/summon', 'id' => $model->id], ['class' => 'btn btn-info'])
 			: ''
 		?>
-		<?= Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+		<?= SummonController::canUpdate($model)
+			? Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
+			: ''
+		?>
 
 	</p>
 	<?= DetailView::widget([

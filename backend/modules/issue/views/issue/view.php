@@ -123,7 +123,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 				['class' => 'btn btn-success'])
 			: '' ?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_CALCULATION_TO_CREATE)
+		<?= Yii::$app->user->can(Worker::PERMISSION_SETTLEMENT_ADMINISTRATIVE_CREATE)
 			? Html::a(
 				Yii::t('backend', 'Create administrative settlement'),
 				['/settlement/calculation/create-administrative', 'id' => $model->id],
@@ -141,7 +141,11 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model,
-		'notes' => $model->getIssueNotes()->joinWith('user.userProfile')->pinned()->all(),
+		'notes' => $model->getIssueNotes()
+			->joinWith('user.userProfile')
+			->joinWith('updater.userProfile')
+			->pinned()
+			->all(),
 		'title' => Yii::t('issue', 'Pinned Issue Notes'),
 	]) ?>
 

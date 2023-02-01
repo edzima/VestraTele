@@ -28,12 +28,22 @@ class IssueNoteSearch extends IssueNote {
 		);
 	}
 
+	public static function getUpdatersNames(): array {
+		return User::getSelectList(
+			IssueNote::find()
+				->select('updater_id')
+				->distinct()
+				->column(),
+			false
+		);
+	}
+
 	/**
 	 * @inheritdoc
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'issue_id', 'user_id'], 'integer'],
+			[['id', 'issue_id', 'user_id', 'updater_id'], 'integer'],
 			[['is_pinned', 'is_template', 'issueGrouped'], 'boolean'],
 			[['title', 'description', 'publish_at', 'created_at', 'updated_at', 'type', 'dateFrom', 'dateTo'], 'safe'],
 		];
@@ -99,6 +109,7 @@ class IssueNoteSearch extends IssueNote {
 			IssueNote::tableName() . '.id' => $this->id,
 			IssueNote::tableName() . '.issue_id' => $this->issue_id,
 			IssueNote::tableName() . '.user_id' => $this->user_id,
+			IssueNote::tableName() . '.updater_id' => $this->updater_id,
 			IssueNote::tableName() . '.publish_at' => $this->publish_at,
 			IssueNote::tableName() . '.created_at' => $this->created_at,
 			IssueNote::tableName() . '.updated_at' => $this->updated_at,

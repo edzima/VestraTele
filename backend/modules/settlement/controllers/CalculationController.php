@@ -15,6 +15,7 @@ use common\models\issue\IssuePayCalculation;
 use common\models\KeyStorageItem;
 use common\models\settlement\PaysForm;
 use common\models\user\User;
+use common\models\user\Worker;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
@@ -276,7 +277,8 @@ class CalculationController extends Controller {
 	public function actionDelete(int $id): Response {
 		$model = $this->findModel($id);
 		if ($model->owner_id === Yii::$app->user->getId()
-			|| Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
+			|| Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)
+			|| Yii::$app->user->can(Worker::PERMISSION_SETTLEMENT_DELETE_NOT_SELF)) {
 			$model->delete();
 			return $this->redirect(['index']);
 		}

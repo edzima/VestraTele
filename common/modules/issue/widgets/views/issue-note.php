@@ -22,7 +22,22 @@ use yii\helpers\Html;
 	</div>
 <?php endif; ?>
 <div class="panel-footer">
-	<span class="date pull-left"><?= Yii::$app->formatter->asDateTime($model->publish_at) ?></span>
+	<span class="date pull-left">
+		<span class="date-publish_at">
+			 <?= Yii::$app->formatter->asDateTime($model->publish_at) ?>
+		</span>
+		<?php if ($model->updater): ?>
+			(
+			<strong class="note-updater-name">
+			 <?= Yii::t('issue', 'Updated by: {user}', [
+				 'user' => $model->updater->getFullName(),
+			 ]) ?>
+			</strong>
+			<span class="note-date-update_at"> - <?= Yii::$app->formatter->asDateTime($model->updated_at) ?></span>
+			)
+		<?php endif; ?>
+
+	</span>
 
 	<span class="action pull-right">
 				<?= $editBtn

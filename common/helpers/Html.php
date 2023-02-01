@@ -51,6 +51,7 @@ class Html extends BaseHtml {
 		$items = [];
 		$models = IssueType::getParents();
 		$route = ArrayHelper::getValue($config, 'route', [$url::ROUTE_ISSUE_INDEX]);
+		$queryParam = Yii::$app->request->getQueryParams()[$param] ?? null;
 
 		foreach ($models as $model) {
 			$typeRoute = $route;
@@ -58,13 +59,14 @@ class Html extends BaseHtml {
 			$items[] = [
 				'url' => $typeRoute,
 				'label' => $model->name,
+				'active' => (int) $queryParam === $model->id,
 			];
 		}
 		if (!empty($items)) {
 			$items[] = [
 				'url' => $route,
 				'label' => Yii::t('issue', 'All Issues'),
-				'active' => !isset(Yii::$app->request->getQueryParams()[$param]),
+				'active' => empty($queryParam),
 			];
 		}
 

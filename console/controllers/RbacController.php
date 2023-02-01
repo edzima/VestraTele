@@ -66,9 +66,14 @@ class RbacController extends Controller {
 		Worker::PERMISSION_ISSUE_CLAIM,
 		Worker::PERMISSION_ISSUE_CREATE,
 		Worker::PERMISSION_ISSUE_DELETE,
+		Worker::PERMISSION_ENTITY_RESPONSIBLE_MANAGER,
 		Worker::PERMISSION_ISSUE_LINK_USER,
+		Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE,
+		Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SETTLEMENT,
+		Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SUMMON,
 		Worker::PERMISSION_ISSUE_STAGE_CHANGE,
 		Worker::PERMISSION_ISSUE_STAGE_MANAGER,
+		Worker::PERMISSION_ISSUE_TAG_MANAGER,
 		Worker::PERMISSION_ISSUE_TYPE_MANAGER,
 		Worker::PERMISSION_HINT,
 		User::PERMISSION_LOGS,
@@ -125,6 +130,8 @@ class RbacController extends Controller {
 		Worker::PERMISSION_LEAD_STATUS,
 		Worker::PERMISSION_MESSAGE_TEMPLATE,
 		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
+		Worker::PERMISSION_SETTLEMENT_ADMINISTRATIVE_CREATE,
+		Worker::PERMISSION_SETTLEMENT_DELETE_NOT_SELF,
 	];
 
 	public function actionAddPermissionToWorkers(string $name, array $assignments): void {
@@ -347,6 +354,33 @@ class RbacController extends Controller {
 				->execute();
 
 			Console::output('Delete Assignmnets: ' . $count);
+		}
+	}
+
+	public function actionAssignPermission(string $name, array $usersIds): void {
+		$auth = Yii::$app->authManager;
+		$permission = $auth->getPermission($name);
+		if ($permission) {
+			$count = 0;
+			foreach ($usersIds as $id) {
+				$auth->assign($permission, $id);
+				$count++;
+			}
+			Console::output('Assign for Users: ' . $count);
+		}
+	}
+
+	public function actionRevokePermission(string $name): void {
+		$auth = Yii::$app->authManager;
+		$permission = $auth->getPermission($name);
+		if ($permission) {
+			$count = 0;
+			$users = User::getAssignmentIds([User::PERMISSION_WORKERS]);
+			foreach ($users as $id) {
+				$auth->revoke($permission, $id);
+				$count++;
+			}
+			Console::output('Revoke for Users: ' . $count);
 		}
 	}
 }
