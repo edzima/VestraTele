@@ -55,10 +55,11 @@ class User extends BaseUser {
 			if ($this->can(Worker::ROLE_AGENT)) {
 				$childesIds = Yii::$app->userHierarchy->getAllChildesIds($this->getId());
 				if (!empty($childesIds)) {
-					$forAgents = $model->getIssueModel()->isForAgents($childesIds);
-					if ($forAgents) {
-						Yii::info('Agent: ' . $this->getId() . ' view issue for self childes', 'issue.' . $model->getIssueName());
-						return true;
+					foreach ($childesIds as $id) {
+						if ($model->getIssueModel()->hasUser($id)) {
+							Yii::info('Agent: ' . $this->getId() . ' view issue for self childes', 'issue.' . $model->getIssueName());
+							return true;
+						}
 					}
 				}
 				Yii::warning('Agent: ' . $this->getId() . ' try view issue for not self childes.', 'issue.' . $model->getIssueName());
