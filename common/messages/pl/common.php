@@ -338,4 +338,5 @@ return [
 	'Qualifies but not interest' => 'Kwalifikuje się - nie chce',
 	'Order' => 'Kolejność',
 	'Suspended' => 'Zawieszenie',
+	'Create Potential Client: {name}' => 'Dodaj: {name}',
 ];

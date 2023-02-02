@@ -37,6 +37,23 @@ $this->params['breadcrumbs'][] = $this->title;
 		? GridView::widget([
 			'dataProvider' => $dataProvider,
 			'filterModel' => $searchModel,
+			'emptyText' => Yii::t('yii', 'No results found.')
+				. '<br>'
+				. Html::a(
+					Yii::t('common', 'Create Potential Client: {name}', [
+						'name' => $searchModel->firstname . ' ' . $searchModel->lastname,
+					]), ['create'], [
+					'class' => 'btn btn-success',
+					'data' => [
+						'method' => 'POST',
+						'params' => [
+							Html::getInputName(PotentialClient::instance(), 'firstname') => $searchModel->firstname,
+							Html::getInputName(PotentialClient::instance(), 'lastname') => $searchModel->lastname,
+							Html::getInputName(PotentialClient::instance(), 'birthday') => $searchModel->birthday,
+							Html::getInputName(PotentialClient::instance(), 'status') => PotentialClient::STATUS_NEW,
+						],
+					],
+				]),
 			'columns' => [
 				['class' => 'yii\grid\SerialColumn'],
 				[
