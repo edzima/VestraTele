@@ -9,7 +9,6 @@ use Yii;
 class SummonNoteMessagesForm extends IssueNoteMessagesForm {
 
 	protected Summon $summon;
-	public ?bool $sendEmailToWorkers = true;
 
 	protected static function mainKeys(): array {
 		return [

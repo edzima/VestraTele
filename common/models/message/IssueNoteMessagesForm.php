@@ -20,7 +20,7 @@ class IssueNoteMessagesForm extends IssueMessagesForm {
 	public ?bool $sendSmsToCustomer = false;
 	public ?bool $sendEmailToCustomer = false;
 	public ?bool $sendSmsToAgent = false;
-	public ?bool $sendEmailToWorkers = false;
+	public ?bool $sendEmailToWorkers = true;
 
 	public $workersTypes = [
 		IssueUser::TYPE_AGENT,
