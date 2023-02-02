@@ -25,7 +25,7 @@ class IssueArchiveController extends Controller {
 		Console::output($date->format('Y-m-d'));
 		$count = Issue::updateAll([
 			'stage_id' => IssueStage::ARCHIVES_DEEP_ID,
-		], 'stage_id :stage_id AND stage_change_at < :date', [
+		], 'stage_id = :stage_id AND stage_change_at < :date', [
 			'stage_id' => IssueStage::ARCHIVES_ID,
 			'date' => $date->format('Y-m-d'),
 		]);

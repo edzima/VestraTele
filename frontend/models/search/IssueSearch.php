@@ -17,6 +17,8 @@ class IssueSearch extends BaseIssueSearch {
 	public int $user_id;
 	public array $includedUsersIds = [];
 	public array $excludedUsersIds = [];
+	public bool $withArchive = true;
+	public bool $withArchiveDeep = true;
 
 	private ?array $availableAgentsIds = null;
 
