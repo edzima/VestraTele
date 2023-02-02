@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use backend\modules\issue\models\IssueStage;
 use common\helpers\ArrayHelper;
 use common\models\AddressSearch;
 use common\models\AgentSearchInterface;
@@ -64,7 +65,7 @@ abstract class IssueSearch extends Model
 	public const NOTE_ONLY_PINNED = 'only-pinned';
 
 	public bool $withArchive = false;
-	public bool $allowArchiveFilter = false;
+	public bool $withArchiveDeep = false;
 
 	public $agent_id;
 	public $lawyer_id;
@@ -76,6 +77,7 @@ abstract class IssueSearch extends Model
 	public const SUMMON_SOME_ACTIVE = 'some-active';
 
 	public ?AddressSearch $addressSearch = null;
+	private array $stagesIdsForParentType = [];
 
 	public static function getSummonsStatusesNames(): array {
 		return [
@@ -127,11 +129,12 @@ abstract class IssueSearch extends Model
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 			['userType', 'in', 'range' => array_keys(static::getIssueUserTypesNames())],
 			['parentTypeId', 'in', 'range' => array_keys(static::getParentsTypesNames())],
+
 			[
 				'excludedStages', 'filter', 'filter' => function ($stages): array {
-				$stages = (array) $stages;
+				$stages = array_map('intval', (array) $stages);
 				foreach ([$this->stage_id] as $id) {
-					ArrayHelper::removeValue($stages, $id);
+					ArrayHelper::removeValue($stages, (int) $id);
 				}
 				return $stages;
 			},
@@ -201,6 +204,16 @@ abstract class IssueSearch extends Model
 			Issue::tableName() . '.entity_responsible_id' => $this->entity_responsible_id,
 			Issue::tableName() . '.type_additional_date_at' => $this->type_additional_date_at,
 		]);
+	}
+
+	public function getTotalCountWithArchive(): int {
+		$self = clone $this;
+		$self->withArchiveDeep = true;
+		$self->withArchive = true;
+		foreach (IssueStage::ARCHIVES_IDS as $id) {
+			ArrayHelper::removeValue($self->excludedStages, $id);
+		}
+		return $self->search([])->totalCount;
 	}
 
 	protected function addressFilter(IssueQuery $query): void {
@@ -276,6 +289,9 @@ abstract class IssueSearch extends Model
 	protected function archiveFilter(IssueQuery $query): void {
 		if (!$this->getWithArchive()) {
 			$query->withoutArchives();
+		}
+		if (!$this->getWithArchiveDeep()) {
+			$query->withoutArchiveDeep();
 		}
 	}
 
@@ -379,6 +395,10 @@ abstract class IssueSearch extends Model
 		return $this->withArchive;
 	}
 
+	public function getWithArchiveDeep(): bool {
+		return $this->withArchiveDeep;
+	}
+
 	public function getAgentsNames(): array {
 		return User::getSelectList(
 			IssueUser::userIds(IssueUser::TYPE_AGENT)
@@ -406,7 +426,7 @@ abstract class IssueSearch extends Model
 	}
 
 	public function getStagesNames(): array {
-		$stages = IssueStage::getStagesNames($this->getWithArchive());
+		$stages = IssueStage::getStagesNames($this->withArchive, $this->withArchiveDeep);
 		if ($this->getIssueParentType() === null) {
 			return $stages;
 		}
@@ -448,14 +468,24 @@ abstract class IssueSearch extends Model
 	}
 
 	public function excludeArchiveStage(): void {
-		if ($this->getIssueParentType() && !$this->getIssueParentType()->hasStage(IssueStage::ARCHIVES_ID)) {
+		$this->excludeStage(IssueStage::ARCHIVES_ID);
+	}
+
+	public function excludeArchiveDeepStage(): void {
+		$this->excludeStage(IssueStage::ARCHIVES_DEEP_ID);
+	}
+
+	public function excludeStage(int $stage_id): void {
+		if ($this->getIssueParentType() && !$this->getIssueParentType()->hasStage($stage_id)) {
 			return;
 		}
-		$this->excludedStages[] = IssueStage::ARCHIVES_ID;
+		$this->excludedStages[] = $stage_id;
 	}
 
 	public function hasExcludedArchiveStage(): bool {
-		return in_array(IssueStage::ARCHIVES_ID, $this->excludedStages);
+		return in_array(IssueStage::ARCHIVES_ID, $this->excludedStages)
+			|| !$this->getWithArchiveDeep()
+			|| !$this->getWithArchive();
 	}
 
 	public function applyIssueParentTypeFilter(ActiveQuery $query): void {

@@ -61,6 +61,10 @@ class IssueController extends Controller {
 			$searchModel->withArchive = true;
 			$searchModel->excludeArchiveStage();
 		}
+		if ($user->can(Worker::PERMISSION_ARCHIVE_DEEP)) {
+			$searchModel->withArchiveDeep = true;
+			$searchModel->excludeArchiveDeepStage();
+		}
 		$searchModel->user_id = (int) $user->getId();
 
 		if ($user->can(Worker::ROLE_AGENT)) {

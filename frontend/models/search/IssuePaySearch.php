@@ -9,6 +9,7 @@ class IssuePaySearch extends BaseIssuePaySearch {
 
 	public ?string $delay = self::DELAY_ALL;
 	public bool $withArchive = false;
+	public bool $withArchiveDeep = false;
 
 	public function applyAgentsFilters(QueryInterface $query): void {
 		$query->andWhere(['agent.user_id' => $this->agents_ids]);

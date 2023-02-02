@@ -225,7 +225,11 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function isArchived(): bool {
-		return (int) $this->stage_id === IssueStage::ARCHIVES_ID;
+		return in_array((int) $this->stage_id, IssueStage::ARCHIVES_IDS, true);
+	}
+
+	public function isDeepArchived(): bool {
+		return (int) $this->stage_id === IssueStage::ARCHIVES_DEEP_ID;
 	}
 
 	public function getClaims(): ActiveQuery {

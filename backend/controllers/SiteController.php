@@ -158,6 +158,10 @@ class SiteController extends Controller {
 				'label' => Yii::t('backend', 'Calendar - Users Color'),
 				'type' => FormModel::TYPE_TEXTAREA,
 			];
+			$keys[KeyStorageItem::KEY_ISSUE_DEEP_ARCHIVE_DAYS] = [
+				'label' => Yii::t('backend', 'Archives Deep - Days'),
+				'type' => FormModel::TYPE_TEXTINPUT,
+			];
 		}
 
 		if (Yii::$app->user->can(User::PERMISSION_PROVISION)) {

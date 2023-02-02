@@ -42,7 +42,12 @@ class IssueQuery extends ActiveQuery {
 	}
 
 	public function withoutArchives(): self {
-		$this->andWhere(['not', ['issue.stage_id' => IssueStage::ARCHIVES_ID]]);
+		$this->andWhere(['not', ['issue.stage_id' => IssueStage::ARCHIVES_IDS]]);
+		return $this;
+	}
+
+	public function withoutArchiveDeep(): self {
+		$this->andWhere(['not', ['issue.stage_id' => IssueStage::ARCHIVES_DEEP_ID]]);
 		return $this;
 	}
 

@@ -61,6 +61,13 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		self::TYPE_GUARDIAN,
 	];
 
+	public const TYPES_ARCHIVE_ACCESS = [
+		self::TYPE_AGENT,
+		self::TYPE_CO_AGENT,
+		self::TYPE_TELEMARKETER,
+		self::TYPE_CUSTOMER,
+	];
+
 	/**
 	 * {@inheritdoc}
 	 */

@@ -16,6 +16,10 @@ div.required label:after {
 	color: #ff0000;
 }
 
+.mb-0 {
+	margin-bottom: 0;
+}
+
 .mg-15 {
 	margin-bottom: 15px;
 }

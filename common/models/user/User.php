@@ -73,6 +73,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const ROLE_VINDICATOR = 'vindicator';
 
 	public const PERMISSION_ARCHIVE = 'archive';
+	public const PERMISSION_ARCHIVE_DEEP = 'archive.deep';
 	public const PERMISSION_MESSAGE_TEMPLATE = 'message.template';
 	public const PERMISSION_EXPORT = 'export';
 	public const PERMISSION_ISSUE = 'issue';
@@ -117,6 +118,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const PERMISSION_LEAD_DELETE = 'lead.delete';
 	public const PERMISSION_USER_TRAITS = 'user.traits';
 	public const PERMISSION_NOTE_UPDATE = 'note.update';
+	public const PERMISSION_ISSUE_VISIBLE_NOT_SELF = 'issue.visible_not_self';
 
 	private static $ROLES_NAMES;
 	private static $PERMISSIONS_NAMES;

@@ -22,7 +22,7 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
-use yii\web\MethodNotAllowedHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii2tech\csvgrid\CsvGrid;
@@ -60,6 +60,10 @@ class IssueController extends Controller {
 		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
 			$searchModel->excludeArchiveStage();
+		}
+		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE_DEEP)) {
+			$searchModel->withArchiveDeep = true;
+			$searchModel->excludeArchiveDeepStage();
 		}
 		if (Yii::$app->user->can(Worker::PERMISSION_PAY_ALL_PAID)) {
 			$searchModel->scenario = IssueSearch::SCENARIO_ALL_PAYED;
@@ -315,15 +319,10 @@ class IssueController extends Controller {
 	 * @param integer $id
 	 * @return Issue the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
+	 * @throws ForbiddenHttpException
 	 */
 	protected function findModel(int $id): Issue {
-		if (($model = Issue::findOne($id)) !== null) {
-
-			if ($model->isArchived() && !Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
-				Yii::warning('User: ' . Yii::$app->user->id . ' try view archived issue: ' . $model->id, 'issue');
-
-				throw new MethodNotAllowedHttpException('Sprawa jest w archiwum.');
-			}
+		if (($model = Issue::findOne($id)) !== null && Yii::$app->user->canSeeIssue($model)) {
 			return $model;
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');

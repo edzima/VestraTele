@@ -143,4 +143,9 @@ return [
 	'Send Email to: {worker}' => 'Wyślij Email do: {worker}',
 	'Extra Workers Emails' => 'Dodatkowo',
 	'Updated by: {user}' => 'Edytowano {user}',
+	'Issue is Archived.' => 'Sprawa jest w Archiwum.',
+	'Issue is Deep Archived.' => 'Sprawa jest w Głębokim Archiwum.',
+	'The Issue is Archived. You are not authorized to view.' => 'Sprawa jest w Archiwum. Nie posiadasz dostępu.',
+	'The Issue is Deep Archive. You are not authorized to view.' => 'Sprawa jest w Głębokim Archiwum. Nie posiadasz dostępu.',
+	'The archive is excluded. Matching Issues found in it: {count}.' => 'Archiwum jest wykluczone. Znaleziono w nim Spraw: {count}.',
 ];

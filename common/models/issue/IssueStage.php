@@ -26,6 +26,12 @@ use yii\helpers\ArrayHelper;
 class IssueStage extends ActiveRecord {
 
 	public const ARCHIVES_ID = -1;
+	public const ARCHIVES_DEEP_ID = -10;
+
+	public const ARCHIVES_IDS = [
+		self::ARCHIVES_ID,
+		self::ARCHIVES_DEEP_ID,
+	];
 
 	public static array $STAGES = [];
 
@@ -89,10 +95,13 @@ class IssueStage extends ActiveRecord {
 		return $this->hasMany(IssueStageType::class, ['stage_id' => 'id'])->indexBy('type_id');
 	}
 
-	public static function getStagesNames(bool $withArchive = false): array {
+	public static function getStagesNames(bool $withArchive = false, bool $withDeepArchive = false): array {
 		$names = ArrayHelper::map(static::getStages(), 'id', 'nameWithShort');
 		if (!$withArchive) {
 			unset($names[static::ARCHIVES_ID]);
+		}
+		if (!$withDeepArchive) {
+			unset($names[static::ARCHIVES_DEEP_ID]);
 		}
 		return $names;
 	}

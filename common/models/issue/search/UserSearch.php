@@ -23,6 +23,7 @@ class UserSearch extends IssueUser implements
 	public string $surname = '';
 	public string $phone = '';
 	public bool $withArchive = false;
+	public bool $withArchiveDeep = false;
 
 	/**
 	 * {@inheritdoc}
@@ -95,6 +96,10 @@ class UserSearch extends IssueUser implements
 
 	public function getWithArchive(): bool {
 		return $this->withArchive;
+	}
+
+	public function getWithArchiveDeep(): bool {
+		return $this->withArchiveDeep;
 	}
 
 	public function applySurnameFilter(QueryInterface $query): void {
