@@ -135,7 +135,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function getStageName(): string {
-		return IssueStage::getStagesNames(true)[$this->stage_id];
+		return IssueStage::getStagesNames(true, true)[$this->stage_id];
 	}
 
 	public function getCustomer(): UserQuery {
