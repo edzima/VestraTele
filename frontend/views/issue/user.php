@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'valueType' => IssueStageColumn::VALUE_NAME,
 			],
 			[
-				'attribute' => 'surname',
+				'attribute' => 'fullName',
 				'label' => $searchModel->getAttributeLabel('surname'),
 				'value' => 'user',
 			],

@@ -13,7 +13,7 @@ class IssueUserSearch extends UserSearch {
 
 	public function rules(): array {
 		return [
-			['surname', 'string', 'min' => SurnameSearchInterface::MIN_LENGTH],
+			[['surname', 'fullName'], 'string', 'min' => SurnameSearchInterface::MIN_LENGTH],
 			['phone', PhoneValidator::class],
 			['phone', 'string', 'min' => 9],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
@@ -25,7 +25,7 @@ class IssueUserSearch extends UserSearch {
 		/** @var IssueQuery $query */
 		$query = $provider->query;
 		if ($this->hasErrors() ||
-			(empty($this->surname) && empty($this->phone))) {
+			(empty($this->fullName) && empty($this->phone))) {
 			$provider->query->andWhere('1=0');
 			return $provider;
 		}

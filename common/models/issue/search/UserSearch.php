@@ -10,6 +10,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\db\QueryInterface;
 
 /**
@@ -24,6 +25,7 @@ class UserSearch extends IssueUser implements
 	public string $phone = '';
 	public bool $withArchive = false;
 	public bool $withArchiveDeep = false;
+	public string $fullName = '';
 
 	/**
 	 * {@inheritdoc}
@@ -33,8 +35,7 @@ class UserSearch extends IssueUser implements
 		return [
 			[['issue_id'], 'integer'],
 			[['type', 'phone'], 'string'],
-			['surname', 'string', 'min' => SurnameSearchInterface::MIN_LENGTH],
-
+			[['surname', 'fullName'], 'string', 'min' => SurnameSearchInterface::MIN_LENGTH],
 		];
 	}
 
@@ -67,7 +68,7 @@ class UserSearch extends IssueUser implements
 				}
 			},
 		]);
-		$query->joinWith('user.userProfile');
+		$query->joinWith('user.userProfile UP');
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -104,7 +105,19 @@ class UserSearch extends IssueUser implements
 
 	public function applySurnameFilter(QueryInterface $query): void {
 		if (!empty($this->surname)) {
-			$query->andWhere(['like', 'user_profile.lastname', $this->surname . '%', false]);
+			$query->andWhere(['like', 'UP.lastname', $this->surname . '%', false]);
+		}
+		if (!empty($this->fullName)) {
+			$query->andWhere([
+				'like',
+				new Expression("CONCAT(UP.lastname,' ', UP.firstname)"),
+				$this->fullName . '%', false,
+			]);
+			$query->orWhere([
+				'like',
+				new Expression("CONCAT(UP.firstname,' ', UP.lastname)"),
+				$this->fullName . '%', false,
+			]);
 		}
 	}
 
