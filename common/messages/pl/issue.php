@@ -149,4 +149,6 @@ return [
 	'The Issue is Deep Archive. You are not authorized to view.' => 'Sprawa jest w Głębokim Archiwum. Nie posiadasz dostępu.',
 	'The archive is excluded. Matching Issues found in it: {count}.' => 'Archiwum jest wykluczone. Znaleziono w nim Spraw: {count}.',
 	'Issues Archive: {name}' => 'Sprawy w Archiwum: {name}',
+	'Summon Docs' => 'Dokumenty',
+	'Done At' => 'Wykonano',
 ];

@@ -16,7 +16,7 @@ class SummonDocSearch extends SummonDoc {
 	 */
 	public function rules(): array {
 		return [
-			[['id'], 'integer'],
+			[['id', 'priority'], 'integer'],
 			[['name'], 'safe'],
 		];
 	}
@@ -56,6 +56,7 @@ class SummonDocSearch extends SummonDoc {
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
+			'priority' => $this->priority,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name]);

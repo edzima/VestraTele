@@ -12,10 +12,28 @@ use yii\helpers\ArrayHelper;
  *
  * @property int $id
  * @property string $name
+ * @property int|null $priority
+ * @property string|null $done_at
  *
  * @property Summon[] $summons
  */
 class SummonDoc extends ActiveRecord {
+
+	public const PRIORITY_LOW = 1;
+	public const PRIORITY_MEDIUM = 5;
+	public const PRIORITY_HIGH = 10;
+
+	public function getPriorityName(): ?string {
+		return static::getPriorityNames()[$this->priority];
+	}
+
+	public static function getPriorityNames(): array {
+		return [
+			static::PRIORITY_HIGH => Yii::t('common', 'High'),
+			static::PRIORITY_MEDIUM => Yii::t('common', 'Medium'),
+			static::PRIORITY_LOW => Yii::t('common', 'Low'),
+		];
+	}
 
 	public static function viaTableName(): string {
 		return '{{%summon_doc_list}}';
@@ -40,6 +58,9 @@ class SummonDoc extends ActiveRecord {
 			[['name'], 'required'],
 			[['name'], 'string', 'max' => 255],
 			[['name'], 'unique'],
+			['done_at', 'safe'],
+			['priority', 'integer'],
+			['priority', 'in', 'range' => array_keys(static::getPriorityNames())],
 		];
 	}
 
@@ -50,6 +71,8 @@ class SummonDoc extends ActiveRecord {
 		return [
 			'id' => Yii::t('common', 'ID'),
 			'name' => Yii::t('common', 'Name'),
+			'priority' => Yii::t('common', 'Priority'),
+			'priorityName' => Yii::t('common', 'Priority'),
 		];
 	}
 
@@ -60,6 +83,14 @@ class SummonDoc extends ActiveRecord {
 	 */
 	public function getSummons() {
 		return $this->hasMany(Summon::class, ['id' => 'summon_id'])->viaTable(static::viaTableName(), ['doc_type_id' => 'id']);
+	}
+
+	public static function find() {
+		return parent::find()
+			->orderBy([
+				static::tableName() . '.priority' => SORT_DESC,
+				static::tableName() . '.name' => SORT_ASC,
+			]);
 	}
 
 }

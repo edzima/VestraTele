@@ -35,6 +35,7 @@ YiiAsset::register($this);
 		'attributes' => [
 			'id',
 			'name',
+			'priorityName',
 		],
 	]) ?>
 
