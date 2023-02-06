@@ -7,8 +7,8 @@ use yii\data\ActiveDataProvider;
 /* @var $searchModel IssueSearch */
 /* @var $dataProvider ActiveDataProvider */
 
-$this->title = Yii::t('issue', 'Issues Archive: {customer}', [
-	'customer' => $searchModel->customerName,
+$this->title = Yii::t('issue', 'Issues Archive: {name}', [
+	'name' => $searchModel->customerName ? $searchModel->customerName : $searchModel->issue_id,
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;

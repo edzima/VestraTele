@@ -58,7 +58,10 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 			'body' =>
 				Html::a(Yii::t('issue', 'The archive is excluded. Matching Issues found in it: {count}.', [
 					'count' => $searchModel->getTotalCountWithArchive(),
-				]), ['archive', 'customerName' => $searchModel->customerName]),
+				]), [
+					'archive', 'customerName' => $searchModel->customerName,
+					'issueId' => $searchModel->issue_id,
+				]),
 			'options' => [
 				'class' => 'alert-warning text-center mb-0',
 			],

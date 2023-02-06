@@ -120,7 +120,16 @@ abstract class IssueSearch extends Model
 					'issue_id', 'agent_id', 'stage_id', 'entity_responsible_id',
 				], 'integer',
 			],
-			[['customerName'], 'required', 'on' => static::SCENARIO_ARCHIVE_CUSTOMER],
+			[
+				['customerName'], 'required', 'on' => static::SCENARIO_ARCHIVE_CUSTOMER, 'when' => function (): bool {
+				return empty($this->issue_id);
+			},
+			],
+			[
+				['issue_id'], 'required', 'on' => static::SCENARIO_ARCHIVE_CUSTOMER, 'when' => function (): bool {
+				return empty($this->customerName);
+			},
+			],
 			[['onlyWithTelemarketers'], 'boolean'],
 			[['onlyWithTelemarketers'], 'default', 'value' => null],
 

@@ -172,9 +172,10 @@ class IssueController extends Controller {
 		]);
 	}
 
-	public function actionArchive(string $customerName): string {
+	public function actionArchive(string $customerName, string $issueId = null): string {
 		$searchModel = new IssueSearch();
 		$searchModel->customerName = $customerName;
+		$searchModel->issue_id = $issueId;
 		$searchModel->scenario = IssueSearch::SCENARIO_ARCHIVE_CUSTOMER;
 		$dataProvider = $searchModel->search([]);
 		return $this->render('archive', [
