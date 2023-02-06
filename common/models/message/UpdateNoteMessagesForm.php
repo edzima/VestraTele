@@ -6,8 +6,6 @@ use common\components\message\MessageTemplate;
 
 class UpdateNoteMessagesForm extends IssueNoteMessagesForm {
 
-	public ?bool $sendEmailToWorkers = false;
-
 	protected static function mainKeys(): array {
 		return [
 			'issue',
