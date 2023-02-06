@@ -1,5 +1,7 @@
 <?php
 
+use common\widgets\grid\IssueStageColumn;
+use common\widgets\grid\IssueTypeColumn;
 use frontend\models\search\IssueUserSearch;
 use frontend\widgets\GridView;
 use frontend\widgets\IssueColumn;
@@ -23,6 +25,14 @@ $this->params['breadcrumbs'][] = $this->title;
 		'filterModel' => $searchModel,
 		'columns' => [
 			['class' => IssueColumn::class],
+			[
+				'class' => IssueTypeColumn::class,
+				'valueType' => IssueTypeColumn::VALUE_NAME,
+			],
+			[
+				'class' => IssueStageColumn::class,
+				'valueType' => IssueStageColumn::VALUE_NAME,
+			],
 			[
 				'attribute' => 'surname',
 				'label' => $searchModel->getAttributeLabel('surname'),

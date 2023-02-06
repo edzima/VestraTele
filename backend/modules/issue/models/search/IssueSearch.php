@@ -100,6 +100,9 @@ class IssueSearch extends BaseIssueSearch {
 		}
 
 		if (!$this->validate()) {
+			if ($this->isArchiveScenario()) {
+				$query->andWhere('0=1');
+			}
 			$this->archiveFilter($query);
 			return $dataProvider;
 		}
@@ -111,6 +114,10 @@ class IssueSearch extends BaseIssueSearch {
 		];
 
 		return $dataProvider;
+	}
+
+	public function isArchiveScenario(): bool {
+		return $this->scenario === static::SCENARIO_ARCHIVE_CUSTOMER;
 	}
 
 	protected function archiveFilter(IssueQuery $query): void {

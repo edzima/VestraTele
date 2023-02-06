@@ -172,6 +172,17 @@ class IssueController extends Controller {
 		]);
 	}
 
+	public function actionArchive(string $customerName): string {
+		$searchModel = new IssueSearch();
+		$searchModel->customerName = $customerName;
+		$searchModel->scenario = IssueSearch::SCENARIO_ARCHIVE_CUSTOMER;
+		$dataProvider = $searchModel->search([]);
+		return $this->render('archive', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
 	public function actionLead(): string {
 		$searchModel = new IssueLeadsSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);

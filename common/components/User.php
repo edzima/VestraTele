@@ -79,13 +79,7 @@ class User extends BaseUser {
 				return true;
 			}
 		}
-		if ($issue->isDeepArchived() && !$this->can(Worker::PERMISSION_ARCHIVE_DEEP)) {
-			throw new ForbiddenHttpException(Yii::t('issue', 'The Issue is Deep Archive. You are not authorized to view.'));
-		}
-		if (!$this->can(Worker::PERMISSION_ARCHIVE)) {
-			throw new ForbiddenHttpException(Yii::t('issue', 'The Issue is arcived. You are not authorized to view.'));
-		}
-		return true;
+		return $this->can(Worker::PERMISSION_ARCHIVE) && $this->can(Worker::PERMISSION_ISSUE_VISIBLE_NOT_SELF);
 	}
 
 	public function canDeleteNote(IssueNote $note): bool {

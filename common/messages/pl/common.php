@@ -339,4 +339,5 @@ return [
 	'Order' => 'Kolejność',
 	'Suspended' => 'Zawieszenie',
 	'Create Potential Client: {name}' => 'Dodaj: {name}',
+	'Issues Archive: {customer}' => 'Sprawy w Archiwum: {customer}',
 ];

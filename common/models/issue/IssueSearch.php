@@ -34,6 +34,8 @@ abstract class IssueSearch extends Model
 	IssueTypeSearch,
 	SearchModel {
 
+	public const SCENARIO_ARCHIVE_CUSTOMER = 'archive.customer';
+
 	public $issue_id;
 	public $stage_id;
 	public $type_id;
@@ -100,6 +102,14 @@ abstract class IssueSearch extends Model
 		return $names;
 	}
 
+	public function setScenario($value) {
+		parent::setScenario($value);
+		if ($value === static::SCENARIO_ARCHIVE_CUSTOMER) {
+			$this->withArchiveDeep = true;
+			$this->withArchive = true;
+		}
+	}
+
 	/**
 	 * @inheritdoc
 	 */
@@ -110,6 +120,7 @@ abstract class IssueSearch extends Model
 					'issue_id', 'agent_id', 'stage_id', 'entity_responsible_id',
 				], 'integer',
 			],
+			[['customerName'], 'required', 'on' => static::SCENARIO_ARCHIVE_CUSTOMER],
 			[['onlyWithTelemarketers'], 'boolean'],
 			[['onlyWithTelemarketers'], 'default', 'value' => null],
 
