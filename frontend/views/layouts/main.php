@@ -142,6 +142,7 @@ AppAsset::register($this);
 			'label' => Yii::t('frontend', 'Articles'),
 			'url' => ['/article/index'],
 			'items' => NavItem::getNewsCategoryItems(),
+			'visible' => Yii::$app->user->can(User::PERMISSION_NEWS),
 		];
 		$menuItems[] = [
 			'label' => 'Prowizje',

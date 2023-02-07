@@ -404,7 +404,7 @@ $user = Yii::$app->user;
 						['label' => Yii::t('backend', 'Articles'), 'url' => ['/article/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 						['label' => Yii::t('backend', 'Article categories'), 'url' => ['/article-category/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
 					],
-					'visible' => $user->can(User::PERMISSION_NEWS),
+					'visible' => $user->can(User::PERMISSION_NEWS_MANAGER),
 				],
 				[
 					'label' => Yii::t('backend', 'Addresses'),

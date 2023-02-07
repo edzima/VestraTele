@@ -282,7 +282,7 @@ return [
 			[
 				'controllers' => ['article', 'article-category'],
 				'allow' => true,
-				'permissions' => [User::PERMISSION_NEWS],
+				'permissions' => [User::PERMISSION_NEWS_MANAGER],
 			],
 			[
 				'controllers' => ['article', 'article-category'],

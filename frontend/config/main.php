@@ -79,6 +79,13 @@ return [
 					[
 						'allow' => true,
 						'controllers' => [
+							'article',
+						],
+						'permissions' => [User::PERMISSION_NEWS],
+					],
+					[
+						'allow' => true,
+						'controllers' => [
 							'lead/user',
 						],
 						'actions' => ['assign-single'],

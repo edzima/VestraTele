@@ -81,6 +81,8 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const PERMISSION_LOGS = 'logs';
 	public const PERMISSION_MEET = 'meet';
 	public const PERMISSION_NEWS = 'news';
+	public const PERMISSION_NEWS_MANAGER = 'news.manager';
+
 	public const PERMISSION_NOTE = 'note';
 	public const PERMISSION_NOTE_SELF = 'note.self';
 
