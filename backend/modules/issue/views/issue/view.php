@@ -1,6 +1,7 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
+use backend\helpers\Html;
 use backend\modules\issue\widgets\IssueSmsButtonDropdown;
 use backend\modules\issue\widgets\IssueViewSummonsWidgets;
 use backend\modules\issue\widgets\IssueViewTopSummonsWidgets;
@@ -12,10 +13,10 @@ use common\models\issue\IssueClaim;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
+use common\modules\issue\widgets\IssueSummonDocsWidget;
 use common\modules\issue\widgets\IssueViewWidget;
 use yii\bootstrap\ButtonDropdown;
 use yii\data\DataProviderInterface;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model Issue */
@@ -24,6 +25,7 @@ use yii\helpers\Html;
 
 $this->title = $model->longId;
 $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
+
 ?>
 <div class="issue-view">
 	<p>
@@ -149,6 +151,10 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		'title' => Yii::t('issue', 'Pinned Issue Notes'),
 	]) ?>
 
+
+	<?= IssueSummonDocsWidget::widget([
+		'issue' => $model,
+	]) ?>
 
 
 	<?= $calculationsDataProvider->getTotalCount() > 0

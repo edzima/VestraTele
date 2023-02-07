@@ -218,7 +218,11 @@ class Summon extends ActiveRecord implements IssueInterface {
 	}
 
 	public function getDocs() {
-		return $this->hasMany(SummonDoc::class, ['id' => 'doc_type_id'])->viaTable(SummonDoc::viaTableName(), ['summon_id' => 'id']);
+		return $this->hasMany(SummonDoc::class, ['id' => 'doc_type_id'])->via('docsLink');
+	}
+
+	public function getDocsLink() {
+		return $this->hasMany(SummonDocLink::class, ['summon_id' => 'id']);
 	}
 
 	/**

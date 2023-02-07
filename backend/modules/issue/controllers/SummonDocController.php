@@ -2,8 +2,10 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\helpers\Url;
 use backend\modules\issue\models\search\SummonDocSearch;
 use common\models\issue\SummonDoc;
+use common\models\issue\SummonDocLink;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -122,5 +124,23 @@ class SummonDocController extends Controller {
 		}
 
 		throw new NotFoundHttpException(Yii::t('backend', 'The requested page does not exist.'));
+	}
+
+	public function actionDone(int $docId, int $summonId, string $returnUrl = null) {
+		$summonLink = SummonDocLink::find()
+			->andWhere([
+				'doc_type_id' => $docId,
+				'summon_id' => $summonId,
+			])
+			->one();
+		if ($summonLink === null) {
+			throw new NotFoundHttpException();
+		}
+		$summonLink->done_at = date(DATE_ATOM);
+		$summonLink->save();
+		if ($returnUrl === null) {
+			$returnUrl = Url::previous();
+		}
+		return $this->redirect($returnUrl);
 	}
 }

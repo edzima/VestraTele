@@ -16,6 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $done_at
  *
  * @property Summon[] $summons
+ * @property-read string|null $priorityName
  */
 class SummonDoc extends ActiveRecord {
 
@@ -33,10 +34,6 @@ class SummonDoc extends ActiveRecord {
 			static::PRIORITY_MEDIUM => Yii::t('common', 'Medium'),
 			static::PRIORITY_LOW => Yii::t('common', 'Low'),
 		];
-	}
-
-	public static function viaTableName(): string {
-		return '{{%summon_doc_list}}';
 	}
 
 	/**
@@ -82,7 +79,11 @@ class SummonDoc extends ActiveRecord {
 	 * @return ActiveQuery
 	 */
 	public function getSummons() {
-		return $this->hasMany(Summon::class, ['id' => 'summon_id'])->viaTable(static::viaTableName(), ['doc_type_id' => 'id']);
+		return $this->hasMany(Summon::class, ['id' => 'summon_id'])->via(SummonDocLink::class, ['doc_type_id' => 'id']);
+	}
+
+	public function getLinks() {
+		return $this->hasMany(SummonDocLink::class, ['doc_type_id' => 'id']);
 	}
 
 	public static function find() {

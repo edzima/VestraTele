@@ -8,6 +8,7 @@ use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\issue\Summon;
 use common\models\issue\SummonDoc;
+use common\models\issue\SummonDocLink;
 use common\models\issue\SummonType;
 use common\models\SummonTypeOptions;
 use common\models\user\User;
@@ -242,7 +243,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 
 		if (!empty($rows)) {
 			Yii::$app->db->createCommand()
-				->batchInsert(SummonDoc::viaTableName(), [
+				->batchInsert(SummonDocLink::tableName(), [
 					'summon_id',
 					'doc_type_id',
 				], $rows)
