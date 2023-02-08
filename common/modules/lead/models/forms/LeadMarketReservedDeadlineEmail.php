@@ -44,15 +44,14 @@ class LeadMarketReservedDeadlineEmail extends Model {
 		}
 		$models = $this->findModels();
 		if (empty($models)) {
-			Yii::warning('not find models');
+			Yii::warning('Not find models', __METHOD__);
 			return null;
 		}
 
 		$count = 0;
 		foreach ($models as $model) {
 			if ($this->sendEmail($model)) {
-				Yii::warning(
-					'Send Email');
+				Yii::warning('Send Email', __METHOD__);
 				$count++;
 			}
 		}

@@ -5,6 +5,7 @@ namespace console\controllers;
 use common\modules\lead\models\forms\LeadMarketCreateSummaryEmail;
 use common\modules\lead\models\forms\LeadMarketReservedDeadlineEmail;
 use common\modules\lead\Module;
+use Yii;
 use yii\console\Controller;
 use yii\helpers\Console;
 use yii\helpers\VarDumper;
@@ -19,7 +20,9 @@ class LeadMarketController extends Controller {
 			Console::output('Send Reserved Deadline Emails: ' . $count . '.');
 		}
 		if ($model->hasErrors()) {
-			Console::output(VarDumper::export($model->getErrors()));
+			$errors = VarDumper::export($model->getErrors());
+			Yii::warning($errors, __METHOD__);
+			Console::output($errors);
 		}
 	}
 

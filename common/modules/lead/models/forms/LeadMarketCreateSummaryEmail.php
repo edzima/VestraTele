@@ -58,6 +58,7 @@ class LeadMarketCreateSummaryEmail extends Model {
 		}
 		$models = $this->findModels();
 		if (empty($models)) {
+			Yii::warning('Not find models', __METHOD__);
 			return null;
 		}
 		$grouped = $this->groupModelsByAddressRegion($models);
