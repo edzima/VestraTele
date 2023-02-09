@@ -1,7 +1,9 @@
 <?php
 
+use backend\widgets\CsvForm;
 use common\helpers\Html;
 use common\models\user\User;
+use common\models\user\Worker;
 use common\modules\lead\models\searches\LeadSearch;
 
 /* @var $this yii\web\View */
@@ -243,3 +245,11 @@ $dataProvider->getModels();
 	</div>
 
 <?php endif; ?>
+
+<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
+	? CsvForm::widget([
+		'buttonText' => Html::icon('export'),
+	])
+	: ''
+?>
+

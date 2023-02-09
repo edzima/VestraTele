@@ -2,6 +2,7 @@
 
 namespace backend\widgets;
 
+use Yii;
 use yii\base\Widget;
 use yii\helpers\Html;
 
@@ -23,6 +24,8 @@ class CsvForm extends Widget {
 		$content = Html::beginForm($this->action, $this->method, $formOptions);
 		$options = $this->buttonOptions;
 		$options['name'] = static::BUTTON_NAME;
+		$options['title'] = Yii::t('common', 'Export');
+		$options['aria-label'] = Yii::t('common', 'Export');
 		$content .= Html::submitButton($this->buttonText, $options);
 		$content .= Html::endForm();
 		return $content;
