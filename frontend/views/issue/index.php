@@ -15,9 +15,9 @@ use frontend\models\search\IssueSearch;
 use frontend\widgets\GridView;
 use frontend\widgets\issue\StageChangeButtonDropdown;
 use frontend\widgets\IssueColumn;
+use frontend\widgets\IssueParentTypeHeader;
 use kartik\select2\Select2;
 use yii\bootstrap\Alert;
-use yii\bootstrap\Nav;
 use yii\grid\SerialColumn;
 use yii\widgets\Pjax;
 
@@ -37,20 +37,7 @@ $parentMenuItems = Html::issueParentTypeItems();
 ?>
 <div class="issue-index">
 
-	<?php if (empty($parentMenuItems)): ?>
-		<h1><?= Html::encode($this->title) ?></h1>
-	<?php else: ?>
-		<h1 class="title-with-nav">
-			<?= Html::encode($this->title) ?>
-			<?= Nav::widget([
-				'items' => $parentMenuItems,
-				'options' => [
-					'class' => 'nav nav-pills',
-				],
-			]); ?>
-		</h1>
-
-	<?php endif; ?>
+	<?= IssueParentTypeHeader::widget([]) ?>
 
 	<p>
 		<?= Html::a(Yii::t('frontend', 'Search issue user'), ['user'], ['class' => 'btn btn-info']) ?>
@@ -58,7 +45,10 @@ $parentMenuItems = Html::issueParentTypeItems();
 		<?= Html::a(Yii::t('settlement', 'Pays'), ['/pay/index'], ['class' => 'btn btn-success']) ?>
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON)
-			? Html::a(Yii::t('issue', 'Summons'), ['/summon/index'], ['class' => 'btn btn-warning'])
+			? Html::a(Yii::t('issue', 'Summons'), [
+				'/summon/index',
+				Url::PARAM_ISSUE_PARENT_TYPE => $searchModel->parentTypeId,
+			], ['class' => 'btn btn-warning'])
 			: ''
 		?>
 

@@ -50,8 +50,9 @@ class SummonController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionIndex(int $parentTypeId = null): string {
 		$searchModel = new SummonSearch();
+		$searchModel->issueParentTypeId = $parentTypeId;
 		$searchModel->user_id = Yii::$app->user->getId();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 

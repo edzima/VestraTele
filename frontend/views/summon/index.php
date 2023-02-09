@@ -1,8 +1,10 @@
 <?php
 
+use frontend\helpers\Html;
+use frontend\helpers\Url;
 use frontend\models\search\SummonSearch;
+use frontend\widgets\IssueParentTypeHeader;
 use frontend\widgets\SummonGrid;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel SummonSearch */
@@ -10,12 +12,22 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('common', 'Summons');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/index']];
+if ($searchModel->getIssueParentType()) {
+	$this->params['breadcrumbs'][] = [
+		'label' => $searchModel->getIssueParentType()->name,
+		'url' => Url::issuesParentType($searchModel->getIssueParentType()->id),
+	];
+}
+
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="summon-index">
 
-	<h1><?= Html::encode($this->title) ?></h1>
-
+	<?= IssueParentTypeHeader::widget([
+		'parentsMenuConfig' => [
+			'route' => ['/summon/index'],
+		],
+	]) ?>
 
 	<p>
 		<?= Html::a(Yii::t('issue', 'Calendar'), ['/calendar/summon-calendar/index'], [
