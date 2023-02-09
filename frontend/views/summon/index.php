@@ -21,6 +21,10 @@ $this->params['breadcrumbs'][] = $this->title;
 		<?= Html::a(Yii::t('issue', 'Calendar'), ['/calendar/summon-calendar/index'], [
 			'class' => 'btn btn-success',
 		]) ?>
+
+		<?= Html::a(Yii::t('issue', 'Summon Docs'), ['/summon-doc/to-do'], [
+			'class' => 'btn btn-warning',
+		]) ?>
 	</p>
 
 	<?= SummonGrid::widget([

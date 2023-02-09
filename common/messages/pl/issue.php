@@ -151,4 +151,6 @@ return [
 	'Issues Archive: {name}' => 'Sprawy w Archiwum: {name}',
 	'Summon Docs' => 'Dokumenty',
 	'Done At' => 'Wykonano',
+	'Doc Name' => 'Dokument',
+	'Summon Type' => 'Typ Zlecenia',
 ];

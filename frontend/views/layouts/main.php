@@ -132,6 +132,10 @@ AppAsset::register($this);
 					'url' => ['/summon/index'],
 				],
 				[
+					'label' => Yii::t('issue', 'Summon Docs'),
+					'url' => ['/summon-doc/to-do'],
+				],
+				[
 					'label' => 'Kalendarz',
 					'url' => ['/calendar/summon-calendar/index'],
 				],

@@ -9,7 +9,6 @@ use yii\widgets\ListView;
 $this->title = Yii::$app->name;
 ?>
 <div class="site-index">
-
 	<?php if ($articlesDataProvider !== null && $articlesDataProvider->getTotalCount() > 0): ?>
 		<?= ListView::widget([
 			'summary' => '',
