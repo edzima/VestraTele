@@ -2,6 +2,7 @@
 
 use common\models\issue\search\SummonDocLinkSearch;
 use common\models\issue\SummonDocLink;
+use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use frontend\helpers\Html;
 use frontend\helpers\Url;
@@ -32,6 +33,10 @@ $this->params['breadcrumbs'][] = $this->title;
 		],
 	]) ?>
 
+	<?= $this->render('_nav', [
+		'searchModel' => $searchModel,
+	]) ?>
+
 
 	<?= \frontend\widgets\GridView::widget([
 		'dataProvider' => $dataProvider,
@@ -60,6 +65,24 @@ $this->params['breadcrumbs'][] = $this->title;
 				},
 				'format' => 'html',
 				'filter' => $searchModel->getSummonTypesNames(),
+			],
+			'deadline_at:date',
+			[
+				'class' => ActionColumn::class,
+				'template' => '{done}',
+				'buttons' => [
+					'done' => function (string $url, SummonDocLink $docLink): string {
+						$url .= '&returnUrl=' . Url::current();
+						return
+							Html::a(
+								Html::icon('check'),
+								$url, [
+								'title' => Yii::t('common', 'Done'),
+								'aria-label' => Yii::t('common', 'Done'),
+								'data-method' => 'POST',
+							]);
+					},
+				],
 			],
 
 		],

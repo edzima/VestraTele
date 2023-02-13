@@ -20,10 +20,6 @@ class SummonDocLinkSearch extends SummonDocLink implements
 	CustomerSearchInterface,
 	IssueParentTypeSearchable {
 
-	public const STATUS_TO_DO = 'to-do';
-	public const STATUS_TO_CONFIRM = 'to-confirm';
-	public const STATUS_CONFIRMED = 'confirmed';
-
 	public string $docName = '';
 	public string $customerName = '';
 	public string $customerPhone = '';
@@ -167,7 +163,8 @@ class SummonDocLinkSearch extends SummonDocLink implements
 	}
 
 	private function applyStatusFilter(SummonDocLinkQuery $query): void {
-
-
+		if (!empty($this->status)) {
+			$query->status($this->status);
+		}
 	}
 }
