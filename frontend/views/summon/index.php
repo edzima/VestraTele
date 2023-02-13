@@ -34,7 +34,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			'class' => 'btn btn-success',
 		]) ?>
 
-		<?= Html::a(Yii::t('issue', 'Summon Docs'), ['/summon-doc/to-do'], [
+		<?= Html::a(Yii::t('issue', 'Summon Docs'), [
+			'/summon-doc/to-do',
+			Url::PARAM_ISSUE_PARENT_TYPE => $searchModel->issueParentTypeId,
+		], [
 			'class' => 'btn btn-warning',
 		]) ?>
 	</p>

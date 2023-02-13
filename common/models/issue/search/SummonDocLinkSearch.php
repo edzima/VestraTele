@@ -3,6 +3,9 @@
 namespace common\models\issue\search;
 
 use common\helpers\ArrayHelper;
+use common\models\issue\Issue;
+use common\models\issue\IssueType;
+use common\models\issue\query\SummonDocLinkQuery;
 use common\models\issue\Summon;
 use common\models\issue\SummonDocLink;
 use common\models\user\CustomerSearchInterface;
@@ -13,21 +16,30 @@ use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\db\QueryInterface;
 
-class SummonDocLinkSearch extends SummonDocLink implements CustomerSearchInterface {
+class SummonDocLinkSearch extends SummonDocLink implements
+	CustomerSearchInterface,
+	IssueParentTypeSearchable {
+
+	public const STATUS_TO_DO = 'to-do';
+	public const STATUS_TO_CONFIRM = 'to-confirm';
+	public const STATUS_CONFIRMED = 'confirmed';
 
 	public string $docName = '';
 	public string $customerName = '';
 	public string $customerPhone = '';
+	public ?int $issueParentTypeId = null;
 	public $issue_id;
 
 	public $summonTypeId;
+
+	public ?string $status = null;
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['doc_type_id', 'summon_id', 'issue_id', 'summonTypeId'], 'integer'],
+			[['doc_type_id', 'summon_id', 'issue_id', 'summonTypeId', 'issueParentTypeId'], 'integer'],
 			['docName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['customerName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['customerPhone', PhoneValidator::class],
@@ -72,9 +84,11 @@ class SummonDocLinkSearch extends SummonDocLink implements CustomerSearchInterfa
 			return $dataProvider;
 		}
 
+		$this->applyIssueParentTypeFilter($query);
 		$this->applySummonTypeFilter($query);
 		$this->applyCustomerNameFilter($query);
 		$this->applyDocFilter($query);
+		$this->applyStatusFilter($query);
 
 		return $dataProvider;
 	}
@@ -117,12 +131,11 @@ class SummonDocLinkSearch extends SummonDocLink implements CustomerSearchInterfa
 		}
 	}
 
-	private function applyCustomerFilter(ActiveQuery $query) {
-		if (!empty($this->customerLastname)) {
-			$query->andWhere([
-				SummonDocLink::tableName() . '.doc_type_id' => $this->doc_type_id,
-			]);
+	public function getIssueParentType(): ?IssueType {
+		if (empty($this->issueParentTypeId)) {
+			return null;
 		}
+		return IssueType::get($this->issueParentTypeId);
 	}
 
 	public function applyCustomerNameFilter(QueryInterface $query): void {
@@ -142,5 +155,19 @@ class SummonDocLinkSearch extends SummonDocLink implements CustomerSearchInterfa
 				},
 			]);
 		}
+	}
+
+	public function applyIssueParentTypeFilter(ActiveQuery $query): void {
+		$parentType = $this->getIssueParentType();
+		if ($parentType) {
+			$childs = ArrayHelper::getColumn($parentType->childs, 'id');
+			$query->joinWith('summon.issue');
+			$query->andFilterWhere([Issue::tableName() . '.type_id' => $childs]);
+		}
+	}
+
+	private function applyStatusFilter(SummonDocLinkQuery $query): void {
+
+
 	}
 }

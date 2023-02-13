@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\models\issue\query\SummonDocLinkQuery;
 use common\models\issue\query\SummonQuery;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -41,5 +42,9 @@ class SummonDocLink extends ActiveRecord implements IssueInterface {
 
 	public function getIssue(): Issue {
 		return $this->getIssueModel();
+	}
+
+	public static function find(): SummonDocLinkQuery {
+		return new SummonDocLinkQuery(static::class);
 	}
 }
