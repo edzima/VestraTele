@@ -65,7 +65,7 @@ $this->params['issueParentTypeNav'] = [
 				'format' => 'html',
 				'filter' => $searchModel->getSummonTypesNames(),
 			],
-			'deadline_at:date',
+			//	'deadline_at:date',
 			'done_at:datetime',
 			'doneUser',
 			[

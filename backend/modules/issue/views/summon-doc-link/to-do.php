@@ -8,6 +8,7 @@ use common\models\issue\search\SummonDocLinkSearch;
 use common\models\issue\SummonDocLink;
 use common\modules\issue\widgets\SummonDocsLinkActionColumn;
 use common\widgets\grid\CustomerDataColumn;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $searchModel SummonDocLinkSearch */
@@ -65,6 +66,40 @@ $this->params['issueParentTypeNav'] = [
 				'filter' => $searchModel->getSummonTypesNames(),
 			],
 			'deadline_at:date',
+			[
+				'attribute' => 'summonContractorId',
+				'value' => 'summon.contractor',
+				'label' => Yii::t('common', 'Contractor'),
+				'filter' => $searchModel->getSummonContractorsNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('common', 'Contractor'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+			],
+			[
+				'attribute' => 'summonOwnerId',
+				'value' => 'summon.owner',
+				'label' => Yii::t('common', 'Owner'),
+				'filter' => $searchModel->getSummonOwnersNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('common', 'Owner'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+			],
 			[
 				'class' => SummonDocsLinkActionColumn::class,
 				'status' => $searchModel->status,

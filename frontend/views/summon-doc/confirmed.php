@@ -66,7 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'format' => 'html',
 				'filter' => $searchModel->getSummonTypesNames(),
 			],
-			'deadline_at:date',
+			//	'deadline_at:date',
 			'done_at:date',
 			'doneUser',
 			'confirmed_at:date',

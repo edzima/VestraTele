@@ -6,12 +6,15 @@ use common\modules\issue\widgets\SummonDocsLinkActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use frontend\helpers\Html;
 use frontend\helpers\Url;
+use frontend\widgets\GridView;
 use frontend\widgets\IssueColumn;
 use frontend\widgets\IssueParentTypeHeader;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $searchModel SummonDocLinkSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $contractorsNames string[] */
 
 $this->title = Yii::t('issue', 'Summon Docs - To Do');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/index']];
@@ -38,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	]) ?>
 
 
-	<?= \frontend\widgets\GridView::widget([
+	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
@@ -66,7 +69,42 @@ $this->params['breadcrumbs'][] = $this->title;
 				'format' => 'html',
 				'filter' => $searchModel->getSummonTypesNames(),
 			],
-			'deadline_at:date',
+			//	'deadline_at:date',
+			[
+				'attribute' => 'summonContractorId',
+				'value' => 'summon.contractor',
+				'label' => Yii::t('common', 'Contractor'),
+				'filter' => $contractorsNames,
+				'visible' => count($contractorsNames) > 1,
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('common', 'Contractor'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+			],
+			[
+				'attribute' => 'summonOwnerId',
+				'value' => 'summon.owner',
+				'label' => Yii::t('common', 'Owner'),
+				'filter' => $searchModel->getSummonOwnersNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('common', 'Owner'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+			],
 			[
 				'class' => SummonDocsLinkActionColumn::class,
 				'status' => $searchModel->status,
