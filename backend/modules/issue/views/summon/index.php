@@ -28,6 +28,9 @@ $this->params['issueParentTypeNav'] = [
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create summon'), ['create'], ['class' => 'btn btn-success']) ?>
 
+
+		<?= Html::a(Yii::t('backend', 'Summon Docs'), ['summon-doc-link/to-do'], ['class' => 'btn btn-warning']) ?>
+
 		<?= Html::a(Yii::t('issue', 'Calendar'), ['/calendar/summon-calendar/index', 'parentTypeId' => $searchModel->issueParentTypeId], ['class' => 'btn btn-primary']) ?>
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
@@ -36,7 +39,7 @@ $this->params['issueParentTypeNav'] = [
 		?>
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
-			? Html::a(Yii::t('backend', 'Summon Docs'), ['summon-doc/index'], ['class' => 'btn btn-warning'])
+			? Html::a(Yii::t('issue', 'Summon Docs Types'), ['summon-doc/index'], ['class' => 'btn btn-secondary'])
 			: ''
 		?>
 
