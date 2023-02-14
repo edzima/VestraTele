@@ -35,15 +35,19 @@ class SummonDocsLinkActionColumn extends ActionColumn {
 							]);
 					},
 					'confirm' => function (string $url, SummonDocLink $docLink): string {
-						$url .= '&returnUrl=' . $this->returnUrl;
-						return
-							Html::a(
-								Html::icon('ok'),
-								$url, [
-								'title' => Yii::t('issue', 'Confirmed'),
-								'aria-label' => Yii::t('issue', 'Confirmed'),
-							]);
+						if ($docLink->summon->isOwner(Yii::$app->user->getId() || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER))) {
+							$url .= '&returnUrl=' . $this->returnUrl;
+							return
+								Html::a(
+									Html::icon('ok'),
+									$url, [
+									'title' => Yii::t('issue', 'Confirmed'),
+									'aria-label' => Yii::t('issue', 'Confirmed'),
+								]);
+						}
+						return '';
 					},
+
 				];
 				break;
 			case SummonDocLink::STATUS_TO_CONFIRM:
