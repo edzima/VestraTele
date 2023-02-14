@@ -10,6 +10,7 @@ use common\models\issue\query\SummonQuery;
 use common\models\issue\Summon;
 use common\models\issue\SummonDocLink;
 use common\models\user\CustomerSearchInterface;
+use common\models\user\User;
 use common\validators\PhoneValidator;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -35,12 +36,20 @@ class SummonDocLinkSearch extends SummonDocLink implements
 	 */
 	public int $userId;
 
+	public $summonContractorId;
+	public $summonOwnerId;
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['doc_type_id', 'summon_id', 'issue_id', 'summonTypeId', 'issueParentTypeId'], 'integer'],
+			[
+				[
+					'doc_type_id', 'summon_id', 'issue_id', 'summonTypeId', 'issueParentTypeId',
+					'summonContractorId', 'summonOwnerId',
+				], 'integer',
+			],
 			['docName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['customerName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['customerPhone', PhoneValidator::class],
@@ -87,6 +96,8 @@ class SummonDocLinkSearch extends SummonDocLink implements
 
 		$this->applyUserFilter($query);
 		$this->applyIssueParentTypeFilter($query);
+		$this->applySummonContractorFilter($query);
+		$this->applySummonOwnerFilter($query);
 		$this->applySummonTypeFilter($query);
 		$this->applyCustomerNameFilter($query);
 		$this->applyDocFilter($query);
@@ -183,4 +194,42 @@ class SummonDocLinkSearch extends SummonDocLink implements
 			]);
 		}
 	}
+
+	private function applySummonContractorFilter(SummonDocLinkQuery $query) {
+		if (!empty($this->summonContractorId)) {
+			$query->joinWith('summon');
+			$query->andWhere([Summon::tableName() . '.contractor_id' => $this->summonContractorId]);
+		}
+	}
+
+	private function applySummonOwnerFilter(SummonDocLinkQuery $query) {
+		if (!empty($this->summonOwnerId)) {
+			$query->joinWith('summon');
+			$query->andWhere([Summon::tableName() . '.owner_id' => $this->summonOwnerId]);
+		}
+	}
+
+	public function getSummonContractorsNames(): array {
+		$query = SummonDocLink::find()
+			->select('contractor_id')
+			->distinct()
+			->joinWith('summon');
+
+		$this->applyStatusFilter($query);
+		$this->applyUserFilter($query);
+		$this->applySummonOwnerFilter($query);
+		return User::getSelectList($query->column(), false);
+	}
+
+	public function getSummonOwnersNames(): array {
+		$query = SummonDocLink::find()
+			->select('owner_id')
+			->distinct()
+			->joinWith('summon');
+
+		$this->applyStatusFilter($query);
+		$this->applyUserFilter($query);
+		return User::getSelectList($query->column(), false);
+	}
+
 }
