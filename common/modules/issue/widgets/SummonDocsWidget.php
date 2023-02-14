@@ -3,6 +3,7 @@
 namespace common\modules\issue\widgets;
 
 use common\helpers\Url;
+use common\models\issue\Summon;
 use common\models\issue\SummonDocLink;
 use yii\base\Widget;
 use yii\data\ArrayDataProvider;
@@ -14,7 +15,22 @@ class SummonDocsWidget extends Widget {
 	 * @var SummonDocLink[]
 	 */
 	public array $models = [];
+	public string $controller = '/summon-doc';
 	public $returnUrl;
+
+	/**
+	 * @param Summon[] $summons
+	 * @return SummonDocLink[]
+	 */
+	public static function modelsFromSummons(array $summons): array {
+		$docs = [];
+		foreach ($summons as $summon) {
+			foreach ($summon->docsLink as $doc) {
+				$docs[] = $doc;
+			}
+		}
+		return $docs;
+	}
 
 	public function init() {
 		parent::init();
@@ -26,6 +42,7 @@ class SummonDocsWidget extends Widget {
 	public function run() {
 		return $this->render('summon-docs', [
 			'returnUrl' => $this->returnUrl,
+			'controller' => $this->controller,
 			'toDoDataProvider' => $this->toDoDataProvider(),
 			'toConfirmDataProvider' => $this->toConfirmDataProvider(),
 			'confirmedDataProvider' => $this->confirmedDataProvider(),
@@ -36,7 +53,7 @@ class SummonDocsWidget extends Widget {
 		return $this->createDataProvider(
 			array_filter($this->models,
 				static function (SummonDocLink $model): bool {
-					return $model->done_at === null;
+					return $model->isToDo();
 				}
 			)
 		);
@@ -46,7 +63,7 @@ class SummonDocsWidget extends Widget {
 		return $this->createDataProvider(
 			array_filter($this->models,
 				static function (SummonDocLink $model): bool {
-					return $model->done_at !== null && $model->confirmed_at === null;
+					return $model->isToConfirm();
 				}
 			)
 		);
@@ -56,7 +73,7 @@ class SummonDocsWidget extends Widget {
 		return $this->createDataProvider(
 			array_filter($this->models,
 				static function (SummonDocLink $model): bool {
-					return $model->confirmed_at !== null;
+					return $model->isConfirmed();
 				}
 			)
 		);
@@ -64,6 +81,12 @@ class SummonDocsWidget extends Widget {
 
 	private function createDataProvider(array $models, array $config = []): DataProviderInterface {
 		$config['allModels'] = $models;
+//		$config['keys'] = function (SummonDocLink $link){
+//			return [
+//				'summon_id' => $link->summon_id,
+//				'doc_type_id' => $link->doc_type_id
+//			];
+//		};
 		return new ArrayDataProvider($config);
 	}
 }

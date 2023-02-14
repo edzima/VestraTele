@@ -42,6 +42,7 @@ use yii\db\ActiveRecord;
  * @property-read Simc $city
  * @property-read EntityResponsible $entityResponsible
  * @property-read SummonDoc[] $docs
+ * @property-read SummonDocLink[] $docsLink
  */
 class Summon extends ActiveRecord implements IssueInterface {
 

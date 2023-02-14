@@ -6,6 +6,7 @@ use common\models\issue\query\SummonDocLinkQuery;
 use common\models\issue\query\SummonQuery;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -35,6 +36,16 @@ class SummonDocLink extends ActiveRecord implements IssueInterface {
 		return '{{%summon_doc_list}}';
 	}
 
+	public function attributeLabels(): array {
+		return [
+			'confirmedUser' => Yii::t('common', 'Confirmed User'),
+			'doneUser' => Yii::t('common', 'Done User'),
+			'deadline_at' => Yii::t('common', 'Deadline at'),
+			'done_at' => Yii::t('common', 'Done at'),
+			'confirmed_at' => Yii::t('common', 'Confirmed at'),
+		];
+	}
+
 	public function getSummon(): SummonQuery {
 		return $this->hasOne(Summon::class, ['id' => 'summon_id']);
 	}
@@ -47,7 +58,7 @@ class SummonDocLink extends ActiveRecord implements IssueInterface {
 		return $this->hasOne(User::class, ['id' => 'confirmed_user_id']);
 	}
 
-	public function getDoneUser(): SummonQuery {
+	public function getDoneUser(): UserQuery {
 		return $this->hasOne(User::class, ['id' => 'done_user_id']);
 	}
 
@@ -65,5 +76,21 @@ class SummonDocLink extends ActiveRecord implements IssueInterface {
 
 	public static function find(): SummonDocLinkQuery {
 		return new SummonDocLinkQuery(static::class);
+	}
+
+	public function isDone(): bool {
+		return !empty($this->done_at);
+	}
+
+	public function isConfirmed(): bool {
+		return !empty($this->confirmed_at);
+	}
+
+	public function isToDo(): bool {
+		return empty($this->done_at);
+	}
+
+	public function isToConfirm(): bool {
+		return !$this->isToDo() && !$this->isConfirmed();
 	}
 }

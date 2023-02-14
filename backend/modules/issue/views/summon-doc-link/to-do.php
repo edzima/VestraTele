@@ -1,13 +1,13 @@
 <?php
 
+use backend\helpers\Html;
+use backend\helpers\Url;
+use backend\widgets\GridView;
+use backend\widgets\IssueColumn;
 use common\models\issue\search\SummonDocLinkSearch;
 use common\models\issue\SummonDocLink;
 use common\modules\issue\widgets\SummonDocsLinkActionColumn;
 use common\widgets\grid\CustomerDataColumn;
-use frontend\helpers\Html;
-use frontend\helpers\Url;
-use frontend\widgets\IssueColumn;
-use frontend\widgets\IssueParentTypeHeader;
 
 /* @var $this yii\web\View */
 /* @var $searchModel SummonDocLinkSearch */
@@ -23,22 +23,20 @@ if ($searchModel->getIssueParentType()) {
 }
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Summons'), 'url' => ['/summon/index']];
 $this->params['breadcrumbs'][] = $this->title;
+$this->params['issueParentTypeNav'] = [
+	'route' => ['/issue/summon-doc-link/to-do'],
+];
 ?>
 
 <div class="summon-doc-to-do">
 
-	<?= IssueParentTypeHeader::widget([
-		'parentsMenuConfig' => [
-			'route' => ['/summon-doc/to-do'],
-		],
-	]) ?>
 
 	<?= $this->render('_nav', [
 		'searchModel' => $searchModel,
 	]) ?>
 
 
-	<?= \frontend\widgets\GridView::widget([
+	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
@@ -70,7 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'class' => SummonDocsLinkActionColumn::class,
 				'status' => $searchModel->status,
-				'controller' => '/summon-doc',
+				'controller' => '/issue/summon-doc-link',
 			],
 
 		],

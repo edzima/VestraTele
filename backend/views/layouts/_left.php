@@ -269,12 +269,17 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-eye"></i>',
 						],
 						[
+							'label' => Yii::t('issue', 'Summon Docs'),
+							'url' => ['/issue/summon-doc-link/to-do'],
+							'icon' => '<i class="fa fa-file"></i>',
+						],
+						[
 							'label' => Yii::t('issue', 'Calendar'),
 							'url' => ['/calendar/summon-calendar/index'],
 							'icon' => '<i class="fa fa-calendar"></i>',
 						],
 						[
-							'label' => Yii::t('issue', 'Summon Docs'),
+							'label' => Yii::t('issue', 'Summon Docs Types'),
 							'url' => ['/issue/summon-doc/index'],
 							'icon' => '<i class="fa fa-file"></i>',
 							'visible' => $user->can(Worker::PERMISSION_SUMMON_MANAGER),

@@ -39,19 +39,8 @@ class SummonDocLinkQuery extends ActiveQuery {
 				$this->andWhere(['confirmed_at' => null]);
 				break;
 			case SummonDocLink::STATUS_CONFIRMED:
-//				$this->andWhere([
-//					'NOT', [
-//						'done_at' => null,
-//						'confirmed_at'=> null
-//					],
-//				]);
-
 				$this->andWhere(['NOT', ['done_at' => null]]);
-
 				$this->andWhere(['NOT', ['confirmed_at' => null]]);
-
-//				$this->andWhere(['<>', 'done_at', null]);
-//				$this->andWhere(['<>', 'confirmed_at', null]);
 				break;
 		}
 	}

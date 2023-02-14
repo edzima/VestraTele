@@ -13,8 +13,8 @@ use common\models\issue\IssueClaim;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
-use common\modules\issue\widgets\IssueSummonDocsWidget;
 use common\modules\issue\widgets\IssueViewWidget;
+use common\modules\issue\widgets\SummonDocsWidget;
 use yii\bootstrap\ButtonDropdown;
 use yii\data\DataProviderInterface;
 
@@ -152,10 +152,10 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 	]) ?>
 
 
-	<?= IssueSummonDocsWidget::widget([
-		'issue' => $model,
+	<?= SummonDocsWidget::widget([
+		'models' => SummonDocsWidget::modelsFromSummons($summonDataProvider->getModels()),
+		'controller' => '/issue/summon-doc-link',
 	]) ?>
-
 
 	<?= $calculationsDataProvider->getTotalCount() > 0
 		? IssuePayCalculationGrid::widget([

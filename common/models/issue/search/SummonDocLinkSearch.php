@@ -6,6 +6,7 @@ use common\helpers\ArrayHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueType;
 use common\models\issue\query\SummonDocLinkQuery;
+use common\models\issue\query\SummonQuery;
 use common\models\issue\Summon;
 use common\models\issue\SummonDocLink;
 use common\models\user\CustomerSearchInterface;
@@ -29,6 +30,10 @@ class SummonDocLinkSearch extends SummonDocLink implements
 	public $summonTypeId;
 
 	public ?string $status = null;
+	/**
+	 * @var int|mixed|string|null
+	 */
+	public int $userId;
 
 	/**
 	 * {@inheritdoc}
@@ -80,6 +85,7 @@ class SummonDocLinkSearch extends SummonDocLink implements
 			return $dataProvider;
 		}
 
+		$this->applyUserFilter($query);
 		$this->applyIssueParentTypeFilter($query);
 		$this->applySummonTypeFilter($query);
 		$this->applyCustomerNameFilter($query);
@@ -165,6 +171,16 @@ class SummonDocLinkSearch extends SummonDocLink implements
 	private function applyStatusFilter(SummonDocLinkQuery $query): void {
 		if (!empty($this->status)) {
 			$query->status($this->status);
+		}
+	}
+
+	private function applyUserFilter(SummonDocLinkQuery $query) {
+		if (!empty($this->userId)) {
+			$query->joinWith([
+				'summon' => function (SummonQuery $query) {
+					$query->user($this->userId);
+				},
+			]);
 		}
 	}
 }

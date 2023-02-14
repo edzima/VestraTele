@@ -1,7 +1,7 @@
 <?php
 
+use common\helpers\Url;
 use common\models\issue\search\SummonDocLinkSearch;
-use frontend\helpers\Url;
 use yii\bootstrap\Nav;
 
 /** @var SummonDocLinkSearch $searchModel */

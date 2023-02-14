@@ -13,7 +13,7 @@ use frontend\widgets\IssueParentTypeHeader;
 /* @var $searchModel SummonDocLinkSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('issue', 'Summon Docs - To Do');
+$this->title = Yii::t('issue', 'Summon Docs - Confirmed');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/index']];
 if ($searchModel->getIssueParentType()) {
 	$this->params['breadcrumbs'][] = [
@@ -25,11 +25,11 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Summons'), 'url' =
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="summon-doc-to-do">
+<div class="summon-doc-confirmed">
 
 	<?= IssueParentTypeHeader::widget([
 		'parentsMenuConfig' => [
-			'route' => ['/summon-doc/to-do'],
+			'route' => ['/summon-doc/confirmed'],
 		],
 	]) ?>
 
@@ -67,6 +67,10 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => $searchModel->getSummonTypesNames(),
 			],
 			'deadline_at:date',
+			'done_at:date',
+			'doneUser',
+			'confirmed_at:date',
+			'confirmedUser',
 			[
 				'class' => SummonDocsLinkActionColumn::class,
 				'status' => $searchModel->status,

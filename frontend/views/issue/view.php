@@ -4,6 +4,7 @@ use common\models\issue\Issue;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
+use common\modules\issue\widgets\SummonDocsWidget;
 use frontend\helpers\Breadcrumbs;
 use frontend\helpers\Html;
 use frontend\widgets\issue\StageChangeButtonDropdown;
@@ -61,6 +62,11 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		'model' => $model,
 		'notes' => $model->getIssueNotes()->joinWith('user.userProfile')->pinned()->all(),
 		'title' => Yii::t('issue', 'Pinned Issue Notes'),
+	]) ?>
+
+
+	<?= SummonDocsWidget::widget([
+		'models' => SummonDocsWidget::modelsFromSummons($summonDataProvider->getModels()),
 	]) ?>
 
 	<?= $calculationsDataProvider !== null

@@ -153,4 +153,11 @@ return [
 	'Done At' => 'Wykonano',
 	'Doc Name' => 'Dokument',
 	'Summon Type' => 'Typ Zlecenia',
+	'Summon Docs - To Do' => 'Dokumenty - Do Zrobienia',
+	'Summon Docs - To Confirm' => 'Dokumenty - Do Potwierdzenia',
+	'Summon Docs - Confirmed' => 'Dokumenty - Potwierdzone',
+	'To Do' => 'Do Zrobienia',
+	'To Confirm' => 'Do Potwierdzenia',
+	'Confirmed' => 'Potwierdzone',
+	'Summon Docs Types' => 'Typy Dokumentów',
 ];

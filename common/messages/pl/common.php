@@ -340,4 +340,8 @@ return [
 	'Suspended' => 'Zawieszenie',
 	'Create Potential Client: {name}' => 'Dodaj: {name}',
 	'Issues Archive: {customer}' => 'Sprawy w Archiwum: {customer}',
+	'Confirmed at' => 'Potwierdzono',
+	'Confirmed User' => 'Potwierdził(a)',
+	'Done at' => 'Wykonano',
+	'Done User' => 'Wykonał(a)',
 ];
