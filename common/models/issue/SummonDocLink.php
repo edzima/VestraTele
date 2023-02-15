@@ -93,4 +93,18 @@ class SummonDocLink extends ActiveRecord implements IssueInterface {
 	public function isToConfirm(): bool {
 		return !$this->isToDo() && !$this->isConfirmed();
 	}
+
+	public function userNameWithDate(?User $user, ?string $date_at): ?string {
+		$content = [];
+		if ($user) {
+			$content[] = $user->getFullName();
+		}
+		if ($date_at) {
+			$content[] = Yii::$app->formatter->asDate($date_at);
+		}
+		if (empty($content)) {
+			return null;
+		}
+		return implode(': ', $content);
+	}
 }
