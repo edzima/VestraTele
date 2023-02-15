@@ -15,8 +15,10 @@ class SummonDocsWidget extends Widget {
 	 * @var SummonDocLink[]
 	 */
 	public array $models = [];
-	public string $controller = '/summon-doc';
+	public string $controller;
 	public $returnUrl;
+
+	public bool $hideOnAllAreConfirmed = false;
 
 	/**
 	 * @param Summon[] $summons
@@ -40,11 +42,18 @@ class SummonDocsWidget extends Widget {
 	}
 
 	public function run() {
+		$toDoDataProvider = $this->toDoDataProvider();
+		$toConfirmDataProvider = $this->toConfirmDataProvider();
+		if ($this->hideOnAllAreConfirmed
+			&& empty($toDoDataProvider->getTotalCount())
+			&& empty($toConfirmDataProvider->getTotalCount())) {
+			return '';
+		}
 		return $this->render('summon-docs', [
 			'returnUrl' => $this->returnUrl,
 			'controller' => $this->controller,
-			'toDoDataProvider' => $this->toDoDataProvider(),
-			'toConfirmDataProvider' => $this->toConfirmDataProvider(),
+			'toDoDataProvider' => $toDoDataProvider,
+			'toConfirmDataProvider' => $toConfirmDataProvider,
 			'confirmedDataProvider' => $this->confirmedDataProvider(),
 		]);
 	}
@@ -80,13 +89,14 @@ class SummonDocsWidget extends Widget {
 	}
 
 	private function createDataProvider(array $models, array $config = []): DataProviderInterface {
+		$this->sort($models);
 		$config['allModels'] = $models;
-//		$config['keys'] = function (SummonDocLink $link){
-//			return [
-//				'summon_id' => $link->summon_id,
-//				'doc_type_id' => $link->doc_type_id
-//			];
-//		};
 		return new ArrayDataProvider($config);
+	}
+
+	private function sort(array &$models) {
+		usort($models, static function (SummonDocLink $a, SummonDocLink $b) {
+			return $a->doc->priority < $b->doc->priority;
+		});
 	}
 }

@@ -92,15 +92,18 @@ class SummonDocsLinkActionColumn extends ActionColumn {
 				$this->template = '{not-confirmed}';
 				$this->buttons = [
 					'not-confirmed' => function (string $url, SummonDocLink $docLink): string {
-						$url .= '&returnUrl=' . $this->returnUrl;
-						return
-							Html::a(
-								Html::icon('remove'),
-								$url, [
-								'title' => Yii::t('issue', 'To Confirm'),
-								'aria-label' => Yii::t('issue', 'To Confirm'),
-								'data-method' => 'POST',
-							]);
+						if ($docLink->confirmed_at === Yii::$app->user->getId() || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
+							$url .= '&returnUrl=' . $this->returnUrl;
+							return
+								Html::a(
+									Html::icon('remove'),
+									$url, [
+									'title' => Yii::t('issue', 'To Confirm'),
+									'aria-label' => Yii::t('issue', 'To Confirm'),
+									'data-method' => 'POST',
+								]);
+						}
+						return '';
 					},
 				];
 				break;

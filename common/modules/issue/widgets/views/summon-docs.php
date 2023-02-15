@@ -12,16 +12,18 @@ use yii\data\DataProviderInterface;
 /** @var DataProviderInterface $confirmedDataProvider */
 
 ?>
+<?php if ($toConfirmDataProvider->getTotalCount() || $toDoDataProvider->getTotalCount() || $confirmedDataProvider->getTotalCount()): ?>
+	<div class="summon-docs-widget">
+		<fieldset>
+			<legend>
+				<?= Yii::t('issue', 'Summon Docs') ?>
+			</legend>
 
-<div class="summon-docs-widget">
-	<fieldset>
-		<legend>
-			<?= Yii::t('issue', 'Summon Docs') ?>
-		</legend>
-
-		<div class="row">
-			<div class="col-md-4">
+			<div class="row">
 				<?= GridView::widget([
+					'containerOptions' => [
+						'class' => 'col-md-4',
+					],
 					'caption' => Yii::t('issue', 'To Do'),
 					'dataProvider' => $toDoDataProvider,
 					'columns' => [
@@ -37,14 +39,21 @@ use yii\data\DataProviderInterface;
 					'showOnEmpty' => false,
 					'summary' => '',
 				]) ?>
-			</div>
 
-			<div class="col-md-4">
 				<?= GridView::widget([
+					'containerOptions' => [
+						'class' => 'col-md-4',
+					],
 					'caption' => Yii::t('issue', 'To Confirm'),
 					'dataProvider' => $toConfirmDataProvider,
 					'columns' => [
 						'doc.name',
+						[
+							'attribute' => 'doneUser',
+							'value' => function (SummonDocLink $docLink): ?string {
+								return $docLink->userNameWithDate($docLink->doneUser, $docLink->done_at);
+							},
+						],
 						[
 							'class' => SummonDocsLinkActionColumn::class,
 							'status' => SummonDocLink::STATUS_TO_CONFIRM,
@@ -56,14 +65,21 @@ use yii\data\DataProviderInterface;
 					'showOnEmpty' => false,
 					'summary' => '',
 				]) ?>
-			</div>
 
-			<div class="col-md-4">
 				<?= GridView::widget([
+					'containerOptions' => [
+						'class' => 'col-md-4',
+					],
 					'caption' => Yii::t('issue', 'Confirmed'),
 					'dataProvider' => $confirmedDataProvider,
 					'columns' => [
 						'doc.name',
+						[
+							'attribute' => 'confirmedUser',
+							'value' => function (SummonDocLink $docLink): ?string {
+								return $docLink->userNameWithDate($docLink->confirmedUser, $docLink->confirmed_at);
+							},
+						],
 						[
 							'class' => SummonDocsLinkActionColumn::class,
 							'status' => SummonDocLink::STATUS_CONFIRMED,
@@ -76,6 +92,6 @@ use yii\data\DataProviderInterface;
 					'summary' => '',
 				]) ?>
 			</div>
-		</div>
-	</fieldset>
-</div>
+		</fieldset>
+	</div>
+<?php endif; ?>
