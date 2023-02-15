@@ -4,6 +4,7 @@ use backend\helpers\Breadcrumbs;
 use common\models\issue\Summon;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
+use common\modules\issue\widgets\SummonDocsWidget;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -45,11 +46,17 @@ YiiAsset::register($this);
 		?>
 	</p>
 
+
+	<?= SummonDocsWidget::widget([
+		'models' => $model->docsLink,
+		'controller' => '/issue/summon-doc-link',
+	]) ?>
+
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [
 			'type.name',
-			'titleWithDocs:text',
+			'title',
 			'issue.longId:text:Sprawa',
 			'owner',
 			'contractor',

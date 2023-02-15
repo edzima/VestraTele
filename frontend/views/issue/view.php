@@ -67,6 +67,8 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 	<?= SummonDocsWidget::widget([
 		'models' => SummonDocsWidget::modelsFromSummons($summonDataProvider->getModels()),
+		'controller' => '/summon-doc',
+		'hideOnAllAreConfirmed' => true,
 	]) ?>
 
 	<?= $calculationsDataProvider !== null

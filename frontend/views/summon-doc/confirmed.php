@@ -67,10 +67,10 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => $searchModel->getSummonTypesNames(),
 			],
 			//	'deadline_at:date',
-			'done_at:date',
 			'doneUser',
-			'confirmed_at:date',
+			'done_at:date',
 			'confirmedUser',
+			'confirmed_at:date',
 			[
 				'class' => SummonDocsLinkActionColumn::class,
 				'status' => $searchModel->status,

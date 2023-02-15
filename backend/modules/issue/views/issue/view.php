@@ -155,6 +155,8 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 	<?= SummonDocsWidget::widget([
 		'models' => SummonDocsWidget::modelsFromSummons($summonDataProvider->getModels()),
 		'controller' => '/issue/summon-doc-link',
+		'hideOnAllAreConfirmed' => true,
+
 	]) ?>
 
 	<?= $calculationsDataProvider->getTotalCount() > 0

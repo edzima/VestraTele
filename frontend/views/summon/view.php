@@ -3,11 +3,9 @@
 use common\models\issue\Summon;
 use common\models\user\User;
 use common\modules\issue\widgets\IssueNotesWidget;
-use common\widgets\grid\SerialColumn;
+use common\modules\issue\widgets\SummonDocsWidget;
 use frontend\controllers\SummonController;
 use frontend\helpers\Html;
-use frontend\widgets\GridView;
-use yii\data\ActiveDataProvider;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
@@ -37,62 +35,43 @@ YiiAsset::register($this);
 
 	</p>
 
-	<div class="row">
-		<div class="col-md-4">
-			<?= DetailView::widget([
-				'model' => $model,
-				'attributes' => [
-					'issue.longId:text:Sprawa',
-					'owner',
-					'contractor',
-					'typeName',
-					'statusName',
-					'entityWithCity',
-					'start_at:date',
-					'realize_at:datetime',
-					'realized_at:datetime',
-					[
-						'attribute' => 'deadline_at',
-						'format' => 'date',
-						'options' => [
-							'class' => 'red-text',
-						],
-					],
+	<?= SummonDocsWidget::widget([
+		'models' => $model->docsLink,
+		'controller' => '/summon-doc',
+	]) ?>
 
-					'created_at:datetime',
-					'updated_at:datetime',
+
+	<?= DetailView::widget([
+		'model' => $model,
+		'attributes' => [
+			'issue.longId:text:Sprawa',
+			'owner',
+			'contractor',
+			'typeName',
+			'statusName',
+			'entityWithCity',
+			'start_at:date',
+			'realize_at:datetime',
+			'realized_at:datetime',
+			[
+				'attribute' => 'deadline_at',
+				'format' => 'date',
+				'options' => [
+					'class' => 'red-text',
 				],
-			]) ?>
+			],
 
-		</div>
-		<div class="col-md-8">
-			<?= GridView::widget(
-				[
-					'dataProvider' => new ActiveDataProvider([
-						'query' => $model->getDocsLink(),
-					]),
-					'summary' => false,
-					'caption' => Yii::t('issue', 'Summon Docs'),
-					'columns' => [
-						[
-							'class' => SerialColumn::class,
-						],
-						'doc.name',
-					],
-					'emptyText' => '',
-					'showOnEmpty' => false,
-				])
-			?>
+			'created_at:datetime',
+			'updated_at:datetime',
+		],
+	]) ?>
 
 
 
-			<?= IssueNotesWidget::widget([
-				'model' => $model->issue,
-				'notes' => $model->issue->getIssueNotes()->joinWith('user.userProfile')->onlySummon($model->id)->all(),
-			]) ?>
-
-		</div>
-	</div>
+	<?= IssueNotesWidget::widget([
+		'model' => $model->issue,
+		'notes' => $model->issue->getIssueNotes()->joinWith('user.userProfile')->onlySummon($model->id)->all(),
+	]) ?>
 
 
 </div>

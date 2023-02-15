@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\helpers\Html;
 use common\models\issue\query\SummonDocLinkQuery;
 use common\models\issue\query\SummonQuery;
 use common\models\user\query\UserQuery;
@@ -94,10 +95,10 @@ class SummonDocLink extends ActiveRecord implements IssueInterface {
 		return !$this->isToDo() && !$this->isConfirmed();
 	}
 
-	public function userNameWithDate(?User $user, ?string $date_at): ?string {
+	public function userNameWithDate(?User $user, ?string $date_at, string $separator = '<br>'): ?string {
 		$content = [];
 		if ($user) {
-			$content[] = $user->getFullName();
+			$content[] = Html::encode($user->getFullName());
 		}
 		if ($date_at) {
 			$content[] = Yii::$app->formatter->asDate($date_at);
@@ -105,6 +106,6 @@ class SummonDocLink extends ActiveRecord implements IssueInterface {
 		if (empty($content)) {
 			return null;
 		}
-		return implode(': ', $content);
+		return implode($separator, $content);
 	}
 }

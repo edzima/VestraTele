@@ -78,8 +78,8 @@ class SummonDocsLinkActionColumn extends ActionColumn {
 								Html::a(
 									Html::icon('remove'),
 									$url, [
-									'title' => Yii::t('issue', 'To do'),
-									'aria - label' => Yii::t('issue', 'To do'),
+									'title' => Yii::t('issue', 'To Do'),
+									'aria - label' => Yii::t('issue', 'To Do'),
 									'data - method' => 'POST',
 								]);
 						}

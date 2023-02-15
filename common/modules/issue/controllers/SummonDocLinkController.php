@@ -17,6 +17,10 @@ class SummonDocLinkController extends Controller {
 		$searchModel = new SummonDocLinkSearch();
 		if (!Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
 			$searchModel->userId = Yii::$app->user->getId();
+		} else {
+			if (isset($searchModel->getSummonContractorsNames()[Yii::$app->user->getId()])) {
+				$searchModel->summonContractorId = Yii::$app->user->getId();
+			}
 		}
 		$searchModel->status = SummonDocLinkSearch::STATUS_TO_DO;
 		$searchModel->issueParentTypeId = $parentTypeId;
@@ -25,12 +29,15 @@ class SummonDocLinkController extends Controller {
 		return $this->render('to-do', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+			'contractorsNames' => $searchModel->getSummonContractorsNames(),
 		]);
 	}
 
 	public function actionToConfirm(int $parentTypeId = null): string {
 		$searchModel = new SummonDocLinkSearch();
-		$searchModel->userId = Yii::$app->user->getId();
+		if (!Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
+			$searchModel->userId = Yii::$app->user->getId();
+		}
 		$searchModel->status = SummonDocLinkSearch::STATUS_TO_CONFIRM;
 		$searchModel->issueParentTypeId = $parentTypeId;
 		$dataProvider = $searchModel->search(Yii::$app->request->getQueryParams());
@@ -43,7 +50,9 @@ class SummonDocLinkController extends Controller {
 
 	public function actionConfirmed(int $parentTypeId = null): string {
 		$searchModel = new SummonDocLinkSearch();
-		$searchModel->userId = Yii::$app->user->getId();
+		if (!Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
+			$searchModel->userId = Yii::$app->user->getId();
+		}
 		$searchModel->status = SummonDocLinkSearch::STATUS_CONFIRMED;
 		$searchModel->issueParentTypeId = $parentTypeId;
 		$dataProvider = $searchModel->search(Yii::$app->request->getQueryParams());

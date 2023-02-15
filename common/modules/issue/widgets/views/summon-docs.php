@@ -22,7 +22,7 @@ use yii\data\DataProviderInterface;
 			<div class="row">
 				<?= GridView::widget([
 					'containerOptions' => [
-						'class' => 'col-md-4',
+						'class' => 'col-md-2',
 					],
 					'caption' => Yii::t('issue', 'To Do'),
 					'dataProvider' => $toDoDataProvider,
@@ -53,6 +53,7 @@ use yii\data\DataProviderInterface;
 							'value' => function (SummonDocLink $docLink): ?string {
 								return $docLink->userNameWithDate($docLink->doneUser, $docLink->done_at);
 							},
+							'format' => 'html',
 						],
 						[
 							'class' => SummonDocsLinkActionColumn::class,
@@ -68,17 +69,26 @@ use yii\data\DataProviderInterface;
 
 				<?= GridView::widget([
 					'containerOptions' => [
-						'class' => 'col-md-4',
+						'class' => 'col-md-5',
 					],
 					'caption' => Yii::t('issue', 'Confirmed'),
 					'dataProvider' => $confirmedDataProvider,
 					'columns' => [
 						'doc.name',
 						[
+							'attribute' => 'doneUser',
+							'value' => function (SummonDocLink $docLink): ?string {
+								return $docLink->userNameWithDate($docLink->doneUser, $docLink->done_at);
+							},
+							'format' => 'html',
+						],
+						[
 							'attribute' => 'confirmedUser',
 							'value' => function (SummonDocLink $docLink): ?string {
 								return $docLink->userNameWithDate($docLink->confirmedUser, $docLink->confirmed_at);
 							},
+							'format' => 'html',
+
 						],
 						[
 							'class' => SummonDocsLinkActionColumn::class,
