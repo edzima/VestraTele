@@ -7,11 +7,29 @@ use common\models\issue\SummonDocLink;
 use common\models\user\Worker;
 use frontend\helpers\Url;
 use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class SummonDocLinkController extends Controller {
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function behaviors(): array {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'done' => ['POST'],
+					'not-done' => ['POST'],
+					'confirm' => ['POST'],
+					'not-confirmed' => ['POST'],
+				],
+			],
+		];
+	}
 
 	public function actionToDo(int $parentTypeId = null): string {
 		$searchModel = new SummonDocLinkSearch();
@@ -124,10 +142,10 @@ class SummonDocLinkController extends Controller {
 		if ($model === null) {
 			throw new NotFoundHttpException();
 		}
-//		if (!$model->summon->isForUser(Yii::$app->user->getId())
-//			|| !Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
-//			throw new ForbiddenHttpException();
-//		}
+		if (!$model->summon->isForUser(Yii::$app->user->getId())
+			|| !Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
+			throw new ForbiddenHttpException();
+		}
 		return $model;
 	}
 }
