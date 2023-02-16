@@ -25,17 +25,20 @@ class SummonDocsLinkActionColumn extends ActionColumn {
 				$this->template = '{done} {confirm}';
 				$this->buttons = [
 					'done' => function (string $url, SummonDocLink $docLink): string {
-						$url .= '&returnUrl=' . $this->returnUrl;
-						return
-							Html::a(
-								Html::icon('check'),
-								$url, [
-								'title' => Yii::t('issue', 'To Confirm'),
-								'aria-label' => Yii::t('issue', 'To Confirm'),
-							]);
+						if ($docLink->summon->isContractor(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
+							$url .= '&returnUrl=' . $this->returnUrl;
+							return
+								Html::a(
+									Html::icon('check'),
+									$url, [
+									'title' => Yii::t('issue', 'To Confirm'),
+									'aria-label' => Yii::t('issue', 'To Confirm'),
+								]);
+						}
+						return '';
 					},
 					'confirm' => function (string $url, SummonDocLink $docLink): string {
-						if ($docLink->summon->isOwner(Yii::$app->user->getId() || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER))) {
+						if ($docLink->summon->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
 							$url .= '&returnUrl=' . $this->returnUrl;
 							return
 								Html::a(
@@ -112,6 +115,7 @@ class SummonDocsLinkActionColumn extends ActionColumn {
 	}
 
 	function createUrl($action, $model, $key, $index) {
+		assert($model instanceof SummonDocLink);
 		$key = [
 			'summon_id' => $model->summon_id,
 			'doc_type_id' => $model->doc_type_id,

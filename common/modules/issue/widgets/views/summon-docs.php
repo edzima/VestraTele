@@ -22,7 +22,7 @@ use yii\data\DataProviderInterface;
 			<div class="row">
 				<?= GridView::widget([
 					'containerOptions' => [
-						'class' => 'col-md-2',
+						'class' => 'col-md-3',
 					],
 					'caption' => Yii::t('issue', 'To Do'),
 					'dataProvider' => $toDoDataProvider,
