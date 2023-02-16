@@ -94,7 +94,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			},
 				'message' => Yii::t('common', 'Deadline At cannot be blank on custom term.'),
 			],
-			['deadline_at', 'default', 'value' => null],
+			[['deadline_at', 'start_at'], 'default', 'value' => null],
 			[['start_at', 'deadline_at'], 'date', 'format' => 'yyyy-MM-dd'],
 			[['realize_at', 'realized_at'], 'datetime', 'format' => 'yyyy-MM-dd HH:mm:00'],
 			['entity_id', 'in', 'range' => array_keys(static::getEntityNames())],
@@ -229,25 +229,28 @@ class SummonForm extends Model implements HiddenFieldsModel {
 
 	public function saveDocs(): void {
 		$model = $this->getModel();
-		$model->unlinkAll('docs', true);
-		$rows = [];
-		if (!empty($this->doc_types_ids)) {
-			$docs = (array) $this->doc_types_ids;
-			foreach ($docs as $id) {
-				$rows[] = [
-					'summon_id' => $model->id,
-					'doc_type_id' => $id,
-				];
+		if (empty($this->doc_types_ids)) {
+			if (!$model->isNewRecord) {
+				$model->unlinkAll('docs', true);
 			}
-		}
-
-		if (!empty($rows)) {
-			Yii::$app->db->createCommand()
-				->batchInsert(SummonDocLink::tableName(), [
-					'summon_id',
-					'doc_type_id',
-				], $rows)
-				->execute();
+		} else {
+			if ($model->isNewRecord) {
+				$this->linkDocsTypes($this->doc_types_ids);
+			} else {
+				$currentTypesIds = ArrayHelper::getColumn($model->docsLink, 'doc_type_id');
+				if (empty($currentTypesIds)) {
+					$this->linkDocsTypes($this->doc_types_ids);
+				} else {
+					$toDeleteIds = array_diff($currentTypesIds, $this->doc_types_ids);
+					$toInsertIds = array_diff($this->doc_types_ids, $currentTypesIds);
+					if (!empty($toDeleteIds)) {
+						$this->unlinkDocsTypes($toDeleteIds);
+					}
+					if (!empty($toInsertIds)) {
+						$this->linkDocsTypes($toInsertIds);
+					}
+				}
+			}
 		}
 	}
 
@@ -335,5 +338,36 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			return $this->getModel()->type;
 		}
 		return $this->type;
+	}
+
+	private function linkDocsTypes(array $doc_types_ids) {
+		$summonId = $this->getModel()->id;
+		if ($summonId) {
+			$rows = [];
+			foreach ($doc_types_ids as $doc_type_id) {
+				$rows[] = [
+					'doc_type_id' => $doc_type_id,
+					'summon_id' => $summonId,
+				];
+			}
+			if (!empty($rows)) {
+				Yii::$app->db->createCommand()
+					->batchInsert(SummonDocLink::tableName(), [
+						'doc_type_id',
+						'summon_id',
+					], $rows)
+					->execute();
+			}
+		}
+	}
+
+	private function unlinkDocsTypes(array $doc_types_ids) {
+		$summonId = $this->getModel()->id;
+		if ($summonId && !empty($doc_types_ids)) {
+			SummonDocLink::deleteAll([
+				'summon_id' => $summonId,
+				'doc_type_id' => $doc_types_ids,
+			]);
+		}
 	}
 }
