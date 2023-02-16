@@ -14,18 +14,18 @@ use common\widgets\grid\CustomerDataColumn;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('issue', 'Summon Docs - Confirmed');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['issue/index']];
 if ($searchModel->getIssueParentType()) {
 	$this->params['breadcrumbs'][] = [
 		'label' => $searchModel->getIssueParentType()->name,
 		'url' => Url::issuesParentType($searchModel->getIssueParentType()->id),
 	];
 }
-$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Summons'), 'url' => ['/summon/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Summons'), 'url' => ['summon/index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 $this->params['issueParentTypeNav'] = [
-	'route' => ['/issue/summon-doc-link/confirmed'],
+	'route' => ['confirmed'],
 ];
 ?>
 
