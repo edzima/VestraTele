@@ -33,6 +33,7 @@ class SummonDocsLinkActionColumn extends ActionColumn {
 									$url, [
 									'title' => Yii::t('issue', 'To Confirm'),
 									'aria-label' => Yii::t('issue', 'To Confirm'),
+									'data-method' => 'POST',
 								]);
 						}
 						return '';
@@ -46,6 +47,7 @@ class SummonDocsLinkActionColumn extends ActionColumn {
 									$url, [
 									'title' => Yii::t('issue', 'Confirmed'),
 									'aria-label' => Yii::t('issue', 'Confirmed'),
+									'data-method' => 'POST',
 								]);
 						}
 						return '';
@@ -66,8 +68,8 @@ class SummonDocsLinkActionColumn extends ActionColumn {
 									Html::icon('ok'),
 									$url, [
 									'title' => Yii::t('issue', 'Confirm'),
-									'aria - label' => Yii::t('issue', 'Confirm'),
-									'data - method' => 'POST',
+									'aria-label' => Yii::t('issue', 'Confirm'),
+									'data-method' => 'POST',
 								]);
 						}
 						return '';
@@ -82,8 +84,8 @@ class SummonDocsLinkActionColumn extends ActionColumn {
 									Html::icon('remove'),
 									$url, [
 									'title' => Yii::t('issue', 'To Do'),
-									'aria - label' => Yii::t('issue', 'To Do'),
-									'data - method' => 'POST',
+									'aria-label' => Yii::t('issue', 'To Do'),
+									'data-method' => 'POST',
 								]);
 						}
 						return '';
