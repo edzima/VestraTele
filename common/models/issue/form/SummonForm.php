@@ -58,6 +58,8 @@ class SummonForm extends Model implements HiddenFieldsModel {
 	public $realize_at;
 	public $realized_at;
 
+	public ?int $updater_id = null;
+
 	public bool $sendEmailToContractor = true;
 
 	private ?Summon $model = null;
@@ -68,7 +70,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		return [
 			[['type_id', 'status', 'issue_id', 'owner_id', 'start_at'], 'required'],
 			[$this->requiredFields(), 'required'],
-			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status', 'entity_id'], 'integer'],
+			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status', 'entity_id', '!updater_id'], 'integer'],
 			[
 				'title', 'required',
 				'message' => Yii::t('issue', 'Title cannot be blank when Docs are empty.'),
@@ -105,6 +107,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			[['contractor_id'], 'in', 'range' => array_keys($this->getContractors()),],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			[['!owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
+			[['!updater_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updater_id' => 'id']],
 		];
 	}
 
@@ -198,6 +201,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		$model->start_at = $this->start_at;
 		$model->city_id = $this->city_id;
 		$model->entity_id = $this->entity_id;
+		$model->updater_id = $this->updater_id;
 		if (empty($this->realize_at)) {
 			$dateTime = new DateTime($this->start_at);
 			$dateTime->setTime(date('H'), date('i'));
@@ -249,6 +253,15 @@ class SummonForm extends Model implements HiddenFieldsModel {
 					if (!empty($toInsertIds)) {
 						$this->linkDocsTypes($toInsertIds);
 					}
+				}
+				if ((int) $this->status === Summon::STATUS_REALIZED) {
+					SummonDocLink::updateAll([
+						'confirmed_at' => date(DATE_ATOM),
+						'confirmed_user_id' => $this->updater_id ?: $this->owner_id,
+					], [
+						'summon_id' => $model->id,
+						'confirmed_user_id' => null,
+					]);
 				}
 			}
 		}

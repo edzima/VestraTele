@@ -28,6 +28,7 @@ use yii\db\ActiveRecord;
  * @property int $issue_id
  * @property int $owner_id
  * @property int $contractor_id
+ * @property int|null $updater_id
  * @property int $entity_id
  * @property int $city_id
  *
@@ -39,6 +40,7 @@ use yii\db\ActiveRecord;
  * @property-read Issue $issue
  * @property-read User $contractor
  * @property-read User $owner
+ * @property-read User|null $updater
  * @property-read Simc $city
  * @property-read EntityResponsible $entityResponsible
  * @property-read SummonDoc[] $docs
@@ -85,24 +87,25 @@ class Summon extends ActiveRecord implements IssueInterface {
 		return '{{%summon}}';
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules(): array {
-		return [
-			[['status', 'issue_id', 'owner_id', 'type_id'], 'required'],
-			[['status', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
-			[['title'], 'string', 'max' => 255],
-			[['created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at'], 'safe'],
-			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
-			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => SummonType::class, 'targetAttribute' => ['type_id' => 'id']],
-			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
-			[['entity_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_id' => 'id']],
-			[['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Simc::class, 'targetAttribute' => ['city_id' => 'id']],
-			[['contractor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['contractor_id' => 'id']],
-			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
-		];
-	}
+//	/**
+//	 * {@inheritdoc}
+//	 */
+//	public function rules(): array {
+//		return [
+//			[['status', 'issue_id', 'owner_id', 'type_id'], 'required'],
+//			[['status', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
+//			[['title'], 'string', 'max' => 255],
+//			[['created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at'], 'safe'],
+//			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
+//			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => SummonType::class, 'targetAttribute' => ['type_id' => 'id']],
+//			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
+//			[['entity_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_id' => 'id']],
+//			[['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Simc::class, 'targetAttribute' => ['city_id' => 'id']],
+//			[['contractor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['contractor_id' => 'id']],
+//			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
+//			[['updater_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updater_id' => 'id']],
+//		];
+//	}
 
 	/**
 	 * {@inheritdoc}
@@ -157,7 +160,6 @@ class Summon extends ActiveRecord implements IssueInterface {
 		}
 		return implode(', ', ArrayHelper::getColumn($docs, 'name'));
 	}
-
 
 	public function getType(): ActiveQuery {
 		return $this->hasOne(SummonType::class, ['id' => 'type_id']);
@@ -244,6 +246,10 @@ class Summon extends ActiveRecord implements IssueInterface {
 	 */
 	public function getOwner() {
 		return $this->hasOne(User::class, ['id' => 'owner_id']);
+	}
+
+	public function getUpdater() {
+		return $this->hasOne(User::class, ['id' => 'updater_id']);
 	}
 
 	public function isForUser(int $id): bool {

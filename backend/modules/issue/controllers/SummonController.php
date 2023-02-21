@@ -115,7 +115,7 @@ class SummonController extends Controller {
 			throw new ForbiddenHttpException('Only for Owner or Summon Manager.');
 		}
 		$model->setModel($summon);
-
+		$model->updater_id = Yii::$app->user->getId();
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $id]);
 		}

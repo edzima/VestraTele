@@ -60,13 +60,16 @@ YiiAsset::register($this);
 			'issue.longId:text:Sprawa',
 			'owner',
 			'contractor',
+			[
+				'attribute' => 'updater',
+				'visible' => $model->updater !== null,
+			],
 			'statusName',
 			'entityWithCity',
 			'start_at:date',
 			'realize_at:datetime',
 			'realized_at:datetime',
 			'deadline_at:date',
-
 			'created_at:datetime',
 			'updated_at:datetime',
 		],

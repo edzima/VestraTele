@@ -142,10 +142,11 @@ class SummonDocLinkController extends Controller {
 		if ($model === null) {
 			throw new NotFoundHttpException();
 		}
-		if (!$model->summon->isForUser(Yii::$app->user->getId())
-			|| !Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
-			throw new ForbiddenHttpException();
+
+		if ($model->summon->isForUser(Yii::$app->user->getId())
+			|| Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
+			return $model;
 		}
-		return $model;
+		throw new ForbiddenHttpException('Only for Summon User on Summon Manager.');
 	}
 }

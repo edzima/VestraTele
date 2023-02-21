@@ -127,6 +127,7 @@ class SummonController extends Controller {
 		}
 		$model = new SummonForm();
 		$model->setModel($summon);
+		$model->updater_id = Yii::$app->user->getId();
 		if ($summon->owner_id !== Yii::$app->getUser()->getId()) {
 			$model->scenario = SummonForm::SCENARIO_CONTRACTOR;
 		}
