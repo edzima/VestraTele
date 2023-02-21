@@ -171,7 +171,40 @@ class SummonGrid extends GridView {
 			],
 			[
 				'attribute' => 'doc_types_ids',
-				'value' => 'docsNames',
+				'value' => function (Summon $summon): ?string {
+					$docsLink = $summon->docsLink;
+					if (empty($docsLink)) {
+						return null;
+					}
+					$confirmed = [];
+					$notConfirmed = [];
+					foreach ($docsLink as $docLink) {
+						if ($docLink->isConfirmed()) {
+							$confirmed[] = Html::encode($docLink->doc->name);
+						} else {
+							$notConfirmed[] = Html::encode($docLink->doc->name);
+						}
+					}
+					$content = '';
+					if (!empty($notConfirmed)) {
+						$content .= Html::tag('strong', Yii::t('issue', 'To Do: {count}', [
+								'count' => count($notConfirmed),
+							]))
+							. Html::ul($notConfirmed, [
+								'class' => ['mb-0'],
+							]);
+					}
+					if (!empty($confirmed)) {
+						$content .= Html::tag('strong', Yii::t('issue', 'Confirmed: {count}', [
+								'count' => count($confirmed),
+							]))
+							. Html::ul($confirmed, [
+								'class' => ['mb-0 text-line_trough'],
+							]);
+					}
+					return $content;
+				},
+				'format' => 'html',
 				'filter' => SummonSearch::getDocTypesNames(),
 				'filterType' => GridView::FILTER_SELECT2,
 				'filterWidgetOptions' => [
@@ -182,11 +215,15 @@ class SummonGrid extends GridView {
 				],
 				'options' => [
 					'style' => [
-						'min-width' => '200px',
+						'min-width' => '250px',
 					],
 				],
 				'visible' => $this->withDocs,
 			],
+			//			[
+			//				'attribute' => 'docsCountSummary',
+			//				'noWrap' => true,
+			//			],
 			[
 				'attribute' => 'start_at',
 				'format' => 'date',
