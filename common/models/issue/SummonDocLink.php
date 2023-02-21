@@ -37,6 +37,16 @@ class SummonDocLink extends ActiveRecord implements IssueInterface {
 		return '{{%summon_doc_list}}';
 	}
 
+	public static function countSummary(array $docsLink): ?string {
+		if (empty($docsLink)) {
+			return null;
+		}
+		$confirmed = array_filter($docsLink, static function (SummonDocLink $doc): bool {
+			return $doc->isConfirmed();
+		});
+		return count($confirmed) . ' / ' . count($docsLink);
+	}
+
 	public function attributeLabels(): array {
 		return [
 			'confirmedUser' => Yii::t('common', 'Confirmed User'),

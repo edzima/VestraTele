@@ -157,8 +157,11 @@ return [
 	'Summon Docs - To Confirm' => 'Dokumenty - Do Potwierdzenia',
 	'Summon Docs - Confirmed' => 'Dokumenty - Potwierdzone',
 	'To Do' => 'Do Zrobienia',
+	'To Do: {count}' => 'Do Zrobienia: {count}',
 	'To Confirm' => 'Do Potwierdzenia',
 	'Confirm' => 'Potwierdź',
 	'Confirmed' => 'Potwierdzone',
+	'Confirmed: {count}' => 'Potwierdzone: {count}',
 	'Summon Docs Types' => 'Typy Dokumentów',
+	'Docs Count Summary' => 'Dokumenty Zrealizowane',
 ];

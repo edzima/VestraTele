@@ -136,6 +136,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 			'doc_types_ids' => Yii::t('common', 'Doc Types'),
 			'docsNames' => Yii::t('common', 'Doc Types'),
 			'titleWithDocs' => Yii::t('issue', 'Title with Docs'),
+			'docsCountSummary' => Yii::t('issue', 'Docs Count Summary'),
 		];
 	}
 
@@ -156,6 +157,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 		}
 		return implode(', ', ArrayHelper::getColumn($docs, 'name'));
 	}
+
 
 	public function getType(): ActiveQuery {
 		return $this->hasOne(SummonType::class, ['id' => 'type_id']);
@@ -262,5 +264,9 @@ class Summon extends ActiveRecord implements IssueInterface {
 
 	public static function find(): SummonQuery {
 		return new SummonQuery(static::class);
+	}
+
+	public function getDocsCountSummary(): ?string {
+		return SummonDocLink::countSummary($this->docsLink);
 	}
 }
