@@ -2,6 +2,7 @@
 
 use common\models\issue\Summon;
 use common\models\user\User;
+use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\SummonDocsWidget;
 use frontend\controllers\SummonController;
@@ -24,6 +25,20 @@ YiiAsset::register($this);
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
+
+
+		<?= !$model->isRealized() &&
+		($model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER))
+			? Html::a(Yii::t('issue', 'Realize it'), ['realize', 'id' => $model->id], [
+				'class' => 'btn btn-success',
+				'data' => [
+					'confirm' => Yii::t('issue', 'Are you sure you want to realize this summon?'),
+					'method' => 'post',
+				],
+			])
+			: ''
+		?>
+
 		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
 			? Html::a(Yii::t('common', 'Create note'), ['/note/summon', 'id' => $model->id], ['class' => 'btn btn-info'])
 			: ''

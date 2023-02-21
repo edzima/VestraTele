@@ -25,7 +25,7 @@ class SummonGrid extends GridView {
 	/** @todo add note link */
 	public $actionColumn = [
 		'class' => ActionColumn::class,
-		'template' => '{note} {view} {update} {delete}',
+		'template' => '{realize} {note} {view} {update} {delete}',
 	];
 
 	public ?string $noteRoute = '/issue/note/create-summon';
@@ -67,6 +67,19 @@ class SummonGrid extends GridView {
 						'title' => Yii::t('issue', 'Create Note'),
 						'aria-label' => Yii::t('issue', 'Create Note'),
 					]
+				);
+			};
+		}
+
+		if (!isset($this->actionColumn['buttons']['realize'])) {
+			$this->actionColumn['buttons']['realize'] = static function (string $url, Summon $model): string {
+				return Html::a(Html::icon('check'),
+					$url,
+					[
+						'title' => Yii::t('issue', 'Realize it'),
+						'aria-label' => Yii::t('issue', 'Realize it'),
+						'data-method' => 'POST',
+					],
 				);
 			};
 		}

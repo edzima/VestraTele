@@ -18,6 +18,9 @@ class SummonGrid extends BaseSummonGrid {
 			'update' => function (Summon $model): bool {
 				return SummonController::canUpdate($model);
 			},
+			'realize' => function (Summon $model): bool {
+				return !$model->isRealized() && SummonController::canUpdate($model);
+			},
 			'delete' => function (Summon $model): bool {
 				return SummonController::canDelete($model);
 			},

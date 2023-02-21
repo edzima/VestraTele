@@ -21,6 +21,19 @@ YiiAsset::register($this);
 <div class="summon-view">
 
 	<p>
+
+		<?= !$model->isRealized() &&
+		($model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER))
+			? Html::a(Yii::t('issue', 'Realize it'), ['realize', 'id' => $model->id], [
+				'class' => 'btn btn-success',
+				'data' => [
+					'confirm' => Yii::t('issue', 'Are you sure you want to realize this summon?'),
+					'method' => 'post',
+				],
+			])
+			: ''
+		?>
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_NOTE)
 			? Html::a(
 				Yii::t('common', 'Create note'),
@@ -34,6 +47,8 @@ YiiAsset::register($this);
 			? Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: ''
 		?>
+
+
 		<?= $model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)
 			? Html::a(Yii::t('common', 'Delete'), ['delete', 'id' => $model->id], [
 				'class' => 'btn btn-danger',
@@ -44,6 +59,8 @@ YiiAsset::register($this);
 			])
 			: ''
 		?>
+
+
 	</p>
 
 

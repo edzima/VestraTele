@@ -164,4 +164,7 @@ return [
 	'Confirmed: {count}' => 'Potwierdzone: {count}',
 	'Summon Docs Types' => 'Typy Dokumentów',
 	'Docs Count Summary' => 'Dokumenty Zrealizowane',
+	'Realize it' => 'Zrealizuj',
+	'Are you sure you want to realize this summon?' => 'Czy napewno chcesz Zrealizować to Zlecenie?',
+	'Success. Mark Summon as Realized.' => 'Zlecenie Zrealizowano!',
 ];

@@ -179,8 +179,8 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		$this->owner_id = $model->owner_id;
 		$this->entity_id = $model->entity_id;
 		$this->city_id = $model->city_id;
-		$this->start_at = $model->start_at;
-		$this->deadline_at = $model->deadline_at;
+		$this->start_at = $model->start_at ? date('Y-m-d', strtotime($model->start_at)) : null;
+		$this->deadline_at = $model->deadline_at ? date('Y-m-d', strtotime($model->deadline_at)) : null;
 		$this->realize_at = $model->realize_at;
 		$this->realized_at = $model->realized_at;
 	}

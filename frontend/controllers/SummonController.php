@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use backend\helpers\Url;
 use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\Summon;
@@ -139,6 +140,26 @@ class SummonController extends Controller {
 		return $this->render('update', [
 			'model' => $model,
 		]);
+	}
+
+	public function actionRealize(int $id, string $returnUrl = null) {
+		$model = $this->findModel($id);
+		if (!static::canUpdate($model)) {
+			throw new ForbiddenHttpException();
+		}
+		$form = new SummonForm();
+		$form->setModel($model);
+		$form->status = Summon::STATUS_REALIZED;
+		$form->updater_id = Yii::$app->user->getId();
+		if ($form->save()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('issue', 'Success. Mark Summon as Realized.')
+			);
+		}
+		return $this->redirect($returnUrl
+			? Url::to($returnUrl)
+			: ['view', 'id' => $id]
+		);
 	}
 
 	/**
