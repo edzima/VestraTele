@@ -15,7 +15,9 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'priority')->dropDownList(SummonDoc::getPriorityNames()) ?>
+	<?= $form->field($model, 'priority')->dropDownList(SummonDoc::getPriorityNames(), [
+		'prompt' => Yii::t('common', '--- Select ---'),
+	]) ?>
 
 
 	<div class="form-group">
