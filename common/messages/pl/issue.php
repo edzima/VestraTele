@@ -167,4 +167,5 @@ return [
 	'Realize it' => 'Zrealizuj',
 	'Are you sure you want to realize this summon?' => 'Czy napewno chcesz Zrealizować to Zlecenie?',
 	'Success. Mark Summon as Realized.' => 'Zlecenie Zrealizowano!',
+	'Status' => 'Status',
 ];

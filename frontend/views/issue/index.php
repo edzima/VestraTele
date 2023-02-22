@@ -77,10 +77,10 @@ $parentMenuItems = Html::issueParentTypeItems();
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'emptyText' => $searchModel->hasExcludedArchiveStage()
+		'emptyText' =>  $searchModel->hasExcludedArchiveStage() && ($totalCount = $searchModel->getTotalCountWithArchive()) >0
 			? Alert::widget([
 				'body' => Yii::t('issue', 'The archive is excluded. Matching Issues found in it: {count}.', [
-					'count' => $searchModel->getTotalCountWithArchive(),
+					'count' => $totalCount,
 				]),
 				'options' => [
 					'class' => 'alert-warning text-center mb-0',

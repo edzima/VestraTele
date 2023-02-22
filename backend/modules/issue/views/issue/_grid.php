@@ -53,11 +53,11 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 		}
 		return [];
 	},
-	'emptyText' => $searchModel->hasExcludedArchiveStage()
+	'emptyText' => $searchModel->hasExcludedArchiveStage() && ($totalCount = $searchModel->getTotalCountWithArchive()) >0
 		? Alert::widget([
 			'body' =>
 				Html::a(Yii::t('issue', 'The archive is excluded. Matching Issues found in it: {count}.', [
-					'count' => $searchModel->getTotalCountWithArchive(),
+					'count' => $totalCount,
 				]), [
 					'archive', 'customerName' => $searchModel->customerName,
 					'issueId' => $searchModel->issue_id,
