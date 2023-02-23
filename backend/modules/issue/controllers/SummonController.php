@@ -30,6 +30,7 @@ class SummonController extends Controller {
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'realize' => ['POST'],
 				],
 			],
 		];

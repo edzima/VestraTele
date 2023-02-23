@@ -79,6 +79,7 @@ YiiAsset::register($this);
 			'contractor',
 			[
 				'attribute' => 'updater',
+				'label' => Yii::t('common','Updater'),
 				'visible' => $model->updater !== null,
 			],
 			'statusName',
