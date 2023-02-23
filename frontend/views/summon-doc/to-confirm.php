@@ -68,6 +68,11 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			//		'deadline_at:date',
 			'done_at:datetime',
+			[
+				'attribute' => 'summon_owner_id',
+				'value' => 'summon.owner',
+				'label' => Yii::t('common','Owner'),
+			],
 			'doneUser',
 			[
 				'class' => SummonDocsLinkActionColumn::class,

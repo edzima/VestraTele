@@ -15,6 +15,8 @@ use yii\web\NotFoundHttpException;
 
 class SummonDocLinkController extends Controller {
 
+	public bool $sendEmailAboutToConfirm = false;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -93,7 +95,7 @@ class SummonDocLinkController extends Controller {
 				]));
 			$email = $model->summon->owner->getEmail();
 			if ($email) {
-				return Yii::$app
+				Yii::$app
 					->mailer
 					->compose(
 						['html' => 'summonDocToConfirm-html', 'text' => 'summonDocToConfirm-text'],

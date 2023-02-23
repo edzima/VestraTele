@@ -39,14 +39,18 @@ YiiAsset::register($this);
 			: ''
 		?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
-			? Html::a(Yii::t('common', 'Create note'), ['/note/summon', 'id' => $model->id], ['class' => 'btn btn-info'])
-			: ''
-		?>
 		<?= SummonController::canUpdate($model)
 			? Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: ''
 		?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
+			? Html::a(Yii::t('common', 'Create note'), ['/note/summon', 'id' => $model->id], [
+				'class' => 'btn btn-info pull-right',
+			])
+			: ''
+		?>
+
 
 	</p>
 
@@ -56,41 +60,46 @@ YiiAsset::register($this);
 	]) ?>
 
 
-	<?= DetailView::widget([
-		'model' => $model,
-		'attributes' => [
-			'issue.longId:text:Sprawa',
-			'owner',
-			'contractor',
-			[
-				'attribute' => 'updater',
-				'visible' => $model->updater !== null,
-			],
-			'typeName',
-			'statusName',
-			'entityWithCity',
-			'start_at:date',
-			'realize_at:datetime',
-			'realized_at:datetime',
-			[
-				'attribute' => 'deadline_at',
-				'format' => 'date',
-				'options' => [
-					'class' => 'red-text',
+	<div class="row">
+
+		<div class="col-md-5">
+			<?= DetailView::widget([
+				'model' => $model,
+				'attributes' => [
+					'issue.longId:text:Sprawa',
+					'owner',
+					'contractor',
+					[
+						'attribute' => 'updater',
+						'visible' => $model->updater !== null,
+					],
+					'typeName',
+					'statusName',
+					'entityWithCity',
+					'start_at:date',
+					'realize_at:datetime',
+					'realized_at:datetime',
+					[
+						'attribute' => 'deadline_at',
+						'format' => 'date',
+						'options' => [
+							'class' => 'red-text',
+						],
+					],
+
+					'created_at:datetime',
+					'updated_at:datetime',
 				],
-			],
+			]) ?>
+		</div>
+		<div class="col-md-7">
 
-			'created_at:datetime',
-			'updated_at:datetime',
-		],
-	]) ?>
-
-
-
-	<?= IssueNotesWidget::widget([
-		'model' => $model->issue,
-		'notes' => $model->issue->getIssueNotes()->joinWith('user.userProfile')->onlySummon($model->id)->all(),
-	]) ?>
+			<?= IssueNotesWidget::widget([
+				'model' => $model->issue,
+				'notes' => $model->issue->getIssueNotes()->joinWith('user.userProfile')->onlySummon($model->id)->all(),
+			]) ?>
+		</div>
+	</div>
 
 
 </div>
