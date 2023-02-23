@@ -168,4 +168,7 @@ return [
 	'Are you sure you want to realize this summon?' => 'Czy napewno chcesz Zrealizować to Zlecenie?',
 	'Success. Mark Summon as Realized.' => 'Zlecenie Zrealizowano!',
 	'Status' => 'Status',
+	'Mark Doc: {name} as To Confirm.' => 'Oznaczono Dokument: {name} do Potwierdzenia',
+	'In Issue: {issue} has Doc: {name} as To Confirm.' => 'W Sprawie: {issue} jest Dokument: {name} do Potwierdzenia.',
+	'User: {user} mark Doc: {name} to Confirm.' => '{user} oznaczył Dokument: {name} do Potwierdzenia',
 ];

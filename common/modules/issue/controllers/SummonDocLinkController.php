@@ -2,6 +2,7 @@
 
 namespace common\modules\issue\controllers;
 
+use common\helpers\Flash;
 use common\models\issue\search\SummonDocLinkSearch;
 use common\models\issue\SummonDocLink;
 use common\models\user\Worker;
@@ -85,7 +86,30 @@ class SummonDocLinkController extends Controller {
 		$model = $this->findModel($summon_id, $doc_type_id);
 		$model->done_user_id = Yii::$app->user->id;
 		$model->done_at = date(DATE_ATOM);
-		$model->save();
+		if ($model->save()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('issue', 'Mark Doc: {name} as To Confirm.', [
+					'name' => $model->doc->name,
+				]));
+			$email = $model->summon->owner->getEmail();
+			if ($email) {
+				return Yii::$app
+					->mailer
+					->compose(
+						['html' => 'summonDocToConfirm-html', 'text' => 'summonDocToConfirm-text'],
+						[
+							'model' => $model,
+						]
+					)
+					->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
+					->setTo($email)
+					->setSubject(Yii::t('issue', 'In Issue: {issue} has Doc: {name} as To Confirm.', [
+						'issue' => $model->summon->getIssueName(),
+						'name' => $model->doc->name,
+					]))
+					->send();
+			}
+		}
 		return $this->redirect($returnUrl ?: Url::previous());
 	}
 
