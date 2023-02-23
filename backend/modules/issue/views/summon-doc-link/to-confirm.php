@@ -42,6 +42,17 @@ $this->params['issueParentTypeNav'] = [
 		'filterModel' => $searchModel,
 		'columns' => [
 			[
+				'attribute' => 'summonTypeId',
+				'label' => Yii::t('issue', 'Summon Type'),
+				'value' => static function (SummonDocLink $docLink): string {
+					return Html::a($docLink->summon->getTypeName(), [
+						'summon/view', 'id' => $docLink->summon_id,
+					]);
+				},
+				'format' => 'html',
+				'filter' => $searchModel->getSummonTypesNames(),
+			],
+			[
 				'class' => IssueColumn::class,
 			],
 			[
@@ -55,19 +66,20 @@ $this->params['issueParentTypeNav'] = [
 				'filter' => $searchModel->getDocsNames(),
 			],
 			[
-				'attribute' => 'summonTypeId',
-				'label' => Yii::t('issue', 'Summon Type'),
-				'value' => static function (SummonDocLink $docLink): string {
-					return Html::a($docLink->summon->getTypeName(), [
-						'summon/view', 'id' => $docLink->summon_id,
-					]);
-				},
-				'format' => 'html',
-				'filter' => $searchModel->getSummonTypesNames(),
+				'attribute' => 'done_user_id',
+				'value' => 'doneUser',
+				'filter' => $searchModel->getDoneUsersNames(),
 			],
-			//	'deadline_at:date',
-			'done_at:datetime',
-			'doneUser',
+			[
+				'attribute' => 'done_at',
+				'format' => 'date',
+				'noWrap' => true,
+			],			[
+				'attribute' => 'summonOwnerId',
+				'value' => 'summon.owner',
+				'label' => Yii::t('common', 'Owner'),
+				'filter' => $searchModel->getSummonOwnersNames(),
+			],
 			[
 				'class' => SummonDocsLinkActionColumn::class,
 				'status' => $searchModel->status,

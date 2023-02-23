@@ -49,7 +49,9 @@ class SummonDocLink extends ActiveRecord implements IssueInterface {
 
 	public function attributeLabels(): array {
 		return [
+			'confirmed_user_id' => Yii::t('common', 'Confirmed User'),
 			'confirmedUser' => Yii::t('common', 'Confirmed User'),
+			'done_user_id' => Yii::t('common', 'Done User'),
 			'doneUser' => Yii::t('common', 'Done User'),
 			'deadline_at' => Yii::t('common', 'Deadline at'),
 			'done_at' => Yii::t('common', 'Done at'),
@@ -89,16 +91,12 @@ class SummonDocLink extends ActiveRecord implements IssueInterface {
 		return new SummonDocLinkQuery(static::class);
 	}
 
-	public function isDone(): bool {
-		return !empty($this->done_at);
+	public function isToDo(): bool {
+		return empty($this->done_at) && !$this->isConfirmed();
 	}
 
 	public function isConfirmed(): bool {
 		return !empty($this->confirmed_at);
-	}
-
-	public function isToDo(): bool {
-		return empty($this->done_at);
 	}
 
 	public function isToConfirm(): bool {

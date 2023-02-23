@@ -6,6 +6,7 @@ use common\modules\issue\widgets\SummonDocsLinkActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use frontend\helpers\Html;
 use frontend\helpers\Url;
+use frontend\widgets\GridView;
 use frontend\widgets\IssueColumn;
 use frontend\widgets\IssueParentTypeHeader;
 
@@ -38,10 +39,21 @@ $this->params['breadcrumbs'][] = $this->title;
 	]) ?>
 
 
-	<?= \frontend\widgets\GridView::widget([
+	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
+			[
+				'attribute' => 'summonTypeId',
+				'label' => Yii::t('issue', 'Summon Type'),
+				'value' => static function (SummonDocLink $docLink): string {
+					return Html::a($docLink->summon->getTypeName(), [
+						'summon/view', 'id' => $docLink->summon_id,
+					]);
+				},
+				'format' => 'html',
+				'filter' => $searchModel->getSummonTypesNames(),
+			],
 			[
 				'class' => IssueColumn::class,
 			],
@@ -56,24 +68,17 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => $searchModel->getDocsNames(),
 			],
 			[
-				'attribute' => 'summonTypeId',
-				'label' => Yii::t('issue', 'Summon Type'),
-				'value' => static function (SummonDocLink $docLink): string {
-					return Html::a($docLink->summon->getTypeName(), [
-						'summon/view', 'id' => $docLink->summon_id,
-					]);
-				},
-				'format' => 'html',
-				'filter' => $searchModel->getSummonTypesNames(),
+				'attribute' => 'done_user_id',
+				'value' => 'doneUser',
+				'filter' => $searchModel->getDoneUsersNames(),
 			],
-			//		'deadline_at:date',
 			'done_at:datetime',
 			[
-				'attribute' => 'summon_owner_id',
+				'attribute' => 'summonOwnerId',
 				'value' => 'summon.owner',
-				'label' => Yii::t('common','Owner'),
+				'label' => Yii::t('common', 'Owner'),
+				'filter' => $searchModel->getSummonOwnersNames(),
 			],
-			'doneUser',
 			[
 				'class' => SummonDocsLinkActionColumn::class,
 				'status' => $searchModel->status,

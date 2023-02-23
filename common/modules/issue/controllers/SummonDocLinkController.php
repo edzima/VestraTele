@@ -129,7 +129,7 @@ class SummonDocLinkController extends Controller {
 
 	public function actionConfirm(int $summon_id, int $doc_type_id, string $returnUrl = null) {
 		$model = $this->findModel($summon_id, $doc_type_id);
-		if (!$model->isDone()) {
+		if(empty($model->done_at)){
 			$model->done_user_id = Yii::$app->user->getId();
 			$model->done_at = date(DATE_ATOM);
 		}

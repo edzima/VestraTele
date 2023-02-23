@@ -47,7 +47,7 @@ class SummonDocLinkSearch extends SummonDocLink implements
 			[
 				[
 					'doc_type_id', 'summon_id', 'issue_id', 'summonTypeId', 'issueParentTypeId',
-					'summonContractorId', 'summonOwnerId',
+					'summonContractorId', 'summonOwnerId', 'done_user_id', 'confirmed_user_id',
 				], 'integer',
 			],
 			['docName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
@@ -95,6 +95,8 @@ class SummonDocLinkSearch extends SummonDocLink implements
 		}
 
 		$this->applyUserFilter($query);
+		$this->applyDoneUserFilter($query);
+		$this->applyConfirmedUserFilter($query);
 		$this->applyIssueParentTypeFilter($query);
 		$this->applySummonContractorFilter($query);
 		$this->applySummonOwnerFilter($query);
@@ -227,6 +229,36 @@ class SummonDocLinkSearch extends SummonDocLink implements
 			->distinct()
 			->joinWith('summon');
 
+		$this->applyStatusFilter($query);
+		$this->applyUserFilter($query);
+		return User::getSelectList($query->column(), false);
+	}
+
+	public function getDoneUsersNames(): array {
+		$query = SummonDocLink::find()
+			->select('done_user_id')
+			->distinct();
+		$this->applyStatusFilter($query);
+		$this->applyUserFilter($query);
+		return User::getSelectList($query->column(), false);
+	}
+
+	private function applyDoneUserFilter(SummonDocLinkQuery $query) {
+		$query->andFilterWhere([
+			SummonDocLink::tableName() . '.done_user_id' => $this->done_user_id,
+		]);
+	}
+
+	private function applyConfirmedUserFilter(SummonDocLinkQuery $query) {
+		$query->andFilterWhere([
+			SummonDocLink::tableName() . '.confirmed_user_id' => $this->confirmed_user_id,
+		]);
+	}
+
+	public function getConfirmedUsersNames(): array {
+		$query = SummonDocLink::find()
+			->select('confirmed_user_id')
+			->distinct();
 		$this->applyStatusFilter($query);
 		$this->applyUserFilter($query);
 		return User::getSelectList($query->column(), false);

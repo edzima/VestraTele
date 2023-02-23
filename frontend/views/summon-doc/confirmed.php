@@ -43,6 +43,17 @@ $this->params['breadcrumbs'][] = $this->title;
 		'filterModel' => $searchModel,
 		'columns' => [
 			[
+				'attribute' => 'summonTypeId',
+				'label' => Yii::t('issue', 'Summon Type'),
+				'value' => static function (SummonDocLink $docLink): string {
+					return Html::a($docLink->summon->getTypeName(), [
+						'summon/view', 'id' => $docLink->summon_id,
+					]);
+				},
+				'format' => 'html',
+				'filter' => $searchModel->getSummonTypesNames(),
+			],
+			[
 				'class' => IssueColumn::class,
 			],
 			[
@@ -55,22 +66,19 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('issue', 'Doc Name'),
 				'filter' => $searchModel->getDocsNames(),
 			],
-			[
-				'attribute' => 'summonTypeId',
-				'label' => Yii::t('issue', 'Summon Type'),
-				'value' => static function (SummonDocLink $docLink): string {
-					return Html::a($docLink->summon->getTypeName(), [
-						'summon/view', 'id' => $docLink->summon_id,
-					]);
-				},
-				'format' => 'html',
-				'filter' => $searchModel->getSummonTypesNames(),
-			],
 			//	'deadline_at:date',
 			'doneUser',
-			'done_at:date',
+			[
+				'attribute' => 'done_at',
+				'format' => 'date',
+				'noWrap' => true,
+			],
 			'confirmedUser',
-			'confirmed_at:date',
+			[
+				'attribute' => 'confirmed_at',
+				'format' => 'date',
+				'noWrap' => true,
+			],
 			[
 				'class' => SummonDocsLinkActionColumn::class,
 				'status' => $searchModel->status,

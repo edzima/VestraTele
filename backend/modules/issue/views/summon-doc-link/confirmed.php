@@ -42,6 +42,17 @@ $this->params['issueParentTypeNav'] = [
 		'filterModel' => $searchModel,
 		'columns' => [
 			[
+				'attribute' => 'summonTypeId',
+				'label' => Yii::t('issue', 'Summon Type'),
+				'value' => static function (SummonDocLink $docLink): string {
+					return Html::a($docLink->summon->getTypeName(), [
+						'summon/view', 'id' => $docLink->summon_id,
+					]);
+				},
+				'format' => 'html',
+				'filter' => $searchModel->getSummonTypesNames(),
+			],
+			[
 				'class' => IssueColumn::class,
 			],
 			[
@@ -54,22 +65,28 @@ $this->params['issueParentTypeNav'] = [
 				'label' => Yii::t('issue', 'Doc Name'),
 				'filter' => $searchModel->getDocsNames(),
 			],
-			[
-				'attribute' => 'summonTypeId',
-				'label' => Yii::t('issue', 'Summon Type'),
-				'value' => static function (SummonDocLink $docLink): string {
-					return Html::a($docLink->summon->getTypeName(), [
-						'summon/view', 'id' => $docLink->summon_id,
-					]);
-				},
-				'format' => 'html',
-				'filter' => $searchModel->getSummonTypesNames(),
-			],
+
 			//	'deadline_at:date',
-			'done_at:date',
-			'doneUser',
-			'confirmed_at:date',
-			'confirmedUser',
+			[
+				'attribute' => 'done_at',
+				'format' => 'date',
+				'noWrap' => true,
+			],
+			[
+				'attribute' => 'done_user_id',
+				'value' => 'doneUser',
+				'filter' => $searchModel->getDoneUsersNames(),
+			],
+			[
+				'attribute' => 'confirmed_at',
+				'format' => 'date',
+				'noWrap' => true,
+			],
+			[
+				'attribute' => 'confirmed_user_id',
+				'value' => 'confirmedUser',
+				'filter' => $searchModel->getConfirmedUsersNames(),
+			],
 			[
 				'class' => SummonDocsLinkActionColumn::class,
 				'status' => $searchModel->status,
