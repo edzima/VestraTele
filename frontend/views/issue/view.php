@@ -71,7 +71,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		'hideOnAllAreConfirmed' => true,
 	]) ?>
 
-	
+
 	<?= $calculationsDataProvider !== null
 	&& $calculationsDataProvider->getTotalCount() > 0
 		? IssuePayCalculationGrid::widget([
@@ -106,9 +106,11 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 			'withCaption' => true,
 			'withIssue' => false,
 			'withCustomer' => false,
+			'withCustomerPhone' => false,
 			'withOwner' => false,
 			'withContractor' => true,
 			'withUpdatedAt' => false,
+			'withDocsCountSummary' => true,
 		])
 		: ''
 	?>
