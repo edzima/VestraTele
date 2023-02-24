@@ -44,13 +44,6 @@ YiiAsset::register($this);
 			: ''
 		?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_NOTE)
-			? Html::a(Yii::t('common', 'Create note'), ['/note/summon', 'id' => $model->id], [
-				'class' => 'btn btn-info pull-right',
-			])
-			: ''
-		?>
-
 
 	</p>
 
@@ -94,6 +87,14 @@ YiiAsset::register($this);
 		</div>
 		<div class="col-md-7">
 
+			<p>
+				<?= Yii::$app->user->can(User::PERMISSION_NOTE)
+					? Html::a(Yii::t('common', 'Create note'), ['/note/summon', 'id' => $model->id], [
+						'class' => 'btn btn-info',
+					])
+					: ''
+				?>
+			</p>
 			<?= IssueNotesWidget::widget([
 				'model' => $model->issue,
 				'notes' => $model->issue->getIssueNotes()->joinWith('user.userProfile')->onlySummon($model->id)->all(),

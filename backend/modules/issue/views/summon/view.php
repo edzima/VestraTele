@@ -51,7 +51,7 @@ YiiAsset::register($this);
 
 		<?= $model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)
 			? Html::a(Yii::t('common', 'Delete'), ['delete', 'id' => $model->id], [
-				'class' => 'btn btn-danger',
+				'class' => 'btn btn-danger pull-right',
 				'data' => [
 					'confirm' => 'Are you sure you want to delete this item?',
 					'method' => 'post',
@@ -63,40 +63,48 @@ YiiAsset::register($this);
 
 	</p>
 
-
 	<?= SummonDocsWidget::widget([
 		'models' => $model->docsLink,
 		'controller' => '/issue/summon-doc-link',
 	]) ?>
 
-	<?= DetailView::widget([
-		'model' => $model,
-		'attributes' => [
-			'type.name',
-			'title',
-			'issue.longId:text:Sprawa',
-			'owner',
-			'contractor',
-			[
-				'attribute' => 'updater',
-				'label' => Yii::t('common','Updater'),
-				'visible' => $model->updater !== null,
-			],
-			'statusName',
-			'entityWithCity',
-			'start_at:date',
-			'realize_at:datetime',
-			'realized_at:datetime',
-			'deadline_at:date',
-			'created_at:datetime',
-			'updated_at:datetime',
-		],
-	]) ?>
 
-	<?= IssueNotesWidget::widget([
-		'model' => $model->issue,
-		'notes' => $model->issue->getIssueNotes()->onlySummon($model->id)->all(),
-	]) ?>
+	<div class="row">
+		<div class="col-md-4">
+			<?= DetailView::widget([
+				'model' => $model,
+				'attributes' => [
+					'type.name',
+					'title',
+					'issue.longId:text:Sprawa',
+					'owner',
+					'contractor',
+					[
+						'attribute' => 'updater',
+						'label' => Yii::t('common', 'Updater'),
+						'visible' => $model->updater !== null,
+					],
+					'statusName',
+					'entityWithCity',
+					'start_at:date',
+					'realize_at:datetime',
+					'realized_at:datetime',
+					'deadline_at:date',
+					'created_at:datetime',
+					'updated_at:datetime',
+				],
+			]) ?>
+		</div>
+
+		<div class="col-md-8">
+			<?= IssueNotesWidget::widget([
+				'model' => $model->issue,
+				'notes' => $model->issue->getIssueNotes()->onlySummon($model->id)->all(),
+			]) ?>
+
+
+		</div>
+	</div>
 
 
 </div>
