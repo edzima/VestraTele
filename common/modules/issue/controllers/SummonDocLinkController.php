@@ -117,11 +117,10 @@ class SummonDocLinkController extends Controller {
 
 	public function actionNotDone(int $summon_id, int $doc_type_id, string $returnUrl = null) {
 		$model = $this->findModel($summon_id, $doc_type_id);
-		if ($model->isConfirmed()) {
-			throw new ForbiddenHttpException('Only not confirmed docs can unmark as done.');
-		}
 		$model->done_user_id = null;
 		$model->done_at = null;
+		$model->confirmed_at = null;
+		$model->confirmed_user_id = null;
 		$model->save();
 
 		return $this->redirect($returnUrl ?: Url::previous());

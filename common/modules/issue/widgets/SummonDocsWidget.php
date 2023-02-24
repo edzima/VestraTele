@@ -55,11 +55,9 @@ class SummonDocsWidget extends Widget {
 			return '';
 		}
 		return $this->render('summon-docs', [
+			'dataProvider' => $this->createDataProvider($this->models),
 			'returnUrl' => $this->returnUrl,
 			'controller' => $this->controller,
-			'toDoDataProvider' => $toDoDataProvider,
-			'toConfirmDataProvider' => $toConfirmDataProvider,
-			'confirmedDataProvider' => $this->confirmedDataProvider(),
 		]);
 	}
 
