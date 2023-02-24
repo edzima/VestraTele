@@ -262,6 +262,13 @@ class SummonForm extends Model implements HiddenFieldsModel {
 						'summon_id' => $model->id,
 						'confirmed_user_id' => null,
 					]);
+					SummonDocLink::updateAll([
+						'done_at' => date(DATE_ATOM),
+						'done_user_id' => $this->updater_id ?: $this->owner_id,
+					], [
+						'summon_id' => $model->id,
+						'done_at' => null,
+					]);
 				}
 			}
 		}
