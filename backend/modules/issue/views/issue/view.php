@@ -153,10 +153,9 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 
 	<?= SummonDocsWidget::widget([
-		'models' => SummonDocsWidget::modelsFromSummons($summonDataProvider->getModels()),
+		'models' => SummonDocsWidget::modelsFromSummons($summonDataProvider->getModels(), Yii::$app->user->getId()),
 		'controller' => '/issue/summon-doc-link',
 		'hideOnAllAreConfirmed' => true,
-
 	]) ?>
 
 	<?= $calculationsDataProvider->getTotalCount() > 0
@@ -182,6 +181,8 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		'relationActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
 		'claimActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
 	]) ?>
+
+
 
 	<?= IssueViewSummonsWidgets::widget([
 		'dataProvider' => $summonDataProvider,

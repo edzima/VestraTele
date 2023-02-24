@@ -66,11 +66,12 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 
 	<?= SummonDocsWidget::widget([
-		'models' => SummonDocsWidget::modelsFromSummons($summonDataProvider->getModels()),
+		'models' => SummonDocsWidget::modelsFromSummons($summonDataProvider->getModels(), Yii::$app->user->getId()),
 		'controller' => '/summon-doc',
 		'hideOnAllAreConfirmed' => true,
 	]) ?>
 
+	
 	<?= $calculationsDataProvider !== null
 	&& $calculationsDataProvider->getTotalCount() > 0
 		? IssuePayCalculationGrid::widget([
@@ -93,6 +94,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		'claimActionColumn' => false,
 		'userMailVisibilityCheck' => true,
 	]) ?>
+
 
 	<?= $summonDataProvider->getTotalCount() > 0
 		? SummonGrid::widget([

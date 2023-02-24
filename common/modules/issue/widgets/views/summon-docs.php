@@ -10,7 +10,6 @@ use yii\data\DataProviderInterface;
 /** @var DataProviderInterface $toDoDataProvider */
 /** @var DataProviderInterface $toConfirmDataProvider */
 /** @var DataProviderInterface $confirmedDataProvider */
-
 ?>
 <?php if ($toConfirmDataProvider->getTotalCount() || $toDoDataProvider->getTotalCount() || $confirmedDataProvider->getTotalCount()): ?>
 	<div class="summon-docs-widget">

@@ -93,6 +93,16 @@ class SummonDocLinkSearch extends SummonDocLink implements
 			// $query->where('0=1');
 			return $dataProvider;
 		}
+		switch ($this->status) {
+			case static::STATUS_TO_CONFIRM:
+				$query->with('summon.owner.userProfile');
+				$query->with('doneUser.userProfile');
+				break;
+			case static::STATUS_CONFIRMED:
+				$query->with('doneUser.userProfile');
+				$query->with('confirmedUser.userProfile');
+				break;
+		}
 
 		$this->applyUserFilter($query);
 		$this->applyDoneUserFilter($query);
@@ -120,7 +130,6 @@ class SummonDocLinkSearch extends SummonDocLink implements
 
 	public function getSummonTypesNames(): array {
 		//@todo add user filter
-
 		return ArrayHelper::map(SummonDocLink::find()
 			->select(['type_id', 'name'])
 			->joinWith('summon.type')

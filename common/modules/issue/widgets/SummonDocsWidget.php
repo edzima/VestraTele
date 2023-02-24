@@ -24,11 +24,13 @@ class SummonDocsWidget extends Widget {
 	 * @param Summon[] $summons
 	 * @return SummonDocLink[]
 	 */
-	public static function modelsFromSummons(array $summons): array {
+	public static function modelsFromSummons(array $summons, int $userId = null): array {
 		$docs = [];
 		foreach ($summons as $summon) {
-			foreach ($summon->docsLink as $doc) {
-				$docs[] = $doc;
+			if ($userId === null || $summon->isForUser($userId)) {
+				foreach ($summon->docsLink as $doc) {
+					$docs[] = $doc;
+				}
 			}
 		}
 		return $docs;
@@ -42,6 +44,9 @@ class SummonDocsWidget extends Widget {
 	}
 
 	public function run() {
+		if (empty($this->models)) {
+			return '';
+		}
 		$toDoDataProvider = $this->toDoDataProvider();
 		$toConfirmDataProvider = $this->toConfirmDataProvider();
 		if ($this->hideOnAllAreConfirmed
@@ -99,4 +104,5 @@ class SummonDocsWidget extends Widget {
 			return $a->doc->priority < $b->doc->priority;
 		});
 	}
+
 }
