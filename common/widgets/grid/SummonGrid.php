@@ -54,6 +54,7 @@ class SummonGrid extends GridView {
 	public string $tightDeadlineClass = 'warning';
 
 	public int $tightDeadlineDays = 3;
+	public bool $withDocsCountSummary = false;
 
 	public function init(): void {
 		if ($this->filterModel !== null && !$this->filterModel instanceof SummonSearch) {
@@ -173,14 +174,14 @@ class SummonGrid extends GridView {
 				'visible' => $this->withStatus,
 			],
 			[
-				'attribute' => 'titleWithDocs',
-				'contentOptions' => ['style' => 'width: 35%;'],
-				'visible' => $this->withTitleWithDocs,
-			],
-			[
 				'attribute' => 'title',
 				'contentOptions' => ['style' => 'width: 35%;'],
 				'visible' => $this->withTitle,
+			],
+			[
+				'attribute' => 'titleWithDocs',
+				'contentOptions' => ['style' => 'width: 35%;'],
+				'visible' => $this->withTitleWithDocs,
 			],
 			[
 				'attribute' => 'doc_types_ids',
@@ -233,10 +234,18 @@ class SummonGrid extends GridView {
 				],
 				'visible' => $this->withDocs,
 			],
-			//			[
-			//				'attribute' => 'docsCountSummary',
-			//				'noWrap' => true,
-			//			],
+			[
+				'attribute' => 'docsCountSummary',
+				'noWrap' => true,
+				'value' => function(Summon $model):string{
+					$summary = $model->getDocsCountSummary();
+					if($summary){
+						return $summary;
+					}
+					return '';
+				},
+				'visible' => $this->withDocsCountSummary,
+			],
 			[
 				'attribute' => 'start_at',
 				'format' => 'date',
