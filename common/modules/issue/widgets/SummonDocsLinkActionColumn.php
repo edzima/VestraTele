@@ -72,74 +72,9 @@ class SummonDocsLinkActionColumn extends ActionColumn {
 		switch ($this->status) {
 			case SummonDocLink::STATUS_TO_DO:
 				$this->template = '{done} {confirm}';
-				$this->buttons = [
-					'done' => function (string $url, SummonDocLink $docLink): string {
-						if ($docLink->summon->isContractor(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
-							$url .= '&returnUrl=' . $this->returnUrl;
-							return
-								Html::a(
-									Html::icon('check'),
-									$url, [
-									'title' => Yii::t('issue', 'To Confirm'),
-									'aria-label' => Yii::t('issue', 'To Confirm'),
-									'data-method' => 'POST',
-								]);
-						}
-						return '';
-					},
-					'confirm' => function (string $url, SummonDocLink $docLink): string {
-						if ($docLink->summon->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
-							$url .= '&returnUrl=' . $this->returnUrl;
-							return
-								Html::a(
-									Html::icon('ok'),
-									$url, [
-									'title' => Yii::t('issue', 'Confirmed'),
-									'aria-label' => Yii::t('issue', 'Confirmed'),
-									'data-method' => 'POST',
-								]);
-						}
-						return '';
-					},
-
-				];
 				break;
 			case SummonDocLink::STATUS_TO_CONFIRM:
 				$this->template = '{confirm} {not-done}';
-				$this->buttons = [
-					'confirm' => function (string $url, SummonDocLink $docLink): string {
-						if ($docLink->summon->isOwner(Yii::$app->user->getId())
-							|| Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
-						) {
-							$url .= '&returnUrl=' . $this->returnUrl;
-							return
-								Html::a(
-									Html::icon('ok'),
-									$url, [
-									'title' => Yii::t('issue', 'Confirm'),
-									'aria-label' => Yii::t('issue', 'Confirm'),
-									'data-method' => 'POST',
-								]);
-						}
-						return '';
-					},
-					'not-done' => function (string $url, SummonDocLink $docLink): string {
-						if ($docLink->done_user_id === Yii::$app->user->getId()
-							|| Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
-						) {
-							$url .= '&returnUrl=' . $this->returnUrl;
-							return
-								Html::a(
-									Html::icon('remove'),
-									$url, [
-									'title' => Yii::t('issue', 'To Do'),
-									'aria-label' => Yii::t('issue', 'To Do'),
-									'data-method' => 'POST',
-								]);
-						}
-						return '';
-					},
-				];
 				break;
 
 			case SummonDocLink::STATUS_CONFIRMED:
@@ -187,6 +122,7 @@ class SummonDocsLinkActionColumn extends ActionColumn {
 				'title' => Yii::t('issue', 'To Do'),
 				'aria-label' => Yii::t('issue', 'To Do'),
 				'data-method' => 'POST',
+				'data-confirm' => Yii::t('issue','Are you sure you want to mark this doc as not done?'),
 			]);
 	}
 
@@ -222,6 +158,7 @@ class SummonDocsLinkActionColumn extends ActionColumn {
 				'title' => Yii::t('issue', 'To Confirm'),
 				'aria-label' => Yii::t('issue', 'To Confirm'),
 				'data-method' => 'POST',
+				'data-confirm' => Yii::t('issue','Are you sure you want to mark this doc as not confirmed?'),
 			]);
 	}
 
