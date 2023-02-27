@@ -104,6 +104,7 @@ class SummonDocLinkSearch extends SummonDocLink implements
 				break;
 		}
 
+		$this->applyIssueIdFilter($query);
 		$this->applyUserFilter($query);
 		$this->applyDoneUserFilter($query);
 		$this->applyConfirmedUserFilter($query);
@@ -271,6 +272,15 @@ class SummonDocLinkSearch extends SummonDocLink implements
 		$this->applyStatusFilter($query);
 		$this->applyUserFilter($query);
 		return User::getSelectList($query->column(), false);
+	}
+
+	private function applyIssueIdFilter(SummonDocLinkQuery $query) {
+		if (!empty($this->issue_id)) {
+			$query->joinWith('summon');
+			$query->andWhere([
+				Summon::tableName() . '.issue_id' => $this->issue_id,
+			]);
+		}
 	}
 
 }
