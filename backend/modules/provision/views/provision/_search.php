@@ -46,7 +46,7 @@ use yii\widgets\ActiveForm;
 			<div class="pull-right">
 				<?= LastCurrentNextMonthNav::widget([
 					'model' => $model,
-					'baseRoute' => $action,
+					'route' => [$action],
 					'dateFromAttribute' => 'dateFrom',
 					'dateToAttribute' => 'dateTo',
 				]) ?>
