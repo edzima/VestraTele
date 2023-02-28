@@ -39,7 +39,7 @@ class ProvisionSearch extends Provision implements CustomerSearchInterface, Sear
 	}
 
 	public ?bool $withoutEmpty = null;
-	public array $excludedFromUsers = [];
+	public $excludedFromUsers = [];
 
 	/**
 	 * {@inheritdoc}
