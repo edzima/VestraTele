@@ -23,9 +23,6 @@ class ProvisionDoubleSearch extends ProvisionSearch {
 		return static::$usersNames;
 	}
 
-	public function getToUsersList(bool $dateFilter = true): array {
-		return static::getSettlementTypesNames();
-	}
 
 	public static function getSettlementTypesNames(): array {
 		return IssuePayCalculation::getTypesNames();
