@@ -2,6 +2,8 @@
 
 namespace common\models\issue;
 
+use common\helpers\Html;
+use common\models\issue\query\SummonDocQuery;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -43,8 +45,20 @@ class SummonDoc extends ActiveRecord {
 		return '{{%summon_doc}}';
 	}
 
-	public static function getNames(): array {
-		return ArrayHelper::map(static::find()->all(), 'id', 'name');
+	public static function getNames(int $summonTypeId = null): array {
+		$query = static::find();
+		$models = $query->all();
+		if ($summonTypeId !== null) {
+			$models = array_filter($models, function (SummonDoc $doc) use ($summonTypeId): bool {
+				return $doc->isForSummonType($summonTypeId);
+			});
+		}
+		return ArrayHelper::map($models, 'id', 'name');
+	}
+
+	public function isForSummonType(int $typeId): bool {
+		$typesIds = $this->getSummonTypesIds();
+		return empty($typesIds) || in_array($typeId, $typesIds);
 	}
 
 	/**
@@ -87,27 +101,25 @@ class SummonDoc extends ActiveRecord {
 		return $this->hasMany(SummonDocLink::class, ['doc_type_id' => 'id']);
 	}
 
-	public static function find() {
-		return parent::find()
-			->orderBy([
-				static::tableName() . '.priority' => SORT_DESC,
-				static::tableName() . '.name' => SORT_ASC,
-			]);
-	}
-
-	public function getSummonTypesNames(): string {
+	public function getSummonTypesNames(bool $html = false): string {
 		$ids = $this->getSummonTypesIds();
 		if (empty($ids)) {
 			return Yii::t('common', 'All');
 		}
 		$names = [];
 		foreach ($ids as $id) {
-			$name = SummonType::getNames()[$id]?? null;
-			if($name){
-				$names[] =$name;
+			$name = SummonType::getNames()[$id] ?? null;
+			if ($name) {
+				if ($html) {
+					$name = Html::encode($name);
+				}
+				$names[] = $name;
 			}
 		}
-		return implode(', ',$names);
+		if ($html) {
+			return Html::ul($names);
+		}
+		return implode(', ', $names);
 	}
 
 	public function getSummonTypesIds(): array {
@@ -123,6 +135,14 @@ class SummonDoc extends ActiveRecord {
 		} else {
 			$this->summon_types = implode('|', $ids);
 		}
+	}
+
+	public static function find(): SummonDocQuery {
+		return (new SummonDocQuery(static::class))
+			->orderBy([
+				static::tableName() . '.priority' => SORT_DESC,
+				static::tableName() . '.name' => SORT_ASC,
+			]);
 	}
 
 }

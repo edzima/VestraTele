@@ -102,7 +102,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			['entity_id', 'in', 'range' => array_keys(static::getEntityNames())],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
-			['doc_types_ids', 'in', 'range' => array_keys(static::getDocNames()), 'allowArray' => true],
+			['doc_types_ids', 'in', 'range' => array_keys($this->getDocNames()), 'allowArray' => true],
 			['term', 'in', 'range' => array_keys(static::getTermsNames())],
 			[['contractor_id'], 'in', 'range' => array_keys($this->getContractors()),],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
@@ -290,8 +290,11 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			->send();
 	}
 
-	public static function getDocNames(): array {
-		return SummonDoc::getNames();
+	public function getDocNames(): array {
+		if (empty($this->type_id)) {
+			return SummonDoc::getNames();
+		}
+		return SummonDoc::getNames($this->type_id);
 	}
 
 	public static function getStatusesNames(): array {

@@ -3,6 +3,7 @@
 namespace backend\modules\issue\models\search;
 
 use common\models\issue\SummonDoc;
+use common\models\issue\SummonType;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -11,12 +12,15 @@ use yii\data\ActiveDataProvider;
  */
 class SummonDocSearch extends SummonDoc {
 
+	public $summonTypesIds;
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
 			[['id', 'priority'], 'integer'],
+			['summonTypesIds', 'in', 'range' => array_keys(SummonType::getNames())],
 			[['name'], 'safe'],
 		];
 	}
@@ -60,6 +64,9 @@ class SummonDocSearch extends SummonDoc {
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name]);
+		if (!empty($this->summonTypesIds)) {
+			$query->summonTypes((array) $this->summonTypesIds);
+		}
 
 		return $dataProvider;
 	}

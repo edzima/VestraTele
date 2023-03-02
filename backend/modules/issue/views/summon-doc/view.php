@@ -14,6 +14,7 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Summons'), 'url' 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Summon Docs'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
+var_dump($model->summon_types);
 ?>
 <div class="summon-doc-view">
 
@@ -36,7 +37,11 @@ YiiAsset::register($this);
 			'id',
 			'name',
 			'priorityName',
-			'summonTypesNames',
+			[
+				'attribute' => 'summonTypesNames',
+				'value' => $model->getSummonTypesNames(true),
+				'format' => 'html',
+			],
 		],
 	]) ?>
 

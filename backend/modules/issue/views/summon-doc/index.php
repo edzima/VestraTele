@@ -36,8 +36,13 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => SummonDoc::getPriorityNames(),
 			],
 			[
-				'attribute' => 'summonTypesNames',
-				'filter' =>SummonType::getNames(),
+				'attribute' => 'summonTypesIds',
+				'value' => function (SummonDoc $doc): string {
+					return $doc->getSummonTypesNames(true);
+				},
+				'format' => 'html',
+				'filter' => SummonType::getNames(),
+				'label' => Yii::t('issue', 'Summon Types'),
 			],
 
 			['class' => 'yii\grid\ActionColumn'],
