@@ -101,7 +101,7 @@ class SummonSearch extends Summon implements
 				$query->joinWith('userProfile CP');
 			},
 		]);
-		$query->with('docs');
+		$query->with('docsLink.doc');
 		$query->with('owner.userProfile');
 		$query->with('contractor.userProfile');
 		$query->with('type');
