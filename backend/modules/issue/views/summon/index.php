@@ -4,6 +4,7 @@ use backend\helpers\Url;
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\issue\widgets\SummonGrid;
 use common\models\user\Worker;
+use yii\bootstrap\Nav;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
@@ -19,11 +20,18 @@ if ($searchModel->getIssueParentType()) {
 $this->params['breadcrumbs'][] = $this->title;
 
 $this->params['issueParentTypeNav'] = [
-	'route' => ['/issue/summon/index'],
+	'route' => ['/issue/summon/index', Html::getInputName($searchModel, 'type_id') => $searchModel->type_id],
 ];
 
 ?>
 <div class="summon-index">
+	<p>
+		<?= Nav::widget([
+			'options' => ['class' => 'nav-pills'],
+			'items' => $searchModel->getSummonTypeNavItems(),
+		])
+		?>
+	</p>
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create summon'), ['create'], ['class' => 'btn btn-success']) ?>

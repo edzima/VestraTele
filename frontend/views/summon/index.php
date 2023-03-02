@@ -5,6 +5,7 @@ use frontend\helpers\Url;
 use frontend\models\search\SummonSearch;
 use frontend\widgets\IssueParentTypeHeader;
 use frontend\widgets\SummonGrid;
+use yii\bootstrap\Nav;
 
 /* @var $this yii\web\View */
 /* @var $searchModel SummonSearch */
@@ -25,9 +26,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= IssueParentTypeHeader::widget([
 		'parentsMenuConfig' => [
-			'route' => ['/summon/index'],
+			'route' => ['/summon/index', Html::getInputName($searchModel, 'type_id') => $searchModel->type_id],
 		],
 	]) ?>
+
+	<p>
+		<?= Nav::widget([
+			'options' => ['class' => 'nav-pills'],
+			'items' => $searchModel->getSummonTypeNavItems(),
+		])
+		?>
+	</p>
 
 	<p>
 		<?= Html::a(Yii::t('issue', 'Calendar'), ['/calendar/summon-calendar/index'], [

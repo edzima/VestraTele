@@ -3,6 +3,8 @@
 namespace common\models\issue\search;
 
 use common\helpers\ArrayHelper;
+use common\helpers\Html;
+use common\helpers\Url;
 use common\models\issue\Issue;
 use common\models\issue\IssueType;
 use common\models\issue\Summon;
@@ -14,6 +16,7 @@ use common\models\user\CustomerSearchInterface;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\validators\PhoneValidator;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -41,6 +44,40 @@ class SummonSearch extends Summon implements
 
 	public static function getDocTypesNames(): array {
 		return SummonDoc::getNames();
+	}
+
+	public function getSummonTypeNavItems(): array {
+		$typeQuery = Summon::find()
+			->select([Summon::tableName() . '.type_id', 'count(*) as typeCount'])
+			->groupBy('type_id')
+			->asArray();
+
+		if (!empty($this->user_id)) {
+			$typeQuery->user($this->user_id);
+		}
+
+		if ($this->getIssueParentType()) {
+			$this->applyIssueParentTypeFilter($typeQuery);
+		}
+		$types = $typeQuery
+			->all();
+		$typesItems = [];
+		foreach ($types as $row) {
+			$typeId = (int) $row['type_id'];
+			$count = (int) $row['typeCount'];
+			$typeName = SummonType::getNames()[$typeId];
+			$typesItems[] = [
+				'label' => "$typeName ($count)",
+				'url' => ['index', Html::getInputName($this, 'type_id') => $typeId, Url::PARAM_ISSUE_PARENT_TYPE => $this->issueParentTypeId],
+				'active' => (int) $this->type_id === $typeId,
+			];
+		}
+		$typesItems[] = [
+			'label' => Yii::t('common', 'All'),
+			'url' => ['index', Url::PARAM_ISSUE_PARENT_TYPE => $this->issueParentTypeId],
+			'active' => empty($this->type_id),
+		];
+		return $typesItems;
 	}
 
 	public function getOwnersNames(): array {
