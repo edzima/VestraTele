@@ -13,7 +13,7 @@ use yii\helpers\ArrayHelper;
  * @property int $id
  * @property string $name
  * @property int|null $priority
- * @property string|null $done_at
+ * @property string|null $summon_types
  *
  * @property Summon[] $summons
  * @property-read string|null $priorityName
@@ -70,6 +70,7 @@ class SummonDoc extends ActiveRecord {
 			'name' => Yii::t('common', 'Name'),
 			'priority' => Yii::t('common', 'Priority'),
 			'priorityName' => Yii::t('common', 'Priority'),
+			'summonTypesNames' => Yii::t('issue', 'Summon Types'),
 		];
 	}
 
@@ -92,6 +93,36 @@ class SummonDoc extends ActiveRecord {
 				static::tableName() . '.priority' => SORT_DESC,
 				static::tableName() . '.name' => SORT_ASC,
 			]);
+	}
+
+	public function getSummonTypesNames(): string {
+		$ids = $this->getSummonTypesIds();
+		if (empty($ids)) {
+			return Yii::t('common', 'All');
+		}
+		$names = [];
+		foreach ($ids as $id) {
+			$name = SummonType::getNames()[$id]?? null;
+			if($name){
+				$names[] =$name;
+			}
+		}
+		return implode(', ',$names);
+	}
+
+	public function getSummonTypesIds(): array {
+		if (empty($this->summon_types)) {
+			return [];
+		}
+		return explode('|', $this->summon_types);
+	}
+
+	public function setSummonTypesIds(array $ids) {
+		if (empty($ids)) {
+			$this->summon_types = null;
+		} else {
+			$this->summon_types = implode('|', $ids);
+		}
 	}
 
 }

@@ -2,6 +2,7 @@
 
 use backend\modules\issue\models\search\SummonDocSearch;
 use common\models\issue\SummonDoc;
+use common\models\issue\SummonType;
 use yii\grid\GridView;
 use yii\helpers\Html;
 
@@ -33,6 +34,10 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'priority',
 				'value' => 'priorityName',
 				'filter' => SummonDoc::getPriorityNames(),
+			],
+			[
+				'attribute' => 'summonTypesNames',
+				'filter' =>SummonType::getNames(),
 			],
 
 			['class' => 'yii\grid\ActionColumn'],

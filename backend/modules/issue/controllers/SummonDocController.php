@@ -4,6 +4,7 @@ namespace backend\modules\issue\controllers;
 
 use backend\helpers\Url;
 use backend\modules\issue\models\search\SummonDocSearch;
+use backend\modules\issue\models\SummonDocForm;
 use common\models\issue\SummonDoc;
 use common\models\issue\SummonDocLink;
 use Yii;
@@ -65,10 +66,10 @@ class SummonDocController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new SummonDoc();
+		$model = new SummonDocForm();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
 		return $this->render('create', [
@@ -85,10 +86,11 @@ class SummonDocController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$model = $this->findModel($id);
+		$model = new SummonDocForm();
+		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $id]);
 		}
 
 		return $this->render('update', [

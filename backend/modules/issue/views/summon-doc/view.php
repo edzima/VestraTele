@@ -36,6 +36,7 @@ YiiAsset::register($this);
 			'id',
 			'name',
 			'priorityName',
+			'summonTypesNames',
 		],
 	]) ?>
 

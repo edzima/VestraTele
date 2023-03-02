@@ -172,5 +172,6 @@ return [
 	'In Issue: {issue} has Doc: {name} as To Confirm.' => 'W Sprawie: {issue} jest Dokument: {name} do Potwierdzenia.',
 	'User: {user} mark Doc: {name} to Confirm.' => '{user} oznaczył Dokument: {name} do Potwierdzenia',
 	'Are you sure you want to mark this doc as not done?' => 'Czy napewno chesz oznaczyć ten Dokument jako: Do zrobienia?',
-	'Are you sure you want to mark this doc as not confirmed?' => 'Czy napewno chcesz oznaczyć ten Dokument jako niepotwierdzony?'
+	'Are you sure you want to mark this doc as not confirmed?' => 'Czy napewno chcesz oznaczyć ten Dokument jako niepotwierdzony?',
+	'Summon Types' => 'Typy Zleceń',
 ];
