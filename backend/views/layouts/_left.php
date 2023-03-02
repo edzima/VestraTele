@@ -282,7 +282,7 @@ $user = Yii::$app->user;
 							'label' => Yii::t('issue', 'Summon Docs Types'),
 							'url' => ['/issue/summon-doc/index'],
 							'icon' => '<i class="fa fa-flag"></i>',
-							'visible' => $user->can(Worker::PERMISSION_SUMMON_MANAGER),
+							'visible' => $user->can(Worker::PERMISSION_SUMMON_DOC_MANAGER),
 						],
 						[
 							'label' => Yii::t('issue', 'Types'),
