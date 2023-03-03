@@ -46,7 +46,7 @@ $this->params['issueParentTypeNav'] = [
 			: ''
 		?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_DOC_MANAGER)
+		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_DOC_MANAGER) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
 			? Html::a(Yii::t('issue', 'Summon Docs Types'), ['summon-doc/index'], ['class' => 'btn btn-info'])
 			: ''
 		?>
