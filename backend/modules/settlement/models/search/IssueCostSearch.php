@@ -76,6 +76,8 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 			[['id', 'issue_id', 'user_id'], 'integer'],
 			[['type', 'transfer_type'], 'string'],
 			[['settled', 'withSettlements', 'is_confirmed', 'hide_on_report'], 'boolean'],
+			[['settled', 'withSettlements', 'is_confirmed', 'hide_on_report'], 'default', 'value' => null],
+
 			[['created_at', 'updated_at', 'date_at', 'settled_at'], 'safe'],
 			[['dateRange', 'deadlineRange', 'settledRange'], 'match', 'pattern' => '/^.+\s\-\s.+$/'],
 			[['value', 'base_value', 'vat'], 'number'],
@@ -114,6 +116,9 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 		$query = IssueCost::find();
 		$query->joinWith(['issue', 'settlements', 'user']);
 		$query->with('issue.type');
+		$query->groupBy([
+			IssueCost::tableName() . '.id',
+		]);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,

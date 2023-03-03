@@ -50,6 +50,7 @@ return [
 	'message.template' => 'Szablony Wiadomości',
 	'minor' => 'Nieletni',
 	'news' => 'Newsy',
+	'news.manager' => 'Newsy - Manager',
 	'note' => 'Notatki',
 	'note.self' => 'Notatki - Własne (widoczne tylko na froncie)',
 	'note.update' => 'Notatki - edycja',

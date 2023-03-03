@@ -78,6 +78,7 @@ class RbacController extends Controller {
 		Worker::PERMISSION_HINT,
 		User::PERMISSION_LOGS,
 		User::PERMISSION_NEWS,
+		User::PERMISSION_NEWS_MANAGER,
 		User::PERMISSION_NOTE,
 		User::PERMISSION_NOTE_SELF,
 		User::PERMISSION_NOTE_UPDATE,

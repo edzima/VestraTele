@@ -46,6 +46,7 @@ $this->params['breadcrumbs'][] = Yii::t('provision', 'Doubles');
 		'columns' => [
 			[
 				'attribute' => 'settlementTypes',
+				'label' => Yii::t('settlement', 'Settlement type'),
 				'value' => static function (Provision $model): string {
 					return Html::a(
 						$model->getIssueName() . ' - ' . $model->pay->calculation->getTypeName(),

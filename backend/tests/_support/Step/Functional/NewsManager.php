@@ -8,7 +8,7 @@ class NewsManager extends Manager {
 
 	protected function getPermissions(): array {
 		return [
-			User::PERMISSION_NEWS,
+			User::PERMISSION_NEWS_MANAGER,
 		];
 	}
 

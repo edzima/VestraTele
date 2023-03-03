@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\helpers\Flash;
 use common\models\Article;
 use common\models\user\LoginForm;
+use common\models\user\User;
 use frontend\models\ContactForm;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResendVerificationEmailForm;
@@ -77,7 +78,7 @@ class SiteController extends Controller {
 	public function actionIndex() {
 
 		$articlesDataProvider = null;
-		if (!Yii::$app->user->isGuest) {
+		if (Yii::$app->user->can(User::PERMISSION_NEWS)) {
 			$articlesDataProvider = new ActiveDataProvider([
 				'query' => Article::find()
 					->published()

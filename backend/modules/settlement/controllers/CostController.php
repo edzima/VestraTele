@@ -153,6 +153,7 @@ class CostController extends Controller {
 	public function actionIndex(): string {
 		$model = new IssueCostSearch();
 		$dataProvider = $model->search(Yii::$app->request->queryParams);
+		$dataProvider->pagination->setPageSize(500);
 
 		return $this->render('index', [
 			'model' => $model,

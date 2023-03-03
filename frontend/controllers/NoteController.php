@@ -31,6 +31,8 @@ use yii\web\Response;
  */
 class NoteController extends Controller {
 
+	public bool $selfNote = false;
+
 	/**
 	 * @inheritdoc
 	 */
@@ -90,7 +92,7 @@ class NoteController extends Controller {
 		$message->setExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE));
 		$model->messagesForm = $message;
 
-		if (!Yii::$app->user->can(User::PERMISSION_NOTE)) {
+		if ($this->selfNote && !Yii::$app->user->can(User::PERMISSION_NOTE)) {
 			$model->type = IssueNote::TYPE_SELF;
 			Flash::add(Flash::TYPE_WARNING,
 				Yii::t('frontend', 'Warning! This note will only be visible to you.'));

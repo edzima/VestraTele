@@ -141,6 +141,7 @@ foreach (LeadSearch::questions() as $question) {
 					'allowClear' => true,
 					'dropdownAutoWidth' => true,
 				],
+				'options' => ['multiple' => true],
 			],
 		],
 		'date_at:date',

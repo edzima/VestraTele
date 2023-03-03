@@ -44,6 +44,10 @@ class FunctionalTester extends Actor implements FixtureTester {
 		$this->see($link, '#main-nav li a');
 	}
 
+	public function clickMenuLink($link): void {
+		$this->click($link, '#main-nav li a');
+	}
+
 	public function dontSeeMenuLink($link): void {
 		$this->dontSee($link, '#main-nav li a');
 	}

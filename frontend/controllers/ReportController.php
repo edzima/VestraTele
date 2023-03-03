@@ -37,7 +37,7 @@ class ReportController extends Controller {
 		$searchModel->to_user_id = $currentUserId;
 		$searchModel->withoutEmpty = true;
 		if ($user_id !== null && $user_id !== $currentUserId) {
-			if (in_array($user_id, $searchModel->excludedFromUsers)) {
+			if (in_array($user_id, (array) $searchModel->excludedFromUsers)) {
 				Yii::warning("User: $currentUserId try view provision report for excluded user: " . $user_id);
 				throw new NotFoundHttpException();
 			}
