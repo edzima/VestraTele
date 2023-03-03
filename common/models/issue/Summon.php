@@ -128,6 +128,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 			'owner_id' => Yii::t('common', 'Owner'),
 			'issue' => 'Sprawa',
 			'owner' => Yii::t('common', 'Owner'),
+			'updater' => Yii::t('common', 'Updater'),
 			'contractor_id' => Yii::t('common', 'Contractor'),
 			'contractor' => Yii::t('common', 'Contractor'),
 			'city_id' => Yii::t('address', 'City'),

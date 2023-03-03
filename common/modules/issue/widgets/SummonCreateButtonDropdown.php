@@ -16,8 +16,6 @@ class SummonCreateButtonDropdown extends ButtonDropdown {
 	public $options = [
 		'class' => 'btn-warning',
 	];
-	public $tagName = 'a';
-	public $split = true;
 
 	public ?int $issueId = null;
 
