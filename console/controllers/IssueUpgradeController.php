@@ -6,6 +6,7 @@ use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\IssueStage;
 use common\models\issue\Summon;
+use common\models\issue\SummonDocLink;
 use DateTime;
 use yii\console\Controller;
 use yii\db\Expression;
@@ -13,6 +14,29 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 
 class IssueUpgradeController extends Controller {
+
+	public function actionSummonsRealizedDocs(): void {
+		SummonDocLink::updateAll([
+			'confirmed_user_id' => null,
+		]);
+		$summons = Summon::find()
+			->select(['owner_id', 'realized_at', 'id'])
+			->andWhere(['status' => Summon::STATUS_REALIZED])
+			->joinWith('docsLink')
+			->andWhere(SummonDocLink::tableName() . '.confirmed_user_id IS NULL')
+			->asArray()
+			->all();
+		$count = 0;
+		foreach ($summons as $data) {
+			$count += SummonDocLink::updateAll([
+				'confirmed_user_id' => $data['owner_id'],
+				'confirmed_at' => $data['realized_at'],
+			], [
+				'summon_id' => $data['id'],
+			]);
+		}
+		Console::output('Mark Docs as confirmed: ' . $count);
+	}
 
 	public function actionIssueStageDeadlineUpdate(): void {
 		$stages = IssueStage::find()

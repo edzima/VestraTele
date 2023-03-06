@@ -24,7 +24,8 @@ class Url extends BaseUrl {
 
 	public static function issuesParentType(int $id, array $params = []): string {
 		$params[static::PARAM_ISSUE_PARENT_TYPE] = $id;
-		return static::to([static::ROUTE_ISSUE_INDEX, $params]);
+		array_unshift($params, static::ROUTE_ISSUE_INDEX);
+		return static::to($params);
 	}
 
 	public static function leadView(int $id, $schema = false): string {

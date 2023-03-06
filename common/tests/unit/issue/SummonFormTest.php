@@ -8,6 +8,7 @@ use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\form\SummonForm;
 use common\models\issue\Summon;
 use common\models\issue\SummonDoc;
+use common\models\issue\SummonDocLink;
 use common\models\issue\SummonType;
 use common\models\SummonTypeOptions;
 use common\models\user\Worker;
@@ -40,6 +41,14 @@ class SummonFormTest extends Unit {
 			IssueFixtureHelper::entityResponsible(),
 			IssueFixtureHelper::summon()
 		);
+	}
+
+	public function testIdsDiff(): void {
+		$currentIds = [1, 3, 5];
+		$newTypesIds = [1, 5, 6];
+
+		$toDeleteIds = array_diff($currentIds, $newTypesIds);
+		$toInserIds = array_diff($newTypesIds, $currentIds);
 	}
 
 	public function testEmpty(): void {
@@ -112,6 +121,7 @@ class SummonFormTest extends Unit {
 		]);
 		$this->giveModel();
 		$model = $this->model;
+		$model->term = SummonForm::TERM_EMPTY;
 		$model->issue_id = 1;
 		$model->type_id = 1;
 		$model->doc_types_ids = [
@@ -134,17 +144,49 @@ class SummonFormTest extends Unit {
 			'owner_id' => static::DEFAULT_OWNER_ID,
 			'city_id' => static::DEFAULT_CITY_ID,
 		]);
+		$summon = $this->model->getModel();
 
-		$model = $this->model->getModel();
+		$this->tester->seeRecord(SummonDocLink::class, [
+			'summon_id' => $summon->id,
+			'doc_type_id' => $summonDocTypeId1,
+		]);
+		$this->tester->seeRecord(SummonDocLink::class, [
+			'summon_id' => $summon->id,
+			'doc_type_id' => $summonDocTypeId2,
+		]);
+		$summon->refresh();
 		$this->tester->assertSame(
 			'Test summon Doc 1, Test summon Doc 2',
-			$model->getDocsNames()
+			$summon->getDocsNames()
 		);
 
 		$this->tester->assertSame(
-			'Test Unit Summon Title - ' . $model->getDocsNames(),
-			$model->getTitleWithDocs()
+			'Test Unit Summon Title - ' . $summon->getDocsNames(),
+			$summon->getTitleWithDocs()
 		);
+
+		$this->giveModel();
+		$model = $this->model;
+		$model->setModel($summon);
+		$model->start_at = '2020-01-01';
+
+		$model->doc_types_ids = [
+			$summonDocTypeId1, $summonDocTypeId3,
+		];
+
+		$this->thenSuccessSave();
+		$this->tester->dontSeeRecord(SummonDocLink::class, [
+			'summon_id' => $summon->id,
+			'doc_type_id' => $summonDocTypeId2,
+		]);
+		$this->tester->seeRecord(SummonDocLink::class, [
+			'summon_id' => $summon->id,
+			'doc_type_id' => $summonDocTypeId1,
+		]);
+		$this->tester->seeRecord(SummonDocLink::class, [
+			'summon_id' => $summon->id,
+			'doc_type_id' => $summonDocTypeId3,
+		]);
 	}
 
 	public function testDeadlineFromTerm(): void {

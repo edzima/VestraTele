@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use backend\helpers\Url;
 use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\Summon;
@@ -50,8 +51,9 @@ class SummonController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionIndex(int $parentTypeId = null): string {
 		$searchModel = new SummonSearch();
+		$searchModel->issueParentTypeId = $parentTypeId;
 		$searchModel->user_id = Yii::$app->user->getId();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -126,6 +128,7 @@ class SummonController extends Controller {
 		}
 		$model = new SummonForm();
 		$model->setModel($summon);
+		$model->updater_id = Yii::$app->user->getId();
 		if ($summon->owner_id !== Yii::$app->getUser()->getId()) {
 			$model->scenario = SummonForm::SCENARIO_CONTRACTOR;
 		}
@@ -137,6 +140,26 @@ class SummonController extends Controller {
 		return $this->render('update', [
 			'model' => $model,
 		]);
+	}
+
+	public function actionRealize(int $id, string $returnUrl = null) {
+		$model = $this->findModel($id);
+		if (!static::canUpdate($model)) {
+			throw new ForbiddenHttpException();
+		}
+		$form = new SummonForm();
+		$form->setModel($model);
+		$form->status = Summon::STATUS_REALIZED;
+		$form->updater_id = Yii::$app->user->getId();
+		if ($form->save()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('issue', 'Success. Mark Summon as Realized.')
+			);
+		}
+		return $this->redirect($returnUrl
+			? Url::to($returnUrl)
+			: ['view', 'id' => $id]
+		);
 	}
 
 	/**

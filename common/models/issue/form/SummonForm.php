@@ -8,6 +8,7 @@ use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\issue\Summon;
 use common\models\issue\SummonDoc;
+use common\models\issue\SummonDocLink;
 use common\models\issue\SummonType;
 use common\models\SummonTypeOptions;
 use common\models\user\User;
@@ -57,6 +58,8 @@ class SummonForm extends Model implements HiddenFieldsModel {
 	public $realize_at;
 	public $realized_at;
 
+	public ?int $updater_id = null;
+
 	public bool $sendEmailToContractor = true;
 
 	private ?Summon $model = null;
@@ -67,7 +70,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		return [
 			[['type_id', 'status', 'issue_id', 'owner_id', 'start_at'], 'required'],
 			[$this->requiredFields(), 'required'],
-			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status', 'entity_id'], 'integer'],
+			[['type_id', 'issue_id', 'owner_id', 'contractor_id', 'status', 'entity_id', '!updater_id'], 'integer'],
 			[
 				'title', 'required',
 				'message' => Yii::t('issue', 'Title cannot be blank when Docs are empty.'),
@@ -93,17 +96,18 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			},
 				'message' => Yii::t('common', 'Deadline At cannot be blank on custom term.'),
 			],
-			['deadline_at', 'default', 'value' => null],
+			[['deadline_at', 'start_at'], 'default', 'value' => null],
 			[['start_at', 'deadline_at'], 'date', 'format' => 'yyyy-MM-dd'],
 			[['realize_at', 'realized_at'], 'datetime', 'format' => 'yyyy-MM-dd HH:mm:00'],
 			['entity_id', 'in', 'range' => array_keys(static::getEntityNames())],
 			['status', 'in', 'range' => array_keys(static::getStatusesNames())],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
-			['doc_types_ids', 'in', 'range' => array_keys(static::getDocNames()), 'allowArray' => true],
+			['doc_types_ids', 'in', 'range' => array_keys($this->getDocNames()), 'allowArray' => true],
 			['term', 'in', 'range' => array_keys(static::getTermsNames())],
 			[['contractor_id'], 'in', 'range' => array_keys($this->getContractors()),],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 			[['!owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
+			[['!updater_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updater_id' => 'id']],
 		];
 	}
 
@@ -175,8 +179,8 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		$this->owner_id = $model->owner_id;
 		$this->entity_id = $model->entity_id;
 		$this->city_id = $model->city_id;
-		$this->start_at = $model->start_at;
-		$this->deadline_at = $model->deadline_at;
+		$this->start_at = $model->start_at ? date('Y-m-d', strtotime($model->start_at)) : null;
+		$this->deadline_at = $model->deadline_at ? date('Y-m-d', strtotime($model->deadline_at)) : null;
 		$this->realize_at = $model->realize_at;
 		$this->realized_at = $model->realized_at;
 	}
@@ -197,6 +201,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		$model->start_at = $this->start_at;
 		$model->city_id = $this->city_id;
 		$model->entity_id = $this->entity_id;
+		$model->updater_id = $this->updater_id;
 		if (empty($this->realize_at)) {
 			$dateTime = new DateTime($this->start_at);
 			$dateTime->setTime(date('H'), date('i'));
@@ -228,25 +233,44 @@ class SummonForm extends Model implements HiddenFieldsModel {
 
 	public function saveDocs(): void {
 		$model = $this->getModel();
-		$model->unlinkAll('docs', true);
-		$rows = [];
-		if (!empty($this->doc_types_ids)) {
-			$docs = (array) $this->doc_types_ids;
-			foreach ($docs as $id) {
-				$rows[] = [
-					'summon_id' => $model->id,
-					'doc_type_id' => $id,
-				];
+		if (empty($this->doc_types_ids)) {
+			if (!$model->isNewRecord) {
+				$model->unlinkAll('docs', true);
 			}
-		}
-
-		if (!empty($rows)) {
-			Yii::$app->db->createCommand()
-				->batchInsert(SummonDoc::viaTableName(), [
-					'summon_id',
-					'doc_type_id',
-				], $rows)
-				->execute();
+		} else {
+			if ($model->isNewRecord) {
+				$this->linkDocsTypes($this->doc_types_ids);
+			} else {
+				$currentTypesIds = ArrayHelper::getColumn($model->docsLink, 'doc_type_id');
+				if (empty($currentTypesIds)) {
+					$this->linkDocsTypes($this->doc_types_ids);
+				} else {
+					$toDeleteIds = array_diff($currentTypesIds, $this->doc_types_ids);
+					$toInsertIds = array_diff($this->doc_types_ids, $currentTypesIds);
+					if (!empty($toDeleteIds)) {
+						$this->unlinkDocsTypes($toDeleteIds);
+					}
+					if (!empty($toInsertIds)) {
+						$this->linkDocsTypes($toInsertIds);
+					}
+				}
+				if ((int) $this->status === Summon::STATUS_REALIZED) {
+					SummonDocLink::updateAll([
+						'confirmed_at' => date(DATE_ATOM),
+						'confirmed_user_id' => $this->updater_id ?: $this->owner_id,
+					], [
+						'summon_id' => $model->id,
+						'confirmed_user_id' => null,
+					]);
+					SummonDocLink::updateAll([
+						'done_at' => date(DATE_ATOM),
+						'done_user_id' => $this->updater_id ?: $this->owner_id,
+					], [
+						'summon_id' => $model->id,
+						'done_at' => null,
+					]);
+				}
+			}
 		}
 	}
 
@@ -266,8 +290,11 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			->send();
 	}
 
-	public static function getDocNames(): array {
-		return SummonDoc::getNames();
+	public function getDocNames(): array {
+		if (empty($this->type_id)) {
+			return SummonDoc::getNames();
+		}
+		return SummonDoc::getNames($this->type_id);
 	}
 
 	public static function getStatusesNames(): array {
@@ -334,5 +361,36 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			return $this->getModel()->type;
 		}
 		return $this->type;
+	}
+
+	private function linkDocsTypes(array $doc_types_ids) {
+		$summonId = $this->getModel()->id;
+		if ($summonId) {
+			$rows = [];
+			foreach ($doc_types_ids as $doc_type_id) {
+				$rows[] = [
+					'doc_type_id' => $doc_type_id,
+					'summon_id' => $summonId,
+				];
+			}
+			if (!empty($rows)) {
+				Yii::$app->db->createCommand()
+					->batchInsert(SummonDocLink::tableName(), [
+						'doc_type_id',
+						'summon_id',
+					], $rows)
+					->execute();
+			}
+		}
+	}
+
+	private function unlinkDocsTypes(array $doc_types_ids) {
+		$summonId = $this->getModel()->id;
+		if ($summonId && !empty($doc_types_ids)) {
+			SummonDocLink::deleteAll([
+				'summon_id' => $summonId,
+				'doc_type_id' => $doc_types_ids,
+			]);
+		}
 	}
 }

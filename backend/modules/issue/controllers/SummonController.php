@@ -2,6 +2,7 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\helpers\Url;
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\issue\models\SummonForm;
 use common\helpers\Flash;
@@ -29,6 +30,7 @@ class SummonController extends Controller {
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'realize' => ['POST'],
 				],
 			],
 		];
@@ -115,7 +117,7 @@ class SummonController extends Controller {
 			throw new ForbiddenHttpException('Only for Owner or Summon Manager.');
 		}
 		$model->setModel($summon);
-
+		$model->updater_id = Yii::$app->user->getId();
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $id]);
 		}
@@ -140,6 +142,26 @@ class SummonController extends Controller {
 		}
 
 		return $this->redirect(['index']);
+	}
+
+	public function actionRealize(int $id, string $returnUrl = null) {
+		$model = $this->findModel($id);
+		if (!static::canUpdate($model)) {
+			throw new ForbiddenHttpException();
+		}
+		$form = new SummonForm();
+		$form->setModel($model);
+		$form->status = Summon::STATUS_REALIZED;
+		$form->updater_id = Yii::$app->user->getId();
+		if ($form->save()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('issue', 'Success. Mark Summon as Realized.')
+			);
+		}
+		return $this->redirect($returnUrl
+			? Url::to($returnUrl)
+			: ['view', 'id' => $id]
+		);
 	}
 
 	/**

@@ -4,6 +4,7 @@ use backend\helpers\Url;
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\issue\widgets\SummonGrid;
 use common\models\user\Worker;
+use yii\bootstrap\Nav;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
@@ -19,14 +20,24 @@ if ($searchModel->getIssueParentType()) {
 $this->params['breadcrumbs'][] = $this->title;
 
 $this->params['issueParentTypeNav'] = [
-	'route' => ['/issue/summon/index'],
+	'route' => ['/issue/summon/index', Html::getInputName($searchModel, 'type_id') => $searchModel->type_id],
 ];
 
 ?>
 <div class="summon-index">
+	<p>
+		<?= Nav::widget([
+			'options' => ['class' => 'nav-pills'],
+			'items' => $searchModel->getSummonTypeNavItems(),
+		])
+		?>
+	</p>
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create summon'), ['create'], ['class' => 'btn btn-success']) ?>
+
+
+		<?= Html::a(Yii::t('backend', 'Summon Docs'), ['summon-doc-link/to-do'], ['class' => 'btn btn-warning']) ?>
 
 		<?= Html::a(Yii::t('issue', 'Calendar'), ['/calendar/summon-calendar/index', 'parentTypeId' => $searchModel->issueParentTypeId], ['class' => 'btn btn-primary']) ?>
 
@@ -35,8 +46,8 @@ $this->params['issueParentTypeNav'] = [
 			: ''
 		?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
-			? Html::a(Yii::t('backend', 'Summon Docs'), ['summon-doc/index'], ['class' => 'btn btn-warning'])
+		<?= Yii::$app->user->can(Worker::PERMISSION_SUMMON_DOC_MANAGER) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
+			? Html::a(Yii::t('issue', 'Summon Docs Types'), ['summon-doc/index'], ['class' => 'btn btn-info'])
 			: ''
 		?>
 

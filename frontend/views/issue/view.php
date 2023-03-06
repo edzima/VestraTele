@@ -4,6 +4,7 @@ use common\models\issue\Issue;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
+use common\modules\issue\widgets\SummonDocsWidget;
 use frontend\helpers\Breadcrumbs;
 use frontend\helpers\Html;
 use frontend\widgets\issue\StageChangeButtonDropdown;
@@ -63,6 +64,14 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		'title' => Yii::t('issue', 'Pinned Issue Notes'),
 	]) ?>
 
+
+	<?= SummonDocsWidget::widget([
+		'models' => SummonDocsWidget::modelsFromSummons($summonDataProvider->getModels(), Yii::$app->user->getId()),
+		'controller' => '/summon-doc',
+		'hideOnAllAreConfirmed' => true,
+	]) ?>
+
+
 	<?= $calculationsDataProvider !== null
 	&& $calculationsDataProvider->getTotalCount() > 0
 		? IssuePayCalculationGrid::widget([
@@ -86,6 +95,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		'userMailVisibilityCheck' => true,
 	]) ?>
 
+
 	<?= $summonDataProvider->getTotalCount() > 0
 		? SummonGrid::widget([
 			'dataProvider' => $summonDataProvider,
@@ -96,9 +106,11 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 			'withCaption' => true,
 			'withIssue' => false,
 			'withCustomer' => false,
+			'withCustomerPhone' => false,
 			'withOwner' => false,
 			'withContractor' => true,
 			'withUpdatedAt' => false,
+			'withDocsCountSummary' => true,
 		])
 		: ''
 	?>

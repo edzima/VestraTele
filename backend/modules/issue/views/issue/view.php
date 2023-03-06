@@ -1,6 +1,7 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
+use backend\helpers\Html;
 use backend\modules\issue\widgets\IssueSmsButtonDropdown;
 use backend\modules\issue\widgets\IssueViewSummonsWidgets;
 use backend\modules\issue\widgets\IssueViewTopSummonsWidgets;
@@ -13,9 +14,9 @@ use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
+use common\modules\issue\widgets\SummonDocsWidget;
 use yii\bootstrap\ButtonDropdown;
 use yii\data\DataProviderInterface;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model Issue */
@@ -24,6 +25,7 @@ use yii\helpers\Html;
 
 $this->title = $model->longId;
 $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
+
 ?>
 <div class="issue-view">
 	<p>
@@ -150,6 +152,11 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 	]) ?>
 
 
+	<?= SummonDocsWidget::widget([
+		'models' => SummonDocsWidget::modelsFromSummons($summonDataProvider->getModels(), Yii::$app->user->getId()),
+		'controller' => '/issue/summon-doc-link',
+		'hideOnAllAreConfirmed' => true,
+	]) ?>
 
 	<?= $calculationsDataProvider->getTotalCount() > 0
 		? IssuePayCalculationGrid::widget([
@@ -174,6 +181,8 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		'relationActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
 		'claimActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
 	]) ?>
+
+
 
 	<?= IssueViewSummonsWidgets::widget([
 		'dataProvider' => $summonDataProvider,

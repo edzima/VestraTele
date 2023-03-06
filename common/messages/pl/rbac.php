@@ -69,6 +69,7 @@ return [
 	'shareholder' => 'Wspólnik',
 	'summon' => 'Zlecenia',
 	'summon.create' => 'Zlecenia - Dodawanie',
+	'summon.doc.manager' => 'Zlecenia - Dokumenty (manager)',
 	'summon.manager' => 'Zlecenia - manager',
 	'settlement.administrative.create' => 'Opłata Administracyjna - Dodawanie',
 	'telemarketer' => 'Konsultant',

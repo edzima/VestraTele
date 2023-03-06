@@ -29,7 +29,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'source_id', [
 			'options' => [
-				'class' => 'col-md-3 col-lg-2',
+				'class' => 'col-md-4 col-lg-3',
 			],
 		])
 			->widget(Select2::class, [

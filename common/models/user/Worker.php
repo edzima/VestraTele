@@ -48,6 +48,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_NOTE_DELETE = 'note.delete';
 	public const PERMISSION_SUMMON_MANAGER = 'summon.manager';
 	public const PERMISSION_SUMMON_CREATE = 'summon.create';
+	public const PERMISSION_SUMMON_DOC_MANAGER = 'summon.doc.manager';
 
 	public const PERMISSION_SETTLEMENT_ADMINISTRATIVE_CREATE = 'settlement.administrative.create';
 	public const PERMISSION_PAY_ALL_PAID = 'pay.all-paid';

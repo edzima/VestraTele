@@ -78,10 +78,33 @@ abstract class IssueSearch extends Model
 	public const SUMMON_ALL_REALIZED = 'all-realized';
 	public const SUMMON_SOME_ACTIVE = 'some-active';
 
+	public const SUMMON_DOCS_SOME_TO_CONFIRM = 'docs.to-confirm';
+
 	public ?AddressSearch $addressSearch = null;
 	private array $stagesIdsForParentType = [];
 
+	protected static function getSummonsStatusFilters():array{
+		$filters = [];
+		foreach (static::getSummonsStatusesNames() as $filtersNames){
+			foreach ($filtersNames as $filter => $name){
+				$filters[] = $filter;
+			}
+		}
+		return $filters;
+	}
+
 	public static function getSummonsStatusesNames(): array {
+		$statuses = Summon::getStatusesNames();
+		$statuses = [
+				static::SUMMON_ALL_REALIZED => Yii::t('issue', 'All Realized'),
+				static::SUMMON_SOME_ACTIVE => Yii::t('issue', 'Some Active'),
+			] + Summon::getStatusesNames();
+		return [
+			Yii::t('issue','Status') => $statuses,
+			Yii::t('issue','Summon Docs')  => [
+				static::SUMMON_DOCS_SOME_TO_CONFIRM => Yii::t('issue', 'To Confirm'),
+			],
+		];
 		return [
 				static::SUMMON_ALL_REALIZED => Yii::t('issue', 'All Realized'),
 				static::SUMMON_SOME_ACTIVE => Yii::t('issue', 'Some Active'),
@@ -144,7 +167,9 @@ abstract class IssueSearch extends Model
 					'created_at', 'updated_at', 'type_additional_date_at',
 				], 'safe',
 			],
-			['summonsStatusFilter', 'in', 'range' => array_keys(static::getSummonsStatusesNames()), 'allowArray' => true],
+			['summonsStatusFilter', 'safe'],
+
+			['summonsStatusFilter', 'in', 'range' => static::getSummonsStatusFilters(), 'allowArray' => true],
 			['customerPhone', PhoneValidator::class],
 			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
 			['userType', 'in', 'range' => array_keys(static::getIssueUserTypesNames())],
@@ -529,6 +554,13 @@ abstract class IssueSearch extends Model
 			$summonsStatuses = [];
 			foreach ($this->summonsStatusFilter as $summonFilter) {
 				switch ($summonFilter) {
+					case static::SUMMON_DOCS_SOME_TO_CONFIRM:
+						$query->joinWith('summons.docsLink');
+						$query->andWhere(SummonDocLink::tableName() . '.summon_id IS NOT NULL');
+						$query->andWhere([
+							SummonDocLink::tableName() . '.confirmed_at' => null,
+						]);
+						break;
 					case static::SUMMON_SOME_ACTIVE:
 						$query->andWhere(['NOT IN', Summon::tableName() . '.status', [Summon::STATUS_REALIZED]]);
 						break;

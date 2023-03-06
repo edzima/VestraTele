@@ -1,12 +1,14 @@
 <?php
 
 use common\helpers\Html;
+use common\helpers\Url;
 use common\models\issue\form\SummonForm;
 use common\models\user\Worker;
 use common\widgets\ActiveForm;
 use common\widgets\address\CitySimcInputWidget;
 use common\widgets\DateTimeWidget;
 use common\widgets\DateWidget;
+use kartik\depdrop\DepDrop;
 use kartik\select2\Select2;
 use yii\web\View;
 
@@ -25,24 +27,25 @@ use yii\web\View;
 				'options' => [
 					'class' => 'col-md-12',
 				],
-
-			])->widget(Select2::class, [
-					'data' => SummonForm::getDocNames(),
-					'options' => [
-						'multiple' => true,
-						'placeholder' => $model->getAttributeLabel('doc_types_ids'),
-					],
+			])
+				->widget(DepDrop::class, [
+					'type' => DepDrop::TYPE_SELECT2,
+					'data' => $model->getDocNames(),
 					'pluginOptions' => [
+						'depends' => [Html::getInputId($model, 'type_id')],
+						'url' => Url::to(['summon-doc/types-list']),
+						'loading' => Yii::t('common', 'Loading...'),
+					],
+					'options' => [
+						'placeholder' => $model->getAttributeLabel('doc_types_ids'),
 						'allowClear' => true,
-
+						'multiple' => true,
 					],
 					'disabled' => !(
-						Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
+						Yii::$app->user->can(Worker::PERMISSION_SUMMON_DOC_MANAGER)
 						|| (!$model->getModel()->isNewRecord && $model->getModel()->owner_id === Yii::$app->user->getId())
 					),
-				]
-			)
-
+				])
 			?>
 		</div>
 

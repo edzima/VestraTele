@@ -304,7 +304,7 @@ return [
 	'Update User Trait: {name}' => 'Edytuj Cechę: {name}',
 	'Create issue' => 'Dodaj Sprawę',
 	'Create Summon Doc' => 'Dodaj Typ Dokumentu',
-	'Update Summon Doc: {name}' => 'Edytuj Typ Dokumnetu: {name}',
+	'Update Summon Doc: {name}' => 'Edytuj Typ Dokumentu: {name}',
 	'Summon Docs' => 'Dokumenty',
 	'Issue Agent SMS' => 'SMS do Przedstawiciela w Sprawie',
 	'Issue Customer SMS' => 'SMS do Klienta w Sprawie',

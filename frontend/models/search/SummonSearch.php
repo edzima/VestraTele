@@ -23,8 +23,9 @@ class SummonSearch extends BaseSummonSearch {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type', 'status', 'created_at', 'updated_at', 'realized_at', 'deadline_at', 'start_at', 'issue_id', 'owner_id', '!user_id'], 'integer'],
+			[['id', 'type_id', 'status', 'created_at', 'updated_at', 'realized_at', 'deadline_at', 'start_at', 'issue_id', 'owner_id', '!user_id'], 'integer'],
 			[['title', 'customerPhone'], 'safe'],
+			['doc_types_ids', 'in', 'range' => array_keys(static::getDocTypesNames()), 'allowArray' => true],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];
 	}

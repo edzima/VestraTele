@@ -2,12 +2,16 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\helpers\Url;
 use backend\modules\issue\models\search\SummonDocSearch;
+use backend\modules\issue\models\SummonDocForm;
 use common\models\issue\SummonDoc;
+use common\models\issue\SummonDocLink;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * SummonDocController implements the CRUD actions for SummonDoc model.
@@ -26,6 +30,26 @@ class SummonDocController extends Controller {
 				],
 			],
 		];
+	}
+
+	public function actionTypesList() {
+		Yii::$app->response->format = Response::FORMAT_JSON;
+		$out = [];
+		if (isset($_POST['depdrop_parents'])) {
+			$parents = $_POST['depdrop_parents'];
+			if ($parents != null) {
+				$type_id = $parents[0];
+				$names = SummonDoc::getNames($type_id);
+				foreach ($names as $id => $name) {
+					$out[] = [
+						'id' => $id,
+						'name' => $name,
+					];
+				}
+				return ['output' => $out, 'selected' => ''];
+			}
+		}
+		return ['output' => '', 'selected' => ''];
 	}
 
 	/**
@@ -63,10 +87,10 @@ class SummonDocController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new SummonDoc();
+		$model = new SummonDocForm();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
 		return $this->render('create', [
@@ -83,10 +107,11 @@ class SummonDocController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$model = $this->findModel($id);
+		$model = new SummonDocForm();
+		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $id]);
 		}
 
 		return $this->render('update', [
@@ -122,5 +147,23 @@ class SummonDocController extends Controller {
 		}
 
 		throw new NotFoundHttpException(Yii::t('backend', 'The requested page does not exist.'));
+	}
+
+	public function actionDone(int $docId, int $summonId, string $returnUrl = null) {
+		$summonLink = SummonDocLink::find()
+			->andWhere([
+				'doc_type_id' => $docId,
+				'summon_id' => $summonId,
+			])
+			->one();
+		if ($summonLink === null) {
+			throw new NotFoundHttpException();
+		}
+		$summonLink->done_at = date(DATE_ATOM);
+		$summonLink->save();
+		if ($returnUrl === null) {
+			$returnUrl = Url::previous();
+		}
+		return $this->redirect($returnUrl);
 	}
 }

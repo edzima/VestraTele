@@ -25,7 +25,7 @@ class SummonGrid extends GridView {
 	/** @todo add note link */
 	public $actionColumn = [
 		'class' => ActionColumn::class,
-		'template' => '{note} {view} {update} {delete}',
+		'template' => '{realize} {note} {view} {update} {delete}',
 	];
 
 	public ?string $noteRoute = '/issue/note/create-summon';
@@ -54,6 +54,7 @@ class SummonGrid extends GridView {
 	public string $tightDeadlineClass = 'warning';
 
 	public int $tightDeadlineDays = 3;
+	public bool $withDocsCountSummary = false;
 
 	public function init(): void {
 		if ($this->filterModel !== null && !$this->filterModel instanceof SummonSearch) {
@@ -67,6 +68,19 @@ class SummonGrid extends GridView {
 						'title' => Yii::t('issue', 'Create Note'),
 						'aria-label' => Yii::t('issue', 'Create Note'),
 					]
+				);
+			};
+		}
+
+		if (!isset($this->actionColumn['buttons']['realize'])) {
+			$this->actionColumn['buttons']['realize'] = static function (string $url, Summon $model): string {
+				return Html::a(Html::icon('check'),
+					$url,
+					[
+						'title' => Yii::t('issue', 'Realize it'),
+						'aria-label' => Yii::t('issue', 'Realize it'),
+						'data-method' => 'POST',
+					],
 				);
 			};
 		}
@@ -160,18 +174,51 @@ class SummonGrid extends GridView {
 				'visible' => $this->withStatus,
 			],
 			[
-				'attribute' => 'titleWithDocs',
-				'contentOptions' => ['style' => 'width: 35%;'],
-				'visible' => $this->withTitleWithDocs,
-			],
-			[
 				'attribute' => 'title',
 				'contentOptions' => ['style' => 'width: 35%;'],
 				'visible' => $this->withTitle,
 			],
 			[
+				'attribute' => 'titleWithDocs',
+				'contentOptions' => ['style' => 'width: 35%;'],
+				'visible' => $this->withTitleWithDocs,
+			],
+			[
 				'attribute' => 'doc_types_ids',
-				'value' => 'docsNames',
+				'value' => function (Summon $summon): ?string {
+					$docsLink = $summon->docsLink;
+					if (empty($docsLink)) {
+						return null;
+					}
+					$confirmed = [];
+					$notConfirmed = [];
+					foreach ($docsLink as $docLink) {
+						if ($docLink->isConfirmed()) {
+							$confirmed[] = Html::encode($docLink->doc->name);
+						} else {
+							$notConfirmed[] = Html::encode($docLink->doc->name);
+						}
+					}
+					$content = '';
+					if (!empty($notConfirmed)) {
+						$content .= Html::tag('strong', Yii::t('issue', 'To Do: {count}', [
+								'count' => count($notConfirmed),
+							]))
+							. Html::ul($notConfirmed, [
+								'class' => ['mb-0'],
+							]);
+					}
+					if (!empty($confirmed)) {
+						$content .= Html::tag('strong', Yii::t('issue', 'Confirmed: {count}', [
+								'count' => count($confirmed),
+							]))
+							. Html::ul($confirmed, [
+								'class' => ['mb-0 text-line_trough'],
+							]);
+					}
+					return $content;
+				},
+				'format' => 'html',
 				'filter' => SummonSearch::getDocTypesNames(),
 				'filterType' => GridView::FILTER_SELECT2,
 				'filterWidgetOptions' => [
@@ -182,10 +229,22 @@ class SummonGrid extends GridView {
 				],
 				'options' => [
 					'style' => [
-						'min-width' => '200px',
+						'min-width' => '250px',
 					],
 				],
 				'visible' => $this->withDocs,
+			],
+			[
+				'attribute' => 'docsCountSummary',
+				'noWrap' => true,
+				'value' => function(Summon $model):string{
+					$summary = $model->getDocsCountSummary();
+					if($summary){
+						return $summary;
+					}
+					return '';
+				},
+				'visible' => $this->withDocsCountSummary,
 			],
 			[
 				'attribute' => 'start_at',

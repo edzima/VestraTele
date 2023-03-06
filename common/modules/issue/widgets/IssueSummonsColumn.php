@@ -47,8 +47,17 @@ class IssueSummonsColumn extends DataColumn {
 
 	public function getDataCellValue($model, $key, $index): string {
 		assert($model instanceof IssueInterface);
-		$issue = $model->getIssueModel();
-		$summons = $issue->summons;
+		$summons = $model->getIssueModel()->summons;
+
+		$content = $this->summonCountContent($summons);
+		$docs = $this->docsCountContent($summons);
+		if (!empty($docs)) {
+			$content .= '<br>' . $docs;
+		}
+		return $content;
+	}
+
+	public function summonCountContent(array $summons): string {
 		if (empty($summons)) {
 			return 0;
 		}
@@ -59,6 +68,27 @@ class IssueSummonsColumn extends DataColumn {
 			return count($summons);
 		}
 		return Html::tag('strong', count($realized)) . ' / ' . count($summons);
+	}
+
+	/**
+	 * @param Summon[] $summons
+	 * @return string
+	 */
+	private function docsCountContent(array $summons): ?string {
+		$docsCount = 0;
+		$confirmedCount = 0;
+		foreach ($summons as $summon) {
+			foreach ($summon->docsLink as $docLink) {
+				$docsCount++;
+				if ($docLink->isConfirmed()) {
+					$confirmedCount++;
+				}
+			}
+		}
+		if (!$docsCount) {
+			return null;
+		}
+		return $confirmedCount . ' / ' . $docsCount;
 	}
 
 }

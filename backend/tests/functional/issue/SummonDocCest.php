@@ -20,7 +20,7 @@ class SummonDocCest {
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->seeResponseCodeIs(403);
 		$I->amOnPage(SummonCest::ROUTE_INDEX);
-		$I->dontSeeLink('Docs');
+		$I->dontSeeMenuSubLink('Docs');
 	}
 
 	public function checkIndexPageAsSummonManager(SummonIssueManager $I): void {
@@ -28,9 +28,11 @@ class SummonDocCest {
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->seeResponseCodeIsSuccessful();
 		$I->amOnPage(SummonCest::ROUTE_INDEX);
-		$I->seeLink('Summon Docs');
-		$I->click('Summon Docs');
-		$I->seeInCurrentUrl(static::ROUTE_INDEX);
+		$I->seeMenuSubLink('Summon Docs Types');
+		$I->clickMenuSubLink('Summon Docs Types');
+		$I->seeInGridHeader('Name');
+		$I->seeInGridHeader('Priority');
+		$I->seeInGridHeader('Summon Types');
 	}
 
 	public function checkCreate(SummonIssueManager $I): void {
