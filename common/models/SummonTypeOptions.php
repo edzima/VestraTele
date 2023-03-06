@@ -61,6 +61,7 @@ class SummonTypeOptions extends Model {
 			'issue_id',
 			'type_id',
 			'status',
+			'updater_id',
 		];
 	}
 
@@ -106,10 +107,14 @@ class SummonTypeOptions extends Model {
 			'status',
 			'created_at',
 			'updated_at',
+			'updater_id'
 		];
 	}
 
 	protected static function getSummonAttributeLabel(string $attribute): string {
+		if ($attribute === 'deadline_at') {
+			return Yii::t('common', 'Deadline At(Day)');
+		}
 		return static::summonInstance()->getAttributeLabel($attribute);
 	}
 

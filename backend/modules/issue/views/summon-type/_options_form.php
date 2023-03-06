@@ -5,7 +5,6 @@ use common\models\SummonTypeOptions;
 /* @var $this yii\web\View */
 /* @var $model SummonTypeOptions */
 /* @var $form yii\widgets\ActiveForm */
-
 ?>
 
 <div class="summon-type-options-form">

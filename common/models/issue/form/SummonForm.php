@@ -142,6 +142,8 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			'term' => Yii::t('common', 'Term'),
 			'sendEmailToContractor' => Yii::t('issue', 'Send Email To Contractor'),
 			'start_at' => Yii::t('issue', 'Date At'),
+			'deadline_at' => Yii::t('common','Deadline At(Day)'),
+			'updater_id' => Yii::t('common','Updater'),
 		]);
 	}
 

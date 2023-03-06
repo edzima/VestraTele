@@ -225,6 +225,7 @@ return [
 	'Start at' => 'Data Zlecenia',
 	'Term' => 'Termin',
 	'Deadline at' => 'Termin',
+	'Deadline At(Day)' => 'Termin (Dzień)',
 	'Update Summon: #{id}' => 'Edycja zlecenia: #{id}',
 	'Office' => 'Biuro',
 	'Create note for settlement: {typeName}' => 'Dodaj notatkę do rozliczenia: {typeName}',
