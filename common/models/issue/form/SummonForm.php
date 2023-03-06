@@ -142,8 +142,8 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			'term' => Yii::t('common', 'Term'),
 			'sendEmailToContractor' => Yii::t('issue', 'Send Email To Contractor'),
 			'start_at' => Yii::t('issue', 'Date At'),
-			'deadline_at' => Yii::t('common','Deadline At(Day)'),
-			'updater_id' => Yii::t('common','Updater'),
+			'deadline_at' => Yii::t('common', 'Deadline At(Day)'),
+			'updater_id' => Yii::t('common', 'Updater'),
 		]);
 	}
 
@@ -353,6 +353,9 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		}
 		if ($attribute === 'type_id') {
 			return false;
+		}
+		if ($attribute === 'status') {
+			return true;
 		}
 
 		return $this->getType()->isForFormAttribute($attribute);
