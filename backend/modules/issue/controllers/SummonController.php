@@ -153,6 +153,7 @@ class SummonController extends Controller {
 		$form->setModel($model);
 		$form->status = Summon::STATUS_REALIZED;
 		$form->updater_id = Yii::$app->user->getId();
+		$form->realized_at = DATE_ATOM;
 		if ($form->save()) {
 			Flash::add(Flash::TYPE_SUCCESS,
 				Yii::t('issue', 'Success. Mark Summon as Realized.')
