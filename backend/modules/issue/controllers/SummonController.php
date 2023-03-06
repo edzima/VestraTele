@@ -153,14 +153,11 @@ class SummonController extends Controller {
 		$form->setModel($model);
 		$form->status = Summon::STATUS_REALIZED;
 		$form->updater_id = Yii::$app->user->getId();
-		$form->realized_at = date('Y-m-d H:i:00');
+		$form->realized_at = date('Y-m-d H:i:');
 		if ($form->save()) {
 			Flash::add(Flash::TYPE_SUCCESS,
 				Yii::t('issue', 'Success. Mark Summon as Realized.')
 			);
-		}else{
-			var_dump($form->realized_at);
-			var_dump($form->getErrors());
 		}
 		return $this->redirect($returnUrl
 			? Url::to($returnUrl)
