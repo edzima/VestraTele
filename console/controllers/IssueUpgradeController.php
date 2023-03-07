@@ -20,7 +20,7 @@ class IssueUpgradeController extends Controller {
 			'confirmed_user_id' => null,
 		]);
 		$summons = Summon::find()
-			->select(['owner_id', 'realized_at', 'id'])
+			->select(['owner_id', 'realized_at', 'updated_at', 'id'])
 			->andWhere(['status' => Summon::STATUS_REALIZED])
 			->joinWith('docsLink')
 			->andWhere(SummonDocLink::tableName() . '.confirmed_user_id IS NULL')
@@ -28,9 +28,12 @@ class IssueUpgradeController extends Controller {
 			->all();
 		$count = 0;
 		foreach ($summons as $data) {
+			$confirmed_at = !empty($data['realized_at'])
+				? $data['realized_at']
+				: $data['updated_at'];
 			$count += SummonDocLink::updateAll([
 				'confirmed_user_id' => $data['owner_id'],
-				'confirmed_at' => $data['realized_at'],
+				'confirmed_at' => $confirmed_at,
 			], [
 				'summon_id' => $data['id'],
 			]);
