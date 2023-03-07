@@ -6,8 +6,10 @@ use common\modules\issue\widgets\SummonDocsLinkActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use frontend\helpers\Html;
 use frontend\helpers\Url;
+use frontend\widgets\GridView;
 use frontend\widgets\IssueColumn;
 use frontend\widgets\IssueParentTypeHeader;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $searchModel SummonDocLinkSearch */
@@ -65,15 +67,60 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'doc.name',
 				'label' => Yii::t('issue', 'Doc Name'),
 				'filter' => $searchModel->getDocsNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('issue', 'Doc Name'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'multiple' => true,
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			//	'deadline_at:date',
-			'doneUser',
+			[
+
+			],
+			[
+				'attribute' => 'done_user_id',
+				'value' => 'doneUser',
+				'filter' => $searchModel->getDoneUsersNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => $searchModel->getAttributeLabel('done_user_id'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+			],
 			[
 				'attribute' => 'done_at',
 				'format' => 'date',
 				'noWrap' => true,
 			],
-			'confirmedUser',
+			[
+				'attribute' => 'confirmed_user_id',
+				'value' => 'confirmedUser',
+				'filter' => $searchModel->getConfirmedUsersNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => $searchModel->getAttributeLabel('confirmed_user_id'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+			],
 			[
 				'attribute' => 'confirmed_at',
 				'format' => 'date',

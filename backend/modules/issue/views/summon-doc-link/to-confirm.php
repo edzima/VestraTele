@@ -8,6 +8,7 @@ use common\models\issue\search\SummonDocLinkSearch;
 use common\models\issue\SummonDocLink;
 use common\modules\issue\widgets\SummonDocsLinkActionColumn;
 use common\widgets\grid\CustomerDataColumn;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $searchModel SummonDocLinkSearch */
@@ -64,21 +65,55 @@ $this->params['issueParentTypeNav'] = [
 				'value' => 'doc.name',
 				'label' => Yii::t('issue', 'Doc Name'),
 				'filter' => $searchModel->getDocsNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('issue', 'Doc Name'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'multiple' => true,
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			[
 				'attribute' => 'done_user_id',
 				'value' => 'doneUser',
 				'filter' => $searchModel->getDoneUsersNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => $searchModel->getAttributeLabel('done_user_id'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			[
 				'attribute' => 'done_at',
 				'format' => 'date',
 				'noWrap' => true,
-			],			[
+			], [
 				'attribute' => 'summonOwnerId',
 				'value' => 'summon.owner',
 				'label' => Yii::t('common', 'Owner'),
 				'filter' => $searchModel->getSummonOwnersNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('common', 'Owner'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			[
 				'class' => SummonDocsLinkActionColumn::class,

@@ -68,6 +68,18 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'doc.name',
 				'label' => Yii::t('issue', 'Doc Name'),
 				'filter' => $searchModel->getDocsNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => Yii::t('issue', 'Doc Name'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'multiple' => true,
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
 			],
 			//	'deadline_at:date',
 			[

@@ -46,12 +46,13 @@ class SummonDocLinkSearch extends SummonDocLink implements
 		return [
 			[
 				[
-					'doc_type_id', 'summon_id', 'issue_id', 'summonTypeId', 'issueParentTypeId',
+					'summon_id', 'issue_id', 'summonTypeId', 'issueParentTypeId',
 					'summonContractorId', 'summonOwnerId', 'done_user_id', 'confirmed_user_id',
 				], 'integer',
 			],
 			['docName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['customerName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
+			['doc_type_id','safe'],
 			['customerPhone', PhoneValidator::class],
 		];
 	}
@@ -63,6 +64,7 @@ class SummonDocLinkSearch extends SummonDocLink implements
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
 	}
+
 
 	/**
 	 * Creates data provider instance with search query applied
