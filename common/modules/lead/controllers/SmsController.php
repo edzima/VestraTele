@@ -3,11 +3,24 @@
 namespace common\modules\lead\controllers;
 
 use common\helpers\Flash;
+use common\models\user\User;
 use common\modules\lead\models\LeadMultipleSmsForm;
 use common\modules\lead\models\LeadSmsForm;
 use Yii;
+use yii\filters\VerbFilter;
 
 class SmsController extends BaseController {
+
+	public function behaviors(): array {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'welcome' => ['POST'],
+				],
+			],
+		];
+	}
 
 	public function actionPush(int $id) {
 		$lead = $this->findLead($id);
@@ -16,7 +29,7 @@ class SmsController extends BaseController {
 				Yii::t('lead', 'Try send sms to Lead: {lead} without Phone.', [
 					'lead' => $lead->getName(),
 				]));
-			return $this->redirect(['lead/index']);
+			return $this->redirectLead($id);
 		}
 
 		$model = new LeadSmsForm($lead);
@@ -66,5 +79,53 @@ class SmsController extends BaseController {
 		return $this->render('push-mutliple', [
 			'model' => $model,
 		]);
+	}
+
+	public function actionWelcome(int $id) {
+		$lead = $this->findLead($id);
+		if (empty($lead->getPhone())) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('lead', 'Try send sms to Lead: {lead} without Phone.', [
+					'lead' => $lead->getName(),
+				]));
+			return $this->redirect(['lead/view', 'id' => $id]);
+		}
+		$template = Yii::$app->messageTemplate->getTemplate('lead.sms.welcome');
+		if ($template === null) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('lead', 'Not Found Message template for Welcome SMS. Key: "lead.sms.welcome"')
+			);
+			return $this->redirect(['/message-templates/default']);
+		}
+		/**
+		 * @var User $user
+		 */
+		$user = Yii::$app->user->getIdentity();
+		$phone = $user->getPhone();
+		if (empty($phone)) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('lead', 'You has not set phone.', [
+					'user' => $user->getFullName(),
+				])
+			);
+			return $this->redirectLead($id);
+		}
+		$model = new LeadSmsForm($lead);
+		$model->owner_id = $user->getId();
+		$template->parseBody([
+			'userName' => $user->profile->firstname,
+			'userPhone' => Yii::$app->formatter->asTel($phone, [
+				'asLink' => false,
+			]),
+		]);
+		$model->message = $template->getBody();
+		if (!empty($model->pushJob())) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('lead', 'Success add SMS: {message} to send queue.', [
+					'message' => $model->message,
+				]));
+		}
+		return $this->redirectLead($lead->getId());
+
 	}
 }

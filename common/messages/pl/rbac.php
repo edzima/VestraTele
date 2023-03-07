@@ -44,6 +44,7 @@ return [
 	'lead.duplicate' => 'Leads - Duplikaty',
 	'lead.import' => 'Leads - Import',
 	'lead.market' => 'Leads - Giełda',
+	'lead.sms.welcome' => 'Leads - Sms Powitalny',
 	'lead.status' => 'Leads - Statusy',
 	'logs' => 'Logi',
 	'manager' => 'Manager (Panel Admina)',
