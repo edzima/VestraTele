@@ -5,6 +5,7 @@ namespace common\models\issue\form;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\forms\HiddenFieldsModel;
 use common\models\issue\Issue;
+use common\models\issue\IssueInterface;
 use common\models\issue\IssueUser;
 use common\models\issue\Summon;
 use common\models\issue\SummonDoc;
@@ -65,6 +66,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 	private ?Summon $model = null;
 	private ?array $_contractorIds = null;
 	private ?SummonType $type = null;
+	private ?IssueInterface $_issue = null;
 
 	public function rules(): array {
 		return [
@@ -145,6 +147,13 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			'deadline_at' => Yii::t('common', 'Deadline At(Day)'),
 			'updater_id' => Yii::t('common', 'Updater'),
 		]);
+	}
+
+	public function getIssue():?IssueInterface{
+		if($this->_issue === null || $this->_issue->getId() !== $this->issue_id){
+			$this->_issue = Issue::findOne($this->issue_id);
+		}
+		return $this->_issue;
 	}
 
 	public function getModel(): Summon {
