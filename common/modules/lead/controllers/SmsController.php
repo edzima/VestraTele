@@ -7,8 +7,20 @@ use common\models\user\User;
 use common\modules\lead\models\LeadMultipleSmsForm;
 use common\modules\lead\models\LeadSmsForm;
 use Yii;
+use yii\filters\VerbFilter;
 
 class SmsController extends BaseController {
+
+	public function behaviors(): array {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'welcome' => ['POST'],
+				],
+			],
+		];
+	}
 
 	public function actionPush(int $id) {
 		$lead = $this->findLead($id);
@@ -81,9 +93,9 @@ class SmsController extends BaseController {
 		$template = Yii::$app->messageTemplate->getTemplate('lead.sms.welcome');
 		if ($template === null) {
 			Flash::add(Flash::TYPE_WARNING,
-				Yii::t('lead', 'Not Found Message template for Welcome SMS.')
+				Yii::t('lead', 'Not Found Message template for Welcome SMS. Key: "lead.sms.welcome"')
 			);
-			return $this->redirect(['/message-template/default']);
+			return $this->redirect(['/message-templates/default']);
 		}
 		/**
 		 * @var User $user
@@ -92,7 +104,7 @@ class SmsController extends BaseController {
 		$phone = $user->getPhone();
 		if (empty($phone)) {
 			Flash::add(Flash::TYPE_WARNING,
-				Yii::t('lead', 'User: {user} has not set phone.', [
+				Yii::t('lead', 'You has not set phone.', [
 					'user' => $user->getFullName(),
 				])
 			);
@@ -100,14 +112,20 @@ class SmsController extends BaseController {
 		}
 		$model = new LeadSmsForm($lead);
 		$model->owner_id = $user->getId();
-		$model->message = $template->getBody();
 		$template->parseBody([
 			'userName' => $user->profile->firstname,
-			'userPhone' => Yii::$app->formatter->asTel('', [
+			'userPhone' => Yii::$app->formatter->asTel($phone, [
 				'asLink' => false,
 			]),
 		]);
+		$model->message = $template->getBody();
+		if (!empty($model->pushJob())) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('lead', 'Success add SMS: {message} to send queue.', [
+					'message' => $model->message,
+				]));
+		}
+		return $this->redirectLead($lead->getId());
 
-		return $this->redirectLead($id);
 	}
 }

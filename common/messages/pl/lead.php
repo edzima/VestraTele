@@ -377,4 +377,7 @@ return [
 	'In progress' => 'W trakcie realizacji',
 	'Calendar Background' => 'Kalendarz - Kolor',
 	'Update Reminder for Lead: {lead}' => 'Edytuj Przypomnienie Lead: {lead}',
+	'Not Found Message template for Welcome SMS. Key: "lead.sms.welcome"' => 'Nie znaleziono szablonu Wiadomości dla SMS Powitalnego. Klucz: "lead.sms.welcome"',
+	'You has not set phone.' => 'Nie masz ustawionego Numeru Telefonu. Zaktualizuj ustawienia.',
+	'Send Send Welcome SMS?' => 'Czy napewno wysłać powitalny SMS?',
 ];

@@ -90,7 +90,15 @@ YiiAsset::register($this);
 
 		<?= Yii::$app->user->can(User::PERMISSION_LEAD_SMS_WELCOME)
 			? Html::a(Yii::t('lead', 'Send Welcome SMS'), ['sms/welcome', 'id' => $model->getId()],
-				['class' => 'btn btn-primary'])
+				[
+					'class' => 'btn btn-primary',
+					'data' => [
+						'method' => 'POST',
+						'confirm' => Yii::t('lead', 'Send Send Welcome SMS?', [
+							'lead' => $model->getName(),
+						]),
+					],
+				])
 			: ''
 		?>
 
