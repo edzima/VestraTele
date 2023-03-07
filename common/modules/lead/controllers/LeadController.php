@@ -76,6 +76,7 @@ class LeadController extends BaseController {
 
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {
 			$query = $dataProvider->query;
+			$query->orderBy(['date_at' => SORT_DESC]);
 			$columns = [
 				'name',
 				'phone',
