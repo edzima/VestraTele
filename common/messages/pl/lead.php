@@ -219,6 +219,7 @@ return [
 	'Create Report' => 'Dodaj Raport',
 	'Send SMS to Lead: {lead}' => 'Wyślij SMS do: {lead}',
 	'Send SMS' => 'Wyślij SMS',
+	'Send Welcome SMS' => 'Powitalny SMS',
 	'Send' => 'Wyślij',
 	'Success add SMS: {message} to send queue.' => 'SMS: {message} skierowano do wysłania.',
 	'Success add: {count} SMS: {message} to send queue.' => 'Dodano {count} SMS: {message} do wysłania',
