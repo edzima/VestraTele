@@ -62,7 +62,7 @@ return [
 								if ($action->id === 'push-multiple') {
 									return Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS);
 								}
-								return Yii::$app->user->can(User::PERMISSION_SMS);
+								return Yii::$app->user->can(User::PERMISSION_SMS) || Yii::$app->user->can(User::PERMISSION_LEAD_SMS_WELCOME);
 							}
 							return true;
 						},
