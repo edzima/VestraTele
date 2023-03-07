@@ -15,10 +15,17 @@ use yii\helpers\Console;
 
 class IssueUpgradeController extends Controller {
 
+	public function actionSummonsRealizedAt(): void {
+		Console::output(Summon::updateAll([
+			'realized_at' => new Expression('FROM_UNIXTIME(updated_at)'),
+		], [
+			'status' => Summon::STATUS_REALIZED,
+			'realized_at' => null,
+		])
+		);
+	}
+
 	public function actionSummonsRealizedDocs(): void {
-		SummonDocLink::updateAll([
-			'confirmed_user_id' => null,
-		]);
 		$summons = Summon::find()
 			->select(['owner_id', 'realized_at', 'updated_at', 'id'])
 			->andWhere(['status' => Summon::STATUS_REALIZED])
@@ -30,7 +37,7 @@ class IssueUpgradeController extends Controller {
 		foreach ($summons as $data) {
 			$confirmed_at = !empty($data['realized_at'])
 				? $data['realized_at']
-				: $data['updated_at'];
+				: date(DATE_ATOM, $data['updated_at']);
 			$count += SummonDocLink::updateAll([
 				'confirmed_user_id' => $data['owner_id'],
 				'confirmed_at' => $confirmed_at,
