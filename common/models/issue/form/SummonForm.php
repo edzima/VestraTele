@@ -167,6 +167,9 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		if ($options->title) {
 			$this->title = $options->title;
 		}
+		if ($options->sendEmailToContractor !== null) {
+			$this->sendEmailToContractor = $options->sendEmailToContractor;
+		}
 		$this->term = $options->term;
 	}
 

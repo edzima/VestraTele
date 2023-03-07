@@ -48,6 +48,7 @@ YiiAsset::register($this);
 				'model' => $model->getOptions(),
 				'attributes' => [
 					'showOnTop:boolean',
+					'sendEmailToContractor:boolean',
 					'title',
 					[
 						'attribute' => 'status',

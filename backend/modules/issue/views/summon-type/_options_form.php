@@ -12,6 +12,8 @@ use common\models\SummonTypeOptions;
 
 	<?= $form->field($model, 'showOnTop')->checkbox() ?>
 
+	<?= $form->field($model, 'sendEmailToContractor')->checkbox() ?>
+
 	<?= $form->field($model, 'term')->dropDownList(SummonTypeOptions::getTermsNames()) ?>
 
 	<?= $form->field($model, 'formAttributes')->dropDownList(

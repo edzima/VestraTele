@@ -19,11 +19,12 @@ class SummonTypeOptions extends Model {
 	public ?string $term = null;
 	public ?string $title = null;
 	public ?int $status = null;
+	public ?bool $sendEmailToContractor = null;
 
 	public function rules(): array {
 		return [
 			[['status'], 'integer'],
-			[['showOnTop'], 'boolean'],
+			[['showOnTop', 'sendEmailToContractor'], 'boolean'],
 			['title', 'string'],
 			['formAttributes', 'in', 'range' => array_keys(static::formAttributesNames()), 'allowArray' => true],
 			['visibleSummonFields', 'in', 'range' => array_keys(static::visibleSummonAttributesNames()), 'allowArray' => true],
@@ -107,7 +108,7 @@ class SummonTypeOptions extends Model {
 			'status',
 			'created_at',
 			'updated_at',
-			'updater_id'
+			'updater_id',
 		];
 	}
 
@@ -145,6 +146,7 @@ class SummonTypeOptions extends Model {
 			'title' => Yii::t('common', 'Title'),
 			'term' => Yii::t('common', 'Term'),
 			'status' => Yii::t('common', 'Status'),
+			'sendEmailToContractor' => Yii::t('issue', 'Send Email To Contractor'),
 		];
 	}
 
