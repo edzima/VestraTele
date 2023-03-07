@@ -6,8 +6,9 @@ use backend\modules\issue\models\SummonForm;
 /* @var $this yii\web\View */
 /* @var $model SummonForm */
 
-$this->title = Yii::t('common', 'Update Summon {type}', [
+$this->title = Yii::t('common', 'Update Summon {type} in Issue: {issue}', [
 	'type' => $model->getModel()->typeName,
+	'issue' => $model->getModel()->getIssueName(),
 ]);
 $this->params['breadcrumbs'] = Breadcrumbs::issue($model->getModel());
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Summons'), 'url' => ['index']];

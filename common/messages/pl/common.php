@@ -314,6 +314,7 @@ return [
 	'Calendar Background' => 'Kalendarz - Kolor',
 	'Summon: {type}' => 'Zlecenie: {type}',
 	'Update Summon {type}' => 'Edycja Zlecenia: {type}',
+	'Update Summon {type} in Issue: {issue}' => 'Edycja Zlecenia ({type}) w Sprawie: {issue}',
 	'Default' => 'Domyślne',
 	'Show on Top' => 'Pokazuj na górze',
 	'Form Attributes' => 'Pola Formularza',
