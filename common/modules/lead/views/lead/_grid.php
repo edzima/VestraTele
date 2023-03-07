@@ -113,6 +113,7 @@ foreach (LeadSearch::questions() as $question) {
 				'size' => Select2::SIZE_SMALL,
 				'pluginOptions' => [
 					'allowClear' => true,
+					'multiple' => true,
 					'dropdownAutoWidth' => true,
 				],
 			],
