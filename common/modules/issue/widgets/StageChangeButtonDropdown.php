@@ -37,8 +37,8 @@ class StageChangeButtonDropdown extends ButtonDropdown {
 	}
 
 	public function defaultItems(): array {
-		$stages = IssueStageChangeForm::getStagesNames($this->model->getIssueType()->id);
-		unset($stages[$this->model->getIssueStage()->id]);
+		$stages = IssueStageChangeForm::getStagesNames($this->model->getIssueTypeId());
+		unset($stages[$this->model->getIssueStageId()]);
 		asort($stages);
 		$items = [];
 		foreach ($stages as $id => $stage) {

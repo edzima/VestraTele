@@ -121,6 +121,7 @@ class IssueType extends ActiveRecord {
 				->orderBy('name')
 				->indexBy('id')
 				->with('childs')
+				->with('stages')
 				->all();
 		}
 		return static::$TYPES;

@@ -94,7 +94,6 @@ abstract class IssueSearch extends Model
 	}
 
 	public static function getSummonsStatusesNames(): array {
-		$statuses = Summon::getStatusesNames();
 		$statuses = [
 				static::SUMMON_ALL_REALIZED => Yii::t('issue', 'All Realized'),
 				static::SUMMON_SOME_ACTIVE => Yii::t('issue', 'Some Active'),
@@ -105,10 +104,6 @@ abstract class IssueSearch extends Model
 				static::SUMMON_DOCS_SOME_TO_CONFIRM => Yii::t('issue', 'To Confirm'),
 			],
 		];
-		return [
-				static::SUMMON_ALL_REALIZED => Yii::t('issue', 'All Realized'),
-				static::SUMMON_SOME_ACTIVE => Yii::t('issue', 'Some Active'),
-			] + Summon::getStatusesNames();
 	}
 
 	public static function getIssueUserTypesNames(): array {
@@ -294,7 +289,7 @@ abstract class IssueSearch extends Model
 			'stage.types',
 			'type',
 			'issueNotes',
-			'summons',
+			'summons.docsLink',
 		];
 	}
 
