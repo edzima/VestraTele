@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models;
 
+use common\components\message\MessageTemplateKeyHelper;
 use common\models\message\QueueSmsForm;
 use common\modules\lead\models\forms\ReportForm;
 use console\jobs\LeadSmsSendJob;
@@ -10,6 +11,8 @@ use Yii;
 use yii\validators\CompareValidator;
 
 class LeadSmsForm extends QueueSmsForm {
+
+	protected const KEY_ISSUE_TYPES = 'type';
 
 	public const SCENARIO_CHANGE_STATUS = 'change-status';
 
@@ -22,6 +25,16 @@ class LeadSmsForm extends QueueSmsForm {
 		$this->status_id = $lead->getStatusId();
 		$this->phone = $lead->getPhone();
 		parent::__construct($config);
+	}
+
+	public static function isForLeadType(string $key, int $id): bool {
+		$ids = (array) static::getTypesIds($key);
+		return empty($ids)
+			|| in_array($id, $ids);
+	}
+
+	protected static function getTypesIds(string $key) {
+		return MessageTemplateKeyHelper::getValue($key, static::KEY_ISSUE_TYPES);
 	}
 
 	public function attributeLabels(): array {

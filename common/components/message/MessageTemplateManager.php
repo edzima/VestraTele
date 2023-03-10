@@ -3,6 +3,7 @@
 namespace common\components\message;
 
 use common\models\message\IssueMessagesForm;
+use common\modules\lead\models\LeadSmsForm;
 use Yii;
 use yii\data\ActiveDataProvider;
 use ymaker\email\templates\components\TemplateManager;
@@ -52,8 +53,33 @@ class MessageTemplateManager extends TemplateManager implements KeyMessageTempla
 				return $template;
 			}
 		}
-		Yii::warning("Not found templates like key: $key for $language for Issue Type ID: $typeId.", 'messageTemplate');
+		Yii::warning("Not found templates like key: $key for $language for Issue Type ID: $typeId.", __FUNCTION__);
 
 		return null;
+	}
+
+	/**
+	 * @param string $key
+	 * @param int $typeId
+	 * @param string|null $language
+	 * @return MessageTemplate[]
+	 */
+	public function getLeadTypeTemplatesLikeKey(string $key, int $typeId, string $language = null): array {
+		$templates = $this->getTemplatesLikeKey($key, $language);
+		if (empty($templates)) {
+			return [];
+		}
+		$typeTemplates = array_filter(
+			$templates,
+			function (MessageTemplate $messageTemplate, string $key) use ($typeId): bool {
+				return LeadSmsForm::isForLeadType($key, $typeId);
+			},
+			ARRAY_FILTER_USE_BOTH
+		);
+
+		if (empty($typeTemplates)) {
+			Yii::warning("Not found templates like key: $key for $language for Lead Type ID: $typeId.", __FUNCTION__);
+		}
+		return $typeTemplates;
 	}
 }

@@ -8,6 +8,7 @@ use common\modules\lead\models\LeadMultipleSmsForm;
 use common\modules\lead\models\LeadSmsForm;
 use Yii;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 
 class SmsController extends BaseController {
 
@@ -81,7 +82,7 @@ class SmsController extends BaseController {
 		]);
 	}
 
-	public function actionWelcome(int $id) {
+	public function actionTemplate(int $id, string $key) {
 		$lead = $this->findLead($id);
 		if (empty($lead->getPhone())) {
 			Flash::add(Flash::TYPE_WARNING,
@@ -90,13 +91,7 @@ class SmsController extends BaseController {
 				]));
 			return $this->redirect(['lead/view', 'id' => $id]);
 		}
-		$template = Yii::$app->messageTemplate->getTemplate('lead.sms.welcome');
-		if ($template === null) {
-			Flash::add(Flash::TYPE_WARNING,
-				Yii::t('lead', 'Not Found Message template for Welcome SMS. Key: "lead.sms.welcome"')
-			);
-			return $this->redirect(['/message-templates/default']);
-		}
+
 		/**
 		 * @var User $user
 		 */
@@ -110,6 +105,12 @@ class SmsController extends BaseController {
 			);
 			return $this->redirectLead($id);
 		}
+
+		$template = Yii::$app->messageTemplate->getTemplate($key);
+		if ($template === null) {
+			throw new NotFoundHttpException('Not Found Message Template for Key: ' . $key);
+		}
+
 		$model = new LeadSmsForm($lead);
 		$model->owner_id = $user->getId();
 		$template->parseBody([
@@ -126,6 +127,5 @@ class SmsController extends BaseController {
 				]));
 		}
 		return $this->redirectLead($lead->getId());
-
 	}
 }

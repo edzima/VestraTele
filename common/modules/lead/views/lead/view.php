@@ -10,6 +10,7 @@ use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadDialersGridView;
 use common\modules\lead\widgets\LeadReportWidget;
+use common\modules\lead\widgets\LeadSmsBtnWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
 use common\modules\lead\widgets\ShortReportStatusesWidget;
 use common\modules\reminder\widgets\ReminderGridWidget;
@@ -88,23 +89,11 @@ YiiAsset::register($this);
 			: ''
 		?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_LEAD_SMS_WELCOME)
-			? Html::a(Yii::t('lead', 'Send Welcome SMS'), ['sms/welcome', 'id' => $model->getId()],
-				[
-					'class' => 'btn btn-primary',
-					'data' => [
-						'method' => 'POST',
-						'confirm' => Yii::t('lead', 'Send Send Welcome SMS?', [
-							'lead' => $model->getName(),
-						]),
-					],
-				])
-			: ''
-		?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_SMS)
-			? Html::a(Yii::t('lead', 'Send SMS'), ['sms/push', 'id' => $model->getId()],
-				['class' => 'btn btn-success'])
+		<?= Yii::$app->user->can(User::PERMISSION_LEAD_SMS_WELCOME)
+			? LeadSmsBtnWidget::widget([
+				'model' => $model,
+			])
 			: ''
 		?>
 
