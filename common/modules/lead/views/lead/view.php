@@ -22,6 +22,12 @@ use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
+# 73
+# 49
+# 206
+
+
+
 /* @var $this yii\web\View */
 /* @var $model ActiveLead */
 /* @var $sameContacts LeadInterface[] */
