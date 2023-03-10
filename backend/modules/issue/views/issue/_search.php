@@ -7,6 +7,7 @@ use common\widgets\address\AddressSearchWidget;
 use common\widgets\DateWidget;
 use kartik\select2\Select2;
 use yii\widgets\ActiveForm;
+use common\models\user\Worker;
 
 /* @var $this yii\web\View */
 /* @var $model IssueSearch */
@@ -144,7 +145,7 @@ use yii\widgets\ActiveForm;
 			: ''
 		?>
 
-		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ?
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_SEARCH_WITH_SETTLEMENTS) ?
 			$form->field($model, 'onlyWithSettlements', ['options' => ['class' => 'col-md-2']])->dropDownList(Html::booleanDropdownList(), [
 				'prompt' => Yii::t('common', 'All'),
 			])

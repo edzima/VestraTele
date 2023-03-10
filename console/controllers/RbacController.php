@@ -61,6 +61,9 @@ class RbacController extends Controller {
 		Worker::PERMISSION_CALCULATION_PROBLEMS => [
 			Worker::ROLE_BOOKKEEPER,
 		],
+		Worker::PERMISSION_ISSUE_SEARCH_WITH_SETTLEMENTS => [
+			User::ROLE_BOOKKEEPER,
+		],
 		User::PERMISSION_EXPORT,
 		User::PERMISSION_ISSUE,
 		Worker::PERMISSION_ISSUE_CLAIM,

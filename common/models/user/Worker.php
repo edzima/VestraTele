@@ -37,6 +37,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_ISSUE_STAGE_MANAGER = 'issue.stage.manager';
 	public const PERMISSION_ISSUE_TAG_MANAGER = 'issue.tag.manager';
 	public const PERMISSION_ISSUE_TYPE_MANAGER = 'issue.type.manager';
+	public const PERMISSION_ISSUE_SEARCH_WITH_SETTLEMENTS = 'issue.search.with-settlements';
 
 	public const PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE = 'issue.message.note.issue';
 	public const PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SUMMON = 'issue.message.note.summon';
@@ -54,7 +55,6 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_PAY_ALL_PAID = 'pay.all-paid';
 	public const PERMISSION_POTENTIAL_CLIENT = 'potential-client';
 	public const PERMISSION_SETTLEMENT_DELETE_NOT_SELF = 'settlement.delete-not-self';
-
 	private static $USER_NAMES = [];
 
 	public function getParent(): ActiveQuery {

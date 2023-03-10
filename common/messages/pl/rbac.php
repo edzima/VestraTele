@@ -27,6 +27,7 @@ return [
 	'issue.message.note.issue' => 'Powiadomienia Mailowe w Notatkach do Sprawy',
 	'issue.message.note.summon' => 'Powiadomienia Mailowe w Notatkach do Zlecenia',
 	'issue.message.note.settlement' => 'Powiadomienia Mailowe w Notatkach do Rozliczenia',
+	'issue.search.with-settlements' => 'Sprawy - Wyszukiwanie: Z rozliczeniami',
 	'issue.stage.change' => 'Sprawy - zmiana etapów',
 	'issue.stage.manager' => 'Etapy Spraw (Manager)',
 	'issue.tag.manager' => 'Tagi Spraw (Mangaer)',
