@@ -23,7 +23,7 @@ use yii\data\DataProviderInterface;
 /* @var $calculationsDataProvider DataProviderInterface */
 /* @var $summonDataProvider DataProviderInterface */
 
-$this->title = $model->longId;
+$this->title = $model->getIssueModel()->customer->getFullName() . ' - ' . $model->getIssueName();
 $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 ?>

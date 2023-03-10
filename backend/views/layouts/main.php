@@ -30,11 +30,7 @@ use yii\web\View;
 		<meta name="msapplication-TileColor" content="#4894cc">
 		<meta name="theme-color" content="#4894cc">
 		<?php $this->registerCsrfMetaTags() ?>
-		<title><?= Html::encode(strtr('{appName} - {title}', [
-					'{appName}' => Yii::$app->name,
-					'{title}' => $this->title,
-				])
-			) ?></title>
+		<title><?= $this->title ?></title>
 		<?php $this->head() ?>
 	</head>
 	<?= Html::beginTag('body', [
