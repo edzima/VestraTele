@@ -12,6 +12,14 @@ use ymaker\email\templates\queries\EmailTemplateQuery;
 
 class MessageTemplateManager extends TemplateManager implements KeyMessageTemplateManager, IssueMessageManager {
 
+	public function getTemplate($key, $language = null, $default = null): ?MessageTemplate {
+		$template = parent::getTemplate($key, $language, $default);
+		if ($template) {
+			return MessageTemplate::buildFromEntity($template);
+		}
+		return null;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */

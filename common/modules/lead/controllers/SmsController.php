@@ -119,7 +119,7 @@ class SmsController extends BaseController {
 				'asLink' => false,
 			]),
 		]);
-		$model->message = $template->getBody();
+		$model->message = $template->getSmsMessage();
 		if (!empty($model->pushJob())) {
 			Flash::add(Flash::TYPE_SUCCESS,
 				Yii::t('lead', 'Success add SMS: {message} to send queue.', [
