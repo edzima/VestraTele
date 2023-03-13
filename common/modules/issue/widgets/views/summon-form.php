@@ -99,7 +99,7 @@ use yii\web\View;
 			<?= $form->field($model, 'deadline_at', [
 				'options' => [
 					'id' => 'deadline_at_field',
-					'class' => 'col-md-2' . ($model->getModel()->isNewRecord ? ' hidden' : ''),
+					'class' => 'col-md-2' . ($model->getModel()->isNewRecord && $model->term !== SummonForm::TERM_CUSTOM ? ' hidden' : ''),
 				],
 			])
 				->widget(DateWidget::class) ?>
