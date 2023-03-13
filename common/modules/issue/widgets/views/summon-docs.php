@@ -61,12 +61,16 @@ use yii\web\View;
 						'class' => 'text-danger',
 					]);
 				}
+				$user = $docLink->doneUser;
+				$tooltip = '';
+				if ($user !== null) {
+					$tooltip .= Html::encode($user->getFullName()) . ' - ';
+				}
+				$tooltip .= Yii::$app->formatter->asDate($docLink->done_at);
 				return Html::tag('span',
 					Html::icon('ok-sign'), [
 						'class' => 'text-success',
-						TooltipAsset::DEFAULT_ATTRIBUTE_NAME =>
-							Html::encode($docLink->doneUser->getFullName()) .
-							' - ' . Yii::$app->formatter->asDate($docLink->done_at),
+						TooltipAsset::DEFAULT_ATTRIBUTE_NAME => $tooltip,
 					]);
 			},
 		],
@@ -84,12 +88,16 @@ use yii\web\View;
 						'class' => 'text-danger',
 					]);
 				}
+				$user = $docLink->confirmedUser;
+				$tooltip = '';
+				if ($user !== null) {
+					$tooltip .= Html::encode($user->getFullName()) . ' - ';
+				}
+				$tooltip .= Yii::$app->formatter->asDate($docLink->confirmed_at);
 				return Html::tag('span',
 					Html::icon('ok-sign'), [
 						'class' => 'text-success',
-						TooltipAsset::DEFAULT_ATTRIBUTE_NAME =>
-							Html::encode($docLink->confirmedUser->getFullName()) .
-							' - ' . Yii::$app->formatter->asDate($docLink->confirmed_at),
+						TooltipAsset::DEFAULT_ATTRIBUTE_NAME => $tooltip,
 					]);
 			},
 		],
