@@ -96,23 +96,21 @@ class IssueSearch extends BaseIssueSearch {
 
 	protected function getAvailableAgentsIds(): array {
 		if ($this->availableAgentsIds === null) {
-			if (empty($this->includedUsersIds)) {
-				$ids = IssueUser::find()
-					->from([
-						IssueUser::tableName() . ' IU_1',
-						IssueUser::tableName() . ' IU_2',
-					])
-					->andWhere(['IU_1.user_id' => $this->user_id])
-					->andWhere('IU_1.issue_id = IU_2.issue_id')
-					->andWhere(['IU_2.type' => IssueUser::TYPE_AGENT])
-					->select('IU_2.user_id')
-					->distinct()
-					->column();
-			} else {
-				$ids = $this->includedUsersIds;
-				if (!in_array($this->user_id, $ids)) {
-					$ids[] = $this->user_id;
-				}
+			$selfUserIds = IssueUser::find()
+				->from([
+					IssueUser::tableName() . ' IU_1',
+					IssueUser::tableName() . ' IU_2',
+				])
+				->andWhere(['IU_1.user_id' => $this->user_id])
+				->andWhere('IU_1.issue_id = IU_2.issue_id')
+				->andWhere(['IU_2.type' => IssueUser::TYPE_AGENT])
+				->select('IU_2.user_id')
+				->distinct()
+				->column();
+
+			$ids = array_unique(array_merge([],$selfUserIds, $this->includedUsersIds));
+			if (!in_array($this->user_id, $ids)) {
+				$ids[] = $this->user_id;
 			}
 			$this->availableAgentsIds = $ids;
 		}
