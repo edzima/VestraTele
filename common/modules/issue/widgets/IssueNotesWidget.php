@@ -36,13 +36,23 @@ class IssueNotesWidget extends IssueWidget {
 	public function init(): void {
 		parent::init();
 		if ($this->notes === null) {
-			$query = $this->model
-				->getIssueNotes()
+			$query = IssueNote::find()
+				->andWhere(['issue_id' => $this->model->getIssueId()])
+				->orderBy(['publish_at' => SORT_DESC])
 				->joinWith('user.userProfile')
 				->joinWith('updater.userProfile');
 
-			if (!$this->withProvisionControl) {
-				//	$query->withoutTypes([IssueNote::TYPE_SETTLEMENT_PROVISION_CONTROL]);
+			$linkedIds = $this->model->getLinkedIssuesIds();
+			if (!empty($linkedIds)) {
+				$ids = IssueNote::find()
+					->select('id')
+					->andWhere(['issue_id' => $linkedIds])
+					->andWhere(['show_on_linked_issues' => ''])
+					->orWhere(['LIKE','show_on_linked_issues',$this->model->getIssueId()])
+					->column();
+				if (!empty($ids)) {
+					$query->orWhere(['IN', IssueNote::tableName() . '.id', $ids]);
+				}
 			}
 
 			$this->notes = $query->all();
@@ -62,6 +72,7 @@ class IssueNotesWidget extends IssueWidget {
 		$this->noteOptions['collapseTypes'] = $this->collapseTypes;
 		return $this->render('issue-notes', [
 			'noteOptions' => $this->noteOptions,
+			'issue_id' => $this->model->getIssueId(),
 			'notes' => $this->notes,
 			'title' => $this->title,
 			'id' => $this->getId(),
