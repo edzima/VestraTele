@@ -330,3 +330,23 @@ input[type="tel"]::-ms-input-placeholder {
 .mb-0 {
 	margin-bottom: 0;
 }
+
+
+div:target {
+	box-shadow: 0 2px 6px rgba(255, 0, 0, 0.5);
+	animation-delay: 0.5s;
+	animation-fill-mode: forwards;
+	animation-duration: 2s;
+	animation-name: highlight;
+	animation-timing-function: ease-in-out;
+	margin-top:20px;
+}
+
+@keyframes highlight {
+	from {
+		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+	}
+	to {
+		box-shadow: 0 2px 6px rgba(255, 0, 0, 0.5);
+	}
+}
