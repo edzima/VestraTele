@@ -170,6 +170,7 @@ class IssueNoteForm extends Model {
 		$this->publish_at = (string) $model->publish_at;
 		$this->user_id = $model->user_id;
 		$this->linkedIssues = $model->getShowOnLinkedIssuesIds();
+		$this->showOnLinkedIssues = $model->show_on_linked_issues !== null;
 		if ($model->isForStageChange()) {
 			$this->scenario = static::SCENARIO_STAGE_CHANGE;
 		}
