@@ -113,7 +113,8 @@ return [
 	'Linked Issues' => 'Połączone Sprawy',
 	'Change Stage also in Linked Issues.' => 'Zmień Etap również w Połączonych Sprawach.',
 	'Linked Issues Messages' => 'Powiadomienia do Połączonych Spraw',
-	'Create Note also in Linked Issues.' => 'Dodaj Notatkę również w Połączonych Sprawach.',
+	'Show Note also in Linked Issues.' => 'Pokaż Notatkę również w Połączonych Sprawach.',
+	'Set Empty for All Linked or set only selected.' => 'Zostaw niewypełnione dla WSZYSTKICH połączonych Spraw lub ogranicz do wybranych.',
 	'Used for the Calendar.' => 'Do Kalendarza',
 	'Calendar' => 'Kalendarz',
 	'Stage Deadline At' => 'Termin Etapu',
@@ -174,4 +175,6 @@ return [
 	'Are you sure you want to mark this doc as not done?' => 'Czy napewno chesz oznaczyć ten Dokument jako: Do zrobienia?',
 	'Are you sure you want to mark this doc as not confirmed?' => 'Czy napewno chcesz oznaczyć ten Dokument jako niepotwierdzony?',
 	'Summon Types' => 'Typy Zleceń',
+	'From Issue: ' => 'Z Sprawy: ',
+	'Default show Linked Notes' => 'Domyślnie pokazuj Połączone Notatki'
 ];

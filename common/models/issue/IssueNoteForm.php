@@ -27,6 +27,8 @@ class IssueNoteForm extends Model {
 	public ?string $description = null;
 	public string $publish_at = '';
 
+	public ?bool $showOnLinkedIssues = null;
+
 	private ?string $_title = null;
 	private ?string $_description = null;
 
@@ -81,7 +83,7 @@ class IssueNoteForm extends Model {
 			[['!title'], 'required', 'on' => static::SCENARIO_STAGE_CHANGE],
 			[['stageChangeAtMerge'], 'required', 'on' => static::SCENARIO_STAGE_CHANGE],
 			[['issue_id', 'user_id'], 'integer'],
-			['is_pinned', 'boolean'],
+			[['is_pinned', 'showOnLinkedIssues'], 'boolean'],
 			['!type', 'string'],
 			[['title'], 'string', 'max' => 255],
 			['description', 'string'],
@@ -124,6 +126,7 @@ class IssueNoteForm extends Model {
 		return array_merge(
 			IssueNote::instance()->attributeLabels(),
 			[
+				'showOnLinkedIssues' => Yii::t('issue', 'Show Note also in Linked Issues.'),
 				'stageChangeAtMerge' => Yii::t('issue', 'Stage change At merge'),
 				'linkedIssues' => Yii::t('issue', 'Linked Issues'),
 				'linkedIssuesMessages' => Yii::t('issue', 'Linked Issues Messages'),
@@ -166,6 +169,7 @@ class IssueNoteForm extends Model {
 		$this->description = $model->description;
 		$this->publish_at = (string) $model->publish_at;
 		$this->user_id = $model->user_id;
+		$this->linkedIssues = $model->getShowOnLinkedIssuesIds();
 		if ($model->isForStageChange()) {
 			$this->scenario = static::SCENARIO_STAGE_CHANGE;
 		}
@@ -190,10 +194,11 @@ class IssueNoteForm extends Model {
 			$model->title = $this->title;
 			$model->description = $this->description;
 			$model->publish_at = $this->publish_at;
+			$this->setLinkedIssues($model);
+
 			$save = $model->save(false);
 			if ($save) {
 				$this->mergeStageChangeAt();
-				$this->saveLinked();
 				return $save;
 			}
 		}
@@ -249,6 +254,18 @@ class IssueNoteForm extends Model {
 			}
 		}
 		return true;
+	}
+
+	private function setLinkedIssues(IssueNote $note): void {
+		if ($this->showOnLinkedIssues) {
+			if (empty($this->linkedIssues)) {
+				$note->showOnAllLinkedIssues();
+			} else {
+				$note->setShowOnLinkedIssues($this->linkedIssues);
+			}
+		} else {
+			$note->hideOnLinkedIssues();
+		}
 	}
 
 }

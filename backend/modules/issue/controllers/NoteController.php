@@ -93,6 +93,7 @@ class NoteController extends Controller {
 		$model = new IssueNoteForm([
 			'issue_id' => $issue->getIssueId(),
 			'user_id' => Yii::$app->user->id,
+			'showOnLinkedIssues' => $issue->getIssueType()->default_show_linked_notes,
 		]);
 		$model->messagesForm = new IssueNoteMessagesForm([
 			'issue' => $issue,
