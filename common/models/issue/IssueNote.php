@@ -27,6 +27,7 @@ use yii\helpers\StringHelper;
  * @property int $is_pinned
  * @property int $is_template
  * @property int|null $updater_id
+ * @property string|null $show_on_linked_issues
  *
  * @property Issue $issue
  * @property User $user
@@ -101,8 +102,11 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 			'typeFullName' => Yii::t('common', 'Type'),
 			'updater_id' => Yii::t('common', 'Updater'),
 			'updater' => Yii::t('common', 'Updater'),
+			'show_on_linked_issues' => Yii::t('common', 'Show on Linked Issues'),
 		];
 	}
+
+
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getIssue(): IssueQuery {
@@ -214,6 +218,25 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	 */
 	public static function find(): IssueNoteQuery {
 		return new IssueNoteQuery(static::class);
+	}
+
+	public function setShowOnLinkedIssues(array $ids): void {
+		$this->show_on_linked_issues = implode('|', $ids);
+	}
+
+	public function hideOnLinkedIssues(): void {
+		$this->show_on_linked_issues = null;
+	}
+
+	public function showOnAllLinkedIssues(): void {
+		$this->show_on_linked_issues = '';
+	}
+
+	public function getShowOnLinkedIssuesIds(): ?array {
+		if ($this->show_on_linked_issues === null) {
+			return null;
+		}
+		return explode('|', $this->show_on_linked_issues);
 	}
 
 }

@@ -5,6 +5,7 @@ use common\models\issue\IssueNote;
 use common\modules\issue\widgets\IssueNoteWidget;
 
 /* @var $this yii\web\View */
+/* @var $issue_id int */
 /* @var $notes IssueNote[] */
 /* @var $noteOptions array */
 /* @var $title string */
@@ -79,6 +80,7 @@ $smsCount = count(array_filter($notes, static function (IssueNote $note): bool {
 			<?php
 			$options = $noteOptions;
 			$options['model'] = $note;
+			$options['compareIssueId'] = $issue_id;
 			?>
 			<?= IssueNoteWidget::widget(array_merge($options, [
 				'options' => [

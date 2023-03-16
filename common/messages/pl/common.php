@@ -346,4 +346,5 @@ return [
 	'Confirmed User' => 'Potwierdził(a)',
 	'Done at' => 'Wykonano',
 	'Done User' => 'Wykonał(a)',
+	'Show on Linked Issues' => 'Pokaż w Połączonych Sprawach',
 ];

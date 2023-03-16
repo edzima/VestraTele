@@ -50,6 +50,7 @@ use yii\web\View;
 		]) ?>
 	</div>
 
+	<?= $form->field($model, 'default_show_linked_notes')->checkbox() ?>
 
 	<?= $form->field($model, 'with_additional_date')->checkbox() ?>
 

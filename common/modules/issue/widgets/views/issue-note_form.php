@@ -48,7 +48,7 @@ $this->registerJs("window.onbeforeunload = function (e) {
 					: '' ?>
 
 				<?= $form->field($model, 'is_pinned', [
-					'options' => ['class' => 'col-md-1'],
+					'options' => ['class' => 'col-md-2'],
 				])->checkbox() ?>
 
 				<?= $model->isAttributeSafe('is_template')
@@ -58,17 +58,9 @@ $this->registerJs("window.onbeforeunload = function (e) {
 					: ''
 				?>
 			</div>
-			<?= $model->getModel()->isNewRecord && !empty($model->getLinkedIssuesNames())
-				? $form->field($model, 'linkedIssues')
-					->widget(Select2::class, [
-						'data' => $model->getLinkedIssuesNames(),
-						'options' => [
-							'multiple' => true,
-						],
-					])
-					->hint(Yii::t('issue', 'Create Note also in Linked Issues.'))
-				: ''
-			?>
+
+
+
 
 			<?= $model->getScenario() !== IssueNoteForm::SCENARIO_STAGE_CHANGE
 				? $form->field($model, 'title')->widget(AutoCompleteTextarea::class, [
@@ -103,6 +95,21 @@ $this->registerJs("window.onbeforeunload = function (e) {
 				],
 			])
 			?>
+
+			<?= $form->field($model, 'showOnLinkedIssues')->checkbox() ?>
+
+			<?= !empty($model->getLinkedIssuesNames())
+				? $form->field($model, 'linkedIssues')
+					->widget(Select2::class, [
+						'data' => $model->getLinkedIssuesNames(),
+						'options' => [
+							'multiple' => true,
+						],
+					])
+					->hint(Yii::t('issue', 'Set Empty for All Linked or set only selected.'))
+				: ''
+			?>
+
 			<?= $model->getModel()->isNewRecord && $model->messagesForm !== null && !empty($model->getLinkedIssuesNames())
 				? $form->field($model, 'linkedIssuesMessages')->checkbox()
 				: ''

@@ -8,6 +8,7 @@ use yii\helpers\Html;
 /* @var $options array */
 /* @var $editBtn bool */
 /* @var $removeBtn bool */
+/* @var $compareIssueId int|null */
 ?>
 
 <?= Html::beginTag('div', $options) ?>
@@ -40,6 +41,12 @@ use yii\helpers\Html;
 	</span>
 
 	<span class="action pull-right">
+			<?php if ($compareIssueId !== null && $model->issue_id !== $compareIssueId): ?>
+				<strong class="text-warning">
+					<?= Yii::t('issue', 'From Issue: ') ?>
+					<?= Html::a($model->getIssueName(), ['issue/view', 'id' => $model->issue_id, '#' => $options['id']]) ?>
+				</strong>
+			<?php endif; ?>
 				<?= $editBtn
 					? Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['note/update', 'id' => $model->id])
 					: ''

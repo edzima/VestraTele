@@ -54,6 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					'short_name',
 					'vat',
 					'with_additional_date:boolean',
+					'default_show_linked_notes:boolean',
 				],
 			]) ?>
 		</div>

@@ -28,6 +28,8 @@ class IssueNoteWidget extends Widget {
 	protected const CLASS_PROVISION_CONTROL = 'panel-warning';
 	protected const CLASS_USER_FRONTEND = self::CLASS_DEFAULT;
 
+	public ?int $compareIssueId = null;
+
 	public IssueNote $model;
 	public ?bool $editBtn = null;
 	public ?bool $removeBtn = null;
@@ -54,6 +56,7 @@ class IssueNoteWidget extends Widget {
 				$this->editBtn = Yii::$app->user->getId() === $this->model->user_id || Yii::$app->user->can(User::PERMISSION_NOTE_UPDATE);
 			}
 		}
+		$this->options['id'] = 'issue-note-'.$this->model->id;
 		$this->ensureHtmlOptions();
 	}
 
@@ -99,12 +102,14 @@ class IssueNoteWidget extends Widget {
 		return static::CLASS_DEFAULT;
 	}
 
+
 	public function run(): string {
 		if (!$this->shouldRender()) {
 			return '';
 		}
 		return $this->render('issue-note', [
 			'model' => $this->model,
+			'compareIssueId' => $this->compareIssueId,
 			'options' => $this->options,
 			'editBtn' => $this->editBtn,
 			'removeBtn' => $this->removeBtn,

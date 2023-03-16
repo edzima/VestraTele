@@ -15,6 +15,44 @@ use yii\helpers\Console;
 
 class IssueUpgradeController extends Controller {
 
+	public function actionLinkedIssuesNote(): void {
+		$notes = IssueNote::find()
+			->groupBy([
+				'created_at',
+				'description',
+			])
+			->having('COUNT(*) >1')
+			->all();
+		$notesIds = [];
+		$deleteNotesCount = 0;
+		$updateNotesCount = 0;
+		foreach ($notes as $note) {
+			$issue = $note->issue;
+			$linkedIds = $issue->getLinkedIssuesIds();
+			if (!empty($linkedIds)) {
+				$deleteNotesCount += IssueNote::deleteAll(
+					[
+						'AND',
+						['NOT', ['id' => $note->id]],  // array i.e [1,2]
+						[
+							'description' => $note->description,
+							'issue_id' => $linkedIds,
+						],
+
+					]);
+
+				$notesIds[] = $note->id;
+			}
+		}
+		if (!empty($notesIds)) {
+			$updateNotesCount = IssueNote::updateAll(['show_on_linked_issues' => ''], ['id' => $notesIds]);
+		}
+		Console::output('All Duplicated Notes: ' . count($notes));
+		Console::output(var_dump(ArrayHelper::getColumn($notes, 'issue_id')));
+		Console::output('Deleted Notes: ' . $deleteNotesCount);
+		Console::output('Updated Notes: ' . $updateNotesCount);
+	}
+
 	public function actionSummonsRealizedAt(): void {
 		Console::output(Summon::updateAll([
 			'realized_at' => new Expression('FROM_UNIXTIME(updated_at)'),
