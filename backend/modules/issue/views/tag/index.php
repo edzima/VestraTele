@@ -17,6 +17,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 		<?= Html::a(Yii::t('issue', 'Create Issue Tag'), ['create'], ['class' => 'btn btn-success']) ?>
+
+		<?= Html::a(Yii::t('issue', 'Types'), ['tag-type/index'], ['class' => 'btn btn-info']) ?>
+
 	</p>
 
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>

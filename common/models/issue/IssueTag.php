@@ -12,9 +12,10 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property string $name
  * @property string $description
- * @property string|null $type
+ * @property int|null $type
  * @property int|null $is_active
  *
+ * @property IssueTagType|null $tagType
  * @property IssueTagLink[] $issueTagLinks
  */
 class IssueTag extends ActiveRecord {

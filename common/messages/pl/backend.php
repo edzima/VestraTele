@@ -339,4 +339,7 @@ return [
 	'Stage Deadline from at' => 'Termin (od)',
 	'Stage Deadline to at' => 'Termin (do)',
 	'Archives Deep - Days' => 'Archiwum Głębokie - Po ilu dniach',
+	'Issue Tag Types' => 'Typy Tagów',
+	'Create Issue Tag Type' => 'Dodaj Typ',
+	'Update Issue Tag Type: {name}' => 'Edytuj Typ Tagu: {name}'
 ];
