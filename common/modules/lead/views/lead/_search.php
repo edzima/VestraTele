@@ -1,6 +1,7 @@
 <?php
 
 use common\helpers\Html;
+use common\models\user\User;
 use common\modules\lead\models\searches\LeadSearch;
 use common\widgets\ActiveForm;
 use common\widgets\address\AddressSearchWidget;
@@ -118,7 +119,13 @@ use kartik\select2\Select2;
 		])->widget(DateWidget::class)
 		?>
 
-		<?= $form->field($model, 'fromMarket', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
+		<?= Yii::$app->user->can(User::PERMISSION_LEAD_MARKET) ?
+			$form->field($model, 'fromMarket', ['options' => ['class' => 'col-md-2']])->dropDownList(Html::booleanDropdownList(), [
+				'prompt' => Yii::t('common', 'All'),
+			])
+			: ''
+		?>
+
 
 	</div>
 

@@ -85,11 +85,11 @@ class LeadSearch extends Lead implements SearchModel {
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
 			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress'], 'boolean'],
 			['name', 'string', 'min' => 3],
-			[['duplicatePhone'], 'default', 'value' => null],
+			[['duplicatePhone', 'fromMarket'], 'default', 'value' => null],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames()), 'allowArray' => true],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
-			['status_id', 'in', 'range' => array_keys(static::getStatusNames()),'allowArray' => true],
+			['status_id', 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
 			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
 			[['from_at', 'to_at'], 'safe'],
 			[array_keys($this->questionsAttributes), 'safe'],
@@ -435,5 +435,15 @@ class LeadSearch extends Lead implements SearchModel {
 			$query->joinWith('market');
 			$query->andWhere(LeadMarket::tableName() . '.lead_id IS NOT NULL');
 		}
+
+		if ($this->fromMarket === null || $this->fromMarket === '') {
+			return;
+		}
+		$query->joinWith('market M');
+		if ((bool) $this->fromMarket === true) {
+			$query->andWhere('M.lead_id IS NOT NULL');
+			return;
+		}
+		$query->andWhere('M.lead_id IS NULL');
 	}
 }
