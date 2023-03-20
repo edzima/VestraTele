@@ -1,7 +1,11 @@
 <?php
 
 use backend\helpers\Html;
+use backend\modules\issue\models\search\IssueSearch;
+use backend\widgets\GridView;
+use common\models\issue\IssueTag;
 use common\models\issue\IssueTagType;
+use yii\data\ActiveDataProvider;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
@@ -36,7 +40,27 @@ YiiAsset::register($this);
 			'background',
 			'color',
 			'css-class',
-			'view_issue_position',
+			'viewIssuePositionName',
+			'issuesCount',
+		],
+	]) ?>
+
+	<?= GridView::widget([
+		'dataProvider' => new ActiveDataProvider([
+			'query' => $model->getIssueTags(),
+		],
+		),
+		'columns' => [
+			[
+				'attribute' => 'name',
+				'format' => 'html',
+				'value' => function (IssueTag $data): string {
+					return Html::a(Html::encode($data->name), [
+						'tag/view', 'id' => $data->id,
+					]);
+				},
+			],
+			'is_active:boolean',
 		],
 	]) ?>
 

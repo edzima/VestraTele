@@ -35,16 +35,19 @@ $this->params['breadcrumbs'][] = $this->title;
 			'description',
 			[
 				'attribute' => 'type',
-				'value' => 'typeName',
+				'format' => 'html',
+				'value' => function (IssueTag $data): ?string {
+					if (!$data->tagType) {
+						return null;
+					}
+					return Html::a(Html::encode($data->tagType->name), [
+						'tag-type/view', 'id' => $data->tagType->id,
+					]);
+				},
 				'filter' => TagSearch::getTypesNames(),
 			],
 			'is_active:boolean',
-			[
-				'label' => Yii::t('issue', 'Issues'),
-				'value' => function (IssueTag $tag): int {
-					return count($tag->issueTagLinks);
-				},
-			],
+			'issuesCount',
 
 			['class' => 'yii\grid\ActionColumn'],
 		],

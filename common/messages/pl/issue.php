@@ -176,5 +176,9 @@ return [
 	'Are you sure you want to mark this doc as not confirmed?' => 'Czy napewno chcesz oznaczyć ten Dokument jako niepotwierdzony?',
 	'Summon Types' => 'Typy Zleceń',
 	'From Issue: ' => 'Z Sprawy: ',
-	'Default show Linked Notes' => 'Domyślnie pokazuj Połączone Notatki'
+	'Default show Linked Notes' => 'Domyślnie pokazuj Połączone Notatki',
+	'Issue View Position - Customer' => 'Karta Sprawy - Klient',
+	'Issue View Position - After Details' => 'Karta Sprawy - pod Szczegółami',
+	'Issue View Position - Before Details' => 'Karta Sprawy - nad Szczegółami',
+
 ];

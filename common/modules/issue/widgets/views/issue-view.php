@@ -4,6 +4,7 @@ use common\helpers\Url;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueTag;
+use common\models\issue\IssueTagType;
 use common\models\issue\IssueUser;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueUsersWidget;
@@ -34,7 +35,7 @@ use yii\data\ActiveDataProvider;
 				'legend' => function (IssueUser $issueUser) use ($usersLinks, $model): string {
 					$legend = Html::encode($issueUser->getTypeWithUser());
 					if ($issueUser->type === IssueUser::TYPE_CUSTOMER) {
-						$tags = IssueTag::typeFilter($model->tags, IssueTag::TYPE_CLIENT);
+						$tags = IssueTagType::viewIssuePositionFilter($model->tags, IssueTagType::VIEW_ISSUE_POSITION_CUSTOMER);
 						if (!empty($tags)) {
 							$legend .= $this->render('_tags', [
 								'models' => $tags,
@@ -181,7 +182,9 @@ use yii\data\ActiveDataProvider;
 						'format' => 'html',
 						'value' => function (IssueInterface $issue): string {
 							return Html::a(
-									Html::encode($issue->getIssueName()), ['issue/view', 'id' => $issue->getIssueId()]) . $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags)]);
+									Html::encode($issue->getIssueName()),
+									['issue/view', 'id' => $issue->getIssueId()])
+								. $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags)]);
 						},
 					],
 					[
@@ -196,7 +199,11 @@ use yii\data\ActiveDataProvider;
 						'label' => Yii::t('issue', 'Customer'),
 						'format' => 'html',
 						'value' => function (IssueInterface $issue): string {
-							return Html::encode($issue->getIssueModel()->customer->getFullName()) . $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags, IssueTag::TYPE_CLIENT)]);
+							return Html::encode(
+									$issue->getIssueModel()->customer->getFullName())
+								. $this->render('_tags', [
+									'models' => IssueTagType::viewIssuePositionFilter($issue->tags, IssueTagType::VIEW_ISSUE_POSITION_CUSTOMER),
+								]);
 						},
 						'attribute' => 'customer',
 					],

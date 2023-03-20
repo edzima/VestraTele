@@ -3,6 +3,8 @@
 namespace backend\modules\issue\models\search;
 
 use common\models\issue\IssueTag;
+use common\models\issue\IssueTagLink;
+use common\models\issue\IssueTagType;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -11,12 +13,19 @@ use yii\data\ActiveDataProvider;
  */
 class TagSearch extends IssueTag {
 
+
+
+	public static function getTypesNames(): array {
+		return IssueTagType::getTypesNames();
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'is_active'], 'integer'],
+			[['id', 'is_active','issuesCount'], 'integer'],
+			[['is_active'], 'default', 'value' => null],
 			[['name', 'description', 'type'], 'safe'],
 		];
 	}
@@ -38,11 +47,24 @@ class TagSearch extends IssueTag {
 	 */
 	public function search(array $params): ActiveDataProvider {
 		$query = IssueTag::find();
+		$query->joinWith('issueTagLinks');
+		$query->groupBy(IssueTag::tableName() . '.id');
+		$query->addSelect(['*','COUNT(' . IssueTagLink::tableName() . '.issue_id' . ') as issuesCount']);
+		$query->with([
+			'tagType',
+		]);
 
 		// add conditions that should always apply here
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
+			'sort' => [
+				'attributes'=> [
+					'name',
+					'description',
+					'issuesCount',
+				]
+			]
 		]);
 
 		$this->load($params);
@@ -52,6 +74,7 @@ class TagSearch extends IssueTag {
 			// $query->where('0=1');
 			return $dataProvider;
 		}
+
 
 		// grid filtering conditions
 		$query->andFilterWhere([

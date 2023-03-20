@@ -347,4 +347,9 @@ return [
 	'Done at' => 'Wykonano',
 	'Done User' => 'Wykonał(a)',
 	'Show on Linked Issues' => 'Pokaż w Połączonych Sprawach',
+	'Tags Count' => 'Tagi',
+	'Background' => 'Tło',
+	'Color' => 'Kolor',
+	'Css Class' => 'CSS Klasa',
+	'View Issue Position' => 'Karta Sprawy - Pozycja',
 ];

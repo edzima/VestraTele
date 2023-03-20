@@ -20,6 +20,15 @@ use yii\db\ActiveRecord;
  */
 class IssueTag extends ActiveRecord {
 
+	public $issuesCount;
+
+	public function getIssuesCount(): int {
+		if ($this->issuesCount === null) {
+			$this->issuesCount = count($this->issueTagLinks);
+		}
+		return $this->issuesCount;
+	}
+
 	public const TYPE_CLIENT = 'client';
 	public const TYPE_SETTLEMENT = 'settlement';
 
@@ -35,7 +44,7 @@ class IssueTag extends ActiveRecord {
 	 * @param string $type
 	 * @return static[]
 	 */
-	public static function typeFilter(array $tags, string $type = null): array {
+	public static function typeFilter(array $tags, int $type = null): array {
 		$models = [];
 		foreach ($tags as $tag) {
 			if ($tag->type === $type) {
@@ -43,13 +52,6 @@ class IssueTag extends ActiveRecord {
 			}
 		}
 		return $models;
-	}
-
-	public static function getTypesNames(): array {
-		return [
-			static::TYPE_CLIENT => Yii::t('issue', 'Client'),
-			static::TYPE_SETTLEMENT => Yii::t('issue', 'Settlement'),
-		];
 	}
 
 	/**
@@ -78,6 +80,7 @@ class IssueTag extends ActiveRecord {
 			'is_active' => Yii::t('issue', 'Is Active'),
 			'type' => Yii::t('issue', 'Type'),
 			'typeName' => Yii::t('issue', 'Type'),
+			'issuesCount' => Yii::t('issue', 'Issues Count'),
 		];
 	}
 
@@ -92,5 +95,9 @@ class IssueTag extends ActiveRecord {
 	 */
 	public function getIssueTagLinks(): ActiveQuery {
 		return $this->hasMany(IssueTagLink::class, ['tag_id' => 'id']);
+	}
+
+	public function getTagType() {
+		return $this->hasOne(IssueTagType::class, ['id' => 'type']);
 	}
 }

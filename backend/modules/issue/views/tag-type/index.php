@@ -3,6 +3,7 @@
 use backend\helpers\Html;
 use backend\modules\issue\models\search\TagTypeSearch;
 use backend\widgets\GridView;
+use common\models\issue\IssueTagType;
 use common\widgets\grid\ActionColumn;
 
 /* @var $this yii\web\View */
@@ -30,10 +31,14 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
 			'name',
+			[
+				'attribute' => 'view_issue_position',
+				'value' => 'viewIssuePositionName',
+				'filter' => IssueTagType::getViewIssuePositionNames(),
+			],
 			'background',
 			'color',
 			'css_class',
-			//'view_issue_position',
 
 			[
 				'class' => ActionColumn::class,
