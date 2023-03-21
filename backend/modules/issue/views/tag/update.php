@@ -16,7 +16,6 @@ $this->params['breadcrumbs'][] = Yii::t('issue', 'Update');
 ?>
 <div class="issue-tag-update">
 
-	<h1><?= Html::encode($this->title) ?></h1>
 
 	<?= $this->render('_form', [
 		'model' => $model,
