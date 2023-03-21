@@ -1,6 +1,7 @@
 <?php
 
 use common\models\issue\IssueTag;
+use common\models\issue\IssueTagType;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -13,7 +14,7 @@ use yii\widgets\ActiveForm;
 
 	<?php $form = ActiveForm::begin(); ?>
 
-	<?= $form->field($model, 'type')->dropDownList(IssueTag::getTypesNames(), [
+	<?= $form->field($model, 'type')->dropDownList(IssueTagType::getTypesNames(), [
 		'prompt' => Yii::t('common', 'Select...'),
 	]) ?>
 

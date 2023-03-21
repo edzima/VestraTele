@@ -35,7 +35,6 @@ YiiAsset::register($this);
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [
-			'id',
 			'name',
 			'background',
 			'color',
@@ -60,6 +59,7 @@ YiiAsset::register($this);
 					]);
 				},
 			],
+			'issuesCount',
 			'is_active:boolean',
 		],
 	]) ?>

@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\models\issue\query\IssueQuery;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -20,13 +21,17 @@ use yii\db\ActiveRecord;
  */
 class IssueTag extends ActiveRecord {
 
-	public $issuesCount;
+	protected $issuesCount;
 
-	public function getIssuesCount(): int {
+	public function getIssuesCount(): ?int {
+		if ($this->issuesCount === '') {
+			$this->issuesCount = null;
+		}
 		if ($this->issuesCount === null) {
 			$this->issuesCount = count($this->issueTagLinks);
 		}
-		return $this->issuesCount;
+
+		return (int) $this->issuesCount;
 	}
 
 	public const TYPE_CLIENT = 'client';
@@ -61,11 +66,10 @@ class IssueTag extends ActiveRecord {
 		return [
 			[['name'], 'required'],
 			['name', 'unique'],
-			[['is_active'], 'integer'],
-			[['type'], 'string'],
+			[['is_active', 'integer'], 'integer'],
 			[['type'], 'default', 'value' => null],
-			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 			[['name', 'description'], 'string', 'max' => 255],
+			[['type'], 'exist', 'skipOnError' => true, 'targetClass' => IssueTagType::class, 'targetAttribute' => ['type' => 'id']],
 		];
 	}
 
@@ -79,6 +83,7 @@ class IssueTag extends ActiveRecord {
 			'description' => Yii::t('issue', 'Description'),
 			'is_active' => Yii::t('issue', 'Is Active'),
 			'type' => Yii::t('issue', 'Type'),
+			'tagType' => Yii::t('issue', 'Type'),
 			'typeName' => Yii::t('issue', 'Type'),
 			'issuesCount' => Yii::t('issue', 'Issues Count'),
 		];
@@ -88,11 +93,13 @@ class IssueTag extends ActiveRecord {
 		return static::getTypesNames()[$this->type] ?? null;
 	}
 
-	/**
-	 * Gets query for [[IssueTagLinks]].
-	 *
-	 * @return ActiveQuery
-	 */
+	public function getIssues(): IssueQuery {
+		return $this->hasMany(Issue::class, [
+			'id' => 'issue_id',
+		])
+			->via('issueTagLinks');
+	}
+
 	public function getIssueTagLinks(): ActiveQuery {
 		return $this->hasMany(IssueTagLink::class, ['tag_id' => 'id']);
 	}

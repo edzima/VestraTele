@@ -17,6 +17,7 @@ class TagTypeSearch extends IssueTagType {
 	public function rules(): array {
 		return [
 			[['id'], 'integer'],
+			['issuesCount','default','value' => null],
 			[['name', 'background', 'color', 'css_class', 'view_issue_position'], 'safe'],
 		];
 	}
