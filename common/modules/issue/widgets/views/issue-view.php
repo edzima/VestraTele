@@ -7,6 +7,7 @@ use common\models\issue\IssueTag;
 use common\models\issue\IssueTagType;
 use common\models\issue\IssueUser;
 use common\models\user\Worker;
+use common\modules\issue\widgets\IssueTagsWidget;
 use common\modules\issue\widgets\IssueUsersWidget;
 use common\widgets\FieldsetDetailView;
 use common\widgets\grid\ActionColumn;
@@ -170,7 +171,8 @@ use yii\data\ActiveDataProvider;
 				'dataProvider' => new ActiveDataProvider([
 					'query' => $model->getLinkedIssues()
 						->with('customer')
-						->with('tags'),
+						->with('tags')
+						->with('tags.tagType'),
 				]),
 				'summary' => '',
 				'caption' => Yii::t('issue', 'Linked'),
@@ -184,7 +186,9 @@ use yii\data\ActiveDataProvider;
 							return Html::a(
 									Html::encode($issue->getIssueName()),
 									['issue/view', 'id' => $issue->getIssueId()])
-								. $this->render('_tags', ['models' => IssueTag::typeFilter($issue->tags)]);
+								. IssueTagsWidget::widget([
+									'models' => IssueTag::typeFilter($issue->getIssueModel()->tags),
+								]);
 						},
 					],
 					[
@@ -201,8 +205,8 @@ use yii\data\ActiveDataProvider;
 						'value' => function (IssueInterface $issue): string {
 							return Html::encode(
 									$issue->getIssueModel()->customer->getFullName())
-								. $this->render('_tags', [
-									'models' => IssueTagType::viewIssuePositionFilter($issue->tags, IssueTagType::VIEW_ISSUE_POSITION_CUSTOMER),
+								. IssueTagsWidget::widget([
+									'models' => IssueTagType::viewIssuePositionFilter($issue->getIssueModel()->tags, IssueTagType::VIEW_ISSUE_POSITION_CUSTOMER),
 								]);
 						},
 						'attribute' => 'customer',
