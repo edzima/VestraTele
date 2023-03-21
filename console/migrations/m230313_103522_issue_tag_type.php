@@ -3,9 +3,9 @@
 use console\base\Migration;
 
 /**
- * Class m230313_103522_issue_note_show_in_linked_issues
+ * Class m230313_103522_issue_tag_type
  */
-class m230313_103522_issue_type extends Migration {
+class m230313_103522_issue_tag_type extends Migration {
 
 	/**
 	 * {@inheritdoc}
@@ -23,11 +23,13 @@ class m230313_103522_issue_type extends Migration {
 		$this->insert('{{%issue_tag_type}}', [
 			'id' => -10,
 			'name' => 'Customer',
+			'css_class' => 'label label-danger'
 		]);
 
 		$this->insert('{{%issue_tag_type}}', [
 			'id' => -100,
 			'name' => 'Settlement',
+			'css_class' => 'label label-warning'
 		]);
 
 		$this->update('{{%issue_tag}}', [
