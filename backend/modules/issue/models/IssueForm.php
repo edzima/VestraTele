@@ -57,13 +57,16 @@ class IssueForm extends Model {
 	}
 
 	public static function getTagsNames(bool $onlyActive): array {
-		$models = IssueTag::find();
+		$models = IssueTag::find()
+			->with('tagType');
 		if ($onlyActive) {
 			$models->andWhere(['is_active' => true]);
 		}
+		/** @var IssueTag[] $models */
 		$models = $models->all();
 
 		$data = [];
+		$types = [];
 		foreach ($models as $model) {
 			$data[$model->getTypeName()][$model->id] = $model->name;
 		}

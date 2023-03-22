@@ -23,6 +23,28 @@ class IssueTag extends ActiveRecord {
 
 	protected $issuesCount;
 
+	private static array $MODELS = [];
+
+	public static function getNames(bool $active = true) {
+		$names = [];
+		foreach (static::getModels() as $model) {
+			if (!$active || $model->is_active) {
+				$names[$model->id] = $model->name;
+			}
+		}
+		return $names;
+	}
+
+	/**
+	 * @return static[]
+	 */
+	public static function getModels(): array {
+		if (empty(static::$MODELS)) {
+			static::$MODELS = static::find()->all();
+		}
+		return static::$MODELS;
+	}
+
 	public function getIssuesCount(): ?int {
 		if ($this->issuesCount === '') {
 			$this->issuesCount = null;
@@ -65,8 +87,7 @@ class IssueTag extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['name'], 'required'],
-			['name', 'unique'],
-			[['is_active', 'integer'], 'integer'],
+			[['is_active'], 'boolean'],
 			[['type'], 'default', 'value' => null],
 			[['name', 'description'], 'string', 'max' => 255],
 			[['type'], 'exist', 'skipOnError' => true, 'targetClass' => IssueTagType::class, 'targetAttribute' => ['type' => 'id']],

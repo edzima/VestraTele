@@ -15,6 +15,7 @@ use yii\db\ActiveRecord;
  * @property string|null $color
  * @property string|null $css_class
  * @property string|null $view_issue_position
+ * @property string|null $issues_grid_position
  *
  * @property IssueTag[] $issueTags
  */
@@ -23,6 +24,9 @@ class IssueTagType extends ActiveRecord {
 	public const VIEW_ISSUE_POSITION_CUSTOMER = 'customer';
 	public const VIEW_ISSUE_POSITION_BEFORE_DETAILS = 'beforeDetails';
 	public const VIEW_ISSUE_POSITION_AFTER_DETAILS = 'afterDetails';
+
+	public const ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM = 'column-Customer_bottom';
+	public const ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM = 'column-Issue_bottom';
 
 	/**
 	 * @param IssueTag[] $tags
@@ -40,23 +44,37 @@ class IssueTagType extends ActiveRecord {
 	}
 
 	/**
+	 * @param IssueTag[] $tags
+	 * @param string $position
+	 * @return IssueTag[]
+	 */
+	public static function issuesGridPositionFilter(array $tags, string $position): array {
+		$models = [];
+		foreach ($tags as $tag) {
+			if ($tag->tagType && $tag->tagType->issues_grid_position === $position) {
+				$models[$tag->id] = $tag;
+			}
+		}
+		return $models;
+	}
+
+
+	/**
 	 * {@inheritdoc}
 	 */
 	public static function tableName(): string {
 		return '{{%issue_tag_type}}';
 	}
 
-	public function getViewIssuePositionName(): ?string {
-		return static::getViewIssuePositionNames()[$this->view_issue_position];
-	}
+
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['name', 'background', 'color', 'css_class', 'view_issue_position'], 'string', 'max' => 255],
-			[['color', 'css_class', 'view_issue_position'], 'default', 'value' => null],
+			[['name', 'background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position'], 'string', 'max' => 255],
+			[['color', 'css_class', 'view_issue_position', 'issues_grid_position'], 'default', 'value' => null],
 			[['name'], 'unique'],
 		];
 	}
@@ -71,15 +89,20 @@ class IssueTagType extends ActiveRecord {
 			'background' => Yii::t('common', 'Background'),
 			'color' => Yii::t('common', 'Color'),
 			'css_class' => Yii::t('common', 'Css Class'),
-			'view_issue_position' => Yii::t('common', 'View Issue Position'),
-			'viewIssuePositionName' => Yii::t('common', 'View Issue Position'),
+			'view_issue_position' => Yii::t('issue', 'View Issue Position'),
+			'viewIssuePositionName' => Yii::t('issue', 'View Issue Position'),
+			'issues_grid_position' => Yii::t('issue','Issues_Grid Position'),
+			'issuesGridPositionName' => Yii::t('issue','Issues_Grid Position'),
 			'tagsCount' => Yii::t('common', 'Tags Count'),
 			'issuesCount' => Yii::t('issue', 'Issues Count'),
 		];
 	}
 
 	public static function getTypesNames(): array {
-		return ArrayHelper::map(IssueTagType::find()->all(), 'id', 'name');
+		return ArrayHelper::map(
+			IssueTagType::find()->orderBy('name')->all(),
+			'id',
+			'name');
 	}
 
 	/**
@@ -103,11 +126,27 @@ class IssueTagType extends ActiveRecord {
 		return $count;
 	}
 
+	public function getViewIssuePositionName(): ?string {
+		return static::getViewIssuePositionNames()[$this->view_issue_position];
+	}
+
 	public static function getViewIssuePositionNames(): array {
 		return [
 			static::VIEW_ISSUE_POSITION_CUSTOMER => Yii::t('issue', 'Issue View Position - Customer'),
 			static::VIEW_ISSUE_POSITION_AFTER_DETAILS => Yii::t('issue', 'Issue View Position - After Details'),
 			static::VIEW_ISSUE_POSITION_BEFORE_DETAILS => Yii::t('issue', 'Issue View Position - Before Details'),
+
+		];
+	}
+
+	public function getIssuesGridPositionName(): ?string {
+		return static::getIssuesGridPositionNames()[$this->issues_grid_position];
+	}
+
+	public static function getIssuesGridPositionNames(): array {
+		return [
+			static::ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM => Yii::t('issue', 'Issues Grid Position - Issue -> bottom'),
+			static::ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM => Yii::t('issue', 'Issues Grid Position - Customer -> bottom'),
 
 		];
 	}

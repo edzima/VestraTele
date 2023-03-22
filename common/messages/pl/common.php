@@ -351,5 +351,5 @@ return [
 	'Background' => 'Tło',
 	'Color' => 'Kolor',
 	'Css Class' => 'CSS Klasa',
-	'View Issue Position' => 'Karta Sprawy - Pozycja',
+	'Tags without Type' => 'Nieprzypisane',
 ];
