@@ -30,7 +30,17 @@ use yii\widgets\ActiveForm;
 		IssueTagType::getViewIssuePositionNames(),
 		[
 			'prompt' => Yii::t('common', 'Select...'),
-		]) ?>
+		])
+	?>
+
+
+	<?= $form->field($model, 'issues_grid_position')->dropDownList(
+		IssueTagType::getIssuesGridPositionNames(),
+		[
+			'prompt' => Yii::t('common', 'Select...'),
+		])
+	?>
+
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>

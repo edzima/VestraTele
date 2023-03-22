@@ -17,19 +17,20 @@ class m230313_103522_issue_tag_type extends Migration {
 			'background' => $this->string(),
 			'color' => $this->string(),
 			'css_class' => $this->string(),
-			'view_issue_position' => $this->string(),
+			'view_issue_position' => $this->string()->null(),
+			'issues_grid_position' => $this->string()->null(),
 		]);
 
 		$this->insert('{{%issue_tag_type}}', [
 			'id' => -10,
 			'name' => 'Customer',
-			'css_class' => 'label label-danger'
+			'css_class' => 'label label-danger',
 		]);
 
 		$this->insert('{{%issue_tag_type}}', [
 			'id' => -100,
 			'name' => 'Settlement',
-			'css_class' => 'label label-warning'
+			'css_class' => 'label label-warning',
 		]);
 
 		$this->update('{{%issue_tag}}', [
@@ -46,12 +47,14 @@ class m230313_103522_issue_tag_type extends Migration {
 
 		$this->alterColumn('{{%issue_tag}}', 'type', $this->integer()->null());
 		$this->addForeignKey('{{%fk_issue_tag_type}}', '{{%issue_tag}}', 'type', '{{%issue_tag_type}}', 'id', 'SET NULL', 'CASCADE');
+		$this->dropIndex('name', '{{%issue_tag}}');
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function safeDown() {
+		$this->alterColumn('{{%issue_tag}}', 'name', $this->string()->notNull()->unique());
 		$this->dropForeignKey('{{%fk_issue_tag_type}}', '{{%issue_tag}}');
 		$this->alterColumn('{{%issue_tag}}', 'type', $this->string()->null());
 

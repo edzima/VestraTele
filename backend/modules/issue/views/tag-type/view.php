@@ -22,6 +22,7 @@ YiiAsset::register($this);
 <div class="issue-tag-type-view">
 
 	<p>
+		<?= Html::a(Yii::t('backend', 'Tags'), ['tags', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 		<?= Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',
@@ -40,6 +41,7 @@ YiiAsset::register($this);
 			'color',
 			'css-class',
 			'viewIssuePositionName',
+			'issuesGridPositionName',
 			'issuesCount',
 		],
 	]) ?>
