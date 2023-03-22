@@ -11,6 +11,7 @@ use common\modules\issue\widgets\IssueTagsWidget;
 use common\modules\issue\widgets\IssueUsersWidget;
 use common\widgets\FieldsetDetailView;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\IssueColumn;
 use common\widgets\GridView;
 use yii\bootstrap\Html;
 use yii\data\ActiveDataProvider;
@@ -180,6 +181,10 @@ use yii\data\ActiveDataProvider;
 				'showOnEmpty' => false,
 				'columns' => [
 					[
+						'class' => IssueColumn::class,
+						'viewBaseUrl' => 'view',
+					],
+					[
 						'label' => Yii::t('issue', 'Issue'),
 						'format' => 'html',
 						'value' => function (IssueInterface $issue): string {
@@ -187,7 +192,11 @@ use yii\data\ActiveDataProvider;
 									Html::encode($issue->getIssueName()),
 									['issue/view', 'id' => $issue->getIssueId()])
 								. IssueTagsWidget::widget([
-									'models' => IssueTag::typeFilter($issue->getIssueModel()->tags),
+									'models' => IssueTagType::issuesGridPositionFilter(
+										$issue->getIssueModel()->tags,
+										IssueTagType::ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM
+									),
+
 								]);
 						},
 					],
@@ -206,7 +215,10 @@ use yii\data\ActiveDataProvider;
 							return Html::encode(
 									$issue->getIssueModel()->customer->getFullName())
 								. IssueTagsWidget::widget([
-									'models' => IssueTagType::viewIssuePositionFilter($issue->getIssueModel()->tags, IssueTagType::VIEW_ISSUE_POSITION_CUSTOMER),
+									'models' => IssueTagType::issuesGridPositionFilter(
+										$issue->getIssueModel()->tags,
+										IssueTagType::ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM
+									),
 								]);
 						},
 						'attribute' => 'customer',

@@ -4,6 +4,8 @@ namespace common\widgets\grid;
 
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueTagType;
+use common\modules\issue\widgets\IssueTagsWidget;
 use Yii;
 
 class IssueColumn extends DataColumn {
@@ -17,6 +19,7 @@ class IssueColumn extends DataColumn {
 	];
 
 	public ?string $viewBaseUrl = null;
+	public bool $withTags = true;
 
 	public function init(): void {
 		if (empty($this->label)) {
@@ -25,7 +28,7 @@ class IssueColumn extends DataColumn {
 		if (!empty($this->viewBaseUrl) && !empty($this->linkOptions)) {
 			$this->format = 'raw';
 			$this->value = function (IssueInterface $model): string {
-				return $this->renderIssueLink($model);
+				return $this->renderIssueLink($model) . $this->renderTags($model);
 			};
 		}
 		if (empty($this->value)) {
@@ -44,6 +47,19 @@ class IssueColumn extends DataColumn {
 		return Html::a($model->getIssueName(),
 			[$this->viewBaseUrl, 'id' => $model->getIssueId()],
 			$this->linkOptions);
+	}
+
+	public function renderTags(IssueInterface $model): string {
+		if (!$this->withTags) {
+			return '';
+		}
+		return IssueTagsWidget::widget([
+			'models' =>
+				IssueTagType::issuesGridPositionFilter(
+					$model->getIssueModel()->tags,
+					IssueTagType::ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM
+				),
+		]);
 	}
 
 }

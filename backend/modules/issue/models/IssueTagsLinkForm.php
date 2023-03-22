@@ -2,7 +2,6 @@
 
 namespace backend\modules\issue\models;
 
-use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueTag;
 use common\models\issue\IssueTagLink;

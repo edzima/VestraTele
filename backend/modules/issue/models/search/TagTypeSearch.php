@@ -17,8 +17,8 @@ class TagTypeSearch extends IssueTagType {
 	public function rules(): array {
 		return [
 			[['id'], 'integer'],
-			['issuesCount','default','value' => null],
-			[['name', 'background', 'color', 'css_class', 'view_issue_position'], 'safe'],
+			['issuesCount', 'default', 'value' => null],
+			[['name', 'background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position'], 'safe'],
 		];
 	}
 
@@ -63,8 +63,9 @@ class TagTypeSearch extends IssueTagType {
 			->andFilterWhere(['like', 'background', $this->background])
 			->andFilterWhere(['like', 'color', $this->color])
 			->andFilterWhere(['like', 'css_class', $this->css_class])
-            ->andFilterWhere(['like', 'view_issue_position', $this->view_issue_position]);
+			->andFilterWhere(['like', 'view_issue_position', $this->view_issue_position])
+			->andFilterWhere(['like', 'issues_grid_position', $this->issues_grid_position]);
 
-        return $dataProvider;
-    }
+		return $dataProvider;
+	}
 }

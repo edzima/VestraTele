@@ -36,8 +36,31 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'viewIssuePositionName',
 				'filter' => IssueTagType::getViewIssuePositionNames(),
 			],
-			'background',
-			'color',
+			[
+				'attribute' => 'issues_grid_position',
+				'value' => 'issuesGridPositionName',
+				'filter' => IssueTagType::getIssuesGridPositionNames(),
+			],
+			[
+				'attribute' => 'background',
+				'contentOptions' => function (IssueTagType $data): array {
+					$options = [];
+					if (!empty($data->background)) {
+						$options['style']['background-color'] = $data->background;
+					}
+					return $options;
+				},
+			],
+			[
+				'attribute' => 'color',
+				'contentOptions' => function (IssueTagType $data): array {
+					$options = [];
+					if (!empty($data->color)) {
+						$options['style']['background-color'] = $data->color;
+					}
+					return $options;
+				},
+			],
 			'css_class',
 
 			[

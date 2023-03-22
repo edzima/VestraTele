@@ -4,6 +4,7 @@ namespace common\models\issue;
 
 use common\helpers\ArrayHelper;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -58,7 +59,6 @@ class IssueTagType extends ActiveRecord {
 		return $models;
 	}
 
-
 	/**
 	 * {@inheritdoc}
 	 */
@@ -66,15 +66,13 @@ class IssueTagType extends ActiveRecord {
 		return '{{%issue_tag_type}}';
 	}
 
-
-
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
 			[['name', 'background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position'], 'string', 'max' => 255],
-			[['color', 'css_class', 'view_issue_position', 'issues_grid_position'], 'default', 'value' => null],
+			[['background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position'], 'default', 'value' => null],
 			[['name'], 'unique'],
 		];
 	}
@@ -91,8 +89,8 @@ class IssueTagType extends ActiveRecord {
 			'css_class' => Yii::t('common', 'Css Class'),
 			'view_issue_position' => Yii::t('issue', 'View Issue Position'),
 			'viewIssuePositionName' => Yii::t('issue', 'View Issue Position'),
-			'issues_grid_position' => Yii::t('issue','Issues_Grid Position'),
-			'issuesGridPositionName' => Yii::t('issue','Issues_Grid Position'),
+			'issues_grid_position' => Yii::t('issue', 'Issues_Grid Position'),
+			'issuesGridPositionName' => Yii::t('issue', 'Issues_Grid Position'),
 			'tagsCount' => Yii::t('common', 'Tags Count'),
 			'issuesCount' => Yii::t('issue', 'Issues Count'),
 		];
@@ -108,7 +106,7 @@ class IssueTagType extends ActiveRecord {
 	/**
 	 * Gets query for [[IssueTags]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getIssueTags() {
 		return $this->hasMany(IssueTag::class, ['type' => 'id']);
