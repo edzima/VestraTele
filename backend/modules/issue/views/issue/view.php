@@ -30,6 +30,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 <div class="issue-view">
 	<p>
 
+
 		<?= StageChangeButtonDropdown::widget([
 			'model' => $model,
 		])
@@ -72,16 +73,30 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE)
-			? Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
-				'class' => 'btn btn-danger pull-right',
-				'data' => [
-					'confirm' => 'Czy napewno chcesz usunąć?',
-					'method' => 'post',
-				],
-			])
-			: ''
-		?>
+		<span class="pull-right">
+	<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
+		? Html::a(
+			Html::icon('tag'), ['tag/issue', 'issueId' => $model->id], [
+				'title' => Yii::t('common', 'Tags'),
+				'aria-label' => Yii::t('common', 'Tags'),
+				'class' => 'btn btn-success',
+			]
+		)
+		: ''
+	?>
+
+	<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE)
+		? Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
+			'class' => 'btn btn-danger',
+			'data' => [
+				'confirm' => 'Czy napewno chcesz usunąć?',
+				'method' => 'post',
+			],
+		])
+		: ''
+	?>
+		</span>
+
 
 
 	</p>

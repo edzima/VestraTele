@@ -2,7 +2,9 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\modules\issue\models\IssueTagsLinkForm;
 use backend\modules\issue\models\search\TagSearch;
+use common\models\issue\Issue;
 use common\models\issue\IssueTag;
 use Yii;
 use yii\filters\VerbFilter;
@@ -26,6 +28,21 @@ class TagController extends Controller {
 				],
 			],
 		];
+	}
+
+	public function actionIssue(int $issueId) {
+		$issue = Issue::findOne($issueId);
+		if ($issue === null) {
+			throw new NotFoundHttpException();
+		}
+		$model = new IssueTagsLinkForm();
+		$model->setIssue($issue);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['issue/view', 'id' => $issueId]);
+		}
+		return $this->render('issue', [
+			'model' => $model,
+		]);
 	}
 
 	/**
