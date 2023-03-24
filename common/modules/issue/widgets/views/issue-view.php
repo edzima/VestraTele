@@ -11,6 +11,7 @@ use common\modules\issue\widgets\IssueTagsWidget;
 use common\modules\issue\widgets\IssueUsersWidget;
 use common\widgets\FieldsetDetailView;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\IssueColumn;
 use common\widgets\GridView;
 use yii\bootstrap\Html;
@@ -36,16 +37,19 @@ use yii\data\ActiveDataProvider;
 				'withTraits' => true,
 				'legend' => function (IssueUser $issueUser) use ($usersLinks, $model): string {
 					$legend = Html::encode($issueUser->getTypeWithUser());
+
+					if ($usersLinks) {
+						$legend = Html::a($legend, ['/user/customer/view', 'id' => $issueUser->user_id]);
+					}
 					if ($issueUser->type === IssueUser::TYPE_CUSTOMER) {
 						$tags = IssueTagType::viewIssuePositionFilter($model->tags, IssueTagType::VIEW_ISSUE_POSITION_CUSTOMER);
 						if (!empty($tags)) {
-							$legend .= $this->render('_tags', [
+							$legend .= IssueTagsWidget::widget([
 								'models' => $tags,
+								'containerTag' => 'span',
+								'groupTag' => 'span',
 							]);
 						}
-					}
-					if ($usersLinks) {
-						$legend = Html::a($legend, ['/user/customer/view', 'id' => $issueUser->user_id]);
 					}
 					return $legend;
 				},
@@ -185,22 +189,6 @@ use yii\data\ActiveDataProvider;
 						'viewBaseUrl' => 'view',
 					],
 					[
-						'label' => Yii::t('issue', 'Issue'),
-						'format' => 'html',
-						'value' => function (IssueInterface $issue): string {
-							return Html::a(
-									Html::encode($issue->getIssueName()),
-									['issue/view', 'id' => $issue->getIssueId()])
-								. IssueTagsWidget::widget([
-									'models' => IssueTagType::issuesGridPositionFilter(
-										$issue->getIssueModel()->tags,
-										IssueTagType::ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM
-									),
-
-								]);
-						},
-					],
-					[
 						'label' => Yii::t('issue', 'Type'),
 						'attribute' => 'typeName',
 					],
@@ -209,19 +197,8 @@ use yii\data\ActiveDataProvider;
 						'attribute' => 'stageName',
 					],
 					[
-						'label' => Yii::t('issue', 'Customer'),
-						'format' => 'html',
-						'value' => function (IssueInterface $issue): string {
-							return Html::encode(
-									$issue->getIssueModel()->customer->getFullName())
-								. IssueTagsWidget::widget([
-									'models' => IssueTagType::issuesGridPositionFilter(
-										$issue->getIssueModel()->tags,
-										IssueTagType::ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM
-									),
-								]);
-						},
-						'attribute' => 'customer',
+						'class' => CustomerDataColumn::class,
+						'value' => 'customer.fullName',
 					],
 					[
 						'class' => ActionColumn::class,
@@ -262,10 +239,20 @@ use yii\data\ActiveDataProvider;
 
 
 			<?= FieldsetDetailView::widget([
-				'legend' => Yii::t('common', 'Issue details') . $this->render('_tags', ['models' => IssueTag::typeFilter($model->tags)]),
+				'legend' => Yii::t('common', 'Issue details'),
 				'legendOptions' => [
 					'encode' => false,
 				],
+				'afterLegend' => IssueTagsWidget::widget([
+					'position' => IssueTagsWidget::POSITION_ISSUE_DETAIL_BEFORE,
+					'models' => $model->tags,
+					'groupLabel' => true,
+				]),
+				'afterDetail' => IssueTagsWidget::widget([
+					'position' => IssueTagsWidget::POSITION_ISSUE_DETAIL_AFTER,
+					'models' => $model->tags,
+					'groupLabel' => true,
+				]),
 				'toggle' => false,
 				'detailConfig' => [
 					'id' => 'base-details',

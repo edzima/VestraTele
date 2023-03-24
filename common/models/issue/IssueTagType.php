@@ -29,6 +29,18 @@ class IssueTagType extends ActiveRecord {
 	public const ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM = 'column-Customer_bottom';
 	public const ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM = 'column-Issue_bottom';
 
+	public static function positionFilter(array $tags, ?string $position): array {
+		switch ($position) {
+			case self::ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM:
+			case self::ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM:
+				return static::issuesGridPositionFilter($tags, $position);
+			case self::VIEW_ISSUE_POSITION_BEFORE_DETAILS:
+			case self::VIEW_ISSUE_POSITION_AFTER_DETAILS:
+				return static::viewIssuePositionFilter($tags, $position);
+		}
+		return $tags;
+	}
+
 	/**
 	 * @param IssueTag[] $tags
 	 * @param string $position
