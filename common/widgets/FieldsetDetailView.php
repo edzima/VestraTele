@@ -12,6 +12,8 @@ class FieldsetDetailView extends Widget {
 	public string $legend;
 	public array $legendOptions = [];
 	public string $afterLegend = '';
+
+	public string $afterDetail = '';
 	public array $htmlOptions = [];
 
 	public array $detailConfig = [];
@@ -34,7 +36,7 @@ class FieldsetDetailView extends Widget {
 	public function run(): string {
 		if (isset($this->detailConfig['model']) && $this->detailConfig['model'] !== null) {
 			return Html::tag('fieldset',
-				$this->renderLegend() . $this->renderDetailView(),
+				$this->renderLegend() . $this->renderDetailView() . $this->afterDetail,
 				$this->htmlOptions);
 		}
 		return '';

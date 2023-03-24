@@ -37,8 +37,22 @@ YiiAsset::register($this);
 		'model' => $model,
 		'attributes' => [
 			'name',
-			'background',
-			'color',
+			[
+				'attribute' => 'background',
+				'contentOptions' => [
+					'style' => [
+						'color' => $model->background,
+					],
+				],
+			],
+			[
+				'attribute' => 'color',
+				'contentOptions' => [
+					'style' => [
+						'color' => $model->color,
+					],
+				],
+			],
 			'css-class',
 			'viewIssuePositionName',
 			'issuesGridPositionName',

@@ -2,6 +2,7 @@
 
 use backend\modules\issue\models\search\TagSearch;
 use common\models\issue\IssueTag;
+use common\modules\issue\widgets\IssueTagsWidget;
 use yii\grid\GridView;
 use yii\helpers\Html;
 
@@ -40,15 +41,18 @@ $this->params['breadcrumbs'][] = $this->title;
 					if (!$data->tagType) {
 						return null;
 					}
+					$type = $data->tagType;
+					$options = IssueTagsWidget::tagTypeOptions($type);
+					Html::addCssClass($options, 'label');
+
 					return Html::a(Html::encode($data->tagType->name), [
 						'tag-type/view', 'id' => $data->tagType->id,
-					]);
+					], $options);
 				},
 				'filter' => TagSearch::getTypesNames(),
 			],
-			'is_active:boolean',
 			'issuesCount',
-
+			'is_active:boolean',
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>
