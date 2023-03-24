@@ -19,7 +19,8 @@ class IssueColumn extends DataColumn {
 	];
 
 	public ?string $viewBaseUrl = null;
-	public bool $withTags = true;
+
+	public bool $tooltip = true;
 
 	public function init(): void {
 		if (empty($this->label)) {
@@ -28,7 +29,7 @@ class IssueColumn extends DataColumn {
 		if (!empty($this->viewBaseUrl) && !empty($this->linkOptions)) {
 			$this->format = 'raw';
 			$this->value = function (IssueInterface $model): string {
-				return $this->renderIssueLink($model) . $this->renderTags($model);
+				return $this->renderIssueLink($model);
 			};
 		}
 		if (empty($this->value)) {
@@ -49,10 +50,7 @@ class IssueColumn extends DataColumn {
 			$this->linkOptions);
 	}
 
-	public function renderTags(IssueInterface $model): string {
-		if (!$this->withTags) {
-			return '';
-		}
+	protected function renderTags($model, $key, $index): string {
 		return IssueTagsWidget::widget([
 			'models' =>
 				IssueTagType::issuesGridPositionFilter(

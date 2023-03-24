@@ -21,6 +21,8 @@ class DataColumn extends BaseDataColumn {
 
 	public bool $tooltip = false;
 
+	public bool $withTags = true;
+
 	public function init() {
 		parent::init();
 		if ($this->tooltip) {
@@ -57,4 +59,17 @@ class DataColumn extends BaseDataColumn {
 		}
 		return $options;
 	}
+
+	public function getDataCellValue($model, $key, $index) {
+		$value = parent::getDataCellValue($model, $key, $index);
+		if ($this->withTags) {
+			$value .= $this->renderTags($model, $key, $index);
+		}
+		return $value;
+	}
+
+	protected function renderTags($model, $key, $index): string {
+		return '';
+	}
+
 }
