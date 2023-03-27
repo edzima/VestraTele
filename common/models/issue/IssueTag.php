@@ -6,6 +6,7 @@ use common\models\issue\query\IssueQuery;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%issue_tag}}".
@@ -25,11 +26,29 @@ class IssueTag extends ActiveRecord {
 
 	private static array $MODELS = [];
 
-	public static function getNames(bool $active = true) {
+	public static function getNames(bool $active = true, bool $typeGroup = false) {
 		$names = [];
-		foreach (static::getModels() as $model) {
-			if (!$active || $model->is_active) {
-				$names[$model->id] = $model->name;
+		$models = static::getModels();
+		if ($active) {
+			$models = static::activeFilter($models);
+		}
+		foreach ($models as $model) {
+			$names[$model->id] = $model->name;
+		}
+		return $names;
+	}
+
+	public static function getNamesGroupByType(bool $active = true): array {
+		$models = static::getModels();
+		if ($active) {
+			$models = static::activeFilter($models);
+		}
+		$names = [];
+		foreach ($models as $model) {
+			if ($model->tagType) {
+				$names[$model->tagType->name][$model->id] = $model->name;
+			} else {
+				$names[Yii::t('common', 'Tags without Type')][$model->id] = $model->name;
 			}
 		}
 		return $names;
@@ -40,9 +59,21 @@ class IssueTag extends ActiveRecord {
 	 */
 	public static function getModels(): array {
 		if (empty(static::$MODELS)) {
-			static::$MODELS = static::find()->all();
+			static::$MODELS = static::find()
+				->with('tagType')
+				->all();
 		}
 		return static::$MODELS;
+	}
+
+	/**
+	 * @param static[] $models
+	 * @return static[]
+	 */
+	public static function activeFilter(array $models): array {
+		return array_filter($models, function (IssueTag $model): bool {
+			return $model->is_active;
+		});
 	}
 
 	public function getIssuesCount(): ?int {
@@ -111,7 +142,7 @@ class IssueTag extends ActiveRecord {
 	}
 
 	public function getTypeName(): ?string {
-		return static::getTypesNames()[$this->type] ?? null;
+		return $this->tagType ? $this->tagType->name : null;
 	}
 
 	public function getIssues(): IssueQuery {

@@ -57,20 +57,7 @@ class IssueForm extends Model {
 	}
 
 	public static function getTagsNames(bool $onlyActive): array {
-		$models = IssueTag::find()
-			->with('tagType');
-		if ($onlyActive) {
-			$models->andWhere(['is_active' => true]);
-		}
-		/** @var IssueTag[] $models */
-		$models = $models->all();
-
-		$data = [];
-		$types = [];
-		foreach ($models as $model) {
-			$data[$model->getTypeName()][$model->id] = $model->name;
-		}
-		return $data;
+		return IssueTag::getNamesGroupByType($onlyActive);
 	}
 
 	public function rules(): array {
@@ -91,7 +78,7 @@ class IssueForm extends Model {
 			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
 			[['signature_act', 'stage_deadline_at', 'stage_change_at'], 'default', 'value' => null],
 			['type_id', 'in', 'range' => static::getTypesIds()],
-			['tagsIds', 'in', 'range' => IssueTag::find()->select('id')->column(), 'allowArray' => true],
+			['tagsIds', 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
 			[
 				'archives_nr',
 				'required',
