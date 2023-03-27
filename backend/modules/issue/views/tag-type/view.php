@@ -54,6 +54,7 @@ YiiAsset::register($this);
 				],
 			],
 			'css-class',
+			'sort_order',
 			'viewIssuePositionName',
 			'issuesGridPositionName',
 			'issuesCount',

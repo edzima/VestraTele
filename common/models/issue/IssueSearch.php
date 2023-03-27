@@ -83,10 +83,10 @@ abstract class IssueSearch extends Model
 	public ?AddressSearch $addressSearch = null;
 	private array $stagesIdsForParentType = [];
 
-	protected static function getSummonsStatusFilters():array{
+	protected static function getSummonsStatusFilters(): array {
 		$filters = [];
-		foreach (static::getSummonsStatusesNames() as $filtersNames){
-			foreach ($filtersNames as $filter => $name){
+		foreach (static::getSummonsStatusesNames() as $filtersNames) {
+			foreach ($filtersNames as $filter => $name) {
 				$filters[] = $filter;
 			}
 		}
@@ -99,8 +99,8 @@ abstract class IssueSearch extends Model
 				static::SUMMON_SOME_ACTIVE => Yii::t('issue', 'Some Active'),
 			] + Summon::getStatusesNames();
 		return [
-			Yii::t('issue','Status') => $statuses,
-			Yii::t('issue','Summon Docs')  => [
+			Yii::t('issue', 'Status') => $statuses,
+			Yii::t('issue', 'Summon Docs') => [
 				static::SUMMON_DOCS_SOME_TO_CONFIRM => Yii::t('issue', 'To Confirm'),
 			],
 		];
@@ -156,7 +156,7 @@ abstract class IssueSearch extends Model
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			[['type_id', 'excludedTypes'], 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			[['customerName', 'userName'], 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
-			['tagsIds', 'in', 'range' => array_keys(static::getTagsNames()), 'allowArray' => true],
+			['tagsIds', 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
 			[
 				[
 					'created_at', 'updated_at', 'type_additional_date_at',
@@ -458,7 +458,7 @@ abstract class IssueSearch extends Model
 	}
 
 	public static function getTagsNames(): array {
-		return ArrayHelper::map(IssueTag::find()->asArray()->all(), 'id', 'name');
+		return IssueTag::getNamesGroupByType(true);
 	}
 
 	public static function getEntityNames(): array {

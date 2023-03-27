@@ -352,4 +352,5 @@ return [
 	'Color' => 'Kolor',
 	'Css Class' => 'CSS Klasa',
 	'Tags without Type' => 'Nieprzypisane',
+	'Sort order' => 'Kolejność',
 ];

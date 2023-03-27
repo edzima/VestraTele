@@ -17,6 +17,7 @@ use yii\db\ActiveRecord;
  * @property string|null $css_class
  * @property string|null $view_issue_position
  * @property string|null $issues_grid_position
+ * @property int|null $sort_order
  *
  * @property IssueTag[] $issueTags
  */
@@ -83,6 +84,7 @@ class IssueTagType extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
+			[['sort_order'], 'integer'],
 			[['name', 'background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position'], 'string', 'max' => 255],
 			[['background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position'], 'default', 'value' => null],
 			[['name'], 'unique'],
@@ -105,6 +107,7 @@ class IssueTagType extends ActiveRecord {
 			'issuesGridPositionName' => Yii::t('issue', 'Issues_Grid Position'),
 			'tagsCount' => Yii::t('common', 'Tags Count'),
 			'issuesCount' => Yii::t('issue', 'Issues Count'),
+			'sort_order' => Yii::t('common', 'Sort order'),
 		];
 	}
 

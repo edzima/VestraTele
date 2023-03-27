@@ -4,6 +4,7 @@ use backend\helpers\Html;
 use backend\modules\issue\models\search\TagTypeSearch;
 use backend\widgets\GridView;
 use common\models\issue\IssueTagType;
+use common\modules\issue\widgets\IssueTagsWidget;
 use common\widgets\grid\ActionColumn;
 
 /* @var $this yii\web\View */
@@ -30,7 +31,12 @@ $this->params['breadcrumbs'][] = $this->title;
 		'filterModel' => $searchModel,
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
-			'name',
+			[
+				'attribute' => 'name',
+				'contentOptions' => function (IssueTagType $data): array {
+					return IssueTagsWidget::tagTypeOptions($data);
+				},
+			],
 			[
 				'attribute' => 'view_issue_position',
 				'value' => 'viewIssuePositionName',
@@ -41,28 +47,8 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'issuesGridPositionName',
 				'filter' => IssueTagType::getIssuesGridPositionNames(),
 			],
-			[
-				'attribute' => 'background',
-				'contentOptions' => function (IssueTagType $data): array {
-					$options = [];
-					if (!empty($data->background)) {
-						$options['style']['background-color'] = $data->background;
-					}
-					return $options;
-				},
-			],
-			[
-				'attribute' => 'color',
-				'contentOptions' => function (IssueTagType $data): array {
-					$options = [];
-					if (!empty($data->color)) {
-						$options['style']['background-color'] = $data->color;
-					}
-					return $options;
-				},
-			],
 			'css_class',
-
+			'sort_order',
 			[
 				'class' => ActionColumn::class,
 			],

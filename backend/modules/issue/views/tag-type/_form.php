@@ -41,6 +41,8 @@ use yii\widgets\ActiveForm;
 		])
 	?>
 
+	<?= $form->field($model, 'sort_order')->textInput() ?>
+
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>

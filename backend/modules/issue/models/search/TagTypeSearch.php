@@ -16,7 +16,7 @@ class TagTypeSearch extends IssueTagType {
 	 */
 	public function rules(): array {
 		return [
-			[['id'], 'integer'],
+			[['id', 'sort_order'], 'integer'],
 			['issuesCount', 'default', 'value' => null],
 			[['name', 'background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position'], 'safe'],
 		];
@@ -44,6 +44,7 @@ class TagTypeSearch extends IssueTagType {
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
+			'sort' => ['defaultOrder' => ['sort_order' => SORT_ASC]],
 		]);
 
 		$this->load($params);
