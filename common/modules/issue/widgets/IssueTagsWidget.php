@@ -41,6 +41,21 @@ class IssueTagsWidget extends Widget {
 		if ($this->position !== null) {
 			$this->models = IssueTagType::positionFilter($this->models, $this->position);
 		}
+		usort($this->models, function (IssueTag $a, IssueTag $b) {
+			$typeA = $a->tagType ?: null;
+			$typeB = $b->tagType ?: null;
+			if ($typeA === null && $typeB !== null) {
+				return -1;
+			}
+			if ($typeB === null && $typeA !== null) {
+				return 1;
+			}
+			if ($typeA === null && $typeB === null) {
+				return 0;
+			}
+			return ($typeA->sort_order < $typeB->sort_order) ? -1 : 1;
+		});
+
 		parent::init();
 		$this->tooltipInit();
 	}
