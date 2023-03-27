@@ -41,6 +41,14 @@ use yii\widgets\ActiveForm;
 		])
 	?>
 
+
+	<?= $form->field($model, 'link_issues_grid_position')->dropDownList(
+		IssueTagType::getLinkIssuesGridPositionNames(),
+		[
+			'prompt' => Yii::t('common', 'Select...'),
+		])
+	?>
+
 	<?= $form->field($model, 'sort_order')->textInput() ?>
 
 

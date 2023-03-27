@@ -61,6 +61,7 @@ class IssueTag extends ActiveRecord {
 		if (empty(static::$MODELS)) {
 			static::$MODELS = static::find()
 				->with('tagType')
+				->indexBy('id')
 				->all();
 		}
 		return static::$MODELS;

@@ -179,10 +179,13 @@ return [
 	'Default show Linked Notes' => 'Domyślnie pokazuj Połączone Notatki',
 	'View Issue Position' => 'Karta Sprawy - Pozycja',
 	'Issues_Grid Position' => 'Lista Spraw - Pozycja',
+	'Link Issues Grid Position' => 'Połączone Sprawy - Pozycja',
 	'Issue View Position - Customer' => 'Karta Sprawy - Klient',
 	'Issue View Position - After Details' => 'Karta Sprawy - pod Szczegółami',
 	'Issue View Position - Before Details' => 'Karta Sprawy - nad Szczegółami',
 	'Issue: {issue} - Tags' => '{issue} - Tagi',
 	'Issues Grid Position - Issue -> bottom' => 'Nr Sprawy - pod',
-	'Issues Grid Position - Customer -> bottom' => 'Klient - pod'
+	'Issues Grid Position - Customer -> bottom' => 'Klient - pod',
+	'Link Issues Grid Position - Issue' => 'Nr Sprawy - pod',
+	'Link Issues Grid Position - Customer' => 'Klient - pod',
 ];

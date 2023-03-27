@@ -17,6 +17,7 @@ use yii\db\ActiveRecord;
  * @property string|null $css_class
  * @property string|null $view_issue_position
  * @property string|null $issues_grid_position
+ * @property string|null $link_issues_grid_position
  * @property int|null $sort_order
  *
  * @property IssueTag[] $issueTags
@@ -24,11 +25,17 @@ use yii\db\ActiveRecord;
 class IssueTagType extends ActiveRecord {
 
 	public const VIEW_ISSUE_POSITION_CUSTOMER = 'customer';
+
+	public const VIEW_ISSUE_POSITION_VICTIM = 'victim';
+
 	public const VIEW_ISSUE_POSITION_BEFORE_DETAILS = 'beforeDetails';
 	public const VIEW_ISSUE_POSITION_AFTER_DETAILS = 'afterDetails';
 
 	public const ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM = 'column-Customer_bottom';
 	public const ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM = 'column-Issue_bottom';
+
+	public const LINK_ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM = 'column-Customer_bottom';
+	public const LINK_ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM = 'column-Issue_bottom';
 
 	public static function positionFilter(array $tags, ?string $position): array {
 		switch ($position) {
@@ -73,6 +80,21 @@ class IssueTagType extends ActiveRecord {
 	}
 
 	/**
+	 * @param IssueTag[] $tags
+	 * @param string $position
+	 * @return IssueTag[]
+	 */
+	public static function linkIssuesGridPositionFilter(array $tags, string $position): array {
+		$models = [];
+		foreach ($tags as $tag) {
+			if ($tag->tagType && $tag->tagType->link_issues_grid_position === $position) {
+				$models[$tag->id] = $tag;
+			}
+		}
+		return $models;
+	}
+
+	/**
 	 * {@inheritdoc}
 	 */
 	public static function tableName(): string {
@@ -85,8 +107,8 @@ class IssueTagType extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['sort_order'], 'integer'],
-			[['name', 'background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position'], 'string', 'max' => 255],
-			[['background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position'], 'default', 'value' => null],
+			[['name', 'background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position', 'link_issues_grid_position'], 'string', 'max' => 255],
+			[['background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position', 'link_issues_grid_position'], 'default', 'value' => null],
 			[['name'], 'unique'],
 		];
 	}
@@ -105,6 +127,8 @@ class IssueTagType extends ActiveRecord {
 			'viewIssuePositionName' => Yii::t('issue', 'View Issue Position'),
 			'issues_grid_position' => Yii::t('issue', 'Issues_Grid Position'),
 			'issuesGridPositionName' => Yii::t('issue', 'Issues_Grid Position'),
+			'link_issues_grid_position' => Yii::t('issue', 'Link Issues Grid Position'),
+			'linkIssuesGridPositionName' => Yii::t('issue', 'Link Issues Grid Position'),
 			'tagsCount' => Yii::t('common', 'Tags Count'),
 			'issuesCount' => Yii::t('issue', 'Issues Count'),
 			'sort_order' => Yii::t('common', 'Sort order'),
@@ -137,6 +161,17 @@ class IssueTagType extends ActiveRecord {
 			$count += $issueTag->getIssuesCount();
 		}
 		return $count;
+	}
+
+	public function getLinkIssuesGridPositionName(): ?string {
+		return static::getLinkIssuesGridPositionNames()[$this->link_issues_grid_position];
+	}
+
+	public static function getLinkIssuesGridPositionNames(): array {
+		return [
+			static::LINK_ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM => Yii::t('issue', 'Link Issues Grid Position - Issue'),
+			static::LINK_ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM => Yii::t('issue', 'Link Issues Grid Position - Customer'),
+		];
 	}
 
 	public function getViewIssuePositionName(): ?string {

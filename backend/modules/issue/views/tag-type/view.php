@@ -57,6 +57,7 @@ YiiAsset::register($this);
 			'sort_order',
 			'viewIssuePositionName',
 			'issuesGridPositionName',
+			'linkIssuesGridPositionName',
 			'issuesCount',
 		],
 	]) ?>

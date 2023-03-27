@@ -18,7 +18,12 @@ class TagTypeSearch extends IssueTagType {
 		return [
 			[['id', 'sort_order'], 'integer'],
 			['issuesCount', 'default', 'value' => null],
-			[['name', 'background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position'], 'safe'],
+			[
+				[
+					'name', 'background', 'color', 'css_class',
+					'view_issue_position', 'issues_grid_position', 'link_issues_grid_position',
+				], 'safe',
+			],
 		];
 	}
 
@@ -65,7 +70,8 @@ class TagTypeSearch extends IssueTagType {
 			->andFilterWhere(['like', 'color', $this->color])
 			->andFilterWhere(['like', 'css_class', $this->css_class])
 			->andFilterWhere(['like', 'view_issue_position', $this->view_issue_position])
-			->andFilterWhere(['like', 'issues_grid_position', $this->issues_grid_position]);
+			->andFilterWhere(['like', 'issues_grid_position', $this->issues_grid_position])
+			->andFilterWhere(['like', 'link_issues_grid_position', $this->link_issues_grid_position]);
 
 		return $dataProvider;
 	}

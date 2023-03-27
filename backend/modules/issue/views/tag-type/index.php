@@ -47,6 +47,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'issuesGridPositionName',
 				'filter' => IssueTagType::getIssuesGridPositionNames(),
 			],
+			[
+				'attribute' => 'link_issues_grid_position',
+				'value' => 'linkIssuesGridPositionName',
+				'filter' => IssueTagType::getLinkIssuesGridPositionNames(),
+			],
 			'css_class',
 			'sort_order',
 			[
