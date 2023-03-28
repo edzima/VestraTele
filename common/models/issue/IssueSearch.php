@@ -74,6 +74,7 @@ abstract class IssueSearch extends Model
 	public $tele_id;
 
 	public $tagsIds;
+	public $excludedTagsIds;
 
 	public const SUMMON_ALL_REALIZED = 'all-realized';
 	public const SUMMON_SOME_ACTIVE = 'some-active';
@@ -156,7 +157,7 @@ abstract class IssueSearch extends Model
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			[['type_id', 'excludedTypes'], 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			[['customerName', 'userName'], 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
-			['tagsIds', 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
+			[['tagsIds'], 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
 			[
 				[
 					'created_at', 'updated_at', 'type_additional_date_at',
@@ -290,6 +291,8 @@ abstract class IssueSearch extends Model
 			'type',
 			'issueNotes',
 			'summons.docsLink',
+			'tags',
+			'tags.tagType',
 		];
 	}
 
