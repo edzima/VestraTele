@@ -119,16 +119,10 @@ class LeadMarketCreateSummaryEmail extends Model {
 	}
 
 	public function getMarketUsersEmails(): array {
-		return LeadMarketUser::find()
-			->select([
-				User::tableName() . '.email',
-				User::tableName() . '.status',
-			])
-			->joinWith([
-				'user' => function (UserQuery $query) {
-					$query->active();
-				},
-			])
+		return User::find()
+			->active()
+			->onlyAssignments([User::PERMISSION_LEAD_MARKET], false)
+			->select('email')
 			->column();
 	}
 
