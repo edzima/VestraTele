@@ -3,12 +3,15 @@
 namespace common\widgets\grid;
 
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueTagType;
 use common\models\issue\search\IssueStageSearchable;
 use common\widgets\GridView;
 use kartik\select2\Select2;
 use Yii;
 
 class IssueStageColumn extends DataColumn {
+
+	use IssueTagsColumnTrait;
 
 	public const VALUE_SHORT = 'short';
 	public const VALUE_NAME = 'name';
@@ -45,6 +48,10 @@ class IssueStageColumn extends DataColumn {
 
 		if ($this->valueType === static::VALUE_SHORT) {
 			$this->width = '75px';
+		}
+
+		if (empty($this->tagType)) {
+			$this->tagType = IssueTagType::ISSUES_GRID_POSITION_COLUMN_STAGE_BOTTOM;
 		}
 
 		if (empty($this->filterWidgetOptions)) {

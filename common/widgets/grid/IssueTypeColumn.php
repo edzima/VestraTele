@@ -3,12 +3,15 @@
 namespace common\widgets\grid;
 
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueTagType;
 use common\models\issue\search\IssueTypeSearch;
 use common\widgets\GridView;
 use kartik\select2\Select2;
 use Yii;
 
 class IssueTypeColumn extends DataColumn {
+
+	use IssueTagsColumnTrait;
 
 	public const VALUE_SHORT = 'short';
 	public const VALUE_NAME = 'name';
@@ -41,6 +44,10 @@ class IssueTypeColumn extends DataColumn {
 		}
 		if (empty($this->filterType)) {
 			$this->filterType = GridView::FILTER_SELECT2;
+		}
+
+		if (empty($this->tagType)) {
+			$this->tagType = IssueTagType::ISSUES_GRID_POSITION_COLUMN_TYPE_BOTTOM;
 		}
 
 //		switch ($this->valueType) {

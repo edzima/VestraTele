@@ -10,6 +10,8 @@ use Yii;
 
 class IssueColumn extends DataColumn {
 
+	use IssueTagsColumnTrait;
+
 	public $noWrap = true;
 
 	public $attribute = 'issue_id';
@@ -19,8 +21,6 @@ class IssueColumn extends DataColumn {
 	];
 
 	public ?string $viewBaseUrl = null;
-
-	public bool $tooltip = true;
 
 	public function init(): void {
 		if (empty($this->label)) {
@@ -40,6 +40,9 @@ class IssueColumn extends DataColumn {
 		if (!isset($this->filterInputOptions['placeholder'])) {
 			$this->filterInputOptions['placeholder'] = Yii::t('issue', 'Issue Name');
 		}
+		if (empty($this->tagType)) {
+			$this->tagType = IssueTagType::ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM;
+		}
 		$this->options['style'] = 'width:100px';
 		parent::init();
 	}
@@ -48,16 +51,6 @@ class IssueColumn extends DataColumn {
 		return Html::a($model->getIssueName(),
 			[$this->viewBaseUrl, 'id' => $model->getIssueId()],
 			$this->linkOptions);
-	}
-
-	protected function renderTags($model, $key, $index): string {
-		return IssueTagsWidget::widget([
-			'models' =>
-				IssueTagType::issuesGridPositionFilter(
-					$model->getIssueModel()->tags,
-					IssueTagType::ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM
-				),
-		]);
 	}
 
 }
