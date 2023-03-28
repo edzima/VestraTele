@@ -26,13 +26,16 @@ class IssueTagType extends ActiveRecord {
 
 	public const VIEW_ISSUE_POSITION_CUSTOMER = 'customer';
 
-	public const VIEW_ISSUE_POSITION_VICTIM = 'victim';
-
+	public const VIEW_ISSUE_BEFORE_CUSTOMERS = 'beforeCustomer';
 	public const VIEW_ISSUE_POSITION_BEFORE_DETAILS = 'beforeDetails';
 	public const VIEW_ISSUE_POSITION_AFTER_DETAILS = 'afterDetails';
 
 	public const ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM = 'column-Customer_bottom';
 	public const ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM = 'column-Issue_bottom';
+
+	public const ISSUES_GRID_POSITION_COLUMN_TYPE_BOTTOM = 'column-Type_bottom';
+
+	public const ISSUES_GRID_POSITION_COLUMN_STAGE_BOTTOM = 'column-Stage_bottom';
 
 	public const LINK_ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM = 'column-Customer_bottom';
 	public const LINK_ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM = 'column-Issue_bottom';
@@ -41,9 +44,12 @@ class IssueTagType extends ActiveRecord {
 		switch ($position) {
 			case self::ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM:
 			case self::ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM:
+			case self::ISSUES_GRID_POSITION_COLUMN_STAGE_BOTTOM:
+			case self::ISSUES_GRID_POSITION_COLUMN_TYPE_BOTTOM:
 				return static::issuesGridPositionFilter($tags, $position);
 			case self::VIEW_ISSUE_POSITION_BEFORE_DETAILS:
 			case self::VIEW_ISSUE_POSITION_AFTER_DETAILS:
+			case self::VIEW_ISSUE_BEFORE_CUSTOMERS:
 				return static::viewIssuePositionFilter($tags, $position);
 		}
 		return $tags;
@@ -106,6 +112,7 @@ class IssueTagType extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
+			[['name', 'background', 'color'], 'required'],
 			[['sort_order'], 'integer'],
 			[['name', 'background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position', 'link_issues_grid_position'], 'string', 'max' => 255],
 			[['background', 'color', 'css_class', 'view_issue_position', 'issues_grid_position', 'link_issues_grid_position'], 'default', 'value' => null],
@@ -137,9 +144,13 @@ class IssueTagType extends ActiveRecord {
 
 	public static function getTypesNames(): array {
 		return ArrayHelper::map(
-			IssueTagType::find()->orderBy('name')->all(),
+			IssueTagType::find()->orderBy([
+				'sort_order' => SORT_ASC,
+				'name' => SORT_ASC,
+			])->all(),
 			'id',
-			'name');
+			'name'
+		);
 	}
 
 	/**
@@ -180,6 +191,7 @@ class IssueTagType extends ActiveRecord {
 
 	public static function getViewIssuePositionNames(): array {
 		return [
+			static::VIEW_ISSUE_BEFORE_CUSTOMERS => Yii::t('issue', 'Issue View Position - Before Customers'),
 			static::VIEW_ISSUE_POSITION_CUSTOMER => Yii::t('issue', 'Issue View Position - Customer'),
 			static::VIEW_ISSUE_POSITION_AFTER_DETAILS => Yii::t('issue', 'Issue View Position - After Details'),
 			static::VIEW_ISSUE_POSITION_BEFORE_DETAILS => Yii::t('issue', 'Issue View Position - Before Details'),
@@ -195,6 +207,8 @@ class IssueTagType extends ActiveRecord {
 		return [
 			static::ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM => Yii::t('issue', 'Issues Grid Position - Issue -> bottom'),
 			static::ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM => Yii::t('issue', 'Issues Grid Position - Customer -> bottom'),
+			static::ISSUES_GRID_POSITION_COLUMN_STAGE_BOTTOM => Yii::t('issue', 'Issues Grid Position - Type -> bottom'),
+			static::ISSUES_GRID_POSITION_COLUMN_TYPE_BOTTOM => Yii::t('issue', 'Issues Grid Position - Stage -> bottom'),
 
 		];
 	}

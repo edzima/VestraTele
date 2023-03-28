@@ -22,9 +22,7 @@ class IssueTagsWidget extends Widget {
 	public array $models = [];
 
 	public string $containerTag = 'div';
-	public array $containerOptions = [
-		'class' => 'tags-wrapper',
-	];
+	public array $containerOptions = [];
 
 	public bool $onlyActive = true;
 
@@ -57,6 +55,7 @@ class IssueTagsWidget extends Widget {
 		});
 
 		parent::init();
+		Html::addCssClass($this->containerOptions, 'tags-wrapper');
 		$this->tooltipInit();
 	}
 

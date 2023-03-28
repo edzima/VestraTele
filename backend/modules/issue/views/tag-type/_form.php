@@ -14,42 +14,87 @@ use yii\widgets\ActiveForm;
 
 	<?php $form = ActiveForm::begin(); ?>
 
-	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+	<div class="row">
+		<?= $form->field($model, 'name', [
+			'options' => [
+				'class' => 'col-md-3',
+			],
+		])->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'background')->widget(
-		ColorInput::class
-	) ?>
-
-	<?= $form->field($model, 'color')->widget(
-		ColorInput::class
-	) ?>
-
-	<?= $form->field($model, 'css_class')->textInput(['maxlength' => true]) ?>
-
-	<?= $form->field($model, 'view_issue_position')->dropDownList(
-		IssueTagType::getViewIssuePositionNames(),
-		[
-			'prompt' => Yii::t('common', 'Select...'),
-		])
-	?>
+	</div>
 
 
-	<?= $form->field($model, 'issues_grid_position')->dropDownList(
-		IssueTagType::getIssuesGridPositionNames(),
-		[
-			'prompt' => Yii::t('common', 'Select...'),
-		])
-	?>
+	<div class="row">
+
+		<?= $form->field($model, 'background', [
+			'options' => [
+				'class' => 'col-md-3',
+			],
+		])->widget(
+			ColorInput::class
+		) ?>
+
+		<?= $form->field($model, 'color', [
+			'options' => [
+				'class' => 'col-md-3',
+			],
+		])->widget(
+			ColorInput::class
+		) ?>
+
+		<?= $form->field($model, 'css_class', [
+			'options' => [
+				'class' => 'col-md-3',
+			],
+		])->textInput(['maxlength' => true]) ?>
 
 
-	<?= $form->field($model, 'link_issues_grid_position')->dropDownList(
-		IssueTagType::getLinkIssuesGridPositionNames(),
-		[
-			'prompt' => Yii::t('common', 'Select...'),
-		])
-	?>
+		<?= $form->field($model, 'sort_order', [
+			'options' => [
+				'class' => 'col-md-3',
+			],
+		])->textInput() ?>
 
-	<?= $form->field($model, 'sort_order')->textInput() ?>
+	</div>
+
+	<div class="row">
+
+		<?= $form->field($model, 'view_issue_position', [
+			'options' => [
+				'class' => 'col-md-4',
+			],
+		])->dropDownList(
+			IssueTagType::getViewIssuePositionNames(),
+			[
+				'prompt' => Yii::t('common', 'Select...'),
+			])
+		?>
+
+
+		<?= $form->field($model, 'issues_grid_position', [
+			'options' => [
+				'class' => 'col-md-4',
+			],
+		])->dropDownList(
+			IssueTagType::getIssuesGridPositionNames(),
+			[
+				'prompt' => Yii::t('common', 'Select...'),
+			])
+		?>
+
+
+		<?= $form->field($model, 'link_issues_grid_position', [
+			'options' => [
+				'class' => 'col-md-4',
+			],
+		])->dropDownList(
+			IssueTagType::getLinkIssuesGridPositionNames(),
+			[
+				'prompt' => Yii::t('common', 'Select...'),
+			])
+		?>
+
+	</div>
 
 
 	<div class="form-group">

@@ -236,6 +236,10 @@ div:target {
 }
 
 
+.label {
+	font-size: 0.9em;
+}
+
 .grid-view .tags-wrapper a {
 	color: #33596f
 }
@@ -244,7 +248,7 @@ div:target {
 	color: #06283d
 }
 
-.grid-view .tags-wrapper label {
+.grid-view .tags-wrapper .label {
 	font-size: 85%;
 	font-weight: 600;
 }

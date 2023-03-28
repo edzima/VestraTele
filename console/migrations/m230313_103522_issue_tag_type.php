@@ -13,7 +13,7 @@ class m230313_103522_issue_tag_type extends Migration {
 	public function safeUp() {
 		$this->createTable('{{%issue_tag_type}}', [
 			'id' => $this->primaryKey(),
-			'name' => $this->string()->unique(),
+			'name' => $this->string()->unique()->notNull(),
 			'background' => $this->string(),
 			'color' => $this->string(),
 			'css_class' => $this->string(),

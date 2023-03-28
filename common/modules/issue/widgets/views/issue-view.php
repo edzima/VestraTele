@@ -29,6 +29,19 @@ use yii\data\ActiveDataProvider;
 <div id="issue-details">
 	<div class="row">
 		<div class="col-md-7 col-lg-6">
+
+			<span class="pull-right">
+				<?= IssueTagsWidget::widget([
+					'containerTag' => 'span',
+					'groupTag' => 'span',
+					'models' => IssueTagType::viewIssuePositionFilter(
+						$model->tags,
+						IssueTagType::VIEW_ISSUE_BEFORE_CUSTOMERS
+					),
+				]) ?>
+			</span>
+			<div class="clearfix"></div>
+
 			<?= IssueUsersWidget::widget([
 				'model' => $model,
 				'type' => IssueUsersWidget::TYPE_CUSTOMERS,
@@ -187,6 +200,12 @@ use yii\data\ActiveDataProvider;
 					[
 						'class' => IssueColumn::class,
 						'viewBaseUrl' => 'view',
+						'tags' => static function (IssueInterface $issue): array {
+							return IssueTagType::linkIssuesGridPositionFilter(
+								$issue->getIssueModel()->tags,
+								IssueTagType::LINK_ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM
+							);
+						},
 					],
 					[
 						'label' => Yii::t('issue', 'Type'),
@@ -199,6 +218,12 @@ use yii\data\ActiveDataProvider;
 					[
 						'class' => CustomerDataColumn::class,
 						'value' => 'customer.fullName',
+						'tags' => static function (IssueInterface $issue): array {
+							return IssueTagType::linkIssuesGridPositionFilter(
+								$issue->getIssueModel()->tags,
+								IssueTagType::LINK_ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM
+							);
+						},
 					],
 					[
 						'class' => ActionColumn::class,

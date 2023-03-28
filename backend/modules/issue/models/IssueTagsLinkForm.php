@@ -35,9 +35,7 @@ class IssueTagsLinkForm extends Model {
 				$typesTags = $this->getTagsNames($typeId);
 				foreach ((array) $ids as $key => $tagIdOrNewName) {
 					if (!isset($typesTags[$tagIdOrNewName])) {
-						//		var_dump($this->typeTags[$typeId]);
 						unset($this->typeTags[$typeId][$key]);
-						//var_dump($this->typeTags);
 						if (!empty($tagIdOrNewName) && !is_numeric($tagIdOrNewName)) {
 							$tag = $this->addTag($tagIdOrNewName, $typeId);
 							if ($tag->id) {
@@ -56,10 +54,7 @@ class IssueTagsLinkForm extends Model {
 		$tag->name = $name;
 		$tag->type = $type;
 		if ($tag->save()) {
-			var_dump('save tag');
 			$this->_tags[] = $tag;
-		}else{
-			var_dump($tag->getErrors());
 		}
 		return $tag;
 	}
@@ -106,7 +101,9 @@ class IssueTagsLinkForm extends Model {
 		if (!$this->validate()) {
 			return false;
 		}
-		IssueTagLink::deleteAll(['issue_id' => $this->issue->getIssueId()]);
+		IssueTagLink::deleteAll([
+			'issue_id' => $this->issue->getIssueId(),
+		]);
 		$rows = [];
 		$ids = $this->getTagsIds();
 		foreach ($ids as $id) {

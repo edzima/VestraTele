@@ -18,10 +18,10 @@ class TagTypeController extends Controller {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return [
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
 				],
@@ -34,7 +34,7 @@ class TagTypeController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new TagTypeSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -47,11 +47,11 @@ class TagTypeController extends Controller {
 	public function actionTags(int $id) {
 		$model = new TypeTagsForm();
 		$model->setType($this->findModel($id));
-		if ($model->load(Yii::$app->request->post()) && $model->save()){
-			return $this->redirect(['view','id' => $id]);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $id]);
 		}
-		return $this->render('tags',[
-			'model' => $model
+		return $this->render('tags', [
+			'model' => $model,
 		]);
 	}
 
@@ -62,7 +62,7 @@ class TagTypeController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView(int $id) {
+	public function actionView(int $id): string {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
@@ -94,7 +94,7 @@ class TagTypeController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionUpdate($id) {
+	public function actionUpdate(int $id) {
 		$model = $this->findModel($id);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
