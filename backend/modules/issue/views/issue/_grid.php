@@ -15,6 +15,7 @@ use common\modules\issue\widgets\IssueSummonsColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\DataColumn;
+use common\widgets\grid\IssueStageColumn;
 use common\widgets\grid\IssueTypeColumn;
 use common\widgets\grid\SerialColumn;
 use kartik\grid\CheckboxColumn;
@@ -53,7 +54,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 		}
 		return [];
 	},
-	'emptyText' => $searchModel->hasExcludedArchiveStage() && ($totalCount = $searchModel->getTotalCountWithArchive()) >0
+	'emptyText' => $searchModel->hasExcludedArchiveStage() && ($totalCount = $searchModel->getTotalCountWithArchive()) > 0
 		? Alert::widget([
 			'body' =>
 				Html::a(Yii::t('issue', 'The archive is excluded. Matching Issues found in it: {count}.', [
@@ -120,7 +121,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 			'attribute' => 'customerName',
 		],
 		[
-			'class' => DataColumn::class,
+			'class' => IssueStageColumn::class,
 			'attribute' => 'stage_id',
 			'filter' => $searchModel->getStagesNames(),
 			'value' => static function (Issue $model): string {
