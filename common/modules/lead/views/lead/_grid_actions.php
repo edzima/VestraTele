@@ -250,6 +250,9 @@ $dataProvider->getModels();
 	? CsvForm::widget([
 		'buttonText' => Html::icon('export'),
 		'endForm' => false,
+		'buttonOptions' => [
+			'class' => 'btn btn-secondary not-selected-all',
+		],
 	])
 	: ''
 ?>
