@@ -74,7 +74,7 @@ class LeadMarketCreateSummaryEmail extends Model {
 				]
 			)
 			->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
-			->setTo($this->emails)
+			->setBcc($this->emails)
 			->setSubject(Yii::t('lead', 'New {count} Leads on Market.', [
 				'count' => $count,
 			]))
