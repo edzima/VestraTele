@@ -66,6 +66,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		self::TYPE_CO_AGENT,
 		self::TYPE_TELEMARKETER,
 		self::TYPE_CUSTOMER,
+		self::TYPE_RECOMMENDING,
 	];
 
 	/**

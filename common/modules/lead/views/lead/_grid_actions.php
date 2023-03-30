@@ -249,6 +249,10 @@ $dataProvider->getModels();
 <?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
 	? CsvForm::widget([
 		'buttonText' => Html::icon('export'),
+		'endForm' => false,
+		'buttonOptions' => [
+			'class' => 'btn btn-secondary not-selected-all',
+		],
 	])
 	: ''
 ?>

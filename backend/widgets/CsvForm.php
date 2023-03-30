@@ -18,6 +18,8 @@ class CsvForm extends Widget {
 		'class' => 'btn btn-secondary',
 	];
 
+	public bool $endForm = true;
+
 	public function run(): string {
 		$formOptions = $this->formOptions;
 		Html::addCssClass($formOptions, 'csv-form');
@@ -27,7 +29,9 @@ class CsvForm extends Widget {
 		$options['title'] = Yii::t('common', 'Export');
 		$options['aria-label'] = Yii::t('common', 'Export');
 		$content .= Html::submitButton($this->buttonText, $options);
-		$content .= Html::endForm();
+		if ($this->endForm) {
+			$content .= Html::endForm();
+		}
 		return $content;
 	}
 }

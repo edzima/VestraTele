@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 $js = <<< JS
 
 function ensureSelectionAllOnEmpty(){
-	$("#leads-grid-pjax button[type='submit']").on('click', function (){
+	$("#leads-grid-pjax button[type='submit']:not(.not-selected-all)").on('click', function (){
 		 if($('#leads-grid').yiiGridView('getSelectedRows').length===0){
 			$('#leads-grid [name="selection_all"]').click(); 
 		 }
