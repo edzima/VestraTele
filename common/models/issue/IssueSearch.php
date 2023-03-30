@@ -157,7 +157,7 @@ abstract class IssueSearch extends Model
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			[['type_id', 'excludedTypes'], 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			[['customerName', 'userName'], 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
-			[['tagsIds'], 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
+			[['excludedTagsIds', 'tagsIds'], 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
 			[
 				[
 					'created_at', 'updated_at', 'type_additional_date_at',
@@ -199,6 +199,7 @@ abstract class IssueSearch extends Model
 			'signedAtFrom' => Yii::t('issue', 'Signed At from'),
 			'signedAtTo' => Yii::t('issue', 'Signed At to'),
 			'tagsIds' => Yii::t('issue', 'Tags'),
+			'excludedTagsIds' => Yii::t('issue', 'Excluded tags'),
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 			'userName' => Yii::t('issue', 'First name & surname'),
 			'userType' => Yii::t('issue', 'Who'),
@@ -506,7 +507,17 @@ abstract class IssueSearch extends Model
 		if (!empty($this->tagsIds)) {
 			$query->joinWith('tags');
 			$query->distinct();
-			$query->andWhere([IssueTag::tableName() . '.id' => $this->tagsIds]);
+			$query->andWhere([IssueTagLink::tableName() . '.tag_id' => $this->tagsIds]);
+		}
+		if (!empty($this->excludedTagsIds)) {
+			$query->joinWith('tags');
+			$query->distinct();
+			$query->andWhere([
+				'NOT IN', Issue::tableName() . '.id', IssueTagLink::find()
+					->select('issue_id')
+					->distinct()
+					->andWhere(['tag_id' => $this->excludedTagsIds]),
+			]);
 		}
 	}
 
