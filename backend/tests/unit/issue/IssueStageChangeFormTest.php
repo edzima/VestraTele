@@ -2,6 +2,7 @@
 
 namespace backend\tests\unit\issue;
 
+use backend\modules\issue\models\IssueStage;
 use backend\modules\issue\models\IssueStageChangeForm;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
@@ -35,6 +36,14 @@ class IssueStageChangeFormTest extends Unit {
 		$this->thenUnsuccessSave();
 		$this->thenSeeError('Date At cannot be blank.', 'date_at');
 		$this->thenSeeError('New Stage must be other than old.', 'stage_id');
+	}
+
+	public function testArchiveWithoutArchiveNr(): void {
+		$issue = $this->tester->grabFixture(IssueFixtureHelper::ISSUE, 0);
+		$this->giveModel($issue);
+		$this->model->stage_id = IssueStage::ARCHIVES_ID;
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Archives nr cannot be blank.', 'archives_nr');
 	}
 
 	public function testLinkedIssueWithNotLinkedId(): void {

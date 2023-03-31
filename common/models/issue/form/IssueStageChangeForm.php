@@ -22,6 +22,8 @@ class IssueStageChangeForm extends Model {
 	public ?string $description = null;
 
 	public $linkedIssues = [];
+
+	public ?string $archives_nr = null;
 	public bool $linkedIssuesMessages = true;
 
 	private IssueInterface $issue;
@@ -30,17 +32,21 @@ class IssueStageChangeForm extends Model {
 	private ?IssueNote $note = null;
 
 	public function __construct(IssueInterface $issue, array $config = []) {
-		$this->issue = $issue;
-		$this->stage_id = $issue->getIssueStage()->id;
+		$this->setIssue($issue);
 		parent::__construct($config);
 	}
 
 	public function rules(): array {
 		return [
 			[['stage_id', 'date_at', '!user_id'], 'required'],
-			['stage_id', 'compare', 'operator' => '!=', 'compareValue' => $this->getIssue()->getIssueStage()->id, 'message' => Yii::t('issue', 'New Stage must be other than old.')],
+			[
+				'archives_nr', 'required', 'when' => function (): bool {
+				return in_array($this->stage_id, IssueStage::ARCHIVES_IDS);
+			},
+			],
+			['stage_id', 'compare', 'operator' => '!=', 'compareValue' => $this->getIssue()->getIssueStageId(), 'message' => Yii::t('issue', 'New Stage must be other than old.')],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesData())],
-			['description', 'string'],
+			[['description', 'archives_nr'], 'string'],
 			['linkedIssuesMessages', 'boolean'],
 			['date_at', 'date', 'format' => 'php:' . $this->dateFormat],
 			[
@@ -65,6 +71,7 @@ class IssueStageChangeForm extends Model {
 
 	public function attributeLabels(): array {
 		return [
+			'archives_nr' => Yii::t('common', 'Archives nr'),
 			'stage_id' => Yii::t('common', 'Stage'),
 			'date_at' => Yii::t('common', 'Date At'),
 			'description' => Yii::t('common', 'Description'),
@@ -85,6 +92,7 @@ class IssueStageChangeForm extends Model {
 		$this->previous_stage_id = $model->stage_id;
 		$model->stage_id = $this->stage_id;
 		$model->stage_change_at = $this->date_at;
+		$model->archives_nr = $this->archives_nr;
 		$model->generateStageDeadlineAt();
 		$update = (bool) $model->updateAttributes([
 			'stage_id',
@@ -136,6 +144,12 @@ class IssueStageChangeForm extends Model {
 
 	public function getIssue(): IssueInterface {
 		return $this->issue;
+	}
+
+	public function setIssue(IssueInterface $issue): void {
+		$this->issue = $issue;
+		$this->stage_id = $issue->getIssueStageId();
+		$this->archives_nr = $issue->getArchivesNr();
 	}
 
 	public function getNoteTitle(): string {
