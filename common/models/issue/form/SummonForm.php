@@ -36,9 +36,11 @@ class SummonForm extends Model implements HiddenFieldsModel {
 	public const TERM_TREE_DAYS = 3;
 	public const TERM_FIVE_DAYS = 5;
 	public const TERM_ONE_WEEK = 7;
+	public const TERM_TEN_DAYS = 10;
 	public const TERM_TWO_WEEKS = 14;
 	public const TERM_THREE_WEEKS = 21;
 	public const TERM_ONE_MONTH = 30;
+	public const TERM_TWO_MONTH = 61;
 	public const TERM_CUSTOM = 'custom';
 
 	public int $owner_id;
@@ -348,9 +350,11 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			static::TERM_TREE_DAYS => Yii::t('common', '1 Days'),
 			static::TERM_FIVE_DAYS => Yii::t('common', '5 Days'),
 			static::TERM_ONE_WEEK => Yii::t('common', 'Week'),
+			static::TERM_TEN_DAYS => Yii::t('common', '10 Days'),
 			static::TERM_TWO_WEEKS => Yii::t('common', '2 Weeks'),
 			static::TERM_THREE_WEEKS => Yii::t('common', '3 Weeks'),
-			static::TERM_ONE_MONTH => Yii::t('common', 'Month'),
+			static::TERM_ONE_MONTH => Yii::t('common', 'One Month'),
+			static::TERM_TWO_MONTH => Yii::t('common', 'Two Months'),
 			static::TERM_EMPTY => Yii::t('common', 'Without Term'),
 			static::TERM_CUSTOM => Yii::t('common', 'Custom Term'),
 		];
