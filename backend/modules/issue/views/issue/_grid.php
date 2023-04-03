@@ -61,7 +61,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 				Html::a(Yii::t('issue', 'The archive is excluded. Matching Issues found in it: {count}.', [
 					'count' => $totalCount,
 				]),
-					'archive?' . Yii::$app->request->queryString
+					Url::to(['archive']) . '?' . Yii::$app->request->queryString
 				),
 			'options' => [
 				'class' => 'alert-warning text-center mb-0',
