@@ -38,7 +38,6 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 	})"
 );
 
-var_dump(Yii::$app->request->queryString);
 ?>
 
 
