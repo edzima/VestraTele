@@ -172,11 +172,11 @@ class IssueController extends Controller {
 		]);
 	}
 
-	public function actionArchive(string $customerName, string $issueId = null): string {
+	public function actionArchive(): string {
 		$searchModel = new IssueSearch();
-		$searchModel->customerName = $customerName;
-		$searchModel->issue_id = $issueId;
 		$searchModel->scenario = IssueSearch::SCENARIO_ARCHIVE_CUSTOMER;
+		$searchModel->load(Yii::$app->request->queryParams);
+		$searchModel->excludedStages = [];
 		$dataProvider = $searchModel->search([]);
 		return $this->render('archive', [
 			'searchModel' => $searchModel,
