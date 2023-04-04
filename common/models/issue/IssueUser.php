@@ -31,6 +31,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	use IssueTrait;
 
 	public const TYPE_LAWYER = Worker::ROLE_LAWYER;
+	public const TYPE_LAWYER_OFFICE = Worker::ROLE_LAWYER_OFFICE;
 	public const TYPE_LAWYER_ASSISTANT = Worker::ROLE_LAWYER_ASSISTANT;
 	public const TYPE_AGENT = Worker::ROLE_AGENT;
 	public const TYPE_CO_AGENT = Worker::ROLE_CO_AGENT;
@@ -45,6 +46,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 
 	public const TYPES_WORKERS = [
 		self::TYPE_LAWYER,
+		self::TYPE_LAWYER_OFFICE,
 		self::TYPE_LAWYER_ASSISTANT,
 		self::TYPE_AGENT,
 		self::TYPE_CO_AGENT,
@@ -149,6 +151,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 			static::TYPE_CO_AGENT => User::getRolesNames()[static::TYPE_CO_AGENT],
 			static::TYPE_LAWYER => User::getRolesNames()[static::TYPE_LAWYER],
 			static::TYPE_LAWYER_ASSISTANT => User::getRolesNames()[static::TYPE_LAWYER_ASSISTANT],
+			static::TYPE_LAWYER_OFFICE => User::getRolesNames()[static::TYPE_LAWYER_OFFICE],
 			static::TYPE_TELEMARKETER => User::getRolesNames()[static::TYPE_TELEMARKETER],
 			static::TYPE_VINDICATOR => User::getRolesNames()[static::TYPE_VINDICATOR],
 			static::TYPE_VICTIM => User::getRolesNames()[static::TYPE_VICTIM],
