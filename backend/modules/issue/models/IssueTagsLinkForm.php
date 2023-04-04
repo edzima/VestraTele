@@ -18,7 +18,7 @@ class IssueTagsLinkForm extends Model {
 
 	public function rules(): array {
 		return [
-			['withoutType', 'in', 'range' => array_keys($this->getTagsNames(null)), 'allowArray' => true],
+			['withoutType', 'withoutTypeTagsFilter'],
 			['typeTags', 'typeTagsFilter'],
 		];
 	}
@@ -42,6 +42,21 @@ class IssueTagsLinkForm extends Model {
 								$this->typeTags[$typeId][] = $tag->id;
 							}
 						}
+					}
+				}
+			}
+		}
+	}
+
+	public function withoutTypeTagsFilter(): void {
+		$tags = $this->getTagsNames(null);
+		foreach ((array) $this->withoutType as $key => $tagIdOrNewName) {
+			if (!isset($tags[$tagIdOrNewName])) {
+				unset($this->withoutType[$key]);
+				if (!empty($tagIdOrNewName) && !is_numeric($tagIdOrNewName)) {
+					$tag = $this->addTag($tagIdOrNewName, null);
+					if ($tag->id) {
+						$this->withoutType[] = $tag->id;
 					}
 				}
 			}
