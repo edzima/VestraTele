@@ -2,10 +2,10 @@
 
 namespace common\widgets\grid;
 
+use common\assets\TooltipAsset;
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueTagType;
-use common\modules\issue\widgets\IssueTagsWidget;
 use Yii;
 
 class IssueColumn extends DataColumn {
@@ -20,11 +20,23 @@ class IssueColumn extends DataColumn {
 		'data-pjax' => '0',
 	];
 
+	public bool $detailsTooltip = true;
+
 	public ?string $viewBaseUrl = null;
 
 	public function init(): void {
 		if (empty($this->label)) {
 			$this->label = Yii::t('issue', 'Issue');
+		}
+		if ($this->detailsTooltip) {
+			$this->contentOptions = function (IssueInterface $model): array {
+				if (!empty($model->getIssueModel()->details)) {
+					return [
+						TooltipAsset::DEFAULT_ATTRIBUTE_NAME => $model->getIssueModel()->details,
+					];
+				}
+				return [];
+			};
 		}
 		if (!empty($this->viewBaseUrl) && !empty($this->linkOptions)) {
 			$this->format = 'raw';
