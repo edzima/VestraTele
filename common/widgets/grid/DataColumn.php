@@ -36,13 +36,15 @@ class DataColumn extends BaseDataColumn {
 		}
 		if ($this->format === 'date') {
 			if ($this->value === null) {
-				$this->format = 'text';
-				$this->value = function ($model) {
-					if ($model->{$this->attribute} !== null) {
-						return Yii::$app->formatter->asDate($model->{$this->attribute});
-					}
-					return null;
-				};
+				if (strpos($this->attribute, '.') === false) {
+					$this->format = 'text';
+					$this->value = function ($model) {
+						if ($model->{$this->attribute} !== null) {
+							return Yii::$app->formatter->asDate($model->{$this->attribute});
+						}
+						return null;
+					};
+				}
 			}
 		}
 	}
