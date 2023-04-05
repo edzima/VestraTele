@@ -6,6 +6,7 @@ use common\assets\TooltipAsset;
 use common\helpers\Html;
 use common\widgets\GridView;
 use kartik\grid\DataColumn as BaseDataColumn;
+use Yii;
 
 /**
  * Class DataColumn
@@ -32,6 +33,17 @@ class DataColumn extends BaseDataColumn {
 			Html::addNoPrintClass($this->headerOptions);
 			Html::addNoPrintClass($this->contentOptions);
 			Html::addNoPrintClass($this->footerOptions);
+		}
+		if ($this->format === 'date') {
+			if ($this->value === null) {
+				$this->format = 'text';
+				$this->value = function ($model) {
+					if ($model->{$this->attribute} !== null) {
+						return Yii::$app->formatter->asDate($model->{$this->attribute});
+					}
+					return null;
+				};
+			}
 		}
 	}
 
