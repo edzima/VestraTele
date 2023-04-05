@@ -20,12 +20,23 @@ class ProvisionUserReportWidget extends Widget {
 		'class' => IssueColumn::class,
 	];
 
+	public function init() {
+		parent::init();
+		$this->issueColumn = array_merge($this->issueColumn, $this->defaultIssueColumn());
+	}
+
 	public function run(): string {
 		return $this->render('user-report', [
 			'model' => $this->model,
 			'issueColumn' => $this->issueColumn,
 			'actionColumn' => $this->actionColumn,
 		]);
+	}
+
+	public function defaultIssueColumn(): array {
+		return [
+			'withTags' => false,
+		];
 	}
 
 }
