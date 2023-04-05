@@ -63,13 +63,23 @@ $this->params['issueParentTypeNav'] = [
 			: ''
 		?>
 
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_TAG_MANAGER)
+			? Html::a(Html::icon('tags'), ['tag/index'],
+				[
+					'class' => 'btn btn-success',
+					'title' => Yii::t('common', 'Tags'),
+					'aria-label' => Yii::t('common', 'Tags'),
+					'data-pjax' => 0,
+				])
+			: ''
+		?>
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
 			? CsvForm::widget([
 				'formOptions' => ['class' => 'pull-right'],
 			])
 			: ''
 		?>
-
 
 	</div>
 

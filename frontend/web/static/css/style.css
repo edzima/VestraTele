@@ -339,7 +339,7 @@ div:target {
 	animation-duration: 2s;
 	animation-name: highlight;
 	animation-timing-function: ease-in-out;
-	margin-top:20px;
+	margin-top: 20px;
 }
 
 @keyframes highlight {
@@ -349,4 +349,31 @@ div:target {
 	to {
 		box-shadow: 0 2px 6px rgba(255, 0, 0, 0.5);
 	}
+}
+
+
+.grid-view .tags-wrapper a {
+	color: #33596f
+}
+
+.grid-view .tags-wrapper a:hover {
+	color: #06283d
+}
+
+.grid-view .tags-wrapper label {
+	font-size: 85%;
+	font-weight: 600;
+}
+
+.tags-wrapper label {
+	display: inline-block;
+}
+
+.tags-wrapper .label {
+	display: inline-block;
+}
+
+
+.issue-users legend .tags-wrapper .label {
+	font-size: 0.6em;
 }

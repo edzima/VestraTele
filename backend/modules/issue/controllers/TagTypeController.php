@@ -2,19 +2,18 @@
 
 namespace backend\modules\issue\controllers;
 
-use backend\modules\issue\models\IssueTagsLinkForm;
-use backend\modules\issue\models\search\TagSearch;
-use common\models\issue\Issue;
-use common\models\issue\IssueTag;
+use backend\modules\issue\models\TypeTagsForm;
 use Yii;
-use yii\filters\VerbFilter;
+use common\models\issue\IssueTagType;
+use backend\modules\issue\models\search\TagTypeSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
 
 /**
- * TagController implements the CRUD actions for IssueTag model.
+ * TagTypeController implements the CRUD actions for IssueTagType model.
  */
-class TagController extends Controller {
+class TagTypeController extends Controller {
 
 	/**
 	 * {@inheritdoc}
@@ -30,28 +29,13 @@ class TagController extends Controller {
 		];
 	}
 
-	public function actionIssue(int $issueId) {
-		$issue = Issue::findOne($issueId);
-		if ($issue === null) {
-			throw new NotFoundHttpException();
-		}
-		$model = new IssueTagsLinkForm();
-		$model->setIssue($issue);
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['issue/view', 'id' => $issueId]);
-		}
-		return $this->render('issue', [
-			'model' => $model,
-		]);
-	}
-
 	/**
-	 * Lists all IssueTag models.
+	 * Lists all IssueTagType models.
 	 *
 	 * @return mixed
 	 */
 	public function actionIndex(): string {
-		$searchModel = new TagSearch();
+		$searchModel = new TagTypeSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
@@ -60,8 +44,19 @@ class TagController extends Controller {
 		]);
 	}
 
+	public function actionTags(int $id) {
+		$model = new TypeTagsForm();
+		$model->setType($this->findModel($id));
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $id]);
+		}
+		return $this->render('tags', [
+			'model' => $model,
+		]);
+	}
+
 	/**
-	 * Displays a single IssueTag model.
+	 * Displays a single IssueTagType model.
 	 *
 	 * @param integer $id
 	 * @return mixed
@@ -74,14 +69,13 @@ class TagController extends Controller {
 	}
 
 	/**
-	 * Creates a new IssueTag model.
+	 * Creates a new IssueTagType model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 *
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new IssueTag();
-		$model->is_active = true;
+		$model = new IssueTagType();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
@@ -93,7 +87,7 @@ class TagController extends Controller {
 	}
 
 	/**
-	 * Updates an existing IssueTag model.
+	 * Updates an existing IssueTagType model.
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 *
 	 * @param integer $id
@@ -113,7 +107,7 @@ class TagController extends Controller {
 	}
 
 	/**
-	 * Deletes an existing IssueTag model.
+	 * Deletes an existing IssueTagType model.
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
 	 *
 	 * @param integer $id
@@ -127,18 +121,18 @@ class TagController extends Controller {
 	}
 
 	/**
-	 * Finds the IssueTag model based on its primary key value.
+	 * Finds the IssueTagType model based on its primary key value.
 	 * If the model is not found, a 404 HTTP exception will be thrown.
 	 *
 	 * @param integer $id
-	 * @return IssueTag the loaded model
+	 * @return IssueTagType the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel(int $id): IssueTag {
-		if (($model = IssueTag::findOne($id)) !== null) {
+	protected function findModel(int $id): IssueTagType {
+		if (($model = IssueTagType::findOne($id)) !== null) {
 			return $model;
 		}
 
-		throw new NotFoundHttpException(Yii::t('issue', 'The requested page does not exist.'));
+		throw new NotFoundHttpException(Yii::t('backend', 'The requested page does not exist.'));
 	}
 }

@@ -4,9 +4,13 @@ namespace common\widgets\grid;
 
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueTagType;
+use common\modules\issue\widgets\IssueTagsWidget;
 use Yii;
 
 class IssueColumn extends DataColumn {
+
+	use IssueTagsColumnTrait;
 
 	public $noWrap = true;
 
@@ -35,6 +39,9 @@ class IssueColumn extends DataColumn {
 		}
 		if (!isset($this->filterInputOptions['placeholder'])) {
 			$this->filterInputOptions['placeholder'] = Yii::t('issue', 'Issue Name');
+		}
+		if (empty($this->tagType)) {
+			$this->tagType = IssueTagType::ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM;
 		}
 		$this->options['style'] = 'width:100px';
 		parent::init();

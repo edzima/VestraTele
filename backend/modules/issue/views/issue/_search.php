@@ -22,6 +22,7 @@ use common\models\user\Worker;
 		],
 		'id' => 'issue-search-form',
 		'method' => 'get',
+		'action' => null,
 	]); ?>
 
 	<div class="row">
@@ -175,17 +176,6 @@ use common\models\user\Worker;
 			->textInput()
 		?>
 
-		<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-8 col-lg-6']])->widget(Select2::class, [
-			'data' => IssueSearch::getTagsNames(),
-			'options' => [
-				'multiple' => true,
-				'placeholder' => Yii::t('issue', 'Tags'),
-			],
-			'pluginOptions' => [
-				'allowClear' => true,
-			],
-			'showToggleAll' => false,
-		]) ?>
 
 
 		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ?
@@ -197,6 +187,34 @@ use common\models\user\Worker;
 
 
 	</div>
+	<?php if (Yii::$app->user->can(Worker::PERMISSION_ISSUE_TAG_MANAGER)): ?>
+		<div class="row">
+			<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+				'data' => IssueSearch::getTagsNames(),
+				'options' => [
+					'multiple' => true,
+					'placeholder' => $model->getAttributeLabel('tagsIds'),
+				],
+				'pluginOptions' => [
+					'allowClear' => true,
+				],
+				'showToggleAll' => true,
+			]) ?>
+
+			<?= $form->field($model, 'excludedTagsIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+				'data' => IssueSearch::getTagsNames(),
+				'options' => [
+					'multiple' => true,
+					'placeholder' => $model->getAttributeLabel('excludedTagsIds'),
+				],
+				'pluginOptions' => [
+					'allowClear' => true,
+				],
+				'showToggleAll' => true,
+			]) ?>
+		</div>
+
+	<?php endif; ?>
 
 
 	<div class="form-group">

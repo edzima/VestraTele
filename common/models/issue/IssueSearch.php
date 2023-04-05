@@ -74,6 +74,7 @@ abstract class IssueSearch extends Model
 	public $tele_id;
 
 	public $tagsIds;
+	public $excludedTagsIds;
 
 	public const SUMMON_ALL_REALIZED = 'all-realized';
 	public const SUMMON_SOME_ACTIVE = 'some-active';
@@ -83,10 +84,10 @@ abstract class IssueSearch extends Model
 	public ?AddressSearch $addressSearch = null;
 	private array $stagesIdsForParentType = [];
 
-	protected static function getSummonsStatusFilters():array{
+	protected static function getSummonsStatusFilters(): array {
 		$filters = [];
-		foreach (static::getSummonsStatusesNames() as $filtersNames){
-			foreach ($filtersNames as $filter => $name){
+		foreach (static::getSummonsStatusesNames() as $filtersNames) {
+			foreach ($filtersNames as $filter => $name) {
 				$filters[] = $filter;
 			}
 		}
@@ -99,8 +100,8 @@ abstract class IssueSearch extends Model
 				static::SUMMON_SOME_ACTIVE => Yii::t('issue', 'Some Active'),
 			] + Summon::getStatusesNames();
 		return [
-			Yii::t('issue','Status') => $statuses,
-			Yii::t('issue','Summon Docs')  => [
+			Yii::t('issue', 'Status') => $statuses,
+			Yii::t('issue', 'Summon Docs') => [
 				static::SUMMON_DOCS_SOME_TO_CONFIRM => Yii::t('issue', 'To Confirm'),
 			],
 		];
@@ -156,7 +157,7 @@ abstract class IssueSearch extends Model
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			[['type_id', 'excludedTypes'], 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			[['customerName', 'userName'], 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
-			['tagsIds', 'in', 'range' => array_keys(static::getTagsNames()), 'allowArray' => true],
+			[['excludedTagsIds', 'tagsIds'], 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
 			[
 				[
 					'created_at', 'updated_at', 'type_additional_date_at',
@@ -198,6 +199,7 @@ abstract class IssueSearch extends Model
 			'signedAtFrom' => Yii::t('issue', 'Signed At from'),
 			'signedAtTo' => Yii::t('issue', 'Signed At to'),
 			'tagsIds' => Yii::t('issue', 'Tags'),
+			'excludedTagsIds' => Yii::t('issue', 'Excluded tags'),
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 			'userName' => Yii::t('issue', 'First name & surname'),
 			'userType' => Yii::t('issue', 'Who'),
@@ -290,6 +292,8 @@ abstract class IssueSearch extends Model
 			'type',
 			'issueNotes',
 			'summons.docsLink',
+			'tags',
+			'tags.tagType',
 		];
 	}
 
@@ -458,7 +462,7 @@ abstract class IssueSearch extends Model
 	}
 
 	public static function getTagsNames(): array {
-		return ArrayHelper::map(IssueTag::find()->asArray()->all(), 'id', 'name');
+		return IssueTag::getNamesGroupByType(true);
 	}
 
 	public static function getEntityNames(): array {
@@ -503,7 +507,17 @@ abstract class IssueSearch extends Model
 		if (!empty($this->tagsIds)) {
 			$query->joinWith('tags');
 			$query->distinct();
-			$query->andWhere([IssueTag::tableName() . '.id' => $this->tagsIds]);
+			$query->andWhere([IssueTagLink::tableName() . '.tag_id' => $this->tagsIds]);
+		}
+		if (!empty($this->excludedTagsIds)) {
+			$query->joinWith('tags');
+			$query->distinct();
+			$query->andWhere([
+				'NOT IN', Issue::tableName() . '.id', IssueTagLink::find()
+					->select('issue_id')
+					->distinct()
+					->andWhere(['tag_id' => $this->excludedTagsIds]),
+			]);
 		}
 	}
 

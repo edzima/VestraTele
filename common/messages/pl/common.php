@@ -349,4 +349,10 @@ return [
 	'Done at' => 'Wykonano',
 	'Done User' => 'Wykonał(a)',
 	'Show on Linked Issues' => 'Pokaż w Połączonych Sprawach',
+	'Tags Count' => 'Tagi',
+	'Background' => 'Tło',
+	'Color' => 'Kolor',
+	'Css Class' => 'CSS Klasa',
+	'Tags without Type' => 'Nieprzypisane',
+	'Sort order' => 'Kolejność',
 ];
