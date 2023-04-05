@@ -5,6 +5,7 @@ namespace common\models\issue\form;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueNote;
 use common\models\issue\IssueStage;
+use common\models\issue\IssueTagType;
 use common\models\issue\IssueType;
 use common\models\message\IssueStageChangeMessagesForm;
 use Yii;
@@ -40,9 +41,11 @@ class IssueStageChangeForm extends Model {
 		return [
 			[['stage_id', 'date_at', '!user_id'], 'required'],
 			[
-				'archives_nr', 'required', 'when' => function (): bool {
-				return in_array($this->stage_id, IssueStage::ARCHIVES_IDS);
-			},
+				'archives_nr', 'required',
+				'enableClientValidation' => false,
+				'when' => function (): bool {
+					return in_array($this->stage_id, IssueStage::ARCHIVES_IDS);
+				},
 			],
 			['stage_id', 'compare', 'operator' => '!=', 'compareValue' => $this->getIssue()->getIssueStageId(), 'message' => Yii::t('issue', 'New Stage must be other than old.')],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesData())],
@@ -64,14 +67,35 @@ class IssueStageChangeForm extends Model {
 	public function getLinkedIssuesNames(): array {
 		$names = [];
 		foreach ($this->getIssue()->getIssueModel()->linkedIssues as $issue) {
-			$names[$issue->getIssueId()] = $issue->getIssueName() . ' - ' . $issue->customer;
+			$names[$issue->getIssueId()] = $this->getLinkedIssueName($issue);
 		}
 		return $names;
 	}
 
+	public function getLinkedIssueName(IssueInterface $issue): string {
+		$customerLinkedTags = IssueTagType::linkIssuesGridPositionFilter($issue->getIssueModel()->tags, IssueTagType::LINK_ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM);
+		if (empty($customerLinkedTags)) {
+			return strtr('{customer}:  {stage} - {issue}', [
+				'{customer}' => $issue->getIssueModel()->customer,
+				'{issue}' => $issue->getIssueName(),
+				'{stage}' => $issue->getIssueStage()->name,
+			]);
+		}
+		$tagsNames = [];
+		foreach ($customerLinkedTags as $tag) {
+			$tagsNames[] = $tag->name;
+		}
+		return strtr('{customer} ({tags}):  {stage} - {issue}', [
+			'{customer}' => $issue->getIssueModel()->customer,
+			'{issue}' => $issue->getIssueName(),
+			'{stage}' => $issue->getIssueStage()->name,
+			'{tags}' => implode(', ', $tagsNames),
+		]);
+	}
+
 	public function attributeLabels(): array {
 		return [
-			'archives_nr' => Yii::t('common', 'Archives nr'),
+			'archives_nr' => Yii::t('common', 'Archives'),
 			'stage_id' => Yii::t('common', 'Stage'),
 			'date_at' => Yii::t('common', 'Date At'),
 			'description' => Yii::t('common', 'Description'),
@@ -98,6 +122,7 @@ class IssueStageChangeForm extends Model {
 			'stage_id',
 			'stage_change_at',
 			'stage_deadline_at',
+			'archives_nr',
 		]);
 		return $update && $this->saveNote() && $this->saveLinked();
 	}
