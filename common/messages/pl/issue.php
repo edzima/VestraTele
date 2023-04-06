@@ -113,6 +113,7 @@ return [
 	'Linked Issues' => 'Połączone Sprawy',
 	'Change Stage also in Linked Issues.' => 'Zmień Etap również w Połączonych Sprawach.',
 	'Linked Issues Messages' => 'Powiadomienia do Połączonych Spraw',
+	'Unlink' => 'Rozłącz',
 	'Show Note also in Linked Issues.' => 'Pokaż Notatkę również w Połączonych Sprawach.',
 	'Set Empty for All Linked or set only selected.' => 'Zostaw niewypełnione dla WSZYSTKICH połączonych Spraw lub ogranicz do wybranych.',
 	'Used for the Calendar.' => 'Do Kalendarza',

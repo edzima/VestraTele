@@ -31,6 +31,7 @@ class IssueColumn extends DataColumn {
 		if ($this->detailsTooltip) {
 			$this->contentOptions = function (IssueInterface $model): array {
 				if (!empty($model->getIssueModel()->details)) {
+					$this->tooltip = true;
 					return [
 						TooltipAsset::DEFAULT_ATTRIBUTE_NAME => $model->getIssueModel()->details,
 					];
