@@ -1,5 +1,6 @@
 <?php
 
+use backend\modules\issue\models\IssueClaimForm;
 use common\models\issue\IssueClaim;
 use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
@@ -8,7 +9,7 @@ use kartik\select2\Select2;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model IssueClaim */
+/* @var $model IssueClaimForm */
 /* @var $form yii\widgets\ActiveForm|null */
 /* @var $onlyField bool */
 
@@ -23,12 +24,12 @@ use yii\helpers\Html;
 
 	<div class="row">
 
-		<?= $model->scenario !== IssueClaim::SCENARIO_TYPE
+		<?= $model->isTypeScenario()
 			? $form->field($model, 'type', [
 				'options' => [
 					'class' => 'col-md-2',
 				],
-			])->dropDownList(IssueClaim::getTypesNames())
+			])->dropDownList(IssueClaimForm::getTypesNames())
 			: ''
 		?>
 

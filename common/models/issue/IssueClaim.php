@@ -52,13 +52,6 @@ class IssueClaim extends ActiveRecord implements IssueInterface {
 		return ArrayHelper::map(EntityResponsible::find()->asArray()->all(), 'id', 'name');
 	}
 
-	public function formName(): string {
-		$name = parent::formName();
-		if ($this->scenario === static::SCENARIO_TYPE) {
-			$name .= '-' . $this->type;
-		}
-		return $name;
-	}
 
 	public function getTypeName(): string {
 		return static::getTypesNames()[$this->type];
@@ -71,21 +64,6 @@ class IssueClaim extends ActiveRecord implements IssueInterface {
 		return '{{%issue_claim}}';
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules(): array {
-		return [
-			[['issue_id', 'type', 'entity_responsible_id', 'date'], 'required'],
-			[['!type'], 'required', 'on' => static::SCENARIO_TYPE],
-			[['issue_id'], 'integer'],
-			[['trying_value', 'obtained_value', 'percent_value'], 'number', 'min' => 0],
-			[['type'], 'string', 'max' => 10],
-			[['details'], 'string', 'max' => 255],
-			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
-			['type', 'in', 'range' => array_keys(static::getTypesNames())],
-		];
-	}
 
 	/**
 	 * {@inheritdoc}

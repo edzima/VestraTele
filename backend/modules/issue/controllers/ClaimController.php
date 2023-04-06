@@ -2,6 +2,7 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\modules\issue\models\IssueClaimForm;
 use backend\modules\issue\models\IssueClaimsForm;
 use backend\modules\issue\models\search\ClaimSearch;
 use common\models\issue\Issue;
@@ -69,13 +70,13 @@ class ClaimController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate(int $issueId, string $type = IssueClaim::TYPE_COMPANY) {
-		if ($type !== null && !isset(IssueClaim::getTypesNames()[$type])) {
+		if ($type !== null && !isset(IssueClaimForm::getTypesNames()[$type])) {
 			throw new NotFoundHttpException();
 		}
-		$model = new IssueClaim();
+		$model = new IssueClaimForm();
 		$model->issue_id = $issueId;
 		$model->type = $type;
-		if ($model->issue === null) {
+		if ($model->getIssue() === null) {
 			throw new NotFoundHttpException();
 		}
 
