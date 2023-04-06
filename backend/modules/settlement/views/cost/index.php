@@ -111,15 +111,10 @@ $this->params['breadcrumbs'][] = $this->title;
 						],
 					],
 				],
-			],
-			[
+			], [
 				'attribute' => 'deadlineRange',
-				'value' => function (IssueCost $model): ?string {
-					if ($model->deadline_at) {
-						return Yii::$app->formatter->asDate($model->deadline_at);
-					}
-					return null;
-				},
+				'format' => 'date',
+				'value' => 'deadline_at',
 				'label' => $model->getAttributeLabel('deadline_at'),
 				'filterType' => GridView::FILTER_DATE_RANGE,
 				'filterWidgetOptions' => [
@@ -132,12 +127,8 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'attribute' => 'settledRange',
-				'value' => function (IssueCost $model): ?string {
-					if ($model->settled_at) {
-						return Yii::$app->formatter->asDate($model->settled_at);
-					}
-					return null;
-				},
+				'format' => 'date',
+				'value' => 'settled_at',
 				'label' => $model->getAttributeLabel('settled_at'),
 				'filterType' => GridView::FILTER_DATE_RANGE,
 				'filterWidgetOptions' => [

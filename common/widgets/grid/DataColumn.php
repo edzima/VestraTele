@@ -34,19 +34,6 @@ class DataColumn extends BaseDataColumn {
 			Html::addNoPrintClass($this->contentOptions);
 			Html::addNoPrintClass($this->footerOptions);
 		}
-		if ($this->format === 'date') {
-			if ($this->value === null) {
-				if (strpos($this->attribute, '.') === false) {
-					$this->format = 'text';
-					$this->value = function ($model) {
-						if ($model->{$this->attribute} !== null) {
-							return Yii::$app->formatter->asDate($model->{$this->attribute});
-						}
-						return null;
-					};
-				}
-			}
-		}
 	}
 
 	protected function tooltipInit(): void {
@@ -77,13 +64,16 @@ class DataColumn extends BaseDataColumn {
 	public function getDataCellValue($model, $key, $index) {
 		$value = parent::getDataCellValue($model, $key, $index);
 		if ($this->withTags) {
-			$value .= $this->renderTags($model, $key, $index);
+			$tags = $this->renderTags($model, $key, $index);
+			if ($tags !== null) {
+				$value .= $tags;
+			}
 		}
 		return $value;
 	}
 
-	protected function renderTags($model, $key, $index): string {
-		return '';
+	protected function renderTags($model, $key, $index): ?string {
+		return null;
 	}
 
 }
