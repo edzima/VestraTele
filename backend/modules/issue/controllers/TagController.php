@@ -30,7 +30,7 @@ class TagController extends Controller {
 		];
 	}
 
-	public function actionIssue(int $issueId) {
+	public function actionIssue(int $issueId, string $returnUrl = null) {
 		$issue = Issue::findOne($issueId);
 		if ($issue === null) {
 			throw new NotFoundHttpException();
@@ -38,7 +38,11 @@ class TagController extends Controller {
 		$model = new IssueTagsLinkForm();
 		$model->setIssue($issue);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['issue/view', 'id' => $issueId]);
+
+			return $this->redirect($returnUrl !== null
+				? $returnUrl
+				: ['issue/view', 'id' => $issueId]
+			);
 		}
 		return $this->render('issue', [
 			'model' => $model,
