@@ -94,6 +94,7 @@ class IssueClaimForm extends Model implements LinkedIssuesModel {
 		}
 		$model = $this->getModel();
 		$model->date = $this->date;
+		$model->details = $this->details;
 		$model->entity_responsible_id = $this->entity_responsible_id;
 		$model->issue_id = $this->issue_id;
 		$model->obtained_value = $this->obtained_value;
@@ -110,7 +111,9 @@ class IssueClaimForm extends Model implements LinkedIssuesModel {
 
 	public function saveLinkedIssues(): ?int {
 		$count = 0;
+
 		foreach ($this->getLinkedIssuesIds() as $issueId) {
+
 			$form = new static();
 			$form->issue_id = $issueId;
 			$model = IssueClaim::find()
@@ -150,6 +153,7 @@ class IssueClaimForm extends Model implements LinkedIssuesModel {
 	public function setModel(IssueClaim $model): void {
 		$this->model = $model;
 		$this->date = $model->date;
+		$this->details = $model->details;
 		$this->entity_responsible_id = $model->entity_responsible_id;
 		$this->issue_id = $model->issue_id;
 		$this->obtained_value = $model->obtained_value;
@@ -159,6 +163,9 @@ class IssueClaimForm extends Model implements LinkedIssuesModel {
 	}
 
 	function getLinkedIssuesIds(): array {
+		if (empty($this->linkedIssuesIds)) {
+			return [];
+		}
 		return (array) $this->linkedIssuesIds;
 	}
 
