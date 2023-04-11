@@ -7,6 +7,7 @@ use common\models\issue\IssueClaim;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueTagType;
 use common\models\issue\LinkedIssuesModel;
+use Yii;
 use yii\base\Model;
 
 class IssueClaimForm extends Model implements LinkedIssuesModel {
@@ -73,7 +74,9 @@ class IssueClaimForm extends Model implements LinkedIssuesModel {
 	}
 
 	public function attributeLabels(): array {
-		return IssueClaim::instance()->attributeLabels();
+		return IssueClaim::instance()->attributeLabels() + [
+				'linkedIssuesIds' => Yii::t('issue', 'Linked Issues'),
+			];
 	}
 
 	public function isTypeScenario(): bool {
