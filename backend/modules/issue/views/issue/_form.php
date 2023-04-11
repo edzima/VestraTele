@@ -66,7 +66,7 @@ use yii\widgets\ActiveForm;
 						'disabled' => true,
 						'depends' => [Html::getInputId($model, 'type_id')],
 						'placeholder' => $model->getAttributeLabel('stage_id'),
-						'url' => Url::to(['//issue/type/stages-list']),
+						'url' => Url::to(['//issue/type/stages-list', 'stageId' => $model->stage_id]),
 						'loading' => Yii::t('common', 'Loading...'),
 					],
 				])
