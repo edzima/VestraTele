@@ -98,7 +98,8 @@ class ClaimController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$model = $this->findModel($id);
+		$model = new IssueClaimForm();
+		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['issue/view', 'id' => $model->issue_id]);

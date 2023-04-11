@@ -24,6 +24,22 @@ use yii\helpers\Html;
 
 	<div class="row">
 
+		<?= !empty($model->getLinkedIssuesNames())
+			? $form->field($model, 'linkedIssuesIds', [
+				'options' => [
+					'class' => 'col-md-12',
+				],
+			])
+				->widget(Select2::class, [
+					'data' => $model->getLinkedIssuesNames(),
+					'options' => [
+						'multiple' => true,
+					],
+				])
+				->hint(Yii::t('issue', 'Claim also in Linked Issues.'))
+			: ''
+		?>
+
 		<?= $model->isTypeScenario()
 			? $form->field($model, 'type', [
 				'options' => [
@@ -73,8 +89,14 @@ use yii\helpers\Html;
 
 	</div>
 
+	<div class="row">
+		<?= $form->field($model, 'details', [
+			'options' => [
+				'class' => 'col-md-4',
+			],
+		])->textarea(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'details')->textarea(['maxlength' => true]) ?>
+	</div>
 
 
 	<?php if (!$onlyField): ?>

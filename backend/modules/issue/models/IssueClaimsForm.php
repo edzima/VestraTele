@@ -66,7 +66,7 @@ class IssueClaimsForm extends Model {
 
 	protected function saveModel(IssueClaimForm $model): bool {
 		if (!empty($model->obtained_value) || !empty($model->trying_value)) {
-			return $model->save();
+			return $model->save(false);
 		}
 		return false;
 	}
