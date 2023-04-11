@@ -108,7 +108,7 @@ class TypeController extends Controller {
 		return $this->redirect(['index']);
 	}
 
-	public function actionStagesList(): array {
+	public function actionStagesList(int $stageId = null): array {
 		$params = Yii::$app->request->post('depdrop_parents');
 		if (empty($params)) {
 			throw new NotFoundHttpException('The requested page does not exist.');
@@ -124,7 +124,10 @@ class TypeController extends Controller {
 				'name' => $name,
 			];
 		}
-		$selected = array_key_first($stages);
+		$selected = $stageId;
+		if (!isset($stages[$stageId])) {
+			$selected = array_key_first($stages);
+		}
 
 		return [
 			'output' => $output,
