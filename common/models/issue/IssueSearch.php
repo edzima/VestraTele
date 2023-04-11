@@ -246,6 +246,7 @@ abstract class IssueSearch extends Model
 			Issue::tableName() . '.entity_responsible_id' => $this->entity_responsible_id,
 			Issue::tableName() . '.type_additional_date_at' => $this->type_additional_date_at,
 		]);
+		$query->groupBy(Issue::tableName() . '.id');
 	}
 
 	public function getTotalCountWithArchive(): int {
