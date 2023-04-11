@@ -5,6 +5,7 @@ use backend\helpers\Html;
 use backend\modules\issue\models\IssueTagsLinkForm;
 use common\widgets\ActiveForm;
 use kartik\select2\Select2;
+use common\models\user\Worker;
 
 /* @var $this yii\web\View */
 /* @var $model IssueTagsLinkForm */
@@ -14,7 +15,9 @@ $this->title = Yii::t('issue', 'Issue: {issue} - Tags', [
 ]);
 
 $this->params['breadcrumbs'] = Breadcrumbs::issue($model->getIssue());
-$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issue Tags'), 'url' => ['index']];
+if (Yii::$app->user->can(Worker::PERMISSION_ISSUE_TAG_MANAGER)) {
+	$this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issue Tags'), 'url' => ['index']];
+}
 ?>
 <div class="issue-tag-issue-tags-link">
 	<?php $form = ActiveForm::begin(); ?>

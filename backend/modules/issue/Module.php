@@ -83,6 +83,12 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
+						'controllers' => ['issue/tag'],
+						'actions' => ['issue'],
+						'permissions' => [Worker::PERMISSION_ISSUE_CREATE],
+					],
+					[
+						'allow' => true,
 						'controllers' => ['issue/type', 'issue/stage-type'],
 						'permissions' => [Worker::PERMISSION_ISSUE_TYPE_MANAGER],
 					],
