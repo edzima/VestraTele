@@ -139,8 +139,26 @@ use yii\widgets\ActiveForm;
 		</div>
 
 		<div class="row">
+
+
 			<?= $form->field($model, 'details', ['options' => ['class' => 'col-md-5']])
 				->textarea(['rows' => 5, 'maxlength' => true]) ?>
+
+			<?= !empty($model->getLinkedIssuesNames())
+				? $form->field($model, 'linkedIssuesIds', [
+					'options' => [
+						'class' => 'col-md-12',
+					],
+				])
+					->widget(Select2::class, [
+						'data' => $model->getLinkedIssuesNames(),
+						'options' => [
+							'multiple' => true,
+						],
+					])
+					->hint(Yii::t('issue', 'Details also in Linked Issues.'))
+				: ''
+			?>
 
 		</div>
 
