@@ -121,6 +121,13 @@ class IssueForm extends Model implements LinkedIssuesModel {
 
 	protected function setModel(Issue $model): void {
 		$this->model = $model;
+		$this->loadFromModel($model);
+	}
+
+	public function loadFromModel(Issue $model, bool $withCustomer = true): void {
+		if ($withCustomer) {
+			$this->customer = $model->customer;
+		}
 		$this->type_id = $model->type_id;
 		$this->stage_id = $model->stage_id;
 		$this->archives_nr = $model->archives_nr;
@@ -128,7 +135,6 @@ class IssueForm extends Model implements LinkedIssuesModel {
 		$this->agent_id = $model->agent->id;
 		$this->lawyer_id = $model->lawyer->id;
 		$this->tele_id = $model->tele->id ?? null;
-		$this->customer = $model->customer;
 		$this->entity_responsible_id = $model->entity_responsible_id;
 		$this->details = $model->details;
 		$this->signing_at = $model->signing_at;

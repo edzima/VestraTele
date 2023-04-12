@@ -343,4 +343,6 @@ return [
 	'Create Issue Tag Type' => 'Dodaj Typ',
 	'Update Issue Tag Type: {name}' => 'Edytuj Typ Tagu: {name}',
 	'Type: {type} Tags' => 'Przypisz Tagi do Typu: {type}',
+	'Find Customer Issue and copy from them ...' => 'Znajdź Sprawę (imie / nazwisko Klienta) i skopiuj',
+	'Copy from Issue' => 'Skopiuj',
 ];
