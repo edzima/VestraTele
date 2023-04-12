@@ -6,6 +6,7 @@ use common\assets\TooltipAsset;
 use common\helpers\Html;
 use common\widgets\GridView;
 use kartik\grid\DataColumn as BaseDataColumn;
+use Yii;
 
 /**
  * Class DataColumn
@@ -63,13 +64,16 @@ class DataColumn extends BaseDataColumn {
 	public function getDataCellValue($model, $key, $index) {
 		$value = parent::getDataCellValue($model, $key, $index);
 		if ($this->withTags) {
-			$value .= $this->renderTags($model, $key, $index);
+			$tags = $this->renderTags($model, $key, $index);
+			if ($tags !== null) {
+				$value .= $tags;
+			}
 		}
 		return $value;
 	}
 
-	protected function renderTags($model, $key, $index): string {
-		return '';
+	protected function renderTags($model, $key, $index): ?string {
+		return null;
 	}
 
 }

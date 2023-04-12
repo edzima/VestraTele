@@ -25,6 +25,7 @@ class Worker extends User implements ActiveHierarchy {
 		self::ROLE_CUSTOMER_SERVICE,
 		self::ROLE_LAWYER,
 		self::ROLE_LAWYER_ASSISTANT,
+		self::ROLE_LAWYER_OFFICE,
 		self::ROLE_MANAGER,
 	];
 	public const PERMISSION_ENTITY_RESPONSIBLE_MANAGER = 'entity_responsible.manager';

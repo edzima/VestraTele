@@ -37,6 +37,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
             $('.table-responsive').css( 'overflow', 'auto' );
 	})"
 );
+
 ?>
 
 
@@ -59,10 +60,9 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 			'body' =>
 				Html::a(Yii::t('issue', 'The archive is excluded. Matching Issues found in it: {count}.', [
 					'count' => $totalCount,
-				]), [
-					'archive', 'customerName' => $searchModel->customerName,
-					'issueId' => $searchModel->issue_id,
 				]),
+					Url::to(['archive']) . '?' . Yii::$app->request->queryString
+				),
 			'options' => [
 				'class' => 'alert-warning text-center mb-0',
 			],

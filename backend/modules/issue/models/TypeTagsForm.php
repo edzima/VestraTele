@@ -3,8 +3,10 @@
 namespace backend\modules\issue\models;
 
 use common\helpers\ArrayHelper;
+use common\models\issue\Issue;
 use common\models\issue\IssueTag;
 use common\models\issue\IssueTagType;
+use Yii;
 use yii\base\Model;
 
 class TypeTagsForm extends Model {
@@ -15,15 +17,41 @@ class TypeTagsForm extends Model {
 
 	public function attributeLabels(): array {
 		return [
-			'tags' => \Yii::t('common', 'Tags'),
+			'tags' => Yii::t('common', 'Tags'),
 		];
 	}
 
 	public function rules(): array {
 		return [
-			['tags', 'required'],
-			['tags', 'in', 'range' => array_keys(static::getTagsNames(false)), 'allowArray' => true],
+			['tags', 'newTagsFilter'],
 		];
+	}
+
+	public function newTagsFilter(): void {
+		$tags = static::getTagsNames(false);
+		foreach ((array) $this->tags as $key => $tagIdOrNewName) {
+			if (!isset($tags[$tagIdOrNewName])) {
+				unset($this->tags[$key]);
+				if (!empty($tagIdOrNewName) && !is_numeric($tagIdOrNewName)) {
+					$tag = new IssueTag();
+					$tag->is_active = true;
+					$tag->name = $tagIdOrNewName;
+					$tag->type = $this->type->id;
+					$tag->save();
+					if ($tag->id) {
+						$this->tags[] = $tag->id;
+					}
+				}
+			}
+		}
+	}
+
+	protected function addTag(string $name, ?int $type): IssueTag {
+		$tag = new IssueTag();
+		$tag->is_active = true;
+		$tag->name = $name;
+		$tag->type = $type;
+		return $tag;
 	}
 
 	public function setType(IssueTagType $type): void {

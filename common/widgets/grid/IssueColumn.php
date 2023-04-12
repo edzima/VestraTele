@@ -23,6 +23,7 @@ class IssueColumn extends DataColumn {
 	public bool $detailsTooltip = true;
 
 	public ?string $viewBaseUrl = null;
+	public $format = 'html';
 
 	public function init(): void {
 		if (empty($this->label)) {

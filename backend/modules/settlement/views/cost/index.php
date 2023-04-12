@@ -111,8 +111,7 @@ $this->params['breadcrumbs'][] = $this->title;
 						],
 					],
 				],
-			],
-			[
+			], [
 				'attribute' => 'deadlineRange',
 				'format' => 'date',
 				'value' => 'deadline_at',

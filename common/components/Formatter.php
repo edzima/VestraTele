@@ -13,6 +13,7 @@ use yii\i18n\Formatter as BaseFormatter;
 
 class Formatter extends BaseFormatter {
 
+	public $nullDisplay = '';
 	public const FRACTION_DIGITS = 2;
 	public const FRACTION_PERCENT_DIGITS = 4;
 
