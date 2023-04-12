@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use common\models\issue\IssueMeet;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\modules\lead\models\Lead;
@@ -23,7 +22,6 @@ use yii\db\ActiveRecord;
  * @property Simc $city
  *
  * @property-read User[] $users
- * @property-read IssueMeet[] $meets
  * @property-read Lead[] $leads
  */
 class Address extends ActiveRecord {

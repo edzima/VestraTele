@@ -37,30 +37,6 @@ $user = Yii::$app->user;
 					'icon' => '<i class="fa fa-users"></i>',
 				],
 				[
-					'label' => Yii::t('backend', 'Meets'),
-					'url' => '#',
-					'icon' => '<i class="fa fa fa-calendar"></i>',
-					'options' => ['class' => 'treeview'],
-					'visible' => $user->can(User::PERMISSION_MEET),
-					'items' => [
-						[
-							'label' => Yii::t('backend', 'Create'),
-							'url' => ['/issue/meet/create'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
-						],
-						[
-							'label' => Yii::t('common', 'Browse'),
-							'url' => ['/issue/meet/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
-						],
-						[
-							'label' => 'Kampanie',
-							'url' => ['/campaign/index'],
-							'icon' => '<i class="fa fa-angle-double-right"></i>',
-						],
-					],
-				],
-				[
 					'label' => Yii::t('common', 'Leads'),
 					'url' => '#',
 					'visible' => $user->can(User::PERMISSION_LEAD),
