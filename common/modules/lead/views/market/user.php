@@ -1,7 +1,10 @@
 <?php
 
 use common\helpers\Html;
+use common\helpers\StringHelper;
+use common\modules\lead\models\forms\LeadMarketForm;
 use common\modules\lead\models\LeadMarket;
+use common\modules\lead\models\LeadSmsForm;
 use common\modules\lead\models\searches\LeadMarketSearch;
 use common\modules\lead\widgets\LeadMarketAccessRequestBtnWidget;
 use common\modules\lead\widgets\LeadMarketUserStatusColumn;
@@ -34,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	</p>
 
 	<?php Pjax::begin([
-		//	'timeout' => 2000,
+		'timeout' => 3000,
 	]); ?>
 
 
@@ -77,6 +80,27 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('lead', 'Status Lead'),
 				'value' => 'lead.statusName',
 				'filter' => LeadMarketSearch::getLeadStatusesNames(),
+			],
+			[
+				'attribute' => 'reportsDetails',
+				'format' => 'html',
+				'label' => Yii::t('lead', 'Reports'),
+				'value' => static function (LeadMarket $market): string {
+					$content = [];
+					foreach ($market->lead->reports as $report) {
+						if ($report->status->show_report_in_lead_index) {
+							$details = $report->getDetails();
+							if (!StringHelper::startsWith($details, LeadSmsForm::detailsPrefix())
+								&& !StringHelper::startsWith($details, LeadMarketForm::detailsReportText())) {
+								$content[] = Html::encode($details);
+							}
+						}
+					}
+					$content = array_filter($content, static function ($value): bool {
+						return !empty(trim($value));
+					});
+					return implode(', ', $content);
+				},
 			],
 			[
 				'attribute' => 'creator_id',

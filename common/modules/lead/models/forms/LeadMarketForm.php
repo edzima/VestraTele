@@ -141,8 +141,12 @@ class LeadMarketForm extends Model {
 		$report->lead_id = $this->lead_id;
 		$report->old_status_id = $model->lead->getStatusId();
 		$report->status_id = $model->lead->getStatusId();
-		$report->details = Yii::t('lead', 'Move Lead to Market');
+		$report->details = static::detailsReportText();
 		return $report->save();
+	}
+
+	public static function detailsReportText(): string {
+		return Yii::t('lead', 'Move Lead to Market');
 	}
 
 	public function getOptions(): LeadMarketOptions {

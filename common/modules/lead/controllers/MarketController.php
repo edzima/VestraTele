@@ -48,6 +48,7 @@ class MarketController extends BaseController {
 		$searchModel->selfMarket = false;
 		$searchModel->selfAssign = false;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		$dataProvider->query->with('lead.reports');
 		$dataProvider->setModels($searchModel->filterAddressOptions($dataProvider->getModels()));
 
 		return $this->render('user', [
