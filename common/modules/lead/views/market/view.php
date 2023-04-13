@@ -4,6 +4,7 @@ use common\helpers\Html;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
 use common\modules\lead\widgets\LeadMarketAccessRequestBtnWidget;
+use common\modules\lead\widgets\LeadReportWidget;
 use common\widgets\address\AddressDetailView;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -186,5 +187,17 @@ YiiAsset::register($this);
 		],
 	]) ?>
 
+	<?php if (!empty($model->lead->reports)): ?>
+		<h4><?= Yii::t('lead', 'Reports') ?></h4>
+		<?php foreach ($model->lead->reports as $report): ?>
+
+			<?= LeadReportWidget::widget([
+				'model' => $report,
+				'withDelete' => false,
+			]) ?>
+
+
+		<?php endforeach; ?>
+	<?php endif; ?>
 
 </div>
