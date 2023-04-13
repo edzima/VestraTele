@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			//'id',
 			[
 				'attribute' => 'addressDetails',
-				'visible' => !$searchModel->withoutCity,
+				'visible' => $searchModel->withAddress === null || $searchModel->withAddress,
 			],
 			[
 				'attribute' => 'status',

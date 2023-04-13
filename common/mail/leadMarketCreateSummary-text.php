@@ -30,7 +30,7 @@ $marketUrl = FrontendUrl::toRoute(['/lead/market/user'], true);
 		. ': '
 		. count($withoutRegionsModels)
 		. ' '
-		. FrontendUrl::to(['/lead/market/user', 'withoutCity' => true], true)
+		. FrontendUrl::to(['/lead/market/user', 'withoutAddress' => true], true)
 	)
 	: ''
 ?>

@@ -6,6 +6,7 @@ use common\models\AddressSearch;
 use common\models\user\User;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadMarketUser;
 use common\modules\lead\models\LeadSource;
@@ -40,18 +41,21 @@ class LeadMarketSearch extends LeadMarket {
 	public $selfMarket;
 
 	public $withoutArchive;
-	public $withoutCity;
+
+	public $withAddress;
+	public $withPhone;
 
 	public ?AddressSearch $addressSearch = null;
 
 	public function attributeLabels(): array {
 		return parent::attributeLabels() + [
-				'selfAssign' => Yii::t('lead', 'Self Assign'),
-				'selfMarket' => Yii::t('lead', 'Self Market'),
-				'withoutCity' => Yii::t('lead', 'Without City'),
-				'withoutArchive' => Yii::t('lead', 'Without Archives'),
 				'leadStatus' => Yii::t('lead', 'Lead Status'),
 				'leadSource' => Yii::t('lead', 'Source'),
+				'selfAssign' => Yii::t('lead', 'Self Assign'),
+				'selfMarket' => Yii::t('lead', 'Self Market'),
+				'withAddress' => Yii::t('lead', 'With Address'),
+				'withPhone' => Yii::t('lead', 'With Phone'),
+				'withoutArchive' => Yii::t('lead', 'Without Archives'),
 			];
 	}
 
@@ -78,7 +82,9 @@ class LeadMarketSearch extends LeadMarket {
 					'leadStatus', 'leadType', 'leadSource',
 				], 'integer',
 			],
-			[['selfAssign', 'selfMarket', 'withoutArchive', 'withoutCity'], 'boolean'],
+			[['withAddress', 'withPhone'], 'trim'],
+			[['selfAssign', 'selfMarket', 'withoutArchive', 'withAddress', 'withPhone'], 'boolean'],
+			[['withAddress', 'withPhone', 'selfAssign', 'selfMarket'], 'default', 'value' => null],
 			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details', 'leadName'], 'safe'],
 		];
 	}
@@ -122,7 +128,7 @@ class LeadMarketSearch extends LeadMarket {
 		]);
 
 		$this->load($params);
-		if ($this->withoutCity) {
+		if ($this->withAddress === false || $this->withAddress === '0') {
 			$this->addressSearch = null;
 		}
 		if ($this->addressSearch) {
@@ -135,15 +141,19 @@ class LeadMarketSearch extends LeadMarket {
 			return $dataProvider;
 		}
 
-		$this->applyAddressFilter($query);
-		$this->applyVisibleAreaFilter($query);
-		$this->applySelfMarketFilter($query);
-		$this->applySelfAssignFilter($query);
-		$this->applyWithoutArchiveFilter($query);
 		$this->applyLeadNameFilter($query);
 		$this->applyLeadSourceNameFilter($query);
 		$this->applyLeadStatusFilter($query);
 		$this->applyLeadTypeFilter($query);
+		$this->applyWithoutArchiveFilter($query);
+		$this->applyWithPhoneFilter($query);
+
+		$this->applyAddressFilter($query);
+		$this->applyVisibleAreaFilter($query);
+
+		$this->applySelfMarketFilter($query);
+		$this->applySelfAssignFilter($query);
+
 		$this->applyMarketUserStatusFilter($query);
 
 		// grid filtering conditions
@@ -188,11 +198,20 @@ class LeadMarketSearch extends LeadMarket {
 		});
 	}
 
+	private function applyWithPhoneFilter(ActiveQuery $query): void {
+		if ($this->withPhone === null || $this->withPhone === '') {
+			return;
+		}
+		$query->joinWith('lead');
+		if ((bool) $this->withPhone === true) {
+			$query->andWhere(Lead::tableName() . '.phone IS NOT NULL');
+			return;
+		}
+		$query->andWhere(Lead::tableName() . '.phone IS NULL');
+	}
+
 	private function applyAddressFilter(ActiveQuery $query): void {
-		if ($this->withoutCity) {
-			$query->joinWith('lead.addresses.address', false, 'LEFT OUTER JOIN');
-			$query->andWhere('city_id IS NULL');
-		} else {
+		if ($this->withAddress === null || $this->withAddress === '' || $this->withAddress) {
 			if ($this->addressSearch->validate()) {
 				if ($this->addressSearch->isNotEmpty()) {
 					$query->joinWith([
@@ -204,6 +223,14 @@ class LeadMarketSearch extends LeadMarket {
 					$query->with('lead.addresses.address.city.terc');
 				}
 			}
+			if ($this->withAddress) {
+				$query->joinWith('lead.addresses.address');
+				$query->andWhere(LeadAddress::tableName() . '.lead_id IS NOT NULL');
+			}
+		}
+		if ($this->withAddress === false || $this->withAddress === '0') {
+			$query->joinWith('lead.addresses.address', false, 'LEFT OUTER JOIN');
+			$query->andWhere('city_id IS NULL');
 		}
 	}
 

@@ -39,15 +39,30 @@ use yii\widgets\ActiveForm;
 			'options' => [
 				'class' => 'col-md-2',
 			],
-		])->dropDownList(Html::booleanDropdownList(), ['prompt' => Yii::t('common', 'All')]) ?>
+		])->dropDownList(
+			Html::booleanDropdownList(), ['prompt' => Yii::t('common', 'All')])
+		?>
 
-		<?= $form->field($model, 'withoutArchive', [
+
+		<?= $form->field($model, 'withAddress', [
 			'options' => [
 				'class' => 'col-md-2',
 			],
-		])->checkbox() ?>
+		])->dropDownList(
+			Html::booleanDropdownList(), ['prompt' => Yii::t('common', 'All')])
+		?>
 
-		<?= $form->field($model, 'withoutCity', [
+
+		<?= $form->field($model, 'withPhone', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])->dropDownList(
+			Html::booleanDropdownList(), ['prompt' => Yii::t('common', 'All')])
+		?>
+
+
+		<?= $form->field($model, 'withoutArchive', [
 			'options' => [
 				'class' => 'col-md-2',
 			],

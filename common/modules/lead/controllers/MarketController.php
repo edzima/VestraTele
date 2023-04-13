@@ -33,11 +33,11 @@ class MarketController extends BaseController {
 		];
 	}
 
-	public function actionUser(int $regionId = null, bool $withoutCity = false): string {
+	public function actionUser(int $regionId = null, bool $withoutAddress = null): string {
 		$searchModel = new LeadMarketSearch();
-		if ($withoutCity) {
+		if ($withoutAddress) {
 			$searchModel->addressSearch = null;
-			$searchModel->withoutCity = true;
+			$searchModel->withAddress = false;
 			$regionId = null;
 		} elseif ($regionId !== null) {
 			$searchModel->addressSearch->region_id = $regionId;
@@ -45,8 +45,8 @@ class MarketController extends BaseController {
 
 		$searchModel->userId = Yii::$app->user->getId();
 		$searchModel->withoutArchive = true;
-		$searchModel->selfMarket = 0;
-		$searchModel->selfAssign = 0;
+		$searchModel->selfMarket = false;
+		$searchModel->selfAssign = false;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		$dataProvider->setModels($searchModel->filterAddressOptions($dataProvider->getModels()));
 

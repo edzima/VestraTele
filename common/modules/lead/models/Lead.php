@@ -266,6 +266,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return LeadType::getNames()[$this->getTypeId()];
 	}
 
+	public function getSourceName(): string {
+		return LeadSource::getNames()[$this->getSourceId()];
+	}
+
 	public function updateFromLead(LeadInterface $lead): void {
 		if (!empty($lead->getEmail()) && empty($this->email)) {
 			$this->email = $lead->getEmail();

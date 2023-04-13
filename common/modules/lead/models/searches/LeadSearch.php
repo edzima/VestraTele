@@ -431,11 +431,6 @@ class LeadSearch extends Lead implements SearchModel {
 	}
 
 	public function applyFromMarketFilter(LeadQuery $query): void {
-		if ($this->fromMarket) {
-			$query->joinWith('market');
-			$query->andWhere(LeadMarket::tableName() . '.lead_id IS NOT NULL');
-		}
-
 		if ($this->fromMarket === null || $this->fromMarket === '') {
 			return;
 		}

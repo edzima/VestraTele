@@ -335,6 +335,7 @@ return [
 	'Market Status same Contacts' => 'Status Giełdy - Tożsame',
 	'Lead Status' => 'Status Leada',
 	'With Address' => 'Z Adresem',
+	'With Phone' => 'Z Telefonem',
 	'Lead must have Address.' => 'Lead musi mieć Adres.',
 	'Problem with move Lead to Market: {error}' => 'Problem z przeniesiem na Giełdę: {error}',
 	'From Market' => 'Z Giełdy',
