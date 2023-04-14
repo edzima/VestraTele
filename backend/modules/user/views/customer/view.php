@@ -82,6 +82,13 @@ $this->params['breadcrumbs'][] = $this->title;
 						'value' => $model->getStatusName(),
 					],
 					[
+						'attribute' => 'profile.birthday',
+						'format' => 'date',
+						'label' => Yii::t('common', 'Birthday'),
+						'visible' => !empty($model->profile->birthday),
+					],
+
+					[
 						'attribute' => 'profile.pesel',
 						'label' => Yii::t('backend', 'PESEL'),
 						'visible' => !empty($model->profile->pesel),

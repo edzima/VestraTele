@@ -107,6 +107,7 @@ use yii\data\ActiveDataProvider;
 				'withAddress' => static function (IssueUser $issueUser): bool {
 					return $issueUser->type === IssueUser::TYPE_CUSTOMER;
 				},
+				'withBirthday' => true,
 			]) ?>
 
 			<p>

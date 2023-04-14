@@ -1,6 +1,7 @@
 <?php
 
 use common\models\user\UserProfile;
+use common\widgets\DateWidget;
 use common\widgets\PhoneInput;
 use yii\widgets\ActiveForm;
 
@@ -23,6 +24,22 @@ use yii\widgets\ActiveForm;
 				'class' => 'col-md-3 col-lg-2',
 			],
 		])->textInput(['maxlength' => true]) ?>
+
+		<?= $form->field($model, 'birthday', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->widget(DateWidget::class, [
+			'clientOptions' => [
+				'allowInputToggle' => true,
+				'sideBySide' => true,
+				'viewMode' => 'years',
+				'widgetPositioning' => [
+					'horizontal' => 'auto',
+					'vertical' => 'auto',
+				],
+			],
+		]) ?>
 
 		<?= $form->field($model, 'pesel', [
 			'options' => [

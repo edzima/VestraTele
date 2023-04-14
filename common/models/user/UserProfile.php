@@ -69,7 +69,7 @@ class UserProfile extends ActiveRecord {
 			['firstname', 'required'],
 			['lastname', 'trim'],
 			['lastname', 'required'],
-			['birthday', 'filter', 'filter' => 'strtotime', 'skipOnEmpty' => true],
+			[['birthday'], 'date', 'format' => 'Y-m-d'],
 			['gender', 'in', 'range' => [null, self::GENDER_MALE, self::GENDER_FEMALE]],
 			['website', 'trim'],
 			['website', 'url', 'defaultScheme' => 'http', 'validSchemes' => ['http', 'https']],

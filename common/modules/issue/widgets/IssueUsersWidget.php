@@ -40,6 +40,7 @@ class IssueUsersWidget extends Widget {
 	public ?Closure $withAddress = null;
 	public bool $legendEncode = true;
 	public bool $withTraits = false;
+	public bool $withBirthday = false;
 
 	public function getDefaultFieldsetOptions(IssueUser $issueUser): array {
 		$user = $issueUser->user;
@@ -75,6 +76,12 @@ class IssueUsersWidget extends Widget {
 						'label' => Yii::t('common', 'Phone number 2'),
 						'format' => 'tel',
 						'visible' => !empty($user->profile->phone_2),
+					],
+					[
+						'attribute' => 'profile.birthday',
+						'label' => Yii::t('common', 'Birthday'),
+						'format' => 'date',
+						'visible' => $this->withBirthday && !empty($user->profile->birthday),
 					],
 					[
 						'label' => Yii::t('common', 'Traits'),
