@@ -30,6 +30,7 @@ class PotentialClient extends ActiveRecord {
 
 	public const STATUS_NEW = 0;
 	public const STATUS_ADDRESS = 1;
+	public const STATUS_CONTACT = 2;
 	public const STATUS_NOT_QUALIFY = 5;
 	public const STATUS_QUALIFIES_BUT_NOT_INTEREST = 10;
 	public const STATUS_AGREEMENT = 20;
@@ -125,7 +126,7 @@ class PotentialClient extends ActiveRecord {
 			static::STATUS_QUALIFIES_BUT_NOT_INTEREST => Yii::t('common', 'Qualifies but not interest'),
 			static::STATUS_NOT_QUALIFY => Yii::t('common', 'Not qualify'),
 			static::STATUS_AGREEMENT => Yii::t('common', 'Agreement'),
-
+			static::STATUS_CONTACT => Yii::t('common', 'Contact'),
 		];
 	}
 }

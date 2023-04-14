@@ -32,7 +32,17 @@ use yii\widgets\ActiveForm;
 			'options' => [
 				'class' => 'col-md-4',
 			],
-		])->widget(DateWidget::class) ?>
+		])->widget(DateWidget::class, [
+			'clientOptions' => [
+				'allowInputToggle' => true,
+				'sideBySide' => true,
+				'viewMode' => 'years',
+				'widgetPositioning' => [
+					'horizontal' => 'auto',
+					'vertical' => 'auto',
+				],
+			],
+		]) ?>
 
 	</div>
 

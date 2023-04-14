@@ -355,4 +355,5 @@ return [
 	'Css Class' => 'CSS Klasa',
 	'Tags without Type' => 'Nieprzypisane',
 	'Sort order' => 'Kolejność',
+	'Contact' => 'Kontakt',
 ];
