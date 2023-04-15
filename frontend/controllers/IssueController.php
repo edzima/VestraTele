@@ -15,7 +15,7 @@ use frontend\helpers\Url;
 use frontend\models\IssueStageChangeForm;
 use frontend\models\search\IssuePayCalculationSearch;
 use frontend\models\search\IssueSearch;
-use frontend\models\search\IssueUserSearch;
+use frontend\models\search\IssueCustomersSearch;
 use frontend\models\search\SummonSearch;
 use Yii;
 use yii\base\Action;
@@ -74,21 +74,15 @@ class IssueController extends Controller {
 		]);
 	}
 
-	public function actionUser(): string {
+	public function actionCustomers(): string {
 		$user = Yii::$app->user;
-
-		$searchModel = new IssueUserSearch();
-
+		$searchModel = new IssueCustomersSearch();
+		$searchModel->withArchive = true;
 		if ($user->can(Worker::ROLE_CUSTOMER_SERVICE)) {
-			$searchModel->withArchive = true;
-		} else {
-			$searchModel->user_id = $user->id;
-		}
-		if ($user->can(Worker::PERMISSION_ARCHIVE)) {
-			$searchModel->withArchive = true;
+			$searchModel->strictUserSurname = false;
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-		return $this->render('user', [
+		return $this->render('customers', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
 		]);

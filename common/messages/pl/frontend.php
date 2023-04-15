@@ -145,4 +145,5 @@ return [
 	'Please fill out your email. A verification email will be sent there.' => 'Podaj swój adres e-mail. Zostanie tam wysłany e-mail weryfikacyjny.',
 	'Please choose your new password:' => 'Wybierz nowe hasło:',
 	'Warning! This note will only be visible to you.' => 'Pamietaj! Ta Notatka będzie widoczna tylko dla Ciebie.',
+	'Search Customer' => 'Szukaj Klienta',
 ];

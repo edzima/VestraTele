@@ -23,6 +23,8 @@ class IssueColumn extends DataColumn {
 	public ?string $viewBaseUrl = null;
 	public $format = 'html';
 
+	public bool $onlyUserLink = false;
+
 	public function init(): void {
 		if (empty($this->label)) {
 			$this->label = Yii::t('issue', 'Issue');
@@ -49,6 +51,10 @@ class IssueColumn extends DataColumn {
 	}
 
 	public function renderIssueLink(IssueInterface $model): string {
+		if ($this->onlyUserLink && !Yii::$app->user->canSeeIssue($model)) {
+			return $model->getIssueName();
+		}
+
 		return Html::a($model->getIssueName(),
 			[$this->viewBaseUrl, 'id' => $model->getIssueId()],
 			$this->linkOptions);

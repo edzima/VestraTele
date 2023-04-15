@@ -8,8 +8,19 @@ use common\models\issue\search\UserSearch;
 use common\models\user\SurnameSearchInterface;
 use common\validators\PhoneValidator;
 use yii\data\ActiveDataProvider;
+use yii\db\QueryInterface;
 
-class IssueUserSearch extends UserSearch {
+class IssueCustomersSearch extends UserSearch {
+
+	public bool $strictUserSurname = true;
+
+	public function applySurnameFilter(QueryInterface $query): void {
+		if (!$this->strictUserSurname) {
+			parent::applySurnameFilter($query);
+		} else {
+			$query->andFilterWhere(['UP.lastname' => $this->fullName]);
+		}
+	}
 
 	public function rules(): array {
 		return [

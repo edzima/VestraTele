@@ -40,7 +40,7 @@ $parentMenuItems = Html::issueParentTypeItems();
 	<?= IssueParentTypeHeader::widget([]) ?>
 
 	<p>
-		<?= Html::a(Yii::t('frontend', 'Search issue user'), ['user'], ['class' => 'btn btn-info']) ?>
+		<?= Html::a(Yii::t('frontend', 'Search Customer'), ['customers'], ['class' => 'btn btn-info']) ?>
 		<?= Html::a(Yii::t('frontend', 'Yours settlements'), ['/settlement/index'], ['class' => 'btn btn-success']) ?>
 		<?= Html::a(Yii::t('settlement', 'Pays'), ['/pay/index'], ['class' => 'btn btn-success']) ?>
 
@@ -77,7 +77,7 @@ $parentMenuItems = Html::issueParentTypeItems();
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'emptyText' =>  $searchModel->hasExcludedArchiveStage() && ($totalCount = $searchModel->getTotalCountWithArchive()) >0
+		'emptyText' => $searchModel->hasExcludedArchiveStage() && ($totalCount = $searchModel->getTotalCountWithArchive()) > 0
 			? Alert::widget([
 				'body' => Yii::t('issue', 'The archive is excluded. Matching Issues found in it: {count}.', [
 					'count' => $totalCount,

@@ -143,6 +143,14 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
 
+	public function isWorkerType(): bool {
+		return in_array($this->type, static::TYPES_WORKERS);
+	}
+
+	public function isCustomerType(): bool {
+		return in_array($this->type, static::TYPES_CUSTOMERS);
+	}
+
 	public static function getTypesNames(): array {
 		return [
 			static::TYPE_CUSTOMER => User::getRolesNames()[static::TYPE_CUSTOMER],
