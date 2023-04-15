@@ -88,6 +88,40 @@ $dataProvider->getModels();
 
 <?php endif; ?>
 
+<?php if (Yii::$app->user->can(User::PERMISSION_LEAD_STATUS)): ?>
+	<div class="btn-group">
+		<?= Html::submitButton(
+			'<i class="fa fa-feed" aria-hidden="true"></i>',
+			[
+				'class' => 'btn btn-warning',
+				'name' => 'route',
+				'value' => 'source/change',
+				'title' => Yii::t('lead', 'Change Source'),
+				'aria-label' => Yii::t('lead', 'Change Source'),
+			])
+		?>
+		<?= $dataProvider->pagination->pageCount > 1
+			? Html::a(
+				count($searchModel->getAllIds($dataProvider->query)),
+
+				['source/change'],
+				[
+					'class' => 'btn btn-warning',
+					'data' => [
+						'title' => Yii::t('lead', 'Change Source ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
+						'aria-label' => Yii::t('lead', 'Change Source ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
+						'method' => 'POST',
+						'params' => [
+							'leadsIds' => $searchModel->getAllIds($dataProvider->query),
+						],
+					],
+				])
+			: ''
+		?>
+	</div>
+
+<?php endif; ?>
+
 <?php if (Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)): ?>
 	<div class="btn-group">
 		<?= Html::submitButton(
