@@ -34,12 +34,7 @@ class Module extends BaseModule {
 			'access' => [
 				'class' => AccessControl::class,
 				'rules' => [
-					[
-						'allow' => false,
-						'controllers' => ['issue/issue', 'issue/user', 'issue/tag', 'issue/tag-type'],
-						'actions' => ['delete'],
-						'permissions' => [Worker::PERMISSION_ISSUE],
-					],
+
 					[
 						'allow' => true,
 						'controllers' => ['issue/issue', 'issue/user'],
@@ -118,6 +113,12 @@ class Module extends BaseModule {
 					[
 						'allow' => true,
 						'roles' => ['administrator'],
+					],
+					[
+						'allow' => false,
+						'controllers' => ['issue/issue', 'issue/user', 'issue/tag', 'issue/tag-type'],
+						'actions' => ['delete'],
+						'permissions' => [Worker::PERMISSION_ISSUE],
 					],
 				],
 			],
