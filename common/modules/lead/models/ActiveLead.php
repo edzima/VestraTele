@@ -5,6 +5,7 @@ namespace common\modules\lead\models;
 /**
  * Interface ActiveLead
  *
+ * @property-read LeadUserInterface|null $owner
  * @property-read LeadReport[] $reports
  * @property-read LeadAnswer[] $answers
  * @property-read LeadAddress[] $addresses
