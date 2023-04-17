@@ -5,7 +5,7 @@ use console\base\Migration;
 /**
  * Class m300322_164316_summon_title_not_required
  */
-class m300322_164316_summon_title_not_required extends Migration {
+class m220322_164316_summon_title_not_required extends Migration {
 
 	/**
 	 * {@inheritdoc}

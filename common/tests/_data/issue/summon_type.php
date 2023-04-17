@@ -9,5 +9,8 @@ return [
 		'name' => 'Direct',
 		'short_name' => 'D',
 	],
-
+	[
+		'name' => 'Customer',
+		'short_name' => 'C',
+	],
 ];

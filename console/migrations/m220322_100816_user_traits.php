@@ -5,7 +5,7 @@ use console\base\Migration;
 /**
  * Class m220322_120416_issue_relation
  */
-class m280322_100816_user_traits extends Migration {
+class m220322_100816_user_traits extends Migration {
 
 	/**
 	 * {@inheritdoc}
