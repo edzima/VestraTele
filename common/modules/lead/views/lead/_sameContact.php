@@ -72,7 +72,18 @@ use yii\widgets\DetailView;
 				'attribute' => 'providerName',
 				'visible' => !empty($model->getProvider()),
 			],
-			'owner',
+			[
+				'attribute' => 'owner',
+				'format' => 'html',
+				'value' => $model->owner
+					? $model->owner->getEmail()
+						? Html::mailto(
+							Html::encode($model->owner->getFullName()),
+							$model->owner->getEmail())
+						: Html::encode($model->owner->getFullName())
+					: null,
+				'visible' => $model->owner !== null,
+			],
 		],
 	]) ?>
 
