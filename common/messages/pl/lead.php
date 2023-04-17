@@ -42,6 +42,7 @@ return [
 	'Copy Lead' => 'Kopiuj',
 	'Copy Lead to {type}: {lead}' => 'Kopiuj Lead jako {type}: {lead}',
 	'Leads by Phone' => 'Szukaj Lead po Numerze',
+	'Leads by Name' => 'Szukaj Lead po Nazwisku',
 	'Create Lead Status' => 'Dodaj status',
 	'Search' => 'Szukaj',
 	'Reports schemas' => 'Reports schemas',
@@ -386,4 +387,6 @@ return [
 	'Not Found Message template for Welcome SMS. Key: "lead.sms.welcome"' => 'Nie znaleziono szablonu Wiadomości dla SMS Powitalnego. Klucz: "lead.sms.welcome"',
 	'You has not set phone.' => 'Nie masz ustawionego Numeru Telefonu. Zaktualizuj ustawienia.',
 	'Are you sure you want to send SMS: {message}?' => "Czy napewno chcesz wysłać SMS:\n{message}?",
+	'Search - Phone' => 'Szukaj - Telefon',
+	'Search - Name' => 'Szukaj - Nazwisko',
 ];

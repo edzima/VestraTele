@@ -57,7 +57,19 @@ $this->registerJs($js);
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p style="display: inline">
-		<?= Html::a(Yii::t('lead', 'Phone Lead'), ['phone'], ['class' => 'btn btn-info']) ?>
+
+		<?= Html::a(Yii::t('lead', 'Search') . ' ' . Html::icon('phone'), ['phone'], [
+			'class' => 'btn btn-success',
+			'title' => Yii::t('lead', 'Search - Phone'),
+			'aria-label' => Yii::t('lead', 'Search - Phone'),
+		]) ?>
+
+
+		<?= Html::a(Yii::t('lead', 'Search') . ' ' . Html::icon('user'), ['name'], [
+			'class' => 'btn btn-info',
+			'title' => Yii::t('lead', 'Search - Name'),
+			'aria-label' => Yii::t('lead', 'Search - Name'),
+		]) ?>
 
 		<?= CreateLeadBtnWidget::widget([
 			'owner_id' => is_int($searchModel->user_id) ? $searchModel->user_id : null,

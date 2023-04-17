@@ -14,6 +14,7 @@ use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadType;
+use common\modules\lead\models\searches\LeadNameSearch;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
@@ -145,6 +146,21 @@ class LeadController extends BaseController {
 			$model->clearErrors();
 		}
 		return $this->render('phone', [
+			'model' => $model,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	public function actionName(string $name = null) {
+		$model = new LeadNameSearch();
+		if ($name !== null) {
+			$model->name = $name;
+		}
+		$dataProvider = $model->search(Yii::$app->request->queryParams);
+		if (empty(Yii::$app->request->queryParams)) {
+			$model->clearErrors();
+		}
+		return $this->render('name', [
 			'model' => $model,
 			'dataProvider' => $dataProvider,
 		]);
