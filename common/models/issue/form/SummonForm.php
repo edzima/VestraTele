@@ -151,8 +151,8 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		]);
 	}
 
-	public function getIssue():?IssueInterface{
-		if($this->_issue === null || $this->_issue->getId() !== $this->issue_id){
+	public function getIssue(): ?IssueInterface {
+		if ($this->_issue === null || $this->_issue->getId() !== $this->issue_id) {
 			$this->_issue = Issue::findOne($this->issue_id);
 		}
 		return $this->_issue;
@@ -373,7 +373,9 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		if ($attribute === 'status') {
 			return true;
 		}
-
+		if ($attribute === 'realized_at' && $this->getModel()->isRealized()) {
+			return true;
+		}
 		return $this->getType()->isForFormAttribute($attribute);
 	}
 
