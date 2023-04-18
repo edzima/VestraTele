@@ -75,6 +75,9 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'date_at', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(DateTimeWidget::class, [
 			'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
+			'options' => [
+				'readonly' => !empty($model->date_at),
+			],
 		]) ?>
 
 	</div>
