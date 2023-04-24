@@ -283,6 +283,7 @@ class UserForm extends Model {
 		$profile = $model->profile;
 		$profile->lastname = $this->getProfile()->lastname;
 		$profile->firstname = $this->getProfile()->firstname;
+		$profile->birthday = $this->getProfile()->birthday;
 		$profile->phone = $this->getProfile()->phone;
 		$profile->phone_2 = $this->getProfile()->phone_2;
 		$profile->gender = $this->getProfile()->gender;
