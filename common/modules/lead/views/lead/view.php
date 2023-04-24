@@ -22,12 +22,6 @@ use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
-# 73
-# 49
-# 206
-
-
-
 /* @var $this yii\web\View */
 /* @var $model ActiveLead */
 /* @var $sameContacts LeadInterface[] */
@@ -64,7 +58,9 @@ YiiAsset::register($this);
 		<?= (!$onlyUser || $isOwner)
 		&& Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)
 		&& $model->market === null
-			? Html::a(Yii::t('lead', '-> Market'), ['market/create', 'id' => $model->getId()], ['class' => 'btn btn-success'])
+			? Html::a(Yii::t('lead', '-> Market'),
+				['market/create', 'id' => $model->getId()],
+				['class' => 'btn btn-success'])
 			: ''
 		?>
 

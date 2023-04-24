@@ -66,6 +66,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('common', 'Phone number'),
 				'format' => 'tel',
 			],
+			[
+				'attribute' => 'profile.birthday',
+				'format' => 'date',
+				'label' => Yii::t('common', 'Birthday'),
+			],
 			'updated_at:datetime',
 			[
 				'class' => ActionColumn::class,
