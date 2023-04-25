@@ -3,6 +3,7 @@
 namespace common\models\issue\query;
 
 use common\models\issue\IssueUser;
+use common\models\user\query\UserProfileQuery;
 use yii\db\ActiveQuery;
 
 /**
@@ -20,6 +21,15 @@ class IssueUserQuery extends ActiveQuery {
 		[, $alias] = $this->getTableNameAndAlias();
 
 		$this->andWhere([$alias . '.type' => $type]);
+		return $this;
+	}
+
+	public function withUserFullName(string $name): self {
+		$this->joinWith([
+			'user.userProfile' => function (UserProfileQuery $query) use ($name) {
+				$query->withFullName($name);
+			},
+		]);
 		return $this;
 	}
 

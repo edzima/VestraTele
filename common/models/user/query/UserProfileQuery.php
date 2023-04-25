@@ -6,6 +6,7 @@ use common\models\query\PhonableQuery;
 use common\models\query\PhonableQueryTrait;
 use common\models\user\UserProfile;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 
 /**
  * This is the ActiveQuery class for [[\common\models\user\UserProfile]].
@@ -15,6 +16,21 @@ use yii\db\ActiveQuery;
 class UserProfileQuery extends ActiveQuery implements PhonableQuery {
 
 	use PhonableQueryTrait;
+
+	public function withFullName(string $name): self {
+		[$table, $alias] = $this->getTableNameAndAlias();
+		$this->andWhere([
+			'like',
+			new Expression("CONCAT($alias.lastname,' ', $alias.firstname)"),
+			$name . '%', false,
+		]);
+		$this->orWhere([
+			'like',
+			new Expression("CONCAT($alias.firstname,' ', $alias.lastname)"),
+			$name . '%', false,
+		]);
+		return $this;
+	}
 
 	protected function getPhoneColumns(): array {
 		return [

@@ -5,6 +5,7 @@ namespace common\models\issue\form;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueNote;
 use common\models\issue\IssueStage;
+use common\models\issue\IssueTagType;
 use common\models\issue\IssueType;
 use common\models\message\IssueStageChangeMessagesForm;
 use Yii;
@@ -22,6 +23,8 @@ class IssueStageChangeForm extends Model {
 	public ?string $description = null;
 
 	public $linkedIssues = [];
+
+	public ?string $archives_nr = null;
 	public bool $linkedIssuesMessages = true;
 
 	private IssueInterface $issue;
@@ -30,17 +33,23 @@ class IssueStageChangeForm extends Model {
 	private ?IssueNote $note = null;
 
 	public function __construct(IssueInterface $issue, array $config = []) {
-		$this->issue = $issue;
-		$this->stage_id = $issue->getIssueStage()->id;
+		$this->setIssue($issue);
 		parent::__construct($config);
 	}
 
 	public function rules(): array {
 		return [
 			[['stage_id', 'date_at', '!user_id'], 'required'],
-			['stage_id', 'compare', 'operator' => '!=', 'compareValue' => $this->getIssue()->getIssueStage()->id, 'message' => Yii::t('issue', 'New Stage must be other than old.')],
+			[
+				'archives_nr', 'required',
+				'enableClientValidation' => false,
+				'when' => function (): bool {
+					return in_array($this->stage_id, IssueStage::ARCHIVES_IDS);
+				},
+			],
+			['stage_id', 'compare', 'operator' => '!=', 'compareValue' => $this->getIssue()->getIssueStageId(), 'message' => Yii::t('issue', 'New Stage must be other than old.')],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesData())],
-			['description', 'string'],
+			[['description', 'archives_nr'], 'string'],
 			['linkedIssuesMessages', 'boolean'],
 			['date_at', 'date', 'format' => 'php:' . $this->dateFormat],
 			[
@@ -58,13 +67,35 @@ class IssueStageChangeForm extends Model {
 	public function getLinkedIssuesNames(): array {
 		$names = [];
 		foreach ($this->getIssue()->getIssueModel()->linkedIssues as $issue) {
-			$names[$issue->getIssueId()] = $issue->getIssueName() . ' - ' . $issue->customer;
+			$names[$issue->getIssueId()] = $this->getLinkedIssueName($issue);
 		}
 		return $names;
 	}
 
+	public function getLinkedIssueName(IssueInterface $issue): string {
+		$customerLinkedTags = IssueTagType::linkIssuesGridPositionFilter($issue->getIssueModel()->tags, IssueTagType::LINK_ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM);
+		if (empty($customerLinkedTags)) {
+			return strtr('{customer}:  {stage} - {issue}', [
+				'{customer}' => $issue->getIssueModel()->customer,
+				'{issue}' => $issue->getIssueName(),
+				'{stage}' => $issue->getIssueStage()->name,
+			]);
+		}
+		$tagsNames = [];
+		foreach ($customerLinkedTags as $tag) {
+			$tagsNames[] = $tag->name;
+		}
+		return strtr('{customer} ({tags}):  {stage} - {issue}', [
+			'{customer}' => $issue->getIssueModel()->customer,
+			'{issue}' => $issue->getIssueName(),
+			'{stage}' => $issue->getIssueStage()->name,
+			'{tags}' => implode(', ', $tagsNames),
+		]);
+	}
+
 	public function attributeLabels(): array {
 		return [
+			'archives_nr' => Yii::t('common', 'Archives'),
 			'stage_id' => Yii::t('common', 'Stage'),
 			'date_at' => Yii::t('common', 'Date At'),
 			'description' => Yii::t('common', 'Description'),
@@ -85,11 +116,13 @@ class IssueStageChangeForm extends Model {
 		$this->previous_stage_id = $model->stage_id;
 		$model->stage_id = $this->stage_id;
 		$model->stage_change_at = $this->date_at;
+		$model->archives_nr = $this->archives_nr;
 		$model->generateStageDeadlineAt();
 		$update = (bool) $model->updateAttributes([
 			'stage_id',
 			'stage_change_at',
 			'stage_deadline_at',
+			'archives_nr',
 		]);
 		return $update && $this->saveNote() && $this->saveLinked();
 	}
@@ -136,6 +169,12 @@ class IssueStageChangeForm extends Model {
 
 	public function getIssue(): IssueInterface {
 		return $this->issue;
+	}
+
+	public function setIssue(IssueInterface $issue): void {
+		$this->issue = $issue;
+		$this->stage_id = $issue->getIssueStageId();
+		$this->archives_nr = $issue->getArchivesNr();
 	}
 
 	public function getNoteTitle(): string {

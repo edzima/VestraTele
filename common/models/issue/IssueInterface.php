@@ -18,4 +18,6 @@ interface IssueInterface {
 
 	public function getIssueTypeId(): int;
 
+	public function getArchivesNr(): ?string;
+
 }

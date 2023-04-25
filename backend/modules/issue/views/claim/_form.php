@@ -1,5 +1,6 @@
 <?php
 
+use backend\modules\issue\models\IssueClaimForm;
 use common\models\issue\IssueClaim;
 use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
@@ -8,7 +9,7 @@ use kartik\select2\Select2;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model IssueClaim */
+/* @var $model IssueClaimForm */
 /* @var $form yii\widgets\ActiveForm|null */
 /* @var $onlyField bool */
 
@@ -23,12 +24,28 @@ use yii\helpers\Html;
 
 	<div class="row">
 
-		<?= $model->scenario !== IssueClaim::SCENARIO_TYPE
+		<?= !empty($model->getLinkedIssuesNames())
+			? $form->field($model, 'linkedIssuesIds', [
+				'options' => [
+					'class' => 'col-md-12',
+				],
+			])
+				->widget(Select2::class, [
+					'data' => $model->getLinkedIssuesNames(),
+					'options' => [
+						'multiple' => true,
+					],
+				])
+				->hint(Yii::t('issue', 'Claim also in Linked Issues.'))
+			: ''
+		?>
+
+		<?= $model->isTypeScenario()
 			? $form->field($model, 'type', [
 				'options' => [
 					'class' => 'col-md-2',
 				],
-			])->dropDownList(IssueClaim::getTypesNames())
+			])->dropDownList(IssueClaimForm::getTypesNames())
 			: ''
 		?>
 
@@ -72,8 +89,14 @@ use yii\helpers\Html;
 
 	</div>
 
+	<div class="row">
+		<?= $form->field($model, 'details', [
+			'options' => [
+				'class' => 'col-md-4',
+			],
+		])->textarea(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'details')->textarea(['maxlength' => true]) ?>
+	</div>
 
 
 	<?php if (!$onlyField): ?>

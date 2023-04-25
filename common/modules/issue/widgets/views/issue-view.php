@@ -229,10 +229,40 @@ use yii\data\ActiveDataProvider;
 					[
 						'class' => ActionColumn::class,
 						'controller' => '/issue/relation',
-						'template' => '{delete}',
+						'template' => '{tags} {update} {delete}',
 						'visible' => $relationActionColumn,
+						'buttons' => [
+							'tags' => function (string $url): string {
+								return Html::a(Html::icon('tags'), $url, [
+									'title' => Yii::t('issue', 'Tags'),
+									'aria-label' => Yii::t('issue', 'Tags'),
+								]);
+							},
+							'delete' => function (string $url): string {
+								return Html::a(Html::icon('remove'), $url, [
+									'title' => Yii::t('issue', 'Unlink'),
+									'aria-label' => Yii::t('issue', 'Unlink'),
+								]);
+							},
+						],
 						'urlCreator' => static function (string $action, IssueInterface $issue) use ($model): string {
-							return Url::to(['/issue/relation/delete', 'id' => $model->getIssueRelationId($issue->getIssueId()), 'returnUrl' => Url::current()]);
+							switch ($action) {
+								case 'delete':
+									return Url::to([
+										'/issue/relation/delete',
+										'id' => $model->getIssueRelationId($issue->getIssueId()),
+										'returnUrl' => Url::current(),
+									]);
+								case 'update':
+									return Url::to(['/issue/issue/update', 'id' => $issue->getIssueId()]);
+								case 'tags':
+									return Url::to([
+										'/issue/tag/issue',
+										'issueId' => $issue->getIssueId(),
+										'returnUrl' => Url::current(),
+									]);
+							}
+							return '';
 						},
 					],
 				],

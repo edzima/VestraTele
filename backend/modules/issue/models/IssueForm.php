@@ -7,8 +7,10 @@ use common\models\issue\Issue;
 use common\models\issue\IssueStage;
 use common\models\issue\IssueTag;
 use common\models\issue\IssueTagLink;
+use common\models\issue\IssueTagType;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
+use common\models\issue\LinkedIssuesModel;
 use common\models\user\User;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -20,7 +22,7 @@ use yii\helpers\ArrayHelper;
  *
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  */
-class IssueForm extends Model {
+class IssueForm extends Model implements LinkedIssuesModel {
 
 	public ?int $agent_id = null;
 	public ?int $lawyer_id = null;
@@ -37,6 +39,8 @@ class IssueForm extends Model {
 	public ?string $signature_act = null;
 
 	public ?string $stage_deadline_at = null;
+
+	public $linkedIssuesIds;
 
 	public const STAGE_ARCHIVED_ID = IssueStage::ARCHIVES_ID;
 
@@ -79,6 +83,7 @@ class IssueForm extends Model {
 			[['signature_act', 'stage_deadline_at', 'stage_change_at'], 'default', 'value' => null],
 			['type_id', 'in', 'range' => static::getTypesIds()],
 			['tagsIds', 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
+			['linkedIssuesIds', 'in', 'range' => array_keys($this->getLinkedIssuesNames()), 'allowArray' => true],
 			[
 				'archives_nr',
 				'required',
@@ -102,6 +107,7 @@ class IssueForm extends Model {
 			'lawyer_id' => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 			'tagsIds' => Yii::t('issue', 'Tags'),
+			'linkedIssuesIds' => Yii::t('issue', 'Linked Issues'),
 		]);
 	}
 
@@ -115,6 +121,13 @@ class IssueForm extends Model {
 
 	protected function setModel(Issue $model): void {
 		$this->model = $model;
+		$this->loadFromModel($model);
+	}
+
+	public function loadFromModel(Issue $model, bool $withCustomer = true): void {
+		if ($withCustomer) {
+			$this->customer = $model->customer;
+		}
 		$this->type_id = $model->type_id;
 		$this->stage_id = $model->stage_id;
 		$this->archives_nr = $model->archives_nr;
@@ -122,7 +135,6 @@ class IssueForm extends Model {
 		$this->agent_id = $model->agent->id;
 		$this->lawyer_id = $model->lawyer->id;
 		$this->tele_id = $model->tele->id ?? null;
-		$this->customer = $model->customer;
 		$this->entity_responsible_id = $model->entity_responsible_id;
 		$this->details = $model->details;
 		$this->signing_at = $model->signing_at;
@@ -162,6 +174,7 @@ class IssueForm extends Model {
 
 			$this->linkTags();
 			$this->linkUsers();
+			$this->saveLinkedIssues();
 
 			return true;
 		}
@@ -270,4 +283,49 @@ class IssueForm extends Model {
 		return $names;
 	}
 
+	public function getLinkedIssuesNames(): array {
+		$names = [];
+		foreach ($this->getModel()->linkedIssues as $linkedIssue) {
+			$names[$linkedIssue->id] = $this->getLinkedIssueName($linkedIssue);
+		}
+		return $names;
+	}
+
+	public function getLinkedIssuesIds(): array {
+		if (empty($this->linkedIssuesIds)) {
+			return [];
+		}
+		return (array) $this->linkedIssuesIds;
+	}
+
+	public function saveLinkedIssues(): ?int {
+		$linkedIssues = $this->getLinkedIssuesIds();
+		if (!empty($linkedIssues)) {
+			return Issue::updateAll([
+				'details' => $this->details,
+			], ['id' => $linkedIssues]);
+		}
+		return null;
+	}
+
+	protected function getLinkedIssueName(Issue $issue): string {
+		$customerLinkedTags = IssueTagType::linkIssuesGridPositionFilter($issue->getIssueModel()->tags, IssueTagType::LINK_ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM);
+		if (empty($customerLinkedTags)) {
+			return strtr('{customer} - {issue} ({details})', [
+				'{customer}' => $issue->getIssueModel()->customer,
+				'{details}' => $issue->details,
+				'{issue}' => $issue->getIssueName(),
+			]);
+		}
+		$tagsNames = [];
+		foreach ($customerLinkedTags as $tag) {
+			$tagsNames[] = $tag->name;
+		}
+		return strtr('{customer} ({tags}) - {issue} ({details})', [
+			'{customer}' => $issue->getIssueModel()->customer,
+			'{details}' => $issue->details,
+			'{issue}' => $issue->getIssueName(),
+			'{tags}' => implode(', ', $tagsNames),
+		]);
+	}
 }

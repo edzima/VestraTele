@@ -2,17 +2,45 @@
 
 use common\helpers\Html;
 use common\models\issue\form\IssueStageChangeForm;
+use common\models\issue\IssueStage;
 use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\ActiveForm;
 use common\widgets\AutoCompleteTextarea;
 use common\widgets\DateTimeWidget;
 use kartik\select2\Select2;
+use yii\helpers\Json;
 use yii\web\View;
 use yii\widgets\DetailView;
 
 /* @var $this View */
 /* @var $model IssueStageChangeForm */
 /* @var $noteDescriptionUrl string */
+
+$stageInputId = Html::getInputId($model, 'stage_id');
+$archivesIds = Json::encode(IssueStage::ARCHIVES_IDS);
+
+$js = <<<JS
+
+const stageInput = document.getElementById('$stageInputId');
+const archivesField = document.getElementById('archives-field');
+const archivesIds = $archivesIds;
+
+
+stageInput.onchange = function(){
+	let value = parseInt(this.value);
+	console.log(value);
+	console.log(archivesIds.includes(value));
+	if(archivesIds.includes(value)){
+		archivesField.classList.remove('hidden');
+	}else{
+		archivesField.classList.add('hidden');
+	}
+	
+};
+
+JS;
+
+$this->registerJs($js, View::POS_LOAD);
 
 ?>
 
@@ -54,6 +82,8 @@ use yii\widgets\DetailView;
 					: ''
 				?>
 
+
+
 				<?= $form->field($model, 'stage_id', [
 					'options' => [
 						'class' => 'col-md-8',
@@ -64,6 +94,9 @@ use yii\widgets\DetailView;
 					])
 				?>
 
+
+
+
 				<?= $form->field($model, 'date_at', [
 					'options' => [
 						'class' => 'col-md-4',
@@ -72,6 +105,21 @@ use yii\widgets\DetailView;
 					->widget(DateTimeWidget::class, [
 						'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
 					])
+				?>
+
+
+				<?= $form->field($model, 'archives_nr', [
+					'options' => [
+						'id' => 'archives-field',
+						'class' => 'col-md-4' . (!empty($model->archives_nr)
+							|| in_array($model->stage_id, IssueStage::ARCHIVES_IDS)
+							|| $model->getIssue()->getIssueModel()->isArchived()
+								? ''
+								: ' hidden'
+							),
+					],
+				])->textInput()
+
 				?>
 
 			</div>

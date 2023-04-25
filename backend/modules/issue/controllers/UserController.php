@@ -112,6 +112,32 @@ class UserController extends Controller {
 		]);
 	}
 
+	public function actionCustomerIssues(string $q) {
+		Yii::$app->response->format = Response::FORMAT_JSON;
+		$out = ['results' => ['id' => '', 'text' => '']];
+		if (!empty($q) && strlen($q) >= 3) {
+			$models = IssueUser::find()
+				->withType(IssueUser::TYPE_CUSTOMER)
+				->withUserFullName($q)
+				->joinWith('issue')
+				->orderBy([
+					Issue::tableName() . '.created_at' => SORT_DESC,
+				])
+				->all();
+			if (!empty($models)) {
+				$results = [];
+				foreach ($models as $model) {
+					$results[] = [
+						'id' => $model->issue_id,
+						'text' => $model->issue->getIssueName() . ' - ' . $model->user->getFullName(),
+					];
+				}
+				$out['results'] = $results;
+			}
+		}
+		return $out;
+	}
+
 	/**
 	 * Deletes an existing IssueStage model.
 	 * If deletion is successful, the browser will be redirected to the 'index' page.

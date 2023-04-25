@@ -125,6 +125,7 @@ return [
 	'Stage' => 'Etap',
 	'Show in summon' => 'Zlecenia',
 	'Archives' => 'Archiwum',
+	'Archives Nr' => 'Nr. Archiwum',
 	'Full name' => 'Imie i nazwisko',
 	'Registration at' => 'Zarejestrowano',
 	'Home address' => 'Adres zameldowania',

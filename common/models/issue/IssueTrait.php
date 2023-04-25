@@ -36,6 +36,10 @@ trait IssueTrait {
 		return $this->getIssueModel()->stage_id;
 	}
 
+	public function getArchivesNr(): ?string {
+		return $this->getIssueModel()->archives_nr;
+	}
+
 	public function getIssueModel(): Issue {
 		return $this->{static::getIssueAttribute()};
 	}

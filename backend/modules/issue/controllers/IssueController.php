@@ -224,13 +224,18 @@ class IssueController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException
 	 */
-	public function actionCreate(int $customerId) {
+	public function actionCreate(int $customerId, int $issueId = null) {
 		$customer = Customer::findOne($customerId);
 		if ($customer === null) {
 			throw new NotFoundHttpException('Client not exist');
 		}
 
 		$model = new IssueForm(['customer' => $customer]);
+		if ($issueId !== null) {
+			$baseIssue = $this->findModel($issueId);
+			$model->loadFromModel($baseIssue, false);
+		}
+
 		$messagesModel = new IssueCreateMessagesForm();
 		$messagesModel->setIssue($model->getModel());
 		$messagesModel->workersTypes = [
@@ -273,6 +278,7 @@ class IssueController extends Controller {
 			'model' => $model,
 			'duplicatesCustomersDataProvider' => $duplicatesCustomersDataProvider,
 			'messagesModel' => $messagesModel,
+			'baseIssue' => $baseIssue,
 		]);
 	}
 

@@ -10,8 +10,8 @@ class IssueClaimsForm extends Model {
 
 	private IssueInterface $issue;
 
-	private ?IssueClaim $customer = null;
-	private ?IssueClaim $company = null;
+	private ?IssueClaimForm $customer = null;
+	private ?IssueClaimForm $company = null;
 
 	public function __construct(IssueInterface $issue, $config = []) {
 		$this->issue = $issue;
@@ -22,24 +22,24 @@ class IssueClaimsForm extends Model {
 		return $this->issue;
 	}
 
-	public function getCustomer(): IssueClaim {
+	public function getCustomer(): IssueClaimForm {
 		if ($this->customer === null) {
-			$this->customer = new IssueClaim([
+			$this->customer = new IssueClaimForm([
 				'type' => IssueClaim::TYPE_CUSTOMER,
 				'issue_id' => $this->issue->getIssueId(),
-				'scenario' => IssueClaim::SCENARIO_TYPE,
+				'scenario' => IssueClaimForm::SCENARIO_TYPE,
 				'date' => time(),
 			]);
 		}
 		return $this->customer;
 	}
 
-	public function getCompany(): IssueClaim {
+	public function getCompany(): IssueClaimForm {
 		if ($this->company === null) {
-			$this->company = new IssueClaim([
+			$this->company = new IssueClaimForm([
 				'type' => IssueClaim::TYPE_COMPANY,
 				'issue_id' => $this->issue->getIssueId(),
-				'scenario' => IssueClaim::SCENARIO_TYPE,
+				'scenario' => IssueClaimForm::SCENARIO_TYPE,
 				'date' => time(),
 			]);
 		}
@@ -64,9 +64,9 @@ class IssueClaimsForm extends Model {
 		return true;
 	}
 
-	protected function saveModel(IssueClaim $model): bool {
+	protected function saveModel(IssueClaimForm $model): bool {
 		if (!empty($model->obtained_value) || !empty($model->trying_value)) {
-			return $model->save();
+			return $model->save(false);
 		}
 		return false;
 	}

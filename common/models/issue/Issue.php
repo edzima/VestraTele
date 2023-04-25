@@ -33,7 +33,7 @@ use yii\db\Expression;
  * @property int $stage_id
  * @property int $type_id
  * @property int $entity_responsible_id
- * @property string $archives_nr
+ * @property string|null $archives_nr
  * @property string $signing_at
  * @property string|null $type_additional_date_at
  * @property string $stage_change_at
