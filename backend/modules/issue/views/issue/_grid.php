@@ -238,7 +238,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 		],
 		[
 			'class' => ActionColumn::class,
-			'template' => '{installment} {link} {note} {sms} {view} {update} {delete}',
+			'template' => '{installment} {link} {note} {sms} {tag} {view} {update} {delete}',
 			'buttons' => [
 				'installment' => static function (string $url, Issue $model): string {
 					return Html::a('<i class="fa fa-money" aria-hidden="true"></i>',
@@ -276,6 +276,15 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 						]
 					);
 				},
+				'tag' => static function (string $url, Issue $model): string {
+					return Html::a(Html::icon('tag'),
+						['tag/issue', 'issueId' => $model->id],
+						[
+							'title' => Yii::t('common', 'Tags'),
+							'aria-label' => Yii::t('common', 'Tags'),
+						]
+					);
+				},
 			],
 			'visibleButtons' => [
 				'installment' => Yii::$app->user->can(Worker::ROLE_BOOKKEEPER),
@@ -285,6 +294,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 				},
 				'link' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
 				'sms' => Yii::$app->user->can(Worker::PERMISSION_SMS),
+				'tag' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
 				'delete' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE),
 			],
 		],
