@@ -426,4 +426,17 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return false;
 	}
 
+	public function summonsHasUser(int $userId): ?bool {
+		$summons = $this->summons;
+		if (empty($summons)) {
+			return null;
+		}
+		foreach ($summons as $summon) {
+			if ($summon->isForUser($userId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

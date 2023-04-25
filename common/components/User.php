@@ -32,7 +32,10 @@ class User extends BaseUser {
 		}
 
 		$issue = $model->getIssueModel();
-		if ($this->can(Worker::PERMISSION_ISSUE_VISIBLE_NOT_SELF) || $issue->hasUser($this->getId())) {
+		if ($this->can(Worker::PERMISSION_ISSUE_VISIBLE_NOT_SELF)
+			|| $issue->hasUser($this->getId())
+			|| $issue->summonsHasUser($this->getId())
+		) {
 			return $this->canSeeArchivedIssue($model);
 		}
 
