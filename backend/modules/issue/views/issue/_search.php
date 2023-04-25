@@ -187,34 +187,31 @@ use common\models\user\Worker;
 
 
 	</div>
-	<?php if (Yii::$app->user->can(Worker::PERMISSION_ISSUE_TAG_MANAGER)): ?>
-		<div class="row">
-			<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
-				'data' => IssueSearch::getTagsNames(),
-				'options' => [
-					'multiple' => true,
-					'placeholder' => $model->getAttributeLabel('tagsIds'),
-				],
-				'pluginOptions' => [
-					'allowClear' => true,
-				],
-				'showToggleAll' => true,
-			]) ?>
+	<div class="row">
+		<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+			'data' => IssueSearch::getTagsNames(),
+			'options' => [
+				'multiple' => true,
+				'placeholder' => $model->getAttributeLabel('tagsIds'),
+			],
+			'pluginOptions' => [
+				'allowClear' => true,
+			],
+			'showToggleAll' => true,
+		]) ?>
 
-			<?= $form->field($model, 'excludedTagsIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
-				'data' => IssueSearch::getTagsNames(),
-				'options' => [
-					'multiple' => true,
-					'placeholder' => $model->getAttributeLabel('excludedTagsIds'),
-				],
-				'pluginOptions' => [
-					'allowClear' => true,
-				],
-				'showToggleAll' => true,
-			]) ?>
-		</div>
-
-	<?php endif; ?>
+		<?= $form->field($model, 'excludedTagsIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+			'data' => IssueSearch::getTagsNames(),
+			'options' => [
+				'multiple' => true,
+				'placeholder' => $model->getAttributeLabel('excludedTagsIds'),
+			],
+			'pluginOptions' => [
+				'allowClear' => true,
+			],
+			'showToggleAll' => true,
+		]) ?>
+	</div>
 
 
 	<div class="form-group">
