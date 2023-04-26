@@ -22,6 +22,7 @@ use yii\db\Expression;
  * @property int|null $status
  * @property string $created_at
  * @property string $updated_at
+ * @property string|null $phone
  *
  * @property Simc $city
  * @property User $owner
@@ -57,7 +58,14 @@ class PotentialClient extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['firstname', 'lastname', '!owner_id', 'birthday', 'status'], 'required'],
-			[['details'], 'string'],
+			[
+				'phone', 'required',
+				'when' => function (): bool {
+					return $this->status === static::STATUS_CONTACT;
+				},
+				'enableClientValidation' => false,
+			],
+			[['details', 'phone'], 'string'],
 			[['city_id', 'status'], 'integer'],
 			[['birthday', 'created_at', 'updated_at'], 'safe'],
 			[['firstname', 'lastname'], 'string', 'max' => 255],
@@ -84,6 +92,7 @@ class PotentialClient extends ActiveRecord {
 			'ownerName' => Yii::t('common', 'Owner'),
 			'firstname' => Yii::t('common', 'Firstname'),
 			'lastname' => Yii::t('common', 'Lastname'),
+			'phone' => Yii::t('common', 'Phone'),
 		];
 	}
 

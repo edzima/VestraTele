@@ -37,6 +37,12 @@ $user = Yii::$app->user;
 					'icon' => '<i class="fa fa-users"></i>',
 				],
 				[
+					'label' => Yii::t('common', 'Potential Clients'),
+					'url' => ['/potential-client/index'],
+					'icon' => '<i class="fa fa-user-secret"></i>',
+					'visible' => $user->can(Worker::PERMISSION_POTENTIAL_CLIENT),
+				],
+				[
 					'label' => Yii::t('common', 'Leads'),
 					'url' => '#',
 					'visible' => $user->can(User::PERMISSION_LEAD),
