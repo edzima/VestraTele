@@ -3,6 +3,7 @@
 use common\models\PotentialClient;
 use common\widgets\address\CitySimcInputWidget;
 use common\widgets\DateWidget;
+use common\widgets\PhoneInput;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -18,19 +19,19 @@ use yii\widgets\ActiveForm;
 	<div class="row">
 		<?= $form->field($model, 'firstname', [
 			'options' => [
-				'class' => 'col-md-4',
+				'class' => 'col-md-3',
 			],
 		])->textInput(['maxlength' => true]) ?>
 
 		<?= $form->field($model, 'lastname', [
 			'options' => [
-				'class' => 'col-md-4',
+				'class' => 'col-md-3',
 			],
 		])->textInput(['maxlength' => true]) ?>
 
 		<?= $form->field($model, 'birthday', [
 			'options' => [
-				'class' => 'col-md-4',
+				'class' => 'col-md-2',
 			],
 		])->widget(DateWidget::class, [
 			'clientOptions' => [
@@ -43,6 +44,12 @@ use yii\widgets\ActiveForm;
 				],
 			],
 		]) ?>
+
+		<?= $form->field($model, 'phone', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])->widget(PhoneInput::class) ?>
 
 	</div>
 

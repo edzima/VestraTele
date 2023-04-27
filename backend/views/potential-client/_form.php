@@ -19,10 +19,6 @@ use common\widgets\PhoneInput;
 	]); ?>
 
 
-
-	<?= $form->field($model, 'status')->dropDownList(PotentialClient::getStatusesNames()) ?>
-
-
 	<div class="row">
 
 		<?= $form->field($model, 'firstname', [
@@ -71,6 +67,8 @@ use common\widgets\PhoneInput;
 
 
 	</div>
+
+	<?= $form->field($model, 'status')->dropDownList(PotentialClient::getStatusesNames()) ?>
 
 
 	<div class="row">
