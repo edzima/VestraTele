@@ -2,6 +2,8 @@
 
 namespace backend\models\search;
 
+use common\models\AddressSearch;
+use common\models\user\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\PotentialClient;
@@ -10,6 +12,17 @@ use common\models\PotentialClient;
  * PotentialClientSearch represents the model behind the search form of `common\models\PotentialClient`.
  */
 class PotentialClientSearch extends PotentialClient {
+
+	private ?AddressSearch $addressSearch = null;
+
+	public static function getOwnersNames(): array {
+		return User::getSelectList(
+			PotentialClient::find()
+				->select('owner_id')
+				->distinct()
+				->column()
+		);
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -39,19 +52,21 @@ class PotentialClientSearch extends PotentialClient {
 	public function search(array $params): ActiveDataProvider {
 		$query = PotentialClient::find();
 
-		// add conditions that should always apply here
+		$query->with('owner.userProfile');
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
 		]);
 
 		$this->load($params);
-
+		$this->getAddressSearch()->load($params);
 		if (!$this->validate()) {
 			// uncomment the following line if you do not want to return any records when validation fails
 			// $query->where('0=1');
 			return $dataProvider;
 		}
+
+		$this->getAddressSearch()->applySearch($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -64,11 +79,21 @@ class PotentialClientSearch extends PotentialClient {
 			'owner_id' => $this->owner_id,
 		]);
 
+		if (!empty($this->phone)) {
+			$query->withPhoneNumber($this->phone);
+		}
+
 		$query->andFilterWhere(['like', 'firstname', $this->firstname])
 			->andFilterWhere(['like', 'lastname', $this->lastname])
-			->andFilterWhere(['like', 'details', $this->details])
-			->andFilterWhere(['like', 'phone', $this->phone]);
+			->andFilterWhere(['like', 'details', $this->details]);
 
 		return $dataProvider;
+	}
+
+	public function getAddressSearch(): AddressSearch {
+		if ($this->addressSearch === null) {
+			$this->addressSearch = new AddressSearch();
+		}
+		return $this->addressSearch;
 	}
 }

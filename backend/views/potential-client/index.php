@@ -6,6 +6,7 @@ use backend\widgets\GridView;
 use common\helpers\Url;
 use common\models\PotentialClient;
 use common\widgets\grid\ActionColumn;
+use kartik\select2\Select2;
 
 /** @var yii\web\View $this */
 /** @var PotentialClientSearch $searchModel */
@@ -20,25 +21,44 @@ $this->params['breadcrumbs'][] = $this->title;
 		<?= Html::a(Yii::t('common', 'Create Potential Client'), ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
 
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]); ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-			['class' => 'yii\grid\SerialColumn'],
-
-			'id',
 			'firstname',
 			'lastname',
 			//	'details:ntext',
-			'city_id',
-			//'birthday',
-			//'status',
-			//'created_at',
-			//'updated_at',
-			//'owner_id',
+			'cityName',
 			'phone:tel',
+			'birthday',
+			[
+				'attribute' => 'status',
+				'value' => 'statusName',
+				'filter' => PotentialClientSearch::getStatusesNames(),
+			],
+			[
+				'attribute' => 'owner_id',
+				'filter' => PotentialClientSearch::getOwnersNames(),
+				'value' => 'owner',
+				'format' => 'userEmail',
+				'label' => $searchModel->getAttributeLabel('owner'),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => $searchModel->getAttributeLabel('owner'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+			],
+			'created_at:datetime',
+			'updated_at:datetime',
+
 			[
 				'class' => ActionColumn::class,
 				'urlCreator' => function ($action, PotentialClient $model, $key, $index, $column) {

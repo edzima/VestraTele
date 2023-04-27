@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\models\query\PotentialClientQuery;
 use common\models\user\User;
 use edzima\teryt\models\Simc;
 use Yii;
@@ -70,6 +71,7 @@ class PotentialClient extends ActiveRecord {
 			[['city_id', 'status'], 'integer'],
 			[['birthday', 'created_at', 'updated_at'], 'safe'],
 			[['firstname', 'lastname'], 'string', 'max' => 255],
+			[['firstname', 'lastname'], 'match', 'pattern' => '/[AaĄąBbCcĆćDdEeĘęFfGgHhIiJjKkLlŁłMmNnŃńOoÓóPpRrSsŚśTtUuWwYyZzŹźŻż]/iu'],
 			[['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Simc::class, 'targetAttribute' => ['city_id' => 'id']],
 			[['!owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
 		];
@@ -139,5 +141,9 @@ class PotentialClient extends ActiveRecord {
 			static::STATUS_AGREEMENT => Yii::t('common', 'Agreement'),
 			static::STATUS_CONTACT => Yii::t('common', 'Contact'),
 		];
+	}
+
+	public static function find(): PotentialClientQuery {
+		return new PotentialClientQuery(static::class);
 	}
 }

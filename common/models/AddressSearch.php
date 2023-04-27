@@ -53,7 +53,6 @@ class AddressSearch extends Address implements SearchModel {
 		$query = Address::find();
 
 		$query->joinWith('users.userProfile UP');
-		$query->joinWith('meets M');
 
 		$this->load($params);
 		$this->applySearch($query);

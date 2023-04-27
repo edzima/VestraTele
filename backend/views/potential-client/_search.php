@@ -3,6 +3,7 @@
 use backend\helpers\Html;
 use backend\models\search\PotentialClientSearch;
 use common\widgets\ActiveForm;
+use common\widgets\address\AddressSearchWidget;
 
 /** @var yii\web\View $this */
 /** @var PotentialClientSearch $model */
@@ -16,32 +17,20 @@ use common\widgets\ActiveForm;
 		'action' => ['index'],
 		'method' => 'get',
 	]); ?>
+	<?= AddressSearchWidget::widget([
+		'form' => $form,
+		'model' => $model->getAddressSearch(),
+		'withPostalCode' => false,
+	])
+	?>
 
-	<?= $form->field($model, 'id') ?>
-
-	<?= $form->field($model, 'firstname') ?>
-
-	<?= $form->field($model, 'lastname') ?>
-
-	<?= $form->field($model, 'details') ?>
-
-	<?= $form->field($model, 'city_id') ?>
-
-	<?php // echo $form->field($model, 'birthday') ?>
-
-	<?php // echo $form->field($model, 'status') ?>
-
-	<?php // echo $form->field($model, 'created_at') ?>
-
-	<?php // echo $form->field($model, 'updated_at') ?>
-
-	<?php // echo $form->field($model, 'owner_id') ?>
-
-	<?php // echo $form->field($model, 'phone') ?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('common', 'Search'), ['class' => 'btn btn-primary']) ?>
-		<?= Html::resetButton(Yii::t('common', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>
+		<?= Html::a(Yii::t('backend', 'Reset'),
+			['index'], [
+				'class' => 'btn btn-default',
+			]) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>
