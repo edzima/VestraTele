@@ -31,17 +31,22 @@ YiiAsset::register($this);
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [
-			'id',
-			'firstname',
-			'lastname',
-			'details:ntext',
-			'city_id',
-			'birthday',
-			'status',
-			'created_at',
-			'updated_at',
-			'owner_id',
-			'phone',
+			'statusName',
+			[
+				'attribute' => 'phone',
+				'format' => 'tel',
+				'visible' => !empty($model->phone),
+			],
+			'birthday:date',
+			'cityName',
+			[
+				'attribute' => 'details',
+				'format' => 'ntext',
+				'visible' => !empty($model->details),
+			],
+			'owner:userEmail',
+			'created_at:datetime',
+			'updated_at:datetime',
 		],
 	]) ?>
 

@@ -61,9 +61,10 @@ class PotentialClient extends ActiveRecord {
 			[
 				'phone', 'required',
 				'when' => function (): bool {
-					return $this->status === static::STATUS_CONTACT;
+					return (int) $this->status === static::STATUS_CONTACT;
 				},
 				'enableClientValidation' => false,
+				'message' => Yii::t('common', 'Phone cannot be blank on Contact status.'),
 			],
 			[['details', 'phone'], 'string'],
 			[['city_id', 'status'], 'integer'],
@@ -93,6 +94,7 @@ class PotentialClient extends ActiveRecord {
 			'firstname' => Yii::t('common', 'Firstname'),
 			'lastname' => Yii::t('common', 'Lastname'),
 			'phone' => Yii::t('common', 'Phone'),
+			'owner' => Yii::t('common', 'Owner'),
 		];
 	}
 

@@ -3,6 +3,9 @@
 use common\helpers\Html;
 use common\models\PotentialClient;
 use common\widgets\ActiveForm;
+use common\widgets\address\CitySimcInputWidget;
+use common\widgets\DateWidget;
+use common\widgets\PhoneInput;
 
 /** @var yii\web\View $this */
 /** @var PotentialClient $model */
@@ -15,23 +18,68 @@ use common\widgets\ActiveForm;
 		'id' => 'form-potential-client',
 	]); ?>
 
-	<?= $form->field($model, 'firstname')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'lastname')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'details')->textarea(['rows' => 6]) ?>
+	<?= $form->field($model, 'status')->dropDownList(PotentialClient::getStatusesNames()) ?>
 
-	<?= $form->field($model, 'city_id')->textInput() ?>
 
-	<?= $form->field($model, 'birthday')->textInput() ?>
+	<div class="row">
 
-	<?= $form->field($model, 'status')->textInput() ?>
+		<?= $form->field($model, 'firstname', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'created_at')->textInput() ?>
+		<?= $form->field($model, 'lastname', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'updated_at')->textInput() ?>
+		<?= $form->field($model, 'birthday', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->widget(DateWidget::class, [
+			'clientOptions' => [
+				'allowInputToggle' => true,
+				'sideBySide' => true,
+				'viewMode' => 'years',
+				'widgetPositioning' => [
+					'horizontal' => 'auto',
+					'vertical' => 'auto',
+				],
+			],
+		]) ?>
 
-	<?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
+
+	</div>
+
+	<div class="row">
+		<?= $form->field($model, 'phone', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->widget(PhoneInput::class) ?>
+
+		<?= $form->field($model, 'city_id', [
+			'options' => [
+				'class' => 'col-md-5 col-lg-4',
+			],
+		])->widget(CitySimcInputWidget::class) ?>
+
+
+	</div>
+
+
+	<div class="row">
+		<?= $form->field($model, 'details', [
+			'options' => [
+				'class' => 'col-md-6 col-lg-4',
+			],
+		])->textarea(['rows' => 6]) ?>
+	</div>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>

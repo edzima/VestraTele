@@ -79,7 +79,7 @@ class PotentialClientController extends Controller {
 	 */
 	public function actionCreate() {
 		$model = new PotentialClient();
-
+		$model->owner_id = Yii::$app->user->getId();
 		if ($this->request->isPost) {
 			if ($model->load($this->request->post()) && $model->save()) {
 				return $this->redirect(['view', 'id' => $model->id]);
@@ -101,7 +101,7 @@ class PotentialClientController extends Controller {
 	 * @return string|Response
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionUpdate($id) {
+	public function actionUpdate(int $id) {
 		$model = $this->findModel($id);
 
 		if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
