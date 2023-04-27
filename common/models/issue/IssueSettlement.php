@@ -21,6 +21,8 @@ interface IssueSettlement extends IssueInterface, SettlementInterface {
 	public const TYPE_SUBSCRIPTION = 50;
 	public const TYPE_DEBT = 100;
 
+	public const TYPE_INTEREST = 110;
+
 	public const PROVIDER_CLIENT = 1;
 	public const PROVIDER_RESPONSIBLE_ENTITY = 10;
 
