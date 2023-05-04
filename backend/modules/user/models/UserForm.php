@@ -2,6 +2,7 @@
 
 namespace backend\modules\user\models;
 
+use backend\modules\user\models\event\UserFormEvent;
 use common\models\Address;
 use common\models\user\User;
 use common\models\user\UserAddress;
@@ -20,6 +21,7 @@ use yii\helpers\ArrayHelper;
 class UserForm extends Model {
 
 	public const SCENARIO_CREATE = 'create';
+	public const EVENT_AFTER_SAVE = 'afterSave';
 
 	public int $status = User::STATUS_INACTIVE;
 	public string $username = '';
@@ -252,6 +254,7 @@ class UserForm extends Model {
 			return $this->sendEmail($model);
 		}
 
+		$this->afterSave($isNewRecord);
 		return true;
 	}
 
@@ -387,6 +390,12 @@ class UserForm extends Model {
 
 	public static function getTraitsNames(): array {
 		return UserTrait::getNames();
+	}
+
+	protected function afterSave(bool $isNewRecord): void {
+		$event = new UserFormEvent();
+		$event->isNewRecord = $isNewRecord;
+		$this->trigger(static::EVENT_AFTER_SAVE, $event);
 	}
 
 }
