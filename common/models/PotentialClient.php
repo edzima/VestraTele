@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use borales\extensions\phoneInput\PhoneInputBehavior;
 use common\models\query\PotentialClientQuery;
 use common\models\user\User;
 use edzima\teryt\models\Simc;
@@ -44,11 +45,18 @@ class PotentialClient extends ActiveRecord {
 		return '{{%potential_client}}';
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function behaviors(): array {
 		return [
 			[
 				'class' => TimestampBehavior::class,
 				'value' => new Expression('CURRENT_TIMESTAMP'),
+			],
+			'phoneInput' => [
+				'class' => PhoneInputBehavior::class,
+				'attributes' => ['phone'],
 			],
 		];
 	}
@@ -68,6 +76,7 @@ class PotentialClient extends ActiveRecord {
 				'message' => Yii::t('common', 'Phone cannot be blank on Contact status.'),
 			],
 			[['details', 'phone'], 'string'],
+			[['phone', 'details'], 'default', 'value' => null],
 			[['city_id', 'status'], 'integer'],
 			[['birthday', 'created_at', 'updated_at'], 'safe'],
 			[['firstname', 'lastname'], 'string', 'max' => 255],

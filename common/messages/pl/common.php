@@ -328,7 +328,7 @@ return [
 	'User Frontend' => 'Użytkownik Frontend',
 	'Potential Clients' => 'Potencjalny Klient',
 	'Create Potential Client' => 'Dodaj Potencjalnego Klienta',
-	'Update Potential Client: {name}' => 'Edytuj Potencjalnego Klienta',
+	'Update Potential Client: {name}' => 'Edytuj Potencjalnego Klienta: {name}',
 	'Phone cannot be blank on Contact status.' => 'Telefon jest wymagany dla statusu Kontakt.',
 	'Not qualify' => 'Nie kwalifikuje się',
 	'Qualifies' => 'Kwalifikuje się',
