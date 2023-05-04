@@ -10,6 +10,7 @@ use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use NumberFormatter;
 use yii\i18n\Formatter as BaseFormatter;
+use common\models\user\User as UserModel;
 
 class Formatter extends BaseFormatter {
 
@@ -22,6 +23,16 @@ class Formatter extends BaseFormatter {
 	];
 	public string $defaultPhoneRegion = 'PL';
 	public int $defaultPhoneFormat = PhoneNumberFormat::INTERNATIONAL;
+
+	public function asUserEmail(?UserModel $user): ?string {
+		if ($user) {
+			if ($user->email) {
+				return Html::mailto($user->getFullName(), $user->email);
+			}
+			return $user->getFullName();
+		}
+		return $this->nullDisplay;
+	}
 
 	public function asCityCode(?string $city, ?string $code, bool $postalStrongTag = true) {
 		if ($city === null && $code === null) {

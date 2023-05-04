@@ -130,4 +130,15 @@ class UserQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function withPhone(string $phone) {
+		if (!empty($phone)) {
+			$this->joinWith([
+				'userProfile' => function (UserProfileQuery $query) use ($phone) {
+					$query->withPhoneNumber($phone);
+				},
+			]);
+		}
+		return $this;
+	}
+
 }

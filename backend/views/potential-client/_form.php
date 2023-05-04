@@ -1,37 +1,41 @@
 <?php
 
+use common\helpers\Html;
 use common\models\PotentialClient;
+use common\widgets\ActiveForm;
 use common\widgets\address\CitySimcInputWidget;
 use common\widgets\DateWidget;
 use common\widgets\PhoneInput;
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
 
-/* @var $this yii\web\View */
-/* @var $model PotentialClient */
-/* @var $form yii\widgets\ActiveForm */
+/** @var yii\web\View $this */
+/** @var PotentialClient $model */
+/** @var yii\widgets\ActiveForm $form */
 ?>
 
 <div class="potential-client-form">
 
-	<?php $form = ActiveForm::begin(); ?>
+	<?php $form = ActiveForm::begin([
+		'id' => 'form-potential-client',
+	]); ?>
+
 
 	<div class="row">
+
 		<?= $form->field($model, 'firstname', [
 			'options' => [
-				'class' => 'col-md-3',
+				'class' => 'col-md-3 col-lg-2',
 			],
 		])->textInput(['maxlength' => true]) ?>
 
 		<?= $form->field($model, 'lastname', [
 			'options' => [
-				'class' => 'col-md-3',
+				'class' => 'col-md-3 col-lg-2',
 			],
 		])->textInput(['maxlength' => true]) ?>
 
 		<?= $form->field($model, 'birthday', [
 			'options' => [
-				'class' => 'col-md-2',
+				'class' => 'col-md-3 col-lg-2',
 			],
 		])->widget(DateWidget::class, [
 			'clientOptions' => [
@@ -45,23 +49,38 @@ use yii\widgets\ActiveForm;
 			],
 		]) ?>
 
-		<?= $form->field($model, 'phone', [
-			'options' => [
-				'class' => 'col-md-2',
-			],
-		])->widget(PhoneInput::class) ?>
 
 	</div>
 
-	<?= $form->field($model, 'city_id')->widget(CitySimcInputWidget::class) ?>
+	<div class="row">
+		<?= $form->field($model, 'phone', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->widget(PhoneInput::class) ?>
+
+		<?= $form->field($model, 'city_id', [
+			'options' => [
+				'class' => 'col-md-5 col-lg-4',
+			],
+		])->widget(CitySimcInputWidget::class) ?>
+
+
+	</div>
 
 	<?= $form->field($model, 'status')->dropDownList(PotentialClient::getStatusesNames()) ?>
 
-	<?= $form->field($model, 'details')->textarea(['rows' => 4]) ?>
 
+	<div class="row">
+		<?= $form->field($model, 'details', [
+			'options' => [
+				'class' => 'col-md-6 col-lg-4',
+			],
+		])->textarea(['rows' => 6]) ?>
+	</div>
 
 	<div class="form-group">
-		<?= Html::submitButton(Yii::t('common', 'Save'), ['class' => 'btn btn-success']) ?>
+		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

@@ -2,6 +2,8 @@
 
 namespace common\models;
 
+use borales\extensions\phoneInput\PhoneInputBehavior;
+use common\models\query\PotentialClientQuery;
 use common\models\user\User;
 use edzima\teryt\models\Simc;
 use Yii;
@@ -22,6 +24,7 @@ use yii\db\Expression;
  * @property int|null $status
  * @property string $created_at
  * @property string $updated_at
+ * @property string|null $phone
  *
  * @property Simc $city
  * @property User $owner
@@ -42,11 +45,18 @@ class PotentialClient extends ActiveRecord {
 		return '{{%potential_client}}';
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function behaviors(): array {
 		return [
 			[
 				'class' => TimestampBehavior::class,
 				'value' => new Expression('CURRENT_TIMESTAMP'),
+			],
+			'phoneInput' => [
+				'class' => PhoneInputBehavior::class,
+				'attributes' => ['phone'],
 			],
 		];
 	}
@@ -57,10 +67,20 @@ class PotentialClient extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['firstname', 'lastname', '!owner_id', 'birthday', 'status'], 'required'],
-			[['details'], 'string'],
+			[
+				'phone', 'required',
+				'when' => function (): bool {
+					return (int) $this->status === static::STATUS_CONTACT;
+				},
+				'enableClientValidation' => false,
+				'message' => Yii::t('common', 'Phone cannot be blank on Contact status.'),
+			],
+			[['details', 'phone'], 'string'],
+			[['phone', 'details'], 'default', 'value' => null],
 			[['city_id', 'status'], 'integer'],
 			[['birthday', 'created_at', 'updated_at'], 'safe'],
 			[['firstname', 'lastname'], 'string', 'max' => 255],
+			[['firstname', 'lastname'], 'match', 'pattern' => '/[AaĄąBbCcĆćDdEeĘęFfGgHhIiJjKkLlŁłMmNnŃńOoÓóPpRrSsŚśTtUuWwYyZzŹźŻż]/iu'],
 			[['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Simc::class, 'targetAttribute' => ['city_id' => 'id']],
 			[['!owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['owner_id' => 'id']],
 		];
@@ -84,6 +104,8 @@ class PotentialClient extends ActiveRecord {
 			'ownerName' => Yii::t('common', 'Owner'),
 			'firstname' => Yii::t('common', 'Firstname'),
 			'lastname' => Yii::t('common', 'Lastname'),
+			'phone' => Yii::t('common', 'Phone'),
+			'owner' => Yii::t('common', 'Owner'),
 		];
 	}
 
@@ -128,5 +150,9 @@ class PotentialClient extends ActiveRecord {
 			static::STATUS_AGREEMENT => Yii::t('common', 'Agreement'),
 			static::STATUS_CONTACT => Yii::t('common', 'Contact'),
 		];
+	}
+
+	public static function find(): PotentialClientQuery {
+		return new PotentialClientQuery(static::class);
 	}
 }

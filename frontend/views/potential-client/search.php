@@ -64,9 +64,9 @@ $this->params['breadcrumbs'][] = $this->title;
 				'firstname',
 				'lastname',
 				'birthday',
+				'owner:userEmail',
 				'created_at:date',
 				'updated_at:date',
-
 				[
 					'class' => ActionColumn::class,
 					'visibleButtons' => [
