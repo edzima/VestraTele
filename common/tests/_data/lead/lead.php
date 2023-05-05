@@ -12,7 +12,7 @@ return [
 		'date_at' => '2020-01-01',
 		'email' => 'test@lead.com',
 		'phone' => '48777-222-122',
-		'provider' => Lead::PROVIDER_FORM,
+		'provider' => Lead::PROVIDER_FORM_LANDING,
 		'data' => '{"external_id":1}',
 	],
 	'equal-accident-phone-from-other-source' => [
@@ -22,7 +22,7 @@ return [
 		'date_at' => '2020-01-01',
 		'email' => 'test@lead.com',
 		'phone' => '48777-222-122',
-		'provider' => Lead::PROVIDER_FORM,
+		'provider' => Lead::PROVIDER_FORM_LANDING,
 		'data' => '[]',
 	],
 	'equal-accident-phone-from-other-source-and-archive' => [
@@ -32,7 +32,7 @@ return [
 		'date_at' => '2020-01-01',
 		'email' => 'test@lead.com',
 		'phone' => '48777-222-122',
-		'provider' => Lead::PROVIDER_FORM,
+		'provider' => Lead::PROVIDER_FORM_LANDING,
 		'data' => '[]',
 	],
 	'archive-wordpress-accident' => [

@@ -127,9 +127,9 @@ class LeadSearchTest extends Unit {
 	}
 
 	public function testProvider(): void {
-		$this->model->provider = Lead::PROVIDER_FORM;
+		$this->model->provider = Lead::PROVIDER_FORM_LANDING;
 		foreach ($this->getSearchModels() as $model) {
-			$this->tester->assertSame(Lead::PROVIDER_FORM, $model->getProvider());
+			$this->tester->assertSame(Lead::PROVIDER_FORM_LANDING, $model->getProvider());
 		}
 	}
 

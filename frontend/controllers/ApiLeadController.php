@@ -9,8 +9,8 @@ use common\modules\lead\events\LeadEvent;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\forms\CzaterLeadForm;
 use common\modules\lead\models\forms\LandingLeadForm;
-use common\modules\lead\models\forms\LeadForm;
 use common\modules\lead\models\forms\LeadPushEmail;
+use common\modules\lead\models\forms\ZapierLeadForm;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadSmsForm;
 use common\modules\lead\models\LeadUser;
@@ -98,23 +98,34 @@ class ApiLeadController extends Controller {
 	}
 
 	public function actionZapier() {
-		$model = new LeadForm();
-		Yii::warning([
-			'post' => Yii::$app->request->post(),
-			'bodyParams' => Yii::$app->request->bodyParams,
-			'queryParams' => Yii::$app->request->queryParams,
-			'header' => Yii::$app->request->headers->toArray(),
-		], __METHOD__);
+		$model = new ZapierLeadForm();
+		$model->date_at = date($model->dateFormat);
+
 		if ($model->load(Yii::$app->request->post())) {
-			if ($model->validate()) {
+			if ($model->validate() && $this->pushLead($model)) {
 				return [
-					'success' => true,
+					'status' => 'success',
 				];
 			}
-			return $model->getErrors();
+			Yii::warning([
+				'message' => 'Zapier lead with validate errors.',
+				'post' => Yii::$app->request->post(),
+				'error' => $model->getErrors(),
+			], 'lead.landing.error');
+
+			return [
+				'status' => 'error',
+				'errors' => $model->getErrors(),
+			];
 		}
+		Yii::warning([
+			'message' => 'Landing Lead not Loaded Data',
+			'post' => Yii::$app->request->post(),
+			'error' => $model->getErrors(),
+		], 'lead.landing.error');
 		return [
-			'message' => 'Not send Data',
+			'status' => 'warning',
+			'message' => 'Not Send Data',
 		];
 	}
 
