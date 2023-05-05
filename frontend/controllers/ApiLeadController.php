@@ -9,6 +9,7 @@ use common\modules\lead\events\LeadEvent;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\forms\CzaterLeadForm;
 use common\modules\lead\models\forms\LandingLeadForm;
+use common\modules\lead\models\forms\LeadForm;
 use common\modules\lead\models\forms\LeadPushEmail;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadSmsForm;
@@ -93,6 +94,27 @@ class ApiLeadController extends Controller {
 		return [
 			'status' => 'warning',
 			'message' => 'Not Send Data',
+		];
+	}
+
+	public function actionZapier() {
+		$model = new LeadForm();
+		Yii::warning([
+			'post' => Yii::$app->request->post(),
+			'bodyParams' => Yii::$app->request->bodyParams,
+			'queryParams' => Yii::$app->request->queryParams,
+			'header' => Yii::$app->request->headers->toArray(),
+		], __METHOD__);
+		if ($model->load(Yii::$app->request->post())) {
+			if ($model->validate()) {
+				return [
+					'success' => true,
+				];
+			}
+			return $model->getErrors();
+		}
+		return [
+			'message' => 'Not send Data',
 		];
 	}
 
