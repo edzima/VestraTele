@@ -47,7 +47,8 @@ class Lead extends ActiveRecord implements ActiveLead {
 	public const EVENT_AFTER_STATUS_UPDATE = 'afterStatusUpdate';
 
 	public const PROVIDER_COPY = 'copy';
-	public const PROVIDER_FORM = 'form';
+	public const PROVIDER_FORM_LANDING = 'form';
+	public const PROVIDER_CRM_CUSTOMER = 'crm';
 	public const PROVIDER_CZATER = 'czater';
 	public const PROVIDER_CENTRAL_PHONE = 'central-phone';
 	public const PROVIDER_FORM_ZAPIER = 'form.zapier';
@@ -327,12 +328,12 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public static function getProvidersNames(): array {
-		//@todo load from Lead Module
 		return [
 			static::PROVIDER_COPY => Yii::t('lead', 'Copy'),
 			static::PROVIDER_FORM_LANDING => Yii::t('lead', 'Form - Landing'),
 			static::PROVIDER_FORM_ZAPIER => Yii::t('lead', 'Form - Zapier'),
 			static::PROVIDER_CZATER => Yii::t('lead', 'Czater'),
+			static::PROVIDER_CRM_CUSTOMER => Yii::t('lead', 'CRM - Customer'),
 			static::PROVIDER_CENTRAL_PHONE => Yii::t('lead', 'Central phone'),
 		];
 	}
