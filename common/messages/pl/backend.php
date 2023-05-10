@@ -345,4 +345,5 @@ return [
 	'Type: {type} Tags' => 'Przypisz Tagi do Typu: {type}',
 	'Find Customer Issue and copy from them ...' => 'Znajdź Sprawę (imie / nazwisko Klienta) i skopiuj',
 	'Copy from Issue' => 'Skopiuj',
+	'Lead Source for Created Customers' => 'Źródło Lead dla utworzonych Klientów',
 ];
