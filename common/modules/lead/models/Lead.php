@@ -48,10 +48,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public const PROVIDER_COPY = 'copy';
 	public const PROVIDER_FORM_LANDING = 'form';
-	public const PROVIDER_CRM_CUSTOMER = 'crm';
 	public const PROVIDER_CZATER = 'czater';
 	public const PROVIDER_CENTRAL_PHONE = 'central-phone';
 	public const PROVIDER_FORM_ZAPIER = 'form.zapier';
+	public const PROVIDER_CRM_CUSTOMER = 'crm.customer';
 
 	private ?array $users_ids = null;
 

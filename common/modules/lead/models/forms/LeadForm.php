@@ -77,7 +77,7 @@ class LeadForm extends Model implements LeadInterface {
 			}, 'message' => Yii::t('lead', 'Email cannot be blank when phone is blank.'),
 			],
 			[['status_id', 'source_id', 'campaign_id', 'agent_id', 'owner_id'], 'integer'],
-			[['phone', 'postal_code', 'email'], 'string'],
+			[['phone', 'postal_code', 'email', 'data'], 'string'],
 			[['campaign_id', 'email', 'phone'], 'default', 'value' => null],
 			['postal_code', 'string', 'max' => 6],
 			['email', 'email'],

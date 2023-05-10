@@ -140,8 +140,15 @@ YiiAsset::register($this);
 					[
 						'attribute' => 'data',
 						'visible' => !empty($model->getData())
-							&& Yii::$app->user->can(User::ROLE_MANAGER),
+							&& Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
 						'format' => 'ntext',
+					],
+					[
+						'attribute' => 'customerUrl',
+						'format' => 'html',
+						'label' => Yii::t('lead', 'Customer View'),
+						'visible' => isset($model->getData()['customerUrl']),
+						'value' => Html::a($model->getName(), $model->getData()['customerUrl']),
 					],
 					[
 						'attribute' => 'phone',
@@ -172,15 +179,11 @@ YiiAsset::register($this);
 		<div class="col-md-8">
 
 
-			<?= LeadAnswersWidget::widget([
-				'answers' => $model->answers,
-			]) ?>
+			<?= LeadAnswersWidget::widget(['answers' => $model->answers,]) ?>
 
 
 			<?= $model->getCustomerAddress()
-				? AddressDetailView::widget([
-					'model' => $model->getCustomerAddress(),
-				])
+				? AddressDetailView::widget(['model' => $model->getCustomerAddress(),])
 				: ''
 			?>
 
@@ -233,18 +236,12 @@ YiiAsset::register($this);
 				'model' => $model,
 				'viewLink' => !$onlyUser,
 				'updateLink' => !$onlyUser && Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE),
-				'headerOptions' => [
-					'class' => 'col-md-12',
-				],
+				'headerOptions' => ['class' => 'col-md-12',],
 				'archiveBtn' => Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE) && !$userIsFromMarket,
 				'withType' => false,
 				'withDialers' => true,
-				'options' => [
-					'class' => 'row',
-				],
-				'itemOptions' => [
-					'class' => 'col-md-6',
-				],
+				'options' => ['class' => 'row',],
+				'itemOptions' => ['class' => 'col-md-6',],
 			]) ?>
 			<div class="clearfix"></div>
 

@@ -7,10 +7,12 @@ use common\models\user\User;
 use common\modules\lead\components\LeadManager;
 use common\modules\lead\events\LeadEvent;
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\forms\CustomerLeadForm;
 use common\modules\lead\models\forms\CzaterLeadForm;
 use common\modules\lead\models\forms\LandingLeadForm;
 use common\modules\lead\models\forms\LeadPushEmail;
 use common\modules\lead\models\forms\ZapierLeadForm;
+use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadSmsForm;
 use common\modules\lead\models\LeadUser;
@@ -22,6 +24,17 @@ use yii\base\InvalidConfigException;
 use yii\rest\Controller;
 
 class ApiLeadController extends Controller {
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function verbs() {
+		return [
+			'customer' => ['POST'],
+			'landing' => ['POST'],
+			'zapier' => ['POST'],
+		];
+	}
 
 	public function init() {
 		Module::manager()->on(LeadManager::EVENT_AFTER_PUSH, [$this, 'afterPush']);
@@ -129,6 +142,27 @@ class ApiLeadController extends Controller {
 		];
 	}
 
+	public function actionCustomer(): array {
+		$model = new CustomerLeadForm();
+		if ($model->load(Yii::$app->request->post())) {
+			if ($model->validate() && $this->pushLead($model)) {
+				return [
+					'success' => true,
+				];
+			}
+			Yii::warning([
+				'message' => 'Customer lead with validate errors.',
+				'post' => Yii::$app->request->post(),
+				'error' => $model->getErrors(),
+			], 'lead.landing.error');
+			return $model->getErrors();
+		}
+		return [
+			'success' => false,
+			'message' => 'Not send Data',
+		];
+	}
+
 	protected function afterPush(LeadEvent $event): void {
 		$lead = $event->getLead();
 		$this->sendEmail($lead);
@@ -150,7 +184,7 @@ class ApiLeadController extends Controller {
 	}
 
 	private function sendSms(ActiveLead $lead): void {
-		if (!empty($lead->getPhone()) && !empty($lead->getSource()->getPhone())) {
+		if ($this->smsShouldSend($lead)) {
 			$message = Yii::t('lead', "Thank you for submitting your application.\n"
 				. "We will contact you within 24 hours.\n"
 				. "If you do not want to wait, call us directly on the number: {sourcePhone}", [
@@ -169,15 +203,22 @@ class ApiLeadController extends Controller {
 		}
 	}
 
-	private function getSmsOwnerId(): int {
+	private function getSmsOwnerId(): ?int {
 		$owner = Yii::$app->keyStorage->get(KeyStorageItem::KEY_ROBOT_SMS_OWNER_ID);
 		if ($owner === null) {
-			throw new InvalidConfigException('Not Set Robot SMS Owner. Key: (' . KeyStorageItem::KEY_ROBOT_SMS_OWNER_ID . ').');
+			Yii::warning('Not Set Robot SMS Owner. Key: (' . KeyStorageItem::KEY_ROBOT_SMS_OWNER_ID . ').');
 		}
 		return $owner;
 	}
 
 	protected function pushLead(LeadInterface $lead): bool {
 		return Module::manager()->pushLead($lead) !== null;
+	}
+
+	private function smsShouldSend(ActiveLead $lead): bool {
+		return !empty($lead->getPhone())
+			&& !empty($lead->getSource()->getPhone())
+			&& $lead->getProvider() !== Lead::PROVIDER_CRM_CUSTOMER
+			&& $this->getSmsOwnerId() !== null;
 	}
 }
