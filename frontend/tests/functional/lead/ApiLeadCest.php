@@ -4,6 +4,7 @@ namespace frontend\tests\functional\lead;
 
 use common\fixtures\helpers\LeadFixtureHelper;
 use common\models\KeyStorageItem;
+use common\modules\lead\models\Lead;
 use common\modules\lead\Module;
 use frontend\controllers\ApiLeadController;
 use frontend\tests\FunctionalTester;
@@ -12,6 +13,8 @@ class ApiLeadCest {
 
 	/** @see ApiLeadController::actionLanding() */
 	private const ROUTE_LANDING = '/lead/api/landing';
+	/** @see ApiLeadController::actionCustomer() */
+	private const ROUTE_CUSTOMER = '/lead/api/customer';
 
 	public function _before(FunctionalTester $I): void {
 		$I->haveRecord(KeyStorageItem::class, [
@@ -24,6 +27,22 @@ class ApiLeadCest {
 		return LeadFixtureHelper::leads();
 	}
 
+	public function checkCustomerAction(FunctionalTester $I): void {
+		$I->sendAjaxPostRequest(static::ROUTE_CUSTOMER, [
+			'source_id' => 1,
+			'name' => 'Jonny',
+			'email' => 'email@example.com',
+		]);
+		$I->seeRecord(Module::manager()->model, [
+			'source_id' => 1,
+			'name' => 'Jonny',
+			'email' => 'email@example.com',
+			'provider' => Lead::PROVIDER_CRM_CUSTOMER,
+		]);
+		$I->seeEmailIsSent();
+		$I->dontSeeSmsIsSend();
+	}
+
 	public function checkLandingForSourceWithoutOwner(FunctionalTester $I): void {
 		$I->sendAjaxPostRequest(static::ROUTE_LANDING, [
 			'source_id' => 1,
@@ -34,6 +53,7 @@ class ApiLeadCest {
 			'source_id' => 1,
 			'name' => 'Jonny',
 			'email' => 'email@example.com',
+			'provider' => Lead::PROVIDER_FORM_LANDING,
 		]);
 		$I->seeEmailIsSent();
 		$I->dontSeeSmsIsSend();

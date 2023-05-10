@@ -2,6 +2,7 @@
 
 use common\models\message\Message;
 use common\models\user\User;
+use common\modules\lead\components\LeadClient;
 use common\modules\lead\components\LeadDialerManager;
 use common\modules\lead\Module;
 use yii\helpers\ArrayHelper;
@@ -18,6 +19,10 @@ return [
 		],
 		'authManager' => [
 			'cache' => null,
+		],
+		'leadClient' => [
+			'class' => LeadClient::class,
+			'baseUrl' => Yii::getAlias('@frontendUrl'),
 		],
 	],
 	'modules' => [
