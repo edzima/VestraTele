@@ -366,9 +366,7 @@ class LeadController extends BaseController {
 			$model->setScenario(LeadForm::SCENARIO_OWNER);
 		}
 
-		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-			$lead->setLead($model);
-			$lead->update();
+		if ($model->load(Yii::$app->request->post()) && $model->updateLead($lead, Yii::$app->user->getId())) {
 			return $this->redirect(['view', 'id' => $lead->getId()]);
 		}
 

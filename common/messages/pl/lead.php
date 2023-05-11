@@ -391,4 +391,6 @@ return [
 	'Are you sure you want to send SMS: {message}?' => "Czy napewno chcesz wysłać SMS:\n{message}?",
 	'Search - Phone' => 'Szukaj - Telefon',
 	'Search - Name' => 'Szukaj - Nazwisko',
+	'Updated Contact Attributes!' => 'Edytowano Dane Kontaktowe!',
+	'{attribute} is changed from: {oldValue} to {newValue}.' => '{attribute} został edytowany z "{oldValue}" na "{newValue}".',
 ];

@@ -86,7 +86,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 				}
 			}
 
-			foreach ($this->users_ids as $type => $userId) {
+			foreach ((array) $this->users_ids as $type => $userId) {
 				if (!in_array($type, $currentTypes, true)) {
 					$this->linkUser($type, $userId);
 				}

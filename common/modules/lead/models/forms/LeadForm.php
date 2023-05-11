@@ -7,6 +7,7 @@ use common\helpers\ArrayHelper;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadInterface;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadSourceInterface;
 use common\modules\lead\models\LeadStatus;
@@ -48,6 +49,12 @@ class LeadForm extends Model implements LeadInterface {
 	public $agent_id;
 
 	public string $dateFormat = 'Y-m-d H:i:s';
+
+	public array $contactAttributes = [
+		'phone',
+		'name',
+		'email',
+	];
 	private array $users = [];
 
 	public function init(): void {
@@ -282,5 +289,48 @@ class LeadForm extends Model implements LeadInterface {
 	private function setData(array $data): void {
 		$this->data = Json::encode($data);
 		$this->details = ArrayHelper::getValue($data, 'details');
+	}
+
+	public function updateLead(Lead $lead, int $updater_id, bool $validate = true): bool {
+		if ($validate && !$this->validate()) {
+			codecept_debug($this->getErrors());
+			return false;
+		}
+		$lead->setLead($this);
+		$contactChangedAttributes = $this->getContactChangedAttributes($lead);
+		if (!empty($contactChangedAttributes)) {
+			$this->createLeadReportAboutContactChanged($lead, $updater_id, $contactChangedAttributes);
+		}
+		return $lead->update(false);
+	}
+
+	public function getContactChangedAttributes(Lead $lead): array {
+		$attributes = [];
+		foreach ($this->contactAttributes as $attribute) {
+			if ($lead->isAttributeChanged($attribute)) {
+				$attributes[] = $attribute;
+			}
+		}
+		return $attributes;
+	}
+
+	protected function createLeadReportAboutContactChanged(Lead $lead, int $updater_id, array $changedAttributes): bool {
+		$report = new LeadReport();
+		$report->lead_id = $lead->getId();
+		$report->owner_id = $updater_id;
+		$report->old_status_id = $lead->getOldAttribute('status_id');
+		$report->status_id = $lead->status_id;
+		$details[] = Yii::t('lead', 'Updated Contact Attributes!');
+		foreach ($changedAttributes as $attribute) {
+			$details[] = Yii::t('lead', '{attribute} is changed from: {oldValue} to {newValue}.', [
+				'oldValue' => $lead->getOldAttribute($attribute),
+				'newValue' => $lead->getAttribute($attribute),
+				'attribute' => $lead->getAttributeLabel($attribute),
+			]);
+		}
+
+		$report->details = implode("\n", $details);
+
+		return $report->save();
 	}
 }
