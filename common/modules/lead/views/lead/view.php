@@ -138,6 +138,16 @@ YiiAsset::register($this);
 					],
 					'date_at:datetime',
 					[
+						'attribute' => 'updated_at',
+						'format' => 'datetime',
+						'visible' => !empty($model->updated_at),
+					],
+					[
+						'attribute' => 'details',
+						'visible' => !empty($model->getDetails()),
+						'format' => 'ntext',
+					],
+					[
 						'attribute' => 'data',
 						'visible' => !empty($model->getData())
 							&& Yii::$app->user->can(User::ROLE_ADMINISTRATOR),

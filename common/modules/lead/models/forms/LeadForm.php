@@ -3,6 +3,7 @@
 namespace common\modules\lead\models\forms;
 
 use borales\extensions\phoneInput\PhoneInputValidator;
+use common\helpers\ArrayHelper;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadInterface;
@@ -38,6 +39,8 @@ class LeadForm extends Model implements LeadInterface {
 	public ?string $email = null;
 	public ?string $phone = null;
 	public ?string $postal_code = null;
+
+	public ?string $details = null;
 
 	public ?string $phoneRegion = null;
 
@@ -77,7 +80,9 @@ class LeadForm extends Model implements LeadInterface {
 			}, 'message' => Yii::t('lead', 'Email cannot be blank when phone is blank.'),
 			],
 			[['status_id', 'source_id', 'campaign_id', 'agent_id', 'owner_id'], 'integer'],
-			[['phone', 'postal_code', 'email', 'data'], 'string'],
+			[['phone', 'postal_code', 'email', 'data', 'details'], 'string'],
+			[['phone', 'postal_code', 'email', 'data', 'details'], 'trim'],
+
 			[['campaign_id', 'email', 'phone'], 'default', 'value' => null],
 			['postal_code', 'string', 'max' => 6],
 			['email', 'email'],
@@ -112,16 +117,17 @@ class LeadForm extends Model implements LeadInterface {
 			'agent_id' => Yii::t('lead', 'Agent'),
 			'owner_id' => Yii::t('lead', 'Owner'),
 			'name' => Yii::t('lead', 'Lead Name'),
+			'details' => Yii::t('lead', 'Details'),
 		];
 	}
 
 	public function setLead(LeadInterface $lead): void {
 		$this->setSource($lead->getSource());
 		$this->setUsers($lead->getUsers());
+		$this->setData($lead->getData());
 		$this->name = $lead->getName();
 		$this->status_id = $lead->getStatusId();
 		$this->date_at = $lead->getDateTime()->format($this->dateFormat);
-		$this->data = Json::encode($lead->getData());
 		$this->email = $lead->getEmail();
 		$this->phone = $lead->getPhone();
 		$this->postal_code = $lead->getPostalCode();
@@ -156,7 +162,17 @@ class LeadForm extends Model implements LeadInterface {
 	}
 
 	public function getData(): array {
-		return Json::decode($this->data) ?? [];
+		$data = Json::decode($this->data) ?? [];
+		if (empty($this->details)) {
+			unset($data[Lead::DATA_KEY_DETAILS]);
+		} else {
+			$data[Lead::DATA_KEY_DETAILS] = $this->details;
+		}
+		return $data;
+	}
+
+	public function getDetails(): ?string {
+		return $this->details;
 	}
 
 	public function getPhone(): ?string {
@@ -261,5 +277,10 @@ class LeadForm extends Model implements LeadInterface {
 
 	public function getSameContacts(bool $withType = false): array {
 		return Lead::findByLead($this);
+	}
+
+	private function setData(array $data): void {
+		$this->data = Json::encode($data);
+		$this->details = ArrayHelper::getValue($data, 'details');
 	}
 }

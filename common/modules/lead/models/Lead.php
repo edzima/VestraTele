@@ -10,8 +10,10 @@ use common\modules\lead\Module;
 use common\modules\reminder\models\Reminder;
 use DateTime;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
@@ -43,6 +45,8 @@ use yii\helpers\Json;
  * @property-read LeadDialer[] $dialers
  */
 class Lead extends ActiveRecord implements ActiveLead {
+
+	public const DATA_KEY_DETAILS = 'details';
 
 	public const EVENT_AFTER_STATUS_UPDATE = 'afterStatusUpdate';
 
@@ -94,6 +98,18 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return '{{%lead}}';
 	}
 
+	public function behaviors(): array {
+		return [
+			[
+				'class' => TimestampBehavior::class,
+				'value' => new Expression('CURRENT_TIMESTAMP'),
+				'attributes' => [
+					static::EVENT_BEFORE_UPDATE => 'updated_at',
+				],
+			],
+		];
+	}
+
 	public function rules(): array {
 		return [
 			[['source_id', 'status_id', 'data', 'name'], 'required'],
@@ -127,6 +143,8 @@ class Lead extends ActiveRecord implements ActiveLead {
 			'phone' => Yii::t('lead', 'Phone'),
 			'postal_code' => Yii::t('lead', 'Postal Code'),
 			'owner' => Yii::t('lead', 'Owner'),
+			'details' => Yii::t('lead', 'Details'),
+			'updated_at' => Yii::t('lead', 'Updated At'),
 		];
 	}
 
@@ -195,6 +213,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function getLeadUsers(): ActiveQuery {
 		return $this->hasMany(LeadUser::class, ['lead_id' => 'id']);
+	}
+
+	public function getDetails(): ?string {
+		return $this->getData()[static::DATA_KEY_DETAILS] ?? null;
 	}
 
 	public function getId(): int {
