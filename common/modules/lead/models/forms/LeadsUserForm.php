@@ -67,8 +67,7 @@ class LeadsUserForm extends Model {
 		}
 		if ($this->scenario === static::SCENARIO_SINGLE || count($this->leadsIds) === 1) {
 			$leadId = reset($this->leadsIds);
-			$this->saveSingle($leadId, $this->type, $this->userId);
-			return 1;
+			return $this->saveSingle($leadId, $this->type, $this->userId);
 		}
 		return $this->saveMultiple();
 	}
@@ -129,11 +128,9 @@ class LeadsUserForm extends Model {
 			$user = new LeadUser();
 			$user->lead_id = $leadId;
 			$user->type = $type;
-			$user->user_id = $userId;
 		}
-		if ($user->user_id !== $userId) {
-			$user->save();
-		}
+		$user->user_id = $userId;
+		return $user->save();
 	}
 
 }
