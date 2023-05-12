@@ -33,6 +33,9 @@ class LeadReportSearch extends LeadReport {
 	public $answersQuestions;
 	public $from_at;
 	public $to_at;
+
+	public $withoutDeleted;
+
 	private ?array $leadsIds = null;
 
 	/**
@@ -41,9 +44,10 @@ class LeadReportSearch extends LeadReport {
 	public function rules(): array {
 		return [
 			[['id', 'lead_id', 'owner_id', 'lead_user_id', 'status_id', 'old_status_id', 'lead_type_id', 'lead_source_id', 'lead_campaign_id', 'lead_status_id'], 'integer'],
-			[['!owner_id', 'lead_user_id'], 'required', 'on' => static::SCENARIO_OWNER],
+			[['!owner_id', 'lead_user_id', '!withoutDeleted'], 'required', 'on' => static::SCENARIO_OWNER],
 			[['onlySelf'], 'boolean', 'on' => static::SCENARIO_OWNER],
-			[['changedStatus'], 'boolean'],
+			[['changedStatus', 'withoutDeleted'], 'boolean'],
+			[['withoutDeleted'], 'default', 'value' => null],
 			['lead_source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['lead_campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			['lead_name', 'string', 'min' => 3],
@@ -60,6 +64,7 @@ class LeadReportSearch extends LeadReport {
 			'from_at' => Yii::t('lead', 'From At'),
 			'to_at' => Yii::t('lead', 'To At'),
 			'onlySelf' => Yii::t('lead', 'Only Self'),
+			'withoutDeleted' => Yii::t('lead', 'With Deleted'),
 		];
 	}
 
@@ -111,6 +116,7 @@ class LeadReportSearch extends LeadReport {
 		$this->applyLeadPhoneFilter($query);
 		$this->applyStatusesFilter($query);
 		$this->applyUserFilter($query);
+		$this->applyDeletedFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -219,6 +225,17 @@ class LeadReportSearch extends LeadReport {
 				->select('owner_id')
 				->distinct()
 				->column(), true);
+	}
+
+	private function applyDeletedFilter(LeadReportQuery $query) {
+		if ($this->withoutDeleted === null || $this->withoutDeleted === '') {
+			return;
+		}
+		if ($this->withoutDeleted) {
+			$query->andWhere(LeadReport::tableName() . '.deleted_at IS NOT NULL');
+		} else {
+			$query->andWhere(LeadReport::tableName() . '.deleted_at IS NULL');
+		}
 	}
 
 }

@@ -52,6 +52,7 @@ class ReportController extends BaseController {
 			}
 			$searchModel->scenario = LeadReportSearch::SCENARIO_OWNER;
 			$searchModel->owner_id = $userId;
+			$searchModel->withoutDeleted = false;
 			$searchModel->lead_user_id = $userId;
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -149,8 +150,10 @@ class ReportController extends BaseController {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionDelete($id) {
-		$this->findModel($id)->delete();
+	public function actionDelete(int $id) {
+		$model = $this->findModel($id);
+		$model->markAsDelete();
+		$model->update(false);
 
 		return $this->redirect(['index']);
 	}

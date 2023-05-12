@@ -27,6 +27,7 @@ $multipleForm = Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
 if ($multipleForm) {
 	$dataProvider->getModels();
 }
+
 ?>
 <div class="lead-report-index">
 
@@ -232,7 +233,12 @@ if ($multipleForm) {
 			'details:text',
 			'created_at:datetime',
 			'updated_at:datetime',
-
+			[
+				'attribute' => 'deleted_at',
+				'format' => 'datetime',
+				'noWrap' => true,
+				'visible' => $searchModel->scenario !== LeadReportSearch::SCENARIO_OWNER && ($searchModel->withoutDeleted === null || $searchModel->withoutDeleted),
+			],
 			[
 				'class' => ActionColumn::class,
 				'template' => '{report} {sms} {view} {update} {delete}',

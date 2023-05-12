@@ -20,6 +20,7 @@ use yii\db\ActiveRecord;
  * @property string|null $details
  * @property string $created_at
  * @property string $updated_at
+ * @property string $deleted_at
  *
  * @property-read Lead $lead
  * @property-read LeadStatus $oldStatus
@@ -78,6 +79,7 @@ class LeadReport extends ActiveRecord {
 			'created_at' => Yii::t('lead', 'Created At'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
 			'answersQuestions' => Yii::t('lead', 'Answers Questions'),
+			'deleted_at' => Yii::t('lead', 'Deleted At'),
 		];
 	}
 
@@ -145,6 +147,10 @@ class LeadReport extends ActiveRecord {
 	 */
 	public static function find(): LeadReportQuery {
 		return new LeadReportQuery(static::class);
+	}
+
+	public function markAsDelete(): void {
+		$this->deleted_at = date(DATE_ATOM);
 	}
 
 }

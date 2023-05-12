@@ -1,10 +1,10 @@
 <?php
 
+use common\helpers\Html;
 use common\modules\lead\models\searches\LeadReportSearch;
+use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
 use kartik\select2\Select2;
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model LeadReportSearch */
@@ -19,6 +19,7 @@ use yii\widgets\ActiveForm;
 	]); ?>
 
 	<div class="row">
+
 
 
 		<?= $model->scenario === LeadReportSearch::SCENARIO_OWNER
@@ -77,6 +78,14 @@ use yii\widgets\ActiveForm;
 				'class' => 'col-md-2 col-lg-1',
 			],
 		])->checkbox() ?>
+
+
+		<?= $model->scenario !== LeadReportSearch::SCENARIO_OWNER
+			? $form->field($model, 'withoutDeleted', ['options' => ['class' => 'col-md-1']])->dropDownList(Html::booleanDropdownList(), [
+				'prompt' => Yii::t('lead', 'Select...'),
+			])
+			: ''
+		?>
 
 
 	</div>

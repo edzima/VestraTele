@@ -393,4 +393,7 @@ return [
 	'Search - Name' => 'Szukaj - Nazwisko',
 	'Updated Contact Attributes!' => 'Edytowano Dane Kontaktowe!',
 	'{attribute} is changed from: {oldValue} to {newValue}.' => '{attribute} został edytowany z "{oldValue}" na "{newValue}".',
+	'Deleted At' => 'Usunięto',
+	'With Deleted' => 'Usunięte',
+	'You have not access to Lead.' => 'Brak przypisania do Leada',
 ];

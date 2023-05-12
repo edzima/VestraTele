@@ -199,16 +199,18 @@ YiiAsset::register($this);
 
 			<?= $usersDataProvider !== null
 				? GridView::widget([
+					'options' => [
+						'class' => 'col-md-4',
+					],
 					'caption' => Yii::t('lead', 'Users'),
 					'dataProvider' => $usersDataProvider,
 					'showOnEmpty' => false,
 					'emptyText' => false,
 					'summary' => false,
 					'columns' => [
-						'typeName',
 						[
 							'label' => Yii::t('lead', 'User'),
-							'value' => 'user.fullName',
+							'value' => 'userWithTypeName',
 						],
 						[
 							'label' => Yii::t('lead', 'Date At'),
