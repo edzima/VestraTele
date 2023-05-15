@@ -377,3 +377,7 @@ div:target {
 .issue-users legend .tags-wrapper .label {
 	font-size: 0.6em;
 }
+
+.panel-transparent {
+	opacity: 0.5;
+}

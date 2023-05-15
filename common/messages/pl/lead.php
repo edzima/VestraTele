@@ -394,6 +394,7 @@ return [
 	'Updated Contact Attributes!' => 'Edytowano Dane Kontaktowe!',
 	'{attribute} is changed from: {oldValue} to {newValue}.' => '{attribute} został edytowany z "{oldValue}" na "{newValue}".',
 	'Deleted At' => 'Usunięto',
+	'Deleted At: {date}' => 'Usunięto: {date}',
 	'With Deleted' => 'Usunięte',
 	'You have not access to Lead.' => 'Brak przypisania do Leada',
 ];

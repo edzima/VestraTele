@@ -11,7 +11,7 @@ use yii\web\View;
 /* @var $withDeleteButton bool */
 ?>
 
-<div class="panel <?= $model->isChangeStatus() ? 'panel-success' : 'panel-primary' ?> panel-note">
+<div class="panel <?= $model->isChangeStatus() ? 'panel-success' : 'panel-primary' ?> panel-note <?= $model->isDeleted() ? 'panel-deleted panel-transparent' : '' ?>">
 	<div class="panel-heading">
 		<div class="panel-title pull-left">
 			<?= $model->isChangeStatus()
@@ -43,6 +43,12 @@ use yii\web\View;
 	<div class="panel-footer">
 		<span class="date pull-left">
 			<?= $model->formattedDates ?>
+			<?= $model->isDeleted()
+				? '<strong>' . Yii::t('lead', 'Deleted At: {date}', [
+					'date' => Yii::$app->formatter->asDatetime($model->deleted_at),
+				]) . '</strong>'
+				: ''
+			?>
 		</span>
 		<?php if ($model->owner_id === Yii::$app->user->id || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)): ?>
 			<span class="action pull-right">
