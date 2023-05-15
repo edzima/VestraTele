@@ -10,6 +10,7 @@ use common\modules\lead\models\LeadStatus;
 use Yii;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\searches\LeadReportSearch;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -131,6 +132,9 @@ class ReportController extends BaseController {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
+		if ($this->module->onlyUser) {
+			throw new ForbiddenHttpException(Yii::t('lead', 'Report editing is not allowed.'));
+		}
 		$model = new ReportForm();
 		$model->setModel($this->findModel($id));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {

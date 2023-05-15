@@ -10,6 +10,7 @@ class LeadReportWidget extends Widget {
 
 	public LeadReport $model;
 	public bool $withDeleteButton = true;
+	public ?bool $withUpdateButton = null;
 
 	public ?bool $renderDeleted = null;
 
@@ -17,6 +18,9 @@ class LeadReportWidget extends Widget {
 		parent::init();
 		if ($this->renderDeleted === null) {
 			$this->renderDeleted = !Module::manager()->onlyForUser;
+		}
+		if ($this->withUpdateButton === null) {
+			$this->withUpdateButton = !Module::manager()->onlyForUser;
 		}
 	}
 
@@ -27,6 +31,7 @@ class LeadReportWidget extends Widget {
 		return $this->render('report', [
 			'model' => $this->model,
 			'withDeleteButton' => $this->withDeleteButton,
+			'withUpdateButton' => $this->withUpdateButton,
 		]);
 	}
 
