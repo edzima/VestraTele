@@ -3,6 +3,7 @@
 namespace common\modules\lead\widgets;
 
 use common\modules\lead\models\LeadAnswer;
+use common\modules\lead\Module;
 use Yii;
 use yii\base\Widget;
 use yii\widgets\DetailView;
@@ -13,6 +14,18 @@ class LeadAnswersWidget extends Widget {
 	 * @var LeadAnswer[]
 	 */
 	public array $answers = [];
+
+	public ?bool $deletedReportFilter = null;
+
+	public function init(): void {
+		if ($this->deletedReportFilter === null) {
+			$this->deletedReportFilter = Module::manager()->onlyForUser;
+		}
+		if ($this->deletedReportFilter) {
+			$this->answers = $this->getAnswersWithoutDeletedReports($this->answers);
+		}
+		parent::init();
+	}
 
 	public function run(): string {
 
@@ -45,6 +58,12 @@ class LeadAnswersWidget extends Widget {
 			];
 		}
 		return $attributes;
+	}
+
+	private function getAnswersWithoutDeletedReports(array $answers): array {
+		return array_filter($answers, function (LeadAnswer $answer): bool {
+			return !$answer->report->isDeleted();
+		});
 	}
 
 }

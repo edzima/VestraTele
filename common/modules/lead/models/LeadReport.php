@@ -153,4 +153,8 @@ class LeadReport extends ActiveRecord {
 		$this->deleted_at = date(DATE_ATOM);
 	}
 
+	public function isDeleted(): bool {
+		return !empty($this->deleted_at);
+	}
+
 }

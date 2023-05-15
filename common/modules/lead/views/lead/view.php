@@ -189,7 +189,7 @@ YiiAsset::register($this);
 		<div class="col-md-8">
 
 
-			<?= LeadAnswersWidget::widget(['answers' => $model->answers,]) ?>
+			<?= LeadAnswersWidget::widget(['answers' => $model->answers]) ?>
 
 
 			<?= $model->getCustomerAddress()
