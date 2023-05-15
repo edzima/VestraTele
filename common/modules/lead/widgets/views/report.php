@@ -8,7 +8,7 @@ use yii\web\View;
 
 /* @var $this View */
 /* @var $model LeadReport */
-/* @var $withDelete bool */
+/* @var $withDeleteButton bool */
 ?>
 
 <div class="panel <?= $model->isChangeStatus() ? 'panel-success' : 'panel-primary' ?> panel-note">
@@ -47,7 +47,7 @@ use yii\web\View;
 		<?php if ($model->owner_id === Yii::$app->user->id || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)): ?>
 			<span class="action pull-right">
 				<?= Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['/lead/report/update', 'id' => $model->id]) ?>
-				<?= $withDelete || Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('<i class="glyphicon glyphicon-trash"></i>', ['/lead/report/delete', 'id' => $model->id], [
+				<?= $withDeleteButton || Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('<i class="glyphicon glyphicon-trash"></i>', ['/lead/report/delete', 'id' => $model->id], [
 					'data' => [
 						'confirm' => Yii::t('lead', 'Are you sure you want to delete this report?'),
 						'method' => 'POST',

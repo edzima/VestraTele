@@ -267,7 +267,7 @@ YiiAsset::register($this);
 
 			<?= LeadReportWidget::widget([
 				'model' => $report,
-				'withDelete' => false,
+				'withDeleteButton' => false,
 			]) ?>
 
 

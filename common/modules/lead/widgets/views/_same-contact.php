@@ -108,7 +108,7 @@ use yii\widgets\DetailView;
 
 			<?= LeadReportWidget::widget([
 				'model' => $report,
-				'withDelete' => false,
+				'withDeleteButton' => false,
 			]) ?>
 
 
