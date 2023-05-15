@@ -49,6 +49,10 @@ use yii\widgets\DetailView;
 				'visible' => !empty($model->getProvider()),
 			],
 			[
+				'attribute' => 'owner',
+				'format' => 'userEmail',
+			],
+			[
 				'attribute' => 'date_at',
 				'format' => 'date',
 			],
