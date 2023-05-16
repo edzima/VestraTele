@@ -14,6 +14,7 @@ use yii\widgets\DetailView;
 /* @var $viewLink bool */
 /* @var $withDialers bool */
 /* @var $updateLink bool */
+/* @var $visibleCustomerLink bool */
 ?>
 
 <div class="same-contact-lead">
@@ -63,6 +64,13 @@ use yii\widgets\DetailView;
 			'source',
 			'date_at:datetime',
 			[
+				'attribute' => 'customerUrl',
+				'format' => 'html',
+				'label' => Yii::t('lead', 'Customer View'),
+				'visible' => $visibleCustomerLink && isset($model->getData()['customerUrl']),
+				'value' => Html::a($model->getName(), $model->getData()['customerUrl']),
+			],
+			[
 				'attribute' => 'phone',
 				'format' => 'tel',
 				'visible' => !empty($model->getPhone()),
@@ -92,6 +100,7 @@ use yii\widgets\DetailView;
 					: null,
 				'visible' => $model->owner !== null,
 			],
+
 		],
 	]) ?>
 

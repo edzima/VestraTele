@@ -392,7 +392,7 @@ return [
 	'Search - Phone' => 'Szukaj - Telefon',
 	'Search - Name' => 'Szukaj - Nazwisko',
 	'Updated Contact Attributes!' => 'Edytowano Dane Kontaktowe!',
-	'{attribute} is changed from: {oldValue} to {newValue}.' => '{attribute} został edytowany z "{oldValue}" na "{newValue}".',
+	'{attribute} is changed from: {oldValue} to {newValue}.' => '{attribute} z "{oldValue}" na "{newValue}".',
 	'Deleted At' => 'Usunięto',
 	'Deleted At: {date}' => 'Usunięto: {date}',
 	'With Deleted' => 'Usunięte',

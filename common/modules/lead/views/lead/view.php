@@ -157,7 +157,7 @@ YiiAsset::register($this);
 						'attribute' => 'customerUrl',
 						'format' => 'html',
 						'label' => Yii::t('lead', 'Customer View'),
-						'visible' => isset($model->getData()['customerUrl']),
+						'visible' => !$onlyUser && isset($model->getData()['customerUrl']),
 						'value' => Html::a($model->getName(), $model->getData()['customerUrl']),
 					],
 					[
@@ -247,6 +247,7 @@ YiiAsset::register($this);
 			<?= SameContactsListWidget::widget([
 				'model' => $model,
 				'viewLink' => !$onlyUser,
+				'visibleCustomerLink' => !$onlyUser,
 				'updateLink' => !$onlyUser && Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE),
 				'headerOptions' => ['class' => 'col-md-12',],
 				'archiveBtn' => Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE) && !$userIsFromMarket,
