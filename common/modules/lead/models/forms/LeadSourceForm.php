@@ -23,6 +23,8 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 	public ?string $dialer_phone = null;
 	public ?string $sort_index = null;
 	public ?string $owner_id = null;
+	public ?string $sms_push_template = null;
+	public bool $is_active = true;
 
 	private ?LeadSource $model = null;
 
@@ -36,11 +38,13 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 
 	public function rules(): array {
 		return [
-			[['name', 'type_id'], 'required'],
+			[['name', 'type_id', 'is_active'], 'required'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
+			[['is_active'], 'boolean'],
 			[['type_id', 'owner_id'], 'integer'],
 			[['name', 'url'], 'string', 'max' => 255],
 			[['phone', 'dialer_phone'], 'string', 'max' => 30],
+			[['sms_push_template'], 'string'],
 			['phone', PhoneInputValidator::class],
 			['url', 'url'],
 			[
@@ -62,6 +66,8 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 			'phone' => Yii::t('lead', 'Phone'),
 			'dialer_phone' => Yii::t('lead', 'Dialer Phone'),
 			'sort_index' => Yii::t('lead', 'Sort Index'),
+			'is_active' => Yii::t('lead', 'Is Active'),
+			'sms_push_template' => Yii::t('lead', 'SMS Push Template'),
 		];
 	}
 
@@ -77,6 +83,8 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 		$this->phone = $source->getPhone();
 		$this->dialer_phone = $source->getDialerPhone();
 		$this->url = $source->getURL();
+		$this->is_active = $source->getIsActive();
+		$this->sms_push_template = $source->getSmsPushTemplate();
 	}
 
 	public function getModel(): LeadSource {
@@ -98,6 +106,8 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 		$model->sort_index = $this->sort_index;
 		$model->phone = $this->phone;
 		$model->dialer_phone = $this->dialer_phone;
+		$model->is_active = $this->is_active;
+		$model->sms_push_template = $this->sms_push_template;
 		return $model->save(false);
 	}
 
@@ -127,5 +137,13 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 
 	public function getDialerPhone(): ?string {
 		return $this->dialer_phone;
+	}
+
+	public function getSmsPushTemplate(): ?string {
+		return $this->sms_push_template;
+	}
+
+	public function getIsActive(): bool {
+		return $this->is_active;
 	}
 }

@@ -1,5 +1,6 @@
 <?php
 
+use common\models\user\User;
 use common\modules\lead\models\forms\LeadForm;
 use common\widgets\DateTimeWidget;
 use common\widgets\PhoneInput;
@@ -20,10 +21,12 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-3 col-lg-2']])
-			->widget(Select2::class, [
-				'data' => LeadForm::getStatusNames(),
-			])
+		<?= Yii::$app->user->can(User::PERMISSION_LEAD_STATUS)
+			? $form->field($model, 'status_id', ['options' => ['class' => 'col-md-3 col-lg-2']])
+				->widget(Select2::class, [
+					'data' => LeadForm::getStatusNames(),
+				])
+			: ''
 		?>
 
 
@@ -58,18 +61,19 @@ use yii\widgets\ActiveForm;
 			: ''
 		?>
 
-		<?= $form->field($model, 'campaign_id', [
-			'options' => [
-				'class' => 'col-md-3 col-lg-2',
-			],
-		])
-			->widget(Select2::class, [
-					'data' => $model->getCampaignsNames(),
-					'options' => [
-						'placeholder' => $model->getAttributeLabel('campaign_id'),
-					],
-				]
-			)
+		<?php
+		//		$form->field($model, 'campaign_id', [
+		//			'options' => [
+		//				'class' => 'col-md-3 col-lg-2',
+		//			],
+		//		])
+		//			->widget(Select2::class, [
+		//					'data' => $model->getCampaignsNames(),
+		//					'options' => [
+		//						'placeholder' => $model->getAttributeLabel('campaign_id'),
+		//					],
+		//				]
+		//			)
 		?>
 
 
@@ -93,8 +97,9 @@ use yii\widgets\ActiveForm;
 
 	</div>
 
+
 	<div class="row">
-		<?= $model->scenario !== LeadForm::SCENARIO_OWNER
+		<?= false && $model->scenario !== LeadForm::SCENARIO_OWNER
 			? $form->field($model, 'owner_id', [
 				'options' => [
 					'class' => 'col-md-3 col-lg-2',
@@ -108,20 +113,14 @@ use yii\widgets\ActiveForm;
 			])
 			: ''
 		?>
-
-		<?= $form->field($model, 'agent_id', [
-			'options' => [
-				'class' => 'col-md-3 col-lg-2',
-			],
-		])->widget(Select2::class, [
-			'data' => LeadForm::getUsersNames(),
-			'pluginOptions' => [
-				'placeholder' => $model->getAttributeLabel('agent_id'),
-				'allowClear' => true,
-			],
-		]) ?>
 	</div>
 
+
+	<div class="row">
+
+		<?= $form->field($model, 'details', ['options' => ['class' => 'col-md-5']])->textarea(['maxlength' => true]) ?>
+
+	</div>
 
 	<?php //form->field($model, 'data')->textarea(['rows' => 6]) ?>
 

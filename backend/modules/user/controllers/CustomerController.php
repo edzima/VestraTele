@@ -5,8 +5,10 @@ namespace backend\modules\user\controllers;
 use backend\modules\user\models\CustomerUserForm;
 use backend\modules\user\models\event\UserFormEvent;
 use backend\modules\user\models\search\CustomerUserSearch;
+use backend\modules\user\models\UserForm;
 use common\models\PotentialClient;
 use common\models\user\Customer;
+use common\modules\lead\models\forms\CustomerLeadForm;
 use Yii;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
@@ -19,23 +21,10 @@ class CustomerController extends UserController {
 
 	public function actionCreate() {
 		Event::on(CustomerUserForm::class, CustomerUserForm::EVENT_AFTER_SAVE, function (UserFormEvent $event): void {
-			$this->createPotentialClientAgreement($event);
+			$this->createPotentialClientAgreement($event->sender);
+			$this->createCustomerLead($event->sender->getModel());
 		});
 		return parent::actionCreate();
-	}
-
-	protected function createPotentialClientAgreement(UserFormEvent $event): void {
-		$form = $event->sender;
-		if (!empty($form->getProfile()->birthday)) {
-			$model = new PotentialClient();
-			$model->birthday = $form->getProfile()->birthday;
-			$model->firstname = $form->getProfile()->firstname;
-			$model->lastname = $form->getProfile()->lastname;
-			$model->status = PotentialClient::STATUS_AGREEMENT;
-			$model->city_id = $form->getHomeAddress()->city_id;
-			$model->owner_id = Yii::$app->user->getId();
-			$model->save();
-		}
 	}
 
 	public function actionView(int $id): string {
@@ -55,4 +44,45 @@ class CustomerController extends UserController {
 			'issuesDataProvider' => $dataProvider,
 		]);
 	}
+
+	public function actionLead(int $id) {
+		$model = Customer::findOne($id);
+		$this->createCustomerLead($model);
+		$query = $model->getIssueUsers();
+		$query->with([
+			'issue',
+			'issue.type',
+			'issue.stage',
+		]);
+		$dataProvider = new ActiveDataProvider([
+			'query' => $query,
+		]);
+
+		return $this->render('view', [
+			'model' => $model,
+			'issuesDataProvider' => $dataProvider,
+
+		]);
+	}
+
+	protected function createPotentialClientAgreement(UserForm $form): void {
+		if (!empty($form->getProfile()->birthday)) {
+			$model = new PotentialClient();
+			$model->birthday = $form->getProfile()->birthday;
+			$model->firstname = $form->getProfile()->firstname;
+			$model->lastname = $form->getProfile()->lastname;
+			$model->status = PotentialClient::STATUS_AGREEMENT;
+			$model->city_id = $form->getHomeAddress()->city_id;
+			$model->owner_id = Yii::$app->user->getId();
+			$model->save();
+		}
+	}
+
+	private function createCustomerLead(Customer $model) {
+		$data = CustomerLeadForm::customerAttributes($model);
+		if (!empty($data)) {
+			Yii::$app->leadClient->addFromCustomer($data);
+		}
+	}
+
 }

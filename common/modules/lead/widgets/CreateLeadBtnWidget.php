@@ -48,6 +48,11 @@ class CreateLeadBtnWidget extends ButtonDropdown {
 	}
 
 	protected function getNames(): array {
-		return LeadSource::getNames($this->owner_id);
+		return LeadSource::getNames(
+			$this->owner_id,
+			true,
+			null,
+			true
+		);
 	}
 }

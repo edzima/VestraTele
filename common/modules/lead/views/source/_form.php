@@ -35,9 +35,17 @@ use yii\widgets\ActiveForm;
 			],
 
 		])
-		: '' ?>
+		: ''
+	?>
 
 	<?= $form->field($model, 'sort_index')->textInput() ?>
+
+	<?= $form->field($model, 'is_active')->checkbox() ?>
+
+	<?= $model->scenario !== LeadSourceForm::SCENARIO_OWNER
+		? $form->field($model, 'sms_push_template')->textarea()
+		: ''
+	?>
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>

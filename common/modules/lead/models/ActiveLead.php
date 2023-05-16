@@ -15,6 +15,8 @@ interface ActiveLead extends LeadInterface {
 
 	public function getId(): int;
 
+	public function getDetails(): ?string;
+
 	public function updateFromLead(LeadInterface $lead): void;
 
 	public function updateStatus(int $status_id): bool;

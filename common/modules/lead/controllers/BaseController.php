@@ -8,6 +8,7 @@ use Yii;
 use yii\base\ActionEvent;
 use yii\db\ActiveRecord;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -50,9 +51,12 @@ class BaseController extends Controller {
 	 * @throws NotFoundHttpException
 	 */
 	protected function findLead(int $id, bool $forUser = true): ActiveLead {
-		$model = $this->module->manager->findById($id, $forUser);
+		$model = $this->module->manager->findById($id, false);
 		if ($model === null) {
 			throw new NotFoundHttpException();
+		}
+		if ($forUser && !$this->module->manager->isForUser($model, Yii::$app->user->getId())) {
+			throw new ForbiddenHttpException(Yii::t('lead', 'You have not access to Lead.'));
 		}
 		return $model;
 	}

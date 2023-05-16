@@ -8,10 +8,11 @@ use yii\web\View;
 
 /* @var $this View */
 /* @var $model LeadReport */
-/* @var $withDelete bool */
+/* @var $withDeleteButton bool */
+/* @var $withUpdateButton bool */
 ?>
 
-<div class="panel <?= $model->isChangeStatus() ? 'panel-success' : 'panel-primary' ?> panel-note">
+<div class="panel <?= $model->isChangeStatus() ? 'panel-success' : 'panel-primary' ?> panel-note <?= $model->isDeleted() ? 'panel-deleted panel-transparent' : '' ?>">
 	<div class="panel-heading">
 		<div class="panel-title pull-left">
 			<?= $model->isChangeStatus()
@@ -43,17 +44,29 @@ use yii\web\View;
 	<div class="panel-footer">
 		<span class="date pull-left">
 			<?= $model->formattedDates ?>
+			<?= $model->isDeleted()
+				? '<strong>' . Yii::t('lead', 'Deleted At: {date}', [
+					'date' => Yii::$app->formatter->asDatetime($model->deleted_at),
+				]) . '</strong>'
+				: ''
+			?>
 		</span>
 		<?php if ($model->owner_id === Yii::$app->user->id || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)): ?>
 			<span class="action pull-right">
-				<?= Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['/lead/report/update', 'id' => $model->id]) ?>
-				<?= $withDelete || Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ? Html::a('<i class="glyphicon glyphicon-trash"></i>', ['/lead/report/delete', 'id' => $model->id], [
-					'data' => [
-						'confirm' => Yii::t('lead', 'Are you sure you want to delete this report?'),
-						'method' => 'POST',
-						'params' => ['id' => $model->id],
-					],
-				]) : '' ?>
+				<?= $withUpdateButton || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
+					? Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['/lead/report/update', 'id' => $model->id])
+					: ''
+				?>
+				<?= $withDeleteButton || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
+					? Html::a('<i class="glyphicon glyphicon-trash"></i>', ['/lead/report/delete', 'id' => $model->id], [
+						'data' => [
+							'confirm' => Yii::t('lead', 'Are you sure you want to delete this report?'),
+							'method' => 'POST',
+							'params' => ['id' => $model->id],
+						],
+					])
+					: ''
+				?>
 					</span>
 		<?php endif; ?>
 		<div class="clearfix"></div>

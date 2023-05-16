@@ -8,6 +8,7 @@ use common\components\PayComponent;
 use common\components\provision\Provisions;
 use common\components\TaxComponent;
 use common\components\User;
+use common\modules\lead\components\LeadClient;
 use Edzima\Yii2Adescom\models\SenderInterface;
 use yii\BaseYii;
 use yii\queue\Queue;
@@ -31,6 +32,7 @@ class Yii extends BaseYii {
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  * @mixin yii\web\Application|yii\web\Application
  * @property Formatter $formatter
+ * @property LeadClient $leadClient
  * @property-read MessageTemplateManager $messageTemplate
  * @property HierarchyComponent $userHierarchy
  * @property PayComponent $pay

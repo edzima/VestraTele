@@ -162,6 +162,10 @@ class SiteController extends Controller {
 				'label' => Yii::t('backend', 'Archives Deep - Days'),
 				'type' => FormModel::TYPE_TEXTINPUT,
 			];
+			$keys[KeyStorageItem::KEY_LEAD_CUSTOMER_SOURCE] = [
+				'label' => Yii::t('backend', 'Lead Source for Created Customers'),
+				'type' => FormModel::TYPE_TEXTINPUT,
+			];
 		}
 
 		if (Yii::$app->user->can(User::PERMISSION_PROVISION)) {

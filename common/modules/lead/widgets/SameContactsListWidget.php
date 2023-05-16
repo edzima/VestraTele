@@ -14,6 +14,7 @@ class SameContactsListWidget extends ListView {
 	public bool $withType = false;
 	public bool $withDialers = false;
 	public bool $viewLink = false;
+	public bool $visibleCustomerLink = false;
 	public bool $updateLink = false;
 
 	public $itemView = '@common/modules/lead/widgets/views/_same-contact';
@@ -36,6 +37,7 @@ class SameContactsListWidget extends ListView {
 			'viewLink' => $this->viewLink,
 			'updateLink' => $this->updateLink,
 			'withDialers' => $this->withDialers,
+			'visibleCustomerLink' => $this->visibleCustomerLink,
 		];
 		parent::init();
 	}

@@ -26,7 +26,7 @@ class LeadMarketReservedDeadlineEmail extends Model {
 				['html' => 'leadMarketReservedDeadline-html', 'text' => 'leadMarketReservedDeadline-text'],
 				['model' => $model]
 			)
-			->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
+			->setFrom([Yii::$app->params['senderEmail'] => Yii::t('lead', 'Market Leads')])
 			->setTo($model->user->getEmail())
 			->setSubject($this->getSubject())
 			->send();

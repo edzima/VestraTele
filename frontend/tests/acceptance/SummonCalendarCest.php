@@ -20,8 +20,8 @@ class SummonCalendarCest {
 	public const EightAMSelector = 'tr[data-time="08:00:00"]';
 	public const SwalErrorSelector = '.swal2-icon-error';
 
-	public const NewFilterSelector = '.filter-item[data-id="'.Summon::STATUS_NEW.'"]';
-	public const AppealFilterSelector = '.filter-item[data-id="'.Summon::TYPE_APPEAL.'"]';
+	public const NewFilterSelector = '.filter-item[data-id="' . Summon::STATUS_NEW . '"]';
+	public const AppealFilterSelector = '.filter-item[data-id="1"]';
 	public const EventFilterSelector = '.filter-item[data-id="event"]';
 	public const DeadlineFilterSelector = '.filter-item[data-id="deadline"]';
 
@@ -37,7 +37,6 @@ class SummonCalendarCest {
 	public function _fixtures(): array {
 		return array_merge(
 			IssueFixtureHelper::fixtures(),
-			IssueFixtureHelper::campagin(),
 			IssueFixtureHelper::summon(),
 		);
 	}
