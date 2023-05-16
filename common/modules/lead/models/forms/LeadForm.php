@@ -262,22 +262,21 @@ class LeadForm extends Model implements LeadInterface {
 				throw new InvalidConfigException('Owner must be integer.');
 			}
 			$names = LeadSource::getNames($this->owner_id, true, $this->typeId, true);
-			if (!empty($this->source_id) && !isset($names[$this->source_id])) {
-				$name = LeadSource::getNames($this->owner_id, true, $this->typeId, false)[$this->source_id] ?? null;
-				if ($name !== null) {
-					$names[$this->source_id] = $name;
-				}
-				return $names;
-			}
+			$this->ensureCurrentSourceName($names);
+			return $names;
 		}
 		$names = LeadSource::getNames(null, true, $this->typeId, true);
+		$this->ensureCurrentSourceName($names);
+		return $names;
+	}
+
+	private function ensureCurrentSourceName(array &$names): void {
 		if (!empty($this->source_id) && !isset($names[$this->source_id])) {
-			$name = LeadSource::getNames(null, true, $this->typeId, false)[$this->source_id] ?? null;
+			$name = LeadSource::getNames()[$this->source_id] ?? null;
 			if ($name !== null) {
 				$names[$this->source_id] = $name;
 			}
 		}
-		return $names;
 	}
 
 	public static function getStatusNames(): array {
