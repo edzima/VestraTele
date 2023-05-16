@@ -306,7 +306,6 @@ class LeadForm extends Model implements LeadInterface {
 
 	public function updateLead(Lead $lead, int $updater_id, bool $validate = true): bool {
 		if ($validate && !$this->validate()) {
-			codecept_debug($this->getErrors());
 			return false;
 		}
 		$lead->setLead($this);
