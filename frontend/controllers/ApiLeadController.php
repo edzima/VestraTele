@@ -185,9 +185,7 @@ class ApiLeadController extends Controller {
 
 	private function sendSms(ActiveLead $lead): void {
 		if ($this->smsShouldSend($lead)) {
-			$message = Yii::t('lead', "Thank you for submitting your application.\n"
-				. "We will contact you within 24 hours.\n"
-				. "If you do not want to wait, call us directly on the number: {sourcePhone}", [
+			$message = Yii::t('lead', $lead->getSource()->getSmsPushTemplate(), [
 				'sourcePhone' => $lead->getSource()->getPhone(),
 			]);
 			$model = new LeadSmsForm($lead);
@@ -217,6 +215,7 @@ class ApiLeadController extends Controller {
 
 	private function smsShouldSend(ActiveLead $lead): bool {
 		return !empty($lead->getPhone())
+			&& !empty($lead->getSource()->getSmsPushTemplate())
 			&& !empty($lead->getSource()->getPhone())
 			&& $lead->getProvider() !== Lead::PROVIDER_CRM_CUSTOMER
 			&& $this->getSmsOwnerId() !== null;

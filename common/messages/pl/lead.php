@@ -398,4 +398,5 @@ return [
 	'With Deleted' => 'Usunięte',
 	'You have not access to Lead.' => 'Brak przypisania do Leada',
 	'Report editing is not allowed.' => 'Edycja Raportu jest niedozwolona.',
+	'SMS Push Template' => 'SMS Powitalny API',
 ];
