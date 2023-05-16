@@ -145,6 +145,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			'owner' => Yii::t('lead', 'Owner'),
 			'details' => Yii::t('lead', 'Details'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
+			'customerAddress' => Yii::t('lead', 'Customer Address'),
 		];
 	}
 

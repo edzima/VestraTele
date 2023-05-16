@@ -8,7 +8,6 @@ use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
-use common\modules\lead\widgets\LeadDialersGridView;
 use common\modules\lead\widgets\LeadReportWidget;
 use common\modules\lead\widgets\LeadSmsBtnWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
@@ -178,12 +177,18 @@ YiiAsset::register($this);
 						'attribute' => 'providerName',
 						'visible' => !empty($model->provider),
 					],
+					[
+						'attribute' => 'customerAddress',
+						'format' => 'address',
+					],
 				],
 			]) ?>
 
-			<?= LeadDialersGridView::widget([
-				'lead' => $model,
-			]) ?>
+			<?php
+			//			LeadDialersGridView::widget([
+			//				'lead' => $model,
+			//			])
+			// ?>
 
 		</div>
 		<div class="col-md-8">
@@ -199,9 +204,7 @@ YiiAsset::register($this);
 
 			<?= $usersDataProvider !== null
 				? GridView::widget([
-					'options' => [
-						'class' => 'col-md-4',
-					],
+					'options' => ['class' => 'col-md-4',],
 					'caption' => Yii::t('lead', 'Users'),
 					'dataProvider' => $usersDataProvider,
 					'showOnEmpty' => false,
