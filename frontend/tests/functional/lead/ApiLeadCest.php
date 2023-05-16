@@ -32,6 +32,7 @@ class ApiLeadCest {
 			'source_id' => 1,
 			'name' => 'Jonny',
 			'email' => 'email@example.com',
+			'date_at' => '2020-01-01 12:00:00',
 		]);
 		$I->seeRecord(Module::manager()->model, [
 			'source_id' => 1,
@@ -59,7 +60,7 @@ class ApiLeadCest {
 		$I->dontSeeSmsIsSend();
 	}
 
-	public function checkLandingForSourceWithPhone(FunctionalTester $I): void {
+	public function checkLandingForSourceWithPhoneAndSmsTemplate(FunctionalTester $I): void {
 		$I->sendAjaxPostRequest(static::ROUTE_LANDING, [
 			'source_id' => 1,
 			'name' => 'Jonny',
@@ -71,6 +72,20 @@ class ApiLeadCest {
 			'phone' => '+48123123123',
 		]);
 		$I->seeSmsIsSend();
+	}
+
+	public function checkLandingForSourceWithPhoneAndWithoutSmsTemplate(FunctionalTester $I): void {
+		$I->sendAjaxPostRequest(static::ROUTE_LANDING, [
+			'source_id' => 3,
+			'name' => 'Dep',
+			'phone' => '123123123',
+		]);
+		$I->seeRecord(Module::manager()->model, [
+			'source_id' => 3,
+			'name' => 'Dep',
+			'phone' => '+48123123123',
+		]);
+		$I->dontSeeSmsIsSend();
 	}
 
 	public function checkLandingForSourceWithOwner(FunctionalTester $I): void {
