@@ -1,5 +1,6 @@
 <?php
 
+use common\helpers\Html;
 use common\helpers\Url;
 use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
@@ -17,7 +18,6 @@ use common\widgets\address\AddressDetailView;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
 use yii\data\DataProviderInterface;
-use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
@@ -46,7 +46,13 @@ YiiAsset::register($this);
 
 		<?= ShortReportStatusesWidget::widget(['lead_id' => $model->getId()]) ?>
 
-		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->getId()], ['class' => 'btn btn-warning']) ?>
+		<?= Html::a(
+			Html::icon('calendar'),
+			['reminder/create', 'id' => $model->getId()], [
+			'title' => Yii::t('lead', 'Create Reminder'),
+			'aria-label' => Yii::t('lead', 'Create Reminder'),
+			'class' => 'btn btn-warning',
+		]) ?>
 
 		<?= !$userIsFromMarket
 			? Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary'])
@@ -176,10 +182,6 @@ YiiAsset::register($this);
 					[
 						'attribute' => 'providerName',
 						'visible' => !empty($model->provider),
-					],
-					[
-						'attribute' => 'customerAddress',
-						'format' => 'address',
 					],
 				],
 			]) ?>
