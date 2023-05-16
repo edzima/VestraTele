@@ -401,4 +401,5 @@ return [
 	'SMS Push Template' => 'SMS Powitalny API',
 	'-> Market' => 'Na Giełdę',
 	'Customer Address' => 'Adres',
+	'Market Leads' => 'Vestra Leads - Giełda',
 ];
