@@ -178,6 +178,7 @@ class ReportForm extends Model {
 
 	public function save(bool $validate = true): bool {
 		if ($validate && !$this->validate()) {
+			Yii::warning($this->getErrors(), __METHOD__ . '.validate');
 			return false;
 		}
 
@@ -189,6 +190,7 @@ class ReportForm extends Model {
 		$model->lead_id = $this->lead->getId();
 		$isNewRecord = $model->isNewRecord;
 		if (!$model->save()) {
+			Yii::warning($model->getErrors(), __METHOD__ . '.save');
 			return false;
 		}
 		$this->linkUser();
