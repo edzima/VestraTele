@@ -57,6 +57,7 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Sources');
 				'attribute' => 'dialer_phone',
 				'visible' => $searchModel->scenario !== $searchModel::SCENARIO_OWNER,
 			],
+			'sms_push_template',
 			[
 				'attribute' => 'owner_id',
 				'value' => 'owner',
@@ -65,6 +66,7 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Sources');
 				'visible' => $searchModel->scenario !== $searchModel::SCENARIO_OWNER,
 			],
 			'sort_index',
+			'is_active:boolean',
 			[
 				'class' => ActionColumn::class,
 				'visibleButtons' => $visibleButtons,

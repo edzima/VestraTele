@@ -245,4 +245,8 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 		$this->tester->dontSeeRecord(LeadReport::class, $atributtes);
 	}
 
+	public function grabReport(array $attributes): LeadReport {
+		return $this->tester->grabRecord(LeadReport::class, $attributes);
+	}
+
 }

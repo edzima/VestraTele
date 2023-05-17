@@ -18,8 +18,10 @@ use yii\helpers\ArrayHelper;
  * @property string|null $phone
  * @property string|null $dialer_phone
  * @property string|null $url
+ * @property string|null $sms_push_template
  * @property int|null $sort_index
  * @property int|null $owner_id
+ * @property int|null $is_active
  *
  * @property-read Lead[] $leads
  * @property-read LeadType $leadType
@@ -57,8 +59,10 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 			[['name', 'type_id'], 'required'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['sort_index'], 'integer'],
+			[['is_active'], 'boolean'],
 			[['name', 'url'], 'string', 'max' => 255],
 			[['phone', 'dialer_phone'], 'string', 'max' => 30],
+			['sms_push_template', 'string'],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadType::class, 'targetAttribute' => ['type_id' => 'id']],
 			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['owner_id' => 'id']],
 		];
@@ -76,6 +80,8 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 			'dialer_phone' => Yii::t('lead', 'Dialer Phone'),
 			'sort_index' => Yii::t('lead', 'Sort Index'),
 			'type_id' => Yii::t('lead', 'Type'),
+			'is_active' => Yii::t('lead', 'Is Active'),
+			'sms_push_template' => Yii::t('lead', 'SMS Push Template'),
 		];
 	}
 
@@ -96,8 +102,13 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 		return $this->hasOne(Module::userClass(), ['id' => 'owner_id']);
 	}
 
-	public static function getNames(int $owner_id = null, bool $withType = false, int $typeId = null): array {
-		$models = static::getModels();
+	public static function getNames(
+		int $owner_id = null,
+		bool $withType = false,
+		int $typeId = null,
+		bool $active = false
+	): array {
+		$models = static::getModels($active);
 		if ($owner_id) {
 			$models = array_filter($models, static function (LeadSource $model) use ($owner_id): bool {
 				return $model->owner_id === null || $model->owner_id === $owner_id;
@@ -119,13 +130,18 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 	 * @param bool $refresh
 	 * @return static[]
 	 */
-	public static function getModels(bool $refresh = false): array {
+	public static function getModels(bool $active = false, bool $refresh = false): array {
 		if (static::$models === null || $refresh) {
 			static::$models = static::find()
 				->indexBy('id')
 				->joinWith('owner.userProfile')
 				->orderBy('sort_index')
 				->all();
+		}
+		if ($active) {
+			return array_filter(static::$models, function (LeadSourceInterface $source): bool {
+				return $source->getIsActive();
+			});
 		}
 		return static::$models;
 	}
@@ -167,6 +183,14 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 
 	public function getPhone(): ?string {
 		return $this->phone;
+	}
+
+	public function getSmsPushTemplate(): ?string {
+		return $this->sms_push_template;
+	}
+
+	public function getIsActive(): bool {
+		return $this->is_active;
 	}
 
 	public function getDialerPhone(): ?string {

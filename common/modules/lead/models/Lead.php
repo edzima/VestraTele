@@ -10,8 +10,10 @@ use common\modules\lead\Module;
 use common\modules\reminder\models\Reminder;
 use DateTime;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
@@ -44,14 +46,16 @@ use yii\helpers\Json;
  */
 class Lead extends ActiveRecord implements ActiveLead {
 
+	public const DATA_KEY_DETAILS = 'details';
+
 	public const EVENT_AFTER_STATUS_UPDATE = 'afterStatusUpdate';
 
 	public const PROVIDER_COPY = 'copy';
 	public const PROVIDER_FORM_LANDING = 'form';
-	public const PROVIDER_CRM_CUSTOMER = 'crm';
 	public const PROVIDER_CZATER = 'czater';
 	public const PROVIDER_CENTRAL_PHONE = 'central-phone';
 	public const PROVIDER_FORM_ZAPIER = 'form.zapier';
+	public const PROVIDER_CRM_CUSTOMER = 'crm.customer';
 
 	private ?array $users_ids = null;
 
@@ -82,7 +86,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 				}
 			}
 
-			foreach ($this->users_ids as $type => $userId) {
+			foreach ((array) $this->users_ids as $type => $userId) {
 				if (!in_array($type, $currentTypes, true)) {
 					$this->linkUser($type, $userId);
 				}
@@ -92,6 +96,18 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public static function tableName(): string {
 		return '{{%lead}}';
+	}
+
+	public function behaviors(): array {
+		return [
+			[
+				'class' => TimestampBehavior::class,
+				'value' => new Expression('CURRENT_TIMESTAMP'),
+				'attributes' => [
+					static::EVENT_BEFORE_UPDATE => 'updated_at',
+				],
+			],
+		];
 	}
 
 	public function rules(): array {
@@ -127,6 +143,9 @@ class Lead extends ActiveRecord implements ActiveLead {
 			'phone' => Yii::t('lead', 'Phone'),
 			'postal_code' => Yii::t('lead', 'Postal Code'),
 			'owner' => Yii::t('lead', 'Owner'),
+			'details' => Yii::t('lead', 'Details'),
+			'updated_at' => Yii::t('lead', 'Updated At'),
+			'customerAddress' => Yii::t('lead', 'Customer Address'),
 		];
 	}
 
@@ -195,6 +214,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function getLeadUsers(): ActiveQuery {
 		return $this->hasMany(LeadUser::class, ['lead_id' => 'id']);
+	}
+
+	public function getDetails(): ?string {
+		return $this->getData()[static::DATA_KEY_DETAILS] ?? null;
 	}
 
 	public function getId(): int {

@@ -1,5 +1,6 @@
 <?php
 
+use common\helpers\Html;
 use common\helpers\Url;
 use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
@@ -8,7 +9,6 @@ use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
-use common\modules\lead\widgets\LeadDialersGridView;
 use common\modules\lead\widgets\LeadReportWidget;
 use common\modules\lead\widgets\LeadSmsBtnWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
@@ -18,7 +18,6 @@ use common\widgets\address\AddressDetailView;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
 use yii\data\DataProviderInterface;
-use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
@@ -47,7 +46,13 @@ YiiAsset::register($this);
 
 		<?= ShortReportStatusesWidget::widget(['lead_id' => $model->getId()]) ?>
 
-		<?= Html::a(Yii::t('lead', 'Create Reminder'), ['reminder/create', 'id' => $model->getId()], ['class' => 'btn btn-warning']) ?>
+		<?= Html::a(
+			Html::icon('calendar'),
+			['reminder/create', 'id' => $model->getId()], [
+			'title' => Yii::t('lead', 'Create Reminder'),
+			'aria-label' => Yii::t('lead', 'Create Reminder'),
+			'class' => 'btn btn-warning',
+		]) ?>
 
 		<?= !$userIsFromMarket
 			? Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary'])
@@ -138,10 +143,27 @@ YiiAsset::register($this);
 					],
 					'date_at:datetime',
 					[
+						'attribute' => 'updated_at',
+						'format' => 'datetime',
+						'visible' => !empty($model->updated_at),
+					],
+					[
+						'attribute' => 'details',
+						'visible' => !empty($model->getDetails()),
+						'format' => 'ntext',
+					],
+					[
 						'attribute' => 'data',
 						'visible' => !empty($model->getData())
-							&& Yii::$app->user->can(User::ROLE_MANAGER),
+							&& Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
 						'format' => 'ntext',
+					],
+					[
+						'attribute' => 'customerUrl',
+						'format' => 'html',
+						'label' => Yii::t('lead', 'Customer View'),
+						'visible' => !$onlyUser && isset($model->getData()['customerUrl']),
+						'value' => Html::a($model->getName(), $model->getData()['customerUrl']),
 					],
 					[
 						'attribute' => 'phone',
@@ -164,38 +186,36 @@ YiiAsset::register($this);
 				],
 			]) ?>
 
-			<?= LeadDialersGridView::widget([
-				'lead' => $model,
-			]) ?>
+			<?php
+			//			LeadDialersGridView::widget([
+			//				'lead' => $model,
+			//			])
+			// ?>
 
 		</div>
 		<div class="col-md-8">
 
 
-			<?= LeadAnswersWidget::widget([
-				'answers' => $model->answers,
-			]) ?>
+			<?= LeadAnswersWidget::widget(['answers' => $model->answers]) ?>
 
 
 			<?= $model->getCustomerAddress()
-				? AddressDetailView::widget([
-					'model' => $model->getCustomerAddress(),
-				])
+				? AddressDetailView::widget(['model' => $model->getCustomerAddress(),])
 				: ''
 			?>
 
 			<?= $usersDataProvider !== null
 				? GridView::widget([
+					'options' => ['class' => 'col-md-4',],
 					'caption' => Yii::t('lead', 'Users'),
 					'dataProvider' => $usersDataProvider,
 					'showOnEmpty' => false,
 					'emptyText' => false,
 					'summary' => false,
 					'columns' => [
-						'typeName',
 						[
 							'label' => Yii::t('lead', 'User'),
-							'value' => 'user.fullName',
+							'value' => 'userWithTypeName',
 						],
 						[
 							'label' => Yii::t('lead', 'Date At'),
@@ -232,19 +252,14 @@ YiiAsset::register($this);
 			<?= SameContactsListWidget::widget([
 				'model' => $model,
 				'viewLink' => !$onlyUser,
+				'visibleCustomerLink' => !$onlyUser,
 				'updateLink' => !$onlyUser && Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE),
-				'headerOptions' => [
-					'class' => 'col-md-12',
-				],
+				'headerOptions' => ['class' => 'col-md-12',],
 				'archiveBtn' => Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE) && !$userIsFromMarket,
 				'withType' => false,
 				'withDialers' => true,
-				'options' => [
-					'class' => 'row',
-				],
-				'itemOptions' => [
-					'class' => 'col-md-6',
-				],
+				'options' => ['class' => 'row',],
+				'itemOptions' => ['class' => 'col-md-6',],
 			]) ?>
 			<div class="clearfix"></div>
 
@@ -258,7 +273,7 @@ YiiAsset::register($this);
 
 			<?= LeadReportWidget::widget([
 				'model' => $report,
-				'withDelete' => false,
+				'withDeleteButton' => false,
 			]) ?>
 
 

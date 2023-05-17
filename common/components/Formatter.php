@@ -4,6 +4,7 @@ namespace common\components;
 
 use common\helpers\ArrayHelper;
 use common\helpers\Html;
+use common\models\Address;
 use Decimal\Decimal;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
@@ -23,6 +24,27 @@ class Formatter extends BaseFormatter {
 	];
 	public string $defaultPhoneRegion = 'PL';
 	public int $defaultPhoneFormat = PhoneNumberFormat::INTERNATIONAL;
+
+	public function asAddress(?Address $address): ?string {
+		if (!$address) {
+			return $this->nullDisplay;
+		}
+		$content = [];
+		$content[] = $this->asCityCode(
+			$address->city
+				? $address->city->getNameWithRegionAndDistrict()
+				: null,
+			$address->postal_code
+		);
+
+		if ($address->info) {
+			$content[] = Html::tag('strong', $address->getAttributeLabel('info')) . ': ' . $address->info;
+		}
+		if (empty($content)) {
+			return $this->nullDisplay;
+		}
+		return implode('<br>', $content);
+	}
 
 	public function asUserEmail(?UserModel $user): ?string {
 		if ($user) {

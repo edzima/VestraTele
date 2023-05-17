@@ -114,8 +114,9 @@ class ReportCest {
 		$I->assignPermission(User::PERMISSION_LEAD);
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->sendAjaxPostRequest(Url::to([static::ROUTE_DELETE, 'id' => 2]), $I->getCSRF());
-		$I->dontSeeRecord(LeadReport::class, [
+		$I->seeRecord(LeadReport::class, [
 			'id' => 2,
+			'deleted_at is not null',
 		]);
 	}
 

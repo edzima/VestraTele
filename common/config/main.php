@@ -11,6 +11,7 @@ use common\components\TaxComponent;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\czater\Czater;
+use common\modules\lead\components\LeadClient;
 use common\modules\lead\Module as LeadModule;
 use edzima\teryt\Module as TerytModule;
 use Edzima\Yii2Adescom\AdescomSender;
@@ -127,7 +128,10 @@ return [
 				],
 			],
 		],
-
+		'leadClient' => [
+			'class' => LeadClient::class,
+			'baseUrl' => $_ENV['LEADS_HOST'],
+		],
 		'keyStorage' => [
 			'class' => KeyStorage::class,
 		],

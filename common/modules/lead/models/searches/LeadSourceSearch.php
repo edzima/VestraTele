@@ -30,7 +30,9 @@ class LeadSourceSearch extends LeadSource {
 		return [
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['id', 'sort_index', 'owner_id', 'type_id'], 'integer'],
-			[['name', 'url', 'phone', 'dialer_phone'], 'safe'],
+			[['is_active'], 'boolean'],
+			[['is_active'], 'default', 'value' => null],
+			[['name', 'url', 'phone', 'dialer_phone', 'sms_push_template'], 'safe'],
 		];
 	}
 
@@ -72,11 +74,13 @@ class LeadSourceSearch extends LeadSource {
 			'id' => $this->id,
 			'sort_index' => $this->sort_index,
 			'owner_id' => $this->owner_id,
+			'is_active' => $this->is_active,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])
 			->andFilterWhere(['like', 'phone', $this->phone])
 			->andFilterWhere(['like', 'dialer_phone', $this->dialer_phone])
+			->andFilterWhere(['like', 'sms_push_template', $this->sms_push_template])
 			->andFilterWhere(['like', 'url', $this->url]);
 
 		return $dataProvider;

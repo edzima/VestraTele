@@ -37,11 +37,13 @@ YiiAsset::register($this);
 		'attributes' => [
 			'id',
 			'name',
+			'is_active:boolean',
 			'url:url',
 			'owner',
 			'phone:tel',
 			'dialer_phone',
 			'sort_index',
+			'sms_push_template:ntext',
 		],
 	]) ?>
 

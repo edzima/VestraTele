@@ -10,6 +10,7 @@ use common\modules\lead\models\LeadStatus;
 use Yii;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\searches\LeadReportSearch;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -52,6 +53,7 @@ class ReportController extends BaseController {
 			}
 			$searchModel->scenario = LeadReportSearch::SCENARIO_OWNER;
 			$searchModel->owner_id = $userId;
+			$searchModel->withoutDeleted = false;
 			$searchModel->lead_user_id = $userId;
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -130,6 +132,9 @@ class ReportController extends BaseController {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
+		if ($this->module->onlyUser) {
+			throw new ForbiddenHttpException(Yii::t('lead', 'Report editing is not allowed.'));
+		}
 		$model = new ReportForm();
 		$model->setModel($this->findModel($id));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -149,8 +154,10 @@ class ReportController extends BaseController {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionDelete($id) {
-		$this->findModel($id)->delete();
+	public function actionDelete(int $id) {
+		$model = $this->findModel($id);
+		$model->markAsDelete();
+		$model->update(false);
 
 		return $this->redirect(['index']);
 	}

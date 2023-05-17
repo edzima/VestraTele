@@ -18,4 +18,8 @@ interface LeadSourceInterface {
 
 	public function getDialerPhone(): ?string;
 
+	public function getSmsPushTemplate(): ?string;
+
+	public function getIsActive(): bool;
+
 }
