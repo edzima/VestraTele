@@ -1,11 +1,14 @@
 <?php
 
-/* @var $this \yii\web\View */
-/* @var $model \common\modules\lead\models\forms\LeadForm */
+/* @var $this View */
+/* @var $model LeadForm */
 
-/* @var $report \common\modules\lead\models\forms\ReportForm */
+/* @var $report ReportForm */
 
 use common\helpers\Html;
+use common\modules\lead\models\forms\LeadForm;
+use common\modules\lead\models\forms\ReportForm;
+use yii\web\View;
 
 $this->title = Yii::t('lead', 'Create Lead: {source}', ['source' => $model->getSourcesNames()[$model->source_id]]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['index']];
@@ -19,6 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= $this->render('_form_report', [
 		'model' => $model,
+		'isCreateForm' => true,
 		'report' => $report,
 	]) ?>
 

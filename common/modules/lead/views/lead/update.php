@@ -16,10 +16,11 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Update');
 ?>
 <div class="lead-update">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+	<h1><?= Html::encode($this->title) ?></h1>
 
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+	<?= $this->render('_form', [
+		'model' => $model,
+		'isCreateForm' => false,
+	]) ?>
 
 </div>

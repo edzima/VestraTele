@@ -10,6 +10,7 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model LeadForm */
+/* @var $isCreateForm bool */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -21,7 +22,7 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= Yii::$app->user->can(User::PERMISSION_LEAD_STATUS)
+		<?= Yii::$app->user->can(User::PERMISSION_LEAD_STATUS) || $isCreateForm
 			? $form->field($model, 'status_id', ['options' => ['class' => 'col-md-3 col-lg-2']])
 				->widget(Select2::class, [
 					'data' => LeadForm::getStatusNames(),
