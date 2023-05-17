@@ -41,7 +41,7 @@ class IssueNoteWidget extends Widget {
 		if ($type) {
 			return 'type-' . str_replace(['.'], ['_'], $type);
 		}
-		return 'type';
+		return 'without-type';
 	}
 
 	public function init() {

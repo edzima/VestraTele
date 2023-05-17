@@ -12,6 +12,10 @@ use common\modules\issue\widgets\IssueNoteWidget;
 /* @var $id string */
 /* @var $frontendCount int */
 
+$withoutType = count(array_filter($notes, static function (IssueNote $note): bool {
+	return $note->type === null;
+}));
+
 $userCount = count(array_filter($notes, static function (IssueNote $note): bool {
 	return $note->isUserFrontend();
 }));
@@ -32,6 +36,18 @@ $smsCount = count(array_filter($notes, static function (IssueNote $note): bool {
 		<?= $title ?>
 
 		<span class="btn-group pull-right">
+
+					<?= $withoutType
+						? Html::button("<i class='fa fa-comments' aria-hidden='true'></i> $withoutType", [
+							'class' => 'btn btn-sm',
+							'data-toggle' => 'collapse',
+							'data-target' => "#$id ." . IssueNoteWidget::getTypeKindClass(null),
+							'onClick' => 'this.classList.toggle("active");',
+							'title' => Yii::t('common', 'Issues'),
+							'aria-label' => Yii::t('common', 'Issues'),
+						])
+						: ''
+					?>
 
 					<?= $smsCount
 						? Html::button(Html::icon('envelope') . " $smsCount", [
