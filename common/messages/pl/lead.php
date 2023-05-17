@@ -402,4 +402,5 @@ return [
 	'-> Market' => 'Na Giełdę',
 	'Customer Address' => 'Adres',
 	'Market Leads' => 'Vestra Leads - Giełda',
+	'Older by days' => 'Starsze (dni)',
 ];

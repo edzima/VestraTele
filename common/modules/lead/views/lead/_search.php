@@ -23,7 +23,10 @@ use kartik\select2\Select2;
 
 	<div class="row">
 
-		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-2 col-lg-1']]) ?>
+
+		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput([
+			'type' => 'email',
+		]) ?>
 
 		<?= $form->field($model, 'provider', ['options' => ['class' => 'col-md-2 col-lg-1']])->widget(Select2::class, [
 			'data' => LeadSearch::getProvidersNames(),
@@ -119,8 +122,15 @@ use kartik\select2\Select2;
 		])->widget(DateWidget::class)
 		?>
 
+		<?= $form->field($model, 'olderByDays', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput([
+			'type' => 'number',
+			'min' => 1,
+			'step' => 1,
+		]) ?>
+
+
 		<?= Yii::$app->user->can(User::PERMISSION_LEAD_MARKET) ?
-			$form->field($model, 'fromMarket', ['options' => ['class' => 'col-md-2']])->dropDownList(Html::booleanDropdownList(), [
+			$form->field($model, 'fromMarket', ['options' => ['class' => 'col-md-1']])->dropDownList(Html::booleanDropdownList(), [
 				'prompt' => Yii::t('common', 'All'),
 			])
 			: ''

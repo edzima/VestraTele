@@ -56,6 +56,8 @@ class LeadSearch extends Lead implements SearchModel {
 	public $from_at;
 	public $to_at;
 
+	public $olderByDays;
+
 	public string $reportsDetails = '';
 
 	public $answers = [];
@@ -80,7 +82,7 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type_id', 'campaign_id'], 'integer'],
+			[['id', 'type_id', 'campaign_id', 'olderByDays'], 'integer', 'min' => 1],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
 			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress'], 'boolean'],
@@ -113,6 +115,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'from_at' => Yii::t('lead', 'From At'),
 				'to_at' => Yii::t('lead', 'To At'),
 				'fromMarket' => Yii::t('lead', 'From Market'),
+				'olderByDays' => Yii::t('lead', 'Older by days'),
 			]
 		);
 	}
@@ -422,6 +425,10 @@ class LeadSearch extends Lead implements SearchModel {
 	}
 
 	private function applyDateFilter(LeadQuery $query) {
+		if (!empty($this->olderByDays)) {
+			$this->to_at = date(DATE_ATOM, strtotime("- $this->olderByDays days"));
+		}
+
 		if (!empty($this->from_at)) {
 			$query->andWhere(['>=', Lead::tableName() . '.date_at', date('Y-m-d 00:00:00', strtotime($this->from_at))]);
 		}
