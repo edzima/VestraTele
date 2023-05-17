@@ -7,15 +7,16 @@ use yii\base\Model;
 class FullCalendarEvent extends Model {
 
 	public string $id;
-	public ?string $groupId = null;
-	public bool $allDay;
+	public string $title;
 	public string $start;
 	public ?string $end = null;
+
+	public ?bool $allDay = null;
+	public ?string $groupId = null;
 
 	public ?string $startTime = null;
 	public ?string $startRecur = null;
 	public ?string $endRecur = null;
-	public string $title;
 	public ?string $url = null;
 	public ?array $classNames = null;
 	public ?bool $editable = null;
