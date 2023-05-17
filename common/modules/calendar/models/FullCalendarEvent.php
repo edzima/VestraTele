@@ -7,7 +7,7 @@ use yii\base\Model;
 class FullCalendarEvent extends Model {
 
 	public string $id;
-	public string $groupId;
+	public ?string $groupId = null;
 	public bool $allDay;
 	public string $start;
 	public ?string $end = null;
