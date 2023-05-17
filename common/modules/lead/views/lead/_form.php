@@ -119,7 +119,10 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= $form->field($model, 'details', ['options' => ['class' => 'col-md-5']])->textarea(['maxlength' => true]) ?>
+		<?= $model->scenario !== LeadForm::SCENARIO_OWNER
+			? $form->field($model, 'details', ['options' => ['class' => 'col-md-5']])->textarea(['maxlength' => true])
+			: ''
+		?>
 
 	</div>
 

@@ -80,6 +80,7 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 		$this->name = $source->getName();
 		$this->type_id = $source->getType()->getID();
 		$this->sort_index = $source->sort_index;
+		$this->owner_id = $source->getOwnerId();
 		$this->phone = $source->getPhone();
 		$this->dialer_phone = $source->getDialerPhone();
 		$this->url = $source->getURL();
