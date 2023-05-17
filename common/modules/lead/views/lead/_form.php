@@ -99,7 +99,7 @@ use yii\widgets\ActiveForm;
 
 
 	<div class="row">
-		<?= false && $model->scenario !== LeadForm::SCENARIO_OWNER
+		<?= $model->scenario !== LeadForm::SCENARIO_OWNER
 			? $form->field($model, 'owner_id', [
 				'options' => [
 					'class' => 'col-md-3 col-lg-2',
