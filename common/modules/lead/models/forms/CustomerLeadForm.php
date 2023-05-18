@@ -29,7 +29,7 @@ class CustomerLeadForm extends LeadForm {
 		$lead = new static();
 		$lead->email = $model->email;
 		$lead->phone = $model->getPhone();
-		$lead->name = $model->profile->firstname . ' ' . $model->profile->lastname;
+		$lead->name = $model->userProfile->firstname . ' ' . $model->userProfile->lastname;
 		$lead->date_at = date($lead->dateFormat, $model->created_at);
 		$lead->data = Json::encode([
 			'customerUrl' => Yii::$app->urlManager->createAbsoluteUrl(['/customer/view', 'id' => $model->id]),
