@@ -46,7 +46,8 @@
 		"yiisoft/yii2-queue": "^2.3",
 		"yiisoft/yii2-jui": "^2.0",
 		"borales/yii2-phone-input": "^0.3.0",
-		"yiisoft/yii2-httpclient": "^2.0"
+		"yiisoft/yii2-httpclient": "^2.0",
+		"ext-zip": "*"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-latest",

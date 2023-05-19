@@ -69,6 +69,10 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public AddressSearch $addressSearch;
 	private ?array $ids = null;
+	/**
+	 * @var mixed|null
+	 */
+	public bool $joinAddress = true;
 
 	public function __construct($config = []) {
 		if (!isset($config['addressSearch'])) {
@@ -253,7 +257,7 @@ class LeadSearch extends Lead implements SearchModel {
 			$query->joinWith('addresses.address.city');
 			$query->andWhere(LeadAddress::tableName() . '.lead_id IS NOT NULL');
 		}
-		if ($this->addressSearch->validate()) {
+		if ($this->joinAddress || $this->addressSearch->isNotEmpty()) {
 			$query->joinWith([
 				'addresses.address' => function (ActiveQuery $addressQuery) {
 					$this->addressSearch->applySearch($addressQuery);

@@ -403,4 +403,5 @@ return [
 	'Customer Address' => 'Adres',
 	'Market Leads' => 'Vestra Leads - Giełda',
 	'Older by days' => 'Starsze (dni)',
+	'Export grouped by Types' => 'Export - Typami',
 ];

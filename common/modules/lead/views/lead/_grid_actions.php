@@ -236,6 +236,18 @@ $dataProvider->getModels();
 				])
 			: ''
 		?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT) && !empty(Yii::$app->request->getQueryString())
+			? Html::a(Html::icon('export') . '<sub><i class="fa fa-sitemap"></i></sub>', [
+				'export/query-grouped-by-types', 'query' => Yii::$app->request->getQueryString(),
+			], [
+				'data-method' => 'POST',
+				'class' => 'btn btn-secondary not-selected-all',
+				'data-pjax' => 0,
+				'title' => Yii::t('lead', 'Export grouped by Types'),
+				'aria-label' => Yii::t('lead', 'Export grouped by Types'),
+			])
+			: '' ?>
 	</div>
 <?php endif; ?>
 
@@ -275,6 +287,7 @@ $dataProvider->getModels();
 				])
 			: ''
 		?>
+
 
 	</div>
 
