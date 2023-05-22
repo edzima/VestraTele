@@ -27,13 +27,16 @@ class IssueStageDeadlineController extends Controller {
 		return parent::runAction($id, $params);
 	}
 
-	public function actionIndex(): string {
+	public function actionIndex(int $parentTypeId = null): string {
+		$searchModel = new IssueStageDeadlineCalendarSearch();
+		$searchModel->issueParentTypeId = $parentTypeId;
 		return $this->render('index', [
 			'indexUrl' => Url::to([$this->issueIndexRoute]),
+			'searchModel' => $searchModel,
 		]);
 	}
 
-	public function actionList(string $start = null, string $end = null, int $userId = null): Response {
+	public function actionList(string $start = null, string $end = null, int $userId = null, int $parentTypeId = null): Response {
 		if ($start === null) {
 			$start = date($this->defaultStartDateFormat);
 		}
@@ -42,6 +45,7 @@ class IssueStageDeadlineController extends Controller {
 		}
 
 		$model = new IssueStageDeadlineCalendarSearch();
+		$model->issueParentTypeId = $parentTypeId;
 		$model->start = $start;
 		$model->end = $end;
 

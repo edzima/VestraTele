@@ -6,34 +6,39 @@ use common\helpers\ArrayHelper;
 use common\helpers\Html;
 use common\models\issue\Issue;
 use common\models\issue\IssueStage;
+use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
+use common\models\issue\search\IssueParentTypeSearchable;
 use common\models\KeyStorageItem;
 use common\models\user\User;
 use common\modules\calendar\models\IssueStageDeadlineEvent;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\Model;
+use yii\db\ActiveQuery;
 use yii\helpers\Json;
 
-class IssueStageDeadlineCalendarSearch extends Model {
+class IssueStageDeadlineCalendarSearch extends Model implements IssueParentTypeSearchable {
 
 	public string $start;
 	public string $end;
+	public ?int $issueParentTypeId = null;
 
-	public static function getLawyersFilters(): array {
+	public function getLawyersFilters(): array {
 		$stages = static::getStages();
 		if (empty($stages)) {
 			return [];
 		}
 
-		$usersIds = IssueUser::find()
+		$query = IssueUser::find()
 			->select('user_id')
 			->joinWith('issue')
 			->andWhere([Issue::tableName() . '.stage_id' => array_keys($stages)])
 			->withType(IssueUser::TYPE_LAWYER)
-			->distinct()
-			->column();
+			->distinct();
+		$this->applyIssueParentTypeFilter($query);
+		$usersIds = $query->column();
 		if (empty($usersIds)) {
 			return [];
 		}
@@ -79,9 +84,23 @@ class IssueStageDeadlineCalendarSearch extends Model {
 		return $colorsData;
 	}
 
-	public static function getStagesFilters(): array {
+	public function getStagesFilters(): array {
 		$data = [];
-		foreach (static::getStages() as $model) {
+		$stages = static::getStages();
+		if ($this->getIssueParentType() !== null) {
+			$stages = array_filter($stages, function (IssueStage $stage) {
+				if ($this->getIssueParentType()->hasStage($stage->id)) {
+					return true;
+				}
+				foreach ($this->getIssueParentType()->childs as $type) {
+					if ($type->hasStage($stage->id)) {
+						return true;
+					}
+				}
+				return false;
+			});
+		}
+		foreach ($stages as $model) {
 			$color = $model->calendar_background;
 			$data[] = [
 				'value' => $model->id,
@@ -103,6 +122,7 @@ class IssueStageDeadlineCalendarSearch extends Model {
 			'newestNote',
 			'lawyer'
 		);
+		$this->applyIssueParentTypeFilter($query);
 		$data = [];
 		foreach ($query->all() as $model) {
 			$event = new IssueStageDeadlineEvent();
@@ -135,4 +155,21 @@ class IssueStageDeadlineCalendarSearch extends Model {
 	public static function getStages(): array {
 		return IssueStageDeadlineEvent::getStages();
 	}
+
+	public function applyIssueParentTypeFilter(ActiveQuery $query): void {
+		$parentType = $this->getIssueParentType();
+		if ($parentType) {
+			$childs = ArrayHelper::getColumn($parentType->childs, 'id');
+			$query->joinWith('issue');
+			$query->andFilterWhere([Issue::tableName() . '.type_id' => $childs]);
+		}
+	}
+
+	public function getIssueParentType(): ?IssueType {
+		if ($this->issueParentTypeId) {
+			return IssueType::get($this->issueParentTypeId);
+		}
+		return null;
+	}
+
 }

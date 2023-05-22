@@ -55,7 +55,7 @@ $this->params['issueParentTypeNav'] = [
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE)
 			? Html::a('<i class="fa fa-calendar"></i>' . ' ' . Yii::t('issue', 'Stages Deadlines'),
-				['/calendar/issue-stage-deadline/index'],
+				['/calendar/issue-stage-deadline/index', 'parentTypeId' => $searchModel->getIssueParentType()->id ?? null,],
 				[
 					'class' => 'btn btn-warning',
 					'data-pjax' => 0,

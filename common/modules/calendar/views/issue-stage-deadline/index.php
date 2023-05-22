@@ -9,9 +9,16 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $users string[]|null */
 /* @var $indexUrl string */
+/* @var $searchModel IssueStageDeadlineCalendarSearch */
 
 $this->title = Yii::t('issue', 'Stages Deadlines');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => $indexUrl];
+if ($searchModel->getIssueParentType()) {
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name];
+}
+$this->params['issueParentTypeNav'] = [
+	'route' => ['/calendar/issue-stage-deadline/index'],
+];
 $this->params['breadcrumbs'][] = $this->title;
 
 CalendarAsset::register($this);
@@ -21,13 +28,13 @@ $props = [
 			'id' => 0,
 			'title' => Yii::t('issue', 'Stages'),
 			'filteredPropertyName' => 'stageId',
-			'filters' => IssueStageDeadlineCalendarSearch::getStagesFilters(),
+			'filters' => $searchModel->getStagesFilters(),
 		],
 		[
 			'id' => 1,
 			'title' => Yii::t('issue', 'Lawyer'),
 			'filteredPropertyName' => 'lawyerId',
-			'filters' => IssueStageDeadlineCalendarSearch::getLawyersFilters(),
+			'filters' => $searchModel->getLawyersFilters(),
 		],
 	],
 	'eventSourcesConfig' => [
