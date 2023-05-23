@@ -116,7 +116,7 @@ use yii\widgets\ActiveForm;
 				'options' => [
 					'id' => 'field-' . Html::getInputId($model, 'type_additional_date_at'),
 					'class' => 'col-md-2' . (
-						!isset($model::getTypesWithAdditionalDateNames()[(int) $model->type_id]) || empty($model->type_additional_date_at) ?
+						!isset($model::getTypesWithAdditionalDateNames()[(int) $model->type_id]) ?
 							' hidden' : ''),
 				],
 			])
