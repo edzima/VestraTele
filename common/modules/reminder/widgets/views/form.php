@@ -4,17 +4,26 @@ use common\helpers\Html;
 use common\modules\reminder\models\ReminderForm;
 use common\widgets\ActiveForm;
 use common\widgets\DateTimeWidget;
+use yii\web\View;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $model ReminderForm */
 /* @var $options array */
-
+/* @var $users null|array */
 ?>
 
 
 <div class="reminder-form">
 
 	<?php $form = ActiveForm::begin($options); ?>
+
+	<?= $users !== null ?
+		$form->field($model, 'user_id')->dropDownList($users, [
+			'prompt' => Yii::t('common', 'Without User - For All Users.'),
+		])
+		: ''
+	?>
+
 
 	<?= $form->field($model, 'priority')->dropDownList($model::getPriorityNames()) ?>
 

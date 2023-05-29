@@ -13,6 +13,8 @@ class ReminderGridWidget extends GridView {
 	public $emptyText = false;
 	public $summary = false;
 	public string $actionController = '/reminder/reminder';
+
+	public bool $visibleUserColumn = true;
 	public ?Closure $urlCreator = null;
 
 	public function init(): void {
@@ -33,6 +35,10 @@ class ReminderGridWidget extends GridView {
 			[
 				'attribute' => 'priority',
 				'value' => 'priorityName',
+			],
+			[
+				'attribute' => 'user',
+				'visible' => $this->visibleUserColumn,
 			],
 			'created_at:date',
 			'updated_at:date',
