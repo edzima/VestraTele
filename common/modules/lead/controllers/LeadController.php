@@ -18,6 +18,7 @@ use common\modules\lead\models\searches\LeadNameSearch;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
@@ -226,6 +227,13 @@ class LeadController extends BaseController {
 				'allModels' => $users,
 			]);
 		}
+		$reminderQuery = $model->getReminders();
+		if ($this->module->onlyUser) {
+			$reminderQuery->onlyUser(Yii::$app->user->getId());
+		}
+		$remindersDataProvider = new ActiveDataProvider([
+			'query' => $reminderQuery,
+		]);
 
 		return $this->render('view', [
 			'model' => $model,
@@ -234,6 +242,7 @@ class LeadController extends BaseController {
 			'isOwner' => $isOwner,
 			'userIsFromMarket' => $userIsFromMarket,
 			'usersDataProvider' => $usersDataProvider,
+			'remindersDataProvider' => $remindersDataProvider,
 		]);
 	}
 

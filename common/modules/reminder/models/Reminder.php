@@ -54,6 +54,7 @@ class Reminder extends ActiveRecord {
 			[['date_at'], 'safe'],
 			[['details'], 'string', 'max' => 255],
 			['priority', 'in', 'range' => array_keys(static::getPriorityNames())],
+			[['user_id'], 'default', 'value' => null],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 		];
 	}

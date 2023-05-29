@@ -30,4 +30,13 @@ return [
 		'updated_at' => '1391885313',
 		'email' => 'john.miller@rutherford.com',
 	],
+	[
+		'username' => 'without_lead',
+		'auth_key' => 'iwTNae9t34OmnK6l4vT4I2eaTk-YWI2Rv',
+		'password_hash' => '$2y$13$CXT0Rkle1E2MJ/c1l5bylL.EylfmQ39O5JlHJVFpNn618OUS1HwaIi',
+		'password_reset_token' => 't5GU9NwpuGYSfa1sdFEZMAxqtuz2PkEvv_' . time(),
+		'created_at' => '1391885313',
+		'updated_at' => '1391885313',
+		'email' => 'without-lead@rutherford.com',
+	],
 ];

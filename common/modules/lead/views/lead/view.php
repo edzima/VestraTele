@@ -16,7 +16,6 @@ use common\modules\lead\widgets\ShortReportStatusesWidget;
 use common\modules\reminder\widgets\ReminderGridWidget;
 use common\widgets\address\AddressDetailView;
 use common\widgets\GridView;
-use yii\data\ActiveDataProvider;
 use yii\data\DataProviderInterface;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -28,6 +27,7 @@ use yii\widgets\DetailView;
 /* @var $onlyUser bool */
 /* @var $isOwner bool */
 /* @var $userIsFromMarket bool */
+/* @var $remindersDataProvider DataProviderInterface */
 /* @var $usersDataProvider null|DataProviderInterface */
 
 $this->title = $model->getName();
@@ -236,7 +236,8 @@ YiiAsset::register($this);
 
 
 			<?= ReminderGridWidget::widget([
-				'dataProvider' => new ActiveDataProvider(['query' => $model->getReminders()]),
+				'dataProvider' => $remindersDataProvider,
+				'visibleUserColumn' => !$onlyUser,
 				'urlCreator' => static function ($action, $reminder, $key, $index) use ($model) {
 					return Url::toRoute([
 						'reminder/' . $action,

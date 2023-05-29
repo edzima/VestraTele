@@ -11,7 +11,7 @@ class ReminderForm extends Model {
 	public ?int $priority = null;
 	public ?string $details = null;
 	public ?string $date_at = null;
-	public ?int $user_id = null;
+	public $user_id;
 
 	public array $usersRange = [];
 

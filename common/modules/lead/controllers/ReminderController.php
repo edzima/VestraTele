@@ -2,11 +2,12 @@
 
 namespace common\modules\lead\controllers;
 
+use common\modules\lead\models\forms\LeadReminderForm;
 use common\modules\lead\models\LeadReminder;
 use common\modules\lead\models\searches\LeadReminderSearch;
 use common\modules\lead\models\searches\LeadSearch;
-use common\modules\reminder\models\ReminderForm;
 use Yii;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class ReminderController extends BaseController {
@@ -32,15 +33,13 @@ class ReminderController extends BaseController {
 
 	public function actionCreate(int $id) {
 		$lead = $this->findLead($id);
-		$model = new ReminderForm();
-		$model->date_at = date(DATE_ATOM, strtotime("+1 week"));
+		$model = new LeadReminderForm();
+		$model->setLead($this->findLead($id));
+		if ($this->module->onlyUser) {
+			$model->user_id = Yii::$app->user->getId();
+		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$leadReminder = new LeadReminder([
-				'lead_id' => $lead->getId(),
-				'reminder_id' => $model->getModel()->id,
-			]);
-			$leadReminder->save();
 			return $this->redirect(['lead/view', 'id' => $id]);
 		}
 		return $this->render('create', [
@@ -51,8 +50,15 @@ class ReminderController extends BaseController {
 
 	public function actionUpdate(int $lead_id, int $reminder_id) {
 		$leadReminder = $this->findModel($lead_id, $reminder_id);
-		$model = new ReminderForm();
-		$model->setModel($leadReminder->reminder);
+		if ($leadReminder->reminder->user_id !== null && $leadReminder->reminder->user_id !== Yii::$app->user->getId()) {
+			throw new ForbiddenHttpException(
+				Yii::t('lead',
+					'Only General or Self Reminder can be updated.'
+				)
+			);
+		}
+		$model = new LeadReminderForm();
+		$model->setLeadReminder($leadReminder);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['lead/view', 'id' => $lead_id]);
 		}
@@ -69,6 +75,10 @@ class ReminderController extends BaseController {
 		return $this->redirect(['lead/view', 'id' => $lead_id]);
 	}
 
+	/**
+	 * @throws NotFoundHttpException
+	 * @throws ForbiddenHttpException
+	 */
 	private function findModel(int $lead_id, int $reminder_id): LeadReminder {
 		$model = LeadReminder::find()
 			->andWhere([
@@ -78,6 +88,10 @@ class ReminderController extends BaseController {
 			->one();
 		if ($model === null) {
 			throw new NotFoundHttpException();
+		}
+		/** @var LeadReminder $model */
+		if (!$this->module->manager->isForUser($model->lead)) {
+			throw new ForbiddenHttpException();
 		}
 		return $model;
 	}
