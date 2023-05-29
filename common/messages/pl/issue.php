@@ -195,4 +195,7 @@ return [
 	'Link Issues Grid Position - Issue' => 'Nr Sprawy - pod',
 	'Link Issues Grid Position - Customer' => 'Klient - pod',
 	'Details also in Linked Issues.' => 'Szczegóły w Połączonych Sprawach',
+	'Type additional Date at from' => 'Data (typu) od',
+	'Type additional Date at to' => 'Data (typu) do',
+
 ];

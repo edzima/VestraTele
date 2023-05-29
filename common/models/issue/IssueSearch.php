@@ -40,7 +40,8 @@ abstract class IssueSearch extends Model
 	public $stage_id;
 	public $type_id;
 	public $entity_responsible_id;
-	public $type_additional_date_at;
+	public $type_additional_date_from_at;
+	public $type_additional_date_to_at;
 
 	public $summonsStatusFilter;
 
@@ -153,14 +154,14 @@ abstract class IssueSearch extends Model
 			[['onlyWithTelemarketers'], 'default', 'value' => null],
 
 			['noteFilter', 'string'],
-			[['createdAtTo', 'createdAtFrom', 'signedAtFrom', 'signedAtTo'], 'date', 'format' => DATE_ATOM],
+			[['createdAtTo', 'createdAtFrom', 'signedAtFrom', 'signedAtTo', 'type_additional_date_from_at', 'type_additional_date_to_at'], 'date', 'format' => DATE_ATOM],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
 			[['type_id', 'excludedTypes'], 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			[['customerName', 'userName'], 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[['excludedTagsIds', 'tagsIds'], 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
 			[
 				[
-					'created_at', 'updated_at', 'type_additional_date_at',
+					'created_at', 'updated_at',
 				], 'safe',
 			],
 			['summonsStatusFilter', 'safe'],
@@ -203,6 +204,9 @@ abstract class IssueSearch extends Model
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 			'userName' => Yii::t('issue', 'First name & surname'),
 			'userType' => Yii::t('issue', 'Who'),
+			'type_additional_date_from_at' => Yii::t('issue', 'Type additional Date at from'),
+			'type_additional_date_to_at' => Yii::t('issue', 'Type additional Date at to'),
+
 		], Issue::instance()->attributeLabels());
 	}
 
@@ -229,6 +233,7 @@ abstract class IssueSearch extends Model
 		$this->applyCustomerNameFilter($query);
 		$this->applyCustomerPhoneFilter($query);
 		$this->applyCreatedAtFilter($query);
+		$this->applyTypeDateAtFilter($query);
 		$this->applyNotesFilter($query);
 		$this->excludedStagesFilter($query);
 		$this->excludedTypesFilter($query);
@@ -244,7 +249,6 @@ abstract class IssueSearch extends Model
 			Issue::tableName() . '.stage_id' => $this->stage_id,
 			Issue::tableName() . '.type_id' => $this->type_id,
 			Issue::tableName() . '.entity_responsible_id' => $this->entity_responsible_id,
-			Issue::tableName() . '.type_additional_date_at' => $this->type_additional_date_at,
 		]);
 		$query->groupBy(Issue::tableName() . '.id');
 	}
@@ -592,6 +596,22 @@ abstract class IssueSearch extends Model
 			if (!empty($summonsStatuses)) {
 				$query->andWhere([Summon::tableName() . '.status' => $summonsStatuses]);
 			}
+		}
+	}
+
+	private function applyTypeDateAtFilter(IssueQuery $query) {
+		if (!empty($this->type_additional_date_from_at)) {
+			$query->andFilterWhere([
+				'>=', Issue::tableName() . '.type_additional_date_at',
+				date('Y-m-d 00:00:00', strtotime($this->type_additional_date_from_at)),
+			]);
+		}
+
+		if (!empty($this->type_additional_date_to_at)) {
+			$query->andFilterWhere([
+				'<=', Issue::tableName() . '.type_additional_date_at',
+				date('Y-m-d 23:59:59', strtotime($this->type_additional_date_to_at)),
+			]);
 		}
 	}
 

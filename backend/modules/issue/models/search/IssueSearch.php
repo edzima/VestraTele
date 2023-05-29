@@ -57,15 +57,13 @@ class IssueSearch extends BaseIssueSearch {
 			[['onlyWithSettlements', 'onlyWithClaims'], 'default', 'value' => null],
 			['claimCompanyTryingValue', 'number', 'min' => 0],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
-			[['type_additional_date_at', 'signature_act', 'stage_change_at', 'stageDeadlineFromAt', 'stageDeadlineToAt'], 'safe'],
-
+			[['signature_act', 'stage_change_at', 'stageDeadlineFromAt', 'stageDeadlineToAt'], 'safe'],
 		]);
 	}
 
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
 			'parentId' => Yii::t('backend', 'Structures'),
-
 			'onlyDelayed' => Yii::t('backend', 'Only delayed'),
 			'onlyWithClaims' => Yii::t('backend', 'Only with Claims'),
 			'onlyWithPayedPay' => Yii::t('backend', 'Only with payed pay'),

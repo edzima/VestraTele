@@ -45,9 +45,7 @@ use common\models\user\Worker;
 		?>
 
 
-		<?= $form->field($model, 'type_additional_date_at', ['options' => ['class' => 'col-md-2']])
-			->widget(DateWidget::class)
-		?>
+
 
 		<?= $form->field($model, 'stage_change_at', ['options' => ['class' => 'col-md-2']])
 			->widget(DateWidget::class)
@@ -153,6 +151,7 @@ use common\models\user\Worker;
 			: ''
 		?>
 
+
 	</div>
 
 	<?= $model->addressSearch !== null
@@ -185,6 +184,14 @@ use common\models\user\Worker;
 			: ''
 		?>
 
+		<?= $form->field($model, 'type_additional_date_from_at', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+		<?= $form->field($model, 'type_additional_date_to_at', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
 
 	</div>
 	<div class="row">
@@ -211,6 +218,8 @@ use common\models\user\Worker;
 			],
 			'showToggleAll' => true,
 		]) ?>
+
+
 	</div>
 
 
