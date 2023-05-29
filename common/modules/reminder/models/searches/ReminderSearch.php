@@ -83,7 +83,9 @@ class ReminderSearch extends Reminder {
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,
 		]);
-
+		if (!empty($this->user_id)) {
+			$query->onlyUser($this->user_id);
+		}
 		$query->andFilterWhere(['like', 'details', $this->details]);
 	}
 

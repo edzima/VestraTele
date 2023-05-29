@@ -7,6 +7,15 @@ use yii\db\Expression;
 
 class ReminderQuery extends ActiveQuery {
 
+	public function onlyUser(int $userId, bool $withNotSet = true): self {
+		[$table, $alias] = $this->getTableNameAndAlias();
+		$this->andWhere([$alias . '.user_id' => $userId]);
+		if ($withNotSet) {
+			$this->orWhere([$alias . '.user_id' => null]);
+		}
+		return $this;
+	}
+
 	public function onlyDelayed(): self {
 		[$table, $alias] = $this->getTableNameAndAlias();
 		$this->andWhere(['>', new Expression("DATEDIFF(CURDATE(), $alias.date_at)"), 0]);
