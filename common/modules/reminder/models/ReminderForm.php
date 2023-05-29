@@ -11,6 +11,9 @@ class ReminderForm extends Model {
 	public ?int $priority = null;
 	public ?string $details = null;
 	public ?string $date_at = null;
+	public ?int $user_id = null;
+
+	public array $usersRange = [];
 
 	private ?Reminder $model = null;
 
@@ -18,7 +21,9 @@ class ReminderForm extends Model {
 		return [
 			[['priority', 'date_at'], 'required'],
 			['details', 'string'],
+			[['user_id'], 'integer'],
 			[['date_at'], 'date', 'format' => $this->dateFormat],
+			['user_id', 'in', 'range' => $this->usersRange, 'when' => function () { return !empty($this->usersRange); }],
 		];
 	}
 
@@ -34,6 +39,7 @@ class ReminderForm extends Model {
 		$model->priority = $this->priority;
 		$model->details = $this->details;
 		$model->date_at = $this->date_at;
+		$model->user_id = $this->user_id;
 		return $model->save();
 	}
 
@@ -53,5 +59,6 @@ class ReminderForm extends Model {
 		$this->details = $model->details;
 		$this->date_at = $model->date_at;
 		$this->priority = $model->priority;
+		$this->user_id = $model->user_id;
 	}
 }

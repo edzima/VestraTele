@@ -2,10 +2,12 @@
 
 namespace common\modules\reminder\models;
 
+use common\models\user\User;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReminder;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -16,10 +18,12 @@ use yii\db\ActiveRecord;
  * @property int $created_at
  * @property int $updated_at
  * @property string $date_at
+ * @property int|null $user_id
  * @property string|null $details
  *
  * @property LeadReminder[] $leadReminders
  * @property Lead[] $leads
+ * @property User|null $user
  */
 class Reminder extends ActiveRecord {
 
@@ -49,6 +53,8 @@ class Reminder extends ActiveRecord {
 			[['priority'], 'integer'],
 			[['date_at'], 'safe'],
 			[['details'], 'string', 'max' => 255],
+			['priority', 'in', 'range' => array_keys(static::getPriorityNames())],
+			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 		];
 	}
 
@@ -63,22 +69,33 @@ class Reminder extends ActiveRecord {
 			'updated_at' => Yii::t('common', 'Updated At'),
 			'date_at' => Yii::t('common', 'Date At'),
 			'details' => Yii::t('common', 'Details'),
+			'user_id' => Yii::t('common', 'User'),
+			'user' => Yii::t('common', 'User'),
 		];
 	}
 
 	/**
 	 * Gets query for [[LeadReminders]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getLeadReminders() {
 		return $this->hasMany(LeadReminder::class, ['reminder_id' => 'id']);
 	}
 
 	/**
+	 * Gets query for [[User]].
+	 *
+	 * @return ActiveQuery
+	 */
+	public function getUser() {
+		return $this->hasOne(User::class, ['id' => 'user_id']);
+	}
+
+	/**
 	 * Gets query for [[Leads]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getLeads() {
 		return $this->hasMany(Lead::class, ['id' => 'lead_id'])->viaTable(LeadReminder::tableName(), ['reminder_id' => 'id']);
