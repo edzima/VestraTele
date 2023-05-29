@@ -6,7 +6,7 @@ use yii\base\Model;
 
 class ReminderForm extends Model {
 
-	public string $dateFormat = 'YYYY-MM-DD HH:mm';
+	public string $dateFormat = 'Y-m-d H:i';
 
 	public ?int $priority = null;
 	public ?string $details = null;
@@ -22,7 +22,7 @@ class ReminderForm extends Model {
 			[['priority', 'date_at'], 'required'],
 			['details', 'string'],
 			[['user_id'], 'integer'],
-			[['date_at'], 'date', 'format' => $this->dateFormat],
+			[['date_at'], 'date', 'format' => 'php:' . $this->dateFormat],
 			['user_id', 'in', 'range' => $this->usersRange, 'when' => function () { return !empty($this->usersRange); }],
 		];
 	}
