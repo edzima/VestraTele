@@ -2,6 +2,7 @@
 
 namespace common\widgets\grid;
 
+use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueTagType;
 use common\models\issue\search\IssueTypeSearch;
@@ -19,6 +20,18 @@ class IssueTypeColumn extends DataColumn {
 
 	public string $valueType = self::VALUE_SHORT;
 	public bool $contentBold = true;
+	public bool $withAdditionalDateAt = false;
+
+	public function getTypeValue(IssueInterface $model): string {
+		switch ($this->valueType) {
+			case static::VALUE_SHORT:
+				return $model->getIssueType()->short_name;
+			case static::VALUE_NAME_WITH_SHORT:
+				return $model->getIssueType()->getNameWithShort();
+			default:
+				return $model->getIssueType()->name;
+		}
+	}
 
 	public function init(): void {
 		if (empty($this->label)) {
@@ -26,14 +39,13 @@ class IssueTypeColumn extends DataColumn {
 		}
 		if (empty($this->value)) {
 			$this->value = function (IssueInterface $model): string {
-				switch ($this->valueType) {
-					case static::VALUE_SHORT:
-						return $model->getIssueType()->short_name;
-					case static::VALUE_NAME_WITH_SHORT:
-						return $model->getIssueType()->getNameWithShort();
-					default:
-						return $model->getIssueType()->name;
+				$value = $this->getTypeValue($model);
+				if ($this->withAdditionalDateAt && !empty($model->getIssueModel()->type_additional_date_at)) {
+					$this->format = 'html';
+					$value = Html::encode($value);
+					$value .= '<br><strong>' . Yii::$app->formatter->asDate($model->getIssueModel()->type_additional_date_at) . '</strong>';
 				}
+				return $value;
 			};
 		}
 		if (empty($this->filter)) {

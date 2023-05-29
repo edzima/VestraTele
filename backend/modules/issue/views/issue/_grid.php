@@ -114,6 +114,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 		[
 			'class' => IssueTypeColumn::class,
 			'attribute' => 'type_id',
+			'withAdditionalDateAt' => true,
 		],
 		[
 			'class' => CustomerDataColumn::class,

@@ -100,6 +100,7 @@ $parentMenuItems = Html::issueParentTypeItems();
 				'class' => IssueTypeColumn::class,
 				'attribute' => 'type_id',
 				'noWrap' => true,
+				'withAdditionalDateAt' => true,
 			],
 
 			[
