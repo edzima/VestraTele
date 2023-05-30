@@ -405,4 +405,5 @@ return [
 	'Older by days' => 'Starsze (dni)',
 	'Export grouped by Types' => 'Export - Typami',
 	'Only General or Self Reminder can be updated.' => 'Tylko własne lub ogólne przypomnienia możesz edytować.',
+	'For all Users in Lead.' => 'Dla wszystkich z Leada',
 ];

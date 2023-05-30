@@ -21,6 +21,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= ReminderFormWidget::widget([
 		'model' => $model,
-		'users' => $model->getUsersNames(),
+		'users' => [
+			'items' => $model->getUsersNames(),
+			'prompt' => Yii::t('lead', 'For all Users in Lead.'),
+		],
 	]) ?>
 </div>
