@@ -242,6 +242,7 @@ use yii\data\ActiveDataProvider;
 								return Html::a(Html::icon('remove'), $url, [
 									'title' => Yii::t('issue', 'Unlink'),
 									'aria-label' => Yii::t('issue', 'Unlink'),
+									'data-method' => 'POST',
 								]);
 							},
 						],
