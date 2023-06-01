@@ -117,4 +117,13 @@ class Reminder extends ActiveRecord {
 	public static function find(): ReminderQuery {
 		return new ReminderQuery(static::class);
 	}
+
+	public function isDone(): bool {
+		return !empty($this->done_at);
+	}
+
+	public function isDelayed(): bool {
+		return !$this->isDone()
+			&& (strtotime($this->date_at) < time());
+	}
 }
