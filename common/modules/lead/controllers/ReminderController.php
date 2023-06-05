@@ -21,7 +21,7 @@ class ReminderController extends BaseController {
 				return Yii::$app->user->loginRequired();
 			}
 			$searchModel->setScenario(LeadSearch::SCENARIO_USER);
-			$searchModel->user_id = Yii::$app->user->getId();
+			$searchModel->leadUserId = Yii::$app->user->getId();
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -46,6 +46,10 @@ class ReminderController extends BaseController {
 			'model' => $model,
 			'lead' => $lead,
 		]);
+	}
+
+	public function actionView(int $lead_id) {
+		return $this->redirectLead($lead_id);
 	}
 
 	public function actionUpdate(int $lead_id, int $reminder_id) {

@@ -406,4 +406,8 @@ return [
 	'Export grouped by Types' => 'Export - Typami',
 	'Only General or Self Reminder can be updated.' => 'Tylko własne lub ogólne przypomnienia możesz edytować.',
 	'For all Users in Lead.' => 'Dla wszystkich z Leada',
+	'Done At' => 'Zrobiono',
+	'Hide Done' => 'Ukryj Zrobione',
+	'Lead Date At' => 'Data Leada',
+	'Without User Reminder' => 'Nieprzypisany',
 ];

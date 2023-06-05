@@ -36,7 +36,7 @@ class LeadReminderController extends Controller {
 		$model = new LeadReminderSearch();
 		$model->scenario = LeadReminderSearch::SCENARIO_USER;
 		$model->onlyDelayed = null;
-		$model->user_id = Yii::$app->user->getId();
+		$model->leadUserId = Yii::$app->user->getId();
 		$model->dateStart = $start;
 		$model->dateEnd = $end;
 

@@ -3,10 +3,12 @@
 namespace common\modules\lead\models\searches;
 
 use common\models\query\PhonableQuery;
+use common\models\user\User;
 use common\modules\calendar\models\LeadReminderCalendarEvent;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReminder;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadUser;
 use common\modules\reminder\models\Reminder;
 use common\modules\reminder\models\ReminderQuery;
 use common\modules\reminder\models\searches\ReminderSearch;
@@ -26,12 +28,17 @@ class LeadReminderSearch extends ReminderSearch {
 	public ?string $leadName = null;
 	public ?string $leadPhone = null;
 	public $leadStatusId;
-	public ?int $user_id = null;
+	public ?int $leadUserId = null;
+
+	public $leadReminderUserId;
+	public $leadDateAt;
 
 	public function rules(): array {
 		return array_merge([
-			['!user_id', 'required', 'on' => static::SCENARIO_USER],
-			['leadStatusId', 'integer'],
+			['!leadUserId', 'required', 'on' => static::SCENARIO_USER],
+			[['leadStatusId', 'user_id', 'leadUserId'], 'integer'],
+			[['hideDone'], 'boolean'],
+			[['hideDone'], 'default', 'value' => null],
 			['leadName', 'trim'],
 			['leadName', 'string', 'min' => 3],
 			['leadPhone', PhoneValidator::class],
@@ -45,22 +52,39 @@ class LeadReminderSearch extends ReminderSearch {
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
+			'sort' => [
+				'defaultOrder' => [
+					'date_at' => SORT_ASC,
+					'priority' => SORT_DESC,
+				],
+				'attributes' => [
+					'leadName' => [
+						'asc' => [Lead::tableName() . '.name' => SORT_ASC],
+						'desc' => [Lead::tableName() . '.name' => SORT_DESC],
+					],
+					'priority',
+					'created_at',
+					'updated_at',
+					'done_at',
+					'user_id',
+					'date_at' => [
+						'asc' => [Reminder::tableName() . '.date_at' => SORT_ASC],
+						'desc' => [Reminder::tableName() . '.date_at' => SORT_DESC],
+					],
+					'leadDateAt' => [
+						'asc' => [Lead::tableName() . '.date_at' => SORT_ASC],
+						'desc' => [Lead::tableName() . '.date_at' => SORT_DESC],
+					],
+				],
+			],
 		]);
 
 		$this->load($params);
 
 		if (!$this->validate()) {
 			$query->andWhere('0=1');
+			return $dataProvider;
 		}
-
-		/*
-		$query->joinWith([
-			'lead' => function (LeadQuery $query) {
-				$this->applyReminderFilter($query);
-			},
-		]);
-
-		*/
 
 		$query->joinWith([
 			'reminder' => function (ReminderQuery $query) {
@@ -72,12 +96,12 @@ class LeadReminderSearch extends ReminderSearch {
 		$this->applyLeadStatusFilter($query);
 
 		if ($this->scenario === static::SCENARIO_USER) {
-			if (empty($this->user_id)) {
+			if (empty($this->leadUserId)) {
 				throw new InvalidConfigException('User Id cannot be blank on User scenario.');
 			}
 			$query->joinWith([
 				'lead.leadUsers' => function (QueryInterface $query) {
-					$query->andWhere(['user_id' => $this->user_id]);
+					$query->andWhere([LeadUser::tableName() . '.user_id' => $this->leadUserId]);
 				},
 			]);
 		}
@@ -88,6 +112,8 @@ class LeadReminderSearch extends ReminderSearch {
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
 				'leadName' => Yii::t('lead', 'Lead Name'),
+				'hideDone' => Yii::t('lead', 'Hide Done'),
+				'done_at' => Yii::t('lead', 'Done At'),
 			]
 		);
 	}
@@ -153,6 +179,7 @@ class LeadReminderSearch extends ReminderSearch {
 			->all();
 		$options = [];
 		foreach ($models as $model) {
+			/** @var LeadStatus $model */
 			$options[] = [
 				'value' => $model->id,
 				'isActive' => true,
@@ -178,6 +205,18 @@ class LeadReminderSearch extends ReminderSearch {
 				},
 			]);
 		}
+	}
+
+	public function getUsersNames(): array {
+		$names[static::REMINDER_USER_AS_NULL] = Yii::t('lead', 'Without User Reminder');
+		return $names +
+			User::getSelectList(LeadReminder::find()
+				->select('user_id')
+				->joinWith('reminder')
+				->distinct()
+				->andWhere('user_id IS NOT NULL')
+				->column(),
+				false);
 	}
 
 }
