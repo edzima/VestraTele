@@ -79,6 +79,7 @@ class CustomerController extends UserController {
 	}
 
 	private function createCustomerLead(Customer $model) {
+		$model->profile->refresh();
 		$data = CustomerLeadForm::customerAttributes($model);
 		if (!empty($data)) {
 			Yii::$app->leadClient->addFromCustomer($data);
