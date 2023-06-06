@@ -1,17 +1,17 @@
 <?php
 
-use common\modules\lead\models\ActiveLead;
-use common\modules\reminder\models\ReminderForm;
+use common\modules\lead\models\forms\LeadReminderForm;
 use common\modules\reminder\widgets\ReminderFormWidget;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model ReminderForm */
-/* @var $lead ActiveLead */
+/* @var $model LeadReminderForm $model */
 
-$this->title = Yii::t('lead', 'Create Reminder for Lead: #{id}', ['id' => $lead->getId()]);
+$lead = $model->getLead();
+
+$this->title = Yii::t('lead', 'Create Reminder for Lead: {lead}', ['lead' => $lead->getName()]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
-$this->params['breadcrumbs'][] = ['label' => $lead->getId(), 'url' => ['lead/view', 'id' => $lead->getId()]];
+$this->params['breadcrumbs'][] = ['label' => $lead->getName(), 'url' => ['lead/view', 'id' => $lead->getId()]];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Reminders'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -21,5 +21,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= ReminderFormWidget::widget([
 		'model' => $model,
+		'users' => [
+			'items' => $model->getUsersNames(),
+			'prompt' => Yii::t('lead', 'For all Users in Lead.'),
+		],
 	]) ?>
 </div>

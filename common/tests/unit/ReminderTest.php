@@ -2,10 +2,11 @@
 
 namespace common\tests\unit;
 
+use common\fixtures\ReminderFixture;
+use common\fixtures\UserFixture;
 use common\modules\reminder\models\Reminder;
 use common\modules\reminder\models\ReminderForm;
 use common\tests\_support\UnitModelTrait;
-use yii\test\ActiveFixture;
 
 class ReminderTest extends Unit {
 
@@ -20,9 +21,13 @@ class ReminderTest extends Unit {
 	public function _fixtures(): array {
 		return [
 			'reminder' => [
-				'class' => ActiveFixture::class,
-				'modelClass' => Reminder::class,
+				'class' => ReminderFixture::class,
 				'dataFile' => codecept_data_dir() . 'reminder.php',
+			],
+			'user' => [
+				'class' => UserFixture::class,
+				'dataFile' => codecept_data_dir() . 'user.php',
+
 			],
 		];
 	}
@@ -66,11 +71,12 @@ class ReminderTest extends Unit {
 		]);
 	}
 
-	private function thenSeeReminder(int $priority, string $date_at, ?string $details = null) {
+	private function thenSeeReminder(int $priority, string $date_at, ?string $details = null, ?int $user_id = null) {
 		$this->tester->seeRecord(Reminder::class, [
 			'priority' => $priority,
 			'date_at' => $date_at,
 			'details' => $details,
+			'user_id' => $user_id,
 		]);
 	}
 

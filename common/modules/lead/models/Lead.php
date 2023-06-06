@@ -8,6 +8,7 @@ use common\modules\lead\models\query\LeadDialerQuery;
 use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
 use common\modules\reminder\models\Reminder;
+use common\modules\reminder\models\ReminderQuery;
 use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -198,7 +199,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			->indexBy('question_id');
 	}
 
-	public function getReminders(): ActiveQuery {
+	public function getReminders(): ReminderQuery {
 		return $this->hasMany(Reminder::class, ['id' => 'reminder_id'])->viaTable(LeadReminder::tableName(), ['lead_id' => 'id']);
 	}
 

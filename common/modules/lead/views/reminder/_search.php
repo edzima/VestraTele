@@ -21,6 +21,7 @@ use yii\widgets\ActiveForm;
 
 		<?= $form->field($model, 'onlyToday', ['options' => ['class' => 'col-md-3']])->checkbox() ?>
 		<?= $form->field($model, 'onlyDelayed', ['options' => ['class' => 'col-md-3']])->checkbox() ?>
+		<?= $form->field($model, 'hideDone', ['options' => ['class' => 'col-md-3']])->checkbox() ?>
 
 	</div>
 

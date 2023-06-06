@@ -359,4 +359,5 @@ return [
 	'Tags without Type' => 'Nieprzypisane',
 	'Sort order' => 'Kolejność',
 	'Contact' => 'Kontakt',
+	'Without User - For All Users.' => 'Dla Wszystkich',
 ];

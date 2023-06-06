@@ -9,14 +9,15 @@ use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
+use common\modules\lead\widgets\LeadReminderActionColumn;
 use common\modules\lead\widgets\LeadReportWidget;
 use common\modules\lead\widgets\LeadSmsBtnWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
 use common\modules\lead\widgets\ShortReportStatusesWidget;
+use common\modules\reminder\models\Reminder;
 use common\modules\reminder\widgets\ReminderGridWidget;
 use common\widgets\address\AddressDetailView;
 use common\widgets\GridView;
-use yii\data\ActiveDataProvider;
 use yii\data\DataProviderInterface;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -28,6 +29,7 @@ use yii\widgets\DetailView;
 /* @var $onlyUser bool */
 /* @var $isOwner bool */
 /* @var $userIsFromMarket bool */
+/* @var $remindersDataProvider DataProviderInterface */
 /* @var $usersDataProvider null|DataProviderInterface */
 
 $this->title = $model->getName();
@@ -236,14 +238,20 @@ YiiAsset::register($this);
 
 
 			<?= ReminderGridWidget::widget([
-				'dataProvider' => new ActiveDataProvider(['query' => $model->getReminders()]),
-				'urlCreator' => static function ($action, $reminder, $key, $index) use ($model) {
-					return Url::toRoute([
-						'reminder/' . $action,
-						'reminder_id' => $reminder->id,
-						'lead_id' => $model->getId(),
-					]);
-				},
+				'dataProvider' => $remindersDataProvider,
+				'visibleUserColumn' => !$onlyUser,
+				'actionColumn' => [
+					'class' => LeadReminderActionColumn::class,
+					'urlCreator' => static function ($action, Reminder $reminder) use ($model) {
+						return Url::toRoute([
+							'reminder/' . $action,
+							'reminder_id' => $reminder->id,
+							'lead_id' => $model->getId(),
+						]);
+					},
+					'template' => '{not-done} {done} {update} {delete}',
+				],
+
 			]) ?>
 
 			<div class="clearfix"></div>

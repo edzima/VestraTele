@@ -13,8 +13,12 @@ use common\modules\reminder\models\Reminder;
  */
 class ReminderSearch extends Reminder {
 
+	protected const REMINDER_USER_AS_NULL = -1;
+
 	public ?bool $onlyToday = false;
 	public ?bool $onlyDelayed = true;
+
+	public bool $hideDone = true;
 
 	public ?string $dateStart = null;
 	public ?string $dateEnd = null;
@@ -78,13 +82,24 @@ class ReminderSearch extends Reminder {
 
 	protected function applyReminderFilter(ReminderQuery $query): void {
 		$this->applyDateFilter($query);
+		$this->applyHideDoneFilter($query);
+		$this->applyUserFilter($query);
 		$query->andFilterWhere([
 			'priority' => $this->priority,
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,
 		]);
-
 		$query->andFilterWhere(['like', 'details', $this->details]);
+	}
+
+	public function applyUserFilter(ReminderQuery $query): void {
+		if ((int) $this->user_id === static::REMINDER_USER_AS_NULL) {
+			$query->andWhere(Reminder::tableName() . '.user_id IS NULL');
+			return;
+		}
+		if (!empty($this->user_id)) {
+			$query->onlyUser($this->user_id, false);
+		}
 	}
 
 	protected function applyDateFilter(ReminderQuery $query): void {
@@ -96,5 +111,11 @@ class ReminderSearch extends Reminder {
 		}
 		$query->andFilterWhere(['>=', Reminder::tableName() . '.date_at', $this->dateStart]);
 		$query->andFilterWhere(['<=', Reminder::tableName() . '.date_at', $this->dateEnd]);
+	}
+
+	protected function applyHideDoneFilter(ReminderQuery $query) {
+		if ($this->hideDone) {
+			$query->andWhere(Reminder::tableName() . '.done_at IS NULL');
+		}
 	}
 }

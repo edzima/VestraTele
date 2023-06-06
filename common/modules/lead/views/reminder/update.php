@@ -1,12 +1,13 @@
 <?php
 
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\forms\LeadReminderForm;
 use common\modules\reminder\models\ReminderForm;
 use common\modules\reminder\widgets\ReminderFormWidget;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model ReminderForm */
+/* @var $model LeadReminderForm */
 /* @var $lead ActiveLead */
 
 $this->title = Yii::t('lead', 'Update Reminder for Lead: {lead}', ['lead' => $lead->getName()]);
@@ -21,5 +22,9 @@ $this->params['breadcrumbs'][] = Yii::t('common', 'Update');
 
 	<?= ReminderFormWidget::widget([
 		'model' => $model,
+		'users' => [
+			'items' => $model->getUsersNames(),
+			'prompt' => Yii::t('lead', 'For all Users in Lead.'),
+		],
 	]) ?>
 </div>

@@ -2,14 +2,30 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Url;
+use common\modules\lead\models\forms\LeadReminderForm;
 use common\modules\lead\models\LeadReminder;
 use common\modules\lead\models\searches\LeadReminderSearch;
 use common\modules\lead\models\searches\LeadSearch;
-use common\modules\reminder\models\ReminderForm;
 use Yii;
+use yii\filters\VerbFilter;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class ReminderController extends BaseController {
+
+	public function behaviors(): array {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'delete' => ['POST'],
+					'done' => ['POST'],
+					'not-done' => ['POST'],
+				],
+			],
+		];
+	}
 
 	public ?bool $allowDelete = true;
 
@@ -20,7 +36,7 @@ class ReminderController extends BaseController {
 				return Yii::$app->user->loginRequired();
 			}
 			$searchModel->setScenario(LeadSearch::SCENARIO_USER);
-			$searchModel->user_id = Yii::$app->user->getId();
+			$searchModel->leadUserId = Yii::$app->user->getId();
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -32,15 +48,13 @@ class ReminderController extends BaseController {
 
 	public function actionCreate(int $id) {
 		$lead = $this->findLead($id);
-		$model = new ReminderForm();
-		$model->date_at = date(DATE_ATOM, strtotime("+1 week"));
+		$model = new LeadReminderForm();
+		$model->setLead($this->findLead($id));
+		if ($this->module->onlyUser) {
+			$model->user_id = Yii::$app->user->getId();
+		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			$leadReminder = new LeadReminder([
-				'lead_id' => $lead->getId(),
-				'reminder_id' => $model->getModel()->id,
-			]);
-			$leadReminder->save();
 			return $this->redirect(['lead/view', 'id' => $id]);
 		}
 		return $this->render('create', [
@@ -49,10 +63,21 @@ class ReminderController extends BaseController {
 		]);
 	}
 
+	public function actionView(int $lead_id) {
+		return $this->redirectLead($lead_id);
+	}
+
 	public function actionUpdate(int $lead_id, int $reminder_id) {
 		$leadReminder = $this->findModel($lead_id, $reminder_id);
-		$model = new ReminderForm();
-		$model->setModel($leadReminder->reminder);
+		if ($leadReminder->reminder->user_id !== null && $leadReminder->reminder->user_id !== Yii::$app->user->getId()) {
+			throw new ForbiddenHttpException(
+				Yii::t('lead',
+					'Only General or Self Reminder can be updated.'
+				)
+			);
+		}
+		$model = new LeadReminderForm();
+		$model->setLeadReminder($leadReminder);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['lead/view', 'id' => $lead_id]);
 		}
@@ -69,6 +94,28 @@ class ReminderController extends BaseController {
 		return $this->redirect(['lead/view', 'id' => $lead_id]);
 	}
 
+	public function actionDone(int $lead_id, int $reminder_id, string $returnUrl = null) {
+		$model = $this->findModel($lead_id, $reminder_id);
+		if (!$model->reminder->isDone()) {
+			$model->reminder->markAsDone();
+			$model->reminder->save();
+		}
+		return $this->redirect($returnUrl ?: $this->redirectLead($lead_id));
+	}
+
+	public function actionNotDone(int $lead_id, int $reminder_id, string $returnUrl = null) {
+		$model = $this->findModel($lead_id, $reminder_id);
+		if ($model->reminder->isDone()) {
+			$model->reminder->unmarkAsDone();
+			$model->reminder->save();
+		}
+		return $this->redirect($returnUrl ?: $this->redirectLead($lead_id));
+	}
+
+	/**
+	 * @throws NotFoundHttpException
+	 * @throws ForbiddenHttpException
+	 */
 	private function findModel(int $lead_id, int $reminder_id): LeadReminder {
 		$model = LeadReminder::find()
 			->andWhere([
@@ -78,6 +125,10 @@ class ReminderController extends BaseController {
 			->one();
 		if ($model === null) {
 			throw new NotFoundHttpException();
+		}
+		/** @var LeadReminder $model */
+		if (!$this->module->manager->isForUser($model->lead)) {
+			throw new ForbiddenHttpException();
 		}
 		return $model;
 	}

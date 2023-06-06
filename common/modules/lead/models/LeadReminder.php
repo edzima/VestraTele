@@ -3,7 +3,9 @@
 namespace common\modules\lead\models;
 
 use common\modules\reminder\models\Reminder;
+use common\modules\reminder\models\ReminderInterface;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -15,7 +17,7 @@ use yii\db\ActiveRecord;
  * @property Lead $lead
  * @property Reminder $reminder
  */
-class LeadReminder extends ActiveRecord {
+class LeadReminder extends ActiveRecord implements ReminderInterface {
 
 	/**
 	 * {@inheritdoc}
@@ -51,7 +53,7 @@ class LeadReminder extends ActiveRecord {
 	/**
 	 * Gets query for [[Lead]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getLead() {
 		return $this->hasOne(Lead::class, ['id' => 'lead_id']);
@@ -60,9 +62,33 @@ class LeadReminder extends ActiveRecord {
 	/**
 	 * Gets query for [[Reminder]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getReminder() {
 		return $this->hasOne(Reminder::class, ['id' => 'reminder_id']);
+	}
+
+	public function getUserId(): ?int {
+		return $this->reminder->getUserId();
+	}
+
+	public function isDone(): bool {
+		return $this->reminder->isDone();
+	}
+
+	public function isDelayed(): bool {
+		return $this->reminder->isDelayed();
+	}
+
+	public function getDateAt(): string {
+		return $this->reminder->getDateAt();
+	}
+
+	public function getDoneAt(): ?string {
+		return $this->reminder->getDoneAt();
+	}
+
+	public function getPriority(): int {
+		return $this->reminder->getPriority();
 	}
 }
