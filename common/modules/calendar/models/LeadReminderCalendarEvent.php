@@ -13,6 +13,7 @@ class LeadReminderCalendarEvent extends FullCalendarEvent {
 	private LeadReminder $model;
 
 	public int $priority;
+	public bool $isDone;
 
 	public static function getPriorityColors(): array {
 		return [
@@ -32,6 +33,7 @@ class LeadReminderCalendarEvent extends FullCalendarEvent {
 		$this->priority = $model->reminder->priority;
 		$this->backgroundColor = $this->getBackgroundColor();
 		$this->borderColor = $this->getBorderColor();
+		$this->isDone = $model->isDone();
 	}
 
 	protected function getId(): string {

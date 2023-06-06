@@ -4,7 +4,7 @@ namespace common\modules\lead\widgets;
 
 use common\helpers\Html;
 use common\helpers\Url;
-use common\modules\lead\models\LeadReminder;
+use common\modules\reminder\models\ReminderInterface;
 use common\widgets\grid\ActionColumn;
 use Yii;
 
@@ -59,50 +59,50 @@ class LeadReminderActionColumn extends ActionColumn {
 		}
 	}
 
-	private function visibleNotDoneButton(LeadReminder $reminder) {
-		return $reminder->reminder->isDone() && $this->isForUserOrGeneral($reminder);
+	private function visibleNotDoneButton(ReminderInterface $reminder) {
+		return $reminder->isDone() && $this->isForUserOrGeneral($reminder);
 	}
 
-	private function visibleDoneButton(LeadReminder $reminder) {
-		return !$reminder->reminder->isDone() && $this->isForUserOrGeneral($reminder);
+	private function visibleDoneButton(ReminderInterface $reminder) {
+		return !$reminder->isDone() && $this->isForUserOrGeneral($reminder);
 	}
 
-	private function visibleDeleteButton(LeadReminder $reminder) {
+	private function visibleDeleteButton(ReminderInterface $reminder) {
 		return $this->isForUserOrGeneral($reminder);
 	}
 
-	private function visibleUdpateButton(LeadReminder $reminder) {
+	private function visibleUdpateButton(ReminderInterface $reminder) {
 		return $this->isForUserOrGeneral($reminder);
 	}
 
-	private function isForUserOrGeneral(LeadReminder $reminder): bool {
+	private function isForUserOrGeneral(ReminderInterface $reminder): bool {
 		if ($this->userId === null) {
 			return true;
 		}
-		return $reminder->reminder->user_id === null || $reminder->reminder->user_id === $this->userId;
+		return $reminder->getUserId() === null || $reminder->getUserId() === $this->userId;
 	}
 
 	private function initDefaultVisibleButtons() {
 		if (!isset($this->visibleButtons['delete'])) {
-			$this->visibleButtons['delete'] = function (LeadReminder $reminder): bool {
+			$this->visibleButtons['delete'] = function (ReminderInterface $reminder): bool {
 				return $this->visibleDeleteButton($reminder);
 			};
 		}
 
 		if (!isset($this->visibleButtons['update'])) {
-			$this->visibleButtons['update'] = function (LeadReminder $reminder): bool {
+			$this->visibleButtons['update'] = function (ReminderInterface $reminder): bool {
 				return $this->visibleUdpateButton($reminder);
 			};
 		}
 
 		if (!isset($this->visibleButtons['done'])) {
-			$this->visibleButtons['done'] = function (LeadReminder $reminder): bool {
+			$this->visibleButtons['done'] = function (ReminderInterface $reminder): bool {
 				return $this->visibleDoneButton($reminder);
 			};
 		}
 
 		if (!isset($this->visibleButtons['not-done'])) {
-			$this->visibleButtons['not-done'] = function (LeadReminder $reminder): bool {
+			$this->visibleButtons['not-done'] = function (ReminderInterface $reminder): bool {
 				return $this->visibleNotDoneButton($reminder);
 			};
 		}

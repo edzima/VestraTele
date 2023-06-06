@@ -1,8 +1,8 @@
 <?php
 
+use common\helpers\Html;
 use common\modules\calendar\CalendarAsset;
 use common\modules\lead\models\searches\LeadReminderSearch;
-use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
 
@@ -21,15 +21,21 @@ $props = [
 	'filterGroups' => [
 		[
 			'id' => 0,
-			'title' => 'Statusy',
+			'title' => Yii::t('lead', 'Statuses'),
 			'filteredPropertyName' => 'statusId',
 			'filters' => LeadReminderSearch::getStatusesFilters(),
 		],
 		[
 			'id' => 1,
-			'title' => 'Priorytet',
+			'title' => Yii::t('common', 'Priority'),
 			'filteredPropertyName' => 'priority',
 			'filters' => LeadReminderSearch::getPriorityFilters(),
+		],
+		[
+			'id' => 2,
+			'title' => Yii::t('lead', 'Is Done'),
+			'filteredPropertyName' => 'isDone',
+			'filters' => LeadReminderSearch::getIsDoneFilters(),
 		],
 	],
 	'eventSourcesConfig' => [

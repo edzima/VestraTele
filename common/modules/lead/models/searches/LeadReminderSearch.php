@@ -173,6 +173,25 @@ class LeadReminderSearch extends ReminderSearch {
 		return $options;
 	}
 
+	public static function getIsDoneFilters(): array {
+		return [
+			[
+				'label' => Yii::t('lead', 'Yes'),
+				'value' => true,
+				'isActive' => false,
+				'color' => 'green',
+
+			],
+			[
+				'label' => Yii::t('lead', 'No'),
+				'value' => false,
+				'isActive' => true,
+				'color' => 'grey',
+
+			],
+		];
+	}
+
 	public static function getStatusesFilters(): array {
 		$models = LeadStatus::find()
 			->andWhere('calendar_background IS NOT NULL')
