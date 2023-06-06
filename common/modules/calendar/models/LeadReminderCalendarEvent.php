@@ -17,8 +17,8 @@ class LeadReminderCalendarEvent extends FullCalendarEvent {
 
 	public static function getPriorityColors(): array {
 		return [
-			Reminder::PRIORITY_LOW => '#d4edda',
-			Reminder::PRIORITY_MEDIUM => '#ffeeba',
+			Reminder::PRIORITY_LOW => 'rgb(32, 169, 253)',
+			Reminder::PRIORITY_MEDIUM => 'rgb(232, 178, 15)',
 			Reminder::PRIORITY_HIGH => 'rgb(204, 0, 0)',
 		];
 	}

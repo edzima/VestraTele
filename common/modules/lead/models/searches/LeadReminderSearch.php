@@ -179,14 +179,14 @@ class LeadReminderSearch extends ReminderSearch {
 				'label' => Yii::t('lead', 'Yes'),
 				'value' => true,
 				'isActive' => false,
-				'color' => 'green',
+				'color' => '#67ca67',
 
 			],
 			[
 				'label' => Yii::t('lead', 'No'),
 				'value' => false,
 				'isActive' => true,
-				'color' => 'grey',
+				'color' => '#443e3e',
 
 			],
 		];
