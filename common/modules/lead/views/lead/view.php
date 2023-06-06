@@ -9,6 +9,7 @@ use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
+use common\modules\lead\widgets\LeadReminderActionColumn;
 use common\modules\lead\widgets\LeadReportWidget;
 use common\modules\lead\widgets\LeadSmsBtnWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
@@ -239,24 +240,18 @@ YiiAsset::register($this);
 			<?= ReminderGridWidget::widget([
 				'dataProvider' => $remindersDataProvider,
 				'visibleUserColumn' => !$onlyUser,
-				'urlCreator' => static function ($action, Reminder $reminder, $key, $index) use ($model) {
-					return Url::toRoute([
-						'reminder/' . $action,
-						'reminder_id' => $reminder->id,
-						'lead_id' => $model->getId(),
-					]);
-				},
-				'visibleButtons' => [
-					'done' => static function (Reminder $model) use ($onlyUser): bool {
-						return !$onlyUser || ($model->user_id === null || $model->user_id === Yii::$app->user->getId());
+				'actionColumn' => [
+					'class' => LeadReminderActionColumn::class,
+					'urlCreator' => static function ($action, Reminder $reminder) use ($model) {
+						return Url::toRoute([
+							'reminder/' . $action,
+							'reminder_id' => $reminder->id,
+							'lead_id' => $model->getId(),
+						]);
 					},
-					'update' => static function (Reminder $model) use ($onlyUser): bool {
-						return !$onlyUser || ($model->user_id === null || $model->user_id === Yii::$app->user->getId());
-					},
-					'delete' => static function (Reminder $model) use ($onlyUser): bool {
-						return !$onlyUser || ($model->user_id === null || $model->user_id === Yii::$app->user->getId());
-					},
+					'template' => '{not-done} {done} {update} {delete}',
 				],
+
 			]) ?>
 
 			<div class="clearfix"></div>

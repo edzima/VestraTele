@@ -2,7 +2,6 @@
 
 namespace common\modules\reminder\widgets;
 
-use Closure;
 use common\modules\reminder\models\Reminder;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -14,11 +13,9 @@ class ReminderGridWidget extends GridView {
 	public $emptyText = false;
 	public $summary = false;
 
-	public array $visibleButtons = [];
-	public string $actionController = '/reminder/reminder';
-
 	public bool $visibleUserColumn = true;
-	public ?Closure $urlCreator = null;
+
+	public array $actionColumn = [];
 
 	protected const ROW_CLASS_DONE = 'success';
 	protected const ROW_CLASS_DELAYED = 'danger';
@@ -71,13 +68,15 @@ class ReminderGridWidget extends GridView {
 			],
 			'created_at:date',
 			'updated_at:date',
-			[
-				'class' => ActionColumn::class,
-				'controller' => $this->actionController,
-				'urlCreator' => $this->urlCreator,
-				'template' => '{update} {delete}',
-				'visibleButtons' => $this->visibleButtons,
-			],
+			$this->getActionColumnConfig(),
 		];
+	}
+
+	protected function getActionColumnConfig(): array {
+		$options = $this->actionColumn;
+		if (!isset($options['class'])) {
+			$options['class'] = ActionColumn::class;
+		}
+		return $options;
 	}
 }
