@@ -26,7 +26,7 @@ use yii\db\ActiveRecord;
  * @property Lead[] $leads
  * @property User|null $user
  */
-class Reminder extends ActiveRecord {
+class Reminder extends ActiveRecord implements ReminderInterface {
 
 	public const PRIORITY_LOW = 0;
 	public const PRIORITY_MEDIUM = 50;
@@ -134,5 +134,21 @@ class Reminder extends ActiveRecord {
 
 	public function unmarkAsDone(): void {
 		$this->done_at = null;
+	}
+
+	public function getUserId(): ?int {
+		return $this->user_id;
+	}
+
+	public function getDateAt(): string {
+		return $this->date_at;
+	}
+
+	public function getDoneAt(): ?string {
+		return $this->done_at;
+	}
+
+	public function getPriority(): int {
+		return $this->priority;
 	}
 }
