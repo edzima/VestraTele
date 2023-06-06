@@ -3,6 +3,7 @@
 namespace common\modules\reminder\widgets;
 
 use common\modules\reminder\models\Reminder;
+use common\modules\reminder\models\ReminderInterface;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use Yii;
@@ -21,7 +22,7 @@ class ReminderGridWidget extends GridView {
 	protected const ROW_CLASS_DELAYED = 'danger';
 	protected const ROW_CLASS_NOT_DONE_AND_NOT_DELAYED = 'warning';
 
-	public static function htmlRowOptions(Reminder $model): array {
+	public static function htmlRowOptions(ReminderInterface $model): array {
 		if ($model->isDone()) {
 			return [
 				'class' => static::ROW_CLASS_DONE,

@@ -8,6 +8,8 @@ interface ReminderInterface {
 
 	public function isDone(): bool;
 
+	public function isDelayed(): bool;
+
 	public function getDateAt(): string;
 
 	public function getDoneAt(): ?string;

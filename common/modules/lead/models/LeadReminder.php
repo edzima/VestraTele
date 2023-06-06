@@ -76,6 +76,10 @@ class LeadReminder extends ActiveRecord implements ReminderInterface {
 		return $this->reminder->isDone();
 	}
 
+	public function isDelayed(): bool {
+		return $this->reminder->isDelayed();
+	}
+
 	public function getDateAt(): string {
 		return $this->reminder->getDateAt();
 	}

@@ -5,6 +5,7 @@ use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadReminderSearch;
 use common\modules\lead\widgets\LeadReminderActionColumn;
 use common\modules\reminder\models\Reminder;
+use common\modules\reminder\widgets\ReminderGridWidget;
 use common\widgets\GridView;
 use yii\data\DataProviderInterface;
 use yii\web\View;
@@ -34,6 +35,9 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'rowOptions' => function ($model) {
+			return ReminderGridWidget::htmlRowOptions($model);
+		},
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
 			[
