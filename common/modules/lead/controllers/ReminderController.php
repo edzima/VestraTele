@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Url;
 use common\modules\lead\models\forms\LeadReminderForm;
 use common\modules\lead\models\LeadReminder;
 use common\modules\lead\models\searches\LeadReminderSearch;
@@ -77,6 +78,24 @@ class ReminderController extends BaseController {
 		$model->delete();
 		$model->reminder->delete();
 		return $this->redirect(['lead/view', 'id' => $lead_id]);
+	}
+
+	public function actionDone(int $lead_id, int $reminder_id, string $returnUrl = null) {
+		$model = $this->findModel($lead_id, $reminder_id);
+		if (!$model->reminder->isDone()) {
+			$model->reminder->markAsDone();
+			$model->reminder->save();
+		}
+		return $this->redirect($returnUrl ?: Url::previous());
+	}
+
+	public function actionNotDone(int $lead_id, int $reminder_id, string $returnUrl = null) {
+		$model = $this->findModel($lead_id, $reminder_id);
+		if ($model->reminder->isDone()) {
+			$model->reminder->unmarkAsDone();
+			$model->reminder->save();
+		}
+		return $this->redirect($returnUrl ?: Url::previous());
 	}
 
 	/**

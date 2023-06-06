@@ -18,6 +18,7 @@ use yii\db\ActiveRecord;
  * @property int $created_at
  * @property int $updated_at
  * @property string $date_at
+ * @property string|null $done_at
  * @property int|null $user_id
  * @property string|null $details
  *
@@ -51,10 +52,10 @@ class Reminder extends ActiveRecord {
 		return [
 			[['priority', 'date_at'], 'required'],
 			[['priority'], 'integer'],
-			[['date_at'], 'safe'],
+			[['date_at', 'done_at'], 'safe'],
 			[['details'], 'string', 'max' => 255],
 			['priority', 'in', 'range' => array_keys(static::getPriorityNames())],
-			[['user_id'], 'default', 'value' => null],
+			[['user_id', 'done_at'], 'default', 'value' => null],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 		];
 	}
@@ -125,5 +126,13 @@ class Reminder extends ActiveRecord {
 	public function isDelayed(): bool {
 		return !$this->isDone()
 			&& (strtotime($this->date_at) < time());
+	}
+
+	public function markAsDone(): void {
+		$this->done_at = date(DATE_ATOM);
+	}
+
+	public function unmarkAsDone(): void {
+		$this->done_at = null;
 	}
 }

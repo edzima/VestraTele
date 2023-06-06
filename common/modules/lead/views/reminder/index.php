@@ -1,12 +1,10 @@
 <?php
 
 use common\helpers\Html;
-use common\helpers\Url;
-use common\modules\lead\models\LeadReminder;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadReminderSearch;
+use common\modules\lead\widgets\LeadReminderActionColumn;
 use common\modules\reminder\models\Reminder;
-use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use yii\data\DataProviderInterface;
 use yii\web\View;
@@ -22,7 +20,12 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="lead-reminder-index">
-	<h1><?= Html::encode($this->title) ?></h1>
+	<?= $searchModel->scenario === LeadReminderSearch::SCENARIO_USER
+		? Html::tag('h1', Html::encode($this->title))
+		: ''
+	?>
+
+
 	<p>
 		<?= Html::a(Yii::t('lead', 'Calendar'), ['/calendar/lead-reminder/index'], ['class' => 'btn btn-warning']) ?>
 	</p>
@@ -51,6 +54,13 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('lead', 'Lead Status'),
 			],
 			[
+				'attribute' => 'leadDateAt',
+				'value' => 'lead.date_at',
+				'label' => Yii::t('lead', 'Lead Date At'),
+				'format' => 'date',
+				'noWrap' => true,
+			],
+			[
 				'attribute' => 'details',
 				'value' => 'reminder.details',
 				'label' => $searchModel->getAttributeLabel('details'),
@@ -61,19 +71,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'reminder.priorityName',
 				'filter' => Reminder::getPriorityNames(),
 				'label' => $searchModel->getAttributeLabel('priority'),
-
-			],
-			[
-				'attribute' => 'created_at',
-				'format' => 'date',
-				'label' => $searchModel->getAttributeLabel('created_at'),
-				'value' => 'reminder.created_at',
-			],
-			[
-				'attribute' => 'updated_at',
-				'value' => 'reminder.updated_at',
-				'label' => $searchModel->getAttributeLabel('updated_at'),
-				'format' => 'date',
 			],
 			[
 				'attribute' => 'date_at',
@@ -81,18 +78,42 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => $searchModel->getAttributeLabel('date_at'),
 				'format' => 'date',
 			],
+			[
+				'attribute' => 'created_at',
+				'format' => 'date',
+				'label' => $searchModel->getAttributeLabel('created_at'),
+				'value' => 'reminder.created_at',
+				'visible' => $searchModel->scenario !== LeadReminderSearch::SCENARIO_USER,
+
+			],
+			[
+				'attribute' => 'updated_at',
+				'value' => 'reminder.updated_at',
+				'label' => $searchModel->getAttributeLabel('updated_at'),
+				'format' => 'date',
+			],
 
 			[
-				'class' => ActionColumn::class,
-				'buttons' => [
-					'view' => static function (string $url, LeadReminder $model): string {
-						$url = Url::toRoute(['lead/view', 'id' => $model->lead_id]);
-						return Html::a(Html::icon('eye-open'), $url);
-					},
-				],
+				'attribute' => 'done_at',
+				'value' => 'reminder.done_at',
+				'label' => $searchModel->getAttributeLabel('done_at'),
+				'format' => 'date',
+				'visible' => !$searchModel->hideDone,
+			],
+			[
+				'attribute' => 'user_id',
+				'value' => 'reminder.user',
+				'label' => $searchModel->getAttributeLabel('user_id'),
+				'filter' => $searchModel->getUsersNames(),
+				'visible' => $searchModel->scenario !== LeadReminderSearch::SCENARIO_USER,
+			],
+			[
+				'class' => LeadReminderActionColumn::class,
+				'userId' => $searchModel->scenario === LeadReminderSearch::SCENARIO_USER ? Yii::$app->user->getId() : null,
 			],
 		],
-	]); ?>
+	]);
+	?>
 
 
 </div>

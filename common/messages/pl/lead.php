@@ -410,4 +410,6 @@ return [
 	'Hide Done' => 'Ukryj Zrobione',
 	'Lead Date At' => 'Data Leada',
 	'Without User Reminder' => 'Nieprzypisany',
+	'Reminder mark as done' => 'Zrobione',
+	'Reminder unmark as done' => 'Do zrobienia',
 ];
