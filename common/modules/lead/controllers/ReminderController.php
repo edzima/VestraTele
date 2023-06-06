@@ -100,7 +100,7 @@ class ReminderController extends BaseController {
 			$model->reminder->markAsDone();
 			$model->reminder->save();
 		}
-		return $this->redirect($returnUrl ?: Url::previous());
+		return $this->redirect($returnUrl ?: $this->redirectLead($lead_id));
 	}
 
 	public function actionNotDone(int $lead_id, int $reminder_id, string $returnUrl = null) {
@@ -109,7 +109,7 @@ class ReminderController extends BaseController {
 			$model->reminder->unmarkAsDone();
 			$model->reminder->save();
 		}
-		return $this->redirect($returnUrl ?: Url::previous());
+		return $this->redirect($returnUrl ?: $this->redirectLead($lead_id));
 	}
 
 	/**
