@@ -8,10 +8,24 @@ use common\modules\lead\models\LeadReminder;
 use common\modules\lead\models\searches\LeadReminderSearch;
 use common\modules\lead\models\searches\LeadSearch;
 use Yii;
+use yii\filters\VerbFilter;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class ReminderController extends BaseController {
+
+	public function behaviors(): array {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'delete' => ['POST'],
+					'done' => ['POST'],
+					'not-done' => ['POST'],
+				],
+			],
+		];
+	}
 
 	public ?bool $allowDelete = true;
 
