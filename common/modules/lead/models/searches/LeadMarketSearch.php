@@ -3,6 +3,7 @@
 namespace common\modules\lead\models\searches;
 
 use common\models\AddressSearch;
+use common\models\query\PhonableQuery;
 use common\models\user\User;
 use common\modules\lead\models\entities\LeadMarketOptions;
 use common\modules\lead\models\Lead;
@@ -31,6 +32,7 @@ class LeadMarketSearch extends LeadMarket {
 	public $visibleArea;
 
 	public $leadSource;
+	public $leadPhone;
 	public $leadStatus;
 	public $leadName;
 	public $leadType;
@@ -49,6 +51,8 @@ class LeadMarketSearch extends LeadMarket {
 
 	public function attributeLabels(): array {
 		return parent::attributeLabels() + [
+				'leadPhone' => Yii::t('lead', 'Phone'),
+				'leadName' => Yii::t('lead', 'Lead'),
 				'leadStatus' => Yii::t('lead', 'Lead Status'),
 				'leadSource' => Yii::t('lead', 'Source'),
 				'selfAssign' => Yii::t('lead', 'Self Assign'),
@@ -85,7 +89,7 @@ class LeadMarketSearch extends LeadMarket {
 			[['withAddress', 'withPhone'], 'trim'],
 			[['selfAssign', 'selfMarket', 'withoutArchive', 'withAddress', 'withPhone'], 'boolean'],
 			[['withAddress', 'withPhone', 'selfAssign', 'selfMarket'], 'default', 'value' => null],
-			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details', 'leadName'], 'safe'],
+			[['created_at', 'updated_at', 'options', 'booleanOptions', 'details', 'leadName', 'leadPhone'], 'safe'],
 		];
 	}
 
@@ -142,6 +146,7 @@ class LeadMarketSearch extends LeadMarket {
 		}
 
 		$this->applyLeadNameFilter($query);
+		$this->applyLeadPhoneFilter($query);
 		$this->applyLeadSourceNameFilter($query);
 		$this->applyLeadStatusFilter($query);
 		$this->applyLeadTypeFilter($query);
@@ -341,6 +346,16 @@ class LeadMarketSearch extends LeadMarket {
 			$query->joinWith('lead');
 			$query->andWhere([
 				'like', Lead::tableName() . '.name', $this->leadName,
+			]);
+		}
+	}
+
+	private function applyLeadPhoneFilter(ActiveQuery $query) {
+		if (!empty($this->leadPhone)) {
+			$query->joinWith([
+				'lead' => function (PhonableQuery $query): void {
+					$query->withPhoneNumber($this->leadPhone);
+				},
 			]);
 		}
 	}

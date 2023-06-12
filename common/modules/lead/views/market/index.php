@@ -60,7 +60,18 @@ $this->params['breadcrumbs'][] = $this->title;
 						'lead/view', 'id' => $data->lead_id,
 					]);
 				},
+				'label' => $searchModel->getAttributeLabel('leadName'),
 				'format' => 'html',
+			],
+			[
+
+				'attribute' => 'leadPhone',
+				'value' => function (LeadMarket $data): ?string {
+					return $data->lead->getPhone();
+				},
+				'format' => 'tel',
+				'label' => $searchModel->getAttributeLabel('leadPhone'),
+				'visible' => !Module::getInstance()->onlyUser,
 			],
 			[
 				'attribute' => 'leadStatus',
