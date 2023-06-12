@@ -38,6 +38,7 @@ use yii\web\IdentityInterface;
  * @property integer|null $boss
  * @property-write string $password
  * @property-read UserProfile $profile
+ * @property-read UserProfile $userProfile
  * @property-read UserAddress[] $addresses
  * @property-read Address|null $homeAddress
  * @property-read Address|null $postalAddress
@@ -158,7 +159,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 				$name .= ' ' . $this->profile->firstname;
 			}
 		}
-		if (trim($name) === '') {
+		if (empty(trim($name))) {
 			$name = $this->username;
 		}
 		return $name;
