@@ -126,6 +126,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const PERMISSION_NOTE_UPDATE = 'note.update';
 	public const PERMISSION_ISSUE_VISIBLE_NOT_SELF = 'issue.visible_not_self';
 
+	private ?UserProfile $_profile = null;
 	private static $ROLES_NAMES;
 	private static $PERMISSIONS_NAMES;
 
@@ -257,7 +258,15 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	}
 
 	public function getProfile(): UserProfile {
-		return $this->userProfile ?: new UserProfile(['user_id' => $this->id]);
+		if ($this->_profile !== null) {
+			return $this->_profile;
+		}
+		$profile = $this->userProfile;
+		if ($profile === null) {
+			$profile = new UserProfile(['user_id' => $this->id]);
+		}
+		$this->_profile = $profile;
+		return $profile;
 	}
 
 	public function getHomeAddress(): ?Address {
