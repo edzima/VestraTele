@@ -43,6 +43,8 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 
 	public bool $bindIssueType = false;
 
+	public bool $pushMessageEnable = false;
+
 	protected ?IssueInterface $issue = null;
 
 	protected ?MessageTemplate $customerSMSTemplate = null;
@@ -137,6 +139,9 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 	}
 
 	public function pushMessages(): ?int {
+		if (!$this->pushMessageEnable) {
+			return null;
+		}
 		if (!$this->validate()) {
 			Yii::error($this->getErrors());
 			return false;
