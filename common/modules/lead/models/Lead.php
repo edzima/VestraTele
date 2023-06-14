@@ -56,6 +56,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 	public const PROVIDER_CZATER = 'czater';
 	public const PROVIDER_CENTRAL_PHONE = 'central-phone';
 	public const PROVIDER_FORM_ZAPIER = 'form.zapier';
+	public const PROVIDER_MESSAGE_ZAPIER = 'message.zapier';
 	public const PROVIDER_CRM_CUSTOMER = 'crm.customer';
 
 	private ?array $users_ids = null;
@@ -356,6 +357,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			static::PROVIDER_COPY => Yii::t('lead', 'Copy'),
 			static::PROVIDER_FORM_LANDING => Yii::t('lead', 'Form - Landing'),
 			static::PROVIDER_FORM_ZAPIER => Yii::t('lead', 'Form - Zapier'),
+			static::PROVIDER_MESSAGE_ZAPIER => Yii::t('lead', 'Message - Zapier'),
 			static::PROVIDER_CZATER => Yii::t('lead', 'Czater'),
 			static::PROVIDER_CRM_CUSTOMER => Yii::t('lead', 'CRM - Customer'),
 			static::PROVIDER_CENTRAL_PHONE => Yii::t('lead', 'Central phone'),

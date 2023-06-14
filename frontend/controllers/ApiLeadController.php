@@ -11,6 +11,7 @@ use common\modules\lead\models\forms\CustomerLeadForm;
 use common\modules\lead\models\forms\CzaterLeadForm;
 use common\modules\lead\models\forms\LandingLeadForm;
 use common\modules\lead\models\forms\LeadPushEmail;
+use common\modules\lead\models\forms\MessageZapierLeadForm;
 use common\modules\lead\models\forms\ZapierLeadForm;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadInterface;
@@ -33,6 +34,7 @@ class ApiLeadController extends Controller {
 			'customer' => ['POST'],
 			'landing' => ['POST'],
 			'zapier' => ['POST'],
+			'message-zapier' => ['POST'],
 		];
 	}
 
@@ -124,7 +126,39 @@ class ApiLeadController extends Controller {
 				'message' => 'Zapier lead with validate errors.',
 				'post' => Yii::$app->request->post(),
 				'error' => $model->getErrors(),
-			], 'lead.landing.error');
+			], 'lead.zapier.error');
+
+			return [
+				'status' => 'error',
+				'errors' => $model->getErrors(),
+			];
+		}
+		Yii::warning([
+			'message' => 'Zapier Lead not Loaded Data',
+			'post' => Yii::$app->request->post(),
+			'error' => $model->getErrors(),
+		], 'lead.zapier.error');
+		return [
+			'status' => 'warning',
+			'message' => 'Not Send Data',
+		];
+	}
+
+	public function actionMessageZapier() {
+		$model = new MessageZapierLeadForm();
+		$model->date_at = date($model->dateFormat);
+
+		if ($model->load(Yii::$app->request->post())) {
+			if ($model->validate() && $this->pushLead($model)) {
+				return [
+					'status' => 'success',
+				];
+			}
+			Yii::warning([
+				'message' => 'Message Zapier lead with validate errors.',
+				'post' => Yii::$app->request->post(),
+				'error' => $model->getErrors(),
+			], 'lead.message-zapier.error');
 
 			return [
 				'status' => 'error',
@@ -135,7 +169,7 @@ class ApiLeadController extends Controller {
 			'message' => 'Landing Lead not Loaded Data',
 			'post' => Yii::$app->request->post(),
 			'error' => $model->getErrors(),
-		], 'lead.landing.error');
+		], 'lead.message-zapier.error');
 		return [
 			'status' => 'warning',
 			'message' => 'Not Send Data',

@@ -415,4 +415,6 @@ return [
 	'Is Done' => 'Wykonano',
 	'Yes' => 'Tak',
 	'No' => 'Nie',
+	'Form - Zapier' => 'Formularz - Zapier (LeadsAds)',
+	'Message - Zapier' => 'Messanger - Zapier',
 ];
