@@ -11,6 +11,7 @@ use yii\web\View;
 /* @var $options array */
 /* @var $usersItems array */
 /* @var $usersOptions array|Closure */
+/* @var $fieldsOptions array */
 ?>
 
 
@@ -19,24 +20,29 @@ use yii\web\View;
 	<?php $form = ActiveForm::begin($options); ?>
 
 	<div class="row">
-		<?= $form->field($model, 'date_at', [
-			'options' => [
-				'class' => ['col-md-3 col-lg-2'],
+		<?= $form->field(
+			$model,
+			'date_at',
+			$fieldsOptions['date_at'] ?? []
+		)->widget(DateTimeWidget::class, [
+			'containerOptions' => [
+				'id' => 'reminder-date-widget',
 			],
-		])->widget(DateTimeWidget::class)
+		])
 		?>
 
 
-
-		<?= $form->field($model, 'priority', [
-			'options' => [
-				'class' => ['col-md-2 col-lg-1'],
-			],
-		])->dropDownList($model::getPriorityNames()) ?>
+		<?= $form->field(
+			$model,
+			'priority',
+			$fieldsOptions['priority'] ?? []
+		)->dropDownList($model::getPriorityNames()) ?>
 
 
 		<?= is_array($usersOptions) && !empty($usersItems)
-			? $form->field($model, 'user_id', [
+			? $form->field(
+				$model,
+				'user_id', [
 				'options' => [
 					'class' => ['col-md-3 col-lg-2'],
 				],
@@ -51,11 +57,11 @@ use yii\web\View;
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'details', [
-			'options' => [
-				'class' => ['col-md-8 col-lg-5'],
-			],
-		])->textarea(['maxlength' => true]) ?>
+		<?= $form->field(
+			$model,
+			'details',
+			$fieldsOptions['details'] ?? []
+		)->textarea(['maxlength' => true]) ?>
 	</div>
 
 
