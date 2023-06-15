@@ -242,16 +242,8 @@ YiiAsset::register($this);
 				'visibleUserColumn' => !$onlyUser,
 				'actionColumn' => [
 					'class' => LeadReminderActionColumn::class,
-					'urlCreator' => static function ($action, Reminder $reminder) use ($model) {
-						return Url::toRoute([
-							'reminder/' . $action,
-							'reminder_id' => $reminder->id,
-							'lead_id' => $model->getId(),
-						]);
-					},
 					'template' => '{not-done} {done} {update} {delete}',
 				],
-
 			]) ?>
 
 			<div class="clearfix"></div>

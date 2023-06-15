@@ -2,9 +2,8 @@
 
 namespace common\modules\reminder\widgets;
 
-use common\modules\reminder\models\Reminder;
 use common\modules\reminder\models\ReminderInterface;
-use common\widgets\grid\ActionColumn;
+use common\widgets\grid\ReminderActionColumn;
 use common\widgets\GridView;
 use Yii;
 
@@ -47,7 +46,7 @@ class ReminderGridWidget extends GridView {
 		}
 
 		if (empty($this->rowOptions)) {
-			$this->rowOptions = function (Reminder $model): array {
+			$this->rowOptions = function (ReminderInterface $model): array {
 				return static::htmlRowOptions($model);
 			};
 		}
@@ -57,18 +56,18 @@ class ReminderGridWidget extends GridView {
 
 	protected function defaultColumns(): array {
 		return [
-			'date_at:datetime',
-			'details',
+			'reminder.date_at:datetime',
+			'reminder.details',
 			[
-				'attribute' => 'priority',
-				'value' => 'priorityName',
+				'attribute' => 'reminder.priority',
+				'value' => 'reminder.priorityName',
 			],
 			[
-				'attribute' => 'user',
+				'attribute' => 'reminder.user',
 				'visible' => $this->visibleUserColumn,
 			],
-			'created_at:date',
-			'updated_at:date',
+			'reminder.created_at:date',
+			'reminder.updated_at:date',
 			$this->getActionColumnConfig(),
 		];
 	}
@@ -76,7 +75,7 @@ class ReminderGridWidget extends GridView {
 	protected function getActionColumnConfig(): array {
 		$options = $this->actionColumn;
 		if (!isset($options['class'])) {
-			$options['class'] = ActionColumn::class;
+			$options['class'] = ReminderActionColumn::class;
 		}
 		return $options;
 	}

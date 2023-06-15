@@ -2,7 +2,6 @@
 
 namespace common\modules\lead\controllers;
 
-use common\helpers\Url;
 use common\modules\lead\models\forms\LeadReminderForm;
 use common\modules\lead\models\LeadReminder;
 use common\modules\lead\models\searches\LeadReminderSearch;

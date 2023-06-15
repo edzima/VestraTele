@@ -204,6 +204,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->hasMany(Reminder::class, ['id' => 'reminder_id'])->viaTable(LeadReminder::tableName(), ['lead_id' => 'id']);
 	}
 
+	public function getLeadReminders(): ActiveQuery {
+		return $this->hasMany(LeadReminder::class, ['lead_id' => 'id']);
+	}
+
 	public function getReports(): ActiveQuery {
 		return $this->hasMany(LeadReport::class, ['lead_id' => 'id'])->indexBy('id')->orderBy([LeadReport::tableName() . '.created_at' => SORT_DESC]);
 	}
