@@ -43,7 +43,7 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 
 	public bool $bindIssueType = false;
 
-	public bool $pushMessageEnable = false;
+	public bool $pushMessageEnable = true;
 
 	protected ?IssueInterface $issue = null;
 
