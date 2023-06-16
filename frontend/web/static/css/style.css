@@ -381,3 +381,14 @@ div:target {
 .panel-transparent {
 	opacity: 0.5;
 }
+
+
+.reminder-grid-modal {
+	position: relative;
+}
+
+.reminder-grid-modal .create-btn {
+	position: absolute;
+	right: 7px;
+	top: 7px;
+}

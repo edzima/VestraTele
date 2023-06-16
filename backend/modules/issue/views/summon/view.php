@@ -1,16 +1,17 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
+use backend\helpers\Html;
 use common\models\issue\Summon;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\SummonDocsWidget;
-use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model Summon */
+/* @var $reminderPjaxId string */
 
 $this->title = Yii::t('common', 'Summon: {type}', ['type' => $model->typeName]);
 $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
@@ -20,7 +21,7 @@ YiiAsset::register($this);
 ?>
 <div class="summon-view">
 
-	<p>
+	<div class="form-group">
 
 		<?= !$model->isRealized() &&
 		($model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER))
@@ -43,10 +44,12 @@ YiiAsset::register($this);
 				])
 			: ''
 		?>
+
 		<?= $model->isForUser(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
 			? Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
 			: ''
 		?>
+
 
 
 		<?= $model->isOwner(Yii::$app->user->getId()) || Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)
@@ -61,7 +64,8 @@ YiiAsset::register($this);
 		?>
 
 
-	</p>
+	</div>
+
 
 	<?= SummonDocsWidget::widget([
 		'models' => $model->docsLink,
@@ -97,6 +101,13 @@ YiiAsset::register($this);
 		</div>
 
 		<div class="col-md-8">
+
+
+			<?= $this->render('_reminder-grid', [
+				'model' => $model,
+				'pjaxId' => $reminderPjaxId,
+			]) ?>
+
 			<?= IssueNotesWidget::widget([
 				'model' => $model->issue,
 				'notes' => $model->issue->getIssueNotes()->onlySummon($model->id)->all(),
