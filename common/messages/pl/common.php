@@ -360,4 +360,7 @@ return [
 	'Sort order' => 'Kolejność',
 	'Contact' => 'Kontakt',
 	'Without User - For All Users.' => 'Dla Wszystkich',
+	'Create Reminder' => 'Dodaj Przypomnienie',
+	'Reminder mark as done' => 'Wykonane',
+	'Reminder unmark as done' => 'Niewykonane',
 ];
