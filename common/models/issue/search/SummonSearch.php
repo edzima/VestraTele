@@ -142,6 +142,7 @@ class SummonSearch extends Summon implements
 		$query->with('owner.userProfile');
 		$query->with('contractor.userProfile');
 		$query->with('type');
+		$query->with('issue.tags');
 
 		// add conditions that should always apply here
 
