@@ -13,7 +13,10 @@ use yii\widgets\DetailView;
 /* @var $model Summon */
 /* @var $reminderPjaxId string */
 
-$this->title = Yii::t('common', 'Summon: {type}', ['type' => $model->typeName]);
+$this->title = Yii::t('common', 'Summon: {type} - {customer}', [
+	'type' => $model->typeName,
+	'customer' => $model->getIssueModel()->customer->getFullName(),
+]);
 $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Summons'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $model->typeName;
