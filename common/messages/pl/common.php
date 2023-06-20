@@ -208,6 +208,7 @@ return [
 	'Signi at' => 'Signi at',
 	'Create note for: {name}' => 'Dodaj notatkę dla: {name}',
 	'Summon {type}' => 'Zlecenie {type}',
+	'Summon: {type} - {customer}' => 'Zlecenie {type} - {customer}',
 	'Create note for settlement: {id}' => 'Create note for settlement: {id}',
 	'Phonable' => 'Telefoniczne',
 	'Incomplete documentation' => 'Dokumentacja niekompletna',
@@ -360,4 +361,7 @@ return [
 	'Sort order' => 'Kolejność',
 	'Contact' => 'Kontakt',
 	'Without User - For All Users.' => 'Dla Wszystkich',
+	'Create Reminder' => 'Dodaj Przypomnienie',
+	'Reminder mark as done' => 'Wykonane',
+	'Reminder unmark as done' => 'Niewykonane',
 ];

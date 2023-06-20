@@ -17,7 +17,7 @@ use yii\web\JsExpression;
 /* @var $indexUrl string */
 /* @var $searchModel ContactorSummonCalendarSearch */
 
-$this->title = Yii::t('issue', 'Calendar');
+$this->title = Yii::t('issue', 'Calendar - Summons');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Summons'), 'url' => $indexUrl];
 $this->params['breadcrumbs'][] = $this->title;
 $this->params['issueParentTypeNav'] = [
@@ -54,7 +54,7 @@ $filterGroups[] = [
 	//'id' => 2,
 	'title' => 'Rodzaj',
 	'filteredPropertyName' => 'is',
-	'filters' => ContactorSummonCalendarSearch::getKindFilterOptions(),
+	'filters' => $searchModel->getKindFilterOptions(),
 ];
 $httpParams = [
 	[
@@ -81,6 +81,13 @@ $props = [
 		[
 			'id' => 1,
 			'url' => Url::to(['summon-calendar/deadline']),
+			'allDayDefault' => true,
+			'urlUpdate' => '',
+			'editable' => false,
+		],
+		[
+			'id' => 2,
+			'url' => Url::to(['summon-calendar/reminder']),
 			'allDayDefault' => true,
 			'urlUpdate' => '',
 			'editable' => false,

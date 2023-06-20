@@ -8,6 +8,8 @@ use common\models\issue\Summon;
 use common\models\issue\SummonType;
 use common\models\user\User;
 use common\modules\calendar\models\SummonCalendarEvent;
+use common\modules\reminder\models\Reminder;
+use common\modules\reminder\models\ReminderQuery;
 use frontend\models\search\SummonSearch;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -15,6 +17,7 @@ use yii\data\ActiveDataProvider;
 class ContactorSummonCalendarSearch extends SummonSearch {
 
 	public const SCENARIO_DEADLINE = 'deadline';
+	public const SCENARIO_REMINDER = 'reminder';
 	public string $start;
 	public string $end;
 	public int $contractor_id;
@@ -22,26 +25,13 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 	public int $typeId;
 	public int $title;
 
-	protected const EVENT_CLASS = SummonCalendarEvent::class;
-
-	public static function getExcludedStatuses(): array {
-		return Summon::notActiveStatuses();
-	}
-
-	public static function getSelfContractorsNames(int $userId): array {
-		$ids = Summon::find()
-			->select('contractor_id')
-			->distinct()
-			->andWhere(['owner_id' => $userId])
-			->column();
-
-		$ids[] = $userId;
-		return User::getSelectList($ids, false);
-	}
+	public array $eventConfig = [
+		'class' => SummonCalendarEvent::class,
+	];
 
 	public function rules(): array {
 		return [
-			[['contractor_id', 'start', 'end'], 'required', 'on' => [static::SCENARIO_DEADLINE, static::SCENARIO_DEFAULT]],
+			[['contractor_id', 'start', 'end'], 'required', 'on' => [static::SCENARIO_DEADLINE, static::SCENARIO_DEFAULT, static::SCENARIO_REMINDER]],
 			[['contractor_id'], 'integer'],
 		];
 	}
@@ -49,15 +39,30 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 	public function getEventsData(array $config = []): array {
 		$data = [];
 		foreach ($this->search()->getModels() as $model) {
-			$event = static::createEvent($config);
-			if ($this->scenario === static::SCENARIO_DEADLINE) {
-				$event->is = SummonCalendarEvent::IS_DEADLINE;
+			/** @var Summon $model */
+			$event = $this->createEvent($config);
+			$event->is = $this->getEventKind();
+			if ($this->scenario === static::SCENARIO_REMINDER) {
+				$reminders = $this->getSummonReminders($model);
+				foreach ($reminders as $reminder) {
+					$event->setReminder($reminder);
+					$event->setModel($model);
+					$data[] = $event->toArray();
+				}
+			} else {
+				$event->setModel($model);
 			}
-			$event->setModel($model);
-
 			$data[] = $event->toArray();
 		}
 		return $data;
+	}
+
+	protected function getSummonReminders(Summon $model): array {
+		return array_filter($model->reminders, function (Reminder $reminder): bool {
+			$time = strtotime($reminder->date_at);
+			return $time > strtotime($this->start)
+				&& $time < strtotime($this->end);
+		});
 	}
 
 	/**
@@ -80,10 +85,9 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 			$query->andWhere('0=1');
 			return $dataProvider;
 		}
-		$query->andFilterWhere([
-			'NOT IN', Summon::tableName() . '.status', static::getExcludedStatuses(),
-		]);
+
 		$this->applyDateFilter($query);
+		$this->applyExcludedStatusesFilter($query);
 		$this->applyIssueParentTypeFilter($query);
 		$this->applyContractorFilter($query);
 		return $dataProvider;
@@ -95,6 +99,75 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 		]);
 	}
 
+	private function applyDateFilter(SummonQuery $query) {
+		switch ($this->scenario) {
+			case self::SCENARIO_DEADLINE:
+				$query
+					->andWhere(['>=', Summon::tableName() . '.deadline_at', $this->start])
+					->andWhere(['<=', Summon::tableName() . '.deadline_at', $this->end]);
+				break;
+			case self::SCENARIO_REMINDER:
+				$this->applyReminderFilter($query);
+				break;
+			default:
+				$query
+					->andWhere(['>=', Summon::tableName() . '.realize_at', $this->start])
+					->andWhere(['<=', Summon::tableName() . '.realize_at', $this->end]);
+				break;
+		}
+	}
+
+	protected function applyExcludedStatusesFilter(SummonQuery $query): void {
+		if ($this->scenario !== static::SCENARIO_REMINDER) {
+			$query->andFilterWhere([
+				'NOT IN', Summon::tableName() . '.status', static::getExcludedStatuses(),
+			]);
+		}
+	}
+
+	private function applyReminderFilter(SummonQuery $query): void {
+		if ($this->scenario === static::SCENARIO_REMINDER) {
+			$query->joinWith([
+				'reminders' => function (ReminderQuery $query) {
+					if (!empty($this->contractor_id)) {
+						$query->onlyUser($this->contractor_id);
+					}
+					$query
+						->andWhere(['>=', Reminder::tableName() . '.date_at', $this->start])
+						->andWhere(['<=', Reminder::tableName() . '.date_at', $this->end]);
+				},
+			]);
+		}
+	}
+
+	public function createEvent(array $config = []): SummonCalendarEvent {
+		$config = array_merge($config, $this->eventConfig);
+		if (!isset($config['class'])) {
+			$config['class'] = SummonCalendarEvent::class;
+		}
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
+		return Yii::createObject($config);
+	}
+
+	protected function getEventKind(): string {
+		switch ($this->scenario) {
+			case static::SCENARIO_DEADLINE:
+				return SummonCalendarEvent::IS_DEADLINE;
+			case static::SCENARIO_REMINDER:
+				return SummonCalendarEvent::IS_REMINDER;
+			default:
+				return SummonCalendarEvent::IS_SUMMON;
+		}
+	}
+
+	public static function getStatusesNames(): array {
+		$statuses = parent::getStatusesNames();
+		foreach (static::getExcludedStatuses() as $statusId) {
+			unset($statuses[$statusId]);
+		}
+		return $statuses;
+	}
+
 	public function getStatusFiltersOptions(): array {
 		$options = [];
 		$query = Summon::find()
@@ -104,7 +177,7 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 		$this->applyContractorFilter($query);
 		$ids = $query->column();
 		$statusNames = static::getStatusesNames();
-		$event = static::createEvent();
+		$event = $this->createEvent();
 		foreach ($statusNames as $statusId => $statusName) {
 			if (in_array($statusId, $ids)) {
 				$options[] = [
@@ -116,22 +189,6 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 			}
 		}
 		return $options;
-	}
-
-	public static function createEvent(array $config = []): SummonCalendarEvent {
-		if (!isset($config['class'])) {
-			$config['class'] = static::EVENT_CLASS;
-		}
-		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		return Yii::createObject($config);
-	}
-
-	public static function getStatusesNames(): array {
-		$statuses = parent::getStatusesNames();
-		foreach (static::getExcludedStatuses() as $statusId) {
-			unset($statuses[$statusId]);
-		}
-		return $statuses;
 	}
 
 	public function getTypesFilterOptions(): array {
@@ -164,32 +221,43 @@ class ContactorSummonCalendarSearch extends SummonSearch {
 		return $options;
 	}
 
-	public static function getKindFilterOptions(): array {
+	public static function getExcludedStatuses(): array {
+		return Summon::notActiveStatuses();
+	}
+
+	public function getKindFilterOptions(): array {
+		$event = $this->createEvent();
 		$options = [];
 		$options[] = [
 			'value' => SummonCalendarEvent::IS_SUMMON,
 			'isActive' => true,
 			'label' => Yii::t('issue', 'Summons'),
-			'color' => '#2196F3',
+			'color' => $event->borderColors[SummonCalendarEvent::IS_SUMMON] ?? '#2196F3',
 		];
 		$options[] = [
 			'value' => SummonCalendarEvent::IS_DEADLINE,
 			'isActive' => true,
 			'label' => Yii::t('issue', 'Deadline'),
-			'color' => SummonCalendarEvent::DEADLINE_BACKGROUND_COLOR,
+			'color' => $event->borderColors[SummonCalendarEvent::IS_DEADLINE] ?? 'red',
+		];
+		$options[] = [
+			'value' => SummonCalendarEvent::IS_REMINDER,
+			'isActive' => true,
+			'label' => Yii::t('issue', 'Reminder'),
+			'color' => $event->borderColors[SummonCalendarEvent::IS_REMINDER] ?? 'yellow',
 		];
 		return $options;
 	}
 
-	private function applyDateFilter(SummonQuery $query) {
-		if ($this->scenario === static::SCENARIO_DEADLINE) {
-			$query
-				->andWhere(['>=', Summon::tableName() . '.deadline_at', $this->start])
-				->andWhere(['<=', Summon::tableName() . '.deadline_at', $this->end]);
-			return;
-		}
-		$query
-			->andWhere(['>=', Summon::tableName() . '.realize_at', $this->start])
-			->andWhere(['<=', Summon::tableName() . '.realize_at', $this->end]);
+	public static function getSelfContractorsNames(int $userId): array {
+		$ids = Summon::find()
+			->select('contractor_id')
+			->distinct()
+			->andWhere(['owner_id' => $userId])
+			->column();
+
+		$ids[] = $userId;
+		return User::getSelectList($ids, false);
 	}
+
 }

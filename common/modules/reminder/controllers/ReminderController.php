@@ -5,6 +5,7 @@ namespace common\modules\reminder\controllers;
 use common\modules\reminder\models\ReminderForm;
 use common\modules\reminder\models\Reminder;
 use common\modules\reminder\models\searches\ReminderSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -26,6 +27,16 @@ class ReminderController extends Controller {
 					'delete' => ['POST'],
 				],
 			],
+			'access' => [
+				'class' => AccessControl::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'roles' => ['administrator'],
+					],
+				],
+			],
+
 		];
 	}
 

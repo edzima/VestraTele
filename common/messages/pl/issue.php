@@ -119,6 +119,7 @@ return [
 	'Set Empty for All Linked or set only selected.' => 'Zostaw niewypełnione dla WSZYSTKICH połączonych Spraw lub ogranicz do wybranych.',
 	'Used for the Calendar.' => 'Do Kalendarza',
 	'Calendar' => 'Kalendarz',
+	'Calendar - Summons' => 'Kalendarz Zleceń',
 	'Stage Deadline At' => 'Termin Etapu',
 	'Stages Deadlines' => 'Terminy Etapów',
 	'Lawyer' => 'Prawnik',
@@ -197,5 +198,6 @@ return [
 	'Details also in Linked Issues.' => 'Szczegóły w Połączonych Sprawach',
 	'Type additional Date at from' => 'Data (typu) od',
 	'Type additional Date at to' => 'Data (typu) do',
+	'Reminder' => 'Przypomnienia',
 
 ];

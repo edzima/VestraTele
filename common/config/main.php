@@ -13,6 +13,7 @@ use common\models\user\Worker;
 use common\modules\czater\Czater;
 use common\modules\lead\components\LeadClient;
 use common\modules\lead\Module as LeadModule;
+use common\modules\reminder\Module as ReminderModule;
 use edzima\teryt\Module as TerytModule;
 use Edzima\Yii2Adescom\AdescomSender;
 use Edzima\Yii2Adescom\AdescomSoap;
@@ -44,6 +45,9 @@ return [
 		'lead' => [
 			'class' => LeadModule::class,
 			'userClass' => User::class,
+		],
+		'reminder' => [
+			'class' => ReminderModule::class,
 		],
 	],
 	'components' => [

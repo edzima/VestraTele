@@ -19,6 +19,29 @@ class ReminderFormWidget extends Widget {
 	 */
 	public $users;
 
+	public $fieldsOptions = [
+		'date_at' => [
+			'options' => [
+				'class' => ['col-md-3 col-lg-2'],
+			],
+		],
+		'priority' => [
+			'options' => [
+				'class' => ['col-md-2 col-lg-1'],
+			],
+		],
+		'user_id' => [
+			'options' => [
+				'class' => ['col-md-3 col-lg-2'],
+			],
+		],
+		'details' => [
+			'options' => [
+				'class' => ['col-md-8 col-lg-5'],
+			],
+		],
+	];
+
 	public function run(): string {
 
 		$usersOptions = $this->users;
@@ -29,6 +52,7 @@ class ReminderFormWidget extends Widget {
 			'options' => $this->options,
 			'usersOptions' => $usersOptions,
 			'usersItems' => $usersItems,
+			'fieldsOptions' => $this->fieldsOptions,
 		]);
 	}
 }

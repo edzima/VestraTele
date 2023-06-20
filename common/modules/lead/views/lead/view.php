@@ -48,14 +48,6 @@ YiiAsset::register($this);
 
 		<?= ShortReportStatusesWidget::widget(['lead_id' => $model->getId()]) ?>
 
-		<?= Html::a(
-			Html::icon('calendar'),
-			['reminder/create', 'id' => $model->getId()], [
-			'title' => Yii::t('lead', 'Create Reminder'),
-			'aria-label' => Yii::t('lead', 'Create Reminder'),
-			'class' => 'btn btn-warning',
-		]) ?>
-
 		<?= !$userIsFromMarket
 			? Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->getId()], ['class' => 'btn btn-primary'])
 			: ''
@@ -130,6 +122,8 @@ YiiAsset::register($this);
 
 	<div class="row">
 		<div class="col-md-4">
+
+
 			<?= DetailView::widget([
 				'model' => $model,
 				'attributes' => [
@@ -197,6 +191,13 @@ YiiAsset::register($this);
 		</div>
 		<div class="col-md-8">
 
+			<?= $this->render('_reminder-grid', [
+				'model' => $model,
+				'onlyUser' => $onlyUser,
+				'dataProvider' => $remindersDataProvider,
+			]) ?>
+			<div class="clearfix"></div>
+
 
 			<?= LeadAnswersWidget::widget(['answers' => $model->answers]) ?>
 
@@ -233,26 +234,6 @@ YiiAsset::register($this);
 				])
 				: '' ?>
 
-
-			<div class="clearfix"></div>
-
-
-			<?= ReminderGridWidget::widget([
-				'dataProvider' => $remindersDataProvider,
-				'visibleUserColumn' => !$onlyUser,
-				'actionColumn' => [
-					'class' => LeadReminderActionColumn::class,
-					'urlCreator' => static function ($action, Reminder $reminder) use ($model) {
-						return Url::toRoute([
-							'reminder/' . $action,
-							'reminder_id' => $reminder->id,
-							'lead_id' => $model->getId(),
-						]);
-					},
-					'template' => '{not-done} {done} {update} {delete}',
-				],
-
-			]) ?>
 
 			<div class="clearfix"></div>
 

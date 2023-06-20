@@ -6,6 +6,8 @@ use common\helpers\ArrayHelper;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\SummonQuery;
 use common\models\user\User;
+use common\modules\reminder\models\Reminder;
+use common\modules\reminder\models\ReminderQuery;
 use edzima\teryt\models\Simc;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -25,6 +27,7 @@ use yii\db\ActiveRecord;
  * @property string|null $realize_at
  * @property string|null $realized_at
  * @property string|null $deadline_at
+ * @property string|null $reminder_at
  * @property int $issue_id
  * @property int $owner_id
  * @property int $contractor_id
@@ -45,6 +48,8 @@ use yii\db\ActiveRecord;
  * @property-read EntityResponsible $entityResponsible
  * @property-read SummonDoc[] $docs
  * @property-read SummonDocLink[] $docsLink
+ * @property-read Reminder[] $reminders
+ *
  */
 class Summon extends ActiveRecord implements IssueInterface {
 
@@ -231,6 +236,14 @@ class Summon extends ActiveRecord implements IssueInterface {
 		return $this->hasMany(SummonDocLink::class, ['summon_id' => 'id']);
 	}
 
+	public function getReminders(): ReminderQuery {
+		return $this->hasMany(Reminder::class, ['id' => 'reminder_id'])->via('remindersLink');
+	}
+
+	public function getRemindersLink() {
+		return $this->hasMany(SummonReminder::class, ['summon_id' => 'id']);
+	}
+
 	/**
 	 * Gets query for [[Contractor]].
 	 *
@@ -275,5 +288,10 @@ class Summon extends ActiveRecord implements IssueInterface {
 
 	public function getDocsCountSummary(): ?string {
 		return SummonDocLink::countSummary($this->docsLink);
+	}
+
+	public function isDelayed(): bool {
+		return !$this->isRealized()
+			&& (strtotime($this->deadline_at) < time());
 	}
 }

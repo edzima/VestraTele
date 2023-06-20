@@ -65,8 +65,14 @@ class SummonController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionView(int $id): string {
+		$model = $this->findModel($id);
+		if (Yii::$app->request->isPjax) {
+			return $this->renderAjax('_reminder-grid', [
+				'model' => $model,
+			]);
+		}
 		return $this->render('view', [
-			'model' => $this->findModel($id),
+			'model' => $model,
 		]);
 	}
 
@@ -142,6 +148,13 @@ class SummonController extends Controller {
 		}
 
 		return $this->redirect(['index']);
+	}
+
+	public function actionReminder(int $id) {
+		$model = $this->findModel($id);
+		if (!static::canUpdate($model)) {
+			throw new ForbiddenHttpException();
+		}
 	}
 
 	public function actionRealize(int $id, string $returnUrl = null) {
