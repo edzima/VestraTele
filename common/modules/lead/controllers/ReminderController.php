@@ -54,7 +54,17 @@ class ReminderController extends BaseController {
 		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			if (Yii::$app->request->isAjax) {
+				return $this->asJson([
+					'success' => true,
+				]);
+			}
 			return $this->redirect(['lead/view', 'id' => $id]);
+		}
+		if (Yii::$app->request->isAjax) {
+			return $this->renderAjax('form', [
+				'model' => $model,
+			]);
 		}
 		return $this->render('create', [
 			'model' => $model,
@@ -78,7 +88,17 @@ class ReminderController extends BaseController {
 		$model = new LeadReminderForm();
 		$model->setLeadReminder($leadReminder);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			if (Yii::$app->request->isAjax) {
+				return $this->asJson([
+					'success' => true,
+				]);
+			}
 			return $this->redirect(['lead/view', 'id' => $lead_id]);
+		}
+		if (Yii::$app->request->isAjax) {
+			return $this->renderAjax('form', [
+				'model' => $model,
+			]);
 		}
 		return $this->render('update', [
 			'model' => $model,

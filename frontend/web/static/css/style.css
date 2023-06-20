@@ -164,6 +164,10 @@ div.required label:after {
 	margin-top: 7px;
 }
 
+.d-inline {
+	display: inline-block;
+}
+
 /* task */
 
 .input-group-addon {

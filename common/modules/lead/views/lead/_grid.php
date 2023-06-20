@@ -205,6 +205,7 @@ foreach (LeadSearch::questions() as $question) {
 								[
 									'title' => Yii::t('lead', 'Move to Market'),
 									'aria-label' => Yii::t('lead', 'Move to Market'),
+									'data-pjax' => 0,
 								]
 							);
 						}
@@ -217,6 +218,7 @@ foreach (LeadSearch::questions() as $question) {
 							[
 								'title' => Yii::t('lead', 'Assign User'),
 								'aria-title' => Yii::t('lead', 'Assign User'),
+								'data-pjax' => 0,
 							]
 						);
 					},
@@ -227,6 +229,7 @@ foreach (LeadSearch::questions() as $question) {
 							[
 								'title' => Yii::t('lead', 'Create Report'),
 								'aria-title' => Yii::t('lead', 'Create Report'),
+								'data-pjax' => 0,
 							]
 						);
 					},
@@ -237,6 +240,7 @@ foreach (LeadSearch::questions() as $question) {
 							[
 								'title' => Yii::t('lead', 'Create Reminder'),
 								'aria-title' => Yii::t('lead', 'Create Reminder'),
+								'data-pjax' => 0,
 							]);
 					},
 					'sms' => static function (string $url, ActiveLead $model): string {
@@ -246,6 +250,7 @@ foreach (LeadSearch::questions() as $question) {
 								[
 									'title' => Yii::t('lead', 'Send SMS'),
 									'aria-label' => Yii::t('lead', 'Send SMS'),
+									'data-pjax' => 0,
 								]
 							);
 						}

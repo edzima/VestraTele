@@ -44,13 +44,6 @@ class SummonController extends Controller {
 				'success' => true,
 			]);
 		}
-		if ($model->hasErrors()) {
-			return $this->asJson([
-				'errors' => $model->getErrors(),
-				'usersIds' => $model->usersRange,
-
-			]);
-		}
 		return $this->renderAjax('form', [
 			'model' => $model,
 		]);

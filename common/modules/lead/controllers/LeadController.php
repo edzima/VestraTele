@@ -180,6 +180,25 @@ class LeadController extends BaseController {
 		 * @var Lead $model
 		 */
 		$model = $this->findLead($id);
+		$reminderQuery = $model->getLeadReminders()
+			->with([
+				'reminder' => function (ReminderQuery $query) {
+					if ($this->module->onlyUser) {
+						$query->onlyUser(Yii::$app->user->getId());
+					}
+				},
+			]);
+		$remindersDataProvider = new ActiveDataProvider([
+			'query' => $reminderQuery,
+		]);
+		if (Yii::$app->request->isPjax) {
+			return $this->renderAjax('_reminder-grid', [
+				'model' => $model,
+				'dataProvider' => $remindersDataProvider,
+				'onlyUser' => $this->module->onlyUser,
+			]);
+		}
+
 		$userIsFromMarket = $this->module->market->isFromMarket($model->getUsers(), Yii::$app->user->getId());
 		if (
 			$userIsFromMarket
@@ -228,17 +247,6 @@ class LeadController extends BaseController {
 				'allModels' => $users,
 			]);
 		}
-		$reminderQuery = $model->getLeadReminders()
-			->with([
-				'reminder' => function (ReminderQuery $query) {
-					if ($this->module->onlyUser) {
-						$query->onlyUser(Yii::$app->user->getId());
-					}
-				},
-			]);
-		$remindersDataProvider = new ActiveDataProvider([
-			'query' => $reminderQuery,
-		]);
 
 		return $this->render('view', [
 			'model' => $model,
