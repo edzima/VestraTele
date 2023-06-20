@@ -38,6 +38,20 @@ class ReminderActionColumn extends ActionColumn {
 				);
 			};
 		}
+		if (!isset($this->buttons['delete'])) {
+			$this->buttons['delete'] = function (string $url): string {
+				$url .= '&returnUrl=' . $this->returnUrl;
+				return Html::a(
+					Html::icon('trash'),
+					$url,
+					[
+						'title' => Yii::t('common', 'Delete'),
+						'aria-label' => Yii::t('common', 'Delete'),
+						'data-method' => 'POST',
+					]
+				);
+			};
+		}
 		parent::initDefaultButtons();
 		if (!isset($this->buttons['done'])) {
 			$this->buttons['done'] = function (string $url): string {

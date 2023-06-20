@@ -48,7 +48,7 @@ class SummonCalendarController extends Controller {
 
 	public function actionIndex(int $userId = null, int $parentTypeId = null): string {
 		$users = null;
-		if ($userId === null) {
+		if ($userId === null && !Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)) {
 			$userId = Yii::$app->user->getId();
 		}
 		$searchModel = new ContactorSummonCalendarSearch();
@@ -61,7 +61,7 @@ class SummonCalendarController extends Controller {
 		}
 		return $this->render('index', [
 			'users' => $users,
-			'user_id' => $userId,
+			'user_id' => $userId ? $userId : '',
 			'indexUrl' => Url::to($this->summonIndexRoute),
 			'searchModel' => $searchModel,
 		]);
@@ -106,6 +106,26 @@ class SummonCalendarController extends Controller {
 		]));
 	}
 
+	public function actionReminder(string $start = null, string $end = null, int $userId = null, int $parentTypeId = null): Response {
+		if ($start === null) {
+			$start = date('Y-m-01');
+		}
+		if ($end === null) {
+			$end = date('Y-m-t 23:59:59');
+		}
+
+		$model = new ContactorSummonCalendarSearch();
+		$model->scenario = ContactorSummonCalendarSearch::SCENARIO_REMINDER;
+		$model->issueParentTypeId = $parentTypeId;
+		$model->contractor_id = $this->ensureUserId($userId);
+		$model->start = $start;
+		$model->end = $end;
+
+		return $this->asJson($model->getEventsData([
+			'urlRoute' => $this->summonViewRoute,
+		]));
+	}
+
 	protected function ensureUserId(int $userId = null): int {
 		if ($userId === null) {
 			$userId = Yii::$app->user->getId();
@@ -123,6 +143,7 @@ class SummonCalendarController extends Controller {
 	}
 
 	public function actionUpdate(int $id, string $start_at): Response {
+		//@todo add type event to params and update for them date
 		$model = new SummonCalendarEvent();
 		$model->id = $id;
 		try {

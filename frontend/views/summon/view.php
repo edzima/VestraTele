@@ -87,6 +87,12 @@ YiiAsset::register($this);
 		</div>
 		<div class="col-md-7">
 
+			<?= $this->render('_reminder-grid', [
+				'model' => $model,
+			])
+			?>
+
+
 			<p>
 				<?= Yii::$app->user->can(User::PERMISSION_NOTE)
 					? Html::a(Yii::t('common', 'Create note'), ['/note/summon', 'id' => $model->id], [

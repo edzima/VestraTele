@@ -66,16 +66,13 @@ class SummonController extends Controller {
 	 */
 	public function actionView(int $id): string {
 		$model = $this->findModel($id);
-		$reminderPjaxId = 'reminder-pjax';
 		if (Yii::$app->request->isPjax) {
 			return $this->renderAjax('_reminder-grid', [
 				'model' => $model,
-				'pjaxId' => $reminderPjaxId,
 			]);
 		}
 		return $this->render('view', [
 			'model' => $model,
-			'reminderPjaxId' => $reminderPjaxId,
 		]);
 	}
 

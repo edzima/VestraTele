@@ -94,9 +94,6 @@ class SummonController extends Controller {
 			$model->reminder->markAsDone();
 			$model->reminder->save();
 		}
-		if (Yii::$app->request->isAjax) {
-			return $this->asJson(['success' => true]);
-		}
 		return $returnUrl ? $this->redirect($returnUrl) : $this->redirectSummon($summon_id);
 	}
 
