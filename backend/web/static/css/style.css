@@ -278,4 +278,5 @@ div:target {
 	position: absolute;
 	right: 7px;
 	top: 7px;
+	z-index: 100;
 }

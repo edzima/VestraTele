@@ -5,14 +5,21 @@ namespace common\modules\calendar\models;
 use common\helpers\Html;
 use common\helpers\Url;
 use common\models\issue\Summon;
+use common\modules\reminder\models\Reminder;
 use Yii;
 
 class SummonCalendarEvent extends FullCalendarEvent {
 
 	public const IS_SUMMON = 'summon';
 	public const IS_DEADLINE = 'deadline';
-	public const DEADLINE_BACKGROUND_COLOR = 'red';
+
+	public const IS_REMINDER = 'reminder';
 	public string $is = self::IS_SUMMON;
+
+	public array $borderColors = [
+		self::IS_DEADLINE => '#c44119',
+		self::IS_REMINDER => '#ffbf00',
+	];
 
 	public int $statusId;
 	public ?string $phone = null;
@@ -22,6 +29,7 @@ class SummonCalendarEvent extends FullCalendarEvent {
 	protected string $urlRoute = '/summon/view';
 
 	private ?Summon $model = null;
+	private ?Reminder $reminder = null;
 
 	public function setUrlRoute(string $route): void {
 		$this->urlRoute = $route;
@@ -96,19 +104,28 @@ class SummonCalendarEvent extends FullCalendarEvent {
 		$this->tooltipContent = $this->getTooltipContent();
 	}
 
+	public function setReminder(Reminder $reminder) {
+		$this->reminder = $reminder;
+		$this->id = $this->model->id . ', ' . $this->reminder->id;
+	}
+
 	protected function getUrl(): string {
 		return Url::to([$this->urlRoute, 'id' => $this->getModel()->id]);
 	}
 
 	protected function getStart(): string {
-		return $this->is === static::IS_DEADLINE ? $this->getModel()->deadline_at : $this->getModel()->realize_at;
+		switch ($this->is) {
+			case static::IS_DEADLINE:
+				return $this->getModel()->deadline_at;
+			case static::IS_REMINDER:
+				return $this->reminder->date_at;
+			default:
+				return $this->getModel()->realize_at;
+		}
 	}
 
 	protected function getBorderColor(): string {
-		if ($this->is === static::IS_DEADLINE) {
-			return static::DEADLINE_BACKGROUND_COLOR;
-		}
-		return $this->getBackgroundColor();
+		return $this->borderColors[$this->is] ?? $this->getBackgroundColor();
 	}
 
 	protected function getBackgroundColor(): string {
@@ -116,7 +133,11 @@ class SummonCalendarEvent extends FullCalendarEvent {
 	}
 
 	protected function getTooltipContent(): ?string {
-		$title = $this->getModel()->getTitleWithDocs();
+		if ($this->reminder !== null && $this->is === static::IS_REMINDER) {
+			$title = $this->reminder->details;
+		} else {
+			$title = $this->getModel()->getTitleWithDocs();
+		}
 		if ($title) {
 			return Html::encode($title);
 		}
