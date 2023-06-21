@@ -24,25 +24,27 @@ class NoteDescriptionListAction extends Action
     public function run(string $term = null): array
     {
         if (strlen($term) >= $this->minLength) {
-            return IssueNote::find()
-                ->select('description')
-                ->andWhere(['is_template' => true])
-                ->andWhere(['like', 'description', $term])
-                ->distinct()
-                ->limit($this->limit)
-                ->addOrderBy(new Expression(
-                    'CASE'
-                    . " WHEN description like :description THEN 1"
-                    . " WHEN description like :descriptionBegin THEN 2"
-                    . " WHEN description like :descriptionBetween THEN 4"
-                    . " ELSE 3 END"
-                    , [
-                    'description' => $term,
-                    'descriptionBegin' => $term . '%',
-                    'descriptionBetween' => '%' . $term . '%'
-                ]))
-                ->column();
-        }
+			$descriptions = IssueNote::find()
+				->select('description')
+				->andWhere(['is_template' => true])
+				->andWhere(['like', 'description', $term])
+				->distinct()
+				->limit($this->limit)
+				->addOrderBy(new Expression(
+					'CASE'
+					. " WHEN description like :description THEN 1"
+					. " WHEN description like :descriptionBegin THEN 2"
+					. " WHEN description like :descriptionBetween THEN 4"
+					. " ELSE 3 END"
+					, [
+					'description' => $term,
+					'descriptionBegin' => $term . '%',
+					'descriptionBetween' => '%' . $term . '%',
+				]))
+				->column();
+			sort($descriptions);
+			return $descriptions;
+		}
         return [];
     }
 }
