@@ -50,6 +50,8 @@ class IssueStageChangeForm extends Model {
 			['stage_id', 'compare', 'operator' => '!=', 'compareValue' => $this->getIssue()->getIssueStageId(), 'message' => Yii::t('issue', 'New Stage must be other than old.')],
 			['stage_id', 'in', 'range' => array_keys($this->getStagesData())],
 			[['description', 'archives_nr'], 'string'],
+			[['description', 'archives_nr'], 'trim'],
+			[['description', 'archives_nr'], 'default', 'value' => null],
 			['linkedIssuesMessages', 'boolean'],
 			['date_at', 'date', 'format' => 'php:' . $this->dateFormat],
 			[
