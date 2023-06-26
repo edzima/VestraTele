@@ -15,6 +15,11 @@ use yii\helpers\Console;
 
 class IssueUpgradeController extends Controller {
 
+	public function actionArchive(): void {
+		$count = Issue::updateAll(['archives_nr' => null], ['archives_nr' => '']);
+		Console::output('Update empty archives Issues: ' . $count);
+	}
+
 	public function actionLinkedIssuesNote(): void {
 		$notes = IssueNote::find()
 			->groupBy([
