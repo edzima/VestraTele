@@ -76,7 +76,11 @@ class Module extends BaseModule {
 						'controllers' => ['issue/claim'],
 						'permissions' => [Worker::PERMISSION_ISSUE_CLAIM],
 					],
-
+					[
+						'allow' => true,
+						'controllers' => ['issue/issue', 'issue/archive'],
+						'permissions' => [Worker::PERMISSION_ARCHIVE],
+					],
 					[
 						'allow' => true,
 						'controllers' => ['issue/stage', 'issue/stage-type'],

@@ -23,26 +23,27 @@ class NoteTitleListAction extends Action
     public function run(string $term = null): array
     {
         if (strlen($term) >= $this->minLength) {
-            return IssueNote::find()
-                ->select('title')
-                ->where(['like', 'title', $term])
-                ->andWhere(['is_template' => true])
-                ->distinct()
-                ->limit($this->limit)
-                ->addOrderBy(new Expression(
-                    'CASE'
-                    . " WHEN title like :title THEN 1"
-                    . " WHEN title like :titleBegin THEN 2"
-                    . " WHEN title like :titleBetween THEN 4"
-                    . " ELSE 3 END"
-                    , [
-                    'title' => $term,
-                    'titleBegin' => $term . '%',
-                    'titleBetween' => '%' . $term . '%'
-                ]))
-                ->column();
-
-        }
+			$titles = IssueNote::find()
+				->select('title')
+				->where(['like', 'title', $term])
+				->andWhere(['is_template' => true])
+				->distinct()
+				->limit($this->limit)
+				->addOrderBy(new Expression(
+					'CASE'
+					. " WHEN title like :title THEN 1"
+					. " WHEN title like :titleBegin THEN 2"
+					. " WHEN title like :titleBetween THEN 4"
+					. " ELSE 3 END"
+					, [
+					'title' => $term,
+					'titleBegin' => $term . '%',
+					'titleBetween' => '%' . $term . '%',
+				]))
+				->column();
+			sort($titles);
+			return $titles;
+		}
         return [];
     }
 }

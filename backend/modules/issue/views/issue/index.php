@@ -74,6 +74,17 @@ $this->params['issueParentTypeNav'] = [
 			: ''
 		?>
 
+		<?= Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)
+			? Html::a('<i class="fa fa-archive"></i>', ['archive/index'],
+				[
+					'class' => 'btn btn-danger',
+					'title' => Yii::t('issue', 'Archive'),
+					'aria-label' => Yii::t('issue', 'Archive'),
+					'data-pjax' => 0,
+				])
+			: ''
+		?>
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
 			? CsvForm::widget([
 				'formOptions' => ['class' => 'pull-right'],

@@ -72,7 +72,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	 * @inheritdoc
 	 */
 	public static function tableName(): string {
-		return 'issue';
+		return '{{%issue}}';
 	}
 
 	public function behaviors(): array {
@@ -93,7 +93,9 @@ class Issue extends ActiveRecord implements IssueInterface {
 			[['created_at', 'updated_at'], 'safe'],
 			[['stage_id', 'type_id', 'entity_responsible_id',], 'required',],
 			[['stage_id', 'type_id', 'entity_responsible_id'], 'integer'],
-			[['details', 'signature_act'], 'string'],
+			[['details', 'signature_act', 'archives_nr'], 'string'],
+			[['details', 'signature_act', 'archives_nr'], 'trim'],
+			[['details', 'signature_act', 'archives_nr'], 'default', 'value' => null],
 			[['entity_responsible_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_responsible_id' => 'id']],
 			[['stage_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueStage::class, 'targetAttribute' => ['stage_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueType::class, 'targetAttribute' => ['type_id' => 'id']],

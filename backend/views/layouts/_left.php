@@ -190,6 +190,12 @@ $user = Yii::$app->user;
 							'items' => Html::issueParentTypeItems(),
 						],
 						[
+							'label' => Yii::t('issue', 'Archive'),
+							'url' => ['/issue/archive/index'],
+							'icon' => '<i class="fa fa-archive"></i>',
+							'visible' => $user->can(Worker::PERMISSION_ARCHIVE),
+						],
+						[
 							'label' => Yii::t('common', 'Issues users'),
 							'url' => ['/issue/user/index'],
 							'icon' => '<i class="fa fa-users"></i>',

@@ -1,6 +1,7 @@
 <?php
 
 return [
+	'Archive' => 'Archiwum',
 	'Client' => 'Klient',
 	'Create Issue Note' => 'Dodaj notatkę',
 	'Create Issue Note for: {issue}' => 'Dodaj notatkę do sprawy: {issue}',
@@ -199,5 +200,4 @@ return [
 	'Type additional Date at from' => 'Data (typu) od',
 	'Type additional Date at to' => 'Data (typu) do',
 	'Reminder' => 'Przypomnienia',
-
 ];
