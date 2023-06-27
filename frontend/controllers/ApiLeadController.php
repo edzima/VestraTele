@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\components\callpage\CallPageClient;
 use common\models\KeyStorageItem;
 use common\models\user\User;
 use common\modules\lead\components\LeadManager;
@@ -201,6 +202,7 @@ class ApiLeadController extends Controller {
 		$lead = $event->getLead();
 		$this->sendEmail($lead);
 		$this->sendSms($lead);
+		$this->pushCall($lead);
 	}
 
 	private function sendEmail(LeadInterface $lead): void {
@@ -253,5 +255,21 @@ class ApiLeadController extends Controller {
 			&& !empty($lead->getSource()->getPhone())
 			&& $lead->getProvider() !== Lead::PROVIDER_CRM_CUSTOMER
 			&& $this->getSmsOwnerId() !== null;
+	}
+
+	private function pushCall(LeadInterface $lead): bool {
+		if (empty($lead->getPhone())) {
+			return false;
+		}
+		if (empty($lead->getSource()->getCallPageWidgetId())) {
+			return false;
+		}
+
+		$callPage = Yii::$app->get('callPageClient', false);
+		if ($callPage === null) {
+			return false;
+		}
+		/** @var CallPageClient $callPage */
+		return $callPage->simpleCall($lead->getSource()->getCallPageWidgetId(), $lead->getPhone());
 	}
 }

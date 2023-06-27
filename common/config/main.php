@@ -1,5 +1,6 @@
 <?php
 
+use common\components\callpage\CallPageClient;
 use common\components\DbManager;
 use common\components\Formatter;
 use common\components\HierarchyComponent;
@@ -22,7 +23,7 @@ use yii\caching\FileCache;
 use yii\mutex\MysqlMutex;
 use yii\queue\db\Queue;
 
-return [
+$config = [
 	'name' => $_ENV['APP_NAME'],
 	'vendorPath' => dirname(__DIR__, 2) . '/vendor',
 	'extensions' => require(__DIR__ . '/../../vendor/yiisoft/extensions.php'),
@@ -51,10 +52,6 @@ return [
 		],
 	],
 	'components' => [
-		'czater' => [
-			'class' => Czater::class,
-			'apiKey' => $_ENV['CZATER_API_KEY'],
-		],
 		'db' => [
 			'class' => 'yii\db\Connection',
 			'dsn' => getenv('DB_DSN'),
@@ -183,3 +180,19 @@ return [
 		],
 	],
 ];
+if (isset($_ENV['CALLPAGE_API_KEY'])) {
+	$config['components']['callPageClient'] = [
+		'class' => CallPageClient::class,
+		'apiKey' => $_ENV['CALLPAGE_API_KEY'],
+	];
+}
+
+if (isset($_ENV['CZATER_API_KEY'])) {
+	$config['components']['czater'] = [
+		'class' => Czater::class,
+		'apiKey' => $_ENV['CZATER_API_KEY'],
+	];
+}
+
+return $config;
+

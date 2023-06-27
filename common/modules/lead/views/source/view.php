@@ -42,6 +42,7 @@ YiiAsset::register($this);
 			'owner',
 			'phone:tel',
 			'dialer_phone',
+			'call_page_widget_id',
 			'sort_index',
 			'sms_push_template:ntext',
 		],

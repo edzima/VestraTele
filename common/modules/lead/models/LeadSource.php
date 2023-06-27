@@ -22,6 +22,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null $sort_index
  * @property int|null $owner_id
  * @property int|null $is_active
+ * @property int|null $call_page_widget_id
  *
  * @property-read Lead[] $leads
  * @property-read LeadType $leadType
@@ -58,7 +59,7 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 		return [
 			[['name', 'type_id'], 'required'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
-			[['sort_index'], 'integer'],
+			[['sort_index', 'call_page_widget_id'], 'integer'],
 			[['is_active'], 'boolean'],
 			[['name', 'url'], 'string', 'max' => 255],
 			[['phone', 'dialer_phone'], 'string', 'max' => 30],
@@ -82,6 +83,7 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 			'type_id' => Yii::t('lead', 'Type'),
 			'is_active' => Yii::t('lead', 'Is Active'),
 			'sms_push_template' => Yii::t('lead', 'SMS Push Template'),
+			'call_page_widget_id' => Yii::t('lead', 'CallPage Widget ID'),
 		];
 	}
 
@@ -195,6 +197,10 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 
 	public function getDialerPhone(): ?string {
 		return $this->dialer_phone;
+	}
+
+	public function getCallPageWidgetId(): ?int {
+		return $this->call_page_widget_id;
 	}
 
 	public static function typeId(int $sourceId): int {

@@ -1,5 +1,6 @@
 <?php
 
+use common\components\callpage\CallPageClient;
 use common\components\Formatter;
 use common\components\HierarchyComponent;
 use common\components\keyStorage\KeyStorage;
@@ -31,6 +32,7 @@ class Yii extends BaseYii {
  *
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  * @mixin yii\web\Application|yii\web\Application
+ * @property CallPageClient|null $callPageClient
  * @property Formatter $formatter
  * @property LeadClient $leadClient
  * @property-read MessageTemplateManager $messageTemplate
