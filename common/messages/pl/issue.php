@@ -200,4 +200,6 @@ return [
 	'Type additional Date at from' => 'Data (typu) od',
 	'Type additional Date at to' => 'Data (typu) do',
 	'Reminder' => 'Przypomnienia',
+	'Update linked Issues.' => 'Aktualizuj również połączone.',
+	'Linked Issues Attributes' => 'Pola do aktualizacji Połączonych Spraw',
 ];

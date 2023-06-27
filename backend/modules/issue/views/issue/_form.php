@@ -147,7 +147,7 @@ use yii\widgets\ActiveForm;
 			<?= !empty($model->getLinkedIssuesNames())
 				? $form->field($model, 'linkedIssuesIds', [
 					'options' => [
-						'class' => 'col-md-12',
+						'class' => 'col-md-6',
 					],
 				])
 					->widget(Select2::class, [
@@ -156,7 +156,23 @@ use yii\widgets\ActiveForm;
 							'multiple' => true,
 						],
 					])
-					->hint(Yii::t('issue', 'Details also in Linked Issues.'))
+					->hint(Yii::t('issue', 'Update linked Issues.'))
+				: ''
+			?>
+
+			<?= !empty($model->getLinkedIssuesNames())
+				? $form->field($model, 'linkedIssuesAttributes', [
+					'options' => [
+						'class' => 'col-md-6 hidden',
+						'id' => 'field-' . Html::getInputId($model, 'linkedIssuesAttributes'),
+					],
+				])
+					->widget(Select2::class, [
+						'data' => $model->getLinkedAttributesNames(),
+						'options' => [
+							'multiple' => true,
+						],
+					])
 				: ''
 			?>
 
@@ -226,9 +242,13 @@ $archivesStageId = IssueForm::STAGE_ARCHIVED_ID;
 $stageInputId = Html::getInputId($model, 'stage_id');
 $typeInputId = Html::getInputId($model, 'type_id');
 $typeAdditionalInputId = 'field-' . Html::getInputId($model, 'type_additional_date_at');
+
 $typesWithAdditionalDateAtNames = Json::encode($model::getTypesWithAdditionalDateNames());
 
 $stageChangeInputId = Html::getInputId($model, 'stage_change_at');
+
+$linkedIdsField = Html::getInputId($model, 'linkedIssuesIds');
+$linkedAttributesField = 'field-' . Html::getInputId($model, 'linkedIssuesAttributes');
 
 $js = <<<JS
 
@@ -238,6 +258,10 @@ const typeAdditionalDateAtField = document.getElementById('$typeAdditionalInputI
 const labelForTypeAdditionalDateAtField = typeAdditionalDateAtField.getElementsByTagName('label')[0];
 const typesAdditionalDateAtNames = $typesWithAdditionalDateAtNames;
 const archivesField = document.getElementById('archives-field');
+
+
+const linkedIssuesIdsInput = document.getElementById('$linkedIdsField');
+const linkedAttributesField = document.getElementById('$linkedAttributesField');
 
 function isArchived(){
 	return parseInt(stageInput.value) === $archivesStageId;
@@ -252,8 +276,23 @@ stageInput.onchange = function(){
 	}else{
 		archivesField.classList.add('hidden');
 	}
-	
 };
+
+
+linkedIssuesIdsInput.onchange = function(){
+	let value = parseInt(this.value);
+	console.log(value);
+	if(value){
+		console.log('remove');
+		console.log(linkedAttributesField);
+		linkedAttributesField.classList.remove('hidden');
+	}else{
+				console.log('add');
+
+		linkedAttributesField.classList.add('hidden');
+	}
+};
+
 
 typeInput.onchange= function(){
 	if(typesAdditionalDateAtNames.hasOwnProperty(parseInt(this.value))){

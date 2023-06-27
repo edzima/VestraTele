@@ -41,8 +41,17 @@ class IssueForm extends Model implements LinkedIssuesModel {
 	public ?string $stage_deadline_at = null;
 
 	public $linkedIssuesIds;
+	public $linkedIssuesAttributes = [];
 
 	public const STAGE_ARCHIVED_ID = IssueStage::ARCHIVES_ID;
+
+	protected const LINKED_ISSUE_ATTRIBUTES_LIST = [
+		'details',
+		'entity_responsible_id',
+		'signature_act',
+		'stage_id',
+		'type_id',
+	];
 
 	public $tagsIds = [];
 
@@ -84,6 +93,7 @@ class IssueForm extends Model implements LinkedIssuesModel {
 			['type_id', 'in', 'range' => static::getTypesIds()],
 			['tagsIds', 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
 			['linkedIssuesIds', 'in', 'range' => array_keys($this->getLinkedIssuesNames()), 'allowArray' => true],
+			['linkedIssuesAttributes', 'in', 'range' => array_keys($this->getLinkedAttributesNames()), 'allowArray' => true],
 			[
 				'archives_nr',
 				'required',
@@ -108,6 +118,7 @@ class IssueForm extends Model implements LinkedIssuesModel {
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 			'tagsIds' => Yii::t('issue', 'Tags'),
 			'linkedIssuesIds' => Yii::t('issue', 'Linked Issues'),
+			'linkedIssuesAttributes' => Yii::t('issue', 'Linked Issues Attributes'),
 		]);
 	}
 
@@ -300,10 +311,12 @@ class IssueForm extends Model implements LinkedIssuesModel {
 
 	public function saveLinkedIssues(): ?int {
 		$linkedIssues = $this->getLinkedIssuesIds();
-		if (!empty($linkedIssues)) {
-			return Issue::updateAll([
-				'details' => $this->details,
-			], ['id' => $linkedIssues]);
+		if (!empty($linkedIssues) && !empty($this->linkedIssuesAttributes)) {
+			$attributes = [];
+			foreach ($this->linkedIssuesAttributes as $attribute) {
+				$attributes[$attribute] = $this->{$attribute};
+			}
+			return Issue::updateAll($attributes, ['id' => $this->linkedIssuesIds]);
 		}
 		return null;
 	}
@@ -327,5 +340,13 @@ class IssueForm extends Model implements LinkedIssuesModel {
 			'{issue}' => $issue->getIssueName(),
 			'{tags}' => implode(', ', $tagsNames),
 		]);
+	}
+
+	public function getLinkedAttributesNames(): array {
+		$names = [];
+		foreach (static::LINKED_ISSUE_ATTRIBUTES_LIST as $attribute) {
+			$names[$attribute] = $this->getAttributeLabel($attribute);
+		}
+		return $names;
 	}
 }

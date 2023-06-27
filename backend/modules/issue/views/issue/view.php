@@ -98,7 +98,6 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		</span>
 
 
-
 	</p>
 	<p>
 		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM)
