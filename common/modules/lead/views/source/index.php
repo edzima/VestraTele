@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Sources');
 			],
 			'phone:tel',
 			[
-				'attribute' => 'dialer_phone',
+				'attribute' => 'call_page_widget_id',
 				'visible' => $searchModel->scenario !== $searchModel::SCENARIO_OWNER,
 			],
 			'sms_push_template',

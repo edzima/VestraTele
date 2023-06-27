@@ -26,6 +26,8 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 	public ?string $sms_push_template = null;
 	public bool $is_active = true;
 
+	public ?string $call_page_widget_id = null;
+
 	private ?LeadSource $model = null;
 
 	public static function getUsersNames(): array {
@@ -41,9 +43,10 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 			[['name', 'type_id', 'is_active'], 'required'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['is_active'], 'boolean'],
-			[['type_id', 'owner_id'], 'integer'],
+			[['type_id', 'owner_id', 'call_page_widget_id'], 'integer'],
 			[['name', 'url'], 'string', 'max' => 255],
 			[['phone', 'dialer_phone'], 'string', 'max' => 30],
+			[['owner_id', 'call_page_widget_id', 'dialer_phone'], 'default', 'value' => null],
 			[['sms_push_template'], 'string'],
 			['phone', PhoneInputValidator::class],
 			['url', 'url'],
@@ -68,6 +71,7 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 			'sort_index' => Yii::t('lead', 'Sort Index'),
 			'is_active' => Yii::t('lead', 'Is Active'),
 			'sms_push_template' => Yii::t('lead', 'SMS Push Template'),
+			'call_page_widget_id' => Yii::t('lead', 'CallPage Widget ID'),
 		];
 	}
 
@@ -86,6 +90,7 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 		$this->url = $source->getURL();
 		$this->is_active = $source->getIsActive();
 		$this->sms_push_template = $source->getSmsPushTemplate();
+		$this->call_page_widget_id = $source->getCallPageWidgetId();
 	}
 
 	public function getModel(): LeadSource {
@@ -109,6 +114,7 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 		$model->dialer_phone = $this->dialer_phone;
 		$model->is_active = $this->is_active;
 		$model->sms_push_template = $this->sms_push_template;
+		$model->call_page_widget_id = $this->call_page_widget_id;
 		return $model->save(false);
 	}
 
@@ -146,5 +152,9 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 
 	public function getIsActive(): bool {
 		return $this->is_active;
+	}
+
+	public function getCallPageWidgetId(): ?int {
+		return $this->call_page_widget_id;
 	}
 }

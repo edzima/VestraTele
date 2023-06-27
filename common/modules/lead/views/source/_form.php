@@ -26,6 +26,8 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'dialer_phone')->textInput(['maxlength' => true]) ?>
 
+	<?= $form->field($model, 'call_page_widget_id')->textInput(['maxlength' => true]) ?>
+
 	<?= $model->scenario !== LeadSourceForm::SCENARIO_OWNER
 		? $form->field($model, 'owner_id')->widget(Select2::class, [
 			'data' => LeadSourceForm::getUsersNames(),

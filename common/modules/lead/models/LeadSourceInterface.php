@@ -22,4 +22,6 @@ interface LeadSourceInterface {
 
 	public function getIsActive(): bool;
 
+	public function getCallPageWidgetId(): ?int;
+
 }

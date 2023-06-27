@@ -29,7 +29,7 @@ class LeadSourceSearch extends LeadSource {
 	public function rules(): array {
 		return [
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
-			[['id', 'sort_index', 'owner_id', 'type_id'], 'integer'],
+			[['id', 'sort_index', 'owner_id', 'type_id', 'call_page_widget_id'], 'integer'],
 			[['is_active'], 'boolean'],
 			[['is_active'], 'default', 'value' => null],
 			[['name', 'url', 'phone', 'dialer_phone', 'sms_push_template'], 'safe'],
@@ -75,6 +75,7 @@ class LeadSourceSearch extends LeadSource {
 			'sort_index' => $this->sort_index,
 			'owner_id' => $this->owner_id,
 			'is_active' => $this->is_active,
+			'call_page_widget_id' => $this->call_page_widget_id,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])
