@@ -280,3 +280,7 @@ div:target {
 	top: 7px;
 	z-index: 100;
 }
+
+.box-body h1:first-of-type {
+	display: none;
+}
