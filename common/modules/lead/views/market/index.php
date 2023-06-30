@@ -79,6 +79,12 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => LeadMarketSearch::getLeadStatusesNames(),
 			],
 			[
+				'attribute' => 'leadType',
+				'label' => Yii::t('lead', 'Type Lead'),
+				'value' => 'lead.typeName',
+				'filter' => LeadMarketSearch::getLeadTypesNames(),
+			],
+			[
 				'attribute' => 'leadSource',
 				'value' => 'lead.sourceName',
 				'filter' => LeadMarketSearch::getLeadSourcesNames(),
