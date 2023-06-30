@@ -246,22 +246,6 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return $this->lawyer !== null;
 	}
 
-	public function getClientFullName(): string {
-		return trim($this->client_surname) . ' ' . trim($this->client_first_name);
-	}
-
-	public function getVictimFullName(): string {
-		return trim($this->victim_surname) . ' ' . trim($this->victim_first_name);
-	}
-
-	public function hasClientSubprovince(): bool {
-		return $this->client_subprovince_id !== null && $this->clientSubprovince !== null;
-	}
-
-	public function hasVictimSubprovince(): bool {
-		return $this->victim_subprovince_id !== null && $this->victimSubprovince !== null;
-	}
-
 	public function markAsUpdate(): void {
 		$this->touch('updated_at');
 	}
