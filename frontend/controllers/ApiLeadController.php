@@ -270,6 +270,6 @@ class ApiLeadController extends Controller {
 			return false;
 		}
 		/** @var CallPageClient $callPage */
-		return $callPage->simpleCall($lead->getSource()->getCallPageWidgetId(), $lead->getPhone());
+		return $callPage->callOrSchedule($lead->getSource()->getCallPageWidgetId(), $lead->getPhone());
 	}
 }

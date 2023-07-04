@@ -45,6 +45,27 @@ class CallPageClient extends Component {
 		return true;
 	}
 
+	public function callOrSchedule(int $widgetId, string $tel, ?int $department_id = null): bool {
+		$data = [
+			'id' => $widgetId,
+			'tel' => $tel,
+		];
+		if ($department_id !== null) {
+			$data['department_id'] = $department_id;
+		}
+		$client = $this->getClient();
+		$response = $client
+			->post('widgets/call-or-schedule', $data, $this->authorizationHeaders())
+			->send();
+		$responseData = $response->getData();
+		$hasError = ArrayHelper::getValue($responseData, 'hasError', null);
+		if ($hasError) {
+			Yii::error($response->getData(), __METHOD__);
+			return false;
+		}
+		return true;
+	}
+
 	protected function getClient(): Client {
 		if ($this->client === null) {
 			$this->client = new Client($this->clientOptions);
