@@ -158,13 +158,24 @@ class IssueStageChangeForm extends Model {
 	}
 
 	public static function getStagesNames(int $typeId): array {
+		$stages = static::getStages($typeId);
+		usort($stages, function (IssueStage $a, IssueStage $b): bool {
+			if ($a->posi === $b->posi) {
+				return strtolower($a->name) > strtolower($b->name);
+			}
+			return $a->posi < $b->posi;
+		});
+		return ArrayHelper::map($stages, 'id', 'name');
+	}
+
+	public static function getStages(int $typeId): array {
 		$type = IssueType::get($typeId);
 		if ($type === null) {
 			return [];
 		}
-		$stages = ArrayHelper::map($type->stages, 'id', 'name');
+		$stages = $type->stages;
 		if ($type->parent_id) {
-			$stages += static::getStagesNames($type->parent_id);
+			$stages = array_merge(static::getStages($type->parent_id), $stages);
 		}
 		return $stages;
 	}
