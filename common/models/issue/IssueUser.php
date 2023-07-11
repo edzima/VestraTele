@@ -50,6 +50,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		self::TYPE_LAWYER_ASSISTANT,
 		self::TYPE_AGENT,
 		self::TYPE_CO_AGENT,
+		self::TYPE_RECOMMENDING,
 		self::TYPE_TELEMARKETER,
 		self::TYPE_VINDICATOR,
 	];
@@ -59,7 +60,6 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		self::TYPE_HANDICAPPED,
 		self::TYPE_VICTIM,
 		self::TYPE_SHAREHOLDER,
-		self::TYPE_RECOMMENDING,
 		self::TYPE_GUARDIAN,
 	];
 

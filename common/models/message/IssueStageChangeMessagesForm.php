@@ -39,6 +39,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 
 	public $workersTypes = [
 		IssueUser::TYPE_AGENT,
+		IssueUser::TYPE_RECOMMENDING,
 	];
 
 	public static function pushDelayedMessages(int $smsOwnerId): array {
