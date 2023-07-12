@@ -14,7 +14,7 @@ $background = Yii::$app->keyStorage->get(KeyStorageItem::KEY_EMAIL_BACKGROUND, '
 $logoUrl = Yii::$app->keyStorage->get(KeyStorageItem::KEY_EMAIL_LOGO_URL);
 $darkBackground = Html::luminanceDark($background, 0.2);
 $darkestBackground = Html::luminanceDark($background, 0.4);
-
+$footerText = Yii::$app->keyStorage->get(KeyStorageItem::KEY_EMAIL_FOOTER_TEXT);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -386,20 +386,17 @@ $darkestBackground = Html::luminanceDark($background, 0.4);
 		</table>
 		<!-- Email Body : END -->
 
-		<!-- Email Footer : BEGIN -->
-		<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 680px;" class="footer">
-			<tr>
-				<td style="padding: 20px; font-family: sans-serif; font-size: 12px; line-height: 15px; text-align: center; color: #ffffff;">
-					<br>
-					Vestra sp. z o.o.<br>
-					Aleja Wolności 26<br>
-					84-300 Lębork
-					<br><br>
-				</td>
-			</tr>
-		</table>
-		<!-- Email Footer : END -->
-
+		<?php if ($footerText): ?>
+			<!-- Email Footer : BEGIN -->
+			<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 680px;" class="footer">
+				<tr>
+					<td style="padding: 40px; font-family: sans-serif; font-size: 12px; line-height: 15px; text-align: center; color: #ffffff;">
+						<?= $footerText ?>
+					</td>
+				</tr>
+			</table>
+			<!-- Email Footer : END -->
+		<?php endif; ?>
 		<!--[if mso]>
 		</td>
 		</tr>

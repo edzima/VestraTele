@@ -29,6 +29,7 @@ class KeyStorageItem extends ActiveRecord {
 	public const KEY_LEAD_CUSTOMER_SOURCE = 'lead.customer.source';
 	public const KEY_EMAIL_BACKGROUND = 'email.background';
 	public const KEY_EMAIL_LOGO_URL = 'email.logoUrl';
+	public const KEY_EMAIL_FOOTER_TEXT = 'email.footer-text';
 
 	/**
 	 * @inheritdoc

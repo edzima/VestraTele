@@ -156,6 +156,10 @@ class SiteController extends Controller {
 				'label' => Yii::t('backend', 'Email Logo Url'),
 				'type' => FormModel::TYPE_TEXTINPUT,
 			],
+			KeyStorageItem::KEY_EMAIL_FOOTER_TEXT => [
+				'label' => Yii::t('backend', 'Email Foooter Text'),
+				'type' => FormModel::TYPE_TEXTAREA,
+			],
 		];
 
 		if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
