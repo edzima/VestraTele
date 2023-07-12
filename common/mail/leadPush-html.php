@@ -17,10 +17,7 @@ $reportLink = FrontendUrl::toRoute(
 );
 
 $this->params['primaryButtonText'] = Yii::t('lead', 'Create Lead Report');
-$this->params['primaryButtonHref'] = $reportLink = FrontendUrl::toRoute(
-	['/lead/report/report', 'id' => $lead->getId()],
-	true
-);
+$this->params['primaryButtonHref'] = $reportLink;
 ?>
 <div class="lead-push-email">
 	<p><?= Yii::t('lead', 'Source') ?>: <?= Html::encode($lead->getSource()->getName()) ?></p>
