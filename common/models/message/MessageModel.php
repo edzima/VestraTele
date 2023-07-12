@@ -13,6 +13,8 @@ use yii\mail\MessageInterface;
 
 abstract class MessageModel extends Model {
 
+	public $messageView = 'message';
+
 	public const TYPE_EMAIL = MessageTemplateKeyHelper::TYPE_EMAIL;
 	public const TYPE_SMS = MessageTemplateKeyHelper::TYPE_SMS;
 
@@ -52,15 +54,22 @@ abstract class MessageModel extends Model {
 	}
 
 	public function createEmail(MessageTemplate $template = null): MessageInterface {
-		$message = $this->getMailer()->compose();
+		$params = $this->composeViewParams();
+		$params['template'] = $template;
+		$message = $this->getMailer()->compose($this->messageView, $params);
 		if ($template) {
-			$this->bindEmailTemplate($message, $template);
+			$message->setSubject($template->getSubject());
+//			$this->bindEmailTemplate($message, $template);
 		}
 		$from = $this->getFromMailer();
 		if (!empty($from)) {
 			$message->setFrom($from);
 		}
 		return $message;
+	}
+
+	protected function composeViewParams(): array {
+		return [];
 	}
 
 	protected function getFromMailer(): ?array {

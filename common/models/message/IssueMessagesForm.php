@@ -216,6 +216,7 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 		$this->parseAgent($template);
 		$this->parseCustomer($template);
 		$this->parseIssue($template);
+		$this->parsePrimaryButton($template);
 	}
 
 	public function getSmsToAgent(): ?IssueSmsForm {
@@ -279,7 +280,8 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 			return null;
 		}
 		$this->parseTemplate($template);
-		return $this->createEmail($template)->setTo($emails);
+		return $this->createEmail($template)
+			->setBcc($emails);
 	}
 
 	protected function getWorkersTemplate(): ?MessageTemplate {
@@ -360,8 +362,12 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 	}
 
 	public function getIssueFrontendAbsoluteLink(): string {
-		$url = Url::issueView($this->issue->getIssueId(), true);
+		$url = $this->getIssueUrl();
 		return Html::a($this->issue->getIssueName(), $url);
+	}
+
+	public function getIssueUrl(): string {
+		return Url::issueView($this->issue->getIssueId(), true);
 	}
 
 	protected function parseCustomer(MessageTemplate $template): void {
@@ -483,5 +489,10 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 
 	public function isVisibleField(string $attribute): bool {
 		return empty($this->hiddenFields) || !in_array($attribute, $this->hiddenFields, true);
+	}
+
+	protected function parsePrimaryButton(MessageTemplate $template): void {
+		$template->primaryButtonText = $this->issue->getIssueName();
+		$template->primaryButtonHref = $this->getIssueUrl();
 	}
 }
