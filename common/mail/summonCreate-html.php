@@ -8,10 +8,11 @@ use common\models\issue\Summon;
 
 $summonLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl(['/summon/view', 'id' => $model->id]);
 
+$this->title = $model->title;
+$this->params['primaryButtonText'] = Yii::t('common', 'Details');
+$this->params['primaryButtonHref'] = $summonLink;
 ?>
 <div class="summon-create-email">
-
-	<p><?= Html::encode($model->title) ?> </p>
 
 	<p><?= Yii::t('common', 'Entity responsible') ?>: <?= Html::encode($model->entityWithCity) ?></p>
 
@@ -19,5 +20,4 @@ $summonLink = Yii::getAlias('@frontendUrl') . Yii::$app->urlManager->createUrl([
 		'user' => $model->getIssueModel()->customer,
 	]) ?>
 
-	<p><?= Html::a(Yii::t('common', 'Details'), $summonLink) ?></p>
 </div>

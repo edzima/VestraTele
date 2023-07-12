@@ -8,14 +8,13 @@ use yii\helpers\Html;
 /* @var $title string */
 /* @var $issue IssueInterface */
 
+$this->title = $title;
+
 $issueLink = Url::issueView($issue->getIssueId(), true);
 
+$this->params['primaryButtonText'] = $issue->getIssueName();
+$this->params['primaryButtonHref'] = $issueLink;
 ?>
 <div class="issue-user-change-for-settlement-with-provisions">
-	<h1><?= $title ?></h1>
-
 	<p><?= Yii::t('provision', 'Settlement mark as Provision Control.') ?></p>
-
-	<p><?= Html::a(Html::encode($issue->getIssueName()), $issueLink) ?></p>
-
 </div>

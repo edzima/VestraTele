@@ -8,21 +8,20 @@ use frontend\helpers\Url as FrontendUrl;
 /* @var $model LeadMarket */
 
 $lead = $model->lead;
-$leadLink = FrontendUrl::leadView($lead->getId(), true);
 
+$this->title = Yii::t('lead', 'Lead: {lead} from Market change Status: {status}.', [
+	'lead' => $lead->getName(),
+	'status' => $lead->getStatusName(),
+]);
+
+$leadLink = FrontendUrl::leadView($lead->getId(), true);
+$marketLink = FrontendUrl::toRoute(['/lead/market/view', 'id' => $model->id], true);
+
+$this->params['primaryButtonText'] = Yii::t('lead', 'Lead');
+$this->params['primaryButtonHref'] = $leadLink;
 ?>
 <div class="lead-from-market-change-status">
-	<p><?= Yii::t('lead', 'Lead: {lead} from Market has changed Status: {status}.', [
-			'lead' => $lead->getName(),
-			'status' => $lead->getStatusName(),
-		]) ?>
+	<p>
+		<?= Yii::t('lead', 'Status Market') ?>: <?= Html::a($model->getStatusName(), $marketLink) ?>
 	</p>
-
-	<p><?= Yii::t('lead', 'Market Status: {status}.', [
-			'status' => $model->getStatusName(),
-		]) ?>
-	</p>
-
-	<p><?= Html::a(Html::encode($lead->getName()), $leadLink) ?></p>
-
 </div>

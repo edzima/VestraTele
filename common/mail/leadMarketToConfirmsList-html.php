@@ -11,16 +11,24 @@ use frontend\helpers\Url as FrontendUrl;
 
 $lead = $model->lead;
 $leadLink = FrontendUrl::leadView($lead->getId(), true);
+
+$this->title = Yii::t('lead', 'Access Request to Confirm for Lead: {lead}', [
+	'lead' => $lead->getName(),
+]);
+
+$this->params['primaryButtonText'] = Yii::t('lead', 'Lead');
+$this->params['primaryButtonHref'] = $leadLink;
 $marketLink = FrontendUrl::toRoute(['/lead/market/view', 'id' => $model->id], true);
+
 ?>
 <div class="lead-market-to-confirms-list-email">
 
-	<?= Yii::t('lead', 'Status Market') ?>: <?= Html::encode($model->getStatusName()) ?>
-	<?= Html::a(Html::encode($marketLink), $marketLink) ?>
+	<p>
+		<?= Yii::t('lead', 'Status Market') ?>: <?= Html::a($model->getStatusName(), $marketLink) ?>
+	</p>
 
 	<?php foreach ($users as $user): ?>
-		<p><?= $user->user->getFullName() ?></p>
-
+		<h3><?= $user->user->getFullName() ?></h3>
 		<?php
 		$acceptLink = FrontendUrl::toRoute(['/lead/market-user/accept', 'market_id' => $user->market_id, 'user_id' => $user->user_id], true);
 		$rejectLink = FrontendUrl::toRoute(['/lead/market-user/reject', 'market_id' => $user->market_id, 'user_id' => $user->user_id], true);
@@ -33,6 +41,4 @@ $marketLink = FrontendUrl::toRoute(['/lead/market/view', 'id' => $model->id], tr
 	<p><?= Yii::t('lead', 'Status Lead') ?>: <?= Html::encode($lead->getStatusName()) ?></p>
 
 	<p><?= Yii::t('lead', 'Type Lead') ?>: <?= Html::encode($lead->getTypeName()) ?></p>
-
-	<p><?= Html::a(Html::encode($leadLink), $leadLink) ?></p>
 </div>

@@ -10,17 +10,15 @@ use frontend\helpers\Url as FrontendUrl;
 /* @var $withoutRegionsModels LeadMarket[] */
 /* @var $totalCount int */
 
+$this->title = Yii::t('lead', 'New {count} Leads on Market.', [
+	'count' => $totalCount,
+]);
+
 $marketUrl = FrontendUrl::toRoute(['/lead/market/user'], true);
+$this->params['primaryButtonText'] = Yii::t('lead', 'Lead Market');
+$this->params['primaryButtonHref'] = $marketUrl;
 ?>
 <div class="lead-market-create-summary">
-
-	<p><?= Yii::t('lead', 'New {count} Leads on Market.', [
-			'count' => $totalCount,
-		]) ?>
-	</p>
-
-	<p><?= Html::a(Yii::t('lead', 'Lead Market'), $marketUrl) ?></p>
-
 
 	<?php foreach ($regionsModels as $regionId => $models): ?>
 		<p><?= Html::a(
