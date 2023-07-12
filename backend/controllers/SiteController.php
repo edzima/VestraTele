@@ -8,6 +8,7 @@ use common\models\issue\IssuePayCalculation;
 use common\models\KeyStorageItem;
 use common\models\user\LoginForm;
 use common\models\user\User;
+use kartik\color\ColorInput;
 use vova07\fileapi\actions\UploadAction as FileAPIUpload;
 use vova07\imperavi\actions\UploadFileAction;
 use Yii;
@@ -146,7 +147,15 @@ class SiteController extends Controller {
 				'label' => Yii::t('backend', 'Issue Customer SMS'),
 				'type' => FormModel::TYPE_TEXTAREA,
 			],
-
+			KeyStorageItem::KEY_EMAIL_BACKGROUND => [
+				'label' => Yii::t('backend', 'Email Background'),
+				'type' => FormModel::TYPE_WIDGET,
+				'widget' => ColorInput::class,
+			],
+			KeyStorageItem::KEY_EMAIL_LOGO_URL => [
+				'label' => Yii::t('backend', 'Email Logo Url'),
+				'type' => FormModel::TYPE_TEXTINPUT,
+			],
 		];
 
 		if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
