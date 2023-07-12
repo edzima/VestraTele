@@ -49,6 +49,11 @@ class IssueSettlementMessagesForm extends IssueMessagesForm {
 		$template->parseBody(['settlementValue' => Yii::$app->formatter->asCurrency($this->settlement->getValue())]);
 	}
 
+	protected function parsePrimaryButton(MessageTemplate $template): void {
+		$template->primaryButtonText = $this->settlement->getIssueName() . ' - ' . $this->settlement->getTypeName();
+		$template->primaryButtonHref = $this->settlement->getFrontendUrl();
+	}
+
 	protected function getSettlementLink(): string {
 		return Html::a(
 			$this->settlement->getIssueName() . ' - ' . $this->settlement->getTypeName(),

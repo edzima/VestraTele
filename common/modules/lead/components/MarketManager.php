@@ -116,7 +116,6 @@ class MarketManager extends Component {
 		$toConfirms = array_filter($market->leadMarketUsers, static function (LeadMarketUser $marketUser): bool {
 			return $marketUser->isToConfirm();
 		});
-		$emails = 'fachowosc@gmail.com';
 		if (empty($toConfirms)) {
 			return false;
 		}
@@ -129,8 +128,8 @@ class MarketManager extends Component {
 					'users' => $toConfirms,
 				]
 			)
-			->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
-			->setTo($emails)
+			->setFrom([Yii::$app->params['senderEmail'] => Yii::t('lead', 'Market Leads')])
+			->setBcc($emails)
 			->setSubject(Yii::t('lead', '{count} Access Request to Confirm for Lead: {lead} from Market.', [
 				'lead' => $market->lead->getName(),
 				'count' => count($toConfirms),
@@ -163,8 +162,8 @@ class MarketManager extends Component {
 					'model' => $market,
 				]
 			)
-			->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
-			->setTo($emails)
+			->setFrom([Yii::$app->params['senderEmail'] => Yii::t('lead', 'Market Leads')])
+			->setBcc($emails)
 			->setSubject(Yii::t('lead', 'Lead: {lead} from Market change Status: {status}.', [
 				'lead' => $market->lead->getName(),
 				'status' => $market->lead->getStatusName(),

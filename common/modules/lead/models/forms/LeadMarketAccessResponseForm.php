@@ -110,7 +110,7 @@ class LeadMarketAccessResponseForm extends Model {
 					'model' => $this->model,
 				]
 			)
-			->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->name . ' robot'])
+			->setFrom([Yii::$app->params['senderEmail'] => Yii::t('lead', 'Market Leads')])
 			->setTo($this->model->user->getEmail())
 			->setSubject(Yii::t('lead', 'Your Access Request is Accepted.'))
 			->send();

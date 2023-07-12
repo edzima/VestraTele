@@ -27,6 +27,8 @@ class KeyStorageItem extends ActiveRecord {
 	public const KEY_CALENDAR_USERS_BACKGROUND = 'calendar.users.background';
 	public const KEY_ISSUE_DEEP_ARCHIVE_DAYS = 'issue.deep_archive_days';
 	public const KEY_LEAD_CUSTOMER_SOURCE = 'lead.customer.source';
+	public const KEY_EMAIL_BACKGROUND = 'email.background';
+	public const KEY_EMAIL_LOGO_URL = 'email.logoUrl';
 
 	/**
 	 * @inheritdoc

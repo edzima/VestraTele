@@ -375,6 +375,7 @@ return [
 	'Users count Limit exceed' => '> Użytkowników',
 	'Not Realized' => 'Niezrealizowane',
 	'{count} Access Request to Confirm for Lead: {lead} from Market.' => 'Prośby do Potwierdzenia: {count} dla Leada: {lead} z Giełdy',
+	'Access Request to Confirm for Lead: {lead}' => 'Prośby do Potwierdzenia dla Leada: {lead}.',
 	'Status Lead' => 'Status Leada',
 	'Status Market' => 'Status Giełdy',
 	'Type Lead' => 'Typ Leada',
@@ -415,4 +416,5 @@ return [
 	'No' => 'Nie',
 	'Form - Zapier' => 'Formularz - Zapier (LeadsAds)',
 	'Message - Zapier' => 'Messenger - Zapier',
+	'New Lead: {lead}' => 'Nowy Lead: {lead}',
 ];
