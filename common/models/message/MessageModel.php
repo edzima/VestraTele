@@ -59,7 +59,6 @@ abstract class MessageModel extends Model {
 		$message = $this->getMailer()->compose($this->messageView, $params);
 		if ($template) {
 			$message->setSubject($template->getSubject());
-//			$this->bindEmailTemplate($message, $template);
 		}
 		$from = $this->getFromMailer();
 		if (!empty($from)) {
@@ -92,11 +91,6 @@ abstract class MessageModel extends Model {
 		return strtr($this->fromNameTemplate, [
 			'{appName}' => Yii::$app->name,
 		]);
-	}
-
-	protected function bindEmailTemplate(MessageInterface $message, MessageTemplate $template): void {
-		$message->setSubject($template->getSubject());
-		$message->setHtmlBody($template->getBody());
 	}
 
 	protected function getSmsTemplate(string $baseKey): ?MessageTemplate {
