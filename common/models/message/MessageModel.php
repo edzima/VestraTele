@@ -102,13 +102,22 @@ abstract class MessageModel extends Model {
 	}
 
 	protected function getTemplate(string $type, string $baseKey): ?MessageTemplate {
-		$templates = $this
-			->getTemplateManager()
-			->getTemplatesLikeKey(static::generateKey($type, $baseKey), $this->language);
+		$templates = $this->getTemplates($type, $baseKey);
 		if ($templates) {
 			return reset($templates);
 		}
 		return null;
+	}
+
+	/**
+	 * @param string $type
+	 * @param string $baseKey
+	 * @return MessageTemplate[]|null indexed by Key
+	 */
+	protected function getTemplates(string $type, string $baseKey): ?array {
+		return $this
+			->getTemplateManager()
+			->getTemplatesLikeKey(static::generateKey($type, $baseKey), $this->language);
 	}
 
 	protected function getTemplateManager(): MessageTemplateManager {

@@ -19,17 +19,76 @@ use yii\widgets\DetailView;
 $stageInputId = Html::getInputId($model, 'stage_id');
 $archivesIds = Json::encode(IssueStage::ARCHIVES_IDS);
 
+$customerSmsMessages = Json::encode($model->getMessagesModel()->getCustomerSmsMessages());
+$customerSmsInputFieldClass = 'field-' . Html::getInputId($model->getMessagesModel(), 'sendSmsToCustomer');
+$workersSmsMessages = Json::encode(null);
+$workersSmsInputFieldClass = 'field-' . Html::getInputId($model->getMessagesModel(), 'sendSmsToWorkers');
+
 $js = <<<JS
+
+const customerSmsField = document.getElementsByClassName('$customerSmsInputFieldClass')[0];
+const customerSmsMessages = $customerSmsMessages;
+
+const workersSmsField = document.getElementsByClassName('$workersSmsInputFieldClass')[0];
+const workersSmsMessages = $workersSmsMessages;
+
 
 const stageInput = document.getElementById('$stageInputId');
 const archivesField = document.getElementById('archives-field');
 const archivesIds = $archivesIds;
 
 
+
+function updateMessagesText(stage_id){
+	updateCustomerSmsBlockText(stage_id);
+	updateWorkersSmsBlockText(stage_id);
+}
+
+function updateCustomerSmsBlockText(stage_id){
+	updateMessageBlockText(stage_id, customerSmsMessages, customerSmsField);
+}
+
+function updateWorkersSmsBlockText(stage_id){
+	updateMessageBlockText(stage_id, workersSmsMessages, workersSmsField);
+}
+
+
+function updateMessageBlockText(stage_id, messages, field){
+		if(messages){
+		let defaultTemplate = null;
+		let currentStageTemplate = null;
+		messages.forEach((message) =>{
+			if(message.stage_id === null){
+				defaultTemplate = message.message;
+			}
+			if(message.stage_id === stage_id){
+				currentStageTemplate = message.message;
+			}
+		});
+		field.getElementsByClassName('help-block-templates');
+		let messageEleement = field.getElementsByClassName('help-block-templates')[0];
+		if(messageEleement === undefined){
+			messageEleement = document.createElement('p');
+			messageEleement.classList.add('help-block');
+			messageEleement.classList.add('help-block-templates');
+			field.append(messageEleement);
+		}
+		if(defaultTemplate === null && currentStageTemplate === null){
+			messageEleement.textContent = '';
+		}else{
+			if(currentStageTemplate){
+				messageEleement.textContent =currentStageTemplate;
+			}else{
+				messageEleement.textContent = defaultTemplate;
+			}
+		}
+		
+	}
+}
+
 stageInput.onchange = function(){
 	let value = parseInt(this.value);
-	console.log(value);
-	console.log(archivesIds.includes(value));
+	updateMessagesText(value);
 	if(archivesIds.includes(value)){
 		archivesField.classList.remove('hidden');
 	}else{
@@ -37,6 +96,9 @@ stageInput.onchange = function(){
 	}
 	
 };
+
+updateMessagesText(parseInt(stageInput.value));
+
 
 JS;
 

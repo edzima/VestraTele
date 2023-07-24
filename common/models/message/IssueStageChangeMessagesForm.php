@@ -4,6 +4,7 @@ namespace common\models\message;
 
 use common\components\message\MessageTemplate;
 use common\components\message\MessageTemplateKeyHelper;
+use common\helpers\Html;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\IssueStage;
@@ -137,6 +138,46 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 
 	public static function getStageID(string $key): ?int {
 		return MessageTemplateKeyHelper::getValue($key, static::KEY_STAGE_ID);
+	}
+
+	public function getCustomerSmsMessages(): array {
+		$currentWithStageIdKey = $this->withStageIdKey;
+		if ($this->withStageIdKey) {
+			$this->withStageIdKey = false;
+		}
+		$templates = $this->getTemplates(static::TYPE_SMS, $this->getCustomerTemplateKey());
+		$this->withStageIdKey = $currentWithStageIdKey;
+		$stages = [];
+		if ($templates !== null) {
+			foreach ($templates as $key => $template) {
+				$this->parseTemplate($template);
+				$stages[] = [
+					'stage_id' => static::getStageID($key),
+					'message' => Html::encode($template->getSmsMessage()),
+				];
+			}
+		}
+		return $stages;
+	}
+
+	public function getWorkersSmsMessages(): array {
+		$currentWithStageIdKey = $this->withStageIdKey;
+		if ($this->withStageIdKey) {
+			$this->withStageIdKey = false;
+		}
+		$templates = $this->getTemplates(static::TYPE_SMS, $this->getWorkersTemplateKey());
+		$this->withStageIdKey = $currentWithStageIdKey;
+		$stages = [];
+		if ($templates !== null) {
+			foreach ($templates as $key => $template) {
+				$this->parseTemplate($template);
+				$stages[] = [
+					'stage_id' => static::getStageID($key),
+					'message' => Html::encode($template->getSmsMessage()),
+				];
+			}
+		}
+		return $stages;
 	}
 
 	protected function parseTemplate(MessageTemplate $template): void {
