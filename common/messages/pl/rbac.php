@@ -55,6 +55,7 @@ return [
 	'news' => 'Newsy',
 	'news.manager' => 'Newsy - Manager',
 	'note' => 'Notatki',
+	'note.manager' => 'Notatki - Manager',
 	'note.self' => 'Notatki - Własne (widoczne tylko na froncie)',
 	'note.update' => 'Notatki - edycja',
 	'note.template' => 'Notatki - szablony',

@@ -6,6 +6,8 @@ use backend\widgets\IssueColumn;
 use common\models\issue\IssueNote;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\DataColumn;
+use common\widgets\grid\IssueStageColumn;
+use common\widgets\grid\IssueTypeColumn;
 
 /* @var $this yii\web\View */
 /* @var $searchModel IssueNoteSearch */
@@ -24,6 +26,14 @@ $this->params['breadcrumbs'][] = $this->title;
 		'filterModel' => $searchModel,
 		'columns' => [
 			['class' => IssueColumn::class],
+			[
+				'class' => IssueTypeColumn::class,
+				'attribute' => 'issueTypeId',
+			],
+			[
+				'class' => IssueStageColumn::class,
+				'attribute' => 'issueStageId',
+			],
 			[
 				'attribute' => 'type',
 				'filter' => IssueNoteSearch::getTypesNames(),

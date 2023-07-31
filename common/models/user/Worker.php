@@ -47,6 +47,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_NOTE_TEMPLATE = 'note.template';
 	public const PERMISSION_COST_DEBT = 'cost.debt';
 	public const PERMISSION_PROVISION_CHILDREN_VISIBLE = 'provision.children.visible';
+	public const PERMISSION_NOTE_MANAGER = 'note.manager';
 	public const PERMISSION_NOTE_DELETE = 'note.delete';
 	public const PERMISSION_SUMMON_MANAGER = 'summon.manager';
 	public const PERMISSION_SUMMON_CREATE = 'summon.create';
@@ -56,6 +57,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_PAY_ALL_PAID = 'pay.all-paid';
 	public const PERMISSION_POTENTIAL_CLIENT = 'potential-client';
 	public const PERMISSION_SETTLEMENT_DELETE_NOT_SELF = 'settlement.delete-not-self';
+
 	private static $USER_NAMES = [];
 
 	public function getParent(): ActiveQuery {

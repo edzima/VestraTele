@@ -2,20 +2,30 @@
 
 namespace backend\modules\issue\models\search;
 
+use backend\modules\issue\models\IssueStage;
+use common\models\issue\Issue;
 use common\models\issue\IssueNote;
+use common\models\issue\search\IssueStageSearchable;
 use common\models\user\User;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\QueryInterface;
+use common\models\issue\search\IssueTypeSearch as IssueTypeSearchable;
 
 /**
  * IssueNoteSearch represents the model behind the search form of `common\models\issue\IssueNote`.
  */
-class IssueNoteSearch extends IssueNote {
+class IssueNoteSearch extends IssueNote implements
+	IssueStageSearchable,
+	IssueTypeSearchable {
 
+	public const SCENARIO_USER = 'user';
 	public $dateFrom;
 	public $dateTo;
+
+	public $issueTypeId;
+	public $issueStageId;
 	public $issueGrouped;
 
 	public static function getUsersNames(): array {
@@ -44,8 +54,11 @@ class IssueNoteSearch extends IssueNote {
 	public function rules(): array {
 		return [
 			[['id', 'issue_id', 'user_id', 'updater_id'], 'integer'],
+			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			[['is_pinned', 'is_template', 'issueGrouped'], 'boolean'],
 			[['title', 'description', 'publish_at', 'created_at', 'updated_at', 'type', 'dateFrom', 'dateTo'], 'safe'],
+			['issueStageId', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
+			['issueTypeId', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 		];
 	}
 
@@ -77,6 +90,7 @@ class IssueNoteSearch extends IssueNote {
 		$query = IssueNote::find();
 		$query->joinWith('issue');
 		$query->joinWith('user.userProfile');
+		$query->with('issue.tags');
 
 		// add conditions that should always apply here
 
@@ -99,6 +113,8 @@ class IssueNoteSearch extends IssueNote {
 		}
 
 		$this->applyDateFilter($query);
+		$this->applyIssueTypeFilter($query);
+		$this->applyIssueStageFilter($query);
 
 		if ($this->issueGrouped) {
 			$query->groupBy(IssueNote::tableName() . '.issue_id');
@@ -138,6 +154,26 @@ class IssueNoteSearch extends IssueNote {
 				'<=', IssueNote::tableName() . '.publish_at',
 				date('Y-m-d 23:59:59', strtotime($this->dateTo)),
 			]);
+		}
+	}
+
+	public function getIssueStagesNames(): array {
+		return IssueStage::getStagesNames(true, true);
+	}
+
+	public function applyIssueStageFilter(QueryInterface $query): void {
+		if (!empty($this->issueStageId)) {
+			$query->andWhere([Issue::tableName() . '.stage_id' => $this->issueStageId]);
+		}
+	}
+
+	public function getIssueTypesNames(): array {
+		return IssueStage::getStagesNames(true, true);
+	}
+
+	public function applyIssueTypeFilter(QueryInterface $query): void {
+		if (!empty($this->issueTypeId)) {
+			$query->andWhere([Issue::tableName() . '.type_id' => $this->issueTypeId]);
 		}
 	}
 }

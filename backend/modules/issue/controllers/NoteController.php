@@ -58,6 +58,11 @@ class NoteController extends Controller {
 	 */
 	public function actionIndex(): string {
 		$searchModel = new IssueNoteSearch();
+		if (!Yii::$app->user->can(Worker::PERMISSION_NOTE_MANAGER)) {
+			$searchModel->scenario = IssueNoteSearch::SCENARIO_USER;
+			$searchModel->user_id = Yii::$app->user->getId();
+		}
+
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		$dataProvider->pagination->pageSize = 50;
 
