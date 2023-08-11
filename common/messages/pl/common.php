@@ -305,6 +305,7 @@ return [
 	'Week' => 'Tydzień',
 	'2 Weeks' => '2 tygodnie',
 	'3 Weeks' => '3 tygodnie ',
+	'4 Weeks' => '28 dni ',
 	'One Month' => 'Miesiąc',
 	'Two Months' => '2 Miesiące',
 	'Without Recognition' => 'Niepotwierdzone',
