@@ -75,26 +75,27 @@ class ReportForm extends Model {
 			},
 			],
 			[['details', 'leadName'], 'string'],
+			[['details', 'leadName'], 'trim'],
 			[['withAddress', 'withSameContacts'], 'boolean'],
 			[
 				'details', 'required',
 				'when' => function () {
-					return empty($this->closedQuestions) && !$this->hasOpenAnswer();
+					return $this->detailsIsRequired();
 				},
 				'enableClientValidation' => false,
 				'message' => Yii::t('lead', 'Details cannot be blank when answers is empty.'),
 			],
-			[
-				'closedQuestions', 'required',
-				'when' => function () {
-					return empty($this->details) && !$this->hasOpenAnswer();
-				},
-				'enableClientValidation' => false,
-				'message' => Yii::t('lead', 'Closed Questions must be set when details is blank.'),
-			],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 			['closedQuestions', 'in', 'range' => array_keys($this->getClosedQuestionsData()), 'allowArray' => true],
+
 		];
+	}
+
+	protected function detailsIsRequired(): bool {
+		if (empty($this->getQuestions())) {
+			return true;
+		}
+		return empty($this->closedQuestions) && $this->allOpenAnswersIsEmpty();
 	}
 
 	/**
@@ -104,10 +105,16 @@ class ReportForm extends Model {
 		return $this->getLead()->getSameContacts(true);
 	}
 
-	private function hasOpenAnswer(): bool {
-		return !empty(array_filter($this->getAnswersModels(), static function (AnswerForm $answerForm): bool {
-			return !empty($answerForm->answer);
+	private function allOpenAnswersIsEmpty(): ?bool {
+		$models = $this->getAnswersModels();
+		if (empty($models)) {
+			return null;
+		}
+		$count = count(array_filter($models, static function (AnswerForm $answerForm): bool {
+			$answerForm->validate();
+			return $answerForm->answer === null;
 		}));
+		return $count === count($models);
 	}
 
 	public function getClosedQuestionsData(): array {
@@ -119,7 +126,7 @@ class ReportForm extends Model {
 	 */
 	public function getOpenQuestions(): array {
 		return array_filter($this->getQuestions(), static function (LeadQuestion $question): bool {
-			return $question->hasPlaceholder();
+			return !$question->isClosed();
 		});
 	}
 
@@ -128,7 +135,16 @@ class ReportForm extends Model {
 	 */
 	public function getClosedQuestions(): array {
 		return array_filter($this->getQuestions(), static function (LeadQuestion $question): bool {
-			return !$question->hasPlaceholder();
+			return $question->isClosed();
+		});
+	}
+
+	/**
+	 * @return LeadQuestion[]
+	 */
+	public function getBooleanQuestions(): array {
+		return array_filter($this->getQuestions(), static function (LeadQuestion $question): bool {
+			return $question->is_boolean;
 		});
 	}
 
@@ -157,10 +173,14 @@ class ReportForm extends Model {
 		return $model;
 	}
 
+	/**
+	 * @return LeadQuestion[]
+	 */
 	public function getQuestions(): array {
 		if ($this->questions === null) {
 
 			$query = LeadQuestion::find()
+				->indexBy('id')
 				->forStatus($this->status_id)
 				->forType($this->lead_type_id);
 			if ($this->getModel()->isNewRecord && $this->lead !== null) {
@@ -178,7 +198,16 @@ class ReportForm extends Model {
 
 	public function save(bool $validate = true): bool {
 		if ($validate && !$this->validate()) {
-			Yii::warning($this->getErrors(), __METHOD__ . '.validate');
+			if ($this->getErrors()) {
+				Yii::warning($this->getErrors(), __METHOD__ . '.validateModel');
+			}
+			foreach ($this->getAnswersModels() as $model) {
+				if ($model->hasErrors()) {
+					Yii::warning($model->getQuestion()->id);
+					Yii::warning($model->answer);
+					Yii::warning($model->getErrors(), __METHOD__ . '.validateAnswerModel');
+				}
+			}
 			return false;
 		}
 
@@ -336,8 +365,17 @@ class ReportForm extends Model {
 		$this->status_id = $model->status_id;
 		$this->owner_id = $model->owner_id;
 		$this->details = $model->details;
-		foreach ($this->getModel()->answers as $answer) {
-			if (isset($this->getClosedQuestionsData()[$answer->question_id])) {
+		$this->setAnswers($model->answers);
+	}
+
+	public function setAnswers(array $answers): void {
+		$this->setClosedAnswers($answers);
+	}
+
+	protected function setClosedAnswers(array $answers): void {
+		$closed = $this->getClosedQuestions();
+		foreach ($answers as $answer) {
+			if (isset($closed[$answer->question_id])) {
 				$this->closedQuestions[] = $answer->question_id;
 			}
 		}

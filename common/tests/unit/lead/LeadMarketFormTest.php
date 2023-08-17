@@ -84,7 +84,7 @@ class LeadMarketFormTest extends Unit {
 	public function testSaveWithoutAddress(): void {
 		$this->giveModel([
 			'status' => LeadMarket::STATUS_NEW,
-			'lead_id' => 4,
+			'lead_id' => 5,
 			'details' => 'Lead without Address',
 		]);
 

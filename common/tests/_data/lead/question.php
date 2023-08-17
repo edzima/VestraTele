@@ -23,6 +23,10 @@ return [
 	[
 		'name' => 'No judgment, it will not',
 	],
+	[
+		'name' => 'Bool Quest',
+		'is_boolean' => true,
+	],
 	'only-accident' => [
 		'name' => 'Died',
 		'type_id' => 1,

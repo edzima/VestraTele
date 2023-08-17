@@ -42,13 +42,14 @@ class LeadAnswersWidget extends Widget {
 		$attributes = [];
 		$closed = [];
 		foreach ($this->answers as $answer) {
-			if ($answer->question->hasPlaceholder()) {
+			if ($answer->question->isClosed()) {
+				$closed[] = $answer->getAnswerQuestion();
+			} else {
 				$attributes[] = [
 					'label' => $answer->question->name,
 					'value' => $answer->answer,
+					'format' => $answer->question->is_boolean ? 'boolean' : 'text',
 				];
-			} else {
-				$closed[] = $answer->getAnswerQuestion();
 			}
 		}
 		if (!empty($closed)) {

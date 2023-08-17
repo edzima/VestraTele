@@ -18,6 +18,7 @@ use yii\db\ActiveRecord;
  * @property int|null $status_id
  * @property int|null $type_id
  * @property boolean $show_in_grid
+ * @property boolean $is_boolean
  *
  * @property-read LeadAnswer[] $answers
  * @property-read LeadReport[] $reports
@@ -53,8 +54,21 @@ class LeadQuestion extends ActiveRecord {
 		];
 	}
 
-	public function generateAnswer(string $answer = null): string {
+	public function isClosed(): bool {
 		if ($this->hasPlaceholder()) {
+			return false;
+		}
+		if ($this->is_boolean) {
+			return false;
+		}
+		return true;
+	}
+
+	public function generateAnswer(string $answer = null): string {
+		if ($this->hasPlaceholder() || $this->is_boolean) {
+			if ($this->is_boolean) {
+				$answer = Yii::$app->formatter->asBoolean($answer);
+			}
 			if ($answer === null) {
 				$answer = Yii::$app->formatter->nullDisplay;
 			}

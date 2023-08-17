@@ -20,16 +20,29 @@ class AnswerForm extends Model {
 	}
 
 	public function rules(): array {
-		return [
-			['answer', 'string'],
-			[
+
+		$rules = [];
+		if ($this->getQuestion()->is_required) {
+			$rules[] = [
 				'answer', 'required',
-				'when' => function () {
-					return $this->getQuestion()->is_required;
-				},
-				'enableClientValidation' => false,
-			],
+			];
+		}
+		if ($this->getQuestion()->is_boolean) {
+			$rules[] = [
+				'answer', 'boolean',
+			];
+		} else {
+			$rules[] = [
+				'answer', 'string',
+			];
+			$rules[] = [
+				'answer', 'trim',
+			];
+		}
+		$rules[] = [
+			'answer', 'default', 'value' => null,
 		];
+		return $rules;
 	}
 
 	public function attributeLabels(): array {
@@ -60,7 +73,7 @@ class AnswerForm extends Model {
 		}
 		$questionId = $this->getQuestion()->id;
 		$model = $report->getAnswer($questionId) ?? $this->getModel();
-		if (empty($this->answer) && $this->getQuestion()->hasPlaceholder()) {
+		if ($this->answer === null) {
 			if (!$model->isNewRecord) {
 				$model->delete();
 			}

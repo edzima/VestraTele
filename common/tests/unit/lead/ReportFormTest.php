@@ -6,6 +6,7 @@ use common\fixtures\helpers\LeadFixtureHelper;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\LeadAnswer;
+use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadUser;
@@ -85,7 +86,6 @@ class ReportFormTest extends Unit {
 		]);
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Details cannot be blank when answers is empty.', 'details');
-		$this->thenSeeError('Closed Questions must be set when details is blank.', 'closedQuestions');
 	}
 
 	public function testWithDetails(): void {
@@ -177,13 +177,72 @@ class ReportFormTest extends Unit {
 		]);
 		$answered = [];
 		foreach ($this->model->getAnswersModels() as $answerForm) {
-			$answered[$answerForm->getQuestion()->id] = 'test-answer';
-			$answerForm->answer = 'test-answer';
+			if (!$answerForm->getQuestion()->is_boolean) {
+				$answered[$answerForm->getQuestion()->id] = 'test-answer';
+				$answerForm->answer = 'test-answer';
+			}
 		}
 		$this->thenSuccessSave();
 		foreach ($answered as $questionId => $answer) {
 			$this->thenSeeAnswer($questionId, $answer);
 		}
+	}
+
+	public function testBooleanQuestions(): void {
+		$questionBoolRequiredId1 = $this->tester->haveRecord(LeadQuestion::class, [
+			'name' => 'Do you have question?',
+			'is_boolean' => true,
+			'is_required' => true,
+		]);
+		$questionBoolId2 = $this->tester->haveRecord(LeadQuestion::class, [
+			'name' => 'Do you have question yet?',
+			'is_boolean' => true,
+		]);
+
+		$questionNotBoolId = $this->tester->haveRecord(LeadQuestion::class, [
+			'name' => 'Do you have question?',
+			'is_boolean' => false,
+		]);
+		$this->giveForm([
+			'owner_id' => 1,
+			'lead' => $this->haveLead([
+				'source_id' => 1,
+				'status_id' => LeadStatusInterface::STATUS_NEW,
+				'name' => __METHOD__,
+			]),
+			'closedQuestions' => [],
+			'openAnswers' => [
+				$questionBoolRequiredId1 => 1,
+				$questionBoolId2 => 0,
+			],
+		]);
+		$this->thenSuccessSave();
+		$this->thenSeeAnswer($questionBoolRequiredId1, 1);
+		$this->thenSeeAnswer($questionBoolId2, 0);
+
+		$this->tester->wantTo('Answer without required field');
+		$this->giveForm([
+			'owner_id' => 1,
+			'lead' => $this->haveLead([
+				'source_id' => 1,
+				'status_id' => LeadStatusInterface::STATUS_NEW,
+				'name' => __METHOD__,
+			]),
+			'closedQuestions' => [],
+			'openAnswers' => [
+				$questionNotBoolId => 1,
+				$questionBoolId2 => 0,
+			],
+		]);
+		$this->thenUnsuccessValidate();
+		$this->thenSeeAnswerError('Do you have question? cannot be blank.', $questionBoolRequiredId1);
+	}
+
+	protected function thenSeeAnswerError(string $message, int $questionId): void {
+		$this->tester->assertSame(
+			$message,
+			$this->model->getAnswersModels()[$questionId]->getFirstError('answer')
+		);
 	}
 
 	public function testLeadWithoutOwner(): void {
@@ -386,6 +445,14 @@ class ReportFormTest extends Unit {
 
 	private function thenSeeAnswer(int $question_id, string $answer = null, int $report_id = null) {
 		return $this->tester->seeRecord(LeadAnswer::class, [
+			'question_id' => $question_id,
+			'answer' => $answer,
+			'report_id' => $report_id ?? $this->model->getModel()->id,
+		]);
+	}
+
+	private function thenDontSeeAnswer(int $question_id, string $answer = null, int $report_id = null) {
+		return $this->tester->dontSeeRecord(LeadAnswer::class, [
 			'question_id' => $question_id,
 			'answer' => $answer,
 			'report_id' => $report_id ?? $this->model->getModel()->id,

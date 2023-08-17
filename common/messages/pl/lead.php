@@ -417,4 +417,5 @@ return [
 	'Form - Zapier' => 'Formularz - Zapier (LeadsAds)',
 	'Message - Zapier' => 'Messenger - Zapier',
 	'New Lead: {lead}' => 'Nowy Lead: {lead}',
+	'Question is required.' => 'Nie może pozostać bez odpowiedzi',
 ];

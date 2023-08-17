@@ -31,10 +31,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 		<div class="col-md-6">
 
-			<?= LeadAnswersWidget::widget([
-				'answers' => $model->getLead()->answers,
-			]) ?>
-
 			<?= SameContactsListWidget::widget([
 				'model' => $model->getLead(),
 				'withType' => true,

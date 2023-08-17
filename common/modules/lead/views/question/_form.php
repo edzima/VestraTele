@@ -32,6 +32,8 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'is_required')->checkbox() ?>
 
+	<?= $form->field($model, 'is_boolean')->checkbox() ?>
+
 	<?= $form->field($model, 'show_in_grid')->checkbox() ?>
 
 	<div class="form-group">

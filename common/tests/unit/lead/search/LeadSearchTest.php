@@ -92,7 +92,7 @@ class LeadSearchTest extends Unit {
 		foreach ($models as $model) {
 			$this->assertTrue($model->IsForUser(2));
 		}
-		$this->model->user_id = 3;
+		$this->model->user_id = 10000;
 		$models = $this->getSearchModels(true);
 		$this->tester->assertEmpty($models);
 	}

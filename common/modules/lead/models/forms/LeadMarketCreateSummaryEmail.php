@@ -2,10 +2,8 @@
 
 namespace common\modules\lead\models\forms;
 
-use common\models\user\query\UserQuery;
 use common\models\user\User;
 use common\modules\lead\models\LeadMarket;
-use common\modules\lead\models\LeadMarketUser;
 use Yii;
 use yii\base\Model;
 

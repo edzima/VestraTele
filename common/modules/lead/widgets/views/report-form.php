@@ -48,16 +48,20 @@ use yii\widgets\ActiveForm;
 
 
 	<?php foreach ($model->getAnswersModels() as $id => $answer): ?>
+		<?php if ($answer->getQuestion()->is_boolean): ?>
+			<?= $form->field($answer, "[$id]answer")
+				->radioList(Html::booleanDropdownList())
+				->label($answer->getQuestion()->name)
+			?>
+		<?php else: ?>
+			<?= $form->field($answer, "[$id]answer")
+				->textInput(['placeholder' => $answer->getQuestion()->placeholder])
+				->label($answer->getQuestion()->name)
+			?>
+		<?php endif; ?>
 
-		<?= $form->field($answer, "[$id]answer")
-			->textInput(['placeholder' => $answer->getQuestion()->placeholder])
-			->label($answer->getQuestion()->name)
-		?>
 
 	<?php endforeach; ?>
-
-
-
 
 	<?= !empty($model->getClosedQuestionsData())
 		? $form->field($model, 'closedQuestions')->widget(Select2::class, [
