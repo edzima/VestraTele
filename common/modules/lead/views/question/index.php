@@ -44,6 +44,8 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => LeadType::getNames(),
 
 			],
+			'is_active:boolean',
+			'is_boolean:boolean',
 			'is_required:boolean',
 			'show_in_grid:boolean',
 			['class' => 'yii\grid\ActionColumn'],

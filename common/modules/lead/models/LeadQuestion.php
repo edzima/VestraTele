@@ -49,6 +49,7 @@ class LeadQuestion extends ActiveRecord {
 			'type_id' => Yii::t('lead', 'Type'),
 			'status_id' => Yii::t('lead', 'Status'),
 			'is_active' => Yii::t('lead', 'Is Active'),
+			'is_boolean' => Yii::t('lead', 'Is Boolean'),
 			'is_required' => Yii::t('lead', 'Is required'),
 			'show_in_grid' => Yii::t('lead', 'Show in grid'),
 		];

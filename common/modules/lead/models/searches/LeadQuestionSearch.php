@@ -16,7 +16,9 @@ class LeadQuestionSearch extends LeadQuestion {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type_id', 'status_id', 'is_required', 'show_in_grid'], 'integer'],
+			[['id', 'type_id', 'status_id', 'show_in_grid'], 'integer'],
+			[['is_active', 'is_boolean', 'is_required'], 'boolean'],
+			[['is_active', 'is_boolean', 'is_required'], 'default', 'value' => null],
 			[['name', 'placeholder'], 'safe'],
 		];
 	}
@@ -57,15 +59,17 @@ class LeadQuestionSearch extends LeadQuestion {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
-			'status_id' => $this->status_id,
-			'type_id' => $this->type_id,
-			'is_required' => $this->is_required,
-			'show_in_grid' => $this->show_in_grid,
+			LeadQuestion::tableName() . '.id' => $this->id,
+			LeadQuestion::tableName() . '.status_id' => $this->status_id,
+			LeadQuestion::tableName() . '.type_id' => $this->type_id,
+			LeadQuestion::tableName() . '.is_active' => $this->is_active,
+			LeadQuestion::tableName() . '.is_boolean' => $this->is_boolean,
+			LeadQuestion::tableName() . '.is_required' => $this->is_required,
+			LeadQuestion::tableName() . '.show_in_grid' => $this->show_in_grid,
 		]);
 
-		$query->andFilterWhere(['like', 'name', $this->name])
-			->andFilterWhere(['like', 'placeholder', $this->placeholder]);
+		$query->andFilterWhere(['like', LeadQuestion::tableName() . '.name', $this->name])
+			->andFilterWhere(['like', LeadQuestion::tableName() . '.placeholder', $this->placeholder]);
 
 		return $dataProvider;
 	}
