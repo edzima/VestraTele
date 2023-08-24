@@ -26,6 +26,13 @@ use yii\db\ActiveRecord;
  */
 class Address extends ActiveRecord {
 
+	public string $formName = 'address';
+	public const SCENARIO_NOT_REQUIRED = 'not-required';
+
+	public function formName(): string {
+		return $this->formName;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -40,22 +47,32 @@ class Address extends ActiveRecord {
 		return [
 			[['postal_code', 'info'], 'trim'],
 			[
-				'city_id', 'required', 'enableClientValidation' => false, 'when' => function (): bool {
-				return empty($this->postal_code) && empty($this->info);
-			},
+				'city_id', 'required',
+				'enableClientValidation' => false,
+				'when' => function (): bool {
+					return empty($this->postal_code) && empty($this->info);
+				},
+				'except' => static::SCENARIO_NOT_REQUIRED,
 			],
 			[
-				'postal_code', 'required', 'enableClientValidation' => false, 'when' => function (): bool {
-				return empty($this->city_id) && empty($this->info);
-			},
+				'postal_code', 'required',
+				'enableClientValidation' => false,
+				'when' => function (): bool {
+					return empty($this->city_id) && empty($this->info);
+				},
+				'except' => static::SCENARIO_NOT_REQUIRED,
 			],
 			[
-				'info', 'required', 'enableClientValidation' => false, 'when' => function (): bool {
-				return empty($this->city_id) && empty($this->postal_code);
-			},
+				'info', 'required',
+				'enableClientValidation' => false,
+				'when' => function (): bool {
+					return empty($this->city_id) && empty($this->postal_code);
+				},
+				'except' => static::SCENARIO_NOT_REQUIRED,
 			],
 			[['city_id'], 'integer'],
 			[['postal_code'], 'string', 'max' => 6],
+			['postal_code', 'match', 'pattern' => '/^[0-9]{2}-[0-9]{3}/'],
 			[['info'], 'string', 'max' => 100],
 			[['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Simc::class, 'targetAttribute' => ['city_id' => 'id']],
 		];

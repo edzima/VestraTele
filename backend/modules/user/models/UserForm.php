@@ -46,6 +46,7 @@ class UserForm extends Model {
 	protected const EXCLUDED_PERMISSIONS = [];
 
 	private ?ActiveDataProvider $duplicatesDataProvider = null;
+	private bool $isPostalAddressRequired = false;
 
 	public function getDuplicatesDataProvider(): ?ActiveDataProvider {
 		if (
@@ -196,6 +197,9 @@ class UserForm extends Model {
 		if (!$this->postalAddress) {
 			$this->postalAddress = $this->getModel()->postalAddress ?: new Address();
 			$this->postalAddress->formName = 'addressPostal';
+			if (!$this->isPostalAddressRequired) {
+				$this->postalAddress->scenario = Address::SCENARIO_NOT_REQUIRED;
+			}
 		}
 
 		return $this->postalAddress;
@@ -208,7 +212,7 @@ class UserForm extends Model {
 		return parent::load($data)
 			&& $this->getProfile()->load($data)
 			&& $this->getHomeAddress()->load($data)
-			&& $this->getPostalAddress()->load($data);
+			&& ($this->isPostalAddressRequired ? $this->getPostalAddress()->load($data) : true);
 	}
 
 	public function hasDuplicates(): bool {
@@ -251,13 +255,9 @@ class UserForm extends Model {
 		$this->applyAuth($model->id, $isNewRecord);
 		$this->assignTraits($model->id, $isNewRecord);
 
-		if (!$this->updateProfile($model)
-			|| !$this->updateHomeAddress($model)
-			|| !$this->updatePostalAddress($model)
-
-		) {
-			return false;
-		}
+		$this->updateProfile($model);
+		$this->updateHomeAddress($model);
+		$this->updatePostalAddress($model);
 
 		if ($isNewRecord && $this->shouldSendEmail()) {
 			return $this->sendEmail($model);
@@ -301,7 +301,7 @@ class UserForm extends Model {
 		$profile->gender = $this->getProfile()->gender;
 		$profile->email_hidden_in_frontend_issue = $this->getProfile()->email_hidden_in_frontend_issue;
 
-		return $profile->save();
+		return $profile->save(false);
 	}
 
 	private function updateAddress(Address $address, User $model, string $type = UserAddress::TYPE_HOME): bool {

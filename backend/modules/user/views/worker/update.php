@@ -31,9 +31,16 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 	]) ?>
 
 
+	<legend><?= Yii::t('common', 'Home address') ?></legend>
 	<?= AddressFormWidget::widget([
 		'form' => $form,
 		'model' => $model->getHomeAddress(),
+	]) ?>
+
+	<legend><?= Yii::t('common', 'Postal address') ?></legend>
+	<?= AddressFormWidget::widget([
+		'form' => $form,
+		'model' => $model->getPostalAddress(),
 	]) ?>
 
 

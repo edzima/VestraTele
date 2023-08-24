@@ -31,9 +31,16 @@ use common\widgets\address\AddressFormWidget;
 ]) ?>
 
 
+<legend><?= Yii::t('common', 'Home address') ?></legend>
 <?= AddressFormWidget::widget([
 	'form' => $form,
 	'model' => $model->getHomeAddress(),
+]) ?>
+
+<legend><?= Yii::t('common', 'Postal address') ?></legend>
+<?= AddressFormWidget::widget([
+	'form' => $form,
+	'model' => $model->getPostalAddress(),
 ]) ?>
 
 <?= $form->field($model, 'roles')->checkboxList($model::getRolesNames()) ?>
