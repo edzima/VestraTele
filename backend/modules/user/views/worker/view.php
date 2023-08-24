@@ -116,7 +116,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		]) : '' ?>
 
 		<?= $model->postalAddress ? FieldsetDetailView::widget([
-			'legend' => Yii::t('common', 'Postals address'),
+			'legend' => Yii::t('common', 'Postal address'),
 			'detailConfig' => [
 				'class' => AddressDetailView::class,
 				'model' => $model->postalAddress,

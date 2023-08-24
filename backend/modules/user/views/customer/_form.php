@@ -51,19 +51,25 @@ use yii\bootstrap\Html;
 
 	<div class="col-md-10 col-lg-8">
 
-
-		<?= AddressFormWidget::widget([
-			'form' => $form,
-			'model' => $model->getHomeAddress(),
-		]) ?>
-
-
 		<?= $form->field($model, 'traits')->widget(Select2::class, [
 			'data' => CustomerUserForm::getTraitsNames(),
 			'options' => [
 				'multiple' => true,
 			],
 		]) ?>
+
+		<legend><?= Yii::t('common', 'Home address') ?></legend>
+		<?= AddressFormWidget::widget([
+			'form' => $form,
+			'model' => $model->getHomeAddress(),
+		]) ?>
+
+		<legend><?= Yii::t('common', 'Postal address') ?></legend>
+		<?= AddressFormWidget::widget([
+			'form' => $form,
+			'model' => $model->getPostalAddress(),
+		]) ?>
+
 
 	</div>
 </div>

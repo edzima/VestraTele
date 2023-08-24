@@ -187,6 +187,7 @@ class UserForm extends Model {
 	public function getHomeAddress(): Address {
 		if (!$this->homeAddress) {
 			$this->homeAddress = $this->getModel()->homeAddress ?: new Address();
+			$this->homeAddress->formName = 'addressHome';
 		}
 		return $this->homeAddress;
 	}
@@ -194,7 +195,9 @@ class UserForm extends Model {
 	public function getPostalAddress(): Address {
 		if (!$this->postalAddress) {
 			$this->postalAddress = $this->getModel()->postalAddress ?: new Address();
+			$this->postalAddress->formName = 'addressPostal';
 		}
+
 		return $this->postalAddress;
 	}
 
@@ -204,7 +207,8 @@ class UserForm extends Model {
 	public function load($data, $formName = null): bool {
 		return parent::load($data)
 			&& $this->getProfile()->load($data)
-			&& $this->getHomeAddress()->load($data);
+			&& $this->getHomeAddress()->load($data)
+			&& $this->getPostalAddress()->load($data);
 	}
 
 	public function hasDuplicates(): bool {
@@ -227,7 +231,8 @@ class UserForm extends Model {
 	public function validate($attributeNames = null, $clearErrors = true) {
 		return $this->getProfile()->validate($attributeNames, $clearErrors) // first profile for duplicatesConfirm rule
 			&& parent::validate($attributeNames, $clearErrors)
-			&& $this->getHomeAddress()->validate($attributeNames, $clearErrors);
+			&& $this->getHomeAddress()->validate($attributeNames, $clearErrors)
+			&& $this->getPostalAddress()->validate($attributeNames, $clearErrors);
 	}
 
 	public function save(bool $validate = true): bool {
@@ -246,7 +251,11 @@ class UserForm extends Model {
 		$this->applyAuth($model->id, $isNewRecord);
 		$this->assignTraits($model->id, $isNewRecord);
 
-		if (!$this->updateProfile($model) || !$this->updateHomeAddress($model)) {
+		if (!$this->updateProfile($model)
+			|| !$this->updateHomeAddress($model)
+			|| !$this->updatePostalAddress($model)
+
+		) {
 			return false;
 		}
 
@@ -309,6 +318,10 @@ class UserForm extends Model {
 
 	private function updateHomeAddress(User $model): bool {
 		return $this->updateAddress($this->getHomeAddress(), $model, UserAddress::TYPE_HOME);
+	}
+
+	private function updatePostalAddress(User $model): bool {
+		return $this->updateAddress($this->getPostalAddress(), $model, UserAddress::TYPE_POSTAL);
 	}
 
 	private function assignRoles(int $userId): void {
