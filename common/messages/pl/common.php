@@ -107,6 +107,7 @@ return [
 	'Summon: {text}' => 'Zlecenie: {text}',
 	'Issues' => 'Sprawy',
 	'Entity responsible' => 'Podmiot odpowiedzialny',
+	'Entities responsible' => 'Podmioty odpowiedzialne',
 	'loginToBackend' => 'Logowanie do backendu',
 	'Loading...' => 'Ładowanie...',
 	'Select...' => 'Wybierz...',
@@ -368,6 +369,7 @@ return [
 	'Reminder mark as done' => 'Wykonane',
 	'Reminder unmark as done' => 'Niewykonane',
 	'Account registration at {appName}' => 'Założenie konta w {appName}',
+	'Incorrect username or password.' => 'Niepoprawny Login lub Hasło.',
 	'Password reset for {appName}' => 'Przywrócenie hasła dla {appName}',
 	'email.bleed-background-text' => 'Ta wiadomość została wysłana automatycznie. Nie odpowiadaj na tego e-maila.',
 ];
