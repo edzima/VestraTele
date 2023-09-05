@@ -359,14 +359,20 @@ use yii\data\ActiveDataProvider;
 						[
 							'attribute' => 'type_additional_date_at',
 							'format' => 'date',
-							'visible' => $model->type->with_additional_date,
+							'visible' => !empty($model->type_additional_date_at),
 						],
-						'details:ntext',
+						[
+							'attribute' => 'details',
+							'format' => 'ntext',
+							'visible' => !empty($model->details),
+						],
 					],
 
 				],
 			]) ?>
 
+			<?php
+			?>
 
 		</div>
 	</div>
