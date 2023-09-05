@@ -19,7 +19,7 @@ use yii\data\DataProviderInterface;
 /* @var $summonDataProvider DataProviderInterface|null */
 
 $this->title = $model->longId;
-$this->params['breadcrumbs'] = Breadcrumbs::issue($model);
+$this->params['breadcrumbs'] = Breadcrumbs::issue($model, false);
 
 ?>
 <div class="issue-view">

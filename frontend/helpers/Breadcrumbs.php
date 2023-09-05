@@ -7,7 +7,7 @@ use Yii;
 
 class Breadcrumbs {
 
-	public static function issue(IssueInterface $model, bool $withCustomer = true): array {
+	public static function issue(IssueInterface $model, bool $withIssueLink = true): array {
 		$breadcrumbs = [];
 		if ($model->getIssueModel()->customer) {
 			$breadcrumbs[] = $model->getIssueModel()->customer->getFullName();
@@ -19,7 +19,9 @@ class Breadcrumbs {
 				'url' => Url::issuesParentType($model->getIssueType()->parent_id),
 			];
 		}
-		$breadcrumbs[] = ['label' => $model->getIssueName(), 'url' => Url::issueView($model->getIssueId())];
+		$breadcrumbs[] = $withIssueLink
+			? ['label' => $model->getIssueName(), 'url' => Url::issueView($model->getIssueId())]
+			: $model->getIssueName();
 		return $breadcrumbs;
 	}
 
