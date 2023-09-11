@@ -159,11 +159,11 @@ class IssueStageChangeForm extends Model {
 
 	public static function getStagesNames(int $typeId): array {
 		$stages = static::getStages($typeId);
-		usort($stages, function (IssueStage $a, IssueStage $b): bool {
+		usort($stages, function (IssueStage $a, IssueStage $b): int {
 			if ($a->posi === $b->posi) {
-				return strtolower($a->name) > strtolower($b->name);
+				return strcmp($a->name, $b->name);
 			}
-			return $a->posi < $b->posi;
+			return $a->posi <=> $b->posi;
 		});
 		return ArrayHelper::map($stages, 'id', 'name');
 	}
