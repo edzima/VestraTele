@@ -54,7 +54,7 @@ use kartik\select2\Select2;
 		]) ?>
 
 		<?= $form->field($model, 'excludedStages', ['options' => ['class' => 'col-md-5 col-lg-4']])->widget(Select2::class, [
-			'data' => $model->getStagesNames(),
+			'data' => $model->getIssueStagesNames(),
 			'options' => [
 				'multiple' => true,
 				'placeholder' => $model->getAttributeLabel('excludedStages'),

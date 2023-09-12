@@ -10,6 +10,7 @@ use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\search\ArchivedIssueSearch;
 use common\models\issue\search\IssueParentTypeSearchable;
+use common\models\issue\search\IssueStageSearchable;
 use common\models\issue\search\IssueTypeSearch;
 use common\models\query\PhonableQuery;
 use common\models\SearchModel;
@@ -31,6 +32,7 @@ abstract class IssueSearch extends Model
 	ArchivedIssueSearch,
 	CustomerSearchInterface,
 	IssueParentTypeSearchable,
+	IssueStageSearchable,
 	IssueTypeSearch,
 	SearchModel {
 
@@ -137,7 +139,7 @@ abstract class IssueSearch extends Model
 		return [
 			[
 				[
-					'issue_id', 'agent_id', 'stage_id', 'entity_responsible_id',
+					'issue_id', 'agent_id', 'entity_responsible_id',
 				], 'integer',
 			],
 			[
@@ -155,7 +157,7 @@ abstract class IssueSearch extends Model
 
 			['noteFilter', 'string'],
 			[['createdAtTo', 'createdAtFrom', 'signedAtFrom', 'signedAtTo', 'type_additional_date_from_at', 'type_additional_date_to_at'], 'date', 'format' => DATE_ATOM],
-			['stage_id', 'in', 'range' => array_keys($this->getStagesNames())],
+			['stage_id', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
 			[['type_id', 'excludedTypes'], 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			[['customerName', 'userName'], 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[['excludedTagsIds', 'tagsIds'], 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
@@ -168,7 +170,7 @@ abstract class IssueSearch extends Model
 
 			['summonsStatusFilter', 'in', 'range' => static::getSummonsStatusFilters(), 'allowArray' => true],
 			['customerPhone', PhoneValidator::class],
-			['excludedStages', 'in', 'range' => array_keys($this->getStagesNames()), 'allowArray' => true],
+			['excludedStages', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
 			['userType', 'in', 'range' => array_keys(static::getIssueUserTypesNames())],
 			['parentTypeId', 'in', 'range' => array_keys(static::getParentsTypesNames())],
 
@@ -243,14 +245,22 @@ abstract class IssueSearch extends Model
 		$this->applyOnlyWithTelemarketersFilter($query);
 		$this->applyIssueParentTypeFilter($query);
 		$this->applySummonsStatusFilter($query);
+		$this->applyIssueStageFilter($query);
 
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
-			Issue::tableName() . '.stage_id' => $this->stage_id,
 			Issue::tableName() . '.type_id' => $this->type_id,
 			Issue::tableName() . '.entity_responsible_id' => $this->entity_responsible_id,
 		]);
 		$query->groupBy(Issue::tableName() . '.id');
+	}
+
+	public function applyIssueStageFilter(QueryInterface $query): void {
+		if (!empty($this->stage_id)) {
+			$query->andWhere([
+				Issue::tableName() . '.stage_id' => $this->stage_id,
+			]);
+		}
 	}
 
 	public function getTotalCountWithArchive(): int {
@@ -474,7 +484,7 @@ abstract class IssueSearch extends Model
 		return ArrayHelper::map(EntityResponsible::find()->asArray()->all(), 'id', 'name');
 	}
 
-	public function getStagesNames(): array {
+	public function getIssueStagesNames(): array {
 		$stages = IssueStage::getStagesNames($this->withArchive, $this->withArchiveDeep);
 		if ($this->getIssueParentType() === null) {
 			return $stages;

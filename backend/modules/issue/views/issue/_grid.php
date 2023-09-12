@@ -124,7 +124,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 		[
 			'class' => IssueStageColumn::class,
 			'attribute' => 'stage_id',
-			'filter' => $searchModel->getStagesNames(),
+			'filter' => $searchModel->getIssueStagesNames(),
 			'value' => static function (Issue $model): string {
 				return StageChangeButtonDropdown::widget([
 					'model' => $model,
