@@ -194,6 +194,9 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		'model' => $model,
 		'relationActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
 		'claimActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
+		'entityResponsibleRoute' => '/entity-responsible/default/view',
+		'stageRoute' => 'stage/view',
+		'typeRoute' => 'type/view',
 	]) ?>
 
 
