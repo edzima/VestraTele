@@ -334,7 +334,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 
 	public function getContractors(): array {
 		if ($this->_contractorIds === null) {
-			$ids = Worker::getAssignmentIds([Worker::PERMISSION_SUMMON]);
+			$ids = User::getAssignmentIds([User::PERMISSION_SUMMON]);
 			if ($this->issue_id) {
 				$issueUsersIds = IssueUser::find()
 					->select('user_id')
