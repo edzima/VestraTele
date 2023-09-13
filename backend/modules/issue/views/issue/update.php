@@ -21,6 +21,7 @@ $this->params['breadcrumbs'][] = 'Edycja';
 
 	<?= $this->render('_form', [
 		'model' => $model,
+		'messagesModel' => null,
 	]) ?>
 
 </div>
