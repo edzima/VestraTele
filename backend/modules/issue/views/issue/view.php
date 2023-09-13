@@ -178,6 +178,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 			'caption' => Yii::t('settlement', 'Settlements'),
 			'withIssue' => false,
 			'summary' => '',
+			'withAgent' => false,
 			'withIssueType' => false,
 			'withCustomer' => false,
 			'withDates' => false,
