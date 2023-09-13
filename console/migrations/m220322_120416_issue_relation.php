@@ -16,7 +16,7 @@ class m220322_120416_issue_relation extends Migration {
 			'id' => $this->primaryKey(),
 			'issue_id_1' => $this->integer()->notNull(),
 			'issue_id_2' => $this->integer()->notNull(),
-			'created_at' => $this->integer()->notNull(),
+			'created_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
 		]);
 
 		$this->addForeignKey(

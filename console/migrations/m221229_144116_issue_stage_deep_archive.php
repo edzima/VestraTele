@@ -15,6 +15,7 @@ class m221229_144116_issue_stage_deep_archive extends Migration {
 		$this->upsert('{{%issue_stage}}', [
 			'id' => IssueStage::ARCHIVES_DEEP_ID,
 			'name' => 'Deep Archive',
+			'short_name' => 'DA',
 		]);
 	}
 
