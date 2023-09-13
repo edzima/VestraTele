@@ -1,11 +1,12 @@
 <?php
 
-use common\models\entityResponsible\EntityResponsible;
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use backend\helpers\Html;
+use backend\modules\entityResponsible\models\EntityResponsibleForm;
+use common\widgets\ActiveForm;
+use common\widgets\address\AddressFormWidget;
 
 /* @var $this yii\web\View */
-/* @var $model EntityResponsible */
+/* @var $model EntityResponsibleForm */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -13,12 +14,26 @@ use yii\widgets\ActiveForm;
 
 	<?php $form = ActiveForm::begin(); ?>
 
-	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+	<div class="row">
+		<div class="col-md-6">
+			<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-	<?= $form->field($model, 'is_for_summon')->checkbox() ?>
-	
+			<?= $form->field($model, 'details')->textarea(['maxlength' => true]) ?>
+
+			<?= AddressFormWidget::widget([
+				'model' => $model->getAddress(),
+				'form' => $form,
+			]) ?>
+
+			<?= $form->field($model, 'is_for_summon')->checkbox() ?>
+
+		</div>
+
+	</div>
+
+
 	<div class="form-group">
-		<?= Html::submitButton('Zapisz', ['class' => 'btn btn-success']) ?>
+		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

@@ -2,6 +2,8 @@
 
 namespace backend\modules\entityResponsible\controllers;
 
+use backend\modules\entityResponsible\models\EntityResponsibleForm;
+use backend\modules\issue\models\search\IssueSearch;
 use Yii;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\entityResponsible\EntityResponsibleSearch;
@@ -20,7 +22,7 @@ class DefaultController extends Controller {
 	public function behaviors() {
 		return [
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
 				],
@@ -33,7 +35,7 @@ class DefaultController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(): string {
 		$searchModel = new EntityResponsibleSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -48,10 +50,17 @@ class DefaultController extends Controller {
 	 *
 	 * @param integer $id
 	 * @return mixed
+	 * @throws NotFoundHttpException
 	 */
-	public function actionView($id) {
+	public function actionView(int $id): string {
+		$model = $this->findModel($id);
+		$searchModel = new IssueSearch();
+		$searchModel->entity_responsible_id = $id;
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		return $this->render('view', [
-			'model' => $this->findModel($id),
+			'model' => $model,
+			'issueFilterModel' => $searchModel,
+			'issueDataProvider' => $dataProvider,
 		]);
 	}
 
@@ -62,10 +71,10 @@ class DefaultController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new EntityResponsible();
+		$model = new EntityResponsibleForm();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('create', [
 			'model' => $model,
@@ -79,11 +88,12 @@ class DefaultController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionUpdate($id) {
-		$model = $this->findModel($id);
+	public function actionUpdate(int $id) {
+		$model = new EntityResponsibleForm();
+		$model->setModel($this->findModel($id));
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $id]);
 		}
 		return $this->render('update', [
 			'model' => $model,
@@ -97,7 +107,7 @@ class DefaultController extends Controller {
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function actionDelete($id) {
+	public function actionDelete(int $id) {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);
@@ -111,7 +121,7 @@ class DefaultController extends Controller {
 	 * @return EntityResponsible the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel($id): EntityResponsible {
+	protected function findModel(int $id): EntityResponsible {
 		if (($model = EntityResponsible::findOne($id)) !== null) {
 			return $model;
 		}

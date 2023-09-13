@@ -115,4 +115,10 @@ class Address extends ActiveRecord {
 		return Yii::$app->formatter->asCityCode($cityName, $this->postal_code, $strongPostalCodeTag);
 	}
 
+	public function isEmpty(): bool {
+		return empty($this->city_id)
+			&& empty($this->info)
+			&& empty($this->postal_code);
+	}
+
 }

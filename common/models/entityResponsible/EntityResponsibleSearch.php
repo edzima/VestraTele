@@ -2,6 +2,7 @@
 
 namespace common\models\entityResponsible;
 
+use common\models\issue\Issue;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -13,17 +14,17 @@ class EntityResponsibleSearch extends EntityResponsible {
 	/**
 	 * @inheritdoc
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			[['id', 'is_for_summon'], 'integer'],
-			[['name'], 'safe'],
+			[['name', 'details'], 'safe'],
 		];
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function scenarios() {
+	public function scenarios(): array {
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
 	}
@@ -35,14 +36,23 @@ class EntityResponsibleSearch extends EntityResponsible {
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function search($params) {
+	public function search(array $params) {
 		$query = EntityResponsible::find();
+		$query->select([
+			EntityResponsible::tableName() . '.*',
+			'COUNT(' . Issue::tableName() . '.id) AS issuesCount',
+		])->joinWith('issues', false)
+			->groupBy(EntityResponsible::tableName() . '.id');
 
 		// add conditions that should always apply here
-
+		$query->with('address');
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
 		]);
+		$dataProvider->getSort()->attributes['issuesCount'] = [
+			'asc' => ['issuesCount' => SORT_ASC],
+			'desc' => ['issuesCount' => SORT_DESC],
+		];
 
 		$this->load($params);
 
@@ -58,7 +68,8 @@ class EntityResponsibleSearch extends EntityResponsible {
 			'is_for_summon' => $this->is_for_summon,
 		]);
 
-		$query->andFilterWhere(['like', 'name', $this->name]);
+		$query->andFilterWhere(['like', 'name', $this->name])
+			->andFilterWhere(['like', 'details', $this->details]);
 
 		return $dataProvider;
 	}

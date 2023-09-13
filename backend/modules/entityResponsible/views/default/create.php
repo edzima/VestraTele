@@ -1,12 +1,14 @@
 <?php
 
+use backend\modules\entityResponsible\models\EntityResponsibleForm;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model \common\models\entityResponsible\EntityResponsible */
+/* @var $model EntityResponsibleForm */
 
-$this->title = 'Dodaj podmiot odpowiedzialny';
-$this->params['breadcrumbs'][] = ['label' => 'Podmioty odpowiedzialne', 'url' => ['index']];
+$this->title = Yii::t('backend', 'Create Entity Responsible');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Entities responsible'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-entity-responsible-create">

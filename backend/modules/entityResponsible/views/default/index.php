@@ -1,14 +1,16 @@
 <?php
 
+use backend\helpers\Html;
+use backend\widgets\GridView;
 use common\models\entityResponsible\EntityResponsibleSearch;
-use yii\grid\GridView;
-use yii\helpers\Html;
+use common\widgets\grid\AddressColumn;
 
 /* @var $this yii\web\View */
 /* @var $searchModel EntityResponsibleSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Podmioty odpowiedzialne';
+$this->title = Yii::t('common', 'Entities responsible');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issue-entity-responsible-index">
@@ -17,16 +19,20 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
 	<p>
-		<?= Html::a('Dodaj', ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('backend', 'Create'), ['create'], ['class' => 'btn btn-success']) ?>
 	</p>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-			['class' => 'yii\grid\SerialColumn'],
 			'name',
+			'details',
+			[
+				'class' => AddressColumn::class,
+			],
 			'is_for_summon:boolean',
+			'issuesCount',
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>

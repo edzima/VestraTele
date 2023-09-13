@@ -23,6 +23,11 @@ class Module extends BaseModule {
 				'rules' => [
 					[
 						'allow' => true,
+						'actions' => ['view'],
+						'permissions' => [Worker::PERMISSION_ISSUE],
+					],
+					[
+						'allow' => true,
 						'roles' => [Worker::ROLE_ADMINISTRATOR],
 						'permissions' => [Worker::PERMISSION_ENTITY_RESPONSIBLE_MANAGER],
 					],
