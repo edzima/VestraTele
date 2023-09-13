@@ -202,6 +202,7 @@ return [
 	'Status...' => 'Status...',
 	'Agent' => 'Agent',
 	'created_at' => 'Dodano',
+	'Created at / Updated at' => 'Dodano / Edytowano',
 	'Delete this pay' => 'Delete this pay',
 	'Provisions' => 'Prowizje',
 	'Create note for issue: {id}' => 'Dodaj notatkę do sprawy: {id}',

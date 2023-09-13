@@ -1,9 +1,9 @@
 <?php
 
+use common\assets\TooltipAsset;
 use common\helpers\Url;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
-use common\models\issue\IssueTag;
 use common\models\issue\IssueTagType;
 use common\models\issue\IssueUser;
 use common\models\user\Worker;
@@ -23,6 +23,9 @@ use yii\data\ActiveDataProvider;
 /* @var $claimActionColumn bool */
 /* @var $relationActionColumn bool */
 /* @var $userMailVisibilityCheck bool */
+/* @var $entityUrl string|null */
+/* @var $stageUrl string|null */
+/* @var $typeUrl string|null */
 
 ?>
 
@@ -319,6 +322,24 @@ use yii\data\ActiveDataProvider;
 					],
 					'attributes' => [
 						[
+							'label' => Yii::t('common', 'Created at / Updated at'),
+							'value' => function (Issue $model): string {
+								$content = Html::tag('span',
+									Yii::$app->formatter->asDate($model->created_at), [
+										TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::$app->formatter->asTime($model->created_at),
+									]
+								);
+								$content .= ' / ';
+								$content .= Html::tag('strong',
+									Yii::$app->formatter->asDate($model->updated_at), [
+										TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::$app->formatter->asTime($model->updated_at),
+									]
+								);
+								return $content;
+							},
+							'format' => 'raw',
+						],
+						[
 							'attribute' => 'signature_act',
 							'visible' => !empty($model->signature_act),
 						],
@@ -328,19 +349,27 @@ use yii\data\ActiveDataProvider;
 						],
 						[
 							'attribute' => 'type',
+							'format' => $typeUrl ? 'html' : 'text',
 							'label' => $model->getAttributeLabel('type_id'),
+							'value' => $typeUrl
+								? Html::a(Html::encode($model->type->name), $typeUrl)
+								: $model->type->name,
 						],
 						[
 							'attribute' => 'stage',
 							'label' => $model->getAttributeLabel('stage_id'),
-							'value' => function (IssueInterface $issue): string {
-								if (!empty($issue->getIssueModel()->stage_change_at)) {
-									return Yii::t('issue', '{stage} ({from})', [
+							'format' => $stageUrl ? 'html' : 'text',
+							'value' => function (IssueInterface $issue) use ($stageUrl): string {
+								$label = !empty($issue->getIssueModel()->stage_change_at)
+									? Yii::t('issue', '{stage} ({from})', [
 										'stage' => $issue->getIssueStage()->name,
 										'from' => Yii::$app->formatter->asDate($issue->getIssueModel()->stage_change_at),
-									]);
+									])
+									: $issue->getIssueStage()->name;
+								if ($stageUrl) {
+									return Html::a(Html::encode($label), $stageUrl);
 								}
-								return $issue->getIssueStage()->name;
+								return $label;
 							},
 						],
 						[
@@ -350,11 +379,16 @@ use yii\data\ActiveDataProvider;
 							'visible' => !empty($model->getIssueModel()->stage_deadline_at),
 						],
 						[
-							'attribute' => 'entityResponsible',
 							'label' => $model->getAttributeLabel('entity_responsible_id'),
+							'format' => $entityUrl ? 'html' : 'text',
+							'value' => $entityUrl
+								? Html::a(
+									Html::encode($model->entityResponsible->name), $entityUrl
+								)
+								: $model->entityResponsible->name,
+
 						],
-						'created_at:date',
-						'updated_at:date',
+
 						'signing_at:date',
 						[
 							'attribute' => 'type_additional_date_at',
@@ -366,6 +400,7 @@ use yii\data\ActiveDataProvider;
 							'format' => 'ntext',
 							'visible' => !empty($model->details),
 						],
+
 					],
 
 				],
