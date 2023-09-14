@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?php endif; ?>
 
 	<div class="row">
-		<div class="col-md-3">
+		<div class="col-md-9">
 			<?= DetailView::widget([
 				'model' => $model,
 				'attributes' => [

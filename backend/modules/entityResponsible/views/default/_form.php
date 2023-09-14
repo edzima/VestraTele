@@ -18,7 +18,7 @@ use common\widgets\address\AddressFormWidget;
 		<div class="col-md-6">
 			<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-			<?= $form->field($model, 'details')->textarea(['maxlength' => true]) ?>
+			<?= $form->field($model, 'details')->textarea(['maxlength' => true, 'rows' => 7]) ?>
 
 			<?= AddressFormWidget::widget([
 				'model' => $model->getAddress(),

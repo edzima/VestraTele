@@ -11,7 +11,7 @@ class m230824_113222_entity_responsible_details_and_address extends Migration {
 	 * {@inheritdoc}
 	 */
 	public function safeUp() {
-		$this->addColumn('{{%issue_entity_responsible}}', 'details', $this->string()->null());
+		$this->addColumn('{{%issue_entity_responsible}}', 'details', $this->text()->null());
 		$this->addColumn('{{%issue_entity_responsible}}', 'address_id', $this->integer()->null());
 
 		$this->addForeignKey(

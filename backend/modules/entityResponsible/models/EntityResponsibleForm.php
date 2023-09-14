@@ -19,7 +19,7 @@ class EntityResponsibleForm extends Model {
 	public function rules(): array {
 		return [
 			[['name'], 'required'],
-			[['name', 'details'], 'string', 'max' => 255],
+			[['name', 'details'], 'string'],
 			[['is_for_summon'], 'boolean'],
 			[['details', 'is_for_summon'], 'default', 'value' => null],
 			[
