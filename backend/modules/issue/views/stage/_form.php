@@ -50,8 +50,6 @@ use kartik\select2\Select2;
 		],
 	]) ?>
 
-	<?= $form->field($model, 'days_reminder')->textInput(['maxlength' => true]) ?>
-
 	<?= $form->field($model, 'calendar_background')->widget(
 		ColorInput::class
 	) ?>
