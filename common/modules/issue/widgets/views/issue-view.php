@@ -322,6 +322,10 @@ use yii\data\ActiveDataProvider;
 					],
 					'attributes' => [
 						[
+							'attribute' => 'signature_act',
+							'visible' => !empty($model->signature_act),
+						],
+						[
 							'label' => Yii::t('common', 'Created at / Updated at'),
 							'value' => function (Issue $model): string {
 								$content = Html::tag('span',
@@ -339,10 +343,7 @@ use yii\data\ActiveDataProvider;
 							},
 							'format' => 'raw',
 						],
-						[
-							'attribute' => 'signature_act',
-							'visible' => !empty($model->signature_act),
-						],
+
 						[
 							'attribute' => 'archives_nr',
 							'visible' => $model->isArchived(),
