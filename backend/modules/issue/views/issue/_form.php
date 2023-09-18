@@ -263,42 +263,55 @@ const archivesField = document.getElementById('archives-field');
 const linkedIssuesIdsInput = document.getElementById('$linkedIdsField');
 const linkedAttributesField = document.getElementById('$linkedAttributesField');
 
+function archivesFieldVisibility(){
+	if(isArchived()){
+		archivesField.classList.remove('hidden');
+	}else{
+		archivesField.classList.add('hidden');
+	}
+}
+
+
 function isArchived(){
 	return parseInt(stageInput.value) === $archivesStageId;
 }
 
 
-
 stageInput.onchange = function(){
-	let value = parseInt(this.value);
-	if(value === $archivesStageId){
-		archivesField.classList.remove('hidden');
-	}else{
-		archivesField.classList.add('hidden');
-	}
+	archivesFieldVisibility();
 };
 
-if(linkedIssuesIdsInput){
-	linkedIssuesIdsInput.onchange = function(){
+function linkedAttributesFieldVisibility(){
 	let value = parseInt(this.value);
 	if(value){
 		linkedAttributesField.classList.remove('hidden');
 	}else{
 		linkedAttributesField.classList.add('hidden');
 	}
-};
 }
 
+if(linkedIssuesIdsInput){
+	linkedIssuesIdsInput.onchange = function(){
+		linkedAttributesFieldVisibility();
+	};
+	linkedAttributesFieldVisibility();
+}
 
-
-typeInput.onchange= function(){
+function typesAdditionalDateVisibility(){
 	if(typesAdditionalDateAtNames.hasOwnProperty(parseInt(this.value))){
 		labelForTypeAdditionalDateAtField.textContent = typesAdditionalDateAtNames[parseInt(this.value)];
 		typeAdditionalDateAtField.classList.remove('hidden');
 	}else{
 		typeAdditionalDateAtField.classList.add('hidden');
 	}
+}
+
+typeInput.onchange= function(){
+	typesAdditionalDateVisibility();
 };
+
+archivesFieldVisibility();
+typesAdditionalDateVisibility();
 
 
 
