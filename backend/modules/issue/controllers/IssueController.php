@@ -231,6 +231,7 @@ class IssueController extends Controller {
 		}
 
 		$model = new IssueForm(['customer' => $customer]);
+		$baseIssue = null;
 		if ($issueId !== null) {
 			$baseIssue = $this->findModel($issueId);
 			$model->loadFromModel($baseIssue, false);
