@@ -163,7 +163,7 @@ class IssueStageChangeForm extends Model {
 			if ($a->posi === $b->posi) {
 				return strcmp($a->name, $b->name);
 			}
-			return $a->posi <=> $b->posi;
+			return $b->posi <=> $a->posi;
 		});
 		return ArrayHelper::map($stages, 'id', 'name');
 	}
