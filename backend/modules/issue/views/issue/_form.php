@@ -278,20 +278,17 @@ stageInput.onchange = function(){
 	}
 };
 
-
-linkedIssuesIdsInput.onchange = function(){
+if(linkedIssuesIdsInput){
+	linkedIssuesIdsInput.onchange = function(){
 	let value = parseInt(this.value);
-	console.log(value);
 	if(value){
-		console.log('remove');
-		console.log(linkedAttributesField);
 		linkedAttributesField.classList.remove('hidden');
 	}else{
-				console.log('add');
-
 		linkedAttributesField.classList.add('hidden');
 	}
 };
+}
+
 
 
 typeInput.onchange= function(){
