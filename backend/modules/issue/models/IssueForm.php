@@ -181,6 +181,10 @@ class IssueForm extends Model implements LinkedIssuesModel {
 				$model->stage_deadline_at = $this->stage_deadline_at;
 			}
 			if (!$model->save(false)) {
+				Yii::warning([
+					'message' => 'Issue validate save error.',
+					'errors' => $model->getErrors(),
+				], __METHOD__);
 				return false;
 			}
 
@@ -190,7 +194,7 @@ class IssueForm extends Model implements LinkedIssuesModel {
 
 			return true;
 		}
-		Yii::error($this->getModel()->getErrors(), 'issueForm');
+		Yii::error($this->getModel()->getErrors(), __METHOD__);
 		return false;
 	}
 
