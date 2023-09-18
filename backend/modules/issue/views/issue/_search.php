@@ -85,7 +85,7 @@ use common\models\user\Worker;
 				]
 			) ?>
 
-		<?= Yii::$app->user->can(User::ROLE_ADMINISTRATOR) ?
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_SEARCH_PARENTS) ?
 			$form->field($model, 'parentId', ['options' => ['class' => 'col-md-3 col-lg-2']])
 				->widget(Select2::class, [
 						'data' => User::getSelectList(Yii::$app->userHierarchy->getAllParentsIds()),
