@@ -115,6 +115,7 @@ class SmsController extends BaseController {
 		$model->owner_id = $user->getId();
 		$template->parseBody([
 			'userName' => $user->profile->firstname,
+			'userEmail' => $user->email,
 			'userPhone' => Yii::$app->formatter->asTel($phone, [
 				'asLink' => false,
 			]),
