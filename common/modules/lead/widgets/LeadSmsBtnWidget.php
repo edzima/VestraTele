@@ -87,6 +87,7 @@ class LeadSmsBtnWidget extends ButtonDropdown {
 		if ($this->user) {
 			$template->parseBody([
 				'userName' => $this->user->getProfile()->firstname,
+				'userEmail' => $this->user->email,
 				'userPhone' => Yii::$app->formatter->asTel($this->user->getPhone(), [
 					'asLink' => false,
 				]),
