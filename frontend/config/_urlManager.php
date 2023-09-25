@@ -30,6 +30,6 @@ return [
 		'spotkania' => 'meet',
 
 		'admin' => '/backend/web',
-
+		'mpkk' => 'site/max-amount',
 	],
 ];

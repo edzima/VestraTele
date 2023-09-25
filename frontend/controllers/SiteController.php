@@ -7,6 +7,7 @@ use common\models\Article;
 use common\models\user\LoginForm;
 use common\models\user\User;
 use frontend\models\ContactForm;
+use frontend\models\MaxAmountOfNonInterestFinancialCosts;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\ResetPasswordForm;
@@ -87,6 +88,16 @@ class SiteController extends Controller {
 		}
 		return $this->render('index', [
 			'articlesDataProvider' => $articlesDataProvider,
+		]);
+	}
+
+	public function actionMaxAmount(): string {
+		$model = new MaxAmountOfNonInterestFinancialCosts();
+		if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+			$model->calculate();
+		}
+		return $this->render('max-amount', [
+			'model' => $model,
 		]);
 	}
 
