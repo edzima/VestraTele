@@ -37,6 +37,7 @@ return [
 	'Settlements' => 'Rozliczenia',
 	'Settlement' => 'Rozliczenie',
 	'Entity rensponsible - {name}' => 'Podmiot - {name}',
+	'Entry fee' => 'Opłata wstępna',
 	'Provision' => 'Prowizja',
 	'Administrative' => 'Opłata administracyjna',
 	'Honorarium' => 'Honorarium',

@@ -14,6 +14,8 @@ interface IssueSettlement extends IssueInterface, SettlementInterface {
 
 	public const TYPE_ADMINISTRATIVE = 10;
 	public const TYPE_APPEAL = 15;
+
+	public const TYPE_ENTRY_FEE = 20;
 	public const TYPE_HONORARIUM = 30;
 	public const TYPE_HONORARIUM_VINDICATION = 31;
 	public const TYPE_LAWYER = 40;
