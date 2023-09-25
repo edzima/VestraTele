@@ -1,6 +1,8 @@
 <?php
 
-return [
+$local = file_exists(__DIR__ . '/rbac-local.php') ? require_once __DIR__ . '/rbac-local.php' : [];
+
+return array_merge([
 	'administrator' => 'Admin',
 	'agent' => 'Przedstawiciel',
 	'archive' => 'Archiwum',
@@ -35,6 +37,7 @@ return [
 	'issue.tag.manager' => 'Tagi Spraw (Mangaer)',
 	'issue.type.manager' => 'Typy Spraw - (Manager)',
 	'issue.visible_not_self' => 'Sprawy - podgląd Wszystkie',
+	'issue-file.delete_not_self' => 'Sprawy - Pliki usuwanie nie swoich',
 	'guardian' => 'Opiekun',
 	'handicapped' => 'Niepełnosprawny',
 	'hint' => 'Wskazówki',
@@ -87,4 +90,4 @@ return [
 	'vindicator' => 'Windykator',
 	'potential-client' => 'Potencjalny Klient',
 	'settlement.delete-not-self' => 'Rozliczenia - Usuwanie nie swoich',
-];
+], $local);
