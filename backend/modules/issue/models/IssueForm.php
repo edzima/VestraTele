@@ -50,6 +50,7 @@ class IssueForm extends Model implements LinkedIssuesModel {
 		'entity_responsible_id',
 		'signature_act',
 		'stage_id',
+		'stage_deadline_at',
 		'type_id',
 	];
 
