@@ -76,6 +76,8 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const ROLE_GUARDIAN = 'guardian';
 	public const ROLE_VINDICATOR = 'vindicator';
 
+	public const ROLE_ISSUE_FILE_MANAGER = 'issue-file-manager';
+
 	public const PERMISSION_ARCHIVE = 'archive';
 	public const PERMISSION_ARCHIVE_DEEP = 'archive.deep';
 	public const PERMISSION_MESSAGE_TEMPLATE = 'message.template';
