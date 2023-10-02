@@ -282,8 +282,7 @@ stageInput.onchange = function(){
 };
 
 function linkedAttributesFieldVisibility(){
-	let value = parseInt(this.value);
-	if(value){
+	if(linkedIssuesIdsInput.value.length){
 		linkedAttributesField.classList.remove('hidden');
 	}else{
 		linkedAttributesField.classList.add('hidden');
