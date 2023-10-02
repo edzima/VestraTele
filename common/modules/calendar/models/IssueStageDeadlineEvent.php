@@ -6,6 +6,7 @@ use common\helpers\Html;
 use common\helpers\Url;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueStage;
+use common\models\issue\IssueStageType;
 use DateTime;
 use Yii;
 
@@ -80,8 +81,9 @@ class IssueStageDeadlineEvent extends FullCalendarEvent {
 	public static function getStages(): array {
 		if (empty(static::$STAGES)) {
 			static::$STAGES = IssueStage::find()
-				->andWhere('days_reminder IS NOT NULL')
-				->andWhere('calendar_background IS NOT NULL')
+				->joinWith('stageTypes')
+				->andWhere(IssueStageType::tableName() . '.days_reminder IS NOT NULL')
+				->andWhere(IssueStageType::tableName() . '.calendar_background IS NOT NULL')
 				->orderBy('posi')
 				->indexBy('id')
 				->all();
