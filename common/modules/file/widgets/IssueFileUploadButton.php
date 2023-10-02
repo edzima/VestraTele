@@ -19,6 +19,7 @@ class IssueFileUploadButton extends ButtonDropdown {
 			$this->dropdown['items'] = $this->defaultItems();
 		}
 		$this->options['id'] = $this->getId();
+		parent::init();
 	}
 
 	public function run(): string {

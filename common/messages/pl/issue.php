@@ -202,4 +202,5 @@ return [
 	'Reminder' => 'Przypomnienia',
 	'Update linked Issues.' => 'Aktualizuj również połączone.',
 	'Linked Issues Attributes' => 'Pola do aktualizacji Połączonych Spraw',
+	'Files' => 'Pliki',
 ];

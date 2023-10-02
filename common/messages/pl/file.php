@@ -30,6 +30,7 @@ return [
 	'Public' => 'Publiczne',
 	'Private' => 'Prywatne',
 	'Revoke Access' => 'Odmów',
-	'Upload -{type} to Issue: {issue}' => 'Dodaj Plik ({type} do Sprawy: {issue}',
+	'Upload -{type} to Issue: {issue}' => 'Dodaj plik - {type} do Sprawy: {issue}',
 	'Types' => 'Typy',
+	'Save' => 'Zapisz',
 ];
