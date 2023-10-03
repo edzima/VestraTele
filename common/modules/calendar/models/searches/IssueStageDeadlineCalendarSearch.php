@@ -101,15 +101,26 @@ class IssueStageDeadlineCalendarSearch extends Model implements IssueParentTypeS
 			});
 		}
 		foreach ($stages as $model) {
-			$color = $model->calendar_background;
 			$data[] = [
 				'value' => $model->id,
 				'label' => Html::encode($model->name),
 				'isActive' => true,
-				'color' => $color,
+				'color' => $this->getStageBackgroundColor($model),
 			];
 		}
 		return $data;
+	}
+
+	protected function getStageBackgroundColor(IssueStage $model): ?string {
+		if ($model->calendar_background) {
+			return $model->calendar_background;
+		}
+		foreach ($model->stageTypes as $stageType) {
+			if ($stageType->calendar_background) {
+				return $stageType->calendar_background;
+			}
+		}
+		return null;
 	}
 
 	public function getEventsData(string $urlRoute): array {
