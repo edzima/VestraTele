@@ -59,6 +59,10 @@ div.required label:after {
 	.table-fixed-layout {
 		table-layout: fixed;
 	}
+
+	.mw-140-md {
+		max-width: 140px;
+	}
 }
 
 

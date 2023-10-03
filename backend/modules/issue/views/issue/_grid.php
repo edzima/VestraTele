@@ -174,8 +174,8 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 			],
 			'ellipsis' => true,
 			'value' => 'entityResponsible.name',
-			'options' => [
-				'style' => 'width:140px',
+			'contentOptions' => [
+				'class' => 'mw-140-md',
 			],
 		],
 
