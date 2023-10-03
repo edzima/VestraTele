@@ -72,7 +72,7 @@ class IssueStageDeadlineEvent extends FullCalendarEvent {
 	}
 
 	protected function getStagesBackgroundColor(): ?string {
-		return static::getStages()[$this->stageId]->calendar_background ?? null;
+		return $this->issue->getIssueModel()->getIssueStageType()->calendar_background ?? null;
 	}
 
 	/**

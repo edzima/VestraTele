@@ -36,6 +36,9 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Update');
 
 		<?= $form->field($model, 'days_reminder')->textInput(['maxlength' => true]) ?>
 
+		<?= $form->field($model, 'updateIssuesStageDeadlineAt')->checkbox()->hint(Yii::t('issue', 'Warning! Update all "Stage Deadline At"')) ?>
+
+
 		<?= $form->field($model, 'calendar_background')->widget(
 			ColorInput::class
 		) ?>

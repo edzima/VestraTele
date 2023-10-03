@@ -50,11 +50,6 @@ use kartik\select2\Select2;
 		],
 	]) ?>
 
-	<?= $form->field($model, 'calendar_background')->widget(
-		ColorInput::class
-	) ?>
-
-
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success']) ?>
 	</div>
