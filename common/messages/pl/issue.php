@@ -21,6 +21,7 @@ return [
 	'Note Title' => 'Tytuł Notatki',
 	'{newStage} (previous: {previousStage})' => '{newStage} (poprzedni: {previousStage})',
 	'Update Issue Note: {title}' => 'Edytuj notatkę: {title}',
+	'Update Issues Stage Deadline at' => 'Aktualizuj Terminy Etapów w Sprawach',
 	'Search for a title ...' => 'Szukaj tytułu ...',
 	'Email hidden in Frontend Issue' => 'Ukryj Email na Karcie Sprawy (Front)',
 	'Search for a description ...' => 'Szukaj opisu ...',
@@ -202,4 +203,5 @@ return [
 	'Reminder' => 'Przypomnienia',
 	'Update linked Issues.' => 'Aktualizuj również połączone.',
 	'Linked Issues Attributes' => 'Pola do aktualizacji Połączonych Spraw',
+	'Warning! Update all "Stage Deadline At"' => 'Uwaga! Zaktualizuje "Termin etapu" w Sprawach',
 ];
