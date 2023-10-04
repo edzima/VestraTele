@@ -36,8 +36,9 @@ class ApiLeadController extends Controller {
 		return [
 			'customer' => ['POST'],
 			'landing' => ['POST'],
-			'zapier' => ['POST'],
 			'message-zapier' => ['POST'],
+			'zapier' => ['POST'],
+			'wordpress' => ['POST'],
 		];
 	}
 
