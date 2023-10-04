@@ -58,7 +58,7 @@ use yii\web\View;
 		[
 			'attribute' => 'stage_id',
 			'value' => 'stage.name',
-			'filter' => $searchModel->getStagesNames(),
+			'filter' => $searchModel->getIssueStagesNames(),
 		],
 
 	],

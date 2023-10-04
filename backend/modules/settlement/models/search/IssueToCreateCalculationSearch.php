@@ -66,10 +66,10 @@ class IssueToCreateCalculationSearch extends IssueSearch {
 	}
 
 	public function existMinCalculationSettings(): bool {
-		return !empty($this->getStagesNames());
+		return !empty($this->getIssueStagesNames());
 	}
 
-	public function getStagesNames(): array {
+	public function getIssueStagesNames(): array {
 		return ArrayHelper::map(
 			StageType::find()
 				->with('stage')
