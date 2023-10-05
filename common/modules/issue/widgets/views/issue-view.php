@@ -217,7 +217,19 @@ use yii\data\ActiveDataProvider;
 					],
 					[
 						'label' => Yii::t('issue', 'Stage'),
-						'attribute' => 'stageName',
+						'format' => 'raw',
+						'value' => function (IssueInterface $issue): string {
+							return Html::tag(
+								'span',
+								Html::encode($issue->getIssueModel()->getStageName()),
+								[TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::$app->formatter->asDate($issue->getIssueModel()->stage_change_at)]
+							);
+						},
+					],
+					[
+						'label' => Yii::t('issue', 'Stage Deadline At'),
+						'format' => 'date',
+						'attribute' => 'stage_deadline_at',
 					],
 					[
 						'class' => CustomerDataColumn::class,
