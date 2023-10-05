@@ -5,6 +5,7 @@ use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
+use common\assets\TooltipAsset;
 use common\helpers\Html;
 use common\models\issue\Issue;
 use common\models\user\Worker;
@@ -128,22 +129,20 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 			'value' => static function (Issue $model): string {
 				return StageChangeButtonDropdown::widget([
 					'model' => $model,
-					'label' => $model->stage->name,
+					'label' => $model->stage->short_name,
 					'containerOptions' => [
 						'class' => 'd-inline-flex',
+						TooltipAsset::DEFAULT_ATTRIBUTE_NAME => $model->stage->name,
 					],
 					'returnUrl' => Url::to('/issue/issue/index'),
 					'options' => [
 						'class' => 'btn btn-default btn-sm',
-						'title' => Yii::t('backend', 'Change Stage'),
-						'aria-label' => Yii::t('backend', 'Change Stage'),
+						'title' => Yii::t('issue', 'Change Stage'),
+						'aria-label' => Yii::t('issue', 'Change Stage'),
 						'data-pjax' => 0,
 					],
 				]);
 			},
-			'options' => [
-				'style' => 'width:250px',
-			],
 			'format' => 'raw',
 			'contentBold' => true,
 			'contentCenter' => true,
@@ -175,7 +174,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 			'ellipsis' => true,
 			'value' => 'entityResponsible.name',
 			'contentOptions' => [
-				'class' => 'mw-140-md',
+				'class' => 'mw-120-md',
 			],
 		],
 
