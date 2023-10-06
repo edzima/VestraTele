@@ -55,6 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					'vat',
 					'with_additional_date:boolean',
 					'default_show_linked_notes:boolean',
+					'lead_source_id',
 				],
 			]) ?>
 		</div>

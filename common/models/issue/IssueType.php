@@ -19,6 +19,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null $with_additional_date
  * @property int|null $parent_id
  * @property int|null $default_show_linked_notes
+ * @property int|null $lead_source_id
  *
  * @property Issue[] $issues
  * @property IssueStage[] $stages
@@ -55,6 +56,7 @@ class IssueType extends ActiveRecord {
 			'parent' => Yii::t('issue', 'Type Parent'),
 			'parentName' => Yii::t('issue', 'Type Parent'),
 			'default_show_linked_notes' => Yii::t('issue', 'Default show Linked Notes'),
+			'lead_source_id' => Yii::t('issue', 'Lead Source for Created Issues'),
 		];
 	}
 

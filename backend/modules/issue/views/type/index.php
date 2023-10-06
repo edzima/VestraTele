@@ -36,6 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'value' => 'parentName',
 				'filter' => ArrayHelper::map(IssueTypeSearch::getParents(), 'id', 'name'),
 			],
+			'lead_source_id',
 			'default_show_linked_notes:boolean',
 			['class' => 'yii\grid\ActionColumn'],
 		],

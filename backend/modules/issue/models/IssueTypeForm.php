@@ -16,6 +16,8 @@ class IssueTypeForm extends Model {
 	public ?bool $with_additional_date = null;
 	public ?bool $default_show_linked_notes = null;
 	public $parent_id;
+	public $main_type_id;
+	public $lead_source_id;
 
 	private ?IssueType $model = null;
 
@@ -27,6 +29,7 @@ class IssueTypeForm extends Model {
 			[['name', 'short_name', 'vat'], 'required'],
 			[['with_additional_date', 'default_show_linked_notes'], 'boolean'],
 			[['name', 'short_name'], 'string', 'max' => 255],
+			['lead_source_id', 'integer', 'min' => 1],
 			['vat', 'number', 'min' => 0, 'max' => 100],
 			[
 				['name'], 'unique', 'targetClass' => IssueType::class, 'filter' => function (QueryInterface $query) {
@@ -61,6 +64,7 @@ class IssueTypeForm extends Model {
 		$this->parent_id = $model->parent_id;
 		$this->vat = $model->vat;
 		$this->default_show_linked_notes = $model->default_show_linked_notes;
+		$this->lead_source_id = $model->lead_source_id;
 	}
 
 	public function getParentsData(): array {
@@ -86,6 +90,7 @@ class IssueTypeForm extends Model {
 			'with_additional_date' => Yii::t('common', 'With additional Date'),
 			'parent_id' => Yii::t('issue', 'Type Parent'),
 			'default_show_linked_notes' => Yii::t('issue', 'Default show Linked Notes'),
+			'lead_source_id' => Yii::t('issue', 'Lead Source for Created Issues'),
 		];
 	}
 
@@ -101,6 +106,7 @@ class IssueTypeForm extends Model {
 		$model->with_additional_date = $this->with_additional_date;
 		$model->parent_id = $this->parent_id;
 		$model->default_show_linked_notes = $this->default_show_linked_notes;
+		$model->lead_source_id = $this->lead_source_id;
 		return $model->save();
 	}
 

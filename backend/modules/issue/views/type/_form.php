@@ -48,7 +48,18 @@ use yii\web\View;
 			'data' => $model->getParentsData(),
 			'options' => ['placeholder' => $model->getAttributeLabel('parent_id')],
 		]) ?>
+
+		<?= $form->field($model, 'lead_source_id', [
+			'options' => [
+				'class' => 'col-md-2',
+			],
+		])->widget(NumberControl::class, [
+			'maskedInputOptions' => [
+				'digits' => 0,
+			],
+		]) ?>
 	</div>
+
 
 	<?= $form->field($model, 'default_show_linked_notes')->checkbox() ?>
 

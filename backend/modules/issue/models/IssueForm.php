@@ -176,7 +176,8 @@ class IssueForm extends Model implements LinkedIssuesModel {
 			$model->entity_responsible_id = $this->entity_responsible_id;
 			$model->signing_at = $this->signing_at;
 			$model->type_additional_date_at = $this->type_additional_date_at;
-			if ($model->isNewRecord) {
+			$isNewRecord = $model->isNewRecord;
+			if ($isNewRecord) {
 				$model->generateStageDeadlineAt();
 			} else {
 				$model->stage_deadline_at = $this->stage_deadline_at;
@@ -189,7 +190,7 @@ class IssueForm extends Model implements LinkedIssuesModel {
 				return false;
 			}
 
-			$this->linkTags();
+			$this->linkTags(!$isNewRecord);
 			$this->linkUsers();
 			$this->saveLinkedIssues();
 
@@ -211,9 +212,9 @@ class IssueForm extends Model implements LinkedIssuesModel {
 		}
 	}
 
-	private function linkTags(): void {
+	private function linkTags(bool $withDelete): void {
 		$model = $this->getModel();
-		if (!$model->isNewRecord) {
+		if ($withDelete) {
 			IssueTagLink::deleteAll(['issue_id' => $model->id]);
 		}
 

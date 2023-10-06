@@ -18,6 +18,7 @@ use common\models\message\IssueCreateMessagesForm;
 use common\models\user\Customer;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\lead\models\forms\IssueLeadForm;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
@@ -253,6 +254,7 @@ class IssueController extends Controller {
 			if ($messagesModel->load($data)) {
 				$messagesModel->pushMessages();
 			}
+			$this->createCustomerLead($model->getModel());
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 
@@ -345,6 +347,13 @@ class IssueController extends Controller {
 			return $model;
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');
+	}
+
+	private function createCustomerLead(Issue $model) {
+		$data = IssueLeadForm::issueCustomerAttributes($model);
+		if (!empty($data)) {
+			Yii::$app->leadClient->addFromCustomer($data);
+		}
 	}
 
 }
