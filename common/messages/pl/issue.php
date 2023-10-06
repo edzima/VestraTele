@@ -204,4 +204,5 @@ return [
 	'Update linked Issues.' => 'Aktualizuj również połączone.',
 	'Linked Issues Attributes' => 'Pola do aktualizacji Połączonych Spraw',
 	'Warning! Update all "Stage Deadline At"' => 'Uwaga! Zaktualizuje "Termin etapu" w Sprawach',
+	'Lead Source for Created Issues' => 'Źródło Leada dla utworzonych Spraw',
 ];
