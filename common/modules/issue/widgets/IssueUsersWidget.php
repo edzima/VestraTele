@@ -162,7 +162,10 @@ class IssueUsersWidget extends Widget {
 		if ($this->withAddress !== null) {
 			if (call_user_func($this->withAddress, $issueUser) && $issueUser->user->homeAddress) {
 				$address = $issueUser->user->homeAddress;
-				$name = $address->city->nameWithRegionAndDistrict;
+				$name = '';
+				if ($address->city) {
+					$name = $address->city->nameWithRegionAndDistrict;
+				}
 				if ($address->postal_code) {
 					$name = $address->postal_code . ' ' . $name;
 				}
