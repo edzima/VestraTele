@@ -37,9 +37,9 @@ class IssueLeadForm extends LeadForm {
 		$lead->email = $customer->email;
 		$lead->phone = $customer->getPhone();
 		$lead->name = $customer->getFullName() . ' - ' . $model->getIssueName();
-		$lead->date_at = date($lead->dateFormat, strtotime($model->created_at));
+		$lead->date_at = date($lead->dateFormat, is_string($model->created_at) ? strtotime($model->created_at) : null);
 		$lead->data = Json::encode([
-			'customerUrl' => Yii::$app->urlManager->createAbsoluteUrl(['/customer/view', 'id' => $model->id]),
+			'customerUrl' => Yii::$app->urlManager->createAbsoluteUrl(['/customer/view', 'id' => $customer->id]),
 		]);
 		$lead->source_id = $sourceId;
 		return $lead->getAttributes();
