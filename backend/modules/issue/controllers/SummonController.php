@@ -87,7 +87,7 @@ class SummonController extends Controller {
 		$model = new SummonForm();
 		$model->owner_id = Yii::$app->user->id;
 		$model->issue_id = $issueId;
-		$model->start_at = time();
+		$model->start_at = date('Y-m-d');
 		if ($typeId && isset(SummonType::getModels()[$typeId])) {
 			$model->setType(SummonType::getModels()[$typeId]);
 		}
