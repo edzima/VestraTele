@@ -34,7 +34,9 @@ $this->params['issueParentTypeNav'] = [
 	</p>
 
 	<p>
-		<?= Html::a(Yii::t('backend', 'Create summon'), ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('backend', 'Create summon'), [
+			'create', 'typeId' => $searchModel->type_id,
+		], ['class' => 'btn btn-success']) ?>
 
 
 		<?= Html::a(Yii::t('backend', 'Summon Docs'), ['summon-doc-link/to-do'], ['class' => 'btn btn-warning']) ?>
