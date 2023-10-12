@@ -11,7 +11,6 @@ use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model Summon */
-/* @var $reminderPjaxId string */
 
 $this->title = Yii::t('common', 'Summon: {type} - {customer}', [
 	'type' => $model->typeName,
@@ -108,7 +107,6 @@ YiiAsset::register($this);
 
 			<?= $this->render('_reminder-grid', [
 				'model' => $model,
-				'pjaxId' => $reminderPjaxId,
 			]) ?>
 
 			<?= IssueNotesWidget::widget([
