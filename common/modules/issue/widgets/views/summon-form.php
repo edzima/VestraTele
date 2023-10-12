@@ -42,8 +42,13 @@ use yii\web\View;
 						'multiple' => true,
 					],
 					'disabled' => !(
-						Yii::$app->user->can(Worker::PERMISSION_SUMMON_DOC_MANAGER)
-						|| (!$model->getModel()->isNewRecord && $model->getModel()->owner_id === Yii::$app->user->getId())
+						(
+							Yii::$app->user->can(Worker::PERMISSION_SUMMON_DOC_MANAGER)
+							|| Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
+						)
+						|| (
+							!$model->getModel()->isNewRecord && $model->getModel()->owner_id === Yii::$app->user->getId()
+						)
 					),
 				])
 			?>
