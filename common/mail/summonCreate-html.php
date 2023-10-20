@@ -14,7 +14,9 @@ $this->params['primaryButtonHref'] = $summonLink;
 ?>
 <div class="summon-create-email">
 
-	<p><?= Yii::t('common', 'Entity responsible') ?>: <?= Html::encode($model->entityWithCity) ?></p>
+	<?php if ($model->entityWithCity): ?>
+		<p><?= Yii::t('common', 'Entity responsible') ?>: <?= Html::encode($model->entityWithCity) ?></p>
+	<?php endif; ?>
 
 	<?= $this->render('_customerDetails-html', [
 		'user' => $model->getIssueModel()->customer,

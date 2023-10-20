@@ -171,7 +171,13 @@ class Summon extends ActiveRecord implements IssueInterface {
 		return $this->hasOne(SummonType::class, ['id' => 'type_id']);
 	}
 
-	public function getEntityWithCity(): string {
+	public function getEntityWithCity(): ?string {
+		if ($this->entityResponsible === null) {
+			return null;
+		}
+		if ($this->city === null) {
+			return $this->entityResponsible->name;
+		}
 		return $this->entityResponsible->name .
 			' - '
 			. $this->city->name;
