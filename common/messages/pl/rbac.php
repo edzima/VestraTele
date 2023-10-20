@@ -27,6 +27,8 @@ return array_merge([
 	'issue.create' => 'Sprawy - dodawanie',
 	'issue.delete' => 'Sprawy - usuwanie',
 	'issue.link-user' => 'Sprawy - przypisywanie użytkowników',
+	'message:email.issue:create' => 'Powiadomienia Mailowe: Założenie Sprawy',
+	'message:email.issue:stageChange' => 'Powiadomienia Mailowe: Zmiana etapu Sprawy',
 	'issue.message.note.issue' => 'Powiadomienia Mailowe w Notatkach do Sprawy',
 	'issue.message.note.summon' => 'Powiadomienia Mailowe w Notatkach do Zlecenia',
 	'issue.message.note.settlement' => 'Powiadomienia Mailowe w Notatkach do Rozliczenia',

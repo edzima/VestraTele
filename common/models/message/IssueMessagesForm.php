@@ -82,7 +82,6 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 			],
 			['workersTypes', 'in', 'range' => array_keys($this->getWorkersUsersTypesNames()), 'allowArray' => true],
 			['extraWorkersEmails', 'in', 'range' => array_keys($this->getExtraWorkersEmailsData()), 'allowArray' => true],
-
 			[
 				'!sms_owner_id', 'required', 'when' => function (): bool {
 				return $this->sendSmsToCustomer || $this->sendSmsToAgent;
@@ -130,6 +129,7 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 				->joinWith('userProfile')
 				->andWhere(['email' => array_keys($this->extraWorkersEmails)])
 				->active()
+				->asArray()
 				->all(),
 				'email',
 				'fullName'

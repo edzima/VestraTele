@@ -245,6 +245,8 @@ class IssueController extends Controller {
 			IssueUser::TYPE_TELEMARKETER => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 			IssueUser::TYPE_LAWYER => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
 		];
+		$messagesModel->setExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_MESSAGE_EMAIL_ISSUE_CREATE));
+
 		$messagesModel->sendSmsToCustomer = $messagesModel->hasSmsCustomerTemplate(false);
 		$messagesModel->sms_owner_id = Yii::$app->user->getId();
 		$data = Yii::$app->request->post();
@@ -309,6 +311,7 @@ class IssueController extends Controller {
 		}
 		$model->date_at = date($model->dateFormat);
 		$model->user_id = Yii::$app->user->getId();
+		$model->getMessagesModel()->setExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_MESSAGE_EMAIL_ISSUE_STAGE_CHANGE));
 		if ($model->load(Yii::$app->request->post())
 			&& $model->save()
 		) {
