@@ -13,8 +13,8 @@ $this->title = Yii::t('issue', 'Issues Archive: {name}', [
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Issues'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-if ($searchModel->getIssueParentType()) {
-	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name];
+if ($searchModel->getIssueMainType()) {
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueMainType()->name];
 }
 $this->params['issueParentTypeNav'] = [
 	'route' => ['/issue/issue/index'],

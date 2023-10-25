@@ -26,13 +26,13 @@ use yii\widgets\Pjax;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('common', 'Issues');
-if ($searchModel->getIssueParentType()) {
+if ($searchModel->getIssueMainType()) {
 	$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
-	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name, Url::issuesParentType($searchModel->getIssueParentType()->id)];
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueMainType()->name, Url::issuesParentType($searchModel->getIssueMainType()->id)];
 } else {
 	$this->params['breadcrumbs'][] = $this->title;
 }
-$parentMenuItems = Html::issueParentTypeItems();
+$parentMenuItems = Html::issueMainTypesItems();
 
 ?>
 <div class="issue-index">

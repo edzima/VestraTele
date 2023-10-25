@@ -2,6 +2,7 @@
 
 namespace common\modules\issue\controllers;
 
+use common\behaviors\IssueTypeParentIdAction;
 use common\helpers\Flash;
 use common\models\issue\search\SummonDocLinkSearch;
 use common\models\issue\SummonDocLink;
@@ -30,6 +31,16 @@ class SummonDocLinkController extends Controller {
 					'confirm' => ['POST'],
 					'not-confirmed' => ['POST'],
 				],
+			],
+			'typeTypeParent' => [
+				'class' => IssueTypeParentIdAction::class,
+
+				'actions' => [
+					'to-do',
+					'to-confirm',
+					'confirmed',
+				],
+
 			],
 		];
 	}
@@ -128,7 +139,7 @@ class SummonDocLinkController extends Controller {
 
 	public function actionConfirm(int $summon_id, int $doc_type_id, string $returnUrl = null) {
 		$model = $this->findModel($summon_id, $doc_type_id);
-		if(empty($model->done_at)){
+		if (empty($model->done_at)) {
 			$model->done_user_id = Yii::$app->user->getId();
 			$model->done_at = date(DATE_ATOM);
 		}

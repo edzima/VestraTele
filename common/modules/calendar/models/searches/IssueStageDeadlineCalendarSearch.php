@@ -9,7 +9,7 @@ use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
-use common\models\issue\search\IssueParentTypeSearchable;
+use common\models\issue\search\IssueMainTypeSearchable;
 use common\models\KeyStorageItem;
 use common\models\user\User;
 use common\modules\calendar\models\IssueStageDeadlineEvent;
@@ -19,7 +19,7 @@ use yii\base\Model;
 use yii\db\ActiveQuery;
 use yii\helpers\Json;
 
-class IssueStageDeadlineCalendarSearch extends Model implements IssueParentTypeSearchable {
+class IssueStageDeadlineCalendarSearch extends Model implements IssueMainTypeSearchable {
 
 	public string $start;
 	public string $end;
@@ -37,7 +37,7 @@ class IssueStageDeadlineCalendarSearch extends Model implements IssueParentTypeS
 			->andWhere([Issue::tableName() . '.stage_id' => array_keys($stages)])
 			->withType(IssueUser::TYPE_LAWYER)
 			->distinct();
-		$this->applyIssueParentTypeFilter($query);
+		$this->applyIssueMainTypeFilter($query);
 		$usersIds = $query->column();
 		if (empty($usersIds)) {
 			return [];
@@ -87,12 +87,12 @@ class IssueStageDeadlineCalendarSearch extends Model implements IssueParentTypeS
 	public function getStagesFilters(): array {
 		$data = [];
 		$stages = static::getStages();
-		if ($this->getIssueParentType() !== null) {
+		if ($this->getIssueMainType() !== null) {
 			$stages = array_filter($stages, function (IssueStage $stage) {
-				if ($this->getIssueParentType()->hasStage($stage->id)) {
+				if ($this->getIssueMainType()->hasStage($stage->id)) {
 					return true;
 				}
-				foreach ($this->getIssueParentType()->childs as $type) {
+				foreach ($this->getIssueMainType()->childs as $type) {
 					if ($type->hasStage($stage->id)) {
 						return true;
 					}
@@ -133,7 +133,7 @@ class IssueStageDeadlineCalendarSearch extends Model implements IssueParentTypeS
 			'newestNote',
 			'lawyer'
 		);
-		$this->applyIssueParentTypeFilter($query);
+		$this->applyIssueMainTypeFilter($query);
 		$data = [];
 		foreach ($query->all() as $model) {
 			$event = new IssueStageDeadlineEvent();
@@ -167,16 +167,17 @@ class IssueStageDeadlineCalendarSearch extends Model implements IssueParentTypeS
 		return IssueStageDeadlineEvent::getStages();
 	}
 
-	public function applyIssueParentTypeFilter(ActiveQuery $query): void {
-		$parentType = $this->getIssueParentType();
-		if ($parentType) {
-			$childs = ArrayHelper::getColumn($parentType->childs, 'id');
-			$query->joinWith('issue');
-			$query->andFilterWhere([Issue::tableName() . '.type_id' => $childs]);
+	public function applyIssueMainTypeFilter(ActiveQuery $query): void {
+		if ($this->issueParentTypeId) {
+			$query->joinWith([
+				'issue' => function (IssueQuery $query) {
+					$query->type($this->issueParentTypeId);
+				},
+			]);
 		}
 	}
 
-	public function getIssueParentType(): ?IssueType {
+	public function getIssueMainType(): ?IssueType {
 		if ($this->issueParentTypeId) {
 			return IssueType::get($this->issueParentTypeId);
 		}

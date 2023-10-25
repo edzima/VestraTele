@@ -8,6 +8,7 @@
 
 namespace frontend\controllers;
 
+use common\behaviors\IssueTypeParentIdAction;
 use common\models\issue\Issue;
 use common\models\user\UserVisible;
 use common\models\user\Worker;
@@ -43,6 +44,9 @@ class IssueController extends Controller {
 					],
 				],
 			],
+			'typeTypeParent' => [
+				'class' => IssueTypeParentIdAction::class,
+			],
 		];
 	}
 
@@ -53,10 +57,11 @@ class IssueController extends Controller {
 	 * @return string
 	 * @see Url::PARAM_ISSUE_PARENT_TYPE
 	 */
-	public function actionIndex(int $parentTypeId = null): string {
+	public function actionIndex(int $parentTypeId = null) {
 		$user = Yii::$app->user;
 		$searchModel = new IssueSearch();
-		$searchModel->parentTypeId = $parentTypeId;
+		$searchModel->parentTypeId = IssueTypeParentIdAction::validate($parentTypeId);
+
 		$searchModel->excludeArchiveStage();
 		$searchModel->excludeArchiveDeepStage();
 		$searchModel->user_id = (int) $user->getId();

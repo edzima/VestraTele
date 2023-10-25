@@ -2,8 +2,10 @@
 
 namespace common\models\issue\query;
 
+use common\helpers\ArrayHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueStage;
+use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use yii\db\ActiveQuery;
 
@@ -13,6 +15,19 @@ use yii\db\ActiveQuery;
  * @see Issue
  */
 class IssueQuery extends ActiveQuery {
+
+	public function type(int $typeId, bool $withChildren = true): self {
+		$types = [];
+		if ($withChildren) {
+			$type = IssueType::getTypes()[$typeId];
+			if ($type) {
+				$types = ArrayHelper::getColumn($type->childs, 'id');
+			}
+		}
+		$types[] = $typeId;
+		$this->andWhere([Issue::tableName() . '.type_id' => $types]);
+		return $this;
+	}
 
 	public function withoutCustomer(): self {
 		$this->andWhere([

@@ -205,4 +205,7 @@ return [
 	'Linked Issues Attributes' => 'Pola do aktualizacji Połączonych Spraw',
 	'Warning! Update all "Stage Deadline At"' => 'Uwaga! Zaktualizuje "Termin etapu" w Sprawach',
 	'Lead Source for Created Issues' => 'Źródło Leada dla utworzonych Spraw',
+	'Mark Type: {type} as Favorite.' => 'Ustawiono: {type} jako domyślny Typ.',
+	'Unmark Favorite Issue Type.' => 'Bez domyślnego Typu.',
+	'Is main Type' => 'Główny Typ',
 ];

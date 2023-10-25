@@ -8,6 +8,10 @@ use yii\bootstrap\Nav;
 
 class IssueParentTypeHeader extends Widget {
 
+	protected const CLASS_WITH_FAVORITE = 'nav-with-favorite';
+
+	public bool $withFavorite = true;
+
 	public string $content = '';
 	public string $tag = 'h1';
 	public array $options = [];
@@ -22,10 +26,16 @@ class IssueParentTypeHeader extends Widget {
 	public function init() {
 		parent::init();
 		if (empty($this->parentsMenuItems)) {
-			$this->parentsMenuItems = Html::issueParentTypeItems($this->parentsMenuConfig);
+			if ($this->withFavorite) {
+				$this->parentsMenuConfig['withFavorite'] = true;
+			}
+			$this->parentsMenuItems = Html::issueMainTypesItems($this->parentsMenuConfig);
 		}
 		if (empty($this->content)) {
 			$this->content = $this->view->title;
+		}
+		if ($this->withFavorite) {
+			Html::addCssClass($this->parentsNavConfig['options'], static::CLASS_WITH_FAVORITE);
 		}
 	}
 

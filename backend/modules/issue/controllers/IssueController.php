@@ -9,6 +9,7 @@ use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\CsvForm;
+use common\behaviors\IssueTypeParentIdAction;
 use common\behaviors\SelectionRouteBehavior;
 use common\helpers\Flash;
 use common\models\issue\Issue;
@@ -47,6 +48,9 @@ class IssueController extends Controller {
 			'selection' => [
 				'class' => SelectionRouteBehavior::class,
 			],
+			'typeTypeParent' => [
+				'class' => IssueTypeParentIdAction::class,
+			],
 		];
 	}
 
@@ -57,7 +61,8 @@ class IssueController extends Controller {
 	 */
 	public function actionIndex(int $parentTypeId = null) {
 		$searchModel = new IssueSearch();
-		$searchModel->parentTypeId = $parentTypeId;
+
+		$searchModel->parentTypeId = IssueTypeParentIdAction::validate($parentTypeId);
 		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
 			$searchModel->excludeArchiveStage();

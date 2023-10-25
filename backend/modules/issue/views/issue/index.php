@@ -3,6 +3,7 @@
 use backend\helpers\Html;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\widgets\CsvForm;
+use common\behaviors\IssueTypeParentIdAction;
 use common\models\user\Worker;
 use common\widgets\grid\SelectionForm;
 use yii\data\ActiveDataProvider;
@@ -13,10 +14,12 @@ use yii\widgets\Pjax;
 /* @var $dataProvider ActiveDataProvider */
 
 $this->title = Yii::t('backend', 'Issues');
-$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
 
-if ($searchModel->getIssueParentType()) {
-	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name];
+if (!$searchModel->getIssueMainType()) {
+	$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
+} else {
+	$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => IssueTypeParentIdAction::urlAll()];
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueMainType()->name];
 }
 $this->params['issueParentTypeNav'] = [
 	'route' => ['/issue/issue/index'],
@@ -55,7 +58,7 @@ $this->params['issueParentTypeNav'] = [
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE)
 			? Html::a('<i class="fa fa-calendar"></i>' . ' ' . Yii::t('issue', 'Stages Deadlines'),
-				['/calendar/issue-stage-deadline/index', 'parentTypeId' => $searchModel->getIssueParentType()->id ?? null,],
+				['/calendar/issue-stage-deadline/index', 'parentTypeId' => $searchModel->getIssueMainType()->id ?? null,],
 				[
 					'class' => 'btn btn-warning',
 					'data-pjax' => 0,

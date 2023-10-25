@@ -20,6 +20,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null $parent_id
  * @property int|null $default_show_linked_notes
  * @property int|null $lead_source_id
+ * @property int|null is_main
  *
  * @property Issue[] $issues
  * @property IssueStage[] $stages
@@ -57,6 +58,7 @@ class IssueType extends ActiveRecord {
 			'parentName' => Yii::t('issue', 'Type Parent'),
 			'default_show_linked_notes' => Yii::t('issue', 'Default show Linked Notes'),
 			'lead_source_id' => Yii::t('issue', 'Lead Source for Created Issues'),
+			'is_main' => Yii::t('issue', 'Is main Type'),
 		];
 	}
 
@@ -129,6 +131,27 @@ class IssueType extends ActiveRecord {
 				->all();
 		}
 		return static::$TYPES;
+	}
+
+	/**
+	 * @return static[]
+	 */
+	public static function getMainTypes(): array {
+		$types = static::getTypes();
+		$main = [];
+		foreach ($types as $type) {
+			if ($type->is_main && !isset($main[$type->id])) {
+				$main[$type->id] = $type;
+				continue;
+			}
+			if ($type->parent_id && !isset($main[$type->parent_id])) {
+				$parent = $types[$type->parent_id] ?? null;
+				if ($parent) {
+					$main[$parent->id] = $parent;
+				}
+			}
+		}
+		return $main;
 	}
 
 	/**

@@ -181,13 +181,13 @@ $user = Yii::$app->user;
 						[
 							'label' => Yii::t('common', 'Browse'),
 							'url' => ['/issue/issue/index'],
-							'options' => empty(Html::issueParentTypeItems())
+							'options' => empty(Html::issueMainTypesItems())
 								? []
 								: [
 									'class' => 'treeview',
 								],
 							'icon' => '<i class="fa fa-eye"></i>',
-							'items' => Html::issueParentTypeItems(),
+							'items' => Html::issueMainTypesItems(),
 						],
 						[
 							'label' => Yii::t('issue', 'Archive'),
@@ -241,6 +241,30 @@ $user = Yii::$app->user;
 							'label' => Yii::t('common', 'Leads'),
 							'url' => ['/issue/issue/lead'],
 							'icon' => '<i class="fa fa-vcard"></i>',
+						],
+					],
+				],
+				[
+					'label' => Yii::t('file', 'Files'),
+					'url' => ['/file/file/index'],
+					'icon' => '<i class="fa fa-paperclip"></i>',
+					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(User::PERMISSION_ISSUE),
+					'items' => [
+						[
+							'label' => Yii::t('file', 'Browse'),
+							'url' => ['/file/file/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('file', 'Types'),
+							'url' => ['/file/file-type/index'],
+							'icon' => '<i class="fa fa-sitemap"></i>',
+						],
+						[
+							'label' => Yii::t('file', 'Access'),
+							'url' => ['/file/file-access/index'],
+							'icon' => '<i class="fa fa-users"></i>',
 						],
 					],
 				],

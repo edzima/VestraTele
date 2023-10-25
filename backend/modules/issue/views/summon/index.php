@@ -13,8 +13,8 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('common', 'Summons');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];
-if ($searchModel->getIssueParentType()) {
-	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name, 'url' => Url::issuesParentType($searchModel->issueParentTypeId)];
+if ($searchModel->getIssueMainType()) {
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueMainType()->name, 'url' => Url::issuesParentType($searchModel->issueParentTypeId)];
 }
 
 $this->params['breadcrumbs'][] = $this->title;

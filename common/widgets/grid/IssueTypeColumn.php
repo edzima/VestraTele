@@ -52,6 +52,9 @@ class IssueTypeColumn extends DataColumn {
 			$filterModel = $this->grid->filterModel;
 			if ($filterModel instanceof IssueTypeSearch) {
 				$this->filter = $filterModel->getIssueTypesNames();
+				if (count($this->filter) === 1) {
+					$this->visible = false;
+				}
 			}
 		}
 		if (empty($this->filterType)) {
