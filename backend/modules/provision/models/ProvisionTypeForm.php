@@ -95,6 +95,7 @@ class ProvisionTypeForm extends Model {
 		$this->is_default = $model->is_default;
 		$this->is_active = $model->is_active;
 		$this->from_at = $model->from_at;
+		$this->to_at = $model->to_at;
 		$this->issueUserType = $model->getIssueUserType();
 		$this->issueTypesIds = $model->getIssueTypesIds();
 		$this->issueRequiredUserTypes = $model->getIssueRequiredUserTypes();
