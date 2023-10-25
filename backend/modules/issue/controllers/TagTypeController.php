@@ -2,13 +2,13 @@
 
 namespace backend\modules\issue\controllers;
 
-use backend\modules\issue\models\TypeTagsForm;
-use Yii;
-use common\models\issue\IssueTagType;
 use backend\modules\issue\models\search\TagTypeSearch;
+use backend\modules\issue\models\TypeTagsForm;
+use common\models\issue\IssueTagType;
+use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * TagTypeController implements the CRUD actions for IssueTagType model.

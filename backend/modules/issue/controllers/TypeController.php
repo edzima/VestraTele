@@ -11,6 +11,7 @@ use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use function array_key_first;
 
 /**
  * TypeController implements the CRUD actions for IssueType model.

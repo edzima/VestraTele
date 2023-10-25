@@ -2,11 +2,9 @@
 
 namespace backend\modules\issue\models;
 
-use common\models\issue\Issue;
 use common\models\issue\IssueType;
 use Yii;
 use yii\base\Model;
-use yii\db\Expression;
 use yii\db\QueryInterface;
 
 class IssueStageForm extends Model {

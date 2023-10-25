@@ -251,29 +251,34 @@ class IssueForm extends Model implements LinkedIssuesModel {
 	}
 
 	public static function getTypesNames(): array {
-		$parents = IssueType::getParents();
-		if (empty($parents)) {
-			return IssueType::getTypesNames();
-		}
+
+		$types = static::getTypesWithStages();
 		$names = [];
-		foreach ($parents as $parent) {
-			$names[$parent->name] = ArrayHelper::map($parent->childs, 'id', 'name');
+		foreach ($types as $type) {
+			if ($type->parent) {
+				$names[$type->parent->name][$type->id] = $type->name;
+			} else {
+				$names[$type->id] = $type->name;
+			}
 		}
 		return $names;
 	}
 
 	public static function getTypesIds(): array {
-		$parents = IssueType::getParents();
-		if (empty($parents)) {
-			return array_keys(IssueType::getTypesNames());
-		}
-		$ids = [];
-		foreach ($parents as $parent) {
-			foreach ($parent->childs as $child) {
-				$ids[] = $child->id;
+		return array_keys(static::getTypesWithStages());
+	}
+
+	/**
+	 * @return IssueType[]
+	 */
+	protected static function getTypesWithStages(): array {
+		$types = [];
+		foreach (IssueType::getTypes() as $type) {
+			if (!empty($type->stages)) {
+				$types[$type->id] = $type;
 			}
 		}
-		return $ids;
+		return $types;
 	}
 
 	public function getStagesData(): array {

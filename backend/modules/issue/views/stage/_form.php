@@ -4,7 +4,6 @@ use backend\helpers\Html;
 use backend\modules\issue\models\IssueStageForm;
 use common\models\issue\IssueType;
 use common\widgets\ActiveForm;
-use kartik\color\ColorInput;
 use kartik\select2\Select2;
 
 /* @var $this yii\web\View */

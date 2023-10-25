@@ -2,9 +2,9 @@
 
 namespace backend\modules\issue\models\search;
 
+use common\models\issue\IssueTagType;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\issue\IssueTagType;
 
 /**
  * TagTypeSearch represents the model behind the search form of `common\models\issue\IssueTagType`.

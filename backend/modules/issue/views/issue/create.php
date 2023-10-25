@@ -1,14 +1,10 @@
 <?php
 
-use backend\helpers\Html;
-use backend\helpers\Url;
 use backend\modules\issue\models\IssueForm;
 use backend\modules\user\widgets\DuplicateUserGridView;
 use common\models\issue\Issue;
 use common\models\message\IssueCreateMessagesForm;
-use kartik\select2\Select2;
 use yii\data\ActiveDataProvider;
-use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $baseIssue Issue|null */

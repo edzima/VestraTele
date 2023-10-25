@@ -2,7 +2,6 @@
 
 use backend\helpers\Breadcrumbs;
 use backend\modules\issue\models\IssueClaimForm;
-use common\models\issue\IssueClaim;
 
 /* @var $this yii\web\View */
 /* @var $model IssueClaimForm */

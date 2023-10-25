@@ -4,8 +4,8 @@ namespace backend\modules\issue\models;
 
 use common\models\issue\SummonDoc;
 use common\models\issue\SummonType;
+use Yii;
 use yii\base\Model;
-use yii\db\ActiveQuery;
 use yii\db\QueryInterface;
 
 class SummonDocForm extends Model {
@@ -44,7 +44,7 @@ class SummonDocForm extends Model {
 	public function attributeLabels() {
 		return array_merge(
 			SummonDoc::instance()->attributeLabels(), [
-				'summonTypesIds' => \Yii::t('issue', 'Summon Types'),
+				'summonTypesIds' => Yii::t('issue', 'Summon Types'),
 			]
 		);
 	}

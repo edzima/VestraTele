@@ -1,10 +1,11 @@
 <?php
 
+use backend\modules\issue\models\search\RelationSearch;
 use yii\grid\GridView;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $searchModel backend\modules\issue\models\search\RelationSearch */
+/* @var $searchModel RelationSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('issue', 'Issue Relations');

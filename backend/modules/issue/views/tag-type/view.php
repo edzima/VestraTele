@@ -1,7 +1,6 @@
 <?php
 
 use backend\helpers\Html;
-use backend\modules\issue\models\search\IssueSearch;
 use backend\widgets\GridView;
 use common\models\issue\IssueTag;
 use common\models\issue\IssueTagType;

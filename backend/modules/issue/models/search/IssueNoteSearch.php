@@ -6,12 +6,12 @@ use backend\modules\issue\models\IssueStage;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\search\IssueStageSearchable;
+use common\models\issue\search\IssueTypeSearch as IssueTypeSearchable;
 use common\models\user\User;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\QueryInterface;
-use common\models\issue\search\IssueTypeSearch as IssueTypeSearchable;
 
 /**
  * IssueNoteSearch represents the model behind the search form of `common\models\issue\IssueNote`.

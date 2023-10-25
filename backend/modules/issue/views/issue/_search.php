@@ -3,11 +3,11 @@
 use backend\helpers\Html;
 use backend\modules\issue\models\search\IssueSearch;
 use common\models\user\User;
+use common\models\user\Worker;
 use common\widgets\address\AddressSearchWidget;
 use common\widgets\DateWidget;
 use kartik\select2\Select2;
 use yii\widgets\ActiveForm;
-use common\models\user\Worker;
 
 /* @var $this yii\web\View */
 /* @var $model IssueSearch */
