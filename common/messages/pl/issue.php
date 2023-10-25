@@ -208,4 +208,6 @@ return [
 	'Mark Type: {type} as Favorite.' => 'Ustawiono: {type} jako domyślny Typ.',
 	'Unmark Favorite Issue Type.' => 'Bez domyślnego Typu.',
 	'Is main Type' => 'Główny Typ',
+	'Not from Issues' => 'Spoza Sprawy',
+	'From Issues' => 'Przypisani do Sprawy',
 ];

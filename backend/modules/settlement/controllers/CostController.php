@@ -261,9 +261,10 @@ class CostController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException
 	 */
-	public function actionCreate(int $id) {
+	public function actionCreate(int $id, bool $usersFromIssue = true) {
 		$issue = $this->findIssue($id);
 		$model = new IssueCostForm($issue);
+		$model->usersFromIssue = $usersFromIssue;
 		$model->date_at = date(DATE_ATOM);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
@@ -274,11 +275,12 @@ class CostController extends Controller {
 		]);
 	}
 
-	public function actionCreateInstallment(int $id, int $user_id = null) {
+	public function actionCreateInstallment(int $id, int $user_id = null, bool $usersFromIssue = true) {
 		$issue = $this->findIssue($id);
 		$model = new IssueCostForm($issue);
 		$model->setScenario(IssueCostForm::SCENARIO_CREATE_INSTALLMENT);
 		$model->user_id = $user_id;
+		$model->usersFromIssue = $usersFromIssue;
 		$model->type = IssueCost::TYPE_INSTALLMENT;
 		$model->date_at = date(DATE_ATOM);
 		$model->vat = 0;

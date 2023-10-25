@@ -1,14 +1,17 @@
 <?php
 
+use backend\helpers\Url;
 use backend\modules\settlement\models\IssueCostForm;
 use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
 use kartik\number\NumberControl;
+use kartik\select2\Select2;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model IssueCostForm */
 /* @var $form yii\widgets\ActiveForm */
+
 ?>
 
 <div class="issue-cost-form">
@@ -17,7 +20,23 @@ use yii\helpers\Html;
 
 	<div class="row">
 
-		<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-4 col-lg-3']])->dropDownList($model->getUserNames(), ['prompt' => Yii::t('common', 'Select...')]) ?>
+		<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-4 col-lg-3']])
+			->widget(Select2::class, [
+				'data' => $model->getUserNames(),
+				'pluginOptions' => [
+					'placeholder' => Yii::t('common', 'Select...'),
+					'allowClear' => true,
+				],
+			])
+			->hint(
+				$model->getModel()->isNewRecord
+					? ($model->usersFromIssue
+					? Html::a(Yii::t('issue', 'Not from Issues'), Url::current(['usersFromIssue' => 0]))
+					: Html::a(Yii::t('issue', 'From Issues'), Url::current(['usersFromIssue' => 1]))
+				)
+					: null
+			)
+		?>
 
 		<?= $form->field($model, 'type', ['options' => ['class' => 'col-md-4 col-lg-3']])->dropDownList(IssueCostForm::getTypesNames()) ?>
 

@@ -7,6 +7,7 @@ use common\models\issue\IssueCost;
 use common\models\issue\IssueCostInterface;
 use common\models\issue\IssueInterface;
 use common\models\user\User;
+use common\models\user\Worker;
 use Decimal\Decimal;
 use Yii;
 use yii\base\Model;
@@ -20,7 +21,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 
 	public const SCENARIO_CREATE_INSTALLMENT = 'create-installment';
 	public const SCENARIO_SETTLE = 'settle';
-
+	public bool $usersFromIssue = true;
 	public ?string $base_value = null;
 	public string $value = '';
 	public ?string $vat = null;
@@ -45,6 +46,9 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	public static function createFromModel(IssueCost $cost): self {
 		$model = new static($cost->getIssueModel());
 		$model->setModel($cost);
+		if ($model->user_id && $model->usersFromIssue && !isset($model->getUserNames()[$model->user_id])) {
+			$model->usersFromIssue = false;
+		}
 		return $model;
 	}
 
@@ -122,7 +126,13 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	}
 
 	public function getUserNames(): array {
-		return User::getSelectList($this->getIssue()->getIssueModel()->getUsers()->select('user_id')->column(), false);
+		if (!$this->usersFromIssue) {
+			return User::getSelectList(Worker::getAssignmentIds([Worker::PERMISSION_ISSUE]), false);
+		}
+		return User::getSelectList(
+			$this->getIssue()->getIssueModel()->getUsers()->select('user_id')->column(),
+			false
+		);
 	}
 
 	public function save(): bool {
