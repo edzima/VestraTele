@@ -73,13 +73,6 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 	public function rules(): array {
 		return [
 			[['sendSmsToCustomer', 'sendEmailToCustomer', 'sendSmsToAgent', 'sendEmailToWorkers'], 'boolean'],
-			[
-				'workersTypes', 'required',
-				'enableClientValidation' => false,
-				'when' => function (): bool {
-					return $this->sendEmailToWorkers && !empty($this->getWorkersUsersTypesNames());
-				},
-			],
 			['workersTypes', 'in', 'range' => array_keys($this->getWorkersUsersTypesNames()), 'allowArray' => true],
 			['extraWorkersEmails', 'in', 'range' => array_keys($this->getExtraWorkersEmailsData()), 'allowArray' => true],
 			[
