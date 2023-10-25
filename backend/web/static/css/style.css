@@ -213,6 +213,45 @@ input[type="tel"]::-ms-input-placeholder {
 }
 
 
+.nav-with-favorite li {
+	position: relative;
+}
+
+.nav-with-favorite li:not(:last-child) a:first-child {
+	padding-right: 24px;
+}
+
+
+.nav-with-favorite li .favorite-link {
+	position: absolute;
+	right: 4px;
+	top: 13px;
+	padding: 0;
+	border: none;
+}
+
+.nav-with-favorite .favorite-link.active {
+	opacity: 1;
+}
+
+.nav-with-favorite .favorite-link:hover {
+	opacity: 1;
+	background: none;
+}
+
+.nav-with-favorite .favorite-link:not(.active) {
+	opacity: 0.2;
+}
+
+.nav-with-favorite .favorite-link:not(.active):hover {
+	opacity: 1;
+}
+
+.nav-with-favorite li a.favorite-link .glyphicon {
+	margin-right: 0;
+}
+
+
 @media (min-width: 992px) {
 	.title-with-nav .breadcrumb {
 		top: 20px;
