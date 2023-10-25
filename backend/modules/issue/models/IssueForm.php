@@ -261,6 +261,11 @@ class IssueForm extends Model implements LinkedIssuesModel {
 				$names[$type->id] = $type->name;
 			}
 		}
+		foreach ($names as $key => $value) {
+			if (is_string($value) && isset($names[$value])) {
+				unset($names[$key]);
+			}
+		}
 		return $names;
 	}
 
@@ -274,7 +279,10 @@ class IssueForm extends Model implements LinkedIssuesModel {
 	protected static function getTypesWithStages(): array {
 		$types = [];
 		foreach (IssueType::getTypes() as $type) {
-			if (!empty($type->stages)) {
+			if (
+				!empty($type->stages)
+				|| ($type->parent !== null && !empty($type->parent->stages))
+			) {
 				$types[$type->id] = $type;
 			}
 		}
