@@ -23,6 +23,8 @@ interface IssueCostInterface extends
 	public const TYPE_OFFICE = 'office';
 	public const TYPE_JUSTIFICATION_OF_THE_JUDGMENT = 'justification_of_the_judgment';
 	public const TYPE_INSTALLMENT = 'installment';
+
+	public const TYPE_COMMISSION_REFUND = 'commission_refund';
 	public const TYPE_PCC = 'pcc';
 	public const TYPE_PIT_4 = 'PIT-4';
 
