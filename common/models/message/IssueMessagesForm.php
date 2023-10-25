@@ -416,10 +416,14 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 	}
 
 	protected function getIssueUsersEmails(): array {
+		$types = (array) $this->workersTypes;
+		if (empty($types)) {
+			return [];
+		}
 		return $this->issue
 			->getIssueModel()
 			->getUsers()
-			->withTypes($this->workersTypes)
+			->withTypes($types)
 			->joinWith('user')
 			->select('user.email')
 			->column();
