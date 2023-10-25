@@ -29,6 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 			'name',
 			'short_name',
+			'is_main:boolean',
 			'vat',
 			'with_additional_date:boolean',
 			[

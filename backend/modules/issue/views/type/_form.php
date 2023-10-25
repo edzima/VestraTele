@@ -64,6 +64,8 @@ use yii\web\View;
 		]) ?>
 	</div>
 
+	<?= $form->field($model, 'is_main')->checkbox() ?>
+
 
 	<?= $form->field($model, 'default_show_linked_notes')->checkbox() ?>
 
