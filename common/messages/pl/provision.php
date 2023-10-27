@@ -37,6 +37,9 @@ return [
 	'Provisions Report ({from} - {to})' => 'Raport Prowizji ({from} - {to})',
 	'Provisions Report: {user} ({from} - {to})' => 'Raport Prowizji: {user} ({from} - {to})',
 	'Report: {user} ({fromDate} - {toDate})' => 'Raport: {user} ({fromDate} - {toDate})',
+	'Create self provision' => 'Ustal Prowizję',
+	'Create from provision' => 'Ustal nadprowizję',
+	'Create to provision' => 'Ustal działkę',
 	'Self provisions' => 'Własne prowizje',
 	'Self - {user}' => 'Własna - {user}',
 	'Settled costs' => 'Zaliczki rozliczone',
@@ -100,6 +103,9 @@ return [
 	'Provision - Doubles' => 'Prowizje - Duplikaty',
 	'Excluded from Users' => 'Wykluczeni',
 	'Without Empty' => '> 0',
+	'Not set' => 'Nieustalono',
+	'Min Settlement Value' => 'Min. wartosć Rozliczenia',
+	'Max Settlement Value' => 'Max. wartość Rozliczenia',
 ];
 
 

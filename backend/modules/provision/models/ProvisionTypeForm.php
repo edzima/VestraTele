@@ -28,6 +28,9 @@ class ProvisionTypeForm extends Model {
 	public ?string $from_at = null;
 	public ?string $to_at = null;
 
+	public ?string $minSettlementValue = null;
+	public ?string $maxSettlementValue = null;
+
 	public $baseTypeId;
 
 	private ?IssueProvisionType $model = null;
@@ -53,7 +56,7 @@ class ProvisionTypeForm extends Model {
 				'to_at', 'compare', 'compareAttribute' => 'from_at', 'operator' => '>=',
 				'enableClientValidation' => false,
 			],
-			['value', 'number', 'min' => 0],
+			[['value', 'minSettlementValue', 'maxSettlementValue'], 'number', 'min' => 0],
 			[
 				'value', 'number', 'max' => 100,
 				'when' => function (): bool {
@@ -84,6 +87,8 @@ class ProvisionTypeForm extends Model {
 			'issueExcludedUserTypes' => Yii::t('provision', 'Excluded issue user types'),
 			'with_hierarchy' => Yii::t('provision', 'With hierarchy'),
 			'isDateFromSettlement' => Yii::t('provision', 'Date from Settlement'),
+			'minSettlementValue' => Yii::t('provision', 'Min Settlement Value'),
+			'maxSettlementValue' => Yii::t('provision', 'Max Settlement Value'),
 		]);
 	}
 
@@ -104,6 +109,8 @@ class ProvisionTypeForm extends Model {
 		$this->with_hierarchy = $model->getWithHierarchy();
 		$this->baseTypeId = $model->getBaseTypeId();
 		$this->isDateFromSettlement = $model->getIsForDateFromSettlement();
+		$this->minSettlementValue = $model->getMinSettlementValue();
+		$this->maxSettlementValue = $model->getMaxSettlementValue();
 	}
 
 	public function getModel(): IssueProvisionType {
@@ -134,6 +141,8 @@ class ProvisionTypeForm extends Model {
 		$model->setIssueRequiredUserTypes(is_array($this->issueRequiredUserTypes) ? $this->issueRequiredUserTypes : []);
 		$model->setIssueExcludedUserTypes(is_array($this->issueExcludedUserTypes) ? $this->issueExcludedUserTypes : []);
 		$model->setSettlementTypes(is_array($this->settlementTypes) ? $this->settlementTypes : []);
+		$model->setMinSettlementValue($this->minSettlementValue);
+		$model->setMaxSettlementValue($this->maxSettlementValue);
 		return $model->save();
 	}
 

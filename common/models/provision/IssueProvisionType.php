@@ -8,6 +8,7 @@ use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSettlement;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
+use Decimal\Decimal;
 use Yii;
 use yii\base\InvalidCallException;
 use yii\helpers\ArrayHelper;
@@ -22,6 +23,9 @@ class IssueProvisionType extends ProvisionType {
 	public const KEY_DATA_ISSUE_USER_TYPE = 'issue.user.type';
 	public const KEY_DATA_ISSUE_EXCLUDED_USER_TYPES = 'issue.user.types.excluded';
 	public const KEY_DATA_SETTLEMENT_DATE = 'dateFromSettlement';
+
+	public const KEY_DATA_MIN_SETTLEMENT_VALUE = 'minSettlementValue';
+	public const KEY_DATA_MAX_SETTLEMENT_VALUE = 'maxSettlementValue';
 
 	public static function settlementTypesNames(): array {
 		return IssuePayCalculation::getTypesNames();
@@ -48,6 +52,8 @@ class IssueProvisionType extends ProvisionType {
 			'issueUserTypeName' => Yii::t('common', 'Issue user type'),
 			'issueExcludedUserTypesNames' => Yii::t('provision', 'Excluded Users Types'),
 			'isForDateFromSettlement' => Yii::t('provision', 'Date from Settlement'),
+			'minSettlementValue' => Yii::t('provision', 'Min Settlement Value'),
+			'maxSettlementValue' => Yii::t('provision', 'Max Settlement Value'),
 		]);
 	}
 
@@ -228,7 +234,14 @@ class IssueProvisionType extends ProvisionType {
 		if (empty($ids)) {
 			return true;
 		}
-		return in_array($id, $ids, true);
+		if (in_array($id, $ids, true)) {
+			return true;
+		}
+		$type = IssueType::getTypes()[$id];
+		if ($type->parent_id) {
+			return $this->isForIssueType($type->parent_id);
+		}
+		return false;
 	}
 
 	public function isForIssueUser(string $type): bool {
@@ -260,7 +273,43 @@ class IssueProvisionType extends ProvisionType {
 	public function isForSettlement(IssueSettlement $settlement, string $issueUserType = null): bool {
 		return $this->isForSettlementType($settlement->getType())
 			&& $this->isForIssue($settlement->getIssueModel())
-			&& (!$issueUserType ? true : $this->isForIssueUser($issueUserType));
+			&& $this->isForValue($settlement->getValue())
+			&& (!$issueUserType || $this->isForIssueUser($issueUserType));
+	}
+
+	public function getMinSettlementValue(): ?string {
+		return $this->getDataArray()[static::KEY_DATA_MIN_SETTLEMENT_VALUE] ?? null;
+	}
+
+	public function setMinSettlementValue(?string $value): void {
+		$this->setDataValues(static::KEY_DATA_MIN_SETTLEMENT_VALUE, $value);
+	}
+
+	public function getMaxSettlementValue(): ?string {
+		return $this->getDataArray()[static::KEY_DATA_MAX_SETTLEMENT_VALUE] ?? null;
+	}
+
+	public function setMaxSettlementValue(?string $value): void {
+		$this->setDataValues(static::KEY_DATA_MAX_SETTLEMENT_VALUE, $value);
+	}
+
+	public function isForValue(Decimal $value): bool {
+		$min = $this->getMinSettlementValue();
+		$max = $this->getMaxSettlementValue();
+		if (!$min && !$max) {
+			return true;
+		}
+		if ($min) {
+			if ($value < $min) {
+				return false;
+			}
+		}
+		if ($max) {
+			if ($value > $max) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
