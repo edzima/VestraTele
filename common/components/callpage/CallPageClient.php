@@ -39,7 +39,10 @@ class CallPageClient extends Component {
 		$responseData = $response->getData();
 		$hasError = ArrayHelper::getValue($responseData, 'hasError', null);
 		if ($hasError) {
-			Yii::error($response->getData(), __METHOD__);
+			Yii::error([
+				'response' => $response->getData(),
+				'data' => $data,
+			], __METHOD__);
 			return false;
 		}
 		return true;
@@ -60,7 +63,10 @@ class CallPageClient extends Component {
 		$responseData = $response->getData();
 		$hasError = ArrayHelper::getValue($responseData, 'hasError', null);
 		if ($hasError) {
-			Yii::error($response->getData(), __METHOD__);
+			Yii::error([
+				'response' => $response->getData(),
+				'data' => $data,
+			], __METHOD__);
 			return false;
 		}
 		return true;
