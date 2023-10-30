@@ -210,4 +210,8 @@ return [
 	'Is main Type' => 'Główny Typ',
 	'Not from Issues' => 'Spoza Sprawy',
 	'From Issues' => 'Przypisani do Sprawy',
+	'Change Type to Issues: {count}' => 'Zmień Typ w Sprawach: {count}',
+	'Update Type' => 'Zmień Typ',
+	'Update Type: {count}' => 'Zmień Typ: {count}',
+
 ];

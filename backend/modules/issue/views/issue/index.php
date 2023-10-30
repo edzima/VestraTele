@@ -24,7 +24,6 @@ if (!$searchModel->getIssueMainType()) {
 $this->params['issueParentTypeNav'] = [
 	'route' => ['/issue/issue/index'],
 ];
-
 ?>
 <div class="issue-index">
 
@@ -141,6 +140,42 @@ $this->params['issueParentTypeNav'] = [
 						'class' => 'btn btn-success',
 						'name' => 'route',
 						'value' => 'sms/push-multiple',
+						'data-pjax' => '0',
+					])
+				: ''
+			?>
+
+
+			<?= Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)
+			&& !empty($dataProvider->getModels())
+			&& $dataProvider->pagination->pageCount > 1
+				? Html::a(
+					Yii::t('issue', 'Update Type: {count}', [
+						'count' => count($searchModel->getAllIds($dataProvider->query)),
+					]), [
+					'type/update-multiple',
+				],
+					[
+						'data' => [
+							'pjax' => '0',
+							'method' => 'POST',
+							'params' => [
+								'ids' => $searchModel->getAllIds($dataProvider->query),
+							],
+						],
+						'class' => 'btn btn-info',
+					]
+				)
+				: ''
+			?>
+
+			<?= Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)
+				? Html::submitButton(
+					Yii::t('issue', 'Update Type'),
+					[
+						'class' => 'btn btn-info',
+						'name' => 'route',
+						'value' => 'type/update-multiple',
 						'data-pjax' => '0',
 					])
 				: ''

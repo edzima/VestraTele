@@ -2,9 +2,11 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\modules\issue\models\IssuesUpdateTypeMultiple;
 use backend\modules\issue\models\IssueStageChangeForm;
 use backend\modules\issue\models\IssueTypeForm;
 use backend\modules\issue\models\search\IssueTypeSearch;
+use common\helpers\Flash;
 use common\models\issue\IssueType;
 use Yii;
 use yii\filters\VerbFilter;
@@ -45,6 +47,41 @@ class TypeController extends Controller {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	public function actionUpdateMultiple(array $ids = []) {
+		if (empty($ids)) {
+			$postIds = Yii::$app->request->post('ids');
+			if (is_string($postIds)) {
+				$postIds = explode(',', $postIds);
+			}
+			if ($postIds) {
+				$ids = $postIds;
+			}
+		}
+		if (empty($ids)) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('backend', 'IDs must be set.')
+			);
+			return $this->redirect(['issue/index']);
+		}
+
+		$model = new IssuesUpdateTypeMultiple();
+		$model->ids = $ids;
+
+		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+			$count = $model->update(false);
+			if ($count) {
+				Flash::add(Flash::TYPE_SUCCESS, Yii::t('backend', 'Change {count} to Type: {type}.', [
+					'count' => $count,
+					'type' => IssueType::getTypesNames()[$model->typeId],
+				]));
+			}
+			return $this->redirect(['issue/index']);
+		}
+		return $this->render('update-multiple', [
+			'model' => $model,
 		]);
 	}
 
