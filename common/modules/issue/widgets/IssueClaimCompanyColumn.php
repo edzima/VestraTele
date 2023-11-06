@@ -8,6 +8,7 @@ use common\models\issue\IssueClaim;
 use common\models\issue\IssueInterface;
 use common\models\user\Worker;
 use common\widgets\grid\DataColumn;
+use Decimal\Decimal;
 use Yii;
 use function array_filter;
 
@@ -17,10 +18,20 @@ class IssueClaimCompanyColumn extends DataColumn {
 	public bool $contentCenter = true;
 	public $format = 'html';
 	public bool $tooltip = true;
-
 	public string $notEmptyContentClass = 'success';
 
+	private array $raw_values = [];
+
 	public function init(): void {
+		if ($this->pageSummary) {
+			$this->pageSummaryFunc = function (array $decimals): string {
+				$sum = new Decimal(0);
+				foreach ($this->raw_values as $value) {
+					$sum = $sum->add($value);
+				}
+				return Yii::$app->formatter->asCurrency($sum);
+			};
+		}
 		parent::init();
 		if (empty($this->label)) {
 			$this->label = Yii::t('issue', 'Company Claim Trying Value');
@@ -39,6 +50,7 @@ class IssueClaimCompanyColumn extends DataColumn {
 			if ($claim->isCompany()) {
 				if (!empty($claim->trying_value)) {
 					$values[] = Yii::$app->formatter->asCurrency($claim->trying_value);
+					$this->raw_values[$claim->id] = $claim->trying_value;
 				}
 			}
 		}

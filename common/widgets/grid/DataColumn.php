@@ -6,7 +6,6 @@ use common\assets\TooltipAsset;
 use common\helpers\Html;
 use common\widgets\GridView;
 use kartik\grid\DataColumn as BaseDataColumn;
-use Yii;
 
 /**
  * Class DataColumn

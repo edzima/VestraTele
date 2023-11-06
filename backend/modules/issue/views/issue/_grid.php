@@ -8,6 +8,7 @@ use backend\widgets\IssueColumn;
 use common\assets\TooltipAsset;
 use common\helpers\Html;
 use common\models\issue\Issue;
+use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\IssueNoteColumn;
 use common\modules\issue\widgets\IssueClaimCompanyColumn;
@@ -45,6 +46,8 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 <?= GridView::widget([
 	'id' => 'issues-list',
 	'dataProvider' => $dataProvider,
+	'showPageSummary' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+	'pageSummaryPosition' => GridView::POS_BOTTOM,
 	'filterModel' => $searchModel->isArchiveScenario() ? null : $searchModel,
 	'rowOptions' => static function (Issue $issue): array {
 		if ($issue->hasDelayedStage()) {
@@ -225,6 +228,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 		[
 			'class' => IssueClaimCompanyColumn::class,
 			'attribute' => 'claimCompanyTryingValue',
+			'pageSummary' => true,
 		],
 		[
 			'class' => IssueNoteColumn::class,
