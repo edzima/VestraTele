@@ -490,13 +490,17 @@ abstract class IssueSearch extends Model
 		if ($this->getIssueMainType() === null) {
 			return $stages;
 		}
-		$parent = $this->getIssueMainType();
-		foreach ($stages as $id => $name) {
-			if (!$parent->hasStage($id)) {
-				unset($stages[$id]);
+		return array_filter($stages, function (int $stageId) {
+			if ($this->getIssueMainType()->hasStage($stageId)) {
+				return true;
 			}
-		}
-		return $stages;
+			foreach ($this->getIssueMainType()->childs as $type) {
+				if ($type->hasStage($stageId)) {
+					return true;
+				}
+			}
+			return false;
+		}, ARRAY_FILTER_USE_KEY);
 	}
 
 	public function getIssueTypesNames(): array {
