@@ -2,6 +2,7 @@
 
 namespace common\models\issue;
 
+use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
@@ -308,9 +309,20 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 				'fullName' => $this->issue->customer->getFullName(),
 			]),
 			static::PROVIDER_RESPONSIBLE_ENTITY => Yii::t('settlement', 'Entity rensponsible - {name}', [
-				'name' => $this->issue->entityResponsible,
+				'name' => $this->getEntityResponsibleName(),
 			]),
 		];
+	}
+
+	public function getEntityResponsibleName(): ?string {
+		if ($this->provider_type === static::PROVIDER_RESPONSIBLE_ENTITY
+			&& $this->provider_id !== $this->issue->entity_responsible_id) {
+			$entity = EntityResponsible::findOne($this->provider_id);
+			if ($entity) {
+				return $entity->name;
+			}
+		}
+		return $this->issue->entityResponsible->name;
 	}
 
 	public function hasProblemStatus(): bool {
