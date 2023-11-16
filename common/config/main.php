@@ -12,16 +12,21 @@ use common\components\TaxComponent;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\czater\Czater;
+use common\modules\file\Module as FileModule;
 use common\modules\lead\components\LeadClient;
 use common\modules\lead\Module as LeadModule;
 use common\modules\reminder\Module as ReminderModule;
+use creocoder\flysystem\LocalFilesystem;
 use edzima\teryt\Module as TerytModule;
 use Edzima\Yii2Adescom\AdescomSender;
 use Edzima\Yii2Adescom\AdescomSoap;
+use League\Flysystem\AdapterInterface;
 use yii\caching\DummyCache;
 use yii\caching\FileCache;
 use yii\mutex\MysqlMutex;
 use yii\queue\db\Queue;
+
+//use fredyns\attachments\Module as AttachmentsModule;
 
 $config = [
 	'name' => $_ENV['APP_NAME'],
@@ -40,18 +45,47 @@ $config = [
 		'@npm' => '@vendor/npm-asset',
 	],
 	'modules' => [
-		'teryt' => [
-			'class' => TerytModule::class,
-		],
-		'lead' => [
-			'class' => LeadModule::class,
-			'userClass' => User::class,
-		],
-		'reminder' => [
-			'class' => ReminderModule::class,
-		],
+//		'attachments' => [
+//			'class' => AttachmentsModule::class,
+//			'tempPath' => '@runtime/uploads/temp',
+//			'rules' => [ // Rules according to the FileValidator
+//						 'maxFiles' => 10, // Allow to upload maximum 3 files, default to 3
+//						// 'mimeTypes' => 'image/png', // Only png images
+//						// 'maxSize' => 1024 * 1024 * 5, // 1 MB
+//			],
+//			'filesystem' => 'fs',
+//			'tableName' => '{{%attachments}}', // Optional, default to 'attach_file'
+//		],
+'file' => [
+	'class' => FileModule::class,
+	'tempPath' => '@runtime/uploads/temp',
+	//			'rules' => [ // Rules according to the FileValidator
+	//						 'maxFiles' => 10, // Allow to upload maximum 3 files, default to 3
+	//						 // 'mimeTypes' => 'image/png', // Only png images
+	//						 // 'maxSize' => 1024 * 1024 * 5, // 1 MB
+	//			],
+	'filesystem' => 'fs',
+],
+'teryt' => [
+	'class' => TerytModule::class,
+],
+'lead' => [
+	'class' => LeadModule::class,
+	'userClass' => User::class,
+],
+'reminder' => [
+	'class' => ReminderModule::class,
+],
 	],
 	'components' => [
+
+		'fs' => [
+			'class' => LocalFilesystem::class,
+			'path' => '@protected',
+			'config' => [
+				'visibility' => AdapterInterface::VISIBILITY_PRIVATE,
+			],
+		],
 		'db' => [
 			'class' => 'yii\db\Connection',
 			'dsn' => getenv('DB_DSN'),

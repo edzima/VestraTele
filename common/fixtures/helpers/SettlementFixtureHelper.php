@@ -20,12 +20,15 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 	public const OWNER_JOHN = UserFixtureHelper::MANAGER_JOHN;
 	public const OWNER_NICOLE = UserFixtureHelper::MANAGER_NICOLE;
 
+	public const DEFAULT_PROVIDER_ID = 1;
+
 	public const SETTLEMENT = 'settlement.settlement';
 	public const COST = 'settlement.cost';
 	public const PAY = 'settlement.pay';
 	private const OWNER = 'settlement.owner';
 	private const PAY_RECEIVED = 'settlement.pay_received';
 	private const DEFAULT_TYPE = IssueSettlement::TYPE_HONORARIUM;
+	const DEFAULT_PROVIDER_TYPE = IssueSettlement::PROVIDER_CLIENT;
 
 	private ?int $lastSettlementId = null;
 
@@ -106,6 +109,12 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 		}
 		if (!isset($attributes['type'])) {
 			$attributes['type'] = static::DEFAULT_TYPE;
+		}
+		if (!isset($attributes['provider_id'])) {
+			$attributes['provider_id'] = static::DEFAULT_PROVIDER_ID;
+		}
+		if (!isset($attributes['provider_type'])) {
+			$attributes['provider_type'] = static::DEFAULT_PROVIDER_TYPE;
 		}
 		$attributes['value'] = $value;
 		$this->lastSettlementId = $this->tester->haveRecord(IssuePayCalculation::class, $attributes);

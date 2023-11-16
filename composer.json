@@ -62,7 +62,9 @@
 		"codeception/verify": "~0.5.0 || ~1.1.0",
 		"symfony/browser-kit": ">=2.7 <=4.2.4",
 		"codeception/module-webdriver": "^1.1",
-		"codeception/module-rest": "^2.0"
+		"codeception/module-rest": "^2.0",
+		"creocoder/yii2-flysystem": "^1.1",
+		"kartik-v/yii2-widget-fileinput": "^1.0"
 	},
 	"repositories": [
 		{

@@ -16,6 +16,9 @@ use common\models\issue\query\IssueStageQuery;
 use common\models\issue\query\IssueUserQuery;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
+use common\modules\file\models\AttachableModel;
+use common\modules\file\models\File;
+use common\modules\file\models\IssueFile;
 use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -59,8 +62,11 @@ use yii\db\Expression;
  * @property-read IssueRelation[] $issuesRelations
  * @property-read Issue[] $linkedIssues
  * @property-read IssueNote|null $newestNote
+ * @property-read IssueFile[] $issueFiles
  */
-class Issue extends ActiveRecord implements IssueInterface {
+class Issue extends ActiveRecord implements
+	IssueInterface,
+	AttachableModel {
 
 	use IssueTrait;
 
@@ -425,4 +431,34 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return false;
 	}
 
+	public function linkFile(File $file): void {
+		$issueFile = $this->issueFiles[$file->id] ?? new IssueFile();
+		$issueFile->issue_id = $this->id;
+		$issueFile->file_id = $file->id;
+		$issueFile->save();
+	}
+
+	public function getDirParts(): array {
+		return [
+			'issue',
+			$this->id,
+		];
+	}
+
+	public function getIssueFiles(): ActiveQuery {
+		return $this
+			->hasMany(IssueFile::class, ['issue_id' => 'id'])
+			->with('file')
+			->indexBy('file_id');
+	}
+
+	public function getFilesByType(int $fileTypeId): array {
+		$types = [];
+		foreach ($this->issueFiles as $issueFile) {
+			if ($issueFile->file->file_type_id === $fileTypeId) {
+				$types[$issueFile->file_id] = $issueFile->file;
+			}
+		}
+		return $types;
+	}
 }
