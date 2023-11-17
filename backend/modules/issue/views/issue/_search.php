@@ -1,6 +1,7 @@
 <?php
 
 use backend\helpers\Html;
+use backend\modules\issue\models\IssueStage;
 use backend\modules\issue\models\search\IssueSearch;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -192,6 +193,15 @@ use yii\widgets\ActiveForm;
 			->widget(DateWidget::class)
 		?>
 
+
+		<?= $form->field($model, 'note_stage_id', ['options' => ['class' => 'col-md-2']])
+			->widget(Select2::class, [
+				'data' => IssueStage::getStagesNames(),
+				'pluginOptions' => [
+					'placeholder' => '',
+				],
+			])
+		?>
 
 	</div>
 	<div class="row">

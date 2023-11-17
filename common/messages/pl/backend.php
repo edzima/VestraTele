@@ -347,5 +347,5 @@ return [
 	'Copy from Issue' => 'Skopiuj',
 	'Lead Source for Created Customers' => 'Źródło Lead dla utworzonych Klientów',
 	'Change {count} to Type: {type}.' => 'Zmieniono Typ na:{type} w Sprawach: {count}',
-
+	'Note Stage' => 'Etap (kiedykowiek)',
 ];

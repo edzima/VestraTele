@@ -7,6 +7,7 @@ use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSearch as BaseIssueSearch;
+use common\models\issue\query\IssueNoteQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\user\User;
@@ -40,6 +41,8 @@ class IssueSearch extends BaseIssueSearch {
 	public $stageDeadlineFromAt;
 	public $stageDeadlineToAt;
 
+	public $note_stage_id;
+
 	public ?string $signature_act = null;
 	private ?array $ids = null;
 
@@ -52,7 +55,7 @@ class IssueSearch extends BaseIssueSearch {
 
 	public function rules(): array {
 		return array_merge(parent::rules(), [
-			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
+			[['parentId', 'agent_id', 'tele_id', 'lawyer_id', 'note_stage_id'], 'integer'],
 			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims',], 'boolean'],
 			[['onlyWithSettlements', 'onlyWithClaims'], 'default', 'value' => null],
 			['claimCompanyTryingValue', 'number', 'min' => 0],
@@ -71,6 +74,7 @@ class IssueSearch extends BaseIssueSearch {
 			'onlyWithAllPayedPay' => Yii::t('settlement', 'Only with all paid Pays'),
 			'stageDeadlineFromAt' => Yii::t('backend', 'Stage Deadline from at'),
 			'stageDeadlineToAt' => Yii::t('backend', 'Stage Deadline to at'),
+			'note_stage_id' => Yii::t('backend', 'Note Stage'),
 		]);
 	}
 
@@ -136,6 +140,7 @@ class IssueSearch extends BaseIssueSearch {
 		$this->stageChangeAtFilter($query);
 		$this->applyStageDeadlineFilter($query);
 		$this->claimFilter($query);
+		$this->noteStageFilter($query);
 	}
 
 	private function signatureActFilter(IssueQuery $query): void {
@@ -259,6 +264,16 @@ class IssueSearch extends BaseIssueSearch {
 		}
 		if (!empty($this->stageDeadlineToAt)) {
 			$query->andWhere(['<', Issue::tableName() . '.stage_deadline_at', date('Y-m-d 23:59:59', strtotime($this->stageDeadlineToAt))]);
+		}
+	}
+
+	private function noteStageFilter(IssueQuery $query): void {
+		if (!empty($this->note_stage_id)) {
+			$query->joinWith([
+				'issueNotes' => function (IssueNoteQuery $noteQuery) {
+					$noteQuery->onlyStage($this->note_stage_id);
+				},
+			]);
 		}
 	}
 
