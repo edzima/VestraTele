@@ -199,6 +199,7 @@ use yii\widgets\ActiveForm;
 				'data' => IssueStage::getStagesNames(),
 				'pluginOptions' => [
 					'placeholder' => '',
+					'allowClear' => true,
 				],
 			])
 		?>
