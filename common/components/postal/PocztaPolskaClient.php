@@ -35,15 +35,13 @@ class PocztaPolskaClient extends SoapClient {
 	public function __construct(?string $wsdl, array $options = null) {
 		$options['classmap'] = static::$classMap;
 		parent::__construct($wsdl, $options);
-		//data nadania
-		//data doreczenia
 	}
 
 	public function setWsHeader(): void {
 		$this->__setSoapHeaders($this->getWsHeader());
 	}
 
-	public function checkShipment(string $number) {
+	public function checkShipment(string $number): Shipment {
 		return $this->__soapCall('sprawdzPrzesylke', ['parameters' => ['numer' => $number]])->return;
 	}
 

@@ -2,6 +2,9 @@
 
 namespace common\components\postal;
 
+use common\components\postal\models\Shipment;
+use SoapFault;
+use Yii;
 use yii\base\Component;
 
 class PocztaPolska extends Component {
@@ -12,6 +15,25 @@ class PocztaPolska extends Component {
 	public string $password = 'PPSA';
 
 	private ?PocztaPolskaClient $client = null;
+	private ?Shipment $shipment;
+
+	public function checkShipment(string $number): void {
+		try {
+			$client = $this->getClient();
+			$shipment = $client->checkShipment($number);
+			if (!$shipment->isOk()) {
+				Yii::warning($shipment->getStatusName(), __METHOD__);
+			}
+			$this->shipment = $shipment;
+		} catch (SoapFault $exception) {
+			Yii::error($exception->getMessage(), __METHOD__);
+			$this->shipment = null;
+		}
+	}
+
+	public function getShipment(): ?Shipment {
+		return $this->shipment;
+	}
 
 	public function getClient(): PocztaPolskaClient {
 		if ($this->client === null) {
