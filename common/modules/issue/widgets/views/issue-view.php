@@ -4,6 +4,7 @@ use common\assets\TooltipAsset;
 use common\helpers\Url;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueShipmentPocztaPolska;
 use common\models\issue\IssueTagType;
 use common\models\issue\IssueUser;
 use common\models\user\Worker;
@@ -26,6 +27,7 @@ use yii\data\ActiveDataProvider;
 /* @var $entityUrl string|null */
 /* @var $stageUrl string|null */
 /* @var $typeUrl string|null */
+/* @var $shipmentsActionColumn bool */
 
 ?>
 
@@ -419,7 +421,42 @@ use yii\data\ActiveDataProvider;
 				],
 			]) ?>
 
-			<?php
+			<?=
+			GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getIssueModel()->getShipmentsPocztaPolska(),
+				]),
+				'summary' => '',
+				'caption' => Yii::t('issue', 'Issue Shipment Poczta Polska'),
+				'emptyText' => false,
+				'columns' => [
+					'shipment_number',
+					'details',
+					'shipment_at:date',
+					'finished_at:date',
+					'created_at:date',
+					'updated_at:date',
+					[
+						'class' => ActionColumn::class,
+						'visible' => $shipmentsActionColumn,
+						'controller' => 'shipment-poczta-polska',
+						'template' => '{refresh} {view} {update} {delete}',
+						'buttons' => [
+							'refresh' => function (string $url, IssueShipmentPocztaPolska $model): string {
+								if ($model->isFinished()) {
+									return '';
+								}
+								return Html::a(
+									Html::icon('refresh'),
+									$url, [
+										'data-method' => 'POST',
+									]
+								);
+							},
+						],
+					],
+				],
+			])
 			?>
 
 		</div>

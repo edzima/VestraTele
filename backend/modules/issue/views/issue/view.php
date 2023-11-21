@@ -85,6 +85,18 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		: ''
 	?>
 
+	<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_SHIPMENT)
+		? Html::a(
+			'<i class="fa fa-envelope-open-o" aria-hidden="true"></i>',
+			['shipment-poczta-polska/create', 'issueId' => $model->id], [
+				'title' => Yii::t('backend', 'Add a Shipment'),
+				'aria-label' => Yii::t('backend', 'Add a Shipment'),
+				'class' => 'btn btn-info',
+			]
+		)
+		: ''
+	?>
+
 	<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE)
 		? Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',
@@ -198,6 +210,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		'entityResponsibleRoute' => '/entity-responsible/default/view',
 		'stageRoute' => 'stage/view',
 		'typeRoute' => 'type/view',
+		'shipmentsActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_SHIPMENT),
 	]) ?>
 
 
