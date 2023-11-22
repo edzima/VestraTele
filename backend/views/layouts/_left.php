@@ -2,7 +2,6 @@
 
 use backend\widgets\Menu;
 use common\helpers\Html;
-use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
 use common\models\user\Worker;
 use yii\web\View;
@@ -194,6 +193,12 @@ $user = Yii::$app->user;
 							'url' => ['/issue/archive/index'],
 							'icon' => '<i class="fa fa-archive"></i>',
 							'visible' => $user->can(Worker::PERMISSION_ARCHIVE),
+						],
+						[
+							'label' => Yii::t('issue', 'Issue Shipment Poczta Polska'),
+							'url' => ['/issue/shipment-poczta-polska/index'],
+							'icon' => '<i class="fa fa-envelope-open-o" aria-hidden="true"></i>',
+							'visible' => $user->can(Worker::PERMISSION_ISSUE_SHIPMENT),
 						],
 						[
 							'label' => Yii::t('common', 'Issues users'),

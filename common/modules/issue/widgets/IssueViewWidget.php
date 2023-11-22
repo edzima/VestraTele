@@ -13,6 +13,8 @@ class IssueViewWidget extends IssueWidget {
 	public bool $relationActionColumn = true;
 	public bool $claimActionColumn = true;
 
+	public bool $shipmentsActionColumn = false;
+
 	public ?string $entityResponsibleRoute = null;
 
 	private ?string $entityUrl = null;
@@ -48,6 +50,7 @@ class IssueViewWidget extends IssueWidget {
 			'entityUrl' => $this->entityUrl,
 			'stageUrl' => $this->stageUrl,
 			'typeUrl' => $this->typeUrl,
+			'shipmentsActionColumn' => $this->shipmentsActionColumn,
 		]);
 	}
 }

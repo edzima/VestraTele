@@ -61,6 +61,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_SETTLEMENT_DELETE_NOT_SELF = 'settlement.delete-not-self';
 	public const PERMISSION_ISSUE_ATTACHMENTS = 'issue.attachments';
 	public const PERMISSION_ISSUE_SEARCH_PARENTS = 'issue.search.parent';
+	public const PERMISSION_ISSUE_SHIPMENT = 'issue.shipment';
 
 	private static $USER_NAMES = [];
 
