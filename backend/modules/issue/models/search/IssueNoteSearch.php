@@ -5,6 +5,7 @@ namespace backend\modules\issue\models\search;
 use backend\modules\issue\models\IssueStage;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
+use common\models\issue\IssueType;
 use common\models\issue\search\IssueStageSearchable;
 use common\models\issue\search\IssueTypeSearch as IssueTypeSearchable;
 use common\models\user\User;
@@ -168,7 +169,7 @@ class IssueNoteSearch extends IssueNote implements
 	}
 
 	public function getIssueTypesNames(): array {
-		return IssueStage::getStagesNames(true, true);
+		return IssueType::getTypesNames();
 	}
 
 	public function applyIssueTypeFilter(QueryInterface $query): void {
