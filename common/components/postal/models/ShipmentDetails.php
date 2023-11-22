@@ -17,4 +17,13 @@ class ShipmentDetails {
 	public bool $zakonczonoObsluge;
 
 	public EventsList $zdarzenia;
+
+	public function getFinishedAt(): ?string {
+		foreach ($this->zdarzenia->zdarzenie as $event) {
+			if ($event->konczace) {
+				return $event->czas;
+			}
+		}
+		return null;
+	}
 }

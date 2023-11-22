@@ -197,6 +197,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 	}
 
 	public function getNewestNote(): IssueNoteQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasOne(IssueNote::class, ['issue_id' => 'id'])
 			->orderBy('publish_at DESC');
 	}
@@ -423,6 +424,10 @@ class Issue extends ActiveRecord implements IssueInterface {
 			}
 		}
 		return false;
+	}
+
+	public function getShipmentsPocztaPolska(): ActiveQuery {
+		return $this->hasMany(IssueShipmentPocztaPolska::class, ['issue_id' => 'id']);
 	}
 
 }

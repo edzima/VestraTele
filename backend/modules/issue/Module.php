@@ -108,7 +108,11 @@ class Module extends BaseModule {
 						'controllers' => ['issue/tag', 'issue/tag-type'],
 						'permissions' => [Worker::PERMISSION_ISSUE_TAG_MANAGER],
 					],
-
+					[
+						'allow' => true,
+						'controllers' => ['issue/shipment-poczta-polska'],
+						'permissions' => [Worker::PERMISSION_ISSUE_SHIPMENT],
+					],
 					[
 						'allow' => true,
 						'controllers' => ['issue/sms'],

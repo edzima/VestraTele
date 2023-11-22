@@ -3,6 +3,7 @@
 namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\search\ShipmentPocztaPolskaSearch;
+use common\helpers\Flash;
 use common\models\issue\IssueShipmentPocztaPolska;
 use Yii;
 use yii\filters\VerbFilter;
@@ -18,7 +19,7 @@ class ShipmentPocztaPolskaController extends Controller {
 	/**
 	 * @inheritDoc
 	 */
-	public function behaviors() {
+	public function behaviors(): array {
 		return array_merge(
 			parent::behaviors(),
 			[
@@ -26,6 +27,7 @@ class ShipmentPocztaPolskaController extends Controller {
 					'class' => VerbFilter::class,
 					'actions' => [
 						'delete' => ['POST'],
+						'refresh' => ['POST'],
 					],
 				],
 			]
@@ -55,10 +57,53 @@ class ShipmentPocztaPolskaController extends Controller {
 	 * @return string
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView(int $issue_id, string $shipment_number) {
+	public function actionView(int $issue_id, string $shipment_number): string {
 		return $this->render('view', [
 			'model' => $this->findModel($issue_id, $shipment_number),
 		]);
+	}
+
+	/**
+	 * Refresh Shipment Info from  a single IssueShipmentPocztaPolska model.
+	 *
+	 * @param int $issue_id
+	 * @param string $shipment_number
+	 * @param string|null $returnUrl
+	 * @return Response
+	 * @throws NotFoundHttpException
+	 */
+	public function actionRefresh(int $issue_id, string $shipment_number, string $returnUrl = null) {
+		$model = $this->findModel($issue_id, $shipment_number);
+		$this->updateShipmentData($model);
+		$returnUrl = $returnUrl ?: ['view', 'issue_id' => $issue_id, 'shipment_number' => $shipment_number];
+		return $this->redirect($returnUrl);
+	}
+
+	protected function updateShipmentData(IssueShipmentPocztaPolska $model, bool $finishedForce = false): void {
+		if (!$model->isFinished() || $finishedForce) {
+			$poczta = Yii::$app->pocztaPolska;
+			$poczta->checkShipment($model->shipment_number);
+			$shipment = $poczta->getShipment();
+			$model->setShipment($shipment);
+			$model->save();
+			if ($model->hasErrors()) {
+				Yii::error($model->getErrors(), __METHOD__);
+			}
+			if ($shipment !== null) {
+				if (!$shipment->isOk()) {
+					Flash::add(
+						Flash::TYPE_WARNING, $shipment->getStatusName()
+					);
+				}
+			} else {
+				Flash::add(
+					Flash::TYPE_ERROR,
+					Yii::t('issue', 'Problem with check Shipment Info: #{number}', [
+						'number' => $model->shipment_number,
+					])
+				);
+			}
+		}
 	}
 
 	/**
@@ -67,11 +112,13 @@ class ShipmentPocztaPolskaController extends Controller {
 	 *
 	 * @return string|Response
 	 */
-	public function actionCreate() {
+	public function actionCreate(int $issueId = null) {
 		$model = new IssueShipmentPocztaPolska();
+		$model->issue_id = $issueId;
 
 		if ($this->request->isPost) {
 			if ($model->load($this->request->post()) && $model->save()) {
+				$this->updateShipmentData($model);
 				return $this->redirect(['view', 'issue_id' => $model->issue_id, 'shipment_number' => $model->shipment_number]);
 			}
 		} else {
@@ -80,6 +127,7 @@ class ShipmentPocztaPolskaController extends Controller {
 
 		return $this->render('create', [
 			'model' => $model,
+			'issue' => $model->issue,
 		]);
 	}
 
@@ -96,6 +144,9 @@ class ShipmentPocztaPolskaController extends Controller {
 		$model = $this->findModel($issue_id, $shipment_number);
 
 		if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+			if ($model->getShipment() && $model->getShipment()->numer !== $model->shipment_number) {
+				$this->updateShipmentData($model, true);
+			}
 			return $this->redirect(['view', 'issue_id' => $model->issue_id, 'shipment_number' => $model->shipment_number]);
 		}
 
@@ -128,7 +179,7 @@ class ShipmentPocztaPolskaController extends Controller {
 	 * @return IssueShipmentPocztaPolska the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel(int $issue_id, string $shipment_number) {
+	protected function findModel(int $issue_id, string $shipment_number): IssueShipmentPocztaPolska {
 		if (($model = IssueShipmentPocztaPolska::findOne(['issue_id' => $issue_id, 'shipment_number' => $shipment_number])) !== null) {
 			return $model;
 		}
