@@ -5,6 +5,7 @@ use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
 use common\models\issue\IssueNote;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\AgentDataColumn;
 use common\widgets\grid\DataColumn;
 use common\widgets\grid\IssueStageColumn;
 use common\widgets\grid\IssueTypeColumn;
@@ -29,6 +30,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'class' => IssueTypeColumn::class,
 				'attribute' => 'issueTypeId',
+			],
+			[
+				'class' => AgentDataColumn::class,
+				'value' => 'issue.agent',
 			],
 			[
 				'class' => IssueStageColumn::class,
