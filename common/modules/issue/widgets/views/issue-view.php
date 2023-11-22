@@ -430,8 +430,9 @@ use yii\data\ActiveDataProvider;
 				'caption' => Yii::t('issue', 'Issue Shipment Poczta Polska'),
 				'emptyText' => false,
 				'columns' => [
+					'shipmentTypeName',
+					'details:ntext',
 					'shipment_number',
-					'details',
 					'shipment_at:date',
 					'finished_at:date',
 					'created_at:date',
@@ -446,6 +447,12 @@ use yii\data\ActiveDataProvider;
 								if ($model->isFinished()) {
 									return '';
 								}
+								$url = Url::to([
+									'shipment-poczta-polska/refresh',
+									'issue_id' => $model->issue_id,
+									'shipment_number' => $model->shipment_number,
+									'returnUrl' => Url::current(),
+								]);
 								return Html::a(
 									Html::icon('refresh'),
 									$url, [

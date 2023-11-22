@@ -34,6 +34,7 @@ return array_merge([
 	'issue.message.note.settlement' => 'Powiadomienia Mailowe w Notatkach do Rozliczenia',
 	'issue.search.parent' => 'Sprawy - Wyszukiwanie - Struktury',
 	'issue.search.with-settlements' => 'Sprawy - Wyszukiwanie: Z rozliczeniami',
+	'issue.shipment' => 'Sprawy - Poczta',
 	'issue.stage.change' => 'Sprawy - zmiana etapów',
 	'issue.stage.manager' => 'Etapy Spraw (Manager)',
 	'issue.tag.manager' => 'Tagi Spraw (Mangaer)',

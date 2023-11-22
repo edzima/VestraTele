@@ -347,5 +347,6 @@ return [
 	'Copy from Issue' => 'Skopiuj',
 	'Lead Source for Created Customers' => 'Źródło Lead dla utworzonych Klientów',
 	'Change {count} to Type: {type}.' => 'Zmieniono Typ na:{type} w Sprawach: {count}',
-
+	'Add a Shipment' => 'Dodaj List',
+	'Have not loaded Data from API. Click refresh.' => 'Brak danych z API. Klinij Aktualizuj.',
 ];

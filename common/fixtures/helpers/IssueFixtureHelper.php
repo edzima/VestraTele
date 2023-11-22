@@ -8,6 +8,7 @@ use common\fixtures\issue\IssueFixture;
 use common\fixtures\issue\IssueRelationFixture;
 use common\fixtures\issue\IssueUserFixture;
 use common\fixtures\issue\NoteFixture;
+use common\fixtures\issue\ShipmentsPolskaPocztaFixture;
 use common\fixtures\issue\StageFixture;
 use common\fixtures\issue\StageTypesFixtures;
 use common\fixtures\issue\SummonDocFixture;
@@ -141,6 +142,16 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 			static::NOTE => [
 				'class' => NoteFixture::class,
 				'dataFile' => static::getDataDirPath() . 'note.php',
+
+			],
+		];
+	}
+
+	public static function shipmetsPocztaPolska(): array {
+		return [
+			'shipments-poczta-polska' => [
+				'class' => ShipmentsPolskaPocztaFixture::class,
+				'dataFile' => static::getDataDirPath() . 'shipments-poczta-polska.php',
 
 			],
 		];

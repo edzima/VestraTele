@@ -18,16 +18,16 @@ class PocztaPolska extends Component {
 	private ?Shipment $shipment;
 
 	public function checkShipment(string $number): void {
+		$this->shipment = null;
 		try {
 			$client = $this->getClient();
 			$shipment = $client->checkShipment($number);
 			if (!$shipment->isOk()) {
-				Yii::warning($shipment->getStatusName(), __METHOD__);
+				Yii::warning('Check Shipment: #' . $number . ' is not OK. Status: ' . $shipment->getStatusName(), __METHOD__);
 			}
 			$this->shipment = $shipment;
 		} catch (SoapFault $exception) {
 			Yii::error($exception->getMessage(), __METHOD__);
-			$this->shipment = null;
 		}
 	}
 

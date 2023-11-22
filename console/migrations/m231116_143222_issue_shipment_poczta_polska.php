@@ -14,11 +14,12 @@ class m231116_143222_issue_shipment_poczta_polska extends Migration {
 		$this->createTable('{{%issue_shipment_poczta_polska}}', [
 			'issue_id' => $this->integer()->notNull(),
 			'shipment_number' => $this->string()->notNull(),
+			'details' => $this->string()->null(),
 			'created_at' => $this->dateTime()->notNull(),
 			'updated_at' => $this->dateTime()->notNull(),
 			'shipment_at' => $this->dateTime()->null(),
 			'finished_at' => $this->dateTime()->null(),
-			'apiData' => $this->json()->null(),
+			'apiData' => $this->text()->null(),
 		]);
 
 		$this->addPrimaryKey(
