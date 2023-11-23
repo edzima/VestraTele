@@ -56,11 +56,18 @@ class IssueShipmentPocztaPolska extends ActiveRecord implements
 			[['created_at', 'updated_at', 'shipment_at', 'finished_at'], 'safe'],
 			[['apiData'], 'string'],
 			[['shipment_number', 'details'], 'string', 'max' => 255],
+			[['shipment_number'], 'filterShipmentNumber'],
 			[['apiData', 'details'], 'trim'],
 			[['apiData', 'details'], 'default', 'value' => null],
 			[['issue_id', 'shipment_number'], 'unique', 'targetAttribute' => ['issue_id', 'shipment_number']],
 			[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::class, 'targetAttribute' => ['issue_id' => 'id']],
 		];
+	}
+
+	public function filterShipmentNumber($attribute): void {
+		$value = $this->{$attribute};
+		$value = str_replace(['(', ')', ' ', '_', '-'], '', $value);
+		$this->{$attribute} = $value;
 	}
 
 	/**
