@@ -79,6 +79,7 @@ class ClaimController extends Controller {
 		if ($model->getIssue() === null) {
 			throw new NotFoundHttpException();
 		}
+		$model->entity_responsible_id = $model->getIssue()->getIssueModel()->entity_responsible_id;
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['issue/view', 'id' => $model->issue_id]);

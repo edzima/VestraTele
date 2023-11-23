@@ -28,6 +28,7 @@ class IssueClaimsForm extends Model {
 				'type' => IssueClaim::TYPE_CUSTOMER,
 				'issue_id' => $this->issue->getIssueId(),
 				'scenario' => IssueClaimForm::SCENARIO_TYPE,
+				'entity_responsible_id' => $this->issue->getIssueModel()->entity_responsible_id,
 				'date' => time(),
 			]);
 		}
@@ -40,6 +41,7 @@ class IssueClaimsForm extends Model {
 				'type' => IssueClaim::TYPE_COMPANY,
 				'issue_id' => $this->issue->getIssueId(),
 				'scenario' => IssueClaimForm::SCENARIO_TYPE,
+				'entity_responsible_id' => $this->issue->getIssueModel()->entity_responsible_id,
 				'date' => time(),
 			]);
 		}
