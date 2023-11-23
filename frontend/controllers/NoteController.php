@@ -152,7 +152,9 @@ class NoteController extends Controller {
 			],
 			'sendEmailToWorkers' => true,
 		]);
-		$message->setExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SUMMON));
+		$extraEmailsIds = Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SUMMON);
+		$extraEmailsIds[] = $summon->owner_id;
+		$message->setExtraWorkersEmailsIds(array_unique($extraEmailsIds));
 		$model->messagesForm = $message;
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$this->redirect(['/summon/view', 'id' => $summon->id]);
