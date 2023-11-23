@@ -139,6 +139,7 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 				->joinWith('owner.userProfile')
 				->orderBy('sort_index')
 				->all();
+			static::sortModels(static::$models);
 		}
 		if ($active) {
 			return array_filter(static::$models, function (LeadSourceInterface $source): bool {
@@ -146,6 +147,19 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 			});
 		}
 		return static::$models;
+	}
+
+	public static function sortModels(array &$models): void {
+		uasort($models, function (LeadSource $a, LeadSource $b) {
+			if ($a->sort_index || $b->sort_index) {
+				$sort = $b->sort_index <=> $a->sort_index;
+				if ($sort === 0) {
+					return strcmp($a->name, $b->name);
+				}
+				return $sort;
+			}
+			return strcmp($a->name, $b->name);
+		});
 	}
 
 	public function getID(): string {

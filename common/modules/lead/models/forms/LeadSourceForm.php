@@ -43,7 +43,7 @@ class LeadSourceForm extends Model implements LeadSourceInterface {
 			[['name', 'type_id', 'is_active'], 'required'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['is_active'], 'boolean'],
-			[['type_id', 'owner_id', 'call_page_widget_id'], 'integer'],
+			[['type_id', 'owner_id', 'call_page_widget_id', 'sort_index'], 'integer'],
 			[['name', 'url'], 'string', 'max' => 255],
 			[['phone', 'dialer_phone'], 'string', 'max' => 30],
 			[['owner_id', 'call_page_widget_id', 'dialer_phone'], 'default', 'value' => null],
