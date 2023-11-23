@@ -80,6 +80,7 @@ class LeadSource extends ActiveRecord implements LeadSourceInterface {
 			'phone' => Yii::t('lead', 'Phone'),
 			'dialer_phone' => Yii::t('lead', 'Dialer Phone'),
 			'sort_index' => Yii::t('lead', 'Sort Index'),
+			'owner' => Yii::t('lead', 'Owner'),
 			'type_id' => Yii::t('lead', 'Type'),
 			'is_active' => Yii::t('lead', 'Is Active'),
 			'sms_push_template' => Yii::t('lead', 'SMS Push Template'),
