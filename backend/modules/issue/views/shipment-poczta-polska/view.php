@@ -62,7 +62,12 @@ YiiAsset::register($this);
 		</div>
 
 		<div class="col-md-4">
-
+			<?= Html::a(
+				Html::encode(Yii::$app->pocztaPolska->externalTrackingUrl($model->shipment_number)),
+				Yii::$app->pocztaPolska->externalTrackingUrl($model->shipment_number), [
+					'target' => '_blank',
+				]
+			) ?>
 			<?= DetailView::widget([
 				'model' => $model,
 				'attributes' => [

@@ -13,9 +13,14 @@ class PocztaPolska extends Component {
 
 	public string $username = 'sledzeniepp';
 	public string $password = 'PPSA';
+	public string $trackingUrl = 'https://emonitoring.poczta-polska.pl/?numer=';
 
 	private ?PocztaPolskaClient $client = null;
 	private ?Shipment $shipment;
+
+	public function externalTrackingUrl(string $number): string {
+		return $this->trackingUrl . $number;
+	}
 
 	public function checkShipment(string $number): void {
 		$this->shipment = null;

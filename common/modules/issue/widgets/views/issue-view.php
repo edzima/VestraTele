@@ -432,6 +432,19 @@ use yii\data\ActiveDataProvider;
 				'columns' => [
 					'shipmentTypeName',
 					'details:ntext',
+					[
+						'attribute' => 'shipment_number',
+						'format' => 'raw',
+						'value' => function (IssueShipmentPocztaPolska $model): string {
+							return Html::a(
+								Html::encode($model->shipment_number),
+								Yii::$app->pocztaPolska->externalTrackingUrl($model->shipment_number),
+								[
+									'target' => '_blank',
+								]
+							);
+						},
+					],
 					'shipment_number',
 					'shipment_at:date',
 					'finished_at:date',
