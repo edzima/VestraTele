@@ -7,6 +7,7 @@ use common\widgets\DateTimeWidget;
 use common\widgets\DateWidget;
 use kartik\depdrop\DepDrop;
 use kartik\select2\Select2;
+use vova07\imperavi\Widget;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -142,7 +143,7 @@ use yii\widgets\ActiveForm;
 
 
 			<?= $form->field($model, 'details', ['options' => ['class' => 'col-md-5']])
-				->textarea(['rows' => 5, 'maxlength' => true]) ?>
+				->widget(Widget::class) ?>
 
 			<?= !empty($model->getLinkedIssuesNames())
 				? $form->field($model, 'linkedIssuesIds', [

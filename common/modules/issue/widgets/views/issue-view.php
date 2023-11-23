@@ -412,7 +412,7 @@ use yii\data\ActiveDataProvider;
 						],
 						[
 							'attribute' => 'details',
-							'format' => 'ntext',
+							'format' => 'html',
 							'visible' => !empty($model->details),
 						],
 
@@ -426,6 +426,7 @@ use yii\data\ActiveDataProvider;
 				'dataProvider' => new ActiveDataProvider([
 					'query' => $model->getIssueModel()->getShipmentsPocztaPolska(),
 				]),
+				'showOnEmpty' => false,
 				'summary' => '',
 				'caption' => Yii::t('issue', 'Issue Shipment Poczta Polska'),
 				'emptyText' => false,
