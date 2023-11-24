@@ -446,7 +446,6 @@ use yii\data\ActiveDataProvider;
 							);
 						},
 					],
-					'shipment_number',
 					'shipment_at:date',
 					'finished_at:date',
 					'created_at:date',
