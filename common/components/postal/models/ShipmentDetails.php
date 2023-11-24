@@ -19,9 +19,19 @@ class ShipmentDetails {
 	public EventsList $zdarzenia;
 
 	public function getFinishedAt(): ?string {
-		foreach ($this->zdarzenia->zdarzenie as $event) {
-			if ($event->konczace) {
-				return $event->czas;
+		$events = $this->zdarzenia->zdarzenie;
+		if (!empty($events)) {
+			if (is_array($events)) {
+				foreach ($events as $event) {
+					if ($event->konczace) {
+						return $event->czas;
+					}
+				}
+			}
+			if (is_object($events)) {
+				if ($events->konczace) {
+					return $events->czas;
+				}
 			}
 		}
 		return null;
