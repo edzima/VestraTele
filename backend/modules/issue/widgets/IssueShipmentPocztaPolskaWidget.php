@@ -49,11 +49,8 @@ class IssueShipmentPocztaPolskaWidget extends Widget {
 
 			],
 		]);
-		$events = $shipment->danePrzesylki->zdarzenia->zdarzenie;
+		$events = $shipment->danePrzesylki->zdarzenia->getEvents();
 		if (!empty($events)) {
-			if (!is_array($events)) {
-				$events = [$events];
-			}
 			$content .= GridView::widget([
 				'caption' => 'Zdarzenia',
 				'dataProvider' => new ArrayDataProvider(['allModels' => $events]),
