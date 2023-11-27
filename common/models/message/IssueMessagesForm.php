@@ -126,16 +126,18 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 
 	public function getExtraWorkersEmailsData(): array {
 		if (empty($this->_extraWorkersEmailsData)) {
-			$this->_extraWorkersEmailsData = ArrayHelper::map(User::find()
-				->joinWith('userProfile')
-				->andWhere(['email' => array_keys($this->extraWorkersEmails)])
-				->andFilterWhere(['<>', 'id', $this->excludedExtraWorkersIds()])
-				->active()
-				->asArray()
-				->all(),
-				'email',
-				'fullName'
-			);
+			if (!empty($this->extraWorkersEmails)) {
+				$this->_extraWorkersEmailsData = ArrayHelper::map(User::find()
+					->joinWith('userProfile')
+					->andWhere(['email' => $this->extraWorkersEmails])
+					->andFilterWhere(['<>', 'id', $this->excludedExtraWorkersIds()])
+					->active()
+					->asArray()
+					->all(),
+					'email',
+					'fullName'
+				);
+			}
 		}
 		return $this->_extraWorkersEmailsData;
 	}
@@ -280,12 +282,7 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 	}
 
 	public function getEmailToWorkers(): ?MessageInterface {
-		$emails = array_unique(
-			array_merge(
-				$this->getIssueUsersEmails(),
-				(array) $this->extraWorkersEmails
-			)
-		);
+		$emails = $this->getWorkersEmails();
 		if (empty($emails)) {
 			return null;
 		}
@@ -296,6 +293,26 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 		$this->parseTemplate($template);
 		return $this->createEmail($template)
 			->setBcc($emails);
+	}
+
+	protected function getWorkersEmails(): array {
+		$issue = $this->getIssueUsersEmails();
+		$extra = empty($this->extraWorkersEmails) ? [] : (array) $this->extraWorkersEmails;
+		if (empty($issue)) {
+			if (empty($extra)) {
+				return [];
+			}
+			return $extra;
+		}
+		if (empty($extra)) {
+			return $issue;
+		}
+		return array_unique(
+			array_merge(
+				$this->getIssueUsersEmails(),
+				$this->extraWorkersEmails
+			)
+		);
 	}
 
 	protected function getWorkersTemplate(): ?MessageTemplate {
