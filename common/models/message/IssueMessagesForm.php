@@ -45,6 +45,11 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 
 	public bool $pushMessageEnable = true;
 
+	public array $excludedExtraWorkersRoles = [
+		User::ROLE_ADMINISTRATOR,
+	];
+	public array $excludedExtraWorkersIds = [];
+
 	protected ?IssueInterface $issue = null;
 
 	protected ?MessageTemplate $customerSMSTemplate = null;
@@ -95,14 +100,17 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 		];
 	}
 
-	public function setExtraWorkersEmailsIds(array $ids) {
+	public function addExtraWorkersEmailsIds(array $ids, bool $select = true, bool $excluded = true, string $prefix = null) {
+		if ($excluded) {
+			$ids = array_diff($ids, $this->excludedExtraWorkersIds());
+		}
 		$users = User::find()
 			->andWhere(['id' => $ids])
 			->joinWith('userProfile')
 			->active()
 			->all();
 		foreach ($users as $user) {
-			$this->addExtraWorkerEmail($user);
+			$this->addExtraWorkerEmail($user, $prefix, $select);
 		}
 	}
 
@@ -121,6 +129,7 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 			$this->_extraWorkersEmailsData = ArrayHelper::map(User::find()
 				->joinWith('userProfile')
 				->andWhere(['email' => array_keys($this->extraWorkersEmails)])
+				->andFilterWhere(['<>', 'id', $this->excludedExtraWorkersIds()])
 				->active()
 				->asArray()
 				->all(),
@@ -129,6 +138,18 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 			);
 		}
 		return $this->_extraWorkersEmailsData;
+	}
+
+	protected function excludedExtraWorkersIds(): array {
+		if (empty($this->excludedExtraWorkersIds)) {
+			if (!empty($this->excludedExtraWorkersRoles)) {
+				$this->excludedExtraWorkersIds = User::getAssignmentIds($this->excludedExtraWorkersRoles);
+			}
+			foreach ($this->issue->getIssueModel()->users as $user) {
+				$this->excludedExtraWorkersIds[] = $user->user_id;
+			}
+		}
+		return $this->excludedExtraWorkersIds;
 	}
 
 	public function pushMessages(): ?int {

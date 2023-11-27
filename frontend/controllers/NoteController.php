@@ -89,7 +89,8 @@ class NoteController extends Controller {
 			],
 			'sendEmailToWorkers' => true,
 		]);
-		$message->setExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE));
+		$message->addExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE), false);
+		$message->addExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE));
 		$model->messagesForm = $message;
 
 		if ($this->selfNote && !Yii::$app->user->can(User::PERMISSION_NOTE)) {
@@ -124,7 +125,7 @@ class NoteController extends Controller {
 			],
 			'sendEmailToWorkers' => true,
 		]);
-		$message->setExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SETTLEMENT));
+		$message->addExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SETTLEMENT));
 		$model->messagesForm = $message;
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -154,7 +155,7 @@ class NoteController extends Controller {
 		]);
 		$extraEmailsIds = Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SUMMON);
 		$extraEmailsIds[] = $summon->owner_id;
-		$message->setExtraWorkersEmailsIds(array_unique($extraEmailsIds));
+		$message->addExtraWorkersEmailsIds(array_unique($extraEmailsIds));
 		$model->messagesForm = $message;
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$this->redirect(['/summon/view', 'id' => $summon->id]);
