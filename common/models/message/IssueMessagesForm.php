@@ -45,6 +45,8 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 
 	public bool $pushMessageEnable = true;
 
+	public bool $excludedIssueUsersInExtraWorkers = false;
+
 	public array $excludedExtraWorkersRoles = [
 		User::ROLE_ADMINISTRATOR,
 	];
@@ -147,8 +149,10 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 			if (!empty($this->excludedExtraWorkersRoles)) {
 				$this->excludedExtraWorkersIds = User::getAssignmentIds($this->excludedExtraWorkersRoles);
 			}
-			foreach ($this->issue->getIssueModel()->users as $user) {
-				$this->excludedExtraWorkersIds[] = $user->user_id;
+			if ($this->excludedIssueUsersInExtraWorkers) {
+				foreach ($this->issue->getIssueModel()->users as $user) {
+					$this->excludedExtraWorkersIds[] = $user->user_id;
+				}
 			}
 		}
 		return $this->excludedExtraWorkersIds;
