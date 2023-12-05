@@ -108,7 +108,10 @@ use yii\widgets\ActiveForm;
 				) ?>
 
 			<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-2']])
-				->textInput() ?>
+				->textarea([
+					'row' => 2,
+				])
+			?>
 
 			<?= $form->field($model, 'signing_at', ['options' => ['class' => 'col-md-2']])
 				->widget(DateWidget::class) ?>
