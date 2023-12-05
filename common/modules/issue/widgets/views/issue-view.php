@@ -338,6 +338,7 @@ use yii\data\ActiveDataProvider;
 						[
 							'attribute' => 'signature_act',
 							'visible' => !empty($model->signature_act),
+							'format' => 'ntext',
 						],
 						[
 							'label' => Yii::t('common', 'Created at / Updated at'),
