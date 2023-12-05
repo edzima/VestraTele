@@ -3,6 +3,7 @@
 use common\models\issue\IssueInterface;
 use common\models\user\Worker;
 use common\modules\issue\IssueNoteColumn;
+use common\modules\issue\widgets\IssueClaimCompanyColumn;
 use common\modules\issue\widgets\IssueSummonsColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AgentDataColumn;
@@ -204,6 +205,11 @@ $parentMenuItems = Html::issueMainTypesItems();
 				'attribute' => 'issue.updated_at',
 				'format' => 'date',
 				'noWrap' => true,
+			],
+			[
+				'class' => IssueClaimCompanyColumn::class,
+				'attribute' => 'claimCompanyTryingValue',
+				'pageSummary' => true,
 			],
 			[
 				'class' => IssueNoteColumn::class,

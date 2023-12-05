@@ -58,6 +58,7 @@ class IssueSearch extends BaseIssueSearch {
 				$this->issueQueryFilter($query);
 			},
 		]);
+		$query->with('issue.claims');
 
 		$query->distinct('issue_id');
 
