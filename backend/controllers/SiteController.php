@@ -62,8 +62,15 @@ class SiteController extends Controller {
 		];
 	}
 
+	public function actionInfoExecutionTime() {
+		return $this->renderContent(ini_get('max_execution_time'));
+	}
+
 	public function beforeAction($action): bool {
 		$this->layout = Yii::$app->user->isGuest || !Yii::$app->user->can('loginToBackend') ? 'main-login' : 'main';
+		if (!Yii::$app->user->isGuest) {
+			set_time_limit(240);
+		}
 		return parent::beforeAction($action);
 	}
 
