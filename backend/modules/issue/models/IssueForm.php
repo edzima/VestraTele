@@ -88,7 +88,7 @@ class IssueForm extends Model implements LinkedIssuesModel {
 			],
 			[['archives_nr', 'details', 'signature_act'], 'string'],
 			[['archives_nr', 'details', 'signature_act'], 'trim'],
-			['signature_act', 'string', 'max' => 30],
+			['signature_act', 'string', 'max' => 255],
 			[['signing_at', 'type_additional_date_at', 'stage_change_at', 'stage_deadline_at'], 'date', 'format' => 'Y-m-d'],
 			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
 			[['archives_nr', 'details', 'signature_act', 'stage_deadline_at', 'stage_change_at'], 'default', 'value' => null],
