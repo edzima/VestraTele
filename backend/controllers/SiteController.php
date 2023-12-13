@@ -45,7 +45,7 @@ class SiteController extends Controller {
 			],
 			'fileapi-upload' => [
 				'class' => FileAPIUpload::class,
-				'path' => '@storage/tmp',
+				'path' => '@protected/tmp',
 			],
 			'image-upload' => [
 				'class' => UploadFileAction::class,
@@ -54,11 +54,10 @@ class SiteController extends Controller {
 			],
 			'file-upload' => [
 				'class' => UploadFileAction::class,
-				'url' => Yii::getAlias('@storageUrl/files/' . date('m.y')),
-				'path' => '@storage/files/' . date('m.y'),
+				'url' => Yii::getAlias('@frontendUrl/protected/download?path=' . date('m.y')),
+				'path' => '@protected/files/' . date('m.y'),
 				'uploadOnlyImage' => false,
 			],
-
 		];
 	}
 

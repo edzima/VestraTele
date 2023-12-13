@@ -39,6 +39,7 @@ return [
 			'frontend/web/assets',
 			'storage',
 			'backups',
+			'protected',
 		],
 		'setExecutable' => [
 			'yii',
@@ -60,6 +61,7 @@ return [
 			'frontend/web/assets',
 			'storage',
 			'backups',
+			'protected',
 		],
 		'setExecutable' => [
 			'yii',
