@@ -13,15 +13,26 @@ use yii\db\ActiveQuery;
 class SummonQuery extends ActiveQuery {
 
 	public function user(int $userId): self {
+		$this->users([$userId]);
+		return $this;
+	}
+
+	public function users(array $usersIds): self {
 		[, $alias] = $this->getTableNameAndAlias();
 
 		$this->andWhere([
 			'or', [
-				$alias . '.owner_id' => $userId,
+				$alias . '.owner_id' => $usersIds,
 			], [
-				$alias . '.contractor_id' => $userId,
+				$alias . '.contractor_id' => $usersIds,
 			],
 		]);
+		return $this;
+	}
+
+	public function imminentDeadline(string $range = '+1 day'): self {
+		$date = date('Y-m-d', strtotime($range));
+		$this->andWhere(['<=', Summon::tableName() . '.deadline_at', $date]);
 		return $this;
 	}
 

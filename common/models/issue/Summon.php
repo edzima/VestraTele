@@ -32,8 +32,8 @@ use yii\db\ActiveRecord;
  * @property int $owner_id
  * @property int $contractor_id
  * @property int|null $updater_id
- * @property int $entity_id
- * @property int $city_id
+ * @property int|null $entity_id
+ * @property int|null $city_id
  *
  * @property-read string $statusName
  * @property-read string $typeName
@@ -44,8 +44,8 @@ use yii\db\ActiveRecord;
  * @property-read User $contractor
  * @property-read User $owner
  * @property-read User|null $updater
- * @property-read Simc $city
- * @property-read EntityResponsible $entityResponsible
+ * @property-read Simc|null $city
+ * @property-read EntityResponsible|null $entityResponsible
  * @property-read SummonDoc[] $docs
  * @property-read SummonDocLink[] $docsLink
  * @property-read Reminder[] $reminders
