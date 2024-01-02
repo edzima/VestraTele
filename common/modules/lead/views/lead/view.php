@@ -1,7 +1,6 @@
 <?php
 
 use common\helpers\Html;
-use common\helpers\Url;
 use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadInterface;
@@ -9,13 +8,10 @@ use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
-use common\modules\lead\widgets\LeadReminderActionColumn;
 use common\modules\lead\widgets\LeadReportWidget;
 use common\modules\lead\widgets\LeadSmsBtnWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
 use common\modules\lead\widgets\ShortReportStatusesWidget;
-use common\modules\reminder\models\Reminder;
-use common\modules\reminder\widgets\ReminderGridWidget;
 use common\widgets\address\AddressDetailView;
 use common\widgets\GridView;
 use yii\data\DataProviderInterface;
@@ -120,6 +116,21 @@ YiiAsset::register($this);
 
 	<p></p>
 
+
+	<?php if (!empty($model->reports)): ?>
+		<?php foreach ($model->reports as $report): ?>
+
+			<?= $report->is_pinned
+				? LeadReportWidget::widget([
+					'model' => $report,
+					'withDeleteButton' => false,
+				])
+				: '' ?>
+
+
+		<?php endforeach; ?>
+	<?php endif; ?>
+
 	<div class="row">
 		<div class="col-md-4">
 
@@ -159,7 +170,9 @@ YiiAsset::register($this);
 						'format' => 'html',
 						'label' => Yii::t('lead', 'Customer View'),
 						'visible' => !$onlyUser && isset($model->getData()['customerUrl']),
-						'value' => Html::a($model->getName(), $model->getData()['customerUrl']),
+						'value' => isset($model->getData()['customerUrl'])
+							? Html::a($model->getName(), $model->getData()['customerUrl'])
+							: '',
 					],
 					[
 						'attribute' => 'phone',

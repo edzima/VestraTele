@@ -26,6 +26,9 @@ use yii\widgets\ActiveForm;
 		<?= $form->field($model, 'leadName', ['options' => ['class' => 'col-md-5']])->textInput() ?>
 
 		<?= $form->field($model, 'withAddress', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
+
+		<?= $form->field($model, 'is_pinned', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
+
 	</div>
 
 

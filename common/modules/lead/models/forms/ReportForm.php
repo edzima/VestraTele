@@ -28,6 +28,7 @@ class ReportForm extends Model {
 	public ?string $details = null;
 	public int $owner_id;
 	public bool $withSameContacts = false;
+	public bool $is_pinned = false;
 
 	public $closedQuestions = [];
 
@@ -63,6 +64,7 @@ class ReportForm extends Model {
 			'withSameContacts' => Yii::t('lead', 'With Same Contacts'),
 			'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 			'leadName' => Yii::t('lead', 'Lead Name'),
+			'is_pinned' => Yii::t('lead', 'Is pinned'),
 		];
 	}
 
@@ -76,7 +78,7 @@ class ReportForm extends Model {
 			],
 			[['details', 'leadName'], 'string'],
 			[['details', 'leadName'], 'trim'],
-			[['withAddress', 'withSameContacts'], 'boolean'],
+			[['withAddress', 'withSameContacts', 'is_pinned'], 'boolean'],
 			[
 				'details', 'required',
 				'when' => function () {
@@ -217,6 +219,7 @@ class ReportForm extends Model {
 		$model->status_id = $this->status_id;
 		$model->owner_id = $this->owner_id;
 		$model->lead_id = $this->lead->getId();
+		$model->is_pinned = $this->is_pinned;
 		$isNewRecord = $model->isNewRecord;
 		if (!$model->save()) {
 			Yii::warning($model->getErrors(), __METHOD__ . '.save');
@@ -365,6 +368,7 @@ class ReportForm extends Model {
 		$this->status_id = $model->status_id;
 		$this->owner_id = $model->owner_id;
 		$this->details = $model->details;
+		$this->is_pinned = $model->is_pinned;
 		$this->setAnswers($model->answers);
 	}
 
