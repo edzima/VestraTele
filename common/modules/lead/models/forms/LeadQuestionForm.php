@@ -17,7 +17,7 @@ class LeadQuestionForm extends Model {
 	public ?bool $show_in_grid = null;
 	public ?bool $is_required = null;
 
-	public ?int $order = null;
+	public ?string $order = null;
 	public $type_id;
 	public $status_id;
 
@@ -29,7 +29,7 @@ class LeadQuestionForm extends Model {
 			[['order'], 'integer'],
 			[['show_in_grid', 'is_required', 'is_active', 'is_boolean'], 'boolean'],
 			[['name', 'placeholder'], 'string'],
-			['placeholder', 'default', 'value' => null],
+			[['placeholder', 'order'], 'default', 'value' => null],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 		];

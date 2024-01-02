@@ -70,6 +70,8 @@ class LeadQuestion extends ActiveRecord {
 			'is_required' => Yii::t('lead', 'Is required'),
 			'show_in_grid' => Yii::t('lead', 'Show in grid'),
 			'order' => Yii::t('lead', 'Order'),
+			'type' => Yii::t('lead', 'Lead Type'),
+			'status' => Yii::t('lead', 'Lead Status'),
 		];
 	}
 
