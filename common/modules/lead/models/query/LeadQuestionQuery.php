@@ -64,9 +64,10 @@ class LeadQuestionQuery extends ActiveQuery {
 
 	/**
 	 * {@inheritDoc}
-	 * @return LeadQuestion[]
+	 * @return LeadQuestion[]|array
 	 */
 	public function all($db = null) {
 		return parent::all($db);
 	}
+
 }

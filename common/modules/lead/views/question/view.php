@@ -35,6 +35,10 @@ YiiAsset::register($this);
 			'id',
 			'name',
 			'placeholder',
+			[
+				'attribute' => 'order',
+				'visible' => !empty($model->order),
+			],
 			'is_active:boolean',
 			'is_required:boolean',
 			'show_in_grid:boolean',

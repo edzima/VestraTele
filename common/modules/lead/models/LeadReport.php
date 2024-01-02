@@ -91,6 +91,7 @@ class LeadReport extends ActiveRecord {
 
 	public function getAnswersQuestions(): string {
 		$answers = $this->answers;
+		LeadAnswer::orderByQuestions($answers);
 		$questionAnswers = [];
 		foreach ($answers as $answer) {
 			$questionAnswers[] = $answer->getAnswerQuestion();

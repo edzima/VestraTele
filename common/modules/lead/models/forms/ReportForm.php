@@ -194,6 +194,7 @@ class ReportForm extends Model {
 				$query->andFilterWhere(['not', ['id' => $answeredQuestionsIds]]);
 			}
 			$this->questions = $query->all();
+			LeadQuestion::sortByOrder($this->questions);
 		}
 		return $this->questions;
 	}

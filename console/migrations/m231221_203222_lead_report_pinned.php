@@ -3,7 +3,7 @@
 use console\base\Migration;
 
 /**
- * Class m231116_143222_issue_shipment_poczta_polska
+ * Class m231221_203222_lead_report_pinned
  */
 class m231221_203222_lead_report_pinned extends Migration {
 

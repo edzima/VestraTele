@@ -44,6 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'filter' => LeadType::getNames(),
 
 			],
+			'order',
 			'is_active:boolean',
 			'is_boolean:boolean',
 			'is_required:boolean',

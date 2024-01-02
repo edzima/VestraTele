@@ -2,9 +2,10 @@
 
 namespace common\modules\lead\models\searches;
 
+use common\modules\lead\models\LeadQuestion;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\modules\lead\models\LeadQuestion;
+use yii\db\Expression;
 
 /**
  * LeadReportSchemaSearch represents the model behind the search form of `common\modules\lead\models\LeadReportSchema`.
@@ -16,7 +17,7 @@ class LeadQuestionSearch extends LeadQuestion {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type_id', 'status_id', 'show_in_grid'], 'integer'],
+			[['id', 'type_id', 'status_id', 'show_in_grid', 'order'], 'integer'],
 			[['is_active', 'is_boolean', 'is_required'], 'boolean'],
 			[['is_active', 'is_boolean', 'is_required'], 'default', 'value' => null],
 			[['name', 'placeholder'], 'safe'],
@@ -49,6 +50,8 @@ class LeadQuestionSearch extends LeadQuestion {
 			'query' => $query,
 		]);
 
+		$dataProvider->getSort()->attributes['order']['asc'] = [new Expression('-`order` DESC')];
+
 		$this->load($params);
 
 		if (!$this->validate()) {
@@ -66,6 +69,7 @@ class LeadQuestionSearch extends LeadQuestion {
 			LeadQuestion::tableName() . '.is_boolean' => $this->is_boolean,
 			LeadQuestion::tableName() . '.is_required' => $this->is_required,
 			LeadQuestion::tableName() . '.show_in_grid' => $this->show_in_grid,
+			LeadQuestion::tableName() . '.order' => $this->order,
 		]);
 
 		$query->andFilterWhere(['like', LeadQuestion::tableName() . '.name', $this->name])

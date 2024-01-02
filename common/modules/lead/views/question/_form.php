@@ -1,7 +1,6 @@
 <?php
 
 use common\modules\lead\models\forms\LeadQuestionForm;
-
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -27,6 +26,8 @@ use yii\widgets\ActiveForm;
 	<?= $form->field($model, 'status_id')->dropDownList(LeadQuestionForm::getStatusNames(), [
 		'prompt' => Yii::t('common', 'Select...'),
 	]) ?>
+
+	<?= $form->field($model, 'order')->textInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'is_active')->checkbox() ?>
 
