@@ -136,6 +136,14 @@ use kartik\select2\Select2;
 			: ''
 		?>
 
+		<?= $form->field($model, 'reportStatus', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
+			'data' => LeadSearch::getStatusNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('reportStatus'),
+			],
+		])
+		?>
+
 
 	</div>
 

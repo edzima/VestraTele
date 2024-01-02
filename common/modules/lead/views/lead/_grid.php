@@ -194,6 +194,14 @@ foreach (LeadSearch::questions() as $question) {
 				'label' => Yii::t('lead', 'Reports Answers'),
 			],
 			[
+				'attribute' => 'reportStatusCount',
+				'value' => function (ActiveLead $lead) use ($searchModel, $dataProvider): int {
+					return $searchModel->getReportStatusCount($lead->getId(), $dataProvider->getKeys());
+				},
+				'visible' => !empty($searchModel->reportStatus),
+				'label' => Yii::t('lead', 'Report Status Count'),
+			],
+			[
 				'class' => ActionColumn::class,
 				'template' => '{view} {update} {report} {sms} {user} {reminder} {market} {delete}',
 				'visibleButtons' => $visibleButtons,

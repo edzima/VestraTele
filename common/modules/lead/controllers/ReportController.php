@@ -6,13 +6,13 @@ use common\behaviors\SelectionRouteBehavior;
 use common\helpers\Flash;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\LeadQuestion;
-use common\modules\lead\models\LeadStatus;
-use Yii;
 use common\modules\lead\models\LeadReport;
+use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadReportSearch;
+use Yii;
+use yii\filters\VerbFilter;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 use yii\web\Response;
 
 /**
@@ -31,6 +31,8 @@ class ReportController extends BaseController {
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
+					'status' => ['POST'],
+					'short-status' => ['POST'],
 				],
 			],
 			'selection' => [
@@ -118,6 +120,26 @@ class ReportController extends BaseController {
 		$model->save();
 
 		if ($lead->getStatusId() !== $status_id) {
+			$lead->updateStatus($status_id);
+		}
+		return $this->redirect(['lead/view', 'id' => $lead_id]);
+	}
+
+	public function actionShortStatus(int $lead_id, int $status_id) {
+		$status = LeadStatus::getModels()[$status_id] ?? null;
+		if ($status === null || !$status->short_report) {
+			throw new NotFoundHttpException();
+		}
+		$lead = $this->findLead($lead_id);
+
+		$model = new LeadReport();
+		$model->lead_id = $lead_id;
+		$model->old_status_id = $lead->getStatusId() === LeadStatus::STATUS_NEW ? LeadStatus::STATUS_NEW : $status_id;
+		$model->status_id = $status_id;
+		$model->owner_id = Yii::$app->user->getId();
+		$model->save();
+
+		if ($lead->getStatusId() === LeadStatus::STATUS_NEW) {
 			$lead->updateStatus($status_id);
 		}
 		return $this->redirect(['lead/view', 'id' => $lead_id]);

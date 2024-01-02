@@ -9,7 +9,6 @@ use common\models\user\User;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadCampaign;
-use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
@@ -25,6 +24,7 @@ use yii\base\Model;
 use yii\base\UnknownPropertyException;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
 
@@ -63,6 +63,8 @@ class LeadSearch extends Lead implements SearchModel {
 	public $answers = [];
 	public $closedQuestions = [];
 
+	public $reportStatus;
+
 	private array $questionsAttributes = [];
 
 	private static ?array $QUESTIONS = null;
@@ -87,6 +89,7 @@ class LeadSearch extends Lead implements SearchModel {
 	public function rules(): array {
 		return [
 			[['id', 'type_id', 'campaign_id', 'olderByDays'], 'integer', 'min' => 1],
+			[['status', 'reportStatus'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
 			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress'], 'boolean'],
@@ -95,7 +98,7 @@ class LeadSearch extends Lead implements SearchModel {
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames()), 'allowArray' => true],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
-			['status_id', 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
+			[['status_id', 'reportStatus'], 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
 			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
 			[['from_at', 'to_at'], 'safe'],
 			[array_keys($this->questionsAttributes), 'safe'],
@@ -120,6 +123,8 @@ class LeadSearch extends Lead implements SearchModel {
 				'to_at' => Yii::t('lead', 'To At'),
 				'fromMarket' => Yii::t('lead', 'From Market'),
 				'olderByDays' => Yii::t('lead', 'Older by days'),
+				'reportStatus' => Yii::t('lead', 'Report Status'),
+				'reportStatusCount' => Yii::t('lead', 'Report Status Count'),
 			]
 		);
 	}
@@ -199,6 +204,11 @@ class LeadSearch extends Lead implements SearchModel {
 			],
 		]);
 
+		$dataProvider->sort->attributes['reportStatusCount'] = [
+			'asc' => [new Expression('count(' . LeadReport::tableName() . '.status_id) ASC')],
+			'desc' => [new Expression('count(' . LeadReport::tableName() . '.status_id) DESC')],
+		];
+
 		$this->load($params);
 		$this->addressSearch->load($params);
 
@@ -218,6 +228,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyPhoneFilter($query);
 		$this->applyStatusFilter($query);
 		$this->applyReportFilter($query);
+		$this->applyReportStatusFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -288,6 +299,40 @@ class LeadSearch extends Lead implements SearchModel {
 				$query->andWhere(['like', LeadReport::tableName() . '.details', $this->reportsDetails]);
 			}
 		}
+	}
+
+	private function applyReportStatusFilter(LeadQuery $query) {
+		if (!empty($this->reportStatus)) {
+			$query->joinWith('reports');
+			$query->andWhere([LeadReport::tableName() . '.status_id' => $this->reportStatus]);
+		}
+	}
+
+	public function getReportStatusCount(int $leadId, array $leadsIDs, bool $refresh = false): ?int {
+		if (empty($this->reportStatus)) {
+			return null;
+		}
+		$counts = $this->getReportStatusesCount($leadsIDs, $refresh);
+		return $counts[$leadId] ?? null;
+	}
+
+	private array $reportsStatusesCount = [];
+
+	protected function getReportStatusesCount(array $leadsIDs, bool $refresh = false): array {
+		if (empty($this->reportStatus)) {
+			return [];
+		}
+		if ($refresh || !isset($this->reportsStatusesCount[$this->reportStatus])) {
+			$count = LeadReport::find()
+				->select('count(status_id)')
+				->andWhere(['status_id' => $this->reportStatus])
+				->groupBy('lead_id')
+				->indexBy('lead_id')
+				->andWhere(['lead_id' => $leadsIDs])
+				->column();
+			$this->reportsStatusesCount[$this->reportStatus] = $count;
+		}
+		return $this->reportsStatusesCount[$this->reportStatus];
 	}
 
 	private function applyAnswerFilter(ActiveQuery $query): void {
@@ -452,4 +497,5 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 		$query->andWhere('M.lead_id IS NULL');
 	}
+
 }

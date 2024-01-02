@@ -421,4 +421,6 @@ return [
 	'Is Boolean' => 'Tak/Nie',
 	'Is pinned' => 'Przypięte',
 	'Order' => 'Kolejność',
+	'Report Status' => 'Status Raportu',
+	'Report Status Count' => 'Status Raportu',
 ];
