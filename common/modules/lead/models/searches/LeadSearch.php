@@ -65,6 +65,8 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public $reportStatus;
 
+	public $selfUserId;
+
 	private array $questionsAttributes = [];
 
 	private static ?array $QUESTIONS = null;
@@ -88,16 +90,17 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type_id', 'campaign_id', 'olderByDays'], 'integer', 'min' => 1],
+			[['id', 'type_id', 'campaign_id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
 			[['reportStatus'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
 			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress'], 'boolean'],
 			['name', 'string', 'min' => 3],
-			[['duplicatePhone', 'fromMarket'], 'default', 'value' => null],
+			[['duplicatePhone', 'fromMarket', 'selfUserId'], 'default', 'value' => null],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames()), 'allowArray' => true],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
+			[['selfUserId'], 'in', 'range' => function () { return $this->selfUsersIds(); }, 'allowArray' => true, 'skipOnEmpty' => true],
 			[['status_id', 'reportStatus'], 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
 			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
 			[['from_at', 'to_at'], 'safe'],
@@ -225,6 +228,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyFromMarketFilter($query);
 		$this->applyNameFilter($query);
 		$this->applyUserFilter($query);
+		$this->applySelfUserFilter($query);
 		$this->applyPhoneFilter($query);
 		$this->applyStatusFilter($query);
 		$this->applyReportFilter($query);
@@ -286,6 +290,17 @@ class LeadSearch extends Lead implements SearchModel {
 		if ($this->withoutUser) {
 			$query->joinWith('leadUsers', false, 'LEFT OUTER JOIN');
 			$query->andWhere([LeadUser::tableName() . '.user_id' => null]);
+		}
+	}
+
+	private function applySelfUserFilter(ActiveQuery $query): void {
+		if (!empty($this->selfUserId)) {
+			$query->andWhere([
+				Lead::tableName() . '.id' =>
+					LeadUser::find()
+						->select('lead_id')
+						->andWhere(['user_id' => $this->selfUserId]),
+			]);
 		}
 	}
 
@@ -496,6 +511,28 @@ class LeadSearch extends Lead implements SearchModel {
 			return;
 		}
 		$query->andWhere('M.lead_id IS NULL');
+	}
+
+	private $_selfUsersIds = [];
+
+	public function selfUsersIds() {
+		if (!isset($this->_selfUsersIds[$this->user_id])) {
+			$this->_selfUsersIds[$this->user_id] = LeadUser::find()
+				->select('user_id')
+				->distinct()
+				->andWhere(['!=', 'user_id', $this->user_id])
+				->andWhere([
+					'lead_id' => LeadUser::find()
+						->andWhere(['user_id' => $this->user_id])
+						->select('lead_id'),
+				])
+				->column();
+		}
+		return $this->_selfUsersIds[$this->user_id];
+	}
+
+	public function getSelfUsersNames(): array {
+		return User::getSelectList($this->selfUsersIds());
 	}
 
 }

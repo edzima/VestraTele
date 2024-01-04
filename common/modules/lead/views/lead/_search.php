@@ -76,8 +76,19 @@ use kartik\select2\Select2;
 
 			<?= $form->field($model, 'duplicateEmail', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
-		<?php endif; ?>
 
+		<?php else: ?>
+
+			<?= $form->field($model, 'selfUserId', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(Select2::class, [
+				'data' => $model->getSelfUsersNames(),
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('user_id'),
+					'allowClear' => true,
+				],
+			])
+				->label($model->getAttributeLabel('user_id'))
+			?>
+		<?php endif; ?>
 
 	</div>
 
