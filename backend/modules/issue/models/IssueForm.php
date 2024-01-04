@@ -60,6 +60,8 @@ class IssueForm extends Model implements LinkedIssuesModel {
 
 	private ?Issue $model = null;
 
+	private ?array $users = [];
+
 	/**
 	 * @inheritdoc
 	 */
@@ -157,6 +159,13 @@ class IssueForm extends Model implements LinkedIssuesModel {
 		$this->tagsIds = ArrayHelper::getColumn($model->tags, 'id');
 	}
 
+	public function setUsers(array $users) {
+		$this->users = $users;
+		$this->agent_id = $users[IssueUser::TYPE_AGENT] ?? null;
+		$this->lawyer_id = $users[IssueUser::TYPE_LAWYER] ?? null;
+		$this->tele_id = $users[IssueUser::TYPE_TELEMARKETER] ?? null;
+	}
+
 	public function getModel(): Issue {
 		if ($this->model === null) {
 			$this->model = new Issue();
@@ -196,19 +205,39 @@ class IssueForm extends Model implements LinkedIssuesModel {
 
 			return true;
 		}
-		Yii::error($this->getModel()->getErrors(), __METHOD__);
+		Yii::error($this->getErrors(), __METHOD__);
 		return false;
 	}
 
 	private function linkUsers(): void {
 		$model = $this->getModel();
-		$model->linkUser($this->customer->id, IssueUser::TYPE_CUSTOMER);
-		$model->linkUser($this->agent_id, IssueUser::TYPE_AGENT);
-		$model->linkUser($this->lawyer_id, IssueUser::TYPE_LAWYER);
-		if (!empty($this->tele_id)) {
-			$model->linkUser($this->tele_id, IssueUser::TYPE_TELEMARKETER);
+
+		if (!empty($this->users)) {
+			$data = [];
+			foreach ($this->users as $type => $userId) {
+				$data[] = [
+					'issue_id' => $model->id,
+					'type' => $type,
+					'user_id' => $userId,
+				];
+			}
+			IssueUser::getDb()
+				->createCommand()
+				->batchInsert(IssueUser::tableName(), [
+					'issue_id',
+					'type',
+					'user_id',
+				], $data)
+				->execute();
 		} else {
-			$model->unlinkUser(IssueUser::TYPE_TELEMARKETER);
+			$model->linkUser($this->customer->id, IssueUser::TYPE_CUSTOMER);
+			$model->linkUser($this->agent_id, IssueUser::TYPE_AGENT);
+			$model->linkUser($this->lawyer_id, IssueUser::TYPE_LAWYER);
+			if (!empty($this->tele_id)) {
+				$model->linkUser($this->tele_id, IssueUser::TYPE_TELEMARKETER);
+			} else {
+				$model->unlinkUser(IssueUser::TYPE_TELEMARKETER);
+			}
 		}
 	}
 

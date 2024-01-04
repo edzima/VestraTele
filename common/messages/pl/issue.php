@@ -224,4 +224,11 @@ return [
 	'Shipment: {number}' => 'Przesyłka: {number}',
 	'Shipment Type' => 'Rodzaj',
 	'Problem with check Shipment Info: #{number}' => 'Problem z pobraniem danych z Poczty Polskiej dla przesyłki: #{number}',
+	'Summons with immiment deadline.' => 'Zlecenia z Terminem',
+	'You have one Summon with imminent deadline.' => 'Masz Zlecenie z nadchodzącym terminem',
+	'You have Summons with imminent deadline: <strong>{count}</strong>' => 'Nadchodzące Terminy Zleceń: {count}',
+	'View' => 'Zobacz',
+	'View All' => 'Zobacz wszystkie',
+	'Create & Link' => 'Dodaj & Połącz',
+	'Create & Link from Issue: {issue}' => 'Dodaj i połącz Sprawę: {issue}',
 ];

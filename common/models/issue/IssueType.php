@@ -128,6 +128,8 @@ class IssueType extends ActiveRecord {
 				->indexBy('id')
 				->with('childs')
 				->with('stages')
+				->with('parent')
+				->with('parent.stages')
 				->all();
 		}
 		return static::$TYPES;

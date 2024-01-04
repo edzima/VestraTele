@@ -59,54 +59,89 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		?>
 
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
-			? Html::a(Yii::t('backend', 'Link'), ['relation/create', 'id' => $model->id], ['class' => 'btn btn-primary'])
-			: ''
-		?>
-
-		<?= !$model->isArchived() && Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER)
-			? Html::a(Yii::t('backend', 'Link User'), ['user/link', 'issueId' => $model->id], [
-				'class' => 'btn btn-success',
-			])
-			: ''
-		?>
-
-		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-
 		<span class="pull-right">
-	<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
-		? Html::a(
-			Html::icon('tag'), ['tag/issue', 'issueId' => $model->id], [
-				'title' => Yii::t('common', 'Tags'),
-				'aria-label' => Yii::t('common', 'Tags'),
-				'class' => 'btn btn-success',
-			]
-		)
-		: ''
-	?>
 
-	<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_SHIPMENT)
-		? Html::a(
-			'<i class="fa fa-envelope-open-o" aria-hidden="true"></i>',
-			['shipment-poczta-polska/create', 'issueId' => $model->id], [
-				'title' => Yii::t('backend', 'Add a Shipment'),
-				'aria-label' => Yii::t('backend', 'Add a Shipment'),
-				'class' => 'btn btn-info',
-			]
-		)
-		: ''
-	?>
+					<?= Html::a(
+						Html::faicon('pencil'),
+						['update', 'id' => $model->id],
+						[
+							'class' => 'btn btn-primary',
+							'title' => Yii::t('backend', 'Update'),
+							'aria-label' => Yii::t('backend', 'Update'),
+						]) ?>
 
-	<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE)
-		? Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
-			'class' => 'btn btn-danger',
-			'data' => [
-				'confirm' => 'Czy napewno chcesz usunąć?',
-				'method' => 'post',
-			],
-		])
-		: ''
-	?>
+
+					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
+						? Html::a(Html::faicon('copy'),
+							['issue/create-and-link', 'id' => $model->id],
+							[
+								'class' => 'btn btn-primary',
+								'title' => Yii::t('issue', 'Create & Link'),
+								'aria-label' => Yii::t('issue', 'Create & Link'),
+							])
+						: ''
+					?>
+
+					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
+						? Html::a(Html::faicon('link'),
+							['relation/create', 'id' => $model->id],
+							[
+								'class' => 'btn btn-primary',
+								'title' => Yii::t('backend', 'Link'),
+								'aria-label' => Yii::t('backend', 'Link'),
+							])
+						: ''
+					?>
+
+					<?= !$model->isArchived() && Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER)
+						? Html::a(Html::faicon('user-plus'),
+							['user/link', 'issueId' => $model->id], [
+								'class' => 'btn btn-success',
+								'aria-label' => Yii::t('backend', 'Link User'),
+								'title' => Yii::t('backend', 'Link User'),
+							])
+						: ''
+					?>
+
+					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
+						? Html::a(
+							Html::icon('tag'),
+							['tag/issue', 'issueId' => $model->id],
+							[
+								'title' => Yii::t('common', 'Tags'),
+								'aria-label' => Yii::t('common', 'Tags'),
+								'class' => 'btn btn-success',
+							]
+						)
+						: ''
+					?>
+
+					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_SHIPMENT)
+						? Html::a(
+							Html::faicon('envelope-open-o'),
+							['shipment-poczta-polska/create', 'issueId' => $model->id], [
+								'title' => Yii::t('backend', 'Add a Shipment'),
+								'aria-label' => Yii::t('backend', 'Add a Shipment'),
+								'class' => 'btn btn-info',
+							]
+						)
+						: ''
+					?>
+
+					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE)
+						? Html::a(Html::icon('trash'),
+							['delete', 'id' => $model->id],
+							[
+								'title' => Yii::t('backend', 'Delete'),
+								'aria-label' => Yii::t('backend', 'Delete'),
+								'class' => 'btn btn-danger',
+								'data' => [
+									'confirm' => 'Czy napewno chcesz usunąć?',
+									'method' => 'post',
+								],
+							])
+						: ''
+					?>
 		</span>
 
 

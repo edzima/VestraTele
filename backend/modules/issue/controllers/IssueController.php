@@ -11,6 +11,7 @@ use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\widgets\CsvForm;
 use common\behaviors\IssueTypeParentIdAction;
 use common\behaviors\SelectionRouteBehavior;
+use common\helpers\ArrayHelper;
 use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;
@@ -222,6 +223,51 @@ class IssueController extends Controller {
 		]);
 	}
 
+	public function actionCreateAndLink(int $id) {
+		$baseIssue = $this->findModel($id);
+		$model = new IssueForm(['customer' => $baseIssue->customer]);
+
+		$model->entity_responsible_id = $baseIssue->entity_responsible_id;
+		$model->details = $baseIssue->details;
+		$model->signing_at = $baseIssue->signing_at;
+		$model->signature_act = $baseIssue->signature_act;
+		$model->tagsIds = ArrayHelper::getColumn($baseIssue->tags, 'id');
+		$model->setUsers(ArrayHelper::map($baseIssue->users, 'type', 'user_id'));
+
+		$messagesModel = $this->createCreateMessagesForm($model);
+		$data = Yii::$app->request->post();
+		if ($model->load($data)
+			&& $model->save()) {
+			$messagesModel->setIssue($model->getModel());
+			if ($messagesModel->load($data)) {
+				$messagesModel->pushMessages();
+			}
+			$this->createCustomerLead($model->getModel());
+			$model->getModel()->linkIssue($baseIssue->id);
+			return $this->redirect(['view', 'id' => $model->getModel()->id]);
+		}
+		return $this->render('create-and-link', [
+			'model' => $model,
+			'baseIssue' => $baseIssue,
+			'messagesModel' => $messagesModel,
+		]);
+	}
+
+	protected function createCreateMessagesForm(IssueForm $model): IssueCreateMessagesForm {
+		$messagesModel = new IssueCreateMessagesForm();
+		$messagesModel->setIssue($model->getModel());
+		$messagesModel->workersTypes = [
+			IssueUser::TYPE_AGENT => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
+			IssueUser::TYPE_TELEMARKETER => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
+			IssueUser::TYPE_LAWYER => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
+		];
+		$messagesModel->addExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_MESSAGE_EMAIL_ISSUE_CREATE));
+		$messagesModel->sendSmsToCustomer = $messagesModel->hasSmsCustomerTemplate(false);
+		$messagesModel->sms_owner_id = Yii::$app->user->getId();
+
+		return $messagesModel;
+	}
+
 	/**
 	 * Creates a new Issue model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
@@ -243,18 +289,7 @@ class IssueController extends Controller {
 			$model->loadFromModel($baseIssue, false);
 		}
 
-		$messagesModel = new IssueCreateMessagesForm();
-		$messagesModel->setIssue($model->getModel());
-		$messagesModel->workersTypes = [
-			IssueUser::TYPE_AGENT => IssueUser::getTypesNames()[IssueUser::TYPE_AGENT],
-			IssueUser::TYPE_TELEMARKETER => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
-			IssueUser::TYPE_LAWYER => IssueUser::getTypesNames()[IssueUser::TYPE_LAWYER],
-		];
-
-		$messagesModel->addExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_MESSAGE_EMAIL_ISSUE_CREATE));
-
-		$messagesModel->sendSmsToCustomer = $messagesModel->hasSmsCustomerTemplate(false);
-		$messagesModel->sms_owner_id = Yii::$app->user->getId();
+		$messagesModel = $this->createCreateMessagesForm($model);
 		$data = Yii::$app->request->post();
 		if ($model->load($data)
 			&& $model->save()) {

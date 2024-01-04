@@ -258,6 +258,13 @@ class Issue extends ActiveRecord implements IssueInterface {
 		return implode(', ', ArrayHelper::getColumn($this->tags, 'name'));
 	}
 
+	public function linkIssue(int $issueId): void {
+		$relation = new IssueRelation();
+		$relation->issue_id_1 = $this->id;
+		$relation->issue_id_2 = $issueId;
+		$this->link('issuesRelations', $relation);
+	}
+
 	public function linkUser(int $userId, string $type): void {
 		$issueUser = $this->getIssueUser($type);
 

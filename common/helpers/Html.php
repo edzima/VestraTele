@@ -13,6 +13,12 @@ class Html extends BaseHtml {
 
 	protected const URL_HELPER = Url::class;
 
+	public static function faicon(string $name, array $options = []): string {
+		$options['aria-hidden'] = true;
+		static::addCssClass($options, 'fa fa-' . $name);
+		return static::tag('i', '', $options);
+	}
+
 	public static function telLink($text, $email = null, $options = []) {
 		$options['href'] = 'tel:' . ($email === null ? $text : $email);
 		return static::tag('a', $text, $options);
