@@ -229,7 +229,7 @@ class IssueController extends Controller {
 
 		$model->entity_responsible_id = $baseIssue->entity_responsible_id;
 		$model->details = $baseIssue->details;
-		$model->signing_at = $baseIssue->signing_at;
+		$model->signing_at = date('Y-m-d');
 		$model->signature_act = $baseIssue->signature_act;
 		$model->tagsIds = ArrayHelper::getColumn($baseIssue->tags, 'id');
 		$model->setUsers(ArrayHelper::map($baseIssue->users, 'type', 'user_id'));
