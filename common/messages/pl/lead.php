@@ -423,4 +423,5 @@ return [
 	'Order' => 'Kolejność',
 	'Report Status' => 'Status Raportu',
 	'Report Status Count' => 'Status Raportu',
+	'Update Lead User: {lead}' => 'Edycja Użytkownika Leada: {lead}',
 ];
