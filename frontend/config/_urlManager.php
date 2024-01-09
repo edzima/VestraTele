@@ -31,5 +31,8 @@ return [
 
 		'admin' => '/backend/web',
 		'mpkk' => 'site/max-amount',
+
+		//lead
+		'lead/report/<hash>/<id>' => 'lead/report/report',
 	],
 ];
