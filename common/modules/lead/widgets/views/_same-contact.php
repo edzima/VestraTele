@@ -68,7 +68,13 @@ use yii\widgets\DetailView;
 				'format' => 'html',
 				'label' => Yii::t('lead', 'Customer View'),
 				'visible' => $visibleCustomerLink && isset($model->getData()['customerUrl']),
-				'value' => Html::a($model->getName(), $model->getData()['customerUrl']),
+				'value' => function (ActiveLead $model): ?string {
+					$url = $model->getData()['customerUrl'] ?? null;
+					if ($url) {
+						return Html::a(Html::encode($model->getName()), $url);
+					}
+					return null;
+				},
 			],
 			[
 				'attribute' => 'phone',

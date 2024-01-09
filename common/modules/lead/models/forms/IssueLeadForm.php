@@ -20,13 +20,15 @@ class IssueLeadForm extends LeadForm {
 		return parent::load($data, $formName);
 	}
 
-	public static function issueCustomerAttributes(Issue $model): ?array {
+	public static function issueCustomerAttributes(Issue $model, int $sourceId = null): ?array {
 		$customer = $model->customer;
 		if (empty($customer->email) && empty($customer->getPhone())) {
 			Yii::warning('Customer: ' . $customer->id . ' without email and phone in Issue: ' . $model->getIssueName(), __METHOD__);
 			return null;
 		}
-		$sourceId = static::getLeadSourceId($model->type);
+		if ($sourceId === null) {
+			$sourceId = static::getLeadSourceId($model->type);
+		}
 		if ($sourceId === null) {
 			return null;
 		}
