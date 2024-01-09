@@ -3,6 +3,7 @@
 namespace common\modules\lead\components;
 
 use frontend\controllers\ApiLeadController;
+use Yii;
 use yii\base\Component;
 use yii\httpclient\Client;
 
@@ -32,6 +33,10 @@ class LeadClient extends Component {
 		if ($response->isOk) {
 			return true;
 		}
+		Yii::error([
+			'msg' => 'Response is not ok',
+			'response' => $response,
+		], __METHOD__);
 		return false;
 	}
 
