@@ -80,11 +80,13 @@ class ReportController extends BaseController {
 		]);
 	}
 
-	public function actionReport(int $id, int $status_id = null, string $hash) {
+	public function actionReport(int $id, int $status_id = null, string $hash = null) {
 		$model = new ReportForm();
 		$model->owner_id = (int) Yii::$app->user->getId();
 		$lead = $this->findLead($id, false); //allow report not self Lead
-		$this->validateHash($lead, $hash);
+		if (!$lead->isForUser(Yii::$app->user->getId())) {
+			$this->validateHash($lead, $hash ?: '');
+		}
 		$model->setLead($lead);
 
 		if ($status_id) {
