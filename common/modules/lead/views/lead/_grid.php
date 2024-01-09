@@ -233,7 +233,7 @@ foreach (LeadSearch::questions() as $question) {
 					'report' => static function (string $url, ActiveLead $lead): string {
 						return Html::a(
 							Html::icon('comment'),
-							['report/report', 'id' => $lead->getId()],
+							['report/report', 'id' => $lead->getId(), 'hash' => $lead->getHash()],
 							[
 								'title' => Yii::t('lead', 'Create Report'),
 								'aria-title' => Yii::t('lead', 'Create Report'),

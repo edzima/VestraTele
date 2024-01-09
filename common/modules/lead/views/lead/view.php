@@ -42,7 +42,7 @@ YiiAsset::register($this);
 
 	<p class="d-inline">
 
-		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->getId()], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->getId(), 'hash' => $model->getHash()], ['class' => 'btn btn-success']) ?>
 
 		<?= ShortReportStatusesWidget::widget(['lead_id' => $model->getId()]) ?>
 

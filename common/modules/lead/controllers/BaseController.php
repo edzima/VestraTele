@@ -61,6 +61,20 @@ class BaseController extends Controller {
 		return $model;
 	}
 
+	protected function validateHash(ActiveLead $lead, string $hash, bool $throwException = true): bool {
+		$validate = $this->module->manager->validateLead($lead, $hash);
+		if (!$validate) {
+			Yii::warning(
+				'User: ' . Yii::$app->user->getId() . ' try check Lead: ' . $lead->getId() . ' with invaldiate hash.',
+				__METHOD__
+			);
+			if ($throwException) {
+				throw new NotFoundHttpException();
+			}
+		}
+		return $validate;
+	}
+
 	protected function redirectLead(int $id): Response {
 		return $this->redirect(['lead/view', 'id' => $id]);
 	}

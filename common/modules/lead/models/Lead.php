@@ -232,6 +232,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->id;
 	}
 
+	public function getHash(): string {
+		return Module::manager()->hashLead($this);
+	}
+
 	public function getName(): string {
 		return $this->name;
 	}

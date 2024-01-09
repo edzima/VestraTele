@@ -2,6 +2,8 @@
 
 namespace common\modules\lead\models;
 
+use yii\base\Arrayable;
+
 /**
  * Interface ActiveLead
  *
@@ -11,9 +13,11 @@ namespace common\modules\lead\models;
  * @property-read LeadAddress[] $addresses
  * @property-read LeadMarket|null $market
  */
-interface ActiveLead extends LeadInterface {
+interface ActiveLead extends LeadInterface, Arrayable {
 
 	public function getId(): int;
+
+	public function getHash(): string;
 
 	public function getDetails(): ?string;
 
