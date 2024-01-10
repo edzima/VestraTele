@@ -212,7 +212,6 @@ use yii\data\ActiveDataProvider;
 							: ''),
 					'summary' => '',
 					'emptyText' => '',
-					'showOnEmpty' => false,
 					'showPageSummary' => $costDataProvider->totalCount > 1,
 					'columns' => [
 						[
