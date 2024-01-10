@@ -193,12 +193,6 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 				['class' => 'btn btn-success'])
 			: '' ?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_COST)
-			? Html::a(
-				Yii::t('backend', 'Costs'),
-				['/settlement/cost/issue', 'id' => $model->id],
-				['class' => 'btn btn-warning'])
-			: '' ?>
 	</p>
 
 
@@ -240,12 +234,14 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 	<?= IssueViewWidget::widget([
 		'model' => $model,
-		'relationActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
 		'claimActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
+		'relationActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
+		'shipmentsActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_SHIPMENT),
+		'costRoute' => '/settlement/cost',
 		'entityResponsibleRoute' => '/entity-responsible/default/view',
 		'stageRoute' => 'stage/view',
 		'typeRoute' => 'type/view',
-		'shipmentsActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_SHIPMENT),
+
 	]) ?>
 
 

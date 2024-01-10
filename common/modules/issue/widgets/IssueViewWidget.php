@@ -21,6 +21,8 @@ class IssueViewWidget extends IssueWidget {
 
 	public ?string $typeRoute = null;
 
+	public ?string $costRoute = null;
+
 	private ?string $typeUrl = null;
 
 	public ?string $stageRoute = null;
@@ -47,10 +49,11 @@ class IssueViewWidget extends IssueWidget {
 			'usersLinks' => $this->usersLinks,
 			'claimActionColumn' => $this->claimActionColumn,
 			'relationActionColumn' => $this->relationActionColumn,
+			'shipmentsActionColumn' => $this->shipmentsActionColumn,
+			'costRoute' => $this->costRoute,
 			'entityUrl' => $this->entityUrl,
 			'stageUrl' => $this->stageUrl,
 			'typeUrl' => $this->typeUrl,
-			'shipmentsActionColumn' => $this->shipmentsActionColumn,
 		]);
 	}
 }

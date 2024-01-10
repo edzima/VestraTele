@@ -1,5 +1,6 @@
 <?php
 
+use backend\modules\settlement\widgets\IssueCostActionColumn;
 use common\assets\TooltipAsset;
 use common\helpers\Url;
 use common\models\issue\Issue;
@@ -7,6 +8,7 @@ use common\models\issue\IssueInterface;
 use common\models\issue\IssueShipmentPocztaPolska;
 use common\models\issue\IssueTagType;
 use common\models\issue\IssueUser;
+use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueTagsWidget;
 use common\modules\issue\widgets\IssueUsersWidget;
@@ -24,6 +26,7 @@ use yii\data\ActiveDataProvider;
 /* @var $claimActionColumn bool */
 /* @var $relationActionColumn bool */
 /* @var $userMailVisibilityCheck bool */
+/* @var $costRoute string|null */
 /* @var $entityUrl string|null */
 /* @var $stageUrl string|null */
 /* @var $typeUrl string|null */
@@ -191,6 +194,54 @@ use yii\data\ActiveDataProvider;
 			]) ?>
 		</div>
 		<div class="col-md-5 col-lg-6">
+
+			<?php
+			if (Yii::$app->user->can(User::PERMISSION_COST)) {
+				$costDataProvider = new ActiveDataProvider([
+					'query' => $model->getCosts()
+						->with('user.userProfile'),
+				]);
+				echo GridView::widget([
+					'dataProvider' => $costDataProvider,
+					'caption' => Yii::t('settlement', 'Costs')
+						. ($costRoute
+							?
+							Html::a(Html::icon('plus'), [$costRoute . '/create', 'id' => $model->id], [
+								'class' => 'btn btn-warning pull-right',
+							])
+							: ''),
+					'summary' => '',
+					'emptyText' => '',
+					'showOnEmpty' => false,
+					'showPageSummary' => $costDataProvider->totalCount > 1,
+					'columns' => [
+						[
+							'attribute' => 'type',
+							'value' => 'typeName',
+						],
+						[
+							'attribute' => 'user_id',
+							'value' => 'user',
+						],
+						[
+							'attribute' => 'value',
+							'format' => 'currency',
+							'pageSummary' => true,
+						],
+						'deadline_at:date',
+						'settled_at:date',
+						[
+							'class' => IssueCostActionColumn::class,
+							'visible' => $costRoute !== null,
+							'issue' => false,
+						],
+					],
+				]);
+			}
+
+			?>
+
+
 			<?= GridView::widget([
 				'dataProvider' => new ActiveDataProvider([
 					'query' => $model->getLinkedIssues()
