@@ -1,6 +1,7 @@
 <?php
 
 return [
+	'Attestation' => 'Zaświadczenie',
 	'Appeal' => 'Opłata od apelacji',
 	'Base Value' => 'Kwota Bazowa',
 	'Details' => 'Szczegóły',
