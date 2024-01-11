@@ -231,4 +231,7 @@ return [
 	'View All' => 'Zobacz wszystkie',
 	'Create & Link' => 'Dodaj & Połącz',
 	'Create & Link from Issue: {issue}' => 'Dodaj i połącz Sprawę: {issue}',
+	'Entity Agreement Details' => 'Umowa z Podmiotem',
+	'Entity Agreement' => 'Umowa z Podmiotem',
+	'Entity Agreement At' => 'Umowa z Podmiotem (Data)',
 ];

@@ -39,7 +39,8 @@ class IssueForm extends Model implements LinkedIssuesModel {
 	public ?string $signature_act = null;
 
 	public ?string $stage_deadline_at = null;
-
+	public ?string $entity_agreement_details = null;
+	public ?string $entity_agreement_at = null;
 	public $linkedIssuesIds;
 	public $linkedIssuesAttributes = [];
 
@@ -82,18 +83,31 @@ class IssueForm extends Model implements LinkedIssuesModel {
 			[['agent_id', 'lawyer_id', 'tele_id', 'type_id', 'stage_id', 'entity_responsible_id'], 'integer'],
 			[['stage_id'], 'filter', 'filter' => 'intval'],
 			[
-				'stage_id', 'in', 'when' => function (): bool {
-				return !empty($this->type_id);
-			}, 'range' => function () {
-				return array_keys($this->getStagesData());
-			}, 'enableClientValidation' => false,
+				'stage_id', 'in',
+				'when' => function (): bool {
+					return !empty($this->type_id);
+				},
+				'range' => function () {
+					return array_keys($this->getStagesData());
+				},
+				'enableClientValidation' => false,
 			],
-			[['archives_nr', 'details', 'signature_act'], 'string'],
-			[['archives_nr', 'details', 'signature_act'], 'trim'],
-			['signature_act', 'string', 'max' => 255],
-			[['signing_at', 'type_additional_date_at', 'stage_change_at', 'stage_deadline_at'], 'date', 'format' => 'Y-m-d'],
+			[['archives_nr', 'details', 'signature_act', 'entity_agreement_details'], 'string'],
+			[['archives_nr', 'details', 'signature_act', 'entity_agreement_details'], 'trim'],
+			[['signature_act', 'entity_agreement_details'], 'string', 'max' => 255],
+			[
+				[
+					'signing_at', 'type_additional_date_at', 'stage_change_at', 'stage_deadline_at',
+					'entity_agreement_at',
+				], 'date', 'format' => 'Y-m-d',
+			],
 			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
-			[['archives_nr', 'details', 'signature_act', 'stage_deadline_at', 'stage_change_at'], 'default', 'value' => null],
+			[
+				[
+					'archives_nr', 'details', 'signature_act', 'stage_deadline_at',
+					'stage_change_at', 'entity_agreement_details', 'entity_agreement_at',
+				], 'default', 'value' => null,
+			],
 			['type_id', 'in', 'range' => static::getTypesIds()],
 			['tagsIds', 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
 			['linkedIssuesIds', 'in', 'range' => array_keys($this->getLinkedIssuesNames()), 'allowArray' => true],
@@ -156,6 +170,8 @@ class IssueForm extends Model implements LinkedIssuesModel {
 		$this->type_additional_date_at = $model->type_additional_date_at;
 		$this->stage_change_at = $model->stage_change_at;
 		$this->stage_deadline_at = $model->stage_deadline_at;
+		$this->entity_agreement_at = $model->entity_agreement_at;
+		$this->entity_agreement_details = $model->entity_agreement_details;
 		$this->tagsIds = ArrayHelper::getColumn($model->tags, 'id');
 	}
 
@@ -185,6 +201,8 @@ class IssueForm extends Model implements LinkedIssuesModel {
 			$model->entity_responsible_id = $this->entity_responsible_id;
 			$model->signing_at = $this->signing_at;
 			$model->type_additional_date_at = $this->type_additional_date_at;
+			$model->entity_agreement_at = $this->entity_agreement_at;
+			$model->entity_agreement_details = $this->entity_agreement_details;
 			$isNewRecord = $model->isNewRecord;
 			if ($isNewRecord) {
 				$model->generateStageDeadlineAt();

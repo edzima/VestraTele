@@ -73,6 +73,10 @@ use yii\widgets\ActiveForm;
 				])
 			?>
 
+			<?= $form->field($model, 'signing_at', ['options' => ['class' => 'col-md-2']])
+				->widget(DateWidget::class) ?>
+
+
 			<?= !empty($model->stage_change_at)
 				? $form->field($model, 'stage_change_at', [
 					'options' => [
@@ -97,7 +101,6 @@ use yii\widgets\ActiveForm;
 
 		<div class="row">
 
-
 			<?= $form->field($model, 'entity_responsible_id', ['options' => ['class' => 'col-md-3']])
 				->widget(Select2::class, [
 						'data' => IssueForm::getEntityResponsibles(),
@@ -107,14 +110,26 @@ use yii\widgets\ActiveForm;
 					]
 				) ?>
 
+
+
+			<?= $form->field($model, 'entity_agreement_at', ['options' => ['class' => 'col-md-2']])
+				->widget(DateWidget::class) ?>
+
+
+
+			<?= $form->field($model, 'entity_agreement_details', ['options' => ['class' => 'col-md-2']])
+				->textarea([
+					'row' => 2,
+				])
+			?>
+
+
 			<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-2']])
 				->textarea([
 					'row' => 2,
 				])
 			?>
 
-			<?= $form->field($model, 'signing_at', ['options' => ['class' => 'col-md-2']])
-				->widget(DateWidget::class) ?>
 
 			<?= $form->field($model, 'type_additional_date_at', [
 				'options' => [
@@ -125,6 +140,11 @@ use yii\widgets\ActiveForm;
 				],
 			])
 				->widget(DateWidget::class) ?>
+
+		</div>
+
+		<div class="row">
+
 
 		</div>
 

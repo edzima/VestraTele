@@ -454,6 +454,22 @@ use yii\data\ActiveDataProvider;
 								: $model->entityResponsible->name,
 
 						],
+						[
+							'label' => Yii::t('issue', 'Entity Agreement'),
+							'format' => 'ntext',
+							'value' => function (Issue $model): ?string {
+								$content = [];
+								if (!empty($model->entity_agreement_at)) {
+									$content[] = Yii::$app->formatter->asDate($model->entity_agreement_at);
+								}
+								if (!empty($model->entity_agreement_details)) {
+									$content[] = $model->entity_agreement_details;
+								}
+								return implode("\n", $content);
+							},
+							'visible' => !empty($model->entity_agreement_at) || !empty($model->entity_agreement_details),
+
+						],
 
 						'signing_at:date',
 						[

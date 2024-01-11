@@ -39,6 +39,8 @@ use yii\db\Expression;
  * @property string $stage_change_at
  * @property string|null $signature_act
  * @property string|null $stage_deadline_at
+ * @property string|null $entity_agreement_details
+ * @property string|null $entity_agreement_at
  * @property IssuePay[] $pays
  * @property EntityResponsible $entityResponsible
  * @property IssueStage $stage
@@ -90,12 +92,12 @@ class Issue extends ActiveRecord implements IssueInterface {
 	 */
 	public function rules(): array {
 		return [
-			[['created_at', 'updated_at'], 'safe'],
+			[['created_at', 'updated_at', 'entity_agreement_at'], 'safe'],
 			[['stage_id', 'type_id', 'entity_responsible_id',], 'required',],
 			[['stage_id', 'type_id', 'entity_responsible_id'], 'integer'],
-			[['details', 'signature_act', 'archives_nr'], 'string'],
-			[['details', 'signature_act', 'archives_nr'], 'trim'],
-			[['details', 'signature_act', 'archives_nr'], 'default', 'value' => null],
+			[['details', 'signature_act', 'archives_nr', 'entity_agreement_details'], 'string'],
+			[['details', 'signature_act', 'archives_nr', 'entity_agreement_details'], 'trim'],
+			[['details', 'signature_act', 'archives_nr', 'entity_agreement_details', 'entity_agreement_at'], 'default', 'value' => null],
 			[['entity_responsible_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_responsible_id' => 'id']],
 			[['stage_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueStage::class, 'targetAttribute' => ['stage_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueType::class, 'targetAttribute' => ['type_id' => 'id']],
@@ -118,6 +120,8 @@ class Issue extends ActiveRecord implements IssueInterface {
 			'type' => Yii::t('common', 'Type'),
 			'entity_responsible_id' => Yii::t('common', 'Entity responsible'),
 			'entityResponsible' => Yii::t('common', 'Entity responsible'),
+			'entity_agreement_at' => Yii::t('issue', 'Entity Agreement At'),
+			'entity_agreement_details' => Yii::t('issue', 'Entity Agreement Details'),
 			'signing_at' => Yii::t('common', 'Signing at'),
 			'archives_nr' => Yii::t('common', 'Archives'),
 			'type_additional_date_at' => $this->type
