@@ -42,10 +42,12 @@ $this->registerJs("window.onbeforeunload = function (e) {
 					'phpDatetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
 				]) ?>
 
-				<?= $model->getScenario() === IssueNoteForm::SCENARIO_STAGE_CHANGE ? $form->field($model, 'stageChangeAtMerge', [
-					'options' => ['class' => 'col-md-4'],
-				])->checkbox()
-					: '' ?>
+				<?= $model->getScenario() === IssueNoteForm::SCENARIO_STAGE_CHANGE
+					? $form->field($model, 'stageChangeAtMerge', [
+						'options' => ['class' => 'col-md-4'],
+					])->checkbox()
+					: ''
+				?>
 
 				<?= $form->field($model, 'is_pinned', [
 					'options' => ['class' => 'col-md-2'],
@@ -58,8 +60,6 @@ $this->registerJs("window.onbeforeunload = function (e) {
 					: ''
 				?>
 			</div>
-
-
 
 
 			<?= $model->getScenario() !== IssueNoteForm::SCENARIO_STAGE_CHANGE
