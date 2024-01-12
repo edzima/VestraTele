@@ -10,6 +10,7 @@ use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
+use common\models\message\IssueCostMessagesForm;
 use common\models\user\User;
 use Yii;
 use yii\filters\VerbFilter;
@@ -266,12 +267,31 @@ class CostController extends Controller {
 		$model = new IssueCostForm($issue);
 		$model->usersFromIssue = $usersFromIssue;
 		$model->date_at = date(DATE_ATOM);
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->getModel()->id]);
+		$message = new IssueCostMessagesForm();
+		$message->setIssue($issue);
+		$message->sendEmailToCustomer = false;
+		$message->sendSmsToCustomer = false;
+		$message->workersTypes = [];
+		$message->sms_owner_id = Yii::$app->user->getId();
+		$message->addExtraWorkersEmailsIds(User::getAssignmentIds([User::PERMISSION_ISSUE]), false);
+		if ($model->load(Yii::$app->request->post()) && $message->load(Yii::$app->request->post())) {
+			Yii::warning('load');
+			if ($model->validate() && $message->validate()) {
+				if ($model->save()) {
+					$message->setCost($model->getModel());
+					$message->pushMessages();
+				}
+				return $this->redirect(['view', 'id' => $model->getModel()->id]);
+			}
+			Yii::warning([
+				'model' => $model->getErrors(),
+				'message' => $message->getErrors(),
+			]);
 		}
 
 		return $this->render('create', [
 			'model' => $model,
+			'message' => $message,
 		]);
 	}
 

@@ -135,8 +135,8 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		);
 	}
 
-	public function save(): bool {
-		if (!$this->validate()) {
+	public function save(bool $validate = true): bool {
+		if ($validate && !$this->validate()) {
 			return false;
 		}
 		$model = $this->getModel();

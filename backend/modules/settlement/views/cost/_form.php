@@ -2,6 +2,7 @@
 
 use backend\helpers\Url;
 use backend\modules\settlement\models\IssueCostForm;
+use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
 use kartik\number\NumberControl;
@@ -11,6 +12,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model IssueCostForm */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $message |null IssueCostMessagesForm */
 
 ?>
 
@@ -63,6 +65,22 @@ use yii\helpers\Html;
 
 		<?= $form->field($model, 'base_value', ['options' => ['class' => 'col-xs-9 col-md-3 col-lg-2']])->widget(NumberControl::class) ?>
 
+	</div>
+
+	<div class="row">
+		<div class="col-md-6">
+			<?= isset($message)
+				? IssueMessagesFormWidget::widget([
+					'model' => $message,
+					'form' => $form,
+					'checkboxesAttributes' => [
+						'sendSmsToCustomer',
+						'sendEmailToWorkers',
+					],
+				])
+				: ''
+			?>
+		</div>
 	</div>
 
 

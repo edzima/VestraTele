@@ -42,9 +42,9 @@ class DebtCostsForm extends IssueCostForm {
 		]);
 	}
 
-	public function save(): bool {
+	public function save(bool $validate = true): bool {
 		$this->type = IssueCostInterface::TYPE_PURCHASE_OF_RECEIVABLES;
-		if (!parent::save()) {
+		if (!parent::save($validate)) {
 			return false;
 		}
 		$costs = [];
