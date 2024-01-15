@@ -1,12 +1,9 @@
 <?php
 
 use common\helpers\Url;
-use common\models\issue\Summon;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\widgets\LeadReminderActionColumn;
-use common\modules\reminder\models\ReminderQuery;
 use common\modules\reminder\widgets\ReminderGridModal;
-use yii\data\ActiveDataProvider;
 use yii\data\DataProviderInterface;
 
 /* @var $this yii\web\View */
@@ -23,6 +20,7 @@ use yii\data\DataProviderInterface;
 		'visibleUserColumn' => !$onlyUser,
 		'actionColumn' => [
 			'class' => LeadReminderActionColumn::class,
+			'userId' => Yii::$app->user->getId(),
 			'template' => '{not-done} {done} {update} {delete}',
 		],
 		'showOnEmpty' => true,
