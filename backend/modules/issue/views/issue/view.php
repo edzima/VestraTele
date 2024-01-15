@@ -227,9 +227,6 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		: ''
 	?>
 
-	<?= IssueViewTopSummonsWidgets::widget([
-		'dataProvider' => $summonDataProvider,
-	]) ?>
 
 
 	<?= IssueViewWidget::widget([
@@ -247,6 +244,10 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 
 	<?= IssueViewSummonsWidgets::widget([
+		'dataProvider' => $summonDataProvider,
+	]) ?>
+
+	<?= IssueViewTopSummonsWidgets::widget([
 		'dataProvider' => $summonDataProvider,
 	]) ?>
 
