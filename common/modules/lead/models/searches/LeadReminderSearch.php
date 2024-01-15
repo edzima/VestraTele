@@ -8,7 +8,7 @@ use common\modules\calendar\models\LeadReminderCalendarEvent;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReminder;
 use common\modules\lead\models\LeadStatus;
-use common\modules\lead\models\LeadUser;
+use common\modules\lead\models\query\LeadQuery;
 use common\modules\reminder\models\Reminder;
 use common\modules\reminder\models\ReminderQuery;
 use common\modules\reminder\models\searches\ReminderSearch;
@@ -18,7 +18,6 @@ use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\data\DataProviderInterface;
 use yii\db\ActiveQuery;
-use yii\db\QueryInterface;
 
 class LeadReminderSearch extends ReminderSearch {
 
@@ -83,6 +82,7 @@ class LeadReminderSearch extends ReminderSearch {
 
 		if (!$this->validate()) {
 			$query->andWhere('0=1');
+			Yii::warning($this->getErrors(), __METHOD__);
 			return $dataProvider;
 		}
 
@@ -100,8 +100,8 @@ class LeadReminderSearch extends ReminderSearch {
 				throw new InvalidConfigException('User Id cannot be blank on User scenario.');
 			}
 			$query->joinWith([
-				'lead.leadUsers' => function (QueryInterface $query) {
-					$query->andWhere([LeadUser::tableName() . '.user_id' => $this->leadUserId]);
+				'lead' => function (LeadQuery $query) {
+					$query->user($this->leadUserId);
 				},
 			]);
 		}
