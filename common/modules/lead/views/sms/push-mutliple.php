@@ -4,6 +4,7 @@ use common\helpers\Html;
 use common\modules\lead\models\LeadMultipleSmsForm;
 use common\modules\lead\models\LeadSmsForm;
 use common\widgets\ActiveForm;
+use common\widgets\DateTimeWidget;
 use yii\web\View;
 
 /* @var $this View */
@@ -24,13 +25,52 @@ $this->params['breadcrumbs'][] = $this->title;
 
 		<?= Html::hiddenInput('leadsIds', implode(',', $model->ids)) ?>
 
-		<?= $form->field($model, 'status_id')->dropDownList(LeadSmsForm::getStatusNames()) ?>
 
-		<?= $form->field($model, 'message')->textarea() ?>
+		<div class="row">
+			<?= $form->field($model, 'status_id', [
+				'options' => [
+					'class' => 'col-md-4',
+				],
+			])->dropDownList(LeadSmsForm::getStatusNames()) ?>
 
-		<?= $form->field($model, 'withOverwrite')->checkbox() ?>
 
-		<?= $form->field($model, 'removeSpecialCharacters')->checkbox() ?>
+		</div>
+
+
+		<div class="row">
+			<?= $form->field($model, 'message', [
+				'options' => [
+					'class' => 'col-md-4',
+				],
+			])->textarea() ?>
+		</div>
+
+		<div class="row">
+
+			<?= $form->field($model, 'withOverwrite', [
+				'options' => [
+					'class' => 'col-md-2',
+				],
+			])->checkbox() ?>
+
+			<?= $form->field($model, 'removeSpecialCharacters', [
+				'options' => [
+					'class' => 'col-md-2',
+				],
+			])->checkbox() ?>
+		</div>
+
+		<div class="row">
+			<?= $form->field($model, 'delayAt', [
+				'options' => [
+					'class' => 'col-md-3 col-lg-2',
+				],
+			])->widget(
+				DateTimeWidget::class,
+			) ?>
+
+		</div>
+
 
 		<div class="form-group">
 			<?= Html::submitButton(Yii::t('lead', 'Send'), ['class' => 'btn btn-success']) ?>
