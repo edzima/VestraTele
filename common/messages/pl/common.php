@@ -373,4 +373,12 @@ return [
 	'Incorrect username or password.' => 'Niepoprawny Login lub Hasło.',
 	'Password reset for {appName}' => 'Przywrócenie hasła dla {appName}',
 	'email.bleed-background-text' => 'Ta wiadomość została wysłana automatycznie. Nie odpowiadaj na tego e-maila.',
+	'Increase by {percent}' => 'Wzrost o <strong>{percent}</strong>',
+	'Decrease by {percent}' => 'Spadek o <strong>{percent}</strong>',
+	'Without changes' => 'Bez zmian',
+	'{diff} more' => 'o <strong>{diff}</strong> więcej',
+	'{diff} less' => 'o <strong>{diff}</strong> mniej',
+	'Push Delay At' => 'Zaplanuj wysłanie',
+	'SMS has been scheduled({date}): "{message}". JOB_ID: {jobId}' => 'Zaplanowano ({date}) wysyłkę SMS: "{message}". JOB_ID:{jobId}',
+	'Date At must be from future.' => 'Data musi być z przyszłości',
 ];

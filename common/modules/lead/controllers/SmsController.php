@@ -35,12 +35,18 @@ class SmsController extends BaseController {
 
 		$model = new LeadSmsForm($lead);
 		$model->owner_id = Yii::$app->user->getId();
-		if ($model->load(Yii::$app->request->post()) && !empty($model->pushJob())) {
-			Flash::add(Flash::TYPE_SUCCESS,
-				Yii::t('lead', 'Success add SMS: {message} to send queue.', [
-					'message' => $model->message,
-				]));
-			return $this->redirectLead($lead->getId());
+		if ($model->load(Yii::$app->request->post())) {
+			$jobId = $model->pushJob();
+			if (!empty($jobId)) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('lead', 'Success add SMS: {message} to send queue.', [
+						'message' => $model->message,
+					]));
+				if ($model->getDelay()) {
+					$model->delayReport($jobId);
+				}
+				return $this->redirectLead($lead->getId());
+			}
 		}
 		return $this->render('push', [
 			'model' => $model,

@@ -20,6 +20,8 @@ class LeadSmsForm extends QueueSmsForm {
 	public int $status_id;
 	public ?int $owner_id = null;
 
+	public string $delayReportDetails = 'SMS has been scheduled({date}): "{message}". JOB_ID: {jobId}';
+
 	public function __construct(ActiveLead $lead, $config = []) {
 		$this->lead = $lead;
 		$this->status_id = $lead->getStatusId();
@@ -70,6 +72,28 @@ class LeadSmsForm extends QueueSmsForm {
 		return $this->lead;
 	}
 
+	public function delayReport(string $jobId): bool {
+		if (empty($jobId) || empty($this->delayAt)) {
+			return false;
+		}
+		$report = new ReportForm();
+		$report->withSameContacts = false;
+		$report->setLead($this->lead);
+		$report->owner_id = $this->owner_id;
+		$report->status_id = $this->status_id;
+		$report->details =
+			Yii::t('common', $this->delayReportDetails, [
+				'date' => Yii::$app->formatter->asDatetime($this->delayAt),
+				'message' => $this->getMessage()->getMessage(),
+				'jobId' => $jobId,
+			]);
+		if ($report->save()) {
+			return true;
+		}
+		Yii::error($report->getErrors(), __METHOD__);
+		return false;
+	}
+
 	public function report(string $smsId): bool {
 		$report = new ReportForm();
 		$report->withSameContacts = false;
@@ -82,6 +106,10 @@ class LeadSmsForm extends QueueSmsForm {
 		}
 		Yii::error($report->getErrors(), __METHOD__);
 		return false;
+	}
+
+	public static function delayDetailsPrefix(): string {
+		return Yii::t('common', 'SMS has been scheduled: ');
 	}
 
 	public static function detailsPrefix(): string {
