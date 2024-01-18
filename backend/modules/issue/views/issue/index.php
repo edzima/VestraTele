@@ -87,12 +87,24 @@ $this->params['issueParentTypeNav'] = [
 			: ''
 		?>
 
+
+		<span class="pull-right">
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
 			? CsvForm::widget([
-				'formOptions' => ['class' => 'pull-right'],
+				'formOptions' => ['class' => 'd-inline'],
 			])
 			: ''
 		?>
+
+		<?= Html::button(Html::icon('search'), [
+			'data-toggle' => 'collapse',
+			'data-target' => '#issue-search',
+			'class' => 'btn btn-info',
+		]) ?>
+
+		</span>
+
 
 	</div>
 

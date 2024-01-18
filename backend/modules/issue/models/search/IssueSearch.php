@@ -43,8 +43,13 @@ class IssueSearch extends BaseIssueSearch {
 
 	public $note_stage_id;
 
+	public $entity_agreement_details;
+	public $entity_agreement_at;
+
 	public ?string $signature_act = null;
 	private ?array $ids = null;
+
+	private bool $isLoad = false;
 
 	public function __construct($config = []) {
 		if (!isset($config['addressSearch'])) {
@@ -57,10 +62,11 @@ class IssueSearch extends BaseIssueSearch {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id', 'note_stage_id'], 'integer'],
 			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims',], 'boolean'],
+			[['entity_agreement_details'], 'string'],
 			[['onlyWithSettlements', 'onlyWithClaims'], 'default', 'value' => null],
 			['claimCompanyTryingValue', 'number', 'min' => 0],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
-			[['signature_act', 'stage_change_at', 'stageDeadlineFromAt', 'stageDeadlineToAt'], 'safe'],
+			[['signature_act', 'stage_change_at', 'stageDeadlineFromAt', 'stageDeadlineToAt', 'entity_agreement_at'], 'safe'],
 		]);
 	}
 
@@ -76,6 +82,15 @@ class IssueSearch extends BaseIssueSearch {
 			'stageDeadlineToAt' => Yii::t('backend', 'Stage Deadline to at'),
 			'note_stage_id' => Yii::t('backend', 'Note Stage'),
 		]);
+	}
+
+	public function load($data, $formName = null) {
+		$this->isLoad = parent::load($data, $formName);
+		return $this->isLoad;
+	}
+
+	public function getIsLoad(): bool {
+		return $this->isLoad;
 	}
 
 	public function search(array $params): ActiveDataProvider {
@@ -141,6 +156,7 @@ class IssueSearch extends BaseIssueSearch {
 		$this->applyStageDeadlineFilter($query);
 		$this->claimFilter($query);
 		$this->noteStageFilter($query);
+		$this->applyEntityAgreementFilter($query);
 	}
 
 	private function signatureActFilter(IssueQuery $query): void {
@@ -275,6 +291,11 @@ class IssueSearch extends BaseIssueSearch {
 				},
 			]);
 		}
+	}
+
+	private function applyEntityAgreementFilter(IssueQuery $query) {
+		$query->andFilterWhere(['like', Issue::tableName() . '.entity_agreement_details', $this->entity_agreement_details])
+			->andFilterWhere([Issue::tableName() . '.entity_agreement_at' => $this->entity_agreement_at]);
 	}
 
 }

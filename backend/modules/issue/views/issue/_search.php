@@ -233,6 +233,19 @@ use yii\widgets\ActiveForm;
 
 	</div>
 
+	<div class="row">
+		<?= $form->field($model, 'entity_agreement_details', [
+			'options' => [
+				'class' => 'col-md-3',
+			],
+		])->textInput() ?>
+		<?= $form->field($model, 'entity_agreement_at', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->widget(DateWidget::class) ?>
+	</div>
+
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Search'), ['class' => 'btn btn-primary']) ?>
