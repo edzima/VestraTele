@@ -424,4 +424,5 @@ return [
 	'Report Status' => 'Status Raportu',
 	'Report Status Count' => 'Status Raportu',
 	'Update Lead User: {lead}' => 'Edycja Użytkownika Leada: {lead}',
+	'Newest Report At' => 'Raport',
 ];

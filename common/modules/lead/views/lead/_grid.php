@@ -1,5 +1,6 @@
 <?php
 
+use common\helpers\ArrayHelper;
 use common\helpers\Html;
 use common\helpers\StringHelper;
 use common\models\user\User;
@@ -192,6 +193,18 @@ foreach (LeadSearch::questions() as $question) {
 					return implode(', ', $content);
 				},
 				'label' => Yii::t('lead', 'Reports Answers'),
+			],
+			[
+				'attribute' => 'newestReportAt',
+				'format' => 'date',
+				'value' => function (ActiveLead $lead): ?string {
+					$reports = $lead->reports;
+					if (empty($reports)) {
+						return null;
+					}
+					return max(ArrayHelper::getColumn($reports, 'created_at'));
+				},
+				'label' => Yii::t('lead', 'Newest Report At'),
 			],
 			[
 				'attribute' => 'reportStatusCount',
