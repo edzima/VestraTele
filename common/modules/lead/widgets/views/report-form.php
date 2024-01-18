@@ -19,18 +19,17 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
-		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-4']])
+		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-5 col-lg-4']])
 			->widget(Select2::class, ['data' => ReportForm::getStatusNames()])
 		?>
 
-		<?= $form->field($model, 'leadName', ['options' => ['class' => 'col-md-5']])->textInput() ?>
+		<?= $form->field($model, 'leadName', ['options' => ['class' => 'col-md-6 col-lg-5']])->textInput() ?>
 
 		<?= $form->field($model, 'withAddress', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
 		<?= $form->field($model, 'is_pinned', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
 	</div>
-
 
 	<div id="address-wrapper" class="address-wrapper<?= !$model->withAddress ? ' hidden' : '' ?>">
 		<?= AddressFormWidget::widget([
@@ -40,6 +39,35 @@ use yii\widgets\ActiveForm;
 	</div>
 
 
+	<div class="row">
+		<?= $form->field($model, 'tele_id', [
+			'options' => [
+				'class' => 'col-md-5 col-lg-4',
+			],
+
+		])->widget(
+			Select2::class, [
+				'data' => $model->getTeleUsersNames(),
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('tele_id'),
+				],
+			]
+
+		) ?>
+
+		<?= $form->field($model, 'partner_id', [
+			'options' => [
+				'class' => 'col-md-5 col-lg-4',
+			],
+		])->widget(
+			Select2::class, [
+				'data' => $model->getUsersNames(),
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('partner_id'),
+				],
+			]
+		) ?>
+	</div>
 	<?= $form->field($model, 'details')->textarea() ?>
 
 

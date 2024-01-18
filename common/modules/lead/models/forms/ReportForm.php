@@ -3,6 +3,7 @@
 namespace common\modules\lead\models\forms;
 
 use common\models\Address;
+use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadAnswer;
@@ -10,6 +11,7 @@ use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadUser;
+use common\modules\lead\Module;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -46,6 +48,9 @@ class ReportForm extends Model {
 	public bool $withAnswers = true;
 	public int $lead_type_id;
 
+	public $tele_id;
+	public $partner_id;
+
 	public function setOpenAnswers(array $questionsAnswers): void {
 		$models = $this->getAnswersModels();
 		foreach ($questionsAnswers as $question_id => $answer) {
@@ -65,6 +70,8 @@ class ReportForm extends Model {
 			'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 			'leadName' => Yii::t('lead', 'Lead Name'),
 			'is_pinned' => Yii::t('lead', 'Is pinned'),
+			'tele_id' => LeadUser::getTypesNames()[LeadUser::TYPE_TELE],
+			'partner_id' => LeadUser::getTypesNames()[LeadUser::TYPE_PARTNER],
 		];
 	}
 
@@ -89,8 +96,13 @@ class ReportForm extends Model {
 			],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 			['closedQuestions', 'in', 'range' => array_keys($this->getClosedQuestionsData()), 'allowArray' => true],
-
+			['partner_id', 'in', 'range' => array_keys($this->getUsersNames())],
+			['tele_id', 'in', 'range' => array_keys($this->getTeleUsersNames())],
 		];
+	}
+
+	public function getUsersNames(): array {
+		return Module::userNames();
 	}
 
 	protected function detailsIsRequired(): bool {
@@ -282,6 +294,12 @@ class ReportForm extends Model {
 				: LeadUser::TYPE_OWNER;
 			$this->lead->linkUser($type, $this->owner_id);
 		}
+		if (!empty($this->tele_id) && !isset($this->lead->getUsers()[LeadUser::TYPE_TELE])) {
+			$this->lead->linkUser(LeadUser::TYPE_TELE, $this->tele_id);
+		}
+		if (!empty($this->partner_id) && !isset($this->lead->getUsers()[LeadUser::TYPE_PARTNER])) {
+			$this->lead->linkUser(LeadUser::TYPE_TELE, $this->partner_id);
+		}
 	}
 
 	private function linkAnswers(bool $unlink): void {
@@ -349,6 +367,8 @@ class ReportForm extends Model {
 				$this->address = $lead->addresses[$this->addressType]->address ?? null;
 				$this->withAddress = true;
 			}
+			$this->tele_id = $lead->getUsers()[LeadUser::TYPE_TELE] ?? null;
+			$this->partner_id = $lead->getUsers()[LeadUser::TYPE_PARTNER] ?? null;
 		}
 	}
 
@@ -375,6 +395,12 @@ class ReportForm extends Model {
 
 	public function setAnswers(array $answers): void {
 		$this->setClosedAnswers($answers);
+	}
+
+	public function getTeleUsersNames(): array {
+		return User::getSelectList(
+			LeadUser::userIds(LeadUser::TYPE_TELE)
+		);
 	}
 
 	protected function setClosedAnswers(array $answers): void {

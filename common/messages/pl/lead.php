@@ -155,6 +155,7 @@ return [
 	'Users' => 'Użytkownicy',
 	'Telemarketer' => 'Telemarketer',
 	'Tele' => 'Tele',
+	'Partner' => 'Wspólnik',
 	'New status: {oldStatus} from: {status}' => 'New status: {oldStatus} from: {status}',
 	'Closed questions must be set when closed.' => 'Closed questions must be set when closed.',
 	'Create Lead User' => 'Przypisz użytkownika do Leada',
