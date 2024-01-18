@@ -15,7 +15,7 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 
 ?>
-<div id="issue-search" class="issue-search">
+<div id="issue-search" class="issue-search collapse<?= $model->getIsLoad() ? ' in' : '' ?>">
 
 	<?php $form = ActiveForm::begin([
 		'options' => [
