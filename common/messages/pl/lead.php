@@ -153,7 +153,7 @@ return [
 	'Lead Users' => 'Użytkownicy',
 	'Details cannot be blank when questions is empty.' => 'Details cannot be blank when questions is empty.',
 	'Users' => 'Użytkownicy',
-	'Telemarketer' => 'Telemarketer',
+	'Telemarketer' => 'Konsultant',
 	'Tele' => 'Tele',
 	'Partner' => 'Wspólnik',
 	'New status: {oldStatus} from: {status}' => 'New status: {oldStatus} from: {status}',
