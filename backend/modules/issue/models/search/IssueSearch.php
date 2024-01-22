@@ -46,6 +46,8 @@ class IssueSearch extends BaseIssueSearch {
 	public $entity_agreement_details;
 	public $entity_agreement_at;
 
+	public bool $withClaimsSum = false;
+
 	public ?string $signature_act = null;
 	private ?array $ids = null;
 
@@ -61,7 +63,7 @@ class IssueSearch extends BaseIssueSearch {
 	public function rules(): array {
 		return array_merge(parent::rules(), [
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id', 'note_stage_id'], 'integer'],
-			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims',], 'boolean'],
+			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims', 'withClaimsSum'], 'boolean'],
 			[['entity_agreement_details'], 'string'],
 			[['onlyWithSettlements', 'onlyWithClaims'], 'default', 'value' => null],
 			['claimCompanyTryingValue', 'number', 'min' => 0],
@@ -81,6 +83,7 @@ class IssueSearch extends BaseIssueSearch {
 			'stageDeadlineFromAt' => Yii::t('backend', 'Stage Deadline from at'),
 			'stageDeadlineToAt' => Yii::t('backend', 'Stage Deadline to at'),
 			'note_stage_id' => Yii::t('backend', 'Note Stage'),
+			'withClaimsSum' => Yii::t('backend', 'With claims sum'),
 		]);
 	}
 
@@ -296,6 +299,13 @@ class IssueSearch extends BaseIssueSearch {
 	private function applyEntityAgreementFilter(IssueQuery $query) {
 		$query->andFilterWhere(['like', Issue::tableName() . '.entity_agreement_details', $this->entity_agreement_details])
 			->andFilterWhere([Issue::tableName() . '.entity_agreement_at' => $this->entity_agreement_at]);
+	}
+
+	public function claimsSum(IssueQuery $query) {
+		$query = clone $query;
+		$query->select(IssueClaim::tableName() . '.trying_value');
+		$query->joinWith('claims');
+		return $query->sum('trying_value');
 	}
 
 }

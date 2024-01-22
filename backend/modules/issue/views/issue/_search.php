@@ -140,6 +140,11 @@ use yii\widgets\ActiveForm;
 			: ''
 		?>
 
+		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ?
+			$form->field($model, 'withClaimsSum', ['options' => ['class' => 'col-md-2']])->checkbox()
+			: ''
+		?>
+
 		<?= $model->scenario === IssueSearch::SCENARIO_ALL_PAYED
 			? $form->field($model, 'onlyWithAllPayedPay', ['options' => ['class' => 'col-md-2']])->checkbox()
 			: ''

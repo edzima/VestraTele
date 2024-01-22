@@ -39,8 +39,16 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
             $('.table-responsive').css( 'overflow', 'auto' );
 	})"
 );
-
 ?>
+
+<p>
+	<?= $searchModel->withClaimsSum && ($claimSum = $searchModel->claimsSum($dataProvider->query)) > 0
+		? (Yii::t('backend', 'Claims Sum: {sum}', [
+			'sum' => Yii::$app->formatter->asCurrency($claimSum),
+		]))
+		: '' ?>
+
+</p>
 
 
 <?= GridView::widget([
@@ -306,3 +314,4 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 	],
 ]);
 ?>
+

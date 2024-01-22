@@ -350,4 +350,6 @@ return [
 	'Add a Shipment' => 'Dodaj List',
 	'Have not loaded Data from API. Click refresh.' => 'Brak danych z API. Klinij Aktualizuj.',
 	'Note Stage' => 'Etap (kiedykowiek)',
+	'Claims Sum: {sum}' => 'Suma roszczeń: {sum}',
+	'With claims sum' => 'Suma roszczeń',
 ];
