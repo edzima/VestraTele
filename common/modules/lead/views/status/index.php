@@ -2,7 +2,7 @@
 
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadStatusSearch;
-use yii\grid\GridView;
+use common\widgets\GridView;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
@@ -27,15 +27,18 @@ $this->params['breadcrumbs'][] = $this->title;
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-			['class' => 'yii\grid\SerialColumn'],
-
-			'id',
+			[
+				'header' => '#',
+				'attribute' => 'id',
+				'width' => '65px',
+				'contentCenter' => true,
+			],
 			'name',
-			'description',
+			//	'description',
+			'days_deadline',
 			'short_report:boolean',
 			'show_report_in_lead_index:boolean',
-			'not_for_dialer:boolean',
-			'sort_index',
+			//		'not_for_dialer:boolean',
 			[
 				'attribute' => 'calendar_background',
 				'contentOptions' => static function (LeadStatus $data): array {
@@ -47,11 +50,23 @@ $this->params['breadcrumbs'][] = $this->title;
 				},
 			],
 			[
+				'attribute' => 'statuses',
+				'format' => 'html',
+				'value' => function (LeadStatus $data): string {
+					return Html::ul($data->getStatusesNames());
+				},
+			],
+			[
 				'attribute' => 'market_status',
 				'value' => 'marketStatusName',
 				'filter' => LeadStatusSearch::getMarketStatusesNames(),
 			],
-
+			[
+				'header' => '↑ ↓',
+				'attribute' => 'sort_index',
+				'width' => '65px',
+				'contentCenter' => true,
+			],
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>

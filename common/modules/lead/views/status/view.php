@@ -35,6 +35,18 @@ YiiAsset::register($this);
 			'id',
 			'name',
 			'description',
+			[
+				'attribute' => 'days_deadline',
+				'visible' => !empty($model->days_deadline),
+			],
+			[
+				'attribute' => 'statuses',
+				'format' => 'html',
+				'value' => function () use ($model): string {
+					return Html::ul($model->getStatusesNames());
+				},
+				'visible' => !empty($model->getStatusesIds()),
+			],
 			'marketStatusName',
 			'not_for_dialer:boolean',
 			'show_report_in_lead_index:boolean',
