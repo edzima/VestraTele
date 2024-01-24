@@ -16,7 +16,6 @@ use common\validators\PhoneValidator;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
-use yii\data\DataProviderInterface;
 use yii\db\ActiveQuery;
 
 class LeadReminderSearch extends ReminderSearch {
@@ -45,7 +44,7 @@ class LeadReminderSearch extends ReminderSearch {
 		], parent::rules());
 	}
 
-	public function search(array $params): DataProviderInterface {
+	public function search(array $params): ActiveDataProvider {
 		$query = LeadReminder::find()
 			->joinWith('lead');
 
@@ -131,7 +130,9 @@ class LeadReminderSearch extends ReminderSearch {
 	}
 
 	public function getEventsData(): array {
-		$models = $this->search([])->getModels();
+		$dataProvider = $this->search([]);
+		$dataProvider->pagination = false;
+		$models = $dataProvider->getModels();
 		$data = [];
 		foreach ($models as $model) {
 			$event = static::createEvent();
