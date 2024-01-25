@@ -10,7 +10,7 @@ use yii\web\UploadedFile;
 class ImportController extends BaseController {
 
 	public function init() {
-		@set_time_limit(300) or Yii::warning('Not set time limit');
+		@set_time_limit(600) or Yii::warning('Not set time limit');
 		parent::init();
 	}
 
