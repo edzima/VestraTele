@@ -381,4 +381,5 @@ return [
 	'Push Delay At' => 'Zaplanuj wysłanie',
 	'SMS has been scheduled({date}): "{message}". JOB_ID: {jobId}' => 'Zaplanowano ({date}) wysyłkę SMS: "{message}". JOB_ID:{jobId}',
 	'Date At must be from future.' => 'Data musi być z przyszłości',
+	'Add import task to queue. Rows count: {count}.' => 'Dodano zadanie do kolejki. Ilość wierszy: {count}.',
 ];
