@@ -97,7 +97,7 @@ class LeadSearch extends Lead implements SearchModel {
 	public function rules(): array {
 		return [
 			[['id', 'type_id', 'campaign_id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
-			[['reportStatus', 'delayDays'], 'integer'],
+			[['reportStatus'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
 			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress'], 'boolean'],
