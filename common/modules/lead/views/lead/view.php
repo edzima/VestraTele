@@ -194,6 +194,11 @@ YiiAsset::register($this);
 						'attribute' => 'providerName',
 						'visible' => !empty($model->provider),
 					],
+					[
+						'attribute' => 'deadline',
+						'visible' => !empty($model->getDeadline()),
+						'format' => 'date',
+					],
 				],
 			]) ?>
 

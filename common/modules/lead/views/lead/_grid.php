@@ -7,6 +7,7 @@ use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadSmsForm;
 use common\modules\lead\models\searches\LeadSearch;
+use common\modules\lead\Module;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AddressColumn;
 use common\widgets\grid\SerialColumn;
@@ -60,13 +61,50 @@ foreach (LeadSearch::questions() as $question) {
 		]),
 		'afterGrid' => Html::endForm(),
 	],
+	'rowOptions' => function (ActiveLead $model) use ($searchModel, $dataProvider): array {
+		$options = [];
+		$fromMarket = false;
+		$inMarket = false;
+		if ($searchModel->leadMarketId($model->getId(), $dataProvider->getKeys())) {
+			$inMarket = true;
+			$fromMarket = Module::getInstance()->market->isFromMarket(
+				$model->getUsers(),
+				Yii::$app->user->getId()
+			);
+			if ($fromMarket) {
+				Html::addCssClass($options, 'lead-from-market');
+			}
+			Html::addCssClass($options, 'lead-on-market');
+		}
+		if (!$inMarket || $fromMarket) {
+			$hours = $model->getDeadlineHours();
+			if ($hours !== null) {
+				$warning = $model->status->hours_deadline_warning;
+				if ($hours > 0) {
+					if ($hours <= $warning) {
+						Html::addCssClass($options, 'warning');
+					}
+				} else {
+					Html::addCssClass($options, 'danger');
+				}
+			}
+		}
 
+		return $options;
+	},
 	'columns' => array_merge([
 		[
 			'class' => CheckboxColumn::class,
 			'visible' => $multipleForm,
+			'rowHighlight' => false,
 		],
 		['class' => SerialColumn::class],
+		[
+			//	'label' => null,
+			'header' => '',
+			'value' => 'from MARKET',
+			//	'visible' => $searchModel->fromMarket,
+		],
 		[
 			'attribute' => 'owner_id',
 			'label' => Yii::t('lead', 'Owner'),
@@ -121,14 +159,33 @@ foreach (LeadSearch::questions() as $question) {
 		],
 		[
 			'attribute' => 'source_id',
-			'value' => function (ActiveLead $lead): string {
+			'value' => function (ActiveLead $lead) use ($searchModel, $dataProvider): string {
+				$tag = '';
+				if (Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)) {
+					$marketId = $searchModel->leadMarketId($lead->getId(), $dataProvider->getKeys());
+					if ($marketId) {
+						$from = Module::getInstance()->market->isFromMarket(
+							$lead->getUsers(),
+							Yii::$app->user->getId()
+						);
+						$text = $from ? Yii::t('lead', 'From Market') : Yii::t('lead', 'On Market');
+
+						$tag = Html::a($text . ' ' . Html::faicon('bullhorn'),
+							['market/view', 'id' => $marketId], [
+								'class' => 'label white-label lead-from-market-label',
+								'data-pjax' => 0,
+							]
+						);
+						$tag = Html::tag('div', $tag, ['class' => 'tags-wrapper text-center']);
+					}
+				}
 				if (!$lead->getSource()->getURL()) {
-					return $lead->getSource()->getName();
+					return $lead->getSource()->getName() . $tag;
 				}
 				return Html::a(Html::encode($lead->getSource()->getName()),
-					$lead->getSource()->getURL(), [
-						'target' => '_blank',
-					]);
+						$lead->getSource()->getURL(), [
+							'target' => '_blank',
+						]) . $tag;
 			},
 			'format' => 'raw',
 			'filter' => $searchModel->getSourcesNames(),
@@ -197,6 +254,7 @@ foreach (LeadSearch::questions() as $question) {
 			[
 				'attribute' => 'newestReportAt',
 				'format' => 'date',
+				'noWrap' => true,
 				'value' => function (ActiveLead $lead): ?string {
 					$reports = $lead->reports;
 					if (empty($reports)) {
@@ -205,6 +263,13 @@ foreach (LeadSearch::questions() as $question) {
 					return max(ArrayHelper::getColumn($reports, 'created_at'));
 				},
 				'label' => Yii::t('lead', 'Newest Report At'),
+			],
+			[
+				'attribute' => 'deadline',
+				'label' => Yii::t('lead', 'Deadline'),
+				'noWrap' => true,
+				'contentBold' => true,
+				'format' => 'date',
 			],
 			[
 				'attribute' => 'reportStatusCount',
@@ -219,8 +284,9 @@ foreach (LeadSearch::questions() as $question) {
 				'template' => '{view} {update} {report} {sms} {user} {reminder} {market} {delete}',
 				'visibleButtons' => $visibleButtons,
 				'buttons' => [
-					'market' => static function (string $url, ActiveLead $model): string {
-						if (Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)) {
+					'market' => function (string $url, ActiveLead $model) use ($searchModel, $dataProvider): string {
+						if (Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)
+							&& empty($searchModel->leadMarketId($model->getId(), $dataProvider->getKeys()))) {
 							return Html::a('<i class="fa fa-bullhorn" aria-hidden="true"></i>',
 								['market/create', 'id' => $model->getId()],
 								[

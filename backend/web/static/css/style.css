@@ -327,3 +327,38 @@ div:target {
 .box-body h1:first-of-type {
 	display: none;
 }
+
+
+.issue-create-count-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+	grid-gap: 15px;
+}
+
+
+.white-label {
+	background: white;
+}
+
+.lead-from-market-label {
+	color: rgb(0, 192, 239) !important;
+	border: 1px solid rgb(0, 172, 214);
+}
+
+.lead-warning-deadline {
+	background: #e1bc2a;
+}
+
+.lead-danger-deadline {
+	background: #b62d2d;
+}
+
+
+.lead-on-market {
+	background: #9bbbc68a !important;
+	opacity: 0.4;
+}
+
+.lead-from-market {
+	opacity: 0.8;
+}
