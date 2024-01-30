@@ -9,6 +9,7 @@ use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
 use common\modules\reminder\models\Reminder;
 use common\modules\reminder\models\ReminderQuery;
+use DateInterval;
 use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -396,6 +397,34 @@ class Lead extends ActiveRecord implements ActiveLead {
 			}
 		}
 		return false;
+	}
+
+	public function isDelay(): ?bool {
+		return $this->getDeadlineHours() === 0;
+	}
+
+	public function getDeadlineHours(): ?int {
+		$deadline = $this->getDeadline();
+		if ($deadline === null) {
+			return null;
+		}
+		$datetime = new DateTime($deadline);
+		return $datetime->diff(new DateTime())->format('%h');
+	}
+
+	public function getDeadline(): ?string {
+		$hours = $this->status->hours_deadline;
+		if (empty($hours)) {
+			return null;
+		}
+		$date = $this->date_at;
+		$reports = $this->reports;
+		if (!empty($reports)) {
+			$date = max(ArrayHelper::getColumn($reports, 'created_at'));
+		}
+		$datetime = new DateTime($date);
+		$datetime->add(new DateInterval("PT{$hours}H"));
+		return $datetime->format(DATE_ATOM);
 	}
 
 	/**

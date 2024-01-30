@@ -45,7 +45,13 @@ use yii\widgets\ActiveForm;
 		</div>
 		<div class="col-md-2">
 
-			<?= $form->field($model, 'days_deadline')->widget(NumberControl::class, [
+			<?= $form->field($model, 'hours_deadline')->widget(NumberControl::class, [
+				'maskedInputOptions' => [
+					'digits' => 0,
+				],
+			]) ?>
+
+			<?= $form->field($model, 'hours_deadline_warning')->widget(NumberControl::class, [
 				'maskedInputOptions' => [
 					'digits' => 0,
 				],

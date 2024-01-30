@@ -36,8 +36,12 @@ YiiAsset::register($this);
 			'name',
 			'description',
 			[
-				'attribute' => 'days_deadline',
-				'visible' => !empty($model->days_deadline),
+				'attribute' => 'hours_deadline',
+				'visible' => !empty($model->hours_deadline),
+			],
+			[
+				'attribute' => 'hours_deadline_warning',
+				'visible' => !empty($model->hours_deadline_warning),
 			],
 			[
 				'attribute' => 'statuses',
