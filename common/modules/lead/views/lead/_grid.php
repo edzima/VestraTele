@@ -265,7 +265,9 @@ foreach (LeadSearch::questions() as $question) {
 				'label' => Yii::t('lead', 'Newest Report At'),
 			],
 			[
-				'attribute' => 'deadline',
+				'attribute' => 'deadlineType',
+				'filter' => LeadSearch::getDeadlineNames(),
+				'value' => 'deadline',
 				'label' => Yii::t('lead', 'Deadline'),
 				'noWrap' => true,
 				'contentBold' => true,

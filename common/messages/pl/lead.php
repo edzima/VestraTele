@@ -429,4 +429,7 @@ return [
 	'Newest Report At' => 'Raport',
 	'Hours deadline' => 'Termin (h)',
 	'Hours deadline warning' => 'Termin ostrzeżenie (h)',
+	'Tomorow' => 'Jutro',
+	'Today' => 'Dziś',
+	'Exceeded' => 'Przekroczony',
 ];
