@@ -36,6 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'name',
 			//	'description',
 			'hours_deadline',
+			'hours_deadline_warning',
 			'short_report:boolean',
 			'show_report_in_lead_index:boolean',
 			//		'not_for_dialer:boolean',

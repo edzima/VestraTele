@@ -400,7 +400,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function isDelay(): ?bool {
-		return $this->getDeadlineHours() === 0;
+		return $this->getDeadlineHours() > 0;
 	}
 
 	public function getDeadlineHours(): ?int {
@@ -409,7 +409,8 @@ class Lead extends ActiveRecord implements ActiveLead {
 			return null;
 		}
 		$datetime = new DateTime($deadline);
-		return $datetime->diff(new DateTime())->format('%h');
+		$diff = $datetime->diff(new DateTime());
+		return ($diff->days * 24 + $diff->h) * ($diff->invert ? -1 : 1);
 	}
 
 	public function getDeadline(): ?string {

@@ -79,13 +79,13 @@ foreach (LeadSearch::questions() as $question) {
 		if (!$inMarket || $fromMarket) {
 			$hours = $model->getDeadlineHours();
 			if ($hours !== null) {
-				$warning = $model->status->hours_deadline_warning;
 				if ($hours > 0) {
-					if ($hours <= $warning) {
+					Html::addCssClass($options, 'danger');
+				} else {
+					$warning = $model->status->hours_deadline_warning;
+					if ($warning && $hours * -1 < $warning) {
 						Html::addCssClass($options, 'warning');
 					}
-				} else {
-					Html::addCssClass($options, 'danger');
 				}
 			}
 		}
