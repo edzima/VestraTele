@@ -33,6 +33,7 @@ use yii\helpers\Json;
  * @property string|null $postal_code
  * @property string|null $email
  * @property int|null $campaign_id
+ * @property string|null $deadline_at
  *
  * @property-read LeadUserInterface|null $owner
  * @property-read LeadCampaign|null $campaign
@@ -120,7 +121,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			[['source_id', 'status_id', 'data', 'name'], 'required'],
 			[['status_id'], 'integer'],
 			[['phone', 'postal_code', 'email', 'provider', 'name'], 'string'],
-			[['phone', 'email', 'provider'], 'default', 'value' => null],
+			[['phone', 'email', 'provider', 'deadline_at'], 'default', 'value' => null],
 			['email', 'email'],
 			['postal_code', 'string', 'max' => 6],
 			['provider', 'in', 'range' => array_keys(static::getProvidersNames())],
@@ -414,6 +415,9 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function getDeadline(): ?string {
+		if (!empty($this->deadline_at)) {
+			return $this->deadline_at;
+		}
 		$hours = $this->status->hours_deadline;
 		if (empty($hours)) {
 			return null;

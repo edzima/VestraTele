@@ -432,4 +432,8 @@ return [
 	'Tomorow' => 'Jutro',
 	'Today' => 'Dziś',
 	'Exceeded' => 'Przekroczony',
+	'Update Deadline: {name}' => 'Zmień Deadline: {name}',
+	'Update Deadline' => 'Zmień Deadline',
+	'Success update Lead deadline.' => 'Zaktualizowano Deadline',
+	'Updated Deadline' => 'Nadpisany',
 ];

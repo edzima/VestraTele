@@ -197,7 +197,19 @@ YiiAsset::register($this);
 					[
 						'attribute' => 'deadline',
 						'visible' => !empty($model->getDeadline()),
-						'format' => 'date',
+						'format' => 'raw',
+						'value' => function () use ($model) {
+							$deadline = $model->getDeadline();
+							if ($deadline) {
+								return Html::a(
+									Yii::$app->formatter->asDate($deadline),
+									['deadline', 'id' => $model->id], [
+									'aria-label' => Yii::t('lead', 'Update Deadline'),
+									'title' => Yii::t('lead', 'Update Deadline'),
+								]);
+							}
+							return null;
+						},
 					],
 				],
 			]) ?>

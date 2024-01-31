@@ -3,6 +3,7 @@
 use common\helpers\ArrayHelper;
 use common\helpers\Html;
 use common\helpers\StringHelper;
+use common\helpers\Url;
 use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadSmsForm;
@@ -10,6 +11,7 @@ use common\modules\lead\models\searches\LeadSearch;
 use common\modules\lead\Module;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AddressColumn;
+use common\widgets\grid\DateTimeColumn;
 use common\widgets\grid\SerialColumn;
 use common\widgets\GridView;
 use kartik\grid\CheckboxColumn;
@@ -99,12 +101,6 @@ foreach (LeadSearch::questions() as $question) {
 			'rowHighlight' => false,
 		],
 		['class' => SerialColumn::class],
-		[
-			//	'label' => null,
-			'header' => '',
-			'value' => 'from MARKET',
-			//	'visible' => $searchModel->fromMarket,
-		],
 		[
 			'attribute' => 'owner_id',
 			'label' => Yii::t('lead', 'Owner'),
@@ -203,7 +199,10 @@ foreach (LeadSearch::questions() as $question) {
 				'options' => ['multiple' => true],
 			],
 		],
-		'date_at:date',
+		[
+			'class' => DateTimeColumn::class,
+			'attribute' => 'date_at',
+		],
 	],
 		$questionColumns,
 		[
@@ -252,8 +251,8 @@ foreach (LeadSearch::questions() as $question) {
 				'label' => Yii::t('lead', 'Reports Answers'),
 			],
 			[
+				'class' => DateTimeColumn::class,
 				'attribute' => 'newestReportAt',
-				'format' => 'date',
 				'noWrap' => true,
 				'value' => function (ActiveLead $lead): ?string {
 					$reports = $lead->reports;
@@ -267,11 +266,23 @@ foreach (LeadSearch::questions() as $question) {
 			[
 				'attribute' => 'deadlineType',
 				'filter' => LeadSearch::getDeadlineNames(),
-				'value' => 'deadline',
+				'format' => 'raw',
+				'value' => function (ActiveLead $lead): ?string {
+					$deadline = $lead->getDeadline();
+					if ($deadline) {
+						return Html::a(
+							Yii::$app->formatter->asDate($deadline),
+							['deadline', 'id' => $lead->getId(), 'returnUrl' => Url::current()], [
+							'aria-label' => Yii::t('lead', 'Update Deadline'),
+							'title' => Yii::t('lead', 'Update Deadline'),
+							'data-pjax' => 0,
+						]);
+					}
+					return null;
+				},
 				'label' => Yii::t('lead', 'Deadline'),
 				'noWrap' => true,
 				'contentBold' => true,
-				'format' => 'date',
 			],
 			[
 				'attribute' => 'reportStatusCount',
