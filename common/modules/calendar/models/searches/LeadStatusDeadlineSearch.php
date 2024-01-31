@@ -90,6 +90,11 @@ class LeadStatusDeadlineSearch extends Model {
 			['>=', $dateColumnWithInterval, $this->startAt],
 			['<=', $dateColumnWithInterval, $this->endAt],
 		]);
+		$query->orWhere([
+			'and',
+			['>=', Lead::tableName() . '.deadline_at', $this->startAt],
+			['<=', Lead::tableName() . '.deadline_at', $this->endAt],
+		]);
 
 		$query->groupBy(Lead::tableName() . '.id');
 		return $query;
