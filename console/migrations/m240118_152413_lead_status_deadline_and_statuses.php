@@ -14,6 +14,7 @@ class m240118_152413_lead_status_deadline_and_statuses extends Migration {
 		$this->addColumn('{{%lead_status}}', 'hours_deadline', $this->smallInteger()->null());
 		$this->addColumn('{{%lead_status}}', 'hours_deadline_warning', $this->smallInteger()->null());
 		$this->addColumn('{{%lead_status}}', 'statuses', $this->string()->null());
+		$this->addColumn('{{%lead}}', 'deadline_at', $this->dateTime()->null());
 	}
 
 	/**
@@ -21,7 +22,8 @@ class m240118_152413_lead_status_deadline_and_statuses extends Migration {
 	 */
 	public function safeDown() {
 		$this->dropColumn('{{%lead_status}}', 'hours_deadline');
-		$this->addColumn('{{%lead_status}}', 'hours_deadline_warning', $this->smallInteger()->null());
+		$this->dropColumn('{{%lead_status}}', 'hours_deadline_warning');
 		$this->dropColumn('{{%lead_status}}', 'statuses');
+		$this->dropColumn('{{%lead}}', 'deadline_at');
 	}
 }
