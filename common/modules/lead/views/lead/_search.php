@@ -131,7 +131,14 @@ use kartik\select2\Select2;
 				],
 			],
 		])->widget(DateWidget::class)
+
 		?>
+
+		<?= $form->field($model, 'hoursAfterLastReport', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput([
+			'type' => 'number',
+			'step' => 1,
+		]) ?>
+
 
 		<?= $form->field($model, 'olderByDays', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput([
 			'type' => 'number',

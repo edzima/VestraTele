@@ -5,6 +5,7 @@ namespace common\modules\lead\models\query;
 use common\models\query\PhonableQuery;
 use common\models\query\PhonableQueryTrait;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadUser;
 use yii\db\ActiveQuery;
 
@@ -78,6 +79,18 @@ class LeadQuery extends ActiveQuery implements PhonableQuery {
 	public function type(int $type_id): self {
 		$this->joinWith('leadSource S');
 		$this->andWhere(['S.type_id' => $type_id]);
+		return $this;
+	}
+
+	public function onlyNewestReport(): self {
+		$this->joinWith(['reports']);
+		$this->andWhere([
+			'=',
+			LeadReport::tableName() . '.id',
+			LeadReport::find()
+				->select('MAX(' . LeadReport::tableName() . '.id)')
+				->andWhere(LeadReport::tableName() . '.lead_id = ' . Lead::tableName() . '.id'),
+		]);
 		return $this;
 	}
 }

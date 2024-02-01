@@ -3,6 +3,7 @@
 namespace common\modules\calendar\controllers;
 
 use common\helpers\ArrayHelper;
+use common\modules\calendar\models\searches\LeadStatusDeadlineSearch;
 use common\modules\lead\models\searches\LeadReminderSearch;
 use common\modules\reminder\models\Reminder;
 use DateTime;
@@ -26,13 +27,7 @@ class LeadReminderController extends Controller {
 	}
 
 	public function actionList(string $start = null, string $end = null): Response {
-		if ($start === null) {
-			$start = date('Y-m-01');
-		}
-		if ($end === null) {
-			$end = date('Y-m-t 23:59:59');
-		}
-
+		$this->ensureStartAndAt($start, $end);
 		$model = new LeadReminderSearch();
 		$model->scenario = LeadReminderSearch::SCENARIO_USER;
 		$model->onlyDelayed = null;
@@ -41,6 +36,29 @@ class LeadReminderController extends Controller {
 		$model->dateStart = $start;
 		$model->dateEnd = $end;
 		return $this->asJson($model->getEventsData());
+	}
+
+	public function actionStatusDeadline(string $start = null, string $end = null): Response {
+		$this->ensureStartAndAt($start, $end);
+
+		$model = new LeadStatusDeadlineSearch();
+		$model->startAt = $start;
+		$model->endAt = $end;
+		if (YII_IS_FRONTEND) {
+			$model->scenario = LeadStatusDeadlineSearch::SCENARIO_USER;
+			$model->leadUserId = Yii::$app->user->getId();
+		}
+
+		return $this->asJson($model->getEventsData());
+	}
+
+	protected function ensureStartAndAt(string &$start = null, string &$end = null): void {
+		if ($start === null) {
+			$start = date('Y-m-d 00:00:00', strtotime('monday this week'));
+		}
+		if ($end === null) {
+			$end = date('Y-m-d 23:59:59', strtotime('sunday this week'));
+		}
 	}
 
 	public function actionUpdate(string $id, string $start_at): Response {
@@ -62,10 +80,5 @@ class LeadReminderController extends Controller {
 				'message' => 'Invalid Start Date format',
 			]);
 		}
-
-		return $this->asJson([
-			'success' => false,
-			'errors' => $model->getErrors(),
-		]);
 	}
 }

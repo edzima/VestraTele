@@ -9,6 +9,7 @@ use common\models\user\User;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadCampaign;
+use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
@@ -66,7 +67,6 @@ class LeadSearch extends Lead implements SearchModel {
 	public $reportStatus;
 
 	public $selfUserId;
-
 	private array $questionsAttributes = [];
 
 	private static ?array $QUESTIONS = null;
@@ -77,6 +77,15 @@ class LeadSearch extends Lead implements SearchModel {
 	 * @var mixed|null
 	 */
 	public bool $joinAddress = true;
+
+	protected const DEADLINE_TODAY = 'today';
+	protected const DEADLINE_TOMORROW = 'tomorrow';
+	protected const DEADLINE_EXCEEDED = 'exceeded';
+	protected const DEADLINE_UPDATED = 'updated';
+
+	public ?string $deadlineType = null;
+
+	public ?string $hoursAfterLastReport = null;
 
 	public function __construct($config = []) {
 		if (!isset($config['addressSearch'])) {
@@ -91,7 +100,7 @@ class LeadSearch extends Lead implements SearchModel {
 	public function rules(): array {
 		return [
 			[['id', 'type_id', 'campaign_id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
-			[['reportStatus'], 'integer'],
+			[['reportStatus', 'hoursAfterLastReport'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
 			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress'], 'boolean'],
@@ -102,6 +111,7 @@ class LeadSearch extends Lead implements SearchModel {
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			[['selfUserId'], 'in', 'range' => function () { return $this->selfUsersIds(); }, 'allowArray' => true, 'skipOnEmpty' => true],
 			[['status_id', 'reportStatus'], 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
+			['deadlineType', 'in', 'range' => array_keys(static::getDeadlineNames())],
 			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
 			[['from_at', 'to_at'], 'safe'],
 			[array_keys($this->questionsAttributes), 'safe'],
@@ -128,6 +138,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'olderByDays' => Yii::t('lead', 'Older by days'),
 				'reportStatus' => Yii::t('lead', 'Report Status'),
 				'reportStatusCount' => Yii::t('lead', 'Report Status Count'),
+				'hoursAfterLastReport' => Yii::t('lead', 'Hours after newest Report'),
 			]
 		);
 	}
@@ -213,7 +224,7 @@ class LeadSearch extends Lead implements SearchModel {
 		];
 
 		$this->load($params);
-		$this->addressSearch->load($params);
+		//	$this->addressSearch->load($params);
 
 		if (!$this->validate()) {
 			$query->where('0=1');
@@ -233,7 +244,8 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyStatusFilter($query);
 		$this->applyReportFilter($query);
 		$this->applyReportStatusFilter($query);
-
+		$this->applyDeadlineFilter($query);
+		$this->applyHoursAfterLastReport($query);
 		// grid filtering conditions
 		$query->andFilterWhere([
 			Lead::tableName() . '.id' => $this->id,
@@ -531,8 +543,98 @@ class LeadSearch extends Lead implements SearchModel {
 		return $this->_selfUsersIds[$this->user_id];
 	}
 
+	public function leadMarketId(int $id, array $keys): ?int {
+		return $this->leadsMarket($keys)[$id] ?? null;
+	}
+
+	private array $leadsMarket = [];
+
+	private function leadsMarket(array $keys) {
+		$hashKeys = md5(implode('|', $keys));
+		if (!isset($this->leadsMarket[$hashKeys])) {
+			$ids = LeadMarket::find()
+				->andWhere(['lead_id' => $keys])
+				->select('id')
+				->indexBy('lead_id')
+				->column();
+			$this->leadsMarket[$hashKeys] = $ids;
+		}
+
+		return $this->leadsMarket[$hashKeys];
+	}
+
 	public function getSelfUsersNames(): array {
 		return User::getSelectList($this->selfUsersIds());
 	}
 
+	private function applyHoursAfterLastReport(LeadQuery $query): void {
+		if (!empty($this->hoursAfterLastReport)) {
+			$query->onlyNewestReport();
+			$hours = $this->hoursAfterLastReport;
+			$condition = '<';
+			if ($hours < 0) {
+				$condition = '>';
+				$hours *= -1;
+			}
+			$reportDateWithHours = 'DATE_ADD(' . LeadReport::tableName() . '.created_at'
+				. ', INTERVAL ' . $hours . ' HOUR)';
+			$query->andWhere([
+				$condition,
+				$reportDateWithHours,
+				date(DATE_ATOM),
+			]);
+		}
+	}
+
+	private function applyDeadlineFilter(LeadQuery $query): void {
+
+		if (!empty($this->deadlineType)) {
+			if ($this->deadlineType === static::DEADLINE_UPDATED) {
+				$query->andWhere(Lead::tableName() . '.deadline_at IS NOT NULL');
+			} else {
+				$query->joinWith('status');
+				$query->andWhere(LeadStatus::tableName() . '.hours_deadline IS NOT NULL');
+
+				$query->onlyNewestReport();
+				$query->andWhere(LeadReport::tableName() . '.status_id = ' . Lead::tableName() . '.status_id');
+
+				$reportDateWithDaysReminderInterval = 'DATE_ADD(' . LeadReport::tableName() . '.created_at'
+					. ', INTERVAL ' . LeadStatus::tableName() . '.hours_deadline HOUR)';
+				$dateCondition = "DATEDIFF(CURDATE(), $reportDateWithDaysReminderInterval)";
+
+				switch ($this->deadlineType) {
+					case static::DEADLINE_TOMORROW:
+						$query->andWhere([
+							'=',
+							$dateCondition,
+							-1,
+						]);
+						break;
+					case static::DEADLINE_TODAY:
+						$query->andWhere([
+							'=',
+							$dateCondition,
+							0,
+						]);
+						break;
+					case static::DEADLINE_EXCEEDED:
+						$query->andWhere([
+							'>',
+							$dateCondition,
+							0,
+						]);
+						break;
+				}
+			}
+		}
+	}
+
+	public static function getDeadlineNames(): array {
+		return [
+			static::DEADLINE_TODAY => Yii::t('lead', 'Today'),
+			static::DEADLINE_TOMORROW => Yii::t('lead', 'Tomorow'),
+			static::DEADLINE_EXCEEDED => Yii::t('lead', 'Exceeded'),
+			static::DEADLINE_UPDATED => Yii::t('lead', 'Updated Deadline'),
+		];
+	}
 }

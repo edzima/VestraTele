@@ -7,6 +7,7 @@ use common\behaviors\SelectionRouteBehavior;
 use common\helpers\Flash;
 use common\helpers\Html;
 use common\models\user\User;
+use common\modules\lead\models\forms\LeadDeadlineForm;
 use common\modules\lead\models\forms\LeadForm;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\Lead;
@@ -165,6 +166,23 @@ class LeadController extends BaseController {
 		return $this->render('name', [
 			'model' => $model,
 			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	public function actionDeadline(int $id, string $returnUrl = null) {
+		$lead = $this->findLead($id);
+		$model = new LeadDeadlineForm();
+		$model->setLead($lead);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('lead', 'Success update Lead deadline.'));
+			if ($returnUrl) {
+				return $this->redirect($returnUrl);
+			}
+			return $this->redirectLead($id);
+		}
+		return $this->render('deadline', [
+			'model' => $model,
 		]);
 	}
 

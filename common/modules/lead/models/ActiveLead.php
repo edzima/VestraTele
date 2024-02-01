@@ -15,6 +15,12 @@ use yii\base\Arrayable;
  */
 interface ActiveLead extends LeadInterface, Arrayable {
 
+	public function isDelay(): ?bool;
+
+	public function getDeadlineHours();
+
+	public function getDeadline(): ?string;
+
 	public function getId(): int;
 
 	public function getHash(): string;

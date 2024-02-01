@@ -3,12 +3,15 @@
 use common\helpers\ArrayHelper;
 use common\helpers\Html;
 use common\helpers\StringHelper;
+use common\helpers\Url;
 use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadSmsForm;
 use common\modules\lead\models\searches\LeadSearch;
+use common\modules\lead\Module;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AddressColumn;
+use common\widgets\grid\DateTimeColumn;
 use common\widgets\grid\SerialColumn;
 use common\widgets\GridView;
 use kartik\grid\CheckboxColumn;
@@ -48,6 +51,7 @@ foreach (LeadSearch::questions() as $question) {
 ?>
 
 <?= GridView::widget([
+	'filterAllowedEmpty' => false,
 	'dataProvider' => $dataProvider,
 	'filterModel' => $searchModel,
 	'id' => 'leads-grid',
@@ -60,11 +64,42 @@ foreach (LeadSearch::questions() as $question) {
 		]),
 		'afterGrid' => Html::endForm(),
 	],
+	'rowOptions' => function (ActiveLead $model) use ($searchModel, $dataProvider): array {
+		$options = [];
+		$fromMarket = false;
+		$inMarket = false;
+		if ($searchModel->leadMarketId($model->getId(), $dataProvider->getKeys())) {
+			$inMarket = true;
+			$fromMarket = Module::getInstance()->market->isFromMarket(
+				$model->getUsers(),
+				Yii::$app->user->getId()
+			);
+			if ($fromMarket) {
+				Html::addCssClass($options, 'lead-from-market');
+			}
+			Html::addCssClass($options, 'lead-on-market');
+		}
+		if (!$inMarket || $fromMarket) {
+			$hours = $model->getDeadlineHours();
+			if ($hours !== null) {
+				if ($hours > 0) {
+					Html::addCssClass($options, 'danger');
+				} else {
+					$warning = $model->status->hours_deadline_warning;
+					if ($warning && $hours * -1 < $warning) {
+						Html::addCssClass($options, 'warning');
+					}
+				}
+			}
+		}
 
+		return $options;
+	},
 	'columns' => array_merge([
 		[
 			'class' => CheckboxColumn::class,
 			'visible' => $multipleForm,
+			'rowHighlight' => false,
 		],
 		['class' => SerialColumn::class],
 		[
@@ -121,14 +156,33 @@ foreach (LeadSearch::questions() as $question) {
 		],
 		[
 			'attribute' => 'source_id',
-			'value' => function (ActiveLead $lead): string {
+			'value' => function (ActiveLead $lead) use ($searchModel, $dataProvider): string {
+				$tag = '';
+				if (Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)) {
+					$marketId = $searchModel->leadMarketId($lead->getId(), $dataProvider->getKeys());
+					if ($marketId) {
+						$from = Module::getInstance()->market->isFromMarket(
+							$lead->getUsers(),
+							Yii::$app->user->getId()
+						);
+						$text = $from ? Yii::t('lead', 'From Market') : Yii::t('lead', 'On Market');
+
+						$tag = Html::a($text . ' ' . Html::faicon('bullhorn'),
+							['market/view', 'id' => $marketId], [
+								'class' => 'label white-label lead-from-market-label',
+								'data-pjax' => 0,
+							]
+						);
+						$tag = Html::tag('div', $tag, ['class' => 'tags-wrapper text-center']);
+					}
+				}
 				if (!$lead->getSource()->getURL()) {
-					return $lead->getSource()->getName();
+					return $lead->getSource()->getName() . $tag;
 				}
 				return Html::a(Html::encode($lead->getSource()->getName()),
-					$lead->getSource()->getURL(), [
-						'target' => '_blank',
-					]);
+						$lead->getSource()->getURL(), [
+							'target' => '_blank',
+						]) . $tag;
 			},
 			'format' => 'raw',
 			'filter' => $searchModel->getSourcesNames(),
@@ -146,7 +200,10 @@ foreach (LeadSearch::questions() as $question) {
 				'options' => ['multiple' => true],
 			],
 		],
-		'date_at:date',
+		[
+			'class' => DateTimeColumn::class,
+			'attribute' => 'date_at',
+		],
 	],
 		$questionColumns,
 		[
@@ -195,8 +252,9 @@ foreach (LeadSearch::questions() as $question) {
 				'label' => Yii::t('lead', 'Reports Answers'),
 			],
 			[
+				'class' => DateTimeColumn::class,
 				'attribute' => 'newestReportAt',
-				'format' => 'date',
+				'noWrap' => true,
 				'value' => function (ActiveLead $lead): ?string {
 					$reports = $lead->reports;
 					if (empty($reports)) {
@@ -205,6 +263,27 @@ foreach (LeadSearch::questions() as $question) {
 					return max(ArrayHelper::getColumn($reports, 'created_at'));
 				},
 				'label' => Yii::t('lead', 'Newest Report At'),
+			],
+			[
+				'attribute' => 'deadlineType',
+				'filter' => LeadSearch::getDeadlineNames(),
+				'format' => 'raw',
+				'value' => function (ActiveLead $lead): ?string {
+					$deadline = $lead->getDeadline();
+					if ($deadline) {
+						return Html::a(
+							Yii::$app->formatter->asDate($deadline),
+							['deadline', 'id' => $lead->getId(), 'returnUrl' => Url::current()], [
+							'aria-label' => Yii::t('lead', 'Update Deadline'),
+							'title' => Yii::t('lead', 'Update Deadline'),
+							'data-pjax' => 0,
+						]);
+					}
+					return null;
+				},
+				'label' => Yii::t('lead', 'Deadline'),
+				'noWrap' => true,
+				'contentBold' => true,
 			],
 			[
 				'attribute' => 'reportStatusCount',
@@ -219,8 +298,9 @@ foreach (LeadSearch::questions() as $question) {
 				'template' => '{view} {update} {report} {sms} {user} {reminder} {market} {delete}',
 				'visibleButtons' => $visibleButtons,
 				'buttons' => [
-					'market' => static function (string $url, ActiveLead $model): string {
-						if (Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)) {
+					'market' => function (string $url, ActiveLead $model) use ($searchModel, $dataProvider): string {
+						if (Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)
+							&& empty($searchModel->leadMarketId($model->getId(), $dataProvider->getKeys()))) {
 							return Html::a('<i class="fa fa-bullhorn" aria-hidden="true"></i>',
 								['market/create', 'id' => $model->getId()],
 								[

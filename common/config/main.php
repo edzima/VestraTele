@@ -73,6 +73,11 @@ $config = [
 			'class' => 'yii\web\AssetManager',
 			'linkAssets' => getenv('LINK_ASSETS'),
 			'appendTimestamp' => true,
+			'bundles' => [
+				'yii\grid\GridViewAsset' => [
+					'sourcePath' => __DIR__ . '/../assets/',
+				],
+			],
 		],
 		'formatter' => [
 			'class' => Formatter::class,

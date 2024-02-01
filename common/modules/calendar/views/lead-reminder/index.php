@@ -45,6 +45,11 @@ $props = [
 			'allDayDefault' => false,
 			'urlUpdate' => Url::to(['update']),
 		],
+		[
+			'id' => 1,
+			'url' => Url::to(['status-deadline']),
+			'allDayDefault' => false,
+		],
 	],
 	'notesEnabled' => true,
 	'URLAddEvent' => Url::to(['/lead/lead/create']),
