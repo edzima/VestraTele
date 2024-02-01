@@ -12,6 +12,7 @@ use common\components\provision\Provisions;
 use common\components\TaxComponent;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\credit\Module as CreditModule;
 use common\modules\czater\Czater;
 use common\modules\lead\components\LeadClient;
 use common\modules\lead\Module as LeadModule;
@@ -51,6 +52,9 @@ $config = [
 		'reminder' => [
 			'class' => ReminderModule::class,
 		],
+		'credit' => [
+			'class' => CreditModule::class,
+		],
 	],
 	'components' => [
 		'db' => [
@@ -73,6 +77,11 @@ $config = [
 			'class' => 'yii\web\AssetManager',
 			'linkAssets' => getenv('LINK_ASSETS'),
 			'appendTimestamp' => true,
+			'bundles' => [
+				'yii\grid\GridViewAsset' => [
+					'sourcePath' => __DIR__ . '/../assets/',
+				],
+			],
 		],
 		'formatter' => [
 			'class' => Formatter::class,
