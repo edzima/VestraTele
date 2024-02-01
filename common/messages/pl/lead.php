@@ -436,4 +436,5 @@ return [
 	'Update Deadline' => 'Zmień Deadline',
 	'Success update Lead deadline.' => 'Zaktualizowano Deadline',
 	'Updated Deadline' => 'Nadpisany',
+	'Hours after newest Report' => 'Od raportu(h)',
 ];

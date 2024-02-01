@@ -51,6 +51,7 @@ foreach (LeadSearch::questions() as $question) {
 ?>
 
 <?= GridView::widget([
+	'filterAllowedEmpty' => false,
 	'dataProvider' => $dataProvider,
 	'filterModel' => $searchModel,
 	'id' => 'leads-grid',
