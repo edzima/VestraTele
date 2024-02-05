@@ -185,6 +185,11 @@ class CalculationController extends Controller {
 		}
 		$model->vat = $issue->type->vat;
 		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
+		$model->getMessagesModel()
+			->addExtraWorkersEmailsIds(
+				Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_MESSAGE_EMAIL_ISSUE_SETTLEMENT_CREATE)
+			);
+
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			if ($model->pushMessages(Yii::$app->user->getId())) {
 				Flash::add(Flash::TYPE_SUCCESS,
