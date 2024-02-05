@@ -203,6 +203,7 @@ class IssueStageChangeForm extends Model {
 		$message = $this->getMessagesModel();
 		$message->withWithoutStageIdOnNotFound = true;
 		$message->previousStage = IssueStage::getStages()[$this->previous_stage_id];
+		$message->stageChangeAt = $this->date_at;
 		$message->sms_owner_id = $this->user_id;
 		return $message->pushMessages() > 0;
 	}
@@ -218,7 +219,7 @@ class IssueStageChangeForm extends Model {
 				'issue' => $this->issue,
 				'note' => $this->getNote(),
 			]);
-			$this->_messagesForm->setIssue($this->issue);
+			$this->_messagesForm->stageChangeAt = $this->date_at;
 		}
 		return $this->_messagesForm;
 	}

@@ -9,8 +9,20 @@ class MessageTemplate extends EmailTemplate {
 	public ?string $primaryButtonText = null;
 	public ?string $primaryButtonHref = null;
 
+	private $key;
+
+	protected function setKey(string $value): void {
+		$this->key = $value;
+	}
+
+	public function getKey(): string {
+		return $this->key;
+	}
+
 	public static function buildFromEntity($entity): self {
-		return new self($entity->subject, $entity->body);
+		$model = new self($entity->subject, $entity->body);
+		$model->setKey($entity->template->key);
+		return $model;
 	}
 
 	public function getSmsMessage(): string {

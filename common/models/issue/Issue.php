@@ -393,7 +393,7 @@ class Issue extends ActiveRecord implements IssueInterface {
 		if ($days > 0) {
 			$date = new DateTime($this->stage_change_at);
 			$date->modify("+ $days days");
-			$this->stage_deadline_at = $date->format(DATE_ATOM);
+			$this->stage_deadline_at = $date->format('Y-m-d H:i:s');
 		} else {
 			$this->stage_deadline_at = null;
 		}

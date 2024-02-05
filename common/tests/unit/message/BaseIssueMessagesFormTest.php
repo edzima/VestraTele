@@ -60,7 +60,7 @@ abstract class BaseIssueMessagesFormTest extends Unit {
 		$this->giveModel();
 		$this->model->workersTypes = [IssueUser::TYPE_CUSTOMER];
 		$this->thenUnsuccessValidate();
-		$this->thenSeeError('Workers is invalid.', 'workersTypes');
+		$this->thenSeeError('Issue Workers Types is invalid.', 'workersTypes');
 	}
 
 	public function testNotIssueWorkerType(): void {

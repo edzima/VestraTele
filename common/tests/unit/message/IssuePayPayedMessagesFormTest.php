@@ -3,16 +3,10 @@
 namespace common\tests\unit\message;
 
 use common\fixtures\helpers\MessageTemplateFixtureHelper;
-use common\fixtures\helpers\SettlementFixtureHelper;
-use common\models\issue\IssueInterface;
-use common\models\issue\IssuePayInterface;
 use common\models\issue\IssueSettlement;
 use common\models\issue\IssueUser;
 use common\models\message\IssuePayPayedMessagesForm;
-use Yii;
-use yii\helpers\ArrayHelper;
 use yii\swiftmailer\Message;
-use ymaker\email\templates\entities\EmailTemplate;
 
 /**
  * @property IssuePayPayedMessagesForm $model
@@ -41,8 +35,10 @@ class IssuePayPayedMessagesFormTest extends IssuePayMessagesFormTest {
 		$smsPart = $this->model->getSmsToCustomer();
 		$this->tester->assertNotNull($smsPart);
 
+		$this->giveModel();
 		$this->model->isPartPayment = false;
 		$smsNotPart = $this->model->getSmsToCustomer();
+
 		$this->tester->assertNotSame($smsPart->message, $smsNotPart->message);
 	}
 
@@ -123,8 +119,8 @@ class IssuePayPayedMessagesFormTest extends IssuePayMessagesFormTest {
 		/**
 		 * @var Message $email
 		 */
-		$this->tester->assertTrue(array_key_exists($this->pay->calculation->getIssueModel()->agent->email, $email->getTo()));
-		$this->tester->assertTrue(array_key_exists($this->pay->calculation->getIssueModel()->tele->email, $email->getTo()));
+		$this->tester->assertTrue(array_key_exists($this->pay->calculation->getIssueModel()->agent->email, $email->getBcc()));
+		$this->tester->assertTrue(array_key_exists($this->pay->calculation->getIssueModel()->tele->email, $email->getBcc()));
 		$this->tester->assertSame(
 			'Email. Pay Payed: '
 			. $this->getFormattedPayValue(false)

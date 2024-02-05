@@ -10,6 +10,7 @@ use common\models\issue\IssueNote;
 use common\models\issue\IssueStage;
 use common\models\issue\IssueUser;
 use common\models\issue\query\IssueQuery;
+use Yii;
 use yii\db\Expression;
 
 class IssueStageChangeMessagesForm extends IssueMessagesForm {
@@ -22,6 +23,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 
 	public ?IssueNote $note = null;
 	public ?IssueStage $previousStage = null;
+	public ?string $stageChangeAt = null;
 
 	protected static function mainKeys(): array {
 		return [
@@ -140,41 +142,33 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 		return MessageTemplateKeyHelper::getValue($key, static::KEY_STAGE_ID);
 	}
 
+	public const GROUP_CUSTOMER_SMS = 'customerSms';
+	private const GROUP_CUSTOMER_EMAIL = 'customerEmail';
+	public const GROUP_AGENT_SMS = 'agentSms';
+	private const GROUP_WORKERS_EMAIL = 'workersEmail';
+
+	private array $templateGroups = [];
+
+	private const GROUP_KEY_WITHOUT_STAGE_ID = 'withoutStageId';
+
 	public function getCustomerSmsMessages(): array {
-		$currentWithStageIdKey = $this->withStageIdKey;
-		if ($this->withStageIdKey) {
-			$this->withStageIdKey = false;
-		}
-		$templates = $this->getTemplates(static::TYPE_SMS, $this->getCustomerTemplateKey());
-		$this->withStageIdKey = $currentWithStageIdKey;
-		$stages = [];
-		if ($templates !== null) {
-			foreach ($templates as $key => $template) {
-				$this->parseTemplate($template);
-				$stages[] = [
-					'stage_id' => static::getStageID($key),
-					'message' => Html::encode($template->getSmsMessage()),
-				];
-			}
-		}
-		return $stages;
+		return $this->getStagesMessagesData(static::GROUP_CUSTOMER_SMS);
 	}
 
-	public function getWorkersSmsMessages(): array {
-		$currentWithStageIdKey = $this->withStageIdKey;
-		if ($this->withStageIdKey) {
-			$this->withStageIdKey = false;
-		}
-		$templates = $this->getTemplates(static::TYPE_SMS, $this->getWorkersTemplateKey());
-		$this->withStageIdKey = $currentWithStageIdKey;
+	protected function getStagesMessagesData(string $groupType): array {
+		$groups = $this->getTemplatesGroups($groupType);
 		$stages = [];
-		if ($templates !== null) {
-			foreach ($templates as $key => $template) {
-				$this->parseTemplate($template);
-				$stages[] = [
-					'stage_id' => static::getStageID($key),
-					'message' => Html::encode($template->getSmsMessage()),
-				];
+
+		foreach ($groups as $key => $templates) {
+			if (is_int($key)) {
+				$template = reset($templates);
+				if ($template) {
+					$this->parseTemplate($template);
+					$stages[] = [
+						'stage_id' => $key,
+						'message' => Html::encode($template->getSmsMessage()),
+					];
+				}
 			}
 		}
 		return $stages;
@@ -190,6 +184,10 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 		$data = [
 			'stage' => $this->issue->getIssueStage()->name,
 		];
+		$stageChangeAt = $this->stageChangeAt ?: $this->issue->getIssueModel()->stage_change_at;
+		if ($stageChangeAt) {
+			$data['stageChangeAt'] = Yii::$app->formatter->asDate($stageChangeAt);
+		}
 		if ($this->previousStage) {
 			$data['previousStage'] = $this->previousStage->name;
 		}
@@ -234,43 +232,113 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 	}
 
 	protected function getAgentSMSTemplate(): ?MessageTemplate {
-		$template = parent::getAgentSMSTemplate();
-		if ($template === null && $this->withWithoutStageIdOnNotFound && $this->withStageIdKey) {
-			$self = clone($this);
-			$self->withStageIdKey = false;
-			$template = $self->getAgentSMSTemplate();
+		if ($this->agentSMSTemplate) {
+			return $this->agentSMSTemplate;
 		}
-		return $template;
+		return $this->findFirstTemplate(
+			$this->getTemplatesGroups(static::GROUP_AGENT_SMS)
+		);
 	}
 
 	protected function getCustomerSMSTemplate(): ?MessageTemplate {
-		$template = parent::getCustomerSMSTemplate();
-		if ($template === null && $this->withWithoutStageIdOnNotFound && $this->withStageIdKey) {
-			$self = clone($this);
-			$self->withStageIdKey = false;
-			$template = $self->getCustomerSMSTemplate();
+		if ($this->customerSMSTemplate) {
+			return $this->customerSMSTemplate;
 		}
-		return $template;
+		return $this->findFirstTemplate(
+			$this->getTemplatesGroups(static::GROUP_CUSTOMER_SMS)
+		);
 	}
 
 	protected function getCustomerEmailTemplate(): ?MessageTemplate {
-		$template = parent::getCustomerEmailTemplate();
-		if ($template === null && $this->withWithoutStageIdOnNotFound && $this->withStageIdKey) {
-			$self = clone($this);
-			$self->withStageIdKey = false;
-			$template = $self->getCustomerEmailTemplate();
+		if ($this->customerEmailTemplate) {
+			return $this->customerEmailTemplate;
+		}
+		return $this->findFirstTemplate(
+			$this->getTemplatesGroups(static::GROUP_CUSTOMER_EMAIL)
+		);
+	}
+
+	protected function getWorkersTemplate(): ?MessageTemplate {
+		if ($this->workersEmailTemplate) {
+			return $this->workersEmailTemplate;
+		}
+		return $this->findFirstTemplate(
+			$this->getTemplatesGroups(static::GROUP_WORKERS_EMAIL)
+		);
+	}
+
+	protected function findFirstTemplate(array $groupTemplates): ?MessageTemplate {
+		$template = null;
+		if ($this->withStageIdKey) {
+			$stageTemplates = $groupTemplates[$this->issue->getIssueStageId()] ?? null;
+			if (!empty($stageTemplates)) {
+				if (count($stageTemplates) > 1) {
+					Yii::warning('Find more than 1 templates: ' . count($stageTemplates) . ' for stage: ' . $this->issue->getIssueStageId(), __METHOD__);
+				}
+				$template = reset($stageTemplates);
+			}
+		}
+		if (empty($template) && ($this->withWithoutStageIdOnNotFound || !$this->withStageIdKey)) {
+			$withoutStageIdTemplates = $groupTemplates[static::GROUP_KEY_WITHOUT_STAGE_ID] ?? null;
+			if (!empty($withoutStageIdTemplates)) {
+				if (count($withoutStageIdTemplates) > 1) {
+					Yii::warning('Find more than 1 templates without stage id.', __METHOD__);
+				}
+				$template = reset($withoutStageIdTemplates);
+			}
 		}
 		return $template;
 	}
 
-	protected function getWorkersTemplate(): ?MessageTemplate {
-		$template = parent::getWorkersTemplate();
-		if ($template === null && $this->withWithoutStageIdOnNotFound && $this->withStageIdKey) {
-			$self = clone($this);
-			$self->withStageIdKey = false;
-			$template = $self->getWorkersTemplate();
+	protected function getTemplatesGroups(string $group) {
+		if (isset($this->templateGroups[$group])) {
+			return $this->templateGroups[$group];
 		}
-		return $template;
+		$currentWithStageIdKey = $this->withStageIdKey;
+		if ($this->withStageIdKey) {
+			$this->withStageIdKey = false;
+		}
+		$templates = [];
+		switch ($group) {
+			case static::GROUP_CUSTOMER_SMS:
+				$templates = $this->getTemplates(static::TYPE_SMS, $this->getCustomerTemplateKey());
+				break;
+			case static::GROUP_CUSTOMER_EMAIL:
+				$templates = $this->getTemplates(static::TYPE_EMAIL, $this->getCustomerTemplateKey());
+				break;
+			case static::GROUP_AGENT_SMS:
+				$templates = $this->getTemplates(static::TYPE_SMS, $this->getWorkersTemplateKey());
+				break;
+			case static::GROUP_WORKERS_EMAIL:
+				$templates = $this->getTemplates(static::TYPE_EMAIL, $this->getWorkersTemplateKey());
+				break;
+		}
+		$this->withStageIdKey = $currentWithStageIdKey;
+		if ($templates === null) {
+			$templates = [];
+		}
+		if ($templates) {
+			$templates = $this->groupTemplates($templates);
+		}
+		$this->templateGroups[$group] = $templates;
+		return $templates;
+	}
+
+	/**
+	 * @param MessageTemplate[] $templates
+	 * @return MessageTemplate[][]
+	 */
+	protected function groupTemplates(array $templates): array {
+		$groupTemplates = [];
+		foreach ($templates as $template) {
+			$stageId = static::getStageID($template->getKey());
+			if ($stageId === null) {
+				$groupTemplates[static::GROUP_KEY_WITHOUT_STAGE_ID][] = $template;
+			} else {
+				$groupTemplates[$stageId][] = $template;
+			}
+		}
+		return $groupTemplates;
 	}
 
 }

@@ -74,7 +74,23 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 			if ($this->sendEmailToWorkers === null) {
 				$this->sendEmailToWorkers = !empty($this->getIssueUsersEmails());
 			}
+			if (!empty($this->workersTypes)) {
+				$this->workersTypes = $this->filterIssueWorkersTypes(
+					$this->workersTypes,
+					ArrayHelper::getColumn($this->issue->getIssueModel()->users, 'type')
+				);
+			}
 		}
+	}
+
+	protected function filterIssueWorkersTypes(array $workersTypes, array $issueWorkersTypes): array {
+		$defaultWorkersTypes = [];
+		foreach ($workersTypes as $type) {
+			if (in_array($type, $issueWorkersTypes)) {
+				$defaultWorkersTypes[] = $type;
+			}
+		}
+		return $defaultWorkersTypes;
 	}
 
 	public function rules(): array {
@@ -174,12 +190,15 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 		if ($this->sendSmsToCustomer) {
 			$sms = $this->getSmsToCustomer();
 			if ($sms && $sms->pushJob()) {
+				Yii::warning('push sms to customer: ' . $sms->message, __METHOD__);
 				$count++;
 			}
 		}
 		if ($this->sendEmailToCustomer) {
 			$message = $this->getEmailToCustomer();
 			if ($message && $message->send()) {
+				Yii::warning('push email to customer: ' . $message->getSubject(), __METHOD__);
+
 				$count++;
 			}
 		}
@@ -191,12 +210,16 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 		if ($this->sendSmsToAgent) {
 			$sms = $this->getSmsToAgent();
 			if ($sms && $sms->pushJob()) {
+				Yii::warning('push sms to agent: ' . $sms->message, __METHOD__);
+
 				$count++;
 			}
 		}
 		if ($this->sendEmailToWorkers) {
 			$message = $this->getEmailToWorkers();
 			if ($message && $message->send()) {
+				Yii::warning('push email to workers: ' . $message->getSubject(), __METHOD__);
+
 				$count++;
 			}
 		}
@@ -294,6 +317,8 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 		if ($template === null) {
 			return null;
 		}
+		codecept_debug($this->issue->getIssueStageId());
+		codecept_debug($template->getKey());
 		$this->parseTemplate($template);
 		return $this->createEmail($template)
 			->setBcc($emails);
