@@ -195,6 +195,7 @@ class ReportForm extends Model {
 
 			$query = LeadQuestion::find()
 				->indexBy('id')
+				->andWhere(['is_active' => true])
 				->forStatus($this->status_id)
 				->forType($this->lead_type_id);
 			if ($this->getModel()->isNewRecord && $this->lead !== null) {
