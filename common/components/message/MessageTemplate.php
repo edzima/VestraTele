@@ -19,9 +19,10 @@ class MessageTemplate extends EmailTemplate {
 		return $this->key;
 	}
 
-	public static function buildFromEntity($entity): self {
+	public static function buildFromEntity($entity, $key = null): self {
 		$model = new self($entity->subject, $entity->body);
-		$model->setKey($entity->template->key);
+		$model->setKey($key);
+
 		return $model;
 	}
 
