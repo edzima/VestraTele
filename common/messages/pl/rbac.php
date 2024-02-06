@@ -24,6 +24,7 @@ return array_merge([
 	'issue' => 'Sprawy',
 	'issue.attachments' => 'Sprawy - Załączniki',
 	'issue.claim' => 'Sprawy - Roszczenia',
+	'issue.claim.totalSum' => 'Sprawy - Roszczenia (SUMA)',
 	'issue.create' => 'Sprawy - dodawanie',
 	'issue.delete' => 'Sprawy - usuwanie',
 	'issue.link-user' => 'Sprawy - przypisywanie użytkowników',

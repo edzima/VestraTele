@@ -140,7 +140,7 @@ use yii\widgets\ActiveForm;
 			: ''
 		?>
 
-		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ?
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM_TOTAL_SUM) ?
 			$form->field($model, 'withClaimsSum', ['options' => ['class' => 'col-md-2']])->checkbox()
 			: ''
 		?>

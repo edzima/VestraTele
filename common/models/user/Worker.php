@@ -31,6 +31,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_ENTITY_RESPONSIBLE_MANAGER = 'entity_responsible.manager';
 
 	public const PERMISSION_ISSUE_CLAIM = 'issue.claim';
+	public const PERMISSION_ISSUE_CLAIM_TOTAL_SUM = 'issue.claim.totalSum';
 	public const PERMISSION_ISSUE_CREATE = 'issue.create';
 	public const PERMISSION_ISSUE_DELETE = 'issue.delete';
 	public const PERMISSION_ISSUE_LINK_USER = 'issue.link-user';
