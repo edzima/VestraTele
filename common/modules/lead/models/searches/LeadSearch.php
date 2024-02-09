@@ -8,6 +8,7 @@ use common\models\SearchModel;
 use common\models\user\User;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadAddress;
+use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadQuestion;
@@ -64,6 +65,11 @@ class LeadSearch extends Lead implements SearchModel {
 	public $answers = [];
 	public $closedQuestions = [];
 
+	public $excludedClosedQuestions = [];
+
+	public $onlyWithEmail;
+	public $onlyWithPhone;
+
 	public $reportStatus;
 
 	public $selfUserId;
@@ -103,10 +109,10 @@ class LeadSearch extends Lead implements SearchModel {
 			[['reportStatus', 'hoursAfterLastReport'], 'integer'],
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
-			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress'], 'boolean'],
+			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress', 'onlyWithEmail', 'onlyWithPhone'], 'boolean'],
 			['name', 'string', 'min' => 3],
-			[['duplicatePhone', 'fromMarket', 'selfUserId'], 'default', 'value' => null],
-			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
+			[['duplicatePhone', 'fromMarket', 'selfUserId', 'onlyWithEmail', 'onlyWithPhone',], 'default', 'value' => null],
+			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'excludedClosedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames()), 'allowArray' => true],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			[['selfUserId'], 'in', 'range' => function () { return $this->selfUsersIds(); }, 'allowArray' => true, 'skipOnEmpty' => true],
@@ -129,6 +135,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'withoutReport' => Yii::t('lead', 'Without Report'),
 				'user_id' => Yii::t('lead', 'User'),
 				'closedQuestions' => Yii::t('lead', 'Closed Questions'),
+				'excludedClosedQuestions' => Yii::t('lead', 'Excluded Closed Questions'),
 				'duplicateEmail' => Yii::t('lead', 'Duplicate Email'),
 				'duplicatePhone' => Yii::t('lead', 'Duplicate Phone'),
 				'user_type' => Yii::t('lead', 'Type'),
@@ -136,6 +143,8 @@ class LeadSearch extends Lead implements SearchModel {
 				'to_at' => Yii::t('lead', 'To At'),
 				'fromMarket' => Yii::t('lead', 'From Market'),
 				'olderByDays' => Yii::t('lead', 'Older by days'),
+				'onlyWithEmail' => Yii::t('lead', 'Only with Email'),
+				'onlyWithPhone' => Yii::t('lead', 'Only with Phone'),
 				'reportStatus' => Yii::t('lead', 'Report Status'),
 				'reportStatusCount' => Yii::t('lead', 'Report Status Count'),
 				'hoursAfterLastReport' => Yii::t('lead', 'Hours after newest Report'),
@@ -238,6 +247,8 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyDuplicates($query);
 		$this->applyFromMarketFilter($query);
 		$this->applyNameFilter($query);
+		$this->applyOnlyWithEmail($query);
+		$this->applyOnlyWithPhone($query);
 		$this->applyUserFilter($query);
 		$this->applySelfUserFilter($query);
 		$this->applyPhoneFilter($query);
@@ -362,7 +373,8 @@ class LeadSearch extends Lead implements SearchModel {
 		return $this->reportsStatusesCount[$this->reportStatus];
 	}
 
-	private function applyAnswerFilter(ActiveQuery $query): void {
+	private function applyAnswerFilter(LeadQuery $query): void {
+		$this->applyExcludedClosedQuestions($query);
 		if (!empty($this->closedQuestions)) {
 			foreach ($this->closedQuestions as $closedQuestionId) {
 				$this->answers[$closedQuestionId] = true;
@@ -390,6 +402,20 @@ class LeadSearch extends Lead implements SearchModel {
 					$answerQuery->likeAnswers($this->answers);
 				},
 			], false);
+		}
+	}
+
+	private function applyExcludedClosedQuestions(LeadQuery $query): void {
+		if (!empty($this->excludedClosedQuestions)) {
+			$query->andWhere([
+				'NOT IN',
+				Lead::tableName() . '.id',
+				LeadAnswer::find()
+					->select(Lead::tableName() . '.id')
+					->andWhere(['question_id' => $this->excludedClosedQuestions])
+					->joinWith('report.lead'),
+
+			]);
 		}
 	}
 
@@ -636,5 +662,17 @@ class LeadSearch extends Lead implements SearchModel {
 			static::DEADLINE_EXCEEDED => Yii::t('lead', 'Exceeded'),
 			static::DEADLINE_UPDATED => Yii::t('lead', 'Updated Deadline'),
 		];
+	}
+
+	private function applyOnlyWithEmail(LeadQuery $query) {
+		if ($this->onlyWithEmail) {
+			$query->andWhere(Lead::tableName() . '.email IS NOT NULL');
+		}
+	}
+
+	private function applyOnlyWithPhone(LeadQuery $query) {
+		if ($this->onlyWithPhone) {
+			$query->andWhere(Lead::tableName() . '.phone IS NOT NULL');
+		}
 	}
 }

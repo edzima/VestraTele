@@ -95,15 +95,31 @@ use kartik\select2\Select2;
 
 	<div class="row">
 
-		<?= $form->field($model, 'closedQuestions', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
-			'data' => LeadSearch::getClosedQuestionsNames(),
-			'options' => ['multiple' => true,],
-			'pluginOptions' => [
-				'placeholder' => $model->getAttributeLabel('closedQuestions'),
-				'allowClear' => true,
-			],
-		])
+		<?php
+		$closedData = LeadSearch::getClosedQuestionsNames();
+		if (!empty($closedData)) {
+			echo $form->field($model, 'closedQuestions', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+				'data' => $closedData,
+				'options' => ['multiple' => true,],
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('closedQuestions'),
+					'allowClear' => true,
+				],
+			]);
+			echo $form->field($model, 'excludedClosedQuestions', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+				'data' => $closedData,
+				'options' => ['multiple' => true,],
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('excludedClosedQuestions'),
+					'allowClear' => true,
+				],
+			]);
+		}
 		?>
+
+		<?= $form->field($model, 'onlyWithEmail', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
+
+		<?= $form->field($model, 'onlyWithPhone', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
 		<?= $form->field($model, 'withoutArchives', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
