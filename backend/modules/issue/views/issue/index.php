@@ -1,6 +1,7 @@
 <?php
 
 use backend\helpers\Html;
+use backend\helpers\Url;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\widgets\CsvForm;
 use common\behaviors\IssueTypeParentIdAction;
@@ -82,6 +83,18 @@ $this->params['issueParentTypeNav'] = [
 					'class' => 'btn btn-danger',
 					'title' => Yii::t('issue', 'Archive'),
 					'aria-label' => Yii::t('issue', 'Archive'),
+					'data-pjax' => 0,
+				])
+			: ''
+		?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAT)
+			? Html::a('<i class="fa fa-bar-chart"></i>',
+				['stat/index', Url::PARAM_ISSUE_PARENT_TYPE => $searchModel->parentTypeId],
+				[
+					'class' => 'btn btn-info',
+					'title' => Yii::t('issue', 'Stats'),
+					'aria-label' => Yii::t('issue', 'Stats'),
 					'data-pjax' => 0,
 				])
 			: ''
