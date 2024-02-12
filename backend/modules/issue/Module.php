@@ -110,6 +110,11 @@ class Module extends BaseModule {
 					],
 					[
 						'allow' => true,
+						'controllers' => ['issue/stat'],
+						'permissions' => [Worker::PERMISSION_ISSUE_STAT],
+					],
+					[
+						'allow' => true,
 						'controllers' => ['issue/shipment-poczta-polska'],
 						'permissions' => [Worker::PERMISSION_ISSUE_SHIPMENT],
 					],
