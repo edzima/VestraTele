@@ -43,7 +43,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_ISSUE_STAT = 'issue.stat';
 	public const PERMISSION_MESSAGE_EMAIL_ISSUE_CREATE = 'message:email.issue:create';
 	public const PERMISSION_MESSAGE_EMAIL_ISSUE_SETTLEMENT_CREATE = 'message:email.issueSettlement:create';
-
+	public const PERMISSION_MESSAGE_EMAIL_ISSUE_PAY_PAID = 'message:email.issuePay:paid';
 	public const PERMISSION_MESSAGE_EMAIL_ISSUE_STAGE_CHANGE = 'message:email.issue:stageChange';
 	public const PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE = 'issue.message.note.issue';
 	public const PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SUMMON = 'issue.message.note.summon';

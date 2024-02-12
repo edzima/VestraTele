@@ -32,7 +32,7 @@ use yii\widgets\ActiveForm;
 	</div>
 
 	<div class="row">
-		<div class="col-md-5 col-lg-3">
+		<div class="col-md-6 col-lg-5">
 			<?= IssueMessagesFormWidget::widget([
 				'form' => $form,
 				'model' => $model->getMessagesModel(),

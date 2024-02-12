@@ -30,6 +30,7 @@ return array_merge([
 	'issue.link-user' => 'Sprawy - przypisywanie użytkowników',
 	'message:email.issue:create' => 'Powiadomienia Mailowe: Założenie Sprawy',
 	'message:email.issueSettlement:create' => 'Powiadomienie Mailowe: Nowe Rozliczenie',
+	'message:email.issuePay:paid' => 'Powiadomienia Mailowe: Opłącenie wpłaty',
 	'message:email.issue:stageChange' => 'Powiadomienia Mailowe: Zmiana etapu Sprawy',
 	'message:email.issueSummon:imminentDeadline' => 'Powiadomienia Mailowe: Zlecenia - Deadline',
 	'issue.message.note.issue' => 'Powiadomienia Mailowe w Notatkach do Sprawy',
