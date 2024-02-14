@@ -81,7 +81,10 @@ class LeadMultipleSmsForm extends QueueSmsForm {
 		$ids = [];
 		foreach ($this->getModels() as $model) {
 			$sms = $this->createLeadSms($model);
-			$ids[] = $sms->pushJob();
+			$id = $sms->pushJob();
+			if ($id) {
+				$ids[] = $id;
+			}
 		}
 		return $ids;
 	}

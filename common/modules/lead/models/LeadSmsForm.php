@@ -63,9 +63,16 @@ class LeadSmsForm extends QueueSmsForm {
 						'status' => static::getStatusNames()[$this->getLead()->getStatusId()],
 					]),
 				],
+				['phone', 'phoneBlacklist'],
 			],
 			parent::rules()
 		);
+	}
+
+	public function phoneBlacklist(): void {
+		if ($this->lead->phoneBlacklist) {
+			$this->addError('phone', 'Phone is on Blacklist.');
+		}
 	}
 
 	public function getLead(): ActiveLead {

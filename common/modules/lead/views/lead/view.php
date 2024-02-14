@@ -1,5 +1,6 @@
 <?php
 
+use common\helpers\Flash;
 use common\helpers\Html;
 use common\helpers\Url;
 use common\models\user\User;
@@ -34,7 +35,31 @@ $this->title = $model->getName();
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
-
+$phoneBlacklist = $model->phoneBlacklist;
+if ($phoneBlacklist) {
+	$userPhoneBlacklist = $phoneBlacklist->user;
+	$deleteLink = Html::a(Yii::t('lead', 'Delete from Blacklist'), [
+		'phone-blacklist/delete', 'phone' => $model->getPhone(), 'returnUrl' => Url::current(),
+	], [
+		'data-method' => 'POST',
+	]);
+	if ($userPhoneBlacklist) {
+		Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'User: {user} add this phone: {phone} to Blacklist - {date}. {deleteLink}', [
+			'user' => $userPhoneBlacklist->getFullName(),
+			'phone' => $phoneBlacklist->phone,
+			'date' => Yii::$app->formatter->asDate($phoneBlacklist->created_at),
+			'deleteLink' => $deleteLink,
+		]));
+	} else {
+		Flash::add(Flash::TYPE_WARNING,
+			Yii::t('lead', 'This phone: {phone} is on Blacklist - {date}. {deleteLink}', [
+				'user' => $userPhoneBlacklist->getFullName(),
+				'phone' => $phoneBlacklist->phone,
+				'date' => Yii::$app->formatter->asDate($phoneBlacklist->created_at),
+				'deleteLink' => $deleteLink,
+			]));
+	}
+}
 ?>
 <div class="lead-view">
 
@@ -43,6 +68,8 @@ YiiAsset::register($this);
 	<p class="d-inline">
 
 		<?= Html::a(Yii::t('lead', 'Report'), ['report/report', 'id' => $model->getId(), 'hash' => $model->getHash()], ['class' => 'btn btn-success']) ?>
+
+
 
 		<?= ShortReportStatusesWidget::widget(['lead_id' => $model->getId()]) ?>
 
@@ -89,13 +116,25 @@ YiiAsset::register($this);
 		?>
 
 
-		<?= Yii::$app->user->can(User::PERMISSION_LEAD_SMS_WELCOME)
+
+
+		<?= $phoneBlacklist === null && Yii::$app->user->can(User::PERMISSION_LEAD_SMS_WELCOME)
 			? LeadSmsBtnWidget::widget([
 				'model' => $model,
 			])
 			: ''
 		?>
 
+		<?= $phoneBlacklist === null
+			? Html::a('<s>' . Html::icon('lock') . '</s>', [
+				'phone-blacklist/create', 'phone' => $model->getPhone(), 'returnUrl' => Url::current(),
+			], [
+				'class' => 'btn btn-danger',
+				'data-method' => 'POST',
+				'title' => Yii::t('lead', 'Add to Add to Blacklist. Blocked SMS'),
+			])
+			: ''
+		?>
 
 		<?= !$userIsFromMarket ?
 			Html::a(Yii::t('lead', 'Assign User'), ['user/assign-single', 'id' => $model->getId()],
