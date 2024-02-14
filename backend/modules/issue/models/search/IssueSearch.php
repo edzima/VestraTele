@@ -2,7 +2,6 @@
 
 namespace backend\modules\issue\models\search;
 
-use common\models\AddressSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
 use common\models\issue\IssuePayCalculation;
@@ -52,13 +51,6 @@ class IssueSearch extends BaseIssueSearch {
 	private ?array $ids = null;
 
 	private bool $isLoad = false;
-
-	public function __construct($config = []) {
-		if (!isset($config['addressSearch'])) {
-			$config['addressSearch'] = new AddressSearch();
-		}
-		parent::__construct($config);
-	}
 
 	public function rules(): array {
 		return array_merge(parent::rules(), [
