@@ -12,7 +12,7 @@ use yii\base\Component;
 use yii\caching\CacheInterface;
 use yii\di\Instance;
 
-class ReferenceRateNBPComponent extends Component {
+class ReferenceRateNBPComponent extends Component implements InterestRateInterface {
 
 	public string $archivePath = 'https://static.nbp.pl/dane/stopy/stopy_procentowe_archiwum.xml';
 
@@ -26,6 +26,14 @@ class ReferenceRateNBPComponent extends Component {
 
 	public function init() {
 		$this->cache = Instance::ensure($this->cache);
+	}
+
+	public function getInterestRate(string $date): ?float {
+		$model = $this->findModel($date);
+		if ($model) {
+			return $model->ref;
+		}
+		return null;
 	}
 
 	public function findModel(string $date): ?ReferenceRateNBP {

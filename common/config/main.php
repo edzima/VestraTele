@@ -12,6 +12,7 @@ use common\components\provision\Provisions;
 use common\components\TaxComponent;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\credit\Module as CreditModule;
 use common\modules\czater\Czater;
 use common\modules\lead\components\LeadClient;
 use common\modules\lead\Module as LeadModule;
@@ -41,6 +42,9 @@ $config = [
 		'@npm' => '@vendor/npm-asset',
 	],
 	'modules' => [
+		'credit' => [
+			'class' => CreditModule::class,
+		],
 		'teryt' => [
 			'class' => TerytModule::class,
 		],

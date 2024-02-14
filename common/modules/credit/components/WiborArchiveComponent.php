@@ -8,7 +8,7 @@ use yii\base\ErrorException;
 use yii\caching\CacheInterface;
 use yii\di\Instance;
 
-class WiborArchiveComponent extends Component {
+class WiborArchiveComponent extends Component implements InterestRateInterface {
 
 	public string $archiveCSVPath = 'https://stooq.pl/q/d/l/?s=plopln3m&i=d';
 	public string $separator = ',';
@@ -18,16 +18,37 @@ class WiborArchiveComponent extends Component {
 	/**
 	 * @var string|array|CacheInterface
 	 */
-	public $cache;
+	public $cache = 'cache';
 
 	public string $cacheKey = 'referenceRateNBP';
 	public int $cacheDuration = 60 * 60 * 24;
+
+	private array $_data = [];
 
 	public function init() {
 		$this->cache = Instance::ensure($this->cache);
 	}
 
+	public function getInterestRate(string $date): ?float {
+		$date = date('Y-m-d', strtotime($date));
+		$value = $this->getData()[$date] ?? null;
+		if ($value) {
+			return $value;
+		}
+		return null;
+	}
+
+	/**
+	 * Wibor Values indexed by date (Y-m-d)
+	 *
+	 * @param bool $cache
+	 * @return float[]
+	 * @throws WiborArchiveException
+	 */
 	public function getData(bool $cache = true): array {
+		if (!empty($this->_data) && $cache) {
+			return $this->_data;
+		}
 		$data = [];
 		if ($cache) {
 			$data = $this->cache->get($this->cacheKey);
@@ -37,8 +58,9 @@ class WiborArchiveComponent extends Component {
 			if (!empty($data) && $cache) {
 				$this->cache->set($this->cacheKey, $data, $this->cacheDuration);
 			}
+			$this->_data = $data;
 		}
-		return $data;
+		return $this->_data;
 	}
 
 	/**
