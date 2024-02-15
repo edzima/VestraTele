@@ -37,6 +37,7 @@ class ReportForm extends Model {
 	public int $addressType = LeadAddress::TYPE_CUSTOMER;
 	public bool $withAddress = false;
 	public ?Address $address = null;
+	public bool $withLinkUsers = true;
 
 	private ?ActiveLead $lead = null;
 	private ?LeadReport $model = null;
@@ -50,6 +51,8 @@ class ReportForm extends Model {
 
 	public $tele_id;
 	public $partner_id;
+
+	public $linkUserTypeForLeadNotForReportOwner = LeadUser::TYPE_TELE;
 
 	public function setOpenAnswers(array $questionsAnswers): void {
 		$models = $this->getAnswersModels();
@@ -94,6 +97,7 @@ class ReportForm extends Model {
 				'enableClientValidation' => false,
 				'message' => Yii::t('lead', 'Details cannot be blank when answers is empty.'),
 			],
+			[['partner_id', 'tele_id'], 'default', 'value' => null],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 			['closedQuestions', 'in', 'range' => array_keys($this->getClosedQuestionsData()), 'allowArray' => true],
 			['partner_id', 'in', 'range' => array_keys($this->getUsersNames())],
@@ -215,7 +219,10 @@ class ReportForm extends Model {
 	public function save(bool $validate = true): bool {
 		if ($validate && !$this->validate()) {
 			if ($this->getErrors()) {
-				Yii::warning($this->getErrors(), __METHOD__ . '.validateModel');
+				Yii::warning([
+					'errors' => $this->getErrors(),
+					'attributes' => $this->getAttributes(),
+				], __METHOD__ . '.validateModel');
 			}
 			foreach ($this->getAnswersModels() as $model) {
 				if ($model->hasErrors()) {
@@ -289,17 +296,19 @@ class ReportForm extends Model {
 	}
 
 	protected function linkUser(): void {
-		if (!$this->lead->isForUser($this->owner_id)) {
-			$type = array_key_exists(LeadUser::TYPE_OWNER, $this->lead->getUsers())
-				? LeadUser::TYPE_TELE
-				: LeadUser::TYPE_OWNER;
-			$this->lead->linkUser($type, $this->owner_id);
-		}
-		if (!empty($this->tele_id) && !isset($this->lead->getUsers()[LeadUser::TYPE_TELE])) {
-			$this->lead->linkUser(LeadUser::TYPE_TELE, $this->tele_id);
-		}
-		if (!empty($this->partner_id) && !isset($this->lead->getUsers()[LeadUser::TYPE_PARTNER])) {
-			$this->lead->linkUser(LeadUser::TYPE_TELE, $this->partner_id);
+		if ($this->withLinkUsers) {
+			if ($this->linkUserTypeForLeadNotForReportOwner && !$this->lead->isForUser($this->owner_id)) {
+				$type = array_key_exists(LeadUser::TYPE_OWNER, $this->lead->getUsers())
+					? $this->linkUserTypeForLeadNotForReportOwner
+					: LeadUser::TYPE_OWNER;
+				$this->lead->linkUser($type, $this->owner_id);
+			}
+			if (!empty($this->tele_id) && !isset($this->lead->getUsers()[LeadUser::TYPE_TELE])) {
+				$this->lead->linkUser(LeadUser::TYPE_TELE, $this->tele_id);
+			}
+			if (!empty($this->partner_id) && !isset($this->lead->getUsers()[LeadUser::TYPE_PARTNER])) {
+				$this->lead->linkUser(LeadUser::TYPE_TELE, $this->partner_id);
+			}
 		}
 	}
 

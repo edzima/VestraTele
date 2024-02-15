@@ -108,17 +108,18 @@ class LeadMessageController extends Controller {
 								}
 							}
 						}
-					}
-					if ($smsCount < $limit) {
-						if ($model->pushJob()) {
-							$count++;
+						if ($smsCount < $limit) {
+							if ($model->pushJob()) {
+								$count++;
+							}
+						} else {
+							Console::output('Not qualify to send');
+							if ($smsTagId && $lastSmsReportId) {
+								$notQualify[] = $lastSmsReportId;
+							}
 						}
-					} else {
-						Console::output('Not qualify to send');
-						if ($smsTagId && $lastSmsReportId) {
-							$notQualify[] = $lastSmsReportId;
-						}
 					}
+
 				} else {
 					Yii::warning('In Lead: ' . $lead->getId() . ' Owner without all required data.');
 				}
