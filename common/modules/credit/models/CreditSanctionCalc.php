@@ -22,7 +22,7 @@ class CreditSanctionCalc extends Model {
 
 	public ?int $periods = null;
 
-	public string $creditAt = '';
+	public string $firstInstallmentAt = '';
 
 	public string $dateAt = '';
 
@@ -130,6 +130,21 @@ class CreditSanctionCalc extends Model {
 
 	private array $installments = [];
 
+	public function generateInstallments(): void {
+		$this->installments = [];
+		for ($period = 1; $period <= $this->periods; $period++) {
+			$this->installments[$period] = $this->generateInstalment($period);
+		}
+	}
+
+	public function generateInstalment(int $period, float $debt): CreditLoanInstallment {
+		$installment = new CreditLoanInstallment();
+		$installment->period = $period;
+		$installment->date = $this->getInstalmentDateAt($period);
+	}
+
+
+
 	/**
 	 * @param bool $refresh
 	 * @return CreditLoanInstallment[]
@@ -138,7 +153,7 @@ class CreditSanctionCalc extends Model {
 	public function getLoanInstallments(bool $refresh = false): array {
 		if ($refresh || empty($this->installments)) {
 			$this->installments = [];
-			$dateAt = new DateTime($this->creditAt);
+			$dateAt = new DateTime($this->firstInstallmentAt);
 			$debt = $this->sumCredit;
 			$percent = $this->yearNominalPercent / 100;
 			for ($i = 1; $i <= $this->periods; $i++) {
@@ -177,11 +192,13 @@ class CreditSanctionCalc extends Model {
 		return $this->installments;
 	}
 
-	public function generateInstalment(int $index, float $debt): CreditLoanInstallment {
-		$installment = new CreditLoanInstallment();
-		$installment->period = $index;
+	protected function getInstalmentDateAt(int $period): string {
+		$dateTime = new DateTime($this->firstInstallmentAt);
+		if ($period > 1) {
+			$dateTime = $dateTime->modify("+$period month");
+		}
+		return $dateTime->format('Y-m-d');
 	}
-
 	public static function getInstallmentsTypes(): array {
 		return CreditLoanInstallment::getInstallmentsTypes();
 	}

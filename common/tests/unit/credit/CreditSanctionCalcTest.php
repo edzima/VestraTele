@@ -26,7 +26,7 @@ class CreditSanctionCalcTest extends Unit {
 		$this->giveModel();
 		$this->loadDefaultValues();
 		$this->thenSuccessValidate();
-		$this->tester->assertSame(CreditLoanInstallment::INTEREST_RATE_FIXED, $this->model->interestRate);
+		$this->tester->assertSame(CreditLoanInstallment::INTEREST_RATE_FIXED, $this->model->interestRateType);
 		$this->tester->assertSame(CreditLoanInstallment::INSTALLMENTS_EQUAL, $this->model->installmentsType);
 		$this->tester->assertCount(60, $this->model->getLoanInstallments());
 	}
@@ -34,7 +34,7 @@ class CreditSanctionCalcTest extends Unit {
 	public function testEqualInstallmentsWithFixedRate() {
 		$this->giveModel();
 		$this->loadDefaultValues();
-		$this->model->interestRate = CreditLoanInstallment::INTEREST_RATE_FIXED;
+		$this->model->interestRateType = CreditLoanInstallment::INTEREST_RATE_FIXED;
 		$this->model->installmentsType = CreditLoanInstallment::INSTALLMENTS_EQUAL;
 		$this->thenSuccessValidate();
 		$instalments = $this->model->getLoanInstallments();
@@ -54,7 +54,7 @@ class CreditSanctionCalcTest extends Unit {
 		$this->model->provision = 2000;
 		$this->model->periods = 60;
 		$this->model->dateAt = '2024-01-01';
-		$this->model->creditAt = '2022-01-01';
+		$this->model->firstInstallmentAt = '2022-01-01';
 		$this->model->yearNominalPercent = 5;
 	}
 
