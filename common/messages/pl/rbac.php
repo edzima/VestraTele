@@ -53,6 +53,7 @@ return array_merge([
 	'lawyer_assistant' => 'Asystent Prawnika',
 	'lawyer_office' => 'Prawnik [Biuro]',
 	'lead' => 'Leads',
+	'lead.manager' => 'Leads - Manager',
 	'lead.delete' => 'Leads - Usuwanie',
 	'lead.dialer' => 'Leads - Dialer',
 	'lead.dialer.manager' => 'Leads- Dialer (Manager)',
