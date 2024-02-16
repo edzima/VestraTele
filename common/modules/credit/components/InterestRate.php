@@ -3,6 +3,7 @@
 namespace common\modules\credit\components;
 
 use common\modules\credit\models\CreditLoanInstallment;
+use Yii;
 use yii\base\Component;
 use yii\di\Instance;
 
@@ -31,12 +32,16 @@ class InterestRate extends Component implements InterestRateInterface {
 				$wibor = $this->getWibor()->getInterestRate($date);
 				if ($wibor) {
 					$interestRate += $wibor;
+				} else {
+					Yii::warning('not found wibor rate for date: ' . $date);
 				}
 				break;
 			case static::INTEREST_RATE_REFERENCE_RATE:
 				$reference = $this->getReferenceRateNBP()->getInterestRate($date);
 				if ($reference) {
 					$interestRate += $reference;
+				} else {
+					Yii::warning('not found reference rate for date: ' . $date);
 				}
 				break;
 		}
@@ -64,4 +69,13 @@ class InterestRate extends Component implements InterestRateInterface {
 		}
 		return $this->referenceRate;
 	}
+
+	public static function getInterestRateNames(): array {
+		return [
+			static::INTEREST_RATE_FIXED => Yii::t('credit', 'Fixed interest rate'),
+			static::INTEREST_RATE_WIBOR_3M => Yii::t('credit', 'Wibor 3M'),
+			static::INTEREST_RATE_REFERENCE_RATE => Yii::t('credit', 'Reference Rate'),
+		];
+	}
+
 }

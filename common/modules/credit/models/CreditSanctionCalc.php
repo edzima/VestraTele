@@ -7,13 +7,17 @@ use DateTime;
 use Exception;
 use MathPHP\Finance;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\di\Instance;
 
 class CreditSanctionCalc extends Model {
 
-	public string $installmentsType = CreditLoanInstallment::INSTALLMENTS_EQUAL;
-	public string $interestRateType = CreditLoanInstallment::INTEREST_RATE_FIXED;
+	public const INSTALLMENTS_EQUAL = 'equal';
+	public const INSTALLMENTS_DECLINING = 'declining';
+
+	public string $installmentsType = self::INSTALLMENTS_EQUAL;
+	public string $interestRateType = InterestRate::INTEREST_RATE_FIXED;
 
 	public ?float $sumCredit = null;
 	public ?float $provision = null;
@@ -42,7 +46,7 @@ class CreditSanctionCalc extends Model {
 		return [
 			[
 				[
-					'sumCredit', 'creditAt', 'yearNominalPercent', 'periods', 'dateAt',
+					'sumCredit', 'firstInstallmentAt', 'yearNominalPercent', 'periods', 'dateAt',
 					'installmentsType', 'interestRateType',
 				], 'required',
 			],
@@ -55,7 +59,7 @@ class CreditSanctionCalc extends Model {
 		return [
 			'sumCredit' => Yii::t('credit', 'Sum Credit'),
 			'yearNominalPercent' => Yii::t('credit', '%'),
-			'creditAt' => Yii::t('credit', 'Credit At'),
+			'firstInstallmentAt' => Yii::t('credit', 'First installment At'),
 			'periods' => Yii::t('credit', 'Installments'),
 			'dateAt' => Yii::t('credit', 'Analyze At'),
 			'provision' => Yii::t('credit', 'Provision'),
@@ -128,22 +132,50 @@ class CreditSanctionCalc extends Model {
 		return strtotime($installment->date) < strtotime($date ?: $this->dateAt);
 	}
 
+	/**
+	 * @var CreditLoanInstallment[]
+	 */
 	private array $installments = [];
 
 	public function generateInstallments(): void {
 		$this->installments = [];
 		for ($period = 1; $period <= $this->periods; $period++) {
-			$this->installments[$period] = $this->generateInstalment($period);
+			$debt = $period === 1 ? $this->sumCredit : $this->installments[$period - 1]->debt;
+			$this->installments[$period] = $this->generateInstallment($period, $debt);
 		}
 	}
 
-	public function generateInstalment(int $period, float $debt): CreditLoanInstallment {
-		$installment = new CreditLoanInstallment();
+	public function generateInstallment(int $period, float $debt = null): CreditLoanInstallment {
+		$installment = $this->createInstallment();
+		if ($debt === null) {
+			Yii::error('debt is null');
+			if ($period === 1) {
+				$debt = $this->sumCredit;
+			} else {
+				$debt = $this->generateInstallment($period - 1)->debt;
+			}
+		}
+		$installment->debt = $debt;
 		$installment->period = $period;
 		$installment->date = $this->getInstalmentDateAt($period);
+		$rate = $this->interestRateComponent
+			->getInterestRate($installment->date, $this->interestRateType, $this->yearNominalPercent);
+		$installment->interestRate = $rate / 100;
+		$installment->calculate($this->periods, $this->sumCredit);
+		$installment->debt -= $installment->capitalValue;
+
+		return $installment;
 	}
 
-
+	public function createInstallment() {
+		switch ($this->installmentsType) {
+			case static::INSTALLMENTS_EQUAL:
+				return new EqualCreditLoanInstallment();
+			case static::INSTALLMENTS_DECLINING:
+				return new DecliningCreditLoanInstallment();
+		}
+		throw new InvalidConfigException('Invalid installments type.');
+	}
 
 	/**
 	 * @param bool $refresh
@@ -199,12 +231,16 @@ class CreditSanctionCalc extends Model {
 		}
 		return $dateTime->format('Y-m-d');
 	}
+
 	public static function getInstallmentsTypes(): array {
-		return CreditLoanInstallment::getInstallmentsTypes();
+		return [
+			static::INSTALLMENTS_EQUAL => Yii::t('credit', 'Equal'),
+			static::INSTALLMENTS_DECLINING => Yii::t('credit', 'Declining'),
+		];
 	}
 
 	public static function getInterestRateNames(): array {
-		return CreditLoanInstallment::getInterestRateNames();
+		return InterestRate::getInterestRateNames();
 	}
 
 }

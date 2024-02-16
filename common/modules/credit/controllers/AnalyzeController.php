@@ -20,6 +20,7 @@ class AnalyzeController extends Controller {
 
 		$analyze = null;
 		if ($model->load(Yii::$app->request->queryParams) && $model->validate()) {
+			$model->generateInstallments();
 			Flash::add(Flash::TYPE_SUCCESS, 'Model load & validate');
 			$analyze = new CreditClientAnalyze();
 			$analyze->setSanctionCalc($model);

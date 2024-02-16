@@ -71,7 +71,7 @@ $pdfQueryParams[0] = 'pdf';
 			'capitalValue:currency',
 			'interestPart:currency',
 			'date:date',
-			'interestRate',
+			'interestRate:percent',
 		],
 		'emptyText' => '',
 		'showOnEmpty' => false,

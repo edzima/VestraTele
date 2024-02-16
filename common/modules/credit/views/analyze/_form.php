@@ -87,7 +87,7 @@ use kartik\number\NumberControl;
 
 	<div class="row">
 
-		<?= $form->field($model, 'creditAt', [
+		<?= $form->field($model, 'firstInstallmentAt', [
 			'options' => [
 				'class' => [
 					'col-md-3 col-lg-2',

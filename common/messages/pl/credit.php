@@ -26,4 +26,5 @@ kredytu bez odsetek, prowizji i innych kosztów dodatkowych.',
 	'Credit At' => 'Data Kredytu',
 	'Provision' => 'Prowizja',
 	'Calc' => 'Kalkulacja',
+	'First installment At' => 'Pierwsza Rata',
 ];
