@@ -56,6 +56,7 @@ return [
 							'lead/reminder',
 							'lead/report',
 							'lead/sms',
+							'lead/phone-blacklist',
 						],
 						'matchCallback' => static function ($rule, Action $action): bool {
 							if ($action->controller->id === 'sms') {
