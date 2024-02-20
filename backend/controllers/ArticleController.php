@@ -2,13 +2,13 @@
 
 namespace backend\controllers;
 
+use backend\models\ArticleForm;
+use backend\models\search\ArticleSearch;
+use common\models\Article;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use backend\models\search\ArticleSearch;
-use common\models\Article;
-use common\models\ArticleCategory;
 
 /**
  * Class ArticleController.
@@ -52,14 +52,14 @@ class ArticleController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new Article();
+		$model = new ArticleForm();
+		$model->author_id = Yii::$app->user->getId();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['index']);
 		}
 		return $this->render('create', [
 			'model' => $model,
-			'categories' => ArticleCategory::find()->active()->all(),
 		]);
 	}
 
@@ -71,14 +71,15 @@ class ArticleController extends Controller {
 	 * @return mixed
 	 */
 	public function actionUpdate(int $id) {
-		$model = $this->findModel($id);
+		$model = new ArticleForm();
+		$model->setModel($this->findModel($id));
+		$model->updater_id = Yii::$app->user->getId();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['index']);
 		}
 		return $this->render('update', [
 			'model' => $model,
-			'categories' => ArticleCategory::find()->active()->all(),
 		]);
 	}
 

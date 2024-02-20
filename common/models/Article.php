@@ -5,7 +5,6 @@ namespace common\models;
 use common\models\query\ArticleQuery;
 use common\models\user\User;
 use Yii;
-use yii\behaviors\BlameableBehavior;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -29,14 +28,17 @@ use yii\db\ActiveRecord;
  * @property integer $show_on_mainpage
  *
  *
- * @property User $author
- * @property ArticleCategory $category
- * @property User $updater
+ * @property-read User $author
+ * @property-read ArticleCategory $category
+ * @property-read User $updater
+ * @property-read ArticleUser[] $articleUsers
  */
 class Article extends ActiveRecord {
 
 	public const STATUS_DRAFT = 0;
 	public const STATUS_ACTIVE = 1;
+
+	public array $usersIds = [];
 
 	/**
 	 * @inheritdoc
@@ -51,11 +53,6 @@ class Article extends ActiveRecord {
 	public function behaviors(): array {
 		return [
 			TimestampBehavior::class,
-			[
-				'class' => BlameableBehavior::class,
-				'createdByAttribute' => 'author_id',
-				'updatedByAttribute' => 'updater_id',
-			],
 			[
 				'class' => SluggableBehavior::class,
 				'attribute' => 'title',
@@ -111,6 +108,19 @@ class Article extends ActiveRecord {
 		];
 	}
 
+	public function isForUser(int $userId): bool {
+		$users = $this->articleUsers;
+		if (empty($users)) {
+			return true;
+		}
+		foreach ($users as $user) {
+			if ($user->user_id === $userId) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * @inheritdoc
 	 */
@@ -139,6 +149,12 @@ class Article extends ActiveRecord {
 	 */
 	public function getUpdater() {
 		return $this->hasOne(User::class, ['id' => 'updater_id']);
+	}
+
+	public function getArticleUsers() {
+		return $this->hasMany(ArticleUser::class, [
+			'article_id' => 'id',
+		]);
 	}
 
 	public static function find(): ArticleQuery {

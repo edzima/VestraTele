@@ -3,6 +3,7 @@
 namespace common\models\query;
 
 use common\models\Article;
+use common\models\ArticleUser;
 use yii\db\ActiveQuery;
 
 /**
@@ -25,6 +26,20 @@ class ArticleQuery extends ActiveQuery {
 	public function mainpage(): self {
 		$this->andWhere('show_on_mainpage IS NOT NULL');
 		$this->orderBy(['show_on_mainpage' => SORT_ASC]);
+		return $this;
+	}
+
+	public function forUser(int|string|null $id): self {
+		if ($id) {
+			$this->joinWith('articleUsers');
+			$this->andWhere([
+				'or', [
+					ArticleUser::tableName() . '.user_id' => $id,
+				], [
+					ArticleUser::tableName() . '.article_id' => null,
+				],
+			]);
+		}
 		return $this;
 	}
 }

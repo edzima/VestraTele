@@ -352,4 +352,5 @@ return [
 	'Note Stage' => 'Etap (kiedykowiek)',
 	'Claims Sum: {sum}' => 'Suma roszczeń: {sum}',
 	'With claims sum' => 'Suma roszczeń',
+	'All Users' => 'Wszyscy',
 ];
