@@ -69,13 +69,6 @@ class Article extends ActiveRecord {
 		return [
 			[['title', 'body', 'category_id'], 'required'],
 			[['preview', 'body'], 'string'],
-			[
-				'published_at', 'default',
-				'value' => static function () {
-					return date(DATE_ATOM);
-				},
-			],
-			['published_at', 'filter', 'filter' => 'strtotime'],
 			[['status', 'category_id', 'author_id', 'updater_id', 'created_at', 'updated_at', 'show_on_mainpage'], 'integer'],
 			[['title', 'slug'], 'string', 'max' => 255],
 			['show_on_mainpage', 'default', 'value' => null],
@@ -83,7 +76,6 @@ class Article extends ActiveRecord {
 			['author_id', 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['author_id' => 'id']],
 			['category_id', 'exist', 'skipOnError' => true, 'targetClass' => ArticleCategory::class, 'targetAttribute' => ['category_id' => 'id']],
 			['updater_id', 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updater_id' => 'id']],
-
 		];
 	}
 

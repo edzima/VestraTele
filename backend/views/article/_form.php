@@ -78,7 +78,7 @@ use yii\web\View;
 				'prompt' => $model->getAttributeLabel('usersIds'),
 			],
 		]
-	) ?>
+	)->hint(Yii::t('backend', 'Empty: all')) ?>
 
 	<div class="form-group">
 		<?= Html::submitButton($model->getModel()->isNewRecord ? Yii::t('backend', 'Create') : Yii::t('backend', 'Update'), ['class' => $model->getModel()->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

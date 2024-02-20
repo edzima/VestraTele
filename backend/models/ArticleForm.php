@@ -7,17 +7,18 @@ use common\models\Article;
 use common\models\ArticleCategory;
 use common\models\ArticleUser;
 use common\models\user\User;
+use Yii;
 use yii\base\Model;
 
 class ArticleForm extends Model {
 
 	private ?Article $model = null;
-	public array $usersIds = [];
+	public $usersIds = [];
 	public string $title = '';
 	public string $slug = '';
 	public string $preview = '';
 	public int $status = Article::STATUS_ACTIVE;
-	public string $published_at = '';
+	public $published_at;
 	public string $body = '';
 	public ?int $updater_id = null;
 	public $show_on_mainpage;
@@ -31,12 +32,6 @@ class ArticleForm extends Model {
 		return [
 			[['title', 'body', 'category_id'], 'required'],
 			[['preview', 'body'], 'string'],
-			[
-				'published_at', 'default',
-				'value' => static function () {
-					return date(DATE_ATOM);
-				},
-			],
 			['published_at', 'filter', 'filter' => 'strtotime'],
 			[['show_on_mainpage'], 'default', 'value' => null],
 
@@ -51,7 +46,7 @@ class ArticleForm extends Model {
 	public function attributeLabels(): array {
 		return array_merge(
 			Article::instance()->attributeLabels(), [
-
+				'usersIds' => Yii::t('backend', 'Visible for'),
 			]
 		);
 	}

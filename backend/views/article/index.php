@@ -75,6 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					return Yii::t('backend', 'All Users');
 				},
 				'format' => 'html',
+				'label' => Yii::t('backend', 'Visible for'),
 			],
 			[
 				'class' => ActionColumn::class,

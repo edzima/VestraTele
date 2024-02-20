@@ -53,6 +53,7 @@ class ArticleController extends Controller {
 	 */
 	public function actionCreate() {
 		$model = new ArticleForm();
+		$model->published_at = date(DATE_ATOM);
 		$model->author_id = Yii::$app->user->getId();
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
