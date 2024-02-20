@@ -29,17 +29,16 @@ class ArticleQuery extends ActiveQuery {
 		return $this;
 	}
 
-	public function forUser(int|string|null $id): self {
-		if ($id) {
-			$this->joinWith('articleUsers');
-			$this->andWhere([
-				'or', [
-					ArticleUser::tableName() . '.user_id' => $id,
-				], [
-					ArticleUser::tableName() . '.article_id' => null,
-				],
-			]);
-		}
+	public function forUser(int $id): self {
+		$this->joinWith('articleUsers');
+		$this->andWhere([
+			'or', [
+				ArticleUser::tableName() . '.user_id' => $id,
+			], [
+				ArticleUser::tableName() . '.article_id' => null,
+			],
+		]);
+
 		return $this;
 	}
 }
