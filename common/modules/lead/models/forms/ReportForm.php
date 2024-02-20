@@ -100,8 +100,16 @@ class ReportForm extends Model {
 			[['partner_id', 'tele_id'], 'default', 'value' => null],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 			['closedQuestions', 'in', 'range' => array_keys($this->getClosedQuestionsData()), 'allowArray' => true],
-			['partner_id', 'in', 'range' => array_keys($this->getUsersNames())],
-			['tele_id', 'in', 'range' => array_keys($this->getTeleUsersNames())],
+			[
+				'partner_id', 'in', 'range' => array_keys($this->getUsersNames()), 'when' => function (): bool {
+				return $this->withLinkUsers;
+			},
+			],
+			[
+				'tele_id', 'in', 'range' => array_keys($this->getTeleUsersNames()), 'when' => function (): bool {
+				return $this->withLinkUsers;
+			},
+			],
 		];
 	}
 
