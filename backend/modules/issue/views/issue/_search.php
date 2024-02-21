@@ -249,6 +249,16 @@ use yii\widgets\ActiveForm;
 				'class' => 'col-md-3 col-lg-2',
 			],
 		])->widget(DateWidget::class) ?>
+
+		<?= $form->field($model, 'groupByIssueUserTypes', ['options' => ['class' => 'col-md-2']])
+			->widget(Select2::class, [
+				'data' => IssueSearch::getIssueUserTypesNames(),
+				'pluginOptions' => [
+					'prompt' => Yii::t('common', 'Select...'),
+					'multiple' => true,
+				],
+			])
+		?>
 	</div>
 
 

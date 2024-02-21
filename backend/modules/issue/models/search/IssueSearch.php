@@ -6,6 +6,7 @@ use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSearch as BaseIssueSearch;
+use common\models\issue\IssueUser;
 use common\models\issue\query\IssueNoteQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
@@ -45,6 +46,8 @@ class IssueSearch extends BaseIssueSearch {
 	public $entity_agreement_details;
 	public $entity_agreement_at;
 
+	public $groupByIssueUserTypes;
+
 	public bool $withClaimsSum = false;
 
 	public ?string $signature_act = null;
@@ -61,6 +64,7 @@ class IssueSearch extends BaseIssueSearch {
 			['claimCompanyTryingValue', 'number', 'min' => 0],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
 			[['signature_act', 'stage_change_at', 'stageDeadlineFromAt', 'stageDeadlineToAt', 'entity_agreement_at'], 'safe'],
+			['groupByIssueUserTypes', 'in', 'range' => array_keys(static::getIssueUserTypesNames()), 'allowArray' => true],
 		]);
 	}
 
@@ -76,6 +80,7 @@ class IssueSearch extends BaseIssueSearch {
 			'stageDeadlineToAt' => Yii::t('backend', 'Stage Deadline to at'),
 			'note_stage_id' => Yii::t('backend', 'Note Stage'),
 			'withClaimsSum' => Yii::t('backend', 'With claims sum'),
+			'groupByIssueUserTypes' => Yii::t('backend', 'Group by Issue user Types'),
 		]);
 	}
 
@@ -152,6 +157,7 @@ class IssueSearch extends BaseIssueSearch {
 		$this->claimFilter($query);
 		$this->noteStageFilter($query);
 		$this->applyEntityAgreementFilter($query);
+		$this->applyGroupByIssueUserTypes($query);
 	}
 
 	private function signatureActFilter(IssueQuery $query): void {
@@ -298,6 +304,14 @@ class IssueSearch extends BaseIssueSearch {
 		$query->select(IssueClaim::tableName() . '.trying_value');
 		$query->joinWith('claims');
 		return $query->sum('trying_value');
+	}
+
+	private function applyGroupByIssueUserTypes(IssueQuery $query): void {
+		if (!empty($this->groupByIssueUserTypes)) {
+			$query->joinWith('users');
+			$query->groupBy([IssueUser::tableName() . '.user_id', IssueUser::tableName() . '.type']);
+			$query->having([IssueUser::tableName() . '.type' => $this->groupByIssueUserTypes]);
+		}
 	}
 
 }

@@ -355,4 +355,5 @@ return [
 	'Empty: all' => 'Puste: wszyscy',
 	'All Users' => 'Wszyscy',
 	'Visible for' => 'Widoczność',
+	'Group by Issue user Types' => 'Grupuj po typie',
 ];
