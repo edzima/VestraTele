@@ -22,7 +22,7 @@ class WiborArchiveComponent extends Component implements InterestRateInterface {
 	 */
 	public $cache = 'cache';
 
-	public string $cacheKey = 'referenceRateNBP';
+	public string $cacheKey;
 	public int $cacheDuration = 60 * 60 * 24;
 
 	private array $_data = [];
@@ -32,6 +32,7 @@ class WiborArchiveComponent extends Component implements InterestRateInterface {
 
 	public function init() {
 		$this->cache = Instance::ensure($this->cache);
+		$this->cacheKey = $this->archiveCSVPath;
 	}
 
 	public function getInterestRate(string $date): ?float {
@@ -68,21 +69,19 @@ class WiborArchiveComponent extends Component implements InterestRateInterface {
 	 * @return float[]
 	 * @throws WiborArchiveException
 	 */
-	public function getData(bool $cache = true): array {
-		if (!empty($this->_data) && $cache) {
-			return $this->_data;
-		}
-		$data = [];
-		if ($cache) {
+	public function getData(bool $refresh = false): array {
+		if (!$refresh) {
 			$data = $this->cache->get($this->cacheKey);
-		}
-		if (empty($data)) {
-			$data = $this->getDataFromFile();
-			if (!empty($data) && $cache) {
-				$this->cache->set($this->cacheKey, $data, $this->cacheDuration);
+			if ($data !== false) {
+				$this->_data = $data;
 			}
+		}
+		if (empty($this->_data)) {
+			$data = $this->getDataFromFile();
+			$this->cache->set($this->cacheKey, $data, $this->cacheDuration);
 			$this->_data = $data;
 		}
+
 		return $this->_data;
 	}
 
@@ -90,6 +89,8 @@ class WiborArchiveComponent extends Component implements InterestRateInterface {
 	 * @throws WiborArchiveException
 	 */
 	protected function getDataFromFile(): array {
+		Yii::beginProfile($this->archiveCSVPath, __METHOD__);
+
 		$values = [];
 		$i = 0;
 		try {
@@ -111,6 +112,8 @@ class WiborArchiveComponent extends Component implements InterestRateInterface {
 		if (empty($values)) {
 			throw new WiborArchiveException('Empty Wibor data.');
 		}
+		Yii::endProfile($this->archiveCSVPath, __METHOD__);
+
 		return $values;
 	}
 

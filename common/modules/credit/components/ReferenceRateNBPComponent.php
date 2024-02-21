@@ -19,10 +19,12 @@ class ReferenceRateNBPComponent extends Component implements InterestRateInterfa
 	/**
 	 * @var string|array|CacheInterface
 	 */
-	public $cache;
+	public $cache = 'cache';
 
 	public string $cacheKey = 'referenceRateNBP';
 	public int $cacheDuration = 60 * 60 * 24;
+
+	private array $_models = [];
 
 	public function init() {
 		$this->cache = Instance::ensure($this->cache);
@@ -53,14 +55,18 @@ class ReferenceRateNBPComponent extends Component implements InterestRateInterfa
 	public function getModels(bool $refresh = false): array {
 		if (!$refresh) {
 			$models = $this->cache->get($this->cacheKey);
-			if ($models === false) {
-				return $this->getModels(true);
+			if ($models !== false) {
+				$this->_models = $models;
 			}
 		}
-		$xml = $this->getXMLFromArchive();
-		$models = ReferenceRateNBP::createModels($xml);
-		$this->cache->set($this->cacheKey, $models, $this->cacheDuration);
-		return ReferenceRateNBP::createModels($xml);
+		if (empty($this->_models)) {
+			$xml = $this->getXMLFromArchive();
+			$models = ReferenceRateNBP::createModels($xml);
+			$this->cache->set($this->cacheKey, $models, $this->cacheDuration);
+			$this->_models = $models;
+		}
+
+		return $this->_models;
 	}
 
 	public function getXMLFromArchive(): SimpleXMLElement {

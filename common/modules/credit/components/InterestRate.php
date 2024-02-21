@@ -2,7 +2,6 @@
 
 namespace common\modules\credit\components;
 
-use common\modules\credit\models\CreditLoanInstallment;
 use Yii;
 use yii\base\Component;
 use yii\di\Instance;
@@ -12,10 +11,6 @@ class InterestRate extends Component implements InterestRateInterface {
 	public const INTEREST_RATE_FIXED = 'fixed';
 	public const INTEREST_RATE_WIBOR_3M = 'wibor_3m';
 	public const INTEREST_RATE_REFERENCE_RATE = 'referenceNBP';
-
-	public $model = [
-		'class' => CreditLoanInstallment::class,
-	];
 
 	public $wibor = [
 		'class' => WiborArchiveComponent::class,
