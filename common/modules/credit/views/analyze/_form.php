@@ -71,14 +71,14 @@ use kartik\number\NumberControl;
 
 		<?= $form->field($model, 'installmentsType', [
 			'options' => [
-				'class' => 'col-md-2',
+				'class' => 'col-md-1',
 			],
 		])->radioList(CreditSanctionCalc::getInstallmentsTypes())->label(false) ?>
 
 
 		<?= $form->field($model, 'interestRateType', [
 			'options' => [
-				'class' => 'col-md-3',
+				'class' => 'col-md-2',
 			],
 		])->radioList(CreditSanctionCalc::getInterestRateNames())->label(false) ?>
 

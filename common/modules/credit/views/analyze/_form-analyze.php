@@ -43,7 +43,7 @@ use yii\web\View;
 
 		<?= $form->field($model, 'analyzeResult', [
 			'options' => [
-				'class' => 'col-md-4',
+				'class' => 'col-md-3',
 			],
 		])->textarea() ?>
 	</div>

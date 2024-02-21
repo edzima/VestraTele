@@ -29,12 +29,6 @@ class AnalyzeController extends Controller {
 			}
 		}
 
-//		$model->sumCredit = 120000;
-//		$model->provision = 1000;
-//		$model->periods = 26;
-//		$model->dateAt = '10-10-2022';
-//		$model->yearNominalPercent = 5;
-
 		return $this->render('calc', [
 			'model' => $model,
 			'analyze' => $analyze,

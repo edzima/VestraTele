@@ -5,7 +5,8 @@ return [
 	'Analyze At' => 'Data wykonania analizy',
 	'Agreement' => 'Umowa',
 	'Agreement At' => 'Data zawarcia Umowy',
-	'Borrower' => 'Kredytobiorca/Pożyczkobiorca',
+	'Borrower' => 'Kredytobiorca / Pożyczkobiorca',
+	'Creditor / Lender' => 'Kredytodawca / Pożyczkodawca',
 	'Creditor' => 'Kredytodawca',
 	'Default analyze result' => 'Umowa zawiera naruszenia, które uprawniają kredytobiorcę do złożenia
 oświadczenia w trybie art. 45 ust. 1 Ustawy o kredycie konsumenckim (tzw.

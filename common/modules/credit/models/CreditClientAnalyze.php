@@ -57,6 +57,7 @@ class CreditClientAnalyze extends Model {
 			'estimatedRefundAmount' => Yii::t('credit', 'Estimated refund amount'),
 			'repaymentAt' => Yii::t('credit', 'Repayment At'),
 			'totalLoanAmount' => Yii::t('credit', 'Total loan amount'),
+			'entityResponsibleId' => Yii::t('credit', 'Creditor / Lender'),
 		];
 	}
 

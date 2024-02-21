@@ -23,6 +23,7 @@ $pdfQueryParams[0] = 'pdf';
 
 <div class="credit-sanction-calc">
 
+
 	<?= $this->render('_form', [
 		'model' => $model,
 	]) ?>
@@ -33,23 +34,27 @@ $pdfQueryParams[0] = 'pdf';
 				'class' => 'btn btn-success',
 			]) ?>
 		</p>
+		<div class="row">
+			<div class="col-md-6">
 
-		<?= DetailView::widget([
-			'model' => $model,
-			'attributes' => [
-				'interestPaid:currency',
-				'interestToPay:currency',
-				'interestTotal:currency',
-				'capitalPaid:currency',
-				'capitalToPay:currency',
-				'capitalTotal:currency',
-			],
-		]) ?>
+				<?= DetailView::widget([
+					'model' => $model,
+					'attributes' => [
+						'interestPaid:currency',
+						'interestToPay:currency',
+						'interestTotal:currency',
+					],
+				]) ?>
+
+
+			</div>
+		</div>
 
 		<?= $this->render('_form-analyze', [
 			'model' => $analyze,
 		]) ?>
 	<?php endif; ?>
+
 
 	<?= GridView::widget([
 		'dataProvider' => new ArrayDataProvider([
@@ -75,7 +80,10 @@ $pdfQueryParams[0] = 'pdf';
 		],
 		'emptyText' => '',
 		'showOnEmpty' => false,
-	]) ?>
+	])
+	?>
+
+
 
 	<?php
 
