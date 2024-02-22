@@ -372,7 +372,14 @@ class IssueController extends Controller {
 	 * @return mixed
 	 */
 	public function actionDelete(int $id): Response {
-		$this->findModel($id)->delete();
+		$model = $this->findModel($id);
+		Yii::warning([
+			'message' => 'Delete issue: ' . $id, [
+				'attributes' => $model->getAttributes(),
+				'user_id' => Yii::$app->user->getId(),
+			],
+		], __METHOD__);
+		$model->delete();
 
 		return $this->redirect(['index']);
 	}
