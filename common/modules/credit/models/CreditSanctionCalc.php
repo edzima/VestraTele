@@ -21,7 +21,7 @@ class CreditSanctionCalc extends Model {
 	public ?float $sumCredit = null;
 	public ?float $provision = null;
 
-	public ?float $yearNominalPercent = null;
+	public ?float $interestRatePercent = null;
 
 	public ?int $periods = null;
 
@@ -45,27 +45,34 @@ class CreditSanctionCalc extends Model {
 		return [
 			[
 				[
-					'sumCredit', 'firstInstallmentAt', 'yearNominalPercent', 'periods', 'dateAt',
+					'sumCredit', 'firstInstallmentAt', 'interestRatePercent', 'periods', 'dateAt',
 					'installmentsType', 'interestRateType',
 				], 'required',
 			],
 			[['interestRateType', 'installmentsType'], 'string'],
-			[['sumCredit', 'yearNominalPercent', 'provision', 'periods',], 'number', 'min' => 0],
+			[['sumCredit', 'interestRatePercent', 'provision', 'periods',], 'number', 'min' => 0],
 		];
 	}
 
 	public function attributeLabels(): array {
 		return [
 			'sumCredit' => Yii::t('credit', 'Sum Credit'),
-			'yearNominalPercent' => Yii::t('credit', '%'),
+			'interestRatePercent' => $this->interestRateAttributeLabel(),
 			'firstInstallmentAt' => Yii::t('credit', 'First installment At'),
 			'periods' => Yii::t('credit', 'Installments'),
 			'dateAt' => Yii::t('credit', 'Analyze At'),
 			'provision' => Yii::t('credit', 'Provision'),
+			'interestsPaid' => Yii::t('credit', 'Interests paid'),
+			'interestsToPay' => Yii::t('credit', 'Interests to pay'),
+			'interestsTotal' => Yii::t('credit', 'Interests total'),
 		];
 	}
 
-	public function getInterestPaid(string $date = null): float {
+	public function interestRateAttributeLabel(): string {
+		return InterestRate::interestRatePercentNames()[$this->interestRateType];
+	}
+
+	public function getInterestsPaid(string $date = null): float {
 		$parts = $this->getLoanInstallments();
 		$sum = 0;
 		foreach ($parts as $part) {
@@ -76,7 +83,7 @@ class CreditSanctionCalc extends Model {
 		return $sum;
 	}
 
-	public function getInterestToPay(string $date = null): float {
+	public function getInterestsToPay(string $date = null): float {
 		$parts = $this->getLoanInstallments();
 		$sum = 0;
 		foreach ($parts as $part) {
@@ -87,7 +94,7 @@ class CreditSanctionCalc extends Model {
 		return $sum;
 	}
 
-	public function getInterestTotal(): float {
+	public function getInterestsTotal(): float {
 		$parts = $this->getLoanInstallments();
 		$sum = 0;
 		foreach ($parts as $part) {
@@ -126,7 +133,7 @@ class CreditSanctionCalc extends Model {
 		$installment->period = $period;
 		$installment->date = $this->getInstalmentDateAt($period);
 		$rate = $this->interestRateComponent
-			->getInterestRate($installment->date, $this->interestRateType, $this->yearNominalPercent);
+			->getInterestRate($installment->date, $this->interestRateType, $this->interestRatePercent);
 		$installment->interestRate = $rate / 100;
 		$installment->calculate($this->periods, $this->sumCredit);
 		$installment->debt -= $installment->capitalValue;

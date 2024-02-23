@@ -73,4 +73,12 @@ class InterestRate extends Component implements InterestRateInterface {
 		];
 	}
 
+	public static function interestRatePercentNames(): array {
+		return [
+			static::INTEREST_RATE_FIXED => Yii::t('credit', 'Year nominal percent'),
+			static::INTEREST_RATE_WIBOR_3M => Yii::t('credit', 'Margin'),
+			static::INTEREST_RATE_REFERENCE_RATE => Yii::t('credit', 'Margin'),
+		];
+	}
+
 }
