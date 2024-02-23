@@ -1,14 +1,35 @@
 <?php
 
 use backend\helpers\Html;
+use common\modules\credit\components\InterestRate;
 use common\modules\credit\models\CreditSanctionCalc;
 use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
 use kartik\number\NumberControl;
+use yii\helpers\Json;
 
 /* @var $this yii\web\View */
 /* @var $model CreditSanctionCalc */
 /* @var $form yii\widgets\ActiveForm */
+
+$inputNameTnterestRateType = Html::getInputName($model, 'interestRateType');
+$interestRateTypeId = Html::getInputId($model, 'interestRateType');
+$interestRatePercentInputId = Html::getInputId($model, 'interestRatePercent');
+$interestRatePercentNames = Json::encode(InterestRate::interestRatePercentNames());
+$js = <<<JS
+		const interestRateTypeInput = document.getElementById('$interestRateTypeId');
+		const interestRatePercentLabel = document.querySelector('label[for="$interestRatePercentInputId"]');
+		const interestRatePercenetLablesNames = $interestRatePercentNames;
+		interestRateTypeInput.onchange = function (){
+			const val = document.querySelector('input[name="$inputNameTnterestRateType"]:checked').value;
+			const label = interestRatePercenetLablesNames[val];
+			if(label){
+				interestRatePercentLabel.innerText = label;
+			}
+		}
+JS;
+
+$this->registerJs($js);
 ?>
 
 <div class="credit-calc-form">
@@ -43,20 +64,7 @@ use kartik\number\NumberControl;
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'yearNominalPercent', [
-			'inputTemplate' => '<div class="input-group">'
-				. '{input}'
-				. '<span class="input-group-addon"><i class="fa fa-percent"></i></span></div>',
-			'options' => [
-				'class' => [
-					'col-md-2 col-lg-1',
-				],
-				'placeholder' => 'prowizja',
-			],
-		])
-			->widget(NumberControl::class, [
-			])
-		?>
+
 
 		<?= $form->field($model, 'periods', [
 			'options' => [
@@ -65,7 +73,10 @@ use kartik\number\NumberControl;
 				],
 			],
 		])
-			->widget(NumberControl::class)
+			->widget(NumberControl::class, [
+				'displayOptions' => ['placeholder' => Yii::t('credit', 'Periods count')],
+			])
+
 		?>
 
 
@@ -78,11 +89,24 @@ use kartik\number\NumberControl;
 
 		<?= $form->field($model, 'interestRateType', [
 			'options' => [
-				'class' => 'col-md-2',
+				'class' => 'col-md-1',
 			],
 		])->radioList(CreditSanctionCalc::getInterestRateNames())->label(false) ?>
 
 
+		<?= $form->field($model, 'interestRatePercent', [
+			'inputTemplate' => '<div class="input-group">'
+				. '{input}'
+				. '<span class="input-group-addon"><i class="fa fa-percent"></i></span></div>',
+			'options' => [
+				'class' => [
+					'col-md-2 col-lg-1',
+				],
+				'placeholder' => 'prowizja',
+			],
+		])
+			->widget(NumberControl::class)
+		?>
 	</div>
 
 	<div class="row">
@@ -94,7 +118,17 @@ use kartik\number\NumberControl;
 				],
 			],
 		])
-			->widget(DateWidget::class)
+			->widget(DateWidget::class, [
+				'clientOptions' => [
+					'viewMode' => 'years',
+					'allowInputToggle' => true,
+					'sideBySide' => true,
+					'widgetPositioning' => [
+						'horizontal' => 'auto',
+						'vertical' => 'auto',
+					],
+				],
+			])
 		?>
 
 
