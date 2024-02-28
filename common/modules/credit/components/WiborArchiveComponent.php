@@ -40,11 +40,9 @@ class WiborArchiveComponent extends Component implements InterestRateInterface {
 		if ($value) {
 			return $value;
 		}
-		Yii::warning('Not Find Wibor for Date: ' . $date, __METHOD__);
 		$dateTime = (new DateTime($date))->modify('-1 day');
 		$min = new DateTime($this->getMinDate());
 		if ($dateTime < $min) {
-			Yii::warning('Date: ' . $date . ' is less than min date: ' . $min->format($this->dateFormat), __METHOD__);
 			return null;
 		}
 		$max = new DateTime($this->getMaxDate());
