@@ -2,21 +2,27 @@
 
 return [
 	'Amount of cancelled interest on future' => 'Kwota anulowanych odsetek na przyszłość',
-	'Analyze At' => 'Data wykonania analizy',
+	'Analyze At' => 'Data analizy',
+	'Analyze - {borrower} ({analyzeAt})' => 'Analiza: {borrower} ({analyzeAt})',
 	'Agreement' => 'Umowa',
-	'Agreement At' => 'Data zawarcia Umowy',
+	'A  greement Number' => 'Nr. umowy',
+	'Agreement At' => 'Data Umowy',
 	'Borrower' => 'Kredytobiorca / Pożyczkobiorca',
+	'{interests} (interests)' => '{interests} (odsetki)',
+	'{interests} (interests) + {provision} (provision) = {sum}' => '{interests} (odestki) + {provision} (prowizja) = {sum}',
+	'Calculation' => 'Kalkulacja',
 	'Creditor / Lender' => 'Kredytodawca / Pożyczkodawca',
 	'Creditor' => 'Kredytodawca',
 	'Default analyze result' => 'Umowa zawiera naruszenia, które uprawniają kredytobiorcę do złożenia
 oświadczenia w trybie art. 45 ust. 1 Ustawy o kredycie konsumenckim (tzw.
 sankcja kredytu darmowego), a w wyniku złożonego oświadczenia do spłaty
 kredytu bez odsetek, prowizji i innych kosztów dodatkowych.',
-	'Repayment At' => 'Planowana data spłaty kredytu/pożyczki',
+	'Repayment At' => 'Planowana data spłaty',
 	'%' => '%',
-	'Sum Credit' => 'Kwota Kredytu (udzielona)',
+	'Sum Credit' => 'Kwota Kredytu',
+	'Granted' => 'Udzielona',
 	'Analyze result' => 'Wynik analizy umowy',
-	'Amount of loan granted' => 'Kowta udzielonego kredytu/pożyczki',
+	'Amount of loan granted' => 'Kwota udzielonego kredytu/pożyczki',
 	'Total loan amount' => 'Całkowita kwota kredytu/pożyczki',
 	'Estimated refund amount' => 'Szacowana kwota zwrotu (do odzyskania)***',
 	'Equal' => 'Równe',

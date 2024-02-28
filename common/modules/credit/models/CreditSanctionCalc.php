@@ -19,9 +19,9 @@ class CreditSanctionCalc extends Model {
 	public string $interestRateType = InterestRate::INTEREST_RATE_FIXED;
 
 	public ?float $sumCredit = null;
-	public ?float $provision = null;
+	public $provision;
 
-	public ?float $interestRatePercent = null;
+	public $interestRatePercent = 0;
 
 	public ?int $periods = null;
 
@@ -45,9 +45,16 @@ class CreditSanctionCalc extends Model {
 		return [
 			[
 				[
-					'sumCredit', 'firstInstallmentAt', 'interestRatePercent', 'periods', 'dateAt',
+					'sumCredit', 'firstInstallmentAt', 'periods', 'dateAt',
 					'installmentsType', 'interestRateType',
 				], 'required',
+			],
+			[
+				['interestRatePercent'], 'required',
+				'when' => function (): bool {
+					return $this->interestRateType === InterestRate::INTEREST_RATE_FIXED;
+				},
+				'enableClientValidation' => false,
 			],
 			[['interestRateType', 'installmentsType'], 'string'],
 			[['sumCredit', 'interestRatePercent', 'provision', 'periods',], 'number', 'min' => 0],
@@ -136,6 +143,7 @@ class CreditSanctionCalc extends Model {
 			->getInterestRate($installment->date, $this->interestRateType, $this->interestRatePercent);
 		$installment->interestRate = $rate / 100;
 		$installment->calculate($this->periods, $this->sumCredit);
+
 		$installment->debt -= $installment->capitalValue;
 
 		return $installment;

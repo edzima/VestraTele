@@ -18,6 +18,9 @@ class CurrencyColumn extends DataColumn {
 			$this->pageSummaryFunc = static function (array $decimals): Decimal {
 				$sum = new Decimal(0);
 				foreach ($decimals as $decimal) {
+					if (is_float($decimal)) {
+						$decimal = (string) $decimal;
+					}
 					$sum = $sum->add($decimal);
 				}
 				return $sum;

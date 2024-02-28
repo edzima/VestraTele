@@ -3,6 +3,8 @@
 use common\helpers\Html;
 use common\modules\credit\models\CreditClientAnalyze;
 use common\widgets\ActiveForm;
+use common\widgets\DateWidget;
+use kartik\number\NumberControl;
 use kartik\select2\Select2;
 use yii\web\View;
 
@@ -13,44 +15,85 @@ use yii\web\View;
 
 <div class="credit-analyze-form">
 	<?php $form = ActiveForm::begin([
-		//	'method' => 'GET',
+		'method' => 'POST',
 	]) ?>
 
 	<div class="row">
+
+		<?= $form->field($model, 'amountOfCanceledInterestOnFuture')->hiddenInput()->label(false) ?>
+		<?= $form->field($model, 'estimatedRefundAmount')->hiddenInput()->label(false) ?>
+		<?= $form->field($model, 'analyzeAt')->hiddenInput()->label(false) ?>
+
+
 		<?= $form->field($model, 'borrower', [
 			'options' => [
-				'class' => 'col-md-3',
+				'class' => 'col-md-6',
 			],
-		])->textInput() ?>
+		])->textInput()
+		?>
 
 		<?= $form->field($model, 'entityResponsibleId', [
 			'options' => [
-				'class' => 'col-md-3',
+				'class' => 'col-md-6',
 			],
 		])->widget(Select2::class, [
 			'data' => $model->getEntityResponsibleNames(),
 		]) ?>
-
+	</div>
+	<div class="row">
 
 	</div>
 
 	<div class="row">
+
+
 		<?= $form->field($model, 'agreement', [
 			'options' => [
 				'class' => 'col-md-3',
 			],
-		])->textInput() ?>
+		])->textInput([
+			'placeholder' => Yii::t('credit', 'Agreement Number'),
+		]) ?>
 
-		<?= $form->field($model, 'analyzeResult', [
+		<?= $form->field($model, 'agreementAt', [
 			'options' => [
-				'class' => 'col-md-3',
+				'class' => 'col-md-3 col-lg-3',
 			],
-		])->textarea() ?>
+		])->widget(DateWidget::class) ?>
+
+		<?= $form->field($model, 'repaymentAt', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->widget(DateWidget::class) ?>
+
+	</div>
+	<div class="row">
+
+
+		<?= $form->field($model, 'totalLoanAmount', [
+			'options' => [
+				'class' => [
+					'col-md-3 col-lg-2',
+				],
+			],
+		])
+			->widget(NumberControl::class)
+		?>
+
+		<?= $form->field($model, 'amountOfLoanGranted', [
+			'options' => [
+				'class' => [
+					'col-md-3 col-lg-2',
+				],
+			],
+		])
+			->widget(NumberControl::class)
+		?>
 	</div>
 
 	<div class="form-group">
-		<?= Html::submitButton(Yii::t('issue', 'PDF'), ['class' => 'btn btn-primary']) ?>
-		<?= Html::a(Yii::t('common', 'Reset'), ['calc'], ['class' => 'btn btn-outline-secondary']) ?>
+		<?= Html::submitButton(Yii::t('credit', 'PDF'), ['class' => 'btn btn-success']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

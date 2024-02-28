@@ -48,12 +48,13 @@ $this->registerJs($js);
 			],
 		])
 			->widget(NumberControl::class)
+			->hint(Yii::t('credit', 'Granted'))
 		?>
 
 		<?= $form->field($model, 'provision', [
 			'options' => [
 				'class' => [
-					'col-md-2 col-lg-1',
+					'col-md-2',
 				],
 			],
 		])
@@ -69,7 +70,7 @@ $this->registerJs($js);
 		<?= $form->field($model, 'periods', [
 			'options' => [
 				'class' => [
-					'col-md-2 col-lg-1',
+					'col-md-2 col-lg-2',
 				],
 			],
 		])
@@ -82,14 +83,14 @@ $this->registerJs($js);
 
 		<?= $form->field($model, 'installmentsType', [
 			'options' => [
-				'class' => 'col-md-1',
+				'class' => 'col-md-2',
 			],
 		])->radioList(CreditSanctionCalc::getInstallmentsTypes())->label(false) ?>
 
 
 		<?= $form->field($model, 'interestRateType', [
 			'options' => [
-				'class' => 'col-md-1',
+				'class' => 'col-md-2',
 			],
 		])->radioList(CreditSanctionCalc::getInterestRateNames())->label(false) ?>
 
@@ -100,7 +101,7 @@ $this->registerJs($js);
 				. '<span class="input-group-addon"><i class="fa fa-percent"></i></span></div>',
 			'options' => [
 				'class' => [
-					'col-md-2 col-lg-1',
+					'col-md-2 col-lg-2',
 				],
 				'placeholder' => 'prowizja',
 			],
@@ -114,7 +115,7 @@ $this->registerJs($js);
 		<?= $form->field($model, 'firstInstallmentAt', [
 			'options' => [
 				'class' => [
-					'col-md-3 col-lg-2',
+					'col-md-4 col-lg-2',
 				],
 			],
 		])
@@ -136,7 +137,7 @@ $this->registerJs($js);
 		<?= $form->field($model, 'dateAt', [
 			'options' => [
 				'class' => [
-					'col-md-3 col-lg-2',
+					'col-md-4 col-lg-2',
 				],
 			],
 		])

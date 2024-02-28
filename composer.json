@@ -21,6 +21,7 @@
 		"ext-intl": "*",
 		"ext-mbstring": "*",
 		"ext-decimal": "*",
+		"ext-simplexml": "*",
 		"ext-zip": "*",
 		"ext-soap": "*",
 		"php-decimal/php-decimal": "^1.1",
@@ -51,7 +52,9 @@
 		"yiisoft/yii2-httpclient": "^2.0",
 		"loveorigami/yii2-modal-ajax": "^3.8",
 		"wsdltophp/wssecurity": "^2.0",
-		"opis/closure": "^3.6"
+		"opis/closure": "^3.6",
+		"mpdf/mpdf": "^8.2",
+		"markrogoyski/math-php": "^2.8"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-latest",
