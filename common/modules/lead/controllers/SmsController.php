@@ -33,6 +33,13 @@ class SmsController extends BaseController {
 				]));
 			return $this->redirectLead($id);
 		}
+		if (!empty($lead->phoneBlacklist)) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('lead', 'Phone: {phone} is on Blacklist.', [
+					'phone' => $lead->getPhone(),
+				]));
+			return $this->redirectLead($id);
+		}
 
 		$model = new LeadSmsForm($lead);
 		if (!empty($message)) {

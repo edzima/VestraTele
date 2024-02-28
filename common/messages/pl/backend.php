@@ -352,4 +352,8 @@ return [
 	'Note Stage' => 'Etap (kiedykowiek)',
 	'Claims Sum: {sum}' => 'Suma roszczeń: {sum}',
 	'With claims sum' => 'Suma roszczeń',
+	'Empty: all' => 'Puste: wszyscy',
+	'All Users' => 'Wszyscy',
+	'Visible for' => 'Widoczność',
+	'Group by Issue user Types' => 'Grupuj po typie',
 ];

@@ -5,7 +5,6 @@ namespace common\models;
 use common\models\query\ArticleQuery;
 use common\models\user\User;
 use Yii;
-use yii\behaviors\BlameableBehavior;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -29,14 +28,17 @@ use yii\db\ActiveRecord;
  * @property integer $show_on_mainpage
  *
  *
- * @property User $author
- * @property ArticleCategory $category
- * @property User $updater
+ * @property-read User $author
+ * @property-read ArticleCategory $category
+ * @property-read User $updater
+ * @property-read ArticleUser[] $articleUsers
  */
 class Article extends ActiveRecord {
 
 	public const STATUS_DRAFT = 0;
 	public const STATUS_ACTIVE = 1;
+
+	public array $usersIds = [];
 
 	/**
 	 * @inheritdoc
@@ -51,11 +53,6 @@ class Article extends ActiveRecord {
 	public function behaviors(): array {
 		return [
 			TimestampBehavior::class,
-			[
-				'class' => BlameableBehavior::class,
-				'createdByAttribute' => 'author_id',
-				'updatedByAttribute' => 'updater_id',
-			],
 			[
 				'class' => SluggableBehavior::class,
 				'attribute' => 'title',
@@ -72,13 +69,6 @@ class Article extends ActiveRecord {
 		return [
 			[['title', 'body', 'category_id'], 'required'],
 			[['preview', 'body'], 'string'],
-			[
-				'published_at', 'default',
-				'value' => static function () {
-					return date(DATE_ATOM);
-				},
-			],
-			['published_at', 'filter', 'filter' => 'strtotime'],
 			[['status', 'category_id', 'author_id', 'updater_id', 'created_at', 'updated_at', 'show_on_mainpage'], 'integer'],
 			[['title', 'slug'], 'string', 'max' => 255],
 			['show_on_mainpage', 'default', 'value' => null],
@@ -86,7 +76,6 @@ class Article extends ActiveRecord {
 			['author_id', 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['author_id' => 'id']],
 			['category_id', 'exist', 'skipOnError' => true, 'targetClass' => ArticleCategory::class, 'targetAttribute' => ['category_id' => 'id']],
 			['updater_id', 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updater_id' => 'id']],
-
 		];
 	}
 
@@ -109,6 +98,19 @@ class Article extends ActiveRecord {
 			'tagValues' => Yii::t('common', 'Tags'),
 			'show_on_mainpage' => Yii::t('common', 'Show on Mainpage'),
 		];
+	}
+
+	public function isForUser(int $userId): bool {
+		$users = $this->articleUsers;
+		if (empty($users)) {
+			return true;
+		}
+		foreach ($users as $user) {
+			if ($user->user_id === $userId) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -139,6 +141,12 @@ class Article extends ActiveRecord {
 	 */
 	public function getUpdater() {
 		return $this->hasOne(User::class, ['id' => 'updater_id']);
+	}
+
+	public function getArticleUsers() {
+		return $this->hasMany(ArticleUser::class, [
+			'article_id' => 'id',
+		]);
 	}
 
 	public static function find(): ArticleQuery {

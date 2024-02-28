@@ -64,7 +64,19 @@ $this->params['breadcrumbs'][] = $this->title;
 			'published_at:datetime',
 			'created_at:datetime',
 			'updated_at:datetime',
-
+			[
+				'attribute' => 'user_id',
+				'value' => function (Article $data): string {
+					$users = $data->articleUsers;
+					if ($users) {
+						$names = ArrayHelper::getColumn($users, 'user');
+						return Html::ul($names);
+					}
+					return Yii::t('backend', 'All Users');
+				},
+				'format' => 'html',
+				'label' => Yii::t('backend', 'Visible for'),
+			],
 			[
 				'class' => ActionColumn::class,
 				'template' => '{update} {delete}',

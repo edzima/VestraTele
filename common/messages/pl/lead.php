@@ -440,4 +440,12 @@ return [
 	'Success update Lead deadline.' => 'Zaktualizowano Deadline',
 	'Updated Deadline' => 'Nadpisany',
 	'Hours after newest Report' => 'Od raportu(h)',
+	'Add phone: {phone} to blacklist. Blocked from sending new SMS.' => 'Dodano numer: {phone} do Blacklist. Zablokowano wysyłke nowych SMS.',
+	'User: {user} add this phone: {phone} to Blacklist - {date}. {deleteLink}' => '{date} - {user} dodał numer: {phone} do Czarnej Listy . {deleteLink}',
+	'This phone: {phone} is on Blacklist - {date}. {deleteLink}' => 'Numer: {phone} jest na czarnej liście. {deleteLink}',
+	'Delete from Blacklist' => 'Usuń z Listy',
+	'Add to Add to Blacklist. Blocked SMS' => 'Dodaj do czarnej listy. Blokada SMS',
+	'Phone: {phone} is on Blacklist.' => 'Numer: {phone} jest na Czarnej liście',
+	'Phone is on Blacklist.' => 'Numer jest na Czarnej liście',
+	'Lead Phone Blacklists' => 'Leads - Blacklist',
 ];

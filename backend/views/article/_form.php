@@ -1,16 +1,17 @@
 <?php
 
+use backend\helpers\Html;
+use backend\helpers\Url;
+use backend\models\ArticleForm;
+use common\widgets\ActiveForm;
 use common\widgets\DateTimeWidget;
+use kartik\select2\Select2;
 use vova07\imperavi\Widget;
-use yii\bootstrap\ActiveForm;
-use yii\bootstrap\Html;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Url;
+use yii\web\View;
 
-/* @var $this yii\web\View */
-/* @var $model common\models\Article */
-/* @var $form yii\bootstrap\ActiveForm */
-/* @var $categories string[] */
+/* @var $this View */
+/* @var $model ArticleForm */
+/* @var $form ActiveForm */
 ?>
 
 <div class="article-form">
@@ -61,19 +62,26 @@ use yii\helpers\Url;
 	<?= $form->field($model, 'show_on_mainpage')->textInput()->hint(Yii::t('common', 'Empty: not visible. Number for Order.')) ?>
 
 
-	<?= $form->field($model, 'category_id')->dropDownList(ArrayHelper::map(
-		$categories,
-		'id',
-		'title'
-	), ['prompt' => Yii::t('common', 'Select...')]
-	) ?>
+	<?= $form->field($model, 'category_id')->dropDownList(
+		$model->getCategoriesNames(),
+		['prompt' => Yii::t('common', 'Select...')])
+	?>
 
 
 	<?= $form->field($model, 'published_at')->widget(DateTimeWidget::class) ?>
 
+	<?= $form->field($model, 'usersIds')->widget(
+		Select2::class, [
+			'data' => $model->getUsersNames(),
+			'options' => [
+				'multiple' => true,
+				'prompt' => $model->getAttributeLabel('usersIds'),
+			],
+		]
+	)->hint(Yii::t('backend', 'Empty: all')) ?>
 
 	<div class="form-group">
-		<?= Html::submitButton($model->isNewRecord ? Yii::t('backend', 'Create') : Yii::t('backend', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+		<?= Html::submitButton($model->getModel()->isNewRecord ? Yii::t('backend', 'Create') : Yii::t('backend', 'Update'), ['class' => $model->getModel()->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
 	</div>
 
 	<?php ActiveForm::end() ?>

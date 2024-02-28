@@ -329,6 +329,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		]);
 	}
 
+	public function getPhoneBlacklist(): ActiveQuery {
+		return $this->hasOne(LeadPhoneBlacklist::class, ['phone' => 'phone']);
+	}
+
 	public function updateStatus(int $status_id): bool {
 		if ($this->status_id !== $status_id) {
 			$this->updateAttributes([
