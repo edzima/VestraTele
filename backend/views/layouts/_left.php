@@ -42,6 +42,12 @@ $user = Yii::$app->user;
 					'visible' => $user->can(Worker::PERMISSION_POTENTIAL_CLIENT),
 				],
 				[
+					'label' => Yii::t('credit', 'Analyze SKD'),
+					'url' => ['/credit/analyze/calc'],
+					'icon' => '<i class="fa fa-credit-card"></i>',
+					'visible' => $user->can(Worker::PERMISSION_CREDIT_ANALYZE),
+				],
+				[
 					'label' => Yii::t('common', 'Leads'),
 					'url' => '#',
 					'visible' => $user->can(User::PERMISSION_LEAD),
