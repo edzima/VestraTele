@@ -98,4 +98,5 @@ return array_merge([
 	'vindicator' => 'Windykator',
 	'potential-client' => 'Potencjalny Klient',
 	'settlement.delete-not-self' => 'Rozliczenia - Usuwanie nie swoich',
+	'credit.analyze' => 'Analiza SKD',
 ], $local);

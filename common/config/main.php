@@ -1,5 +1,6 @@
 <?php
 
+use common\behaviors\GlobalAccessBehavior;
 use common\components\callpage\CallPageClient;
 use common\components\DbManager;
 use common\components\Formatter;
@@ -44,6 +45,15 @@ $config = [
 	'modules' => [
 		'credit' => [
 			'class' => CreditModule::class,
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'permissions' => [Worker::PERMISSION_CREDIT_ANALYZE],
+					],
+				],
+			],
 		],
 		'teryt' => [
 			'class' => TerytModule::class,
