@@ -152,6 +152,7 @@ class RbacController extends Controller {
 		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
 		Worker::PERMISSION_SETTLEMENT_ADMINISTRATIVE_CREATE,
 		Worker::PERMISSION_SETTLEMENT_DELETE_NOT_SELF,
+		Worker::PERMISSION_CREDIT_ANALYZE,
 	];
 
 	public function actionAddPermissionToWorkers(string $name, array $assignments): void {

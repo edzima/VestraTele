@@ -13,6 +13,51 @@ return [
 		'date' => '2020-01-01'
 	],
 	[
+		'region_id' => 04,
+		'name' => 'KUJAWSKO-POMORSKIE',
+		'date' => '2020-01-01',
+	],
+	[
+		'region_id' => 06,
+		'name' => 'LUBELSKIE',
+		'date' => '2020-01-01',
+	],
+	[
+		'region_id' => 8,
+		'name' => 'LUBUSKIE',
+		'date' => '2020-01-01',
+	],
+	[
+		'region_id' => 10,
+		'name' => 'ŁÓDZKIE',
+		'date' => '2020-01-01',
+	],
+	[
+		'region_id' => 12,
+		'name' => 'MAŁOPOLSKIE',
+		'date' => '2020-01-01',
+	],
+	[
+		'region_id' => 14,
+		'name' => 'MAZOWIECKIE',
+		'date' => '2020-01-01',
+	],
+	[
+		'region_id' => 16,
+		'name' => 'OPOLSKIE',
+		'date' => '2020-01-01',
+	],
+	[
+		'region_id' => 18,
+		'name' => 'PODKARPACKIE',
+		'date' => '2020-01-01',
+	],
+	[
+		'region_id' => 20,
+		'name' => 'PODLASKIE',
+		'date' => '2020-01-01',
+	],
+	[
 		'region_id' => 22,
 		'name' => 'POMORSKIE',
 		'date' => '2020-01-01'
@@ -72,5 +117,24 @@ return [
 		'name' => 'Bielsko-Biała',
 		'date' => '2020-01-01'
 	],
-
+	[
+		'region_id' => 26,
+		'name' => 'ŚWIĘTOKRZYSKIE',
+		'date' => '2020-01-01',
+	],
+	[
+		'region_id' => 28,
+		'name' => 'WARMIŃSKO-MAZURSKIE',
+		'date' => '2020-01-01',
+	],
+	[
+		'region_id' => 30,
+		'name' => 'WIELKOPOLSKIE',
+		'date' => '2020-01-01',
+	],
+	[
+		'region_id' => 32,
+		'name' => 'ZACHODNIOPOMORSKIE',
+		'date' => '2020-01-01',
+	],
 ];
