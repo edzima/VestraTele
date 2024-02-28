@@ -6,7 +6,7 @@ return [
 	'Analyze - {borrower} ({analyzeAt})' => 'Analiza: {borrower} ({analyzeAt})',
 	'Analyze SKD' => 'Analiza SKD',
 	'Agreement' => 'Umowa',
-	'A  greement Number' => 'Nr. umowy',
+	'Agreement Number' => 'Nr. umowy',
 	'Agreement At' => 'Data Umowy',
 	'Borrower' => 'Kredytobiorca / Pożyczkobiorca',
 	'{interests} (interests)' => '{interests} (odsetki)',
