@@ -4,6 +4,7 @@ return [
 	'Amount of cancelled interest on future' => 'Kwota anulowanych odsetek na przyszłość',
 	'Analyze At' => 'Data analizy',
 	'Analyze - {borrower} ({analyzeAt})' => 'Analiza: {borrower} ({analyzeAt})',
+	'Analyze SKD' => 'Analiza SKD',
 	'Agreement' => 'Umowa',
 	'A  greement Number' => 'Nr. umowy',
 	'Agreement At' => 'Data Umowy',
