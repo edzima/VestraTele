@@ -22,7 +22,7 @@ class ArticleForm extends Model {
 	public string $body = '';
 	public ?int $updater_id = null;
 	public $show_on_mainpage;
-	public int $author_id;
+	public ?int $author_id = null;
 	public ?int $category_id = null;
 
 	/**
@@ -30,7 +30,7 @@ class ArticleForm extends Model {
 	 */
 	public function rules(): array {
 		return [
-			[['title', 'body', 'category_id'], 'required'],
+			[['title', 'body', 'category_id', 'author_id'], 'required'],
 			[['preview', 'body'], 'string'],
 			['published_at', 'filter', 'filter' => 'strtotime'],
 			[['show_on_mainpage'], 'default', 'value' => null],
