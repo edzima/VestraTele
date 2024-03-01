@@ -51,7 +51,7 @@ class CreditClientAnalyze extends Model {
 				'min' => $this->sanctionCalc ? $this->sanctionCalc->getInterestsToPay() - 1 : null,
 				'max' => $this->sanctionCalc ? $this->sanctionCalc->getInterestsToPay() + 1 : null,
 			],
-			[['totalLoanAmount', 'amountOfLoanGranted',], 'number', 'min' => $this->sanctionCalc ? $this->sanctionCalc->sumCredit : 0],
+			[['totalLoanAmount', 'amountOfLoanGranted',], 'number', 'min' => 0],
 			['agreement', 'string', 'min' => 3],
 			[['borrower', 'analyzeResult'], 'string', 'min' => 8],
 			[['entityResponsibleId'], 'in', 'range' => array_keys($this->getEntityResponsibleNames())],
