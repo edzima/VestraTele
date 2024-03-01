@@ -24,6 +24,25 @@ class CreditSanctionCalcTest extends Unit {
 		$this->thenSeeError('First installment At cannot be blank.', 'firstInstallmentAt');
 	}
 
+	public function testDates() {
+		$this->giveModel();
+		$this->loadDefaultValues();
+		$this->model->generateInstallments();
+		$i = 0;
+		$dates = [
+			'2022-01-01',
+			'2022-02-01',
+			'2022-03-01',
+			'2022-04-01',
+		];
+		foreach ($this->model->getLoanInstallments() as $loanInstallment) {
+			if (isset($dates[$i])) {
+				$this->assertSame($dates[$i], $loanInstallment->date);
+			}
+			$i++;
+		}
+	}
+
 	public function testDefaultValues() {
 		$this->giveModel();
 		$this->loadDefaultValues();
@@ -79,9 +98,9 @@ class CreditSanctionCalcTest extends Unit {
 			$this->tester->assertSame(2000.0, $installment->capitalValue);
 		}
 		$last = end($installments);
-		$this->tester->assertSame(18.08, round($last->interestPart, 2));
+		$this->tester->assertSame(18.1, round($last->interestPart, 2));
 		$this->tester->assertSame(2000.0, $last->capitalValue);
-		$this->tester->assertSame(2018.08, round($last->getValue(), 2));
+		$this->tester->assertSame(2018.1, round($last->getValue(), 2));
 	}
 
 	private function assertCapitalSum(float $value = self::DEFAULT_CAPITAL_VALUE): void {

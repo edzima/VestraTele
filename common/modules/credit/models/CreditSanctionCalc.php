@@ -171,6 +171,7 @@ class CreditSanctionCalc extends Model {
 	protected function getInstalmentDateAt(int $period): string {
 		$dateTime = new DateTime($this->firstInstallmentAt);
 		if ($period > 1) {
+			$period--;
 			$dateTime = $dateTime->modify("+$period month");
 		}
 		return $dateTime->format('Y-m-d');
