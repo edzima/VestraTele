@@ -2,6 +2,7 @@
 
 namespace common\modules\credit\controllers;
 
+use common\helpers\Inflector;
 use common\modules\credit\models\CreditClientAnalyze;
 use common\modules\credit\models\CreditSanctionCalc;
 use Mpdf\Mpdf;
@@ -21,7 +22,7 @@ class AnalyzeController extends Controller {
 			$analyze->setSanctionCalc($model);
 			if ($analyze->load(Yii::$app->request->post()) && $analyze->validate()) {
 				$pdf = $this->createPDF($analyze);
-				return $pdf->OutputHttpDownload($pdf->title);
+				return $pdf->OutputHttpDownload(Inflector::slug($pdf->title) . '.pdf');
 			}
 		}
 
