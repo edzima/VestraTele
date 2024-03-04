@@ -2,6 +2,7 @@
 
 namespace frontend\assets;
 
+use common\assets\CopyToClipboardAsset;
 use yii\web\AssetBundle;
 
 /**
@@ -22,6 +23,6 @@ class AppAsset extends AssetBundle {
 		'yii\bootstrap\BootstrapAsset',
 		'common\assets\OpenSans',
 		'rmrevin\yii\fontawesome\AssetBundle',
-	//	'common\assets\SweetAlert',
+		CopyToClipboardAsset::class,
 	];
 }
