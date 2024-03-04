@@ -50,6 +50,8 @@ return [
 	'Create user' => 'Dodaj użytkownika',
 	'Create customer' => 'Dodaj klienta',
 	'Create worker' => 'Dodaj pracownika',
+	'Create worker from JSON' => 'Dodaj Pracownika',
+	'Load from String' => 'Wklej Dane',
 	'Create installment cost: {issue}' => 'Dodaj zaliczkę: {issue}',
 	'Create User Trait' => 'Dodaj Cechę',
 	'Customers' => 'Klienci',

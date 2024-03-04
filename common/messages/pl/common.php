@@ -109,6 +109,7 @@ return [
 	'Entity responsible' => 'Podmiot odpowiedzialny',
 	'Entities responsible' => 'Podmioty odpowiedzialne',
 	'loginToBackend' => 'Logowanie do backendu',
+	'Load' => 'Prześlij',
 	'Loading...' => 'Ładowanie...',
 	'Select...' => 'Wybierz...',
 	'Issue details' => 'Szczegóły sprawy',
@@ -382,4 +383,6 @@ return [
 	'SMS has been scheduled({date}): "{message}". JOB_ID: {jobId}' => 'Zaplanowano ({date}) wysyłkę SMS: "{message}". JOB_ID:{jobId}',
 	'Date At must be from future.' => 'Data musi być z przyszłości',
 	'Add import task to queue. Rows count: {count}.' => 'Dodano zadanie do kolejki. Ilość wierszy: {count}.',
+	'Copy to Clipboard' => 'Kopiuj do Schowka',
+	'Copied to Clipboard' => 'Skopiowano do Schowka!',
 ];

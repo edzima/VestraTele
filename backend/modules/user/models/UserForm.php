@@ -14,6 +14,7 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 /**
  * Create user form.
@@ -47,6 +48,10 @@ class UserForm extends Model {
 
 	private ?ActiveDataProvider $duplicatesDataProvider = null;
 	private bool $isPostalAddressRequired = false;
+
+	public function isCreate(): bool {
+		return $this->scenario === static::SCENARIO_CREATE || $this->model->isNewRecord;
+	}
 
 	public function getDuplicatesDataProvider(): ?ActiveDataProvider {
 		if (
@@ -409,6 +414,24 @@ class UserForm extends Model {
 		$event = new UserFormEvent();
 		$event->isNewRecord = $isNewRecord;
 		$this->trigger(static::EVENT_AFTER_SAVE, $event);
+	}
+
+	public function formAttributes(): array {
+		$data = [
+			$this->formName() => $this->getAttributes(),
+			$this->getProfile()->formName() => $this->getProfile()->getAttributes(null, ['user_id']),
+		];
+		if (!$this->getHomeAddress()->isEmpty()) {
+			$data[$this->getHomeAddress()->formName] = $this->getHomeAddress()->getAttributes(null, ['id']);
+		}
+		if (!$this->getPostalAddress()->isEmpty()) {
+			$data[$this->getPostalAddress()->formName] = $this->getPostalAddress()->getAttributes(null, ['id']);
+		}
+		return $data;
+	}
+
+	public function formToJson(): string {
+		return Json::encode($this->formAttributes());
 	}
 
 }

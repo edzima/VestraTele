@@ -1,5 +1,6 @@
 <?php
 
+use backend\helpers\Html;
 use backend\modules\user\models\WorkerUserForm;
 use backend\modules\user\widgets\DuplicateUserGridView;
 
@@ -18,10 +19,20 @@ if ($duplicates) {
 ?>
 <div class="user-create user-worker-create">
 
+	<p>
+		<?= Html::a(Html::icon('paste'), ['create-from-json'], [
+			'class' => 'btn btn-sm btn-success',
+			'title' => Yii::t('backend', 'Load from String'),
+			'aria-label' => Yii::t('backend', 'Load from String'),
+		]) ?>
+
+	</p>
+
 
 	<?= $duplicates !== null
 		? DuplicateUserGridView::widget([
 			'dataProvider' => $duplicates,
+			'actionController' => '/user/worker',
 		])
 		: ''
 	?>

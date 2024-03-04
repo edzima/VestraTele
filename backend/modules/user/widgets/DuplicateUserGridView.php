@@ -13,6 +13,7 @@ use Yii;
 class DuplicateUserGridView extends GridView {
 
 	public string $actionTemplate = '{create-issue} {link} {view} {update}';
+	public string $actionController = '/user/customer';
 
 	public function init() {
 		if (empty($this->columns)) {
@@ -81,7 +82,7 @@ class DuplicateUserGridView extends GridView {
 			[
 				'class' => ActionColumn::class,
 				'template' => $this->actionTemplate,
-				'controller' => '/user/customer',
+				'controller' => $this->actionController,
 				'visibleButtons' => [
 					'create-issue' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
 					'link' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER),
