@@ -17,8 +17,7 @@ class CopyToCliboardFormAttributesBtn extends CopyToClipboardBtn {
 	public ?UserForm $formModel = null;
 
 	protected function createUserForm(): UserForm {
-		$model = $this->model;
-		switch ($model::class) {
+		switch (get_class($this->model)) {
 			case User::class:
 				return new UserForm();
 			case Worker::class:
