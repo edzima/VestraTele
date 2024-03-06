@@ -385,4 +385,5 @@ return [
 	'Add import task to queue. Rows count: {count}.' => 'Dodano zadanie do kolejki. Ilość wierszy: {count}.',
 	'Copy to Clipboard' => 'Kopiuj do Schowka',
 	'Copied to Clipboard' => 'Skopiowano do Schowka!',
+	'Send further instructions to Emai: {email}' => 'Wysłano instrukcje resetu hasła na E-mail: {email}',
 ];

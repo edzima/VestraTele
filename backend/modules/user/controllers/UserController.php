@@ -6,6 +6,7 @@ use backend\modules\user\models\search\UserSearch;
 use backend\modules\user\models\UserForm;
 use common\helpers\Flash;
 use common\models\forms\JsonModel;
+use common\models\user\PasswordResetRequestForm;
 use common\models\user\User;
 use common\widgets\JsonFormWidget;
 use Yii;
@@ -131,6 +132,31 @@ class UserController extends Controller {
 		}
 
 		return $this->redirect(['index']);
+	}
+
+	/**
+	 * Requests password reset.
+	 *
+	 * @return mixed
+	 */
+	public function actionRequestPasswordReset(int $id, string $returnUrl = null) {
+		$user = $this->findModel($id);
+		$model = new PasswordResetRequestForm();
+		$model->email = $user->getEmail();
+		if ($model->validate() && $model->sendEmail()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('common', 'Send further instructions to Emai: {email}', [
+					'email' => $model->email,
+				])
+			);
+		} else {
+			Flash::add(Flash::TYPE_ERROR,
+				Yii::t('backend', 'Sorry, we are unable to reset password for the provided User.')
+			);
+			Yii::warning($model->getErrors(), __METHOD__);
+		}
+
+		return $this->redirect($returnUrl ? $returnUrl : ['index']);
 	}
 
 	/**

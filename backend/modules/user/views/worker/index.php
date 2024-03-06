@@ -4,6 +4,7 @@ use backend\helpers\Url;
 use backend\modules\user\models\search\WorkerUserSearch;
 use backend\modules\user\widgets\CopyToCliboardFormAttributesBtn;
 use backend\widgets\GridView;
+use common\models\user\PasswordResetRequestForm;
 use common\models\user\UserProfile;
 use common\models\user\Worker;
 use common\widgets\grid\ActionColumn;
@@ -75,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			'action_at:Datetime',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{copy} {view} {update} {provision} {hierarchy} {delete}',
+				'template' => '{request-password-reset} {copy} {view} {update} {provision} {hierarchy} {delete}',
 				'buttons' => [
 					'copy' => static function (string $url, Worker $model): string {
 						return CopyToCliboardFormAttributesBtn::widget([
@@ -111,6 +112,19 @@ $this->params['breadcrumbs'][] = $this->title;
 								'data-pjax' => '0',
 							]);
 					},
+					'request-password-reset' => static function (string $url, Worker $model): ?string {
+						if (!PasswordResetRequestForm::forUser($model)) {
+							return null;
+						}
+						return Html::a('<i class="fa fa-key"></i>',
+							['request-password-reset', 'id' => $model->id, 'returnUrl' => Url::current()],
+							[
+								'title' => Yii::t('backend', 'Reset password'),
+								'aria-label' => Yii::t('backend', 'Reset password'),
+								'data-pjax' => '0',
+								'data-method' => 'POST',
+							]);
+					},
 				],
 				'visibleButtons' => [
 					'view' => true,
@@ -119,6 +133,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					'hierarchy' => Yii::$app->user->can(Worker::PERMISSION_WORKERS_HIERARCHY),
 					'link' => Yii::$app->user->can(Worker::PERMISSION_ISSUE),
 					'provision' => Yii::$app->user->can(Worker::PERMISSION_PROVISION),
+					'request-password-reset' => Yii::$app->user->can(Worker::PERMISSION_WORKERS),
 				],
 
 			],
