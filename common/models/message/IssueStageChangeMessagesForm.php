@@ -183,6 +183,7 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 		parent::parseIssue($template);
 		$data = [
 			'stage' => $this->issue->getIssueStage()->name,
+			'agentPhone' => $this->issue->getIssueModel()->agent->getPhone(),
 		];
 		$stageChangeAt = $this->stageChangeAt ?: $this->issue->getIssueModel()->stage_change_at;
 		if ($stageChangeAt) {
