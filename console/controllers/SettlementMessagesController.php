@@ -26,7 +26,7 @@ class SettlementMessagesController extends Controller {
 
 	public function actionThirdDemand(int $delayDays): void {
 		$model = $this->createModel();
-		$model->which = DemandForPayment::WHICH_SECOND;
+		$model->which = DemandForPayment::WHICH_THIRD;
 		$model->delayedDays = $delayDays;
 		$model->markMultiple();
 	}
