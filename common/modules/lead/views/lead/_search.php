@@ -174,6 +174,16 @@ use kartik\select2\Select2;
 			'data' => LeadSearch::getStatusNames(),
 			'pluginOptions' => [
 				'placeholder' => $model->getAttributeLabel('reportStatus'),
+				'allowClear' => true,
+			],
+		])
+		?>
+
+		<?= $form->field($model, 'excludedStatus', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
+			'data' => LeadSearch::getStatusNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('excludedStatus'),
+				'allowClear' => true,
 			],
 		])
 		?>

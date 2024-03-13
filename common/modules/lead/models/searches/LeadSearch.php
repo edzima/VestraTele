@@ -84,6 +84,8 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public bool $joinAddress = true;
 
+	public $excludedStatus = [];
+
 	protected const DEADLINE_TODAY = 'today';
 	protected const DEADLINE_TOMORROW = 'tomorrow';
 	protected const DEADLINE_EXCEEDED = 'exceeded';
@@ -116,7 +118,7 @@ class LeadSearch extends Lead implements SearchModel {
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames()), 'allowArray' => true],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			[['selfUserId'], 'in', 'range' => function () { return $this->selfUsersIds(); }, 'allowArray' => true, 'skipOnEmpty' => true],
-			[['status_id', 'reportStatus'], 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
+			[['status_id', 'excludedStatus', 'reportStatus'], 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
 			['deadlineType', 'in', 'range' => array_keys(static::getDeadlineNames())],
 			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
 			[['from_at', 'to_at'], 'safe'],
@@ -135,6 +137,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'withoutReport' => Yii::t('lead', 'Without Report'),
 				'user_id' => Yii::t('lead', 'User'),
 				'closedQuestions' => Yii::t('lead', 'Closed Questions'),
+				'excludedStatus' => Yii::t('lead', 'Excluded Status'),
 				'excludedClosedQuestions' => Yii::t('lead', 'Excluded Closed Questions'),
 				'duplicateEmail' => Yii::t('lead', 'Duplicate Email'),
 				'duplicatePhone' => Yii::t('lead', 'Duplicate Phone'),
@@ -253,6 +256,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applySelfUserFilter($query);
 		$this->applyPhoneFilter($query);
 		$this->applyStatusFilter($query);
+		$this->applyExcludedStatusFilter($query);
 		$this->applyReportFilter($query);
 		$this->applyReportStatusFilter($query);
 		$this->applyDeadlineFilter($query);
@@ -673,6 +677,12 @@ class LeadSearch extends Lead implements SearchModel {
 	private function applyOnlyWithPhone(LeadQuery $query) {
 		if ($this->onlyWithPhone) {
 			$query->andWhere(Lead::tableName() . '.phone IS NOT NULL');
+		}
+	}
+
+	private function applyExcludedStatusFilter(LeadQuery $query): void {
+		if (!empty($this->excludedStatus)) {
+			$query->andWhere(['NOT IN', Lead::tableName() . '.status_id', $this->excludedStatus]);
 		}
 	}
 }
