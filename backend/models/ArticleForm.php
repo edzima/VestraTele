@@ -72,6 +72,7 @@ class ArticleForm extends Model {
 		}
 		$model = $this->getModel();
 		$model->title = $this->title;
+		$model->author_id = $this->author_id;
 		$model->slug = $this->slug;
 		$model->show_on_mainpage = $this->show_on_mainpage;
 		$model->status = $this->status;
