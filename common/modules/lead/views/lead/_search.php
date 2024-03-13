@@ -183,6 +183,7 @@ use kartik\select2\Select2;
 			'data' => LeadSearch::getStatusNames(),
 			'pluginOptions' => [
 				'placeholder' => $model->getAttributeLabel('excludedStatus'),
+				'multiple' => true,
 				'allowClear' => true,
 			],
 		])
