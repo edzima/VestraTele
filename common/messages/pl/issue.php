@@ -234,4 +234,6 @@ return [
 	'Entity Agreement Details' => 'Umowa z Podmiotem',
 	'Entity Agreement' => 'Umowa z Podmiotem',
 	'Entity Agreement At' => 'Umowa z Podmiotem (Data)',
+	'In Issue: {issue} the stage was changed' => 'W Sprawie: {issue} etap został zmieniony',
+	'The stage was changed' => 'Etap został zmieniony',
 ];

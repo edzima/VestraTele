@@ -147,7 +147,7 @@ $parentMenuItems = Html::issueMainTypesItems();
 							'containerOptions' => [
 								'class' => 'd-inline-flex',
 							],
-							'returnUrl' => Url::to('/issue/index'),
+							'returnUrl' => Url::current(),
 							'options' => [
 								'class' => 'btn btn-default btn-sm',
 								'title' => Yii::t('issue', 'Change Stage'),

@@ -356,7 +356,16 @@ class IssueController extends Controller {
 		if ($model->load(Yii::$app->request->post())
 			&& $model->save()
 		) {
+			$message = $returnUrl
+				? Yii::t('issue', 'In Issue: {issue} the stage was changed', [
+					'issue' => $model->getIssue()->getIssueName(),
+				])
+				: Yii::t('issue', 'The stage was changed');
+
+			$message .= ': ' . $model->getNoteTitle();
+			Flash::add(Flash::TYPE_SUCCESS, $message);
 			$model->pushMessages();
+
 			return $this->redirect($returnUrl ?? ['view', 'id' => $issueId]);
 		}
 		return $this->render('stage', [

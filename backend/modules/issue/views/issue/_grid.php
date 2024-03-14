@@ -145,7 +145,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 						'class' => 'd-inline-flex',
 						TooltipAsset::DEFAULT_ATTRIBUTE_NAME => $model->stage->name,
 					],
-					'returnUrl' => Url::to('/issue/issue/index'),
+					'returnUrl' => Url::current(),
 					'options' => [
 						'class' => 'btn btn-default btn-sm',
 						'title' => Yii::t('issue', 'Change Stage'),

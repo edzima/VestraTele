@@ -9,14 +9,15 @@
 namespace frontend\controllers;
 
 use common\behaviors\IssueTypeParentIdAction;
+use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\user\UserVisible;
 use common\models\user\Worker;
 use frontend\helpers\Url;
 use frontend\models\IssueStageChangeForm;
+use frontend\models\search\IssueCustomersSearch;
 use frontend\models\search\IssuePayCalculationSearch;
 use frontend\models\search\IssueSearch;
-use frontend\models\search\IssueCustomersSearch;
 use frontend\models\search\SummonSearch;
 use Yii;
 use yii\base\Action;
@@ -138,6 +139,14 @@ class IssueController extends Controller {
 		$model->user_id = Yii::$app->user->getId();
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$model->pushMessages();
+			$message = $returnUrl
+				? Yii::t('issue', 'In Issue: {issue} the stage was changed', [
+					'issue' => $model->getIssue()->getIssueName(),
+				])
+				: Yii::t('issue', 'The stage was changed');
+
+			$message .= ': ' . $model->getNoteTitle();
+			Flash::add(Flash::TYPE_SUCCESS, $message);
 			return $this->redirect($returnUrl ?? ['view', 'id' => $issueId]);
 		}
 		return $this->render('stage', [
