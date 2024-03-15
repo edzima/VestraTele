@@ -60,6 +60,7 @@ return array_merge([
 	'lead.duplicate' => 'Leads - Duplikaty',
 	'lead.import' => 'Leads - Import',
 	'lead.market' => 'Leads - Giełda',
+	'lead.update-multiple' => 'Leads - Edycja masowa',
 	'lead.sms.welcome' => 'Leads - Sms Powitalny',
 	'lead.status' => 'Leads - Statusy',
 	'logs' => 'Logi',

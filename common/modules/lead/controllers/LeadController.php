@@ -9,6 +9,7 @@ use common\helpers\Html;
 use common\models\user\User;
 use common\modules\lead\models\forms\LeadDeadlineForm;
 use common\modules\lead\models\forms\LeadForm;
+use common\modules\lead\models\forms\LeadMultipleUpdate;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;
@@ -182,6 +183,63 @@ class LeadController extends BaseController {
 			return $this->redirectLead($id);
 		}
 		return $this->render('deadline', [
+			'model' => $model,
+		]);
+	}
+
+	public function actionUpdateMultiple(array $ids = []) {
+		if (empty($ids)) {
+			$postIds = Yii::$app->request->post('leadsIds');
+			if (is_string($postIds)) {
+				$postIds = explode(',', $postIds);
+			}
+			if ($postIds) {
+				$ids = $postIds;
+			}
+		}
+		if (empty($ids)) {
+			Flash::add(Flash::TYPE_WARNING, 'Ids cannot be blank.');
+			return $this->redirect(['index']);
+		}
+		$ids = array_unique($ids);
+		if (count($ids) === 1) {
+			return $this->redirect(['update', 'id' => reset($ids)]);
+		}
+		$model = new LeadMultipleUpdate();
+		$model->ids = $ids;
+		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+			$sourceCount = $model->updateSource();
+			if ($sourceCount) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('lead', 'Success Change Source: {source} for Leads: {count}.', [
+						'source' => $model->getSourceModel()->getSourceName(),
+						'count' => $sourceCount,
+					]));
+			}
+			$model->getStatusModel()->owner_id = Yii::$app->user->getId();
+			$statusCount = $model->updateStatus();
+			if ($statusCount) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('lead', 'Success Change Status: {status} for Leads: {count}.', [
+						'status' => $model->getStatusModel()->getStatusName(),
+						'count' => $statusCount,
+					]));
+			}
+			$usersCount = $model->updateUsers();
+			if ($usersCount) {
+				$userModel = $model->getUsersModel();
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('lead', 'Success assign {user} as {type} to {count} leads.', [
+						'user' => $userModel->getUserName(),
+						'type' => $userModel->getTypeName(),
+						'count' => $usersCount,
+					])
+				);
+				$userModel->sendEmail();
+			}
+			return $this->redirect(['index']);
+		}
+		return $this->render('update-multiple', [
 			'model' => $model,
 		]);
 	}

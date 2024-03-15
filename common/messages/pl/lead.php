@@ -449,4 +449,5 @@ return [
 	'Phone is on Blacklist.' => 'Numer jest na Czarnej liście',
 	'Lead Phone Blacklists' => 'Leads - Blacklist',
 	'Excluded Status' => 'Wykluczony Status',
+	'Update Leads: {count}' => 'Edycja Leads: {count}',
 ];
