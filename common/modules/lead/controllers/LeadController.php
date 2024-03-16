@@ -257,7 +257,7 @@ class LeadController extends BaseController {
 		 */
 		$model = $this->findLead($id);
 		$reminderQuery = $model->getLeadReminders()
-			->with([
+			->joinWith([
 				'reminder' => function (ReminderQuery $query) {
 					if ($this->module->onlyUser) {
 						$query->onlyUser(Yii::$app->user->getId());
