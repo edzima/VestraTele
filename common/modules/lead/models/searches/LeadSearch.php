@@ -236,7 +236,7 @@ class LeadSearch extends Lead implements SearchModel {
 		];
 
 		$this->load($params);
-		//	$this->addressSearch->load($params);
+		$this->addressSearch->load($params);
 
 		if (!$this->validate()) {
 			$query->where('0=1');
