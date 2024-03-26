@@ -17,7 +17,7 @@ use yii\widgets\DetailView;
 <div class="same-contact-lead">
 
 	<h3>
-		<?= Module::manager()->isForUser($model->getId())
+		<?= Module::manager()->isForUser($model)
 			? Html::a(Html::encode($model->getName()), ['view', 'id' => $model->getId()])
 			: Html::encode($model->getName())
 		?>
