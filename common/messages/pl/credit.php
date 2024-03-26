@@ -10,7 +10,7 @@ return [
 	'Agreement At' => 'Data Umowy',
 	'Borrower' => 'Kredytobiorca / Pożyczkobiorca',
 	'{interests} (interests)' => '{interests} (odsetki)',
-	'{interests} (interests) + {provision} (provision) = {sum}' => '{interests} (odestki) + {provision} (prowizja) = {sum}',
+	'{interests} (interests) + {provision} (provision) = {sum}' => '{interests} (odsetki) + {provision} (prowizja) = {sum}',
 	'Calculation' => 'Kalkulacja',
 	'Creditor / Lender' => 'Kredytodawca / Pożyczkodawca',
 	'Creditor' => 'Kredytodawca',
