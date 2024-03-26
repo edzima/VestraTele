@@ -108,9 +108,9 @@ class LeadSearch extends Lead implements SearchModel {
 	public function rules(): array {
 		return [
 			[['id', 'type_id', 'campaign_id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
-			[['reportStatus', 'hoursAfterLastReport'], 'integer'],
-			['!user_id', 'required', 'on' => static::SCENARIO_USER],
-			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
+			[['reportStatus', 'hoursAfterLastReport', 'owner_id'], 'integer'],
+			[['!user_id'], 'required', 'on' => static::SCENARIO_USER],
+			[['!user_id'], 'integer', 'on' => static::SCENARIO_USER],
 			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress', 'onlyWithEmail', 'onlyWithPhone'], 'boolean'],
 			['name', 'string', 'min' => 3],
 			[['duplicatePhone', 'fromMarket', 'selfUserId', 'onlyWithEmail', 'onlyWithPhone',], 'default', 'value' => null],
@@ -308,7 +308,12 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 	}
 
-	private function applyUserFilter(ActiveQuery $query): void {
+	public $owner_id;
+
+	private function applyUserFilter(LeadQuery $query): void {
+		if (!empty($this->owner_id)) {
+			$query->owner($this->owner_id);
+		}
 		if (!empty($this->user_id)) {
 			$query->joinWith('leadUsers');
 			$query->andWhere([LeadUser::tableName() . '.user_id' => $this->user_id]);
@@ -702,5 +707,11 @@ class LeadSearch extends Lead implements SearchModel {
 		if (!empty($this->excludedStatus)) {
 			$query->andWhere(['NOT IN', Lead::tableName() . '.status_id', $this->excludedStatus]);
 		}
+	}
+
+	public function getOwnersNames(): array {
+		return User::getSelectList(
+			LeadUser::userIds(LeadUser::TYPE_OWNER)
+		);
 	}
 }

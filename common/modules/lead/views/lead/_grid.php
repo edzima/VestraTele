@@ -106,7 +106,19 @@ foreach (LeadSearch::questions() as $question) {
 			'attribute' => 'owner_id',
 			'label' => Yii::t('lead', 'Owner'),
 			'value' => 'owner',
+			'filter' => $searchModel->getOwnersNames(),
 			'visible' => $searchModel->scenario !== LeadSearch::SCENARIO_USER,
+			'filterType' => GridView::FILTER_SELECT2,
+			'filterInputOptions' => [
+				'placeholder' => Yii::t('lead', 'Owner'),
+			],
+			'filterWidgetOptions' => [
+				'size' => Select2::SIZE_SMALL,
+				'pluginOptions' => [
+					'allowClear' => true,
+					'dropdownAutoWidth' => true,
+				],
+			],
 		],
 		[
 			'attribute' => 'name',
