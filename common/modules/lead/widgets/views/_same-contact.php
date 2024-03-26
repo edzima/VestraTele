@@ -29,7 +29,7 @@ use yii\widgets\DetailView;
 	<p>
 
 		<?= Html::a(Yii::t('lead', 'Create Lead Report'),
-			['/lead/report/report', 'id' => $model->getId()],
+			['/lead/report/report', 'id' => $model->getId(), 'hash' => $model->getHash()],
 			[
 				'class' => 'btn btn-success',
 			])
