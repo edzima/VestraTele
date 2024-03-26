@@ -96,7 +96,7 @@ use kartik\select2\Select2;
 	<div class="row">
 
 		<?php
-		$closedData = LeadSearch::getClosedQuestionsNames();
+		$closedData = $model->getClosedQuestionsNames();
 		if (!empty($closedData)) {
 			echo $form->field($model, 'closedQuestions', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
 				'data' => $closedData,

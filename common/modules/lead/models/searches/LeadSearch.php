@@ -498,11 +498,29 @@ class LeadSearch extends Lead implements SearchModel {
 		return static::$QUESTIONS;
 	}
 
-	public static function getClosedQuestionsNames(): array {
+	public function getClosedQuestionsNames(): array {
+		$query = LeadQuestion::find()
+			->active()
+			->withoutPlaceholder()
+			->boolean(false);
+		if (!empty($this->type_id) || !empty($this->source_id)) {
+			if ($this->validate(['type_id', 'source_id'])) {
+				$typeId = $this->type_id;
+				$sources = $this->source_id;
+				$sourceID = is_array($sources) ? reset($sources) : $sources;
+				if (!empty($sourceID)) {
+					$typeId = LeadSource::typeId((int) $sourceID);
+				}
+
+				if (!empty($typeId)) {
+					$query->forType($typeId);
+				}
+			}
+		}
+
+		$models = $query->all();
 		return ArrayHelper::map(
-			LeadQuestion::find()
-				->withoutPlaceholder()
-				->all(),
+			$models,
 			'id', 'name');
 	}
 
