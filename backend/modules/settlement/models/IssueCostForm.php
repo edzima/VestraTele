@@ -19,6 +19,7 @@ use yii\base\Model;
  */
 class IssueCostForm extends Model implements HiddenFieldsModel {
 
+	public const SCENARIO_WITHOUT_ISSUE = 'without-issue';
 	public const SCENARIO_CREATE_INSTALLMENT = 'create-installment';
 	public const SCENARIO_SETTLE = 'settle';
 	public bool $usersFromIssue = true;
@@ -36,15 +37,15 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	public ?string $settled_at = null;
 
 	private ?IssueCost $model = null;
-	private IssueInterface $issue;
+	private ?IssueInterface $issue = null;
 
-	public function __construct(IssueInterface $issue, $config = []) {
+	public function setIssue(?IssueInterface $issue) {
 		$this->issue = $issue;
-		parent::__construct($config);
 	}
 
 	public static function createFromModel(IssueCost $cost): self {
-		$model = new static($cost->getIssueModel());
+		$model = new static();
+		$model->setIssue($cost->issue);
 		$model->setModel($cost);
 		if ($model->user_id && $model->usersFromIssue && !isset($model->getUserNames()[$model->user_id])) {
 			$model->usersFromIssue = false;
@@ -86,11 +87,18 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 			[['base_value', 'value'], 'number', 'min' => 1, 'max' => 100000],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 			['transfer_type', 'in', 'range' => array_keys(static::getTransfersTypesNames())],
-			['user_id', 'in', 'range' => array_keys($this->getUserNames()), 'message' => Yii::t('backend', 'User must be from issue users.')],
+			[
+				'user_id',
+				'in',
+				'range' => array_keys($this->getUserNames()),
+				'message' => Yii::t('backend', 'User must be from issue users.'),
+				'except' => static::SCENARIO_WITHOUT_ISSUE,
+			],
+
 		];
 	}
 
-	public function getIssue(): IssueInterface {
+	public function getIssue(): ?IssueInterface {
 		return $this->issue;
 	}
 
@@ -103,7 +111,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 
 	public function setModel(IssueCost $cost): void {
 		$this->model = $cost;
-		$this->issue = $cost->getIssueModel();
+		$this->issue = $cost->issue;
 		$this->type = $cost->type;
 		$this->date_at = $cost->date_at;
 		$this->confirmed_at = $cost->confirmed_at;
@@ -126,7 +134,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	}
 
 	public function getUserNames(): array {
-		if (!$this->usersFromIssue) {
+		if (!$this->usersFromIssue || $this->getIssue() === null) {
 			return User::getSelectList(Worker::getAssignmentIds([Worker::PERMISSION_ISSUE]), false);
 		}
 		return User::getSelectList(
@@ -140,7 +148,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 			return false;
 		}
 		$model = $this->getModel();
-		$model->issue_id = $this->getIssue()->getIssueId();
+		$model->issue_id = $this->getIssue() ? $this->getIssue()->getIssueId() : null;
 		$model->base_value = $this->getBaseValue() ? $this->getBaseValue()->toFixed(2) : null;
 		$model->value = $this->getValue()->toFixed(2);
 		$model->vat = $this->vat ? (new Decimal($this->vat))->toFixed(2) : null;

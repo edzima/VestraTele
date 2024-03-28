@@ -11,7 +11,6 @@ use common\models\settlement\VATInfo;
  */
 interface IssueCostInterface extends
 	CostInterface,
-	IssueInterface,
 	TransferType,
 	VATInfo {
 

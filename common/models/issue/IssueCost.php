@@ -17,7 +17,7 @@ use yii\db\ActiveRecord;
  * This is the model class for table "issue_cost".
  *
  * @property int $id
- * @property int $issue_id
+ * @property int|null $issue_id
  * @property string $type
  * @property string $value
  * @property string|null $base_value
@@ -39,13 +39,12 @@ use yii\db\ActiveRecord;
  * @property-read bool $isSettled
  * @property-read bool $hasSettlements
  *
- * @property-read Issue $issue
+ * @property-read Issue|null $issue
  * @property-read IssuePayCalculation[] $settlements
  * @property-read User|null $user
  */
 class IssueCost extends ActiveRecord implements IssueCostInterface {
 
-	use IssueTrait;
 	use VATInfoTrait;
 
 	public static function tableName(): string {

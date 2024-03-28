@@ -137,9 +137,8 @@ class DebtCostsFormTest extends Unit {
 	}
 
 	private function giveModel(): void {
-		$this->model = new DebtCostsForm(
-			$this->getIssue()
-		);
+		$this->model = new DebtCostsForm();
+		$this->model->setIssue($this->getIssue());
 		$this->model->pccPercent = static::PCC_PERCENT;
 		$this->model->pit4Percent = static::PIT_PERCENT;
 		$this->model->transfer_type = TransferType::TRANSFER_TYPE_BANK;

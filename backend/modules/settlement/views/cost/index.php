@@ -1,14 +1,13 @@
 <?php
 
+use backend\helpers\Url;
 use backend\modules\settlement\models\search\IssueCostSearch;
 use backend\modules\settlement\widgets\IssueCostActionColumn;
 use backend\widgets\GridView;
-use backend\widgets\IssueColumn;
 use common\helpers\Html;
 use common\models\issue\IssueCost;
 use common\models\issue\IssueCostInterface;
 use common\models\user\User;
-use common\widgets\grid\IssueTypeColumn;
 use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
@@ -43,18 +42,48 @@ $this->params['breadcrumbs'][] = $this->title;
 
 		'columns' => [
 			[
-				'class' => IssueColumn::class,
+				'attribute' => 'issue_id',
+				'value' => function (IssueCost $model): ?string {
+					if ($model->issue) {
+						return Html::a($model->issue->getIssueName(), Url::issueView($model->issue_id));
+					}
+					return null;
+				},
+				'format' => 'html',
 			],
 			[
-				'class' => IssueTypeColumn::class,
 				'attribute' => 'issueType',
 				'label' => Yii::t('common', 'Issue type'),
+				'value' => function (IssueCost $model): ?string {
+					if ($model->issue) {
+						return Html::encode($model->issue->getTypeName());
+					}
+					return null;
+				},
+				'format' => 'html',
+				'filter' => $model->getIssueTypesNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'options' => [
+						'multiple' => true,
+						'placeholder' => Yii::t('common', 'Issue type'),
+					],
+					'pluginOptions' => [
+						'dropdownAutoWidth' => true,
+					],
+					'size' => Select2::SIZE_SMALL,
+					'showToggleAll' => false,
+				],
 			],
 			[
 				'attribute' => 'issueStage',
 				'label' => Yii::t('common', 'Issue stage'),
-				'value' => static function (IssueCost $model) {
-					return $model->getIssueModel()->getStageName() . ' - ' . Yii::$app->formatter->asDate($model->getIssueModel()->stage_change_at);
+				'value' => static function (IssueCost $model): ?string {
+					if ($model->issue === null) {
+						return null;
+					}
+
+					return $model->issue->getStageName() . ' - ' . Yii::$app->formatter->asDate($model->issue->stage_change_at);
 				},
 				'filter' => IssueCostSearch::getIssueStagesNames(),
 				'filterType' => GridView::FILTER_SELECT2,

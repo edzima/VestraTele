@@ -4,8 +4,8 @@ namespace backend\tests\functional\settlement;
 
 use backend\modules\settlement\controllers\CalculationController;
 use backend\tests\Step\Functional\CreateCalculationIssueManager;
-use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
@@ -22,6 +22,7 @@ class CalculationCreateCest {
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::users(true),
 			IssueFixtureHelper::stageAndTypesFixtures(),
+			IssueFixtureHelper::entityResponsible(),
 			SettlementFixtureHelper::settlement(),
 			SettlementFixtureHelper::pay(),
 			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_SETTLEMENT_CREATE),
