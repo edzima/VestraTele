@@ -137,6 +137,7 @@ return [
 	'Excluded types' => 'Wykluczone typy',
 	'Excluded tags' => 'Wykluczone tagi',
 	'Only with Telemarketers' => 'Z konsultantem',
+	'Telemarketer - Self' => 'Konsultant - Własny',
 	'Archive is Excluded. Check in them.' => 'Archiwum jest wykluczone. Sprawdź w nim',
 	'Type Parent' => 'Nadrzędny Typ',
 	'Child Types' => 'Podtypy',

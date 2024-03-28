@@ -44,6 +44,9 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	public const TYPE_GUARDIAN = User::ROLE_GUARDIAN;
 	public const TYPE_VINDICATOR = User::ROLE_VINDICATOR;
 
+	public const TYPE_TELEMARKETER_SELF = 'tele.self';
+
+
 	public const TYPES_WORKERS = [
 		self::TYPE_LAWYER,
 		self::TYPE_LAWYER_OFFICE,
@@ -52,6 +55,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 		self::TYPE_CO_AGENT,
 		self::TYPE_RECOMMENDING,
 		self::TYPE_TELEMARKETER,
+		self::TYPE_TELEMARKETER_SELF,
 		self::TYPE_VINDICATOR,
 	];
 
@@ -166,6 +170,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 			static::TYPE_SHAREHOLDER => User::getRolesNames()[static::TYPE_SHAREHOLDER],
 			static::TYPE_HANDICAPPED => User::getRolesNames()[static::TYPE_HANDICAPPED],
 			static::TYPE_RECOMMENDING => User::getRolesNames()[static::TYPE_RECOMMENDING],
+			static::TYPE_TELEMARKETER_SELF => Yii::t('issue', 'Telemarketer - Self'),
 		];
 	}
 
