@@ -5,6 +5,7 @@ namespace frontend\tests\functional;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
+use common\models\issue\IssueCost;
 use common\models\user\Worker;
 use frontend\controllers\ReportController;
 use frontend\tests\_support\AgentTester;
@@ -45,6 +46,22 @@ class ReportCest {
 
 	public function checkSelfReport(AgentTester $I): void {
 		$I->amLoggedInAs(UserFixtureHelper::AGENT_PETER_NOWAK);
+		$I->haveRecord(
+			IssueCost::class, [
+			'issue_id' => 1,
+			'type' => IssueCost::TYPE_INSTALLMENT,
+			'date_at' => '2020-02-02',
+			'value' => 300,
+			'user_id' => $I->getUser()->getId(),
+		]);
+		$I->haveRecord(
+			IssueCost::class, [
+			'issue_id' => null,
+			'type' => IssueCost::TYPE_INSTALLMENT,
+			'date_at' => '2020-02-02',
+			'value' => 300,
+			'user_id' => $I->getUser()->getId(),
+		]);
 		$I->amOnPage(static::ROUTE_INDEX);
 		$I->see(
 			strtr('Provisions Report ({from} - {to})', [

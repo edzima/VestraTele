@@ -1,13 +1,16 @@
 <?php
 
+use common\models\issue\IssueCost;
+use common\models\issue\IssueInterface;
 use common\models\provision\ProvisionReportSearch;
+use common\models\user\Worker;
+use common\widgets\grid\DataColumn;
 use common\widgets\provision\ProvisionUserReportWidget;
+use frontend\helpers\Url;
 use frontend\widgets\ChildesSelect2Widget;
-use frontend\widgets\IssueColumn;
 use yii\helpers\Html;
 use yii\web\View;
 use yii\web\YiiAsset;
-use common\models\user\Worker;
 
 /* @var $this View */
 /* @var $searchModel ProvisionReportSearch */
@@ -45,7 +48,23 @@ YiiAsset::register($this);
 <?= ProvisionUserReportWidget::widget([
 	'model' => $searchModel->summary(),
 	'issueColumn' => [
-		'class' => IssueColumn::class,
+		'class' => DataColumn::class,
+		'attribute' => 'issue_id',
+		'format' => 'html',
+		'value' => function ($model): ?string {
+			$issue = null;
+			if ($model instanceof IssueInterface) {
+				$issue = $model->getIssueModel();
+			}
+			if ($model instanceof IssueCost) {
+				$issue = $model->issue;
+			}
+			if ($issue === null) {
+				return null;
+			}
+			return Html::a($issue->getIssueName(), Url::issueView($issue->getIssueId()));
+		},
+
 	],
 	'actionColumn' => [
 		'visible' => false,
