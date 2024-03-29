@@ -176,4 +176,5 @@ return [
 	'Payed Sum' => 'Opłacono',
 	'Commission Refund' => 'Zwrot Prowizji',
 	'Create Cost' => 'Dodaj Koszt',
+	'Shipments' => 'Przesyłki',
 ];
