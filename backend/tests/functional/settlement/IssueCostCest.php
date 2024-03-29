@@ -148,6 +148,14 @@ class IssueCostCest {
 		$I->seeInCurrentUrl(static::ROUTE_VIEW);
 	}
 
+	public function checkCreateLink(CostIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnPage([static::ROUTE_INDEX]);
+		$I->seeLink('Create Cost');
+		$I->click('Create Cost');
+		$I->seeInCurrentUrl(static::ROUTE_CREATE);
+	}
+
 	public function checkCreateInstallment(CostIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(

@@ -175,4 +175,5 @@ return [
 	'Visible Cost: {value} in Report.' => 'Koszt: {value} będzie ponownie w Raporcie.',
 	'Payed Sum' => 'Opłacono',
 	'Commission Refund' => 'Zwrot Prowizji',
+	'Create Cost' => 'Dodaj Koszt',
 ];

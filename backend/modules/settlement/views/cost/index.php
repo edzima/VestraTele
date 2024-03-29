@@ -21,6 +21,10 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="issue-cost-index">
 
 	<p>
+		<?= Html::a(Yii::t('settlement', 'Create Cost'),
+			['create'], ['class' => 'btn btn-success'])
+		?>
+
 		<?= IssueCost::typeExist(IssueCost::TYPE_PCC)
 			? Html::a(Yii::t('backend', 'PCC Export'), ['pcc-export', Yii::$app->request->queryParams], ['class' => 'btn btn-success'])
 			: ''

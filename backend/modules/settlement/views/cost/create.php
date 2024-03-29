@@ -7,7 +7,7 @@ use common\models\message\IssueCostMessagesForm;
 /* @var $model IssueCostForm */
 /* @var $message IssueCostMessagesForm */
 
-$this->title = Yii::t('backend', 'Create cost');
+$this->title = Yii::t('settlement', 'Create Cost');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' => ['/issue/issue/index']];
 
 if ($model->getIssue()) {
