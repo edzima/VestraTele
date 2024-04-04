@@ -20,6 +20,7 @@ class CreditSanctionCalc extends Model {
 
 	public ?float $sumCredit = null;
 	public $provision;
+	public $insurance;
 
 	public $interestRatePercent = 0;
 
@@ -57,7 +58,7 @@ class CreditSanctionCalc extends Model {
 				'enableClientValidation' => false,
 			],
 			[['interestRateType', 'installmentsType'], 'string'],
-			[['sumCredit', 'interestRatePercent', 'provision', 'periods',], 'number', 'min' => 0],
+			[['sumCredit', 'interestRatePercent', 'provision', 'periods', 'insurance'], 'number', 'min' => 0],
 		];
 	}
 
@@ -72,6 +73,7 @@ class CreditSanctionCalc extends Model {
 			'interestsPaid' => Yii::t('credit', 'Interests paid'),
 			'interestsToPay' => Yii::t('credit', 'Interests to pay'),
 			'interestsTotal' => Yii::t('credit', 'Interests total'),
+			'insurance' => Yii::t('credit', 'Insurance'),
 		];
 	}
 

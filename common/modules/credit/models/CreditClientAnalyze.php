@@ -81,7 +81,7 @@ class CreditClientAnalyze extends Model {
 		$this->estimateRefund();
 		$loans = $model->getLoanInstallments();
 		$firstLoan = reset($loans);
-		$this->totalLoanAmount = $model->sumCredit;
+		$this->totalLoanAmount = $model->sumCredit - $model->provision - $model->insurance;
 		$this->amountOfLoanGranted = $model->sumCredit;
 		if ($firstLoan) {
 			$this->agreementAt = $firstLoan->date;

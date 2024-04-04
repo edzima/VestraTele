@@ -48,4 +48,5 @@ kredytu bez odsetek, prowizji i innych kosztów dodatkowych.',
 	'Capital value' => 'Kapitał',
 	'Interest part' => 'Odsetki',
 	'Installment value' => 'Rata',
+	'Insurance' => 'Ubezpieczenie',
 ];
