@@ -61,6 +61,16 @@ $this->registerJs($js);
 			->widget(NumberControl::class)
 		?>
 
+		<?= $form->field($model, 'insurance', [
+			'options' => [
+				'class' => [
+					'col-md-3 col-lg-2',
+				],
+			],
+		])
+			->widget(NumberControl::class)
+		?>
+
 
 	</div>
 
