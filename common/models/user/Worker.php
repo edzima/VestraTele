@@ -27,6 +27,7 @@ class Worker extends User implements ActiveHierarchy {
 		self::ROLE_LAWYER_ASSISTANT,
 		self::ROLE_LAWYER_OFFICE,
 		self::ROLE_MANAGER,
+		self::ROLE_AUDITOR,
 	];
 	public const PERMISSION_ENTITY_RESPONSIBLE_MANAGER = 'entity_responsible.manager';
 
@@ -69,6 +70,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_CREDIT_ANALYZE = 'credit.analyze';
 	public const PERMISSION_COURT = 'court';
 	public const PERMISSION_LAWSUIT = 'lawsuit';
+	public const ROLE_AUDITOR = 'auditor';
 
 	private static $USER_NAMES = [];
 

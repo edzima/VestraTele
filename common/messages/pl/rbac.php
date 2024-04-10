@@ -7,6 +7,7 @@ return array_merge([
 	'agent' => 'Przedstawiciel',
 	'archive' => 'Archiwum',
 	'archive.deep' => 'Archiwum - Glębokie',
+	'auditor' => 'Audytor',
 	'book_keeper' => 'Księgowy',
 	'book_keeper_delayed' => 'Księgowy - przeterminowane',
 	'calculation.to-create' => 'Rozliczenia - dodawanie',
