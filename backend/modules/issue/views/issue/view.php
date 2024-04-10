@@ -103,6 +103,19 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 						: ''
 					?>
 
+					<?= Yii::$app->user->can(Worker::PERMISSION_LAWSUIT)
+						? Html::a(
+							Html::faicon('legal'),
+							['/court/lawsuit/create', 'issueId' => $model->id],
+							[
+								'title' => Yii::t('court', 'Create Lawsuit'),
+								'aria-label' => Yii::t('court', 'Create Lawsuit'),
+								'class' => 'btn btn-warning',
+							]
+						)
+						: ''
+					?>
+
 					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
 						? Html::a(
 							Html::icon('tag'),
@@ -238,7 +251,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		'entityResponsibleRoute' => '/entity-responsible/default/view',
 		'stageRoute' => 'stage/view',
 		'typeRoute' => 'type/view',
-
+		'lawsuitActionColumn' => Yii::$app->user->can(Worker::PERMISSION_LAWSUIT),
 	]) ?>
 
 

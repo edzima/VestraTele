@@ -53,6 +53,13 @@ class Lawsuit extends ActiveRecord {
 		return '{{%lawsuit}}';
 	}
 
+	public function getName(): string {
+		return Yii::t('court', 'Lawsuit {n,plural,=1{for Issue:{issue}} other{for Issues: {issue}}}', [
+			'n' => count($this->issues),
+			'issue' => implode(', ', ArrayHelper::getColumn($this->issues, 'issueName')),
+		]);
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
