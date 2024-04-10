@@ -16,6 +16,7 @@ use common\models\issue\query\IssueStageQuery;
 use common\models\issue\query\IssueUserQuery;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
+use common\modules\court\models\Lawsuit;
 use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -439,6 +440,11 @@ class Issue extends ActiveRecord implements IssueInterface {
 
 	public function getShipmentsPocztaPolska(): ActiveQuery {
 		return $this->hasMany(IssueShipmentPocztaPolska::class, ['issue_id' => 'id']);
+	}
+
+	public function getLawsuits(): ActiveQuery {
+		return $this->hasMany(Lawsuit::class, ['id' => 'lawsuit_id'])
+			->viaTable(Lawsuit::VIA_TABLE_ISSUE, ['issue_id' => 'id']);
 	}
 
 }

@@ -10,6 +10,7 @@ use common\models\issue\IssueTagType;
 use common\models\issue\IssueUser;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\court\models\Lawsuit;
 use common\modules\issue\widgets\IssueTagsWidget;
 use common\modules\issue\widgets\IssueUsersWidget;
 use common\widgets\FieldsetDetailView;
@@ -31,6 +32,7 @@ use yii\data\ActiveDataProvider;
 /* @var $stageUrl string|null */
 /* @var $typeUrl string|null */
 /* @var $shipmentsActionColumn bool */
+/* @var $lawsuitActionColumn bool */
 
 ?>
 
@@ -485,6 +487,37 @@ use yii\data\ActiveDataProvider;
 
 					],
 
+				],
+			]) ?>
+
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getIssueModel()->getLawsuits(),
+				]),
+				'showOnEmpty' => false,
+				'summary' => '',
+				'caption' => Yii::t('court', 'Lawsuits'),
+				'columns' => [
+					[
+						'attribute' => 'court_id',
+						'format' => 'html',
+						'value' => function (Lawsuit $lawsuit) use ($lawsuitActionColumn): string {
+							if ($lawsuitActionColumn) {
+								return Html::a(Html::encode($lawsuit->court->name), [
+									'/court/court/view', 'id' => $lawsuit->court_id,
+								]);
+							}
+							return $lawsuit->court->name;
+						},
+					],
+					'signature_act',
+					'due_at:datetime',
+					'locationName',
+					[
+						'class' => ActionColumn::class,
+						'controller' => '/court/lawsuit',
+						'visible' => $lawsuitActionColumn,
+					],
 				],
 			]) ?>
 

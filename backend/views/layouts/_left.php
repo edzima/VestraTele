@@ -256,6 +256,30 @@ $user = Yii::$app->user;
 					],
 				],
 				[
+					'label' => Yii::t('court', 'Lawsuits'),
+					'url' => '#',
+					'icon' => '<i class="fa fa-legal"></i>',
+					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(User::PERMISSION_CZATER),
+					'items' => [
+						[
+							'label' => Yii::t('common', 'Browse'),
+							'url' => ['/court/lawsuit/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('court', 'Calendar'),
+							'url' => ['/calendar/lawsuit/index'],
+							'icon' => '<i class="fa fa-calendar"></i>',
+						],
+						[
+							'label' => Yii::t('court', 'Courts'),
+							'url' => ['/court/court/index'],
+							'icon' => '<i class="fa fa-sitemap"></i>',
+						],
+					],
+				],
+				[
 					'label' => Yii::t('file', 'Files'),
 					'url' => ['/file/file/index'],
 					'icon' => '<i class="fa fa-paperclip"></i>',
