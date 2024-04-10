@@ -14,6 +14,7 @@ use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\calendar\controllers\SummonCalendarController;
 use common\modules\calendar\Module as CalendarModule;
+use common\modules\court\Module as CourtModule;
 use common\modules\czater\Module as CzaterModule;
 use common\modules\lead\Module as LeadModule;
 use Edzima\Yii2Adescom\Module as AdescomModule;
@@ -111,6 +112,18 @@ return [
 					'class' => SummonCalendarController::class,
 					'summonIndexRoute' => '/issue/summon/index',
 					'summonViewRoute' => '/issue/summon/view',
+				],
+			],
+		],
+		'court' => [
+			'class' => CourtModule::class,
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'permissions' => [Worker::PERMISSION_COURT, Worker::PERMISSION_LAWSUIT],
+					],
 				],
 			],
 		],
