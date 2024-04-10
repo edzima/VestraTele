@@ -17,7 +17,7 @@ class CourtSearch extends Court {
 	public function rules(): array {
 		return [
 			[['id', 'parent_id'], 'integer'],
-			[['name', 'address', 'type', 'phone', 'fax', 'email', 'updated_at'], 'safe'],
+			[['name', 'type', 'phone', 'fax', 'email', 'updated_at'], 'safe'],
 		];
 	}
 
@@ -61,7 +61,6 @@ class CourtSearch extends Court {
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])
-			->andFilterWhere(['like', 'address', $this->address])
 			->andFilterWhere(['like', 'type', $this->type])
 			->andFilterWhere(['like', 'phone', $this->phone])
 			->andFilterWhere(['like', 'fax', $this->fax])
