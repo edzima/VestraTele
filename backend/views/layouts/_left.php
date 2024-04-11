@@ -359,7 +359,7 @@ $user = Yii::$app->user;
 							'label' => Yii::t('backend', 'Browse'),
 							'url' => ['/settlement/calculation/index'],
 							'icon' => '<i class="fa fa-money"></i>',
-							'visible' => $user->can(User::ROLE_BOOKKEEPER),
+							'visible' => $user->can(User::ROLE_BOOKKEEPER) || $user->can(Worker::PERMISSION_CALCULATION_TO_CREATE),
 						],
 						[
 							'label' => Yii::t('settlement', 'Without provisions'),
