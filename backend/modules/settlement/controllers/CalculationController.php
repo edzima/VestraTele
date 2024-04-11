@@ -49,7 +49,7 @@ class CalculationController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionIndex() {
 		if (!Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
 			return $this->redirect(['owner']);
 		}
