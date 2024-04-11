@@ -260,7 +260,7 @@ $user = Yii::$app->user;
 					'url' => '#',
 					'icon' => '<i class="fa fa-legal"></i>',
 					'options' => ['class' => 'treeview'],
-					'visible' => $user->can(User::PERMISSION_CZATER),
+					'visible' => $user->can(Worker::PERMISSION_LAWSUIT),
 					'items' => [
 						[
 							'label' => Yii::t('common', 'Browse'),
