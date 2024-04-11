@@ -66,7 +66,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'attribute' => 'location',
 				'value' => 'locationName',
-				'filter' => Lawsuit::getLocationNames(),
+				'filter' => LawsuitSearch::getLocationNames(),
+			],
+			[
+				'attribute' => 'presence_of_the_claimant',
+				'value' => 'presenceOfTheClaimantName',
+				'filter' => LawsuitSearch::getPresenceOfTheClaimantNames(),
 			],
 			'signature_act',
 			'room',

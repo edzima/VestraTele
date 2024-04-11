@@ -513,6 +513,7 @@ use yii\data\ActiveDataProvider;
 					'signature_act',
 					'due_at:datetime',
 					'locationName',
+					'presenceOfTheClaimantName',
 					[
 						'class' => ActionColumn::class,
 						'controller' => '/court/lawsuit',

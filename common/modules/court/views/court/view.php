@@ -120,6 +120,7 @@ YiiAsset::register($this);
 					'signature_act',
 					'due_at:datetime',
 					'locationName',
+					'presenceOfTheClaimantName',
 					[
 						'class' => ActionColumn::class,
 						'controller' => '/court/lawsuit',
