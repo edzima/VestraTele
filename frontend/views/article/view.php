@@ -1,10 +1,11 @@
 <?php
 
+use common\models\Article;
 use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Article */
+/* @var $model Article */
 
 $this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('frontend', 'Articles'), 'url' => ['index']];
@@ -20,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
 		</div>
 
 		<div class="row">
-			<div>
+			<div class="col-sm-12">
 				<div class="article-text">
 					<?= HtmlPurifier::process($model->body, function ($config) {
 						$config->set('HTML.SafeIframe', true);

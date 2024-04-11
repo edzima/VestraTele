@@ -17,6 +17,41 @@ $dataProvider->getModels();
 
 <?= Html::beginForm() ?>
 
+
+<?php if (Yii::$app->user->can(User::PERMISSION_LEAD_UPDATE_MULTIPLE)): ?>
+	<div class="btn-group">
+		<?= Html::submitButton(
+			'<i class="fa fa-pencil" aria-hidden="true"></i>',
+			[
+				'class' => 'btn btn-info',
+				'name' => 'route',
+				'value' => 'lead/update-multiple',
+				'title' => Yii::t('lead', 'Update'),
+				'aria-label' => Yii::t('lead', 'Update'),
+			])
+		?>
+		<?= $dataProvider->pagination->pageCount > 1
+			? Html::a(
+				count($searchModel->getAllIds($dataProvider->query)),
+
+				['lead/update-multiple'],
+				[
+					'class' => 'btn btn-info',
+					'data' => [
+						'title' => Yii::t('lead', 'Update ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
+						'aria-label' => Yii::t('lead', 'Update ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
+						'method' => 'POST',
+						'params' => [
+							'leadsIds' => $searchModel->getAllIds($dataProvider->query),
+						],
+					],
+				])
+			: ''
+		?>
+	</div>
+
+<?php endif; ?>
+
 <?php if ($assignUsers): ?>
 	<div class="btn-group">
 

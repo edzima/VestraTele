@@ -76,6 +76,9 @@ class IssueSearch extends BaseIssueSearch {
 		]);
 
 		$this->load($params);
+		if ($this->addressSearch) {
+			$this->addressSearch->load($params);
+		}
 
 		if (!$this->validate()) {
 			$query->andFilterWhere([

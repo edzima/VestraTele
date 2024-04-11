@@ -81,7 +81,13 @@ class IssueCostCest {
 
 	public function checkIssue(CostIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->haveFixtures(IssueFixtureHelper::issue());
+		$I->haveFixtures(array_merge(
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::users(true),
+				IssueFixtureHelper::types()
+			)
+		);
+
 		$issue = $this->issueFixture->grabIssue(0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
 		$I->see('Costs: ' . $issue->longId);
@@ -110,7 +116,13 @@ class IssueCostCest {
 
 	public function checkViewPage(CostIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->haveFixtures(array_merge(SettlementFixtureHelper::cost(true), IssueFixtureHelper::issue()));
+		$I->haveFixtures(
+			array_merge(
+				SettlementFixtureHelper::cost(true),
+				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::users(),
+			));
+		codecept_debug(IssueCost::find()->andWhere(['id' => 1])->asArray()->one());
 		$I->amOnPage([static::ROUTE_VIEW, 'id' => 1]);
 		$I->see('Purchase of receivables');
 		$I->see('615.00');
@@ -136,6 +148,14 @@ class IssueCostCest {
 		$I->seeInCurrentUrl(static::ROUTE_VIEW);
 	}
 
+	public function checkCreateLink(CostIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->amOnPage([static::ROUTE_INDEX]);
+		$I->seeLink('Create Cost');
+		$I->click('Create Cost');
+		$I->seeInCurrentUrl(static::ROUTE_CREATE);
+	}
+
 	public function checkCreateInstallment(CostIssueManager $I): void {
 		$I->amLoggedIn();
 		$I->haveFixtures(
@@ -147,8 +167,8 @@ class IssueCostCest {
 		);
 		$issue = $this->issueFixture->grabIssue(0);
 		$I->amOnPage([static::ROUTE_CREATE_INSTALLMENT, 'id' => $issue->id]);
-		$I->dontSee('Type', 'label[for="issuecostform-type"]');
-		$I->dontSee('Settled at', 'label');
+		$I->seeElement('.field-issuecostform-type.hidden');
+		$I->seeElement('.field-issuecostform-settled_at.hidden');
 		$I->selectOption('User', $issue->agent->id);
 		$I->fillField('Value', 123);
 		$I->fillField('VAT (%)', 23);
@@ -211,6 +231,7 @@ class IssueCostCest {
 		));
 		$id = $I->haveRecord(IssueCost::class, [
 			'issue_id' => 1,
+			'date_at' => '2020-01-01',
 			'settled_at' => '2020-01-01',
 			'type' => IssueCost::TYPE_INSTALLMENT,
 			'value' => 300,
@@ -236,6 +257,7 @@ class IssueCostCest {
 			'type' => IssueCost::TYPE_OFFICE,
 			'value' => 300,
 			'date_at' => '2020-01-01',
+			'transfer_type' => IssueCost::TRANSFER_TYPE_BANK,
 		]);
 		$I->amOnPage([static::ROUTE_INDEX]);
 		$I->seeElement('a', [

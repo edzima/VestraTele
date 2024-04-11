@@ -133,6 +133,7 @@ return [
 	'Interest' => 'Odsetki',
 	'Settle' => 'Rozlicz',
 	'Settle cost: {cost}' => 'Rozlicz Koszt: {cost}',
+	'Update Issue Cost' => 'Edytuj Koszt',
 	'Update Issue Cost: {issue}' => 'Edytuj koszt w Sprawie: {issue}',
 	'Create Debt Costs' => 'Zakup Wierzytelności',
 	'Create Debt Costs: {issue}' => 'Zakup Wierzytelności w Sprawie: {issue}',
@@ -174,4 +175,6 @@ return [
 	'Visible Cost: {value} in Report.' => 'Koszt: {value} będzie ponownie w Raporcie.',
 	'Payed Sum' => 'Opłacono',
 	'Commission Refund' => 'Zwrot Prowizji',
+	'Create Cost' => 'Dodaj Koszt',
+	'Shipments' => 'Przesyłki',
 ];

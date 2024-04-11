@@ -25,7 +25,8 @@ class IssueCostFormTest extends Unit {
 				IssueFixtureHelper::fixtures(),
 				SettlementFixtureHelper::cost(false),
 			));
-		$this->model = new IssueCostForm($this->grabIssue());
+		$this->model = new IssueCostForm();
+		$this->model->setIssue($this->grabIssue());
 	}
 
 	public function testEmpty(): void {
@@ -33,6 +34,23 @@ class IssueCostFormTest extends Unit {
 		$this->thenSeeError('Type cannot be blank.', 'type');
 		$this->thenSeeError('Value cannot be blank.', 'value');
 		$this->thenSeeError('Date at cannot be blank.', 'date_at');
+	}
+
+	public function testWithoutIssue() {
+		$this->model = new IssueCostForm();
+		$model = $this->model;
+		$model->type = IssueCost::TYPE_PURCHASE_OF_RECEIVABLES;
+		$model->date_at = '2020-01-01';
+		$model->value = 600;
+		$model->vat = 23;
+		$this->thenSuccessSave();
+		$this->tester->seeRecord(IssueCost::class, [
+			'issue_id' => null,
+			'type' => IssueCost::TYPE_PURCHASE_OF_RECEIVABLES,
+			'value' => 600,
+			'vat' => 23,
+			'date_at' => '2020-01-01',
+		]);
 	}
 
 	public function testValid(): void {

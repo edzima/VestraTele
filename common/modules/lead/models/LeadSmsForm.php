@@ -63,9 +63,16 @@ class LeadSmsForm extends QueueSmsForm {
 						'status' => static::getStatusNames()[$this->getLead()->getStatusId()],
 					]),
 				],
+				['phone', 'phoneBlacklist'],
 			],
 			parent::rules()
 		);
+	}
+
+	public function phoneBlacklist(): void {
+		if ($this->lead->phoneBlacklist) {
+			$this->addError('phone', 'Phone is on Blacklist.');
+		}
 	}
 
 	public function getLead(): ActiveLead {
@@ -97,6 +104,7 @@ class LeadSmsForm extends QueueSmsForm {
 	public function report(string $smsId): bool {
 		$report = new ReportForm();
 		$report->withSameContacts = false;
+		$report->withLinkUsers = false;
 		$report->setLead($this->lead);
 		$report->owner_id = $this->owner_id;
 		$report->status_id = $this->status_id;
@@ -104,7 +112,6 @@ class LeadSmsForm extends QueueSmsForm {
 		if ($report->save()) {
 			return true;
 		}
-		Yii::error($report->getErrors(), __METHOD__);
 		return false;
 	}
 

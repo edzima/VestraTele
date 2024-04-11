@@ -6,8 +6,8 @@
 /* @var $model ResetPasswordForm */
 
 use frontend\models\ResetPasswordForm;
-use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use yii\helpers\Html;
 
 $this->title = Yii::t('frontend', 'Reset password');
 $this->params['breadcrumbs'][] = $this->title;
@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			<?= $form->field($model, 'password')->passwordInput(['autofocus' => true]) ?>
 
 			<div class="form-group">
-				<?= Html::submitButton('Save', ['class' => 'btn btn-primary']) ?>
+				<?= Html::submitButton(Yii::t('frontend', 'Save'), ['class' => 'btn btn-primary']) ?>
 			</div>
 
 			<?php ActiveForm::end(); ?>

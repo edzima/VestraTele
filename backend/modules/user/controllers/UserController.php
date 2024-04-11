@@ -5,9 +5,13 @@ namespace backend\modules\user\controllers;
 use backend\modules\user\models\search\UserSearch;
 use backend\modules\user\models\UserForm;
 use common\helpers\Flash;
+use common\models\forms\JsonModel;
+use common\models\user\PasswordResetRequestForm;
 use common\models\user\User;
+use common\widgets\JsonFormWidget;
 use Yii;
 use yii\filters\VerbFilter;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -43,10 +47,27 @@ class UserController extends Controller {
 		]);
 	}
 
-	public function actionCreate() {
+	public function actionCreateFromJson() {
+		$model = new JsonModel();
+		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+			return $this->redirect(['create', 'json' => $model->json]);
+		}
+		return $this->renderContent(JsonFormWidget::widget([
+			'model' => $model,
+			'viewTitle' => Yii::t('backend', 'Create worker from JSON'),
+		]));
+	}
+
+	public function actionCreate(string $json = null) {
 		/** @var UserForm $model */
 		$model = new $this->formModel();
 		$model->setScenario(UserForm::SCENARIO_CREATE);
+		if ($json) {
+			$values = Json::decode($json);
+			if (!empty($values)) {
+				$model->load($values);
+			}
+		}
 
 		if (
 			$model->load(Yii::$app->request->post())
@@ -111,6 +132,31 @@ class UserController extends Controller {
 		}
 
 		return $this->redirect(['index']);
+	}
+
+	/**
+	 * Requests password reset.
+	 *
+	 * @return mixed
+	 */
+	public function actionRequestPasswordReset(int $id, string $returnUrl = null) {
+		$user = $this->findModel($id);
+		$model = new PasswordResetRequestForm();
+		$model->email = $user->getEmail();
+		if ($model->validate() && $model->sendEmail()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('common', 'Send further instructions to Emai: {email}', [
+					'email' => $model->email,
+				])
+			);
+		} else {
+			Flash::add(Flash::TYPE_ERROR,
+				Yii::t('backend', 'Sorry, we are unable to reset password for the provided User.')
+			);
+			Yii::warning($model->getErrors(), __METHOD__);
+		}
+
+		return $this->redirect($returnUrl ? $returnUrl : ['index']);
 	}
 
 	/**

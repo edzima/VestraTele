@@ -1,7 +1,6 @@
 <?php
 
 use backend\helpers\Html;
-use backend\widgets\IssueColumn;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionReportSearch;
 use common\widgets\grid\ActionColumn;
@@ -29,10 +28,7 @@ YiiAsset::register($this);
 
 
 <?= ProvisionUserReportWidget::widget([
-	'issueColumn' => [
-		'class' => IssueColumn::class,
-		'viewBaseUrl' => null,
-	],
+	'issueRoute' => null,
 	'actionColumn' => [
 		'class' => ActionColumn::class,
 		'template' => '{update} {hide}',

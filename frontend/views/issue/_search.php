@@ -1,6 +1,7 @@
 <?php
 
 use common\widgets\ActiveForm;
+use common\widgets\address\AddressSearchWidget;
 use common\widgets\DateWidget;
 use frontend\helpers\Html;
 use frontend\helpers\Url;
@@ -75,6 +76,15 @@ use kartik\select2\Select2;
 			])
 		?>
 	</div>
+
+
+	<?= $model->addressSearch !== null
+		? AddressSearchWidget::widget([
+			'form' => $form,
+			'model' => $model->addressSearch,
+		])
+		: ''
+	?>
 
 
 	<div class="form-group">

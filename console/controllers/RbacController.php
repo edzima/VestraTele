@@ -39,6 +39,7 @@ class RbacController extends Controller {
 		Customer::ROLE_HANDICAPPED,
 		User::ROLE_RECCOMENDING,
 		User::ROLE_GUARDIAN,
+		Worker::ROLE_AUDITOR,
 	];
 
 	public array $permissions = [
@@ -139,11 +140,13 @@ class RbacController extends Controller {
 		Worker::PERMISSION_WORKERS,
 		Worker::PERMISSION_WORKERS_HIERARCHY,
 		Worker::PERMISSION_LEAD,
+		Worker::PERMISSION_LEAD_MANAGER,
 		Worker::PERMISSION_LEAD_DELETE,
 		Worker::PERMISSION_LEAD_DIALER,
 		Worker::PERMISSION_LEAD_DIALER_MANAGER,
 		Worker::PERMISSION_LEAD_DUPLICATE,
 		Worker::PERMISSION_LEAD_IMPORT,
+		Worker::PERMISSION_LEAD_UPDATE_MULTIPLE,
 		Worker::PERMISSION_LEAD_MARKET,
 		Worker::PERMISSION_LEAD_SMS_WELCOME,
 		Worker::PERMISSION_LEAD_STATUS,
@@ -151,6 +154,9 @@ class RbacController extends Controller {
 		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
 		Worker::PERMISSION_SETTLEMENT_ADMINISTRATIVE_CREATE,
 		Worker::PERMISSION_SETTLEMENT_DELETE_NOT_SELF,
+		Worker::PERMISSION_CREDIT_ANALYZE,
+		Worker::PERMISSION_COURT,
+		Worker::PERMISSION_LAWSUIT,
 	];
 
 	public function actionAddPermissionToWorkers(string $name, array $assignments): void {

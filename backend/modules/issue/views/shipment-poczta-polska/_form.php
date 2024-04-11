@@ -34,9 +34,9 @@ use common\widgets\ActiveForm;
 	<div class="row">
 		<?= $form->field($model, 'details', [
 			'options' => [
-				'class' => 'col-md-3 col-lg-2',
+				'class' => 'col-md-8',
 			],
-		])->textarea(['rows' => 2]) ?>
+		])->textInput(['maxlength' => true]) ?>
 	</div>
 
 

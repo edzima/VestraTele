@@ -5,6 +5,7 @@ namespace backend\modules\settlement\models;
 use common\helpers\DateTimeHelper;
 use common\models\issue\IssueCost;
 use common\models\issue\IssueCostInterface;
+use common\models\issue\IssueInterface;
 use DateTime;
 use Decimal\Decimal;
 use Yii;
@@ -15,10 +16,13 @@ class DebtCostsForm extends IssueCostForm {
 	public string $pccPercent = '1';
 	public string $pit4Percent = '17';
 
-	public function init() {
-		parent::init();
-		$this->user_id = $this->getIssue()->getIssueModel()->customer->getId();
-		$this->date_at = $this->getIssue()->getIssueModel()->signing_at;
+	public function setIssue(?IssueInterface $issue): void {
+		parent::setIssue($issue);
+		if ($issue) {
+			$this->user_id = $this->getIssue()->getIssueModel()->customer->getId();
+			$this->date_at = $this->getIssue()->getIssueModel()->signing_at;
+		}
+
 	}
 
 	public function rules(): array {
@@ -84,7 +88,7 @@ class DebtCostsForm extends IssueCostForm {
 		$cost = new IssueCost();
 		$cost->type = $type;
 		$cost->date_at = $this->date_at;
-		$cost->issue_id = $this->getIssue()->getIssueId();
+		$cost->issue_id = $this->getIssue() ? $this->getIssue()->getIssueId() : null;
 		$cost->user_id = $this->user_id;
 		return $cost;
 	}

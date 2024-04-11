@@ -18,11 +18,12 @@
 	"license": "BSD-3-Clause",
 	"require": {
 		"php": ">7.4.0",
+		"ext-decimal": "*",
 		"ext-intl": "*",
 		"ext-mbstring": "*",
-		"ext-decimal": "*",
-		"ext-zip": "*",
+		"ext-simplexml": "*",
 		"ext-soap": "*",
+		"ext-zip": "*",
 		"php-decimal/php-decimal": "^1.1",
 		"yiisoft/yii2": "^2.0.38",
 		"yiisoft/yii2-bootstrap": "^2.0.10",
@@ -51,7 +52,9 @@
 		"yiisoft/yii2-httpclient": "^2.0",
 		"loveorigami/yii2-modal-ajax": "^3.8",
 		"wsdltophp/wssecurity": "^2.0",
-		"opis/closure": "^3.6"
+		"opis/closure": "^3.6",
+		"mpdf/mpdf": "^8.2",
+		"markrogoyski/math-php": "^2.8"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-latest",

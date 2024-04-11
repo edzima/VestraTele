@@ -18,8 +18,22 @@ class Url extends BaseUrl {
 	protected const ROUTE_SETTLEMENT_VIEW = '/settlement/calculation/view';
 	protected const ROUTE_LEAD_VIEW = '/lead/lead/view';
 
+	public static function issuesIndexRoute(): string {
+		if (YII_IS_FRONTEND) {
+			return '/issue/index';
+		}
+		return '/issue/issue/index';
+	}
+
+	public static function issueViewRoute(): string {
+		if (YII_IS_FRONTEND) {
+			return '/issue/view';
+		}
+		return '/issue/issue/view';
+	}
+
 	public static function issueView(int $id, $schema = false): string {
-		return static::toRoute([static::ROUTE_ISSUE_VIEW, 'id' => $id], $schema);
+		return static::toRoute([static::issueViewRoute(), 'id' => $id], $schema);
 	}
 
 	public static function issuesParentType(int $id, array $params = []): string {

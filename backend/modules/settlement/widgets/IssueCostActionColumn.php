@@ -34,7 +34,7 @@ class IssueCostActionColumn extends ActionColumn {
 			$this->settleRedirectUrl = Url::current();
 		}
 		if ($this->issue && !isset($this->buttons['issue'])) {
-			$this->buttons['issue'] = function (string $key, IssueCost $cost): string {
+			$this->buttons['issue'] = function (string $key, IssueCost $cost): ?string {
 				return $this->issueLink($cost);
 			};
 		}
@@ -125,13 +125,16 @@ class IssueCostActionColumn extends ActionColumn {
 			]);
 	}
 
-	public function issueLink(IssueCost $cost): string {
-		return Html::a(
-			'<i class="fa fa-suitcase"></i>',
-			Url::issueView($cost->getIssueId()), [
-				'title' => $cost->getIssueName(),
-				'aria-label' => $cost->getIssueName(),
-			]
-		);
+	public function issueLink(IssueCost $cost): ?string {
+		if ($cost->issue) {
+			return Html::a(
+				'<i class="fa fa-suitcase"></i>',
+				Url::issueView($cost->issue_id), [
+					'title' => $cost->issue->getIssueName(),
+					'aria-label' => $cost->issue->getIssueName(),
+				]
+			);
+		}
+		return null;
 	}
 }

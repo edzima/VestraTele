@@ -125,6 +125,13 @@ abstract class IssueSearch extends Model
 		return $names;
 	}
 
+	public function __construct($config = []) {
+		if (!isset($config['addressSearch'])) {
+			$config['addressSearch'] = new AddressSearch();
+		}
+		parent::__construct($config);
+	}
+
 	public function setScenario($value) {
 		parent::setScenario($value);
 		if ($value === static::SCENARIO_ARCHIVE_CUSTOMER) {

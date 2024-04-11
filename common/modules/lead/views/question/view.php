@@ -41,6 +41,7 @@ YiiAsset::register($this);
 			],
 			'is_active:boolean',
 			'is_required:boolean',
+			'is_boolean:boolean',
 			'show_in_grid:boolean',
 			[
 				'attribute' => 'type',

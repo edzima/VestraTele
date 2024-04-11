@@ -112,6 +112,10 @@ class IssueStageChangeForm extends Model {
 
 	public function save(): bool {
 		if (!$this->validate()) {
+			Yii::warning([
+				'errors' => $this->getErrors(),
+				'attributes' => $this->getAttributes(),
+			], __METHOD__);
 			return false;
 		}
 		$model = $this->getIssue()->getIssueModel();

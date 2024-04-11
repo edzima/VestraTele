@@ -21,7 +21,7 @@ $this->params['body-class'] = 'login-page';
 		<?php $form = ActiveForm::begin(['id' => 'login-form']) ?>
 
 		<div class="body">
-			<?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+			<?= $form->field($model, 'usernameOrEmail')->textInput(['autofocus' => true]) ?>
 			<?= $form->field($model, 'password')->passwordInput() ?>
 			<?= $form->field($model, 'rememberMe')->checkbox(['class' => 'simple']) ?>
 		</div>

@@ -84,6 +84,8 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public bool $joinAddress = true;
 
+	public $excludedStatus = [];
+
 	protected const DEADLINE_TODAY = 'today';
 	protected const DEADLINE_TOMORROW = 'tomorrow';
 	protected const DEADLINE_EXCEEDED = 'exceeded';
@@ -106,9 +108,9 @@ class LeadSearch extends Lead implements SearchModel {
 	public function rules(): array {
 		return [
 			[['id', 'type_id', 'campaign_id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
-			[['reportStatus', 'hoursAfterLastReport'], 'integer'],
-			['!user_id', 'required', 'on' => static::SCENARIO_USER],
-			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
+			[['reportStatus', 'hoursAfterLastReport', 'owner_id'], 'integer'],
+			[['!user_id'], 'required', 'on' => static::SCENARIO_USER],
+			[['!user_id'], 'integer', 'on' => static::SCENARIO_USER],
 			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress', 'onlyWithEmail', 'onlyWithPhone'], 'boolean'],
 			['name', 'string', 'min' => 3],
 			[['duplicatePhone', 'fromMarket', 'selfUserId', 'onlyWithEmail', 'onlyWithPhone',], 'default', 'value' => null],
@@ -116,7 +118,7 @@ class LeadSearch extends Lead implements SearchModel {
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames()), 'allowArray' => true],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			[['selfUserId'], 'in', 'range' => function () { return $this->selfUsersIds(); }, 'allowArray' => true, 'skipOnEmpty' => true],
-			[['status_id', 'reportStatus'], 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
+			[['status_id', 'excludedStatus', 'reportStatus'], 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
 			['deadlineType', 'in', 'range' => array_keys(static::getDeadlineNames())],
 			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
 			[['from_at', 'to_at'], 'safe'],
@@ -135,6 +137,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'withoutReport' => Yii::t('lead', 'Without Report'),
 				'user_id' => Yii::t('lead', 'User'),
 				'closedQuestions' => Yii::t('lead', 'Closed Questions'),
+				'excludedStatus' => Yii::t('lead', 'Excluded Status'),
 				'excludedClosedQuestions' => Yii::t('lead', 'Excluded Closed Questions'),
 				'duplicateEmail' => Yii::t('lead', 'Duplicate Email'),
 				'duplicatePhone' => Yii::t('lead', 'Duplicate Phone'),
@@ -233,7 +236,7 @@ class LeadSearch extends Lead implements SearchModel {
 		];
 
 		$this->load($params);
-		//	$this->addressSearch->load($params);
+		$this->addressSearch->load($params);
 
 		if (!$this->validate()) {
 			$query->where('0=1');
@@ -253,6 +256,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applySelfUserFilter($query);
 		$this->applyPhoneFilter($query);
 		$this->applyStatusFilter($query);
+		$this->applyExcludedStatusFilter($query);
 		$this->applyReportFilter($query);
 		$this->applyReportStatusFilter($query);
 		$this->applyDeadlineFilter($query);
@@ -304,7 +308,12 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 	}
 
-	private function applyUserFilter(ActiveQuery $query): void {
+	public $owner_id;
+
+	private function applyUserFilter(LeadQuery $query): void {
+		if (!empty($this->owner_id)) {
+			$query->owner($this->owner_id);
+		}
 		if (!empty($this->user_id)) {
 			$query->joinWith('leadUsers');
 			$query->andWhere([LeadUser::tableName() . '.user_id' => $this->user_id]);
@@ -494,11 +503,29 @@ class LeadSearch extends Lead implements SearchModel {
 		return static::$QUESTIONS;
 	}
 
-	public static function getClosedQuestionsNames(): array {
+	public function getClosedQuestionsNames(): array {
+		$query = LeadQuestion::find()
+			->active()
+			->withoutPlaceholder()
+			->boolean(false);
+		if (!empty($this->type_id) || !empty($this->source_id)) {
+			if ($this->validate(['type_id', 'source_id'])) {
+				$typeId = $this->type_id;
+				$sources = $this->source_id;
+				$sourceID = is_array($sources) ? reset($sources) : $sources;
+				if (!empty($sourceID)) {
+					$typeId = LeadSource::typeId((int) $sourceID);
+				}
+
+				if (!empty($typeId)) {
+					$query->forType($typeId);
+				}
+			}
+		}
+
+		$models = $query->all();
 		return ArrayHelper::map(
-			LeadQuestion::find()
-				->withoutPlaceholder()
-				->all(),
+			$models,
 			'id', 'name');
 	}
 
@@ -674,5 +701,17 @@ class LeadSearch extends Lead implements SearchModel {
 		if ($this->onlyWithPhone) {
 			$query->andWhere(Lead::tableName() . '.phone IS NOT NULL');
 		}
+	}
+
+	private function applyExcludedStatusFilter(LeadQuery $query): void {
+		if (!empty($this->excludedStatus)) {
+			$query->andWhere(['NOT IN', Lead::tableName() . '.status_id', $this->excludedStatus]);
+		}
+	}
+
+	public function getOwnersNames(): array {
+		return User::getSelectList(
+			LeadUser::userIds(LeadUser::TYPE_OWNER)
+		);
 	}
 }

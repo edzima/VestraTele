@@ -42,6 +42,12 @@ $user = Yii::$app->user;
 					'visible' => $user->can(Worker::PERMISSION_POTENTIAL_CLIENT),
 				],
 				[
+					'label' => Yii::t('credit', 'Analyze SKD'),
+					'url' => ['/credit/analyze/calc'],
+					'icon' => '<i class="fa fa-credit-card"></i>',
+					'visible' => $user->can(Worker::PERMISSION_CREDIT_ANALYZE),
+				],
+				[
 					'label' => Yii::t('common', 'Leads'),
 					'url' => '#',
 					'visible' => $user->can(User::PERMISSION_LEAD),
@@ -246,6 +252,30 @@ $user = Yii::$app->user;
 							'label' => Yii::t('common', 'Leads'),
 							'url' => ['/issue/issue/lead'],
 							'icon' => '<i class="fa fa-vcard"></i>',
+						],
+					],
+				],
+				[
+					'label' => Yii::t('court', 'Lawsuits'),
+					'url' => '#',
+					'icon' => '<i class="fa fa-legal"></i>',
+					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(Worker::PERMISSION_LAWSUIT),
+					'items' => [
+						[
+							'label' => Yii::t('common', 'Browse'),
+							'url' => ['/court/lawsuit/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('court', 'Calendar'),
+							'url' => ['/calendar/lawsuit/index'],
+							'icon' => '<i class="fa fa-calendar"></i>',
+						],
+						[
+							'label' => Yii::t('court', 'Courts'),
+							'url' => ['/court/court/index'],
+							'icon' => '<i class="fa fa-sitemap"></i>',
 						],
 					],
 				],

@@ -2,9 +2,9 @@
 
 namespace common\modules\issue\widgets;
 
-use backend\assets\CopyToClipboardAsset;
 use backend\helpers\Html;
 use Closure;
+use common\assets\CopyToClipboardAsset;
 use common\assets\TooltipAsset;
 use common\models\issue\Issue;
 use common\models\issue\IssueUser;

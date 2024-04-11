@@ -2,6 +2,7 @@
 
 use common\helpers\Html;
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\Module;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadDialersGridView;
 use common\modules\lead\widgets\LeadReportWidget;
@@ -16,7 +17,7 @@ use yii\widgets\DetailView;
 <div class="same-contact-lead">
 
 	<h3>
-		<?= $model->isForUser(Yii::$app->user->getId())
+		<?= Module::manager()->isForUser($model)
 			? Html::a(Html::encode($model->getName()), ['view', 'id' => $model->getId()])
 			: Html::encode($model->getName())
 		?>

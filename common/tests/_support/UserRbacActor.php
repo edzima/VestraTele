@@ -51,13 +51,14 @@ trait UserRbacActor {
 	final public function amLoggedIn(): void {
 		$I = $this;
 		$I->amOnPage('/site/login');
-		$I->fillField('Username', $this->getUser()->username);
+		$I->fillField(['name' => 'LoginForm[usernameOrEmail]'], $this->getUser()->username);
 		$I->fillField('Password', $this->getPassword());
 		$I->click('#login-form button[type=submit]');
 		$I->waitPageLoad();
 		$this->checkIsLogged();
 	}
-	public function waitPageLoad($wait= 0.5,$timeout = 5): void {
+
+	public function waitPageLoad($wait = 0.5, $timeout = 5): void {
 		if (method_exists($this, 'wait')) {
 			if ($wait) {
 				$this->wait($wait);

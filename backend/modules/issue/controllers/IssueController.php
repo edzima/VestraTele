@@ -356,7 +356,16 @@ class IssueController extends Controller {
 		if ($model->load(Yii::$app->request->post())
 			&& $model->save()
 		) {
+			$message = $returnUrl
+				? Yii::t('issue', 'In Issue: {issue} the stage was changed', [
+					'issue' => $model->getIssue()->getIssueName(),
+				])
+				: Yii::t('issue', 'The stage was changed');
+
+			$message .= ': ' . $model->getNoteTitle();
+			Flash::add(Flash::TYPE_SUCCESS, $message);
 			$model->pushMessages();
+
 			return $this->redirect($returnUrl ?? ['view', 'id' => $issueId]);
 		}
 		return $this->render('stage', [
@@ -372,7 +381,14 @@ class IssueController extends Controller {
 	 * @return mixed
 	 */
 	public function actionDelete(int $id): Response {
-		$this->findModel($id)->delete();
+		$model = $this->findModel($id);
+		Yii::warning([
+			'message' => 'Delete issue: ' . $id, [
+				'attributes' => $model->getAttributes(),
+				'user_id' => Yii::$app->user->getId(),
+			],
+		], __METHOD__);
+		$model->delete();
 
 		return $this->redirect(['index']);
 	}

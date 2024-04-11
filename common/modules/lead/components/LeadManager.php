@@ -74,6 +74,9 @@ class LeadManager extends Component {
 		if (!$this->onlyForUser) {
 			return true;
 		}
+		if (Yii::$app->user->can('lead.manager')) {
+			return true;
+		}
 		if ($userId === null) {
 			$userId = Yii::$app->user->getId();
 		}

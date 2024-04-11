@@ -184,6 +184,14 @@ class IssueStageChangeMessagesForm extends IssueMessagesForm {
 		$data = [
 			'stage' => $this->issue->getIssueStage()->name,
 		];
+		$agentPhone = $this->issue->getIssueModel()->agent->getPhone();
+		if ($agentPhone) {
+			$agentPhone = Yii::$app->formatter->asTel($agentPhone, [
+				'asLink' => false,
+			]);
+			$data['agentPhone'] = $agentPhone;
+		}
+
 		$stageChangeAt = $this->stageChangeAt ?: $this->issue->getIssueModel()->stage_change_at;
 		if ($stageChangeAt) {
 			$data['stageChangeAt'] = Yii::$app->formatter->asDate($stageChangeAt);

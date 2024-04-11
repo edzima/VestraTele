@@ -43,15 +43,20 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	public const TYPE_RECOMMENDING = User::ROLE_RECCOMENDING;
 	public const TYPE_GUARDIAN = User::ROLE_GUARDIAN;
 	public const TYPE_VINDICATOR = User::ROLE_VINDICATOR;
+	public const TYPE_AUDITOR = Worker::ROLE_AUDITOR;
+
+	public const TYPE_TELEMARKETER_SELF = 'tele.self';
 
 	public const TYPES_WORKERS = [
 		self::TYPE_LAWYER,
 		self::TYPE_LAWYER_OFFICE,
 		self::TYPE_LAWYER_ASSISTANT,
 		self::TYPE_AGENT,
+		self::TYPE_AUDITOR,
 		self::TYPE_CO_AGENT,
 		self::TYPE_RECOMMENDING,
 		self::TYPE_TELEMARKETER,
+		self::TYPE_TELEMARKETER_SELF,
 		self::TYPE_VINDICATOR,
 	];
 
@@ -161,11 +166,13 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 			static::TYPE_LAWYER_ASSISTANT => User::getRolesNames()[static::TYPE_LAWYER_ASSISTANT],
 			static::TYPE_LAWYER_OFFICE => User::getRolesNames()[static::TYPE_LAWYER_OFFICE],
 			static::TYPE_TELEMARKETER => User::getRolesNames()[static::TYPE_TELEMARKETER],
+			static::TYPE_AUDITOR => User::getRolesNames()[static::TYPE_AUDITOR],
 			static::TYPE_VINDICATOR => User::getRolesNames()[static::TYPE_VINDICATOR],
 			static::TYPE_VICTIM => User::getRolesNames()[static::TYPE_VICTIM],
 			static::TYPE_SHAREHOLDER => User::getRolesNames()[static::TYPE_SHAREHOLDER],
 			static::TYPE_HANDICAPPED => User::getRolesNames()[static::TYPE_HANDICAPPED],
 			static::TYPE_RECOMMENDING => User::getRolesNames()[static::TYPE_RECOMMENDING],
+			static::TYPE_TELEMARKETER_SELF => Yii::t('issue', 'Telemarketer - Self'),
 		];
 	}
 

@@ -111,9 +111,12 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const PERMISSION_WORKERS_HIERARCHY = 'workers.hierarchy';
 
 	public const PERMISSION_LEAD = 'lead';
+	public const PERMISSION_LEAD_MANAGER = 'lead.manager';
 	public const PERMISSION_LEAD_DIALER = 'lead.dialer';
 	public const PERMISSION_LEAD_DIALER_MANAGER = 'lead.dialer.manager';
 	public const PERMISSION_LEAD_IMPORT = 'lead.import';
+	public const PERMISSION_LEAD_UPDATE_MULTIPLE = 'lead.update-multiple';
+
 	public const PERMISSION_LEAD_MARKET = 'lead.market';
 	public const PERMISSION_LEAD_STATUS = 'lead.status';
 	public const PERMISSION_LEAD_DUPLICATE = 'lead.duplicate';

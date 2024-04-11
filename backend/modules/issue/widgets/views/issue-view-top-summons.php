@@ -29,6 +29,7 @@ use yii\web\View;
 				'attribute' => 'title',
 				'visible' => $type->hasSummonVisibleField('title'),
 			],
+			'statusName',
 			[
 				'attribute' => 'start_at',
 				'format' => 'date',
@@ -39,6 +40,10 @@ use yii\web\View;
 				'attribute' => 'deadline_at',
 				'format' => 'date',
 				'visible' => $type->hasSummonVisibleField('deadline_at'),
+			],
+			[
+				'attribute' => 'contractor',
+				'visible' => $type->hasSummonVisibleField('contractor'),
 			],
 			[
 				'class' => ActionColumn::class,

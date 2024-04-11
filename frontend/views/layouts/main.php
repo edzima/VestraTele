@@ -124,6 +124,11 @@ AppAsset::register($this);
 		];
 
 		$menuItems[] = [
+			'label' => Yii::t('credit', 'Analyze SKD'),
+			'url' => ['/credit/analyze/calc'],
+			'visible' => Yii::$app->user->can(Worker::PERMISSION_CREDIT_ANALYZE),
+		];
+		$menuItems[] = [
 			'label' => Yii::t('common', 'Issues'),
 			'url' => ['/issue/index'],
 			'visible' => Yii::$app->user->can(User::PERMISSION_ISSUE),

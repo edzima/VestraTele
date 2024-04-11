@@ -18,7 +18,7 @@ class CustomerController extends UserController {
 	public $formModel = CustomerUserForm::class;
 	public $model = Customer::class;
 
-	public function actionCreate() {
+	public function actionCreate(string $json = null) {
 		Event::on(CustomerUserForm::class, CustomerUserForm::EVENT_AFTER_SAVE, function (UserFormEvent $event): void {
 			$this->createPotentialClientAgreement($event->sender);
 		});

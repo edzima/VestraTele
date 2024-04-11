@@ -1,6 +1,6 @@
 <?php
 
-use common\models\issue\IssueCost;
+use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssueCostInterface;
 use common\models\settlement\TransferType;
 
@@ -14,6 +14,7 @@ return [
 		'settled_at' => '2020-03-11',
 		'created_at' => '1391885313',
 		'updated_at' => '1391885313',
+		'user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
 		'transfer_type' => TransferType::TRANSFER_TYPE_BANK,
 	],
 	[

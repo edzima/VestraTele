@@ -137,6 +137,7 @@ return [
 	'Excluded types' => 'Wykluczone typy',
 	'Excluded tags' => 'Wykluczone tagi',
 	'Only with Telemarketers' => 'Z konsultantem',
+	'Telemarketer - Self' => 'Konsultant (własny)',
 	'Archive is Excluded. Check in them.' => 'Archiwum jest wykluczone. Sprawdź w nim',
 	'Type Parent' => 'Nadrzędny Typ',
 	'Child Types' => 'Podtypy',
@@ -234,4 +235,6 @@ return [
 	'Entity Agreement Details' => 'Umowa z Podmiotem',
 	'Entity Agreement' => 'Umowa z Podmiotem',
 	'Entity Agreement At' => 'Umowa z Podmiotem (Data)',
+	'In Issue: {issue} the stage was changed' => 'W Sprawie: {issue} etap został zmieniony',
+	'The stage was changed' => 'Etap został zmieniony',
 ];

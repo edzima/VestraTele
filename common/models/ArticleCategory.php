@@ -2,11 +2,12 @@
 
 namespace common\models;
 
+use common\models\query\ArticleCategoryQuery;
 use Yii;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use common\models\query\ArticleCategoryQuery;
 
 /**
  * This is the model class for table "{{%article_category}}".
@@ -26,8 +27,8 @@ use common\models\query\ArticleCategoryQuery;
  */
 class ArticleCategory extends ActiveRecord {
 
-	const STATUS_DRAFT = 0;
-	const STATUS_ACTIVE = 1;
+	public const STATUS_DRAFT = 0;
+	public const STATUS_ACTIVE = 1;
 
 	/**
 	 * @inheritdoc
@@ -73,7 +74,7 @@ class ArticleCategory extends ActiveRecord {
 			'title' => Yii::t('common', 'Title'),
 			'slug' => Yii::t('common', 'Slug'),
 			'comment' => Yii::t('common', 'Comment'),
-			'parent_id' => Yii::t('common', 'Parent'),
+			'parent_id' => Yii::t('common', 'Parent category'),
 			'status' => Yii::t('common', 'Status'),
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
@@ -81,21 +82,21 @@ class ArticleCategory extends ActiveRecord {
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getArticles() {
 		return $this->hasMany(Article::class, ['category_id' => 'id']);
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getParent() {
 		return $this->hasOne(static::class, ['id' => 'parent_id']);
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getChilds() {
 		return $this->hasMany(static::class, ['parent_id' => 'id']);
@@ -103,7 +104,7 @@ class ArticleCategory extends ActiveRecord {
 
 	/**
 	 * @inheritdoc
-	 * @return \common\models\query\ArticleCategoryQuery the active query used by this AR class.
+	 * @return ArticleCategoryQuery the active query used by this AR class.
 	 */
 	public static function find() {
 		return new ArticleCategoryQuery(static::class);
