@@ -387,4 +387,6 @@ return [
 	'Copied to Clipboard' => 'Skopiowano do Schowka!',
 	'Send further instructions to Emai: {email}' => 'Wysłano instrukcje resetu hasła na E-mail: {email}',
 	'Username / Email' => 'Login / E-mail',
+	'Parent category' => 'Kategoria nadrzędna',
+
 ];

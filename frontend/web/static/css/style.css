@@ -149,8 +149,7 @@ div.required label:after {
 
 .article-item .article-title,
 .article-item .article-title a {
-	color: inherit;
-	margin: 0;
+	font-size: 26px;
 }
 
 .article-item .article-meta,

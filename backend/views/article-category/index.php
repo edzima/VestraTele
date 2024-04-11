@@ -1,9 +1,9 @@
 <?php
 
+use common\models\ArticleCategory;
 use yii\bootstrap\Html;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
-use common\models\ArticleCategory;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\search\ArticleCategorySearch */
@@ -27,10 +27,9 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'id',
             'title',
             // 'slug',
-            'comment',
+			//     'comment',
             [
                 'attribute' => 'parent_id',
-                'label' => Yii::t('backend','Parent category'),
                 'value' => function ($model) {
                     return $model->parent ? $model->parent->title : null;
                 },
