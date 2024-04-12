@@ -49,6 +49,9 @@ YiiAsset::register($this);
 						'visible' => !empty($model->location),
 					],
 					[
+						'attribute' => 'presenceOfTheClaimantName',
+					],
+					[
 						'attribute' => 'signature_act',
 						'visible' => !empty($model->signature_act),
 					],

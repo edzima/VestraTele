@@ -38,7 +38,7 @@ class SummonQuery extends ActiveQuery {
 
 	public function active(): self {
 		[$table, $alias] = $this->getTableNameAndAlias();
-		$this->andWhere(['!=', $alias . '.status', Summon::notActiveStatuses()]);
+		$this->andWhere(['NOT IN', $alias . '.status', Summon::notActiveStatuses()]);
 		return $this;
 	}
 

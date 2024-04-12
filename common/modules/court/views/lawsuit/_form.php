@@ -20,6 +20,9 @@ use yii\widgets\ActiveForm;
 		<div class="col-md-4 col-lg-3">
 			<?= $form->field($model, 'court_id')->widget(Select2::class, [
 				'data' => $model->getCourtsNames(),
+				'pluginOptions' => [
+					'placeholder' => Yii::t('court', 'Court'),
+				],
 			]) ?>
 		</div>
 		<div class="col-md-3">
@@ -41,6 +44,14 @@ use yii\widgets\ActiveForm;
 
 			<?= $form->field($model, 'location')
 				->dropDownList(LawsuitIssueForm::getLocationNames(), [
+					'prompt' => '---',
+				]) ?>
+		</div>
+
+		<div class="col-md-2">
+
+			<?= $form->field($model, 'presence_of_the_claimant')
+				->dropDownList(LawsuitIssueForm::getPresenceOfTheClaimantNames(), [
 					'prompt' => '---',
 				]) ?>
 		</div>

@@ -47,6 +47,10 @@ class IssuePayCalculationGrid extends GridView {
 		if ($this->filterModel !== null && !$this->filterModel instanceof IssuePayCalculationSearch) {
 			throw new InvalidConfigException('$filter model must be instance of: ' . IssuePayCalculationSearch::class . '.');
 		}
+		if ($this->filterModel) {
+			$this->withOwner = $this->filterModel->scenario !== IssuePayCalculationSearch::SCENARIO_OWNER;
+		}
+
 		if (empty($this->columns)) {
 			$this->columns = $this->defaultColumns();
 		}

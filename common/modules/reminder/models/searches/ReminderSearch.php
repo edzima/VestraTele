@@ -2,11 +2,11 @@
 
 namespace common\modules\reminder\models\searches;
 
+use common\modules\reminder\models\Reminder;
 use common\modules\reminder\models\ReminderQuery;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\modules\reminder\models\Reminder;
 
 /**
  * ReminderSearch represents the model behind the search form of `common\modules\reminder\models\Reminder`.
@@ -31,6 +31,7 @@ class ReminderSearch extends Reminder {
 			[['id', 'priority', 'created_at', 'updated_at'], 'integer'],
 			[['date_at', 'details', 'dateStart', 'dateEnd'], 'safe'],
 			[['onlyDelayed', 'onlyToday'], 'boolean'],
+			['user_id', 'default', 'value' => static::REMINDER_USER_AS_NULL],
 		];
 	}
 

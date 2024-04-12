@@ -25,6 +25,7 @@ use yii\db\Expression;
  * @property string|null $location
  * @property int $creator_id
  * @property int|null $online
+ * @property int|null $presence_of_the_claimant
  *
  * @property Court $court
  * @property User $creator
@@ -35,6 +36,8 @@ class Lawsuit extends ActiveRecord {
 	public const LOCATION_STATIONARY = 'S';
 	public const LOCATION_ONLINE = 'O';
 
+	public const PRESENCE_OF_THE_CLAIMANT_REQUIRED = 1;
+	public const PRESENCE_OF_THE_CLAIMANT_NOT_REQUIRED = 0;
 	public const VIA_TABLE_ISSUE = '{{%lawsuit_issue}}';
 
 	public function behaviors(): array {
@@ -65,8 +68,8 @@ class Lawsuit extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['court_id', 'creator_id'], 'required'],
-			[['court_id', 'creator_id'], 'integer'],
+			[['court_id', 'creator_id', 'presence_of_the_claimant'], 'required'],
+			[['court_id', 'creator_id', 'presence_of_the_claimant'], 'integer'],
 			[['due_at', 'created_at', 'updated_at'], 'safe'],
 			[['location',], 'string', 'max' => 2],
 			[['signature_act', 'room', 'details'], 'string', 'max' => 255],
@@ -96,6 +99,8 @@ class Lawsuit extends ActiveRecord {
 			'creator' => Yii::t('court', 'Creator'),
 			'location' => Yii::t('court', 'Location'),
 			'locationName' => Yii::t('court', 'Location'),
+			'presence_of_the_claimant' => Yii::t('court', 'Presence of the Claimant'),
+			'presenceOfTheClaimantName' => Yii::t('court', 'Presence of the Claimant'),
 
 		];
 	}
@@ -106,6 +111,10 @@ class Lawsuit extends ActiveRecord {
 
 	public function getLocationName(): ?string {
 		return static::getLocationNames()[$this->location] ?? null;
+	}
+
+	public function getPresenceOfTheClaimantName(): ?string {
+		return static::getPresenceOfTheClaimantNames()[$this->presence_of_the_claimant] ?? null;
 	}
 
 	/**
@@ -178,6 +187,13 @@ class Lawsuit extends ActiveRecord {
 		return [
 			static::LOCATION_STATIONARY => Yii::t('court', 'Stationary'),
 			static::LOCATION_ONLINE => Yii::t('court', 'Online'),
+		];
+	}
+
+	public static function getPresenceOfTheClaimantNames(): array {
+		return [
+			static::PRESENCE_OF_THE_CLAIMANT_REQUIRED => Yii::t('court', 'Required'),
+			static::PRESENCE_OF_THE_CLAIMANT_NOT_REQUIRED => Yii::t('court', 'Not required'),
 		];
 	}
 

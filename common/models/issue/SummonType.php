@@ -69,7 +69,7 @@ class SummonType extends ActiveRecord {
 	 * @return ActiveQuery
 	 */
 	public function getSummons() {
-		return $this->hasMany(Summon::class, ['type' => 'id']);
+		return $this->hasMany(Summon::class, ['type_id' => 'id']);
 	}
 
 	public function getNameWithShort(): string {

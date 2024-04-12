@@ -23,13 +23,16 @@ class LawsuitIssueForm extends Model {
 	public ?string $room = '';
 	public ?string $location = null;
 
+	public ?int $presence_of_the_claimant = null;
+
 	public function rules(): array {
 		return [
-			[['!creator_id', 'court_id'], 'required'],
-			[['creator_id', 'court_id'], 'integer'],
+			[['!creator_id', 'court_id', 'presence_of_the_claimant'], 'required'],
+			[['creator_id', 'court_id', 'presence_of_the_claimant'], 'integer'],
 			[['due_at', 'room', 'signature_act', 'details', 'location'], 'string'],
 			[['due_at', 'room', 'signature_act', 'details', 'location'], 'default', 'value' => null],
 			['location', 'in', 'range' => array_keys(static::getLocationNames())],
+			['presence_of_the_claimant', 'in', 'range' => array_keys(static::getPresenceOfTheClaimantNames())],
 			['issuesIds', 'exist', 'targetClass' => Issue::class, 'targetAttribute' => 'id', 'allowArray' => true],
 		];
 	}
@@ -62,6 +65,7 @@ class LawsuitIssueForm extends Model {
 			return false;
 		}
 		$model = $this->getModel();
+		$model->presence_of_the_claimant = $this->presence_of_the_claimant;
 		$model->creator_id = $this->creator_id;
 		$model->court_id = $this->court_id;
 		$model->due_at = $this->due_at;
@@ -90,6 +94,7 @@ class LawsuitIssueForm extends Model {
 
 	public function setModel(Lawsuit $model) {
 		$this->model = $model;
+		$this->court_id = $model->court_id;
 		$this->issuesIds = $model->getIssuesIds();
 		$this->due_at = $model->due_at;
 		$this->room = $model->room;
@@ -97,6 +102,7 @@ class LawsuitIssueForm extends Model {
 		$this->signature_act = $model->signature_act;
 		$this->details = $model->details;
 		$this->location = $model->location;
+		$this->presence_of_the_claimant = $model->presence_of_the_claimant;
 		if (count($model->issues) === 1) {
 			$issues = $model->issues;
 			$this->setIssue(reset($issues));
@@ -122,6 +128,10 @@ class LawsuitIssueForm extends Model {
 
 	public static function getLocationNames(): array {
 		return Lawsuit::getLocationNames();
+	}
+
+	public static function getPresenceOfTheClaimantNames(): array {
+		return Lawsuit::getPresenceOfTheClaimantNames();
 	}
 
 }

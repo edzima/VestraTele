@@ -174,6 +174,7 @@ return [
 	'Summon Docs Types' => 'Typy Dokumentów',
 	'Docs Count Summary' => 'Dokumenty Zrealizowane',
 	'Realize it' => 'Zrealizuj',
+	'Default Realize at form Start At' => 'Wykonaj domyślnie z Daty, gdy pusty',
 	'Are you sure you want to realize this summon?' => 'Czy napewno chcesz Zrealizować to Zlecenie?',
 	'Success. Mark Summon as Realized.' => 'Zlecenie Zrealizowano!',
 	'Status' => 'Status',
@@ -237,4 +238,5 @@ return [
 	'Entity Agreement At' => 'Umowa z Podmiotem (Data)',
 	'In Issue: {issue} the stage was changed' => 'W Sprawie: {issue} etap został zmieniony',
 	'The stage was changed' => 'Etap został zmieniony',
+	'Lawsuit Calendar Background' => 'Kalendarz Rozpraw',
 ];

@@ -6,6 +6,7 @@ use common\models\query\PhonableQuery;
 use common\models\user\User;
 use common\modules\calendar\models\LeadReminderCalendarEvent;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadReminder;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\query\LeadQuery;
@@ -30,6 +31,8 @@ class LeadReminderSearch extends ReminderSearch {
 
 	public $leadReminderUserId;
 	public $leadDateAt;
+
+	public $hideFromMarket = true;
 
 	public function rules(): array {
 		return array_merge([
@@ -90,6 +93,7 @@ class LeadReminderSearch extends ReminderSearch {
 				$this->applyReminderFilter($query);
 			},
 		]);
+		$this->applyLeadMarketFilter($query);
 		$this->applyLeadPhoneFilter($query);
 		$this->applyLeadNameFilter($query);
 		$this->applyLeadStatusFilter($query);
@@ -210,6 +214,7 @@ class LeadReminderSearch extends ReminderSearch {
 		return $options;
 	}
 
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	protected static function createEvent(array $config = []): LeadReminderCalendarEvent {
 		if (!isset($config['class'])) {
 			$config['class'] = static::EVENT_CLASS;
@@ -237,6 +242,14 @@ class LeadReminderSearch extends ReminderSearch {
 				->andWhere('user_id IS NOT NULL')
 				->column(),
 				false);
+	}
+
+	private function applyLeadMarketFilter(ActiveQuery $query): void {
+		if ($this->hideFromMarket) {
+			$query->joinWith('lead.market', false, 'LEFT OUTER JOIN');
+			$query->andWhere(LeadMarket::tableName() . '.lead_id IS NULL');
+			$query->groupBy(LeadReminder::tableName() . '.reminder_id');
+		}
 	}
 
 }

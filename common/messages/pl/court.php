@@ -35,4 +35,8 @@ return [
 	'Are you sure you want to delete this Issue from Lawsuit?' => 'Napewno chcesz usunąć tą Sprawę z Rozprawy?',
 	'Update Court: {name}' => 'Edycja Sądu: {name}',
 	'Lawsuit {n,plural,=1{for Issue:{issue}} other{for Issues: {issue}}}' => 'Rozprawa {n,plural,=1{w Sprawie:{issue}} other{w Sprawach: {issue}}}',
+	'Presence of the Claimant' => 'Obecność Powoda',
+	'Required' => 'Obowiązkowa',
+	'Not required' => 'Nieobowiązkowa',
+	'Summons' => 'Zlecenia',
 ];

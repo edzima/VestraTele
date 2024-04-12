@@ -3,6 +3,7 @@
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\user\User;
+use common\models\user\Worker;
 use yii\bootstrap\Html;
 use yii\data\ActiveDataProvider;
 
@@ -17,8 +18,14 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="settlement-calculation-index">
 
 	<p>
-		<?= Html::a(Yii::t('backend', 'To create'), ['to-create'], ['class' => 'btn btn-success']) ?>
-		<?= Html::a(Yii::t('settlement', 'Uncollectible'), ['/settlement/calculation-problem/index'], ['class' => 'btn btn-warning']) ?>
+		<?= Yii::$app->user->can(Worker::PERMISSION_CALCULATION_TO_CREATE)
+			? Html::a(Yii::t('backend', 'To create'), ['to-create'], ['class' => 'btn btn-success'])
+			: '' ?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_CALCULATION_PROBLEMS)
+			? Html::a(Yii::t('settlement', 'Uncollectible'), ['/settlement/calculation-problem/index'], ['class' => 'btn btn-warning'])
+			: ''
+		?>
 
 
 		<?= Yii::$app->user->can(User::PERMISSION_PROVISION)

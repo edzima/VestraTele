@@ -25,7 +25,7 @@ class LawsuitSearch extends Lawsuit {
 	public function rules(): array {
 		return [
 			[['id', 'court_id', 'creator_id', 'issue_id'], 'integer'],
-			[['customer', 'signature_act', 'room', 'due_at', 'details', 'created_at', 'updated_at', 'location'], 'safe'],
+			[['customer', 'signature_act', 'room', 'due_at', 'details', 'created_at', 'updated_at', 'location', 'presence_of_the_claimant'], 'safe'],
 		];
 	}
 
@@ -74,6 +74,7 @@ class LawsuitSearch extends Lawsuit {
 			'updated_at' => $this->updated_at,
 			'creator_id' => $this->creator_id,
 			'location' => $this->location,
+			'presence_of_the_claimant' => $this->presence_of_the_claimant,
 		]);
 
 		$query->andFilterWhere(['like', 'signature_act', $this->signature_act])

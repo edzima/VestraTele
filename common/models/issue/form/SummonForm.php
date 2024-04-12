@@ -13,7 +13,6 @@ use common\models\issue\SummonDocLink;
 use common\models\issue\SummonType;
 use common\models\SummonTypeOptions;
 use common\models\user\User;
-use common\models\user\Worker;
 use DateTime;
 use edzima\teryt\models\Simc;
 use Yii;
@@ -53,8 +52,8 @@ class SummonForm extends Model implements HiddenFieldsModel {
 	public $term = self::TERM_ONE_WEEK;
 	public string $title = '';
 	public ?int $issue_id = null;
-	public ?int $contractor_id = null;
-	public ?int $entity_id = null;
+	public $contractor_id;
+	public $entity_id;
 	public ?int $city_id = null;
 
 	public $doc_types_ids = [];
@@ -72,6 +71,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 	private ?array $_contractorIds = null;
 	private ?SummonType $type = null;
 	private ?IssueInterface $_issue = null;
+	private bool $defaultRealizeAtFromStartAt = true;
 
 	public function rules(): array {
 		return [
@@ -185,6 +185,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 			$this->sendEmailToContractor = $options->sendEmailToContractor;
 		}
 		$this->term = $options->term;
+		$this->defaultRealizeAtFromStartAt = $options->defaultRealizeAtFromStartAt;
 	}
 
 	public function setModel(Summon $model): void {
@@ -221,7 +222,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		$model->city_id = $this->city_id;
 		$model->entity_id = $this->entity_id;
 		$model->updater_id = $this->updater_id;
-		if (empty($this->realize_at)) {
+		if (empty($this->realize_at) && $this->defaultRealizeAtFromStartAt) {
 			$dateTime = new DateTime($this->start_at);
 			$dateTime->setTime(date('H'), date('i'));
 			$this->realize_at = $dateTime->format(DATE_ATOM);

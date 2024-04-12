@@ -16,16 +16,18 @@ class SummonTypeOptions extends Model {
 	public $formAttributes = [];
 	public $visibleSummonFields = [];
 	public $requiredFields = [];
+	public ?string $lawsuitCalendarBackground = null;
 	public ?string $term = null;
 	public ?string $title = null;
 	public ?int $status = null;
 	public ?bool $sendEmailToContractor = null;
+	public bool $defaultRealizeAtFromStartAt = true;
 
 	public function rules(): array {
 		return [
 			[['status'], 'integer'],
-			[['showOnTop', 'sendEmailToContractor'], 'boolean'],
-			['title', 'string'],
+			[['showOnTop', 'sendEmailToContractor', 'defaultRealizeAtFromStartAt'], 'boolean'],
+			[['title', 'lawsuitCalendarBackground'], 'string'],
 			['formAttributes', 'in', 'range' => array_keys(static::formAttributesNames()), 'allowArray' => true],
 			['visibleSummonFields', 'in', 'range' => array_keys(static::visibleSummonAttributesNames()), 'allowArray' => true],
 			['requiredFields', 'in', 'range' => array_keys(static::getRequiredAttributes()), 'allowArray' => true],
@@ -147,6 +149,8 @@ class SummonTypeOptions extends Model {
 			'term' => Yii::t('common', 'Term'),
 			'status' => Yii::t('common', 'Status'),
 			'sendEmailToContractor' => Yii::t('issue', 'Send Email To Contractor'),
+			'defaultRealizeAtFromStartAt' => Yii::t('issue', 'Default Realize at form Start At'),
+			'lawsuitCalendarBackground' => Yii::t('issue', 'Lawsuit Calendar Background'),
 		];
 	}
 

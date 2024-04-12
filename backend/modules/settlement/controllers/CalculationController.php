@@ -49,11 +49,24 @@ class CalculationController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionIndex() {
 		if (!Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
-			throw new ForbiddenHttpException();
+			return $this->redirect(['owner']);
 		}
 		$searchModel = new IssuePayCalculationSearch();
+		$searchModel->onlyWithPayProblems = false;
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+		return $this->render('index', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	public function actionOwner() {
+		$searchModel = new IssuePayCalculationSearch();
+		$searchModel->scenario = IssuePayCalculationSearch::SCENARIO_OWNER;
+		$searchModel->owner_id = Yii::$app->user->getId();
 		$searchModel->onlyWithPayProblems = false;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 

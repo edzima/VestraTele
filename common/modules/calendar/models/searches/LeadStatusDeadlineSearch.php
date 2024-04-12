@@ -4,6 +4,7 @@ namespace common\modules\calendar\models\searches;
 
 use common\modules\calendar\models\LeadStatusDeadlineEvent;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\query\LeadQuery;
@@ -18,6 +19,8 @@ class LeadStatusDeadlineSearch extends Model {
 	public $endAt;
 
 	public $leadUserId;
+
+	public bool $hideFromMarket = true;
 
 	public const SCENARIO_USER = 'user';
 
@@ -96,6 +99,7 @@ class LeadStatusDeadlineSearch extends Model {
 			['<=', Lead::tableName() . '.deadline_at', $this->endAt],
 		]);
 
+		$this->applyMarketFilter($query);
 		$query->groupBy(Lead::tableName() . '.id');
 		return $query;
 	}
@@ -125,5 +129,12 @@ class LeadStatusDeadlineSearch extends Model {
 			$event['class'] = LeadStatusDeadlineEvent::class;
 		}
 		return Yii::createObject($event);
+	}
+
+	protected function applyMarketFilter(LeadQuery $query): void {
+		if ($this->hideFromMarket) {
+			$query->joinWith('market', false, 'LEFT OUTER JOIN');
+			$query->andWhere(LeadMarket::tableName() . '.lead_id IS NULL');
+		}
 	}
 }

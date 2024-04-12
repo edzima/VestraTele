@@ -1,6 +1,7 @@
 <?php
 
 use common\models\SummonTypeOptions;
+use kartik\color\ColorInput;
 
 /* @var $this yii\web\View */
 /* @var $model SummonTypeOptions */
@@ -13,6 +14,10 @@ use common\models\SummonTypeOptions;
 	<?= $form->field($model, 'showOnTop')->checkbox() ?>
 
 	<?= $form->field($model, 'sendEmailToContractor')->checkbox() ?>
+
+	<?= $form->field($model, 'defaultRealizeAtFromStartAt')->checkbox() ?>
+
+	<?= $form->field($model, 'lawsuitCalendarBackground')->widget(ColorInput::class) ?>
 
 	<?= $form->field($model, 'term')->dropDownList(SummonTypeOptions::getTermsNames()) ?>
 

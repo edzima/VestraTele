@@ -118,6 +118,9 @@ use yii\web\View;
 				['options' => ['class' => 'col-md-3 col-lg-2']])
 				->widget(Select2::class, [
 						'data' => $model->getContractors(),
+						'pluginOptions' => [
+							'placeholder' => $model->getAttributeLabel('contractor_id'),
+						],
 					]
 				)
 			?>
@@ -128,6 +131,9 @@ use yii\web\View;
 				],
 			])->widget(Select2::class, [
 				'data' => SummonForm::getEntityNames(),
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('entity_id'),
+				],
 			])
 			?>
 
