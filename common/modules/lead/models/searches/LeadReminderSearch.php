@@ -248,6 +248,7 @@ class LeadReminderSearch extends ReminderSearch {
 		if ($this->hideFromMarket) {
 			$query->joinWith('lead.market', false, 'LEFT OUTER JOIN');
 			$query->andWhere(LeadMarket::tableName() . '.lead_id IS NULL');
+			$query->groupBy(LeadReminder::tableName() . '.reminder_id');
 		}
 	}
 
