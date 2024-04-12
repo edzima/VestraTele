@@ -186,8 +186,16 @@ class CreditSanctionCalc extends Model {
 		];
 	}
 
+	public const  EXCLUDES_INTEREST_RATE = [
+		InterestRate::INTEREST_RATE_REFERENCE_RATE,
+	];
+
 	public static function getInterestRateNames(): array {
-		return InterestRate::getInterestRateNames();
+		$names = InterestRate::getInterestRateNames();
+		foreach (static::EXCLUDES_INTEREST_RATE as $interestRate) {
+			unset($names[$interestRate]);
+		}
+		return $names;
 	}
 
 }
