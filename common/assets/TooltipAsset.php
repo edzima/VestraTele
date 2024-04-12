@@ -9,7 +9,9 @@ class TooltipAsset extends AssetBundle {
 
 	public const DEFAULT_ATTRIBUTE_NAME = 'data-tippy-content';
 
-	public $baseUrl = 'https://unpkg.com/';
+	//public $baseUrl = 'https://unpkg.com/';
+
+	public $baseUrl = 'https://cdn.jsdelivr.net/npm/';
 
 	public $css = ['tippy.js@5/dist/tippy.css'];
 	public $js = [
