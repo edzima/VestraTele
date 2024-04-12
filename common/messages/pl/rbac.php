@@ -92,7 +92,7 @@ return array_merge([
 	'summon.doc.manager' => 'Zlecenia - Dokumenty (manager)',
 	'summon.manager' => 'Zlecenia - manager',
 	'settlement.administrative.create' => 'Opłata Administracyjna - Dodawanie',
-	'telemarketer' => 'Konsultant',
+	'telemarketer' => 'Konsultant (Biuro)',
 	'user' => 'Użytkownik',
 	'user.traits' => 'Użytkownicy - Cechy',
 	'workers' => 'Lista pracowników',
