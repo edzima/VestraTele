@@ -38,4 +38,5 @@ return [
 	'Presence of the Claimant' => 'Obecność Powoda',
 	'Required' => 'Obowiązkowa',
 	'Not required' => 'Nieobowiązkowa',
+	'Summons' => 'Zlecenia',
 ];

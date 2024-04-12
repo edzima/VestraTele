@@ -82,19 +82,32 @@ YiiAsset::register($this);
 				'attributes' => [
 					'type.name',
 					'title',
-					'issue.longId:text:Sprawa',
 					'owner',
-					'contractor',
+					[
+						'attribute' => 'contractor',
+						'visible' => $model->contractor !== null,
+					],
 					[
 						'attribute' => 'updater',
 						'label' => Yii::t('common', 'Updater'),
 						'visible' => $model->updater !== null,
 					],
 					'statusName',
-					'entityWithCity',
+					[
+						'attribute' => 'entityWithCity',
+						'visible' => !empty($model->getEntityWithCity()),
+					],
 					'start_at:date',
-					'realize_at:datetime',
-					'realized_at:datetime',
+					[
+						'attribute' => 'realize_at',
+						'format' => 'datetime',
+						'visible' => !empty($model->realize_at),
+					],
+					[
+						'attribute' => 'realized_at',
+						'format' => 'datetime',
+						'visible' => !empty($model->realized_at),
+					],
 					'deadline_at:date',
 					'created_at:datetime',
 					'updated_at:datetime',

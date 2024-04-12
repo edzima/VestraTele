@@ -1,13 +1,16 @@
 <?php
 
+use backend\modules\issue\widgets\SummonGrid;
 use common\models\issue\Summon;
+use common\models\issue\SummonType;
 use common\models\SummonTypeOptions;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\issue\SummonType */
+/* @var $model SummonType */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];
@@ -49,6 +52,8 @@ YiiAsset::register($this);
 				'attributes' => [
 					'showOnTop:boolean',
 					'sendEmailToContractor:boolean',
+					'defaultRealizeAtFromStartAt:boolean',
+					'lawsuitCalendarBackground',
 					'title',
 					[
 						'attribute' => 'status',
@@ -93,6 +98,23 @@ YiiAsset::register($this);
 				],
 			]) ?>
 		</div>
+	</div>
+
+	<div class="summons">
+		<?= SummonGrid::widget([
+			'dataProvider' => new ActiveDataProvider([
+				'query' => $model->getSummons()
+					->with([
+						'issue',
+						'issue.tags',
+						'issue.customer.userProfile',
+						'owner.userProfile',
+						'contractor.userProfile',
+					]),
+			]),
+			'withDocs' => false,
+			'withType' => false,
+		]) ?>
 	</div>
 
 
