@@ -129,7 +129,7 @@ class LeadReportSearch extends LeadReport {
 		]);
 
 		$query->andFilterWhere(['like', LeadReport::tableName() . '.details', $this->details]);
-
+		$query->groupBy(LeadReport::tableName() . '.id');
 		return $dataProvider;
 	}
 
@@ -192,7 +192,6 @@ class LeadReportSearch extends LeadReport {
 			return;
 		}
 		$query->joinWith('lead.leadUsers LU');
-		$query->groupBy(LeadReport::tableName() . '.id');
 		if (empty($this->owner_id)) {
 			$query->andWhere(['LU.user_id' => $this->lead_user_id]);
 			return;
