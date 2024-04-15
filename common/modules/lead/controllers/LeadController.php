@@ -55,7 +55,7 @@ class LeadController extends BaseController {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(int $pageSize = 50) {
 		$searchModel = new LeadSearch();
 		if ($this->module->onlyUser) {
 			if (Yii::$app->user->getIsGuest()) {
@@ -66,8 +66,8 @@ class LeadController extends BaseController {
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-		$dataProvider->pagination->defaultPageSize = 50;
-
+		$dataProvider->pagination->defaultPageSize = $pageSize;
+		$dataProvider->pagination->pageSize = $pageSize;
 		if (Yii::$app->request->isPjax) {
 			return $this->renderAjax('_grid', [
 				'dataProvider' => $dataProvider,
