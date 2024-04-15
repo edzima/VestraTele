@@ -23,6 +23,8 @@ class ReminderSearch extends Reminder {
 	public ?string $dateStart = null;
 	public ?string $dateEnd = null;
 
+	public bool $userFilterWithNotSet = false;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -99,7 +101,7 @@ class ReminderSearch extends Reminder {
 			return;
 		}
 		if (!empty($this->user_id)) {
-			$query->onlyUser($this->user_id, false);
+			$query->onlyUser($this->user_id, $this->userFilterWithNotSet);
 		}
 	}
 
