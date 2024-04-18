@@ -177,4 +177,6 @@ return [
 	'Commission Refund' => 'Zwrot Prowizji',
 	'Create Cost' => 'Dodaj Koszt',
 	'Shipments' => 'Przesyłki',
+	'Cost Refund: Company' => 'Zwrot kosztów: Kancelaria',
+	'Cost Refund: Legal represantion' => 'Zwrot kosztów: Zastępstwo procesowe',
 ];
