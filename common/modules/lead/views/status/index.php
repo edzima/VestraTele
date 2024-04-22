@@ -51,6 +51,16 @@ $this->params['breadcrumbs'][] = $this->title;
 				},
 			],
 			[
+				'attribute' => 'chart_color',
+				'contentOptions' => static function (LeadStatus $data): array {
+					$options = [];
+					if (!empty($data->chart_color)) {
+						$options['style']['background-color'] = $data->chart_color;
+					}
+					return $options;
+				},
+			],
+			[
 				'attribute' => 'statuses',
 				'format' => 'html',
 				'value' => function (LeadStatus $data): string {

@@ -65,6 +65,15 @@ YiiAsset::register($this);
 					],
 				],
 			],
+			[
+				'attribute' => 'chart_color',
+				'visible' => $model->chart_color !== null,
+				'contentOptions' => [
+					'style' => [
+						'background-color' => $model->chart_color,
+					],
+				],
+			],
 		],
 	]) ?>
 

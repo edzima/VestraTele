@@ -20,6 +20,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null $market_status
  * @property int|null $market_status_same_contacts
  * @property string|null $calendar_background
+ * @property string|null $chart_color
  * @property string|null $statuses
  * @property int|null $hours_deadline
  * @property int|null $hours_deadline_warning
@@ -58,8 +59,8 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			[['sort_index', 'market_status', 'hours_deadline', 'hours_deadline_warning'], 'integer'],
 			[['hours_deadline', 'hours_deadline_warning'], 'integer', 'min' => 0],
 			[['short_report', 'show_report_in_lead_index', 'not_for_dialer', 'market_status_same_contacts'], 'boolean'],
-			[['name', 'description', 'statuses', 'calendar_background'], 'string', 'max' => 255],
-			[['calendar_background', 'hours_deadline', 'hours_deadline_warning', 'statuses'], 'default', 'value' => null],
+			[['name', 'description', 'statuses', 'calendar_background', 'chart_color'], 'string', 'max' => 255],
+			[['calendar_background', 'hours_deadline', 'hours_deadline_warning', 'statuses', 'chart_color'], 'default', 'value' => null],
 			[['market_status'], 'in', 'range' => array_keys(static::getMarketStatusesNames())],
 			['statusesIds', 'in', 'range' => array_keys(static::getNames()), 'allowArray' => true],
 		];
@@ -95,6 +96,7 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			'hours_deadline' => Yii::t('lead', 'Hours deadline'),
 			'hours_deadline_warning' => Yii::t('lead', 'Hours deadline warning'),
 			'statuses' => Yii::t('lead', 'Statuses'),
+			'chart_color' => Yii::t('lead', 'Chart Color'),
 		];
 	}
 
