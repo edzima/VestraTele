@@ -61,6 +61,10 @@ use yii\widgets\ActiveForm;
 			<?= $form->field($model, 'calendar_background')->widget(
 				ColorInput::class
 			) ?>
+
+			<?= $form->field($model, 'chart_color')->widget(
+				ColorInput::class
+			) ?>
 		</div>
 
 		<div class="col-md-2">
