@@ -6,6 +6,7 @@ use backend\modules\issue\models\search\IssueSearch;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\widgets\address\AddressSearchWidget;
+use common\widgets\DateTimeWidget;
 use common\widgets\DateWidget;
 use kartik\select2\Select2;
 use yii\widgets\ActiveForm;
@@ -199,6 +200,11 @@ use yii\widgets\ActiveForm;
 		?>
 
 
+	</div>
+
+	<div class="row">
+
+
 		<?= $form->field($model, 'note_stage_id', ['options' => ['class' => 'col-md-2']])
 			->widget(Select2::class, [
 				'data' => IssueStage::getStagesNames(),
@@ -207,6 +213,19 @@ use yii\widgets\ActiveForm;
 					'allowClear' => true,
 				],
 			])
+		?>
+
+		<?= $form->field($model, 'note_stage_change_from_at', ['options' => ['class' => 'col-md-2']])
+			->widget(DateTimeWidget::class)
+		?>
+
+		<?= $form->field($model, 'note_stage_change_to_at', [
+			'options' => [
+				'class' => 'col-md-2',
+				'placeholder' => 'test',
+			],
+		])
+			->widget(DateTimeWidget::class)
 		?>
 
 	</div>

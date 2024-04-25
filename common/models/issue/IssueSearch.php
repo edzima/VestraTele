@@ -7,6 +7,7 @@ use common\helpers\ArrayHelper;
 use common\models\AddressSearch;
 use common\models\AgentSearchInterface;
 use common\models\entityResponsible\EntityResponsible;
+use common\models\issue\query\IssueNoteQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\search\ArchivedIssueSearch;
 use common\models\issue\search\IssueMainTypeSearchable;
@@ -79,6 +80,11 @@ abstract class IssueSearch extends Model
 	public $tagsIds;
 	public $excludedTagsIds;
 
+	public $note_stage_id;
+
+	public $note_stage_change_from_at;
+	public $note_stage_change_to_at;
+
 	public const SUMMON_ALL_REALIZED = 'all-realized';
 	public const SUMMON_SOME_ACTIVE = 'some-active';
 
@@ -147,7 +153,7 @@ abstract class IssueSearch extends Model
 		return [
 			[
 				[
-					'issue_id', 'agent_id', 'entity_responsible_id',
+					'issue_id', 'agent_id', 'entity_responsible_id', 'note_stage_id',
 				], 'integer',
 			],
 			[
@@ -174,7 +180,7 @@ abstract class IssueSearch extends Model
 					'created_at', 'updated_at',
 				], 'safe',
 			],
-			['summonsStatusFilter', 'safe'],
+			[['summonsStatusFilter', 'note_stage_change_from_at', 'note_stage_change_to_at'], 'safe'],
 
 			['summonsStatusFilter', 'in', 'range' => static::getSummonsStatusFilters(), 'allowArray' => true],
 			['customerPhone', PhoneValidator::class],
@@ -216,7 +222,9 @@ abstract class IssueSearch extends Model
 			'userType' => Yii::t('issue', 'Who'),
 			'type_additional_date_from_at' => Yii::t('issue', 'Type additional Date at from'),
 			'type_additional_date_to_at' => Yii::t('issue', 'Type additional Date at to'),
-
+			'note_stage_id' => Yii::t('issue', 'Stage Change'),
+			'note_stage_change_from_at' => Yii::t('issue', 'Stage Change from At'),
+			'note_stage_change_to_at' => Yii::t('issue', 'Stage Change to At'),
 		], Issue::instance()->attributeLabels());
 	}
 
@@ -254,6 +262,7 @@ abstract class IssueSearch extends Model
 		$this->applyIssueMainTypeFilter($query);
 		$this->applySummonsStatusFilter($query);
 		$this->applyIssueStageFilter($query);
+		$this->noteStageFilter($query);
 
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
@@ -333,6 +342,22 @@ abstract class IssueSearch extends Model
 			$query->andFilterWhere([
 				'<=', Issue::tableName() . '.created_at',
 				date('Y-m-d 23:59:59', strtotime($this->createdAtTo)),
+			]);
+		}
+	}
+
+	protected function noteStageFilter(IssueQuery $query): void {
+		if (!empty($this->note_stage_id)) {
+			$query->joinWith([
+				'issueNotes' => function (IssueNoteQuery $noteQuery) {
+					$noteQuery->onlyStage($this->note_stage_id);
+					if (!empty($this->note_stage_change_from_at)) {
+						$noteQuery->andWhere(['>=', IssueNote::tableName() . '.publish_at', $this->note_stage_change_from_at]);
+					}
+					if (!empty($this->note_stage_change_to_at)) {
+						$noteQuery->andWhere(['<=', IssueNote::tableName() . '.publish_at', $this->note_stage_change_to_at]);
+					}
+				},
 			]);
 		}
 	}

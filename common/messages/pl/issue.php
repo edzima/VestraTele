@@ -239,4 +239,8 @@ return [
 	'In Issue: {issue} the stage was changed' => 'W Sprawie: {issue} etap został zmieniony',
 	'The stage was changed' => 'Etap został zmieniony',
 	'Lawsuit Calendar Background' => 'Kalendarz Rozpraw',
+	'Stage Change' => 'Zmiana Etapu',
+	'Stage Change from At' => 'Od',
+	'Stage Change to At' => 'Do',
+
 ];
