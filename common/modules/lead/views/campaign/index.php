@@ -37,6 +37,7 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Campaigns');
 				'value' => 'owner',
 				'visible' => $searchModel->scenario !== $searchModel::SCENARIO_OWNER,
 			],
+			'is_active:boolean',
 			'sort_index',
 			[
 				'class' => ActionColumn::class,

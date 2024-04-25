@@ -39,6 +39,7 @@ YiiAsset::register($this);
 			'name',
 			'url:url',
 			'owner',
+			'is_active:boolean',
 			'sort_index',
 		],
 	]) ?>
