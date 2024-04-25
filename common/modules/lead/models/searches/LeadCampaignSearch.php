@@ -16,7 +16,7 @@ class LeadCampaignSearch extends LeadCampaign {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'sort_index', 'owner_id'], 'integer'],
+			[['id', 'sort_index', 'owner_id', 'is_active'], 'integer'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
 			[['name'], 'safe'],
 		];
@@ -58,6 +58,7 @@ class LeadCampaignSearch extends LeadCampaign {
 			'id' => $this->id,
 			'sort_index' => $this->sort_index,
 			'owner_id' => $this->owner_id,
+			'is_active' => $this->is_active,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name]);

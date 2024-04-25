@@ -29,6 +29,9 @@ use yii\widgets\ActiveForm;
 		])
 		: '' ?>
 
+	<?= $form->field($model, 'is_active')->checkbox() ?>
+
+
 	<?= $form->field($model, 'sort_index')->textInput() ?>
 
 	<div class="form-group">
