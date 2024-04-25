@@ -52,6 +52,7 @@ return [
 						'controllers' => [
 							'lead/lead',
 							'lead/campaign',
+							'lead/cost',
 							'lead/source',
 							'lead/reminder',
 							'lead/report',
