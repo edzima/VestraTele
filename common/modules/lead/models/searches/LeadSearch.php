@@ -37,7 +37,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public const SCENARIO_USER = 'user';
 
-	private const QUESTION_ATTRIBUTE_PREFIX = 'question';
+	protected const QUESTION_ATTRIBUTE_PREFIX = 'question';
 
 	public bool $withoutUser = false;
 	public bool $withoutReport = false;
@@ -310,7 +310,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public $owner_id;
 
-	private function applyUserFilter(LeadQuery $query): void {
+	protected function applyUserFilter(LeadQuery $query): void {
 		if (!empty($this->owner_id)) {
 			$query->owner($this->owner_id);
 		}
@@ -553,7 +553,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$query->andFilterWhere([Lead::tableName() . '.status_id' => $this->status_id]);
 	}
 
-	private function applyDateFilter(LeadQuery $query) {
+	protected function applyDateFilter(LeadQuery $query) {
 		if (!empty($this->olderByDays)) {
 			$this->to_at = date(DATE_ATOM, strtotime("- $this->olderByDays days"));
 		}
@@ -703,7 +703,7 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 	}
 
-	private function applyExcludedStatusFilter(LeadQuery $query): void {
+	public function applyExcludedStatusFilter(LeadQuery $query): void {
 		if (!empty($this->excludedStatus)) {
 			$query->andWhere(['NOT IN', Lead::tableName() . '.status_id', $this->excludedStatus]);
 		}

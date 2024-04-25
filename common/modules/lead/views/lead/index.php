@@ -58,6 +58,8 @@ $this->registerJs($js);
 
 	<p style="display: inline">
 
+		<?= Html::a(Yii::t('lead', 'Charts'), ['chart/index'], ['class' => 'btn']) ?>
+
 		<?= Html::a(Yii::t('lead', 'Search') . ' ' . Html::icon('phone'), ['phone'], [
 			'class' => 'btn btn-success',
 			'title' => Yii::t('lead', 'Search - Phone'),
