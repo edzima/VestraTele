@@ -170,7 +170,14 @@ abstract class IssueSearch extends Model
 			[['onlyWithTelemarketers'], 'default', 'value' => null],
 
 			['noteFilter', 'string'],
-			[['createdAtTo', 'createdAtFrom', 'signedAtFrom', 'signedAtTo', 'type_additional_date_from_at', 'type_additional_date_to_at'], 'date', 'format' => DATE_ATOM],
+			[
+				[
+					'createdAtTo', 'createdAtFrom', 'signedAtFrom', 'signedAtTo',
+					'type_additional_date_from_at', 'type_additional_date_to_at',
+					'note_stage_change_from_at', 'note_stage_change_to_at',
+				],
+				'date', 'format' => DATE_ATOM,
+			],
 			['stage_id', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
 			[['type_id', 'excludedTypes'], 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			[['customerName', 'userName'], 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
@@ -180,7 +187,7 @@ abstract class IssueSearch extends Model
 					'created_at', 'updated_at',
 				], 'safe',
 			],
-			[['summonsStatusFilter', 'note_stage_change_from_at', 'note_stage_change_to_at'], 'safe'],
+			[['summonsStatusFilter',], 'safe'],
 
 			['summonsStatusFilter', 'in', 'range' => static::getSummonsStatusFilters(), 'allowArray' => true],
 			['customerPhone', PhoneValidator::class],
@@ -350,12 +357,21 @@ abstract class IssueSearch extends Model
 		if (!empty($this->note_stage_id)) {
 			$query->joinWith([
 				'issueNotes' => function (IssueNoteQuery $noteQuery) {
-					$noteQuery->onlyStage($this->note_stage_id);
+					$noteQuery->onlyStage($this->note_stage_id, false);
 					if (!empty($this->note_stage_change_from_at)) {
-						$noteQuery->andWhere(['>=', IssueNote::tableName() . '.publish_at', $this->note_stage_change_from_at]);
+						$noteQuery->andWhere([
+								'>=',
+								IssueNote::tableName() . '.publish_at',
+								date('Y-m-d 00:00:00', strtotime($this->note_stage_change_from_at)),
+							]
+						);
 					}
 					if (!empty($this->note_stage_change_to_at)) {
-						$noteQuery->andWhere(['<=', IssueNote::tableName() . '.publish_at', $this->note_stage_change_to_at]);
+						$noteQuery->andWhere([
+							'<=',
+							IssueNote::tableName() . '.publish_at',
+							date('Y-m-d 23:59:59', strtotime($this->note_stage_change_to_at)),
+						]);
 					}
 				},
 			]);

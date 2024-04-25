@@ -26,19 +26,31 @@ class IssueNoteQuery extends ActiveQuery {
 		return $this;
 	}
 
-	public function onlyStage(int $stageId): self {
-		$this->andWhere([
-			'or',
-			[
-				'like',
-				IssueNote::tableName() . '.type',
-				IssueNote::generateType(
-					IssueNote::generateType(IssueNote::TYPE_STAGE_CHANGE, '%'),
-					$stageId
-				),
-				false,
-			],
-			[
+	public function onlyStage(int $stageId, bool $oldOrNew = true): self {
+		if ($oldOrNew) {
+			$this->andWhere([
+				'or',
+				[
+					'like',
+					IssueNote::tableName() . '.type',
+					IssueNote::generateType(
+						IssueNote::generateType(IssueNote::TYPE_STAGE_CHANGE, '%'),
+						$stageId
+					),
+					false,
+				],
+				[
+					'like',
+					IssueNote::tableName() . '.type',
+					IssueNote::generateType(
+						IssueNote::generateType(IssueNote::TYPE_STAGE_CHANGE, $stageId),
+						'%'
+					),
+					false,
+				],
+			]);
+		} else {
+			$this->andWhere([
 				'like',
 				IssueNote::tableName() . '.type',
 				IssueNote::generateType(
@@ -46,8 +58,9 @@ class IssueNoteQuery extends ActiveQuery {
 					'%'
 				),
 				false,
-			],
-		]);
+			]);
+		}
+
 		return $this;
 	}
 

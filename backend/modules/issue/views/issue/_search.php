@@ -6,7 +6,6 @@ use backend\modules\issue\models\search\IssueSearch;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\widgets\address\AddressSearchWidget;
-use common\widgets\DateTimeWidget;
 use common\widgets\DateWidget;
 use kartik\select2\Select2;
 use yii\widgets\ActiveForm;
@@ -216,7 +215,7 @@ use yii\widgets\ActiveForm;
 		?>
 
 		<?= $form->field($model, 'note_stage_change_from_at', ['options' => ['class' => 'col-md-2']])
-			->widget(DateTimeWidget::class)
+			->widget(DateWidget::class)
 		?>
 
 		<?= $form->field($model, 'note_stage_change_to_at', [
@@ -225,7 +224,7 @@ use yii\widgets\ActiveForm;
 				'placeholder' => 'test',
 			],
 		])
-			->widget(DateTimeWidget::class)
+			->widget(DateWidget::class)
 		?>
 
 	</div>
