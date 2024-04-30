@@ -211,7 +211,7 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function search(array $params = []): ActiveDataProvider {
 		$query = Lead::find()
-			->joinWith('leadSource S')
+			->joinWith('leadSource')
 			->with('status')
 			->with('campaign')
 			->with('owner.userProfile')
@@ -261,20 +261,10 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyReportStatusFilter($query);
 		$this->applyDeadlineFilter($query);
 		$this->applyHoursAfterLastReport($query);
-		// grid filtering conditions
-		$query->andFilterWhere([
-			Lead::tableName() . '.id' => $this->id,
-			Lead::tableName() . '.date_at' => $this->date_at,
-			Lead::tableName() . '.campaign_id' => $this->campaign_id,
-			Lead::tableName() . '.source_id' => $this->source_id,
-			Lead::tableName() . '.provider' => $this->provider,
-			'S.type_id' => $this->type_id,
-		]);
+		$this->applyTypeFilter($query);
 
-		$query
-			->andFilterWhere(['like', Lead::tableName() . '.data', $this->data])
-			->andFilterWhere(['like', Lead::tableName() . '.email', $this->email])
-			->andFilterWhere(['like', Lead::tableName() . '.postal_code', $this->postal_code]);
+		$this->applyLeadDirectlyFilter($query);
+		// grid filtering conditions
 
 		if (YII_ENV_TEST) {
 			codecept_debug($query->createCommand()->getRawSql());
@@ -713,5 +703,27 @@ class LeadSearch extends Lead implements SearchModel {
 		return User::getSelectList(
 			LeadUser::userIds(LeadUser::TYPE_OWNER)
 		);
+	}
+
+	protected function applyTypeFilter(LeadQuery $query): void {
+		if (!empty($this->type_id)) {
+			$query->joinWith('leadSource');
+			$query->andWhere([LeadSource::tableName() . '.id' => $this->type_id]);
+		}
+	}
+
+	protected function applyLeadDirectlyFilter(LeadQuery $query) {
+		$query->andFilterWhere([
+			Lead::tableName() . '.id' => $this->id,
+			Lead::tableName() . '.date_at' => $this->date_at,
+			Lead::tableName() . '.campaign_id' => $this->campaign_id,
+			Lead::tableName() . '.source_id' => $this->source_id,
+			Lead::tableName() . '.provider' => $this->provider,
+		]);
+
+		$query
+			->andFilterWhere(['like', Lead::tableName() . '.data', $this->data])
+			->andFilterWhere(['like', Lead::tableName() . '.email', $this->email])
+			->andFilterWhere(['like', Lead::tableName() . '.postal_code', $this->postal_code]);
 	}
 }
