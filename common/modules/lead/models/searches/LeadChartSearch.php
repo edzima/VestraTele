@@ -14,6 +14,8 @@ class LeadChartSearch extends LeadSearch {
 	public string $defaultStartDateFormat = 'Y-m-01';
 	public string $defaultEndDateFormat = 'Y-m-t 23:59:59';
 
+	public array $excludesSources = [];
+
 	public function getUniqueId(): string {
 		return md5(serialize($this->toArray()));
 	}
@@ -22,6 +24,7 @@ class LeadChartSearch extends LeadSearch {
 		return array_merge([
 			['from_at', 'default', 'value' => date($this->defaultStartDateFormat)],
 			['to_at', 'default', 'value' => date($this->defaultEndDateFormat)],
+			['excludesSources', 'in', 'range' => array_keys($this->getSourcesNames())],
 		], parent::rules());
 	}
 
@@ -38,6 +41,18 @@ class LeadChartSearch extends LeadSearch {
 		$this->applyDateFilter($query);
 
 		return $dataProvider;
+	}
+
+	public function getLeadSourcesCount(): array {
+		$query = $this->getBaseQuery();
+		$query->groupBy(Lead::tableName() . '.source_id');
+		$query->select([Lead::tableName() . '.source_id', 'count(*) as count']);
+		$query->asArray();
+		$data = $query->all();
+		$data = ArrayHelper::map($data, 'source_id', 'count');
+		$data = array_map('intval', $data);
+		arsort($data);
+		return $data;
 	}
 
 	public function getLeadTypesCount(): array {
@@ -66,6 +81,9 @@ class LeadChartSearch extends LeadSearch {
 	}
 
 	public function getLeadsUsersCount(): array {
+		if (!empty($this->user_id) && count((array) $this->user_id) === 1) {
+			return [];
+		}
 //		$query = LeadUser::find();
 //		$query->joinWith([
 //			'lead' => function (LeadQuery $query) {
@@ -102,6 +120,7 @@ class LeadChartSearch extends LeadSearch {
 		$this->applyDateFilter($query);
 		$this->applyExcludedStatusFilter($query);
 		$this->applyUserFilter($query);
+		$this->applyLeadDirectlyFilter($query);
 	}
 
 	public function getLeadsByDays(): array {
