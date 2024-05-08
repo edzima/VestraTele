@@ -458,6 +458,12 @@ return [
 	'Value (max)' => 'Wartość (max)',
 	'Update Lead Cost: {name}' => 'Edycja Kosztu: {name}',
 	'Status Count' => 'Statusy',
+	'Sources Count' => 'Źródła',
 	'Types Count' => 'Typy',
 	'Leads Users Count' => 'Leads',
+	'Link At' => 'Przypisano',
+	'First view At' => 'Pierwsze otwarcie',
+	'Last view At' => 'Ostatnie otwarcie',
+	'Action At' => 'Akcja',
+	'Chart Group' => 'Wykres - Grupa',
 ];

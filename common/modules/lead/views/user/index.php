@@ -1,11 +1,13 @@
 <?php
 
-use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadType;
+use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadUsersSearch;
 use common\modules\lead\Module;
 use common\widgets\GridView;
 use yii\helpers\Html;
+use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadUsersSearch */
@@ -31,7 +33,28 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Users');
 
 	</p>
 
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+	<?= $this->render('_search', ['model' => $searchModel]); ?>
+
+
+	<div class="row">
+		<div class="col-sm-3">
+			<?= DetailView::widget([
+				'model' => $searchModel->getAvgViewDuration(),
+				'attributes' => [
+					[
+						'attribute' => 'firstViewDuration',
+						'format' => 'duration',
+					],
+					[
+						'attribute' => 'viewDuration',
+						'format' => 'duration',
+					],
+				],
+			]) ?>
+		</div>
+
+	</div>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
@@ -39,17 +62,20 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Users');
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
 			[
-				'attribute' => 'lead_id',
+				'attribute' => 'leadName',
 				'format' => 'html',
 				'value' => function (LeadUser $data): string {
 					return Html::a(Html::encode($data->lead->getName()), [
 						'lead/view', 'id' => $data->lead_id,
 					]);
 				},
+				'label' => Yii::t('lead', 'Lead'),
 			],
 			[
-				'attribute' => 'leadName',
-				'value' => 'lead.name',
+				'attribute' => 'leadTypeId',
+				'value' => 'lead.typeName',
+				'label' => Yii::t('lead', 'Type'),
+				'filter' => LeadType::getNames(),
 			],
 			[
 				'attribute' => 'leadStatusId',
@@ -77,7 +103,19 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Users');
 				'filter' => LeadUsersSearch::getTypesNames(),
 			],
 			'created_at:datetime',
-			'updated_at:datetime',
+			'first_view_at:datetime',
+			[
+				'attribute' => 'firstViewDuration',
+				//	'value' => 'firstViewDuration',
+				'format' => 'duration',
+				'filter' => \common\helpers\Html::booleanDropdownList(),
+			],
+			'last_view_at:datetime',
+			[
+				'attribute' => 'lastViewDuration',
+				'format' => 'duration',
+			],
+			'action_at:datetime',
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>

@@ -19,6 +19,9 @@ use yii\db\Expression;
  * @property string $type
  * @property int $created_at
  * @property int $updated_at
+ * @property int|null $first_view_at
+ * @property int|null $action_at
+ * @property int|null $last_view_at
  *
  * @property Lead $lead
  * @property LeadUserInterface $user
@@ -33,6 +36,33 @@ class LeadUser extends ActiveRecord {
 	public const TYPE_MARKET_SECOND = 'market-second';
 	public const TYPE_MARKET_THIRD = 'market-third';
 	public const TYPE_PARTNER = 'partner';
+
+	protected $firstViewDuration;
+
+	protected $lastViewDuration;
+
+	public function setFirstViewDuration(int $duration): void {
+		$this->firstViewDuration = $duration;
+	}
+
+	public function setLastViewDuration(int $duration): void {
+		$this->lastViewDuration = $duration;
+	}
+
+	public function getFirstViewDuration(): ?string {
+		if (!empty($this->first_view_at) && empty($this->firstViewDuration)) {
+			$this->firstViewDuration = strtotime($this->first_view_at) - strtotime($this->created_at);
+		}
+		return $this->firstViewDuration;
+	}
+
+	public function getLastViewDuration(): ?string {
+		if (!empty($this->last_view_at) && empty($this->lastViewDuration)) {
+			$this->lastViewDuration = strtotime($this->last_view_at) - strtotime($this->first_view_at);
+		}
+		return $this->lastViewDuration;
+	}
+
 
 	/**
 	 * {@inheritdoc}
@@ -79,8 +109,13 @@ class LeadUser extends ActiveRecord {
 			'lead_id' => Yii::t('lead', 'Lead'),
 			'type' => Yii::t('lead', 'Type'),
 			'typeName' => Yii::t('lead', 'Type'),
-			'created_at' => Yii::t('lead', 'Created At'),
+			'created_at' => Yii::t('lead', 'Link At'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
+			'action_at' => Yii::t('lead', 'Action At'),
+			'first_view_at' => Yii::t('lead', 'First view At'),
+			'last_view_at' => Yii::t('lead', 'Last view At'),
+			'user' => Yii::t('lead', 'User'),
+
 		];
 	}
 
@@ -139,6 +174,12 @@ class LeadUser extends ActiveRecord {
 			static::TYPE_MARKET_SECOND,
 			static::TYPE_MARKET_THIRD,
 		];
+	}
+
+	public function updateActionAt(): void {
+		$this->updateAttributes([
+			'action_at' => time(),
+		]);
 	}
 
 }
