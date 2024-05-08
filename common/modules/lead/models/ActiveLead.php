@@ -12,6 +12,7 @@ use yii\base\Arrayable;
  * @property-read LeadAnswer[] $answers
  * @property-read LeadAddress[] $addresses
  * @property-read LeadMarket|null $market
+ * @property-read LeadUser[] $leadUsers
  * @property-read LeadPhoneBlacklist|null $phoneBlacklist
  */
 interface ActiveLead extends LeadInterface, Arrayable {

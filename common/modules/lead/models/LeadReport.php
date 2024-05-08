@@ -49,6 +49,14 @@ class LeadReport extends ActiveRecord {
 		];
 	}
 
+	public function afterSave($insert, $changedAttributes) {
+		parent::afterSave($insert, $changedAttributes);
+		$leadUser = Module::manager()->getLeadUser($this->lead, $this->owner_id);
+		if ($leadUser) {
+			$leadUser->updateActionAt();
+		}
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */

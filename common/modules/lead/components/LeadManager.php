@@ -86,6 +86,24 @@ class LeadManager extends Component {
 		return $lead->isForUser($userId);
 	}
 
+	public function getLeadUser(ActiveLead $lead, int $userId = null, string $type = null): ?LeadUser {
+		if ($userId === null) {
+			$userId = Yii::$app->user->getId();
+		}
+		if ($userId === null) {
+			return null;
+		}
+		$users = $lead->leadUsers;
+		foreach ($users as $leadUser) {
+			if ($type === null || $leadUser->type === $type) {
+				if ($leadUser->user_id === $userId) {
+					return $leadUser;
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * @param LeadInterface $lead
 	 * @return ActiveLead|ActiveRecord|null
@@ -135,6 +153,7 @@ class LeadManager extends Component {
 	protected function afterStatusUpdate(LeadEvent $event): void {
 		/** @var ActiveLead $lead */
 		$lead = $event->getLead();
+
 		$status = LeadStatus::getModels()[$lead->getStatusId()];
 		if (!empty($status->market_status) && $lead->market !== null) {
 
