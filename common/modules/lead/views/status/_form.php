@@ -65,6 +65,7 @@ use yii\widgets\ActiveForm;
 			<?= $form->field($model, 'chart_color')->widget(
 				ColorInput::class
 			) ?>
+			<?= $form->field($model, 'chart_group')->textInput() ?>
 		</div>
 
 		<div class="col-md-2">
