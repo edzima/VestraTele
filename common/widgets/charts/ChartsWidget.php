@@ -26,6 +26,8 @@ class ChartsWidget extends Widget {
 
 	public int $timeout = 50;
 
+	public array $containerOptions = [];
+
 	public function init() {
 		if (!isset($this->options['defaultLocale'])) {
 			$this->options['defaultLocale'] = Yii::$app->language;
@@ -38,10 +40,9 @@ class ChartsWidget extends Widget {
 
 	public function run() {
 		ChartsAsset::register($this->getView());
-
-		echo Html::tag('div', '', [
-			'id' => $this->getId(),
-		]);
+		$options = $this->containerOptions;
+		$options['id'] = $this->getId();
+		echo Html::tag('div', '', $options);
 
 		$this->view->registerJs($this->getScript());
 	}
