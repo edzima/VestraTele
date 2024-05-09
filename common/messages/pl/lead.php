@@ -466,4 +466,5 @@ return [
 	'Last view At' => 'Ostatnie otwarcie',
 	'Action At' => 'Akcja',
 	'Chart Group' => 'Wykres - Grupa',
+	'Costs' => 'Koszty',
 ];
