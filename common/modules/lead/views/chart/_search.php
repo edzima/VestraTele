@@ -10,6 +10,8 @@ use kartik\select2\Select2;
 /* @var $this yii\web\View */
 /* @var $model LeadSearch */
 /* @var $form ActiveForm */
+/* @var $sourcesNames array */
+/* @var $usersNames array */
 
 ?>
 
@@ -18,6 +20,7 @@ use kartik\select2\Select2;
 	<?php $form = ActiveForm::begin([
 		'method' => 'get',
 		'id' => 'lead-chart-filter-form',
+		'action' => ['index'],
 	]); ?>
 
 
@@ -81,18 +84,20 @@ use kartik\select2\Select2;
 		])
 		?>
 
-
 	</div>
 
 	<div class="row">
 
-		<?= $form->field($model, 'source_id', ['options' => ['class' => 'col-md-2 col-lg-2']])->widget(Select2::class, [
-			'data' => $model->getSourcesNames(),
-			'pluginOptions' => [
-				'placeholder' => Yii::t('lead', 'Source'),
-				'allowClear' => true,
-			],
-		]) ?>
+		<?= !empty($sourcesNames) ?
+			$form->field($model, 'source_id', ['options' => ['class' => 'col-md-2 col-lg-2']])->widget(Select2::class, [
+				'data' => $sourcesNames,
+				'pluginOptions' => [
+					'placeholder' => Yii::t('lead', 'Source'),
+					'allowClear' => true,
+					'multiple' => true,
+				],
+			])
+			: '' ?>
 
 
 		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-2 col-lg-2']])->widget(Select2::class, [
@@ -105,23 +110,27 @@ use kartik\select2\Select2;
 
 		<?php if ($model->scenario !== LeadSearch::SCENARIO_USER): ?>
 
-			<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(Select2::class, [
-				'data' => LeadSearch::getUsersNames(),
-				'pluginOptions' => [
-					'placeholder' => $model->getAttributeLabel('user_id'),
-					'allowClear' => true,
-					'multiple' => true,
-				],
-			])
+			<?= !empty($usersNames)
+				? $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(Select2::class, [
+					'data' => $usersNames,
+					'pluginOptions' => [
+						'placeholder' => $model->getAttributeLabel('user_id'),
+						'allowClear' => true,
+						'multiple' => true,
+					],
+				])
+				: ''
 			?>
 
-			<?= $form->field($model, 'user_type', ['options' => ['class' => 'col-md-2 col-lg-1']])->widget(Select2::class, [
-				'data' => LeadSearch::getUserTypesNames(),
-				'pluginOptions' => [
-					'placeholder' => $model->getAttributeLabel('user_type'),
-					'allowClear' => true,
-				],
-			])
+			<?= !empty($usersNames)
+				? $form->field($model, 'user_type', ['options' => ['class' => 'col-md-2 col-lg-1']])->widget(Select2::class, [
+					'data' => LeadSearch::getUserTypesNames(),
+					'pluginOptions' => [
+						'placeholder' => $model->getAttributeLabel('user_type'),
+						'allowClear' => true,
+					],
+				])
+				: ''
 			?>
 
 			<?= $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-2']])->checkbox() ?>

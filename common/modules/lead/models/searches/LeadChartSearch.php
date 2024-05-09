@@ -7,14 +7,11 @@ use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\query\LeadQuery;
-use yii\data\ActiveDataProvider;
 
 class LeadChartSearch extends LeadSearch {
 
 	public string $defaultStartDateFormat = 'Y-m-01';
 	public string $defaultEndDateFormat = 'Y-m-t 23:59:59';
-
-	public array $excludesSources = [];
 
 	public function getUniqueId(): string {
 		return md5(serialize($this->toArray()));
@@ -24,23 +21,20 @@ class LeadChartSearch extends LeadSearch {
 		return array_merge([
 			['from_at', 'default', 'value' => date($this->defaultStartDateFormat)],
 			['to_at', 'default', 'value' => date($this->defaultEndDateFormat)],
-			['excludesSources', 'in', 'range' => array_keys($this->getSourcesNames())],
 		], parent::rules());
 	}
 
-	public function search(array $params = []): ActiveDataProvider {
-		$query = Lead::find();
-		$this->load($params);
-		$dataProvider = new ActiveDataProvider([
-			'query' => $query,
+	public function getLeadsByDays(): array {
+		$query = $this->getBaseQuery();
+		$query->groupBy(['DATE(date_at)', 'status_id']);
+		$query->select([
+			'count(*) AS count',
+			'DATE(date_at) as date',
+			'status_id',
 		]);
-		if (!$this->validate()) {
-			$query->andWhere('0=1');
-			return $dataProvider;
-		}
-		$this->applyDateFilter($query);
-
-		return $dataProvider;
+		$query->orderBy(['date_at' => SORT_ASC]);
+		$query->asArray();
+		return $query->all();
 	}
 
 	public function getLeadSourcesCount(): array {
@@ -121,19 +115,6 @@ class LeadChartSearch extends LeadSearch {
 		$this->applyExcludedStatusFilter($query);
 		$this->applyUserFilter($query);
 		$this->applyLeadDirectlyFilter($query);
-	}
-
-	public function getLeadsByDays(): array {
-		$query = $this->getBaseQuery();
-		$query->groupBy(['EXTRACT(day FROM date_at)', 'status_id']);
-		$query->select([
-			'count(*) AS count',
-			'DATE(date_at) as date',
-			'status_id',
-		]);
-		$query->orderBy(['date_at' => SORT_ASC]);
-		$query->asArray();
-		return $query->all();
 	}
 
 }
