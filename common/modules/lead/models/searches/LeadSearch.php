@@ -107,7 +107,7 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type_id', 'campaign_id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
+			[['id', 'campaign_id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
 			[['reportStatus', 'hoursAfterLastReport', 'owner_id'], 'integer'],
 			[['!user_id'], 'required', 'on' => static::SCENARIO_USER],
 			[['!user_id'], 'integer', 'on' => static::SCENARIO_USER],
@@ -116,6 +116,7 @@ class LeadSearch extends Lead implements SearchModel {
 			[['duplicatePhone', 'fromMarket', 'selfUserId', 'onlyWithEmail', 'onlyWithPhone',], 'default', 'value' => null],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'excludedClosedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames()), 'allowArray' => true],
+			['type_id', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			[['selfUserId'], 'in', 'range' => function () { return $this->selfUsersIds(); }, 'allowArray' => true, 'skipOnEmpty' => true],
 			[['status_id', 'excludedStatus', 'reportStatus'], 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
@@ -338,7 +339,7 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 	}
 
-	private function applyReportStatusFilter(LeadQuery $query) {
+	protected function applyReportStatusFilter(LeadQuery $query) {
 		if (!empty($this->reportStatus)) {
 			$query->joinWith('reports');
 			$query->andWhere([LeadReport::tableName() . '.status_id' => $this->reportStatus]);
@@ -610,7 +611,7 @@ class LeadSearch extends Lead implements SearchModel {
 		return User::getSelectList($this->selfUsersIds());
 	}
 
-	private function applyHoursAfterLastReport(LeadQuery $query): void {
+	protected function applyHoursAfterLastReport(LeadQuery $query): void {
 		if (!empty($this->hoursAfterLastReport)) {
 			$query->onlyNewestReport();
 			$hours = $this->hoursAfterLastReport;
@@ -708,7 +709,7 @@ class LeadSearch extends Lead implements SearchModel {
 	protected function applyTypeFilter(LeadQuery $query): void {
 		if (!empty($this->type_id)) {
 			$query->joinWith('leadSource');
-			$query->andWhere([LeadSource::tableName() . '.id' => $this->type_id]);
+			$query->andWhere([LeadSource::tableName() . '.type_id' => $this->type_id]);
 		}
 	}
 
@@ -717,7 +718,7 @@ class LeadSearch extends Lead implements SearchModel {
 			Lead::tableName() . '.id' => $this->id,
 			Lead::tableName() . '.date_at' => $this->date_at,
 			Lead::tableName() . '.campaign_id' => $this->campaign_id,
-			Lead::tableName() . '.source_id' => $this->source_id,
+			//	Lead::tableName() . '.source_id' => $this->source_id,
 			Lead::tableName() . '.provider' => $this->provider,
 		]);
 

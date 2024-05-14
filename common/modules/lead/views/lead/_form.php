@@ -45,6 +45,22 @@ use yii\widgets\ActiveForm;
 			)
 		?>
 
+		<?=
+		$form->field($model, 'campaign_id', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])
+			->widget(Select2::class, [
+					'data' => $model->getCampaignsNames(),
+					'options' => [
+						'placeholder' => $model->getAttributeLabel('campaign_id'),
+					],
+				]
+			)
+		?>
+
+
 
 		<?= $model->scenario !== LeadForm::SCENARIO_OWNER
 			? $form->field($model, 'provider', [
@@ -62,20 +78,6 @@ use yii\widgets\ActiveForm;
 			: ''
 		?>
 
-		<?php
-		//		$form->field($model, 'campaign_id', [
-		//			'options' => [
-		//				'class' => 'col-md-3 col-lg-2',
-		//			],
-		//		])
-		//			->widget(Select2::class, [
-		//					'data' => $model->getCampaignsNames(),
-		//					'options' => [
-		//						'placeholder' => $model->getAttributeLabel('campaign_id'),
-		//					],
-		//				]
-		//			)
-		?>
 
 
 		<?= $form->field($model, 'date_at', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(DateTimeWidget::class, [
