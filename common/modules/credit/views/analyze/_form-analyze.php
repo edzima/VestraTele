@@ -4,6 +4,7 @@ use common\helpers\Html;
 use common\modules\credit\models\CreditClientAnalyze;
 use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
+use common\widgets\PhoneInput;
 use kartik\number\NumberControl;
 use kartik\select2\Select2;
 use yii\web\View;
@@ -41,7 +42,18 @@ use yii\web\View;
 		]) ?>
 	</div>
 	<div class="row">
-
+		<?= $form->field($model, 'phone', [
+			'options' => [
+				'class' => 'col-md-6',
+			],
+		])->widget(PhoneInput::class)
+		?>
+		<?= $form->field($model, 'email', [
+			'options' => [
+				'class' => 'col-md-6',
+			],
+		])->textInput()
+		?>
 	</div>
 
 	<div class="row">

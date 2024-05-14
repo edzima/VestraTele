@@ -56,6 +56,22 @@ use yii\web\View;
 			]) ?>
 			<?= Html::tag('td', Html::encode($model->borrower)) ?>
 		</tr>
+		<?php if (!empty($model->phone)): ?>
+			<tr>
+				<?= Html::tag('th', $model->getAttributeLabel('phone'), [
+					'class' => 'bold-text',
+				]) ?>
+				<?= Html::tag('td', Html::encode($model->phone)) ?>
+			</tr>
+		<?php endif; ?>
+		<?php if (!empty($model->email)): ?>
+			<tr>
+				<?= Html::tag('th', $model->getAttributeLabel('email'), [
+					'class' => 'bold-text',
+				]) ?>
+				<?= Html::tag('td', Html::encode($model->email)) ?>
+			</tr>
+		<?php endif; ?>
 		<tr>
 			<?= Html::tag('th', $model->getAttributeLabel('entityResponsibleId'), [
 				'class' => 'bold-text',

@@ -49,4 +49,6 @@ kredytu bez odsetek, prowizji i innych kosztów dodatkowych.',
 	'Interest part' => 'Odsetki',
 	'Installment value' => 'Rata',
 	'Insurance' => 'Ubezpieczenie',
+	'Phone' => 'Numer',
+	'Email' => 'E-mail',
 ];
