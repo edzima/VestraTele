@@ -60,6 +60,12 @@ $user = Yii::$app->user;
 							'icon' => '<i class="fa fa-eye"></i>',
 						],
 						[
+							'label' => Yii::t('lead', 'Lead Costs'),
+							'url' => ['/lead/cost/index'],
+							'icon' => '<i class="fa fa-money"></i>',
+							'visible' => $user->can(Worker::PERMISSION_LEAD_COST),
+						],
+						[
 							'label' => Yii::t('lead', 'Lead Market'),
 							'url' => ['/lead/market/index'],
 							'icon' => '<i class="fa fa-bullhorn"></i>',

@@ -1,6 +1,8 @@
 <?php
 
 use common\modules\lead\models\LeadCost;
+use common\widgets\GridView;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -33,11 +35,18 @@ YiiAsset::register($this);
 		'model' => $model,
 		'attributes' => [
 			'campaign',
-			'value',
-			'date_at',
-			'created_at',
-			'updated_at',
+			'value:currency',
+			'date_at:date',
+			'created_at:datetime',
+			'updated_at:datetime',
 		],
+	]) ?>
+
+
+	<?= GridView::widget([
+		'dataProvider' => new ActiveDataProvider([
+			'query' => $model->getLeads(),
+		]),
 	]) ?>
 
 </div>

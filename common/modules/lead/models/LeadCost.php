@@ -79,4 +79,9 @@ class LeadCost extends ActiveRecord {
 	public function getName(): string {
 		return $this->campaign->name . ': ' . Yii::$app->formatter->asCurrency($this->value);
 	}
+
+	public function getLeads(): ActiveQuery {
+		return $this->hasMany(Lead::class, ['campaign_id' => 'campaign_id'])
+			->andWhere(['date_at' => date('Y-m-d', strtotime($this->date_at))]);
+	}
 }

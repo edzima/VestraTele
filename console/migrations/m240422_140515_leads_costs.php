@@ -16,7 +16,7 @@ class m240422_140515_leads_costs extends Migration {
 			'id' => $this->primaryKey(),
 			'campaign_id' => $this->integer()->notNull(),
 			'value' => $this->decimal(10, 2),
-			'date_at' => $this->dateTime()->notNull(),
+			'date_at' => $this->date()->notNull(),
 			'created_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
 			'updated_at' => $this->timestamp()->notNull()->defaultExpression('current_timestamp()'),
 		]);
