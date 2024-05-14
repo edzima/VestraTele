@@ -52,6 +52,38 @@ $dataProvider->getModels();
 
 <?php endif; ?>
 
+<div class="btn-group">
+	<?= Html::submitButton(
+		Html::faicon('bullhorn'),
+		[
+			'class' => 'btn btn-warning',
+			'name' => 'route',
+			'value' => 'campaign/assign',
+			'title' => Yii::t('lead', 'Campaign'),
+			'aria-label' => Yii::t('lead', 'Campaign'),
+		])
+	?>
+	<?= $dataProvider->pagination->pageCount > 1
+		? Html::a(
+			count($searchModel->getAllIds($dataProvider->query)),
+
+			['campaign/assign'],
+			[
+				'class' => 'btn btn-warning',
+				'data' => [
+					'title' => Yii::t('lead', 'Campaign ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
+					'aria-label' => Yii::t('lead', 'Campaign ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
+					'method' => 'POST',
+					'params' => [
+						'leadsIds' => $searchModel->getAllIds($dataProvider->query),
+					],
+				],
+			])
+		: ''
+	?>
+</div>
+
+
 <?php if ($assignUsers): ?>
 	<div class="btn-group">
 

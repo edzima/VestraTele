@@ -2,11 +2,14 @@
 
 namespace common\modules\lead\controllers;
 
-use Yii;
+use common\helpers\Flash;
+use common\helpers\Url;
+use common\modules\lead\models\forms\LeadCampaignForm;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\searches\LeadCampaignSearch;
-use yii\web\NotFoundHttpException;
+use Yii;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 
 /**
  * CampaignController implements the CRUD actions for LeadCampaign model.
@@ -50,6 +53,51 @@ class CampaignController extends BaseController {
 			'visibleButtons' => [
 				'delete' => $this->module->allowDelete,
 			],
+		]);
+	}
+
+	public function actionAssign(array $ids = []) {
+		if (empty($ids)) {
+			$postIds = Yii::$app->request->post('leadsIds');
+			if (is_string($postIds)) {
+				$postIds = explode(',', $postIds);
+			}
+			if ($postIds) {
+				$ids = $postIds;
+			}
+		}
+		$model = new LeadCampaignForm();
+		$ids = array_unique($ids);
+		$model->leadsIds = array_combine($ids, $ids);
+		if ($this->module->onlyUser) {
+			$model->scenario = LeadCampaignForm::SCENARIO_OWNER;
+			$model->ownerId = Yii::$app->user->getId();
+		}
+		if ($model->load(Yii::$app->request->post())) {
+			$count = $model->save();
+			if ($count) {
+				if ($model->campaignId) {
+					Flash::add(Flash::TYPE_SUCCESS,
+						Yii::t('lead', 'Success assign {count} Leads to Campaign: {campaign}.', [
+							'campaign' => $model->getCampaignNames()[$model->campaignId],
+							'count' => $count,
+						])
+					);
+				}
+				if ($model->campaignId) {
+					Flash::add(Flash::TYPE_SUCCESS,
+						Yii::t('lead', '{count} Leads without Campaign.', [
+							'campaign' => $model->getCampaignNames()[$model->campaignId],
+							'count' => $count,
+						])
+					);
+				}
+
+				return $this->redirect(Url::previous());
+			}
+		}
+		return $this->render('assign', [
+			'model' => $model,
 		]);
 	}
 
