@@ -36,6 +36,14 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Campaigns');
 				'attribute' => 'owner_id',
 				'value' => 'owner',
 				'visible' => $searchModel->scenario !== $searchModel::SCENARIO_OWNER,
+				'filter' => LeadCampaignSearch::getOwnersNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'pluginOptions' => [
+						'placeholder' => Yii::t('lead', 'Select...'),
+						'allowClear' => true,
+					],
+				],
 			],
 			'is_active:boolean',
 			'sort_index',
