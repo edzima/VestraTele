@@ -17,10 +17,13 @@ $this->title = Yii::t('lead', 'Charts');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
 $this->params['breadcrumbs'][] = $this->title;
 
+var_dump($searchModel->from_at);
+
 $leadStatusColor = new LeadStatusColor();
 
 $leadsDaysData = $searchModel->getLeadsByDays();
 
+//echo '<pre>' . \yii\helpers\VarDumper::dumpAsString($leadsDaysData) . '</pre>';
 $testData = [];
 foreach ($leadsDaysData as $leadDaysData) {
 	$day = $leadDaysData['date'];
@@ -32,7 +35,6 @@ foreach ($leadsDaysData as $leadDaysData) {
 	$testData[$day]['data'][$leadDaysData['status_id']] = $leadDaysData['count'];
 	$testData[$day]['count'] += $leadDaysData['count'];
 }
-
 
 $leadsCountSeries = [];
 $leadDates = array_values(array_unique(ArrayHelper::getColumn($leadsDaysData, 'date')));

@@ -467,4 +467,8 @@ return [
 	'Action At' => 'Akcja',
 	'Chart Group' => 'Wykres - Grupa',
 	'Costs' => 'Koszty',
+	'---Without Owner---' => '--- BRAK ---',
+	'Charts' => 'Wykresy',
+	'Success assign {count} Leads to Campaign: {campaign}.' => 'Przypisano {count} Lead do Kampanii: {campaign}',
+	'{count} Leads without Campaign.' => '{count} Lead bez Kampanii.',
 ];
