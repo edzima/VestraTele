@@ -244,14 +244,16 @@ class LeadForm extends Model implements LeadInterface {
 				throw new InvalidConfigException('Owner must be integer.');
 			}
 			$names = LeadCampaign::getNames($this->owner_id);
-			if (!empty($this->campaign_id)
-				&& !isset($names[$this->campaign_id])
-				&& isset(LeadCampaign::getNames()[$this->campaign_id])) {
-				$names[$this->campaign_id] = LeadCampaign::getNames()[$this->campaign_id];
-			}
-			return LeadCampaign::getNames($this->owner_id);
+		} else {
+			$names = LeadCampaign::getNames();
 		}
-		return LeadCampaign::getNames();
+		if (!empty($this->campaign_id) && !isset($names[$this->campaign_id])) {
+			$name = LeadCampaign::getNames(null, false)[$this->campaign_id] ?? null;
+			if ($name) {
+				$names[$this->campaign_id] = $name;
+			}
+		}
+		return $names;
 	}
 
 	/**

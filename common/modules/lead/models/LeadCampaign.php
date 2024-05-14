@@ -92,11 +92,16 @@ class LeadCampaign extends ActiveRecord {
 		return $this->hasOne(Module::userClass(), ['id' => 'owner_id']);
 	}
 
-	public static function getNames(int $owner_id = null): array {
+	public static function getNames(int $owner_id = null, bool $active = true): array {
 		$models = static::getModels();
 		if ($owner_id) {
 			$models = array_filter($models, static function (LeadCampaign $model) use ($owner_id): bool {
 				return $model->owner_id === null || $model->owner_id === $owner_id;
+			});
+		}
+		if ($active) {
+			$models = array_filter($models, static function (LeadCampaign $model): bool {
+				return $model->is_active;
 			});
 		}
 		return ArrayHelper::map($models, 'id', $owner_id ? 'name' : 'nameWithOwner');

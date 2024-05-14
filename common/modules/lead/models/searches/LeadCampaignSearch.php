@@ -2,7 +2,9 @@
 
 namespace common\modules\lead\models\searches;
 
+use common\models\user\User;
 use common\modules\lead\models\LeadCampaign;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -10,6 +12,19 @@ use yii\data\ActiveDataProvider;
  * LeadCampaignSearch represents the model behind the search form of `common\modules\lead\models\LeadCampaign`.
  */
 class LeadCampaignSearch extends LeadCampaign {
+
+	public const WITHOUT_OWNER = -1;
+
+	public static function getOwnersNames(): array {
+		$owners = [self::WITHOUT_OWNER => Yii::t('lead', '---Without Owner---')];
+		return array_merge($owners, User::getSelectList(
+			LeadCampaign::find()
+				->andWhere('owner_id IS NOT NULL')
+				->distinct()
+				->select('owner_id')
+				->column()
+			, false));
+	}
 
 	/**
 	 * {@inheritdoc}
