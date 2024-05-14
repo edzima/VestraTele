@@ -76,6 +76,7 @@ class CostController extends BaseController {
 			$model->scenario = LeadCostForm::SCENARIO_USER;
 			$model->userId = Yii::$app->user->getId();
 		}
+		$model->date_at = time();
 
 		if ($this->request->isPost) {
 			if ($model->load($this->request->post()) && $model->save()) {

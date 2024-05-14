@@ -46,6 +46,7 @@ use yii\helpers\Json;
  * @property-read Lead[] $samePhoneLeads
  * @property-read Lead[] $sameEmailLeads
  * @property-read LeadDialer[] $dialers
+ * @property-read LeadCost[] $costs
  */
 class Lead extends ActiveRecord implements ActiveLead {
 
@@ -224,6 +225,11 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function getLeadUsers(): ActiveQuery {
 		return $this->hasMany(LeadUser::class, ['lead_id' => 'id']);
+	}
+
+	public function getCosts(): ActiveQuery {
+		return $this->hasMany(LeadCost::class, ['campaign_id' => 'campaign_id'])
+			->andOnCondition(LeadCost::tableName() . '.date_at = ' . Lead::tableName() . '.date_at');
 	}
 
 	public function getDetails(): ?string {

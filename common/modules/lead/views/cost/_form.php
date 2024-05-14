@@ -1,7 +1,7 @@
 <?php
 
 use common\modules\lead\models\forms\LeadCostForm;
-use common\widgets\DateTimeWidget;
+use common\widgets\DateWidget;
 use kartik\number\NumberControl;
 use kartik\select2\Select2;
 use yii\helpers\Html;
@@ -35,14 +35,15 @@ use yii\widgets\ActiveForm;
 				'class' => 'col-md-3 col-lg-2',
 			],
 		])->widget(
-			DateTimeWidget::class,
+			DateWidget::class,
 		) ?>
 
 		<?= $form->field($model, 'value', [
 			'options' => [
 				'class' => 'col-md-3 col-lg-2',
+				'autofocus' => true,
 			],
-		])->widget(NumberControl::class) ?>
+		])->widget(NumberControl::class, ['displayOptions' => ['autofocus' => true]]) ?>
 	</div>
 
 
