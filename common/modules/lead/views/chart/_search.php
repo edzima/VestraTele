@@ -2,17 +2,24 @@
 
 use common\helpers\Html;
 use common\models\user\User;
-use common\modules\lead\models\searches\LeadSearch;
+use common\modules\lead\models\searches\LeadChartSearch;
 use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
 use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
-/* @var $model LeadSearch */
+/* @var $model LeadChartSearch */
 /* @var $form ActiveForm */
 /* @var $sourcesNames array */
 /* @var $usersNames array */
 
+//var_export($model->source_id);
+//var_export($model->type_id);
+var_dump([
+	'from_at' => $model->from_at,
+	'fromAt' => $model->getDefaultFromAt(),
+	'to_at' => $model->to_at,
+]);
 ?>
 
 <div class="lead-chart-search-search">
@@ -46,7 +53,17 @@ use kartik\select2\Select2;
 
 
 		<?= $form->field($model, 'excludedStatus', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
-			'data' => LeadSearch::getStatusNames(),
+			'data' => LeadChartSearch::getStatusNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('excludedStatus'),
+				'multiple' => true,
+				'allowClear' => true,
+			],
+		])
+		?>
+
+		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
+			'data' => LeadChartSearch::getStatusNames(),
 			'pluginOptions' => [
 				'placeholder' => $model->getAttributeLabel('excludedStatus'),
 				'multiple' => true,
@@ -76,7 +93,7 @@ use kartik\select2\Select2;
 		?>
 
 		<?= $form->field($model, 'reportStatus', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
-			'data' => LeadSearch::getStatusNames(),
+			'data' => LeadChartSearch::getStatusNames(),
 			'pluginOptions' => [
 				'placeholder' => $model->getAttributeLabel('reportStatus'),
 				'allowClear' => true,
@@ -87,6 +104,16 @@ use kartik\select2\Select2;
 	</div>
 
 	<div class="row">
+		<?=
+		$form->field($model, 'type_id', ['options' => ['class' => 'col-md-2 col-lg-2']])->widget(Select2::class, [
+			'data' => LeadChartSearch::getTypesNames(),
+			'pluginOptions' => [
+				'placeholder' => Yii::t('lead', 'Type'),
+				'allowClear' => true,
+				'multiple' => true,
+			],
+		])->label(Yii::t('lead', 'Type'))
+		?>
 
 		<?= !empty($sourcesNames) ?
 			$form->field($model, 'source_id', ['options' => ['class' => 'col-md-2 col-lg-2']])->widget(Select2::class, [
@@ -108,7 +135,7 @@ use kartik\select2\Select2;
 			],
 		]) ?>
 
-		<?php if ($model->scenario !== LeadSearch::SCENARIO_USER): ?>
+		<?php if ($model->scenario !== LeadChartSearch::SCENARIO_USER): ?>
 
 			<?= !empty($usersNames)
 				? $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(Select2::class, [
@@ -124,7 +151,7 @@ use kartik\select2\Select2;
 
 			<?= !empty($usersNames)
 				? $form->field($model, 'user_type', ['options' => ['class' => 'col-md-2 col-lg-1']])->widget(Select2::class, [
-					'data' => LeadSearch::getUserTypesNames(),
+					'data' => LeadChartSearch::getUserTypesNames(),
 					'pluginOptions' => [
 						'placeholder' => $model->getAttributeLabel('user_type'),
 						'allowClear' => true,

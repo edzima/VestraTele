@@ -17,7 +17,4 @@ class ChartController extends Controller {
 		]);
 	}
 
-	public function actionApex(): string {
-		return $this->render('apex');
-	}
 }

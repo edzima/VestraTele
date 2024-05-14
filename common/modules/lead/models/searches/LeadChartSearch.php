@@ -4,35 +4,48 @@ namespace common\modules\lead\models\searches;
 
 use common\helpers\ArrayHelper;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadCost;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\query\LeadQuery;
+use DateTime;
+use yii\db\Expression;
 
 class LeadChartSearch extends LeadSearch {
 
-	public string $defaultStartDateFormat = 'Y-m-01';
-	public string $defaultEndDateFormat = 'Y-m-t 23:59:59';
-
-	public function getUniqueId(): string {
-		return md5(serialize($this->toArray()));
-	}
-
 	public function rules(): array {
 		return array_merge([
-			['from_at', 'default', 'value' => date($this->defaultStartDateFormat)],
-			['to_at', 'default', 'value' => date($this->defaultEndDateFormat)],
+			['from_at', 'default', 'value' => $this->getDefaultFromAt()],
+			['to_at', 'default', 'value' => $this->getDefaultToAt()],
 		], parent::rules());
+	}
+
+	public function getDefaultFromAt(): string {
+		$currentDate = new DateTime();
+		$currentDate->modify('Monday this week');
+		return $currentDate->format('Y-m-d');
+	}
+
+	public function getDefaultToAt(): string {
+		$currentDate = new DateTime();
+		$currentDate->modify('Sunday this week');
+		return $currentDate->format('Y-m-d');
 	}
 
 	public function getLeadsByDays(): array {
 		$query = $this->getBaseQuery();
-		$query->groupBy(['DATE(date_at)', 'status_id']);
+		$query->joinWith('costs');
+		$query->groupBy([
+			new Expression('DATE(' . Lead::tableName() . '.date_at)'),
+			Lead::tableName() . '.status_id',
+		]);
 		$query->select([
 			'count(*) AS count',
-			'DATE(date_at) as date',
-			'status_id',
+			new Expression('DATE(' . Lead::tableName() . '.date_at) as date'),
+			Lead::tableName() . '.status_id',
+			new Expression('SUM(' . LeadCost::tableName() . '.value)'),
 		]);
-		$query->orderBy(['date_at' => SORT_ASC]);
+		$query->orderBy([Lead::tableName() . '.date_at' => SORT_ASC]);
 		$query->asArray();
 		return $query->all();
 	}
@@ -115,6 +128,14 @@ class LeadChartSearch extends LeadSearch {
 		$this->applyExcludedStatusFilter($query);
 		$this->applyUserFilter($query);
 		$this->applyLeadDirectlyFilter($query);
+		$this->applyHoursAfterLastReport($query);
+		$this->applyFromMarketFilter($query);
+		$this->applyReportStatusFilter($query);
+		$this->applyTypeFilter($query);
+	}
+
+	public function getUniqueId(): string {
+		return md5(serialize($this->toArray()));
 	}
 
 }
