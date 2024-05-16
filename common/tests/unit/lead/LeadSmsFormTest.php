@@ -55,6 +55,28 @@ class LeadSmsFormTest extends Unit {
 		$this->tester->assertNotEmpty(Yii::$app->queue->status($jobId));
 	}
 
+	public function testDelayDate(): void {
+		$this->giveModel();
+		$this->tester->assertNull($this->model->getDelay());
+		$this->model->delayAt = date(DATE_ATOM, strtotime('+ 1 hours'));
+		$delay = $this->model->getDelay();
+		$this->tester->assertNotEmpty($delay);
+		$this->tester->assertTrue($delay > 3540 && $delay <= 3600);
+
+		$this->model->delayAt = date(DATE_ATOM, strtotime('+ 30 minutes'));
+
+		$delay = $this->model->getDelay();
+		$this->tester->assertTrue($delay > 1750 && $delay <= 1800);
+	}
+
+	public function testDelayDateFromPast(): void {
+		$this->giveModel();
+		$this->tester->assertNull($this->model->getDelay());
+		$this->model->delayAt = date('Y-m-d H:i', strtotime('- 1 hours'));
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Date At must be from future.', 'delayAt');
+	}
+
 	private function giveModel(int $lead_id = 1): void {
 		$this->model = new LeadSmsForm($this->tester->grabRecord(Lead::class, ['id' => $lead_id]));
 	}

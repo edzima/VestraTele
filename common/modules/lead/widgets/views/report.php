@@ -8,40 +8,40 @@ use yii\web\View;
 
 /* @var $this View */
 /* @var $model LeadReport */
+/* @var $htmlOptions array */
 /* @var $withDeleteButton bool */
 /* @var $withUpdateButton bool */
 ?>
-
-<div class="panel <?= $model->isChangeStatus() ? 'panel-success' : 'panel-primary' ?> panel-note <?= $model->isDeleted() ? 'panel-deleted panel-transparent' : '' ?>">
-	<div class="panel-heading">
-		<div class="panel-title pull-left">
-			<?= $model->isChangeStatus()
-				? Yii::t('lead', 'Change status from: {oldStatus} to: {status}', [
-					'status' => $model->status->name,
-					'oldStatus' => $model->oldStatus->name,
-				])
-				: Html::encode($model->status->name)
-			?>
-		</div>
-		<div class="panel-title pull-right">
-			<?= Html::encode($model->owner) ?>
-		</div>
-		<div class="clearfix"></div>
+<?= Html::beginTag('div', $htmlOptions) ?>
+<div class="panel-heading">
+	<div class="panel-title pull-left">
+		<?= $model->isChangeStatus()
+			? Yii::t('lead', 'Change status from: {oldStatus} to: {status}', [
+				'status' => $model->status->name,
+				'oldStatus' => $model->oldStatus->name,
+			])
+			: Html::encode($model->status->name)
+		?>
 	</div>
-	<?php if (!empty($model->details) || !empty($model->answers)) : ?>
-		<div class="panel-body">
-			<?php if ($model->details): ?>
-				<p>
-					<?= Html::encode($model->details) ?>
-				</p>
-			<?php endif; ?>
-			<?= LeadAnswersWidget::widget([
-				'answers' => $model->answers,
-			]) ?>
-		</div>
-	<?php endif; ?>
+	<div class="panel-title pull-right">
+		<?= Html::encode($model->owner) ?>
+	</div>
+	<div class="clearfix"></div>
+</div>
+<?php if (!empty($model->details) || !empty($model->answers)) : ?>
+	<div class="panel-body">
+		<?php if ($model->details): ?>
+			<p>
+				<?= Html::encode($model->details) ?>
+			</p>
+		<?php endif; ?>
+		<?= LeadAnswersWidget::widget([
+			'answers' => $model->answers,
+		]) ?>
+	</div>
+<?php endif; ?>
 
-	<div class="panel-footer">
+<div class="panel-footer">
 		<span class="date pull-left">
 			<?= $model->formattedDates ?>
 			<?= $model->isDeleted()
@@ -51,8 +51,8 @@ use yii\web\View;
 				: ''
 			?>
 		</span>
-		<?php if ($model->owner_id === Yii::$app->user->id || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)): ?>
-			<span class="action pull-right">
+	<?php if ($model->owner_id === Yii::$app->user->id || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)): ?>
+		<span class="action pull-right">
 				<?= $withUpdateButton || Yii::$app->user->can(User::ROLE_ADMINISTRATOR)
 					? Html::a('<i class="glyphicon glyphicon-pencil"></i>', ['/lead/report/update', 'id' => $model->id])
 					: ''
@@ -68,8 +68,7 @@ use yii\web\View;
 					: ''
 				?>
 					</span>
-		<?php endif; ?>
-		<div class="clearfix"></div>
-	</div>
+	<?php endif; ?>
+	<div class="clearfix"></div>
 </div>
-
+<?= Html::endTag('div') ?>

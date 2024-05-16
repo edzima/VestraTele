@@ -89,7 +89,8 @@ class NoteController extends Controller {
 			],
 			'sendEmailToWorkers' => true,
 		]);
-		$message->setExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE));
+		$message->addExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE), false);
+		$message->addExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE));
 		$model->messagesForm = $message;
 
 		if ($this->selfNote && !Yii::$app->user->can(User::PERMISSION_NOTE)) {
@@ -99,6 +100,7 @@ class NoteController extends Controller {
 		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$model->pushMessages();
 			$this->redirect(['/issue/view', 'id' => $issue->getIssueId()]);
 		}
 		return $this->render('issue', [
@@ -123,7 +125,9 @@ class NoteController extends Controller {
 			],
 			'sendEmailToWorkers' => true,
 		]);
-		$message->setExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SETTLEMENT));
+		$message->addExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SETTLEMENT));
+		$message->addExtraWorkerEmail($settlement->owner, Yii::t('common', 'Owner'));
+
 		$model->messagesForm = $message;
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -142,7 +146,7 @@ class NoteController extends Controller {
 		}
 		$model = IssueNoteForm::createSummon($summon);
 		$model->user_id = Yii::$app->user->getId();
-		$message = new SummonNoteMessagesForm([
+		$messageForm = new SummonNoteMessagesForm([
 			'summon' => $summon,
 			'sms_owner_id' => Yii::$app->user->getId(),
 			'hiddenFields' => [
@@ -151,8 +155,11 @@ class NoteController extends Controller {
 			],
 			'sendEmailToWorkers' => true,
 		]);
-		$message->setExtraWorkersEmailsIds(Yii::$app->authManager->getUserIdsByRole(Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SUMMON));
-		$model->messagesForm = $message;
+
+		$messageForm->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SUMMON]));
+		$messageForm->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_ISSUE]), false);
+		$messageForm->addExtraWorkerEmail($summon->owner, Yii::t('common', 'Owner'));
+		$model->messagesForm = $messageForm;
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$this->redirect(['/summon/view', 'id' => $summon->id]);
 		}

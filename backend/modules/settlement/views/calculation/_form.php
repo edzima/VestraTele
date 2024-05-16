@@ -13,6 +13,22 @@ use yii\web\View;
 /* @var $model CalculationForm */
 /* @var $form ActiveForm */
 
+$providerTypeId = Html::getInputId($model, 'providerType');
+$providerEntity = CalculationForm::PROVIDER_TYPE_RESPONSIBLE_ENTITY;
+$js = <<<JS
+ const providerTypeInput = document.getElementById('$providerTypeId');
+ const entityResponsibleField = document.getElementById('entity-provider-field');
+ const providerEntity = $providerEntity;
+ providerTypeInput.addEventListener('change',(event)=>{
+		if(parseInt(event.target.value) === providerEntity){
+			entityResponsibleField.classList.remove('hidden');
+		}else{
+			entityResponsibleField.classList.add('hidden');
+		}
+ });
+JS;
+
+$this->registerJs($js);
 ?>
 
 <div class="settlement-form">
@@ -21,7 +37,19 @@ use yii\web\View;
 
 	<div class="row">
 
-		<?= $form->field($model, 'providerType', ['options' => ['class' => 'col-md-3 col-lg-2']])->dropDownList($model->getProvidersNames()) ?>
+		<?= $form->field($model, 'providerType', [
+			'options' => ['class' => 'col-md-3 col-lg-2'],
+		])->dropDownList($model->getProvidersNames()) ?>
+
+		<?= $form->field($model, 'entityProviderId', [
+			'options' => [
+				'id' => 'entity-provider-field',
+				'class' => 'col-md-4 col-lg-3' . ($model->providerType !== CalculationForm::PROVIDER_TYPE_RESPONSIBLE_ENTITY ? ' hidden' : ''),
+			],
+		])->widget(Select2::class, [
+				'data' => CalculationForm::getEntityResponsibleNames(),
+			]
+		) ?>
 
 		<?= $form->field($model, 'type', ['options' => ['class' => 'col-md-2 col-lg-2']])->dropDownList(CalculationForm::getTypesNames()) ?>
 

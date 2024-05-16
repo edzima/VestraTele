@@ -29,7 +29,7 @@ class Module extends BaseModule implements BootstrapInterface {
 	 */
 	public string $userClass = User::class;
 	/** @var Closure|array */
-	public $userNames;
+	public $userNames = [];
 
 	public bool $onlyUser = false;
 	public bool $allowDelete = true;

@@ -3,6 +3,7 @@
 use common\models\issue\IssueInterface;
 use common\models\user\Worker;
 use common\modules\issue\IssueNoteColumn;
+use common\modules\issue\widgets\IssueClaimCompanyColumn;
 use common\modules\issue\widgets\IssueSummonsColumn;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\AgentDataColumn;
@@ -26,13 +27,13 @@ use yii\widgets\Pjax;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('common', 'Issues');
-if ($searchModel->getIssueParentType()) {
+if ($searchModel->getIssueMainType()) {
 	$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
-	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name, Url::issuesParentType($searchModel->getIssueParentType()->id)];
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueMainType()->name, Url::issuesParentType($searchModel->getIssueMainType()->id)];
 } else {
 	$this->params['breadcrumbs'][] = $this->title;
 }
-$parentMenuItems = Html::issueParentTypeItems();
+$parentMenuItems = Html::issueMainTypesItems();
 
 ?>
 <div class="issue-index">
@@ -146,7 +147,7 @@ $parentMenuItems = Html::issueParentTypeItems();
 							'containerOptions' => [
 								'class' => 'd-inline-flex',
 							],
-							'returnUrl' => Url::to('/issue/index'),
+							'returnUrl' => Url::current(),
 							'options' => [
 								'class' => 'btn btn-default btn-sm',
 								'title' => Yii::t('issue', 'Change Stage'),
@@ -204,6 +205,11 @@ $parentMenuItems = Html::issueParentTypeItems();
 				'attribute' => 'issue.updated_at',
 				'format' => 'date',
 				'noWrap' => true,
+			],
+			[
+				'class' => IssueClaimCompanyColumn::class,
+				'attribute' => 'claimCompanyTryingValue',
+				'pageSummary' => true,
 			],
 			[
 				'class' => IssueNoteColumn::class,

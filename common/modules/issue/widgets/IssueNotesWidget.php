@@ -43,12 +43,13 @@ class IssueNotesWidget extends IssueWidget {
 				->joinWith('updater.userProfile');
 
 			$linkedIds = $this->model->getLinkedIssuesIds();
+
 			if (!empty($linkedIds)) {
 				$ids = IssueNote::find()
 					->select('id')
 					->andWhere(['issue_id' => $linkedIds])
 					->andWhere(['show_on_linked_issues' => ''])
-					->orWhere(['LIKE','show_on_linked_issues',$this->model->getIssueId()])
+					->orWhere(['like', 'CONCAT(CONCAT("|",show_on_linked_issues),"|")', '|' . $this->model->getIssueId() . '|'])
 					->column();
 				if (!empty($ids)) {
 					$query->orWhere(['IN', IssueNote::tableName() . '.id', $ids]);

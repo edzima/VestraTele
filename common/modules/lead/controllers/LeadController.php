@@ -7,7 +7,9 @@ use common\behaviors\SelectionRouteBehavior;
 use common\helpers\Flash;
 use common\helpers\Html;
 use common\models\user\User;
+use common\modules\lead\models\forms\LeadDeadlineForm;
 use common\modules\lead\models\forms\LeadForm;
+use common\modules\lead\models\forms\LeadMultipleUpdate;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;
@@ -53,7 +55,7 @@ class LeadController extends BaseController {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex() {
+	public function actionIndex(int $pageSize = 50) {
 		$searchModel = new LeadSearch();
 		if ($this->module->onlyUser) {
 			if (Yii::$app->user->getIsGuest()) {
@@ -64,8 +66,8 @@ class LeadController extends BaseController {
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-		$dataProvider->pagination->defaultPageSize = 50;
-
+		$dataProvider->pagination->defaultPageSize = $pageSize;
+		$dataProvider->pagination->pageSize = $pageSize;
 		if (Yii::$app->request->isPjax) {
 			return $this->renderAjax('_grid', [
 				'dataProvider' => $dataProvider,
@@ -168,6 +170,80 @@ class LeadController extends BaseController {
 		]);
 	}
 
+	public function actionDeadline(int $id, string $returnUrl = null) {
+		$lead = $this->findLead($id);
+		$model = new LeadDeadlineForm();
+		$model->setLead($lead);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('lead', 'Success update Lead deadline.'));
+			if ($returnUrl) {
+				return $this->redirect($returnUrl);
+			}
+			return $this->redirectLead($id);
+		}
+		return $this->render('deadline', [
+			'model' => $model,
+		]);
+	}
+
+	public function actionUpdateMultiple(array $ids = []) {
+		if (empty($ids)) {
+			$postIds = Yii::$app->request->post('leadsIds');
+			if (is_string($postIds)) {
+				$postIds = explode(',', $postIds);
+			}
+			if ($postIds) {
+				$ids = $postIds;
+			}
+		}
+		if (empty($ids)) {
+			Flash::add(Flash::TYPE_WARNING, 'Ids cannot be blank.');
+			return $this->redirect(['index']);
+		}
+		$ids = array_unique($ids);
+		if (count($ids) === 1) {
+			return $this->redirect(['update', 'id' => reset($ids)]);
+		}
+		$model = new LeadMultipleUpdate();
+		$model->ids = $ids;
+		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+			$sourceCount = $model->updateSource();
+			if ($sourceCount) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('lead', 'Success Change Source: {source} for Leads: {count}.', [
+						'source' => $model->getSourceModel()->getSourceName(),
+						'count' => $sourceCount,
+					]));
+			}
+			$model->getStatusModel()->owner_id = Yii::$app->user->getId();
+			$statusCount = $model->updateStatus();
+			if ($statusCount) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('lead', 'Success Change Status: {status} for Leads: {count}.', [
+						'status' => $model->getStatusModel()->getStatusName(),
+						'count' => $statusCount,
+					]));
+			}
+			$usersCount = $model->updateUsers();
+			if ($usersCount) {
+				$userModel = $model->getUsersModel();
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('lead', 'Success assign {user} as {type} to {count} leads.', [
+						'user' => $userModel->getUserName(),
+						'type' => $userModel->getTypeName(),
+						'count' => $usersCount,
+					])
+				);
+				$userModel->sendEmail();
+			}
+			return $this->redirect(['index']);
+		}
+		return $this->render('update-multiple', [
+			'model' => $model,
+		]);
+	}
+
 	/**
 	 * Displays a single Lead model.
 	 *
@@ -181,7 +257,7 @@ class LeadController extends BaseController {
 		 */
 		$model = $this->findLead($id);
 		$reminderQuery = $model->getLeadReminders()
-			->with([
+			->joinWith([
 				'reminder' => function (ReminderQuery $query) {
 					if ($this->module->onlyUser) {
 						$query->onlyUser(Yii::$app->user->getId());

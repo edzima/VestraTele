@@ -1,5 +1,6 @@
 <?php
 
+use common\behaviors\GlobalAccessBehavior;
 use common\components\callpage\CallPageClient;
 use common\components\DbManager;
 use common\components\Formatter;
@@ -7,10 +8,12 @@ use common\components\HierarchyComponent;
 use common\components\keyStorage\KeyStorage;
 use common\components\message\MessageTemplateManager;
 use common\components\PayComponent;
+use common\components\postal\PocztaPolska;
 use common\components\provision\Provisions;
 use common\components\TaxComponent;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\credit\Module as CreditModule;
 use common\modules\czater\Czater;
 use common\modules\file\Module as FileModule;
 use common\modules\lead\components\LeadClient;
@@ -25,8 +28,6 @@ use yii\caching\DummyCache;
 use yii\caching\FileCache;
 use yii\mutex\MysqlMutex;
 use yii\queue\db\Queue;
-
-//use fredyns\attachments\Module as AttachmentsModule;
 
 $config = [
 	'name' => $_ENV['APP_NAME'],
@@ -45,6 +46,28 @@ $config = [
 		'@npm' => '@vendor/npm-asset',
 	],
 	'modules' => [
+		'credit' => [
+			'class' => CreditModule::class,
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'permissions' => [Worker::PERMISSION_CREDIT_ANALYZE],
+					],
+				],
+			],
+		],
+		'teryt' => [
+			'class' => TerytModule::class,
+		],
+		'lead' => [
+			'class' => LeadModule::class,
+			'userClass' => User::class,
+		],
+		'reminder' => [
+			'class' => ReminderModule::class,
+		],
 //		'attachments' => [
 //			'class' => AttachmentsModule::class,
 //			'tempPath' => '@runtime/uploads/temp',
@@ -106,6 +129,11 @@ $config = [
 			'class' => 'yii\web\AssetManager',
 			'linkAssets' => getenv('LINK_ASSETS'),
 			'appendTimestamp' => true,
+			'bundles' => [
+				'yii\grid\GridViewAsset' => [
+					'sourcePath' => __DIR__ . '/../assets/',
+				],
+			],
 		],
 		'formatter' => [
 			'class' => Formatter::class,
@@ -182,6 +210,9 @@ $config = [
 		],
 		'provisions' => [
 			'class' => Provisions::class,
+		],
+		'pocztaPolska' => [
+			'class' => PocztaPolska::class,
 		],
 		'sms' => [
 			'class' => AdescomSender::class,

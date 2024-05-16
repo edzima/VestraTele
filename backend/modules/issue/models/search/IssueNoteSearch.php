@@ -3,24 +3,31 @@
 namespace backend\modules\issue\models\search;
 
 use backend\modules\issue\models\IssueStage;
+use common\models\AgentSearchInterface;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
+use common\models\issue\IssueType;
+use common\models\issue\IssueUser;
+use common\models\issue\query\IssueQuery;
 use common\models\issue\search\IssueStageSearchable;
+use common\models\issue\search\IssueTypeSearch as IssueTypeSearchable;
 use common\models\user\User;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\QueryInterface;
-use common\models\issue\search\IssueTypeSearch as IssueTypeSearchable;
 
 /**
  * IssueNoteSearch represents the model behind the search form of `common\models\issue\IssueNote`.
  */
 class IssueNoteSearch extends IssueNote implements
+	AgentSearchInterface,
 	IssueStageSearchable,
 	IssueTypeSearchable {
 
 	public const SCENARIO_USER = 'user';
+
+	public $agent_id;
 	public $dateFrom;
 	public $dateTo;
 
@@ -48,6 +55,17 @@ class IssueNoteSearch extends IssueNote implements
 		);
 	}
 
+	public function getAgentsNames(): array {
+		return User::getSelectList(
+			IssueUser::find()
+				->select('user_id')
+				->withType(IssueUser::TYPE_AGENT)
+				->distinct()
+				->column(),
+			false
+		);
+	}
+
 	/**
 	 * @inheritdoc
 	 */
@@ -57,6 +75,7 @@ class IssueNoteSearch extends IssueNote implements
 			['!user_id', 'required', 'on' => static::SCENARIO_USER],
 			[['is_pinned', 'is_template', 'issueGrouped'], 'boolean'],
 			[['title', 'description', 'publish_at', 'created_at', 'updated_at', 'type', 'dateFrom', 'dateTo'], 'safe'],
+			['agent_id', 'in', 'range' => array_keys($this->getAgentsNames()), 'allowArray' => true],
 			['issueStageId', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
 			['issueTypeId', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 		];
@@ -89,7 +108,9 @@ class IssueNoteSearch extends IssueNote implements
 	public function search(array $params): ActiveDataProvider {
 		$query = IssueNote::find();
 		$query->joinWith('issue');
+		$query->joinWith('issue.agent.userProfile');
 		$query->joinWith('user.userProfile');
+		$query->joinWith('updater.userProfile');
 		$query->with('issue.tags');
 
 		// add conditions that should always apply here
@@ -112,6 +133,7 @@ class IssueNoteSearch extends IssueNote implements
 			return $dataProvider;
 		}
 
+		$this->applyAgentsFilters($query);
 		$this->applyDateFilter($query);
 		$this->applyIssueTypeFilter($query);
 		$this->applyIssueStageFilter($query);
@@ -168,12 +190,22 @@ class IssueNoteSearch extends IssueNote implements
 	}
 
 	public function getIssueTypesNames(): array {
-		return IssueStage::getStagesNames(true, true);
+		return IssueType::getTypesNames();
 	}
 
 	public function applyIssueTypeFilter(QueryInterface $query): void {
 		if (!empty($this->issueTypeId)) {
 			$query->andWhere([Issue::tableName() . '.type_id' => $this->issueTypeId]);
+		}
+	}
+
+	public function applyAgentsFilters(QueryInterface $query): void {
+		if (!empty($this->agent_id)) {
+			$query->joinWith([
+				'issue' => function (IssueQuery $query): void {
+					$query->agents($this->agent_id);
+				},
+			]);
 		}
 	}
 }

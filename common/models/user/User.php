@@ -12,6 +12,7 @@ use common\models\provision\ProvisionQuery;
 use common\models\user\query\UserQuery;
 use common\modules\lead\models\LeadUserInterface;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -112,9 +113,12 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const PERMISSION_WORKERS_HIERARCHY = 'workers.hierarchy';
 
 	public const PERMISSION_LEAD = 'lead';
+	public const PERMISSION_LEAD_MANAGER = 'lead.manager';
 	public const PERMISSION_LEAD_DIALER = 'lead.dialer';
 	public const PERMISSION_LEAD_DIALER_MANAGER = 'lead.dialer.manager';
 	public const PERMISSION_LEAD_IMPORT = 'lead.import';
+	public const PERMISSION_LEAD_UPDATE_MULTIPLE = 'lead.update-multiple';
+
 	public const PERMISSION_LEAD_MARKET = 'lead.market';
 	public const PERMISSION_LEAD_STATUS = 'lead.status';
 	public const PERMISSION_LEAD_DUPLICATE = 'lead.duplicate';
@@ -509,6 +513,12 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 		return static::$PERMISSIONS_NAMES;
 	}
 
+	/**
+	 * @param array $names
+	 * @param bool $common
+	 * @return int[]
+	 * @throws InvalidConfigException
+	 */
 	public static function getAssignmentIds(array $names, bool $common = true): array {
 		return static::find()
 			->select('id')
@@ -516,6 +526,13 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 			->column();
 	}
 
+	/**
+	 * Users names list indexed by ID
+	 *
+	 * @param int[] $ids
+	 * @param bool $active
+	 * @return string[]
+	 */
 	public static function getSelectList(array $ids, bool $active = true): array {
 		$query = static::find()
 			->joinWith('userProfile UP')

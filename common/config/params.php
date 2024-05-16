@@ -12,5 +12,7 @@ return [
 		'PL',
 		'UA',
 		'DE',
+		'NO',
+		'DK',
 	],
 ];

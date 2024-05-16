@@ -75,6 +75,7 @@ class LeadSourceSearch extends LeadSource {
 			'sort_index' => $this->sort_index,
 			'owner_id' => $this->owner_id,
 			'is_active' => $this->is_active,
+			'type_id' => $this->type_id,
 			'call_page_widget_id' => $this->call_page_widget_id,
 		]);
 

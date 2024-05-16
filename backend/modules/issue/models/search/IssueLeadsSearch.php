@@ -2,7 +2,6 @@
 
 namespace backend\modules\issue\models\search;
 
-use common\models\issue\Issue;
 use common\models\issue\IssueUser;
 use common\models\issue\IssueUserLead;
 use common\models\SearchModel;

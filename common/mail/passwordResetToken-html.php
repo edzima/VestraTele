@@ -1,5 +1,7 @@
 <?php
 
+use frontend\helpers\Url as FrontendUrl;
+
 /* @var $this yii\web\View */
 /* @var $user common\models\user\User */
 
@@ -7,7 +9,7 @@ $this->title = Yii::t('common', 'Hello, {user}', [
 	'user' => $user->username,
 ]);
 
-$resetLink = Yii::$app->urlManager->createAbsoluteUrl(['site/reset-password', 'token' => $user->password_reset_token]);
+$resetLink = FrontendUrl::toRoute(['/site/reset-password', 'token' => $user->password_reset_token], true);
 
 $this->params['primaryButtonText'] = Yii::t('common', 'Reset');
 $this->params['primaryButtonHref'] = $resetLink;

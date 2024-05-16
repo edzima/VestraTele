@@ -45,6 +45,7 @@ use yii\web\View;
 			],
 			[
 				'label' => Yii::t('provision', 'Value'),
+				'format' => 'html',
 				'value' => static function (IssueProvisionType $type) use ($model): ?string {
 					$data = $model->getData();
 					$data->type = $type;
@@ -57,7 +58,14 @@ use yii\web\View;
 						$selfies = $data->getSelfQuery()->all();
 					}
 					if (empty($selfies)) {
-						return null;
+						return Html::a(
+							Yii::t('provision', 'Not set'),
+							['user/create-self', 'userId' => $model->getIssueUser()->user_id, 'typeId' => $data->type->id],
+							[
+								'class' => 'text-danger',
+								'title' => Yii::t('provision', 'Create self provision'),
+							]
+						);
 					}
 
 					if (count($selfies) === 1) {

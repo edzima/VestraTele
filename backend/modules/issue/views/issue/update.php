@@ -1,7 +1,6 @@
 <?php
 
 use backend\modules\issue\models\IssueForm;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model IssueForm */

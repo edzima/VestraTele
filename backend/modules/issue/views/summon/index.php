@@ -13,8 +13,8 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('common', 'Summons');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/issue/index']];
-if ($searchModel->getIssueParentType()) {
-	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name, 'url' => Url::issuesParentType($searchModel->issueParentTypeId)];
+if ($searchModel->getIssueMainType()) {
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueMainType()->name, 'url' => Url::issuesParentType($searchModel->issueParentTypeId)];
 }
 
 $this->params['breadcrumbs'][] = $this->title;
@@ -34,7 +34,9 @@ $this->params['issueParentTypeNav'] = [
 	</p>
 
 	<p>
-		<?= Html::a(Yii::t('backend', 'Create summon'), ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('backend', 'Create summon'), [
+			'create', 'typeId' => $searchModel->type_id,
+		], ['class' => 'btn btn-success']) ?>
 
 
 		<?= Html::a(Yii::t('backend', 'Summon Docs'), ['summon-doc-link/to-do'], ['class' => 'btn btn-warning']) ?>

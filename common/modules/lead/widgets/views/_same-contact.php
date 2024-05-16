@@ -29,7 +29,7 @@ use yii\widgets\DetailView;
 	<p>
 
 		<?= Html::a(Yii::t('lead', 'Create Lead Report'),
-			['/lead/report/report', 'id' => $model->getId()],
+			['/lead/report/report', 'id' => $model->getId(), 'hash' => $model->getHash()],
 			[
 				'class' => 'btn btn-success',
 			])
@@ -68,7 +68,13 @@ use yii\widgets\DetailView;
 				'format' => 'html',
 				'label' => Yii::t('lead', 'Customer View'),
 				'visible' => $visibleCustomerLink && isset($model->getData()['customerUrl']),
-				'value' => Html::a($model->getName(), $model->getData()['customerUrl']),
+				'value' => function (ActiveLead $model): ?string {
+					$url = $model->getData()['customerUrl'] ?? null;
+					if ($url) {
+						return Html::a(Html::encode($model->getName()), $url);
+					}
+					return null;
+				},
 			],
 			[
 				'attribute' => 'phone',

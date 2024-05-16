@@ -43,7 +43,7 @@ class IssueStageChangeFormTest extends Unit {
 		$this->giveModel($issue);
 		$this->model->stage_id = IssueStage::ARCHIVES_ID;
 		$this->thenUnsuccessSave();
-		$this->thenSeeError('Archives nr cannot be blank.', 'archives_nr');
+		$this->thenSeeError('Archives cannot be blank.', 'archives_nr');
 	}
 
 	public function testLinkedIssueWithNotLinkedId(): void {

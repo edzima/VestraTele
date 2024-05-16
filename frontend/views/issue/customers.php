@@ -40,8 +40,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => AgentDataColumn::class,
-				'value' => function (IssueUser $issueUser): string {
+				'value' => function (IssueUser $issueUser): ?string {
 					$agent = $issueUser->issue->agent;
+					if ($agent === null) {
+						Yii::warning('Issue: ' . $issueUser->issue_id . ' has not agent.', 'issue.without-agent');
+						return null;
+					}
 					if ($agent->id !== Yii::$app->user->getId()) {
 						return Html::mailto(
 							Html::encode($agent->getFullName()), $agent->email);

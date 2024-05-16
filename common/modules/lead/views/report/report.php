@@ -1,7 +1,6 @@
 <?php
 
 use common\modules\lead\models\forms\ReportForm;
-use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
 use yii\helpers\Html;
 use yii\web\View;
@@ -19,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<div class="row">
-		<div class="col-md-6">
+		<div class="col-md-9 col-lg-6">
 			<?= $this->render('_lead', [
 				'model' => $model->getLead(),
 			]) ?>

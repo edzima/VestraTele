@@ -21,6 +21,7 @@ use yii\db\ActiveRecord;
  * @property string $created_at
  * @property string $updated_at
  * @property string $deleted_at
+ * @property int $is_pinned
  *
  * @property-read Lead $lead
  * @property-read LeadStatus $oldStatus
@@ -56,6 +57,7 @@ class LeadReport extends ActiveRecord {
 			[['lead_id', 'owner_id', 'status_id', 'old_status_id'], 'required'],
 			[['lead_id', 'owner_id', 'status_id', 'old_status_id'], 'integer'],
 			[['created_at', 'updated_at'], 'safe'],
+			[['is_pinned'], 'boolean'],
 			[['details'], 'string'],
 			[['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => ['lead_id' => 'id']],
 			[['old_status_id'], 'exist', 'skipOnError' => true, 'targetClass' => LeadStatus::class, 'targetAttribute' => ['old_status_id' => 'id']],
@@ -89,6 +91,7 @@ class LeadReport extends ActiveRecord {
 
 	public function getAnswersQuestions(): string {
 		$answers = $this->answers;
+		LeadAnswer::orderByQuestions($answers);
 		$questionAnswers = [];
 		foreach ($answers as $answer) {
 			$questionAnswers[] = $answer->getAnswerQuestion();

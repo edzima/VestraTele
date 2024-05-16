@@ -1,6 +1,7 @@
 <?php
 
 use backend\widgets\GridView;
+use common\models\issue\Issue;
 use common\models\issue\IssueStageType;
 use common\models\issue\IssueType;
 use common\widgets\grid\ActionColumn;
@@ -53,8 +54,10 @@ $this->params['breadcrumbs'][] = $this->title;
 					'name',
 					'short_name',
 					'vat',
+					'is_main:boolean',
 					'with_additional_date:boolean',
 					'default_show_linked_notes:boolean',
+					'lead_source_id',
 				],
 			]) ?>
 		</div>
@@ -106,6 +109,15 @@ $this->params['breadcrumbs'][] = $this->title;
 								$options['style']['background-color'] = $data->calendar_background;
 							}
 							return $options;
+						},
+					],
+					[
+						'label' => Yii::t('issue', 'Issues Count'),
+						'value' => function (IssueStageType $model): int {
+							return Issue::find()
+								->type($model->type_id)
+								->andWhere(['stage_id' => $model->stage_id])
+								->count();
 						},
 					],
 					[

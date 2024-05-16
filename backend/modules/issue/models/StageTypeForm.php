@@ -18,11 +18,14 @@ class StageTypeForm extends Model {
 	public $calendar_background;
 	public $days_reminder;
 
+	public $updateIssuesStageDeadlineAt = false;
+
 	private ?IssueStageType $model = null;
 
 	public function rules(): array {
 		return [
-			[['type_id', 'stage_id'], 'required', 'on' => [static::SCENARIO_CREATE, static::SCENARIO_DEFAULT]],
+			[['type_id', 'stage_id', 'updateIssuesStageDeadlineAt'], 'required', 'on' => [static::SCENARIO_CREATE, static::SCENARIO_DEFAULT]],
+			['updateIssuesStageDeadlineAt', 'boolean'],
 			[['type_id', 'stage_id', 'days_reminder'], 'integer'],
 			[['calendar_background'], 'string'],
 			[['days_reminder', 'calendar_background'], 'default', 'value' => null],
@@ -67,6 +70,7 @@ class StageTypeForm extends Model {
 			'type_id' => Yii::t('issue', 'Type'),
 			'days_reminder' => Yii::t('common', 'Reminder (days)'),
 			'calendar_background' => Yii::t('common', 'Calendar Background'),
+			'updateIssuesStageDeadlineAt' => Yii::t('issue', 'Update Issues Stage Deadline at'),
 		];
 	}
 
@@ -75,7 +79,9 @@ class StageTypeForm extends Model {
 			return false;
 		}
 		$this->upsert();
-		$this->updateIssuesStageDeadlineAt();
+		if ($this->updateIssuesStageDeadlineAt) {
+			$this->updateIssuesStageDeadlineAt();
+		}
 		return true;
 	}
 

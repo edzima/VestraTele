@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models;
 
+use common\behaviors\DatesInfoBehavior;
 use common\models\user\Worker;
 use common\modules\lead\Module;
 use Yii;
@@ -31,6 +32,7 @@ class LeadUser extends ActiveRecord {
 	public const TYPE_MARKET_FIRST = 'market-first';
 	public const TYPE_MARKET_SECOND = 'market-second';
 	public const TYPE_MARKET_THIRD = 'market-third';
+	public const TYPE_PARTNER = 'partner';
 
 	/**
 	 * {@inheritdoc}
@@ -41,6 +43,7 @@ class LeadUser extends ActiveRecord {
 				'class' => TimestampBehavior::class,
 				'value' => new Expression('CURRENT_TIMESTAMP'),
 			],
+			DatesInfoBehavior::class,
 		];
 	}
 
@@ -118,6 +121,7 @@ class LeadUser extends ActiveRecord {
 			static::TYPE_TELE => Yii::t('lead', 'Telemarketer'),
 			static::TYPE_OWNER => Yii::t('lead', 'Owner'),
 			static::TYPE_DIALER => Yii::t('lead', 'Dialer'),
+			static::TYPE_PARTNER => Yii::t('lead', 'Partner'),
 		];
 	}
 

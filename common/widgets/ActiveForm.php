@@ -14,7 +14,6 @@ class ActiveForm extends BaseActiveForm {
 		if ($model instanceof HiddenFieldsModel && !$model->isVisibleField($attribute)) {
 			Html::addCssClass($field->options, 'hidden');
 			$field->inputOptions['hidden'] = true;
-			$field->template = '';
 		}
 		return $field;
 	}

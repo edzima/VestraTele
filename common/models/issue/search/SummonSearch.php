@@ -2,11 +2,10 @@
 
 namespace common\models\issue\search;
 
-use common\helpers\ArrayHelper;
 use common\helpers\Html;
 use common\helpers\Url;
-use common\models\issue\Issue;
 use common\models\issue\IssueType;
+use common\models\issue\query\IssueQuery;
 use common\models\issue\Summon;
 use common\models\issue\SummonDoc;
 use common\models\issue\SummonType;
@@ -27,7 +26,7 @@ use yii\db\QueryInterface;
  */
 class SummonSearch extends Summon implements
 	CustomerSearchInterface,
-	IssueParentTypeSearchable,
+	IssueMainTypeSearchable,
 	SearchModel {
 
 	public ?int $issueParentTypeId = null;
@@ -56,8 +55,8 @@ class SummonSearch extends Summon implements
 			$typeQuery->user($this->user_id);
 		}
 
-		if ($this->getIssueParentType()) {
-			$this->applyIssueParentTypeFilter($typeQuery);
+		if ($this->getIssueMainType()) {
+			$this->applyIssueMainTypeFilter($typeQuery);
 		}
 		$types = $typeQuery
 			->all();
@@ -72,11 +71,14 @@ class SummonSearch extends Summon implements
 				'active' => (int) $this->type_id === $typeId,
 			];
 		}
-		$typesItems[] = [
-			'label' => Yii::t('common', 'All'),
-			'url' => ['index', Url::PARAM_ISSUE_PARENT_TYPE => $this->issueParentTypeId],
-			'active' => empty($this->type_id),
-		];
+		if (!empty($typesItems)) {
+			$typesItems[] = [
+				'label' => Yii::t('common', 'All'),
+				'url' => ['index', Url::PARAM_ISSUE_PARENT_TYPE => $this->issueParentTypeId],
+				'active' => empty($this->type_id),
+			];
+		}
+
 		return $typesItems;
 	}
 
@@ -96,7 +98,7 @@ class SummonSearch extends Summon implements
 		if ($ownerId) {
 			$query->andWhere(['owner_id' => $ownerId]);
 		}
-		$this->applyIssueParentTypeFilter($query);
+		$this->applyIssueMainTypeFilter($query);
 		$ids = $query->column();
 		return User::getSelectList($ids,
 			false
@@ -168,7 +170,7 @@ class SummonSearch extends Summon implements
 
 		$this->applyCustomerNameFilter($query);
 		$this->applyCustomerPhoneFilter($query);
-		$this->applyIssueParentTypeFilter($query);
+		$this->applyIssueMainTypeFilter($query);
 		// grid filtering conditions
 		$query->andFilterWhere([
 			static::SUMMON_ALIAS . '.id' => $this->id,
@@ -204,16 +206,17 @@ class SummonSearch extends Summon implements
 		}
 	}
 
-	public function applyIssueParentTypeFilter(ActiveQuery $query): void {
-		$parentType = $this->getIssueParentType();
-		if ($parentType) {
-			$childs = ArrayHelper::getColumn($parentType->childs, 'id');
-			$query->joinWith('issue');
-			$query->andFilterWhere([Issue::tableName() . '.type_id' => $childs]);
+	public function applyIssueMainTypeFilter(ActiveQuery $query): void {
+		if ($this->issueParentTypeId) {
+			$query->joinWith([
+				'issue' => function (IssueQuery $query) {
+					$query->type($this->issueParentTypeId);
+				},
+			]);
 		}
 	}
 
-	public function getIssueParentType(): ?IssueType {
+	public function getIssueMainType(): ?IssueType {
 		if ($this->issueParentTypeId) {
 			return IssueType::get($this->issueParentTypeId);
 		}

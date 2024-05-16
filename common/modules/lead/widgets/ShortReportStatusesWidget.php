@@ -9,12 +9,17 @@ use yii\base\Widget;
 class ShortReportStatusesWidget extends Widget {
 
 	public int $lead_id;
-	public string $route = '/lead/report/status';
+	public string $route = '/lead/report/short-status';
 	public array $options = [
 		'class' => 'btn btn-info',
 	];
 
 	private static array $models;
+
+	public function init() {
+		parent::init();
+		$this->options['data-method'] = 'POST';
+	}
 
 	public function run(): string {
 		$models = static::getModels();

@@ -41,6 +41,8 @@ class SummonGrid extends GridView {
 	public bool $withCaption = false;
 	public bool $withCustomerPhone = true;
 	public bool $withContractor = true;
+
+	public bool $withType = true;
 	public bool $withOwner = true;
 	public bool $withUpdatedAt = true;
 	public bool $withDeadline = true;
@@ -160,6 +162,7 @@ class SummonGrid extends GridView {
 				'filter' => SummonSearch::getTypesNames(),
 				'contentBold' => true,
 				'noWrap' => true,
+				'visible' => $this->withType,
 			],
 
 			[
@@ -237,9 +240,9 @@ class SummonGrid extends GridView {
 			[
 				'attribute' => 'docsCountSummary',
 				'noWrap' => true,
-				'value' => function(Summon $model):string{
+				'value' => function (Summon $model): string {
 					$summary = $model->getDocsCountSummary();
-					if($summary){
+					if ($summary) {
 						return $summary;
 					}
 					return '';

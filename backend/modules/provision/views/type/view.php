@@ -56,6 +56,8 @@ YiiAsset::register($this);
 			'isForDateFromSettlement:boolean',
 			'from_at:date',
 			'to_at:date',
+			'minSettlementValue:currency',
+			'maxSettlementValue:currency',
 		],
 	]) ?>
 

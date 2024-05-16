@@ -1,13 +1,17 @@
 <?php
 
+use backend\modules\settlement\widgets\IssueCostActionColumn;
 use common\assets\TooltipAsset;
 use common\helpers\Url;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueShipmentPocztaPolska;
 use common\models\issue\IssueTagType;
 use common\models\issue\IssueUser;
+use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\file\widgets\IssueFileGrid;
+use common\modules\court\models\Lawsuit;
 use common\modules\issue\widgets\IssueTagsWidget;
 use common\modules\issue\widgets\IssueUsersWidget;
 use common\widgets\FieldsetDetailView;
@@ -24,9 +28,12 @@ use yii\data\ActiveDataProvider;
 /* @var $claimActionColumn bool */
 /* @var $relationActionColumn bool */
 /* @var $userMailVisibilityCheck bool */
+/* @var $costRoute string|null */
 /* @var $entityUrl string|null */
 /* @var $stageUrl string|null */
 /* @var $typeUrl string|null */
+/* @var $shipmentsActionColumn bool */
+/* @var $lawsuitActionColumn bool */
 
 ?>
 
@@ -190,6 +197,53 @@ use yii\data\ActiveDataProvider;
 			]) ?>
 		</div>
 		<div class="col-md-5 col-lg-6">
+
+			<?php
+			if (Yii::$app->user->can(User::PERMISSION_COST)) {
+				$costDataProvider = new ActiveDataProvider([
+					'query' => $model->getCosts()
+						->with('user.userProfile'),
+				]);
+				echo GridView::widget([
+					'dataProvider' => $costDataProvider,
+					'caption' => Yii::t('settlement', 'Costs')
+						. ($costRoute
+							?
+							Html::a(Html::icon('plus'), [$costRoute . '/create', 'id' => $model->id], [
+								'class' => 'btn btn-warning pull-right',
+							])
+							: ''),
+					'summary' => '',
+					'emptyText' => '',
+					'showPageSummary' => $costDataProvider->totalCount > 1,
+					'columns' => [
+						[
+							'attribute' => 'type',
+							'value' => 'typeName',
+						],
+						[
+							'attribute' => 'user_id',
+							'value' => 'user',
+						],
+						[
+							'attribute' => 'value',
+							'format' => 'currency',
+							'pageSummary' => true,
+						],
+						'deadline_at:date',
+						'settled_at:date',
+						[
+							'class' => IssueCostActionColumn::class,
+							'visible' => $costRoute !== null,
+							'issue' => false,
+						],
+					],
+				]);
+			}
+
+			?>
+
+
 			<?= GridView::widget([
 				'dataProvider' => new ActiveDataProvider([
 					'query' => $model->getLinkedIssues()
@@ -218,7 +272,19 @@ use yii\data\ActiveDataProvider;
 					],
 					[
 						'label' => Yii::t('issue', 'Stage'),
-						'attribute' => 'stageName',
+						'format' => 'raw',
+						'value' => function (IssueInterface $issue): string {
+							return Html::tag(
+								'span',
+								Html::encode($issue->getIssueModel()->getStageName()),
+								[TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::$app->formatter->asDate($issue->getIssueModel()->stage_change_at)]
+							);
+						},
+					],
+					[
+						'label' => Yii::t('issue', 'Stage Deadline At'),
+						'format' => 'date',
+						'attribute' => 'stage_deadline_at',
 					],
 					[
 						'class' => CustomerDataColumn::class,
@@ -323,6 +389,11 @@ use yii\data\ActiveDataProvider;
 					],
 					'attributes' => [
 						[
+							'attribute' => 'signature_act',
+							'visible' => !empty($model->signature_act),
+							'format' => 'ntext',
+						],
+						[
 							'label' => Yii::t('common', 'Created at / Updated at'),
 							'value' => function (Issue $model): string {
 								$content = Html::tag('span',
@@ -340,10 +411,7 @@ use yii\data\ActiveDataProvider;
 							},
 							'format' => 'raw',
 						],
-						[
-							'attribute' => 'signature_act',
-							'visible' => !empty($model->signature_act),
-						],
+
 						[
 							'attribute' => 'archives_nr',
 							'visible' => $model->isArchived(),
@@ -389,6 +457,22 @@ use yii\data\ActiveDataProvider;
 								: $model->entityResponsible->name,
 
 						],
+						[
+							'label' => Yii::t('issue', 'Entity Agreement'),
+							'format' => 'ntext',
+							'value' => function (Issue $model): ?string {
+								$content = [];
+								if (!empty($model->entity_agreement_at)) {
+									$content[] = Yii::$app->formatter->asDate($model->entity_agreement_at);
+								}
+								if (!empty($model->entity_agreement_details)) {
+									$content[] = $model->entity_agreement_details;
+								}
+								return implode("\n", $content);
+							},
+							'visible' => !empty($model->entity_agreement_at) || !empty($model->entity_agreement_details),
+
+						],
 
 						'signing_at:date',
 						[
@@ -398,7 +482,7 @@ use yii\data\ActiveDataProvider;
 						],
 						[
 							'attribute' => 'details',
-							'format' => 'ntext',
+							'format' => 'html',
 							'visible' => !empty($model->details),
 						],
 
@@ -407,8 +491,99 @@ use yii\data\ActiveDataProvider;
 				],
 			]) ?>
 
+
 			<?= IssueFileGrid::widget([
 				'model' => $model,
+			])
+			?>
+
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getIssueModel()->getLawsuits(),
+				]),
+				'showOnEmpty' => false,
+				'summary' => '',
+				'caption' => Yii::t('court', 'Lawsuits'),
+				'columns' => [
+					[
+						'attribute' => 'court_id',
+						'format' => 'html',
+						'value' => function (Lawsuit $lawsuit) use ($lawsuitActionColumn): string {
+							if ($lawsuitActionColumn) {
+								return Html::a(Html::encode($lawsuit->court->name), [
+									'/court/court/view', 'id' => $lawsuit->court_id,
+								]);
+							}
+							return $lawsuit->court->name;
+						},
+					],
+					'signature_act',
+					'due_at:datetime',
+					'locationName',
+					'presenceOfTheClaimantName',
+					[
+						'class' => ActionColumn::class,
+						'controller' => '/court/lawsuit',
+						'visible' => $lawsuitActionColumn,
+					],
+				],
+			]) ?>
+
+			<?=
+			GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getIssueModel()->getShipmentsPocztaPolska(),
+				]),
+				'showOnEmpty' => false,
+				'summary' => '',
+				'caption' => Yii::t('issue', 'Issue Shipment Poczta Polska'),
+				'emptyText' => false,
+				'columns' => [
+					'shipmentTypeName',
+					'details:ntext',
+					[
+						'attribute' => 'shipment_number',
+						'format' => 'raw',
+						'value' => function (IssueShipmentPocztaPolska $model): string {
+							return Html::a(
+								Html::encode($model->shipment_number),
+								Yii::$app->pocztaPolska->externalTrackingUrl($model->shipment_number),
+								[
+									'target' => '_blank',
+								]
+							);
+						},
+					],
+					'shipment_at:date',
+					'finished_at:date',
+					'created_at:date',
+					'updated_at:date',
+					[
+						'class' => ActionColumn::class,
+						'visible' => $shipmentsActionColumn,
+						'controller' => 'shipment-poczta-polska',
+						'template' => '{refresh} {view} {update} {delete}',
+						'buttons' => [
+							'refresh' => function (string $url, IssueShipmentPocztaPolska $model): string {
+								if ($model->isFinished()) {
+									return '';
+								}
+								$url = Url::to([
+									'shipment-poczta-polska/refresh',
+									'issue_id' => $model->issue_id,
+									'shipment_number' => $model->shipment_number,
+									'returnUrl' => Url::current(),
+								]);
+								return Html::a(
+									Html::icon('refresh'),
+									$url, [
+										'data-method' => 'POST',
+									]
+								);
+							},
+						],
+					],
+				],
 			])
 			?>
 

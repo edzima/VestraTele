@@ -2,11 +2,11 @@
 
 namespace backend\modules\issue\models\search;
 
-use common\models\AddressSearch;
 use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSearch as BaseIssueSearch;
+use common\models\issue\IssueUser;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\user\User;
@@ -40,24 +40,29 @@ class IssueSearch extends BaseIssueSearch {
 	public $stageDeadlineFromAt;
 	public $stageDeadlineToAt;
 
+
+	public $entity_agreement_details;
+	public $entity_agreement_at;
+
+	public $groupByIssueUserTypes;
+
+	public bool $withClaimsSum = false;
+
 	public ?string $signature_act = null;
 	private ?array $ids = null;
 
-	public function __construct($config = []) {
-		if (!isset($config['addressSearch'])) {
-			$config['addressSearch'] = new AddressSearch();
-		}
-		parent::__construct($config);
-	}
+	private bool $isLoad = false;
 
 	public function rules(): array {
 		return array_merge(parent::rules(), [
-			[['parentId', 'agent_id', 'tele_id', 'lawyer_id',], 'integer'],
-			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims',], 'boolean'],
+			[['parentId', 'agent_id', 'tele_id', 'lawyer_id'], 'integer'],
+			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims', 'withClaimsSum'], 'boolean'],
+			[['entity_agreement_details'], 'string'],
 			[['onlyWithSettlements', 'onlyWithClaims'], 'default', 'value' => null],
 			['claimCompanyTryingValue', 'number', 'min' => 0],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
-			[['signature_act', 'stage_change_at', 'stageDeadlineFromAt', 'stageDeadlineToAt'], 'safe'],
+			[['signature_act', 'stage_change_at', 'stageDeadlineFromAt', 'stageDeadlineToAt', 'entity_agreement_at'], 'safe'],
+			['groupByIssueUserTypes', 'in', 'range' => array_keys(static::getIssueUserTypesNames()), 'allowArray' => true],
 		]);
 	}
 
@@ -71,7 +76,18 @@ class IssueSearch extends BaseIssueSearch {
 			'onlyWithAllPayedPay' => Yii::t('settlement', 'Only with all paid Pays'),
 			'stageDeadlineFromAt' => Yii::t('backend', 'Stage Deadline from at'),
 			'stageDeadlineToAt' => Yii::t('backend', 'Stage Deadline to at'),
+			'withClaimsSum' => Yii::t('backend', 'With claims sum'),
+			'groupByIssueUserTypes' => Yii::t('backend', 'Group by Issue user Types'),
 		]);
+	}
+
+	public function load($data, $formName = null) {
+		$this->isLoad = parent::load($data, $formName);
+		return $this->isLoad;
+	}
+
+	public function getIsLoad(): bool {
+		return $this->isLoad;
 	}
 
 	public function search(array $params): ActiveDataProvider {
@@ -136,6 +152,8 @@ class IssueSearch extends BaseIssueSearch {
 		$this->stageChangeAtFilter($query);
 		$this->applyStageDeadlineFilter($query);
 		$this->claimFilter($query);
+		$this->applyEntityAgreementFilter($query);
+		$this->applyGroupByIssueUserTypes($query);
 	}
 
 	private function signatureActFilter(IssueQuery $query): void {
@@ -259,6 +277,27 @@ class IssueSearch extends BaseIssueSearch {
 		}
 		if (!empty($this->stageDeadlineToAt)) {
 			$query->andWhere(['<', Issue::tableName() . '.stage_deadline_at', date('Y-m-d 23:59:59', strtotime($this->stageDeadlineToAt))]);
+		}
+	}
+
+
+	private function applyEntityAgreementFilter(IssueQuery $query) {
+		$query->andFilterWhere(['like', Issue::tableName() . '.entity_agreement_details', $this->entity_agreement_details])
+			->andFilterWhere([Issue::tableName() . '.entity_agreement_at' => $this->entity_agreement_at]);
+	}
+
+	public function claimsSum(IssueQuery $query) {
+		$query = clone $query;
+		$query->select(IssueClaim::tableName() . '.trying_value');
+		$query->joinWith('claims');
+		return $query->sum('trying_value');
+	}
+
+	private function applyGroupByIssueUserTypes(IssueQuery $query): void {
+		if (!empty($this->groupByIssueUserTypes)) {
+			$query->joinWith('users');
+			$query->groupBy([IssueUser::tableName() . '.user_id', IssueUser::tableName() . '.type']);
+			$query->having([IssueUser::tableName() . '.type' => $this->groupByIssueUserTypes]);
 		}
 	}
 

@@ -45,7 +45,7 @@ class SiteController extends Controller {
 			],
 			'fileapi-upload' => [
 				'class' => FileAPIUpload::class,
-				'path' => '@storage/tmp',
+				'path' => '@protected/tmp',
 			],
 			'image-upload' => [
 				'class' => UploadFileAction::class,
@@ -54,16 +54,22 @@ class SiteController extends Controller {
 			],
 			'file-upload' => [
 				'class' => UploadFileAction::class,
-				'url' => Yii::getAlias('@storageUrl/files/' . date('m.y')),
-				'path' => '@storage/files/' . date('m.y'),
+				'url' => Yii::getAlias('@frontendUrl/protected/download?path=' . date('m.y')),
+				'path' => '@protected/files/' . date('m.y'),
 				'uploadOnlyImage' => false,
 			],
-
 		];
+	}
+
+	public function actionInfoExecutionTime() {
+		return $this->renderContent(ini_get('max_execution_time'));
 	}
 
 	public function beforeAction($action): bool {
 		$this->layout = Yii::$app->user->isGuest || !Yii::$app->user->can('loginToBackend') ? 'main-login' : 'main';
+		if (!Yii::$app->user->isGuest) {
+			set_time_limit(240);
+		}
 		return parent::beforeAction($action);
 	}
 
@@ -173,10 +179,6 @@ class SiteController extends Controller {
 			];
 			$keys[KeyStorageItem::KEY_ISSUE_DEEP_ARCHIVE_DAYS] = [
 				'label' => Yii::t('backend', 'Archives Deep - Days'),
-				'type' => FormModel::TYPE_TEXTINPUT,
-			];
-			$keys[KeyStorageItem::KEY_LEAD_CUSTOMER_SOURCE] = [
-				'label' => Yii::t('backend', 'Lead Source for Created Customers'),
 				'type' => FormModel::TYPE_TEXTINPUT,
 			];
 		}

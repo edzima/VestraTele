@@ -256,7 +256,7 @@ if ($multipleForm) {
 					'report' => static function (string $url, LeadReport $report): string {
 						return Html::a(
 							Html::icon('comment'),
-							['report', 'id' => $report->lead_id],
+							['report', 'id' => $report->lead_id, 'hash' => $report->lead->getHash()],
 							[
 								'title' => Yii::t('lead', 'Create Report'),
 								'aria-title' => Yii::t('lead', 'Create Report'),

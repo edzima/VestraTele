@@ -8,6 +8,7 @@ use common\models\SearchModel;
 use common\models\user\User;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadAddress;
+use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadMarket;
 use common\modules\lead\models\LeadQuestion;
@@ -25,6 +26,7 @@ use yii\base\Model;
 use yii\base\UnknownPropertyException;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
 
@@ -63,6 +65,14 @@ class LeadSearch extends Lead implements SearchModel {
 	public $answers = [];
 	public $closedQuestions = [];
 
+	public $excludedClosedQuestions = [];
+
+	public $onlyWithEmail;
+	public $onlyWithPhone;
+
+	public $reportStatus;
+
+	public $selfUserId;
 	private array $questionsAttributes = [];
 
 	private static ?array $QUESTIONS = null;
@@ -73,6 +83,17 @@ class LeadSearch extends Lead implements SearchModel {
 	 * @var mixed|null
 	 */
 	public bool $joinAddress = true;
+
+	public $excludedStatus = [];
+
+	protected const DEADLINE_TODAY = 'today';
+	protected const DEADLINE_TOMORROW = 'tomorrow';
+	protected const DEADLINE_EXCEEDED = 'exceeded';
+	protected const DEADLINE_UPDATED = 'updated';
+
+	public ?string $deadlineType = null;
+
+	public ?string $hoursAfterLastReport = null;
 
 	public function __construct($config = []) {
 		if (!isset($config['addressSearch'])) {
@@ -86,16 +107,19 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type_id', 'campaign_id', 'olderByDays'], 'integer', 'min' => 1],
-			['!user_id', 'required', 'on' => static::SCENARIO_USER],
-			['!user_id', 'integer', 'on' => static::SCENARIO_USER],
-			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress'], 'boolean'],
-			['name', 'string', 'min' => 3],
-			[['duplicatePhone', 'fromMarket'], 'default', 'value' => null],
-			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
+			[['id', 'type_id', 'campaign_id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
+			[['reportStatus', 'hoursAfterLastReport', 'owner_id'], 'integer'],
+			[['!user_id'], 'required', 'on' => static::SCENARIO_USER],
+			[['!user_id'], 'integer', 'on' => static::SCENARIO_USER],
+			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress', 'onlyWithEmail', 'onlyWithPhone'], 'boolean'],
+			[['name', 'data'], 'string', 'min' => 3],
+			[['duplicatePhone', 'fromMarket', 'selfUserId', 'onlyWithEmail', 'onlyWithPhone',], 'default', 'value' => null],
+			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'excludedClosedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames()), 'allowArray' => true],
 			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
-			['status_id', 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
+			[['selfUserId'], 'in', 'range' => function () { return $this->selfUsersIds(); }, 'allowArray' => true, 'skipOnEmpty' => true],
+			[['status_id', 'excludedStatus', 'reportStatus'], 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
+			['deadlineType', 'in', 'range' => array_keys(static::getDeadlineNames())],
 			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
 			[['from_at', 'to_at'], 'safe'],
 			[array_keys($this->questionsAttributes), 'safe'],
@@ -113,6 +137,8 @@ class LeadSearch extends Lead implements SearchModel {
 				'withoutReport' => Yii::t('lead', 'Without Report'),
 				'user_id' => Yii::t('lead', 'User'),
 				'closedQuestions' => Yii::t('lead', 'Closed Questions'),
+				'excludedStatus' => Yii::t('lead', 'Excluded Status'),
+				'excludedClosedQuestions' => Yii::t('lead', 'Excluded Closed Questions'),
 				'duplicateEmail' => Yii::t('lead', 'Duplicate Email'),
 				'duplicatePhone' => Yii::t('lead', 'Duplicate Phone'),
 				'user_type' => Yii::t('lead', 'Type'),
@@ -120,6 +146,11 @@ class LeadSearch extends Lead implements SearchModel {
 				'to_at' => Yii::t('lead', 'To At'),
 				'fromMarket' => Yii::t('lead', 'From Market'),
 				'olderByDays' => Yii::t('lead', 'Older by days'),
+				'onlyWithEmail' => Yii::t('lead', 'Only with Email'),
+				'onlyWithPhone' => Yii::t('lead', 'Only with Phone'),
+				'reportStatus' => Yii::t('lead', 'Report Status'),
+				'reportStatusCount' => Yii::t('lead', 'Report Status Count'),
+				'hoursAfterLastReport' => Yii::t('lead', 'Hours after newest Report'),
 			]
 		);
 	}
@@ -199,6 +230,11 @@ class LeadSearch extends Lead implements SearchModel {
 			],
 		]);
 
+		$dataProvider->sort->attributes['reportStatusCount'] = [
+			'asc' => [new Expression('count(' . LeadReport::tableName() . '.status_id) ASC')],
+			'desc' => [new Expression('count(' . LeadReport::tableName() . '.status_id) DESC')],
+		];
+
 		$this->load($params);
 		$this->addressSearch->load($params);
 
@@ -214,11 +250,17 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyDuplicates($query);
 		$this->applyFromMarketFilter($query);
 		$this->applyNameFilter($query);
+		$this->applyOnlyWithEmail($query);
+		$this->applyOnlyWithPhone($query);
 		$this->applyUserFilter($query);
+		$this->applySelfUserFilter($query);
 		$this->applyPhoneFilter($query);
 		$this->applyStatusFilter($query);
+		$this->applyExcludedStatusFilter($query);
 		$this->applyReportFilter($query);
-
+		$this->applyReportStatusFilter($query);
+		$this->applyDeadlineFilter($query);
+		$this->applyHoursAfterLastReport($query);
 		// grid filtering conditions
 		$query->andFilterWhere([
 			Lead::tableName() . '.id' => $this->id,
@@ -266,7 +308,12 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 	}
 
-	private function applyUserFilter(ActiveQuery $query): void {
+	public $owner_id;
+
+	private function applyUserFilter(LeadQuery $query): void {
+		if (!empty($this->owner_id)) {
+			$query->owner($this->owner_id);
+		}
 		if (!empty($this->user_id)) {
 			$query->joinWith('leadUsers');
 			$query->andWhere([LeadUser::tableName() . '.user_id' => $this->user_id]);
@@ -275,6 +322,17 @@ class LeadSearch extends Lead implements SearchModel {
 		if ($this->withoutUser) {
 			$query->joinWith('leadUsers', false, 'LEFT OUTER JOIN');
 			$query->andWhere([LeadUser::tableName() . '.user_id' => null]);
+		}
+	}
+
+	private function applySelfUserFilter(ActiveQuery $query): void {
+		if (!empty($this->selfUserId)) {
+			$query->andWhere([
+				Lead::tableName() . '.id' =>
+					LeadUser::find()
+						->select('lead_id')
+						->andWhere(['user_id' => $this->selfUserId]),
+			]);
 		}
 	}
 
@@ -290,7 +348,42 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 	}
 
-	private function applyAnswerFilter(ActiveQuery $query): void {
+	private function applyReportStatusFilter(LeadQuery $query) {
+		if (!empty($this->reportStatus)) {
+			$query->joinWith('reports');
+			$query->andWhere([LeadReport::tableName() . '.status_id' => $this->reportStatus]);
+		}
+	}
+
+	public function getReportStatusCount(int $leadId, array $leadsIDs, bool $refresh = false): ?int {
+		if (empty($this->reportStatus)) {
+			return null;
+		}
+		$counts = $this->getReportStatusesCount($leadsIDs, $refresh);
+		return $counts[$leadId] ?? null;
+	}
+
+	private array $reportsStatusesCount = [];
+
+	protected function getReportStatusesCount(array $leadsIDs, bool $refresh = false): array {
+		if (empty($this->reportStatus)) {
+			return [];
+		}
+		if ($refresh || !isset($this->reportsStatusesCount[$this->reportStatus])) {
+			$count = LeadReport::find()
+				->select('count(status_id)')
+				->andWhere(['status_id' => $this->reportStatus])
+				->groupBy('lead_id')
+				->indexBy('lead_id')
+				->andWhere(['lead_id' => $leadsIDs])
+				->column();
+			$this->reportsStatusesCount[$this->reportStatus] = $count;
+		}
+		return $this->reportsStatusesCount[$this->reportStatus];
+	}
+
+	private function applyAnswerFilter(LeadQuery $query): void {
+		$this->applyExcludedClosedQuestions($query);
 		if (!empty($this->closedQuestions)) {
 			foreach ($this->closedQuestions as $closedQuestionId) {
 				$this->answers[$closedQuestionId] = true;
@@ -318,6 +411,20 @@ class LeadSearch extends Lead implements SearchModel {
 					$answerQuery->likeAnswers($this->answers);
 				},
 			], false);
+		}
+	}
+
+	private function applyExcludedClosedQuestions(LeadQuery $query): void {
+		if (!empty($this->excludedClosedQuestions)) {
+			$query->andWhere([
+				'NOT IN',
+				Lead::tableName() . '.id',
+				LeadAnswer::find()
+					->select(Lead::tableName() . '.id')
+					->andWhere(['question_id' => $this->excludedClosedQuestions])
+					->joinWith('report.lead'),
+
+			]);
 		}
 	}
 
@@ -396,11 +503,29 @@ class LeadSearch extends Lead implements SearchModel {
 		return static::$QUESTIONS;
 	}
 
-	public static function getClosedQuestionsNames(): array {
+	public function getClosedQuestionsNames(): array {
+		$query = LeadQuestion::find()
+			->active()
+			->withoutPlaceholder()
+			->boolean(false);
+		if (!empty($this->type_id) || !empty($this->source_id)) {
+			if ($this->validate(['type_id', 'source_id'])) {
+				$typeId = $this->type_id;
+				$sources = $this->source_id;
+				$sourceID = is_array($sources) ? reset($sources) : $sources;
+				if (!empty($sourceID)) {
+					$typeId = LeadSource::typeId((int) $sourceID);
+				}
+
+				if (!empty($typeId)) {
+					$query->forType($typeId);
+				}
+			}
+		}
+
+		$models = $query->all();
 		return ArrayHelper::map(
-			LeadQuestion::find()
-				->withoutPlaceholder()
-				->all(),
+			$models,
 			'id', 'name');
 	}
 
@@ -451,5 +576,142 @@ class LeadSearch extends Lead implements SearchModel {
 			return;
 		}
 		$query->andWhere('M.lead_id IS NULL');
+	}
+
+	private $_selfUsersIds = [];
+
+	public function selfUsersIds() {
+		if (!isset($this->_selfUsersIds[$this->user_id])) {
+			$this->_selfUsersIds[$this->user_id] = LeadUser::find()
+				->select('user_id')
+				->distinct()
+				->andWhere(['!=', 'user_id', $this->user_id])
+				->andWhere([
+					'lead_id' => LeadUser::find()
+						->andWhere(['user_id' => $this->user_id])
+						->select('lead_id'),
+				])
+				->column();
+		}
+		return $this->_selfUsersIds[$this->user_id];
+	}
+
+	public function leadMarketId(int $id, array $keys): ?int {
+		return $this->leadsMarket($keys)[$id] ?? null;
+	}
+
+	private array $leadsMarket = [];
+
+	private function leadsMarket(array $keys) {
+		$hashKeys = md5(implode('|', $keys));
+		if (!isset($this->leadsMarket[$hashKeys])) {
+			$ids = LeadMarket::find()
+				->andWhere(['lead_id' => $keys])
+				->select('id')
+				->indexBy('lead_id')
+				->column();
+			$this->leadsMarket[$hashKeys] = $ids;
+		}
+
+		return $this->leadsMarket[$hashKeys];
+	}
+
+	public function getSelfUsersNames(): array {
+		return User::getSelectList($this->selfUsersIds());
+	}
+
+	private function applyHoursAfterLastReport(LeadQuery $query): void {
+		if (!empty($this->hoursAfterLastReport)) {
+			$query->onlyNewestReport();
+			$hours = $this->hoursAfterLastReport;
+			$condition = '<';
+			if ($hours < 0) {
+				$condition = '>';
+				$hours *= -1;
+			}
+			$reportDateWithHours = 'DATE_ADD(' . LeadReport::tableName() . '.created_at'
+				. ', INTERVAL ' . $hours . ' HOUR)';
+			$query->andWhere([
+				$condition,
+				$reportDateWithHours,
+				date(DATE_ATOM),
+			]);
+		}
+	}
+
+	private function applyDeadlineFilter(LeadQuery $query): void {
+
+		if (!empty($this->deadlineType)) {
+			if ($this->deadlineType === static::DEADLINE_UPDATED) {
+				$query->andWhere(Lead::tableName() . '.deadline_at IS NOT NULL');
+			} else {
+				$query->joinWith('status');
+				$query->andWhere(LeadStatus::tableName() . '.hours_deadline IS NOT NULL');
+
+				$query->onlyNewestReport();
+				$query->andWhere(LeadReport::tableName() . '.status_id = ' . Lead::tableName() . '.status_id');
+
+				$reportDateWithDaysReminderInterval = 'DATE_ADD(' . LeadReport::tableName() . '.created_at'
+					. ', INTERVAL ' . LeadStatus::tableName() . '.hours_deadline HOUR)';
+				$dateCondition = "DATEDIFF(CURDATE(), $reportDateWithDaysReminderInterval)";
+
+				switch ($this->deadlineType) {
+					case static::DEADLINE_TOMORROW:
+						$query->andWhere([
+							'=',
+							$dateCondition,
+							-1,
+						]);
+						break;
+					case static::DEADLINE_TODAY:
+						$query->andWhere([
+							'=',
+							$dateCondition,
+							0,
+						]);
+						break;
+					case static::DEADLINE_EXCEEDED:
+						$query->andWhere([
+							'>',
+							$dateCondition,
+							0,
+						]);
+						break;
+				}
+			}
+		}
+	}
+
+	public static function getDeadlineNames(): array {
+		return [
+			static::DEADLINE_TODAY => Yii::t('lead', 'Today'),
+			static::DEADLINE_TOMORROW => Yii::t('lead', 'Tomorow'),
+			static::DEADLINE_EXCEEDED => Yii::t('lead', 'Exceeded'),
+			static::DEADLINE_UPDATED => Yii::t('lead', 'Updated Deadline'),
+		];
+	}
+
+	private function applyOnlyWithEmail(LeadQuery $query) {
+		if ($this->onlyWithEmail) {
+			$query->andWhere(Lead::tableName() . '.email IS NOT NULL');
+		}
+	}
+
+	private function applyOnlyWithPhone(LeadQuery $query) {
+		if ($this->onlyWithPhone) {
+			$query->andWhere(Lead::tableName() . '.phone IS NOT NULL');
+		}
+	}
+
+	private function applyExcludedStatusFilter(LeadQuery $query): void {
+		if (!empty($this->excludedStatus)) {
+			$query->andWhere(['NOT IN', Lead::tableName() . '.status_id', $this->excludedStatus]);
+		}
+	}
+
+	public function getOwnersNames(): array {
+		return User::getSelectList(
+			LeadUser::userIds(LeadUser::TYPE_OWNER)
+		);
 	}
 }

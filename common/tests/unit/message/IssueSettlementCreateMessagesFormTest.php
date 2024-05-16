@@ -4,16 +4,12 @@ namespace common\tests\unit\message;
 
 use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\models\issue\IssueInterface;
-use common\models\issue\IssueNote;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSettlement;
 use common\models\message\IssueSettlementCreateMessagesForm;
-use common\models\message\IssueSmsForm;
 use common\models\user\User;
-use console\jobs\IssueSmsSendJob;
 use Yii;
 use yii\helpers\ArrayHelper;
-use yii\mail\MessageInterface;
 
 /**
  * @property IssueSettlementCreateMessagesForm $model
@@ -135,8 +131,8 @@ class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 		$message = $this->model->getEmailToWorkers();
 		$this->tester->assertNotNull($message);
 		$settlement = $this->settlement;
-		$this->tester->assertArrayHasKey($this->getAgent()->email, $message->getTo());
-		$this->tester->assertArrayHasKey($settlement->getIssueModel()->tele->email, $message->getTo());
+		$this->tester->assertArrayHasKey($this->getAgent()->email, $message->getBcc());
+		$this->tester->assertArrayHasKey($settlement->getIssueModel()->tele->email, $message->getBcc());
 		$this->tester->assertMessageBodyContainsString($settlement->getFrontendUrl(), $message);
 		$this->tester->assertStringNotContainsString($this->getFormattedValue(false), $message);
 	}

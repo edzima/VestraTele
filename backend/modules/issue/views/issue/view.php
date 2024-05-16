@@ -59,50 +59,102 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		?>
 
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
-			? Html::a(Yii::t('backend', 'Link'), ['relation/create', 'id' => $model->id], ['class' => 'btn btn-primary'])
-			: ''
-		?>
-
-		<?= !$model->isArchived() && Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER)
-			? Html::a(Yii::t('backend', 'Link User'), ['user/link', 'issueId' => $model->id], [
-				'class' => 'btn btn-success',
-			])
-			: ''
-		?>
-
-		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-
 		<span class="pull-right">
 
-<!--			--><?php //= Yii::$app->user->can(Worker::PERMISSION_ISSUE_FILE_UPLOAD)
-			//				? IssueFileUploadButton::widget([
-			//					'issueId' => $model->id,
-			//				])
-			//				: ''
-			//			?>
+					<?= Html::a(
+						Html::faicon('pencil'),
+						['update', 'id' => $model->id],
+						[
+							'class' => 'btn btn-primary',
+							'title' => Yii::t('backend', 'Update'),
+							'aria-label' => Yii::t('backend', 'Update'),
+						]) ?>
 
-			<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
-				? Html::a(
-					Html::icon('tag'), ['tag/issue', 'issueId' => $model->id], [
-						'title' => Yii::t('common', 'Tags'),
-						'aria-label' => Yii::t('common', 'Tags'),
-						'class' => 'btn btn-success',
-					]
-				)
-				: ''
-			?>
 
-			<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE)
-				? Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
-					'class' => 'btn btn-danger',
-					'data' => [
-						'confirm' => 'Czy napewno chcesz usunąć?',
-						'method' => 'post',
-					],
-				])
-				: ''
-			?>
+					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
+						? Html::a(Html::faicon('copy'),
+							['issue/create-and-link', 'id' => $model->id],
+							[
+								'class' => 'btn btn-primary',
+								'title' => Yii::t('issue', 'Create & Link'),
+								'aria-label' => Yii::t('issue', 'Create & Link'),
+							])
+						: ''
+					?>
+
+					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
+						? Html::a(Html::faicon('link'),
+							['relation/create', 'id' => $model->id],
+							[
+								'class' => 'btn btn-primary',
+								'title' => Yii::t('backend', 'Link'),
+								'aria-label' => Yii::t('backend', 'Link'),
+							])
+						: ''
+					?>
+
+					<?= !$model->isArchived() && Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER)
+						? Html::a(Html::faicon('user-plus'),
+							['user/link', 'issueId' => $model->id], [
+								'class' => 'btn btn-success',
+								'aria-label' => Yii::t('backend', 'Link User'),
+								'title' => Yii::t('backend', 'Link User'),
+							])
+						: ''
+					?>
+
+					<?= Yii::$app->user->can(Worker::PERMISSION_LAWSUIT)
+						? Html::a(
+							Html::faicon('legal'),
+							['/court/lawsuit/create', 'issueId' => $model->id],
+							[
+								'title' => Yii::t('court', 'Create Lawsuit'),
+								'aria-label' => Yii::t('court', 'Create Lawsuit'),
+								'class' => 'btn btn-warning',
+							]
+						)
+						: ''
+					?>
+
+					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
+						? Html::a(
+							Html::icon('tag'),
+							['tag/issue', 'issueId' => $model->id],
+							[
+								'title' => Yii::t('common', 'Tags'),
+								'aria-label' => Yii::t('common', 'Tags'),
+								'class' => 'btn btn-success',
+							]
+						)
+						: ''
+					?>
+
+					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_SHIPMENT)
+						? Html::a(
+							Html::faicon('envelope-open-o'),
+							['shipment-poczta-polska/create', 'issueId' => $model->id], [
+								'title' => Yii::t('backend', 'Add a Shipment'),
+								'aria-label' => Yii::t('backend', 'Add a Shipment'),
+								'class' => 'btn btn-info',
+							]
+						)
+						: ''
+					?>
+
+					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_DELETE)
+						? Html::a(Html::icon('trash'),
+							['delete', 'id' => $model->id],
+							[
+								'title' => Yii::t('backend', 'Delete'),
+								'aria-label' => Yii::t('backend', 'Delete'),
+								'class' => 'btn btn-danger',
+								'data' => [
+									'confirm' => 'Czy napewno chcesz usunąć?',
+									'method' => 'post',
+								],
+							])
+						: ''
+					?>
 		</span>
 
 
@@ -154,12 +206,6 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 				['class' => 'btn btn-success'])
 			: '' ?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_COST)
-			? Html::a(
-				Yii::t('backend', 'Costs'),
-				['/settlement/cost/issue', 'id' => $model->id],
-				['class' => 'btn btn-warning'])
-			: '' ?>
 	</p>
 
 
@@ -194,23 +240,27 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		: ''
 	?>
 
-	<?= IssueViewTopSummonsWidgets::widget([
-		'dataProvider' => $summonDataProvider,
-	]) ?>
 
 
 	<?= IssueViewWidget::widget([
 		'model' => $model,
-		'relationActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
 		'claimActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
+		'relationActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE),
+		'shipmentsActionColumn' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_SHIPMENT),
+		'costRoute' => '/settlement/cost',
 		'entityResponsibleRoute' => '/entity-responsible/default/view',
 		'stageRoute' => 'stage/view',
 		'typeRoute' => 'type/view',
+		'lawsuitActionColumn' => Yii::$app->user->can(Worker::PERMISSION_LAWSUIT),
 	]) ?>
 
 
 
 	<?= IssueViewSummonsWidgets::widget([
+		'dataProvider' => $summonDataProvider,
+	]) ?>
+
+	<?= IssueViewTopSummonsWidgets::widget([
 		'dataProvider' => $summonDataProvider,
 	]) ?>
 

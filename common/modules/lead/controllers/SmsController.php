@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use common\components\message\MessageTemplate;
 use common\helpers\Flash;
 use common\models\user\User;
 use common\modules\lead\models\LeadMultipleSmsForm;
@@ -23,7 +24,7 @@ class SmsController extends BaseController {
 		];
 	}
 
-	public function actionPush(int $id) {
+	public function actionPush(int $id, string $message = null) {
 		$lead = $this->findLead($id);
 		if (empty($lead->getPhone())) {
 			Flash::add(Flash::TYPE_WARNING,
@@ -32,15 +33,31 @@ class SmsController extends BaseController {
 				]));
 			return $this->redirectLead($id);
 		}
+		if (!empty($lead->phoneBlacklist)) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('lead', 'Phone: {phone} is on Blacklist.', [
+					'phone' => $lead->getPhone(),
+				]));
+			return $this->redirectLead($id);
+		}
 
 		$model = new LeadSmsForm($lead);
+		if (!empty($message)) {
+			$model->message = $message;
+		}
 		$model->owner_id = Yii::$app->user->getId();
-		if ($model->load(Yii::$app->request->post()) && !empty($model->pushJob())) {
-			Flash::add(Flash::TYPE_SUCCESS,
-				Yii::t('lead', 'Success add SMS: {message} to send queue.', [
-					'message' => $model->message,
-				]));
-			return $this->redirectLead($lead->getId());
+		if ($model->load(Yii::$app->request->post())) {
+			$jobId = $model->pushJob();
+			if (!empty($jobId)) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('lead', 'Success add SMS: {message} to send queue.', [
+						'message' => $model->message,
+					]));
+				if ($model->getDelay()) {
+					$model->delayReport($jobId);
+				}
+				return $this->redirectLead($lead->getId());
+			}
 		}
 		return $this->render('push', [
 			'model' => $model,
@@ -106,26 +123,37 @@ class SmsController extends BaseController {
 			return $this->redirectLead($id);
 		}
 
-		$template = Yii::$app->messageTemplate->getTemplate($key);
-		if ($template === null) {
-			throw new NotFoundHttpException('Not Found Message Template for Key: ' . $key);
-		}
+		$template = $this->findTemplate($key);
 
 		$model = new LeadSmsForm($lead);
 		$model->owner_id = $user->getId();
 		$template->parseBody([
 			'userName' => $user->profile->firstname,
+			'userEmail' => $user->email,
 			'userPhone' => Yii::$app->formatter->asTel($phone, [
 				'asLink' => false,
 			]),
 		]);
 		$model->message = $template->getSmsMessage();
+		if (!Yii::$app->request->isPost) {
+			return $this->redirect(['push', 'id' => $id, 'message' => $model->message]);
+		}
+
 		if (!empty($model->pushJob())) {
 			Flash::add(Flash::TYPE_SUCCESS,
 				Yii::t('lead', 'Success add SMS: {message} to send queue.', [
 					'message' => $model->message,
 				]));
 		}
+
 		return $this->redirectLead($lead->getId());
+	}
+
+	protected function findTemplate(string $key): MessageTemplate {
+		$template = Yii::$app->messageTemplate->getTemplate($key);
+		if ($template === null) {
+			throw new NotFoundHttpException('Not Found Message Template for Key: ' . $key);
+		}
+		return $template;
 	}
 }

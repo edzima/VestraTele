@@ -2,20 +2,16 @@
 
 namespace common\modules\lead\models;
 
-use common\helpers\ArrayHelper;
-use common\modules\lead\models\forms\LeadForm;
-use DateTime;
-use Exception;
+use common\modules\lead\models\import\LeadImportStrategy;
+use console\jobs\CsvImportJob;
 use ruskid\csvimporter\CSVImporter;
 use ruskid\csvimporter\CSVReader;
 use ruskid\csvimporter\ImportInterface;
-use ruskid\csvimporter\MultipleImportStrategy;
 use Yii;
-use yii\base\InvalidArgumentException;
 use yii\base\Model;
 use yii\behaviors\AttributeTypecastBehavior;
-use yii\helpers\Json;
-use yii\helpers\VarDumper;
+use yii\helpers\FileHelper;
+use yii\queue\closure\Behavior;
 use yii\web\UploadedFile;
 
 class LeadCSVImport extends Model {
@@ -40,8 +36,9 @@ class LeadCSVImport extends Model {
 	public $source_id;
 	public ?string $provider = null;
 
-	private int $index = 0;
-	public string $dateFormat = 'Y-m-d H:i';
+	public string $queueDir = '@runtime/lead-csv';
+
+	public int $pushLimit = 10000;
 
 	public function behaviors(): array {
 		return [
@@ -89,11 +86,27 @@ class LeadCSVImport extends Model {
 		];
 	}
 
+	public function getRowsCount(): int {
+		return count(file($this->csvFile->tempName));
+	}
+
+	public function push(): ?string {
+		$job = new CsvImportJob();
+		$job->importStrategy = $this->importStrategy();
+		$fileName = $this->getQueueDir() . DIRECTORY_SEPARATOR . uniqid() . '.' . $this->csvFile->extension;
+		$this->csvFile->saveAs($fileName);
+		$reader = $this->reader();
+		$reader->filename = $fileName;
+		$job->reader = $reader;
+		$queue = Yii::$app->queue;
+		$queue->attachBehavior('closureJob', Behavior::class);
+		return $queue->push($job);
+	}
+
 	public function import(bool $validate = true): ?int {
 		if ($validate && !$this->validate()) {
 			return null;
 		}
-		$this->index = 0;
 		$importer = new CSVImporter();
 		$importer->setData($this->reader());
 		return $importer->import($this->importStrategy());
@@ -117,106 +130,23 @@ class LeadCSVImport extends Model {
 	}
 
 	protected function importStrategy(): ImportInterface {
-		return new MultipleImportStrategy([
-			'tableName' => Lead::tableName(),
-			'configs' => $this->configStrategy(),
-			'skipImport' => function (array $row): bool {
-				return $this->skipImport($row);
-			},
-		]);
+		$import = new LeadImportStrategy();
+		$import->status_id = $this->status_id;
+		$import->source_id = $this->source_id;
+		$import->phoneColumn = $this->phoneColumn;
+		$import->dateColumn = $this->dateColumn;
+		$import->nameColumn = $this->nameColumn;
+		$import->namePrefix = $this->csvFile->getBaseName();
+		$import->provider = $this->provider;
+		return $import;
 	}
 
-	protected function configStrategy(): array {
-		return [
-			[
-				'attribute' => 'name',
-				'value' => function (array $line) {
-					if (is_int($this->nameColumn)) {
-						$name = $line[$this->nameColumn] ?? null;
-						if (!empty($name)) {
-							return $name;
-						}
-					}
-
-					return $this->csvFile->getBaseName() . '.' . $this->index;
-				},
-			],
-			[
-				'attribute' => 'phone',
-				'value' => function (array $line): string {
-					$phone = $line[$this->phoneColumn];
-					$model = new LeadForm(['phone' => $phone]);
-					$model->validate(['phone']);
-					return $model->getPhone();
-				},
-				'unique' => true,
-			],
-			[
-				'attribute' => 'source_id',
-				'value' => function (): int {
-					return $this->source_id;
-				},
-			],
-			[
-				'attribute' => 'status_id',
-				'value' => function (): int {
-					return $this->status_id;
-				},
-			],
-			[
-				'attribute' => 'provider',
-				'value' => function (): ?string {
-					return $this->provider;
-				},
-			],
-			[
-				'attribute' => 'date_at',
-				'value' => function (array $row): string {
-					if (is_int($this->dateColumn) && isset($row[$this->dateColumn])) {
-						try {
-							return (new DateTime($row[$this->dateColumn]))
-								->format($this->dateFormat);
-						} catch (Exception $exception) {
-							return date($this->dateFormat);
-						}
-					}
-					return date($this->dateFormat);
-				},
-			],
-			[
-				'attribute' => 'data',
-				'value' => function (array $row): string {
-					try {
-						return Json::encode($row);
-					} catch (InvalidArgumentException $e) {
-						if ($e->getCode() === JSON_ERROR_UTF8) {
-							$row = ArrayHelper::toUtf8($row);
-							return Json::encode($row);
-						}
-						throw $e;
-					}
-				},
-			],
-		];
-	}
-
-	protected function skipImport(array $row): bool {
-		$this->index++;
-		$phone = $row[$this->phoneColumn] ?? null;
-		if (!$phone) {
-			return true;
+	private function getQueueDir(): string {
+		$queueDir = Yii::getAlias($this->queueDir);
+		if (!file_exists($queueDir)) {
+			FileHelper::createDirectory($queueDir);
 		}
-		$model = new LeadForm(['phone' => $phone]);
-		$model->phone = $phone;
-
-		$skip = !$model->validate(['phone']);
-		if ($skip) {
-			Yii::warning('Skip Lead Row: ' . VarDumper::dumpAsString($row)
-				. '. With errors: ' . VarDumper::dumpAsString($model->getErrors()),
-				'lead.csvImport'
-			);
-		}
-		return !$model->validate(['phone']);
+		return $queueDir;
 	}
 
 	public static function getStatusNames(): array {

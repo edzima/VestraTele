@@ -30,6 +30,10 @@ return [
 		'spotkania' => 'meet',
 
 		'admin' => '/backend/web',
-
+		'mpkk' => 'site/max-amount',
+		'analiza-skd' => 'credit/analyze/calc',
+		//lead
+		'lead/report/<hash>/<id>' => 'lead/report/report',
+		'issue/issue/view' => 'issue/view',
 	],
 ];

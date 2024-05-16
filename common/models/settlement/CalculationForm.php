@@ -3,6 +3,7 @@
 namespace common\models\settlement;
 
 use common\components\provision\exception\Exception;
+use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
@@ -12,6 +13,9 @@ use yii\helpers\ArrayHelper;
 
 class CalculationForm extends PayForm {
 
+	public const PROVIDER_TYPE_RESPONSIBLE_ENTITY = IssuePayCalculation::PROVIDER_RESPONSIBLE_ENTITY;
+	public const PROVIDER_TYPE_CLIENT = IssuePayCalculation::PROVIDER_CLIENT;
+
 	private Issue $issue;
 	private int $owner;
 	public $type;
@@ -19,10 +23,13 @@ class CalculationForm extends PayForm {
 	public ?int $providerType = null;
 	public $costs_ids = [];
 
+	public $entityProviderId;
+
 	private ?IssuePayCalculation $model = null;
 
 	public function __construct(int $owner_id, Issue $issue, $config = []) {
 		$this->issue = $issue;
+		$this->entityProviderId = $issue->entity_responsible_id;
 		$this->owner = $owner_id;
 		parent::__construct($config);
 	}
@@ -39,11 +46,25 @@ class CalculationForm extends PayForm {
 	public function rules(): array {
 		return array_merge([
 			[['type', 'providerType',], 'required'],
-			[['owner', 'type', 'providerType'], 'integer'],
+			[['owner', 'type', 'providerType', 'entityProviderId'], 'integer'],
+			[
+				'entityProviderId', 'required', 'when' => function () {
+				return $this->providerType === static::PROVIDER_TYPE_RESPONSIBLE_ENTITY;
+			}, 'enableClientValidation' => false,
+			],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 			['costs_ids', 'in', 'range' => array_keys($this->getCostsData()), 'allowArray' => true],
 			['providerType', 'in', 'range' => array_keys(IssuePayCalculation::getProvidersTypesNames())],
+			['entityProviderId', 'in', 'range' => array_keys(static::getEntityResponsibleNames())],
 		], parent::rules());
+	}
+
+	public static function getEntityResponsibleNames(): array {
+		return ArrayHelper::map(
+			EntityResponsible::find()->asArray()->all(),
+			'id',
+			'name'
+		);
 	}
 
 	public function attributeLabels(): array {
@@ -51,6 +72,7 @@ class CalculationForm extends PayForm {
 			'providerType' => Yii::t('settlement', 'Provider'),
 			'type' => Yii::t('settlement', 'Type'),
 			'costs_ids' => Yii::t('settlement', 'Costs'),
+			'entityProviderId' => Yii::t('settlement', 'Entity responsible'),
 		], parent::attributeLabels());
 	}
 
@@ -68,6 +90,9 @@ class CalculationForm extends PayForm {
 		$this->owner = $model->owner_id;
 		$this->costs_ids = ArrayHelper::getColumn($model->costs, 'id');
 		$this->providerType = $model->provider_type;
+		if ($model->provider_type === static::PROVIDER_TYPE_RESPONSIBLE_ENTITY) {
+			$this->entityProviderId = $model->provider_id;
+		}
 		$this->type = $model->type;
 		if ($model->getPaysCount() === 1) {
 			$this->setPay($model->getPays()->one());
@@ -163,17 +188,20 @@ class CalculationForm extends PayForm {
 	 */
 	public function getProviderId(): int {
 		switch ($this->providerType) {
-			case IssuePayCalculation::PROVIDER_CLIENT:
+			case static::PROVIDER_TYPE_CLIENT:
 				return $this->getModel()->issue->customer->id;
-			case IssuePayCalculation::PROVIDER_RESPONSIBLE_ENTITY:
-				return $this->getModel()->issue->entity_responsible_id;
+			case static::PROVIDER_TYPE_RESPONSIBLE_ENTITY:
+				return $this->entityProviderId ?: $this->getModel()->issue->entity_responsible_id;
 			default:
 				throw new InvalidConfigException('Invalid provider type.');
 		}
 	}
 
 	public function getProvidersNames(): array {
-		return $this->getModel()->getProvidersNames();
+		return [
+			static::PROVIDER_TYPE_CLIENT => Yii::t('settlement', 'Customer'),
+			static::PROVIDER_TYPE_RESPONSIBLE_ENTITY => Yii::t('settlement', 'Entity responsible'),
+		];
 	}
 
 	public static function getTypesNames(): array {

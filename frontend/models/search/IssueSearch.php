@@ -58,6 +58,7 @@ class IssueSearch extends BaseIssueSearch {
 				$this->issueQueryFilter($query);
 			},
 		]);
+		$query->with('issue.claims');
 
 		$query->distinct('issue_id');
 
@@ -75,6 +76,9 @@ class IssueSearch extends BaseIssueSearch {
 		]);
 
 		$this->load($params);
+		if ($this->addressSearch) {
+			$this->addressSearch->load($params);
+		}
 
 		if (!$this->validate()) {
 			$query->andFilterWhere([

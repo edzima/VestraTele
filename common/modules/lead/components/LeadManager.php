@@ -14,6 +14,7 @@ use yii\base\Component;
 use yii\base\Event;
 use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
+use yii\helpers\Json;
 
 class LeadManager extends Component {
 
@@ -24,6 +25,25 @@ class LeadManager extends Component {
 	 */
 	public $model = Lead::class;
 	public bool $onlyForUser = false;
+
+	protected const SALT_HASH = '7812asdEsa@@';
+
+	public function validateLead(ActiveLead $lead, string $hash): bool {
+		$data = $this->hashLeadData($lead);
+		return $data === Yii::$app->security->validateData($hash . $data, static::SALT_HASH);
+	}
+
+	public function hashLead(ActiveLead $lead): string {
+		$data = $this->hashLeadData($lead);
+		$hashData = Yii::$app->security->hashData($data, static::SALT_HASH);
+		return str_replace($data, '', $hashData);
+	}
+
+	protected function hashLeadData(ActiveLead $lead): string {
+		return Json::encode($lead->toArray([
+			'phone', 'email', 'name', 'source_id', 'type_id', 'date_at',
+		]));
+	}
 
 	public function init() {
 		parent::init();
@@ -52,6 +72,9 @@ class LeadManager extends Component {
 
 	public function isForUser(ActiveLead $lead, $userId = null): bool {
 		if (!$this->onlyForUser) {
+			return true;
+		}
+		if (Yii::$app->user->can('lead.manager')) {
 			return true;
 		}
 		if ($userId === null) {

@@ -82,7 +82,7 @@ class IssueStageChangeMessagesFormTest extends BaseIssueMessagesFormTest {
 				$this->tester->assertEmpty(IssueStageChangeMessagesForm::findIssues($key)->all());
 
 				$this->issueFixture->haveIssue([
-					'stage_change_at' => date(DATE_ATOM, strtotime('-7 day')),
+					'stage_change_at' => date('Y-m-d H:i:s', strtotime('-7 day')),
 					'type_id' => 1,
 					'stage_id' => 1,
 				]);
@@ -103,6 +103,20 @@ class IssueStageChangeMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->tester->assertSame(0, $counters['customersEmail']);
 		$this->tester->assertSame(0, $counters['agentsSMS']);
 		$this->tester->assertSame(0, $counters['agentsEmail']);
+	}
+
+	public function testSmsToCustomerWithSingleStageTemplateForNotIssueStage(): void {
+		$this->templateFixture->flushAll();
+		$key = IssueStageChangeMessagesForm::generateKey(
+			IssueStageChangeMessagesForm::TYPE_SMS,
+			IssueStageChangeMessagesForm::keyCustomer(),
+			null,
+			12,
+		);
+		$this->templateFixture->save($key);
+		$this->giveModel();
+		$sms = $this->model->getSmsToCustomer();
+		$this->tester->assertNull($sms);
 	}
 
 	public function testFindIssues(): void {
@@ -135,26 +149,26 @@ class IssueStageChangeMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->tester->assertSame(0, (int) $query->count());
 
 		$this->issueFixture->haveIssue([
-			'stage_change_at' => date(DATE_ATOM, strtotime('-1 day')),
+			'stage_change_at' => $this->date('-1 day'),
 			'type_id' => 1,
 			'stage_id' => 1,
 		]);
 
 		$this->issueFixture->haveIssue([
-			'stage_change_at' => date(DATE_ATOM, strtotime('+1 day')),
+			'stage_change_at' => $this->date('+1 day'),
 			'type_id' => 1,
 			'stage_id' => 1,
 		]);
 
 		$this->issueFixture->haveIssue([
-			'stage_change_at' => date(DATE_ATOM, strtotime('-2 day')),
+			'stage_change_at' => $this->date('-2 day'),
 			'type_id' => 1,
 			'stage_id' => 1,
 		]);
 
 		// other stage_id from create key.
 		$this->issueFixture->haveIssue([
-			'stage_change_at' => date(DATE_ATOM, strtotime('-1 day')),
+			'stage_change_at' => $this->date('-1 day'),
 			'type_id' => 1,
 			'stage_id' => 2,
 		]);
@@ -162,7 +176,7 @@ class IssueStageChangeMessagesFormTest extends BaseIssueMessagesFormTest {
 		// other type_id from create key.
 
 		$this->issueFixture->haveIssue([
-			'stage_change_at' => date(DATE_ATOM, strtotime('-1 day')),
+			'stage_change_at' => $this->date('-1 day'),
 			'type_id' => 3,
 			'stage_id' => 1,
 		]);
@@ -174,6 +188,10 @@ class IssueStageChangeMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->tester->assertSame(1, $issue->getIssueType()->id);
 	}
 
+	protected function date(string $datetime): string {
+		return date('Y-m-d H:i:s', strtotime($datetime));
+	}
+
 	public function testTemplateFromFixture(): void {
 		$this->giveIssue();
 		$this->giveModel();
@@ -182,10 +200,11 @@ class IssueStageChangeMessagesFormTest extends BaseIssueMessagesFormTest {
 		$this->tester->assertNull($message);
 
 		$message = $this->model->getEmailToWorkers();
-		$this->tester->assertNull($message);
+		$this->tester->assertNotNull($message);
 
 		$this->model->withStageIdKey = false;
 
+		$this->model->withWithoutStageIdOnNotFound = true;
 		$message = $this->model->getEmailToWorkers();
 		$this->tester->assertNotNull($message);
 	}

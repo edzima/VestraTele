@@ -24,6 +24,8 @@ class CalculationUpdateCest {
 
 		$I->haveFixtures(array_merge(
 			IssueFixtureHelper::issue(),
+			IssueFixtureHelper::entityResponsible(),
+			IssueFixtureHelper::types(),
 			IssueFixtureHelper::customer(),
 			IssueFixtureHelper::issueUsers(),
 			SettlementFixtureHelper::settlement(),

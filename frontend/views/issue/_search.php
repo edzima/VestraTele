@@ -1,8 +1,10 @@
 <?php
 
 use common\widgets\ActiveForm;
+use common\widgets\address\AddressSearchWidget;
 use common\widgets\DateWidget;
 use frontend\helpers\Html;
+use frontend\helpers\Url;
 use frontend\models\search\IssueSearch;
 use kartik\select2\Select2;
 
@@ -13,8 +15,11 @@ use kartik\select2\Select2;
 <div id="issue-search" class="issue-search">
 
 	<?php $form = ActiveForm::begin([
-		'action' => ['index'],
 		'method' => 'get',
+		'options' => [
+			'data-pjax' => 1,
+		],
+		'action' => null,
 	]); ?>
 
 	<div class="row">
@@ -73,9 +78,18 @@ use kartik\select2\Select2;
 	</div>
 
 
+	<?= $model->addressSearch !== null
+		? AddressSearchWidget::widget([
+			'form' => $form,
+			'model' => $model->addressSearch,
+		])
+		: ''
+	?>
+
+
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('frontend', 'Search'), ['class' => 'btn btn-primary']) ?>
-		<?= Html::a('Reset', 'index', ['class' => 'btn btn-default']) ?>
+		<?= Html::a('Reset', ['index', Url::PARAM_ISSUE_PARENT_TYPE => $model->parentTypeId], ['class' => 'btn btn-default']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

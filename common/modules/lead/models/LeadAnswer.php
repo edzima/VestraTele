@@ -20,6 +20,12 @@ use yii\db\ActiveRecord;
  */
 class LeadAnswer extends ActiveRecord {
 
+	public static function orderByQuestions(array &$models): void {
+		usort($models, function (LeadAnswer $a, LeadAnswer $b) {
+			return LeadQuestion::orderClosure($a->question, $b->question);
+		});
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -66,7 +72,7 @@ class LeadAnswer extends ActiveRecord {
 	/**
 	 * Gets query for [[Question]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getQuestion(): ActiveQuery {
 		return $this->hasOne(LeadQuestion::class, ['id' => 'question_id']);
@@ -75,7 +81,7 @@ class LeadAnswer extends ActiveRecord {
 	/**
 	 * Gets query for [[Report]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
 	public function getReport(): ActiveQuery {
 		return $this->hasOne(LeadReport::class, ['id' => 'report_id']);

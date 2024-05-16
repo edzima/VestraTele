@@ -99,7 +99,7 @@ class SummonDocsWidget extends Widget {
 
 	private function sort(array &$models) {
 		usort($models, static function (SummonDocLink $a, SummonDocLink $b) {
-			return $a->doc->priority < $b->doc->priority;
+			return $a->doc->priority <=> $b->doc->priority;
 		});
 	}
 

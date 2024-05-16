@@ -2,6 +2,8 @@
 
 namespace common\modules\lead\models;
 
+use yii\base\Arrayable;
+
 /**
  * Interface ActiveLead
  *
@@ -10,10 +12,19 @@ namespace common\modules\lead\models;
  * @property-read LeadAnswer[] $answers
  * @property-read LeadAddress[] $addresses
  * @property-read LeadMarket|null $market
+ * @property-read LeadPhoneBlacklist|null $phoneBlacklist
  */
-interface ActiveLead extends LeadInterface {
+interface ActiveLead extends LeadInterface, Arrayable {
+
+	public function isDelay(): ?bool;
+
+	public function getDeadlineHours();
+
+	public function getDeadline(): ?string;
 
 	public function getId(): int;
+
+	public function getHash(): string;
 
 	public function getDetails(): ?string;
 

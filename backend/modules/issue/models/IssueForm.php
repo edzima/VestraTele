@@ -39,7 +39,8 @@ class IssueForm extends Model implements LinkedIssuesModel {
 	public ?string $signature_act = null;
 
 	public ?string $stage_deadline_at = null;
-
+	public ?string $entity_agreement_details = null;
+	public ?string $entity_agreement_at = null;
 	public $linkedIssuesIds;
 	public $linkedIssuesAttributes = [];
 
@@ -50,6 +51,7 @@ class IssueForm extends Model implements LinkedIssuesModel {
 		'entity_responsible_id',
 		'signature_act',
 		'stage_id',
+		'stage_deadline_at',
 		'type_id',
 	];
 
@@ -58,6 +60,8 @@ class IssueForm extends Model implements LinkedIssuesModel {
 	private User $customer;
 
 	private ?Issue $model = null;
+
+	private ?array $users = [];
 
 	/**
 	 * @inheritdoc
@@ -79,18 +83,31 @@ class IssueForm extends Model implements LinkedIssuesModel {
 			[['agent_id', 'lawyer_id', 'tele_id', 'type_id', 'stage_id', 'entity_responsible_id'], 'integer'],
 			[['stage_id'], 'filter', 'filter' => 'intval'],
 			[
-				'stage_id', 'in', 'when' => function (): bool {
-				return !empty($this->type_id);
-			}, 'range' => function () {
-				return array_keys($this->getStagesData());
-			}, 'enableClientValidation' => false,
+				'stage_id', 'in',
+				'when' => function (): bool {
+					return !empty($this->type_id);
+				},
+				'range' => function () {
+					return array_keys($this->getStagesData());
+				},
+				'enableClientValidation' => false,
 			],
-			[['archives_nr', 'details', 'signature_act'], 'string'],
-			[['archives_nr', 'details', 'signature_act'], 'trim'],
-			['signature_act', 'string', 'max' => 30],
-			[['signing_at', 'type_additional_date_at', 'stage_change_at', 'stage_deadline_at'], 'date', 'format' => 'Y-m-d'],
+			[['archives_nr', 'details', 'signature_act', 'entity_agreement_details'], 'string'],
+			[['archives_nr', 'details', 'signature_act', 'entity_agreement_details'], 'trim'],
+			[['signature_act', 'entity_agreement_details'], 'string', 'max' => 255],
+			[
+				[
+					'signing_at', 'type_additional_date_at', 'stage_change_at', 'stage_deadline_at',
+					'entity_agreement_at',
+				], 'date', 'format' => 'Y-m-d',
+			],
 			[['stage_change_at'], 'default', 'value' => date('Y-m-d')],
-			[['archives_nr', 'details', 'signature_act', 'stage_deadline_at', 'stage_change_at'], 'default', 'value' => null],
+			[
+				[
+					'archives_nr', 'details', 'signature_act', 'stage_deadline_at',
+					'stage_change_at', 'entity_agreement_details', 'entity_agreement_at',
+				], 'default', 'value' => null,
+			],
 			['type_id', 'in', 'range' => static::getTypesIds()],
 			['tagsIds', 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
 			['linkedIssuesIds', 'in', 'range' => array_keys($this->getLinkedIssuesNames()), 'allowArray' => true],
@@ -153,7 +170,16 @@ class IssueForm extends Model implements LinkedIssuesModel {
 		$this->type_additional_date_at = $model->type_additional_date_at;
 		$this->stage_change_at = $model->stage_change_at;
 		$this->stage_deadline_at = $model->stage_deadline_at;
+		$this->entity_agreement_at = $model->entity_agreement_at;
+		$this->entity_agreement_details = $model->entity_agreement_details;
 		$this->tagsIds = ArrayHelper::getColumn($model->tags, 'id');
+	}
+
+	public function setUsers(array $users) {
+		$this->users = $users;
+		$this->agent_id = $users[IssueUser::TYPE_AGENT] ?? null;
+		$this->lawyer_id = $users[IssueUser::TYPE_LAWYER] ?? null;
+		$this->tele_id = $users[IssueUser::TYPE_TELEMARKETER] ?? null;
 	}
 
 	public function getModel(): Issue {
@@ -175,7 +201,10 @@ class IssueForm extends Model implements LinkedIssuesModel {
 			$model->entity_responsible_id = $this->entity_responsible_id;
 			$model->signing_at = $this->signing_at;
 			$model->type_additional_date_at = $this->type_additional_date_at;
-			if ($model->isNewRecord) {
+			$model->entity_agreement_at = $this->entity_agreement_at;
+			$model->entity_agreement_details = $this->entity_agreement_details;
+			$isNewRecord = $model->isNewRecord;
+			if ($isNewRecord) {
 				$model->generateStageDeadlineAt();
 			} else {
 				$model->stage_deadline_at = $this->stage_deadline_at;
@@ -188,31 +217,51 @@ class IssueForm extends Model implements LinkedIssuesModel {
 				return false;
 			}
 
-			$this->linkTags();
+			$this->linkTags(!$isNewRecord);
 			$this->linkUsers();
 			$this->saveLinkedIssues();
 
 			return true;
 		}
-		Yii::error($this->getModel()->getErrors(), __METHOD__);
+		Yii::error($this->getErrors(), __METHOD__);
 		return false;
 	}
 
 	private function linkUsers(): void {
 		$model = $this->getModel();
-		$model->linkUser($this->customer->id, IssueUser::TYPE_CUSTOMER);
-		$model->linkUser($this->agent_id, IssueUser::TYPE_AGENT);
-		$model->linkUser($this->lawyer_id, IssueUser::TYPE_LAWYER);
-		if (!empty($this->tele_id)) {
-			$model->linkUser($this->tele_id, IssueUser::TYPE_TELEMARKETER);
+
+		if (!empty($this->users)) {
+			$data = [];
+			foreach ($this->users as $type => $userId) {
+				$data[] = [
+					'issue_id' => $model->id,
+					'type' => $type,
+					'user_id' => $userId,
+				];
+			}
+			IssueUser::getDb()
+				->createCommand()
+				->batchInsert(IssueUser::tableName(), [
+					'issue_id',
+					'type',
+					'user_id',
+				], $data)
+				->execute();
 		} else {
-			$model->unlinkUser(IssueUser::TYPE_TELEMARKETER);
+			$model->linkUser($this->customer->id, IssueUser::TYPE_CUSTOMER);
+			$model->linkUser($this->agent_id, IssueUser::TYPE_AGENT);
+			$model->linkUser($this->lawyer_id, IssueUser::TYPE_LAWYER);
+			if (!empty($this->tele_id)) {
+				$model->linkUser($this->tele_id, IssueUser::TYPE_TELEMARKETER);
+			} else {
+				$model->unlinkUser(IssueUser::TYPE_TELEMARKETER);
+			}
 		}
 	}
 
-	private function linkTags(): void {
+	private function linkTags(bool $withDelete): void {
 		$model = $this->getModel();
-		if (!$model->isNewRecord) {
+		if ($withDelete) {
 			IssueTagLink::deleteAll(['issue_id' => $model->id]);
 		}
 
@@ -249,29 +298,42 @@ class IssueForm extends Model implements LinkedIssuesModel {
 	}
 
 	public static function getTypesNames(): array {
-		$parents = IssueType::getParents();
-		if (empty($parents)) {
-			return IssueType::getTypesNames();
-		}
+
+		$types = static::getTypesWithStages();
 		$names = [];
-		foreach ($parents as $parent) {
-			$names[$parent->name] = ArrayHelper::map($parent->childs, 'id', 'name');
+		foreach ($types as $type) {
+			if ($type->parent) {
+				$names[$type->parent->name][$type->id] = $type->name;
+			} else {
+				$names[$type->id] = $type->name;
+			}
+		}
+		foreach ($names as $key => $value) {
+			if (is_string($value) && isset($names[$value])) {
+				unset($names[$key]);
+			}
 		}
 		return $names;
 	}
 
 	public static function getTypesIds(): array {
-		$parents = IssueType::getParents();
-		if (empty($parents)) {
-			return array_keys(IssueType::getTypesNames());
-		}
-		$ids = [];
-		foreach ($parents as $parent) {
-			foreach ($parent->childs as $child) {
-				$ids[] = $child->id;
+		return array_keys(static::getTypesWithStages());
+	}
+
+	/**
+	 * @return IssueType[]
+	 */
+	protected static function getTypesWithStages(): array {
+		$types = [];
+		foreach (IssueType::getTypes() as $type) {
+			if (
+				!empty($type->stages)
+				|| ($type->parent !== null && !empty($type->parent->stages))
+			) {
+				$types[$type->id] = $type;
 			}
 		}
-		return $ids;
+		return $types;
 	}
 
 	public function getStagesData(): array {

@@ -17,10 +17,10 @@ use kartik\select2\Select2;
 
 $this->title = Yii::t('issue', 'Summon Docs - Confirmed');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/index']];
-if ($searchModel->getIssueParentType()) {
+if ($searchModel->getIssueMainType()) {
 	$this->params['breadcrumbs'][] = [
-		'label' => $searchModel->getIssueParentType()->name,
-		'url' => Url::issuesParentType($searchModel->getIssueParentType()->id),
+		'label' => $searchModel->getIssueMainType()->name,
+		'url' => Url::issuesParentType($searchModel->getIssueMainType()->id),
 	];
 }
 $this->params['breadcrumbs'][] = ['label' => Yii::t('issue', 'Summons'), 'url' => ['/summon/index']];
@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	]) ?>
 
 
-	<?= \frontend\widgets\GridView::widget([
+	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [

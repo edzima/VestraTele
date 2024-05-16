@@ -19,6 +19,7 @@ use common\models\user\User;
 use common\modules\file\models\AttachableModel;
 use common\modules\file\models\File;
 use common\modules\file\models\IssueFile;
+use common\modules\court\models\Lawsuit;
 use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -42,6 +43,8 @@ use yii\db\Expression;
  * @property string $stage_change_at
  * @property string|null $signature_act
  * @property string|null $stage_deadline_at
+ * @property string|null $entity_agreement_details
+ * @property string|null $entity_agreement_at
  * @property IssuePay[] $pays
  * @property EntityResponsible $entityResponsible
  * @property IssueStage $stage
@@ -96,12 +99,12 @@ class Issue extends ActiveRecord implements
 	 */
 	public function rules(): array {
 		return [
-			[['created_at', 'updated_at'], 'safe'],
+			[['created_at', 'updated_at', 'entity_agreement_at'], 'safe'],
 			[['stage_id', 'type_id', 'entity_responsible_id',], 'required',],
 			[['stage_id', 'type_id', 'entity_responsible_id'], 'integer'],
-			[['details', 'signature_act', 'archives_nr'], 'string'],
-			[['details', 'signature_act', 'archives_nr'], 'trim'],
-			[['details', 'signature_act', 'archives_nr'], 'default', 'value' => null],
+			[['details', 'signature_act', 'archives_nr', 'entity_agreement_details'], 'string'],
+			[['details', 'signature_act', 'archives_nr', 'entity_agreement_details'], 'trim'],
+			[['details', 'signature_act', 'archives_nr', 'entity_agreement_details', 'entity_agreement_at'], 'default', 'value' => null],
 			[['entity_responsible_id'], 'exist', 'skipOnError' => true, 'targetClass' => EntityResponsible::class, 'targetAttribute' => ['entity_responsible_id' => 'id']],
 			[['stage_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueStage::class, 'targetAttribute' => ['stage_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => IssueType::class, 'targetAttribute' => ['type_id' => 'id']],
@@ -124,6 +127,8 @@ class Issue extends ActiveRecord implements
 			'type' => Yii::t('common', 'Type'),
 			'entity_responsible_id' => Yii::t('common', 'Entity responsible'),
 			'entityResponsible' => Yii::t('common', 'Entity responsible'),
+			'entity_agreement_at' => Yii::t('issue', 'Entity Agreement At'),
+			'entity_agreement_details' => Yii::t('issue', 'Entity Agreement Details'),
 			'signing_at' => Yii::t('common', 'Signing at'),
 			'archives_nr' => Yii::t('common', 'Archives'),
 			'type_additional_date_at' => $this->type
@@ -203,6 +208,7 @@ class Issue extends ActiveRecord implements
 	}
 
 	public function getNewestNote(): IssueNoteQuery {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasOne(IssueNote::class, ['issue_id' => 'id'])
 			->orderBy('publish_at DESC');
 	}
@@ -261,6 +267,13 @@ class Issue extends ActiveRecord implements
 			return null;
 		}
 		return implode(', ', ArrayHelper::getColumn($this->tags, 'name'));
+	}
+
+	public function linkIssue(int $issueId): void {
+		$relation = new IssueRelation();
+		$relation->issue_id_1 = $this->id;
+		$relation->issue_id_2 = $issueId;
+		$this->link('issuesRelations', $relation);
 	}
 
 	public function linkUser(int $userId, string $type): void {
@@ -387,7 +400,7 @@ class Issue extends ActiveRecord implements
 		if ($days > 0) {
 			$date = new DateTime($this->stage_change_at);
 			$date->modify("+ $days days");
-			$this->stage_deadline_at = $date->format(DATE_ATOM);
+			$this->stage_deadline_at = $date->format('Y-m-d H:i:s');
 		} else {
 			$this->stage_deadline_at = null;
 		}
@@ -461,4 +474,13 @@ class Issue extends ActiveRecord implements
 		}
 		return $types;
 	}
+	public function getShipmentsPocztaPolska(): ActiveQuery {
+		return $this->hasMany(IssueShipmentPocztaPolska::class, ['issue_id' => 'id']);
+	}
+
+	public function getLawsuits(): ActiveQuery {
+		return $this->hasMany(Lawsuit::class, ['id' => 'lawsuit_id'])
+			->viaTable(Lawsuit::VIA_TABLE_ISSUE, ['issue_id' => 'id']);
+	}
+
 }

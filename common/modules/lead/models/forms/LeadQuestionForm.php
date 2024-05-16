@@ -17,6 +17,7 @@ class LeadQuestionForm extends Model {
 	public ?bool $show_in_grid = null;
 	public ?bool $is_required = null;
 
+	public ?string $order = null;
 	public $type_id;
 	public $status_id;
 
@@ -25,9 +26,10 @@ class LeadQuestionForm extends Model {
 	public function rules(): array {
 		return [
 			[['name'], 'required'],
+			[['order'], 'integer'],
 			[['show_in_grid', 'is_required', 'is_active', 'is_boolean'], 'boolean'],
 			[['name', 'placeholder'], 'string'],
-			['placeholder', 'default', 'value' => null],
+			[['placeholder', 'order'], 'default', 'value' => null],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 		];
@@ -47,6 +49,7 @@ class LeadQuestionForm extends Model {
 		$this->is_boolean = $model->is_boolean;
 		$this->type_id = $model->type_id;
 		$this->status_id = $model->status_id;
+		$this->order = $model->order;
 	}
 
 	public function getModel(): LeadQuestion {
@@ -77,6 +80,7 @@ class LeadQuestionForm extends Model {
 		$model->show_in_grid = $this->show_in_grid;
 		$model->type_id = $this->type_id;
 		$model->status_id = $this->status_id;
+		$model->order = $this->order;
 		return $model->save();
 	}
 

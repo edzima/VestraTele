@@ -27,6 +27,8 @@ class LeadForm extends Model implements LeadInterface {
 
 	public const SCENARIO_OWNER = 'owner';
 
+	public bool $onlyActiveSource = true;
+
 	public $campaign_id;
 	public $source_id;
 	public $status_id;
@@ -260,11 +262,11 @@ class LeadForm extends Model implements LeadInterface {
 			if (!is_int($this->owner_id)) {
 				throw new InvalidConfigException('Owner must be integer.');
 			}
-			$names = LeadSource::getNames($this->owner_id, true, $this->typeId, true);
+			$names = LeadSource::getNames($this->owner_id, true, $this->typeId, $this->onlyActiveSource);
 			$this->ensureCurrentSourceName($names);
 			return $names;
 		}
-		$names = LeadSource::getNames(null, true, $this->typeId, true);
+		$names = LeadSource::getNames(null, true, $this->typeId, $this->onlyActiveSource);
 		$this->ensureCurrentSourceName($names);
 		return $names;
 	}

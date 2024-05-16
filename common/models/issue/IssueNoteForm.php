@@ -215,6 +215,7 @@ class IssueNoteForm extends Model {
 		if ($this->getModel()->isForStageChange() && $this->stageChangeAtMerge) {
 			$issue = $this->getModel()->getIssueModel();
 			$issue->stage_change_at = $this->publish_at;
+			$issue->generateStageDeadlineAt();
 			$issue->save();
 		}
 	}

@@ -3,9 +3,9 @@
 use backend\helpers\Breadcrumbs;
 use backend\helpers\Html;
 use backend\modules\issue\models\IssueTagsLinkForm;
+use common\models\user\Worker;
 use common\widgets\ActiveForm;
 use kartik\select2\Select2;
-use common\models\user\Worker;
 
 /* @var $this yii\web\View */
 /* @var $model IssueTagsLinkForm */

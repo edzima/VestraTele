@@ -20,7 +20,9 @@ use yii\helpers\ArrayHelper;
  * @property int|null $market_status
  * @property int|null $market_status_same_contacts
  * @property string|null $calendar_background
- *
+ * @property string|null $statuses
+ * @property int|null $hours_deadline
+ * @property int|null $hours_deadline_warning
  * @property-read Lead[] $leads
  * @property-read string $marketStatusName
  */
@@ -53,12 +55,25 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 	public function rules(): array {
 		return [
 			[['name'], 'required'],
-			[['sort_index', 'market_status'], 'integer'],
+			[['sort_index', 'market_status', 'hours_deadline', 'hours_deadline_warning'], 'integer'],
+			[['hours_deadline', 'hours_deadline_warning'], 'integer', 'min' => 0],
 			[['short_report', 'show_report_in_lead_index', 'not_for_dialer', 'market_status_same_contacts'], 'boolean'],
-			[['name', 'description'], 'string', 'max' => 255],
-			[['calendar_background'], 'string'],
+			[['name', 'description', 'statuses', 'calendar_background'], 'string', 'max' => 255],
+			[['calendar_background', 'hours_deadline', 'hours_deadline_warning', 'statuses'], 'default', 'value' => null],
 			[['market_status'], 'in', 'range' => array_keys(static::getMarketStatusesNames())],
+			['statusesIds', 'in', 'range' => array_keys(static::getNames()), 'allowArray' => true],
 		];
+	}
+
+	public function getStatusesNames(): array {
+		$names = [];
+		foreach ($this->getStatusesIds() as $id) {
+			$name = static::getNames()[$id] ?: null;
+			if ($name) {
+				$names[$id] = $name;
+			}
+		}
+		return $names;
 	}
 
 	/**
@@ -77,7 +92,28 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			'marketStatusName' => Yii::t('lead', 'Market Status'),
 			'market_status_same_contacts' => Yii::t('lead', 'Market Status same Contacts'),
 			'calendar_background' => Yii::t('lead', 'Calendar Background'),
+			'hours_deadline' => Yii::t('lead', 'Hours deadline'),
+			'hours_deadline_warning' => Yii::t('lead', 'Hours deadline warning'),
+			'statuses' => Yii::t('lead', 'Statuses'),
 		];
+	}
+
+	public function getStatusesIds(): array {
+		if (empty($this->statuses)) {
+			return [];
+		}
+		return explode('|', $this->statuses);
+	}
+
+	public function setStatusesIds($ids): void {
+		if (empty($ids)) {
+			$this->statuses = null;
+		} else {
+			if (is_string($ids)) {
+				$ids = [$ids];
+			}
+			$this->statuses = implode('|', $ids);
+		}
 	}
 
 	/**

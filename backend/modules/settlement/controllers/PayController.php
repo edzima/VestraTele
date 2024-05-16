@@ -12,6 +12,7 @@ use common\models\issue\query\IssuePayQuery;
 use common\models\settlement\PayPayedForm;
 use common\models\settlement\search\DelayedIssuePaySearch;
 use common\models\user\User;
+use common\models\user\Worker;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
@@ -158,6 +159,7 @@ class PayController extends Controller {
 		}
 		$model = new PayPayedForm($this->findModel($id));
 		$model->date = date('Y-m-d');
+		$model->getMessagesModel()->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_MESSAGE_EMAIL_ISSUE_PAY_PAID]));
 		if ($model->load(Yii::$app->request->post()) && $model->pay()) {
 			$generated = $model->getGeneratedPay();
 			if ($generated !== null) {

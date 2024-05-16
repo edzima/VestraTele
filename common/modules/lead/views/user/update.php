@@ -6,13 +6,12 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model LeadUser */
 
-$this->title = Yii::t('lead', 'Update Lead User: {name}', [
-	'name' => $model->lead_id,
+$this->title = Yii::t('lead', 'Update Lead User: {lead}', [
+	'lead' => $model->lead->getName(),
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['/lead/lead/index']];
-$this->params['breadcrumbs'][] = ['label' => $model->lead_id, 'url' => ['lead/view', 'id' => $model->lead_id]];
+$this->params['breadcrumbs'][] = ['label' => $model->lead->getName(), 'url' => ['lead/view', 'id' => $model->lead_id]];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Lead Users'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->lead_id, 'url' => ['view', 'lead_id' => $model->lead_id, 'user_id' => $model->user_id, 'type' => $model->type]];
 $this->params['breadcrumbs'][] = Yii::t('lead', 'Update');
 ?>
 <div class="lead-user-update">

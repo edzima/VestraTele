@@ -10,7 +10,7 @@ use yii\web\UploadedFile;
 class ImportController extends BaseController {
 
 	public function init() {
-		@set_time_limit(300) or Yii::warning('Not set time limit');
+		@set_time_limit(600) or Yii::warning('Not set time limit');
 		parent::init();
 	}
 
@@ -20,15 +20,29 @@ class ImportController extends BaseController {
 			$model->csvFile = UploadedFile::getInstance($model, 'csvFile');
 		}
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-			$imported = $model->import(false);
-			if ($imported) {
-				Flash::add(Flash::TYPE_SUCCESS,
-					Yii::t('lead', 'Success Import: {count} from CSV.', [
-						'count' => $imported,
-					]));
+			$rowsCount = $model->getRowsCount();
+			if ($rowsCount > $model->pushLimit) {
+				if ($model->push()) {
+					Flash::add(Flash::TYPE_SUCCESS,
+						Yii::t('common', 'Add import task to queue. Rows count: {count}.', [
+								'count' => $rowsCount,
+							]
+						)
+					);
+				}
 			} else {
-				Flash::add(Flash::TYPE_ERROR,
-					Yii::t('lead', 'Problem with Import Leads from CSV.'));
+				$imported = $model->import(false);
+				if ($imported) {
+					Flash::add(Flash::TYPE_SUCCESS,
+						Yii::t('lead', 'Success Import: {count} from CSV.', [
+							'count' => $imported,
+						])
+					);
+				} else {
+					Flash::add(Flash::TYPE_ERROR,
+						Yii::t('lead', 'Problem with Import Leads from CSV.')
+					);
+				}
 			}
 
 			return $this->redirect(['lead/index']);

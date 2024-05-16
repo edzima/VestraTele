@@ -13,6 +13,7 @@ use common\modules\lead\models\forms\CzaterLeadForm;
 use common\modules\lead\models\forms\LandingLeadForm;
 use common\modules\lead\models\forms\LeadPushEmail;
 use common\modules\lead\models\forms\MessageZapierLeadForm;
+use common\modules\lead\models\forms\WordpressFormLead;
 use common\modules\lead\models\forms\ZapierLeadForm;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadInterface;
@@ -24,6 +25,7 @@ use SoapFault;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\rest\Controller;
+use yii\web\Response;
 
 class ApiLeadController extends Controller {
 
@@ -34,8 +36,9 @@ class ApiLeadController extends Controller {
 		return [
 			'customer' => ['POST'],
 			'landing' => ['POST'],
-			'zapier' => ['POST'],
 			'message-zapier' => ['POST'],
+			'zapier' => ['POST'],
+			'wordpress' => ['POST'],
 		];
 	}
 
@@ -107,6 +110,39 @@ class ApiLeadController extends Controller {
 				'errors' => $model->getErrors(),
 			];
 		}
+		return [
+			'status' => 'warning',
+			'message' => 'Not Send Data',
+		];
+	}
+
+	public function actionWordpress() {
+		Yii::$app->response->format = Response::FORMAT_JSON;
+		$model = new WordpressFormLead();
+		$model->date_at = date($model->dateFormat);
+
+		if ($model->load(Yii::$app->request->post())) {
+			if ($model->validate() && $this->pushLead($model)) {
+				return [
+					'status' => 'success',
+				];
+			}
+			Yii::warning([
+				'message' => 'Wordpress lead with validate errors.',
+				'post' => Yii::$app->request->post(),
+				'error' => $model->getErrors(),
+			], 'lead.wordpress.error');
+
+			return [
+				'status' => 'error',
+				'errors' => $model->getErrors(),
+			];
+		}
+		Yii::warning([
+			'message' => 'Wordpress Lead not Loaded Data',
+			'post' => Yii::$app->request->post(),
+			'error' => $model->getErrors(),
+		], 'lead.wordpress.error');
 		return [
 			'status' => 'warning',
 			'message' => 'Not Send Data',

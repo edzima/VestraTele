@@ -25,6 +25,7 @@ use yii\db\ActiveRecord;
  * @property string $tax_office
  * @property string $pesel
  * @property bool $email_hidden_in_frontend_issue
+ * @property integer|null $favorite_issue_type_id
  */
 class UserProfile extends ActiveRecord {
 

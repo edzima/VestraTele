@@ -16,9 +16,9 @@ class IssueTypeSearch extends IssueType {
 	 */
 	public function rules(): array {
 		return [
-			[['parent_id'], 'integer'],
-			[['with_additional_date', 'default_show_linked_notes'], 'boolean'],
-			[['with_additional_date', 'default_show_linked_notes'], 'default', 'value' => null],
+			[['parent_id', 'lead_source_id'], 'integer'],
+			[['with_additional_date', 'default_show_linked_notes', 'is_main'], 'boolean'],
+			[['with_additional_date', 'default_show_linked_notes', 'is_main'], 'default', 'value' => null],
 			[['name', 'short_name'], 'safe'],
 		];
 	}
@@ -60,6 +60,8 @@ class IssueTypeSearch extends IssueType {
 			'with_additional_date' => $this->with_additional_date,
 			'default_show_linked_notes' => $this->default_show_linked_notes,
 			'parent_id' => $this->parent_id,
+			'lead_source_id' => $this->lead_source_id,
+			'is_main' => $this->is_main,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])

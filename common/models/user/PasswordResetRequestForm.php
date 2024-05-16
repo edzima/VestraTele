@@ -1,8 +1,7 @@
 <?php
 
-namespace frontend\models;
+namespace common\models\user;
 
-use common\models\user\User;
 use Yii;
 use yii\base\Model;
 
@@ -11,12 +10,20 @@ use yii\base\Model;
  */
 class PasswordResetRequestForm extends Model {
 
+	protected const USER_STATUSES = [
+		User::STATUS_ACTIVE,
+	];
+
+	public static function forUser(User $model): bool {
+		return !empty($model->email) && in_array($model->status, static::USER_STATUSES, true);
+	}
+
 	public $email;
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function rules() {
+	public function rules(): array {
 		return [
 			['email', 'trim'],
 			['email', 'required'],
@@ -24,7 +31,7 @@ class PasswordResetRequestForm extends Model {
 			[
 				'email', 'exist',
 				'targetClass' => User::class,
-				'filter' => ['status' => User::STATUS_ACTIVE],
+				'filter' => ['status' => static::USER_STATUSES],
 				'message' => 'There is no user with this email address.',
 			],
 		];
@@ -38,7 +45,7 @@ class PasswordResetRequestForm extends Model {
 	public function sendEmail(): bool {
 		/* @var $user User */
 		$user = User::findOne([
-			'status' => User::STATUS_ACTIVE,
+			'status' => static::USER_STATUSES,
 			'email' => $this->email,
 		]);
 

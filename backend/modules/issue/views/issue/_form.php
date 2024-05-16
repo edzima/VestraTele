@@ -7,6 +7,7 @@ use common\widgets\DateTimeWidget;
 use common\widgets\DateWidget;
 use kartik\depdrop\DepDrop;
 use kartik\select2\Select2;
+use vova07\imperavi\Widget;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -72,6 +73,10 @@ use yii\widgets\ActiveForm;
 				])
 			?>
 
+			<?= $form->field($model, 'signing_at', ['options' => ['class' => 'col-md-2']])
+				->widget(DateWidget::class) ?>
+
+
 			<?= !empty($model->stage_change_at)
 				? $form->field($model, 'stage_change_at', [
 					'options' => [
@@ -96,7 +101,6 @@ use yii\widgets\ActiveForm;
 
 		<div class="row">
 
-
 			<?= $form->field($model, 'entity_responsible_id', ['options' => ['class' => 'col-md-3']])
 				->widget(Select2::class, [
 						'data' => IssueForm::getEntityResponsibles(),
@@ -106,11 +110,26 @@ use yii\widgets\ActiveForm;
 					]
 				) ?>
 
-			<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-2']])
-				->textInput() ?>
 
-			<?= $form->field($model, 'signing_at', ['options' => ['class' => 'col-md-2']])
+
+			<?= $form->field($model, 'entity_agreement_at', ['options' => ['class' => 'col-md-2']])
 				->widget(DateWidget::class) ?>
+
+
+
+			<?= $form->field($model, 'entity_agreement_details', ['options' => ['class' => 'col-md-2']])
+				->textarea([
+					'row' => 2,
+				])
+			?>
+
+
+			<?= $form->field($model, 'signature_act', ['options' => ['class' => 'col-md-2']])
+				->textarea([
+					'row' => 2,
+				])
+			?>
+
 
 			<?= $form->field($model, 'type_additional_date_at', [
 				'options' => [
@@ -121,6 +140,11 @@ use yii\widgets\ActiveForm;
 				],
 			])
 				->widget(DateWidget::class) ?>
+
+		</div>
+
+		<div class="row">
+
 
 		</div>
 
@@ -142,7 +166,7 @@ use yii\widgets\ActiveForm;
 
 
 			<?= $form->field($model, 'details', ['options' => ['class' => 'col-md-5']])
-				->textarea(['rows' => 5, 'maxlength' => true]) ?>
+				->widget(Widget::class) ?>
 
 			<?= !empty($model->getLinkedIssuesNames())
 				? $form->field($model, 'linkedIssuesIds', [
@@ -282,8 +306,7 @@ stageInput.onchange = function(){
 };
 
 function linkedAttributesFieldVisibility(){
-	let value = parseInt(this.value);
-	if(value){
+	if(linkedIssuesIdsInput.value.length){
 		linkedAttributesField.classList.remove('hidden');
 	}else{
 		linkedAttributesField.classList.add('hidden');

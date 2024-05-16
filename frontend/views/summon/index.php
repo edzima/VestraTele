@@ -13,10 +13,10 @@ use yii\bootstrap\Nav;
 
 $this->title = Yii::t('common', 'Summons');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Issues'), 'url' => ['/issue/index']];
-if ($searchModel->getIssueParentType()) {
+if ($searchModel->getIssueMainType()) {
 	$this->params['breadcrumbs'][] = [
-		'label' => $searchModel->getIssueParentType()->name,
-		'url' => Url::issuesParentType($searchModel->getIssueParentType()->id),
+		'label' => $searchModel->getIssueMainType()->name,
+		'url' => Url::issuesParentType($searchModel->getIssueMainType()->id),
 	];
 }
 

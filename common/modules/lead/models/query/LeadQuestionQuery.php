@@ -54,6 +54,11 @@ class LeadQuestionQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function boolean(bool $boolean): self {
+		$this->andWhere(['is_boolean' => $boolean]);
+		return $this;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * @return LeadQuestion|null
@@ -64,9 +69,10 @@ class LeadQuestionQuery extends ActiveQuery {
 
 	/**
 	 * {@inheritDoc}
-	 * @return LeadQuestion[]
+	 * @return LeadQuestion[]|array
 	 */
 	public function all($db = null) {
 		return parent::all($db);
 	}
+
 }

@@ -33,7 +33,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	SearchModel {
 
 	public const SCENARIO_ARCHIVE = 'archive';
-
+	public const SCENARIO_OWNER = 'owner';
 
 	public $agent_id;
 	public string $customerLastname = '';
@@ -61,6 +61,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public function rules(): array {
 		return [
 			[['issue_id', 'stage_id', 'problem_status', 'owner_id'], 'integer'],
+			[['!owner_id'], 'required', 'on' => static::SCENARIO_OWNER],
 			['type', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
 			['issue_type_id', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			['issue_stage_id', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true, 'when' => function (): bool { return $this->withIssueStage; }],
@@ -157,7 +158,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 		]);
 
-		$query->andFilterWhere(['like', 'owner_id', $this->owner_id]);
+		$query->andFilterWhere([IssuePayCalculation::tableName() . '.owner_id' => $this->owner_id]);
 
 		return $dataProvider;
 	}

@@ -12,6 +12,7 @@ use yii\base\Model;
 class LeadsUserForm extends Model {
 
 	public const SCENARIO_SINGLE = 'single';
+	public const SCENARIO_NOT_REQUIRED = 'not-required';
 
 	public array $leadsIds = [];
 
@@ -40,7 +41,7 @@ class LeadsUserForm extends Model {
 
 	public function rules(): array {
 		return [
-			[['userId', 'type', 'leadsIds'], 'required'],
+			[['userId', 'type', 'leadsIds'], 'required', 'except' => static::SCENARIO_NOT_REQUIRED],
 			['!leadsIds', 'required', 'on' => static::SCENARIO_SINGLE],
 			['userId', 'integer'],
 			['type', 'string'],
@@ -53,6 +54,10 @@ class LeadsUserForm extends Model {
 		];
 	}
 
+	public function load($data, $formName = null) {
+		$Load = parent::load($data, $formName);
+		return $Load;
+	}
 	public function attributeLabels(): array {
 		return [
 			'userId' => Yii::t('lead', 'User'),
@@ -131,6 +136,14 @@ class LeadsUserForm extends Model {
 		}
 		$user->user_id = $userId;
 		return $user->save();
+	}
+
+	public function getUserName(): ?string {
+		return static::getUsersNames()[$this->userId] ?? null;
+	}
+
+	public function getTypeName(): ?string {
+		return static::getTypesNames()[$this->type] ?? null;
 	}
 
 }

@@ -10,6 +10,7 @@ use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePayCalculation;
+use common\models\message\IssueCostMessagesForm;
 use common\models\user\User;
 use Yii;
 use yii\filters\VerbFilter;
@@ -189,7 +190,8 @@ class CostController extends Controller {
 	 * @throws NotFoundHttpException
 	 */
 	public function actionCreateDebt(int $issue_id) {
-		$model = new DebtCostsForm($this->findIssue($issue_id));
+		$model = new DebtCostsForm();
+		$model->setIssue($this->findIssue($issue_id));
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['issue', 'id' => $issue_id]);
 		}
@@ -261,24 +263,55 @@ class CostController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException
 	 */
-	public function actionCreate(int $id) {
-		$issue = $this->findIssue($id);
-		$model = new IssueCostForm($issue);
+	public function actionCreate(int $id = null, bool $usersFromIssue = true) {
+		$model = new IssueCostForm();
+		$message = null;
+		if ($id) {
+			$issue = $this->findIssue($id);
+			$model->setIssue($issue);
+			$message = new IssueCostMessagesForm();
+			$message->setIssue($issue);
+			$message->sendEmailToCustomer = false;
+			$message->sendSmsToCustomer = false;
+			$message->workersTypes = [];
+			$message->sms_owner_id = Yii::$app->user->getId();
+			$message->addExtraWorkersEmailsIds(User::getAssignmentIds([User::PERMISSION_ISSUE]), false);
+		} else {
+			$model->setScenario(IssueCostForm::SCENARIO_WITHOUT_ISSUE);
+		}
+
+		$model->usersFromIssue = $usersFromIssue;
 		$model->date_at = date(DATE_ATOM);
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->getModel()->id]);
+
+		if ($model->load(Yii::$app->request->post())
+			&& ($message === null || $message->load(Yii::$app->request->post()))
+		) {
+			if ($model->validate() && ($message === null || $message->validate())) {
+				if ($model->save() && $message !== null) {
+					$message->setCost($model->getModel());
+					$message->pushMessages();
+				}
+				return $this->redirect(['view', 'id' => $model->getModel()->id]);
+			}
+			Yii::warning([
+				'model' => $model->getErrors(),
+				'message' => $message->getErrors(),
+			]);
 		}
 
 		return $this->render('create', [
 			'model' => $model,
+			'message' => $message,
 		]);
 	}
 
-	public function actionCreateInstallment(int $id, int $user_id = null) {
+	public function actionCreateInstallment(int $id, int $user_id = null, bool $usersFromIssue = true) {
 		$issue = $this->findIssue($id);
-		$model = new IssueCostForm($issue);
+		$model = new IssueCostForm();
+		$model->setIssue($issue);
 		$model->setScenario(IssueCostForm::SCENARIO_CREATE_INSTALLMENT);
 		$model->user_id = $user_id;
+		$model->usersFromIssue = $usersFromIssue;
 		$model->type = IssueCost::TYPE_INSTALLMENT;
 		$model->date_at = date(DATE_ATOM);
 		$model->vat = 0;

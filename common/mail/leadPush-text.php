@@ -8,7 +8,11 @@ use frontend\helpers\Url as FrontendUrl;
 
 $leadLink = FrontendUrl::leadView($lead->getId(), true);
 $reportLink = FrontendUrl::toRoute(
-	['/lead/report/report', 'id' => $lead->getId()],
+	[
+		'/lead/report/report',
+		'id' => $lead->getId(),
+		'hash' => $lead->getHash(),
+	],
 	true
 );
 ?>

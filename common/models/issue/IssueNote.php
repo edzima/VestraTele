@@ -167,7 +167,10 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 	}
 
 	public function getTypeKind(): ?string {
-		return StringHelper::explode($this->type, ':')[0] ?? null;
+		if (!empty($this->type)) {
+			return StringHelper::explode($this->type, ':')[0] ?? null;
+		}
+		return null;
 	}
 
 	public function getTypeKindName(): ?string {

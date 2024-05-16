@@ -3,7 +3,6 @@
 namespace backend\modules\issue\models;
 
 use common\helpers\ArrayHelper;
-use common\models\issue\Issue;
 use common\models\issue\IssueTag;
 use common\models\issue\IssueTagType;
 use Yii;

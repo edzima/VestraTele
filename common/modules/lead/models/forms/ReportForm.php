@@ -3,6 +3,7 @@
 namespace common\modules\lead\models\forms;
 
 use common\models\Address;
+use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadAddress;
 use common\modules\lead\models\LeadAnswer;
@@ -10,6 +11,7 @@ use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadUser;
+use common\modules\lead\Module;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -28,12 +30,14 @@ class ReportForm extends Model {
 	public ?string $details = null;
 	public int $owner_id;
 	public bool $withSameContacts = false;
+	public bool $is_pinned = false;
 
 	public $closedQuestions = [];
 
 	public int $addressType = LeadAddress::TYPE_CUSTOMER;
 	public bool $withAddress = false;
 	public ?Address $address = null;
+	public bool $withLinkUsers = true;
 
 	private ?ActiveLead $lead = null;
 	private ?LeadReport $model = null;
@@ -44,6 +48,11 @@ class ReportForm extends Model {
 
 	public bool $withAnswers = true;
 	public int $lead_type_id;
+
+	public $tele_id;
+	public $partner_id;
+
+	public $linkUserTypeForLeadNotForReportOwner = LeadUser::TYPE_TELE;
 
 	public function setOpenAnswers(array $questionsAnswers): void {
 		$models = $this->getAnswersModels();
@@ -63,6 +72,9 @@ class ReportForm extends Model {
 			'withSameContacts' => Yii::t('lead', 'With Same Contacts'),
 			'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 			'leadName' => Yii::t('lead', 'Lead Name'),
+			'is_pinned' => Yii::t('lead', 'Is pinned'),
+			'tele_id' => LeadUser::getTypesNames()[LeadUser::TYPE_TELE],
+			'partner_id' => LeadUser::getTypesNames()[LeadUser::TYPE_PARTNER],
 		];
 	}
 
@@ -76,7 +88,7 @@ class ReportForm extends Model {
 			],
 			[['details', 'leadName'], 'string'],
 			[['details', 'leadName'], 'trim'],
-			[['withAddress', 'withSameContacts'], 'boolean'],
+			[['withAddress', 'withSameContacts', 'is_pinned'], 'boolean'],
 			[
 				'details', 'required',
 				'when' => function () {
@@ -85,10 +97,24 @@ class ReportForm extends Model {
 				'enableClientValidation' => false,
 				'message' => Yii::t('lead', 'Details cannot be blank when answers is empty.'),
 			],
+			[['partner_id', 'tele_id'], 'default', 'value' => null],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 			['closedQuestions', 'in', 'range' => array_keys($this->getClosedQuestionsData()), 'allowArray' => true],
-
+			[
+				'partner_id', 'in', 'range' => array_keys($this->getUsersNames()), 'when' => function (): bool {
+				return $this->withLinkUsers;
+			},
+			],
+			[
+				'tele_id', 'in', 'range' => array_keys($this->getTeleUsersNames()), 'when' => function (): bool {
+				return $this->withLinkUsers;
+			},
+			],
 		];
+	}
+
+	public function getUsersNames(): array {
+		return Module::userNames();
 	}
 
 	protected function detailsIsRequired(): bool {
@@ -181,6 +207,7 @@ class ReportForm extends Model {
 
 			$query = LeadQuestion::find()
 				->indexBy('id')
+				->andWhere(['is_active' => true])
 				->forStatus($this->status_id)
 				->forType($this->lead_type_id);
 			if ($this->getModel()->isNewRecord && $this->lead !== null) {
@@ -192,6 +219,7 @@ class ReportForm extends Model {
 				$query->andFilterWhere(['not', ['id' => $answeredQuestionsIds]]);
 			}
 			$this->questions = $query->all();
+			LeadQuestion::sortByOrder($this->questions);
 		}
 		return $this->questions;
 	}
@@ -199,7 +227,10 @@ class ReportForm extends Model {
 	public function save(bool $validate = true): bool {
 		if ($validate && !$this->validate()) {
 			if ($this->getErrors()) {
-				Yii::warning($this->getErrors(), __METHOD__ . '.validateModel');
+				Yii::warning([
+					'errors' => $this->getErrors(),
+					'attributes' => $this->getAttributes(),
+				], __METHOD__ . '.validateModel');
 			}
 			foreach ($this->getAnswersModels() as $model) {
 				if ($model->hasErrors()) {
@@ -217,6 +248,7 @@ class ReportForm extends Model {
 		$model->status_id = $this->status_id;
 		$model->owner_id = $this->owner_id;
 		$model->lead_id = $this->lead->getId();
+		$model->is_pinned = $this->is_pinned;
 		$isNewRecord = $model->isNewRecord;
 		if (!$model->save()) {
 			Yii::warning($model->getErrors(), __METHOD__ . '.save');
@@ -272,11 +304,19 @@ class ReportForm extends Model {
 	}
 
 	protected function linkUser(): void {
-		if (!$this->lead->isForUser($this->owner_id)) {
-			$type = array_key_exists(LeadUser::TYPE_OWNER, $this->lead->getUsers())
-				? LeadUser::TYPE_TELE
-				: LeadUser::TYPE_OWNER;
-			$this->lead->linkUser($type, $this->owner_id);
+		if ($this->withLinkUsers) {
+			if ($this->linkUserTypeForLeadNotForReportOwner && !$this->lead->isForUser($this->owner_id)) {
+				$type = array_key_exists(LeadUser::TYPE_OWNER, $this->lead->getUsers())
+					? $this->linkUserTypeForLeadNotForReportOwner
+					: LeadUser::TYPE_OWNER;
+				$this->lead->linkUser($type, $this->owner_id);
+			}
+			if (!empty($this->tele_id) && !isset($this->lead->getUsers()[LeadUser::TYPE_TELE])) {
+				$this->lead->linkUser(LeadUser::TYPE_TELE, $this->tele_id);
+			}
+			if (!empty($this->partner_id) && !isset($this->lead->getUsers()[LeadUser::TYPE_PARTNER])) {
+				$this->lead->linkUser(LeadUser::TYPE_TELE, $this->partner_id);
+			}
 		}
 	}
 
@@ -345,6 +385,8 @@ class ReportForm extends Model {
 				$this->address = $lead->addresses[$this->addressType]->address ?? null;
 				$this->withAddress = true;
 			}
+			$this->tele_id = $lead->getUsers()[LeadUser::TYPE_TELE] ?? null;
+			$this->partner_id = $lead->getUsers()[LeadUser::TYPE_PARTNER] ?? null;
 		}
 	}
 
@@ -365,11 +407,18 @@ class ReportForm extends Model {
 		$this->status_id = $model->status_id;
 		$this->owner_id = $model->owner_id;
 		$this->details = $model->details;
+		$this->is_pinned = $model->is_pinned;
 		$this->setAnswers($model->answers);
 	}
 
 	public function setAnswers(array $answers): void {
 		$this->setClosedAnswers($answers);
+	}
+
+	public function getTeleUsersNames(): array {
+		return User::getSelectList(
+			LeadUser::userIds(LeadUser::TYPE_TELE)
+		);
 	}
 
 	protected function setClosedAnswers(array $answers): void {

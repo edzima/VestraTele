@@ -24,9 +24,9 @@ $this->params['issueParentTypeNav'] = [
 	'route' => ['/calendar/summon-calendar/index', 'userId' => $user_id],
 ];
 
-if ($searchModel->getIssueParentType()) {
+if ($searchModel->getIssueMainType()) {
 	$this->params['breadcrumbs'][] = [
-		'label' => $searchModel->getIssueParentType()->name,
+		'label' => $searchModel->getIssueMainType()->name,
 	];
 }
 
@@ -62,11 +62,11 @@ $httpParams = [
 		'value' => $user_id,
 	],
 ];
-if ($searchModel->getIssueParentType()) {
+if ($searchModel->getIssueMainType()) {
 	$httpParams[] =
 		[
 			'name' => Url::PARAM_ISSUE_PARENT_TYPE,
-			'value' => $searchModel->getIssueParentType()->id,
+			'value' => $searchModel->getIssueMainType()->id,
 		];
 }
 $props = [

@@ -3,6 +3,7 @@
 use backend\helpers\Html;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\widgets\CsvForm;
+use common\behaviors\IssueTypeParentIdAction;
 use common\models\user\Worker;
 use common\widgets\grid\SelectionForm;
 use yii\data\ActiveDataProvider;
@@ -13,15 +14,16 @@ use yii\widgets\Pjax;
 /* @var $dataProvider ActiveDataProvider */
 
 $this->title = Yii::t('backend', 'Issues');
-$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
 
-if ($searchModel->getIssueParentType()) {
-	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueParentType()->name];
+if (!$searchModel->getIssueMainType()) {
+	$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
+} else {
+	$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => IssueTypeParentIdAction::urlAll()];
+	$this->params['breadcrumbs'][] = ['label' => $searchModel->getIssueMainType()->name];
 }
 $this->params['issueParentTypeNav'] = [
 	'route' => ['/issue/issue/index'],
 ];
-
 ?>
 <div class="issue-index">
 
@@ -55,7 +57,7 @@ $this->params['issueParentTypeNav'] = [
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE)
 			? Html::a('<i class="fa fa-calendar"></i>' . ' ' . Yii::t('issue', 'Stages Deadlines'),
-				['/calendar/issue-stage-deadline/index', 'parentTypeId' => $searchModel->getIssueParentType()->id ?? null,],
+				['/calendar/issue-stage-deadline/index', 'parentTypeId' => $searchModel->getIssueMainType()->id ?? null,],
 				[
 					'class' => 'btn btn-warning',
 					'data-pjax' => 0,
@@ -85,12 +87,24 @@ $this->params['issueParentTypeNav'] = [
 			: ''
 		?>
 
+
+		<span class="pull-right">
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_EXPORT)
 			? CsvForm::widget([
-				'formOptions' => ['class' => 'pull-right'],
+				'formOptions' => ['class' => 'd-inline'],
 			])
 			: ''
 		?>
+
+		<?= Html::button(Html::icon('search'), [
+			'data-toggle' => 'collapse',
+			'data-target' => '#issue-search',
+			'class' => 'btn btn-info',
+		]) ?>
+
+		</span>
+
 
 	</div>
 
@@ -138,6 +152,42 @@ $this->params['issueParentTypeNav'] = [
 						'class' => 'btn btn-success',
 						'name' => 'route',
 						'value' => 'sms/push-multiple',
+						'data-pjax' => '0',
+					])
+				: ''
+			?>
+
+
+			<?= Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)
+			&& !empty($dataProvider->getModels())
+			&& $dataProvider->pagination->pageCount > 1
+				? Html::a(
+					Yii::t('issue', 'Update Type: {count}', [
+						'count' => count($searchModel->getAllIds($dataProvider->query)),
+					]), [
+					'type/update-multiple',
+				],
+					[
+						'data' => [
+							'pjax' => '0',
+							'method' => 'POST',
+							'params' => [
+								'ids' => $searchModel->getAllIds($dataProvider->query),
+							],
+						],
+						'class' => 'btn btn-info',
+					]
+				)
+				: ''
+			?>
+
+			<?= Yii::$app->user->can(Worker::ROLE_ADMINISTRATOR)
+				? Html::submitButton(
+					Yii::t('issue', 'Update Type'),
+					[
+						'class' => 'btn btn-info',
+						'name' => 'route',
+						'value' => 'type/update-multiple',
 						'data-pjax' => '0',
 					])
 				: ''

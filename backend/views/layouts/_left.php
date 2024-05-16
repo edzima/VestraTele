@@ -2,7 +2,6 @@
 
 use backend\widgets\Menu;
 use common\helpers\Html;
-use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
 use common\models\user\Worker;
 use yii\web\View;
@@ -41,6 +40,12 @@ $user = Yii::$app->user;
 					'url' => ['/potential-client/index'],
 					'icon' => '<i class="fa fa-user-secret"></i>',
 					'visible' => $user->can(Worker::PERMISSION_POTENTIAL_CLIENT),
+				],
+				[
+					'label' => Yii::t('credit', 'Analyze SKD'),
+					'url' => ['/credit/analyze/calc'],
+					'icon' => '<i class="fa fa-credit-card"></i>',
+					'visible' => $user->can(Worker::PERMISSION_CREDIT_ANALYZE),
 				],
 				[
 					'label' => Yii::t('common', 'Leads'),
@@ -181,19 +186,25 @@ $user = Yii::$app->user;
 						[
 							'label' => Yii::t('common', 'Browse'),
 							'url' => ['/issue/issue/index'],
-							'options' => empty(Html::issueParentTypeItems())
+							'options' => empty(Html::issueMainTypesItems())
 								? []
 								: [
 									'class' => 'treeview',
 								],
 							'icon' => '<i class="fa fa-eye"></i>',
-							'items' => Html::issueParentTypeItems(),
+							'items' => Html::issueMainTypesItems(),
 						],
 						[
 							'label' => Yii::t('issue', 'Archive'),
 							'url' => ['/issue/archive/index'],
 							'icon' => '<i class="fa fa-archive"></i>',
 							'visible' => $user->can(Worker::PERMISSION_ARCHIVE),
+						],
+						[
+							'label' => Yii::t('issue', 'Issue Shipment Poczta Polska'),
+							'url' => ['/issue/shipment-poczta-polska/index'],
+							'icon' => '<i class="fa fa-envelope-open-o" aria-hidden="true"></i>',
+							'visible' => $user->can(Worker::PERMISSION_ISSUE_SHIPMENT),
 						],
 						[
 							'label' => Yii::t('common', 'Issues users'),
@@ -241,6 +252,54 @@ $user = Yii::$app->user;
 							'label' => Yii::t('common', 'Leads'),
 							'url' => ['/issue/issue/lead'],
 							'icon' => '<i class="fa fa-vcard"></i>',
+						],
+					],
+				],
+				[
+					'label' => Yii::t('court', 'Lawsuits'),
+					'url' => '#',
+					'icon' => '<i class="fa fa-legal"></i>',
+					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(Worker::PERMISSION_LAWSUIT),
+					'items' => [
+						[
+							'label' => Yii::t('common', 'Browse'),
+							'url' => ['/court/lawsuit/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('court', 'Calendar'),
+							'url' => ['/calendar/lawsuit/index'],
+							'icon' => '<i class="fa fa-calendar"></i>',
+						],
+						[
+							'label' => Yii::t('court', 'Courts'),
+							'url' => ['/court/court/index'],
+							'icon' => '<i class="fa fa-sitemap"></i>',
+						],
+					],
+				],
+				[
+					'label' => Yii::t('file', 'Files'),
+					'url' => ['/file/file/index'],
+					'icon' => '<i class="fa fa-paperclip"></i>',
+					'options' => ['class' => 'treeview'],
+					'visible' => $user->can(User::PERMISSION_ISSUE),
+					'items' => [
+						[
+							'label' => Yii::t('file', 'Browse'),
+							'url' => ['/file/file/index'],
+							'icon' => '<i class="fa fa-eye"></i>',
+						],
+						[
+							'label' => Yii::t('file', 'Types'),
+							'url' => ['/file/file-type/index'],
+							'icon' => '<i class="fa fa-sitemap"></i>',
+						],
+						[
+							'label' => Yii::t('file', 'Access'),
+							'url' => ['/file/file-access/index'],
+							'icon' => '<i class="fa fa-users"></i>',
 						],
 					],
 				],
@@ -300,7 +359,7 @@ $user = Yii::$app->user;
 							'label' => Yii::t('backend', 'Browse'),
 							'url' => ['/settlement/calculation/index'],
 							'icon' => '<i class="fa fa-money"></i>',
-							'visible' => $user->can(User::ROLE_BOOKKEEPER),
+							'visible' => $user->can(User::ROLE_BOOKKEEPER) || $user->can(Worker::PERMISSION_CALCULATION_TO_CREATE),
 						],
 						[
 							'label' => Yii::t('settlement', 'Without provisions'),

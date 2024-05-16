@@ -9,6 +9,7 @@ use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
 use common\modules\reminder\models\Reminder;
 use common\modules\reminder\models\ReminderQuery;
+use DateInterval;
 use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -32,6 +33,7 @@ use yii\helpers\Json;
  * @property string|null $postal_code
  * @property string|null $email
  * @property int|null $campaign_id
+ * @property string|null $deadline_at
  *
  * @property-read LeadUserInterface|null $owner
  * @property-read LeadCampaign|null $campaign
@@ -56,6 +58,8 @@ class Lead extends ActiveRecord implements ActiveLead {
 	public const PROVIDER_CZATER = 'czater';
 	public const PROVIDER_CENTRAL_PHONE = 'central-phone';
 	public const PROVIDER_FORM_ZAPIER = 'form.zapier';
+
+	public const PROVIDER_FORM_WORDPRESS = 'form.wordpress';
 	public const PROVIDER_MESSAGE_ZAPIER = 'message.zapier';
 	public const PROVIDER_CRM_CUSTOMER = 'crm.customer';
 
@@ -117,7 +121,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			[['source_id', 'status_id', 'data', 'name'], 'required'],
 			[['status_id'], 'integer'],
 			[['phone', 'postal_code', 'email', 'provider', 'name'], 'string'],
-			[['phone', 'email', 'provider'], 'default', 'value' => null],
+			[['phone', 'email', 'provider', 'deadline_at'], 'default', 'value' => null],
 			['email', 'email'],
 			['postal_code', 'string', 'max' => 6],
 			['provider', 'in', 'range' => array_keys(static::getProvidersNames())],
@@ -230,6 +234,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		return $this->id;
 	}
 
+	public function getHash(): string {
+		return Module::manager()->hashLead($this);
+	}
+
 	public function getName(): string {
 		return $this->name;
 	}
@@ -321,6 +329,10 @@ class Lead extends ActiveRecord implements ActiveLead {
 		]);
 	}
 
+	public function getPhoneBlacklist(): ActiveQuery {
+		return $this->hasOne(LeadPhoneBlacklist::class, ['phone' => 'phone']);
+	}
+
 	public function updateStatus(int $status_id): bool {
 		if ($this->status_id !== $status_id) {
 			$this->updateAttributes([
@@ -361,6 +373,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			static::PROVIDER_COPY => Yii::t('lead', 'Copy'),
 			static::PROVIDER_FORM_LANDING => Yii::t('lead', 'Form - Landing'),
 			static::PROVIDER_FORM_ZAPIER => Yii::t('lead', 'Form - Zapier'),
+			static::PROVIDER_FORM_WORDPRESS => Yii::t('lead', 'Form - Wordpress'),
 			static::PROVIDER_MESSAGE_ZAPIER => Yii::t('lead', 'Message - Zapier'),
 			static::PROVIDER_CZATER => Yii::t('lead', 'Czater'),
 			static::PROVIDER_CRM_CUSTOMER => Yii::t('lead', 'CRM - Customer'),
@@ -389,6 +402,38 @@ class Lead extends ActiveRecord implements ActiveLead {
 			}
 		}
 		return false;
+	}
+
+	public function isDelay(): ?bool {
+		return $this->getDeadlineHours() > 0;
+	}
+
+	public function getDeadlineHours(): ?int {
+		$deadline = $this->getDeadline();
+		if ($deadline === null) {
+			return null;
+		}
+		$datetime = new DateTime($deadline);
+		$diff = $datetime->diff(new DateTime());
+		return ($diff->days * 24 + $diff->h) * ($diff->invert ? -1 : 1);
+	}
+
+	public function getDeadline(): ?string {
+		if (!empty($this->deadline_at)) {
+			return $this->deadline_at;
+		}
+		$hours = $this->status->hours_deadline;
+		if (empty($hours)) {
+			return null;
+		}
+		$date = $this->date_at;
+		$reports = $this->reports;
+		if (!empty($reports)) {
+			$date = max(ArrayHelper::getColumn($reports, 'created_at'));
+		}
+		$datetime = new DateTime($date);
+		$datetime->add(new DateInterval("PT{$hours}H"));
+		return $datetime->format(DATE_ATOM);
 	}
 
 	/**

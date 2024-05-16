@@ -2,9 +2,12 @@
 
 namespace common\widgets\provision;
 
+use common\helpers\Html;
+use common\models\issue\IssueCost;
+use common\models\issue\IssueInterface;
 use common\models\provision\ProvisionReportSummary;
 use common\widgets\grid\ActionColumn;
-use common\widgets\grid\IssueColumn;
+use common\widgets\grid\DataColumn;
 use yii\base\Widget;
 
 class ProvisionUserReportWidget extends Widget {
@@ -16,9 +19,9 @@ class ProvisionUserReportWidget extends Widget {
 		'template' => '{delete}',
 	];
 
-	public array $issueColumn = [
-		'class' => IssueColumn::class,
-	];
+	public array $issueColumn = [];
+
+	public ?string $issueRoute = '/issue/view';
 
 	public function init() {
 		parent::init();
@@ -33,9 +36,27 @@ class ProvisionUserReportWidget extends Widget {
 		]);
 	}
 
-	public function defaultIssueColumn(): array {
+	protected function defaultIssueColumn(): array {
 		return [
-			'withTags' => false,
+			'class' => DataColumn::class,
+			'attribute' => 'issue_id',
+			'format' => $this->issueRoute ? 'html' : 'text',
+			'value' => function ($model): ?string {
+				$issue = null;
+				if ($model instanceof IssueInterface) {
+					$issue = $model->getIssueModel();
+				}
+				if ($model instanceof IssueCost) {
+					$issue = $model->issue;
+				}
+				if ($issue === null) {
+					return null;
+				}
+				if ($this->issueRoute) {
+					return Html::a($issue->getIssueName(), [$this->issueRoute, 'id' => $issue->getIssueId()]);
+				}
+				return $issue->getIssueName();
+			},
 		];
 	}
 

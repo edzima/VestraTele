@@ -15,7 +15,7 @@ class MessageTemplateManager extends TemplateManager implements KeyMessageTempla
 	public function getTemplate($key, $language = null, $default = null): ?MessageTemplate {
 		$template = parent::getTemplate($key, $language, $default);
 		if ($template) {
-			return MessageTemplate::buildFromEntity($template);
+			return MessageTemplate::buildFromEntity($template, $key);
 		}
 		return null;
 	}
@@ -42,7 +42,7 @@ class MessageTemplateManager extends TemplateManager implements KeyMessageTempla
 		foreach ($models as $model) {
 			$translation = $model->getTranslation($language);
 			if ($translation && !$translation->isNewRecord) {
-				$templates[$model->key] = MessageTemplate::buildFromEntity($translation);
+				$templates[$model->key] = MessageTemplate::buildFromEntity($translation, $model->key);
 			}
 		}
 		return $templates;

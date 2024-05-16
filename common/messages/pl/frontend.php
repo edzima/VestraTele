@@ -146,4 +146,8 @@ return [
 	'Please choose your new password:' => 'Wybierz nowe hasło:',
 	'Warning! This note will only be visible to you.' => 'Pamietaj! Ta Notatka będzie widoczna tylko dla Ciebie.',
 	'Search Customer' => 'Szukaj Klienta',
+	'Months' => 'Ilość miesięcy',
+	'Calculate' => 'Oblicz',
+	'Total loan amount' => 'Całkowita kwota kredytu',
+	'Max amount of non interest financial costs' => 'Maksymalną wysokość pozaodsetkowych kosztów kredytu',
 ];

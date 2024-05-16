@@ -16,7 +16,7 @@ class LeadStatusSearch extends LeadStatus {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'sort_index', 'market_status'], 'integer'],
+			[['id', 'sort_index', 'market_status', 'hours_deadline'], 'integer'],
 			[['short_report', 'show_report_in_lead_index', 'not_for_dialer'], 'boolean'],
 			[['name', 'description'], 'safe'],
 		];
@@ -61,6 +61,7 @@ class LeadStatusSearch extends LeadStatus {
 			'sort_index' => $this->sort_index,
 			'short_report' => $this->short_report,
 			'not_for_dialer' => $this->not_for_dialer,
+			'hours_deadline' => $this->hours_deadline,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])

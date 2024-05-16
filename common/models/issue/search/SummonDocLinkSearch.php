@@ -3,8 +3,8 @@
 namespace common\models\issue\search;
 
 use common\helpers\ArrayHelper;
-use common\models\issue\Issue;
 use common\models\issue\IssueType;
+use common\models\issue\query\IssueQuery;
 use common\models\issue\query\SummonDocLinkQuery;
 use common\models\issue\query\SummonQuery;
 use common\models\issue\Summon;
@@ -12,6 +12,7 @@ use common\models\issue\SummonDocLink;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\User;
 use common\validators\PhoneValidator;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -20,7 +21,7 @@ use yii\db\QueryInterface;
 
 class SummonDocLinkSearch extends SummonDocLink implements
 	CustomerSearchInterface,
-	IssueParentTypeSearchable {
+	IssueMainTypeSearchable {
 
 	public string $docName = '';
 	public string $customerName = '';
@@ -52,7 +53,7 @@ class SummonDocLinkSearch extends SummonDocLink implements
 			],
 			['docName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['customerName', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
-			['doc_type_id','safe'],
+			['doc_type_id', 'safe'],
 			['customerPhone', PhoneValidator::class],
 		];
 	}
@@ -64,7 +65,6 @@ class SummonDocLinkSearch extends SummonDocLink implements
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
 	}
-
 
 	/**
 	 * Creates data provider instance with search query applied
@@ -93,6 +93,7 @@ class SummonDocLinkSearch extends SummonDocLink implements
 		if (!$this->validate()) {
 			// uncomment the following line if you do not want to return any records when validation fails
 			// $query->where('0=1');
+			Yii::warning($this->getErrors());
 			return $dataProvider;
 		}
 		switch ($this->status) {
@@ -110,7 +111,7 @@ class SummonDocLinkSearch extends SummonDocLink implements
 		$this->applyUserFilter($query);
 		$this->applyDoneUserFilter($query);
 		$this->applyConfirmedUserFilter($query);
-		$this->applyIssueParentTypeFilter($query);
+		$this->applyIssueMainTypeFilter($query);
 		$this->applySummonContractorFilter($query);
 		$this->applySummonOwnerFilter($query);
 		$this->applySummonTypeFilter($query);
@@ -158,7 +159,7 @@ class SummonDocLinkSearch extends SummonDocLink implements
 		}
 	}
 
-	public function getIssueParentType(): ?IssueType {
+	public function getIssueMainType(): ?IssueType {
 		if (empty($this->issueParentTypeId)) {
 			return null;
 		}
@@ -184,12 +185,14 @@ class SummonDocLinkSearch extends SummonDocLink implements
 		}
 	}
 
-	public function applyIssueParentTypeFilter(ActiveQuery $query): void {
-		$parentType = $this->getIssueParentType();
+	public function applyIssueMainTypeFilter(ActiveQuery $query): void {
+		$parentType = $this->getIssueMainType();
 		if ($parentType) {
-			$childs = ArrayHelper::getColumn($parentType->childs, 'id');
-			$query->joinWith('summon.issue');
-			$query->andFilterWhere([Issue::tableName() . '.type_id' => $childs]);
+			$query->joinWith([
+				'summon.issue' => function (IssueQuery $query) {
+					$query->type($this->issueParentTypeId);
+				},
+			]);
 		}
 	}
 

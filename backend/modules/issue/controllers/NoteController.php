@@ -100,10 +100,14 @@ class NoteController extends Controller {
 			'user_id' => Yii::$app->user->id,
 			'showOnLinkedIssues' => $issue->getIssueType()->default_show_linked_notes,
 		]);
-		$model->messagesForm = new IssueNoteMessagesForm([
+		$message = new IssueNoteMessagesForm([
 			'issue' => $issue,
 			'sms_owner_id' => Yii::$app->user->getId(),
 		]);
+		$message->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_ISSUE]), false);
+		$message->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE]));
+
+		$model->messagesForm = $message;
 		if (Yii::$app->user->can(Worker::PERMISSION_NOTE_TEMPLATE)) {
 			$model->scenario = IssueNoteForm::SCENARIO_TEMPLATE;
 		}
@@ -149,6 +153,8 @@ class NoteController extends Controller {
 				'sendSmsToAgent',
 			],
 		]);
+		$messageForm->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE]));
+		$messageForm->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_ISSUE]), false);
 		$messageForm->addExtraWorkerEmail($summon->owner, Yii::t('common', 'Owner'));
 
 		$model->messagesForm = $messageForm;

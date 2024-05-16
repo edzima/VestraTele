@@ -1,7 +1,10 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Article */
+
+/* @var $model ArticleForm */
+
+use backend\models\ArticleForm;
 
 $this->title = Yii::t('backend', 'Create article');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Articles'), 'url' => ['index']];
@@ -11,7 +14,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $this->render('_form', [
         'model' => $model,
-        'categories' => $categories,
     ]) ?>
 
 </div>

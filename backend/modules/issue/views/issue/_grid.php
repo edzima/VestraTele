@@ -5,8 +5,10 @@ use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
+use common\assets\TooltipAsset;
 use common\helpers\Html;
 use common\models\issue\Issue;
+use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\issue\IssueNoteColumn;
 use common\modules\issue\widgets\IssueClaimCompanyColumn;
@@ -37,13 +39,23 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
             $('.table-responsive').css( 'overflow', 'auto' );
 	})"
 );
-
 ?>
+
+<p>
+	<?= $searchModel->withClaimsSum && ($claimSum = $searchModel->claimsSum($dataProvider->query)) > 0
+		? (Yii::t('backend', 'Claims Sum: {sum}', [
+			'sum' => Yii::$app->formatter->asCurrency($claimSum),
+		]))
+		: '' ?>
+
+</p>
 
 
 <?= GridView::widget([
 	'id' => 'issues-list',
 	'dataProvider' => $dataProvider,
+	'showPageSummary' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+	'pageSummaryPosition' => GridView::POS_BOTTOM,
 	'filterModel' => $searchModel->isArchiveScenario() ? null : $searchModel,
 	'rowOptions' => static function (Issue $issue): array {
 		if ($issue->hasDelayedStage()) {
@@ -128,22 +140,20 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 			'value' => static function (Issue $model): string {
 				return StageChangeButtonDropdown::widget([
 					'model' => $model,
-					'label' => $model->stage->name,
+					'label' => $model->stage->short_name,
 					'containerOptions' => [
 						'class' => 'd-inline-flex',
+						TooltipAsset::DEFAULT_ATTRIBUTE_NAME => $model->stage->name,
 					],
-					'returnUrl' => Url::to('/issue/issue/index'),
+					'returnUrl' => Url::current(),
 					'options' => [
 						'class' => 'btn btn-default btn-sm',
-						'title' => Yii::t('backend', 'Change Stage'),
-						'aria-label' => Yii::t('backend', 'Change Stage'),
+						'title' => Yii::t('issue', 'Change Stage'),
+						'aria-label' => Yii::t('issue', 'Change Stage'),
 						'data-pjax' => 0,
 					],
 				]);
 			},
-			'options' => [
-				'style' => 'width:250px',
-			],
 			'format' => 'raw',
 			'contentBold' => true,
 			'contentCenter' => true,
@@ -174,8 +184,8 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 			],
 			'ellipsis' => true,
 			'value' => 'entityResponsible.name',
-			'options' => [
-				'style' => 'width:140px',
+			'contentOptions' => [
+				'class' => 'mw-120-md',
 			],
 		],
 
@@ -226,6 +236,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 		[
 			'class' => IssueClaimCompanyColumn::class,
 			'attribute' => 'claimCompanyTryingValue',
+			'pageSummary' => true,
 		],
 		[
 			'class' => IssueNoteColumn::class,
@@ -303,3 +314,4 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 	],
 ]);
 ?>
+

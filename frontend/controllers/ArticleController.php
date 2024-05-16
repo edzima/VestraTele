@@ -2,13 +2,13 @@
 
 namespace frontend\controllers;
 
-use Yii;
-use yii\data\ActiveDataProvider;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
 use common\models\Article;
 use common\models\ArticleCategory;
+use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 /**
  * Class ArticleController.
@@ -35,7 +35,10 @@ class ArticleController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex(): string {
-		$query = Article::find()->published()->with('category');
+		$query = Article::find()
+			->published()
+			->forUser(Yii::$app->user->getId())
+			->with('category');
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -65,6 +68,9 @@ class ArticleController extends Controller {
 		if (!$model) {
 			throw new NotFoundHttpException(Yii::t('frontend', 'Page not found.'));
 		}
+		if (!$model->isForUser(Yii::$app->user->getId())) {
+			throw new NotFoundHttpException(Yii::t('frontend', 'Page not found.'));
+		}
 
 		return $this->render('view', [
 			'model' => $model,
@@ -84,7 +90,10 @@ class ArticleController extends Controller {
 			throw new NotFoundHttpException(Yii::t('frontend', 'Page not found.'));
 		}
 
-		$query = Article::find()->joinWith('category')->where('{{%article_category}}.slug = :slug', [':slug' => $slug])->published();
+		$query = Article::find()
+			->joinWith('category')->where('{{%article_category}}.slug = :slug', [':slug' => $slug])
+			->published()
+			->forUser(Yii::$app->user->getId());
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,

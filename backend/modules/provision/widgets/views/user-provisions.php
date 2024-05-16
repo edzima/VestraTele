@@ -44,11 +44,15 @@ $context = $this->context;
 					[
 						'label' => Yii::t('provision', 'Base Type'),
 						'format' => 'html',
-						'value' => Html::a(Html::encode($model->type->getBaseType()->name), [
-							'/provision/user/user-view',
-							'userId' => $model->getUser()->id,
-							'typeId' => $model->type->getBaseTypeId(),
-						]),
+						'value' => function () use ($model): string {
+
+							return Html::a(Html::encode($model->type->getBaseType()->name), [
+								'/provision/user/user-view',
+								'userId' => $model->getUser()->id,
+								'typeId' => $model->type->getBaseTypeId(),
+							]);
+						},
+
 						'visible' => $model->type->getBaseType() !== null,
 					],
 					'issueUserTypeName',

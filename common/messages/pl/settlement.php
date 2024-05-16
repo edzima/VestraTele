@@ -1,6 +1,7 @@
 <?php
 
 return [
+	'Attestation' => 'Zaświadczenie',
 	'Appeal' => 'Opłata od apelacji',
 	'Base Value' => 'Kwota Bazowa',
 	'Details' => 'Szczegóły',
@@ -37,6 +38,7 @@ return [
 	'Settlements' => 'Rozliczenia',
 	'Settlement' => 'Rozliczenie',
 	'Entity rensponsible - {name}' => 'Podmiot - {name}',
+	'Entry fee' => 'Opłata wstępna',
 	'Provision' => 'Prowizja',
 	'Administrative' => 'Opłata administracyjna',
 	'Honorarium' => 'Honorarium',
@@ -131,6 +133,7 @@ return [
 	'Interest' => 'Odsetki',
 	'Settle' => 'Rozlicz',
 	'Settle cost: {cost}' => 'Rozlicz Koszt: {cost}',
+	'Update Issue Cost' => 'Edytuj Koszt',
 	'Update Issue Cost: {issue}' => 'Edytuj koszt w Sprawie: {issue}',
 	'Create Debt Costs' => 'Zakup Wierzytelności',
 	'Create Debt Costs: {issue}' => 'Zakup Wierzytelności w Sprawie: {issue}',
@@ -171,4 +174,9 @@ return [
 	'Hide Cost: {value} in Report.' => 'Ukryto Koszt: {value} w Raporcie.',
 	'Visible Cost: {value} in Report.' => 'Koszt: {value} będzie ponownie w Raporcie.',
 	'Payed Sum' => 'Opłacono',
+	'Commission Refund' => 'Zwrot Prowizji',
+	'Create Cost' => 'Dodaj Koszt',
+	'Shipments' => 'Przesyłki',
+	'Cost Refund: Company' => 'Zwrot kosztów: Kancelaria',
+	'Cost Refund: Legal represantion' => 'Zwrot kosztów: Zastępstwo procesowe',
 ];

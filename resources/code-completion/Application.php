@@ -6,6 +6,7 @@ use common\components\HierarchyComponent;
 use common\components\keyStorage\KeyStorage;
 use common\components\message\MessageTemplateManager;
 use common\components\PayComponent;
+use common\components\postal\PocztaPolska;
 use common\components\provision\Provisions;
 use common\components\TaxComponent;
 use common\components\User;
@@ -44,6 +45,7 @@ class Yii extends BaseYii {
  * @property SenderInterface $sms
  * @property Queue $queue
  * @property KeyStorage $keyStorage
+ * @property PocztaPolska $pocztaPolska
  */
 abstract class Application extends \yii\web\Application {
 

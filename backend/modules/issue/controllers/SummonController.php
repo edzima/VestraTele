@@ -5,6 +5,7 @@ namespace backend\modules\issue\controllers;
 use backend\helpers\Url;
 use backend\modules\issue\models\search\SummonSearch;
 use backend\modules\issue\models\SummonForm;
+use common\behaviors\IssueTypeParentIdAction;
 use common\helpers\Flash;
 use common\models\issue\Summon;
 use common\models\issue\SummonType;
@@ -33,6 +34,9 @@ class SummonController extends Controller {
 					'realize' => ['POST'],
 				],
 			],
+			'typeTypeParent' => [
+				'class' => IssueTypeParentIdAction::class,
+			],
 		];
 	}
 
@@ -43,7 +47,7 @@ class SummonController extends Controller {
 	 */
 	public function actionIndex(int $parentTypeId = null): string {
 		$searchModel = new SummonSearch();
-		$searchModel->issueParentTypeId = $parentTypeId;
+		$searchModel->issueParentTypeId = IssueTypeParentIdAction::validate($parentTypeId);
 		if (!Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)
 			&& isset($searchModel->getContractorsNames()[Yii::$app->user->getId()])) {
 			$searchModel->contractor_id = Yii::$app->user->getId();
@@ -87,7 +91,7 @@ class SummonController extends Controller {
 		$model = new SummonForm();
 		$model->owner_id = Yii::$app->user->id;
 		$model->issue_id = $issueId;
-		$model->start_at = time();
+		$model->start_at = date('Y-m-d');
 		if ($typeId && isset(SummonType::getModels()[$typeId])) {
 			$model->setType(SummonType::getModels()[$typeId]);
 		}

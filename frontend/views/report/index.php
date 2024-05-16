@@ -1,13 +1,12 @@
 <?php
 
 use common\models\provision\ProvisionReportSearch;
+use common\models\user\Worker;
 use common\widgets\provision\ProvisionUserReportWidget;
 use frontend\widgets\ChildesSelect2Widget;
-use frontend\widgets\IssueColumn;
 use yii\helpers\Html;
 use yii\web\View;
 use yii\web\YiiAsset;
-use common\models\user\Worker;
 
 /* @var $this View */
 /* @var $searchModel ProvisionReportSearch */
@@ -44,9 +43,6 @@ YiiAsset::register($this);
 
 <?= ProvisionUserReportWidget::widget([
 	'model' => $searchModel->summary(),
-	'issueColumn' => [
-		'class' => IssueColumn::class,
-	],
 	'actionColumn' => [
 		'visible' => false,
 	],

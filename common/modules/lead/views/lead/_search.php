@@ -76,23 +76,53 @@ use kartik\select2\Select2;
 
 			<?= $form->field($model, 'duplicateEmail', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
-		<?php endif; ?>
 
+		<?php else: ?>
+
+			<?= $form->field($model, 'selfUserId', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(Select2::class, [
+				'data' => $model->getSelfUsersNames(),
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('user_id'),
+					'allowClear' => true,
+				],
+			])
+				->label($model->getAttributeLabel('user_id'))
+			?>
+		<?php endif; ?>
 
 	</div>
 
 
 	<div class="row">
 
-		<?= $form->field($model, 'closedQuestions', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
-			'data' => LeadSearch::getClosedQuestionsNames(),
-			'options' => ['multiple' => true,],
-			'pluginOptions' => [
-				'placeholder' => $model->getAttributeLabel('closedQuestions'),
-				'allowClear' => true,
-			],
-		])
+		<?php
+		$closedData = $model->getClosedQuestionsNames();
+		if (!empty($closedData)) {
+			echo $form->field($model, 'closedQuestions', ['options' => ['class' => 'col-md-4']])->widget(Select2::class, [
+				'data' => $closedData,
+				'options' => ['multiple' => true,],
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('closedQuestions'),
+					'allowClear' => true,
+				],
+			]);
+			echo $form->field($model, 'excludedClosedQuestions', ['options' => ['class' => 'col-md-4']])->widget(Select2::class, [
+				'data' => $closedData,
+				'options' => ['multiple' => true,],
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('excludedClosedQuestions'),
+					'allowClear' => true,
+				],
+			]);
+		}
 		?>
+
+		<?= $form->field($model, 'data', ['options' => ['class' => 'col-md-2']])->textInput() ?>
+
+
+		<?= $form->field($model, 'onlyWithEmail', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
+
+		<?= $form->field($model, 'onlyWithPhone', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
 		<?= $form->field($model, 'withoutArchives', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
@@ -120,7 +150,14 @@ use kartik\select2\Select2;
 				],
 			],
 		])->widget(DateWidget::class)
+
 		?>
+
+		<?= $form->field($model, 'hoursAfterLastReport', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput([
+			'type' => 'number',
+			'step' => 1,
+		]) ?>
+
 
 		<?= $form->field($model, 'olderByDays', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput([
 			'type' => 'number',
@@ -134,6 +171,25 @@ use kartik\select2\Select2;
 				'prompt' => Yii::t('common', 'All'),
 			])
 			: ''
+		?>
+
+		<?= $form->field($model, 'reportStatus', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
+			'data' => LeadSearch::getStatusNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('reportStatus'),
+				'allowClear' => true,
+			],
+		])
+		?>
+
+		<?= $form->field($model, 'excludedStatus', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
+			'data' => LeadSearch::getStatusNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('excludedStatus'),
+				'multiple' => true,
+				'allowClear' => true,
+			],
+		])
 		?>
 
 

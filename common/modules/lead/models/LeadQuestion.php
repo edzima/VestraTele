@@ -17,6 +17,7 @@ use yii\db\ActiveRecord;
  * @property boolean $is_active
  * @property int|null $status_id
  * @property int|null $type_id
+ * @property int|null $order
  * @property boolean $show_in_grid
  * @property boolean $is_boolean
  *
@@ -38,6 +39,22 @@ class LeadQuestion extends ActiveRecord {
 		return '{{%lead_question}}';
 	}
 
+	public static function sortByOrder(array &$models): void {
+		usort($models, function (LeadQuestion $a, LeadQuestion $b) {
+			return static::orderClosure($a, $b);
+		});
+	}
+
+	public static function orderClosure(LeadQuestion $a, LeadQuestion $b): int {
+		if (empty($a->order) && !empty($b->order)) {
+			return 1;
+		}
+		if (empty($b->order) && !empty($a->order)) {
+			return -1;
+		}
+		return $a->order <=> $b->order;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -52,6 +69,9 @@ class LeadQuestion extends ActiveRecord {
 			'is_boolean' => Yii::t('lead', 'Is Boolean'),
 			'is_required' => Yii::t('lead', 'Is required'),
 			'show_in_grid' => Yii::t('lead', 'Show in grid'),
+			'order' => Yii::t('lead', 'Order'),
+			'type' => Yii::t('lead', 'Lead Type'),
+			'status' => Yii::t('lead', 'Lead Status'),
 		];
 	}
 

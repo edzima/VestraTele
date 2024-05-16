@@ -54,13 +54,6 @@ class LeadSmsBtnWidget extends ButtonDropdown {
 		return parent::run();
 	}
 
-	private function welcomeSmsItem(): array {
-		return [
-			'label' => Yii::t('lead', 'Send Welcome SMS'),
-			'url' => ['/lead/sms/welcome', 'id' => $this->model->getId()],
-		];
-	}
-
 	public function templateItems(): array {
 		$items = [];
 		$templates = Yii::$app->messageTemplate->getLeadTypeTemplatesLikeKey('lead.sms', $this->model->getSource()->getType()->getID());
@@ -87,6 +80,7 @@ class LeadSmsBtnWidget extends ButtonDropdown {
 		if ($this->user) {
 			$template->parseBody([
 				'userName' => $this->user->getProfile()->firstname,
+				'userEmail' => $this->user->email,
 				'userPhone' => Yii::$app->formatter->asTel($this->user->getPhone(), [
 					'asLink' => false,
 				]),

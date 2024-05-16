@@ -4,7 +4,9 @@ namespace common\modules\issue\widgets;
 
 use backend\helpers\Url;
 use backend\modules\issue\models\IssueStageChangeForm;
+use common\helpers\Html;
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueStage;
 use Yii;
 use yii\bootstrap\ButtonDropdown;
 
@@ -42,8 +44,11 @@ class StageChangeButtonDropdown extends ButtonDropdown {
 		asort($stages);
 		$items = [];
 		foreach ($stages as $id => $stage) {
+			$stage = IssueStage::getStages()[$id];
+			$label = Html::encode($stage->name) . Html::tag('strong', ' (' . Html::encode($stage->short_name) . ')');
 			$items[] = [
-				'label' => $stage,
+				'label' => $label,
+				'encode' => false,
 				'linkOptions' => [
 					'data-pjax' => 0,
 				],

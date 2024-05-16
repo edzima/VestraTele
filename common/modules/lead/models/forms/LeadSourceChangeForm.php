@@ -3,21 +3,19 @@
 namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\Lead;
-use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
-use common\modules\lead\models\LeadStatus;
 use Yii;
 use yii\base\Model;
-use yii\helpers\ArrayHelper;
 
 class LeadSourceChangeForm extends Model {
 
 	public array $ids = [];
 	public ?int $source_id = null;
+	public const SCENARIO_NOT_REQUIRED = 'not-required';
 
 	public function rules(): array {
 		return [
-			[['ids', 'source_id'], 'required'],
+			[['ids', 'source_id'], 'required', 'except' => static::SCENARIO_NOT_REQUIRED],
 			['source_id', 'integer'],
 			['source_id', 'in', 'range' => array_keys(static::getSourcesNames())],
 		];
@@ -40,5 +38,9 @@ class LeadSourceChangeForm extends Model {
 
 	public static function getSourcesNames(): array {
 		return LeadSource::getNames();
+	}
+
+	public function getSourceName(): ?string {
+		return static::getSourcesNames()[$this->source_id] ?? null;
 	}
 }

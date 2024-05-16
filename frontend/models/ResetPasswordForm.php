@@ -37,6 +37,12 @@ class ResetPasswordForm extends Model {
 		parent::__construct($config);
 	}
 
+	public function attributeLabels(): array {
+		return [
+			'password' => Yii::t('common', 'Password'),
+		];
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */

@@ -12,7 +12,11 @@ $this->title = Yii::t('lead', 'New Lead: {lead}', [
 ]);
 
 $reportLink = FrontendUrl::toRoute(
-	['/lead/report/report', 'id' => $lead->getId()],
+	[
+		'/lead/report/report',
+		'id' => $lead->getId(),
+		'hash' => $lead->getHash(),
+	],
 	true
 );
 

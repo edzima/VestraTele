@@ -1,10 +1,11 @@
 <?php
 
+use backend\modules\issue\models\search\TagTypeSearch;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\modules\issue\models\search\TagTypeSearch */
+/* @var $model TagTypeSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 

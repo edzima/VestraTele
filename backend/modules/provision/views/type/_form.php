@@ -2,6 +2,7 @@
 
 use backend\modules\provision\models\ProvisionTypeForm;
 use common\widgets\DateWidget;
+use kartik\number\NumberControl;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -117,9 +118,19 @@ use yii\widgets\ActiveForm;
 	</div>
 
 	<div class="row">
-		<?= $form->field($model, 'from_at', ['options' => ['class' => 'col-md-3']])->widget(DateWidget::class) ?>
 
-		<?= $form->field($model, 'to_at', ['options' => ['class' => 'col-md-3']])->widget(DateWidget::class) ?>
+
+		<?= $form->field($model, 'from_at', ['options' => ['class' => 'col-md-2']])->widget(DateWidget::class) ?>
+
+		<?= $form->field($model, 'to_at', ['options' => ['class' => 'col-md-2']])->widget(DateWidget::class) ?>
+	</div>
+
+	<div class="row">
+		<?= $form->field($model, 'minSettlementValue', ['options' => ['class' => 'col-md-2']])->widget(NumberControl::class) ?>
+
+		<?= $form->field($model, 'maxSettlementValue', ['options' => ['class' => 'col-md-2']])->widget(NumberControl::class) ?>
+
+
 	</div>
 
 

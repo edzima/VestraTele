@@ -91,4 +91,11 @@ class User extends BaseUser {
 		}
 		return $note->user_id === $this->getId() || $this->can(Worker::PERMISSION_NOTE_DELETE);
 	}
+
+	public function getFavoriteIssueType(): ?int {
+		if ($this->isGuest || !($this->identity instanceof \common\models\user\User)) {
+			return null;
+		}
+		return $this->identity->userProfile->favorite_issue_type_id;
+	}
 }

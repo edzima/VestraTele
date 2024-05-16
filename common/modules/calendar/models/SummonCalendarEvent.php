@@ -89,19 +89,29 @@ class SummonCalendarEvent extends FullCalendarEvent {
 	public function setModel(Summon $model): void {
 		$this->model = $model;
 		$this->id = $model->id;
-		$this->start = $this->getStart();
-		$customer = $model->issue->customer;
-		$this->title = Html::encode($customer->getFullName());
-		$this->phone = Yii::$app->formatter->asTel($customer->getPhone(), [
-			'nullDisplay' => null,
-			'asLink' => false,
-		]);
-		$this->url = $this->getUrl();
 		$this->statusId = $model->status;
 		$this->typeId = $model->type_id;
+		$this->start = $this->getStart();
+		$this->title = $this->getTitle();
+		$this->phone = $this->getPhone();
+		$this->url = $this->getUrl();
 		$this->backgroundColor = $this->getBackgroundColor();
 		$this->borderColor = $this->getBorderColor();
 		$this->tooltipContent = $this->getTooltipContent();
+	}
+
+	protected function getTitle(): string {
+		$customer = $this->model->issue->customer;
+		return Html::encode($customer->getFullName());
+	}
+
+	protected function getPhone() {
+		$customer = $this->model->issue->customer;
+
+		return Yii::$app->formatter->asTel($customer->getPhone(), [
+			'nullDisplay' => null,
+			'asLink' => false,
+		]);
 	}
 
 	public function setReminder(Reminder $reminder) {

@@ -13,11 +13,16 @@ class IssueViewWidget extends IssueWidget {
 	public bool $relationActionColumn = true;
 	public bool $claimActionColumn = true;
 
+	public bool $shipmentsActionColumn = false;
+	public bool $lawsuitActionColumn = false;
+
 	public ?string $entityResponsibleRoute = null;
 
 	private ?string $entityUrl = null;
 
 	public ?string $typeRoute = null;
+
+	public ?string $costRoute = null;
 
 	private ?string $typeUrl = null;
 
@@ -44,7 +49,10 @@ class IssueViewWidget extends IssueWidget {
 			'userMailVisibilityCheck' => $this->userMailVisibilityCheck,
 			'usersLinks' => $this->usersLinks,
 			'claimActionColumn' => $this->claimActionColumn,
+			'lawsuitActionColumn' => $this->lawsuitActionColumn,
 			'relationActionColumn' => $this->relationActionColumn,
+			'shipmentsActionColumn' => $this->shipmentsActionColumn,
+			'costRoute' => $this->costRoute,
 			'entityUrl' => $this->entityUrl,
 			'stageUrl' => $this->stageUrl,
 			'typeUrl' => $this->typeUrl,

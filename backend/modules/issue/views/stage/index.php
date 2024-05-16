@@ -53,16 +53,42 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 				'contentBold' => true,
 			],
-			'days_reminder',
 			'posi',
 			[
-				'attribute' => 'calendar_background',
-				'contentOptions' => static function (IssueStage $data): array {
-					$options = [];
-					if (!empty($data->calendar_background)) {
-						$options['style']['background-color'] = $data->calendar_background;
+				'attribute' => 'days_reminder',
+				'value' => static function (IssueStage $data): ?string {
+					$days = [];
+					foreach ($data->stageTypes as $stageType) {
+						if ($stageType->days_reminder) {
+							$days[$stageType->days_reminder] = $stageType->days_reminder;
+						}
 					}
-					return $options;
+					if (empty($days)) {
+						return null;
+					}
+					return implode(', ', $days);
+				},
+			],
+			[
+				'attribute' => 'calendar_background',
+				'format' => 'html',
+				'value' => static function (IssueStage $data): ?string {
+					$colors = [];
+					foreach ($data->stageTypes as $stageType) {
+						if ($stageType->calendar_background) {
+							$colors[] = $stageType->calendar_background;
+						}
+					}
+					if (empty($colors)) {
+						return null;
+					}
+					$colors = array_unique($colors);
+					$spanColors = [];
+					foreach ($colors as $color) {
+						$spanColors[] = Html::tag('span',
+							Html::encode($color), ['style' => ['color' => $color]]);
+					}
+					return implode(', ', $spanColors);
 				},
 			],
 			[

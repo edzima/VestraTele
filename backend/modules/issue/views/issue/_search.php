@@ -1,20 +1,21 @@
 <?php
 
 use backend\helpers\Html;
+use backend\modules\issue\models\IssueStage;
 use backend\modules\issue\models\search\IssueSearch;
 use common\models\user\User;
+use common\models\user\Worker;
 use common\widgets\address\AddressSearchWidget;
 use common\widgets\DateWidget;
 use kartik\select2\Select2;
 use yii\widgets\ActiveForm;
-use common\models\user\Worker;
 
 /* @var $this yii\web\View */
 /* @var $model IssueSearch */
 /* @var $form yii\widgets\ActiveForm */
 
 ?>
-<div id="issue-search" class="issue-search">
+<div id="issue-search" class="issue-search collapse<?= $model->getIsLoad() ? ' in' : '' ?>">
 
 	<?php $form = ActiveForm::begin([
 		'options' => [
@@ -139,6 +140,11 @@ use common\models\user\Worker;
 			: ''
 		?>
 
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM_TOTAL_SUM) ?
+			$form->field($model, 'withClaimsSum', ['options' => ['class' => 'col-md-2']])->checkbox()
+			: ''
+		?>
+
 		<?= $model->scenario === IssueSearch::SCENARIO_ALL_PAYED
 			? $form->field($model, 'onlyWithAllPayedPay', ['options' => ['class' => 'col-md-2']])->checkbox()
 			: ''
@@ -194,6 +200,34 @@ use common\models\user\Worker;
 
 
 	</div>
+
+	<div class="row">
+
+
+		<?= $form->field($model, 'note_stage_id', ['options' => ['class' => 'col-md-2']])
+			->widget(Select2::class, [
+				'data' => IssueStage::getStagesNames(),
+				'pluginOptions' => [
+					'placeholder' => '',
+					'allowClear' => true,
+				],
+			])
+		?>
+
+		<?= $form->field($model, 'note_stage_change_from_at', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+		<?= $form->field($model, 'note_stage_change_to_at', [
+			'options' => [
+				'class' => 'col-md-2',
+				'placeholder' => 'test',
+			],
+		])
+			->widget(DateWidget::class)
+		?>
+
+	</div>
 	<div class="row">
 		<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
 			'data' => IssueSearch::getTagsNames(),
@@ -220,6 +254,29 @@ use common\models\user\Worker;
 		]) ?>
 
 
+	</div>
+
+	<div class="row">
+		<?= $form->field($model, 'entity_agreement_details', [
+			'options' => [
+				'class' => 'col-md-3',
+			],
+		])->textInput() ?>
+		<?= $form->field($model, 'entity_agreement_at', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->widget(DateWidget::class) ?>
+
+		<?= $form->field($model, 'groupByIssueUserTypes', ['options' => ['class' => 'col-md-2']])
+			->widget(Select2::class, [
+				'data' => IssueSearch::getIssueUserTypesNames(),
+				'pluginOptions' => [
+					'prompt' => Yii::t('common', 'Select...'),
+					'multiple' => true,
+				],
+			])
+		?>
 	</div>
 
 

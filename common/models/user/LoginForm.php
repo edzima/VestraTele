@@ -10,7 +10,7 @@ use yii\base\Model;
  */
 class LoginForm extends Model {
 
-	public $username;
+	public $usernameOrEmail;
 	public $password;
 	public $rememberMe = true;
 
@@ -22,7 +22,7 @@ class LoginForm extends Model {
 	public function rules(): array {
 		return [
 			// username and password are both required
-			[['username', 'password'], 'required'],
+			[['usernameOrEmail', 'password'], 'required'],
 			// rememberMe must be a boolean value
 			['rememberMe', 'boolean'],
 			// password is validated by validatePassword()
@@ -32,7 +32,7 @@ class LoginForm extends Model {
 
 	public function attributeLabels() {
 		return [
-			'username' => Yii::t('frontend', 'Username'),
+			'usernameOrEmail' => Yii::t('common', 'Username / Email'),
 			'password' => Yii::t('frontend', 'Password'),
 			'rememberMe' => Yii::t('frontend', 'Remember Me'),
 		];
@@ -76,7 +76,17 @@ class LoginForm extends Model {
 	 */
 	protected function getUser(): ?User {
 		if ($this->_user === null) {
-			$this->_user = User::findByUsername($this->username);
+			$this->_user = User::find()
+				->active()
+				->andWhere([
+					'or', [
+						'email' => $this->usernameOrEmail,
+					],
+					[
+						'username' => $this->usernameOrEmail,
+					],
+				])
+				->one();
 		}
 
 		return $this->_user;

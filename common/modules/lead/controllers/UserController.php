@@ -5,11 +5,11 @@ namespace common\modules\lead\controllers;
 use common\helpers\Flash;
 use common\helpers\Url;
 use common\modules\lead\models\forms\LeadsUserForm;
-use Yii;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadUsersSearch;
-use yii\web\NotFoundHttpException;
+use Yii;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -149,10 +149,13 @@ class UserController extends BaseController {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionUpdate(int $lead_id, int $user_id, string $type) {
+	public function actionUpdate(int $lead_id, int $user_id, string $type, string $returnUrl = null) {
 		$model = $this->findModel($lead_id, $user_id, $type);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			if ($returnUrl) {
+				return $this->redirect($returnUrl);
+			}
 			return $this->redirect(['view', 'lead_id' => $model->lead_id, 'user_id' => $model->user_id, 'type' => $model->type]);
 		}
 
@@ -171,8 +174,11 @@ class UserController extends BaseController {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionDelete(int $lead_id, int $user_id, string $type) {
+	public function actionDelete(int $lead_id, int $user_id, string $type, string $returnUrl = null) {
 		$this->findModel($lead_id, $user_id, $type)->delete();
+		if ($returnUrl) {
+			return $this->redirect($returnUrl);
+		}
 
 		return $this->redirect(['index']);
 	}

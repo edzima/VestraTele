@@ -27,10 +27,12 @@ class Worker extends User implements ActiveHierarchy {
 		self::ROLE_LAWYER_ASSISTANT,
 		self::ROLE_LAWYER_OFFICE,
 		self::ROLE_MANAGER,
+		self::ROLE_AUDITOR,
 	];
 	public const PERMISSION_ENTITY_RESPONSIBLE_MANAGER = 'entity_responsible.manager';
 
 	public const PERMISSION_ISSUE_CLAIM = 'issue.claim';
+	public const PERMISSION_ISSUE_CLAIM_TOTAL_SUM = 'issue.claim.totalSum';
 	public const PERMISSION_ISSUE_CREATE = 'issue.create';
 	public const PERMISSION_ISSUE_DELETE = 'issue.delete';
 	public const PERMISSION_ISSUE_LINK_USER = 'issue.link-user';
@@ -39,11 +41,16 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_ISSUE_TAG_MANAGER = 'issue.tag.manager';
 	public const PERMISSION_ISSUE_TYPE_MANAGER = 'issue.type.manager';
 	public const PERMISSION_ISSUE_SEARCH_WITH_SETTLEMENTS = 'issue.search.with-settlements';
-
+	public const PERMISSION_ISSUE_STAT = 'issue.stat';
+	public const PERMISSION_MESSAGE_EMAIL_ISSUE_CREATE = 'message:email.issue:create';
+	public const PERMISSION_MESSAGE_EMAIL_ISSUE_SETTLEMENT_CREATE = 'message:email.issueSettlement:create';
+	public const PERMISSION_MESSAGE_EMAIL_ISSUE_PAY_PAID = 'message:email.issuePay:paid';
+	public const PERMISSION_MESSAGE_EMAIL_ISSUE_STAGE_CHANGE = 'message:email.issue:stageChange';
 	public const PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_ISSUE = 'issue.message.note.issue';
 	public const PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SUMMON = 'issue.message.note.summon';
 	public const PERMISSION_ISSUE_NOTE_EMAIL_MESSAGE_SETTLEMENT = 'issue.message.note.settlement';
 
+	public const PERMISSION_MESSAGE_EMAIL_SUMMON_IMMINENT_DEADLINE = 'message:email.issueSummon:imminentDeadline';
 	public const PERMISSION_NOTE_TEMPLATE = 'note.template';
 	public const PERMISSION_COST_DEBT = 'cost.debt';
 	public const PERMISSION_PROVISION_CHILDREN_VISIBLE = 'provision.children.visible';
@@ -59,6 +66,11 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_SETTLEMENT_DELETE_NOT_SELF = 'settlement.delete-not-self';
 	public const PERMISSION_ISSUE_ATTACHMENTS = 'issue.attachments';
 	public const PERMISSION_ISSUE_SEARCH_PARENTS = 'issue.search.parent';
+	public const PERMISSION_ISSUE_SHIPMENT = 'issue.shipment';
+	public const PERMISSION_CREDIT_ANALYZE = 'credit.analyze';
+	public const PERMISSION_COURT = 'court';
+	public const PERMISSION_LAWSUIT = 'lawsuit';
+	public const ROLE_AUDITOR = 'auditor';
 
 	public const PERMISSION_ISSUE_FILE_DELETE_NOT_SELF = 'issue-file.delete_not_self';
 

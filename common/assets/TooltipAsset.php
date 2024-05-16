@@ -9,14 +9,17 @@ class TooltipAsset extends AssetBundle {
 
 	public const DEFAULT_ATTRIBUTE_NAME = 'data-tippy-content';
 
-	public $baseUrl = 'https://unpkg.com/';
+	//public $baseUrl = 'https://unpkg.com/';
+
+	public $baseUrl = 'https://cdn.jsdelivr.net/npm/';
 
 	public $css = ['tippy.js@5/dist/tippy.css'];
 	public $js = [
 		'popper.js@1',
-		YII_ENV_DEV
-			? 'tippy.js@5/dist/tippy-bundle.iife.js'
-			: 'tippy.js@5',
+		'tippy.js@5/dist/tippy-bundle.iife.js',
+		//		YII_ENV_DEV
+		//			? 'tippy.js@5/dist/tippy-bundle.iife.js'
+		//			: 'tippy.js@5',
 	];
 
 	public static function initScript(?string $selector = null, array $options = []): string {

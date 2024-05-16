@@ -4,12 +4,12 @@ namespace backend\modules\entityResponsible\controllers;
 
 use backend\modules\entityResponsible\models\EntityResponsibleForm;
 use backend\modules\issue\models\search\IssueSearch;
-use Yii;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\entityResponsible\EntityResponsibleSearch;
+use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * EntityResponsibleController implements the CRUD actions for IssueEntityResponsible model.

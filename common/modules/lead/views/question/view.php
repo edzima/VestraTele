@@ -35,17 +35,20 @@ YiiAsset::register($this);
 			'id',
 			'name',
 			'placeholder',
+			[
+				'attribute' => 'order',
+				'visible' => !empty($model->order),
+			],
 			'is_active:boolean',
 			'is_required:boolean',
+			'is_boolean:boolean',
 			'show_in_grid:boolean',
 			[
 				'attribute' => 'type',
-				'value' => 'type.name',
 				'visible' => !empty($model->type),
 			],
 			[
 				'attribute' => 'status',
-				'value' => 'status.name',
 				'visible' => !empty($model->status),
 			],
 		],

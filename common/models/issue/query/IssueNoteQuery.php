@@ -13,7 +13,7 @@ use yii\db\ActiveQuery;
 class IssueNoteQuery extends ActiveQuery {
 
 	public function pinned(): self {
-		$this->andWhere(['is_pinned' => true]);
+		$this->andWhere([IssueNote::tableName() . '.is_pinned' => true]);
 		return $this;
 	}
 
@@ -26,23 +26,61 @@ class IssueNoteQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function onlyStage(int $stageId, bool $oldOrNew = true): self {
+		if ($oldOrNew) {
+			$this->andWhere([
+				'or',
+				[
+					'like',
+					IssueNote::tableName() . '.type',
+					IssueNote::generateType(
+						IssueNote::generateType(IssueNote::TYPE_STAGE_CHANGE, '%'),
+						$stageId
+					),
+					false,
+				],
+				[
+					'like',
+					IssueNote::tableName() . '.type',
+					IssueNote::generateType(
+						IssueNote::generateType(IssueNote::TYPE_STAGE_CHANGE, $stageId),
+						'%'
+					),
+					false,
+				],
+			]);
+		} else {
+			$this->andWhere([
+				'like',
+				IssueNote::tableName() . '.type',
+				IssueNote::generateType(
+					IssueNote::generateType(IssueNote::TYPE_STAGE_CHANGE, $stageId),
+					'%'
+				),
+				false,
+			]);
+		}
+
+		return $this;
+	}
+
 	public function onlyType(string $type, int $id = null): self {
 		if ($id !== null) {
-			$this->andWhere(['type' => IssueNote::generateType($type, $id)]);
+			$this->andWhere([IssueNote::tableName() . '.type' => IssueNote::generateType($type, $id)]);
 		} else {
-			$this->andWhere(['like', 'type', $type]);
+			$this->andWhere(['like', IssueNote::tableName() . '.type', $type]);
 		}
 		return $this;
 	}
 
 	public function withoutType(): self {
-		$this->andWhere(['type' => null]);
+		$this->andWhere([IssueNote::tableName() . '.type' => null]);
 		return $this;
 	}
 
 	public function withoutTypes(array $types): self {
 		foreach ($types as $type) {
-			$this->andWhere(['NOT LIKE', 'type', $type]);
+			$this->andWhere(['NOT LIKE', IssueNote::tableName() . '.type', $type]);
 		}
 		return $this;
 	}

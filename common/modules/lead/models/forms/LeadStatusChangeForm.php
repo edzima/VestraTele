@@ -11,13 +11,14 @@ use yii\helpers\ArrayHelper;
 
 class LeadStatusChangeForm extends Model {
 
+	public const SCENARIO_NOT_REQUIRED = 'not-require';
 	public array $ids = [];
 	public ?int $status_id = null;
 	public int $owner_id;
 
 	public function rules(): array {
 		return [
-			[['ids', 'status_id', '!owner_id'], 'required'],
+			[['ids', 'status_id', '!owner_id'], 'required', 'except' => static::SCENARIO_NOT_REQUIRED],
 			['status_id', 'integer'],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
 		];
@@ -70,5 +71,9 @@ class LeadStatusChangeForm extends Model {
 
 	public static function getStatusNames(): array {
 		return LeadStatus::getNames();
+	}
+
+	public function getStatusName(): ?string {
+		return static::getStatusNames()[$this->status_id] ?? null;
 	}
 }

@@ -41,6 +41,7 @@ class LeadAnswersWidget extends Widget {
 	private function getDetailViewAttributes(): array {
 		$attributes = [];
 		$closed = [];
+		LeadAnswer::orderByQuestions($this->answers);
 		foreach ($this->answers as $answer) {
 			if ($answer->question->isClosed()) {
 				$closed[] = $answer->getAnswerQuestion();

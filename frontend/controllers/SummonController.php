@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use backend\helpers\Url;
+use common\behaviors\IssueTypeParentIdAction;
 use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\Summon;
@@ -43,6 +44,9 @@ class SummonController extends Controller {
 					],
 				],
 			],
+			'typeTypeParent' => [
+				'class' => IssueTypeParentIdAction::class,
+			],
 		];
 	}
 
@@ -53,7 +57,7 @@ class SummonController extends Controller {
 	 */
 	public function actionIndex(int $parentTypeId = null): string {
 		$searchModel = new SummonSearch();
-		$searchModel->issueParentTypeId = $parentTypeId;
+		$searchModel->issueParentTypeId = IssueTypeParentIdAction::validate($parentTypeId);
 		$searchModel->user_id = Yii::$app->user->getId();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -78,7 +82,7 @@ class SummonController extends Controller {
 		$model = new SummonForm();
 		$model->owner_id = Yii::$app->user->id;
 		$model->issue_id = $issueId;
-		$model->start_at = time();
+		$model->start_at = date('Y-m-d');
 		if ($typeId && isset(SummonType::getModels()[$typeId])) {
 			$model->setType(SummonType::getModels()[$typeId]);
 		}
