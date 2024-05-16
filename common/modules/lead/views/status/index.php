@@ -35,8 +35,16 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			'name',
 			//	'description',
-			'hours_deadline',
-			'hours_deadline_warning',
+			[
+				'attribute' => 'hours_deadline',
+				'width' => '65px',
+				'contentCenter' => true,
+			],
+			[
+				'attribute' => 'hours_deadline_warning',
+				'width' => '65px',
+				'contentCenter' => true,
+			],
 			'short_report:boolean',
 			'show_report_in_lead_index:boolean',
 			//		'not_for_dialer:boolean',
@@ -61,12 +69,16 @@ $this->params['breadcrumbs'][] = $this->title;
 				},
 			],
 			[
-				'attribute' => 'statuses',
-				'format' => 'html',
-				'value' => function (LeadStatus $data): string {
-					return Html::ul($data->getStatusesNames());
-				},
+				'attribute' => 'chart_group',
+				'filter' => LeadStatusSearch::getChartGroupsNames(),
 			],
+			//			[
+			//				'attribute' => 'statuses',
+			//				'format' => 'html',
+			//				'value' => function (LeadStatus $data): string {
+			//					return Html::ul($data->getStatusesNames());
+			//				},
+			//			],
 			[
 				'attribute' => 'market_status',
 				'value' => 'marketStatusName',

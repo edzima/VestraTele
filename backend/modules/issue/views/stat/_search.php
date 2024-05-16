@@ -8,7 +8,6 @@ use common\widgets\DateWidget;
 /* @var $this yii\web\View */
 /* @var $model IssueStats */
 /* @var $form ActiveForm */
-var_dump($model->endAt);
 ?>
 
 <div id="issue-search" class="issue-search">

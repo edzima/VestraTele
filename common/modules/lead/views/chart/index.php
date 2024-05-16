@@ -17,8 +17,6 @@ $this->title = Yii::t('lead', 'Charts');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-var_dump($searchModel->from_at);
-
 $leadStatusColor = new LeadStatusColor();
 
 $leadsDaysData = $searchModel->getLeadsByDays();
@@ -77,12 +75,32 @@ foreach ($leadsCountSeries as $index => $data) {
 	$leadsCountSeries[$index]['data'] = $dataWithoutStatues;
 }
 
-$statusData = $searchModel->getLeadStatusesCount();
-foreach ($statusData as $status_id => $count) {
+$statusesCount = $searchModel->getLeadStatusesCount();
+$statusData = [];
+foreach ($statusesCount as $status_id => $count) {
 	$status = LeadStatus::getModels()[$status_id];
 	$statusData['series'][] = $count;
 	$statusData['labels'][] = $status->name;
 	$statusData['colors'][] = $leadStatusColor->getStatusColor($status);
+}
+
+$statusGroupData = [];
+$withoutGroup = false;
+foreach ($statusesCount as $status_id => $count) {
+	$status = LeadStatus::getModels()[$status_id];
+	if (!$withoutGroup) {
+		if (empty($status->chart_group)) {
+			continue;
+		}
+	}
+	$group = $status->chart_group ? $status->chart_group : Yii::t('chart', 'Without group');
+	if (!isset($statusGroupData['series'][$group])) {
+		$statusGroupData['series'][$group] = 0;
+	}
+
+	$statusGroupData['series'][$group] += $count;
+	$statusGroupData['labels'][$group] = $group;
+	$statusGroupData['colors'][$group] = $leadStatusColor->getStatusColor($status);
 }
 
 $typesData = $searchModel->getLeadTypesCount();
@@ -163,6 +181,7 @@ foreach ($usersData as $userId => $count) {
 
 		?>
 
+
 		<div class="row">
 			<?= !empty($statusData) ?
 				ChartsWidget::widget([
@@ -183,8 +202,9 @@ foreach ($usersData as $userId => $count) {
 							'align' => 'center',
 						],
 						'legend' => [
-							//		'position' => 'bottom',
-							'width' => 200,
+							'position' => 'bottom',
+							//'width' => 200,
+							'height' => '55',
 							'formatter' => new JsExpression('function(seriesName, opts){
 															return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]];
 															}'),
@@ -226,8 +246,9 @@ foreach ($usersData as $userId => $count) {
 							'align' => 'center',
 						],
 						'legend' => [
-							//		'position' => 'bottom',
-							'width' => 200,
+							'position' => 'bottom',
+							//'width' => 200,
+							'height' => '55',
 							'formatter' => new JsExpression('function(seriesName, opts){
 															return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]];
 															}'),
@@ -270,8 +291,9 @@ foreach ($usersData as $userId => $count) {
 							'align' => 'center',
 						],
 						'legend' => [
-							//		'position' => 'bottom',
-							'width' => 200,
+							'position' => 'bottom',
+							//							'width' => 200,
+							'height' => '55',
 							'formatter' => new JsExpression('function(seriesName, opts){
 															return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]];
 															}'),
@@ -296,56 +318,106 @@ foreach ($usersData as $userId => $count) {
 			?>
 		</div>
 
-		<?php if (!empty($usersData)): ?>
 		<div class="row">
-			<div class="col-sm-12"
-			">
-			<?= ChartsWidget::widget([
-				'type' => ChartsWidget::TYPE_BAR,
-				'id' => 'chart-leads-bar-users-count' . $searchModel->getUniqueId(),
-				'height' => '300',
-				'series' => [
-					[
-						'name' => Yii::t('lead', 'Users'),
-						'data' => $usersData['series'],
+			<?= !empty($statusGroupData) ?
+				ChartsWidget::widget([
+					'type' => ChartsWidget::TYPE_DONUT,
+					'containerOptions' => [
+						'class' => 'col-sm-12 col-md-4',
+						'style' => [
+							'height' => '50vh',
+						],
 					],
-				],
-				'chart' => [
-					'stacked' => true,
-					'zoom' => [
-						'enabled' => true,
-						'type' => 'x',
-						'autoScaleYaxis' => true,
+					'id' => 'chart-leads-statuses-group-count' . $searchModel->getUniqueId(),
+					'series' => array_values($statusGroupData['series']),
+					'options' => [
+						'colors' => array_values($statusGroupData['colors']),
+						'labels' => array_values($statusGroupData['labels']),
+						'title' => [
+							'text' => Yii::t('lead', 'Status Count'),
+							'align' => 'center',
+						],
+						'legend' => [
+							'position' => 'bottom',
+							//'width' => 200,
+							'height' => '55',
+							'formatter' => new JsExpression('function(seriesName, opts){
+															return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]];
+															}'),
+						],
+						'plotOptions' => [
+							'pie' => [
+								'donut' => [
+									'labels' => [
+										'show' => true,
+										'total' => [
+											'show' => true,
+											'showAlways' => true,
+											'label' => Yii::t('common', 'Sum'),
+										],
+									],
+								],
+							],
+						],
 					],
-				],
-				'options' => [
-					'labels' => $usersData['labels'],
-					'title' => [
-						'text' => Yii::t('lead', 'Leads Users Count'),
-						'align' => 'center',
-					],
-					'legend' => [
-						//	'position' => 'bottom',
-						'width' => 200,
-						'formatter' => new JsExpression('function(seriesName, opts){
+				])
+				: ''
+			?>
+
+		</div>
+
+		<?php if (!empty($usersData)): ?>
+			<div class="row">
+				<div class="col-sm-12">
+					<?= ChartsWidget::widget([
+						'type' => ChartsWidget::TYPE_BAR,
+						'id' => 'chart-leads-bar-users-count' . $searchModel->getUniqueId(),
+						'height' => '340',
+						'series' => [
+							[
+								'name' => Yii::t('lead', 'Users'),
+								'data' => $usersData['series'],
+							],
+						],
+						'chart' => [
+							'stacked' => true,
+							'zoom' => [
+								'enabled' => true,
+								'type' => 'x',
+								'autoScaleYaxis' => true,
+							],
+						],
+						'options' => [
+							'labels' => $usersData['labels'],
+							'title' => [
+								'text' => Yii::t('lead', 'Leads Users Count'),
+								'align' => 'center',
+							],
+							'legend' => [
+								//	'position' => 'bottom',
+								'width' => 200,
+								'formatter' => new JsExpression('function(seriesName, opts){
 							return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]];
 							}'),
-					],
-				],
-			])
-			?>
-		</div>
-	</div>
-	<div class="clearfix"></div>
+							],
+						],
+					])
+					?>
+				</div>
+			</div>
+			<div class="clearfix"></div>
 
-<?php endif; ?>
-	<?php if (!empty($usersData)): ?>
-		<div class="row">
-			<div class="col-sm-12 col-md-6">
+		<?php endif; ?>
+		<?php if (!empty($usersData)): ?>
+			<div class="row">
 				<?= ChartsWidget::widget([
 					'type' => ChartsWidget::TYPE_DONUT,
-					'height' => '300',
-
+					'containerOptions' => [
+						'class' => 'col-sm-12 col-md-4',
+						'style' => [
+							'height' => '50vh',
+						],
+					],
 					'id' => 'chart-leads-users-count' . $searchModel->getUniqueId(),
 					'series' => $usersData['series'],
 					'options' => [
@@ -355,8 +427,8 @@ foreach ($usersData as $userId => $count) {
 							'align' => 'center',
 						],
 						'legend' => [
-							//	'position' => 'bottom',
-							'width' => 200,
+							'position' => 'bottom',
+							'height' => 100,
 							'formatter' => new JsExpression('function(seriesName, opts){
 							return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]];
 							}'),
@@ -379,12 +451,11 @@ foreach ($usersData as $userId => $count) {
 				])
 				?>
 			</div>
-		</div>
 
-		<div class="clearfix"></div>
+			<div class="clearfix"></div>
 
-	<?php endif; ?>
+		<?php endif; ?>
 
-</div>
+	</div>
 
 
