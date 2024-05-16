@@ -13,13 +13,6 @@ use kartik\select2\Select2;
 /* @var $sourcesNames array */
 /* @var $usersNames array */
 
-//var_export($model->source_id);
-//var_export($model->type_id);
-var_dump([
-	'from_at' => $model->from_at,
-	'fromAt' => $model->getDefaultFromAt(),
-	'to_at' => $model->to_at,
-]);
 ?>
 
 <div class="lead-chart-search-search">
@@ -52,26 +45,6 @@ var_dump([
 		?>
 
 
-		<?= $form->field($model, 'excludedStatus', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
-			'data' => LeadChartSearch::getStatusNames(),
-			'pluginOptions' => [
-				'placeholder' => $model->getAttributeLabel('excludedStatus'),
-				'multiple' => true,
-				'allowClear' => true,
-			],
-		])
-		?>
-
-		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
-			'data' => LeadChartSearch::getStatusNames(),
-			'pluginOptions' => [
-				'placeholder' => $model->getAttributeLabel('excludedStatus'),
-				'multiple' => true,
-				'allowClear' => true,
-			],
-		])
-		?>
-
 		<?= $form->field($model, 'hoursAfterLastReport', ['options' => ['class' => 'col-md-2 col-lg-1']])->textInput([
 			'type' => 'number',
 			'step' => 1,
@@ -85,12 +58,30 @@ var_dump([
 		]) ?>
 
 
-		<?= Yii::$app->user->can(User::PERMISSION_LEAD_MARKET) ?
-			$form->field($model, 'fromMarket', ['options' => ['class' => 'col-md-1']])->dropDownList(Html::booleanDropdownList(), [
-				'prompt' => Yii::t('common', 'All'),
-			])
-			: ''
+	</div>
+
+	<div class="row">
+
+		<?= $form->field($model, 'excludedStatus', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
+			'data' => LeadChartSearch::getStatusNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('excludedStatus'),
+				'multiple' => true,
+				'allowClear' => true,
+			],
+		])
 		?>
+
+		<?= $form->field($model, 'status_id', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
+			'data' => LeadChartSearch::getStatusNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('status_id'),
+				'multiple' => true,
+				'allowClear' => true,
+			],
+		])
+		?>
+
 
 		<?= $form->field($model, 'reportStatus', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
 			'data' => LeadChartSearch::getStatusNames(),
@@ -99,6 +90,14 @@ var_dump([
 				'allowClear' => true,
 			],
 		])
+		?>
+
+
+		<?= Yii::$app->user->can(User::PERMISSION_LEAD_MARKET) ?
+			$form->field($model, 'fromMarket', ['options' => ['class' => 'col-md-1']])->dropDownList(Html::booleanDropdownList(), [
+				'prompt' => Yii::t('common', 'All'),
+			])
+			: ''
 		?>
 
 	</div>
@@ -159,14 +158,6 @@ var_dump([
 				])
 				: ''
 			?>
-
-			<?= $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
-
-			<?= $form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])
-				->dropDownList(Html::booleanDropdownList(), [
-					'prompt' => Yii::t('lead', 'Select...'),
-				]) ?>
-
 
 		<?php else: ?>
 

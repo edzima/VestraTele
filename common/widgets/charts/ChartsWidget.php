@@ -12,6 +12,8 @@ class ChartsWidget extends Widget {
 	public static $autoIdPrefix = 'c';
 
 	public const TYPE_BAR = 'bar';
+
+	public const TYPE_PIE = 'pie';
 	public const TYPE_LINE = 'line';
 	public const TYPE_DONUT = 'donut';
 	public const TYPE_DEFAULT = self::TYPE_LINE;
