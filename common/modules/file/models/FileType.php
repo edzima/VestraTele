@@ -34,6 +34,57 @@ class FileType extends ActiveRecord {
 		return '{{%file_type}}';
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
+	public function rules(): array {
+		return [
+			[['name', 'visibility', 'validator_config'], 'required'],
+			[['is_active'], 'integer'],
+			[['validator_config'], 'string'],
+			[['name', 'visibility'], 'string', 'max' => 255],
+			[['name'], 'unique'],
+		];
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function attributeLabels() {
+		return [
+			'id' => Yii::t('file', 'ID'),
+			'name' => Yii::t('file', 'Name'),
+			'is_active' => Yii::t('file', 'Is Active'),
+			'visibility' => Yii::t('file', 'Visibility'),
+			'visibilityName' => Yii::t('file', 'Visibility'),
+			'validator_config' => Yii::t('file', 'Validator Config'),
+		];
+	}
+
+	/**
+	 * Gets query for [[Files]].
+	 *
+	 * @return ActiveQuery
+	 */
+	public function getFiles() {
+		return $this->hasMany(File::class, ['type_id' => 'id']);
+	}
+
+	public function getValidatorOptions(): ValidatorOptions {
+		if ($this->_validatorOptions === null) {
+			$this->_validatorOptions = ValidatorOptions::createFromJson($this->validator_config);
+		}
+		return $this->_validatorOptions;
+	}
+
+	public function isPublic(): bool {
+		return $this->visibility === static::VISIBILITY_PUBLIC;
+	}
+
+	public function getVisibilityName(): string {
+		return static::getVisibilityNames()[$this->visibility];
+	}
+
 	public static function getVisibilityNames(): array {
 		return [
 			static::VISIBILITY_PUBLIC => Yii::t('file', 'Public'),
@@ -61,49 +112,4 @@ class FileType extends ActiveRecord {
 		return static::$_instances;
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules() {
-		return [
-			[['name', 'visibility', 'validator_config'], 'required'],
-			[['is_active'], 'integer'],
-			[['validator_config'], 'string'],
-			[['name', 'visibility'], 'string', 'max' => 255],
-			[['name'], 'unique'],
-		];
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function attributeLabels() {
-		return [
-			'id' => Yii::t('file', 'ID'),
-			'name' => Yii::t('file', 'Name'),
-			'is_active' => Yii::t('file', 'Is Active'),
-			'visibility' => Yii::t('file', 'Visibility'),
-			'validator_config' => Yii::t('file', 'Validator Config'),
-		];
-	}
-
-	/**
-	 * Gets query for [[Files]].
-	 *
-	 * @return ActiveQuery
-	 */
-	public function getFiles() {
-		return $this->hasMany(File::class, ['type_id' => 'id']);
-	}
-
-	public function getValidatorOptions(): ValidatorOptions {
-		if ($this->_validatorOptions === null) {
-			$this->_validatorOptions = ValidatorOptions::createFromJson($this->validator_config);
-		}
-		return $this->_validatorOptions;
-	}
-
-	public function isPublic(): bool {
-		return $this->visibility === static::VISIBILITY_PUBLIC;
-	}
 }

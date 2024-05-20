@@ -72,11 +72,6 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_LAWSUIT = 'lawsuit';
 	public const ROLE_AUDITOR = 'auditor';
 
-	public const PERMISSION_ISSUE_FILE_DELETE_NOT_SELF = 'issue-file.delete_not_self';
-
-	public const PERMISSION_ISSUE_FILE_UPLOAD = 'issue-file.upload';
-	public const PERMISSION_FILE_TYPE = 'file.type';
-
 	private static $USER_NAMES = [];
 
 	public function getParent(): ActiveQuery {

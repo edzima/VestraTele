@@ -1,11 +1,12 @@
 <?php
 
+use common\modules\file\models\FileType;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
-/** @var common\modules\file\models\FileType $model */
+/** @var FileType $model */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('file', 'File Types'), 'url' => ['index']];

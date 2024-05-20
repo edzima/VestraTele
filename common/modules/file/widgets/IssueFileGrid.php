@@ -58,7 +58,7 @@ class IssueFileGrid extends GridView {
 			],
 			//	'details',
 			'file.typeName',
-			'file.owner',
+			//	'file.owner',
 			[
 				'class' => ActionColumn::class,
 				'controller' => '/file/issue',

@@ -130,6 +130,12 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const PERMISSION_LEAD_DELETE = 'lead.delete';
 	public const PERMISSION_USER_TRAITS = 'user.traits';
 	public const PERMISSION_NOTE_UPDATE = 'note.update';
+
+	public const PERMISSION_ISSUE_FILE_DELETE_NOT_SELF = 'issue-file.delete_not_self';
+
+	public const PERMISSION_ISSUE_FILE_UPLOAD = 'issue-file.upload';
+	public const PERMISSION_FILE_TYPE = 'file.type';
+
 	public const PERMISSION_ISSUE_VISIBLE_NOT_SELF = 'issue.visible_not_self';
 
 	private ?UserProfile $_profile = null;

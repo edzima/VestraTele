@@ -10,8 +10,8 @@ use common\models\issue\IssueTagType;
 use common\models\issue\IssueUser;
 use common\models\user\User;
 use common\models\user\Worker;
-use common\modules\file\widgets\IssueFileGrid;
 use common\modules\court\models\Lawsuit;
+use common\modules\file\widgets\IssueFileGrid;
 use common\modules\issue\widgets\IssueTagsWidget;
 use common\modules\issue\widgets\IssueUsersWidget;
 use common\widgets\FieldsetDetailView;
@@ -502,6 +502,7 @@ use yii\data\ActiveDataProvider;
 					'query' => $model->getIssueModel()->getLawsuits(),
 				]),
 				'showOnEmpty' => false,
+				'emptyText' => '',
 				'summary' => '',
 				'caption' => Yii::t('court', 'Lawsuits'),
 				'columns' => [

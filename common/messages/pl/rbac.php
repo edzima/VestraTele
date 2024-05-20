@@ -47,6 +47,7 @@ return array_merge([
 	'issue.type.manager' => 'Typy Spraw - (Manager)',
 	'issue.visible_not_self' => 'Sprawy - podgląd Wszystkie',
 	'issue-file.delete_not_self' => 'Sprawy - Pliki usuwanie nie swoich',
+	'issue-file.upload' => 'Sprawy - wgrywanie plików',
 	'guardian' => 'Opiekun',
 	'handicapped' => 'Niepełnosprawny',
 	'hint' => 'Wskazówki',
