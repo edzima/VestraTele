@@ -19,6 +19,7 @@ use common\modules\file\Module as FileModule;
 use common\modules\lead\components\LeadClient;
 use common\modules\lead\Module as LeadModule;
 use common\modules\reminder\Module as ReminderModule;
+use creocoder\flysystem\AwsS3Filesystem;
 use creocoder\flysystem\LocalFilesystem;
 use edzima\teryt\Module as TerytModule;
 use Edzima\Yii2Adescom\AdescomSender;
@@ -68,37 +69,11 @@ $config = [
 		'reminder' => [
 			'class' => ReminderModule::class,
 		],
-//		'attachments' => [
-//			'class' => AttachmentsModule::class,
-//			'tempPath' => '@runtime/uploads/temp',
-//			'rules' => [ // Rules according to the FileValidator
-//						 'maxFiles' => 10, // Allow to upload maximum 3 files, default to 3
-//						// 'mimeTypes' => 'image/png', // Only png images
-//						// 'maxSize' => 1024 * 1024 * 5, // 1 MB
-//			],
-//			'filesystem' => 'fs',
-//			'tableName' => '{{%attachments}}', // Optional, default to 'attach_file'
-//		],
-'file' => [
-	'class' => FileModule::class,
-	'tempPath' => '@runtime/uploads/temp',
-	//			'rules' => [ // Rules according to the FileValidator
-	//						 'maxFiles' => 10, // Allow to upload maximum 3 files, default to 3
-	//						 // 'mimeTypes' => 'image/png', // Only png images
-	//						 // 'maxSize' => 1024 * 1024 * 5, // 1 MB
-	//			],
-	'filesystem' => 'fs',
-],
-'teryt' => [
-	'class' => TerytModule::class,
-],
-'lead' => [
-	'class' => LeadModule::class,
-	'userClass' => User::class,
-],
-'reminder' => [
-	'class' => ReminderModule::class,
-],
+		'file' => [
+			'class' => FileModule::class,
+			'tempPath' => '@runtime/uploads/temp',
+			'filesystem' => 'awss3Fs',
+		],
 	],
 	'components' => [
 
@@ -108,6 +83,13 @@ $config = [
 			'config' => [
 				'visibility' => AdapterInterface::VISIBILITY_PRIVATE,
 			],
+		],
+		'awss3Fs' => [
+			'class' => AwsS3Filesystem::class,
+			'key' => getenv('AWS_S3_KEY'),
+			'secret' => getenv('AWS_S3_SECRET'),
+			'bucket' => getenv('AWS_S3_BUCKET'),
+			'region' => getenv('AWS_S3_REGION'),
 		],
 		'db' => [
 			'class' => 'yii\db\Connection',
