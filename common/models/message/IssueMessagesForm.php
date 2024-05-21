@@ -317,8 +317,6 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 		if ($template === null) {
 			return null;
 		}
-		codecept_debug($this->issue->getIssueStageId());
-		codecept_debug($template->getKey());
 		$this->parseTemplate($template);
 		return $this->createEmail($template)
 			->setBcc($emails);
