@@ -72,7 +72,7 @@ class IssueFileGrid extends GridView {
 				'visibleButtons' => [
 					'update' => false,
 					'view' => function (IssueFile $model): string {
-						return $model->file->isForUser(Yii::$app->user->getId());
+						return $model->file->owner_id === (Yii::$app->user->getId()) || Yii::$app->user->can(Worker::ROLE_ISSUE_FILE_MANAGER);
 					},
 					'delete' => function (IssueFile $model): string {
 						return $model->file->owner_id === (Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_ISSUE_FILE_DELETE_NOT_SELF);
