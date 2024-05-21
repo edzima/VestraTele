@@ -5,22 +5,26 @@ namespace common\modules\file\widgets;
 use common\helpers\Url;
 use common\modules\file\models\File;
 use kartik\file\FileInput as BaseFileInput;
-use yii\helpers\Html;
 
 class FileInput extends BaseFileInput {
 
 	public array $previewRoute = [];
 	public array $deleteRoute = [];
 
-	public string $paramFileId = 'fileId';
+	public string $paramFileId = 'file_id';
 
 	/**
 	 * @var File[]
 	 */
 	public array $previewFiles = [];
+	public string $defaultFileType = 'image';
+
+	public bool $overwriteInitial = false;
 
 	public function init() {
 		parent::init();
+		$this->pluginOptions['overwriteInitial'] = $this->overwriteInitial;
+		$this->pluginOptions['fileActionSettings']['showDrag'] = false;
 		if (!isset($this->pluginOptions['initialPreview'])) {
 			$this->pluginOptions['initialPreview'] = $this->getInitialPreview();
 			$this->pluginOptions['initialPreviewAsData'] = true;
@@ -41,22 +45,6 @@ class FileInput extends BaseFileInput {
 			$initialPreview[] = Url::to($url, true);
 		}
 		return $initialPreview;
-		$initialPreview = [];
-		foreach ($this->previewFiles as $file) {
-			if (substr($file->mime, 0, 5) === 'image') {
-				$url = $this->previewRoute;
-				$url[$this->paramFileId] = $file->id;
-				$initialPreview[] = Html::img($url, ['class' => 'file-preview-image']);
-			} else {
-				$initialPreview[] = Html::beginTag('div', ['class' => 'file-preview-other']) .
-					Html::beginTag('h2') .
-					Html::tag('i', '', ['class' => 'glyphicon glyphicon-file']) .
-					Html::endTag('h2') .
-					Html::endTag('div');
-			}
-		}
-
-		return $initialPreview;
 	}
 
 	public function getInitialPreviewConfig(): array {
@@ -69,9 +57,30 @@ class FileInput extends BaseFileInput {
 			$url[$this->paramFileId] = $file->id;
 			$initialPreviewConfig[] = [
 				'caption' => $file->getNameWithType(),
-				'url' => Url::to($url),
+				'url' => Url::to($url, true),
+				'size' => $file->size,
+				'type' => $this->getInitialPreviewConfigFileType($file),
 			];
 		}
 		return $initialPreviewConfig;
+	}
+
+	protected function getInitialPreviewConfigFileType(File $file): string {
+		if (strpos($file->mime, 'image') !== false) {
+			return 'image';
+		}
+		if (strpos($file->mime, 'pdf') !== false) {
+			return 'pdf';
+		}
+		if (strpos($file->mime, 'video') !== false) {
+			return 'video';
+		}
+		if (strpos($file->mime, 'text') !== false) {
+			return 'text';
+		}
+		if (strpos($file->mime, 'opendocument') !== false) {
+			return 'office';
+		}
+		return $this->defaultFileType;
 	}
 }

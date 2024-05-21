@@ -4,8 +4,10 @@ namespace common\modules\file\widgets;
 
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
+use common\models\user\Worker;
 use common\modules\file\models\IssueFile;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\DataColumn;
 use common\widgets\GridView;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -39,8 +41,13 @@ class IssueFileGrid extends GridView {
 
 	public function defaultColumns(): array {
 		return [
+			'file.typeName',
 			[
+				'class' => DataColumn::class,
 				'label' => Yii::t('file', 'File'),
+				'options' => [
+					'style' => 'width:70%',
+				],
 				'value' => function (IssueFile $issueFile): string {
 					$name = Html::encode($issueFile->file->getNameWithType());
 					if ($issueFile->file->isForUser(Yii::$app->user->getId())) {
@@ -57,11 +64,20 @@ class IssueFileGrid extends GridView {
 				'format' => 'html',
 			],
 			//	'details',
-			'file.typeName',
+
 			//	'file.owner',
 			[
 				'class' => ActionColumn::class,
 				'controller' => '/file/issue',
+				'visibleButtons' => [
+					'update' => false,
+					'view' => function (IssueFile $model): string {
+						return $model->file->isForUser(Yii::$app->user->getId());
+					},
+					'delete' => function (IssueFile $model): string {
+						return $model->file->owner_id === (Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_ISSUE_FILE_DELETE_NOT_SELF);
+					},
+				],
 			],
 		];
 	}

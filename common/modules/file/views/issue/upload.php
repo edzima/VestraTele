@@ -1,5 +1,6 @@
 <?php
 
+use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use common\modules\file\models\UploadForm;
 use common\modules\file\widgets\FileInput;
@@ -16,6 +17,8 @@ $this->title = Yii::t('file', 'Upload -{type} to Issue: {issue}', [
 );
 ?>
 <div class="issue-file-upload">
+
+	<h1><?= Html::encode($this->title) ?></h1>
 
 	<div class="issue-attachments-form">
 

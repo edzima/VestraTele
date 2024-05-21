@@ -4,10 +4,10 @@ namespace common\modules\file\models;
 
 use common\modules\file\Module;
 use Exception;
+use Maestroerror\HeicToJpg;
 use Yii;
 use yii\base\Model;
 use yii\helpers\FileHelper;
-use yii\helpers\Html;
 use yii\validators\FileValidator;
 use yii\web\UploadedFile;
 
@@ -20,6 +20,9 @@ class UploadForm extends Model {
 
 	public int $userId;
 
+	public bool $imageToWeb = true;
+	public int $imageQuality = 75;
+
 	private FileType $type;
 	private Module $module;
 
@@ -29,6 +32,12 @@ class UploadForm extends Model {
 		$this->type = $type;
 		$this->module = $module;
 		parent::__construct($config);
+	}
+
+	public function attributeLabels(): array {
+		return [
+			'file' => Yii::t('file', 'Files'),
+		];
 	}
 
 	public function getType(): FileType {
@@ -66,6 +75,9 @@ class UploadForm extends Model {
 		}
 		$attachedFiles = [];
 		foreach (FileHelper::findFiles($userTempDir) as $file) {
+			if ($this->imageToWeb && $this->fileIsImage($file)) {
+				$file = $this->imageToWebp($file);
+			}
 			if (!($attachedFile = $module->attachFile(
 				$file,
 				$model,
@@ -79,6 +91,57 @@ class UploadForm extends Model {
 		}
 		rmdir($userTempDir);
 		return count($attachedFiles);
+	}
+
+	public function fileIsImage(string $file): bool {
+		$mime = FileHelper::getMimeType($file);
+		return strpos($mime, 'image') !== false;
+	}
+
+	public function imageToWebp(string $file): string {
+		if (HeicToJpg::isHeic($file)) {
+			$newFile = $this->replace_extension($file, 'jpg');
+			HeicToJpg::convert($file)->saveAs($this->replace_extension($file, 'jpg'));
+			FileHelper::unlink($file);
+			$file = $newFile;
+		}
+
+		$extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+		switch ($extension) {
+			case 'jpg':
+			case 'jpeg':
+				$img = @imagecreatefromjpeg($file);
+				break;
+			case 'gif':
+				$img = @imagecreatefromgif($file);
+				break;
+			case 'png':
+				$img = @imagecreatefrompng($file);
+				break;
+			default:
+				$img = false;
+				break;
+		}
+		if ($img !== false) {
+			// open an image file
+			$newFile = $this->replace_extension($file, 'webp');
+			if (imagewebp($img, $newFile, $this->imageQuality)) {
+				FileHelper::unlink($file);
+				$file = $newFile;
+			} else {
+				Yii::error([
+					'msg' => 'Image to webp failed.',
+					'file' => $file,
+				], __METHOD__);
+			}
+			imagedestroy($img);
+		}
+		return $file;
+	}
+
+	function replace_extension($filename, $new_extension) {
+		$info = pathinfo($filename);
+		return $info['dirname'] . '/' . $info['filename'] . '.' . $new_extension;
 	}
 
 }
