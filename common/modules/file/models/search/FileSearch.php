@@ -3,6 +3,7 @@
 namespace common\modules\file\models\search;
 
 use common\modules\file\models\File;
+use common\modules\file\models\FileType;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -10,6 +11,20 @@ use yii\data\ActiveDataProvider;
  * FileSearch represents the model behind the search form of `common\modules\file\models\File`.
  */
 class FileSearch extends File {
+
+	public static function getFileTypesNames(): array {
+		return FileType::getNames(false);
+	}
+
+	public static function getTypesNames(): array {
+		return File::find()
+			->select('type')
+			->asArray()
+			->distinct()
+			->groupBy('type')
+			->indexBy('type')
+			->column();
+	}
 
 	/**
 	 * {@inheritdoc}

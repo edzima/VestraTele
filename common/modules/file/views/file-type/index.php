@@ -1,13 +1,14 @@
 <?php
 
 use common\modules\file\models\FileType;
+use common\modules\file\models\search\FileTypeSearch;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
 /** @var yii\web\View $this */
-/** @var common\modules\file\models\search\FileTypeSearch $searchModel */
+/** @var FileTypeSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
 $this->title = Yii::t('file', 'File Types');
@@ -31,13 +32,37 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
 
-			'id',
+			//	'id',
 			'name',
-			'is_active',
-			'visibility',
-			'validator_config:ntext',
+			'is_active:boolean',
 			[
-				'class' => ActionColumn::className(),
+				'attribute' => 'visibility',
+				'value' => 'visibilityName',
+				'filter' => FileTypeSearch::getVisibilityNames(),
+			],
+			[
+				'attribute' => 'extensions',
+				'value' => function (FileType $type) {
+					return $type->getValidatorOptions()->extensions;
+				},
+				'label' => Yii::t('file', 'Extensions'),
+			],
+			[
+				'attribute' => 'maxSize',
+				'value' => function (FileType $type) {
+					return $type->getValidatorOptions()->maxSize;
+				},
+				'label' => Yii::t('file', 'Max size'),
+			],
+			[
+				'attribute' => 'maxFiles',
+				'value' => function (FileType $type) {
+					return $type->getValidatorOptions()->maxFiles;
+				},
+				'label' => Yii::t('file', 'Max files'),
+			],
+			[
+				'class' => ActionColumn::class,
 				'urlCreator' => function ($action, FileType $model, $key, $index, $column) {
 					return Url::toRoute([$action, 'id' => $model->id]);
 				},

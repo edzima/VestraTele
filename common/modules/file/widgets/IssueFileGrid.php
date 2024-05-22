@@ -23,6 +23,11 @@ class IssueFileGrid extends GridView {
 	public $emptyText = '';
 	public $showOnEmpty = false;
 
+	public bool $groupByType = true;
+
+	private array $typeModels = [];
+	private array $renderTypes = [];
+
 	public function init(): void {
 		if (empty($this->caption)) {
 			$this->caption = Yii::t('issue', 'Files');
@@ -36,12 +41,57 @@ class IssueFileGrid extends GridView {
 		if (empty($this->columns)) {
 			$this->columns = $this->defaultColumns();
 		}
+		if ($this->groupByType) {
+			$this->typeModels = [];
+			foreach ($this->dataProvider->getModels() as $model) {
+				$this->typeModels[$model->file->file_type_id][] = $model;
+			}
+		}
 		parent::init();
+	}
+
+	public function renderTableRow($model, $key, $index): string {
+		if (!$this->groupByType || !isset($this->renderTypes[$model->file->file_type_id])) {
+			$this->renderTypes[$model->file->file_type_id] = $model->file->file_type_id;
+			return parent::renderTableRow($model, $key, $index);
+		}
+		return '';
 	}
 
 	public function defaultColumns(): array {
 		return [
-			'file.typeName',
+			[
+				'noWrap' => true,
+				'contentBold' => true,
+				'value' => function (IssueFile $model) {
+					return Html::a($model->file->fileType->name,
+						[
+							'/file/issue/upload',
+							'issue_id' => $model->issue_id,
+							'file_type_id' => $model->file->file_type_id,
+						]);
+				},
+				'format' => 'html',
+			],
+			[
+				'class' => 'kartik\grid\ExpandRowColumn',
+				'width' => '50px',
+				'value' => function () {
+					return GridView::ROW_COLLAPSED;
+				},
+				'detail' => function (IssueFile $model) {
+					$models = $this->typeModels[$model->file->file_type_id] ?? [];
+					$content = [];
+					foreach ($models as $typeModel) {
+						$content[] = $this->renderFileLink($typeModel);
+					}
+					return implode('; ', $content);
+				},
+				'headerOptions' => ['class' => 'kartik-sheet-style'],
+				'expandOneOnly' => true,
+				'enableRowClick' => true,
+				'visible' => $this->groupByType,
+			],
 			[
 				'class' => DataColumn::class,
 				'label' => Yii::t('file', 'File'),
@@ -49,19 +99,10 @@ class IssueFileGrid extends GridView {
 					'style' => 'width:70%',
 				],
 				'value' => function (IssueFile $issueFile): string {
-					$name = Html::encode($issueFile->file->getNameWithType());
-					if ($issueFile->file->isForUser(Yii::$app->user->getId())) {
-						return Html::a(
-							$name, [
-								'/file/issue/download',
-								'issue_id' => $issueFile->issue_id,
-								'file_id' => $issueFile->file_id,
-							]
-						);
-					}
-					return $name;
+					return $this->renderFileLink($issueFile);
 				},
 				'format' => 'html',
+				'visible' => !$this->groupByType,
 			],
 			//	'details',
 
@@ -78,8 +119,23 @@ class IssueFileGrid extends GridView {
 						return $model->file->owner_id === (Yii::$app->user->getId()) || Yii::$app->user->can(Worker::PERMISSION_ISSUE_FILE_DELETE_NOT_SELF);
 					},
 				],
+				'visible' => !$this->groupByType,
 			],
 		];
+	}
+
+	protected function renderFileLink(IssueFile $issueFile): string {
+		$name = Html::encode($issueFile->file->getNameWithType());
+		if ($issueFile->file->isForUser(Yii::$app->user->getId())) {
+			return Html::a(
+				$name, [
+					'/file/issue/download',
+					'issue_id' => $issueFile->issue_id,
+					'file_id' => $issueFile->file_id,
+				]
+			);
+		}
+		return $name;
 	}
 
 	public function issueDataProvider(): DataProviderInterface {

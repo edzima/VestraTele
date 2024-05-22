@@ -1,13 +1,14 @@
 <?php
 
 use common\modules\file\models\File;
+use common\modules\file\models\search\FileSearch;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
 /** @var yii\web\View $this */
-/** @var common\modules\file\models\search\FileSearch $searchModel */
+/** @var FileSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
 $this->title = Yii::t('file', 'Files');
@@ -18,9 +19,9 @@ $this->params['breadcrumbs'][] = $this->title;
 	<h1><?= Html::encode($this->title) ?></h1>
 
 	<p>
-		<?php
-		//Html::a(Yii::t('file', 'Create File'), ['create'], ['class' => 'btn btn-success'])
-		?>
+		<?= Html::a(Yii::t('file', 'File Types'), ['file-type/index'], ['class' => 'btn btn-info']) ?>
+		<?= Html::a(Yii::t('file', 'Access'), ['file-access/index'], ['class' => 'btn btn-warning']) ?>
+
 	</p>
 
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -31,18 +32,32 @@ $this->params['breadcrumbs'][] = $this->title;
 		'columns' => [
 			['class' => 'yii\grid\SerialColumn'],
 
-			'id',
+			//	'id',
+			[
+				'attribute' => 'file_type_id',
+				'value' => function (File $file): string {
+					return Html::a(Html::encode($file->fileType->name), ['file-type/view', 'id' => $file->file_type_id]);
+				},
+				'filter' => FileSearch::getFileTypesNames(),
+				'format' => 'html',
+			],
 			'name',
-			'hash',
-			'size',
-			'type',
+			[
+				'attribute' => 'type',
+				'filter' => FileSearch::getTypesNames(),
+			],
+			//'hash',
+			[
+				'attribute' => 'size',
+				'value' => 'formattedSize',
+			],
+
 			//'mime',
-			//'file_type_id',
-			//'created_at',
-			//'updated_at',
+			'created_at:datetime',
+			'updated_at:datetime',
 			//'owner_id',
 			[
-				'class' => ActionColumn::className(),
+				'class' => ActionColumn::class,
 				'urlCreator' => function ($action, File $model, $key, $index, $column) {
 					return Url::toRoute([$action, 'id' => $model->id]);
 				},

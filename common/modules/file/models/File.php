@@ -4,10 +4,11 @@ namespace common\modules\file\models;
 
 use common\models\issue\Issue;
 use common\models\user\User;
-use fredyns\attachments\helpers\AttachmentHelper;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 use yii\helpers\FileHelper;
 use yii\helpers\Inflector;
 
@@ -33,6 +34,17 @@ use yii\helpers\Inflector;
  * @property FileType $fileType
  */
 class File extends ActiveRecord {
+
+	public function behaviors() {
+		return array_merge(parent::behaviors(), [
+				[
+					'class' => TimestampBehavior::class,
+					'value' => new Expression('CURRENT_TIMESTAMP'),
+
+				],
+			]
+		);
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -104,6 +116,10 @@ class File extends ActiveRecord {
 			'owner' => Yii::t('file', 'Owner'),
 			'path' => Yii::t('file', 'Path'),
 		];
+	}
+
+	public function getFormattedSize(): string {
+		return Yii::$app->formatter->asShortSize($this->size, 2);
 	}
 
 	/**

@@ -33,4 +33,6 @@ return [
 	'Upload -{type} to Issue: {issue}' => 'Dodaj plik - {type} do Sprawy: {issue}',
 	'Types' => 'Typy',
 	'Save' => 'Zapisz',
+	'Type' => 'Rozszerzenie',
+	'Size' => 'Rozmiar',
 ];

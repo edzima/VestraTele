@@ -16,10 +16,10 @@ use common\models\issue\query\IssueStageQuery;
 use common\models\issue\query\IssueUserQuery;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
+use common\modules\court\models\Lawsuit;
 use common\modules\file\models\AttachableModel;
 use common\modules\file\models\File;
 use common\modules\file\models\IssueFile;
-use common\modules\court\models\Lawsuit;
 use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -461,7 +461,7 @@ class Issue extends ActiveRecord implements
 	public function getIssueFiles(): ActiveQuery {
 		return $this
 			->hasMany(IssueFile::class, ['issue_id' => 'id'])
-			->with('file')
+			->joinWith('file')
 			->indexBy('file_id');
 	}
 

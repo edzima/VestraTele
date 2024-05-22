@@ -33,6 +33,7 @@ class RbacController extends Controller {
 		Worker::ROLE_LAWYER_ASSISTANT,
 		Worker::ROLE_TELEMARKETER,
 		Worker::ROLE_VINDICATOR,
+		Worker::ROLE_ISSUE_FILE_MANAGER,
 		Customer::ROLE_CUSTOMER,
 		Customer::ROLE_VICTIM,
 		Customer::ROLE_SHAREHOLDER,

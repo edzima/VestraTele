@@ -50,7 +50,7 @@ class FileType extends ActiveRecord {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'id' => Yii::t('file', 'ID'),
 			'name' => Yii::t('file', 'Name'),
@@ -67,11 +67,11 @@ class FileType extends ActiveRecord {
 	 * @return ActiveQuery
 	 */
 	public function getFiles() {
-		return $this->hasMany(File::class, ['type_id' => 'id']);
+		return $this->hasMany(File::class, ['file_type_id' => 'id']);
 	}
 
-	public function getValidatorOptions(): ValidatorOptions {
-		if ($this->_validatorOptions === null) {
+	public function getValidatorOptions(): ?ValidatorOptions {
+		if ($this->_validatorOptions === null && is_string($this->validator_config)) {
 			$this->_validatorOptions = ValidatorOptions::createFromJson($this->validator_config);
 		}
 		return $this->_validatorOptions;

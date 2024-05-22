@@ -1,6 +1,9 @@
 <?php
 
 use common\modules\file\models\FileType;
+use common\widgets\grid\IssuesDataColumn;
+use common\widgets\GridView;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -48,6 +51,28 @@ YiiAsset::register($this);
 					'maxSize',
 					'maxFiles',
 					'extensions',
+				],
+			]) ?>
+		</div>
+
+	</div>
+
+	<div class="row">
+		<div class="col-sm-12">
+			<?= GridView::widget([
+				'dataProvider' => (new ActiveDataProvider([
+					'query' => $model->getFiles(),
+				])),
+				'columns' => [
+					'name',
+					'type',
+					[
+						'attribute' => 'size',
+						'value' => 'formattedSize',
+					],
+					[
+						'class' => IssuesDataColumn::class,
+					],
 				],
 			]) ?>
 		</div>

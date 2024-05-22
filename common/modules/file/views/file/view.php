@@ -36,10 +36,10 @@ YiiAsset::register($this);
 			'size',
 			'type',
 			'mime',
-			'file_type_id',
-			'created_at',
-			'updated_at',
-			'owner_id',
+			'fileType.name',
+			'created_at:datetime',
+			'updated_at:datetime',
+			'owner.fullName',
 		],
 	]) ?>
 

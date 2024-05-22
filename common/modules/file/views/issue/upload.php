@@ -1,5 +1,6 @@
 <?php
 
+use common\helpers\Breadcrumbs;
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use common\modules\file\models\UploadForm;
@@ -15,6 +16,9 @@ $this->title = Yii::t('file', 'Upload -{type} to Issue: {issue}', [
 		'type' => $model->getType()->name,
 	]
 );
+$this->params['breadcrumbs'] = Breadcrumbs::issue($issue);
+$this->params['breadcrumbs'][] = $model->getType()->name;
+
 ?>
 <div class="issue-file-upload">
 

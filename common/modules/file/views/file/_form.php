@@ -1,10 +1,11 @@
 <?php
 
+use common\modules\file\models\File;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var common\modules\file\models\File $model */
+/** @var File $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
@@ -23,10 +24,6 @@ use yii\widgets\ActiveForm;
 	<?= $form->field($model, 'mime')->textInput(['maxlength' => true]) ?>
 
 	<?= $form->field($model, 'file_type_id')->textInput() ?>
-
-	<?= $form->field($model, 'created_at')->textInput() ?>
-
-	<?= $form->field($model, 'updated_at')->textInput() ?>
 
 	<?= $form->field($model, 'owner_id')->textInput() ?>
 

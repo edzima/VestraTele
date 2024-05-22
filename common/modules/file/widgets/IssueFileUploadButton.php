@@ -10,6 +10,10 @@ class IssueFileUploadButton extends ButtonDropdown {
 
 	public int $issueId;
 
+	public $options = [
+		'class' => 'btn btn-success',
+	];
+
 	public function init(): void {
 		if ($this->label === 'Button') {
 			$this->label = Html::icon('upload');
@@ -30,17 +34,13 @@ class IssueFileUploadButton extends ButtonDropdown {
 	}
 
 	protected function defaultItems(): array {
-		/** @var FileType[] $types */
-		$types = FileType::find()
-			->andWhere(['is_active' => true])
-			->orderBy(['name' => SORT_ASC])
-			->all();
+		$types = FileType::getNames(true);
 
 		$items = [];
-		foreach ($types as $type) {
+		foreach ($types as $typeId => $name) {
 			$items[] = [
-				'label' => $type->name,
-				'url' => ['/file/issue/upload', 'issue_id' => $this->issueId, 'file_type_id' => $type->id],
+				'label' => $name,
+				'url' => ['/file/issue/upload', 'issue_id' => $this->issueId, 'file_type_id' => $typeId],
 			];
 		}
 		return $items;
