@@ -41,6 +41,9 @@ class IssueController extends Controller {
 	public bool $checkCanSeeIssue = true;
 
 	protected function checkIssueAccess(IssueInterface $issue): void {
+		if (Yii::$app->user->can(Worker::ROLE_ISSUE_FILE_MANAGER)) {
+			$this->checkCanSeeIssue = false;
+		}
 		if ($this->checkCanSeeIssue && !Yii::$app->user->canSeeIssue($issue)) {
 			throw new ForbiddenHttpException();
 		}
