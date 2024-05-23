@@ -96,6 +96,9 @@ class IssueController extends Controller {
 		$model = new UploadForm($fileType, $this->module);
 		$model->userId = Yii::$app->user->getId();
 		$messagesForm = new IssueFilesUploadMessagesForm();
+		$messagesForm->workersTypes = [
+			Worker::ROLE_AUDITOR,
+		];
 		$messagesForm->setIssue($issue);
 		$messagesForm->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_MESSAGE_EMAIL_ISSUE_UPLOAD_FILE]));
 		if (Yii::$app->request->isPost && $model->saveUploads($issue)) {

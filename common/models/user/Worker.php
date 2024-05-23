@@ -76,6 +76,9 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_LAWSUIT = 'lawsuit';
 	public const ROLE_AUDITOR = 'auditor';
 
+	public const ROLE_AUDITOR_INNER = 'auditor.inner';
+
+
 	private static $USER_NAMES = [];
 
 	public function getParent(): ActiveQuery {

@@ -41,6 +41,7 @@ class RbacController extends Controller {
 		User::ROLE_RECCOMENDING,
 		User::ROLE_GUARDIAN,
 		Worker::ROLE_AUDITOR,
+		Worker::ROLE_AUDITOR_INNER,
 	];
 
 	public array $permissions = [

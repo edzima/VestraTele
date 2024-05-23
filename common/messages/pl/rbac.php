@@ -8,6 +8,7 @@ return array_merge([
 	'archive' => 'Archiwum',
 	'archive.deep' => 'Archiwum - Glębokie',
 	'auditor' => 'Audytor',
+	'auditor.inner' => 'Audytor - Wewnętrzny',
 	'book_keeper' => 'Księgowy',
 	'book_keeper_delayed' => 'Księgowy - przeterminowane',
 	'calculation.to-create' => 'Rozliczenia - dodawanie',
