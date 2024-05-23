@@ -4,6 +4,7 @@ namespace common\modules\file\controllers;
 
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
+use common\models\message\IssueFilesUploadMessagesForm;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\file\models\FileAccess;
@@ -39,7 +40,7 @@ class IssueController extends Controller {
 
 	public bool $checkCanSeeIssue = true;
 
-	protected function checkIssueAccess(Issue $issue): void {
+	protected function checkIssueAccess(IssueInterface $issue): void {
 		if ($this->checkCanSeeIssue && !Yii::$app->user->canSeeIssue($issue)) {
 			throw new ForbiddenHttpException();
 		}
@@ -94,13 +95,23 @@ class IssueController extends Controller {
 		$this->checkIssueAccess($issue);
 		$model = new UploadForm($fileType, $this->module);
 		$model->userId = Yii::$app->user->getId();
+		$messagesForm = new IssueFilesUploadMessagesForm();
+		$messagesForm->setIssue($issue);
+		$messagesForm->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_MESSAGE_EMAIL_ISSUE_UPLOAD_FILE]));
 		if (Yii::$app->request->isPost && $model->saveUploads($issue)) {
+			if ($messagesForm->load(Yii::$app->request->post())) {
+				$messagesForm->fileUploader = Yii::$app->user->getIdentity()->getFullName();
+				$messagesForm->setFiles($model->getAttachedFiles());
+				$messagesForm->pushMessages();
+			}
+
 			return $this->redirect(['/issue/issue/view', 'id' => $issue_id]);
 		}
 		return $this->render('upload', [
 			'issue' => $issue,
 			'model' => $model,
 			'type' => $fileType,
+			'messages' => $messagesForm,
 		]);
 	}
 
@@ -175,6 +186,6 @@ class IssueController extends Controller {
 		if ($model->file->owner_id === Yii::$app->user->getId()) {
 			return true;
 		}
-		return Yii::$app->user->can(User::PERMISSION_ISSUE_FILE_DELETE_NOT_SELF);
+		return Yii::$app->user->can(User::PERMISSION_ISSUE_FILE_DELETE_NOT_SELF) || Yii::$app->user->can(Worker::ROLE_ISSUE_FILE_MANAGER);
 	}
 }

@@ -3,13 +3,16 @@
 use common\helpers\Breadcrumbs;
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
+use common\models\message\IssueFilesUploadMessagesForm;
 use common\modules\file\models\UploadForm;
 use common\modules\file\widgets\FileInput;
+use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $issue IssueInterface */
 /* @var $model UploadForm */
+/* @var $messages IssueFilesUploadMessagesForm */
 
 $this->title = Yii::t('file', 'Upload -{type} to Issue: {issue}', [
 		'issue' => $issue->getIssueName(),
@@ -39,6 +42,13 @@ $this->params['breadcrumbs'][] = $model->getType()->name;
 			'deleteRoute' => ['/file/issue/delete', 'issue_id' => $issue->getIssueId()],
 		]) ?>
 
+		<?= IssueMessagesFormWidget::widget([
+			'form' => $form,
+			'model' => $messages,
+			'checkboxesAttributes' => [
+				'sendEmailToWorkers',
+			],
+		]) ?>
 
 		<?php ActiveForm::end(); ?>
 

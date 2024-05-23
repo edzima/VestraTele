@@ -41,12 +41,14 @@ class IssueFileGrid extends GridView {
 		if (empty($this->columns)) {
 			$this->columns = $this->defaultColumns();
 		}
+
 		if ($this->groupByType) {
 			$this->typeModels = [];
 			foreach ($this->dataProvider->getModels() as $model) {
 				$this->typeModels[$model->file->file_type_id][] = $model;
 			}
 		}
+
 		parent::init();
 	}
 
@@ -125,17 +127,7 @@ class IssueFileGrid extends GridView {
 	}
 
 	protected function renderFileLink(IssueFile $issueFile): string {
-		$name = Html::encode($issueFile->file->getNameWithType());
-		if ($issueFile->file->isForUser(Yii::$app->user->getId())) {
-			return Html::a(
-				$name, [
-					'/file/issue/download',
-					'issue_id' => $issueFile->issue_id,
-					'file_id' => $issueFile->file_id,
-				]
-			);
-		}
-		return $name;
+		return Html::issueFileLink($issueFile->file, $issueFile->issue_id);
 	}
 
 	public function issueDataProvider(): DataProviderInterface {

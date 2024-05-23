@@ -73,7 +73,7 @@ class UploadForm extends Model {
 				}
 			}
 		}
-		$attachedFiles = [];
+		$this->attachedFiles = [];
 		foreach (FileHelper::findFiles($userTempDir) as $file) {
 			if ($this->imageToWeb && $this->fileIsImage($file)) {
 				$file = $this->imageToWebp($file);
@@ -86,11 +86,17 @@ class UploadForm extends Model {
 			)) {
 				throw new Exception(Yii::t('yii', 'File upload failed.'));
 			} else {
-				$attachedFiles[] = $attachedFile;
+				$this->attachedFiles[] = $attachedFile;
 			}
 		}
 		rmdir($userTempDir);
-		return count($attachedFiles);
+		return count($this->attachedFiles);
+	}
+
+	private array $attachedFiles = [];
+
+	public function getAttachedFiles(): array {
+		return $this->attachedFiles;
 	}
 
 	public function fileIsImage(string $file): bool {
