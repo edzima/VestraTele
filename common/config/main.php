@@ -73,6 +73,35 @@ $config = [
 			'class' => FileModule::class,
 			'tempPath' => '@runtime/uploads/temp',
 			'filesystem' => 'awss3Fs',
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'controllers' => ['file/issue'],
+						'actions' => ['upload', 'delete'],
+						'permissions' => [
+							Worker::PERMISSION_ISSUE_FILE_UPLOAD,
+							Worker::PERMISSION_ISSUE_FILE_DELETE_NOT_SELF,
+						],
+						'allow' => true,
+					],
+					[
+						'controllers' => ['file/type'],
+						'permissions' => [Worker::PERMISSION_FILE_TYPE],
+						'allow' => true,
+					],
+					[
+						'controllers' => ['file/issue'],
+						'actions' => ['download'],
+						'permissions' => [Worker::PERMISSION_ISSUE],
+						'allow' => true,
+					],
+					[
+						'allow' => true,
+						'permissions' => [Worker::ROLE_ISSUE_FILE_MANAGER],
+					],
+				],
+			],
 		],
 	],
 	'components' => [
