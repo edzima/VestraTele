@@ -34,6 +34,7 @@ return array_merge([
 	'message:email.issuePay:paid' => 'Powiadomienia Mailowe: Opłącenie wpłaty',
 	'message:email.issue:stageChange' => 'Powiadomienia Mailowe: Zmiana etapu Sprawy',
 	'message:email.issueSummon:imminentDeadline' => 'Powiadomienia Mailowe: Zlecenia - Deadline',
+	'message:email.issue:uploadFile' => 'Powiadomienia Mailowe: Nowy plik w Sprawie',
 	'issue.message.note.issue' => 'Powiadomienia Mailowe w Notatkach do Sprawy',
 	'issue.message.note.summon' => 'Powiadomienia Mailowe w Notatkach do Zlecenia',
 	'issue.message.note.settlement' => 'Powiadomienia Mailowe w Notatkach do Rozliczenia',
