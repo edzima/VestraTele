@@ -32,7 +32,8 @@ class Html extends BaseHtml {
 	}
 
 	public static function issueFileLink(File $file, int $issue_id, $schema = false): string {
-		$name = Html::encode($file->getNameWithType());
+		$name = $file->getShortName() . '.' . $file->type;
+		$name = Html::encode($name);
 		if ($file->isForUser(Yii::$app->user->getId())) {
 			$url = static::URL_HELPER::issueFileDownload($issue_id, $file->id, $schema);
 			return Html::a($name, $url);

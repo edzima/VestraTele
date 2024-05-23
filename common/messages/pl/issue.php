@@ -244,4 +244,5 @@ return [
 	'Stage Change to At' => 'Do',
 
 	'Files' => 'Pliki',
+	'Files Count' => 'Pliki',
 ];

@@ -53,6 +53,15 @@ class File extends ActiveRecord {
 		return '{{%file}}';
 	}
 
+	public function getShortName(int $length = 50, int $endLength = 10): string {
+		$name = $this->name;
+		if (strlen($name) > $length) {
+			$name = substr($this->name, 0, $length - $endLength) . '...';
+			$name .= substr($this->name, -$endLength);
+		}
+		return $name;
+	}
+
 	public function isForUser(int $userId): bool {
 		return $this->owner_id === $userId
 			|| $this->fileType->isPublic()
