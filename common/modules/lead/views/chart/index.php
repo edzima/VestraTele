@@ -126,6 +126,36 @@ foreach ($usersData as $userId => $count) {
 	$usersData['labels'][] = $name;
 }
 
+//echo '<pre>' . VarDumper::dumpAsString($leadsCountSeries) . '</pre>';
+
+$js = <<< JS
+
+
+
+$('.btn-toggle').click(function() {
+	let btn = $(this).find('.btn');
+   btn.toggleClass('active');  
+	if ($(this).find('.btn-primary').length) {
+    	btn.toggleClass('btn-primary');
+    }
+    if ($(this).find('.btn-danger').length) {
+    	btn.toggleClass('btn-danger');
+    }
+    if ($(this).find('.btn-success').length) {
+    	btn.toggleClass('btn-success');
+    }
+    if ($(this).find('.btn-info').length) {
+    	btn.toggleClass('btn-info');
+    }
+   btn.toggleClass('btn-default');
+	let toggleContainer = this.getAttribute('data-toggle-container')
+	$(toggleContainer).toggleClass('hidden');
+});
+
+JS;
+
+$this->registerJs($js);
+
 ?>
 <div class="lead-chart-index">
 	<?= $this->render('_search', [
@@ -183,11 +213,65 @@ foreach ($usersData as $userId => $count) {
 
 
 		<div class="row">
+			<?php if (!empty($statusGroupData) && !empty($statusData)): ?>
+				<div class="bnt-toggle-wrapper">
+					<span>Statusy</span>
+					<div class="btn-group btn-toggle" data-toggle-container=".status-charts">
+						<button class="btn btn-xs btn-primary active">Grupy</button>
+						<button class="btn btn-xs btn-default">Wszystkie</button>
+					</div>
+				</div>
+
+			<?php endif; ?>
+			<?= !empty($statusGroupData) ?
+				ChartsWidget::widget([
+					'type' => ChartsWidget::TYPE_DONUT,
+					'containerOptions' => [
+						'class' => 'col-sm-12 col-md-6 col-lg-4 status-charts',
+						'style' => [
+							'height' => '50vh',
+						],
+					],
+					'id' => 'chart-leads-statuses-group-count' . $searchModel->getUniqueId(),
+					'series' => array_values($statusGroupData['series']),
+					'options' => [
+						'colors' => array_values($statusGroupData['colors']),
+						'labels' => array_values($statusGroupData['labels']),
+						'title' => [
+							'text' => Yii::t('lead', 'Status Count'),
+							'align' => 'center',
+						],
+						'legend' => [
+							'position' => 'bottom',
+							//'width' => 200,
+							'height' => '55',
+							'formatter' => new JsExpression('function(seriesName, opts){
+															return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]];
+															}'),
+						],
+						'plotOptions' => [
+							'pie' => [
+								'donut' => [
+									'labels' => [
+										'show' => true,
+										'total' => [
+											'show' => true,
+											'showAlways' => true,
+											'label' => Yii::t('common', 'Sum'),
+										],
+									],
+								],
+							],
+						],
+					],
+				])
+				: ''
+			?>
 			<?= !empty($statusData) ?
 				ChartsWidget::widget([
 					'type' => 'donut',
 					'containerOptions' => [
-						'class' => 'col-sm-12 col-md-4',
+						'class' => 'col-sm-12 col-md-6 col-lg-4 hidden status-charts',
 						'style' => [
 							'height' => '50vh',
 						],
@@ -232,7 +316,7 @@ foreach ($usersData as $userId => $count) {
 				ChartsWidget::widget([
 					'type' => ChartsWidget::TYPE_DONUT,
 					'containerOptions' => [
-						'class' => 'col-sm-12 col-md-4',
+						'class' => 'col-sm-12 col-md-6 col-lg-4',
 						'style' => [
 							'height' => '50vh',
 						],
@@ -277,7 +361,7 @@ foreach ($usersData as $userId => $count) {
 				ChartsWidget::widget([
 					'type' => ChartsWidget::TYPE_DONUT,
 					'containerOptions' => [
-						'class' => 'col-sm-12 col-md-4',
+						'class' => 'col-sm-12 col-md-6 col-lg-4',
 						'style' => [
 							'height' => '50vh',
 						],
@@ -319,50 +403,7 @@ foreach ($usersData as $userId => $count) {
 		</div>
 
 		<div class="row">
-			<?= !empty($statusGroupData) ?
-				ChartsWidget::widget([
-					'type' => ChartsWidget::TYPE_DONUT,
-					'containerOptions' => [
-						'class' => 'col-sm-12 col-md-4',
-						'style' => [
-							'height' => '50vh',
-						],
-					],
-					'id' => 'chart-leads-statuses-group-count' . $searchModel->getUniqueId(),
-					'series' => array_values($statusGroupData['series']),
-					'options' => [
-						'colors' => array_values($statusGroupData['colors']),
-						'labels' => array_values($statusGroupData['labels']),
-						'title' => [
-							'text' => Yii::t('lead', 'Status Count'),
-							'align' => 'center',
-						],
-						'legend' => [
-							'position' => 'bottom',
-							//'width' => 200,
-							'height' => '55',
-							'formatter' => new JsExpression('function(seriesName, opts){
-															return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]];
-															}'),
-						],
-						'plotOptions' => [
-							'pie' => [
-								'donut' => [
-									'labels' => [
-										'show' => true,
-										'total' => [
-											'show' => true,
-											'showAlways' => true,
-											'label' => Yii::t('common', 'Sum'),
-										],
-									],
-								],
-							],
-						],
-					],
-				])
-				: ''
-			?>
+
 
 		</div>
 
