@@ -60,6 +60,9 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const ROLE_ADMINISTRATOR = 'administrator';
 	public const ROLE_MANAGER = 'manager';
 	public const ROLE_USER = 'user';
+	public const ROLE_AUDITOR = 'auditor';
+	public const ROLE_AUDITOR_INNER = 'auditor.inner';
+
 
 	public const ROLE_RECCOMENDING = 'recommending';
 

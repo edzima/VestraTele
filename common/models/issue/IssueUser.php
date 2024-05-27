@@ -45,6 +45,7 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 	public const TYPE_VINDICATOR = User::ROLE_VINDICATOR;
 	public const TYPE_AUDITOR = Worker::ROLE_AUDITOR;
 
+	public const TYPE_AUDITOR_INNER = Worker::ROLE_AUDITOR_INNER;
 	public const TYPE_TELEMARKETER_SELF = 'tele.self';
 
 	public const TYPES_WORKERS = [
@@ -167,6 +168,8 @@ class IssueUser extends ActiveRecord implements IssueInterface {
 			static::TYPE_LAWYER_OFFICE => User::getRolesNames()[static::TYPE_LAWYER_OFFICE],
 			static::TYPE_TELEMARKETER => User::getRolesNames()[static::TYPE_TELEMARKETER],
 			static::TYPE_AUDITOR => User::getRolesNames()[static::TYPE_AUDITOR],
+			static::TYPE_AUDITOR_INNER => User::getRolesNames()[static::TYPE_AUDITOR_INNER],
+
 			static::TYPE_VINDICATOR => User::getRolesNames()[static::TYPE_VINDICATOR],
 			static::TYPE_VICTIM => User::getRolesNames()[static::TYPE_VICTIM],
 			static::TYPE_SHAREHOLDER => User::getRolesNames()[static::TYPE_SHAREHOLDER],
