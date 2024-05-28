@@ -60,6 +60,9 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const ROLE_ADMINISTRATOR = 'administrator';
 	public const ROLE_MANAGER = 'manager';
 	public const ROLE_USER = 'user';
+	public const ROLE_AUDITOR = 'auditor';
+	public const ROLE_AUDITOR_INNER = 'auditor.inner';
+
 
 	public const ROLE_RECCOMENDING = 'recommending';
 
@@ -76,6 +79,8 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 
 	public const ROLE_GUARDIAN = 'guardian';
 	public const ROLE_VINDICATOR = 'vindicator';
+
+	public const ROLE_ISSUE_FILE_MANAGER = 'issue-file-manager';
 
 	public const PERMISSION_ARCHIVE = 'archive';
 	public const PERMISSION_ARCHIVE_DEEP = 'archive.deep';
@@ -128,6 +133,12 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const PERMISSION_LEAD_DELETE = 'lead.delete';
 	public const PERMISSION_USER_TRAITS = 'user.traits';
 	public const PERMISSION_NOTE_UPDATE = 'note.update';
+
+	public const PERMISSION_ISSUE_FILE_DELETE_NOT_SELF = 'issue-file.delete_not_self';
+
+	public const PERMISSION_ISSUE_FILE_UPLOAD = 'issue-file.upload';
+	public const PERMISSION_FILE_TYPE = 'file.type';
+
 	public const PERMISSION_ISSUE_VISIBLE_NOT_SELF = 'issue.visible_not_self';
 
 	private ?UserProfile $_profile = null;

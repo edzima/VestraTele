@@ -15,12 +15,16 @@ use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\credit\Module as CreditModule;
 use common\modules\czater\Czater;
+use common\modules\file\Module as FileModule;
 use common\modules\lead\components\LeadClient;
 use common\modules\lead\Module as LeadModule;
 use common\modules\reminder\Module as ReminderModule;
+use creocoder\flysystem\AwsS3Filesystem;
+use creocoder\flysystem\LocalFilesystem;
 use edzima\teryt\Module as TerytModule;
 use Edzima\Yii2Adescom\AdescomSender;
 use Edzima\Yii2Adescom\AdescomSoap;
+use League\Flysystem\AdapterInterface;
 use yii\caching\DummyCache;
 use yii\caching\FileCache;
 use yii\mutex\MysqlMutex;
@@ -65,8 +69,57 @@ $config = [
 		'reminder' => [
 			'class' => ReminderModule::class,
 		],
+		'file' => [
+			'class' => FileModule::class,
+			'tempPath' => '@runtime/uploads/temp',
+			'filesystem' => 'awss3Fs',
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'controllers' => ['file/issue'],
+						'actions' => ['upload', 'delete'],
+						'permissions' => [
+							Worker::PERMISSION_ISSUE_FILE_UPLOAD,
+							Worker::PERMISSION_ISSUE_FILE_DELETE_NOT_SELF,
+						],
+						'allow' => true,
+					],
+					[
+						'controllers' => ['file/type'],
+						'permissions' => [Worker::PERMISSION_FILE_TYPE],
+						'allow' => true,
+					],
+					[
+						'controllers' => ['file/issue'],
+						'actions' => ['download'],
+						'permissions' => [Worker::PERMISSION_ISSUE],
+						'allow' => true,
+					],
+					[
+						'allow' => true,
+						'permissions' => [Worker::ROLE_ISSUE_FILE_MANAGER],
+					],
+				],
+			],
+		],
 	],
 	'components' => [
+
+		'fs' => [
+			'class' => LocalFilesystem::class,
+			'path' => '@protected',
+			'config' => [
+				'visibility' => AdapterInterface::VISIBILITY_PRIVATE,
+			],
+		],
+		'awss3Fs' => [
+			'class' => AwsS3Filesystem::class,
+			'key' => getenv('AWS_S3_KEY'),
+			'secret' => getenv('AWS_S3_SECRET'),
+			'bucket' => getenv('AWS_S3_BUCKET'),
+			'region' => getenv('AWS_S3_REGION'),
+		],
 		'db' => [
 			'class' => 'yii\db\Connection',
 			'dsn' => getenv('DB_DSN'),

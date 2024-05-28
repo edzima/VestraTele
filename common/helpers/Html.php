@@ -6,6 +6,7 @@ use common\behaviors\IssueTypeParentIdAction;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueType;
 use common\models\settlement\PayedInterface;
+use common\modules\file\models\File;
 use Yii;
 use yii\bootstrap\BaseHtml;
 
@@ -28,6 +29,16 @@ class Html extends BaseHtml {
 		/** @var $url Url */
 		$url = static::URL_HELPER;
 		return static::a($issue->getIssueName(), $url::issueView($issue->getIssueId()), $options);
+	}
+
+	public static function issueFileLink(File $file, int $issue_id, $schema = false): string {
+		$name = $file->getShortName() . '.' . $file->type;
+		$name = Html::encode($name);
+		if ($file->isForUser(Yii::$app->user->getId())) {
+			$url = static::URL_HELPER::issueFileDownload($issue_id, $file->id, $schema);
+			return Html::a($name, $url);
+		}
+		return $name;
 	}
 
 	public static function payStatusRowOptions(PayedInterface $pay): array {

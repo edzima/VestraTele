@@ -62,7 +62,7 @@ class IssueTest extends Unit {
 		$issue = $this->tester->grabRecord(Issue::class, [
 			'id' => $this->issueFixtureHelper->haveIssue([
 				'stage_id' => $stageId,
-				'stage_change_at' => strtotime('- 1 day'),
+				'stage_change_at' => date('Y-m-d', strtotime('- 1 day')),
 			]),
 		]);
 
@@ -78,7 +78,7 @@ class IssueTest extends Unit {
 		$issue = $this->tester->grabRecord(Issue::class, [
 			'id' => $this->issueFixtureHelper->haveIssue([
 				'stage_id' => $stageId,
-				'stage_change_at' => date(DATE_ATOM, strtotime('- 3 days')),
+				'stage_change_at' => date('Y-m-d', strtotime('- 3 days')),
 			]),
 		]);
 
@@ -94,7 +94,7 @@ class IssueTest extends Unit {
 		$issue = $this->tester->grabRecord(Issue::class, [
 			'id' => $this->issueFixtureHelper->haveIssue([
 				'stage_id' => $stageId,
-				'stage_change_at' => date(DATE_ATOM, strtotime('- 4 days')),
+				'stage_change_at' => date('Y-m-d', strtotime('- 4 days')),
 			]),
 		]);
 
@@ -105,6 +105,7 @@ class IssueTest extends Unit {
 		return $this->tester->haveRecord(IssueStage::class, [
 			'name' => $name,
 			'days_reminder' => $daysReminder,
+			'short_name' => substr($name, 0, 2),
 		]);
 	}
 }
