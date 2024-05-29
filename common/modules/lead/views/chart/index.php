@@ -21,41 +21,36 @@ $leadStatusColor = new LeadStatusColor();
 
 $leadsDaysData = $searchModel->getLeadsByDays();
 
-//echo '<pre>' . \yii\helpers\VarDumper::dumpAsString($leadsDaysData) . '</pre>';
-$testData = [];
-foreach ($leadsDaysData as $leadDaysData) {
-	$day = $leadDaysData['date'];
-	if (!isset($testData[$day])) {
-		$testData[$day] = [
-			'count' => 0,
-		];
-	}
-	$testData[$day]['data'][$leadDaysData['status_id']] = $leadDaysData['count'];
-	$testData[$day]['count'] += $leadDaysData['count'];
-}
-
 $leadsCountSeries = [];
 $leadDates = array_values(array_unique(ArrayHelper::getColumn($leadsDaysData, 'date')));
 $hasGroup = false;
 foreach ($leadsDaysData as $data) {
 	$statusId = $data['status_id'];
+
 	if (!isset($leadsCountSeries[$statusId])) {
 		$statusModel = LeadStatus::getModels()[$statusId];
+		if ($searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_ONLY_ASSIGNED) {
+			if (empty($statusModel->chart_group)) {
+				continue;
+			}
+		}
 		$leadsCountSeries[$statusId] = [
 			'name' => $statusModel->name,
 			'data' => [],
 		];
-		if ($statusModel->chart_group) {
+		if (!empty($statusModel->chart_group)) {
 			$leadsCountSeries[$statusId]['group'] = $statusModel->chart_group;
 			$hasGroup = true;
 		}
+
 		$leadsDaysData['colors'][] = $leadStatusColor->getStatusColor($statusModel);
 	}
+
 	//datetime
-//	$leadsCountSeries[$statusId]['data'][] = [
-//		$data['date'],
-//		(int) $data['count'],
-//	];
+	//	$leadsCountSeries[$statusId]['data'][] = [
+	//		$data['date'],
+	//		(int) $data['count'],
+	//	];
 	//category
 	$leadsCountSeries[$statusId]['data'][$data['date']] = (int) $data['count'];
 
@@ -64,7 +59,7 @@ foreach ($leadsDaysData as $data) {
 
 foreach ($leadsCountSeries as $index => $data) {
 	if ($hasGroup && !isset($data['group'])) {
-		$leadsCountSeries[$index]['group'] = Yii::t('chart', 'Other');
+		$leadsCountSeries[$index]['group'] = Yii::t('lead', 'Without group');
 	}
 	$data = $data['data'];
 	$dataWithoutStatues = [];
@@ -77,30 +72,45 @@ foreach ($leadsCountSeries as $index => $data) {
 
 $statusesCount = $searchModel->getLeadStatusesCount();
 $statusData = [];
-foreach ($statusesCount as $status_id => $count) {
-	$status = LeadStatus::getModels()[$status_id];
-	$statusData['series'][] = $count;
-	$statusData['labels'][] = $status->name;
-	$statusData['colors'][] = $leadStatusColor->getStatusColor($status);
+if ($searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_DISABLE) {
+	foreach ($statusesCount as $status_id => $count) {
+		$status = LeadStatus::getModels()[$status_id];
+		$statusData['series'][] = $count;
+		$statusData['labels'][] = $status->name;
+		$statusData['colors'][] = $leadStatusColor->getStatusColor($status);
+	}
 }
+if ($searchModel->groupedStatus !== LeadChartSearch::STATUS_GROUP_DISABLE) {
+	$statusGroupData = [];
+	$withoutGroup = $searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_WITHOUT_ASSIGNED;
+	foreach ($statusesCount as $status_id => $count) {
+		$status = LeadStatus::getModels()[$status_id];
+		if (!$withoutGroup) {
+			if (empty($status->chart_group)) {
+				continue;
+			}
+		}
+		$group = $status->chart_group ? $status->chart_group : Yii::t('lead', 'Without group');
+		if (!isset($statusGroupData['series'][$group])) {
+			$statusGroupData['series'][$group] = 0;
+		}
 
-$statusGroupData = [];
-$withoutGroup = false;
-foreach ($statusesCount as $status_id => $count) {
-	$status = LeadStatus::getModels()[$status_id];
-	if (!$withoutGroup) {
-		if (empty($status->chart_group)) {
-			continue;
+		$statusGroupData['series'][$group] += $count;
+		$statusGroupData['labels'][$group] = $group;
+		$statusGroupData['colors'][$group] = $leadStatusColor->getStatusColor($status);
+		if (!isset($statusGroupData['totalCount'])) {
+			$statusGroupData['totalCount'] = 0;
+		}
+		$statusGroupData['totalCount'] += $count;
+	}
+
+	$statusGroupDataPercent = [];
+	$statusGroupTotalCount = $statusGroupData['totalCount'] ?? 0;
+	if ($statusGroupTotalCount) {
+		foreach ($statusGroupData['series'] as $index => $data) {
+			$statusGroupDataPercent[] = round($data / $statusGroupTotalCount * 100, 1);
 		}
 	}
-	$group = $status->chart_group ? $status->chart_group : Yii::t('chart', 'Without group');
-	if (!isset($statusGroupData['series'][$group])) {
-		$statusGroupData['series'][$group] = 0;
-	}
-
-	$statusGroupData['series'][$group] += $count;
-	$statusGroupData['labels'][$group] = $group;
-	$statusGroupData['colors'][$group] = $leadStatusColor->getStatusColor($status);
 }
 
 $typesData = $searchModel->getLeadTypesCount();
@@ -127,34 +137,6 @@ foreach ($usersData as $userId => $count) {
 }
 
 //echo '<pre>' . VarDumper::dumpAsString($leadsCountSeries) . '</pre>';
-
-$js = <<< JS
-
-
-
-$('.btn-toggle').click(function() {
-	let btn = $(this).find('.btn');
-   btn.toggleClass('active');  
-	if ($(this).find('.btn-primary').length) {
-    	btn.toggleClass('btn-primary');
-    }
-    if ($(this).find('.btn-danger').length) {
-    	btn.toggleClass('btn-danger');
-    }
-    if ($(this).find('.btn-success').length) {
-    	btn.toggleClass('btn-success');
-    }
-    if ($(this).find('.btn-info').length) {
-    	btn.toggleClass('btn-info');
-    }
-   btn.toggleClass('btn-default');
-	let toggleContainer = this.getAttribute('data-toggle-container')
-	$(toggleContainer).toggleClass('hidden');
-});
-
-JS;
-
-$this->registerJs($js);
 
 ?>
 <div class="lead-chart-index">
@@ -213,17 +195,77 @@ $this->registerJs($js);
 
 
 		<div class="row">
-			<?php if (!empty($statusGroupData) && !empty($statusData)): ?>
-				<div class="bnt-toggle-wrapper">
-					<span>Statusy</span>
-					<div class="btn-group btn-toggle" data-toggle-container=".status-charts">
-						<button class="btn btn-xs btn-primary active">Grupy</button>
-						<button class="btn btn-xs btn-default">Wszystkie</button>
-					</div>
-				</div>
+			<?= !empty($statusGroupData) && $searchModel->groupedStatusChartType === ChartsWidget::TYPE_RADIAL_BAR ?
+				ChartsWidget::widget([
+					'type' => ChartsWidget::TYPE_RADIAL_BAR,
+					'containerOptions' => [
+						'class' => 'col-sm-12 col-md-6 col-lg-4 status-charts',
+						'style' => [
+							'height' => '50vh',
+						],
+					],
+					'id' => 'chart-leads-statuses-group-radial-count' . $searchModel->getUniqueId(),
+					'series' => $statusGroupDataPercent,
+					'options' => [
+						'colors' => array_values($statusGroupData['colors']),
+						'labels' => array_values($statusGroupData['labels']),
+						'title' => [
+							'text' => Yii::t('lead', 'Status Count'),
+							'align' => 'center',
+						],
+						'legend' => [
+							'position' => 'bottom',
+							//'width' => 200,
+							'height' => '55',
+							//							'formatter' => new JsExpression('function(seriesName, opts){
+							//															return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]];
+							//															}'),
+						],
+						'plotOptions' => [
+							'radialBar' => [
+								'track' => [
+									'show' => true,
+								],
+								'inverseOrder' => true,
+								'dataLabels' => [
+									'show' => true,
+									'name' => [
+										'show' => true,
+									],
+									'value' => [
+										'show' => true,
+										'formatter' => new JsExpression("function (val) {
+                    return val + '%';
+                  }"),
+									],
+									'total' => [
+										'show' => true,
+										'label' => Yii::t('common', 'Sum'),
+										'formatter' => new JsExpression("function (w) {
+                    return " . $statusGroupTotalCount . "
+                  }"),
+									],
+								],
+							],
+							'pie' => [
+								'donut' => [
+									'labels' => [
+										'show' => true,
+										'total' => [
+											'show' => true,
+											'showAlways' => true,
+											'label' => Yii::t('common', 'Sum'),
+										],
+									],
+								],
+							],
+						],
+					],
+				])
+				: ''
+			?>
 
-			<?php endif; ?>
-			<?= !empty($statusGroupData) ?
+			<?= !empty($statusGroupData) && $searchModel->groupedStatusChartType === ChartsWidget::TYPE_DONUT ?
 				ChartsWidget::widget([
 					'type' => ChartsWidget::TYPE_DONUT,
 					'containerOptions' => [
@@ -271,7 +313,7 @@ $this->registerJs($js);
 				ChartsWidget::widget([
 					'type' => 'donut',
 					'containerOptions' => [
-						'class' => 'col-sm-12 col-md-6 col-lg-4 hidden status-charts',
+						'class' => 'col-sm-12 col-md-6 col-lg-4 status-charts',
 						'style' => [
 							'height' => '50vh',
 						],
@@ -454,7 +496,7 @@ $this->registerJs($js);
 				<?= ChartsWidget::widget([
 					'type' => ChartsWidget::TYPE_DONUT,
 					'containerOptions' => [
-						'class' => 'col-sm-12 col-md-4',
+						'class' => 'col-sm-12 col-md-6',
 						'style' => [
 							'height' => '50vh',
 						],
@@ -468,8 +510,8 @@ $this->registerJs($js);
 							'align' => 'center',
 						],
 						'legend' => [
-							'position' => 'bottom',
-							'height' => 100,
+							//	'position' => 'bottom',
+							//	'height' => 100,
 							'formatter' => new JsExpression('function(seriesName, opts){
 							return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]];
 							}'),

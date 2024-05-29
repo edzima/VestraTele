@@ -13,6 +13,8 @@ class ChartsWidget extends Widget {
 
 	public const TYPE_BAR = 'bar';
 
+	public const TYPE_RADIAL_BAR = 'radialBar';
+
 	public const TYPE_PIE = 'pie';
 	public const TYPE_LINE = 'line';
 	public const TYPE_DONUT = 'donut';
@@ -31,11 +33,11 @@ class ChartsWidget extends Widget {
 	public array $containerOptions = [];
 
 	public function init() {
-		if (!isset($this->options['defaultLocale'])) {
-			$this->options['defaultLocale'] = Yii::$app->language;
+		if (!isset($this->chart['defaultLocale'])) {
+			$this->chart['defaultLocale'] = Yii::$app->language;
 		}
-		if ($this->options['defaultLocale'] === 'pl') {
-			$this->options['locales'][] = $this->getPlLanguageData();
+		if ($this->chart['defaultLocale'] === 'pl') {
+			$this->chart['locales'][] = $this->getPlLanguageData();
 		}
 		parent::init();
 	}
@@ -84,6 +86,53 @@ JS;
 			'options' => [
 				'toolbar' => [
 					'exportToSVG' => 'Pobierz SVG',
+					'download' => 'Pobierz',
+				],
+				'days' => [
+					'Niedziela',
+					'Poniedziałek',
+					'Wtorek',
+					'Środa',
+					'Czwartek',
+					'Piątek',
+					'Sobota',
+				],
+				'shortDays' => [
+					'Niedz.',
+					'Pon.',
+					'Wt.',
+					'Śr.',
+					'Czw.',
+					'Pt.',
+					'Sob.',
+				],
+				'months' => [
+					'Styczeń',
+					'Luty',
+					'Marzec',
+					'Kwiecień',
+					'Maj',
+					'Czerwiec',
+					'Lipiec',
+					'Sierpień',
+					'Wrzesień',
+					'Październik',
+					'Listopad',
+					'Grudzień',
+				],
+				'shortMonths' => [
+					'Sty',
+					'Lut',
+					'Mar',
+					'Kwi',
+					'Maj',
+					'Cze',
+					'Lip',
+					'Śie',
+					'Wrz',
+					'Paź',
+					'Lis',
+					'Gru',
 				],
 			],
 		];

@@ -92,12 +92,13 @@ use kartik\select2\Select2;
 		])
 		?>
 
+		<?= $form->field($model, 'groupedStatus', ['options' => ['class' => 'col-md-2']])
+			->dropDownList(LeadChartSearch::statusGroupNames())
+		?>
 
-		<?= Yii::$app->user->can(User::PERMISSION_LEAD_MARKET) ?
-			$form->field($model, 'fromMarket', ['options' => ['class' => 'col-md-1']])->dropDownList(Html::booleanDropdownList(), [
-				'prompt' => Yii::t('common', 'All'),
-			])
-			: ''
+
+		<?= $form->field($model, 'groupedStatusChartType', ['options' => ['class' => 'col-md-2']])
+			->dropDownList(LeadChartSearch::statusGroupChartTypesNames())
 		?>
 
 	</div>
@@ -133,6 +134,14 @@ use kartik\select2\Select2;
 				'allowClear' => true,
 			],
 		]) ?>
+
+
+		<?= Yii::$app->user->can(User::PERMISSION_LEAD_MARKET) ?
+			$form->field($model, 'fromMarket', ['options' => ['class' => 'col-md-1']])->dropDownList(Html::booleanDropdownList(), [
+				'prompt' => Yii::t('common', 'All'),
+			])
+			: ''
+		?>
 
 		<?php if ($model->scenario !== LeadChartSearch::SCENARIO_USER): ?>
 
