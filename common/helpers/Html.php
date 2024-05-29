@@ -28,7 +28,7 @@ class Html extends BaseHtml {
 	public static function issueLink(IssueInterface $issue, array $options = []): string {
 		/** @var $url Url */
 		$url = static::URL_HELPER;
-		$issueUrl = call_user_func([$url, 'issueView'], $issue->getIssueId());
+		$issueUrl = $url::issueView($issue->getIssueId());
 		return static::a($issue->getIssueName(), $issueUrl, $options);
 	}
 
