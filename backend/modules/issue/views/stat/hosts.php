@@ -3,7 +3,7 @@
 use backend\helpers\Html;
 use backend\modules\issue\models\HostIssueStats;
 use common\helpers\Inflector;
-use common\widgets\ChartsWidget;
+use common\widgets\charts\ChartsWidget;
 
 /* @var $this yii\web\View */
 /* @var $models HostIssueStats[] */
@@ -35,7 +35,7 @@ echo ChartsWidget::widget([
 	'id' => 'chart-bar-pays',
 	'height' => 420,
 	'series' => array_values($series),
-	'chartOptions' => [
+	'options' => [
 		'xaxis' => [
 			'categories' => $categories,
 		],
@@ -68,7 +68,7 @@ echo ChartsWidget::widget([
 	'height' => 420,
 	'series' => $data,
 	//'series' => $series,
-	'chartOptions' => [
+	'options' => [
 		'labels' => $categories,
 		'title' => [
 			'text' => Yii::t('issue', 'Pays'),

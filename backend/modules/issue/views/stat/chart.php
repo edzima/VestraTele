@@ -1,7 +1,7 @@
 <?php
 
 use backend\modules\issue\models\IssueStats;
-use onmotion\apexcharts\ApexchartsWidget;
+use common\widgets\charts\ChartsWidget;
 use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
@@ -63,15 +63,15 @@ $series[] = [
 	'type' => 'line',
 ];
 
-echo ApexchartsWidget::widget([
+echo ChartsWidget::widget([
 	'type' => 'line',
 	//'type' => 'rangeBar',
 	'height' => '400',
 	'series' => $series,
-	'chartOptions' => [
+	'chart' => [
 		'stacked' => true,
-		'defaultLocale' => 'pl',
-		'locales' => ['pl'],
+	],
+	'options' => [
 		'dataLabels' => [
 			'formatter' => new JsExpression('function (val, { seriesIndex, dataPointIndex, w }) {
 				return val;

@@ -361,5 +361,5 @@ return [
 	'Visible for' => 'Widoczność',
 	'Group by Issue user Types' => 'Grupuj po typie',
 	'Linked {tagsCount} Tags to {issuesCount} Issues.' => 'Przypisano Tagi {tagsCount} do Spraw: {issuesCount}',
-
+	'Stats - Chart' => 'Wykresy',
 ];

@@ -6,6 +6,7 @@ use common\helpers\Html;
 use Yii;
 use yii\base\Widget;
 use yii\helpers\Json;
+use yii\web\JsExpression;
 
 class ChartsWidget extends Widget {
 
@@ -136,6 +137,26 @@ JS;
 				],
 			],
 		];
+	}
+
+	public static function currencyFormatterExpression(array $options = [], string $language = null, string $currencyCode = null): JsExpression {
+		if ($language === null) {
+			$language = Yii::$app->formatter->language;
+		}
+		if ($currencyCode === null) {
+			$currencyCode = Yii::$app->formatter->currencyCode;
+		}
+		$options['style'] = 'currency';
+		$options['currency'] = $currencyCode;
+		if (!isset($options['maximumFractionDigits'])) {
+			$options['maximumFractionDigits'] = 0;
+		}
+		$options = Json::encode($options);
+		return new JsExpression("function (value) {
+					  return new Intl.NumberFormat('$language',$options)
+					  		.format(value);
+  					}"
+		);
 	}
 
 }
