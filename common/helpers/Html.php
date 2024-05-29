@@ -28,15 +28,16 @@ class Html extends BaseHtml {
 	public static function issueLink(IssueInterface $issue, array $options = []): string {
 		/** @var $url Url */
 		$url = static::URL_HELPER;
-		$issueUrl = call_user_func([$url, 'issueView'], $issue->getIssueId());
+		$issueUrl = $url::issueView($issue->getIssueId());
 		return static::a($issue->getIssueName(), $issueUrl, $options);
 	}
 
 	public static function issueFileLink(File $file, int $issue_id, $schema = false): string {
 		$name = $file->getShortName() . '.' . $file->type;
 		$name = Html::encode($name);
+		$url = static::URL_HELPER;
 		if ($file->isForUser(Yii::$app->user->getId())) {
-			$url = static::URL_HELPER::issueFileDownload($issue_id, $file->id, $schema);
+			$url = $url::issueFileDownload($issue_id, $file->id, $schema);
 			return Html::a($name, $url);
 		}
 		return $name;
