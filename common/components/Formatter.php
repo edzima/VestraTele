@@ -5,13 +5,13 @@ namespace common\components;
 use common\helpers\ArrayHelper;
 use common\helpers\Html;
 use common\models\Address;
+use common\models\user\User as UserModel;
 use Decimal\Decimal;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use NumberFormatter;
 use yii\i18n\Formatter as BaseFormatter;
-use common\models\user\User as UserModel;
 
 class Formatter extends BaseFormatter {
 
@@ -24,6 +24,8 @@ class Formatter extends BaseFormatter {
 	];
 	public string $defaultPhoneRegion = 'PL';
 	public int $defaultPhoneFormat = PhoneNumberFormat::INTERNATIONAL;
+
+	public $sizeFormatBase = 1000;
 
 	public function asAddress(?Address $address): ?string {
 		if (!$address) {

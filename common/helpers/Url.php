@@ -16,6 +16,8 @@ class Url extends BaseUrl {
 	public const PARAM_ISSUE_PARENT_TYPE = 'parentTypeId';
 	protected const ROUTE_ISSUE_VIEW = '/issue/issue/view';
 	protected const ROUTE_SETTLEMENT_VIEW = '/settlement/calculation/view';
+
+	protected const ROUTE_ISSUE_FILE_DOWNLOAD = '/file/issue/download';
 	protected const ROUTE_LEAD_VIEW = '/lead/lead/view';
 
 	public static function issuesIndexRoute(): string {
@@ -30,6 +32,14 @@ class Url extends BaseUrl {
 			return '/issue/view';
 		}
 		return '/issue/issue/view';
+	}
+
+	public static function issueFileDownload(int $issueId, int $fileId, $schema = false) {
+		return static::to([
+			static::ROUTE_ISSUE_FILE_DOWNLOAD,
+			'issue_id' => $issueId,
+			'file_id' => $fileId,
+		], $schema);
 	}
 
 	public static function issueView(int $id, $schema = false): string {

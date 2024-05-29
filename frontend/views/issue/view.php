@@ -2,6 +2,7 @@
 
 use common\models\issue\Issue;
 use common\models\user\Worker;
+use common\modules\file\widgets\IssueFileUploadButton;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
 use common\modules\issue\widgets\SummonDocsWidget;
@@ -31,6 +32,13 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model, false);
 		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_STAGE_CHANGE)
 			? StageChangeButtonDropdown::widget([
 				'model' => $model,
+			])
+			: ''
+		?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_FILE_UPLOAD)
+			? IssueFileUploadButton::widget([
+				'issueId' => $model->id,
 			])
 			: ''
 		?>

@@ -12,6 +12,7 @@ use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\file\widgets\IssueFileUploadButton;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\IssueViewWidget;
 use common\modules\issue\widgets\SummonDocsWidget;
@@ -70,6 +71,13 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 							'aria-label' => Yii::t('backend', 'Update'),
 						]) ?>
 
+
+					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_FILE_UPLOAD)
+						? IssueFileUploadButton::widget([
+							'issueId' => $model->id,
+						])
+						: ''
+					?>
 
 					<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_CREATE)
 						? Html::a(Html::faicon('copy'),
