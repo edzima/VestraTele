@@ -359,4 +359,5 @@ return [
 	'All Users' => 'Wszyscy',
 	'Visible for' => 'Widoczność',
 	'Group by Issue user Types' => 'Grupuj po typie',
+	'Stats - Chart' => 'Wykresy',
 ];

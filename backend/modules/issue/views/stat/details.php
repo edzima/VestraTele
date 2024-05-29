@@ -7,7 +7,7 @@ use common\helpers\ArrayHelper;
 use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\IssueStage;
 use common\models\user\User;
-use common\widgets\ChartsWidget;
+use common\widgets\charts\ChartsWidget;
 use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
@@ -171,11 +171,11 @@ $modelId = $widgetId . '-' . $model->year . '-' . $model->month;
 
 			<?= !empty($agentsData) ?
 				ChartsWidget::widget([
-					'type' => 'donut',
+					'type' => ChartsWidget::TYPE_DONUT,
 					'id' => 'chart-agents-' . $modelId,
 					'height' => 600,
 					'series' => $agentsData['series'],
-					'chartOptions' => [
+					'options' => [
 						'labels' => $agentsData['labels'],
 						'title' => [
 							'text' => Yii::t('issue', 'Issues Count'),
@@ -230,11 +230,11 @@ $modelId = $widgetId . '-' . $model->year . '-' . $model->month;
 						],
 
 					],
-					'chartOptions' => [
-						'chart' => [
-							'stacked' => true,
-							'stackType' => '100%',
-						],
+					'chart' => [
+						'stacked' => true,
+						'stackType' => '100%',
+					],
+					'options' => [
 						'plotOptions' => [
 							'bar' => [
 								'horizontal' => true,
@@ -259,7 +259,7 @@ $modelId = $widgetId . '-' . $model->year . '-' . $model->month;
 					'id' => 'chart-stages-' . $modelId,
 					'height' => 420,
 					'series' => $stagesData['series'],
-					'chartOptions' => [
+					'options' => [
 						'labels' => $stagesData['labels'],
 						'title' => [
 							'text' => Yii::t('issue', 'Stages'),
@@ -285,7 +285,7 @@ $modelId = $widgetId . '-' . $model->year . '-' . $model->month;
 					'id' => 'chart-entity-' . $modelId,
 					'height' => 420,
 					'series' => $entityResponsibleData['series'],
-					'chartOptions' => [
+					'options' => [
 						'labels' => $entityResponsibleData['labels'],
 						'title' => [
 							'text' => Yii::t('issue', 'Entity'),
