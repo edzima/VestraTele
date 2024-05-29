@@ -8,13 +8,47 @@ use common\modules\lead\models\LeadCost;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\query\LeadQuery;
+use common\widgets\charts\ChartsWidget;
 use DateTime;
+use Yii;
 use yii\db\Expression;
 
 class LeadChartSearch extends LeadSearch {
 
+	public ?int $groupedStatus = self::STATUS_GROUP_ONLY_ASSIGNED;
+
+	public string $groupedStatusChartType = ChartsWidget::TYPE_DONUT;
+
+	public const STATUS_GROUP_ONLY_ASSIGNED = 1;
+	public const STATUS_GROUP_WITHOUT_ASSIGNED = 2;
+	public const STATUS_GROUP_DISABLE = 3;
+
+	public function attributeLabels(): array {
+		return array_merge(parent::attributeLabels(), [
+			'groupedStatus' => Yii::t('lead', 'Grouped Status'),
+			'groupedStatusChartType' => Yii::t('lead', 'Grouped Status Chart'),
+		]);
+	}
+
+	public static function statusGroupNames(): array {
+		return [
+			static::STATUS_GROUP_ONLY_ASSIGNED => Yii::t('lead', 'Status Group only Assigned'),
+			static::STATUS_GROUP_WITHOUT_ASSIGNED => Yii::t('lead', 'Status Group Without Assigned'),
+			static::STATUS_GROUP_DISABLE => Yii::t('lead', 'Status Group Disabled'),
+		];
+	}
+
+	public static function statusGroupChartTypesNames(): array {
+		return [
+			ChartsWidget::TYPE_DONUT => Yii::t('chart', 'Donut'),
+			ChartsWidget::TYPE_RADIAL_BAR => Yii::t('chart', 'Radial Bar'),
+		];
+	}
+
 	public function rules(): array {
 		return array_merge([
+			['groupedStatus', 'integer'],
+			[['groupedStatusChartType'], 'string'],
 			['from_at', 'default', 'value' => $this->getDefaultFromAt()],
 			['to_at', 'default', 'value' => $this->getDefaultToAt()],
 		], parent::rules());

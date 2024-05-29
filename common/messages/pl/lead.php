@@ -471,4 +471,10 @@ return [
 	'Charts' => 'Wykresy',
 	'Success assign {count} Leads to Campaign: {campaign}.' => 'Przypisano {count} Lead do Kampanii: {campaign}',
 	'{count} Leads without Campaign.' => '{count} Lead bez Kampanii.',
+	'Grouped Status' => 'Grupuj Statusy',
+	'Grouped Status Chart' => 'Wykres',
+	'Status Group only Assigned' => 'Tylko przypisane',
+	'Status Group Without Assigned' => 'Wszystkie',
+	'Status Group Disabled' => 'Nie grupuj',
+	'Without group' => 'Nieprzypisane',
 ];
