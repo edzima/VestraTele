@@ -28,6 +28,7 @@ class SummonTypeOptions extends Model {
 			[['status'], 'integer'],
 			[['showOnTop', 'sendEmailToContractor', 'defaultRealizeAtFromStartAt'], 'boolean'],
 			[['title', 'lawsuitCalendarBackground'], 'string'],
+			[['title', 'lawsuitCalendarBackground'], 'default', 'value' => null],
 			['formAttributes', 'in', 'range' => array_keys(static::formAttributesNames()), 'allowArray' => true],
 			['visibleSummonFields', 'in', 'range' => array_keys(static::visibleSummonAttributesNames()), 'allowArray' => true],
 			['requiredFields', 'in', 'range' => array_keys(static::getRequiredAttributes()), 'allowArray' => true],
@@ -156,6 +157,9 @@ class SummonTypeOptions extends Model {
 
 	public function toJson(): string {
 		$data = $this->toArray();
+		$data = array_filter($data, function ($value): bool {
+			return $value !== null;
+		});
 		ksort($data);
 		return Json::encode($data);
 	}

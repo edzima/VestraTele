@@ -7,7 +7,6 @@ use common\models\issue\IssueClaim;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSearch as BaseIssueSearch;
 use common\models\issue\IssueUser;
-use common\models\issue\query\IssueNoteQuery;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\user\User;
@@ -41,7 +40,6 @@ class IssueSearch extends BaseIssueSearch {
 	public $stageDeadlineFromAt;
 	public $stageDeadlineToAt;
 
-	public $note_stage_id;
 
 	public $entity_agreement_details;
 	public $entity_agreement_at;
@@ -57,7 +55,7 @@ class IssueSearch extends BaseIssueSearch {
 
 	public function rules(): array {
 		return array_merge(parent::rules(), [
-			[['parentId', 'agent_id', 'tele_id', 'lawyer_id', 'note_stage_id'], 'integer'],
+			[['parentId', 'agent_id', 'tele_id', 'lawyer_id'], 'integer'],
 			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims', 'withClaimsSum'], 'boolean'],
 			[['entity_agreement_details'], 'string'],
 			[['onlyWithSettlements', 'onlyWithClaims'], 'default', 'value' => null],
@@ -78,7 +76,6 @@ class IssueSearch extends BaseIssueSearch {
 			'onlyWithAllPayedPay' => Yii::t('settlement', 'Only with all paid Pays'),
 			'stageDeadlineFromAt' => Yii::t('backend', 'Stage Deadline from at'),
 			'stageDeadlineToAt' => Yii::t('backend', 'Stage Deadline to at'),
-			'note_stage_id' => Yii::t('backend', 'Note Stage'),
 			'withClaimsSum' => Yii::t('backend', 'With claims sum'),
 			'groupByIssueUserTypes' => Yii::t('backend', 'Group by Issue user Types'),
 		]);
@@ -155,7 +152,6 @@ class IssueSearch extends BaseIssueSearch {
 		$this->stageChangeAtFilter($query);
 		$this->applyStageDeadlineFilter($query);
 		$this->claimFilter($query);
-		$this->noteStageFilter($query);
 		$this->applyEntityAgreementFilter($query);
 		$this->applyGroupByIssueUserTypes($query);
 	}
@@ -284,15 +280,6 @@ class IssueSearch extends BaseIssueSearch {
 		}
 	}
 
-	private function noteStageFilter(IssueQuery $query): void {
-		if (!empty($this->note_stage_id)) {
-			$query->joinWith([
-				'issueNotes' => function (IssueNoteQuery $noteQuery) {
-					$noteQuery->onlyStage($this->note_stage_id);
-				},
-			]);
-		}
-	}
 
 	private function applyEntityAgreementFilter(IssueQuery $query) {
 		$query->andFilterWhere(['like', Issue::tableName() . '.entity_agreement_details', $this->entity_agreement_details])

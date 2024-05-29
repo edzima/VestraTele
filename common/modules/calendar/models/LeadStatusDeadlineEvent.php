@@ -9,6 +9,8 @@ class LeadStatusDeadlineEvent extends FullCalendarEvent {
 
 	private Lead $lead;
 
+	public bool $isStatusDeadline = true;
+
 	public function setModel(Lead $model) {
 		$this->lead = $model;
 		$this->id = $this->getId();

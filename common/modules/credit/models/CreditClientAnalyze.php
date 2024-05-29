@@ -4,6 +4,7 @@ namespace common\modules\credit\models;
 
 use common\helpers\ArrayHelper;
 use common\models\entityResponsible\EntityResponsible;
+use common\validators\PhoneValidator;
 use Yii;
 use yii\base\Model;
 
@@ -24,6 +25,9 @@ class CreditClientAnalyze extends Model {
 	public string $amountOfLoanGranted = '';
 
 	public string $estimatedRefundAmount = '';
+
+	public string $phone = '';
+	public string $email = '';
 	private ?CreditSanctionCalc $sanctionCalc = null;
 
 	public function init() {
@@ -53,6 +57,9 @@ class CreditClientAnalyze extends Model {
 			],
 			[['totalLoanAmount', 'amountOfLoanGranted',], 'number', 'min' => 0],
 			['agreement', 'string', 'min' => 3],
+			[['phone', 'email'], 'string'],
+			[['email'], 'email'],
+			[['phone'], PhoneValidator::class],
 			[['borrower', 'analyzeResult'], 'string', 'min' => 8],
 			[['entityResponsibleId'], 'in', 'range' => array_keys($this->getEntityResponsibleNames())],
 		];
@@ -72,6 +79,8 @@ class CreditClientAnalyze extends Model {
 			'repaymentAt' => Yii::t('credit', 'Repayment At'),
 			'totalLoanAmount' => Yii::t('credit', 'Total loan amount'),
 			'entityResponsibleId' => Yii::t('credit', 'Creditor / Lender'),
+			'phone' => Yii::t('credit', 'Phone'),
+			'email' => Yii::t('credit', 'Email'),
 		];
 	}
 

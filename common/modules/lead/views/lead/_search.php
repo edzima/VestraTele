@@ -98,7 +98,7 @@ use kartik\select2\Select2;
 		<?php
 		$closedData = $model->getClosedQuestionsNames();
 		if (!empty($closedData)) {
-			echo $form->field($model, 'closedQuestions', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+			echo $form->field($model, 'closedQuestions', ['options' => ['class' => 'col-md-4']])->widget(Select2::class, [
 				'data' => $closedData,
 				'options' => ['multiple' => true,],
 				'pluginOptions' => [
@@ -106,7 +106,7 @@ use kartik\select2\Select2;
 					'allowClear' => true,
 				],
 			]);
-			echo $form->field($model, 'excludedClosedQuestions', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+			echo $form->field($model, 'excludedClosedQuestions', ['options' => ['class' => 'col-md-4']])->widget(Select2::class, [
 				'data' => $closedData,
 				'options' => ['multiple' => true,],
 				'pluginOptions' => [
@@ -116,6 +116,9 @@ use kartik\select2\Select2;
 			]);
 		}
 		?>
+
+		<?= $form->field($model, 'data', ['options' => ['class' => 'col-md-2']])->textInput() ?>
+
 
 		<?= $form->field($model, 'onlyWithEmail', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 

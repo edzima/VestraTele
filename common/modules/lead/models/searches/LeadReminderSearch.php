@@ -197,6 +197,17 @@ class LeadReminderSearch extends ReminderSearch {
 		];
 	}
 
+	public static function getStatusDeadlineFilters(): array {
+		return [
+			[
+				'label' => Yii::t('lead', 'Deadline'),
+				'value' => true,
+				'isActive' => true,
+				'color' => '#67ca67',
+			],
+		];
+	}
+
 	public static function getStatusesFilters(): array {
 		$models = LeadStatus::find()
 			->andWhere('calendar_background IS NOT NULL')

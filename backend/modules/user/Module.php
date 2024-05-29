@@ -35,7 +35,7 @@ class Module extends BaseModule {
 					],
 					[
 						'controllers' => ['user/worker'],
-						'actions' => ['index', 'create', 'update', 'create-from-json'],
+						'actions' => ['index', 'create', 'update', 'create-from-json', 'request-password-reset'],
 						'allow' => true,
 						'permissions' => [User::PERMISSION_WORKERS],
 					],

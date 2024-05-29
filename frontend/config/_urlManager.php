@@ -34,5 +34,6 @@ return [
 		'analiza-skd' => 'credit/analyze/calc',
 		//lead
 		'lead/report/<hash>/<id>' => 'lead/report/report',
+		'issue/issue/view' => 'issue/view',
 	],
 ];

@@ -20,6 +20,12 @@ CalendarAsset::register($this);
 $props = [
 	'filterGroups' => [
 		[
+			'id' => 3,
+			'title' => " ",
+			'filteredPropertyName' => 'isStatusDeadline',
+			'filters' => LeadReminderSearch::getStatusDeadlineFilters(),
+		],
+		[
 			'id' => 0,
 			'title' => Yii::t('lead', 'Statuses'),
 			'filteredPropertyName' => 'statusId',
@@ -37,6 +43,7 @@ $props = [
 			'filteredPropertyName' => 'isDone',
 			'filters' => LeadReminderSearch::getIsDoneFilters(),
 		],
+
 	],
 	'eventSourcesConfig' => [
 		[

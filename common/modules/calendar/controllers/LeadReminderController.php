@@ -33,6 +33,8 @@ class LeadReminderController extends Controller {
 		$model->onlyDelayed = null;
 		$model->hideDone = false;
 		$model->leadUserId = Yii::$app->user->getId();
+		$model->user_id = Yii::$app->user->getId();
+		$model->userFilterWithNotSet = true;
 		$model->dateStart = $start;
 		$model->dateEnd = $end;
 		return $this->asJson($model->getEventsData());

@@ -199,6 +199,11 @@ use yii\widgets\ActiveForm;
 		?>
 
 
+	</div>
+
+	<div class="row">
+
+
 		<?= $form->field($model, 'note_stage_id', ['options' => ['class' => 'col-md-2']])
 			->widget(Select2::class, [
 				'data' => IssueStage::getStagesNames(),
@@ -207,6 +212,19 @@ use yii\widgets\ActiveForm;
 					'allowClear' => true,
 				],
 			])
+		?>
+
+		<?= $form->field($model, 'note_stage_change_from_at', ['options' => ['class' => 'col-md-2']])
+			->widget(DateWidget::class)
+		?>
+
+		<?= $form->field($model, 'note_stage_change_to_at', [
+			'options' => [
+				'class' => 'col-md-2',
+				'placeholder' => 'test',
+			],
+		])
+			->widget(DateWidget::class)
 		?>
 
 	</div>
