@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\controllers;
 
+use backend\helpers\Url;
 use backend\widgets\CsvForm;
 use common\behaviors\SelectionRouteBehavior;
 use common\helpers\Flash;
@@ -311,6 +312,13 @@ class LeadController extends BaseController {
 				Yii::t('lead', 'Find Similars Leads: {count}.', [
 					'count' => $sameContactsCount,
 				])
+			);
+		}
+
+		if (YII_IS_FRONTEND && Yii::$app->user->can(User::PERMISSION_LEAD_MANAGER)) {
+			$backendUrl = Url::class;
+			Flash::add(Flash::TYPE_INFO,
+				Html::a(Yii::t('frontend', 'Backend'), $backendUrl::leadView($id, true))
 			);
 		}
 

@@ -8,9 +8,11 @@
 
 namespace frontend\controllers;
 
+use backend\helpers\Html;
 use common\behaviors\IssueTypeParentIdAction;
 use common\helpers\Flash;
 use common\models\issue\Issue;
+use common\models\user\User;
 use common\models\user\UserVisible;
 use common\models\user\Worker;
 use frontend\helpers\Url;
@@ -122,7 +124,12 @@ class IssueController extends Controller {
 		$summonDataProvider->sort = false;
 		$summonDataProvider->pagination = false;
 		Url::remember();
-
+		if (Yii::$app->user->can(User::ROLE_MANAGER)) {
+			$backendUrl = \backend\helpers\Url::class;
+			Flash::add(Flash::TYPE_INFO,
+				Html::a(Yii::t('frontend', 'Backend'), $backendUrl::issueView($id, true))
+			);
+		}
 		return $this->render('view', [
 			'model' => $model,
 			'calculationsDataProvider' => $calculationsDataProvider,

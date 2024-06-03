@@ -83,7 +83,7 @@ trait UserRbacActor {
 		}
 	}
 
-	protected function assignRole(string $name): void {
+	public function assignRole(string $name): void {
 		$auth = $this->getAuth();
 		try {
 			$auth->assign($auth->getRole($name), $this->getUser()->id);

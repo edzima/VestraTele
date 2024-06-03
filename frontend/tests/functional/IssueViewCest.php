@@ -27,10 +27,29 @@ class IssueViewCest {
 		return $this->issueFixture->grabIssue($index);
 	}
 
+	public function checkSeeBackendLinkWithoutPermission(CustomerServiceTester $I): void {
+		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		$I->amLoggedIn();
+		$issue = $this->grabIssue();
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $issue->getIssueId()]);
+		$I->dontSeeLink('Backend');
+		$I->dontSeeFlash('Backend', Flash::TYPE_INFO);
+	}
+
+	public function checkSeeBackendLinkWithPermission(CustomerServiceTester $I): void {
+		$I->haveFixtures(IssueFixtureHelper::fixtures());
+		$I->assignRole(User::ROLE_MANAGER);
+		$I->amLoggedIn();
+		$issue = $this->grabIssue();
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $issue->getIssueId()]);
+		$I->seeLink('Backend');
+		$I->seeFlash('Backend', Flash::TYPE_INFO);
+	}
+
 	public function checkViewNotSelfIssue(IssueUserTester $I): void {
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		$I->amLoggedInAs(UserFixtureHelper::TELE_2);
-		$I->amOnPage([static::ROUTE_VIEW, 'id' => $this->grabIssue()->getIssueId()]);
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $this->grabIssue()->getIssueId()]);
 		$I->seeResponseCodeIs(404);
 	}
 
@@ -38,7 +57,7 @@ class IssueViewCest {
 		$I->amLoggedIn();
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		$issue = $this->grabIssue();
-		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->getIssueId()]);
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $issue->getIssueId()]);
 		$I->see($issue->getIssueName(), 'h1');
 		$I->dontSeeLink('Create note');
 		$I->dontSeeLink('Create Summon');
@@ -50,7 +69,7 @@ class IssueViewCest {
 		$I->amLoggedIn();
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		$issue = $this->grabIssue('archived');
-		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->getIssueId()]);
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $issue->getIssueId()]);
 		$I->seeResponseCodeIs(403);
 		$I->see('The Issue is archived. You are not authorized to view the archive.');
 	}
@@ -60,7 +79,7 @@ class IssueViewCest {
 		$I->assignPermission(User::PERMISSION_ARCHIVE);
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		$issue = $this->grabIssue('archived');
-		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->getIssueId()]);
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $issue->getIssueId()]);
 		$I->see($issue->getIssueName(), 'h1');
 	}
 
@@ -76,7 +95,7 @@ class IssueViewCest {
 			)
 		);
 		$issue = $this->issueFixture->grabIssue(0);
-		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->getIssueId()]);
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $issue->getIssueId()]);
 		$I->see('Summons');
 		$I->dontSeeInGridHeader('Issue', '#summon-grid');
 		$I->dontSeeInGridHeader('Customer', '#summon-grid');
@@ -105,7 +124,7 @@ class IssueViewCest {
 		$I->assignPermission(User::PERMISSION_NOTE);
 		$I->amLoggedIn();
 		$issue = $this->grabIssue();
-		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->getIssueId()]);
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $issue->getIssueId()]);
 		$I->seeLink('Create note');
 		$I->click('Create note');
 		$I->seeInCurrentUrl(NoteCest::ROUTE_ISSUE);
@@ -124,7 +143,7 @@ class IssueViewCest {
 		$I->assignPermission(User::PERMISSION_NOTE_SELF);
 		$I->amLoggedIn();
 		$issue = $this->grabIssue();
-		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->getIssueId()]);
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $issue->getIssueId()]);
 		$I->seeLink('Create note');
 		$I->click('Create note');
 		$I->seeInCurrentUrl(NoteCest::ROUTE_ISSUE);
@@ -136,7 +155,7 @@ class IssueViewCest {
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		$I->assignPermission(Worker::PERMISSION_ISSUE_STAGE_CHANGE);
 		$issue = $this->grabIssue();
-		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->getIssueId()]);
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $issue->getIssueId()]);
 		$I->seeLink('Change Stage');
 		$I->click('Change Stage');
 		$I->seeInCurrentUrl(IssueStageCest::ROUTE);
@@ -147,7 +166,7 @@ class IssueViewCest {
 		$I->haveFixtures(IssueFixtureHelper::fixtures());
 		$I->assignPermission(Worker::PERMISSION_SUMMON_CREATE);
 		$issue = $this->grabIssue();
-		$I->amOnPage([static::ROUTE_VIEW, 'id' => $issue->getIssueId()]);
+		$I->amOnRoute(static::ROUTE_VIEW, ['id' => $issue->getIssueId()]);
 		$I->seeLink('Create Summon');
 		$I->click('Create Summon');
 		$I->seeInCurrentUrl(SummonCest::ROUTE_CREATE);

@@ -1,6 +1,5 @@
 <?php
 
-use backend\helpers\Url;
 use backend\modules\settlement\models\search\IssueCostSearch;
 use backend\modules\settlement\widgets\IssueCostActionColumn;
 use backend\widgets\GridView;
@@ -49,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'issue_id',
 				'value' => function (IssueCost $model): ?string {
 					if ($model->issue) {
-						return Html::a($model->issue->getIssueName(), Url::issueView($model->issue_id));
+						return Html::issueLink($model->issue);
 					}
 					return null;
 				},

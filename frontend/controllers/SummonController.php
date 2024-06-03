@@ -2,12 +2,14 @@
 
 namespace frontend\controllers;
 
+use backend\helpers\Html;
 use backend\helpers\Url;
 use common\behaviors\IssueTypeParentIdAction;
 use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\Summon;
 use common\models\issue\SummonType;
+use common\models\user\User;
 use common\models\user\Worker;
 use frontend\models\search\SummonSearch;
 use frontend\models\SummonForm;
@@ -117,6 +119,12 @@ class SummonController extends Controller {
 			return $this->renderAjax('_reminder-grid', [
 				'model' => $model,
 			]);
+		}
+		if (Yii::$app->user->can(User::ROLE_MANAGER)) {
+			$backendUrl = Url::class;
+			Flash::add(Flash::TYPE_INFO,
+				Html::a(Yii::t('frontend', 'Backend'), $backendUrl::summonView($id, true))
+			);
 		}
 		return $this->render('view', [
 			'model' => $model,

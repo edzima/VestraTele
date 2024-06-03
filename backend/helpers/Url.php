@@ -11,6 +11,14 @@ use common\helpers\Url as BaseUrl;
  */
 class Url extends BaseUrl {
 
+	public static function issueViewRoute(): string {
+		return '/issue/issue/view';
+	}
+
+	public static function summonViewRoute(): string {
+		return '/issue/summon/view';
+	}
+
 	public static function userProvisions(int $userId, int $typeId = null): string {
 		return static::to(['/provision/user/user-view', 'userId' => $userId, 'typeId' => $typeId]);
 	}

@@ -34,6 +34,14 @@ class Url extends BaseUrl {
 		return '/issue/issue/view';
 	}
 
+	public static function summonViewRoute(): string {
+		if (YII_IS_FRONTEND) {
+			return '/summon/view';
+		}
+		return '/issue/summon/view';
+	}
+
+
 	public static function issueFileDownload(int $issueId, int $fileId, $schema = false) {
 		return static::to([
 			static::ROUTE_ISSUE_FILE_DOWNLOAD,
@@ -44,6 +52,10 @@ class Url extends BaseUrl {
 
 	public static function issueView(int $id, $schema = false): string {
 		return static::toRoute([static::issueViewRoute(), 'id' => $id], $schema);
+	}
+
+	public static function summonView(int $id, $schema = false): string {
+		return static::toRoute([static::summonViewRoute(), 'id' => $id], $schema);
 	}
 
 	public static function issuesParentType(int $id, array $params = []): string {

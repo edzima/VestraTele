@@ -2,7 +2,6 @@
 
 use backend\helpers\Url;
 use common\models\issue\IssueInterface;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $title string */
