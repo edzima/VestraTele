@@ -35,8 +35,9 @@ class Html extends BaseHtml {
 		$name = $file->getShortName() . '.' . $file->type;
 		$name = Html::encode($name);
 		if ($file->isForUser(Yii::$app->user->getId())) {
-			$url = static::URL_HELPER::issueFileDownload($issue_id, $file->id, $schema);
-			return Html::a($name, $url);
+			/** @var $url Url */
+			$url = static::URL_HELPER;
+			return Html::a($name, $url::issueFileDownload($issue_id, $file->id, $schema));
 		}
 		return $name;
 	}
