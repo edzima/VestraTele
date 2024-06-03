@@ -122,7 +122,6 @@ class SummonGrid extends GridView {
 			$nowDiff = $deadline->diff(new DateTime());
 			if (!$nowDiff->invert) {
 				$days = $nowDiff->days;
-				var_dump($days);
 				if ($days >= 0 && $days > $this->tightDeadlineDays) {
 					return [
 						'class' => $this->deadlineExceededClass,
