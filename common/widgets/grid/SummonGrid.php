@@ -55,7 +55,7 @@ class SummonGrid extends GridView {
 	public string $deadlineExceededClass = 'danger';
 	public string $tightDeadlineClass = 'warning';
 
-	public int $tightDeadlineDays = 3;
+	public int $tightDeadlineDays = 0;
 	public bool $withDocsCountSummary = false;
 
 	public function init(): void {
@@ -122,6 +122,7 @@ class SummonGrid extends GridView {
 			$nowDiff = $deadline->diff(new DateTime());
 			if (!$nowDiff->invert) {
 				$days = $nowDiff->days;
+				var_dump($days);
 				if ($days >= 0 && $days > $this->tightDeadlineDays) {
 					return [
 						'class' => $this->deadlineExceededClass,
