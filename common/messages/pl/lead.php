@@ -477,4 +477,5 @@ return [
 	'Status Group Without Assigned' => 'Wszystkie',
 	'Status Group Disabled' => 'Nie grupuj',
 	'Without group' => 'Nieprzypisane',
+	'Assign Campaign to Leads: {count}' => 'Przypisz Kampanię do Leads: {count}',
 ];
