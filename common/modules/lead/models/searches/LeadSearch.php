@@ -718,7 +718,7 @@ class LeadSearch extends Lead implements SearchModel {
 			Lead::tableName() . '.id' => $this->id,
 			Lead::tableName() . '.date_at' => $this->date_at,
 			Lead::tableName() . '.campaign_id' => $this->campaign_id,
-			//	Lead::tableName() . '.source_id' => $this->source_id,
+			Lead::tableName() . '.source_id' => $this->source_id,
 			Lead::tableName() . '.provider' => $this->provider,
 		]);
 
