@@ -4,6 +4,7 @@ namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
+use Yii;
 use yii\base\Model;
 
 class LeadCampaignForm extends Model {
@@ -21,6 +22,13 @@ class LeadCampaignForm extends Model {
 			[['!ownerId', 'leadsIds'], 'required', 'on' => static::SCENARIO_OWNER],
 			[['campaignId'], 'integer'],
 			['campaignId', 'in', 'range' => array_keys($this->getCampaignNames())],
+		];
+	}
+
+	public function attributeLabels(): array {
+		return [
+			'ownerId' => Yii::t('lead', 'Owner'),
+			'campaignId' => Yii::t('lead', 'Campaign'),
 		];
 	}
 
