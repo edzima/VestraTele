@@ -28,4 +28,6 @@ interface IssueCostInterface extends
 	public const TYPE_PCC = 'pcc';
 	public const TYPE_PIT_4 = 'PIT-4';
 
+	public const TYPE_APPEAL = 'appeal';
+
 }

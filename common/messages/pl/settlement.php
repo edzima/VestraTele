@@ -3,6 +3,7 @@
 return [
 	'Attestation' => 'Zaświadczenie',
 	'Appeal' => 'Opłata od apelacji',
+	'Appeal Cost' => 'Apelacja',
 	'Base Value' => 'Kwota Bazowa',
 	'Details' => 'Szczegóły',
 	'Deadline at' => 'Termin płatności',
