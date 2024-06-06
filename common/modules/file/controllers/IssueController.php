@@ -15,6 +15,7 @@ use common\modules\file\models\IssueFileOverwrite;
 use common\modules\file\models\UploadForm;
 use common\modules\file\Module;
 use Yii;
+use yii\filters\HttpCache;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -26,17 +27,27 @@ use yii\web\Response;
  */
 class IssueController extends Controller {
 
-	public function behaviors() {
+	public function behaviors(): array {
 
-		return [
-			'verbs' => [
-				'class' => VerbFilter::class,
-				'actions' => [
-					'revoke-access' => ['POST'],
-					'delete' => ['POST'],
+		return array_merge(parent::behaviors(),
+			[
+				'httpCache' => [
+					'class' => HttpCache::class,
+					'only' => ['download'],
+					'etagSeed' => function (): ?string {
+						return Yii::$app->request->userAgent;
+					},
+					'cacheControlHeader' => 'public, max-age=31536000',
+					'sessionCacheLimiter' => 'public',
 				],
-			],
-		];
+				'verbs' => [
+					'class' => VerbFilter::class,
+					'actions' => [
+						'revoke-access' => ['POST'],
+						'delete' => ['POST'],
+					],
+				],
+			]);
 	}
 
 	public bool $checkCanSeeIssue = true;
@@ -159,6 +170,7 @@ class IssueController extends Controller {
 		$issueFile = $this->findIssueFile($issue_id, $file_id);
 		$this->checkIssueAccess($issueFile->issue);
 		$path = $issueFile->file->path;
+		Yii::warning('load action');
 		if (!$this->module->getFlysystem()->has($path)) {
 			Yii::warning('Fly system has not file with ID: ' . $file_id . ' for path: ' . $path);
 			//@todo maybe should delete IssueFile and File models.
