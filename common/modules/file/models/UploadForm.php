@@ -95,6 +95,9 @@ class UploadForm extends Model {
 
 	private array $attachedFiles = [];
 
+	/**
+	 * @return File[]
+	 */
 	public function getAttachedFiles(): array {
 		return $this->attachedFiles;
 	}
@@ -123,6 +126,9 @@ class UploadForm extends Model {
 				break;
 			case 'png':
 				$img = @imagecreatefrompng($file);
+				imagepalettetotruecolor($img);
+				imagealphablending($img, true);
+				imagesavealpha($img, true);
 				break;
 			default:
 				$img = false;

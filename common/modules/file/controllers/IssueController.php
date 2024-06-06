@@ -7,6 +7,7 @@ use common\models\issue\IssueInterface;
 use common\models\message\IssueFilesUploadMessagesForm;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\file\helpers\FilePreviewHelper;
 use common\modules\file\models\FileAccess;
 use common\modules\file\models\IssueFile;
 use common\modules\file\models\IssueFileAccess;
@@ -89,7 +90,7 @@ class IssueController extends Controller {
 			|| Yii::$app->user->can(Worker::ROLE_ISSUE_FILE_MANAGER);
 	}
 
-	public function actionUpload(int $issue_id, int $file_type_id) {
+	public function actionSingleUpload(int $issue_id, int $file_type_id) {
 		$fileType = $this->module->findFileType($file_type_id);
 		if ($fileType === null) {
 			throw new NotFoundHttpException();
@@ -98,18 +99,40 @@ class IssueController extends Controller {
 		$this->checkIssueAccess($issue);
 		$model = new UploadForm($fileType, $this->module);
 		$model->userId = Yii::$app->user->getId();
-		$messagesForm = new IssueFilesUploadMessagesForm();
-		$messagesForm->workersTypes = [
+		$data = [];
+		if ($model->saveUploads($issue)) {
+			$data['append'] = true;
+			$previewHelper = FilePreviewHelper::createForIssue($issue_id);
+			$data['initialPreview'] = $previewHelper->getInitialPreview($model->getAttachedFiles());
+			$data['initialPreviewConfig'] = $previewHelper->getInitialPreviewConfig($model->getAttachedFiles());
+		} else {
+			$data['message'] = $model->getFirstErrors();
+		}
+		return $this->asJson($data);
+	}
+
+	public function actionUpload(int $issue_id, int $file_type_id) {
+		$fileType = $this->module->findFileType($file_type_id);
+		if ($fileType === null) {
+			throw new NotFoundHttpException();
+		}
+		$issue = $this->findIssue($issue_id);
+		$this->checkIssueAccess($issue);
+		$model = new IssueFilesUploadMessagesForm();
+		$model->workersTypes = [
 			Worker::ROLE_AUDITOR,
 		];
-		$messagesForm->setIssue($issue);
-		$messagesForm->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_MESSAGE_EMAIL_ISSUE_UPLOAD_FILE]));
-		if (Yii::$app->request->isPost && $model->saveUploads($issue)) {
-			if ($messagesForm->load(Yii::$app->request->post())) {
-				$messagesForm->fileUploader = Yii::$app->user->getIdentity()->getFullName();
-				$messagesForm->setFiles($model->getAttachedFiles());
-				$messagesForm->pushMessages();
+		$model->setIssue($issue);
+		$model->setFileType($fileType);
+		$model->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_MESSAGE_EMAIL_ISSUE_UPLOAD_FILE]));
+		if ($model->load(Yii::$app->request->post())) {
+			$model->fileUploader = Yii::$app->user->getIdentity()->getFullName();
+			$files = $issue->getIssueModel()->getFilesByType($file_type_id);
+			if (!empty($files)) {
+				$model->setFiles($files);
+				$model->pushMessages();
 			}
+			$model->pushMessages();
 
 			return $this->redirect(['/issue/issue/view', 'id' => $issue_id]);
 		}
@@ -117,7 +140,7 @@ class IssueController extends Controller {
 			'issue' => $issue,
 			'model' => $model,
 			'type' => $fileType,
-			'messages' => $messagesForm,
+			'messages' => $model,
 		]);
 	}
 
@@ -184,6 +207,9 @@ class IssueController extends Controller {
 			->one();
 		if (empty($issueFile)) {
 			throw new NotFoundHttpException('not found issue file');
+		}
+		if (!$issueFile->isForUser(Yii::$app->user->getId())) {
+			throw new ForbiddenHttpException();
 		}
 		return $issueFile;
 	}

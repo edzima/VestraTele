@@ -2,26 +2,25 @@
 
 use common\helpers\Breadcrumbs;
 use common\helpers\Html;
+use common\helpers\Url;
 use common\models\issue\IssueInterface;
 use common\models\message\IssueFilesUploadMessagesForm;
-use common\modules\file\models\UploadForm;
+use common\modules\file\helpers\FilePreviewHelper;
 use common\modules\file\widgets\FileInput;
 use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $issue IssueInterface */
-/* @var $model UploadForm */
-/* @var $messages IssueFilesUploadMessagesForm */
+/* @var $model IssueFilesUploadMessagesForm */
 
 $this->title = Yii::t('file', 'Upload -{type} to Issue: {issue}', [
 		'issue' => $issue->getIssueName(),
-		'type' => $model->getType()->name,
+		'type' => $model->getFileType()->name,
 	]
 );
 $this->params['breadcrumbs'] = Breadcrumbs::issue($issue);
-$this->params['breadcrumbs'][] = $model->getType()->name;
-
+$this->params['breadcrumbs'][] = $model->getFileType()->name;
 ?>
 <div class="issue-file-upload">
 
@@ -33,21 +32,29 @@ $this->params['breadcrumbs'][] = $model->getType()->name;
 			['id' => 'issue-attachments-form']
 		); ?>
 
-		<?= $form->field($model, 'file[]')->widget(FileInput::class, [
+		<?=
+		FileInput::widget([
+			'name' => 'files[]',
 			'options' => [
 				'multiple' => true,
+				'accept' => $model->getFileType()->getAcceptExtensions(),
 			],
-			'previewFiles' => $issue->getFilesByType($model->getType()->id),
-			'previewRoute' => ['/file/issue/download', 'issue_id' => $issue->getIssueId()],
-			'deleteRoute' => ['/file/issue/delete', 'issue_id' => $issue->getIssueId()],
+			'filePreviewHelper' => FilePreviewHelper::createForIssue($issue->getIssueId()),
+			'previewFiles' => $issue->getFilesByType($model->getFileType()->id),
+			'pluginOptions' => [
+				'uploadUrl' => Url::to(['/file/issue/single-upload', 'issue_id' => $issue->getIssueId(), 'file_type_id' => $model->getFileType()->id]),
+			],
 		]) ?>
+
 
 		<?= IssueMessagesFormWidget::widget([
 			'form' => $form,
-			'model' => $messages,
-			'checkboxesAttributes' => [
-				'sendEmailToWorkers',
-			],
+			'model' => $model,
+			'checkboxesAttributes' => ['sendEmailToWorkers',],
+		]) ?>
+
+		<?= Html::submitButton(Yii::t('common', 'Save'), [
+			'class' => 'btn btn-primary',
 		]) ?>
 
 		<?php ActiveForm::end(); ?>
