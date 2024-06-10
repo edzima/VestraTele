@@ -483,4 +483,14 @@ class Issue extends ActiveRecord implements
 			->viaTable(Lawsuit::VIA_TABLE_ISSUE, ['issue_id' => 'id']);
 	}
 
+	public function getUserRoles(int $userId): array {
+		$roles = [];
+		foreach ($this->users as $issueUser) {
+			if ($issueUser->user_id === $userId) {
+				$roles[] = $issueUser->type;
+			}
+		}
+		return $roles;
+	}
+
 }
