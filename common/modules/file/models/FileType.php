@@ -73,16 +73,16 @@ class FileType extends ActiveRecord {
 		return $this->hasMany(File::class, ['file_type_id' => 'id']);
 	}
 
-	public function getValidatorOptions(): ?ValidatorOptions {
-		if ($this->_validatorOptions === null && is_string($this->validator_config)) {
-			$this->_validatorOptions = ValidatorOptions::createFromJson($this->validator_config);
+	public function getValidatorOptions(): ValidatorOptions {
+		if ($this->_validatorOptions === null) {
+			$this->_validatorOptions = ValidatorOptions::createFromJson((string) $this->validator_config);
 		}
 		return $this->_validatorOptions;
 	}
 
 	public function getVisibilityOptions(): VisibilityOptions {
-		if ($this->_visibilityOptions === null && is_string($this->visibility_attributes)) {
-			$this->_visibilityOptions = VisibilityOptions::createFromJson($this->visibility_attributes);
+		if ($this->_visibilityOptions === null) {
+			$this->_visibilityOptions = VisibilityOptions::createFromJson((string) $this->visibility_attributes);
 		}
 		return $this->_visibilityOptions;
 	}
