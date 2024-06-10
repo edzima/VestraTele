@@ -125,11 +125,11 @@ class FileAuth extends Component {
 	}
 
 	protected function getAllowedTypeRoles(): array {
-		return $this->getFileType()->getVisibilityOptions()->allowedRoles;
+		return $this->getFileType()->getVisibilityOptions()->allowedRoles ?? [];
 	}
 
 	protected function getDisallowedTypeRoles(): array {
-		return $this->getFileType()->getVisibilityOptions()->disallowedRoles;
+		return $this->getFileType()->getVisibilityOptions()->disallowedRoles ?? [];
 	}
 
 	protected function getFileType(): FileType {
