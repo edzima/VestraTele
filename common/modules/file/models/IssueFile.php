@@ -19,6 +19,8 @@ use yii\db\ActiveRecord;
  */
 class IssueFile extends ActiveRecord {
 
+	private array $_fileUserAccess = [];
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -67,6 +69,11 @@ class IssueFile extends ActiveRecord {
 	 */
 	public function getIssue() {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
+	}
+
+	public function isForUser(int $user_id): bool {
+		return $this->file
+			->isForUser($user_id, $this->issue->getUserRoles($user_id));
 	}
 
 }

@@ -5,6 +5,7 @@ namespace common\models\message;
 use common\components\message\MessageTemplate;
 use common\helpers\Html;
 use common\modules\file\models\File;
+use common\modules\file\models\FileType;
 
 class IssueFilesUploadMessagesForm extends IssueMessagesForm {
 
@@ -18,6 +19,7 @@ class IssueFilesUploadMessagesForm extends IssueMessagesForm {
 	public ?bool $sendSmsToCustomer = false;
 	public ?bool $sendEmailToCustomer = false;
 	public ?bool $sendSmsToAgent = false;
+	private FileType $fileType;
 
 	protected static function mainKeys(): array {
 		return [
@@ -31,6 +33,14 @@ class IssueFilesUploadMessagesForm extends IssueMessagesForm {
 		$this->files = $files;
 	}
 
+	public function setFileType(FileType $fileType) {
+		$this->fileType = $fileType;
+	}
+
+	public function getFileType(): FileType {
+		return $this->fileType;
+	}
+
 	protected function parseTemplate(MessageTemplate $template): void {
 		parent::parseTemplate($template);
 		$this->parseFiles($template);
@@ -40,7 +50,7 @@ class IssueFilesUploadMessagesForm extends IssueMessagesForm {
 		$count = count($this->files);
 		$items = [];
 		foreach ($this->files as $file) {
-			$items[] = Html::issueFileLink($file, $this->issue->getIssueId(), true);
+			$items[] = Html::issueFileLink($file, $this->issue, true);
 		}
 		$template->parseSubject([
 			'filesCount' => $count,

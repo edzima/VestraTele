@@ -7,13 +7,18 @@ use common\models\issue\IssueInterface;
 use common\models\message\IssueFilesUploadMessagesForm;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\file\helpers\FilePreviewHelper;
 use common\modules\file\models\FileAccess;
+use common\modules\file\models\FileType;
 use common\modules\file\models\IssueFile;
 use common\modules\file\models\IssueFileAccess;
 use common\modules\file\models\IssueFileOverwrite;
 use common\modules\file\models\UploadForm;
 use common\modules\file\Module;
+use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
+use yii\filters\HttpCache;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -25,17 +30,27 @@ use yii\web\Response;
  */
 class IssueController extends Controller {
 
-	public function behaviors() {
+	public function behaviors(): array {
 
-		return [
-			'verbs' => [
-				'class' => VerbFilter::class,
-				'actions' => [
-					'revoke-access' => ['POST'],
-					'delete' => ['POST'],
+		return array_merge(parent::behaviors(),
+			[
+				'httpCache' => [
+					'class' => HttpCache::class,
+					'only' => ['download'],
+					'etagSeed' => function (): ?string {
+						return Yii::$app->request->userAgent;
+					},
+					'cacheControlHeader' => 'public, max-age=31536000',
+					'sessionCacheLimiter' => 'public',
 				],
-			],
-		];
+				'verbs' => [
+					'class' => VerbFilter::class,
+					'actions' => [
+						'revoke-access' => ['POST'],
+						'delete' => ['POST'],
+					],
+				],
+			]);
 	}
 
 	public bool $checkCanSeeIssue = true;
@@ -89,26 +104,57 @@ class IssueController extends Controller {
 			|| Yii::$app->user->can(Worker::ROLE_ISSUE_FILE_MANAGER);
 	}
 
+	public function actionSingleUpload(int $issue_id, int $file_type_id) {
+		$fileType = $this->module->findFileType($file_type_id);
+		if ($fileType === null) {
+			throw new NotFoundHttpException();
+		}
+		$issue = $this->findIssue($issue_id);
+		$this->checkUserAccess($fileType, $issue);
+
+		$model = new UploadForm($fileType, $this->module);
+		$model->userId = Yii::$app->user->getId();
+		$data = [];
+		if ($model->saveUploads($issue)) {
+			$data['append'] = true;
+			$previewHelper = FilePreviewHelper::createForIssue($issue_id);
+			$data['initialPreview'] = $previewHelper->getInitialPreview($model->getAttachedFiles());
+			$data['initialPreviewConfig'] = $previewHelper->getInitialPreviewConfig($model->getAttachedFiles());
+		} else {
+			if ($model->hasErrors()) {
+				$data['message'] = $model->getFirstErrors();
+			}
+		}
+		return $this->asJson($data);
+	}
+
+	/**
+	 * @throws Throwable
+	 * @throws InvalidConfigException
+	 * @throws ForbiddenHttpException
+	 * @throws NotFoundHttpException
+	 */
 	public function actionUpload(int $issue_id, int $file_type_id) {
 		$fileType = $this->module->findFileType($file_type_id);
 		if ($fileType === null) {
 			throw new NotFoundHttpException();
 		}
 		$issue = $this->findIssue($issue_id);
-		$this->checkIssueAccess($issue);
-		$model = new UploadForm($fileType, $this->module);
-		$model->userId = Yii::$app->user->getId();
-		$messagesForm = new IssueFilesUploadMessagesForm();
-		$messagesForm->workersTypes = [
+		$this->checkUserAccess($fileType, $issue);
+		$model = new IssueFilesUploadMessagesForm();
+		$model->workersTypes = [
 			Worker::ROLE_AUDITOR,
 		];
-		$messagesForm->setIssue($issue);
-		$messagesForm->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_MESSAGE_EMAIL_ISSUE_UPLOAD_FILE]));
-		if (Yii::$app->request->isPost && $model->saveUploads($issue)) {
-			if ($messagesForm->load(Yii::$app->request->post())) {
-				$messagesForm->fileUploader = Yii::$app->user->getIdentity()->getFullName();
-				$messagesForm->setFiles($model->getAttachedFiles());
-				$messagesForm->pushMessages();
+		$model->setIssue($issue);
+		$model->setFileType($fileType);
+		$model->addExtraWorkersEmailsIds(User::getAssignmentIds([Worker::PERMISSION_MESSAGE_EMAIL_ISSUE_UPLOAD_FILE]));
+		if ($model->load(Yii::$app->request->post())) {
+			$model->fileUploader = Yii::$app->user->getIdentity()->getFullName();
+			$files = $issue->getIssueModel()->getFilesByType($file_type_id);
+			if (!empty($files)) {
+				Yii::warning($files);
+				$model->setFiles($files);
+				$model->pushMessages();
 			}
 
 			return $this->redirect(['/issue/issue/view', 'id' => $issue_id]);
@@ -117,8 +163,19 @@ class IssueController extends Controller {
 			'issue' => $issue,
 			'model' => $model,
 			'type' => $fileType,
-			'messages' => $messagesForm,
+			'messages' => $model,
 		]);
+	}
+
+	private function checkUserAccess(FileType $fileType, IssueInterface $issue): void {
+		if (!Yii::$app->fileAuth
+			->isTypeForUser(
+				Yii::$app->user->getId(),
+				$fileType,
+				$issue->getIssueModel()->getUserRoles(Yii::$app->user->getId()))
+		) {
+			throw new ForbiddenHttpException();
+		}
 	}
 
 	public function actionOverwrite(int $issue_id, int $file_id) {
@@ -167,10 +224,11 @@ class IssueController extends Controller {
 
 	protected function findIssue(int $id): IssueInterface {
 		$model = Issue::findOne($id);
-		if ($model) {
-			return $model;
+		if (!$model) {
+			throw new NotFoundHttpException();
 		}
-		throw new NotFoundHttpException();
+		$this->checkIssueAccess($model);
+		return $model;
 	}
 
 	protected function findIssueFile(int $issueId, int $fileId): IssueFile {
@@ -184,6 +242,9 @@ class IssueController extends Controller {
 			->one();
 		if (empty($issueFile)) {
 			throw new NotFoundHttpException('not found issue file');
+		}
+		if (!$issueFile->isForUser(Yii::$app->user->getId())) {
+			throw new ForbiddenHttpException();
 		}
 		return $issueFile;
 	}

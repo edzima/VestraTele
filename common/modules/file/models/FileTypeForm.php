@@ -7,13 +7,15 @@ use yii\db\QueryInterface;
 
 class FileTypeForm extends Model {
 
-	private ?ValidatorOptions $options = null;
-
 	private ?FileType $model = null;
 
 	public $name;
 	public $is_active;
 	public $visibility;
+
+	private ?ValidatorOptions $options = null;
+
+	private ?VisibilityOptions $visibilityOptions = null;
 
 	public function attributeLabels(): array {
 		return FileType::instance()->attributeLabels();
@@ -47,6 +49,7 @@ class FileTypeForm extends Model {
 		$this->is_active = $model->is_active;
 		$this->visibility = $model->visibility;
 		$this->options = $model->getValidatorOptions();
+		$this->visibilityOptions = $model->getVisibilityOptions();
 	}
 
 	public function getModel(): FileType {
@@ -63,12 +66,23 @@ class FileTypeForm extends Model {
 		return $this->options;
 	}
 
+	public function getVisibility(): VisibilityOptions {
+		if ($this->visibilityOptions === null) {
+			$this->visibilityOptions = new VisibilityOptions();
+		}
+		return $this->visibilityOptions;
+	}
+
 	public function load($data, $formName = null) {
-		return parent::load($data, $formName) && $this->getOptions()->load($data, $formName);
+		return parent::load($data, $formName)
+			&& $this->getOptions()->load($data, $formName)
+			&& $this->getVisibility()->load($data, $formName);
 	}
 
 	public function validate($attributeNames = null, $clearErrors = true) {
-		return parent::validate($attributeNames, $clearErrors) && $this->getOptions()->validate($attributeNames, $clearErrors);
+		return parent::validate($attributeNames, $clearErrors)
+			&& $this->getOptions()->validate($attributeNames, $clearErrors)
+			&& $this->getVisibility()->validate($attributeNames, $clearErrors);
 	}
 
 	public function save(bool $validate = true): bool {
@@ -80,6 +94,8 @@ class FileTypeForm extends Model {
 		$model->visibility = $this->visibility;
 		$model->is_active = $this->is_active;
 		$model->validator_config = $this->getOptions()->toJson();
+		$model->visibility_attributes = $this->getVisibility()->toJson();
 		return $model->save();
 	}
+
 }

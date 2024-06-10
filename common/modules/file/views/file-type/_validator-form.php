@@ -11,7 +11,8 @@ use yii\widgets\ActiveForm;
 
 <div class="file-type-validator-form">
 
-	<?= $form->field($model, 'extensions')->textInput() ?>
+	<?= $form->field($model, 'extensions')->textInput()
+		->hint(Yii::t('file', "Separate ','. E.g.: pdf, jpg, png, doc, ...")) ?>
 
 	<?= $form->field($model, 'maxSize')->widget(NumberControl::class) ?>
 

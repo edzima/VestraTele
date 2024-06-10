@@ -35,4 +35,8 @@ return [
 	'Save' => 'Zapisz',
 	'Type' => 'Rozszerzenie',
 	'Size' => 'Rozmiar',
+	"Separate ','. E.g.: pdf, jpg, png, doc, ..." => "Oddziel (,) np.: pdf, jpg, png, doc, ...",
+	'Allowed Roles' => 'Dozwolone Role',
+	'Disallowed Roles' => 'Niedozwolone Role',
+	'Update File Type: {name}' => 'Edycja typu Plików: {name}',
 ];

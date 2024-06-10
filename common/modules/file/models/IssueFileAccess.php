@@ -27,7 +27,7 @@ class IssueFileAccess extends Model {
 		$this->issueFile = $issueFile;
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'user_id' => Yii::t('file', 'User'),
 		];

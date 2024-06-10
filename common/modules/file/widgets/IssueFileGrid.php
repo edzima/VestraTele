@@ -49,12 +49,15 @@ class IssueFileGrid extends GridView {
 				'noWrap' => true,
 				'contentBold' => true,
 				'value' => function (IssueFileTypes $model) {
-					return Html::a($model->type->name,
-						[
-							'/file/issue/upload',
-							'issue_id' => $model->model->getIssueId(),
-							'file_type_id' => $model->type->id,
-						]);
+					if ($model->isTypeForUser(Yii::$app->user->getId())) {
+						return Html::a($model->type->name,
+							[
+								'/file/issue/upload',
+								'issue_id' => $model->model->getIssueId(),
+								'file_type_id' => $model->type->id,
+							]);
+					}
+					return $model->type->name;
 				},
 				'format' => 'html',
 			],
@@ -96,7 +99,7 @@ class IssueFileGrid extends GridView {
 	}
 
 	protected function renderFileLink(File $file): string {
-		return Html::issueFileLink($file, $this->model->getIssueId());
+		return Html::issueFileLink($file, $this->model);
 	}
 
 	public function issueDataProvider(): DataProviderInterface {

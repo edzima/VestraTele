@@ -18,6 +18,8 @@ class UploadForm extends Model {
 	 */
 	public $file;
 
+	public string $attributeName = 'file';
+
 	public int $userId;
 
 	public bool $imageToWeb = true;
@@ -54,16 +56,17 @@ class UploadForm extends Model {
 	protected function getFileValidator(): FileValidator {
 		if ($this->fileValidator === null) {
 			$this->fileValidator = $this->type->getValidatorOptions()->createValidator();
-			$this->fileValidator->attributes = ['file'];
+			$this->fileValidator->attributes = [$this->attributeName];
 		}
 		return $this->fileValidator;
 	}
 
 	public function saveUploads(AttachableModel $model, bool $validate = true): ?int {
 		if ($validate && !$this->validate()) {
+			Yii::warning($this->getErrors(), __METHOD__);
 			return null;
 		}
-		$files = UploadedFile::getInstances($this, 'file');
+		$files = UploadedFile::getInstancesByName($this->attributeName);
 		$module = $this->module;
 		$userTempDir = $module->getUserDirPath();
 		if (!empty($files)) {
@@ -73,6 +76,7 @@ class UploadForm extends Model {
 				}
 			}
 		}
+		Yii::warning($files);
 		$this->attachedFiles = [];
 		foreach (FileHelper::findFiles($userTempDir) as $file) {
 			if ($this->imageToWeb && $this->fileIsImage($file)) {
@@ -95,6 +99,9 @@ class UploadForm extends Model {
 
 	private array $attachedFiles = [];
 
+	/**
+	 * @return File[]
+	 */
 	public function getAttachedFiles(): array {
 		return $this->attachedFiles;
 	}
@@ -123,6 +130,9 @@ class UploadForm extends Model {
 				break;
 			case 'png':
 				$img = @imagecreatefrompng($file);
+				imagepalettetotruecolor($img);
+				imagealphablending($img, true);
+				imagesavealpha($img, true);
 				break;
 			default:
 				$img = false;
@@ -145,7 +155,7 @@ class UploadForm extends Model {
 		return $file;
 	}
 
-	function replace_extension($filename, $new_extension) {
+	private function replace_extension($filename, $new_extension) {
 		$info = pathinfo($filename);
 		return $info['dirname'] . '/' . $info['filename'] . '.' . $new_extension;
 	}

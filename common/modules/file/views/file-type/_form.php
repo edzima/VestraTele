@@ -19,6 +19,11 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'visibility')->dropDownList(FileTypeForm::getVisibilityNames()) ?>
 
+	<?= $this->render('_visibility-form', [
+		'model' => $model->getVisibility(),
+		'form' => $form,
+	]) ?>
+
 	<?= $this->render('_validator-form', [
 		'model' => $model->getOptions(),
 		'form' => $form,
