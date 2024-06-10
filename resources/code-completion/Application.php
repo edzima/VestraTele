@@ -10,6 +10,7 @@ use common\components\postal\PocztaPolska;
 use common\components\provision\Provisions;
 use common\components\TaxComponent;
 use common\components\User;
+use common\modules\file\components\FileAuth;
 use common\modules\lead\components\LeadClient;
 use Edzima\Yii2Adescom\models\SenderInterface;
 use yii\BaseYii;
@@ -46,6 +47,7 @@ class Yii extends BaseYii {
  * @property Queue $queue
  * @property KeyStorage $keyStorage
  * @property PocztaPolska $pocztaPolska
+ * @property FileAuth $fileAuth
  */
 abstract class Application extends \yii\web\Application {
 

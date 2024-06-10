@@ -15,6 +15,7 @@ use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\credit\Module as CreditModule;
 use common\modules\czater\Czater;
+use common\modules\file\components\FileAuth;
 use common\modules\file\Module as FileModule;
 use common\modules\lead\components\LeadClient;
 use common\modules\lead\Module as LeadModule;
@@ -105,7 +106,9 @@ $config = [
 		],
 	],
 	'components' => [
-
+		'fileAuth' => [
+			'class' => FileAuth::class,
+		],
 		'fs' => [
 			'class' => LocalFilesystem::class,
 			'path' => '@protected',

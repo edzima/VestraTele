@@ -34,13 +34,18 @@ $this->params['breadcrumbs'][] = $model->getFileType()->name;
 
 		<?=
 		FileInput::widget([
-			'name' => 'files[]',
+			'name' => 'file',
 			'options' => [
 				'multiple' => true,
 				'accept' => $model->getFileType()->getAcceptExtensions(),
 			],
 			'filePreviewHelper' => FilePreviewHelper::createForIssue($issue->getIssueId()),
-			'previewFiles' => $issue->getFilesByType($model->getFileType()->id),
+			'previewFiles' => Yii::$app->fileAuth
+				->filterUserFiles(
+					Yii::$app->user->getId(),
+					$issue->getFilesByType($model->getFileType()->id),
+					$issue->getIssueModel()->getUserRoles(Yii::$app->user->getId())
+				),
 			'pluginOptions' => [
 				'uploadUrl' => Url::to(['/file/issue/single-upload', 'issue_id' => $issue->getIssueId(), 'file_type_id' => $model->getFileType()->id]),
 			],

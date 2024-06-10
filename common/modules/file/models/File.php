@@ -62,12 +62,6 @@ class File extends ActiveRecord {
 		return $name;
 	}
 
-	public function isForUser(int $userId): bool {
-		return $this->owner_id === $userId
-			|| $this->fileType->isPublic()
-			|| $this->hasAccess($userId);
-	}
-
 	public function getNameWithType(): string {
 		return $this->name . '.' . $this->type;
 	}
@@ -180,8 +174,7 @@ class File extends ActiveRecord {
 		return $this->hasMany(FileAccess::class, ['file_id' => 'id']);
 	}
 
-	private function hasAccess(int $userId): bool {
-		return FileAccess::userHasAccess($userId, $this->id);
+	public function isForUser(int $userId, array $roles = []): bool {
+		return Yii::$app->fileAuth->isForUser($userId, $this, $roles);
 	}
-
 }

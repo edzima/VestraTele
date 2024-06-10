@@ -50,7 +50,7 @@ class IssueFilesUploadMessagesForm extends IssueMessagesForm {
 		$count = count($this->files);
 		$items = [];
 		foreach ($this->files as $file) {
-			$items[] = Html::issueFileLink($file, $this->issue->getIssueId(), true);
+			$items[] = Html::issueFileLink($file, $this->issue, true);
 		}
 		$template->parseSubject([
 			'filesCount' => $count,

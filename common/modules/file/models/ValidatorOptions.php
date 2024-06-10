@@ -4,7 +4,6 @@ namespace common\modules\file\models;
 
 use Yii;
 use yii\base\Model;
-use yii\di\Instance;
 use yii\helpers\Json;
 use yii\validators\FileValidator;
 
@@ -26,7 +25,7 @@ class ValidatorOptions extends Model {
 		foreach ($this->getFileValidatorAttributes() as $attribute) {
 			$config[$attribute] = $this->{$attribute};
 		}
-		return Instance::ensure($config, FileValidator::class);
+		return Yii::createObject($config);
 	}
 
 	public function getFileValidatorAttributes(): array {
@@ -45,7 +44,7 @@ class ValidatorOptions extends Model {
 		];
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels(): array {
 		return [
 			'extensions' => Yii::t('file', 'Extensions'),
 			'maxSize' => Yii::t('file', 'Max size'),

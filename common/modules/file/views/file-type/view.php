@@ -1,6 +1,7 @@
 <?php
 
 use common\modules\file\models\FileType;
+use common\modules\file\models\VisibilityOptions;
 use common\widgets\grid\IssuesDataColumn;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
@@ -55,6 +56,30 @@ YiiAsset::register($this);
 			]) ?>
 		</div>
 
+		<div class="col-md-2">
+
+			<?= DetailView::widget([
+				'model' => $model->getVisibilityOptions(),
+				'attributes' => [
+					[
+						'attribute' => 'allowedRoles',
+						'format' => 'html',
+						'value' => function (VisibilityOptions $model): ?string {
+							return Html::ul($model->allowedRoles);
+						},
+						'visible' => !empty($model->getVisibilityOptions()->allowedRoles),
+					],
+					[
+						'attribute' => 'disallowedRoles',
+						'format' => 'html',
+						'value' => function (VisibilityOptions $model): ?string {
+							return Html::ul($model->disallowedRoles);
+						},
+						'visible' => !empty($model->getVisibilityOptions()->disallowedRoles),
+					],
+				],
+			]) ?>
+		</div>
 	</div>
 
 	<div class="row">

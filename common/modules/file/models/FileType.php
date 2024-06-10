@@ -3,6 +3,7 @@
 namespace common\modules\file\models;
 
 use common\helpers\ArrayHelper;
+use common\helpers\FileHelper;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -15,6 +16,7 @@ use yii\db\ActiveRecord;
  * @property int $is_active
  * @property string $visibility
  * @property string $validator_config
+ * @property string $visibility_attributes
  *
  * @property File[] $files
  */
@@ -24,6 +26,7 @@ class FileType extends ActiveRecord {
 	public const VISIBILITY_PUBLIC = 'public';
 
 	private ?ValidatorOptions $_validatorOptions = null;
+	private ?VisibilityOptions $_visibilityOptions = null;
 
 	private static $_instances = [];
 
@@ -77,12 +80,36 @@ class FileType extends ActiveRecord {
 		return $this->_validatorOptions;
 	}
 
+	public function getVisibilityOptions(): VisibilityOptions {
+		if ($this->_visibilityOptions === null && is_string($this->visibility_attributes)) {
+			$this->_visibilityOptions = VisibilityOptions::createFromJson($this->visibility_attributes);
+		}
+		return $this->_visibilityOptions;
+	}
+
 	public function isPublic(): bool {
 		return $this->visibility === static::VISIBILITY_PUBLIC;
 	}
 
 	public function getVisibilityName(): string {
 		return static::getVisibilityNames()[$this->visibility];
+	}
+
+	public function getAcceptExtensions(): string {
+		$accept = [];
+		$extensions = $this->getValidatorOptions()->extensions;
+		if (empty($extensions)) {
+			return '*';
+		}
+		$extensions = explode(',', $extensions);
+		foreach ($extensions as $extension) {
+			$extension = trim($extension);
+			$mime = FileHelper::getMimeTypeFromExtension($extension);
+			if ($mime) {
+				$accept[] = $mime;
+			}
+		}
+		return implode(',', $accept);
 	}
 
 	public static function getVisibilityNames(): array {
@@ -110,6 +137,10 @@ class FileType extends ActiveRecord {
 			});
 		}
 		return static::$_instances;
+	}
+
+	public function isForUser(int $userId) {
+
 	}
 
 }

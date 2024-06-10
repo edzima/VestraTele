@@ -31,15 +31,19 @@ class Html extends BaseHtml {
 		return static::a($issue->getIssueName(), $url::issueView($issue->getIssueId()), $options);
 	}
 
-	public static function issueFileLink(File $file, int $issue_id, $schema = false): string {
+	public static function issueFileLink(File $file, IssueInterface $issue, $schema = false): string {
 		$name = $file->getShortName() . '.' . $file->type;
 		$name = Html::encode($name);
-		if ($file->isForUser(Yii::$app->user->getId())) {
+		$date = static::tag('span', '(' . Yii::$app->formatter->asDate($file->updated_at) . ')');
+		if ($file->isForUser(
+			Yii::$app->user->getId(),
+			$issue->getIssueModel()->getUserRoles(Yii::$app->user->getId())
+		)) {
 			/** @var $url Url */
 			$url = static::URL_HELPER;
-			return Html::a($name, $url::issueFileDownload($issue_id, $file->id, $schema));
+			return Html::a($name, $url::issueFileDownload($issue->getIssueId(), $file->id, $schema)) . ' ' . $date;
 		}
-		return $name;
+		return $name . ' ' . $date;
 	}
 
 	public static function payStatusRowOptions(PayedInterface $pay): array {
