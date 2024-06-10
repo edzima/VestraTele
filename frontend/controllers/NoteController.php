@@ -161,6 +161,7 @@ class NoteController extends Controller {
 		$messageForm->addExtraWorkerEmail($summon->owner, Yii::t('common', 'Owner'));
 		$model->messagesForm = $messageForm;
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$model->pushMessages();
 			$this->redirect(['/summon/view', 'id' => $summon->id]);
 		}
 		return $this->render('summon', [
