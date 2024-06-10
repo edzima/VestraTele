@@ -79,7 +79,7 @@ $config = [
 				'rules' => [
 					[
 						'controllers' => ['file/issue'],
-						'actions' => ['upload', 'delete'],
+						'actions' => ['single-upload', 'upload', 'delete'],
 						'permissions' => [
 							Worker::PERMISSION_ISSUE_FILE_UPLOAD,
 							Worker::PERMISSION_ISSUE_FILE_DELETE_NOT_SELF,
