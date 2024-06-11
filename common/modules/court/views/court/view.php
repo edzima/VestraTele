@@ -37,7 +37,6 @@ YiiAsset::register($this);
 					'phone:ntext',
 					'fax',
 					'email:email',
-					'updated_at',
 					[
 						'label' => Yii::t('court', 'Address'),
 						'format' => 'html',
