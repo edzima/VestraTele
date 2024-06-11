@@ -39,4 +39,5 @@ return [
 	'Required' => 'Obowiązkowa',
 	'Not required' => 'Nieobowiązkowa',
 	'Summons' => 'Zlecenia',
+	'Create Court' => 'Dodaj Sąd',
 ];

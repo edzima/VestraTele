@@ -44,7 +44,7 @@ class Court extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['name', 'type', 'phone', 'email', 'updated_at'], 'required'],
+			[['name', 'type', 'phone', 'email'], 'required'],
 			[['parent_id'], 'integer'],
 			[['updated_at'], 'safe'],
 			[['phone'], 'string'],
