@@ -10,5 +10,5 @@ class Events {
 	public bool $konczace;
 	public string $nazwa;
 
-	public ?Cause $przyczyna;
+	public ?Cause $przyczyna = null;
 }
