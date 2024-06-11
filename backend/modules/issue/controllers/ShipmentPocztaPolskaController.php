@@ -118,7 +118,7 @@ class ShipmentPocztaPolskaController extends Controller {
 
 		if ($this->request->isPost) {
 			if ($model->load($this->request->post()) && $model->save()) {
-				$this->updateShipmentData($model);
+				//	$this->updateShipmentData($model);
 				return $this->redirect(['view', 'issue_id' => $model->issue_id, 'shipment_number' => $model->shipment_number]);
 			}
 		} else {
