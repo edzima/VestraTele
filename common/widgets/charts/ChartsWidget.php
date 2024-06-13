@@ -13,6 +13,7 @@ class ChartsWidget extends Widget {
 	public static $autoIdPrefix = 'c';
 
 	public const TYPE_BAR = 'bar';
+	public const TYPE_COLUMN = 'column';
 
 	public const TYPE_RADIAL_BAR = 'radialBar';
 
@@ -31,6 +32,8 @@ class ChartsWidget extends Widget {
 
 	public int $timeout = 50;
 
+	public bool $legendFormatterAsSeriesWithCount = false;
+
 	public array $containerOptions = [];
 
 	public function init() {
@@ -39,6 +42,9 @@ class ChartsWidget extends Widget {
 		}
 		if ($this->chart['defaultLocale'] === 'pl') {
 			$this->chart['locales'][] = $this->getPlLanguageData();
+		}
+		if ($this->legendFormatterAsSeriesWithCount && !isset($this->options['legend']['formatter'])) {
+			$this->options['legend']['formatter'] = static::legendFormaterSeriesNameWithCount();
 		}
 		parent::init();
 	}
@@ -88,6 +94,14 @@ JS;
 				'toolbar' => [
 					'exportToSVG' => 'Pobierz SVG',
 					'download' => 'Pobierz',
+					"exportToCSV" => "Pobierz CSV",
+					"exportToPNG" => "Pobierz PNG",
+					"selection" => "Wybór",
+					"selectionZoom" => "Zoom",
+					"zoomIn" => "Zbliż",
+					"zoomOut" => "Oddal",
+					"pan" => "Przesuwanie",
+					"reset" => "Reset Zoom",
 				],
 				'days' => [
 					'Niedziela',
@@ -156,6 +170,12 @@ JS;
 					  return new Intl.NumberFormat('$language',$options)
 					  		.format(value);
   					}"
+		);
+	}
+
+	public static function legendFormaterSeriesNameWithCount(): JsExpression {
+		return new JsExpression(
+			'function(seriesName, opts){ return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]];}'
 		);
 	}
 
