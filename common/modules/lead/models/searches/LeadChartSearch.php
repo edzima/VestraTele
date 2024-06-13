@@ -3,9 +3,11 @@
 namespace common\modules\lead\models\searches;
 
 use common\helpers\ArrayHelper;
+use common\modules\lead\chart\LeadStatusColor;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCost;
 use common\modules\lead\models\LeadSource;
+use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\query\LeadQuery;
 use common\widgets\charts\ChartsWidget;
@@ -22,6 +24,7 @@ class LeadChartSearch extends LeadSearch {
 	public const STATUS_GROUP_ONLY_ASSIGNED = 1;
 	public const STATUS_GROUP_WITHOUT_ASSIGNED = 2;
 	public const STATUS_GROUP_DISABLE = 3;
+	private ?LeadStatusColor $leadStatusColor = null;
 
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
@@ -81,7 +84,11 @@ class LeadChartSearch extends LeadSearch {
 		]);
 		$query->orderBy([Lead::tableName() . '.date_at' => SORT_ASC]);
 		$query->asArray();
-		return $query->all();
+		$data = $query->all();
+		uasort($data, function ($a, $b) {
+			return LeadStatus::getModels()[$b['status_id']]->sort_index <=> LeadStatus::getModels()[$a['status_id']]->sort_index;
+		});
+		return $data;
 	}
 
 	public function getLeadSourcesCount(): array {
@@ -117,33 +124,37 @@ class LeadChartSearch extends LeadSearch {
 		$data = $query->all();
 		$data = ArrayHelper::map($data, 'status_id', 'count');
 		$data = array_map('intval', $data);
-		arsort($data);
+		uksort($data, function ($a, $b) {
+			return LeadStatus::getModels()[$b]->sort_index <=> LeadStatus::getModels()[$a]->sort_index;
+		});
 		return $data;
 	}
 
-	public function getLeadsUsersCount(): array {
-		if (!empty($this->user_id) && count((array) $this->user_id) === 1) {
-			return [];
-		}
-//		$query = LeadUser::find();
-//		$query->joinWith([
-//			'lead' => function (LeadQuery $query) {
-//				$this->applyDateFilter($query);
-//			},
-//		]);
-		$query = $this->getBaseQuery();
-		$query->joinWith('leadUsers');
-		$query->addSelect(['*', 'count(*) as count']);
+	public function getLeadsUserStatusData(): array {
+		$query = LeadUser::find();
+		$query->joinWith([
+			'lead' => function (LeadQuery $query) {
+				$this->applyLeadFilter($query);
+			},
+		]);
+		$query = $this->getBaseQuery()->joinWith('leadUsers');
+		$query->andWhere([LeadUser::tableName() . '.type' => LeadUser::TYPE_OWNER]);
+
+		$query->select([
+			LeadUser::tableName() . '.user_id',
+			Lead::tableName() . '.status_id',
+			'count(*) as count',
+		]);
 		$query->groupBy([
 			LeadUser::tableName() . '.user_id',
-			//	LeadUser::tableName() . '.lead_id',
+			Lead::tableName() . '.status_id',
 		]);
 		$query->distinct();
 		$query->asArray();
 		$data = $query->all();
-		$data = ArrayHelper::map($data, 'user_id', 'count');
-		$data = array_map('intval', $data);
-		arsort($data);
+		uasort($data, function ($a, $b) {
+			return LeadStatus::getModels()[$b['status_id']]->sort_index <=> LeadStatus::getModels()[$a['status_id']]->sort_index;
+		});
 		return $data;
 	}
 
@@ -170,6 +181,13 @@ class LeadChartSearch extends LeadSearch {
 
 	public function getUniqueId(): string {
 		return md5(serialize($this->toArray()));
+	}
+
+	public function getLeadStatusColor(): LeadStatusColor {
+		if ($this->leadStatusColor === null) {
+			$this->leadStatusColor = new LeadStatusColor();
+		}
+		return $this->leadStatusColor;
 	}
 
 }
