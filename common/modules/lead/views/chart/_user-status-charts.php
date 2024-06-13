@@ -1,9 +1,12 @@
 <?php
 
 use common\helpers\ArrayHelper;
+use common\helpers\Html;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadChartSearch;
 use common\widgets\charts\ChartsWidget;
+use yii\helpers\Json;
+use yii\web\View;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadChartSearch */
@@ -42,7 +45,7 @@ foreach ($usersStatusData as $data) {
 }
 
 uasort($userCounts, function ($a, $b) {
-	return $a['count'] <=> $b['count'];
+	return $b['count'] <=> $a['count'];
 });
 
 $groupSeries = [];
@@ -81,8 +84,47 @@ foreach ($userCounts as $data) {
 	}
 }
 
-array_push($groupSeries, $totalSeries);
+$groupSeries[$totalSeries['name']] = $totalSeries;
 $statusUsersNames = array_values(ArrayHelper::getColumn($userCounts, 'name'));
+
+$jsonGroupSeries = Json::encode($groupSeries);
+$js = <<<JS
+	var lastGroup = '';
+	function changeGroupStatus(groupId, btn){
+		document.querySelectorAll('#nav-status-groups .btn').forEach(function(element){
+			element.classList.remove('active');
+		});
+		btn.classList.add('active');
+		const series = $jsonGroupSeries;
+		if(groupId !== lastGroup){
+			const data = series[groupId].data;
+			if(data){
+				lastGroup = groupId;
+				ApexCharts.exec('donut-leads-users-count', 'updateSeries', data, true);
+				ApexCharts.exec('donut-leads-users-count', 'updateOptions', {title:{
+					text:groupId
+				}}, true);
+			}
+		}
+	}
+JS;
+
+$this->registerJs($js, View::POS_HEAD);
+
+foreach ($groupSeries as $group) {
+	$buttons[] = [
+		'label' => $group['name'] . ' - ' . array_sum($group['data']),
+		'linkOptions' => [
+			'class' => 'btn btn-xs',
+			'style' => [
+				'background-color' => $group['color'],
+				'color' => 'white',
+			],
+			'onclick' => 'changeGroupStatus("' . $group['name'] . '", this);',
+		],
+	];
+}
+
 ?>
 
 <div class="user-status-charts">
@@ -95,7 +137,7 @@ $statusUsersNames = array_values(ArrayHelper::getColumn($userCounts, 'name'));
 				'id' => 'line-leads-users-count',
 				'type' => ChartsWidget::TYPE_LINE,
 				'series' => array_values($groupSeries),
-				'height' => '600',
+				//	'height' => '600',
 				'chart' => [
 					'stacked' => true,
 					'id' => 'line-leads-users-count',
@@ -145,56 +187,61 @@ $statusUsersNames = array_values(ArrayHelper::getColumn($userCounts, 'name'));
 		</div>
 
 		<?php if (!empty($totalSeries)): ?>
-			<?= ChartsWidget::widget([
-				'id' => 'donut-leads-users-count',
-				'type' => ChartsWidget::TYPE_DONUT,
-				'containerOptions' => [
-					'class' => 'col-sm-12 col-md-4',
-					'style' => ['height' => '50vh',],
-				],
-				'legendFormatterAsSeriesWithCount' => true,
-				'series' => $totalSeries['data'],
-				'chart' => [
+
+			<div class="col-sm-12 col-md-4">
+
+				<p>
+					<?php
+					foreach ($buttons as $button) {
+						echo Html::button($button['label'], $button['linkOptions']) . ' ';
+					}
+					?>
+				</p>
+
+
+				<?= ChartsWidget::widget([
 					'id' => 'donut-leads-users-count',
-					'group' => 'users',
-				],
-				'options' => [
-					'labels' => $statusUsersNames,
-					'title' => [
-						'text' => Yii::t('lead', 'Leads Users Count'),
-						'align' => 'center',
+					'type' => ChartsWidget::TYPE_PIE,
+					'legendFormatterAsSeriesWithCount' => true,
+					'series' => $totalSeries['data'],
+					'chart' => [
+						'id' => 'donut-leads-users-count',
+						'group' => 'users',
 					],
-					'legend' => [
-						'show' => false,
-						'floating' => true,
-						'position' => 'bottom',
-						//		'height' => 10,
-						//	'width' => '100',
-					],
-					'grid' => [
-						'padding' => [
-							'bottom' => -15,
-							'left' => -15,
-							'right' => 0,
+					'options' => [
+						'labels' => $statusUsersNames,
+						'title' => [
+							'text' => Yii::t('lead', 'Leads Users Count'),
+							'align' => 'center',
 						],
-					],
-					'plotOptions' => [
-						'pie' => [
-							'donut' => [
-								'labels' => [
-									'show' => true,
-									'total' => [
-										'show' => true,
-										'showAlways' => true,
-										'label' => Yii::t('common', 'Sum'),
-									],
-								],
-							],
+						'legend' => [
+							'show' => false,
+							//	'floating' => true,
+							'position' => 'bottom',
+							'height' => 120,
+							//	'width' => '100',
 						],
+
+						//						'plotOptions' => [
+						//							'pie' => [
+						//								//	'customScale' => 2,
+						//								'donut' => [
+						//									//	'size' => '80%',
+						//									'labels' => [
+						//										'show' => true,
+						//										'total' => [
+						//											'show' => true,
+						//											'showAlways' => true,
+						//											'label' => Yii::t('common', 'Sum'),
+						//										],
+						//									],
+						//								],
+						//							],
+						//						],
 					],
-				],
-			])
-			?>
+				])
+				?>
+			</div>
 
 
 		<?php endif; ?>
