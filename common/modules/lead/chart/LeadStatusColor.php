@@ -11,6 +11,22 @@ class LeadStatusColor {
 
 	private array $assignedColors = [];
 
+	public function getStatusColorById(int $id): ?string {
+		$model = $this->getModels()[$id] ?? null;
+		if ($model) {
+			return $this->getStatusColor($model);
+		}
+		return null;
+	}
+
+	public function getStatusColorByGroup(string $name): ?string {
+		$model = $this->findStatusByChartGroup($name);
+		if ($model) {
+			return $this->getStatusColor($model);
+		}
+		return null;
+	}
+
 	public function getStatusColor(LeadStatus $status): string {
 		if ($status->chart_color) {
 			return $status->chart_color;
@@ -28,6 +44,22 @@ class LeadStatusColor {
 		$color = $this->colors[count($this->usedColors) + 1];
 		$this->usedColors[] = $color;
 		return $color;
+	}
+
+	protected function findStatusByChartGroup(string $name): ?LeadStatus {
+		foreach ($this->getModels() as $model) {
+			if ($model->chart_group === $name) {
+				return $model;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @return LeadStatus[]
+	 */
+	protected function getModels(): array {
+		return LeadStatus::getModels();
 	}
 
 }
