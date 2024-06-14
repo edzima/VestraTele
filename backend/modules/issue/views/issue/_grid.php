@@ -33,7 +33,7 @@ use yii\data\ActiveDataProvider;
 //@todo remove this after migrate BS4 (add data-boundary="viewport")
 //@see https://stackoverflow.com/questions/26018756/bootstrap-button-drop-down-inside-responsive-table-not-visible-because-of-scroll#answer-51992907
 $js = <<<JS
-const table = $('.table-responsive');
+var table = $('.table-responsive');
 table.on('show.bs.dropdown', function () { 
 	table.css('overflow', 'inherit' );
 });
