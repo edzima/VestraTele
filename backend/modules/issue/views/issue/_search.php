@@ -277,6 +277,13 @@ use yii\widgets\ActiveForm;
 				],
 			])
 		?>
+
+
+		<?= $form->field($model, 'details', [
+			'options' => [
+				'class' => 'col-md-4',
+			],
+		])->textInput() ?>
 	</div>
 
 

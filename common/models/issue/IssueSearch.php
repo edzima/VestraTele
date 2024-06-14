@@ -61,6 +61,8 @@ abstract class IssueSearch extends Model
 	public string $userName = '';
 	public string $userType = '';
 
+	public string $details = '';
+
 	public $excludedTypes = [];
 	public $excludedStages = [];
 
@@ -166,9 +168,9 @@ abstract class IssueSearch extends Model
 				return empty($this->customerName);
 			},
 			],
+			[['details'], 'string'],
 			[['onlyWithTelemarketers'], 'boolean'],
 			[['onlyWithTelemarketers'], 'default', 'value' => null],
-
 			['noteFilter', 'string'],
 			[
 				[
@@ -270,6 +272,7 @@ abstract class IssueSearch extends Model
 		$this->applySummonsStatusFilter($query);
 		$this->applyIssueStageFilter($query);
 		$this->noteStageFilter($query);
+		$this->applyIssueDetailsFilter($query);
 
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
@@ -700,6 +703,12 @@ abstract class IssueSearch extends Model
 				'<=', Issue::tableName() . '.type_additional_date_at',
 				date('Y-m-d 23:59:59', strtotime($this->type_additional_date_to_at)),
 			]);
+		}
+	}
+
+	protected function applyIssueDetailsFilter(IssueQuery $query) {
+		if (!empty($this->details)) {
+			$query->andWhere(['like', Issue::tableName() . '.details', $this->details]);
 		}
 	}
 
