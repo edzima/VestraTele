@@ -92,7 +92,7 @@ class ExportController extends BaseController {
 				$result = $exporter->export();
 				$csvFile = Yii::getAlias('@runtime/lead-csv') . DIRECTORY_SEPARATOR . $name . '.csv';
 				$result->saveAs($csvFile);
-				$zip->addFile($csvFile, $name);
+				$zip->addFile($csvFile, $name . '.csv');
 			}
 			$zip->close();
 			Yii::$app->response->sendFile($zipPath);
