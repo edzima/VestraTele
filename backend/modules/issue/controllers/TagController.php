@@ -2,6 +2,7 @@
 
 namespace backend\modules\issue\controllers;
 
+use backend\helpers\Url;
 use backend\modules\issue\models\IssueTagsLinkForm;
 use backend\modules\issue\models\search\TagSearch;
 use common\helpers\Flash;
@@ -72,14 +73,15 @@ class TagController extends Controller {
 		$model->setScenario(IssueTagsLinkForm::SCENARIO_MULTIPLE_ISSUES);
 		$model->issuesIds = $ids;
 
-		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-			if ($model->linkMultiple()) {
-				Flash::add(Flash::TYPE_SUCCESS, Yii::t('backend', 'Linked {tagsCount} Tags to {issuesCount} Issues.', [
+		if ($model->load(Yii::$app->request->post()) && $model->linkMultiple()) {
+			Flash::add(Flash::TYPE_SUCCESS,
+				Yii::t('backend', 'Linked {tagsCount} Tags to {issuesCount} Issues.', [
 					'tagsCount' => count($model->getTagsIds()),
 					'issuesCount' => count($model->issuesIds),
-				]));
-			}
-			return $this->redirect(['issue/index']);
+				])
+			);
+
+			return $this->redirect(Url::previous());
 		}
 		return $this->render('link-multiple', [
 			'model' => $model,

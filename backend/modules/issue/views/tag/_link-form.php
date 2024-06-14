@@ -15,7 +15,7 @@ use kartik\select2\Select2;
 	<?php $form = ActiveForm::begin(); ?>
 
 	<?= $model->scenario === IssueTagsLinkForm::SCENARIO_MULTIPLE_ISSUES
-		? Html::hiddenInput('issuesIds', implode(',', $model->issuesIds))
+		? Html::hiddenInput('ids', implode(',', $model->issuesIds))
 		: ''
 	?>
 
