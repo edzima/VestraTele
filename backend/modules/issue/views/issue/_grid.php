@@ -28,18 +28,25 @@ use yii\data\ActiveDataProvider;
 /* @var $this yii\web\View */
 /* @var $searchModel IssueSearch */
 /* @var $dataProvider ActiveDataProvider */
+/* @var $gridId string */
 
 //@todo remove this after migrate BS4 (add data-boundary="viewport")
 //@see https://stackoverflow.com/questions/26018756/bootstrap-button-drop-down-inside-responsive-table-not-visible-because-of-scroll#answer-51992907
-$this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
-	     $('.table-responsive').css('overflow', 'inherit' );
-		});
+$js = <<<JS
+const table = $('.table-responsive');
+table.on('show.bs.dropdown', function () { 
+	table.css('overflow', 'inherit' );
+});
 
-		$('.table-responsive').on('hide.bs.dropdown', function () {
-            $('.table-responsive').css( 'overflow', 'auto' );
-	})"
-);
+table.on('hide.bs.dropdown', function () {
+    table.css( 'overflow', 'auto' );
+})
+JS;
+
+$this->registerJs($js);
+
 ?>
+
 
 <p>
 	<?= $searchModel->withClaimsSum && ($claimSum = $searchModel->claimsSum($dataProvider->query)) > 0
@@ -52,7 +59,7 @@ $this->registerJs("$('.table-responsive').on('show.bs.dropdown', function () {
 
 
 <?= GridView::widget([
-	'id' => 'issues-list',
+	'id' => $gridId,
 	'dataProvider' => $dataProvider,
 	'showPageSummary' => Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
 	'pageSummaryPosition' => GridView::POS_BOTTOM,

@@ -76,6 +76,7 @@ return [
 	'Reset' => 'Reset',
 	'Tag ID' => 'Tag ID',
 	'Tags' => 'Tagi',
+	'Link Tags to Issues: {count}' => 'Przypisz Tagi do Spraw: {count}',
 	'Created At' => 'Dodano',
 	'Updated At' => 'Edytowano',
 	'Issue User Types' => 'Issue User Types',

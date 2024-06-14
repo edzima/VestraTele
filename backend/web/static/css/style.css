@@ -362,3 +362,7 @@ div:target {
 .lead-from-market {
 	opacity: 0.8;
 }
+
+.btn-icon-with-link a {
+	color: white;
+}

@@ -2,7 +2,6 @@
 
 namespace backend\modules\issue\models;
 
-use common\models\issue\IssueInterface;
 use common\models\issue\IssueTag;
 use common\models\issue\IssueTagLink;
 use common\models\issue\IssueTagType;
@@ -11,7 +10,9 @@ use yii\base\Model;
 
 class IssueTagsLinkForm extends Model {
 
-	private IssueInterface $issue;
+	public const SCENARIO_MULTIPLE_ISSUES = 'multiple_issues';
+
+	public array $issuesIds = [];
 	public $withoutType = [];
 	public $typeTags = [];
 	private ?array $_tags = null;
@@ -20,6 +21,7 @@ class IssueTagsLinkForm extends Model {
 		return [
 			['withoutType', 'withoutTypeTagsFilter'],
 			['typeTags', 'typeTagsFilter'],
+			['issuesIds', 'required', 'on' => static::SCENARIO_MULTIPLE_ISSUES],
 		];
 	}
 
@@ -98,32 +100,27 @@ class IssueTagsLinkForm extends Model {
 		return $this->_tags;
 	}
 
-	public function setIssue(IssueInterface $issue): void {
-		$this->issue = $issue;
+	public function setIssueTags(int $issueId): void {
 		$this->setTagsIds(
 			IssueTagLink::find()
 				->select('tag_id')
-				->andWhere(['issue_id' => $issue->getIssueId()])
+				->andWhere(['issue_id' => $issueId])
 				->column()
 		);
 	}
 
-	public function getIssue(): IssueInterface {
-		return $this->issue;
-	}
-
-	public function save(): bool {
+	public function linkIssue(int $issueId): bool {
 		if (!$this->validate()) {
 			return false;
 		}
 		IssueTagLink::deleteAll([
-			'issue_id' => $this->issue->getIssueId(),
+			'issue_id' => $issueId,
 		]);
 		$rows = [];
 		$ids = $this->getTagsIds();
 		foreach ($ids as $id) {
 			$rows[] = [
-				'issue_id' => $this->getIssue()->getIssueId(),
+				'issue_id' => $issueId,
 				'tag_id' => $id,
 			];
 		}
@@ -136,7 +133,40 @@ class IssueTagsLinkForm extends Model {
 		return true;
 	}
 
-	private function getTagsIds(): array {
+	public function linkMultiple(): bool {
+		if (!$this->validate()) {
+			return false;
+		}
+		$tagsIds = $this->getTagsIds();
+		if (empty($tagsIds)) {
+			return false;
+		}
+
+		IssueTagLink::deleteAll([
+			'tag_id' => $tagsIds,
+			'issue_id' => $this->issuesIds,
+		]);
+
+		$rows = [];
+
+		foreach ($tagsIds as $tagId) {
+			foreach ($this->issuesIds as $issueId) {
+				$rows[] = [
+					'issue_id' => $issueId,
+					'tag_id' => $tagId,
+				];
+			}
+		}
+
+		if (!empty($rows)) {
+			IssueTagLink::getDb()->createCommand()
+				->batchInsert(IssueTagLink::tableName(), ['issue_id', 'tag_id'], $rows)
+				->execute();
+		}
+		return true;
+	}
+
+	public function getTagsIds(): array {
 		$ids = (array) $this->withoutType;
 		foreach ($this->typeTags as $typesIds) {
 			if (!empty($typesIds)) {

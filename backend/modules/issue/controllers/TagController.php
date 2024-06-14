@@ -4,6 +4,7 @@ namespace backend\modules\issue\controllers;
 
 use backend\modules\issue\models\IssueTagsLinkForm;
 use backend\modules\issue\models\search\TagSearch;
+use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueTag;
 use Yii;
@@ -36,8 +37,8 @@ class TagController extends Controller {
 			throw new NotFoundHttpException();
 		}
 		$model = new IssueTagsLinkForm();
-		$model->setIssue($issue);
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+		$model->setIssueTags($issueId);
+		if ($model->load(Yii::$app->request->post()) && $model->linkIssue($issueId)) {
 
 			return $this->redirect($returnUrl !== null
 				? $returnUrl
@@ -45,6 +46,42 @@ class TagController extends Controller {
 			);
 		}
 		return $this->render('issue', [
+			'model' => $model,
+			'issue' => $issue,
+		]);
+	}
+
+	public function actionLinkMultiple(array $ids = []) {
+		if (empty($ids)) {
+			$postIds = Yii::$app->request->post('ids');
+			if (is_string($postIds)) {
+				$postIds = explode(',', $postIds);
+			}
+			if ($postIds) {
+				$ids = $postIds;
+			}
+		}
+		if (empty($ids)) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('backend', 'IDs must be set.')
+			);
+			return $this->redirect(['issue/index']);
+		}
+
+		$model = new IssueTagsLinkForm();
+		$model->setScenario(IssueTagsLinkForm::SCENARIO_MULTIPLE_ISSUES);
+		$model->issuesIds = $ids;
+
+		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+			if ($model->linkMultiple()) {
+				Flash::add(Flash::TYPE_SUCCESS, Yii::t('backend', 'Linked {tagsCount} Tags to {issuesCount} Issues.', [
+					'tagsCount' => count($model->getTagsIds()),
+					'issuesCount' => count($model->issuesIds),
+				]));
+			}
+			return $this->redirect(['issue/index']);
+		}
+		return $this->render('link-multiple', [
 			'model' => $model,
 		]);
 	}
