@@ -168,6 +168,7 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 			static::TYPE_WRIT => Yii::t('common', 'Writ'),
 			static::TYPE_POWER_OF_ATTORNEY => Yii::t('common', 'Power of attorney'),
 			static::TYPE_ATTESTATION => Yii::t('settlement', 'Attestation'),
+			static::TYPE_CESSION => Yii::t('settlement', 'Cession'),
 			static::TYPE_OFFICE => Yii::t('common', 'Office'),
 			static::TYPE_JUSTIFICATION_OF_THE_JUDGMENT => Yii::t('common', 'Justification of the judgment'),
 			static::TYPE_INSTALLMENT => Yii::t('common', 'Installment'),

@@ -15,6 +15,7 @@ return [
 	'Demand' => 'Wezwanie',
 	'Judgement' => 'Sąd',
 	'Date at' => 'Data',
+	'Cession' => 'Cesja',
 	'Prepariation for demand' => 'Przygotowanie do wezwania',
 	'Prepariation for judgement' => 'Przygotowanie do sądu',
 	'Baillif' => 'Komornik',

@@ -20,6 +20,8 @@ interface IssueCostInterface extends
 	public const TYPE_WRIT = 'writ';
 	public const TYPE_OFFICE = 'office';
 
+	public const TYPE_CESSION = 'cession';
+
 	public const TYPE_SHIPMENTS = 'shipments';
 	public const TYPE_JUSTIFICATION_OF_THE_JUDGMENT = 'justification_of_the_judgment';
 	public const TYPE_INSTALLMENT = 'installment';
