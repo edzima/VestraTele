@@ -38,6 +38,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<?= $this->render('_search', ['model' => $model]) ?>
 
+	<p>
+		<?= $model->showSummary
+			? Html::tag('strong', Yii::t('settlement', 'Total Sum: {value}', [
+				'value' => Yii::$app->formatter->asCurrency($model->getValueSum($dataProvider->query)),
+			]))
+			: '' ?>
+	</p>
+
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $model,

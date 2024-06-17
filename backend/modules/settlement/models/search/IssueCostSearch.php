@@ -13,6 +13,7 @@ use kartik\daterange\DateRangeBehavior;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use yii\db\QueryInterface;
 
 /**
@@ -38,6 +39,8 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 	public $settledStart;
 	public $settledEnd;
 	public $hide_on_report;
+
+	public bool $showSummary = false;
 
 	public function behaviors(): array {
 		return [
@@ -75,8 +78,8 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 		return [
 			[['id', 'issue_id', 'user_id'], 'integer'],
 			[['type', 'transfer_type'], 'string'],
-			[['settled', 'withSettlements', 'is_confirmed', 'hide_on_report'], 'boolean'],
-			[['settled', 'withSettlements', 'is_confirmed', 'hide_on_report'], 'default', 'value' => null],
+			[['settled', 'withSettlements', 'is_confirmed', 'hide_on_report', 'showSummary'], 'boolean'],
+			[['settled', 'withSettlements', 'is_confirmed', 'hide_on_report', 'showSummary'], 'default', 'value' => null],
 
 			[['created_at', 'updated_at', 'date_at', 'settled_at'], 'safe'],
 			[['dateRange', 'deadlineRange', 'settledRange'], 'match', 'pattern' => '/^.+\s\-\s.+$/'],
@@ -93,6 +96,7 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 			[
 				'settled' => Yii::t('settlement', 'Settled'),
 				'withSettlements' => Yii::t('settlement', 'With settlements'),
+				'showSummary' => Yii::t('settlement', 'Show summary'),
 			]
 		);
 	}
@@ -103,6 +107,10 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 	public function scenarios(): array {
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
+	}
+
+	public function getValueSum(ActiveQuery $query): float {
+		return $query->sum('value');
 	}
 
 	/**

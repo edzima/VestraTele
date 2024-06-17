@@ -29,11 +29,13 @@ use yii\widgets\ActiveForm;
 		])
 		?>
 
-		<?= $form->field($model, 'is_confirmed', ['options' => ['class' => 'col-xs-4']])->dropDownList(
+		<?= $form->field($model, 'is_confirmed', ['options' => ['class' => 'col-xs-4 col-md-2']])->dropDownList(
 			Html::booleanDropdownList(), [
 			'prompt' => Yii::t('common', 'All'),
 		])
 		?>
+		<?= $form->field($model, 'showSummary', ['options' => ['class' => 'col-xs-4 col-md-2']])->checkbox() ?>
+
 	</div>
 
 

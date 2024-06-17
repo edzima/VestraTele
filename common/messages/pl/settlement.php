@@ -181,4 +181,6 @@ return [
 	'Shipments' => 'Przesyłki',
 	'Cost Refund: Company' => 'Zwrot kosztów: Kancelaria',
 	'Cost Refund: Legal represantion' => 'Zwrot kosztów: Zastępstwo procesowe',
+	'Show summary' => 'Pokaż podsumowanie',
+	'Total Sum: {value}' => 'Suma Całość: {value}',
 ];
