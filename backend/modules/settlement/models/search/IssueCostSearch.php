@@ -110,6 +110,8 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 	}
 
 	public function getValueSum(ActiveQuery $query): float {
+		$query = clone $query;
+		$query->limit(null);
 		return $query->sum('value');
 	}
 
