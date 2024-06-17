@@ -32,4 +32,7 @@ interface IssueCostInterface extends
 
 	public const TYPE_APPEAL = 'appeal';
 
+	public const TYPE_COURT_EXPERT = 'court_expert';
+	public const TYPE_APPEARANCE_OF_LAWYER = 'Appearance of a lawyer';
+
 }

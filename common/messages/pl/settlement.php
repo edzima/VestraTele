@@ -183,4 +183,6 @@ return [
 	'Cost Refund: Legal represantion' => 'Zwrot kosztów: Zastępstwo procesowe',
 	'Show summary' => 'Pokaż podsumowanie',
 	'Total Sum: {value}' => 'Suma Całość: {value}',
+	'Appearance of Lawyer' => 'Stawiennictwo Adwokata',
+	'Court expert' => 'Biegły',
 ];
