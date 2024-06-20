@@ -2,6 +2,7 @@
 
 namespace common\modules\file\controllers;
 
+use common\helpers\FileHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
 use common\models\message\IssueFilesUploadMessagesForm;
@@ -201,7 +202,12 @@ class IssueController extends Controller {
 			throw new NotFoundHttpException();
 		}
 		$content = $this->module->getFlysystem()->read($path);
-		return Yii::$app->response->sendContentAsFile($content, $issueFile->file->getNameWithType());
+		return Yii::$app
+			->response
+			->sendContentAsFile($content, $issueFile->file->getNameWithType(), [
+				'inline' => true,
+				'mimeType' => FileHelper::getMimeTypeFromExtension($issueFile->file->type),
+			]);
 	}
 
 	public function actionDelete(int $issue_id, int $file_id) {
