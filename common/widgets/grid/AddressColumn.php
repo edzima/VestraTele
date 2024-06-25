@@ -13,7 +13,7 @@ class AddressColumn extends DataColumn {
 	public $format = 'html';
 	public $noWrap = true;
 
-	public $template = '{postal_code} {city}<br>{region}';
+	public $template = '{info}<br>{postal_code} {city}<br>{region}';
 
 	public function init(): void {
 		if (empty($this->label)) {
@@ -38,7 +38,9 @@ class AddressColumn extends DataColumn {
 		$names = [];
 		$names['{postal_code}'] = Html::encode($address->postal_code);
 		$names['{city}'] = Html::tag('strong', Html::encode($address->city->name));
+		$names['{info}'] = Html::encode($address->info);
 		$names['{region}'] = Html::encode(ucwords($address->city->region->name));
+
 		return strtr($this->template, $names);
 	}
 }
