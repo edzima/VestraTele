@@ -153,7 +153,6 @@ class IssueController extends Controller {
 			$model->fileUploader = Yii::$app->user->getIdentity()->getFullName();
 			$files = $issue->getIssueModel()->getFilesByType($file_type_id);
 			if (!empty($files)) {
-				Yii::warning($files);
 				$model->setFiles($files);
 				$model->pushMessages();
 			}
