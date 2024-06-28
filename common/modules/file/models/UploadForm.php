@@ -63,7 +63,10 @@ class UploadForm extends Model {
 
 	public function saveUploads(AttachableModel $model, bool $validate = true): ?int {
 		if ($validate && !$this->validate()) {
-			Yii::warning($this->getErrors(), __METHOD__);
+			Yii::warning([
+				'attributes' => $this->getAttributes(),
+				'errors' => $this->getErrors(),
+			], __METHOD__);
 			return null;
 		}
 		$files = UploadedFile::getInstancesByName($this->attributeName);
@@ -76,7 +79,6 @@ class UploadForm extends Model {
 				}
 			}
 		}
-		Yii::warning($files);
 		$this->attachedFiles = [];
 		foreach (FileHelper::findFiles($userTempDir) as $file) {
 			if ($this->imageToWeb && $this->fileIsImage($file)) {
