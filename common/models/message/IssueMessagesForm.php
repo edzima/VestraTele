@@ -197,7 +197,13 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 		if ($this->sendEmailToCustomer) {
 			$message = $this->getEmailToCustomer();
 			if ($message && $message->send()) {
-				Yii::warning('push email to customer: ' . $message->getSubject(), __METHOD__);
+				Yii::warning([
+					'event' => 'push Email to Customer',
+					'bcc' => $message->getTo(),
+					'subject' => $message->getSubject(),
+					'issue' => $this->issue->getIssueName(),
+					'class' => static::class,
+				], __METHOD__);
 
 				$count++;
 			}
@@ -218,7 +224,13 @@ class IssueMessagesForm extends MessageModel implements HiddenFieldsModel {
 		if ($this->sendEmailToWorkers) {
 			$message = $this->getEmailToWorkers();
 			if ($message && $message->send()) {
-				Yii::warning('push email to workers: ' . $message->getSubject(), __METHOD__);
+				Yii::warning([
+					'event' => 'push emails to workers',
+					'bcc' => $message->getBcc(),
+					'subject' => $message->getSubject(),
+					'issue' => $this->issue->getIssueName(),
+					'class' => static::class,
+				], __METHOD__);
 
 				$count++;
 			}
