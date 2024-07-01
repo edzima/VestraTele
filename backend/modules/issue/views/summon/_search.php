@@ -13,7 +13,6 @@ use yii\widgets\ActiveForm;
 <div class="summon-search">
 
 	<?php $form = ActiveForm::begin([
-		'action' => ['index'],
 		'method' => 'get',
 	]); ?>
 
@@ -51,7 +50,7 @@ use yii\widgets\ActiveForm;
 
 	<div class="form-group">
 		<?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-		<?= Html::resetButton('Reset', ['class' => 'btn btn-outline-secondary']) ?>
+		<?= Html::a('Reset', ['index'], ['class' => 'btn btn-outline-secondary']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>
