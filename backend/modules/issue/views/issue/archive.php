@@ -27,6 +27,7 @@ $this->params['issueParentTypeNav'] = [
 	<?= $this->render('_grid', [
 		'dataProvider' => $dataProvider,
 		'searchModel' => $searchModel,
+		'gridId' => 'issues-list',
 	]) ?>
 
 
