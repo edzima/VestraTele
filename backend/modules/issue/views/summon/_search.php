@@ -1,6 +1,7 @@
 <?php
 
 use backend\modules\issue\models\search\SummonSearch;
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -11,34 +12,48 @@ use yii\widgets\ActiveForm;
 
 <div class="summon-search">
 
-    <?php $form = ActiveForm::begin([
-        'action' => ['index'],
-        'method' => 'get',
-    ]); ?>
+	<?php $form = ActiveForm::begin([
+		'action' => ['index'],
+		'method' => 'get',
+	]); ?>
 
-    <?= $form->field($model, 'id') ?>
 
-    <?= $form->field($model, 'status') ?>
+	<div class="row">
+		<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-6']])
+			->widget(Select2::class, [
+				'data' => SummonSearch::getTagsNames(),
+				'options' => [
+					'multiple' => true,
+					'placeholder' => $model->getAttributeLabel('tagsIds'),
+				],
+				'pluginOptions' => [
+					'allowClear' => true,
+				],
+				'showToggleAll' => true,
+			]) ?>
 
-    <?= $form->field($model, 'title') ?>
+		<?= $form->field($model, 'excludedTagsIds', ['options' => ['class' => 'col-md-6']])
+			->widget(Select2::class, [
+				'data' => SummonSearch::getTagsNames(),
+				'options' => [
+					'multiple' => true,
+					'placeholder' => $model->getAttributeLabel('excludedTagsIds'),
+				],
+				'pluginOptions' => [
+					'allowClear' => true,
+				],
+				'showToggleAll' => true,
+			]) ?>
 
-    <?= $form->field($model, 'created_at') ?>
 
-    <?= $form->field($model, 'updated_at') ?>
+	</div>
 
-    <?= $form->field($model, 'realized_at') ?>
 
-    <?php // echo $form->field($model, 'issue_id') ?>
+	<div class="form-group">
+		<?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
+		<?= Html::resetButton('Reset', ['class' => 'btn btn-outline-secondary']) ?>
+	</div>
 
-    <?php // echo $form->field($model, 'owner_id') ?>
-
-    <?php // echo $form->field($model, 'contractor_id') ?>
-
-    <div class="form-group">
-        <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton('Reset', ['class' => 'btn btn-outline-secondary']) ?>
-    </div>
-
-    <?php ActiveForm::end(); ?>
+	<?php ActiveForm::end(); ?>
 
 </div>

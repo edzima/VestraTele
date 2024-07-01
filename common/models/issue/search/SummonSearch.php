@@ -4,8 +4,11 @@ namespace common\models\issue\search;
 
 use common\helpers\Html;
 use common\helpers\Url;
+use common\models\issue\IssueTag;
+use common\models\issue\IssueTagLink;
 use common\models\issue\IssueType;
 use common\models\issue\query\IssueQuery;
+use common\models\issue\query\SummonQuery;
 use common\models\issue\Summon;
 use common\models\issue\SummonDoc;
 use common\models\issue\SummonType;
@@ -35,6 +38,10 @@ class SummonSearch extends Summon implements
 	public string $customerLastname = '';
 	public string $customerPhone = '';
 
+	public $tagsIds;
+
+	public $excludedTagsIds;
+
 	protected const SUMMON_ALIAS = 'S';
 
 	public static function getTypesNames(): array {
@@ -43,6 +50,13 @@ class SummonSearch extends Summon implements
 
 	public static function getDocTypesNames(): array {
 		return SummonDoc::getNames();
+	}
+
+	public function attributeLabels(): array {
+		return array_merge(parent::attributeLabels(), [
+			'tagsIds' => Yii::t('issue', 'Tags'),
+			'excludedTagsIds' => Yii::t('issue', 'Excluded tags'),
+		]);
 	}
 
 	public function getSummonTypeNavItems(): array {
@@ -115,6 +129,8 @@ class SummonSearch extends Summon implements
 			['doc_types_ids', 'in', 'range' => array_keys(static::getDocTypesNames()), 'allowArray' => true],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			['customerPhone', PhoneValidator::class],
+			[['excludedTagsIds', 'tagsIds'], 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
+
 		];
 	}
 
@@ -171,6 +187,8 @@ class SummonSearch extends Summon implements
 		$this->applyCustomerNameFilter($query);
 		$this->applyCustomerPhoneFilter($query);
 		$this->applyIssueMainTypeFilter($query);
+
+		$this->applyTagsFilter($query);
 		// grid filtering conditions
 		$query->andFilterWhere([
 			static::SUMMON_ALIAS . '.id' => $this->id,
@@ -188,6 +206,24 @@ class SummonSearch extends Summon implements
 		$query->andFilterWhere(['like', static::SUMMON_ALIAS . '.title', $this->title]);
 
 		return $dataProvider;
+	}
+
+	protected function applyTagsFilter(SummonQuery $query): void {
+		if (!empty($this->tagsIds)) {
+			$query->joinWith('issue.tags');
+			$query->distinct();
+			$query->andWhere([IssueTagLink::tableName() . '.tag_id' => $this->tagsIds]);
+		}
+		if (!empty($this->excludedTagsIds)) {
+			$query->joinWith('issue.tags');
+			$query->distinct();
+			$query->andWhere([
+				'NOT IN', static::SUMMON_ALIAS . '.issue_id', IssueTagLink::find()
+					->select('issue_id')
+					->distinct()
+					->andWhere(['tag_id' => $this->excludedTagsIds]),
+			]);
+		}
 	}
 
 	public function applyCustomerNameFilter(QueryInterface $query): void {
@@ -221,6 +257,10 @@ class SummonSearch extends Summon implements
 			return IssueType::get($this->issueParentTypeId);
 		}
 		return null;
+	}
+
+	public static function getTagsNames(): array {
+		return IssueTag::getNamesGroupByType(true);
 	}
 
 }

@@ -55,13 +55,12 @@ $this->params['issueParentTypeNav'] = [
 
 	</p>
 
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]); ?>
 
 	<?= SummonGrid::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'valueType' => SummonGrid::VALUE_TYPE_NAME_SHORT,
 	]) ?>
-
 
 </div>
