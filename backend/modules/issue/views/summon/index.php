@@ -61,6 +61,7 @@ $this->params['issueParentTypeNav'] = [
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'valueType' => SummonGrid::VALUE_TYPE_NAME_SHORT,
+		'withIssueStage' => true,
 	]) ?>
 
 </div>

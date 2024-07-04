@@ -18,7 +18,7 @@ use yii\widgets\ActiveForm;
 
 
 	<div class="row">
-		<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-6']])
+		<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
 				'data' => SummonSearch::getTagsNames(),
 				'options' => [
@@ -31,7 +31,7 @@ use yii\widgets\ActiveForm;
 				'showToggleAll' => true,
 			]) ?>
 
-		<?= $form->field($model, 'excludedTagsIds', ['options' => ['class' => 'col-md-6']])
+		<?= $form->field($model, 'excludedTagsIds', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
 				'data' => SummonSearch::getTagsNames(),
 				'options' => [
@@ -45,11 +45,26 @@ use yii\widgets\ActiveForm;
 			]) ?>
 
 
+		<?= $form->field($model, 'excludedIssueStagesIds', ['options' => ['class' => 'col-md-4']])
+			->widget(Select2::class, [
+				'data' => $model->getIssueStagesNames(),
+				'options' => [
+					'multiple' => true,
+					'placeholder' => $model->getAttributeLabel('excludedIssueStagesIds'),
+				],
+				'pluginOptions' => [
+					'allowClear' => true,
+				],
+				'showToggleAll' => true,
+			]) ?>
+
+
+
 	</div>
 
 
 	<div class="form-group">
-		<?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
+		<?= Html::submitButton(Yii::t('backend', 'Search'), ['class' => 'btn btn-primary']) ?>
 		<?= Html::a('Reset', ['index'], ['class' => 'btn btn-outline-secondary']) ?>
 	</div>
 

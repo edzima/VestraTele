@@ -4,6 +4,8 @@ namespace common\models\issue\search;
 
 use common\helpers\Html;
 use common\helpers\Url;
+use common\models\issue\Issue;
+use common\models\issue\IssueStage;
 use common\models\issue\IssueTag;
 use common\models\issue\IssueTagLink;
 use common\models\issue\IssueType;
@@ -30,6 +32,7 @@ use yii\db\QueryInterface;
 class SummonSearch extends Summon implements
 	CustomerSearchInterface,
 	IssueMainTypeSearchable,
+	IssueStageSearchable,
 	SearchModel {
 
 	public ?int $issueParentTypeId = null;
@@ -42,7 +45,27 @@ class SummonSearch extends Summon implements
 
 	public $excludedTagsIds;
 
+	public $issueStageId;
+
+	public $excludedIssueStagesIds;
+
 	protected const SUMMON_ALIAS = 'S';
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function rules(): array {
+		return [
+			[['id', 'type_id', 'status', 'created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
+			[['title'], 'safe'],
+			['doc_types_ids', 'in', 'range' => array_keys(static::getDocTypesNames()), 'allowArray' => true],
+			[['issueStageId', 'excludedIssueStagesIds'], 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
+			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
+			['customerPhone', PhoneValidator::class],
+			[['excludedTagsIds', 'tagsIds'], 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
+
+		];
+	}
 
 	public static function getTypesNames(): array {
 		return SummonType::getNamesWithShort();
@@ -56,6 +79,7 @@ class SummonSearch extends Summon implements
 		return array_merge(parent::attributeLabels(), [
 			'tagsIds' => Yii::t('issue', 'Tags'),
 			'excludedTagsIds' => Yii::t('issue', 'Excluded tags'),
+			'excludedIssueStagesIds' => Yii::t('issue', 'Excluded stages'),
 		]);
 	}
 
@@ -122,21 +146,6 @@ class SummonSearch extends Summon implements
 	/**
 	 * {@inheritdoc}
 	 */
-	public function rules(): array {
-		return [
-			[['id', 'type_id', 'status', 'created_at', 'updated_at', 'realized_at', 'start_at', 'deadline_at', 'issue_id', 'owner_id', 'contractor_id'], 'integer'],
-			[['title'], 'safe'],
-			['doc_types_ids', 'in', 'range' => array_keys(static::getDocTypesNames()), 'allowArray' => true],
-			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
-			['customerPhone', PhoneValidator::class],
-			[['excludedTagsIds', 'tagsIds'], 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
-
-		];
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
 	public function scenarios(): array {
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
@@ -160,7 +169,7 @@ class SummonSearch extends Summon implements
 		$query->with('owner.userProfile');
 		$query->with('contractor.userProfile');
 		$query->with('type');
-		$query->with('issue.tags');
+		$query->with('issue.tags.tagType');
 
 		// add conditions that should always apply here
 
@@ -184,6 +193,7 @@ class SummonSearch extends Summon implements
 			$query->andFilterWhere([SummonDoc::tableName() . '.id' => $this->doc_types_ids]);
 		}
 
+		$this->applyIssueStageFilter($query);
 		$this->applyCustomerNameFilter($query);
 		$this->applyCustomerPhoneFilter($query);
 		$this->applyIssueMainTypeFilter($query);
@@ -263,4 +273,18 @@ class SummonSearch extends Summon implements
 		return IssueTag::getNamesGroupByType(true);
 	}
 
+	public function getIssueStagesNames(): array {
+		return IssueStage::getStagesNames();
+	}
+
+	public function applyIssueStageFilter(QueryInterface $query): void {
+		if (!empty($this->issueStageId)) {
+			$query->joinWith(['issue']);
+			$query->andWhere([Issue::tableName() . '.stage_id' => $this->issueStageId]);
+		}
+		if (!empty($this->excludedIssueStagesIds)) {
+			$query->joinWith(['issue']);
+			$query->andWhere(['NOT IN', Issue::tableName() . '.stage_id', $this->excludedIssueStagesIds]);
+		}
+	}
 }

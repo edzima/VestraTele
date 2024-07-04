@@ -31,6 +31,8 @@ class SummonGrid extends GridView {
 	public ?string $noteRoute = '/issue/note/create-summon';
 
 	public string $issueColumn = IssueColumn::class;
+
+	public string $issueStageColumn = IssueStageColumn::class;
 	public string $valueType = self::VALUE_TYPE_NAME;
 
 	public bool $withTitle = true;
@@ -47,6 +49,8 @@ class SummonGrid extends GridView {
 	public bool $withUpdatedAt = true;
 	public bool $withDeadline = true;
 	public bool $withStatus = true;
+
+	public bool $withIssueStage = false;
 	public bool $withRealizedAt = false;
 
 	public bool $rowColors = true;
@@ -142,6 +146,12 @@ class SummonGrid extends GridView {
 			[
 				'class' => $this->issueColumn,
 				'visible' => $this->withIssue,
+			],
+			[
+				'class' => $this->issueStageColumn,
+				'visible' => $this->withIssueStage,
+				'attribute' => 'issueStageId',
+				'contentCenter' => true,
 			],
 			[
 				'class' => CustomerDataColumn::class,
