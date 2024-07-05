@@ -7,6 +7,8 @@ use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\SummonDocsWidget;
 use frontend\controllers\SummonController;
 use frontend\helpers\Html;
+use frontend\widgets\GridView;
+use yii\data\ActiveDataProvider;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
@@ -84,8 +86,31 @@ YiiAsset::register($this);
 					'updated_at:datetime',
 				],
 			]) ?>
+
+
 		</div>
+
+	</div>
 		<div class="col-md-7">
+
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getIssueModel()->getClaims(),
+				]),
+				'summary' => '',
+				'caption' => Yii::t('issue', 'Issue Claims'),
+				'emptyText' => '',
+				'showOnEmpty' => false,
+				'columns' => [
+					'typeName',
+					'entityResponsible.name:text:' . Yii::t('issue', 'Entity'),
+					'trying_value:currency:' . Yii::t('issue', 'Claim'),
+					'percent_value',
+					'obtained_value:currency:' . Yii::t('issue', 'Obtained'),
+					'details:ntext',
+					'date:date',
+				],
+			]) ?>
 
 			<?= $this->render('_reminder-grid', [
 				'model' => $model,

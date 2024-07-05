@@ -2,10 +2,13 @@
 
 use backend\helpers\Breadcrumbs;
 use backend\helpers\Html;
+use backend\widgets\GridView;
 use common\models\issue\Summon;
 use common\models\user\Worker;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\modules\issue\widgets\SummonDocsWidget;
+use common\widgets\grid\ActionColumn;
+use yii\data\ActiveDataProvider;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
@@ -113,9 +116,36 @@ YiiAsset::register($this);
 					'updated_at:datetime',
 				],
 			]) ?>
+
 		</div>
 
 		<div class="col-md-8">
+
+
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getIssueModel()->getClaims(),
+				]),
+				'summary' => '',
+				'caption' => Yii::t('issue', 'Issue Claims'),
+				'emptyText' => '',
+				'showOnEmpty' => false,
+				'columns' => [
+					'typeName',
+					'entityResponsible.name:text:' . Yii::t('issue', 'Entity'),
+					'trying_value:currency:' . Yii::t('issue', 'Claim'),
+					'percent_value',
+					'obtained_value:currency:' . Yii::t('issue', 'Obtained'),
+					'details:ntext',
+					'date:date',
+					[
+						'class' => ActionColumn::class,
+						'controller' => '/issue/claim',
+						'template' => '{update} {delete}',
+						'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_CLAIM),
+					],
+				],
+			]) ?>
 
 
 			<?= $this->render('_reminder-grid', [
