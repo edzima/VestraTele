@@ -63,11 +63,13 @@ class Summon extends ActiveRecord implements IssueInterface {
 	public const STATUS_SUSPENDED = 15;
 
 	public const STATUS_UNREALIZED_CLIENT = 6;
+	public const STATUS_UNREALIZED_AGENT = 10;
 	public const STATUS_UNREALIZED_COMPANY = 8;
 
 	public const STATUSES_UNREALIZED = [
 		self::STATUS_UNREALIZED_CLIENT,
 		self::STATUS_UNREALIZED_COMPANY,
+		self::STATUS_UNREALIZED_AGENT,
 	];
 
 	public static function notActiveStatuses(): array {
@@ -201,6 +203,7 @@ class Summon extends ActiveRecord implements IssueInterface {
 			static::STATUS_SUSPENDED => Yii::t('common', 'Suspended'),
 			static::STATUS_UNREALIZED_CLIENT => Yii::t('common', 'Unrealized - Client'),
 			static::STATUS_UNREALIZED_COMPANY => Yii::t('common', 'Unrealized - Company'),
+			static::STATUS_UNREALIZED_AGENT => Yii::t('common', 'Unrealized - Agent'),
 		];
 	}
 

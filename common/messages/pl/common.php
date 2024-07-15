@@ -301,6 +301,7 @@ return [
 	'Unrealized' => 'Niezrealizowane',
 	'Unrealized - Client' => 'Niezrealizowane - Klient',
 	'Unrealized - Company' => 'Niezrealizowane - Biuro',
+	'Unrealized - Agent' => 'Niezrealizowane - Przedstawiciel',
 	'1 Day' => '1 dzień',
 	'1 Days' => '3 dni',
 	'5 Days' => '5 dni',
