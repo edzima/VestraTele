@@ -24,7 +24,9 @@ $this->params['breadcrumbs'][] = $this->title;
 		'options' => ['enctype' => 'multipart/form-data'],
 	]); ?>
 
-	<?= $form->field($model, 'csvFile')->fileInput() ?>
+	<?= $form->field($model, 'csvFile')->fileInput([
+		'accept' => '.csv',
+	]) ?>
 
 	<div class="row">
 

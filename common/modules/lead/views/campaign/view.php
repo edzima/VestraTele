@@ -35,12 +35,45 @@ YiiAsset::register($this);
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [
-			'id',
+			//	'id',
 			'name',
-			'url:url',
-			'owner',
+			[
+				'attribute' => 'typeName',
+				'visible' => !empty($model->type),
+			],
+			[
+				'attribute' => 'parent',
+				'value' => function ($model) {
+					return Html::a($model->parent->name, [
+						'view', 'id' => $model->parent_id,
+					]);
+				},
+				'format' => 'html',
+				'visible' => !empty($model->parent),
+				'label' => $model->parent ? $model->parent->getTypeName() : null,
+			],
+			[
+				'attribute' => 'entity_id',
+				'visible' => !empty($model->entity_id),
+			],
+			[
+				'attribute' => 'url',
+				'format' => 'url',
+				'visible' => !empty($model->url),
+			],
+			[
+				'attribute' => 'owner',
+				'visible' => !empty($model->owner),
+			],
+			[
+				'attribute' => 'sort_index',
+				'visible' => !empty($model->sort_index),
+			],
 			'is_active:boolean',
-			'sort_index',
+			[
+				'attribute' => 'details',
+				'visible' => !empty($model->details),
+			],
 		],
 	]) ?>
 
