@@ -22,6 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 		<?= Html::a(Yii::t('lead', 'Create Lead Cost'), ['create'], ['class' => 'btn btn-success']) ?>
+		<?= Html::a(Yii::t('lead', 'Import FB Ads'), ['import-fb-ads'], ['class' => 'btn btn-warning']) ?>
 	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]); ?>
@@ -35,10 +36,12 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'campaign_id',
 				'label' => Yii::t('lead', 'Campaign'),
 				'value' => function (LeadCost $data) use ($searchModel): string {
-					return $searchModel->getCampaignNames()[$data->campaign_id];
+					return Html::a($data->campaign->getFullName(), ['campaign/view', 'id' => $data->campaign_id]);
 				},
+				'format' => 'html',
 				'filter' => $searchModel->getCampaignNames(),
 			],
+			'campaign.name',
 			'value:currency',
 			'date_at:date',
 			'created_at:datetime',

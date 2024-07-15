@@ -17,13 +17,21 @@ use yii\helpers\ArrayHelper;
  * @property int|null $parent_id
  * @property int|null $sort_index
  * @property int $is_active
+ * @property string|null $entity_id
+ * @property string|null $details
+ * @property string|null $type
  *
  * @property-read Lead[] $leads
  * @property-read LeadCampaign $parent
+ * @property-read LeadUserInterface $owner
  */
 class LeadCampaign extends ActiveRecord {
 
 	public const SCENARIO_OWNER = 'owner';
+
+	public const TYPE_CAMPAIGN = 'campaign';
+	public const TYPE_ADSET = 'adset';
+	public const TYPE_AD = 'ad';
 
 	private static ?array $models = null;
 
@@ -51,11 +59,12 @@ class LeadCampaign extends ActiveRecord {
 	public function rules(): array {
 		return [
 			[['name'], 'required'],
-			[['sort_index'], 'integer'],
+			[['sort_index', 'parent_id'], 'integer'],
 			[['name'], 'string', 'max' => 255],
 			[['is_active'], 'boolean'],
+			[['name', 'entity_id', 'type', 'details'], 'string', 'max' => 255],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
-			[['name', 'owner_id'], 'unique', 'targetAttribute' => ['name', 'owner_id']],
+			[['name', 'entity_id'], 'unique', 'targetAttribute' => ['name', 'entity_id']],
 			[['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => static::class, 'targetAttribute' => ['parent_id' => 'id']],
 			[['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => Module::userClass(), 'targetAttribute' => ['owner_id' => 'id']],
 		];
@@ -71,7 +80,12 @@ class LeadCampaign extends ActiveRecord {
 			'parent_id' => Yii::t('lead', 'Parent'),
 			'owner_id' => Yii::t('lead', 'Owner'),
 			'sort_index' => Yii::t('lead', 'Sort Index'),
+			'type' => Yii::t('lead', 'Type'),
+			'details' => Yii::t('lead', 'Details'),
+			'entity_id' => Yii::t('lead', 'Entity ID'),
 			'is_active' => Yii::t('lead', 'Is Active'),
+			'typeName' => Yii::t('lead', 'Type'),
+			'parent' => Yii::t('lead', 'Parent Campaign'),
 		];
 	}
 
@@ -85,11 +99,15 @@ class LeadCampaign extends ActiveRecord {
 	}
 
 	public function getParent(): ActiveQuery {
-		return $this->hasOne(static::class, ['parent_id' => 'id']);
+		return $this->hasOne(static::class, ['id' => 'parent_id']);
 	}
 
 	public function getOwner(): ActiveQuery {
 		return $this->hasOne(Module::userClass(), ['id' => 'owner_id']);
+	}
+
+	public function getTypeName(): ?string {
+		return static::getTypesNames()[$this->type] ?? null;
 	}
 
 	public static function getNames(int $owner_id = null, bool $active = true): array {
@@ -120,5 +138,25 @@ class LeadCampaign extends ActiveRecord {
 				->all();
 		}
 		return static::$models;
+	}
+
+	public static function getTypesNames(): array {
+		return [
+			static::TYPE_CAMPAIGN => Yii::t('lead', 'Campaign'),
+			static::TYPE_ADSET => Yii::t('lead', 'Adset'),
+			static::TYPE_AD => Yii::t('lead', 'Ad'),
+		];
+	}
+
+	public function getFullName() {
+		$names = [];
+		$model = $this;
+		$names[] = $model->name;
+		while ($model->parent) {
+			$model = $model->parent;
+			$names[] = $model->name;
+		}
+		$names = array_reverse($names);
+		return implode(' ', $names);
 	}
 }

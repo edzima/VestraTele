@@ -84,4 +84,14 @@ class LeadCost extends ActiveRecord {
 		return $this->hasMany(Lead::class, ['campaign_id' => 'campaign_id'])
 			->andWhere(['date_at' => date('Y-m-d', strtotime($this->date_at))]);
 	}
+
+	public static function batchUpsert(array $columns, array $rows): int {
+		$command = static::getDb()
+			->createCommand()
+			->batchInsert(static::tableName(), $columns, $rows);
+		$sql = $command->getRawSql();
+		$sql .= ' ON DUPLICATE KEY UPDATE value=value';
+		$command->setSql($sql);
+		return $command->execute();
+	}
 }

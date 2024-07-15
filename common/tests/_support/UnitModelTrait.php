@@ -20,6 +20,7 @@ trait UnitModelTrait {
 	public function thenUnsuccessValidate($attributeNames = null, $clearErrors = true): void {
 		$validate = $this->getModel()->validate($attributeNames, $clearErrors);
 		$this->tester->assertFalse($validate);
+		codecept_debug($this->getModel()->getErrors());
 	}
 
 	public function thenSuccessSave(): void {
@@ -42,10 +43,10 @@ trait UnitModelTrait {
 	}
 
 	public function thenSeeError(string $message, string $attribute): void {
-		$this->tester->assertSame($message, $this->getModel()->getFirstError($attribute));
+		$this->tester->assertContains($message, $this->model->getErrors($attribute));
 	}
 
 	public function thenDontSeeError(string $attribute): void {
-		$this->tester->assertNull($this->getModel()->getFirstError($attribute));
+		$this->tester->assertEmpty($this->getModel()->getErrors($attribute));
 	}
 }

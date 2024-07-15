@@ -2,13 +2,16 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Flash;
 use common\modules\lead\models\forms\LeadCostForm;
+use common\modules\lead\models\import\FBAdsCostImport;
 use common\modules\lead\models\LeadCost;
 use common\modules\lead\models\searches\LeadCostSearch;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\web\UploadedFile;
 
 /**
  * CostController implements the CRUD actions for LeadCost model.
@@ -30,6 +33,31 @@ class CostController extends BaseController {
 				],
 			]
 		);
+	}
+
+	public function actionImportFbAds() {
+		$model = new FBAdsCostImport();
+		if (Yii::$app->request->isPost) {
+			if ($model->load(Yii::$app->request->post())) {
+				$model->file = UploadedFile::getInstance($model, 'file');
+			}
+			if ($model->validate()) {
+				$count = $model->import();
+				if ($count) {
+					Flash::add(Flash::TYPE_SUCCESS,
+						Yii::t('lead', 'Success import Costs: {count}.', ['count' => $count])
+					);
+				} elseif ($count === 0) {
+					Flash::add(Flash::TYPE_INFO,
+						Yii::t('lead', 'No new data to record.',)
+					);
+				}
+				return $this->redirect(['index']);
+			}
+		}
+		return $this->render('import-pixel', [
+			'model' => $model,
+		]);
 	}
 
 	/**

@@ -4,6 +4,7 @@ namespace common\fixtures\helpers;
 
 use common\fixtures\ReminderFixture;
 use common\modules\lead\fixtures\CampaignFixture;
+use common\modules\lead\fixtures\CostFixture;
 use common\modules\lead\fixtures\DialerFixture;
 use common\modules\lead\fixtures\DialerTypeFixture;
 use common\modules\lead\fixtures\LeadAddressFixture;
@@ -48,6 +49,8 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 
 	public const DEFAULT_PHONE = '+48 123-123-123';
 	public const DEFAULT_SOURCE_ID = 1;
+	public const COST = 'lead.cost';
+	const CAMPAIGN = 'lead.campaign';
 
 	public static function address(): array {
 		return [
@@ -142,13 +145,22 @@ class LeadFixtureHelper extends BaseFixtureHelper {
 		];
 	}
 
+	public static function cost(): array {
+		return [
+			static::COST => [
+				'class' => CostFixture::class,
+				'dataFile' => static::getDataDirPath() . 'cost.php',
+			],
+		];
+	}
+
 	public static function campaign(): array {
 		return [
 			static::USER => [
 				'class' => UserFixture::class,
 				'dataFile' => static::getDataDirPath() . 'user.php',
 			],
-			static::SOURCE => [
+			static::CAMPAIGN => [
 				'class' => CampaignFixture::class,
 				'dataFile' => static::getDataDirPath() . 'campaign.php',
 			],
