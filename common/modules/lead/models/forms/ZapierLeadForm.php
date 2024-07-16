@@ -18,6 +18,10 @@ class ZapierLeadForm extends LeadForm {
 	public ?string $fb_ad_id = null;
 	public ?string $fb_ad_name = null;
 
+	public function load($data, $formName = ''): bool {
+		return parent::load($data, $formName);
+	}
+
 	public function rules(): array {
 		return array_merge([
 			[
