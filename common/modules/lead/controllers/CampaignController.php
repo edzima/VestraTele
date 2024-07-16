@@ -8,6 +8,7 @@ use common\modules\lead\models\forms\LeadCampaignForm;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\searches\LeadCampaignSearch;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
 
@@ -109,8 +110,19 @@ class CampaignController extends BaseController {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionView(int $id): string {
+		$model = $this->findModel($id);
+
+		$leadsQuery = $model->getLeads();
+		if ($this->module->onlyUser) {
+			$leadsQuery->user(Yii::$app->user->getId());
+		}
+		$leadsDataProvider = new ActiveDataProvider([
+			'query' => $leadsQuery,
+		]);
+
 		return $this->render('view', [
 			'model' => $this->findModel($id),
+			'leadsDataProvider' => $leadsDataProvider,
 		]);
 	}
 

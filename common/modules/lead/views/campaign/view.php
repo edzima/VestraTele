@@ -1,13 +1,18 @@
 <?php
 
+use common\helpers\Url;
+use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\Module;
+use common\widgets\GridView;
+use yii\data\DataProviderInterface;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model LeadCampaign */
+/* @var $leadsDataProvider DataProviderInterface */
 
 $this->title = $model->name;
 
@@ -74,6 +79,21 @@ YiiAsset::register($this);
 				'attribute' => 'details',
 				'visible' => !empty($model->details),
 			],
+		],
+	]) ?>
+
+	<?= GridView::widget([
+		'dataProvider' => $leadsDataProvider,
+		'columns' => [
+			[
+				'attribute' => 'name',
+				'format' => 'html',
+				'value' => function (ActiveLead $model) {
+					return Html::a($model->getName(), Url::leadView($model->getId()));
+				},
+			],
+			'source',
+			'date_at:datetime',
 		],
 	]) ?>
 
