@@ -5,7 +5,6 @@ namespace common\modules\lead\models\forms;
 use common\modules\lead\entities\FBCampaign;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadStatusInterface;
-use Yii;
 
 class ZapierLeadForm extends LeadForm {
 
@@ -30,14 +29,6 @@ class ZapierLeadForm extends LeadForm {
 				'string',
 			],
 		], parent::rules());
-	}
-
-	public function load($data, $formName = ''): bool {
-		Yii::warning([
-			'msg' => 'load zapier lead data',
-			'data' => $data,
-		], __METHOD__);
-		return parent::load($data, $formName);
 	}
 
 	public function afterValidate(): void {
