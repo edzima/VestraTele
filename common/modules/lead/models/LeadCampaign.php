@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models;
 
+use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
 use Yii;
 use yii\db\ActiveQuery;
@@ -94,7 +95,7 @@ class LeadCampaign extends ActiveRecord {
 	 *
 	 * @return ActiveQuery
 	 */
-	public function getLeads() {
+	public function getLeads(): LeadQuery {
 		return $this->hasMany(Lead::class, ['campaign_id' => 'id']);
 	}
 

@@ -189,6 +189,13 @@ if ($phoneBlacklist) {
 					[
 						'attribute' => 'campaign',
 						'visible' => !empty($model->campaign_id),
+						'value' => function (ActiveLead $lead): ?string {
+							if (empty($lead->campaign)) {
+								return null;
+							}
+							return Html::a($lead->campaign->name, ['campaign/view', 'id' => $lead->campaign_id]);
+						},
+						'format' => 'html',
 					],
 					'date_at:datetime',
 					[

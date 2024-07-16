@@ -229,7 +229,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function getCosts(): ActiveQuery {
 		return $this->hasMany(LeadCost::class, ['campaign_id' => 'campaign_id'])
-			->andOnCondition(LeadCost::tableName() . '.date_at = ' . Lead::tableName() . '.date_at');
+			->andOnCondition([LeadCost::tableName() . '.date_at' => new Expression('DATE(' . Lead::tableName() . '.date_at' . ')')]);
 	}
 
 	public function getDetails(): ?string {
