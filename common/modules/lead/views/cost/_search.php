@@ -41,6 +41,9 @@ use yii\widgets\ActiveForm;
 				'class' => 'col-md-3 col-lg-2',
 			],
 		])->widget(NumberControl::class) ?>
+
+
+		<?= $form->field($model, 'withoutLeads')->checkbox() ?>
 	</div>
 
 

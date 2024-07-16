@@ -3,6 +3,7 @@
 namespace common\modules\lead\models\searches;
 
 use common\helpers\ArrayHelper;
+use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadCost;
 use Yii;
@@ -23,6 +24,7 @@ class LeadCostSearch extends LeadCost {
 	public string $toAt = '';
 	public string $valueMin = '';
 	public string $valueMax = '';
+	public ?bool $withoutLeads = null;
 
 	private array $campaignNames = [];
 
@@ -33,6 +35,8 @@ class LeadCostSearch extends LeadCost {
 		return [
 			['!userId', 'required', 'on' => static::SCENARIO_USER],
 			[['id', 'campaign_id'], 'integer'],
+			['withoutLeads', 'boolean'],
+			['withoutLeads', 'default', 'value' => null],
 			[['value', 'valueMin', 'valueMax'], 'number'],
 			[['date_at', 'created_at', 'updated_at', 'fromAt', 'toAt'], 'safe'],
 		];
@@ -73,6 +77,7 @@ class LeadCostSearch extends LeadCost {
 			'query' => $query,
 		]);
 
+
 		$this->load($params);
 
 		if (!$this->validate()) {
@@ -84,14 +89,15 @@ class LeadCostSearch extends LeadCost {
 		$this->applyUserFilter($query);
 		$this->applyDateFilter($query);
 		$this->applyValueFilter($query);
-		// grid filtering conditions
+		$this->applyWithoutLeadFilter($query);
+//		 grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
-			'campaign_id' => $this->campaign_id,
-			'value' => $this->value,
-			'date_at' => $this->date_at,
-			'created_at' => $this->created_at,
-			'updated_at' => $this->updated_at,
+			LeadCampaign::tableName() . '.id' => $this->id,
+			LeadCampaign::tableName() . '.campaign_id' => $this->campaign_id,
+			LeadCampaign::tableName() . '.value' => $this->value,
+			LeadCampaign::tableName() . '.date_at' => $this->date_at,
+			LeadCampaign::tableName() . '.created_at' => $this->created_at,
+			LeadCampaign::tableName() . '.updated_at' => $this->updated_at,
 		]);
 
 		return $dataProvider;
@@ -120,7 +126,7 @@ class LeadCostSearch extends LeadCost {
 		$query->andFilterWhere([LeadCampaign::tableName() . '.owner_id' => $this->userId]);
 	}
 
-	private function applyDateFilter(ActiveQuery $query) {
+	private function applyDateFilter(ActiveQuery $query): void {
 		if (!empty($this->fromAt)) {
 			$query->andWhere(['>=', LeadCost::tableName() . '.date_at', $this->fromAt]);
 		}
@@ -129,12 +135,19 @@ class LeadCostSearch extends LeadCost {
 		}
 	}
 
-	private function applyValueFilter(ActiveQuery $query) {
+	private function applyValueFilter(ActiveQuery $query): void {
 		if (!empty($this->valueMin)) {
 			$query->andWhere(['>=', LeadCost::tableName() . '.value', $this->valueMin]);
 		}
 		if (!empty($this->valueMax)) {
 			$query->andWhere(['<=', LeadCost::tableName() . '.value', $this->valueMax]);
+		}
+	}
+
+	private function applyWithoutLeadFilter(ActiveQuery $query): void {
+		if ($this->withoutLeads) {
+			$query->joinWith('leads');
+			$query->andWhere([Lead::tableName() . '.id' => null]);
 		}
 	}
 
