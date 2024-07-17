@@ -68,9 +68,9 @@ class BaseController extends Controller {
 		$leadUser = $this->module->manager->getLeadUser($model, Yii::$app->user->getId());
 		if ($leadUser) {
 			if (empty($leadUser->first_view_at)) {
-				$leadUser->first_view_at = time();
+				$leadUser->first_view_at = date('Y-m-d H:i:s');
 			}
-			$leadUser->last_view_at = time();
+			$leadUser->last_view_at = date('Y-m-d H:i:s');
 			$leadUser->updateAttributes(['first_view_at', 'last_view_at']);
 		}
 	}
