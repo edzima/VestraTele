@@ -91,7 +91,7 @@ class LeadForm extends Model implements LeadInterface {
 			[['status_id', 'source_id', 'campaign_id', 'agent_id', 'owner_id'], 'integer'],
 			[['phone', 'postal_code', 'email', 'data', 'details', 'name'], 'string'],
 			[['phone', 'postal_code', 'email', 'data', 'details', 'name'], 'trim'],
-			[['campaign_id', 'email', 'phone'], 'default', 'value' => null],
+			[['campaign_id', 'email', 'phone', 'provider'], 'default', 'value' => null],
 			['postal_code', 'string', 'max' => 6],
 			['email', 'email'],
 			['date_at', 'date', 'format' => 'php:' . $this->dateFormat],
@@ -248,7 +248,6 @@ class LeadForm extends Model implements LeadInterface {
 		} else {
 			$names = LeadCampaign::getNames();
 			codecept_debug('NOT OWNER SCENARIO');
-
 		}
 		if (!empty($this->campaign_id) && !isset($names[$this->campaign_id])) {
 			$name = LeadCampaign::getNames(null, false)[$this->campaign_id] ?? null;
