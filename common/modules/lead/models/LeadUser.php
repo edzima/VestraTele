@@ -63,7 +63,6 @@ class LeadUser extends ActiveRecord {
 		return $this->lastViewDuration;
 	}
 
-
 	/**
 	 * {@inheritdoc}
 	 */
@@ -91,8 +90,9 @@ class LeadUser extends ActiveRecord {
 		return [
 			[['user_id', 'lead_id', 'type'], 'required'],
 			[['user_id', 'lead_id'], 'integer'],
-			[['created_at', 'updated_at'], 'safe'],
+			[['created_at', 'updated_at', 'first_view_at', 'last_view_at', 'action_at'], 'safe'],
 			[['type'], 'string', 'max' => 255],
+			[['first_view_at', 'last_view_at', 'action_at'], 'default', 'value' => null],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 			[['user_id', 'lead_id', 'type'], 'unique', 'targetAttribute' => ['user_id', 'lead_id', 'type']],
 			[['lead_id'], 'exist', 'skipOnError' => true, 'targetClass' => Lead::class, 'targetAttribute' => ['lead_id' => 'id']],
@@ -178,7 +178,7 @@ class LeadUser extends ActiveRecord {
 
 	public function updateActionAt(): void {
 		$this->updateAttributes([
-			'action_at' => time(),
+			'action_at' => date('Y-m-d H:i:s'),
 		]);
 	}
 
