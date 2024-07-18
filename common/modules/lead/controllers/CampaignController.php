@@ -112,16 +112,33 @@ class CampaignController extends BaseController {
 	public function actionView(int $id): string {
 		$model = $this->findModel($id);
 
+		$costQueryDataProvider = new ActiveDataProvider([
+			'query' => $model->getCosts(),
+			'sort' => [
+				'defaultOrder' => [
+					'date_at' => SORT_DESC,
+				],
+			],
+		]);
+
+
 		$leadsQuery = $model->getLeads();
 		if ($this->module->onlyUser) {
 			$leadsQuery->user(Yii::$app->user->getId());
 		}
+
 		$leadsDataProvider = new ActiveDataProvider([
 			'query' => $leadsQuery,
+			'sort' => [
+				'defaultOrder' => [
+					'date_at' => SORT_DESC,
+				],
+			],
 		]);
 
 		return $this->render('view', [
 			'model' => $this->findModel($id),
+			'costQueryDataProvider' => $costQueryDataProvider,
 			'leadsDataProvider' => $leadsDataProvider,
 		]);
 	}

@@ -149,7 +149,7 @@ class LeadCampaign extends ActiveRecord {
 		];
 	}
 
-	public function getFullName() {
+	public function getFullName(): string {
 		$names = [];
 		$model = $this;
 		$names[] = $model->name;
@@ -159,5 +159,11 @@ class LeadCampaign extends ActiveRecord {
 		}
 		$names = array_reverse($names);
 		return implode(' ', $names);
+	}
+
+	public function getCosts() {
+		return $this->hasMany(LeadCost::class, [
+			'campaign_id' => 'id',
+		]);
 	}
 }

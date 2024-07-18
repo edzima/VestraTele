@@ -4,6 +4,7 @@ use common\helpers\Url;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\Module;
+use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use yii\data\DataProviderInterface;
 use yii\helpers\Html;
@@ -12,6 +13,7 @@ use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model LeadCampaign */
+/* @var $costQueryDataProvider DataProviderInterface */
 /* @var $leadsDataProvider DataProviderInterface */
 
 $this->title = $model->name;
@@ -43,6 +45,10 @@ YiiAsset::register($this);
 			//	'id',
 			'name',
 			[
+				'attribute' => 'details',
+				'visible' => !empty($model->details),
+			],
+			[
 				'attribute' => 'typeName',
 				'visible' => !empty($model->type),
 			],
@@ -53,7 +59,6 @@ YiiAsset::register($this);
 						'view', 'id' => $model->parent_id,
 					]);
 				},
-				'format' => 'html',
 				'visible' => !empty($model->parent),
 				'label' => $model->parent ? $model->parent->getTypeName() : null,
 			],
@@ -75,26 +80,49 @@ YiiAsset::register($this);
 				'visible' => !empty($model->sort_index),
 			],
 			'is_active:boolean',
-			[
-				'attribute' => 'details',
-				'visible' => !empty($model->details),
-			],
+
 		],
 	]) ?>
 
-	<?= GridView::widget([
-		'dataProvider' => $leadsDataProvider,
-		'columns' => [
-			[
-				'attribute' => 'name',
-				'format' => 'html',
-				'value' => function (ActiveLead $model) {
-					return Html::a($model->getName(), Url::leadView($model->getId()));
-				},
-			],
-			'source',
-			'date_at:datetime',
-		],
-	]) ?>
+
+	<div class="row">
+		<div class="col-md-6">
+			<?= GridView::widget([
+				'dataProvider' => $costQueryDataProvider,
+				'caption' => Yii::t('lead', 'Costs'),
+				'columns' => [
+					'date_at:date',
+					'value:currency',
+					'leadsCount',
+					//		'singleLeadCostValue:currency',
+					[
+						'class' => ActionColumn::class,
+						'controller' => 'cost',
+					],
+				],
+			]) ?>
+		</div>
+
+		<div class="col-md-6">
+			<?= GridView::widget([
+				'dataProvider' => $leadsDataProvider,
+				'caption' => Yii::t('lead', 'Leads'),
+				'columns' => [
+					[
+						'attribute' => 'name',
+						'format' => 'html',
+						'value' => function (ActiveLead $model) {
+							return Html::a($model->getName(), Url::leadView($model->getId()));
+						},
+					],
+					'statusName',
+					'sourceName',
+					'date_at:datetime',
+					'costValue:currency',
+				],
+			]) ?>
+		</div>
+	</div>
+
 
 </div>
