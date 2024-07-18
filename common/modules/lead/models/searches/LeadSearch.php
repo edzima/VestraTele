@@ -534,7 +534,7 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 	}
 
-	private function applyStatusFilter(LeadQuery $query): void {
+	protected function applyStatusFilter(LeadQuery $query): void {
 		if ((int) $this->status_id === LeadStatusInterface::STATUS_ARCHIVE) {
 			$this->withoutArchives = false;
 		}

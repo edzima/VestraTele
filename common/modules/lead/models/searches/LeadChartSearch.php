@@ -69,11 +69,27 @@ class LeadChartSearch extends LeadSearch {
 		return $currentDate->format('Y-m-d');
 	}
 
+	public function getLeadsGroupsByHours(): array {
+		$query = $this->getBaseQuery();
+		$query->select([
+			new Expression('HOUR(date_at) as hour'),
+			new Expression('COUNT(*) as count'),
+			'provider',
+		]);
+		$query->groupBy([
+			'HOUR(date_at)',
+			'provider',
+		]);
+		$query->asArray();
+		$data = $query->all();
+		return $data;
+	}
+
 	public function getLeadsByDays(): array {
 		$query = $this->getBaseQuery();
 		$query->joinWith('costs');
 		$query->groupBy([
-			new Expression('DATE(' . Lead::tableName() . '.date_at)'),
+			Lead::expressionDateAtAsDate(),
 			Lead::tableName() . '.status_id',
 		]);
 		$query->select([
@@ -130,6 +146,41 @@ class LeadChartSearch extends LeadSearch {
 		return $data;
 	}
 
+	public function getLeadCampaignsCount(): array {
+		$query = $this->getBaseQuery();
+		$query->groupBy(Lead::tableName() . '.campaign_id');
+		$query->select([Lead::tableName() . '.campaign_id', 'count(*) as count']);
+		$query->asArray();
+		$data = $query->all();
+		$data = ArrayHelper::map($data, 'campaign_id', 'count');
+		$data = array_map('intval', $data);
+		return $data;
+	}
+
+	public function getLeadProvidersCount(): array {
+		$query = $this->getBaseQuery();
+		$query->groupBy(Lead::tableName() . '.provider');
+		$query->select([Lead::tableName() . '.provider', 'count(*) as count']);
+		$query->asArray();
+		$data = $query->all();
+		$data = ArrayHelper::map($data, 'provider', 'count');
+		$data = array_map('intval', $data);
+		return $data;
+	}
+
+	public function getLeadCostsData(): array {
+		$query = LeadCost::find();
+		$query->joinWith([
+			'leads' => function (LeadQuery $query) {
+				$this->applyLeadFilter($query);
+			},
+		]);
+		$query->select([
+			'value',
+		]);
+		return $query->column();
+	}
+
 	public function getLeadsUserStatusData(): array {
 		$query = LeadUser::find();
 		$query->joinWith([
@@ -170,6 +221,7 @@ class LeadChartSearch extends LeadSearch {
 
 	protected function applyLeadFilter(LeadQuery $query): void {
 		$this->applyDateFilter($query);
+		$this->applyStatusFilter($query);
 		$this->applyExcludedStatusFilter($query);
 		$this->applyUserFilter($query);
 		$this->applyLeadDirectlyFilter($query);
