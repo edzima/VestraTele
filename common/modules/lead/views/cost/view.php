@@ -31,22 +31,37 @@ YiiAsset::register($this);
 		]) ?>
 	</p>
 
-	<?= DetailView::widget([
-		'model' => $model,
-		'attributes' => [
-			'campaign',
-			'value:currency',
-			'date_at:date',
-			'created_at:datetime',
-			'updated_at:datetime',
-		],
-	]) ?>
+	<div class="row">
+		<div class="col-md-6">
 
+			<?= DetailView::widget([
+				'model' => $model,
+				'attributes' => [
+					'campaign',
+					'value:currency',
+					'singleLeadCostValue:currency',
+					'date_at:date',
+					'created_at:datetime',
+					'updated_at:datetime',
+				],
+			]) ?>
+		</div>
 
-	<?= GridView::widget([
-		'dataProvider' => new ActiveDataProvider([
-			'query' => $model->getLeads(),
-		]),
-	]) ?>
+		<div class="row">
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getLeads()
+						->with('costs'),
+				]),
+				'columns' => [
+					'sourceName',
+					'name',
+					'date_at',
+					'costValue:currency',
+				],
+			]) ?>
+		</div>
+	</div>
+
 
 </div>

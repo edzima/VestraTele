@@ -153,6 +153,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			'details' => Yii::t('lead', 'Details'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
 			'customerAddress' => Yii::t('lead', 'Customer Address'),
+			'costValue' => Yii::t('lead', 'Single Lead cost Value'),
 		];
 	}
 
@@ -228,8 +229,18 @@ class Lead extends ActiveRecord implements ActiveLead {
 	}
 
 	public function getCosts(): ActiveQuery {
-		return $this->hasMany(LeadCost::class, ['campaign_id' => 'campaign_id'])
-			->andOnCondition([LeadCost::tableName() . '.date_at' => new Expression('DATE(' . Lead::tableName() . '.date_at' . ')')]);
+		if ($this->isNewRecord) {
+			//@todo yii2 not allowed Expression in link attribute.
+			$relation = $this->hasMany(LeadCost::class, ['campaign_id' => 'campaign_id']);
+			$relation->onCondition([
+				LeadCost::tableName() . '.date_at' => Lead::expressionDateAtAsDate(),
+			]);
+			return $relation;
+		}
+
+		return $this->hasMany(LeadCost::class, [
+			'campaign_id' => 'campaign_id',
+		])->andWhere([LeadCost::tableName() . '.date_at' => date('Y-m-d', strtotime($this->date_at))]);
 	}
 
 	public function getDetails(): ?string {
@@ -489,5 +500,21 @@ class Lead extends ActiveRecord implements ActiveLead {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(static::class, ['email' => 'email'])
 			->indexBy('id');
+	}
+
+	public function getCostValue(): ?float {
+		$costs = $this->costs;
+		if (empty($costs)) {
+			return null;
+		}
+		$sum = 0;
+		foreach ($costs as $cost) {
+			$sum += $cost->getSingleLeadCostValue();
+		}
+		return $sum;
+	}
+
+	public static function expressionDateAtAsDate(): Expression {
+		return new Expression('DATE(' . Lead::tableName() . '.date_at)');
 	}
 }

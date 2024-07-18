@@ -49,6 +49,7 @@ class LeadCostSearch extends LeadCost {
 				'toAt' => Yii::t('lead', 'To At'),
 				'valueMin' => Yii::t('lead', 'Value (min)'),
 				'valueMax' => Yii::t('lead', 'Value (max)'),
+				'withoutLeads' => Yii::t('lead', 'Without Leads'),
 			]
 		);
 	}
@@ -71,12 +72,19 @@ class LeadCostSearch extends LeadCost {
 	public function search(array $params) {
 		$query = LeadCost::find();
 
+		//	$query->with('leads');
+//		$query->joinWith('leads');
+//		$query->groupBy(LeadCost::tableName() . '.id');
 		// add conditions that should always apply here
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
+			'sort' => [
+				'defaultOrder' => [
+					'date_at' => SORT_DESC,
+				],
+			],
 		]);
-
 
 		$this->load($params);
 
