@@ -3,6 +3,7 @@
 use common\helpers\ArrayHelper;
 use common\helpers\Html;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadChartSearch;
 use common\widgets\charts\ChartsWidget;
 use yii\helpers\Json;
@@ -11,6 +12,8 @@ use yii\web\View;
 /* @var $this yii\web\View */
 /* @var $searchModel LeadChartSearch */
 /* @var $usersNames string[] */
+
+$usersNames = LeadChartSearch::getUsersNames(LeadUser::TYPE_OWNER);
 
 $leadStatusColor = $searchModel->getLeadStatusColor();
 
@@ -78,6 +81,7 @@ foreach ($userCounts as $userId => $data) {
 		}
 	}
 }
+
 foreach ($userCounts as $data) {
 	foreach ($data['data'] as $groupId => $count) {
 		$groupSeries[$groupId]['data'][] = $count;
@@ -112,6 +116,10 @@ JS;
 $this->registerJs($js, View::POS_HEAD);
 
 foreach ($groupSeries as $group) {
+	//var_dump($group);
+	$count = $searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_DISABLE
+		? count($group['data'])
+		: array_sum($group['data']);
 	$buttons[] = [
 		'label' => $group['name'] . ' - ' . array_sum($group['data']),
 		'linkOptions' => [
@@ -137,7 +145,7 @@ foreach ($groupSeries as $group) {
 				'id' => 'line-leads-users-count',
 				'type' => ChartsWidget::TYPE_LINE,
 				'series' => array_values($groupSeries),
-				//	'height' => '600',
+				'height' => '520px',
 				'chart' => [
 					'stacked' => true,
 					'id' => 'line-leads-users-count',
