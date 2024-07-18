@@ -477,8 +477,15 @@ class LeadSearch extends Lead implements SearchModel {
 		return LeadUser::getTypesNames();
 	}
 
+	private static array $users = [];
+
 	public static function getUsersNames(string $type = null): array {
-		return User::getSelectList(LeadUser::userIds($type));
+		$key = $type ?: 'all';
+		if (!isset(static::$users[$key])) {
+			static::$users[$key] = User::getSelectList(LeadUser::userIds($type));
+		}
+
+		return static::$users[$key];
 	}
 
 	/**
