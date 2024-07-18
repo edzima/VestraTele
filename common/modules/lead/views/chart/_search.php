@@ -11,8 +11,7 @@ use kartik\select2\Select2;
 /* @var $model LeadChartSearch */
 /* @var $form ActiveForm */
 /* @var $sourcesNames array */
-/* @var $usersNames array */
-
+$usersNames = LeadChartSearch::getUsersNames();
 ?>
 
 <div class="lead-chart-search-search">
@@ -136,6 +135,15 @@ use kartik\select2\Select2;
 		]) ?>
 
 
+		<?= $form->field($model, 'provider', ['options' => ['class' => 'col-md-2 col-lg-2']])->widget(Select2::class, [
+			'data' => LeadChartSearch::getProvidersNames(),
+			'pluginOptions' => [
+				'placeholder' => Yii::t('lead', 'Provider'),
+				'allowClear' => true,
+			],
+		]) ?>
+
+
 		<?= Yii::$app->user->can(User::PERMISSION_LEAD_MARKET) ?
 			$form->field($model, 'fromMarket', ['options' => ['class' => 'col-md-1']])->dropDownList(Html::booleanDropdownList(), [
 				'prompt' => Yii::t('common', 'All'),
@@ -145,27 +153,25 @@ use kartik\select2\Select2;
 
 		<?php if ($model->scenario !== LeadChartSearch::SCENARIO_USER): ?>
 
-			<?= !empty($usersNames)
-				? $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(Select2::class, [
-					'data' => $usersNames,
-					'pluginOptions' => [
-						'placeholder' => $model->getAttributeLabel('user_id'),
-						'allowClear' => true,
-						'multiple' => true,
-					],
-				])
-				: ''
+			<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(Select2::class, [
+				'data' => $usersNames,
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('user_id'),
+					'allowClear' => true,
+					'multiple' => true,
+				],
+			])
+
 			?>
 
-			<?= !empty($usersNames)
-				? $form->field($model, 'user_type', ['options' => ['class' => 'col-md-2 col-lg-1']])->widget(Select2::class, [
-					'data' => LeadChartSearch::getUserTypesNames(),
-					'pluginOptions' => [
-						'placeholder' => $model->getAttributeLabel('user_type'),
-						'allowClear' => true,
-					],
-				])
-				: ''
+			<?= $form->field($model, 'user_type', ['options' => ['class' => 'col-md-2 col-lg-1']])->widget(Select2::class, [
+				'data' => LeadChartSearch::getUserTypesNames(),
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('user_type'),
+					'allowClear' => true,
+				],
+			])
+
 			?>
 
 		<?php else: ?>

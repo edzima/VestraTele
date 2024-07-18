@@ -5,7 +5,6 @@ use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
-use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadChartSearch;
 use common\widgets\charts\ChartsWidget;
 use yii\web\JsExpression;
@@ -13,7 +12,11 @@ use yii\web\JsExpression;
 /* @var $this yii\web\View */
 /* @var $searchModel LeadChartSearch */
 
-$this->title = Yii::t('lead', 'Charts');
+$this->title = Yii::t('lead', 'Leads');
+if (is_array($searchModel->user_id) && count($searchModel->user_id) === 1) {
+	$userId = $searchModel->user_id[array_key_first($searchModel->user_id)];
+	$this->title .= ' - ' . $searchModel::getUsersNames()[$userId];
+}
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -185,21 +188,18 @@ if (count($providersData) > 1) {
 	}
 }
 
-$usersNames = $searchModel::getUsersNames(LeadUser::TYPE_OWNER);
-
 ?>
 <div class="lead-chart-index">
 	<?= $this->render('_search', [
 		'model' => $searchModel,
 		'sourcesNames' => $sourcesData['names'] ?? [],
-		'usersNames' => $usersNames,
 	]) ?>
 	<div class="lead-charts">
 
-		<?= $this->render('_user-status-charts', [
-			'searchModel' => $searchModel,
-			'usersNames' => $usersNames,
-		]) ?>
+		<?= (count((array) $searchModel->user_id) !== 1)
+			? $this->render('_user-status-charts', [
+				'searchModel' => $searchModel,
+			]) : '' ?>
 
 		<div class="row">
 			<?= !empty($statusGroupData) && $searchModel->groupedStatusChartType === ChartsWidget::TYPE_RADIAL_BAR ?
@@ -506,11 +506,6 @@ $usersNames = $searchModel::getUsersNames(LeadUser::TYPE_OWNER);
 				])
 				: ''
 			?>
-
-
-		</div>
-
-		<div class="row">
 			<?= !empty($hoursChartData)
 				? ChartsWidget::widget([
 					'containerOptions' => [
@@ -526,10 +521,15 @@ $usersNames = $searchModel::getUsersNames(LeadUser::TYPE_OWNER);
 						'dataLabels' => [
 							'enabled' => false,
 						],
+						'title' => [
+							'text' => Yii::t('lead', 'Hours'),
+							'align' => 'center',
+						],
 					],
 				])
 				: ''
 			?>
+
 		</div>
 
 
