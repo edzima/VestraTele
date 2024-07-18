@@ -9,6 +9,7 @@ use common\models\settlement\PayedInterface;
 use common\modules\file\models\File;
 use Yii;
 use yii\bootstrap\BaseHtml;
+use yii\helpers\VarDumper;
 
 class Html extends BaseHtml {
 
@@ -161,6 +162,10 @@ class Html extends BaseHtml {
 		}
 
 		return '#' . implode($hexcolor);
+	}
+
+	public static function dump(array $var, array $options = []): string {
+		return static::tag('pre', VarDumper::dumpAsString($var), $options);
 	}
 
 }
