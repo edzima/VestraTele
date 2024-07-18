@@ -1,6 +1,8 @@
 <?php
 
-return [
+$local = file_exists(__DIR__ . '/issue-local.php') ? require_once __DIR__ . '/issue-local.php' : [];
+
+return array_merge([
 	'Archive' => 'Archiwum',
 	'Client' => 'Klient',
 	'Create Issue Note' => 'Dodaj notatkę',
@@ -243,7 +245,7 @@ return [
 	'Stage Change' => 'Zmiana Etapu',
 	'Stage Change from At' => 'Od',
 	'Stage Change to At' => 'Do',
-
+	'Signature act' => 'Sygnatura akt',
 	'Files' => 'Pliki',
 	'Files Count' => 'Pliki',
-];
+], $local);

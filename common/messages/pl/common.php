@@ -133,7 +133,6 @@ return [
 	'Registration at' => 'Zarejestrowano',
 	'Home address' => 'Adres zameldowania',
 	'Postal address' => 'Adres korespondencyjny',
-	'Signature act' => 'Sygnatura akt',
 	'Full user name' => 'Full user name',
 	'Unknown issue type' => 'Nieznany typ (przeniesione)',
 	'As role' => 'Jako',

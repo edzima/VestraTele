@@ -135,7 +135,7 @@ class Issue extends ActiveRecord implements
 				? Yii::t('common', 'Date at ({type})', ['type' => $this->type->name])
 				: Yii::t('common', 'Additional Date for Type'),
 			'stage_change_at' => Yii::t('common', 'Stage date'),
-			'signature_act' => Yii::t('common', 'Signature act'),
+			'signature_act' => Yii::t('issue', 'Signature act'),
 			'customer' => IssueUser::getTypesNames()[IssueUser::TYPE_CUSTOMER],
 			'tagsNames' => Yii::t('issue', 'Tags Names'),
 			'stage_deadline_at' => Yii::t('issue', 'Stage Deadline At'),
