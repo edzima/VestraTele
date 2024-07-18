@@ -1,6 +1,7 @@
 <?php
 
 use common\helpers\ArrayHelper;
+use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
@@ -18,6 +19,32 @@ $this->params['breadcrumbs'][] = $this->title;
 
 $leadStatusColor = $searchModel->getLeadStatusColor();
 $leadsDaysData = $searchModel->getLeadsByDays();
+
+$hoursData = $searchModel->getLeadsGroupsByHours();
+
+$hoursChartData = [];
+foreach ($hoursData as $data) {
+	$hour = $data['hour'];
+	if (!isset($hoursChartData['categories'][$hour])) {
+		$hoursChartData['categories'][$hour] = $hour;
+	}
+	$provider = $data['provider'];
+	if (empty($provider)) {
+		$provider = Yii::t('lead', 'Without Provider');
+	} else {
+		$provider = LeadChartSearch::getProvidersNames()[$provider];
+	}
+	if (!isset($hoursChartData['series'][$provider])) {
+		$hoursChartData['series'][$provider] = [
+			'name' => $provider,
+			'data' => [],
+		];
+	}
+	$hoursChartData['series'][$provider]['data'][] = [
+		'x' => (int) ($hour),
+		'y' => (int) ($data['count']),
+	];
+}
 
 $leadsCountSeries = [];
 $leadDates = array_values(array_unique(ArrayHelper::getColumn($leadsDaysData, 'date')));
@@ -125,7 +152,37 @@ foreach ($sourcesData as $id => $count) {
 	$source = LeadSource::getModels()[$id];
 	$sourcesData['series'][] = $count;
 	$sourcesData['labels'][] = $source->name;
-	$sourcesData['names'][$id] = $source->name;
+}
+
+$campaignsData = $searchModel->getLeadCampaignsCount();
+if (count($campaignsData) > 1) {
+	$campaigns = LeadCampaign::find()
+		->andWhere(['id' => array_keys($campaignsData)])
+		->indexBy('id')
+		->all();
+	foreach ($campaignsData as $id => $count) {
+		if (empty($id)) {
+			$name = Yii::t('lead', 'Without Campaign');
+		} else {
+			$campaign = $campaigns[$id];
+			$name = $campaign->getFullname();
+		}
+		$campaignsData['series'][] = $count;
+		$campaignsData['labels'][] = $name;
+	}
+}
+
+$providersData = $searchModel->getLeadProvidersCount();
+if (count($providersData) > 1) {
+	foreach ($providersData as $provider => $count) {
+		if (empty($provider)) {
+			$name = Yii::t('lead', 'Without Provider');
+		} else {
+			$name = LeadChartSearch::getProvidersNames()[$provider];
+		}
+		$providersData['series'][] = $count;
+		$providersData['labels'][] = $name;
+	}
 }
 
 $usersNames = $searchModel::getUsersNames(LeadUser::TYPE_OWNER);
@@ -368,6 +425,111 @@ $usersNames = $searchModel::getUsersNames(LeadUser::TYPE_OWNER);
 			?>
 
 
+		</div>
+
+		<div class="row">
+
+			<?= isset($campaignsData['series']) ?
+				ChartsWidget::widget([
+					'type' => 'donut',
+					'containerOptions' => [
+						'class' => 'col-sm-12 col-md-6 col-lg-4',
+						//		'style' => ['height' => '50vh',],
+					],
+					'id' => 'chart-leads-campaigns-count' . $searchModel->getUniqueId(),
+					'legendFormatterAsSeriesWithCount' => true,
+					'series' => $campaignsData['series'],
+					'options' => [
+						'labels' => $campaignsData['labels'],
+						'title' => [
+							'text' => Yii::t('lead', 'Campaigns Count'),
+							'align' => 'center',
+						],
+						'legend' => [
+							'position' => 'bottom',
+							'height' => '55',
+						],
+						'plotOptions' => [
+							'pie' => [
+								'donut' => [
+									'labels' => [
+										'show' => true,
+										'total' => [
+											'show' => true,
+											'showAlways' => true,
+											'label' => Yii::t('common', 'Sum'),
+										],
+									],
+								],
+							],
+						],
+					],
+				])
+				: ''
+			?>
+
+			<?= isset($providersData['series']) ?
+				ChartsWidget::widget([
+					'type' => 'donut',
+					'containerOptions' => [
+						'class' => 'col-sm-12 col-md-6 col-lg-4',
+						//		'style' => ['height' => '50vh',],
+					],
+					'id' => 'chart-leads-providers-count' . $searchModel->getUniqueId(),
+					'legendFormatterAsSeriesWithCount' => true,
+					'series' => $providersData['series'],
+					'options' => [
+						'labels' => $providersData['labels'],
+						'title' => [
+							'text' => Yii::t('lead', 'Provider Count'),
+							'align' => 'center',
+						],
+						'legend' => [
+							'position' => 'bottom',
+							'height' => '55',
+						],
+						'plotOptions' => [
+							'pie' => [
+								'donut' => [
+									'labels' => [
+										'show' => true,
+										'total' => [
+											'show' => true,
+											'showAlways' => true,
+											'label' => Yii::t('common', 'Sum'),
+										],
+									],
+								],
+							],
+						],
+					],
+				])
+				: ''
+			?>
+
+
+		</div>
+
+		<div class="row">
+			<?= !empty($hoursChartData)
+				? ChartsWidget::widget([
+					'containerOptions' => [
+						'class' => 'col-sm-12 col-md-6',
+					],
+					'height' => '350px',
+					'type' => ChartsWidget::TYPE_BAR,
+					'series' => array_values($hoursChartData['series']),
+					'options' => [
+						'xaxis' => [
+							'type' => 'category',
+						],
+						'dataLabels' => [
+							'enabled' => false,
+						],
+					],
+				])
+				: ''
+			?>
 		</div>
 
 
