@@ -43,9 +43,16 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			'campaign.name',
 			'value:currency',
+			'singleLeadCostValue:currency',
+			'leadsCount',
 			'date_at:date',
 			'created_at:datetime',
 			'updated_at:datetime',
+			[
+				'value' => function (LeadCost $data): int {
+					return count($data->leads);
+				},
+			],
 			[
 				'class' => ActionColumn::class,
 				'urlCreator' => function ($action, LeadCost $model, $key, $index, $column) {

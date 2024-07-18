@@ -23,6 +23,9 @@ use yii\db\Expression;
  */
 class LeadCost extends ActiveRecord {
 
+	public $leads_count;
+	public $single_lead_cost_value;
+
 	public function behaviors(): array {
 		return array_merge(parent::behaviors(), [
 			[
@@ -61,7 +64,9 @@ class LeadCost extends ActiveRecord {
 			'id' => Yii::t('lead', 'ID'),
 			'campaign' => Yii::t('lead', 'Campaign'),
 			'campaign_id' => Yii::t('lead', 'Campaign'),
-			'value' => Yii::t('lead', 'Value'),
+			'value' => Yii::t('lead', 'Cost'),
+			'singleLeadCostValue' => Yii::t('lead', 'Single Lead cost Value'),
+			'leadsCount' => Yii::t('lead', 'Leads Count'),
 			'date_at' => Yii::t('lead', 'Date At'),
 			'created_at' => Yii::t('lead', 'Created At'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
@@ -81,9 +86,32 @@ class LeadCost extends ActiveRecord {
 		return $this->campaign->name . ': ' . Yii::$app->formatter->asCurrency($this->value);
 	}
 
+	public function getSingleLeadCostValue(): ?float {
+		if ($this->value && $this->getLeadsCount()) {
+			return $this->value / count($this->leads);
+		}
+		return null;
+	}
+
 	public function getLeads(): ActiveQuery {
-		return $this->hasMany(Lead::class, ['campaign_id' => 'campaign_id'])
-			->andWhere(['date_at' => date('Y-m-d', strtotime($this->date_at))]);
+		if ($this->isNewRecord) {
+			//@todo yii2 not allowed Expression in link attribute.
+			$relation = $this->hasMany(Lead::class, ['campaign_id' => 'campaign_id']);
+			$relation->onCondition([
+				LeadCost::tableName() . '.date_at' => Lead::expressionDateAtAsDate(),
+			]);
+			return $relation;
+		}
+
+		return $this->hasMany(Lead::class, [
+			'campaign_id' => 'campaign_id',
+			'DATE(date_at)' => 'date_at',
+		]);
+	}
+
+	public function getLeadsCount(): int {
+		//@todo maybe internal cache for them
+		return count($this->leads);
 	}
 
 	public static function batchUpsert(array $columns, array $rows): int {
