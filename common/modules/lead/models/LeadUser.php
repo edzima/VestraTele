@@ -143,7 +143,11 @@ class LeadUser extends ActiveRecord {
 
 	public static function getTypesNames(): array {
 		return [
+			static::TYPE_OWNER => Yii::t('lead', 'Owner'),
 			static::TYPE_AGENT => Yii::t('lead', 'Agent'),
+			static::TYPE_TELE => Yii::t('lead', 'Telemarketer'),
+			static::TYPE_DIALER => Yii::t('lead', 'Dialer'),
+			static::TYPE_PARTNER => Yii::t('lead', 'Partner'),
 			static::TYPE_MARKET_FIRST => Yii::t('lead', '{which}. from Market', [
 				'which' => 1,
 			]),
@@ -153,10 +157,6 @@ class LeadUser extends ActiveRecord {
 			static::TYPE_MARKET_THIRD => Yii::t('lead', '{which}. from Market', [
 				'which' => 3,
 			]),
-			static::TYPE_TELE => Yii::t('lead', 'Telemarketer'),
-			static::TYPE_OWNER => Yii::t('lead', 'Owner'),
-			static::TYPE_DIALER => Yii::t('lead', 'Dialer'),
-			static::TYPE_PARTNER => Yii::t('lead', 'Partner'),
 		];
 	}
 
