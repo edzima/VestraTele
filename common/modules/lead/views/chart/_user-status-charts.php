@@ -424,9 +424,8 @@ if ($hasCosts) {
 		</div>
 		<div class="col-md-4">
 
-			<?= empty($totalCostData)
-				?
-				ChartsWidget::widget([
+			<?= !empty($totalCostData)
+				? ChartsWidget::widget([
 					'id' => 'donut-leads-users-total-cost',
 					'type' => ChartsWidget::TYPE_DONUT,
 					'series' => $totalCostData['data'],
