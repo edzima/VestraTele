@@ -7,6 +7,7 @@ use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadChartSearch;
 use common\widgets\charts\ChartsWidget;
 use yii\helpers\Json;
+use yii\web\JsExpression;
 use yii\web\View;
 
 /* @var $this yii\web\View */
@@ -18,10 +19,13 @@ $usersNames = LeadChartSearch::getUsersNames(LeadUser::TYPE_OWNER);
 $leadStatusColor = $searchModel->getLeadStatusColor();
 
 $usersStatusData = $searchModel->getLeadsUserStatusData();
+
 $userCounts = [];
 $groupsOrStatuses = [];
 foreach ($usersStatusData as $data) {
-	$count = $data['count'];
+	$costValue = $data['costValue'];
+	$costCount = $data['costCount'];
+	$count = (int) $data['count'];
 	$userId = $data['user_id'];
 	$statusId = $data['status_id'];
 	if (!isset($userCounts[$userId])) {
@@ -29,9 +33,22 @@ foreach ($usersStatusData as $data) {
 			'name' => $usersNames[$userId],
 			'count' => 0,
 			'data' => [],
+			'totalLeadsCostValue' => 0,
+			'statusCostValue' => [],
 		];
 	}
 	$userCounts[$userId]['count'] += $count;
+	$userCounts[$userId]['totalLeadsCostValue'] += $costValue;
+
+	if (!isset($userCounts[$userId]['statusCostValue'][$statusId])) {
+		$userCounts[$userId]['statusCostValue'][$statusId] = [
+			'cost' => 0,
+			'count' => 0,
+		];
+	}
+	$userCounts[$userId]['statusCostValue'][$statusId]['cost'] += $costValue;
+	$userCounts[$userId]['statusCostValue'][$statusId]['count'] += $costCount;
+
 	if ($searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_DISABLE) {
 		$groupsOrStatuses[$statusId] = LeadStatus::getNames()[$statusId];
 		$userCounts[$userId][$statusId] = $count;
@@ -51,6 +68,44 @@ uasort($userCounts, function ($a, $b) {
 	return $b['count'] <=> $a['count'];
 });
 
+$costsUsersData = [];
+foreach ($userCounts as $userId => $data) {
+	if (!empty($data['totalLeadsCostValue'])) {
+		$series = [
+			'name' => $data['name'],
+			'data' => [],
+		];
+		foreach ($data['statusCostValue'] as $statusId => $costValue) {
+			$series['data'][] = [
+				'x' => LeadStatus::getNames()[$statusId],
+				'y' => (int) $costValue['cost'],
+			];
+		}
+		$costsUsersData[] = $series;
+	}
+}
+
+$costsUsersData = [];
+foreach ($userCounts as $userId => $data) {
+	if (!empty($data['totalLeadsCostValue'])) {
+		foreach ($data['statusCostValue'] as $statusId => $costValue) {
+			if (!isset($costsUsersData[$statusId])) {
+				$costsUsersData[$statusId] = [
+					'name' => LeadStatus::getNames()[$statusId],
+					'data' => [],
+				];
+			}
+			$count = $costValue['count'];
+			$value = $count ? $costValue['cost'] / $count : 0;
+			$costsUsersData[$statusId]['data'][] = [
+				'x' => $data['name'],
+				'y' => (int) $value,
+			];
+		}
+	}
+}
+
+
 $groupSeries = [];
 
 foreach ($groupsOrStatuses as $groupOrId => $group) {
@@ -60,8 +115,9 @@ foreach ($groupsOrStatuses as $groupOrId => $group) {
 			'name' => $group,
 			'data' => [],
 			'group' => 'status',
-			'type' => 'column',
+			'type' => ChartsWidget::TYPE_COLUMN,
 			'color' => $color,
+			'strokeWidth' => 0,
 		];
 	}
 }
@@ -87,6 +143,47 @@ foreach ($userCounts as $data) {
 		$groupSeries[$groupId]['data'][] = $count;
 	}
 }
+
+$hasCosts = !empty(array_filter($userCounts, function (array $data): bool {
+	return !empty($data['totalLeadsCostValue']);
+}));
+
+$hasCosts = true;
+if ($hasCosts) {
+	$groupSeries['totalCostValue'] = [
+		'name' => Yii::t('lead', 'Total Costs Value'),
+		'type' => 'line',
+		'data' => [],
+		'color' => 'yellow',
+		'strokeWidth' => 1,
+	];
+
+	$groupSeries['singleCostValue'] = [
+		'name' => Yii::t('lead', 'Single Costs Value'),
+		'type' => 'line',
+		'data' => [],
+		'color' => '#6600CC',
+		'strokeWidth' => 3,
+	];
+
+	foreach ($userCounts as $data) {
+		$totalCost = round($data['totalLeadsCostValue'], 2);
+		$count = $data['count'];
+		if ($totalCost) {
+			$groupSeries['totalCostValue']['data'][] = $totalCost;
+			$costCount = 0;
+			foreach ($data['statusCostValue'] as $statusCosts) {
+				$costCount += $statusCosts['count'];
+			}
+			$groupSeries['singleCostValue']['data'][] = $totalCost ? round($totalCost / $costCount, 2) : 0;
+		} else {
+			$groupSeries['totalCostValue']['data'][] = 0;
+			$groupSeries['singleCostValue']['data'][] = 0;
+		}
+	}
+}
+
+unset($groupSeries['totalCostValue']);
 
 $groupSeries[$totalSeries['name']] = $totalSeries;
 $statusUsersNames = array_values(ArrayHelper::getColumn($userCounts, 'name'));
@@ -116,7 +213,6 @@ JS;
 $this->registerJs($js, View::POS_HEAD);
 
 foreach ($groupSeries as $group) {
-	//var_dump($group);
 	$count = $searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_DISABLE
 		? count($group['data'])
 		: array_sum($group['data']);
@@ -132,7 +228,57 @@ foreach ($groupSeries as $group) {
 		],
 	];
 }
+$yaxis = [];
+if ($hasCosts) {
+	$leadsSeriesNames = ArrayHelper::getColumn($groupSeries, 'name');
+	$notLeadsSeriesNames = ['totalCostValue', 'singleCostValue'];
+	foreach ($notLeadsSeriesNames as $notLeadsSeriesName) {
+		unset($leadsSeriesNames[$notLeadsSeriesName]);
+	}
+	$yaxis = [
 
+		[
+			'seriesName' => array_values($leadsSeriesNames),
+			'title' => [
+				'text' => Yii::t('lead', 'Leads'),
+			],
+			'decimalsInFloat' => 0,
+			'labels' => [
+				'formatter' => new JsExpression('function (val) { return val.toString();}'),
+			],
+		],
+		[
+			'opposite' => true,
+			'seriesName' => [
+				//	Yii::t('lead', 'Total Costs Value'),
+				Yii::t('lead', 'Single Costs Value'),
+			],
+			'title' => [
+				'text' => Yii::t('lead', 'Single Costs Value'),
+			],
+			'decimalsInFloat' => 0,
+			'labels' => [
+				'formatter' => new JsExpression('function (val) { return val.toString() + " zł";}'),
+			],
+		],
+
+	];
+
+	$totalCostData = [];
+	$allTotalCosts = 0;
+	$usersCostData = [];
+	foreach ($userCounts as $user) {
+		$allTotalCosts += $user['totalLeadsCostValue'];
+	}
+	foreach ($userCounts as $userId => $userData) {
+		$value = round($userData['totalLeadsCostValue']);
+		if ($value) {
+			$totalCostData['data'][] = $value;
+			$totalCostData['labels'][] = $usersNames[$userId];
+		}
+	}
+	$totalCostData['totalValue'] = $allTotalCosts;
+}
 ?>
 
 <div class="user-status-charts">
@@ -157,14 +303,15 @@ foreach ($groupSeries as $group) {
 				],
 				'options' => [
 					'stroke' => [
-						'show' => false,
-						'width' => 0,
-						//	'curve' => 'smooth',
+						'width' => ArrayHelper::getColumn($groupSeries, 'strokeWidth', false),
+						'curve' => 'straight',
+						'curve' => 'smooth',
+						//		'curve' => 'stepline',
 					],
-					'markers' => [
-						'size' => 10,
-						'shape' => 'rect',
-					],
+					//					'markers' => [
+					//						'size' => 10,
+					//						'shape' => 'rect',
+					//					],
 					//					'dataLabels' => [
 					//						'enabled' => false,
 					//					],
@@ -179,15 +326,21 @@ foreach ($groupSeries as $group) {
 							'rotate' => -45,
 						],
 					],
-					'yaxis' => [
-						//	'max' => 200,
-						//	'logarithmic' => true,
-					],
+					'yaxis' => $yaxis,
 					'tooltip' => [
 						'shared' => true,
 						'fixed' => [
 							'enabled' => true,
 							'position' => 'bottomRight',
+						],
+						'y' => [
+							//	'formatter' => new JsExpression('function (val) { return val.toString() + "dasda";}'),
+							'title' => [
+								'formatter' =>
+									new JsExpression('function (seriesName,x,y,z) { 
+								//	console.log(x, y, z);
+									return seriesName;}'),
+							],
 						],
 					],
 				],
@@ -209,7 +362,7 @@ foreach ($groupSeries as $group) {
 
 				<?= ChartsWidget::widget([
 					'id' => 'donut-leads-users-count',
-					'type' => ChartsWidget::TYPE_PIE,
+					'type' => ChartsWidget::TYPE_DONUT,
 					'legendFormatterAsSeriesWithCount' => true,
 					'series' => $totalSeries['data'],
 					'chart' => [
@@ -226,26 +379,22 @@ foreach ($groupSeries as $group) {
 							'show' => false,
 							//	'floating' => true,
 							'position' => 'bottom',
-							'height' => 120,
-							//	'width' => '100',
+							'height' => 120,//	'width' => '100',
 						],
-
-						//						'plotOptions' => [
-						//							'pie' => [
-						//								//	'customScale' => 2,
-						//								'donut' => [
-						//									//	'size' => '80%',
-						//									'labels' => [
-						//										'show' => true,
-						//										'total' => [
-						//											'show' => true,
-						//											'showAlways' => true,
-						//											'label' => Yii::t('common', 'Sum'),
-						//										],
-						//									],
-						//								],
-						//							],
-						//						],
+						'plotOptions' => [
+							'pie' => [
+								'donut' => [
+									'labels' => [
+										'show' => true,
+										'total' => [
+											'show' => true,
+											'showAlways' => true,
+											'label' => Yii::t('common', 'Sum'),
+										],
+									],
+								],
+							],
+						],
 					],
 				])
 				?>
@@ -257,5 +406,55 @@ foreach ($groupSeries as $group) {
 
 	<div class="clearfix"></div>
 
+	<div class="row">
+
+		<div class="col-md-8">
+			<?= ChartsWidget::widget([
+				'series' => array_values($costsUsersData),
+				'type' => ChartsWidget::TYPE_BAR,
+				'options' => [
+					'xaxis' => [
+						'type' => 'category',
+					],
+				],
+			]) ?>
+		</div>
+		<div class="col-md-4">
+
+			<?= ChartsWidget::widget([
+				'id' => 'donut-leads-users-total-cost',
+				'type' => ChartsWidget::TYPE_DONUT,
+				'series' => $totalCostData['data'],
+				'options' => [
+					'title' => [
+						'text' => Yii::t('lead', 'Leads Total Cost'),
+						'align' => 'center',
+					],
+					'labels' => array_values($totalCostData['labels']),
+					'legend' => [
+						'position' => 'bottom',
+						'height' => '55',
+					],
+					'plotOptions' => [
+						'pie' => [
+							'donut' => [
+								'labels' => [
+									'show' => true,
+									'total' => [
+										'show' => true,
+										'showAlways' => true,
+										'label' => Yii::t('common', 'Sum'),
+									],
+								],
+							],
+						],
+					],
+				],
+				'legendFormatterAsSeriesWithCount' => true,
+
+			])
+			?>
+		</div>
+	</div>
 
 </div>

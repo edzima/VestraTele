@@ -4,6 +4,7 @@ namespace common\modules\lead;
 
 use Closure;
 use common\models\user\User;
+use common\modules\lead\components\CostComponent;
 use common\modules\lead\components\LeadDialerManager;
 use common\modules\lead\components\LeadManager;
 use common\modules\lead\components\MarketManager;
@@ -44,6 +45,10 @@ class Module extends BaseModule implements BootstrapInterface {
 
 	protected $manager = [
 		'class' => LeadManager::class,
+	];
+
+	protected $cost = [
+		'class' => CostComponent::class,
 	];
 
 	public function init(): void {
@@ -90,6 +95,13 @@ class Module extends BaseModule implements BootstrapInterface {
 			$this->manager = Instance::ensure($this->manager, LeadManager::class);
 		}
 		return $this->manager;
+	}
+
+	public function getCost(): CostComponent {
+		if (!is_object($this->cost)) {
+			$this->cost = Instance::ensure($this->cost, CostComponent::class);
+		}
+		return $this->cost;
 	}
 
 	public function bootstrap($app) {

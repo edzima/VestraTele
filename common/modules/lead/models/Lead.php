@@ -34,6 +34,7 @@ use yii\helpers\Json;
  * @property string|null $email
  * @property int|null $campaign_id
  * @property string|null $deadline_at
+ * @property float|null $cost_value
  *
  * @property-read LeadUserInterface|null $owner
  * @property-read LeadCampaign|null $campaign
@@ -500,18 +501,6 @@ class Lead extends ActiveRecord implements ActiveLead {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(static::class, ['email' => 'email'])
 			->indexBy('id');
-	}
-
-	public function getCostValue(): ?float {
-		$costs = $this->costs;
-		if (empty($costs)) {
-			return null;
-		}
-		$sum = 0;
-		foreach ($costs as $cost) {
-			$sum += $cost->getSingleLeadCostValue();
-		}
-		return $sum;
 	}
 
 	public static function expressionDateAtAsDate(): Expression {

@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models;
 
+use common\modules\lead\models\query\LeadCostQuery;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -25,6 +26,7 @@ class LeadCost extends ActiveRecord {
 
 	public $leads_count;
 	public $single_lead_cost_value;
+	public ?string $leads_ids;
 
 	public function behaviors(): array {
 		return array_merge(parent::behaviors(), [
@@ -88,7 +90,7 @@ class LeadCost extends ActiveRecord {
 
 	public function getSingleLeadCostValue(): ?float {
 		if ($this->value && $this->getLeadsCount()) {
-			return $this->value / count($this->leads);
+			return $this->value / $this->getLeadsCount();
 		}
 		return null;
 	}
@@ -109,9 +111,15 @@ class LeadCost extends ActiveRecord {
 		]);
 	}
 
-	public function getLeadsCount(): int {
-		//@todo maybe internal cache for them
-		return count($this->leads);
+	public function getLeadsCount(bool $refresh = false): int {
+		if ($this->leads_count === null || $refresh) {
+			$this->leads_count = $this->getLeads()->count();
+		}
+		return $this->leads_count;
+	}
+
+	public function getLeadsIds(): array {
+		return explode(',', $this->leads_ids);
 	}
 
 	public static function batchUpsert(array $columns, array $rows): int {
@@ -123,4 +131,21 @@ class LeadCost extends ActiveRecord {
 		$command->setSql($sql);
 		return $command->execute();
 	}
+
+	public static function find(): LeadCostQuery {
+		return new LeadCostQuery(static::class);
+	}
+
+	public static function findWithLeads() {
+		return static::find()
+			->joinWith('leads', false)
+			->addSelect([
+				static::tableName() . '.*',
+				new Expression('COUNT(' . Lead::tableName() . '.id) as leads_count'),
+				new Expression(static::tableName() . '.value / ' . 'count( ' . Lead::tableName() . '.id) as single_lead_cost_value'),
+				new Expression('GROUP_CONCAT(' . Lead::tableName() . '.id) AS leads_ids'),
+			])
+			->groupBy([static::tableName() . '.id']);
+	}
+
 }

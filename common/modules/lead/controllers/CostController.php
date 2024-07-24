@@ -92,6 +92,20 @@ class CostController extends BaseController {
 		]);
 	}
 
+	public function actionRecalculate(int $id) {
+		$model = $this->findModel($id);
+		$cost = $this->module->getCost();
+		if ($cost->recalculate($model->campaign_id, $model->date_at)) {
+			Flash::add(Flash::TYPE_INFO, Yii::t('lead', 'Recalculate Leads cost.'));
+		}
+		return $this->redirect(['view', 'id' => $id]);
+	}
+
+	public function actionRecalculateAll() {
+		$cost = $this->module->getCost();
+		return $this->asJson($cost->recalculateAllMissing());
+	}
+
 	/**
 	 * Creates a new LeadCost model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.

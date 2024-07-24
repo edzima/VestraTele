@@ -48,11 +48,12 @@ $this->params['breadcrumbs'][] = $this->title;
 			'date_at:date',
 			'created_at:datetime',
 			'updated_at:datetime',
-			[
-				'value' => function (LeadCost $data): int {
-					return count($data->leads);
-				},
-			],
+			//'leads_ids',
+			//			[
+			//				'value' => function (LeadCost $data): int {
+			//					return count($data->leads);
+			//				},
+			//			],
 			[
 				'class' => ActionColumn::class,
 				'urlCreator' => function ($action, LeadCost $model, $key, $index, $column) {

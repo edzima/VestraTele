@@ -13,7 +13,7 @@ use yii\web\JsExpression;
 /* @var $searchModel LeadChartSearch */
 
 $this->title = Yii::t('lead', 'Leads');
-if (is_array($searchModel->user_id) && count($searchModel->user_id) === 1) {
+if (!empty($searchModel->user_id) && count((array) $searchModel->user_id) === 1) {
 	$userId = $searchModel->user_id[array_key_first($searchModel->user_id)];
 	$this->title .= ' - ' . $searchModel::getUsersNames()[$userId];
 }
@@ -196,7 +196,7 @@ if (count($providersData) > 1) {
 	]) ?>
 	<div class="lead-charts">
 
-		<?= (count((array) $searchModel->user_id) !== 1)
+		<?= (empty($searchModel->user_id) || count((array) $searchModel->user_id) !== 1)
 			? $this->render('_user-status-charts', [
 				'searchModel' => $searchModel,
 			]) : '' ?>

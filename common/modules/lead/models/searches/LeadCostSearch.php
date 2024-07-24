@@ -3,9 +3,9 @@
 namespace common\modules\lead\models\searches;
 
 use common\helpers\ArrayHelper;
-use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadCost;
+use common\modules\lead\models\query\LeadCostQuery;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -70,12 +70,8 @@ class LeadCostSearch extends LeadCost {
 	 * @return ActiveDataProvider
 	 */
 	public function search(array $params) {
-		$query = LeadCost::find();
-
-		//	$query->with('leads');
-//		$query->joinWith('leads');
-//		$query->groupBy(LeadCost::tableName() . '.id');
-		// add conditions that should always apply here
+		$query = LeadCost::find()
+			->withLeadsCount();
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -152,10 +148,9 @@ class LeadCostSearch extends LeadCost {
 		}
 	}
 
-	private function applyWithoutLeadFilter(ActiveQuery $query): void {
+	private function applyWithoutLeadFilter(LeadCostQuery $query): void {
 		if ($this->withoutLeads) {
-			$query->joinWith('leads');
-			$query->andWhere([Lead::tableName() . '.id' => null]);
+			$query->withoutLeads();
 		}
 	}
 
