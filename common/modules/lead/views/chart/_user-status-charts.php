@@ -424,38 +424,41 @@ if ($hasCosts) {
 		</div>
 		<div class="col-md-4">
 
-			<?= ChartsWidget::widget([
-				'id' => 'donut-leads-users-total-cost',
-				'type' => ChartsWidget::TYPE_DONUT,
-				'series' => $totalCostData['data'],
-				'options' => [
-					'title' => [
-						'text' => Yii::t('lead', 'Leads Total Cost'),
-						'align' => 'center',
-					],
-					'labels' => array_values($totalCostData['labels']),
-					'legend' => [
-						'position' => 'bottom',
-						'height' => '55',
-					],
-					'plotOptions' => [
-						'pie' => [
-							'donut' => [
-								'labels' => [
-									'show' => true,
-									'total' => [
+			<?= empty($totalCostData)
+				?
+				ChartsWidget::widget([
+					'id' => 'donut-leads-users-total-cost',
+					'type' => ChartsWidget::TYPE_DONUT,
+					'series' => $totalCostData['data'],
+					'options' => [
+						'title' => [
+							'text' => Yii::t('lead', 'Leads Total Cost'),
+							'align' => 'center',
+						],
+						'labels' => array_values($totalCostData['labels']),
+						'legend' => [
+							'position' => 'bottom',
+							'height' => '55',
+						],
+						'plotOptions' => [
+							'pie' => [
+								'donut' => [
+									'labels' => [
 										'show' => true,
-										'showAlways' => true,
-										'label' => Yii::t('common', 'Sum'),
+										'total' => [
+											'show' => true,
+											'showAlways' => true,
+											'label' => Yii::t('common', 'Sum'),
+										],
 									],
 								],
 							],
 						],
 					],
-				],
-				'legendFormatterAsSeriesWithCount' => true,
+					'legendFormatterAsSeriesWithCount' => true,
 
-			])
+				])
+				: ''
 			?>
 		</div>
 	</div>
