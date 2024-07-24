@@ -195,10 +195,13 @@ class LeadChartSearch extends LeadSearch {
 			LeadUser::tableName() . '.user_id',
 			Lead::tableName() . '.status_id',
 			'count(*) as count',
+			'count(' . Lead::tableName() . '.cost_value) as costCount',
+			'SUM(' . Lead::tableName() . '.cost_value) as costValue',
 		]);
 		$query->groupBy([
 			LeadUser::tableName() . '.user_id',
 			Lead::tableName() . '.status_id',
+			Lead::tableName() . '.campaign_id',
 		]);
 		$query->distinct();
 		$query->asArray();

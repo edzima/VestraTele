@@ -1,6 +1,7 @@
 <?php
 
 use common\modules\lead\models\LeadCost;
+use common\modules\lead\widgets\LeadStatusChart;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
@@ -22,6 +23,9 @@ YiiAsset::register($this);
 
 	<p>
 		<?= Html::a(Yii::t('lead', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+
+		<?= Html::a(Yii::t('lead', 'Recalculate'), ['recalculate', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+
 		<?= Html::a(Yii::t('lead', 'Delete'), ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',
 			'data' => [
@@ -45,19 +49,25 @@ YiiAsset::register($this);
 					'updated_at:datetime',
 				],
 			]) ?>
+
+			<?= LeadStatusChart::widget([
+				'query' => $model->getLeads(),
+			]) ?>
+
 		</div>
 
-		<div class="row">
+		<div class="col-md-6">
+
 			<?= GridView::widget([
 				'dataProvider' => new ActiveDataProvider([
-					'query' => $model->getLeads()
-						->with('costs'),
+					'query' => $model->getLeads(),
 				]),
 				'columns' => [
 					'sourceName',
 					'name',
 					'date_at',
-					'costValue:currency',
+					'cost_value:currency',
+					'statusName',
 				],
 			]) ?>
 		</div>

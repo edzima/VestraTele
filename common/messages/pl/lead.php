@@ -497,4 +497,5 @@ return [
 	'Provider Count' => 'Dostawca',
 	'Without Campaign' => 'Brak',
 	'Hours' => 'Godziny',
+	'Single Costs Value' => 'Koszt',
 ];
