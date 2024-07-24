@@ -93,6 +93,7 @@ foreach ($userCounts as $userId => $data) {
 				$costsUsersData[$statusId] = [
 					'name' => LeadStatus::getNames()[$statusId],
 					'data' => [],
+					'color' => $searchModel->getLeadStatusColor()->getStatusColorById($statusId),
 				];
 			}
 			$count = $costValue['count'];
