@@ -105,7 +105,6 @@ foreach ($userCounts as $userId => $data) {
 	}
 }
 
-
 $groupSeries = [];
 
 foreach ($groupsOrStatuses as $groupOrId => $group) {
@@ -148,7 +147,6 @@ $hasCosts = !empty(array_filter($userCounts, function (array $data): bool {
 	return !empty($data['totalLeadsCostValue']);
 }));
 
-$hasCosts = true;
 if ($hasCosts) {
 	$groupSeries['totalCostValue'] = [
 		'name' => Yii::t('lead', 'Total Costs Value'),
@@ -270,7 +268,9 @@ if ($hasCosts) {
 	foreach ($userCounts as $user) {
 		$allTotalCosts += $user['totalLeadsCostValue'];
 	}
+	$i = 0;
 	foreach ($userCounts as $userId => $userData) {
+		$i++;
 		$value = round($userData['totalLeadsCostValue']);
 		if ($value) {
 			$totalCostData['data'][] = $value;
@@ -287,64 +287,65 @@ if ($hasCosts) {
 	<div class="row">
 
 		<div class="col-sm-12 col-md-8">
-			<?= ChartsWidget::widget([
-				'id' => 'line-leads-users-count',
-				'type' => ChartsWidget::TYPE_LINE,
-				'series' => array_values($groupSeries),
-				'height' => '520px',
-				'chart' => [
-					'stacked' => true,
+			<?= !empty($group) ?
+				ChartsWidget::widget([
 					'id' => 'line-leads-users-count',
-					'group' => 'users',
-					'zoom' => [
-						'enabled' => true,
-						'type' => 'x',
-					],
-				],
-				'options' => [
-					'stroke' => [
-						'width' => ArrayHelper::getColumn($groupSeries, 'strokeWidth', false),
-						'curve' => 'straight',
-						'curve' => 'smooth',
-						//		'curve' => 'stepline',
-					],
-					//					'markers' => [
-					//						'size' => 10,
-					//						'shape' => 'rect',
-					//					],
-					//					'dataLabels' => [
-					//						'enabled' => false,
-					//					],
-					'plotOptions' => [
-						'bar' => [
-							'horizontal' => false,
-						],
-					],
-					'xaxis' => [
-						'categories' => $statusUsersNames,
-						'labels' => [
-							'rotate' => -45,
-						],
-					],
-					'yaxis' => $yaxis,
-					'tooltip' => [
-						'shared' => true,
-						'fixed' => [
+					'type' => ChartsWidget::TYPE_LINE,
+					'series' => array_values($groupSeries),
+					'height' => '520px',
+					'chart' => [
+						'stacked' => true,
+						'id' => 'line-leads-users-count',
+						'group' => 'users',
+						'zoom' => [
 							'enabled' => true,
-							'position' => 'bottomRight',
+							'type' => 'x',
 						],
-						'y' => [
-							//	'formatter' => new JsExpression('function (val) { return val.toString() + "dasda";}'),
-							'title' => [
-								'formatter' =>
-									new JsExpression('function (seriesName,x,y,z) { 
+					],
+					'options' => [
+						'stroke' => [
+							'width' => ArrayHelper::getColumn($groupSeries, 'strokeWidth', false),
+							'curve' => 'straight',
+							'curve' => 'smooth',
+							//		'curve' => 'stepline',
+						],
+						//					'markers' => [
+						//						'size' => 10,
+						//						'shape' => 'rect',
+						//					],
+						//					'dataLabels' => [
+						//						'enabled' => false,
+						//					],
+						'plotOptions' => [
+							'bar' => [
+								'horizontal' => false,
+							],
+						],
+						'xaxis' => [
+							'categories' => $statusUsersNames,
+							'labels' => [
+								'rotate' => -45,
+							],
+						],
+						'yaxis' => $yaxis,
+						'tooltip' => [
+							'shared' => true,
+							'fixed' => [
+								'enabled' => true,
+								'position' => 'bottomRight',
+							],
+							'y' => [
+								//	'formatter' => new JsExpression('function (val) { return val.toString() + "dasda";}'),
+								'title' => [
+									'formatter' =>
+										new JsExpression('function (seriesName,x,y,z) { 
 								//	console.log(x, y, z);
 									return seriesName;}'),
+								],
 							],
 						],
 					],
-				],
-			]) ?>
+				]) : '' ?>
 		</div>
 
 		<?php if (!empty($totalSeries)): ?>
@@ -409,15 +410,17 @@ if ($hasCosts) {
 	<div class="row">
 
 		<div class="col-md-8">
-			<?= ChartsWidget::widget([
-				'series' => array_values($costsUsersData),
-				'type' => ChartsWidget::TYPE_BAR,
-				'options' => [
-					'xaxis' => [
-						'type' => 'category',
+			<?= !empty($costsUsersData)
+				? ChartsWidget::widget([
+					'series' => array_values($costsUsersData),
+					'type' => ChartsWidget::TYPE_BAR,
+					'options' => [
+						'xaxis' => [
+							'type' => 'category',
+						],
 					],
-				],
-			]) ?>
+				])
+				: '' ?>
 		</div>
 		<div class="col-md-4">
 
