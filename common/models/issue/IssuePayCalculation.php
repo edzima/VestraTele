@@ -480,7 +480,8 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 			static::TYPE_INTEREST => Yii::t('settlement', 'Interest'),
 			static::TYPE_COST_REFUND_SELF => Yii::t('settlement', 'Cost Refund: Company'),
 			static::TYPE_COST_REFUND_LEGAL_REPRESANTION => Yii::t('settlement', 'Cost Refund: Legal represantion'),
-
+			static::TYPE_VAT => Yii::t('settlement', 'VAT'),
+			static::TYPE_EQUITY => Yii::t('settlement', 'Equity'),
 		];
 	}
 

@@ -185,4 +185,6 @@ return [
 	'Total Sum: {value}' => 'Suma Całość: {value}',
 	'Appearance of Lawyer' => 'Stawiennictwo Adwokata',
 	'Court expert' => 'Biegły',
+	'Equity' => 'Udział własny',
+	'VAT' => 'VAT',
 ];

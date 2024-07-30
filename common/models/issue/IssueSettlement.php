@@ -29,6 +29,8 @@ interface IssueSettlement extends IssueInterface, SettlementInterface {
 	public const TYPE_COST_REFUND_SELF = 150;
 	public const TYPE_COST_REFUND_LEGAL_REPRESANTION = 151;
 
+	public const TYPE_EQUITY = 200;
+	public const TYPE_VAT = 250;
 	public const PROVIDER_CLIENT = 1;
 	public const PROVIDER_RESPONSIBLE_ENTITY = 10;
 
