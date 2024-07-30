@@ -47,6 +47,13 @@ class CostController extends BaseController {
 					Flash::add(Flash::TYPE_SUCCESS,
 						Yii::t('lead', 'Success import Costs: {count}.', ['count' => $count])
 					);
+					$cost = $this->module->getCost();
+					$leadsCount = $cost->recalculateAllMissing();
+					if ($leadsCount) {
+						Flash::add(Flash::TYPE_INFO,
+							Yii::t('lead', 'Success recalculate Leads Costs: {count}.', ['count' => $leadsCount])
+						);
+					}
 				} elseif ($count === 0) {
 					Flash::add(Flash::TYPE_INFO,
 						Yii::t('lead', 'No new data to record.',)
