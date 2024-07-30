@@ -173,9 +173,15 @@ JS;
 		);
 	}
 
+
 	public static function legendFormaterSeriesNameWithCount(): JsExpression {
 		return new JsExpression(
-			'function(seriesName, opts){ return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]];}'
+			'function(seriesName, opts){ 
+			return [
+			seriesName,
+			 " - ",
+			  opts.w.globals.series[opts.seriesIndex]
+			  ];}'
 		);
 	}
 

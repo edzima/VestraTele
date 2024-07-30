@@ -151,6 +151,11 @@ $usersNames = LeadChartSearch::getUsersNames();
 			: ''
 		?>
 
+		<?= Yii::$app->user->can(User::PERMISSION_LEAD_COST)
+			? $form->field($model, 'onlyWithCosts', ['options' => ['class' => 'col-md-1']])->checkbox()
+			: ''
+		?>
+
 		<?php if ($model->scenario !== LeadChartSearch::SCENARIO_USER): ?>
 
 			<?= $form->field($model, 'user_id', ['options' => ['class' => 'col-md-3 col-lg-2']])->widget(Select2::class, [

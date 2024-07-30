@@ -232,6 +232,7 @@ class LeadChartSearch extends LeadSearch {
 		$this->applyFromMarketFilter($query);
 		$this->applyReportStatusFilter($query);
 		$this->applyTypeFilter($query);
+		$this->applyOnlyWithCosts($query);
 	}
 
 	public function getUniqueId(): string {
