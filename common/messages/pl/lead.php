@@ -498,4 +498,10 @@ return [
 	'Without Campaign' => 'Brak',
 	'Hours' => 'Godziny',
 	'Single Costs Value' => 'Koszt',
+	'Leads Total Cost' => 'Suma Kosztów',
+	'AVG' => 'Średnia',
+	'Leads Users Costs' => 'Koszt Leada',
+	'Success import Costs: {count}.' => 'Zaimportowano Koszty: {count}.',
+	'Success recalculate Leads Costs: {count}.' => 'Zaktualizowano Koszty Leads: {count}.',
+	'Only with Costs' => 'Tylko z Kosztami',
 ];

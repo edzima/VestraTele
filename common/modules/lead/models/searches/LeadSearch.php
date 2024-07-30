@@ -73,6 +73,8 @@ class LeadSearch extends Lead implements SearchModel {
 	public $reportStatus;
 
 	public $selfUserId;
+
+	public bool $onlyWithCosts = false;
 	private array $questionsAttributes = [];
 
 	private static ?array $QUESTIONS = null;
@@ -111,7 +113,12 @@ class LeadSearch extends Lead implements SearchModel {
 			[['reportStatus', 'hoursAfterLastReport', 'owner_id'], 'integer'],
 			[['!user_id'], 'required', 'on' => static::SCENARIO_USER],
 			[['!user_id'], 'integer', 'on' => static::SCENARIO_USER],
-			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress', 'onlyWithEmail', 'onlyWithPhone'], 'boolean'],
+			[
+				[
+					'fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone',
+					'duplicateEmail', 'withAddress', 'onlyWithEmail', 'onlyWithPhone', 'onlyWithCosts',
+				], 'boolean',
+			],
 			[['name', 'data'], 'string', 'min' => 3],
 			[['duplicatePhone', 'fromMarket', 'selfUserId', 'onlyWithEmail', 'onlyWithPhone',], 'default', 'value' => null],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'excludedClosedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
@@ -152,6 +159,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'reportStatus' => Yii::t('lead', 'Report Status'),
 				'reportStatusCount' => Yii::t('lead', 'Report Status Count'),
 				'hoursAfterLastReport' => Yii::t('lead', 'Hours after newest Report'),
+				'onlyWithCosts' => Yii::t('lead', 'Only with Costs'),
 			]
 		);
 	}
@@ -263,6 +271,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyDeadlineFilter($query);
 		$this->applyHoursAfterLastReport($query);
 		$this->applyTypeFilter($query);
+		$this->applyOnlyWithCosts($query);
 
 		$this->applyLeadDirectlyFilter($query);
 		// grid filtering conditions
@@ -733,5 +742,11 @@ class LeadSearch extends Lead implements SearchModel {
 			->andFilterWhere(['like', Lead::tableName() . '.data', $this->data])
 			->andFilterWhere(['like', Lead::tableName() . '.email', $this->email])
 			->andFilterWhere(['like', Lead::tableName() . '.postal_code', $this->postal_code]);
+	}
+
+	protected function applyOnlyWithCosts(LeadQuery $query) {
+		if ($this->onlyWithCosts) {
+			$query->andWhere(['IS NOT', Lead::tableName() . '.cost_value', null]);
+		}
 	}
 }
