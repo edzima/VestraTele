@@ -132,6 +132,18 @@ class LeadChartSearch extends LeadSearch {
 		return $data;
 	}
 
+	public function getCampaignCost(): array {
+		$query = $this->getBaseQuery();
+		$query->groupBy(Lead::tableName() . '.campaign_id');
+		$query->select(['SUM(cost_value) as sumCost', 'campaign_id']);
+		$query->asArray();
+		$data = $query->all();
+		$data = ArrayHelper::map($data, 'campaign_id', 'sumCost');
+		$data = array_map('floatval', $data);
+		arsort($data);
+		return $data;
+	}
+
 	public function getLeadStatusesCount(): array {
 		$query = $this->getBaseQuery();
 		$query->groupBy(Lead::tableName() . '.status_id');
@@ -154,6 +166,8 @@ class LeadChartSearch extends LeadSearch {
 		$data = $query->all();
 		$data = ArrayHelper::map($data, 'campaign_id', 'count');
 		$data = array_map('intval', $data);
+		arsort($data);
+
 		return $data;
 	}
 

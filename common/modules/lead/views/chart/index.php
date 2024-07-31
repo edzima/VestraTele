@@ -159,8 +159,11 @@ foreach ($sourcesData as $id => $count) {
 
 $campaignsData = $searchModel->getLeadCampaignsCount();
 if (count($campaignsData) > 1) {
+	$campaignsCostData = $searchModel->getCampaignCost();
+
 	$campaigns = LeadCampaign::find()
 		->andWhere(['id' => array_keys($campaignsData)])
+		->with('parent.parent')
 		->indexBy('id')
 		->all();
 	foreach ($campaignsData as $id => $count) {
@@ -172,6 +175,19 @@ if (count($campaignsData) > 1) {
 		}
 		$campaignsData['series'][] = $count;
 		$campaignsData['labels'][] = $name;
+		$campaignsData['costSeries'][] = $campaignsCostData[$id] ?? 0;
+	}
+
+	$campaignsCostData = $searchModel->getCampaignCost();
+	foreach ($campaignsCostData as $id => $costValue) {
+		if (empty($id)) {
+			$name = Yii::t('lead', 'Without Campaign');
+		} else {
+			$campaign = $campaigns[$id];
+			$name = $campaign->getFullname();
+		}
+		$campaignsCostData['series'][] = $costValue;
+		$campaignsCostData['labels'][] = $name;
 	}
 }
 
@@ -384,6 +400,7 @@ if (count($providersData) > 1) {
 				: ''
 			?>
 
+
 			<?= !empty($sourcesData) ?
 				ChartsWidget::widget([
 					'type' => ChartsWidget::TYPE_DONUT,
@@ -443,6 +460,105 @@ if (count($providersData) > 1) {
 						'labels' => $campaignsData['labels'],
 						'title' => [
 							'text' => Yii::t('lead', 'Campaigns Count'),
+							'align' => 'center',
+						],
+						'legend' => [
+							'position' => 'bottom',
+							'height' => '55',
+						],
+						'plotOptions' => [
+							'pie' => [
+								'donut' => [
+									'labels' => [
+										'show' => true,
+										'total' => [
+											'show' => true,
+											'showAlways' => true,
+											'label' => Yii::t('common', 'Sum'),
+										],
+									],
+								],
+							],
+						],
+					],
+				])
+				: ''
+			?>
+
+
+			<div class="col-md-12">
+				<?= isset($campaignsData['series']) ?
+					ChartsWidget::widget([
+						'type' => ChartsWidget::TYPE_LINE,
+						'height' => 420,
+						'series' => [
+							[
+								'name' => Yii::t('lead', 'Costs'),
+								'data' => $campaignsData['costSeries'],
+								'type' => ChartsWidget::TYPE_LINE,
+							],
+							[
+								'name' => Yii::t('lead', 'Leads'),
+								'type' => ChartsWidget::TYPE_COLUMN,
+								'data' => $campaignsData['series'],
+							],
+
+						],
+						'options' => [
+							'labels' => $campaignsData['labels'],
+
+							'stroke' => [
+								'width' => [3, 0],
+							],
+							'xaxis' =>
+								[
+									'type' => 'category',
+								],
+							'yaxis' => [
+								[
+									'min' => 0,
+									'seriesName' => Yii::t('lead', 'Costs'),
+									'showForNullSeries' => false,
+									'decimalsInFloat' => 0,
+									'title' => [
+										'text' => Yii::t('lead', 'Costs'),
+									],
+								],
+								[
+									'min' => 0,
+									'seriesName' => Yii::t('lead', 'Leads'),
+									'showForNullSeries' => false,
+									'decimalsInFloat' => 0,
+
+									'title' => [
+										'text' => Yii::t('lead', 'Leads'),
+									],
+									'opposite' => true,
+
+								],
+
+							],
+						],
+					])
+					: ''
+				?>
+			</div>
+
+
+			<?= isset($campaignsCostData['series']) ?
+				ChartsWidget::widget([
+					'type' => 'donut',
+					'containerOptions' => [
+						'class' => 'col-sm-12 col-md-6 col-lg-4',
+						//		'style' => ['height' => '50vh',],
+					],
+					'id' => 'chart-leads-campaigns-cost' . $searchModel->getUniqueId(),
+					'legendFormatterAsSeriesWithCount' => true,
+					'series' => $campaignsCostData['series'],
+					'options' => [
+						'labels' => $campaignsCostData['labels'],
+						'title' => [
+							'text' => Yii::t('lead', 'Campaigns Costs'),
 							'align' => 'center',
 						],
 						'legend' => [
