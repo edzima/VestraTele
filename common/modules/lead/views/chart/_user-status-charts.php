@@ -1,11 +1,11 @@
 <?php
 
 use common\helpers\ArrayHelper;
-use common\helpers\Html;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadChartSearch;
 use common\widgets\charts\ChartsWidget;
+use yii\bootstrap\Nav;
 use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\web\View;
@@ -15,6 +15,14 @@ use yii\web\View;
 /* @var $usersNames string[] */
 
 $usersNames = LeadChartSearch::getUsersNames(LeadUser::TYPE_OWNER);
+foreach ($usersNames as &$name) {
+	$names = explode(' ', $name);
+	$shortName = $names[0];
+	if (isset($names[1])) {
+		$shortName .= ' ' . substr($names[1], 0, 1) . '.';
+	}
+	$name = $shortName;
+}
 
 $leadStatusColor = $searchModel->getLeadStatusColor();
 
@@ -50,15 +58,16 @@ foreach ($usersStatusData as $data) {
 
 	if ($searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_DISABLE) {
 		$groupsOrStatuses[$statusId] = LeadStatus::getNames()[$statusId];
-		$userCounts[$userId][$statusId] = $count;
+		$userCounts[$userId]['data'][$statusId] = $count;
+		//$userCounts[$userId][$statusId] = $count;
 	} else {
 		$group = LeadStatus::getModels()[$statusId]->chart_group;
 		if ($group) {
+			$groupsOrStatuses[$group] = $group;
 			if (!isset($userCounts[$userId]['data'][$group])) {
 				$userCounts[$userId]['data'][$group] = 0;
 			}
 			$userCounts[$userId]['data'][$group] += $count;
-			$groupsOrStatuses[$group] = $group;
 		}
 	}
 }
@@ -99,11 +108,10 @@ foreach ($userCounts as $userId => $data) {
 }
 
 $groupSeries = [];
-
 foreach ($groupsOrStatuses as $groupOrId => $group) {
-	if (!isset($groupSeries[$group])) {
+	if (!isset($groupSeries[$groupOrId])) {
 		$color = is_int($groupOrId) ? $leadStatusColor->getStatusColorById($groupOrId) : $leadStatusColor->getStatusColorByGroup($groupOrId);
-		$groupSeries[$group] = [
+		$groupSeries[$groupOrId] = [
 			'name' => $group,
 			'data' => [],
 			'group' => 'status',
@@ -144,9 +152,9 @@ $totalSeries = [
 ];
 foreach ($userCounts as $userId => $data) {
 	$totalSeries['data'][] = $data['count'];
-	foreach ($groupsOrStatuses as $groupId) {
+	foreach ($groupsOrStatuses as $groupId => $name) {
 		if (!isset($data['data'][$groupId])) {
-			$userCounts[$userId]['data'][$groupId] = 0;
+			$userCounts[$userId]['data'][$groupId] = null;
 		}
 	}
 }
@@ -176,6 +184,8 @@ if ($hasCosts) {
 		'data' => [],
 		'color' => '#6600CC',
 		'strokeWidth' => 3,
+		'currencyFormatter' => true,
+		'countAsAvg' => true,
 		'yAxis' => [
 			'opposite' => true,
 			'seriesName' => [
@@ -200,7 +210,7 @@ if ($hasCosts) {
 			foreach ($data['statusCostValue'] as $statusCosts) {
 				$costCount += $statusCosts['count'];
 			}
-			$groupSeries['singleCostValue']['data'][] = $totalCost ? $totalCost / $costCount : 0;
+			$groupSeries['singleCostValue']['data'][] = $totalCost ? round($totalCost / $costCount) : 0;
 		} else {
 			$groupSeries['totalCostValue']['data'][] = 0;
 			$groupSeries['singleCostValue']['data'][] = 0;
@@ -270,10 +280,11 @@ if ($hasCosts) {
 	}
 
 	$costsUsersData['avg'] = [
-		'name' => Yii::t('lead', 'AVG'),
+		'name' => Yii::t('lead', 'Single Costs Value'),
 		'data' => $costAvgData,
 		'type' => 'line',
 		'strokeWidth' => 3,
+		'color' => '#6600CC',
 	];
 }
 unset($groupSeries['totalCostValue']);
@@ -284,46 +295,6 @@ if (!empty($totalSeries['data'])) {
 
 $statusUsersNames = array_values(ArrayHelper::getColumn($userCounts, 'name'));
 
-$jsonGroupSeries = Json::encode($groupSeries);
-$js = <<<JS
-	var lastGroup = '';
-	function changeGroupStatus(groupId, btn){
-		document.querySelectorAll('#nav-status-groups .btn').forEach(function(element){
-			element.classList.remove('active');
-		});
-		btn.classList.add('active');
-		const series = $jsonGroupSeries;
-		if(groupId !== lastGroup){
-			const data = series[groupId].data;
-			if(data){
-				lastGroup = groupId;
-				ApexCharts.exec('donut-leads-users-count', 'updateSeries', data, true);
-				ApexCharts.exec('donut-leads-users-count', 'updateOptions', {title:{
-					text:groupId
-				}}, true);
-			}
-		}
-	}
-JS;
-
-$this->registerJs($js, View::POS_HEAD);
-$groupButtons = [];
-foreach ($groupSeries as $group) {
-	$count = $searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_DISABLE
-		? count($group['data'])
-		: array_sum($group['data']);
-	$groupButtons[] = [
-		'label' => $group['name'] . ' - ' . array_sum($group['data']),
-		'linkOptions' => [
-			'class' => 'btn btn-xs',
-			'style' => [
-				'background-color' => $group['color'],
-				'color' => 'white',
-			],
-			'onclick' => 'changeGroupStatus("' . $group['name'] . '", this);',
-		],
-	];
-}
 $yaxis = [];
 if ($hasCosts) {
 	$leadsSeriesNames = ArrayHelper::getColumn($groupSeries, 'name');
@@ -365,13 +336,157 @@ if ($hasCosts) {
 		$totalCostData['labels'][] = $usersNames[$userId];
 	}
 }
+
+//pie can't have null values
+$pieGroupSeries = $groupSeries;
+foreach ($pieGroupSeries as $index => $serie) {
+	foreach ($serie['data'] as $dataIndex => $value) {
+		if (empty($value)) {
+			$pieGroupSeries[$index]['data'][$dataIndex] = 0;
+		}
+	}
+}
+$jsonGroupSeries = Json::encode($pieGroupSeries);
+$currencyFormatter = (string) ChartsWidget::currencyFormatterExpression();
+$js = <<<JS
+	var lastGroup = '';
+	function changeGroupStatus(groupId, btn){
+		document.querySelectorAll('#nav-status-groups .btn').forEach(function(element){
+			element.classList.remove('active');
+		});
+		btn.classList.add('active');
+		const series = $jsonGroupSeries;
+		const currencyFormatter = $currencyFormatter;
+		
+		if(groupId !== lastGroup){
+			var data = null;
+			var serie = null;
+			for (const [key, value] of Object.entries(series)) {
+				if(value.name === groupId){
+					data = value.data;
+					serie = value;
+					break;
+				}
+			}
+			if(data){
+				ApexCharts.exec('donut-leads-users-count', 'updateSeries', data, true);
+				// if(serie.currencyFormatter){
+				// 	ApexCharts.exec('donut-leads-users-count', 'updateOptions', {
+				// 		dataLabels:{
+				// 			formatter: currencyFormatter,
+				// 		}
+				// 	}, true);
+				// }
+				// else{
+				// 	ApexCharts.exec('donut-leads-users-count', 'updateOptions', {
+				// 		dataLabels:{
+				// 			formatter: function(val){return val.toFixed(1) + '%'}
+				// 		}
+				// 	}, true);
+				// }
+				
+		
+				ApexCharts.exec('donut-leads-users-count', 'updateOptions', {title:{
+					text:groupId
+				}}, true);
+			}
+		}
+	}
+JS;
+
+$this->registerJs($js, View::POS_HEAD);
+$groupButtons = [];
+foreach ($groupSeries as $group) {
+	$name = $group['name'];
+	$count = $searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_DISABLE
+		? count($group['data'])
+		: array_sum($group['data']);
+	if (isset($group['countAsAvg'])) {
+		$count = array_sum($group['data']) / count($group['data']);
+	}
+
+	$count = round($count);
+	if (isset($group['currencyFormatter'])) {
+		$count = Yii::$app->formatter->asCurrency($count);
+	}
+	$label = $name . ' - ' . $count;
+	$groupButtons[] = [
+		'label' => $label,
+		'linkOptions' => [
+			'class' => 'btn btn-sm',
+			'style' => [
+				'background-color' => $group['color'],
+				'color' => 'white',
+			],
+			'onclick' => 'changeGroupStatus("' . $group['name'] . '", this);',
+		],
+	];
+}
 ?>
 
 <div class="user-status-charts">
 
 
+	<p>
+		<?= Nav::widget([
+			'items' => $groupButtons,
+			'options' => ['class' => 'nav-pills'],
+			'id' => 'nav-status-groups',
+		]) ?>
+
+	</p>
+
 	<div class="row">
 
+
+		<?php if (!empty($totalSeries)): ?>
+
+			<div class="col-sm-12 col-md-4">
+
+				<?= !empty($totalSeries['data'])
+					? ChartsWidget::widget([
+						'id' => 'donut-leads-users-count',
+						'type' => ChartsWidget::TYPE_DONUT,
+						'legendFormatterAsSeriesWithCount' => true,
+						'series' => $totalSeries['data'],
+						'chart' => [
+							'id' => 'donut-leads-users-count',
+							'group' => 'users',
+						],
+						'options' => [
+							'labels' => $statusUsersNames,
+							'title' => [
+								'text' => Yii::t('lead', 'Leads Users Count'),
+								'align' => 'center',
+							],
+							'legend' => [
+								'show' => false,
+								//	'floating' => true,
+								'position' => 'bottom',
+								'height' => 120,//	'width' => '100',
+							],
+							'plotOptions' => [
+								'pie' => [
+									'donut' => [
+										'labels' => [
+											'show' => true,
+											'total' => [
+												'show' => true,
+												'showAlways' => true,
+												'label' => Yii::t('common', 'Sum'),
+											],
+										],
+									],
+								],
+							],
+						],
+					])
+					: ''
+				?>
+			</div>
+
+
+		<?php endif; ?>
 		<div class="col-sm-12 col-md-8">
 			<?= !empty($groupSeries) ?
 				ChartsWidget::widget([
@@ -426,63 +541,6 @@ if ($hasCosts) {
 				]) : '' ?>
 		</div>
 
-		<?php if (!empty($totalSeries)): ?>
-
-			<div class="col-sm-12 col-md-4">
-
-				<p>
-					<?php
-					foreach ($groupButtons as $button) {
-						echo Html::button($button['label'], $button['linkOptions']) . ' ';
-					}
-					?>
-				</p>
-
-
-				<?= !empty($totalSeries['data'])
-					? ChartsWidget::widget([
-						'id' => 'donut-leads-users-count',
-						'type' => ChartsWidget::TYPE_DONUT,
-						'legendFormatterAsSeriesWithCount' => true,
-						'series' => $totalSeries['data'],
-						'chart' => [
-							'id' => 'donut-leads-users-count',
-							'group' => 'users',
-						],
-						'options' => [
-							'labels' => $statusUsersNames,
-							'title' => [
-								'text' => Yii::t('lead', 'Leads Users Count'),
-								'align' => 'center',
-							],
-							'legend' => [
-								'show' => false,
-								//	'floating' => true,
-								'position' => 'bottom',
-								'height' => 120,//	'width' => '100',
-							],
-							'plotOptions' => [
-								'pie' => [
-									'donut' => [
-										'labels' => [
-											'show' => true,
-											'total' => [
-												'show' => true,
-												'showAlways' => true,
-												'label' => Yii::t('common', 'Sum'),
-											],
-										],
-									],
-								],
-							],
-						],
-					])
-					: ''
-				?>
-			</div>
-
-
-		<?php endif; ?>
 	</div>
 
 	<div class="clearfix"></div>
@@ -490,7 +548,6 @@ if ($hasCosts) {
 	<div class="row">
 
 		<div class="col-md-8">
-
 
 			<?= !empty($costsUsersData)
 				? ChartsWidget::widget([
@@ -562,6 +619,7 @@ if ($hasCosts) {
 						],
 					],
 					'legendFormatterAsSeriesWithCount' => true,
+					'legendFormatterAsSeriesAsCurrency' => true,
 				])
 				: ''
 			?>

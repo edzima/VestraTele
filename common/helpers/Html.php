@@ -164,7 +164,7 @@ class Html extends BaseHtml {
 		return '#' . implode($hexcolor);
 	}
 
-	public static function dump(array $var, array $options = []): string {
+	public static function dump(mixed $var, array $options = []): string {
 		return static::tag('pre', VarDumper::dumpAsString($var), $options);
 	}
 
