@@ -2,6 +2,7 @@
 
 namespace common\widgets\charts;
 
+use common\assets\CurrencyFormatterAsset;
 use yii\web\AssetBundle;
 
 class ChartsAsset extends AssetBundle {
@@ -10,6 +11,10 @@ class ChartsAsset extends AssetBundle {
 
 	public $js = [
 		'apexcharts',
+	];
+
+	public $depends = [
+		CurrencyFormatterAsset::class,
 	];
 
 }

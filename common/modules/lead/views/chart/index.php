@@ -1,6 +1,7 @@
 <?php
 
 use common\helpers\ArrayHelper;
+use common\models\user\Worker;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
@@ -173,6 +174,7 @@ if (count($campaignsData) > 1) {
 			$campaign = $campaigns[$id];
 			$name = $campaign->getFullname();
 		}
+
 		$campaignsData['series'][] = $count;
 		$campaignsData['labels'][] = $name;
 		$campaignsData['costSeries'][] = $campaignsCostData[$id] ?? 0;
@@ -215,7 +217,16 @@ if (count($providersData) > 1) {
 		<?= (empty($searchModel->user_id) || count((array) $searchModel->user_id) !== 1)
 			? $this->render('_user-status-charts', [
 				'searchModel' => $searchModel,
-			]) : '' ?>
+			])
+			: ''
+		?>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_COST)
+			? $this->render('_cost-charts', [
+				'searchModel' => $searchModel,
+			])
+			: ''
+		?>
 
 		<div class="row">
 			<?= !empty($statusGroupData) && $searchModel->groupedStatusChartType === ChartsWidget::TYPE_RADIAL_BAR ?
@@ -445,47 +456,6 @@ if (count($providersData) > 1) {
 		</div>
 
 		<div class="row">
-
-			<?= isset($campaignsData['series']) ?
-				ChartsWidget::widget([
-					'type' => 'donut',
-					'containerOptions' => [
-						'class' => 'col-sm-12 col-md-6 col-lg-4',
-						//		'style' => ['height' => '50vh',],
-					],
-					'id' => 'chart-leads-campaigns-count' . $searchModel->getUniqueId(),
-					'legendFormatterAsSeriesWithCount' => true,
-					'series' => $campaignsData['series'],
-					'options' => [
-						'labels' => $campaignsData['labels'],
-						'title' => [
-							'text' => Yii::t('lead', 'Campaigns Count'),
-							'align' => 'center',
-						],
-						'legend' => [
-							'position' => 'bottom',
-							'height' => '55',
-						],
-						'plotOptions' => [
-							'pie' => [
-								'donut' => [
-									'labels' => [
-										'show' => true,
-										'total' => [
-											'show' => true,
-											'showAlways' => true,
-											'label' => Yii::t('common', 'Sum'),
-										],
-									],
-								],
-							],
-						],
-					],
-				])
-				: ''
-			?>
-
-
 			<div class="col-md-12">
 				<?= isset($campaignsData['series']) ?
 					ChartsWidget::widget([
@@ -505,6 +475,10 @@ if (count($providersData) > 1) {
 
 						],
 						'options' => [
+							'title' => [
+								'text' => Yii::t('lead', 'Campaigns Costs'),
+								'align' => 'center',
+							],
 							'labels' => $campaignsData['labels'],
 
 							'stroke' => [
@@ -543,46 +517,50 @@ if (count($providersData) > 1) {
 					: ''
 				?>
 			</div>
+		</div>
 
+		<div class="row">
 
-			<?= isset($campaignsCostData['series']) ?
-				ChartsWidget::widget([
-					'type' => 'donut',
-					'containerOptions' => [
-						'class' => 'col-sm-12 col-md-6 col-lg-4',
-						//		'style' => ['height' => '50vh',],
-					],
-					'id' => 'chart-leads-campaigns-cost' . $searchModel->getUniqueId(),
-					'legendFormatterAsSeriesWithCount' => true,
-					'series' => $campaignsCostData['series'],
-					'options' => [
-						'labels' => $campaignsCostData['labels'],
-						'title' => [
-							'text' => Yii::t('lead', 'Campaigns Costs'),
-							'align' => 'center',
-						],
-						'legend' => [
-							'position' => 'bottom',
-							'height' => '55',
-						],
-						'plotOptions' => [
-							'pie' => [
-								'donut' => [
-									'labels' => [
-										'show' => true,
-										'total' => [
-											'show' => true,
-											'showAlways' => true,
-											'label' => Yii::t('common', 'Sum'),
-										],
-									],
-								],
-							],
-						],
-					],
-				])
-				: ''
+			<?php
+			//			isset($campaignsData['series']) ?
+			//				ChartsWidget::widget([
+			//					'type' => 'donut',
+			//					'containerOptions' => [
+			//						'class' => 'col-sm-12 col-md-6 col-lg-4',
+			//						//		'style' => ['height' => '50vh',],
+			//					],
+			//					'id' => 'chart-leads-campaigns-count' . $searchModel->getUniqueId(),
+			//					'legendFormatterAsSeriesWithCount' => true,
+			//					'series' => $campaignsData['series'],
+			//					'options' => [
+			//						'labels' => $campaignsData['labels'],
+			//						'title' => [
+			//							'text' => Yii::t('lead', 'Campaigns Count'),
+			//							'align' => 'center',
+			//						],
+			//						'legend' => [
+			//							'position' => 'bottom',
+			//							'height' => '55',
+			//						],
+			//						'plotOptions' => [
+			//							'pie' => [
+			//								'donut' => [
+			//									'labels' => [
+			//										'show' => true,
+			//										'total' => [
+			//											'show' => true,
+			//											'showAlways' => true,
+			//											'label' => Yii::t('common', 'Sum'),
+			//										],
+			//									],
+			//								],
+			//							],
+			//						],
+			//					],
+			//				])
+			//				: ''
 			?>
+
 
 			<?= isset($providersData['series']) ?
 				ChartsWidget::widget([
@@ -625,7 +603,7 @@ if (count($providersData) > 1) {
 			<?= !empty($hoursChartData)
 				? ChartsWidget::widget([
 					'containerOptions' => [
-						'class' => 'col-sm-12 col-md-6',
+						'class' => 'col-sm-12 col-md-8',
 					],
 					'height' => '350px',
 					'type' => ChartsWidget::TYPE_BAR,
@@ -645,6 +623,48 @@ if (count($providersData) > 1) {
 				])
 				: ''
 			?>
+
+
+			<?php
+
+			//				ChartsWidget::widget([
+			//					'type' => 'donut',
+			//					'containerOptions' => [
+			//						'class' => 'col-sm-12 col-md-6 col-lg-4',
+			//						//		'style' => ['height' => '50vh',],
+			//					],
+			//					'id' => 'chart-leads-campaigns-cost' . $searchModel->getUniqueId(),
+			//					'legendFormatterAsSeriesWithCount' => true,
+			//					'series' => $campaignsCostData['series'],
+			//					'options' => [
+			//						'labels' => $campaignsCostData['labels'],
+			//						'title' => [
+			//							'text' => Yii::t('lead', 'Campaigns Costs'),
+			//							'align' => 'center',
+			//						],
+			//						'legend' => [
+			//							'position' => 'bottom',
+			//							'height' => '55',
+			//						],
+			//						'plotOptions' => [
+			//							'pie' => [
+			//								'donut' => [
+			//									'labels' => [
+			//										'show' => true,
+			//										'total' => [
+			//											'show' => true,
+			//											'showAlways' => true,
+			//											'label' => Yii::t('common', 'Sum'),
+			//										],
+			//									],
+			//								],
+			//							],
+			//						],
+			//					],
+			//				])
+
+			?>
+
 
 		</div>
 

@@ -5,6 +5,7 @@ namespace common\modules\lead\controllers;
 use common\helpers\Flash;
 use common\modules\lead\models\forms\LeadCostForm;
 use common\modules\lead\models\import\FBAdsCostImport;
+use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCost;
 use common\modules\lead\models\searches\LeadCostSearch;
 use Yii;
@@ -108,9 +109,19 @@ class CostController extends BaseController {
 		return $this->redirect(['view', 'id' => $id]);
 	}
 
-	public function actionRecalculateAll() {
+	public function actionRecalculateAll(bool $clear = false) {
+		$before = (int) Lead::find()->andWhere(['IS NOT', 'cost_value', null])->count();
+		if ($clear) {
+			Lead::updateAll([
+				'cost_value' => null,
+			]);
+		}
+
 		$cost = $this->module->getCost();
-		return $this->asJson($cost->recalculateAllMissing());
+		return $this->asJson([
+			'before' => $before,
+			'recalculate' => $cost->recalculateAllMissing(),
+		]);
 	}
 
 	/**

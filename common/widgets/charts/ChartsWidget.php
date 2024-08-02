@@ -33,6 +33,7 @@ class ChartsWidget extends Widget {
 	public int $timeout = 50;
 
 	public bool $legendFormatterAsSeriesWithCount = false;
+	public bool $legendFormatterAsSeriesAsCurrency = false;
 
 	public array $containerOptions = [];
 
@@ -44,7 +45,7 @@ class ChartsWidget extends Widget {
 			$this->chart['locales'][] = $this->getPlLanguageData();
 		}
 		if ($this->legendFormatterAsSeriesWithCount && !isset($this->options['legend']['formatter'])) {
-			$this->options['legend']['formatter'] = static::legendFormaterSeriesNameWithCount();
+			$this->options['legend']['formatter'] = $this->legendFormaterSeriesNameWithCount($this->legendFormatterAsSeriesAsCurrency);
 		}
 		parent::init();
 	}
@@ -154,33 +155,23 @@ JS;
 	}
 
 	public static function currencyFormatterExpression(array $options = [], string $language = null, string $currencyCode = null): JsExpression {
-		if ($language === null) {
-			$language = Yii::$app->formatter->language;
-		}
-		if ($currencyCode === null) {
-			$currencyCode = Yii::$app->formatter->currencyCode;
-		}
-		$options['style'] = 'currency';
-		$options['currency'] = $currencyCode;
-		if (!isset($options['maximumFractionDigits'])) {
-			$options['maximumFractionDigits'] = 0;
-		}
-		$options = Json::encode($options);
 		return new JsExpression("function (value) {
-					  return new Intl.NumberFormat('$language',$options)
-					  		.format(value);
+					  return valueToCurrencyFormat(value);
   					}"
 		);
 	}
 
-
-	public static function legendFormaterSeriesNameWithCount(): JsExpression {
+	public function legendFormaterSeriesNameWithCount(bool $currency = false): JsExpression {
 		return new JsExpression(
 			'function(seriesName, opts){ 
+			var count = opts.w.globals.series[opts.seriesIndex];
+			if(' . Json::encode($currency) . '){
+				count = valueToCurrencyFormat(count);
+			}
 			return [
 			seriesName,
 			 " - ",
-			  opts.w.globals.series[opts.seriesIndex]
+			  count
 			  ];}'
 		);
 	}
