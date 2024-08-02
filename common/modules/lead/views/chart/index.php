@@ -1,7 +1,6 @@
 <?php
 
 use common\helpers\ArrayHelper;
-use common\models\user\Worker;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
@@ -221,12 +220,6 @@ if (count($providersData) > 1) {
 			: ''
 		?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_COST)
-			? $this->render('_cost-charts', [
-				'searchModel' => $searchModel,
-			])
-			: ''
-		?>
 
 		<div class="row">
 			<?= !empty($statusGroupData) && $searchModel->groupedStatusChartType === ChartsWidget::TYPE_RADIAL_BAR ?
