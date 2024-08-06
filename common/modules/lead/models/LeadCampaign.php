@@ -2,6 +2,8 @@
 
 namespace common\modules\lead\models;
 
+use common\models\hierarchy\ActiveHierarchy;
+use common\models\hierarchy\HierarchyActiveModelTrait;
 use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
 use Yii;
@@ -26,7 +28,9 @@ use yii\helpers\ArrayHelper;
  * @property-read LeadCampaign $parent
  * @property-read LeadUserInterface $owner
  */
-class LeadCampaign extends ActiveRecord {
+class LeadCampaign extends ActiveRecord implements ActiveHierarchy {
+
+	use HierarchyActiveModelTrait;
 
 	public const SCENARIO_OWNER = 'owner';
 
@@ -99,6 +103,13 @@ class LeadCampaign extends ActiveRecord {
 		return $this->hasMany(Lead::class, ['campaign_id' => 'id']);
 	}
 
+	public function getLeadWithAllChildes(): LeadQuery {
+		$ids = $this->getAllChildesIds();
+		$ids[] = $this->id;
+		return Lead::find()
+			->andWhere(['campaign_id' => $ids]);
+	}
+
 	public function getParent(): ActiveQuery {
 		return $this->hasOne(static::class, ['id' => 'parent_id']);
 	}
@@ -166,4 +177,17 @@ class LeadCampaign extends ActiveRecord {
 			'campaign_id' => 'id',
 		]);
 	}
+
+	public function getCostsWithAllChildesQuery() {
+		$ids = $this->getAllChildesIds();
+		$ids[] = $this->id;
+		return LeadCost::find()
+			->andWhere([LeadCost::tableName() . '.campaign_id' => $ids]);
+	}
+
+	public function getTotalCostSumValue(bool $withAllChildes = true): float {
+		$query = $withAllChildes ? $this->getCostsWithAllChildesQuery() : $this->getCosts();
+		return (float) $query->sum('value');
+	}
+
 }

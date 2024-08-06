@@ -1,13 +1,14 @@
 <?php
 
+use common\helpers\Html;
 use common\helpers\Url;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\Module;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
+use yii\data\ActiveDataProvider;
 use yii\data\DataProviderInterface;
-use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
@@ -22,6 +23,13 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => [
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Campaigns'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
+
+$totalCostsValue = $model->getTotalCostSumValue();
+$totalLeads = $leadsDataProvider->getTotalCount();
+$singleCostValue = 0;
+if ($totalLeads && $totalCostsValue) {
+	$singleCostValue = $totalCostsValue / $totalLeads;
+}
 ?>
 <div class="lead-campaign-view">
 
@@ -39,50 +47,101 @@ YiiAsset::register($this);
 			]) : '' ?>
 	</p>
 
-	<?= DetailView::widget([
-		'model' => $model,
-		'attributes' => [
-			//	'id',
-			'name',
-			[
-				'attribute' => 'details',
-				'visible' => !empty($model->details),
-			],
-			[
-				'attribute' => 'typeName',
-				'visible' => !empty($model->type),
-			],
-			[
-				'attribute' => 'parent',
-				'value' => function ($model) {
-					return Html::a($model->parent->name, [
-						'view', 'id' => $model->parent_id,
-					]);
-				},
-				'visible' => !empty($model->parent),
-				'label' => $model->parent ? $model->parent->getTypeName() : null,
-			],
-			[
-				'attribute' => 'entity_id',
-				'visible' => !empty($model->entity_id),
-			],
-			[
-				'attribute' => 'url',
-				'format' => 'url',
-				'visible' => !empty($model->url),
-			],
-			[
-				'attribute' => 'owner',
-				'visible' => !empty($model->owner),
-			],
-			[
-				'attribute' => 'sort_index',
-				'visible' => !empty($model->sort_index),
-			],
-			'is_active:boolean',
+	<div class="row">
 
-		],
-	]) ?>
+		<div class="col-md-4">
+			<?= DetailView::widget([
+				'model' => $model,
+				'attributes' => [
+					//	'id',
+					'name',
+					[
+						'attribute' => 'details',
+						'visible' => !empty($model->details),
+					],
+					[
+						'attribute' => 'typeName',
+						'visible' => !empty($model->type),
+					],
+					[
+						'label' => Yii::t('lead', 'Cost'),
+						'value' => $totalCostsValue,
+						'format' => 'currency',
+						'visible' => !empty($totalCostsValue),
+					],
+					[
+						'label' => Yii::t('lead', 'Single Lead cost Value'),
+						'value' => $singleCostValue,
+						'format' => 'currency',
+						'visible' => !empty($singleCostValue),
+					],
+					[
+						'attribute' => 'parent',
+						'value' => function ($model) {
+							return Html::a($model->parent->name, [
+								'view', 'id' => $model->parent_id,
+							]);
+						},
+						'format' => 'html',
+						'visible' => !empty($model->parent),
+						'label' => $model->parent ? $model->parent->getTypeName() : null,
+					],
+					[
+						'attribute' => 'entity_id',
+						'visible' => !empty($model->entity_id),
+					],
+					[
+						'attribute' => 'url',
+						'format' => 'url',
+						'visible' => !empty($model->url),
+					],
+					[
+						'attribute' => 'owner',
+						'visible' => !empty($model->owner),
+					],
+					[
+						'attribute' => 'sort_index',
+						'visible' => !empty($model->sort_index),
+					],
+					'is_active:boolean',
+
+				],
+			]) ?>
+		</div>
+
+		<div class="col-md-6">
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => LeadCampaign::find()
+						->andWhere(['id' => $model->getChildesIds()])
+						->with('leads'),
+				]),
+				'showOnEmpty' => false,
+				'emptyText' => '',
+				'columns' => [
+					[
+						'attribute' => 'name',
+						'format' => 'html',
+						'value' => function (LeadCampaign $data): string {
+							return Html::a($data->name, [
+								'view', 'id' => $data->id,
+							]);
+						},
+					],
+					'typeName',
+					[
+						'attribute' => 'leads',
+						'value' => function (LeadCampaign $data): int {
+							return $data->getLeads()
+								->count();
+						},
+					],
+				],
+			]) ?>
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
 
 
 	<div class="row">
@@ -94,6 +153,8 @@ YiiAsset::register($this);
 					'date_at:date',
 					'value:currency',
 					'leadsCount',
+					'campaign',
+					'campaign.typeName',
 					//		'singleLeadCostValue:currency',
 					[
 						'class' => ActionColumn::class,
@@ -118,7 +179,7 @@ YiiAsset::register($this);
 					'statusName',
 					'sourceName',
 					'date_at:datetime',
-					'costValue:currency',
+					'cost_value:currency',
 				],
 			]) ?>
 		</div>
