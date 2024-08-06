@@ -46,6 +46,8 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public bool $withoutArchives = true;
 
+	public bool $campaignWithChildes = true;
+
 	public $fromMarket;
 
 	public $withAddress;
@@ -109,7 +111,7 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'campaign_id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
+			[['id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
 			[['reportStatus', 'hoursAfterLastReport', 'owner_id'], 'integer'],
 			[['!user_id'], 'required', 'on' => static::SCENARIO_USER],
 			[['!user_id'], 'integer', 'on' => static::SCENARIO_USER],
@@ -117,6 +119,7 @@ class LeadSearch extends Lead implements SearchModel {
 				[
 					'fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone',
 					'duplicateEmail', 'withAddress', 'onlyWithEmail', 'onlyWithPhone', 'onlyWithCosts',
+					'campaignWithChildes',
 				], 'boolean',
 			],
 			[['name', 'data'], 'string', 'min' => 3],
@@ -124,7 +127,7 @@ class LeadSearch extends Lead implements SearchModel {
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'excludedClosedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames()), 'allowArray' => true],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
-			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
+			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames()), 'allowArray' => true],
 			[['selfUserId'], 'in', 'range' => function () { return $this->selfUsersIds(); }, 'allowArray' => true, 'skipOnEmpty' => true],
 			[['status_id', 'excludedStatus', 'reportStatus'], 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
 			['deadlineType', 'in', 'range' => array_keys(static::getDeadlineNames())],
@@ -255,6 +258,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 		$this->applyAddressFilter($query);
 		$this->applyAnswerFilter($query);
+		$this->applyCampaignFilter($query);
 		$this->applyDateFilter($query);
 		$this->applyDuplicates($query);
 		$this->applyFromMarketFilter($query);
@@ -733,7 +737,6 @@ class LeadSearch extends Lead implements SearchModel {
 		$query->andFilterWhere([
 			Lead::tableName() . '.id' => $this->id,
 			Lead::tableName() . '.date_at' => $this->date_at,
-			Lead::tableName() . '.campaign_id' => $this->campaign_id,
 			Lead::tableName() . '.source_id' => $this->source_id,
 			Lead::tableName() . '.provider' => $this->provider,
 		]);
@@ -747,6 +750,22 @@ class LeadSearch extends Lead implements SearchModel {
 	protected function applyOnlyWithCosts(LeadQuery $query) {
 		if ($this->onlyWithCosts) {
 			$query->andWhere(['IS NOT', Lead::tableName() . '.cost_value', null]);
+		}
+	}
+
+	protected function applyCampaignFilter(LeadQuery $query): void {
+		if (!empty($this->campaign_id)) {
+			$ids = [];
+			foreach ($this->campaign_id as $id) {
+				if (!empty($id)) {
+					$ids[] = $id;
+					if ($this->campaignWithChildes) {
+						$ids += LeadCampaign::getHierarchy()->getAllChildesIds($id);
+					}
+				}
+			}
+			$ids = array_unique($ids);
+			$query->andFilterWhere([Lead::tableName() . '.campaign_id' => $ids]);
 		}
 	}
 }
