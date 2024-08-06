@@ -18,7 +18,11 @@ class HierarchyComponent extends Component {
 	/** @var string|ActiveRecord */
 	public $modelClass = User::class;
 
+	public array $treeSelect = [];
+
 	private array $tree = [];
+
+	private array $_parentsData = [];
 
 	public function getModel(int $id): ?ActiveHierarchy {
 		return $this->modelClass::findOne($id);
@@ -70,8 +74,8 @@ class HierarchyComponent extends Component {
 			return [];
 		}
 		$ids = [];
-		array_walk_recursive($selfTree, static function ($item, $key) use (&$ids) {
-			if ($key === 'id') {
+		array_walk_recursive($selfTree, function ($item, $key) use (&$ids) {
+			if ($key === $this->primaryKeyColumn) {
 				$ids[] = $item;
 			}
 		});
@@ -93,18 +97,7 @@ class HierarchyComponent extends Component {
 		return array_keys($this->getTree());
 	}
 
-	public function getParent(int $id): ?int {
-		$model = $this->getModel($id);
-		if ($model) {
-			return $model->getParentId();
-		}
-		return null;
-	}
-
 	public function getParentsIds(int $id): array {
-		if ($this->getParent($id) === null) {
-			return [];
-		}
 		$map = $this->getParentsMap();
 		$ids = [];
 		while (($id = $map[$id] ?? null) !== null) {
@@ -123,13 +116,19 @@ class HierarchyComponent extends Component {
 	}
 
 	private function getParentsData(): array {
-		/** @var ActiveRecord $model */
-		$model = $this->modelClass;
-		return $model::find()
-			->select([$this->primaryKeyColumn, $this->parentColumn])
-			->andWhere($this->parentColumn . ' IS NOT NULL')
-			->asArray()
-			->all();
+		if (empty($this->_parentsData)) {
+			/** @var ActiveRecord $model */
+			$model = $this->modelClass;
+			$select = $this->treeSelect;
+			$select[] = $this->primaryKeyColumn;
+			$select[] = $this->parentColumn;
+			$this->_parentsData = $model::find()
+				->select($select)
+				->andWhere($this->parentColumn . ' IS NOT NULL')
+				->asArray()
+				->all();
+		}
+		return $this->_parentsData;
 	}
 
 	private function buildTree(array $items): array {
