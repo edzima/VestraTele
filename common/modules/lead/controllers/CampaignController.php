@@ -113,7 +113,7 @@ class CampaignController extends BaseController {
 		$model = $this->findModel($id);
 
 		$costQueryDataProvider = new ActiveDataProvider([
-			'query' => $model->getCosts(),
+			'query' => $model->getCostsWithAllChildesQuery(),
 			'sort' => [
 				'defaultOrder' => [
 					'date_at' => SORT_DESC,
@@ -121,8 +121,7 @@ class CampaignController extends BaseController {
 			],
 		]);
 
-
-		$leadsQuery = $model->getLeads();
+		$leadsQuery = $model->getLeadWithAllChildes();
 		if ($this->module->onlyUser) {
 			$leadsQuery->user(Yii::$app->user->getId());
 		}
