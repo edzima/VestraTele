@@ -42,6 +42,7 @@ use kartik\select2\Select2;
 			'pluginOptions' => [
 				'placeholder' => Yii::t('lead', 'Campaign'),
 				'allowClear' => true,
+				'multiple' => true,
 			],
 		]) ?>
 
