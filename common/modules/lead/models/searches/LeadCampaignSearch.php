@@ -31,8 +31,9 @@ class LeadCampaignSearch extends LeadCampaign {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'sort_index', 'owner_id', 'is_active'], 'integer'],
+			[['id', 'sort_index', 'owner_id', 'is_active', 'leads_count'], 'integer'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
+			['cost_value', 'number'],
 			[['name'], 'safe'],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 		];
@@ -56,11 +57,28 @@ class LeadCampaignSearch extends LeadCampaign {
 	public function search(array $params): ActiveDataProvider {
 		$query = LeadCampaign::find();
 
+		$query->joinWith('leads');
+		$query->joinWith('costs c');
+		$query->select([
+			LeadCampaign::tableName() . '.*',
+			'count(lead.id) as leads_count',
+			'sum(c.value) as cost_value',
+		]);
+		$query->groupBy(LeadCampaign::tableName() . '.id');
+
 		// add conditions that should always apply here
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
 		]);
+		$dataProvider->sort->attributes['leads_count'] = [
+			'asc' => ['leads_count' => SORT_ASC],
+			'desc' => ['leads_count' => SORT_DESC],
+		];
+		$dataProvider->sort->attributes['totalCostSumValue'] = [
+			'asc' => ['cost_value' => SORT_ASC],
+			'desc' => ['cost_value' => SORT_DESC],
+		];
 
 		$this->load($params);
 
@@ -71,15 +89,17 @@ class LeadCampaignSearch extends LeadCampaign {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
-			'sort_index' => $this->sort_index,
-			'owner_id' => $this->owner_id,
-			'is_active' => $this->is_active,
-			'type' => $this->type,
-			'details' => $this->details,
+			LeadCampaign::tableName() . '.id' => $this->id,
+			LeadCampaign::tableName() . '.sort_index' => $this->sort_index,
+			LeadCampaign::tableName() . '.owner_id' => $this->owner_id,
+			LeadCampaign::tableName() . '.is_active' => $this->is_active,
+			LeadCampaign::tableName() . '.type' => $this->type,
+			LeadCampaign::tableName() . '.details' => $this->details,
 		]);
 
-		$query->andFilterWhere(['like', 'name', $this->name]);
+		$query->andFilterWhere([
+			'like', LeadCampaign::tableName() . '.name', $this->name,
+		]);
 
 		return $dataProvider;
 	}

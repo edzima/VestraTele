@@ -1,6 +1,7 @@
 <?php
 
 use common\models\user\Worker;
+use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\searches\LeadCampaignSearch;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
@@ -64,6 +65,16 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Campaigns');
 			],
 			'is_active:boolean',
 			'sort_index',
+			[
+				'attribute' => 'totalCostSumValue',
+				'format' => 'currency',
+			],
+			[
+				'attribute' => 'leads_count',
+				'value' => function (LeadCampaign $model) {
+					return $model->getTotalLeadsCount();
+				},
+			],
 			[
 				'class' => ActionColumn::class,
 				'visibleButtons' => $visibleButtons,
