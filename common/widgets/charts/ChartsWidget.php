@@ -12,6 +12,8 @@ class ChartsWidget extends Widget {
 
 	public static $autoIdPrefix = 'c';
 
+	public const TYPE_AREA = 'area';
+
 	public const TYPE_BAR = 'bar';
 	public const TYPE_COLUMN = 'column';
 
