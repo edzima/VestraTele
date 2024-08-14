@@ -41,7 +41,11 @@ YiiAsset::register($this);
 			<?= DetailView::widget([
 				'model' => $model,
 				'attributes' => [
-					'campaign',
+					[
+						'attribute' => 'campaign',
+						'value' => Html::a($model->campaign, ['campaign/view', 'id' => $model->campaign_id]),
+						'format' => 'html',
+					],
 					'value:currency',
 					'singleLeadCostValue:currency',
 					'date_at:date',
@@ -59,9 +63,7 @@ YiiAsset::register($this);
 		<div class="col-md-6">
 
 			<?= GridView::widget([
-				'dataProvider' => new ActiveDataProvider([
-					'query' => $model->getLeads(),
-				]),
+				'dataProvider' => new ActiveDataProvider(['query' => $model->getLeads(),]),
 				'columns' => [
 					'sourceName',
 					'name',

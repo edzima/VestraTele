@@ -1,7 +1,7 @@
 <?php
 
 use common\helpers\Html;
-use common\helpers\Url;
+use common\modules\lead\components\CostComponent;
 use common\modules\lead\models\LeadCost;
 use common\modules\lead\models\searches\LeadCostSearch;
 use common\widgets\grid\ActionColumn;
@@ -10,11 +10,13 @@ use common\widgets\GridView;
 /** @var yii\web\View $this */
 /** @var LeadCostSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var CostComponent $cost */
 
 $this->title = Yii::t('lead', 'Lead Costs');
 $this->params['breadcrumbs'][] = ['url' => ['lead/index'], 'label' => Yii::t('lead', 'Leads')];
 
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="lead-cost-index">
 
@@ -48,17 +50,8 @@ $this->params['breadcrumbs'][] = $this->title;
 			'date_at:date',
 			'created_at:datetime',
 			'updated_at:datetime',
-			//'leads_ids',
-			//			[
-			//				'value' => function (LeadCost $data): int {
-			//					return count($data->leads);
-			//				},
-			//			],
 			[
 				'class' => ActionColumn::class,
-				'urlCreator' => function ($action, LeadCost $model, $key, $index, $column) {
-					return Url::toRoute([$action, 'id' => $model->id]);
-				},
 			],
 		],
 	]); ?>
