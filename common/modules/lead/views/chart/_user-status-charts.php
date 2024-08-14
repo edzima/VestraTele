@@ -184,6 +184,7 @@ if ($hasCosts) {
 		'data' => [],
 		'color' => '#6600CC',
 		'strokeWidth' => 3,
+		'withoutCount' => true,
 		'currencyFormatter' => true,
 		'countAsAvg' => true,
 		'yAxis' => [
@@ -398,22 +399,27 @@ $this->registerJs($js, View::POS_HEAD);
 $groupButtons = [];
 foreach ($groupSeries as $group) {
 	$name = $group['name'];
-	$count = $searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_DISABLE
-		? count($group['data'])
-		: array_sum($group['data']);
-	if (isset($group['countAsAvg'])) {
-		$count = array_sum($group['data']) / count($group['data']);
-	}
 
-	$count = round($count);
-	if (isset($group['currencyFormatter'])) {
-		$count = Yii::$app->formatter->asCurrency($count);
+	if (!isset($group['withoutCount'])) {
+		$count = $searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_DISABLE
+			? count($group['data'])
+			: array_sum($group['data']);
+		if (isset($group['countAsAvg'])) {
+			$count = array_sum($group['data']) / count($group['data']);
+		}
+
+		$count = round($count);
+		if (isset($group['currencyFormatter'])) {
+			$count = Yii::$app->formatter->asCurrency($count);
+		}
+		$label = $name . ' - ' . $count;
+	} else {
+		$label = $name;
 	}
-	$label = $name . ' - ' . $count;
 	$groupButtons[] = [
 		'label' => $label,
 		'linkOptions' => [
-			'class' => 'btn btn-sm',
+			'class' => 'btn btn-sm text-uppercase',
 			'style' => [
 				'background-color' => $group['color'],
 				'color' => 'white',
@@ -491,7 +497,7 @@ foreach ($groupSeries as $group) {
 			<?= !empty($groupSeries) ?
 				ChartsWidget::widget([
 					'id' => 'line-leads-users-count',
-					'type' => ChartsWidget::TYPE_LINE,
+					'type' => ChartsWidget::TYPE_AREA,
 					'series' => array_values($groupSeries),
 					'height' => '520px',
 					'chart' => [
