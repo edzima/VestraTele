@@ -76,7 +76,7 @@ class HierarchyComponent extends Component {
 		$ids = [];
 		array_walk_recursive($selfTree, function ($item, $key) use (&$ids) {
 			if ($key === $this->primaryKeyColumn) {
-				$ids[] = $item;
+				$ids[] = (int) $item;
 			}
 		});
 		return $ids;
