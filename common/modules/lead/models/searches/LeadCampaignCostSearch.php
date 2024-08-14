@@ -107,8 +107,6 @@ class LeadCampaignCostSearch extends Model {
 			]);
 		}
 
-		Yii::warning($count);
-
 		return $query->all();
 	}
 

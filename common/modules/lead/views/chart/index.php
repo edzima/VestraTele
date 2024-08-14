@@ -1,6 +1,7 @@
 <?php
 
 use common\helpers\ArrayHelper;
+use common\modules\lead\components\CostComponent;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
@@ -11,6 +12,9 @@ use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadChartSearch */
+/* @var $cost CostComponent */
+
+$campaigns = $cost->recalculateFromDate($searchModel->from_at, $searchModel->to_at);
 
 $this->title = Yii::t('lead', 'Leads');
 if (!empty($searchModel->user_id) && count((array) $searchModel->user_id) === 1) {
@@ -213,13 +217,12 @@ if (count($providersData) > 1) {
 	]) ?>
 	<div class="lead-charts">
 
-		<?= (empty($searchModel->user_id) || count((array) $searchModel->user_id) !== 1)
+		<?= true || (empty($searchModel->user_id) || count((array) $searchModel->user_id) !== 1)
 			? $this->render('_user-status-charts', [
 				'searchModel' => $searchModel,
 			])
 			: ''
 		?>
-
 
 		<div class="row">
 			<?= !empty($statusGroupData) && $searchModel->groupedStatusChartType === ChartsWidget::TYPE_RADIAL_BAR ?
@@ -450,6 +453,7 @@ if (count($providersData) > 1) {
 
 		<div class="row">
 			<div class="col-md-12">
+
 				<?= isset($campaignsData['series']) ?
 					ChartsWidget::widget([
 						'type' => ChartsWidget::TYPE_LINE,
@@ -476,6 +480,7 @@ if (count($providersData) > 1) {
 
 							'stroke' => [
 								'width' => [3, 0],
+								'curve' => 'smooth',
 							],
 							'xaxis' =>
 								[
