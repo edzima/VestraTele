@@ -6,9 +6,9 @@ use common\helpers\Flash;
 use common\helpers\Url;
 use common\modules\lead\models\forms\LeadCampaignForm;
 use common\modules\lead\models\LeadCampaign;
+use common\modules\lead\models\searches\LeadCampaignCostSearch;
 use common\modules\lead\models\searches\LeadCampaignSearch;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
 
@@ -36,7 +36,7 @@ class CampaignController extends BaseController {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionIndex(string $type = LeadCampaign::TYPE_CAMPAIGN): string {
 		$searchModel = new LeadCampaignSearch();
 		if ($this->module->onlyUser) {
 			if (Yii::$app->user->getIsGuest()) {
@@ -45,6 +45,7 @@ class CampaignController extends BaseController {
 			$searchModel->setScenario(LeadCampaignSearch::SCENARIO_OWNER);
 			$searchModel->owner_id = Yii::$app->user->getId();
 		}
+		$searchModel->type = $type;
 
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -112,33 +113,23 @@ class CampaignController extends BaseController {
 	public function actionView(int $id): string {
 		$model = $this->findModel($id);
 
-		$costQueryDataProvider = new ActiveDataProvider([
-			'query' => $model->getCostsWithAllChildesQuery(),
-			'sort' => [
-				'defaultOrder' => [
-					'date_at' => SORT_DESC,
-				],
-			],
-		]);
-
-		$leadsQuery = $model->getLeadWithAllChildes();
-		if ($this->module->onlyUser) {
-			$leadsQuery->user(Yii::$app->user->getId());
+		$campaignCost = new LeadCampaignCostSearch();
+		$campaignCost->campaignIds = [
+			$id,
+		];
+		$campaignCost->load(Yii::$app->request->queryParams);
+		if (empty($campaignCost->fromAt) || empty($campaignCost->toAt)) {
+			$campaignCost->setDateFromCampaigns();
 		}
 
-		$leadsDataProvider = new ActiveDataProvider([
-			'query' => $leadsQuery,
-			'sort' => [
-				'defaultOrder' => [
-					'date_at' => SORT_DESC,
-				],
-			],
-		]);
+		if ($this->module->onlyUser) {
+			$campaignCost->userId = Yii::$app->user->getId();
+			$campaignCost->scenario = LeadCampaignCostSearch::SCENARIO_USER;
+		}
 
 		return $this->render('view', [
-			'model' => $this->findModel($id),
-			'costQueryDataProvider' => $costQueryDataProvider,
-			'leadsDataProvider' => $leadsDataProvider,
+			'model' => $model,
+			'campaignCost' => $campaignCost,
 		]);
 	}
 
