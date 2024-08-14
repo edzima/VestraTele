@@ -2,44 +2,43 @@
 
 namespace common\modules\lead\components;
 
+use common\modules\lead\models\CampaignCost;
 use common\modules\lead\models\Lead;
-use common\modules\lead\models\LeadCost;
 use yii\base\Component;
 
 class CostComponent extends Component {
 
-	public function recalculate(int $campaign_id, string $date_at): ?int {
-		/** @var LeadCost|null $model */
-		$model = LeadCost::find()
-			->andWhere(['campaign_id' => $campaign_id])
-			->andWhere(['date_at' => $date_at])
-			->one();
-		if (empty($model)) {
-			return null;
+	public function recalculateFromDate(
+		string $fromAt,
+		string $toAt,
+		array $campaignsIds = []) {
+
+		$data = $this->getCostData($fromAt, $toAt, $campaignsIds);
+		foreach ($data as $model) {
+			if (!empty($model->leads_ids)) {
+				Lead::updateAll([
+					'cost_value' => $model->single_cost_value,
+				], [
+					'id' => $model->leads_ids,
+				]);
+			}
 		}
-		$leadsIds = $model->getLeads()->select([Lead::tableName() . '.id'])->column();
-		if (empty($leadsIds)) {
-			return null;
-		}
-		$value = $model->value / count($leadsIds);
-		return $this->updateLeadCosts($value, $leadsIds);
+
+		return $data;
 	}
 
-	public function updateLeadCosts(?float $value, array $ids): int {
-		return Lead::updateAll(['cost_value' => $value], ['id' => $ids]);
+	/**
+	 * @param string|null $fromAt
+	 * @param string|null $toAt
+	 * @param array $campaignsIds
+	 * @return CampaignCost[]
+	 */
+	public function getCostData(
+		?string $fromAt,
+		?string $toAt,
+		array $campaignsIds = []
+	): array {
+		return CampaignCost::getModels($fromAt, $toAt, $campaignsIds);
 	}
 
-	public function recalculateAllMissing() {
-		$models = LeadCost::find()
-			->withLeadsCount()
-			->onlyWithLeads()
-			->onlyLeadsWithoutCostValue()
-			->all();
-
-		$count = 0;
-		foreach ($models as $model) {
-			$count += $this->updateLeadCosts($model->getSingleLeadCostValue(), $model->getLeadsIds());
-		}
-		return $count;
-	}
 }
