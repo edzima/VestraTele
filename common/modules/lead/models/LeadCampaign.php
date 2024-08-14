@@ -4,6 +4,8 @@ namespace common\modules\lead\models;
 
 use common\models\hierarchy\ActiveHierarchy;
 use common\models\hierarchy\HierarchyActiveModelTrait;
+use common\modules\lead\models\query\LeadCampaignQuery;
+use common\modules\lead\models\query\LeadCostQuery;
 use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
 use Yii;
@@ -37,6 +39,8 @@ class LeadCampaign extends ActiveRecord implements ActiveHierarchy {
 	public const TYPE_CAMPAIGN = 'campaign';
 	public const TYPE_ADSET = 'adset';
 	public const TYPE_AD = 'ad';
+
+	public $leads_count;
 
 	private static ?array $models = null;
 
@@ -91,14 +95,24 @@ class LeadCampaign extends ActiveRecord implements ActiveHierarchy {
 			'is_active' => Yii::t('lead', 'Is Active'),
 			'typeName' => Yii::t('lead', 'Type'),
 			'parent' => Yii::t('lead', 'Parent Campaign'),
+			'leads_count' => Yii::t('lead', 'Leads Count'),
+			'totalCostSumValue' => Yii::t('lead', 'Total Cost Value'),
 		];
 	}
 
-	/**
-	 * Gets query for [[Leads]].
-	 *
-	 * @return ActiveQuery
-	 */
+	public function getCosts(): LeadCostQuery {
+		return $this->hasMany(LeadCost::class, [
+			'campaign_id' => 'id',
+		]);
+	}
+
+	public function getCostsWithAllChildesQuery() {
+		$ids = $this->getAllChildesIds();
+		$ids[] = $this->id;
+		return LeadCost::find()
+			->andWhere([LeadCost::tableName() . '.campaign_id' => $ids]);
+	}
+
 	public function getLeads(): LeadQuery {
 		return $this->hasMany(Lead::class, ['campaign_id' => 'id']);
 	}
@@ -172,22 +186,18 @@ class LeadCampaign extends ActiveRecord implements ActiveHierarchy {
 		return implode(' ', $names);
 	}
 
-	public function getCosts() {
-		return $this->hasMany(LeadCost::class, [
-			'campaign_id' => 'id',
-		]);
-	}
-
-	public function getCostsWithAllChildesQuery() {
-		$ids = $this->getAllChildesIds();
-		$ids[] = $this->id;
-		return LeadCost::find()
-			->andWhere([LeadCost::tableName() . '.campaign_id' => $ids]);
-	}
-
 	public function getTotalCostSumValue(bool $withAllChildes = true): float {
 		$query = $withAllChildes ? $this->getCostsWithAllChildesQuery() : $this->getCosts();
 		return (float) $query->sum('value');
+	}
+
+	public function getTotalLeadsCount(bool $withAllChildes = true): int {
+		$query = $withAllChildes ? $this->getLeadWithAllChildes() : $this->getLeads();
+		return $query->count();
+	}
+
+	public static function find(): LeadCampaignQuery {
+		return new LeadCampaignQuery(static::class);
 	}
 
 }

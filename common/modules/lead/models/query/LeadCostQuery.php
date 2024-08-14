@@ -33,7 +33,8 @@ class LeadCostQuery extends ActiveQuery {
 				new Expression(LeadCost::tableName() . '.value / ' . 'count( ' . Lead::tableName() . '.id) as single_lead_cost_value'),
 				new Expression('GROUP_CONCAT(' . Lead::tableName() . '.id) AS leads_ids'),
 			])
-			->groupBy([LeadCost::tableName() . '.id']);
+			->
+			groupBy(LeadCost::primaryKey());
 		return $this;
 	}
 
@@ -55,4 +56,13 @@ class LeadCostQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function between(?string $fromAt, ?string $toAt): self {
+		$this->andFilterWhere([
+			'>=', LeadCost::tableName() . '.date_at', $fromAt,
+		]);
+		$this->andFilterWhere([
+			'<=', LeadCost::tableName() . '.date_at', $toAt,
+		]);
+		return $this;
+	}
 }
