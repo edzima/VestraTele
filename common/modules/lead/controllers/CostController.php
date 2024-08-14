@@ -5,7 +5,6 @@ namespace common\modules\lead\controllers;
 use common\helpers\Flash;
 use common\modules\lead\models\forms\LeadCostForm;
 use common\modules\lead\models\import\FBAdsCostImport;
-use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCost;
 use common\modules\lead\models\searches\LeadCostSearch;
 use Yii;
@@ -48,13 +47,6 @@ class CostController extends BaseController {
 					Flash::add(Flash::TYPE_SUCCESS,
 						Yii::t('lead', 'Success import Costs: {count}.', ['count' => $count])
 					);
-					$cost = $this->module->getCost();
-					$leadsCount = $cost->recalculateAllMissing();
-					if ($leadsCount) {
-						Flash::add(Flash::TYPE_INFO,
-							Yii::t('lead', 'Success recalculate Leads Costs: {count}.', ['count' => $leadsCount])
-						);
-					}
 				} elseif ($count === 0) {
 					Flash::add(Flash::TYPE_INFO,
 						Yii::t('lead', 'No new data to record.',)
@@ -74,6 +66,10 @@ class CostController extends BaseController {
 	 * @return string
 	 */
 	public function actionIndex(): string {
+//		LeadCost::deleteAll();
+//		LeadCost::deleteAll([
+//			'>=','date_at','2024-08-13 00:00:00'
+//		]);
 		$searchModel = new LeadCostSearch();
 		if ($this->module->onlyUser) {
 			$searchModel->scenario = LeadCostSearch::SCENARIO_USER;
@@ -97,30 +93,6 @@ class CostController extends BaseController {
 	public function actionView(int $id) {
 		return $this->render('view', [
 			'model' => $this->findModel($id),
-		]);
-	}
-
-	public function actionRecalculate(int $id) {
-		$model = $this->findModel($id);
-		$cost = $this->module->getCost();
-		if ($cost->recalculate($model->campaign_id, $model->date_at)) {
-			Flash::add(Flash::TYPE_INFO, Yii::t('lead', 'Recalculate Leads cost.'));
-		}
-		return $this->redirect(['view', 'id' => $id]);
-	}
-
-	public function actionRecalculateAll(bool $clear = false) {
-		$before = (int) Lead::find()->andWhere(['IS NOT', 'cost_value', null])->count();
-		if ($clear) {
-			Lead::updateAll([
-				'cost_value' => null,
-			]);
-		}
-
-		$cost = $this->module->getCost();
-		return $this->asJson([
-			'before' => $before,
-			'recalculate' => $cost->recalculateAllMissing(),
 		]);
 	}
 
