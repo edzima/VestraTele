@@ -17,6 +17,7 @@ use yii\db\Expression;
 
 class LeadChartSearch extends LeadSearch {
 
+	public bool $withoutArchives = false;
 	public ?int $groupedStatus = self::STATUS_GROUP_ONLY_ASSIGNED;
 
 	public string $groupedStatusChartType = ChartsWidget::TYPE_DONUT;
@@ -132,18 +133,6 @@ class LeadChartSearch extends LeadSearch {
 		return $data;
 	}
 
-	public function getCampaignCost(): array {
-		$query = $this->getBaseQuery();
-		$query->groupBy(Lead::tableName() . '.campaign_id');
-		$query->select(['SUM(cost_value) as sumCost', 'campaign_id']);
-		$query->asArray();
-		$data = $query->all();
-		$data = ArrayHelper::map($data, 'campaign_id', 'sumCost');
-		$data = array_map('floatval', $data);
-		arsort($data);
-		return $data;
-	}
-
 	public function getLeadStatusesCount(): array {
 		$query = $this->getBaseQuery();
 		$query->groupBy(Lead::tableName() . '.status_id');
@@ -158,6 +147,24 @@ class LeadChartSearch extends LeadSearch {
 		return $data;
 	}
 
+	public function getCampaignsData(bool $withCosts = false): array {
+		$query = $this->getBaseQuery();
+		$query->groupBy(Lead::tableName() . '.campaign_id');
+		$select = [
+			Lead::tableName() . '.campaign_id',
+			'count(*) as count',
+		];
+		if ($withCosts) {
+			$select[] = 'SUM(cost_value) as sumCost';
+		}
+		$query->select($select);
+		$query->asArray();
+		$data = $query->all();
+		//$data = array_map('floatval', $data);
+
+		return $data;
+	}
+
 	public function getLeadCampaignsCount(): array {
 		$query = $this->getBaseQuery();
 		$query->groupBy(Lead::tableName() . '.campaign_id');
@@ -168,6 +175,18 @@ class LeadChartSearch extends LeadSearch {
 		$data = array_map('intval', $data);
 		arsort($data);
 
+		return $data;
+	}
+
+	public function getCampaignCost(): array {
+		$query = $this->getBaseQuery();
+		$query->groupBy(Lead::tableName() . '.campaign_id');
+		$query->select(['SUM(cost_value) as sumCost', 'campaign_id']);
+		$query->asArray();
+		$data = $query->all();
+		$data = ArrayHelper::map($data, 'campaign_id', 'sumCost');
+		$data = array_map('floatval', $data);
+		arsort($data);
 		return $data;
 	}
 

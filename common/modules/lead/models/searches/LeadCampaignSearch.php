@@ -33,7 +33,6 @@ class LeadCampaignSearch extends LeadCampaign {
 		return [
 			[['id', 'sort_index', 'owner_id', 'is_active', 'leads_count'], 'integer'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
-			['cost_value', 'number'],
 			[['name'], 'safe'],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 		];

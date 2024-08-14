@@ -507,4 +507,8 @@ return [
 	'Only with Costs' => 'Tylko z Kosztami',
 	'Campaigns Costs' => 'Koszty Kampanii',
 	'Total Cost Value' => 'Koszt Całkowity',
+	'Total Cost Value (total)' => 'Koszt Całkowity (cały okres)',
+	'Single Lead cost Value (total)' => 'Koszt Leada (cały okres)',
+	'{name} - Leads' => '{name} - Leads',
+	'{name} - Cost' => '{name} - Koszt',
 ];

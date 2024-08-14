@@ -18,6 +18,7 @@ class ChartController extends BaseController {
 		$searchModel->validate();
 		return $this->render('index', [
 			'searchModel' => $searchModel,
+			'cost' => $this->module->getCost(),
 		]);
 	}
 
