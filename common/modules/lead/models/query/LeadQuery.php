@@ -43,6 +43,24 @@ class LeadQuery extends ActiveQuery implements PhonableQuery {
 		return $this;
 	}
 
+	public function dateBetween(?string $fromAt, ?string $toAt, bool $day = true): self {
+		if ($day) {
+			$fromAt = $fromAt ? date('Y-m-d 00:00:00', strtotime($fromAt)) : null;
+			$toAt = $toAt ? date('Y-m-d 23:59:59', strtotime($toAt)) : null;
+		}
+		if ($fromAt) {
+			$this->andWhere([
+				'>=', Lead::tableName() . '.date_at', $fromAt,
+			]);
+		}
+		if ($toAt) {
+			$this->andWhere([
+				'<=', Lead::tableName() . '.date_at', $toAt,
+			]);
+		}
+		return $this;
+	}
+
 	public function owner(int $user_id): self {
 		$this->joinWith([
 			'leadUsers' => function (ActiveQuery $query) use ($user_id) {
