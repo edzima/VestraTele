@@ -545,7 +545,7 @@ foreach ($groupSeries as $group) {
 			<?= !empty($costsUsersData)
 				? ChartsWidget::widget([
 					'series' => array_values($costsUsersData),
-					'type' => ChartsWidget::TYPE_LINE,
+					'type' => ChartsWidget::TYPE_AREA,
 
 					'height' => '420px',
 					'options' => [
@@ -562,6 +562,9 @@ foreach ($groupSeries as $group) {
 							'labels' => [
 								'rotate' => -45,
 							],
+						],
+						'dataLabels' => [
+							'enabled' => false,
 						],
 						'yaxis' => [
 							'showForNullSeries' => false,
