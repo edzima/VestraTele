@@ -6,6 +6,7 @@ use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\searches\LeadCampaignCostSearch;
 use common\modules\lead\Module;
 use common\modules\lead\widgets\chart\CampaignCostChart;
+use common\modules\lead\widgets\chart\LeadStatusChart;
 use common\widgets\charts\ChartsWidget;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
@@ -266,6 +267,14 @@ if ($leadsDataProvider->getTotalCount()) {
 				],
 			]) ?>
 		</div>
+
+		<div class="col-md-6 col-lg-5">
+			<?= LeadStatusChart::widget([
+				'query' => $leadsDataProvider->query,
+			]) ?>
+		</div>
+
+
 	</div>
 
 

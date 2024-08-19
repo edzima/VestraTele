@@ -511,4 +511,5 @@ return [
 	'Single Lead cost Value (total)' => 'Koszt Leada (cały okres)',
 	'{name} - Leads' => '{name} - Leads',
 	'{name} - Cost' => '{name} - Koszt',
+	'Statuses without group' => 'Nieznane',
 ];
