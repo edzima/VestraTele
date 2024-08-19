@@ -247,6 +247,7 @@ if (count($providersData) > 1) {
 					],
 					'id' => 'chart-leads-statuses-group-radial-count' . $searchModel->getUniqueId(),
 					'series' => $statusGroupDataPercent,
+					'showDonutTotalLabels' => true,
 					'options' => [
 						'colors' => array_values($statusGroupData['colors']),
 						'labels' => array_values($statusGroupData['labels']),
@@ -280,18 +281,6 @@ if (count($providersData) > 1) {
 									],
 								],
 							],
-							'pie' => [
-								'donut' => [
-									'labels' => [
-										'show' => true,
-										'total' => [
-											'show' => true,
-											'showAlways' => true,
-											'label' => Yii::t('common', 'Sum'),
-										],
-									],
-								],
-							],
 						],
 					],
 				])
@@ -307,6 +296,7 @@ if (count($providersData) > 1) {
 					],
 					'id' => 'chart-leads-statuses-group-count' . $searchModel->getUniqueId(),
 					'legendFormatterAsSeriesWithCount' => true,
+					'showDonutTotalLabels' => true,
 					'series' => array_values($statusGroupData['series']),
 					'options' => [
 						'colors' => array_values($statusGroupData['colors']),
@@ -319,20 +309,6 @@ if (count($providersData) > 1) {
 							'position' => 'bottom',
 							//'width' => 200,
 							'height' => '55',
-						],
-						'plotOptions' => [
-							'pie' => [
-								'donut' => [
-									'labels' => [
-										'show' => true,
-										'total' => [
-											'show' => true,
-											'showAlways' => true,
-											'label' => Yii::t('common', 'Sum'),
-										],
-									],
-								],
-							],
 						],
 					],
 				])
@@ -347,6 +323,7 @@ if (count($providersData) > 1) {
 					],
 					'id' => 'chart-leads-statuses-count' . $searchModel->getUniqueId(),
 					'legendFormatterAsSeriesWithCount' => true,
+					'showDonutTotalLabels' => true,
 					'series' => $statusData['series'],
 					'options' => [
 						'colors' => $statusData['colors'],
@@ -359,20 +336,6 @@ if (count($providersData) > 1) {
 							'position' => 'bottom',
 							//'width' => 200,
 							'height' => '55',
-						],
-						'plotOptions' => [
-							'pie' => [
-								'donut' => [
-									'labels' => [
-										'show' => true,
-										'total' => [
-											'show' => true,
-											'showAlways' => true,
-											'label' => Yii::t('common', 'Sum'),
-										],
-									],
-								],
-							],
 						],
 					],
 				])
@@ -388,6 +351,7 @@ if (count($providersData) > 1) {
 						'class' => 'col-sm-12 col-md-6 col-lg-4',
 						'style' => ['height' => '50vh',],
 					],
+					'showDonutTotalLabels' => true,
 					'legendFormatterAsSeriesWithCount' => true,
 					'series' => $typesData['series'],
 					'options' => [
@@ -400,20 +364,6 @@ if (count($providersData) > 1) {
 							'position' => 'bottom',
 							//'width' => 200,
 							'height' => '55',
-						],
-						'plotOptions' => [
-							'pie' => [
-								'donut' => [
-									'labels' => [
-										'show' => true,
-										'total' => [
-											'show' => true,
-											'showAlways' => true,
-											'label' => Yii::t('common', 'Sum'),
-										],
-									],
-								],
-							],
 						],
 					],
 				])
@@ -430,6 +380,7 @@ if (count($providersData) > 1) {
 					],
 					'id' => 'chart-leads-sources-count' . $searchModel->getUniqueId(),
 					'legendFormatterAsSeriesWithCount' => true,
+					'showDonutTotalLabels' => true,
 					'series' => $sourcesData['series'],
 					'options' => [
 						'labels' => $sourcesData['labels'],
@@ -441,20 +392,6 @@ if (count($providersData) > 1) {
 							'position' => 'bottom',
 							//'width' => 200,
 							'height' => '55',
-						],
-						'plotOptions' => [
-							'pie' => [
-								'donut' => [
-									'labels' => [
-										'show' => true,
-										'total' => [
-											'show' => true,
-											'showAlways' => true,
-											'label' => Yii::t('common', 'Sum'),
-										],
-									],
-								],
-							],
 						],
 					],
 				])
@@ -587,13 +524,14 @@ if (count($providersData) > 1) {
 
 			<?= isset($providersData['series']) ?
 				ChartsWidget::widget([
-					'type' => 'donut',
+					'type' => ChartsWidget::TYPE_DONUT,
 					'containerOptions' => [
 						'class' => 'col-sm-12 col-md-6 col-lg-4',
 						//		'style' => ['height' => '50vh',],
 					],
 					'id' => 'chart-leads-providers-count' . $searchModel->getUniqueId(),
 					'legendFormatterAsSeriesWithCount' => true,
+					'showDonutTotalLabels' => true,
 					'series' => $providersData['series'],
 					'options' => [
 						'labels' => $providersData['labels'],
@@ -604,20 +542,6 @@ if (count($providersData) > 1) {
 						'legend' => [
 							'position' => 'bottom',
 							'height' => '55',
-						],
-						'plotOptions' => [
-							'pie' => [
-								'donut' => [
-									'labels' => [
-										'show' => true,
-										'total' => [
-											'show' => true,
-											'showAlways' => true,
-											'label' => Yii::t('common', 'Sum'),
-										],
-									],
-								],
-							],
 						],
 					],
 				])
