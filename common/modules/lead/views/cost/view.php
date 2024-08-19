@@ -1,7 +1,7 @@
 <?php
 
 use common\modules\lead\models\LeadCost;
-use common\modules\lead\widgets\LeadStatusChart;
+use common\modules\lead\widgets\chart\LeadStatusChart;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;

@@ -66,10 +66,6 @@ class CostController extends BaseController {
 	 * @return string
 	 */
 	public function actionIndex(): string {
-//		LeadCost::deleteAll();
-//		LeadCost::deleteAll([
-//			'>=','date_at','2024-08-13 00:00:00'
-//		]);
 		$searchModel = new LeadCostSearch();
 		if ($this->module->onlyUser) {
 			$searchModel->scenario = LeadCostSearch::SCENARIO_USER;
