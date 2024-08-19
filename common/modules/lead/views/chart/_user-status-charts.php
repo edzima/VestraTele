@@ -454,6 +454,7 @@ foreach ($groupSeries as $group) {
 						'id' => 'donut-leads-users-count',
 						'type' => ChartsWidget::TYPE_DONUT,
 						'legendFormatterAsSeriesWithCount' => true,
+						'showDonutTotalLabels' => true,
 						'series' => $totalSeries['data'],
 						'chart' => [
 							'id' => 'donut-leads-users-count',
@@ -470,20 +471,6 @@ foreach ($groupSeries as $group) {
 								//	'floating' => true,
 								'position' => 'bottom',
 								'height' => 120,//	'width' => '100',
-							],
-							'plotOptions' => [
-								'pie' => [
-									'donut' => [
-										'labels' => [
-											'show' => true,
-											'total' => [
-												'show' => true,
-												'showAlways' => true,
-												'label' => Yii::t('common', 'Sum'),
-											],
-										],
-									],
-								],
 							],
 						],
 					])
@@ -609,23 +596,10 @@ foreach ($groupSeries as $group) {
 							'position' => 'bottom',
 							'height' => '55',
 						],
-						'plotOptions' => [
-							'pie' => [
-								'donut' => [
-									'labels' => [
-										'show' => true,
-										'total' => [
-											'show' => true,
-											'showAlways' => true,
-											'label' => Yii::t('common', 'Sum'),
-										],
-									],
-								],
-							],
-						],
 					],
 					'legendFormatterAsSeriesWithCount' => true,
 					'legendFormatterAsSeriesAsCurrency' => true,
+					'showDonutTotalLabels' => true,
 				])
 				: ''
 			?>

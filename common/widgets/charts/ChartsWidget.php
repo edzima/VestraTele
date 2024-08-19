@@ -37,6 +37,8 @@ class ChartsWidget extends Widget {
 	public bool $legendFormatterAsSeriesWithCount = false;
 	public bool $legendFormatterAsSeriesAsCurrency = false;
 
+	public bool $showDonutTotalLabels = false;
+
 	public array $containerOptions = [];
 
 	public function init() {
@@ -48,6 +50,9 @@ class ChartsWidget extends Widget {
 		}
 		if ($this->legendFormatterAsSeriesWithCount && !isset($this->options['legend']['formatter'])) {
 			$this->options['legend']['formatter'] = $this->legendFormaterSeriesNameWithCount($this->legendFormatterAsSeriesAsCurrency);
+		}
+		if ($this->showDonutTotalLabels) {
+			$this->options['plotOptions']['pie']['donut']['labels'] = $this->donutLabels();
 		}
 		parent::init();
 	}
@@ -176,6 +181,17 @@ JS;
 			  count
 			  ];}'
 		);
+	}
+
+	protected function donutLabels(): array {
+		return [
+			'show' => true,
+			'total' => [
+				'show' => true,
+				'showAlways' => true,
+				'label' => Yii::t('common', 'Sum'),
+			],
+		];
 	}
 
 }
