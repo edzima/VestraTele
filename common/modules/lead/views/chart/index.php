@@ -191,21 +191,24 @@ if (count($campaignsData) > 1) {
 		}
 		$campaignsData['url'][] = $url;
 
-		$campaignsData['series'][] = $count;
-		$campaignsData['labels'][] = $name;
-		$campaignsData['costSeries'][] = $campaignsCostData[$id] ?? 0;
-	}
+		$campaignsData['series'][] = [
+			'x' => $name,
+			'y' => $count,
+		];
 
-	$campaignsCostData = $searchModel->getCampaignCost();
-	foreach ($campaignsCostData as $id => $costValue) {
-		if (empty($id)) {
-			$name = Yii::t('lead', 'Without Campaign');
-		} else {
-			$campaign = $campaigns[$id];
-			$name = $campaign->getFullname();
-		}
-		$campaignsCostData['series'][] = $costValue;
-		$campaignsCostData['labels'][] = $name;
+		$cost = $campaignsCostData[$id] ?? 0;
+		$campaignsData['costSeries'][] = [
+			'x' => $name,
+			'y' => $cost ?: null,
+		];
+		$avg = $count && $cost
+			? $cost / $count
+			: null;
+
+		$campaignsData['avgSeries'][] = [
+			'x' => $name,
+			'y' => round($avg, 2),
+		];
 	}
 }
 
@@ -406,7 +409,7 @@ if (count($providersData) > 1) {
 
 				<?= isset($campaignsData['series']) ?
 					ChartsWidget::widget([
-						'type' => ChartsWidget::TYPE_LINE,
+						'type' => ChartsWidget::TYPE_AREA,
 						'height' => 420,
 						'chart' => [
 							'events' => [
@@ -427,20 +430,26 @@ if (count($providersData) > 1) {
 								'type' => ChartsWidget::TYPE_LINE,
 							],
 							[
+								'name' => Yii::t('lead', 'AVG'),
+								'type' => ChartsWidget::TYPE_LINE,
+								'data' => $campaignsData['avgSeries'],
+							],
+							[
 								'name' => Yii::t('lead', 'Leads'),
 								'type' => ChartsWidget::TYPE_COLUMN,
 								'data' => $campaignsData['series'],
 							],
+
 						],
 						'options' => [
 							'title' => [
 								'text' => Yii::t('lead', 'Campaigns Costs'),
 								'align' => 'center',
 							],
-							'labels' => $campaignsData['labels'],
+							//	'labels' => $campaignsData['labels'],
 
 							'stroke' => [
-								'width' => [3, 0],
+								'width' => [3, 4, 0],
 								'curve' => 'smooth',
 							],
 
@@ -453,9 +462,18 @@ if (count($providersData) > 1) {
 									'min' => 0,
 									'seriesName' => Yii::t('lead', 'Costs'),
 									'showForNullSeries' => false,
-									'decimalsInFloat' => 0,
+									'decimalsInFloat' => 2,
 									'title' => [
 										'text' => Yii::t('lead', 'Costs'),
+									],
+								],
+								[
+									'min' => 0,
+									'seriesName' => Yii::t('lead', 'AVG'),
+									'showForNullSeries' => false,
+									'decimalsInFloat' => 2,
+									'title' => [
+										'text' => Yii::t('lead', 'AVG'),
 									],
 								],
 								[
@@ -463,7 +481,6 @@ if (count($providersData) > 1) {
 									'seriesName' => Yii::t('lead', 'Leads'),
 									'showForNullSeries' => false,
 									'decimalsInFloat' => 0,
-
 									'title' => [
 										'text' => Yii::t('lead', 'Leads'),
 									],
