@@ -1,6 +1,7 @@
 <?php
 
 use common\helpers\ArrayHelper;
+use common\helpers\Url;
 use common\modules\lead\components\CostComponent;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadSource;
@@ -8,6 +9,7 @@ use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadChartSearch;
 use common\widgets\charts\ChartsWidget;
+use yii\helpers\Json;
 use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
@@ -173,10 +175,21 @@ if (count($campaignsData) > 1) {
 	foreach ($campaignsData as $id => $count) {
 		if (empty($id)) {
 			$name = Yii::t('lead', 'Without Campaign');
+			$url = null;
 		} else {
 			$campaign = $campaigns[$id];
-			$name = $campaign->getFullname();
+			$name = $campaign->name;
+			if ($campaign->parent) {
+				$name .= ' (' . $campaign->parent->name . ')';
+			}
+			$url = Url::to([
+				'campaign/view',
+				'id' => $id,
+				'fromAt' => $searchModel->from_at,
+				'toAt' => $searchModel->to_at,
+			]);
 		}
+		$campaignsData['url'][] = $url;
 
 		$campaignsData['series'][] = $count;
 		$campaignsData['labels'][] = $name;
@@ -458,6 +471,18 @@ if (count($providersData) > 1) {
 					ChartsWidget::widget([
 						'type' => ChartsWidget::TYPE_LINE,
 						'height' => 420,
+						'chart' => [
+							'events' => [
+								'dataPointSelection' => new JsExpression("function(event, chartContext, opts) {
+								const index = opts.dataPointIndex;
+								const urls = " . Json::encode($campaignsData['url']) . ";
+								const url = urls[index];
+								if(url){
+									window.open(urls[index]);
+								}
+                            }"),
+							],
+						],
 						'series' => [
 							[
 								'name' => Yii::t('lead', 'Costs'),
@@ -469,7 +494,6 @@ if (count($providersData) > 1) {
 								'type' => ChartsWidget::TYPE_COLUMN,
 								'data' => $campaignsData['series'],
 							],
-
 						],
 						'options' => [
 							'title' => [
@@ -482,6 +506,7 @@ if (count($providersData) > 1) {
 								'width' => [3, 0],
 								'curve' => 'smooth',
 							],
+
 							'xaxis' =>
 								[
 									'type' => 'category',

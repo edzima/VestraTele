@@ -110,13 +110,16 @@ class CampaignController extends BaseController {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView(int $id): string {
+	public function actionView(int $id, string $fromAt = null, string $toAt = null): string {
 		$model = $this->findModel($id);
 
 		$campaignCost = new LeadCampaignCostSearch();
 		$campaignCost->campaignIds = [
 			$id,
 		];
+		$campaignCost->fromAt = $fromAt;
+		$campaignCost->toAt = $toAt;
+
 		$campaignCost->load(Yii::$app->request->queryParams);
 		if (empty($campaignCost->fromAt) || empty($campaignCost->toAt)) {
 			$campaignCost->setDateFromCampaigns();
