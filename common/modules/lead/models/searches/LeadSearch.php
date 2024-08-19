@@ -465,10 +465,24 @@ class LeadSearch extends Lead implements SearchModel {
 	}
 
 	public function getCampaignNames(): array {
-		if ($this->getScenario() === static::SCENARIO_USER) {
-			return LeadCampaign::getNames($this->user_id);
+		$campaignNames = $this->getScenario() === static::SCENARIO_USER
+			? LeadCampaign::getNames($this->user_id)
+			: LeadCampaign::getNames();
+
+		$campaignsIds = Lead::find()
+			->select('campaign_id')
+			->distinct()
+			->dateBetween($this->from_at, $this->to_at)
+			->column();
+
+		$names = [];
+		foreach ($campaignsIds as $campaignId) {
+			$name = $campaignNames[$campaignId] ?? null;
+			if ($name) {
+				$names[$campaignId] = $name;
+			}
 		}
-		return LeadCampaign::getNames();
+		return $names;
 	}
 
 	public function getSourcesNames(): array {
@@ -765,6 +779,7 @@ class LeadSearch extends Lead implements SearchModel {
 				}
 			}
 			$ids = array_unique($ids);
+			Yii::warning($ids);
 			$query->andFilterWhere([Lead::tableName() . '.campaign_id' => $ids]);
 		}
 	}

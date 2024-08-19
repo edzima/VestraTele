@@ -234,7 +234,6 @@ class LeadChartSearch extends LeadSearch {
 		$query->groupBy([
 			LeadUser::tableName() . '.user_id',
 			Lead::tableName() . '.status_id',
-			Lead::tableName() . '.campaign_id',
 		]);
 		$query->distinct();
 		$query->asArray();
@@ -266,6 +265,7 @@ class LeadChartSearch extends LeadSearch {
 		$this->applyReportStatusFilter($query);
 		$this->applyTypeFilter($query);
 		$this->applyOnlyWithCosts($query);
+		$this->applyCampaignFilter($query);
 	}
 
 	public function getUniqueId(): string {
