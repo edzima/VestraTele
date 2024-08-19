@@ -131,6 +131,7 @@ $usersNames = LeadChartSearch::getUsersNames();
 			'pluginOptions' => [
 				'placeholder' => Yii::t('lead', 'Campaign'),
 				'allowClear' => true,
+				'multiple' => true,
 			],
 		]) ?>
 
