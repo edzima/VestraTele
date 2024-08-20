@@ -1,6 +1,7 @@
 <?php
 
 use common\helpers\ArrayHelper;
+use common\models\user\User;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadChartSearch;
@@ -26,40 +27,45 @@ foreach ($usersNames as &$name) {
 
 $leadStatusColor = $searchModel->getLeadStatusColor();
 
-$usersStatusData = $searchModel->getLeadsUserStatusData();
+$withCosts = Yii::$app->user->can(User::PERMISSION_LEAD_COST);
+$usersStatusData = $searchModel->getLeadsUserStatusData($withCosts);
 $userCounts = [];
 $groupsOrStatuses = [];
 foreach ($usersStatusData as $data) {
-	$costValue = $data['costValue'];
-	$costCount = $data['costCount'];
 	$count = (int) $data['count'];
 	$userId = $data['user_id'];
 	$statusId = $data['status_id'];
 	if (!isset($userCounts[$userId])) {
-		$userCounts[$userId] = [
+		$userData = [
 			'name' => $usersNames[$userId],
 			'count' => 0,
 			'data' => [],
-			'totalLeadsCostValue' => 0,
-			'statusCostValue' => [],
 		];
+		if ($withCosts) {
+			$userData['totalLeadsCostValue'] = 0;
+			$userData['statusCostValue'] = [];
+		}
+		$userCounts[$userId] = $userData;
 	}
 	$userCounts[$userId]['count'] += $count;
-	$userCounts[$userId]['totalLeadsCostValue'] += $costValue;
 
-	if (!isset($userCounts[$userId]['statusCostValue'][$statusId])) {
-		$userCounts[$userId]['statusCostValue'][$statusId] = [
-			'cost' => 0,
-			'count' => 0,
-		];
+	if ($withCosts) {
+		$costValue = $data['costValue'];
+		$costCount = $data['costCount'];
+		$userCounts[$userId]['totalLeadsCostValue'] += $costValue;
+		if (!isset($userCounts[$userId]['statusCostValue'][$statusId])) {
+			$userCounts[$userId]['statusCostValue'][$statusId] = [
+				'cost' => 0,
+				'count' => 0,
+			];
+		}
+		$userCounts[$userId]['statusCostValue'][$statusId]['cost'] += $costValue;
+		$userCounts[$userId]['statusCostValue'][$statusId]['count'] += $costCount;
 	}
-	$userCounts[$userId]['statusCostValue'][$statusId]['cost'] += $costValue;
-	$userCounts[$userId]['statusCostValue'][$statusId]['count'] += $costCount;
 
 	if ($searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_DISABLE) {
 		$groupsOrStatuses[$statusId] = LeadStatus::getNames()[$statusId];
 		$userCounts[$userId]['data'][$statusId] = $count;
-		//$userCounts[$userId][$statusId] = $count;
 	} else {
 		$group = LeadStatus::getModels()[$statusId]->chart_group;
 		if ($group) {

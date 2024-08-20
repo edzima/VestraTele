@@ -15,10 +15,12 @@ class ChartController extends BaseController {
 			$searchModel->user_id = Yii::$app->user->getId();
 		}
 		$searchModel->load(Yii::$app->request->queryParams);
-		$searchModel->validate();
+		if ($searchModel->validate()) {
+			$this->module->getCost()
+				->recalculateFromDate($searchModel->from_at, $searchModel->to_at);
+		}
 		return $this->render('index', [
 			'searchModel' => $searchModel,
-			'cost' => $this->module->getCost(),
 		]);
 	}
 
