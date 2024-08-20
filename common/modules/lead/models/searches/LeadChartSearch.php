@@ -22,15 +22,28 @@ class LeadChartSearch extends LeadSearch {
 
 	public string $groupedStatusChartType = ChartsWidget::TYPE_DONUT;
 
+	public bool $visibleHoursChart = true;
+
 	public const STATUS_GROUP_ONLY_ASSIGNED = 1;
 	public const STATUS_GROUP_WITHOUT_ASSIGNED = 2;
 	public const STATUS_GROUP_DISABLE = 3;
 	private ?LeadStatusColor $leadStatusColor = null;
 
+	public function rules(): array {
+		return array_merge([
+			[['visibleHoursChart'], 'boolean'],
+			['groupedStatus', 'integer'],
+			[['groupedStatusChartType'], 'string'],
+			['from_at', 'default', 'value' => $this->getDefaultFromAt()],
+			['to_at', 'default', 'value' => $this->getDefaultToAt()],
+		], parent::rules());
+	}
+
 	public function attributeLabels(): array {
 		return array_merge(parent::attributeLabels(), [
 			'groupedStatus' => Yii::t('lead', 'Grouped Status'),
 			'groupedStatusChartType' => Yii::t('lead', 'Grouped Status Chart'),
+			'visibleHoursChart' => Yii::t('lead', 'Visible Hours Chart'),
 		]);
 	}
 
@@ -47,15 +60,6 @@ class LeadChartSearch extends LeadSearch {
 			ChartsWidget::TYPE_DONUT => Yii::t('chart', 'Donut'),
 			ChartsWidget::TYPE_RADIAL_BAR => Yii::t('chart', 'Radial Bar'),
 		];
-	}
-
-	public function rules(): array {
-		return array_merge([
-			['groupedStatus', 'integer'],
-			[['groupedStatusChartType'], 'string'],
-			['from_at', 'default', 'value' => $this->getDefaultFromAt()],
-			['to_at', 'default', 'value' => $this->getDefaultToAt()],
-		], parent::rules());
 	}
 
 	public function getDefaultFromAt(): string {
