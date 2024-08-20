@@ -22,4 +22,12 @@ class ArrayHelper extends BaseArrayHelper {
 
 		return $data;
 	}
+
+	public static function shortNames(array $names, int $secondLength = 1): array {
+		$shortNames = [];
+		foreach ($names as $index => $name) {
+			$shortNames[$index] = StringHelper::shortName($name, $secondLength);
+		}
+		return $shortNames;
+	}
 }

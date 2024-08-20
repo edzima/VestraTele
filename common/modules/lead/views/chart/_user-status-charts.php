@@ -15,15 +15,7 @@ use yii\web\View;
 /* @var $searchModel LeadChartSearch */
 /* @var $usersNames string[] */
 
-$usersNames = LeadChartSearch::getUsersNames(LeadUser::TYPE_OWNER);
-foreach ($usersNames as &$name) {
-	$names = explode(' ', $name);
-	$shortName = $names[0];
-	if (isset($names[1])) {
-		$shortName .= ' ' . substr($names[1], 0, 1) . '.';
-	}
-	$name = $shortName;
-}
+$usersNames = ArrayHelper::shortNames(LeadChartSearch::getUsersNames(LeadUser::TYPE_OWNER));
 
 $leadStatusColor = $searchModel->getLeadStatusColor();
 
@@ -357,12 +349,12 @@ $currencyFormatter = (string) ChartsWidget::currencyFormatterExpression();
 $js = <<<JS
 	var lastGroup = '';
 	function changeGroupStatus(groupId, btn){
+		console.log(groupId, btn);
 		document.querySelectorAll('#nav-status-groups .btn').forEach(function(element){
 			element.classList.remove('active');
 		});
 		btn.classList.add('active');
 		const series = $jsonGroupSeries;
-		const currencyFormatter = $currencyFormatter;
 		
 		if(groupId !== lastGroup){
 			var data = null;
@@ -376,28 +368,13 @@ $js = <<<JS
 			}
 			if(data){
 				ApexCharts.exec('donut-leads-users-count', 'updateSeries', data, true);
-				// if(serie.currencyFormatter){
-				// 	ApexCharts.exec('donut-leads-users-count', 'updateOptions', {
-				// 		dataLabels:{
-				// 			formatter: currencyFormatter,
-				// 		}
-				// 	}, true);
-				// }
-				// else{
-				// 	ApexCharts.exec('donut-leads-users-count', 'updateOptions', {
-				// 		dataLabels:{
-				// 			formatter: function(val){return val.toFixed(1) + '%'}
-				// 		}
-				// 	}, true);
-				// }
-				
-		
 				ApexCharts.exec('donut-leads-users-count', 'updateOptions', {title:{
 					text:groupId
 				}}, true);
 			}
 		}
 	}
+	
 JS;
 
 $this->registerJs($js, View::POS_HEAD);
