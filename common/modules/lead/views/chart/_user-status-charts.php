@@ -94,14 +94,14 @@ foreach ($userCounts as $userId => $data) {
 			$count = $costValue['count'];
 			if ($count) {
 				$value = $costValue['cost'] / $count;
-				$name = $data['name'];
+				$userName = $data['name'];
 				$costsUsersData[$statusId]['costValue'][$userId] = $costValue;
 				$costsUsersData[$statusId]['data'][] = [
-					'x' => $name,
+					'x' => $userName,
 					'y' => (int) $value,
 					'user_id' => $userId,
 				];
-				$costsUsers[$userId] = $name;
+				$costsUsers[$userId] = $userName;
 			}
 		}
 	}
@@ -152,7 +152,7 @@ $totalSeries = [
 ];
 foreach ($userCounts as $userId => $data) {
 	$totalSeries['data'][] = $data['count'];
-	foreach ($groupsOrStatuses as $groupId => $name) {
+	foreach ($groupsOrStatuses as $groupId => $value) {
 		if (!isset($data['data'][$groupId])) {
 			$userCounts[$userId]['data'][$groupId] = null;
 		}
@@ -186,7 +186,6 @@ if ($hasCosts) {
 		'strokeWidth' => 3,
 		'withoutCount' => true,
 		'currencyFormatter' => true,
-		'countAsAvg' => true,
 		'yAxis' => [
 			'opposite' => true,
 			'seriesName' => [
@@ -401,12 +400,7 @@ foreach ($groupSeries as $group) {
 	$name = $group['name'];
 
 	if (!isset($group['withoutCount'])) {
-		$count = $searchModel->groupedStatus === LeadChartSearch::STATUS_GROUP_DISABLE
-			? count($group['data'])
-			: array_sum($group['data']);
-		if (isset($group['countAsAvg'])) {
-			$count = array_sum($group['data']) / count($group['data']);
-		}
+		$count = array_sum($group['data']);
 
 		$count = round($count);
 		if (isset($group['currencyFormatter'])) {
@@ -416,6 +410,7 @@ foreach ($groupSeries as $group) {
 	} else {
 		$label = $name;
 	}
+
 	$groupButtons[] = [
 		'label' => $label,
 		'linkOptions' => [
