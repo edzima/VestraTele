@@ -29,32 +29,6 @@ $this->params['breadcrumbs'][] = $this->title;
 $leadStatusColor = $searchModel->getLeadStatusColor();
 $leadsDaysData = $searchModel->getLeadsByDays();
 
-$hoursData = $searchModel->getLeadsGroupsByHours();
-
-$hoursChartData = [];
-foreach ($hoursData as $data) {
-	$hour = $data['hour'];
-	if (!isset($hoursChartData['categories'][$hour])) {
-		$hoursChartData['categories'][$hour] = $hour;
-	}
-	$provider = $data['provider'];
-	if (empty($provider)) {
-		$provider = Yii::t('lead', 'Without Provider');
-	} else {
-		$provider = LeadChartSearch::getProvidersNames()[$provider];
-	}
-	if (!isset($hoursChartData['series'][$provider])) {
-		$hoursChartData['series'][$provider] = [
-			'name' => $provider,
-			'data' => [],
-		];
-	}
-	$hoursChartData['series'][$provider]['data'][] = [
-		'x' => (int) ($hour),
-		'y' => (int) ($data['count']),
-	];
-}
-
 $leadsCountSeries = [];
 $leadDates = array_values(array_unique(ArrayHelper::getColumn($leadsDaysData, 'date')));
 $hasGroup = false;
@@ -564,25 +538,12 @@ if (count($providersData) > 1) {
 				])
 				: ''
 			?>
-			<?= !empty($hoursChartData)
-				? ChartsWidget::widget([
-					'containerOptions' => [
+
+			<?= $searchModel->visibleHoursChart
+				? $this->render('_hoursChart', [
+					'model' => $searchModel,
+					'chartContainerOptions' => [
 						'class' => 'col-sm-12 col-md-8',
-					],
-					'height' => '350px',
-					'type' => ChartsWidget::TYPE_BAR,
-					'series' => array_values($hoursChartData['series']),
-					'options' => [
-						'xaxis' => [
-							'type' => 'category',
-						],
-						'dataLabels' => [
-							'enabled' => false,
-						],
-						'title' => [
-							'text' => Yii::t('lead', 'Hours'),
-							'align' => 'center',
-						],
 					],
 				])
 				: ''
@@ -626,7 +587,6 @@ if (count($providersData) > 1) {
 			//						],
 			//					],
 			//				])
-
 			?>
 
 

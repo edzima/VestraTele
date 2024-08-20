@@ -512,4 +512,5 @@ return [
 	'{name} - Leads' => '{name} - Leads',
 	'{name} - Cost' => '{name} - Koszt',
 	'Statuses without group' => 'Nieznane',
+	'Visible Hours Chart' => 'Pokaż wykres Godzinowy',
 ];
