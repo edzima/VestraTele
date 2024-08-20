@@ -92,7 +92,6 @@ class LeadChartSearch extends LeadSearch {
 
 	public function getLeadsByDays(): array {
 		$query = $this->getBaseQuery();
-		$query->joinWith('costs');
 		$query->groupBy([
 			Lead::expressionDateAtAsDate(),
 			Lead::tableName() . '.status_id',
@@ -101,7 +100,6 @@ class LeadChartSearch extends LeadSearch {
 			'count(*) AS count',
 			new Expression('DATE(' . Lead::tableName() . '.date_at) as date'),
 			Lead::tableName() . '.status_id',
-			new Expression('SUM(' . LeadCost::tableName() . '.value)'),
 		]);
 		$query->orderBy([Lead::tableName() . '.date_at' => SORT_ASC]);
 		$query->asArray();
@@ -218,7 +216,7 @@ class LeadChartSearch extends LeadSearch {
 		return $query->column();
 	}
 
-	public function getLeadsUserStatusData(): array {
+	public function getLeadsUserStatusData(bool $withCosts): array {
 		$query = LeadUser::find();
 		$query->joinWith([
 			'lead' => function (LeadQuery $query) {
@@ -228,13 +226,16 @@ class LeadChartSearch extends LeadSearch {
 		$query = $this->getBaseQuery()->joinWith('leadUsers');
 		$query->andWhere([LeadUser::tableName() . '.type' => LeadUser::TYPE_OWNER]);
 
-		$query->select([
+		$select = [
 			LeadUser::tableName() . '.user_id',
 			Lead::tableName() . '.status_id',
 			'count(*) as count',
-			'count(' . Lead::tableName() . '.cost_value) as costCount',
-			'SUM(' . Lead::tableName() . '.cost_value) as costValue',
-		]);
+		];
+		if ($withCosts) {
+			$select[] = 'SUM(' . Lead::tableName() . '.cost_value) as costValue';
+			$select[] = 'count(' . Lead::tableName() . '.cost_value) as costCount';
+		}
+		$query->select($select);
 		$query->groupBy([
 			LeadUser::tableName() . '.user_id',
 			Lead::tableName() . '.status_id',
