@@ -195,7 +195,7 @@ if ($leadsDataProvider->getTotalCount()) {
 			<?php
 			$chartCostDayData = CampaignCostChart::costDayData($costDataProvider->query);
 			?>
-			<?= isset($chartCostDayData['series'])
+			<?= !empty($chartCostDayData['series'])
 				? ChartsWidget::widget([
 					'series' => $chartCostDayData['series'],
 					'type' => ChartsWidget::TYPE_AREA,
@@ -212,6 +212,7 @@ if ($leadsDataProvider->getTotalCount()) {
 							[
 								'seriesName' => $chartCostDayData['yAxis']['seriesNames.leads'],
 								'decimalsInFloat' => 0,
+								'showForNullSeries' => false,
 								'title' => [
 									'text' => Yii::t('lead', 'Leads'),
 								],
@@ -219,6 +220,7 @@ if ($leadsDataProvider->getTotalCount()) {
 							[
 								'seriesName' => $chartCostDayData['yAxis']['seriesNames.cost'],
 								'decimalsInFloat' => 1,
+								'showForNullSeries' => false,
 								'title' => [
 									'text' => Yii::t('lead', 'Cost'),
 								],
@@ -226,6 +228,7 @@ if ($leadsDataProvider->getTotalCount()) {
 							[
 								'seriesName' => $chartCostDayData['yAxis']['seriesNames.avg'],
 								'opposite' => true,
+								'showForNullSeries' => false,
 								'decimalsInFloat' => 1,
 								'title' => [
 									'text' => Yii::t('lead', 'Single Lead cost Value'),
