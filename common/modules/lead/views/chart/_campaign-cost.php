@@ -1,13 +1,13 @@
 <?php
 
-/* @var $model LeadChartSearch */
-
 use common\helpers\Url;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\searches\LeadChartSearch;
 use common\widgets\charts\ChartsWidget;
 use yii\helpers\Json;
 use yii\web\JsExpression;
+
+/* @var $model LeadChartSearch */
 
 $campaignsData = $model->getLeadCampaignsCount();
 
@@ -55,12 +55,14 @@ if (count($campaignsData) > 1) {
 
 		$campaignsData['avgSeries'][] = [
 			'x' => $name,
-			'y' => round($avg, 2),
+			'y' => $avg ? round($avg, 2) : null,
 		];
 	}
 }
 
 ?>
+
+
 
 <?= isset($campaignsData['series']) ?
 	ChartsWidget::widget([
@@ -72,6 +74,7 @@ if (count($campaignsData) > 1) {
 								const index = opts.dataPointIndex;
 								const urls = " . Json::encode($campaignsData['url']) . ";
 								const url = urls[index];
+								console.log(index);
 								if(url){
 									window.open(urls[index]);
 								}
@@ -94,7 +97,6 @@ if (count($campaignsData) > 1) {
 				'type' => ChartsWidget::TYPE_COLUMN,
 				'data' => $campaignsData['series'],
 			],
-
 		],
 		'options' => [
 			'title' => [
@@ -104,7 +106,7 @@ if (count($campaignsData) > 1) {
 			//	'labels' => $campaignsData['labels'],
 
 			'stroke' => [
-				'width' => [3, 4, 0],
+				'width' => [2, 3, 0],
 				'curve' => 'smooth',
 			],
 
