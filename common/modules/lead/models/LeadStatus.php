@@ -129,8 +129,38 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 		return $this->hasMany(Lead::class, ['status_id' => 'id']);
 	}
 
+	public static function notForDialer(int $id): bool {
+		return (bool) static::getModels()[$id]->not_for_dialer;
+	}
+
+	public function getId(): int {
+		return $this->id;
+	}
+
+	public function getName(): string {
+		return $this->name;
+	}
+
+	public function isShortReport(): bool {
+		return !empty($this->short_report);
+	}
+
 	public static function getNames(): array {
 		return ArrayHelper::map(static::getModels(), 'id', 'name');
+	}
+
+	public static function sortIndexByKey($groupOrId, bool $grouped = false, int $default = -1): int {
+		$model = $grouped ? static::findStatusByChartGroup($groupOrId) : static::getModels()[$groupOrId];
+		return $model ? (int) $model->sort_index : $default;
+	}
+
+	public static function findStatusByChartGroup(string $name): ?LeadStatus {
+		foreach (static::getModels() as $model) {
+			if ($model->chart_group === $name) {
+				return $model;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -147,19 +177,4 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 		return static::$models;
 	}
 
-	public static function notForDialer(int $id): bool {
-		return (bool) static::getModels()[$id]->not_for_dialer;
-	}
-
-	public function getId(): int {
-		return $this->id;
-	}
-
-	public function getName(): string {
-		return $this->name;
-	}
-
-	public function isShortReport(): bool {
-		return !empty($this->short_report);
-	}
 }
