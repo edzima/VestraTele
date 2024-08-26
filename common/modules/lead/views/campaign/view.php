@@ -218,12 +218,17 @@ if ($leadsDataProvider->getTotalCount()) {
 							],
 							[
 								'seriesName' => $chartCostDayData['yAxis']['seriesNames.cost'],
-								'opposite' => true,
+								'decimalsInFloat' => 1,
 								'title' => [
 									'text' => Yii::t('lead', 'Cost'),
 								],
-								'labels' => [
-									'formatter' => ChartsWidget::currencyFormatterExpression(),
+							],
+							[
+								'seriesName' => $chartCostDayData['yAxis']['seriesNames.avg'],
+								'opposite' => true,
+								'decimalsInFloat' => 1,
+								'title' => [
+									'text' => Yii::t('lead', 'Single Lead cost Value'),
 								],
 							],
 						],

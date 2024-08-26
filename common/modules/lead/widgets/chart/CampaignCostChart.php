@@ -45,44 +45,73 @@ class CampaignCostChart extends Widget {
 		$data = ArrayHelper::index($data, 'date_at', 'campaign_id');
 		$series = [];
 		$yAxis = [];
+		$campaignsCount = count($data);
+		$campaignNames = LeadCampaign::find()->andWhere([
+			'id' => array_keys($data),
+		])
+			->select('name')
+			->indexBy('id')
+			->column();
+
 		foreach ($data as $campaignId => $rows) {
 			if (!isset($series[$campaignId])) {
-				$name = LeadCampaign::getModels()[$campaignId]->name;
+				$name = $campaignsCount > 1 ? $campaignNames[$campaignId] : null;
+
 				$series[$campaignId . '-count'] = [
-					'name' => Yii::t('lead', '{name} - Leads', [
-						'name' => $name,
-					]),
+					'name' => $name
+						? Yii::t('lead', '{name} - Leads', [
+							'name' => $name,
+						])
+						: Yii::t('lead', 'Leads Count'),
 					'data' => [],
 					'campaign_id' => $campaignId,
 					'group' => 'count',
 					'type' => ChartsWidget::TYPE_BAR,
 					'strokeWidth' => 0,
 				];
-				$series[$campaignId] = [
-					'name' => Yii::t('lead', '{name} - Cost', [
-						'name' => $name,
-					]),
+				$series[$campaignId . '-cost'] = [
+					'name' => $name
+						? Yii::t('lead', '{name} - Cost', [
+							'name' => $name,
+						])
+						: Yii::t('lead', 'Total Cost Value'),
 					'data' => [],
 					'campaign_id' => $campaignId,
 					'group' => 'cost',
 					'type' => ChartsWidget::TYPE_LINE,
 					'strokeWidth' => 3,
 				];
-				$yAxis['seriesNames.leads'][] = Yii::t('lead', '{name} - Leads', [
-					'name' => $name,
-				]);
-				$yAxis['seriesNames.cost'][] = Yii::t('lead', '{name} - Cost', [
-					'name' => $name,
-				]);
+				$series[$campaignId . '-avg'] = [
+					'name' => $name
+						? Yii::t('lead', '{campaignName} - Single Lead Cost', [
+							'campaignName' => $name,
+						])
+						: Yii::t('lead', 'Single Lead cost Value'),
+					'data' => [],
+					'campaign_id' => $campaignId,
+					'group' => 'avg',
+					'type' => ChartsWidget::TYPE_AREA,
+					'strokeWidth' => 2,
+				];
+				$yAxis['seriesNames.leads'][] = $series[$campaignId . '-count']['name'];
+				$yAxis['seriesNames.cost'][] = $series[$campaignId . '-cost']['name'];
+				$yAxis['seriesNames.avg'][] = $series[$campaignId . '-avg']['name'];
 			}
 			foreach ($rows as $row) {
-				$series[$campaignId]['data'][] = [
+				$cost = $row['value'] ? (float) $row['value'] : null;
+				$count = $row['leadsCount'] ? (int) $row['leadsCount'] : null;
+				$avg = $cost && $count ? $cost / $count : null;
+				$series[$campaignId . '-cost']['data'][] = [
 					'x' => $row['date_at'],
-					'y' => $row['value'] ? (float) $row['value'] : null,
+					'y' => $cost,
 				];
 				$series[$campaignId . '-count']['data'][] = [
 					'x' => $row['date_at'],
-					'y' => $row['leadsCount'] ? (int) $row['leadsCount'] : null,
+					'y' => $count,
+				];
+				$series[$campaignId . '-avg']['data'][] = [
+					'x' => $row['date_at'],
+					'y' => $avg ? round($avg, 1) : null,
 				];
 			}
 		}
