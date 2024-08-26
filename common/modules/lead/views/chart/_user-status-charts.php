@@ -184,6 +184,7 @@ if ($hasCosts) {
 		'strokeWidth' => 3,
 		'withoutCount' => true,
 		'currencyFormatter' => true,
+		'group' => 'cost',
 		'yAxis' => [
 			'opposite' => true,
 			'seriesName' => [
@@ -233,7 +234,6 @@ if ($hasCosts) {
 
 	$costUsersNames = [];
 
-	$firstCost = reset($costsUsersData);
 	$newCostsAvg = [];
 	foreach ($costsUsersData as $data) {
 		foreach ($data['costValue'] as $userID => $costData) {
@@ -334,6 +334,8 @@ if ($hasCosts) {
 		$totalCostData['labels'][] = $usersNames[$userId];
 	}
 }
+//@todo when use single cost value, total data labels always get data from cost
+unset($groupSeries['singleCostValue']);
 
 //pie can't have null values
 $pieGroupSeries = $groupSeries;
@@ -345,11 +347,10 @@ foreach ($pieGroupSeries as $index => $serie) {
 	}
 }
 $jsonGroupSeries = Json::encode($pieGroupSeries);
-$currencyFormatter = (string) ChartsWidget::currencyFormatterExpression();
+
 $js = <<<JS
 	var lastGroup = '';
 	function changeGroupStatus(groupId, btn){
-		console.log(groupId, btn);
 		document.querySelectorAll('#nav-status-groups .btn').forEach(function(element){
 			element.classList.remove('active');
 		});
@@ -406,6 +407,7 @@ foreach ($groupSeries as $group) {
 		],
 	];
 }
+
 ?>
 
 <div class="user-status-charts">
@@ -429,7 +431,6 @@ foreach ($groupSeries as $group) {
 
 				<?= !empty($totalSeries['data'])
 					? ChartsWidget::widget([
-						'id' => 'donut-leads-users-count',
 						'type' => ChartsWidget::TYPE_DONUT,
 						'legendFormatterAsSeriesWithCount' => true,
 						'showDonutTotalLabels' => true,
@@ -499,7 +500,7 @@ foreach ($groupSeries as $group) {
 								'rotate' => -45,
 							],
 						],
-						'yaxis' => $yaxis,
+						//	'yaxis' => $yaxis,
 						'tooltip' => [
 							'shared' => true,
 							'hideEmptySeries' => true,

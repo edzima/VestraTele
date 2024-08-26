@@ -4,8 +4,8 @@ use common\helpers\ArrayHelper;
 use common\models\user\User;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
-use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadChartSearch;
+use common\modules\lead\widgets\chart\LeadTypeChart;
 use common\widgets\charts\ChartsWidget;
 use yii\web\JsExpression;
 
@@ -111,13 +111,6 @@ if ($searchModel->groupedStatus !== LeadChartSearch::STATUS_GROUP_DISABLE) {
 			$statusGroupDataPercent[] = round($data / $statusGroupTotalCount * 100, 1);
 		}
 	}
-}
-
-$typesData = $searchModel->getLeadTypesCount();
-foreach ($typesData as $typeId => $count) {
-	$type = LeadType::getModels()[$typeId];
-	$typesData['series'][] = $count;
-	$typesData['labels'][] = $type->name;
 }
 
 $sourcesData = $searchModel->getLeadSourcesCount();
@@ -261,32 +254,22 @@ if (count($providersData) > 1) {
 			?>
 
 
-			<?= !empty($typesData) ?
-				ChartsWidget::widget([
-					'id' => 'chart-leads-types-count' . $searchModel->getUniqueId(),
-					'type' => ChartsWidget::TYPE_DONUT,
-					'containerOptions' => [
-						'class' => 'col-sm-12 col-md-6 col-lg-4',
-						'style' => ['height' => '50vh',],
+			<?= LeadTypeChart::widget([
+				'typesCount' => $searchModel->getLeadTypesCount(),
+				'containerOptions' => [
+					'class' => 'col-sm-12 col-md-6 col-lg-4',
+					'style' => ['height' => '50vh',],
+				],
+				'options' => [
+					'legend' => [
+						'position' => 'bottom',
+						'height' => '55',
 					],
-					'showDonutTotalLabels' => true,
-					'legendFormatterAsSeriesWithCount' => true,
-					'series' => $typesData['series'],
-					'options' => [
-						'labels' => $typesData['labels'],
-						'title' => [
-							'text' => Yii::t('lead', 'Types Count'),
-							'align' => 'center',
-						],
-						'legend' => [
-							'position' => 'bottom',
-							//'width' => 200,
-							'height' => '55',
-						],
-					],
-				])
-				: ''
+				],
+			])
 			?>
+
+
 
 
 			<?= !empty($sourcesData) ?
