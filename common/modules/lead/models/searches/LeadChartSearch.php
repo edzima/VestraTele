@@ -5,7 +5,6 @@ namespace common\modules\lead\models\searches;
 use common\helpers\ArrayHelper;
 use common\modules\lead\chart\LeadStatusColor;
 use common\modules\lead\models\Lead;
-use common\modules\lead\models\LeadCost;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadUser;
@@ -167,17 +166,21 @@ class LeadChartSearch extends LeadSearch {
 		return $data;
 	}
 
-	public function getLeadCampaignsCount(): array {
-		$query = $this->getBaseQuery();
-		$query->groupBy(Lead::tableName() . '.campaign_id');
-		$query->select([Lead::tableName() . '.campaign_id', 'count(*) as count']);
-		$query->asArray();
-		$data = $query->all();
-		$data = ArrayHelper::map($data, 'campaign_id', 'count');
-		$data = array_map('intval', $data);
-		arsort($data);
+	private ?array $leadCampaignsCount = null;
 
-		return $data;
+	public function getLeadCampaignsCount(bool $refresh = false): array {
+		if ($this->leadCampaignsCount === null || $refresh) {
+			$query = $this->getBaseQuery();
+			$query->groupBy(Lead::tableName() . '.campaign_id');
+			$query->select([Lead::tableName() . '.campaign_id', 'count(*) as count']);
+			$query->asArray();
+			$data = $query->all();
+			$data = ArrayHelper::map($data, 'campaign_id', 'count');
+			$data = array_map('intval', $data);
+			arsort($data);
+			$this->leadCampaignsCount = $data;
+		}
+		return $this->leadCampaignsCount;
 	}
 
 	public function getCampaignCost(): array {
@@ -201,19 +204,6 @@ class LeadChartSearch extends LeadSearch {
 		$data = ArrayHelper::map($data, 'provider', 'count');
 		$data = array_map('intval', $data);
 		return $data;
-	}
-
-	public function getLeadCostsData(): array {
-		$query = LeadCost::find();
-		$query->joinWith([
-			'leads' => function (LeadQuery $query) {
-				$this->applyLeadFilter($query);
-			},
-		]);
-		$query->select([
-			'value',
-		]);
-		return $query->column();
 	}
 
 	public function getLeadsUserStatusData(bool $withCosts): array {
@@ -249,7 +239,7 @@ class LeadChartSearch extends LeadSearch {
 		return $data;
 	}
 
-	protected function getBaseQuery(bool $validate = false): LeadQuery {
+	public function getBaseQuery(bool $validate = false): LeadQuery {
 		$query = Lead::find();
 		if ($validate && !$this->validate()) {
 			$query->andWhere('0=1');
