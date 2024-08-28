@@ -1,8 +1,7 @@
 <?php
 
-namespace common\modules\lead\components;
+namespace common\modules\lead\components\cost;
 
-use common\modules\lead\models\CampaignCost;
 use common\modules\lead\models\Lead;
 use yii\base\Component;
 

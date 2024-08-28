@@ -1,7 +1,9 @@
 <?php
 
-namespace common\modules\lead\models;
+namespace common\modules\lead\components\cost;
 
+use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadCost;
 use yii\base\Model;
 use yii\db\Query;
 
@@ -11,8 +13,6 @@ class CampaignCost extends Model {
 	public ?string $toAt = null;
 
 	public int $campaign_id;
-
-	public int $leads_count;
 
 	public ?float $sum;
 	public ?float $single_cost_value;
