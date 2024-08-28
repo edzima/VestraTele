@@ -20,13 +20,13 @@ $id = $model->campaignIds[array_key_first($model->campaignIds)];
 	<div class="row">
 		<?= $form->field($model, 'fromAt', [
 			'options' => [
-				'class' => 'col-md-4',
+				'class' => 'col-xs-6',
 			],
 		])->widget(DateWidget::class) ?>
 
 		<?= $form->field($model, 'toAt', [
 			'options' => [
-				'class' => 'col-md-4',
+				'class' => 'col-xs-6',
 			],
 		])->widget(DateWidget::class) ?>
 	</div>

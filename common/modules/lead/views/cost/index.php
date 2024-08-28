@@ -1,7 +1,7 @@
 <?php
 
 use common\helpers\Html;
-use common\modules\lead\components\CostComponent;
+use common\modules\lead\components\cost\CostComponent;
 use common\modules\lead\models\LeadCost;
 use common\modules\lead\models\searches\LeadCostSearch;
 use common\widgets\grid\ActionColumn;
