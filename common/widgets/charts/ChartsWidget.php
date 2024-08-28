@@ -41,6 +41,17 @@ class ChartsWidget extends Widget {
 
 	public array $containerOptions = [];
 
+	public static function radialDataFromCounts(array $data, int $precision = 1): array {
+		$total = array_sum($data);
+		$radialData = [];
+		foreach ($data as $count) {
+			$value = $count ? $count / $total * 100 : 0;
+			$value = round($value, $precision);
+			$radialData[] = $value;
+		}
+		return $radialData;
+	}
+
 	public function init() {
 		if (!isset($this->chart['defaultLocale'])) {
 			$this->chart['defaultLocale'] = Yii::$app->language;
@@ -58,12 +69,15 @@ class ChartsWidget extends Widget {
 	}
 
 	public function run() {
+		if (empty($this->series)) {
+			return '';
+		}
 		ChartsAsset::register($this->getView());
 		$options = $this->containerOptions;
 		$options['id'] = $this->getId();
-		echo Html::tag('div', '', $options);
-
 		$this->view->registerJs($this->getScript());
+
+		return Html::tag('div', '', $options);
 	}
 
 	public function getScript(): string {
