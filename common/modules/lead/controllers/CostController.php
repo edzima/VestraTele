@@ -49,7 +49,7 @@ class CostController extends BaseController {
 					);
 				} elseif ($count === 0) {
 					Flash::add(Flash::TYPE_INFO,
-						Yii::t('lead', 'No new data to record.',)
+						Yii::t('lead', 'No new data to record.')
 					);
 				}
 				return $this->redirect(['index']);

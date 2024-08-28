@@ -318,10 +318,14 @@ class LeadSearch extends Lead implements SearchModel {
 		if (!empty($this->owner_id)) {
 			$query->owner($this->owner_id);
 		}
+		if (!empty($this->user_type)) {
+			$query->joinWith('leadUsers');
+			$query->andWhere([LeadUser::tableName() . '.type' => $this->user_type]);
+
+		}
 		if (!empty($this->user_id)) {
 			$query->joinWith('leadUsers');
 			$query->andWhere([LeadUser::tableName() . '.user_id' => $this->user_id]);
-			$query->andFilterWhere([LeadUser::tableName() . '.type' => $this->user_type]);
 		}
 		if ($this->withoutUser) {
 			$query->joinWith('leadUsers', false, 'LEFT OUTER JOIN');
