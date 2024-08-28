@@ -15,6 +15,7 @@ class ChartsAsset extends AssetBundle {
 
 	public $depends = [
 		CurrencyFormatterAsset::class,
+		NavChartAsset::class,
 	];
 
 }
