@@ -25,10 +25,13 @@ use yii\helpers\ArrayHelper;
  * @property string|null $statuses
  * @property int|null $hours_deadline
  * @property int|null $hours_deadline_warning
+ * @property int|null $deal_stage
  * @property-read Lead[] $leads
  * @property-read string $marketStatusName
  */
-class LeadStatus extends ActiveRecord implements LeadStatusInterface {
+class LeadStatus extends ActiveRecord implements
+	LeadStatusInterface,
+	LeadDealStage {
 
 	private static ?array $models = null;
 
@@ -57,13 +60,14 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 	public function rules(): array {
 		return [
 			[['name'], 'required'],
-			[['sort_index', 'market_status', 'hours_deadline', 'hours_deadline_warning'], 'integer'],
+			[['sort_index', 'market_status', 'hours_deadline', 'hours_deadline_warning', 'deal_stage'], 'integer'],
 			[['hours_deadline', 'hours_deadline_warning'], 'integer', 'min' => 0],
 			[['short_report', 'show_report_in_lead_index', 'not_for_dialer', 'market_status_same_contacts'], 'boolean'],
 			[['name', 'description', 'statuses', 'calendar_background', 'chart_color', 'chart_group'], 'string', 'max' => 255],
-			[['calendar_background', 'hours_deadline', 'hours_deadline_warning', 'statuses', 'chart_color', 'chart_group'], 'default', 'value' => null],
+			[['calendar_background', 'hours_deadline', 'hours_deadline_warning', 'statuses', 'chart_color', 'chart_group', 'deal_stage'], 'default', 'value' => null],
 			[['market_status'], 'in', 'range' => array_keys(static::getMarketStatusesNames())],
 			['statusesIds', 'in', 'range' => array_keys(static::getNames()), 'allowArray' => true],
+			['deal_stage', 'in', 'range' => array_keys($this->dealStagesNames()), 'enableClientValidation' => false],
 		];
 	}
 
@@ -99,6 +103,8 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 			'statuses' => Yii::t('lead', 'Statuses'),
 			'chart_color' => Yii::t('lead', 'Chart Color'),
 			'chart_group' => Yii::t('lead', 'Chart Group'),
+			'deal_stage' => Yii::t('lead', 'Deal Stage'),
+			'dealStageName' => Yii::t('lead', 'Deal Stage'),
 		];
 	}
 
@@ -143,6 +149,23 @@ class LeadStatus extends ActiveRecord implements LeadStatusInterface {
 
 	public function isShortReport(): bool {
 		return !empty($this->short_report);
+	}
+
+	public function getDealStage(): ?int {
+		return $this->deal_stage;
+	}
+
+	public function getDealStageName(): ?string {
+		return $this->dealStagesNames()[$this->deal_stage] ?? null;
+	}
+
+	public function dealStagesNames(): array {
+		return [
+			static::DEAL_STAGE_QUALIFIED => Yii::t('lead', 'Deal Stage: Qualified'),
+			static::DEAL_STAGE_CONTRACT_SENT => Yii::t('lead', 'Deal Stage: Contract Sent'),
+			static::DEAL_STAGE_CLOSED_WON => Yii::t('lead', 'Deal Stage: Closed Won'),
+			static::DEAL_STAGE_CLOSED_LOST => Yii::t('lead', 'Deal Stage: Closed Lost'),
+		];
 	}
 
 	public static function getNames(): array {
