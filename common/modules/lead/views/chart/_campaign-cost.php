@@ -89,7 +89,7 @@ if (count($campaignsData) > 1) {
 			],
 			[
 				'name' => Yii::t('lead', 'AVG'),
-				'type' => ChartsWidget::TYPE_LINE,
+				'type' => ChartsWidget::TYPE_AREA,
 				'data' => $campaignsData['avgSeries'],
 			],
 			[
