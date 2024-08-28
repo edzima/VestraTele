@@ -24,6 +24,18 @@ use yii\widgets\ActiveForm;
 
 			<?= $form->field($model, 'description')->textarea(['maxlength' => true]) ?>
 
+			<?= $form->field($model, 'deal_stage')
+				->widget(Select2::class, [
+					'data' => $model->dealStagesNames(),
+					'options' => [
+						'placeholder' => $model->getAttributeLabel('deal_stage'),
+					],
+					'pluginOptions' => [
+						'allowClear' => true,
+					],
+				])
+			?>
+
 			<?= $form->field($model, 'statusesIds')
 				->widget(Select2::class, [
 					'data' => LeadStatus::getNames(),
@@ -37,25 +49,15 @@ use yii\widgets\ActiveForm;
 		</div>
 
 		<div class="col-md-2">
-			<?= $form->field($model, 'market_status')->dropDownList(LeadStatus::getMarketStatusesNames(), [
-				'prompt' => Yii::t('lead', 'Select...'),
-			]) ?>
+			<?= $form->field($model, 'market_status')->dropDownList(LeadStatus::getMarketStatusesNames(), ['prompt' => Yii::t('lead', 'Select...'),]) ?>
 			<?= $form->field($model, 'market_status_same_contacts')->checkbox() ?>
 
 		</div>
 		<div class="col-md-2">
 
-			<?= $form->field($model, 'hours_deadline')->widget(NumberControl::class, [
-				'maskedInputOptions' => [
-					'digits' => 0,
-				],
-			]) ?>
+			<?= $form->field($model, 'hours_deadline')->widget(NumberControl::class, ['maskedInputOptions' => ['digits' => 0,],]) ?>
 
-			<?= $form->field($model, 'hours_deadline_warning')->widget(NumberControl::class, [
-				'maskedInputOptions' => [
-					'digits' => 0,
-				],
-			]) ?>
+			<?= $form->field($model, 'hours_deadline_warning')->widget(NumberControl::class, ['maskedInputOptions' => ['digits' => 0,],]) ?>
 
 
 			<?= $form->field($model, 'calendar_background')->widget(

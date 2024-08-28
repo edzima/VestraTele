@@ -36,6 +36,10 @@ YiiAsset::register($this);
 			'name',
 			'description',
 			[
+				'attribute' => 'dealStageName',
+				'visible' => !empty($model->getDealStage()),
+			],
+			[
 				'attribute' => 'hours_deadline',
 				'visible' => !empty($model->hours_deadline),
 			],
