@@ -8,6 +8,7 @@ use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\searches\LeadChartReportSearch;
 use common\modules\lead\models\searches\LeadReportSearch;
 use Yii;
 use yii\filters\VerbFilter;
@@ -53,16 +54,31 @@ class ReportController extends BaseController {
 			if ($userId === null) {
 				throw new NotFoundHttpException();
 			}
-			$searchModel->scenario = LeadReportSearch::SCENARIO_OWNER;
-			$searchModel->owner_id = $userId;
-			$searchModel->withoutDeleted = false;
-			$searchModel->lead_user_id = $userId;
+			$searchModel->setOwnerScenario($userId);
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	public function actionChart(string $fromAt = null, string $toAt = null, int $type = null): string {
+		$searchModel = new LeadChartReportSearch();
+		if ($this->module->onlyUser) {
+			$userId = Yii::$app->user->getId();
+			if ($userId === null) {
+				throw new NotFoundHttpException();
+			}
+			$searchModel->setOwnerScenario($userId);
+		}
+		$searchModel->from_at = $fromAt;
+		$searchModel->to_at = $toAt;
+		$searchModel->load(Yii::$app->request->queryParams);
+		$searchModel->validate();
+		return $this->render('chart', [
+			'searchModel' => $searchModel,
 		]);
 	}
 
