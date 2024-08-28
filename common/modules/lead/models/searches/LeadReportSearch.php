@@ -264,7 +264,7 @@ class LeadReportSearch extends LeadReport {
 		}
 	}
 
-	public function setOwnerScenario(int|string $userId): void {
+	public function setOwnerScenario(int $userId): void {
 		$this->scenario = LeadReportSearch::SCENARIO_OWNER;
 		$this->owner_id = $userId;
 		$this->withoutDeleted = false;
