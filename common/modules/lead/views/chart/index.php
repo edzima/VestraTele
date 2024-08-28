@@ -6,6 +6,7 @@ use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadChartSearch;
 use common\modules\lead\widgets\chart\LeadTypeChart;
+use common\modules\lead\widgets\chart\LeadUsersStatusChart;
 use common\widgets\charts\ChartsWidget;
 use yii\web\JsExpression;
 
@@ -141,12 +142,20 @@ if (count($providersData) > 1) {
 	]) ?>
 	<div class="lead-charts">
 
+		<?= LeadUsersStatusChart::widget([
+			'query' => $searchModel->getBaseQuery(),
+			//->joinWith('leadUsers')
+			//->andWhere([LeadUser::tableName() . '.type' => $searchModel->user_type ? $searchModel->user_type : LeadUser::TYPE_OWNER]),
+		]) ?>
+
+
 		<?= true || (empty($searchModel->user_id) || count((array) $searchModel->user_id) !== 1)
 			? $this->render('_user-status-charts', [
 				'searchModel' => $searchModel,
 			])
 			: ''
 		?>
+
 
 		<div class="row">
 			<?= !empty($statusGroupData) && $searchModel->groupedStatusChartType === ChartsWidget::TYPE_RADIAL_BAR ?
@@ -307,9 +316,7 @@ if (count($providersData) > 1) {
 
 				<?= Yii::$app->user->can(
 					User::PERMISSION_LEAD_COST
-				) ? $this->render('_campaign-cost', [
-					'model' => $searchModel,
-				])
+				) ? $this->render('_campaign-cost', ['model' => $searchModel,])
 					: ''
 				?>
 			</div>
@@ -362,8 +369,7 @@ if (count($providersData) > 1) {
 				ChartsWidget::widget([
 					'type' => ChartsWidget::TYPE_DONUT,
 					'containerOptions' => [
-						'class' => 'col-sm-12 col-md-6 col-lg-4',
-						//		'style' => ['height' => '50vh',],
+						'class' => 'col-sm-12 col-md-6 col-lg-4',//		'style' => ['height' => '50vh',],
 					],
 					'id' => 'chart-leads-providers-count' . $searchModel->getUniqueId(),
 					'legendFormatterAsSeriesWithCount' => true,
@@ -387,9 +393,7 @@ if (count($providersData) > 1) {
 			<?= $searchModel->visibleHoursChart
 				? $this->render('_hoursChart', [
 					'model' => $searchModel,
-					'chartContainerOptions' => [
-						'class' => 'col-sm-12 col-md-8',
-					],
+					'chartContainerOptions' => ['class' => 'col-sm-12 col-md-8',],
 				])
 				: ''
 			?>
