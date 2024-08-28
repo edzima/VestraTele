@@ -4,7 +4,7 @@ namespace common\modules\lead;
 
 use Closure;
 use common\models\user\User;
-use common\modules\lead\components\CostComponent;
+use common\modules\lead\components\cost\CostComponent;
 use common\modules\lead\components\LeadDialerManager;
 use common\modules\lead\components\LeadManager;
 use common\modules\lead\components\MarketManager;

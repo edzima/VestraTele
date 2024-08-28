@@ -2,14 +2,15 @@
 
 namespace common\modules\lead\models\searches;
 
+use common\modules\lead\components\cost\StatusCost;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadCost;
 use common\modules\lead\models\query\LeadCostQuery;
+use common\modules\lead\widgets\chart\LeadStatusChart;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use yii\db\Query;
 
 class LeadCampaignCostSearch extends Model {
 
@@ -25,6 +26,24 @@ class LeadCampaignCostSearch extends Model {
 	public const SCENARIO_USER = 'user';
 
 	private ?float $costSum = null;
+	private ?int $leadsTotalCount = null;
+
+	private ?StatusCost $statusCost = null;
+
+	private array $instances = [];
+
+	public function getOrCreateForCampaignIds(array $campaignIds): LeadCampaignCostSearch {
+		$key = implode(',', $campaignIds);
+		if (!isset($this->instances[$key])) {
+			$model = new self();
+			$model->fromAt = $this->fromAt;
+			$model->toAt = $this->toAt;
+			$model->userId = $this->userId;
+			$model->campaignIds = $campaignIds;
+			$this->instances[$key] = $model;
+		}
+		return $this->instances[$key];
+	}
 
 	public function rules(): array {
 		return [
@@ -42,11 +61,18 @@ class LeadCampaignCostSearch extends Model {
 		];
 	}
 
-	public function getCostSum(): ?float {
-		if (empty($this->costSum)) {
+	public function getCostSum(bool $refresh = false): ?float {
+		if ($this->costSum === null || $refresh) {
 			$this->costSum = $this->getCostQuery()->sum('value');
 		}
 		return $this->costSum;
+	}
+
+	public function getLeadsTotalCount(bool $refresh = false): int {
+		if ($this->leadsTotalCount === null || $refresh) {
+			$this->leadsTotalCount = $this->getLeadsDataProvider()->getTotalCount();
+		}
+		return $this->leadsTotalCount;
 	}
 
 	public function getCostQueryDataProvider(): ActiveDataProvider {
@@ -64,50 +90,6 @@ class LeadCampaignCostSearch extends Model {
 			$query->where('0=1');
 		}
 		return $dataProvider;
-	}
-
-	public function getCostData(): array {
-		$subQuery = $this->getCostQuery();
-		$subQuery->select([
-			'sum(value) as sum',
-			'campaign_id',
-		]);
-		$subQuery->groupBy([
-			LeadCost::tableName() . '.campaign_id',
-		]);
-
-		$query = new Query();
-		$query->select([
-			//	'c.sum',
-			'c.campaign_id',
-			'count(l.id) as leads_count',
-			'c.sum/count(l.id) as single_cost_value',
-			'GROUP_CONCAT(l.id) as leads_ids',
-		]);
-		$query->from(['c' => $subQuery]);
-		$query->leftJoin(['l' => Lead::tableName()], 'l.campaign_id = c.campaign_id');
-		$query->andWhere([
-			'between',
-			'l.date_at',
-			date('Y-m-d 00:00:00', strtotime($this->fromAt)),
-			date('Y-m-d 23:59:59', strtotime($this->toAt)),
-		]);
-		$query->groupBy('c.campaign_id');
-
-		$count = 0;
-		foreach ($query->all() as $row) {
-			$campaign = $row['campaign_id'];
-			$cost = $row['single_cost_value'];
-			$leadsIds = explode(',', $row['leads_ids']);
-			$count += Lead::updateAll([
-				'cost_value' => $cost,
-			], [
-				'campaign_id' => $campaign,
-				'id' => $leadsIds,
-			]);
-		}
-
-		return $query->all();
 	}
 
 	protected function getCostQuery(): LeadCostQuery {
@@ -168,6 +150,23 @@ class LeadCampaignCostSearch extends Model {
 		}
 		$ids = array_unique($ids);
 		return $ids;
+	}
+
+	public function getStatusCost(bool $refresh = false): StatusCost {
+		if ($this->statusCost === null || $refresh) {
+			$statusCost = new StatusCost();
+			$statusCost->setStatusCounts($this->getStatusCount());
+			$statusCost->setCostSum((float) $this->getCostSum());
+			$this->statusCost = $statusCost;
+		}
+		return $this->statusCost;
+	}
+
+	public function getStatusCount(): array {
+		$widget = new  LeadStatusChart([
+			'query' => $this->getLeadsDataProvider()->query,
+		]);
+		return $widget->statuses;
 	}
 
 }

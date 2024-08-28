@@ -7,6 +7,8 @@ use common\modules\lead\models\searches\LeadCampaignCostSearch;
 use common\modules\lead\Module;
 use common\modules\lead\widgets\chart\CampaignCostChart;
 use common\modules\lead\widgets\chart\LeadStatusChart;
+use common\modules\lead\widgets\chart\LeadUsersStatusChart;
+use common\modules\lead\widgets\StatusDealStageDetailView;
 use common\widgets\charts\ChartsWidget;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
@@ -40,6 +42,8 @@ if ($leadsDataProvider->getTotalCount()) {
 	$data = $cost->recalculateFromDate($campaignCost->fromAt, $campaignCost->toAt, $campaignCost->getCampaignsIds());
 }
 
+$statusCost = $campaignCost->getStatusCost();
+
 ?>
 <div class="lead-campaign-view">
 
@@ -60,7 +64,7 @@ if ($leadsDataProvider->getTotalCount()) {
 
 	<div class="row">
 
-		<div class="col-md-4">
+		<div class="col-md-5 col-lg-4">
 			<?= DetailView::widget([
 				'model' => $model,
 				'attributes' => [
@@ -117,7 +121,7 @@ if ($leadsDataProvider->getTotalCount()) {
 		</div>
 
 
-		<div class="col-md-6">
+		<div class="col-md-7 col-lg-8">
 			<?= GridView::widget([
 				'dataProvider' => new ActiveDataProvider([
 					'query' => LeadCampaign::find()
@@ -143,32 +147,28 @@ if ($leadsDataProvider->getTotalCount()) {
 					[
 						'attribute' => 'leads',
 						'value' => function (LeadCampaign $data) use ($campaignCost): ?float {
-							$search = clone($campaignCost);
-							$search->campaignIds = [
+							$search = $campaignCost->getOrCreateForCampaignIds([
 								$data->id,
-							];
-							return $search->getLeadsDataProvider()->getTotalCount();
+							]);
+							return $search->getLeadsTotalCount();
 						},
 					],
 					[
 						'attribute' => 'totalCostSumValue',
 						'format' => 'currency',
 						'value' => function (LeadCampaign $data) use ($campaignCost): ?float {
-							$search = clone($campaignCost);
-							$search->campaignIds = [
+							return $campaignCost->getOrCreateForCampaignIds([
 								$data->id,
-							];
-							return $search->getCostSum();
+							])->getCostSum();
 						},
 					],
 					[
 						'attribute' => 'singleCostValue',
 						'value' => function (LeadCampaign $data) use ($campaignCost): ?float {
-							$search = clone($campaignCost);
-							$search->campaignIds = [
+							$search = $campaignCost->getOrCreateForCampaignIds([
 								$data->id,
-							];
-							$count = $search->getLeadsDataProvider()->getTotalCount();
+							]);
+							$count = $search->getLeadsTotalCount();
 							if ($count) {
 								return $search->getCostSum() / $count;
 							}
@@ -177,16 +177,72 @@ if ($leadsDataProvider->getTotalCount()) {
 						'format' => 'currency',
 						'label' => Yii::t('lead', 'Single Costs Value'),
 					],
+					[
+						'label' => Yii::t('lead', 'Deal Contracts Costs'),
+						'value' => function (LeadCampaign $data) use ($campaignCost): string {
+							$search = $campaignCost->getOrCreateForCampaignIds([
+								$data->id,
+							]);
+							return StatusDealStageDetailView::widget([
+								'model' => $search->getStatusCost(),
+								'options' => [
+									'tag' => 'ul',
+								],
+								'template' => '<li>{label}: {value}</li>',
+							]);
+						},
+						'format' => 'raw',
+					],
+
 				],
+
 			]) ?>
 
-
-			<?= $this->render('_view_search', ['model' => $campaignCost,]) ?>
 
 		</div>
 	</div>
 
 	<div class="clearfix"></div>
+
+	<div class="row">
+
+		<div class="col-md-6 col-lg-4">
+			<?= $this->render('_view_search', ['model' => $campaignCost,]) ?>
+
+			<?= DetailView::widget([
+				'model' => $campaignCost,
+				'attributes' => array_merge([
+					[
+						'attribute' => 'costSum',
+						'format' => 'currency',
+						'label' => Yii::t('lead', 'Total Cost Value'),
+					],
+					[
+						'attribute' => 'leadsCount',
+						'value' => $leadsDataProvider->getTotalCount(),
+						'label' => Yii::t('lead', 'Leads Count'),
+					],
+					[
+						'attribute' => 'singleLeadCost',
+						'value' => $campaignCost->getCostSum() && $leadsDataProvider->getTotalCount()
+							? $campaignCost->getCostSum() / $leadsDataProvider->getTotalCount()
+							: 0,
+						'visible' => !empty($leadsDataProvider->getTotalCount()),
+						'format' => 'currency',
+						'label' => Yii::t('lead', 'Single Costs Value'),
+					],
+				],
+					StatusDealStageDetailView::attributesFromStatusCost($statusCost, StatusDealStageDetailView::STAGES_CLOSED_WON_WITH_CONTRACT_SENT)
+				),
+			]) ?>
+		</div>
+
+		<div class="col-md-6 col-lg-4">
+			<?= LeadStatusChart::widget(['statuses' => $statusCost->getStatusCounts(),]) ?>
+		</div>
+
+
+	</div>
 
 
 	<div class="row">
@@ -200,39 +256,28 @@ if ($leadsDataProvider->getTotalCount()) {
 					'series' => $chartCostDayData['series'],
 					'type' => ChartsWidget::TYPE_AREA,
 					'height' => '400px',
-					'chart' => [
-						'stacked' => true,
-					],
+					'chart' => ['stacked' => true,],
 					'options' => [
-						'xaxis' => [
-							'type' => 'datetime',
-						],
+						'xaxis' => ['type' => 'datetime',],
 						'yaxis' => [
-
 							[
 								'seriesName' => $chartCostDayData['yAxis']['seriesNames.leads'],
 								'decimalsInFloat' => 0,
 								'showForNullSeries' => false,
-								'title' => [
-									'text' => Yii::t('lead', 'Leads'),
-								],
+								'title' => ['text' => Yii::t('lead', 'Leads'),],
 							],
 							[
 								'seriesName' => $chartCostDayData['yAxis']['seriesNames.cost'],
 								'decimalsInFloat' => 1,
 								'showForNullSeries' => false,
-								'title' => [
-									'text' => Yii::t('lead', 'Cost'),
-								],
+								'title' => ['text' => Yii::t('lead', 'Cost'),],
 							],
 							[
 								'seriesName' => $chartCostDayData['yAxis']['seriesNames.avg'],
 								'opposite' => true,
 								'showForNullSeries' => false,
 								'decimalsInFloat' => 1,
-								'title' => [
-									'text' => Yii::t('lead', 'Single Lead cost Value'),
-								],
+								'title' => ['text' => Yii::t('lead', 'Single Lead cost Value'),],
 							],
 						],
 						'stroke' => [
@@ -245,46 +290,12 @@ if ($leadsDataProvider->getTotalCount()) {
 			?>
 		</div>
 
-		<div class="col-md-6 col-lg-4">
-
-
-			<?= DetailView::widget([
-				'model' => $campaignCost,
-				'attributes' => [
-					[
-						'attribute' => 'costSum',
-						'format' => 'currency',
-						'label' => Yii::t('lead', 'Total Cost Value'),
-					],
-					[
-						'attribute' => 'leadsCount',
-						'value' => $leadsDataProvider->getTotalCount(),
-						'label' => Yii::t('lead', 'Leads Count'),
-
-					],
-					[
-						'attribute' => 'singleLeadCost',
-						'value' => $campaignCost->getCostSum() && $leadsDataProvider->getTotalCount()
-							? $campaignCost->getCostSum() / $leadsDataProvider->getTotalCount()
-							: 0,
-						'visible' => !empty($leadsDataProvider->getTotalCount()),
-						'format' => 'currency',
-						'label' => Yii::t('lead', 'Single Costs Value'),
-
-					],
-				],
-			]) ?>
-		</div>
-
-		<div class="col-md-6 col-lg-5">
-			<?= LeadStatusChart::widget([
-				'query' => $leadsDataProvider->query,
-			]) ?>
-		</div>
-
 
 	</div>
 
+	<?= LeadUsersStatusChart::widget([
+		'query' => $leadsDataProvider->query,
+	]) ?>
 
 	<div class="row">
 		<div class="col-md-6">
