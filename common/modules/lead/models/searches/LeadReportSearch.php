@@ -8,6 +8,8 @@ use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
+use common\modules\lead\models\LeadStatus;
+use common\modules\lead\models\LeadType;
 use common\modules\lead\models\query\LeadReportQuery;
 use Yii;
 use yii\base\Model;
@@ -43,11 +45,14 @@ class LeadReportSearch extends LeadReport {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'lead_id', 'owner_id', 'lead_user_id', 'status_id', 'old_status_id', 'lead_type_id', 'lead_source_id', 'lead_campaign_id', 'lead_status_id'], 'integer'],
+			[['id', 'lead_id', 'lead_user_id', 'lead_source_id', 'lead_campaign_id'], 'integer'],
 			[['!owner_id', 'lead_user_id', '!withoutDeleted'], 'required', 'on' => static::SCENARIO_OWNER],
 			[['onlySelf'], 'boolean', 'on' => static::SCENARIO_OWNER],
+			['owner_id', 'each', 'rule' => ['integer']],
 			[['changedStatus', 'withoutDeleted'], 'boolean'],
 			[['withoutDeleted'], 'default', 'value' => null],
+			[['lead_status_id', 'old_status_id', 'status_id'], 'in', 'range' => array_keys($this->getLeadStatusNames()), 'allowArray' => true],
+			['lead_type_id', 'in', 'range' => array_keys($this->leadTypesNames()), 'allowArray' => true],
 			['lead_source_id', 'in', 'range' => array_keys($this->getSourcesNames())],
 			['lead_campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
 			['lead_name', 'string', 'min' => 3],
@@ -60,11 +65,15 @@ class LeadReportSearch extends LeadReport {
 			'lead_status_id' => Yii::t('lead', 'Current Status'),
 			'changedStatus' => Yii::t('lead', 'Changed Status'),
 			'lead_source_id' => Yii::t('lead', 'Source'),
+			'lead_type_id' => Yii::t('lead', 'Lead Type'),
 			'lead_campaign_id' => Yii::t('lead', 'Campaign'),
 			'from_at' => Yii::t('lead', 'From At'),
 			'to_at' => Yii::t('lead', 'To At'),
 			'onlySelf' => Yii::t('lead', 'Only Self'),
 			'withoutDeleted' => Yii::t('lead', 'With Deleted'),
+			'owner_id' => Yii::t('lead', 'Owner'),
+			'old_status_id' => Yii::t('lead', 'Old Status'),
+			'status_id' => Yii::t('lead', 'Status'),
 		];
 	}
 
@@ -117,6 +126,8 @@ class LeadReportSearch extends LeadReport {
 		$this->applyStatusesFilter($query);
 		$this->applyUserFilter($query);
 		$this->applyDeletedFilter($query);
+		$this->applyLeadTypeFilter($query);
+		$this->applyLeadStatusFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -124,13 +135,29 @@ class LeadReportSearch extends LeadReport {
 			LeadReport::tableName() . '.lead_id' => $this->lead_id,
 			Lead::tableName() . '.campaign_id' => $this->lead_campaign_id,
 			Lead::tableName() . '.source_id' => $this->lead_source_id,
-			Lead::tableName() . '.status_id' => $this->lead_status_id,
-			LeadSource::tableName() . '.type_id' => $this->lead_type_id,
 		]);
 
 		$query->andFilterWhere(['like', LeadReport::tableName() . '.details', $this->details]);
 		$query->groupBy(LeadReport::tableName() . '.id');
 		return $dataProvider;
+	}
+
+	protected function applyLeadStatusFilter(ActiveQuery $query): void {
+		if (!empty($this->lead_status_id)) {
+			$query->joinWith('lead');
+			$query->andWhere([
+				Lead::tableName() . '.status_id' => $this->lead_status_id,
+			]);
+		}
+	}
+
+	protected function applyLeadTypeFilter(ActiveQuery $query): void {
+		if (!empty($this->lead_type_id)) {
+			$query->joinWith('lead.leadSource');
+			$query->andWhere([
+				LeadSource::tableName() . '.type_id' => $this->lead_type_id,
+			]);
+		}
 	}
 
 	public function getAllLeadsIds(Query $query, bool $refresh = false): array {
@@ -149,7 +176,7 @@ class LeadReportSearch extends LeadReport {
 		]);
 	}
 
-	private function applyDateFilter(ActiveQuery $query): void {
+	protected function applyDateFilter(ActiveQuery $query): void {
 		if (!empty($this->from_at)) {
 			$query->andWhere(['>=', LeadReport::tableName() . '.created_at', date('Y-m-d 00:00:00', strtotime($this->from_at))]);
 		}
@@ -174,7 +201,7 @@ class LeadReportSearch extends LeadReport {
 		}
 	}
 
-	private function applyStatusesFilter(Query $query): void {
+	protected function applyStatusesFilter(Query $query): void {
 		if ($this->changedStatus) {
 			$query->andWhere(LeadReport::tableName() . '.status_id != ' . LeadReport::tableName() . '.old_status_id');
 		}
@@ -184,7 +211,7 @@ class LeadReportSearch extends LeadReport {
 		]);
 	}
 
-	private function applyUserFilter(LeadReportQuery $query): void {
+	protected function applyUserFilter(LeadReportQuery $query): void {
 		if (empty($this->lead_user_id) || $this->onlySelf) {
 			$query->andFilterWhere([
 				LeadReport::tableName() . '.owner_id' => $this->owner_id,
@@ -218,12 +245,12 @@ class LeadReportSearch extends LeadReport {
 		return LeadCampaign::getNames();
 	}
 
-	public static function getOwnersNames(): array {
+	public function getOwnersNames(): array {
 		return User::getSelectList(
 			LeadReport::find()
 				->select('owner_id')
 				->distinct()
-				->column(), true);
+				->column(), false);
 	}
 
 	private function applyDeletedFilter(LeadReportQuery $query) {
@@ -235,6 +262,21 @@ class LeadReportSearch extends LeadReport {
 		} else {
 			$query->andWhere(LeadReport::tableName() . '.deleted_at IS NULL');
 		}
+	}
+
+	public function setOwnerScenario(int|string $userId): void {
+		$this->scenario = LeadReportSearch::SCENARIO_OWNER;
+		$this->owner_id = $userId;
+		$this->withoutDeleted = false;
+		$this->lead_user_id = $userId;
+	}
+
+	public function leadTypesNames(): array {
+		return LeadType::getNames();
+	}
+
+	public function getLeadStatusNames(): array {
+		return LeadStatus::getNames();
 	}
 
 }
