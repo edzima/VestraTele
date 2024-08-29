@@ -48,7 +48,7 @@ class LeadReportSearch extends LeadReport {
 			[['id', 'lead_id', 'lead_user_id', 'lead_source_id', 'lead_campaign_id'], 'integer'],
 			[['!owner_id', 'lead_user_id', '!withoutDeleted'], 'required', 'on' => static::SCENARIO_OWNER],
 			[['onlySelf'], 'boolean', 'on' => static::SCENARIO_OWNER],
-			['owner_id', 'each', 'rule' => ['integer']],
+			['owner_id', 'each', 'rule' => ['integer'], 'except' => static::SCENARIO_OWNER],
 			[['changedStatus', 'withoutDeleted'], 'boolean'],
 			[['withoutDeleted'], 'default', 'value' => null],
 			[['lead_status_id', 'old_status_id', 'status_id'], 'in', 'range' => array_keys($this->getLeadStatusNames()), 'allowArray' => true],
