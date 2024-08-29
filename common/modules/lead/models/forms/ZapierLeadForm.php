@@ -5,6 +5,7 @@ namespace common\modules\lead\models\forms;
 use common\modules\lead\entities\FBCampaign;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadStatusInterface;
+use Yii;
 
 class ZapierLeadForm extends LeadForm {
 
@@ -57,6 +58,12 @@ class ZapierLeadForm extends LeadForm {
 			$campaign = $pixelCampaign->getLeadCampaign();
 			if ($campaign) {
 				$this->campaign_id = $campaign->id;
+			} else {
+				Yii::warning([
+					'message' => 'Not find Campaign for fb_ad_id: ' . $this->fb_ad_id,
+					'fbCampaign' => $pixelCampaign->getAttributes(),
+					'attributes' => $this->getAttributes(),
+				], __METHOD__);
 			}
 		}
 	}
