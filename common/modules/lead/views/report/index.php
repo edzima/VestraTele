@@ -145,6 +145,7 @@ if ($multipleForm) {
 			[
 				'attribute' => 'lead_status_id',
 				'value' => 'lead.statusName',
+				'label' => $searchModel->getAttributeLabel('lead_status_id'),
 				'filter' => LeadStatus::getNames(),
 				'filterType' => GridView::FILTER_SELECT2,
 				'filterInputOptions' => [
@@ -206,6 +207,7 @@ if ($multipleForm) {
 				'value' => 'status',
 				'filter' => LeadStatus::getNames(),
 				'filterType' => GridView::FILTER_SELECT2,
+				'label' => $searchModel->getAttributeLabel('status_id'),
 				'filterInputOptions' => [
 					'placeholder' => $searchModel->getAttributeLabel('status_id'),
 				],
@@ -222,6 +224,7 @@ if ($multipleForm) {
 				'value' => 'oldStatus',
 				'filter' => LeadStatus::getNames(),
 				'filterType' => GridView::FILTER_SELECT2,
+				'label' => $searchModel->getAttributeLabel('old_status_id'),
 				'filterInputOptions' => [
 					'placeholder' => $searchModel->getAttributeLabel('old_status_id'),
 				],
