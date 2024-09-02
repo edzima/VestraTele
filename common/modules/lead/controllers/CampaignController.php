@@ -113,30 +113,32 @@ class CampaignController extends BaseController {
 	 */
 	public function actionView(int $id, string $fromAt = null, string $toAt = null): string {
 		$model = $this->findModel($id);
-
-		$campaignCost = new LeadCampaignCostSearch();
-		$campaignCost->campaignIds = [
-			$id,
-		];
-		$campaignCost->fromAt = $fromAt;
-		$campaignCost->toAt = $toAt;
-
-		$campaignCost->load(Yii::$app->request->queryParams);
-		if (empty($campaignCost->fromAt) || empty($campaignCost->toAt)) {
-			$campaignCost->setDateFromCosts();
-			if (empty($campaignCost->fromAt)) {
-				$campaignCost->setDateFromLeads();
-			}
-		}
-
-		if ($this->module->onlyUser) {
-			$campaignCost->userId = Yii::$app->user->getId();
-			$campaignCost->scenario = LeadCampaignCostSearch::SCENARIO_USER;
-		}
+		$campaignCost = null;
 		if (Yii::$app->user->can(User::PERMISSION_LEAD_COST)) {
-			if ($campaignCost->getLeadsTotalCount()) {
-				$cost = $this->module->getCost();
-				$data = $cost->recalculateFromDate($campaignCost->fromAt, $campaignCost->toAt, $campaignCost->getCampaignsIds());
+			$campaignCost = new LeadCampaignCostSearch();
+			$campaignCost->campaignIds = [
+				$id,
+			];
+			$campaignCost->fromAt = $fromAt;
+			$campaignCost->toAt = $toAt;
+
+			$campaignCost->load(Yii::$app->request->queryParams);
+			if (empty($campaignCost->fromAt) || empty($campaignCost->toAt)) {
+				$campaignCost->setDateFromCosts();
+				if (empty($campaignCost->fromAt)) {
+					$campaignCost->setDateFromLeads();
+				}
+			}
+
+			if ($this->module->onlyUser) {
+				$campaignCost->userId = Yii::$app->user->getId();
+				$campaignCost->scenario = LeadCampaignCostSearch::SCENARIO_USER;
+			}
+			if (Yii::$app->user->can(User::PERMISSION_LEAD_COST)) {
+				if ($campaignCost->getLeadsTotalCount()) {
+					$cost = $this->module->getCost();
+					$data = $cost->recalculateFromDate($campaignCost->fromAt, $campaignCost->toAt, $campaignCost->getCampaignsIds());
+				}
 			}
 		}
 

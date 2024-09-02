@@ -17,7 +17,7 @@ use yii\db\Expression;
 class LeadChartSearch extends LeadSearch {
 
 	public bool $withoutArchives = false;
-	public ?int $groupedStatus = self::STATUS_GROUP_ONLY_ASSIGNED;
+	public ?int $groupedStatus = self::STATUS_GROUP_DISABLE;
 
 	public string $groupedStatusChartType = ChartsWidget::TYPE_DONUT;
 
