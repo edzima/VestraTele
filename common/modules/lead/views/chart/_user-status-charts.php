@@ -5,7 +5,6 @@ use common\models\user\User;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\searches\LeadChartSearch;
-use common\modules\lead\widgets\chart\NavChart;
 use common\widgets\charts\ChartsWidget;
 
 /* @var $this yii\web\View */
@@ -236,7 +235,6 @@ if (!empty($totalSeries['data'])) {
 	$groupSeries[$totalSeries['name']] = $totalSeries;
 }
 
-$statusUsersNames = array_values(ArrayHelper::getColumn($userCounts, 'name'));
 
 if ($hasCosts) {
 	$totalCostData = [];
@@ -262,98 +260,6 @@ unset($groupSeries['singleCostValue']);
 <div class="user-status-charts">
 
 
-	<p>
-		<?= NavChart::widget([
-			'series' => $groupSeries,
-			'chartID' => 'donut-leads-users-count',
-		]) ?>
-
-	</p>
-
-	<div class="row">
-
-		<?php if (!empty($totalSeries)): ?>
-
-			<div class="col-sm-12 col-md-4">
-
-				<?= !empty($totalSeries['data'])
-					? ChartsWidget::widget([
-						'type' => ChartsWidget::TYPE_DONUT,
-						'legendFormatterAsSeriesWithCount' => true,
-						'showDonutTotalLabels' => true,
-						'series' => $totalSeries['data'],
-						'chart' => [
-							'id' => 'donut-leads-users-count',
-							'group' => 'users',
-						],
-						'options' => [
-							'labels' => $statusUsersNames,
-							'title' => [
-								'text' => Yii::t('lead', 'Leads Users Count'),
-								'align' => 'center',
-							],
-							'legend' => [
-								'show' => false,
-								//	'floating' => true,
-								'position' => 'bottom',
-								'height' => 120,//	'width' => '100',
-							],
-						],
-					])
-					: ''
-				?>
-			</div>
-
-
-		<?php endif; ?>
-		<div class="col-sm-12 col-md-8">
-			<?= !empty($groupSeries) ?
-				ChartsWidget::widget([
-					'id' => 'line-leads-users-count',
-					'type' => ChartsWidget::TYPE_AREA,
-					'series' => array_values($groupSeries),
-					'height' => '520px',
-					'chart' => [
-						'stacked' => true,
-						'id' => 'line-leads-users-count',
-						'group' => 'users',
-						'zoom' => [
-							'enabled' => true,
-							'type' => 'x',
-						],
-					],
-					'options' => [
-						'stroke' => [
-							'width' => ArrayHelper::getColumn($groupSeries, 'strokeWidth', false),
-							'curve' => 'smooth',
-						],
-						'plotOptions' => [
-							'bar' => [
-								'horizontal' => false,
-							],
-						],
-						'xaxis' => [
-							'categories' => $statusUsersNames,
-							'labels' => [
-								'rotate' => -45,
-							],
-						],
-						//	'yaxis' => $yaxis,
-						'tooltip' => [
-							'shared' => true,
-							'hideEmptySeries' => true,
-							'fixed' => [
-								'enabled' => true,
-								'position' => 'bottomRight',
-							],
-						],
-					],
-				]) : '' ?>
-		</div>
-
-	</div>
-
-	<div class="clearfix"></div>
 
 	<div class="row">
 
@@ -363,7 +269,6 @@ unset($groupSeries['singleCostValue']);
 				? ChartsWidget::widget([
 					'series' => array_values($costsUsersData),
 					'type' => ChartsWidget::TYPE_AREA,
-
 					'height' => '420px',
 					'options' => [
 						'title' => [
@@ -420,7 +325,6 @@ unset($groupSeries['singleCostValue']);
 							'height' => '55',
 						],
 					],
-
 				])
 				: ''
 			?>

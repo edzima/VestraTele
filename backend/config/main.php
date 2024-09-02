@@ -218,6 +218,11 @@ return [
 						'permissions' => [Worker::PERMISSION_LEAD_MARKET],
 					],
 					[
+						'allow' => true,
+						'controllers' => ['lead/cost'],
+						'permissions' => [User::PERMISSION_LEAD_COST],
+					],
+					[
 						'allow' => false,
 						'controllers' => [
 							'lead/dialer',
@@ -227,7 +232,7 @@ return [
 							'lead/import',
 							'lead/market',
 							'lead/market-user',
-
+							'lead/cost',
 						],
 					],
 					[
