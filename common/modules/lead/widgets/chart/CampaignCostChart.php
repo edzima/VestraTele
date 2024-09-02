@@ -103,7 +103,7 @@ class CampaignCostChart extends Widget {
 				$avg = $cost && $count ? $cost / $count : null;
 				$series[$campaignId . '-cost']['data'][] = [
 					'x' => $row['date_at'],
-					'y' => $cost,
+					'y' => $cost ? round($cost, 1) : null,
 				];
 				$series[$campaignId . '-count']['data'][] = [
 					'x' => $row['date_at'],
