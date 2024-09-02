@@ -146,8 +146,6 @@ if (count($providersData) > 1) {
 
 		<?= LeadUsersStatusChart::widget([
 			'query' => $searchModel->getBaseQuery(),
-			//->joinWith('leadUsers')
-			//->andWhere([LeadUser::tableName() . '.type' => $searchModel->user_type ? $searchModel->user_type : LeadUser::TYPE_OWNER]),
 		]) ?>
 
 
@@ -157,6 +155,20 @@ if (count($providersData) > 1) {
 			])
 			: ''
 		?>
+
+		<div class="row">
+			<div class="col-md-12">
+
+				<?= Yii::$app->user->can(
+					User::PERMISSION_LEAD_COST
+				) ? $this->render('_campaign-cost', [
+					'model' => $searchModel,
+					'data' => $campaignsCost,
+				])
+					: ''
+				?>
+			</div>
+		</div>
 
 
 		<div class="row">
@@ -313,19 +325,6 @@ if (count($providersData) > 1) {
 
 		</div>
 
-		<div class="row">
-			<div class="col-md-12">
-
-				<?= Yii::$app->user->can(
-					User::PERMISSION_LEAD_COST
-				) ? $this->render('_campaign-cost', [
-					'model' => $searchModel,
-					'data' => $campaignsCost,
-				])
-					: ''
-				?>
-			</div>
-		</div>
 
 		<div class="row">
 

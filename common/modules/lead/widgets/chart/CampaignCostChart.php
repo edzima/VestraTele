@@ -74,7 +74,7 @@ class CampaignCostChart extends Widget {
 						? Yii::t('lead', '{name} - Cost', [
 							'name' => $name,
 						])
-						: Yii::t('lead', 'Total Cost Value'),
+						: Yii::t('lead', 'Cost'),
 					'data' => [],
 					'campaign_id' => $campaignId,
 					'group' => 'cost',
