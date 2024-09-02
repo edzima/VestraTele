@@ -3,8 +3,12 @@
 namespace common\modules\lead\chart;
 
 use common\modules\lead\models\LeadStatus;
+use yii\base\BaseObject;
+use yii\base\StaticInstanceTrait;
 
-class LeadStatusColor {
+class LeadStatusColor extends BaseObject {
+
+	use StaticInstanceTrait;
 
 	public array $colors = ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0'];
 	private array $usedColors = [];
