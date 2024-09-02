@@ -31,6 +31,14 @@ class LeadCampaignCostSearch extends Model {
 	private ?StatusCost $statusCost = null;
 
 	private array $instances = [];
+	/**
+	 * @var true
+	 */
+	private bool $hasDefaultDate = false;
+
+	public function getHasDefaultDate(): bool {
+		return $this->hasDefaultDate;
+	}
 
 	public function getOrCreateForCampaignIds(array $campaignIds): LeadCampaignCostSearch {
 		$key = implode(',', $campaignIds);
@@ -136,6 +144,7 @@ class LeadCampaignCostSearch extends Model {
 			->one();
 		$this->fromAt = $values['min'] ?? null;
 		$this->toAt = $values['max'] ?? null;
+		$this->hasDefaultDate = true;
 	}
 
 	public function setDateFromLeads(): void {
@@ -146,6 +155,7 @@ class LeadCampaignCostSearch extends Model {
 			->one();
 		$this->fromAt = $values['min'] ?? null;
 		$this->toAt = $values['max'] ?? null;
+		$this->hasDefaultDate = true;
 	}
 
 	public function getCampaignsIds(): array {

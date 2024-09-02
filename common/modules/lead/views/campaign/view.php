@@ -1,6 +1,5 @@
 <?php
 
-use common\helpers\ArrayHelper;
 use common\helpers\Html;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\searches\LeadCampaignCostSearch;
@@ -9,7 +8,6 @@ use common\modules\lead\widgets\chart\CampaignCostChart;
 use common\modules\lead\widgets\chart\LeadStatusChart;
 use common\modules\lead\widgets\chart\LeadUsersStatusChart;
 use common\modules\lead\widgets\StatusDealStageDetailView;
-use common\widgets\charts\ChartsWidget;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
 use yii\web\YiiAsset;
@@ -59,6 +57,32 @@ if ($campaignCost) {
 				],
 			]) : '' ?>
 	</p>
+
+
+	<?php if ($campaignCost && !$campaignCost->getHasDefaultDate()): ?>
+		<div class="row">
+			<div class="col-md-8 col-lg-9">
+				<?= $this->render('_campaign_cost_chart', [
+					'chartCostDayData' => CampaignCostChart::costDayData($model->getCosts()),
+				]) ?>
+			</div>
+			<div class="col-md-4 col-lg-3">
+				<?= LeadStatusChart::widget([
+					'query' => $model->getLeads(),
+					'chartOptions' => [
+						'legendFormatterAsSeriesWithCount' => true,
+						'showDonutTotalLabels' => true,
+						'options' => [
+							'legend' => [
+								'position' => 'bottom',
+							],
+						],
+					],
+				]) ?>
+			</div>
+
+		</div>
+	<?php endif; ?>
 
 
 	<div class="row">
@@ -121,7 +145,9 @@ if ($campaignCost) {
 
 
 		<div class="col-md-7 col-lg-8">
-			<?= $campaignCost
+
+
+		<?= $campaignCost
 				? GridView::widget([
 					'dataProvider' => new ActiveDataProvider([
 						'query' => LeadCampaign::find()
@@ -243,57 +269,30 @@ if ($campaignCost) {
 				]) ?>
 			</div>
 
-			<div class="col-md-6 col-lg-4">
-				<?= LeadStatusChart::widget(['statuses' => $statusCost->getStatusCounts(),]) ?>
-			</div>
-
 
 		</div>
 
 
 		<div class="row">
 
-			<div class="col-md-12">
-				<?php
-				$chartCostDayData = CampaignCostChart::costDayData($costDataProvider->query);
-				?>
-				<?= !empty($chartCostDayData['series'])
-					? ChartsWidget::widget([
-						'series' => $chartCostDayData['series'],
-						'type' => ChartsWidget::TYPE_AREA,
-						'height' => '400px',
-						'chart' => ['stacked' => true,],
+			<div class="col-md-4 col-lg-3">
+				<?= LeadStatusChart::widget([
+					'statuses' => $statusCost->getStatusCounts(),
+					'chartOptions' => [
 						'options' => [
-							'xaxis' => ['type' => 'datetime',],
-							'yaxis' => [
-								[
-									'seriesName' => $chartCostDayData['yAxis']['seriesNames.leads'],
-									'decimalsInFloat' => 0,
-									'showForNullSeries' => false,
-									'title' => ['text' => Yii::t('lead', 'Leads'),],
-								],
-								[
-									'seriesName' => $chartCostDayData['yAxis']['seriesNames.cost'],
-									'decimalsInFloat' => 1,
-									'showForNullSeries' => false,
-									'title' => ['text' => Yii::t('lead', 'Cost'),],
-								],
-								[
-									'seriesName' => $chartCostDayData['yAxis']['seriesNames.avg'],
-									'opposite' => true,
-									'showForNullSeries' => false,
-									'decimalsInFloat' => 1,
-									'title' => ['text' => Yii::t('lead', 'Single Lead cost Value'),],
-								],
-							],
-							'stroke' => [
-								'curve' => 'smooth',
-								'width' => ArrayHelper::getColumn($chartCostDayData['series'], 'strokeWidth', false),
+							'legend' => [
+								'position' => 'bottom',
 							],
 						],
-					])
-					: ''
-				?>
+					],
+				]) ?>
+			</div>
+
+
+			<div class="col-md-8 col-lg-9">
+				<?= $this->render('_campaign_cost_chart', [
+					'chartCostDayData' => CampaignCostChart::costDayData($costDataProvider->query),
+				]) ?>
 			</div>
 
 		</div>
