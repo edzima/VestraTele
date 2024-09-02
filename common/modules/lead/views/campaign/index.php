@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = Yii::t('lead', 'Campaigns');
 		?>
 	</p>
 
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]); ?>
 
 	<?= GridView::widget([
 		'id' => 'lead-campaign-grid',

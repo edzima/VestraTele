@@ -17,7 +17,7 @@ class LeadCampaignCostSearch extends Model {
 	public array $campaignIds = [];
 
 	public ?string $fromAt;
-	public $toAt;
+	public ?string $toAt;
 
 	public $userId;
 
@@ -128,8 +128,18 @@ class LeadCampaignCostSearch extends Model {
 		return $dataProvider;
 	}
 
-	public function setDateFromCampaigns(): void {
+	public function setDateFromCosts(): void {
 		$values = LeadCost::find()
+			->andWhere(['campaign_id' => $this->getCampaignsIds()])
+			->select(['MIN(date_at) as min, MAX(date_at) as max'])
+			->asArray()
+			->one();
+		$this->fromAt = $values['min'] ?? null;
+		$this->toAt = $values['max'] ?? null;
+	}
+
+	public function setDateFromLeads(): void {
+		$values = Lead::find()
 			->andWhere(['campaign_id' => $this->getCampaignsIds()])
 			->select(['MIN(date_at) as min, MAX(date_at) as max'])
 			->asArray()

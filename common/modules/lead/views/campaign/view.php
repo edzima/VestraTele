@@ -37,11 +37,6 @@ if ($totalCostsValue) {
 
 $costDataProvider = $campaignCost->getCostQueryDataProvider();
 $leadsDataProvider = $campaignCost->getLeadsDataProvider();
-if ($leadsDataProvider->getTotalCount()) {
-	$cost = Module::getInstance()->getCost();
-	$data = $cost->recalculateFromDate($campaignCost->fromAt, $campaignCost->toAt, $campaignCost->getCampaignsIds());
-}
-
 $statusCost = $campaignCost->getStatusCost();
 
 ?>
