@@ -43,6 +43,7 @@ return [
 	'Create' => 'Dodaj',
 	'Create article' => 'Dodaj post',
 	'Create article category' => 'Dodaj kategorię',
+	'Create Entity Responsible' => 'Dodaj Podmiot Odpowiedzialny',
 	'Create item' => 'Dodaj element',
 	'Create key storage item' => 'Dodaj klucz składowy',
 	'Create page' => 'Dodaj strone',

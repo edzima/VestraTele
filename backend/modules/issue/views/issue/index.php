@@ -82,12 +82,6 @@ $this->params['issueParentTypeNav'] = [
 							],
 						],
 						'class' => 'btn btn-success',
-						'title' => Yii::t('backend', 'Send SMS: {count}', [
-							'count' => count($searchModel->getAllIds($dataProvider->query)),
-						]),
-						'aria-label' => Yii::t('backend', 'Send SMS: {count}', [
-							'count' => count($searchModel->getAllIds($dataProvider->query)),
-						]),
 					]
 				)
 					: ''
