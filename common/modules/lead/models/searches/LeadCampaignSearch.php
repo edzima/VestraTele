@@ -31,9 +31,9 @@ class LeadCampaignSearch extends LeadCampaign {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'sort_index', 'owner_id', 'is_active', 'leads_count'], 'integer'],
+			[['id', 'sort_index', 'owner_id', 'is_active', 'leads_count', 'parent_id'], 'integer'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
-			[['name'], 'safe'],
+			[['name', 'entity_id'], 'safe'],
 			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 		];
 	}
@@ -94,6 +94,9 @@ class LeadCampaignSearch extends LeadCampaign {
 			LeadCampaign::tableName() . '.is_active' => $this->is_active,
 			LeadCampaign::tableName() . '.type' => $this->type,
 			LeadCampaign::tableName() . '.details' => $this->details,
+			LeadCampaign::tableName() . '.entity_id' => $this->entity_id,
+			LeadCampaign::tableName() . '.parent_id' => $this->parent_id,
+
 		]);
 
 		$query->andFilterWhere([

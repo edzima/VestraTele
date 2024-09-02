@@ -8,8 +8,8 @@ use yii\base\Component;
 class CostComponent extends Component {
 
 	public function recalculateFromDate(
-		string $fromAt,
-		string $toAt,
+		?string $fromAt,
+		?string $toAt,
 		array $campaignsIds = []) {
 
 		$data = $this->getCostData($fromAt, $toAt, $campaignsIds);

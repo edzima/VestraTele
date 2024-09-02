@@ -46,12 +46,21 @@ class CampaignCost extends Model {
 		]);
 		$query->from(['c' => $subQuery]);
 		$query->leftJoin(['l' => Lead::tableName()], 'l.campaign_id = c.campaign_id');
-		$query->andWhere([
-			'between',
-			'l.date_at',
-			date('Y-m-d 00:00:00', strtotime($fromAt)),
-			date('Y-m-d 23:59:59', strtotime($toAt)),
-		]);
+		if ($fromAt) {
+			$query->andWhere([
+				'>=',
+				'l.date_at',
+				date('Y-m-d 00:00:00', strtotime($fromAt)),
+			]);
+		}
+		if ($toAt) {
+			$query->andWhere([
+				'<=',
+				'l.date_at',
+				date('Y-m-d 23:59:59', strtotime($toAt)),
+			]);
+		}
+
 		$query->groupBy('c.campaign_id');
 		$data = $query->all();
 		$models = [];

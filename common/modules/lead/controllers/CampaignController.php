@@ -4,6 +4,7 @@ namespace common\modules\lead\controllers;
 
 use common\helpers\Flash;
 use common\helpers\Url;
+use common\models\user\User;
 use common\modules\lead\models\forms\LeadCampaignForm;
 use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\models\searches\LeadCampaignCostSearch;
@@ -122,12 +123,21 @@ class CampaignController extends BaseController {
 
 		$campaignCost->load(Yii::$app->request->queryParams);
 		if (empty($campaignCost->fromAt) || empty($campaignCost->toAt)) {
-			$campaignCost->setDateFromCampaigns();
+			$campaignCost->setDateFromCosts();
+			if (empty($campaignCost->fromAt)) {
+				$campaignCost->setDateFromLeads();
+			}
 		}
 
 		if ($this->module->onlyUser) {
 			$campaignCost->userId = Yii::$app->user->getId();
 			$campaignCost->scenario = LeadCampaignCostSearch::SCENARIO_USER;
+		}
+		if (Yii::$app->user->can(User::PERMISSION_LEAD_COST)) {
+			if ($campaignCost->getLeadsTotalCount()) {
+				$cost = $this->module->getCost();
+				$data = $cost->recalculateFromDate($campaignCost->fromAt, $campaignCost->toAt, $campaignCost->getCampaignsIds());
+			}
 		}
 
 		return $this->render('view', [
