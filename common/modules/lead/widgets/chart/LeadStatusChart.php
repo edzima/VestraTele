@@ -37,7 +37,7 @@ class LeadStatusChart extends Widget {
 		parent::init();
 
 		if (empty($this->statusColor)) {
-			$this->statusColor = new LeadStatusColor();
+			$this->statusColor = LeadStatusColor::instance();
 		}
 		if (empty($this->statuses) && empty($this->statusesList)) {
 			if (!empty($this->query)) {
