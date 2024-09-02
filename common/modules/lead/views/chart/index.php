@@ -2,6 +2,7 @@
 
 use common\helpers\ArrayHelper;
 use common\models\user\User;
+use common\modules\lead\components\cost\CampaignCost;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadChartSearch;
@@ -12,6 +13,7 @@ use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadChartSearch */
+/* @var $campaignsCost CampaignCost[] */
 
 $this->title = Yii::t('lead', 'Leads');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('lead', 'Leads'), 'url' => ['lead/index']];
@@ -316,7 +318,10 @@ if (count($providersData) > 1) {
 
 				<?= Yii::$app->user->can(
 					User::PERMISSION_LEAD_COST
-				) ? $this->render('_campaign-cost', ['model' => $searchModel,])
+				) ? $this->render('_campaign-cost', [
+					'model' => $searchModel,
+					'data' => $campaignsCost,
+				])
 					: ''
 				?>
 			</div>

@@ -490,7 +490,7 @@ return [
 	'Leads Count' => 'Leads',
 	'Create Campaigns' => 'Utwórz Kampanie',
 	'Without Leads' => 'Brak Leads',
-	'Single Lead cost Value' => 'Koszt jednostkowy',
+	'Single Lead cost Value' => 'Koszt Leada',
 	'Cost' => 'Koszt',
 	'Without Provider' => 'Brak',
 	'Campaigns Count' => 'Kampania',
