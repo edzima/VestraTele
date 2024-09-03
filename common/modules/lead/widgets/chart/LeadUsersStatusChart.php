@@ -128,6 +128,7 @@ class LeadUsersStatusChart extends Widget {
 		foreach ($seriesArrayData as $seriesData) {
 			$data[] = $seriesData[$index];
 		}
+		$title = $this->totalTitle . ' - ' . $this->getUserName(array_keys($this->getTotalData())[$index]);
 		return ChartsWidget::widget([
 			'type' => ChartsWidget::TYPE_DONUT,
 			'series' => $data,
@@ -135,7 +136,7 @@ class LeadUsersStatusChart extends Widget {
 				'labels' => $labels,
 				'colors' => $colors,
 				'title' => [
-					'text' => $this->totalTitle,
+					'text' => $title,
 					'align' => 'center',
 				],
 			],
