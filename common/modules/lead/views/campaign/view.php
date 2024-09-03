@@ -72,9 +72,11 @@ if ($campaignCost) {
 					'chartOptions' => [
 						'legendFormatterAsSeriesWithCount' => true,
 						'showDonutTotalLabels' => true,
+						'height' => 400,
 						'options' => [
 							'legend' => [
 								'position' => 'bottom',
+								'height' => 60,
 							],
 						],
 					],
@@ -147,7 +149,7 @@ if ($campaignCost) {
 		<div class="col-md-7 col-lg-8">
 
 
-		<?= $campaignCost
+			<?= $campaignCost
 				? GridView::widget([
 					'dataProvider' => new ActiveDataProvider([
 						'query' => LeadCampaign::find()
