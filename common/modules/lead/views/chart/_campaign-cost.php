@@ -80,7 +80,7 @@ if (count($campaignsData) > 1) {
 				'data' => $chartData['seriesLeads'],
 			],
 			[
-				'name' => Yii::t('lead', 'Total Cost Value (total)'),
+				'name' => Yii::t('lead', 'Cost Value (range)'),
 				'data' => $chartData['seriesCosts'],
 				'type' => ChartsWidget::TYPE_LINE,
 			],
@@ -110,10 +110,10 @@ if (count($campaignsData) > 1) {
 					'opposite' => true,
 				],
 				[
-					'seriesName' => Yii::t('lead', 'Total Cost Value (total)'),
+					'seriesName' => Yii::t('lead', 'Cost Value (range)'),
 					'showForNullSeries' => false,
 					'decimalsInFloat' => 2,
-					'title' => ['text' => Yii::t('lead', 'Total Cost Value (total)'),],
+					'title' => ['text' => Yii::t('lead', 'Cost Value (range)'),],
 				],
 				[
 					'seriesName' => Yii::t('lead', 'Single Lead cost Value'),

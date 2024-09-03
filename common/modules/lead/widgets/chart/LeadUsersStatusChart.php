@@ -38,6 +38,8 @@ class LeadUsersStatusChart extends Widget {
 	public ?string $areaGroup = null;
 	public ?string $emptyUserName = null;
 	public ?string $notfoundUserName = null;
+
+	public ?string $totalTitle = null;
 	private array $userTypes = [
 		LeadUser::TYPE_OWNER,
 	];
@@ -53,6 +55,9 @@ class LeadUsersStatusChart extends Widget {
 		if ($this->notfoundUserName === null) {
 			$this->notfoundUserName = Yii::t('lead', 'Not found User');
 		}
+		if ($this->totalTitle === null) {
+			$this->totalTitle = Yii::t('lead', 'Leads');
+		}
 	}
 
 	public function run() {
@@ -63,7 +68,7 @@ class LeadUsersStatusChart extends Widget {
 		return $this->render('lead-user-status', [
 			'nav' => $renderNavAndTotal ? $this->renderNav() : '',
 			'donutUsersChart' => $renderNavAndTotal ? $this->renderDonutUsersChart() : '',
-			'areaUsersStatusChart' => $this->renderAreaUsersStatusChart(),
+			'areaUsersStatusChart' => $this->renderUsersStatusChart(),
 		]);
 	}
 
@@ -93,37 +98,54 @@ class LeadUsersStatusChart extends Widget {
 				'legend' => [
 					'show' => false,
 				],
+				'title' => [
+					'text' => $this->totalTitle,
+					'align' => 'center',
+				],
+
 			],
 		]);
 	}
 
-	public function renderDonutStatusesChart(): string {
-		$labels = [];
-		$colors = [];
-		$data = [];
-		foreach ($this->getSeries() as $series) {
-			$labels[] = $series['name'];
-			$data[] = array_sum($series['data']);
-			$colors[] = $series['color'];
+	public function renderUsersStatusChart(): string {
+		$total = $this->getTotalData();
+		$usersCount = count($total);
+		if ($usersCount === 0) {
+			return '';
 		}
+		if ($usersCount === 1) {
+			return $this->renderSingleUserStatusesChart();
+		}
+		return $this->renderMultipleUsersStatusesChart();
+	}
 
+	protected function renderSingleUserStatusesChart(int $index = 0): string {
+		$series = $this->getSeries();
+		$colors = ArrayHelper::getColumn($series, 'color', []);
+		$labels = ArrayHelper::getColumn($series, 'name', []);
+		$seriesArrayData = ArrayHelper::getColumn($series, 'data', []);
+		$data = [];
+		foreach ($seriesArrayData as $seriesData) {
+			$data[] = $seriesData[$index];
+		}
 		return ChartsWidget::widget([
 			'type' => ChartsWidget::TYPE_DONUT,
 			'series' => $data,
-			'height' => '200px',
-			'showDonutTotalLabels' => true,
-			'legendFormatterAsSeriesWithCount' => true,
 			'options' => [
 				'labels' => $labels,
 				'colors' => $colors,
-				'legend' => [
-					'show' => false,
+				'title' => [
+					'text' => $this->totalTitle,
+					'align' => 'center',
 				],
 			],
+			'height' => '400px',
+			'legendFormatterAsSeriesWithCount' => true,
+			'showDonutTotalLabels' => true,
 		]);
 	}
 
-	public function renderAreaUsersStatusChart(): string {
+	protected function renderMultipleUsersStatusesChart(): string {
 		$series = array_values($this->getSeries());
 		$labels = $this->getUsersNamesFromIds(
 			array_keys($this->getTotalData())
@@ -133,7 +155,7 @@ class LeadUsersStatusChart extends Widget {
 			'height' => $this->height,
 			'series' => $series,
 			'chart' => [
-				'stacked' => count($labels) > 1,
+				'stacked' => true,
 				'id' => $this->getAreaChartId(),
 				'group' => $this->areaGroup,
 			],

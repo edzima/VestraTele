@@ -4,6 +4,7 @@ namespace common\modules\lead\widgets\chart;
 
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;
+use Yii;
 use yii\base\InvalidConfigException;
 
 class LeadReportStatusChart extends LeadUsersStatusChart {
@@ -19,6 +20,7 @@ class LeadReportStatusChart extends LeadUsersStatusChart {
 	public function init(): void {
 		parent::init();
 		$this->statusColumn = $this->getStatusColumn();
+		$this->totalTitle = Yii::t('lead', 'Reports');
 	}
 
 	protected function getQueryData(): array {
