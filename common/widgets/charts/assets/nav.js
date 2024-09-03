@@ -6,13 +6,17 @@ function onClickNavChart(element) {
 	updateChartsSeries(chartId, seriesData);
 	updateChartTitles(chartId, seriesName);
 	if (toggleChart) {
-		ApexCharts.exec(toggleChart, 'showSeries', seriesName, true);
+		highlightSeries(toggleChart, seriesName);
 	}
 }
 
 
 function updateChartsSeries(chartId, data) {
 	ApexCharts.exec(chartId, 'updateSeries', data, true);
+}
+
+function highlightSeries(chartId, seriesName) {
+	ApexCharts.exec(toggleChart, 'highlightSeries', seriesName, true);
 }
 
 function updateChartTitles(chartId, title) {
