@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models\query;
 
+use common\helpers\ArrayHelper;
 use common\models\query\PhonableQuery;
 use common\models\query\PhonableQueryTrait;
 use common\modules\lead\models\Lead;
@@ -110,5 +111,15 @@ class LeadQuery extends ActiveQuery implements PhonableQuery {
 				->andWhere(LeadReport::tableName() . '.lead_id = ' . Lead::tableName() . '.id'),
 		]);
 		return $this;
+	}
+
+	public function statusesCounts(array $statuses = []): array {
+		$this->andFilterWhere([Lead::tableName() . '.status_id' => $statuses]);
+		$this->select([Lead::tableName() . '.status_id', 'count(*) as count'])
+			->groupBy(Lead::tableName() . '.status_id');
+		$data = $this->asArray()->all();
+		$data = ArrayHelper::map($data, 'status_id', 'count');
+		$data = array_map('intval', $data);
+		return $data;
 	}
 }

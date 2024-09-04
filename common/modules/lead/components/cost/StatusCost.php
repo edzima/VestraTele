@@ -56,6 +56,23 @@ class StatusCost {
 		return $costs;
 	}
 
+	public function getDealsCosts(array $stages = []): ?float {
+		if (empty($this->getCostSum())) {
+			return null;
+		}
+		$stagesCounts = $this->getDealStagesCounts();
+		$count = 0;
+		foreach ($stagesCounts as $dealStage => $dealCount) {
+			if (empty($stages) || in_array($dealStage, $stages)) {
+				$count += $dealCount;
+			}
+		}
+		if ($count === 0) {
+			return null;
+		}
+		return $this->getCostSum() / $count;
+	}
+
 	public function getDealStagesCounts(): array {
 		$counts = [];
 		foreach ($this->statusCounts as $statusId => $count) {

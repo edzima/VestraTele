@@ -18,6 +18,26 @@ class CampaignCost extends Model {
 	public ?float $single_cost_value;
 	public array $leads_ids = [];
 
+	private ?StatusCost $statusCost = null;
+
+	public function getStatusCost(): StatusCost {
+		if ($this->statusCost === null) {
+			$this->statusCost = $this->createStatusCost();
+		}
+		return $this->statusCost;
+	}
+
+	protected function createStatusCost(): StatusCost {
+		$cost = new StatusCost();
+		$cost->setCostSum($this->sum);
+		$cost->setStatusCounts(
+			Lead::find()
+				->andWhere(['id' => $this->leads_ids])
+				->statusesCounts()
+		);
+		return $cost;
+	}
+
 	public static function getModels(
 		?string $fromAt,
 		?string $toAt,
