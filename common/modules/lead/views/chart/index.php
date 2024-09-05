@@ -7,6 +7,7 @@ use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadChartSearch;
 use common\modules\lead\widgets\chart\LeadTypeChart;
+use common\modules\lead\widgets\chart\LeadUsersCostsChart;
 use common\modules\lead\widgets\chart\LeadUsersStatusChart;
 use common\widgets\charts\ChartsWidget;
 use yii\web\JsExpression;
@@ -148,13 +149,10 @@ if (count($providersData) > 1) {
 			'query' => $searchModel->getBaseQuery(),
 		]) ?>
 
+		<?= LeadUsersCostsChart::widget([
+			'query' => $searchModel->getBaseQuery(),
+		]) ?>
 
-		<?= true || (empty($searchModel->user_id) || count((array) $searchModel->user_id) !== 1)
-			? $this->render('_user-status-charts', [
-				'searchModel' => $searchModel,
-			])
-			: ''
-		?>
 
 		<div class="row">
 			<div class="col-md-12">

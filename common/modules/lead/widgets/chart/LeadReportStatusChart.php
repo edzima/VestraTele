@@ -54,8 +54,8 @@ class LeadReportStatusChart extends LeadUsersStatusChart {
 		return parent::getAreaChartId() . '-' . $this->statusType;
 	}
 
-	protected function getDonutUsersStatusesChartId(): string {
-		return parent::getDonutUsersStatusesChartId() . '-' . $this->statusType;
+	protected function getDonutChartId(): string {
+		return parent::getDonutChartId() . '-' . $this->statusType;
 	}
 
 	protected function getStatusColumn(): string {

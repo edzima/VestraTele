@@ -9,11 +9,22 @@ class StatusCost {
 	private array $statusCounts = [];
 	private float $costSum;
 
+	/**
+	 * Status counts indexed by Status ID.
+	 *
+	 * @param int[] $statusCounts
+	 * @return $this
+	 */
 	public function setStatusCounts(array $statusCounts): self {
 		$this->statusCounts = $statusCounts;
 		return $this;
 	}
 
+	/**
+	 * Status counts indexed by Status ID.
+	 *
+	 * @return int[]
+	 */
 	public function getStatusCounts(): array {
 		return $this->statusCounts;
 	}
@@ -41,6 +52,10 @@ class StatusCost {
 			$costs[$statusId] = $sum / $count;
 		}
 		return $costs;
+	}
+
+	public function getDealStageCost(int $stage): ?float {
+		return $this->getDealStagesCosts()[$stage] ?? null;
 	}
 
 	public function getDealStagesCosts(): array {

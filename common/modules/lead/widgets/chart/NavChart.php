@@ -101,16 +101,6 @@ class NavChart extends Widget {
 
 	private function getSeriesData(array $series): array {
 		$data = $series['data'];
-		if (!$this->emptyValueAsZero) {
-			return $data;
-		}
-		$emptyAsZero = [];
-		foreach ($data as $value) {
-			if (empty($value)) {
-				$value = 0;
-			}
-			$emptyAsZero[] = $value;
-		}
-		return $emptyAsZero;
+		return array_map('round', $data);
 	}
 }

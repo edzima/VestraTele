@@ -4,6 +4,7 @@
 /* @var $donutUsersChart string */
 /* @var $areaUsersStatusChart string */
 /* @var $donutStatusesChart string */
+
 ?>
 
 <div class="lead-user-status-chart-wrapper">
