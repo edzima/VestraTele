@@ -149,9 +149,14 @@ if (count($providersData) > 1) {
 			'query' => $searchModel->getBaseQuery(),
 		]) ?>
 
-		<?= LeadUsersCostsChart::widget([
-			'query' => $searchModel->getBaseQuery(),
-		]) ?>
+
+		<?= Yii::$app->user->can(
+			User::PERMISSION_LEAD_COST)
+			? LeadUsersCostsChart::widget([
+				'query' => $searchModel->getBaseQuery(),
+			])
+			: ''
+		?>
 
 
 		<div class="row">
