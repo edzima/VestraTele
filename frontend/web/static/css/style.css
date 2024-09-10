@@ -340,10 +340,37 @@ input[type="tel"]::-ms-input-placeholder {
 }
 
 
-.nav-with-favorite li .favorite-link {
+.nav-with-favorite li:not(.dropdown) .favorite-link {
 	position: absolute;
 	right: 4px;
 	top: 1rem;
+	padding: 0;
+	border: none;
+}
+
+.nav-with-favorite li.dropdown .favorite-link {
+	position: absolute;
+	right: 16px;
+	top: 9px;
+	padding: 0;
+	border: none;
+}
+
+.nav-with-favorite li .caret {
+	position: absolute;
+	right: 4px;
+	top: 14px;
+}
+
+.nav-with-favorite li.dropdown:not(:last-child) a:first-child {
+	padding-right: 36px;
+}
+
+
+.nav-with-favorite li.dropdown .dropdown-menu .favorite-link {
+	position: absolute;
+	right: 4px;
+	top: 4px;
 	padding: 0;
 	border: none;
 }

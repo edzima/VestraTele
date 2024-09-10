@@ -8,7 +8,7 @@ use frontend\helpers\Html;
 use frontend\helpers\Url;
 use frontend\widgets\GridView;
 use frontend\widgets\IssueColumn;
-use frontend\widgets\IssueParentTypeHeader;
+use frontend\widgets\IssueTypeHeader;
 use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
@@ -30,8 +30,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="summon-doc-to-do">
 
-	<?= IssueParentTypeHeader::widget([
-		'parentsMenuConfig' => [
+	<?= IssueTypeHeader::widget([
+		'navOptions' => [
 			'route' => ['/summon-doc/to-do'],
 		],
 	]) ?>

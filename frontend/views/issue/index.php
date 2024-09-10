@@ -16,7 +16,7 @@ use frontend\models\search\IssueSearch;
 use frontend\widgets\GridView;
 use frontend\widgets\issue\StageChangeButtonDropdown;
 use frontend\widgets\IssueColumn;
-use frontend\widgets\IssueParentTypeHeader;
+use frontend\widgets\IssueTypeHeader;
 use kartik\select2\Select2;
 use yii\bootstrap\Alert;
 use yii\grid\SerialColumn;
@@ -33,12 +33,11 @@ if ($searchModel->getIssueMainType()) {
 } else {
 	$this->params['breadcrumbs'][] = $this->title;
 }
-$parentMenuItems = Html::issueMainTypesItems();
 
 ?>
 <div class="issue-index">
 
-	<?= IssueParentTypeHeader::widget([]) ?>
+	<?= IssueTypeHeader::widget([]) ?>
 
 	<p>
 		<?= Html::a(Yii::t('frontend', 'Search Customer'), ['customers'], ['class' => 'btn btn-info']) ?>

@@ -1,8 +1,8 @@
 <?php
 
 use backend\helpers\Html;
+use common\modules\issue\widgets\IssueTypeNav;
 use common\widgets\Alert;
-use yii\bootstrap\Nav;
 use yii\helpers\Inflector;
 use yii\web\View;
 use yii\widgets\Breadcrumbs;
@@ -13,17 +13,15 @@ use yii\widgets\Breadcrumbs;
 $class = '';
 if (isset($this->params['issueParentTypeNav'])) {
 	$config = $this->params['issueParentTypeNav'];
-	$parentMenuItems = Html::issueMainTypesItems();
+	$navIssueTypes = new IssueTypeNav($config);
+	$parentMenuItems = $navIssueTypes->getItems();
 	if (!empty($parentMenuItems)) {
 		$class = 'title-with-nav';
-		$config['withFavorite'] = true;
-		$this->blocks['content-header'] = $this->title
-			. Nav::widget([
-				'items' => Html::issueMainTypesItems($config),
-				'options' => [
-					'class' => 'nav nav-pills nav-with-favorite',
-				],
-			]);
+		if ($navIssueTypes->activeType && $navIssueTypes->activeType->parent) {
+			$this->title = $navIssueTypes->activeType->parent->name;
+		}
+		$contentHeader = $this->title . $navIssueTypes->run();
+		$this->blocks['content-header'] = $contentHeader;
 	}
 }
 
