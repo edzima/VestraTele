@@ -19,7 +19,7 @@ class IssueQuery extends ActiveQuery {
 	public function type(int $typeId, bool $withChildren = true): self {
 		$types = [];
 		if ($withChildren) {
-			$type = IssueType::getTypes()[$typeId];
+			$type = IssueType::getTypes()[$typeId] ?? null;
 			if ($type) {
 				$types = ArrayHelper::getColumn($type->childs, 'id');
 			}
