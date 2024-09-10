@@ -155,7 +155,7 @@ abstract class IssueSearch extends Model
 		return [
 			[
 				[
-					'issue_id', 'agent_id', 'entity_responsible_id', 'note_stage_id',
+					'issue_id', 'parentTypeId', 'agent_id', 'entity_responsible_id', 'note_stage_id',
 				], 'integer',
 			],
 			[
@@ -195,8 +195,6 @@ abstract class IssueSearch extends Model
 			['customerPhone', PhoneValidator::class],
 			['excludedStages', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
 			['userType', 'in', 'range' => array_keys(static::getIssueUserTypesNames())],
-			['parentTypeId', 'in', 'range' => array_keys(static::getMainTypesNames())],
-
 			[
 				'excludedStages', 'filter', 'filter' => function ($stages): array {
 				$stages = array_map('intval', (array) $stages);
