@@ -2,9 +2,7 @@
 
 namespace common\helpers;
 
-use common\behaviors\IssueTypeParentIdAction;
 use common\models\issue\IssueInterface;
-use common\models\issue\IssueType;
 use common\models\settlement\PayedInterface;
 use common\modules\file\models\File;
 use Yii;
@@ -65,68 +63,6 @@ class Html extends BaseHtml {
 
 	public static function addNoPrintClass(array &$options): void {
 		static::addCssClass($options, 'no-print');
-	}
-
-	public static function issueMainTypesItems(array $config = []): array {
-		/** @var $url Url */
-		$url = static::URL_HELPER;
-		$param = $url::PARAM_ISSUE_PARENT_TYPE;
-		$items = [];
-		$models = IssueType::getMainTypes();
-		$route = ArrayHelper::getValue($config, 'route', [$url::ROUTE_ISSUE_INDEX]);
-		$queryParam = Yii::$app->request->getQueryParams()[$param] ?? null;
-		$withFavorite = ArrayHelper::getValue($config, 'withFavorite', false);
-		$favoriteType = null;
-		if ($withFavorite) {
-			$favoriteType = Yii::$app->user->getFavoriteIssueType();
-		}
-		foreach ($models as $model) {
-
-			$label = static::encode($model->name);
-			if ($withFavorite) {
-				$isFavorite = $model->id === $favoriteType;
-				$favoriteConfig = ArrayHelper::getValue($config, 'favoriteConfig');
-				$favoriteConfig['data-method'] = 'POST';
-
-				static::addCssClass($favoriteConfig, 'favorite-link');
-				if ($isFavorite) {
-					static::addCssClass($favoriteConfig, 'active');
-				}
-				$favoriteLink = static::a(
-					static::icon('star'),
-					[
-						'/user-settings/favorite-issue-type',
-						'type_id' => !$isFavorite ? $model->id : null,
-						'returnUrl' => Url::current(),
-					],
-					$favoriteConfig
-				);
-				$label .= $favoriteLink;
-			}
-
-			$typeRoute = $route;
-			$typeRoute[$param] = $model->id;
-			$item = ArrayHelper::getValue($config, 'itemOptions', []);
-			$item = array_merge($item, [
-				'url' => $typeRoute,
-				'label' => $label,
-				'encode' => false,
-				'active' => (int) $queryParam === $model->id,
-			]);
-			$items[] = $item;
-		}
-		if (!empty($items)) {
-			$typeRoute = $route;
-			$allIssueParentType = IssueTypeParentIdAction::ISSUE_PARENT_TYPE_ALL;
-			$typeRoute[$param] = $allIssueParentType;
-			$items[] = [
-				'url' => $typeRoute,
-				'label' => Yii::t('issue', 'All Issues'),
-				'active' => (int) $queryParam === $allIssueParentType || empty($queryParam),
-			];
-		}
-
-		return $items;
 	}
 
 	public static function hexToRgb(string $hex, bool $alpha = false): array {
