@@ -9,8 +9,9 @@ class ChartsAsset extends AssetBundle {
 
 	public $baseUrl = 'https://cdn.jsdelivr.net/npm/';
 
+	//3.52 has default disable wheel zoom
 	public $js = [
-		'apexcharts',
+		'apexcharts@3.52',
 	];
 
 	public $depends = [
