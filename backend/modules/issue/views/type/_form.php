@@ -31,11 +31,6 @@ use yii\web\View;
 			],
 		])->textInput(['maxlength' => true]) ?>
 
-		<?= $form->field($model, 'vat', [
-			'options' => [
-				'class' => 'col-md-1',
-			],
-		])->widget(NumberControl::class) ?>
 
 	</div>
 

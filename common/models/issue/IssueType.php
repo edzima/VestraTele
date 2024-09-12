@@ -17,7 +17,6 @@ use yii\helpers\ArrayHelper;
  * @property int $id
  * @property string $name
  * @property string $short_name
- * @property string $vat
  * @property int|null $with_additional_date
  * @property int|null $parent_id
  * @property int|null $default_show_linked_notes
@@ -61,7 +60,6 @@ class IssueType extends ActiveRecord implements Hierarchy {
 			'id' => 'ID',
 			'name' => Yii::t('common', 'Name'),
 			'short_name' => Yii::t('common', 'Shortname'),
-			'vat' => 'VAT (%)',
 			'with_additional_date' => Yii::t('common', 'With additional Date'),
 			'parent_id' => Yii::t('issue', 'Type Parent'),
 			'parent' => Yii::t('issue', 'Type Parent'),

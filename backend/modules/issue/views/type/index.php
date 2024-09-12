@@ -33,7 +33,6 @@ $this->params['breadcrumbs'][] = $this->title;
 			'name',
 			'short_name',
 			'is_main:boolean',
-			'vat',
 			'with_additional_date:boolean',
 			[
 				'attribute' => 'parent_id',
