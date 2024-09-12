@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\models\query;
 
+use common\helpers\ArrayHelper;
 use common\models\query\PhonableQuery;
 use common\models\query\PhonableQueryTrait;
 use common\modules\lead\models\Lead;
@@ -40,6 +41,24 @@ class LeadQuery extends ActiveQuery implements PhonableQuery {
 				$query->andWhere(LeadUser::tableName() . '.lead_id IS NULL');
 			},
 		]);
+		return $this;
+	}
+
+	public function dateBetween(?string $fromAt, ?string $toAt, bool $day = true): self {
+		if ($day) {
+			$fromAt = $fromAt ? date('Y-m-d 00:00:00', strtotime($fromAt)) : null;
+			$toAt = $toAt ? date('Y-m-d 23:59:59', strtotime($toAt)) : null;
+		}
+		if ($fromAt) {
+			$this->andWhere([
+				'>=', Lead::tableName() . '.date_at', $fromAt,
+			]);
+		}
+		if ($toAt) {
+			$this->andWhere([
+				'<=', Lead::tableName() . '.date_at', $toAt,
+			]);
+		}
 		return $this;
 	}
 
@@ -92,5 +111,15 @@ class LeadQuery extends ActiveQuery implements PhonableQuery {
 				->andWhere(LeadReport::tableName() . '.lead_id = ' . Lead::tableName() . '.id'),
 		]);
 		return $this;
+	}
+
+	public function statusesCounts(array $statuses = []): array {
+		$this->andFilterWhere([Lead::tableName() . '.status_id' => $statuses]);
+		$this->select([Lead::tableName() . '.status_id', 'count(*) as count'])
+			->groupBy(Lead::tableName() . '.status_id');
+		$data = $this->asArray()->all();
+		$data = ArrayHelper::map($data, 'status_id', 'count');
+		$data = array_map('intval', $data);
+		return $data;
 	}
 }

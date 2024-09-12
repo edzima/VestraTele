@@ -5,6 +5,7 @@ namespace frontend\tests\functional\lead;
 use common\fixtures\helpers\LeadFixtureHelper;
 use common\models\KeyStorageItem;
 use common\modules\lead\models\Lead;
+use common\modules\lead\models\LeadCampaign;
 use common\modules\lead\Module;
 use frontend\controllers\ApiLeadController;
 use frontend\tests\FunctionalTester;
@@ -15,6 +16,8 @@ class ApiLeadCest {
 	private const ROUTE_LANDING = '/lead/api/landing';
 	/** @see ApiLeadController::actionCustomer() */
 	private const ROUTE_CUSTOMER = '/lead/api/customer';
+	/** @see ApiLeadController::actionZapier() */
+	private const ROUTE_ZAPIER = '/lead/api/zapier';
 
 	public function _before(FunctionalTester $I): void {
 		$I->haveRecord(KeyStorageItem::class, [
@@ -24,7 +27,10 @@ class ApiLeadCest {
 	}
 
 	public function _fixtures(): array {
-		return LeadFixtureHelper::leads();
+		return array_merge(
+			LeadFixtureHelper::campaign(),
+			LeadFixtureHelper::leads(),
+		);
 	}
 
 	public function checkCustomerAction(FunctionalTester $I): void {
@@ -93,6 +99,33 @@ class ApiLeadCest {
 			'source_id' => 2,
 			'name' => 'Jonny',
 			'email' => 'email@example.com',
+		]);
+
+		$I->seeRecord(Module::manager()->model, [
+			'source_id' => 2,
+			'name' => 'Jonny',
+			'email' => 'email@example.com',
+		]);
+		$I->seeEmailIsSent();
+		$I->dontSeeSmsIsSend();
+	}
+
+	public function checkZapierWithPixelCampaign(FunctionalTester $I): void {
+		$I->sendAjaxPostRequest(static::ROUTE_ZAPIER, [
+			'source_id' => 2,
+			'name' => 'Jonny',
+			'email' => 'email@example.com',
+			'fb_ad_id' => '120210349625950400',
+			'fb_ad_name' => 'FilmNowyNkz – kopia',
+			'fb_adset_id' => '120210349625920400',
+			'fb_adset_name' => 'Sankcje wszyscy 30+',
+			'fb_campaign_id' => '120210349625930400',
+			'fb_campaign_name' => 'BO_Sankcje_LeadAds_10052024',
+		]);
+
+		$I->seeRecord(LeadCampaign::class, [
+			'type' => LeadCampaign::TYPE_AD,
+			'entity_id' => '120210349625950400',
 		]);
 
 		$I->seeRecord(Module::manager()->model, [

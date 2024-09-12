@@ -68,4 +68,13 @@ class StringHelper extends BaseStringHelper {
 		return html_entity_decode(mb_convert_encoding(strtr($text, static::w1250Map()), 'UTF-8', 'ISO-8859-2'), ENT_QUOTES, 'UTF-8');
 	}
 
+	public static function shortName(string $fullName, int $secondLength = 1): string {
+		$names = explode(' ', $fullName);
+		$shortName = $names[0];
+		if (isset($names[1])) {
+			$shortName .= ' ' . mb_substr($names[1], 0, $secondLength) . '.';
+		}
+		return $shortName;
+	}
+
 }

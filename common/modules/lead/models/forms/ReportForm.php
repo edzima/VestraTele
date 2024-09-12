@@ -255,6 +255,10 @@ class ReportForm extends Model {
 			return false;
 		}
 		$this->linkUser();
+		$leadUser = Module::manager()->getLeadUser($this->lead, $this->owner_id);
+		if ($leadUser) {
+			$leadUser->updateActionAt();
+		}
 
 		if ($this->leadName !== $this->lead->getName()) {
 			$this->lead->updateName($this->leadName);

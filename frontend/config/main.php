@@ -52,11 +52,13 @@ return [
 						'controllers' => [
 							'lead/lead',
 							'lead/campaign',
+							'lead/cost',
 							'lead/source',
 							'lead/reminder',
 							'lead/report',
 							'lead/sms',
 							'lead/phone-blacklist',
+							'lead/chart',
 						],
 						'matchCallback' => static function ($rule, Action $action): bool {
 							if ($action->controller->id === 'sms') {

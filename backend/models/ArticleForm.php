@@ -16,7 +16,7 @@ class ArticleForm extends Model {
 	public $usersIds = [];
 	public string $title = '';
 	public string $slug = '';
-	public string $preview = '';
+	public ?string $preview = '';
 	public int $status = Article::STATUS_ACTIVE;
 	public $published_at;
 	public string $body = '';

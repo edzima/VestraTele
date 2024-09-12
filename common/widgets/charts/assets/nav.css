@@ -1,0 +1,14 @@
+
+.nav-scrollable {
+	overflow-x: auto; /* Enable horizontal scrolling */
+	white-space: nowrap; /* Prevent items from wrapping */
+}
+
+.nav-scrollable li {
+	display: inline-block;
+	float: none;
+}
+
+.nav-chart > li > a {
+	padding: 5px 10px;
+}

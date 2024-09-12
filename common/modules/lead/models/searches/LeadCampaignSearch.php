@@ -2,7 +2,9 @@
 
 namespace common\modules\lead\models\searches;
 
+use common\models\user\User;
 use common\modules\lead\models\LeadCampaign;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -11,14 +13,28 @@ use yii\data\ActiveDataProvider;
  */
 class LeadCampaignSearch extends LeadCampaign {
 
+	public const WITHOUT_OWNER = -1;
+
+	public static function getOwnersNames(): array {
+		$owners = [self::WITHOUT_OWNER => Yii::t('lead', '---Without Owner---')];
+		return array_merge($owners, User::getSelectList(
+			LeadCampaign::find()
+				->andWhere('owner_id IS NOT NULL')
+				->distinct()
+				->select('owner_id')
+				->column()
+			, false));
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'sort_index', 'owner_id'], 'integer'],
+			[['id', 'sort_index', 'owner_id', 'is_active', 'leads_count', 'parent_id'], 'integer'],
 			['!owner_id', 'required', 'on' => static::SCENARIO_OWNER],
-			[['name'], 'safe'],
+			[['name', 'entity_id'], 'safe'],
+			['type', 'in', 'range' => array_keys(static::getTypesNames())],
 		];
 	}
 
@@ -40,11 +56,28 @@ class LeadCampaignSearch extends LeadCampaign {
 	public function search(array $params): ActiveDataProvider {
 		$query = LeadCampaign::find();
 
+		$query->joinWith('leads');
+		$query->joinWith('costs c');
+		$query->select([
+			LeadCampaign::tableName() . '.*',
+			'count(lead.id) as leads_count',
+			'sum(c.value) as cost_value',
+		]);
+		$query->groupBy(LeadCampaign::tableName() . '.id');
+
 		// add conditions that should always apply here
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
 		]);
+		$dataProvider->sort->attributes['leads_count'] = [
+			'asc' => ['leads_count' => SORT_ASC],
+			'desc' => ['leads_count' => SORT_DESC],
+		];
+		$dataProvider->sort->attributes['totalCostSumValue'] = [
+			'asc' => ['cost_value' => SORT_ASC],
+			'desc' => ['cost_value' => SORT_DESC],
+		];
 
 		$this->load($params);
 
@@ -55,12 +88,20 @@ class LeadCampaignSearch extends LeadCampaign {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'id' => $this->id,
-			'sort_index' => $this->sort_index,
-			'owner_id' => $this->owner_id,
+			LeadCampaign::tableName() . '.id' => $this->id,
+			LeadCampaign::tableName() . '.sort_index' => $this->sort_index,
+			LeadCampaign::tableName() . '.owner_id' => $this->owner_id,
+			LeadCampaign::tableName() . '.is_active' => $this->is_active,
+			LeadCampaign::tableName() . '.type' => $this->type,
+			LeadCampaign::tableName() . '.details' => $this->details,
+			LeadCampaign::tableName() . '.entity_id' => $this->entity_id,
+			LeadCampaign::tableName() . '.parent_id' => $this->parent_id,
+
 		]);
 
-		$query->andFilterWhere(['like', 'name', $this->name]);
+		$query->andFilterWhere([
+			'like', LeadCampaign::tableName() . '.name', $this->name,
+		]);
 
 		return $dataProvider;
 	}

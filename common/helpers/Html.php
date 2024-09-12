@@ -9,6 +9,7 @@ use common\models\settlement\PayedInterface;
 use common\modules\file\models\File;
 use Yii;
 use yii\bootstrap\BaseHtml;
+use yii\helpers\VarDumper;
 
 class Html extends BaseHtml {
 
@@ -28,7 +29,8 @@ class Html extends BaseHtml {
 	public static function issueLink(IssueInterface $issue, array $options = []): string {
 		/** @var $url Url */
 		$url = static::URL_HELPER;
-		return static::a($issue->getIssueName(), $url::issueView($issue->getIssueId()), $options);
+		$issueUrl = $url::issueView($issue->getIssueId());
+		return static::a($issue->getIssueName(), $issueUrl, $options);
 	}
 
 	public static function issueFileLink(File $file, IssueInterface $issue, $schema = false): string {
@@ -160,6 +162,10 @@ class Html extends BaseHtml {
 		}
 
 		return '#' . implode($hexcolor);
+	}
+
+	public static function dump(mixed $var, array $options = []): string {
+		return static::tag('pre', VarDumper::dumpAsString($var), $options);
 	}
 
 }

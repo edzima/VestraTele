@@ -58,6 +58,8 @@ $this->registerJs($js);
 
 	<p style="display: inline">
 
+		<?= Html::a(Html::faicon('bar-chart'), ['chart/index'], ['class' => 'btn btn-success', 'title' => Yii::t('lead', 'Charts')]) ?>
+
 		<?= Html::a(Yii::t('lead', 'Search') . ' ' . Html::icon('phone'), ['phone'], [
 			'class' => 'btn btn-success',
 			'title' => Yii::t('lead', 'Search - Phone'),
@@ -81,6 +83,11 @@ $this->registerJs($js);
 			<?= Html::a(Yii::t('lead', 'Lead Reminders'), ['reminder/index'], ['class' => 'btn btn-danger']) ?>
 			<?= Html::a(Html::icon('calendar'), ['/calendar/lead-reminder/index'], ['class' => 'btn btn-danger']) ?>
 		</span>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_COST)
+			? Html::a(Yii::t('lead', 'Costs'), ['cost/index'], ['class' => 'btn btn-warning'])
+			: ''
+		?>
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_LEAD_DIALER_MANAGER)
 			? Html::a(Yii::t('lead', 'Dialers'), ['dialer/index'], ['class' => 'btn btn-primary'])

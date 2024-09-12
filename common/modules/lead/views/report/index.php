@@ -33,8 +33,15 @@ if ($multipleForm) {
 
 	<h1><?= Html::encode($this->title) ?></h1>
 
+	<p>
+		<?= Html::a(Html::faicon('bar-chart'), ['chart', 'fromAt' => $searchModel->from_at, 'toAt' => $searchModel->to_at], ['class' => 'btn btn-success', 'title' => Yii::t('lead', 'Charts')]) ?>
+	</p>
 
-	<?= $this->render('_search', ['model' => $searchModel]) ?>
+
+	<?= $this->render('_search', [
+		'model' => $searchModel,
+		'action' => ['index'],
+	]) ?>
 
 	<?php if ($multipleForm): ?>
 		<div class="grid-before">
@@ -138,11 +145,11 @@ if ($multipleForm) {
 			[
 				'attribute' => 'lead_status_id',
 				'value' => 'lead.statusName',
+				'label' => $searchModel->getAttributeLabel('lead_status_id'),
 				'filter' => LeadStatus::getNames(),
-				'label' => Yii::t('lead', 'Current Status'),
 				'filterType' => GridView::FILTER_SELECT2,
 				'filterInputOptions' => [
-					'placeholder' => Yii::t('lead', 'Current Status'),
+					'placeholder' => $searchModel->getAttributeLabel('lead_status_id'),
 				],
 				'filterWidgetOptions' => [
 					'size' => Select2::SIZE_SMALL,
@@ -179,7 +186,7 @@ if ($multipleForm) {
 			[
 				'attribute' => 'owner_id',
 				'value' => 'owner',
-				'filter' => LeadReportSearch::getOwnersNames(),
+				'filter' => $searchModel->getOwnersNames(),
 				'label' => Yii::t('lead', 'Owner'),
 				'visible' => $searchModel->scenario !== LeadReportSearch::SCENARIO_OWNER,
 				'filterType' => GridView::FILTER_SELECT2,
@@ -199,10 +206,10 @@ if ($multipleForm) {
 				'attribute' => 'status_id',
 				'value' => 'status',
 				'filter' => LeadStatus::getNames(),
-				'label' => Yii::t('lead', 'Status'),
 				'filterType' => GridView::FILTER_SELECT2,
+				'label' => $searchModel->getAttributeLabel('status_id'),
 				'filterInputOptions' => [
-					'placeholder' => Yii::t('lead', 'Status'),
+					'placeholder' => $searchModel->getAttributeLabel('status_id'),
 				],
 				'filterWidgetOptions' => [
 					'size' => Select2::SIZE_SMALL,
@@ -216,10 +223,10 @@ if ($multipleForm) {
 				'attribute' => 'old_status_id',
 				'value' => 'oldStatus',
 				'filter' => LeadStatus::getNames(),
-				'label' => Yii::t('lead', 'Old Status'),
 				'filterType' => GridView::FILTER_SELECT2,
+				'label' => $searchModel->getAttributeLabel('old_status_id'),
 				'filterInputOptions' => [
-					'placeholder' => Yii::t('lead', 'Old Status'),
+					'placeholder' => $searchModel->getAttributeLabel('old_status_id'),
 				],
 				'filterWidgetOptions' => [
 					'size' => Select2::SIZE_SMALL,

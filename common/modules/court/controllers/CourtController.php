@@ -48,6 +48,26 @@ class CourtController extends Controller {
 	}
 
 	/**
+	 * Creates a new Court model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 *
+	 * @return string|Response
+	 */
+	public function actionCreate() {
+		$model = new Court();
+
+		if ($this->request->isPost) {
+			if ($model->load($this->request->post()) && $model->save()) {
+				return $this->redirect(['view', 'id' => $model->id]);
+			}
+		}
+
+		return $this->render('create', [
+			'model' => $model,
+		]);
+	}
+
+	/**
 	 * Displays a single Court model.
 	 *
 	 * @param int $id ID

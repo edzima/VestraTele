@@ -36,6 +36,11 @@ class LeadFixController extends Controller {
 		], 'phone IS NOT NULL');
 	}
 
+	public function actionEmptyProvider(): void {
+		$count = Lead::updateAll(['provider' => null], ['provider' => '']);
+		Console::output('Update Leads with provider as empty string: ' . $count);
+	}
+
 	public function actionOwnerFromReports(): void {
 		$query = Lead::find()
 			->joinWith('leadUsers')

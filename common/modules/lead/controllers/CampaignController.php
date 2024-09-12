@@ -2,11 +2,16 @@
 
 namespace common\modules\lead\controllers;
 
-use Yii;
+use common\helpers\Flash;
+use common\helpers\Url;
+use common\models\user\User;
+use common\modules\lead\models\forms\LeadCampaignForm;
 use common\modules\lead\models\LeadCampaign;
+use common\modules\lead\models\searches\LeadCampaignCostSearch;
 use common\modules\lead\models\searches\LeadCampaignSearch;
-use yii\web\NotFoundHttpException;
+use Yii;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 
 /**
  * CampaignController implements the CRUD actions for LeadCampaign model.
@@ -32,7 +37,7 @@ class CampaignController extends BaseController {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(): string {
+	public function actionIndex(string $type = LeadCampaign::TYPE_CAMPAIGN): string {
 		$searchModel = new LeadCampaignSearch();
 		if ($this->module->onlyUser) {
 			if (Yii::$app->user->getIsGuest()) {
@@ -41,6 +46,7 @@ class CampaignController extends BaseController {
 			$searchModel->setScenario(LeadCampaignSearch::SCENARIO_OWNER);
 			$searchModel->owner_id = Yii::$app->user->getId();
 		}
+		$searchModel->type = $type;
 
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -53,6 +59,51 @@ class CampaignController extends BaseController {
 		]);
 	}
 
+	public function actionAssign(array $ids = []) {
+		if (empty($ids)) {
+			$postIds = Yii::$app->request->post('leadsIds');
+			if (is_string($postIds)) {
+				$postIds = explode(',', $postIds);
+			}
+			if ($postIds) {
+				$ids = $postIds;
+			}
+		}
+		$model = new LeadCampaignForm();
+		$ids = array_unique($ids);
+		$model->leadsIds = array_combine($ids, $ids);
+		if ($this->module->onlyUser) {
+			$model->scenario = LeadCampaignForm::SCENARIO_OWNER;
+			$model->ownerId = Yii::$app->user->getId();
+		}
+		if ($model->load(Yii::$app->request->post())) {
+			$count = $model->save();
+			if ($count) {
+				if ($model->campaignId) {
+					Flash::add(Flash::TYPE_SUCCESS,
+						Yii::t('lead', 'Success assign {count} Leads to Campaign: {campaign}.', [
+							'campaign' => $model->getCampaignNames()[$model->campaignId],
+							'count' => $count,
+						])
+					);
+				}
+				if ($model->campaignId) {
+					Flash::add(Flash::TYPE_SUCCESS,
+						Yii::t('lead', '{count} Leads without Campaign.', [
+							'campaign' => $model->getCampaignNames()[$model->campaignId],
+							'count' => $count,
+						])
+					);
+				}
+
+				return $this->redirect(Url::previous());
+			}
+		}
+		return $this->render('assign', [
+			'model' => $model,
+		]);
+	}
+
 	/**
 	 * Displays a single LeadCampaign model.
 	 *
@@ -60,9 +111,40 @@ class CampaignController extends BaseController {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView(int $id): string {
+	public function actionView(int $id, string $fromAt = null, string $toAt = null): string {
+		$model = $this->findModel($id);
+		$campaignCost = null;
+		if (Yii::$app->user->can(User::PERMISSION_LEAD_COST)) {
+			$campaignCost = new LeadCampaignCostSearch();
+			$campaignCost->campaignIds = [
+				$id,
+			];
+			$campaignCost->fromAt = $fromAt;
+			$campaignCost->toAt = $toAt;
+
+			$campaignCost->load(Yii::$app->request->queryParams);
+			if (empty($campaignCost->fromAt) || empty($campaignCost->toAt)) {
+				$campaignCost->setDateFromCosts();
+				if (empty($campaignCost->fromAt)) {
+					$campaignCost->setDateFromLeads();
+				}
+			}
+
+			if ($this->module->onlyUser) {
+				$campaignCost->userId = Yii::$app->user->getId();
+				$campaignCost->scenario = LeadCampaignCostSearch::SCENARIO_USER;
+			}
+			if (Yii::$app->user->can(User::PERMISSION_LEAD_COST)) {
+				if ($campaignCost->getLeadsTotalCount()) {
+					$cost = $this->module->getCost();
+					$data = $cost->recalculateFromDate($campaignCost->fromAt, $campaignCost->toAt, $campaignCost->getCampaignsIds());
+				}
+			}
+		}
+
 		return $this->render('view', [
-			'model' => $this->findModel($id),
+			'model' => $model,
+			'campaignCost' => $campaignCost,
 		]);
 	}
 

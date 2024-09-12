@@ -34,6 +34,7 @@ use yii\helpers\Json;
  * @property string|null $email
  * @property int|null $campaign_id
  * @property string|null $deadline_at
+ * @property float|null $cost_value
  *
  * @property-read LeadUserInterface|null $owner
  * @property-read LeadCampaign|null $campaign
@@ -46,6 +47,7 @@ use yii\helpers\Json;
  * @property-read Lead[] $samePhoneLeads
  * @property-read Lead[] $sameEmailLeads
  * @property-read LeadDialer[] $dialers
+ * @property-read LeadCost[] $costs
  */
 class Lead extends ActiveRecord implements ActiveLead {
 
@@ -152,6 +154,7 @@ class Lead extends ActiveRecord implements ActiveLead {
 			'details' => Yii::t('lead', 'Details'),
 			'updated_at' => Yii::t('lead', 'Updated At'),
 			'customerAddress' => Yii::t('lead', 'Customer Address'),
+			'cost_value' => Yii::t('lead', 'Single Costs Value'),
 		];
 	}
 
@@ -224,6 +227,21 @@ class Lead extends ActiveRecord implements ActiveLead {
 
 	public function getLeadUsers(): ActiveQuery {
 		return $this->hasMany(LeadUser::class, ['lead_id' => 'id']);
+	}
+
+	public function getCosts(): ActiveQuery {
+		if ($this->isNewRecord) {
+			//@todo yii2 not allowed Expression in link attribute.
+			$relation = $this->hasMany(LeadCost::class, ['campaign_id' => 'campaign_id']);
+			$relation->onCondition([
+				LeadCost::tableName() . '.date_at' => Lead::expressionDateAtAsDate(),
+			]);
+			return $relation;
+		}
+
+		return $this->hasMany(LeadCost::class, [
+			'campaign_id' => 'campaign_id',
+		])->andWhere([LeadCost::tableName() . '.date_at' => date('Y-m-d', strtotime($this->date_at))]);
 	}
 
 	public function getDetails(): ?string {
@@ -483,5 +501,9 @@ class Lead extends ActiveRecord implements ActiveLead {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->hasMany(static::class, ['email' => 'email'])
 			->indexBy('id');
+	}
+
+	public static function expressionDateAtAsDate(): Expression {
+		return new Expression('DATE(' . Lead::tableName() . '.date_at)');
 	}
 }

@@ -1,6 +1,7 @@
 <?php
 
 use backend\helpers\Html;
+use backend\helpers\Url;
 use backend\modules\issue\models\search\IssueSearch;
 use common\behaviors\IssueTypeParentIdAction;
 use common\models\user\Worker;
@@ -81,12 +82,6 @@ $this->params['issueParentTypeNav'] = [
 							],
 						],
 						'class' => 'btn btn-success',
-						'title' => Yii::t('backend', 'Send SMS: {count}', [
-							'count' => count($searchModel->getAllIds($dataProvider->query)),
-						]),
-						'aria-label' => Yii::t('backend', 'Send SMS: {count}', [
-							'count' => count($searchModel->getAllIds($dataProvider->query)),
-						]),
 					]
 				)
 					: ''

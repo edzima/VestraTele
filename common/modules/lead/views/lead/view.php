@@ -16,6 +16,7 @@ use common\modules\lead\widgets\SameContactsListWidget;
 use common\modules\lead\widgets\ShortReportStatusesWidget;
 use common\widgets\address\AddressDetailView;
 use common\widgets\grid\ActionColumn;
+use common\widgets\grid\DateTimeColumn;
 use common\widgets\GridView;
 use yii\data\DataProviderInterface;
 use yii\web\YiiAsset;
@@ -188,6 +189,13 @@ if ($phoneBlacklist) {
 					[
 						'attribute' => 'campaign',
 						'visible' => !empty($model->campaign_id),
+						'value' => function (ActiveLead $lead): ?string {
+							if (empty($lead->campaign)) {
+								return null;
+							}
+							return Html::a($lead->campaign->name, ['campaign/view', 'id' => $lead->campaign_id]);
+						},
+						'format' => 'html',
 					],
 					'date_at:datetime',
 					[
@@ -291,7 +299,7 @@ if ($phoneBlacklist) {
 
 				<?= $usersDataProvider !== null
 					? GridView::widget([
-						'options' => ['class' => 'col-md-4',],
+						'options' => ['class' => 'col-sm-12',],
 						'caption' => Yii::t('lead', 'Users'),
 						'dataProvider' => $usersDataProvider,
 						'showOnEmpty' => false,
@@ -299,12 +307,38 @@ if ($phoneBlacklist) {
 						'summary' => false,
 						'columns' => [
 							[
-								'label' => Yii::t('lead', 'User'),
-								'value' => 'userWithTypeName',
+								'attribute' => 'user',
+								'noWrap' => true,
 							],
 							[
-								'label' => Yii::t('lead', 'Date At'),
-								'value' => 'formattedDates',
+								'attribute' => 'typeName',
+								'noWrap' => true,
+							],
+							[
+								'class' => DateTimeColumn::class,
+								'attribute' => 'created_at',
+								'noWrap' => true,
+							],
+							[
+								'class' => DateTimeColumn::class,
+								'attribute' => 'action_at',
+								'noWrap' => true,
+							],
+							[
+								'class' => DateTimeColumn::class,
+								'attribute' => 'first_view_at',
+								'noWrap' => true,
+							],
+							[
+								'class' => DateTimeColumn::class,
+								'attribute' => 'last_view_at',
+								'noWrap' => true,
+							],
+
+							[
+								'class' => DateTimeColumn::class,
+								'attribute' => 'updated_at',
+								'noWrap' => true,
 							],
 							[
 								'class' => ActionColumn::class,

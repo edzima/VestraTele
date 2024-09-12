@@ -16,7 +16,7 @@ use yii\db\ActiveRecord;
  * @property integer $id
  * @property string $title
  * @property string $slug
- * @property string $preview
+ * @property string|null $preview
  * @property string $body
  * @property integer $status
  * @property integer $category_id

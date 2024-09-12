@@ -36,6 +36,10 @@ YiiAsset::register($this);
 			'name',
 			'description',
 			[
+				'attribute' => 'dealStageName',
+				'visible' => !empty($model->getDealStage()),
+			],
+			[
 				'attribute' => 'hours_deadline',
 				'visible' => !empty($model->hours_deadline),
 			],
@@ -62,6 +66,15 @@ YiiAsset::register($this);
 				'contentOptions' => [
 					'style' => [
 						'background-color' => $model->calendar_background,
+					],
+				],
+			],
+			[
+				'attribute' => 'chart_color',
+				'visible' => $model->chart_color !== null,
+				'contentOptions' => [
+					'style' => [
+						'background-color' => $model->chart_color,
 					],
 				],
 			],

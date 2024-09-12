@@ -1,6 +1,7 @@
 <?php
 
 use common\modules\lead\models\forms\ReportForm;
+use common\modules\lead\widgets\LeadStatusDetailsWidget;
 use common\modules\lead\widgets\SameContactsListWidget;
 use yii\helpers\Html;
 use yii\web\View;
@@ -29,6 +30,8 @@ $this->params['breadcrumbs'][] = $this->title;
 		</div>
 
 		<div class="col-md-6">
+
+			<?= LeadStatusDetailsWidget::widget([]) ?>
 
 			<?= SameContactsListWidget::widget([
 				'model' => $model->getLead(),

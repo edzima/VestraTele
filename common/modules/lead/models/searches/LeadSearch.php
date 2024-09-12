@@ -37,7 +37,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public const SCENARIO_USER = 'user';
 
-	private const QUESTION_ATTRIBUTE_PREFIX = 'question';
+	protected const QUESTION_ATTRIBUTE_PREFIX = 'question';
 
 	public bool $withoutUser = false;
 	public bool $withoutReport = false;
@@ -45,6 +45,8 @@ class LeadSearch extends Lead implements SearchModel {
 	public $duplicatePhone;
 
 	public bool $withoutArchives = true;
+
+	public bool $campaignWithChildes = true;
 
 	public $fromMarket;
 
@@ -73,6 +75,8 @@ class LeadSearch extends Lead implements SearchModel {
 	public $reportStatus;
 
 	public $selfUserId;
+
+	public bool $onlyWithCosts = false;
 	private array $questionsAttributes = [];
 
 	private static ?array $QUESTIONS = null;
@@ -107,16 +111,23 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'type_id', 'campaign_id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
+			[['id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
 			[['reportStatus', 'hoursAfterLastReport', 'owner_id'], 'integer'],
 			[['!user_id'], 'required', 'on' => static::SCENARIO_USER],
 			[['!user_id'], 'integer', 'on' => static::SCENARIO_USER],
-			[['fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone', 'duplicateEmail', 'withAddress', 'onlyWithEmail', 'onlyWithPhone'], 'boolean'],
+			[
+				[
+					'fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone',
+					'duplicateEmail', 'withAddress', 'onlyWithEmail', 'onlyWithPhone', 'onlyWithCosts',
+					'campaignWithChildes',
+				], 'boolean',
+			],
 			[['name', 'data'], 'string', 'min' => 3],
 			[['duplicatePhone', 'fromMarket', 'selfUserId', 'onlyWithEmail', 'onlyWithPhone',], 'default', 'value' => null],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'excludedClosedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames()), 'allowArray' => true],
-			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames())],
+			['type_id', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
+			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames()), 'allowArray' => true],
 			[['selfUserId'], 'in', 'range' => function () { return $this->selfUsersIds(); }, 'allowArray' => true, 'skipOnEmpty' => true],
 			[['status_id', 'excludedStatus', 'reportStatus'], 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
 			['deadlineType', 'in', 'range' => array_keys(static::getDeadlineNames())],
@@ -151,6 +162,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'reportStatus' => Yii::t('lead', 'Report Status'),
 				'reportStatusCount' => Yii::t('lead', 'Report Status Count'),
 				'hoursAfterLastReport' => Yii::t('lead', 'Hours after newest Report'),
+				'onlyWithCosts' => Yii::t('lead', 'Only with Costs'),
 			]
 		);
 	}
@@ -211,7 +223,7 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function search(array $params = []): ActiveDataProvider {
 		$query = Lead::find()
-			->joinWith('leadSource S')
+			->joinWith('leadSource')
 			->with('status')
 			->with('campaign')
 			->with('owner.userProfile')
@@ -246,6 +258,7 @@ class LeadSearch extends Lead implements SearchModel {
 
 		$this->applyAddressFilter($query);
 		$this->applyAnswerFilter($query);
+		$this->applyCampaignFilter($query);
 		$this->applyDateFilter($query);
 		$this->applyDuplicates($query);
 		$this->applyFromMarketFilter($query);
@@ -261,20 +274,11 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyReportStatusFilter($query);
 		$this->applyDeadlineFilter($query);
 		$this->applyHoursAfterLastReport($query);
-		// grid filtering conditions
-		$query->andFilterWhere([
-			Lead::tableName() . '.id' => $this->id,
-			Lead::tableName() . '.date_at' => $this->date_at,
-			Lead::tableName() . '.campaign_id' => $this->campaign_id,
-			Lead::tableName() . '.source_id' => $this->source_id,
-			Lead::tableName() . '.provider' => $this->provider,
-			'S.type_id' => $this->type_id,
-		]);
+		$this->applyTypeFilter($query);
+		$this->applyOnlyWithCosts($query);
 
-		$query
-			->andFilterWhere(['like', Lead::tableName() . '.data', $this->data])
-			->andFilterWhere(['like', Lead::tableName() . '.email', $this->email])
-			->andFilterWhere(['like', Lead::tableName() . '.postal_code', $this->postal_code]);
+		$this->applyLeadDirectlyFilter($query);
+		// grid filtering conditions
 
 		if (YII_ENV_TEST) {
 			codecept_debug($query->createCommand()->getRawSql());
@@ -310,14 +314,18 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public $owner_id;
 
-	private function applyUserFilter(LeadQuery $query): void {
+	protected function applyUserFilter(LeadQuery $query): void {
 		if (!empty($this->owner_id)) {
 			$query->owner($this->owner_id);
+		}
+		if (!empty($this->user_type)) {
+			$query->joinWith('leadUsers');
+			$query->andWhere([LeadUser::tableName() . '.type' => $this->user_type]);
+
 		}
 		if (!empty($this->user_id)) {
 			$query->joinWith('leadUsers');
 			$query->andWhere([LeadUser::tableName() . '.user_id' => $this->user_id]);
-			$query->andFilterWhere([LeadUser::tableName() . '.type' => $this->user_type]);
 		}
 		if ($this->withoutUser) {
 			$query->joinWith('leadUsers', false, 'LEFT OUTER JOIN');
@@ -348,7 +356,7 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 	}
 
-	private function applyReportStatusFilter(LeadQuery $query) {
+	protected function applyReportStatusFilter(LeadQuery $query) {
 		if (!empty($this->reportStatus)) {
 			$query->joinWith('reports');
 			$query->andWhere([LeadReport::tableName() . '.status_id' => $this->reportStatus]);
@@ -461,10 +469,24 @@ class LeadSearch extends Lead implements SearchModel {
 	}
 
 	public function getCampaignNames(): array {
-		if ($this->getScenario() === static::SCENARIO_USER) {
-			return LeadCampaign::getNames($this->user_id);
+		$campaignNames = $this->getScenario() === static::SCENARIO_USER
+			? LeadCampaign::getNames($this->user_id)
+			: LeadCampaign::getNames();
+
+		$campaignsIds = Lead::find()
+			->select('campaign_id')
+			->distinct()
+			->dateBetween($this->from_at, $this->to_at)
+			->column();
+
+		$names = [];
+		foreach ($campaignsIds as $campaignId) {
+			$name = $campaignNames[$campaignId] ?? null;
+			if ($name) {
+				$names[$campaignId] = $name;
+			}
 		}
-		return LeadCampaign::getNames();
+		return $names;
 	}
 
 	public function getSourcesNames(): array {
@@ -486,8 +508,15 @@ class LeadSearch extends Lead implements SearchModel {
 		return LeadUser::getTypesNames();
 	}
 
+	private static array $users = [];
+
 	public static function getUsersNames(string $type = null): array {
-		return User::getSelectList(LeadUser::userIds($type));
+		$key = $type ?: 'all';
+		if (!isset(static::$users[$key])) {
+			static::$users[$key] = User::getSelectList(LeadUser::userIds($type));
+		}
+
+		return static::$users[$key];
 	}
 
 	/**
@@ -543,7 +572,7 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 	}
 
-	private function applyStatusFilter(LeadQuery $query): void {
+	protected function applyStatusFilter(LeadQuery $query): void {
 		if ((int) $this->status_id === LeadStatusInterface::STATUS_ARCHIVE) {
 			$this->withoutArchives = false;
 		}
@@ -553,7 +582,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$query->andFilterWhere([Lead::tableName() . '.status_id' => $this->status_id]);
 	}
 
-	private function applyDateFilter(LeadQuery $query) {
+	protected function applyDateFilter(LeadQuery $query) {
 		if (!empty($this->olderByDays)) {
 			$this->to_at = date(DATE_ATOM, strtotime("- $this->olderByDays days"));
 		}
@@ -620,7 +649,7 @@ class LeadSearch extends Lead implements SearchModel {
 		return User::getSelectList($this->selfUsersIds());
 	}
 
-	private function applyHoursAfterLastReport(LeadQuery $query): void {
+	protected function applyHoursAfterLastReport(LeadQuery $query): void {
 		if (!empty($this->hoursAfterLastReport)) {
 			$query->onlyNewestReport();
 			$hours = $this->hoursAfterLastReport;
@@ -703,7 +732,7 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 	}
 
-	private function applyExcludedStatusFilter(LeadQuery $query): void {
+	public function applyExcludedStatusFilter(LeadQuery $query): void {
 		if (!empty($this->excludedStatus)) {
 			$query->andWhere(['NOT IN', Lead::tableName() . '.status_id', $this->excludedStatus]);
 		}
@@ -713,5 +742,49 @@ class LeadSearch extends Lead implements SearchModel {
 		return User::getSelectList(
 			LeadUser::userIds(LeadUser::TYPE_OWNER)
 		);
+	}
+
+	protected function applyTypeFilter(LeadQuery $query): void {
+		if (!empty($this->type_id)) {
+			$query->joinWith('leadSource');
+			$query->andWhere([LeadSource::tableName() . '.type_id' => $this->type_id]);
+		}
+	}
+
+	protected function applyLeadDirectlyFilter(LeadQuery $query) {
+		$query->andFilterWhere([
+			Lead::tableName() . '.id' => $this->id,
+			Lead::tableName() . '.date_at' => $this->date_at,
+			Lead::tableName() . '.source_id' => $this->source_id,
+			Lead::tableName() . '.provider' => $this->provider,
+		]);
+
+		$query
+			->andFilterWhere(['like', Lead::tableName() . '.data', $this->data])
+			->andFilterWhere(['like', Lead::tableName() . '.email', $this->email])
+			->andFilterWhere(['like', Lead::tableName() . '.postal_code', $this->postal_code]);
+	}
+
+	protected function applyOnlyWithCosts(LeadQuery $query) {
+		if ($this->onlyWithCosts) {
+			$query->andWhere(['IS NOT', Lead::tableName() . '.cost_value', null]);
+		}
+	}
+
+	protected function applyCampaignFilter(LeadQuery $query): void {
+		if (!empty($this->campaign_id)) {
+			$ids = [];
+			foreach ($this->campaign_id as $id) {
+				if (!empty($id)) {
+					$ids[] = $id;
+					if ($this->campaignWithChildes) {
+						$ids += LeadCampaign::getHierarchy()->getAllChildesIds($id);
+					}
+				}
+			}
+			$ids = array_unique($ids);
+			Yii::warning($ids);
+			$query->andFilterWhere([Lead::tableName() . '.campaign_id' => $ids]);
+		}
 	}
 }
