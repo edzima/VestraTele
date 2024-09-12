@@ -60,7 +60,6 @@ $this->params['breadcrumbs'][] = $this->title;
 					],
 					'name',
 					'short_name',
-					'vat',
 					'is_main:boolean',
 					'with_additional_date:boolean',
 					'default_show_linked_notes:boolean',
