@@ -162,6 +162,14 @@ class IssueController extends Controller {
 				];
 				$columns = array_merge($columns, $addressColumns);
 			}
+			if ($searchModel->withClaimsSum) {
+				$columns = array_merge($columns, [
+					[
+						'label' => Yii::t('issue', 'Issue Claims'),
+						'attribute' => 'claimsSum',
+					],
+				]);
+			}
 			$exporter = new CsvGrid([
 				'query' => $query,
 				'columns' => $columns,

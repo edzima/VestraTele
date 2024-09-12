@@ -246,6 +246,17 @@ class Issue extends ActiveRecord implements
 		return (int) $this->stage_id === IssueStage::ARCHIVES_DEEP_ID;
 	}
 
+	public function getClaimsSum(string $attribute = 'trying_value'): ?float {
+		if (empty($this->claims)) {
+			return null;
+		}
+		$sum = 0;
+		foreach ($this->claims as $claim) {
+			$sum += $claim->{$attribute};
+		}
+		return $sum;
+	}
+
 	public function getClaims(): ActiveQuery {
 		return $this->hasMany(IssueClaim::class, ['issue_id' => 'id']);
 	}
@@ -474,6 +485,7 @@ class Issue extends ActiveRecord implements
 		}
 		return $types;
 	}
+
 	public function getShipmentsPocztaPolska(): ActiveQuery {
 		return $this->hasMany(IssueShipmentPocztaPolska::class, ['issue_id' => 'id']);
 	}
