@@ -198,6 +198,7 @@ if ($multipleForm) {
 					'pluginOptions' => [
 						'allowClear' => true,
 						'dropdownAutoWidth' => true,
+						'multiple' => true,
 					],
 				],
 
