@@ -2,7 +2,6 @@
 
 namespace common\models\issue\query;
 
-use common\helpers\ArrayHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
@@ -21,7 +20,7 @@ class IssueQuery extends ActiveQuery {
 		if ($withChildren) {
 			$type = IssueType::getTypes()[$typeId] ?? null;
 			if ($type) {
-				$types = ArrayHelper::getColumn($type->childs, 'id');
+				$types = $type->getAllChildesIds();
 			}
 		}
 		$types[] = $typeId;

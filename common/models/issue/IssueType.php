@@ -2,6 +2,8 @@
 
 namespace common\models\issue;
 
+use common\models\hierarchy\Hierarchy;
+use common\models\hierarchy\HierarchyActiveModelTrait;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
 use Yii;
@@ -28,7 +30,9 @@ use yii\helpers\ArrayHelper;
  * @property IssueStageType[] $typeStages
  * @property static[] $childs
  */
-class IssueType extends ActiveRecord {
+class IssueType extends ActiveRecord implements Hierarchy {
+
+	use HierarchyActiveModelTrait;
 
 	private static ?array $TYPES = null;
 
