@@ -396,3 +396,26 @@ div:target {
 .btn-icon-with-link a {
 	color: white;
 }
+
+.dropdown .dropdown-submenu > ul {
+	padding-left: 32px;
+}
+
+.dropdown .dropdown-submenu li > a {
+	color: #777;
+	font-weight: 400;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	white-space: nowrap;
+	display: inline-block;
+}
+
+
+.dropdown .dropdown-submenu li:hover {
+	background-color: #e1e3e9;
+	color: #333;
+}
+
+
+
+
