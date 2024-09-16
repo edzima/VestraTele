@@ -2,6 +2,7 @@
 
 use backend\helpers\Breadcrumbs;
 use backend\helpers\Html;
+use backend\modules\issue\widgets\IssueCreateSettlementButtonDropdown;
 use backend\modules\issue\widgets\IssueSmsButtonDropdown;
 use backend\modules\issue\widgets\IssueViewSummonsWidgets;
 use backend\modules\issue\widgets\IssueViewTopSummonsWidgets;
@@ -211,20 +212,16 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 			: ''
 		?>
 
-
 		<?= Yii::$app->user->can(Worker::PERMISSION_CALCULATION_TO_CREATE)
-			? Html::a(
-				Yii::t('backend', 'Create settlement'),
-				['/settlement/calculation/create', 'id' => $model->id],
-				['class' => 'btn btn-success'])
-			: '' ?>
+			? IssueCreateSettlementButtonDropdown::widget([
+				'issue' => $model,
+				'options' => [
+					'class' => 'btn btn-success',
+				],
+			])
+			: ''
+		?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_SETTLEMENT_ADMINISTRATIVE_CREATE)
-			? Html::a(
-				Yii::t('backend', 'Create administrative settlement'),
-				['/settlement/calculation/create-administrative', 'id' => $model->id],
-				['class' => 'btn btn-success'])
-			: '' ?>
 
 	</p>
 
