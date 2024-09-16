@@ -26,6 +26,7 @@ class CalculationForm extends PayForm {
 	public $entityProviderId;
 
 	private ?IssuePayCalculation $model = null;
+	private ?SettlementType $settlementType = null;
 
 	public function __construct(int $owner_id, Issue $issue, $config = []) {
 		$this->issue = $issue;
@@ -74,6 +75,24 @@ class CalculationForm extends PayForm {
 			'costs_ids' => Yii::t('settlement', 'Costs'),
 			'entityProviderId' => Yii::t('settlement', 'Entity responsible'),
 		], parent::attributeLabels());
+	}
+
+	public function setType(SettlementType $type): void {
+		$this->settlementType = $type;
+		$this->type = $type->id;
+		$this->setTypeOptions($type->getTypeOptions());
+	}
+
+	public function setTypeOptions(SettlementTypeOptions $options): void {
+		if ($options->vat) {
+			$this->vat = $options->vat;
+		}
+		if ($options->default_value) {
+			$this->value = $options->default_value;
+		}
+		if ($options->provider_type) {
+			$this->providerType = $options->provider_type;
+		}
 	}
 
 	public function isRequiredPaymentAt(): bool {

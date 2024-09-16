@@ -48,6 +48,9 @@ $this->params['breadcrumbs'][] = $this->title;
 			: ''
 		?>
 
+		<?= Yii::$app->user->can(Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER)
+			? Html::a(Yii::t('settlement', 'Settlement Types'), ['type/index'], ['class' => 'btn btn-info'])
+			: '' ?>
 
 
 		<?= Yii::$app->user->can(User::PERMISSION_PROVISION)

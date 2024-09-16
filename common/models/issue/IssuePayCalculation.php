@@ -8,6 +8,7 @@ use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionQuery;
+use common\models\settlement\SettlementProviderInterface;
 use common\models\user\User;
 use DateTime;
 use Decimal\Decimal;
@@ -46,7 +47,9 @@ use yii\helpers\ArrayHelper;
  * @property-read IssuePay[] $pays
  * @property-read IssueStage $stage
  */
-class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
+class IssuePayCalculation extends ActiveRecord implements
+	IssueSettlement,
+	SettlementProviderInterface {
 
 	use IssueTrait;
 
@@ -501,5 +504,13 @@ class IssuePayCalculation extends ActiveRecord implements IssueSettlement {
 			}
 		}
 		return empty($deadlines) ? null : min($deadlines);
+	}
+
+	public function getProviderId(): int {
+		return $this->provider_id;
+	}
+
+	public function providersTypesNames(): array {
+		return static::getProvidersTypesNames();
 	}
 }

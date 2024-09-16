@@ -362,6 +362,7 @@ $typesItems = $typesNav->getItems();
 						|| $user->can(User::PERMISSION_PAY)
 						|| $user->can(User::PERMISSION_PAY_RECEIVED)
 						|| $user->can(User::PERMISSION_PAYS_DELAYED)
+						|| $user->can(Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER)
 					,
 					'items' => [
 						[
@@ -417,6 +418,12 @@ $typesItems = $typesNav->getItems();
 							'url' => ['/settlement/cost/index'],
 							'icon' => '<i class="fa fa-minus"></i>',
 							'visible' => $user->can(User::PERMISSION_COST),
+						],
+						[
+							'label' => Yii::t('settlement', 'Settlement Types'),
+							'url' => ['/settlement/type/index'],
+							'icon' => '<i class="fa fa-sitemap"></i>',
+							'visible' => $user->can(Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER),
 						],
 					],
 				],

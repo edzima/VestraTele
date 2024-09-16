@@ -40,9 +40,9 @@ class CalculationCest {
 
 	public function checkAsCreateCalculationIssueManager(CreateCalculationIssueManager $I): void {
 		$I->amLoggedIn();
-		$I->seeMenuLink('Calculation to create');
-		$I->amOnRoute(static::ROUTE_INDEX);
-		$I->seeResponseCodeIs(403);
+		$I->seeMenuSubLink('Calculation to create');
+		$I->clickMenuSubLink('Calculation to create');
+		$I->seeInCurrentUrl(static::ROUTE_TO_CREATE);
 	}
 
 	public function checkAsProblemsCalculationIssueManager(ProblemCalculationIssueManager $I): void {
@@ -56,7 +56,7 @@ class CalculationCest {
 	public function checkAsBookkeeper(Bookkeeper $I): void {
 		$I->amLoggedIn();
 		$I->seeMenuLink('Settlements');
-		$I->seeMenuLink('Calculation to create');
+		$I->seeMenuSubLink('Calculation to create');
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->see('Settlements', 'h1');
 	}
@@ -67,6 +67,7 @@ class CalculationCest {
 		$I->seeLink('To create');
 		$I->seeLink('Uncollectible');
 		$I->dontSeeLink('Without provisions');
+		$I->dontSeeLink('Settlement Types');
 		$I->seeLink('Costs');
 		$I->seeInGridHeader('Issue');
 		$I->dontSeeInGridHeader('Problem status');
@@ -92,6 +93,15 @@ class CalculationCest {
 		$I->seeLink('Delete provisions');
 		$I->seeLink('Without provisions');
 		$I->click('Without provisions');
+		$I->seeResponseCodeIsSuccessful();
+	}
+
+	public function checkWithTypesPermission(Bookkeeper $I): void {
+		$I->assignPermission(TypeCest::PERMISSION);
+		$I->amLoggedIn();
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeLink('Settlement Types');
+		$I->click('Settlement Types');
 		$I->seeResponseCodeIsSuccessful();
 	}
 

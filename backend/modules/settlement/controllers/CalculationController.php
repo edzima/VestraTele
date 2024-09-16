@@ -3,7 +3,6 @@
 namespace backend\modules\settlement\controllers;
 
 use backend\helpers\Url;
-use backend\modules\settlement\models\AdministrativeCalculationForm;
 use backend\modules\settlement\models\CalculationForm;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\modules\settlement\models\search\IssueToCreateCalculationSearch;
@@ -14,6 +13,7 @@ use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\KeyStorageItem;
 use common\models\settlement\PaysForm;
+use common\models\settlement\SettlementType;
 use common\models\user\User;
 use common\models\user\Worker;
 use Yii;
@@ -172,31 +172,13 @@ class CalculationController extends Controller {
 		]);
 	}
 
-	public function actionCreateAdministrative(int $id) {
-		$issue = $this->findIssueModel($id);
-		$model = new AdministrativeCalculationForm(Yii::$app->user->getId(), $issue);
-
-		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			if ($model->pushMessages(Yii::$app->user->getId())) {
-				Flash::add(Flash::TYPE_SUCCESS,
-					Yii::t('settlement', 'Push Messages about Create Administrative Settlement.')
-				);
-			}
-			return $this->redirect(['view', 'id' => $model->getModel()->id]);
-		}
-		return $this->render('administrative', [
-			'model' => $model,
-		]);
-	}
-
-	public function actionCreate(int $id) {
-		$issue = $this->findIssueModel($id);
+	public function actionCreate(int $issueId, int $typeId) {
+		$issue = $this->findIssueModel($issueId);
 		$model = new CalculationForm(Yii::$app->user->getId(), $issue);
+		$model->setType($this->findType($typeId));
 		if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
 			Yii::$app->session->addFlash('warning', Yii::t('settlement', 'You try create calculation as Admin.'));
 		}
-		$model->vat = $issue->type->vat;
 		$model->deadline_at = date($model->dateFormat, strtotime('last day of this month'));
 		$model->getMessagesModel()
 			->addExtraWorkersEmailsIds(
@@ -330,5 +312,13 @@ class CalculationController extends Controller {
 		}
 
 		throw new NotFoundHttpException('The requested page does not exist.');
+	}
+
+	private function findType(int $id): SettlementType {
+		$model = SettlementType::findOne($id);
+		if ($model === null) {
+			throw new NotFoundHttpException('The requested page does not exist.');
+		}
+		return $model;
 	}
 }

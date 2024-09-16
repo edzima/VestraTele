@@ -100,6 +100,7 @@ return array_merge([
 	'summon.doc.manager' => 'Zlecenia - Dokumenty (manager)',
 	'summon.manager' => 'Zlecenia - manager',
 	'settlement.administrative.create' => 'Opłata Administracyjna - Dodawanie',
+	'settlement.type.manager' => 'Rozliczenia - Typy (Manager)',
 	'telemarketer' => 'Konsultant (Biuro)',
 	'user' => 'Użytkownik',
 	'user.traits' => 'Użytkownicy - Cechy',
