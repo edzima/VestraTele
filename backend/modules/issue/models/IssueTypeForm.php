@@ -70,9 +70,7 @@ class IssueTypeForm extends Model {
 	}
 
 	public function getParentsData(): array {
-		$types = array_filter(IssueType::getTypes(), static function (IssueType $type): bool {
-			return empty($type->parent_id);
-		});
+		$types = IssueType::getTypes();
 		$names = ArrayHelper::map($types, 'id', 'name');
 		if ($this->getModel()->id) {
 			unset($names[$this->getModel()->id]);

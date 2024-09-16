@@ -139,21 +139,9 @@ class IssueType extends ActiveRecord {
 	 * @return static[]
 	 */
 	public static function getMainTypes(): array {
-		$types = static::getTypes();
-		$main = [];
-		foreach ($types as $type) {
-			if ($type->is_main && !isset($main[$type->id])) {
-				$main[$type->id] = $type;
-				continue;
-			}
-			if ($type->parent_id && !isset($main[$type->parent_id])) {
-				$parent = $types[$type->parent_id] ?? null;
-				if ($parent) {
-					$main[$parent->id] = $parent;
-				}
-			}
-		}
-		return $main;
+		return array_filter(static::getTypes(), function (self $type) {
+			return $type->is_main;
+		});
 	}
 
 	/**
