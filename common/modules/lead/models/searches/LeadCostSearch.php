@@ -96,12 +96,12 @@ class LeadCostSearch extends LeadCost {
 		$this->applyWithoutLeadFilter($query);
 //		 grid filtering conditions
 		$query->andFilterWhere([
-			LeadCampaign::tableName() . '.id' => $this->id,
-			LeadCampaign::tableName() . '.campaign_id' => $this->campaign_id,
-			LeadCampaign::tableName() . '.value' => $this->value,
-			LeadCampaign::tableName() . '.date_at' => $this->date_at,
-			LeadCampaign::tableName() . '.created_at' => $this->created_at,
-			LeadCampaign::tableName() . '.updated_at' => $this->updated_at,
+			LeadCost::tableName() . '.id' => $this->id,
+			LeadCost::tableName() . '.campaign_id' => $this->campaign_id,
+			LeadCost::tableName() . '.value' => $this->value,
+			LeadCost::tableName() . '.date_at' => $this->date_at,
+			LeadCost::tableName() . '.created_at' => $this->created_at,
+			LeadCost::tableName() . '.updated_at' => $this->updated_at,
 		]);
 
 		return $dataProvider;

@@ -38,12 +38,18 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'campaign_id',
 				'label' => Yii::t('lead', 'Campaign'),
 				'value' => function (LeadCost $data) use ($searchModel): string {
-					return Html::a($data->campaign->getFullName(), ['campaign/view', 'id' => $data->campaign_id]);
+					return Html::a($data->campaign->getNameWithParent(), ['campaign/view', 'id' => $data->campaign_id]);
 				},
 				'format' => 'html',
 				'filter' => $searchModel->getCampaignNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterWidgetOptions' => [
+					'pluginOptions' => ['allowClear' => true],
+					'options' => [
+						'placeholder' => $searchModel->getAttributeLabel('campaign_id'),
+					],
+				],
 			],
-			'campaign.name',
 			'value:currency',
 			'singleLeadCostValue:currency',
 			'leadsCount',

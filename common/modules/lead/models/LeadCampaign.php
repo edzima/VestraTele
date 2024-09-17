@@ -174,6 +174,14 @@ class LeadCampaign extends ActiveRecord implements ActiveHierarchy {
 		];
 	}
 
+	public function getNameWithParent(): string {
+		$name = $this->name;
+		if ($this->parent) {
+			$name .= ' - ' . $this->parent->name;
+		}
+		return $name;
+	}
+
 	public function getFullName(): string {
 		$names = [];
 		$model = $this;
