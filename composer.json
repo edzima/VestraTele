@@ -59,7 +59,8 @@
 		"markrogoyski/math-php": "^2.8",
 		"kartik-v/yii2-widget-fileinput": "^1.1",
 		"league/flysystem-aws-s3-v3": "^1.0",
-		"maestroerror/php-heic-to-jpg": "^1.0"
+		"maestroerror/php-heic-to-jpg": "^1.0",
+		"kartik-v/yii2-sortable-input": "^1.2.1"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-latest",
