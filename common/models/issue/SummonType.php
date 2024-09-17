@@ -105,7 +105,11 @@ class SummonType extends ActiveRecord {
 
 	public function getOptions(): SummonTypeOptions {
 		if ($this->typeModel === null) {
-			$this->typeModel = new SummonTypeOptions(Json::decode($this->options));
+			$options = $this->options;
+			if (!is_array($options)) {
+				$options = Json::decode($options);
+			}
+			$this->typeModel = new SummonTypeOptions($options);
 		}
 		return $this->typeModel;
 	}

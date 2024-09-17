@@ -31,6 +31,8 @@ use yii\caching\FileCache;
 use yii\mutex\MysqlMutex;
 use yii\queue\db\Queue;
 
+$_ENV['AWS_SUPPRESS_PHP_DEPRECATION_WARNING'] = true;
+
 $config = [
 	'name' => $_ENV['APP_NAME'],
 	'vendorPath' => dirname(__DIR__, 2) . '/vendor',
@@ -122,6 +124,9 @@ $config = [
 			'secret' => getenv('AWS_S3_SECRET'),
 			'bucket' => getenv('AWS_S3_BUCKET'),
 			'region' => getenv('AWS_S3_REGION'),
+			'options' => [
+				'suppress_php_deprecation_warning' => true,
+			],
 		],
 		'db' => [
 			'class' => 'yii\db\Connection',

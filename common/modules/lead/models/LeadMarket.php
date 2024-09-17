@@ -186,7 +186,11 @@ class LeadMarket extends ActiveRecord {
 
 	public function getMarketOptions(): LeadMarketOptions {
 		if ($this->marketOptions === null) {
-			$this->marketOptions = new LeadMarketOptions(Json::decode($this->options));
+			$config = $this->options;
+			if (!is_array($config)) {
+				$config = Json::decode($config);
+			}
+			$this->marketOptions = new LeadMarketOptions($config);
 		}
 		return $this->marketOptions;
 	}

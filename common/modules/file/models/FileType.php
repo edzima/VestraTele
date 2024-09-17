@@ -7,6 +7,7 @@ use common\helpers\FileHelper;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "file_type".
@@ -75,14 +76,22 @@ class FileType extends ActiveRecord {
 
 	public function getValidatorOptions(): ValidatorOptions {
 		if ($this->_validatorOptions === null) {
-			$this->_validatorOptions = ValidatorOptions::createFromJson((string) $this->validator_config);
+			$config = $this->validator_config;
+			if (!is_array($config)) {
+				$config = Json::decode($config);
+			}
+			$this->_validatorOptions = new ValidatorOptions($config);
 		}
 		return $this->_validatorOptions;
 	}
 
 	public function getVisibilityOptions(): VisibilityOptions {
 		if ($this->_visibilityOptions === null) {
-			$this->_visibilityOptions = VisibilityOptions::createFromJson((string) $this->visibility_attributes);
+			$config = $this->visibility_attributes;
+			if (!is_array($config)) {
+				$config = Json::decode($config);
+			}
+			$this->_visibilityOptions = new VisibilityOptions($config);
 		}
 		return $this->_visibilityOptions;
 	}
