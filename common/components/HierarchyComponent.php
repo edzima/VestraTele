@@ -57,6 +57,20 @@ class HierarchyComponent extends Component {
 		return true;
 	}
 
+	public function detectLoop($parent, $child): bool {
+		if ($child === $parent) {
+			return true;
+		}
+
+		foreach ($this->getChildesIds($child) as $grandchild) {
+			if ($this->detectLoop($parent, $grandchild)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public function getChildesIds(int $id): array {
 		$ids = [];
 		$parentsIdsMap = $this->getParentsMap();

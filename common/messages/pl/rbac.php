@@ -47,6 +47,7 @@ return array_merge([
 	'issue.stat' => 'Sprawy - Statystyki',
 	'issue.tag.manager' => 'Tagi Spraw (Mangaer)',
 	'issue.type.manager' => 'Typy Spraw - (Manager)',
+	'issue.type.permissions' => 'Typy Spraw - Uprawnienia',
 	'issue.visible_not_self' => 'Sprawy - podgląd Wszystkie',
 	'issue-file-manager' => 'Manager Plików',
 	'issue-file.delete_not_self' => 'Sprawy - Pliki usuwanie nie swoich',
@@ -110,4 +111,7 @@ return array_merge([
 	'credit.analyze' => 'Analiza SKD',
 	'court' => 'Sądy Powszechne',
 	'lawsuit' => 'Procesy\Sprawy Sądowe',
+	'sms' => 'SMS',
+	'sms.multiple' => 'SMS - Multi',
+	'loginToBackend' => 'Logowanie - Backend',
 ], $local);

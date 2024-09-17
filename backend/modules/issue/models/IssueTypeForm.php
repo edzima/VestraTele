@@ -2,7 +2,6 @@
 
 namespace backend\modules\issue\models;
 
-use common\helpers\ArrayHelper;
 use common\models\issue\IssueType;
 use Yii;
 use yii\base\Model;
@@ -19,6 +18,8 @@ class IssueTypeForm extends Model {
 	public $parent_id;
 	public $main_type_id;
 	public $lead_source_id;
+
+	public $authManager = 'authManager';
 
 	private ?IssueType $model = null;
 
@@ -47,7 +48,16 @@ class IssueTypeForm extends Model {
 			},
 			],
 			['parent_id', 'in', 'range' => array_keys($this->getParentsData())],
+			['parent_id', 'detectLoop'],
 		];
+	}
+
+	public function detectLoop(): void {
+		if ($this->parent_id && !$this->getModel()->isNewRecord) {
+			if ($this->getModel()->detectLoop($this->parent_id)) {
+				$this->addError('parent_id', Yii::t('backend', 'Detect loop'));
+			}
+		}
 	}
 
 	public function getModel(): IssueType {
@@ -70,8 +80,7 @@ class IssueTypeForm extends Model {
 	}
 
 	public function getParentsData(): array {
-		$types = IssueType::getTypes();
-		$names = ArrayHelper::map($types, 'id', 'name');
+		$names = IssueType::getTypesNames();
 		if ($this->getModel()->id) {
 			unset($names[$this->getModel()->id]);
 		}
@@ -109,7 +118,17 @@ class IssueTypeForm extends Model {
 		$model->default_show_linked_notes = $this->default_show_linked_notes;
 		$model->lead_source_id = $this->lead_source_id;
 		$model->is_main = $this->is_main;
-		return $model->save();
+		if (!$model->save()) {
+			return false;
+		}
+		if ($this->getModel()->isNewRecord) {
+			$this->addPermission();
+		}
+		return true;
+	}
+
+	public function addPermission(): void {
+		Yii::$app->issueTypeUser->addPermission($this->getModel()->id);
 	}
 
 }

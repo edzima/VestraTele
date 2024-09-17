@@ -24,6 +24,35 @@ class TypeFormTest extends Unit {
 		$this->thenSeeError('Name "Accident" has already been taken.', 'name');
 	}
 
+	public function testParentLoop() {
+
+		$topParentId = $this->tester->haveRecord(IssueType::class, [
+			'name' => 'Top Parent',
+			'short_name' => 'TP',
+		]);
+
+		$firstChildId = $this->tester->haveRecord(IssueType::class, [
+			'name' => 'First child',
+			'parent_id' => $topParentId,
+			'short_name' => 'FC',
+
+		]);
+
+		$secondChildId = $this->tester->haveRecord(IssueType::class, [
+			'name' => 'Second child',
+			'parent_id' => $firstChildId,
+			'short_name' => 'SC',
+
+		]);
+
+		$this->giveModel();
+		$this->model->setModel(IssueType::findOne($firstChildId));
+		$this->model->parent_id = $secondChildId;
+
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Detect loop', 'parent_id');
+	}
+
 	private function giveModel(array $config = []): void {
 		$this->model = new IssueTypeForm($config);
 	}

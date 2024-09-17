@@ -13,6 +13,11 @@ use yii\db\ActiveQuery;
  */
 class IssueUserQuery extends ActiveQuery {
 
+	public function users(array $ids): self {
+		$this->andWhere([IssueUser::tableName() . '.user_id' => $ids]);
+		return $this;
+	}
+
 	public function onlyWorkers(): self {
 		return $this->withTypes(IssueUser::TYPES_WORKERS);
 	}

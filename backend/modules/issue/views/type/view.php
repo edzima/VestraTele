@@ -4,6 +4,7 @@ use backend\widgets\GridView;
 use common\models\issue\Issue;
 use common\models\issue\IssueStageType;
 use common\models\issue\IssueType;
+use common\models\user\Worker;
 use common\widgets\grid\ActionColumn;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
@@ -20,6 +21,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="issue-type-view">
 
 	<p>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS)
+			? Html::a(Yii::t('backend', 'Permissions'), ['permission', 'id' => $model->id], ['class' => 'btn btn-warning'])
+			: ''
+		?>
+
 		<?= Html::a(Yii::t('backend', 'Link with Stage'), ['stage-type/create', 'type_id' => $model->id], ['class' => 'btn btn-success']) ?>
 
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -129,5 +136,6 @@ $this->params['breadcrumbs'][] = $this->title;
 			]) ?>
 		</div>
 	</div>
+
 
 </div>

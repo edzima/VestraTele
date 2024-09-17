@@ -8,13 +8,10 @@ use common\helpers\Html;
 use common\helpers\Url;
 use common\models\issue\IssueType;
 use Yii;
-use yii\base\StaticInstanceTrait;
 use yii\base\Widget;
 use yii\bootstrap\Nav;
 
 class IssueTypeNav extends Widget {
-
-	use StaticInstanceTrait;
 
 	public ?IssueType $activeType = null;
 
@@ -47,6 +44,8 @@ class IssueTypeNav extends Widget {
 		'class' => 'favorite-link',
 	];
 
+	public bool $onlyUserTypes = false;
+
 	public array $route = [Url::ROUTE_ISSUE_INDEX];
 	public string $typeIdParamName = Url::PARAM_ISSUE_PARENT_TYPE;
 
@@ -55,20 +54,28 @@ class IssueTypeNav extends Widget {
 	public array $params = [];
 	public bool $withAllItem = true;
 	public ?string $allLabel = null;
+	public ?int $userId = null;
 
 	public function init(): void {
 		parent::init();
-		if ($this->allLabel === null) {
-			$this->allLabel = Yii::t('issue', 'All Issues');
-		}
+
 		if ($this->activeTypeId === null) {
 			$this->activeTypeId = $this->defaultActiveTypeId();
+		}
+		if ($this->userId === null) {
+			$this->userId = $this->defaultUserId();
 		}
 		if ($this->activeTypeFromId && $this->activeTypeId !== null) {
 			$this->activeType = IssueType::get($this->getTypeFromQueryParams());
 			if ($this->activeType && $this->activeType->parent) {
 				$this->models = $this->activeType->parent->childs;
+				$this->allLabel = $this->activeType->parent->name;
+				$this->allParamValue = $this->activeType->parent_id;
 			}
+		}
+
+		if ($this->allLabel === null) {
+			$this->allLabel = Yii::t('issue', 'All Issues');
 		}
 
 		if ($this->models === null) {
@@ -95,7 +102,9 @@ class IssueTypeNav extends Widget {
 	public function getItems(): array {
 		$items = [];
 		foreach ($this->models as $model) {
-			$items[] = $this->itemOptions($model);
+			if ($this->beforeItem($model)) {
+				$items[] = $this->itemOptions($model);
+			}
 		}
 		if (!empty($items) && $this->withAllItem()) {
 			$items[] = $this->allItemOptions();
@@ -232,18 +241,22 @@ class IssueTypeNav extends Widget {
 		$models = $model->childs;
 		$items = [];
 		foreach ($models as $model) {
-			$items[] = $this->itemOptions($model);
+			if ($this->beforeItem($model)) {
+				$items[] = $this->itemOptions($model);
+			}
 		}
 		return $items;
 	}
 
-	private static $NAV_INSTANCE = null;
-
-	public static function getNavInstance(array $config = []): self {
-		if (static::$NAV_INSTANCE === null) {
-			static::$NAV_INSTANCE = new self($config);
+	protected function beforeItem(IssueType $model): bool {
+		if ($this->userId) {
+			return $model->isForUser($this->userId, $this->onlyUserTypes);
 		}
-		return static::$NAV_INSTANCE;
+		return true;
+	}
+
+	protected function defaultUserId(): ?int {
+		return Yii::$app->user->getId();
 	}
 
 }

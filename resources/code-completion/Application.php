@@ -3,6 +3,7 @@
 use common\components\callpage\CallPageClient;
 use common\components\Formatter;
 use common\components\HierarchyComponent;
+use common\components\IssueTypeUser;
 use common\components\keyStorage\KeyStorage;
 use common\components\message\MessageTemplateManager;
 use common\components\PayComponent;
@@ -37,6 +38,7 @@ class Yii extends BaseYii {
  * @property CallPageClient|null $callPageClient
  * @property Formatter $formatter
  * @property LeadClient $leadClient
+ * @property IssueTypeUser $issueTypeUser
  * @property-read MessageTemplateManager $messageTemplate
  * @property HierarchyComponent $userHierarchy
  * @property PayComponent $pay

@@ -13,14 +13,10 @@ use yii\widgets\Breadcrumbs;
 $class = '';
 if (isset($this->params['issueParentTypeNav'])) {
 	$config = $this->params['issueParentTypeNav'];
-	$navIssueTypes = new IssueTypeNav($config);
-	$parentMenuItems = $navIssueTypes->getItems();
-	if (!empty($parentMenuItems)) {
+	$navIssueTypes = IssueTypeNav::widget($config);
+	if (!empty($navIssueTypes)) {
 		$class = 'title-with-nav';
-		if ($navIssueTypes->activeType && $navIssueTypes->activeType->parent) {
-			$this->title = $navIssueTypes->activeType->parent->name;
-		}
-		$contentHeader = $this->title . $navIssueTypes->run();
+		$contentHeader = $this->title . $navIssueTypes;
 		$this->blocks['content-header'] = $contentHeader;
 	}
 }

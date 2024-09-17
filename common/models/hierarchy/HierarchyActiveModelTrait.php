@@ -18,6 +18,10 @@ trait HierarchyActiveModelTrait {
 		return static::$hierarchy;
 	}
 
+	public function detectLoop($parentId): bool {
+		return static::getHierarchy()->detectLoop($parentId, $this->{$this->hierarchyKeyAttribute()});
+	}
+
 	public function getParentsIds(): array {
 		if ($this->getParentId() === null) {
 			return [];

@@ -2,9 +2,10 @@
 
 namespace backend\modules\issue\controllers;
 
-use backend\modules\issue\models\IssuesUpdateTypeMultiple;
 use backend\modules\issue\models\IssueStageChangeForm;
+use backend\modules\issue\models\IssuesUpdateTypeMultiple;
 use backend\modules\issue\models\IssueTypeForm;
+use backend\modules\issue\models\IssueTypePermissionForm;
 use backend\modules\issue\models\search\IssueTypeSearch;
 use common\helpers\Flash;
 use common\models\issue\IssueType;
@@ -92,6 +93,8 @@ class TypeController extends Controller {
 	 * @return mixed
 	 */
 	public function actionView(int $id) {
+		$model = $this->findModel($id);
+		Yii::warning(Yii::$app->issueTypeUser->getUsersIds($id));
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
@@ -110,6 +113,17 @@ class TypeController extends Controller {
 			return $this->redirect(['view', 'id' => $model->getModel()->id]);
 		}
 		return $this->render('create', [
+			'model' => $model,
+		]);
+	}
+
+	public function actionPermission(int $id) {
+		$model = new IssueTypePermissionForm();
+		$model->setModel($this->findModel($id));
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->typeId]);
+		}
+		return $this->render('permission', [
 			'model' => $model,
 		]);
 	}
