@@ -56,7 +56,6 @@ class ReportController extends BaseController {
 			}
 			$searchModel->setOwnerScenario($userId);
 		}
-		$searchModel->setOwnerScenario(25629);
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		return $this->render('index', [
