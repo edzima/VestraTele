@@ -9,6 +9,6 @@ class IssueTypeNav extends BaseIssueTypeNav {
 
 	public array $route = [Url::ROUTE_ISSUE_INDEX];
 
-	public bool $onlyUserTypes = true;
+	public bool $onlyUserIssues = true;
 
 }

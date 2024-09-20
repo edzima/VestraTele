@@ -35,6 +35,12 @@ class IssueType extends ActiveRecord implements Hierarchy {
 
 	use HierarchyActiveModelTrait;
 
+	protected static function getHierarchyConfig(): array {
+		return [
+			'onlyWithParents' => false,
+		];
+	}
+
 	private static ?array $TYPES = null;
 
 	public function __toString(): string {
@@ -183,24 +189,19 @@ class IssueType extends ActiveRecord implements Hierarchy {
 		return 'issue.type.' . $this->id;
 	}
 
-	public function isForUser(int $userId, bool $onlyHasIssues = true): bool {
+	public function isForUser(int $userId, bool $onlyHasIssues = true, bool $withChildren = true): bool {
 		if (!$onlyHasIssues) {
-			return $this->userHasAccess($userId);
+			return $this->userHasAccess($userId, $withChildren);
 		}
-		return $this->userHasAccess($userId) && $this->userHasIssues($userId);
+		return $this->userHasAccess($userId, $withChildren) && $this->userHasIssues($userId, $withChildren);
 	}
 
-	public function userHasIssues(int $userId): bool {
-		return Yii::$app->issueTypeUser->userHasIssues($userId, $this->id);
+	public function userHasIssues(int $userId, bool $withChildren = true): bool {
+		return Yii::$app->issueTypeUser->userHasIssues($userId, $this->id, $withChildren);
 	}
 
-	protected function userHasAccess(int $userId): bool {
-		$hasAccess = Yii::$app->issueTypeUser->userHasAccess($userId, $this->id);
-		Yii::warning([
-			'name' => $this->name,
-			'hasAccess' => $hasAccess,
-		]);
-		return $hasAccess;
+	protected function userHasAccess(int $userId, bool $withChildren = true): bool {
+		return Yii::$app->issueTypeUser->userHasAccess($userId, $this->id, $withChildren);
 	}
 
 }

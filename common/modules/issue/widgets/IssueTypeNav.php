@@ -44,7 +44,7 @@ class IssueTypeNav extends Widget {
 		'class' => 'favorite-link',
 	];
 
-	public bool $onlyUserTypes = false;
+	public bool $onlyUserIssues = false;
 
 	public array $route = [Url::ROUTE_ISSUE_INDEX];
 	public string $typeIdParamName = Url::PARAM_ISSUE_PARENT_TYPE;
@@ -142,16 +142,21 @@ class IssueTypeNav extends Widget {
 		return Url::to($url);
 	}
 
-	public function itemOptions(IssueType $model): array {
-		$options = $this->itemOptions;
+	public function itemOptions(IssueType $model, array $options = []): array {
+		$options = array_merge($this->itemOptions, $options);
 		if (!isset($options['label'])) {
 			$options['label'] = $this->getLabel($model);
 		}
 		if (!isset($options['url'])) {
 			$options['url'] = $this->getUrl($model);
 		}
+		if (!isset($options['visible'])) {
+			$options['visible'] = $this->isVisible($model, true);
+		}
 		if (!isset($options['items'])) {
-			$items = $this->getSubItems($model);
+			$subItemsOptions = ArrayHelper::remove($options, 'subItemsOptions', []);
+			$items = $this->getSubItems($model, $subItemsOptions);
+
 			if (!empty($items)) {
 				if ($this->childsClass !== null) {
 					Html::addCssClass($options, $this->childsClass);
@@ -237,26 +242,30 @@ class IssueTypeNav extends Widget {
 		return Yii::$app->request->getQueryParams()[$this->typeIdParamName] ?? null;
 	}
 
-	protected function getSubItems(IssueType $model): array {
+	protected function getSubItems(IssueType $model, array $options = []): array {
 		$models = $model->childs;
 		$items = [];
 		foreach ($models as $model) {
 			if ($this->beforeItem($model)) {
-				$items[] = $this->itemOptions($model);
+				$items[] = $this->itemOptions($model, $options);
 			}
 		}
 		return $items;
 	}
 
 	protected function beforeItem(IssueType $model): bool {
-		if ($this->userId) {
-			return $model->isForUser($this->userId, $this->onlyUserTypes);
-		}
 		return true;
 	}
 
 	protected function defaultUserId(): ?int {
 		return Yii::$app->user->getId();
+	}
+
+	private function isVisible(IssueType $model, bool $withChildren): bool {
+		if ($this->userId) {
+			return $model->isForUser($this->userId, $this->onlyUserIssues, $withChildren);
+		}
+		return true;
 	}
 
 }
