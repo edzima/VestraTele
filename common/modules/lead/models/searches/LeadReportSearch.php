@@ -30,7 +30,7 @@ class LeadReportSearch extends LeadReport {
 	public $lead_type_id;
 	public $lead_user_id;
 
-	public $onlySelf;
+	public $onlySelf = true;
 	public bool $changedStatus = false;
 	public $answersQuestions;
 	public $from_at;

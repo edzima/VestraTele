@@ -46,16 +46,20 @@ if (count($campaignsData) > 1) {
 		$count = count($campaignCost->leads_ids);
 		$cost = $campaignCost->sum;
 		$chartData['seriesLeads'][] = $count;
-		$chartData['seriesCosts'][] = $cost;
+		$chartData['seriesCosts'][] = round($cost, 1);
 		$chartData['seriesAvg'][] = $campaignCost->single_cost_value ? round($campaignCost->single_cost_value, 1) : null;
 
 		$dealsCosts = $campaignCost->getStatusCost()->getDealsCosts([
 			LeadDealStage::DEAL_STAGE_CONTRACT_SENT, LeadDealStage::DEAL_STAGE_CLOSED_WON,
 		]);
+		$qualifiedCost = $campaignCost->getStatusCost()->getDealStageCost(LeadDealStage::DEAL_STAGE_QUALIFIED);
 		$stagesCounts = $campaignCost->getStatusCost()->getDealStagesCounts();
+
 		$chartData['seriesDealWon'][] = $stagesCounts[LeadDealStage::DEAL_STAGE_CLOSED_WON] ?? null;
 		$chartData['seriesDealContractSent'][] = $stagesCounts[LeadDealStage::DEAL_STAGE_CONTRACT_SENT] ?? null;
 		$chartData['seriesDealCosts'][] = $dealsCosts ? round($dealsCosts, 1) : null;
+		$chartData['seriesDealQualifiedCount'][] = $stagesCounts[LeadDealStage::DEAL_STAGE_QUALIFIED] ?? null;
+		$chartData['seriesDealQualifiedCost'][] = $qualifiedCost ? round($qualifiedCost, 1) : null;
 	}
 }
 
@@ -67,7 +71,7 @@ if (count($campaignsData) > 1) {
 	?
 	ChartsWidget::widget([
 		'type' => ChartsWidget::TYPE_AREA,
-		'height' => 420,
+		'height' => 520,
 		'chart' => [
 			'stacked' => true,
 			'events' => [
@@ -102,6 +106,12 @@ if (count($campaignsData) > 1) {
 				'group' => 'deal',
 			],
 			[
+				'name' => Yii::t('lead', 'Deal Stage: Qualified'),
+				'type' => ChartsWidget::TYPE_COLUMN,
+				'data' => $chartData['seriesDealQualifiedCount'],
+				'group' => 'deal',
+			],
+			[
 				'name' => Yii::t('lead', 'Cost Value (range)'),
 				'data' => $chartData['seriesCosts'],
 				'type' => ChartsWidget::TYPE_LINE,
@@ -119,6 +129,12 @@ if (count($campaignsData) > 1) {
 				'data' => $chartData['seriesDealCosts'],
 				'group' => 'deal',
 			],
+			[
+				'name' => Yii::t('lead', 'Deal Qualified cost Value'),
+				'type' => ChartsWidget::TYPE_AREA,
+				'data' => $chartData['seriesDealQualifiedCost'],
+				'group' => 'deal',
+			],
 		],
 		'options' => [
 			'title' => [
@@ -126,10 +142,15 @@ if (count($campaignsData) > 1) {
 				'align' => 'center',
 			],
 			'stroke' => [
-				'width' => [0, 0, 0, 2, 3, 3],
+				'width' => [0, 0, 0, 0, 2, 3, 3, 2],
 				'curve' => 'smooth',
 			],
-
+			'xaxis' => [
+				'labels' => [
+					'maxHeight' => 100,
+					'trim' => true,
+				],
+			],
 			'labels' => $chartData['labels'],
 			'yaxis' => [
 				[
@@ -163,6 +184,15 @@ if (count($campaignsData) > 1) {
 					//		'title' => ['text' => Yii::t('lead', 'Deals Stages: Closed Won & Contract Sent'),],
 				],
 				[
+					'seriesName' => Yii::t('lead', 'Deal Stage: Qualified'),
+					'showForNullSeries' => false,
+					'decimalsInFloat' => 0,
+					'opposite' => true,
+					'labels' => [
+						'show' => false,
+					],
+				],
+				[
 					'seriesName' => Yii::t('lead', 'Cost Value (range)'),
 					'showForNullSeries' => false,
 					'decimalsInFloat' => 1,
@@ -193,6 +223,17 @@ if (count($campaignsData) > 1) {
 						'show' => false,
 					],
 					//	'title' => ['text' => Yii::t('lead', 'Deals Stages: Costs'),],
+				],
+				[
+					'seriesName' => [
+						Yii::t('lead', 'Deal Qualified - Costs'),
+					],
+					'showForNullSeries' => false,
+					'decimalsInFloat' => 1,
+					'opposite' => true,
+					'labels' => [
+						'show' => false,
+					],
 				],
 			],
 		],

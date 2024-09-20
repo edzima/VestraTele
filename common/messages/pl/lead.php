@@ -524,7 +524,8 @@ return [
 	'Deal Stage: Closed Won' => 'Umowa',
 	'Deal Stage: Closed Lost' => 'Zakończone - Porażka',
 	'Deals Stages: Closed Won & Contract Sent' => 'Umowa / Wysłane',
-	'Deal Deals Stages: Closed Won & Contract Sent - Costs' => 'Koszt: (umowa/wysłąne)',
+	'Deal Deals Stages: Closed Won & Contract Sent - Costs' => 'Koszt: (umowa/wysłane)',
+	'Deal Qualified cost Value' => 'Koszt: Kwalifikuje się',
 	'Deal Contracts Costs' => 'Koszty Umów',
 	'Cost Value (range)' => 'Koszt (okres)',
 ];
