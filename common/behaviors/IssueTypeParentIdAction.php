@@ -45,7 +45,7 @@ class IssueTypeParentIdAction extends Behavior {
 		if ($parentTypeId === static::ISSUE_PARENT_TYPE_ALL) {
 			return null;
 		}
-		if ($parentTypeId && !Yii::$app->issueTypeUser->userHasAccess(Yii::$app->user->getId(), $parentTypeId)) {
+		if ($parentTypeId && !Yii::$app->issueTypeUser->userHasAccess(Yii::$app->user->getId(), $parentTypeId, false)) {
 			throw new ForbiddenHttpException('Not Access for Type: ' . $parentTypeId);
 		}
 		return $parentTypeId;

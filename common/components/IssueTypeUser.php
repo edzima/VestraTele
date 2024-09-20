@@ -51,15 +51,15 @@ class IssueTypeUser extends Component {
 		return $this->auth->getUserIdsByRole($this->getPermissionName($typeId));
 	}
 
-	public function userHasAccess(int $userId, int $typeId, bool $withChildren = true): bool {
-		if ($this->userHasAccessToType($userId, $typeId)) {
+	public function userHasAccess(int $userId, int $typeId, bool $withParent, $withChildren = true): bool {
+		if ($this->userHasAccessToType($userId, $typeId, $withParent)) {
 			return true;
 		}
 		if ($withChildren) {
 			$model = $this->findModel($typeId);
 			if ($model) {
 				foreach ($model->getAllChildesIds() as $childId) {
-					if ($this->userHasAccessToType($userId, $childId)) {
+					if ($this->userHasAccessToType($userId, $childId, false)) {
 						return true;
 					}
 				}
@@ -68,7 +68,17 @@ class IssueTypeUser extends Component {
 		return false;
 	}
 
-	protected function userHasAccessToType(int $userId, int $typeId): bool {
+	public function getUserTypesIds(int $userId): array {
+		$ids = [];
+		foreach (IssueType::getTypes() as $type) {
+			if ($this->userHasAccessToType($userId, $type->id, false)) {
+				$ids[] = $type->id;
+			}
+		}
+		return $ids;
+	}
+
+	protected function userHasAccessToType(int $userId, int $typeId, bool $withParent): bool {
 		$permission = $this->getPermissionName($typeId);
 		if ($permission === null) {
 			return false;
@@ -86,10 +96,13 @@ class IssueTypeUser extends Component {
 				return true;
 			}
 		}
-		$model = $this->findModel($typeId);
-		if ($model && $model->parent_id) {
-			return $this->userHasAccessToType($userId, $model->parent_id);
+		if ($withParent) {
+			$model = $this->findModel($typeId);
+			if ($model && $model->parent_id) {
+				return $this->userHasAccessToType($userId, $model->parent_id, $withParent);
+			}
 		}
+
 		return false;
 	}
 

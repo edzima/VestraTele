@@ -715,14 +715,7 @@ abstract class IssueSearch extends Model
 		if (empty($this->userId)) {
 			throw new InvalidConfigException('userId cannot be empty');
 		}
-		$types = IssueType::getTypes();
-		$ids = [];
-		foreach ($types as $type) {
-			if (Yii::$app->issueTypeUser->userHasAccess($this->userId, $type->id)) {
-				$ids[$type->id] = $type->id;
-			}
-		}
-		$query->types($ids, $withChildren);
+		$query->userTypes($this->userId, $withChildren);
 	}
 
 }
