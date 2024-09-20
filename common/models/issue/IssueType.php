@@ -7,7 +7,6 @@ use common\models\hierarchy\HierarchyActiveModelTrait;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
 use Yii;
-use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -180,13 +179,6 @@ class IssueType extends ActiveRecord implements Hierarchy {
 			}
 		}
 		return false;
-	}
-
-	public function getPermissionName(): string {
-		if (empty($this->id)) {
-			throw new InvalidConfigException('Model ID must be set.');
-		}
-		return 'issue.type.' . $this->id;
 	}
 
 	public function isForUser(int $userId, bool $onlyHasIssues = true, bool $withChildren = true): bool {

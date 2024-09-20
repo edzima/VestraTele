@@ -65,6 +65,34 @@ $this->params['breadcrumbs'][] = $this->title;
 					'with_additional_date:boolean',
 					'default_show_linked_notes:boolean',
 					'lead_source_id',
+					[
+						'attribute' => 'roles',
+						'value' => function (IssueType $model): ?string {
+							$items = Yii::$app->issueTypeUser->getParentsRoles($model->id);
+							$names = [];
+							foreach ($items as $item) {
+								$names[] = Worker::getRolesNames()[$item];
+							}
+							return Html::ul($names, ['encode' => false]);
+						},
+						'format' => 'html',
+						'label' => Yii::t('backend', 'Roles'),
+						'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS),
+					],
+					[
+						'attribute' => 'permissions',
+						'value' => function (IssueType $model): ?string {
+							$items = Yii::$app->issueTypeUser->getParentsPermissions($model->id);
+							$names = [];
+							foreach ($items as $item) {
+								$names[] = Worker::getPermissionsNames()[$item];
+							}
+							return Html::ul($names, ['encode' => false]);
+						},
+						'format' => 'html',
+						'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS),
+						'label' => Yii::t('backend', 'Permissions'),
+					],
 				],
 			]) ?>
 		</div>
@@ -81,6 +109,34 @@ $this->params['breadcrumbs'][] = $this->title;
 				'showOnEmpty' => false,
 				'columns' => [
 					'name',
+					[
+						'attribute' => 'roles',
+						'value' => function (IssueType $model): ?string {
+							$items = Yii::$app->issueTypeUser->getParentsRoles($model->id);
+							$names = [];
+							foreach ($items as $item) {
+								$names[] = Worker::getRolesNames()[$item];
+							}
+							return Html::ul($names, ['encode' => false]);
+						},
+						'format' => 'html',
+						'label' => Yii::t('backend', 'Roles'),
+						'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS),
+					],
+					[
+						'attribute' => 'permissions',
+						'value' => function (IssueType $model): ?string {
+							$items = Yii::$app->issueTypeUser->getParentsPermissions($model->id);
+							$names = [];
+							foreach ($items as $item) {
+								$names[] = Worker::getPermissionsNames()[$item];
+							}
+							return Html::ul($names, ['encode' => false]);
+						},
+						'format' => 'html',
+						'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS),
+						'label' => Yii::t('backend', 'Permissions'),
+					],
 					[
 						'class' => ActionColumn::class,
 						'template' => '{view} {update} {delete}',
