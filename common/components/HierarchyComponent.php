@@ -3,7 +3,6 @@
 namespace common\components;
 
 use common\models\hierarchy\ActiveHierarchy;
-use common\models\user\User;
 use yii\base\Component;
 use yii\base\InvalidArgumentException;
 use yii\db\ActiveRecord;
@@ -11,12 +10,14 @@ use yii\helpers\ArrayHelper;
 
 class HierarchyComponent extends Component {
 
-	public const CHILDS_ARRAY_KEY = 'childs';
-
 	public $primaryKeyColumn = 'id';
 	public $parentColumn = 'parent_id';
-	/** @var string|ActiveRecord */
-	public $modelClass = User::class;
+	/** @var string|ActiveRecord|ActiveHierarchy */
+	public $modelClass;
+
+	public string $keyChildren = 'children';
+
+	public bool $onlyWithParents = true;
 
 	public array $treeSelect = [];
 
@@ -83,12 +84,12 @@ class HierarchyComponent extends Component {
 	}
 
 	public function getAllChildesIds(int $id): array {
-		$selfTree = $this->getSelfTree($id);
-		if (empty($selfTree)) {
+		$tree = $this->getTree($id);
+		if (empty($tree)) {
 			return [];
 		}
 		$ids = [];
-		array_walk_recursive($selfTree, function ($item, $key) use (&$ids) {
+		array_walk_recursive($tree, function ($item, $key) use (&$ids) {
 			if ($key === $this->primaryKeyColumn) {
 				$ids[] = (int) $item;
 			}
@@ -96,13 +97,12 @@ class HierarchyComponent extends Component {
 		return $ids;
 	}
 
-	public function getSelfTree(int $id): array {
-		return $this->getTree()[$id] ?? [];
-	}
-
-	public function getTree(): array {
+	public function getTree($id = null): array {
 		if (empty($this->tree)) {
 			$this->tree = $this->buildTree($this->getParentsData());
+		}
+		if ($id !== null) {
+			return $this->tree[$id] ?? [];
 		}
 		return $this->tree;
 	}
@@ -136,13 +136,31 @@ class HierarchyComponent extends Component {
 			$select = $this->treeSelect;
 			$select[] = $this->primaryKeyColumn;
 			$select[] = $this->parentColumn;
-			$this->_parentsData = $model::find()
+			$query = $model::find()
 				->select($select)
-				->andWhere($this->parentColumn . ' IS NOT NULL')
-				->asArray()
-				->all();
+				->indexBy($this->primaryKeyColumn)
+				->asArray();
+			if ($this->onlyWithParents) {
+				$query->andWhere($this->parentColumn . ' IS NOT NULL');
+			}
+			$this->_parentsData = $query->all();
 		}
 		return $this->_parentsData;
+	}
+
+	public function nonIndexedTree(array $elements, $parentId = null): array {
+		$branch = [];
+		foreach ($elements as $element) {
+			if ($element[$this->parentColumn] == $parentId) {
+				$children = $this->nonIndexedTree($elements, $element[$this->primaryKeyColumn]);
+				if ($children) {
+					$element[$this->keyChildren] = $children;
+				}
+				$branch[] = $element;
+			}
+		}
+
+		return $branch;
 	}
 
 	private function buildTree(array $items): array {
@@ -153,7 +171,7 @@ class HierarchyComponent extends Component {
 		unset($item);
 		foreach ($items as &$item) {
 			if (isset($childs[$item[$this->primaryKeyColumn]])) {
-				$item[static::CHILDS_ARRAY_KEY] = $childs[$item[$this->primaryKeyColumn]];
+				$item[$this->keyChildren] = $childs[$item[$this->primaryKeyColumn]];
 			}
 		}
 		return $childs;

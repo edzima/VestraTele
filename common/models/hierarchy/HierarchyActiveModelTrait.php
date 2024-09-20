@@ -3,17 +3,31 @@
 namespace common\models\hierarchy;
 
 use common\components\HierarchyComponent;
+use Yii;
 use yii\db\ActiveQuery;
 
 trait HierarchyActiveModelTrait {
 
 	private static ?HierarchyComponent $hierarchy = null;
 
+	protected static function getHierarchyConfig(): array {
+		return [
+			'class' => HierarchyComponent::class,
+			'modelClass' => static::class,
+		];
+	}
+
+	/** @noinspection PhpFieldAssignmentTypeMismatchInspection */
 	public static function getHierarchy(): HierarchyComponent {
 		if (static::$hierarchy === null) {
-			$hierarchy = new HierarchyComponent();
-			$hierarchy->modelClass = static::class;
-			static::$hierarchy = $hierarchy;
+			$config = static::getHierarchyConfig();
+			if (!isset($config['class'])) {
+				$config['class'] = HierarchyComponent::class;
+			}
+			if (!isset($config['modelClass'])) {
+				$config['modelClass'] = static::class;
+			}
+			static::$hierarchy = Yii::createObject($config);
 		}
 		return static::$hierarchy;
 	}
