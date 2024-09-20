@@ -19,6 +19,7 @@ use common\models\user\CustomerSearchInterface;
 use common\models\user\User;
 use common\validators\PhoneValidator;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -69,6 +70,11 @@ abstract class IssueSearch extends Model
 	public $onlyWithTelemarketers;
 
 	public $noteFilter;
+
+	/**
+	 * @var int|string|null
+	 */
+	public $userId;
 
 	public const NOTE_ONLY_PINNED = 'only-pinned';
 
@@ -189,11 +195,9 @@ abstract class IssueSearch extends Model
 					'created_at', 'updated_at',
 				], 'safe',
 			],
-			[['summonsStatusFilter',], 'safe'],
-
+			[['summonsStatusFilter', 'excludedStages'], 'safe'],
 			['summonsStatusFilter', 'in', 'range' => static::getSummonsStatusFilters(), 'allowArray' => true],
 			['customerPhone', PhoneValidator::class],
-			['excludedStages', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
 			['userType', 'in', 'range' => array_keys(static::getIssueUserTypesNames())],
 			[
 				'excludedStages', 'filter', 'filter' => function ($stages): array {
@@ -624,9 +628,6 @@ abstract class IssueSearch extends Model
 	}
 
 	public function excludeStage(int $stage_id): void {
-		if ($this->getIssueMainType() && !$this->getIssueMainType()->hasStage($stage_id)) {
-			return;
-		}
 		$this->excludedStages[] = $stage_id;
 	}
 
@@ -708,6 +709,20 @@ abstract class IssueSearch extends Model
 		if (!empty($this->details)) {
 			$query->andWhere(['like', Issue::tableName() . '.details', $this->details]);
 		}
+	}
+
+	protected function onlyUserTypes(IssueQuery $query, bool $withChildren = true): void {
+		if (empty($this->userId)) {
+			throw new InvalidConfigException('userId cannot be empty');
+		}
+		$types = IssueType::getTypes();
+		$ids = [];
+		foreach ($types as $type) {
+			if (Yii::$app->issueTypeUser->userHasAccess($this->userId, $type->id)) {
+				$ids[$type->id] = $type->id;
+			}
+		}
+		$query->types($ids, $withChildren);
 	}
 
 }

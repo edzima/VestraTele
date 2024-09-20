@@ -40,7 +40,6 @@ class IssueSearch extends BaseIssueSearch {
 	public $stageDeadlineFromAt;
 	public $stageDeadlineToAt;
 
-
 	public $entity_agreement_details;
 	public $entity_agreement_at;
 
@@ -49,12 +48,14 @@ class IssueSearch extends BaseIssueSearch {
 	public bool $withClaimsSum = false;
 
 	public ?string $signature_act = null;
+
 	private ?array $ids = null;
 
 	private bool $isLoad = false;
 
 	public function rules(): array {
 		return array_merge(parent::rules(), [
+			['!userId', 'required'],
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id'], 'integer'],
 			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims', 'withClaimsSum'], 'boolean'],
 			[['entity_agreement_details'], 'string'],
@@ -107,6 +108,7 @@ class IssueSearch extends BaseIssueSearch {
 		if ($this->scenario === static::SCENARIO_ALL_PAYED) {
 			$query->with('pays');
 		}
+		$this->onlyUserTypes($query);
 
 		$this->load($params);
 		if ($this->addressSearch) {
@@ -279,7 +281,6 @@ class IssueSearch extends BaseIssueSearch {
 			$query->andWhere(['<', Issue::tableName() . '.stage_deadline_at', date('Y-m-d 23:59:59', strtotime($this->stageDeadlineToAt))]);
 		}
 	}
-
 
 	private function applyEntityAgreementFilter(IssueQuery $query) {
 		$query->andFilterWhere(['like', Issue::tableName() . '.entity_agreement_details', $this->entity_agreement_details])

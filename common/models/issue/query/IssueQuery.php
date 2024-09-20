@@ -28,6 +28,25 @@ class IssueQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function types(array $types, bool $withChildren = true): self {
+		$ids = $types;
+		if ($withChildren) {
+			foreach ($types as $typeId) {
+				$type = IssueType::getTypes()[$typeId] ?? null;
+				if ($type !== null) {
+					$children = $type->getAllChildesIds();
+					if (!empty($children)) {
+						$ids = array_merge($ids, $children);
+					}
+				}
+			}
+			$ids = array_unique($ids);
+		}
+
+		$this->andWhere([Issue::tableName() . '.type_id' => $ids]);
+		return $this;
+	}
+
 	public function withoutCustomer(): self {
 		$this->andWhere([
 			'NOT IN', 'id', IssueUser::find()
