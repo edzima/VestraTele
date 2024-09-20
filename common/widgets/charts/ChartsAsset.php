@@ -9,9 +9,9 @@ class ChartsAsset extends AssetBundle {
 
 	public $baseUrl = 'https://cdn.jsdelivr.net/npm/';
 
-	//3.52 has default disable wheel zoom
+	//3.52 has default disable wheel zoom, but not valid data label for area not stacked chart.
 	public $js = [
-		'apexcharts@3.52',
+		'apexcharts@3.50',
 	];
 
 	public $depends = [
