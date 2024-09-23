@@ -107,7 +107,7 @@ class IssueTypeUser extends Component {
 	}
 
 	protected function createPermission(int $typeId): Item {
-		$permission = $this->auth->createPermission($this->getPermission($typeId));
+		$permission = $this->auth->createPermission($this->getPermissionName($typeId));
 		$permission->description = Yii::t('issue', 'Issues Type: {name}', [
 			'name' => $this->findModel($typeId)->name,
 		]);

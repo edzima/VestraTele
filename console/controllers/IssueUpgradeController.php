@@ -9,6 +9,7 @@ use common\models\issue\IssueType;
 use common\models\issue\Summon;
 use common\models\issue\SummonDocLink;
 use DateTime;
+use Exception;
 use Yii;
 use yii\console\Controller;
 use yii\db\Expression;
@@ -20,8 +21,11 @@ class IssueUpgradeController extends Controller {
 	public function actionTypesPermission() {
 		$models = IssueType::getTypes();
 		foreach ($models as $model) {
-			if (Yii::$app->issueTypeUser->addPermission($model->id)) {
+			try {
+				Yii::$app->issueTypeUser->addPermission($model->id);
 				Console::output('Create Permission for Type: ' . $model->name);
+			} catch (Exception $exception) {
+				Console::output($exception->getMessage());
 			}
 		}
 	}
