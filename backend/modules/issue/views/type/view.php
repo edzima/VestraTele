@@ -1,5 +1,6 @@
 <?php
 
+use backend\helpers\Html;
 use backend\widgets\GridView;
 use common\models\issue\Issue;
 use common\models\issue\IssueStageType;
@@ -7,7 +8,6 @@ use common\models\issue\IssueType;
 use common\models\user\Worker;
 use common\widgets\grid\ActionColumn;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
@@ -139,7 +139,22 @@ $this->params['breadcrumbs'][] = $this->title;
 					],
 					[
 						'class' => ActionColumn::class,
-						'template' => '{view} {update} {delete}',
+						'template' => '{permission} {view} {update} {delete}',
+						'buttons' => [
+							'permission' => function ($url, IssueType $model) {
+								return Html::a(Html::faicon('key'), [
+									'permission', 'id' => $model->id,
+								], [
+									'title' => Yii::t('backend', 'Permissions'),
+									'aria-label' => Yii::t('backend', 'Permissions'),
+								]);
+							},
+						],
+						'visibleButtons' => [
+							'permission' => function () {
+								return Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS);
+							},
+						],
 					],
 				],
 			]) ?>

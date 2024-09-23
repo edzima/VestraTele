@@ -2,10 +2,11 @@
 
 use backend\modules\issue\models\search\IssueTypeSearch;
 use common\helpers\ArrayHelper;
+use common\helpers\Html;
 use common\models\issue\IssueType;
 use common\models\user\Worker;
-use yii\grid\GridView;
-use yii\helpers\Html;
+use common\widgets\grid\ActionColumn;
+use common\widgets\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel IssueTypeSearch */
@@ -69,7 +70,25 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			'lead_source_id',
 			'default_show_linked_notes:boolean',
-			['class' => 'yii\grid\ActionColumn'],
+			[
+				'class' => ActionColumn::class,
+				'template' => '{permission} {view} {update} {delete}',
+				'buttons' => [
+					'permission' => function ($url, IssueType $model) {
+						return Html::a(Html::faicon('key'), [
+							'permission', 'id' => $model->id,
+						], [
+							'title' => Yii::t('backend', 'Permissions'),
+							'aria-label' => Yii::t('backend', 'Permissions'),
+						]);
+					},
+				],
+				'visibleButtons' => [
+					'permission' => function () {
+						return Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS);
+					},
+				],
+			],
 		],
 	]); ?>
 </div>

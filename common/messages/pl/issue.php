@@ -250,4 +250,6 @@ return array_merge([
 	'Files Count' => 'Pliki',
 	'Issues Type: {name}' => 'Typy Spraw: {name}',
 	'Issue Type Permissions' => 'Uprawnienia Typy Sprawy',
+	'Issue Type - Permissions' => 'Typy Sprawy - u	prawnienia dostępu',
+	'Issue Type: {name} -  Permissions' => '{name} - uprawnienia dostępu',
 ], $local);
