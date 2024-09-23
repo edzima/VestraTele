@@ -90,6 +90,8 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public $excludedStatus = [];
 
+	public $excludedSources = [];
+
 	protected const DEADLINE_TODAY = 'today';
 	protected const DEADLINE_TOMORROW = 'tomorrow';
 	protected const DEADLINE_EXCEEDED = 'exceeded';
@@ -133,6 +135,7 @@ class LeadSearch extends Lead implements SearchModel {
 			['deadlineType', 'in', 'range' => array_keys(static::getDeadlineNames())],
 			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
 			[['from_at', 'to_at'], 'safe'],
+			['excludedSources', 'integer', 'allowArray' => true],
 			[array_keys($this->questionsAttributes), 'safe'],
 			['phone', PhoneValidator::class],
 		];
@@ -149,6 +152,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'user_id' => Yii::t('lead', 'User'),
 				'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 				'excludedStatus' => Yii::t('lead', 'Excluded Status'),
+				'excludedSources' => Yii::t('lead', 'Excluded Sources'),
 				'excludedClosedQuestions' => Yii::t('lead', 'Excluded Closed Questions'),
 				'duplicateEmail' => Yii::t('lead', 'Duplicate Email'),
 				'duplicatePhone' => Yii::t('lead', 'Duplicate Phone'),
@@ -270,6 +274,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyPhoneFilter($query);
 		$this->applyStatusFilter($query);
 		$this->applyExcludedStatusFilter($query);
+		$this->applyExcludedSourcesFilter($query);
 		$this->applyReportFilter($query);
 		$this->applyReportStatusFilter($query);
 		$this->applyDeadlineFilter($query);
@@ -321,7 +326,6 @@ class LeadSearch extends Lead implements SearchModel {
 		if (!empty($this->user_type)) {
 			$query->joinWith('leadUsers');
 			$query->andWhere([LeadUser::tableName() . '.type' => $this->user_type]);
-
 		}
 		if (!empty($this->user_id)) {
 			$query->joinWith('leadUsers');
@@ -785,6 +789,12 @@ class LeadSearch extends Lead implements SearchModel {
 			$ids = array_unique($ids);
 			Yii::warning($ids);
 			$query->andFilterWhere([Lead::tableName() . '.campaign_id' => $ids]);
+		}
+	}
+
+	protected function applyExcludedSourcesFilter(LeadQuery $query): void {
+		if (!empty($this->excludedSources)) {
+			$query->andWhere(['NOT IN', Lead::tableName() . '.source_id', $this->excludedSources]);
 		}
 	}
 }

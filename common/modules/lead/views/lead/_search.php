@@ -193,6 +193,16 @@ use kartik\select2\Select2;
 		])
 		?>
 
+		<?= $form->field($model, 'excludedSources', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
+			'data' => $model->getSourcesNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('excludedSources'),
+				'multiple' => true,
+				'allowClear' => true,
+			],
+		])
+		?>
+
 
 	</div>
 

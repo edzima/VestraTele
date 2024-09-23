@@ -528,4 +528,5 @@ return [
 	'Deal Qualified cost Value' => 'Koszt: Kwalifikuje się',
 	'Deal Contracts Costs' => 'Koszty Umów',
 	'Cost Value (range)' => 'Koszt (okres)',
+	'Excluded Sources' => 'Wykluczone Źródła',
 ];
