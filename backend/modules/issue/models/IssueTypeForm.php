@@ -121,9 +121,8 @@ class IssueTypeForm extends Model {
 		if (!$model->save()) {
 			return false;
 		}
-		if ($this->getModel()->isNewRecord) {
-			$this->addPermission();
-		}
+		$this->addPermission();
+
 		return true;
 	}
 
