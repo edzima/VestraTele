@@ -73,7 +73,6 @@ class ReportController extends BaseController {
 			}
 			$searchModel->setOwnerScenario($userId);
 		}
-		$searchModel->setOwnerScenario(25629);
 		$searchModel->from_at = $fromAt;
 		$searchModel->to_at = $toAt;
 		$searchModel->load(Yii::$app->request->queryParams);
