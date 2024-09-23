@@ -1,12 +1,13 @@
 <?php
 
+use backend\helpers\Html;
 use backend\widgets\GridView;
 use common\models\issue\Issue;
 use common\models\issue\IssueStageType;
 use common\models\issue\IssueType;
+use common\models\user\Worker;
 use common\widgets\grid\ActionColumn;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
@@ -20,6 +21,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="issue-type-view">
 
 	<p>
+
+		<?= Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS)
+			? Html::a(Yii::t('backend', 'Permissions'), ['permission', 'id' => $model->id], ['class' => 'btn btn-warning'])
+			: ''
+		?>
+
 		<?= Html::a(Yii::t('backend', 'Link with Stage'), ['stage-type/create', 'type_id' => $model->id], ['class' => 'btn btn-success']) ?>
 
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -58,6 +65,34 @@ $this->params['breadcrumbs'][] = $this->title;
 					'with_additional_date:boolean',
 					'default_show_linked_notes:boolean',
 					'lead_source_id',
+					[
+						'attribute' => 'roles',
+						'value' => function (IssueType $model): ?string {
+							$items = Yii::$app->issueTypeUser->getParentsRoles($model->id);
+							$names = [];
+							foreach ($items as $item) {
+								$names[] = Worker::getRolesNames()[$item];
+							}
+							return Html::ul($names, ['encode' => false]);
+						},
+						'format' => 'html',
+						'label' => Yii::t('backend', 'Roles'),
+						'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS),
+					],
+					[
+						'attribute' => 'permissions',
+						'value' => function (IssueType $model): ?string {
+							$items = Yii::$app->issueTypeUser->getParentsPermissions($model->id);
+							$names = [];
+							foreach ($items as $item) {
+								$names[] = Worker::getPermissionsNames()[$item];
+							}
+							return Html::ul($names, ['encode' => false]);
+						},
+						'format' => 'html',
+						'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS),
+						'label' => Yii::t('backend', 'Permissions'),
+					],
 				],
 			]) ?>
 		</div>
@@ -75,8 +110,51 @@ $this->params['breadcrumbs'][] = $this->title;
 				'columns' => [
 					'name',
 					[
+						'attribute' => 'roles',
+						'value' => function (IssueType $model): ?string {
+							$items = Yii::$app->issueTypeUser->getParentsRoles($model->id);
+							$names = [];
+							foreach ($items as $item) {
+								$names[] = Worker::getRolesNames()[$item];
+							}
+							return Html::ul($names, ['encode' => false]);
+						},
+						'format' => 'html',
+						'label' => Yii::t('backend', 'Roles'),
+						'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS),
+					],
+					[
+						'attribute' => 'permissions',
+						'value' => function (IssueType $model): ?string {
+							$items = Yii::$app->issueTypeUser->getParentsPermissions($model->id);
+							$names = [];
+							foreach ($items as $item) {
+								$names[] = Worker::getPermissionsNames()[$item];
+							}
+							return Html::ul($names, ['encode' => false]);
+						},
+						'format' => 'html',
+						'visible' => Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS),
+						'label' => Yii::t('backend', 'Permissions'),
+					],
+					[
 						'class' => ActionColumn::class,
-						'template' => '{view} {update} {delete}',
+						'template' => '{permission} {view} {update} {delete}',
+						'buttons' => [
+							'permission' => function ($url, IssueType $model) {
+								return Html::a(Html::faicon('key'), [
+									'permission', 'id' => $model->id,
+								], [
+									'title' => Yii::t('backend', 'Permissions'),
+									'aria-label' => Yii::t('backend', 'Permissions'),
+								]);
+							},
+						],
+						'visibleButtons' => [
+							'permission' => function () {
+								return Yii::$app->user->can(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS);
+							},
+						],
 					],
 				],
 			]) ?>
@@ -129,5 +207,6 @@ $this->params['breadcrumbs'][] = $this->title;
 			]) ?>
 		</div>
 	</div>
+
 
 </div>

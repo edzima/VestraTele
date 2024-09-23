@@ -64,10 +64,9 @@ class IssueController extends Controller {
 		$user = Yii::$app->user;
 		$searchModel = new IssueSearch();
 		$searchModel->parentTypeId = IssueTypeParentIdAction::validate($parentTypeId);
-
 		$searchModel->excludeArchiveStage();
 		$searchModel->excludeArchiveDeepStage();
-		$searchModel->user_id = (int) $user->getId();
+		$searchModel->userId = (int) $user->getId();
 
 		if ($user->can(Worker::ROLE_AGENT)) {
 			$searchModel->includedUsersIds = Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId());

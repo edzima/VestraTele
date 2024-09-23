@@ -518,7 +518,11 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 			$rolesI18n = [];
 			foreach ($roles as $role) {
 				$name = $role->name;
-				$rolesI18n[$name] = Yii::t('rbac', $name);
+				$rbac = Yii::t('rbac', $name);
+				if ($name === $rbac) {
+					$rbac = $role->description;
+				}
+				$rolesI18n[$name] = $rbac;
 			}
 			static::$PERMISSIONS_NAMES = $rolesI18n;
 		}

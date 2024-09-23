@@ -5,6 +5,7 @@ namespace common\widgets\grid;
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssueTagType;
+use common\models\issue\search\IssueMainTypeSearchable;
 use common\models\issue\search\IssueTypeSearch;
 use common\widgets\GridView;
 use kartik\select2\Select2;
@@ -54,6 +55,11 @@ class IssueTypeColumn extends DataColumn {
 				$this->filter = $filterModel->getIssueTypesNames();
 				if (count($this->filter) === 1) {
 					$this->visible = false;
+				}
+			}
+			if ($filterModel instanceof IssueMainTypeSearchable) {
+				if ($filterModel->getIssueMainType()) {
+					$this->visible = !empty($filterModel->getIssueMainType()->childs);
 				}
 			}
 		}

@@ -2,11 +2,11 @@
 
 namespace common\models\issue\query;
 
-use common\helpers\ArrayHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
+use Yii;
 use yii\db\ActiveQuery;
 
 /**
@@ -16,16 +16,41 @@ use yii\db\ActiveQuery;
  */
 class IssueQuery extends ActiveQuery {
 
+	public function userTypes(int $userId, bool $withChildren = true): self {
+		$ids = Yii::$app->issueTypeUser->getUserTypesIds($userId);
+		$this->types($ids, $withChildren);
+		return $this;
+	}
+
 	public function type(int $typeId, bool $withChildren = true): self {
 		$types = [];
 		if ($withChildren) {
-			$type = IssueType::getTypes()[$typeId];
+			$type = IssueType::getTypes()[$typeId] ?? null;
 			if ($type) {
-				$types = ArrayHelper::getColumn($type->childs, 'id');
+				$types = $type->getAllChildesIds();
 			}
 		}
 		$types[] = $typeId;
 		$this->andWhere([Issue::tableName() . '.type_id' => $types]);
+		return $this;
+	}
+
+	public function types(array $types, bool $withChildren = true): self {
+		$ids = $types;
+		if ($withChildren) {
+			foreach ($types as $typeId) {
+				$type = IssueType::getTypes()[$typeId] ?? null;
+				if ($type !== null) {
+					$children = $type->getAllChildesIds();
+					if (!empty($children)) {
+						$ids = array_merge($ids, $children);
+					}
+				}
+			}
+			$ids = array_unique($ids);
+		}
+
+		$this->andWhere([Issue::tableName() . '.type_id' => $ids]);
 		return $this;
 	}
 

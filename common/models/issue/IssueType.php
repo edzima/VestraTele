@@ -2,6 +2,8 @@
 
 namespace common\models\issue;
 
+use common\models\hierarchy\Hierarchy;
+use common\models\hierarchy\HierarchyActiveModelTrait;
 use common\models\issue\query\IssueQuery;
 use common\models\issue\query\IssueStageQuery;
 use Yii;
@@ -28,7 +30,15 @@ use yii\helpers\ArrayHelper;
  * @property IssueStageType[] $typeStages
  * @property static[] $childs
  */
-class IssueType extends ActiveRecord {
+class IssueType extends ActiveRecord implements Hierarchy {
+
+	use HierarchyActiveModelTrait;
+
+	protected static function getHierarchyConfig(): array {
+		return [
+			'onlyWithParents' => false,
+		];
+	}
 
 	private static ?array $TYPES = null;
 
@@ -139,21 +149,9 @@ class IssueType extends ActiveRecord {
 	 * @return static[]
 	 */
 	public static function getMainTypes(): array {
-		$types = static::getTypes();
-		$main = [];
-		foreach ($types as $type) {
-			if ($type->is_main && !isset($main[$type->id])) {
-				$main[$type->id] = $type;
-				continue;
-			}
-			if ($type->parent_id && !isset($main[$type->parent_id])) {
-				$parent = $types[$type->parent_id] ?? null;
-				if ($parent) {
-					$main[$parent->id] = $parent;
-				}
-			}
-		}
-		return $main;
+		return array_filter(static::getTypes(), function (self $type) {
+			return $type->is_main;
+		});
 	}
 
 	/**
@@ -181,6 +179,21 @@ class IssueType extends ActiveRecord {
 			}
 		}
 		return false;
+	}
+
+	public function isForUser(int $userId, bool $onlyHasIssues = true, bool $withChildren = true): bool {
+		if (!$onlyHasIssues) {
+			return $this->userHasAccess($userId, $withChildren);
+		}
+		return $this->userHasAccess($userId, $withChildren) && $this->userHasIssues($userId, $withChildren);
+	}
+
+	public function userHasIssues(int $userId, bool $withChildren = true): bool {
+		return Yii::$app->issueTypeUser->userHasIssues($userId, $this->id, $withChildren);
+	}
+
+	protected function userHasAccess(int $userId, bool $withChildren = true): bool {
+		return Yii::$app->issueTypeUser->userHasAccess($userId, $this->id, $withChildren);
 	}
 
 }

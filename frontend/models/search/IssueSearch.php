@@ -14,7 +14,6 @@ use yii\helpers\ArrayHelper;
 
 class IssueSearch extends BaseIssueSearch {
 
-	public int $user_id;
 	public array $includedUsersIds = [];
 	public array $excludedUsersIds = [];
 	public bool $withArchive = true;
@@ -24,6 +23,7 @@ class IssueSearch extends BaseIssueSearch {
 
 	public function rules(): array {
 		return array_merge(parent::rules(), [
+			['!userId', 'required'],
 			['agent_id', 'in', 'range' => $this->getAvailableAgentsIds()],
 		]);
 	}
@@ -47,8 +47,8 @@ class IssueSearch extends BaseIssueSearch {
 	 * @throws InvalidConfigException
 	 */
 	public function search(array $params): ActiveDataProvider {
-		if (empty($this->user_id)) {
-			throw new InvalidConfigException('user_id must be set.');
+		if (empty($this->userId)) {
+			throw new InvalidConfigException('userId must be set.');
 		}
 
 		$query = IssueUser::find();
@@ -56,6 +56,7 @@ class IssueSearch extends BaseIssueSearch {
 			'issue' => function (IssueQuery $query): void {
 				$query->with($this->issueWith());
 				$this->issueQueryFilter($query);
+				$this->onlyUserTypes($query);
 			},
 		]);
 		$query->with('issue.claims');
@@ -82,7 +83,7 @@ class IssueSearch extends BaseIssueSearch {
 
 		if (!$this->validate()) {
 			$query->andFilterWhere([
-				'issue_user.user_id' => $this->user_id,
+				'issue_user.user_id' => $this->userId,
 			]);
 
 			return $dataProvider;
@@ -90,9 +91,8 @@ class IssueSearch extends BaseIssueSearch {
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			'issue_user.user_id' => empty($this->includedUsersIds) ? $this->user_id : array_merge($this->includedUsersIds, [$this->user_id]),
+			'issue_user.user_id' => empty($this->includedUsersIds) ? $this->userId : array_merge($this->includedUsersIds, [$this->userId]),
 		]);
-		$query->groupBy('issue_user.issue_id');
 
 		$query->andFilterWhere(['NOT IN', 'issue_user.user_id', $this->excludedUsersIds]);
 		return $dataProvider;
@@ -105,16 +105,16 @@ class IssueSearch extends BaseIssueSearch {
 					IssueUser::tableName() . ' IU_1',
 					IssueUser::tableName() . ' IU_2',
 				])
-				->andWhere(['IU_1.user_id' => $this->user_id])
+				->andWhere(['IU_1.user_id' => $this->userId])
 				->andWhere('IU_1.issue_id = IU_2.issue_id')
 				->andWhere(['IU_2.type' => IssueUser::TYPE_AGENT])
 				->select('IU_2.user_id')
 				->distinct()
 				->column();
 
-			$ids = array_unique(array_merge([],$selfUserIds, $this->includedUsersIds));
-			if (!in_array($this->user_id, $ids)) {
-				$ids[] = $this->user_id;
+			$ids = array_unique(array_merge([], $selfUserIds, $this->includedUsersIds));
+			if (!in_array($this->userId, $ids)) {
+				$ids[] = $this->userId;
 			}
 			$this->availableAgentsIds = $ids;
 		}

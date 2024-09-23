@@ -64,6 +64,8 @@ class IssueController extends Controller {
 		$searchModel = new IssueSearch();
 
 		$searchModel->parentTypeId = IssueTypeParentIdAction::validate($parentTypeId);
+
+		$searchModel->userId = Yii::$app->user->id;
 		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
 			$searchModel->withArchive = true;
 			$searchModel->excludeArchiveStage();

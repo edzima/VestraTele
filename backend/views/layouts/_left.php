@@ -1,7 +1,7 @@
 <?php
 
+use backend\widgets\IssueTypeLeftNavWidget;
 use backend\widgets\Menu;
-use common\helpers\Html;
 use common\models\user\User;
 use common\models\user\Worker;
 use yii\web\View;
@@ -9,6 +9,9 @@ use yii\web\View;
 /* @var $this View */
 
 $user = Yii::$app->user;
+
+$typesNav = new IssueTypeLeftNavWidget();
+$typesItems = $typesNav->getItems();
 ?>
 <aside class="main-sidebar">
 	<section class="sidebar">
@@ -192,13 +195,13 @@ $user = Yii::$app->user;
 						[
 							'label' => Yii::t('common', 'Browse'),
 							'url' => ['/issue/issue/index'],
-							'options' => empty(Html::issueMainTypesItems())
+							'options' => empty($typesItems)
 								? []
 								: [
 									'class' => 'treeview',
 								],
 							'icon' => '<i class="fa fa-eye"></i>',
-							'items' => Html::issueMainTypesItems(),
+							'items' => $typesItems,
 						],
 						[
 							'label' => Yii::t('issue', 'Archive'),

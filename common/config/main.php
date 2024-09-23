@@ -5,6 +5,7 @@ use common\components\callpage\CallPageClient;
 use common\components\DbManager;
 use common\components\Formatter;
 use common\components\HierarchyComponent;
+use common\components\IssueTypeUser;
 use common\components\keyStorage\KeyStorage;
 use common\components\message\MessageTemplateManager;
 use common\components\PayComponent;
@@ -176,6 +177,9 @@ $config = [
 					'logVars' => [],
 				],
 			],
+		],
+		'issueTypeUser' => [
+			'class' => IssueTypeUser::class,
 		],
 		'i18n' => [
 			'translations' => [

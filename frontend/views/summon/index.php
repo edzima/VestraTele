@@ -3,7 +3,7 @@
 use frontend\helpers\Html;
 use frontend\helpers\Url;
 use frontend\models\search\SummonSearch;
-use frontend\widgets\IssueParentTypeHeader;
+use frontend\widgets\IssueTypeHeader;
 use frontend\widgets\SummonGrid;
 use yii\bootstrap\Nav;
 
@@ -24,8 +24,8 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="summon-index">
 
-	<?= IssueParentTypeHeader::widget([
-		'parentsMenuConfig' => [
+	<?= IssueTypeHeader::widget([
+		'navOptions' => [
 			'route' => ['/summon/index', Html::getInputName($searchModel, 'type_id') => $searchModel->type_id],
 		],
 	]) ?>

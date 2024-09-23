@@ -8,7 +8,6 @@ use common\models\issue\IssueUser;
 use common\models\user\UserVisible;
 use common\models\user\Worker;
 use Yii;
-use yii\web\ForbiddenHttpException;
 use yii\web\User as BaseUser;
 
 class User extends BaseUser {
@@ -24,13 +23,21 @@ class User extends BaseUser {
 	 * @param IssueInterface $model
 	 * @param bool $withChildes
 	 * @return bool
-	 * @throws ForbiddenHttpException
 	 */
 	public function canSeeIssue(IssueInterface $model, bool $withChildes = true): bool {
 		if ($this->can(Worker::ROLE_ADMINISTRATOR)) {
 			return true;
 		}
 
+		if (!$this->canSeeIssueType($model->getIssueTypeId())) {
+			Yii::warning([
+				'message' => 'User try view issue with type without access.',
+				'issue_id' => $model->getIssueId(),
+				'type_id' => $model->getIssueTypeId(),
+				'user_id' => $this->getId(),
+			], __METHOD__);
+			return false;
+		}
 		$issue = $model->getIssueModel();
 		if ($this->can(Worker::PERMISSION_ISSUE_VISIBLE_NOT_SELF)
 			|| $issue->hasUser($this->getId())
@@ -97,5 +104,13 @@ class User extends BaseUser {
 			return null;
 		}
 		return $this->identity->userProfile->favorite_issue_type_id;
+	}
+
+	protected function canSeeIssueType(int $typeId): bool {
+		$id = $this->getId();
+		if (empty($id)) {
+			return false;
+		}
+		return Yii::$app->issueTypeUser->userHasAccess($id, $typeId, true);
 	}
 }

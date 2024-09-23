@@ -75,7 +75,7 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_CREDIT_ANALYZE = 'credit.analyze';
 	public const PERMISSION_COURT = 'court';
 	public const PERMISSION_LAWSUIT = 'lawsuit';
-
+	public const PERMISSION_ISSUE_TYPE_PERMISSIONS = 'issue.type.permissions';
 
 	private static $USER_NAMES = [];
 

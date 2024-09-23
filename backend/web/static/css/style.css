@@ -199,6 +199,9 @@ input[type="tel"]::-ms-input-placeholder {
 	color: transparent;
 }
 
+.sidebar-menu .treeview-menu > li > a {
+	white-space: collapse;
+}
 
 .title-with-nav h1 {
 	display: flex;
@@ -222,10 +225,37 @@ input[type="tel"]::-ms-input-placeholder {
 }
 
 
-.nav-with-favorite li .favorite-link {
+.nav-with-favorite li:not(.dropdown) .favorite-link {
 	position: absolute;
 	right: 4px;
 	top: 13px;
+	padding: 0;
+	border: none;
+}
+
+.nav-with-favorite li.dropdown .favorite-link {
+	position: absolute;
+	right: 16px;
+	top: 13px;
+	padding: 0;
+	border: none;
+}
+
+.nav-with-favorite li .caret {
+	position: absolute;
+	right: 4px;
+	top: 18px;
+}
+
+.nav-with-favorite li.dropdown:not(:last-child) a:first-child {
+	padding-right: 36px;
+}
+
+
+.nav-with-favorite li.dropdown .dropdown-menu .favorite-link {
+	position: absolute;
+	right: 4px;
+	top: 4px;
 	padding: 0;
 	border: none;
 }
@@ -366,3 +396,26 @@ div:target {
 .btn-icon-with-link a {
 	color: white;
 }
+
+.dropdown .dropdown-submenu > ul {
+	padding-left: 32px;
+}
+
+.dropdown .dropdown-submenu li > a {
+	color: #777;
+	font-weight: 400;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	white-space: nowrap;
+	display: inline-block;
+}
+
+
+.dropdown .dropdown-submenu li:hover {
+	background-color: #e1e3e9;
+	color: #333;
+}
+
+
+
+

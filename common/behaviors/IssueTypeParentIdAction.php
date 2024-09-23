@@ -6,6 +6,7 @@ use common\helpers\Url;
 use Yii;
 use yii\base\Behavior;
 use yii\base\Controller;
+use yii\web\ForbiddenHttpException;
 
 class IssueTypeParentIdAction extends Behavior {
 
@@ -43,6 +44,9 @@ class IssueTypeParentIdAction extends Behavior {
 	public static function validate(?int $parentTypeId): ?int {
 		if ($parentTypeId === static::ISSUE_PARENT_TYPE_ALL) {
 			return null;
+		}
+		if ($parentTypeId && !Yii::$app->issueTypeUser->userHasAccess(Yii::$app->user->getId(), $parentTypeId, true)) {
+			throw new ForbiddenHttpException('Not Access for Type: ' . $parentTypeId);
 		}
 		return $parentTypeId;
 	}

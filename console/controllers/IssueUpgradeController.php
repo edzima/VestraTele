@@ -5,15 +5,26 @@ namespace console\controllers;
 use common\models\issue\Issue;
 use common\models\issue\IssueNote;
 use common\models\issue\IssueStage;
+use common\models\issue\IssueType;
 use common\models\issue\Summon;
 use common\models\issue\SummonDocLink;
 use DateTime;
+use Yii;
 use yii\console\Controller;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 
 class IssueUpgradeController extends Controller {
+
+	public function actionTypesPermission() {
+		$models = IssueType::getTypes();
+		foreach ($models as $model) {
+			if (Yii::$app->issueTypeUser->addPermission($model->id)) {
+				Console::output('Create Permission for Type: ' . $model->name);
+			}
+		}
+	}
 
 	public function actionArchive(): void {
 		$count = Issue::updateAll(['archives_nr' => null], ['archives_nr' => '']);
@@ -52,10 +63,6 @@ class IssueUpgradeController extends Controller {
 		if (!empty($notesIds)) {
 			$updateNotesCount = IssueNote::updateAll(['show_on_linked_issues' => ''], ['id' => $notesIds]);
 		}
-		Console::output('All Duplicated Notes: ' . count($notes));
-		Console::output(var_dump(ArrayHelper::getColumn($notes, 'issue_id')));
-		Console::output('Deleted Notes: ' . $deleteNotesCount);
-		Console::output('Updated Notes: ' . $updateNotesCount);
 	}
 
 	public function actionSummonsRealizedAt(): void {
