@@ -83,10 +83,14 @@ class SummonSearch extends Summon implements
 		]);
 	}
 
-	public function getSummonTypeNavItems(): array {
+	public function getSummonTypeNavItems(int $parentTypeId = null): array {
+		if ($parentTypeId === null) {
+			$parentTypeId = Yii::$app->request->get(Url::PARAM_ISSUE_PARENT_TYPE);
+		}
 		$typeQuery = Summon::find()
 			->select([Summon::tableName() . '.type_id', 'count(*) as typeCount'])
 			->groupBy('type_id')
+			->active()
 			->asArray();
 
 		if (!empty($this->user_id)) {
@@ -105,14 +109,14 @@ class SummonSearch extends Summon implements
 			$typeName = SummonType::getNames()[$typeId];
 			$typesItems[] = [
 				'label' => "$typeName ($count)",
-				'url' => ['index', Html::getInputName($this, 'type_id') => $typeId, Url::PARAM_ISSUE_PARENT_TYPE => $this->issueParentTypeId],
+				'url' => ['index', Html::getInputName($this, 'type_id') => $typeId, Url::PARAM_ISSUE_PARENT_TYPE => $parentTypeId],
 				'active' => (int) $this->type_id === $typeId,
 			];
 		}
 		if (!empty($typesItems)) {
 			$typesItems[] = [
 				'label' => Yii::t('common', 'All'),
-				'url' => ['index', Url::PARAM_ISSUE_PARENT_TYPE => $this->issueParentTypeId],
+				'url' => ['index', Url::PARAM_ISSUE_PARENT_TYPE => $parentTypeId],
 				'active' => empty($this->type_id),
 			];
 		}
