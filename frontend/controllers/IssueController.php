@@ -75,7 +75,6 @@ class IssueController extends Controller {
 		$searchModel->includedUsersIds = array_unique(array_merge($searchModel->includedUsersIds, $visible));
 		$searchModel->excludedUsersIds = UserVisible::hiddenUsers(Yii::$app->user->getId());
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-		$dataProvider->pagination = false;
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,

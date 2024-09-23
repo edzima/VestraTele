@@ -75,20 +75,16 @@ class IssueSearch extends BaseIssueSearch {
 				'defaultOrder' => ['issue.updated_at' => SORT_DESC],
 			],
 		]);
-		$query->groupBy('issue_user.issue_id');
-
 
 		$this->load($params);
 		if ($this->addressSearch) {
 			$this->addressSearch->load($params);
 		}
 
-
 		if (!$this->validate()) {
 			$query->andFilterWhere([
 				'issue_user.user_id' => $this->userId,
 			]);
-			var_dump($this->getErrors());
 
 			return $dataProvider;
 		}
