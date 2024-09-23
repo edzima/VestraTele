@@ -31,6 +31,9 @@ class User extends BaseUser {
 			return true;
 		}
 
+		if (!$this->canSeeIssueType($model->getIssueTypeId())) {
+			return false;
+		}
 		$issue = $model->getIssueModel();
 		if ($this->can(Worker::PERMISSION_ISSUE_VISIBLE_NOT_SELF)
 			|| $issue->hasUser($this->getId())
@@ -97,5 +100,13 @@ class User extends BaseUser {
 			return null;
 		}
 		return $this->identity->userProfile->favorite_issue_type_id;
+	}
+
+	protected function canSeeIssueType(int $typeId): bool {
+		$id = $this->getId();
+		if (empty($id)) {
+			return false;
+		}
+		return Yii::$app->issueTypeUser->userHasAccess($id, $typeId, true);
 	}
 }

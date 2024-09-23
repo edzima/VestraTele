@@ -55,7 +55,7 @@ class SummonDocLinkController extends Controller {
 			}
 		}
 		$searchModel->status = SummonDocLinkSearch::STATUS_TO_DO;
-		$searchModel->issueParentTypeId = $parentTypeId;
+		$searchModel->issueParentTypeId = IssueTypeParentIdAction::validate($parentTypeId);
 		$dataProvider = $searchModel->search(Yii::$app->request->getQueryParams());
 
 		return $this->render('to-do', [
@@ -71,7 +71,7 @@ class SummonDocLinkController extends Controller {
 			$searchModel->userId = Yii::$app->user->getId();
 		}
 		$searchModel->status = SummonDocLinkSearch::STATUS_TO_CONFIRM;
-		$searchModel->issueParentTypeId = $parentTypeId;
+		$searchModel->issueParentTypeId = IssueTypeParentIdAction::validate($parentTypeId);
 		$dataProvider = $searchModel->search(Yii::$app->request->getQueryParams());
 
 		return $this->render('to-confirm', [
@@ -86,7 +86,7 @@ class SummonDocLinkController extends Controller {
 			$searchModel->userId = Yii::$app->user->getId();
 		}
 		$searchModel->status = SummonDocLinkSearch::STATUS_CONFIRMED;
-		$searchModel->issueParentTypeId = $parentTypeId;
+		$searchModel->issueParentTypeId = IssueTypeParentIdAction::validate($parentTypeId);
 		$dataProvider = $searchModel->search(Yii::$app->request->getQueryParams());
 
 		return $this->render('confirmed', [

@@ -93,8 +93,6 @@ class TypeController extends Controller {
 	 * @return mixed
 	 */
 	public function actionView(int $id) {
-		$model = $this->findModel($id);
-		Yii::warning(Yii::$app->issueTypeUser->getUsersIds($id));
 		return $this->render('view', [
 			'model' => $this->findModel($id),
 		]);
