@@ -121,13 +121,8 @@ class IssueTypeForm extends Model {
 		if (!$model->save()) {
 			return false;
 		}
-		$this->addPermission();
 
 		return true;
-	}
-
-	public function addPermission(): void {
-		Yii::$app->issueTypeUser->addPermission($this->getModel()->id);
 	}
 
 }

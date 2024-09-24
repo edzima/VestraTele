@@ -24,7 +24,7 @@ class IssueTypeUser extends Component {
 		$this->auth = Instance::ensure($this->auth, ManagerInterface::class);
 	}
 
-	public function addPermission(int $typeId): bool {
+	public function ensurePermission(int $typeId): bool {
 		$permission = $this->getPermission($typeId);
 		if ($permission === null) {
 			$permission = $this->createPermission($typeId);

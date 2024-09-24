@@ -22,7 +22,7 @@ class IssueUpgradeController extends Controller {
 		$models = IssueType::getTypes();
 		foreach ($models as $model) {
 			try {
-				Yii::$app->issueTypeUser->addPermission($model->id);
+				Yii::$app->issueTypeUser->ensurePermission($model->id);
 				Console::output('Create Permission for Type: ' . $model->name);
 			} catch (Exception $exception) {
 				Console::output($exception->getMessage());

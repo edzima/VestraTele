@@ -64,6 +64,7 @@ class IssueTypePermissionForm extends Model {
 		if ($validate && !$this->validate()) {
 			return false;
 		}
+		$this->issueTypeUser->ensurePermission($this->typeId);
 		$this->issueTypeUser->removeFromParents($this->typeId);
 		foreach ($this->permissions as $permissionName) {
 			$permission = $this->issueTypeUser->auth->getPermission($permissionName);
