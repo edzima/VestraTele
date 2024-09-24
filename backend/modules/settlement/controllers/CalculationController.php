@@ -89,7 +89,7 @@ class CalculationController extends Controller {
 
 		$types = Yii::$app->keyStorage->get(KeyStorageItem::KEY_SETTLEMENT_TYPES_FOR_PROVISIONS, []);
 		if (!empty($types)) {
-			$searchModel->type = Json::decode($types);
+			$searchModel->type_id = Json::decode($types);
 		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -175,7 +175,11 @@ class CalculationController extends Controller {
 	public function actionCreate(int $issueId, int $typeId) {
 		$issue = $this->findIssueModel($issueId);
 		$model = new CalculationForm(Yii::$app->user->getId(), $issue);
-		$model->setType($this->findType($typeId));
+		$type = $this->findType($typeId);
+		if (!$type->isForIssueTypeId($issue->getIssueTypeId())) {
+			throw new NotFoundHttpException();
+		}
+		$model->setType($type, true);
 		if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
 			Yii::$app->session->addFlash('warning', Yii::t('settlement', 'You try create calculation as Admin.'));
 		}
@@ -315,7 +319,11 @@ class CalculationController extends Controller {
 	}
 
 	private function findType(int $id): SettlementType {
-		$model = SettlementType::findOne($id);
+		$model = SettlementType::find()
+			->active()
+			->andWhere([
+				'id' => $id,
+			])->one();
 		if ($model === null) {
 			throw new NotFoundHttpException('The requested page does not exist.');
 		}

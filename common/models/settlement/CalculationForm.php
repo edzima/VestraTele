@@ -18,7 +18,7 @@ class CalculationForm extends PayForm {
 
 	private Issue $issue;
 	private int $owner;
-	public $type;
+	private int $type_id;
 
 	public ?int $providerType = null;
 	public $costs_ids = [];
@@ -46,14 +46,15 @@ class CalculationForm extends PayForm {
 
 	public function rules(): array {
 		return array_merge([
-			[['type', 'providerType',], 'required'],
+			[['!type_id', '!owner_d',], 'required'],
+			[['providerType',], 'required'],
 			[['owner', 'type', 'providerType', 'entityProviderId'], 'integer'],
 			[
 				'entityProviderId', 'required', 'when' => function () {
 				return $this->providerType === static::PROVIDER_TYPE_RESPONSIBLE_ENTITY;
 			}, 'enableClientValidation' => false,
 			],
-			['type', 'in', 'range' => array_keys(static::getTypesNames())],
+			['type_id', 'in', 'range' => array_keys($this->getTypesNames())],
 			['costs_ids', 'in', 'range' => array_keys($this->getCostsData()), 'allowArray' => true],
 			['providerType', 'in', 'range' => array_keys(IssuePayCalculation::getProvidersTypesNames())],
 			['entityProviderId', 'in', 'range' => array_keys(static::getEntityResponsibleNames())],
@@ -71,15 +72,14 @@ class CalculationForm extends PayForm {
 	public function attributeLabels(): array {
 		return array_merge([
 			'providerType' => Yii::t('settlement', 'Provider'),
-			'type' => Yii::t('settlement', 'Type'),
 			'costs_ids' => Yii::t('settlement', 'Costs'),
 			'entityProviderId' => Yii::t('settlement', 'Entity responsible'),
 		], parent::attributeLabels());
 	}
 
-	public function setType(SettlementType $type): void {
+	public function setType(SettlementType $type, bool $withTypeOptions): void {
 		$this->settlementType = $type;
-		$this->type = $type->id;
+		$this->type_id = $type->id;
 		$this->setTypeOptions($type->getTypeOptions());
 	}
 
@@ -112,7 +112,7 @@ class CalculationForm extends PayForm {
 		if ($model->provider_type === static::PROVIDER_TYPE_RESPONSIBLE_ENTITY) {
 			$this->entityProviderId = $model->provider_id;
 		}
-		$this->type = $model->type;
+		$this->setType($model->type, false);
 		if ($model->getPaysCount() === 1) {
 			$this->setPay($model->getPays()->one());
 		}
@@ -159,7 +159,7 @@ class CalculationForm extends PayForm {
 
 		$model->payment_at = $this->getPaymentAt() ? $this->getPaymentAt()->format($this->dateFormat) : null;
 		$model->value = $this->getValue()->toFixed(2);
-		$model->type = $this->type;
+		$model->type_id = $this->type_id;
 		$model->provider_type = $this->providerType;
 		$model->provider_id = $this->getProviderId();
 		if (!$model->save(false)) {
@@ -223,8 +223,8 @@ class CalculationForm extends PayForm {
 		];
 	}
 
-	public static function getTypesNames(): array {
-		return IssuePayCalculation::getTypesNames();
+	public function getTypesNames(): array {
+		return IssuePayCalculation::getTypesNames($this->getModel()->isNewRecord);
 	}
 
 }

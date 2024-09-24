@@ -62,18 +62,18 @@ class IssuePayCalculationSearchTest extends Unit {
 	}
 
 	public function testType(): void {
-		$this->model->type = IssueSettlement::TYPE_HONORARIUM;
+		$this->model->type_id = IssueSettlement::TYPE_HONORARIUM;
 		$models = $this->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
-			$this->tester->assertSame(IssueSettlement::TYPE_HONORARIUM, $model->getType());
+			$this->tester->assertSame(IssueSettlement::TYPE_HONORARIUM, $model->getTypeId());
 		}
 
-		$this->model->type = IssueSettlement::TYPE_ADMINISTRATIVE;
+		$this->model->type_id = IssueSettlement::TYPE_ADMINISTRATIVE;
 		$models = $this->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
-			$this->tester->assertSame(IssueSettlement::TYPE_ADMINISTRATIVE, $model->getType());
+			$this->tester->assertSame(IssueSettlement::TYPE_ADMINISTRATIVE, $model->getTypeId());
 		}
 	}
 

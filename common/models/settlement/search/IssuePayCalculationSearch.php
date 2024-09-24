@@ -64,7 +64,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		return [
 			[['issue_id', 'stage_id', 'problem_status', 'owner_id'], 'integer'],
 			[['!owner_id'], 'required', 'on' => static::SCENARIO_OWNER],
-			[['type', 'excludesTypes'], 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
+			[['type_id', 'excludesTypes'], 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
 			['issue_type_id', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			['issue_stage_id', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true, 'when' => function (): bool { return $this->withIssueStage; }],
 			['agent_id', 'in', 'range' => array_keys($this->getAgentsNames()), 'allowArray' => true],
@@ -120,6 +120,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 				}
 			},
 		]);
+		$query->with('type');
 		$query->joinWith('issue.type IT');
 		$query->joinWith('owner O');
 		$query->joinWith('pays P');
@@ -276,7 +277,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 	protected function applyExcludesTypesFilter(IssuePayCalculationQuery $query): void {
 		if (!empty($this->excludesTypes)) {
-			$query->andWhere(['NOT IN', IssuePayCalculation::tableName() . '.type', $this->excludesTypes]);
+			$query->andWhere(['NOT IN', IssuePayCalculation::tableName() . '.type_id', $this->excludesTypes]);
 		}
 	}
 

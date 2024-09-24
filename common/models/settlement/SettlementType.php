@@ -47,6 +47,33 @@ class SettlementType extends ActiveRecord {
 			->all();
 	}
 
+	public function isForIssueTypeId(int $type_id): bool {
+		if (empty($this->issueTypes)) {
+			return true;
+		}
+		foreach ($this->issueTypes as $issueType) {
+			if ($issueType->id === $type_id || in_array($type_id, $issueType->getAllChildesIds())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static ?array $MODELS = null;
+
+	/**
+	 * @param bool $refresh
+	 * @return static[] indexed by id
+	 */
+	public static function getModels(bool $refresh = false): array {
+		if (static::$MODELS === null || $refresh) {
+			static::$MODELS = static::find()
+				->indexBy('id')
+				->all();
+		}
+		return static::$MODELS;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -80,7 +107,7 @@ class SettlementType extends ActiveRecord {
 		}
 		$rows = [];
 		foreach ($typesIds as $id) {
-			if (is_int($id)) {
+			if (!empty($id)) {
 				$rows[] = [
 					'settlement_type_id' => $this->id,
 					'issue_type_id' => $id,

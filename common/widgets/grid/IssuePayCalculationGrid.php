@@ -91,8 +91,8 @@ class IssuePayCalculationGrid extends GridView {
 				'value' => 'issue.agent.fullName',
 			],
 			[
-				'attribute' => 'type',
-				'value' => 'typeName',
+				'attribute' => 'type_id',
+				'value' => 'type.name',
 				'filter' => $this->filterModel ? $this->filterModel::getTypesNames() : null,
 				'filterType' => static::FILTER_SELECT2,
 				'filterWidgetOptions' => [

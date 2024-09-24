@@ -21,21 +21,23 @@ class m240910_150844_settlement_types extends Migration {
 	 * {@inheritdoc}
 	 */
 	public function safeUp() {
-//		$this->createTable('{{%settlement_type}}', [
-//			'id' => $this->primaryKey(),
-//			'name' => $this->string()->notNull()->unique(),
-//			'is_active' => $this->boolean(),
-//			'visibility_status' => $this->smallInteger(),
-//			'options' => $this->json()->null(),
-//		]);
-//
-//		$this->alterColumn('{{%issue_pay_calculation}}', 'type', $this->integer()->notNull());
+		$this->createTable('{{%settlement_type}}', [
+			'id' => $this->primaryKey(),
+			'name' => $this->string()->notNull()->unique(),
+			'is_active' => $this->boolean(),
+			'visibility_status' => $this->smallInteger(),
+			'options' => $this->json()->null(),
+		]);
+
+		$this->renameColumn('{{%issue_pay_calculation}}', 'type', 'type_id');
+
+		$this->alterColumn('{{%issue_pay_calculation}}', 'type_id', $this->integer()->notNull());
 		$this->createLegacyTypes();
 
 		$this->addForeignKey(
 			'{{%fk_issue_pay_calculation_type}}',
 			'{{%issue_pay_calculation}}',
-			'type',
+			'type_id',
 			'{{%settlement_type}}',
 			'id', 'CASCADE', 'CASCADE');
 
@@ -80,11 +82,12 @@ class m240910_150844_settlement_types extends Migration {
 			'{{%issue_pay_calculation}}'
 		);
 		$this->dropTable('{{%settlement_type}}');
+		$this->renameColumn('{{%issue_pay_calculation}}', 'type_id', 'type');
 	}
 
 	protected function createLegacyTypes(): void {
 		$types = (new Query())
-			->select('type')
+			->select('type_id')
 			->from('{{%issue_pay_calculation}}')
 			->distinct()
 			->column();

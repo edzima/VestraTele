@@ -75,6 +75,7 @@ class SettlementTypeForm extends Model {
 		if (!$model->save()) {
 			return false;
 		}
+		Yii::warning($this->getIssueTypesIds());
 		$model->linkIssueTypes($this->getIssueTypesIds());
 		return $model->save();
 	}

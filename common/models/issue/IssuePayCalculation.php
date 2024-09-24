@@ -9,6 +9,7 @@ use common\models\issue\query\IssueQuery;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionQuery;
 use common\models\settlement\SettlementProviderInterface;
+use common\models\settlement\SettlementType;
 use common\models\user\User;
 use DateTime;
 use Decimal\Decimal;
@@ -26,7 +27,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property int $id
  * @property int $issue_id
- * @property int $type
+ * @property int $type_id
  * @property string $value
  * @property string $details
  * @property string $created_at
@@ -46,6 +47,7 @@ use yii\helpers\ArrayHelper;
  * @property-read IssueCost[] $costs
  * @property-read IssuePay[] $pays
  * @property-read IssueStage $stage
+ * @property-read SettlementType $type
  */
 class IssuePayCalculation extends ActiveRecord implements
 	IssueSettlement,
@@ -146,6 +148,7 @@ class IssuePayCalculation extends ActiveRecord implements
 			'payment_at' => Yii::t('common', 'Payment at'),
 			'value' => Yii::t('common', 'Value with VAT'),
 			'valueToPay' => Yii::t('common', 'Value to pay'),
+			'type_id' => Yii::t('common', 'Type'),
 			'type' => Yii::t('common', 'Type'),
 			'stage_id' => Yii::t('common', 'Stage'),
 			'stageName' => Yii::t('common', 'Stage'),
@@ -176,12 +179,12 @@ class IssuePayCalculation extends ActiveRecord implements
 		return $this->provider_type;
 	}
 
-	public function getType(): int {
-		return $this->type;
+	public function getTypeId(): int {
+		return $this->type_id;
 	}
 
 	public function getTypeName(): string {
-		return static::getTypesNames()[$this->type] ?? '';
+		return static::getTypesNames(false)[$this->type_id] ?? '';
 	}
 
 	public function getName(): string {
@@ -262,6 +265,10 @@ class IssuePayCalculation extends ActiveRecord implements
 
 	public function getOwner(): ActiveQuery {
 		return $this->hasOne(User::class, ['id' => 'owner_id']);
+	}
+
+	public function getType(): ActiveQuery {
+		return $this->hasOne(SettlementType::class, ['id' => 'type_id']);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
@@ -468,24 +475,14 @@ class IssuePayCalculation extends ActiveRecord implements
 		return static::$STAGES_NAMES;
 	}
 
-	public static function getTypesNames(): array {
-		return [
-			static::TYPE_HONORARIUM => Yii::t('settlement', 'Honorarium'),
-			static::TYPE_ENTRY_FEE => Yii::t('settlement', 'Entry fee'),
-			static::TYPE_HONORARIUM_VINDICATION => Yii::t('settlement', 'Honorarium - Vindication'),
-			static::TYPE_ADMINISTRATIVE => Yii::t('settlement', 'Administrative'),
-			static::TYPE_APPEAL => Yii::t('settlement', 'Appeal'),
-			static::TYPE_LAWYER => Yii::t('settlement', 'Lawyer'),
-			static::TYPE_APPEARANCE_OF_A_LAWYER => Yii::t('settlement', 'Appearance of Lawyer'),
-			static::TYPE_REQUEST_FOR_JUSTIFICATION => Yii::t('settlement', 'Request for Justification'),
-			static::TYPE_SUBSCRIPTION => Yii::t('settlement', 'Subscription'),
-			static::TYPE_DEBT => Yii::t('settlement', 'Debt'),
-			static::TYPE_INTEREST => Yii::t('settlement', 'Interest'),
-			static::TYPE_COST_REFUND_SELF => Yii::t('settlement', 'Cost Refund: Company'),
-			static::TYPE_COST_REFUND_LEGAL_REPRESANTION => Yii::t('settlement', 'Cost Refund: Legal represantion'),
-			static::TYPE_VAT => Yii::t('settlement', 'VAT'),
-			static::TYPE_EQUITY => Yii::t('settlement', 'Equity'),
-		];
+	public static function getTypesNames(bool $active = true): array {
+		$models = SettlementType::getModels();
+		if ($active) {
+			$models = array_filter($models, function (SettlementType $model) {
+				return $model->is_active;
+			});
+		}
+		return ArrayHelper::map($models, 'id', 'name');
 	}
 
 	public static function find(): IssuePayCalculationQuery {
