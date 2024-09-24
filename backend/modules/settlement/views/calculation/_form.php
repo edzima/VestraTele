@@ -51,8 +51,6 @@ $this->registerJs($js);
 			]
 		) ?>
 
-		<?= $form->field($model, 'type', ['options' => ['class' => 'col-md-2 col-lg-2']])->dropDownList(CalculationForm::getTypesNames()) ?>
-
 	</div>
 	<div class="row">
 		<?= $form->field($model, 'value', ['options' => ['class' => 'col-xs-9 col-md-2 col-lg-2']])->widget(NumberControl::class) ?>

@@ -271,7 +271,7 @@ class IssueProvisionType extends ProvisionType {
 	}
 
 	public function isForSettlement(IssueSettlement $settlement, string $issueUserType = null): bool {
-		return $this->isForSettlementType($settlement->getType())
+		return $this->isForSettlementType($settlement->getTypeId())
 			&& $this->isForIssue($settlement->getIssueModel())
 			&& $this->isForValue($settlement->getValue())
 			&& (!$issueUserType || $this->isForIssueUser($issueUserType));

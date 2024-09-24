@@ -28,6 +28,11 @@ class SettlementTypeQuery extends ActiveQuery {
 		return parent::one($db);
 	}
 
+	public function active(): self {
+		$this->andWhere(['is_active' => true]);
+		return $this;
+	}
+
 	public function forIssueTypes(array $ids): self {
 		if (!empty($ids)) {
 			$this->joinWith(['issueTypes IT']);

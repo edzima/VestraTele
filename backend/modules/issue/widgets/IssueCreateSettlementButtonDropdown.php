@@ -35,7 +35,11 @@ class IssueCreateSettlementButtonDropdown extends ButtonDropdown {
 	}
 
 	protected function defaultItems(): array {
-		$settlementTypes = SettlementType::findForIssueType($this->issue->getIssueTypeId());
+		$settlementTypes = array_filter(SettlementType::getModels(),
+			function (SettlementType $type) {
+				return $type->is_active
+					&& $type->isForIssueTypeId($this->issue->getIssueTypeId());
+			});
 		$items = [];
 		foreach ($settlementTypes as $type) {
 			$items[] = $this->settlementTypeItem($type);

@@ -13,11 +13,11 @@ use yii\db\ActiveQuery;
  */
 interface SettlementInterface extends PayedInterface {
 
-	public function getType(): int;
+	public function getTypeId(): int;
 
 	public function getTypeName(): string;
 
-	public static function getTypesNames(): array;
+	public static function getTypesNames(bool $active = true): array;
 
 	public function getValue(): Decimal;
 
