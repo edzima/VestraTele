@@ -203,5 +203,5 @@ return [
 	'Deadline: 1 Week' => 'Tydzień',
 	'Deadline: 2 Week' => '2 tygodnie',
 	'Deadline: 1 Month' => 'Miesiąc',
-
+	'Deadline: Last Day of Month' => 'Ostatni dzień miesiąca',
 ];

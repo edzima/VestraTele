@@ -80,10 +80,12 @@ class CalculationForm extends PayForm {
 	public function setType(SettlementType $type, bool $withTypeOptions): void {
 		$this->settlementType = $type;
 		$this->type_id = $type->id;
-		$this->setTypeOptions($type->getTypeOptions());
+		if ($withTypeOptions) {
+			$this->setTypeOptions($type->getTypeOptions());
+		}
 	}
 
-	public function setTypeOptions(SettlementTypeOptions $options): void {
+	protected function setTypeOptions(SettlementTypeOptions $options): void {
 		if ($options->vat) {
 			$this->vat = $options->vat;
 		}
@@ -92,6 +94,9 @@ class CalculationForm extends PayForm {
 		}
 		if ($options->provider_type) {
 			$this->providerType = $options->provider_type;
+		}
+		if ($options->deadline_range) {
+			$this->deadline_at = date($this->dateFormat, strtotime($options->deadline_range));
 		}
 	}
 

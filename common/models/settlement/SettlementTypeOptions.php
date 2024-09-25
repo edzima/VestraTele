@@ -12,6 +12,7 @@ class SettlementTypeOptions extends Model {
 	public const DEADLINE_1_WEEK = '+1 week';
 	public const DEADLINE_2_WEEK = '+2 weeks';
 	public const DEADLINE_1_MONTH = '+3 month';
+	public const DEADLINE_LAST_DAY_OF_MONTH = 'last day of this month';
 	public ?string $default_value = null;
 	public ?string $vat = null;
 	public ?int $provider_type = null;
@@ -70,7 +71,7 @@ class SettlementTypeOptions extends Model {
 			static::DEADLINE_1_WEEK => Yii::t('settlement', 'Deadline: 1 Week'),
 			static::DEADLINE_2_WEEK => Yii::t('settlement', 'Deadline: 2 Week'),
 			static::DEADLINE_1_MONTH => Yii::t('settlement', 'Deadline: 1 Month'),
-
+			static::DEADLINE_LAST_DAY_OF_MONTH => Yii::t('settlement', 'Deadline: Last Day of Month'),
 		];
 	}
 
