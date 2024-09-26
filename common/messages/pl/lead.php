@@ -529,4 +529,5 @@ return [
 	'Deal Contracts Costs' => 'Koszty Umów',
 	'Cost Value (range)' => 'Koszt (okres)',
 	'Excluded Sources' => 'Wykluczone Źródła',
+	'From Campaigns' => 'Z Kampanii',
 ];

@@ -52,6 +52,8 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public $withAddress;
 
+	public $fromCampaigns;
+
 	public $name = '';
 	public $user_id;
 	public $user_type;
@@ -122,10 +124,11 @@ class LeadSearch extends Lead implements SearchModel {
 					'fromMarket', 'withoutUser', 'withoutReport', 'withoutArchives', 'duplicatePhone',
 					'duplicateEmail', 'withAddress', 'onlyWithEmail', 'onlyWithPhone', 'onlyWithCosts',
 					'campaignWithChildes',
+					'fromCampaigns',
 				], 'boolean',
 			],
 			[['name', 'data'], 'string', 'min' => 3],
-			[['duplicatePhone', 'fromMarket', 'selfUserId', 'onlyWithEmail', 'onlyWithPhone',], 'default', 'value' => null],
+			[['duplicatePhone', 'fromMarket', 'selfUserId', 'onlyWithEmail', 'onlyWithPhone', 'fromCampaigns'], 'default', 'value' => null],
 			[['date_at', 'data', 'phone', 'email', 'postal_code', 'provider', 'answers', 'closedQuestions', 'excludedClosedQuestions', 'gridQuestions', 'user_type', 'reportsDetails'], 'safe'],
 			['source_id', 'in', 'range' => array_keys($this->getSourcesNames()), 'allowArray' => true],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
@@ -167,6 +170,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'reportStatusCount' => Yii::t('lead', 'Report Status Count'),
 				'hoursAfterLastReport' => Yii::t('lead', 'Hours after newest Report'),
 				'onlyWithCosts' => Yii::t('lead', 'Only with Costs'),
+				'fromCampaigns' => Yii::t('lead', 'From Campaigns'),
 			]
 		);
 	}
@@ -775,7 +779,19 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 	}
 
+	protected function applyWithoutCampaignFilter(LeadQuery $query): void {
+		if ($this->fromCampaigns === null || $this->fromCampaigns === '') {
+			return;
+		}
+		if ($this->fromCampaigns) {
+			$query->andWhere(['IS NOT', Lead::tableName() . '.campaign_id', null]);
+		} else {
+			$query->andWhere([Lead::tableName() . '.campaign_id' => null]);
+		}
+	}
+
 	protected function applyCampaignFilter(LeadQuery $query): void {
+		$this->applyWithoutCampaignFilter($query);
 		if (!empty($this->campaign_id)) {
 			$ids = [];
 			foreach ($this->campaign_id as $id) {
@@ -787,7 +803,6 @@ class LeadSearch extends Lead implements SearchModel {
 				}
 			}
 			$ids = array_unique($ids);
-			Yii::warning($ids);
 			$query->andFilterWhere([Lead::tableName() . '.campaign_id' => $ids]);
 		}
 	}
