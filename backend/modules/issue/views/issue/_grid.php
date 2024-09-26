@@ -173,6 +173,7 @@ $this->registerJs($js);
 				'pluginOptions' => [
 					'allowClear' => true,
 					'dropdownAutoWidth' => true,
+					'multiple' => true,
 				],
 			],
 		],
