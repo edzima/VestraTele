@@ -18,7 +18,7 @@ class CalculationForm extends PayForm {
 
 	private Issue $issue;
 	private int $owner;
-	private int $type_id;
+	public int $type_id;
 
 	public ?int $providerType = null;
 	public $costs_ids = [];
@@ -46,9 +46,9 @@ class CalculationForm extends PayForm {
 
 	public function rules(): array {
 		return array_merge([
-			[['!type_id', '!owner_d',], 'required'],
+			[['!type_id'], 'required'],
 			[['providerType',], 'required'],
-			[['owner', 'type', 'providerType', 'entityProviderId'], 'integer'],
+			[['owner', 'type_id', 'providerType', 'entityProviderId'], 'integer'],
 			[
 				'entityProviderId', 'required', 'when' => function () {
 				return $this->providerType === static::PROVIDER_TYPE_RESPONSIBLE_ENTITY;
