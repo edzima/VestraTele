@@ -229,7 +229,7 @@ use yii\widgets\ActiveForm;
 
 	</div>
 	<div class="row">
-		<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+		<?= $form->field($model, 'tagsIds', ['options' => ['class' => 'col-md-5']])->widget(Select2::class, [
 			'data' => IssueSearch::getTagsNames(),
 			'options' => [
 				'multiple' => true,
@@ -241,7 +241,7 @@ use yii\widgets\ActiveForm;
 			'showToggleAll' => true,
 		]) ?>
 
-		<?= $form->field($model, 'excludedTagsIds', ['options' => ['class' => 'col-md-6']])->widget(Select2::class, [
+		<?= $form->field($model, 'excludedTagsIds', ['options' => ['class' => 'col-md-5']])->widget(Select2::class, [
 			'data' => IssueSearch::getTagsNames(),
 			'options' => [
 				'multiple' => true,
@@ -253,6 +253,8 @@ use yii\widgets\ActiveForm;
 			'showToggleAll' => true,
 		]) ?>
 
+
+		<?= $form->field($model, 'withoutTags', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
 	</div>
 

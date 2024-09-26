@@ -139,6 +139,7 @@ return array_merge([
 	'Excluded stages' => 'Wykluczone etapy',
 	'Excluded types' => 'Wykluczone typy',
 	'Excluded tags' => 'Wykluczone tagi',
+	'Without Tags' => 'Bez tagów',
 	'Only with Telemarketers' => 'Z konsultantem',
 	'Telemarketer - Self' => 'Konsultant (własny)',
 	'Archive is Excluded. Check in them.' => 'Archiwum jest wykluczone. Sprawdź w nim',

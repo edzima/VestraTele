@@ -93,6 +93,8 @@ abstract class IssueSearch extends Model
 	public $note_stage_change_from_at;
 	public $note_stage_change_to_at;
 
+	public $withoutTags;
+
 	public const SUMMON_ALL_REALIZED = 'all-realized';
 	public const SUMMON_SOME_ACTIVE = 'some-active';
 
@@ -175,8 +177,8 @@ abstract class IssueSearch extends Model
 			},
 			],
 			[['details'], 'string'],
-			[['onlyWithTelemarketers'], 'boolean'],
-			[['onlyWithTelemarketers'], 'default', 'value' => null],
+			[['onlyWithTelemarketers', 'withoutTags'], 'boolean'],
+			[['onlyWithTelemarketers', 'withoutTags'], 'default', 'value' => null],
 			['noteFilter', 'string'],
 			[
 				[
@@ -228,6 +230,7 @@ abstract class IssueSearch extends Model
 			'signedAtTo' => Yii::t('issue', 'Signed At to'),
 			'tagsIds' => Yii::t('issue', 'Tags'),
 			'excludedTagsIds' => Yii::t('issue', 'Excluded tags'),
+			'withoutTags' => Yii::t('issue', 'Without Tags'),
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 			'userName' => Yii::t('issue', 'First name & surname'),
 			'userType' => Yii::t('issue', 'Who'),
@@ -602,6 +605,11 @@ abstract class IssueSearch extends Model
 	}
 
 	private function applyTagsFilter(IssueQuery $query): void {
+		if ($this->withoutTags) {
+			$query->joinWith('tags', false);
+			$query->andWhere([IssueTag::tableName() . '.id' => null]);
+			return;
+		}
 		if (!empty($this->tagsIds)) {
 			$query->joinWith('tags');
 			$query->distinct();
