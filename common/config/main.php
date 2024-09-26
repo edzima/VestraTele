@@ -2,7 +2,6 @@
 
 use common\behaviors\GlobalAccessBehavior;
 use common\components\callpage\CallPageClient;
-use common\components\DbManager;
 use common\components\Formatter;
 use common\components\HierarchyComponent;
 use common\components\IssueTypeUser;
@@ -11,6 +10,7 @@ use common\components\message\MessageTemplateManager;
 use common\components\PayComponent;
 use common\components\postal\PocztaPolska;
 use common\components\provision\Provisions;
+use common\components\rbac\DbManager;
 use common\components\TaxComponent;
 use common\models\user\User;
 use common\models\user\Worker;

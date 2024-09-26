@@ -2,7 +2,7 @@
 
 namespace common\models\user\query;
 
-use common\components\DbManager;
+use common\components\rbac\DbManager;
 use common\models\user\Customer;
 use common\models\user\User;
 use common\models\user\Worker;
