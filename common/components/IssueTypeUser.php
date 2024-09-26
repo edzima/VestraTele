@@ -2,18 +2,18 @@
 
 namespace common\components;
 
+use common\components\rbac\ParentsManagerInterface;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use Yii;
 use yii\base\Component;
 use yii\di\Instance;
 use yii\rbac\Item;
-use yii\rbac\ManagerInterface;
 
 class IssueTypeUser extends Component {
 
 	/**
-	 * @var string|array|ManagerInterface
+	 * @var string|array|ParentsManagerInterface
 	 */
 	public $auth = 'authManager';
 
@@ -21,7 +21,7 @@ class IssueTypeUser extends Component {
 
 	public function init(): void {
 		parent::init();
-		$this->auth = Instance::ensure($this->auth, ManagerInterface::class);
+		$this->auth = Instance::ensure($this->auth, ParentsManagerInterface::class);
 	}
 
 	public function ensurePermission(int $typeId): bool {
@@ -35,7 +35,7 @@ class IssueTypeUser extends Component {
 	}
 
 	public function removeFromParents(int $typeId): int {
-		return $this->auth->removeFromParents($this->getPermissionName($typeId));
+		return $this->auth->removeChildFromParents($this->getPermissionName($typeId));
 	}
 
 	public function addChild(Item $parent, int $typeId): bool {

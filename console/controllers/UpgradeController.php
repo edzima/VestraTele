@@ -3,7 +3,7 @@
 namespace console\controllers;
 
 use backend\modules\settlement\models\CalculationProblemStatusForm;
-use common\components\DbManager;
+use common\components\rbac\DbManager;
 use common\helpers\StringHelper;
 use common\models\CalendarNews;
 use common\models\issue\IssueNote;

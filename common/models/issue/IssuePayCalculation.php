@@ -235,8 +235,12 @@ class IssuePayCalculation extends ActiveRecord implements
 	}
 
 	public function isForUser(int $id): bool {
-		return $this->owner_id === $id ||
-			$this->issue->isForUser($id);
+		return $this->isOwner($id)
+			|| $this->issue->isForUser($id);
+	}
+
+	public function isOwner(int $id): bool {
+		return $this->owner_id === $id;
 	}
 
 	public function getProvisionsSum(): Decimal {

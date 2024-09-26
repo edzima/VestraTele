@@ -2,6 +2,9 @@
 
 namespace common\models\settlement;
 
+use common\components\rbac\ModelAccess;
+use common\components\rbac\ModelRbacInterface;
+use common\components\rbac\SettlementTypeAccess;
 use common\helpers\ArrayHelper;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueType;
@@ -23,10 +26,9 @@ use yii\helpers\Json;
  * @property IssuePayCalculation[] $issuePayCalculations
  * @property IssueType[] $issueTypes
  */
-class SettlementType extends ActiveRecord {
+class SettlementType extends ActiveRecord implements ModelRbacInterface {
 
-	public const VISIBILITY_ONLY_OWNER = 10;
-	public const VISIBILITY_OLNY_BOOKEEPER = 20;
+	public const VISIBILITY_ONLY_BOOKEEPER = 20;
 	public const VISIBILITY_ISSUE_USERS = 30;
 	public const VISIBILITY_ISSUE_ACCESS = 40;
 
@@ -161,8 +163,7 @@ class SettlementType extends ActiveRecord {
 
 	public static function visibilityNames(): array {
 		return [
-			static::VISIBILITY_ONLY_OWNER => Yii::t('settlement', 'Visibility: Owner'),
-			static::VISIBILITY_OLNY_BOOKEEPER => Yii::t('settlement', 'Visibility: Bookeper'),
+			static::VISIBILITY_ONLY_BOOKEEPER => Yii::t('settlement', 'Visibility: Bookeper'),
 			static::VISIBILITY_ISSUE_USERS => Yii::t('settlement', 'Visibility: Issue Users'),
 			static::VISIBILITY_ISSUE_ACCESS => Yii::t('settlement', 'Visibility: Issue Access'),
 		];
@@ -172,4 +173,23 @@ class SettlementType extends ActiveRecord {
 		return new SettlementTypeQuery(static::class);
 	}
 
+	public function hasAccess(string|int $id, string $action): bool {
+		return $this->getModelRbac()
+			->setAction($action)
+			->hasAccess($id);
+	}
+
+	public function getRbacName(): string {
+		return $this->isNewRecord
+			? Yii::t('settlement', 'Settlement Types')
+			: Yii::t('settlement', 'Settlement Type: {name}', ['name' => $this->name]);
+	}
+
+	public function getRbacId(): ?string {
+		return $this->id;
+	}
+
+	public function getModelRbac(): ModelAccess {
+		return new SettlementTypeAccess($this);
+	}
 }
