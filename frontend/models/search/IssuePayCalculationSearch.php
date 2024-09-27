@@ -2,6 +2,7 @@
 
 namespace frontend\models\search;
 
+use common\models\issue\IssuePayCalculation;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\settlement\search\IssuePayCalculationSearch as BaseIssuePayCalculationSearch;
 use common\models\user\User;
@@ -13,6 +14,16 @@ class IssuePayCalculationSearch extends BaseIssuePayCalculationSearch {
 
 	public $problem_status = self::PROBLEM_STATUS_NONE;
 	public bool $onlyToPayed = true;
+
+	public $excludesTypes = [
+		IssuePayCalculation::TYPE_COST_REFUND_LEGAL_REPRESANTION,
+	];
+
+	public function rules(): array {
+		return array_merge([
+			['!excludesTypes', 'required'],
+		], parent::rules());
+	}
 
 	public function getAgentsNames(): array {
 		if (count($this->issueUsersIds) > 1) {
