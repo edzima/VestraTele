@@ -2,6 +2,7 @@
 
 use backend\modules\settlement\widgets\IssueCostActionColumn;
 use common\assets\TooltipAsset;
+use common\helpers\Html;
 use common\helpers\Url;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
@@ -19,7 +20,6 @@ use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\IssueColumn;
 use common\widgets\GridView;
-use yii\bootstrap\Html;
 use yii\data\ActiveDataProvider;
 
 /* @var $this yii\web\View */
@@ -220,85 +220,100 @@ use yii\data\ActiveDataProvider;
 			<p>
 
 			</p>
-			<?= IssueUsersWidget::widget([
-				'model' => $model,
-				'type' => IssueUsersWidget::TYPE_WORKERS,
-				'legendEncode' => !$usersLinks,
-				'withCheckEmailVisibility' => $userMailVisibilityCheck,
-				'legend' => static function (IssueUser $issueUser) use ($usersLinks): string {
-					$legend = $issueUser->getTypeWithUser();
-					if ($usersLinks) {
-						$legend = Html::a($legend,
-							['/user/worker/view', 'id' => $issueUser->user_id]);
-					}
-					return $legend;
-				},
-				'afterLegend' => static function (IssueUser $issueUser) use ($usersLinks): string {
-					if (!$usersLinks) {
-						return '';
-					}
-					$content = Html::beginTag('span', ['class' => 'pull-right form-group']);
-					if (Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)) {
-						$content .= Html::a('<i class="fa fa-money" aria-hidden="true"></i>',
-							[
-								'/settlement/cost/create-installment',
-								'id' => $issueUser->issue_id,
-								'user_id' => $issueUser->user_id,
-							], [
-								'class' => 'btn btn-success btn-xs',
-								'title' => Yii::t('settlement', 'Create Installment'),
-								'aria-label' => Yii::t('settlement', 'Create Installment'),
-							]);
-					}
 
-					if (Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER)) {
-						$content .= ' ' . Html::a(Html::icon('pencil'),
-								[
-									'/issue/user/update-type',
-									'issueId' => $issueUser->issue_id,
-									'userId' => $issueUser->user_id,
-									'type' => $issueUser->type,
-								],
-								[
-									'class' => 'btn btn-xs btn-primary',
-									'title' => Yii::t('common', 'Update'),
-									'aria-label' => Yii::t('common', 'Update'),
-								]);
+			<?= GridView::widget([
+				'dataProvider' => IssueUsersWidget::usersDataProvider($model, IssueUsersWidget::TYPE_WORKERS),
+				'summary' => false,
+				'columns' => [
+					[
+						'attribute' => 'typeWithUser',
+						'label' => Yii::t('issue', 'Workers'),
+					],
+					[
+						'attribute' => 'user.email',
+						'format' => 'email',
+						'visible' => function (IssueUser $model): bool {
+							return !$model->user->profile->email_hidden_in_frontend_issue;
+						},
+					],
+					[
+						'attribute' => 'user.phone',
+						'format' => 'tel',
+						'label' => Yii::t('issue', 'Phone'),
+					],
+					[
+						'class' => ActionColumn::class,
+						'visible' => $usersLinks,
+						'template' => '{view} {create-installment} {link-user} {delete}',
+						'buttons' => [
+							'view' => function ($url, IssueUser $model): string {
+								if (!Yii::$app->user->can(Worker::PERMISSION_WORKERS)) {
+									return '';
+								}
+								return Html::a(Html::icon('eye-open'),
+									['/user/worker/view', 'id' => $model->user_id]
+								);
+							},
+							'create-installment' => function ($url, IssueUser $model): string {
+								if (!Yii::$app->user->can(Worker::PERMISSION_COST)) {
+									return '';
+								}
+								return Html::a(Html::faicon('money'),
+									[
+										'/settlement/cost/create-installment',
+										'id' => $model->issue_id,
+										'user_id' => $model->user_id,
+									], [
+										'title' => Yii::t('settlement', 'Create Installment'),
+										'aria-label' => Yii::t('settlement', 'Create Installment'),
+									]
+								);
+							},
+							'link-user' => function ($url, IssueUser $model): string {
+								if (!Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER)) {
+									return '';
+								}
+								return Html::a(Html::icon('pencil'),
+									[
+										'/issue/user/update-type',
+										'issueId' => $model->issue_id,
+										'userId' => $model->user_id,
+										'type' => $model->type,
+									],
+									[
+										'title' => Yii::t('common', 'Update'),
+										'aria-label' => Yii::t('common', 'Update'),
+									]);
+							},
+							'delete' => function ($url, IssueUser $model): string {
+								if (!Yii::$app->user->can(Worker::PERMISSION_ISSUE_LINK_USER) || $model->type === IssueUser::TYPE_AGENT) {
+									return '';
+								}
 
-						$requiredTypes = [
-							IssueUser::TYPE_AGENT,
-							IssueUser::TYPE_LAWYER,
-						];
-						if (!in_array($issueUser->type, $requiredTypes)) {
-							$content .= ' ' . Html::a(Html::icon('trash'),
+								return Html::a(Html::icon('trash'),
 									[
 										'/issue/user/delete',
-										'issueId' => $issueUser->issue_id,
-										'userId' => $issueUser->user_id,
-										'type' => $issueUser->type,
+										'issueId' => $model->issue_id,
+										'userId' => $model->user_id,
+										'type' => $model->type,
 									], [
-
-										'class' => 'btn btn-xs btn-danger',
 										'data-method' => 'POST',
 										'title' => Yii::t('common', 'Delete'),
 										'aria-label' => Yii::t('common', 'Delete'),
 										'data-confirm' => Yii::t('backend', 'Are you sure you want to delete this item?'),
 									]);
-						}
-					}
-					$content .= Html::endTag('span');
-
-					return $content;
-				},
+							},
+						],
+					],
+				],
 			]) ?>
+
 		</div>
 		<div class="col-md-5 col-lg-6">
 
 
 			<?= GridView::widget([
-				'dataProvider' => new ActiveDataProvider([
-					'query' => $model->getIssueModel()->getLawsuits(),
-				]),
+				'dataProvider' => new ActiveDataProvider(['query' => $model->getIssueModel()->getLawsuits(),]),
 				'showOnEmpty' => false,
 				'emptyText' => '',
 				'summary' => '',
@@ -316,9 +331,7 @@ use yii\data\ActiveDataProvider;
 						'format' => 'html',
 						'value' => function (Lawsuit $lawsuit) use ($lawsuitActionColumn): string {
 							if ($lawsuitActionColumn) {
-								return Html::a(Html::encode($lawsuit->court->name), [
-									'/court/court/view', 'id' => $lawsuit->court_id,
-								]);
+								return Html::a(Html::encode($lawsuit->court->name), ['/court/court/view', 'id' => $lawsuit->court_id,]);
 							}
 							return $lawsuit->court->name;
 						},
@@ -346,9 +359,7 @@ use yii\data\ActiveDataProvider;
 					'caption' => Yii::t('settlement', 'Costs')
 						. ($costRoute
 							?
-							Html::a(Html::icon('plus'), [$costRoute . '/create', 'id' => $model->id], [
-								'class' => 'btn btn-warning pull-right',
-							])
+							Html::a(Html::icon('plus'), [$costRoute . '/create', 'id' => $model->id], ['class' => 'btn btn-warning pull-right',])
 							: ''),
 					'summary' => '',
 					'emptyText' => '',
@@ -387,9 +398,7 @@ use yii\data\ActiveDataProvider;
 
 			<?= FieldsetDetailView::widget([
 				'legend' => Yii::t('common', 'Issue details'),
-				'legendOptions' => [
-					'encode' => false,
-				],
+				'legendOptions' => ['encode' => false,],
 				'afterLegend' => IssueTagsWidget::widget([
 					'position' => IssueTagsWidget::POSITION_ISSUE_DETAIL_BEFORE,
 					'models' => $model->tags,
@@ -404,9 +413,7 @@ use yii\data\ActiveDataProvider;
 				'detailConfig' => [
 					'id' => 'base-details',
 					'model' => $model,
-					'options' => [
-						'class' => 'table table-striped table-bordered detail-view th-nowrap',
-					],
+					'options' => ['class' => 'table table-striped table-bordered detail-view th-nowrap',],
 					'attributes' => [
 						[
 							'attribute' => 'signature_act',
@@ -417,15 +424,11 @@ use yii\data\ActiveDataProvider;
 							'label' => Yii::t('common', 'Created at / Updated at'),
 							'value' => function (Issue $model): string {
 								$content = Html::tag('span',
-									Yii::$app->formatter->asDate($model->created_at), [
-										TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::$app->formatter->asTime($model->created_at),
-									]
+									Yii::$app->formatter->asDate($model->created_at), [TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::$app->formatter->asTime($model->created_at),]
 								);
 								$content .= ' / ';
 								$content .= Html::tag('strong',
-									Yii::$app->formatter->asDate($model->updated_at), [
-										TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::$app->formatter->asTime($model->updated_at),
-									]
+									Yii::$app->formatter->asDate($model->updated_at), [TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::$app->formatter->asTime($model->updated_at),]
 								);
 								return $content;
 							},
@@ -475,7 +478,6 @@ use yii\data\ActiveDataProvider;
 									Html::encode($model->entityResponsible->name), $entityUrl
 								)
 								: $model->entityResponsible->name,
-
 						],
 						[
 							'label' => Yii::t('issue', 'Entity Agreement'),
@@ -491,7 +493,6 @@ use yii\data\ActiveDataProvider;
 								return implode("\n", $content);
 							},
 							'visible' => !empty($model->entity_agreement_at) || !empty($model->entity_agreement_details),
-
 						],
 
 						'signing_at:date',
@@ -505,18 +506,14 @@ use yii\data\ActiveDataProvider;
 							'format' => 'html',
 							'visible' => !empty($model->details),
 						],
-
 					],
-
 				],
 			]) ?>
 
 
 
 			<?= GridView::widget([
-				'dataProvider' => new ActiveDataProvider([
-					'query' => $model->getClaims(),
-				]),
+				'dataProvider' => new ActiveDataProvider(['query' => $model->getClaims(),]),
 				'summary' => '',
 				'caption' => Yii::t('issue', 'Issue Claims'),
 				'emptyText' => '',
@@ -539,18 +536,14 @@ use yii\data\ActiveDataProvider;
 			]) ?>
 
 
-			<?= IssueFileGrid::widget([
-				'model' => $model,
-			])
+			<?= IssueFileGrid::widget(['model' => $model,])
 			?>
 
 
 
 			<?=
 			GridView::widget([
-				'dataProvider' => new ActiveDataProvider([
-					'query' => $model->getIssueModel()->getShipmentsPocztaPolska(),
-				]),
+				'dataProvider' => new ActiveDataProvider(['query' => $model->getIssueModel()->getShipmentsPocztaPolska(),]),
 				'showOnEmpty' => false,
 				'summary' => '',
 				'caption' => Yii::t('issue', 'Issue Shipment Poczta Polska'),
@@ -565,9 +558,7 @@ use yii\data\ActiveDataProvider;
 							return Html::a(
 								Html::encode($model->shipment_number),
 								Yii::$app->pocztaPolska->externalTrackingUrl($model->shipment_number),
-								[
-									'target' => '_blank',
-								]
+								['target' => '_blank',]
 							);
 						},
 					],
@@ -593,9 +584,7 @@ use yii\data\ActiveDataProvider;
 								]);
 								return Html::a(
 									Html::icon('refresh'),
-									$url, [
-										'data-method' => 'POST',
-									]
+									$url, ['data-method' => 'POST',]
 								);
 							},
 						],

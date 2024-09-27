@@ -7,12 +7,14 @@ use Closure;
 use common\assets\CopyToClipboardAsset;
 use common\assets\TooltipAsset;
 use common\models\issue\Issue;
+use common\models\issue\IssueInterface;
 use common\models\issue\IssueUser;
 use common\models\user\User;
 use common\widgets\FieldsetDetailView;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
+use yii\data\ArrayDataProvider;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -116,6 +118,17 @@ class IssueUsersWidget extends Widget {
 		}
 		$content[] = Html::endTag('div');
 		return implode("\n", $content);
+	}
+
+	public static function usersDataProvider(IssueInterface $model, string $type): ArrayDataProvider {
+		$widget = new static([
+			'model' => $model,
+			'type' => $type,
+		]);
+
+		return new ArrayDataProvider([
+			'allModels' => $widget->getUsers(),
+		]);
 	}
 
 	/**
