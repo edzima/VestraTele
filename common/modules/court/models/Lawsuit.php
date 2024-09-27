@@ -197,4 +197,11 @@ class Lawsuit extends ActiveRecord {
 		];
 	}
 
+	public function isAfterDueAt(): ?bool {
+		if (empty($this->due_at)) {
+			return null;
+		}
+		return strtotime($this->due_at) < strtotime('now');
+	}
+
 }

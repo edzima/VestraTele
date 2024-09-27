@@ -62,6 +62,18 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 		<span class="pull-right">
 
+					<?= Yii::$app->user->can(Worker::PERMISSION_COST)
+						? Html::a(
+							Html::faicon('money'),
+							['/settlement/cost/create', 'id' => $model->id],
+							[
+								'class' => 'btn btn-warning',
+								'title' => Yii::t('settlement', 'Create Cost'),
+								'aria-label' => Yii::t('settlement', 'Create Cost'),
+							])
+						: ''
+					?>
+
 					<?= Html::a(
 						Html::faicon('pencil'),
 						['update', 'id' => $model->id],

@@ -18,6 +18,9 @@ class IssueFileGrid extends GridView {
 
 	public $summary = false;
 
+	public $showOnEmpty = false;
+	public $emptyText = '';
+
 	public function init(): void {
 		if (empty($this->caption)) {
 			$this->caption = Yii::t('issue', 'Files');

@@ -29,6 +29,7 @@ trait IssueTagsColumnTrait {
 			}
 		}
 		if (!empty($models)) {
+			$this->format = 'raw';
 			$this->tooltip = true;
 		}
 		return IssueTagsWidget::widget([

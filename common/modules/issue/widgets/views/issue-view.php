@@ -41,6 +41,102 @@ use yii\data\ActiveDataProvider;
 	<div class="row">
 		<div class="col-md-7 col-lg-6">
 
+
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getLinkedIssues()
+						->with('customer')
+						->with('tags')
+						->with('tags.tagType'),
+				]),
+				'summary' => '',
+				'emptyText' => '',
+				'showOnEmpty' => false,
+				'columns' => [
+					[
+						'class' => IssueColumn::class,
+						'viewBaseUrl' => 'view',
+						'tags' => static function (IssueInterface $issue): array {
+							return IssueTagType::linkIssuesGridPositionFilter(
+								$issue->getIssueModel()->tags,
+								IssueTagType::LINK_ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM
+							);
+						},
+					],
+					[
+						'label' => Yii::t('issue', 'Type'),
+						'attribute' => 'typeName',
+					],
+					[
+						'label' => Yii::t('issue', 'Stage'),
+						'format' => 'raw',
+						'value' => function (IssueInterface $issue): string {
+							return Html::tag(
+								'span',
+								Html::encode($issue->getIssueModel()->getStageName()),
+								[TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::$app->formatter->asDate($issue->getIssueModel()->stage_change_at)]
+							);
+						},
+					],
+					[
+						'label' => Yii::t('issue', 'Stage Deadline At'),
+						'format' => 'date',
+						'attribute' => 'stage_deadline_at',
+					],
+					[
+						'class' => CustomerDataColumn::class,
+						'value' => 'customer.fullName',
+						'tags' => static function (IssueInterface $issue): array {
+							return IssueTagType::linkIssuesGridPositionFilter(
+								$issue->getIssueModel()->tags,
+								IssueTagType::LINK_ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM
+							);
+						},
+					],
+					[
+						'class' => ActionColumn::class,
+						'controller' => '/issue/relation',
+						'template' => '{tags} {update} {delete}',
+						'visible' => $relationActionColumn,
+						'buttons' => [
+							'tags' => function (string $url): string {
+								return Html::a(Html::icon('tags'), $url, [
+									'title' => Yii::t('issue', 'Tags'),
+									'aria-label' => Yii::t('issue', 'Tags'),
+								]);
+							},
+							'delete' => function (string $url): string {
+								return Html::a(Html::icon('remove'), $url, [
+									'title' => Yii::t('issue', 'Unlink'),
+									'aria-label' => Yii::t('issue', 'Unlink'),
+									'data-method' => 'POST',
+								]);
+							},
+						],
+						'urlCreator' => static function (string $action, IssueInterface $issue) use ($model): string {
+							switch ($action) {
+								case 'delete':
+									return Url::to([
+										'/issue/relation/delete',
+										'id' => $model->getIssueRelationId($issue->getIssueId()),
+										'returnUrl' => Url::current(),
+									]);
+								case 'update':
+									return Url::to(['/issue/issue/update', 'id' => $issue->getIssueId()]);
+								case 'tags':
+									return Url::to([
+										'/issue/tag/issue',
+										'issueId' => $issue->getIssueId(),
+										'returnUrl' => Url::current(),
+									]);
+							}
+							return '';
+						},
+					],
+				],
+			]) ?>
+
+
 			<span class="pull-right">
 				<?= IssueTagsWidget::widget([
 					'containerTag' => 'span',
@@ -198,6 +294,47 @@ use yii\data\ActiveDataProvider;
 		</div>
 		<div class="col-md-5 col-lg-6">
 
+
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getIssueModel()->getLawsuits(),
+				]),
+				'showOnEmpty' => false,
+				'emptyText' => '',
+				'summary' => '',
+				'caption' => Yii::t('court', 'Lawsuits'),
+				'rowOptions' => function (Lawsuit $model): array {
+					$options = [];
+					if ($model->isAfterDueAt()) {
+						Html::addCssClass($options, 'half-transparent');
+					}
+					return $options;
+				},
+				'columns' => [
+					[
+						'attribute' => 'court_id',
+						'format' => 'html',
+						'value' => function (Lawsuit $lawsuit) use ($lawsuitActionColumn): string {
+							if ($lawsuitActionColumn) {
+								return Html::a(Html::encode($lawsuit->court->name), [
+									'/court/court/view', 'id' => $lawsuit->court_id,
+								]);
+							}
+							return $lawsuit->court->name;
+						},
+					],
+					'signature_act',
+					'due_at:datetime',
+					'locationName',
+					'presenceOfTheClaimantName',
+					[
+						'class' => ActionColumn::class,
+						'controller' => '/court/lawsuit',
+						'visible' => $lawsuitActionColumn,
+					],
+				],
+			]) ?>
+
 			<?php
 			if (Yii::$app->user->can(User::PERMISSION_COST)) {
 				$costDataProvider = new ActiveDataProvider([
@@ -215,6 +352,7 @@ use yii\data\ActiveDataProvider;
 							: ''),
 					'summary' => '',
 					'emptyText' => '',
+					'showOnEmpty' => false,
 					'showPageSummary' => $costDataProvider->totalCount > 1,
 					'columns' => [
 						[
@@ -244,125 +382,7 @@ use yii\data\ActiveDataProvider;
 			?>
 
 
-			<?= GridView::widget([
-				'dataProvider' => new ActiveDataProvider([
-					'query' => $model->getLinkedIssues()
-						->with('customer')
-						->with('tags')
-						->with('tags.tagType'),
-				]),
-				'summary' => '',
-				'caption' => Yii::t('issue', 'Linked'),
-				'emptyText' => '',
-				'showOnEmpty' => false,
-				'columns' => [
-					[
-						'class' => IssueColumn::class,
-						'viewBaseUrl' => 'view',
-						'tags' => static function (IssueInterface $issue): array {
-							return IssueTagType::linkIssuesGridPositionFilter(
-								$issue->getIssueModel()->tags,
-								IssueTagType::LINK_ISSUES_GRID_POSITION_COLUMN_ISSUE_BOTTOM
-							);
-						},
-					],
-					[
-						'label' => Yii::t('issue', 'Type'),
-						'attribute' => 'typeName',
-					],
-					[
-						'label' => Yii::t('issue', 'Stage'),
-						'format' => 'raw',
-						'value' => function (IssueInterface $issue): string {
-							return Html::tag(
-								'span',
-								Html::encode($issue->getIssueModel()->getStageName()),
-								[TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Yii::$app->formatter->asDate($issue->getIssueModel()->stage_change_at)]
-							);
-						},
-					],
-					[
-						'label' => Yii::t('issue', 'Stage Deadline At'),
-						'format' => 'date',
-						'attribute' => 'stage_deadline_at',
-					],
-					[
-						'class' => CustomerDataColumn::class,
-						'value' => 'customer.fullName',
-						'tags' => static function (IssueInterface $issue): array {
-							return IssueTagType::linkIssuesGridPositionFilter(
-								$issue->getIssueModel()->tags,
-								IssueTagType::LINK_ISSUES_GRID_POSITION_COLUMN_CUSTOMER_BOTTOM
-							);
-						},
-					],
-					[
-						'class' => ActionColumn::class,
-						'controller' => '/issue/relation',
-						'template' => '{tags} {update} {delete}',
-						'visible' => $relationActionColumn,
-						'buttons' => [
-							'tags' => function (string $url): string {
-								return Html::a(Html::icon('tags'), $url, [
-									'title' => Yii::t('issue', 'Tags'),
-									'aria-label' => Yii::t('issue', 'Tags'),
-								]);
-							},
-							'delete' => function (string $url): string {
-								return Html::a(Html::icon('remove'), $url, [
-									'title' => Yii::t('issue', 'Unlink'),
-									'aria-label' => Yii::t('issue', 'Unlink'),
-									'data-method' => 'POST',
-								]);
-							},
-						],
-						'urlCreator' => static function (string $action, IssueInterface $issue) use ($model): string {
-							switch ($action) {
-								case 'delete':
-									return Url::to([
-										'/issue/relation/delete',
-										'id' => $model->getIssueRelationId($issue->getIssueId()),
-										'returnUrl' => Url::current(),
-									]);
-								case 'update':
-									return Url::to(['/issue/issue/update', 'id' => $issue->getIssueId()]);
-								case 'tags':
-									return Url::to([
-										'/issue/tag/issue',
-										'issueId' => $issue->getIssueId(),
-										'returnUrl' => Url::current(),
-									]);
-							}
-							return '';
-						},
-					],
-				],
-			]) ?>
 
-			<?= GridView::widget([
-				'dataProvider' => new ActiveDataProvider([
-					'query' => $model->getClaims(),
-				]),
-				'summary' => '',
-				'caption' => Yii::t('issue', 'Issue Claims'),
-				'emptyText' => '',
-				'showOnEmpty' => false,
-				'columns' => [
-					'typeName',
-					'entityResponsible.name:text:' . Yii::t('issue', 'Entity'),
-					'trying_value:currency:' . Yii::t('issue', 'Claim'),
-					'percent_value',
-					'obtained_value:currency:' . Yii::t('issue', 'Obtained'),
-					'details:ntext',
-					'date:date',
-					[
-						'class' => ActionColumn::class,
-						'controller' => '/issue/claim',
-						'template' => '{update} {delete}',
-						'visible' => $claimActionColumn,
-					],
-				],
-			]) ?>
 
 
 			<?= FieldsetDetailView::widget([
@@ -492,43 +512,39 @@ use yii\data\ActiveDataProvider;
 			]) ?>
 
 
+
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getClaims(),
+				]),
+				'summary' => '',
+				'caption' => Yii::t('issue', 'Issue Claims'),
+				'emptyText' => '',
+				'showOnEmpty' => false,
+				'columns' => [
+					'typeName',
+					'entityResponsible.name:text:' . Yii::t('issue', 'Entity'),
+					'trying_value:currency:' . Yii::t('issue', 'Claim'),
+					'percent_value',
+					'obtained_value:currency:' . Yii::t('issue', 'Obtained'),
+					'details:ntext',
+					'date:date',
+					[
+						'class' => ActionColumn::class,
+						'controller' => '/issue/claim',
+						'template' => '{update} {delete}',
+						'visible' => $claimActionColumn,
+					],
+				],
+			]) ?>
+
+
 			<?= IssueFileGrid::widget([
 				'model' => $model,
 			])
 			?>
 
-			<?= GridView::widget([
-				'dataProvider' => new ActiveDataProvider([
-					'query' => $model->getIssueModel()->getLawsuits(),
-				]),
-				'showOnEmpty' => false,
-				'emptyText' => '',
-				'summary' => '',
-				'caption' => Yii::t('court', 'Lawsuits'),
-				'columns' => [
-					[
-						'attribute' => 'court_id',
-						'format' => 'html',
-						'value' => function (Lawsuit $lawsuit) use ($lawsuitActionColumn): string {
-							if ($lawsuitActionColumn) {
-								return Html::a(Html::encode($lawsuit->court->name), [
-									'/court/court/view', 'id' => $lawsuit->court_id,
-								]);
-							}
-							return $lawsuit->court->name;
-						},
-					],
-					'signature_act',
-					'due_at:datetime',
-					'locationName',
-					'presenceOfTheClaimantName',
-					[
-						'class' => ActionColumn::class,
-						'controller' => '/court/lawsuit',
-						'visible' => $lawsuitActionColumn,
-					],
-				],
-			]) ?>
+
 
 			<?=
 			GridView::widget([

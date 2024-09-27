@@ -97,9 +97,12 @@ YiiAsset::register($this);
 					[
 						'class' => IssueTypeColumn::class,
 						'contentBold' => false,
+						'valueType' => IssueTypeColumn::VALUE_NAME,
+
 					],
 					[
 						'class' => IssueStageColumn::class,
+						'valueType' => IssueStageColumn::VALUE_NAME,
 					],
 					[
 						'attribute' => 'entityResponsible',

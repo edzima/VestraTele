@@ -492,7 +492,8 @@ class Issue extends ActiveRecord implements
 
 	public function getLawsuits(): ActiveQuery {
 		return $this->hasMany(Lawsuit::class, ['id' => 'lawsuit_id'])
-			->viaTable(Lawsuit::VIA_TABLE_ISSUE, ['issue_id' => 'id']);
+			->viaTable(Lawsuit::VIA_TABLE_ISSUE, ['issue_id' => 'id'])
+			->orderBy([Lawsuit::tableName() . '.due_at' => SORT_ASC]);
 	}
 
 	public function getUserRoles(int $userId): array {

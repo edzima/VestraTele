@@ -31,6 +31,8 @@ class IssueStageColumn extends DataColumn {
 						return $model->getIssueStage()->short_name;
 					case static::VALUE_NAME_WITH_SHORT:
 						return $model->getIssueStage()->getNameWithShort();
+					case static::VALUE_NAME:
+						return $model->getIssueStage()->name;
 					default:
 						return $model->getIssueModel()->getStageName();
 				}
