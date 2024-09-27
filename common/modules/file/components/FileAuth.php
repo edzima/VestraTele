@@ -70,18 +70,18 @@ class FileAuth extends Component {
 			|| ($this->userHasAllowedRole() && !$this->userHasDisallowedRoles());
 	}
 
-	public function setUserId(int $userId): static {
+	public function setUserId(int $userId): self {
 		$this->userId = $userId;
 		return $this;
 	}
 
-	public function setFile(File $file): static {
+	public function setFile(File $file): self {
 		$this->file = $file;
 		$this->setFileType($file->fileType);
 		return $this;
 	}
 
-	public function setFileType(FileType $fileType): static {
+	public function setFileType(FileType $fileType): self {
 		$this->fileType = $fileType;
 		return $this;
 	}
@@ -136,7 +136,7 @@ class FileAuth extends Component {
 		return $this->fileType;
 	}
 
-	private function setRoles(array $roles): static {
+	private function setRoles(array $roles): self {
 		$this->checkRoles = $roles;
 		return $this;
 	}
