@@ -56,6 +56,7 @@ class DefaultController extends Controller {
 		$model = $this->findModel($id);
 		$searchModel = new IssueSearch();
 		$searchModel->entity_responsible_id = $id;
+		$searchModel->userId = Yii::$app->user->getId();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		return $this->render('view', [
 			'model' => $model,
