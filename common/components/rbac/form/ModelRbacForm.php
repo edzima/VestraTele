@@ -13,12 +13,14 @@ class ModelRbacForm extends Model {
 	public $managerUserIds = [];
 
 	public string $action;
+
+	public ?string $app = null;
 	private ModelAccess $access;
 
 	public function setAccess(ModelAccess $model): void {
 		$this->access = $model;
-		$this->roles = $model->getParentsRoles();
-		$this->permissions = $model->getParentsPermissions();
+//		$this->roles = $model->getParentsRoles();
+//		$this->permissions = $model->getParentsPermissions();
 	}
 
 	public function setAction(string $action): void {

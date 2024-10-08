@@ -5,6 +5,7 @@ namespace common\components\rbac;
 use ReflectionClass;
 use Yii;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\rbac\Assignment;
 use yii\rbac\Item;
@@ -13,11 +14,22 @@ use yii\rbac\Role;
 
 class ModelAccess extends Component {
 
+	public const APP_BASIC = 'basic';
+	public const APP_FRONTEND = 'frontend';
+	public const APP_BACKEND = 'admin';
+	public const APP_ADVANCED = [
+		self::APP_BACKEND,
+		self::APP_FRONTEND,
+	];
+
+	public array $availableApps = self::APP_ADVANCED;
+
 	public const ACTION_INDEX = 'index';
 	public const ACTION_VIEW = 'view';
 	public const ACTION_CREATE = 'create';
 	public const ACTION_UPDATE = 'update';
 	public const ACTION_DELETE = 'delete';
+	public ?string $modelId = null;
 
 	public function getActions(): array {
 		return [
@@ -29,18 +41,20 @@ class ModelAccess extends Component {
 		];
 	}
 
+	public string $nameSeparator = ':';
+
 	public string $managerRolePrefix = 'manager';
 
 	public ?string $modelName = null;
 
 	public string $action = self::ACTION_INDEX;
 
+	protected string $app = self::APP_FRONTEND;
+
 	/**
 	 * @var string|array|ParentsManagerInterface
 	 */
 	public $auth = 'authManager';
-
-	private string $permissionName;
 
 //	public ?Closure $findModel = null;
 
@@ -75,6 +89,13 @@ class ModelAccess extends Component {
 	public function setAction(string $action): self {
 		$this->action = $action;
 		return $this;
+	}
+
+	public function setApp(string $name): void {
+		if (!empty($this->availableApps) && in_array($name, $this->availableApps)) {
+			throw new InvalidConfigException("App: $name ' not is allowed");
+		}
+		$this->app = $name;
 	}
 
 	public function removeFromAllParents(): int {
@@ -130,11 +151,24 @@ class ModelAccess extends Component {
 	}
 
 	protected function getPermissionName(): string {
-		return $this->modelName . ':' . $this->action;
+		$parts = [
+			$this->app,
+			$this->modelName,
+			$this->action,
+		];
+		if (!empty($this->modelId)) {
+			$parts[] = $this->modelId;
+		}
+		return implode($this->nameSeparator, $parts);
 	}
 
 	protected function getRoleName(): string {
-		return $this->managerRolePrefix . ':' . $this->modelName;
+		$parts = [
+			$this->app,
+			$this->managerRolePrefix,
+			$this->modelName,
+		];
+		return implode($this->nameSeparator, $parts);
 	}
 
 
@@ -217,6 +251,10 @@ class ModelAccess extends Component {
 
 	protected function createPermission(): Permission {
 		$permission = $this->auth->createPermission($this->getPermissionName());
+		$permission->description = Yii::t('rbac', 'Access to model: {modelName} for Action: {action}', [
+			'modelName' => $this->modelName,
+			'action' => $this->action,
+		]);
 		return $permission;
 	}
 }
