@@ -8,6 +8,7 @@ use common\models\SearchModel;
 use common\models\user\query\UserQuery;
 use common\models\user\SurnameSearchInterface;
 use common\models\user\User;
+use common\models\user\UserProfile;
 use common\models\user\UserTrait;
 use common\validators\PhoneValidator;
 use edzima\teryt\models\Simc;
@@ -20,6 +21,9 @@ use yii\data\Sort;
  * UserSearch represents the model behind the search form about `common\models\User`.
  */
 class UserSearch extends User implements SurnameSearchInterface, SearchModel {
+
+	public $createdAtFrom;
+	public $createdAtTo;
 
 	public $firstname;
 	public $lastname;
@@ -45,6 +49,8 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 				'permission' => Yii::t('common', 'Permission'),
 				'trait' => Yii::t('common', 'Trait'),
 				'phone' => Yii::t('common', 'Phone number'),
+				'createdAtFrom' => Yii::t('common', 'Created at from'),
+				'createdAtTo' => Yii::t('common', 'Created at to'),
 			]
 		);
 	}
@@ -105,6 +111,7 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 		$this->applyAssigmentFilter($query);
 		$this->applyTraitFilter($query);
 		$this->applyPhoneFilter($query);
+		$this->applyCreatedRangeFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -136,6 +143,12 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 				'action_at',
 				'firstname',
 				'lastname',
+				'status',
+				'ip',
+				'gender' => [
+					'asc' => [UserProfile::tableName() . '.gender' => SORT_ASC],
+					'desc' => [UserProfile::tableName() . '.gender' => SORT_DESC],
+				],
 				'city' => [
 					'asc' => [Simc::tableName() . '.name' => SORT_ASC],
 					'desc' => [Simc::tableName() . '.name' => SORT_DESC],
@@ -193,6 +206,23 @@ class UserSearch extends User implements SurnameSearchInterface, SearchModel {
 		if (!empty($this->trait)) {
 			$query->joinWith('traits T');
 			$query->andWhere(['T.trait_id' => $this->trait]);
+		}
+	}
+
+	protected function applyCreatedRangeFilter(UserQuery $query): void {
+		if (!empty($this->createdAtFrom)) {
+			$query->andFilterWhere([
+				'>=',
+				User::tableName() . '.created_at',
+				strtotime($this->createdAtFrom),
+			]);
+		}
+		if (!empty($this->createdAtTo)) {
+			$query->andFilterWhere([
+				'<=',
+				User::tableName() . '.created_at',
+				strtotime($this->createdAtTo),
+			]);
 		}
 	}
 

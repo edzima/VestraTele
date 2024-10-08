@@ -43,7 +43,6 @@ return [
 	'Create' => 'Dodaj',
 	'Create article' => 'Dodaj post',
 	'Create article category' => 'Dodaj kategorię',
-	'Create Entity Responsible' => 'Dodaj Podmiot Odpowiedzialny',
 	'Create item' => 'Dodaj element',
 	'Create key storage item' => 'Dodaj klucz składowy',
 	'Create page' => 'Dodaj strone',
@@ -364,4 +363,7 @@ return [
 	'Linked {tagsCount} Tags to {issuesCount} Issues.' => 'Przypisano Tagi {tagsCount} do Spraw: {issuesCount}',
 	'Stats - Chart' => 'Wykresy',
 	'Detect loop' => 'Wykryto pętle',
+	'Change Status' => 'Zmień Status',
+	'Are you sure you want to change the status to:{status} for this workers?' => 'Jesteś pewny, że chcesz zmienić Status na: {status}?',
+	'Status changed successfully.' => 'Pomyślnie zmieniono Status.',
 ];

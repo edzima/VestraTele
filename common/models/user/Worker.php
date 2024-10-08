@@ -37,6 +37,8 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_ISSUE_CREATE = 'issue.create';
 	public const PERMISSION_ISSUE_DELETE = 'issue.delete';
 	public const PERMISSION_ISSUE_LINK_USER = 'issue.link-user';
+
+	public const PERMISSION_WORKERS_WITHOUT_ISSUES = 'workers.without.issues';
 	public const PERMISSION_ISSUE_STAGE_CHANGE = 'issue.stage.change';
 	public const PERMISSION_ISSUE_STAGE_MANAGER = 'issue.stage.manager';
 	public const PERMISSION_ISSUE_TAG_MANAGER = 'issue.tag.manager';

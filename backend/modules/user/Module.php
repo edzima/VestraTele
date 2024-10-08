@@ -3,6 +3,7 @@
 namespace backend\modules\user;
 
 use common\models\user\User;
+use common\models\user\Worker;
 use yii\base\Module as BaseModule;
 use yii\filters\AccessControl;
 
@@ -35,9 +36,21 @@ class Module extends BaseModule {
 					],
 					[
 						'controllers' => ['user/worker'],
+						'actions' => ['index'],
+						'allow' => true,
+						'roles' => ['manager'],
+					],
+					[
+						'controllers' => ['user/worker'],
 						'actions' => ['index', 'create', 'update', 'create-from-json', 'request-password-reset'],
 						'allow' => true,
 						'permissions' => [User::PERMISSION_WORKERS],
+					],
+					[
+						'controllers' => ['user/worker'],
+						'actions' => ['without-issues', 'change-status'],
+						'allow' => true,
+						'permissions' => [Worker::PERMISSION_WORKERS_WITHOUT_ISSUES],
 					],
 					[
 						'controllers' => ['user/worker'],

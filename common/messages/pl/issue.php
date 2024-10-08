@@ -254,4 +254,5 @@ return array_merge([
 	'Issue Type - Permissions' => 'Typy Sprawy - u	prawnienia dostępu',
 	'Issue Type: {name} -  Permissions' => '{name} - uprawnienia dostępu',
 	'Phone' => 'Telefon',
+	'Workers without Issues' => 'Pracownicy bez Spraw',
 ], $local);

@@ -104,6 +104,7 @@ return array_merge([
 	'user.traits' => 'Użytkownicy - Cechy',
 	'workers' => 'Lista pracowników',
 	'workers.hierarchy' => 'Lista pracowników - hierarchia',
+	'workers.without.issues' => 'Pracownicy bez Spraw',
 	'victim' => 'Poszkodowany',
 	'vindicator' => 'Windykator',
 	'potential-client' => 'Potencjalny Klient',
