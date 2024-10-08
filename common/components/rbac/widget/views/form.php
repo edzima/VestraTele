@@ -11,7 +11,7 @@ use yii\widgets\ActiveForm;
  */
 ?>
 
-<div class="model-access-form">
+<div class="model-actions-form">
 	<div class="row">
 
 		<?php $form = ActiveForm::begin(); ?>

@@ -7,19 +7,24 @@ use yii\base\Model;
 
 class ModelActionsForm extends Model {
 
+	public array $appsActions = [
+		'@frontendUrl' => [
+			'issue.view',
+		],
+		'@backendUrl' => [
+			'issue.view',
+		],
+	];
+
 	private ModelAccess $_access;
 
 	public array $excludesFrontendActions = [];
 
-	public function setAccess(ModelAccess $model) {
+	public function setAccess(ModelAccess $model): void {
 		$this->_access = $model;
 	}
 
 	private array $models = [];
-
-	public function load($data, $formName = null) {
-		return ModelRbacForm::loadMultiple($this->getModels(), $data, $formName);
-	}
 
 	/**
 	 * @return ModelRbacForm[]
@@ -27,12 +32,18 @@ class ModelActionsForm extends Model {
 	public function getModels(): array {
 		if (empty($this->models)) {
 			$models = [];
-			foreach ($this->_access->getActions() as $action) {
-				$models[$action] = $this->createForm($action);
+			foreach ($this->appsActions as $app => $actions) {
+				foreach ($actions as $action) {
+					$models[$app][$action] = $this->createForm($action, $app);
+				}
 			}
 			$this->models = $models;
 		}
 		return $this->models;
+	}
+
+	public function load($data, $formName = null) {
+		return ModelRbacForm::loadMultiple($this->getModels(), $data, $formName);
 	}
 
 	public function validate($attributeNames = null, $clearErrors = true) {
@@ -49,10 +60,11 @@ class ModelActionsForm extends Model {
 		return true;
 	}
 
-	private function createForm(string $action) {
-		$this->_access->setAction($action);
+	private function createForm(string $action, ?string $app) {
+		//$this->_access->setAction($action);
 		return new ModelRbacForm([
 			'action' => $action,
+			'app' => $app,
 			'access' => $this->_access,
 		]);
 	}
