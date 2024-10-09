@@ -4,9 +4,9 @@ namespace common\components\rbac;
 
 interface ModelRbacInterface {
 
-	public function getRbacName(): string;
+	public function getRbacBaseName(): string;
 
 	public function getRbacId(): ?string;
 
-	public function getModelRbac(): ModelAccess;
+	public function getModelRbac(): ModelAccessManager;
 }

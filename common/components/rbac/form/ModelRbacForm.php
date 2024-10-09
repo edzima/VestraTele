@@ -2,7 +2,7 @@
 
 namespace common\components\rbac\form;
 
-use common\components\rbac\ModelAccess;
+use common\components\rbac\ModelAccessManager;
 use Yii;
 use yii\base\Model;
 
@@ -15,9 +15,9 @@ class ModelRbacForm extends Model {
 	public string $action;
 
 	public ?string $app = null;
-	private ModelAccess $access;
+	private ModelAccessManager $access;
 
-	public function setAccess(ModelAccess $model): void {
+	public function setAccess(ModelAccessManager $model): void {
 		$this->access = $model;
 //		$this->roles = $model->getParentsRoles();
 //		$this->permissions = $model->getParentsPermissions();

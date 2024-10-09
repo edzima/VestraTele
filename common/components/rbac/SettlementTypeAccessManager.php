@@ -5,7 +5,7 @@ namespace common\components\rbac;
 use common\models\settlement\SettlementType;
 use common\models\user\Worker;
 
-class SettlementTypeAccess extends ModelAccess {
+class SettlementTypeAccessManager extends ModelAccessManager {
 
 	public const ACTION_ISSUE_VIEW = 'issue-view';
 

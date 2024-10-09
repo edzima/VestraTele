@@ -2,9 +2,9 @@
 
 namespace common\models\settlement;
 
-use common\components\rbac\ModelAccess;
+use common\components\rbac\ModelAccessManager;
 use common\components\rbac\ModelRbacInterface;
-use common\components\rbac\SettlementTypeAccess;
+use common\components\rbac\SettlementTypeAccessManager;
 use common\helpers\ArrayHelper;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueType;
@@ -179,7 +179,7 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 			->hasAccess($id);
 	}
 
-	public function getRbacName(): string {
+	public function getRbacBaseName(): string {
 		return $this->isNewRecord
 			? Yii::t('settlement', 'Settlement Types')
 			: Yii::t('settlement', 'Settlement Type: {name}', ['name' => $this->name]);
@@ -189,7 +189,7 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 		return $this->id;
 	}
 
-	public function getModelRbac(): ModelAccess {
-		return new SettlementTypeAccess($this);
+	public function getModelRbac(): ModelAccessManager {
+		return new SettlementTypeAccessManager($this);
 	}
 }

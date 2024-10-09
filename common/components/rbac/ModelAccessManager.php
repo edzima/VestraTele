@@ -2,7 +2,6 @@
 
 namespace common\components\rbac;
 
-use ReflectionClass;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -12,7 +11,13 @@ use yii\rbac\Item;
 use yii\rbac\Permission;
 use yii\rbac\Role;
 
-class ModelAccess extends Component {
+class ModelAccessManager extends Component {
+
+	public const ACTION_INDEX = 'index';
+	public const ACTION_VIEW = 'view';
+	public const ACTION_CREATE = 'create';
+	public const ACTION_UPDATE = 'update';
+	public const ACTION_DELETE = 'delete';
 
 	public const APP_BASIC = 'basic';
 	public const APP_FRONTEND = 'frontend';
@@ -22,34 +27,21 @@ class ModelAccess extends Component {
 		self::APP_FRONTEND,
 	];
 
-	public array $availableApps = self::APP_ADVANCED;
-
-	public const ACTION_INDEX = 'index';
-	public const ACTION_VIEW = 'view';
-	public const ACTION_CREATE = 'create';
-	public const ACTION_UPDATE = 'update';
-	public const ACTION_DELETE = 'delete';
-	public ?string $modelId = null;
-
-	public function getActions(): array {
-		return [
-			static::ACTION_INDEX,
-			static::ACTION_VIEW,
-			static::ACTION_CREATE,
-			static::ACTION_UPDATE,
-			static::ACTION_DELETE,
-		];
-	}
-
-	public string $nameSeparator = ':';
-
-	public string $managerRolePrefix = 'manager';
-
-	public ?string $modelName = null;
-
 	public string $action = self::ACTION_INDEX;
 
 	protected string $app = self::APP_FRONTEND;
+
+	public array $availableApps = self::APP_ADVANCED;
+
+	protected ?ModelRbacInterface $modelRbac = null;
+	public ?string $modelId = null;
+	public ?string $modelName = null;
+
+	//public string $modelClass;
+
+	public string $managerRolePrefix = 'manager';
+
+	public string $nameSeparator = ':';
 
 	/**
 	 * @var string|array|ParentsManagerInterface
@@ -61,7 +53,6 @@ class ModelAccess extends Component {
 //	/**
 //	 * @var string|ActiveRecordInterface
 //	 */
-	public string $modelClass;
 
 	public array $availableParentRoles = [];
 	public array $availableParentPermissions = [];
@@ -69,9 +60,19 @@ class ModelAccess extends Component {
 	public function init(): void {
 		parent::init();
 		$this->auth = Instance::ensure($this->auth, ParentsManagerInterface::class);
-		if ($this->modelName === null) {
-			$this->modelName = (new ReflectionClass($this->modelClass))->getShortName();
-		}
+//		if ($this->modelName === null) {
+//			$this->modelName = (new ReflectionClass($this->modelClass))->getShortName();
+//		}
+	}
+
+	public function getActions(): array {
+		return [
+			static::ACTION_INDEX,
+			static::ACTION_VIEW,
+			static::ACTION_CREATE,
+			static::ACTION_UPDATE,
+			static::ACTION_DELETE,
+		];
 	}
 
 	public function hasAccess(string|int $userId): bool {
@@ -79,10 +80,21 @@ class ModelAccess extends Component {
 	}
 
 	public function assign(string|int $userId, bool $manager = false): Assignment {
+		if ($this->modelRbac === null) {
+			throw new InvalidConfigException('Rbac model must be set.');
+		}
+		$permission = $this->getPermission();
+		if ($permission === null) {
+			$this->createPermission();
+		}
+		if ($permission === null) {
+			throw new InvalidConfigException('Permission not already exist.');
+		}
+		return $this->auth->assign($permission, $userId);
+
 		if ($manager) {
 			return $this->auth->assign($this->getManagerRole(), $userId);
 		}
-
 		return $this->auth->assign($this->getPermission(), $userId);
 	}
 
@@ -91,11 +103,19 @@ class ModelAccess extends Component {
 		return $this;
 	}
 
-	public function setApp(string $name): void {
-		if (!empty($this->availableApps) && in_array($name, $this->availableApps)) {
+	public function setApp(string $name): self {
+		if (!empty($this->availableApps) && !in_array($name, $this->availableApps)) {
 			throw new InvalidConfigException("App: $name ' not is allowed");
 		}
 		$this->app = $name;
+		return $this;
+	}
+
+	public function setModel(ModelRbacInterface $model): self {
+		$this->modelRbac = $model;
+		$this->modelName = $model->getRbacBaseName();
+		$this->modelId = $model->getRbacId();
+		return $this;
 	}
 
 	public function removeFromAllParents(): int {
@@ -189,8 +209,7 @@ class ModelAccess extends Component {
 	}
 
 	protected function createManagerRole(): Role {
-		$role = new Role();
-		$role->name = $this->getRoleName();
+		$role = $this->auth->createRole($this->getRoleName());
 		$role->description = Yii::t('rbac', 'Manager: {modelName}', [
 			'modelName' => $this->modelName,
 		]);
