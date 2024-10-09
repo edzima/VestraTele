@@ -5,6 +5,8 @@ namespace common\modules\issue\widgets;
 use common\helpers\Url;
 use common\models\user\Worker;
 use Yii;
+use yii\data\ActiveDataProvider;
+use yii\data\DataProviderInterface;
 
 class IssueViewWidget extends IssueWidget {
 
@@ -56,6 +58,22 @@ class IssueViewWidget extends IssueWidget {
 			'entityUrl' => $this->entityUrl,
 			'stageUrl' => $this->stageUrl,
 			'typeUrl' => $this->typeUrl,
+			'costDataProvider' => $this->getCostDataProvider(),
 		]);
+	}
+
+	protected function getCostDataProvider(): ?DataProviderInterface {
+		$costDataProvider = null;
+		if (Yii::$app->user->can(Worker::PERMISSION_COST)) {
+			$query = $this->model->getCosts()
+				->with('user.userProfile');
+			if (!Yii::$app->user->can(Worker::PERMISSION_COST_COMMISSION_REFUND)) {
+				$query->withoutCommissionsRefund();
+			}
+			$costDataProvider = new ActiveDataProvider([
+				'query' => $query,
+			]);
+		}
+		return $costDataProvider;
 	}
 }

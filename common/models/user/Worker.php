@@ -60,6 +60,8 @@ class Worker extends User implements ActiveHierarchy {
 	public const PERMISSION_MESSAGE_EMAIL_SUMMON_IMMINENT_DEADLINE = 'message:email.issueSummon:imminentDeadline';
 	public const PERMISSION_NOTE_TEMPLATE = 'note.template';
 	public const PERMISSION_COST_DEBT = 'cost.debt';
+
+	public const PERMISSION_COST_COMMISSION_REFUND = 'cost.commission_refund';
 	public const PERMISSION_PROVISION_CHILDREN_VISIBLE = 'provision.children.visible';
 	public const PERMISSION_NOTE_MANAGER = 'note.manager';
 	public const PERMISSION_NOTE_DELETE = 'note.delete';

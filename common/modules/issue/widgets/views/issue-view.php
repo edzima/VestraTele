@@ -9,7 +9,6 @@ use common\models\issue\IssueInterface;
 use common\models\issue\IssueShipmentPocztaPolska;
 use common\models\issue\IssueTagType;
 use common\models\issue\IssueUser;
-use common\models\user\User;
 use common\models\user\Worker;
 use common\modules\court\models\Lawsuit;
 use common\modules\file\widgets\IssueFileGrid;
@@ -21,6 +20,7 @@ use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\IssueColumn;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
+use yii\data\DataProviderInterface;
 
 /* @var $this yii\web\View */
 /* @var $model Issue */
@@ -34,6 +34,7 @@ use yii\data\ActiveDataProvider;
 /* @var $typeUrl string|null */
 /* @var $shipmentsActionColumn bool */
 /* @var $lawsuitActionColumn bool */
+/* @var $costDataProvider DataProviderInterface|null */
 
 ?>
 
@@ -349,11 +350,7 @@ use yii\data\ActiveDataProvider;
 			]) ?>
 
 			<?php
-			if (Yii::$app->user->can(User::PERMISSION_COST)) {
-				$costDataProvider = new ActiveDataProvider([
-					'query' => $model->getCosts()
-						->with('user.userProfile'),
-				]);
+			if ($costDataProvider !== null) {
 				echo GridView::widget([
 					'dataProvider' => $costDataProvider,
 					'caption' => Yii::t('settlement', 'Costs')

@@ -53,6 +53,9 @@ class RbacController extends Controller {
 		Worker::PERMISSION_COST_DEBT => [
 			Worker::ROLE_BOOKKEEPER,
 		],
+		Worker::PERMISSION_COST_COMMISSION_REFUND => [
+			Worker::ROLE_BOOKKEEPER,
+		],
 		Worker::PERMISSION_CALCULATION_TO_CREATE => [
 			Worker::ROLE_BOOKKEEPER,
 		],

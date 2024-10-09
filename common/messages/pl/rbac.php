@@ -19,6 +19,7 @@ return array_merge([
 	'co-agent' => 'Przedstawiciel [wspólnik]',
 	'cost' => 'Koszty',
 	'cost.debt' => 'Koszty - Wierzytelność',
+	'cost.commission_refund' => 'Koszty - Zwroty Prowizji',
 	'czater' => 'Czater',
 	'customer_service' => 'Obsługa klienta',
 	'entity_responsible.manager' => 'Podmioty Odpowiedzialne (Manager)',
