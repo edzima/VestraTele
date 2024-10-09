@@ -2,7 +2,7 @@
 
 namespace common\components\rbac\form;
 
-use common\components\rbac\ModelAccess;
+use common\components\rbac\ModelAccessManager;
 use yii\base\Model;
 
 class ModelActionsForm extends Model {
@@ -16,11 +16,11 @@ class ModelActionsForm extends Model {
 		],
 	];
 
-	private ModelAccess $_access;
+	private ModelAccessManager $_access;
 
 	public array $excludesFrontendActions = [];
 
-	public function setAccess(ModelAccess $model): void {
+	public function setAccess(ModelAccessManager $model): void {
 		$this->_access = $model;
 	}
 
@@ -34,7 +34,7 @@ class ModelActionsForm extends Model {
 			$models = [];
 			foreach ($this->appsActions as $app => $actions) {
 				foreach ($actions as $action) {
-					$models[$app][$action] = $this->createForm($action, $app);
+					$models[] = $this->createForm($action, $app);
 				}
 			}
 			$this->models = $models;
@@ -61,7 +61,6 @@ class ModelActionsForm extends Model {
 	}
 
 	private function createForm(string $action, ?string $app) {
-		//$this->_access->setAction($action);
 		return new ModelRbacForm([
 			'action' => $action,
 			'app' => $app,
