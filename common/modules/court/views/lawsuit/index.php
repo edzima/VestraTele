@@ -62,6 +62,25 @@ $this->params['breadcrumbs'][] = $this->title;
 					],
 				],
 			],
+			[
+				'attribute' => 'court_type',
+				'value' => function (Lawsuit $data): string {
+					return $data->court->getTypeName();
+				},
+				'label' => $searchModel->getAttributeLabel('court_type'),
+				'filter' => LawsuitSearch::getCourtTypeNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => $searchModel->getAttributeLabel('court_type'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+			],
 			'due_at:datetime',
 			[
 				'attribute' => 'location',

@@ -7,6 +7,7 @@ use common\models\issue\Issue;
 use common\models\user\query\UserProfileQuery;
 use common\modules\court\models\Court;
 use common\modules\court\models\Lawsuit;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -18,6 +19,13 @@ class LawsuitSearch extends Lawsuit {
 
 	public $issue_id;
 	public $customer;
+	public $court_type;
+
+	public function attributeLabels(): array {
+		return parent::attributeLabels() + [
+				'court_type' => Yii::t('court', 'Type'),
+			];
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -25,7 +33,7 @@ class LawsuitSearch extends Lawsuit {
 	public function rules(): array {
 		return [
 			[['id', 'court_id', 'creator_id', 'issue_id'], 'integer'],
-			[['customer', 'signature_act', 'room', 'due_at', 'details', 'created_at', 'updated_at', 'location', 'presence_of_the_claimant'], 'safe'],
+			[['customer', 'signature_act', 'room', 'due_at', 'details', 'created_at', 'updated_at', 'location', 'presence_of_the_claimant', 'court_type'], 'safe'],
 		];
 	}
 
@@ -47,6 +55,7 @@ class LawsuitSearch extends Lawsuit {
 	public function search($params) {
 		$query = Lawsuit::find();
 		$query->joinWith('issues');
+		$query->joinWith('court');
 		$query->with('issues.customer.userProfile');
 
 		// add conditions that should always apply here
@@ -75,6 +84,7 @@ class LawsuitSearch extends Lawsuit {
 			'creator_id' => $this->creator_id,
 			'location' => $this->location,
 			'presence_of_the_claimant' => $this->presence_of_the_claimant,
+			Court::tableName() . '.type' => $this->court_type,
 		]);
 
 		$query->andFilterWhere(['like', 'signature_act', $this->signature_act])
@@ -110,5 +120,9 @@ class LawsuitSearch extends Lawsuit {
 				},
 			]);
 		}
+	}
+
+	public static function getCourtTypeNames(): array {
+		return Court::getTypesNames();
 	}
 }
