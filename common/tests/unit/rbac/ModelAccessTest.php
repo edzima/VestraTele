@@ -9,7 +9,7 @@ use yii\base\InvalidConfigException;
 
 class ModelAccessTest extends Unit {
 
-	private ModelRbacInterface $rbac;
+	private ModelRbacInterface $rbacModel;
 
 	private ModelAccessManager $manager;
 
@@ -64,8 +64,8 @@ class ModelAccessTest extends Unit {
 		$this->manager = new ModelAccessManager($config);
 	}
 
-	protected function setRbacModel(string $name = 'test-rbac'): void {
-		$this->rbacModel = new TestRbacModel($name);
+	protected function setRbacModel(string $name = 'test-rbac', string $id = null): void {
+		$this->rbacModel = new TestRbacModel($name, $id);
 		$this->manager->setModel($this->rbacModel);
 	}
 

@@ -39,6 +39,7 @@ class ModelAccessManager extends Component {
 
 	//public string $modelClass;
 
+	public string $permissionPrefixName = 'modelAccess';
 	public string $managerRolePrefix = 'manager';
 
 	public string $nameSeparator = ':';
@@ -172,6 +173,7 @@ class ModelAccessManager extends Component {
 
 	protected function getPermissionName(): string {
 		$parts = [
+			$this->permissionPrefixName,
 			$this->app,
 			$this->modelName,
 			$this->action,
@@ -184,6 +186,7 @@ class ModelAccessManager extends Component {
 
 	protected function getRoleName(): string {
 		$parts = [
+			$this->permissionPrefixName,
 			$this->app,
 			$this->managerRolePrefix,
 			$this->modelName,
@@ -206,6 +209,15 @@ class ModelAccessManager extends Component {
 			$this->auth->add($role);
 		}
 		return $role;
+	}
+
+	protected function createPermission(): Permission {
+		$permission = $this->auth->createPermission($this->getPermissionName());
+		$permission->description = Yii::t('rbac', 'Access to model: {modelName} for Action: {action}', [
+			'modelName' => $this->modelName,
+			'action' => $this->action,
+		]);
+		return $permission;
 	}
 
 	protected function createManagerRole(): Role {
@@ -268,12 +280,4 @@ class ModelAccessManager extends Component {
 		}
 	}
 
-	protected function createPermission(): Permission {
-		$permission = $this->auth->createPermission($this->getPermissionName());
-		$permission->description = Yii::t('rbac', 'Access to model: {modelName} for Action: {action}', [
-			'modelName' => $this->modelName,
-			'action' => $this->action,
-		]);
-		return $permission;
-	}
 }
