@@ -9,7 +9,6 @@ use yii\di\Instance;
 use yii\rbac\Assignment;
 use yii\rbac\Item;
 use yii\rbac\Permission;
-use yii\rbac\Role;
 
 class ModelAccessManager extends Component {
 
@@ -27,43 +26,30 @@ class ModelAccessManager extends Component {
 		self::APP_FRONTEND,
 	];
 
+
 	public string $action = self::ACTION_INDEX;
 
 	protected string $app = self::APP_FRONTEND;
 
 	public array $availableApps = self::APP_ADVANCED;
 
-	protected ?ModelRbacInterface $modelRbac = null;
-	public ?string $modelId = null;
-	public ?string $modelName = null;
-
-	//public string $modelClass;
-
 	public string $permissionPrefixName = 'modelAccess';
-	public string $managerRolePrefix = 'manager';
 
 	public string $nameSeparator = ':';
+
+	public array $availableParentRoles = [];
+	public array $availableParentPermissions = [];
 
 	/**
 	 * @var string|array|ParentsManagerInterface
 	 */
 	public $auth = 'authManager';
 
-//	public ?Closure $findModel = null;
-
-//	/**
-//	 * @var string|ActiveRecordInterface
-//	 */
-
-	public array $availableParentRoles = [];
-	public array $availableParentPermissions = [];
+	protected ?ModelRbacInterface $modelRbac = null;
 
 	public function init(): void {
 		parent::init();
 		$this->auth = Instance::ensure($this->auth, ParentsManagerInterface::class);
-//		if ($this->modelName === null) {
-//			$this->modelName = (new ReflectionClass($this->modelClass))->getShortName();
-//		}
 	}
 
 	public function getActions(): array {
@@ -76,27 +62,27 @@ class ModelAccessManager extends Component {
 		];
 	}
 
-	public function hasAccess(string|int $userId): bool {
+	public function checkAccess(string|int $userId): bool {
 		return $this->auth->checkAccess($userId, $this->getPermissionName());
 	}
 
-	public function assign(string|int $userId, bool $manager = false): Assignment {
+	public function ensurePermission(): void {
+		$name = $this->getPermissionName();
+		if ($this->auth->getPermission($name) === null) {
+			$permission = $this->createPermission();
+			$this->auth->add($permission);
+		}
+	}
+
+	public function assign(string|int $userId): Assignment {
 		if ($this->modelRbac === null) {
-			throw new InvalidConfigException('Rbac model must be set.');
+			throw new InvalidConfigException('Model must be set.');
 		}
 		$permission = $this->getPermission();
 		if ($permission === null) {
-			$this->createPermission();
-		}
-		if ($permission === null) {
-			throw new InvalidConfigException('Permission not already exist.');
+			throw new InvalidConfigException('Permission not exist.');
 		}
 		return $this->auth->assign($permission, $userId);
-
-		if ($manager) {
-			return $this->auth->assign($this->getManagerRole(), $userId);
-		}
-		return $this->auth->assign($this->getPermission(), $userId);
 	}
 
 	public function setAction(string $action): self {
@@ -115,7 +101,6 @@ class ModelAccessManager extends Component {
 	public function setModel(ModelRbacInterface $model): self {
 		$this->modelRbac = $model;
 		$this->modelName = $model->getRbacBaseName();
-		$this->modelId = $model->getRbacId();
 		return $this;
 	}
 
@@ -175,57 +160,22 @@ class ModelAccessManager extends Component {
 		$parts = [
 			$this->permissionPrefixName,
 			$this->app,
-			$this->modelName,
+			$this->modelRbac->getRbacBaseName(),
 			$this->action,
 		];
-		if (!empty($this->modelId)) {
-			$parts[] = $this->modelId;
+		if (!empty($this->modelRbac->getRbacId())) {
+			$parts[] = $this->modelRbac->getRbacId();
 		}
 		return implode($this->nameSeparator, $parts);
-	}
-
-	protected function getRoleName(): string {
-		$parts = [
-			$this->permissionPrefixName,
-			$this->app,
-			$this->managerRolePrefix,
-			$this->modelName,
-		];
-		return implode($this->nameSeparator, $parts);
-	}
-
-
-
-//	protected function findModel($condition): ?ActiveRecordInterface {
-//		if ($this->findModel) {
-//			return call_user_func($this->findModel, $condition);
-//		}
-//		return $this->modelClass::findOne($condition);
-//	}
-	public function getManagerRole(): Role {
-		$role = $this->auth->getRole($this->getRoleName());
-		if ($role === null) {
-			$role = $this->createManagerRole();
-			$this->auth->add($role);
-		}
-		return $role;
 	}
 
 	protected function createPermission(): Permission {
 		$permission = $this->auth->createPermission($this->getPermissionName());
 		$permission->description = Yii::t('rbac', 'Access to model: {modelName} for Action: {action}', [
-			'modelName' => $this->modelName,
+			'modelName' => $this->modelRbac->getRbacBaseName(),
 			'action' => $this->action,
 		]);
 		return $permission;
-	}
-
-	protected function createManagerRole(): Role {
-		$role = $this->auth->createRole($this->getRoleName());
-		$role->description = Yii::t('rbac', 'Manager: {modelName}', [
-			'modelName' => $this->modelName,
-		]);
-		return $role;
 	}
 
 	public function getAvailableParentRolesNames(): array {
@@ -258,6 +208,8 @@ class ModelAccessManager extends Component {
 		return $names;
 	}
 
+
+
 //	public function createForms(): array {
 //		$actions = $this->getActions();
 //		$forms = [];
@@ -272,12 +224,11 @@ class ModelAccessManager extends Component {
 //			'action' => $action,
 //		]);
 //	}
-	public function ensurePermission() {
-		$name = $this->getPermissionName();
-		if ($this->auth->getPermission($name) === null) {
-			$permission = $this->auth->createPermission($name);
-			$this->auth->add($permission);
-		}
+
+	public static function createFromModel(ModelRbacInterface $model, array $config = []): self {
+		$self = new static($config);
+		$self->setModel($model);
+		return $self;
 	}
 
 }

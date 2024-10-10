@@ -176,7 +176,7 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 	public function hasAccess(string|int $id, string $action): bool {
 		return $this->getModelRbac()
 			->setAction($action)
-			->hasAccess($id);
+			->checkAccess($id);
 	}
 
 	public function getRbacBaseName(): string {
@@ -190,6 +190,6 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 	}
 
 	public function getModelRbac(): ModelAccessManager {
-		return new SettlementTypeAccessManager($this);
+		return SettlementTypeAccessManager::createFromModel($this);
 	}
 }
