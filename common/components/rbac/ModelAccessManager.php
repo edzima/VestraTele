@@ -26,7 +26,6 @@ class ModelAccessManager extends Component {
 		self::APP_FRONTEND,
 	];
 
-
 	public string $action = self::ACTION_INDEX;
 
 	protected string $app = self::APP_FRONTEND;
@@ -52,16 +51,6 @@ class ModelAccessManager extends Component {
 		$this->auth = Instance::ensure($this->auth, ParentsManagerInterface::class);
 	}
 
-	public function getActions(): array {
-		return [
-			static::ACTION_INDEX,
-			static::ACTION_VIEW,
-			static::ACTION_CREATE,
-			static::ACTION_UPDATE,
-			static::ACTION_DELETE,
-		];
-	}
-
 	public function checkAccess(string|int $userId): bool {
 		return $this->auth->checkAccess($userId, $this->getPermissionName());
 	}
@@ -72,6 +61,13 @@ class ModelAccessManager extends Component {
 			$permission = $this->createPermission();
 			$this->auth->add($permission);
 		}
+	}
+
+	public function getPermissions(): array {
+		$searchName = $this->nameSeparator . $this->modelRbac->getRbacBaseName() . $this->nameSeparator;
+		return array_filter($this->auth->getPermissions(), function (Permission $permission) use ($searchName) {
+			return strpos($permission->name, $searchName) !== false;
+		});
 	}
 
 	public function assign(string|int $userId): Assignment {
@@ -100,7 +96,6 @@ class ModelAccessManager extends Component {
 
 	public function setModel(ModelRbacInterface $model): self {
 		$this->modelRbac = $model;
-		$this->modelName = $model->getRbacBaseName();
 		return $this;
 	}
 
@@ -137,11 +132,6 @@ class ModelAccessManager extends Component {
 			return false;
 		}
 		return $this->auth->addChild($parent, $permission);
-	}
-
-	public function setPermissionName(string $name): self {
-		$this->permissionName = $name;
-		return $this;
 	}
 
 	protected function getPermission(): ?Permission {
@@ -224,6 +214,16 @@ class ModelAccessManager extends Component {
 //			'action' => $action,
 //		]);
 //	}
+
+	public function getActions(): array {
+		return [
+			static::ACTION_INDEX,
+			static::ACTION_VIEW,
+			static::ACTION_CREATE,
+			static::ACTION_UPDATE,
+			static::ACTION_DELETE,
+		];
+	}
 
 	public static function createFromModel(ModelRbacInterface $model, array $config = []): self {
 		$self = new static($config);

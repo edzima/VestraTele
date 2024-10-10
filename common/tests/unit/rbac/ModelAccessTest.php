@@ -109,6 +109,22 @@ class ModelAccessTest extends Unit {
 		);
 	}
 
+	public function testGetPermissions(): void {
+		$this->giveManager();
+		$this->setRbacModel();
+		$permissions = $this->manager->getPermissions();
+		$this->tester->assertCount(0, $permissions);
+
+		$this->manager->setAction('testOneAction');
+		$this->manager->ensurePermission();
+
+		$this->manager->setAction('testDoubleAction');
+		$this->manager->ensurePermission();
+
+		$permissions = $this->manager->getPermissions();
+		$this->tester->assertCount(2, $permissions);
+	}
+
 	private function giveManager(array $config = []) {
 		if (!isset($config['availableApps'])) {
 			$config['availableApps'] = self::DEFAULT_AVAILABLE_APPS;
