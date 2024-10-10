@@ -56,7 +56,7 @@ class ZapierLeadForm extends LeadForm {
 				'adName' => (string) $this->fb_ad_name,
 			]);
 			$campaign = $pixelCampaign->getLeadCampaign();
-			if ($campaign) {
+			if ($campaign && !empty($campaign->id)) {
 				$this->campaign_id = $campaign->id;
 			} else {
 				Yii::warning([
