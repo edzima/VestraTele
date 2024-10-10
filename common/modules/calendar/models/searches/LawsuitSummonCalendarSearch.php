@@ -29,6 +29,7 @@ class LawsuitSummonCalendarSearch extends SummonSearch {
 		$query->with([
 			'issue.customer.userProfile',
 			'issue.entityResponsible',
+			'type',
 		]);
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -43,7 +44,6 @@ class LawsuitSummonCalendarSearch extends SummonSearch {
 			return $dataProvider;
 		}
 
-		$query->active();
 		$query->andWhere([Summon::tableName() . '.type_id' => $typesIds]);
 		$this->applyDateFilter($query);
 
@@ -61,14 +61,9 @@ class LawsuitSummonCalendarSearch extends SummonSearch {
 			/** @var Summon $model */
 			$event = new LawsuitSummonCalendarEvent($config);
 			$event->setModel($model);
-			$event->backgroundColor = $this->getCalendarBackground($model);
 			$data[] = $event->toArray();
 		}
 		return $data;
-	}
-
-	public function getCalendarBackground(Summon $summon): string {
-		return $this->getSummonsTypes()[$summon->type_id]->getOptions()->lawsuitCalendarBackground;
 	}
 
 	public function getSummonsTypesFilters(): array {

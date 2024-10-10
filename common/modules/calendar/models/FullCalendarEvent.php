@@ -6,6 +6,8 @@ use yii\base\Model;
 
 class FullCalendarEvent extends Model {
 
+	public const CLASS_TRANSPARENT = 'transparent-event';
+
 	public string $id;
 	public string $title;
 	public string $start;

@@ -3,10 +3,18 @@
 namespace common\modules\calendar\models;
 
 use common\helpers\Html;
+use common\models\issue\Summon;
 
 class LawsuitSummonCalendarEvent extends SummonCalendarEvent {
 
 	public string $is = self::IS_DEADLINE;
+
+	public function setModel(Summon $model): void {
+		parent::setModel($model);
+		if ($model->isRealized() || $model->isUnrealized()) {
+			$this->classNames[] = static::CLASS_TRANSPARENT;
+		}
+	}
 
 	protected function getTitle(): string {
 		$customer = $this->getModel()->issue->customer;
@@ -25,6 +33,7 @@ class LawsuitSummonCalendarEvent extends SummonCalendarEvent {
 	}
 
 	protected function getBackgroundColor(): string {
-		return 'green';
+		return $this->getModel()->type->getOptions()->lawsuitCalendarBackground;
 	}
+
 }
