@@ -11,8 +11,9 @@ class TestRbacModel implements ModelRbacInterface {
 
 	private string $baseName;
 
-	public function __construct(string $baseName = 'test-rbac') {
-		return $this->baseName = $baseName;
+	public function __construct(string $baseName = 'test-rbac', string $id = null) {
+		$this->baseName = $baseName;
+		$this->id = $id;
 	}
 
 	public function setId(?string $id) {
