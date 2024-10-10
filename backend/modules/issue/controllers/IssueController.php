@@ -192,6 +192,7 @@ class IssueController extends Controller {
 	public function actionArchive(): string {
 		$searchModel = new IssueSearch();
 		$searchModel->scenario = IssueSearch::SCENARIO_ARCHIVE_CUSTOMER;
+		$searchModel->userId = Yii::$app->user->getId();
 		$searchModel->load(Yii::$app->request->queryParams);
 		$searchModel->excludedStages = [];
 		$dataProvider = $searchModel->search([]);
