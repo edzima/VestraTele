@@ -4,13 +4,17 @@ namespace common\modules\calendar\models;
 
 use common\helpers\Url;
 use common\modules\court\models\Lawsuit;
+use Yii;
 
 class LawsuitEvent extends FullCalendarEvent {
 
-	public const BACKGROUND_APPEAL = '#df2424';
+	public const BACKGROUND_IS_APPEAL = '#df2424';
+
 	private Lawsuit $model;
 
 	public string $courtType;
+
+	public int $is_appeal;
 
 	public function setModel(Lawsuit $model): void {
 		$this->model = $model;
@@ -21,17 +25,22 @@ class LawsuitEvent extends FullCalendarEvent {
 		$this->start = $model->due_at;
 		$this->url = Url::to(['/court/lawsuit/view', 'id' => $model->id]);
 		$this->backgroundColor = $this->getBackgroundColor();
+		$this->is_appeal = $model->is_appeal;
 	}
 
 	protected function getBackgroundColor(): ?string {
-		if ($this->model->court->isAppeal()) {
-			return static::BACKGROUND_APPEAL;
+		if ($this->model->is_appeal) {
+			return static::BACKGROUND_IS_APPEAL;
 		}
 		return null;
 	}
 
 	protected function getTitle(): string {
-		return $this->getCourtCityName() . ' (' . $this->getCustomers() . ')';
+		$title = $this->getCourtCityName() . ' (' . $this->getCustomers() . ')';
+		if ($this->model->is_appeal) {
+			$title .= "\n" . Yii::t('court', 'Is Appeal');
+		}
+		return $title;
 	}
 
 	protected function getCourtCityName(): string {

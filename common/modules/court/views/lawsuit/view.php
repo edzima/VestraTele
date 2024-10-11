@@ -15,6 +15,9 @@ use yii\widgets\DetailView;
 /** @var yii\web\View $this */
 /** @var Lawsuit $model */
 $this->title = $model->getName();
+if ($model->is_appeal) {
+	$this->title .= ' - ' . Yii::t('court', 'Is Appeal');
+}
 $this->params['breadcrumbs'][] = ['label' => Yii::t('court', 'Lawsuits'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);

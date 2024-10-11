@@ -81,6 +81,10 @@ $this->params['breadcrumbs'][] = $this->title;
 					],
 				],
 			],
+			[
+				'attribute' => 'is_appeal',
+				'format' => 'boolean',
+			],
 			'due_at:datetime',
 			[
 				'attribute' => 'location',

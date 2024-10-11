@@ -23,10 +23,16 @@ $filterGroups[] = [
 	'filteredPropertyName' => 'courtType',
 	'filters' => LawsuitCalendarSearch::getCourtFilters(),
 ];
+$filterGroups[] = [
+	'id' => 1,
+	'title' => Yii::t('court', 'Is Appeal'),
+	'filteredPropertyName' => 'is_appeal',
+	'filters' => LawsuitCalendarSearch::getIsAppealFilters(),
+];
 $summonsTypesFilter = $summonsModel->getSummonsTypesFilters();
 if (!empty($summonsTypesFilter)) {
 	$filterGroups[] = [
-		'id' => 1,
+		'id' => 2,
 		'title' => Yii::t('court', 'Summons'),
 		'filteredPropertyName' => 'typeId',
 		'filters' => $summonsTypesFilter,

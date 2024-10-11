@@ -15,6 +15,7 @@ use yii\widgets\ActiveForm;
 
 	<?php $form = ActiveForm::begin(); ?>
 
+	<?= $form->field($model, 'is_appeal')->checkbox() ?>
 
 	<div class="row">
 		<div class="col-md-4 col-lg-3">
@@ -55,6 +56,7 @@ use yii\widgets\ActiveForm;
 					'prompt' => '---',
 				]) ?>
 		</div>
+
 
 	</div>
 

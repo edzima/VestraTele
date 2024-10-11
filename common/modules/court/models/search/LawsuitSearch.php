@@ -33,6 +33,7 @@ class LawsuitSearch extends Lawsuit {
 	public function rules(): array {
 		return [
 			[['id', 'court_id', 'creator_id', 'issue_id'], 'integer'],
+			[['is_appeal'], 'default', 'value' => null],
 			[['customer', 'signature_act', 'room', 'due_at', 'details', 'created_at', 'updated_at', 'location', 'presence_of_the_claimant', 'court_type'], 'safe'],
 		];
 	}
@@ -84,6 +85,7 @@ class LawsuitSearch extends Lawsuit {
 			'creator_id' => $this->creator_id,
 			'location' => $this->location,
 			'presence_of_the_claimant' => $this->presence_of_the_claimant,
+			'is_appeal' => $this->is_appeal,
 			Court::tableName() . '.type' => $this->court_type,
 		]);
 

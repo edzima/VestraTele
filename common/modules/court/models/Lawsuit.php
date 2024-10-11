@@ -26,6 +26,7 @@ use yii\db\Expression;
  * @property int $creator_id
  * @property int|null $online
  * @property int|null $presence_of_the_claimant
+ * @property int $is_appeal
  *
  * @property Court $court
  * @property User $creator
@@ -70,6 +71,7 @@ class Lawsuit extends ActiveRecord {
 		return [
 			[['court_id', 'creator_id', 'presence_of_the_claimant'], 'required'],
 			[['court_id', 'creator_id', 'presence_of_the_claimant'], 'integer'],
+			[['is_appeal', 'boolean']],
 			[['due_at', 'created_at', 'updated_at'], 'safe'],
 			[['location',], 'string', 'max' => 2],
 			[['signature_act', 'room', 'details'], 'string', 'max' => 255],
@@ -101,7 +103,7 @@ class Lawsuit extends ActiveRecord {
 			'locationName' => Yii::t('court', 'Location'),
 			'presence_of_the_claimant' => Yii::t('court', 'Presence of the Claimant'),
 			'presenceOfTheClaimantName' => Yii::t('court', 'Presence of the Claimant'),
-
+			'is_appeal' => Yii::t('court', 'Is Appeal'),
 		];
 	}
 
