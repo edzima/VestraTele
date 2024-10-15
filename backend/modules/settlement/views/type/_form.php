@@ -20,8 +20,6 @@ use yii\helpers\Html;
 
 			<?= $form->field($model, 'is_active')->checkbox() ?>
 
-			<?= $form->field($model, 'visibility_status')->dropDownList($model->visibilityNames()) ?>
-
 			<?= $form->field($model, 'issueTypesIds')->widget(
 				Select2::class, [
 				'data' => $model->getIssueTypesNames(),

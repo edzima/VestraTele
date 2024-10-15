@@ -21,16 +21,11 @@ use yii\helpers\Json;
  * @property string $name
  * @property int|null $is_active
  * @property string|null $options
- * @property int $visibility_status
  *
  * @property IssuePayCalculation[] $issuePayCalculations
  * @property IssueType[] $issueTypes
  */
 class SettlementType extends ActiveRecord implements ModelRbacInterface {
-
-	public const VISIBILITY_ONLY_BOOKEEPER = 20;
-	public const VISIBILITY_ISSUE_USERS = 30;
-	public const VISIBILITY_ISSUE_ACCESS = 40;
 
 	private ?SettlementTypeOptions $typeOptions = null;
 
@@ -41,24 +36,6 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 	 */
 	public static function tableName(): string {
 		return '{{%settlement_type}}';
-	}
-
-	public static function findForIssueType(int $typeId): array {
-		return static::find()
-			->forIssueTypes([$typeId])
-			->all();
-	}
-
-	public function isForIssueTypeId(int $type_id): bool {
-		if (empty($this->issueTypes)) {
-			return true;
-		}
-		foreach ($this->issueTypes as $issueType) {
-			if ($issueType->id === $type_id || in_array($type_id, $issueType->getAllChildesIds())) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private static ?array $MODELS = null;
@@ -82,7 +59,7 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 	public function rules(): array {
 		return [
 			[['name'], 'required'],
-			[['is_active', 'visibility_status'], 'integer'],
+			[['is_active'], 'integer'],
 			[['options'], 'safe'],
 			[['name'], 'string', 'max' => 255],
 		];
@@ -98,8 +75,6 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 			'is_active' => Yii::t('settlement', 'Is Active'),
 			'issueTypes' => Yii::t('settlement', 'Issue Types'),
 			'options' => Yii::t('settlement', 'Options'),
-			'visibility_status' => Yii::t('settlement', 'Visibility'),
-			'visibilityName' => Yii::t('settlement', 'Visibility'),
 		];
 	}
 
@@ -137,10 +112,6 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 			->viaTable(static::ISSUE_TYPE_VIA_TABLE, ['settlement_type_id' => 'id']);
 	}
 
-	public function getVisibilityName(): ?string {
-		return static::visibilityNames()[$this->visibility_status] ?? null;
-	}
-
 	public function getTypeOptions(): SettlementTypeOptions {
 		if ($this->typeOptions === null) {
 			$attributes = $this->options;
@@ -161,28 +132,27 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 		return ArrayHelper::getColumn($this->issueTypes, 'id');
 	}
 
-	public static function visibilityNames(): array {
-		return [
-			static::VISIBILITY_ONLY_BOOKEEPER => Yii::t('settlement', 'Visibility: Bookeper'),
-			static::VISIBILITY_ISSUE_USERS => Yii::t('settlement', 'Visibility: Issue Users'),
-			static::VISIBILITY_ISSUE_ACCESS => Yii::t('settlement', 'Visibility: Issue Access'),
-		];
-	}
-
-	public static function find(): SettlementTypeQuery {
-		return new SettlementTypeQuery(static::class);
-	}
-
-	public function hasAccess(string|int $id, string $action): bool {
+	public function hasAccess(string|int $id, string $action, string $app): bool {
 		return $this->getModelRbac()
+			->setApp($app)
 			->setAction($action)
 			->checkAccess($id);
 	}
 
+	public function isForIssueTypeId(int $type_id): bool {
+		if (empty($this->issueTypes)) {
+			return true;
+		}
+		foreach ($this->issueTypes as $issueType) {
+			if ($issueType->id === $type_id || in_array($type_id, $issueType->getAllChildesIds())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public function getRbacBaseName(): string {
-		return $this->isNewRecord
-			? Yii::t('settlement', 'Settlement Types')
-			: Yii::t('settlement', 'Settlement Type: {name}', ['name' => $this->name]);
+		return Yii::t('settlement', 'Settlement Types');
 	}
 
 	public function getRbacId(): ?string {
@@ -192,4 +162,9 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 	public function getModelRbac(): ModelAccessManager {
 		return SettlementTypeAccessManager::createFromModel($this);
 	}
+
+	public static function find(): SettlementTypeQuery {
+		return new SettlementTypeQuery(static::class);
+	}
+
 }

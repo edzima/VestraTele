@@ -17,7 +17,7 @@ class SettlementTypeSearch extends SettlementType {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'is_active', 'visibility_status'], 'integer'],
+			[['id', 'is_active'], 'integer'],
 			[['name', 'issue_types', 'options'], 'safe'],
 		];
 	}
@@ -61,7 +61,6 @@ class SettlementTypeSearch extends SettlementType {
 		$query->andFilterWhere([
 			'id' => $this->id,
 			'is_active' => $this->is_active,
-			'visibility_status' => $this->visibility_status,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])

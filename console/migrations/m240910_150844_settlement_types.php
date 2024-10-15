@@ -25,7 +25,6 @@ class m240910_150844_settlement_types extends Migration {
 			'id' => $this->primaryKey(),
 			'name' => $this->string()->notNull()->unique(),
 			'is_active' => $this->boolean(),
-			'visibility_status' => $this->smallInteger(),
 			'options' => $this->json()->null(),
 		]);
 

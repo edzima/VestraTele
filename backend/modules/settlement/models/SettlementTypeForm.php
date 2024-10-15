@@ -14,15 +14,12 @@ class SettlementTypeForm extends Model {
 	public $name;
 	public $is_active;
 	public $issueTypesIds;
-	public ?int $visibility_status = SettlementType::VISIBILITY_ONLY_OWNER;
-
 	private ?SettlementType $model = null;
 	private ?SettlementTypeOptions $options = null;
 
 	public function rules(): array {
 		return [
 			[['name', 'is_active'], 'required'],
-			[['visibility_status'], 'integer'],
 			['issueTypesIds', 'each', 'rule' => ['integer']],
 			[
 				'name', 'unique',
@@ -33,14 +30,12 @@ class SettlementTypeForm extends Model {
 					}
 				},
 			],
-			['visibility_status', 'in', 'range' => array_keys($this->visibilityNames())],
 		];
 	}
 
 	public function attributeLabels(): array {
 		return array_merge(SettlementType::instance()->attributeLabels(), [
 			'issueTypesIds' => Yii::t('settlement', 'Issue Types'),
-			'visibility_status' => Yii::t('settlement', 'Visibility'),
 		]);
 	}
 
@@ -48,7 +43,6 @@ class SettlementTypeForm extends Model {
 		$this->model = $model;
 		$this->name = $model->name;
 		$this->is_active = $model->is_active;
-		$this->visibility_status = $model->visibility_status;
 		$this->issueTypesIds = $model->getIssueTypesIds();
 	}
 
@@ -69,13 +63,11 @@ class SettlementTypeForm extends Model {
 		$model = $this->getModel();
 		$model->name = $this->name;
 		$model->is_active = $this->is_active;
-		$model->visibility_status = $this->visibility_status;
 		$model->setTypeOptions($this->getOptions());
 		$model->options = $this->getOptions()->toJson();
 		if (!$model->save()) {
 			return false;
 		}
-		Yii::warning($this->getIssueTypesIds());
 		$model->linkIssueTypes($this->getIssueTypesIds());
 		return $model->save();
 	}
@@ -105,7 +97,4 @@ class SettlementTypeForm extends Model {
 		return $this->options;
 	}
 
-	public function visibilityNames(): array {
-		return SettlementType::visibilityNames();
-	}
 }
