@@ -34,7 +34,6 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attributes' => [
 					'name',
 					'is_active:boolean',
-					'visibilityName',
 					[
 						'attribute' => 'issueTypes',
 						'value' => function (SettlementType $model) {

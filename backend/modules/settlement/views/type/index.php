@@ -34,11 +34,6 @@ $this->params['breadcrumbs'][] = $this->title;
 			'name',
 			'is_active:boolean',
 			[
-				'attribute' => 'visibility_status',
-				'value' => 'visibilityName',
-				'filter' => SettlementTypeSearch::visibilityNames(),
-			],
-			[
 				'attribute' => 'issueTypes',
 				'value' => function (SettlementType $model) {
 					$types = $model->issueTypes;
