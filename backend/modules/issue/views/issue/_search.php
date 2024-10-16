@@ -288,6 +288,21 @@ use yii\widgets\ActiveForm;
 		])->textInput() ?>
 	</div>
 
+	<div class="row">
+		<?= $form->field($model, 'excludedEntity', ['options' => ['class' => 'col-md-4']])
+			->widget(Select2::class, [
+				'data' => IssueSearch::getEntityNames(),
+				'options' => [
+					'multiple' => true,
+					'placeholder' => $model->getAttributeLabel('excludedEntity'),
+				],
+				'pluginOptions' => [
+					'allowClear' => true,
+				],
+				'showToggleAll' => true,
+			]) ?>
+	</div>
+
 
 	<div class="form-group">
 		<?= Html::submitButton(Yii::t('backend', 'Search'), ['class' => 'btn btn-primary']) ?>

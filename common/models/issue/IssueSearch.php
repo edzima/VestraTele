@@ -67,6 +67,8 @@ abstract class IssueSearch extends Model
 	public $excludedTypes = [];
 	public $excludedStages = [];
 
+	public $excludedEntity = [];
+
 	public $onlyWithTelemarketers;
 
 	public $noteFilter;
@@ -190,6 +192,7 @@ abstract class IssueSearch extends Model
 			],
 			['stage_id', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
 			[['type_id', 'excludedTypes'], 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
+			[['excludedEntity'], 'in', 'range' => array_keys(static::getEntityNames()), 'allowArray' => true],
 			[['customerName', 'userName'], 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[['excludedTagsIds', 'tagsIds'], 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
 			[
@@ -230,6 +233,7 @@ abstract class IssueSearch extends Model
 			'signedAtTo' => Yii::t('issue', 'Signed At to'),
 			'tagsIds' => Yii::t('issue', 'Tags'),
 			'excludedTagsIds' => Yii::t('issue', 'Excluded tags'),
+			'excludedEntity' => Yii::t('issue', 'Excluded entity'),
 			'withoutTags' => Yii::t('issue', 'Without Tags'),
 			'tele_id' => IssueUser::getTypesNames()[IssueUser::TYPE_TELEMARKETER],
 			'userName' => Yii::t('issue', 'First name & surname'),
@@ -278,6 +282,7 @@ abstract class IssueSearch extends Model
 		$this->applyIssueStageFilter($query);
 		$this->noteStageFilter($query);
 		$this->applyIssueDetailsFilter($query);
+		$this->applyExcludedEntity($query);
 
 		$query->andFilterWhere([
 			Issue::tableName() . '.id' => $this->issue_id,
@@ -724,6 +729,12 @@ abstract class IssueSearch extends Model
 			throw new InvalidConfigException('userId cannot be empty');
 		}
 		$query->userTypes($this->userId, $withChildren);
+	}
+
+	protected function applyExcludedEntity(IssueQuery $query): void {
+		if (!empty($this->excludedEntity)) {
+			$query->andWhere(['NOT IN', Issue::tableName() . '.entity_responsible_id', $this->excludedEntity]);
+		}
 	}
 
 }
