@@ -12,6 +12,9 @@ use yii\rbac\Permission;
 
 class ModelAccessManager extends Component {
 
+	public const APP_FRONTEND = 'frontend';
+	public const APP_BACKEND = 'admin';
+
 	public const ACTION_INDEX = 'index';
 	public const ACTION_VIEW = 'view';
 	public const ACTION_CREATE = 'create';
@@ -31,10 +34,6 @@ class ModelAccessManager extends Component {
 	protected string $app = self::APP_FRONTEND;
 
 	public array $availableApps = self::APP_ADVANCED;
-
-	public string $permissionPrefixName = 'modelAccess';
-
-	public string $nameSeparator = ':';
 
 	public array $availableParentRoles = [];
 	public array $availableParentPermissions = [];
@@ -138,25 +137,44 @@ class ModelAccessManager extends Component {
 		return $this->auth->getPermission($this->getPermissionName());
 	}
 
-	public function getParentsRoles(): array {
-		return $this->auth->getParentsRoles($this->getPermissionName());
+	public function getParentsRoles(string $name = null): array {
+		$name = $name ?? $this->getPermissionName();
+		return $this->auth->getParentsRoles($name);
 	}
 
-	public function getParentsPermissions(): array {
-		return $this->auth->getParentsPermissions($this->getPermissionName());
+	public function getParentsPermissions(string $name = null): array {
+		$name = $name ?? $this->getPermissionName();
+		return $this->auth->getParentsPermissions($name);
 	}
 
-	protected function getPermissionName(): string {
-		$parts = [
-			$this->permissionPrefixName,
-			$this->app,
-			$this->modelRbac->getRbacBaseName(),
-			$this->action,
-		];
-		if (!empty($this->modelRbac->getRbacId())) {
-			$parts[] = $this->modelRbac->getRbacId();
+	public function getIds(string|int $userId = null): array {
+		$models = $this->getAccessPermissions(AccessPermission::COMPARE_WITHOUT_ID);
+		$ids = array_filter($models, function (AccessPermission $permission) use ($userId) {
+			return !empty($permission->modelId);
+		});
+		if (empty($userId)) {
+			return $ids;
 		}
-		return implode($this->nameSeparator, $parts);
+		return array_filter($ids, function (string $name) use ($userId) {
+			return $this->auth->checkAccess($userId, $name);
+		}, ARRAY_FILTER_USE_KEY);
+	}
+
+	/**
+	 * @param string $type
+	 * @return AccessPermission[]
+	 */
+	public function getAccessPermissions(string $type = AccessPermission::COMPARE_ALL): array {
+		$self = $this->createAccessPermission();
+		$data = [];
+		foreach ($this->auth->getPermissions() as $permission) {
+			$compare = $this->createAccessPermission($permission->name);
+			if ($compare->explode()
+				&& AccessPermission::compare($self, $compare, $type)) {
+				$data[$permission->name] = $compare;
+			}
+		}
+		return $data;
 	}
 
 	protected function createPermission(): Permission {

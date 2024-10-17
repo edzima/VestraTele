@@ -50,6 +50,17 @@ class TypeController extends Controller {
 		]);
 	}
 
+	public function actionAccessDetails(): string {
+		$id = Yii::$app->request->post('expandRowKey');
+		if ($id) {
+			$model = $this->findModel($id);
+			return $this->renderAjax('_access-details', [
+				'model' => $model,
+			]);
+		}
+		return '';
+	}
+
 	/**
 	 * Lists all SettlementType models.
 	 *

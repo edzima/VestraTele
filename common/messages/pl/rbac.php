@@ -118,4 +118,8 @@ return array_merge([
 	'sms' => 'SMS',
 	'sms.multiple' => 'SMS - Multi',
 	'loginToBackend' => 'Logowanie - Backend',
+	'Roles' => 'Role',
+	'Permissions' => 'Uprawnienia',
+	'Action' => 'Akcja',
+	'App' => 'Aplikacja',
 ], $local);

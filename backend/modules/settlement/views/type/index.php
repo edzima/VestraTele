@@ -6,6 +6,7 @@ use common\models\issue\IssueType;
 use common\models\settlement\search\SettlementTypeSearch;
 use common\models\settlement\SettlementType;
 use common\widgets\grid\ActionColumn;
+use kartik\grid\ExpandRowColumn;
 
 /** @var yii\web\View $this */
 /** @var SettlementTypeSearch $searchModel */
@@ -60,6 +61,13 @@ $this->params['breadcrumbs'][] = $this->title;
 				'label' => Yii::t('settlement', 'VAT'),
 				'value' => function (SettlementType $model) {
 					return $model->getTypeOptions()->vat;
+				},
+			],
+			[
+				'class' => ExpandRowColumn::class,
+				'detailUrl' => 'access-details',
+				'value' => function ($model, $key, $index) {
+					return GridView::ROW_COLLAPSED;
 				},
 			],
 			[
