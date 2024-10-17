@@ -6,7 +6,9 @@ use backend\helpers\Url;
 use backend\modules\settlement\models\CalculationForm;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\modules\settlement\models\search\IssueToCreateCalculationSearch;
+use backend\modules\settlement\models\search\IssueViewPayCalculationSearch;
 use common\components\provision\exception\Exception;
+use common\components\rbac\SettlementTypeAccessManager;
 use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
@@ -53,7 +55,8 @@ class CalculationController extends Controller {
 		if (!Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
 			return $this->redirect(['owner']);
 		}
-		$searchModel = new IssuePayCalculationSearch();
+		$searchModel = new IssuePayCalculationSearch(Yii::$app->user->id);
+		$searchModel->action = SettlementTypeAccessManager::ACTION_INDEX;
 		$searchModel->onlyWithPayProblems = false;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -64,9 +67,10 @@ class CalculationController extends Controller {
 	}
 
 	public function actionOwner() {
-		$searchModel = new IssuePayCalculationSearch();
+		$searchModel = new IssuePayCalculationSearch(Yii::$app->user->id);
 		$searchModel->scenario = IssuePayCalculationSearch::SCENARIO_OWNER;
 		$searchModel->owner_id = Yii::$app->user->getId();
+		$searchModel->action = SettlementTypeAccessManager::ACTION_INDEX;
 		$searchModel->onlyWithPayProblems = false;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -81,7 +85,7 @@ class CalculationController extends Controller {
 			throw new ForbiddenHttpException();
 		}
 		Url::remember();
-		$searchModel = new IssuePayCalculationSearch();
+		$searchModel = new IssuePayCalculationSearch(Yii::$app->user->id);
 		$searchModel->setScenario(IssuePayCalculationSearch::SCENARIO_ARCHIVE);
 		$searchModel->withArchive = true;
 		$searchModel->withIssueStage = true;
@@ -119,11 +123,11 @@ class CalculationController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIssue(int $id): string {
-		$searchModel = new IssuePayCalculationSearch();
-		$searchModel->issue_id = $id;
+		$searchModel = new IssueViewPayCalculationSearch($id, Yii::$app->user->getId());
 		if ($searchModel->issue === null) {
 			throw new NotFoundHttpException('Issue dont exist.');
 		}
+		$searchModel->action = SettlementTypeAccessManager::ACTION_ISSUE_VIEW;
 		$searchModel->withCustomer = false;
 		$toCreateSearchModel = new IssueToCreateCalculationSearch();
 		$toCreateSearchModel->issue_id = $id;
@@ -144,7 +148,7 @@ class CalculationController extends Controller {
 	 * @return mixed
 	 */
 	public function actionView(int $id): string {
-		$model = $this->findModel($id);
+		$model = $this->findModel($id, SettlementTypeAccessManager::ACTION_VIEW);
 		if (Yii::$app->user->can(User::PERMISSION_PROVISION)) {
 			foreach ($model->pays as $pay) {
 				if (empty($pay->provisions)) {
@@ -176,6 +180,9 @@ class CalculationController extends Controller {
 		$issue = $this->findIssueModel($issueId);
 		$model = new CalculationForm(Yii::$app->user->getId(), $issue);
 		$type = $this->findType($typeId);
+		if ($this->hasTypeAccess($type, SettlementTypeAccessManager::ACTION_CREATE)) {
+			throw new ForbiddenHttpException();
+		}
 		if (!$type->isForIssueTypeId($issue->getIssueTypeId())) {
 			throw new NotFoundHttpException();
 		}
@@ -211,7 +218,7 @@ class CalculationController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$calculation = $this->findModel($id);
+		$calculation = $this->findModel($id, SettlementTypeAccessManager::ACTION_UPDATE);
 		if (!Yii::$app->user->can(User::PERMISSION_CALCULATION_UPDATE)
 			&& $calculation->owner_id !== Yii::$app->user->getId()) {
 			throw new ForbiddenHttpException(Yii::t('backend', 'Only bookkeeper or owner can update settlement.'));
@@ -227,7 +234,7 @@ class CalculationController extends Controller {
 	}
 
 	public function actionPays(int $id) {
-		$calculation = $this->findModel($id);
+		$calculation = $this->findModel($id, SettlementTypeAccessManager::ACTION_PAYS);
 		if ($calculation->isPayed()) {
 			Yii::$app->session->addFlash('Warning', 'Only in not payed calculation can be generate pays.');
 			return $this->redirect(['view', 'id' => $id]);
@@ -278,7 +285,7 @@ class CalculationController extends Controller {
 	 * @throws MethodNotAllowedHttpException
 	 */
 	public function actionDelete(int $id): Response {
-		$model = $this->findModel($id);
+		$model = $this->findModel($id, SettlementTypeAccessManager::ACTION_DELETE);
 		if ($model->owner_id === Yii::$app->user->getId()
 			|| Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)
 			|| Yii::$app->user->can(Worker::PERMISSION_SETTLEMENT_DELETE_NOT_SELF)) {
@@ -296,8 +303,11 @@ class CalculationController extends Controller {
 	 * @return IssuePayCalculation the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	protected function findModel(int $id): IssuePayCalculation {
+	protected function findModel(int $id, string $action): IssuePayCalculation {
 		if (($model = IssuePayCalculation::findOne($id)) !== null) {
+			if (!$this->hasTypeAccess($model->type, $action)) {
+				throw new ForbiddenHttpException();
+			}
 			return $model;
 		}
 
@@ -315,6 +325,10 @@ class CalculationController extends Controller {
 		}
 
 		throw new NotFoundHttpException('The requested page does not exist.');
+	}
+
+	private function hasTypeAccess(SettlementType $type, string $action): bool {
+		return $type->hasAccess(Yii::$app->user->getId(), $action, SettlementTypeAccessManager::APP_BACKEND);
 	}
 
 	private function findType(int $id): SettlementType {

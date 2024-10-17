@@ -25,7 +25,10 @@ use yii\widgets\DetailView;
 				'attribute' => 'deadlineRangeName',
 				'visible' => !empty($model->deadline_range),
 			],
-			'providerTypeName',
+			[
+				'attribute' => 'providerTypeName',
+				'visible' => !empty($model->provider_type),
+			],
 		],
 	]) ?>
 </div>

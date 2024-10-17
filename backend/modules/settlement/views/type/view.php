@@ -1,7 +1,7 @@
 <?php
 
+use common\helpers\Html;
 use common\models\settlement\SettlementType;
-use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
@@ -11,6 +11,7 @@ $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlements'), 'url' => ['calculation/index']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Settlement Types'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="settlement-type-view">
 
@@ -18,6 +19,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+
+		<?= Html::a(Yii::t('backend', 'Access'), ['access', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+
 		<?= Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',
 			'data' => [

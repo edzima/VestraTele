@@ -2,7 +2,9 @@
 
 namespace common\widgets\settlement;
 
+use common\helpers\Html;
 use common\models\issue\IssuePayCalculation;
+use common\models\user\Worker;
 use Decimal\Decimal;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -16,6 +18,8 @@ class SettlementDetailView extends DetailView {
 	public ?int $userIdProvisions = null;
 
 	public bool $withType = true;
+
+	public ?string $typeRoute = null;
 	public bool $withOwner = true;
 
 	public bool $withCreatedAt = false;
@@ -25,7 +29,9 @@ class SettlementDetailView extends DetailView {
 		if (!$this->model instanceof IssuePayCalculation) {
 			throw new InvalidConfigException('$model must be instance of: ' . IssuePayCalculation::class);
 		}
-
+		if (!YII_IS_FRONTEND && Yii::$app->user->can(Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER)) {
+			$this->typeRoute = '/settlement/type/view';
+		}
 		if (empty($this->attributes)) {
 			$this->attributes = $this->defaultAttributes();
 		}
@@ -46,6 +52,16 @@ class SettlementDetailView extends DetailView {
 			],
 			[
 				'attribute' => 'typeName',
+				'value' => function (IssuePayCalculation $model): string {
+					if ($this->typeRoute) {
+						return Html::a($model->getTypeName(), [
+							$this->typeRoute,
+							'id' => $model->type_id,
+						]);
+					}
+					return $model->getTypeName();
+				},
+				'format' => 'html',
 				'visible' => $this->withType,
 			],
 			[

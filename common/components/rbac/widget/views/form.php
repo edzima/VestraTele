@@ -20,8 +20,7 @@ use yii\widgets\ActiveForm;
 
 			<div class="col-md-4">
 
-				<h3><?= Html::encode($model->getActionName()) ?></h3>
-
+				<h3><?= Html::encode($model->getName()) ?></h3>
 
 				<?= $form->field($model, "[$index]roles")->widget(Select2::class, [
 					'data' => $model->getRolesNames(),

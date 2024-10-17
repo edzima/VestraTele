@@ -8,20 +8,25 @@ use yii\base\Model;
 class ModelActionsForm extends Model {
 
 	public array $appsActions = [
-		'@frontendUrl' => [
-			'issue.view',
+		ModelAccessManager::APP_FRONTEND => [
+			ModelAccessManager::ACTION_VIEW,
 		],
-		'@backendUrl' => [
-			'issue.view',
+		ModelAccessManager::APP_BACKEND => [
+			ModelAccessManager::ACTION_VIEW,
 		],
 	];
 
 	private ModelAccessManager $_access;
 
-	public array $excludesFrontendActions = [];
-
 	public function setAccess(ModelAccessManager $model): void {
 		$this->_access = $model;
+		$appsActions = [];
+		foreach ($model->availableApps as $app) {
+			foreach ($model->getActions() as $action) {
+				$appsActions[$app][] = $action;
+			}
+		}
+		$this->appsActions = $appsActions;
 	}
 
 	private array $models = [];
@@ -60,11 +65,11 @@ class ModelActionsForm extends Model {
 		return true;
 	}
 
-	private function createForm(string $action, ?string $app) {
-		return new ModelRbacForm([
-			'action' => $action,
-			'app' => $app,
-			'access' => $this->_access,
-		]);
+	private function createForm(string $action, string $app) {
+		$access = clone $this->_access;
+		$access->setAction($action)
+			->setApp($app);
+		$model = new ModelRbacForm($access);
+		return $model;
 	}
 }

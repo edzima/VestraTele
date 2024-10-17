@@ -10,48 +10,22 @@ class ModelRbacForm extends Model {
 
 	public $roles = [];
 	public $permissions = [];
-	public $managerUserIds = [];
+
+	public $usersIds = [];
 
 	public string $action;
 
-	public ?string $app = null;
+	public string $app;
 	private ModelAccessManager $access;
 
-	public function setAccess(ModelAccessManager $model): void {
-		$this->access = $model;
-//		$this->roles = $model->getParentsRoles();
-//		$this->permissions = $model->getParentsPermissions();
-	}
-
-	public function setAction(string $action): void {
-		$this->action = $action;
-	}
-
-	public function save(bool $validate = true): bool {
-		if ($validate && !$this->validate()) {
-			return false;
-		}
-		if (!empty($this->managerUserIds) || !empty($this->permissions) || !empty($this->roles)) {
-			$this->access->ensurePermission();
-		}
-		if (!empty($this->managerUserIds)) {
-			foreach ($this->managerUserIds as $managerUserId) {
-				if (!empty($managerUserId)) {
-					$this->access->assign($managerUserId, true);
-				}
-			}
-		}
-		if (!empty($this->roles)) {
-			$this->access->addToRoles($this->roles);
-		}
-		if (!empty($this->roles)) {
-			$this->access->addToPermissions($this->roles);
-		}
-		return true;
+	public function __construct(ModelAccessManager $access, array $config = []) {
+		parent::__construct($config);
+		$this->setAccess($access);
 	}
 
 	public function rules(): array {
 		return [
+			[['!action', '!app'], 'required'],
 			[['roles', 'permissions'], 'default', 'value' => []],
 			['roles', 'in', 'range' => array_keys($this->getRolesNames()), 'allowArray' => true],
 			['permissions', 'in', 'range' => array_keys($this->getPermissionsNames()), 'allowArray' => true],
@@ -65,6 +39,42 @@ class ModelRbacForm extends Model {
 		];
 	}
 
+	protected function setAccess(ModelAccessManager $model): void {
+		$this->access = $model;
+		$this->action = $model->action;
+		$this->app = $model->getApp();
+		$this->roles = $model->getParentsRoles();
+		$this->permissions = $model->getParentsPermissions();
+	}
+
+	public function setAction(string $action): void {
+		$this->action = $action;
+	}
+
+	public function save(bool $validate = true): bool {
+		if ($validate && !$this->validate()) {
+			return false;
+		}
+		if (!empty($this->roles) || !empty($this->permissions) || !empty($this->usersIds)) {
+			$this->access->ensurePermission();
+		}
+		if (!empty($this->usersIds)) {
+			foreach ($this->usersIds as $userId) {
+				if (!empty($userId)) {
+					$this->access->assign($userId);
+				}
+			}
+		}
+		if (!empty($this->roles)) {
+			$this->access->addToRoles($this->roles);
+		}
+		if (!empty($this->permissions)) {
+			$this->access->addToPermissions($this->permissions);
+		}
+		return true;
+	}
+
+
 	public function getRolesNames(): array {
 		return $this->access->getAvailableParentRolesNames();
 	}
@@ -73,7 +83,7 @@ class ModelRbacForm extends Model {
 		return $this->access->getAvailableParentsPermissionsNames();
 	}
 
-	public function getActionName(): string {
-		return $this->access->getActionsNames()[$this->action];
+	public function getName(): string {
+		return $this->access->getPermissionDescription();
 	}
 }

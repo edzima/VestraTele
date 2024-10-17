@@ -2,7 +2,7 @@
 
 namespace frontend\models\search;
 
-use common\models\issue\IssuePayCalculation;
+use common\components\rbac\SettlementTypeAccessManager;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\settlement\search\IssuePayCalculationSearch as BaseIssuePayCalculationSearch;
 use common\models\user\User;
@@ -10,6 +10,7 @@ use Yii;
 
 class IssuePayCalculationSearch extends BaseIssuePayCalculationSearch {
 
+	public string $app = SettlementTypeAccessManager::APP_FRONTEND;
 	public const PROBLEM_STATUS_NONE = -1;
 
 	public $problem_status = self::PROBLEM_STATUS_NONE;
@@ -18,6 +19,11 @@ class IssuePayCalculationSearch extends BaseIssuePayCalculationSearch {
 	public $excludesTypes = [
 		IssuePayCalculation::TYPE_COST_REFUND_LEGAL_REPRESANTION,
 	];
+
+	public function __construct($userId, $config = []) {
+		parent::__construct($config);
+		$this->userId = $userId;
+	}
 
 	public function rules(): array {
 		return array_merge([
