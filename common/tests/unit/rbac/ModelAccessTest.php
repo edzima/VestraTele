@@ -109,10 +109,10 @@ class ModelAccessTest extends Unit {
 		);
 	}
 
-	public function testGetPermissions(): void {
+	public function testGetAccessPermissions(): void {
 		$this->giveManager();
 		$this->setRbacModel();
-		$permissions = $this->manager->getPermissions();
+		$permissions = $this->manager->getAccessPermissions();
 		$this->tester->assertCount(0, $permissions);
 
 		$this->manager->setAction('testOneAction');
@@ -121,7 +121,7 @@ class ModelAccessTest extends Unit {
 		$this->manager->setAction('testDoubleAction');
 		$this->manager->ensurePermission();
 
-		$permissions = $this->manager->getPermissions();
+		$permissions = $this->manager->getAccessPermissions();
 		$this->tester->assertCount(2, $permissions);
 	}
 

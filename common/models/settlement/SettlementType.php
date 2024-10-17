@@ -152,7 +152,7 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 	}
 
 	public function getRbacBaseName(): string {
-		return Yii::t('settlement', 'Settlement Types');
+		return 'settlement_types';
 	}
 
 	public function getRbacId(): ?string {
