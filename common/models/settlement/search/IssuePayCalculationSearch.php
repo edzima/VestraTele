@@ -2,6 +2,7 @@
 
 namespace common\models\settlement\search;
 
+use common\components\rbac\ModelAccessManager;
 use common\models\AgentSearchInterface;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueStage;
@@ -13,6 +14,7 @@ use common\models\issue\query\IssueUserQuery;
 use common\models\issue\search\ArchivedIssueSearch;
 use common\models\issue\search\IssueTypeSearch;
 use common\models\SearchModel;
+use common\models\settlement\SettlementType;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
@@ -57,6 +59,17 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public ?bool $onlyWithPayProblems = null;
 	public bool $onlyToPayed = false;
 
+	public string $app;
+	public string $action;
+	public $userId;
+
+	public function getTypeAccessManager(): ModelAccessManager {
+		return SettlementType::instance()
+			->getModelRbac()
+			->setApp($this->app)
+			->setAction($this->action);
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -64,9 +77,10 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		return [
 			[['issue_id', 'stage_id', 'problem_status', 'owner_id'], 'integer'],
 			[['!owner_id'], 'required', 'on' => static::SCENARIO_OWNER],
-			[['type_id', 'excludesTypes'], 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
+			[['type_id','excludesTypes'], 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
 			['issue_type_id', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			['issue_stage_id', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true, 'when' => function (): bool { return $this->withIssueStage; }],
+
 			['agent_id', 'in', 'range' => array_keys($this->getAgentsNames()), 'allowArray' => true],
 			['problem_status', 'in', 'range' => array_keys(static::getProblemStatusesNames())],
 			[['value'], 'number'],
@@ -120,12 +134,13 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 				}
 			},
 		]);
+
 		$query->with('type');
 		$query->joinWith('issue.type IT');
 		$query->joinWith('owner O');
 		$query->joinWith('pays P');
-
 		$query->distinct();
+		$this->applyUserTypesFilter($query);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -140,6 +155,10 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 		if (!$this->validate()) {
 			$query->andWhere('0=1');
+			Yii::warning([
+				'errors' => $this->getErrors(),
+				'attributes' => $this->getAttributes(),
+			], __METHOD__);
 			return $dataProvider;
 		}
 		$this->applyAgentsFilters($query);
@@ -155,7 +174,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		// grid filtering conditions
 		$query->andFilterWhere([
 			IssuePayCalculation::tableName() . '.value' => $this->value,
-			IssuePayCalculation::tableName() . '.type' => $this->type,
+			IssuePayCalculation::tableName() . '.type_id' => $this->type_id,
 			IssuePayCalculation::tableName() . '.stage_id' => $this->stage_id,
 			IssuePayCalculation::tableName() . '.issue_id' => $this->issue_id,
 
@@ -273,6 +292,13 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 	public static function getProblemStatusesNames(): array {
 		return IssuePayCalculation::getProblemStatusesNames();
+	}
+
+	protected function applyUserTypesFilter(IssuePayCalculationQuery $query) {
+		if ($this->userId) {
+			$ids = $this->getTypeAccessManager()->getIds($this->userId);
+			$query->onlyTypes($ids);
+		}
 	}
 
 	protected function applyExcludesTypesFilter(IssuePayCalculationQuery $query): void {

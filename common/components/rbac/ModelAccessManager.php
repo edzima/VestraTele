@@ -21,13 +21,12 @@ class ModelAccessManager extends Component {
 	public const ACTION_UPDATE = 'update';
 	public const ACTION_DELETE = 'delete';
 
-	public const APP_BASIC = 'basic';
-	public const APP_FRONTEND = 'frontend';
-	public const APP_BACKEND = 'admin';
 	public const APP_ADVANCED = [
 		self::APP_BACKEND,
 		self::APP_FRONTEND,
 	];
+
+	public array $availableActions = [];
 
 	public string $action = self::ACTION_INDEX;
 
@@ -37,6 +36,13 @@ class ModelAccessManager extends Component {
 
 	public array $availableParentRoles = [];
 	public array $availableParentPermissions = [];
+
+	public ?string $managerPermission = null;
+
+	public $accessPermission = [
+		'class' => AccessPermission::class,
+		'prefix' => 'modelAccess',
+	];
 
 	/**
 	 * @var string|array|ParentsManagerInterface
@@ -51,7 +57,17 @@ class ModelAccessManager extends Component {
 	}
 
 	public function checkAccess(string|int $userId): bool {
+		if ($this->managerPermission) {
+			$hasAccess = $this->auth->checkAccess($userId, $this->managerPermission);
+			if ($hasAccess) {
+				return true;
+			}
+		}
 		return $this->auth->checkAccess($userId, $this->getPermissionName());
+	}
+
+	public function hasModel(): bool {
+		return $this->modelRbac !== null;
 	}
 
 	public function ensurePermission(): void {
@@ -62,15 +78,15 @@ class ModelAccessManager extends Component {
 		}
 	}
 
-	public function getPermissions(): array {
-		$searchName = $this->nameSeparator . $this->modelRbac->getRbacBaseName() . $this->nameSeparator;
-		return array_filter($this->auth->getPermissions(), function (Permission $permission) use ($searchName) {
-			return strpos($permission->name, $searchName) !== false;
-		});
+	public function removeAll(string $type): void {
+		$permissions = $this->getPermissions($type);
+		foreach ($permissions as $permission) {
+			$this->auth->remove($permission);
+		}
 	}
 
 	public function assign(string|int $userId): Assignment {
-		if ($this->modelRbac === null) {
+		if (!$this->hasModel()) {
 			throw new InvalidConfigException('Model must be set.');
 		}
 		$permission = $this->getPermission();
@@ -91,6 +107,10 @@ class ModelAccessManager extends Component {
 		}
 		$this->app = $name;
 		return $this;
+	}
+
+	public function getApp(): string {
+		return $this->app;
 	}
 
 	public function setModel(ModelRbacInterface $model): self {
@@ -179,11 +199,49 @@ class ModelAccessManager extends Component {
 
 	protected function createPermission(): Permission {
 		$permission = $this->auth->createPermission($this->getPermissionName());
-		$permission->description = Yii::t('rbac', 'Access to model: {modelName} for Action: {action}', [
+		$permission->description = $this->getPermissionDescription();
+		return $permission;
+	}
+
+	public function getPermissionName(): string {
+		if (!$this->hasModel()) {
+			throw new InvalidConfigException('Model must be set.');
+		}
+		$generator = $this->createAccessPermission();
+		$generator->generate();
+		return $generator->getName();
+	}
+
+	protected function createAccessPermission(string $name = null): AccessPermission {
+		$config = $this->accessPermission;
+		if (!isset($config['class'])) {
+			$config['class'] = AccessPermission::class;
+		}
+		if ($name === null) {
+			$config['app'] = $this->app;
+			$config['action'] = $this->action;
+			$config['modelName'] = $this->modelRbac->getRbacBaseName();
+			$config['modelId'] = $this->modelRbac->getRbacId();
+		} else {
+			$config['name'] = $name;
+		}
+		return Yii::createObject($config);
+	}
+
+	public function getPermissionDescription(): string {
+		if ($this->modelRbac->getRbacId()) {
+			return Yii::t('rbac', 'Access to model: {modelName} with ID: {id} for Action: {action} [{app}]', [
+				'modelName' => Yii::t('rbac', $this->modelRbac->getRbacBaseName()),
+				'action' => $this->action,
+				'app' => $this->app,
+				'id' => $this->modelRbac->getRbacId(),
+			]);
+		}
+		return Yii::t('rbac', 'Access to model: {modelName} for Action: {action} [{app}]', [
 			'modelName' => $this->modelRbac->getRbacBaseName(),
 			'action' => $this->action,
+			'app' => $this->app,
 		]);
-		return $permission;
 	}
 
 	public function getAvailableParentRolesNames(): array {

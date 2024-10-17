@@ -36,7 +36,7 @@ class CalculationProblemController extends Controller {
 			throw new ForbiddenHttpException();
 		}
 		Url::remember();
-		$searchModel = new IssuePayCalculationSearch();
+		$searchModel = new IssuePayCalculationSearch(Yii::$app->user->getId());
 		$searchModel->setScenario(IssuePayCalculationSearch::SCENARIO_ARCHIVE);
 		$searchModel->withArchive = true;
 		$searchModel->problem_status = IssuePayCalculationSearch::PROBLEM_STATUS_PROVISION_CONTROL;
@@ -48,7 +48,7 @@ class CalculationProblemController extends Controller {
 	}
 
 	public function actionIndex(): string {
-		$searchModel = new IssuePayCalculationSearch();
+		$searchModel = new IssuePayCalculationSearch(Yii::$app->user->getId());
 		$searchModel->onlyWithPayProblems = true;
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 

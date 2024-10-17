@@ -14,37 +14,6 @@ use yii\rbac\Item;
 
 class DbManager extends BaseDbManager implements ParentsManagerInterface {
 
-//	public function addToRoles(string $permission, array $names): int {
-//		$count = 0;
-//		foreach ($names as $name) {
-//			$item = $this->getRole($name);
-//			if ($item && $this->addToParent($item, $name)) {
-//				$count++;
-//			}
-//		}
-//		return $count;
-//	}
-//
-//	public function addToPermissions(string $permission, array $names): int {
-//		$count = 0;
-//		foreach ($names as $name) {
-//			$item = $this->getPermission($name);
-//			if ($item && $this->addToParent($item, $name)) {
-//				$count++;
-//			}
-//		}
-//		return $count;
-//	}
-
-//	protected function addToParent(Item $parent, string $permission): bool {
-//		$permission = $this->getPermission($permission);
-//		if (!$permission
-//			|| $this->hasChild($parent, $permission)) {
-//			return false;
-//		}
-//		return $this->addChild($parent, $permission);
-//	}
-
 	public function removeChildFromParents(string $name, array $parents = []): int {
 		$item = $this->getItem($name);
 		$count = 0;

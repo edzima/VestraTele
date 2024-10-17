@@ -10,6 +10,7 @@ namespace frontend\controllers;
 
 use backend\helpers\Html;
 use common\behaviors\IssueTypeParentIdAction;
+use common\components\rbac\SettlementTypeAccessManager;
 use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\user\User;
@@ -110,7 +111,8 @@ class IssueController extends Controller {
 			|| $model->isForUser(Yii::$app->user->getId())
 			|| $model->isForAgents(Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId()))
 		) {
-			$search = new IssuePayCalculationSearch();
+			$search = new IssuePayCalculationSearch(Yii::$app->user->getId());
+			$search->action = SettlementTypeAccessManager::ACTION_ISSUE_VIEW;
 			$search->issue_id = $id;
 			$search->onlyToPayed = false;
 			$search->withAgents = false;

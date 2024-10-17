@@ -15,7 +15,7 @@ class IssuePayCalculationQuery extends ActiveQuery {
 
 	public function onlyTypes(array $types): self {
 		[$table, $alias] = $this->getTableNameAndAlias();
-		$this->andWhere([$alias . '.type' => $types]);
+		$this->andWhere([$alias . '.type_id' => $types]);
 		return $this;
 	}
 

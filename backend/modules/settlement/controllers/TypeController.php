@@ -35,10 +35,12 @@ class TypeController extends Controller {
 		);
 	}
 
-	public function actionAccess(?int $id = null) {
+	public function actionAccess(int $id) {
 		$model = new ModelActionsForm();
-		$model->setAccess(new SettlementTypeAccessManager());
-
+		$manager = new SettlementTypeAccessManager();
+		$type = $this->findModel($id);
+		$manager->setModel($type);
+		$model->setAccess($manager);
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			if ($id) {
 				return $this->redirect(['view', 'id' => $id]);
@@ -47,6 +49,7 @@ class TypeController extends Controller {
 		}
 		return $this->render('access', [
 			'model' => $model,
+			'type' => $type,
 		]);
 	}
 

@@ -53,7 +53,9 @@ class ModelAccessTest extends Unit {
 			->setApp('test-1')
 			->setAction('testAccess');
 
-		$this->tester->assertFalse($manager->checkAccess('test-user'));
+		$this->tester->expectThrowable(InvalidConfigException::class, function () {
+			$this->manager->checkAccess('test-user');
+		});
 	}
 
 	public function testAssignWithoutSetRbacModel() {
@@ -117,12 +119,54 @@ class ModelAccessTest extends Unit {
 
 		$this->manager->setAction('testOneAction');
 		$this->manager->ensurePermission();
+		$permissions = $this->manager->getAccessPermissions();
+
+		$this->tester->assertCount(1, $permissions);
 
 		$this->manager->setAction('testDoubleAction');
 		$this->manager->ensurePermission();
 
 		$permissions = $this->manager->getAccessPermissions();
 		$this->tester->assertCount(2, $permissions);
+	}
+
+	public function testGetIds(): void {
+		$this->giveManager();
+		$this->setRbacModel(1);
+		$this->manager->setAction('testOneAction');
+		$this->manager->ensurePermission();
+		$permissions = $this->manager->getAccessPermissions();
+
+		$this->tester->assertCount(1, $permissions);
+
+		$this->manager->setAction('testDoubleAction');
+		$this->manager->ensurePermission();
+		$this->manager->assign('test-user');
+
+		$this->setRbacModel(2);
+		$this->manager->setAction('testOneAction');
+		$this->manager->ensurePermission();
+
+		$this->manager->assign('test-user');
+		$this->manager->assign('test-user-2');
+
+		$this->manager->setAction('testDoubleAction');
+		$this->manager->ensurePermission();
+
+		$this->manager->assign('test-user');
+		$this->manager->assign('test-user-2');
+
+		$permissions = $this->manager->getAccessPermissions();
+		$this->tester->assertCount(4, $permissions);
+
+		$ids = $this->manager->getIds();
+		$this->tester->assertCount(2, $ids);
+
+		$ids = $this->manager->getIds('test-user');
+		$this->tester->assertCount(2, $ids);
+
+		$ids = $this->manager->getIds('test-user-2');
+		$this->tester->assertCount(1, $ids);
 	}
 
 	private function giveManager(array $config = []) {
