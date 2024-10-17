@@ -340,7 +340,10 @@ use yii\data\DataProviderInterface;
 					'signature_act',
 					'due_at:datetime',
 					'locationName',
-					'presenceOfTheClaimantName',
+					[
+						'attribute' => 'presenceOfTheClaimantName',
+						'visible' => $lawsuitActionColumn,
+					],
 					[
 						'class' => ActionColumn::class,
 						'controller' => '/court/lawsuit',
@@ -388,9 +391,6 @@ use yii\data\DataProviderInterface;
 			}
 
 			?>
-
-
-
 
 
 			<?= FieldsetDetailView::widget([
@@ -508,7 +508,6 @@ use yii\data\DataProviderInterface;
 			]) ?>
 
 
-
 			<?= GridView::widget([
 				'dataProvider' => new ActiveDataProvider(['query' => $model->getClaims(),]),
 				'summary' => '',
@@ -535,7 +534,6 @@ use yii\data\DataProviderInterface;
 
 			<?= IssueFileGrid::widget(['model' => $model,])
 			?>
-
 
 
 			<?=
