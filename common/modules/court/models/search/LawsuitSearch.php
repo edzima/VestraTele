@@ -34,7 +34,7 @@ class LawsuitSearch extends Lawsuit {
 		return [
 			[['id', 'court_id', 'creator_id', 'issue_id'], 'integer'],
 			[['is_appeal'], 'default', 'value' => null],
-			[['customer', 'signature_act', 'room', 'due_at', 'details', 'created_at', 'updated_at', 'location', 'presence_of_the_claimant', 'court_type'], 'safe'],
+			[['customer', 'signature_act', 'room', 'due_at', 'details', 'created_at', 'updated_at', 'location', 'presence_of_the_claimant', 'court_type', 'url'], 'safe'],
 		];
 	}
 
@@ -92,6 +92,7 @@ class LawsuitSearch extends Lawsuit {
 		$query->andFilterWhere(['like', 'signature_act', $this->signature_act])
 			->andFilterWhere(['like', 'details', $this->details])
 			->andFilterWhere(['like', 'room', $this->room])
+			->andFilterWhere(['like', 'url', $this->url])
 			->andFilterWhere(['like', Issue::tableName() . '.id', $this->issue_id . '%', false]);
 
 		$query->groupBy(Lawsuit::tableName() . '.id');

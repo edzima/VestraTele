@@ -27,6 +27,7 @@ use yii\db\Expression;
  * @property int|null $online
  * @property int|null $presence_of_the_claimant
  * @property int $is_appeal
+ * @property string|null $url
  *
  * @property Court $court
  * @property User $creator
@@ -74,8 +75,8 @@ class Lawsuit extends ActiveRecord {
 			[['is_appeal', 'boolean']],
 			[['due_at', 'created_at', 'updated_at'], 'safe'],
 			[['location',], 'string', 'max' => 2],
-			[['signature_act', 'room', 'details'], 'string', 'max' => 255],
-			[['signature_act', 'room', 'details', 'location'], 'default', 'value' => null],
+			[['signature_act', 'room', 'details', 'url'], 'string', 'max' => 255],
+			[['signature_act', 'room', 'details', 'location', 'url'], 'default', 'value' => null],
 			['location', 'in', 'range' => array_keys(static::getLocationNames())],
 			[['court_id'], 'exist', 'skipOnError' => true, 'targetClass' => Court::class, 'targetAttribute' => ['court_id' => 'id']],
 			[['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['creator_id' => 'id']],
@@ -104,6 +105,7 @@ class Lawsuit extends ActiveRecord {
 			'presence_of_the_claimant' => Yii::t('court', 'Presence of the Claimant'),
 			'presenceOfTheClaimantName' => Yii::t('court', 'Presence of the Claimant'),
 			'is_appeal' => Yii::t('court', 'Is Appeal'),
+			'url' => Yii::t('court', 'URL'),
 		];
 	}
 

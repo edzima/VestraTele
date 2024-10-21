@@ -60,6 +60,12 @@ use yii\widgets\ActiveForm;
 
 	</div>
 
+	<div class="row">
+		<div class="col-md-6">
+			<?= $form->field($model, 'url')->textInput() ?>
+		</div>
+	</div>
+
 
 	<div class="row">
 		<div class="col-md-6">

@@ -62,6 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					],
 				],
 			],
+			'url:url',
 			[
 				'attribute' => 'court_type',
 				'value' => function (Lawsuit $data): string {

@@ -52,6 +52,11 @@ YiiAsset::register($this);
 						'visible' => !empty($model->location),
 					],
 					[
+						'attribute' => 'url',
+						'visible' => !empty($model->url),
+						'format' => 'url',
+					],
+					[
 						'attribute' => 'presenceOfTheClaimantName',
 					],
 					[

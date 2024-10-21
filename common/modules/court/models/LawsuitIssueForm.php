@@ -26,13 +26,15 @@ class LawsuitIssueForm extends Model {
 	public ?int $presence_of_the_claimant = null;
 
 	public bool $is_appeal = false;
+	public ?string $url = null;
 
 	public function rules(): array {
 		return [
 			[['!creator_id', 'court_id', 'presence_of_the_claimant'], 'required'],
 			[['creator_id', 'court_id', 'presence_of_the_claimant'], 'integer'],
 			[['is_appeal'], 'boolean'],
-			[['due_at', 'room', 'signature_act', 'details', 'location'], 'string'],
+			[['due_at', 'room', 'signature_act', 'details', 'location', 'url'], 'string'],
+			['url', 'url'],
 			[['due_at', 'room', 'signature_act', 'details', 'location'], 'default', 'value' => null],
 			['location', 'in', 'range' => array_keys(static::getLocationNames())],
 			['presence_of_the_claimant', 'in', 'range' => array_keys(static::getPresenceOfTheClaimantNames())],
@@ -77,6 +79,7 @@ class LawsuitIssueForm extends Model {
 		$model->signature_act = $this->signature_act;
 		$model->location = $this->location;
 		$model->is_appeal = $this->is_appeal;
+		$model->url = $this->url;
 		if (!$model->save(false)) {
 			return false;
 		}
@@ -108,6 +111,7 @@ class LawsuitIssueForm extends Model {
 		$this->location = $model->location;
 		$this->presence_of_the_claimant = $model->presence_of_the_claimant;
 		$this->is_appeal = $model->is_appeal;
+		$this->url = $model->url;
 		if (count($model->issues) === 1) {
 			$issues = $model->issues;
 			$this->setIssue(reset($issues));

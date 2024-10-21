@@ -341,6 +341,11 @@ use yii\data\DataProviderInterface;
 					'due_at:datetime',
 					'locationName',
 					[
+						'attribute' => 'url',
+						'format' => 'url',
+						'visible' => $lawsuitActionColumn,
+					],
+					[
 						'attribute' => 'presenceOfTheClaimantName',
 						'visible' => $lawsuitActionColumn,
 					],
