@@ -12,7 +12,6 @@ use common\models\settlement\search\IssuePayCalculationSearch as BaseIssuePayCal
  */
 class IssuePayCalculationSearch extends BaseIssuePayCalculationSearch {
 
-	public string $app = SettlementTypeAccessManager::APP_BACKEND;
 	public string $action = SettlementTypeAccessManager::ACTION_INDEX;
 
 	public function __construct($userId, array $config = []) {

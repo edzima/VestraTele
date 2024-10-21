@@ -50,7 +50,6 @@ class IssuePayCalculationGrid extends GridView {
 		if ($this->userIsRequired && empty($this->userId)) {
 			throw new InvalidConfigException('UserId cannot be empty.');
 		}
-		$this->filterModelsForUser();
 		if (!empty($this->id) && !isset($this->options['id'])) {
 			$this->options['id'] = $this->id;
 		}
@@ -226,19 +225,6 @@ class IssuePayCalculationGrid extends GridView {
 
 	protected function problemStatusFilter(): array {
 		return IssuePayCalculationSearch::getProblemStatusesNames();
-	}
-
-	protected function filterModelsForUser(): void {
-		$dataProvider = $this->dataProvider;
-		/** @var IssuePayCalculation[] $models */
-		$models = $dataProvider->getModels();
-		$userModels = [];
-		foreach ($models as $model) {
-			if ($model->isForUser($this->userId)) {
-				$userModels[] = $model;
-			}
-		}
-		$dataProvider->setModels($userModels);
 	}
 
 }

@@ -19,6 +19,17 @@ class SettlementTypeAccessManager extends ModelAccessManager {
 		Worker::PERMISSION_COST,
 	];
 
+	public array $appsActions = [
+		self::APP_BACKEND => [
+			self::ACTION_ISSUE_VIEW,
+			self::ACTION_VIEW,
+		],
+		self::APP_FRONTEND => [
+			self::ACTION_ISSUE_VIEW,
+			self::ACTION_VIEW,
+		],
+	];
+
 	public function getActions(): array {
 		return array_merge(parent::getActions(), [
 			self::ACTION_ISSUE_VIEW,

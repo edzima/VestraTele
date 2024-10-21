@@ -59,14 +59,12 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public ?bool $onlyWithPayProblems = null;
 	public bool $onlyToPayed = false;
 
-	public string $app;
 	public string $action;
 	public $userId;
 
 	public function getTypeAccessManager(): ModelAccessManager {
 		return SettlementType::instance()
 			->getModelRbac()
-			->setApp($this->app)
 			->setAction($this->action);
 	}
 
@@ -181,7 +179,6 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		]);
 
 		$query->andFilterWhere([IssuePayCalculation::tableName() . '.owner_id' => $this->owner_id]);
-
 		return $dataProvider;
 	}
 

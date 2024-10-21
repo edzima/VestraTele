@@ -10,7 +10,7 @@ use Yii;
 
 class IssuePayCalculationSearch extends BaseIssuePayCalculationSearch {
 
-	public string $app = SettlementTypeAccessManager::APP_FRONTEND;
+	public string $action = SettlementTypeAccessManager::ACTION_INDEX;
 	public const PROBLEM_STATUS_NONE = -1;
 
 	public $problem_status = self::PROBLEM_STATUS_NONE;

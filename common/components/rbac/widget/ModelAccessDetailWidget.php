@@ -42,10 +42,16 @@ class ModelAccessDetailWidget extends GridView {
 			[
 				'label' => Yii::t('rbac', 'App'),
 				'attribute' => 'app',
+				'value' => function (AccessPermission $model): string {
+					return Yii::t('rbac', $model->app);
+				},
 			],
 			[
 				'label' => Yii::t('rbac', 'Action'),
 				'attribute' => 'action',
+				'value' => function (AccessPermission $model): string {
+					return Yii::t('rbac', $model->action);
+				},
 			],
 			[
 				'label' => Yii::t('rbac', 'Roles'),

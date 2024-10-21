@@ -121,4 +121,6 @@ return array_merge([
 	'Permissions' => 'Uprawnienia',
 	'Action' => 'Akcja',
 	'App' => 'Aplikacja',
+	'issue-view' => 'Widok Sprawy',
+	'view' => 'Widok szczegółowy',
 ], $local);

@@ -363,6 +363,8 @@ return [
 	'Linked {tagsCount} Tags to {issuesCount} Issues.' => 'Przypisano Tagi {tagsCount} do Spraw: {issuesCount}',
 	'Stats - Chart' => 'Wykresy',
 	'Detect loop' => 'Wykryto pętle',
+	'Access' => 'Dostęp',
+	'Access to: {name}' => 'Dostęp do: {name}',
 	'Change Status' => 'Zmień Status',
 	'Are you sure you want to change the status to:{status} for this workers?' => 'Jesteś pewny, że chcesz zmienić Status na: {status}?',
 	'Status changed successfully.' => 'Pomyślnie zmieniono Status.',
