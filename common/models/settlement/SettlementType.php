@@ -40,6 +40,14 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 
 	private static ?array $MODELS = null;
 
+	public static function getNames(): array {
+		return ArrayHelper::map(
+			static::getModels(),
+			'id',
+			'name'
+		);
+	}
+
 	/**
 	 * @param bool $refresh
 	 * @return static[] indexed by id
@@ -132,11 +140,13 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 		return ArrayHelper::getColumn($this->issueTypes, 'id');
 	}
 
-	public function hasAccess(string|int $id, string $action, string $app): bool {
-		return $this->getModelRbac()
-			->setApp($app)
-			->setAction($action)
-			->checkAccess($id);
+	public function hasAccess(string|int $id, string $action = SettlementTypeAccessManager::ACTION_ISSUE_VIEW, string $app = null): bool {
+		$rbac = $this->getModelRbac();
+		$rbac->setAction($action);
+		if ($app) {
+			$rbac->setApp($app);
+		}
+		return $rbac->checkAccess($id);
 	}
 
 	public function isForIssueTypeId(int $type_id): bool {

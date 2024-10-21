@@ -34,7 +34,7 @@ class SettlementController extends Controller {
 	}
 
 	public function actionIndex(): string {
-		$searchModel = new IssuePayCalculationSearch();
+		$searchModel = new IssuePayCalculationSearch(Yii::$app->user->getId());
 		$ids = Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId());
 		$ids[] = Yii::$app->user->getId();
 		$ids = array_diff($ids, UserVisible::hiddenUsers(Yii::$app->user->getId()));
@@ -118,6 +118,9 @@ class SettlementController extends Controller {
 		$model = IssuePayCalculation::findOne($id);
 		if ($model === null || !Yii::$app->user->canSeeIssue($model)) {
 			throw new NotFoundHttpException();
+		}
+		if (!$model->type->hasAccess(Yii::$app->user->getId())) {
+			throw new ForbiddenHttpException();
 		}
 		return $model;
 	}

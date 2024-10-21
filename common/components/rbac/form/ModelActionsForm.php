@@ -3,30 +3,24 @@
 namespace common\components\rbac\form;
 
 use common\components\rbac\ModelAccessManager;
+use Yii;
 use yii\base\Model;
 
 class ModelActionsForm extends Model {
 
-	public array $appsActions = [
-		ModelAccessManager::APP_FRONTEND => [
-			ModelAccessManager::ACTION_VIEW,
-		],
-		ModelAccessManager::APP_BACKEND => [
-			ModelAccessManager::ACTION_VIEW,
-		],
-	];
+	public array $appsActions = [];
 
 	private ModelAccessManager $_access;
 
+	public $formConfig = [
+		'class' => ModelRbacForm::class,
+	];
+
 	public function setAccess(ModelAccessManager $model): void {
 		$this->_access = $model;
-		$appsActions = [];
-		foreach ($model->availableApps as $app) {
-			foreach ($model->getActions() as $action) {
-				$appsActions[$app][] = $action;
-			}
+		if (empty($this->appsActions)) {
+			$this->appsActions = $model->appsActions;
 		}
-		$this->appsActions = $appsActions;
 	}
 
 	private array $models = [];
@@ -65,11 +59,14 @@ class ModelActionsForm extends Model {
 		return true;
 	}
 
-	private function createForm(string $action, string $app) {
+	private function createForm(string $action, string $app): ModelRbacForm {
 		$access = clone $this->_access;
 		$access->setAction($action)
 			->setApp($app);
-		$model = new ModelRbacForm($access);
-		return $model;
+		$config = $this->formConfig;
+		if (!isset($config['class'])) {
+			$config['class'] = ModelRbacForm::class;
+		}
+		return Yii::createObject($config, [$access]);
 	}
 }

@@ -180,7 +180,7 @@ class CalculationController extends Controller {
 		$issue = $this->findIssueModel($issueId);
 		$model = new CalculationForm(Yii::$app->user->getId(), $issue);
 		$type = $this->findType($typeId);
-		if ($this->hasTypeAccess($type, SettlementTypeAccessManager::ACTION_CREATE)) {
+		if (!$this->hasTypeAccess($type, SettlementTypeAccessManager::ACTION_CREATE)) {
 			throw new ForbiddenHttpException();
 		}
 		if (!$type->isForIssueTypeId($issue->getIssueTypeId())) {
@@ -328,7 +328,7 @@ class CalculationController extends Controller {
 	}
 
 	private function hasTypeAccess(SettlementType $type, string $action): bool {
-		return $type->hasAccess(Yii::$app->user->getId(), $action, SettlementTypeAccessManager::APP_BACKEND);
+		return $type->hasAccess(Yii::$app->user->getId(), $action);
 	}
 
 	private function findType(int $id): SettlementType {

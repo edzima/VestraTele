@@ -12,8 +12,8 @@ use yii\rbac\Permission;
 
 class ModelAccessManager extends Component {
 
-	public const APP_FRONTEND = 'frontend';
-	public const APP_BACKEND = 'admin';
+	public const APP_FRONTEND = 'app-frontend';
+	public const APP_BACKEND = 'app-backend';
 
 	public const ACTION_INDEX = 'index';
 	public const ACTION_VIEW = 'view';
@@ -26,7 +26,7 @@ class ModelAccessManager extends Component {
 		self::APP_FRONTEND,
 	];
 
-	public array $availableActions = [];
+	public array $appsActions = [];
 
 	public string $action = self::ACTION_INDEX;
 
@@ -66,10 +66,6 @@ class ModelAccessManager extends Component {
 		return $this->auth->checkAccess($userId, $this->getPermissionName());
 	}
 
-	public function hasModel(): bool {
-		return $this->modelRbac !== null;
-	}
-
 	public function ensurePermission(): void {
 		$name = $this->getPermissionName();
 		if ($this->auth->getPermission($name) === null) {
@@ -94,6 +90,14 @@ class ModelAccessManager extends Component {
 			throw new InvalidConfigException('Permission not exist.');
 		}
 		return $this->auth->assign($permission, $userId);
+	}
+
+	public function getUserIds(): array {
+		return $this->auth->getUserIdsByRole($this->getPermissionName());
+	}
+
+	public function hasModel(): bool {
+		return $this->modelRbac !== null;
 	}
 
 	public function setAction(string $action): self {
@@ -169,9 +173,12 @@ class ModelAccessManager extends Component {
 
 	public function getIds(string|int $userId = null): array {
 		$models = $this->getAccessPermissions(AccessPermission::COMPARE_WITHOUT_ID);
-		$ids = array_filter($models, function (AccessPermission $permission) use ($userId) {
-			return !empty($permission->modelId);
-		});
+		$ids = [];
+		foreach ($models as $model) {
+			if ($model->modelId) {
+				$ids[$model->name] = $model->modelId;
+			}
+		}
 		if (empty($userId)) {
 			return $ids;
 		}
@@ -184,7 +191,7 @@ class ModelAccessManager extends Component {
 	 * @param string $type
 	 * @return AccessPermission[]
 	 */
-	public function getAccessPermissions(string $type = AccessPermission::COMPARE_ALL): array {
+	public function getAccessPermissions(string $type = AccessPermission::COMPARE_ALL_ATTRIBUTES): array {
 		$self = $this->createAccessPermission();
 		$data = [];
 		foreach ($this->auth->getPermissions() as $permission) {
@@ -303,8 +310,17 @@ class ModelAccessManager extends Component {
 
 	public static function createFromModel(ModelRbacInterface $model, array $config = []): self {
 		$self = new static($config);
+		$self->setApp(Yii::$app->id);
 		$self->setModel($model);
 		return $self;
+	}
+
+	public function remove(): bool {
+		$permission = $this->getPermission();
+		if ($permission) {
+			return $this->auth->remove($permission);
+		}
+		return false;
 	}
 
 }

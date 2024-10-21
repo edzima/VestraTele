@@ -5,12 +5,12 @@ namespace common\widgets\grid;
 use common\helpers\Html;
 use common\helpers\Url;
 use common\models\issue\IssuePay;
-use common\models\issue\IssuePayCalculation;
 use common\models\issue\search\IssueStageSearchable;
 use common\models\settlement\PayInterface;
 use common\models\settlement\search\IssuePaySearch;
 use common\widgets\GridView;
 use kartik\grid\ExpandRowColumn;
+use kartik\select2\Select2;
 use Yii;
 
 class IssuePayGrid extends GridView {
@@ -31,6 +31,8 @@ class IssuePayGrid extends GridView {
 	public bool $visiblePayBtn = true;
 	public bool $visibleUpdateBtn = true;
 
+	public ?array $settlementTypesFilter = [];
+
 	public bool $visibleAgent = true;
 	public bool $visibleCustomer = true;
 	public bool $visiblePayAt = true;
@@ -45,8 +47,11 @@ class IssuePayGrid extends GridView {
 	public array $stagesFilters = [];
 
 	public function init(): void {
-		if (empty($this->columns)) {
-			$this->columns = $this->defaultColumns();
+
+		if ($this->settlementTypesFilter !== null && empty($this->settlementTypesFilter)) {
+			if ($this->filterModel instanceof IssuePaySearch) {
+				$this->settlementTypesFilter = $this->filterModel->getSettlementTypesNames();
+			}
 		}
 
 		if ($this->visibleIssueStage
@@ -59,6 +64,10 @@ class IssuePayGrid extends GridView {
 			$this->rowOptions = static function (PayInterface $model): array {
 				return Html::payStatusRowOptions($model);
 			};
+		}
+
+		if (empty($this->columns)) {
+			$this->columns = $this->defaultColumns();
 		}
 
 		parent::init();
@@ -81,7 +90,6 @@ class IssuePayGrid extends GridView {
 			[
 				'class' => DataColumn::class,
 				'attribute' => 'calculationType',
-				'format' => 'raw',
 				'value' => function (IssuePay $model): string {
 					$name = $model->calculation->getTypeName();
 					if ($this->settlementViewRoute === null) {
@@ -95,10 +103,23 @@ class IssuePayGrid extends GridView {
 						]
 					);
 				},
-				'filter' => IssuePayCalculation::getTypesNames(),
+				'format' => 'raw',
+				'filter' => $this->settlementTypesFilter,
+				'filterType' => GridView::FILTER_SELECT2,
 				'label' => Yii::t('settlement', 'Settlement type'),
 				'width' => '120px',
 				'visible' => $this->visibleSettlementType,
+				'filterWidgetOptions' => [
+					'options' => [
+						'multiple' => true,
+						'placeholder' => Yii::t('settlement', 'Settlement type'),
+					],
+					'pluginOptions' => [
+						'dropdownAutoWidth' => true,
+					],
+					'size' => Select2::SIZE_SMALL,
+					'showToggleAll' => false,
+				],
 			],
 			[
 				'class' => IssueTypeColumn::class,

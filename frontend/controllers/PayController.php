@@ -16,6 +16,7 @@ use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class PayController extends Controller {
@@ -47,6 +48,7 @@ class PayController extends Controller {
 
 	public function actionIndex(string $status = IssuePaySearch::PAY_STATUS_NOT_PAYED): string {
 		$searchModel = new IssuePaySearch();
+		$searchModel->userId = Yii::$app->user->id;
 		$searchModel->payStatus = $status;
 		$userId = Yii::$app->user->getId();
 		$ids = Yii::$app->userHierarchy->getAllChildesIds($userId);
@@ -158,6 +160,10 @@ class PayController extends Controller {
 		if ($model === null) {
 			throw new NotFoundHttpException();
 		}
+		if (!$model->calculation->type->hasAccess(Yii::$app->user->getId())) {
+			throw new ForbiddenHttpException();
+		}
+
 		return $model;
 	}
 }

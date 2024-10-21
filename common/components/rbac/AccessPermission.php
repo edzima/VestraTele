@@ -58,15 +58,15 @@ class AccessPermission extends BaseObject {
 		return $this->name;
 	}
 
-	public const COMPARE_ALL = 'all';
+	public const COMPARE_ALL_ATTRIBUTES = 'all';
 	public const COMPARE_WITHOUT_ID = 'without_id';
 	public const COMPARE_WITHOUT_APP_AND_ACTION = 'without_app_and_action';
 	public const COMPARE_PREFIX_WITH_MODEL_NAME = 'model_name_and_prefix';
-	public const COMPARE_PREFIX = 'prefix';
+	public const COMPARE_ONLY_PREFIX = 'prefix';
 
-	public static function compare(self $a, self $b, string $type = self::COMPARE_ALL): bool {
+	public static function compare(self $a, self $b, string $type = self::COMPARE_ALL_ATTRIBUTES): bool {
 		switch ($type) {
-			case self::COMPARE_ALL:
+			case self::COMPARE_ALL_ATTRIBUTES:
 				return
 					$a->prefix === $b->prefix
 					&& $a->app === $b->app
@@ -90,7 +90,7 @@ class AccessPermission extends BaseObject {
 				return
 					$a->prefix === $b->prefix
 					&& $a->modelName === $b->modelName;
-			case self::COMPARE_PREFIX:
+			case self::COMPARE_ONLY_PREFIX:
 				return
 					$a->prefix === $b->prefix;
 		}

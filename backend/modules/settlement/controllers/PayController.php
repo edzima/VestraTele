@@ -17,6 +17,7 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii2tech\csvgrid\CsvGrid;
 
@@ -67,6 +68,7 @@ class PayController extends Controller {
 	public function actionDelayed(): string {
 		Url::remember();
 		$searchModel = new DelayedIssuePaySearch();
+		$searchModel->userId = Yii::$app->user->getId();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		return $this->render('index', [
 			'searchModel' => $searchModel,
@@ -85,6 +87,7 @@ class PayController extends Controller {
 		if (!Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {
 			$searchModel->calculationOwnerId = Yii::$app->user->getId();
 		}
+		$searchModel->userId = Yii::$app->user->getId();
 		Url::remember();
 		$searchModel->payStatus = $status;
 		$searchModel->delay = null;
@@ -251,6 +254,9 @@ class PayController extends Controller {
 	protected function findModel(int $id): IssuePay {
 		if (($model = IssuePay::findOne($id)) !== null) {
 			return $model;
+		}
+		if (!$model->calculation->type->hasAccess(Yii::$app->user->getId())) {
+			throw new ForbiddenHttpException();
 		}
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}

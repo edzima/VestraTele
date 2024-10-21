@@ -51,9 +51,20 @@ class ModelRbacForm extends Model {
 		$this->action = $action;
 	}
 
+	protected function shouldRemove(): bool {
+		return empty($this->permissions)
+			&& empty($this->roles)
+			&& empty($this->usersIds)
+			&& empty($this->access->getUserIds());
+	}
+
 	public function save(bool $validate = true): bool {
 		if ($validate && !$this->validate()) {
 			return false;
+		}
+		if ($this->shouldRemove()) {
+			$this->access->remove();
+			return true;
 		}
 		if (!empty($this->roles) || !empty($this->permissions) || !empty($this->usersIds)) {
 			$this->access->ensurePermission();
@@ -65,6 +76,7 @@ class ModelRbacForm extends Model {
 				}
 			}
 		}
+		$this->access->removeFromAllParents();
 		if (!empty($this->roles)) {
 			$this->access->addToRoles($this->roles);
 		}
@@ -73,7 +85,6 @@ class ModelRbacForm extends Model {
 		}
 		return true;
 	}
-
 
 	public function getRolesNames(): array {
 		return $this->access->getAvailableParentRolesNames();
@@ -84,6 +95,9 @@ class ModelRbacForm extends Model {
 	}
 
 	public function getName(): string {
-		return $this->access->getPermissionDescription();
+		return Yii::t('rbac', '{app}: {action}', [
+			'app' => Yii::t('rbac', $this->app),
+			'action' => Yii::t('rbac', $this->action),
+		]);
 	}
 }

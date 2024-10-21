@@ -2,6 +2,7 @@
 
 namespace common\models\settlement\search;
 
+use common\components\rbac\SettlementTypeAccessManager;
 use common\models\AgentSearchInterface;
 use common\models\issue\IssuePay;
 use common\models\issue\IssueStage;
@@ -13,10 +14,12 @@ use common\models\issue\search\ArchivedIssueSearch;
 use common\models\issue\search\IssueStageSearchable;
 use common\models\issue\search\IssueTypeSearch;
 use common\models\SearchModel;
+use common\models\settlement\SettlementType;
 use common\models\user\CustomerSearchInterface;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use Decimal\Decimal;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -62,10 +65,18 @@ class IssuePaySearch extends IssuePay implements
 	public $deadlineAtFrom;
 	public $deadlineAtTo;
 
+	public $userId;
+
 	/**
 	 * @var int[]
 	 */
 	public array $agents_ids = [];
+
+	public bool $settlementAccessManagerRequired = false;
+
+	public ?SettlementTypeAccessManager $settlementTypeAccessManager = null;
+
+	protected string $settlementTypeAccessManagerAction = SettlementTypeAccessManager::ACTION_ISSUE_VIEW;
 
 	/**
 	 * @inheritdoc
@@ -83,7 +94,7 @@ class IssuePaySearch extends IssuePay implements
 	 */
 	public function rules(): array {
 		return [
-			[['issue_id', 'status', 'calculationType'], 'integer'],
+			[['issue_id', 'status'], 'integer'],
 			[['delay'], 'string'],
 			[['deadlineAtFrom', 'deadlineAtTo'], 'safe'],
 			['delay', 'in', 'range' => array_keys(static::getDelaysRangesNames())],
@@ -95,9 +106,12 @@ class IssuePaySearch extends IssuePay implements
 				return array_keys($this->getAgentsNames());
 			}, 'allowArray' => true,
 			],
-			['issueStagesIds', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
 
+			['calculationType', 'in', 'range' => array_keys($this->getSettlementTypesNames()), 'allowArray' => true],
+			['issueStagesIds', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
 			['issueTypesIds', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
+			['calculationType', 'default', 'value' => $this->defaultSettlementTypes()],
+
 		];
 	}
 
@@ -176,6 +190,10 @@ class IssuePaySearch extends IssuePay implements
 
 		if (!$this->validate()) {
 			// uncomment the following line if you do not want to return any records when validation fails
+			Yii::warning([
+				'errors' => $this->getErrors(),
+				'params' => $params,
+			], __METHOD__);
 			$query->where('0=1');
 			return $dataProvider;
 		}
@@ -195,7 +213,7 @@ class IssuePaySearch extends IssuePay implements
 			'P.transfer_type' => $this->transfer_type,
 			'P.value' => $this->value,
 			'P.status' => $this->status,
-			'C.type' => $this->calculationType,
+			'C.type_id' => $this->calculationType,
 			'C.owner_id' => $this->calculationOwnerId,
 		]);
 
@@ -339,5 +357,43 @@ class IssuePaySearch extends IssuePay implements
 		if (!empty($this->issueStagesIds)) {
 			$query->andWhere(['IS.id' => $this->issueStagesIds]);
 		}
+	}
+
+	public function getSettlementTypesNames(): array {
+		$accessManager = $this->getSettlementAccessManager();
+		$accessManager->setAction($this->settlementTypeAccessManagerAction);
+		if ($accessManager) {
+			if (empty($this->userId)) {
+				throw new InvalidConfigException('userId must be set for settlement type access manager.');
+			}
+			$ids = $accessManager->getIds($this->userId);
+			$names = [];
+			$typesNames = SettlementType::getNames();
+			foreach ($ids as $id) {
+				if (isset($typesNames[$id])) {
+					$names[$id] = $typesNames[$id];
+				}
+			}
+			return $names;
+		}
+		return SettlementType::getNames();
+	}
+
+	protected function getSettlementAccessManager(): ?SettlementTypeAccessManager {
+		$manager = $this->settlementTypeAccessManager;
+		if ($this->settlementAccessManagerRequired && $manager === null) {
+			return SettlementType::instance()->getModelRbac();
+		}
+		if ($this->settlementAccessManagerRequired && $manager === null) {
+			throw new InvalidConfigException('Settlement Type Access manager must be set.');
+		}
+		return $this->settlementTypeAccessManager;
+	}
+
+	private function defaultSettlementTypes(): array {
+		if ($this->settlementAccessManagerRequired) {
+			return array_keys($this->getSettlementTypesNames());
+		}
+		return [];
 	}
 }

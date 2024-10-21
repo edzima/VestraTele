@@ -56,14 +56,18 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 			]) ?>
 
-			<?= $this->render('_access-details', [
-				'model' => $model,
-			]) ?>
-		</div>
-		<div class="col-md-3">
+
 			<?= $this->render('_options-view', [
 				'model' => $model->getTypeOptions(),
 			]) ?>
+
+			<?= $this->render('_access-details', [
+				'model' => $model,
+			]) ?>
+
+		</div>
+		<div class="col-md-3">
+
 		</div>
 	</div>
 

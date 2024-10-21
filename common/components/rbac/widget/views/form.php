@@ -14,13 +14,13 @@ use yii\widgets\ActiveForm;
 <div class="model-actions-form">
 	<div class="row">
 
-		<?php $form = ActiveForm::begin(); ?>
+		<div class="col-md-4">
+			<?php $form = ActiveForm::begin(); ?>
 
-		<?php foreach ($model->getModels() as $index => $model): ?>
+			<?php foreach ($model->getModels() as $index => $model): ?>
 
-			<div class="col-md-4">
 
-				<h3><?= Html::encode($model->getName()) ?></h3>
+				<legend><?= Html::encode($model->getName()) ?></legend>
 
 				<?= $form->field($model, "[$index]roles")->widget(Select2::class, [
 					'data' => $model->getRolesNames(),
@@ -36,9 +36,9 @@ use yii\widgets\ActiveForm;
 					],
 				]) ?>
 
-			</div>
-		<?php endforeach; ?>
 
+			<?php endforeach; ?>
+		</div>
 	</div>
 
 	<div class="form-group">

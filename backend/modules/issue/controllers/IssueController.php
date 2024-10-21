@@ -7,7 +7,7 @@ use backend\modules\issue\models\IssueStageChangeForm;
 use backend\modules\issue\models\search\IssueLeadsSearch;
 use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\issue\models\search\SummonSearch;
-use backend\modules\settlement\models\search\IssuePayCalculationSearch;
+use backend\modules\settlement\models\search\IssueViewPayCalculationSearch;
 use backend\widgets\CsvForm;
 use common\behaviors\IssueTypeParentIdAction;
 use common\behaviors\SelectionRouteBehavior;
@@ -219,9 +219,8 @@ class IssueController extends Controller {
 	 */
 	public function actionView(int $id): string {
 		$model = $this->findModel($id);
-		$search = new IssuePayCalculationSearch();
+		$search = new IssueViewPayCalculationSearch($id, Yii::$app->user->id);
 		$search->withArchive = true;
-		$search->issue_id = $id;
 		$calculationsDataProvider = $search->search([]);
 		$summonDataProvider = (new SummonSearch(['issue_id' => $model->id]))->search([]);
 		$summonDataProvider->sort = false;
