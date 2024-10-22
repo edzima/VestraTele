@@ -30,6 +30,23 @@ class LawsuitCalendarSearch extends Model {
 		];
 	}
 
+	public static function getHasURLFilter(): array {
+		return [
+			[
+				'value' => 1,
+				'isActive' => true,
+				'label' => Yii::t('yii', 'Yes'),
+				'color' => '#df2424',
+			],
+			[
+				'value' => 0,
+				'isActive' => true,
+				'label' => Yii::t('yii', 'No'),
+				'color' => '#3788d8',
+			],
+		];
+	}
+
 	public static function getCourtFilters(): array {
 		$data = [];
 		$data[] = [

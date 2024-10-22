@@ -16,6 +16,8 @@ class LawsuitEvent extends FullCalendarEvent {
 
 	public int $is_appeal;
 
+	public int $has_url;
+
 	public function setModel(Lawsuit $model): void {
 		$this->model = $model;
 		$this->id = $model->id;
@@ -26,11 +28,20 @@ class LawsuitEvent extends FullCalendarEvent {
 		$this->url = Url::to(['/court/lawsuit/view', 'id' => $model->id]);
 		$this->backgroundColor = $this->getBackgroundColor();
 		$this->is_appeal = $model->is_appeal;
+		$this->has_url = !empty($model->url);
+		$this->borderColor = $this->getBorderColor();
 	}
 
 	protected function getBackgroundColor(): ?string {
 		if ($this->model->is_appeal) {
 			return static::BACKGROUND_IS_APPEAL;
+		}
+		return null;
+	}
+
+	protected function getBorderColor(): ?string {
+		if (!empty($this->model->url)) {
+			return 'lime';
 		}
 		return null;
 	}
