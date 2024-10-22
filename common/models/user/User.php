@@ -63,7 +63,6 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	public const ROLE_AUDITOR = 'auditor';
 	public const ROLE_AUDITOR_INNER = 'auditor.inner';
 
-
 	public const ROLE_RECCOMENDING = 'recommending';
 
 	//workers
@@ -519,7 +518,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 			foreach ($roles as $role) {
 				$name = $role->name;
 				$rbac = Yii::t('rbac', $name);
-				if ($name === $rbac) {
+				if ($name === $rbac && !empty($role->description)) {
 					$rbac = $role->description;
 				}
 				$rolesI18n[$name] = $rbac;
