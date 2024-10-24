@@ -1,13 +1,12 @@
 <?php
 
-use common\components\rbac\form\ActionsAccessForm;
-use common\components\rbac\widget\ActionsAccessFormWidget;
+use common\components\rbac\widget\SingleActionAccessFormWidget;
 use common\models\settlement\SettlementType;
 use yii\web\View;
 
 /**
  * @var View $this
- * @var ActionsAccessForm $model
+ * @var ModelActionAccessForm $model
  * @var SettlementType $type
  */
 $this->title = Yii::t('backend', 'Access to: {name}', [
@@ -20,6 +19,6 @@ $this->params['breadcrumbs'][] = ['label' => $type->name, 'url' => ['view', 'id'
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<?= ActionsAccessFormWidget::widget([
+<?= SingleActionAccessFormWidget::widget([
 	'model' => $model,
 ]) ?>

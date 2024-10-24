@@ -3,19 +3,21 @@
 namespace common\components\rbac\form;
 
 use common\components\rbac\ModelAccessManager;
+use common\models\user\User;
 use Yii;
 use yii\base\Model;
 
-class ModelRbacForm extends Model {
+class SingleActionAccessForm extends Model {
 
 	public $roles = [];
 	public $permissions = [];
 
 	public $usersIds = [];
 
+	public string $app;
+
 	public string $action;
 
-	public string $app;
 	private ModelAccessManager $access;
 
 	public function __construct(ModelAccessManager $access, array $config = []) {
@@ -29,6 +31,8 @@ class ModelRbacForm extends Model {
 			[['roles', 'permissions'], 'default', 'value' => []],
 			['roles', 'in', 'range' => array_keys($this->getRolesNames()), 'allowArray' => true],
 			['permissions', 'in', 'range' => array_keys($this->getPermissionsNames()), 'allowArray' => true],
+			['usersIds', 'in', 'range' => array_keys($this->getUsersNames()), 'allowArray' => true],
+
 		];
 	}
 
@@ -36,6 +40,7 @@ class ModelRbacForm extends Model {
 		return [
 			'roles' => Yii::t('rbac', 'Roles'),
 			'permissions' => Yii::t('rbac', 'Permissions'),
+			'usersIds' => Yii::t('rbac', 'Users'),
 		];
 	}
 
@@ -45,27 +50,18 @@ class ModelRbacForm extends Model {
 		$this->app = $model->getApp();
 		$this->roles = $model->getParentsRoles();
 		$this->permissions = $model->getParentsPermissions();
+		$this->usersIds = $model->getUserIds();
 	}
 
 	public function setAction(string $action): void {
 		$this->action = $action;
 	}
 
-	protected function shouldRemove(): bool {
-		return empty($this->permissions)
-			&& empty($this->roles)
-			&& empty($this->usersIds)
-			&& empty($this->access->getUserIds());
-	}
-
 	public function save(bool $validate = true): bool {
 		if ($validate && !$this->validate()) {
 			return false;
 		}
-		if ($this->shouldRemove()) {
-			$this->access->remove();
-			return true;
-		}
+		$this->access->remove();
 		if (!empty($this->roles) || !empty($this->permissions) || !empty($this->usersIds)) {
 			$this->access->ensurePermission();
 		}
@@ -92,6 +88,13 @@ class ModelRbacForm extends Model {
 
 	public function getPermissionsNames(): array {
 		return $this->access->getAvailableParentsPermissionsNames();
+	}
+
+	public function getUsersNames(): array {
+		$names = array_keys($this->getPermissionsNames()) + array_keys($this->getRolesNames());
+		return User::getSelectList(
+			User::getAssignmentIds($names, false)
+		);
 	}
 
 	public function getName(): string {

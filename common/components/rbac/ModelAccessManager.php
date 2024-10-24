@@ -21,39 +21,40 @@ class ModelAccessManager extends Component {
 	public const ACTION_UPDATE = 'update';
 	public const ACTION_DELETE = 'delete';
 
-	public const APP_ADVANCED = [
-		self::APP_BACKEND,
-		self::APP_FRONTEND,
-	];
-
-	public array $appsActions = [];
+	protected array $appsActions = [];
 
 	public string $action = self::ACTION_INDEX;
 
 	protected string $app = self::APP_FRONTEND;
-
-	public array $availableApps = self::APP_ADVANCED;
 
 	public array $availableParentRoles = [];
 	public array $availableParentPermissions = [];
 
 	public ?string $managerPermission = null;
 
-	public $accessPermission = [
-		'class' => AccessPermission::class,
-		'prefix' => 'modelAccess',
-	];
-
 	/**
 	 * @var string|array|ParentsManagerInterface
 	 */
 	public $auth = 'authManager';
+
+	public $accessPermission = [
+		'class' => AccessPermission::class,
+		'prefix' => 'modelAccess',
+	];
 
 	protected ?ModelRbacInterface $modelRbac = null;
 
 	public function init(): void {
 		parent::init();
 		$this->auth = Instance::ensure($this->auth, ParentsManagerInterface::class);
+	}
+
+	public function setAppsActions(array $appsActions): void {
+		$this->appsActions = $appsActions;
+	}
+
+	public function getAppsActions(): array {
+		return $this->appsActions;
 	}
 
 	public function checkAccess(string|int $userId): bool {
@@ -81,7 +82,7 @@ class ModelAccessManager extends Component {
 		}
 	}
 
-	public function assign(string|int $userId): Assignment {
+	public function assign(string|int $userId): ?Assignment {
 		if (!$this->hasModel()) {
 			throw new InvalidConfigException('Model must be set.');
 		}
@@ -89,6 +90,10 @@ class ModelAccessManager extends Component {
 		if ($permission === null) {
 			throw new InvalidConfigException('Permission not exist.');
 		}
+		if ($this->auth->checkAccess($userId, $permission->name)) {
+			return null;
+		}
+
 		return $this->auth->assign($permission, $userId);
 	}
 
@@ -106,7 +111,7 @@ class ModelAccessManager extends Component {
 	}
 
 	public function setApp(string $name): self {
-		if (!empty($this->availableApps) && !in_array($name, $this->availableApps)) {
+		if (!empty($this->appsActions) && !key_exists($name, $this->appsActions)) {
 			throw new InvalidConfigException("App: $name ' not is allowed");
 		}
 		$this->app = $name;
@@ -271,41 +276,6 @@ class ModelAccessManager extends Component {
 			}
 		}
 		return $names;
-	}
-
-	public function getActionsNames(): array {
-		$names = [];
-		foreach ($this->getActions() as $action) {
-			$names[$action] = Yii::t('rbac', $action);
-		}
-		return $names;
-	}
-
-
-
-//	public function createForms(): array {
-//		$actions = $this->getActions();
-//		$forms = [];
-//		foreach ($actions as $action) {
-//			$forms[] = $this->createForm($action);
-//		}
-//		return $forms;
-//	}
-//
-//	private function createForm(string $action) {
-//		return new ModelRbacForm([
-//			'action' => $action,
-//		]);
-//	}
-
-	public function getActions(): array {
-		return [
-			static::ACTION_INDEX,
-			static::ACTION_VIEW,
-			static::ACTION_CREATE,
-			static::ACTION_UPDATE,
-			static::ACTION_DELETE,
-		];
 	}
 
 	public static function createFromModel(ModelRbacInterface $model, array $config = []): self {

@@ -30,13 +30,6 @@ class SettlementTypeAccessManager extends ModelAccessManager {
 		],
 	];
 
-	public function getActions(): array {
-		return array_merge(parent::getActions(), [
-			self::ACTION_ISSUE_VIEW,
-			self::ACTION_PAYS,
-		]);
-	}
-
 	public function getIds(string|int $userId = null): array {
 		if ($userId
 			&& $this->managerPermission

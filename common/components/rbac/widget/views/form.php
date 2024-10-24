@@ -1,13 +1,13 @@
 <?php
 
-use common\components\rbac\form\ModelActionsForm;
+use common\components\rbac\form\ActionsAccessForm;
 use common\helpers\Html;
 use kartik\select2\Select2;
 use yii\widgets\ActiveForm;
 
 /**
  * @var ActiveForm|null $form
- * @var ModelActionsForm $model
+ * @var ActionsAccessForm $model
  */
 ?>
 
@@ -31,6 +31,13 @@ use yii\widgets\ActiveForm;
 
 				<?= $form->field($model, "[$index]permissions")->widget(Select2::class, [
 					'data' => $model->getPermissionsNames(),
+					'options' => [
+						'multiple' => true,
+					],
+				]) ?>
+
+				<?= $form->field($model, "[$index]usersIds")->widget(Select2::class, [
+					'data' => $model->getUsersNames(),
 					'options' => [
 						'multiple' => true,
 					],
