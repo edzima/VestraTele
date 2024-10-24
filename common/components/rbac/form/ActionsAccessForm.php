@@ -6,27 +6,27 @@ use common\components\rbac\ModelAccessManager;
 use Yii;
 use yii\base\Model;
 
-class ModelActionsForm extends Model {
+class ActionsAccessForm extends Model {
 
 	public array $appsActions = [];
 
 	private ModelAccessManager $_access;
 
 	public $formConfig = [
-		'class' => ModelRbacForm::class,
+		'class' => SingleActionAccessForm::class,
 	];
 
 	public function setAccess(ModelAccessManager $model): void {
 		$this->_access = $model;
 		if (empty($this->appsActions)) {
-			$this->appsActions = $model->appsActions;
+			$this->appsActions = $model->getAppsActions();
 		}
 	}
 
 	private array $models = [];
 
 	/**
-	 * @return ModelRbacForm[]
+	 * @return SingleActionAccessForm[]
 	 */
 	public function getModels(): array {
 		if (empty($this->models)) {
@@ -42,11 +42,11 @@ class ModelActionsForm extends Model {
 	}
 
 	public function load($data, $formName = null) {
-		return ModelRbacForm::loadMultiple($this->getModels(), $data, $formName);
+		return SingleActionAccessForm::loadMultiple($this->getModels(), $data, $formName);
 	}
 
 	public function validate($attributeNames = null, $clearErrors = true) {
-		return ModelRbacForm::validateMultiple($this->getModels(), $attributeNames);
+		return SingleActionAccessForm::validateMultiple($this->getModels(), $attributeNames);
 	}
 
 	public function save(bool $validate = true): bool {
@@ -59,13 +59,13 @@ class ModelActionsForm extends Model {
 		return true;
 	}
 
-	private function createForm(string $action, string $app): ModelRbacForm {
+	private function createForm(string $action, string $app): SingleActionAccessForm {
 		$access = clone $this->_access;
 		$access->setAction($action)
 			->setApp($app);
 		$config = $this->formConfig;
 		if (!isset($config['class'])) {
-			$config['class'] = ModelRbacForm::class;
+			$config['class'] = SingleActionAccessForm::class;
 		}
 		return Yii::createObject($config, [$access]);
 	}

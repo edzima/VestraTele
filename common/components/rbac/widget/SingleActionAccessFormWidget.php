@@ -2,18 +2,18 @@
 
 namespace common\components\rbac\widget;
 
-use common\components\rbac\form\ModelActionsForm;
+use common\components\rbac\form\SingleActionAccessForm;
 use yii\base\Widget;
 use yii\widgets\ActiveForm;
 
-class ModelAccessFormWidget extends Widget {
+class SingleActionAccessFormWidget extends Widget {
 
-	public ModelActionsForm $model;
+	public SingleActionAccessForm $model;
 
 	public ?ActiveForm $form = null;
 
 	public function run(): string {
-		return $this->render('form', [
+		return $this->render('single-form', [
 			'model' => $this->model,
 			'form' => $this->form,
 		]);

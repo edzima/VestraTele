@@ -8,7 +8,7 @@
 
 namespace common\components\rbac;
 
-use yii\base\InvalidConfigException;
+use Yii;
 use yii\rbac\DbManager as BaseDbManager;
 use yii\rbac\Item;
 
@@ -67,7 +67,7 @@ class DbManager extends BaseDbManager implements ParentsManagerInterface {
 	protected function getParents(string $name): array {
 		if (empty($this->parents)) {
 			if ($this->items === null && $this->cache === null) {
-				throw new InvalidConfigException('getParents() only with cache enabled.');
+				Yii::warning('getParents() only with cache enabled.', __METHOD__);
 			}
 			$this->loadFromCache();
 		}
