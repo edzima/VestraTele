@@ -124,4 +124,7 @@ return array_merge([
 	'App' => 'Aplikacja',
 	'issue-view' => 'Widok Sprawy',
 	'view' => 'Widok szczegółowy',
+	'Assign Users' => 'Przypisani',
+	'Users' => 'Użytkownicy',
+	'Access detail' => 'Dostęp',
 ], $local);
