@@ -37,6 +37,13 @@ class IssueCreateSettlementButtonDropdown extends ButtonDropdown {
 		}
 	}
 
+	public function run(): string {
+		if (!isset($this->dropdown['items'])) {
+			return '';
+		}
+		return parent::run();
+	}
+
 	protected function defaultItems(): array {
 		$settlementTypes = array_filter(SettlementType::getModels(),
 			function (SettlementType $type) {
