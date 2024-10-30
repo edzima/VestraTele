@@ -19,14 +19,20 @@ class SettlementTypeAccessManager extends ModelAccessManager {
 		Worker::PERMISSION_COST,
 	];
 
-	public array $appsActions = [
+	protected array $appsActions = [
 		self::APP_BACKEND => [
 			self::ACTION_ISSUE_VIEW,
 			self::ACTION_VIEW,
+			self::ACTION_PAYS,
+			self::ACTION_CREATE,
+			self::ACTION_DELETE,
+			self::ACTION_INDEX,
 		],
 		self::APP_FRONTEND => [
 			self::ACTION_ISSUE_VIEW,
 			self::ACTION_VIEW,
+			self::ACTION_PAYS,
+			self::ACTION_INDEX,
 		],
 	];
 

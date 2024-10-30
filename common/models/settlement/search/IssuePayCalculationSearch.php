@@ -64,7 +64,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 
 	public function getTypeAccessManager(): ModelAccessManager {
 		return SettlementType::instance()
-			->getModelRbac()
+			->getModelAccess()
 			->setAction($this->action);
 	}
 

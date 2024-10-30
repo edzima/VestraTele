@@ -8,5 +8,5 @@ interface ModelRbacInterface {
 
 	public function getRbacId(): ?string;
 
-	public function getModelRbac(): ModelAccessManager;
+	public function getModelAccess(): ModelAccessManager;
 }

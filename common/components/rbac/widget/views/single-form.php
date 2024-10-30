@@ -41,6 +41,7 @@ use yii\widgets\ActiveForm;
 				],
 			]) ?>
 
+			<?= $form->field($model, 'description')->textInput() ?>
 		</div>
 	</div>
 

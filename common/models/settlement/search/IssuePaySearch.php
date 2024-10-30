@@ -382,7 +382,7 @@ class IssuePaySearch extends IssuePay implements
 	protected function getSettlementAccessManager(): ?SettlementTypeAccessManager {
 		$manager = $this->settlementTypeAccessManager;
 		if ($this->settlementAccessManagerRequired && $manager === null) {
-			return SettlementType::instance()->getModelRbac();
+			return SettlementType::instance()->getModelAccess();
 		}
 		if ($this->settlementAccessManagerRequired && $manager === null) {
 			throw new InvalidConfigException('Settlement Type Access manager must be set.');

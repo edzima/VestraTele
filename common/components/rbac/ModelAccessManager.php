@@ -67,10 +67,10 @@ class ModelAccessManager extends Component {
 		return $this->auth->checkAccess($userId, $this->getPermissionName());
 	}
 
-	public function ensurePermission(): void {
+	public function ensurePermission(string $description = null): void {
 		$name = $this->getPermissionName();
 		if ($this->auth->getPermission($name) === null) {
-			$permission = $this->createPermission();
+			$permission = $this->createPermission($description);
 			$this->auth->add($permission);
 		}
 	}
@@ -97,8 +97,9 @@ class ModelAccessManager extends Component {
 		return $this->auth->assign($permission, $userId);
 	}
 
-	public function getUserIds(): array {
-		return $this->auth->getUserIdsByRole($this->getPermissionName());
+	public function getUserIds(string $name = null): array {
+		$name = $name ?? $this->getPermissionName();
+		return $this->auth->getUserIdsByRole($name);
 	}
 
 	public function hasModel(): bool {
@@ -209,9 +210,9 @@ class ModelAccessManager extends Component {
 		return $data;
 	}
 
-	protected function createPermission(): Permission {
+	protected function createPermission(string $description = null): Permission {
 		$permission = $this->auth->createPermission($this->getPermissionName());
-		$permission->description = $this->getPermissionDescription();
+		$permission->description = !empty($description) ? $description : $this->getPermissionDescription();
 		return $permission;
 	}
 
@@ -241,11 +242,14 @@ class ModelAccessManager extends Component {
 	}
 
 	public function getPermissionDescription(): string {
+		if ($this->getPermission()) {
+			return $this->getPermission()->description;
+		}
 		if ($this->modelRbac->getRbacId()) {
 			return Yii::t('rbac', 'Access to model: {modelName} with ID: {id} for Action: {action} [{app}]', [
 				'modelName' => Yii::t('rbac', $this->modelRbac->getRbacBaseName()),
-				'action' => $this->action,
-				'app' => $this->app,
+				'action' => Yii::t('rbac', $this->action),
+				'app' => Yii::t('rbac', $this->app),
 				'id' => $this->modelRbac->getRbacId(),
 			]);
 		}

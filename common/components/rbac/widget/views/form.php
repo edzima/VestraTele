@@ -43,6 +43,7 @@ use yii\widgets\ActiveForm;
 					],
 				]) ?>
 
+				<?= $form->field($model, "[$index]description")->textInput() ?>
 
 			<?php endforeach; ?>
 		</div>

@@ -141,7 +141,7 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 	}
 
 	public function hasAccess(string|int $id, string $action = SettlementTypeAccessManager::ACTION_ISSUE_VIEW, string $app = null): bool {
-		$rbac = $this->getModelRbac();
+		$rbac = $this->getModelAccess();
 		$rbac->setAction($action);
 		if ($app) {
 			$rbac->setApp($app);
@@ -169,8 +169,10 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 		return $this->id;
 	}
 
-	public function getModelRbac(): ModelAccessManager {
-		return SettlementTypeAccessManager::createFromModel($this);
+	public function getModelAccess(): ModelAccessManager {
+		return Yii::$app->accessManagerFactory
+			->getManager(static::class)
+			->setModel($this);
 	}
 
 	public static function find(): SettlementTypeQuery {
