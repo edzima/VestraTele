@@ -1,6 +1,7 @@
 <?php
 
 use common\behaviors\GlobalAccessBehavior;
+use common\components\rbac\ManagerFactory;
 use common\components\User as WebUser;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -131,6 +132,12 @@ return [
 		],
 	],
 	'components' => [
+		'accessManagerFactory' => [
+			'class' => ManagerFactory::class,
+			'mapAppsIds' => [
+				ManagerFactory::FRONTEND_APP => 'app-frontend',
+			],
+		],
 		'log' => [
 			'traceLevel' => YII_DEBUG ? 3 : 0,
 			'targets' => [

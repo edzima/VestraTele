@@ -1,4 +1,7 @@
 <?php
+
+use common\components\rbac\ManagerFactory;
+
 return [
 	'id' => 'app-frontend-tests',
 	'homeUrl' => null,
@@ -11,6 +14,12 @@ return [
 		],
 		'request' => [
 			'cookieValidationKey' => 'test',
+		],
+		'accessManagerFactory' => [
+			'class' => ManagerFactory::class,
+			'mapAppsIds' => [
+				ManagerFactory::FRONTEND_APP => 'app-frontend-tests',
+			],
 		],
 	],
 ];

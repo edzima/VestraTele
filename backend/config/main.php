@@ -9,6 +9,7 @@ use backend\modules\settlement\Module as SettlementModule;
 use backend\modules\user\Module as UserModule;
 use common\behaviors\GlobalAccessBehavior;
 use common\behaviors\LastActionBehavior;
+use common\components\rbac\ManagerFactory;
 use common\components\User as WebUser;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -63,6 +64,13 @@ return [
 		],
 	],
 	'components' => [
+		'accessManagerFactory' => [
+			'class' => ManagerFactory::class,
+			'mapAppsIds' => [
+				ManagerFactory::FRONTEND_APP => 'app-frontend',
+				ManagerFactory::BACKEND_APP => 'app-backend',
+			],
+		],
 		'request' => [
 			'csrfParam' => '_csrf-backend',
 		],
