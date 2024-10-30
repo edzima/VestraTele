@@ -72,6 +72,19 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'class' => ActionColumn::class,
+				'template' => '{access} {view} {update} {delete}',
+				'buttons' => [
+					'access' => function ($url, SettlementType $model, $key) {
+						return Html::a(
+							Html::faicon('users'),
+							['access', 'id' => $model->id],
+							[
+								'title' => Yii::t('backend', 'Access'),
+								'aria-label' => Yii::t('backend', 'Access'),
+							]
+						);
+					},
+				],
 			],
 		],
 	]); ?>
