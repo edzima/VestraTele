@@ -33,7 +33,7 @@ class ModelAccessDetailWidget extends GridView {
 				if (empty($this->model)) {
 					throw new InvalidConfigException('rbac or accessManager must be set');
 				}
-				$this->accessManager = $this->model->getModelRbac();
+				$this->accessManager = $this->model->getModelAccess();
 			}
 			$models = $this->accessManager->getAccessPermissions($this->type);
 			$this->dataProvider = new ArrayDataProvider([
@@ -94,7 +94,7 @@ class ModelAccessDetailWidget extends GridView {
 			[
 				'label' => Yii::t('rbac', 'Assign Users'),
 				'value' => function (AccessPermission $model): ?string {
-					$ids = $this->accessManager->getUserIds();
+					$ids = $this->accessManager->getUserIds($model->name);
 					if (empty($ids)) {
 						return null;
 					}

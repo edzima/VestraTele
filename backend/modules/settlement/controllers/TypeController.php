@@ -5,7 +5,6 @@ namespace backend\modules\settlement\controllers;
 use backend\modules\settlement\models\SettlementTypeForm;
 use common\components\rbac\form\ActionsAccessForm;
 use common\components\rbac\form\SingleActionAccessForm;
-use common\components\rbac\SettlementTypeAccessManager;
 use common\models\settlement\search\SettlementTypeSearch;
 use common\models\settlement\SettlementType;
 use Yii;
@@ -38,7 +37,7 @@ class TypeController extends Controller {
 
 	public function actionSingleAccess(int $id, string $app, string $action) {
 		$type = $this->findModel($id);
-		$manager = $type->getModelRbac()
+		$manager = $type->getModelAccess()
 			->setApp($app)
 			->setAction($action);
 		$model = new SingleActionAccessForm($manager);
@@ -53,10 +52,8 @@ class TypeController extends Controller {
 
 	public function actionAccess(int $id) {
 		$model = new ActionsAccessForm();
-		$manager = new SettlementTypeAccessManager();
 		$type = $this->findModel($id);
-		$manager->setModel($type);
-		$model->setAccess($manager);
+		$model->setAccess($type->getModelAccess());
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			if ($id) {
 				return $this->redirect(['view', 'id' => $id]);

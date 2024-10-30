@@ -176,13 +176,16 @@ class CalculationController extends Controller {
 		]);
 	}
 
+	/**
+	 * @throws Exception
+	 * @throws NotFoundHttpException
+	 * @throws ForbiddenHttpException
+	 */
 	public function actionCreate(int $issueId, int $typeId) {
 		$issue = $this->findIssueModel($issueId);
 		$model = new CalculationForm(Yii::$app->user->getId(), $issue);
 		$type = $this->findType($typeId);
-		if (!$this->hasTypeAccess($type, SettlementTypeAccessManager::ACTION_CREATE)) {
-			throw new ForbiddenHttpException();
-		}
+		$this->checkTypeAccess($type, SettlementTypeAccessManager::ACTION_CREATE);
 		if (!$type->isForIssueTypeId($issue->getIssueTypeId())) {
 			throw new NotFoundHttpException();
 		}
@@ -218,7 +221,7 @@ class CalculationController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionUpdate(int $id) {
-		$calculation = $this->findModel($id, SettlementTypeAccessManager::ACTION_UPDATE);
+		$calculation = $this->findModel($id, SettlementTypeAccessManager::ACTION_CREATE);
 		if (!Yii::$app->user->can(User::PERMISSION_CALCULATION_UPDATE)
 			&& $calculation->owner_id !== Yii::$app->user->getId()) {
 			throw new ForbiddenHttpException(Yii::t('backend', 'Only bookkeeper or owner can update settlement.'));
@@ -300,14 +303,14 @@ class CalculationController extends Controller {
 	 * If the model is not found, a 404 HTTP exception will be thrown.
 	 *
 	 * @param integer $id
+	 * @param string $action
 	 * @return IssuePayCalculation the loaded model
+	 * @throws ForbiddenHttpException if user can not allow for model type action
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	protected function findModel(int $id, string $action): IssuePayCalculation {
 		if (($model = IssuePayCalculation::findOne($id)) !== null) {
-			if (!$this->hasTypeAccess($model->type, $action)) {
-				throw new ForbiddenHttpException();
-			}
+			$this->checkTypeAccess($model->type, $action);
 			return $model;
 		}
 
@@ -327,8 +330,19 @@ class CalculationController extends Controller {
 		throw new NotFoundHttpException('The requested page does not exist.');
 	}
 
-	private function hasTypeAccess(SettlementType $type, string $action): bool {
-		return $type->hasAccess(Yii::$app->user->getId(), $action);
+	/**
+	 * @param SettlementType $type
+	 * @param string $action
+	 * @return void
+	 * @throws ForbiddenHttpException
+	 */
+	private function checkTypeAccess(SettlementType $type, string $action): void {
+		if (!$type->hasAccess(Yii::$app->user->getId(), $action)) {
+			throw new ForbiddenHttpException(Yii::t('settlement', 'Not allow action:{action} to Type: {type}', [
+				'action' => Yii::t('rbac', $action),
+				'type' => $type->name,
+			]));
+		}
 	}
 
 	private function findType(int $id): SettlementType {

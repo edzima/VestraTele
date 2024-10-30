@@ -17,6 +17,7 @@ class SingleActionAccessForm extends Model {
 	public string $app;
 
 	public string $action;
+	public string $description;
 
 	private ModelAccessManager $access;
 
@@ -28,6 +29,7 @@ class SingleActionAccessForm extends Model {
 	public function rules(): array {
 		return [
 			[['!action', '!app'], 'required'],
+			['description', 'string'],
 			[['roles', 'permissions'], 'default', 'value' => []],
 			['roles', 'in', 'range' => array_keys($this->getRolesNames()), 'allowArray' => true],
 			['permissions', 'in', 'range' => array_keys($this->getPermissionsNames()), 'allowArray' => true],
@@ -41,6 +43,7 @@ class SingleActionAccessForm extends Model {
 			'roles' => Yii::t('rbac', 'Roles'),
 			'permissions' => Yii::t('rbac', 'Permissions'),
 			'usersIds' => Yii::t('rbac', 'Users'),
+			'description' => Yii::t('rbac', 'Description'),
 		];
 	}
 
@@ -51,6 +54,7 @@ class SingleActionAccessForm extends Model {
 		$this->roles = $model->getParentsRoles();
 		$this->permissions = $model->getParentsPermissions();
 		$this->usersIds = $model->getUserIds();
+		$this->description = $model->getPermissionDescription();
 	}
 
 	public function setAction(string $action): void {
@@ -63,7 +67,7 @@ class SingleActionAccessForm extends Model {
 		}
 		$this->access->remove();
 		if (!empty($this->roles) || !empty($this->permissions) || !empty($this->usersIds)) {
-			$this->access->ensurePermission();
+			$this->access->ensurePermission($this->description);
 		}
 		if (!empty($this->usersIds)) {
 			foreach ($this->usersIds as $userId) {
