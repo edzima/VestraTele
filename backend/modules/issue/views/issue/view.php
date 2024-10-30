@@ -42,6 +42,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 			|| Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER))
 			? SummonCreateButtonDropdown::widget([
 				'issueId' => $model->getIssueId(),
+				'tagName' => 'a',
 			])
 			: ''
 		?>
@@ -215,6 +216,7 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		<?= Yii::$app->user->can(Worker::PERMISSION_CALCULATION_TO_CREATE)
 			? IssueCreateSettlementButtonDropdown::widget([
 				'issue' => $model,
+				'userId' => Yii::$app->user->id,
 				'options' => [
 					'class' => 'btn btn-success',
 				],

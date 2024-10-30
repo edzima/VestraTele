@@ -4,6 +4,7 @@ namespace backend\modules\issue\widgets;
 
 use backend\helpers\Url;
 use Closure;
+use common\components\rbac\SettlementTypeAccessManager;
 use common\models\issue\IssueInterface;
 use common\models\settlement\SettlementType;
 use common\widgets\ButtonDropdown;
@@ -16,6 +17,8 @@ class IssueCreateSettlementButtonDropdown extends ButtonDropdown {
 
 	public IssueInterface $issue;
 	public string $typeRouteParam = 'typeId';
+
+	public ?string $userId = null;
 
 	public ?Closure $typeUrl = null;
 
@@ -38,7 +41,8 @@ class IssueCreateSettlementButtonDropdown extends ButtonDropdown {
 		$settlementTypes = array_filter(SettlementType::getModels(),
 			function (SettlementType $type) {
 				return $type->is_active
-					&& $type->isForIssueTypeId($this->issue->getIssueTypeId());
+					&& $type->isForIssueTypeId($this->issue->getIssueTypeId())
+					&& $this->typeIsForUser($type);
 			});
 		$items = [];
 		foreach ($settlementTypes as $type) {
@@ -62,6 +66,13 @@ class IssueCreateSettlementButtonDropdown extends ButtonDropdown {
 		$route[$this->issueRouteParam] = $this->issue->getIssueId();
 		$route[$this->typeRouteParam] = $type->id;
 		return Url::to($route);
+	}
+
+	private function typeIsForUser(SettlementType $type): bool {
+		if (empty($this->userId)) {
+			return true;
+		}
+		return $type->hasAccess($this->userId, SettlementTypeAccessManager::ACTION_CREATE);
 	}
 
 }
