@@ -38,7 +38,7 @@ class IssueCreateSettlementButtonDropdown extends ButtonDropdown {
 	}
 
 	public function run(): string {
-		if (!isset($this->dropdown['items'])) {
+		if (!isset($this->dropdown['items']) || empty($this->dropdown['items'])) {
 			return '';
 		}
 		return parent::run();
