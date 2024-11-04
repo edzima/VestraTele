@@ -17,12 +17,20 @@ class ManagerFactory extends Component {
 	];
 
 	public string $defaultClass = ModelAccessManager::class;
+	public ?string $appId = null;
 
 	public array $managers = [
 		SettlementType::class => [
 			'class' => SettlementTypeAccessManager::class,
 		],
 	];
+
+	public function init(): void {
+		parent::init();
+		if (empty($this->appId)) {
+			$this->appId = Yii::$app->id;
+		}
+	}
 
 	public function getManager(string $modelClass): ?ModelAccessManager {
 		if (!isset($this->managers[$modelClass])) {
@@ -38,6 +46,7 @@ class ManagerFactory extends Component {
 		$manager = Yii::createObject($config);
 		$actions = $this->mapActions($manager->getAppsActions());
 		$manager->setAppsActions($actions);
+		$manager->setApp($this->appId);
 		return $manager;
 	}
 
