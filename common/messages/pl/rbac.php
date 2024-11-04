@@ -123,7 +123,12 @@ return array_merge([
 	'App' => 'Aplikacja',
 	'issue-view' => 'Widok Sprawy',
 	'view' => 'Widok szczegółowy',
+	'create' => 'Dodawanie',
+	'pays' => 'Raty',
+	'settlement_types' => 'Typ rozliczenia',
+	'Description' => 'Opis',
 	'Assign Users' => 'Przypisani',
 	'Users' => 'Użytkownicy',
 	'Access detail' => 'Dostęp',
+	'Access to model: {modelName} with ID: {id} for Action: {action} [{app}]' => 'Dostep do: {modelName} #{id} - {action} [{app}]',
 ], $local);

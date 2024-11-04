@@ -23,9 +23,9 @@ class ModelAccessManager extends Component {
 
 	protected array $appsActions = [];
 
-	public string $action = self::ACTION_INDEX;
+	public string $action;
 
-	protected string $app = self::APP_FRONTEND;
+	protected string $app;
 
 	public array $availableParentRoles = [];
 	public array $availableParentPermissions = [];
@@ -67,12 +67,13 @@ class ModelAccessManager extends Component {
 		return $this->auth->checkAccess($userId, $this->getPermissionName());
 	}
 
-	public function ensurePermission(string $description = null): void {
+	public function ensurePermission(string $description = null): self {
 		$name = $this->getPermissionName();
 		if ($this->auth->getPermission($name) === null) {
 			$permission = $this->createPermission($description);
 			$this->auth->add($permission);
 		}
+		return $this;
 	}
 
 	public function removeAll(string $type): void {
@@ -93,7 +94,6 @@ class ModelAccessManager extends Component {
 		if ($this->auth->checkAccess($userId, $permission->name)) {
 			return null;
 		}
-
 		return $this->auth->assign($permission, $userId);
 	}
 
