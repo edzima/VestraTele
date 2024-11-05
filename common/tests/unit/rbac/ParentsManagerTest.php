@@ -5,7 +5,6 @@ namespace common\tests\unit\rbac;
 use common\components\rbac\DbManager;
 use common\components\rbac\ParentsManagerInterface;
 use common\tests\unit\Unit;
-use yii\base\InvalidConfigException;
 use yii\caching\DummyCache;
 
 class ParentsManagerTest extends Unit {
@@ -19,9 +18,7 @@ class ParentsManagerTest extends Unit {
 		$this->manager->add($admin);
 		$this->manager->add($postManager);
 		$this->manager->addChild($admin, $postManager);
-		$this->tester->expectThrowable(InvalidConfigException::class, function () {
-			$this->manager->getParentsRoles('admin');
-		});
+		$this->tester->assertEmpty($this->manager->getParentsRoles('admin'));
 	}
 
 	public function testGetParentsRoles() {

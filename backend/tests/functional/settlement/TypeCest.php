@@ -4,6 +4,7 @@ namespace backend\tests\functional\settlement;
 
 use backend\modules\settlement\controllers\TypeController;
 use backend\tests\Step\Functional\Manager;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\user\Worker;
 
 class TypeCest {
@@ -15,6 +16,10 @@ class TypeCest {
 	private const ROUTE_CREATE = '/settlement/type/create';
 
 	public const PERMISSION = Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER;
+
+	public function _fixtures(): array {
+		return SettlementFixtureHelper::type();
+	}
 
 	public function checkIndexAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -40,5 +45,10 @@ class TypeCest {
 		$I->seeLink('Create Settlement Type');
 		$I->click('Create Settlement Type');
 		$I->seeInCurrentUrl(static::ROUTE_CREATE);
+	}
+
+	public function create(Manager $I): void {
+		$I->assignPermission(static::PERMISSION);
+		$I->amOnRoute(static::ROUTE_CREATE);
 	}
 }

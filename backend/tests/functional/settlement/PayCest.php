@@ -5,11 +5,10 @@ namespace backend\tests\functional\settlement;
 use backend\modules\settlement\controllers\PayController;
 use backend\tests\Step\Functional\Manager;
 use backend\tests\Step\Functional\PayIssueManager;
-use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\helpers\Flash;
-use common\models\issue\IssueSettlement;
 use Yii;
 
 /**
@@ -65,12 +64,13 @@ class PayCest {
 			SettlementFixtureHelper::settlement(),
 			SettlementFixtureHelper::owner(),
 			SettlementFixtureHelper::pay(),
+			SettlementFixtureHelper::type(),
 			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_PAY_PAYED),
 		));
 		$I->amLoggedIn();
 		$id = $this->settlementFixture->havePay(100, [
 			'settlement' => [
-				'type' => IssueSettlement::TYPE_HONORARIUM,
+				'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 			],
 		]);
 		$I->amOnRoute(static::ROUTE_PAY, ['id' => $id]);
@@ -79,7 +79,8 @@ class PayCest {
 		$I->click('Save');
 		$I->seeFlash('The payment: ' . Yii::$app->formatter->asCurrency(100) . ' marked as paid.', Flash::TYPE_SUCCESS);
 		$I->seeEmailIsSent(2);
-		$I->seeJobIsPushed(2);
+		$I->wantTo('See push SMS to Agent, not to Customer, default is disabled for them.');
+		$I->seeJobIsPushed(1);
 	}
 
 	public function checkPayAdministrative(PayIssueManager $I): void {
@@ -89,6 +90,7 @@ class PayCest {
 			IssueFixtureHelper::types(),
 			IssueFixtureHelper::users(true),
 			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::type(),
 			SettlementFixtureHelper::owner(),
 			SettlementFixtureHelper::pay(),
 			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_PAY_PAYED),
@@ -96,7 +98,7 @@ class PayCest {
 		$I->amLoggedIn();
 		$id = $this->settlementFixture->havePay(100, [
 			'settlement' => [
-				'type' => IssueSettlement::TYPE_ADMINISTRATIVE,
+				'type_id' => SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE,
 			],
 		]);
 		$I->amOnRoute(static::ROUTE_PAY, ['id' => $id]);

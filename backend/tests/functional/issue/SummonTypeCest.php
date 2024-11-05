@@ -30,7 +30,6 @@ class SummonTypeCest {
 		$I->see('Summon Types');
 		$I->seeInGridHeader('Name');
 		$I->seeInGridHeader('Short Name');
-		$I->seeInGridHeader('Title');
-		$I->seeInGridHeader('Term');
+		$I->seeInGridHeader('Calendar Background');
 	}
 }

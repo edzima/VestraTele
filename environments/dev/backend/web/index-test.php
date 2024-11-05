@@ -7,6 +7,8 @@ if ((ip2long(@$_SERVER['REMOTE_ADDR']) ^ ip2long(@$_SERVER['SERVER_ADDR'])) >= 2
 
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_ENV') or define('YII_ENV', 'test');
+defined('YII_IS_FRONTEND') or define('YII_IS_FRONTEND', false);
+
 
 require __DIR__ . '/../../vendor/autoload.php';
 require __DIR__ . '/../../vendor/yiisoft/yii2/Yii.php';

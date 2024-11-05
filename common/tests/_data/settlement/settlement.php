@@ -8,7 +8,7 @@ return [
 	'not-payed-with-double-costs' => [
 		'issue_id' => 1,
 		'value' => 1230,
-		'type' => IssuePayCalculation::TYPE_HONORARIUM,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 		'provider_id' => 200,
 		'owner_id' => SettlementFixtureHelper::OWNER_JOHN,
@@ -17,7 +17,7 @@ return [
 	'payed-with-single-costs' => [
 		'issue_id' => 3,
 		'value' => 1230,
-		'type' => IssuePayCalculation::TYPE_ADMINISTRATIVE,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE,
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 		'provider_id' => 200,
 		'owner_id' => SettlementFixtureHelper::OWNER_JOHN,
@@ -26,7 +26,7 @@ return [
 	'many-pays-without-costs' => [
 		'issue_id' => 1,
 		'value' => 1230,
-		'type' => IssuePayCalculation::TYPE_HONORARIUM,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 		'provider_id' => 200,
 		'owner_id' => SettlementFixtureHelper::OWNER_JOHN,
@@ -35,7 +35,7 @@ return [
 	'with-problem-status' => [
 		'issue_id' => 3,
 		'value' => 2460,
-		'type' => IssuePayCalculation::TYPE_HONORARIUM,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 		'problem_status' => IssuePayCalculation::PROBLEM_STATUS_PREPEND_DEMAND,
 		'provider_id' => 200,
@@ -45,7 +45,7 @@ return [
 	'with-problem-status_and_pay' => [
 		'issue_id' => 1,
 		'value' => 1230,
-		'type' => IssuePayCalculation::TYPE_HONORARIUM,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 		'problem_status' => IssuePayCalculation::PROBLEM_STATUS_DEMAND,
 		'provider_id' => 200,
@@ -55,7 +55,7 @@ return [
 	'archived-issue' => [
 		'issue_id' => 6,
 		'value' => 1230,
-		'type' => IssuePayCalculation::TYPE_HONORARIUM,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 		'problem_status' => IssuePayCalculation::PROBLEM_STATUS_DEMAND,
 		'provider_id' => 200,
@@ -65,7 +65,7 @@ return [
 	'lawyer' => [
 		'issue_id' => 5,
 		'value' => 100,
-		'type' => IssuePayCalculation::TYPE_LAWYER,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_LAWYER,
 		'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 		'provider_id' => UserFixtureHelper::CUSTOMER_ERIKA_LARSON_ID,
 		'owner_id' => SettlementFixtureHelper::OWNER_NICOLE,

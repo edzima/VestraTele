@@ -21,8 +21,11 @@ class CalculationViewCest {
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::customer(),
 			IssueFixtureHelper::issueUsers(),
+			IssueFixtureHelper::stageAndTypesFixtures(),
 			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::type(),
 		));
+		$I->assignPermission(SettlementFixtureHelper::getTypeManagerPermission());
 		$I->amLoggedIn();
 	}
 

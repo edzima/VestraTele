@@ -9,5 +9,6 @@ class StageTypesFixtures extends ActiveFixture {
 	public $tableName = '{{%issue_stage_type}}';
 	public $depends = [
 		StageFixture::class,
+		TypeFixture::class,
 	];
 }

@@ -6,7 +6,6 @@ use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
-use common\models\issue\IssueSettlement;
 use common\models\settlement\CalculationForm;
 use common\models\settlement\PayInterface;
 use DateTime;
@@ -34,6 +33,7 @@ class CalculationFormTest extends PayFormTest {
 			SettlementFixtureHelper::cost(true),
 			SettlementFixtureHelper::pay(),
 			SettlementFixtureHelper::owner(),
+			SettlementFixtureHelper::type(),
 		);
 	}
 
@@ -42,13 +42,13 @@ class CalculationFormTest extends PayFormTest {
 		$this->thenSeeError('Value with VAT cannot be blank.', 'value');
 		$this->thenDontSeeError('payment_at');
 		$this->thenDontSeeError('deadline_at');
-		$this->thenSeeError('Type cannot be blank.', 'type');
+		$this->thenSeeError('Type cannot be blank.', 'type_id');
 		$this->thenSeeError('Provider cannot be blank.', 'providerType');
 	}
 
 	public function testCreateWithDeadline(): void {
 		$model = $this->getModel();
-		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
+		$model->type_id = SettlementFixtureHelper::TYPE_ID_HONORARIUM;
 		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
 		$model->value = 123;
 		$model->vat = 23;
@@ -61,7 +61,7 @@ class CalculationFormTest extends PayFormTest {
 
 	public function testCreateWithDeadlineRange(): void {
 		$model = $this->createForm();
-		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
+		$model->type_id = SettlementFixtureHelper::TYPE_ID_HONORARIUM;
 		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
 		$model->value = 123;
 		$model->deadlineInterval = CalculationForm::DEADLINE_INTERVAL_3_DAYS;
@@ -71,94 +71,100 @@ class CalculationFormTest extends PayFormTest {
 	}
 
 	public function testInvalidCost(): void {
-		$model = $this->createForm();
-		$model->costs_ids = [12121212];
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Costs is invalid.', $model->getFirstError('costs_ids'));
+		$this->giveForm([
+			'costs_ids' => [11212121212],
+		]);
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Costs is invalid.', 'costs_ids');
 	}
 
 	public function testCostAsEmptyString(): void {
-		$model = $this->createForm();
+		$this->giveForm();
+		$model = $this->getModel();
 		$model->costs_ids = '';
 		$model->value = 12300;
 		$model->vat = 23;
-		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
+		$model->type_id = SettlementFixtureHelper::TYPE_ID_HONORARIUM;
 		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
 		$model->payment_at = '2020-02-02';
-		$this->tester->assertTrue($model->save());
+		codecept_debug($model->getTypesNames());
+		$this->thenSuccessSave();
 	}
 
 	public function testWithCostAsArray(): void {
-		$model = $this->createForm();
+		$this->giveForm();
+		$model = $this->getModel();
 		$model->costs_ids = [1];
 		$model->value = 12300;
 		$model->vat = 23;
-		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
+		$model->type_id = SettlementFixtureHelper::TYPE_ID_HONORARIUM;
 		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
 		$model->payment_at = '2020-02-02';
-		$this->tester->assertTrue($model->save());
+		$this->thenSuccessSave();
 		$costs = $model->getModel()->costs;
 		$this->tester->assertCount(1, $costs);
 	}
 
 	public function testWithCostAsString(): void {
-		$model = $this->createForm();
+		$this->giveForm();
+		$model = $this->getModel();
 		$model->costs_ids = 1;
 		$model->value = 12300;
 		$model->vat = 23;
-		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
+		$model->type_id = SettlementFixtureHelper::TYPE_ID_HONORARIUM;
 		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
 		$model->payment_at = '2020-02-02';
-		$this->tester->assertTrue($model->save());
+		$this->thenSuccessSave();
 		$costs = $model->getModel()->costs;
 		$this->tester->assertCount(1, $costs);
 	}
 
 	public function testWithCosts(): void {
-		$model = $this->createForm();
+		$this->giveForm();
+		$model = $this->getModel();
 		$model->costs_ids = [1, 2];
 		$model->value = 12300;
 		$model->vat = 23;
-		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
+		$model->type_id = SettlementFixtureHelper::TYPE_ID_HONORARIUM;
 		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
 		$model->payment_at = '2020-02-02';
-		$this->tester->assertTrue($model->save());
+		$this->thenSuccessSave();
 		$costs = $model->getModel()->costs;
 		$this->tester->assertCount(2, $costs);
 	}
 
 	public function testUnlinkCost(): void {
-		$model = $this->createForm();
+		$this->giveForm();
+		$model = $this->getModel();
 		$model->costs_ids = [1, 2];
 		$model->value = 12300;
 		$model->vat = 23;
-		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
+		$model->type_id = SettlementFixtureHelper::TYPE_ID_HONORARIUM;
 		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
 		$model->payment_at = '2020-02-02';
-		$this->tester->assertTrue($model->save());
-		$newForm = CalculationForm::createFromModel($model->getModel());
-		$newForm->costs_ids = [1];
-		$newForm->validate();
-		$this->tester->assertTrue($newForm->save());
-		$costs = $newForm->getModel()->costs;
+		$this->thenSuccessSave();
+
+		$this->model = CalculationForm::createFromModel($model->getModel());
+		$model = $this->getModel();
+
+		$model->costs_ids = [1];
+		$this->thenSuccessSave();
+		$costs = $model->getModel()->costs;
 		$this->tester->assertCount(1, $costs);
 	}
 
 	public function testInvalidType(): void {
 		$model = $this->createForm();
-		$model->type = 'invalid-type';
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Type must be an integer.', $model->getFirstError('type'));
-		$model->type = 1212412412412412;
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Type is invalid.', $model->getFirstError('type'));
+		$model->type_id = 1212412412412412;
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Type cannot be blank.', 'type_id');
 	}
 
 	public function testInvalidProviderType(): void {
 		$model = $this->createForm();
 		$model->providerType = -1;
-		$this->tester->assertFalse($model->validate(['providerType']));
-		$this->tester->assertSame('Provider is invalid.', $model->getFirstError('providerType'));
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Provider cannot be blank.', 'providerType');
 		$this->tester->expectThrowable(
 			new InvalidConfigException('Invalid provider type.'),
 			function () use ($model) {
@@ -170,7 +176,7 @@ class CalculationFormTest extends PayFormTest {
 		$model = $this->createForm();
 		$model->value = 12300;
 		$model->vat = 23;
-		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
+		$model->type_id = SettlementFixtureHelper::TYPE_ID_HONORARIUM;
 		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
 		$model->payment_at = '2020-02-02';
 		$this->tester->assertTrue($model->save());
@@ -178,7 +184,7 @@ class CalculationFormTest extends PayFormTest {
 			'owner_id' => static::DEFAULT_OWNER_ID,
 			'issue_id' => 1,
 			'value' => 12300,
-			'type' => IssuePayCalculation::TYPE_HONORARIUM,
+			'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 			'provider_type' => IssuePayCalculation::PROVIDER_CLIENT,
 			'payment_at' => '2020-02-02',
 			'provider_id' => $model->getModel()->issue->customer->id,
@@ -197,7 +203,7 @@ class CalculationFormTest extends PayFormTest {
 		$model = $this->createForm();
 		$model->value = 123;
 		$model->vat = 23;
-		$model->type = IssuePayCalculation::TYPE_HONORARIUM;
+		$model->type_id = SettlementFixtureHelper::TYPE_ID_HONORARIUM;
 		$model->providerType = IssuePayCalculation::PROVIDER_CLIENT;
 		$model->payment_at = '2020-01-01';
 		$pay = $model->generatePay();
@@ -211,13 +217,13 @@ class CalculationFormTest extends PayFormTest {
 	public function testCreateWithoutPayementAndDeadlineAt(): void {
 		$this->giveForm([
 			'value' => 123,
-			'type' => IssueSettlement::TYPE_HONORARIUM,
+			'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 			'providerType' => IssuePayCalculation::PROVIDER_CLIENT,
 		]);
 		$this->thenSuccessSave();
 		$this->tester->seeRecord(IssuePayCalculation::class, [
 			'value' => 123,
-			'type' => IssueSettlement::TYPE_HONORARIUM,
+			'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 			'payment_at' => null,
 		]);
 		$this->tester->seeRecord(IssuePay::class, [

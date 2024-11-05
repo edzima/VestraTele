@@ -53,6 +53,7 @@ class SmsCest {
 
 	public function checkWithPermission(IssueManager $I): void {
 		$I->amLoggedIn();
+		IssueFixtureHelper::accessUserTypes($I->getUser()->id);
 		$I->wantTo('Check Access to Push Page');
 		$I->assignPermission(Worker::PERMISSION_SMS);
 		$I->amOnRoute(static::ROUTE_PUSH, ['id' => 1]);

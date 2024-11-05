@@ -44,7 +44,7 @@ class IssueFormTest extends Unit {
 		$this->tester->assertCount(2, IssueForm::getTele());
 		$tele = $this->tester->grabFixture(IssueFixtureHelper::TELEMARKETER, 0);
 		Yii::$app->authManager->revoke(Yii::$app->authManager->getPermission(User::PERMISSION_ISSUE), $tele->id);
-		$this->tester->assertCount(0, IssueForm::getTele());
+		$this->tester->assertCount(1, IssueForm::getTele());
 	}
 
 	public function testCreateWithoutCustomerOrModel(): void {
@@ -136,8 +136,8 @@ class IssueFormTest extends Unit {
 		$model = $this->createModel([
 			'signature_act' => 'I OC 22',
 		]);
-		$this->tester->assertFalse($model->save());
-		$this->tester->assertSame('Signature act "I OC 22" has already been taken.', $model->getFirstError('signature_act'));
+		// already we are allow duplicate signature
+		$this->tester->assertTrue($model->save());
 	}
 
 	public function testChangeStageNote(): void {

@@ -55,7 +55,7 @@ class IssueUserChangeHandlerTest extends Unit {
 
 		$this->tester->seeEmailIsSent();
 		$email = $this->tester->grabLastSentEmail();
-		$this->tester->assertSame('Change User in Issue: 1/11/2022. Add Larson Erika as vindicator.', $email->getSubject());
+		$this->tester->assertSame('Change User in Issue: ' . $issue->getIssueName() . '. Add Larson Erika as vindicator.', $email->getSubject());
 	}
 
 	public function testUpdate(): void {
@@ -75,6 +75,6 @@ class IssueUserChangeHandlerTest extends Unit {
 
 		$this->tester->seeEmailIsSent();
 		$email = $this->tester->grabLastSentEmail();
-		$this->tester->assertSame('Change User in Issue: 1/11/2022. Update Larson Erika as agent.', $email->getSubject());
+		$this->tester->assertSame('Change User in Issue: ' . $issue->getIssueName() . '. Update Larson Erika as agent.', $email->getSubject());
 	}
 }

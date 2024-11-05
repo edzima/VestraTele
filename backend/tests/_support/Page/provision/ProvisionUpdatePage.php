@@ -20,8 +20,10 @@ class ProvisionUpdatePage {
 	public function haveFixtures(): void {
 		$this->tester->haveFixtures(array_merge(
 				IssueFixtureHelper::issue(),
+				IssueFixtureHelper::types(),
 				IssueFixtureHelper::users(),
 				SettlementFixtureHelper::settlement(),
+				SettlementFixtureHelper::type(),
 				SettlementFixtureHelper::pay(),
 				ProvisionFixtureHelper::provision(),
 				ProvisionFixtureHelper::type(),

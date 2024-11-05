@@ -57,15 +57,15 @@ class CalculationToCreateSearchTest extends Unit {
 	}
 
 	public function testCustomerSearch(): void {
-		$this->model->customerName = 'Lar';
-		$models = $this->model->search(['customerLastname' => 'Lar'])->getModels();
+
+		$models = $this->getModels(['customerName' => 'Lar']);
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
 			/** @var Issue $model */
 			$this->tester->assertStringStartsWith('Lar', $model->customer->profile->lastname);
 		}
 
-		$models = $this->search(['customerLastname' => 'Len'])->getModels();
+		$models = $this->getModels(['customerName' => 'Len']);
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
 			/** @var Issue $model */

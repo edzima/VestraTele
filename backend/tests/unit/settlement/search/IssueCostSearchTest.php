@@ -73,13 +73,13 @@ class IssueCostSearchTest extends Unit {
 		$models = $this->search(['issueType' => 1])->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
-			$this->tester->assertSame(1, $model->getIssueType()->id);
+			$this->tester->assertSame(1, $model->issue->type_id);
 		}
 		/** @var IssueCost[] $models */
 		$models = $this->search(['issueType' => 2])->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
-			$this->tester->assertSame(2, $model->getIssueType()->id);
+			$this->tester->assertSame(2, $model->issue->type_id);
 		}
 	}
 

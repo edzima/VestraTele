@@ -126,7 +126,7 @@ class IssueTypeUser extends Component {
 		return $this->auth->getPermission($this->getPermissionName($typeId));
 	}
 
-	protected function getPermissionName(int $typeId): string {
+	public function getPermissionName(int $typeId): string {
 		return 'issue.types:' . $typeId;
 	}
 

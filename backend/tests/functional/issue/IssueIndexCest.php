@@ -57,7 +57,8 @@ class IssueIndexCest {
 		$I->amOnRoute(static::ROUTE);
 		$I->see('Created at from');
 		$I->see('Created at to');
-		$I->see('Additional Date for Type');
+		$I->see('Type additional Date at from');
+		$I->see('Type additional Date at to');
 		$I->see('Lawyer');
 		$I->see('Agent');
 		$I->see('Telemarketer');

@@ -37,6 +37,9 @@ class IssueSearchTest extends Unit {
 			static::$hasFixture = true;
 		}
 		$this->model = $this->createModel();
+		$this->model->userId = UserFixtureHelper::MANAGER_JOHN;
+		IssueFixtureHelper::accessUserTypes(UserFixtureHelper::MANAGER_JOHN);
+
 		parent::_before();
 	}
 

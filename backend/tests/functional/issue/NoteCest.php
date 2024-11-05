@@ -10,7 +10,7 @@ use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssueNote;
 use common\models\issue\IssueSettlement;
 use common\models\issue\Summon;
-use frontend\helpers\Html;
+use common\models\user\Worker;
 
 class NoteCest {
 
@@ -26,6 +26,7 @@ class NoteCest {
 	private const ROUTE_UPDATE = '/issue/note/update';
 
 	private const SELECTOR_FORM = '#issue-note-form';
+	const PERMISSION_NOTE_UPDATE = Worker::PERMISSION_NOTE_UPDATE;
 
 	public function checkIndexAsManager(Manager $I): void {
 		$I->amLoggedIn();
@@ -152,9 +153,16 @@ class NoteCest {
 		$I->haveFixtures($this->fixtures());
 		$I->amLoggedIn();
 		$I->assignNotePermission();
+		IssueFixtureHelper::accessUserTypes($I->getUser()->id);
 		/** @var IssueNote $note */
 		$note = $I->grabFixture(IssueFixtureHelper::NOTE, 'stage-change');
 		$I->amOnRoute(static::ROUTE_UPDATE, ['id' => $note->id]);
+		$I->see('Only self note can update or User with Note Update permission.');
+
+		$I->assignPermission(static::PERMISSION_NOTE_UPDATE);
+
+		$I->amOnRoute(static::ROUTE_UPDATE, ['id' => $note->id]);
+
 		$I->see('Update Issue Note');
 		$I->seeInField(['name' => 'IssueNoteForm[title]'], $note->title);
 		$I->seeElement('input', [
@@ -240,6 +248,7 @@ class NoteCest {
 			IssueFixtureHelper::note(),
 			IssueFixtureHelper::stageAndTypesFixtures(),
 			IssueFixtureHelper::users(),
+			IssueFixtureHelper::entityResponsible(),
 		);
 	}
 

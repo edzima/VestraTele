@@ -7,7 +7,6 @@ use common\fixtures\helpers\ProvisionFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssuePayCalculation;
-use common\models\issue\IssueSettlement;
 use common\models\issue\IssueStage;
 use common\models\SearchModel;
 use common\models\settlement\search\IssuePayCalculationSearch;
@@ -62,18 +61,18 @@ class IssuePayCalculationSearchTest extends Unit {
 	}
 
 	public function testType(): void {
-		$this->model->type_id = IssueSettlement::TYPE_HONORARIUM;
+		$this->model->type_id = SettlementFixtureHelper::TYPE_ID_HONORARIUM;
 		$models = $this->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
-			$this->tester->assertSame(IssueSettlement::TYPE_HONORARIUM, $model->getTypeId());
+			$this->tester->assertSame(SettlementFixtureHelper::TYPE_ID_HONORARIUM, $model->getTypeId());
 		}
 
-		$this->model->type_id = IssueSettlement::TYPE_ADMINISTRATIVE;
+		$this->model->type_id = SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE;
 		$models = $this->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
-			$this->tester->assertSame(IssueSettlement::TYPE_ADMINISTRATIVE, $model->getTypeId());
+			$this->tester->assertSame(SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE, $model->getTypeId());
 		}
 	}
 

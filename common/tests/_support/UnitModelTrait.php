@@ -43,8 +43,8 @@ trait UnitModelTrait {
 	}
 
 	public function thenSeeError(string $message, string $attribute): void {
-		codecept_debug($this->model->getErrors($attribute));
-		$this->tester->assertContains($message, $this->model->getErrors($attribute));
+		codecept_debug($this->getModel()->getErrors($attribute));
+		$this->tester->assertContains($message, $this->getModel()->getErrors($attribute));
 	}
 
 	public function thenDontSeeError(string $attribute): void {

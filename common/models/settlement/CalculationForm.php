@@ -18,7 +18,7 @@ class CalculationForm extends PayForm {
 
 	private Issue $issue;
 	private int $owner;
-	public int $type_id;
+	public ?int $type_id = null;
 
 	public ?int $providerType = null;
 	public $costs_ids = [];
@@ -35,6 +35,10 @@ class CalculationForm extends PayForm {
 		parent::__construct($config);
 	}
 
+	public function getIsNewRecord(): bool {
+		return $this->getModel()->isNewRecord;
+	}
+
 	public static function createFromModel(IssuePayCalculation $model): self {
 		$self = new static(
 			$model->owner_id,
@@ -46,8 +50,7 @@ class CalculationForm extends PayForm {
 
 	public function rules(): array {
 		return array_merge([
-			[['!type_id'], 'required'],
-			[['providerType',], 'required'],
+			[['providerType', 'type_id'], 'required'],
 			[['owner', 'type_id', 'providerType', 'entityProviderId'], 'integer'],
 			[
 				'entityProviderId', 'required', 'when' => function () {
@@ -74,6 +77,7 @@ class CalculationForm extends PayForm {
 			'providerType' => Yii::t('settlement', 'Provider'),
 			'costs_ids' => Yii::t('settlement', 'Costs'),
 			'entityProviderId' => Yii::t('settlement', 'Entity responsible'),
+			'type_id' => Yii::t('settlement', 'Type'),
 		], parent::attributeLabels());
 	}
 

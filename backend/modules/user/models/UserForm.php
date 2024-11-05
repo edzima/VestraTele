@@ -297,7 +297,8 @@ class UserForm extends Model {
 	}
 
 	private function updateProfile(User $model): bool {
-		$profile = $model->profile;
+		$profile = $model->getProfile();
+		$profile->user_id = $model->id;
 		$profile->lastname = $this->getProfile()->lastname;
 		$profile->firstname = $this->getProfile()->firstname;
 		$profile->birthday = $this->getProfile()->birthday;

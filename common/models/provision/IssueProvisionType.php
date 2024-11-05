@@ -4,10 +4,10 @@ namespace common\models\provision;
 
 use backend\modules\issue\models\IssueStage;
 use common\models\issue\Issue;
-use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSettlement;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
+use common\models\settlement\SettlementType;
 use Decimal\Decimal;
 use Yii;
 use yii\base\InvalidCallException;
@@ -28,7 +28,7 @@ class IssueProvisionType extends ProvisionType {
 	public const KEY_DATA_MAX_SETTLEMENT_VALUE = 'maxSettlementValue';
 
 	public static function settlementTypesNames(): array {
-		return IssuePayCalculation::getTypesNames();
+		return SettlementType::getNames();
 	}
 
 	public static function issueStagesNames(): array {

@@ -5,7 +5,6 @@ namespace common\tests\unit\provision\search;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
-use common\models\issue\IssueSettlement;
 use common\models\provision\Provision;
 use common\models\provision\ProvisionSearch;
 use common\models\SearchModel;
@@ -138,24 +137,24 @@ class ProvisionSearchTest extends Unit {
 	}
 
 	public function testSettlementType(): void {
-		$models = $this->search(['settlementTypes' => [IssueSettlement::TYPE_HONORARIUM]])->getModels();
+		$models = $this->search(['settlementTypes' => [SettlementFixtureHelper::TYPE_ID_HONORARIUM]])->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
 			/** @var Provision $model */
-			$this->tester->assertSame(IssueSettlement::TYPE_HONORARIUM, $model->pay->calculation->type);
+			$this->tester->assertSame(SettlementFixtureHelper::TYPE_ID_HONORARIUM, $model->pay->calculation->type_id);
 		}
 		$models = $this->search([
 			'settlementTypes' => [
-				IssueSettlement::TYPE_HONORARIUM,
-				IssueSettlement::TYPE_ADMINISTRATIVE,
+				SettlementFixtureHelper::TYPE_ID_HONORARIUM,
+				SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE,
 			],
 		])->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
 			/** @var Provision $model */
-			$this->tester->assertContains($model->pay->calculation->type, [
-				IssueSettlement::TYPE_HONORARIUM,
-				IssueSettlement::TYPE_ADMINISTRATIVE,
+			$this->tester->assertContains($model->pay->calculation->type_id, [
+				SettlementFixtureHelper::TYPE_ID_HONORARIUM,
+				SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE,
 			]);
 		}
 		$this->assertPayStatuses();

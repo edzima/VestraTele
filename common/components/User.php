@@ -103,7 +103,7 @@ class User extends BaseUser {
 		if ($this->isGuest || !($this->identity instanceof \common\models\user\User)) {
 			return null;
 		}
-		return $this->identity->userProfile->favorite_issue_type_id;
+		return $this->identity->getProfile()->favorite_issue_type_id;
 	}
 
 	protected function canSeeIssueType(int $typeId): bool {

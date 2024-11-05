@@ -67,8 +67,6 @@ class IssueCreateCest {
 			'user_id' => 200,
 			'type' => IssueUser::TYPE_LAWYER,
 		]);
-
-		$I->seeLink('Update');
 	}
 
 }

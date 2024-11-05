@@ -19,19 +19,22 @@ use common\fixtures\user\UserAddressFixture;
 use common\helpers\ArrayHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
 use common\models\user\User;
+use common\models\user\Worker;
 use Yii;
+use yii\base\InvalidConfigException;
 
 class IssueFixtureHelper extends BaseFixtureHelper {
 
 	public const DEFAULT_AGENT_ID = UserFixtureHelper::AGENT_PETER_NOWAK;
 	public const DEFAULT_CUSTOMER_ID = UserFixtureHelper::CUSTOMER_JOHN_WAYNE_ID;
 
-	public const AGENT = 'agent';
-	public const CUSTOMER = 'customer';
-	public const LAWYER = 'lawyer';
-	public const TELEMARKETER = 'telemarketer';
+	public const AGENT = 'issue.agent';
+	public const CUSTOMER = 'issue.customer';
+	public const LAWYER = 'issue.lawyer';
+	public const TELEMARKETER = 'issue.telemarketer';
 
 	public const ISSUE = 'issue';
 
@@ -105,12 +108,12 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 		];
 	}
 
-	public static function fixtures(): array {
+	public static function fixtures(bool $userProfiles = false): array {
 		return array_merge(
 			static::issue(),
 			static::entityResponsible(),
 			static::stageAndTypesFixtures(),
-			static::users(),
+			static::users($userProfiles),
 		);
 	}
 
@@ -250,6 +253,43 @@ class IssueFixtureHelper extends BaseFixtureHelper {
 					'dataFile' => static::dataDir() . 'issue/summon_doc.php',
 				],
 			]);
+	}
+
+	public static function accessTypesToIssuePermission(array $ids = []): void {
+		if (empty($ids)) {
+			$ids = array_keys(IssueType::getTypes());
+			if (empty($ids)) {
+				throw new InvalidConfigException('issue type must be exist');
+			}
+		}
+		foreach ($ids as $id) {
+			Yii::$app->issueTypeUser->ensurePermission($id);
+			Yii::$app->issueTypeUser->addChild(
+				Yii::$app->issueTypeUser->auth
+					->getPermission(Worker::PERMISSION_ISSUE),
+				$id
+			);
+		}
+	}
+
+	public static function accessUserTypes(string $userID, array $ids = []): void {
+		if (empty($ids)) {
+			$ids = array_keys(IssueType::getTypes());
+			if (empty($ids)) {
+				throw new InvalidConfigException('issue type must be exist');
+			}
+		}
+		foreach ($ids as $id) {
+			Yii::$app->issueTypeUser->ensurePermission($id);
+			$permissionName = Yii::$app->issueTypeUser->getPermissionName($id);
+			$manager = Yii::$app->issueTypeUser->auth;
+			if (!$manager->checkAccess($userID, $permissionName)) {
+				$manager->assign(
+					$manager->getPermission($permissionName),
+					$userID
+				);
+			}
+		}
 	}
 
 }

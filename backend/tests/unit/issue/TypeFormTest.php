@@ -18,11 +18,6 @@ class TypeFormTest extends Unit {
 		return IssueFixtureHelper::types();
 	}
 
-	public function testDuplicateName(): void {
-		$this->giveModel(['name' => 'Accident']);
-		$this->thenUnsuccessSave();
-		$this->thenSeeError('Name "Accident" has already been taken.', 'name');
-	}
 
 	public function testParentLoop() {
 
@@ -42,7 +37,6 @@ class TypeFormTest extends Unit {
 			'name' => 'Second child',
 			'parent_id' => $firstChildId,
 			'short_name' => 'SC',
-
 		]);
 
 		$this->giveModel();
@@ -53,8 +47,10 @@ class TypeFormTest extends Unit {
 		$this->thenSeeError('Detect loop', 'parent_id');
 	}
 
-	private function giveModel(array $config = []): void {
-		$this->model = new IssueTypeForm($config);
+	public function testDuplicateName(): void {
+		$this->giveModel(['name' => 'Accident']);
+		$this->thenUnsuccessSave();
+		$this->thenSeeError('Name "Accident" has already been taken.', 'name');
 	}
 
 	public function testDuplicateShortName(): void {
@@ -67,25 +63,21 @@ class TypeFormTest extends Unit {
 		$this->giveModel([
 			'name' => '',
 			'short_name' => '',
-			'vat' => '',
 		]);
 		$this->thenUnsuccessSave();
 		$this->thenSeeError('Name cannot be blank.', 'name');
 		$this->thenSeeError('Shortname cannot be blank.', 'short_name');
-		$this->thenSeeError('VAT (%) cannot be blank.', 'vat');
 	}
 
 	public function testCreateWithoutParent(): void {
 		$this->giveModel([
 			'name' => 'Some name',
 			'short_name' => 'SN',
-			'vat' => 23,
 		]);
 		$this->thenSuccessSave();
 		$this->tester->seeRecord(IssueType::class, [
 			'name' => 'Some name',
 			'short_name' => 'SN',
-			'vat' => 23,
 		]);
 	}
 
@@ -93,17 +85,18 @@ class TypeFormTest extends Unit {
 		$this->giveModel([
 			'name' => 'Some name',
 			'short_name' => 'SN',
-			'vat' => 23,
 			'parent_id' => 1,
 		]);
 		$this->thenSuccessSave();
 		$this->tester->seeRecord(IssueType::class, [
 			'name' => 'Some name',
 			'short_name' => 'SN',
-			'vat' => 23,
 			'parent_id' => 1,
-
 		]);
+	}
+
+	private function giveModel(array $config = []): void {
+		$this->model = new IssueTypeForm($config);
 	}
 
 	public function getModel(): IssueTypeForm {
