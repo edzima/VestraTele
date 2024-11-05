@@ -3,6 +3,7 @@
 namespace common\tests\unit\message;
 
 use common\fixtures\helpers\MessageTemplateFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssueInterface;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSettlement;
@@ -18,7 +19,7 @@ class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 
 	protected const MODEL_CLASS = IssueSettlementCreateMessagesForm::class;
 
-	private const DEFAULT_SETTLEMENT_TYPE = IssueSettlement::TYPE_HONORARIUM;
+	private const DEFAULT_SETTLEMENT_TYPE = SettlementFixtureHelper::TYPE_ID_HONORARIUM;
 	private const DEFAULT_SETTLEMENT_VALUE = 1000;
 
 	private ?IssueSettlement $settlement = null;
@@ -34,7 +35,7 @@ class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 					IssueSettlementCreateMessagesForm::TYPE_SMS,
 					IssueSettlementCreateMessagesForm::keyCustomer(),
 					[1, 2],
-					IssueSettlement::TYPE_HONORARIUM,
+					SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 				),
 				'sms.issue.settlement.create.customer.settlementType:30.issueTypes:1,2',
 			],
@@ -43,7 +44,7 @@ class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 					IssueSettlementCreateMessagesForm::TYPE_SMS,
 					IssueSettlementCreateMessagesForm::keyWorkers(),
 					[1, 2],
-					IssueSettlement::TYPE_HONORARIUM,
+					SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 				),
 				'sms.issue.settlement.create.workers.settlementType:30.issueTypes:1,2',
 			],
@@ -83,7 +84,7 @@ class IssueSettlementCreateMessagesFormTest extends BaseIssueMessagesFormTest {
 
 	public function testAdministrativeSettlement(): void {
 		$this->giveIssue();
-		$this->giveSettlement(['type' => IssueSettlement::TYPE_ADMINISTRATIVE]);
+		$this->giveSettlement(['type' => SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE]);
 		$this->giveModel();
 
 		$this->tester->assertNull($this->model->getSmsToCustomer());

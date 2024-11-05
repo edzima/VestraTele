@@ -54,7 +54,7 @@ class StageCest {
 		$I->seeInGridHeader('Shortname');
 		$I->seeInGridHeader('Issues Types');
 		$I->seeInGridHeader('Reminder (days)');
-		$I->seeInGridHeader('Posi');
+		$I->seeInGridHeader('Order');
 		$I->seeInGridHeader('Issues Count');
 		$I->seeInGridHeader('Calendar Background');
 	}

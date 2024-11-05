@@ -4,6 +4,7 @@ namespace common\tests\unit\provision;
 
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
@@ -173,9 +174,9 @@ class IssueProvisionTypeTest extends ProvisionTypeTest {
 		$this->tester->assertSame('All', $type->getSettlementTypesNames());
 
 		$this->tester->wantToTest('One type');
-		$type->setSettlementTypes([IssuePayCalculation::TYPE_ADMINISTRATIVE]);
+		$type->setSettlementTypes([SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE]);
 		foreach (IssuePayCalculation::getTypesNames() as $key => $name) {
-			if ($key === IssuePayCalculation::TYPE_ADMINISTRATIVE) {
+			if ($key === SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE) {
 				$this->tester->assertTrue($type->isForSettlementType($key));
 			} else {
 				$this->tester->assertFalse($type->isForSettlementType($key));
@@ -184,10 +185,10 @@ class IssueProvisionTypeTest extends ProvisionTypeTest {
 		$this->tester->assertSame('Administrative', $type->getSettlementTypesNames());
 
 		$this->tester->wantToTest('Multiple types');
-		$type->setSettlementTypes([IssuePayCalculation::TYPE_ADMINISTRATIVE, IssuePayCalculation::TYPE_LAWYER]);
-		$this->tester->assertTrue($type->isForSettlementType(IssuePayCalculation::TYPE_ADMINISTRATIVE));
-		$this->tester->assertTrue($type->isForSettlementType(IssuePayCalculation::TYPE_LAWYER));
-		$this->tester->assertFalse($type->isForSettlementType(IssuePayCalculation::TYPE_HONORARIUM));
+		$type->setSettlementTypes([SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE, SettlementFixtureHelper::TYPE_ID_LAWYER]);
+		$this->tester->assertTrue($type->isForSettlementType(SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE));
+		$this->tester->assertTrue($type->isForSettlementType(SettlementFixtureHelper::TYPE_ID_LAWYER));
+		$this->tester->assertFalse($type->isForSettlementType(SettlementFixtureHelper::TYPE_ID_HONORARIUM));
 		$this->tester->assertSame('Administrative, Lawyer', $type->getSettlementTypesNames());
 	}
 

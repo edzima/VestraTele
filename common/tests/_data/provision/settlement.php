@@ -1,31 +1,31 @@
 <?php
 
-use common\models\issue\IssueSettlement;
+use common\fixtures\helpers\SettlementFixtureHelper;
 
 return [
 	'accident-honorarium-single-pay-not-payed' => [
 		'issue_id' => 1,
 		'value' => 1230,
-		'type' => IssueSettlement::TYPE_HONORARIUM,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 	],
 	'accident-honorarium-single-pay-payed' => [
 		'issue_id' => 1,
 		'value' => 1230,
-		'type' => IssueSettlement::TYPE_HONORARIUM,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 	],
 	'administrative' => [
 		'issue_id' => 1,
 		'value' => 100,
-		'type' => IssueSettlement::TYPE_ADMINISTRATIVE,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE,
 	],
 	'lawyer' => [
 		'issue_id' => 1,
 		'value' => 100,
-		'type' => IssueSettlement::TYPE_LAWYER,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_LAWYER,
 	],
 	'honorarium-larson-customer' => [
 		'issue_id' => 1,
 		'value' => 1230,
-		'type' => IssueSettlement::TYPE_HONORARIUM,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 	],
 ];

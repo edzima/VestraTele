@@ -4,8 +4,8 @@ namespace backend\tests\unit\settlement;
 
 use backend\modules\settlement\models\CalculationForm;
 use backend\tests\unit\Unit;
-use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\fixtures\helpers\MessageTemplateFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
 
@@ -24,6 +24,7 @@ class CalculationFormTest extends Unit {
 			IssueFixtureHelper::types(),
 			IssueFixtureHelper::users(true),
 			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::type(),
 			SettlementFixtureHelper::owner(),
 			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_SETTLEMENT_CREATE)
 		);

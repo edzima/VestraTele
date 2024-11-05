@@ -1,6 +1,6 @@
 <?php
 
-use common\models\issue\IssueSettlement;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\message\IssuePayPayedMessagesForm;
 
 return [
@@ -10,7 +10,7 @@ return [
 			IssuePayPayedMessagesForm::TYPE_SMS,
 			IssuePayPayedMessagesForm::keyCustomer(),
 			[1],
-			IssueSettlement::TYPE_HONORARIUM,
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		),
 	],
 	[
@@ -19,7 +19,7 @@ return [
 			IssuePayPayedMessagesForm::TYPE_SMS,
 			IssuePayPayedMessagesForm::keyCustomer(),
 			[2],
-			IssueSettlement::TYPE_HONORARIUM,
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		),
 	],
 	[
@@ -28,7 +28,7 @@ return [
 			IssuePayPayedMessagesForm::TYPE_EMAIL,
 			IssuePayPayedMessagesForm::keyCustomer(),
 			[1, 2],
-			IssueSettlement::TYPE_HONORARIUM,
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		),
 	],
 	[
@@ -37,7 +37,7 @@ return [
 			IssuePayPayedMessagesForm::TYPE_SMS,
 			IssuePayPayedMessagesForm::keyWorkers(),
 			[1],
-			IssueSettlement::TYPE_HONORARIUM,
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		),
 	],
 	[
@@ -46,7 +46,7 @@ return [
 			IssuePayPayedMessagesForm::TYPE_EMAIL,
 			IssuePayPayedMessagesForm::keyWorkers(),
 			[],
-			IssueSettlement::TYPE_HONORARIUM,
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		),
 	],
 	[
@@ -55,7 +55,7 @@ return [
 			IssuePayPayedMessagesForm::TYPE_SMS,
 			IssuePayPayedMessagesForm::keyCustomer([IssuePayPayedMessagesForm::KEY_PART_PAYMENT]),
 			[1],
-			IssueSettlement::TYPE_HONORARIUM,
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		),
 	],
 ];

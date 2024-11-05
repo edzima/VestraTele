@@ -3,7 +3,7 @@
 namespace common\tests\unit\message;
 
 use common\fixtures\helpers\MessageTemplateFixtureHelper;
-use common\models\issue\IssueSettlement;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssueUser;
 use common\models\message\IssuePayPayedMessagesForm;
 use yii\swiftmailer\Message;
@@ -49,7 +49,7 @@ class IssuePayPayedMessagesFormTest extends IssuePayMessagesFormTest {
 					IssuePayPayedMessagesForm::TYPE_EMAIL,
 					IssuePayPayedMessagesForm::keyCustomer(),
 					[1, 2],
-					IssueSettlement::TYPE_HONORARIUM,
+					SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 				),
 				'email.issue.settlement.pay.payed.customer.settlementType:30.issueTypes:1,2',
 			],
@@ -58,7 +58,7 @@ class IssuePayPayedMessagesFormTest extends IssuePayMessagesFormTest {
 					IssuePayPayedMessagesForm::TYPE_SMS,
 					IssuePayPayedMessagesForm::keyCustomer([IssuePayPayedMessagesForm::KEY_PART_PAYMENT]),
 					[1, 2],
-					IssueSettlement::TYPE_HONORARIUM,
+					SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 				),
 				'sms.issue.settlement.pay.payed.customer.partPayment.settlementType:30.issueTypes:1,2',
 			],
@@ -67,7 +67,7 @@ class IssuePayPayedMessagesFormTest extends IssuePayMessagesFormTest {
 					IssuePayPayedMessagesForm::TYPE_EMAIL,
 					IssuePayPayedMessagesForm::keyCustomer(),
 					[],
-					IssueSettlement::TYPE_HONORARIUM,
+					SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 				),
 				'email.issue.settlement.pay.payed.customer.settlementType:30',
 			],
@@ -76,7 +76,7 @@ class IssuePayPayedMessagesFormTest extends IssuePayMessagesFormTest {
 					IssuePayPayedMessagesForm::TYPE_EMAIL,
 					IssuePayPayedMessagesForm::keyWorkers(),
 					[1, 2],
-					IssueSettlement::TYPE_HONORARIUM,
+					SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 				),
 				'email.issue.settlement.pay.payed.workers.settlementType:30.issueTypes:1,2',
 			],
@@ -85,7 +85,7 @@ class IssuePayPayedMessagesFormTest extends IssuePayMessagesFormTest {
 					IssuePayPayedMessagesForm::TYPE_EMAIL,
 					IssuePayPayedMessagesForm::keyWorkers(),
 					[],
-					IssueSettlement::TYPE_HONORARIUM,
+					SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 				),
 				'email.issue.settlement.pay.payed.workers.settlementType:30',
 			],

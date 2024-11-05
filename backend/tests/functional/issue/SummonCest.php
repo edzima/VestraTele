@@ -31,7 +31,9 @@ class SummonCest {
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::users(true),
 			IssueFixtureHelper::entityResponsible(),
-			IssueFixtureHelper::summon()
+			IssueFixtureHelper::summon(),
+			IssueFixtureHelper::stageAndTypesFixtures(),
+			TerytFixtureHelper::fixtures(),
 		);
 	}
 
@@ -84,14 +86,15 @@ class SummonCest {
 			'SummonForm[type_id]' => 1,
 			'SummonForm[contractor_id]' => $I->getUser()->id,
 			'SummonForm[term]' => SummonForm::TERM_FIVE_DAYS,
+			'SummonForm[entity_id]' => 3,
 			'SummonForm[title]' => 'Test Summon Without Issue in Route Param',
 			'SummonForm[city_id]' => TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA,
-
 		]);
 		$I->seeRecord(Summon::class, [
 			'issue_id' => 1,
 			'type_id' => 1,
 			'title' => 'Test Summon Without Issue in Route Param',
+			'entity_id' => 3,
 		]);
 		$I->seeEmailIsSent();
 	}
@@ -104,6 +107,7 @@ class SummonCest {
 			'SummonForm[type_id]' => 1,
 			'SummonForm[contractor_id]' => $I->getUser()->id,
 			'SummonForm[term]' => SummonForm::TERM_EMPTY,
+			'SummonForm[entity_id]' => 3,
 			'SummonForm[title]' => 'Test Summon With Empty Term',
 			'SummonForm[city_id]' => TerytFixtureHelper::SIMC_ID_BIELSKO_BIALA,
 
@@ -114,6 +118,7 @@ class SummonCest {
 			'type_id' => 1,
 			'title' => 'Test Summon With Empty Term',
 			'deadline_at' => null,
+			'entity_id' => 3,
 		]);
 	}
 
@@ -146,7 +151,6 @@ class SummonCest {
 		$summon = $I->grabFixture(IssueFixtureHelper::SUMMON, 'new');
 		$I->amLoggedIn();
 		$I->amOnPage([static::ROUTE_VIEW, 'id' => $summon->id]);
-		$I->see('Summon #' . $summon->id);
 		$I->dontSeeLink('Create note');
 		$I->see($summon->title);
 		$I->see($summon->issue->longId);

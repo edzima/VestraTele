@@ -47,17 +47,27 @@ class TypeCest {
 		$I->seeResponseCodeIsSuccessful();
 	}
 
-	public function checkIndexPage(IssueManager $I): void {
+	public function checkIndexPageWithoutIssueTypePermission(IssueManager $I): void {
 		$I->amLoggedIn();
 		$I->assignPermission(static::PERMISSION);
 		$I->amOnRoute(static::ROUTE_INDEX);
 		$I->seeInGridHeader('Name');
 		$I->seeInGridHeader('Shortname');
-		$I->seeInGridHeader('VAT (%)');
-		$I->seeInGridHeader('Provision');
 		$I->seeInGridHeader('With additional Date');
-		$I->seeInGridHeader('Meet');
+		$I->seeInGridHeader('Type Parent');
+		$I->dontSeeInGridHeader('Roles');
+		$I->dontSeeInGridHeader('Permissions');
 	}
+
+	public function checkIndexPageWithIssueTypePermission(IssueManager $I): void {
+		$I->amLoggedIn();
+		$I->assignPermission(static::PERMISSION);
+		$I->assignPermission(Worker::PERMISSION_ISSUE_TYPE_PERMISSIONS);
+		$I->amOnRoute(static::ROUTE_INDEX);
+		$I->seeInGridHeader('Roles');
+		$I->seeInGridHeader('Permissions');
+	}
+
 
 	public function checkCreate(IssueManager $I): void {
 		$I->amLoggedIn();
@@ -66,22 +76,19 @@ class TypeCest {
 		$I->submitForm(static::FORM_SELECTOR, $this->formParams(
 			'Some new type name',
 			'SNTM',
-			0,
 		)
 		);
 		$I->seeRecord(IssueType::class, [
 			'name' => 'Some new type name',
 			'short_name' => 'SNTM',
-			'vat' => 0,
 		]);
 		$I->seeInTitle('Some new type name');
 	}
 
-	private function formParams($name, $shortname, $vat, $parent_id = null): array {
+	private function formParams($name, $shortname, $parent_id = null): array {
 		return [
 			'IssueTypeForm[name]' => $name,
 			'IssueTypeForm[short_name]' => $shortname,
-			'IssueTypeForm[vat]' => $vat,
 			'IssueTypeForm[parent_id]' => $parent_id,
 		];
 	}

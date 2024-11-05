@@ -10,6 +10,7 @@ use backend\tests\Step\Functional\ProblemCalculationIssueManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\Issue;
+use common\models\settlement\SettlementType;
 use common\models\user\User;
 
 /**
@@ -140,16 +141,21 @@ class CalculationCest {
 	}
 
 	public function checkIssueWithCalculationAndNotMinLimit(Bookkeeper $I): void {
+		$I->assignPermission(SettlementFixtureHelper::getTypeManagerPermission());
+
 		$I->amLoggedIn();
 		$I->haveFixtures(array_merge(
 			IssueFixtureHelper::issue(),
-			SettlementFixtureHelper::settlement()
+			IssueFixtureHelper::stageAndTypesFixtures(),
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::type(),
 		));
 		/** @var Issue $issue */
 		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
 		$I->see('Calculations for: ' . $issue->longId);
-		$I->seeLink('Create settlement');
+		$I->see('Create settlement');
+		$I->seeLink('Honorarium');
 
 		$I->see('Issue calculations');
 		$I->seeInGridHeader('Type', '#calculation-grid');
@@ -159,18 +165,23 @@ class CalculationCest {
 	}
 
 	public function checkIssueCreateLink(Bookkeeper $I): void {
+		$I->assignPermission(SettlementFixtureHelper::getTypeManagerPermission());
 		$I->amLoggedIn();
 		$I->haveFixtures(array_merge(
 			IssueFixtureHelper::issue(),
 			IssueFixtureHelper::types(),
 			IssueFixtureHelper::users(),
 			IssueFixtureHelper::issueUsers(),
-			SettlementFixtureHelper::settlement()
+			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::type(),
 		));
+		SettlementType::getModels(true);
+
 		/** @var Issue $issue */
 		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
 		$I->amOnPage([static::ROUTE_ISSUE, 'id' => $issue->id]);
-		$I->click('Create settlement');
+		$I->see('Create settlement');
+		$I->click('Honorarium');
 		$I->seeResponseCodeIsSuccessful();
 		$I->seeInCurrentUrl(CalculationCreateCest::ROUTE);
 	}

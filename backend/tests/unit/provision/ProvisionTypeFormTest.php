@@ -6,7 +6,7 @@ use backend\modules\provision\models\ProvisionTypeForm;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
-use common\models\issue\IssuePayCalculation;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssueUser;
 use common\models\provision\IssueProvisionType;
 use common\models\provision\ProvisionType;
@@ -25,7 +25,11 @@ class ProvisionTypeFormTest extends Unit {
 
 	public function _before(): void {
 		parent::_before();
-		$this->tester->haveFixtures(ProvisionFixtureHelper::issueType());
+		$this->tester->haveFixtures(array_merge(
+				ProvisionFixtureHelper::issueType(),
+				SettlementFixtureHelper::type()
+			)
+		);
 		$this->giveModel();
 	}
 
@@ -214,21 +218,21 @@ class ProvisionTypeFormTest extends Unit {
 
 	public function testSingleCalculationType(): void {
 		$model = $this->model;
-		$model->settlementTypes = [IssuePayCalculation::TYPE_ADMINISTRATIVE];
+		$model->settlementTypes = [SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE];
 		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertNotNull($type);
-		$this->tester->assertContains(IssuePayCalculation::TYPE_ADMINISTRATIVE, $type->getSettlementTypes());
+		$this->tester->assertContains(SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE, $type->getSettlementTypes());
 	}
 
 	public function testFewCalculationTypes(): void {
 		$model = $this->model;
-		$model->settlementTypes = [IssuePayCalculation::TYPE_ADMINISTRATIVE, IssuePayCalculation::TYPE_LAWYER];
+		$model->settlementTypes = [SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE, SettlementFixtureHelper::TYPE_ID_LAWYER];
 		$this->thenSuccessSave();
 		$type = $this->grabModel();
 		$this->tester->assertNotNull($type);
-		$this->tester->assertContains(IssuePayCalculation::TYPE_ADMINISTRATIVE, $type->getSettlementTypes());
-		$this->tester->assertContains(IssuePayCalculation::TYPE_LAWYER, $type->getSettlementTypes());
+		$this->tester->assertContains(SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE, $type->getSettlementTypes());
+		$this->tester->assertContains(SettlementFixtureHelper::TYPE_ID_LAWYER, $type->getSettlementTypes());
 	}
 
 	public function testNotExistedSettlementType(): void {

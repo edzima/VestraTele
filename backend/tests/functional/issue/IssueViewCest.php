@@ -8,8 +8,10 @@ use backend\tests\Step\Functional\CostIssueManager;
 use backend\tests\Step\Functional\CreateCalculationIssueManager;
 use backend\tests\Step\Functional\IssueManager;
 use backend\tests\Step\Functional\SummonIssueManager;
+use common\components\rbac\SettlementTypeAccessManager;
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\models\issue\Issue;
+use common\models\settlement\SettlementType;
 use common\models\user\Worker;
 
 class IssueViewCest {
@@ -44,7 +46,7 @@ class IssueViewCest {
 	public function checkLinksAsManager(IssueManager $I): void {
 		$I->amLoggedIn();
 		$this->goToIssuePage($I);
-		$I->seeLink('Update');
+		$I->seeTitleLink('Update');
 		$I->dontSeeLink('Costs');
 		$I->dontSeeLink('Create settlement');
 		$I->dontSeeLink('Create Summon');
@@ -85,11 +87,43 @@ class IssueViewCest {
 		$I->seeResponseCodeIsSuccessful();
 	}
 
-	public function checkCreateSettlementLink(CreateCalculationIssueManager $I): void {
+	public function checkCreateSettlementLinkWithoutSettlementTypes(CreateCalculationIssueManager $I): void {
 		$I->amLoggedIn();
 		$this->goToIssuePage($I);
-		$I->seeLink('Create settlement');
-		$I->click('Create settlement');
+		$I->dontSee('Create settlement');
+	}
+
+	public function checkCreateSettlementLinkWithSettlementTypes(CreateCalculationIssueManager $I): void {
+		$I->amLoggedIn();
+		$I->haveRecord(SettlementType::class, [
+			'name' => 'Test Active Type',
+			'is_active' => true,
+		]);
+
+		$I->haveRecord(SettlementType::class, [
+			'name' => 'Test not Active Type',
+			'is_active' => false,
+		]);
+
+		$notAccess = $I->haveRecord(SettlementType::class, [
+			'name' => 'Active without create Access',
+			'is_active' => false,
+		]);
+
+		foreach (SettlementType::getModels(true) as $model) {
+			if ($model->id != $notAccess) {
+				$access = $model->getModelAccess();
+				$access->setAction(SettlementTypeAccessManager::ACTION_CREATE)
+					->ensurePermission()
+					->assign($I->getUser()->id);
+			}
+		}
+		$this->goToIssuePage($I);
+		$I->see('Create settlement');
+		$I->see('Test Active Type');
+		$I->dontSee('Test not Active Type');
+		$I->dontSee('Active without create Access');
+		$I->click('Test Active Type');
 		$I->seeResponseCodeIsSuccessful();
 	}
 
@@ -105,8 +139,8 @@ class IssueViewCest {
 		$I->amLoggedIn();
 		$I->assignPermission(Worker::PERMISSION_ISSUE_LINK_USER);
 		$this->goToIssuePage($I);
-		$I->seeLink('Link User');
-		$I->click('Link User');
+		$I->seeTitleLink('Link User');
+		$I->clickTitleLink('Link User');
 		$I->seeResponseCodeIsSuccessful();
 		$I->seeInCurrentUrl(LinkUserCest::ROUTE_LINK);
 	}
@@ -126,17 +160,21 @@ class IssueViewCest {
 		$I->amLoggedIn();
 		$I->assignPermission(Worker::PERMISSION_ISSUE_DELETE);
 		$model = $this->goToIssuePage($I);
-		$I->seeLink('Delete');
+		$I->seeTitleLink('Delete');
 		$I->sendAjaxPostRequest(Url::to([static::ROUTE_DELETE, 'id' => $model->id]), $I->getCSRF());
 		$I->dontSeeRecord(Issue::class, [
 			'id' => $model->id,
 		]);
 	}
 
-	protected function goToIssuePage(IssueManager $I, string $issueIndex = '0'): Issue {
+	protected function goToIssuePage(IssueManager $I, string $issueIndex = '0', bool $assignTypeAccess = true): Issue {
 		/** @var Issue $model */
 		$model = $I->grabFixture(IssueFixtureHelper::ISSUE, $issueIndex);
+		if ($assignTypeAccess) {
+			IssueFixtureHelper::accessUserTypes($I->getUser()->getId(), [$model->type_id]);
+		}
 		$I->amOnPage([static::ROUTE, 'id' => $model->id]);
+
 		return $model;
 	}
 

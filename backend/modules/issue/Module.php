@@ -13,6 +13,7 @@ use common\models\issue\event\IssueUserEvent;
 use common\models\issue\Issue;
 use common\models\user\Worker;
 use Yii;
+use yii\base\Action;
 use yii\base\Module as BaseModule;
 use yii\filters\AccessControl;
 
@@ -39,6 +40,9 @@ class Module extends BaseModule {
 						'allow' => true,
 						'controllers' => ['issue/issue', 'issue/user'],
 						'permissions' => [Worker::PERMISSION_ISSUE],
+						'matchCallback' => function ($rule, Action $action) {
+							return $action->id !== 'delete';
+						},
 					],
 					[
 						'allow' => true,

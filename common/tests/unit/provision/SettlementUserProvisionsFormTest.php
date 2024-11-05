@@ -40,14 +40,14 @@ class SettlementUserProvisionsFormTest extends Unit {
 	}
 
 	public function testEmpty(): void {
-		$this->giveSettlement(IssueSettlement::TYPE_HONORARIUM);
+		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_HONORARIUM);
 		$this->giveForm();
 		$this->tester->assertFalse($this->model->validate());
 		$this->tester->assertSame('Type cannot be blank.', $this->model->getFirstError('typeId'));
 	}
 
 	public function testNotExistedIssueUserType(): void {
-		$this->giveSettlement(IssueSettlement::TYPE_HONORARIUM);
+		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_HONORARIUM);
 		$this->tester->expectThrowable(InvalidConfigException::class, function () {
 			$this->giveForm(IssueUser::TYPE_VICTIM);
 		});
@@ -58,31 +58,31 @@ class SettlementUserProvisionsFormTest extends Unit {
 
 	public function testTypesForAgent(): void {
 		$this->tester->wantToTest('Agent administrative type.');
-		$this->giveSettlement(IssueSettlement::TYPE_ADMINISTRATIVE);
+		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE);
 		$this->giveForm(IssueUser::TYPE_AGENT);
 		$this->tester->assertNotEmpty($this->model->getTypes());
 		$this->tester->assertArrayHasKey(3, $this->model->getTypes());
 
 		$this->tester->wantToTest('Agent honorarium type.');
-		$this->giveSettlement(IssueSettlement::TYPE_HONORARIUM);
+		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_HONORARIUM);
 		$this->giveForm(IssueUser::TYPE_AGENT);
 		$this->tester->assertNotEmpty($this->model->getTypes());
 		$this->tester->assertArrayHasKey(1, $this->model->getTypes());
 
 		$this->tester->wantToTest('Agent lawyer type.');
-		$this->giveSettlement(IssueSettlement::TYPE_LAWYER);
+		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_LAWYER);
 		$this->giveForm();
 		$this->tester->assertEmpty($this->model->getTypes());
 	}
 
 	public function testProvisionWithoutPays(): void {
-		$this->giveSettlement(IssueSettlement::TYPE_ADMINISTRATIVE);
+		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE);
 		$this->giveForm();
 		$this->assertEmpty($this->model->getPaysValues());
 	}
 
 	public function testHonorariumProvisionWithOnePayWithoutCosts(): void {
-		$this->giveSettlement(IssueSettlement::TYPE_HONORARIUM);
+		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_HONORARIUM);
 		$this->givePays(1);
 		$this->giveForm();
 		$pays = $this->model->getPaysValues();
@@ -92,7 +92,7 @@ class SettlementUserProvisionsFormTest extends Unit {
 	}
 
 	public function testHonorariumProvisionsWithOnePayWithCostSmallerThanPay(): void {
-		$this->giveSettlement(IssueSettlement::TYPE_HONORARIUM);
+		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_HONORARIUM);
 		$this->givePays(1);
 		$costValue = new Decimal(500);
 		$this->giveCost($costValue->toFixed(2));
@@ -104,7 +104,7 @@ class SettlementUserProvisionsFormTest extends Unit {
 	}
 
 	public function testHonorariumProvisionsWithTeleInstallmentCost(): void {
-		$this->giveSettlement(IssueSettlement::TYPE_HONORARIUM);
+		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_HONORARIUM);
 		$this->givePays(1);
 		$this->giveCost(100, true, [
 			'type' => IssueCost::TYPE_INSTALLMENT,
@@ -118,7 +118,7 @@ class SettlementUserProvisionsFormTest extends Unit {
 	}
 
 	public function testHonorariumProvisionsWithOnePayWithCostGreaterThanPay(): void {
-		$this->giveSettlement(IssueSettlement::TYPE_HONORARIUM);
+		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_HONORARIUM);
 		$this->givePays(1);
 		$costValue = new Decimal(1300);
 		$this->giveCost($costValue->toFixed(2));
@@ -131,7 +131,7 @@ class SettlementUserProvisionsFormTest extends Unit {
 		$this->settlement = IssuePayCalculation::findOne(
 			$this->tester->haveRecord(IssuePayCalculation::class, [
 				'value' => $this->value,
-				'type' => $type,
+				'type_id' => $type,
 				'owner_id' => SettlementFixtureHelper::OWNER_JOHN,
 				'issue_id' => 1,
 			])

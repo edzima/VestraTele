@@ -14,6 +14,12 @@ class IssueStageChangeCest {
 	/** @see IssueController::actionStage() */
 	public const ROUTE = '/issue/issue/stage';
 
+	private IssueFixtureHelper $issueFixture;
+
+	public function _before(IssueManager $I): void {
+		IssueFixtureHelper::accessUserTypes($I->getUser()->id);
+	}
+
 	public function _fixtures(): array {
 		return array_merge(
 			IssueFixtureHelper::issue(),
@@ -21,6 +27,7 @@ class IssueStageChangeCest {
 			IssueFixtureHelper::users(),
 			IssueFixtureHelper::note(),
 			IssueFixtureHelper::stageAndTypesFixtures(),
+			IssueFixtureHelper::entityResponsible(),
 			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_STAGE_CHANGE),
 		);
 	}

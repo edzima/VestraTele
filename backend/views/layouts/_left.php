@@ -293,7 +293,7 @@ $typesItems = $typesNav->getItems();
 					'url' => ['/file/file/index'],
 					'icon' => '<i class="fa fa-paperclip"></i>',
 					'options' => ['class' => 'treeview'],
-					'visible' => $user->can(User::PERMISSION_ISSUE),
+					'visible' => $user->can(User::ROLE_ISSUE_FILE_MANAGER),
 					'items' => [
 						[
 							'label' => Yii::t('file', 'Browse'),

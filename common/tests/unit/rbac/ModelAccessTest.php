@@ -2,6 +2,7 @@
 
 namespace common\tests\unit\rbac;
 
+use common\components\rbac\AccessPermission;
 use common\components\rbac\ModelAccessManager;
 use common\components\rbac\ModelRbacInterface;
 use common\tests\unit\Unit;
@@ -16,22 +17,29 @@ class ModelAccessTest extends Unit {
 	protected const DEFAULT_ACTION = 'testAction';
 	protected const DEFAULT_APP = 'test-app';
 
-	protected const DEFAULT_AVAILABLE_APPS = [
-		'test-app',
+	protected const DEFAULT_APPS_ACTIONS = [
+		self::DEFAULT_APP => [
+			self::DEFAULT_ACTION,
+		],
 	];
 
-	public function testSetAppWithoutAvailableApps() {
+	public function testSetAppWithoutAppsActions() {
 		$this->giveManager();
 		$manager = $this->manager;
-		$manager->availableApps = [];
+		$manager->setAppsActions([]);
 		$manager->setApp('test-id');
 	}
 
 	public function testSetNotAvailableApp() {
 		$this->giveManager([
-			'availableApps' => [
-				'test-2',
-				'test-3',
+			'appsActions' => [
+				'test-2' => [
+					'view',
+					'create',
+				],
+				'test-3' => [
+					'view',
+				],
 			],
 		]);
 
@@ -41,16 +49,11 @@ class ModelAccessTest extends Unit {
 	}
 
 	public function testCheckAccessWithoutAssign() {
-		$this->giveManager([
-			'availableApps' => [
-				'test-1',
-				'test-2',
-			],
-		]);
+		$this->giveManager();
 
 		$manager = $this->manager;
 		$manager
-			->setApp('test-1')
+			->setApp(static::DEFAULT_APP)
 			->setAction('testAccess');
 
 		$this->tester->expectThrowable(InvalidConfigException::class, function () {
@@ -127,7 +130,19 @@ class ModelAccessTest extends Unit {
 		$this->manager->ensurePermission();
 
 		$permissions = $this->manager->getAccessPermissions();
+		$this->tester->assertCount(1, $permissions);
+
+		$permissions = $this->manager->getAccessPermissions(AccessPermission::COMPARE_WITHOUT_APP_AND_ACTION);
 		$this->tester->assertCount(2, $permissions);
+	}
+
+	public function testDoubleAssign() {
+		$this->giveManager();
+		$this->setRbacModel(1);
+		$this->manager->ensurePermission();
+
+		$this->manager->assign('test-user');
+		$this->manager->assign('test-user');
 	}
 
 	public function testGetIds(): void {
@@ -156,8 +171,8 @@ class ModelAccessTest extends Unit {
 		$this->manager->assign('test-user');
 		$this->manager->assign('test-user-2');
 
-		$permissions = $this->manager->getAccessPermissions();
-		$this->tester->assertCount(4, $permissions);
+		$permissions = $this->manager->getAccessPermissions(AccessPermission::COMPARE_WITHOUT_APP_AND_ACTION);
+		$this->tester->assertCount(2, $permissions);
 
 		$ids = $this->manager->getIds();
 		$this->tester->assertCount(2, $ids);
@@ -170,8 +185,8 @@ class ModelAccessTest extends Unit {
 	}
 
 	private function giveManager(array $config = []) {
-		if (!isset($config['availableApps'])) {
-			$config['availableApps'] = self::DEFAULT_AVAILABLE_APPS;
+		if (!isset($config['appsActions'])) {
+			$config['appsActions'] = self::DEFAULT_APPS_ACTIONS;
 			if (!isset($config['app'])) {
 				$config['app'] = self::DEFAULT_APP;
 			}

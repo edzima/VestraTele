@@ -1,5 +1,6 @@
 <?php
 
+use common\components\rbac\ManagerFactory;
 use motion\i18n\ConfigLanguageProvider;
 
 return [
@@ -9,6 +10,13 @@ return [
 	'components' => [
 		'assetManager' => [
 			'basePath' => __DIR__ . '/../web/assets',
+		],
+		'accessManagerFactory' => [
+			'class' => ManagerFactory::class,
+			'mapAppsIds' => [
+				ManagerFactory::FRONTEND_APP => 'app-frontend-tests',
+				ManagerFactory::BACKEND_APP => 'app-backend-tests',
+			],
 		],
 		'urlManager' => [
 			'showScriptName' => true,

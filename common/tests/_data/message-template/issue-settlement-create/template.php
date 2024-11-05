@@ -1,6 +1,6 @@
 <?php
 
-use common\models\issue\IssueSettlement;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\message\IssueSettlementCreateMessagesForm;
 
 return [
@@ -10,7 +10,7 @@ return [
 			IssueSettlementCreateMessagesForm::TYPE_SMS,
 			IssueSettlementCreateMessagesForm::keyCustomer(),
 			[1],
-			IssueSettlement::TYPE_HONORARIUM
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM
 		),
 	],
 	[
@@ -19,7 +19,7 @@ return [
 			IssueSettlementCreateMessagesForm::TYPE_SMS,
 			IssueSettlementCreateMessagesForm::keyCustomer(),
 			[2],
-			IssueSettlement::TYPE_HONORARIUM
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM
 
 		),
 	],
@@ -29,7 +29,7 @@ return [
 			IssueSettlementCreateMessagesForm::TYPE_EMAIL,
 			IssueSettlementCreateMessagesForm::keyCustomer(),
 			[1, 2],
-			IssueSettlement::TYPE_HONORARIUM
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM
 
 		),
 	],
@@ -39,7 +39,7 @@ return [
 			IssueSettlementCreateMessagesForm::TYPE_SMS,
 			IssueSettlementCreateMessagesForm::keyWorkers(),
 			[1],
-			IssueSettlement::TYPE_HONORARIUM
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM
 		),
 	],
 	[
@@ -48,7 +48,7 @@ return [
 			IssueSettlementCreateMessagesForm::TYPE_EMAIL,
 			IssueSettlementCreateMessagesForm::keyWorkers(),
 			[],
-			IssueSettlement::TYPE_HONORARIUM
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM
 		),
 	],
 	[
@@ -57,7 +57,7 @@ return [
 			IssueSettlementCreateMessagesForm::TYPE_EMAIL,
 			IssueSettlementCreateMessagesForm::keyWorkers(),
 			[],
-			IssueSettlement::TYPE_ADMINISTRATIVE
+			SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE
 		),
 	],
 ];

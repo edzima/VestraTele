@@ -155,13 +155,6 @@ class UpgradeController extends Controller {
 		Console::output(Customer::find()->onlyAssignments([Customer::PERMISSION_SUMMON], false)->count());
 	}
 
-	public function actionCalculationOwner(): void {
-		IssuePayCalculation::updateAll(['owner_id' => 21]);
-	}
-
-	public function actionPayType(): void {
-		IssuePayCalculation::updateAll(['type' => IssuePayCalculation::TYPE_HONORARIUM]);
-	}
 
 	public function actionProblemsPays(): void {
 		IssuePay::updateAll(['status' => null], ['or', 'status=0', 'pay_at IS NOT NULL']);

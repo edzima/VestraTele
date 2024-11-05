@@ -7,10 +7,12 @@ use common\fixtures\settlement\CalculationFixture;
 use common\fixtures\settlement\CostFixture;
 use common\fixtures\settlement\PayFixture;
 use common\fixtures\settlement\PayReceivedFixture;
+use common\fixtures\settlement\SettlementTypeFixture;
 use common\models\issue\IssueCost;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSettlement;
+use common\models\settlement\SettlementType;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -23,14 +25,26 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 	public const DEFAULT_PROVIDER_ID = 1;
 
 	public const SETTLEMENT = 'settlement.settlement';
+
+	public const TYPE = 'settlement.type';
+
 	public const COST = 'settlement.cost';
 	public const PAY = 'settlement.pay';
 	private const OWNER = 'settlement.owner';
 	private const PAY_RECEIVED = 'settlement.pay_received';
-	private const DEFAULT_TYPE = IssueSettlement::TYPE_HONORARIUM;
+	private const DEFAULT_TYPE = self::TYPE_ID_HONORARIUM;
 	const DEFAULT_PROVIDER_TYPE = IssueSettlement::PROVIDER_CLIENT;
 
+	public const TYPE_ID_ADMINISTRATIVE = 10;
+	public const TYPE_ID_HONORARIUM = 30;
+	public const TYPE_ID_LAWYER = 40;
+	public const TYPE_ID_NOT_ACTIVE = 50;
+
 	private ?int $lastSettlementId = null;
+
+	public static function getTypeManagerPermission(): string {
+		return SettlementType::instance()->getModelAccess()->managerPermission;
+	}
 
 	protected static function getDefaultDataDirPath(): string {
 		return Yii::getAlias('@common/tests/_data/settlement/');
@@ -57,6 +71,15 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 			static::SETTLEMENT => [
 				'class' => CalculationFixture::class,
 				'dataFile' => static::getDataDirPath($baseDataDir) . 'settlement.php',
+			],
+		];
+	}
+
+	public static function type(string $baseDataDir = null): array {
+		return [
+			static::TYPE => [
+				'class' => SettlementTypeFixture::class,
+				'dataFile' => static::getDataDirPath($baseDataDir) . 'type.php',
 			],
 		];
 	}
@@ -107,8 +130,8 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 		if (!isset($attributes['issue_id'])) {
 			$attributes['issue_id'] = static::DEFAULT_ISSUE_ID;
 		}
-		if (!isset($attributes['type'])) {
-			$attributes['type'] = static::DEFAULT_TYPE;
+		if (!isset($attributes['type_id'])) {
+			$attributes['type_id'] = static::DEFAULT_TYPE;
 		}
 		if (!isset($attributes['provider_id'])) {
 			$attributes['provider_id'] = static::DEFAULT_PROVIDER_ID;

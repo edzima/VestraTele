@@ -2,6 +2,8 @@
 
 namespace backend\tests;
 
+use Codeception\Actor;
+use Codeception\Lib\Friend;
 use common\fixtures\helpers\FixtureTester;
 use common\tests\_support\UserRbacActor;
 use Yii;
@@ -17,11 +19,11 @@ use Yii;
  * @method void am($role)
  * @method void lookForwardTo($achieveValue)
  * @method void comment($description)
- * @method \Codeception\Lib\Friend haveFriend($name, $actorClass = null)
+ * @method Friend haveFriend($name, $actorClass = null)
  *
  * @SuppressWarnings(PHPMD)
  */
-class FunctionalTester extends \Codeception\Actor implements FixtureTester {
+class FunctionalTester extends Actor implements FixtureTester {
 
 	use _generated\FunctionalTesterActions;
 	use UserRbacActor;
@@ -77,6 +79,16 @@ class FunctionalTester extends \Codeception\Actor implements FixtureTester {
 	public function seeGridActionLink(string $title, string $selector = self::DEFAULT_GRID_SELECTOR): void {
 		$selector .= ' .action-column a';
 		$this->seeElement($selector, ['title' => $title]);
+	}
+
+	public function seeTitleLink(string $title): void {
+		$this->seeElement('a', [
+			'title' => $title,
+		]);
+	}
+
+	public function clickTitleLink(string $title): void {
+		$this->click('', 'a[title="' . $title . '"]');
 	}
 
 	public function dontSeeGridActionLink(string $title, string $selector = self::DEFAULT_GRID_SELECTOR): void {

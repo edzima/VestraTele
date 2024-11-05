@@ -3,7 +3,7 @@
 namespace common\tests\unit\message;
 
 use common\fixtures\helpers\MessageTemplateFixtureHelper;
-use common\models\issue\IssueSettlement;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\message\IssuePayDelayedMessagesForm;
 use console\models\DemandForPayment;
 
@@ -31,7 +31,7 @@ class IssuePayDelayedMessagesFormTest extends IssuePayMessagesFormTest {
 					IssuePayDelayedMessagesForm::TYPE_SMS,
 					IssuePayDelayedMessagesForm::keyCustomer([IssuePayDelayedMessagesForm::KEY_DEMAND_WHICH => DemandForPayment::WHICH_FIRST]),
 					[2, 3],
-					IssueSettlement::TYPE_HONORARIUM,
+					SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 				),
 				'sms.issue.settlement.pay.delayed.customer.demandWhich:first.settlementType:30.issueTypes:2,3',
 			],

@@ -1,7 +1,7 @@
 <?php
 
 use common\fixtures\helpers\ProvisionFixtureHelper;
-use common\models\issue\IssuePayCalculation;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\issue\IssueUser;
 use common\models\provision\IssueProvisionType;
 use yii\helpers\Json;
@@ -17,7 +17,7 @@ return [
 			IssueProvisionType::KEY_DATA_ISSUE_USER_TYPE => IssueUser::TYPE_AGENT,
 			IssueProvisionType::KEY_DATA_WITH_HIERARCHY => true,
 			IssueProvisionType::KEY_DATA_CALCULATION_TYPES => [
-				IssuePayCalculation::TYPE_HONORARIUM,
+				SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 			],
 		]),
 	],
@@ -30,7 +30,7 @@ return [
 			IssueProvisionType::KEY_DATA_ISSUE_USER_TYPE => IssueUser::TYPE_TELEMARKETER,
 			IssueProvisionType::KEY_DATA_WITH_HIERARCHY => false,
 			IssueProvisionType::KEY_DATA_CALCULATION_TYPES => [
-				IssuePayCalculation::TYPE_HONORARIUM,
+				SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 			],
 		]),
 	],
@@ -43,7 +43,7 @@ return [
 			IssueProvisionType::KEY_DATA_ISSUE_USER_TYPE => IssueUser::TYPE_AGENT,
 			IssueProvisionType::KEY_DATA_WITH_HIERARCHY => false,
 			IssueProvisionType::KEY_DATA_CALCULATION_TYPES => [
-				IssuePayCalculation::TYPE_ADMINISTRATIVE,
+				SettlementFixtureHelper::TYPE_ID_ADMINISTRATIVE,
 			],
 		]),
 	],

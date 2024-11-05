@@ -39,10 +39,6 @@ class StageTypeFormTest extends Unit {
 		$this->thenSeeError('Stage cannot be blank.', 'stage_id');
 	}
 
-	private function giveModel(array $config = []): void {
-		$this->model = new StageTypeForm($config);
-	}
-
 	public function testUpdateFromFixtures(): void {
 		$this->tester->seeRecord(IssueStageType::class, [
 			'type_id' => 1,
@@ -106,6 +102,7 @@ class StageTypeFormTest extends Unit {
 			'stage_id' => $stageId,
 			'type_id' => $typeLinkedId,
 			'days_reminder' => null,
+			'updateIssuesStageDeadlineAt' => true,
 		]);
 
 		$this->thenSuccessSave();
@@ -166,6 +163,7 @@ class StageTypeFormTest extends Unit {
 			'stage_id' => $stageId,
 			'type_id' => $typeLinkedId,
 			'days_reminder' => 10,
+			'updateIssuesStageDeadlineAt' => true,
 		]);
 
 		$this->thenSuccessSave();
@@ -196,5 +194,9 @@ class StageTypeFormTest extends Unit {
 
 	public function getModel(): StageTypeForm {
 		return $this->model;
+	}
+
+	private function giveModel(array $config = []): void {
+		$this->model = new StageTypeForm($config);
 	}
 }

@@ -32,6 +32,7 @@ class SettlementCest {
 			IssueFixtureHelper::users(),
 			IssueFixtureHelper::stageAndTypesFixtures(),
 			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::type(),
 			SettlementFixtureHelper::cost(true),
 			ProvisionFixtureHelper::user(),
 			ProvisionFixtureHelper::issueType(),
@@ -72,16 +73,13 @@ class SettlementCest {
 
 	public function checkSettlementWithoutTypes(ProvisionManager $I): void {
 		$settlement = $this->grabSettlement('lawyer');
-		codecept_debug($settlement->getId());
-
-		codecept_debug($settlement);
 		$this->goToUserPage($settlement->getId(), IssueUser::TYPE_AGENT);
 		$I->seeResponseCodeIsSuccessful();
 		$I->see('Generate provisions for: agent - ' . $settlement->getIssueModel()->agent->getFullName());
 		$I->seeFlash('Not active agent types for settlement: ' . $settlement->getTypeName(), Flash::TYPE_WARNING);
 		$I->seeLink('Create provision type');
 		$I->click('Create provision type');
-		$I->seeInField('Name', 'Lawyer - Accident');
+		$I->seeInField('Name', 'Lawyer - Benefits - civil proceedings');
 	}
 
 	private function goToUserPage(int $settlementId, string $issueUserType, int $typeId = null): void {

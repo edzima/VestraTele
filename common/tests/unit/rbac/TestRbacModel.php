@@ -28,7 +28,7 @@ class TestRbacModel implements ModelRbacInterface {
 		return $this->baseName;
 	}
 
-	public function getModelRbac(): ModelAccessManager {
+	public function getModelAccess(): ModelAccessManager {
 		// TODO: Implement getModelRbac() method.
 	}
 }

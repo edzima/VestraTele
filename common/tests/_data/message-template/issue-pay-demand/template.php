@@ -1,8 +1,7 @@
 <?php
 
-use common\models\issue\IssueSettlement;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\models\message\IssuePayDelayedMessagesForm;
-use common\models\message\IssuePayPayedMessagesForm;
 use console\models\DemandForPayment;
 
 return [
@@ -12,7 +11,7 @@ return [
 			IssuePayDelayedMessagesForm::TYPE_SMS,
 			IssuePayDelayedMessagesForm::keyCustomer([IssuePayDelayedMessagesForm::KEY_DEMAND_WHICH => DemandForPayment::WHICH_FIRST]),
 			[1],
-			IssueSettlement::TYPE_HONORARIUM,
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		),
 	],
 	[
@@ -21,7 +20,7 @@ return [
 			IssuePayDelayedMessagesForm::TYPE_SMS,
 			IssuePayDelayedMessagesForm::keyCustomer([IssuePayDelayedMessagesForm::KEY_DEMAND_WHICH => DemandForPayment::WHICH_FIRST]),
 			[2, 3],
-			IssueSettlement::TYPE_HONORARIUM,
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		),
 	],
 	[
@@ -30,7 +29,7 @@ return [
 			IssuePayDelayedMessagesForm::TYPE_EMAIL,
 			IssuePayDelayedMessagesForm::keyCustomer([IssuePayDelayedMessagesForm::KEY_DEMAND_WHICH => DemandForPayment::WHICH_FIRST]),
 			[1, 2],
-			IssueSettlement::TYPE_HONORARIUM,
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		),
 	],
 	[
@@ -39,7 +38,7 @@ return [
 			IssuePayDelayedMessagesForm::TYPE_EMAIL,
 			IssuePayDelayedMessagesForm::keyWorkers([IssuePayDelayedMessagesForm::KEY_DEMAND_WHICH => DemandForPayment::WHICH_FIRST]),
 			[],
-			IssueSettlement::TYPE_HONORARIUM,
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		),
 	],
 	[
@@ -48,7 +47,7 @@ return [
 			IssuePayDelayedMessagesForm::TYPE_SMS,
 			IssuePayDelayedMessagesForm::keyWorkers([IssuePayDelayedMessagesForm::KEY_DEMAND_WHICH => DemandForPayment::WHICH_FIRST]),
 			[1],
-			IssueSettlement::TYPE_HONORARIUM,
+			SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 		),
 	],
 ];
