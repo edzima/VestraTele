@@ -1,11 +1,11 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
+use backend\modules\issue\widgets\IssueCreateSettlementButtonDropdown;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\modules\settlement\models\search\IssueToCreateCalculationSearch;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $toCreateSearchModel IssueToCreateCalculationSearch */
@@ -23,7 +23,10 @@ $this->params['breadcrumbs'][] = $searchModel->issue->longId;
 <div class="settlement-calculation-issue">
 
 	<p>
-		<?= Html::a(Yii::t('settlement', 'Create settlement'), ['create', 'id' => $searchModel->issue_id], ['class' => 'btn btn-success']) ?>
+		<?= IssueCreateSettlementButtonDropdown::widget([
+			'issue' => $searchModel->issue,
+			'userId' => Yii::$app->user->id,
+		]) ?>
 	</p>
 
 	<?php if ($toCreateProvider->getTotalCount() > 0): ?>
