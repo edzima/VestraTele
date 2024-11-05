@@ -3,6 +3,7 @@
 namespace common\modules\court\models;
 
 use common\models\Address;
+use common\modules\court\models\query\LawsuitQuery;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -85,7 +86,7 @@ class Court extends ActiveRecord {
 		return $this->hasOne(static::class, ['parent_id' => 'id']);
 	}
 
-	public function getLawsuits(): ActiveQuery {
+	public function getLawsuits(): LawsuitQuery {
 		return $this->hasMany(Lawsuit::class, ['court_id' => 'id']);
 	}
 

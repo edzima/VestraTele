@@ -117,6 +117,7 @@ return [
 		],
 		'court' => [
 			'class' => CourtModule::class,
+			'onlyUserIssues' => false,
 			'as access' => [
 				'class' => GlobalAccessBehavior::class,
 				'rules' => [

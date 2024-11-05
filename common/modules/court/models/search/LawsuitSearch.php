@@ -7,6 +7,7 @@ use common\models\issue\Issue;
 use common\models\user\query\UserProfileQuery;
 use common\modules\court\models\Court;
 use common\modules\court\models\Lawsuit;
+use common\modules\court\models\query\LawsuitQuery;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -21,6 +22,10 @@ class LawsuitSearch extends Lawsuit {
 	public $customer;
 	public $court_type;
 
+	public $issueUserId;
+
+	public const SCENARIO_ISSUE_USER = 'issue_user_id';
+
 	public function attributeLabels(): array {
 		return parent::attributeLabels() + [
 				'court_type' => Yii::t('court', 'Type'),
@@ -32,6 +37,7 @@ class LawsuitSearch extends Lawsuit {
 	 */
 	public function rules(): array {
 		return [
+			['!issueUserId', 'required', 'on' => self::SCENARIO_ISSUE_USER],
 			[['id', 'court_id', 'creator_id', 'issue_id'], 'integer'],
 			[['is_appeal'], 'default', 'value' => null],
 			[['customer', 'signature_act', 'room', 'due_at', 'details', 'created_at', 'updated_at', 'location', 'presence_of_the_claimant', 'court_type', 'url'], 'safe'],
@@ -69,10 +75,11 @@ class LawsuitSearch extends Lawsuit {
 
 		if (!$this->validate()) {
 			// uncomment the following line if you do not want to return any records when validation fails
-			// $query->where('0=1');
+			$query->where('0=1');
 			return $dataProvider;
 		}
 
+		$this->applyIssueUserFilter($query);
 		$this->applyCustomerFileter($query);
 
 		// grid filtering conditions
@@ -127,5 +134,11 @@ class LawsuitSearch extends Lawsuit {
 
 	public static function getCourtTypeNames(): array {
 		return Court::getTypesNames();
+	}
+
+	private function applyIssueUserFilter(LawsuitQuery $query): void {
+		if (!empty($this->issueUserId)) {
+			$query->usersIssues((array) $this->issueUserId);
+		}
 	}
 }

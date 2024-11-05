@@ -13,6 +13,8 @@ class LawsuitCalendarSearch extends Model {
 	public $startAt;
 	public $endAt;
 
+	public array $issueUserIds = [];
+
 	public static function getIsAppealFilters(): array {
 		return [
 			[
@@ -93,6 +95,11 @@ class LawsuitCalendarSearch extends Model {
 			->andWhere([
 				'<=', 'due_at', $this->endAt,
 			]);
+
+		if (!empty($this->issueUserIds)) {
+			$query->usersIssues($this->issueUserIds);
+		}
+		$query->groupBy([Lawsuit::tableName() . '.id']);
 		$data = [];
 		foreach ($query->all() as $model) {
 			$event = new LawsuitEvent();

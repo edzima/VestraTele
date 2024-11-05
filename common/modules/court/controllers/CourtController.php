@@ -4,7 +4,9 @@ namespace common\modules\court\controllers;
 
 use common\modules\court\models\Court;
 use common\modules\court\models\search\CourtSearch;
+use common\modules\court\Module;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -12,6 +14,8 @@ use yii\web\Response;
 
 /**
  * CourtController implements the CRUD actions for Court model.
+ *
+ * @property Module $module
  */
 class CourtController extends Controller {
 
@@ -75,8 +79,20 @@ class CourtController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionView(int $id): string {
+		$model = $this->findModel($id);
+		$query = $model->getLawsuits()
+			->with('issues')
+			->with('issues.customer.userProfile')
+			->orderBy(['due_at' => SORT_ASC]);
+		if ($this->module->onlyUserIssues) {
+			$query->usersIssues([Yii::$app->user->identity->getId()]);
+		}
+		$lawsuitsDataProvider = new ActiveDataProvider([
+			'query' => $query,
+		]);
 		return $this->render('view', [
 			'model' => $this->findModel($id),
+			'lawsuitsDataProvider' => $lawsuitsDataProvider,
 		]);
 	}
 

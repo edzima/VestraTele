@@ -8,4 +8,5 @@ class Module extends BaseModule {
 
 	public $controllerNamespace = 'common\modules\court\controllers';
 
+	public bool $onlyUserIssues;
 }

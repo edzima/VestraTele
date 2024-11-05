@@ -5,6 +5,7 @@ namespace common\modules\court\models;
 use common\helpers\ArrayHelper;
 use common\models\issue\Issue;
 use common\models\user\User;
+use common\modules\court\models\query\LawsuitQuery;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -208,4 +209,16 @@ class Lawsuit extends ActiveRecord {
 		return strtotime($this->due_at) < strtotime('now');
 	}
 
+	public function hasIssueUser(int $userId): bool {
+		foreach ($this->issues as $issue) {
+			if ($issue->isForUser($userId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static function find(): LawsuitQuery {
+		return new LawsuitQuery(static::class);
+	}
 }

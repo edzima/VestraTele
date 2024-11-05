@@ -7,6 +7,7 @@ use common\models\issue\IssueInterface;
 use common\modules\court\models\Lawsuit;
 use common\modules\court\models\LawsuitIssueForm;
 use common\modules\court\models\search\LawsuitSearch;
+use common\modules\court\Module;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -16,6 +17,8 @@ use yii\web\Response;
 
 /**
  * LawsuitController implements the CRUD actions for Lawsuit model.
+ *
+ * @property Module $module
  */
 class LawsuitController extends Controller {
 
@@ -44,6 +47,10 @@ class LawsuitController extends Controller {
 	 */
 	public function actionIndex(): string {
 		$searchModel = new LawsuitSearch();
+		if ($this->module->onlyUserIssues) {
+			$searchModel->setScenario(LawsuitSearch::SCENARIO_ISSUE_USER);
+			$searchModel->issueUserId = Yii::$app->user->getId();
+		}
 		$dataProvider = $searchModel->search($this->request->queryParams);
 
 		return $this->render('index', [
@@ -119,8 +126,13 @@ class LawsuitController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionDelete(int $id) {
-		$this->findModel($id)->delete();
-
+		$model = $this->findModel($id);
+		$model->delete();
+		Yii::warning([
+			'msg' => 'Delete Lawsuit',
+			'attributes' => $model->getAttributes(),
+			'userId' => Yii::$app->user->getId(),
+		], __METHOD__);
 		return $this->redirect(['index']);
 	}
 
@@ -140,6 +152,9 @@ class LawsuitController extends Controller {
 	 */
 	protected function findModel(int $id): Lawsuit {
 		if (($model = Lawsuit::findOne(['id' => $id])) !== null) {
+			if ($this->module->onlyUserIssues && !$model->hasIssueUser(Yii::$app->user->getId())) {
+				throw new ForbiddenHttpException(Yii::t('court', 'Not found Your issues.'));
+			}
 			return $model;
 		}
 

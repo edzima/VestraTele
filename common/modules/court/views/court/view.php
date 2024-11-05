@@ -6,12 +6,14 @@ use common\widgets\grid\CustomerIssuesDataColumn;
 use common\widgets\grid\IssuesDataColumn;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
+use yii\data\DataProviderInterface;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
 /** @var Court $model */
+/** @var DataProviderInterface $lawsuitsDataProvider */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('court', 'Courts'), 'url' => ['index']];
@@ -103,12 +105,7 @@ YiiAsset::register($this);
 				'caption' => Yii::t('court', 'Lawsuits'),
 				'showOnEmpty' => false,
 				'emptyText' => false,
-				'dataProvider' => new ActiveDataProvider([
-					'query' => $model->getLawsuits()
-						->with('issues')
-						->with('issues.customer.userProfile')
-						->orderBy(['due_at' => SORT_ASC]),
-				]),
+				'dataProvider' => $lawsuitsDataProvider,
 				'columns' => [
 					[
 						'class' => IssuesDataColumn::class,

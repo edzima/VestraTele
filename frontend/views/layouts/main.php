@@ -122,6 +122,11 @@ AppAsset::register($this);
 				],
 			],
 		];
+		$menuItems[] = [
+			'label' => Yii::t('court', 'Lawsuits'),
+			'url' => ['/court/lawsuit/index'],
+			'visible' => Yii::$app->user->can(Worker::PERMISSION_LAWSUIT),
+		];
 
 		$menuItems[] = [
 			'label' => Yii::t('credit', 'Analyze SKD'),

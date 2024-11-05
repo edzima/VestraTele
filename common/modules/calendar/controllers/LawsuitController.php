@@ -24,6 +24,11 @@ class LawsuitController extends Controller {
 
 	public function actionIndex(): string {
 		$searchModel = new LawsuitCalendarSearch();
+		if (YII_IS_FRONTEND) {
+			$searchModel->issueUserIds = [
+				Yii::$app->user->getId(),
+			];
+		}
 		$summonsModel = new LawsuitSummonCalendarSearch();
 		return $this->render('index', [
 			'searchModel' => $searchModel,
@@ -40,6 +45,11 @@ class LawsuitController extends Controller {
 		}
 
 		$model = new LawsuitCalendarSearch();
+		if (YII_IS_FRONTEND) {
+			$model->issueUserIds = [
+				Yii::$app->user->getId(),
+			];
+		}
 		$model->startAt = $start;
 		$model->endAt = $end;
 
@@ -56,6 +66,9 @@ class LawsuitController extends Controller {
 		$model = new LawsuitSummonCalendarSearch();
 		$model->start = $start;
 		$model->end = $end;
+		if (YII_IS_FRONTEND) {
+			$model->contractor_id = Yii::$app->user->getId();
+		}
 		return $this->asJson($model->getEventsData([
 			'urlRoute' => $this->summonViewRoute,
 		]));

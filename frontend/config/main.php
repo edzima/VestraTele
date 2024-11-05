@@ -3,7 +3,9 @@
 use common\behaviors\GlobalAccessBehavior;
 use common\components\User as WebUser;
 use common\models\user\User;
+use common\models\user\Worker;
 use common\modules\calendar\Module as CalendarModule;
+use common\modules\court\Module as CourtModule;
 use common\modules\lead\Module as LeadModule;
 use frontend\controllers\ApiLeadController;
 use frontend\controllers\LeadDialerController;
@@ -31,6 +33,22 @@ return [
 		],
 		'gridview' => [
 			'class' => '\kartik\grid\Module',
+		],
+		'court' => [
+			'class' => CourtModule::class,
+			'onlyUserIssues' => true,
+			'as access' => [
+				'class' => GlobalAccessBehavior::class,
+				'rules' => [
+					[
+						'allow' => true,
+						'permissions' => [
+							Worker::PERMISSION_LAWSUIT,
+						],
+					],
+
+				],
+			],
 		],
 		'lead' => [
 			'class' => LeadModule::class,

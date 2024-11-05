@@ -43,7 +43,7 @@ class LawsuitSummonCalendarSearch extends SummonSearch {
 			$query->andWhere('0=1');
 			return $dataProvider;
 		}
-
+		$query->andFilterWhere([Summon::tableName() . '.contractor_id' => $this->contractor_id]);
 		$query->andWhere([Summon::tableName() . '.type_id' => $typesIds]);
 		$this->applyDateFilter($query);
 
