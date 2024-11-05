@@ -36,6 +36,17 @@ YiiAsset::register($this);
 			: ''
 		?>
 
+		<?= Yii::$app->user->can(User::PERMISSION_COST)
+			? Html::a(
+				Yii::t('backend', 'Create cost'),
+				['/settlement/cost/create', 'id' => $model->getIssueId()],
+				[
+					'class' => 'btn btn-warning',
+				]
+			)
+			: ''
+		?>
+
 		<?= $model->owner_id === Yii::$app->user->getId()
 		|| Yii::$app->user->can(User::ROLE_BOOKKEEPER)
 			? Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary'])
