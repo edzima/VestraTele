@@ -1,13 +1,13 @@
 <?php
 
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
-use common\models\issue\IssueCostInterface;
 use common\models\settlement\TransferType;
 
 return [
 	[
 		'issue_id' => 1,
-		'type' => IssueCostInterface::TYPE_PURCHASE_OF_RECEIVABLES,
+		'type_id' => SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES,
 		'value' => 615,
 		'vat' => 23,
 		'date_at' => '2020-02-10',
@@ -19,7 +19,7 @@ return [
 	],
 	[
 		'issue_id' => 1,
-		'type' => IssueCostInterface::TYPE_PURCHASE_OF_RECEIVABLES,
+		'type_id' => SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES,
 		'value' => 100,
 		'vat' => 0,
 		'date_at' => '2020-02-11',
@@ -29,7 +29,7 @@ return [
 	],
 	[
 		'issue_id' => 2,
-		'type' => IssueCostInterface::TYPE_JUSTIFICATION_OF_THE_JUDGMENT,
+		'type_id' => SettlementFixtureHelper::COST_TYPE_JUSTIFICATION_OF_THE_JUDGMENT,
 		'value' => 150,
 		'vat' => 0,
 		'date_at' => '2020-02-11',
@@ -39,7 +39,7 @@ return [
 	],
 	[
 		'issue_id' => 3,
-		'type' => IssueCostInterface::TYPE_JUSTIFICATION_OF_THE_JUDGMENT,
+		'type_id' => SettlementFixtureHelper::COST_TYPE_JUSTIFICATION_OF_THE_JUDGMENT,
 		'value' => 150,
 		'vat' => 0,
 		'date_at' => '2020-02-11',
@@ -49,7 +49,7 @@ return [
 	],
 	[
 		'issue_id' => 3,
-		'type' => IssueCostInterface::TYPE_JUSTIFICATION_OF_THE_JUDGMENT,
+		'type_id' => SettlementFixtureHelper::COST_TYPE_JUSTIFICATION_OF_THE_JUDGMENT,
 		'value' => 150,
 		'vat' => 0,
 		'date_at' => '2020-02-11',
@@ -61,7 +61,7 @@ return [
 	],
 	[
 		'issue_id' => 3,
-		'type' => IssueCostInterface::TYPE_JUSTIFICATION_OF_THE_JUDGMENT,
+		'type_id' => SettlementFixtureHelper::COST_TYPE_JUSTIFICATION_OF_THE_JUDGMENT,
 		'value' => 150,
 		'vat' => 0,
 		'date_at' => '2020-02-11',

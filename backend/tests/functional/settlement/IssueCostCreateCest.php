@@ -30,12 +30,12 @@ class IssueCostCreateCest {
 	protected function issue(CostIssueManager $I) {
 		/* @var Issue $issue */
 		$issue = $I->grabFixture(IssueFixtureHelper::ISSUE, 0);
-		$I->amOnPage([static::ROUTE, 'id' => $issue->id]);
+		$I->amOnRoute(static::ROUTE, ['id' => $issue->id]);
 	}
 
 	public function createWithoutIssue(CostIssueManager $I) {
-		$I->amOnPage([static::ROUTE]);
-		$I->selectOption('Type', IssueCost::TYPE_PURCHASE_OF_RECEIVABLES);
+		$I->amOnRoute(static::ROUTE);
+		$I->selectOption('Type', SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES);
 		$I->fillField('Value', 100);
 		$I->fillField('VAT (%)', 23);
 		$I->click('Save');
@@ -58,13 +58,13 @@ class IssueCostCreateCest {
 
 	public function checkValidCreate(CostIssueManager $I): void {
 		$this->issue($I);
-		$I->selectOption('Type', IssueCost::TYPE_PURCHASE_OF_RECEIVABLES);
+		$I->selectOption('Type', SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES);
 		$I->fillField('Value', 100);
 		$I->fillField('VAT (%)', 23);
 		$I->click('Save');
 		$I->seeLink('Update');
 		$I->seeRecord(IssueCost::class, [
-			'type' => IssueCost::TYPE_PURCHASE_OF_RECEIVABLES,
+			'type_id' => SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES,
 			'value' => 100,
 			'vat' => 23,
 		]);

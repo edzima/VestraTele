@@ -8,6 +8,7 @@ use common\models\issue\IssueType;
 use common\models\issue\query\IssueCostQuery;
 use common\models\issue\search\IssueTypeSearch;
 use common\models\SearchModel;
+use common\models\settlement\CostType;
 use common\models\user\User;
 use kartik\daterange\DateRangeBehavior;
 use Yii;
@@ -76,14 +77,24 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'issue_id', 'user_id'], 'integer'],
-			[['type', 'transfer_type'], 'string'],
+			[
+				[
+					'id', 'issue_id', 'user_id',
+					'type_id',
+					'creator_id',
+				], 'integer',
+			],
+			[
+				[
+					'transfer_type',
+				], 'string',
+			],
 			[['settled', 'withSettlements', 'is_confirmed', 'hide_on_report', 'showSummary'], 'boolean'],
 			[['settled', 'withSettlements', 'is_confirmed', 'hide_on_report', 'showSummary'], 'default', 'value' => null],
 
 			[['created_at', 'updated_at', 'date_at', 'settled_at'], 'safe'],
 			[['dateRange', 'deadlineRange', 'settledRange'], 'match', 'pattern' => '/^.+\s\-\s.+$/'],
-			[['value', 'base_value', 'vat'], 'number'],
+			[['value', 'vat'], 'number'],
 			['issueType', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			['issueStage', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true],
 
@@ -160,10 +171,10 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 			IssueCost::tableName() . '.id' => $this->id,
 			IssueCost::tableName() . '.issue_id' => $this->issue_id,
 			IssueCost::tableName() . '.user_id' => $this->user_id,
+			IssueCost::tableName() . '.creator_id' => $this->creator_id,
 			IssueCost::tableName() . '.value' => $this->value,
-			IssueCost::tableName() . '.base_value' => $this->base_value,
 			IssueCost::tableName() . '.vat' => $this->vat,
-			IssueCost::tableName() . '.type' => $this->type,
+			IssueCost::tableName() . '.type_id' => $this->type_id,
 			IssueCost::tableName() . '.transfer_type' => $this->transfer_type,
 			IssueCost::tableName() . '.hide_on_report' => $this->hide_on_report,
 		]);
@@ -232,12 +243,23 @@ class IssueCostSearch extends IssueCost implements SearchModel, IssueTypeSearch 
 			->column(), false);
 	}
 
+	public static function getCreatorsNames(): array {
+		return User::getSelectList(IssueCost::find()
+			->select('creator_id')
+			->distinct()
+			->column(), false);
+	}
+
 	public function getIssueTypesNames(): array {
 		return IssueType::getShortTypesNames();
 	}
 
 	public static function getIssueStagesNames(): array {
 		return IssueStage::getStagesNames(true);
+	}
+
+	public static function getTypesNames(): array {
+		return CostType::getNames(false);
 	}
 
 }

@@ -60,13 +60,19 @@ YiiAsset::register($this);
 				'attribute' => 'valueWithoutVAT',
 				'format' => 'currency',
 			],
-			'VATPercent',
-			'base_value:currency',
+			[
+				'attribute' => 'VATPercent',
+				'visible' => $model->vat !== null,
+			],
 			'date_at:date',
 			'deadline_at:date',
 			'settled_at:date',
 			'confirmed_at:date',
 			'created_at:datetime',
+			[
+				'attribute' => 'creator',
+				'visible' => $model->creator,
+			],
 			'updated_at:datetime',
 		],
 	]) ?>

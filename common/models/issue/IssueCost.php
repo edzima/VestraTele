@@ -5,22 +5,23 @@ namespace common\models\issue;
 use common\models\issue\query\IssueCostQuery;
 use common\models\issue\query\IssuePayCalculationQuery;
 use common\models\issue\query\IssueQuery;
+use common\models\settlement\CostType;
 use common\models\settlement\VATInfoTrait;
 use common\models\user\query\UserQuery;
 use common\models\user\User;
 use Decimal\Decimal;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "issue_cost".
  *
  * @property int $id
+ * @property int $type_id
  * @property int|null $issue_id
- * @property string $type
  * @property string $value
- * @property string|null $base_value
  * @property string|null $vat
  * @property int $created_at
  * @property int $updated_at
@@ -31,6 +32,7 @@ use yii\db\ActiveRecord;
  * @property string|null $confirmed_at
  * @property int|null $user_id
  * @property int|null $hide_on_report
+ * @property int|null $creator_id
  *
  * @property-read bool $is_confirmed
  * @property-read string|null $transferTypeName
@@ -39,9 +41,11 @@ use yii\db\ActiveRecord;
  * @property-read bool $isSettled
  * @property-read bool $hasSettlements
  *
+ * @property-read CostType $type
  * @property-read Issue|null $issue
  * @property-read IssuePayCalculation[] $settlements
  * @property-read User|null $user
+ * @property-read User|null $creator
  */
 class IssueCost extends ActiveRecord implements IssueCostInterface {
 
@@ -63,12 +67,20 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 			. Yii::$app->formatter->asCurrency($this->getValueWithVAT());
 	}
 
-	public function getType(): string {
-		return $this->type;
+	public function getType(): CostType {
+		return $this->costType;
+	}
+
+	public function getCostType(): ActiveQuery {
+		return $this->hasOne(CostType::class, ['id' => 'type_id']);
 	}
 
 	public function getTypeName(): string {
-		return static::getTypesNames()[$this->type];
+		return $this->getType()->name;
+	}
+
+	public function getTypeNameWithId(): string {
+		return $this->getTypeName() . ': #' . $this->id;
 	}
 
 	public function getTransferTypeName(): ?string {
@@ -82,7 +94,7 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 		return array_merge($this->vatAttributeLabels(), [
 			'id' => 'ID',
 			'issue_id' => Yii::t('common', 'Issue'),
-			'type' => Yii::t('common', 'Type'),
+			'type_id' => Yii::t('common', 'Type'),
 			'typeName' => Yii::t('common', 'Type'),
 			'value' => Yii::t('common', 'Value with VAT'),
 			'vat' => 'VAT (%)',
@@ -90,6 +102,7 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
 			'confirmed_at' => Yii::t('settlement', 'Confirmed at'),
+			'creator' => Yii::t('settlement', 'Creator'),
 			'date_at' => Yii::t('settlement', 'Date at'),
 			'deadline_at' => Yii::t('settlement', 'Deadline at'),
 			'settled_at' => Yii::t('common', 'Settled at'),
@@ -97,7 +110,6 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 			'user' => Yii::t('common', 'User'),
 			'transfer_type' => Yii::t('settlement', 'Transfer Type'),
 			'transferTypeName' => Yii::t('settlement', 'Transfer Type'),
-			'base_value' => Yii::t('settlement', 'Base Value'),
 			'is_confirmed' => Yii::t('settlement', 'Is Confirmed'),
 			'hide_on_report' => Yii::t('provision', 'Hide on report'),
 		]);
@@ -106,6 +118,11 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getUser(): UserQuery {
 		return $this->hasOne(User::class, ['id' => 'user_id']);
+	}
+
+	/** @noinspection PhpIncompatibleReturnTypeInspection */
+	public function getCreator(): UserQuery {
+		return $this->hasOne(User::class, ['id' => 'creator_id']);
 	}
 
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
@@ -125,13 +142,6 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 
 	public function getValue(): Decimal {
 		return new Decimal($this->value);
-	}
-
-	public function getBaseValue(): ?Decimal {
-		if ($this->base_value !== null) {
-			return new Decimal($this->base_value);
-		}
-		return null;
 	}
 
 	public function getIsSettled(): bool {
@@ -159,27 +169,6 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 			->createCommand()
 			->delete(IssuePayCalculation::viaCostTableName(), ['cost_id' => $this->id, 'settlement_id' => $settlementId])
 			->execute();
-	}
-
-	public static function getTypesNames(): array {
-		return [
-			static::TYPE_COURT_ENTRY => Yii::t('common', 'Court entry'),
-			static::TYPE_APPEAL => Yii::t('settlement', 'Appeal Cost'),
-			static::TYPE_WRIT => Yii::t('common', 'Writ'),
-			static::TYPE_POWER_OF_ATTORNEY => Yii::t('common', 'Power of attorney'),
-			static::TYPE_ATTESTATION => Yii::t('settlement', 'Attestation'),
-			static::TYPE_CESSION => Yii::t('settlement', 'Cession'),
-			static::TYPE_OFFICE => Yii::t('common', 'Office'),
-			static::TYPE_APPEARANCE_OF_LAWYER => Yii::t('settlement', 'Appearance of Lawyer'),
-			static::TYPE_COURT_EXPERT => Yii::t('settlement', 'Court expert'),
-			static::TYPE_JUSTIFICATION_OF_THE_JUDGMENT => Yii::t('common', 'Justification of the judgment'),
-			static::TYPE_INSTALLMENT => Yii::t('common', 'Installment'),
-			static::TYPE_SHIPMENTS => Yii::t('settlement', 'Shipments'),
-			static::TYPE_COMMISSION_REFUND => Yii::t('settlement', 'Commission Refund'),
-			static::TYPE_PCC => Yii::t('settlement', 'PCC'),
-			static::TYPE_PIT_4 => Yii::t('settlement', 'PIT-4'),
-			static::TYPE_PURCHASE_OF_RECEIVABLES => Yii::t('common', 'Purchase of receivables'),
-		];
 	}
 
 	public static function getTransfersTypesNames(): array {
@@ -231,12 +220,6 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 	 */
 	public static function find(): IssueCostQuery {
 		return new IssueCostQuery(static::class);
-	}
-
-	public static function typeExist(string $type): bool {
-		return static::find()
-			->andWhere(['type' => $type])
-			->exists();
 	}
 
 }

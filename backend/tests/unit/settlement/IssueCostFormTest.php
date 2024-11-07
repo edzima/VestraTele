@@ -17,6 +17,7 @@ class IssueCostFormTest extends Unit {
 	use UnitModelTrait;
 
 	private IssueCostForm $model;
+	private const DEFAULT_CREATOR_ID = UserFixtureHelper::AGENT_EMILY_PAT;
 
 	public function _before() {
 		parent::_before();
@@ -27,11 +28,12 @@ class IssueCostFormTest extends Unit {
 			));
 		$this->model = new IssueCostForm();
 		$this->model->setIssue($this->grabIssue());
+		$this->model->creator_id = static::DEFAULT_CREATOR_ID;
 	}
 
 	public function testEmpty(): void {
 		$this->thenUnsuccessValidate();
-		$this->thenSeeError('Type cannot be blank.', 'type');
+		$this->thenSeeError('Type cannot be blank.', 'type_id');
 		$this->thenSeeError('Value cannot be blank.', 'value');
 		$this->thenSeeError('Date at cannot be blank.', 'date_at');
 	}
@@ -39,30 +41,32 @@ class IssueCostFormTest extends Unit {
 	public function testWithoutIssue() {
 		$this->model = new IssueCostForm();
 		$model = $this->model;
-		$model->type = IssueCost::TYPE_PURCHASE_OF_RECEIVABLES;
+		$model->creator_id = static::DEFAULT_CREATOR_ID;
+		$model->type_id = SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES;
 		$model->date_at = '2020-01-01';
 		$model->value = 600;
 		$model->vat = 23;
 		$this->thenSuccessSave();
 		$this->tester->seeRecord(IssueCost::class, [
 			'issue_id' => null,
-			'type' => IssueCost::TYPE_PURCHASE_OF_RECEIVABLES,
+			'type_id' => SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES,
 			'value' => 600,
 			'vat' => 23,
 			'date_at' => '2020-01-01',
+			'creator_id' => static::DEFAULT_CREATOR_ID,
 		]);
 	}
 
 	public function testValid(): void {
 		$model = $this->model;
-		$model->type = IssueCost::TYPE_PURCHASE_OF_RECEIVABLES;
+		$model->type_id = SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES;
 		$model->date_at = '2020-01-01';
 		$model->value = 600;
 		$model->vat = 23;
 		$this->thenSuccessSave();
 		$this->tester->seeRecord(IssueCost::class, [
 			'issue_id' => $model->getIssue()->getIssueId(),
-			'type' => IssueCost::TYPE_PURCHASE_OF_RECEIVABLES,
+			'type_id' => SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES,
 			'value' => 600,
 			'vat' => 23,
 			'date_at' => '2020-01-01',
@@ -71,7 +75,7 @@ class IssueCostFormTest extends Unit {
 
 	public function testSettledAtSmallerThanDate(): void {
 		$model = $this->model;
-		$model->type = IssueCost::TYPE_PURCHASE_OF_RECEIVABLES;
+		$model->type_id = SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES;
 		$model->date_at = '2020-01-01';
 		$model->settled_at = '2019-02-02';
 		$model->value = 600;
@@ -80,7 +84,7 @@ class IssueCostFormTest extends Unit {
 		$this->thenSeeError('Settled at must be greater than or equal to "Date at".', 'settled_at');
 		$this->tester->dontSeeRecord(IssueCost::class, [
 			'issue_id' => $model->getIssue()->getIssueId(),
-			'type' => IssueCost::TYPE_PURCHASE_OF_RECEIVABLES,
+			'type_id' => SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES,
 			'value' => 600,
 			'vat' => 23,
 			'date_at' => '2020-01-01',
@@ -90,7 +94,7 @@ class IssueCostFormTest extends Unit {
 
 	public function testSettledAt(): void {
 		$model = $this->model;
-		$model->type = IssueCost::TYPE_PURCHASE_OF_RECEIVABLES;
+		$model->type_id = SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES;
 		$model->date_at = '2020-01-01';
 		$model->settled_at = '2020-02-02';
 		$model->value = 600;
@@ -98,7 +102,7 @@ class IssueCostFormTest extends Unit {
 		$this->thenSuccessSave();
 		$this->tester->seeRecord(IssueCost::class, [
 			'issue_id' => $model->getIssue()->getIssueId(),
-			'type' => IssueCost::TYPE_PURCHASE_OF_RECEIVABLES,
+			'type_id' => SettlementFixtureHelper::COST_TYPE_PURCHASE_OF_RECEIVABLES,
 			'value' => 600,
 			'vat' => 23,
 			'date_at' => '2020-01-01',
@@ -108,14 +112,14 @@ class IssueCostFormTest extends Unit {
 
 	public function testInstallmentWithoutUser(): void {
 		$model = $this->model;
-		$model->type = IssueCost::TYPE_INSTALLMENT;
+		$model->type_id = SettlementFixtureHelper::COST_TYPE_ID_INSTALLMENT;
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('User cannot be blank.', 'user_id');
 	}
 
 	public function testInstallmentWithIssueUser(): void {
 		$model = $this->model;
-		$model->type = IssueCost::TYPE_INSTALLMENT;
+		$model->type_id = SettlementFixtureHelper::COST_TYPE_ID_INSTALLMENT;
 		$model->user_id = $model->getIssue()->getIssueModel()->agent->id;
 		$model->date_at = '2020-01-01';
 		$model->value = 150;
@@ -123,7 +127,7 @@ class IssueCostFormTest extends Unit {
 		$this->thenSuccessSave();
 		$this->tester->seeRecord(IssueCost::class, [
 			'issue_id' => $model->getIssue()->getIssueId(),
-			'type' => IssueCost::TYPE_INSTALLMENT,
+			'type_id' => SettlementFixtureHelper::COST_TYPE_ID_INSTALLMENT,
 			'user_id' => $model->getIssue()->getIssueModel()->agent->id,
 			'value' => 150,
 			'vat' => 23,
@@ -133,7 +137,7 @@ class IssueCostFormTest extends Unit {
 
 	public function testInstallmentWithNotIssueUser(): void {
 		$model = $this->model;
-		$model->type = IssueCost::TYPE_INSTALLMENT;
+		$model->type_id = SettlementFixtureHelper::COST_TYPE_ID_INSTALLMENT;
 		$model->user_id = UserFixtureHelper::AGENT_EMILY_PAT;
 		$model->date_at = '2020-01-01';
 		$model->value = 150;
@@ -142,7 +146,7 @@ class IssueCostFormTest extends Unit {
 		$this->thenSeeError('User must be from issue users.', 'user_id');
 		$this->tester->dontSeeRecord(IssueCost::class, [
 			'issue_id' => $model->getIssue()->id,
-			'type' => IssueCost::TYPE_INSTALLMENT,
+			'type_id' => SettlementFixtureHelper::COST_TYPE_ID_INSTALLMENT,
 			'user_id' => UserFixtureHelper::AGENT_EMILY_PAT,
 			'value' => 150,
 			'vat' => 0,
@@ -152,12 +156,12 @@ class IssueCostFormTest extends Unit {
 
 	public function testInvalidType(): void {
 		$model = $this->model;
-		$model->type = 'invalid-type';
+		$model->type_id = 012421412412;
 		$model->date_at = '2020-01-01';
 		$model->value = 600;
 		$model->vat = 23;
 		$this->thenUnsuccessSave();
-		$this->thenSeeError('Type is invalid.', 'type');
+		$this->thenSeeError('Type is invalid.', 'type_id');
 	}
 
 	public function testInvalidPayType(): void {
@@ -172,14 +176,14 @@ class IssueCostFormTest extends Unit {
 
 	public function testWithPayType(): void {
 		$model = $this->model;
-		$model->type = IssueCost::TYPE_OFFICE;
+		$model->type_id = SettlementFixtureHelper::COST_TYPE_ID_OFFICE;
 		$model->transfer_type = IssueCost::TRANSFER_TYPE_CASH;
 		$model->date_at = '2020-01-01';
 		$model->value = 600;
 		$model->vat = 23;
 		$this->thenSuccessSave();
 		$this->tester->seeRecord(IssueCost::class, [
-			'type' => IssueCost::TYPE_OFFICE,
+			'type_id' => SettlementFixtureHelper::COST_TYPE_ID_OFFICE,
 			'transfer_type' => IssueCost::TRANSFER_TYPE_CASH,
 			'issue_id' => $this->model->getIssue()->getIssueId(),
 			'value' => 600,

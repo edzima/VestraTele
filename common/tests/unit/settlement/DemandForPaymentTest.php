@@ -33,6 +33,7 @@ class DemandForPaymentTest extends Unit {
 			IssueFixtureHelper::users(true),
 			IssueFixtureHelper::types(),
 			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::type(),
 			SettlementFixtureHelper::owner(),
 			SettlementFixtureHelper::pay(),
 			MessageTemplateFixtureHelper::fixture(MessageTemplateFixtureHelper::DIR_ISSUE_PAY_DEMAND)

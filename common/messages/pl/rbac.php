@@ -112,6 +112,7 @@ return array_merge([
 	'vindicator' => 'Windykator',
 	'potential-client' => 'Potencjalny Klient',
 	'settlement.delete-not-self' => 'Rozliczenia - Usuwanie nie swoich',
+	'settlement.cost.manager' => 'Typy Kosztów - Manager',
 	'credit.analyze' => 'Analiza SKD',
 	'court' => 'Sądy Powszechne',
 	'lawsuit' => 'Procesy\Sprawy Sądowe',

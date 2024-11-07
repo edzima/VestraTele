@@ -2,6 +2,7 @@
 
 namespace console\controllers;
 
+use backend\modules\settlement\Module as SettlementModule;
 use common\components\rbac\DbManager;
 use common\models\user\Customer;
 use common\models\user\User;
@@ -43,15 +44,13 @@ class RbacController extends Controller {
 		User::ROLE_GUARDIAN,
 		Worker::ROLE_AUDITOR,
 		Worker::ROLE_AUDITOR_INNER,
+		SettlementModule::ROLE_COST_TYPE_MANAGER,
 	];
 
 	public array $permissions = [
 		User::PERMISSION_ARCHIVE,
 		User::PERMISSION_ARCHIVE_DEEP,
 		Worker::PERMISSION_COST => [
-			Worker::ROLE_BOOKKEEPER,
-		],
-		Worker::PERMISSION_COST_DEBT => [
 			Worker::ROLE_BOOKKEEPER,
 		],
 		Worker::PERMISSION_COST_COMMISSION_REFUND => [

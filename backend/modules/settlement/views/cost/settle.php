@@ -8,7 +8,9 @@ use backend\modules\settlement\models\IssueCostForm;
 /* @var $model IssueCostForm */
 
 $this->title = Yii::t('settlement', 'Settle cost: {cost}', ['cost' => $model->getModel()->getTypeNameWithValue()]);
-$this->params['breadcrumbs'] = Breadcrumbs::issue($model->getIssue());
+if ($model->getIssue()) {
+	$this->params['breadcrumbs'] = Breadcrumbs::issue($model->getIssue());
+}
 $this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Costs'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->getModel()->id, 'url' => ['view', 'id' => $model->getModel()->id]];
 $this->params['breadcrumbs'][] = Yii::t('settlement', 'Settle');

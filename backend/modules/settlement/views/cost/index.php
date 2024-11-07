@@ -16,23 +16,19 @@ use kartik\select2\Select2;
 $this->title = Yii::t('backend', 'Costs');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' => ['/issue/issue/index']];
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="issue-cost-index">
 
 	<p>
+
 		<?= Html::a(Yii::t('settlement', 'Create Cost'),
 			['create'], ['class' => 'btn btn-success'])
 		?>
 
-		<?= IssueCost::typeExist(IssueCost::TYPE_PCC)
-			? Html::a(Yii::t('backend', 'PCC Export'), ['pcc-export', Yii::$app->request->queryParams], ['class' => 'btn btn-success'])
-			: ''
+		<?= Html::a(Yii::t('settlement', 'Cost Types'),
+			['cost-type/index'], ['class' => 'btn btn-info'])
 		?>
-		<?= IssueCost::typeExist(IssueCost::TYPE_PIT_4)
-			? Html::a(Yii::t('backend', 'PIT-4 Export'), ['pit-export', Yii::$app->request->queryParams], ['class' => 'btn btn-success'])
-			: ''
-		?>
-
 	</p>
 
 
@@ -46,12 +42,17 @@ $this->params['breadcrumbs'][] = $this->title;
 			: '' ?>
 	</p>
 
-	<?= GridView::widget([
+	<?= GridView::widget(config: [
 		'dataProvider' => $dataProvider,
 		'filterModel' => $model,
 		'showPageSummary' => true,
 
 		'columns' => [
+			[
+				'attribute' => 'type_id',
+				'value' => 'typeName',
+				'filter' => IssueCostSearch::getTypesNames(),
+			],
 			[
 				'attribute' => 'issue_id',
 				'value' => function (IssueCost $model): ?string {
@@ -110,16 +111,18 @@ $this->params['breadcrumbs'][] = $this->title;
 					'showToggleAll' => false,
 				],
 			],
-			[
-				'attribute' => 'type',
-				'value' => 'typeName',
-				'filter' => IssueCostSearch::getTypesNames(),
-			],
+
 			[
 				'attribute' => 'user_id',
 				'value' => 'user',
 				'label' => Yii::t('backend', 'User'),
 				'filter' => IssueCostSearch::getUsersNames(),
+			],
+			[
+				'attribute' => 'creator_id',
+				'value' => 'creator',
+				'label' => Yii::t('settlement', 'Creator'),
+				'filter' => IssueCostSearch::getCreatorsNames(),
 			],
 
 			[

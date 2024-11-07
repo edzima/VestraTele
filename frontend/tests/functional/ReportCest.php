@@ -4,6 +4,7 @@ namespace frontend\tests\functional;
 
 use common\fixtures\helpers\IssueFixtureHelper;
 use common\fixtures\helpers\ProvisionFixtureHelper;
+use common\fixtures\helpers\SettlementFixtureHelper;
 use common\fixtures\helpers\UserFixtureHelper;
 use common\models\issue\IssueCost;
 use common\models\user\Worker;
@@ -49,7 +50,7 @@ class ReportCest {
 		$I->haveRecord(
 			IssueCost::class, [
 			'issue_id' => 1,
-			'type' => IssueCost::TYPE_INSTALLMENT,
+			'type_id' => SettlementFixtureHelper::COST_TYPE_ID_INSTALLMENT,
 			'date_at' => '2020-02-02',
 			'value' => 300,
 			'user_id' => $I->getUser()->getId(),
@@ -57,7 +58,7 @@ class ReportCest {
 		$I->haveRecord(
 			IssueCost::class, [
 			'issue_id' => null,
-			'type' => IssueCost::TYPE_INSTALLMENT,
+			'type_id' => SettlementFixtureHelper::COST_TYPE_ID_INSTALLMENT,
 			'date_at' => '2020-02-02',
 			'value' => 300,
 			'user_id' => $I->getUser()->getId(),

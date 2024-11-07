@@ -4,8 +4,8 @@ namespace backend\modules\settlement\models;
 
 use common\models\forms\HiddenFieldsModel;
 use common\models\issue\IssueCost;
-use common\models\issue\IssueCostInterface;
 use common\models\issue\IssueInterface;
+use common\models\settlement\CostType;
 use common\models\user\User;
 use common\models\user\Worker;
 use Decimal\Decimal;
@@ -20,16 +20,15 @@ use yii\base\Model;
 class IssueCostForm extends Model implements HiddenFieldsModel {
 
 	public const SCENARIO_WITHOUT_ISSUE = 'without-issue';
-	public const SCENARIO_CREATE_INSTALLMENT = 'create-installment';
 	public const SCENARIO_SETTLE = 'settle';
 	public bool $usersFromIssue = true;
-	public ?string $base_value = null;
 	public string $value = '';
 	public ?string $vat = null;
 
-	public string $type = '';
+	public ?int $type_id = null;
 	public ?string $transfer_type = null;
 	public $user_id;
+	public $creator_id;
 
 	public string $date_at = '';
 	public ?string $confirmed_at = null;
@@ -54,6 +53,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	}
 
 	public function attributeLabels(): array {
+
 		return array_merge(
 			IssueCost::instance()->attributeLabels(), [
 			'value' => $this->vat ? Yii::t('settlement', 'Value with VAT') : Yii::t('settlement', 'Value'),
@@ -62,7 +62,7 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 
 	public function rules(): array {
 		return [
-			[['type', 'value', 'date_at'], 'required'],
+			[['type_id', 'value', 'date_at'], 'required'],
 			[['date_at', 'deadline_at', 'confirmed_at', 'settled_at'], 'date', 'format' => 'Y-m-d'],
 			[
 				'settled_at', 'compare', 'compareAttribute' => 'date_at', 'operator' => '>=',
@@ -71,21 +71,21 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 			[
 				'user_id', 'required',
 				'when' => function (): bool {
-					return $this->type === IssueCostInterface::TYPE_INSTALLMENT;
+					if (empty($this->type_id) || !isset(CostType::getModels()[$this->type_id])) {
+						return false;
+					}
+					return CostType::getModels()[$this->type_id]->getTypeOptions()->user_is_required ?? false;
 				},
 				'enableClientValidation' => false,
-			],
-			[
-				'user_id', 'required',
-				'on' => static::SCENARIO_CREATE_INSTALLMENT,
+				'skipOnError' => true,
 			],
 			[['settled_at', 'transfer_type'], 'required', 'on' => static::SCENARIO_SETTLE],
 			[['vat', 'settled_at', 'confirmed_at', 'deadline_at'], 'default', 'value' => null],
-			['user_id', 'integer'],
+			[['user_id', 'creator_id'], 'integer'],
 			[['value', 'vat'], 'number'],
 			['vat', 'number', 'min' => 0, 'max' => 100],
-			[['base_value', 'value'], 'number', 'min' => 1, 'max' => 100000],
-			['type', 'in', 'range' => array_keys(static::getTypesNames())],
+			[['value'], 'number', 'min' => 1, 'max' => 100000],
+			['type_id', 'in', 'range' => array_keys($this->getTypesNames())],
 			['transfer_type', 'in', 'range' => array_keys(static::getTransfersTypesNames())],
 			[
 				'user_id',
@@ -112,21 +112,26 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	public function setModel(IssueCost $cost): void {
 		$this->model = $cost;
 		$this->issue = $cost->issue;
-		$this->type = $cost->type;
+		$this->type_id = $cost->type_id;
 		$this->date_at = $cost->date_at;
 		$this->confirmed_at = $cost->confirmed_at;
-
 		$this->deadline_at = $cost->deadline_at;
 		$this->settled_at = $cost->settled_at;
-		$this->base_value = $cost->getBaseValue() ? $cost->getBaseValue()->toFixed(2) : null;
 		$this->value = $cost->getValueWithVAT()->toFixed(2);
 		$this->vat = $cost->getVAT() ? $cost->getVAT()->toFixed(2) : null;
 		$this->user_id = $cost->user_id;
 		$this->transfer_type = $cost->getTransferType();
+		$this->creator_id = $cost->creator_id;
 	}
 
-	public static function getTypesNames(): array {
-		return IssueCost::getTypesNames();
+	public function getTypesNames(): array {
+		$names = CostType::getNames(true);
+		if (!$this->getModel()->isNewRecord
+			&& !isset($names[$this->type_id])) {
+			$names[$this->type_id] = CostType::getNames(false)[$this->type_id];
+		}
+		codecept_debug($names);
+		return $names;
 	}
 
 	public static function getTransfersTypesNames(): array {
@@ -149,16 +154,16 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		}
 		$model = $this->getModel();
 		$model->issue_id = $this->getIssue() ? $this->getIssue()->getIssueId() : null;
-		$model->base_value = $this->getBaseValue() ? $this->getBaseValue()->toFixed(2) : null;
 		$model->value = $this->getValue()->toFixed(2);
 		$model->vat = $this->vat ? (new Decimal($this->vat))->toFixed(2) : null;
 		$model->transfer_type = $this->transfer_type;
-		$model->type = $this->type;
+		$model->type_id = $this->type_id;
 		$model->confirmed_at = $this->confirmed_at;
 		$model->date_at = $this->date_at;
 		$model->user_id = $this->user_id;
 		$model->settled_at = $this->settled_at;
 		$model->deadline_at = $this->deadline_at;
+		$model->creator_id = $this->creator_id;
 		return $model->save(false);
 	}
 
@@ -167,14 +172,6 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 	}
 
 	public function isVisibleField(string $attribute): bool {
-		if ($this->scenario === static::SCENARIO_CREATE_INSTALLMENT) {
-			if ($attribute === 'type') {
-				return false;
-			}
-			if ($attribute === 'settled_at') {
-				return false;
-			}
-		}
 		if ($this->scenario === static::SCENARIO_SETTLE) {
 			$attributes = [
 				'transfer_type',
@@ -189,7 +186,4 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 		return new Decimal($this->value);
 	}
 
-	public function getBaseValue(): ?Decimal {
-		return $this->base_value ? new Decimal($this->base_value) : null;
-	}
 }

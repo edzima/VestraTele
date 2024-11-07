@@ -35,7 +35,7 @@ class UserQuery extends ActiveQuery {
 		return $this->onlyAssignments(Customer::ROLES, false);
 	}
 
-	public function onlyAssignments(array $names, bool $common): self {
+	public function onlyAssignments(array $names, bool $common, int $cache = 180): self {
 		if (empty($names)) {
 			return $this;
 		}
@@ -58,6 +58,7 @@ class UserQuery extends ActiveQuery {
 				$this->having('COUNT(' . $assignmentAlias . '.item_name) = ' . count($names));
 			}
 			$this->distinct();
+			$this->cache($cache);
 			return $this;
 		}
 		$assignmentsIds = [];

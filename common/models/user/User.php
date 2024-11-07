@@ -548,7 +548,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 	 * @param bool $active
 	 * @return string[]
 	 */
-	public static function getSelectList(array $ids, bool $active = true): array {
+	public static function getSelectList(array $ids, bool $active = true, int $cache = 180): array {
 		$query = static::find()
 			->joinWith('userProfile UP')
 			->select(['id', 'username', 'firstname', 'lastname'])
@@ -558,7 +558,7 @@ class User extends ActiveRecord implements IdentityInterface, Hierarchy, LeadUse
 			$query->active();
 		}
 
-		$query->cache(60);
+		$query->cache($cache);
 		return ArrayHelper::map(
 			$query->all(), 'id', 'fullName');
 	}
