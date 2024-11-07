@@ -4,7 +4,6 @@ use backend\modules\settlement\models\search\IssueCostSearch;
 use backend\modules\settlement\widgets\IssueCostActionColumn;
 use backend\widgets\GridView;
 use common\models\issue\Issue;
-use common\models\user\Worker;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
@@ -22,10 +21,6 @@ $this->params['breadcrumbs'][] = Yii::t('settlement', 'Costs');
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Create'), ['create', 'id' => $issue->id], ['class' => 'btn btn-success']) ?>
-		<?= Yii::$app->user->can(Worker::PERMISSION_COST_DEBT)
-			? Html::a(Yii::t('settlement', 'Create Debt Costs'), ['create-debt', 'issue_id' => $issue->id], ['class' => 'btn btn-primary'])
-			: ''
-		?>
 	</p>
 
 
@@ -49,7 +44,6 @@ $this->params['breadcrumbs'][] = Yii::t('settlement', 'Costs');
 				'format' => 'currency',
 				'pageSummary' => true,
 			],
-			'base_value:currency',
 			'valueWithoutVAT:currency:' . Yii::t('backend', 'Value without VAT'),
 			'VATPercent',
 			[

@@ -13,7 +13,7 @@ if ($model->getIssue()) {
 }
 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Costs'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->getModel()->id, 'url' => ['view', 'id' => $model->getModel()->id]];
+$this->params['breadcrumbs'][] = ['label' => $model->getModel()->getTypeNameWithId(), 'url' => ['view', 'id' => $model->getModel()->id]];
 $this->params['breadcrumbs'][] = Yii::t('common', 'Update');
 ?>
 <div class="issue-cost-update">

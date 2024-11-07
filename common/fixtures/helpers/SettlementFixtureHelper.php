@@ -5,6 +5,7 @@ namespace common\fixtures\helpers;
 use common\fixtures\settlement\CalculationCostFixture;
 use common\fixtures\settlement\CalculationFixture;
 use common\fixtures\settlement\CostFixture;
+use common\fixtures\settlement\CostTypeFixture;
 use common\fixtures\settlement\PayFixture;
 use common\fixtures\settlement\PayReceivedFixture;
 use common\fixtures\settlement\SettlementTypeFixture;
@@ -29,6 +30,8 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 	public const TYPE = 'settlement.type';
 
 	public const COST = 'settlement.cost';
+
+	public const COST_TYPE = 'settlement.cost.type';
 	public const PAY = 'settlement.pay';
 	private const OWNER = 'settlement.owner';
 	private const PAY_RECEIVED = 'settlement.pay_received';
@@ -39,6 +42,15 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 	public const TYPE_ID_HONORARIUM = 30;
 	public const TYPE_ID_LAWYER = 40;
 	public const TYPE_ID_NOT_ACTIVE = 50;
+	public const COST_TYPE_ID_OFFICE = 20;
+
+	public const COST_TYPE_PURCHASE_OF_RECEIVABLES = 30;
+
+	public const COST_TYPE_JUSTIFICATION_OF_THE_JUDGMENT = 40;
+
+	public const COST_TYPE_ID_INSTALLMENT = 50;
+
+	public const COST_TYPE_ID_NOT_ACTIVE = -1;
 
 	private ?int $lastSettlementId = null;
 
@@ -84,8 +96,17 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 		];
 	}
 
+	public static function costType(): array {
+		return [
+			static::COST_TYPE => [
+				'class' => CostTypeFixture::class,
+				'dataFile' => static::getDataDirPath() . 'cost-type.php',
+			],
+		];
+	}
+
 	public static function cost(bool $withSettlements, string $baseDataDir = null): array {
-		$fixtures = [];
+		$fixtures = static::costType();
 		$fixtures[static::COST] = [
 			'class' => CostFixture::class,
 			'dataFile' => static::getDataDirPath($baseDataDir) . 'cost.php',

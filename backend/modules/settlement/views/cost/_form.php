@@ -2,6 +2,7 @@
 
 use backend\helpers\Url;
 use backend\modules\settlement\models\IssueCostForm;
+use common\models\message\IssueCostMessagesForm;
 use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
@@ -12,7 +13,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model IssueCostForm */
 /* @var $form yii\widgets\ActiveForm */
-/* @var $message |null IssueCostMessagesForm */
+/* @var $message IssueCostMessagesForm|null */
 
 ?>
 
@@ -40,7 +41,7 @@ use yii\helpers\Html;
 			)
 		?>
 
-		<?= $form->field($model, 'type', ['options' => ['class' => 'col-md-4 col-lg-3']])->dropDownList(IssueCostForm::getTypesNames()) ?>
+		<?= $form->field($model, 'type_id', ['options' => ['class' => 'col-md-4 col-lg-3']])->dropDownList($model->getTypesNames()) ?>
 
 		<?= $form->field($model, 'transfer_type', ['options' => ['class' => 'col-md-4 col-lg-2']])->dropDownList(IssueCostForm::getTransfersTypesNames(), ['prompt' => Yii::t('common', 'Select...')]) ?>
 
@@ -62,8 +63,6 @@ use yii\helpers\Html;
 		<?= $form->field($model, 'value', ['options' => ['class' => 'col-xs-9 col-md-3 col-lg-2']])->widget(NumberControl::class) ?>
 
 		<?= $form->field($model, 'vat', ['options' => ['class' => 'col-xs-3 col-md-2']])->widget(NumberControl::class) ?>
-
-		<?= $form->field($model, 'base_value', ['options' => ['class' => 'col-xs-9 col-md-3 col-lg-2']])->widget(NumberControl::class) ?>
 
 	</div>
 

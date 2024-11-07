@@ -245,7 +245,7 @@ use yii\data\DataProviderInterface;
 					[
 						'class' => ActionColumn::class,
 						'visible' => $usersLinks,
-						'template' => '{view} {create-installment} {link-user} {delete}',
+						'template' => '{view} {link-user} {delete}',
 						'buttons' => [
 							'view' => function ($url, IssueUser $model): string {
 								if (!Yii::$app->user->can(Worker::PERMISSION_WORKERS)) {
@@ -253,21 +253,6 @@ use yii\data\DataProviderInterface;
 								}
 								return Html::a(Html::icon('eye-open'),
 									['/user/worker/view', 'id' => $model->user_id]
-								);
-							},
-							'create-installment' => function ($url, IssueUser $model): string {
-								if (!Yii::$app->user->can(Worker::PERMISSION_COST)) {
-									return '';
-								}
-								return Html::a(Html::faicon('money'),
-									[
-										'/settlement/cost/create-installment',
-										'id' => $model->issue_id,
-										'user_id' => $model->user_id,
-									], [
-										'title' => Yii::t('settlement', 'Create Installment'),
-										'aria-label' => Yii::t('settlement', 'Create Installment'),
-									]
 								);
 							},
 							'link-user' => function ($url, IssueUser $model): string {

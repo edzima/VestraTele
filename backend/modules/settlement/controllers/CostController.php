@@ -3,7 +3,6 @@
 namespace backend\modules\settlement\controllers;
 
 use backend\helpers\Url;
-use backend\modules\settlement\models\DebtCostsForm;
 use backend\modules\settlement\models\IssueCostForm;
 use backend\modules\settlement\models\search\IssueCostSearch;
 use common\helpers\Flash;
@@ -16,8 +15,6 @@ use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\Response;
-use yii2tech\csvgrid\CsvGrid;
 
 /**
  * CostController implements the CRUD actions for IssueCost model.
@@ -38,112 +35,6 @@ class CostController extends Controller {
 				],
 			],
 		];
-	}
-
-	public function actionPccExport() {
-		$searchModel = new IssueCostSearch();
-		$searchModel->type = IssueCost::TYPE_PCC;
-		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-		if ($dataProvider->getTotalCount()) {
-			$exporter = new CsvGrid([
-				'dataProvider' => $dataProvider,
-				'columns' => [
-					[
-						'attribute' => 'issue.longId',
-						'label' => Yii::t('common', 'Issue'),
-					],
-					[
-						'attribute' => 'user',
-						'label' => Yii::t('common', 'Full name'),
-					],
-					[
-						'attribute' => 'value',
-						'label' => Yii::t('settlement', 'Value'),
-						'format' => 'currency',
-					],
-					[
-						'attribute' => 'base_value',
-						'label' => Yii::t('settlement', 'Nominal Value'),
-						'format' => 'currency',
-					],
-					[
-						'attribute' => 'date_at',
-						'format' => 'date',
-					],
-					[
-						'attribute' => 'deadline_at',
-						'format' => 'date',
-					],
-					[
-						'attribute' => 'settled_at',
-						'format' => 'date',
-					],
-				],
-			]);
-			return $exporter->export()->send('export.csv');
-		}
-		Flash::add(Flash::TYPE_WARNING, Yii::t('settlement', 'Not found Costs for this filters.'));
-		return $this->redirect(['index', Yii::$app->request->queryParams]);
-	}
-
-	public function actionPitExport() {
-		$searchModel = new IssueCostSearch();
-		$searchModel->type = IssueCost::TYPE_PIT_4;
-		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-		if ($dataProvider->getTotalCount()) {
-			$exporter = new CsvGrid([
-				'dataProvider' => $dataProvider,
-				'columns' => [
-					//PIT4 - numer sprawy, imię i nazwisko, PESEL, adres zamieszkania, Urząd skarbowy, data kosztu, data płatności, termin, wartość kosztu, wartość bazowa
-
-					[
-						'attribute' => 'issue.longId',
-						'label' => Yii::t('common', 'Issue'),
-					],
-					[
-						'attribute' => 'user',
-						'label' => Yii::t('common', 'Full name'),
-					],
-					[
-						'attribute' => 'user.userProfile.pesel',
-						'label' => Yii::t('common', 'PESEL'),
-					],
-					[
-						'attribute' => 'user.homeAddress',
-						'label' => Yii::t('common', 'Home address'),
-					],
-					[
-						'attribute' => 'user.userProfile.tax_office',
-						'label' => Yii::t('settlement', 'Tax Office'),
-					],
-					[
-						'attribute' => 'value',
-						'label' => Yii::t('settlement', 'Value'),
-						'format' => 'currency',
-					],
-					[
-						'attribute' => 'base_value',
-						'label' => Yii::t('settlement', 'Nominal Value'),
-						'format' => 'currency',
-					],
-					[
-						'attribute' => 'date_at',
-						'format' => 'date',
-					],
-					[
-						'attribute' => 'deadline_at',
-						'format' => 'date',
-					],
-					[
-						'attribute' => 'settled_at',
-						'format' => 'date',
-					],
-				],
-			]);
-			return $exporter->export()->send('export.csv');
-		}
-		Flash::add(Flash::TYPE_WARNING, Yii::t('settlement', 'Not found Costs for this filters.'));
-		return $this->redirect(['index', Yii::$app->request->queryParams]);
 	}
 
 	/**
@@ -179,24 +70,6 @@ class CostController extends Controller {
 			'model' => $model,
 			'issue' => $issue,
 			'dataProvider' => $dataProvider,
-		]);
-	}
-
-	/**
-	 * Create Debt Costs for Issue
-	 *
-	 * @param int $issue_id
-	 * @return string|Response
-	 * @throws NotFoundHttpException
-	 */
-	public function actionCreateDebt(int $issue_id) {
-		$model = new DebtCostsForm();
-		$model->setIssue($this->findIssue($issue_id));
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['issue', 'id' => $issue_id]);
-		}
-		return $this->render('create-debt', [
-			'model' => $model,
 		]);
 	}
 
@@ -282,6 +155,7 @@ class CostController extends Controller {
 
 		$model->usersFromIssue = $usersFromIssue;
 		$model->date_at = date(DATE_ATOM);
+		$model->creator_id = Yii::$app->user->getId();
 
 		if ($model->load(Yii::$app->request->post())
 			&& ($message === null || $message->load(Yii::$app->request->post()))
@@ -302,25 +176,6 @@ class CostController extends Controller {
 		return $this->render('create', [
 			'model' => $model,
 			'message' => $message,
-		]);
-	}
-
-	public function actionCreateInstallment(int $id, int $user_id = null, bool $usersFromIssue = true) {
-		$issue = $this->findIssue($id);
-		$model = new IssueCostForm();
-		$model->setIssue($issue);
-		$model->setScenario(IssueCostForm::SCENARIO_CREATE_INSTALLMENT);
-		$model->user_id = $user_id;
-		$model->usersFromIssue = $usersFromIssue;
-		$model->type = IssueCost::TYPE_INSTALLMENT;
-		$model->date_at = date(DATE_ATOM);
-		$model->vat = 0;
-		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->getModel()->id]);
-		}
-
-		return $this->render('create-installment', [
-			'model' => $model,
 		]);
 	}
 

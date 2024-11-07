@@ -5,13 +5,15 @@ namespace backend\tests\unit\settlement;
 use backend\modules\settlement\models\CalculationMinCountForm;
 use backend\tests\unit\Unit;
 use common\fixtures\helpers\IssueFixtureHelper;
+use common\models\issue\IssueType;
 use common\models\issue\StageType;
 
 class CalculationMinCountFormTest extends Unit {
 
-	public function _before():void {
+	public function _before(): void {
 		parent::_before();
 		$this->tester->haveFixtures(IssueFixtureHelper::stageAndTypesFixtures());
+		IssueType::getTypes(true);
 	}
 
 	public function testNotExistedStage(): void {

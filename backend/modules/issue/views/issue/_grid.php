@@ -260,15 +260,6 @@ $this->registerJs($js);
 			'class' => ActionColumn::class,
 			'template' => '{installment} {link} {note} {sms} {tag} {view} {update} {delete}',
 			'buttons' => [
-				'installment' => static function (string $url, Issue $model): string {
-					return Html::a('<i class="fa fa-money" aria-hidden="true"></i>',
-						['/settlement/cost/create-installment', 'id' => $model->id, 'user_id' => $model->agent->id],
-						[
-							'title' => Yii::t('settlement', 'Create Installment'),
-							'aria-label' => Yii::t('settlement', 'Create Installment'),
-						]
-					);
-				},
 				'link' => static function (string $url, Issue $model) {
 					return Html::a('<span class="glyphicon glyphicon-paperclip"></span>',
 						['/issue/relation/create', 'id' => $model->id],

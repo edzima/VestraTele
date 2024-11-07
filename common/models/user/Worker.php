@@ -2,6 +2,7 @@
 
 namespace common\models\user;
 
+use backend\modules\settlement\Module as SettlementModule;
 use common\models\hierarchy\ActiveHierarchy;
 use common\models\user\query\UserQuery;
 use yii\db\ActiveQuery;
@@ -29,6 +30,7 @@ class Worker extends User implements ActiveHierarchy {
 		self::ROLE_MANAGER,
 		self::ROLE_AUDITOR,
 		self::ROLE_AUDITOR_INNER,
+		SettlementModule::ROLE_COST_TYPE_MANAGER,
 	];
 	public const PERMISSION_ENTITY_RESPONSIBLE_MANAGER = 'entity_responsible.manager';
 

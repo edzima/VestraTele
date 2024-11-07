@@ -8,13 +8,11 @@ interface CostInterface {
 
 	public function getValue(): Decimal;
 
-	public function getBaseValue(): ?Decimal;
-
 	public function getIsSettled(): bool;
 
 	public function getIsConfirmed(): bool;
 
-	public function getType(): string;
+	public function getType(): CostType;
 
 	public function getTypeName(): string;
 

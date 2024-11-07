@@ -27,7 +27,6 @@ use edzima\teryt\Module as TerytModule;
 use Edzima\Yii2Adescom\AdescomSender;
 use Edzima\Yii2Adescom\AdescomSoap;
 use League\Flysystem\AdapterInterface;
-use yii\caching\DummyCache;
 use yii\caching\FileCache;
 use yii\mutex\MysqlMutex;
 use yii\queue\db\Queue;
@@ -226,7 +225,7 @@ $config = [
 			'showScriptName' => false,
 		],
 		'cache' => [
-			'class' => YII_ENV_DEV ? DummyCache::class : FileCache::class,
+			'class' => FileCache::class,
 		],
 		'pay' => [
 			'class' => PayComponent::class,

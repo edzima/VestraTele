@@ -17,5 +17,6 @@ class CostFixture extends ActiveFixture {
 
 	public $depends = [
 		IssueFixture::class,
+		CostTypeFixture::class,
 	];
 }

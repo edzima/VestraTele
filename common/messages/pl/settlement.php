@@ -204,4 +204,9 @@ return [
 	'Deadline: 2 Week' => '2 tygodnie',
 	'Deadline: 1 Month' => 'Miesiąc',
 	'Deadline: Last Day of Month' => 'Ostatni dzień miesiąca',
+	'Cost Types' => 'Typy Kosztów',
+	'Create Cost Type' => 'Dodaj Typ',
+	'Is for Settlement' => 'Do rozliczeń',
+	'User is required' => 'Użytkownik obowiązkowy',
+	'Creator' => 'Utworzył',
 ];

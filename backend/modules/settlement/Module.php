@@ -10,6 +10,8 @@ class Module extends BaseModule {
 
 	public $controllerNamespace = 'backend\modules\settlement\controllers';
 
+	public const ROLE_COST_TYPE_MANAGER = 'settlement.cost.manager';
+
 	public function behaviors(): array {
 		return [
 			'access' => [
@@ -68,6 +70,11 @@ class Module extends BaseModule {
 						'allow' => true,
 						'controllers' => ['settlement/pay-received'],
 						'permissions' => [Worker::PERMISSION_PAY_RECEIVED],
+					],
+					[
+						'allow' => true,
+						'controllers' => ['settlement/cost-type'],
+						'roles' => [static::ROLE_COST_TYPE_MANAGER],
 					],
 					[
 						'allow' => true,

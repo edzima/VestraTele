@@ -49,11 +49,6 @@ class IssueCostQuery extends ActiveQuery {
 		return $this;
 	}
 
-	public function withoutCommissionsRefund(): self {
-		$this->andWhere(['!=', IssueCost::tableName() . '.type', IssueCost::TYPE_COMMISSION_REFUND]);
-		return $this;
-	}
-
 	public function user(int $id): self {
 		$this->andWhere(['user_id' => $id]);
 		return $this;

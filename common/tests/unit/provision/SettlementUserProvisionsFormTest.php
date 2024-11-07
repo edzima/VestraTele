@@ -107,7 +107,7 @@ class SettlementUserProvisionsFormTest extends Unit {
 		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_HONORARIUM);
 		$this->givePays(1);
 		$this->giveCost(100, true, [
-			'type' => IssueCost::TYPE_INSTALLMENT,
+			'type_id' => SettlementFixtureHelper::COST_TYPE_ID_INSTALLMENT,
 			'user_id' => $this->settlement->getIssueModel()->tele->id,
 		]);
 		$this->giveForm();
@@ -169,8 +169,8 @@ class SettlementUserProvisionsFormTest extends Unit {
 	}
 
 	private function giveCost(string $value, bool $link = true, array $attributes = []) {
-		if (!isset($attributes['type'])) {
-			$attributes['type'] = IssueCost::TYPE_OFFICE;
+		if (!isset($attributes['type_id'])) {
+			$attributes['type_id'] = SettlementFixtureHelper::COST_TYPE_ID_OFFICE;
 		}
 		$attributes['value'] = $value;
 		$attributes['issue_id'] = $this->settlement->getIssueId();

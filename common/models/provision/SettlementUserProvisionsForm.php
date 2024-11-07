@@ -2,10 +2,9 @@
 
 namespace common\models\provision;
 
-use common\models\issue\IssueCost;
-use common\models\issue\IssueCostInterface;
 use common\models\issue\IssueSettlement;
 use common\models\issue\IssueUser;
+use common\models\settlement\CostType;
 use common\models\settlement\VATInfo;
 use Decimal\Decimal;
 use Yii;
@@ -19,14 +18,25 @@ class SettlementUserProvisionsForm extends Model {
 	public bool $costWithVAT = false;
 	public bool $payWithVAT = false;
 
-	public array $excludedIssueCostTypes = [
-		IssueCostInterface::TYPE_INSTALLMENT,
-	];
+	public ?array $excludedIssueCostTypes = [];
 
 	private IssueSettlement $model;
 	private IssueUser $user;
 	/* @var IssueProvisionType[] */
 	private ?array $types = null;
+
+	public function init(): void {
+		parent::init();
+		if (empty($this->excludedIssueCostTypes) && $this->excludedIssueCostTypes !== null) {
+			$this->excludedIssueCostTypes = array_keys(
+				array_filter(
+					CostType::getModels(),
+					function (CostType $costType) {
+						return $costType->is_for_settlement;
+					})
+			);
+		}
+	}
 
 	public function rules(): array {
 		return [
@@ -232,7 +242,7 @@ class SettlementUserProvisionsForm extends Model {
 	}
 
 	public static function getCostTypesNames(): array {
-		return IssueCost::getTypesNames();
+		return CostType::getNames(true);
 	}
 
 }
