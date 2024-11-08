@@ -2,6 +2,7 @@
 
 namespace common\components\rbac;
 
+use common\models\settlement\CostType;
 use common\models\settlement\SettlementType;
 use Yii;
 use yii\base\Component;
@@ -22,6 +23,9 @@ class ManagerFactory extends Component {
 	public array $managers = [
 		SettlementType::class => [
 			'class' => SettlementTypeAccessManager::class,
+		],
+		CostType::class => [
+			'class' => CostTypeAccessManager::class,
 		],
 	];
 

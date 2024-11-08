@@ -67,6 +67,8 @@ class IssueViewWidget extends IssueWidget {
 		if (Yii::$app->user->can(Worker::PERMISSION_COST)) {
 			$query = $this->model->getCosts()
 				->with('user.userProfile');
+
+			//@todo add query for issue view from ModelRbacAccess
 			if (!Yii::$app->user->can(Worker::PERMISSION_COST_COMMISSION_REFUND)) {
 				$query->withoutCommissionsRefund();
 			}
