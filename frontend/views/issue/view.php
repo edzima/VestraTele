@@ -8,6 +8,7 @@ use common\modules\issue\widgets\IssueViewWidget;
 use common\modules\issue\widgets\SummonDocsWidget;
 use frontend\helpers\Breadcrumbs;
 use frontend\helpers\Html;
+use frontend\widgets\issue\IssueSmsButtonDropdown;
 use frontend\widgets\issue\StageChangeButtonDropdown;
 use frontend\widgets\issue\SummonCreateButtonDropdown;
 use frontend\widgets\IssuePayCalculationGrid;
@@ -59,11 +60,12 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model, false);
 		?>
 
 		<?= Yii::$app->user->can(Worker::PERMISSION_SMS)
-			? Html::a(Yii::t('common', 'Send SMS'), ['/issue-sms/push', 'id' => $model->id], [
-				'class' => 'btn btn-warning',
+			? IssueSmsButtonDropdown::widget([
+				'model' => $model,
 			])
 			: ''
 		?>
+
 	</p>
 
 	<?= IssueNotesWidget::widget([
