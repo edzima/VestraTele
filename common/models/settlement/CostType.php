@@ -120,6 +120,6 @@ class CostType extends ActiveRecord implements ModelRbacInterface {
 	public function getModelAccess(): ModelAccessManager {
 		return Yii::$app->accessManagerFactory->getManager(
 			static::class
-		);
+		)->setModel($this);
 	}
 }

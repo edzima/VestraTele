@@ -1,5 +1,6 @@
 <?php
 
+use common\components\rbac\widget\ModelAccessDetailWidget;
 use common\models\settlement\CostType;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
@@ -43,6 +44,10 @@ YiiAsset::register($this);
 
 			<?= $this->render('_options-view', [
 				'model' => $model->getTypeOptions(),
+			]) ?>
+
+			<?= ModelAccessDetailWidget::widget([
+				'model' => $model,
 			]) ?>
 		</div>
 	</div>
