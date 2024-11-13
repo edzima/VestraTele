@@ -14,24 +14,38 @@ class IssueCostActionColumn extends ActionColumn {
 
 	public $controller = '/settlement/cost';
 	public $template = '{issue} {settle} {link} {unlink} {view} {update} {delete} {hide-on-report} {visible-on-report}';
-	public ?string $settleRedirectUrl = null;
+	public ?string $redirectUrl = null;
 	public bool $settle = true;
 	public bool $unlink = false;
 	public bool $link = false;
 	public bool $issue = true;
 	public bool $report = true;
 
+	public ?string $returnUrl = null;
+
 	public ?IssuePayCalculation $settlement = null;
 
 	public function init() {
+		if ($this->returnUrl === null) {
+			$this->returnUrl = Url::current();
+		}
+		if ($this->urlCreator === null) {
+			$this->urlCreator = function ($action, IssueCost $model, $key, $index, $column) {
+				if ($this->controller) {
+					$action = $this->controller . '/' . $action;
+				}
+				return Url::toRoute([$action, 'id' => $model->id, 'returnUrl' => $this->returnUrl]);
+			};
+		}
+
 		parent::init();
 
 		if ($this->report && !Yii::$app->user->can(User::PERMISSION_PROVISION)) {
 			$this->report = false;
 		}
 
-		if ($this->settleRedirectUrl === null) {
-			$this->settleRedirectUrl = Url::current();
+		if ($this->redirectUrl === null) {
+			$this->redirectUrl = Url::current();
 		}
 		if ($this->issue && !isset($this->buttons['issue'])) {
 			$this->buttons['issue'] = function (string $key, IssueCost $cost): ?string {
@@ -83,7 +97,7 @@ class IssueCostActionColumn extends ActionColumn {
 		}
 		return Html::a(
 			Html::icon('check'),
-			['/settlement/cost/settle', 'id' => $cost->id, 'redirectUrl' => $this->settleRedirectUrl], [
+			['/settlement/cost/settle', 'id' => $cost->id, 'redirectUrl' => $this->redirectUrl], [
 			'title' => Yii::t('settlement', 'Settle'),
 			'aria-label' => Yii::t('settlement', 'Settle'),
 		]);
