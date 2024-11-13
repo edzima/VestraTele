@@ -228,10 +228,10 @@ class CostController extends Controller {
 	 * @return mixed
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionDelete(int $id) {
+	public function actionDelete(int $id, string $returnUrl = null) {
 		$this->findModel($id)->delete();
 
-		return $this->redirect(['index']);
+		return $this->redirect($returnUrl ?: ['index']);
 	}
 
 	/**
