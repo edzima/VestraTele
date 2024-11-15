@@ -146,14 +146,14 @@ class IssuePayCalculation extends ActiveRecord implements
 			'created_at' => Yii::t('common', 'Created at'),
 			'updated_at' => Yii::t('common', 'Updated at'),
 			'payment_at' => Yii::t('common', 'Payment at'),
-			'value' => Yii::t('common', 'Value with VAT'),
-			'valueToPay' => Yii::t('common', 'Value to pay'),
+			'value' => $this->getValueAttributeLabels(),
+			'valueToPay' => Yii::t('settlement', 'Value to pay'),
 			'type_id' => Yii::t('common', 'Type'),
 			'type' => Yii::t('common', 'Type'),
 			'stage_id' => Yii::t('common', 'Stage'),
 			'stageName' => Yii::t('common', 'Stage'),
 			'typeName' => Yii::t('common', 'Type'),
-			'details' => Yii::t('common', 'Details'),
+			'details' => Yii::t('settlement', 'Details'),
 			'providerName' => Yii::t('settlement', 'Provider name'),
 			'problemStatusName' => Yii::t('settlement', 'Problem'),
 			'owner_id' => Yii::t('common', 'Owner'),
@@ -165,6 +165,13 @@ class IssuePayCalculation extends ActiveRecord implements
 			'valueWithoutCosts' => Yii::t('settlement', 'Value without costs'),
 			'payedSum' => Yii::t('settlement', 'Payed Sum'),
 		];
+	}
+
+	protected function getValueAttributeLabels(): string {
+		if ($this->type && $this->type->is_percentage) {
+			return Yii::t('settlement', 'Value - Percent');
+		}
+		return Yii::t('settlement', 'Value with VAT');
 	}
 
 	public function getId(): int {
@@ -513,5 +520,9 @@ class IssuePayCalculation extends ActiveRecord implements
 
 	public function providersTypesNames(): array {
 		return static::getProvidersTypesNames();
+	}
+
+	public function isPercentageType(): bool {
+		return $this->type->is_percentage;
 	}
 }

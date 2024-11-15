@@ -17,7 +17,7 @@ class SettlementTypeSearch extends SettlementType {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'is_active'], 'integer'],
+			[['id', 'is_active', 'is_percentage'], 'integer'],
 			[['name', 'issue_types', 'options'], 'safe'],
 		];
 	}
@@ -60,6 +60,7 @@ class SettlementTypeSearch extends SettlementType {
 		// grid filtering conditions
 		$query->andFilterWhere([
 			'id' => $this->id,
+			'is_percentage' => $this->is_percentage,
 			'is_active' => $this->is_active,
 		]);
 

@@ -8,6 +8,7 @@ use common\models\issue\IssueInterface;
 use common\models\provision\ProvisionReportSummary;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\DataColumn;
+use Yii;
 use yii\base\Widget;
 
 class ProvisionUserReportWidget extends Widget {
@@ -41,6 +42,7 @@ class ProvisionUserReportWidget extends Widget {
 			'class' => DataColumn::class,
 			'attribute' => 'issue_id',
 			'format' => $this->issueRoute ? 'html' : 'text',
+			'label' => Yii::t('issue', 'Issue'),
 			'value' => function ($model): ?string {
 				$issue = null;
 				if ($model instanceof IssueInterface) {

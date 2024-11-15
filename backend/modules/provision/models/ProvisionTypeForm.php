@@ -56,7 +56,8 @@ class ProvisionTypeForm extends Model {
 				'to_at', 'compare', 'compareAttribute' => 'from_at', 'operator' => '>=',
 				'enableClientValidation' => false,
 			],
-			[['value', 'minSettlementValue', 'maxSettlementValue'], 'number', 'min' => 0],
+			[['value'], 'number'],
+			[['minSettlementValue', 'maxSettlementValue'], 'number', 'min' => 0],
 			[
 				'value', 'number', 'max' => 100,
 				'when' => function (): bool {

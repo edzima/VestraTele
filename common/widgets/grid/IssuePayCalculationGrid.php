@@ -2,6 +2,7 @@
 
 namespace common\widgets\grid;
 
+use common\assets\TooltipAsset;
 use common\helpers\Html;
 use common\models\issue\IssuePayCalculation;
 use common\models\settlement\search\IssuePayCalculationSearch;
@@ -30,6 +31,7 @@ class IssuePayCalculationGrid extends GridView {
 	public bool $withIssueType = true;
 	public bool $withProblems = true;
 	public bool $withDates = true;
+	public bool $withDetails = true;
 	public bool $withStageOnCreate = true;
 	public bool $withValueSummary = false;
 	public bool $rowColors = true;
@@ -42,6 +44,15 @@ class IssuePayCalculationGrid extends GridView {
 
 	public $userId;
 	public bool $userIsRequired = true;
+
+	public const TYPE_PERCENTAGE = 'percentage';
+	public const TYPE_VALUE = 'value';
+
+	public string $type = self::TYPE_VALUE;
+
+	public bool $filterType = false;
+
+	public bool $detailsAsTitleTooltip = true;
 
 	public function init(): void {
 		if ($this->userId === null) {
@@ -58,13 +69,17 @@ class IssuePayCalculationGrid extends GridView {
 		}
 		if ($this->filterModel) {
 			$this->withOwner = $this->filterModel->scenario !== IssuePayCalculationSearch::SCENARIO_OWNER;
+			$this->type = $this->filterModel->is_percentage ? static::TYPE_PERCENTAGE : static::TYPE_VALUE;
+		}
+		if ($this->detailsAsTitleTooltip) {
+			$this->withDetails = false;
 		}
 
 		if (empty($this->columns)) {
 			$this->columns = $this->defaultColumns();
 		}
 		if ($this->withCaption && empty($this->caption)) {
-			$this->caption = Yii::t('settlement', 'Settlements');
+			$this->caption = $this->defaultCaption();
 		}
 		if (empty($this->rowOptions) && $this->rowColors) {
 			$this->rowOptions = static function (IssuePayCalculation $model): array {
@@ -78,6 +93,19 @@ class IssuePayCalculationGrid extends GridView {
 		parent::init();
 	}
 
+	protected function defaultCaption(): string {
+		switch ($this->type) {
+			case self::TYPE_VALUE:
+				return Yii::t('settlement', 'Settlements ({currency})', [
+					'currency' => Yii::$app->formatter->getCurrencySymbol(),
+				]);
+			case self::TYPE_PERCENTAGE:
+				return Yii::t('settlement', 'Settlements (%)');
+			default:
+				return Yii::t('settlement', 'Settlements');
+		}
+	}
+
 	protected function actionColumn(): array {
 		return [
 			'class' => ActionColumn::class,
@@ -86,6 +114,12 @@ class IssuePayCalculationGrid extends GridView {
 
 	public function defaultColumns(): array {
 		return [
+			[
+				'attribute' => 'is_percentage',
+				'value' => 'type.is_percentage',
+				'format' => 'boolean',
+				'label' => Yii::t('settlement', '%'),
+			],
 			[
 				'class' => $this->issueColumn,
 				'visible' => $this->withIssue,
@@ -101,7 +135,6 @@ class IssuePayCalculationGrid extends GridView {
 			],
 			[
 				'attribute' => 'type_id',
-				'value' => 'type.name',
 				'filter' => $this->filterModel ? $this->filterModel::getTypesNames() : null,
 				'filterType' => static::FILTER_SELECT2,
 				'filterWidgetOptions' => [
@@ -112,6 +145,21 @@ class IssuePayCalculationGrid extends GridView {
 					'size' => Select2::SIZE_SMALL,
 					'showToggleAll' => false,
 				],
+				'value' => function (IssuePayCalculation $model): string {
+					$value = $model->getTypeName();
+					if (!empty($model->details)) {
+						$this->registerTooltipAssets();
+						return Html::tag('span', $value, [
+							TooltipAsset::DEFAULT_ATTRIBUTE_NAME => Html::encode($model->details),
+						]);
+					}
+					return $value;
+				},
+				'format' => 'raw',
+			],
+			[
+				'attribute' => 'details',
+				'visible' => $this->withDetails,
 			],
 			[
 				'attribute' => 'problem_status',
@@ -119,12 +167,7 @@ class IssuePayCalculationGrid extends GridView {
 				'filter' => $this->problemStatusFilter(),
 				'visible' => $this->withProblems,
 			],
-			[
-				'attribute' => 'owner_id',
-				'value' => 'owner',
-				'filter' => IssuePayCalculationSearch::getOwnerNames(),
-				'visible' => $this->withOwner,
-			],
+
 			[
 				'class' => IssueTypeColumn::class,
 				'label' => Yii::t('common', 'Issue type'),
@@ -168,20 +211,46 @@ class IssuePayCalculationGrid extends GridView {
 				},
 			],
 			[
+				'pageSummary' => $this->withValueSummary,
+				'attribute' => 'value',
+				'format' => 'percent',
+				'label' => Yii::t('settlement', 'Value'),
+				'visible' => $this->isPercentageType(),
+			],
+			[
 				'class' => CurrencyColumn::class,
 				'pageSummary' => $this->withValueSummary,
 				'attribute' => 'value',
 				'contentBold' => false,
+				'visible' => $this->isValueType(),
+			],
+			[
+				'attribute' => 'payedSum',
+				'pageSummary' => $this->withValueSummary,
+				'label' => Yii::t('settlement', 'Settled Percent value'),
+				'format' => 'percent',
+				'pageSummaryFuncAsDecimal' => true,
+				'visible' => $this->isPercentageType(),
 			],
 			[
 				'class' => CurrencyColumn::class,
 				'attribute' => 'payedSum',
 				'pageSummary' => $this->withValueSummary,
+				'visible' => $this->isValueType(),
+			],
+			[
+				'attribute' => 'valueToPay',
+				'format' => 'percent',
+				'pageSummaryFuncAsDecimal' => true,
+				'label' => Yii::t('settlement', 'Percent value to Settle'),
+				'pageSummary' => $this->withValueSummary,
+				'visible' => $this->isPercentageType(),
 			],
 			[
 				'class' => CurrencyColumn::class,
 				'attribute' => 'valueToPay',
 				'pageSummary' => $this->withValueSummary,
+				'visible' => $this->isValueType(),
 			],
 			[
 				'class' => CurrencyColumn::class,
@@ -208,6 +277,12 @@ class IssuePayCalculationGrid extends GridView {
 				},
 			],
 			[
+				'attribute' => 'owner_id',
+				'value' => 'owner',
+				'filter' => IssuePayCalculationSearch::getOwnerNames(),
+				'visible' => $this->withOwner,
+			],
+			[
 				'attribute' => 'created_at',
 				'format' => 'date',
 				'noWrap' => true,
@@ -223,8 +298,20 @@ class IssuePayCalculationGrid extends GridView {
 		];
 	}
 
+	protected function isValueType(): bool {
+		return $this->type === static::TYPE_VALUE;
+	}
+
+	protected function isPercentageType(): bool {
+		return $this->type === static::TYPE_PERCENTAGE;
+	}
+
 	protected function problemStatusFilter(): array {
 		return IssuePayCalculationSearch::getProblemStatusesNames();
+	}
+
+	private function registerTooltipAssets(): void {
+		$this->view->registerJs(TooltipAsset::initScript());
 	}
 
 }

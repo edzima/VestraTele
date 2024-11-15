@@ -1,9 +1,11 @@
 <?php
 
+use common\models\settlement\SettlementType;
 use common\models\settlement\SettlementTypeOptions;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
+/** @var SettlementType $type */
 /** @var SettlementTypeOptions $model */
 
 ?>
@@ -15,7 +17,7 @@ use yii\widgets\DetailView;
 			[
 				'attribute' => 'default_value',
 				'visible' => !empty($model->default_value),
-				'format' => 'currency',
+				'format' => $type->is_percentage ? 'percent' : 'value',
 			],
 			[
 				'attribute' => 'vat',

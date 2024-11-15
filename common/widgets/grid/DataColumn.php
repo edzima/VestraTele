@@ -5,6 +5,7 @@ namespace common\widgets\grid;
 use common\assets\TooltipAsset;
 use common\helpers\Html;
 use common\widgets\GridView;
+use Decimal\Decimal;
 use kartik\grid\DataColumn as BaseDataColumn;
 
 /**
@@ -22,8 +23,21 @@ class DataColumn extends BaseDataColumn {
 	public bool $tooltip = false;
 
 	public bool $withTags = true;
+	public bool $pageSummaryFuncAsDecimal = false;
 
 	public function init() {
+		if ($this->pageSummaryFuncAsDecimal && $this->pageSummary && empty($this->pageSummaryFunc)) {
+			$this->pageSummaryFunc = static function (array $decimals): Decimal {
+				$sum = new Decimal(0);
+				foreach ($decimals as $decimal) {
+					if (is_float($decimal)) {
+						$decimal = (string) $decimal;
+					}
+					$sum = $sum->add($decimal);
+				}
+				return $sum;
+			};
+		}
 		parent::init();
 		if ($this->tooltip) {
 			$this->tooltipInit();

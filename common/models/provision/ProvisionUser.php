@@ -43,7 +43,7 @@ class ProvisionUser extends ActiveRecord {
 		return [
 			[['from_user_id', 'to_user_id', 'type_id', 'value'], 'required'],
 			[['from_user_id', 'to_user_id', 'type_id'], 'integer'],
-			[['value'], 'number', 'min' => 0],
+			[['value'], 'number'],
 			[['from_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['from_user_id' => 'id']],
 			[['to_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['to_user_id' => 'id']],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ProvisionType::class, 'targetAttribute' => ['type_id' => 'id']],
@@ -148,6 +148,9 @@ class ProvisionUser extends ActiveRecord {
 	 */
 	public function generateProvision(Decimal $value = null): Decimal {
 		if (!$this->type->is_percentage) {
+			if ($value !== null) {
+				return $this->getValue()->mul($value);
+			}
 			return $this->getValue();
 		}
 		if ($value === null) {

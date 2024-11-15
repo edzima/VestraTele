@@ -16,19 +16,11 @@ class IssuePayCalculationSearch extends BaseIssuePayCalculationSearch {
 	public $problem_status = self::PROBLEM_STATUS_NONE;
 	public bool $onlyToPayed = true;
 
-	public $excludesTypes = [
-		IssuePayCalculation::TYPE_COST_REFUND_LEGAL_REPRESANTION,
-	];
+	public ?bool $is_percentage = false;
 
 	public function __construct($userId, $config = []) {
 		parent::__construct($config);
 		$this->userId = $userId;
-	}
-
-	public function rules(): array {
-		return array_merge([
-			['!excludesTypes', 'required'],
-		], parent::rules());
 	}
 
 	public function getAgentsNames(): array {

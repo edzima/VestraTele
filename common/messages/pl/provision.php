@@ -48,7 +48,7 @@ return [
 	'Schemas provisions' => 'Schematy prowizji',
 	'Schemas provisions: {user}' => 'Schematy prowizji: {user}',
 	'Schemas provisions: {type} for {user}' => 'Schematy prowizji: {type} dla {user}',
-	'Settlement provisions: {type}' => 'Prowizjie rozliczenia: {type}',
+	'Settlement provisions: {type}' => 'Prowizje od rozliczenia: {type}',
 	'Subordinates without provisions' => 'Podwładni bez prowizji',
 	'User' => 'Użytkownik',
 	'User self schema count' => 'Ustalone (własne)',
@@ -106,6 +106,7 @@ return [
 	'Not set' => 'Nieustalono',
 	'Min Settlement Value' => 'Min. wartosć Rozliczenia',
 	'Max Settlement Value' => 'Max. wartość Rozliczenia',
+	'Provision Pay Value' => 'Wpłata',
 ];
 
 

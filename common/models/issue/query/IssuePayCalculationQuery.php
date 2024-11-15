@@ -3,6 +3,7 @@
 namespace common\models\issue\query;
 
 use common\models\issue\IssuePayCalculation;
+use common\models\settlement\SettlementType;
 use yii\db\ActiveQuery;
 
 /**
@@ -12,6 +13,18 @@ use yii\db\ActiveQuery;
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  */
 class IssuePayCalculationQuery extends ActiveQuery {
+
+	public function onlyPercentages(): self {
+		$this->joinWith('type');
+		$this->andWhere([SettlementType::tableName() . '.is_percentage' => true]);
+		return $this;
+	}
+
+	public function onlyValues(): self {
+		$this->joinWith('type');
+		$this->andWhere([SettlementType::tableName() . '.is_percentage' => false]);
+		return $this;
+	}
 
 	public function onlyTypes(array $types): self {
 		[$table, $alias] = $this->getTableNameAndAlias();
@@ -55,4 +68,5 @@ class IssuePayCalculationQuery extends ActiveQuery {
 	public function one($db = null) {
 		return parent::one($db);
 	}
+
 }

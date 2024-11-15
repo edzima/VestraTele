@@ -44,6 +44,8 @@ class IssuePayGrid extends GridView {
 
 	public ?int $userId = null;
 
+	public bool $percentageValue = false;
+
 	public array $stagesFilters = [];
 
 	public function init(): void {
@@ -158,6 +160,13 @@ class IssuePayGrid extends GridView {
 			[
 				'class' => CurrencyColumn::class,
 				'pageSummary' => true,
+				'visible' => !$this->percentageValue,
+			],
+			[
+				'attribute' => 'value',
+				'format' => 'percent',
+				'label' => Yii::t('settlement', 'Value - Percent'),
+				'visible' => $this->percentageValue,
 			],
 			[
 				'attribute' => 'deadline_at',

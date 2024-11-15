@@ -1,12 +1,12 @@
 <?php
 
 use backend\modules\settlement\models\CalculationForm;
+use common\helpers\Html;
 use common\modules\issue\widgets\IssueMessagesFormWidget;
 use common\widgets\ActiveForm;
 use common\widgets\DateWidget;
 use kartik\number\NumberControl;
 use kartik\select2\Select2;
-use yii\helpers\Html;
 use yii\web\View;
 
 /* @var $this View */
@@ -29,6 +29,7 @@ $js = <<<JS
 JS;
 
 $this->registerJs($js);
+
 ?>
 
 <div class="settlement-form">
@@ -52,11 +53,7 @@ $this->registerJs($js);
 		) ?>
 
 
-		<?= !$model->getIsNewRecord()
-			? $form->field($model, 'type_id', [
-				'options' => ['class' => 'col-md-2 col-lg-2'],
-			])->dropDownList($model->getTypesNames())
-			: '' ?>
+
 
 
 	</div>
@@ -65,11 +62,18 @@ $this->registerJs($js);
 			'options' => ['class' => 'col-xs-9 col-md-2 col-lg-2'],
 		])->widget(NumberControl::class) ?>
 
-		<?= $model->getModel()->isNewRecord
+		<?= $model->getModel()->isNewRecord && !$model->getType()->is_percentage
 			? $form->field($model, 'vat', [
 				'options' => ['class' => 'col-xs-3 col-md-1'],
 			])->widget(NumberControl::class)
 			: '' ?>
+
+		<?= !$model->getIsNewRecord()
+			? $form->field($model, 'type_id', [
+				'options' => ['class' => 'col-md-2 col-lg-2'],
+			])->dropDownList($model->getTypesNames())
+			: ''
+		?>
 
 	</div>
 
@@ -94,6 +98,13 @@ $this->registerJs($js);
 					],
 				]
 			)
+		?>
+	</div>
+
+
+	<div class="row">
+		<?= $form->field($model, 'details', ['options' => ['class' => 'col-md-6 col-lg-4']])
+			->textInput()
 		?>
 	</div>
 

@@ -22,4 +22,10 @@ return [
 		'type_id' => ProvisionFixtureHelper::TYPE_AGENT_PERCENT_25,
 		'value' => 30,
 	],
+	'nowak-self-const' => [
+		'from_user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
+		'to_user_id' => UserFixtureHelper::AGENT_PETER_NOWAK,
+		'type_id' => ProvisionFixtureHelper::TYPE_AGENT_CONST,
+		'value' => 1000,
+	],
 ];

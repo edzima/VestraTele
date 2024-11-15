@@ -13,6 +13,7 @@ class SettlementTypeForm extends Model {
 
 	public $name;
 	public $is_active;
+	public $is_percentage;
 	public $issueTypesIds;
 	private ?SettlementType $model = null;
 	private ?SettlementTypeOptions $options = null;
@@ -20,7 +21,7 @@ class SettlementTypeForm extends Model {
 	public function rules(): array {
 		return [
 			[['name', 'is_active'], 'required'],
-			[['is_active'], 'boolean'],
+			[['is_active', 'is_percentage'], 'boolean'],
 			['issueTypesIds', 'each', 'rule' => ['integer']],
 			[
 				'name', 'unique',
@@ -45,6 +46,7 @@ class SettlementTypeForm extends Model {
 		$this->name = $model->name;
 		$this->is_active = $model->is_active;
 		$this->issueTypesIds = $model->getIssueTypesIds();
+		$this->is_percentage = $model->is_percentage;
 	}
 
 	public function validate($attributeNames = null, $clearErrors = true) {
@@ -64,6 +66,7 @@ class SettlementTypeForm extends Model {
 		$model = $this->getModel();
 		$model->name = $this->name;
 		$model->is_active = $this->is_active;
+		$model->is_percentage = $this->is_percentage;
 		$model->setTypeOptions($this->getOptions());
 		$model->options = $this->getOptions()->toJson();
 		if (!$model->save()) {

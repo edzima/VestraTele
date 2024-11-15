@@ -14,7 +14,10 @@ use yii\base\InvalidCallException;
 class IssueProvisionTypeTest extends ProvisionTypeTest {
 
 	public function fixtures(): array {
-		return ProvisionFixtureHelper::issueType();
+		return array_merge(
+			ProvisionFixtureHelper::issueType(),
+			SettlementFixtureHelper::type()
+		);
 	}
 
 	public function testRequiredIssueUserTypesWithoutIssueAndTypes(): void {

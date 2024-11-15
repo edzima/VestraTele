@@ -20,6 +20,7 @@ use yii\helpers\Json;
  * @property int $id
  * @property string $name
  * @property int|null $is_active
+ * @property int $is_percentage
  * @property string|null $options
  *
  * @property IssuePayCalculation[] $issuePayCalculations
@@ -83,6 +84,7 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 			'is_active' => Yii::t('settlement', 'Is Active'),
 			'issueTypes' => Yii::t('settlement', 'Issue Types'),
 			'options' => Yii::t('settlement', 'Options'),
+			'is_percentage' => Yii::t('settlement', 'Is Percentage'),
 		];
 	}
 
@@ -177,6 +179,16 @@ class SettlementType extends ActiveRecord implements ModelRbacInterface {
 
 	public static function find(): SettlementTypeQuery {
 		return new SettlementTypeQuery(static::class);
+	}
+
+	public function getNameWithType(): string {
+		$name = $this->name;
+		if ($this->is_percentage) {
+			$name .= ' (%)';
+		} else {
+			$name .= ' (' . Yii::$app->formatter->getCurrencySymbol() . ')';
+		}
+		return $name;
 	}
 
 }

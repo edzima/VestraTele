@@ -34,6 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			//   'id',
 			'name',
 			'is_active:boolean',
+			'is_percentage:boolean',
 			[
 				'attribute' => 'issueTypes',
 				'value' => function (SettlementType $model) {
@@ -52,16 +53,17 @@ $this->params['breadcrumbs'][] = $this->title;
 			],
 			[
 				'label' => Yii::t('settlement', 'Default value'),
-				'value' => function (SettlementType $model): ?float {
-					return $model->getTypeOptions()->getDefaultValue();
+				'value' => function (SettlementType $model): ?string {
+					$value = $model->getTypeOptions()->getDefaultValue();
+					if ($value === null) {
+						return null;
+					}
+					if ($model->is_percentage) {
+						return Yii::$app->formatter->asPercent($value);
+					}
+					return Yii::$app->formatter->asCurrency($value);
 				},
-				'format' => 'currency',
-			],
-			[
-				'label' => Yii::t('settlement', 'VAT'),
-				'value' => function (SettlementType $model) {
-					return $model->getTypeOptions()->vat;
-				},
+
 			],
 			[
 				'class' => ExpandRowColumn::class,

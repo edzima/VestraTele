@@ -15,6 +15,8 @@ class ProvisionFixtureHelper extends BaseFixtureHelper {
 
 	public const TYPE_AGENT_PERCENT_25 = 1;
 
+	public const TYPE_AGENT_CONST = 100;
+
 	protected const DEFAULT_TYPE_ID = self::TYPE_AGENT_PERCENT_25;
 	protected const DEFAULT_USER_ID = UserFixtureHelper::AGENT_PETER_NOWAK;
 

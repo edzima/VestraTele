@@ -60,7 +60,7 @@ class IssueCreateSettlementButtonDropdown extends ButtonDropdown {
 
 	protected function settlementTypeItem(SettlementType $type): array {
 		return [
-			'label' => $type->name,
+			'label' => $type->getNameWithType(),
 			'url' => $this->typeUrl($type),
 		];
 	}

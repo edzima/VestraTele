@@ -38,6 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attributes' => [
 					'name',
 					'is_active:boolean',
+					'is_percentage:boolean',
 					[
 						'attribute' => 'issueTypes',
 						'value' => function (SettlementType $model) {
@@ -59,6 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 			<?= $this->render('_options-view', [
 				'model' => $model->getTypeOptions(),
+				'type' => $model,
 			]) ?>
 
 

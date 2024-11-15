@@ -53,6 +53,7 @@ YiiAsset::register($this);
 		'visibleProvisionsDetails' => $model->issue->isForUser(Yii::$app->user->getId())
 			|| $model->issue->isForAgents(Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId())),
 		'visibleSettlementType' => false,
+		'percentageValue' => $model->isPercentageType(),
 	])
 	?>
 

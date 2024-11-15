@@ -1,6 +1,7 @@
 <?php
 
 use backend\modules\settlement\widgets\IssueCostActionColumn;
+use common\models\provision\Provision;
 use common\models\provision\ProvisionReportSummary;
 use common\models\settlement\VATInfo;
 use common\widgets\grid\CurrencyColumn;
@@ -126,7 +127,7 @@ use yii\widgets\DetailView;
 			],
 			'fromUserString',
 			[
-				'label' => 'Płatność',
+				'label' => Yii::t('settlement', 'Part Info'),
 				'value' => 'pay.partInfo',
 			],
 			[
@@ -135,8 +136,13 @@ use yii\widgets\DetailView;
 			],
 			[
 				'attribute' => 'pay.valueWithoutVAT',
-				'label' => Yii::t('settlement', 'Pay Value without VAT'),
-				'format' => 'currency',
+				'label' => Yii::t('provision', 'Provision Pay Value'),
+				'value' => static function (Provision $data): string {
+					if ($data->pay->calculation->isPercentageType()) {
+						return Yii::$app->formatter->asPercent($data->pay->getValue());
+					}
+					return Yii::$app->formatter->asCurrency($data->pay->getValueWithoutVAT());
+				},
 			],
 			'provision',
 			[

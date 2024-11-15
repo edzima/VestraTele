@@ -10,7 +10,6 @@ namespace frontend\controllers;
 
 use backend\helpers\Html;
 use common\behaviors\IssueTypeParentIdAction;
-use common\components\rbac\SettlementTypeAccessManager;
 use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\user\User;
@@ -19,8 +18,8 @@ use common\models\user\Worker;
 use frontend\helpers\Url;
 use frontend\models\IssueStageChangeForm;
 use frontend\models\search\IssueCustomersSearch;
-use frontend\models\search\IssuePayCalculationSearch;
 use frontend\models\search\IssueSearch;
+use frontend\models\search\IssueViewPayCalculationSearch;
 use frontend\models\search\SummonSearch;
 use Yii;
 use yii\base\Action;
@@ -111,14 +110,7 @@ class IssueController extends Controller {
 			|| $model->isForUser(Yii::$app->user->getId())
 			|| $model->isForAgents(Yii::$app->userHierarchy->getAllChildesIds(Yii::$app->user->getId()))
 		) {
-			$search = new IssuePayCalculationSearch(Yii::$app->user->getId());
-			$search->action = SettlementTypeAccessManager::ACTION_ISSUE_VIEW;
-			$search->issue_id = $id;
-			$search->onlyToPayed = false;
-			$search->withAgents = false;
-			$search->withArchive = true;
-			$search->onlyWithPayProblems = null;
-			$search->problem_status = null;
+			$search = new IssueViewPayCalculationSearch($model, Yii::$app->user->getId());
 			$calculationsDataProvider = $search->search([]);
 		}
 		$summonDataProvider = (new SummonSearch(['issue_id' => $model->id]))->search([]);

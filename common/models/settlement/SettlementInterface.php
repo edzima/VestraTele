@@ -10,6 +10,7 @@ use yii\db\ActiveQuery;
  *
  * @property-read PayInterface[] $pays
  * @property-read CostInterface[] $costs
+ * @property-read SettlementType $type
  */
 interface SettlementInterface extends PayedInterface {
 

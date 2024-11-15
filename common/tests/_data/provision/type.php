@@ -47,5 +47,19 @@ return [
 			],
 		]),
 	],
+	'agent-const-percentage-settlement' => [
+		'name' => 'Agent Const from Percentage Settlement',
+		'id' => ProvisionFixtureHelper::TYPE_AGENT_CONST,
+		'is_percentage' => 0,
+		'is_active' => 1,
+		'value' => 100,
+		'data' => Json::encode([
+			IssueProvisionType::KEY_DATA_ISSUE_USER_TYPE => IssueUser::TYPE_AGENT,
+			IssueProvisionType::KEY_DATA_WITH_HIERARCHY => false,
+			IssueProvisionType::KEY_DATA_CALCULATION_TYPES => [
+				SettlementFixtureHelper::TYPE_ID_PERCENTAGE,
+			],
+		]),
+	],
 
 ];
