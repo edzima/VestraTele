@@ -62,6 +62,8 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public string $action;
 	public $userId;
 
+	public ?bool $is_percentage = null;
+
 	public function getTypeAccessManager(): ModelAccessManager {
 		return SettlementType::instance()
 			->getModelAccess()
@@ -74,11 +76,11 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public function rules(): array {
 		return [
 			[['issue_id', 'stage_id', 'problem_status', 'owner_id'], 'integer'],
+			[['is_percentage'], 'boolean'],
 			[['!owner_id'], 'required', 'on' => static::SCENARIO_OWNER],
-			[['type_id','excludesTypes'], 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
+			[['type_id', 'excludesTypes'], 'in', 'range' => array_keys(static::getTypesNames()), 'allowArray' => true],
 			['issue_type_id', 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
 			['issue_stage_id', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true, 'when' => function (): bool { return $this->withIssueStage; }],
-
 			['agent_id', 'in', 'range' => array_keys($this->getAgentsNames()), 'allowArray' => true],
 			['problem_status', 'in', 'range' => array_keys(static::getProblemStatusesNames())],
 			[['value'], 'number'],
@@ -92,6 +94,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 			parent::attributeLabels(),
 			[
 				'withArchive' => Yii::t('common', 'With Archive'),
+				'is_percentage' => Yii::t('settlement', '%'),
 			]
 		);
 	}
@@ -168,6 +171,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		$this->applyToPayedPaysFilter($query);
 		$this->applyWithoutProvisionsFilter($query);
 		$this->applyExcludesTypesFilter($query);
+		$this->applyIsPercentageFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -302,6 +306,11 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		if (!empty($this->excludesTypes)) {
 			$query->andWhere(['NOT IN', IssuePayCalculation::tableName() . '.type_id', $this->excludesTypes]);
 		}
+	}
+
+	private function applyIsPercentageFilter(IssuePayCalculationQuery $query): void {
+		$query->joinWith('type');
+		$query->andFilterWhere([SettlementType::tableName() . '.is_percentage' => $this->is_percentage]);
 	}
 
 }

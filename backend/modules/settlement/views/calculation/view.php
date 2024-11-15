@@ -98,61 +98,71 @@ YiiAsset::register($this);
 
 	</p>
 
-	<?= SettlementDetailView::widget([
-		'model' => $model,
-	]) ?>
+	<div class="row">
+		<div class="col-md-7 col-lg-6">
+			<?= SettlementDetailView::widget([
+				'model' => $model,
+			]) ?>
+			<?= IssuePayGrid::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getPays(),
+				]),
+				'visibleAgent' => false,
+				'visibleCustomer' => false,
+				'caption' => Yii::t('settlement', 'Pays'),
+				'summary' => '',
+				'visibleProvisionsDetails' => Yii::$app->user->can(User::PERMISSION_PROVISION) || $model->issue->isForUser(Yii::$app->user->getId()),
+				'visibleSettlementType' => false,
+				'visibleIssueType' => false,
+				'percentageValue' => $model->isPercentageType(),
+			])
+			?>
 
-	<?= IssuePayGrid::widget([
-		'dataProvider' => new ActiveDataProvider([
-			'query' => $model->getPays(),
-		]),
-		'visibleAgent' => false,
-		'visibleCustomer' => false,
-		'caption' => Yii::t('settlement', 'Pays'),
-		'summary' => '',
-		'visibleProvisionsDetails' => Yii::$app->user->can(User::PERMISSION_PROVISION) || $model->issue->isForUser(Yii::$app->user->getId()),
-		'visibleSettlementType' => false,
-		'visibleIssueType' => false,
-	])
-	?>
+		</div>
+		<div class="col-md-5 col-lg-6">
 
-	<?= GridView::widget([
-		'dataProvider' => new ActiveDataProvider([
-			'query' => $model->getCosts()->joinWith('user.userProfile'),
-		]),
-		'summary' => '',
-		'showPageSummary' => true,
-		'caption' => Yii::t('settlement', 'Costs'),
-		'columns' => [
-			'typeName',
-			'user',
-			'vatPercent:text:' . Yii::t('settlement', 'VAT (%)'),
-			[
-				'class' => CurrencyColumn::class,
-				'attribute' => 'valueWithoutVAT',
-				'pageSummary' => true,
-				'pageSummaryFunc' => static function (array $decimals): Decimal {
-					$sum = new Decimal(0);
-					foreach ($decimals as $decimal) {
-						$sum = $sum->add($decimal);
-					}
-					return $sum;
-				},
-			],
-			[
-				'class' => CurrencyColumn::class,
-				'attribute' => 'valueWithVAT',
-				'pageSummary' => true,
-				'pageSummaryFunc' => static function (array $decimals): Decimal {
-					$sum = new Decimal(0);
-					foreach ($decimals as $decimal) {
-						$sum = $sum->add($decimal);
-					}
-					return $sum;
-				},
-			],
-		],
-	]) ?>
+			<?= GridView::widget([
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getCosts()->joinWith('user.userProfile'),
+				]),
+				'summary' => '',
+				'showPageSummary' => true,
+				'caption' => Yii::t('settlement', 'Costs'),
+				'columns' => [
+					'typeName',
+					'user',
+					'vatPercent:text:' . Yii::t('settlement', 'VAT (%)'),
+					[
+						'class' => CurrencyColumn::class,
+						'attribute' => 'valueWithoutVAT',
+						'pageSummary' => true,
+						'pageSummaryFunc' => static function (array $decimals): Decimal {
+							$sum = new Decimal(0);
+							foreach ($decimals as $decimal) {
+								$sum = $sum->add($decimal);
+							}
+							return $sum;
+						},
+					],
+					[
+						'class' => CurrencyColumn::class,
+						'attribute' => 'valueWithVAT',
+						'pageSummary' => true,
+						'pageSummaryFunc' => static function (array $decimals): Decimal {
+							$sum = new Decimal(0);
+							foreach ($decimals as $decimal) {
+								$sum = $sum->add($decimal);
+							}
+							return $sum;
+						},
+					],
+				],
+			]) ?>
+		</div>
+
+
+	</div>
+
 
 	<?= IssueNotesWidget::widget([
 		'model' => $model->issue,

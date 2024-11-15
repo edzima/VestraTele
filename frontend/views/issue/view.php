@@ -8,10 +8,10 @@ use common\modules\issue\widgets\IssueViewWidget;
 use common\modules\issue\widgets\SummonDocsWidget;
 use frontend\helpers\Breadcrumbs;
 use frontend\helpers\Html;
+use frontend\widgets\issue\IssueSettlementsGrid;
 use frontend\widgets\issue\IssueSmsButtonDropdown;
 use frontend\widgets\issue\StageChangeButtonDropdown;
 use frontend\widgets\issue\SummonCreateButtonDropdown;
-use frontend\widgets\IssuePayCalculationGrid;
 use frontend\widgets\SummonGrid;
 use yii\data\DataProviderInterface;
 
@@ -22,7 +22,6 @@ use yii\data\DataProviderInterface;
 
 $this->title = $model->longId;
 $this->params['breadcrumbs'] = Breadcrumbs::issue($model, false);
-
 ?>
 <div class="issue-view">
 
@@ -83,16 +82,8 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model, false);
 
 
 	<?= $calculationsDataProvider !== null
-	&& $calculationsDataProvider->getTotalCount() > 0
-		? IssuePayCalculationGrid::widget([
+		? IssueSettlementsGrid::widget([
 			'dataProvider' => $calculationsDataProvider,
-			'withIssue' => false,
-			'withAgent' => false,
-			'withCaption' => true,
-			'withIssueType' => false,
-			'withCustomer' => false,
-			'withDates' => false,
-			'userProvisionsId' => Yii::$app->user->getId(),
 		])
 		: ''
 	?>

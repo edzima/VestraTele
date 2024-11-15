@@ -42,6 +42,8 @@ class SettlementFixtureHelper extends BaseFixtureHelper {
 	public const TYPE_ID_HONORARIUM = 30;
 	public const TYPE_ID_LAWYER = 40;
 	public const TYPE_ID_NOT_ACTIVE = 50;
+
+	public const TYPE_ID_PERCENTAGE = 100;
 	public const COST_TYPE_ID_OFFICE = 20;
 
 	public const COST_TYPE_PURCHASE_OF_RECEIVABLES = 30;

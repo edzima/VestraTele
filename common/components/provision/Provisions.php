@@ -113,6 +113,12 @@ class Provisions extends Component {
 					]), __METHOD__);
 				$form->typeId = $type->id;
 				$provisions[] = $this->generateProvisionsData($form->getData(), $form->getPaysValues());
+			} else {
+				Yii::warning([
+					'msg' => 'Types count: ' . $typesCount,
+					'settlementType' => $form->getModel()->getTypeName(),
+					'userWithType' => $form->getIssueUser()->getTypeWithUser(),
+				], __METHOD__);
 			}
 		}
 
@@ -164,7 +170,11 @@ class Provisions extends Component {
 				$model = ProvisionUser::createFromBaseType($model, $type);
 			}
 			foreach ($pays as $payId => $payValue) {
-				$provisions[] = $this->generateData($payId, $model, $payValue);
+				$provisions[] = $this->generateData(
+					$payId,
+					$model,
+					$payValue
+				);
 			}
 		}
 		if ($type->getWithHierarchy()) {

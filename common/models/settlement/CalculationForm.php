@@ -7,14 +7,15 @@ use common\models\entityResponsible\EntityResponsible;
 use common\models\issue\Issue;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
+use common\models\issue\IssueSettlement;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 
 class CalculationForm extends PayForm {
 
-	public const PROVIDER_TYPE_RESPONSIBLE_ENTITY = IssuePayCalculation::PROVIDER_RESPONSIBLE_ENTITY;
-	public const PROVIDER_TYPE_CLIENT = IssuePayCalculation::PROVIDER_CLIENT;
+	public const PROVIDER_TYPE_RESPONSIBLE_ENTITY = IssueSettlement::PROVIDER_RESPONSIBLE_ENTITY;
+	public const PROVIDER_TYPE_CLIENT = IssueSettlement::PROVIDER_CLIENT;
 
 	private Issue $issue;
 	private int $owner;
@@ -24,6 +25,8 @@ class CalculationForm extends PayForm {
 	public $costs_ids = [];
 
 	public $entityProviderId;
+
+	public $details;
 
 	private ?IssuePayCalculation $model = null;
 	private ?SettlementType $settlementType = null;
@@ -57,6 +60,9 @@ class CalculationForm extends PayForm {
 				return $this->providerType === static::PROVIDER_TYPE_RESPONSIBLE_ENTITY;
 			}, 'enableClientValidation' => false,
 			],
+			[['details'], 'string'],
+			[['details'], 'trim'],
+			[['details'], 'default', 'value' => null],
 			['type_id', 'in', 'range' => array_keys($this->getTypesNames())],
 			['costs_ids', 'in', 'range' => array_keys($this->getCostsData()), 'allowArray' => true],
 			['providerType', 'in', 'range' => array_keys(IssuePayCalculation::getProvidersTypesNames())],
@@ -73,12 +79,21 @@ class CalculationForm extends PayForm {
 	}
 
 	public function attributeLabels(): array {
-		return array_merge([
+		return array_merge(parent::attributeLabels(), [
 			'providerType' => Yii::t('settlement', 'Provider'),
 			'costs_ids' => Yii::t('settlement', 'Costs'),
 			'entityProviderId' => Yii::t('settlement', 'Entity responsible'),
 			'type_id' => Yii::t('settlement', 'Type'),
-		], parent::attributeLabels());
+			'details' => Yii::t('settlement', 'Details'),
+			'value' => $this->getType()->is_percentage ? Yii::t('settlement', 'Value') : Yii::t('settlement', 'Value with VAT'),
+		]);
+	}
+
+	public function getType(): ?SettlementType {
+		if ($this->settlementType === null || $this->settlementType !== $this->type_id) {
+			$this->settlementType = SettlementType::getModels()[$this->type_id] ?? null;
+		}
+		return $this->settlementType;
 	}
 
 	public function setType(SettlementType $type, bool $withTypeOptions): void {
@@ -118,6 +133,7 @@ class CalculationForm extends PayForm {
 		$this->owner = $model->owner_id;
 		$this->costs_ids = ArrayHelper::getColumn($model->costs, 'id');
 		$this->providerType = $model->provider_type;
+		$this->details = $model->details;
 		if ($model->provider_type === static::PROVIDER_TYPE_RESPONSIBLE_ENTITY) {
 			$this->entityProviderId = $model->provider_id;
 		}
@@ -170,6 +186,7 @@ class CalculationForm extends PayForm {
 		$model->value = $this->getValue()->toFixed(2);
 		$model->type_id = $this->type_id;
 		$model->provider_type = $this->providerType;
+		$model->details = $this->details;
 		$model->provider_id = $this->getProviderId();
 		if (!$model->save(false)) {
 			return false;

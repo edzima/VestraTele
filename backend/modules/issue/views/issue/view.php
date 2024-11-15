@@ -3,12 +3,12 @@
 use backend\helpers\Breadcrumbs;
 use backend\helpers\Html;
 use backend\modules\issue\widgets\IssueCreateSettlementButtonDropdown;
+use backend\modules\issue\widgets\IssueSettlementsGrid;
 use backend\modules\issue\widgets\IssueSmsButtonDropdown;
 use backend\modules\issue\widgets\IssueViewSummonsWidgets;
 use backend\modules\issue\widgets\IssueViewTopSummonsWidgets;
 use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\modules\issue\widgets\SummonCreateButtonDropdown;
-use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\issue\Issue;
 use common\models\issue\IssueClaim;
 use common\models\user\User;
@@ -245,20 +245,22 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 		'hideOnAllAreConfirmed' => true,
 	]) ?>
 
-	<?= $calculationsDataProvider->getTotalCount() > 0
-		? IssuePayCalculationGrid::widget([
-			'dataProvider' => $calculationsDataProvider,
-			'caption' => Yii::t('settlement', 'Settlements'),
+	<?= IssueSettlementsGrid::widget([
+		'dataProvider' => $calculationsDataProvider,
+		'gridOptions' => [
 			'withIssue' => false,
 			'summary' => '',
 			'withAgent' => false,
 			'withIssueType' => false,
 			'withCustomer' => false,
 			'withDates' => false,
-		])
-		: ''
-	?>
-
+			'withDetails' => true,
+			'showOnEmpty' => false,
+			'emptyText' => false,
+			'withCaption' => true,
+			'withProblems' => false,
+		],
+	]) ?>
 
 
 	<?= IssueViewWidget::widget([

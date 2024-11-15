@@ -10,6 +10,7 @@ use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\issue\IssueSettlement;
 use common\models\issue\IssueUser;
+use common\models\provision\ProvisionUser;
 use common\models\provision\SettlementUserProvisionsForm;
 use common\tests\unit\Unit;
 use Decimal\Decimal;
@@ -32,6 +33,7 @@ class SettlementUserProvisionsFormTest extends Unit {
 			IssueFixtureHelper::users(),
 			SettlementFixtureHelper::owner(),
 			SettlementFixtureHelper::settlement(),
+			SettlementFixtureHelper::type(),
 			SettlementFixtureHelper::pay(),
 			SettlementFixtureHelper::cost(true),
 			ProvisionFixtureHelper::issueType(),
@@ -114,6 +116,8 @@ class SettlementUserProvisionsFormTest extends Unit {
 		$pays = $this->model->getPaysValues();
 		$this->assertCount(1, $pays);
 		$pay = reset($pays);
+		codecept_debug($pay);
+		codecept_debug($this->getNettoValue());
 		$this->assertTrue($this->getNettoValue()->equals($pay));
 	}
 
@@ -125,6 +129,28 @@ class SettlementUserProvisionsFormTest extends Unit {
 		$this->giveForm();
 		$pays = $this->model->getPaysValues();
 		$this->assertEmpty($pays);
+	}
+
+	public function testFullPercentageSettlement(): void {
+		$this->value = 1;
+		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_PERCENTAGE);
+		$this->givePays();
+		$this->giveForm();
+		$this->model->getData();
+		$userProvision = $this->getUserProvision('nowak-self-const');
+		$provisionSum = $this->model->getProvisionsSum($userProvision);
+		$this->tester->assertTrue($provisionSum->equals(new Decimal(1000)));
+	}
+
+	public function testHalfPercentageSettlement(): void {
+		$this->value = 0.5;
+		$this->giveSettlement(SettlementFixtureHelper::TYPE_ID_PERCENTAGE);
+		$this->givePays();
+		$this->giveForm();
+		$this->model->getData();
+		$userProvision = $this->getUserProvision('nowak-self-const');
+		$provisionSum = $this->model->getProvisionsSum($userProvision);
+		$this->tester->assertTrue($provisionSum->equals(new Decimal(500)));
 	}
 
 	private function giveSettlement(string $type) {
@@ -172,6 +198,9 @@ class SettlementUserProvisionsFormTest extends Unit {
 		if (!isset($attributes['type_id'])) {
 			$attributes['type_id'] = SettlementFixtureHelper::COST_TYPE_ID_OFFICE;
 		}
+		if (!isset($attributes['creator_id'])) {
+			$attributes['creator_id'] = SettlementFixtureHelper::OWNER_JOHN;
+		}
 		$attributes['value'] = $value;
 		$attributes['issue_id'] = $this->settlement->getIssueId();
 		$costId = $this->tester->haveRecord(IssueCost::class, $attributes);
@@ -190,6 +219,10 @@ class SettlementUserProvisionsFormTest extends Unit {
 
 	private function getVAT(): Decimal {
 		return new Decimal($this->vat);
+	}
+
+	private function getUserProvision(string $fixtureIndex): ProvisionUser {
+		return $this->tester->grabFixture(ProvisionFixtureHelper::USER, $fixtureIndex);
 	}
 
 }

@@ -28,4 +28,9 @@ return [
 		'value' => 1230,
 		'type_id' => SettlementFixtureHelper::TYPE_ID_HONORARIUM,
 	],
+	'percentage-half' => [
+		'issue_id' => 1,
+		'value' => 0.5,
+		'type_id' => SettlementFixtureHelper::TYPE_ID_PERCENTAGE,
+	],
 ];

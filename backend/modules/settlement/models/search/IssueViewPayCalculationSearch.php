@@ -13,6 +13,8 @@ class IssueViewPayCalculationSearch extends IssuePayCalculationSearch {
 
 	public string $action = SettlementTypeAccessManager::ACTION_ISSUE_VIEW;
 
+	public ?bool $is_percentage = null;
+
 	public function __construct(int $issueId, $userId, array $config = []) {
 		parent::__construct($userId, $config);
 		$this->issue_id = $issueId;

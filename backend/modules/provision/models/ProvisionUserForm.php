@@ -45,7 +45,7 @@ class ProvisionUserForm extends Model {
 			[['type_id', 'from_user_id', 'to_user_id'], 'integer'],
 			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
 			[
-				'value', 'number', 'min' => 0,
+				'value', 'number',
 			],
 			[
 				'value', 'number', 'max' => 100, 'enableClientValidation' => false,
@@ -129,6 +129,7 @@ class ProvisionUserForm extends Model {
 
 	public function save(): bool {
 		if (!$this->validate()) {
+			Yii::warning($this->errors, __METHOD__);
 			return false;
 		}
 		$model = $this->getModel();
@@ -138,7 +139,11 @@ class ProvisionUserForm extends Model {
 		$model->type_id = $this->type_id;
 		$model->from_at = $this->from_at;
 		$model->to_at = $this->to_at;
-		return $model->save();
+		if ($model->save()) {
+			return true;
+		}
+		Yii::warning($model->getErrors(), __METHOD__);
+		return false;
 	}
 
 	public function getName(): string {

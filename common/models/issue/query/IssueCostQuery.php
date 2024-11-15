@@ -3,6 +3,8 @@
 namespace common\models\issue\query;
 
 use common\models\issue\IssueCost;
+use common\models\settlement\CostType;
+use Yii;
 use yii\db\ActiveQuery;
 
 /**
@@ -82,6 +84,19 @@ class IssueCostQuery extends ActiveQuery {
 	 */
 	public function one($db = null) {
 		return parent::one($db);
+	}
+
+	public function userAccessTypes(string|int $userId, string $action, string $app = null): self {
+		if ($app === null) {
+			$app = Yii::$app->id;
+		}
+		$ids = CostType::instance()
+			->getModelAccess()
+			->setApp($app)
+			->setAction($action)
+			->getUserIds($userId);
+		$this->andWhere([IssueCost::tableName() . '.type_id' => $ids]);
+		return $this;
 	}
 
 }

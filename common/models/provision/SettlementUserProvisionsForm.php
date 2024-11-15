@@ -2,6 +2,7 @@
 
 namespace common\models\provision;
 
+use common\models\issue\IssuePayInterface;
 use common\models\issue\IssueSettlement;
 use common\models\issue\IssueUser;
 use common\models\settlement\CostType;
@@ -32,7 +33,7 @@ class SettlementUserProvisionsForm extends Model {
 				array_filter(
 					CostType::getModels(),
 					function (CostType $costType) {
-						return $costType->is_for_settlement;
+						return $costType->is_active && $costType->is_for_settlement;
 					})
 			);
 		}
@@ -139,7 +140,7 @@ class SettlementUserProvisionsForm extends Model {
 			$excludedTypes = false;
 		}
 		foreach ($costs as $cost) {
-			if (!$excludedTypes || !in_array($cost->type, $this->excludedIssueCostTypes, true)) {
+			if (!$excludedTypes || !in_array($cost->type_id, $this->excludedIssueCostTypes, true)) {
 				$sum = $sum->add($this->getCostValue($cost));
 			}
 		}
@@ -150,7 +151,10 @@ class SettlementUserProvisionsForm extends Model {
 		return $provisionUser->generateProvision($this->getPaysSumWithoutGeneralCosts());
 	}
 
-	public function getPayValue(VATInfo $pay): Decimal {
+	public function getPayValue(IssuePayInterface $pay): Decimal {
+		if ($this->model->type->is_percentage) {
+			return $pay->getValue();
+		}
 		return $this->payWithVAT ? $pay->getValueWithVAT() : $pay->getValueWithoutVAT();
 	}
 
@@ -182,7 +186,6 @@ class SettlementUserProvisionsForm extends Model {
 		if (empty($this->model->pays)) {
 			return [];
 		}
-
 		$pays = [];
 		$costsSum = $this->getGeneralCostsSum(true);
 		$subCosts = new Decimal(0);
@@ -190,6 +193,7 @@ class SettlementUserProvisionsForm extends Model {
 			$payValue = $this->getPayValue($pay);
 			if ($subCosts < $costsSum) {
 				if ($payValue > $costsSum) {
+
 					$subCosts = $costsSum;
 					$payValue = $payValue->sub($costsSum);
 				} else {

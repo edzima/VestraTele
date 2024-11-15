@@ -23,4 +23,10 @@ return [
 		'name' => 'Not active',
 		'is_active' => false,
 	],
+	[
+		'id' => SettlementFixtureHelper::TYPE_ID_PERCENTAGE,
+		'name' => 'Percentage',
+		'is_active' => true,
+		'is_percentage' => true,
+	],
 ];

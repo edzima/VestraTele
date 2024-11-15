@@ -36,6 +36,7 @@ class ProvisionComponentTest extends Unit {
 			ProvisionFixtureHelper::type(),
 			SettlementFixtureHelper::pay(codecept_data_dir() . 'provision/'),
 			SettlementFixtureHelper::settlement(codecept_data_dir() . 'provision/'),
+			SettlementFixtureHelper::type(),
 		);
 	}
 

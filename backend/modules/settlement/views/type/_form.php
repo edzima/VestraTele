@@ -20,6 +20,8 @@ use yii\helpers\Html;
 
 			<?= $form->field($model, 'is_active')->checkbox() ?>
 
+			<?= $form->field($model, 'is_percentage')->checkbox() ?>
+
 			<?= $form->field($model, 'issueTypesIds')->widget(
 				Select2::class, [
 				'data' => $model->getIssueTypesNames(),

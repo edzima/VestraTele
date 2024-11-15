@@ -22,6 +22,8 @@ class SettlementDetailView extends DetailView {
 	public ?string $typeRoute = null;
 	public bool $withOwner = true;
 
+	public bool $withDetails = true;
+
 	public bool $withCreatedAt = false;
 	public bool $withValueWithoutCosts = false;
 
@@ -65,6 +67,10 @@ class SettlementDetailView extends DetailView {
 				'visible' => $this->withType,
 			],
 			[
+				'attribute' => 'details',
+				'visible' => $this->withDetails && !empty($this->model->details),
+			],
+			[
 				'attribute' => 'stageName',
 				'label' => Yii::t('settlement', 'Stage on create'),
 				'visible' => $this->model->stage_id !== $this->model->issue->stage_id,
@@ -84,9 +90,10 @@ class SettlementDetailView extends DetailView {
 				'attribute' => 'owner',
 				'visible' => $this->withOwner,
 			],
+
 			[
 				'attribute' => 'value',
-				'format' => 'currency',
+				'format' => $this->valueFormat(),
 			],
 			[
 				'attribute' => 'costsSum',
@@ -95,12 +102,12 @@ class SettlementDetailView extends DetailView {
 			],
 			[
 				'attribute' => 'valueWithoutCosts',
-				'format' => 'currency',
+				'format' => $this->valueFormat(),
 				'visible' => $this->model->hasCosts,
 			],
 			[
 				'attribute' => 'valueToPay',
-				'format' => 'currency',
+				'format' => $this->valueFormat(),
 				'visible' => !$this->model->isPayed(),
 			],
 			[
@@ -125,6 +132,12 @@ class SettlementDetailView extends DetailView {
 				'format' => 'date',
 			],
 		];
+	}
+
+	protected function valueFormat(): string {
+		return $this->model->isPercentageType()
+			? 'percent'
+			: 'currency';
 	}
 
 }
