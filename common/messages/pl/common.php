@@ -388,5 +388,5 @@ return [
 	'Send further instructions to Emai: {email}' => 'Wysłano instrukcje resetu hasła na E-mail: {email}',
 	'Username / Email' => 'Login / E-mail',
 	'Parent category' => 'Kategoria nadrzędna',
-
+	'Success add SMS: {message} to send queue.' => 'SMS:<br>{message}<br><br>skierowano do wysłania.',
 ];
