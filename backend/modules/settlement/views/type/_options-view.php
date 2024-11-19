@@ -17,7 +17,7 @@ use yii\widgets\DetailView;
 			[
 				'attribute' => 'default_value',
 				'visible' => !empty($model->default_value),
-				'format' => $type->is_percentage ? 'percent' : 'value',
+				'format' => $type->is_percentage ? 'percent' : 'currency',
 			],
 			[
 				'attribute' => 'vat',

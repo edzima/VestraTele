@@ -247,19 +247,6 @@ $this->params['breadcrumbs'] = Breadcrumbs::issue($model);
 
 	<?= IssueSettlementsGrid::widget([
 		'dataProvider' => $calculationsDataProvider,
-		'gridOptions' => [
-			'withIssue' => false,
-			'summary' => '',
-			'withAgent' => false,
-			'withIssueType' => false,
-			'withCustomer' => false,
-			'withDates' => false,
-			'withDetails' => true,
-			'showOnEmpty' => false,
-			'emptyText' => false,
-			'withCaption' => true,
-			'withProblems' => false,
-		],
 	]) ?>
 
 

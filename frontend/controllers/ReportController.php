@@ -35,7 +35,7 @@ class ReportController extends Controller {
 		$searchModel = new ProvisionReportSearch();
 		$searchModel->excludedFromUsers = UserVisible::hiddenUsers(Yii::$app->user->getId());
 		$searchModel->to_user_id = $currentUserId;
-		$searchModel->withoutEmpty = true;
+		$searchModel->withoutEmpty = false;
 		if ($user_id !== null && $user_id !== $currentUserId) {
 			if (in_array($user_id, (array) $searchModel->excludedFromUsers)) {
 				Yii::warning("User: $currentUserId try view provision report for excluded user: " . $user_id);

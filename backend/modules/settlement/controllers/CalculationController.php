@@ -154,7 +154,9 @@ class CalculationController extends Controller {
 				if (empty($pay->provisions)) {
 					Yii::$app->session->addFlash('warning',
 						Yii::t('backend', 'Pay: {value} dont has provisions.', [
-							'value' => Yii::$app->formatter->asCurrency($pay->getValue()),
+							'value' => $model->type->is_percentage
+								? Yii::$app->formatter->asPercent($pay->getValue())
+								: Yii::$app->formatter->asCurrency($pay->getValue()),
 						])
 					);
 				}

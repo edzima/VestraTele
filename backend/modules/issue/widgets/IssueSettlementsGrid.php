@@ -21,5 +21,6 @@ class IssueSettlementsGrid extends SettlementsGrids {
 		'emptyText' => false,
 		'withCaption' => true,
 		'withProblems' => false,
+		'withIsPercentage' => false,
 	];
 }

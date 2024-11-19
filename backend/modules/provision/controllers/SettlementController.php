@@ -186,7 +186,11 @@ class SettlementController extends Controller {
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 
 			try {
-				$provisions = Yii::$app->provisions->generateProvisionsData($model->getData(), $model->getPaysValues());
+				$provisions = Yii::$app->provisions->generateProvisionsData(
+					$model->getData(),
+					$model->getPaysValues(),
+					$settlement->type->is_percentage
+				);
 				$count = Yii::$app->provisions->batchInsert($provisions);
 				if ($count === 0) {
 					Flash::add(Flash::TYPE_WARNING,

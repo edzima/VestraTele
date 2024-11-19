@@ -45,6 +45,7 @@ class RbacController extends Controller {
 		Worker::ROLE_AUDITOR,
 		Worker::ROLE_AUDITOR_INNER,
 		SettlementModule::ROLE_COST_TYPE_MANAGER,
+		SettlementModule::ROLE_SETTLEMENT_TYPE_MANAGER,
 	];
 
 	public array $permissions = [
@@ -169,7 +170,6 @@ class RbacController extends Controller {
 		Worker::PERMISSION_MESSAGE_TEMPLATE,
 		Worker::PERMISSION_PROVISION_CHILDREN_VISIBLE,
 		Worker::PERMISSION_SETTLEMENT_ADMINISTRATIVE_CREATE,
-		Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER,
 		Worker::PERMISSION_SETTLEMENT_DELETE_NOT_SELF,
 		Worker::PERMISSION_CREDIT_ANALYZE,
 		Worker::PERMISSION_COURT,

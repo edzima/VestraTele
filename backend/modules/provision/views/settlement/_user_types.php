@@ -59,7 +59,7 @@ use yii\web\View;
 					}
 					if (empty($selfies)) {
 						return Html::a(
-							Yii::t('provision', 'Not set'),
+							Html::icon('plus') . ' ' . Yii::t('provision', 'Not set'),
 							['user/create-self', 'userId' => $model->getIssueUser()->user_id, 'typeId' => $data->type->id],
 							[
 								'class' => 'text-danger',

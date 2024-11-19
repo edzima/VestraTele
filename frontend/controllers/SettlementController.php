@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\components\provision\exception\Exception;
+use common\components\rbac\SettlementTypeAccessManager;
 use common\models\issue\IssuePay;
 use common\models\issue\IssuePayCalculation;
 use common\models\settlement\PaysForm;
@@ -59,7 +60,7 @@ class SettlementController extends Controller {
 		Url::remember();
 
 		return $this->render('view', [
-			'model' => $this->findModel($id),
+			'model' => $this->findModel($id, SettlementTypeAccessManager::ACTION_VIEW),
 		]);
 	}
 
@@ -68,7 +69,7 @@ class SettlementController extends Controller {
 			throw new ForbiddenHttpException();
 		}
 
-		$calculation = $this->findModel($id);
+		$calculation = $this->findModel($id, SettlementTypeAccessManager::ACTION_PAYS);
 		if ($calculation->isPayed()) {
 			Yii::$app->session->addFlash('Warning', 'Only in not payed calculation can be generate pays.');
 			return $this->redirect(['view', 'id' => $id]);
@@ -114,12 +115,12 @@ class SettlementController extends Controller {
 	 * @return IssuePayCalculation
 	 * @throws NotFoundHttpException
 	 */
-	private function findModel(int $id): IssuePayCalculation {
+	private function findModel(int $id, string $action): IssuePayCalculation {
 		$model = IssuePayCalculation::findOne($id);
 		if ($model === null || !Yii::$app->user->canSeeIssue($model)) {
 			throw new NotFoundHttpException();
 		}
-		if (!$model->type->hasAccess(Yii::$app->user->getId())) {
+		if (!$model->type->hasAccess(Yii::$app->user->getId(), $action)) {
 			throw new ForbiddenHttpException();
 		}
 		return $model;

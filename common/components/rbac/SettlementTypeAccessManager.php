@@ -2,6 +2,7 @@
 
 namespace common\components\rbac;
 
+use backend\modules\settlement\Module;
 use common\models\settlement\SettlementType;
 use common\models\user\Worker;
 
@@ -12,7 +13,7 @@ class SettlementTypeAccessManager extends ModelAccessManager implements IssueVie
 	public string $action = self::ACTION_ISSUE_VIEW;
 
 	public array $availableParentRoles = Worker::ROLES;
-	public ?string $managerPermission = Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER;
+	public ?string $managerPermission = Module::ROLE_SETTLEMENT_TYPE_MANAGER;
 	public array $availableParentPermissions = [
 		Worker::PERMISSION_ISSUE,
 		Worker::PERMISSION_COST,

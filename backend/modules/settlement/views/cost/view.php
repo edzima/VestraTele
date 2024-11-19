@@ -1,5 +1,6 @@
 <?php
 
+use backend\modules\settlement\Module;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\issue\IssueCost;
 use yii\data\ActiveDataProvider;
@@ -48,6 +49,19 @@ YiiAsset::register($this);
 	<?= DetailView::widget([
 		'model' => $model,
 		'attributes' => [
+			[
+				'attribute' => 'type',
+				'value' => function (IssueCost $model) {
+					$value = $model->typeName;
+					if (Yii::$app->user->can(
+						Module::ROLE_COST_TYPE_MANAGER
+					)) {
+						return Html::a($value, ['cost-type/view', 'id' => $model->type_id]);
+					}
+					return $value;
+				},
+				'format' => 'html',
+			],
 			[
 				'attribute' => 'user',
 				'visible' => $model->user,

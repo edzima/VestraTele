@@ -11,6 +11,7 @@ class Module extends BaseModule {
 	public $controllerNamespace = 'backend\modules\settlement\controllers';
 
 	public const ROLE_COST_TYPE_MANAGER = 'settlement.cost.manager';
+	public const ROLE_SETTLEMENT_TYPE_MANAGER = 'settlement.type.manager';
 
 	public function behaviors(): array {
 		return [
@@ -47,7 +48,7 @@ class Module extends BaseModule {
 					[
 						'allow' => true,
 						'controllers' => ['settlement/type'],
-						'permissions' => [Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER],
+						'permissions' => [static::ROLE_SETTLEMENT_TYPE_MANAGER],
 					],
 					[
 						'allow' => true,

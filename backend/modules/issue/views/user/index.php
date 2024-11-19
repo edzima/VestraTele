@@ -12,6 +12,7 @@ use yii\helpers\Html;
 /* @var $dataProvider ActiveDataProvider */
 
 $this->title = Yii::t('backend', 'Issues Users');
+
 $this->params['breadcrumbs'][] = ['label' => Yii::t('backend', 'Issues'), 'url' => ['/issue/issue/index']];
 
 $this->params['breadcrumbs'][] = $this->title;

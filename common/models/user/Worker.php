@@ -31,6 +31,7 @@ class Worker extends User implements ActiveHierarchy {
 		self::ROLE_AUDITOR,
 		self::ROLE_AUDITOR_INNER,
 		SettlementModule::ROLE_COST_TYPE_MANAGER,
+		SettlementModule::ROLE_SETTLEMENT_TYPE_MANAGER,
 	];
 	public const PERMISSION_ENTITY_RESPONSIBLE_MANAGER = 'entity_responsible.manager';
 

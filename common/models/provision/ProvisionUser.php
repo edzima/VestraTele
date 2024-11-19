@@ -146,9 +146,9 @@ class ProvisionUser extends ActiveRecord {
 	 * @param Decimal|null $value
 	 * @return Decimal
 	 */
-	public function generateProvision(Decimal $value = null): Decimal {
+	public function generateProvision(Decimal $value = null, bool $mul = false): Decimal {
 		if (!$this->type->is_percentage) {
-			if ($value !== null) {
+			if ($value !== null && $mul) {
 				return $this->getValue()->mul($value);
 			}
 			return $this->getValue();

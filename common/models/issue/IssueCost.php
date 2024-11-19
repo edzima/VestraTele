@@ -93,8 +93,9 @@ class IssueCost extends ActiveRecord implements IssueCostInterface {
 	public function attributeLabels(): array {
 		return array_merge($this->vatAttributeLabels(), [
 			'id' => 'ID',
-			'issue_id' => Yii::t('common', 'Issue'),
-			'type_id' => Yii::t('common', 'Type'),
+			'issue_id' => Yii::t('issue', 'Issue'),
+			'type_id' => Yii::t('settlement', 'Type'),
+			'type' => Yii::t('settlement', 'Type'),
 			'typeName' => Yii::t('common', 'Type'),
 			'value' => Yii::t('common', 'Value with VAT'),
 			'vat' => 'VAT (%)',

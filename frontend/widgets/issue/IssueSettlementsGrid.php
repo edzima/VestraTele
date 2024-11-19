@@ -19,6 +19,8 @@ class IssueSettlementsGrid extends SettlementsGrids {
 		'withDates' => false,
 		'showOnEmpty' => false,
 		'emptyText' => false,
+		'summary' => '',
+		'withIsPercentage' => false,
 	];
 
 	public function init(): void {

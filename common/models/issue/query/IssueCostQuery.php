@@ -94,7 +94,7 @@ class IssueCostQuery extends ActiveQuery {
 			->getModelAccess()
 			->setApp($app)
 			->setAction($action)
-			->getUserIds($userId);
+			->getIds($userId);
 		$this->andWhere([IssueCost::tableName() . '.type_id' => $ids]);
 		return $this;
 	}

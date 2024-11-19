@@ -53,6 +53,7 @@ class IssuePayCalculationGrid extends GridView {
 	public bool $filterType = false;
 
 	public bool $detailsAsTitleTooltip = true;
+	public bool $withIsPercentage = true;
 
 	public function init(): void {
 		if ($this->userId === null) {
@@ -119,6 +120,7 @@ class IssuePayCalculationGrid extends GridView {
 				'value' => 'type.is_percentage',
 				'format' => 'boolean',
 				'label' => Yii::t('settlement', '%'),
+				'visible' => $this->withIsPercentage,
 			],
 			[
 				'class' => $this->issueColumn,

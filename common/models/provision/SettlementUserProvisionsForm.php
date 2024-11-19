@@ -148,7 +148,7 @@ class SettlementUserProvisionsForm extends Model {
 	}
 
 	public function getProvisionsSum(ProvisionUser $provisionUser): Decimal {
-		return $provisionUser->generateProvision($this->getPaysSumWithoutGeneralCosts());
+		return $provisionUser->generateProvision($this->getPaysSumWithoutGeneralCosts(), $this->model->type->is_percentage);
 	}
 
 	public function getPayValue(IssuePayInterface $pay): Decimal {

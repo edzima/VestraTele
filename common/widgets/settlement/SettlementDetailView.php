@@ -2,9 +2,9 @@
 
 namespace common\widgets\settlement;
 
+use backend\modules\settlement\Module;
 use common\helpers\Html;
 use common\models\issue\IssuePayCalculation;
-use common\models\user\Worker;
 use Decimal\Decimal;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -31,7 +31,7 @@ class SettlementDetailView extends DetailView {
 		if (!$this->model instanceof IssuePayCalculation) {
 			throw new InvalidConfigException('$model must be instance of: ' . IssuePayCalculation::class);
 		}
-		if (!YII_IS_FRONTEND && Yii::$app->user->can(Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER)) {
+		if (!YII_IS_FRONTEND && Yii::$app->user->can(Module::ROLE_SETTLEMENT_TYPE_MANAGER)) {
 			$this->typeRoute = '/settlement/type/view';
 		}
 		if (empty($this->attributes)) {
