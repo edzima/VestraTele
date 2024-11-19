@@ -1,5 +1,6 @@
 <?php
 
+use backend\modules\settlement\Module;
 use common\components\rbac\widget\ModelAccessDetailWidget;
 use common\models\settlement\CostType;
 use yii\helpers\Html;
@@ -14,6 +15,7 @@ $this->params['breadcrumbs'][] = ['url' => ['cost/index'], 'label' => Yii::t('se
 $this->params['breadcrumbs'][] = ['label' => Yii::t('settlement', 'Cost Types'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
+
 ?>
 <div class="cost-type-view">
 
@@ -21,6 +23,9 @@ YiiAsset::register($this);
 
 	<p>
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+		<?= Yii::$app->user->can(Module::ROLE_COST_TYPE_MANAGER)
+			? Html::a(Yii::t('backend', 'Access'), ['access', 'id' => $model->id], ['class' => 'btn btn-warning'])
+			: '' ?>
 		<?= Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',
 			'data' => [

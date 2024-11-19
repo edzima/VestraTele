@@ -3,6 +3,8 @@
 namespace backend\modules\settlement\controllers;
 
 use backend\modules\settlement\models\CostTypeForm;
+use common\components\rbac\form\ActionsAccessForm;
+use common\components\rbac\form\SingleActionAccessForm;
 use common\models\settlement\CostType;
 use common\models\settlement\search\CostTypeSearch;
 use Yii;
@@ -31,6 +33,34 @@ class CostTypeController extends Controller {
 				],
 			]
 		);
+	}
+
+	public function actionSingleAccess(int $id, string $app, string $action) {
+		$type = $this->findModel($id);
+		$manager = $type->getModelAccess()
+			->setApp($app)
+			->setAction($action);
+		$model = new SingleActionAccessForm($manager);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $id]);
+		}
+		return $this->render('single-access', [
+			'model' => $model,
+			'type' => $type,
+		]);
+	}
+
+	public function actionAccess(int $id) {
+		$model = new ActionsAccessForm();
+		$type = $this->findModel($id);
+		$model->setAccess($type->getModelAccess());
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $id]);
+		}
+		return $this->render('access', [
+			'model' => $model,
+			'type' => $type,
+		]);
 	}
 
 	/**
