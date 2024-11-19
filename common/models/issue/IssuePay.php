@@ -64,7 +64,12 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 	 */
 	public function rules(): array {
 		return [
-			[['value', 'deadline_at', 'transfer_type', 'vat'], 'required', 'enableClientValidation' => false],
+			[['value', 'transfer_type', 'vat'], 'required', 'enableClientValidation' => false],
+			[
+				'deadline_at', 'required', 'when' => function () {
+				return empty($this->pay_at);
+			},
+			],
 			[['pay_at', 'deadline_at'], 'safe'],
 			[['value', 'vat'], 'number', 'numberPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/', 'enableClientValidation' => false],
 			['vat', 'number', 'min' => 0, 'max' => 100],
@@ -86,7 +91,7 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 			'id' => 'ID',
 			'pay_at' => Yii::t('settlement', 'Pay at'),
 			'deadline_at' => Yii::t('settlement', 'Deadline at'),
-			'value' => Yii::t('settlement', 'Value with VAT'),
+			'value' => Yii::t('settlement', 'Value'),
 			'valueNetto' => Yii::t('settlement', 'Value without VAT'),
 			'transfer_type' => Yii::t('settlement', 'Transfer Type'),
 			'partInfo' => Yii::t('settlement', 'Part Info'),

@@ -112,7 +112,7 @@ class Provisions extends Component {
 						'userWithType' => $form->getIssueUser()->getTypeWithUser(),
 					]), __METHOD__);
 				$form->typeId = $type->id;
-				$provisions[] = $this->generateProvisionsData($form->getData(), $form->getPaysValues());
+				$provisions[] = $this->generateProvisionsData($form->getData(), $form->getPaysValues(), $model->type->is_percentage);
 			} else {
 				Yii::warning([
 					'msg' => 'Types count: ' . $typesCount,
@@ -138,7 +138,7 @@ class Provisions extends Component {
 	 * @param Decimal[] $pays indexed by pay id.
 	 * @throws InvalidConfigException|MissingProvisionUserException
 	 */
-	public function generateProvisionsData(ProvisionUserData $userData, array $pays): array {
+	public function generateProvisionsData(ProvisionUserData $userData, array $pays, bool $mul = false): array {
 		if (!$userData->type) {
 			throw new InvalidConfigException('Type for userData must be set before generate provisions.');
 		}
@@ -173,7 +173,8 @@ class Provisions extends Component {
 				$provisions[] = $this->generateData(
 					$payId,
 					$model,
-					$payValue
+					$payValue,
+					$mul
 				);
 			}
 		}
@@ -199,7 +200,7 @@ class Provisions extends Component {
 					$model = ProvisionUser::createFromBaseType($model, $type);
 				}
 				foreach ($pays as $payId => $payValue) {
-					$provisions[] = $this->generateData($payId, $model, $payValue);
+					$provisions[] = $this->generateData($payId, $model, $payValue, $mul);
 				}
 			}
 		}
@@ -219,9 +220,9 @@ class Provisions extends Component {
 			->execute();
 	}
 
-	protected function generateData(int $pay_id, ProvisionUser $provisionUser, Decimal $baseValue = null): array {
+	protected function generateData(int $pay_id, ProvisionUser $provisionUser, Decimal $baseValue = null, bool $mul = false): array {
 		$type = $provisionUser->type;
-		$value = $provisionUser->generateProvision($baseValue);
+		$value = $provisionUser->generateProvision($baseValue, $mul);
 		$percent = null;
 		if ($type->is_percentage && $baseValue !== null) {
 			$percent = $value->div($baseValue)->mul(100);

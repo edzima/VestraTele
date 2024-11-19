@@ -1,5 +1,6 @@
 <?php
 
+use backend\modules\settlement\Module;
 use common\helpers\Html;
 use common\models\settlement\SettlementType;
 use yii\widgets\DetailView;
@@ -20,7 +21,9 @@ $this->params['breadcrumbs'][] = $this->title;
 	<p>
 		<?= Html::a(Yii::t('backend', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
-		<?= Html::a(Yii::t('backend', 'Access'), ['access', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+		<?= Yii::$app->user->can(Module::ROLE_SETTLEMENT_TYPE_MANAGER)
+			? Html::a(Yii::t('backend', 'Access'), ['access', 'id' => $model->id], ['class' => 'btn btn-warning'])
+			: '' ?>
 
 		<?= Html::a(Yii::t('backend', 'Delete'), ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',

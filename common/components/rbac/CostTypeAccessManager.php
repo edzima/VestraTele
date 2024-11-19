@@ -39,4 +39,5 @@ class CostTypeAccessManager extends ModelAccessManager implements IssueViewActio
 		}
 		return parent::getIds($userId);
 	}
+
 }

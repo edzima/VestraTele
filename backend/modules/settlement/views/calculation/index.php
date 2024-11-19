@@ -1,6 +1,7 @@
 <?php
 
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
+use backend\modules\settlement\Module;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\models\user\User;
 use common\models\user\Worker;
@@ -48,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			: ''
 		?>
 
-		<?= Yii::$app->user->can(Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER)
+		<?= Yii::$app->user->can(Module::ROLE_SETTLEMENT_TYPE_MANAGER)
 			? Html::a(Yii::t('settlement', 'Settlement Types'), ['type/index'], ['class' => 'btn btn-info'])
 			: '' ?>
 

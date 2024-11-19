@@ -1,5 +1,6 @@
 <?php
 
+use backend\modules\settlement\Module;
 use backend\widgets\IssueTypeLeftNavWidget;
 use backend\widgets\Menu;
 use common\models\user\User;
@@ -362,7 +363,8 @@ $typesItems = $typesNav->getItems();
 						|| $user->can(User::PERMISSION_PAY)
 						|| $user->can(User::PERMISSION_PAY_RECEIVED)
 						|| $user->can(User::PERMISSION_PAYS_DELAYED)
-						|| $user->can(Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER)
+						|| $user->can(Module::ROLE_SETTLEMENT_TYPE_MANAGER)
+						|| $user->can(Module::ROLE_COST_TYPE_MANAGER)
 					,
 					'items' => [
 						[
@@ -423,7 +425,7 @@ $typesItems = $typesNav->getItems();
 							'label' => Yii::t('settlement', 'Settlement Types'),
 							'url' => ['/settlement/type/index'],
 							'icon' => '<i class="fa fa-sitemap"></i>',
-							'visible' => $user->can(Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER),
+							'visible' => $user->can(Module::ROLE_SETTLEMENT_TYPE_MANAGER),
 						],
 					],
 				],

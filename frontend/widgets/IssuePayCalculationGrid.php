@@ -2,6 +2,7 @@
 
 namespace frontend\widgets;
 
+use common\components\rbac\SettlementTypeAccessManager;
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
 use common\widgets\grid\ActionColumn;
@@ -23,6 +24,9 @@ class IssuePayCalculationGrid extends BaseIssuePayCalculationGrid {
 			'template' => '{note} {view}',
 			'visibleButtons' => [
 				'note' => Yii::$app->user->can(User::PERMISSION_NOTE),
+				'view' => function (IssuePayCalculation $model): bool {
+					return $model->type->hasAccess($this->userId, SettlementTypeAccessManager::ACTION_VIEW);
+				},
 			],
 			'buttons' => [
 				'note' => function ($url, IssuePayCalculation $model): string {

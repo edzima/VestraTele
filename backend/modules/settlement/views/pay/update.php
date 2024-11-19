@@ -8,7 +8,11 @@ use common\widgets\settlement\SettlementDetailView;
 /* @var $this yii\web\View */
 /* @var $model IssuePay */
 
-$this->title = Yii::t('backend', 'Update pay: {value}', ['value' => Yii::$app->formatter->asCurrency($model->getValue())]);
+$this->title = Yii::t('backend', 'Update pay: {value}', [
+	'value' => $model->calculation->isPercentageType()
+		? Yii::$app->formatter->asPercent($model->getValue())
+		: Yii::$app->formatter->asCurrency($model->getValue()),
+]);
 $issue = $model->calculation->issue;
 $this->params['breadcrumbs'] = Breadcrumbs::issue($issue);
 if (Yii::$app->user->can(User::ROLE_BOOKKEEPER)) {

@@ -3,9 +3,9 @@
 namespace backend\tests\functional\settlement;
 
 use backend\modules\settlement\controllers\TypeController;
+use backend\modules\settlement\Module;
 use backend\tests\Step\Functional\Manager;
 use common\fixtures\helpers\SettlementFixtureHelper;
-use common\models\user\Worker;
 
 class TypeCest {
 
@@ -15,7 +15,7 @@ class TypeCest {
 	/** @see TypeController::actionCreate() */
 	private const ROUTE_CREATE = '/settlement/type/create';
 
-	public const PERMISSION = Worker::PERMISSION_SETTLEMENT_TYPE_MANAGER;
+	public const PERMISSION = Module::ROLE_SETTLEMENT_TYPE_MANAGER;
 
 	public function _fixtures(): array {
 		return SettlementFixtureHelper::type();
