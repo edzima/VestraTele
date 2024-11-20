@@ -1,6 +1,7 @@
 <?php
 
 use backend\helpers\Html;
+use backend\helpers\Url;
 use backend\modules\provision\widgets\UserProvisionsWidget;
 use common\models\provision\ProvisionUserData;
 
@@ -36,6 +37,11 @@ if ($model->hasType()) {
 
 	<?= UserProvisionsWidget::widget([
 		'userData' => $model,
+		'searchUrl' => Url::to([
+			'user-view',
+			'userId' => $model->getUser()->id,
+			'typeId' => $model->getTypeId(),
+		]),
 	]) ?>
 
 

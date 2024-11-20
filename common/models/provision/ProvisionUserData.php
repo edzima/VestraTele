@@ -4,14 +4,27 @@ namespace common\models\provision;
 
 use common\models\user\query\UserQuery;
 use common\models\user\User;
-use yii\base\BaseObject;
+use Yii;
+use yii\base\Model;
 
-class ProvisionUserData extends BaseObject {
+class ProvisionUserData extends Model {
 
 	public ?ProvisionType $type = null;
 	public ?string $date = null;
 
 	private User $user;
+
+	public function rules(): array {
+		return [
+			[['date'], 'safe',],
+		];
+	}
+
+	public function attributeLabels(): array {
+		return [
+			'date' => Yii::t('provision', 'Date'),
+		];
+	}
 
 	public function __construct(User $user, $config = []) {
 		$this->user = $user;

@@ -97,6 +97,7 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 			'partInfo' => Yii::t('settlement', 'Part Info'),
 			'vat' => Yii::t('settlement', 'VAT (%)'),
 			'vatPercent' => Yii::t('settlement', 'VAT (%)'),
+			'formattedValue' => Yii::t('settlement', 'Value'),
 		];
 	}
 
@@ -135,6 +136,13 @@ class IssuePay extends ActiveRecord implements IssuePayInterface {
 
 	public function getValue(): Decimal {
 		return new Decimal($this->value);
+	}
+
+	public function getFormattedValue(): string {
+		if ($this->calculation->isPercentageType()) {
+			return Yii::$app->formatter->asPercent($this->value);
+		}
+		return Yii::$app->formatter->asCurrency($this->value);
 	}
 
 	public function getPaymentAt(): ?DateTime {
