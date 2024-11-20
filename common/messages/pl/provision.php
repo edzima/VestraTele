@@ -107,6 +107,7 @@ return [
 	'Min Settlement Value' => 'Min. wartosć Rozliczenia',
 	'Max Settlement Value' => 'Max. wartość Rozliczenia',
 	'Provision Pay Value' => 'Wpłata',
+	'Date' => 'Data',
 ];
 
 

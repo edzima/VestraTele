@@ -61,6 +61,7 @@ class UserController extends Controller {
 	 */
 	public function actionUserView(int $userId, int $typeId = null): string {
 		$model = new ProvisionUserData($this->findUser($userId));
+		$model->load(Yii::$app->request->queryParams);
 		if ($typeId !== null) {
 			$model->type = $this->findType($typeId, false);
 		}

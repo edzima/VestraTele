@@ -4,6 +4,7 @@ use backend\helpers\Html;
 use backend\helpers\Url;
 use backend\modules\provision\widgets\UserProvisionsWidget;
 use backend\widgets\GridView;
+use common\helpers\ArrayHelper;
 use common\models\provision\ProvisionType;
 use common\models\provision\ProvisionUser;
 use common\models\provision\ProvisionUserData;
@@ -12,6 +13,7 @@ use common\widgets\FieldsetDetailView;
 use common\widgets\grid\ActionColumn;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
+use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model ProvisionUserData */
@@ -36,34 +38,90 @@ $context = $this->context;
 			]) ?>
 		</p>
 
-		<?= FieldsetDetailView::widget([
-			'legend' => $model->type->name,
-			'detailConfig' => [
-				'model' => $model->type,
-				'attributes' => [
-					[
-						'label' => Yii::t('provision', 'Base Type'),
-						'format' => 'html',
-						'value' => function () use ($model): string {
 
-							return Html::a(Html::encode($model->type->getBaseType()->name), [
-								'/provision/user/user-view',
-								'userId' => $model->getUser()->id,
-								'typeId' => $model->type->getBaseTypeId(),
-							]);
-						},
+		<div class="row">
+			<div class="col-md-6">
+				<?= FieldsetDetailView::widget([
+					'legend' => $model->type->name,
+					'detailConfig' => [
+						'model' => $model->type,
+						'attributes' => [
+							[
+								'label' => Yii::t('provision', 'Base Type'),
+								'format' => 'html',
+								'value' => function () use ($model): string {
 
-						'visible' => $model->type->getBaseType() !== null,
+									return Html::a(Html::encode($model->type->getBaseType()->name), [
+										'/provision/user/user-view',
+										'userId' => $model->getUser()->id,
+										'typeId' => $model->type->getBaseTypeId(),
+									]);
+								},
+
+								'visible' => $model->type->getBaseType() !== null,
+							],
+
+							'issueUserTypeName',
+							[
+								'attribute' => 'issueRequiredUserTypesNames',
+								'visible' => !empty($model->issueRequiredUserTypesNames),
+							],
+							[
+								'attribute' => 'issueExcludedUserTypesNames',
+								'visible' => !empty($model->issueExcludedUserTypesNames),
+							],
+							'issueTypesNames',
+							'settlementTypesNames',
+							'withHierarchy:boolean',
+						],
 					],
-					'issueUserTypeName',
-					'issueRequiredUserTypesNames',
-					'issueExcludedUserTypesNames',
-					'issueTypesNames',
-					'settlementTypesNames',
-					'withHierarchy:boolean',
-				],
-			],
-		]) ?>
+				]) ?>
+
+				<?= $context->searchUrl
+					? $this->render('_search-user-provisions', [
+						'model' => $model,
+						'searchUrl' => $context->searchUrl,
+					])
+					: '' ?>
+
+
+				<?php
+
+				$selfSum = array_sum(ArrayHelper::getColumn($selfDataProvider->getModels(), 'value'));
+				$toSum = array_sum(ArrayHelper::getColumn($toDataProvider->getModels(), 'value'));
+				$format = 'currency';
+				if ($model->type->is_percentage) {
+					$selfSum /= 100;
+					$toSum /= 100;
+					$format = 'percent';
+				}
+
+				echo DetailView::widget([
+					'model' => $model,
+					'attributes' => [
+						[
+							'label' => Yii::t('provision', 'Self provisions'),
+							'value' => $selfSum,
+							'format' => $format,
+						],
+						[
+							'label' => Yii::t('provision', 'Parent provisions'),
+							'value' => $toSum,
+							'format' => $format,
+						],
+						[
+							'label' => Yii::t('provision', 'Self provisions')
+								. ' + ' . Yii::t('provision', 'Parent provisions'),
+							'value' => $toSum + $selfSum,
+							'format' => $format,
+						],
+					],
+				]);
+
+				?>
+			</div>
+		</div>
+
 
 	<?php endif; ?>
 
@@ -109,6 +167,8 @@ $context = $this->context;
 				],
 			]) ?>
 		<?php endif; ?>
+
+
 
 		<?= GridView::widget([
 			'dataProvider' => $selfDataProvider,

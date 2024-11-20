@@ -26,6 +26,7 @@ class UserProvisionsWidget extends Widget {
 	];
 
 	public array $extraProvisionsColumns = [];
+	public ?string $searchUrl = null;
 
 	public function run(): string {
 		return $this->render('user-provisions', [

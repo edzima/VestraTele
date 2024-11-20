@@ -1,6 +1,7 @@
 <?php
 
 use backend\helpers\Breadcrumbs;
+use backend\modules\settlement\widgets\IssueCostActionColumn;
 use backend\modules\settlement\widgets\IssuePayGrid;
 use common\models\issue\IssuePayCalculation;
 use common\models\user\User;
@@ -155,6 +156,9 @@ YiiAsset::register($this);
 							}
 							return $sum;
 						},
+					],
+					[
+						'class' => IssueCostActionColumn::class,
 					],
 				],
 			]) ?>
