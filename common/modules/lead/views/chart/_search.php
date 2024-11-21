@@ -126,6 +126,17 @@ $usersNames = LeadChartSearch::getUsersNames();
 			: '' ?>
 
 
+		<?= $form->field($model, 'excludedSources', ['options' => ['class' => 'col-md-2']])->widget(Select2::class, [
+			'data' => $model->getSourcesNames(),
+			'pluginOptions' => [
+				'placeholder' => $model->getAttributeLabel('excludedSources'),
+				'multiple' => true,
+				'allowClear' => true,
+			],
+		])
+		?>
+
+
 		<?= $form->field($model, 'campaign_id', ['options' => ['class' => 'col-md-2 col-lg-2']])->widget(Select2::class, [
 			'data' => $model->getCampaignNames(),
 			'pluginOptions' => [
