@@ -30,7 +30,7 @@ class ModelAccessManager extends Component {
 	public array $availableParentRoles = [];
 	public array $availableParentPermissions = [];
 
-	public ?string $managerPermission = null;
+	public array $managerPermission = [];
 
 	/**
 	 * @var string|array|ParentsManagerInterface
@@ -58,13 +58,19 @@ class ModelAccessManager extends Component {
 	}
 
 	public function checkAccess(string|int $userId): bool {
-		if ($this->managerPermission) {
-			$hasAccess = $this->auth->checkAccess($userId, $this->managerPermission);
-			if ($hasAccess) {
+		return $this->hasManagerAccess($userId) || $this->auth->checkAccess($userId, $this->getPermissionName());
+	}
+
+	protected function hasManagerAccess(string $userId): bool {
+		if (empty($this->managerPermission)) {
+			return false;
+		}
+		foreach ($this->managerPermission as $permission) {
+			if ($this->auth->checkAccess($userId, $permission)) {
 				return true;
 			}
 		}
-		return $this->auth->checkAccess($userId, $this->getPermissionName());
+		return false;
 	}
 
 	public function ensurePermission(string $description = null): self {
