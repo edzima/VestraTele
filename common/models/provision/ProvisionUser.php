@@ -142,6 +142,38 @@ class ProvisionUser extends ActiveRecord {
 		return $date <= new DateTime($this->to_at);
 	}
 
+	public function generateValueFromType(ProvisionType $type): void {
+		if (!$type->is_percentage) {
+			Yii::warning([
+				'msg' => 'Try generate value from not percentage type',
+				'type' => $type->toArray(),
+				'self' => $this->toArray(),
+			], __METHOD__);
+			return;
+		}
+
+		$typeModels = static::find()
+			->andWhere(['type_id' => $type->id])
+			->andWhere(['from_user_id' => $this->from_user_id])
+			->andWhere(['to_user_id' => $this->to_user_id])
+			->andWhere(['from_at' => $this->from_at])
+			->andWhere(['to_at' => $this->to_at])
+			->all();
+		if (count($typeModels) > 1) {
+			Yii::warning([
+				'msg' => 'Find more than one type for Provision User',
+				'type' => $type->toArray(),
+				'self' => $this->toArray(),
+			], __METHOD__);
+		}
+		$typeModel = reset($typeModels);
+		$value = $type->value;
+		if (!empty($typeModel)) {
+			$value = $typeModel->value;
+		}
+		$this->value = $this->getValue()->mul(new Decimal($value))->div(100)->toFixed(2);
+	}
+
 	/**
 	 * @param Decimal|null $value
 	 * @return Decimal
@@ -154,7 +186,7 @@ class ProvisionUser extends ActiveRecord {
 			return $this->getValue();
 		}
 		if ($value === null) {
-			throw new InvalidArgumentException('$value must be Decimal when type is percentage.');
+			throw new InvalidArgumentException('$value must be Decimal when type is percentage . ');
 		}
 		return $value->mul($this->getValue())->div(100);
 	}
@@ -176,12 +208,11 @@ class ProvisionUser extends ActiveRecord {
 
 	public static function addValue(ProvisionUser $a, ProvisionUser $b): Decimal {
 		if ($a->type->is_percentage && !$b->type->is_percentage) {
-			throw new InvalidArgumentException('Percentage/Const of Type must be same.');
+			throw new InvalidArgumentException('Percentage /const of Type must be same . ');
 		}
-		$type = $a->type;
 		$valueA = $a->getValue();
 		$valueB = $b->getValue();
-		if (!$type->is_percentage) {
+		if (!$b->type->is_percentage) {
 			return $valueA->add($valueB);
 		}
 		return $valueA->mul($valueB)->div(100);

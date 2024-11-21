@@ -167,7 +167,7 @@ class Provisions extends Component {
 		}
 		foreach ($selfModels as $model) {
 			if ($baseType !== null) {
-				$model = ProvisionUser::createFromBaseType($model, $type);
+				$model->generateValueFromType($type);
 			}
 			foreach ($pays as $payId => $payValue) {
 				$provisions[] = $this->generateData(
@@ -197,14 +197,14 @@ class Provisions extends Component {
 			$toModels = $userData->getToQuery()->all();
 			foreach ($toModels as $model) {
 				if ($baseType !== null) {
-					$model = ProvisionUser::createFromBaseType($model, $type);
+					$model->generateValueFromType($type);
 				}
 				foreach ($pays as $payId => $payValue) {
 					$provisions[] = $this->generateData($payId, $model, $payValue, $mul);
 				}
 			}
 		}
-
+		Yii::warning($provisions);
 		return $provisions;
 	}
 
