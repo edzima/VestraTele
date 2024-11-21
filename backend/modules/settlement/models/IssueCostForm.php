@@ -130,7 +130,6 @@ class IssueCostForm extends Model implements HiddenFieldsModel {
 			&& !isset($names[$this->type_id])) {
 			$names[$this->type_id] = CostType::getNames(false)[$this->type_id];
 		}
-		codecept_debug($names);
 		return $names;
 	}
 
