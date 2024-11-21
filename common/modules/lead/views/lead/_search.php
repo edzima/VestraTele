@@ -204,8 +204,6 @@ use kartik\select2\Select2;
 		?>
 
 		<?= $form->field($model, 'fromCampaigns', ['options' => ['class' => 'col-md-2']])->dropDownList(Html::booleanDropdownList(), ['prompt' => Yii::t('lead', 'Select...')]) ?>
-		?>
-
 
 	</div>
 
