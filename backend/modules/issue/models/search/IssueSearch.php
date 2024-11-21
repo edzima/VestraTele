@@ -63,7 +63,7 @@ class IssueSearch extends BaseIssueSearch {
 			['claimCompanyTryingValue', 'number', 'min' => 0],
 			['onlyWithAllPayedPay', 'boolean', 'on' => static::SCENARIO_ALL_PAYED],
 			[['signature_act', 'stage_change_at', 'stageDeadlineFromAt', 'stageDeadlineToAt', 'entity_agreement_at'], 'safe'],
-			['groupByIssueUserTypes', 'in', 'range' => array_keys(static::getIssueUserTypesNames()), 'allowArray' => true],
+			[['groupByIssueUserTypes', 'withoutUserTypes'], 'in', 'range' => array_keys(static::getIssueUserTypesNames()), 'allowArray' => true],
 		]);
 	}
 
@@ -79,6 +79,7 @@ class IssueSearch extends BaseIssueSearch {
 			'stageDeadlineToAt' => Yii::t('backend', 'Stage Deadline to at'),
 			'withClaimsSum' => Yii::t('backend', 'With claims sum'),
 			'groupByIssueUserTypes' => Yii::t('backend', 'Group by Issue user Types'),
+			'withoutUserTypes' => Yii::t('backend', 'Without user types'),
 		]);
 	}
 
@@ -156,6 +157,7 @@ class IssueSearch extends BaseIssueSearch {
 		$this->claimFilter($query);
 		$this->applyEntityAgreementFilter($query);
 		$this->applyGroupByIssueUserTypes($query);
+		$this->applyWithoutUserTypes($query);
 	}
 
 	private function signatureActFilter(IssueQuery $query): void {
@@ -299,6 +301,25 @@ class IssueSearch extends BaseIssueSearch {
 			$query->joinWith('users');
 			$query->groupBy([IssueUser::tableName() . '.user_id', IssueUser::tableName() . '.type']);
 			$query->having([IssueUser::tableName() . '.type' => $this->groupByIssueUserTypes]);
+		}
+	}
+
+	public $withoutUserTypes = [];
+
+	private function applyWithoutUserTypes(IssueQuery $query): void {
+		if (!empty($this->withoutUserTypes)) {
+			$subQuery = IssueUser::find()
+				->select('issue_id')
+				->andWhere([
+					'NOT IN', 'issue_id',
+					IssueUser::find()
+						->select('issue_id')
+						->andWhere(['type' => $this->withoutUserTypes]),
+				]);
+
+			$query->andWhere([
+				'IN', Issue::tableName() . '.id', $subQuery,
+			]);
 		}
 	}
 
