@@ -71,7 +71,6 @@ class ModelAccessManager extends Component {
 		$name = $this->getPermissionName();
 		if ($this->auth->getPermission($name) === null) {
 			$permission = $this->createPermission($description);
-			codecept_debug($permission);
 			$this->auth->add($permission);
 		}
 		return $this;
