@@ -11,7 +11,10 @@ class CostTypeAccessManager extends ModelAccessManager implements IssueViewActio
 	public string $action = self::ACTION_ISSUE_VIEW;
 
 	public array $availableParentRoles = Worker::ROLES;
-	public ?string $managerPermission = Module::ROLE_COST_TYPE_MANAGER;
+	public array $managerPermission = [
+		Module::ROLE_COST_TYPE_MANAGER,
+		Worker::ROLE_BOOKKEEPER,
+	];
 	public array $availableParentPermissions = [
 		Worker::PERMISSION_ISSUE,
 		Worker::PERMISSION_COST,
@@ -31,10 +34,7 @@ class CostTypeAccessManager extends ModelAccessManager implements IssueViewActio
 	];
 
 	public function getIds(string|int $userId = null): array {
-		if ($userId
-			&& $this->managerPermission
-			&& $this->auth->checkAccess($userId, $this->managerPermission)
-		) {
+		if ($userId && $this->hasManagerAccess($userId)) {
 			return array_keys(CostType::getModels());
 		}
 		return parent::getIds($userId);
