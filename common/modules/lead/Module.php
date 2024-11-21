@@ -23,6 +23,8 @@ use yii\di\Instance;
  */
 class Module extends BaseModule implements BootstrapInterface {
 
+	public const PERMISSION_ASSIGN_USERS = 'lead.assign-users';
+
 	public $controllerNamespace = 'common\modules\lead\controllers';
 
 	/**

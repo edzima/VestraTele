@@ -20,6 +20,7 @@ use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadNameSearch;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\models\searches\LeadSearch;
+use common\modules\lead\Module;
 use common\modules\reminder\models\ReminderQuery;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -73,7 +74,9 @@ class LeadController extends BaseController {
 			return $this->renderAjax('_grid', [
 				'dataProvider' => $dataProvider,
 				'searchModel' => $searchModel,
-				'assignUsers' => !$this->module->onlyUser,
+				'assignUsers' => Yii::$app->user->can(
+					Module::PERMISSION_ASSIGN_USERS
+				),
 				'visibleButtons' => [
 					'delete' => $this->module->allowDelete,
 				],

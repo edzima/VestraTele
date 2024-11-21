@@ -6,6 +6,7 @@ use common\components\DbManager;
 use common\models\user\Customer;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\lead\Module as LeadModule;
 use common\rbac\OwnModelRule;
 use Exception;
 use Yii;
@@ -173,6 +174,7 @@ class RbacController extends Controller {
 		Worker::PERMISSION_CREDIT_ANALYZE,
 		Worker::PERMISSION_COURT,
 		Worker::PERMISSION_LAWSUIT,
+		LeadModule::PERMISSION_ASSIGN_USERS,
 	];
 
 	public function actionAddPermissionToWorkers(string $name, array $assignments): void {

@@ -61,6 +61,7 @@ return array_merge([
 	'lawyer_assistant' => 'Asystent Prawnika',
 	'lawyer_office' => 'Prawnik [Biuro]',
 	'lead' => 'Leads',
+	'lead.assign-users' => 'Leads - Przypisywanie użytkowników',
 	'lead.cost' => 'Leads - Koszty',
 	'lead.manager' => 'Leads - Manager',
 	'lead.delete' => 'Leads - Usuwanie',
