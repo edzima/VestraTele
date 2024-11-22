@@ -45,7 +45,7 @@ class ProvisionUpdateForm extends Model {
 
 	public function rules(): array {
 		return [
-			[['percent', 'value'], 'required'],
+			[['value'], 'required'],
 			['hide_on_report', 'boolean'],
 			['percent', 'number', 'min' => 0, 'max' => 100],
 			['value', 'number', 'min' => 0],
@@ -79,11 +79,14 @@ class ProvisionUpdateForm extends Model {
 		$model = $this->model;
 		$model->value = $this->generateValue()->toFixed(2);
 		$model->hide_on_report = $this->hide_on_report;
-		$model->percent = $this->generatePercent()->toFixed(2);
+		$model->percent = $this->generatePercent() ? $this->generatePercent()->toFixed(2) : null;
 		return $model->save(false);
 	}
 
-	public function generatePercent(?Decimal $value = null): Decimal {
+	public function generatePercent(?Decimal $value = null): ?Decimal {
+		if ($this->percent === null || $this->percent === '') {
+			return null;
+		}
 		if ($value === null) {
 			$value = $this->model->getValue();
 		}
