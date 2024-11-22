@@ -151,9 +151,11 @@ class LeadManager extends Component {
 	}
 
 	protected function afterStatusUpdate(LeadEvent $event): void {
-		/** @var ActiveLead $lead */
+		/** @var Lead $lead */
 		$lead = $event->getLead();
-
+		$lead->updateAttributes([
+			'deadline_at' => null,
+		]);
 		$status = LeadStatus::getModels()[$lead->getStatusId()];
 		if (!empty($status->market_status) && $lead->market !== null) {
 
