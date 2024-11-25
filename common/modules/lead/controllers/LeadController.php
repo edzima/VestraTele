@@ -70,13 +70,12 @@ class LeadController extends BaseController {
 
 		$dataProvider->pagination->defaultPageSize = $pageSize;
 		$dataProvider->pagination->pageSize = $pageSize;
+		$assignUsers = Yii::$app->user->can(Module::PERMISSION_ASSIGN_USERS);
 		if (Yii::$app->request->isPjax) {
 			return $this->renderAjax('_grid', [
 				'dataProvider' => $dataProvider,
 				'searchModel' => $searchModel,
-				'assignUsers' => Yii::$app->user->can(
-					Module::PERMISSION_ASSIGN_USERS
-				),
+				'assignUsers' => $assignUsers,
 				'visibleButtons' => [
 					'delete' => $this->module->allowDelete,
 				],
@@ -137,7 +136,7 @@ class LeadController extends BaseController {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'assignUsers' => !$this->module->onlyUser,
+			'assignUsers' => $assignUsers,
 			'visibleButtons' => [
 				'delete' => $this->module->allowDelete,
 			],
