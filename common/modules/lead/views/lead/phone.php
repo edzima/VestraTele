@@ -3,11 +3,12 @@
 use common\helpers\Html;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\widgets\CreateLeadBtnWidget;
+use common\modules\lead\widgets\SameContactsListWidget;
 use common\widgets\ActiveForm;
 use yii\data\ActiveDataProvider;
-use yii\widgets\ListView;
+use yii\web\View;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
 /* @var $model LeadPhoneSearch */
 /* @var $dataProvider ActiveDataProvider */
 $this->title = Yii::t('lead', 'Leads by Phone');
@@ -44,19 +45,16 @@ $this->params['breadcrumbs'][] = $this->title;
 	</div>
 
 	<div class="lead-phone-models">
-		<div class="row">
-			<?= ListView::widget([
-				'dataProvider' => $dataProvider,
-				'emptyText' => false,
-				'itemView' => '_sameContact',
-				'summaryOptions' => [
-					'class' => 'col-md-12',
-				],
-				'itemOptions' => [
-					'class' => 'col-md-6',
-				],
-			])
-			?>
-		</div>
+		<?= SameContactsListWidget::widget([
+			'dataProvider' => $dataProvider,
+			'withType' => true,
+			'withHeader' => false,
+			'summaryOptions' => [
+				'class' => 'col-md-12',
+			],
+			'itemOptions' => [
+				'class' => 'col-md-6',
+			],
+		]) ?>
 	</div>
 </div>
