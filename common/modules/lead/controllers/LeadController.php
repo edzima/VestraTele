@@ -291,15 +291,14 @@ class LeadController extends BaseController {
 				]), 'lead.view.reservationExpired'
 			);
 
-			//@todo temp allow expired reservation see Lead.
-//			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'Reservation for Lead: {lead} from Market has expired.', [
-//				'lead' => $model->getName(),
-//			])
-//			);
-//			if ($model->market) {
-//				return $this->redirect(['market/view', 'id' => $model->market->id]);
-//			}
-//			return $this->redirect(['index']);
+			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'Reservation for Lead: {lead} from Market has expired.', [
+				'lead' => $model->getName(),
+			])
+			);
+			if ($model->market) {
+				return $this->redirect(['market/view', 'id' => $model->market->id]);
+			}
+			return $this->redirect(['index']);
 		}
 		if ($model->market !== null && Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)) {
 			Flash::add(Flash::TYPE_INFO,
