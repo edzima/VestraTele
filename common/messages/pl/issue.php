@@ -257,4 +257,5 @@ return array_merge([
 	'Workers without Issues' => 'Pracownicy bez Spraw',
 	'Excluded entity' => 'Wykluczone Podmioty',
 	'Try send sms to Customer: {customer} without Phone.' => 'Klient: {customer} musi mieć nr telefonu, by wysłąć SMS',
+	'Show Chart' => 'Wykresy',
 ], $local);

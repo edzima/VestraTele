@@ -1,7 +1,6 @@
 <?php
 
 use backend\helpers\Html;
-use backend\helpers\Url;
 use backend\modules\issue\models\search\IssueSearch;
 use common\behaviors\IssueTypeParentIdAction;
 use common\models\user\Worker;
@@ -37,6 +36,11 @@ $this->params['issueParentTypeNav'] = [
 	]) ?>
 
 	<?= $this->render('_search', ['model' => $searchModel]) ?>
+
+	<?= $this->render('_chart', [
+		'model' => $searchModel,
+		'dataProvider' => $dataProvider,
+	]) ?>
 
 	<div class="grid-selection-links-wrapper">
 

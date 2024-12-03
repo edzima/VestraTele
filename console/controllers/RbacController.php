@@ -2,6 +2,7 @@
 
 namespace console\controllers;
 
+use backend\modules\issue\Module as IssueModule;
 use backend\modules\settlement\Module as SettlementModule;
 use common\components\rbac\DbManager;
 use common\models\user\Customer;
@@ -75,6 +76,7 @@ class RbacController extends Controller {
 		User::PERMISSION_EXPORT,
 		User::PERMISSION_ISSUE,
 		Worker::PERMISSION_ISSUE_ATTACHMENTS,
+		IssueModule::PERMISSION_ISSUE_CHART,
 		Worker::PERMISSION_ISSUE_CLAIM,
 		Worker::PERMISSION_ISSUE_CLAIM_TOTAL_SUM,
 		Worker::PERMISSION_ISSUE_CREATE,

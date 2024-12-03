@@ -106,6 +106,11 @@ abstract class IssueSearch extends Model
 	private array $stagesIdsForParentType = [];
 	private ?array $existedIssueTypesIds = null;
 
+	private $entityResponsibleNames = [];
+
+	private array $stagesNames = [];
+	private array $typesNames = [];
+
 	protected static function getSummonsStatusFilters(): array {
 		$filters = [];
 		foreach (static::getSummonsStatusesNames() as $filtersNames) {
@@ -192,7 +197,7 @@ abstract class IssueSearch extends Model
 			],
 			['stage_id', 'in', 'range' => array_keys($this->getIssueStagesNames()), 'allowArray' => true],
 			[['type_id', 'excludedTypes'], 'in', 'range' => array_keys($this->getIssueTypesNames()), 'allowArray' => true],
-			[['excludedEntity'], 'in', 'range' => array_keys(static::getEntityNames()), 'allowArray' => true],
+			[['excludedEntity'], 'in', 'range' => array_keys($this->getEntityResponsibleNames()), 'allowArray' => true],
 			[['customerName', 'userName'], 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 			[['excludedTagsIds', 'tagsIds'], 'in', 'range' => array_keys(IssueTag::getModels()), 'allowArray' => true],
 			[
@@ -243,6 +248,7 @@ abstract class IssueSearch extends Model
 			'note_stage_id' => Yii::t('issue', 'Stage Change'),
 			'note_stage_change_from_at' => Yii::t('issue', 'Stage Change from At'),
 			'note_stage_change_to_at' => Yii::t('issue', 'Stage Change to At'),
+			'showChart' => Yii::t('issue', 'Show Chart'),
 		], Issue::instance()->attributeLabels());
 	}
 
@@ -542,29 +548,54 @@ abstract class IssueSearch extends Model
 		return IssueTag::getNamesGroupByType(true);
 	}
 
-	public static function getEntityNames(): array {
-		return ArrayHelper::map(EntityResponsible::find()->asArray()->all(), 'id', 'name');
+	public function getEntityResponsibleNames(): array {
+		if (empty($this->entityResponsibleNames)) {
+			$this->entityResponsibleNames = ArrayHelper::map(EntityResponsible::find()->asArray()->all(), 'id', 'name');
+		}
+		return $this->entityResponsibleNames;
+	}
+
+	public function setEntityResponsibleNames(array $names): void {
+		$this->entityResponsibleNames = $names;
+	}
+
+	public function setStagesNames(array $names): void {
+		$this->stagesNames = $names;
 	}
 
 	public function getIssueStagesNames(): array {
-		$stages = IssueStage::getStagesNames($this->withArchive, $this->withArchiveDeep);
-		if ($this->getIssueMainType() === null) {
-			return $stages;
-		}
-		return array_filter($stages, function (int $stageId) {
-			if ($this->getIssueMainType()->hasStage($stageId)) {
-				return true;
+		if (empty($this->stagesNames)) {
+			$stages = IssueStage::getStagesNames($this->withArchive, $this->withArchiveDeep);
+			if ($this->getIssueMainType() === null) {
+				return $stages;
 			}
-			foreach ($this->getIssueMainType()->childs as $type) {
-				if ($type->hasStage($stageId)) {
+			$this->stagesNames = array_filter($stages, function (int $stageId) {
+				if ($this->getIssueMainType()->hasStage($stageId)) {
 					return true;
 				}
-			}
-			return false;
-		}, ARRAY_FILTER_USE_KEY);
+				foreach ($this->getIssueMainType()->childs as $type) {
+					if ($type->hasStage($stageId)) {
+						return true;
+					}
+				}
+				return false;
+			}, ARRAY_FILTER_USE_KEY);
+		}
+		return $this->stagesNames;
+	}
+
+	public function setTypesNames(array $names): void {
+		$this->typesNames = $names;
 	}
 
 	public function getIssueTypesNames(): array {
+		if (empty($this->typesNames)) {
+			$this->typesNames = $this->getDefaultIssueTypesNames();
+		}
+		return $this->typesNames;
+	}
+
+	protected function getDefaultIssueTypesNames(): array {
 		if ($this->getIssueMainType()) {
 			$names = ArrayHelper::map($this->getIssueMainType()->childs, 'id', 'nameWithShort');
 			if (empty($names)) {

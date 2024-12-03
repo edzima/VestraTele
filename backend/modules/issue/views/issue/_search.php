@@ -3,6 +3,7 @@
 use backend\helpers\Html;
 use backend\modules\issue\models\IssueStage;
 use backend\modules\issue\models\search\IssueSearch;
+use backend\modules\issue\Module;
 use common\models\user\User;
 use common\models\user\Worker;
 use common\widgets\address\AddressSearchWidget;
@@ -304,7 +305,7 @@ use yii\widgets\ActiveForm;
 	<div class="row">
 		<?= $form->field($model, 'excludedEntity', ['options' => ['class' => 'col-md-4']])
 			->widget(Select2::class, [
-				'data' => IssueSearch::getEntityNames(),
+				'data' => $model->getEntityResponsibleNames(),
 				'options' => [
 					'multiple' => true,
 					'placeholder' => $model->getAttributeLabel('excludedEntity'),
@@ -314,6 +315,13 @@ use yii\widgets\ActiveForm;
 				],
 				'showToggleAll' => true,
 			]) ?>
+
+		<?= Yii::$app->user->can(
+			Module::PERMISSION_ISSUE_CHART
+		)
+			? $form->field($model, 'showChart')->checkbox()
+			: ''
+		?>
 	</div>
 
 
