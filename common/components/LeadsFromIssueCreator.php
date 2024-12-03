@@ -11,7 +11,6 @@ use yii\db\Connection;
 use yii\db\Exception;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Console;
 
 class LeadsFromIssueCreator extends Component {
 
@@ -25,7 +24,7 @@ class LeadsFromIssueCreator extends Component {
 	public $leadDb = 'db';
 	public string $leadTable = '{{%lead}}';
 
-	public int $issueBatchLimit = 1000;
+	public int $issueBatchLimit = 100;
 
 	public $leadsColumns = [
 		'phone' => 'customer.phone',
@@ -58,7 +57,6 @@ class LeadsFromIssueCreator extends Component {
 				$data = $this->validateLeadData($data);
 				if (!empty($data)) {
 					$leadsData[$issue->id] = $data;
-					Console::output(print_r($data));
 				}
 			}
 			if (!empty($leadsData) && !empty($this->_leadColumnsNames)) {
@@ -101,9 +99,6 @@ class LeadsFromIssueCreator extends Component {
 		}
 		foreach ($this->requiredColumns as $column) {
 			if (!isset($data[$column])) {
-				Console::output('Not found Data for required Column: ' . $column
-					. '. Data: '
-					. print_r($data, true));
 				return [];
 			}
 		}
