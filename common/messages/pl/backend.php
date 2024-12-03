@@ -370,4 +370,5 @@ return [
 	'Status changed successfully.' => 'Pomyślnie zmieniono Status.',
 	'Update Cost Type: {name}' => 'Edytuj Typ Kosztu: {name}',
 	'Without user types' => 'Wykluczone Obecności',
+	'Update Cost Type: {name}' => 'Edytuj Typ Kosztu: {name}',
 ];
