@@ -20,6 +20,8 @@ class Module extends BaseModule {
 
 	public $controllerNamespace = 'backend\modules\issue\controllers';
 
+	public const PERMISSION_ISSUE_CHART = 'issue.chart';
+
 	public function init() {
 		parent::init();
 		IssueUserEvent::on(Issue::class, IssueUserEvent::WILDCARD_EVENT, static function (IssueUserEvent $event): void {
