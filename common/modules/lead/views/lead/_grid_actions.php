@@ -197,6 +197,8 @@ $dataProvider->getModels();
 				'class' => 'btn btn-primary',
 				'name' => 'route',
 				'value' => 'sms/push-multiple',
+				'title' => Yii::t('lead', 'Send SMS'),
+				'aria-label' => Yii::t('lead', 'Send SMS'),
 			])
 
 		?>

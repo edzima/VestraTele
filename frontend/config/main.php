@@ -115,6 +115,14 @@ return [
 					],
 					[
 						'allow' => true,
+						'controllers' => [
+							'lead/user',
+						],
+						'actions' => ['assign'],
+						'permissions' => [LeadModule::PERMISSION_ASSIGN_USERS],
+					],
+					[
+						'allow' => true,
 						'actions' => ['self'],
 						'controllers' => [
 							'lead/archive',

@@ -20,6 +20,7 @@ use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadNameSearch;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\models\searches\LeadSearch;
+use common\modules\lead\Module;
 use common\modules\reminder\models\ReminderQuery;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -69,11 +70,12 @@ class LeadController extends BaseController {
 
 		$dataProvider->pagination->defaultPageSize = $pageSize;
 		$dataProvider->pagination->pageSize = $pageSize;
+		$assignUsers = Yii::$app->user->can(Module::PERMISSION_ASSIGN_USERS);
 		if (Yii::$app->request->isPjax) {
 			return $this->renderAjax('_grid', [
 				'dataProvider' => $dataProvider,
 				'searchModel' => $searchModel,
-				'assignUsers' => !$this->module->onlyUser,
+				'assignUsers' => $assignUsers,
 				'visibleButtons' => [
 					'delete' => $this->module->allowDelete,
 				],
@@ -134,7 +136,7 @@ class LeadController extends BaseController {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
-			'assignUsers' => !$this->module->onlyUser,
+			'assignUsers' => $assignUsers,
 			'visibleButtons' => [
 				'delete' => $this->module->allowDelete,
 			],
@@ -289,15 +291,14 @@ class LeadController extends BaseController {
 				]), 'lead.view.reservationExpired'
 			);
 
-			//@todo temp allow expired reservation see Lead.
-//			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'Reservation for Lead: {lead} from Market has expired.', [
-//				'lead' => $model->getName(),
-//			])
-//			);
-//			if ($model->market) {
-//				return $this->redirect(['market/view', 'id' => $model->market->id]);
-//			}
-//			return $this->redirect(['index']);
+			Flash::add(Flash::TYPE_WARNING, Yii::t('lead', 'Reservation for Lead: {lead} from Market has expired.', [
+				'lead' => $model->getName(),
+			])
+			);
+			if ($model->market) {
+				return $this->redirect(['market/view', 'id' => $model->market->id]);
+			}
+			return $this->redirect(['index']);
 		}
 		if ($model->market !== null && Yii::$app->user->can(User::PERMISSION_LEAD_MARKET)) {
 			Flash::add(Flash::TYPE_INFO,

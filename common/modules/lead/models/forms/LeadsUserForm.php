@@ -5,6 +5,7 @@ namespace common\modules\lead\models\forms;
 use common\models\user\User;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadUser;
+use common\modules\lead\models\query\LeadQuery;
 use common\modules\lead\Module;
 use Yii;
 use yii\base\Model;
@@ -22,10 +23,8 @@ class LeadsUserForm extends Model {
 	public ?string $userId = null;
 	public ?string $type = null;
 
-	public static function getLeadsIds(): array {
-		$ids = Lead::find()->select('id')->column();
-		return array_combine($ids, $ids);
-	}
+	public ?int $idUserLeads = null;
+	public const SCENARIO_USER_LEADS = 'user-leads';
 
 	public function getTypesNames(): array {
 		$types = LeadUser::getTypesNames();
@@ -42,11 +41,25 @@ class LeadsUserForm extends Model {
 	public function rules(): array {
 		return [
 			[['userId', 'type', 'leadsIds'], 'required', 'except' => static::SCENARIO_NOT_REQUIRED],
+			['!idUserLeads', 'required', 'on' => self::SCENARIO_USER_LEADS],
 			['!leadsIds', 'required', 'on' => static::SCENARIO_SINGLE],
 			['userId', 'integer'],
 			['type', 'string'],
 			['sendEmail', 'boolean'],
-			['leadsIds', 'exist', 'skipOnError' => true, 'allowArray' => true, 'targetClass' => Lead::class, 'targetAttribute' => 'id', 'enableClientValidation' => false],
+			[
+				'leadsIds',
+				'exist',
+				'skipOnError' => true,
+				'allowArray' => true,
+				'targetClass' => Lead::class,
+				'targetAttribute' => 'id',
+				'enableClientValidation' => false,
+				'filter' => function (LeadQuery $query) {
+					if ($this->scenario === self::SCENARIO_USER_LEADS) {
+						$query->user($this->idUserLeads);
+					}
+				},
+			],
 			[
 				'userId', 'in', 'range' => array_keys(static::getUsersNames()),
 			],
@@ -58,6 +71,7 @@ class LeadsUserForm extends Model {
 		$Load = parent::load($data, $formName);
 		return $Load;
 	}
+
 	public function attributeLabels(): array {
 		return [
 			'userId' => Yii::t('lead', 'User'),
@@ -97,8 +111,7 @@ class LeadsUserForm extends Model {
 		);
 		return LeadUser::getDb()->createCommand()
 			->batchInsert(LeadUser::tableName(), ['lead_id', 'user_id', 'type'], $rows)
-			->
-			execute();
+			->execute();
 	}
 
 	public function sendEmail(): ?int {

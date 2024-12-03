@@ -182,6 +182,19 @@ use yii\widgets\ActiveForm;
 		?>
 
 
+		<?= $form->field($model, 'withoutUserTypes', ['options' => ['class' => 'col-md-2']])
+			->widget(Select2::class, [
+				'data' => IssueSearch::getIssueUserTypesNames(),
+				'options' => [
+					'placeholder' => $model->getAttributeLabel('withoutUserTypes'),
+				],
+				'pluginOptions' => [
+					'allowClear' => true,
+					'multiple' => true,
+				],
+			])
+		?>
+
 
 		<?= Yii::$app->user->can(User::ROLE_BOOKKEEPER) ?
 			$form->field($model, 'onlyWithClaims', ['options' => ['class' => 'col-md-2']])->dropDownList(Html::booleanDropdownList(), [

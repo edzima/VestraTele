@@ -3,6 +3,7 @@
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use common\modules\court\models\Lawsuit;
+use common\modules\court\widgets\LawsuitSmsBtnWidget;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\IssueColumn;
 use common\widgets\grid\IssueStageColumn;
@@ -115,7 +116,15 @@ YiiAsset::register($this);
 					[
 						'attribute' => 'entityResponsible',
 					],
-
+					[
+						'value' => function (IssueInterface $issue) use ($model): string {
+							return LawsuitSmsBtnWidget::widget([
+								'issue' => $issue,
+								'model' => $model,
+							]);
+						},
+						'format' => 'raw',
+					],
 					[
 						'value' => function (IssueInterface $issue) use ($model): string {
 							return Html::a(

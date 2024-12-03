@@ -2,12 +2,16 @@
 
 namespace common\modules\court\controllers;
 
+use common\components\message\MessageTemplate;
+use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
+use common\models\message\IssueLawsuitSmsForm;
 use common\modules\court\models\Lawsuit;
 use common\modules\court\models\LawsuitIssueForm;
 use common\modules\court\models\search\LawsuitSearch;
 use common\modules\court\Module;
+use common\modules\court\widgets\LawsuitSmsBtnWidget;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -57,6 +61,43 @@ class LawsuitController extends Controller {
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
 		]);
+	}
+
+	public function actionSmsTemplate(int $lawsuitId, int $issueId, string $key) {
+		$template = $this->findTemplate($key);
+		$lawsuit = $this->findModel($lawsuitId);
+		$issue = $this->findIssue($issueId);
+		if (empty($issue->getIssueModel()->customer->getPhone())) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('issue', 'Try send sms to Customer: {customer} without Phone.', [
+					'customer' => $issue->getIssueModel()->customer->getFullName(),
+				]));
+			return $this->redirect(['view', 'id' => $lawsuitId]);
+		}
+		$model = new IssueLawsuitSmsForm($issue);
+		$model->setLawsuit($lawsuit);
+		$model->owner_id = Yii::$app->user->getId();
+		$model->setFirstAvailablePhone();
+		$model->message = LawsuitSmsBtnWidget::getSmsMessage($lawsuit, $template);
+		if (Yii::$app->request->isPost) {
+			$jobId = $model->pushJob();
+			if (!empty($jobId)) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('common', 'Success add SMS: {message} to send queue.', [
+						'message' => $model->message,
+					]));
+				return $this->redirect(['view', 'id' => $lawsuitId]);
+			}
+		}
+		return $this->renderContent($model->message);
+	}
+
+	protected function findTemplate(string $key): MessageTemplate {
+		$template = Yii::$app->messageTemplate->getTemplate($key);
+		if ($template === null) {
+			throw new NotFoundHttpException('Not Found Message Template for Key: ' . $key);
+		}
+		return $template;
 	}
 
 	/**

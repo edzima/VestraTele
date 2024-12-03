@@ -1,6 +1,6 @@
 <?php
 
-use common\models\court\Court;
+use common\modules\court\models\Court;
 
 return [
 	[

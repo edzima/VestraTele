@@ -2,6 +2,7 @@
 
 use common\helpers\Html;
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\Module;
 use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadDialersGridView;
@@ -15,12 +16,13 @@ use yii\widgets\DetailView;
 /* @var $withDialers bool */
 /* @var $updateLink bool */
 /* @var $visibleCustomerLink bool */
+/* @var $withType bool */
 ?>
 
 <div class="same-contact-lead">
 
 	<h3>
-		<?= $viewLink || $model->isForUser(Yii::$app->user->getId())
+		<?= Module::manager()->isForUser($model)
 			? Html::a(Html::encode($model->getName()), ['view', 'id' => $model->getId()])
 			: Html::encode($model->getName())
 		?>
@@ -60,6 +62,7 @@ use yii\widgets\DetailView;
 			[
 				'attribute' => 'source.type',
 				'label' => Yii::t('lead', 'Type'),
+				'visible' => $withType,
 			],
 			'source',
 			'date_at:datetime',

@@ -87,6 +87,10 @@ class UserController extends BaseController {
 		$model = new LeadsUserForm();
 		$ids = array_unique($ids);
 		$model->leadsIds = array_combine($ids, $ids);
+		if ($this->module->onlyUser) {
+			$model->scenario = LeadsUserForm::SCENARIO_USER_LEADS;
+			$model->idUserLeads = Yii::$app->user->getId();
+		}
 		if ($model->load(Yii::$app->request->post())) {
 			$count = $model->save();
 			if ($count) {

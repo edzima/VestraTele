@@ -3,8 +3,6 @@
 namespace common\modules\lead\models\searches;
 
 use common\helpers\ArrayHelper;
-use common\helpers\Html;
-use common\helpers\Url;
 use common\modules\lead\chart\LeadStatusColor;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadSource;
@@ -263,6 +261,7 @@ class LeadChartSearch extends LeadSearch {
 		$this->applyTypeFilter($query);
 		$this->applyOnlyWithCosts($query);
 		$this->applyCampaignFilter($query);
+		$this->applyExcludedSourcesFilter($query);
 	}
 
 	public function getUniqueId(): string {
@@ -274,16 +273,6 @@ class LeadChartSearch extends LeadSearch {
 			$this->leadStatusColor = LeadStatusColor::instance();
 		}
 		return $this->leadStatusColor;
-	}
-
-	public function getLeadsUrl() {
-		$params = ['lead/index'];
-		foreach ($this->safeAttributes() as $name) {
-			$params[Html::getInputName(LeadSearch::instance(), $name)] = $this->getAttribute($name);
-		}
-		var_dump($this->owner_id);
-		echo Html::dump($params);
-		return Url::to($params);
 	}
 
 }

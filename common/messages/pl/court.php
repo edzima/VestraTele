@@ -41,4 +41,5 @@ return [
 	'Summons' => 'Zlecenia',
 	'Create Court' => 'Dodaj Sąd',
 	'Is Appeal' => 'Apelacja',
+	'Are you sure you want to send SMS: {message}?' => 'Chcesz wysłać SMS?<br>{message}',
 ];

@@ -368,5 +368,6 @@ return [
 	'Change Status' => 'Zmień Status',
 	'Are you sure you want to change the status to:{status} for this workers?' => 'Jesteś pewny, że chcesz zmienić Status na: {status}?',
 	'Status changed successfully.' => 'Pomyślnie zmieniono Status.',
+	'Without user types' => 'Wykluczone Obecności',
 	'Update Cost Type: {name}' => 'Edytuj Typ Kosztu: {name}',
 ];
