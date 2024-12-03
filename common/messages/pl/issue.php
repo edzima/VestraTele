@@ -260,5 +260,5 @@ return array_merge([
 	'Show Chart' => 'Wykresy',
 	'Types Count' => 'Typ',
 	'Stages Count' => 'Etap',
-	'Entity Resposbile Count' => 'Podmiot',
+	'Entity Responsible Count' => 'Podmiot',
 ], $local);
