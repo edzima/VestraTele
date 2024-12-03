@@ -258,4 +258,7 @@ return array_merge([
 	'Excluded entity' => 'Wykluczone Podmioty',
 	'Try send sms to Customer: {customer} without Phone.' => 'Klient: {customer} musi mieć nr telefonu, by wysłąć SMS',
 	'Show Chart' => 'Wykresy',
+	'Types Count' => 'Typ',
+	'Stages Count' => 'Etap',
+	'Entity Resposbile Count' => 'Podmiot',
 ], $local);

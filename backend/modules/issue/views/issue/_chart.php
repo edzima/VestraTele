@@ -107,8 +107,8 @@ $model->setTypesNames($typesNamesWithCount);
 
 		<?= !empty($typeChartData)
 			? ChartsWidget::widget([
-				'type' => ChartsWidget::TYPE_DONUT,
-				'id' => 'issue-chart-type--chart',
+				'type' => ChartsWidget::TYPE_PIE,
+				'id' => 'issue-chart-type-chart',
 				'legendFormatterAsSeriesWithCount' => true,
 				'series' => $typeChartData['series'],
 				'options' => [
@@ -117,9 +117,13 @@ $model->setTypesNames($typesNamesWithCount);
 						'position' => 'bottom',
 						'height' => '55',
 					],
+					'title' => [
+						'text' => Yii::t('issue', 'Types Count'),
+						'align' => 'center',
+					],
 				],
 				'containerOptions' => [
-					'class' => 'col-sm-12 col-md-6 col-lg-4 status-charts',
+					'class' => 'col-sm-12 col-md-6 col-lg-4',
 					'style' => ['height' => '50vh',],
 				],
 			])
@@ -128,7 +132,7 @@ $model->setTypesNames($typesNamesWithCount);
 
 		<?= !empty($stageChartData)
 			? ChartsWidget::widget([
-				'type' => ChartsWidget::TYPE_DONUT,
+				'type' => ChartsWidget::TYPE_PIE,
 				'id' => 'issue-chart-stage-chart',
 				'legendFormatterAsSeriesWithCount' => true,
 				'series' => $stageChartData['series'],
@@ -138,9 +142,13 @@ $model->setTypesNames($typesNamesWithCount);
 						'position' => 'bottom',
 						'height' => '55',
 					],
+					'title' => [
+						'text' => Yii::t('issue', 'Stages Count'),
+						'align' => 'center',
+					],
 				],
 				'containerOptions' => [
-					'class' => 'col-sm-12 col-md-6 col-lg-4 status-charts',
+					'class' => 'col-sm-12 col-md-6 col-lg-4',
 					'style' => ['height' => '50vh',],
 				],
 			])
@@ -149,7 +157,7 @@ $model->setTypesNames($typesNamesWithCount);
 
 		<?= !empty($entityChartData)
 			? ChartsWidget::widget([
-				'type' => ChartsWidget::TYPE_DONUT,
+				'type' => ChartsWidget::TYPE_PIE,
 				'id' => 'issue-chart-entity-responsible-chart',
 				'legendFormatterAsSeriesWithCount' => true,
 				'series' => $entityChartData['series'],
@@ -158,6 +166,10 @@ $model->setTypesNames($typesNamesWithCount);
 					'legend' => [
 						'position' => 'bottom',
 						'height' => '55',
+					],
+					'title' => [
+						'text' => Yii::t('issue', 'Entity Responsible Count'),
+						'align' => 'center',
 					],
 				],
 				'containerOptions' => [
