@@ -107,7 +107,7 @@ if ($searchModel->getIssueMainType()) {
 				'class' => DataColumn::class,
 				'attribute' => 'entity_responsible_id',
 				'label' => $searchModel->getAttributeLabel('entity_responsible_id'),
-				'filter' => IssueSearch::getEntityNames(),
+				'filter' => $searchModel->getEntityResponsibleNames(),
 				'filterType' => GridView::FILTER_SELECT2,
 				'filterWidgetOptions' => [
 					'pluginOptions' => [

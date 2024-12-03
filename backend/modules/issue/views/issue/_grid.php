@@ -180,7 +180,7 @@ $this->registerJs($js);
 		[
 			'class' => DataColumn::class,
 			'attribute' => 'entity_responsible_id',
-			'filter' => IssueSearch::getEntityNames(),
+			'filter' => $searchModel->getEntityResponsibleNames(),
 			'filterType' => GridView::FILTER_SELECT2,
 			'filterWidgetOptions' => [
 				'pluginOptions' => [

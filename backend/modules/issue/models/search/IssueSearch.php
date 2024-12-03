@@ -48,6 +48,10 @@ class IssueSearch extends BaseIssueSearch {
 	public bool $withClaimsSum = false;
 
 	public ?string $signature_act = null;
+	/**
+	 * @var mixed|null
+	 */
+	public bool $showChart = false;
 
 	private ?array $ids = null;
 
@@ -57,7 +61,7 @@ class IssueSearch extends BaseIssueSearch {
 		return array_merge(parent::rules(), [
 			['!userId', 'required'],
 			[['parentId', 'agent_id', 'tele_id', 'lawyer_id'], 'integer'],
-			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims', 'withClaimsSum'], 'boolean'],
+			[['onlyDelayed', 'onlyWithPayedPay', 'onlyWithSettlements', 'onlyWithClaims', 'withClaimsSum', 'showChart'], 'boolean'],
 			[['entity_agreement_details'], 'string'],
 			[['onlyWithSettlements', 'onlyWithClaims'], 'default', 'value' => null],
 			['claimCompanyTryingValue', 'number', 'min' => 0],
