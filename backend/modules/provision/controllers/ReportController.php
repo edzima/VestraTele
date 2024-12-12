@@ -70,7 +70,6 @@ class ReportController extends Controller {
 		$searchModel->dateTo = $dateTo;
 		$searchModel->dateFrom = $dateFrom;
 		$searchModel->hide_on_report = false;
-		$searchModel->withoutEmpty = true;
 		$searchModel->excludedFromUsers = UserVisible::hiddenUsers($id);
 		$searchModel->load(Yii::$app->request->queryParams);
 
