@@ -27,12 +27,11 @@
 		"ext-zip": "*",
 		"ext-gd": "*",
 		"php-decimal/php-decimal": "^1.1",
-		"yiisoft/yii2": "^2.0.49",
+		"yiisoft/yii2": "^2.0.51",
 		"yiisoft/yii2-bootstrap": "^2.0.1",
 		"yiisoft/yii2-swiftmailer": "^2.1.2",
 		"vlucas/phpdotenv": "^5.1.0",
 		"dmstr/yii2-adminlte-asset": "^2.6.2",
-		"beaten-sect0r/yii2-db-manager": "^2.2.2",
 		"vova07/yii2-imperavi-widget": "^2.0.11",
 		"vova07/yii2-fileapi-widget": "^0.1.9",
 		"trntv/yii2-datetime-widget": "^1.1.1",
@@ -60,7 +59,8 @@
 		"kartik-v/yii2-widget-fileinput": "^1.1",
 		"league/flysystem-aws-s3-v3": "^1.0",
 		"maestroerror/php-heic-to-jpg": "^1.0",
-		"kartik-v/yii2-sortable-input": "^1.2.1"
+		"kartik-v/yii2-sortable-input": "^1.2.1",
+		"creocoder/yii2-flysystem": "^1.2"
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-latest",
