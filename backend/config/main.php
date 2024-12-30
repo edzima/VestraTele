@@ -87,6 +87,7 @@ return [
 			'errorAction' => 'site/error',
 		],
 		'urlManager' => require __DIR__ . '/_urlManager.php',
+		'multipleHosts' => require(__DIR__ . '/_multipleHosts.php'),
 		'frontendCache' => require Yii::getAlias('@frontend/config/_cache.php'),
 	],
 	'modules' => [

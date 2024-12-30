@@ -170,6 +170,7 @@ return [
 		],
 		'urlManager' => require(__DIR__ . '/_urlManager.php'),
 		'cache' => require(__DIR__ . '/_cache.php'),
+		'multipleHosts' => require(__DIR__ . '/_multipleHosts.php'),
 	],
 	'as beforeAction' => [
 		'class' => 'common\behaviors\LastActionBehavior',

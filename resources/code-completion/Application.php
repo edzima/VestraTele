@@ -6,6 +6,7 @@ use common\components\HierarchyComponent;
 use common\components\IssueTypeUser;
 use common\components\keyStorage\KeyStorage;
 use common\components\message\MessageTemplateManager;
+use common\components\MultipleHosts;
 use common\components\PayComponent;
 use common\components\postal\PocztaPolska;
 use common\components\provision\Provisions;
@@ -50,6 +51,7 @@ class Yii extends BaseYii {
  * @property KeyStorage $keyStorage
  * @property PocztaPolska $pocztaPolska
  * @property FileAuth $fileAuth
+ * @property MultipleHosts|null $multipleHosts
  */
 abstract class Application extends \yii\web\Application {
 

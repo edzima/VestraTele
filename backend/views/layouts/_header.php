@@ -1,8 +1,11 @@
 <?php
 
-use yii\bootstrap\Html;
+use backend\helpers\Html;
+use common\widgets\MultipleHostsButtonDropdown;
+use yii\web\View;
 
-/* @var $this \yii\web\View */
+/* @var $this View */
+
 ?>
 <header class="main-header">
 	<?= Html::a('<span class="logo-mini">APP</span><span class="logo-lg"><i class="fa fa-diamond"></i> ' . Yii::$app->name . '</span>', Yii::$app->homeUrl, ['class' => 'logo']) ?>
@@ -12,12 +15,13 @@ use yii\bootstrap\Html;
 		</a>
 		<div class="navbar-custom-menu">
 			<ul class="nav navbar-nav">
+				<?= MultipleHostsButtonDropdown::widget() ?>
 
 				<li class="dropdown user user-menu">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						<?php if (Yii::$app->user->identity->profile->avatar_path) : ?>
 							<img src="<?= Yii::getAlias('@storageUrl/avatars/' . Yii::$app->user->identity->profile->avatar_path) ?>"
-							     class="user-image" alt>
+									class="user-image" alt>
 						<?php else: ?>
 							<img src="<?= Yii::$app->homeUrl . '/static/img/default.png' ?>" class="user-image" alt>
 						<?php endif ?>
@@ -27,7 +31,7 @@ use yii\bootstrap\Html;
 						<li class="user-header">
 							<?php if (Yii::$app->user->identity->profile->avatar_path) : ?>
 								<img src="<?= Yii::getAlias('@storageUrl/avatars/' . Yii::$app->user->identity->profile->avatar_path) ?>"
-								     class="img-circle" alt>
+										class="img-circle" alt>
 							<?php else: ?>
 								<img src="<?= Yii::$app->homeUrl . '/static/img/default.png' ?>" class="img-circle" alt>
 							<?php endif ?>

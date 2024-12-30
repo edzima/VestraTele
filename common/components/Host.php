@@ -9,6 +9,7 @@ use yii\db\Connection;
 class Host extends BaseObject {
 
 	public string $name;
+	public ?string $url = null;
 
 	public array $db = [];
 

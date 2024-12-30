@@ -3,6 +3,7 @@
 use common\models\user\User;
 use common\models\user\Worker;
 use common\widgets\Alert;
+use common\widgets\MultipleHostsButtonDropdown;
 use frontend\assets\AppAsset;
 use frontend\helpers\Html;
 use frontend\models\NavItem;
@@ -170,6 +171,17 @@ AppAsset::register($this);
 			'url' => ['/report/index'],
 
 		];
+
+		$multipleHosts = new MultipleHostsButtonDropdown();
+		$hostsItems = $multipleHosts->defaultItems();
+		if (!empty($hostsItems)) {
+			$menuItems[] = [
+				'label' => Html::icon('link'),
+				'encode' => false,
+				'url' => '#',
+				'items' => $hostsItems,
+			];
+		}
 		$menuItems[] = [
 			'label' => Yii::$app->user->identity->username,
 			'url' => '#',
@@ -188,6 +200,7 @@ AppAsset::register($this);
 					'url' => ['/account/sign-in/logout'],
 					'linkOptions' => ['data-method' => 'post'],
 				],
+
 			],
 		];
 	}
@@ -197,6 +210,7 @@ AppAsset::register($this);
 		'options' => ['class' => 'navbar-nav navbar-right'],
 		'items' => $menuItems,
 	]);
+
 	NavBar::end() ?>
 
 	<div class="container">
