@@ -31,6 +31,13 @@ class MultipleHostsButtonDropdown extends ButtonDropdown {
 		}
 	}
 
+	public function run(): string {
+		if (empty($this->dropdown['items'])) {
+			return '';
+		}
+		return parent::run();
+	}
+
 	public function defaultItems(): array {
 		$items = [];
 		foreach ($this->hosts as $host) {
