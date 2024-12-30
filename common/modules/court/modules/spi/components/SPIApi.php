@@ -1,0 +1,320 @@
+<?php
+
+namespace common\modules\court\modules\spi\components;
+
+use common\modules\court\modules\spi\components\exceptions\SPIApiException;
+use common\modules\court\modules\spi\components\exceptions\UnauthorizedSPIApiException;
+use common\modules\court\modules\spi\models\AppealInterface;
+use common\modules\court\modules\spi\models\application\ApplicationDTO;
+use common\modules\court\modules\spi\models\application\ApplicationType;
+use common\modules\court\modules\spi\models\application\ApplicationViewDTO;
+use common\modules\court\modules\spi\models\lawsuit\LawsuitDetailsDto;
+use common\modules\court\modules\spi\models\lawsuit\LawsuitViewIntegratorDto;
+use Yii;
+use yii\base\Component;
+use yii\data\ArrayDataProvider;
+use yii\data\DataProviderInterface;
+use yii\httpclient\Client;
+use yii\httpclient\Request;
+use yii\httpclient\RequestEvent;
+use yii\httpclient\Response;
+
+class SPIApi extends Component implements ApplicationType {
+
+	public string $baseUrl;
+	public string $username;
+	public string $password;
+
+	protected string $appeal = self::DEFAULT_APPEAL;
+	public string $appealUrlSchema = 'https://portal.wroclaw.sa.gov.pl/{appeal}/api';
+
+	private const ROUTE_SLPS_COURT = 'slps/courts';
+
+	private const ROUTE_COURT = 'courts';
+	private const ROUTE_COURT_DEPARTMENTS = 'court-departments';
+	private const ROUTE_LAWSUITS = 'lawsuits';
+	private const ROUTE_APPLICATIONS = 'applications';
+
+	protected const DEFAULT_APPEAL = AppealInterface::APPEAL_WROCLAW;
+
+	private ?Client $client = null;
+
+	private array $clientOptions = [
+		'requestConfig' => [
+			'format' => Client::FORMAT_JSON,
+		],
+	];
+
+	private ?string $token = null;
+
+	public static function testApi(): self {
+		return new self([
+			'baseUrl' => 'https://testapi.wroclaw.sa.gov.pl/api/',
+			'password' => 'Wroclaw123',
+			'username' => '83040707012',
+		]);
+	}
+
+	private const NO_AUTH_ROUTES = [
+		self::ROUTE_COURT,
+	];
+
+	public function setAppeal(string $appeal): void {
+		$this->appeal = $appeal;
+		$this->baseUrl = $this->getAppealUrl($appeal);
+	}
+
+	public function getAppealUrl(string $appeal): string {
+		return str_replace('{appeal}', $appeal, $this->appealUrlSchema);
+	}
+
+	public function getLawsuits(array $params = []): ?DataProviderInterface {
+		$url = $this->getUrl(static::ROUTE_LAWSUITS, $params);
+		$response = $this->getClient()
+			->createRequest()
+			->setUrl($url)
+			->setMethod('GET')
+			->send();
+
+		if ($response->isOk) {
+			$totalCount = $this->getTotalCount($response);
+			$data = $response->getData();
+			$models = [];
+			foreach ($data as $datum) {
+				$models[] = new LawsuitViewIntegratorDto($datum);
+			}
+			return new ArrayDataProvider([
+				'key' => 'id',
+				'modelClass' => LawsuitViewIntegratorDto::class,
+				'models' => $models,
+				'totalCount' => $totalCount,
+			]);
+		}
+		Yii::warning($response->getData(), __METHOD__);
+		return null;
+	}
+
+	public function getLawsuit(string $id): ?LawsuitDetailsDto {
+		$url = static::ROUTE_LAWSUITS . '/' . $id;
+		$response = $this->getClient()
+			->createRequest()
+			->setUrl($url)
+			->setMethod('GET')
+			->send();
+		codecept_debug($response->getData());
+		if ($response->isOk) {
+			return new LawsuitDetailsDto($response->getData());
+		}
+
+		Yii::warning($response->getData(), __METHOD__);
+		return null;
+	}
+
+	public function createApplication(ApplicationDTO $model): bool {
+		return true;
+		$url = static::ROUTE_APPLICATIONS;
+		$respone = $this->getClient()
+			->createRequest()
+			->setUrl($url)
+			->setMethod('POST')
+			->setData($model->toArray())
+			->send();
+
+		codecept_debug($respone->getData());
+
+		if ($respone->isOk) {
+			return true;
+		}
+		Yii::warning($respone->getData(), __METHOD__);
+		return false;
+	}
+
+	public function checkApplication(ApplicationDTO &$model): bool {
+		$url = static::ROUTE_APPLICATIONS . '/' . 'check';
+		$response = $this->getClient()
+			->createRequest()
+			->setUrl($url)
+			->setMethod('POST')
+			->setData($model->toArray())
+			->send();
+
+		codecept_debug($response->getData());
+
+		if ($response->isOk) {
+			$model = ApplicationDTO::createFromResponse($response);
+			return true;
+		}
+		return false;
+	}
+
+	public function getApplications(array $params = []): ?DataProviderInterface {
+		Yii::warning($params);
+		$url = $this->getUrl(static::ROUTE_APPLICATIONS, $params);
+		$response = $this->getClient()
+			->createRequest()
+			->setUrl($url)
+			->setMethod('GET')
+			->send();
+		if ($response->isOk) {
+			$totalCount = $this->getTotalCount($response);
+			$data = $response->getData();
+			$models = [];
+			foreach ($data as $datum) {
+				$models[] = new ApplicationViewDTO($datum);
+			}
+			return new ArrayDataProvider([
+				'key' => 'id',
+				'modelClass' => ApplicationViewDTO::class,
+				'models' => $models,
+				'totalCount' => $totalCount,
+			]);
+		}
+		Yii::warning($response->getData(), __METHOD__);
+		return null;
+	}
+
+	public function getCourts(array $params = []) {
+		$url = $this->getUrl(static::ROUTE_COURT, $params);
+		$response = $this->getClient()
+			->createRequest()
+			->setUrl($url)
+			->setMethod('GET')
+			->send();
+		codecept_debug($response->getData());
+		if ($response->isOk) {
+			$totalCount = $this->getTotalCount($response);
+			return new ArrayDataProvider([
+				'key' => 'id',
+				'models' => $response->getData(),
+				'totalCount' => $totalCount,
+			]);
+		}
+
+		Yii::warning($response->getData(), __METHOD__);
+		return null;
+	}
+
+	public function getCourtDepartments(array $params = []) {
+		$url = $this->getUrl(static::ROUTE_COURT_DEPARTMENTS, $params);
+		$response = $this->getClient()
+			->createRequest()
+			->setUrl($url)
+			->setMethod('GET')
+			->send();
+		codecept_debug($response->getData());
+		if ($response->isOk) {
+			$totalCount = $this->getTotalCount($response);
+			return new ArrayDataProvider([
+				'key' => 'id',
+				'models' => $response->getData(),
+				'totalCount' => $totalCount,
+			]);
+		}
+		Yii::warning($response->getData(), __METHOD__);
+		return null;
+	}
+
+	public function authenticate(bool $thrown = true): bool {
+		$this->token = null;
+		$client = $this->getClient();
+
+		$response = $client->createRequest()
+			->setUrl('/authenticate')
+			->setData([
+				'username' => $this->username,
+				'password' => $this->password,
+			])
+			->setMethod('POST')
+			->send();
+		if ($response->isOk) {
+			$this->token = $response->data['id_token'];
+			return true;
+		}
+
+		if ($thrown) {
+			$this->thrown($response);
+		}
+
+		return false;
+	}
+
+	protected function getClient(): Client {
+		if ($this->client === null) {
+			$this->client = new Client($this->clientOptions);
+			$this->client->baseUrl = $this->baseUrl;
+			$this->client->on(
+				Client::EVENT_BEFORE_SEND,
+				[$this, 'beforeSend']
+			);
+			$this->client->on(
+				Client::EVENT_AFTER_SEND,
+				[$this, 'afterSend'],
+			);
+		}
+		return $this->client;
+	}
+
+	protected function getUrl(string $route, array $params = []): string {
+		$url = $route;
+		if (!empty($params)) {
+			$url .= '?' . http_build_query($params);
+		}
+		return $url;
+	}
+
+	protected function beforeSend(RequestEvent $event): void {
+		$request = $event->request;
+		if (!$this->isAuthRequest($request) && $this->isRequiredAuthUrl($request->getUrl())) {
+			$this->authenticate();
+			$this->addAuthHeader($request);
+		}
+	}
+
+	protected function afterSend(RequestEvent $event): void {
+		if (!$this->isAuthRequest($event->request)) {
+			$this->token = null;
+		}
+	}
+
+	protected function isAuthRequest(Request $request): bool {
+		return strpos($request->getUrl(), '/authenticate') !== false;
+	}
+
+	private function isRequiredAuthUrl(string $url): bool {
+		if (empty(static::NO_AUTH_ROUTES)) {
+			return true;
+		}
+		$url = str_replace($this->baseUrl, '', $url);
+		foreach (static::NO_AUTH_ROUTES as $route) {
+			if (str_starts_with($url, $route)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private function thrown(Response $response) {
+		$data = $response->getData();
+		$status = $data['status'] ?? $response->getStatusCode();
+		switch ($status) {
+			case '401':
+				throw UnauthorizedSPIApiException::createFromResponseData($data);
+		}
+		throw SPIApiException::createFromResponseData($data);
+	}
+
+	private function addAuthHeader(Request $request): void {
+		$request->addHeaders([
+			'Authorization' => 'Bearer ' . $this->token,
+		]);
+	}
+
+	private function getTotalCount(Response $response): int {
+		return $response->getHeaders()['X-Total-Count'];
+	}
+
+	public function getApplicationType(): string {
+		return $this->appeal;
+	}
+
+}
