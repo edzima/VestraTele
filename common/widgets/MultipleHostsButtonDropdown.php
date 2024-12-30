@@ -16,11 +16,18 @@ class MultipleHostsButtonDropdown extends ButtonDropdown {
 	public $containerOptions = [
 		'tag' => 'li',
 	];
+	public array $excludedUrls = [];
 
 	public function init(): void {
 		parent::init();
 		if (empty($this->hosts)) {
 			$this->hosts = Yii::$app->multipleHosts->hosts ?? [];
+		}
+		if (empty($this->excludedUrls)) {
+			$this->excludedUrls = [
+				$_ENV['FRONTEND_URL'],
+				$_ENV['BACKEND_URL'],
+			];
 		}
 		if ($this->label === 'Button') {
 			$this->label = Html::icon('link');
@@ -53,6 +60,9 @@ class MultipleHostsButtonDropdown extends ButtonDropdown {
 		if (empty($host->url)) {
 			return [];
 		}
+		if (in_array($host->url, $this->excludedUrls)) {
+			return [];
+		}
 		return [
 			'label' => $host->name,
 			'url' => $host->url,
@@ -61,4 +71,5 @@ class MultipleHostsButtonDropdown extends ButtonDropdown {
 			],
 		];
 	}
+
 }
