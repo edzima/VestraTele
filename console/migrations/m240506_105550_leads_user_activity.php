@@ -24,19 +24,22 @@ class m240506_105550_leads_user_activity extends Migration {
 			foreach ($rows as $model) {
 				/** @var LeadUser $model */
 				$dates = [];
-				foreach ($model->lead->reports as $report) {
-					if ($report->owner_id === $model->user_id) {
-						$dates[] = $report->created_at;
+				$lead = $model->lead;
+				if ($lead) {
+					foreach ($lead->reports as $report) {
+						if ($report->owner_id === $model->user_id) {
+							$dates[] = $report->created_at;
+						}
 					}
-				}
-				if (!empty($dates)) {
-					$min = min($dates);
-					$max = max($dates);
-					$model->updateAttributes([
-						'first_view_at' => $min,
-						'last_view_at' => $max,
-						'action_at' => $max,
-					]);
+					if (!empty($dates)) {
+						$min = min($dates);
+						$max = max($dates);
+						$model->updateAttributes([
+							'first_view_at' => $min,
+							'last_view_at' => $max,
+							'action_at' => $max,
+						]);
+					}
 				}
 			}
 		}

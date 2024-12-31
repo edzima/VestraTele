@@ -6,10 +6,10 @@ use common\components\HierarchyComponent;
 use common\components\IssueTypeUser;
 use common\components\keyStorage\KeyStorage;
 use common\components\message\MessageTemplateManager;
+use common\components\MultipleHosts;
 use common\components\PayComponent;
 use common\components\postal\PocztaPolska;
 use common\components\provision\Provisions;
-use common\components\rbac\ManagerFactory;
 use common\components\TaxComponent;
 use common\components\User;
 use common\modules\file\components\FileAuth;
@@ -52,6 +52,7 @@ class Yii extends BaseYii {
  * @property PocztaPolska $pocztaPolska
  * @property FileAuth $fileAuth
  * @property ManagerFactory $accessManagerFactory
+ * @property MultipleHosts|null $multipleHosts
  */
 abstract class Application extends \yii\web\Application {
 

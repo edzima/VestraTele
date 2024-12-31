@@ -14,11 +14,8 @@ class MultipleHosts extends Component {
 	 */
 	public array $hosts = [];
 
-	public function init() {
+	public function init(): void {
 		parent::init();
-		if (empty($this->hosts)) {
-			throw new InvalidConfigException('$hosts must be set.');
-		}
 		$this->initHosts();
 	}
 
