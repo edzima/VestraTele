@@ -8,6 +8,9 @@ use common\modules\court\modules\spi\models\AppealInterface;
 use common\modules\court\modules\spi\models\application\ApplicationDTO;
 use common\modules\court\modules\spi\models\application\ApplicationType;
 use common\modules\court\modules\spi\models\application\ApplicationViewDTO;
+use common\modules\court\modules\spi\models\court\CourtDepartmentFullDTO;
+use common\modules\court\modules\spi\models\court\CourtDepartmentSmallDTO;
+use common\modules\court\modules\spi\models\court\RepertoryDTO;
 use common\modules\court\modules\spi\models\lawsuit\LawsuitDetailsDto;
 use common\modules\court\modules\spi\models\lawsuit\LawsuitViewIntegratorDto;
 use Yii;
@@ -28,10 +31,9 @@ class SPIApi extends Component implements ApplicationType {
 	protected string $appeal = self::DEFAULT_APPEAL;
 	public string $appealUrlSchema = 'https://portal.wroclaw.sa.gov.pl/{appeal}/api';
 
-	private const ROUTE_SLPS_COURT = 'slps/courts';
-
 	private const ROUTE_COURT = 'courts';
 	private const ROUTE_COURT_DEPARTMENTS = 'court-departments';
+	private const ROUTE_DEPARTMENT_REPERTORIES = 'repertories/department';
 	private const ROUTE_LAWSUITS = 'lawsuits';
 	private const ROUTE_APPLICATIONS = 'applications';
 
@@ -194,8 +196,38 @@ class SPIApi extends Component implements ApplicationType {
 		return null;
 	}
 
-	public function getCourtDepartments(array $params = []) {
-		$url = $this->getUrl(static::ROUTE_COURT_DEPARTMENTS, $params);
+	public function getAllCourtDepartments(array $pageableParams = []): ?DataProviderInterface {
+		$route = static::ROUTE_COURT_DEPARTMENTS;
+		$url = $this->getUrl($route, $pageableParams);
+		$response = $this->getClient()
+			->createRequest()
+			->setUrl($url)
+			->setMethod('GET')
+			->send();
+		if ($response->isOk) {
+			$totalCount = $this->getTotalCount($response);
+			$data = $response->getData();
+			$models = [];
+			foreach ($data as $datum) {
+				$models[] = new CourtDepartmentFullDTO($datum);
+			}
+			return new ArrayDataProvider([
+				'key' => 'id',
+				'models' => $models,
+				'totalCount' => $totalCount,
+				'modelClass' => CourtDepartmentFullDTO::class,
+			]);
+		}
+		Yii::warning($response->getData(), __METHOD__);
+		return null;
+	}
+
+	public function getCourtDepartments(int $courtId, array $params = []) {
+		$route = static::ROUTE_COURT_DEPARTMENTS;
+		if ($courtId) {
+			$route .= '/court/' . $courtId;
+		}
+		$url = $this->getUrl($route, $params);
 		$response = $this->getClient()
 			->createRequest()
 			->setUrl($url)
@@ -204,10 +236,43 @@ class SPIApi extends Component implements ApplicationType {
 		codecept_debug($response->getData());
 		if ($response->isOk) {
 			$totalCount = $this->getTotalCount($response);
+			$data = $response->getData();
+			$models = [];
+			foreach ($data as $datum) {
+				$models[] = new CourtDepartmentSmallDTO($datum);
+			}
 			return new ArrayDataProvider([
 				'key' => 'id',
-				'models' => $response->getData(),
+				'models' => $models,
 				'totalCount' => $totalCount,
+				'modelClass' => CourtDepartmentSmallDTO::class,
+			]);
+		}
+		Yii::warning($response->getData(), __METHOD__);
+		return null;
+	}
+
+	public function getDepartmentRepertories(int $departmentId, array $params = []): ?DataProviderInterface {
+		$route = static::ROUTE_DEPARTMENT_REPERTORIES . '/' . $departmentId;
+		$url = $this->getUrl($route, $params);
+		$response = $this->getClient()
+			->createRequest()
+			->setUrl($url)
+			->setMethod('GET')
+			->send();
+		codecept_debug($response->getData());
+		if ($response->isOk) {
+			$totalCount = $this->getTotalCount($response);
+			$data = $response->getData();
+			$models = [];
+			foreach ($data as $datum) {
+				$models[] = new RepertoryDTO($datum);
+			}
+			return new ArrayDataProvider([
+				'key' => 'id',
+				'models' => $models,
+				'totalCount' => $totalCount,
+				'modelClass' => RepertoryDTO::class,
 			]);
 		}
 		Yii::warning($response->getData(), __METHOD__);
@@ -310,7 +375,10 @@ class SPIApi extends Component implements ApplicationType {
 	}
 
 	private function getTotalCount(Response $response): int {
-		return $response->getHeaders()['X-Total-Count'];
+		if (isset($response->getHeaders()['X-Total-Count'])) {
+			return (int) $response->getHeaders()['X-Total-Count'];
+		}
+		return count($response->getData());
 	}
 
 	public function getApplicationType(): string {
