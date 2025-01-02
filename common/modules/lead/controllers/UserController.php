@@ -75,17 +75,8 @@ class UserController extends BaseController {
 	}
 
 	public function actionAssign(array $ids = []) {
-		if (empty($ids)) {
-			$postIds = Yii::$app->request->post('leadsIds');
-			if (is_string($postIds)) {
-				$postIds = explode(',', $postIds);
-			}
-			if ($postIds) {
-				$ids = $postIds;
-			}
-		}
+		$this->ensureLeadsIds($ids);
 		$model = new LeadsUserForm();
-		$ids = array_unique($ids);
 		$model->leadsIds = array_combine($ids, $ids);
 		if ($this->module->onlyUser) {
 			$model->scenario = LeadsUserForm::SCENARIO_USER_LEADS;
@@ -204,4 +195,5 @@ class UserController extends BaseController {
 
 		throw new NotFoundHttpException(Yii::t('lead', 'The requested page does not exist.'));
 	}
+
 }

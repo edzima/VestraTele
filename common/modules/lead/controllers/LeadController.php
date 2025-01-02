@@ -19,7 +19,6 @@ use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadNameSearch;
 use common\modules\lead\models\searches\LeadPhoneSearch;
-use common\modules\lead\models\searches\LeadSearch;
 use common\modules\lead\Module;
 use common\modules\reminder\models\ReminderQuery;
 use Yii;
@@ -58,14 +57,7 @@ class LeadController extends BaseController {
 	 * @return mixed
 	 */
 	public function actionIndex(int $pageSize = 50) {
-		$searchModel = new LeadSearch();
-		if ($this->module->onlyUser) {
-			if (Yii::$app->user->getIsGuest()) {
-				return Yii::$app->user->loginRequired();
-			}
-			$searchModel->setScenario(LeadSearch::SCENARIO_USER);
-			$searchModel->user_id = Yii::$app->user->getId();
-		}
+		$searchModel = $this->getLeadsSearchModel();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		$dataProvider->pagination->defaultPageSize = $pageSize;
@@ -191,20 +183,7 @@ class LeadController extends BaseController {
 	}
 
 	public function actionUpdateMultiple(array $ids = []) {
-		if (empty($ids)) {
-			$postIds = Yii::$app->request->post('leadsIds');
-			if (is_string($postIds)) {
-				$postIds = explode(',', $postIds);
-			}
-			if ($postIds) {
-				$ids = $postIds;
-			}
-		}
-		if (empty($ids)) {
-			Flash::add(Flash::TYPE_WARNING, 'Ids cannot be blank.');
-			return $this->redirect(['index']);
-		}
-		$ids = array_unique($ids);
+		$this->ensureLeadsIds($ids);
 		if (count($ids) === 1) {
 			return $this->redirect(['update', 'id' => reset($ids)]);
 		}
@@ -497,11 +476,9 @@ class LeadController extends BaseController {
 		return $this->redirect(['index']);
 	}
 
-	public function actionDeleteMultiple(array $ids) {
-		$selection = Yii::$app->request->post('selection');
-		if (is_array($selection)) {
-			$ids = $selection;
-		}
+	public function actionDeleteMultiple(array $ids = []) {
+		$this->ensureLeadsIds($ids);
+		return $this->renderContent(Html::dump($ids));
 
 		if (!empty($ids)) {
 			$count = Lead::deleteAll(['id' => $ids]);

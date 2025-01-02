@@ -60,17 +60,8 @@ class CampaignController extends BaseController {
 	}
 
 	public function actionAssign(array $ids = []) {
-		if (empty($ids)) {
-			$postIds = Yii::$app->request->post('leadsIds');
-			if (is_string($postIds)) {
-				$postIds = explode(',', $postIds);
-			}
-			if ($postIds) {
-				$ids = $postIds;
-			}
-		}
+		$this->ensureLeadsIds($ids);
 		$model = new LeadCampaignForm();
-		$ids = array_unique($ids);
 		$model->leadsIds = array_combine($ids, $ids);
 		if ($this->module->onlyUser) {
 			$model->scenario = LeadCampaignForm::SCENARIO_OWNER;

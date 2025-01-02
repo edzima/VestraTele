@@ -530,4 +530,5 @@ return [
 	'Cost Value (range)' => 'Koszt (okres)',
 	'Excluded Sources' => 'Wykluczone Źródła',
 	'From Campaigns' => 'Z Kampanii',
+	'Ids cannot be blank.' => 'Nie podano Leads IDs',
 ];

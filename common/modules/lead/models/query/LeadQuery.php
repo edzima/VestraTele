@@ -122,4 +122,11 @@ class LeadQuery extends ActiveQuery implements PhonableQuery {
 		$data = array_map('intval', $data);
 		return $data;
 	}
+
+	public function getIds(): array {
+		$self = clone $this;
+		$self->select(Lead::tableName() . '.id');
+		$self->groupBy(Lead::tableName() . '.id');
+		return $self->column();
+	}
 }

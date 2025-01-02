@@ -4,11 +4,11 @@ namespace common\modules\lead\controllers;
 
 use common\helpers\Flash;
 use common\modules\lead\models\forms\LeadStatusChangeForm;
-use Yii;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\searches\LeadStatusSearch;
-use yii\web\NotFoundHttpException;
+use Yii;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 
 /**
  * StatusController implements the CRUD actions for LeadStatus model.
@@ -110,20 +110,7 @@ class StatusController extends BaseController {
 	}
 
 	public function actionChange(array $ids = []) {
-		if (empty($ids)) {
-			$postIds = Yii::$app->request->post('leadsIds');
-			if (is_string($postIds)) {
-				$postIds = explode(',', $postIds);
-			}
-			if ($postIds) {
-				$ids = $postIds;
-			}
-		}
-		if (empty($ids)) {
-			Flash::add(Flash::TYPE_WARNING, 'Ids cannot be blank.');
-			return $this->redirect(['lead/index']);
-		}
-		$ids = array_unique($ids);
+		$this->ensureLeadsIds($ids);
 		$model = new LeadStatusChangeForm();
 		$model->ids = $ids;
 		$model->owner_id = Yii::$app->user->id;

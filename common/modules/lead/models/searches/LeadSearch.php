@@ -84,7 +84,6 @@ class LeadSearch extends Lead implements SearchModel {
 	private static ?array $QUESTIONS = null;
 
 	public AddressSearch $addressSearch;
-	private ?array $ids = null;
 	/**
 	 * @var mixed|null
 	 */
@@ -294,17 +293,6 @@ class LeadSearch extends Lead implements SearchModel {
 		}
 
 		return $dataProvider;
-	}
-
-	public function getAllIds(LeadQuery $query, bool $refresh = false): array {
-		if ($refresh || $this->ids === null) {
-			$query = clone $query;
-			$query->select(Lead::tableName() . '.id');
-			$this->applyDuplicates($query);
-			$query->orderBy(['date_at' => SORT_DESC]);
-			$this->ids = $query->column();
-		}
-		return $this->ids;
 	}
 
 	private function applyAddressFilter(ActiveQuery $query): void {

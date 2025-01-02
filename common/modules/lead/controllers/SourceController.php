@@ -8,8 +8,8 @@ use common\modules\lead\models\forms\LeadSourceForm;
 use common\modules\lead\models\LeadSource;
 use common\modules\lead\models\searches\LeadSourceSearch;
 use Yii;
-use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 
 /**
  * SourceController implements the CRUD actions for LeadSource model.
@@ -31,20 +31,7 @@ class SourceController extends BaseController {
 	}
 
 	public function actionChange(array $ids = []) {
-		if (empty($ids)) {
-			$postIds = Yii::$app->request->post('leadsIds');
-			if (is_string($postIds)) {
-				$postIds = explode(',', $postIds);
-			}
-			if ($postIds) {
-				$ids = $postIds;
-			}
-		}
-		if (empty($ids)) {
-			Flash::add(Flash::TYPE_WARNING, 'Ids cannot be blank.');
-			return $this->redirect(['lead/index']);
-		}
-		$ids = array_unique($ids);
+		$this->ensureLeadsIds($ids);
 		$model = new LeadSourceChangeForm();
 		$model->ids = $ids;
 		if ($model->load(Yii::$app->request->post())) {
