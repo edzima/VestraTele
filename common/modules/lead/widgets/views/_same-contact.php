@@ -39,7 +39,7 @@ use yii\widgets\DetailView;
 
 		<?= !$model->isForUser(Yii::$app->user->getId())
 			? CopyLeadBtnWidget::widget([
-				'leadId' => $model->getId(),
+				'lead' => $model,
 			])
 			: ''
 		?>

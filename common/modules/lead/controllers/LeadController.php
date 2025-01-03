@@ -385,12 +385,13 @@ class LeadController extends BaseController {
 		]);
 	}
 
-	public function actionCopy(int $id, int $typeId) {
+	public function actionCopy(int $id, int $typeId, string $hash) {
 		if (!isset(LeadType::getModels()[$typeId])) {
 			throw new NotFoundHttpException();
 		}
 		$type = LeadType::getModels()[$typeId];
 		$lead = $this->findLead($id, false);
+		$this->validateHash($lead, $hash);
 		$model = new LeadForm();
 		$model->scenario = LeadForm::SCENARIO_OWNER;
 		$model->setLead($lead);
