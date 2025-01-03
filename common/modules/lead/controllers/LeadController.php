@@ -399,6 +399,7 @@ class LeadController extends BaseController {
 		$model->provider = Lead::PROVIDER_COPY;
 		$model->date_at = date($model->dateFormat);
 		$model->owner_id = Yii::$app->user->getId();
+		$model->source_id = null;
 		$report = new ReportForm();
 		$report->setLead($lead, true);
 		$report->withSameContacts = false;
