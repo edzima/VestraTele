@@ -85,26 +85,10 @@ class SameContactsListWidget extends ListView {
 		if (!$this->model->getSameContacts(true)) {
 			return '';
 		}
-		$content = Html::a(
-			Yii::t('lead', 'Move {type} to Archive', [
-				'type' => $this->model->getTypeName(),
-			]),
-			[
-				'/lead/archive/same-contact',
-				'id' => $this->model->getId(),
-				'onlySameType' => true,
-			],
-			[
-				'class' => 'btn btn-danger',
-				'data' => [
-					'method' => 'POST',
-					'confirm' => Yii::t('lead',
-						'Move {type} Same Contact to Archive?', [
-							'type' => $this->model->getTypeName(),
-						]),
-				],
-			]
-		);
+		$content = ArchiveSameContactButton::widget([
+			'model' => $this->model,
+		]);
+
 		return Html::tag('span', $content, ['class' => 'btn-wrapper pull-right']);
 	}
 

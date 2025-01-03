@@ -34,6 +34,7 @@ class ReportController extends BaseController {
 					'delete' => ['POST'],
 					'status' => ['POST'],
 					'short-status' => ['POST'],
+					'reports-details' => ['POST'],
 				],
 			],
 			'selection' => [
@@ -94,6 +95,26 @@ class ReportController extends BaseController {
 			'model' => $this->findModel($id),
 			'withDelete' => $this->module->allowDelete,
 		]);
+	}
+
+	public function actionReportsDetails(): string {
+		$idWithHash = Yii::$app->request->post('expandRowKey');
+		if (!empty($idWithHash)) {
+			$explode = explode(':', $idWithHash);
+			$id = $explode[0] ?? null;
+			$hash = $explode[1] ?? null;
+			if ($id === null || $hash === null) {
+				throw new NotFoundHttpException();
+			}
+			$model = $this->findLead($id, false);
+			$this->validateHash($model, $hash);
+			return $this->renderAjax(
+				'_reports', [
+					'model' => $model,
+				]
+			);
+		}
+		return Yii::t('yii', 'Page not found.');
 	}
 
 	public function actionReport(int $id, int $status_id = null, string $hash = null) {
