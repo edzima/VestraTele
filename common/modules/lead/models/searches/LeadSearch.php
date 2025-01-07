@@ -20,6 +20,7 @@ use common\modules\lead\models\LeadType;
 use common\modules\lead\models\LeadUser;
 use common\modules\lead\models\query\LeadAnswerQuery;
 use common\modules\lead\models\query\LeadQuery;
+use common\modules\lead\Module;
 use common\validators\PhoneValidator;
 use Yii;
 use yii\base\Model;
@@ -38,6 +39,14 @@ class LeadSearch extends Lead implements SearchModel {
 	public const SCENARIO_USER = 'user';
 
 	protected const QUESTION_ATTRIBUTE_PREFIX = 'question';
+	/**
+	 * @var mixed|null
+	 */
+	protected static array $onlyUsersTypes = [
+		LeadUser::TYPE_OWNER,
+		LeadUser::TYPE_AGENT,
+		LeadUser::TYPE_TELE,
+	];
 
 	public bool $withoutUser = false;
 	public bool $withoutReport = false;
@@ -315,17 +324,30 @@ class LeadSearch extends Lead implements SearchModel {
 		if (!empty($this->owner_id)) {
 			$query->owner($this->owner_id);
 		}
-		if (!empty($this->user_type)) {
-			$query->joinWith('leadUsers');
-			$query->andWhere([LeadUser::tableName() . '.type' => $this->user_type]);
-		}
 		if (!empty($this->user_id)) {
 			$query->joinWith('leadUsers');
 			$query->andWhere([LeadUser::tableName() . '.user_id' => $this->user_id]);
 		}
-		if ($this->withoutUser) {
-			$query->joinWith('leadUsers', false, 'LEFT OUTER JOIN');
-			$query->andWhere([LeadUser::tableName() . '.user_id' => null]);
+		if (!empty($this->user_type) || !empty($this->selfUserId)) {
+			if (!$this->withoutUser) {
+				if (!empty($this->user_type)) {
+					$query->joinWith('leadUsers');
+					$query->andWhere([LeadUser::tableName() . '.type' => $this->user_type]);
+				}
+			} else {
+				$leadUserQuery = LeadUser::find()
+					->select([LeadUser::tableName() . '.lead_id'])
+					->distinct()
+					->andFilterWhere([LeadUser::tableName() . '.user_id' => $this->selfUserId])
+					->andFilterWhere([LeadUser::tableName() . '.type' => $this->user_type]);
+
+				$query->andFilterWhere(['NOT IN', Lead::tableName() . '.id', $leadUserQuery]);
+			}
+		} else {
+			if ($this->withoutUser) {
+				$query->joinWith('leadUsers', false, 'LEFT OUTER JOIN');
+				$query->andWhere([LeadUser::tableName() . '.user_id' => null]);
+			}
 		}
 	}
 
@@ -501,7 +523,18 @@ class LeadSearch extends Lead implements SearchModel {
 	}
 
 	public static function getUserTypesNames(): array {
-		return LeadUser::getTypesNames();
+		$typesNames = LeadUser::getTypesNames();
+
+		if (Module::getInstance()->onlyUser) {
+			$userTypes = [];
+			foreach (static::$onlyUsersTypes as $type) {
+				if (isset($typesNames[$type])) {
+					$userTypes[$type] = $typesNames[$type];
+				}
+			}
+			return $userTypes;
+		}
+		return $typesNames;
 	}
 
 	private static array $users = [];

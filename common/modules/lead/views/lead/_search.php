@@ -89,6 +89,18 @@ use kartik\select2\Select2;
 			])
 				->label($model->getAttributeLabel('user_id'))
 			?>
+
+			<?= $form->field($model, 'user_type', ['options' => ['class' => 'col-md-2 col-lg-1']])->widget(Select2::class, [
+				'data' => LeadSearch::getUserTypesNames(),
+				'pluginOptions' => [
+					'placeholder' => $model->getAttributeLabel('user_type'),
+					'allowClear' => true,
+				],
+			])
+			?>
+
+			<?= $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
+
 		<?php endif; ?>
 
 	</div>
