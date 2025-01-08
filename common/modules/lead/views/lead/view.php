@@ -275,6 +275,7 @@ if ($phoneBlacklist) {
 
 
 
+
 			<?php if (!empty($model->reports)): ?>
 				<h4><?= Yii::t('lead', 'Reports') ?></h4>
 				<?php foreach ($model->reports as $report): ?>
@@ -310,12 +311,26 @@ if ($phoneBlacklist) {
 					]) ?>
 
 				</div>
+
+					<?php if (!empty($model->answers)) : ?>
+						<div class="col-md-12 lead-answers-wrapper">
+							<h4><?= Yii::t('lead', 'Lead Answers') ?>
+								<?= Html::a(
+									Html::icon('pencil'),
+									['answer/update-lead', 'id' => $model->getId()], [
+										'class' => 'btn btn-primary btn-sm',
+									]
+								) ?>
+							</h4>
+							<?= LeadAnswersWidget::widget([
+								'answers' => $model->answers,
+							]) ?>
+						</div>
+
+					<?php endif; ?>
 				<div class="clearfix"></div>
 
-				<div class="col-md-12">
-					<?= LeadAnswersWidget::widget(['answers' => $model->answers]) ?>
 
-				</div>
 
 				<?= $model->getCustomerAddress()
 					? Html::tag('div',

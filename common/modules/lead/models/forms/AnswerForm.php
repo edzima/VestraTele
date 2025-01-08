@@ -4,12 +4,13 @@ namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadQuestion;
-use common\modules\lead\models\LeadReport;
 use yii\base\Model;
 
 class AnswerForm extends Model {
 
 	public ?string $answer = null;
+
+	public $report_id;
 
 	private ?LeadAnswer $model = null;
 	private LeadQuestion $question;
@@ -20,7 +21,6 @@ class AnswerForm extends Model {
 	}
 
 	public function rules(): array {
-
 		$rules = [];
 		if ($this->getQuestion()->is_required) {
 			$rules[] = [
@@ -65,24 +65,24 @@ class AnswerForm extends Model {
 	public function setModel(LeadAnswer $model): void {
 		$this->model = $model;
 		$this->answer = $model->answer;
+		$this->question = $model->question;
+		$this->report_id = $model->report_id;
 	}
 
-	public function linkReport(LeadReport $report, bool $validate = true): bool {
+	public function save(bool $validate = true): bool {
 		if ($validate && !$this->validate()) {
 			return false;
 		}
-		$questionId = $this->getQuestion()->id;
-		$model = $report->getAnswer($questionId) ?? $this->getModel();
-		if ($this->answer === null) {
-			if (!$model->isNewRecord) {
-				$model->delete();
-			}
+		$model = $this->getModel();
+		$model->answer = $this->answer;
+		$model->question_id = $this->getQuestion()->id;
+		$model->report_id = $this->report_id;
+		if ($model->question->hasPlaceholder()
+			&& empty($model->answer)) {
+			$model->delete();
 			return false;
 		}
-		$model->answer = $this->answer;
-		$model->question_id = $questionId;
-		$report->link('answers', $model);
-		return true;
+		return $model->save(false);
 	}
 
 }

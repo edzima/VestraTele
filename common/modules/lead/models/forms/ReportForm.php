@@ -330,7 +330,8 @@ class ReportForm extends Model {
 			$model->unlinkAll('answers', true);
 		}
 		foreach ($this->getAnswersModels() as $answer) {
-			$answer->linkReport($model, false);
+			$answer->report_id = $model->id;
+			$answer->save();
 		}
 		$this->saveClosedQuestions();
 	}

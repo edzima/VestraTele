@@ -100,6 +100,16 @@ return [
 					[
 						'allow' => true,
 						'controllers' => [
+							'lead/answer',
+						],
+						'actions' => [
+							'update-lead',
+						],
+						'permissions' => [User::PERMISSION_LEAD_MARKET],
+					],
+					[
+						'allow' => true,
+						'controllers' => [
 							'article',
 						],
 						'permissions' => [User::PERMISSION_NEWS],
