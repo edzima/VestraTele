@@ -40,7 +40,7 @@ class LeadQuery extends ActiveQuery implements PhonableQuery {
 			'leadUsers' => function (ActiveQuery $query) {
 				$query->andWhere(LeadUser::tableName() . '.lead_id IS NULL');
 			},
-		]);
+		], false);
 		return $this;
 	}
 

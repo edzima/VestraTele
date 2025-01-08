@@ -96,7 +96,7 @@ class LeadSearch extends Lead implements SearchModel {
 	/**
 	 * @var mixed|null
 	 */
-	public bool $joinAddress = true;
+	public bool $joinAddress = false;
 
 	public $excludedStatus = [];
 
@@ -239,13 +239,13 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function search(array $params = []): ActiveDataProvider {
 		$query = Lead::find()
-			->joinWith('leadSource')
+			->with('leadSource')
 			->with('status')
 			->with('campaign')
 			->with('owner.userProfile')
 			->with('reports.answers')
 			->with('reports.answers.question')
-			->groupBy(Lead::tableName() . '.id');
+			->with('addresses');
 
 		// add conditions that should always apply here
 
@@ -345,8 +345,7 @@ class LeadSearch extends Lead implements SearchModel {
 			}
 		} else {
 			if ($this->withoutUser) {
-				$query->joinWith('leadUsers', false, 'LEFT OUTER JOIN');
-				$query->andWhere([LeadUser::tableName() . '.user_id' => null]);
+				$query->withoutUsers();
 			}
 		}
 	}
@@ -378,6 +377,7 @@ class LeadSearch extends Lead implements SearchModel {
 		if (!empty($this->reportStatus)) {
 			$query->joinWith('reports');
 			$query->andWhere([LeadReport::tableName() . '.status_id' => $this->reportStatus]);
+			$query->groupBy([Lead::tableName() . '.id']);
 		}
 	}
 
@@ -606,7 +606,7 @@ class LeadSearch extends Lead implements SearchModel {
 			$this->withoutArchives = false;
 		}
 		if ($this->withoutArchives && empty($this->status_id)) {
-			$query->andWhere(['<>', Lead::tableName() . '.status_id', LeadStatusInterface::STATUS_ARCHIVE]);
+			$query->andWhere(['>', Lead::tableName() . '.status_id', LeadStatusInterface::STATUS_ARCHIVE]);
 		}
 		$query->andFilterWhere([Lead::tableName() . '.status_id' => $this->status_id]);
 	}
