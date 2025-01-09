@@ -5,6 +5,7 @@ namespace common\modules\court\models;
 use common\helpers\ArrayHelper;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
+use common\modules\court\modules\spi\components\LawsuitSignature;
 use Yii;
 use yii\base\Model;
 
@@ -28,6 +29,8 @@ class LawsuitIssueForm extends Model {
 	public bool $is_appeal = false;
 	public ?string $url = null;
 
+	public string $signaturePattern = LawsuitSignature::DEFAULT_PATTERN;
+
 	public function rules(): array {
 		return [
 			[['!creator_id', 'court_id', 'presence_of_the_claimant'], 'required'],
@@ -36,6 +39,7 @@ class LawsuitIssueForm extends Model {
 			[['due_at', 'room', 'signature_act', 'details', 'location', 'url'], 'string'],
 			['url', 'url'],
 			[['due_at', 'room', 'signature_act', 'details', 'location'], 'default', 'value' => null],
+			['signature_act', 'match', 'pattern' => $this->signaturePattern],
 			['location', 'in', 'range' => array_keys(static::getLocationNames())],
 			['presence_of_the_claimant', 'in', 'range' => array_keys(static::getPresenceOfTheClaimantNames())],
 			['issuesIds', 'exist', 'targetClass' => Issue::class, 'targetAttribute' => 'id', 'allowArray' => true],

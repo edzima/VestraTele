@@ -6,6 +6,7 @@ use common\modules\court\modules\spi\components\SPIApi;
 use common\modules\court\modules\spi\models\lawsuit\LawsuitDetailsDto;
 use common\modules\court\modules\spi\models\search\LawsuitSearch;
 use common\modules\court\modules\spi\Module;
+use common\modules\court\modules\spi\repository\LawsuitRepository;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -16,16 +17,17 @@ use yii\web\NotFoundHttpException;
 class LawsuitController extends Controller {
 
 	private SPIApi $api;
+	private LawsuitRepository $repository;
 
 	public function init(): void {
 		parent::init();
-		$this->api = $this->module->getSpiApi();
+		$this->repository = new LawsuitRepository($this->module->spiApi);
+		///	$this->api = $this->module->getSpiApi();
 	}
 
 	public function actionIndex(): string {
-		$searchModel = new LawsuitSearch();
+		$searchModel = new LawsuitSearch($this->repository);
 		$dataProvider = $searchModel->search(
-			$this->api,
 			Yii::$app->request->queryParams
 		);
 
@@ -42,8 +44,7 @@ class LawsuitController extends Controller {
 	}
 
 	private function findModel(string $id): LawsuitDetailsDto {
-		$api = $this->api;
-		$model = $api->getLawsuit($id);
+		$model = $this->repository->getLawsuit($id);
 		if (empty($model)) {
 			throw new NotFoundHttpException();
 		}

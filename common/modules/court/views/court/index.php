@@ -52,6 +52,8 @@ $this->params['breadcrumbs'][] = $this->title;
 				},
 				'format' => 'html',
 			],
+			'spi_appeal',
+			'SPIAppealWithParents',
 			[
 				'class' => ActionColumn::class,
 				'template' => '{view} {update}',

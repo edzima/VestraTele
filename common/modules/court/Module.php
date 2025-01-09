@@ -2,6 +2,7 @@
 
 namespace common\modules\court;
 
+use common\modules\court\modules\spi\components\LawsuitSignature;
 use common\modules\court\modules\spi\Module as SpiModule;
 use yii\base\Module as BaseModule;
 
@@ -11,6 +12,7 @@ class Module extends BaseModule {
 
 	public $controllerNamespace = 'common\modules\court\controllers';
 
+	public string $signaturePattern = LawsuitSignature::DEFAULT_PATTERN;
 	public bool $onlyUserIssues;
 
 	public ?array $spiModuleConfig = [
@@ -27,5 +29,9 @@ class Module extends BaseModule {
 			}
 			$this->setModule(static::SPI_MODULE_NAME, $config);
 		}
+	}
+
+	public function getSPI(): ?SpiModule {
+		return $this->getModule(static::SPI_MODULE_NAME);
 	}
 }

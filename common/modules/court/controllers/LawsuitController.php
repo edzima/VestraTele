@@ -122,6 +122,7 @@ class LawsuitController extends Controller {
 	public function actionCreate(int $issueId) {
 		$issue = $this->findIssue($issueId);
 		$model = new LawsuitIssueForm();
+		$model->signaturePattern = $this->module->signaturePattern;
 		$model->creator_id = Yii::$app->user->getId();
 		$model->setIssue($issue);
 
@@ -147,6 +148,7 @@ class LawsuitController extends Controller {
 	 */
 	public function actionUpdate(int $id) {
 		$model = new LawsuitIssueForm();
+		$model->signaturePattern = $this->module->signaturePattern;
 		$model->setModel($this->findModel($id));
 
 		if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
