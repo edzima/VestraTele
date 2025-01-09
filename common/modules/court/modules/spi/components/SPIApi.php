@@ -11,18 +11,19 @@ use common\modules\court\modules\spi\models\application\ApplicationViewDTO;
 use common\modules\court\modules\spi\models\court\CourtDepartmentFullDTO;
 use common\modules\court\modules\spi\models\court\CourtDepartmentSmallDTO;
 use common\modules\court\modules\spi\models\court\RepertoryDTO;
-use common\modules\court\modules\spi\models\lawsuit\LawsuitDetailsDto;
-use common\modules\court\modules\spi\models\lawsuit\LawsuitViewIntegratorDto;
 use Yii;
 use yii\base\Component;
 use yii\data\ArrayDataProvider;
 use yii\data\DataProviderInterface;
 use yii\httpclient\Client;
+use yii\httpclient\Exception;
 use yii\httpclient\Request;
 use yii\httpclient\RequestEvent;
 use yii\httpclient\Response;
 
 class SPIApi extends Component implements ApplicationType {
+
+	public const REPOSITORY_LAWSUIT = 'lawsuit';
 
 	public string $baseUrl;
 	public string $username;
@@ -61,6 +62,18 @@ class SPIApi extends Component implements ApplicationType {
 		self::ROUTE_COURT,
 	];
 
+	public function get(string $url, array $params = []): Response {
+		$url = $this->buildUrl($url, $params);
+		try {
+			return $this->getClient()
+				->createRequest()
+				->setUrl($url)
+				->send();
+		} catch (Exception $exception) {
+			throw new SPIApiException($exception->getMessage(), $exception->getCode());
+		}
+	}
+
 	public function setAppeal(string $appeal): void {
 		$this->appeal = $appeal;
 		$this->baseUrl = $this->getAppealUrl($appeal);
@@ -68,48 +81,6 @@ class SPIApi extends Component implements ApplicationType {
 
 	public function getAppealUrl(string $appeal): string {
 		return str_replace('{appeal}', $appeal, $this->appealUrlSchema);
-	}
-
-	public function getLawsuits(array $params = []): ?DataProviderInterface {
-		$url = $this->getUrl(static::ROUTE_LAWSUITS, $params);
-		$response = $this->getClient()
-			->createRequest()
-			->setUrl($url)
-			->setMethod('GET')
-			->send();
-
-		if ($response->isOk) {
-			$totalCount = $this->getTotalCount($response);
-			$data = $response->getData();
-			$models = [];
-			foreach ($data as $datum) {
-				$models[] = new LawsuitViewIntegratorDto($datum);
-			}
-			return new ArrayDataProvider([
-				'key' => 'id',
-				'modelClass' => LawsuitViewIntegratorDto::class,
-				'models' => $models,
-				'totalCount' => $totalCount,
-			]);
-		}
-		Yii::warning($response->getData(), __METHOD__);
-		return null;
-	}
-
-	public function getLawsuit(string $id): ?LawsuitDetailsDto {
-		$url = static::ROUTE_LAWSUITS . '/' . $id;
-		$response = $this->getClient()
-			->createRequest()
-			->setUrl($url)
-			->setMethod('GET')
-			->send();
-		codecept_debug($response->getData());
-		if ($response->isOk) {
-			return new LawsuitDetailsDto($response->getData());
-		}
-
-		Yii::warning($response->getData(), __METHOD__);
-		return null;
 	}
 
 	public function createApplication(ApplicationDTO $model): bool {
@@ -339,6 +310,7 @@ class SPIApi extends Component implements ApplicationType {
 		if (!$this->isAuthRequest($event->request)) {
 			$this->token = null;
 		}
+		codecept_debug($event->request->getData());
 	}
 
 	protected function isAuthRequest(Request $request): bool {
@@ -374,7 +346,7 @@ class SPIApi extends Component implements ApplicationType {
 		]);
 	}
 
-	private function getTotalCount(Response $response): int {
+	public function getTotalCount(Response $response): int {
 		if (isset($response->getHeaders()['X-Total-Count'])) {
 			return (int) $response->getHeaders()['X-Total-Count'];
 		}
@@ -383,6 +355,14 @@ class SPIApi extends Component implements ApplicationType {
 
 	public function getApplicationType(): string {
 		return $this->appeal;
+	}
+
+	private function buildUrl(string $url, array $params = []) {
+		$url = $url;
+		if (!empty($params)) {
+			$url .= '?' . http_build_query($params);
+		}
+		return $url;
 	}
 
 }

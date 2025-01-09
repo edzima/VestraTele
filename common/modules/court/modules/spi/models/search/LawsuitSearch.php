@@ -2,9 +2,10 @@
 
 namespace common\modules\court\modules\spi\models\search;
 
-use common\modules\court\modules\spi\components\SPIApi;
 use common\modules\court\modules\spi\models\lawsuit\LawsuitViewIntegratorDto;
+use common\modules\court\modules\spi\repository\LawsuitRepository;
 use Yii;
+use yii\data\ArrayDataProvider;
 use yii\data\DataProviderInterface;
 
 /**
@@ -19,6 +20,13 @@ class LawsuitSearch extends LawsuitViewIntegratorDto {
 	public string $repertoryName = '';
 	public string $departmentName = '';
 
+	private LawsuitRepository $repository;
+
+	public function __construct(LawsuitRepository $repository, array $config = []) {
+		$this->repository = $repository;
+		parent::__construct($config);
+	}
+
 	public function rules(): array {
 		return [
 			[
@@ -27,13 +35,13 @@ class LawsuitSearch extends LawsuitViewIntegratorDto {
 		];
 	}
 
-	public function search(SPIApi $api, array $params = []): DataProviderInterface {
-
+	public function search(array $params = []): DataProviderInterface {
 		$this->load($params);
 		if (!$this->validate()) {
-			Yii::warning($this->errors);
+			Yii::warning($this->errors, __METHOD__);
+			return new ArrayDataProvider([]);
 		}
-		return $api->getLawsuits($this->getApiParams());
+		return $this->repository->getLawsuits($this->getApiParams());
 	}
 
 	public function getApiParams(): array {

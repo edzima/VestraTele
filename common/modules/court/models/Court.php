@@ -19,6 +19,8 @@ use yii\db\ActiveRecord;
  * @property string $email
  * @property string $updated_at
  * @property int $parent_id
+ * @property string|null $spi_appeal
+ * @property string $spi_data
  *
  * @property-read Court|null $parent
  * @property-read Address[] $addresses
@@ -104,6 +106,16 @@ class Court extends ActiveRecord {
 
 	public function getTypeName(): string {
 		return static::getTypesNames()[$this->type];
+	}
+
+	public function getSPIAppealWithParents(): ?string {
+		if (!empty($this->spi_appeal)) {
+			return $this->spi_appeal;
+		}
+		if ($this->parent) {
+			return $this->parent->getSPIAppealWithParents();
+		}
+		return null;
 	}
 
 	public static function getTypesNames(): array {
