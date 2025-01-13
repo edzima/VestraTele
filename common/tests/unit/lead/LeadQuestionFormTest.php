@@ -21,8 +21,10 @@ class LeadQuestionFormTest extends Unit {
 
 	public function testEmpty(): void {
 		$this->giveForm([]);
+		$this->model->type = '';
 		$this->thenUnsuccessValidate();
 		$this->thenSeeError('Name cannot be blank.', 'name');
+		$this->thenSeeError('Type cannot be blank.', 'type');
 	}
 
 	public function testOnlyName(): void {
@@ -30,6 +32,36 @@ class LeadQuestionFormTest extends Unit {
 			'name' => 'Some schema name',
 		]);
 		$this->thenSuccessSave();
+		$this->thenSeeRecord([
+			'name' => 'Some schema name',
+			'type' => LeadQuestion::TYPE_TEXT,
+		]);
+	}
+
+	public function testRadioTypeWithoutValues(): void {
+		$this->giveForm([
+			'name' => 'Some radio group',
+			'type' => LeadQuestion::TYPE_RADIO_GROUP,
+		]);
+		$this->thenUnsuccessValidate();
+		$this->thenSeeError('Values cannot be blank.', 'values');
+	}
+
+	public function testRadioTypeWithValues(): void {
+		$this->giveForm([
+			'name' => 'Are you like ice cream?',
+			'type' => LeadQuestion::TYPE_RADIO_GROUP,
+			'values' => [
+				'yes',
+				'sometimes',
+				'no',
+			],
+		]);
+		$this->thenSuccessSave();
+		$this->thenSeeRecord([
+			'name' => 'Are you like ice cream?',
+			'placeholder' => 'yes|sometimes|no',
+		]);
 	}
 
 	public function testWithStatus(): void {

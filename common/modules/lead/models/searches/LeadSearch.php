@@ -564,8 +564,7 @@ class LeadSearch extends Lead implements SearchModel {
 	public function getClosedQuestionsNames(): array {
 		$query = LeadQuestion::find()
 			->active()
-			->withoutPlaceholder()
-			->boolean(false);
+			->tags();
 		if (!empty($this->type_id) || !empty($this->source_id)) {
 			if ($this->validate(['type_id', 'source_id'])) {
 				$typeId = $this->type_id;

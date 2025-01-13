@@ -27,7 +27,7 @@ class AnswerForm extends Model {
 				'answer', 'required',
 			];
 		}
-		if ($this->getQuestion()->is_boolean) {
+		if ($this->getQuestion()->isBoolean()) {
 			$rules[] = [
 				'answer', 'boolean',
 			];
@@ -39,9 +39,15 @@ class AnswerForm extends Model {
 				'answer', 'trim',
 			];
 		}
+		if ($this->getQuestion()->isRadioGroup()) {
+			$rules[] = [
+				'answer', 'in', 'range' => $this->getQuestion()->getRadioValues(),
+			];
+		}
 		$rules[] = [
 			'answer', 'default', 'value' => null,
 		];
+
 		return $rules;
 	}
 
@@ -55,7 +61,7 @@ class AnswerForm extends Model {
 		return $this->question;
 	}
 
-	private function getModel(): LeadAnswer {
+	public function getModel(): LeadAnswer {
 		if ($this->model === null) {
 			$this->model = new LeadAnswer();
 		}
@@ -73,16 +79,30 @@ class AnswerForm extends Model {
 		if ($validate && !$this->validate()) {
 			return false;
 		}
+		if ($this->getQuestion()->isNewRecord) {
+			$this->getQuestion()->save();
+		}
 		$model = $this->getModel();
 		$model->answer = $this->answer;
 		$model->question_id = $this->getQuestion()->id;
 		$model->report_id = $this->report_id;
-		if ($model->question->hasPlaceholder()
-			&& empty($model->answer)) {
+		if ($this->shouldRemove()) {
 			$model->delete();
-			return false;
+			return true;
 		}
 		return $model->save(false);
+	}
+
+	protected function shouldRemove(): bool {
+		return !$this->getQuestion()->isTag() && ($this->answer === null || $this->answer === '');
+	}
+
+	public function getFormId(): string {
+		return $this->question->id . '_' . $this->report_id;
+	}
+
+	public function hasAnswer(): bool {
+		return $this->answer !== null && $this->answer !== '';
 	}
 
 }

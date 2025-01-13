@@ -10,7 +10,8 @@ use yii\helpers\ArrayHelper;
 
 class MultipleAnswersForm extends Model {
 
-	public $closedQuestions = [];
+	public $tags = [];
+	public $report_id;
 
 	/**
 	 * @var array|LeadQuestion[]
@@ -25,22 +26,21 @@ class MultipleAnswersForm extends Model {
 	 */
 	private array $answers = [];
 
+	public function __construct(array $answers, $config = []) {
+		parent::__construct($config);
+		$this->setAnswers($answers);
+	}
+
 	public function rules(): array {
 		return [
-			['closedQuestions', 'in', 'range' => array_keys($this->getClosedQuestionsData()), 'allowArray' => true],
-
+			['tags', 'in', 'range' => array_keys($this->getTagsData()), 'allowArray' => true],
 		];
 	}
 
 	public function attributeLabels(): array {
 		return [
-			'closedQuestions' => Yii::t('lead', 'Closed Questions'),
+			'tags' => Yii::t('lead', 'Tags'),
 		];
-	}
-
-	public function __construct(array $answers, $config = []) {
-		parent::__construct($config);
-		$this->setAnswers($answers);
 	}
 
 	/**
@@ -49,32 +49,27 @@ class MultipleAnswersForm extends Model {
 	 */
 	protected function setAnswers(array $answers): void {
 		$this->answers = $answers;
+		$this->setTags($answers);
+	}
+
+	protected function setTags(array $answers): void {
 		foreach ($answers as $answer) {
-			if ($answer->question->isClosed()) {
-				$this->closedQuestions[] = $answer->question_id;
+			if ($answer->question->isTag()) {
+				$this->tags[] = $answer->question_id;
 			}
 		}
 	}
 
-	public function getClosedQuestionsData(): array {
-		return ArrayHelper::map($this->getClosedQuestions(), 'id', 'name');
+	public function getTagsData(): array {
+		return ArrayHelper::map($this->getTags(), 'id', 'name');
 	}
 
 	/**
 	 * @return LeadQuestion[]
 	 */
-	public function getOpenQuestions(): array {
+	public function getTags(): array {
 		return array_filter($this->getQuestions(), static function (LeadQuestion $question): bool {
-			return !$question->isClosed();
-		});
-	}
-
-	/**
-	 * @return LeadQuestion[]
-	 */
-	public function getClosedQuestions(): array {
-		return array_filter($this->getQuestions(), static function (LeadQuestion $question): bool {
-			return $question->isClosed();
+			return $question->isTag();
 		});
 	}
 
@@ -83,19 +78,34 @@ class MultipleAnswersForm extends Model {
 	 */
 	public function getAnswersModels(): array {
 		if (empty($this->answersModels)) {
-			foreach ($this->getAnswers() as $answer) {
-				if (!$answer->question->isClosed()) {
-					$this->answersModels[$answer->report_id . '.' . $answer->question_id] = $this->createAnswerForm($answer);
+			foreach ($this->getQuestions() as $question) {
+				if (!$question->isTag()) {
+					$answerForm = $this->createAnswerForm($question);
+					$this->answersModels[$answerForm->getFormId()] = $answerForm;
 				}
 			}
 		}
 		return $this->answersModels;
 	}
 
-	private function createAnswerForm(LeadAnswer $answer): AnswerForm {
-		$model = new AnswerForm($answer->question);
-		$model->setModel($answer);
+	private function createAnswerForm(LeadQuestion $question): AnswerForm {
+		$model = new AnswerForm($question);
+		$answer = $this->findAnswer($question->id);
+		if ($answer) {
+			$model->setModel($answer);
+		} else {
+			$model->report_id = $this->report_id;
+		}
 		return $model;
+	}
+
+	private function findAnswer(int $questionId): ?LeadAnswer {
+		foreach ($this->getAnswers() as $answer) {
+			if ($answer->question_id == $questionId) {
+				return $answer;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -120,32 +130,76 @@ class MultipleAnswersForm extends Model {
 	}
 
 	public function load($data, $formName = null, $answersFormName = null): bool {
-		return parent::load($data, $formName)
-			&& AnswerForm::loadMultiple($this->getAnswersModels(), $data, $answersFormName);
+		$load = parent::load($data, $formName);
+		if (!$load) {
+			return false;
+		}
+		$answers = $this->getAnswersModels();
+		if (!empty($answers)) {
+			return AnswerForm::loadMultiple($answers, $data, $answersFormName);
+		}
+		return true;
 	}
 
 	public function save(bool $validate = true): bool {
 		if ($validate && !$this->validate()) {
 			return false;
 		}
-		$models = $this->answersModels;
+		$models = $this->getAnswersModels();
 		foreach ($models as $model) {
+			if (empty($model->report_id)) {
+				$model->report_id = $this->report_id;
+			}
 			$model->save(false);
 		}
-		$this->updateClosedQuestions();
+		$this->saveTags();
 
 		return true;
 	}
 
-	protected function updateClosedQuestions(): void {
-		$closedQuestions = (array) $this->closedQuestions;
-		foreach ($this->answers as $answer) {
-			if ($answer->question->isClosed()) {
-				if (!in_array($answer->question_id, $closedQuestions)) {
-					$answer->delete();
+	protected function saveTags(): void {
+		$tags = (array) $this->tags;
+		if (empty($this->report_id)) {
+			foreach ($this->answers as $answer) {
+				if ($answer->question->isTag()) {
+					if (!in_array($answer->question_id, $tags)) {
+						$answer->delete();
+					}
 				}
 			}
+		} else {
+			$data = [];
+			foreach ($tags as $tag) {
+				$data[] = [
+					'report_id' => $this->report_id,
+					'question_id' => $tag,
+					'answer' => true,
+				];
+			}
+			if (!empty($data)) {
+				LeadAnswer::getDb()->createCommand()
+					->batchInsert(LeadAnswer::tableName(),
+						[
+							'report_id',
+							'question_id',
+							'answer',
+						],
+						$data)
+					->execute();
+			}
 		}
+	}
+
+	public function hasAnswers(): bool {
+		if (!empty($this->tags)) {
+			return true;
+		}
+		foreach ($this->getAnswersModels() as $answer) {
+			if ($answer->hasAnswer()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function validate($attributeNames = null, $clearErrors = true): bool {

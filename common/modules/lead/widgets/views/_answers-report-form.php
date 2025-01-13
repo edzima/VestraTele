@@ -1,19 +1,18 @@
 <?php
 
-use common\helpers\Html;
 use common\modules\lead\models\forms\MultipleAnswersForm;
 use common\modules\lead\widgets\QuestionFieldWidget;
 use common\widgets\ActiveForm;
 use kartik\select2\Select2;
 
-/* @var $this yii\web\View */
-/* @var $model MultipleAnswersForm */
-/* @var $form yii\widgets\ActiveForm */
+/**
+ * @var MultipleAnswersForm $model
+ * @var ActiveForm $form
+ */
+
 ?>
 
-<div class="lead-answer-form">
-
-	<?php $form = ActiveForm::begin(); ?>
+<div class="report-answer-form">
 
 	<?php foreach ($model->getAnswersModels() as $id => $answer): ?>
 		<?= $form->field($answer, "[$id]answer")
@@ -31,12 +30,4 @@ use kartik\select2\Select2;
 		],
 	])
 	?>
-
-
-	<div class="form-group">
-		<?= Html::submitButton(Yii::t('lead', 'Save'), ['class' => 'btn btn-success']) ?>
-	</div>
-
-	<?php ActiveForm::end(); ?>
-
 </div>

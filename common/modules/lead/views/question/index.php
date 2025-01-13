@@ -35,20 +35,23 @@ $this->params['breadcrumbs'][] = $this->title;
 			'placeholder',
 			[
 				'attribute' => 'status_id',
-				'value' => 'status.name',
+				'value' => 'leadStatus.name',
 				'filter' => LeadStatus::getNames(),
 			],
 			[
 				'attribute' => 'type_id',
-				'value' => 'type.name',
+				'value' => 'leadType.name',
 				'filter' => LeadType::getNames(),
 
 			],
 			'order',
 			'is_active:boolean',
-			'is_boolean:boolean',
-			'is_required:boolean',
 			'show_in_grid:boolean',
+			[
+				'attribute' => 'type',
+				'value' => 'typeName',
+				'filter' => LeadQuestionSearch::getTypesNames(),
+			],
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>

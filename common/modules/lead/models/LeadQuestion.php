@@ -19,14 +19,21 @@ use yii\db\ActiveRecord;
  * @property int|null $type_id
  * @property int|null $order
  * @property boolean $show_in_grid
- * @property boolean $is_boolean
+ * @property string $type
  *
  * @property-read LeadAnswer[] $answers
  * @property-read LeadReport[] $reports
- * @property-read LeadStatus|null $status
- * @property-read LeadType|null $type
+ * @property-read LeadStatus|null $leadStatus
+ * @property-read LeadType|null $leadType
  */
 class LeadQuestion extends ActiveRecord {
+
+	public const TYPE_TEXT = 'text';
+	public const TYPE_TAG = 'tag';
+	public const TYPE_BOOLEAN = 'boolean';
+	public const TYPE_RADIO_GROUP = 'radio_group';
+
+	public const RADIO_SELECTOR = '|';
 
 	public function __toString(): string {
 		return $this->name;
@@ -66,36 +73,37 @@ class LeadQuestion extends ActiveRecord {
 			'type_id' => Yii::t('lead', 'Type'),
 			'status_id' => Yii::t('lead', 'Status'),
 			'is_active' => Yii::t('lead', 'Is Active'),
-			'is_boolean' => Yii::t('lead', 'Is Boolean'),
 			'is_required' => Yii::t('lead', 'Is required'),
 			'show_in_grid' => Yii::t('lead', 'Show in grid'),
 			'order' => Yii::t('lead', 'Order'),
-			'type' => Yii::t('lead', 'Lead Type'),
-			'status' => Yii::t('lead', 'Lead Status'),
+			'leadType' => Yii::t('lead', 'Lead Type'),
+			'leadStatus' => Yii::t('lead', 'Lead Status'),
+			'type' => Yii::t('lead', 'Type'),
 		];
 	}
 
-	public function isClosed(): bool {
-		if ($this->hasPlaceholder()) {
-			return false;
+	public function getQuestionWithAnswer($answer = null, string $template = '{question}: {answer}'): string {
+		$answer = $this->generateAnswer($answer);
+		if ($this->isTag()) {
+			return $answer;
 		}
-		if ($this->is_boolean) {
-			return false;
-		}
-		return true;
+		return strtr($template, [
+			'{question}' => $this->name,
+			'{answer}' => $answer,
+		]);
 	}
 
 	public function generateAnswer(string $answer = null): string {
-		if ($this->hasPlaceholder() || $this->is_boolean) {
-			if ($this->is_boolean) {
-				$answer = Yii::$app->formatter->asBoolean($answer);
-			}
-			if ($answer === null) {
-				$answer = Yii::$app->formatter->nullDisplay;
-			}
-			return $this->name . ': ' . $answer;
+		if ($this->isTag() && $answer) {
+			return $this->name;
 		}
-		return $this->name;
+		if ($this->isBoolean()) {
+			return Yii::$app->formatter->asBoolean($answer);
+		}
+		if ($answer === null) {
+			$answer = Yii::$app->formatter->nullDisplay;
+		}
+		return $answer;
 	}
 
 	public function hasPlaceholder(): bool {
@@ -110,12 +118,16 @@ class LeadQuestion extends ActiveRecord {
 		return $this->hasMany(LeadReport::class, ['id' => 'report_id'])->viaTable(LeadAnswer::tableName(), ['question_id' => 'id']);
 	}
 
-	public function getStatus(): ActiveQuery {
+	public function getLeadStatus(): ActiveQuery {
 		return $this->hasOne(LeadStatus::class, ['id' => 'status_id']);
 	}
 
-	public function getType(): ActiveQuery {
+	public function getLeadType(): ActiveQuery {
 		return $this->hasOne(LeadType::class, ['id' => 'type_id']);
+	}
+
+	public function getTypeName(): string {
+		return static::getTypesNames()[$this->type];
 	}
 
 	public static function find(): LeadQuestionQuery {
@@ -134,4 +146,38 @@ class LeadQuestion extends ActiveRecord {
 			->all();
 	}
 
+	public static function getTypesNames(): array {
+		return [
+			static::TYPE_TEXT => Yii::t('lead', 'Question - Text'),
+			static::TYPE_BOOLEAN => Yii::t('lead', 'Question - Boolean'),
+			static::TYPE_RADIO_GROUP => Yii::t('lead', 'Question - Radio'),
+			static::TYPE_TAG => Yii::t('lead', 'Question - Tag'),
+		];
+	}
+
+	public function isTag(): bool {
+		return $this->type === self::TYPE_TAG;
+	}
+
+	public function isBoolean(): bool {
+		return $this->type === self::TYPE_BOOLEAN;
+	}
+
+	public function isRadioGroup(): bool {
+		return $this->type === self::TYPE_RADIO_GROUP;
+	}
+
+	public function isText(): bool {
+		return $this->type === self::TYPE_TEXT;
+	}
+
+	public function getRadioValues(): array {
+		return array_filter(
+			explode(static::RADIO_SELECTOR, $this->placeholder)
+		);
+	}
+
+	public function setRadioValues(array $values): void {
+		$this->placeholder = implode(static::RADIO_SELECTOR, $values);
+	}
 }

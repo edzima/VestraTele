@@ -18,9 +18,14 @@ class LeadQuestionSearch extends LeadQuestion {
 	public function rules(): array {
 		return [
 			[['id', 'type_id', 'status_id', 'show_in_grid', 'order'], 'integer'],
-			[['is_active', 'is_boolean', 'is_required'], 'boolean'],
-			[['is_active', 'is_boolean', 'is_required'], 'default', 'value' => null],
-			[['name', 'placeholder'], 'safe'],
+			[
+				[
+					'is_active',
+					'is_required',
+				], 'boolean',
+			],
+			[['is_active', 'is_required'], 'default', 'value' => null],
+			[['name', 'placeholder', 'type'], 'safe'],
 		];
 	}
 
@@ -41,8 +46,8 @@ class LeadQuestionSearch extends LeadQuestion {
 	 */
 	public function search($params) {
 		$query = LeadQuestion::find();
-		$query->joinWith('status S');
-		$query->joinWith('type T');
+		$query->joinWith('leadStatus S');
+		$query->joinWith('leadType T');
 
 		// add conditions that should always apply here
 
@@ -66,10 +71,10 @@ class LeadQuestionSearch extends LeadQuestion {
 			LeadQuestion::tableName() . '.status_id' => $this->status_id,
 			LeadQuestion::tableName() . '.type_id' => $this->type_id,
 			LeadQuestion::tableName() . '.is_active' => $this->is_active,
-			LeadQuestion::tableName() . '.is_boolean' => $this->is_boolean,
 			LeadQuestion::tableName() . '.is_required' => $this->is_required,
 			LeadQuestion::tableName() . '.show_in_grid' => $this->show_in_grid,
 			LeadQuestion::tableName() . '.order' => $this->order,
+			LeadQuestion::tableName() . '.type' => $this->type,
 		]);
 
 		$query->andFilterWhere(['like', LeadQuestion::tableName() . '.name', $this->name])

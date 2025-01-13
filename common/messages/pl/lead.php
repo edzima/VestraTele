@@ -532,4 +532,11 @@ return [
 	'Excluded Sources' => 'Wykluczone Źródła',
 	'From Campaigns' => 'Z Kampanii',
 	'Ids cannot be blank.' => 'Nie podano Leads IDs',
+	'Tags' => 'Tagi',
+	'Question - Text' => 'Tekst',
+	'Question - Boolean' => 'Checkbox',
+	'Question - Radio' => 'Pole Wyboru',
+	'Question - Tag' => 'Tag',
+	'Values' => 'Wartości',
+
 ];
