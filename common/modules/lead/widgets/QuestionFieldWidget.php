@@ -26,6 +26,8 @@ class QuestionFieldWidget extends InputWidget {
 				return $this->renderBooleanInput();
 			case LeadQuestion::TYPE_RADIO_GROUP:
 				return $this->renderRadioGroupInput();
+			case LeadQuestion::TYPE_TEXT_AREA:
+				return $this->renderTextArea();
 			default:
 				return '';
 		}
@@ -40,6 +42,17 @@ class QuestionFieldWidget extends InputWidget {
 			return Html::activeInput('text', $this->model, $this->attribute, $options);
 		}
 		return Html::input('text', $this->attribute, $options);
+	}
+
+	private function renderTextArea(): string {
+		$options = $this->options;
+		if (!isset($options['placeholder'])) {
+			$options['placeholder'] = $this->question->placeholder;
+		}
+		if ($this->hasModel()) {
+			return Html::activeTextarea($this->model, $this->attribute, $options);
+		}
+		return Html::textarea($this->attribute, $options);
 	}
 
 	private function renderBooleanInput(): string {

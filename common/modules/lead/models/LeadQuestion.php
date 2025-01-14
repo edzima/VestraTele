@@ -34,6 +34,7 @@ class LeadQuestion extends ActiveRecord {
 	public const TYPE_RADIO_GROUP = 'radio_group';
 
 	public const RADIO_SELECTOR = '|';
+	public const TYPE_TEXT_AREA = 'text-area';
 
 	public function __toString(): string {
 		return $this->name;
@@ -149,6 +150,7 @@ class LeadQuestion extends ActiveRecord {
 	public static function getTypesNames(): array {
 		return [
 			static::TYPE_TEXT => Yii::t('lead', 'Question - Text'),
+			static::TYPE_TEXT_AREA => Yii::t('lead', 'Question - Text Area'),
 			static::TYPE_BOOLEAN => Yii::t('lead', 'Question - Boolean'),
 			static::TYPE_RADIO_GROUP => Yii::t('lead', 'Question - Radio'),
 			static::TYPE_TAG => Yii::t('lead', 'Question - Tag'),
@@ -169,6 +171,10 @@ class LeadQuestion extends ActiveRecord {
 
 	public function isText(): bool {
 		return $this->type === self::TYPE_TEXT;
+	}
+
+	public function isTextArea(): bool {
+		return $this->type === self::TYPE_TEXT_AREA;
 	}
 
 	public function getRadioValues(): array {

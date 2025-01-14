@@ -537,6 +537,7 @@ return [
 	'Question - Boolean' => 'Checkbox',
 	'Question - Radio' => 'Pole Wyboru',
 	'Question - Tag' => 'Tag',
+	'Question - Text Area' => 'Textarea',
 	'Values' => 'Wartości',
 
 ];
