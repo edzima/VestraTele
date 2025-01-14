@@ -170,11 +170,13 @@ class MultipleAnswersForm extends Model {
 		} else {
 			$data = [];
 			foreach ($tags as $tag) {
-				$data[] = [
-					'report_id' => $this->report_id,
-					'question_id' => $tag,
-					'answer' => true,
-				];
+				if ($tag) {
+					$data[] = [
+						'report_id' => $this->report_id,
+						'question_id' => $tag,
+						'answer' => true,
+					];
+				}
 			}
 			if (!empty($data)) {
 				LeadAnswer::getDb()->createCommand()
