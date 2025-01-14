@@ -33,6 +33,7 @@ class MultipleAnswersForm extends Model {
 
 	public function rules(): array {
 		return [
+			['tags', 'default', 'value' => []],
 			['tags', 'in', 'range' => array_keys($this->getTagsData()), 'allowArray' => true],
 		];
 	}
