@@ -10,22 +10,35 @@ use yii\helpers\Console;
 
 class LeadCopyController extends Controller {
 
-	public function actionCopy(int $oldSourceId, int $newSourceId, int $status = LeadStatus::STATUS_NEW): void {
+	public function actionCopy(int $newSourceId, int $oldSourceId = null, int $type = null, int $userID, int $status = LeadStatus::STATUS_NEW): void {
 		if ($oldSourceId === $newSourceId) {
 			Console::output('New source can not be equal as old');
 			return;
 		}
 		$newSource = LeadSource::findOne($newSourceId);
-		$oldSource = LeadSource::findOne($oldSourceId);
-		if ($newSource === null || $oldSource === null) {
-			Console::output('Sources not found');
+		if ($newSource === null) {
+			Console::output('New source not found');
 			return;
 		}
-		$rows = [];
+		if ($oldSourceId) {
+			$oldSource = LeadSource::findOne($oldSourceId);
+			if ($oldSource === null) {
+				Console::output('Old source not found');
+				return;
+			}
+		}
+
 		$count = 0;
 		$columns = [];
-		foreach (Lead::find()
-			->andWhere(['source_id' => $oldSource->id])
+		$query = Lead::find()
+			->andFilterWhere(['source_id' => $oldSourceId]);
+		if ($type) {
+			$query->type($type);
+		}
+		if ($userID) {
+			$query->user($userID);
+		}
+		foreach ($query
 			->batch(1000) as $leads) {
 			$rows = [];
 			/**
