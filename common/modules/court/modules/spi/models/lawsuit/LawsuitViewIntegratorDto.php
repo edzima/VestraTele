@@ -13,7 +13,7 @@ class LawsuitViewIntegratorDto extends Model {
 	public int $year;
 	public string $subject;
 	public string $value;
-	public string $result;
+	public ?string $result;
 	public string $receiptDate;
 	public ?string $finishDate;
 	public string $lastUpdate;
@@ -26,7 +26,7 @@ class LawsuitViewIntegratorDto extends Model {
 	public int $judge;
 	public string $judgeName;
 	public string $partyName;
-	public string $description;
+	public ?string $description;
 	public ?int $partyUserId;
 
 	public string $partyProfileUuid;

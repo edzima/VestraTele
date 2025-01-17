@@ -13,6 +13,8 @@ use yii\data\DataProviderInterface;
  */
 class LawsuitSearch extends LawsuitViewIntegratorDto {
 
+	public string $appeal;
+
 	public string $courtName = '';
 
 	public string $signature = '';
@@ -22,8 +24,9 @@ class LawsuitSearch extends LawsuitViewIntegratorDto {
 
 	private LawsuitRepository $repository;
 
-	public function __construct(LawsuitRepository $repository, array $config = []) {
+	public function __construct(LawsuitRepository $repository, string $appeal, array $config = []) {
 		$this->repository = $repository;
+		$this->appeal = $appeal;
 		parent::__construct($config);
 	}
 
@@ -41,7 +44,7 @@ class LawsuitSearch extends LawsuitViewIntegratorDto {
 			Yii::warning($this->errors, __METHOD__);
 			return new ArrayDataProvider([]);
 		}
-		return $this->repository->getLawsuits($this->getApiParams());
+		return $this->repository->getLawsuits($this->appeal, $this->getApiParams());
 	}
 
 	public function getApiParams(): array {

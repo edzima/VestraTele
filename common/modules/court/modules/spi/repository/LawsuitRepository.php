@@ -18,16 +18,25 @@ class LawsuitRepository {
 		$this->api = $api;
 	}
 
-	public function findBySignature(string $signature): DataProviderInterface {
-		return $this->getLawsuits([
-				'signature.equals' => $signature,
-			]
-		);
+	public function findBySignature(string $signature, string $appeal): ?LawsuitViewIntegratorDto {
+		$dataProvider = $this->getLawsuits($appeal, [
+			'signature.equals' => $signature,
+		]);
+		if ($dataProvider->getTotalCount()) {
+			if ($dataProvider->getTotalCount() > 1) {
+				Yii::warning('Find more than one Lawsuit for Signature: '
+					. $signature . ' in Appeal: ' . $appeal);
+			}
+			return $dataProvider->getModels()[0];
+		}
+		return null;
 	}
 
-	public function getLawsuit(int $id): ?LawsuitDetailsDto {
+	public function getLawsuit(int $id, string $appeal): ?LawsuitDetailsDto {
 		$url = self::ROUTE . '/' . $id;
-		$response = $this->api->get($url);
+		$response = $this->api
+			->setAppeal($appeal)
+			->get($url);
 		if (!$response->isOk) {
 			Yii::warning($response->getData(), __METHOD__);
 			return null;
@@ -35,8 +44,10 @@ class LawsuitRepository {
 		return new LawsuitDetailsDto($response->data);
 	}
 
-	public function getLawsuits(array $params = []): DataProviderInterface {
-		$response = $this->api->get(static::ROUTE, $params);
+	public function getLawsuits(string $appeal, array $params = []): DataProviderInterface {
+		$response = $this->api
+			->setAppeal($appeal)
+			->get(static::ROUTE, $params);
 		$dataProvider = new ArrayDataProvider([
 			'key' => 'id',
 			'modelClass' => LawsuitViewIntegratorDto::class,

@@ -1,5 +1,6 @@
 <?php
 
+use backend\helpers\Html;
 use backend\helpers\Url;
 use backend\modules\user\models\search\WorkerUserSearch;
 use backend\modules\user\widgets\CopyToCliboardFormAttributesBtn;
@@ -7,8 +8,8 @@ use backend\widgets\GridView;
 use common\models\user\PasswordResetRequestForm;
 use common\models\user\UserProfile;
 use common\models\user\Worker;
+use common\modules\court\modules\spi\Module;
 use common\widgets\grid\ActionColumn;
-use yii\bootstrap\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel WorkerUserSearch */
@@ -20,6 +21,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="user-customer-index">
 
 	<p>
+
+		<?= Yii::$app->user->can(Module::PERMISSION_SPI_USER_AUTH)
+			? Html::a(Html::faicon('legal'), ['/court/spi/user-auth/index'], ['class' => 'btn btn-warning'])
+			: ''
+		?>
+
 		<?= Yii::$app->user->can(Worker::PERMISSION_WORKERS)
 			? Html::a(Yii::t('backend', 'Create worker'), ['create'], ['class' => 'btn btn-success'])
 			: ''
@@ -76,8 +83,17 @@ $this->params['breadcrumbs'][] = $this->title;
 			'action_at:Datetime',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{request-password-reset} {copy} {view} {update} {provision} {hierarchy} {delete}',
+				'template' => '{request-password-reset} {spi-user-auth} {copy} {view} {update} {provision} {hierarchy} {delete}',
 				'buttons' => [
+					'spi-user-auth' => static function (string $url, Worker $model) {
+						return Html::a(Html::faicon('legal'),
+							['/court/spi/user-auth/user', 'id' => $model->id],
+							[
+								'title' => Yii::t('spi', 'SPI Auth'),
+								'aria-label' => Yii::t('spi', 'SPI Auth'),
+								'data-pjax' => '0',
+							]);
+					},
 					'copy' => static function (string $url, Worker $model): string {
 						return CopyToCliboardFormAttributesBtn::widget([
 							'model' => $model,
@@ -133,6 +149,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					'hierarchy' => Yii::$app->user->can(Worker::PERMISSION_WORKERS_HIERARCHY),
 					'link' => Yii::$app->user->can(Worker::PERMISSION_ISSUE),
 					'provision' => Yii::$app->user->can(Worker::PERMISSION_PROVISION),
+					'spi-user-auth' => Yii::$app->user->can(Module::PERMISSION_SPI_USER_AUTH),
 					'request-password-reset' => Yii::$app->user->can(Worker::PERMISSION_WORKERS),
 				],
 
