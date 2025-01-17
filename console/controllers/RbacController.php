@@ -7,6 +7,7 @@ use common\components\DbManager;
 use common\models\user\Customer;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\court\modules\spi\Module as SpiModule;
 use common\modules\lead\Module as LeadModule;
 use common\rbac\OwnModelRule;
 use Exception;
@@ -177,6 +178,8 @@ class RbacController extends Controller {
 		Worker::PERMISSION_COURT,
 		Worker::PERMISSION_LAWSUIT,
 		LeadModule::PERMISSION_ASSIGN_USERS,
+		SpiModule::PERMISSION_SPI_LAWSUIT_DETAIL,
+		SpiModule::PERMISSION_SPI_USER_AUTH,
 	];
 
 	public function actionAddPermissionToWorkers(string $name, array $assignments): void {

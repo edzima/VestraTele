@@ -2,6 +2,7 @@
 
 use common\modules\court\modules\spi\models\search\LawsuitSearch;
 use common\modules\court\modules\spi\Module;
+use common\modules\court\modules\spi\widgets\AppealsNavWidget;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use yii\data\DataProviderInterface;
@@ -19,6 +20,8 @@ $this->params['breadcrumbs'][] = $this->title;
 //	'sort' => $dataProvider->getSort(),
 //]);
 ?>
+
+<?= AppealsNavWidget::widget() ?>
 
 <div class="spi-lawsuit-index">
 

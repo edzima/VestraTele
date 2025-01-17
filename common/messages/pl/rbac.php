@@ -118,4 +118,6 @@ return array_merge([
 	'sms' => 'SMS',
 	'sms.multiple' => 'SMS - Multi',
 	'loginToBackend' => 'Logowanie - Backend',
+	'spi.lawsuit.detail' => 'SPI - Sprawy',
+	'spi.user-auth' => 'SPI - Autoryzacja',
 ], $local);

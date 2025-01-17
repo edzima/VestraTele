@@ -10,26 +10,27 @@ use yii\data\ArrayDataProvider;
 
 class LawsuitApiTest extends BaseApiTest {
 
+	const TEST_APPEAL = '';
 	const TEST_LAWSUIT_ID = 5431301;
 
 	const TEST_SIGNATURE = 'I ACa 35/12';
 
 	public function testGetSingleLawsuit() {
 		$repository = new LawsuitRepository($this->api);
-		$model = $repository->getLawsuit(static::TEST_LAWSUIT_ID);
+		$model = $repository->getLawsuit(static::TEST_LAWSUIT_ID, static::TEST_APPEAL);
 		$this->tester->assertInstanceOf(LawsuitDetailsDto::class, $model);
 		$this->tester->assertSame('o podział majatku wpólnego', $model->subject);
 	}
 
 	public function testFindBySignature() {
 		$repository = new LawsuitRepository($this->api);
-		$dataProvider = $repository->findBySignature(static::TEST_SIGNATURE);
+		$dataProvider = $repository->findBySignature(static::TEST_SIGNATURE, static::TEST_APPEAL);
 		$this->tester->assertNotEmpty($dataProvider->getModels());
 	}
 
 	public function testGetLawsuits(): void {
 		$repository = new LawsuitRepository($this->api);
-		$dataProvider = $repository->getLawsuits();
+		$dataProvider = $repository->getLawsuits(static::TEST_APPEAL);
 		$this->tester->assertInstanceOf(ArrayDataProvider::class, $dataProvider);
 		$this->tester->assertCount(2, $dataProvider->getModels());
 		$this->tester->assertSame(2, $dataProvider->getTotalCount());

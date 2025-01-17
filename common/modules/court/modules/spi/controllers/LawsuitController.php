@@ -2,7 +2,6 @@
 
 namespace common\modules\court\modules\spi\controllers;
 
-use common\modules\court\modules\spi\components\SPIApi;
 use common\modules\court\modules\spi\models\lawsuit\LawsuitDetailsDto;
 use common\modules\court\modules\spi\models\search\LawsuitSearch;
 use common\modules\court\modules\spi\Module;
@@ -16,17 +15,21 @@ use yii\web\NotFoundHttpException;
  */
 class LawsuitController extends Controller {
 
-	private SPIApi $api;
 	private LawsuitRepository $repository;
 
 	public function init(): void {
 		parent::init();
-		$this->repository = new LawsuitRepository($this->module->spiApi);
-		///	$this->api = $this->module->getSpiApi();
+		$this->repository = $this->module->getRepositoryManager()->getLawsuit();
 	}
 
-	public function actionIndex(): string {
-		$searchModel = new LawsuitSearch($this->repository);
+	public function actionIndex(string $appeal = null) {
+		if ($appeal === null) {
+			$appeal = $this->module->getAppeal();
+		}
+		$searchModel = new LawsuitSearch(
+			$this->repository,
+			$appeal
+		);
 		$dataProvider = $searchModel->search(
 			Yii::$app->request->queryParams
 		);
@@ -37,14 +40,14 @@ class LawsuitController extends Controller {
 		]);
 	}
 
-	public function actionView(string $id): string {
-		$model = $this->findModel($id);
+	public function actionView(string $id, string $appeal): string {
+		$model = $this->findModel($id, $appeal);
 
 		return $this->render('view', ['model' => $model]);
 	}
 
-	private function findModel(string $id): LawsuitDetailsDto {
-		$model = $this->repository->getLawsuit($id);
+	private function findModel(string $id, string $appeal): LawsuitDetailsDto {
+		$model = $this->repository->getLawsuit($id, $appeal);
 		if (empty($model)) {
 			throw new NotFoundHttpException();
 		}

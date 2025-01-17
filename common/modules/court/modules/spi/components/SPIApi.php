@@ -6,7 +6,6 @@ use common\modules\court\modules\spi\components\exceptions\SPIApiException;
 use common\modules\court\modules\spi\components\exceptions\UnauthorizedSPIApiException;
 use common\modules\court\modules\spi\models\AppealInterface;
 use common\modules\court\modules\spi\models\application\ApplicationDTO;
-use common\modules\court\modules\spi\models\application\ApplicationType;
 use common\modules\court\modules\spi\models\application\ApplicationViewDTO;
 use common\modules\court\modules\spi\models\court\CourtDepartmentFullDTO;
 use common\modules\court\modules\spi\models\court\CourtDepartmentSmallDTO;
@@ -21,11 +20,12 @@ use yii\httpclient\Request;
 use yii\httpclient\RequestEvent;
 use yii\httpclient\Response;
 
-class SPIApi extends Component implements ApplicationType {
+class SPIApi extends Component
+	implements AppealInterface {
 
-	public const REPOSITORY_LAWSUIT = 'lawsuit';
+	public const EVENT_AFTER_REQUEST = 'afterRequest';
 
-	public string $baseUrl;
+	public string $baseUrl = 'https://portal.wroclaw.sa.gov.pl/api';
 	public string $username;
 	public string $password;
 
@@ -35,9 +35,9 @@ class SPIApi extends Component implements ApplicationType {
 	private const ROUTE_COURT = 'courts';
 	private const ROUTE_COURT_DEPARTMENTS = 'court-departments';
 	private const ROUTE_DEPARTMENT_REPERTORIES = 'repertories/department';
-	private const ROUTE_LAWSUITS = 'lawsuits';
 	private const ROUTE_APPLICATIONS = 'applications';
 
+	protected bool $isTest = false;
 	protected const DEFAULT_APPEAL = AppealInterface::APPEAL_WROCLAW;
 
 	private ?Client $client = null;
@@ -50,12 +50,18 @@ class SPIApi extends Component implements ApplicationType {
 
 	private ?string $token = null;
 
+
 	public static function testApi(): self {
-		return new self([
+		return new self(static::testApiConfig());
+	}
+
+	public static function testApiConfig(): array {
+		return [
 			'baseUrl' => 'https://testapi.wroclaw.sa.gov.pl/api/',
 			'password' => 'Wroclaw123',
 			'username' => '83040707012',
-		]);
+			'isTest' => true,
+		];
 	}
 
 	private const NO_AUTH_ROUTES = [
@@ -74,12 +80,25 @@ class SPIApi extends Component implements ApplicationType {
 		}
 	}
 
-	public function setAppeal(string $appeal): void {
+	protected function setIsTest(bool $isTest): void {
+		$this->isTest = $isTest;
+	}
+
+	public function getIsTest(): bool {
+		return $this->isTest;
+	}
+
+	public function setAppeal(string $appeal): self {
 		$this->appeal = $appeal;
 		$this->baseUrl = $this->getAppealUrl($appeal);
+		return $this;
 	}
 
 	public function getAppealUrl(string $appeal): string {
+		//@todo TEST API only default as Wrocal Appeal. Not working appeal URLs
+		if ($this->isTest) {
+			return $this->baseUrl;
+		}
 		return str_replace('{appeal}', $appeal, $this->appealUrlSchema);
 	}
 
@@ -204,7 +223,6 @@ class SPIApi extends Component implements ApplicationType {
 			->setUrl($url)
 			->setMethod('GET')
 			->send();
-		codecept_debug($response->getData());
 		if ($response->isOk) {
 			$totalCount = $this->getTotalCount($response);
 			$data = $response->getData();
@@ -307,10 +325,10 @@ class SPIApi extends Component implements ApplicationType {
 	}
 
 	protected function afterSend(RequestEvent $event): void {
+		$this->trigger(static::EVENT_AFTER_REQUEST, $event);
 		if (!$this->isAuthRequest($event->request)) {
 			$this->token = null;
 		}
-		codecept_debug($event->request->getData());
 	}
 
 	protected function isAuthRequest(Request $request): bool {
@@ -353,16 +371,14 @@ class SPIApi extends Component implements ApplicationType {
 		return count($response->getData());
 	}
 
-	public function getApplicationType(): string {
-		return $this->appeal;
-	}
-
 	private function buildUrl(string $url, array $params = []) {
-		$url = $url;
 		if (!empty($params)) {
 			$url .= '?' . http_build_query($params);
 		}
 		return $url;
 	}
 
+	public function getAppeal(): string {
+		return $this->appeal;
+	}
 }

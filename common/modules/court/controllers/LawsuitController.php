@@ -108,8 +108,36 @@ class LawsuitController extends Controller {
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	public function actionView(int $id): string {
+		$model = $this->findModel($id);
+		$lawsuitDetails = null;
+		if (!empty($model->signature_act)
+			&& Yii::$app->user->can(Module::PERMISSION_SPI_LAWSUIT_DETAIL)
+			&& $this->module->spi !== null
+		) {
+			$appeal = $model->court->getSPIAppealWithParents();
+			if (!$appeal) {
+				Yii::warning(
+					Yii::t('court', 'Not found SPI Appeal for Court: {court}.', [
+							'court' => $model->court,
+						]
+					)
+				);
+			} else {
+				$repository = $this->module->spi
+					->getRepositoryManager()
+					->getLawsuit();
+
+				$lawsuitDetails = $repository
+					->findBySignature(
+						$model->signature_act,
+						$model->court->getSPIAppealWithParents()
+					);
+				Yii::warning($lawsuitDetails);
+			}
+		}
 		return $this->render('view', [
 			'model' => $this->findModel($id),
+			'lawsuitDetails' => $lawsuitDetails,
 		]);
 	}
 
