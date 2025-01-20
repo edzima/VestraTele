@@ -50,7 +50,6 @@ class SPIApi extends Component
 
 	private ?string $token = null;
 
-
 	public static function testApi(): self {
 		return new self(static::testApiConfig());
 	}
@@ -73,6 +72,19 @@ class SPIApi extends Component
 		try {
 			return $this->getClient()
 				->createRequest()
+				->setMethod('GET')
+				->setUrl($url)
+				->send();
+		} catch (Exception $exception) {
+			throw new SPIApiException($exception->getMessage(), $exception->getCode());
+		}
+	}
+
+	public function put(string $url): Response {
+		try {
+			return $this->getClient()
+				->createRequest()
+				->setMethod('PUT')
 				->setUrl($url)
 				->send();
 		} catch (Exception $exception) {

@@ -64,10 +64,13 @@ class Module extends BaseModule implements AppealInterface {
 
 	public function getAppeal(): string {
 		if ($this->appeal === null) {
-			$this->appeal = Yii::$app->request->get(
+			$appeal = Yii::$app->request->get(
 				$this->appealParamName,
-				$this->getSpiApi()->getAppeal()
 			);
+			if ($appeal === null) {
+				$appeal = $this->getSpiApi()->getAppeal();
+			}
+			$this->appeal = $appeal;
 		}
 		return $this->appeal;
 	}

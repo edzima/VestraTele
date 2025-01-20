@@ -16,6 +16,13 @@ class RepositoryManager extends Component {
 		'class' => LawsuitRepository::class,
 	];
 
+	/**
+	 * @var string|array|callable
+	 */
+	public $notifications = [
+		'class' => NotificationsRepository::class,
+	];
+
 	public function init(): void {
 		$this->api = Instance::ensure(
 			$this->api,
@@ -27,6 +34,10 @@ class RepositoryManager extends Component {
 
 	public function getLawsuit(): LawsuitRepository {
 		return Yii::createObject($this->lawsuit, [$this->api]);
+	}
+
+	public function getNotifications(): NotificationsRepository {
+		return Yii::createObject($this->notifications, [$this->api]);
 	}
 
 }
