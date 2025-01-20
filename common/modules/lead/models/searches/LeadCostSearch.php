@@ -34,7 +34,8 @@ class LeadCostSearch extends LeadCost {
 	public function rules(): array {
 		return [
 			['!userId', 'required', 'on' => static::SCENARIO_USER],
-			[['id', 'campaign_id'], 'integer'],
+			[['id'], 'integer'],
+			['campaign_id', 'in', 'range' => array_keys($this->getCampaignNames()), 'allowArray' => true],
 			['withoutLeads', 'boolean'],
 			['withoutLeads', 'default', 'value' => null],
 			[['value', 'valueMin', 'valueMax'], 'number'],

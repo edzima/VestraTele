@@ -539,5 +539,5 @@ return [
 	'Question - Tag' => 'Tag',
 	'Question - Text Area' => 'Textarea',
 	'Values' => 'Wartości',
-
+	'Delete Costs: {count}' => 'Usunięto Koszty: {count}',
 ];
