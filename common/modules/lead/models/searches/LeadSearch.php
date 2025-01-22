@@ -73,8 +73,6 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public $olderByDays;
 
-	public string $reportsDetails = '';
-
 	public $answers = [];
 	public $closedQuestions = [];
 
@@ -83,7 +81,11 @@ class LeadSearch extends Lead implements SearchModel {
 	public $onlyWithEmail;
 	public $onlyWithPhone;
 
+	public $reportUserId;
+	public string $reportsDetails = '';
 	public $reportStatus;
+
+	public ?string $hoursAfterLastReport = null;
 
 	public $selfUserId;
 
@@ -109,8 +111,6 @@ class LeadSearch extends Lead implements SearchModel {
 
 	public ?string $deadlineType = null;
 
-	public ?string $hoursAfterLastReport = null;
-
 	public function __construct($config = []) {
 		if (!isset($config['addressSearch'])) {
 			$config['addressSearch'] = new AddressSearch();
@@ -123,7 +123,7 @@ class LeadSearch extends Lead implements SearchModel {
 	 */
 	public function rules(): array {
 		return [
-			[['id', 'olderByDays', 'selfUserId'], 'integer', 'min' => 1],
+			[['id', 'olderByDays'], 'integer', 'min' => 1],
 			[['reportStatus', 'hoursAfterLastReport', 'owner_id'], 'integer'],
 			[['!user_id'], 'required', 'on' => static::SCENARIO_USER],
 			[['!user_id'], 'integer', 'on' => static::SCENARIO_USER],
@@ -144,7 +144,7 @@ class LeadSearch extends Lead implements SearchModel {
 			[['selfUserId'], 'in', 'range' => function () { return $this->selfUsersIds(); }, 'allowArray' => true, 'skipOnEmpty' => true],
 			[['status_id', 'excludedStatus', 'reportStatus'], 'in', 'range' => array_keys(static::getStatusNames()), 'allowArray' => true],
 			['deadlineType', 'in', 'range' => array_keys(static::getDeadlineNames())],
-			['user_id', 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
+			[['user_id', 'reportUserId'], 'in', 'allowArray' => true, 'range' => array_keys(static::getUsersNames()), 'not' => static::SCENARIO_USER],
 			[['from_at', 'to_at'], 'safe'],
 			['excludedSources', 'integer', 'allowArray' => true],
 			[array_keys($this->questionsAttributes), 'safe'],
@@ -179,6 +179,7 @@ class LeadSearch extends Lead implements SearchModel {
 				'hoursAfterLastReport' => Yii::t('lead', 'Hours after newest Report'),
 				'onlyWithCosts' => Yii::t('lead', 'Only with Costs'),
 				'fromCampaigns' => Yii::t('lead', 'From Campaigns'),
+				'reportUserId' => Yii::t('lead', 'Report User'),
 			]
 		);
 	}
@@ -288,6 +289,7 @@ class LeadSearch extends Lead implements SearchModel {
 		$this->applyExcludedStatusFilter($query);
 		$this->applyExcludedSourcesFilter($query);
 		$this->applyReportFilter($query);
+		$this->applyReportUserFilter($query);
 		$this->applyReportStatusFilter($query);
 		$this->applyDeadlineFilter($query);
 		$this->applyHoursAfterLastReport($query);
@@ -830,6 +832,14 @@ class LeadSearch extends Lead implements SearchModel {
 	protected function applyExcludedSourcesFilter(LeadQuery $query): void {
 		if (!empty($this->excludedSources)) {
 			$query->andWhere(['NOT IN', Lead::tableName() . '.source_id', $this->excludedSources]);
+		}
+	}
+
+	private function applyReportUserFilter(LeadQuery $query): void {
+		if (!empty($this->reportUserId)) {
+			$query->joinWith('reports');
+			$query->groupBy([Lead::tableName() . '.id']);
+			$query->andWhere([LeadReport::tableName() . '.owner_id' => $this->reportUserId]);
 		}
 	}
 }

@@ -67,8 +67,6 @@ use kartik\select2\Select2;
 			])
 			?>
 
-
-
 			<?= $form->field($model, 'withoutUser', ['options' => ['class' => 'col-md-2']])->checkbox() ?>
 
 			<?= $form->field($model, 'duplicatePhone', ['options' => ['class' => 'col-md-1']])->dropDownList(Html::booleanDropdownList(), [
@@ -216,6 +214,20 @@ use kartik\select2\Select2;
 		?>
 
 		<?= $form->field($model, 'fromCampaigns', ['options' => ['class' => 'col-md-2']])->dropDownList(Html::booleanDropdownList(), ['prompt' => Yii::t('lead', 'Select...')]) ?>
+
+
+		<?= $model->scenario !== LeadSearch::SCENARIO_USER
+			? $form->field($model, 'reportUserId', ['options' => ['class' => 'col-md-3 col-lg-2']])
+				->widget(Select2::class, [
+					'data' => LeadSearch::getUsersNames(),
+					'pluginOptions' => [
+						'placeholder' => $model->getAttributeLabel('reportUserId'),
+						'allowClear' => true,
+						'multiple' => true,
+					],
+				])
+			: ''
+		?>
 
 	</div>
 

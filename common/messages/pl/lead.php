@@ -1,5 +1,6 @@
 <?php
 
+/** @noinspection SqlDialectInspection */
 return [
 	'Assign User to Lead' => 'Przypisz Użytkownika do Leada',
 	'Assign User' => 'Przypisz',
@@ -540,4 +541,5 @@ return [
 	'Question - Text Area' => 'Textarea',
 	'Values' => 'Wartości',
 	'Delete Costs: {count}' => 'Usunięto Koszty: {count}',
+	'Report User' => 'Użytkownik (Raport)',
 ];
