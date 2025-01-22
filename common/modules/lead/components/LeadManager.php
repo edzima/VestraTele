@@ -12,6 +12,7 @@ use common\modules\lead\Module;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
 use yii\helpers\Json;
@@ -70,10 +71,15 @@ class LeadManager extends Component {
 		return false;
 	}
 
-	public function isForUser(ActiveLead $lead, $userId = null): bool {
-		if (!$this->onlyForUser) {
+	public function canUserReport(ActiveLead $lead, $userId = null): bool {
+		$users = empty($lead->getUsers());
+		if (empty($users)) {
 			return true;
 		}
+		return $this->isForUser($lead, $userId);
+	}
+
+	public function isForUser(ActiveLead $lead, $userId = null): bool {
 		if (Yii::$app->user->can('lead.manager')) {
 			return true;
 		}
@@ -172,9 +178,11 @@ class LeadManager extends Component {
 
 	/**
 	 * @return ActiveLead|BaseActiveRecord
+	 * @throws InvalidConfigException
 	 */
 	protected function getModel(): ActiveLead {
 		if (!$this->model instanceof ActiveLead) {
+			/** @noinspection PhpIncompatibleReturnTypeInspection */
 			return Yii::createObject($this->model);
 		}
 		return $this->model;

@@ -2,6 +2,7 @@
 
 namespace common\modules\lead\widgets;
 
+use common\helpers\Html;
 use common\helpers\Url;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\Module;
@@ -86,23 +87,36 @@ class SameContactsGridView extends GridView {
 			'owner',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{copy} {view} {update}',
+				'template' => '{report} {view} {update} {copy}',
 				'urlCreator' => function ($action, ActiveLead $model) {
 					return Url::toRoute([$action, 'id' => $model->getId()]);
 				},
 				'visibleButtons' => [
 					'view' => function (ActiveLead $model): bool {
-						return Module::getInstance()->manager->isForUser($model);
+						return Module::getInstance()->manager->isForUser($model, Yii::$app->user->id);
 					},
 					'update' => function (ActiveLead $model): bool {
-						return Module::getInstance()->manager->isForUser($model);
+						return Module::getInstance()->manager->isForUser($model, Yii::$app->user->id);
+					},
+					'report' => function (ActiveLead $model): bool {
+						return Module::getInstance()->manager->canUserReport($model, Yii::$app->user->id);
 					},
 				],
 				'buttons' => [
 					'copy' => function ($url, ActiveLead $model): string {
 						return CopyLeadBtnWidget::widget([
 							'lead' => $model,
+							'options' => [
+								'class' => 'btn btn-sm btn-warning',
+							],
 						]);
+					},
+					'report' => function ($url, ActiveLead $model): string {
+						return Html::a(Html::icon('comment'),
+							['report/report', 'id' => $model->getId(), 'hash' => $model->getHash()], [
+								'title' => Yii::t('lead', 'Report'),
+								'aria-label' => Yii::t('lead', 'Report'),
+							]);
 					},
 				],
 			],
