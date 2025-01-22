@@ -5,17 +5,25 @@ namespace common\tests\unit\court\spi;
 use common\modules\court\modules\spi\models\application\ApplicationDTO;
 use common\modules\court\modules\spi\models\application\ApplicationType;
 use common\modules\court\modules\spi\models\application\ApplicationViewDTO;
+use common\modules\court\modules\spi\repository\ApplicationsRepository;
 
 /**
  */
-class ApplicationApiTest extends BaseApiTest {
+class ApplicationsTest extends BaseApiTest {
 
 	protected ApplicationDTO $model;
 	private bool $check;
 	private bool $create;
 
+	private ApplicationsRepository $repository;
+
+	public function _before(): void {
+		parent::_before();
+		$this->repository = new ApplicationsRepository($this->api);
+	}
+
 	public function testGetApplications(): void {
-		$provider = $this->api->getApplications();
+		$provider = $this->repository->getDataProvider(static::TEST_APPEAL);
 		$models = $provider->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
@@ -68,11 +76,11 @@ class ApplicationApiTest extends BaseApiTest {
 //	}
 
 	protected function giveApplication(array $config = []): void {
-		$this->model = new ApplicationDTO($config);
+		$this->model = $this->repository->createModel($config);
 	}
 
 	protected function whenCheck(): void {
-		$this->check = $this->api->checkApplication($this->model);
+		$this->check = $this->repository->checkApplication(static::TEST_APPEAL, $this->model);
 	}
 
 	protected function thenSuccessCheck(): void {
@@ -98,7 +106,7 @@ class ApplicationApiTest extends BaseApiTest {
 	}
 
 	private function whenCreate(): void {
-		$this->create = $this->api->createApplication($this->model);
+		$this->create = $this->repository->createApplication(static::TEST_APPEAL, $this->model);
 	}
 
 	private function thenSuccessCreate(): void {
