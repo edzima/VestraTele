@@ -110,19 +110,6 @@ class Module extends BaseModule implements AppealInterface {
 		return $this->get('repositoryManager');
 	}
 
-	/**
-	 * Module wrapper for `Yii::t()` method.
-	 *
-	 * @param string $message
-	 * @param array $params
-	 * @param null|string $language
-	 *
-	 * @return string
-	 */
-	public static function t(string $category, string $message, array $params = [], ?string $language = null) {
-		return Yii::t('edzima/spi/' . $category, $message, $params, $language);
-	}
-
 	protected function setApiComponent(): void {
 		$api = $this->spiApi;
 		if (is_array($api) && !isset($api['class'])) {
@@ -150,6 +137,19 @@ class Module extends BaseModule implements AppealInterface {
 			}
 		}
 		return $userId ? SpiUserAuth::findByUserId($userId) : null;
+	}
+
+	/**
+	 * Module wrapper for `Yii::t()` method.
+	 *
+	 * @param string $message
+	 * @param array $params
+	 * @param null|string $language
+	 *
+	 * @return string
+	 */
+	public static function t(string $category, string $message, array $params = [], ?string $language = null) {
+		return Yii::t('edzima/spi/' . $category, $message, $params, $language);
 	}
 
 }

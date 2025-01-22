@@ -39,6 +39,7 @@ class LawsuitDetailsDto extends Model {
 			'department' => Module::t('lawsuit', 'Department'),
 			'court' => Module::t('lawsuit', 'Court'),
 			'judge' => Module::t('lawsuit', 'Judge'),
+			'finishDate' => Module::t('lawsuit', 'Finish Date'),
 		];
 	}
 }

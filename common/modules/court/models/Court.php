@@ -2,6 +2,7 @@
 
 namespace common\modules\court\models;
 
+use common\helpers\ArrayHelper;
 use common\models\Address;
 use common\modules\court\models\query\LawsuitQuery;
 use Yii;
@@ -23,6 +24,7 @@ use yii\db\ActiveRecord;
  * @property string $spi_data
  *
  * @property-read Court|null $parent
+ * @property-read Court[] $childes
  * @property-read Address[] $addresses
  */
 class Court extends ActiveRecord {
@@ -30,6 +32,32 @@ class Court extends ActiveRecord {
 	public const TYPE_APPEAL = 'SA';
 	public const TYPE_REGIONAL = 'SO';
 	public const TYPE_DISTRICT = 'SR';
+
+	private static $courtsAppealsIds = [];
+
+	public static function getCourtsIds(string $spiAppeal) {
+		if (!isset(self::$courtsAppealsIds[$spiAppeal])) {
+			$model = Court::find()
+				->alias('BC')
+				->andWhere([
+					'BC.spi_appeal' => $spiAppeal,
+					'BC.type' => self::TYPE_APPEAL,
+				])->with(
+					'childes',
+					'childes.childes'
+				)
+				->joinWith('childes')
+				->one();
+			$ids = [];
+			if ($model) {
+				$ids = ArrayHelper::getColumn(static::getModelChildes($model), 'id');
+				$ids[] = $model->id;
+			}
+
+			self::$courtsAppealsIds[$spiAppeal] = $ids;
+		}
+		return self::$courtsAppealsIds[$spiAppeal];
+	}
 
 	public function __toString() {
 		return $this->name;
@@ -84,8 +112,19 @@ class Court extends ActiveRecord {
 		return $this->hasOne(static::class, ['id' => 'parent_id']);
 	}
 
+	public static function getModelChildes(self $model): array {
+		$childes = $model->childes;
+		if (empty($childes)) {
+			return [];
+		}
+		foreach ($childes as $child) {
+			$childes = array_merge($childes, static::getModelChildes($child));
+		}
+		return $childes;
+	}
+
 	public function getChildes(): ActiveQuery {
-		return $this->hasOne(static::class, ['parent_id' => 'id']);
+		return $this->hasMany(static::class, ['parent_id' => 'id']);
 	}
 
 	public function getLawsuits(): LawsuitQuery {
