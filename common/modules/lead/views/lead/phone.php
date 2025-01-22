@@ -46,6 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<div class="lead-phone-models">
 		<?= SameContactsListWidget::widget([
+			'withReportBtn' => false,
 			'dataProvider' => $dataProvider,
 			'withType' => true,
 			'withHeader' => false,

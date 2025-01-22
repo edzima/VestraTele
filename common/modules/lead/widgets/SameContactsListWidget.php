@@ -29,6 +29,7 @@ class SameContactsListWidget extends ListView {
 	public bool $archiveBtn = false;
 	public bool $withArchiveBtn = true;
 	public bool $withHeader = true;
+	public bool $withReportBtn = true;
 
 	public function init() {
 		if ($this->dataProvider === null) {
@@ -45,6 +46,7 @@ class SameContactsListWidget extends ListView {
 			'withType' => $this->withType,
 			'withDialers' => $this->withDialers,
 			'visibleCustomerLink' => $this->visibleCustomerLink,
+			'withReportBtn' => $this->withReportBtn,
 		];
 		parent::init();
 	}
