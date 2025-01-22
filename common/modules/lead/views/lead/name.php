@@ -23,9 +23,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<h1><?= Html::encode($this->title) ?></h1>
 	<p>
-		<?= !empty($model->phone) ? CreateLeadBtnWidget::widget([
+		<?= !empty($model->name) ? CreateLeadBtnWidget::widget([
 			'owner_id' => Yii::$app->user->getId(),
-			'phone' => $model->phone,
 		]) : '' ?>
 	</p>
 

@@ -10,6 +10,7 @@ class ReportFormWidget extends Widget {
 
 	public ReportForm $model;
 	public ActiveForm $form;
+	public bool $withName = true;
 
 	public array $formOptions = [];
 
@@ -27,6 +28,7 @@ class ReportFormWidget extends Widget {
 			'form' => $this->form,
 			'model' => $this->model,
 			'withSameContacts' => $this->withSameContacts,
+			'withName' => $this->withName,
 		]);
 	}
 }

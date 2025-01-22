@@ -12,6 +12,7 @@ use yii\widgets\ActiveForm;
 /* @var $formOptions array */
 /* @var $model ReportForm */
 /* @var $withSameContacts bool */
+/* @var $withName bool */
 
 ?>
 
@@ -23,7 +24,10 @@ use yii\widgets\ActiveForm;
 			->widget(Select2::class, ['data' => ReportForm::getStatusNames()])
 		?>
 
-		<?= $form->field($model, 'leadName', ['options' => ['class' => 'col-md-6 col-lg-5']])->textInput() ?>
+		<?= $withName
+			? $form->field($model, 'leadName', ['options' => ['class' => 'col-md-6 col-lg-5']])->textInput()
+			: ''
+		?>
 
 		<?= $form->field($model, 'withAddress', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 

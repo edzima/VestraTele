@@ -542,4 +542,5 @@ return [
 	'Values' => 'Wartości',
 	'Delete Costs: {count}' => 'Usunięto Koszty: {count}',
 	'Report User' => 'Użytkownik (Raport)',
+	'Create Lead: {type}' => 'Dodaj Lead: {type}',
 ];

@@ -15,6 +15,7 @@ use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
+use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadNameSearch;
@@ -347,6 +348,42 @@ class LeadController extends BaseController {
 
 		return $this->render('create', [
 			'model' => $model,
+		]);
+	}
+
+	public function actionCreateFromType(int $id) {
+		$type = LeadType::findOne($id);
+		if ($type === null) {
+			throw new NotFoundHttpException();
+		}
+		$model = new LeadForm();
+		$model->typeId = $id;
+		$model->status_id = LeadStatus::STATUS_NEW;
+		if ($this->module->onlyUser) {
+			$model->setScenario(LeadForm::SCENARIO_OWNER);
+			$model->owner_id = Yii::$app->user->getId();
+		}
+		$model->date_at = date($model->dateFormat);
+		$report = new ReportForm();
+		$report->lead_type_id = $id;
+		$report->status_id = LeadStatusInterface::STATUS_NEW;
+		$report->owner_id = Yii::$app->user->getId();
+		if ($model->load(Yii::$app->request->post())
+			&& $report->load(Yii::$app->request->post())
+			&& $model->validate()
+			&& $report->validate()) {
+			$lead = $this->module->manager->pushLead($model);
+			if ($lead) {
+				$report->setLead($lead, false);
+				Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success create Lead.'));
+				$report->save(false);
+				return $this->redirect(['view', 'id' => $lead->getId()]);
+			}
+		}
+		return $this->render('create-from-type', [
+			'model' => $model,
+			'report' => $report,
+			'type' => $type,
 		]);
 	}
 
