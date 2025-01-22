@@ -5,8 +5,6 @@ namespace common\modules\court\modules\spi\components;
 use common\modules\court\modules\spi\components\exceptions\SPIApiException;
 use common\modules\court\modules\spi\components\exceptions\UnauthorizedSPIApiException;
 use common\modules\court\modules\spi\models\AppealInterface;
-use common\modules\court\modules\spi\models\application\ApplicationDTO;
-use common\modules\court\modules\spi\models\application\ApplicationViewDTO;
 use common\modules\court\modules\spi\models\court\CourtDepartmentFullDTO;
 use common\modules\court\modules\spi\models\court\CourtDepartmentSmallDTO;
 use common\modules\court\modules\spi\models\court\RepertoryDTO;
@@ -97,6 +95,19 @@ class SPIApi extends Component
 		}
 	}
 
+	public function post(string $url, array $data = []): Response {
+		try {
+			return $this->getClient()
+				->createRequest()
+				->setMethod('POST')
+				->setUrl($url)
+				->setData($data)
+				->send();
+		} catch (Exception $exception) {
+			throw new SPIApiException($exception->getMessage(), $exception->getCode());
+		}
+	}
+
 	protected function setIsTest(bool $isTest): void {
 		$this->isTest = $isTest;
 	}
@@ -117,69 +128,6 @@ class SPIApi extends Component
 			return static::TEST_BASE_URL;
 		}
 		return str_replace('{appeal}', $appeal, $this->appealUrlSchema);
-	}
-
-	public function createApplication(ApplicationDTO $model): bool {
-		return true;
-		$url = static::ROUTE_APPLICATIONS;
-		$respone = $this->getClient()
-			->createRequest()
-			->setUrl($url)
-			->setMethod('POST')
-			->setData($model->toArray())
-			->send();
-
-		codecept_debug($respone->getData());
-
-		if ($respone->isOk) {
-			return true;
-		}
-		Yii::warning($respone->getData(), __METHOD__);
-		return false;
-	}
-
-	public function checkApplication(ApplicationDTO &$model): bool {
-		$url = static::ROUTE_APPLICATIONS . '/' . 'check';
-		$response = $this->getClient()
-			->createRequest()
-			->setUrl($url)
-			->setMethod('POST')
-			->setData($model->toArray())
-			->send();
-
-		codecept_debug($response->getData());
-
-		if ($response->isOk) {
-			$model = ApplicationDTO::createFromResponse($response);
-			return true;
-		}
-		return false;
-	}
-
-	public function getApplications(array $params = []): ?DataProviderInterface {
-		Yii::warning($params);
-		$url = $this->getUrl(static::ROUTE_APPLICATIONS, $params);
-		$response = $this->getClient()
-			->createRequest()
-			->setUrl($url)
-			->setMethod('GET')
-			->send();
-		if ($response->isOk) {
-			$totalCount = $this->getTotalCount($response);
-			$data = $response->getData();
-			$models = [];
-			foreach ($data as $datum) {
-				$models[] = new ApplicationViewDTO($datum);
-			}
-			return new ArrayDataProvider([
-				'key' => 'id',
-				'modelClass' => ApplicationViewDTO::class,
-				'models' => $models,
-				'totalCount' => $totalCount,
-			]);
-		}
-		Yii::warning($response->getData(), __METHOD__);
-		return null;
 	}
 
 	public function getCourts(array $params = []) {
