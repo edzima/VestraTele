@@ -15,10 +15,6 @@ use yii\web\View;
 $this->title = Module::t('lawsuit', 'Lawsuits');
 $this->params['breadcrumbs'][] = $this->title;
 
-//echo Html::dump([
-//	'page' => $dataProvider->getPagination(),
-//	'sort' => $dataProvider->getSort(),
-//]);
 ?>
 
 <?= AppealsNavWidget::widget() ?>

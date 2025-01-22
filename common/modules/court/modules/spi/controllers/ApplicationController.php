@@ -12,10 +12,15 @@ use yii\web\Controller;
  */
 class ApplicationController extends Controller {
 
-	public function actionIndex(): string {
-		$searchModel = new ApplicationSearch();
+	public function actionIndex(string $appeal = null): string {
+		if ($appeal === null) {
+			$appeal = $this->module->getAppeal();
+		}
+		$searchModel = new ApplicationSearch(
+			$this->module->getRepositoryManager()->getApplications(),
+			$appeal
+		);
 		$dataProvider = $searchModel->search(
-			$this->module->getSpiApi(),
 			Yii::$app->request->queryParams
 		);
 		return $this->render('index', [

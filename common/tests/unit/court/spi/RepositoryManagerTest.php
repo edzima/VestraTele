@@ -38,7 +38,7 @@ class RepositoryManagerTest extends Unit {
 		$manager = new RepositoryManager([
 			'api' => SPIApi::testApi(),
 		]);
-		$lawsuit = $manager->getLawsuit();
+		$lawsuit = $manager->getLawsuits();
 		$this->tester->assertInstanceOf(LawsuitRepository::class, $lawsuit);
 	}
 

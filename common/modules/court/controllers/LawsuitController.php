@@ -125,7 +125,7 @@ class LawsuitController extends Controller {
 			} else {
 				$repository = $this->module->spi
 					->getRepositoryManager()
-					->getLawsuit();
+					->getLawsuits();
 
 				$lawsuitDetails = $repository
 					->findBySignature(

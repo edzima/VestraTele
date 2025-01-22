@@ -12,6 +12,9 @@ class RepositoryManager extends Component {
 
 	public $api = 'spiApi';
 
+	/**
+	 * @var string|array|callable
+	 */
 	public $lawsuit = [
 		'class' => LawsuitRepository::class,
 	];
@@ -23,6 +26,13 @@ class RepositoryManager extends Component {
 		'class' => NotificationsRepository::class,
 	];
 
+	/**
+	 * @var string|array|callable
+	 */
+	public $application = [
+		'class' => ApplicationsRepository::class,
+	];
+
 	public function init(): void {
 		$this->api = Instance::ensure(
 			$this->api,
@@ -32,12 +42,19 @@ class RepositoryManager extends Component {
 		parent::init();
 	}
 
-	public function getLawsuit(): LawsuitRepository {
+	public function getLawsuits(): LawsuitRepository {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return Yii::createObject($this->lawsuit, [$this->api]);
 	}
 
 	public function getNotifications(): NotificationsRepository {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return Yii::createObject($this->notifications, [$this->api]);
+	}
+
+	public function getApplications(): ApplicationsRepository {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
+		return Yii::createObject($this->application, [$this->api]);
 	}
 
 }

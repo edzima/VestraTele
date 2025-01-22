@@ -15,7 +15,6 @@ use common\models\user\Worker;
 use common\modules\calendar\controllers\SummonCalendarController;
 use common\modules\calendar\Module as CalendarModule;
 use common\modules\court\Module as CourtModule;
-use common\modules\court\modules\spi\components\SPIApi;
 use common\modules\czater\Module as CzaterModule;
 use common\modules\lead\Module as LeadModule;
 use Edzima\Yii2Adescom\Module as AdescomModule;
@@ -119,9 +118,6 @@ return [
 		'court' => [
 			'class' => CourtModule::class,
 			'onlyUserIssues' => false,
-			'spiModuleConfig' => [
-				'spiApi' => SPIApi::testApi(),
-			],
 			'as access' => [
 				'class' => GlobalAccessBehavior::class,
 				'rules' => [

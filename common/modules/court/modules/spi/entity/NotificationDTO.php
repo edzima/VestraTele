@@ -2,6 +2,7 @@
 
 namespace common\modules\court\modules\spi\entity;
 
+use common\modules\court\modules\spi\Module;
 use yii\base\Model;
 
 class NotificationDTO extends Model {
@@ -15,4 +16,15 @@ class NotificationDTO extends Model {
 	public string $signature;
 	public string $courtName;
 	public bool $read;
+
+	public function attributeLabels(): array {
+		return [
+			'type' => Module::t('notification', 'Type'),
+			'content' => Module::t('notification', 'Content'),
+			'date' => Module::t('notification', 'Date'),
+			'courtName' => Module::t('notification', 'Court Name'),
+			'read' => Module::t('notification', 'Read'),
+			'signature' => Module::t('notification', 'Signature'),
+		];
+	}
 }

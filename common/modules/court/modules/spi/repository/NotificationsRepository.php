@@ -2,23 +2,40 @@
 
 namespace common\modules\court\modules\spi\repository;
 
-use common\modules\court\modules\spi\components\SPIApi;
 use common\modules\court\modules\spi\entity\NotificationDTO;
+use common\modules\court\modules\spi\helpers\ApiDataProvider;
 use Yii;
-use yii\data\ArrayDataProvider;
-use yii\data\DataProviderInterface;
 
-class NotificationsRepository {
+class NotificationsRepository extends BaseRepository {
 
-	private const ROUTE = 'notifications';
-	private SPIApi $api;
-
-	public function __construct(SPIApi $api) {
-		$this->api = $api;
+	protected function route(): string {
+		return 'notifications';
 	}
 
+	protected function modelClass(): string {
+		return NotificationDTO::class;
+	}
+
+	public array $dataProviderConfig = [
+		'class' => ApiDataProvider::class,
+		'key' => 'id',
+		'pagination' => [
+			'pageSize' => 50,
+		],
+		'sort' => [
+			'attributes' => [
+				'type',
+				'content',
+				'date',
+				'signature',
+				'read',
+			],
+			'enableMultiSort' => true,
+		],
+	];
+
 	public function getUnread(): ?int {
-		$url = static::ROUTE . '/unread';
+		$url = static::route() . '/unread';
 		$response = $this->api
 			->get($url);
 
@@ -31,39 +48,19 @@ class NotificationsRepository {
 	}
 
 	public function read(int $id): ?NotificationDTO {
-		$url = static::ROUTE . '/read/' . $id;
+		$url = static::route() . '/read/' . $id;
 		$response = $this->api
 			->put($url);
-		codecept_debug($response->getData());
 
 		if (!$response->isOk) {
 			Yii::error($response->getData(), __METHOD__);
 			return null;
 		}
-		return new NotificationDTO($response->getData());
+		return $this->createModel($response->getData());
 	}
 
-	public function getNotifications(array $params = []): DataProviderInterface {
-		$response = $this->api
-			->get(static::ROUTE, $params);
-		$dataProvider = new ArrayDataProvider([
-			'key' => 'id',
-		]);
-		if (!$response->isOk) {
-			Yii::error($response->getData(), __METHOD__);
-			return $dataProvider;
-		}
-		$dataProvider->models = $this->createModels($response->getData());
-		$dataProvider->totalCount = $this->api->getTotalCount($response);
-		return $dataProvider;
-	}
-
-	private function createModels(array $data): array {
-		$models = $data;
-		foreach ($data as $datum) {
-			$models[] = new NotificationDTO($datum);
-		}
-		return $models;
+	protected function createModel(array $data): NotificationDTO {
+		return new NotificationDTO($data);
 	}
 
 }

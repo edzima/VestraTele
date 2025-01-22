@@ -19,7 +19,7 @@ class LawsuitController extends Controller {
 
 	public function init(): void {
 		parent::init();
-		$this->repository = $this->module->getRepositoryManager()->getLawsuit();
+		$this->repository = $this->module->getRepositoryManager()->getLawsuits();
 	}
 
 	public function actionIndex(string $appeal = null) {

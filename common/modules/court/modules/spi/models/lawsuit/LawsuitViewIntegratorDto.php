@@ -52,16 +52,18 @@ class LawsuitViewIntegratorDto extends Model {
 
 	public function attributeLabels(): array {
 		return [
+			'description' => Module::t('lawsuit', 'Description'),
 			'signature' => Module::t('lawsuit', 'Signature'),
 			'subject' => Module::t('lawsuit', 'Subject'),
 			'number' => Module::t('lawsuit', 'Number'),
 			'value' => Module::t('lawsuit', 'Value'),
-			'result' => Module::t('lawsuit', 'Result'),
 			'receiptDate' => Module::t('lawsuit', 'Receipt Date'),
 			'repertoryName' => Module::t('lawsuit', 'Repertory'),
 			'departmentName' => Module::t('lawsuit', 'Department'),
 			'courtName' => Module::t('lawsuit', 'Court'),
 			'lastUpdate' => Module::t('lawsuit', 'Last Update'),
+			'judgeName' => Module::t('lawsuit', 'Judge'),
+			'result' => Module::t('lawsuit', 'Result'),
 		];
 	}
 

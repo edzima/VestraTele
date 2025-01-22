@@ -3,6 +3,7 @@
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use common\modules\court\models\Lawsuit;
+use common\modules\court\modules\spi\models\lawsuit\LawsuitDetailsDto;
 use common\modules\court\widgets\LawsuitSmsBtnWidget;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\IssueColumn;
@@ -15,6 +16,8 @@ use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
 /** @var Lawsuit $model */
+/** @var LawsuitDetailsDto|null $lawsuitDetails */
+
 $this->title = $model->getName();
 if ($model->is_appeal) {
 	$this->title .= ' - ' . Yii::t('court', 'Is Appeal');
@@ -143,5 +146,27 @@ YiiAsset::register($this);
 		</div>
 	</div>
 
+
+	<?php if ($lawsuitDetails): ?>
+		<!--		--><?php //= Html::dump($lawsuitDetails) ?>
+		<div class="row">
+			<div class="col-md-4">
+
+				<?= DetailView::widget([
+					'model' => $lawsuitDetails,
+					'attributes' => [
+						'subject',
+						'description:ntext',
+						'departmentName',
+						'judgeName',
+						'value',
+						'partyName:ntext',
+					],
+				]) ?>
+			</div>
+
+		</div>
+
+	<?php endif; ?>
 
 </div>

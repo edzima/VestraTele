@@ -7,6 +7,7 @@ use common\modules\court\modules\spi\models\AppealInterface;
 class CourtTest extends BaseApiTest {
 
 	public function testGetCourtsForGdanskAppeal() {
+		//@todo in this moment Appal URLs not working in Test API
 		$this->api->setAppeal(AppealInterface::APPEAL_GDANSK);
 		$dataProvider = $this->api->getCourts();
 		$first = $dataProvider->getModels()[0];
@@ -64,6 +65,7 @@ class CourtTest extends BaseApiTest {
 	}
 
 	public function appealsCourtsDataProvider(): array {
+		//@todo in this moment Appal URLs not working in Test API, only Wroclaw Appeal
 		return [
 			AppealInterface::APPEAL_BIALYSTOK => [AppealInterface::APPEAL_BIALYSTOK, 32],
 			AppealInterface::APPEAL_GDANSK => [AppealInterface::APPEAL_GDANSK, 49],
