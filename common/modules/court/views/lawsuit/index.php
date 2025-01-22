@@ -5,6 +5,7 @@ use common\helpers\Html;
 use common\helpers\Url;
 use common\modules\court\models\Lawsuit;
 use common\modules\court\models\search\LawsuitSearch;
+use common\modules\court\modules\spi\widgets\AppealsNavWidget;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerIssuesDataColumn;
 use common\widgets\grid\IssuesDataColumn;
@@ -19,6 +20,13 @@ $this->title = Yii::t('court', 'Lawsuits');
 $this->params['breadcrumbs'][] = Breadcrumbs::issues();
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
+<?= AppealsNavWidget::widget([
+	'activeAppeal' => $searchModel->spiAppeal,
+	'getAppealFromModule' => false,
+	'appealParamName' => 'appeal',
+]) ?>
+
 <div class="court-lawsuit-index">
 
 	<p>

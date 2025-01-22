@@ -38,8 +38,6 @@ class SPIApi extends Component
 	private const ROUTE_COURT = 'courts';
 	private const ROUTE_COURT_DEPARTMENTS = 'court-departments';
 	private const ROUTE_DEPARTMENT_REPERTORIES = 'repertories/department';
-	private const ROUTE_APPLICATIONS = 'applications';
-
 	protected bool $isTest = false;
 	protected const DEFAULT_APPEAL = AppealInterface::APPEAL_WROCLAW;
 

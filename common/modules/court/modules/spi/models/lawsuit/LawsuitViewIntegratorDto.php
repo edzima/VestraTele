@@ -64,6 +64,7 @@ class LawsuitViewIntegratorDto extends Model {
 			'lastUpdate' => Module::t('lawsuit', 'Last Update'),
 			'judgeName' => Module::t('lawsuit', 'Judge'),
 			'result' => Module::t('lawsuit', 'Result'),
+			'finishDate' => Module::t('lawsuit', 'Finish Date'),
 		];
 	}
 

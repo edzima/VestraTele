@@ -49,8 +49,9 @@ class LawsuitController extends Controller {
 	 *
 	 * @return string
 	 */
-	public function actionIndex(): string {
+	public function actionIndex(string $appeal = null): string {
 		$searchModel = new LawsuitSearch();
+		$searchModel->spiAppeal = $appeal;
 		if ($this->module->onlyUserIssues) {
 			$searchModel->setScenario(LawsuitSearch::SCENARIO_ISSUE_USER);
 			$searchModel->issueUserId = Yii::$app->user->getId();
@@ -130,9 +131,8 @@ class LawsuitController extends Controller {
 				$lawsuitDetails = $repository
 					->findBySignature(
 						$model->signature_act,
-						$model->court->getSPIAppealWithParents()
+						$appeal
 					);
-				Yii::warning($lawsuitDetails);
 			}
 		}
 		return $this->render('view', [

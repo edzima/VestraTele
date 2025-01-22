@@ -24,6 +24,8 @@ class LawsuitSearch extends Lawsuit {
 
 	public $issueUserId;
 
+	public $spiAppeal;
+
 	public const SCENARIO_ISSUE_USER = 'issue_user_id';
 
 	public function attributeLabels(): array {
@@ -40,7 +42,7 @@ class LawsuitSearch extends Lawsuit {
 			['!issueUserId', 'required', 'on' => self::SCENARIO_ISSUE_USER],
 			[['id', 'court_id', 'creator_id', 'issue_id'], 'integer'],
 			[['is_appeal'], 'default', 'value' => null],
-			[['customer', 'signature_act', 'room', 'due_at', 'details', 'created_at', 'updated_at', 'location', 'presence_of_the_claimant', 'court_type', 'url'], 'safe'],
+			[['customer', 'signature_act', 'room', 'due_at', 'details', 'created_at', 'updated_at', 'location', 'presence_of_the_claimant', 'court_type', 'url', 'appeal'], 'safe'],
 		];
 	}
 
@@ -80,7 +82,8 @@ class LawsuitSearch extends Lawsuit {
 		}
 
 		$this->applyIssueUserFilter($query);
-		$this->applyCustomerFileter($query);
+		$this->applyCustomerFilter($query);
+		$this->applySpiAppealFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -122,12 +125,22 @@ class LawsuitSearch extends Lawsuit {
 			'id', 'name');
 	}
 
-	private function applyCustomerFileter(ActiveQuery $query) {
+	private function applyCustomerFilter(ActiveQuery $query): void {
 		if (!empty($this->customer)) {
 			$query->joinWith([
 				'issues.customer.userProfile' => function (UserProfileQuery $query) {
 					$query->withFullName($this->customer);
 				},
+			]);
+		}
+	}
+
+	private function applySpiAppealFilter(ActiveQuery $query): void {
+		if (!empty($this->spiAppeal)) {
+			$courts = Court::getCourtsIds($this->spiAppeal);
+			Yii::warning(count($courts));
+			$query->andWhere([
+				'court_id' => $courts,
 			]);
 		}
 	}

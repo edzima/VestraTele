@@ -21,6 +21,7 @@ class AppealsNavWidget extends Widget {
 		],
 	];
 	public ?string $activeAppeal = null;
+	public bool $getAppealFromModule = true;
 
 	public function init(): void {
 		parent::init();
@@ -28,7 +29,7 @@ class AppealsNavWidget extends Widget {
 		if ($this->appealParamName === null) {
 			$this->appealParamName = Module::getInstance()->appealParamName ?? null;
 		}
-		if ($this->activeAppeal === null) {
+		if ($this->activeAppeal === null && $this->getAppealFromModule) {
 			$this->activeAppeal = Module::getInstance()->getAppeal() ?? null;
 		}
 		if (empty($this->appealParamName)) {
@@ -41,6 +42,7 @@ class AppealsNavWidget extends Widget {
 	}
 
 	public function run(): string {
+
 		if (empty($this->items)) {
 			return '';
 		}

@@ -15,4 +15,5 @@ return [
 	'Lawsuit: {signature}' => '{signature}',
 	'Subject' => 'Przedmiot sprawy',
 	'Party Name' => 'Strony',
+	'Finish Date' => 'Data zakończenia',
 ];
