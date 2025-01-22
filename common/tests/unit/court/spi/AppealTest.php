@@ -4,7 +4,7 @@ namespace common\tests\unit\court\spi;
 
 use common\modules\court\modules\spi\models\AppealInterface;
 
-class ConfigurationTest extends BaseApiTest {
+class AppealTest extends BaseApiTest {
 
 	public function testGetAppealUrl() {
 		$api = $this->api;

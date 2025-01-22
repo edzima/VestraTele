@@ -14,8 +14,10 @@ class NotificationsTest extends BaseApiTest {
 		$this->repository = new NotificationsRepository($this->api);
 	}
 
-	public function testGetNotifications(): void {
-		$notifications = $this->repository->getNotifications()->getModels();
+	public function testGetDataProvider(): void {
+		$notifications = $this->repository->getDataProvider(
+			static::TEST_APPEAL
+		)->getModels();
 		$this->tester->assertNotEmpty($notifications);
 		foreach ($notifications as $notification) {
 			$this->tester->assertInstanceOf(NotificationDTO::class, $notification);

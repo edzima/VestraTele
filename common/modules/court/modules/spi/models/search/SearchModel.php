@@ -2,32 +2,41 @@
 
 namespace common\modules\court\modules\spi\models\search;
 
-use common\modules\court\modules\spi\components\SPIApi;
+use common\modules\court\modules\spi\repository\RepositoryInterface;
+use Yii;
 use yii\base\Model;
+use yii\data\DataProviderInterface;
 
-class SearchModel extends Model implements PageableInterface {
+abstract class SearchModel extends Model {
 
-	protected SPIApi $api;
+	protected RepositoryInterface $repository;
 
-	protected int $page;
-	protected int $size;
-	protected string $sort;
+	protected string $appeal;
 
-	public function __construct(SPIApi $api, array $config = []) {
-		$this->api = $api;
+	abstract public function getApiParams(): array;
+
+	public function __construct(RepositoryInterface $repository, string $appeal, array $config = []) {
+		$this->repository = $repository;
+		$this->appeal = $appeal;
 		parent::__construct($config);
 	}
 
-	public function getPage(): int {
-		return $this->page;
+	public function search(array $params = []): DataProviderInterface {
+		$this->load($params);
+		if (!$this->validate()) {
+			Yii::warning($this->errors, __METHOD__);
+			return $this->repository->createDataProvider();
+		}
+
+		$params = $this->getFilterApiParams();
+		return $this->repository->getDataProvider($this->appeal, $params);
 	}
 
-	public function getSize(): int {
-		return $this->size;
-	}
-
-	public function getSort(): string {
-		return $this->sort;
+	protected function getFilterApiParams(): array {
+		$params = $this->getApiParams();
+		return array_filter($params, function ($value) {
+			return !empty($value);
+		});
 	}
 
 }

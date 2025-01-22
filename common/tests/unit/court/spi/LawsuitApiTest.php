@@ -2,11 +2,11 @@
 
 namespace common\tests\unit\court\spi;
 
+use common\modules\court\modules\spi\helpers\ApiDataProvider;
 use common\modules\court\modules\spi\models\lawsuit\LawsuitDetailsDto;
 use common\modules\court\modules\spi\models\lawsuit\LawsuitPartyDTO;
 use common\modules\court\modules\spi\models\lawsuit\LawsuitViewIntegratorDto;
 use common\modules\court\modules\spi\repository\LawsuitRepository;
-use yii\data\ArrayDataProvider;
 
 class LawsuitApiTest extends BaseApiTest {
 
@@ -24,14 +24,20 @@ class LawsuitApiTest extends BaseApiTest {
 
 	public function testFindBySignature() {
 		$repository = new LawsuitRepository($this->api);
-		$dataProvider = $repository->findBySignature(static::TEST_SIGNATURE, static::TEST_APPEAL);
-		$this->tester->assertNotEmpty($dataProvider->getModels());
+		$model = $repository->findBySignature(static::TEST_SIGNATURE, static::TEST_APPEAL);
+		$this->tester->assertNotNull($model);
 	}
 
-	public function testGetLawsuits(): void {
+	public function testFindByNotExistedSignature() {
 		$repository = new LawsuitRepository($this->api);
-		$dataProvider = $repository->getLawsuits(static::TEST_APPEAL);
-		$this->tester->assertInstanceOf(ArrayDataProvider::class, $dataProvider);
+		$model = $repository->findBySignature(static::TEST_SIGNATURE . '.sdasdas', static::TEST_APPEAL);
+		$this->tester->assertNull($model);
+	}
+
+	public function testGetDataProvider(): void {
+		$repository = new LawsuitRepository($this->api);
+		$dataProvider = $repository->getDataProvider(static::TEST_APPEAL);
+		$this->tester->assertInstanceOf(ApiDataProvider::class, $dataProvider);
 		$this->tester->assertCount(2, $dataProvider->getModels());
 		$this->tester->assertSame(2, $dataProvider->getTotalCount());
 		foreach ($dataProvider->getModels() as $model) {

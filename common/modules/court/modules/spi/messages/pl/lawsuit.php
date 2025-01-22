@@ -6,6 +6,7 @@ return [
 	'Value' => 'Wartość',
 	'Result' => 'Wynik',
 	'Repertory' => 'Repertorium',
+	'Description' => 'Opis',
 	'Department' => 'Wydział',
 	'Court' => 'Sąd',
 	'Receipt Date' => 'Wpłyneło',
@@ -13,4 +14,5 @@ return [
 	'Last Update' => 'Aktualizacja',
 	'Lawsuit: {signature}' => '{signature}',
 	'Subject' => 'Przedmiot sprawy',
+	'Party Name' => 'Strony',
 ];

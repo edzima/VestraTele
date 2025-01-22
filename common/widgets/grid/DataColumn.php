@@ -4,6 +4,7 @@ namespace common\widgets\grid;
 
 use common\assets\TooltipAsset;
 use common\helpers\Html;
+use common\modules\court\modules\spi\helpers\ApiDataProvider;
 use common\widgets\GridView;
 use kartik\grid\DataColumn as BaseDataColumn;
 
@@ -33,6 +34,18 @@ class DataColumn extends BaseDataColumn {
 			Html::addNoPrintClass($this->contentOptions);
 			Html::addNoPrintClass($this->footerOptions);
 		}
+	}
+
+	protected function getHeaderCellLabel(): string {
+		$provider = $this->grid->dataProvider;
+		if ($this->label === null
+			&& $this->attribute !== null
+			&& $provider instanceof ApiDataProvider && $provider->modelClass !== null) {
+			$modelClass = $provider->modelClass;
+			$model = $modelClass::instance();
+			$this->label = $model->getAttributeLabel($this->attribute);
+		}
+		return parent::getHeaderCellLabel();
 	}
 
 	protected function tooltipInit(): void {

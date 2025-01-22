@@ -23,7 +23,12 @@ use yii\httpclient\Response;
 class SPIApi extends Component
 	implements AppealInterface {
 
+	protected const TEST_BASE_URL = 'https://testapi.wroclaw.sa.gov.pl/api/';
+
 	public const EVENT_AFTER_REQUEST = 'afterRequest';
+	public const PARAM_PAGE_SIZE = 'size';
+	public const PARAM_PAGE = 'page';
+	public const PARAM_SORT = 'sort';
 
 	public string $baseUrl = 'https://portal.wroclaw.sa.gov.pl/api';
 	public string $username;
@@ -107,9 +112,9 @@ class SPIApi extends Component
 	}
 
 	public function getAppealUrl(string $appeal): string {
-		//@todo TEST API only default as Wrocal Appeal. Not working appeal URLs
+		//@todo TEST API only default as Wroclaw Appeal. Not working appeal URLs
 		if ($this->isTest) {
-			return $this->baseUrl;
+			return static::TEST_BASE_URL;
 		}
 		return str_replace('{appeal}', $appeal, $this->appealUrlSchema);
 	}
@@ -383,9 +388,11 @@ class SPIApi extends Component
 		return count($response->getData());
 	}
 
-	private function buildUrl(string $url, array $params = []) {
+	private function buildUrl(string $url, array $params = []): string {
 		if (!empty($params)) {
-			$url .= '?' . http_build_query($params);
+			$queryString = http_build_query($params);
+			$queryString = str_replace(static::PARAM_SORT . '%5B0%5D=', static::PARAM_SORT . '=', $queryString);
+			$url .= '?' . $queryString;
 		}
 		return $url;
 	}
