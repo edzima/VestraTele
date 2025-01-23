@@ -2,13 +2,16 @@
 
 namespace common\modules\court\modules\spi\models\lawsuit;
 
-class NotificationLawsuit implements LawsuitInterface {
+use common\modules\court\modules\spi\Module;
+use yii\base\Model;
+
+class NotificationLawsuit extends Model implements LawsuitInterface {
 
 	public int $id;
 	public string $signature;
 	public int $number;
 	public int $year;
-	public int $reportoryId;
+	public int $repertoryId;
 	public string $courtName;
 	public bool $visible;
 
@@ -34,5 +37,13 @@ class NotificationLawsuit implements LawsuitInterface {
 
 	public function isVisible(): bool {
 		return $this->visible;
+	}
+
+	public function attributeLabels(): array {
+		return [
+			'visible' => Module::t('lawsuit', 'Visible'),
+			'courtName' => Module::t('lawsuit', 'Court'),
+			'signature' => Module::t('lawsuit', 'Signature'),
+		];
 	}
 }

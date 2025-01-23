@@ -7,4 +7,6 @@ return [
 	'Court Name' => 'Sąd',
 	'Date' => 'Data',
 	'Signature' => 'Sygnatura',
+	'Notifications' => 'Powiadomienia',
+	'Notification: {type}' => 'Powiadomienie: {type}',
 ];

@@ -14,16 +14,15 @@ class NotificationViewDTO extends Model {
 	public string $date;
 	public ?int $user;
 	public string $profileUuid;
-	public string $signature;
-	public string $courtName;
 	public bool $read;
 	public ?string $mobileContent;
-	protected NotificationLawsuit $lawsuit;
+	private NotificationLawsuit $lawsuit;
 	public ?string $tmpProfil;
 
 	public function setLawsuit($value): void {
 		if (is_array($value)) {
-			$value = new NotificationLawsuit($value);
+			$model = new NotificationLawsuit($value);
+			$value = $model;
 		}
 		$this->lawsuit = $value;
 	}

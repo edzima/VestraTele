@@ -3,6 +3,8 @@
 namespace common\tests\unit\court\spi;
 
 use common\modules\court\modules\spi\entity\NotificationDTO;
+use common\modules\court\modules\spi\entity\NotificationViewDTO;
+use common\modules\court\modules\spi\models\lawsuit\NotificationLawsuit;
 use common\modules\court\modules\spi\repository\NotificationsRepository;
 
 class NotificationsTest extends BaseApiTest {
@@ -29,7 +31,12 @@ class NotificationsTest extends BaseApiTest {
 		if (!empty($models)) {
 			$model = reset($models);
 			$this->tester->assertInstanceOf(NotificationDTO::class, $model);
-			$this->repository->findModel($model->id, static::TEST_APPEAL);
+			$model = $this->repository->findModel($model->id, static::TEST_APPEAL);
+			$this->tester->assertInstanceOf(NotificationViewDTO::class, $model);
+			$this->tester->assertNotEmpty($model->type);
+			$lawsuit = $this->tester->assertNotEmpty($model->getLawsuit());
+			$this->tester->assertInstanceOf(NotificationLawsuit::class, $lawsuit);
+			$this->tester->assertNotEmpty($lawsuit->signature);
 		}
 	}
 
@@ -42,6 +49,6 @@ class NotificationsTest extends BaseApiTest {
 
 	public function testReadNotification(): void {
 		$model = $this->repository
-			->read(102);
+			->read(102, static::TEST_APPEAL);
 	}
 }
