@@ -3,7 +3,7 @@
 use common\helpers\Html;
 use common\modules\lead\models\searches\LeadPhoneSearch;
 use common\modules\lead\widgets\CreateLeadBtnWidget;
-use common\modules\lead\widgets\SameContactsListWidget;
+use common\modules\lead\widgets\SameContactsGridView;
 use common\widgets\ActiveForm;
 use yii\data\ActiveDataProvider;
 use yii\web\View;
@@ -54,17 +54,9 @@ $this->params['breadcrumbs'][] = $this->title;
 	<div class="lead-phone-models">
 		<div class="row">
 
-			<?= SameContactsListWidget::widget([
-				'withReportBtn' => false,
+			<?= SameContactsGridView::widget([
 				'dataProvider' => $dataProvider,
 				'withType' => true,
-				'withHeader' => false,
-				'summaryOptions' => [
-					'class' => 'col-md-12',
-				],
-				'itemOptions' => [
-					'class' => 'col-md-6',
-				],
 			]) ?>
 
 
