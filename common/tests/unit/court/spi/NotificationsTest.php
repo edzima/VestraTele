@@ -15,12 +15,21 @@ class NotificationsTest extends BaseApiTest {
 	}
 
 	public function testGetDataProvider(): void {
-		$notifications = $this->repository->getDataProvider(
+		$models = $this->repository->getDataProvider(
 			static::TEST_APPEAL
 		)->getModels();
-		$this->tester->assertNotEmpty($notifications);
-		foreach ($notifications as $notification) {
-			$this->tester->assertInstanceOf(NotificationDTO::class, $notification);
+		$this->tester->assertNotEmpty($models);
+		foreach ($models as $model) {
+			$this->tester->assertInstanceOf(NotificationDTO::class, $model);
+		}
+	}
+
+	public function testFindModel(): void {
+		$models = $this->repository->getDataProvider(static::TEST_APPEAL)->getModels();
+		if (!empty($models)) {
+			$model = reset($models);
+			$this->tester->assertInstanceOf(NotificationDTO::class, $model);
+			$this->repository->findModel($model->id, static::TEST_APPEAL);
 		}
 	}
 
