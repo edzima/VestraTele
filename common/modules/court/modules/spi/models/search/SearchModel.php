@@ -2,12 +2,13 @@
 
 namespace common\modules\court\modules\spi\models\search;
 
+use common\modules\court\modules\spi\models\AppealInterface;
 use common\modules\court\modules\spi\repository\RepositoryInterface;
 use Yii;
 use yii\base\Model;
 use yii\data\DataProviderInterface;
 
-abstract class SearchModel extends Model {
+abstract class SearchModel extends Model implements AppealInterface {
 
 	protected RepositoryInterface $repository;
 
@@ -37,6 +38,10 @@ abstract class SearchModel extends Model {
 		return array_filter($params, function ($value) {
 			return !empty($value);
 		});
+	}
+
+	public function getAppeal(): string {
+		return $this->appeal;
 	}
 
 }

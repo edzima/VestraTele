@@ -7,6 +7,7 @@ use common\modules\court\modules\spi\Module;
 use common\modules\court\modules\spi\repository\NotificationsRepository;
 use Yii;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 /**
  * @property Module $module
@@ -37,4 +38,20 @@ class NotificationController extends Controller {
 			'dataProvider' => $dataProvider,
 		]);
 	}
+
+	public function actionRead(string $appeal, int $id) {
+		$this->repository->read($id);
+		return $this->redirect(['index', 'appeal' => $appeal, 'id' => $id]);
+	}
+
+	public function actionView(string $appeal, int $id) {
+		$model = $this->repository->findModel($id, $appeal);
+		if ($model === null) {
+			throw new NotFoundHttpException();
+		}
+		return $this->render('view', [
+			'model' => $model,
+		]);
+	}
+
 }
