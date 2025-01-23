@@ -183,8 +183,7 @@ if ($phoneBlacklist) {
 	<div class="row">
 		<div class="col-md-6">
 
-			<div class="row">
-				<div class="col-sm-12 col-md-8 col-lg-6">
+
 						<?= DetailView::widget([
 							'model' => $model,
 							'attributes' => [
@@ -268,10 +267,6 @@ if ($phoneBlacklist) {
 								],
 							],
 						]) ?>
-				</div>
-
-			</div>
-
 
 
 
