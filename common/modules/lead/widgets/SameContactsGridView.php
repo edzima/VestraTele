@@ -30,7 +30,7 @@ class SameContactsGridView extends GridView {
 				throw new InvalidConfigException('$model must be set when dataProvider is not set.');
 			}
 			$this->dataProvider = new ArrayDataProvider([
-				'allModels' => $this->getModels(),
+				'allModels' => $this->getLeadModels(),
 				'sort' => [
 					'attributes' => [
 						'date_at',
@@ -42,6 +42,9 @@ class SameContactsGridView extends GridView {
 				],
 			]);
 		}
+		$this->dataProvider->models = $this->indexModelByHash($this->dataProvider->models);
+		$this->dataProvider->keys = array_keys($this->dataProvider->models);
+
 		$this->caption = Yii::t('lead', 'Same Contacts Leads');
 		if ($this->archiveBtn) {
 			$this->caption .= ArchiveSameContactButton::widget(['model' => $this->model]);
@@ -52,8 +55,11 @@ class SameContactsGridView extends GridView {
 		parent::init();
 	}
 
-	private function getModels(): array {
-		$models = $this->model->getSameContacts($this->withType);
+	private function getLeadModels(): array {
+		return $this->model->getSameContacts($this->withType);
+	}
+
+	protected function indexModelByHash(array $models): array {
 		$indexedByIDAndHash = [];
 		foreach ($models as $model) {
 			$indexedByIDAndHash[$model->getId() . ':' . $model->getHash()] = $model;

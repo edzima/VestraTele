@@ -52,14 +52,13 @@ $this->params['breadcrumbs'][] = $this->title;
 	</div>
 
 	<div class="lead-phone-models">
-		<div class="row">
-
-			<?= SameContactsGridView::widget([
-				'dataProvider' => $dataProvider,
-				'withType' => true,
-			]) ?>
 
 
-		</div>
+		<?= SameContactsGridView::widget([
+			'dataProvider' => $dataProvider,
+			'withType' => true,
+		]) ?>
+
+
 	</div>
 </div>
