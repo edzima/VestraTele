@@ -72,7 +72,7 @@ class LeadManager extends Component {
 	}
 
 	public function canUserReport(ActiveLead $lead, $userId = null): bool {
-		$users = empty($lead->getUsers());
+		$users = $lead->getUsers();
 		if (empty($users)) {
 			return true;
 		}
