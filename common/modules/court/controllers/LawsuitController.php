@@ -93,6 +93,10 @@ class LawsuitController extends Controller {
 		return $this->renderContent($model->message);
 	}
 
+	public function actionReadSpiNotification(int $id, string $appeal, string $court = null, string $signature = null) {
+		return $this->renderContent($appeal);
+	}
+
 	protected function findTemplate(string $key): MessageTemplate {
 		$template = Yii::$app->messageTemplate->getTemplate($key);
 		if ($template === null) {

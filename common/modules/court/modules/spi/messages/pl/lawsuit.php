@@ -16,4 +16,5 @@ return [
 	'Subject' => 'Przedmiot sprawy',
 	'Party Name' => 'Strony',
 	'Finish Date' => 'Data zakończenia',
+	'Visible' => 'Widoczne',
 ];

@@ -3,7 +3,10 @@
 namespace common\modules\court;
 
 use common\modules\court\modules\spi\components\LawsuitSignature;
+use common\modules\court\modules\spi\controllers\NotificationController;
 use common\modules\court\modules\spi\Module as SpiModule;
+use Yii;
+use yii\base\ActionEvent;
 use yii\base\Module as BaseModule;
 
 /**
@@ -32,10 +35,21 @@ class Module extends BaseModule {
 				$config['class'] = SpiModule::class;
 			}
 			$this->setModule(static::SPI_MODULE_NAME, $config);
+			Yii::$app->on(
+				NotificationController::EVENT_AFTER_ACTION, function (ActionEvent $event) {
+				$action = $event->action;
+				if ($action->id === 'read') {
+					$route = $action->controller->actionParams;
+					array_unshift($route, '/court/lawsuit/read-spi-notification');
+					return $action->controller->redirect($route);
+				}
+			}
+			);
 		}
 	}
 
 	public function getSPI(): ?SpiModule {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return $this->getModule(static::SPI_MODULE_NAME);
 	}
 }

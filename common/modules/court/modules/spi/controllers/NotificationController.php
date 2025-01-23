@@ -39,8 +39,9 @@ class NotificationController extends Controller {
 		]);
 	}
 
-	public function actionRead(string $appeal, int $id) {
-		$this->repository->read($id);
+	public function actionRead(string $appeal, int $id, string $signature = null, string $court = null) {
+		//@todo Because in Doc API, read action should return NotificationDTO, but return Boolean.
+		$this->repository->read($id, $appeal);
 		return $this->redirect(['index', 'appeal' => $appeal, 'id' => $id]);
 	}
 

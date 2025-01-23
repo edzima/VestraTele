@@ -59,9 +59,11 @@ class NotificationsRepository extends BaseRepository {
 		return $response->getData();
 	}
 
-	public function read(int $id): ?bool {
+	public function read(int $id, string $appeal): ?bool {
+		$api = $this->api;
+		$api->setAppeal($appeal);
 		$url = static::route() . '/read/' . $id;
-		$response = $this->api
+		$response = $api
 			->put($url);
 
 		if ($response->isOk) {
