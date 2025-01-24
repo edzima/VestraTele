@@ -46,9 +46,14 @@ class NotificationsRepository extends BaseRepository {
 		return null;
 	}
 
-	public function getUnread(): ?int {
+	public function getUnread(string $appeal, bool $cache = true): ?int {
+		if ($cache) {
+			return (int) $this->getCacheValue($appeal . ':unread', false);
+		}
 		$url = static::route() . '/unread';
-		$response = $this->api
+		$api = $this->api;
+		$api->setAppeal($appeal);
+		$response = $api
 			->get($url);
 
 		if (!$response->isOk) {
@@ -56,6 +61,7 @@ class NotificationsRepository extends BaseRepository {
 			return null;
 		}
 
+		$this->setCacheValue($appeal . ':unread', (int) $response->getData(), false);
 		return $response->getData();
 	}
 

@@ -11,6 +11,7 @@ use yii\di\Instance;
 class RepositoryManager extends Component {
 
 	public $api = 'spiApi';
+	public $cache = 'cache';
 
 	/**
 	 * @var string|array|callable
@@ -44,17 +45,27 @@ class RepositoryManager extends Component {
 
 	public function getLawsuits(): LawsuitRepository {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		return Yii::createObject($this->lawsuit, [$this->api]);
+		return Yii::createObject($this->mergeWithCommonConfig($this->lawsuit), [$this->api]);
 	}
 
 	public function getNotifications(): NotificationsRepository {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		return Yii::createObject($this->notifications, [$this->api]);
+		return Yii::createObject($this->mergeWithCommonConfig($this->notifications), [$this->api]);
 	}
 
 	public function getApplications(): ApplicationsRepository {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		return Yii::createObject($this->application, [$this->api]);
+		return Yii::createObject($this->mergeWithCommonConfig($this->application), [$this->api]);
+	}
+
+	protected function mergeWithCommonConfig(array $config): array {
+		return array_merge($this->commonConfig(), $config);
+	}
+
+	protected function commonConfig(): array {
+		return [
+			'cache' => $this->cache,
+		];
 	}
 
 }

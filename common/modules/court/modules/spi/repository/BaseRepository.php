@@ -9,13 +9,20 @@ use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
+use yii\caching\CacheInterface;
 use yii\data\DataProviderInterface;
+use yii\di\Instance;
 
 abstract class BaseRepository extends Component implements RepositoryInterface {
 
 	protected SPIApi $api;
 	public string $modelClass;
 	public ?Closure $createModel = null;
+
+	/**
+	 * @var string|array|CacheInterface
+	 */
+	public $cache = 'cache';
 
 	public array $dataProviderConfig = [
 		'class' => ApiDataProvider::class,
@@ -61,6 +68,47 @@ abstract class BaseRepository extends Component implements RepositoryInterface {
 		}
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return Yii::createObject($this->modelClass(), [$data]);
+	}
+
+	public function getCacheValue(string $key, bool $decrypt = true, $defaultValue = null) {
+		if ($this->getCache() === null) {
+			return false;
+		}
+		$value = $this->getCache()->get($key);
+		if ($value === false) {
+			return $defaultValue;
+		}
+		if ($decrypt) {
+			$value = $this->decryptCacheValue($value);
+		}
+		return $value;
+	}
+
+	public function setCacheValue(string $key, $value, bool $encrypt = true, $duration = null, $dependency = null): void {
+		if ($encrypt) {
+			$value = $this->encryptCacheValue($value);
+		}
+		$this->getCache()->set($key, $value, $duration, $dependency);
+	}
+
+	protected function getCache(): ?CacheInterface {
+		if (!$this->cache instanceof CacheInterface) {
+			$this->cache = Instance::ensure($this->cache, CacheInterface::class);
+			Yii::warning($this->cache);
+		}
+		return $this->cache;
+	}
+
+	private function decryptCacheValue($value) {
+		return Yii::$app->security->decryptByPassword($value, $this->getCacheSecurityPassword());
+	}
+
+	private function encryptCacheValue($value) {
+		return Yii::$app->security->encryptByPassword($value, $this->getCacheSecurityPassword());
+	}
+
+	private function getCacheSecurityPassword(): string {
+		return $this->api->username . ':' . $this->api->password;
 	}
 
 }
