@@ -42,7 +42,7 @@ class NotificationsTest extends BaseApiTest {
 
 	public function testGetUnreadNotificationCount(): void {
 		$count = $this->repository
-			->getUnread();
+			->getUnread(static::TEST_APPEAL);
 
 		$this->tester->assertIsInt($count);
 	}
