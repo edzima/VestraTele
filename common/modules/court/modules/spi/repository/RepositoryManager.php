@@ -12,6 +12,14 @@ class RepositoryManager extends Component {
 
 	public $api = 'spiApi';
 	public $cache = 'cache';
+	public string $appeal;
+
+	/**
+	 * @var string|array|callable
+	 */
+	public $document = [
+		'class' => DocumentRepository::class,
+	];
 
 	/**
 	 * @var string|array|callable
@@ -65,7 +73,13 @@ class RepositoryManager extends Component {
 	protected function commonConfig(): array {
 		return [
 			'cache' => $this->cache,
+			'appeal' => $this->appeal,
 		];
+	}
+
+	public function getDocuments(): DocumentRepository {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
+		return Yii::createObject($this->mergeWithCommonConfig($this->document), [$this->api]);
 	}
 
 }

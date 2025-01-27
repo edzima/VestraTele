@@ -2,8 +2,8 @@
 
 namespace common\modules\court\modules\spi\repository;
 
-use common\modules\court\modules\spi\entity\NotificationDTO;
-use common\modules\court\modules\spi\entity\NotificationViewDTO;
+use common\modules\court\modules\spi\entity\notification\NotificationDTO;
+use common\modules\court\modules\spi\entity\notification\NotificationViewDTO;
 use common\modules\court\modules\spi\helpers\ApiDataProvider;
 use Yii;
 
@@ -36,24 +36,21 @@ class NotificationsRepository extends BaseRepository {
 		],
 	];
 
-	public function findModel(int $id, string $appeal): ?NotificationViewDTO {
+	public function findModel(int $id): ?NotificationViewDTO {
 		$url = static::route() . '/' . $id;
-		$this->api->setAppeal($appeal);
-		$response = $this->api->get($url);
+		$response = $this->getApi()->get($url);
 		if ($response->isOk) {
 			return $this->createModel($response->getData());
 		}
 		return null;
 	}
 
-	public function getUnread(string $appeal, bool $cache = true): ?int {
+	public function getUnread(bool $cache = true): ?int {
 		if ($cache) {
-			return (int) $this->getCacheValue($appeal . ':unread', false);
+			return (int) $this->getCacheValue($this->getAppeal() . ':unread', false);
 		}
 		$url = static::route() . '/unread';
-		$api = $this->api;
-		$api->setAppeal($appeal);
-		$response = $api
+		$response = $this->getApi()
 			->get($url);
 
 		if (!$response->isOk) {
@@ -61,13 +58,12 @@ class NotificationsRepository extends BaseRepository {
 			return null;
 		}
 
-		$this->setCacheValue($appeal . ':unread', (int) $response->getData(), false);
+		$this->setCacheValue($this->getAppeal() . ':unread', (int) $response->getData(), false);
 		return $response->getData();
 	}
 
-	public function read(int $id, string $appeal): ?bool {
-		$api = $this->api;
-		$api->setAppeal($appeal);
+	public function read(int $id): ?bool {
+		$api = $this->getApi();
 		$url = static::route() . '/read/' . $id;
 		$response = $api
 			->put($url);

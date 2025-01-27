@@ -1,7 +1,7 @@
 <?php
 
 use common\helpers\Html;
-use common\modules\court\modules\spi\models\auth\SpiUserAuth;
+use common\modules\court\modules\spi\models\SpiUserAuth;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */

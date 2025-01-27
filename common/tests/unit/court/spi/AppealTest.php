@@ -2,7 +2,7 @@
 
 namespace common\tests\unit\court\spi;
 
-use common\modules\court\modules\spi\models\AppealInterface;
+use common\modules\court\modules\spi\entity\AppealInterface;
 
 class AppealTest extends BaseApiTest {
 

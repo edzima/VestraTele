@@ -4,9 +4,9 @@ namespace common\modules\court\modules\spi\controllers;
 
 use common\helpers\Flash;
 use common\modules\court\modules\spi\components\exceptions\SPIApiException;
-use common\modules\court\modules\spi\models\auth\SpiUserAuth;
-use common\modules\court\modules\spi\models\auth\SpiUserAuthForm;
-use common\modules\court\modules\spi\models\search\UserAuthSearch;
+use common\modules\court\modules\spi\models\SpiUserAuth;
+use common\modules\court\modules\spi\models\SpiUserAuthForm;
+use common\modules\court\modules\spi\models\UserAuthSearch;
 use common\modules\court\modules\spi\Module;
 use Yii;
 use yii\filters\VerbFilter;
@@ -70,9 +70,6 @@ class UserAuthController extends Controller {
 	 */
 	public function actionView(int $id): string {
 		$model = $this->findModel($id);
-		Yii::warning(
-			$model->decryptPassword($this->module->userAuthApiPasswordKey)
-		);
 		return $this->render('view', [
 			'model' => $model,
 		]);

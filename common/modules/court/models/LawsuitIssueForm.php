@@ -147,4 +147,18 @@ class LawsuitIssueForm extends Model {
 		return Lawsuit::getPresenceOfTheClaimantNames();
 	}
 
+	public function setCourtName(string $courtName): void {
+		$names = static::getCourtsNames();
+		foreach ($names as $id => $name) {
+			if ($name === $courtName) {
+				$this->court_id = $id;
+				break;
+			}
+		}
+	}
+
+	public function getCourtName(): ?string {
+		return static::getCourtsNames()[$this->court_id] ?? null;
+	}
+
 }

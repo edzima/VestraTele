@@ -5,6 +5,7 @@ use common\helpers\Html;
 use common\helpers\Url;
 use common\modules\court\models\Lawsuit;
 use common\modules\court\models\search\LawsuitSearch;
+use common\modules\court\Module;
 use common\modules\court\modules\spi\widgets\AppealsNavWidget;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerIssuesDataColumn;
@@ -25,6 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	'activeAppeal' => $searchModel->spiAppeal,
 	'getAppealFromModule' => false,
 	'appealParamName' => 'appeal',
+	'module' => Module::getInstance()->getSPI(),
 ]) ?>
 
 <div class="court-lawsuit-index">

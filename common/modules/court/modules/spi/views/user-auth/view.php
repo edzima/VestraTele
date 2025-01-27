@@ -1,6 +1,6 @@
 <?php
 
-use common\modules\court\modules\spi\models\auth\SpiUserAuth;
+use common\modules\court\modules\spi\models\SpiUserAuth;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;

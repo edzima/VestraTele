@@ -2,9 +2,9 @@
 
 namespace common\tests\unit\court\spi;
 
-use common\modules\court\modules\spi\models\application\ApplicationDTO;
-use common\modules\court\modules\spi\models\application\ApplicationType;
-use common\modules\court\modules\spi\models\application\ApplicationViewDTO;
+use common\modules\court\modules\spi\entity\application\ApplicationDTO;
+use common\modules\court\modules\spi\entity\application\ApplicationType;
+use common\modules\court\modules\spi\entity\application\ApplicationViewDTO;
 use common\modules\court\modules\spi\repository\ApplicationsRepository;
 
 /**

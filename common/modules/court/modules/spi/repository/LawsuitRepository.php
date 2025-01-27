@@ -2,9 +2,9 @@
 
 namespace common\modules\court\modules\spi\repository;
 
+use common\modules\court\modules\spi\entity\lawsuit\LawsuitDetailsDto;
+use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
 use common\modules\court\modules\spi\helpers\ApiDataProvider;
-use common\modules\court\modules\spi\models\lawsuit\LawsuitDetailsDto;
-use common\modules\court\modules\spi\models\lawsuit\LawsuitViewIntegratorDto;
 use Yii;
 
 class LawsuitRepository extends BaseRepository {
@@ -32,14 +32,14 @@ class LawsuitRepository extends BaseRepository {
 		],
 	];
 
-	public function findBySignature(string $signature, string $appeal): ?LawsuitViewIntegratorDto {
-		$dataProvider = $this->getDataProvider($appeal, [
+	public function findBySignature(string $signature): ?LawsuitViewIntegratorDto {
+		$dataProvider = $this->getDataProvider([
 			'signature.equals' => $signature,
 		]);
 		if ($dataProvider->getTotalCount()) {
 			if ($dataProvider->getTotalCount() > 1) {
 				Yii::warning('Find more than one Lawsuit for Signature: '
-					. $signature . ' in Appeal: ' . $appeal);
+					. $signature . ' in Appeal: ' . $this->getAppeal());
 			}
 			$models = $dataProvider->getModels();
 			return $models[array_key_first($models)];
@@ -47,10 +47,9 @@ class LawsuitRepository extends BaseRepository {
 		return null;
 	}
 
-	public function getLawsuit(int $id, string $appeal): ?LawsuitDetailsDto {
+	public function getLawsuit(int $id): ?LawsuitDetailsDto {
 		$url = static::route() . '/' . $id;
-		$response = $this->api
-			->setAppeal($appeal)
+		$response = $this->getApi()
 			->get($url);
 		if (!$response->isOk) {
 			Yii::warning($response->getData(), __METHOD__);

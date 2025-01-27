@@ -1,6 +1,6 @@
 <?php
 
-use common\modules\court\modules\spi\models\lawsuit\LawsuitViewIntegratorDto;
+use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */

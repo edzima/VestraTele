@@ -1,0 +1,30 @@
+<?php
+
+namespace common\modules\court\modules\spi\entity\notification;
+
+use common\modules\court\modules\spi\Module;
+use yii\base\Model;
+
+class NotificationDTO extends Model {
+
+	public int $id;
+	public string $type;
+	public string $content;
+	public string $date;
+	public ?int $user;
+	public string $profileUuid;
+	public string $signature;
+	public string $courtName;
+	public bool $read;
+
+	public function attributeLabels(): array {
+		return [
+			'type' => Module::t('notification', 'Type'),
+			'content' => Module::t('notification', 'Content'),
+			'date' => Module::t('notification', 'Date'),
+			'courtName' => Module::t('notification', 'Court Name'),
+			'read' => Module::t('notification', 'Read'),
+			'signature' => Module::t('notification', 'Signature'),
+		];
+	}
+}

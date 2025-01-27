@@ -2,8 +2,8 @@
 
 use common\helpers\Html;
 use common\helpers\Url;
-use common\modules\court\modules\spi\entity\NotificationDTO;
-use common\modules\court\modules\spi\models\search\NotificationSearch;
+use common\modules\court\modules\spi\entity\notification\NotificationDTO;
+use common\modules\court\modules\spi\entity\search\NotificationSearch;
 use common\modules\court\modules\spi\Module;
 use common\modules\court\modules\spi\widgets\AppealsNavWidget;
 use common\widgets\grid\ActionColumn;
@@ -19,7 +19,9 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="spi-notification-index">
 
-	<?= AppealsNavWidget::widget() ?>
+	<?= AppealsNavWidget::widget([
+		'withUnreadCount' => true,
+	]) ?>
 
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -39,6 +41,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'urlCreator' => function ($action, $model, $key) use ($searchModel): string {
 					return Url::to([$action, 'id' => $key, 'appeal' => $searchModel->getAppeal()]);
 				},
+				'visibleButtons' => [
+					'read' => function (NotificationDTO $model): bool {
+						return !$model->read;
+					},
+				],
 				'buttons' => [
 					'read' => function ($url, NotificationDTO $model) use ($searchModel): string {
 						return Html::a(Html::icon('check'),

@@ -1,10 +1,11 @@
 <?php
 
+use common\modules\court\modules\spi\models\UserAuthSearch;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var common\modules\court\modules\spi\models\search\UserAuthSearch $model */
+/** @var UserAuthSearch $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
 

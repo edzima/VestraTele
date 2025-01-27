@@ -1,7 +1,9 @@
 <?php
 
-use common\modules\court\modules\spi\models\lawsuit\LawsuitDetailsDto;
+use common\helpers\Url;
+use common\modules\court\modules\spi\entity\lawsuit\LawsuitDetailsDto;
 use common\modules\court\modules\spi\Module;
+use kartik\tabs\TabsX;
 use yii\web\View;
 use yii\widgets\DetailView;
 
@@ -20,6 +22,21 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="spi-lawsuit-view">
+
+	<?= TabsX::widget([
+		'items' => [
+			[
+				'label' => Module::t('document', 'Documents'),
+				'linkOptions' => [
+					'data-url' => Url::to([
+						'document/lawsuit',
+						'id' => $model->id,
+						'appeal' => $this->params['appeal'],
+					]),
+				],
+			],
+		],
+	]) ?>
 
 	<?= DetailView::widget([
 		'model' => $model,

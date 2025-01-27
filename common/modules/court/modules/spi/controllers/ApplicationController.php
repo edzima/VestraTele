@@ -2,7 +2,7 @@
 
 namespace common\modules\court\modules\spi\controllers;
 
-use common\modules\court\modules\spi\models\search\ApplicationSearch;
+use common\modules\court\modules\spi\entity\search\ApplicationSearch;
 use common\modules\court\modules\spi\Module;
 use Yii;
 use yii\web\Controller;

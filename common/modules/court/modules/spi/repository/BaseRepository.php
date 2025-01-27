@@ -4,6 +4,7 @@ namespace common\modules\court\modules\spi\repository;
 
 use Closure;
 use common\modules\court\modules\spi\components\SPIApi;
+use common\modules\court\modules\spi\entity\AppealInterface;
 use common\modules\court\modules\spi\helpers\ApiDataProvider;
 use Yii;
 use yii\base\Component;
@@ -13,9 +14,11 @@ use yii\caching\CacheInterface;
 use yii\data\DataProviderInterface;
 use yii\di\Instance;
 
-abstract class BaseRepository extends Component implements RepositoryInterface {
+abstract class BaseRepository extends Component
+	implements RepositoryInterface,
+	AppealInterface {
 
-	protected SPIApi $api;
+	private SPIApi $api;
 	public string $modelClass;
 	public ?Closure $createModel = null;
 
@@ -26,7 +29,10 @@ abstract class BaseRepository extends Component implements RepositoryInterface {
 
 	public array $dataProviderConfig = [
 		'class' => ApiDataProvider::class,
+		'key' => 'id',
 	];
+
+	private string $appeal;
 
 	abstract protected function route(): string;
 
@@ -37,8 +43,21 @@ abstract class BaseRepository extends Component implements RepositoryInterface {
 		parent::__construct($config);
 	}
 
-	public function getDataProvider(string $appeal, array $params = []): DataProviderInterface {
-		$api = $this->api->setAppeal($appeal);
+	public function getAppeal(): string {
+		return $this->appeal;
+	}
+
+	public function setAppeal(string $appeal): void {
+		$this->appeal = $appeal;
+		$this->api->setAppeal($appeal);
+	}
+
+	protected function getApi(): SPIApi {
+		return $this->api->setAppeal($this->appeal);
+	}
+
+	public function getDataProvider(array $params = []): DataProviderInterface {
+		$api = $this->getApi();
 		$dataProvider = $this->createDataProvider();
 		$dataProvider->api = $api;
 		$dataProvider->url = static::route();

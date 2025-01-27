@@ -3,7 +3,7 @@
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use common\modules\court\models\Lawsuit;
-use common\modules\court\modules\spi\models\lawsuit\LawsuitViewIntegratorDto;
+use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
 use common\modules\court\widgets\LawsuitSmsBtnWidget;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\IssueColumn;

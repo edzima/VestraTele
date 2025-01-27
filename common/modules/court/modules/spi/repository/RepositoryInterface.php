@@ -8,6 +8,8 @@ interface RepositoryInterface {
 
 	public function createDataProvider(): DataProviderInterface;
 
-	public function getDataProvider(string $appeal, array $params = []): DataProviderInterface;
+	public function setAppeal(string $appeal): void;
+
+	public function getDataProvider(array $params = []): DataProviderInterface;
 
 }

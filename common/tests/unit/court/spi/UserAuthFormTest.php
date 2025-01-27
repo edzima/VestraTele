@@ -3,8 +3,8 @@
 namespace common\tests\unit\court\spi;
 
 use common\fixtures\helpers\UserFixtureHelper;
-use common\modules\court\modules\spi\models\auth\SpiUserAuth;
-use common\modules\court\modules\spi\models\auth\SpiUserAuthForm;
+use common\modules\court\modules\spi\models\SpiUserAuth;
+use common\modules\court\modules\spi\models\SpiUserAuthForm;
 use common\tests\_support\UnitModelTrait;
 use common\tests\unit\Unit;
 use yii\base\Model;

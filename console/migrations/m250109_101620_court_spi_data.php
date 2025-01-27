@@ -1,6 +1,6 @@
 <?php
 
-use common\modules\court\modules\spi\models\AppealInterface;
+use common\modules\court\modules\spi\entity\AppealInterface;
 use console\base\Migration;
 
 /**

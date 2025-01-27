@@ -1,6 +1,6 @@
 <?php
 
-use common\modules\court\modules\spi\models\application\ApplicationViewDTO;
+use common\modules\court\modules\spi\entity\application\ApplicationViewDTO;
 use common\modules\court\modules\spi\Module;
 use yii\web\View;
 use yii\widgets\DetailView;

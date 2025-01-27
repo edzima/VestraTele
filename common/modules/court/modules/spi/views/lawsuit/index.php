@@ -1,6 +1,6 @@
 <?php
 
-use common\modules\court\modules\spi\models\search\LawsuitSearch;
+use common\modules\court\modules\spi\entity\search\LawsuitSearch;
 use common\modules\court\modules\spi\Module;
 use common\modules\court\modules\spi\widgets\AppealsNavWidget;
 use common\widgets\grid\ActionColumn;
