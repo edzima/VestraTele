@@ -37,7 +37,11 @@ class ApiDataProvider extends BaseDataProvider {
 
 	protected function prepareResponse(): Response {
 		$this->prepareParams();
-		return $this->api->get($this->url, $this->params);
+		$response = $this->api->get($this->url, $this->params);
+		if (YII_ENV_TEST) {
+			codecept_debug($response->getData());
+		}
+		return $response;
 	}
 
 	protected function prepareModels(): array {

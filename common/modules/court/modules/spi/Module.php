@@ -3,8 +3,8 @@
 namespace common\modules\court\modules\spi;
 
 use common\modules\court\modules\spi\components\SPIApi;
-use common\modules\court\modules\spi\models\AppealInterface;
-use common\modules\court\modules\spi\models\auth\SpiUserAuth;
+use common\modules\court\modules\spi\entity\AppealInterface;
+use common\modules\court\modules\spi\models\SpiUserAuth;
 use common\modules\court\modules\spi\repository\RepositoryManager;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -107,7 +107,9 @@ class Module extends BaseModule implements AppealInterface {
 	}
 
 	public function getRepositoryManager(): RepositoryManager {
-		return $this->get('repositoryManager');
+		$manager = $this->get('repositoryManager');
+		$manager->appeal = $this->getAppeal();
+		return $manager;
 	}
 
 	protected function setApiComponent(): void {

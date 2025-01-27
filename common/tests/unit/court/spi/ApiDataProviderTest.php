@@ -3,8 +3,8 @@
 namespace common\tests\unit\court\spi;
 
 use common\modules\court\modules\spi\components\SPIApi;
+use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
 use common\modules\court\modules\spi\helpers\ApiDataProvider;
-use common\modules\court\modules\spi\models\lawsuit\LawsuitViewIntegratorDto;
 
 class ApiDataProviderTest extends BaseApiTest {
 

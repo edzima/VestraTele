@@ -3,7 +3,7 @@
 namespace common\tests\unit\court\spi;
 
 use common\modules\court\modules\spi\components\exceptions\UnauthorizedSPIApiException;
-use common\modules\court\modules\spi\models\AppealInterface;
+use common\modules\court\modules\spi\entity\AppealInterface;
 
 class SPIApiTest extends BaseApiTest {
 

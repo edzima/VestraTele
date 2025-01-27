@@ -2,9 +2,9 @@
 
 namespace common\tests\unit\court\spi;
 
-use common\modules\court\modules\spi\entity\NotificationDTO;
-use common\modules\court\modules\spi\entity\NotificationViewDTO;
-use common\modules\court\modules\spi\models\lawsuit\NotificationLawsuit;
+use common\modules\court\modules\spi\entity\lawsuit\NotificationLawsuit;
+use common\modules\court\modules\spi\entity\notification\NotificationDTO;
+use common\modules\court\modules\spi\entity\notification\NotificationViewDTO;
 use common\modules\court\modules\spi\repository\NotificationsRepository;
 
 class NotificationsTest extends BaseApiTest {
@@ -14,12 +14,11 @@ class NotificationsTest extends BaseApiTest {
 	public function _before(): void {
 		parent::_before();
 		$this->repository = new NotificationsRepository($this->api);
+		$this->repository->setAppeal(static::TEST_APPEAL);
 	}
 
 	public function testGetDataProvider(): void {
-		$models = $this->repository->getDataProvider(
-			static::TEST_APPEAL
-		)->getModels();
+		$models = $this->repository->getDataProvider()->getModels();
 		$this->tester->assertNotEmpty($models);
 		foreach ($models as $model) {
 			$this->tester->assertInstanceOf(NotificationDTO::class, $model);
@@ -27,11 +26,11 @@ class NotificationsTest extends BaseApiTest {
 	}
 
 	public function testFindModel(): void {
-		$models = $this->repository->getDataProvider(static::TEST_APPEAL)->getModels();
+		$models = $this->repository->getDataProvider()->getModels();
 		if (!empty($models)) {
 			$model = reset($models);
 			$this->tester->assertInstanceOf(NotificationDTO::class, $model);
-			$model = $this->repository->findModel($model->id, static::TEST_APPEAL);
+			$model = $this->repository->findModel($model->id);
 			$this->tester->assertInstanceOf(NotificationViewDTO::class, $model);
 			$this->tester->assertNotEmpty($model->type);
 			$lawsuit = $this->tester->assertNotEmpty($model->getLawsuit());
@@ -42,13 +41,13 @@ class NotificationsTest extends BaseApiTest {
 
 	public function testGetUnreadNotificationCount(): void {
 		$count = $this->repository
-			->getUnread(static::TEST_APPEAL);
+			->getUnread();
 
 		$this->tester->assertIsInt($count);
 	}
 
 	public function testReadNotification(): void {
 		$model = $this->repository
-			->read(102, static::TEST_APPEAL);
+			->read(102);
 	}
 }

@@ -94,7 +94,44 @@ class LawsuitController extends Controller {
 	}
 
 	public function actionReadSpiNotification(int $id, string $appeal, string $court = null, string $signature = null) {
-		return $this->renderContent($appeal);
+		$searchModel = new LawsuitSearch();
+		$searchModel->signature_act = $signature;
+		$searchModel->courtName = $court;
+
+		$dataProvider = $searchModel->search($this->request->queryParams);
+		if ($dataProvider->getTotalCount() === 0) {
+			return $this->redirect([
+				'create-from-spi-lawsuit',
+				'signature' => $signature,
+				'appeal' => $appeal,
+			]);
+		}
+		return $this->render('index', [
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+		]);
+	}
+
+	public function actionCreateFromSpiLawsuit(string $signature, string $appeal) {
+		$spiModule = $this->module->getSPI();
+		if (!$spiModule) {
+			throw new NotFoundHttpException('SPI Module must be set.');
+		}
+		$repository = $spiModule->getRepositoryManager()
+			->getLawsuits();
+
+		$lawsuit = $repository->findBySignature($signature, $appeal);
+		if ($lawsuit === null) {
+			throw new NotFoundHttpException('Not found SPI Lawsuit');
+		}
+
+		$model = new LawsuitIssueForm();
+		$model->signature_act = $lawsuit->signature;
+		$model->setCourtName($lawsuit->courtName);
+		return $this->render('create-from-spi-lawsuit', [
+			'model' => $model,
+			'lawsuit' => $lawsuit,
+		]);
 	}
 
 	protected function findTemplate(string $key): MessageTemplate {

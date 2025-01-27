@@ -24,7 +24,7 @@ class AppealsNavWidget extends Widget {
 	public ?string $activeAppeal = null;
 	public bool $getAppealFromModule = true;
 
-	public bool $withUnreadCount = true;
+	public bool $withUnreadCount = false;
 
 	public ?NotificationsRepository $notificationsRepository = null;
 
@@ -71,7 +71,10 @@ class AppealsNavWidget extends Widget {
 	}
 
 	private function defaultItems(): array {
-		$appealsNames = Module::getAppealsNames();
+		if ($this->module === null) {
+			return [];
+		}
+		$appealsNames = $this->module::getAppealsNames();
 		$items = [];
 		foreach ($appealsNames as $appeal => $name) {
 			$items[] = [
@@ -89,7 +92,8 @@ class AppealsNavWidget extends Widget {
 		}
 		$count = 0;
 		if ($this->notificationsRepository) {
-			$count = $this->notificationsRepository->getUnread($appeal, $appeal !== $this->activeAppeal);
+			$this->notificationsRepository->setAppeal($appeal);
+			$count = $this->notificationsRepository->getUnread();
 		}
 		$label = $name;
 		if ($count) {

@@ -1,6 +1,6 @@
 <?php
 
-use common\modules\court\modules\spi\models\search\ApplicationSearch;
+use common\modules\court\modules\spi\entity\search\ApplicationSearch;
 use common\modules\court\modules\spi\Module;
 use common\widgets\GridView;
 use yii\data\DataProviderInterface;

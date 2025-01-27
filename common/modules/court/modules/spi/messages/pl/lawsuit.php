@@ -17,4 +17,5 @@ return [
 	'Party Name' => 'Strony',
 	'Finish Date' => 'Data zakończenia',
 	'Visible' => 'Widoczne',
+	'Lawsuits' => 'Sprawy',
 ];

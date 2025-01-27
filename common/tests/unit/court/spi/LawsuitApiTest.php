@@ -2,10 +2,10 @@
 
 namespace common\tests\unit\court\spi;
 
+use common\modules\court\modules\spi\entity\lawsuit\LawsuitDetailsDto;
+use common\modules\court\modules\spi\entity\lawsuit\LawsuitPartyDTO;
+use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
 use common\modules\court\modules\spi\helpers\ApiDataProvider;
-use common\modules\court\modules\spi\models\lawsuit\LawsuitDetailsDto;
-use common\modules\court\modules\spi\models\lawsuit\LawsuitPartyDTO;
-use common\modules\court\modules\spi\models\lawsuit\LawsuitViewIntegratorDto;
 use common\modules\court\modules\spi\repository\LawsuitRepository;
 
 class LawsuitApiTest extends BaseApiTest {
@@ -17,26 +17,26 @@ class LawsuitApiTest extends BaseApiTest {
 
 	public function testGetSingleLawsuit() {
 		$repository = new LawsuitRepository($this->api);
-		$model = $repository->getLawsuit(static::TEST_LAWSUIT_ID, static::TEST_APPEAL);
+		$model = $repository->getLawsuit(static::TEST_LAWSUIT_ID);
 		$this->tester->assertInstanceOf(LawsuitDetailsDto::class, $model);
 		$this->tester->assertSame('o podział majatku wpólnego', $model->subject);
 	}
 
 	public function testFindBySignature() {
 		$repository = new LawsuitRepository($this->api);
-		$model = $repository->findBySignature(static::TEST_SIGNATURE, static::TEST_APPEAL);
+		$model = $repository->findBySignature(static::TEST_SIGNATURE);
 		$this->tester->assertNotNull($model);
 	}
 
 	public function testFindByNotExistedSignature() {
 		$repository = new LawsuitRepository($this->api);
-		$model = $repository->findBySignature(static::TEST_SIGNATURE . '.sdasdas', static::TEST_APPEAL);
+		$model = $repository->findBySignature(static::TEST_SIGNATURE . '.sdasdas');
 		$this->tester->assertNull($model);
 	}
 
 	public function testGetDataProvider(): void {
 		$repository = new LawsuitRepository($this->api);
-		$dataProvider = $repository->getDataProvider(static::TEST_APPEAL);
+		$dataProvider = $repository->getDataProvider();
 		$this->tester->assertInstanceOf(ApiDataProvider::class, $dataProvider);
 		$this->tester->assertCount(2, $dataProvider->getModels());
 		$this->tester->assertSame(2, $dataProvider->getTotalCount());

@@ -1,6 +1,6 @@
 <?php
 
-use common\modules\court\modules\spi\models\auth\SpiUserAuthForm;
+use common\modules\court\modules\spi\models\SpiUserAuthForm;
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */

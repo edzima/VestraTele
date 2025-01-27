@@ -4,12 +4,13 @@ namespace common\modules\court\modules\spi\components;
 
 use common\modules\court\modules\spi\components\exceptions\SPIApiException;
 use common\modules\court\modules\spi\components\exceptions\UnauthorizedSPIApiException;
-use common\modules\court\modules\spi\models\AppealInterface;
-use common\modules\court\modules\spi\models\court\CourtDepartmentFullDTO;
-use common\modules\court\modules\spi\models\court\CourtDepartmentSmallDTO;
-use common\modules\court\modules\spi\models\court\RepertoryDTO;
+use common\modules\court\modules\spi\entity\AppealInterface;
+use common\modules\court\modules\spi\entity\court\CourtDepartmentFullDTO;
+use common\modules\court\modules\spi\entity\court\CourtDepartmentSmallDTO;
+use common\modules\court\modules\spi\entity\court\RepertoryDTO;
 use Yii;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\data\ArrayDataProvider;
 use yii\data\DataProviderInterface;
 use yii\httpclient\Client;
@@ -34,6 +35,20 @@ class SPIApi extends Component
 
 	protected string $appeal = self::DEFAULT_APPEAL;
 	public string $appealUrlSchema = 'https://portal.wroclaw.sa.gov.pl/{appeal}/api';
+
+	public array $availableAppeals = [
+		AppealInterface::APPEAL_BIALYSTOK,
+		AppealInterface::APPEAL_GDANSK,
+		AppealInterface::APPEAL_KATOWICE,
+		AppealInterface::APPEAL_KRAKOW,
+		AppealInterface::APPEAL_LUBLIN,
+		AppealInterface::APPEAL_LODZ,
+		AppealInterface::APPEAL_POZNAN,
+		AppealInterface::APPEAL_RZESZOW,
+		AppealInterface::APPEAL_SZCZECIN,
+		AppealInterface::APPEAL_WARSZAWA,
+		AppealInterface::APPEAL_WROCLAW,
+	];
 
 	private const ROUTE_COURT = 'courts';
 	private const ROUTE_COURT_DEPARTMENTS = 'court-departments';
@@ -114,7 +129,15 @@ class SPIApi extends Component
 		return $this->isTest;
 	}
 
+	/**
+	 * @param string $appeal
+	 * @return $this
+	 * @throws InvalidConfigException
+	 */
 	public function setAppeal(string $appeal): self {
+		if (!in_array($appeal, $this->availableAppeals)) {
+			throw new InvalidConfigException('Invalid appeal');
+		}
 		$this->appeal = $appeal;
 		$this->baseUrl = $this->getAppealUrl($appeal);
 		return $this;

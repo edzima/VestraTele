@@ -1,13 +1,15 @@
 <?php
 
 use common\helpers\Html;
-use common\modules\court\modules\spi\entity\NotificationViewDTO;
+use common\modules\court\modules\spi\entity\lawsuit\NotificationLawsuit;
+use common\modules\court\modules\spi\entity\notification\NotificationViewDTO;
 use common\modules\court\modules\spi\Module;
 use yii\web\View;
 use yii\widgets\DetailView;
 
 /** @var View $this */
 /** @var NotificationViewDTO $model */
+/** @var string $appeal */
 
 $this->title = Module::t('notification', 'Notification: {type}', [
 	'type' => $model->type,
@@ -41,7 +43,17 @@ $this->params['breadcrumbs'][] = $this->title;
 			<?= DetailView::widget([
 				'model' => $model->getLawsuit(),
 				'attributes' => [
-					'signature',
+					[
+						'attribute' => 'signature',
+						'value' => function (NotificationLawsuit $lawsuit) use ($appeal): string {
+							return Html::a($lawsuit->signature, [
+								'lawsuit/view',
+								'id' => $lawsuit->id,
+								'appeal' => $appeal,
+							]);
+						},
+						'format' => 'html',
+					],
 					'courtName',
 					'visible:boolean',
 				],

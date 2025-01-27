@@ -3,7 +3,7 @@
 namespace common\tests\unit\court\spi;
 
 use common\modules\court\modules\spi\components\SPIApi;
-use common\modules\court\modules\spi\models\AppealInterface;
+use common\modules\court\modules\spi\entity\AppealInterface;
 use common\tests\unit\Unit;
 
 abstract class BaseApiTest extends Unit {

@@ -14,10 +14,11 @@ use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 
 /**
- * CourtHearingSearch represents the model behind the search form of `common\modules\court\models\CourtHearing`.
+ * LawsuitSearch represents the model behind the search form of `common\modules\court\models\Lawsuit`.
  */
 class LawsuitSearch extends Lawsuit {
 
+	public $courtName;
 	public $issue_id;
 	public $customer;
 	public $court_type;
@@ -42,6 +43,7 @@ class LawsuitSearch extends Lawsuit {
 			['!issueUserId', 'required', 'on' => self::SCENARIO_ISSUE_USER],
 			[['id', 'court_id', 'creator_id', 'issue_id'], 'integer'],
 			[['is_appeal'], 'default', 'value' => null],
+			[['courtName'], 'string'],
 			[['customer', 'signature_act', 'room', 'due_at', 'details', 'created_at', 'updated_at', 'location', 'presence_of_the_claimant', 'court_type', 'url', 'appeal'], 'safe'],
 		];
 	}
@@ -99,10 +101,11 @@ class LawsuitSearch extends Lawsuit {
 			Court::tableName() . '.type' => $this->court_type,
 		]);
 
-		$query->andFilterWhere(['like', 'signature_act', $this->signature_act])
-			->andFilterWhere(['like', 'details', $this->details])
+		$query->andFilterWhere(['like', Lawsuit::tableName() . '.signature_act', $this->signature_act])
+			->andFilterWhere(['like', Lawsuit::tableName() . '.details', $this->details])
 			->andFilterWhere(['like', 'room', $this->room])
 			->andFilterWhere(['like', 'url', $this->url])
+			->andFilterWhere(['like', Court::tableName() . '.name', $this->courtName])
 			->andFilterWhere(['like', Issue::tableName() . '.id', $this->issue_id . '%', false]);
 
 		$query->groupBy(Lawsuit::tableName() . '.id');
@@ -138,7 +141,6 @@ class LawsuitSearch extends Lawsuit {
 	private function applySpiAppealFilter(ActiveQuery $query): void {
 		if (!empty($this->spiAppeal)) {
 			$courts = Court::getCourtsIds($this->spiAppeal);
-			Yii::warning(count($courts));
 			$query->andWhere([
 				'court_id' => $courts,
 			]);

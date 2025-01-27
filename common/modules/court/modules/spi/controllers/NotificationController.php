@@ -2,7 +2,7 @@
 
 namespace common\modules\court\modules\spi\controllers;
 
-use common\modules\court\modules\spi\models\search\NotificationSearch;
+use common\modules\court\modules\spi\entity\search\NotificationSearch;
 use common\modules\court\modules\spi\Module;
 use common\modules\court\modules\spi\repository\NotificationsRepository;
 use Yii;
@@ -19,6 +19,7 @@ class NotificationController extends Controller {
 	public function init(): void {
 		parent::init();
 		$this->repository = $this->module->getRepositoryManager()->getNotifications();
+		$this->repository->setAppeal($this->module->getAppeal());
 	}
 
 	public function actionIndex(string $appeal = null) {
@@ -32,6 +33,7 @@ class NotificationController extends Controller {
 		$dataProvider = $searchModel->search(
 			Yii::$app->request->queryParams
 		);
+		$this->repository->getUnread(false);
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,
@@ -52,6 +54,7 @@ class NotificationController extends Controller {
 		}
 		return $this->render('view', [
 			'model' => $model,
+			'appeal' => $appeal,
 		]);
 	}
 

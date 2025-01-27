@@ -1,6 +1,6 @@
 <?php
 
-use common\modules\court\modules\spi\models\search\UserAuthSearch;
+use common\modules\court\modules\spi\models\UserAuthSearch;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use yii\helpers\Html;
