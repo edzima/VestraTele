@@ -33,18 +33,12 @@ class DocumentController extends Controller {
 		return Json::encode($html);
 	}
 
-	public function actionView(int $id) {
+	public function actionView(int $id, string $fileName) {
 		$file = $this->repository->download($id);
 		if ($file) {
-			return Yii::$app->response->sendContentAsFile($file, basename($file));
-		}
-	}
-
-	public function actionDownload(int $id) {
-		$file = $this->repository->download($id);
-		if ($file) {
-			return Yii::$app->response->sendContentAsFile($file, basename($file));
+			return Yii::$app->response->sendContentAsFile($file, $fileName);
 		}
 		throw new NotFoundHttpException();
 	}
+
 }

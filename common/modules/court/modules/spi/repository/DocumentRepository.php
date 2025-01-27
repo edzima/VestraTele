@@ -15,7 +15,7 @@ class DocumentRepository extends BaseRepository {
 		return DocumentInnerViewDto::class;
 	}
 
-	public function download(int $documentId) {
+	public function download(int $documentId): ?string {
 		$url = static::route() . '/download/' . $documentId;
 		$response = $this->getApi()
 			->get($url);

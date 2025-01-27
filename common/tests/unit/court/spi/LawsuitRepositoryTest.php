@@ -8,34 +8,33 @@ use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
 use common\modules\court\modules\spi\helpers\ApiDataProvider;
 use common\modules\court\modules\spi\repository\LawsuitRepository;
 
-class LawsuitApiTest extends BaseApiTest {
+class LawsuitRepositoryTest extends BaseRepositoryTest {
 
-	const TEST_APPEAL = '';
 	const TEST_LAWSUIT_ID = 5431301;
 
 	const TEST_SIGNATURE = 'I ACa 35/12';
 
 	public function testGetSingleLawsuit() {
-		$repository = new LawsuitRepository($this->api);
+		$repository = $this->repository;
 		$model = $repository->getLawsuit(static::TEST_LAWSUIT_ID);
 		$this->tester->assertInstanceOf(LawsuitDetailsDto::class, $model);
 		$this->tester->assertSame('o podział majatku wpólnego', $model->subject);
 	}
 
 	public function testFindBySignature() {
-		$repository = new LawsuitRepository($this->api);
+		$repository = $this->repository;
 		$model = $repository->findBySignature(static::TEST_SIGNATURE);
 		$this->tester->assertNotNull($model);
 	}
 
 	public function testFindByNotExistedSignature() {
-		$repository = new LawsuitRepository($this->api);
+		$repository = $this->repository;
 		$model = $repository->findBySignature(static::TEST_SIGNATURE . '.sdasdas');
 		$this->tester->assertNull($model);
 	}
 
 	public function testGetDataProvider(): void {
-		$repository = new LawsuitRepository($this->api);
+		$repository = $this->repository;
 		$dataProvider = $repository->getDataProvider();
 		$this->tester->assertInstanceOf(ApiDataProvider::class, $dataProvider);
 		$this->tester->assertCount(2, $dataProvider->getModels());
@@ -49,5 +48,9 @@ class LawsuitApiTest extends BaseApiTest {
 				$this->tester->assertInstanceOf(LawsuitPartyDTO::class, $lawsuitParty);
 			}
 		}
+	}
+
+	protected function repositoryClass(): string {
+		return LawsuitRepository::class;
 	}
 }
