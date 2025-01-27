@@ -10,7 +10,9 @@ use common\modules\court\modules\spi\repository\DocumentRepository;
  */
 class DocumentsTest extends BaseRepositoryTest {
 
-	public $repositoryModelClass = DocumentRepository::class;
+	protected function repositoryClass(): string {
+		return DocumentRepository::class;
+	}
 
 	public function testDownload(): void {
 		$models = $this->repository->getDataProvider()->getModels();

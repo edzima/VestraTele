@@ -26,6 +26,12 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= TabsX::widget([
 		'items' => [
 			[
+				'label' => Module::t('lawsuit', 'Lawsuit'),
+				'content' => DetailView::widget([
+					'model' => $model,
+				]),
+			],
+			[
 				'label' => Module::t('document', 'Documents'),
 				'linkOptions' => [
 					'data-url' => Url::to([
@@ -38,10 +44,6 @@ $this->params['breadcrumbs'][] = $this->title;
 		],
 	]) ?>
 
-	<?= DetailView::widget([
-		'model' => $model,
-	])
-	?>
 
 </div>
 

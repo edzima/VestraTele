@@ -5,18 +5,19 @@ namespace common\tests\unit\court\spi;
 use common\modules\court\modules\spi\repository\BaseRepository;
 use Yii;
 
-class BaseRepositoryTest extends BaseApiTest {
+abstract class BaseRepositoryTest extends BaseApiTest {
 
 	protected BaseRepository $repository;
-	public $repositoryModelClass;
 
 	public array $dataProviderSearchParams = [];
 
 	protected function repositoryConfig(): array {
 		return [
-			'class' => $this->repositoryModelClass,
+			'class' => $this->repositoryClass(),
 		];
 	}
+
+	abstract protected function repositoryClass(): string;
 
 	public function _before(): void {
 		parent::_before();
