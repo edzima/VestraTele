@@ -80,12 +80,15 @@ class LeadManager extends Component {
 	}
 
 	public function isForUser(ActiveLead $lead, $userId = null): bool {
-		if (Yii::$app->user->can('lead.manager')) {
-			return true;
+		if (Yii::$app->get('user', false)) {
+			if (Yii::$app->user->can('lead.manager')) {
+				return true;
+			}
+			if ($userId === null) {
+				$userId = Yii::$app->user->getId();
+			}
 		}
-		if ($userId === null) {
-			$userId = Yii::$app->user->getId();
-		}
+
 		if (empty($userId)) {
 			return false;
 		}
