@@ -53,10 +53,10 @@ class LeadManager extends Component {
 		});
 	}
 
-	public function findById(string $id, bool $forUser = true): ?ActiveLead {
+	public function findById(string $id, bool $forUser = true, $userId = null): ?ActiveLead {
 		$model = $this->getModel()::findById($id);
 		if (!$model
-			|| ($forUser && !$this->isForUser($model))) {
+			|| ($forUser && !$this->isForUser($model, $userId))) {
 			return null;
 		}
 		return $model;
