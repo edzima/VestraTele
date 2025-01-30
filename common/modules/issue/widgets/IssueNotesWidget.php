@@ -2,16 +2,20 @@
 
 namespace common\modules\issue\widgets;
 
+use common\models\issue\IssueInterface;
 use common\models\issue\IssueNote;
 use Yii;
+use yii\base\InvalidConfigException;
+use yii\base\Widget;
 
 /**
  * Widget for render Issue Notes.
  *
  * @author Łukasz Wojda <lukasz.wojda@protonmail.com>
  */
-class IssueNotesWidget extends IssueWidget {
+class IssueNotesWidget extends Widget {
 
+	public ?IssueInterface $model = null;
 	public const TYPE_USER_FRONT = IssueNote::TYPE_USER_FRONT;
 	public const TYPE_SETTLEMENT = IssueNote::TYPE_SETTLEMENT;
 	public const TYPE_SUMMON = IssueNote::TYPE_SUMMON;
@@ -36,6 +40,9 @@ class IssueNotesWidget extends IssueWidget {
 	public function init(): void {
 		parent::init();
 		if ($this->notes === null) {
+			if ($this->model === null) {
+				throw new InvalidConfigException('$model can not be empty.');
+			}
 			$query = IssueNote::find()
 				->andWhere(['issue_id' => $this->model->getIssueId()])
 				->orderBy(['publish_at' => SORT_DESC])
@@ -73,7 +80,7 @@ class IssueNotesWidget extends IssueWidget {
 		$this->noteOptions['collapseTypes'] = $this->collapseTypes;
 		return $this->render('issue-notes', [
 			'noteOptions' => $this->noteOptions,
-			'issue_id' => $this->model->getIssueId(),
+			'issue_id' => $this->model ? $this->model->getIssueId() : null,
 			'notes' => $this->notes,
 			'title' => $this->title,
 			'id' => $this->getId(),

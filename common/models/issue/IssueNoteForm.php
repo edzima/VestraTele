@@ -4,6 +4,7 @@ namespace common\models\issue;
 
 use common\models\message\IssueNoteMessagesForm;
 use common\models\user\User;
+use common\modules\court\models\Lawsuit;
 use Yii;
 use yii\base\Model;
 
@@ -43,6 +44,12 @@ class IssueNoteForm extends Model {
 
 	private ?IssueInterface $issue = null;
 	private ?IssueNote $model = null;
+
+	public static function createLawsuit(Lawsuit $lawsuit): static {
+		$model = new static();
+		$model->type = IssueNote::generateType(IssueNote::TYPE_LAWSUIT, $lawsuit->id);
+		return $model;
+	}
 
 	public static function createSettlement(IssueSettlement $settlement) {
 		$model = new static();
