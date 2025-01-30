@@ -18,6 +18,8 @@ class IssueNoteWidget extends Widget {
 
 	protected const CLASS_PINNED = 'panel-danger';
 	protected const CLASS_SETTLEMENT = 'panel-success';
+
+	protected const CLASS_LAWSUIT = 'panel-danger';
 	protected const CLASS_STAGE_CHANGE = 'panel-warning';
 	protected const CLASS_SMS = 'panel-info';
 	protected const CLASS_DEFAULT = 'panel-primary';
@@ -56,7 +58,7 @@ class IssueNoteWidget extends Widget {
 				$this->editBtn = Yii::$app->user->getId() === $this->model->user_id || Yii::$app->user->can(User::PERMISSION_NOTE_UPDATE);
 			}
 		}
-		$this->options['id'] = 'issue-note-'.$this->model->id;
+		$this->options['id'] = 'issue-note-' . $this->model->id;
 		$this->ensureHtmlOptions();
 	}
 
@@ -96,12 +98,14 @@ class IssueNoteWidget extends Widget {
 		if ($this->model->isForSettlement()) {
 			return static::CLASS_SETTLEMENT;
 		}
+		if ($this->model->isForLawsuit()) {
+			return static::CLASS_LAWSUIT;
+		}
 		if ($this->model->isForStageChange()) {
 			return static::CLASS_STAGE_CHANGE;
 		}
 		return static::CLASS_DEFAULT;
 	}
-
 
 	public function run(): string {
 		if (!$this->shouldRender()) {

@@ -44,6 +44,7 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 
 	public const TYPE_SMS = 'sms';
 	public const TYPE_SETTLEMENT = 'settlement';
+	public const TYPE_LAWSUIT = 'lawsuit';
 	public const TYPE_SETTLEMENT_PROVISION_CONTROL = 'settlement.provisionControl';
 
 	public const TYPE_SUMMON = 'summon';
@@ -106,8 +107,6 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 		];
 	}
 
-
-
 	/** @noinspection PhpIncompatibleReturnTypeInspection */
 	public function getIssue(): IssueQuery {
 		return $this->hasOne(Issue::class, ['id' => 'issue_id']);
@@ -149,6 +148,10 @@ class IssueNote extends ActiveRecord implements IssueInterface {
 
 	public function isForSummon(): bool {
 		return $this->isType(static::TYPE_SUMMON);
+	}
+
+	public function isForLawsuit(): bool {
+		return $this->isType(static::TYPE_LAWSUIT);
 	}
 
 	public function isSms(): bool {
