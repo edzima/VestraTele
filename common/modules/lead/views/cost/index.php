@@ -25,6 +25,8 @@ $this->params['breadcrumbs'][] = $this->title;
 	<p>
 		<?= Html::a(Yii::t('lead', 'Create Lead Cost'), ['create'], ['class' => 'btn btn-success']) ?>
 		<?= Html::a(Yii::t('lead', 'Import FB Ads'), ['import-fb-ads'], ['class' => 'btn btn-warning']) ?>
+		<?= Html::a(Yii::t('lead', 'Delete'), false, ['class' => 'btn btn-danger pull-right', 'data-method' => 'delete']) ?>
+
 	</p>
 
 	<?= $this->render('_search', ['model' => $searchModel]); ?>
@@ -47,6 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					'pluginOptions' => ['allowClear' => true],
 					'options' => [
 						'placeholder' => $searchModel->getAttributeLabel('campaign_id'),
+						'multiple' => true,
 					],
 				],
 			],

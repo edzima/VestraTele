@@ -54,6 +54,20 @@ class LeadQuestionQuery extends ActiveQuery {
 		return $this;
 	}
 
+	public function tags(): self {
+		$this->andWhere(['type' => LeadQuestion::TYPE_TAG]);
+		return $this;
+	}
+
+	public function onlyAnswered(): self {
+		$this->joinWith([
+			'answers' => function (LeadAnswerQuery $answerQuery): void {
+				$answerQuery->andWhere('question_id IS NOT NULL');
+			},
+		], false);
+		return $this;
+	}
+
 	public function boolean(bool $boolean): self {
 		$this->andWhere(['is_boolean' => $boolean]);
 		return $this;

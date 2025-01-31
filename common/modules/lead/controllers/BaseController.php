@@ -2,11 +2,15 @@
 
 namespace common\modules\lead\controllers;
 
+use common\helpers\Flash;
 use common\modules\lead\models\ActiveLead;
+use common\modules\lead\models\query\LeadQuery;
+use common\modules\lead\models\searches\LeadSearch;
 use common\modules\lead\Module;
 use Yii;
 use yii\base\ActionEvent;
 use yii\db\ActiveRecord;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\MethodNotAllowedHttpException;
@@ -15,6 +19,9 @@ use yii\web\Response;
 
 class BaseController extends Controller {
 
+	public const LEADS_IDS_PARAM = 'leadsIds';
+	public const LEADS_SEARCH_QUERY_PARAM = 'leadsSearchQuery';
+
 	/**
 	 * @var Module
 	 */
@@ -22,6 +29,8 @@ class BaseController extends Controller {
 
 	protected ?bool $allowDelete = null;
 	protected string $deleteAction = 'delete';
+
+	protected $leadsSearchModelClass = LeadSearch::class;
 
 	public function init() {
 		parent::init();
@@ -91,6 +100,55 @@ class BaseController extends Controller {
 
 	protected function redirectLead(int $id): Response {
 		return $this->redirect(['lead/view', 'id' => $id]);
+	}
+
+	protected function ensureLeadsIds(array &$ids): void {
+		if (empty($ids)) {
+			$ids = $this->getLeadsIds();
+		}
+		$ids = array_unique($ids);
+		if (empty($ids)) {
+			Flash::add(Flash::TYPE_WARNING,
+				Yii::t('leads', 'Ids cannot be blank.')
+			);
+			$this->goBack();
+		}
+	}
+
+	private function getLeadsIds(): array {
+		$selection = Yii::$app->request->post('selection');
+		if (is_array($selection) && !empty($selection)) {
+			return $selection;
+		}
+		$postIds = Yii::$app->request->post(static::LEADS_IDS_PARAM);
+		if (is_string($postIds)) {
+			$postIds = explode(',', $postIds);
+		}
+		if ($postIds) {
+			return $postIds;
+		}
+		$queryParams = Yii::$app->request->post(static::LEADS_SEARCH_QUERY_PARAM);
+		if ($queryParams) {
+			$queryParams = Json::decode($queryParams);
+			$searchModel = $this->getLeadsSearchModel();
+			$dataProvider = $searchModel->search($queryParams);
+			/**
+			 * @var LeadQuery $query
+			 */
+			$query = $dataProvider->query;
+			return $query->getIds();
+		}
+
+		return [];
+	}
+
+	protected function getLeadsSearchModel(): LeadSearch {
+		$searchModel = Yii::createObject($this->leadsSearchModelClass);
+		if ($this->module->onlyUser) {
+			$searchModel->setScenario(LeadSearch::SCENARIO_USER);
+			$searchModel->user_id = Yii::$app->user->getId();
+		}
+		return $searchModel;
 	}
 
 }

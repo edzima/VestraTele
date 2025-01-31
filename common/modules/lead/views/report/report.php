@@ -2,7 +2,7 @@
 
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\widgets\LeadStatusDetailsWidget;
-use common\modules\lead\widgets\SameContactsListWidget;
+use common\modules\lead\widgets\SameContactsGridView;
 use yii\helpers\Html;
 use yii\web\View;
 
@@ -33,10 +33,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
 			<?= LeadStatusDetailsWidget::widget([]) ?>
 
-			<?= SameContactsListWidget::widget([
+			<?= SameContactsGridView::widget([
 				'model' => $model->getLead(),
 				'withType' => true,
 			]) ?>
+
 		</div>
 	</div>
 

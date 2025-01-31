@@ -12,6 +12,7 @@ use common\modules\lead\Module;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
 use yii\helpers\Json;
@@ -52,10 +53,10 @@ class LeadManager extends Component {
 		});
 	}
 
-	public function findById(string $id, bool $forUser = true): ?ActiveLead {
+	public function findById(string $id, bool $forUser = true, $userId = null): ?ActiveLead {
 		$model = $this->getModel()::findById($id);
 		if (!$model
-			|| ($forUser && !$this->isForUser($model))) {
+			|| ($forUser && !$this->isForUser($model, $userId))) {
 			return null;
 		}
 		return $model;
@@ -70,16 +71,24 @@ class LeadManager extends Component {
 		return false;
 	}
 
+	public function canUserReport(ActiveLead $lead, $userId = null): bool {
+		$users = $lead->getUsers();
+		if (empty($users)) {
+			return true;
+		}
+		return $this->isForUser($lead, $userId);
+	}
+
 	public function isForUser(ActiveLead $lead, $userId = null): bool {
-		if (!$this->onlyForUser) {
-			return true;
+		if (Yii::$app->get('user', false)) {
+			if (Yii::$app->user->can('lead.manager')) {
+				return true;
+			}
+			if ($userId === null) {
+				$userId = Yii::$app->user->getId();
+			}
 		}
-		if (Yii::$app->user->can('lead.manager')) {
-			return true;
-		}
-		if ($userId === null) {
-			$userId = Yii::$app->user->getId();
-		}
+
 		if (empty($userId)) {
 			return false;
 		}
@@ -172,9 +181,11 @@ class LeadManager extends Component {
 
 	/**
 	 * @return ActiveLead|BaseActiveRecord
+	 * @throws InvalidConfigException
 	 */
 	protected function getModel(): ActiveLead {
 		if (!$this->model instanceof ActiveLead) {
+			/** @noinspection PhpIncompatibleReturnTypeInspection */
 			return Yii::createObject($this->model);
 		}
 		return $this->model;

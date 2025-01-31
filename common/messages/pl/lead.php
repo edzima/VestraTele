@@ -1,5 +1,6 @@
 <?php
 
+/** @noinspection SqlDialectInspection */
 return [
 	'Assign User to Lead' => 'Przypisz Użytkownika do Leada',
 	'Assign User' => 'Przypisz',
@@ -142,7 +143,8 @@ return [
 	'Provider' => 'Dostawca',
 	'Are you sure you want to delete this report?' => 'Czy chcesz usunąć ten raport?',
 	'Owner: {user}' => 'Właściciel: {user}',
-	'Answers' => 'Opdowiedzi',
+	'Answers' => 'Odpowiedzi',
+	'Update Leads Answers: {name}' => 'Edytuj Odpowiedzi: {name}',
 	'User: {user}' => 'Użytkownik: {user}',
 	'Details cannot be blank when answers is empty.' => 'Szczegóły nie mogą być pustę, gdy nie odpowiedziano na pytania.',
 	'Old Status' => 'Poprzedni Status',
@@ -530,4 +532,15 @@ return [
 	'Cost Value (range)' => 'Koszt (okres)',
 	'Excluded Sources' => 'Wykluczone Źródła',
 	'From Campaigns' => 'Z Kampanii',
+	'Ids cannot be blank.' => 'Nie podano Leads IDs',
+	'Tags' => 'Tagi',
+	'Question - Text' => 'Tekst',
+	'Question - Boolean' => 'Checkbox',
+	'Question - Radio' => 'Pole Wyboru',
+	'Question - Tag' => 'Tag',
+	'Question - Text Area' => 'Textarea',
+	'Values' => 'Wartości',
+	'Delete Costs: {count}' => 'Usunięto Koszty: {count}',
+	'Report User' => 'Użytkownik (Raport)',
+	'Create Lead: {type}' => 'Dodaj Lead: {type}',
 ];

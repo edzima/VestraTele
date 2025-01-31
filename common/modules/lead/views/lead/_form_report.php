@@ -64,6 +64,8 @@ use yii\widgets\ActiveForm;
 
 	<div class="row">
 
+		<?= $form->field($model, 'name', ['options' => ['class' => 'col-md-3']])->textInput(['maxlength' => true]) ?>
+
 		<?= $form->field($model, 'phone', ['options' => ['class' => 'col-md-3']])->textInput(['maxlength' => true]) ?>
 
 		<?= $form->field($model, 'email', ['options' => ['class' => 'col-md-3']])->textInput(['maxlength' => true]) ?>
@@ -96,6 +98,7 @@ use yii\widgets\ActiveForm;
 		'form' => $form,
 		'model' => $report,
 		'withSameContacts' => true,
+		'withName' => false,
 	]) ?>
 
 

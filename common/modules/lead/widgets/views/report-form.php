@@ -12,6 +12,7 @@ use yii\widgets\ActiveForm;
 /* @var $formOptions array */
 /* @var $model ReportForm */
 /* @var $withSameContacts bool */
+/* @var $withName bool */
 
 ?>
 
@@ -23,7 +24,10 @@ use yii\widgets\ActiveForm;
 			->widget(Select2::class, ['data' => ReportForm::getStatusNames()])
 		?>
 
-		<?= $form->field($model, 'leadName', ['options' => ['class' => 'col-md-6 col-lg-5']])->textInput() ?>
+		<?= $withName
+			? $form->field($model, 'leadName', ['options' => ['class' => 'col-md-6 col-lg-5']])->textInput()
+			: ''
+		?>
 
 		<?= $form->field($model, 'withAddress', ['options' => ['class' => 'col-md-1']])->checkbox() ?>
 
@@ -77,32 +81,10 @@ use yii\widgets\ActiveForm;
 	?>
 
 
-
-	<?php foreach ($model->getAnswersModels() as $id => $answer): ?>
-		<?php if ($answer->getQuestion()->is_boolean): ?>
-			<?= $form->field($answer, "[$id]answer")
-				->radioList(Html::booleanDropdownList())
-				->label($answer->getQuestion()->name)
-			?>
-		<?php else: ?>
-			<?= $form->field($answer, "[$id]answer")
-				->textInput(['placeholder' => $answer->getQuestion()->placeholder])
-				->label($answer->getQuestion()->name)
-			?>
-		<?php endif; ?>
-
-
-	<?php endforeach; ?>
-
-	<?= !empty($model->getClosedQuestionsData())
-		? $form->field($model, 'closedQuestions')->widget(Select2::class, [
-			'data' => $model->getClosedQuestionsData(),
-			'options' => [
-				'multiple' => true,
-			],
-		])
-		: ''
-	?>
+	<?= $this->render('_answers-report-form', [
+		'model' => $model->getAnswersModel(),
+		'form' => $form,
+	]) ?>
 
 
 </div>

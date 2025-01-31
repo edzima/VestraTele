@@ -2,6 +2,7 @@
 
 use common\helpers\Html;
 use common\models\user\User;
+use common\modules\lead\controllers\BaseController;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
@@ -12,6 +13,7 @@ use common\widgets\grid\SerialColumn;
 use common\widgets\GridView;
 use kartik\grid\CheckboxColumn;
 use kartik\select2\Select2;
+use yii\helpers\Json;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadReportSearch */
@@ -26,7 +28,14 @@ $multipleForm = Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
 
 if ($multipleForm) {
 	$dataProvider->getModels();
+	$count = $dataProvider->getTotalCount();
+
+	$params = [
+		BaseController::LEADS_SEARCH_QUERY_PARAM => Json::encode(Yii::$app->request->queryParams),
+	];
+
 }
+
 
 ?>
 <div class="lead-report-index">
@@ -46,7 +55,7 @@ if ($multipleForm) {
 	<?php if ($multipleForm): ?>
 		<div class="grid-before">
 			<?php
-			$ids = $searchModel->getAllLeadsIds($dataProvider->query);
+			//	$ids = $searchModel->getAllLeadsIds($dataProvider->query);
 			SelectionForm::begin([
 				'formWrapperSelector' => '.selection-form-wrapper',
 				'gridId' => 'leads-report-grid',
@@ -57,19 +66,17 @@ if ($multipleForm) {
 
 				<?= Yii::$app->user->can(User::PERMISSION_MULTIPLE_SMS)
 				&& $dataProvider->pagination->pageCount > 1
-				&& count($ids) < 6000
+				&& $count < 6000
 					? Html::a(
 						Yii::t('lead', 'Send SMS: {count}', [
-							'count' => count($ids),
+							'count' => $count,
 						]), [
 						'sms/push-multiple',
 					],
 						[
 							'data' => [
 								'method' => 'POST',
-								'params' => [
-									'leadsIds' => $ids,
-								],
+								'params' => $params,
 							],
 							'class' => 'btn btn-success',
 						])
@@ -102,15 +109,13 @@ if ($multipleForm) {
 				&& $dataProvider->pagination->pageCount > 1
 
 					? Html::a(
-						Yii::t('lead', 'Change Status ({ids})', ['ids' => count($ids)]),
+						Yii::t('lead', 'Change Status ({ids})', ['ids' => $count]),
 						['status/change'],
 						[
 							'class' => 'btn btn-warning',
 							'data' => [
 								'method' => 'POST',
-								'params' => [
-									'leadsIds' => $ids,
-								],
+								'params' => $params,
 							],
 							'value' => 'status/change',
 						])

@@ -65,13 +65,23 @@ class CostController extends BaseController {
 	 *
 	 * @return string
 	 */
-	public function actionIndex(): string {
+	public function actionIndex() {
 		$searchModel = new LeadCostSearch();
 		if ($this->module->onlyUser) {
 			$searchModel->scenario = LeadCostSearch::SCENARIO_USER;
 			$searchModel->userId = Yii::$app->user->getId();
 		}
 		$dataProvider = $searchModel->search($this->request->queryParams);
+		if (Yii::$app->request->isDelete) {
+			$count = LeadCost::deleteAll($dataProvider->query->where);
+			if ($count) {
+				Flash::add(Flash::TYPE_INFO,
+					Yii::t('lead', 'Delete Costs: {count}', [
+						'count' => $count,
+					]));
+			}
+			return $this->refresh();
+		}
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,

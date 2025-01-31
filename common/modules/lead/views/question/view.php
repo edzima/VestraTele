@@ -33,6 +33,7 @@ YiiAsset::register($this);
 		'model' => $model,
 		'attributes' => [
 			'id',
+			'typeName',
 			'name',
 			'placeholder',
 			[
@@ -41,15 +42,14 @@ YiiAsset::register($this);
 			],
 			'is_active:boolean',
 			'is_required:boolean',
-			'is_boolean:boolean',
 			'show_in_grid:boolean',
 			[
-				'attribute' => 'type',
-				'visible' => !empty($model->type),
+				'attribute' => 'leadType',
+				'visible' => !empty($model->leadType),
 			],
 			[
-				'attribute' => 'status',
-				'visible' => !empty($model->status),
+				'attribute' => 'leadStatus',
+				'visible' => !empty($model->leadStatus),
 			],
 		],
 	]) ?>

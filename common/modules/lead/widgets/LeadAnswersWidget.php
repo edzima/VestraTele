@@ -40,23 +40,22 @@ class LeadAnswersWidget extends Widget {
 
 	private function getDetailViewAttributes(): array {
 		$attributes = [];
-		$closed = [];
+		$tags = [];
 		LeadAnswer::orderByQuestions($this->answers);
 		foreach ($this->answers as $answer) {
-			if ($answer->question->isClosed()) {
-				$closed[] = $answer->getAnswerQuestion();
+			if ($answer->question->isTag()) {
+				$tags[] = $answer->getAnswerQuestion();
 			} else {
 				$attributes[] = [
 					'label' => $answer->question->name,
-					'value' => $answer->answer,
-					'format' => $answer->question->is_boolean ? 'boolean' : 'text',
+					'value' => $answer->getAnswerQuestion(),
 				];
 			}
 		}
-		if (!empty($closed)) {
+		if (!empty($tags)) {
 			$attributes[] = [
-				'label' => Yii::t('lead', 'Closed'),
-				'value' => implode(', ', $closed),
+				'label' => Yii::t('lead', 'Tags'),
+				'value' => implode(', ', $tags),
 			];
 		}
 		return $attributes;

@@ -56,6 +56,7 @@ class LeadChartReportSearch extends LeadReportSearch {
 		if ($validate && !$this->validate()) {
 			$query->andWhere('0=1');
 		}
+		$this->applyLeadJoin($query);
 		$this->applyLeadReportFilter($query);
 
 		return $query;
@@ -116,7 +117,6 @@ class LeadChartReportSearch extends LeadReportSearch {
 			}
 		}
 		foreach ($data as &$row) {
-//			echo Html::dump($row);
 			$values = $row['first'];
 			$row['min'] = min($values);
 			$row['max'] = max($values);
