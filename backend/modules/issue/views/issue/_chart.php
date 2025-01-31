@@ -222,16 +222,29 @@ if (!empty($agentsIds)) {
 		<div class="row">
 
 			<?= ChartsWidget::widget([
-				'type' => ChartsWidget::TYPE_BAR,
+				'type' => ChartsWidget::TYPE_AREA,
 				'height' => '500',
 				'series' => [
 					[
 						'name' => 'Umowy',
 						'data' => $agentChartData['series'],
+						'type' => 'bar',
 					],
 				],
 				'options' => [
 					'labels' => $agentChartData['labels'],
+					'plotOptions' => [
+						'bar' => [
+							'dataLabels' => [
+								'total' => [
+									'enabled' => true,
+								],
+							],
+						],
+					],
+					'stroke' => [
+						'width' => 0,
+					],
 				],
 				'containerOptions' => [
 					'class' => 'col-sm-12 col-md-8',
@@ -255,6 +268,7 @@ if (!empty($agentsIds)) {
 						'text' => Yii::t('issue', 'Agent'),
 						'align' => 'center',
 					],
+
 				],
 				'containerOptions' => [
 					'class' => 'col-sm-12 col-md-4',
