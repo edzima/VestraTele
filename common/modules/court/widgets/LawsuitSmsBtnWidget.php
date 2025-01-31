@@ -67,11 +67,12 @@ class LawsuitSmsBtnWidget extends ButtonDropdown {
 	}
 
 	public static function getSmsMessage(Lawsuit $lawsuit, MessageTemplate $template): string {
+		$session = $lawsuit->getNextSession();
 		$template->parseBody([
 			'courtName' => $lawsuit->court->name,
-			'dueDateAt' => Yii::$app->formatter->asDate($lawsuit->due_at),
-			'dueTimeAt' => Yii::$app->formatter->asTime($lawsuit->due_at, 'short'),
-			'roomNr' => $lawsuit->room,
+			'dueDateAt' => $session ? Yii::$app->formatter->asDate($session->date_at) : null,
+			'dueTimeAt' => $session ? Yii::$app->formatter->asTime($session->date_at, 'short') : null,
+			'roomNr' => $session ? $session->room : null,
 		]);
 		return $template->getSmsMessage();
 	}

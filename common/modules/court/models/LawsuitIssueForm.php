@@ -12,6 +12,7 @@ use yii\base\Model;
 class LawsuitIssueForm extends Model {
 
 	public int $creator_id;
+
 	public $issuesIds = [];
 	private ?Lawsuit $model = null;
 	private ?IssueInterface $issue = null;
@@ -19,31 +20,44 @@ class LawsuitIssueForm extends Model {
 
 	public ?string $signature_act = '';
 	public ?string $details = '';
-
-	public ?string $due_at = '';
-	public ?string $room = '';
-	public ?string $location = null;
-
-	public ?int $presence_of_the_claimant = null;
-
 	public bool $is_appeal = false;
-	public ?string $url = null;
 
 	public string $signaturePattern = LawsuitSignature::DEFAULT_PATTERN;
+	private ?Lawsuit $alreadyExistedLawsuit = null;
 
 	public function rules(): array {
 		return [
-			[['!creator_id', 'court_id', 'presence_of_the_claimant'], 'required'],
-			[['creator_id', 'court_id', 'presence_of_the_claimant'], 'integer'],
+			[['!creator_id', 'court_id', 'signature_act'], 'required'],
+			[['creator_id', 'court_id'], 'integer'],
 			[['is_appeal'], 'boolean'],
-			[['due_at', 'room', 'signature_act', 'details', 'location', 'url'], 'string'],
-			['url', 'url'],
-			[['due_at', 'room', 'signature_act', 'details', 'location'], 'default', 'value' => null],
+			[['signature_act', 'details'], 'string'],
+			[['signature_act'], 'trim'],
 			['signature_act', 'match', 'pattern' => $this->signaturePattern],
-			['location', 'in', 'range' => array_keys(static::getLocationNames())],
-			['presence_of_the_claimant', 'in', 'range' => array_keys(static::getPresenceOfTheClaimantNames())],
+			['signature_act', 'validateSignatureCourt'],
 			['issuesIds', 'exist', 'targetClass' => Issue::class, 'targetAttribute' => 'id', 'allowArray' => true],
 		];
+	}
+
+	public function validateSignatureCourt(): void {
+		$query = Lawsuit::find()
+			->andWhere(['court_id' => $this->court_id])
+			->andWhere(['signature_act' => $this->signature_act]);
+		if (!$this->getModel()->isNewRecord) {
+			$query->andWhere(['not', ['id' => $this->getModel()->id]]);
+		}
+		$model = $query->one();
+		if ($model !== null) {
+			$this->addError('signature_act',
+				Yii::t('court', 'Lawsuit: {signature_act} already exist in Court', [
+					'signature_act' => $model->signature_act,
+				])
+			);
+			$this->alreadyExistedLawsuit = $model;
+		}
+	}
+
+	public function getAlreadyExistedLawsuit(): ?Lawsuit {
+		return $this->alreadyExistedLawsuit;
 	}
 
 	public function attributeLabels(): array {
@@ -74,16 +88,11 @@ class LawsuitIssueForm extends Model {
 			return false;
 		}
 		$model = $this->getModel();
-		$model->presence_of_the_claimant = $this->presence_of_the_claimant;
 		$model->creator_id = $this->creator_id;
 		$model->court_id = $this->court_id;
-		$model->due_at = $this->due_at;
-		$model->room = $this->room;
 		$model->details = $this->details;
 		$model->signature_act = $this->signature_act;
-		$model->location = $this->location;
 		$model->is_appeal = $this->is_appeal;
-		$model->url = $this->url;
 		if (!$model->save(false)) {
 			return false;
 		}
@@ -107,15 +116,10 @@ class LawsuitIssueForm extends Model {
 		$this->model = $model;
 		$this->court_id = $model->court_id;
 		$this->issuesIds = $model->getIssuesIds();
-		$this->due_at = $model->due_at;
-		$this->room = $model->room;
 		$this->creator_id = $model->creator_id;
 		$this->signature_act = $model->signature_act;
 		$this->details = $model->details;
-		$this->location = $model->location;
-		$this->presence_of_the_claimant = $model->presence_of_the_claimant;
 		$this->is_appeal = $model->is_appeal;
-		$this->url = $model->url;
 		if (count($model->issues) === 1) {
 			$issues = $model->issues;
 			$this->setIssue(reset($issues));
@@ -137,14 +141,6 @@ class LawsuitIssueForm extends Model {
 				->all(),
 			'id', 'name'
 		);
-	}
-
-	public static function getLocationNames(): array {
-		return Lawsuit::getLocationNames();
-	}
-
-	public static function getPresenceOfTheClaimantNames(): array {
-		return Lawsuit::getPresenceOfTheClaimantNames();
 	}
 
 	public function setCourtName(string $courtName): void {

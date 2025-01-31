@@ -11,6 +11,7 @@ use common\models\issue\IssueTagType;
 use common\models\issue\IssueUser;
 use common\models\user\Worker;
 use common\modules\court\models\Lawsuit;
+use common\modules\court\models\LawsuitSession;
 use common\modules\file\widgets\IssueFileGrid;
 use common\modules\issue\widgets\IssueTagsWidget;
 use common\modules\issue\widgets\IssueUsersWidget;
@@ -19,7 +20,9 @@ use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
 use common\widgets\grid\IssueColumn;
 use common\widgets\GridView;
+use kartik\grid\ExpandRowColumn;
 use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
 use yii\data\DataProviderInterface;
 
 /* @var $this yii\web\View */
@@ -314,19 +317,75 @@ use yii\data\DataProviderInterface;
 
 
 			<?= GridView::widget([
-				'dataProvider' => new ActiveDataProvider(['query' => $model->getIssueModel()->getLawsuits(),]),
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model->getIssueModel()->getLawsuits()
+						->joinWith('sessions')
+						->orderBy([LawsuitSession::tableName() . '.date_at' => SORT_ASC]),
+				]),
 				'showOnEmpty' => false,
 				'emptyText' => '',
 				'summary' => '',
 				'caption' => Yii::t('court', 'Lawsuits'),
 				'rowOptions' => function (Lawsuit $model): array {
 					$options = [];
-					if ($model->isAfterDueAt()) {
+					if ($model->hasAllSessionsAfterDueAt()) {
 						Html::addCssClass($options, 'half-transparent');
 					}
 					return $options;
 				},
 				'columns' => [
+					[
+						'class' => ExpandRowColumn::class,
+						'value' => function (Lawsuit $model) {
+							if ($model->hasAllSessionsAfterDueAt() || empty($model->sessions)) {
+								return GridView::ROW_COLLAPSED;
+							}
+							return GridView::ROW_EXPANDED;
+						},
+						'detail' => function (Lawsuit $model) use ($lawsuitActionColumn): string {
+							return GridView::widget([
+								'summary' => false,
+								'dataProvider' => new ArrayDataProvider([
+									'allModels' => $model->sessions,
+									'modelClass' => LawsuitSession::class,
+									'key' => 'id',
+								]),
+								'rowOptions' => function (LawsuitSession $model): array {
+									$options = [];
+									if ($model->isAfterDueAt()) {
+										Html::addCssClass($options, 'half-transparent');
+									}
+									return $options;
+								},
+								'columns' => [
+									'date_at:datetime',
+									'locationName',
+									[
+										'attribute' => 'presenceOfTheClaimantName',
+										'visible' => $lawsuitActionColumn,
+									],
+									[
+										'class' => ActionColumn::class,
+										'controller' => '/court/lawsuit-session',
+										'visible' => $lawsuitActionColumn,
+										'template' => '{url} {update} {delete}',
+										'buttons' => [
+											'url' => function ($url, LawsuitSession $model): string {
+												if (!empty($model->url)) {
+													return Html::a(
+														Html::faicon('link')
+														, $model->url, [
+														'data-target' => '-blank',
+													]);
+												}
+												return '';
+											},
+										],
+									],
+								],
+							]);
+						},
+					],
 					[
 						'attribute' => 'court_id',
 						'format' => 'html',
@@ -338,17 +397,6 @@ use yii\data\DataProviderInterface;
 						},
 					],
 					'signature_act',
-					'due_at:datetime',
-					'locationName',
-					[
-						'attribute' => 'url',
-						'format' => 'url',
-						'visible' => $lawsuitActionColumn,
-					],
-					[
-						'attribute' => 'presenceOfTheClaimantName',
-						'visible' => $lawsuitActionColumn,
-					],
 					[
 						'class' => ActionColumn::class,
 						'controller' => '/court/lawsuit',

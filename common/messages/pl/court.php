@@ -42,4 +42,12 @@ return [
 	'Create Court' => 'Dodaj Sąd',
 	'Is Appeal' => 'Apelacja',
 	'Are you sure you want to send SMS: {message}?' => 'Chcesz wysłać SMS?<br>{message}',
+	'Is Cancelled' => 'Odwołane',
+	'Lawsuit Sessions' => 'Posiedzenia',
+	'Create Lawsuit Session' => 'Dodaj Posiedzenie',
+	'Create Lawsuit Session: {signature}' => 'Dodaj Posiedzenie w: {signature}',
+	'Update Lawsuit Session: {signature} - {date}' => 'Edytuj Posiedzienie w: {signature} - {date}',
+	'Create Issue Note for Lawsuit: {signature}' => 'Dodaj Notatkę do Sprawyy: {signature}',
+	'Link {issue} to {lawsuit}' => 'Dodaj {issue} do Sprawy: {lawsuit}',
+	'Lawsuit: {signature_act} already exist in Court' => 'Sprawa: {signature_act} już istnieje.',
 ];

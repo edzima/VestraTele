@@ -12,19 +12,32 @@ use common\widgets\grid\CustomerIssuesDataColumn;
 use common\widgets\grid\IssuesDataColumn;
 use common\widgets\GridView;
 use kartik\select2\Select2;
+use yii\data\ActiveDataProvider;
 
 /** @var yii\web\View $this */
 /** @var LawsuitSearch $searchModel */
-/** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var ActiveDataProvider $dataProvider */
 
 $this->title = Yii::t('court', 'Lawsuits');
 $this->params['breadcrumbs'][] = Breadcrumbs::issues();
-$this->params['breadcrumbs'][] = $this->title;
+if ($searchModel->spiAppeal) {
+	$this->params['breadcrumbs'][] = [
+		'label' => Yii::t('court', 'Lawsuits'),
+		'url' => ['index'],
+	];
+	$name = Module::getInstance()->getSPI()::getAppealsNames()[$searchModel->spiAppeal] ?? null;
+	if ($name) {
+		$this->params['breadcrumbs'][] = $name;
+	}
+} else {
+	$this->params['breadcrumbs'][] = $this->title;
+}
 ?>
 
 <?= AppealsNavWidget::widget([
 	'activeAppeal' => $searchModel->spiAppeal,
 	'getAppealFromModule' => false,
+	'activeFromModule' => false,
 	'appealParamName' => 'appeal',
 	'module' => Module::getInstance()->getSPI(),
 ]) ?>
@@ -72,7 +85,6 @@ $this->params['breadcrumbs'][] = $this->title;
 					],
 				],
 			],
-			'url:url',
 			[
 				'attribute' => 'court_type',
 				'value' => function (Lawsuit $data): string {
@@ -96,19 +108,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'is_appeal',
 				'format' => 'boolean',
 			],
-			'due_at:datetime',
-			[
-				'attribute' => 'location',
-				'value' => 'locationName',
-				'filter' => LawsuitSearch::getLocationNames(),
-			],
-			[
-				'attribute' => 'presence_of_the_claimant',
-				'value' => 'presenceOfTheClaimantName',
-				'filter' => LawsuitSearch::getPresenceOfTheClaimantNames(),
-			],
 			'signature_act',
-			'room',
 			'details',
 			'created_at:date',
 			'updated_at:date',

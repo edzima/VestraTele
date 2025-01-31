@@ -56,11 +56,11 @@ abstract class BaseRepository extends Component
 		return $this->api->setAppeal($this->appeal);
 	}
 
-	public function getDataProvider(array $params = []): DataProviderInterface {
+	public function getDataProvider(array $params = [], string $url = null): DataProviderInterface {
 		$api = $this->getApi();
 		$dataProvider = $this->createDataProvider();
 		$dataProvider->api = $api;
-		$dataProvider->url = static::route();
+		$dataProvider->url = $url ? $url : static::route();
 		$params = array_merge($params, $dataProvider->params);
 		$dataProvider->params = $params;
 		return $dataProvider;
