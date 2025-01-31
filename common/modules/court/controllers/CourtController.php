@@ -3,6 +3,7 @@
 namespace common\modules\court\controllers;
 
 use common\modules\court\models\Court;
+use common\modules\court\models\LawsuitSession;
 use common\modules\court\models\search\CourtSearch;
 use common\modules\court\Module;
 use Yii;
@@ -83,7 +84,8 @@ class CourtController extends Controller {
 		$query = $model->getLawsuits()
 			->with('issues')
 			->with('issues.customer.userProfile')
-			->orderBy(['due_at' => SORT_ASC]);
+			->joinWith('sessions')
+			->orderBy([LawsuitSession::tableName() . '.date_at' => SORT_DESC]);
 		if ($this->module->onlyUserIssues) {
 			$query->usersIssues([Yii::$app->user->identity->getId()]);
 		}
