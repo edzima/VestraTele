@@ -261,4 +261,5 @@ return array_merge([
 	'Types Count' => 'Typ',
 	'Stages Count' => 'Etap',
 	'Entity Responsible Count' => 'Podmiot',
+	'Agent' => 'Przedstawiciel',
 ], $local);

@@ -2,7 +2,9 @@
 
 use backend\modules\issue\models\search\IssueSearch;
 use backend\modules\issue\Module;
+use common\helpers\ArrayHelper;
 use common\models\issue\query\IssueQuery;
+use common\models\user\User;
 use common\widgets\charts\ChartsWidget;
 use yii\data\ActiveDataProvider;
 
@@ -100,6 +102,39 @@ foreach ($typesData as $typeData) {
 }
 
 $model->setTypesNames($typesNamesWithCount);
+
+/**
+ * @var IssueQuery $stageQuery
+ */
+$agentQuery = clone $dataProvider->query;
+$agentQuery->with = [];
+$agentQuery->joinWith = [];
+
+$agentData = $agentQuery
+	->select([
+		'user_id', 'count(*) as agentCount',
+	])
+	->joinWith('agent')
+	->groupBy('user_id')
+	->asArray()
+	->orderBy('agentCount DESC')
+	->all();
+
+$agentChartData = [];
+$agentsNamesWithCount = [];
+$agentsIds = ArrayHelper::getColumn($agentData, 'user_id');
+if (!empty($agentsIds)) {
+	$agentsNames = User::getSelectList($agentsIds, false);
+	foreach ($agentData as $data) {
+		$agentId = $data['user_id'];
+		$agentName = $agentsNames[$agentId];
+		$agentCount = (int) $data['agentCount'];
+		$agentChartData['labels'][] = $agentName;
+		$agentChartData['series'][] = $agentCount;
+		$agentsNamesWithCount[$agentId] = "$agentName ($agentCount)";
+	}
+}
+
 ?>
 <div id="issue-chart" class="issue-chart collapse<?= $model->getIsLoad() ? ' in' : '' ?>">
 
@@ -173,7 +208,7 @@ $model->setTypesNames($typesNamesWithCount);
 					],
 				],
 				'containerOptions' => [
-					'class' => 'col-sm-12 col-md-6 col-lg-4 status-charts',
+					'class' => 'col-sm-12 col-md-6 col-lg-4',
 					'style' => ['height' => '50vh',],
 				],
 			])
@@ -182,5 +217,53 @@ $model->setTypesNames($typesNamesWithCount);
 
 
 	</div>
+
+	<?php if (!empty($agentData)): ?>
+		<div class="row">
+
+			<?= ChartsWidget::widget([
+				'type' => ChartsWidget::TYPE_BAR,
+				'height' => '500',
+				'series' => [
+					[
+						'name' => 'Umowy',
+						'data' => $agentChartData['series'],
+					],
+				],
+				'options' => [
+					'labels' => $agentChartData['labels'],
+				],
+				'containerOptions' => [
+					'class' => 'col-sm-12 col-md-8',
+					'style' => ['height' => '50vh',],
+				],
+			]) ?>
+
+			<?=
+			ChartsWidget::widget([
+				'type' => ChartsWidget::TYPE_DONUT,
+				'showDonutTotalLabels' => true,
+				'legendFormatterAsSeriesWithCount' => true,
+				'series' => $agentChartData['series'],
+				'options' => [
+					'labels' => $agentChartData['labels'],
+					'legend' => [
+						'position' => 'bottom',
+						'height' => '55',
+					],
+					'title' => [
+						'text' => Yii::t('issue', 'Agent'),
+						'align' => 'center',
+					],
+				],
+				'containerOptions' => [
+					'class' => 'col-sm-12 col-md-4',
+					'style' => ['height' => '50vh',],
+				],
+			])
+			?>
+
+		</div>
+	<?php endif; ?>
 
 </div>
