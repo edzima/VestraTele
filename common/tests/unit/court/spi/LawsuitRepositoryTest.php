@@ -10,7 +10,7 @@ use common\modules\court\modules\spi\repository\LawsuitRepository;
 
 class LawsuitRepositoryTest extends BaseRepositoryTest {
 
-	const TEST_LAWSUIT_ID = 5431301;
+	public const TEST_LAWSUIT_ID = 5431301;
 
 	const TEST_SIGNATURE = 'I ACa 35/12';
 

@@ -37,6 +37,7 @@ class LawsuitController extends Controller {
 					'class' => VerbFilter::class,
 					'actions' => [
 						'delete' => ['POST'],
+						'link-issue' => ['POST'],
 						'unlink-issue' => ['POST'],
 					],
 				],
@@ -169,10 +170,10 @@ class LawsuitController extends Controller {
 					->getRepositoryManager()
 					->getLawsuits();
 
+				$repository->setAppeal($appeal);
 				$lawsuitDetails = $repository
 					->findBySignature(
 						$model->signature_act,
-						$appeal
 					);
 			}
 		}
@@ -195,9 +196,13 @@ class LawsuitController extends Controller {
 		$model->creator_id = Yii::$app->user->getId();
 		$model->setIssue($issue);
 
-		if ($this->request->isPost) {
-			if ($model->load($this->request->post()) && $model->save()) {
+		if ($model->load(Yii::$app->request->post())) {
+			if ($model->save()) {
 				return $this->redirect(['view', 'id' => $model->getModel()->id]);
+			}
+			$lawsuit = $model->getAlreadyExistedLawsuit();
+			if ($lawsuit && $lawsuit->hasIssue($issueId)) {
+				return $this->redirect(['view', 'id' => $lawsuit->id]);
 			}
 		}
 
@@ -246,6 +251,14 @@ class LawsuitController extends Controller {
 			'userId' => Yii::$app->user->getId(),
 		], __METHOD__);
 		return $this->redirect(['index']);
+	}
+
+	public function actionLinkIssue(int $id, int $issueId) {
+		$model = $this->findModel($id);
+		if (!$model->hasIssue($issueId)) {
+			$model->linkIssues([$issueId]);
+		}
+		return $this->redirect(['view', 'id' => $model->id]);
 	}
 
 	public function actionUnlinkIssue(int $id, int $issueId) {

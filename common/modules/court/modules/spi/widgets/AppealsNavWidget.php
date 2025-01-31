@@ -22,6 +22,9 @@ class AppealsNavWidget extends Widget {
 		],
 	];
 	public ?string $activeAppeal = null;
+
+	public bool $activeFromModule = true;
+
 	public bool $getAppealFromModule = true;
 
 	public bool $withUnreadCount = false;
@@ -39,7 +42,7 @@ class AppealsNavWidget extends Widget {
 		if ($this->appealParamName === null && $this->module) {
 			$this->appealParamName = $this->module->appealParamName;
 		}
-		if ($this->activeAppeal === null && $this->module) {
+		if ($this->activeAppeal === null && $this->activeFromModule && $this->module) {
 			$this->activeAppeal = $this->module->getAppeal();
 		}
 		if ($this->withUnreadCount && $this->notificationsRepository === null) {

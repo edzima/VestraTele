@@ -4,6 +4,8 @@ namespace common\modules\court\models;
 
 use common\helpers\ArrayHelper;
 use common\models\issue\Issue;
+use common\models\issue\IssueNote;
+use common\models\issue\query\IssueNoteQuery;
 use common\models\user\User;
 use common\modules\court\models\query\LawsuitQuery;
 use Yii;
@@ -17,30 +19,20 @@ use yii\db\Expression;
  *
  * @property int $id
  * @property int $court_id
- * @property string|null $signature_act
- * @property string|null $room
+ * @property string $signature_act
  * @property string|null $details
- * @property string|null $due_at
  * @property string $created_at
  * @property string $updated_at
- * @property string|null $location
  * @property int $creator_id
- * @property int|null $online
- * @property int|null $presence_of_the_claimant
  * @property int $is_appeal
- * @property string|null $url
  *
  * @property Court $court
  * @property User $creator
  * @property Issue[] $issues
+ * @property LawsuitSession[] $sessions
  */
 class Lawsuit extends ActiveRecord {
 
-	public const LOCATION_STATIONARY = 'S';
-	public const LOCATION_ONLINE = 'O';
-
-	public const PRESENCE_OF_THE_CLAIMANT_REQUIRED = 1;
-	public const PRESENCE_OF_THE_CLAIMANT_NOT_REQUIRED = 0;
 	public const VIA_TABLE_ISSUE = '{{%lawsuit_issue}}';
 
 	public function behaviors(): array {
@@ -71,14 +63,12 @@ class Lawsuit extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['court_id', 'creator_id', 'presence_of_the_claimant'], 'required'],
+			[['court_id', 'creator_id', 'signature_act'], 'required'],
 			[['court_id', 'creator_id', 'presence_of_the_claimant'], 'integer'],
 			[['is_appeal', 'boolean']],
 			[['due_at', 'created_at', 'updated_at'], 'safe'],
-			[['location',], 'string', 'max' => 2],
-			[['signature_act', 'room', 'details', 'url'], 'string', 'max' => 255],
-			[['signature_act', 'room', 'details', 'location', 'url'], 'default', 'value' => null],
-			['location', 'in', 'range' => array_keys(static::getLocationNames())],
+			[['signature_act', 'details'], 'string', 'max' => 255],
+			[['signature_act', 'details'], 'default', 'value' => null],
 			[['court_id'], 'exist', 'skipOnError' => true, 'targetClass' => Court::class, 'targetAttribute' => ['court_id' => 'id']],
 			[['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['creator_id' => 'id']],
 		];
@@ -95,31 +85,16 @@ class Lawsuit extends ActiveRecord {
 			'courtName' => Yii::t('court', 'Court'),
 			'signature_act' => Yii::t('court', 'Signature Act'),
 			'details' => Yii::t('court', 'Details'),
-			'room' => Yii::t('court', 'Room'),
-			'due_at' => Yii::t('court', 'Due At'),
 			'created_at' => Yii::t('court', 'Created At'),
 			'updated_at' => Yii::t('court', 'Updated At'),
 			'creator_id' => Yii::t('court', 'Creator ID'),
 			'creator' => Yii::t('court', 'Creator'),
-			'location' => Yii::t('court', 'Location'),
-			'locationName' => Yii::t('court', 'Location'),
-			'presence_of_the_claimant' => Yii::t('court', 'Presence of the Claimant'),
-			'presenceOfTheClaimantName' => Yii::t('court', 'Presence of the Claimant'),
 			'is_appeal' => Yii::t('court', 'Is Appeal'),
-			'url' => Yii::t('court', 'URL'),
 		];
 	}
 
 	public function getCourtName(): string {
 		return $this->court->name;
-	}
-
-	public function getLocationName(): ?string {
-		return static::getLocationNames()[$this->location] ?? null;
-	}
-
-	public function getPresenceOfTheClaimantName(): ?string {
-		return static::getPresenceOfTheClaimantNames()[$this->presence_of_the_claimant] ?? null;
 	}
 
 	/**
@@ -140,6 +115,10 @@ class Lawsuit extends ActiveRecord {
 		return $this->hasOne(User::class, ['id' => 'creator_id']);
 	}
 
+	public function getSessions(): ActiveQuery {
+		return $this->hasMany(LawsuitSession::class, ['lawsuit_id' => 'id']);
+	}
+
 	/**
 	 * Gets query for [[Issue]].
 	 *
@@ -148,6 +127,21 @@ class Lawsuit extends ActiveRecord {
 	public function getIssues() {
 		return $this->hasMany(Issue::class, ['id' => 'issue_id'])
 			->viaTable(static::VIA_TABLE_ISSUE, ['lawsuit_id' => 'id']);
+	}
+
+	public function getNotes(): IssueNoteQuery {
+		/**
+		 * @var IssueNoteQuery $query
+		 */
+		$query = $this->hasMany(
+			IssueNote::class,
+			['issue_id' => 'id'])
+			->via('issues');
+		$query->onlyType(
+			IssueNote::TYPE_LAWSUIT,
+			$this->id
+		);
+		return $query;
 	}
 
 	/**
@@ -188,25 +182,15 @@ class Lawsuit extends ActiveRecord {
 			)->execute();
 	}
 
-	public static function getLocationNames(): array {
-		return [
-			static::LOCATION_STATIONARY => Yii::t('court', 'Stationary'),
-			static::LOCATION_ONLINE => Yii::t('court', 'Online'),
-		];
-	}
-
-	public static function getPresenceOfTheClaimantNames(): array {
-		return [
-			static::PRESENCE_OF_THE_CLAIMANT_REQUIRED => Yii::t('court', 'Required'),
-			static::PRESENCE_OF_THE_CLAIMANT_NOT_REQUIRED => Yii::t('court', 'Not required'),
-		];
-	}
-
-	public function isAfterDueAt(): ?bool {
-		if (empty($this->due_at)) {
+	public function hasAllSessionsAfterDueAt(): ?bool {
+		$sessions = $this->sessions;
+		if (empty($sessions)) {
 			return null;
 		}
-		return strtotime($this->due_at) < strtotime('now');
+		$after = array_filter($sessions, function (LawsuitSession $session): bool {
+			return $session->isAfterDueAt();
+		});
+		return count($sessions) === count($after);
 	}
 
 	public function hasIssueUser(int $userId): bool {
@@ -220,5 +204,21 @@ class Lawsuit extends ActiveRecord {
 
 	public static function find(): LawsuitQuery {
 		return new LawsuitQuery(static::class);
+	}
+
+	public function getNextSession(): ?LawsuitSession {
+		$sessions = $this->sessions;
+		ArrayHelper::multisort($sessions, 'date_at', SORT_ASC);
+		foreach ($sessions as $session) {
+			if (!$session->isAfterDueAt()) {
+				return $session;
+			}
+		}
+		return null;
+	}
+
+	public function hasIssue(int $issueId): bool {
+		$ids = $this->getIssuesIds();
+		return in_array($issueId, $ids);
 	}
 }

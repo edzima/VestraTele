@@ -13,6 +13,8 @@ use common\models\issue\IssueUser;
 use common\models\provision\IssueProvisionType;
 use common\models\user\Customer;
 use common\models\user\UserProfile;
+use common\modules\court\models\Lawsuit;
+use common\modules\court\models\LawsuitSession;
 use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;
@@ -20,11 +22,81 @@ use DateTime;
 use Exception;
 use Yii;
 use yii\console\Controller;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\helpers\Json;
 
 class UpgradeController extends Controller {
+
+	public function actionMergeLawsuitSignatureDuplicates(): void {
+		Lawsuit::updateAll([
+			'signature_act' => new Expression('TRIM(signature_act)'),
+		]);
+		$duplicates = Lawsuit::find()
+			->select(['signature_act', 'court_id'])
+			->groupBy(['signature_act', 'court_id'])
+			->having('COUNT(*) > 1')
+			->asArray()
+			->all();
+
+		if (empty($duplicates)) {
+			Console::output('Not find duplicates');
+			return;
+		}
+		Console::output('Find duplicates: ' . count($duplicates));
+
+		$idsToRemove = [];
+		foreach ($duplicates as $data) {
+			$models = Lawsuit::find()
+				->andWhere([
+					'signature_act' => $data['signature_act'],
+					'court_id' => $data['court_id'],
+				])
+				->orderBy('created_at')
+				->all();
+			Console::output('Find Duplicates: ' . count($models) . ' for signature: ' . $data['signature_act']);
+			Console::output(print_r(
+				ArrayHelper::getColumn($models, 'id')
+			));
+			/**
+			 * @var Lawsuit $oldestModel
+			 */
+			$oldestModel = array_shift($models);
+			$oldestModel->detachBehaviors();
+
+			Console::output('Oldest model: ' . $oldestModel->id);
+
+			foreach ($models as $model) {
+				$idsToRemove[] = $model->id;
+				Console::output('Next model: ' . $model->id);
+				$attributes = [
+					'updated_at' => $model->updated_at,
+				];
+				if ($model->is_appeal) {
+					$attributes['is_appeal'] = true;
+				}
+				$oldestModel->updateAttributes($attributes);
+
+				LawsuitSession::updateAll(['lawsuit_id' => $oldestModel->id], [
+					'lawsuit_id' => $model->id,
+				]);
+				Yii::$app->db->createCommand()
+					->update(Lawsuit::VIA_TABLE_ISSUE, [
+						'lawsuit_id' => $oldestModel->id,
+					], [
+						'lawsuit_id' => $model->id,
+					])
+					->execute();
+			}
+		}
+		if (!empty($idsToRemove)) {
+			Lawsuit::deleteAll([
+				'id' => $idsToRemove,
+			]);
+			Console::output('Remove Lawsuits: ' . count($idsToRemove));
+		}
+	}
 
 	public function actionCalendarNewsType(): void {
 		CalendarNews::updateAll(['type' => CalendarNews::TYPE_SUMMON]);

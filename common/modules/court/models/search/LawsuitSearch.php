@@ -44,14 +44,14 @@ class LawsuitSearch extends Lawsuit {
 			[['id', 'court_id', 'creator_id', 'issue_id'], 'integer'],
 			[['is_appeal'], 'default', 'value' => null],
 			[['courtName'], 'string'],
-			[['customer', 'signature_act', 'room', 'due_at', 'details', 'created_at', 'updated_at', 'location', 'presence_of_the_claimant', 'court_type', 'url', 'appeal'], 'safe'],
+			[['customer', 'signature_act', 'details', 'created_at', 'updated_at', 'court_type', 'appeal'], 'safe'],
 		];
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function scenarios() {
+	public function scenarios(): array {
 		// bypass scenarios() implementation in the parent class
 		return Model::scenarios();
 	}
@@ -63,11 +63,12 @@ class LawsuitSearch extends Lawsuit {
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function search($params) {
+	public function search(array $params) {
 		$query = Lawsuit::find();
 		$query->joinWith('issues');
 		$query->joinWith('court');
 		$query->with('issues.customer.userProfile');
+		$query->with('creator.userProfile');
 
 		// add conditions that should always apply here
 
@@ -91,20 +92,15 @@ class LawsuitSearch extends Lawsuit {
 		$query->andFilterWhere([
 			'id' => $this->id,
 			'court_id' => $this->court_id,
-			'due_at' => $this->due_at,
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,
 			'creator_id' => $this->creator_id,
-			'location' => $this->location,
-			'presence_of_the_claimant' => $this->presence_of_the_claimant,
 			'is_appeal' => $this->is_appeal,
 			Court::tableName() . '.type' => $this->court_type,
 		]);
 
 		$query->andFilterWhere(['like', Lawsuit::tableName() . '.signature_act', $this->signature_act])
 			->andFilterWhere(['like', Lawsuit::tableName() . '.details', $this->details])
-			->andFilterWhere(['like', 'room', $this->room])
-			->andFilterWhere(['like', 'url', $this->url])
 			->andFilterWhere(['like', Court::tableName() . '.name', $this->courtName])
 			->andFilterWhere(['like', Issue::tableName() . '.id', $this->issue_id . '%', false]);
 
