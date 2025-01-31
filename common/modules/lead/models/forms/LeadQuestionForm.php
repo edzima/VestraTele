@@ -2,18 +2,21 @@
 
 namespace common\modules\lead\models\forms;
 
+use common\helpers\Html;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadType;
+use Yii;
 use yii\base\Model;
+use yii\web\JsExpression;
 
 class LeadQuestionForm extends Model {
 
+	public string $type = LeadQuestion::TYPE_TEXT;
 	public string $name = '';
 	public ?string $placeholder = null;
 
 	public ?bool $is_active = true;
-	public ?bool $is_boolean = false;
 	public ?bool $show_in_grid = null;
 	public ?bool $is_required = null;
 
@@ -21,22 +24,37 @@ class LeadQuestionForm extends Model {
 	public $type_id;
 	public $status_id;
 
+	public $values;
+
 	private ?LeadQuestion $model = null;
 
 	public function rules(): array {
 		return [
-			[['name'], 'required'],
+			[['name', 'type'], 'required'],
 			[['order'], 'integer'],
-			[['show_in_grid', 'is_required', 'is_active', 'is_boolean'], 'boolean'],
+			[['show_in_grid', 'is_required', 'is_active'], 'boolean'],
 			[['name', 'placeholder'], 'string'],
 			[['placeholder', 'order'], 'default', 'value' => null],
-			['type_id', 'in', 'range' => array_keys(static::getTypesNames())],
-			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
+			['type_id', 'in', 'range' => array_keys(static::getLeadTypesNames())],
+			['status_id', 'in', 'range' => array_keys(static::getLeadStatusNames())],
+			['type', 'in', 'range' => array_keys(static::getTypesNames())],
+			[
+				'values', 'required',
+				'when' => function (): bool {
+					return $this->type === LeadQuestion::TYPE_RADIO_GROUP;
+				},
+				'whenClient' => new JsExpression("function (attribute, value) {
+       				return $('" . Html::getInputId($this, 'type') . "').val() === '" . LeadQuestion::TYPE_RADIO_GROUP . "';
+    			 }"),
+			],
 		];
 	}
 
 	public function attributeLabels(): array {
-		return LeadQuestion::instance()->attributeLabels();
+		return array_merge(
+			LeadQuestion::instance()->attributeLabels(), [
+			'values' => Yii::t('lead', 'Values'),
+		]);
 	}
 
 	public function setModel(LeadQuestion $model): void {
@@ -46,10 +64,13 @@ class LeadQuestionForm extends Model {
 		$this->show_in_grid = $model->show_in_grid;
 		$this->is_required = $model->is_required;
 		$this->is_active = $model->is_active;
-		$this->is_boolean = $model->is_boolean;
 		$this->type_id = $model->type_id;
+		$this->type = $model->type;
 		$this->status_id = $model->status_id;
 		$this->order = $model->order;
+		if ($this->type === LeadQuestion::TYPE_RADIO_GROUP) {
+			$this->values = $model->getRadioValues();
+		}
 	}
 
 	public function getModel(): LeadQuestion {
@@ -59,29 +80,36 @@ class LeadQuestionForm extends Model {
 		return $this->model;
 	}
 
-	public static function getStatusNames(): array {
-		return LeadStatus::getNames();
-	}
-
-	public static function getTypesNames(): array {
-		return LeadType::getNames();
-	}
-
 	public function save(): bool {
 		if (!$this->validate()) {
 			return false;
 		}
 		$model = $this->getModel();
 		$model->name = $this->name;
-		$model->placeholder = $this->placeholder;
 		$model->is_required = $this->is_required;
 		$model->is_active = $this->is_active;
-		$model->is_boolean = $this->is_boolean;
+		$model->type = $this->type;
+		$model->placeholder = $this->placeholder;
+		if ($model->isRadioGroup()) {
+			$model->setRadioValues((array) $this->values);
+		}
 		$model->show_in_grid = $this->show_in_grid;
 		$model->type_id = $this->type_id;
 		$model->status_id = $this->status_id;
 		$model->order = $this->order;
 		return $model->save();
+	}
+
+	public static function getLeadStatusNames(): array {
+		return LeadStatus::getNames();
+	}
+
+	public static function getLeadTypesNames(): array {
+		return LeadType::getNames();
+	}
+
+	public static function getTypesNames(): array {
+		return LeadQuestion::getTypesNames();
 	}
 
 }

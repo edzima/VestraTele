@@ -8,11 +8,12 @@ use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadInterface;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadUser;
+use common\modules\lead\widgets\ArchiveSameContactButton;
 use common\modules\lead\widgets\CopyLeadBtnWidget;
 use common\modules\lead\widgets\LeadAnswersWidget;
 use common\modules\lead\widgets\LeadReportWidget;
 use common\modules\lead\widgets\LeadSmsBtnWidget;
-use common\modules\lead\widgets\SameContactsListWidget;
+use common\modules\lead\widgets\SameContactsGridView;
 use common\modules\lead\widgets\ShortReportStatusesWidget;
 use common\widgets\address\AddressDetailView;
 use common\widgets\grid\ActionColumn;
@@ -111,8 +112,14 @@ if ($phoneBlacklist) {
 
 		<?= !$userIsFromMarket
 			? CopyLeadBtnWidget::widget([
-				'leadId' => $model->getId(),
+				'lead' => $model,
 			])
+			: ''
+		?>
+
+		<?= Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE)
+		&& !$userIsFromMarket ?
+			ArchiveSameContactButton::widget(['model' => $model])
 			: ''
 		?>
 
@@ -174,92 +181,109 @@ if ($phoneBlacklist) {
 	<?php endif; ?>
 
 	<div class="row">
-		<div class="col-md-4">
+		<div class="col-md-6">
 
 
-			<?= DetailView::widget([
-				'model' => $model,
-				'attributes' => [
-					'status',
-					[
-						'attribute' => 'source.type.nameWithDescription',
-						'label' => Yii::t('lead', 'Type'),
-					],
-					'source',
-					[
-						'attribute' => 'campaign',
-						'visible' => !empty($model->campaign_id),
-						'value' => function (ActiveLead $lead): ?string {
-							if (empty($lead->campaign)) {
-								return null;
-							}
-							return Html::a($lead->campaign->name, ['campaign/view', 'id' => $lead->campaign_id]);
-						},
-						'format' => 'html',
-					],
-					'date_at:datetime',
-					[
-						'attribute' => 'updated_at',
-						'format' => 'datetime',
-						'visible' => !empty($model->updated_at),
-					],
-					[
-						'attribute' => 'details',
-						'visible' => !empty($model->getDetails()),
-						'format' => 'ntext',
-					],
-					[
-						'attribute' => 'data',
-						'visible' => !empty($model->getData())
-							&& Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
-						'format' => 'ntext',
-					],
-					[
-						'attribute' => 'customerUrl',
-						'format' => 'html',
-						'label' => Yii::t('lead', 'Customer View'),
-						'visible' => !$onlyUser && isset($model->getData()['customerUrl']),
-						'value' => isset($model->getData()['customerUrl'])
-							? Html::a($model->getName(), $model->getData()['customerUrl'])
-							: '',
-					],
-					[
-						'attribute' => 'phone',
-						'format' => 'tel',
-						'visible' => !empty($model->getPhone()),
-					],
-					[
-						'attribute' => 'email',
-						'format' => 'email',
-						'visible' => !empty($model->getEmail()),
-					],
-					[
-						'attribute' => 'postal_code',
-						'visible' => !empty($model->postal_code),
-					],
-					[
-						'attribute' => 'providerName',
-						'visible' => !empty($model->provider),
-					],
-					[
-						'attribute' => 'deadline',
-						'visible' => !empty($model->getDeadline()),
-						'format' => 'raw',
-						'value' => function () use ($model) {
-							$deadline = $model->getDeadline();
-							if ($deadline) {
-								return Html::a(
-									Yii::$app->formatter->asDate($deadline),
-									['deadline', 'id' => $model->id], [
-									'aria-label' => Yii::t('lead', 'Update Deadline'),
-									'title' => Yii::t('lead', 'Update Deadline'),
-								]);
-							}
-							return null;
-						},
-					],
-				],
-			]) ?>
+						<?= DetailView::widget([
+							'model' => $model,
+							'attributes' => [
+								'status',
+								[
+									'attribute' => 'source.type.nameWithDescription',
+									'label' => Yii::t('lead', 'Type'),
+								],
+								'source',
+								[
+									'attribute' => 'campaign',
+									'visible' => !empty($model->campaign_id),
+									'value' => function (ActiveLead $lead): ?string {
+										if (empty($lead->campaign)) {
+											return null;
+										}
+										return Html::a($lead->campaign->name, ['campaign/view', 'id' => $lead->campaign_id]);
+									},
+									'format' => 'html',
+								],
+								'date_at:datetime',
+								[
+									'attribute' => 'updated_at',
+									'format' => 'datetime',
+									'visible' => !empty($model->updated_at),
+								],
+								[
+									'attribute' => 'details',
+									'visible' => !empty($model->getDetails()),
+									'format' => 'ntext',
+								],
+								[
+									'attribute' => 'data',
+									'visible' => !empty($model->getData())
+										&& Yii::$app->user->can(User::ROLE_ADMINISTRATOR),
+									'format' => 'ntext',
+								],
+								[
+									'attribute' => 'customerUrl',
+									'format' => 'html',
+									'label' => Yii::t('lead', 'Customer View'),
+									'visible' => !$onlyUser && isset($model->getData()['customerUrl']),
+									'value' => isset($model->getData()['customerUrl'])
+										? Html::a($model->getName(), $model->getData()['customerUrl'])
+										: '',
+								],
+								[
+									'attribute' => 'phone',
+									'format' => 'tel',
+									'visible' => !empty($model->getPhone()),
+								],
+								[
+									'attribute' => 'email',
+									'format' => 'email',
+									'visible' => !empty($model->getEmail()),
+								],
+								[
+									'attribute' => 'postal_code',
+									'visible' => !empty($model->postal_code),
+								],
+								[
+									'attribute' => 'providerName',
+									'visible' => !empty($model->provider),
+								],
+								[
+									'attribute' => 'deadline',
+									'visible' => !empty($model->getDeadline()),
+									'format' => 'raw',
+									'value' => function () use ($model) {
+										$deadline = $model->getDeadline();
+										if ($deadline) {
+											return Html::a(
+												Yii::$app->formatter->asDate($deadline),
+												['deadline', 'id' => $model->id], [
+												'aria-label' => Yii::t('lead', 'Update Deadline'),
+												'title' => Yii::t('lead', 'Update Deadline'),
+											]);
+										}
+										return null;
+									},
+								],
+							],
+						]) ?>
+
+
+
+
+			<?php if (!empty($model->reports)): ?>
+				<h4><?= Yii::t('lead', 'Reports') ?></h4>
+				<?php foreach ($model->reports as $report): ?>
+
+					<?= LeadReportWidget::widget([
+						'model' => $report,
+						'withDeleteButton' => false,
+					]) ?>
+
+
+				<?php endforeach; ?>
+			<?php endif; ?>
+
 
 			<?php
 			//			LeadDialersGridView::widget([
@@ -268,7 +292,7 @@ if ($phoneBlacklist) {
 			// ?>
 
 		</div>
-		<div class="col-md-8">
+		<div class="col-md-6">
 
 			<div class="row">
 
@@ -282,12 +306,26 @@ if ($phoneBlacklist) {
 					]) ?>
 
 				</div>
+
+					<?php if (!empty($model->answers)) : ?>
+						<div class="col-md-12 lead-answers-wrapper">
+							<h4><?= Yii::t('lead', 'Lead Answers') ?>
+								<?= Html::a(
+									Html::icon('pencil'),
+									['answer/update-lead', 'id' => $model->getId()], [
+										'class' => 'btn btn-primary btn-sm',
+									]
+								) ?>
+							</h4>
+							<?= LeadAnswersWidget::widget([
+								'answers' => $model->answers,
+							]) ?>
+						</div>
+
+					<?php endif; ?>
 				<div class="clearfix"></div>
 
-				<div class="col-md-12">
-					<?= LeadAnswersWidget::widget(['answers' => $model->answers]) ?>
 
-				</div>
 
 				<?= $model->getCustomerAddress()
 					? Html::tag('div',
@@ -361,36 +399,16 @@ if ($phoneBlacklist) {
 
 			<div class="clearfix"></div>
 
-
-			<?= SameContactsListWidget::widget([
+			<?= SameContactsGridView::widget([
 				'model' => $model,
-				'viewLink' => !$onlyUser,
-				'visibleCustomerLink' => !$onlyUser,
-				'updateLink' => !$onlyUser && Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE),
-				'headerOptions' => ['class' => 'col-md-12',],
-				'archiveBtn' => Yii::$app->user->can(User::PERMISSION_LEAD_DUPLICATE) && !$userIsFromMarket,
 				'withType' => false,
-				'withDialers' => true,
-				'options' => ['class' => 'row',],
-				'itemOptions' => ['class' => 'col-md-6',],
 			]) ?>
+
 			<div class="clearfix"></div>
 
 		</div>
 	</div>
 	<div class="clearfix"></div>
 
-	<?php if (!empty($model->reports)): ?>
-		<h4><?= Yii::t('lead', 'Reports') ?></h4>
-		<?php foreach ($model->reports as $report): ?>
-
-			<?= LeadReportWidget::widget([
-				'model' => $report,
-				'withDeleteButton' => false,
-			]) ?>
-
-
-		<?php endforeach; ?>
-	<?php endif; ?>
 
 </div>

@@ -4,12 +4,13 @@ namespace common\modules\lead\models\forms;
 
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadQuestion;
-use common\modules\lead\models\LeadReport;
 use yii\base\Model;
 
 class AnswerForm extends Model {
 
 	public ?string $answer = null;
+
+	public $report_id;
 
 	private ?LeadAnswer $model = null;
 	private LeadQuestion $question;
@@ -20,14 +21,13 @@ class AnswerForm extends Model {
 	}
 
 	public function rules(): array {
-
 		$rules = [];
 		if ($this->getQuestion()->is_required) {
 			$rules[] = [
 				'answer', 'required',
 			];
 		}
-		if ($this->getQuestion()->is_boolean) {
+		if ($this->getQuestion()->isBoolean()) {
 			$rules[] = [
 				'answer', 'boolean',
 			];
@@ -39,9 +39,15 @@ class AnswerForm extends Model {
 				'answer', 'trim',
 			];
 		}
+		if ($this->getQuestion()->isRadioGroup()) {
+			$rules[] = [
+				'answer', 'in', 'range' => $this->getQuestion()->getRadioValues(),
+			];
+		}
 		$rules[] = [
 			'answer', 'default', 'value' => null,
 		];
+
 		return $rules;
 	}
 
@@ -55,7 +61,7 @@ class AnswerForm extends Model {
 		return $this->question;
 	}
 
-	private function getModel(): LeadAnswer {
+	public function getModel(): LeadAnswer {
 		if ($this->model === null) {
 			$this->model = new LeadAnswer();
 		}
@@ -65,24 +71,38 @@ class AnswerForm extends Model {
 	public function setModel(LeadAnswer $model): void {
 		$this->model = $model;
 		$this->answer = $model->answer;
+		$this->question = $model->question;
+		$this->report_id = $model->report_id;
 	}
 
-	public function linkReport(LeadReport $report, bool $validate = true): bool {
+	public function save(bool $validate = true): bool {
 		if ($validate && !$this->validate()) {
 			return false;
 		}
-		$questionId = $this->getQuestion()->id;
-		$model = $report->getAnswer($questionId) ?? $this->getModel();
-		if ($this->answer === null) {
-			if (!$model->isNewRecord) {
-				$model->delete();
-			}
-			return false;
+		if ($this->getQuestion()->isNewRecord) {
+			$this->getQuestion()->save();
 		}
+		$model = $this->getModel();
 		$model->answer = $this->answer;
-		$model->question_id = $questionId;
-		$report->link('answers', $model);
-		return true;
+		$model->question_id = $this->getQuestion()->id;
+		$model->report_id = $this->report_id;
+		if ($this->shouldRemove()) {
+			$model->delete();
+			return true;
+		}
+		return $model->save(false);
+	}
+
+	protected function shouldRemove(): bool {
+		return !$this->getQuestion()->isTag() && ($this->answer === null || $this->answer === '');
+	}
+
+	public function getFormId(): string {
+		return $this->question->id . '_' . $this->report_id;
+	}
+
+	public function hasAnswer(): bool {
+		return $this->answer !== null && $this->answer !== '';
 	}
 
 }

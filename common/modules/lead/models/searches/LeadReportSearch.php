@@ -38,8 +38,6 @@ class LeadReportSearch extends LeadReport {
 
 	public $withoutDeleted;
 
-	private ?array $leadsIds = null;
-
 	/**
 	 * {@inheritdoc}
 	 */
@@ -94,11 +92,11 @@ class LeadReportSearch extends LeadReport {
 	 */
 	public function search(array $params = []) {
 		$query = LeadReport::find()
-			->joinWith('lead')
-			->joinWith('lead.leadSource')
-			->joinWith('owner')
-			->joinWith('answers')
-			->joinWith('answers.question');
+			->with('lead')
+			->with('lead.leadSource')
+			->with('owner')
+			->with('answers')
+			->with('answers.question');
 
 		// add conditions that should always apply here
 
@@ -119,6 +117,7 @@ class LeadReportSearch extends LeadReport {
 			return $dataProvider;
 		}
 
+		$this->applyLeadJoin($query);
 		$this->applyAnswersFilter($query);
 		$this->applyDateFilter($query);
 		$this->applyLeadNameFilter($query);
@@ -138,7 +137,6 @@ class LeadReportSearch extends LeadReport {
 		]);
 
 		$query->andFilterWhere(['like', LeadReport::tableName() . '.details', $this->details]);
-		$query->groupBy(LeadReport::tableName() . '.id');
 		return $dataProvider;
 	}
 
@@ -160,20 +158,13 @@ class LeadReportSearch extends LeadReport {
 		}
 	}
 
-	public function getAllLeadsIds(Query $query, bool $refresh = false): array {
-		if ($refresh || $this->leadsIds === null) {
-			$query = clone $query;
-			$query->select(LeadReport::tableName() . '.lead_id');
-			$query->distinct();
-			$this->leadsIds = $query->column();
+	private function applyAnswersFilter(ActiveQuery $query): void {
+		if (!empty($this->answersQuestions)) {
+			$query->joinWith('answers');
+			$query->andWhere([
+				'like', LeadAnswer::tableName() . '.answer', $this->answersQuestions,
+			]);
 		}
-		return $this->leadsIds;
-	}
-
-	private function applyAnswersFilter(Query $query): void {
-		$query->andFilterWhere([
-			'like', LeadAnswer::tableName() . '.answer', $this->answersQuestions,
-		]);
 	}
 
 	protected function applyDateFilter(ActiveQuery $query): void {
@@ -277,6 +268,28 @@ class LeadReportSearch extends LeadReport {
 
 	public function getLeadStatusNames(): array {
 		return LeadStatus::getNames();
+	}
+
+	protected const LEAD_ATTRIBUTES = [
+		'lead_name',
+		'lead_phone',
+		'lead_campaign_id',
+		'lead_source_id',
+		'lead_status_id',
+		'lead_type_id',
+	];
+
+	protected function applyLeadJoin(ActiveQuery $query): void {
+		$hasLeadAttribute = false;
+		foreach (static::LEAD_ATTRIBUTES as $attribute) {
+			if (!empty($this->{$attribute})) {
+				$hasLeadAttribute = true;
+				break;
+			}
+		}
+		if ($hasLeadAttribute) {
+			$query->joinWith('lead');
+		}
 	}
 
 }

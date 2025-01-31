@@ -2,11 +2,13 @@
 
 namespace common\modules\lead\controllers;
 
-use Yii;
+use common\helpers\Flash;
+use common\modules\lead\models\forms\MultipleAnswersForm;
 use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\searches\LeadAnswerSearch;
-use yii\web\NotFoundHttpException;
+use Yii;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 
 /**
  * AnswerController implements the CRUD actions for LeadAnswer model.
@@ -92,6 +94,35 @@ class AnswerController extends BaseController {
 
 		return $this->render('update', [
 			'model' => $model,
+		]);
+	}
+
+	public function actionUpdateLead(int $id, int $reportId = null) {
+		$lead = $this->findLead($id);
+		//@todo must add hash
+		$answers = $lead->getAnswers()->andFilterWhere(['report_id' => $reportId])->all();
+		if (empty($answers)) {
+			Flash::add(
+				Flash::TYPE_WARNING,
+				Yii::t('lead', 'Not found any Answers.')
+			);
+			return $this->redirectLead($id);
+		}
+
+		$model = new MultipleAnswersForm($answers);
+
+		if ($model->load(Yii::$app->request->post())) {
+			Yii::warning('load');
+			if ($model->save()) {
+				return $this->redirectLead($id);
+			}
+		} else {
+			Yii::warning('not loead');
+		}
+
+		return $this->render('update-lead', [
+			'model' => $model,
+			'lead' => $lead,
 		]);
 	}
 

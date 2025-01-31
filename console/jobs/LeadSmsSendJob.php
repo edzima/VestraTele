@@ -18,7 +18,7 @@ class LeadSmsSendJob extends SmsSendJob {
 	 * @throws NotSendSmsException|InvalidConfigException
 	 */
 	public function run(): string {
-		$lead = Module::manager()->findById($this->lead_id);
+		$lead = Module::manager()->findById($this->lead_id, true, $this->owner_id);
 		if (!$lead) {
 			throw new InvalidConfigException('Lead not found: ' . $this->lead_id);
 		}

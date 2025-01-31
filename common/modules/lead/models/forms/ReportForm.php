@@ -6,7 +6,6 @@ use common\models\Address;
 use common\models\user\User;
 use common\modules\lead\models\ActiveLead;
 use common\modules\lead\models\LeadAddress;
-use common\modules\lead\models\LeadAnswer;
 use common\modules\lead\models\LeadQuestion;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadStatus;
@@ -14,14 +13,9 @@ use common\modules\lead\models\LeadUser;
 use common\modules\lead\Module;
 use Yii;
 use yii\base\Model;
-use yii\helpers\ArrayHelper;
 
 /**
  * ReportForm Class.
- *
- * @property-read array $closedQuestionsData
- * @property-write array $openAnswers
- * @property-read LeadQuestion[] $openQuestions
  */
 class ReportForm extends Model {
 
@@ -32,8 +26,6 @@ class ReportForm extends Model {
 	public bool $withSameContacts = false;
 	public bool $is_pinned = false;
 
-	public $closedQuestions = [];
-
 	public int $addressType = LeadAddress::TYPE_CUSTOMER;
 	public bool $withAddress = false;
 	public ?Address $address = null;
@@ -43,8 +35,6 @@ class ReportForm extends Model {
 	private ?LeadReport $model = null;
 	/* @var LeadQuestion[] */
 	private ?array $questions = null;
-	/* @var AnswerForm[] */
-	private array $answersModels = [];
 
 	public bool $withAnswers = true;
 	public int $lead_type_id;
@@ -54,8 +44,10 @@ class ReportForm extends Model {
 
 	public $linkUserTypeForLeadNotForReportOwner = LeadUser::TYPE_TELE;
 
+	private ?MultipleAnswersForm $answersForm = null;
+
 	public function setOpenAnswers(array $questionsAnswers): void {
-		$models = $this->getAnswersModels();
+		$models = $this->getAnswersModel()->getAnswersModels();
 		foreach ($questionsAnswers as $question_id => $answer) {
 			$model = $models[$question_id] ?? null;
 			if ($model) {
@@ -70,7 +62,6 @@ class ReportForm extends Model {
 			'details' => Yii::t('lead', 'Details'),
 			'withAddress' => Yii::t('lead', 'With Address'),
 			'withSameContacts' => Yii::t('lead', 'With Same Contacts'),
-			'closedQuestions' => Yii::t('lead', 'Closed Questions'),
 			'leadName' => Yii::t('lead', 'Lead Name'),
 			'is_pinned' => Yii::t('lead', 'Is pinned'),
 			'tele_id' => LeadUser::getTypesNames()[LeadUser::TYPE_TELE],
@@ -99,7 +90,6 @@ class ReportForm extends Model {
 			],
 			[['partner_id', 'tele_id'], 'default', 'value' => null],
 			['status_id', 'in', 'range' => array_keys(static::getStatusNames())],
-			['closedQuestions', 'in', 'range' => array_keys($this->getClosedQuestionsData()), 'allowArray' => true],
 			[
 				'partner_id', 'in', 'range' => array_keys($this->getUsersNames()), 'when' => function (): bool {
 				return $this->withLinkUsers;
@@ -121,7 +111,7 @@ class ReportForm extends Model {
 		if (empty($this->getQuestions())) {
 			return true;
 		}
-		return empty($this->closedQuestions) && $this->allOpenAnswersIsEmpty();
+		return !$this->getAnswersModel()->hasAnswers();
 	}
 
 	/**
@@ -131,72 +121,13 @@ class ReportForm extends Model {
 		return $this->getLead()->getSameContacts(true);
 	}
 
-	private function allOpenAnswersIsEmpty(): ?bool {
-		$models = $this->getAnswersModels();
-		if (empty($models)) {
-			return null;
+	public function getAnswersModel(): MultipleAnswersForm {
+		if ($this->answersForm === null) {
+			//@todo add load answers from report on update
+			$this->answersForm = new MultipleAnswersForm([]);
+			$this->answersForm->questions = $this->getQuestions();
 		}
-		$count = count(array_filter($models, static function (AnswerForm $answerForm): bool {
-			$answerForm->validate();
-			return $answerForm->answer === null;
-		}));
-		return $count === count($models);
-	}
-
-	public function getClosedQuestionsData(): array {
-		return ArrayHelper::map($this->getClosedQuestions(), 'id', 'name');
-	}
-
-	/**
-	 * @return LeadQuestion[]
-	 */
-	public function getOpenQuestions(): array {
-		return array_filter($this->getQuestions(), static function (LeadQuestion $question): bool {
-			return !$question->isClosed();
-		});
-	}
-
-	/**
-	 * @return LeadQuestion[]
-	 */
-	public function getClosedQuestions(): array {
-		return array_filter($this->getQuestions(), static function (LeadQuestion $question): bool {
-			return $question->isClosed();
-		});
-	}
-
-	/**
-	 * @return LeadQuestion[]
-	 */
-	public function getBooleanQuestions(): array {
-		return array_filter($this->getQuestions(), static function (LeadQuestion $question): bool {
-			return $question->is_boolean;
-		});
-	}
-
-	/**
-	 * @return AnswerForm[]
-	 */
-	public function getAnswersModels(): array {
-		if (empty($this->answersModels)) {
-			foreach ($this->getOpenQuestions() as $question) {
-				if ($this->getModel()->isNewRecord
-					|| isset($this->getModel()->answers[$question->id])
-				) {
-					$this->answersModels[$question->id] = $this->getAnswerForm($question);
-				}
-			}
-		}
-		return $this->answersModels;
-	}
-
-	private function getAnswerForm(LeadQuestion $question): AnswerForm {
-		$model = new AnswerForm($question);
-		$answer = $this->getModel()->getAnswer($question->id);
-		if ($answer) {
-			$model->setModel($answer);
-		}
-		return $model;
+		return $this->answersForm;
 	}
 
 	/**
@@ -232,13 +163,6 @@ class ReportForm extends Model {
 					'attributes' => $this->getAttributes(),
 				], __METHOD__ . '.validateModel');
 			}
-			foreach ($this->getAnswersModels() as $model) {
-				if ($model->hasErrors()) {
-					Yii::warning($model->getQuestion()->id);
-					Yii::warning($model->answer);
-					Yii::warning($model->getErrors(), __METHOD__ . '.validateAnswerModel');
-				}
-			}
 			return false;
 		}
 
@@ -268,7 +192,9 @@ class ReportForm extends Model {
 		}
 
 		if ($this->withAnswers) {
-			$this->linkAnswers(!$isNewRecord);
+			$answerForm = $this->getAnswersModel();
+			$answerForm->report_id = $model->id;
+			$answerForm->save();
 		}
 		if ($isNewRecord) {
 			$this->reportSameContacts();
@@ -324,37 +250,6 @@ class ReportForm extends Model {
 		}
 	}
 
-	private function linkAnswers(bool $unlink): void {
-		$model = $this->getModel();
-		if ($unlink) {
-			$model->unlinkAll('answers', true);
-		}
-		foreach ($this->getAnswersModels() as $answer) {
-			$answer->linkReport($model, false);
-		}
-		$this->saveClosedQuestions();
-	}
-
-	private function saveClosedQuestions(): void {
-		if (empty($this->closedQuestions)) {
-			return;
-		}
-		$rows = [];
-		$report_id = $this->getModel()->id;
-		foreach ($this->closedQuestions as $question_id) {
-			$rows[] = [
-				'report_id' => $report_id,
-				'question_id' => $question_id,
-			];
-		}
-		if (!empty($rows)) {
-			LeadAnswer::getDb()
-				->createCommand()
-				->batchInsert(LeadAnswer::tableName(), ['report_id', 'question_id'], $rows)
-				->execute();
-		}
-	}
-
 	public function load($data, $formName = null, $answersFormName = null, $addressFormName = null): bool {
 		return parent::load($data, $formName)
 			&& $this->loadAnswers($data, $answersFormName)
@@ -362,11 +257,7 @@ class ReportForm extends Model {
 	}
 
 	private function loadAnswers($data, $formName = null): bool {
-		$models = $this->getAnswersModels();
-		if (empty($models)) {
-			return true;
-		}
-		return AnswerForm::loadMultiple($models, $data, $formName);
+		return $this->getAnswersModel()->load($data, $formName);
 	}
 
 	private function loadAddress($data, $formName = null): bool {
@@ -375,7 +266,7 @@ class ReportForm extends Model {
 
 	public function validate($attributeNames = null, $clearErrors = true): bool {
 		return parent::validate($attributeNames, $clearErrors)
-			&& AnswerForm::validateMultiple($this->getAnswersModels())
+			&& $this->getAnswersModel()->validate($attributeNames, $clearErrors)
 			&& ($this->withAddress ? $this->getAddress()->validate() : true);
 	}
 
@@ -412,11 +303,6 @@ class ReportForm extends Model {
 		$this->owner_id = $model->owner_id;
 		$this->details = $model->details;
 		$this->is_pinned = $model->is_pinned;
-		$this->setAnswers($model->answers);
-	}
-
-	public function setAnswers(array $answers): void {
-		$this->setClosedAnswers($answers);
 	}
 
 	public function getTeleUsersNames(): array {
@@ -425,24 +311,11 @@ class ReportForm extends Model {
 		);
 	}
 
-	protected function setClosedAnswers(array $answers): void {
-		$closed = $this->getClosedQuestions();
-		foreach ($answers as $answer) {
-			if (isset($closed[$answer->question_id])) {
-				$this->closedQuestions[] = $answer->question_id;
-			}
-		}
-	}
-
 	public function getAddress(): Address {
 		if ($this->address === null) {
 			$this->address = new Address();
 		}
 		return $this->address;
-	}
-
-	public static function getStatusNames(): array {
-		return LeadStatus::getNames();
 	}
 
 	private function saveAddress(): bool {
@@ -454,4 +327,9 @@ class ReportForm extends Model {
 		}
 		return true;
 	}
+
+	public static function getStatusNames(): array {
+		return LeadStatus::getNames();
+	}
+
 }

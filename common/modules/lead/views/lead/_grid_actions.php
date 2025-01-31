@@ -4,14 +4,20 @@ use backend\widgets\CsvForm;
 use common\helpers\Html;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\lead\controllers\LeadController;
 use common\modules\lead\models\searches\LeadSearch;
+use yii\helpers\Json;
 
 /* @var $this yii\web\View */
 /* @var $searchModel LeadSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $assignUsers bool */
 $dataProvider->getModels();
+$count = $dataProvider->getTotalCount();
 
+$params = [
+	LeadController::LEADS_SEARCH_QUERY_PARAM => Json::encode(Yii::$app->request->queryParams),
+];
 ?>
 
 
@@ -30,20 +36,17 @@ $dataProvider->getModels();
 				'aria-label' => Yii::t('lead', 'Update'),
 			])
 		?>
-		<?= $dataProvider->pagination->pageCount > 1
+		<?= ($dataProvider->pagination->pageCount > 1)
 			? Html::a(
-				count($searchModel->getAllIds($dataProvider->query)),
-
+				$count,
 				['lead/update-multiple'],
 				[
 					'class' => 'btn btn-info',
 					'data' => [
-						'title' => Yii::t('lead', 'Update ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
-						'aria-label' => Yii::t('lead', 'Update ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
+						'title' => Yii::t('lead', 'Update ({ids})', ['ids' => $count]),
+						'aria-label' => Yii::t('lead', 'Update ({ids})', ['ids' => $count]),
 						'method' => 'POST',
-						'params' => [
-							'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-						],
+						'params' => $params,
 					],
 				])
 			: ''
@@ -65,18 +68,15 @@ $dataProvider->getModels();
 	?>
 	<?= $dataProvider->pagination->pageCount > 1
 		? Html::a(
-			count($searchModel->getAllIds($dataProvider->query)),
-
+			$count,
 			['campaign/assign'],
 			[
 				'class' => 'btn btn-warning',
 				'data' => [
-					'title' => Yii::t('lead', 'Campaign ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
-					'aria-label' => Yii::t('lead', 'Campaign ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
+					'title' => Yii::t('lead', 'Campaign ({ids})', ['ids' => $count]),
+					'aria-label' => Yii::t('lead', 'Campaign ({ids})', ['ids' => $count]),
 					'method' => 'POST',
-					'params' => [
-						'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-					],
+					'params' => $params,
 				],
 			])
 		: ''
@@ -99,17 +99,15 @@ $dataProvider->getModels();
 		?>
 		<?= $dataProvider->pagination->pageCount > 1
 			? Html::a(
-				count($searchModel->getAllIds($dataProvider->query)),
+				$count,
 				['user/assign'],
 				[
 					'class' => 'btn btn-info',
-					'title' => Yii::t('lead', 'Link Users ({count})', ['count' => count($searchModel->getAllIds($dataProvider->query))]),
-					'aria-label' => Yii::t('lead', 'Link Users ({count})', ['count' => count($searchModel->getAllIds($dataProvider->query))]),
+					'title' => Yii::t('lead', 'Link Users ({count})', ['count' => $count]),
+					'aria-label' => Yii::t('lead', 'Link Users ({count})', ['count' => $count]),
 					'data' => [
 						'method' => 'POST',
-						'params' => [
-							'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-						],
+						'params' => $params,
 					],
 				])
 			: ''
@@ -135,18 +133,15 @@ $dataProvider->getModels();
 		?>
 		<?= $dataProvider->pagination->pageCount > 1
 			? Html::a(
-				count($searchModel->getAllIds($dataProvider->query)),
-
+				$count,
 				['status/change'],
 				[
 					'class' => 'btn btn-warning',
+					'title' => Yii::t('lead', 'Change Status ({ids})', ['ids' => $count]),
+					'aria-label' => Yii::t('lead', 'Change Status ({ids})', ['ids' => $count]),
 					'data' => [
-						'title' => Yii::t('lead', 'Change Status ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
-						'aria-label' => Yii::t('lead', 'Change Status ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
 						'method' => 'POST',
-						'params' => [
-							'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-						],
+						'params' => $params,
 					],
 				])
 			: ''
@@ -169,18 +164,16 @@ $dataProvider->getModels();
 		?>
 		<?= $dataProvider->pagination->pageCount > 1
 			? Html::a(
-				count($searchModel->getAllIds($dataProvider->query)),
-
+				$count,
 				['source/change'],
 				[
 					'class' => 'btn btn-warning',
+					'title' => Yii::t('lead', 'Change Source ({ids})', ['ids' => $count]),
+					'aria-label' => Yii::t('lead', 'Change Source ({ids})', ['ids' => $count]),
 					'data' => [
-						'title' => Yii::t('lead', 'Change Source ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
-						'aria-label' => Yii::t('lead', 'Change Source ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
+
 						'method' => 'POST',
-						'params' => [
-							'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-						],
+						'params' => $params,
 					],
 				])
 			: ''
@@ -205,23 +198,21 @@ $dataProvider->getModels();
 
 		<?= $dataProvider->pagination->pageCount > 1
 			? Html::a(
-				count($searchModel->getAllIds($dataProvider->query)), [
+				$count, [
 				'sms/push-multiple',
 			],
-				count($searchModel->getAllIds($dataProvider->query)) < 6000
+				$count < 6000
 					? [
 					'data' => [
 						'method' => 'POST',
-						'params' => [
-							'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-						],
+						'params' => $params,
 					],
 					'class' => 'btn btn-primary',
 					'title' => Yii::t('lead', 'Send SMS: {count}', [
-						'count' => count($searchModel->getAllIds($dataProvider->query)),
+						'count' => $count,
 					]),
 					'aria-label' => Yii::t('lead', 'Send SMS: {count}', [
-						'count' => count($searchModel->getAllIds($dataProvider->query)),
+						'count' => $count,
 					]),
 				]
 					: [
@@ -254,18 +245,16 @@ $dataProvider->getModels();
 		<?= $dataProvider->pagination->pageCount > 1
 
 			? Html::a(
-				count($searchModel->getAllIds($dataProvider->query)),
+				$count,
 				['dialer/create-multiple'],
 				[
 					'class' => 'btn btn-primary',
-					'title' => Yii::t('lead', 'Assign to Dialer ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
-					'aria-label' => Yii::t('lead', 'Assign to Dialer ({ids})', ['ids' => count($searchModel->getAllIds($dataProvider->query))]),
+					'title' => Yii::t('lead', 'Assign to Dialer ({ids})', ['ids' => $count]),
+					'aria-label' => Yii::t('lead', 'Assign to Dialer ({ids})', ['ids' => $count]),
 
 					'data' => [
 						'method' => 'POST',
-						'params' => [
-							'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-						],
+						'params' => $params,
 					],
 				])
 			: ''
@@ -290,17 +279,15 @@ $dataProvider->getModels();
 
 		<?= $dataProvider->pagination->pageCount > 1
 			? Html::a(
-				count($searchModel->getAllIds($dataProvider->query)),
+				$count,
 				['market/create-multiple'],
 				[
 					'class' => 'btn btn-success',
-					'title' => Yii::t('lead', 'Move to Market ({count})', ['count' => count($searchModel->getAllIds($dataProvider->query))]),
-					'aria-label' => Yii::t('lead', 'Move to Market ({count})', ['count' => count($searchModel->getAllIds($dataProvider->query))]),
+					'title' => Yii::t('lead', 'Move to Market ({count})', ['count' => $count]),
+					'aria-label' => Yii::t('lead', 'Move to Market ({count})', ['count' => $count]),
 					'data' => [
 						'method' => 'POST',
-						'params' => [
-							'leadsIds' => $searchModel->getAllIds($dataProvider->query),
-						],
+						'params' => $params,
 					],
 				])
 			: ''
@@ -325,7 +312,7 @@ $dataProvider->getModels();
 	<div class="btn-group pull-right">
 		<?= Html::a(
 			'<i class="fa fa-trash" aria-hidden="true"></i>',
-			['delete-multiple', 'ids' => $dataProvider->getKeys()],
+			['delete-multiple'],
 			[
 				'class' => 'btn btn-danger',
 				'title' => Yii::t('lead', 'Delete'),
@@ -339,18 +326,19 @@ $dataProvider->getModels();
 
 		<?= $dataProvider->pagination->pageCount > 1
 			? Html::a(
-				count($searchModel->getAllIds($dataProvider->query)),
-				['lead/delete-multiple', 'ids' => $searchModel->getAllIds($dataProvider->query)],
+				$count,
+				['lead/delete-multiple'],
 				[
 					'class' => 'btn btn-danger',
 					'title' => Yii::t('lead', 'Delete ({count})', [
-						'count' => $dataProvider->getTotalCount(),
+						'count' => $count,
 					]),
 					'aria-label' => Yii::t('lead', 'Delete ({count})', [
-						'count' => $dataProvider->getTotalCount(),
+						'count' => $count,
 					]),
 					'data' => [
 						'method' => 'POST',
+						'params' => $params,
 						'confirm' => Yii::t('lead', 'Are you sure you want to delete this items?'),
 					],
 				])

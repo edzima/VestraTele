@@ -17,6 +17,7 @@ use yii\widgets\DetailView;
 /* @var $updateLink bool */
 /* @var $visibleCustomerLink bool */
 /* @var $withType bool */
+/* @var $withReportBtn bool */
 ?>
 
 <div class="same-contact-lead">
@@ -30,16 +31,18 @@ use yii\widgets\DetailView;
 
 	<p>
 
-		<?= Html::a(Yii::t('lead', 'Create Lead Report'),
-			['/lead/report/report', 'id' => $model->getId(), 'hash' => $model->getHash()],
-			[
-				'class' => 'btn btn-success',
-			])
+		<?= $withReportBtn
+			? Html::a(Yii::t('lead', 'Create Lead Report'),
+				['/lead/report/report', 'id' => $model->getId(), 'hash' => $model->getHash()],
+				[
+					'class' => 'btn btn-success',
+				])
+			: ''
 		?>
 
 		<?= !$model->isForUser(Yii::$app->user->getId())
 			? CopyLeadBtnWidget::widget([
-				'leadId' => $model->getId(),
+				'lead' => $model,
 			])
 			: ''
 		?>

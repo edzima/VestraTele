@@ -15,11 +15,11 @@ use common\modules\lead\models\forms\ReportForm;
 use common\modules\lead\models\Lead;
 use common\modules\lead\models\LeadReport;
 use common\modules\lead\models\LeadSource;
+use common\modules\lead\models\LeadStatus;
 use common\modules\lead\models\LeadStatusInterface;
 use common\modules\lead\models\LeadType;
 use common\modules\lead\models\searches\LeadNameSearch;
 use common\modules\lead\models\searches\LeadPhoneSearch;
-use common\modules\lead\models\searches\LeadSearch;
 use common\modules\lead\Module;
 use common\modules\reminder\models\ReminderQuery;
 use Yii;
@@ -58,14 +58,7 @@ class LeadController extends BaseController {
 	 * @return mixed
 	 */
 	public function actionIndex(int $pageSize = 50) {
-		$searchModel = new LeadSearch();
-		if ($this->module->onlyUser) {
-			if (Yii::$app->user->getIsGuest()) {
-				return Yii::$app->user->loginRequired();
-			}
-			$searchModel->setScenario(LeadSearch::SCENARIO_USER);
-			$searchModel->user_id = Yii::$app->user->getId();
-		}
+		$searchModel = $this->getLeadsSearchModel();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		$dataProvider->pagination->defaultPageSize = $pageSize;
@@ -191,20 +184,7 @@ class LeadController extends BaseController {
 	}
 
 	public function actionUpdateMultiple(array $ids = []) {
-		if (empty($ids)) {
-			$postIds = Yii::$app->request->post('leadsIds');
-			if (is_string($postIds)) {
-				$postIds = explode(',', $postIds);
-			}
-			if ($postIds) {
-				$ids = $postIds;
-			}
-		}
-		if (empty($ids)) {
-			Flash::add(Flash::TYPE_WARNING, 'Ids cannot be blank.');
-			return $this->redirect(['index']);
-		}
-		$ids = array_unique($ids);
+		$this->ensureLeadsIds($ids);
 		if (count($ids) === 1) {
 			return $this->redirect(['update', 'id' => reset($ids)]);
 		}
@@ -371,6 +351,42 @@ class LeadController extends BaseController {
 		]);
 	}
 
+	public function actionCreateFromType(int $id) {
+		$type = LeadType::findOne($id);
+		if ($type === null) {
+			throw new NotFoundHttpException();
+		}
+		$model = new LeadForm();
+		$model->typeId = $id;
+		$model->status_id = LeadStatus::STATUS_NEW;
+		if ($this->module->onlyUser) {
+			$model->setScenario(LeadForm::SCENARIO_OWNER);
+			$model->owner_id = Yii::$app->user->getId();
+		}
+		$model->date_at = date($model->dateFormat);
+		$report = new ReportForm();
+		$report->lead_type_id = $id;
+		$report->status_id = LeadStatusInterface::STATUS_NEW;
+		$report->owner_id = Yii::$app->user->getId();
+		if ($model->load(Yii::$app->request->post())
+			&& $report->load(Yii::$app->request->post())
+			&& $model->validate()
+			&& $report->validate()) {
+			$lead = $this->module->manager->pushLead($model);
+			if ($lead) {
+				$report->setLead($lead, false);
+				Flash::add(Flash::TYPE_SUCCESS, Yii::t('lead', 'Success create Lead.'));
+				$report->save(false);
+				return $this->redirect(['view', 'id' => $lead->getId()]);
+			}
+		}
+		return $this->render('create-from-type', [
+			'model' => $model,
+			'report' => $report,
+			'type' => $type,
+		]);
+	}
+
 	public function actionCreateFromSource(int $id, string $phone = null) {
 		$model = new LeadForm();
 		$model->source_id = $id;
@@ -406,12 +422,13 @@ class LeadController extends BaseController {
 		]);
 	}
 
-	public function actionCopy(int $id, int $typeId) {
+	public function actionCopy(int $id, int $typeId, string $hash) {
 		if (!isset(LeadType::getModels()[$typeId])) {
 			throw new NotFoundHttpException();
 		}
 		$type = LeadType::getModels()[$typeId];
 		$lead = $this->findLead($id, false);
+		$this->validateHash($lead, $hash);
 		$model = new LeadForm();
 		$model->scenario = LeadForm::SCENARIO_OWNER;
 		$model->setLead($lead);
@@ -420,6 +437,7 @@ class LeadController extends BaseController {
 		$model->provider = Lead::PROVIDER_COPY;
 		$model->date_at = date($model->dateFormat);
 		$model->owner_id = Yii::$app->user->getId();
+		$model->source_id = null;
 		$report = new ReportForm();
 		$report->setLead($lead, true);
 		$report->withSameContacts = false;
@@ -497,11 +515,9 @@ class LeadController extends BaseController {
 		return $this->redirect(['index']);
 	}
 
-	public function actionDeleteMultiple(array $ids) {
-		$selection = Yii::$app->request->post('selection');
-		if (is_array($selection)) {
-			$ids = $selection;
-		}
+	public function actionDeleteMultiple(array $ids = []) {
+		$this->ensureLeadsIds($ids);
+		return $this->renderContent(Html::dump($ids));
 
 		if (!empty($ids)) {
 			$count = Lead::deleteAll(['id' => $ids]);
