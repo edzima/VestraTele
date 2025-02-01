@@ -178,7 +178,7 @@ class LawsuitController extends Controller {
 			}
 		}
 		return $this->render('view', [
-			'model' => $this->findModel($id),
+			'model' => $model,
 			'lawsuitDetails' => $lawsuitDetails,
 		]);
 	}

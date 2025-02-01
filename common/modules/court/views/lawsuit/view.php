@@ -134,6 +134,7 @@ YiiAsset::register($this);
 				'dataProvider' => new ActiveDataProvider([
 					'query' => $model->getIssues()
 						->with('customer')
+						->with('tags.tagType')
 						->with('entityResponsible'),
 				]),
 				'summary' => false,
