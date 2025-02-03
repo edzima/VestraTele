@@ -105,19 +105,13 @@ class m250127_130311_lawsuit_sessions extends Migration {
 			->batch() as $rows) {
 
 			foreach ($rows as $row) {
-				$updateColumns = [
-					'room' => $row['room'],
-					'due_at' => $row['date_at'],
-					'presence_of_the_claimant' => $row['presence_of_the_claimant'],
-					'url' => $row['url'],
-					'location' => $row['location'],
-				];
 				$insertColumns = [
 					'room' => $row['room'],
 					'due_at' => $row['date_at'],
 					'presence_of_the_claimant' => $row['presence_of_the_claimant'],
 					'url' => $row['url'],
 					'location' => $row['location'],
+					'id' => $row['lawsuit_id'],
 				];
 				$updateColumns = $insertColumns;
 				unset($updateColumns['id']);
