@@ -125,6 +125,7 @@ $agentsNamesWithCount = [];
 $agentsIds = ArrayHelper::getColumn($agentData, 'user_id');
 if (!empty($agentsIds)) {
 	$agentsNames = User::getSelectList($agentsIds, false);
+	$agentsNames = ArrayHelper::shortNames($agentsNames);
 	foreach ($agentData as $data) {
 		$agentId = $data['user_id'];
 		$agentName = $agentsNames[$agentId];
@@ -233,6 +234,11 @@ if (!empty($agentsIds)) {
 				],
 				'options' => [
 					'labels' => $agentChartData['labels'],
+					'xaxis' => [
+						'labels' => [
+							'rotateAlways' => true,
+						],
+					],
 					'plotOptions' => [
 						'bar' => [
 							'dataLabels' => [
@@ -241,10 +247,12 @@ if (!empty($agentsIds)) {
 								],
 							],
 						],
+
 					],
 					'stroke' => [
 						'width' => 0,
 					],
+
 				],
 				'containerOptions' => [
 					'class' => 'col-sm-12 col-md-8',
