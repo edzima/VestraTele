@@ -4,6 +4,7 @@ use backend\widgets\IssueTypeLeftNavWidget;
 use backend\widgets\Menu;
 use common\models\user\User;
 use common\models\user\Worker;
+use common\modules\court\modules\spi\Module;
 use yii\web\View;
 
 /* @var $this View */
@@ -271,6 +272,12 @@ $typesItems = $typesNav->getItems();
 					'options' => ['class' => 'treeview'],
 					'visible' => $user->can(Worker::PERMISSION_LAWSUIT),
 					'items' => [
+						[
+							'label' => Yii::t('court', 'Notification'),
+							'url' => ['/court/spi/notification/index'],
+							'icon' => '<i class="fa fa-bell"></i>',
+							'visible' => $user->can(Module::PERMISSION_SPI_LAWSUIT_DETAIL),
+						],
 						[
 							'label' => Yii::t('common', 'Browse'),
 							'url' => ['/court/lawsuit/index'],

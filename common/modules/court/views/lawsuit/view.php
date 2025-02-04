@@ -75,9 +75,7 @@ YiiAsset::register($this);
 				],
 			]) ?>
 
-			<?php if ($lawsuitDetails): ?>
-				<?= $this->render('_spi_lawsuit_view', ['model' => $lawsuitDetails,]) ?>
-			<?php endif; ?>
+
 		</div>
 
 		<div class="col-md-7">
@@ -200,6 +198,15 @@ YiiAsset::register($this);
 				'notes' => $model->getNotes()->all(),
 			]) ?>
 		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-sm-12">
+			<?php if ($lawsuitDetails): ?>
+				<?= $this->render('_spi_lawsuit_view', ['model' => $lawsuitDetails,]) ?>
+			<?php endif; ?>
+		</div>
+
 	</div>
 
 

@@ -36,14 +36,18 @@ class Module extends BaseModule {
 			}
 			$this->setModule(static::SPI_MODULE_NAME, $config);
 			Yii::$app->on(
-				NotificationController::EVENT_AFTER_ACTION, function (ActionEvent $event) {
-				$action = $event->action;
-				if ($action->id === 'read') {
-					$route = $action->controller->actionParams;
-					array_unshift($route, '/court/lawsuit/read-spi-notification');
-					return $action->controller->redirect($route);
+				NotificationController::EVENT_AFTER_ACTION,
+				function (ActionEvent $event) {
+					$action = $event->action;
+					if (
+						$action->controller->id === 'notification' &&
+						($action->id === 'read' || $action->id === 'view')
+					) {
+						$route = $action->controller->actionParams;
+						array_unshift($route, '/court/lawsuit/read-spi-notification');
+						return $action->controller->redirect($route);
+					}
 				}
-			}
 			);
 		}
 	}

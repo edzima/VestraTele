@@ -110,6 +110,13 @@ class LawsuitController extends Controller {
 				'appeal' => $appeal,
 			]);
 		}
+		if ($dataProvider->getTotalCount() === 1) {
+			$models = $dataProvider->getModels();
+			$model = reset($models);
+			return $this->redirect([
+				'view', 'id' => $model->id,
+			]);
+		}
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,

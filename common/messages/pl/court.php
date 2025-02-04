@@ -50,4 +50,5 @@ return [
 	'Create Issue Note for Lawsuit: {signature}' => 'Dodaj Notatkę do Sprawyy: {signature}',
 	'Link {issue} to {lawsuit}' => 'Dodaj {issue} do Sprawy: {lawsuit}',
 	'Lawsuit: {signature_act} already exist in Court' => 'Sprawa: {signature_act} już istnieje.',
+	'Notification' => 'Powiadomienia',
 ];
