@@ -420,6 +420,14 @@ div:target {
 	color: #333;
 }
 
+.filter-calendar .filter-group h3 {
+	font-size: 2rem;
+}
+
+.filter-calendar .filter-group .nav-pills a.nav-link {
+	font-size: 1.25rem;
+	padding: 0.8rem;
+}
 
 
 

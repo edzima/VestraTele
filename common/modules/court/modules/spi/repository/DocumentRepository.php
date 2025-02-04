@@ -5,7 +5,7 @@ namespace common\modules\court\modules\spi\repository;
 use common\modules\court\modules\spi\entity\document\DocumentInnerViewDto;
 use yii\data\DataProviderInterface;
 
-class DocumentRepository extends BaseRepository {
+class DocumentRepository extends BaseRepository implements ByLawsuitRepository {
 
 	protected function route(): string {
 		return 'documents';
@@ -25,9 +25,9 @@ class DocumentRepository extends BaseRepository {
 		return null;
 	}
 
-	public function getLawsuitDocuments(int $lawsuitId): DataProviderInterface {
+	public function getByLawsuit(int $id): DataProviderInterface {
 		$params = [
-			'lawsuitId.equals' => $lawsuitId,
+			'lawsuitId.equals' => $id,
 		];
 		return $this->getDataProvider($params);
 	}

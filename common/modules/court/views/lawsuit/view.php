@@ -108,6 +108,8 @@ YiiAsset::register($this);
 						'noWrap' => true,
 					],
 					'details:ntext',
+					'created_at:datetime',
+					'updated_at:datetime',
 					[
 						'class' => ActionColumn::class,
 						'controller' => 'lawsuit-session',

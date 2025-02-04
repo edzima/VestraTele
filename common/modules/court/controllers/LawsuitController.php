@@ -3,14 +3,17 @@
 namespace common\modules\court\controllers;
 
 use common\components\message\MessageTemplate;
+use common\helpers\ArrayHelper;
 use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
 use common\models\message\IssueLawsuitSmsForm;
 use common\modules\court\models\Lawsuit;
 use common\modules\court\models\LawsuitIssueForm;
+use common\modules\court\models\LawsuitSession;
 use common\modules\court\models\search\LawsuitSearch;
 use common\modules\court\Module;
+use common\modules\court\modules\spi\entity\lawsuit\LawsuitSessionDTO;
 use common\modules\court\widgets\LawsuitSmsBtnWidget;
 use Yii;
 use yii\filters\VerbFilter;
@@ -170,6 +173,7 @@ class LawsuitController extends Controller {
 					->getRepositoryManager()
 					->getLawsuits();
 
+				$this->view->params['appeal'] = $appeal;
 				$repository->setAppeal($appeal);
 				$lawsuitDetails = $repository
 					->findBySignature(
@@ -181,6 +185,87 @@ class LawsuitController extends Controller {
 			'model' => $model,
 			'lawsuitDetails' => $lawsuitDetails,
 		]);
+	}
+
+	public function actionUpdateSpi(int $id) {
+		$model = $this->findModel($id);
+
+		if (!empty($model->signature_act)
+			&& Yii::$app->user->can(Module::PERMISSION_SPI_LAWSUIT_DETAIL)
+			&& $this->module->spi !== null
+		) {
+			$appeal = $model->court->getSPIAppealWithParents();
+			if (!$appeal) {
+				Yii::warning(
+					Yii::t('court', 'Not found SPI Appeal for Court: {court}.', [
+							'court' => $model->court,
+						]
+					)
+				);
+			} else {
+				$lawsuitRepository = $this->module->spi
+					->getRepositoryManager()
+					->getLawsuits();
+				$lawsuitRepository->setAppeal($appeal);
+
+				$lawsuitDetails = $lawsuitRepository
+					->findBySignature(
+						$model->signature_act,
+					);
+				if ($lawsuitDetails === null) {
+					throw new NotFoundHttpException();
+				}
+
+				$repository = $this->module->spi
+					->getRepositoryManager()
+					->getCourtSessions();
+				$repository->setAppeal($appeal);
+				$dataProvider = $repository->getLawsuitDataProvider($lawsuitDetails->id);
+				$data = [];
+				foreach ($dataProvider->getModels() as $session) {
+					/**
+					 * @var LawsuitSessionDTO $session
+					 */
+					$data[] = [
+						'lawsuit_id' => $model->id,
+						'room' => $session->room,
+						'date_at' => date(DATE_ATOM, strtotime($session->date)),
+						'created_at' => date(DATE_ATOM, strtotime($session->createdDate)),
+						'updated_at' => date(DATE_ATOM, strtotime($session->modificationDate)),
+					];
+				}
+				if (!empty($data)) {
+					$shouldUpdate = true;
+					if (count($data) !== count($model->sessions)) {
+						$shouldUpdate = true;
+					} else {
+						$lastExisted = max(ArrayHelper::getColumn($model->sessions, 'updated_at'));
+						$lastCurrent = max(ArrayHelper::getColumn($data, 'updated_at'));
+						if (strtotime($lastCurrent) !== strtotime($lastExisted)) {
+							$shouldUpdate = true;
+						}
+					}
+					if ($shouldUpdate) {
+						LawsuitSession::deleteAll([
+							'lawsuit_id' => $model->id,
+						]);
+						LawsuitSession::getDb()
+							->createCommand()
+							->batchInsert(
+								LawsuitSession::tableName(),
+								[
+									'lawsuit_id',
+									'room',
+									'date_at',
+									'created_at',
+									'updated_at',
+								],
+								$data)
+							->execute();
+					}
+				}
+			}
+		}
 	}
 
 	/**

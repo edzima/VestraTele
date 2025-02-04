@@ -42,6 +42,20 @@ class RepositoryManager extends Component {
 		'class' => ApplicationsRepository::class,
 	];
 
+	/**
+	 * @var string|array|callable
+	 */
+	public $courtSessions = [
+		'class' => CourtSessionsRepository::class,
+	];
+
+	/**
+	 * @var string|array|callable
+	 */
+	public $proceedings = [
+		'class' => ProceedingsRepository::class,
+	];
+
 	public function init(): void {
 		$this->api = Instance::ensure(
 			$this->api,
@@ -80,6 +94,16 @@ class RepositoryManager extends Component {
 	public function getDocuments(): DocumentRepository {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return Yii::createObject($this->mergeWithCommonConfig($this->document), [$this->api]);
+	}
+
+	public function getCourtSessions(): CourtSessionsRepository {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
+		return Yii::createObject($this->mergeWithCommonConfig($this->courtSessions), [$this->api]);
+	}
+
+	public function getProceedings(): ProceedingsRepository {
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
+		return Yii::createObject($this->mergeWithCommonConfig($this->proceedings), [$this->api]);
 	}
 
 }

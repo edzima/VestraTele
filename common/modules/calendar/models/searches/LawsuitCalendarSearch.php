@@ -4,7 +4,8 @@ namespace common\modules\calendar\models\searches;
 
 use common\modules\calendar\models\LawsuitEvent;
 use common\modules\court\models\Court;
-use common\modules\court\models\Lawsuit;
+use common\modules\court\models\LawsuitSession;
+use common\modules\court\models\query\LawsuitQuery;
 use Yii;
 use yii\base\Model;
 
@@ -49,6 +50,24 @@ class LawsuitCalendarSearch extends Model {
 		];
 	}
 
+	public static function getIsCanceledFilter(): array {
+		return [
+			[
+				'value' => 1,
+				'isActive' => true,
+				'label' => Yii::t('yii', 'Yes'),
+				'color' => '#df2424',
+			],
+			[
+				'value' => 0,
+				'isActive' => true,
+				'label' => Yii::t('yii', 'No'),
+				'color' => '#3788d8',
+			],
+		];
+	}
+
+
 	public static function getCourtFilters(): array {
 		$data = [];
 		$data[] = [
@@ -88,22 +107,28 @@ class LawsuitCalendarSearch extends Model {
 	}
 
 	public function getEventsData(): array {
-		$query = Lawsuit::find()
+		$query = LawsuitSession::find()
+			->with('lawsuit')
+			->with('lawsuit.issues')
 			->andWhere([
-				'>=', 'due_at', $this->startAt,
+				'>=', 'date_at', $this->startAt,
 			])
 			->andWhere([
-				'<=', 'due_at', $this->endAt,
+				'<=', 'date_at', $this->endAt,
 			]);
 
 		if (!empty($this->issueUserIds)) {
-			$query->usersIssues($this->issueUserIds);
+			$query->joinWith([
+				'lawsuit' => function (LawsuitQuery $query) {
+					$query->usersIssues($this->issueUserIds);
+				},
+			]);
 		}
-		$query->groupBy([Lawsuit::tableName() . '.id']);
+		$query->groupBy([LawsuitSession::tableName() . '.id']);
 		$data = [];
 		foreach ($query->all() as $model) {
 			$event = new LawsuitEvent();
-			$event->setModel($model);
+			$event->setSession($model);
 			$data[] = $event->toArray();
 		}
 		return $data;

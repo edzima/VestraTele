@@ -18,7 +18,7 @@ class CourtSessionsTest extends BaseRepositoryTest {
 		$id = LawsuitRepositoryTest::TEST_LAWSUIT_ID;
 
 		$repository = $this->repository;
-		$dataProvider = $repository->getLawsuitDataProvider($id);
+		$dataProvider = $repository->getByLawsuit($id);
 		$this->tester->assertNotEmpty($dataProvider->getModels());
 		foreach ($dataProvider->getModels() as $model) {
 			$this->tester->assertInstanceOf(LawsuitSessionDTO::class, $model);

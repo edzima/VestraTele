@@ -496,3 +496,13 @@ div:target {
 .lead-from-market {
 	opacity: 0.8;
 }
+
+
+.filter-calendar .filter-group h3 {
+	font-size: 2rem;
+}
+
+.filter-calendar .filter-group .nav-pills a.nav-link {
+	font-size: 1.25rem;
+	padding: 0.8rem;
+}
