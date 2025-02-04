@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 			]) ?>
 
 			<?= Html::a(Html::icon('trash'), ['index'], [
-				'data-method' => 'post',
+				'data-method' => 'DELETE',
 				'class' => 'btn btn-danger pull-right',
 			]) ?>
 		<?php else: ?>
