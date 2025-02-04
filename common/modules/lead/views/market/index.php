@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => 'btn btn-success',
 			]) ?>
 
-			<?= Html::a(Html::icon('trash'), ['index'], [
+			<?= Html::a(Html::icon('trash'), false, [
 				'data-method' => 'DELETE',
 				'class' => 'btn btn-danger pull-right',
 			]) ?>
