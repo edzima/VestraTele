@@ -11,7 +11,7 @@ class LawsuitSessionDTO extends Model {
 	public string $signature;
 	public ?int $court;
 	public string $date;
-	public string $room;
+	public ?string $room;
 	public string $procedure;
 	public string $judge;
 	public string $subject;

@@ -3,6 +3,7 @@
 use common\widgets\GridView;
 use yii\data\DataProviderInterface;
 
+/** @see LawsuitSessionDTO */
 /** @var DataProviderInterface $dataProvider */
 
 ?>
@@ -11,6 +12,7 @@ use yii\data\DataProviderInterface;
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'columns' => [
+			'result',
 			'date:datetime',
 			'room',
 			'judge',

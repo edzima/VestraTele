@@ -4,6 +4,7 @@ namespace common\modules\court\modules\spi\helpers;
 
 use Closure;
 use common\modules\court\modules\spi\components\SPIApi;
+use ReflectionClass;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
@@ -141,4 +142,25 @@ class ApiDataProvider extends BaseDataProvider {
 		parent::refresh();
 	}
 
+	public function setSort($value) {
+		parent::setSort($value);
+		if ($this->modelClass && ($sort = $this->getSort()) !== false) {
+			$modelClass = $this->modelClass;
+			$reflection = new ReflectionClass($modelClass);
+			if ($reflection->isSubclassOf(Model::class)) {
+				$model = $modelClass::instance();
+				if (empty($sort->attributes)) {
+					foreach ($model->attributes() as $attribute) {
+						$sort->attributes[$attribute] = [
+							'asc' => [$attribute => SORT_ASC],
+							'desc' => [$attribute => SORT_DESC],
+						];
+					}
+				}
+				if ($sort->modelClass === null) {
+					$sort->modelClass = $modelClass;
+				}
+			}
+		}
+	}
 }
