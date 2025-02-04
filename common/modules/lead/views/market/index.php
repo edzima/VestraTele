@@ -26,6 +26,11 @@ $this->params['breadcrumbs'][] = $this->title;
 			<?= Html::a(Yii::t('lead', 'Market Users'), ['market-user/index',], [
 				'class' => 'btn btn-success',
 			]) ?>
+
+			<?= Html::a(Html::icon('trash'), ['index'], [
+				'data-method' => 'post',
+				'class' => 'btn btn-danger pull-right',
+			]) ?>
 		<?php else: ?>
 			<?= Html::a(Yii::t('lead', 'Access Request to self Market'), ['market-user/self-market',], [
 				'class' => 'btn btn-warning',
@@ -34,6 +39,8 @@ $this->params['breadcrumbs'][] = $this->title;
 			<?= Html::a(Yii::t('lead', 'Self Access Request'), ['market-user/self',], [
 				'class' => 'btn btn-success',
 			]) ?>
+
+
 		<?php endif; ?>
 
 	</p>

@@ -66,8 +66,14 @@ class MarketController extends BaseController {
 		if ($this->module->onlyUser) {
 			return $this->redirect(['user']);
 		}
+
 		$searchModel = new LeadMarketSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		if (Yii::$app->request->isDelete) {
+			LeadMarket::deleteAll($dataProvider->query->where);
+
+			return $this->refresh();
+		}
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,
