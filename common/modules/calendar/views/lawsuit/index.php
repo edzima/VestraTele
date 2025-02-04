@@ -35,10 +35,16 @@ $filterGroups[] = [
 	'filteredPropertyName' => 'has_url',
 	'filters' => LawsuitCalendarSearch::getHasURLFilter(),
 ];
+$filterGroups[] = [
+	'id' => 3,
+	'title' => Yii::t('court', 'Is Cancelled'),
+	'filteredPropertyName' => 'is_canceled',
+	'filters' => LawsuitCalendarSearch::getIsCanceledFilter(),
+];
 $summonsTypesFilter = $summonsModel->getSummonsTypesFilters();
 if (!empty($summonsTypesFilter)) {
 	$filterGroups[] = [
-		'id' => 3,
+		'id' => 4,
 		'title' => Yii::t('court', 'Summons'),
 		'filteredPropertyName' => 'typeId',
 		'filters' => $summonsTypesFilter,

@@ -83,6 +83,7 @@ class Module extends BaseModule implements AppealInterface {
 			'fileMap' => [
 				'edzima/spi/appeal' => 'appeal.php',
 				'edzima/spi/application' => 'application.php',
+				'edzima/spi/document' => 'document.php',
 				'edzima/spi/lawsuit' => 'lawsuit.php',
 				'edzima/spi/notification' => 'notification.php',
 			],

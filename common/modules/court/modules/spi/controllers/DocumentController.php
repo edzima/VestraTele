@@ -5,6 +5,7 @@ namespace common\modules\court\modules\spi\controllers;
 use common\modules\court\modules\spi\Module;
 use common\modules\court\modules\spi\repository\DocumentRepository;
 use Yii;
+use yii\filters\VerbFilter;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -13,6 +14,23 @@ use yii\web\NotFoundHttpException;
  * @property Module $module
  */
 class DocumentController extends Controller {
+
+	/**
+	 * @inheritDoc
+	 */
+	public function behaviors(): array {
+		return array_merge(
+			parent::behaviors(),
+			[
+				'verbs' => [
+					'class' => VerbFilter::class,
+					'actions' => [
+						'lawsuit' => ['POST'],
+					],
+				],
+			]
+		);
+	}
 
 	private DocumentRepository $repository;
 
@@ -25,7 +43,7 @@ class DocumentController extends Controller {
 	}
 
 	public function actionLawsuit(int $id): string {
-		$dataProvider = $this->repository->getLawsuitDocuments($id);
+		$dataProvider = $this->repository->getByLawsuit($id);
 
 		$html = $this->renderPartial('lawsuit', [
 			'dataProvider' => $dataProvider,
