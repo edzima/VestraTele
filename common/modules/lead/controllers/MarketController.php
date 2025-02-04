@@ -70,7 +70,11 @@ class MarketController extends BaseController {
 		$searchModel = new LeadMarketSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		if (Yii::$app->request->isDelete) {
-			LeadMarket::deleteAll($dataProvider->query->where);
+			$query = $dataProvider->query;
+			$ids = $query->select(LeadMarket::tableName() . '.id')->column();
+			if (!empty($ids)) {
+				LeadMarket::deleteAll(['id' => $ids]);
+			}
 
 			return $this->refresh();
 		}
