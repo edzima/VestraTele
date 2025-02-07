@@ -29,6 +29,24 @@ use yii\helpers\Json;
 
 class UpgradeController extends Controller {
 
+	public function actionLawsuitSessionUrlsFromDetails() {
+		$models = LawsuitSession::find()
+			->andWhere(['like', 'details', 'https'])
+			->all();
+		foreach ($models as $model) {
+			$regex = '#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#';
+			preg_match($regex, $model->details, $matches);
+			if (isset($matches[0])) {
+				$url = $matches[0];
+				$details = str_replace($url, '', $model->details);
+				$model->updateAttributes([
+					'url' => $url,
+					'details' => $details,
+				]);
+			}
+		}
+	}
+
 	public function actionMergeLawsuitSignatureDuplicates(): void {
 		Lawsuit::updateAll([
 			'signature_act' => new Expression('TRIM(signature_act)'),
