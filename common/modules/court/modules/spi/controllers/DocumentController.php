@@ -45,10 +45,12 @@ class DocumentController extends Controller {
 	public function actionLawsuit(int $id): string {
 		$dataProvider = $this->repository->getByLawsuit($id);
 		$dataProvider->getSort()->defaultOrder = ['createDate' => SORT_DESC];
-
+		$dataProvider->prepare();
+		$dataProvider->getSort()->attributes = [];
 		$html = $this->renderPartial('lawsuit', [
 			'dataProvider' => $dataProvider,
 		]);
+
 		return Json::encode($html);
 	}
 

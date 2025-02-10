@@ -27,6 +27,7 @@ class LawsuitController extends Controller {
 				'verbs' => [
 					'class' => VerbFilter::class,
 					'actions' => [
+						'proceedings' => ['POST'],
 						'sessions' => ['POST'],
 					],
 				],
@@ -68,12 +69,26 @@ class LawsuitController extends Controller {
 		]);
 	}
 
+	public function actionParties(int $id): string {
+		$repository = $this->module
+			->getRepositoryManager()
+			->getParties();
+		$dataProvider = $repository->getByLawsuit($id);
+		$dataProvider->setPagination(false);
+		$dataProvider->getSort()->attributes = [];
+		$html = $this->renderPartial('parties', [
+			'dataProvider' => $dataProvider,
+		]);
+		return Json::encode($html);
+	}
+
 	public function actionSessions(int $id): string {
 		$repository = $this->module
 			->getRepositoryManager()
 			->getCourtSessions();
 		$dataProvider = $repository->getByLawsuit($id);
 		$dataProvider->setPagination(false);
+		$dataProvider->getSort()->attributes = [];
 		$html = $this->renderPartial('sessions', [
 			'dataProvider' => $dataProvider,
 		]);
@@ -86,6 +101,9 @@ class LawsuitController extends Controller {
 			->getProceedings();
 		$dataProvider = $repository->getByLawsuit($id);
 		$dataProvider->setPagination(false);
+		$dataProvider->getSort()->defaultOrder = ['date' => SORT_DESC];
+		$dataProvider->prepare();
+		$dataProvider->getSort()->attributes = [];
 		$html = $this->renderPartial('proceedings', [
 			'dataProvider' => $dataProvider,
 		]);

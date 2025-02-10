@@ -10,8 +10,8 @@ class LawsuitProceedingDTO extends Model {
 	public int $id;
 	public string $name;
 	public string $date;
-	public string $sender;
-	public string $comments;
+	public ?string $sender;
+	public ?string $comments;
 	public ?int $documentId;
 	public ?string $documentName;
 	public ?string $documentFile;

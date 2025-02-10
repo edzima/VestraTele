@@ -15,7 +15,7 @@ class LawsuitSessionDTO extends Model {
 	public string $procedure;
 	public string $judge;
 	public string $subject;
-	public string $value;
+	public ?string $value;
 	public ?string $eprotocol;
 	public ?string $eprotocolId;
 	public ?string $eprotocolVideoPath;

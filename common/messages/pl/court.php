@@ -51,4 +51,10 @@ return [
 	'Link {issue} to {lawsuit}' => 'Dodaj {issue} do Sprawy: {lawsuit}',
 	'Lawsuit: {signature_act} already exist in Court' => 'Sprawa: {signature_act} już istnieje.',
 	'Notification' => 'Powiadomienia',
+	'Judge' => 'Sędzia',
+	'Result' => 'Rozstrzygnięcie',
+	'Create Lawsuit: {signature} - {courtName}' => 'Dodaj Sprawe: {signature} - {courtName}',
+	'Parties' => 'Podmioty',
+	'Create Lawsuit for Issues: {issuesCount}' => 'Dodano Rozprawę do Spraw: {issuesCount}',
+	'Not found Issue for User: {user}' => 'Nie znaleziono Spraw dla {user}',
 ];

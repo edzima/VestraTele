@@ -2,8 +2,7 @@
 
 namespace common\modules\court\modules\spi\entity\lawsuit;
 
-use common\modules\court\modules\spi\models\lawsuit\LightParty;
-use common\modules\court\modules\spi\models\lawsuit\Party;
+
 use common\modules\court\modules\spi\Module;
 use yii\base\Model;
 
@@ -38,12 +37,6 @@ class LawsuitViewIntegratorDto extends Model {
 	/** @var Party[] */
 	public ?array $parties = []; // Lista obiektów Party
 
-	/** @var LightParty[] */
-	public ?array $lightParties = []; // Lista obiektów LightParty
-
-	/** @var LawsuitPartyDTO[] */
-	protected array $lawsuitParties = [];
-
 	public string $roleName;
 	public string $groupName;
 	public ?bool $isAttorneyToLawsuit;
@@ -51,6 +44,12 @@ class LawsuitViewIntegratorDto extends Model {
 	public string $publicationDate;
 	public string $createdDate;
 	public string $modificationDate;
+
+	/** @var LightParty[] */
+	public ?array $lightParties = []; // Lista obiektów LightParty
+
+	/** @var LawsuitPartyDTO[] */
+	protected array $lawsuitParties = [];
 
 	public function attributeLabels(): array {
 		return [

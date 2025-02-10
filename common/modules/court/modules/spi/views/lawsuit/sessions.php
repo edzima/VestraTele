@@ -11,6 +11,12 @@ use yii\data\DataProviderInterface;
 <div class="lawsuit-sessions">
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
+		'summary' => false,
+		'pjax' => true,
+		'pjaxSettings' => [
+			'neverTimeout' => true,
+			'refreshGrid' => true,
+		],
 		'columns' => [
 			'result',
 			'date:datetime',

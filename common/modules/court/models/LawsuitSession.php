@@ -3,8 +3,10 @@
 namespace common\modules\court\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "lawsuit_sessions".
@@ -21,6 +23,8 @@ use yii\db\ActiveRecord;
  * @property string|null $location
  * @property int $creator_id
  * @property string|null $url
+ * @property string|null $judge
+ * @property string|null $result
  *
  * @property Lawsuit $lawsuit
  */
@@ -31,6 +35,15 @@ class LawsuitSession extends ActiveRecord {
 
 	public const PRESENCE_OF_THE_CLAIMANT_REQUIRED = 1;
 	public const PRESENCE_OF_THE_CLAIMANT_NOT_REQUIRED = 0;
+
+	public function behaviors(): array {
+		return array_merge(parent::behaviors(), [
+			[
+				'class' => TimestampBehavior::class,
+				'value' => new Expression('NOW()'),
+			],
+		]);
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -44,7 +57,7 @@ class LawsuitSession extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[['details'], 'string'],
+			[['details', 'judge', 'result'], 'string'],
 			[['lawsuit_id', 'date_at', 'created_at', 'updated_at'], 'required'],
 			[['lawsuit_id', 'is_cancelled', 'presence_of_the_claimant'], 'integer'],
 			[['date_at', 'created_at', 'updated_at'], 'safe'],
@@ -71,6 +84,8 @@ class LawsuitSession extends ActiveRecord {
 			'location' => Yii::t('court', 'Location'),
 			'locationName' => Yii::t('court', 'Location'),
 			'url' => Yii::t('court', 'URL'),
+			'result' => Yii::t('court', 'Result'),
+			'judge' => Yii::t('court', 'Judge'),
 		];
 	}
 

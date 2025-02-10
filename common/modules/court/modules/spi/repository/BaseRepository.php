@@ -47,9 +47,10 @@ abstract class BaseRepository extends Component
 		return $this->appeal;
 	}
 
-	public function setAppeal(string $appeal): void {
+	public function setAppeal(string $appeal): self {
 		$this->appeal = $appeal;
 		$this->api->setAppeal($appeal);
+		return $this;
 	}
 
 	protected function getApi(): SPIApi {
