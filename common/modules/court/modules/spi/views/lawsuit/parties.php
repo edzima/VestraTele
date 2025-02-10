@@ -24,6 +24,7 @@ use yii\data\DataProviderInterface;
 			'role',
 			'name',
 			'address',
+			'gainedAccessDate:datetime',
 			'createdDate:datetime',
 			'modificationDate:datetime',
 			[

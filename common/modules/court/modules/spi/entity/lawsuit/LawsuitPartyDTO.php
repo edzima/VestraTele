@@ -30,6 +30,7 @@ class LawsuitPartyDTO extends Model {
 			'address' => Module::t('lawsuit', 'Address'),
 			'createdDate' => Module::t('lawsuit', 'Created Date'),
 			'modificationDate' => Module::t('lawsuit', 'Modification Date'),
+			'gainedAccessDate' => Module::t('lawsuit', 'Gained Access Date'),
 		];
 	}
 
