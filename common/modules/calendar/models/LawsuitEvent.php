@@ -23,12 +23,13 @@ class LawsuitEvent extends FullCalendarEvent {
 
 	public function setSession(LawsuitSession $session) {
 		$this->session = $session;
+		$this->setModel($session->lawsuit);
 		$this->start = $session->date_at;
 		$this->is_canceled = $session->is_cancelled;
+		$this->has_url = !empty($session->url);
 		if ($session->is_cancelled) {
 			$this->classNames[] = static::CLASS_TRANSPARENT;
 		}
-		$this->setModel($session->lawsuit);
 	}
 
 	public function setModel(Lawsuit $model): void {
@@ -40,7 +41,6 @@ class LawsuitEvent extends FullCalendarEvent {
 		$this->url = Url::to(['/court/lawsuit/view', 'id' => $model->id]);
 		$this->backgroundColor = $this->getBackgroundColor();
 		$this->is_appeal = $model->is_appeal;
-		$this->has_url = !empty($model->url);
 		$this->borderColor = $this->getBorderColor();
 	}
 
@@ -52,7 +52,7 @@ class LawsuitEvent extends FullCalendarEvent {
 	}
 
 	protected function getBorderColor(): ?string {
-		if (!empty($this->model->url)) {
+		if (!empty($this->session->url)) {
 			return 'lime';
 		}
 		return null;
