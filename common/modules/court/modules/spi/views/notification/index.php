@@ -28,7 +28,19 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
-		'rowOptions' => static function (NotificationDTO $data): array {
+		'rowOptions' => static function (NotificationDTO $data) use ($searchModel): array {
+			if (strlen($searchModel->read) === 1) {
+				if (
+					($searchModel->read && !$data->read)
+					|| (!$searchModel->read && $data->read)
+				) {
+					return [
+						'style' => [
+							'display' => 'none',
+						],
+					];
+				}
+			}
 			if ($data->read) {
 				return [
 					'class' => 'half-transparent',
