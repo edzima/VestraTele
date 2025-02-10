@@ -37,6 +37,9 @@ return [
 		'court' => [
 			'class' => CourtModule::class,
 			'onlyUserIssues' => true,
+			'spiModuleConfig' => [
+				'userAuthApiPasswordKey' => $_ENV['SPI_USER_AUTH_PASSWORD_KEY'],
+			],
 			'as access' => [
 				'class' => GlobalAccessBehavior::class,
 				'rules' => [

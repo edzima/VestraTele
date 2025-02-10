@@ -31,4 +31,5 @@ return [
 	'Parties' => 'Podmioty',
 	'Role' => 'Rola',
 	'Address' => 'Adres',
+	'Not found Auth Settings for User: {userId}' => 'Nie ustalono danych do Logowania: {userId}',
 ];
