@@ -114,7 +114,6 @@ abstract class BaseRepository extends Component
 	protected function getCache(): ?CacheInterface {
 		if (!$this->cache instanceof CacheInterface) {
 			$this->cache = Instance::ensure($this->cache, CacheInterface::class);
-			Yii::warning($this->cache);
 		}
 		return $this->cache;
 	}
