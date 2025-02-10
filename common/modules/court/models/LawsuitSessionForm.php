@@ -11,6 +11,8 @@ class LawsuitSessionForm extends Model {
 	public int $lawsuit_id;
 
 	public ?string $details = '';
+	public ?string $judge = '';
+	public ?string $result = '';
 
 	public ?string $date_at = '';
 	public ?string $room = '';
@@ -27,9 +29,9 @@ class LawsuitSessionForm extends Model {
 			[['lawsuit_id', 'presence_of_the_claimant', 'date_at'], 'required'],
 			[['presence_of_the_claimant'], 'integer'],
 			[['is_cancelled'], 'boolean'],
-			[['date_at', 'room', 'details', 'location', 'url'], 'string'],
+			[['date_at', 'room', 'details', 'location', 'url', 'judge', 'result'], 'string'],
 			['url', 'url'],
-			[['date_at', 'room', 'details', 'location'], 'default', 'value' => null],
+			[['date_at', 'room', 'details', 'location', 'url', 'judge', 'result'], 'default', 'value' => null],
 			['location', 'in', 'range' => array_keys(static::getLocationNames())],
 			['presence_of_the_claimant', 'in', 'range' => array_keys(static::getPresenceOfTheClaimantNames())],
 		];
@@ -53,6 +55,8 @@ class LawsuitSessionForm extends Model {
 		$model->location = $this->location;
 		$model->is_cancelled = $this->is_cancelled;
 		$model->url = $this->url;
+		$model->judge = $this->judge;
+		$model->result = $this->result;
 		if (!$model->save(false)) {
 			return false;
 		}
@@ -69,6 +73,8 @@ class LawsuitSessionForm extends Model {
 		$this->presence_of_the_claimant = $model->presence_of_the_claimant;
 		$this->is_cancelled = $model->is_cancelled;
 		$this->url = $model->url;
+		$this->result = $model->result;
+		$this->judge = $model->judge;
 		$this->setLawsuit($model->lawsuit);
 	}
 

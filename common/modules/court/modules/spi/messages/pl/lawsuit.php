@@ -27,4 +27,8 @@ return [
 	'Name' => 'Nazwa',
 	'Room' => 'Sala',
 	'Procedure' => 'Procedura',
+	'Sessions' => 'Posiedzenia',
+	'Parties' => 'Podmioty',
+	'Role' => 'Rola',
+	'Address' => 'Adres',
 ];

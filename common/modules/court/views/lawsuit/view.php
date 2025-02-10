@@ -1,10 +1,13 @@
 <?php
 
+use common\helpers\Breadcrumbs;
+use common\helpers\Flash;
 use common\helpers\Html;
 use common\models\issue\IssueInterface;
 use common\modules\court\models\Lawsuit;
 use common\modules\court\models\LawsuitSession;
 use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
+use common\modules\court\modules\spi\entity\notification\NotificationViewDTO;
 use common\modules\court\widgets\LawsuitSmsBtnWidget;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\widgets\grid\ActionColumn;
@@ -20,14 +23,36 @@ use yii\widgets\DetailView;
 /** @var yii\web\View $this */
 /** @var Lawsuit $model */
 /** @var LawsuitViewIntegratorDto|null $lawsuitDetails */
+/** @var NotificationViewDTO|null $notificationDetails */
 
 $this->title = $model->getName();
+
+$issueDataProvider = new ActiveDataProvider([
+	'query' => $model->getIssues()
+		->with('customer')
+		->with('tags.tagType')
+		->with('entityResponsible'),
+]);
+
 if ($model->is_appeal) {
 	$this->title .= ' - ' . Yii::t('court', 'Is Appeal');
 }
+if ($issueDataProvider->getTotalCount()) {
+	$issue = $issueDataProvider->getModels()[0];
+	$this->params['breadcrumbs'] = Breadcrumbs::issue($issue);
+}
 $this->params['breadcrumbs'][] = ['label' => Yii::t('court', 'Lawsuits'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
-
+if ($issueDataProvider->getTotalCount() === 1) {
+	$this->params['breadcrumbs'][] = $model->signature_act;
+} else {
+	$this->params['breadcrumbs'][] = $this->title;
+}
+if ($notificationDetails) {
+	Flash::add(
+		Flash::TYPE_INFO,
+		$notificationDetails->content . ' - ' . Yii::$app->formatter->asDatetime($notificationDetails->date)
+	);
+}
 YiiAsset::register($this);
 ?>
 <div class="court-lawsuit-view">
@@ -51,6 +76,7 @@ YiiAsset::register($this);
 
 	<div class="row">
 		<div class="col-md-5">
+
 			<?= DetailView::widget([
 				'model' => $model,
 				'attributes' => [
@@ -87,7 +113,10 @@ YiiAsset::register($this);
 				'caption' => Yii::t('court', 'Lawsuit Sessions'),
 				'summary' => false,
 				'columns' => [
-
+					[
+						'attribute' => 'result',
+						'noWrap' => true,
+					],
 					[
 						'attribute' => 'date_at',
 						'format' => 'datetime',
@@ -105,9 +134,13 @@ YiiAsset::register($this);
 						'attribute' => 'locationName',
 						'noWrap' => true,
 					],
+					[
+						'attribute' => 'judge',
+						'noWrap' => true,
+					],
 					'details:ntext',
-					'created_at:datetime',
-					'updated_at:datetime',
+					//	'created_at:datetime',
+					//	'updated_at:datetime',
 					[
 						'class' => ActionColumn::class,
 						'controller' => 'lawsuit-session',
@@ -131,12 +164,7 @@ YiiAsset::register($this);
 			]) ?>
 
 			<?= GridView::widget([
-				'dataProvider' => new ActiveDataProvider([
-					'query' => $model->getIssues()
-						->with('customer')
-						->with('tags.tagType')
-						->with('entityResponsible'),
-				]),
+				'dataProvider' => $issueDataProvider,
 				'summary' => false,
 				'columns' => [
 					[

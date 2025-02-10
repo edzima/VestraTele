@@ -13,6 +13,8 @@ use yii\httpclient\Response;
 
 class ApiDataProvider extends BaseDataProvider {
 
+	public int $sizeLimitOnPaginationDisable = 200;
+
 	public SPIApi $api;
 	public string $url;
 	public array $params = [];
@@ -115,6 +117,8 @@ class ApiDataProvider extends BaseDataProvider {
 			$this->params[$this->api::PARAM_PAGE_SIZE] = $pagination->getLimit();
 			$this->params[$this->api::PARAM_PAGE] = $pagination->getPage(true);
 			$pagination->validatePage = $validatePage;
+		} else {
+			$this->params[$this->api::PARAM_PAGE_SIZE] = $this->sizeLimitOnPaginationDisable;
 		}
 	}
 

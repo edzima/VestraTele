@@ -24,6 +24,8 @@ class m250127_130311_lawsuit_sessions extends Migration {
 			'presence_of_the_claimant' => $this->smallInteger(),
 			'location' => $this->string(),
 			'url' => $this->string(),
+			'judge' => $this->string(),
+			'result' => $this->string(),
 		]);
 
 		$this->addForeignKey('{{%FK_lawsuit_sessions_lawsuit}}',

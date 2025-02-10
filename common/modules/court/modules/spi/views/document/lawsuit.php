@@ -5,7 +5,9 @@ use common\modules\court\modules\spi\entity\document\DocumentInnerViewDto;
 use common\widgets\grid\ActionColumn;
 use common\widgets\GridView;
 use yii\data\DataProviderInterface;
+use yii\web\View;
 
+/** @var View */
 /** @var DataProviderInterface $dataProvider */
 
 ?>
@@ -13,6 +15,13 @@ use yii\data\DataProviderInterface;
 <div class="documents-lawsuit">
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
+		'autoXlFormat' => true,
+		'summary' => false,
+		'pjax' => true,
+		'pjaxSettings' => [
+			'neverTimeout' => true,
+			'refreshGrid' => true,
+		],
 		'columns' => [
 			'documentName',
 			'createdDate:datetime',
@@ -26,6 +35,7 @@ use yii\data\DataProviderInterface;
 						$action,
 						'id' => $model->id,
 						'fileName' => $model->fileName,
+						'appeal' => $this->params['appeal'],
 					]);
 				},
 			],

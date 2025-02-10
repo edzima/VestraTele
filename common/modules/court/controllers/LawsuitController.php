@@ -3,19 +3,19 @@
 namespace common\modules\court\controllers;
 
 use common\components\message\MessageTemplate;
-use common\helpers\ArrayHelper;
 use common\helpers\Flash;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
+use common\models\issue\query\IssueUserQuery;
 use common\models\message\IssueLawsuitSmsForm;
 use common\modules\court\models\Lawsuit;
 use common\modules\court\models\LawsuitIssueForm;
-use common\modules\court\models\LawsuitSession;
 use common\modules\court\models\search\LawsuitSearch;
 use common\modules\court\Module;
-use common\modules\court\modules\spi\entity\lawsuit\LawsuitSessionDTO;
+use common\modules\court\modules\spi\entity\lawsuit\LawsuitPartyDTO;
 use common\modules\court\widgets\LawsuitSmsBtnWidget;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -108,13 +108,17 @@ class LawsuitController extends Controller {
 				'create-from-spi-lawsuit',
 				'signature' => $signature,
 				'appeal' => $appeal,
+				'notificationId' => $id,
 			]);
 		}
 		if ($dataProvider->getTotalCount() === 1) {
 			$models = $dataProvider->getModels();
 			$model = reset($models);
 			return $this->redirect([
-				'view', 'id' => $model->id,
+				'view',
+				'id' => $model->id,
+				'syncSpi' => true,
+				'spiNotificationId' => $id,
 			]);
 		}
 		return $this->render('index', [
@@ -123,15 +127,20 @@ class LawsuitController extends Controller {
 		]);
 	}
 
-	public function actionCreateFromSpiLawsuit(string $signature, string $appeal) {
+	public function actionCreateFromSpiLawsuit(string $signature, string $appeal, int $notificationId = null) {
 		$spiModule = $this->module->getSPI();
 		if (!$spiModule) {
 			throw new NotFoundHttpException('SPI Module must be set.');
 		}
-		$repository = $spiModule->getRepositoryManager()
-			->getLawsuits();
+		if (!$spiModule->isForAppeal($appeal)) {
+			throw new NotFoundHttpException('Invalid Appeal.');
+		}
+		$lawsuit = $spiModule
+			->getRepositoryManager()
+			->getLawsuits()
+			->setAppeal($appeal)
+			->findBySignature($signature);
 
-		$lawsuit = $repository->findBySignature($signature, $appeal);
 		if ($lawsuit === null) {
 			throw new NotFoundHttpException('Not found SPI Lawsuit');
 		}
@@ -139,9 +148,55 @@ class LawsuitController extends Controller {
 		$model = new LawsuitIssueForm();
 		$model->signature_act = $lawsuit->signature;
 		$model->setCourtName($lawsuit->courtName);
+		$model->creator_id = Yii::$app->user->getId();
+
+		$partiesDataProvider = $spiModule
+			->getRepositoryManager()
+			->getParties()
+			->setAppeal($appeal)
+			->getByLawsuit($lawsuit->id);
+		/**
+		 * @var LawsuitPartyDTO $customerParty
+		 */
+		$customerParty = $partiesDataProvider->getModels()[0];
+		$issueDataProvider = new ActiveDataProvider([
+				'query' => Issue::find()
+					->joinWith([
+						'users' => function (IssueUserQuery $query) use ($customerParty) {
+							$query->withUserFullName($customerParty->name);
+						},
+					]),
+			]
+		);
+		if (count($issueDataProvider->getModels()) === 0) {
+			Flash::add(
+				Flash::TYPE_WARNING,
+				Yii::t('court', 'Not found Issue for User: {user}', [
+					'user' => $customerParty->name . ' - ' . $customerParty->role,
+				])
+			);
+		} else {
+			$model->issuesIds = $issueDataProvider->getKeys();
+			if ($model->save()) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('court', 'Create Lawsuit for Issues: {issuesCount}', [
+						'issuesCount' => count($model->issuesIds),
+					]));
+				return $this->redirect([
+						'view',
+						'id' => $model->getModel()->id,
+						'syncSpi' => true,
+						'spiNotificationId' => $model->getModel()->id,
+					]
+				);
+			}
+		}
+
+		$this->view->params['appeal'] = $appeal;
 		return $this->render('create-from-spi-lawsuit', [
 			'model' => $model,
 			'lawsuit' => $lawsuit,
+			'partiesDataProvider' => $partiesDataProvider,
 		]);
 	}
 
@@ -160,9 +215,10 @@ class LawsuitController extends Controller {
 	 * @return string
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView(int $id): string {
+	public function actionView(int $id, bool $syncSpi = false, int $spiNotificationId = null): string {
 		$model = $this->findModel($id);
 		$lawsuitDetails = null;
+		$notificationDetails = null;
 		if (!empty($model->signature_act)
 			&& Yii::$app->user->can(Module::PERMISSION_SPI_LAWSUIT_DETAIL)
 			&& $this->module->spi !== null
@@ -186,93 +242,39 @@ class LawsuitController extends Controller {
 					->findBySignature(
 						$model->signature_act,
 					);
+
+				if ($lawsuitDetails && $syncSpi) {
+					$sync = $this->module->getSpiSync();
+					if ($sync) {
+						$sync->sync(
+							$model,
+							$this->module->spi
+								->getRepositoryManager()
+								->getCourtSessions()
+								->getByLawsuit($lawsuitDetails->id)
+								->getModels()
+						);
+					}
+				}
+				if ($spiNotificationId) {
+					$notificationRepository = $this->module->spi
+						->getRepositoryManager()
+						->getNotifications();
+
+					$notificationDetails = $notificationRepository
+						->findModel($spiNotificationId);
+
+					if ($notificationDetails && !$notificationDetails->read) {
+						$notificationRepository->read($spiNotificationId);
+					}
+				}
 			}
 		}
 		return $this->render('view', [
 			'model' => $model,
 			'lawsuitDetails' => $lawsuitDetails,
+			'notificationDetails' => $notificationDetails,
 		]);
-	}
-
-	public function actionUpdateSpi(int $id) {
-		$model = $this->findModel($id);
-
-		if (!empty($model->signature_act)
-			&& Yii::$app->user->can(Module::PERMISSION_SPI_LAWSUIT_DETAIL)
-			&& $this->module->spi !== null
-		) {
-			$appeal = $model->court->getSPIAppealWithParents();
-			if (!$appeal) {
-				Yii::warning(
-					Yii::t('court', 'Not found SPI Appeal for Court: {court}.', [
-							'court' => $model->court,
-						]
-					)
-				);
-			} else {
-				$lawsuitRepository = $this->module->spi
-					->getRepositoryManager()
-					->getLawsuits();
-				$lawsuitRepository->setAppeal($appeal);
-
-				$lawsuitDetails = $lawsuitRepository
-					->findBySignature(
-						$model->signature_act,
-					);
-				if ($lawsuitDetails === null) {
-					throw new NotFoundHttpException();
-				}
-
-				$repository = $this->module->spi
-					->getRepositoryManager()
-					->getCourtSessions();
-				$repository->setAppeal($appeal);
-				$dataProvider = $repository->getLawsuitDataProvider($lawsuitDetails->id);
-				$data = [];
-				foreach ($dataProvider->getModels() as $session) {
-					/**
-					 * @var LawsuitSessionDTO $session
-					 */
-					$data[] = [
-						'lawsuit_id' => $model->id,
-						'room' => $session->room,
-						'date_at' => date(DATE_ATOM, strtotime($session->date)),
-						'created_at' => date(DATE_ATOM, strtotime($session->createdDate)),
-						'updated_at' => date(DATE_ATOM, strtotime($session->modificationDate)),
-					];
-				}
-				if (!empty($data)) {
-					$shouldUpdate = true;
-					if (count($data) !== count($model->sessions)) {
-						$shouldUpdate = true;
-					} else {
-						$lastExisted = max(ArrayHelper::getColumn($model->sessions, 'updated_at'));
-						$lastCurrent = max(ArrayHelper::getColumn($data, 'updated_at'));
-						if (strtotime($lastCurrent) !== strtotime($lastExisted)) {
-							$shouldUpdate = true;
-						}
-					}
-					if ($shouldUpdate) {
-						LawsuitSession::deleteAll([
-							'lawsuit_id' => $model->id,
-						]);
-						LawsuitSession::getDb()
-							->createCommand()
-							->batchInsert(
-								LawsuitSession::tableName(),
-								[
-									'lawsuit_id',
-									'room',
-									'date_at',
-									'created_at',
-									'updated_at',
-								],
-								$data)
-							->execute();
-					}
-				}
-			}
-		}
 	}
 
 	/**

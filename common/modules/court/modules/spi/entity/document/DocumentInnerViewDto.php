@@ -11,7 +11,7 @@ class DocumentInnerViewDto extends Model {
 	public string $createDate;
 	public ?string $publicationDate;
 	public string $documentName;
-	public string $fileName;
+	public ?string $fileName;
 
 	/**
 	 * @deprecated

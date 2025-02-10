@@ -38,6 +38,8 @@ class Module extends BaseModule implements AppealInterface {
 		'class' => RepositoryManager::class,
 	];
 
+	public array $appeals = [];
+
 	public static function getAppealsNames(): array {
 		return [
 			AppealInterface::APPEAL_BIALYSTOK => static::t('appeal', 'Bialystok'),
@@ -56,6 +58,9 @@ class Module extends BaseModule implements AppealInterface {
 
 	public function init(): void {
 		parent::init();
+		if (empty($this->appeals)) {
+			$this->appeals = array_keys(static::getAppealsNames());
+		}
 		$this->setApiComponent();
 		$this->setRepositoryComponent();
 		$this->registerTranslations();
@@ -73,6 +78,10 @@ class Module extends BaseModule implements AppealInterface {
 			$this->appeal = $appeal;
 		}
 		return $this->appeal;
+	}
+
+	public function isForAppeal(string $appeal): bool {
+		return in_array($appeal, $this->appeals);
 	}
 
 	public function registerTranslations(): void {
@@ -104,6 +113,7 @@ class Module extends BaseModule implements AppealInterface {
 				$model->touchLastActionAt();
 			});
 		}
+		$api->availableAppeals = $this->appeals;
 		return $this->get('spiApi');
 	}
 

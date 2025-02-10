@@ -4,10 +4,12 @@ use common\helpers\Url;
 use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
 use common\modules\court\modules\spi\Module;
 use kartik\tabs\TabsX;
+use yii\data\DataProviderInterface;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
 /** @var LawsuitViewIntegratorDto $model */
+/** @var DataProviderInterface $parties |null */
 
 ?>
 <div class="court-lawsuit-spi-details-view">
@@ -24,7 +26,11 @@ use yii\widgets\DetailView;
 							'visible' => !empty($model->result),
 						],
 						'subject',
-						'description:ntext',
+						[
+							'attribute' => 'description',
+							'format' => 'ntext',
+							'visible' => !empty($model->description),
+						],
 						'receiptDate:datetime',
 						[
 							'attribute' => 'finishDate',
@@ -34,9 +40,28 @@ use yii\widgets\DetailView;
 
 						'departmentName',
 						'judgeName',
-						'value',
+						[
+							'attribute' => 'value',
+							'visible' => !empty($model->value),
+						],
 					],
 				]),
+			],
+			[
+				'label' => Module::t('lawsuit', 'Parties'),
+				'linkOptions' => [
+					'data-url' => Url::to([
+						'spi/lawsuit/parties',
+						'id' => $model->id,
+						'appeal' => $this->params['appeal'],
+					]),
+				],
+				//				'content' => GridView::widget([
+				//					'dataProvider' => new ArrayDataProvider([
+				//						'allModels' => $model->getLawsuitParties(),
+				//						'modelClass' => LawsuitPartyDTO::class,
+				//					]),
+				//				]),
 			],
 			[
 				'label' => Module::t('document', 'Documents'),
@@ -59,7 +84,7 @@ use yii\widgets\DetailView;
 				],
 			],
 			[
-				'label' => Module::t('document', 'Posiedzenia'),
+				'label' => Module::t('lawsuit', 'Sessions'),
 				'linkOptions' => [
 					'data-url' => Url::to([
 						'spi/lawsuit/sessions',

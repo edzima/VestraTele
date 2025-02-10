@@ -39,7 +39,13 @@ $this->params['breadcrumbs'][] = $this->title;
 				'class' => ActionColumn::class,
 				'template' => '{read} {view} ',
 				'urlCreator' => function ($action, $model, $key) use ($searchModel): string {
-					return Url::to([$action, 'id' => $key, 'appeal' => $searchModel->getAppeal()]);
+					return Url::to([
+						$action,
+						'id' => $key,
+						'appeal' => $searchModel->getAppeal(),
+						'signature' => $model->signature,
+						'court' => $model->courtName,
+					]);
 				},
 				'visibleButtons' => [
 					'read' => function (NotificationDTO $model): bool {
@@ -48,15 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 				'buttons' => [
 					'read' => function ($url, NotificationDTO $model) use ($searchModel): string {
-						return Html::a(Html::icon('check'),
-							[
-								'read',
-								'id' => $model->id,
-								'signature' => $model->signature,
-								'court' => $model->courtName,
-								'appeal' => $searchModel->getAppeal(),
-							],
-						);
+						return Html::a(Html::icon('check'), $url);
 					},
 
 				],
