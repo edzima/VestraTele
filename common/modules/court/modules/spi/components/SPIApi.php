@@ -359,8 +359,17 @@ class SPIApi extends Component
 
 	private function buildUrl(string $url, array $params = []): string {
 		if (!empty($params)) {
-			$queryString = http_build_query($params);
-			$queryString = str_replace(static::PARAM_SORT . '%5B0%5D=', static::PARAM_SORT . '=', $queryString);
+			$queryParamsString = [];
+			foreach ($params as $key => $value) {
+				if (is_array($value)) {
+					foreach ($value as $subValue) {
+						$queryParamsString[] = urlencode($key) . '=' . urlencode($subValue);
+					}
+				} else {
+					$queryParamsString[] = urlencode($key) . '=' . urlencode($value);
+				}
+			}
+			$queryString = implode('&', $queryParamsString);
 			$url .= '?' . $queryString;
 		}
 		return $url;

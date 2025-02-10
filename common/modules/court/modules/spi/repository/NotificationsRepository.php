@@ -24,16 +24,6 @@ class NotificationsRepository extends BaseRepository {
 		'pagination' => [
 			'pageSize' => 50,
 		],
-		'sort' => [
-			'attributes' => [
-				'type',
-				'content',
-				'date',
-				'signature',
-				'read',
-			],
-			'enableMultiSort' => true,
-		],
 	];
 
 	public function findModel(int $id): ?NotificationViewDTO {
@@ -46,7 +36,7 @@ class NotificationsRepository extends BaseRepository {
 	}
 
 	public function getUnread(bool $cache = true): ?int {
-		if ($cache) {
+		if ($cache && $this->getCache()) {
 			return (int) $this->getCacheValue($this->getAppeal() . ':unread', false);
 		}
 		$url = static::route() . '/unread';

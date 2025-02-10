@@ -129,8 +129,7 @@ class ApiDataProvider extends BaseDataProvider {
 				$nameOrder = $name;
 				if ($order === SORT_ASC) {
 					$nameOrder .= ',asc';
-				}
-				if ($order === SORT_DESC) {
+				} elseif ($order === SORT_DESC) {
 					$nameOrder .= ',desc';
 				}
 				$sortParams[] = $nameOrder;

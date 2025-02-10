@@ -50,6 +50,17 @@ if ($searchModel->spiAppeal) {
 			['/calendar/lawsuit/index'], [
 			'class' => 'btn btn-warning',
 		]) ?>
+
+		<?= Yii::$app->user->can(
+			Module::PERMISSION_SPI_LAWSUIT_DETAIL
+		) ? Html::a(
+			Html::faicon('bell'),
+			['/court/spi/notification/index'],
+			[
+				'class' => 'btn btn-info',
+				'title' => Yii::t('court', 'Notification'),
+			]
+		) : '' ?>
 	</p>
 
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
