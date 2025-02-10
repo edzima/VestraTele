@@ -103,9 +103,15 @@ class Module extends BaseModule implements AppealInterface {
 		/* @var SPIApi $api */
 		$api = $this->get('spiApi');
 		if ($this->bindUserAuth) {
+			if ($userId === null) {
+				$userId = Yii::$app->user->getId();
+			}
 			$model = $this->findUserAuth($userId);
 			if ($model === null) {
-				throw new InvalidConfigException('Not found Auth Setting for User: ' . $userId);
+				throw new InvalidConfigException(
+					static::t('lawsuit', 'Not found Auth Settings for User: {userId}', [
+						'userId' => $userId,
+					]));
 			}
 			$api->username = $model->username;
 			$api->password = $model->decryptPassword($this->userAuthApiPasswordKey);

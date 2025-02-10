@@ -127,6 +127,9 @@ return [
 					],
 				],
 			],
+			'spiModuleConfig' => [
+				'userAuthApiPasswordKey' => $_ENV['SPI_USER_AUTH_PASSWORD_KEY'],
+			],
 		],
 		'db-manager' => [
 			'class' => 'bs\dbManager\Module',
