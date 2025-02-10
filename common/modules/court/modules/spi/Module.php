@@ -123,8 +123,9 @@ class Module extends BaseModule implements AppealInterface {
 		return $this->get('spiApi');
 	}
 
-	public function getRepositoryManager(): RepositoryManager {
+	public function getRepositoryManager($userId = null): RepositoryManager {
 		$manager = $this->get('repositoryManager');
+		$manager->api = $this->getSpiApi($userId);
 		$manager->appeal = $this->getAppeal();
 		return $manager;
 	}
