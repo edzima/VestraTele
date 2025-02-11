@@ -1,7 +1,7 @@
 <?php
 
 use backend\modules\provision\models\ProvisionUserForm;
-use common\widgets\DateWidget;
+use common\widgets\DateTimeWidget;
 use kartik\number\NumberControl;
 use kartik\select2\Select2;
 use yii\helpers\Html;
@@ -52,9 +52,9 @@ use yii\widgets\ActiveForm;
 
 
 	<div class="row">
-		<?= $form->field($model, 'from_at', ['options' => ['class' => 'col-md-3']])->widget(DateWidget::class) ?>
+		<?= $form->field($model, 'from_at', ['options' => ['class' => 'col-md-3']])->widget(DateTimeWidget::class) ?>
 
-		<?= $form->field($model, 'to_at', ['options' => ['class' => 'col-md-3']])->widget(DateWidget::class) ?>
+		<?= $form->field($model, 'to_at', ['options' => ['class' => 'col-md-3']])->widget(DateTimeWidget::class) ?>
 	</div>
 
 

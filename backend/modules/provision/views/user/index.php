@@ -74,8 +74,8 @@ $this->params['breadcrumbs'][] = Yii::t('provision', 'Schemas')
 				'attribute' => 'value',
 				'value' => 'formattedValue',
 			],
-			'from_at:date',
-			'to_at:date',
+			'from_at:datetime',
+			'to_at:datetime',
 			[
 				'attribute' => 'overwritten',
 				'value' => 'isOverwritten',

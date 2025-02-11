@@ -55,7 +55,7 @@ class ProvisionUserForm extends Model {
 				},
 			],
 			['from_user_id', 'compare', 'compareAttribute' => 'to_user_id', 'on' => static::SCENARIO_SELF],
-			[['from_at', 'to_at'], 'date', 'format' => 'Y-m-d'],
+			[['from_at', 'to_at'], 'date', 'format' => 'php:Y-m-d H:i',],
 			[
 				'to_at', 'compare', 'compareAttribute' => 'from_at', 'operator' => '>=',
 				'enableClientValidation' => false,

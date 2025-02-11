@@ -13,7 +13,7 @@ use yii\db\ActiveQuery;
 class ProvisionUserQuery extends ActiveQuery {
 
 	public function forDate(string $date): self {
-		$date = date('Y-m-d', strtotime($date));
+		$date = date(DATE_ATOM, strtotime($date));
 		$this->andWhere([
 			'and', [
 				'or', ['<=', ProvisionUser::tableName() . '.from_at', $date], [ProvisionUser::tableName() . '.from_at' => null],
