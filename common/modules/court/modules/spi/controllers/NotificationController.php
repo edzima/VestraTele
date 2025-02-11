@@ -15,7 +15,7 @@ use yii\web\NotFoundHttpException;
 class NotificationController extends Controller {
 
 	public bool $readOnView = true;
-	private NotificationsRepository $repository;
+	protected NotificationsRepository $repository;
 
 	public function init(): void {
 		parent::init();
@@ -44,10 +44,11 @@ class NotificationController extends Controller {
 		]);
 	}
 
-	public function actionRead(string $appeal, int $id, string $signature = null, string $court = null) {
+	public function actionRead(string $appeal, int $id, string $signature = null, string $court = null, string $returnUrl = null) {
 		//@todo Because in Doc API, read action should return NotificationDTO, but return Boolean.
 		$this->repository->read($id);
-		return $this->redirect(['index', 'appeal' => $appeal, 'id' => $id]);
+		$url = $returnUrl ?: ['index', 'appeal' => $appeal, 'id' => $id];
+		return $this->redirect($url);
 	}
 
 	public function actionView(int $id, string $appeal, string $signature = null, string $court = null) {

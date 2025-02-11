@@ -10,6 +10,7 @@ class DateTimeColumn extends DataColumn {
 
 	public bool $tooltip = true;
 	public $format = 'raw';
+	public $noWrap = true;
 
 	public function getDataCellValue($model, $key, $index) {
 		$value = parent::getDataCellValue($model, $key, $index);

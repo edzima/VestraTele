@@ -8,18 +8,24 @@ class SpiNotificationController extends NotificationController {
 
 	public function actionView(int $id, string $appeal, string $signature = null, string $court = null) {
 		return $this->redirect([
-			'/court/lawsuit/read-spi-notification',
-			'id' => $id,
+			'/court/lawsuit/spi-lawsuit',
+			'notificationId' => $id,
 			'appeal' => $appeal,
 			'signature' => $signature,
 			'court' => $court,
 		]);
 	}
 
-	public function actionRead(string $appeal, int $id, string $signature = null, string $court = null) {
+	public function actionRead(string $appeal, int $id, string $signature = null, string $court = null, string $returnUrl = null) {
+		$this->repository->setAppeal($appeal);
+		$this->repository->read($id);
+		if ($returnUrl) {
+			return $this->redirect($returnUrl);
+		}
+
 		return $this->redirect([
-			'/court/lawsuit/read-spi-notification',
-			'id' => $id,
+			'/court/lawsuit/spi-lawsuit',
+			'notificationId' => $id,
 			'appeal' => $appeal,
 			'signature' => $signature,
 			'court' => $court,

@@ -1,29 +1,32 @@
 <?php
 
 use common\helpers\Breadcrumbs;
-use common\helpers\Flash;
 use common\helpers\Html;
+use common\helpers\Url;
 use common\models\issue\IssueInterface;
 use common\modules\court\models\Lawsuit;
 use common\modules\court\models\LawsuitSession;
 use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
-use common\modules\court\modules\spi\entity\notification\NotificationViewDTO;
+use common\modules\court\modules\spi\entity\notification\NotificationDTO;
 use common\modules\court\widgets\LawsuitSmsBtnWidget;
 use common\modules\issue\widgets\IssueNotesWidget;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerDataColumn;
+use common\widgets\grid\DateTimeColumn;
 use common\widgets\grid\IssueColumn;
 use common\widgets\grid\IssueStageColumn;
 use common\widgets\grid\IssueTypeColumn;
 use common\widgets\GridView;
 use yii\data\ActiveDataProvider;
+use yii\data\DataProviderInterface;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
 /** @var Lawsuit $model */
 /** @var LawsuitViewIntegratorDto|null $lawsuitDetails */
-/** @var NotificationViewDTO|null $notificationDetails */
+/** @var DataProviderInterface|null $notificationsDataProvider */
+/** @var int|null $notificationId */
 
 $this->title = $model->getName();
 
@@ -46,12 +49,6 @@ if ($issueDataProvider->getTotalCount() === 1) {
 	$this->params['breadcrumbs'][] = $model->signature_act;
 } else {
 	$this->params['breadcrumbs'][] = $this->title;
-}
-if ($notificationDetails) {
-	Flash::add(
-		Flash::TYPE_INFO,
-		$notificationDetails->content . ' - ' . Yii::$app->formatter->asDatetime($notificationDetails->date)
-	);
 }
 YiiAsset::register($this);
 ?>
@@ -101,12 +98,62 @@ YiiAsset::register($this);
 				],
 			]) ?>
 
+			<?= $notificationsDataProvider ?
+				GridView::widget([
+					'dataProvider' => $notificationsDataProvider,
+					'caption' => Yii::t('court', 'Notification'),
+					'summary' => false,
+					'columns' => [
+						'type',
+						'content',
+						[
+							'class' => DateTimeColumn::class,
+							'attribute' => 'date',
+							'contentBold' => true,
+						],
+						[
+							'class' => ActionColumn::class,
+							'template' => '{read}',
+							'buttons' => [
+								'read' => function ($url, NotificationDTO $model, $key) {
+									if ($model->read) {
+										return '';
+									}
+									return Html::a(
+										Html::icon('check'),
+										[
+											'spi/notification/read',
+											'id' => $model->id,
+											'appeal' => $this->params['appeal'],
+											'returnUrl' => Url::current(),
+										], [
+											'data-method' => 'POST',
+										]
+									);
+								},
+							],
+						],
+					],
+					'rowOptions' => static function (NotificationDTO $data) use ($notificationId): array {
+						$options = [];
+						if ($data->read) {
+							Html::addCssClass($options, 'half-transparent');
+						}
+						if ($notificationId && $data->id === $notificationId) {
+							Html::addCssClass($options, 'warning');
+						}
+						return $options;
+					},
+				])
+				: ''
+			?>
 
 		</div>
 
 		<div class="col-md-7">
 
-			<?= GridView::widget([
+
+		<?= GridView::widget([
 				'dataProvider' => new ActiveDataProvider([
 					'query' => $model->getSessions(),
 				]),

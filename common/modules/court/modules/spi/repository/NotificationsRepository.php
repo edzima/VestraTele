@@ -6,6 +6,7 @@ use common\modules\court\modules\spi\entity\notification\NotificationDTO;
 use common\modules\court\modules\spi\entity\notification\NotificationViewDTO;
 use common\modules\court\modules\spi\helpers\ApiDataProvider;
 use Yii;
+use yii\data\DataProviderInterface;
 use yii\helpers\Json;
 
 class NotificationsRepository extends BaseRepository {
@@ -25,7 +26,18 @@ class NotificationsRepository extends BaseRepository {
 		'pagination' => [
 			'pageSize' => 50,
 		],
+		'sort' => [
+			'defaultOrder' => [
+				'date' => SORT_DESC,
+			],
+		],
 	];
+
+	public function findByLawsuit(int $lawsuitId): DataProviderInterface {
+		return $this->getDataProvider([
+			'lawsuitId.equals' => $lawsuitId,
+		]);
+	}
 
 	public function findModel(int $id, bool $cache = true): ?NotificationViewDTO {
 		$url = static::route() . '/' . $id;

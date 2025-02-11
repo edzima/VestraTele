@@ -97,8 +97,9 @@ class LawsuitController extends Controller {
 		return $this->renderContent($model->message);
 	}
 
-	public function actionReadSpiNotification(int $id, string $appeal, string $court = null, string $signature = null) {
+	public function actionSpiLawsuit(string $appeal, string $court = null, string $signature = null, int $notificationId = null) {
 		$searchModel = new LawsuitSearch();
+		$searchModel->spiAppeal = $appeal;
 		$searchModel->signature_act = $signature;
 		$searchModel->courtName = $court;
 
@@ -108,7 +109,7 @@ class LawsuitController extends Controller {
 				'create-from-spi-lawsuit',
 				'signature' => $signature,
 				'appeal' => $appeal,
-				'notificationId' => $id,
+				'notificationId' => $notificationId,
 			]);
 		}
 		if ($dataProvider->getTotalCount() === 1) {
@@ -118,7 +119,7 @@ class LawsuitController extends Controller {
 				'view',
 				'id' => $model->id,
 				'syncSpi' => true,
-				'spiNotificationId' => $id,
+				'spiNotificationId' => $notificationId,
 			]);
 		}
 		return $this->render('index', [
@@ -186,7 +187,7 @@ class LawsuitController extends Controller {
 						'view',
 						'id' => $model->getModel()->id,
 						'syncSpi' => true,
-						'spiNotificationId' => $model->getModel()->id,
+						'spiNotificationId' => $notificationId,
 					]
 				);
 			}
@@ -218,7 +219,7 @@ class LawsuitController extends Controller {
 	public function actionView(int $id, bool $syncSpi = false, int $spiNotificationId = null): string {
 		$model = $this->findModel($id);
 		$lawsuitDetails = null;
-		$notificationDetails = null;
+		$notificationsDataProvider = null;
 		if (!empty($model->signature_act)
 			&& Yii::$app->user->can(Module::PERMISSION_SPI_LAWSUIT_DETAIL)
 			&& $this->module->spi !== null
@@ -256,24 +257,22 @@ class LawsuitController extends Controller {
 						);
 					}
 				}
-				if ($spiNotificationId) {
+				if ($lawsuitDetails) {
 					$notificationRepository = $this->module->spi
 						->getRepositoryManager()
 						->getNotifications();
+					$notificationRepository->setAppeal($appeal);
 
-					$notificationDetails = $notificationRepository
-						->findModel($spiNotificationId);
-
-					if ($notificationDetails && !$notificationDetails->read) {
-						$notificationRepository->read($spiNotificationId);
-					}
+					$notificationsDataProvider = $notificationRepository
+						->findByLawsuit($lawsuitDetails->id);
 				}
 			}
 		}
 		return $this->render('view', [
 			'model' => $model,
 			'lawsuitDetails' => $lawsuitDetails,
-			'notificationDetails' => $notificationDetails,
+			'notificationsDataProvider' => $notificationsDataProvider,
+			'notificationId' => $spiNotificationId,
 		]);
 	}
 
