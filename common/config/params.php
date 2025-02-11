@@ -11,6 +11,7 @@ return [
 	'phoneInput.preferredCountries' => [
 		'PL',
 		'UA',
+		'GB',
 		'DE',
 		'NO',
 		'DK',
