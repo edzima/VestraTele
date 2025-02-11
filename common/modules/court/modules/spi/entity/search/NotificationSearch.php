@@ -2,6 +2,8 @@
 
 namespace common\modules\court\modules\spi\entity\search;
 
+use common\modules\court\modules\spi\components\LawsuitSignature;
+use common\modules\court\modules\spi\repository\LawsuitRepository;
 use common\modules\court\modules\spi\repository\NotificationsRepository;
 
 class NotificationSearch extends SearchModel {
@@ -12,6 +14,8 @@ class NotificationSearch extends SearchModel {
 	public string $type = '';
 	public string $content = '';
 	public $date;
+	public ?int $lawsuitId = null;
+	public ?LawsuitRepository $lawsuitRepository = null;
 
 	public function __construct(NotificationsRepository $repository, string $appeal, array $config = []) {
 		parent::__construct($repository, $appeal, $config);
@@ -20,18 +24,27 @@ class NotificationSearch extends SearchModel {
 	public function rules(): array {
 		return [
 			[['read'], 'boolean'],
-			[['courtName', 'signature', 'type', 'content'], 'string'],
+			[['signature', 'type', 'content'], 'string'],
 			[['date'], 'safe'],
+			['signature', 'trim'],
+			['signature', 'match', 'pattern' => LawsuitSignature::DEFAULT_PATTERN],
 		];
 	}
 
 	public function getApiParams(): array {
+		if (!empty($this->signature) && !empty($this->lawsuitRepository)) {
+			$repository = $this->lawsuitRepository;
+			$repository->setAppeal($this->appeal);
+			$lawsuit = $repository->findBySignature($this->signature);
+			if ($lawsuit) {
+				$this->lawsuitId = $lawsuit->id;
+			}
+		}
 		return [
 			'content.contains' => $this->content,
-			'courtName.contains' => $this->courtName,
 			'type.contains' => $this->type,
-			'signature.equals' => $this->signature,
 			'read.specified' => $this->read ? 'true' : 'false',
+			'lawsuitId.equals' => $this->lawsuitId,
 		];
 	}
 }

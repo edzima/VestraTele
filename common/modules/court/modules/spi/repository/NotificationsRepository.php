@@ -6,6 +6,7 @@ use common\modules\court\modules\spi\entity\notification\NotificationDTO;
 use common\modules\court\modules\spi\entity\notification\NotificationViewDTO;
 use common\modules\court\modules\spi\helpers\ApiDataProvider;
 use Yii;
+use yii\helpers\Json;
 
 class NotificationsRepository extends BaseRepository {
 
@@ -26,20 +27,32 @@ class NotificationsRepository extends BaseRepository {
 		],
 	];
 
-	public function findModel(int $id): ?NotificationViewDTO {
+	public function findModel(int $id, bool $cache = true): ?NotificationViewDTO {
 		$url = static::route() . '/' . $id;
+		if ($cache) {
+			$data = $this->getCacheValue($url);
+			if (!empty($data)) {
+				return $this->createModel(Json::decode($data));
+			}
+		}
+
 		$response = $this->getApi()->get($url);
 		if ($response->isOk) {
-			return $this->createModel($response->getData());
+			$data = $response->getData();
+			if ($cache) {
+				$this->setCacheValue($url, Json::encode($data));
+			}
+			return $this->createModel($data);
 		}
 		return null;
 	}
 
 	public function getUnread(bool $cache = true): ?int {
-		if ($cache && $this->getCache()) {
-			return (int) $this->getCacheValue($this->getAppeal() . ':unread', false);
-		}
+
 		$url = static::route() . '/unread';
+		if ($cache && $this->getCache()) {
+			return (int) $this->getCacheValue($url, false);
+		}
 		$response = $this->getApi()
 			->get($url);
 
@@ -48,7 +61,7 @@ class NotificationsRepository extends BaseRepository {
 			return null;
 		}
 
-		$this->setCacheValue($this->getAppeal() . ':unread', (int) $response->getData(), false);
+		$this->setCacheValue($url, (int) $response->getData(), false);
 		return $response->getData();
 	}
 

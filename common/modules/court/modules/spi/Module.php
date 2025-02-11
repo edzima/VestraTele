@@ -120,7 +120,7 @@ class Module extends BaseModule implements AppealInterface {
 			});
 		}
 		$api->availableAppeals = $this->appeals;
-		return $this->get('spiApi');
+		return $api;
 	}
 
 	public function getRepositoryManager($userId = null): RepositoryManager {

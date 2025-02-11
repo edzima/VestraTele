@@ -91,6 +91,7 @@ abstract class BaseRepository extends Component
 	}
 
 	public function getCacheValue(string $key, bool $decrypt = true, $defaultValue = null) {
+		$key = $this->getAppeal() . ':' . $key;
 		if ($this->getCache() === null) {
 			return false;
 		}
@@ -108,6 +109,7 @@ abstract class BaseRepository extends Component
 		if ($encrypt) {
 			$value = $this->encryptCacheValue($value);
 		}
+		$key = $this->getAppeal() . ':' . $key;
 		$this->getCache()->set($key, $value, $duration, $dependency);
 	}
 

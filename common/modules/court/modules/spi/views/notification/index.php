@@ -62,10 +62,10 @@ $this->params['breadcrumbs'][] = $this->title;
 			[
 				'class' => ActionColumn::class,
 				'template' => '{read} {view} ',
-				'urlCreator' => function ($action, $model, $key) use ($searchModel): string {
+				'urlCreator' => function ($action, NotificationDTO $model, $key) use ($searchModel): string {
 					return Url::to([
 						$action,
-						'id' => $key,
+						'id' => $model->id,
 						'appeal' => $searchModel->getAppeal(),
 						'signature' => $model->signature,
 						'court' => $model->courtName,
