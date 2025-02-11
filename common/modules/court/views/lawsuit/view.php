@@ -136,11 +136,14 @@ YiiAsset::register($this);
 					],
 					'rowOptions' => static function (NotificationDTO $data) use ($notificationId): array {
 						$options = [];
+						if (!$data->read) {
+							Html::addCssClass($options, 'warning');
+						}
 						if ($data->read) {
 							Html::addCssClass($options, 'half-transparent');
 						}
 						if ($notificationId && $data->id === $notificationId) {
-							Html::addCssClass($options, 'warning');
+							Html::addCssClass($options, 'success');
 						}
 						return $options;
 					},
@@ -153,7 +156,7 @@ YiiAsset::register($this);
 		<div class="col-md-7">
 
 
-		<?= GridView::widget([
+			<?= GridView::widget([
 				'dataProvider' => new ActiveDataProvider([
 					'query' => $model->getSessions(),
 				]),
