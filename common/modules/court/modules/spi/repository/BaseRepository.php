@@ -54,7 +54,7 @@ abstract class BaseRepository extends Component
 	}
 
 	protected function getApi(): SPIApi {
-		return $this->api->setAppeal($this->appeal);
+		return $this->api;
 	}
 
 	public function getDataProvider(array $params = [], string $url = null): DataProviderInterface {
@@ -91,10 +91,11 @@ abstract class BaseRepository extends Component
 	}
 
 	public function getCacheValue(string $key, bool $decrypt = true, $defaultValue = null) {
-		$key = $this->getAppeal() . ':' . $key;
 		if ($this->getCache() === null) {
 			return false;
 		}
+		$key = $this->getCacheKey($key);
+		Yii::warning($key, __METHOD__);
 		$value = $this->getCache()->get($key);
 		if ($value === false) {
 			return $defaultValue;
@@ -106,11 +107,17 @@ abstract class BaseRepository extends Component
 	}
 
 	public function setCacheValue(string $key, $value, bool $encrypt = true, $duration = null, $dependency = null): void {
-		if ($encrypt) {
-			$value = $this->encryptCacheValue($value);
+		if ($this->getCache()) {
+			if ($encrypt) {
+				$value = $this->encryptCacheValue($value);
+			}
+			$key = $this->getCacheKey($key);
+			$this->getCache()->set($key, $value, $duration, $dependency);
 		}
-		$key = $this->getAppeal() . ':' . $key;
-		$this->getCache()->set($key, $value, $duration, $dependency);
+	}
+
+	private function getCacheKey(string $key): string {
+		return md5($this->api->username . ':' . $this->getAppeal() . ':' . $key);
 	}
 
 	protected function getCache(): ?CacheInterface {

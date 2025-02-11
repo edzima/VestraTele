@@ -31,7 +31,9 @@ class NotificationController extends Controller {
 			$this->repository,
 			$appeal
 		);
-		$searchModel->lawsuitRepository = $this->module->getRepositoryManager()->getLawsuits();
+		$searchModel->lawsuitRepository = $this->module
+			->getRepositoryManager()
+			->getLawsuits();
 		$dataProvider = $searchModel->search(
 			Yii::$app->request->queryParams
 		);

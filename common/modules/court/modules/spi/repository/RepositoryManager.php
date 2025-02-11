@@ -3,14 +3,12 @@
 namespace common\modules\court\modules\spi\repository;
 
 use common\modules\court\modules\spi\components\SPIApi;
-use common\modules\court\modules\spi\Module;
 use Yii;
 use yii\base\Component;
-use yii\di\Instance;
 
 class RepositoryManager extends Component {
 
-	public $api = 'spiApi';
+	public SPIApi $api;
 	public $cache = 'cache';
 	public string $appeal;
 
@@ -62,15 +60,6 @@ class RepositoryManager extends Component {
 	public $proceedings = [
 		'class' => ProceedingsRepository::class,
 	];
-
-	public function init(): void {
-		$this->api = Instance::ensure(
-			$this->api,
-			SPIApi::class,
-			Module::getInstance()
-		);
-		parent::init();
-	}
 
 	public function getLawsuits(): LawsuitRepository {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */

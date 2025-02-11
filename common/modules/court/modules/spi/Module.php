@@ -9,6 +9,7 @@ use common\modules\court\modules\spi\repository\RepositoryManager;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
+use yii\di\Instance;
 
 class Module extends BaseModule implements AppealInterface {
 
@@ -101,8 +102,7 @@ class Module extends BaseModule implements AppealInterface {
 	}
 
 	public function getSpiApi(int $userId = null): SPIApi {
-		/* @var SPIApi $api */
-		$api = $this->get('spiApi');
+		$api = Instance::ensure($this->spiApi, SPIApi::class);
 		if ($this->bindUserAuth) {
 			if ($userId === null) {
 				$userId = Yii::$app->user->getId();

@@ -63,7 +63,10 @@ class NotificationsRepository extends BaseRepository {
 
 		$url = static::route() . '/unread';
 		if ($cache && $this->getCache()) {
-			return (int) $this->getCacheValue($url, false);
+			$value = $this->getCacheValue($url, false);
+			if (is_int($value)) {
+				return $value;
+			}
 		}
 		$response = $this->getApi()
 			->get($url);
@@ -72,9 +75,9 @@ class NotificationsRepository extends BaseRepository {
 			Yii::error($response->getData(), __METHOD__);
 			return null;
 		}
-
-		$this->setCacheValue($url, (int) $response->getData(), false);
-		return $response->getData();
+		$value = (int) $response->getData();
+		$this->setCacheValue($url, $value, false, rand(300, 360));
+		return $value;
 	}
 
 	public function read(int $id): ?bool {

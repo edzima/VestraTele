@@ -140,6 +140,9 @@ class SPIApi extends Component
 		}
 		$this->appeal = $appeal;
 		$this->baseUrl = $this->getAppealUrl($appeal);
+		if ($this->client !== null) {
+			$this->client->baseUrl = $this->baseUrl;
+		}
 		return $this;
 	}
 
@@ -158,7 +161,6 @@ class SPIApi extends Component
 			->setUrl($url)
 			->setMethod('GET')
 			->send();
-		codecept_debug($response->getData());
 		if ($response->isOk) {
 			$totalCount = $this->getTotalCount($response);
 			return new ArrayDataProvider([
@@ -279,18 +281,17 @@ class SPIApi extends Component
 	}
 
 	protected function getClient(): Client {
-		if ($this->client === null) {
-			$this->client = new Client($this->clientOptions);
-			$this->client->baseUrl = $this->baseUrl;
-			$this->client->on(
-				Client::EVENT_BEFORE_SEND,
-				[$this, 'beforeSend']
-			);
-			$this->client->on(
-				Client::EVENT_AFTER_SEND,
-				[$this, 'afterSend'],
-			);
-		}
+
+		$this->client = new Client($this->clientOptions);
+		$this->client->baseUrl = $this->baseUrl;
+		$this->client->on(
+			Client::EVENT_BEFORE_SEND,
+			[$this, 'beforeSend']
+		);
+		$this->client->on(
+			Client::EVENT_AFTER_SEND,
+			[$this, 'afterSend'],
+		);
 		return $this->client;
 	}
 
