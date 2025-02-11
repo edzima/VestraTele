@@ -3,10 +3,14 @@
 namespace common\modules\court\modules\spi\entity\search;
 
 use common\modules\court\modules\spi\components\LawsuitSignature;
+use common\modules\court\modules\spi\Module;
 use common\modules\court\modules\spi\repository\LawsuitRepository;
 use common\modules\court\modules\spi\repository\NotificationsRepository;
 
 class NotificationSearch extends SearchModel {
+
+	public $fromAt;
+	public $toAt;
 
 	public $read;
 	public $courtName;
@@ -25,9 +29,16 @@ class NotificationSearch extends SearchModel {
 		return [
 			[['read'], 'boolean'],
 			[['signature', 'type', 'content'], 'string'],
-			[['date'], 'safe'],
+			[['date', 'fromAt', 'toAt'], 'safe'],
 			['signature', 'trim'],
 			['signature', 'match', 'pattern' => LawsuitSignature::DEFAULT_PATTERN],
+		];
+	}
+
+	public function attributeLabels(): array {
+		return [
+			'fromAt' => Module::t('common', 'From At'),
+			'toAt' => Module::t('common', 'To At'),
 		];
 	}
 
@@ -40,11 +51,18 @@ class NotificationSearch extends SearchModel {
 				$this->lawsuitId = $lawsuit->id;
 			}
 		}
-		return [
+		$params = [
 			'content.contains' => $this->content,
 			'type.contains' => $this->type,
 			'read.specified' => $this->read ? 'true' : 'false',
 			'lawsuitId.equals' => $this->lawsuitId,
 		];
+		if (!empty($this->fromAt)) {
+			$params['date.greaterOrEqualThan'] = date(DATE_ATOM, strtotime($this->fromAt));
+		}
+		if (!empty($this->toAt)) {
+			$params['date.lessOrEqualThan='] = date(DATE_ATOM, strtotime($this->toAt));
+		}
+		return $params;
 	}
 }
