@@ -1,5 +1,6 @@
 <?php
 
+use common\helpers\Html;
 use common\helpers\Url;
 use common\modules\court\modules\spi\entity\document\DocumentInnerViewDto;
 use common\widgets\grid\ActionColumn;
@@ -29,7 +30,7 @@ use yii\web\View;
 			'downloaded:boolean',
 			[
 				'class' => ActionColumn::class,
-				'template' => '{view}',
+				'template' => '{download} {pdf}',
 				'urlCreator' => function ($action, DocumentInnerViewDto $model): string {
 					return Url::toRoute([
 						$action,
@@ -38,6 +39,23 @@ use yii\web\View;
 						'appeal' => $this->params['appeal'],
 					]);
 				},
+				'buttons' => [
+					'download' => function ($url): string {
+						return
+							Html::a(
+								Html::icon('download'),
+								$url,
+							);
+					},
+					'pdf' => function ($url): string {
+						return Html::a(
+							Html::icon('eye-open'),
+							$url, [
+								'target' => '_blank',
+							]
+						);
+					},
+				],
 			],
 		],
 	]) ?>

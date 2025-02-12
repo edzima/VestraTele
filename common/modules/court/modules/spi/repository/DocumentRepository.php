@@ -15,8 +15,11 @@ class DocumentRepository extends BaseRepository implements ByLawsuitRepository {
 		return DocumentInnerViewDto::class;
 	}
 
-	public function download(int $documentId): ?string {
+	public function download(int $documentId, bool $pdf = false): ?string {
 		$url = static::route() . '/download/' . $documentId;
+		if ($pdf) {
+			$url .= '/pdf';
+		}
 		$response = $this->getApi()
 			->get($url);
 		if ($response->isOk) {

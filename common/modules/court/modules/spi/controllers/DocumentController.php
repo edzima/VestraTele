@@ -36,10 +36,12 @@ class DocumentController extends Controller {
 
 	public function init(): void {
 		parent::init();
-		$this->view->params['appeal'] = $this->module->getAppeal();
+		$appeal = $this->module->getAppeal();
+		$this->view->params['appeal'] = $appeal;
 		$this->repository = $this->module
 			->getRepositoryManager()
-			->getDocuments();
+			->getDocuments()
+			->setAppeal($appeal);
 	}
 
 	public function actionLawsuit(int $id): string {
@@ -54,10 +56,21 @@ class DocumentController extends Controller {
 		return Json::encode($html);
 	}
 
-	public function actionView(int $id, string $fileName) {
+	public function actionDownload(int $id, string $fileName) {
 		$file = $this->repository->download($id);
 		if ($file) {
 			return Yii::$app->response->sendContentAsFile($file, $fileName);
+		}
+		throw new NotFoundHttpException();
+	}
+
+	public function actionPdf(int $id, string $fileName) {
+		$file = $this->repository->download($id, true);
+		if ($file) {
+			return Yii::$app->response->sendContentAsFile($file, $fileName, [
+				'mimeType' => 'application/pdf',
+				'inline' => true,
+			]);
 		}
 		throw new NotFoundHttpException();
 	}
