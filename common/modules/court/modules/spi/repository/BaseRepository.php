@@ -22,6 +22,8 @@ abstract class BaseRepository extends Component
 	public string $modelClass;
 	public ?Closure $createModel = null;
 
+	public ?int $cacheDuration = null;
+
 	/**
 	 * @var string|array|CacheInterface
 	 */
@@ -95,7 +97,6 @@ abstract class BaseRepository extends Component
 			return false;
 		}
 		$key = $this->getCacheKey($key);
-		Yii::warning($key, __METHOD__);
 		$value = $this->getCache()->get($key);
 		if ($value === false) {
 			return $defaultValue;
@@ -108,6 +109,9 @@ abstract class BaseRepository extends Component
 
 	public function setCacheValue(string $key, $value, bool $encrypt = true, $duration = null, $dependency = null): void {
 		if ($this->getCache()) {
+			if ($duration === null) {
+				$duration = $this->cacheDuration;
+			}
 			if ($encrypt) {
 				$value = $this->encryptCacheValue($value);
 			}
@@ -117,7 +121,7 @@ abstract class BaseRepository extends Component
 	}
 
 	private function getCacheKey(string $key): string {
-		return md5($this->api->username . ':' . $this->getAppeal() . ':' . $key);
+		return md5(static::class . ':' . $this->api->username . ':' . $this->getAppeal() . ':' . $key);
 	}
 
 	protected function getCache(): ?CacheInterface {

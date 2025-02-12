@@ -6,8 +6,11 @@ use common\modules\court\modules\spi\entity\lawsuit\LawsuitDetailsDto;
 use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
 use common\modules\court\modules\spi\helpers\ApiDataProvider;
 use Yii;
+use yii\helpers\Json;
 
 class LawsuitRepository extends BaseRepository {
+
+	public ?int $cacheDuration = 3600;
 
 	protected function route(): string {
 		return 'lawsuits';
@@ -32,7 +35,14 @@ class LawsuitRepository extends BaseRepository {
 		],
 	];
 
-	public function findBySignature(string $signature): ?LawsuitViewIntegratorDto {
+	public function findBySignature(string $signature, bool $cache = true): ?LawsuitViewIntegratorDto {
+		if ($cache) {
+			$data = $this->getCacheValue($signature, true, null);
+			if ($data !== null) {
+				$data = Json::decode($data);
+				return $this->createModel($data);
+			}
+		}
 		$dataProvider = $this->getDataProvider([
 			'signature.equals' => $signature,
 		]);
@@ -42,7 +52,10 @@ class LawsuitRepository extends BaseRepository {
 					. $signature . ' in Appeal: ' . $this->getAppeal());
 			}
 			$models = $dataProvider->getModels();
-			return $models[array_key_first($models)];
+			$model = $models[array_key_first($models)];
+			$data = Json::encode($model->toArray());
+			$this->setCacheValue($signature, $data);
+			return $model;
 		}
 		return null;
 	}

@@ -179,6 +179,12 @@ class LawsuitController extends Controller {
 		} else {
 			$model->issuesIds = $issueDataProvider->getKeys();
 			if ($model->save()) {
+				$createdModel = $model->getModel();
+				$createdModel->detachBehaviors();
+				$createdModel->updateAttributes([
+					'created_at' => date(DATE_ATOM, strtotime($lawsuit->createdDate)),
+					'updated_at' => date(DATE_ATOM, strtotime($lawsuit->modificationDate)),
+				]);
 				Flash::add(Flash::TYPE_SUCCESS,
 					Yii::t('court', 'Create Lawsuit for Issues: {issuesCount}', [
 						'issuesCount' => count($model->issuesIds),

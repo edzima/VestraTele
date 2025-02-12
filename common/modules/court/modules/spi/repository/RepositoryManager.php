@@ -76,17 +76,6 @@ class RepositoryManager extends Component {
 		return Yii::createObject($this->mergeWithCommonConfig($this->application), [$this->api]);
 	}
 
-	protected function mergeWithCommonConfig(array $config): array {
-		return array_merge($this->commonConfig(), $config);
-	}
-
-	protected function commonConfig(): array {
-		return [
-			'cache' => $this->cache,
-			'appeal' => $this->appeal,
-		];
-	}
-
 	public function getCourtSessions(): CourtSessionsRepository {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return Yii::createObject($this->mergeWithCommonConfig($this->courtSessions), [$this->api]);
@@ -105,6 +94,17 @@ class RepositoryManager extends Component {
 	public function getProceedings(): ProceedingsRepository {
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return Yii::createObject($this->mergeWithCommonConfig($this->proceedings), [$this->api]);
+	}
+
+	protected function mergeWithCommonConfig(array $config): array {
+		return array_merge($this->commonConfig(), $config);
+	}
+
+	protected function commonConfig(): array {
+		return [
+			'cache' => $this->cache,
+			'appeal' => $this->appeal,
+		];
 	}
 
 }

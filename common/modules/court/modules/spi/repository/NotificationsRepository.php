@@ -76,7 +76,7 @@ class NotificationsRepository extends BaseRepository {
 			return null;
 		}
 		$value = (int) $response->getData();
-		$this->setCacheValue($url, $value, false, rand(300, 360));
+		$this->setCacheValue($url, $value, false, rand(1800, 3600));
 		return $value;
 	}
 
