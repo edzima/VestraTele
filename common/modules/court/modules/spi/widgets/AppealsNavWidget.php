@@ -12,6 +12,9 @@ use yii\bootstrap\Nav;
 
 class AppealsNavWidget extends Widget {
 
+	public ?string $route = 'index';
+
+	public array $params = [];
 	public array $items = [];
 	public ?string $appealParamName = null;
 
@@ -81,12 +84,22 @@ class AppealsNavWidget extends Widget {
 		$items = [];
 		foreach ($appealsNames as $appeal => $name) {
 			$items[] = [
-				'url' => Url::current([$this->appealParamName => $appeal]),
+				'url' => $this->getUrl($appeal),
 				'label' => $this->getDefaultLabel($appeal, $name),
 				'active' => $appeal == $this->activeAppeal,
 			];
 		}
 		return $items;
+	}
+
+	protected function getUrl(string $appeal): string {
+		$params = $this->params;
+		$params[$this->appealParamName] = $appeal;
+		if ($this->route) {
+			array_unshift($params, $this->route);
+			return Url::to($params);
+		}
+		return Url::current($params);
 	}
 
 	protected function getDefaultLabel(string $appeal, string $name): string {
