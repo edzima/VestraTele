@@ -61,6 +61,19 @@ YiiAsset::register($this);
 			['lawsuit-session/create', 'lawsuitId' => $model->id], ['class' => 'btn btn-success'])
 		?>
 
+		<?= $lawsuitDetails
+			? Html::a(
+				Html::icon('refresh'), [
+				'sync-spi-session', 'id' => $model->id, 'spiId' => $lawsuitDetails->id,
+			], [
+				'title' => Yii::t('court', 'Sync Sessions'),
+				'aria-label' => Yii::t('court', 'Sync Sessions'),
+				'class' => 'btn btn-warning',
+				'data-method' => 'post',
+			])
+			: ''
+		?>
+
 		<?= Html::a(Yii::t('court', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 		<?= Html::a(Yii::t('court', 'Delete'), ['delete', 'id' => $model->id], [
 			'class' => 'btn btn-danger',
@@ -281,7 +294,10 @@ YiiAsset::register($this);
 	<div class="row">
 		<div class="col-sm-12">
 			<?php if ($lawsuitDetails): ?>
-				<?= $this->render('_spi_lawsuit_view', ['model' => $lawsuitDetails,]) ?>
+				<?= $this->render('_spi_lawsuit_view', [
+					'model' => $lawsuitDetails,
+					'lawsuitId' => $model->id,
+				]) ?>
 			<?php endif; ?>
 		</div>
 

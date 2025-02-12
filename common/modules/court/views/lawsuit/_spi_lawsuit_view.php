@@ -1,7 +1,6 @@
 <?php
 
 use common\helpers\Url;
-use common\models\user\User;
 use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
 use common\modules\court\modules\spi\Module;
 use kartik\tabs\TabsX;
@@ -11,6 +10,7 @@ use yii\widgets\DetailView;
 /** @var yii\web\View $this */
 /** @var LawsuitViewIntegratorDto $model */
 /** @var DataProviderInterface $parties |null */
+/** @var int $lawsuitId */
 
 $items = [
 
@@ -82,18 +82,17 @@ $items = [
 		],
 	],
 ];
-if (Yii::$app->user->can(User::ROLE_ADMINISTRATOR)) {
-	$items[] = [
-		'label' => Module::t('lawsuit', 'Sessions'),
-		'linkOptions' => [
-			'data-url' => Url::to([
-				'spi/lawsuit/sessions',
-				'id' => $model->id,
-				'appeal' => $this->params['appeal'],
-			]),
-		],
-	];
-}
+$items[] = [
+	'label' => Module::t('lawsuit', 'Sessions'),
+	'linkOptions' => [
+		'data-url' => Url::to([
+			'spi/lawsuit/sessions',
+			'id' => $model->id,
+			'appeal' => $this->params['appeal'],
+		]),
+	],
+];
+
 ?>
 <div class="court-lawsuit-spi-details-view">
 

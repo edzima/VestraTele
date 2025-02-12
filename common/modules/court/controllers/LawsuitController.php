@@ -13,8 +13,10 @@ use common\modules\court\models\LawsuitIssueForm;
 use common\modules\court\models\search\LawsuitSearch;
 use common\modules\court\Module;
 use common\modules\court\modules\spi\entity\lawsuit\LawsuitPartyDTO;
+use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
 use common\modules\court\widgets\LawsuitSmsBtnWidget;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -119,7 +121,6 @@ class LawsuitController extends Controller {
 			return $this->redirect([
 				'view',
 				'id' => $model->id,
-				'syncSpi' => true,
 				'spiNotificationId' => $notificationId,
 			]);
 		}
@@ -193,7 +194,6 @@ class LawsuitController extends Controller {
 				return $this->redirect([
 						'view',
 						'id' => $model->getModel()->id,
-						'syncSpi' => true,
 						'spiNotificationId' => $notificationId,
 					]
 				);
@@ -240,38 +240,15 @@ class LawsuitController extends Controller {
 					)
 				);
 			} else {
-				$repository = $this->module->spi
-					->getRepositoryManager()
-					->getLawsuits();
-
 				$this->view->params['appeal'] = $appeal;
-				$repository->setAppeal($appeal);
-				$lawsuitDetails = $repository
-					->findBySignature(
-						$model->signature_act,
-						$model->court->name,
-					);
 
-				if ($lawsuitDetails && $syncSpi) {
-					$sync = $this->module->getSpiSync();
-					if ($sync) {
-						$sync->sync(
-							$model,
-							$this->module->spi
-								->getRepositoryManager()
-								->getCourtSessions()
-								->getByLawsuit($lawsuitDetails->id)
-								->getModels()
-						);
-					}
-				}
+				$lawsuitDetails = $this->findSpiLawsuit($model);
+
 				if ($lawsuitDetails) {
-					$notificationRepository = $this->module->spi
+					$notificationsDataProvider = $this->module->spi
 						->getRepositoryManager()
-						->getNotifications();
-					$notificationRepository->setAppeal($appeal);
-
-					$notificationsDataProvider = $notificationRepository
+						->getNotifications()
+						->setAppeal($appeal)
 						->findByLawsuit($lawsuitDetails->id);
 				}
 			}
@@ -282,6 +259,62 @@ class LawsuitController extends Controller {
 			'notificationsDataProvider' => $notificationsDataProvider,
 			'notificationId' => $spiNotificationId,
 		]);
+	}
+
+	public function actionSyncSpiSession(int $id, ?int $spiId = null) {
+		$model = $this->findModel($id);
+		$appeal = $model->court->getSPIAppealWithParents();
+		if ($appeal === null) {
+			throw new InvalidConfigException('SPI appeal model must be set.');
+		}
+		if ($spiId === null) {
+			$spiLawsuit = $this->findSpiLawsuit($model);
+			$spiId = $spiLawsuit->id;
+		}
+		if ($spiId === null) {
+			throw new InvalidConfigException('spi id must be set.');
+		}
+		$spiModule = $this->module->getSPI();
+		$sessions = $spiModule->getRepositoryManager()
+			->getCourtSessions()
+			->setAppeal($appeal)
+			->getByLawsuit($spiId)
+			->getModels();
+		$sync = $this->module->getSpiSync();
+		$count = $sync->sync($model, $sessions);
+		if ($count) {
+			Flash::add(
+				Flash::TYPE_SUCCESS,
+				Yii::t('court', 'Update Sessions: {count}', [
+					'count' => $count,
+				])
+			);
+		} else {
+			Flash::add(
+				Flash::TYPE_INFO,
+				Yii::t('court', 'All sessions is already synced.'),
+			);
+		}
+		return $this->redirect(['view', 'id' => $model->id]);
+	}
+
+	private function findSpiLawsuit(Lawsuit $model): ?LawsuitViewIntegratorDto {
+		if ($this->module->getSPI() === null) {
+			throw new InvalidConfigException('SPI module not configured');
+		}
+		$appeal = $model->court->getSPIAppealWithParents();
+		if ($appeal === null) {
+			Yii::warning('Not found SPI Appeal for Court: ' . $model->court->name);
+			return null;
+		}
+		return $this->module->getSPI()
+			->getRepositoryManager()
+			->getLawsuits()
+			->setAppeal($appeal)
+			->findBySignature(
+				$model->signature_act,
+				$model->court->name,
+			);
 	}
 
 	/**

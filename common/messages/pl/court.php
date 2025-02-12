@@ -57,4 +57,7 @@ return [
 	'Parties' => 'Podmioty',
 	'Create Lawsuit for Issues: {issuesCount}' => 'Dodano Rozprawę do Spraw: {issuesCount}',
 	'Not found Issue for User: {user}' => 'Nie znaleziono Spraw dla {user}',
+	'Update Sessions: {count}' => 'Zaktualizowano Posiedzenia: {count}',
+	'Sync Sessions' => 'Synchronizuj Posiedzenia z SPI',
+	'All sessions is already synced.' => 'Wszystkie posiedzenia są aktualne.',
 ];
