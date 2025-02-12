@@ -35,16 +35,18 @@ class LawsuitRepository extends BaseRepository {
 		],
 	];
 
-	public function findBySignature(string $signature, bool $cache = true): ?LawsuitViewIntegratorDto {
+	public function findBySignature(string $signature, string $courtName, bool $equals = true, bool $cache = true): ?LawsuitViewIntegratorDto {
 		if ($cache) {
-			$data = $this->getCacheValue($signature, true, null);
+			$data = $this->getCacheValue($courtName . ':' . $signature . ':' . $equals, true, null);
 			if ($data !== null) {
 				$data = Json::decode($data);
 				return $this->createModel($data);
 			}
 		}
+
 		$dataProvider = $this->getDataProvider([
-			'signature.equals' => $signature,
+			'signature.' . ($equals ? 'equals' : 'contains') => $signature,
+			'courtName.' . ($equals ? 'equals' : 'contains') => $courtName,
 		]);
 		if ($dataProvider->getTotalCount()) {
 			if ($dataProvider->getTotalCount() > 1) {
@@ -54,7 +56,7 @@ class LawsuitRepository extends BaseRepository {
 			$models = $dataProvider->getModels();
 			$model = $models[array_key_first($models)];
 			$data = Json::encode($model->toArray());
-			$this->setCacheValue($signature, $data);
+			$this->setCacheValue($courtName . ':' . $signature . ':' . $equals, $data);
 			return $model;
 		}
 		return null;

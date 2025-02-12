@@ -2,7 +2,6 @@
 
 namespace common\modules\court\modules\spi\entity\search;
 
-use common\modules\court\modules\spi\components\LawsuitSignature;
 use common\modules\court\modules\spi\Module;
 use common\modules\court\modules\spi\repository\LawsuitRepository;
 use common\modules\court\modules\spi\repository\NotificationsRepository;
@@ -28,10 +27,19 @@ class NotificationSearch extends SearchModel {
 	public function rules(): array {
 		return [
 			[['read'], 'boolean'],
-			[['signature', 'type', 'content'], 'string'],
+			[['signature', 'type', 'content', 'courtName'], 'string'],
 			[['date', 'fromAt', 'toAt'], 'safe'],
-			['signature', 'trim'],
-			['signature', 'match', 'pattern' => LawsuitSignature::DEFAULT_PATTERN],
+			[
+				'signature', 'required', 'when' => function () {
+				return !empty($this->courtName);
+			},
+			],
+			[
+				'courtName', 'required', 'when' => function () {
+				return !empty($this->signature);
+			},
+			],
+			[['signature', 'courtName'], 'trim'],
 		];
 	}
 
@@ -39,14 +47,18 @@ class NotificationSearch extends SearchModel {
 		return [
 			'fromAt' => Module::t('common', 'From At'),
 			'toAt' => Module::t('common', 'To At'),
+			'courtName' => Module::t('notification', 'Court Name'),
+			'signature' => Module::t('notification', 'Signature'),
 		];
 	}
 
 	public function getApiParams(): array {
-		if (!empty($this->signature) && !empty($this->lawsuitRepository)) {
+		if (!empty($this->lawsuitRepository) && (
+				!empty($this->signature) && !empty($this->courtName)
+			)) {
 			$repository = $this->lawsuitRepository;
 			$repository->setAppeal($this->appeal);
-			$lawsuit = $repository->findBySignature($this->signature);
+			$lawsuit = $repository->findBySignature($this->signature, $this->courtName, false);
 			if ($lawsuit) {
 				$this->lawsuitId = $lawsuit->id;
 			}

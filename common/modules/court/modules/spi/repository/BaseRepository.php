@@ -80,6 +80,12 @@ abstract class BaseRepository extends Component
 		if (!isset($config['modelClass'])) {
 			$config['modelClass'] = $this->modelClass();
 		}
+		if (!isset($config['api'])) {
+			$config['api'] = $this->api;
+		}
+		if (!isset($config['url'])) {
+			$config['url'] = static::route();
+		}
 		/** @noinspection PhpIncompatibleReturnTypeInspection */
 		return Yii::createObject($config);
 	}

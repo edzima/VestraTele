@@ -110,6 +110,7 @@ class LawsuitController extends Controller {
 				'signature' => $signature,
 				'appeal' => $appeal,
 				'notificationId' => $notificationId,
+				'courtName' => $court,
 			]);
 		}
 		if ($dataProvider->getTotalCount() === 1) {
@@ -128,7 +129,7 @@ class LawsuitController extends Controller {
 		]);
 	}
 
-	public function actionCreateFromSpiLawsuit(string $signature, string $appeal, int $notificationId = null) {
+	public function actionCreateFromSpiLawsuit(string $signature, string $appeal, string $courtName, int $notificationId = null) {
 		$spiModule = $this->module->getSPI();
 		if (!$spiModule) {
 			throw new NotFoundHttpException('SPI Module must be set.');
@@ -140,7 +141,7 @@ class LawsuitController extends Controller {
 			->getRepositoryManager()
 			->getLawsuits()
 			->setAppeal($appeal)
-			->findBySignature($signature);
+			->findBySignature($signature, $courtName);
 
 		if ($lawsuit === null) {
 			throw new NotFoundHttpException('Not found SPI Lawsuit');
@@ -248,6 +249,7 @@ class LawsuitController extends Controller {
 				$lawsuitDetails = $repository
 					->findBySignature(
 						$model->signature_act,
+						$model->court->name,
 					);
 
 				if ($lawsuitDetails && $syncSpi) {
