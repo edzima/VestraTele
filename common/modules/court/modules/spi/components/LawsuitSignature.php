@@ -4,7 +4,7 @@ namespace common\modules\court\modules\spi\components;
 
 class LawsuitSignature {
 
-	public const DEFAULT_PATTERN = '/^([A-Za-z]+) ([A-Za-z]+) (\d+)\/(\d+)$/';
+	public const DEFAULT_PATTERN = '/^([A-Za-z0-9]+) ([A-Za-z]+) (\d+)\/(\d+)$/';
 
 	private string $signature;
 
