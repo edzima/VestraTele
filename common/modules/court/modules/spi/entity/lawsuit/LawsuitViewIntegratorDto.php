@@ -15,7 +15,7 @@ class LawsuitViewIntegratorDto extends Model {
 	public string $subject;
 	public ?string $value;
 	public ?string $result;
-	public string $receiptDate;
+	public ?string $receiptDate;
 	public ?string $finishDate;
 	public string $lastUpdate;
 	public int $repertory;
